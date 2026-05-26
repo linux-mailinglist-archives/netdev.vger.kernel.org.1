@@ -1,170 +1,225 @@
-Return-Path: <netdev+bounces-291548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291549-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHYeDHZAFWrJTwcAu9opvQ
-	(envelope-from <netdev+bounces-291548-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:40:54 +0200
+	id AIWxBbxBFWrJTwcAu9opvQ
+	(envelope-from <netdev+bounces-291549-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:46:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2805D13C8
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:40:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A735D14AE
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D22E73019129
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:40:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D6D8303FAC5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AE43B47F7;
-	Tue, 26 May 2026 06:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9B33C3798;
+	Tue, 26 May 2026 06:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unisoc.com header.i=@unisoc.com header.b="byeEHSRI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i0h5xWi6"
 X-Original-To: netdev@vger.kernel.org
-Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCCF3C197F
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D515E3C197F
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779777651; cv=none; b=fDwdnVO/xsQ1P1mS5l5Lmi/RGHgpdTr9JQfyy0II8neOw5DURD599IVz9S0PWAaV1qXPbuV1NdPLNeXBHW5eHBh+Ncnb/PVaWs05POGP3ZwUJKT5pv/nNruDeb8E39YOrFHZUBe2lzRzEB9p7eiqvvBd1oCu18DBDtp+GQQz/fI=
+	t=1779777888; cv=none; b=munwPtVgx98L1xYnglkW7iOfy6l2o9GdPJE+gBvZHpd/8cw9NFJC/BatSqn5Q1nZwEtyAhsZuCw+VctqblvJErUxDG2IB5JGi9eBKllOhVF3lsXNACYK2qZ9789CNbOQVOyV+y5gnDhciKFZLVE/AdQXmvdRasbwfqw7vHUlu+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779777651; c=relaxed/simple;
-	bh=6++EXalkr1z+1YxLK5Lqh9d9XYSOkDSGBELY93mK0ug=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fjGg1WfC8iVduVpaK2nowj9jI7V5ROb5nR9FlLfONuYTQ+tyr20dxfP3WD0Cgc5cYIR5iT75VUeNqM5QYut75xrxQb8Y6zYX1zHwt5BaKmSoxyOeVxcUf9lhif+LcD8eK3jWPIUDcmEJ2IWtlp6pwuLtN8pcQcJbd4SNbeiQT3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; dkim=pass (2048-bit key) header.d=unisoc.com header.i=@unisoc.com header.b=byeEHSRI; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 64Q6b5MH064945;
-	Tue, 26 May 2026 14:37:05 +0800 (+08)
-	(envelope-from Xuewen.Yan@unisoc.com)
-Received: from SHDLP.spreadtrum.com (BJMBX01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4gPjcW1jZzz2LmTMS;
-	Tue, 26 May 2026 14:33:15 +0800 (CST)
-Received: from BJ10918NBW01.spreadtrum.com (10.0.73.73) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 26 May 2026 14:37:02 +0800
-From: Xuewen Yan <xuewen.yan@unisoc.com>
-To: <edumazet@google.com>, <kuniyu@google.com>, <pabeni@redhat.com>,
-        <willemb@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-        <horms@kernel.org>
-CC: <peterz@infradead.org>, <mingo@redhat.com>, <vincent.guittot@linaro.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ke.wang@unisoc.com>, <guohua.yan@unisoc.com>, <Wade.Shu@unisoc.com>,
-        <xuewen.yan94@gmail.com>, <di.shen@unisoc.com>
-Subject: [RFC PATCH] net/core: use wake_up_interruptible_poll() in sock_def_readable()
-Date: Tue, 26 May 2026 14:36:50 +0800
-Message-ID: <20260526063650.952-1-xuewen.yan@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1779777888; c=relaxed/simple;
+	bh=cLgEFYb9vPxgOhRC0ZF0n+Bf95kheC+pGLWemGnfodE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HOesS0ucj/xXlBQzYWRMJR+dk7S2ZLyiDd+ME3FkFz2kL9lrk26ux1pdiEOHuWcOdOBD6kAkujlbjVqZpMd/wVUu05GRxT1CGHEgvIo8rM+cN4E4egZi95iU+SUsInuWOiB0bcImhzDjUkfLi9KAkrhacH9LG0VGkh63aqLp0Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i0h5xWi6; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d92bc603-e345-4dee-9ae9-6ad45e4e6642@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779777874;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DeEV2RRWQsIvQLf46WVN6yblZQZCu/TNWjyKT0rKgO4=;
+	b=i0h5xWi64e1mCrdbRhD8PWRHV36oUuAj4/VLRHWQReoudCWnkWInwKKpUcV7qG/JaiPp8i
+	pMroPjWZ2cxNNWigqTfR5/p7JtasT6W6NfOXGiP0mAsqmSnXTXB1uai1/rxxp4LaEwV42c
+	4MGluiNqz8aHSOst79LbTtdz0t7WSNc=
+Date: Tue, 26 May 2026 14:44:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 64Q6b5MH064945
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unisoc.com;
-	s=default; t=1779777434;
-	bh=djV8qmH+Giaw08bWUC0A/JKUSvRmpthyO/rKydTHshU=;
-	h=From:To:CC:Subject:Date;
-	b=byeEHSRISqyprBlQThzD8C5+xuk4M2PZ80/SNyPl6v+gbETvoaW4Zotkap/6xib9G
-	 QKJIWfR5xwCfsCy1ZcHGpVRr2Pya5dAS6+kN49kgjUJ/ZLRJRGI9ddU6LuJ9zH1p1C
-	 +pD8+ELuPMTI6YDbPJ702zcuww99uLNsVLCEegwdiZ8fcbK5S5EmdyjR1haYOg+Nnu
-	 jzG5MrsQQP8btShUAtDoL6m6rkOLNFuxrDMoczRXdwUocsC5Vd8wjbWpaowR0w44O4
-	 RuByg8RZz6ynyvSVtKtP8bRS3pDpCdKt1N0uuWv2WpCVSVgAHksCxayNTLQffbv4lh
-	 /+YdaketGgtBw==
-X-Spamd-Result: default: False [0.34 / 15.00];
+Subject: Re: [PATCH net v3] net: tls: use sync AEAD for sk_msg BPF sockets
+To: Christopher Lusk <clusk@northecho.dev>, Jakub Kicinski <kuba@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20260526025154.60607-1-clusk@northecho.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260526025154.60607-1-clusk@northecho.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[unisoc.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[unisoc.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[infradead.org,redhat.com,linaro.org,vger.kernel.org,unisoc.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291548-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291549-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuewen.yan@unisoc.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[unisoc.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[unisoc.com:email,unisoc.com:mid,unisoc.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9C2805D13C8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[northecho.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 65A735D14AE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-sock_def_readable() currently uses wake_up_interruptible_sync_poll() to
-wake up tasks waiting for readable data on a socket. The _sync variant
-sets the WF_SYNC flag, which tells the scheduler that the waker will
-schedule away soon, so the wakee should stay on the same CPU to avoid
-needless cache bouncing.
 
-However, we found that the following stack:
- -vfs_write
- -sock_write_iter
- -unix_stream_sendmsg
- -sock_def_readable
- -__wake_up_sync_key
+On 5/26/26 10:51 AM, Christopher Lusk wrote:
+> The kTLS TX path can hand an open record to a sk_msg verdict
+> program before encryption.  If the verdict applies fewer bytes
+> than the open record contains, tls_push_record() splits
+> ctx->open_rec into the record being encrypted and a remainder.
+> The synchronous path reattaches that remainder before continuing.
+>
+> With an async AEAD provider, crypto_aead_encrypt() can return
+> -EINPROGRESS after ctx->open_rec has been unhooked but before the
+> split remainder is reattached.  The remainder is no longer
+> reachable through ctx->open_rec or ctx->tx_list, silently dropping
+> transmitted data and leaking the unreachable tls_rec.  The same
+> composition also entangles the user-page zerocopy lifetime rules
+> with an async completion path.
+>
+> A sockmap cannot be attached to a socket after an inet ULP is
+> installed: sk_psock_init() returns -EINVAL when
+> inet_csk_has_ulp() is true.  So the supported ordering for
+> sockmap + kTLS TX is sockmap first, TLS_TX setup second.  When
+> TLS_TX setup sees an existing sk_psock, allocate the AEAD with
+> CRYPTO_ALG_ASYNC masked out and latch the TX zerocopy gate
+> (sw_ctx_tx->async_capable) so the buggy composition becomes
+> structurally unreachable.  Ordinary kTLS sockets without sk_msg
+> BPF attached are unaffected and continue to use async-capable
+> providers.
+>
+> Fixes: d3b18ad31f93 ("tls: add bpf support to sk_msg handling")
+> Cc: stable@vger.kernel.org # 4.20+
+> Signed-off-by: Christopher Lusk <clusk@northecho.dev>
+> Assisted-by: Codex:gpt-5.5
+> Assisted-by: Claude:claude-opus-4-7
+> ---
+>
+> Changes since v2 [1]:
+> - Per netdev maintainer guidance [2], replace the Option-C
+>    drain-on-error fix with a setup-time surface narrowing in
+>    tls_set_sw_offload(): when a sockmap is already attached at
+>    TLS_TX setup, request a synchronous AEAD (CRYPTO_ALG_ASYNC in
+>    the allocation mask) and set sw_ctx_tx->async_capable = 1.
+>    Both moves are needed: latching async_capable alone disables
+>    zerocopy but tls_do_encryption() can still return -EINPROGRESS
+>    on the copy path; selecting a sync provider removes that return
+>    path for sk_msg-attached sockets.
+> - Drop the selftest from the series per Jakub's note that the
+>    existing sockmap + TLS coverage at
+>    tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c exercises
+>    this configuration [3].  That suite covers sockmap + kTLS
+>    policy paths broadly; the specific async-pcrypt pass-then-drop
+>    failure mode from the v2 reproducer was validated for v3 on
+>    QEMU/KVM with a KASAN+LOCKDEP-instrumented kernel against net
+>    base 2156a29aecff before send.
+> - Single-patch series.
+>
+> Changes since v1:
+> - v1's remainder-rooting fix was incomplete; Sashiko AI review
+>    surfaced a real UAF in the v2 follow-up that John Fastabend
+>    endorsed on the v1 thread [4].  The surface-narrowing approach
+>    in v3 makes both failure modes unreachable by avoiding the
+>    async + sk_msg composition entirely rather than patching each
+>    continuation point.
+>
+> [1] https://lore.kernel.org/all/20260521025840.976378-1-clusk@northecho.dev/
+> [2] https://lore.kernel.org/all/20260525133028.58494274@kernel.org/
+> [3] https://lore.kernel.org/all/20260525133048.2dc6d8d3@kernel.org/
+> [4] https://lore.kernel.org/all/huduxtn6parzgiaf5cyiyrrvjjvx6jsdedowvrd4nkwmuyeind@j6migjgofh2i/
+>
+>   net/tls/tls_sw.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 964ebc268..0000000 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -2867,7 +2867,20 @@ int tls_set_sw_offload(struct sock *sk, int tx,
+>   	rec_seq = crypto_info_rec_seq(src_crypto_info, cipher_desc);
+>
+>   	if (!*aead) {
+> -		*aead = crypto_alloc_aead(cipher_desc->cipher_name, 0, 0);
+> +		u32 mask = 0;
+> +
+> +		if (tx) {
+> +			struct sk_psock *psock;
+> +
+> +			psock = sk_psock_get(sk);
+> +			if (psock) {
+> +				mask = CRYPTO_ALG_ASYNC;
+> +				sw_ctx_tx->async_capable = 1;
+> +				sk_psock_put(sk, psock);
+> +			}
+> +		}
+> +
+> +		*aead = crypto_alloc_aead(cipher_desc->cipher_name, 0, mask);
+>   		if (IS_ERR(*aead)) {
+>   			rc = PTR_ERR(*aead);
+>   			*aead = NULL;
+> --
+> 2.54.0
 
-In this process-context scenario, the waker does NOT go to sleep
-after the wakeup. With WF_SYNC, the scheduler is misled into placing
-the wakee on the waker's CPU (via wake_affine_idle()'s sync path when
-nr_running == 1), causing both the sender and receiver to contend for
-the same CPU. This may hurt throughput for IPC workloads on multi-core
-systems where the sender and receiver could otherwise run in parallel
-on different CPUs.
+If async_capable is set to 1, the zerocopy path in tls_sw_sendmsg() is 
+skipped.
+Unfortunately ktls with bpf_msg_pop_data() does not work correctly under 
+this
+copy path.
 
-Switch to wake_up_interruptible_poll() which does not set WF_SYNC.
-This allows the scheduler to freely migrate the wakee to an idle CPU,
-enabling true parallelism between the sending and receiving processes.
+tls_clone_plaintext_msg() aliases msg_pl onto msg_en's plaintext area 
+(in-place encryption).
 
-Co-developed-by: Guohua Yan <guohua.yan@unisoc.com>
-Signed-off-by: Guohua Yan <guohua.yan@unisoc.com>
-Signed-off-by: Xuewen Yan <xuewen.yan@unisoc.com>
----
-Note:
-The possible cost is that for softirq callers (TCP/UDP receive path), the wakee
-may be migrated away from the current CPU where the received data is
-cache-hot. However, this is mitigated by:
-  - The scheduler's existing wake_affine logic which already considers
-    cache affinity regardless of WF_SYNC.
+BPF runs bpf_msg_pop_data(msg, 0, 2). This shifts msg_pl's SG entry 
+forward by 2 bytes.
+The two SGs now point to the same page at different offsets. Physical 
+memory overlaps but the start of
+address differ.
 
-We are not very familiar with the networking code here,
-so we would greatly appreciate any suggestions or advice from the community.
+I think selecting a sync provider via mask = CRYPTO_ALG_ASYNC is 
+sufficient to
+remove the -EINPROGRESS return path.
 
-Thanks！
----
- net/core/sock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+May be time to remove skmsg from ktls? (disable by default first, 
+re-enable via a new ktls module_param?)
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index b37b664b6eb9..42ab9373194f 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3611,7 +3611,7 @@ void sock_def_readable(struct sock *sk)
- 	rcu_read_lock();
- 	wq = rcu_dereference(sk->sk_wq);
- 	if (skwq_has_sleeper(wq))
--		wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN | EPOLLPRI |
-+		wake_up_interruptible_poll(&wq->wait, EPOLLIN | EPOLLPRI |
- 						EPOLLRDNORM | EPOLLRDBAND);
- 	sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
- 	rcu_read_unlock();
--- 
-2.25.1
 
 
