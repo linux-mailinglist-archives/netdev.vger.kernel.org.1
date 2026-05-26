@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-291697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPxJHeGfFWr9WgcAu9opvQ
-	(envelope-from <netdev+bounces-291697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:28:01 +0200
+	id 6JriJm+hFWprWwcAu9opvQ
+	(envelope-from <netdev+bounces-291698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:34:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24295D677B
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:28:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA3C5D694F
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:34:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E4BDB30117B9
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 13:27:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2BFC43006173
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 13:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A463ECBF9;
-	Tue, 26 May 2026 13:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10EA3DF00D;
+	Tue, 26 May 2026 13:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="HBaRLyxj"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="Sa3Gxj9N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486A63DD86E
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 13:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4238338424D
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 13:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779802077; cv=none; b=JTSt0kPCffUE9kw49M//OqZhVR/oj+6GxmiHDspt9/9VXsE3/31rwj0f9wj4DS2Vvie07jBTlssv6IwRgejadMIc8PLec0JEg63y5dRf5iA/EXqNmK+BatDhqU/63BawRo5CM12Wr1p/ItSsAi/SViMcE2WHhZ6v/zvkHdTggHU=
+	t=1779802125; cv=none; b=joytlso5xDgqlGFDpMluZv4v6jMdlP//E4FoUGa80uQv5cAbmOlKrATfM6ka4ZnTHoiPmtSy0Qx0aKgMypM0BDAW2/7ZZoObf69dEznVKP7oAn6U6DRFuPYr7AQokbnm5LprsBR7+AuRgin7epE4OZB8QH2t87HcQE5oI3Pi9xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779802077; c=relaxed/simple;
-	bh=AF9tJ1amhlOtaGqlNAAzlZV5h8kKDyKt4veK2cMLXSI=;
+	s=arc-20240116; t=1779802125; c=relaxed/simple;
+	bh=/tryWe3YGVmPy2bnscHQmtWVBpbnu81ctvwLdXdUsQA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=STfTFQqD922Rl21M4nFi8zF+B8q9PWYUHQyf6OEM0wlxW6tl5Ff1/MtTqcdiqaLHIJZN2C0hYq25X781kZP+Pa8ytMri6fGl96FYHWVCXTtGPgbn+ne4aiOlcZNPmWr3g7GAEPLTRDCQGjwg6ssyfy6/RSUz8DtP3/fOYEINQ1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=HBaRLyxj; arc=none smtp.client-ip=209.85.128.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=IBS3dKmAwre1PAvyrqpeeY4DQ07j9wMnzaUArhCFYQ/jIPVPmXzYVkgkjVkFyqwEOFWJ/VBet/nzwcd+wNoeSEeP4r72hX2ZAgc3Vz3Oa2FQaO6T3ESlCkQRD4lR9ZFMveuxVdxfP/EoyrCqmqXL84fU461X8u0ySsuNviDSIuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=Sa3Gxj9N; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48a3e9862f0so56144595e9.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:27:55 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-449de065cb3so10340826f8f.2
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 06:28:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1779802074; x=1780406874; darn=vger.kernel.org;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1779802123; x=1780406923; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AF9tJ1amhlOtaGqlNAAzlZV5h8kKDyKt4veK2cMLXSI=;
-        b=HBaRLyxjsk7oX4LbiLb9W999vqrijrauxMeckZV0VurpePTiRVimPMI07awDRiEsRC
-         0XctatJoPWKkufRNLwIfApuji12tyL5KUL4xzCooR5JHAxzxMlSvAdGYipjN1n360Clm
-         fQ6FiucmsJvMepzIivy6ZXYsE4DSMa3kR+6FEE8hlSMs3/J52Uaq6f2tZxpZCtceczka
-         vbo0aooDPZ2+adfF1CpmfKy+38ns5Aj9DRHZFkNh288y+b4sewpCIHI1A/FRKmAc/VVP
-         Bu+Xm5PKnRXaqoSRsWCB2QSmneLMKwBWPfX0J0GfGu03KeL/sQNF0ACs5C/TQ7g4t8kG
-         H8SQ==
+        bh=/tryWe3YGVmPy2bnscHQmtWVBpbnu81ctvwLdXdUsQA=;
+        b=Sa3Gxj9N4zYyVCeYM7RxRX5XlzQpApirGVszxxhw4ikjqhCT1Jce0EnGeiXi+OGSc2
+         DDnkZlmZe5nZYF4plWmTKCMUh6zRb2bq+zDMs7zYD0pJ93ArgHVzoG5crSVgvunYy/Em
+         TOhQr+itjfud0Dq0AyFKEFGNkxt0a8GjQzop29wN6HijhwpHghzVKaQD1bHF5yE2DnoA
+         /UAnQ5mcMeQI9aTYWjHwQoH1l3k4l8tkCXBFco3HF5G8UnIViZ9DtGIqr5NCk7o+Muar
+         DNtZRQPmsm1BNHgV0Okym7iyRrNqemwr1Z8fX3Fl18sU708/lxrl765OH+FOzcIkefw5
+         cTJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779802074; x=1780406874;
+        d=1e100.net; s=20251104; t=1779802123; x=1780406923;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AF9tJ1amhlOtaGqlNAAzlZV5h8kKDyKt4veK2cMLXSI=;
-        b=DJhehzMAo5sROvBk9WjC1k2ydj7M+oq4jW1ZH1ua4VZywJ41u8bZ6r5tg5p6FGZmRr
-         PNf9wnD2vThCQCpKtMcaolv0kBZr7VsNWAPGaoopscwAzOQR01V/Ma6UiB/ohPm7EDp3
-         yUc1jxTMGZcJIzno3emDJoMUZvSkkhf4aSdA56xlUwombpk/ivqEB2Yg9U0gSrLP5XXI
-         914Nxyq+wZNv28IsPW5Ueg9K+kAFVvk6xunQ4PharzyyjPb7NkCR/afAoCKW7fr/mMuA
-         hjKPnTvMMWjZrd1XE544PzqVt4E/ggJ9YLui5e/cW9pdN1M8dqNA5SPv03JwpyK/iKnN
-         VS6g==
-X-Gm-Message-State: AOJu0Yz9AZcD/OdiDEAf7NML1rprjxdKnca0gmykxzsOFBE07ua0fTiy
-	zvAc7J8L9YW1QkrU8lzUiah1DCGvWFamPAy+aEz+DFbbihPavFALo9WFErtPYQuruIY=
-X-Gm-Gg: Acq92OE9DHeCX1gutSxYjtg4OdgSlgZ/CMwLgAcnr44J34d64kVk48p9tiYeFfd+lLT
-	yNNEZGoLYsvc6BNVitor5g1638z3VG6q+2cRtrFAAz4RC13jBAKpEbixvBpYGbDQP5W+PUJCbgF
-	r9NPDH5MF8xk4iuLfhDCIMjeQI03herlKBr0Eq1tzYv2rj+epMohbLvDb/ea2B+2nbvZs9Hs6aP
-	sBgYeX0ssjxuyImG/ztzbii+7toHZyeW0e3kMMXc4REnrDEyT8k38V91fCLiNOrdJU2Ka/enhxM
-	f6atwO3HBqx75Wr9td/FSBlD6/0wnfQgvuakib0CbGmAlrpY4C+D8o4ghvdbrBgs0vR49macuf2
-	IskPOsJWH01S240PmMODKBqOA/ulC9YvK2tl93wL1OXcSyUUkf2RzIcP2F+E/fsAaw8Ub2fY2Qb
-	jsHYySH+CF5BMzHm8/3Omu+NR9FGjbYqz19A4Rr2J2Bv0=
-X-Received: by 2002:a05:600d:4448:20b0:48f:d620:c27f with SMTP id 5b1f17b1804b1-490422687c3mr189986545e9.4.1779802073553;
-        Tue, 26 May 2026 06:27:53 -0700 (PDT)
+        bh=/tryWe3YGVmPy2bnscHQmtWVBpbnu81ctvwLdXdUsQA=;
+        b=PrHknjy49lSaPrVjqkHxqKg2TmDawuweEToFrC43DryVxA2YbMOALAScgA4VQqAIvH
+         M+Im0Nz0446LMxqucAoUGpmprm094eX9VYfoiM80xxDO+rrRHMs9YINotFGqTa7KsDdC
+         vu8BiDKfUc5PW/rGKu/NyrZuimd+fyrBthMGV1smMVwT8nyQS2AhXxYZTEvOwpMncx0m
+         6nGfys920fknuV+wI7WpyGlqiURq4PsaTgJ2aINOo+n5hEjnFi+CSKH3LEUNx0VLGUAQ
+         A/9fVw2F+07/jXbp8NI/+FvobHPfkErj6D9J8xxxPako3bXpiiotCCC2UiqrsrfFQl3t
+         Csmw==
+X-Gm-Message-State: AOJu0YwrfoeYXnzmrL+HV5by65+L3+/T2oIp4f/1T2JnX49gsukS4M2u
+	GU9vWLwstFSvk/gQutebzqO2Mms8UV2nD1J6Yw5MJEcbTSdra4dhcBQWWWFmyJcWM20=
+X-Gm-Gg: Acq92OH0tVbi2B2vAwjHfFmx0sfoz8DI14XYsHm5mNTbDP9yD7sX//j1qoqR8Q+oArP
+	XPdxFQ5hfPg0+dEXXs1rg+Q08dRp6eZlWuJAn6foF5TUkhGgMiwOYGJNVVcBxA0iKw1E3Uj10+y
+	5F0TREu8CAuYLw9PEZLV9ROZqjj6zUd/z4C0j02eHDM7mrFISClHlzTEesQPQ7pBrBrWque0IRG
+	5Snbq6iGkwo43oRaGN1JfRYRttBmyDVZLrYp2JWD76BGSn6vyXcjoSLhlCkXqPgSh4mG1FjAJC2
+	KPnTXXiXsIwlAc5SQ59TVFe6pMQxyEf85vDinWbOIilKhx9V94p2ahOHWKgmYuMYnptaGnG7RDQ
+	tVBvvfY8+V6BYHWuQBxhWJ6lWDasuPZ92hQELw2DNhL8uc++RPfHpAicQxodOS+jl9VYxuwnT/Q
+	HZ8O2xiTgtIlKB6PCPdyJ8GOyrT39X5bdV+fwAPxZm/SQ=
+X-Received: by 2002:a05:6000:1a85:b0:43d:762e:76ba with SMTP id ffacd0b85a97d-45eb367fb35mr31350080f8f.17.1779802122476;
+        Tue, 26 May 2026 06:28:42 -0700 (PDT)
 Received: from localhost ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49045284855sm330056955e9.0.2026.05.26.06.27.52
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d4741bsm37119736f8f.22.2026.05.26.06.28.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 06:27:53 -0700 (PDT)
-Date: Tue, 26 May 2026 15:27:49 +0200
+        Tue, 26 May 2026 06:28:42 -0700 (PDT)
+Date: Tue, 26 May 2026 15:28:38 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,11 +84,10 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	vadim.fedorenko@linux.dev, donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com, 
 	kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH v11 net-next 4/8] dpll: allow fwnode pins to attempt
- state change without capability bit
-Message-ID: <ahWf0HAr3sRfXw0Q@FV6GYCPJ69>
+Subject: Re: [PATCH v11 net-next 1/8] dpll: add generic DPLL type
+Message-ID: <ahWgAPoysfluToIf@FV6GYCPJ69>
 References: <20260526093419.639220-1-grzegorz.nitka@intel.com>
- <20260526093419.639220-5-grzegorz.nitka@intel.com>
+ <20260526093419.639220-2-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,56 +96,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260526093419.639220-5-grzegorz.nitka@intel.com>
+In-Reply-To: <20260526093419.639220-2-grzegorz.nitka@intel.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291697-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291698-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[resnulli-us.20251104.gappssmtp.com:server fail,nvidia.com:server fail,sto.lore.kernel.org:server fail];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[resnulli.us];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,linux.dev,kernel.org,davemloft.net,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.996];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,linux.dev,kernel.org,davemloft.net,google.com];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,nvidia.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F24295D677B
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20251104.gappssmtp.com:dkim,nvidia.com:email,intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0BA3C5D694F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Tue, May 26, 2026 at 11:34:15AM +0200, grzegorz.nitka@intel.com wrote:
->Pins registered with an fwnode may have .state_on_dpll_set implemented
->without advertising DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE upfront.
->Requiring the bit for fwnode pins ties firmware description to driver
->implementation details unnecessarily.
+Tue, May 26, 2026 at 11:34:12AM +0200, grzegorz.nitka@intel.com wrote:
+>Add DPLL_TYPE_GENERIC to represent DPLL devices which do not fit the
+>existing PPS or EEC classes.
 >
->Relax the capability check in dpll_pin_state_set() and
->dpll_pin_on_pin_state_set(): when a pin has an associated fwnode, bypass
->the capability gate and let the ops layer decide, returning -EOPNOTSUPP
->if .state_on_dpll_set is absent. Non-fwnode pins retain the original
->strict behavior.
+>The UAPI type is intentionally generic. During netdev discussion,
+>maintainers pointed out that introducing identifiers tied to a specific
+>placement or single design does not scale across ASICs and vendors.
+>The role of a DPLL is already inferable from the spawning driver,
+>bus device, and pin topology, without encoding additional
+>purpose-specific taxonomy in the type name.
 >
->This is used later in the series by the SyncE_Ref output pin, which
->relies on the fwnode path for state control.
+>Using a generic type keeps the UAPI extensible and avoids premature
+>naming that may become incorrect as new hardware topologies are
+>exposed through the DPLL subsystem.
+>
+>Expose the new type through UAPI and netlink specification as "generic".
 >
 >Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 >Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
