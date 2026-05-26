@@ -1,186 +1,150 @@
-Return-Path: <netdev+bounces-291879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IK+2GoLqFWqXegcAu9opvQ
-	(envelope-from <netdev+bounces-291879-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:46:26 +0200
+	id ABJtF5rsFWogfAcAu9opvQ
+	(envelope-from <netdev+bounces-291880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:55:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B6C5DB84D
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:46:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C505DB9B3
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 37E533014833
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:46:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D881730AEA74
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CDB3446B0;
-	Tue, 26 May 2026 18:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A676C3BFE24;
+	Tue, 26 May 2026 18:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZzsmxkpU"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R66C3xZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062602DEA7B
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 18:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC67D2DEA7B;
+	Tue, 26 May 2026 18:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779821184; cv=none; b=Gz0R+JXgnS4+e4XL2WIJjant4jkq80OmFbo52LjNR+uIFE/m59nP8KJxrvO3uEaZ3hcVv3VjZlNt5DvNF1IWTf0CKQpjFNPGaN45tozJ9TkogN9bV400RQvZ3qOkYOPxA3tKvJV8iTZMZPnnfOi0loufJa9pbKXMenHpwX+L2v0=
+	t=1779821331; cv=none; b=r6P+uedlxGUZqMuUAf4kScRJz5grShd0Roxf33SU93Muwl1QUyvK4z80kgMTwnXv38hqMOQHCxQQXl2mzbCjHhbHfQmBNULy5QdTr4LGzWlmDDA/CLN93gR8uS8zYlBigbKLk0ANHm+1Qy9MwBrtRAk3vrP1dAP9uBW/Iaa495g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779821184; c=relaxed/simple;
-	bh=XdW9He5EDu8NwLUMQOJO5rBU9vk4TninkbjLV/S6asg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FokF+OTyEgeqtjUMNiFoVigedO36clASe0J2HNleblArdjjVC8TdwckiCJEI4h2X77AhpBq+EDdC2uftt+T+ltOHpQujkv6IOjMa98rJN403XnAPhWU1QraeGxKKc/CPd7r0vjErb1T5C14D880F+DWm3rlFeIbVI8NVgxodE/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZzsmxkpU; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7c23248f3a3so115576177b3.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 11:46:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779821182; x=1780425982; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sr3UqMOgY8Q0sOVcNzul/LXQuYjMqGkRarSoqlIbOyM=;
-        b=ZzsmxkpUc05f7wiPWwm7aNDiOKxACVbJl3J/NATKTztPi+CYy3kd/YjhMFmXvvZHBD
-         iz/mcuQkT36erQydBwzaaII8V+uZGugdYhrcZnWRNnwYW2j8SmMSne4kQv3hMz5gfB9l
-         HTdAQEYsPBEYI+MM/JS45lKMR08Spa0FGOfym7gOJ2b+ToI3hE2LprcLxrWTZaeDo1ue
-         RzDHSGyAkOv+TjLuiRvaGFqYdy0S/g0yr7KddA+S3Jh2JB6RDkbSC0cmWIYqQqiU9/3q
-         YdBCSB5/ljq1dSZLMVdfrbSUfuIx0G/jC59N/KLSyFedogwOTPjMZUn3VSVqbHP1QeQW
-         KgMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779821182; x=1780425982;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sr3UqMOgY8Q0sOVcNzul/LXQuYjMqGkRarSoqlIbOyM=;
-        b=s30O+Hi4Wx7fCbxJyzH8ge6dDQHWORSIB5jT4TXi6fb2VuozC8BWx2tXGoWmLFCR4w
-         WUpieR8/E/3kxStqMglDAgzys0Tl5pOj+0HGamZ5hMCoAhb5OFopNAznzi5NYXfKTwpk
-         OsWYauaMj7oEbZqYNVkjh2BcNLBivnBzt0Bv0m73JMUmK1GZ5OM8X+DLPOivF0u+ZO5t
-         gZz7quKxa1cGWBhJEyPRmaaTLOUgLNpjrUOZIOC2TengWdFTi7SsISCQWXYObptCwdYz
-         gjnWYs9zV01T5c+gYiqYkBhLpYqBAnUj7dSYoYQXsbI2pSYUO5/O+zkenfG0dtVvE3Df
-         Q/rQ==
-X-Gm-Message-State: AOJu0Yypdeq/CbQvq7gogoGm9yid2Y5qGbmrIV47JLG4rKieOBUvEuPJ
-	NV+Y+pTooDU6e4oqLb6YhiD/IuVpxdCY1UeNgCJm+ywaNINmKqG82ZErqkUHhg==
-X-Gm-Gg: Acq92OHaj3o5Nr8ali1LxveX5uplHIzpAbmezR1t/M0ui9JP1+SMVr0mrToXy6XsJvH
-	bkasxJBwLga6+L+twh5irpM2dWXynMLCjPOqXI7fHFVgRIoUjMqT7ef6TkjiEZEZ1v97YsrFYP6
-	4xaw3pgDrEuakPU8PFmObD1gClCf0QRfA2puAhmDCGkU1MgNq7epAneygbXroa4SC0+LaJtLPXP
-	6pbMzamR+dC7Cgu7mJVim8fQNSwvFhUVtsm4yDkcvhcwPPyPeV+5rEagPZ2l0w7NlWc81Q5MrzT
-	hYZYNUSvqifEdnbuEQZx5Vgg3zdfhSXYytVb+pennwO6l8gvhKhb0qmfl2J8gcHKOcNKgCJ+t1E
-	mWmpQEPz4jqv6dvD3yMT7YFg/9/5NCLLE+llaZt4ezZdTVgEuL+ASZbbL2F+xvKVCgH6ygxXKeQ
-	3RX9kNbJJEi7EvLnxjbUeCfMps/ypnHF/S7tazTAJTwsr0S4s2eVQi3PXxAvFBxaIsHycoj1pf/
-	yQlklHvQFawz6xViw==
-X-Received: by 2002:a05:690c:3388:b0:7bd:9ce7:164c with SMTP id 00721157ae682-7d338682c32mr218938457b3.43.1779821181917;
-        Tue, 26 May 2026 11:46:21 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7d389813ee6sm64269647b3.2.2026.05.26.11.46.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 11:46:20 -0700 (PDT)
-Date: Tue, 26 May 2026 14:46:20 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- richardcochran@gmail.com, 
- yangbo.lu@nxp.com, 
- kuniyu@google.com, 
- willemb@google.com, 
- matttbe@kernel.org
-Message-ID: <willemdebruijn.kernel.178a41a53d041@gmail.com>
-In-Reply-To: <20260526153650.2779821-1-kuba@kernel.org>
-References: <20260526153650.2779821-1-kuba@kernel.org>
-Subject: Re: [PATCH net] ethtool: vclock: propagate errors from
- ptp_get_vclocks_index()
+	s=arc-20240116; t=1779821331; c=relaxed/simple;
+	bh=0EL5x8+TZGDIraf8UUqY4kkZjJXXT2+S4iC1J4z4c40=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=isj3vgzOVBAcWAwI7RzxUUgTVWmJE4oixWg4X+08KlS+S1K8GDRdMw8vyRGlrHzeOXsQc3+m9u7iYTEABwU/Ln+UqMfB4b9frk6hAnMzKXfUSLG/M/lzIp9MhkUD8E7ipmuCvXYoAikEoaIo7oxYZ95UbTMr6Dlv3FVYr9nyFQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=R66C3xZB; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=q/mZfeEODQi26JC8lul3a6HKpuOhERZOr6DhpJHYplI=; b=R66C3xZBbD38swfm8X5Vh9TTpY
+	3SCmWbtjQQxY4g53/24j0E6g5BmFHCepoU9D4IVSOikao7MYHfk47j9MqtB0SaFFJHMWiS9UJ+yNe
+	L2t3blbuZ+47pt3gboRA77PLNaIAlzaFbhNAr0REeS2CP16Lxr95arGiA/OIr7bxJnMM5Xk4Z2VZU
+	bEcvzfqXtR5GOQqA3cotbxYWRLh6xe4JlXZeLjTZUqfKtmFo80+dX+ePmi4O45l4hZxbOqU2qbnh1
+	gneSXiuj7uYtTkpiJzWqLH7XY5KsL30BtHzcpuQN1sHL5m33t3m6ZNs6URQpC6dx453beQHLQyfuN
+	JJNI+ltg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wRwpX-00000002sMM-1vN0;
+	Tue, 26 May 2026 18:48:43 +0000
+Message-ID: <1c341b25-e720-4f63-9db1-99348c8ebed9@infradead.org>
+Date: Tue, 26 May 2026 11:48:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/10] docs: net: updates for old and cobwebbed
+ docs
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+ vladimir.oltean@nxp.com, willemb@google.com, sdf.kernel@gmail.com,
+ ecree.xilinx@gmail.com, jesse.brandeburg@intel.com, linux-doc@vger.kernel.org
+References: <20260526160151.2793354-1-kuba@kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260526160151.2793354-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291879-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,nxp.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291880-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.764];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 05B6C5DB84D
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:mid,infradead.org:dkim]
+X-Rspamd-Queue-Id: C1C505DB9B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Jakub Kicinski wrote:
-> ptp_get_vclocks_index() was written with sock_timestamping_bind_phc()
-> in mind. Any return <= 0 will get converted to EINVAL by the virtue
-> of sock_timestamping_bind_phc() not finding a matching vclock.
+Hi,
+
+On 5/26/26 9:01 AM, Jakub Kicinski wrote:
+> I'm hoping to start feeding our docs into the AI review tools, instead
+> of maintaining a separate repo with review prompts. To experiment with
+> that we have to refresh the docs a little bit.
 > 
-> ethtool's phc_vclocks_prepare_data(), however, should not be silently
-> returning empty messages on allocation errors or when PHC does not
-> exist at all.
+> A read thru our current docs makes one slightly question the value
+> of including them in reviews. But directionally, I feel, it's probably
+> still right. I'm hoping the Rx Checksum section about not dropping packets
+> for example to be impactful. I don't think the current AI agents or
+> review docs include this guidance.
 > 
-> Commit c156174a6707 ("ethtool: add a new command for getting PHC virtual
-> clocks") added phc_vclocks_prepare_data(), but let's not treat this
-> as a fix in case some user space app now depends on the failures being
-> silent.
+> Jakub Kicinski (10):
+>   docs: net: netdevices: small fixes and clarifications
+>   docs: net: fix minor issues with driver guide
+>   docs: net: statistics: fix kernel-internal stats list
+>   docs: net: update devmem code examples
+>   docs: net: fix minor issues with the NAPI guide
+>   docs: net: refresh netdev feature guidance
+>   docs: net: fix minor issues with checksum offloads
+>   docs: net: add Rx notes to the checksum guide
+>   docs: net: render the checksum comment in checksum-offloads.rst
+>   docs: net: fix minor issues with segmentation offloads
 > 
-> The check in sock_timestamping_bind_phc() is not strickly necessary,
-
-strictly
-
-> but include it just for clarity.
+>  .../networking/checksum-offloads.rst          | 67 ++++++++++++-------
+>  Documentation/networking/devmem.rst           | 27 +++-----
+>  Documentation/networking/driver.rst           |  7 +-
+>  Documentation/networking/napi.rst             | 11 ++-
+>  Documentation/networking/netdev-features.rst  | 60 +++++++++++------
+>  Documentation/networking/netdevices.rst       | 31 +++++----
+>  .../networking/segmentation-offloads.rst      | 37 +++++++++-
+>  Documentation/networking/skbuff.rst           |  6 --
+>  Documentation/networking/statistics.rst       | 19 ++++--
+>  9 files changed, 172 insertions(+), 93 deletions(-)
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+There is one more cleanup that you could do. Current (linux-next) docs builds
+give this warning:
 
->  
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index b37b664b6eb9..9e33e979a283 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -870,6 +870,8 @@ static int sock_timestamping_bind_phc(struct sock *sk, int phc_index)
->  
->  	num = ethtool_get_phc_vclocks(dev, &vclock_index);
->  	dev_put(dev);
-> +	if (num < 0)
-> +		return num;
->  
->  	for (i = 0; i < num; i++) {
->  		if (*(vclock_index + i) == phc_index) {
+WARNING: ../include/linux/netdevice.h:2622 Excess struct member 'ax25_ptr' description in 'net_device'
 
-Not for this patch:
+-- 
+~Randy
 
-This is called by sk_setsockopt and by MPTCP for every subflow.
-Apparently MPTCP does not check the return value. Should it?
 
