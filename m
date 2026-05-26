@@ -1,341 +1,319 @@
-Return-Path: <netdev+bounces-291816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EagBUzKFWqQbgcAu9opvQ
-	(envelope-from <netdev+bounces-291816-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:29:00 +0200
+	id kP1uIc3NFWoTcAcAu9opvQ
+	(envelope-from <netdev+bounces-291813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:43:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64305D9B3C
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:28:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD3E15D9EA5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 086E33072350
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:14:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD9833186E72
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD5D3AFAFE;
-	Tue, 26 May 2026 16:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B6A3B0AFB;
+	Tue, 26 May 2026 16:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="QZSqFMy5";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tAuUr4ho"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpQ4xLvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4713B1EFD
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027FC3B0AF3;
+	Tue, 26 May 2026 16:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779812022; cv=none; b=oCVCwlXeZZC9Aqmqc+KWGJq6umesZqsZERgUMYkDR8gQ/ElR+pdj7Ja/fwhgKRU83r9MHho3PzUj4RirtVJVkmDGixiO5SO+fHf+zKyG4PvBDFEp1Yl69l+DYkcUmYDPQ8qGzP+MPNQM2lwNKQ7qm9zpSkuloiyVa9w0OkSRvsI=
+	t=1779812015; cv=none; b=f3MfrkLmZ5wBRVR+uD19Wfj3bJOhUo7JwvFTWDqeAM17tOqYcUpq6MDG8dm9YSwp58Fv7JIMTvrxeZYfw6Z0+5RDgPmQ9odzEZtrg8SdTBUBBLNvHROPZYqgiBuXDEQ4ijU0M8i0cmd2csPDp98qI4ju1Sf33UdFn9Hsx+i8fMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779812022; c=relaxed/simple;
-	bh=DjeN6lTADd7fG+xpyXI1/+U5FZ0nGwKOHJ3l1lyZoQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EtMfXwlnC/2hq0YhxiokG1spoWPh8dQPe4d3yXpgzh7rtF297UATMClFr6+z09z53gSGnzatqzIRGZUi96Tr6DW5uDEkGdMTi/y1xgjyS4sbwG4Z6L/FvfYY4pk91sr2lJR4RSt0NWedbqt7qaFyuCr2idpxut5/9+3JOJm0M+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=QZSqFMy5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tAuUr4ho; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id C466C7A00C3;
-	Tue, 26 May 2026 12:13:39 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Tue, 26 May 2026 12:13:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1779812019; x=
-	1779898419; bh=hFNcEk+TmU5HYBFJy6O6RRsYd8hYtY3ne/SAFwsMj84=; b=Q
-	ZSqFMy5JobieEIM9o2mtTPmQbS5jdJ+Y6b8M/xedlQEAMsznRu+72JWHEfdm2275
-	sTc3R3WNRy0cLdBuaS1k2Nrl7rIn5tgBe5vnE+PwxT2Ws9zCZ4TyvK5fe3llPUS9
-	PZx5kHISbpjB11zs5iRS9FoSXEXHxoUEFXjKC1agncb7sUU8Ndm3GFLqY3hUfPU5
-	K7ZKNwhkjg2FaIH9gw7fgqfLTBjKwAJ85Ad7GTPuqeEZe+Dkcikod46eNoK1lRQO
-	H0xS5fb6iaiBn4AlhhwQIBXouXb2p7n7nBFEiSL9E84+uC9s1oS6qmpmgGEuwp4d
-	v2KrnBH3A/QR18CIzOHCg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1779812019; x=1779898419; bh=h
-	FNcEk+TmU5HYBFJy6O6RRsYd8hYtY3ne/SAFwsMj84=; b=tAuUr4hoL92uUOuoY
-	xS5uI0c6wayOCuJGZQVRYZ+ckdxNNJhag8L8aNS+ObmnRq5DhYaQI2Qg+pwPlY/B
-	DudCj2fxqvlLhIHxGfeOH/6glj3lT0SQUdTXy2Bsf1moxBE7fU0hzdcne+RmPIF4
-	ZxCRdwPL7OT5RqmT9gQKy62j3XwD9Jb1GlZC76QNjuT4Wvu8huWbHXcmfvihPIL3
-	R2XuQX2CV8t2zcYpC5yJ+Ij0bBW0UbkoIx4EehWgF7LOukvHDwq0qcP22g2GuFGh
-	Chlz+2dNDJ6gN/o8RC2Qhp86h8ftvb6YDhvSExbknfLvs121kYHG460/SWjoC7n9
-	thw6A==
-X-ME-Sender: <xms:s8YVaqpAaJr3Sk1i6Mzbq7NU-najVIa0HKstJK3K_NW7IJz9BSYGAg>
-    <xme:s8YVanKCulAzn1afcsCXERWuleG9RLa1veqYuM1n72EJjklcZv7FNoRlusBVUp_fR
-    HDj73kT6ybNeNqtqD9XZtgJKC2PCRnsLH9XWELJk9T8kn3B7fB-dLI>
-X-ME-Received: <xmr:s8YVamASsINmTeBonoGXifc2BOP_7az9I_5RCHeTvrrZXOKty7DlcYx4_6uMp3mJVKKJVRMdfa_wmh6PzppoSZ-B_a_ZNS-odUMOAw>
-X-ME-Proxy-Cause: dmFkZTG4G9zbtpZgR+LIx8EkHbmWKiCUD5lWWjQ7rQgOwm/VyUoO4wynI5PAYAu1dD2VK+
-    aE6JARqIKgaU0Q1bOd4rLnkhu7UmRwqeTgvkSV5d7grxG9FOkQ0oQeRmYwxzVcDeyksT5X
-    MnuMadVg8leAkVjnwRPLpa+FDPLAPVROlFfmUAgtPHyfk3o9NrypRZ0abuRJIK8O5lp5p8
-    tzBD3Olzgd7un01+SJnRGQin/adteeVD2Zbc2V/ul/M6kb/60qayxpEi+pujApdRm0DdBA
-    gAhadAA2ZHV1xUAE8cGyD+tUbCqQfxKzuc5eRxGV7Mo52+ocM4y7T5twJ1LOAdcR6Qctcd
-    DOCcTd58m1wr2W13ShpN0v3zziiQ/STgq6um8hgiyDvlI4lgHXoPiLyPf+TWPiOMb3tBCu
-    Yqe6GloJfPgX/6LCjT/11N9Bb3mi/Vy+FnV1p5OVVsyVCPLqa67QoCnMVf7M5HLpkMlYzI
-    ZcDv0ZfPbzt42UuBQu6f49ihunGBQ3lDhnEzG+h1msc4dYavv0thP/PpojWUwKsy7UzMc0
-    riYqU+GiJzMIYAF4FpJvdhQebykkxwrz9gmMEAxTbuENWsGcFXTom/m8aqmJ5mybpulQoP
-    YA5jnU9GI63XrXbZNmAOZVwexlRrvKtTSt5ecJZaoJgbmZU2xb2+I4ro6+Sw
-X-ME-Proxy: <xmx:s8YVap5eYEQ61oUGJ7wUCyO_N1dPGvPBes48_WH8MK1iQkf_g7huZQ>
-    <xmx:s8YVaiF7sb8FfGP0VCoQmPw6pVqpcQMFfAew4_7ThM_5lN1SHfqDEw>
-    <xmx:s8YVakSR1W_0HOVi9UBHZxKWpJd1vDnNYgzsx1ufm9KWJBljPj7bpA>
-    <xmx:s8YVasf3zj8FnXA3MflOCfVmZKoYDKKRgM1lyjrtWPxaoEjacBKv0Q>
-    <xmx:s8YVanGRyay8QxSaIHpuRxUQzcwzpoQkcSrA91OHNmX3Al8zUZkPBGHM>
-Feedback-ID: i559e4809:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 26 May 2026 12:13:38 -0400 (EDT)
-From: Alice Mikityanska <alice.kernel@fastmail.im>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org,
-	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v5 11/11] selftests: net: Add a test for BIG TCP in UDP tunnels
-Date: Tue, 26 May 2026 18:12:00 +0200
-Message-ID: <20260526161200.1135899-12-alice.kernel@fastmail.im>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260526161200.1135899-1-alice.kernel@fastmail.im>
-References: <20260526161200.1135899-1-alice.kernel@fastmail.im>
+	s=arc-20240116; t=1779812015; c=relaxed/simple;
+	bh=xW7mQnwXGedcSKCCtrk1aQP/FL3phBCCx5+Hkemnwac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qNSpMQpPsN7jvvBuLP065QSTefo8xdkX18U3h2fl/Oz/Qdn2Chr7gfE/893lddsd96ZrZgenVF4pii8auqwmCwnpQFt3+bV+568//4ePhWAWViwsuvyG+9NvRPScrB1UoFcbaihf64P2b7CM8uvIhRJvMNyi9i02LbyaKxPN8ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpQ4xLvT; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B75F1F000E9;
+	Tue, 26 May 2026 16:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779812013;
+	bh=HoQ502gwpeiNp5KJxRq0pIgzkr0RP/tEx2RDysEICWw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=OpQ4xLvTA4MJ2XS4/Vzdju1ys4yv/uQ85topgEYflLbhAA+30vT7ARUmzmvcB/T77
+	 s1M3fGkNAq2adWMicf7Qw3bch7WWAf11yxvEGYj8io1m1Rs94FPDZ6bzh3UvkO5Owy
+	 5SMqjHw6gSZfdvJZOi+Qk+Sw6+qwprY11fe6oU5YpprUv9BPObJ16z4A8NQ21DAsBo
+	 BFgwbdoLUSLINdcXBiS25P4kP2OcrQgYYHLpItpcamJFTyGyVJQhyNYTsnMLowV6/9
+	 wXK0teGW1H8GSpIOWjz1Q0VXcoLj3vt0G/R8kD1l8WeX61h64NZ3Nq79MJ28Z5pDRC
+	 GqjLQst7v2aYw==
+Date: Tue, 26 May 2026 21:43:19 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: bod@kernel.org
+Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, mchehab@kernel.org,
+	elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v7 00/15] firmware: qcom: Add OP-TEE PAS service support
+Message-ID: <ahXGn4wrEozWd_Ur@sumit-xelite>
+References: <20260522115936.201208-1-sumit.garg@kernel.org>
+ <177975399325.14006.12128272008783925649.b4-reply@b4>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <177975399325.14006.12128272008783925649.b4-reply@b4>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-291816-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291813-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[isovalent.com:email,messagingengine.com:dkim,fastmail.im:mid,fastmail.im:dkim,big_tcp_tunnels.sh:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C64305D9B3C
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: CD3E15D9EA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alice Mikityanska <alice@isovalent.com>
+Hey Brian,
 
-The test sets up VXLAN and GENEVE tunnels over IPv4 and IPv6 and runs
-IPv4 and IPv6 traffic through them with BIG TCP enabled. It checks that
-a non-negligible amount of big aggregated packets are seen in tcpdump.
+On Tue, May 26, 2026 at 01:06:33AM +0100, bod@kernel.org wrote:
+> On 2026-05-22 17:29 +0530, Sumit Garg wrote:
+> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > 
+> > Qcom platforms has the legacy of using non-standard SCM calls
+> > splintered over the various kernel drivers. These SCM calls aren't
+> > compliant with the standard SMC calling conventions which is a
+> > prerequisite to enable migration to the FF-A specifications from Arm.
+> > 
+> > OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+> > support these non-standard SCM calls. And even for newer architectures
+> > using S-EL2 with Hafnium support, QTEE won't be able to support SCM
+> > calls either with FF-A requirements coming in. And with both OP-TEE
+> > and QTEE drivers well integrated in the TEE subsystem, it makes further
+> > sense to reuse the TEE bus client drivers infrastructure.
+> > 
+> > The added benefit of TEE bus infrastructure is that there is support
+> > for discoverable/enumerable services. With that client drivers don't
+> > have to manually invoke a special SCM call to know the service status.
+> > 
+> > So enable the generic Peripheral Authentication Service (PAS) provided
+> > by the firmware. It acts as the common layer with different TZ
+> > backends plugged in whether it's an SCM implementation or a proper
+> > TEE bus based PAS service implementation.
+> > 
+> > The TEE PAS service ABI is designed to be extensible with additional API
+> > as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
+> > extensions of the PAS service needed while still maintaining backwards
+> > compatibility.
+> > 
+> > Currently OP-TEE support is being added to provide the backend PAS
+> > service implementation which can be found as part of this PR [1].
+> > This implementation has been tested on Kodiak/RB3Gen2 board with lemans
+> > EVK board being the next target. In addition to that WIN/IPQ targets
+> > planning to use OP-TEE will use this service too. Surely the backwards
+> > compatibility is maintained and tested for SCM backend.
+> > 
+> > Note that kernel PAS service support while running in EL2 is at parity
+> > among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
+> > on proper IOMMU support being worked out on the PAS client end.
+> > 
+> > Patch summary:
+> > - Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
+> >   only allow UEFI and Linux to boot in EL2.
+> > - Patch #2: adds generic PAS service.
+> > - Patch #3: migrates SCM backend to generic PAS service.
+> > - Patch #4: adds TEE/OP-TEE backend for generic PAS service.
+> > - Patch #5-#13: migrates all client drivers to generic PAS service.
+> > - Patch #14: drops legacy PAS SCM exported APIs.
+> > 
+> > The patch-set is based on qcom tree tip [2] and can be found in git tree
+> > here [3].
+> > 
+> > Merge strategy:
+> > 
+> > It is expected due to APIs dependency, the entire patch-set to go via
+> > the Qcom tree. All other subsystem maintainers, it will be great if I
+> > can get acks for the corresponding subsystem patches.
 
-Signed-off-by: Alice Mikityanska <alice@isovalent.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
----
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/big_tcp_tunnels.sh  | 151 ++++++++++++++++++
- 2 files changed, 152 insertions(+)
- create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
+It looks like you missed this merge strategy part of the cover letter.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 5ca6c557fc3f..f32aa5495751 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -13,6 +13,7 @@ TEST_PROGS := \
- 	arp_ndisc_untracked_subnets.sh \
- 	bareudp.sh \
- 	big_tcp.sh \
-+	big_tcp_tunnels.sh \
- 	bind_bhash.sh \
- 	bpf_offload.py \
- 	bridge_stp_mode.sh \
-diff --git a/tools/testing/selftests/net/big_tcp_tunnels.sh b/tools/testing/selftests/net/big_tcp_tunnels.sh
-new file mode 100755
-index 000000000000..a0a6bd3a3b4d
---- /dev/null
-+++ b/tools/testing/selftests/net/big_tcp_tunnels.sh
-@@ -0,0 +1,151 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Testing for IPv4 and IPv6 BIG TCP over VXLAN and GENEVE tunnels.
-+
-+SERVER_NS=$(mktemp -u server-XXXXXXXX)
-+SERVER_IP4="192.168.1.1"
-+SERVER_IP6="2001:db8::1:1"
-+SERVER_IP4_TUN="192.168.2.1"
-+SERVER_IP6_TUN="2001:db8::2:1"
-+
-+CLIENT_NS=$(mktemp -u client-XXXXXXXX)
-+CLIENT_IP4="192.168.1.2"
-+CLIENT_IP6="2001:db8::1:2"
-+CLIENT_IP4_TUN="192.168.2.2"
-+CLIENT_IP6_TUN="2001:db8::2:2"
-+
-+PACKETS_THRESHOLD=10000
-+
-+# Kselftest framework requirement - SKIP code is 4.
-+ksft_skip=4
-+
-+setup() {
-+	ip netns add "$SERVER_NS"
-+	ip netns add "$CLIENT_NS"
-+	ip -netns "$SERVER_NS" link add link1 type veth peer name link0 netns "$CLIENT_NS"
-+
-+	ip -netns "$CLIENT_NS" link set link0 up
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP4/24" dev link0
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP6/112" dev link0 nodad
-+	ip -netns "$CLIENT_NS" link set link0 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+	ip -netns "$SERVER_NS" link set link1 up
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP4/24" dev link1
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP6/112" dev link1 nodad
-+	ip -netns "$SERVER_NS" link set link1 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+
-+	ip netns exec "$SERVER_NS" netserver >/dev/null
-+}
-+
-+setup_tunnel() {
-+	if [ "$2" = 4 ]; then
-+		SERVER_IP="$SERVER_IP4"
-+		CLIENT_IP="$CLIENT_IP4"
-+		echo "Setting up ${1^^} over IPv4"
-+	else
-+		SERVER_IP="$SERVER_IP6"
-+		CLIENT_IP="$CLIENT_IP6"
-+		echo "Setting up ${1^^} over IPv6"
-+	fi
-+
-+	if [ "$1" = vxlan ]; then
-+		ip -netns "$CLIENT_NS" link add tun0 type vxlan \
-+			id 5001 remote "$SERVER_IP" local "$CLIENT_IP" dev link0 dstport 4789
-+	else
-+		ip -netns "$CLIENT_NS" link add tun0 type geneve \
-+			id 5001 remote "$SERVER_IP"
-+	fi
-+	ip -netns "$CLIENT_NS" link set tun0 up
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP4_TUN/24" dev tun0
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP6_TUN/112" dev tun0 nodad
-+	ip -netns "$CLIENT_NS" link set tun0 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+	if [ "$1" = vxlan ]; then
-+		ip -netns "$SERVER_NS" link add tun1 type vxlan \
-+			id 5001 remote "$CLIENT_IP" local "$SERVER_IP" dev link1 dstport 4789
-+	else
-+		ip -netns "$SERVER_NS" link add tun1 type geneve \
-+			id 5001 remote "$CLIENT_IP"
-+	fi
-+	ip -netns "$SERVER_NS" link set tun1 up
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP4_TUN/24" dev tun1
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP6_TUN/112" dev tun1 nodad
-+	ip -netns "$SERVER_NS" link set tun1 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+}
-+
-+cleanup_tunnel() {
-+	ip -netns "$CLIENT_NS" link del tun0
-+	ip -netns "$SERVER_NS" link del tun1
-+}
-+
-+cleanup() {
-+	ip netns pids "$SERVER_NS" | xargs -r kill
-+	ip netns pids "$CLIENT_NS" | xargs -r kill
-+	ip netns del "$SERVER_NS"
-+	ip netns del "$CLIENT_NS"
-+}
-+
-+do_test() {
-+	exec 3< <(ip netns exec "$SERVER_NS" tcpdump -nn -i link1 greater 65536 2> /dev/null)
-+	TCPDUMP_SERVER_PID="$!"
-+	exec 4< <(wc -l <&3)
-+	exec 5< <(ip netns exec "$CLIENT_NS" tcpdump -nn -i link0 greater 65536 2> /dev/null)
-+	TCPDUMP_CLIENT_PID="$!"
-+	exec 6< <(wc -l <&5)
-+
-+	if [ "$1" = 4 ]; then
-+		SERVER_IP="$SERVER_IP4_TUN"
-+		echo "Running IPv4 traffic in the tunnel"
-+	else
-+		SERVER_IP="$SERVER_IP6_TUN"
-+		echo "Running IPv6 traffic in the tunnel"
-+	fi
-+
-+	ip netns exec "$CLIENT_NS" netperf -t TCP_STREAM -l 5 -H "$SERVER_IP" -- \
-+		-m 80000 > /dev/null
-+	kill "$TCPDUMP_SERVER_PID" "$TCPDUMP_CLIENT_PID"
-+	wait "$TCPDUMP_SERVER_PID" "$TCPDUMP_CLIENT_PID"
-+	PACKETS_SERVER=$(cat <&4)
-+	PACKETS_CLIENT=$(cat <&6)
-+	exec 3>&- 4>&- 5>&- 6>&-
-+
-+	# One line is empty, each packet is two lines (inner and outer).
-+	echo "Captured BIG TCP GRO packets: $(((PACKETS_SERVER - 1) / 2))"
-+	echo "Captured BIG TCP GSO packets: $(((PACKETS_CLIENT - 1) / 2))"
-+	[ "$PACKETS_SERVER" -gt "$(( PACKETS_THRESHOLD * 2 + 1))" ] || return 1
-+	[ "$PACKETS_CLIENT" -gt "$(( PACKETS_THRESHOLD * 2 + 1))" ] || return 1
-+}
-+
-+if ! netperf -V &> /dev/null; then
-+	echo "SKIP: Could not run test without netperf tool"
-+	exit "$ksft_skip"
-+fi
-+
-+if ! tcpdump --version &> /dev/null; then
-+	echo "SKIP: Could not run test without tcpdump tool"
-+	exit "$ksft_skip"
-+fi
-+
-+if ! ip link help 2>&1 | grep gso_ipv4_max_size &> /dev/null; then
-+	echo "SKIP: Could not run test without gso/gro_ipv4_max_size supported in ip-link"
-+	exit "$ksft_skip"
-+fi
-+
-+trap cleanup EXIT
-+setup
-+for tunnel in vxlan geneve; do
-+	for tun_family in 4 6; do
-+		for traffic_family in 4 6; do
-+			setup_tunnel "$tunnel" "$tun_family" || exit "$?"
-+			do_test "$traffic_family" || exit "$?"
-+			cleanup_tunnel
-+		done
-+	done
-+done
--- 
-2.54.0
+> > 
+> > [1] https://github.com/OP-TEE/optee_os/pull/7721 (already merged)
+> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git/log/?h=for-next
+> > [3] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v7
+> > 
+> > ---
+> > Changes in v7:
+> > - Rebased to qcom tree (for-next branch) tip.
+> > - Merged patch #5 and #7 due to build dependency.
+> > - Disabled modem for kodiak EL2 as it isn't tested yet.
+> > - Fix an issue found out by sashiko-bot for patch #4.
+> 
+> This whole series needs to be broken up into different parts and sent in
+> smaller chunks landing the core changes into the firmware, the drivers and
+> finally the dts.
 
+The DTS EL2 change for Kodiak is totally independent one and that's why
+it's the first one in this series which can be picked independently.
+
+> 
+> For example applying the Iris stuff is impossible until the remoteproc
+> stuff lands.
+> 
+> Instead of sending one giant series which no one maintainer can apply send
+> a number of series where one posts a dependency on the other.
+
+The subsystem changes like for Iris are just about renaming of the
+firmware APIs to be used which is moving away from SCM specific API to
+the generic PAS API. I don't think there is any clean way to merge the
+API renaming changes independently of when the new API gets introduced.
+
+> 
+> Lumping the TEE stuff in with video encoder, wifi, dts is spanning too many
+> things and makes merging a NAK.
+> 
+> Break this up into logical chunks and sequence a one series on top of the
+> other - accpeting that you might, likely will have to keep on top of the
+> various series and resend/rebase as things get merged.
+
+I tried my best for the logical split of the patches here keeping the
+subsystems changes to very minimal required (only renaming firmware
+APIs). I would be open to any further suggestions.
+
+However, if you are happy with firmware APIs renaming for the media
+subsystem then it will be nice to get ack from you. I hope Bjorn can
+then pickup the entire series.
+
+-Sumit
+
+> 
+> > Changes in v6:
+> > - Rebased to v7.1-rc4 tag.
+> > - Patch #14: fixed ret error print.
+> > - Add Kconfig descriptions for PAS symbols such that they are visible
+> >   in menuconfig to update.
+> > 
+> > Changes in v5:
+> > - Incorporated misc. comments from Mukesh.
+> > - Split up patch #11 into 2 to add an independent commit for passing
+> >   proper PAS ID to set_remote_state API.
+> > - Picked up tags.
+> > 
+> > Changes in v4:
+> > - Incorporate misc. comments on patch #4.
+> > - Picked up an ack for patch #10.
+> > - Clarify in cover letter about state of media support.
+> > 
+> > Changes in v3:
+> > - Incorporated some style and misc. comments for patch #2, #3 and #4.
+> > - Add QCOM_PAS Kconfig dependency for various subsystems.
+> > - Switch from pseudo TA to proper TA invoke commands.
+> > 
+> > Changes in v2:
+> > - Fixed kernel doc warnings.
+> > - Polish commit message and comments for patch #2.
+> > - Pass proper PAS ID in set_remote_state API for media firmware drivers.
+> > - Added Maintainer entry and dropped MODULE_AUTHOR.
+> > 
+> > Mukesh Ojha (1):
+> >   arm64: dts: qcom: kodiak: Add EL2 overlay
+> > 
+> > Sumit Garg (14):
+> >   firmware: qcom: Add a generic PAS service
+> >   firmware: qcom_scm: Migrate to generic PAS service
+> >   firmware: qcom: Add a PAS TEE service
+> >   remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+> >   remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+> >   remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+> >   remoteproc: qcom: Select QCOM_PAS generic service
+> >   drm/msm: Switch to generic PAS TZ APIs
+> >   media: qcom: Switch to generic PAS TZ APIs
+> >   media: qcom: Pass proper PAS ID to set_remote_state API
+> >   net: ipa: Switch to generic PAS TZ APIs
+> >   wifi: ath12k: Switch to generic PAS TZ APIs
+> >   firmware: qcom_scm: Remove SCM PAS wrappers
+> >   MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+> > 
+> >  MAINTAINERS                                   |   9 +
+> >  arch/arm64/boot/dts/qcom/Makefile             |   2 +
+> >  arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  39 ++
+> >  drivers/firmware/qcom/Kconfig                 |  21 +-
+> >  drivers/firmware/qcom/Makefile                |   2 +
+> >  drivers/firmware/qcom/qcom_pas.c              | 291 +++++++++++
+> >  drivers/firmware/qcom/qcom_pas.h              |  50 ++
+> >  drivers/firmware/qcom/qcom_pas_tee.c          | 477 ++++++++++++++++++
+> >  drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
+> >  drivers/gpu/drm/msm/Kconfig                   |   1 +
+> >  drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
+> >  drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
+> >  drivers/media/platform/qcom/iris/Kconfig      |  25 +-
+> >  .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
+> >  drivers/media/platform/qcom/venus/Kconfig     |   1 +
+> >  drivers/media/platform/qcom/venus/firmware.c  |  11 +-
+> >  drivers/net/ipa/Kconfig                       |   2 +-
+> >  drivers/net/ipa/ipa_main.c                    |  13 +-
+> >  drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
+> >  drivers/net/wireless/ath/ath12k/ahb.c         |  10 +-
+> >  drivers/remoteproc/Kconfig                    |   4 +-
+> >  drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
+> >  drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
+> >  drivers/remoteproc/qcom_wcnss.c               |  12 +-
+> >  drivers/soc/qcom/mdt_loader.c                 |  12 +-
+> >  include/linux/firmware/qcom/qcom_pas.h        |  43 ++
+> >  include/linux/firmware/qcom/qcom_scm.h        |  29 --
+> >  include/linux/soc/qcom/mdt_loader.h           |   6 +-
+> >  28 files changed, 1124 insertions(+), 320 deletions(-)
+> >  create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas.c
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas.h
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+> >  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+> > 
+> > -- 
+> > 2.51.0
+> > 
+> > 
+> 
+> 
 
