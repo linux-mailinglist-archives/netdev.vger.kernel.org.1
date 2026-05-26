@@ -1,53 +1,94 @@
-Return-Path: <netdev+bounces-291637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OP7nE4hxFWpbVAcAu9opvQ
-	(envelope-from <netdev+bounces-291637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:10:16 +0200
+	id 8HUSCg1zFWpbVAcAu9opvQ
+	(envelope-from <netdev+bounces-291638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:16:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C69CE5D3F64
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:10:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BE235D406C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 12:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A58E0300427E
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:10:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 38E9630055D7
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F873D9051;
-	Tue, 26 May 2026 10:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A72C3D891F;
+	Tue, 26 May 2026 10:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aY5/2mwp"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=aerlync.com header.i=@aerlync.com header.b="MbufjXYK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E053CA4AF
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FD63D3016
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 10:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779790213; cv=none; b=ZB5rfgSunlMOmmQ+JSVqBThqemLtlx0ElRqfQtxwLdLLoBACV8yhzfmlOKvrAhj19EDuqbV/ItIHJ1tji54iiEBXXSMDz/im68GqtTecipcgz0ab9VRP45e5QkwZv7vYMATprefI4WwtTAyD5/uY43DZb9GOz2V/TGhl31E6MdQ=
+	t=1779790598; cv=none; b=V53zcXM74qIyZ5FYrZ7BC2scaVt8CBF/xtucSBVhCPaPOsWcDRUXlKcwjkCv1viXfD/j2N0A7tJUSQDYI++yBxoug2yYRN8ce23GAVNj3HVixvuVE+jBOBUOpq2fBGCd/xh1k4YnoLEGUfyh4AT2EBts82/VBYD3g/WFgVDLwVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779790213; c=relaxed/simple;
-	bh=toqSzHyGE5vMlnTOSmxU6ryVsakV5LDNnfvwen6VLZs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hr1XC2DGYKosZQ4UHV3QsagMAxqs4POfCornEsbXkCTYq//1a7LM/+tuf1tyVp9PfoHwXTgyabFwpLI2N7R6D7ktBOtQxl1e+gQr7wx38tyX6u+FodUImG1bNVB96B8PHErDxm7JYW7NbtfGObGwQ8XYmyTPFDGZgPTTAjCwIVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aY5/2mwp; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F271F000E9;
-	Tue, 26 May 2026 10:10:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779790212;
-	bh=4nXci8guigpxw0FiToG5awnHCsiwyJ13956m3zL0xT4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=aY5/2mwpAEo7RnTY4xZKtEPGzbIxgINokL7LnDVjrVZvCkIVRo1S3wIrYr9XcVK05
-	 ekFJjFggmKb+bSSq15Gl+WZXUiFqiAA9VFa3wlkBOeHd1QNM0BHmhwpLrqPfdDU/0r
-	 2Q56zPOiAcjeQOXNBYFO8NO7SDXAXdhCxrUFBZI8TjeQuz10JN1dU24gJymAYFcsy+
-	 eSMgNQGswzGLg4XNBU7LQwCCIhHtzt2mzWuVWZU5dH73PU1vW6Xf0+enW092Rxz3XT
-	 JKzRaP4udJY4FLYuyCmPZBMTrBKdqAg5aNO/yZE19NTCCxzQLP9R3al2t8p1EYlY0w
-	 +K9KAG5MT5pZQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93F19380CED2;
-	Tue, 26 May 2026 10:10:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779790598; c=relaxed/simple;
+	bh=Nh+C+Fy0FqiBHKrNXaY08YwYU34+UqfXLUWTYrNpkdk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LxSDhUq1mVjLqyQhB6UAllm5tgJaWOPtcuxQeTk0KYwO5gO2neUoyNEHPBQwrwNnUJRz8rhc7OEMDxiNgwLSX5e+hz0Zyii8fa/3bZQi4j9TI8WFRSm+ceJcTGRkUEx9Ztez4p2aquYEPjF2I21i3diLW8t0tI7AnudnekQi7ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aerlync.com; spf=pass smtp.mailfrom=aerlync.com; dkim=fail (0-bit key) header.d=aerlync.com header.i=@aerlync.com header.b=MbufjXYK reason="key not found in DNS"; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aerlync.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aerlync.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-366330b6751so8163802a91.1
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 03:16:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=aerlync.com; s=google; t=1779790597; x=1780395397; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XrZ4NvK5jrlaPy7QvhC9XeQXCUzbUpfIVsVCaVJAXRU=;
+        b=MbufjXYKrB08/BqOEE5RCssY4owMi0cOiWdNN7OjPdiTTaWqawCuC78DrHZOpQbikj
+         wFIzwXjFi2YP3BNvJ957LkNZVZE/bdWVS6se2WyLE0y0xpcln7JSIn5uxi47/zpvKnoh
+         Jtt7Ji8KmlqUMBlRzGCS6nEioaH9oa4021XxBU65NiHAoptHBTlT4ajFUm37DAUIfGrB
+         n0xtQ23tFOCfrvBQDOQhPyRmP8TgNedusvs7qnzL2eUlWXvMQnHFfy79EEwOsLAtKftX
+         pkL0/XxoOIbqxeDqtxgzE8fBtVPoSIVk77Dc8HlQ+ln1BsHGa008ftjBzo7FepyeYATn
+         2aTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779790597; x=1780395397;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XrZ4NvK5jrlaPy7QvhC9XeQXCUzbUpfIVsVCaVJAXRU=;
+        b=hlfFH4BGPKFxVFlA4zRJyIF13dq6hMmIMXWP+dZtzyW6Pfyu5Td6viyhbCl6cyXADG
+         19dpnHrLEU4zQMfz0fbPVONTnzMhgbSO0gz+6rEzz/nNqpd30LH87PPMx2/U0b4hT1ml
+         t219uw/rK+w6yjg9pJVQe7yXsx9cVg1G+LoEzw8iY7OO9lQZMgWjw8WYDPEhrQ8Ab+m2
+         bMhHPqB7fFuRcTcsi3vSVGBIG83oGbbFmkvbyi7f+OZfFiYBDYA7IFin26p0GSA+6VfK
+         trF2CFJbETXI2i7obYfdzVphB0VUiOhrnC1e0mXkMpnyIwzcVI4Z57rlxAljowTAG/Uk
+         RaqQ==
+X-Gm-Message-State: AOJu0YysABzk5S1ZZG/suwmTcrvcFUSQy9ipeq/3mKUOk1TJcMbFDiXI
+	pNCRHCTN6oFTSuU6OdgU/JZf8xtsBd4pyXl0c0f25MHMX1QgoTDIULUG9oP6zvUGcTm+ksmg6I6
+	Y+sq6
+X-Gm-Gg: Acq92OHmWZpDxYovTdOLpzSDt8q4bNvOVZ/FmOvIgndu3qrWlxdNU8fkublxNTYTC66
+	u+rMfYjpt/1RmYS+ZfG6KxDTN8XzIZMsKXY7rrDcbzyHoPMUaTUrGj6wTKoe/4bNIj802EmBUNj
+	4BqZbxVUEo1maLwcD7QWYzZC/LsoIwSRQIFeYwevA+9LJYqgxu+72kSJKfXpHXIdKdcoNw/PCZS
+	cEVHj0+bue3qsnrsY+wh2V9klRTzOj6FYOVZFYHC75KmGUPb3jz4ag7Vn/tjYGA8lZFt93k1Ho6
+	fB9+ZBBC/WOj4jbl3FkCmwjFWNshDMhFc9engUrMvdpBelTDUq15g6X07amHI9L7m0AaIG9/ETR
+	wAj9Om6swDKtsBi3/5LPI0X6ohZ0pIMsybm2Vsh6jhfYLf8rsOPPcWdAzg7YQFEs68TmADXfIxV
+	6DwN/en9oWhlBveA1GgWFr/vlBTzjZa+z8kXUGP4Kcrvp2nPE+Tl3Ztad50AcDATk1TEaKbw==
+X-Received: by 2002:a17:903:3bcf:b0:2ba:df8c:11d3 with SMTP id d9443c01a7336-2beb06c0336mr204209215ad.32.1779790597039;
+        Tue, 26 May 2026 03:16:37 -0700 (PDT)
+Received: from manjaro ([103.186.230.13])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56bc46esm127812265ad.25.2026.05.26.03.16.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 03:16:36 -0700 (PDT)
+From: Sayooj K Karun <sayooj@aerlync.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@kernel.org,
+	idosch@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sayooj K Karun <sayooj@aerlync.com>
+Subject: [PATCH] net/ipv6: icmp: fix is_ineligible() to block errors for Redirect packets
+Date: Tue, 26 May 2026 15:46:22 +0530
+Message-ID: <20260526101622.38536-1-sayooj@aerlync.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,92 +96,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/9] net: mdio: realtek-rtl9300: Groundwork
- for
- multi SOC support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177979021839.3302983.7872741518824440277.git-patchwork-notify@kernel.org>
-Date: Tue, 26 May 2026 10:10:18 +0000
-References: <20260521175918.1494797-1-markus.stockhausen@gmx.de>
-In-Reply-To: <20260521175918.1494797-1-markus.stockhausen@gmx.de>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
- daniel@makrotopia.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[aerlync.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	TAGGED_FROM(0.00)[bounces-291637-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmx.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[aerlync.com:~];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291638-lists,netdev=lfdr.de];
+	R_DKIM_PERMFAIL(0.00)[aerlync.com:s=google];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C69CE5D3F64
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sayooj@aerlync.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.987];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2BE235D406C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+RFC 4443 section 2.4(e.2) mandates that an ICMPv6 error message MUST NOT
+be originated in response to an ICMPv6 Redirect message (type 137).
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Add check for NDISC_REDIRECT (137) so that redirect packets become
+ineligible and error packets are not generated for Redirect messages.
 
-On Thu, 21 May 2026 19:59:09 +0200 you wrote:
-> The Realtek Otto switch platform consist of four different series
-> 
-> - RTL838x aka maple   : 28 port 1G Switches
-> - RTL839x aka cypress : 52 port 1G Switches
-> - RTL930x aka longan  : 28 port 1G/2.5G/10G Switches
-> - RTL931x aka mango   : 56 port 1G/2.5G/10G Switches
-> 
-> [...]
+Signed-off-by: Sayooj K Karun <sayooj@aerlync.com>
+---
+ net/ipv6/icmp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [net-next,v2,1/9] net: mdio: realtek-rtl9300: enhance documentation & naming
-    https://git.kernel.org/netdev/net-next/c/d15c0d1df494
-  - [net-next,v2,2/9] net: mdio: realtek-rtl9300: Add device specific info structure
-    https://git.kernel.org/netdev/net-next/c/315a02b39e8c
-  - [net-next,v2,3/9] net: mdio: realtek-rtl9300: Add ports to info structure
-    https://git.kernel.org/netdev/net-next/c/215701873a7e
-  - [net-next,v2,4/9] net: mdio: realtek-rtl9300: Add pages to info structure
-    https://git.kernel.org/netdev/net-next/c/38c9d5b64404
-  - [net-next,v2,5/9] net: mdio: realtek-rtl9300: Add register structure
-    https://git.kernel.org/netdev/net-next/c/62baf5f1d80f
-  - [net-next,v2,6/9] net: mdio: realtek-rtl9300: Add command/C22 register
-    https://git.kernel.org/netdev/net-next/c/8bf7e2b133db
-  - [net-next,v2,7/9] net: mdio: realtek-rtl9300: Add I/O register
-    https://git.kernel.org/netdev/net-next/c/ffc92cd00914
-  - [net-next,v2,8/9] net: mdio: realtek-rtl9300: Add port mask register
-    https://git.kernel.org/netdev/net-next/c/cad6a373f7f6
-  - [net-next,v2,9/9] net: mdio: realtek-rtl9300: Link I/O functions in info structure
-    https://git.kernel.org/netdev/net-next/c/826a1926f084
-
-You are awesome, thank you!
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index efb23807a026..3fdb3a97dd8e 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -157,7 +157,8 @@ static bool is_ineligible(const struct sk_buff *skb)
+ 		 */
+ 		if (!tp && frag_off != 0)
+ 			return false;
+-		else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK))
++		else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK) ||
++			 *tp == NDISC_REDIRECT)
+ 			return true;
+ 	}
+ 	return false;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
 
