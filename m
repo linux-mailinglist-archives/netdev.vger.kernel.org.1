@@ -1,98 +1,111 @@
-Return-Path: <netdev+bounces-291712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDacEB+sFWrgXgcAu9opvQ
-	(envelope-from <netdev+bounces-291712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:20:15 +0200
+	id EOKPHhquFWpkXwcAu9opvQ
+	(envelope-from <netdev+bounces-291713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:28:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACFFE5D7592
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:20:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 001D75D77B0
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:28:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E8AB2304648B
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:18:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42D3431965BC
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 14:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5B53FFAA2;
-	Tue, 26 May 2026 14:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB2D40242B;
+	Tue, 26 May 2026 14:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="aMG7L3pl"
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="Kr5CR1pu"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC70C3FF1AC
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 14:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEB8400E19
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 14:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779805085; cv=none; b=oXsErDVnrDzdxySgW0Bt2Cyqe7f/tz/NtEIx5/v3ldCwDda16XkgZ+xP3yRGA4JVxlX9lNrjLx81TYicg2M8uwbaweGnPp3bMU6zUT+LDR7KXV+K5ueowJ8qTR+8X5Lz02UkE9kr1w6rLrZIodZMayp2b7q9CUdKzjEMMcMdLsk=
+	t=1779805089; cv=none; b=sUNvhKzpTWA0OcetHto3KzVdLu2RQ38Vz92oiRDHInN1d10tDHMnxJg4QFHn35/yOAbj456eGpjCFAYrdW/Se1L+rMxKaS4VW+xtOMgNBUu3C/wH02QRHb+NGS0cl4dc+ce3V+Op/LfbmW5ZIcSF14W4rXZ1L7IPtBg3/iTWC3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779805085; c=relaxed/simple;
-	bh=c0RNn5qb9vT6IIijXBbTxELaRyRjMTkDCyVB2jC4SqM=;
+	s=arc-20240116; t=1779805089; c=relaxed/simple;
+	bh=A14j4ivDNBl2yGcg6n5ndH+ByZLqjyYb/4BbZyB+vg8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GEWi0Rglq2q4CgYXwYciN6g7bhKDJi8T1DtooKBWhWUUTLN029aeGUqUCOnRa/M6EffmTlLegvDwsJJM+7xPYe9RbFLbztemJ2Cu5sdMuswCv01fPuIT1RxszWzah+PTfjBFeUzi6PjVueHByrwpKgTcwtEuNOTQa/0JtknyrZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=aMG7L3pl; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version:Content-Type; b=LsJAEwcP7Ugx1A8KFk1Fctd6c8PGe26iJV1Ozs1Iza/7VJl9Js1f9FbPf+bUlzMsrHNGHnhKjVQqili3XIHuKN4a+LicavzU8wuY5AhJ0zzPU9LcibrVtbiychVCJhosAD3k2JLL1tfa/klz32UUz96lUh/7WutWUSLp/ffpcwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=Kr5CR1pu; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4903d5c67bfso26516825e9.1
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:18:02 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4906238c62eso21188835e9.3
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 07:18:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1779805081; x=1780409881; darn=vger.kernel.org;
+        d=baylibre.com; s=google; t=1779805085; x=1780409885; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NRc0rg9JcNLCZHd/xhMyDX0vGds8lGNNIFHieXRVgTg=;
-        b=aMG7L3plHaZEUQSQ8cnUQ5RdSYI251JsrTDqXoRPrGw6vDM1N64YAYZ1JxZHGYaUDm
-         N/UtNam/RnTrR7syj9Ch1SYtsKXhuc2uTRm4XKonf5ffz9txprVJcIcAERzDeU23hkRu
-         Y+D11ihjJKSLw7JOnY5X/NwLEHdyFOLRwKkVSvVBqu8fgljKG5HAduK+PvPQxpX1vtwM
-         G6llLUIWjmMc8m8c1DSUOUScskmer+hcCKiPdXQWngnqzVlujaiJB5kDd3MxPqW2rJH3
-         RYlvATG0TYkHEgqVlqzqsct7EsFtpJ77kxpSEdv4Zt8o3G2vDrHVPsm3lSIWVCmzeXi3
-         ZZjQ==
+        bh=DWA1rx79U563LTGj65VSgfxyjti8CkpfF8kpzyqUrdk=;
+        b=Kr5CR1puBNaF4clfOgdrSY811kH0XkJYaXu+tVuev20pRHeBFa6PmkgFfS7uPTR2Mj
+         fccEIsQWEhUkWS/CT8WCi3/1a7oZuBvZ0BapIIz3Tp+MeoOcr1VGd0OfwtIMkjbrk1bb
+         S51PVUaLe7Z2+cP8ML/eZy1CDRItho9DvS6wXJJhHCYPnaQRkpWofV8xMl3D+fAmy3L+
+         e8z7ETF1JDJ+fKIfD9mFwX7Xn3lnn0nDGBAeeV/ZNq4TxDc3KDbcEEeWE8PRq1sgwGN/
+         5b2esYUBdADisNNp39HkOaTwLPlCZEXJANrO0FuFsYBD8fAgQRjXET1mdfBqRTJMj+3X
+         x24A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779805081; x=1780409881;
+        d=1e100.net; s=20251104; t=1779805085; x=1780409885;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NRc0rg9JcNLCZHd/xhMyDX0vGds8lGNNIFHieXRVgTg=;
-        b=i6P6TJedVZiUgQ3VHLUeafSazJ+Ec+/JqMrrm0Tt8pfnIM5vlkXmaBIPpsukDyeqYk
-         tEIkTlALUnyZmSTVDud5VxT/njrv0T1BYdck+02MmaJeTxG7/fT6ZSIretR1QLhENe/3
-         w792q3Ur1UzssjK9QaZdS/QMz03QZKDM+TpdekY+Y126TQMEPKVqPH4p9LugcmOn63P3
-         ZOwdA3hIN1CdZ/AwbCRmD5HzCnn3Tpais0xCL/p7rdRy47/X/p0TwjJYNcwYdQH/kjca
-         rgbCft6kke9H4uJLigcOcHVhKUQYVZzf38SqVQjoCyRR0JPqe6CpHzJ9fQ4p30a2g2fj
-         HXbw==
-X-Gm-Message-State: AOJu0YzMFR1cmEX0CgOCZpLBMJChA9ATDFk+J7SLn40Q5YRSMoRggYDr
-	YFEl95BpEzYz5bHL4h+zY3ip7WabBuuyIZGEV8uj8fGo8AIH13VAuNKQwwcSKdMbkA4=
-X-Gm-Gg: Acq92OEx2SJAiJX6sBUzCDT+5Y02M9BQPIBc9VYKdV5G9UuH/I9vx8rH51Zm4+D/ivq
-	l0bapmJZF6Xym3YStoFU8O7mIuWAAkhNhzuZ0+vJ6YamMnQCTaS/e7UqCwCRWiaKxLmvDL7Fu8J
-	qD/UClGjoT7KjQw+VidAtgQJ4rXqd4vMvmoXhV0hjvH/SFWTYVKSCQCQe56PyLRso39lhJ71r2y
-	flJ2E06KXJhOnIb3DIWtCaXfEYzeykpre9Z8idn6O/WZfIwNacAy4oLQwCS5DPjsDBg0sCBpy8U
-	KMJmwhxs79bQ+R3s+V6KVeXlqs4kJYMLKKnPrWglhXxCRWgiRl0Lld4tngCCBFcDNyj978lqKs1
-	pxkxMoIEZP8oeKvtq9YS1wNZH4YmrUHjpsOm9i+SVYmMZsv49k4spe9PE5xmG4i0bcyzU/Exb2I
-	f5mk5U10XqOmxWKeIg2SQjxSuu2w4Q8cR6UKqSf11rDRA017ITjFkSEJlkQ8nNuEmeBtaEUkLf6
-	++K3W7sFwB2XBk=
-X-Received: by 2002:a05:600c:1992:b0:48a:76a3:2b9b with SMTP id 5b1f17b1804b1-490426c5416mr299770605e9.17.1779805081242;
-        Tue, 26 May 2026 07:18:01 -0700 (PDT)
+        bh=DWA1rx79U563LTGj65VSgfxyjti8CkpfF8kpzyqUrdk=;
+        b=pmfPsHutcJ1esXyR44uAha2+b/Ko9utaUu7YeCFhaTQ5G39ZyKLvxjyyPYKAOn2Bek
+         NH30J6ss77LSNHA3JbJ4Gb0IK+L8JFWhlfgmlD2Ygf68vneHPQjI8zoNZniKIC4i2YYq
+         2g4c6P1JRbxWssvnPWBFxX3Iw/EBHt+ErMgXFm6AQDbqI0bAJ0gSxPD3xyeAoZ3RmZmm
+         2H/z217YopNya/FtJRtoxfv8m8Cn6l1U7zKB6OzHxI8uWEu61xOSAsxpbwaGnokhQErN
+         fb2R5PJCrpvUbx1U9Kt728ac87oWl3guzw3MOTUWeABrHICG5yn/Wwcmx2NXFkYCGQ9l
+         k/xQ==
+X-Forwarded-Encrypted: i=1; AFNElJ91rQDtwykIldsmFoNpvdL7qq4J+zdcoSla9XAqz+NnOE+rUm3wfsPQyMtpRJ9MCq354CLOj0c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQkzal+s2FXhyD3jFXb4GiGoXrhuH4wIH7UbNQed9Eq5NtdUCl
+	WToHPwJpdPdkPQp8QlNjlABuqmgSpgX+vMsFQh+BCefCCn56wufdrEKpc3vfAnYaFDo=
+X-Gm-Gg: Acq92OEaW8XvYOYhTaAC8ZG4CaPj2iCYRW759rPeqbSJebkdaEZ+F2PxZQDXZcifK0E
+	hxrfcC/Lvn+0tpvzN4ICNLJI2N5vvgHN+WRAr4lqRwqGRZIL3AHPbCfPdtCoSSGEmUiBzVn107S
+	VwUgeFILJvJW8BFUpVxhWZmTATSAOaYiRUnmh0yzZZi2DsQObCBXtnt9xEYcEFCpe6/5gxOmOef
+	7D8jXF0+kB5lGkowlP1+PcDBKKNGxalpEkAOpUzKfezpnkGtM+sC1Am2YS4eU7fHQANJtEQ2vpF
+	N6hdysMmV698HAlnqyJAL6lQSm+5MkAhqPJ4nM2ZO6tiEj47Dxq7NnG+CaP4aQ2QDDYucp7DHR6
+	fCZcimQnk9p624FvWS4pkE5nJGNc9VtVQdkjhmQd9wnu6fI4ByoQGRRt0ywNsga1BvULlY36q87
+	ZXuBTuUx+w5nc2oFHHJ1gZ0Xvuo/pbEWpOVUjXtI51xf11MzGn9C8GMBlT+j4+RYmlRHwzeg+V/
+	lP77GrOzzivfXHUiq1WE3PsQQ==
+X-Received: by 2002:a05:600c:4592:b0:490:6237:5213 with SMTP id 5b1f17b1804b1-4906237537cmr145220735e9.23.1779805085104;
+        Tue, 26 May 2026 07:18:05 -0700 (PDT)
 Received: from localhost (p200300f65f47db04a716d2bdeddb4813.dip0.t-ipconnect.de. [2003:f6:5f47:db04:a716:d2bd:eddb:4813])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-45eb6cd10acsm29951620f8f.15.2026.05.26.07.18.00
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4904561a160sm379625175e9.9.2026.05.26.07.18.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 07:18:00 -0700 (PDT)
+        Tue, 26 May 2026 07:18:04 -0700 (PDT)
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
 To: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-m68k@lists.linux-m68k.org,
+	Ingo Molnar <mingo@kernel.org>,
+	Max Staudt <max@enpas.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Helge Deller <deller@gmx.de>
+Cc: linux-m68k@lists.linux-m68k.org,
 	linux-kernel@vger.kernel.org,
 	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>,
-	"Christian A. Ehrhardt" <lk@c--e.de>
-Subject: [PATCH v1 net-next 3/8] net: Use named initializer for zorro_device_id arrays
-Date: Tue, 26 May 2026 16:17:29 +0200
-Message-ID:  <2243204c0f57f79750de00c072914354d4f65707.1779803053.git.u.kleine-koenig@baylibre.com>
+	"Christian A. Ehrhardt" <lk@c--e.de>,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org
+Subject: [PATCH v1 6/8] zorro: Simplify storing pointers in device id struct
+Date: Tue, 26 May 2026 16:17:32 +0200
+Message-ID:  <49576a7501128c93ef318566ed7faefce163f1fd.1779803053.git.u.kleine-koenig@baylibre.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <cover.1779803053.git.u.kleine-koenig@baylibre.com>
 References: <cover.1779803053.git.u.kleine-koenig@baylibre.com>
@@ -103,138 +116,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3543; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=c0RNn5qb9vT6IIijXBbTxELaRyRjMTkDCyVB2jC4SqM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqFat9t5Xx1kUno4MeYd8jN4x+EH0x/XZLCiAiA QYtErFip2mJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCahWrfQAKCRCPgPtYfRL+ TnlXB/9uag6CPS55Tq9egoS+k41Y6rFMtl62uNYC0TUlGM9uOKwjfMasmqsDfNj1IolJs8i1x1h NDdjNg8SUnyw9vBBvdpVZkts+PWd4Ls7wYgqioZTWu2jncx/t38Zp88blXJxW5IYW0Qao++0CID OfQk2MLqOmkMOSJ98Dh2HJUyK10UC7H3Dg2PXot79yLY8NYai0+AwW3Wt0dEACfHJYOswUPx0l2 ykalikN7h2MK1AvxQZpbvZnKR9K82plh+P0z4KOSSXwxvMARTUpegSipQGfHeezmXDckky13etF Eg0mFhHpFGuX4GXZQqQabD238N+yk9uRxRnYsHmyzmjDZo/a
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1515; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=A14j4ivDNBl2yGcg6n5ndH+ByZLqjyYb/4BbZyB+vg8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqFauEMCO+XO5wBiq0WLDW9CPIg9uJbXOSVo41d x54C4q2mLiJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCahWrhAAKCRCPgPtYfRL+ TjnnB/9l+SDbdriw4+P0R0QawXzQR6RNcTSEDOsG0Za0QxbkFa85XMb5sLwAO0owuw/Rowx6ky+ QMdsAXUgR3vwvQLdxYJlkEl/VA/XHq/xJJAuw+YZlvI7KLvHFN3YqbmJgo+fHO56QX05JkYBvJ2 Jk9WKvtvJ58lFHkr+5etBSYF3AixiJ+YBuoVcvjao9lM8EjUJ8SyDU/sXtdjUltWSXQmsKSN5Wa cffVeDubVIqpPQNOIDt4M8130VMFMoHEz1nySiOBmpolGD4C9tykhh7r5xGVttivy5+fc/p6kFl 64ZyNUXuXtZrf+NrGcA7ZEOvBZuObVE5B7q9XxMf4MX80c3s
 X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291712-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[baylibre.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[linux-m68k.org,kernel.org,HansenPartnership.com,oracle.com,lunn.ch,davemloft.net,google.com,redhat.com,enpas.org,gmx.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[baylibre.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291713-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[baylibre.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre.com:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,baylibre.com:email,baylibre.com:mid,baylibre.com:dkim]
-X-Rspamd-Queue-Id: ACFFE5D7592
+	NEURAL_HAM(-0.00)[-0.984];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,baylibre.com:email,baylibre.com:mid,baylibre.com:dkim]
+X-Rspamd-Queue-Id: 001D75D77B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Using named initializers is more explicit and thus easier to parse for a
-human.
+Technically it is fine (on all current Linux architectures) to store a
+pointer in an unsigned long variable. However this needs explicit
+casting which is an easy source for type mismatches.
 
-While touching these arrays, drop explicit zeros from the list terminator.
+By replacing the plain unsigned long .driver_data in struct
+zorro_device_id by an anonymous union, most of the casting can be
+dropped. There is still some implicit casting involved (between a void *
+and a driver specific pointer type), but that's better than the approach
+to store a pointer in an unsigned long variable as this doesn't lose the
+information that the data being pointed to is const.
 
-This change doesn't introduce changes to the compiled zorro_device_id
-arrays.
+All users of struct zorro_device_id are initialized in a way that is
+compatible with the new definition, so no adaptions are needed there.
 
 Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
 ---
- drivers/net/ethernet/8390/hydra.c     | 4 ++--
- drivers/net/ethernet/8390/xsurf100.c  | 4 ++--
- drivers/net/ethernet/8390/zorro8390.c | 6 +++---
- drivers/net/ethernet/amd/a2065.c      | 8 ++++----
- drivers/net/ethernet/amd/ariadne.c    | 4 ++--
- 5 files changed, 13 insertions(+), 13 deletions(-)
+ include/linux/mod_devicetable.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/8390/hydra.c b/drivers/net/ethernet/8390/hydra.c
-index fd9dcdc356e6..9a59915436d2 100644
---- a/drivers/net/ethernet/8390/hydra.c
-+++ b/drivers/net/ethernet/8390/hydra.c
-@@ -66,8 +66,8 @@ static void hydra_block_output(struct net_device *dev, int count,
- static void hydra_remove_one(struct zorro_dev *z);
+diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+index 3b0c9a251a2e..2673a1bd82c4 100644
+--- a/include/linux/mod_devicetable.h
++++ b/include/linux/mod_devicetable.h
+@@ -640,7 +640,11 @@ struct mdio_device_id {
  
- static struct zorro_device_id hydra_zorro_tbl[] = {
--    { ZORRO_PROD_HYDRA_SYSTEMS_AMIGANET },
--    { 0 }
-+    { .id = ZORRO_PROD_HYDRA_SYSTEMS_AMIGANET },
-+    { }
- };
- MODULE_DEVICE_TABLE(zorro, hydra_zorro_tbl);
- 
-diff --git a/drivers/net/ethernet/8390/xsurf100.c b/drivers/net/ethernet/8390/xsurf100.c
-index fe7a74707aa4..370c19aa5fb9 100644
---- a/drivers/net/ethernet/8390/xsurf100.c
-+++ b/drivers/net/ethernet/8390/xsurf100.c
-@@ -357,8 +357,8 @@ static void xsurf100_remove(struct zorro_dev *zdev)
- }
- 
- static const struct zorro_device_id xsurf100_zorro_tbl[] = {
--	{ ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF100, },
--	{ 0 }
-+	{ .id = ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF100 },
-+	{ }
+ struct zorro_device_id {
+ 	__u32 id;			/* Device ID or ZORRO_WILDCARD */
+-	kernel_ulong_t driver_data;	/* Data private to the driver */
++	union {
++		/* Data private to the driver */
++		kernel_ulong_t driver_data;
++		const void *driver_data_ptr;
++	};
  };
  
- MODULE_DEVICE_TABLE(zorro, xsurf100_zorro_tbl);
-diff --git a/drivers/net/ethernet/8390/zorro8390.c b/drivers/net/ethernet/8390/zorro8390.c
-index c24dd4fe7a10..cb1d5ed20874 100644
---- a/drivers/net/ethernet/8390/zorro8390.c
-+++ b/drivers/net/ethernet/8390/zorro8390.c
-@@ -262,9 +262,9 @@ static void zorro8390_remove_one(struct zorro_dev *z)
- }
- 
- static struct zorro_device_id zorro8390_zorro_tbl[] = {
--	{ ZORRO_PROD_VILLAGE_TRONIC_ARIADNE2, },
--	{ ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF, },
--	{ 0 }
-+	{ .id = ZORRO_PROD_VILLAGE_TRONIC_ARIADNE2 },
-+	{ .id = ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF },
-+	{ }
- };
- MODULE_DEVICE_TABLE(zorro, zorro8390_zorro_tbl);
- 
-diff --git a/drivers/net/ethernet/amd/a2065.c b/drivers/net/ethernet/amd/a2065.c
-index ce9445425045..672c4996b30e 100644
---- a/drivers/net/ethernet/amd/a2065.c
-+++ b/drivers/net/ethernet/amd/a2065.c
-@@ -647,10 +647,10 @@ static void a2065_remove_one(struct zorro_dev *z);
- 
- 
- static const struct zorro_device_id a2065_zorro_tbl[] = {
--	{ ZORRO_PROD_CBM_A2065_1 },
--	{ ZORRO_PROD_CBM_A2065_2 },
--	{ ZORRO_PROD_AMERISTAR_A2065 },
--	{ 0 }
-+	{ .id = ZORRO_PROD_CBM_A2065_1 },
-+	{ .id = ZORRO_PROD_CBM_A2065_2 },
-+	{ .id = ZORRO_PROD_AMERISTAR_A2065 },
-+	{ }
- };
- MODULE_DEVICE_TABLE(zorro, a2065_zorro_tbl);
- 
-diff --git a/drivers/net/ethernet/amd/ariadne.c b/drivers/net/ethernet/amd/ariadne.c
-index fa201da567ed..ec6e7e8c14fe 100644
---- a/drivers/net/ethernet/amd/ariadne.c
-+++ b/drivers/net/ethernet/amd/ariadne.c
-@@ -693,8 +693,8 @@ static void ariadne_remove_one(struct zorro_dev *z)
- }
- 
- static const struct zorro_device_id ariadne_zorro_tbl[] = {
--	{ ZORRO_PROD_VILLAGE_TRONIC_ARIADNE },
--	{ 0 }
-+	{ .id = ZORRO_PROD_VILLAGE_TRONIC_ARIADNE },
-+	{ }
- };
- MODULE_DEVICE_TABLE(zorro, ariadne_zorro_tbl);
- 
+ #define ZORRO_WILDCARD			(0xffffffff)	/* not official */
 -- 
 2.47.3
 
