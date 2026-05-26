@@ -1,191 +1,136 @@
-Return-Path: <netdev+bounces-291603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291604-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMBCMNJmFWqVUwcAu9opvQ
-	(envelope-from <netdev+bounces-291603-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:24:34 +0200
+	id CIczOC1pFWqyUwcAu9opvQ
+	(envelope-from <netdev+bounces-291604-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:34:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363A35D33BD
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:24:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FBA35D3677
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 11:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3B6DB30036FA
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:24:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C440930036C3
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 09:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635E43CB8F4;
-	Tue, 26 May 2026 09:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C80F314B9A;
+	Tue, 26 May 2026 09:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YWZl5bsN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VqOKWuLG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07603246778;
-	Tue, 26 May 2026 09:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F32C33FE02;
+	Tue, 26 May 2026 09:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779787472; cv=none; b=toz9v64MqmCY21Dm9nMQH91BI6OO3mxyZ5sz/jv8gkbucEBKB7khtkCYafGeR7MvuSnfPyCp27GlGBrtCRW6L/czohgk/JHPb0m8UnhWm3RHORA0qjnF5fcuDSqeb2CazR/cGEzZ2ws3n8aHbXEBrJK/HhmFdVKujPFZsvp6UWU=
+	t=1779787804; cv=none; b=j9gU2PqO5YzO4Kqa2jKOC32f93NDDUSnKOq1/aKGyj4mhTTGliJPC939JRZmukUarvyq3JnLp3i27PmsVC0oJDf9LTxPgS1mXJMGsZfPfFtDG/K07u6oZra7BDwfxrTQR44W68oe+KfswYz2f3c4XmPIa10qPJNc2stzstgUYXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779787472; c=relaxed/simple;
-	bh=AslCWS3RagV27E2krTplEE0YKRgiFoltEh0GO/nUaRc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Il6yy1SoYRNe+5CvJZVYtc8/gs0eVjC3fa/pTjyA+CvWE2Y1VinUaCf8/RBQZmjEwD8Q58W8XnFNwToLLYhbWlu/qq89Nk7rpTTRiZcusqfIa2XhcPAlgbpDi+0BBDptme5CpE/dcvW7t+3ifEnZjbgQ2zVbeMW5n+1XRsplq8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YWZl5bsN; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64PHsgTM3922202;
-	Tue, 26 May 2026 09:24:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=gtlnC1
-	ZNn+wN+LpVBqdtFKL/3z5YBrSxY3QlFKjHCAQ=; b=YWZl5bsNBnOxJoNP6aVGV/
-	GMByrEmnsICQC0k5lnZNv8/wt5twJ8y5bDAwJsMInvNLczJMtToQkMLfpnqb7to+
-	nh3bqexG8bxg3PQRoZFD7q3bPpDAzbl/t8JRGn8Fq8XnhQ2nZzz6Xu3+ABkw85mV
-	318bpVNE23gvuEVB6TiGTWN+hX+b0kykrIITIQnHA/5WRrpyd7loMNvUoyqNFSoM
-	TP3DUfbwRViv36iVFOJTgNG4crcp3YgMlPrr1MVXtkXLoOBwLlGeVP297pahIfYT
-	tYtqveWLDVZj2S3GItKyEaUPVjr75xk8ZROQ10SqTP8WEAyu+rHov4J5zDUdzA0A
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4eb4nukd2x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 May 2026 09:24:06 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64Q9O5LC000592;
-	Tue, 26 May 2026 09:24:05 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ebpjq8tuh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 May 2026 09:24:05 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64Q9O1LW51118520
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 May 2026 09:24:01 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5882A20043;
-	Tue, 26 May 2026 09:24:01 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C0F420040;
-	Tue, 26 May 2026 09:24:01 +0000 (GMT)
-Received: from [9.52.217.250] (unknown [9.52.217.250])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 26 May 2026 09:24:01 +0000 (GMT)
-Message-ID: <09374d76-07fc-4b12-a0a7-94de4bfe595d@linux.ibm.com>
-Date: Tue, 26 May 2026 11:24:00 +0200
+	s=arc-20240116; t=1779787804; c=relaxed/simple;
+	bh=C6JTlSWJ6UTWLfty6893Trz5EJLQuv+avLJUnldQD9M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rQoHogj6+e5YopgVDfUqMdSoonpoGHCHEzdnDXiQA/oeDmV+6KYT9Efyc4yIhRhUiLuJNKUErDMejTyNLAf8E9jaCwgP20qF2MaByQCHvDPpM2BwmhCrsbl4XI/FnMn8kVcDtNcXuSTLa7/CWxoE9dToDkpY1/wkwkApPNwwrEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VqOKWuLG; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FA961F000E9;
+	Tue, 26 May 2026 09:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779787802;
+	bh=34cNSpRjbMNs7v786OsvSmA321upWkDNt7Am792BH8Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=VqOKWuLGge3d6nzPBiKBsrg63KZxKF7HxnNGYPuxViw642wYYz3TikxeSdWHjINc7
+	 dBK77XyI7V5UzlXdAk31OnlCuFsYC/7R9WlGrDQTEdzA3/QudXZ/QDGWwFbciCL52U
+	 oJEByeGUbqgHw1NSUfJOR6t6zMCFZzB/vHbch47RcFn7uzPxiMg9JAal8rF4kkSVyq
+	 vXKTVGNiKH4OIpiTykXhXeJdMNuM/bTr1ZIG+B4R53DMkE3ANL4B0qTVXhgmKEXwY2
+	 wGWhQDmWl2/SMRCmLDMAqIA6Xmjo5GU906CCzr81qbtUoXEGPI40yYSTFr5ZoEIIHa
+	 /s0fKWybZhtQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93E04380CED0;
+	Tue, 26 May 2026 09:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net-next] s390/ism: Drop superflous zeros in
- pci_device_id array
-To: Breno Leitao <leitao@debian.org>,
-        =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?=
- <u.kleine-koenig@baylibre.com>
-Cc: Aswin Karuvally <aswin@linux.ibm.com>,
-        Andrew Lunn
- <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260522153010.777081-2-u.kleine-koenig@baylibre.com>
- <ahB7_10zHxM2HQWG@gmail.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <ahB7_10zHxM2HQWG@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDA3OSBTYWx0ZWRfX8tdgXn8i8Kkz
- +oeF0G9VZ4QUj7slsHo1qwXkUlSCATFRG973vEGAyqQCxWMIm+Qypvg/AomENIzIxGLDVAKYLP/
- /lqv+Ieycf58gH7wzoiAfDb5lQ3knstMCP1McVRpx0zn8C3+2alb05ke34fyV2cxJjyyyMm5cSH
- pAcKl+axMQDfGP1LpSzuKz3Io/dr4EMt5X9gV/08bK4YO/4Qvc3QEDnr1bv2gcJ4fxGLGkA6nB1
- oY9vZn0X1R/6ggz91C/jghQiZPsQV2/fC+u5QO0PdAPqLVR5CEL/4+GfGzXTcld7TmTM6+TbSu4
- RHLupv2lsAUVFOhwBMa8vgB2Pv0XFrqQPg6WfD9dYMWf79aGCh40CD7ToxrrB+grB5MRPRhi0/Y
- AHwYy0faKrLrCB1xc2NkPhHbv0nurH+CEir3UW8LOPnLXCS9dDTwzCju4bCI8kJhm1zcAPStCMJ
- 2NCNLgT7dVmKD4vJwtQ==
-X-Authority-Analysis: v=2.4 cv=UtJT8ewB c=1 sm=1 tr=0 ts=6a1566b6 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=IpJZQVW2AAAA:8
- a=xNf9USuDAAAA:8 a=VnNF1IyMAAAA:8 a=edyCz4FVGJroy-f0aeMA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=IawgGOuG5U0WyFbmm1f5:22
-X-Proofpoint-ORIG-GUID: Wl11F0PSjV_tVFJZPbAUVsVEU-Xr3sr2
-X-Proofpoint-GUID: p05R3Vh-EdEOGkLB3QmECGrri4S8d85T
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-26_02,2026-05-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0 adultscore=0 clxscore=1011 bulkscore=0
- phishscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605260079
+Subject: Re: [PATCH net v4 0/2] ip6_vti: vti6_changelink and
+ vti6_siocdevprivate
+ netns fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177978780814.3286183.4781727530904846983.git-patchwork-notify@kernel.org>
+Date: Tue, 26 May 2026 09:30:08 +0000
+References: <20260521130555.3421684-1-maoyixie.tju@gmail.com>
+In-Reply-To: <20260521130555.3421684-1-maoyixie.tju@gmail.com>
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, kuniyu@google.com,
+ steffen.klassert@secunet.com, shaw.leon@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291603-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.ibm.com:mid];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291604-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,google.com,secunet.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 363A35D33BD
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ip6_tnl.net:url]
+X-Rspamd-Queue-Id: 3FBA35D3677
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 22.05.26 17:54, Breno Leitao wrote:
-> On Fri, May 22, 2026 at 05:30:09PM +0200, Uwe Kleine-König (The Capable Hub) wrote:
->> Subject: [PATCH v1 net-next] s390/ism: Drop superflous zeros in pci_device_id array
+On Thu, 21 May 2026 21:05:53 +0800 you wrote:
+> v3 -> v4
 > 
-> Nit: s/superflous/superfluous/ ?
+>  - Update Fixes tag on both patches to commit 61220ab34948
+>    ("vti6: Enable namespace changing"). Xiao noted the old tag
+>    5e72ce3e3980 is not the introducing commit. dev_net(dev) and
+>    t->net first diverge when 61220ab34948 dropped
+>    NETIF_F_NETNS_LOCAL and made vti6 devices movable through
+>    IFLA_NET_NS_FD. Same Fixes shape Jakub took for the sibling
+>    fix 1d324c2f43f7.
 > 
->> The .driver_data member of the struct pci_device_id array were
->> initialized by a list expressions to zero without making use of that
->> value. In this case it's better to not specify a value at all and let
->> the compiler fill in the zeros. Same for the list terminator that can
->> better be completely empty.
->>
->> This patch doesn't introduce changes to the compiled array.
-> 
-> True. For a `static const` aggregate, omitted members are
-> zero-initialized per C99 6.7.8, so dropping the trailing `, 0` and
-> collapsing `{ 0, }` to `{ }` is a no-op at the object level.
-> 
->> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
-> 
-> Reviewed-by: Breno Leitao <leitao@debian.org>
+> [...]
 
+Here is the summary with links:
+  - [net,v4,1/2] ip6: vti: Use ip6_tnl.net in vti6_changelink().
+    https://git.kernel.org/netdev/net/c/11b326fb0a37
+  - [net,v4,2/2] ip6: vti: Use ip6_tnl.net in vti6_siocdevprivate().
+    https://git.kernel.org/netdev/net/c/8b484efd5cb4
 
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
