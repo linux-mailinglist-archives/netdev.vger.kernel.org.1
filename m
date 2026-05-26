@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-291789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gCUeFKDFFWqxawcAu9opvQ
-	(envelope-from <netdev+bounces-291789-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:09:04 +0200
+	id gIA7HlbHFWqMbAcAu9opvQ
+	(envelope-from <netdev+bounces-291790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:16:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D0A5D95A9
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:09:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D7B85D97D7
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:16:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2000A3026277
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:02:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 13FB03040356
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1FB3ACA5A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A6E3AE6F4;
 	Tue, 26 May 2026 16:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TdiJDBTa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bh/Hpy+0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5126F3AE707;
-	Tue, 26 May 2026 16:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12263AE713;
+	Tue, 26 May 2026 16:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779811329; cv=none; b=eKAdmXpU0ip8wde1jCwoxKMzvezxNc1Vl0DFt0524TGwbSpf3VjsnJ7qRjYfLLZZZx7p+1eTVcPm4uoYK6piUw0rAXXxzpCNhCe2WJhwidxFyNSqT25XW8vAAlFv4aTG7zdyuHSwJqRVZvqVR/TjL5mnpEnSWgh2VthbqFIvte8=
+	t=1779811329; cv=none; b=E9c14UDlJ2dRmRuvWGyFwtaeGubbsvT/qwPd8ieKh56v+L+8bt84C5P+oZglNAoQS6aDXu7g3SI1YF/bnPwiY4UleX4laEXyLwPuROjgJA18k2qEe9h5+nWCvAJxjb5Zp4+2u4botJFAjQooa599epE8CuXAoRx/XDJe13Ra488=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779811329; c=relaxed/simple;
-	bh=ikL53l5I0xjFddb374j1SCSCroWRI4gsprN7eGLwcJg=;
+	bh=KOXzdd4xd6nTSWHCtC/WE6KKKs2l14a8IICPQ+bpz+I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U9xDp3/AyA44/tKag8DCZE4S1H29OHoITPztleSPQOwvzst7GrnBkIr9zm5EPMHeMd4sXvmrKqiR/WO9irrO786oWwOPiCl6AV7Nx4YDx8rixablJSPyEnf6+p4kXiT96m7XgD5DJlFRtSVQmpOfZrcQOFUXxS2WW19truOsp/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TdiJDBTa; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AE101F00A3A;
+	 MIME-Version; b=iueD+VQ5HEvpH6zR81J41NZ/aMMnCii6N9knsvTfnfFNEBMRNbwJcjdfdB52ObWs3TvVgEQnOLEOOSY6ZiYMcir7gAiEV5PPhLG/fm5aXDaup2k4kfSbH4dQKm35lbh5lZWbxn2oqtXbyNCNroM28KUDXtqGXBKzkClSu0CgRE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bh/Hpy+0; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3251F00ACF;
 	Tue, 26 May 2026 16:02:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779811326;
-	bh=tYamZlqxZ/y8MBrGQPb+4YS8BUL8bCOe0fK6Ny6BmcE=;
+	s=k20260515; t=1779811327;
+	bh=lsbczLgSlFDkeQUbxwLuD+CmyZHjIC341E5zE3yocKI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TdiJDBTaK46e1yUTiuXBApioIXwifd2Fagp9+p8HH5B2KYrFo1UyXcRUin0rBVdnt
-	 mcLC+moIpfASpdMoZeBPws5md7LAv7NYKDRw7bnKo6h7KqHSWNFpkm70LairUIi4ft
-	 iEfFVlpLJtbYR0NwPu6MKnQYDquVIX35kHB1DApCmPYO7LNUPktbefalgv9lNVxbJd
-	 5XtravQ1E6mivjLXiCJAR3qjENDQZyib/6csXg00wrJYGlRMXbBuQlLWbS6WEQOofg
-	 K2hxIHiEU9Z5Sjnv2THGIVIB7vyABIyVA9NZq5vevHwCQt5OVGOOhVbFxn6GRAkOxh
-	 LTj6NsLaY1gkA==
+	b=Bh/Hpy+0fXspY2MEsQH0gy5RuoZooje8nyhtK6VvPlAPCmtikRCB3kOPK20D68D+r
+	 EhytfHmqXdalyJD29S2sBZ/1WxquF8UcfGG17bsWl6hadyGULcKjlLRokhOEyMXGvy
+	 a4LrcIhQ9mIIAtTF2iaG3SWk2zOsZiOMq9Wgwq54DhE1cj8im70Nls6xCjuWyLNV7Y
+	 jUD/lEvDERgTOi5wqMeNECMosdJT7q8+oZvjD0T+FL8jLsKWxyh7dBnf6IiKDfsiLH
+	 ejxK9Q4bl8OZn2kGMIQ2vpKbK6yV3MVA9bnis4sVszjN42R0Ui2el+decElq5M6sYQ
+	 gV2rdCCZGYS7Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	jesse.brandeburg@intel.com,
 	linux-doc@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 01/10] docs: net: netdevices: small fixes and clarifications
-Date: Tue, 26 May 2026 09:01:42 -0700
-Message-ID: <20260526160151.2793354-2-kuba@kernel.org>
+Subject: [PATCH net-next 02/10] docs: net: fix minor issues with driver guide
+Date: Tue, 26 May 2026 09:01:43 -0700
+Message-ID: <20260526160151.2793354-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260526160151.2793354-1-kuba@kernel.org>
 References: <20260526160151.2793354-1-kuba@kernel.org>
@@ -79,14 +79,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-291789-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291790-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -99,125 +99,55 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 11D0A5D95A9
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7D7B85D97D7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-A handful of unrelated nits:
+Update the driver documentation TX queue example to match current APIs:
 
- - free_netdevice() does not exist; replace two stray references
-   with free_netdev().
- - The simple-driver probe example fell through into err_undo after
-   register_netdev() success; add return 0 for clarity.
- - Clarify the netdev_priv() paragraph: "(netdev_priv())" was easy
-   to misread as the thing that needs explicit freeing; spell out
-   that it refers to extra pointers stored in the device private
-   struct.
- - ndo_setup_tc synchronization note: TC_SETUP_BLOCK / TC_SETUP_FT
-   actually run under block->cb_lock, not "NFT locks", and rtnl_lock
-   may or may not be held depending on path.
- - ->lltx guidance reads as very outdated, it's not really deprecated.
-   I suspect people may have been trying to use it for HW drivers
-   in the past but I can't think of such a case in the last decade.
+- use the ring-local tx_ring_mask field in drv_tx_avail()
+- stop the selected netdev_queue with netif_tx_stop_queue() instead of
+  stopping queue 0 with netif_stop_queue()
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/networking/netdevices.rst | 31 ++++++++++++++-----------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+ Documentation/networking/driver.rst | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 93e06e8d51a9..60492d4df2ee 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -21,13 +21,14 @@ by free_netdev(). This is required to handle the pathological case cleanly
- alloc_netdev_mqs() / alloc_netdev() reserve extra space for driver
- private data which gets freed when the network device is freed. If
- separately allocated data is attached to the network device
--(netdev_priv()) then it is up to the module exit handler to free that.
-+(extra pointers stored in the device private struct) then it is up
-+to the module exit handler to free that.
+diff --git a/Documentation/networking/driver.rst b/Documentation/networking/driver.rst
+index 4f5dfa9c022e..195a916dc0de 100644
+--- a/Documentation/networking/driver.rst
++++ b/Documentation/networking/driver.rst
+@@ -51,7 +51,7 @@ Instead it must maintain the queue properly.  For example,
+ 	{
+ 		u32 used = READ_ONCE(dr->prod) - READ_ONCE(dr->cons);
  
- There are two groups of APIs for registering struct net_device.
- First group can be used in normal contexts where ``rtnl_lock`` is not already
- held: register_netdev(), unregister_netdev().
- Second group can be used when ``rtnl_lock`` is already held:
--register_netdevice(), unregister_netdevice(), free_netdevice().
-+register_netdevice(), unregister_netdevice(), free_netdev().
+-		return dr->tx_ring_size - (used & bp->tx_ring_mask);
++		return dr->tx_ring_size - (used & dr->tx_ring_mask);
+ 	}
  
- Simple drivers
- --------------
-@@ -58,6 +59,7 @@ In that case the struct net_device registration is done using
-       goto err_undo;
+ 	static netdev_tx_t drv_hard_start_xmit(struct sk_buff *skb,
+@@ -69,7 +69,7 @@ Instead it must maintain the queue properly.  For example,
+ 		//...
+ 		/* This should be a very rare race - log it. */
+ 		if (drv_tx_avail(dr) <= skb_shinfo(skb)->nr_frags + 1) {
+-			netif_stop_queue(dev);
++			netif_tx_stop_queue(txq);
+ 			netdev_warn(dev, "Tx Ring full when queue awake!\n");
+ 			return NETDEV_TX_BUSY;
+ 		}
+@@ -103,6 +103,9 @@ Lockless queue stop / wake helper macros
+ .. kernel-doc:: include/net/netdev_queues.h
+    :doc: Lockless queue stopping / waking helpers.
  
-     /* net_device is visible to the user! */
-+    return 0;
- 
-   err_undo:
-     /* ... undo the device setup ... */
-@@ -73,7 +75,7 @@ In that case the struct net_device registration is done using
- 
- Note that after calling register_netdev() the device is visible in the system.
- Users can open it and start sending / receiving traffic immediately,
--or run any other callback, so all initialization must be done prior to
-+or run any other callback, so all initialization must be **complete** prior to
- registration.
- 
- unregister_netdev() closes the device and waits for all users to be done
-@@ -157,7 +159,7 @@ register_netdevice() fails. The callback may be invoked with or without
- There is no explicit constructor callback, driver "constructs" the private
- netdev state after allocating it and before registration.
- 
--Setting struct net_device.needs_free_netdev makes core call free_netdevice()
-+Setting struct net_device.needs_free_netdev makes core call free_netdev()
- automatically after unregister_netdevice() when all references to the device
- are gone. It only takes effect after a successful call to register_netdevice()
- so if register_netdevice() fails driver is responsible for calling
-@@ -256,7 +258,7 @@ struct net_device synchronization rules
- 	lock if the driver implements queue management or shaper API.
- 	Context: process
- 
--ndo_get_stats:
-+ndo_get_stats / ndo_get_stats64:
- 	Synchronization: RCU (can be called concurrently with the stats
- 	update path).
- 	Context: atomic (can't sleep under RCU)
-@@ -264,12 +266,9 @@ struct net_device synchronization rules
- ndo_start_xmit:
- 	Synchronization: __netif_tx_lock spinlock.
- 
--	When the driver sets dev->lltx this will be
--	called without holding netif_tx_lock. In this case the driver
--	has to lock by itself when needed.
--	The locking there should also properly protect against
--	set_rx_mode. WARNING: use of dev->lltx is deprecated.
--	Don't use it for new drivers.
-+	When the driver sets dev->lltx this will be called without holding
-+	netif_tx_lock. dev->lltx is meant for software drivers only, since
-+	they often have no per-queue state.
- 
- 	Context: Process with BHs disabled or BH (timer),
- 		 will be called with interrupts disabled by netconsole.
-@@ -304,11 +303,15 @@ struct net_device synchronization rules
- 	lock if the driver implements queue management or shaper API.
- 
- ndo_setup_tc:
--	``TC_SETUP_BLOCK`` and ``TC_SETUP_FT`` are running under NFT locks
--	(i.e. no ``rtnl_lock`` and no device instance lock). The rest of
--	``tc_setup_type`` types run under netdev instance lock if the driver
-+	Locking depends on ``tc_setup_type``. For most types the callback
-+	is invoked under ``rtnl_lock`` and netdev instance lock if the driver
- 	implements queue management or shaper API.
- 
-+	For ``TC_SETUP_BLOCK`` and ``TC_SETUP_FT`` ``rtnl_lock`` may or
-+	may not be held, and the netdev instance lock is not held.
-+	``TC_SETUP_BLOCK`` runs under ``block->cb_lock`` and ``TC_SETUP_FT``
-+	runs under ``flowtable->flow_block_lock``.
++The standard macros like netif_txq_maybe_stop(), netif_txq_try_stop() etc.
++are well tested, prefer them over local synchronization schemes.
 +
- Most ndo callbacks not specified in the list above are running
- under ``rtnl_lock``. In addition, netdev instance lock is taken as well if
- the driver implements queue management or shaper API.
+ No exclusive ownership
+ ----------------------
+ 
 -- 
 2.54.0
 
