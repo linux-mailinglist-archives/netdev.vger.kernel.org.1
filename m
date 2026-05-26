@@ -1,118 +1,159 @@
-Return-Path: <netdev+bounces-291913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAtgFUL2FWqzfwcAu9opvQ
-	(envelope-from <netdev+bounces-291913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:36:34 +0200
+	id IiqtBkz3FWpxgQcAu9opvQ
+	(envelope-from <netdev+bounces-291914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:41:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4AD5DC0BE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:36:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3715DC137
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 21:40:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D6C93014BE7
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:36:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 426233015A7A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00AB3A872C;
-	Tue, 26 May 2026 19:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1820A3ACF15;
+	Tue, 26 May 2026 19:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="covj1rD9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RInNDfHP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34817377009;
-	Tue, 26 May 2026 19:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55B0318EE2
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 19:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779824186; cv=none; b=jUKIm8czI19/7GqiSkVf7Rig3g6cgqbCYgAmm2i280x30P6VQYuK4BlKehXJSfXfEDEyGSSLiINGFwARPzpwwdDVD06mUTqR5HiKvNbk/dfKLw5mzpxNNJ6Pf6x+2aIFu4C/vfu5z0eUg4GrUWF1oza3Kx5x6EqKFsfKofTb2UI=
+	t=1779824455; cv=none; b=rrO+NzEJsxDN8pEM+fPzhaVzPETFQrKhcd0GbWslzxow8rJvtwSMYufjOHc9MBrPDAvJ70QNWoe5DIfbkMpQ0yVzeAXV5MxJd940x2CUZ3Q9MEPCpxTIiQjNIUI3pgOGpFd/yVSHsd1rr/KIZ+h04ZV3c/0+yIYgUf8oEAt01R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779824186; c=relaxed/simple;
-	bh=UvKTJ9IuxiWon6lZcZAgjd8GDTaliJRts/5/4wx02SQ=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=f+/SQ64F8SiICU5/E+Et5NzX7zRIXtOBX+SA6b2zUv3N7Ea7UC41VowE4KMU7ZNmJsYyHMQGkZYjaUMT6k3nc231Q0sDkYmavTAt3q2EHqOXxSEl5Q0+WwYN4FJrAXtVug6zJFUR5m5WLmXTA2qJyTLqzRNJuOuvmORY9e8lT8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=covj1rD9; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4D94CA4B6F;
-	Tue, 26 May 2026 21:36:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779824182; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=FIsguaqLNZxyz4WUt9a4bb97qm80/A2ahltxZ1mLKOA=;
-	b=covj1rD9GR1X8WK5A+bMiM1jtOLj41YaqHGzVac+cWrfkKefKTAq6aVXz3cyEwDHFEIX/R
-	xvIphaJBA2K90zduUqPL0z3nyvxK7ZfVskBU8gnPkxXfq5C3fA4TxiZZny0CkQ5+Puwnbq
-	VZvMxII50RrVN/exXmU5lwJ61x6M0zDDs1M75F0LORTJrvWaj4Yg4qqGe31b5A6rR3QYEy
-	GnWj140nzrHV4IYS+9tk7u10K1KhHtaZWrK/lYdYd7t5/4AYQcuQbGPrCM6B5TNYj+YiyI
-	awyOJTm41mPUvS4A/Q6e6/Isl5kIZj/ex8jHfE6QyrP38wxxQDJB7vg5OrHwLw==
+	s=arc-20240116; t=1779824455; c=relaxed/simple;
+	bh=F5frrW998FNG+MVyldwv0/1kfiMGHYyr5DBhehAhFnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ApD3xrrN/pi591zVgEBEyxHSm4oKqwXCFJ0fwVTXVDp3A+qK45xfKPszl83OaSwbLEqu7pNIh72ex8R0dQBgsgM7N1gxYgancfuCNMFApAIySKLdoSSvbO+7JWgyD501r43wmeo/GjuzYIaXeQ6poSxNOL+aPtv/bkGl0KT5AoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RInNDfHP; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53231F000E9;
+	Tue, 26 May 2026 19:40:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779824453;
+	bh=3dc3s5FcGv5TWeqnsXrMMOMRbRrCCsMuvBGziG/wGiQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RInNDfHPD2F13iiBXuM2riLL4luuizpzpHuIIMCA+VQ5qip00sf7n+PbDrNZAfECb
+	 XOzErwmPBYnRivhowJTiOrxIHHvy7qydP/OOsyJET/rRa6J6vXDv7iVQRiUTz3T2Lu
+	 5+zN1G+dl+DjtCFIJWRg3f7mHTMqU4s8t/47XPQPvwbojeAQNC4EYMMpU/cqmo7+B+
+	 2t4N70AmhbPelQtIYzFaTDB51lIAyDOqxXAwMsQpuft3J3JuaHMR28wyNckXNZ6D6Q
+	 WBF9YHmX1VnZUpC093zsFGmqiCPZauViIpbpIP17jo7Kguz3+MFIHSi282jPgVQEST
+	 Lu+9RtCOrq/3w==
+Date: Tue, 26 May 2026 20:40:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next 1/2] iavf: log PF diagnostic message on cloud
+ filter add failure
+Message-ID: <20260526194050.GC2256768@horms.kernel.org>
+References: <20260522025702.1764129-1-aleksandr.loktionov@intel.com>
+ <20260522025702.1764129-2-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 26 May 2026 21:36:20 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- tariqt@nvidia.com, dtatulea@nvidia.com, linux-doc@vger.kernel.org,
- hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH net-next 4/4] net: make page_pool_get_stats() void
-In-Reply-To: <20260526155722.2790742-5-kuba@kernel.org>
-References: <20260526155722.2790742-1-kuba@kernel.org>
- <20260526155722.2790742-5-kuba@kernel.org>
-Message-ID: <8867c95fc2c88a4074526f31dfb583b9@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260522025702.1764129-2-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291914-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-291913-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:dkim]
-X-Rspamd-Queue-Id: AA4AD5DC0BE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,linux.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url]
+X-Rspamd-Queue-Id: 0B3715DC137
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 26.5.2026 17:57, Jakub Kicinski wrote:
-> The kdoc for page_pool_get_stats() is missing a Returns: statement.
-> Looking at this function, I have no idea what is the purpose of
-> the bool it returns. My guess was that maybe the static inline
-> stub returns false if CONFIG_PAGE_POOL_STATS=n but such static
-> inline helper doesn't exist at all. All callers pass a pointer
-> to a struct on the stack. Make this function void.
+On Fri, May 22, 2026 at 04:57:01AM +0200, Aleksandr Loktionov wrote:
+> When the PF rejects a cloud filter add request it may include a
+> diagnostic string in the virtchnl response. Use dev_info() to log it
+> so operators can diagnose offload failures without enabling verbose
+> tracing.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Use %.*s with an explicit length bound to avoid reading past the end of
+> the message buffer when the PF fills all 4096 bytes and leaves no NUL
+> terminator. Add the missing cloud_filter_list_lock around both the
+> VIRTCHNL_OP_ADD_CLOUD_FILTER and VIRTCHNL_OP_DEL_CLOUD_FILTER error
+> paths to close a pre-existing race against iavf_add_cloud_filter() and
+> iavf_del_cloud_filter(). Apply the same %.*s fix to the equivalent
+> VIRTCHNL_OP_ADD_FDIR_FILTER error path which carried the same bug.
+
+This seems to be doing several things. So I would suggest it warrants
+being split into several patches.
+
+And, if they are fixes, some consideration should be given
+to targeting iwl and including Fixes tags in the patches.
+
+Partially flagged by: https://netdev-ai.bots.linux.dev/sashiko/
+
+
+Also, the locking fix here is made to the error path,
+but not the non-error path (v_retval == 0) where
+the VIRTCHNL_OP_ADD_CLOUD_FILTER and VIRTCHNL_OP_DEL_CLOUD_FILTER cases
+traverse and update  cloud_filter_list.
+
+Flagged by https://sashiko.dev/
+
+
+> Suggested-by: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 > ---
+>  drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
 
-> [...]
+...
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+> @@ -2434,8 +2443,10 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+>  							       v_retval));
+>  					iavf_print_fdir_fltr(adapter, fdir);
+>  					if (msglen)
+> -						dev_err(&adapter->pdev->dev,
+> -							"%s\n", msg);
+> +						dev_info(&adapter->pdev->dev,
+> +							 "%.*s\n",
+> +							 (int)msglen,
+> +							 (const char *)msg);
+
+As well as addressing the length of msg, ad described in the commit
+message, this also changes the priority of the message from err to info.
+This seems to be a separate change that is not mentioned in the commit
+message.
+
+Also flagged by: https://sashiko.dev/
+
+>  					list_del(&fdir->list);
+>  					iavf_dec_fdir_active_fltr(adapter, fdir);
+>  					kfree(fdir);
 
