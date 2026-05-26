@@ -1,318 +1,120 @@
-Return-Path: <netdev+bounces-291965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291962-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HjrKmYgFmrLhwcAu9opvQ
-	(envelope-from <netdev+bounces-291965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:36:22 +0200
+	id MA2CCRkcFmq2hgcAu9opvQ
+	(envelope-from <netdev+bounces-291962-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:18:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C79C25DD393
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:36:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803DF5DD26D
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B262D3034EC4
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:36:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 092AC301AD36
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B45F3B27D7;
-	Tue, 26 May 2026 22:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5041A3C3BF6;
+	Tue, 26 May 2026 22:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="hVVh29eX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aMQ4QJ9P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AC22F531F
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 22:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4293F355F2A
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 22:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779834978; cv=none; b=jTQi//kTI9sVFdUeDM0DghxVvykwOaTTRCyAZZESJyoOT2Bv4eHpR1E2+ZBI8ZQx15moy623ke/kOHd9mlHoSJ9y21ANDTu/jwYItYyIdfSy4n5wRAmvpaYogmzUbuEJYt3p4xBC8gYwGaQ3Mg6iSdwLEIUOfJXPUmRvSr3z0LI=
+	t=1779833878; cv=none; b=Us6whlI3FRTDIxcWNzCaluIEUeAI78avMvQND0zJr1yaW0JID3Vnmj7I912QsXe1jo9TWdfg+nUb1QsR0xEk+cIFLd/uRCLSQCLJuBIsKxk9BbtBnbyw258GnBhSvAQ1YwicWhFil5Vykcdd8U2XKyzflObQLGxXzXILJzeL8Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779834978; c=relaxed/simple;
-	bh=qQGMf5Oja55h6Cw2oXwBePJIZxpj+DW+ZyPt7nOTD3w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y4MslBvHA1CaHqYumHp2Ag1TpfBzUANkKQZY6Rs7ivsQ/K8PZfpsDPtjPR0sMFYALUgIR3iNW8RvLXr1gOWA0KvX6iXzYoRIEvSgSQsYwGprHsC/YZsi+P0PhK/Z6MSS5FQXxP1Pa88JgclGQipMZpL1tCVPzDVFNFkARLqm50M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=hVVh29eX; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NJqWELah5fN6kC7HlpvsVp3NB/5DJZ/YkbrusZMNXr8=; t=1779834976; x=1780698976; 
-	b=hVVh29eXEoq6gSoJ4GmClbqe7Kx0GUCsXgoxETAXgAKEiLMTAVEkG+szZZ6SblxW7cE+ZTJjFk7
-	3jev0mjKskqA/s9WcrmldkWADyJQPCHqtD+GAkbZjrGfmQ7IP07VNY92IfcZEZ7GvtJMXMAGFVLtl
-	Xw5COAM01KD2EYdhCGzo4YRY0C7sLavN1kgNwlsse1Lb+sG0ao7FGPygsofub4+ZR/tcLYyMyu7xZ
-	arUYNCG9gN9b5mU2CqLiltO6n2k57WDbj4YjxgEzh4g6Z5uy7u/4UaZQyxdQfJDQlXOAyj8N0E+Df
-	ka/cMZw9PhDFmpiZzivr2uUlDP92s5SP+IFg==;
-Received: from mail-yw1-f179.google.com ([209.85.128.179]:50351)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1wS062-000610-DA
-	for netdev@vger.kernel.org; Tue, 26 May 2026 15:18:01 -0700
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7cb345cb5bfso89527617b3.0
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 15:17:58 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+13uE4mVuuAtNiyG32TqqVNbo4c94veGSuXLhJx5/DE+5dhHhSYV38WSc7RBfaEQ72IiT3tF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxszbqO1pguiS05nOI3zikdJGLf06P49zCbMBR9fVPBVgv2N7Kx
-	nZ6HdCjmsnzbi05si8kq/l8pUnOLkcxeLigBOkrrCnkegbe4Pk7K/Qtwf+7PbQN4WDdOy4aaj2G
-	TnrJGy1wXqt0YAW02pEYJlcBtIjTbaRs=
-X-Received: by 2002:a05:690c:b05:b0:799:198d:8c78 with SMTP id
- 00721157ae682-7d337dac2b7mr212869987b3.46.1779833877680; Tue, 26 May 2026
- 15:17:57 -0700 (PDT)
+	s=arc-20240116; t=1779833878; c=relaxed/simple;
+	bh=sO/QfME8yPF5zF10RJ9dek2yuHdzaZbHktvXvp7Rbmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mVXZ3FY7WiFWucZ6OT8g3abD7R761bjbQrd304JyG1Jjs+0/hZG9ic3vkcl9GDO4iWqJZ4kzXUeZwENUwpWjTFkWRN4GWodQihRugmQ9B2bWI4dI9BIFIlgjPtEtSGWBWe/xkxmsXDKYt47CVUesGz2Dn+AJbNj59JzM1ayKgsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aMQ4QJ9P; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 866C61F000E9;
+	Tue, 26 May 2026 22:17:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779833876;
+	bh=IOVvB/1ifL08mB+puOXObPElfVzRmwSi7IMUhhhJwiA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=aMQ4QJ9P4V2Hg1UnkkzqlvCohvGM4Rm7KdLKa+uuwb3IQqAYeUkWv/2Su5Iwo6q0X
+	 oVWuDajNxgzlMeTMDWVQIKrUScx4kNZ+A5qMP370YPxhURZAoa7gfAKHLg6eCda4Vp
+	 hBFLAWTSRIvxCn5YXxQszt1330U60EW0JY1nzq+a1+AKtC29rH05Rj4bG1f/21XuuO
+	 rVjVJ6WGJeXFvgC0WMqE3Ye7DmpBBlAjEAKfv6XsQW0n4bNU2HGIjmoCSuclgjAzui
+	 Ql/f/N0YtbnKSGfhL3FEz3Rrw6hy4ZkX+mZ8dN3uBzKB/FRVE8qB4ULpmZI/DRI/Ma
+	 Kir13gFBw8V0g==
+Date: Tue, 26 May 2026 15:17:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciek Machnikowski <maciek@machnikowski.net>
+Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
+ milena.olech@intel.com, willemdebruijn.kernel@gmail.com, andrew@lunn.ch,
+ vadim.fedorenko@linux.dev, horms@kernel.org
+Subject: Re: [PATCH v6 net-next 3/3] selftests:net: Implement ptp4l sync
+ test using netdevsim
+Message-ID: <20260526151755.06ba2041@kernel.org>
+In-Reply-To: <f10b3ddd-d403-48d3-ad0c-25b0e2d9d64d@machnikowski.net>
+References: <20260513094520.325693-1-maciek@machnikowski.net>
+	<20260513094520.325693-4-maciek@machnikowski.net>
+	<20260518174209.41e2e039@kernel.org>
+	<f10b3ddd-d403-48d3-ad0c-25b0e2d9d64d@machnikowski.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512181953.1689-1-ouster@cs.stanford.edu> <20260513100732.499e3f49@pumpkin>
- <CAGXJAmzK+56DHnitD1g263mPSgWg9jZyq2z6R+vd8bV_c4ZbuQ@mail.gmail.com>
- <20260513214927.17a8dd45@pumpkin> <CAGXJAmx4LaVv=QJ=SanvF6iayJ8+SiLyUqht+jMxouXPX=54-g@mail.gmail.com>
- <20260514110112.12bdf5ff@pumpkin> <30dc284c-8cc0-4bae-b7b0-99d6d71a66e3@intel.com>
- <e1ce1387-ae6b-4b43-b5d8-a1141c4a4f1c@redhat.com>
-In-Reply-To: <e1ce1387-ae6b-4b43-b5d8-a1141c4a4f1c@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 26 May 2026 15:17:20 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmwa4OQJV1O+Zn8KYBH9wJEVrqefuJQ6NRjbBTmLqF4vwA@mail.gmail.com>
-X-Gm-Features: AVHnY4InlTCmtsr01wWr_JUtpPbh3ksqqJ8UpLXEL8kdVSMNoGuSjEu4uz-pvUU
-Message-ID: <CAGXJAmwa4OQJV1O+Zn8KYBH9wJEVrqefuJQ6NRjbBTmLqF4vwA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH net v3] ice: fix packet corruption due
- to extraneous page flip
-To: Petr Oros <poros@redhat.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, David Laight <david.laight.linux@gmail.com>, 
-	stable@vger.kernel.org, anthony.l.nguyen@intel.com, 
-	intel-wired-lan@lists.osuosl.org, przemyslaw.kitszel@intel.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Scan-Signature: f381877c06e33db9b8e2eda11595152b
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,gmail.com,vger.kernel.org,lists.osuosl.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,intel.com,lunn.ch,linux.dev,kernel.org];
+	TAGGED_FROM(0.00)[bounces-291962-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[cs.stanford.edu:-];
-	TAGGED_FROM(0.00)[bounces-291965-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.812];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,stanford.edu:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C79C25DD393
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 803DF5DD26D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 5:47=E2=80=AFAM Petr Oros <poros@redhat.com> wrote:
->
->
-> On 5/14/26 18:43, Jacob Keller wrote:
-> > On 5/14/2026 3:01 AM, David Laight wrote:
-> >> On Wed, 13 May 2026 21:47:11 -0700
-> >> John Ousterhout <ouster@cs.stanford.edu> wrote:
-> >>
-> >>> On Wed, May 13, 2026 at 1:49=E2=80=AFPM David Laight
-> >>> <david.laight.linux@gmail.com> wrote:
-> >>>> On Wed, 13 May 2026 09:28:40 -0700
-> >>>> John Ousterhout <ouster@cs.stanford.edu> wrote:
-> >>>>
-> >>>>> On Wed, May 13, 2026 at 2:07=E2=80=AFAM David Laight
-> >>>>> <david.laight.linux@gmail.com> wrote:
-> >>>>>> On Tue, 12 May 2026 11:19:53 -0700
-> >>>>>> John Ousterhout <ouster@cs.stanford.edu> wrote:
-> >>>>>>
-> >>>>>>> Consider the following sequence of events:
-> >>>>>>> * The bottom half of a buffer page is filled with data from
-> >>>>>>>    packet A. The page has a net reference count (reference count
-> >>>>>>>    - bias) of 1. The page is returned to the NIC, flipped to
-> >>>>>>>    use the top half.
-> >>>>>>> * Before the reference on the page is released, the NIC returns
-> >>>>>>>    the page with no data in it ('size' is zero in ice_clean_rx_ir=
-q).
-> >>>>>>>    In this case the bias does not get decremented. The page still
-> >>>>>>>    has a net reference count of 1, so it gets returned to the NIC=
-.
-> >>>>>>>    However, ice_put_rx_mbuf flipped the page so that the bottom
-> >>>>>>>    half is active.
-> >>>>>>> * If the NIC stores another packet in the page before packet A
-> >>>>>>>    has released its reference, the data in packet A will be
-> >>>>>>>    overwritten with data from the new packet.
-> >>>>>>> * Unfortunately zero-length buffers occur frequently: they seem
-> >>>>>>>    to occur whenever a packet uses every available byte in a
-> >>>>>>>    buffer, ending precisely at the end of the buffer. When this
-> >>>>>>>    happens the NIC seems to generate an extra zero-length
-> >>>>>>>    buffer.
-> >>>>>>> The fix is for ice_put_rx_mbuf not to flip pages that have a
-> >>>>>>> size of 0.
-> >>>>>> How is this different from packet B (in the top half) being
-> >>>>>> freed before packet A (in the bottom half)?
-> >>>>> I'm not sure exactly what you're referring to here. Are you asking
-> >>>>> about a situation where both halves of the page get filled with pac=
-ket
-> >>>>> data and then the second half to be filled is the first to be freed=
-? I
-> >>>>> believe that the ICE driver abandons a page if both halves are ever
-> >>>>> occupied simultaneously; the page will be returned to the system on=
-ce
-> >>>>> both halves have dropped their references. Thus it doesn't matter
-> >>>>> which half is freed first.
-> >>>> That is what I was thinking, seems like the logic is over complicate=
-d.
-> >>>>
-> >>>> If you need to put 4k pages into some kind of iommu rather than 2k b=
-uffers
-> >>>> (to contain 1536 byte ethernet packets) then I'd have thought you'd
-> >>>> initially put both halves into adjacent tx ring entries.
-> >>>> If a rx buffer is discarded (eg a zero length fragment or a CRC erro=
-r,
-> >>>> or even 'copy break' for short packets) then, as an optimisation,
-> >>>> you could reuse the buffer for another receive.
-> >>>> The same could be done if the page is freed by an application.
-> >>>>
-> >>>> However it sounds like it doesn't use the 2nd half until the first
-> >>>> completes - otherwise you'd never 'flip' to make the other half
-> >>>> active.
-> >>>>
-> >>>> Thinks...
-> >>>> By only putting half of each 4k 'page' into the rx ring the code
-> >>>> will usually save (expensive) iommu setup in the (probably) normal
-> >>>> case where the buffers are freed 'reasonably quickly'.
-> >>>> But that really requires a 'free/with_nic/busy' state for each half
-> >>>> rather then trying to guess from a reference count.
-> >>>>
-> >>>> But if the low-level code is recycling the rx buffer (for any reason=
-)
-> >>>> it wants to use the same buffer.
-> >>>>
-> >>>> The ethernet driver I wrote (a long time ago, early 90s) allocated
-> >>>> 64k as 128 512byte buffers and did an aligned word-sized copy of
-> >>>> every receive frame - most frames were in contiguous memory.
-> >>>> The simplicity of it made up for the cost of the copy, especially
-> >>>> since that was an iommu system.
-> >>> I'm not here to defend the logic (and it has been replaced with
-> >>> something that is probably simpler and more efficient); I'm just
-> >>> suggesting a bug fix for the stable releases that still have this
-> >>> logic.
-> > Right. We definitely want a fix for the possible data corruption in
-> > stable. Ideally one as simple as possible.
-> >
-> >> You've forced me to look at all of the function :-)
-> >> I've noticed a few things:
-> >> - If ice_add_xdp_frag() fails (because there are too many fragments)
-> >>    then the rest of the fragments are left in the tx ring (instead
-> >>    of being discarded) - so are likely to be treated as a full packet
-> >>    later on.
-> >> - Frames with status errors (crc, framing etc) are discarded after
-> >>    the skb is built - surely that should happen before the xdp 'progra=
-m'
-> >>    is called.
-> >> - If the remote system send a very very long frame (traditionally the =
-PHY's
-> >>    'jabber detect' didn't always work) you can end up with all of the =
-rx
-> >>    ring being full of a single partial packet.
-> >>
-> >> I think you need to avoid calling ice_add_xdp_frag() when 'size =3D=3D=
- 0'.
-> >> Then in ice_put_rx_mbuf() unconditionally call ice_put_rx_buf() for
-> >> zero length fragments.
-> >> The comment would be 'zero length fragments can always be reused'.
-> >>
-> > That seems correct.
-> >
-> >> The zero length fragments almost certainly exist because the mac hardw=
-are
-> >> advances the the new buffer expecting more data - but only gets the
-> >> 4 byte CRC. So the zero length buffer contains the receive status.
-> >>
-> > That matches my understanding.
-> Hi John,
->
-> I have been looking at the same area in the pre-page-pool ice code and
-> I want to ask whether you observed memory growth during your Homa runs
-> that exposed the corruption, because in my testing the same bias mismatch
-> also produces a slow page leak that your v3 does not close.
->
-> Short version of the leak path, in the PASS (!CONSUMED) branch:
->
->    1. ice_get_rx_buf(size=3D0) does pagecnt_bias-- unconditionally
->       (added by commit ef68094cb09e ("ice: Fix kernel panic due to page
->       refcount underflow") as the fix for the matching panic).
->    2. ice_add_xdp_frag() then returns 0 for size=3D=3D0, so that page is
->       never attached to the xdp_buff/SKB. Nobody downstream will ever
->       call put_page() to balance the pagecnt_bias-- from step 1.
->    3. Your v3 in ice_put_rx_mbuf() correctly skips the page flip for
->       size=3D=3D0, which closes the corruption window. But it does not
->       restore pagecnt_bias for that zero size buffer, so the page is
->       handed back to ice_reuse_rx_page() with a permanent deficit of 1.
->    4. On the next reuse of that page with size > 0, pagecnt_bias drops
->       again. ice_can_reuse_rx_page() now sees pgcnt - bias =3D=3D 2 and
->       drains via __page_frag_cache_drain(page, pagecnt_bias). Because
->       pagecnt_bias is one too low, the drain undershoots by 1: page
->       refcount stays at 2 instead of 1.
->    5. The SKB eventually releases its reference (refcount -> 1), but
->       nothing ever brings it to 0. The page is leaked.
->       ice_alloc_rx_bufs() just allocates a fresh page to fill the slot.
->
-> At the zero size frequency you mentioned (thousands per second), this
-> adds up to roughly MB/s of leaked page cache, which Jaroslav Pulchart
-> originally reported against 6.13.y on NUMA nodes and which motivated
-> the libeth/page_pool conversion in mainline. So in stable trees the
-> leak side of this bug is still live.
->
-> Two questions:
->
->    - Did you monitor RSS / page allocator stats over the duration of
->      your Homa runs? If you did and did not see growth, I would like
->      to understand what is different about your setup, because by my
->      reading of the code the leak should fire whenever both halves of
->      a page end up in SKBs simultaneously and one of them carried a
->      zero size descriptor along the way.
+On Tue, 26 May 2026 17:10:46 +0200 Maciek Machnikowski wrote:
+> >> +# By default, it:
+> >> +# - Creates two netdevsim instances in separate namespaces
+> >> +# - Assigns IPv4 addresses and links them together
+> >> +# - Uses those interfaces as leader/follower endpoints for ptp4l
+> >> +# Optional: --leader and --follower override endpoints with existing
+> >> +# interfaces. Each argument can be either "ifname" (initial netns) or
+> >> +# "netns:ifname". Both options must be provided together.  
+> > 
+> > Please use the existing DrvEpEnv infra!?  
+> 
+> It exists in the tools/testing/selftest/drivers/net and this script is
+> in tools/testing/selftest/net. I can either keep  the self-contained
+> test only, or move the script to the drivers/net - which one is preferred?
 
-I have not monitored the page allocator stats. I'm not sure I know the
-best way to do this; I tried slabtop but it didn't seem to show
-significant growth in memory usage.
-
->    - If your focus was specifically the corruption, would you be open
->      to extending v3 (or replacing it) with a fix that also restores
->      pagecnt_bias for the size=3D=3D0 case? The minimal extension is one
->      extra branch in ice_put_rx_mbuf:
->
->          if (verdict !=3D ICE_XDP_CONSUMED && size !=3D 0)
->                  ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
->          else
->                  buf->pagecnt_bias++;
->
->      which restores bias on every path where the page is not actually
->      going out to an SKB. (I have a slightly different variant that
->      tracks has_data in struct ice_rx_buf to also handle the broken
->      positional 'i <=3D xdp_frags' counter in the CONSUMED path, where
->      zero size descriptors in the middle of a frame steal bias++ slots
->      from real fragments. Happy to share it if useful.)
-
-My understanding of the ice driver is extremely limited. You may be
-right about the proposed fix, but I don't currently know enough to get
-comfortable with it. I think it might be better to separate your
-change into a different patch, which can be shepherded by people with
-appropriate understanding.
-
--John-
+I assume you are adding the CLI --leader and --follower options to run
+this against a real device, not netdevsim. In this case of course the
+test should live under tools/testing/selftest/drivers/net
 
