@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-291588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291587-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPelK+JdFWp7UgcAu9opvQ
-	(envelope-from <netdev+bounces-291588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:46:26 +0200
+	id +GLFKsNcFWp7UgcAu9opvQ
+	(envelope-from <netdev+bounces-291587-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:41:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0878E5D29C8
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:46:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DC55D291C
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 10:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B49533033D11
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:41:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1FA553009F24
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 08:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00543CD8D3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4236386572;
 	Tue, 26 May 2026 08:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="d+8DKQ+h"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="HlAlxkXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f100.google.com (mail-ej1-f100.google.com [209.85.218.100])
+Received: from mail-ed1-f99.google.com (mail-ed1-f99.google.com [209.85.208.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF2F3B9D9E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23C43CCA05
 	for <netdev@vger.kernel.org>; Tue, 26 May 2026 08:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.100
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779784868; cv=none; b=g/yduqNYafvkhpQXsNcNURTyODdig8Pb0BNNI8hY8k96K2JYdElnvFDZZL7IAdPRhtOlYi4rQn1YAQHMSScwXBV3oswSoM/U1FenM9MRXdJBjktS5PV9QtmEXf+qFjk1SHh1c+LmnKu0vS8R9IUTcw+AMawUgCq4NnfLsG3Hegw=
+	t=1779784868; cv=none; b=pjGjfRkpdmIhbKtgTGzDWQc68fi62QT0qDznNLzdpvWV2gnBbe0VymiXBJaAjkrJtUxadlcDuwp6vzgrXzjYC4JKPiDgcVb8QZcphATYSBo6mPgSbTev7sPt2TwJu1b2qLEf72yKPch3QVq6syWUWy+Mwf4Oq/poBDF1GgrQPgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779784868; c=relaxed/simple;
-	bh=As0IIB8SaM9g0iJhsygQfNz95ki/F/8soFisaCB0aVg=;
+	bh=G0FN6kA6Tea78nrlCADVDkW9gVxo/7otmN92WP8pM/k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dx7xx4y28sm629nXeiT5x5o4pglXgSFmQ2oWMzGIrK4lvNbG+Y5SSep07XmY7Fi39he8i27zMbnhWybRgxPwzLJZueuQ/4rVOD6A8lWaATuZo58s+V+7UZmUllOCzndlOq61dFu3au624ga+ga5hnph0+qT8SYrla2SbkKGYXhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=d+8DKQ+h; arc=none smtp.client-ip=209.85.218.100
+	 MIME-Version; b=AYEP4ZtvGwZWgeuB/R6LP6biSrshPzDNZOR/1ih6NGy9cZZEKpqq2p9odqXogav/d1kxmM0lz611olCCRQL/tehdMYmwturP7B+XdQjdvYEYcdTzaQhfxOquTlCAZOUzrOwETc2uwOmAT8xg7BzYBlJdhqDC1ocXmyeqQtxTfbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=HlAlxkXk; arc=none smtp.client-ip=209.85.208.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f100.google.com with SMTP id a640c23a62f3a-bdb3eb93e20so863113066b.0
+Received: by mail-ed1-f99.google.com with SMTP id 4fb4d7f45d1cf-6870a365c77so11655527a12.0
         for <netdev@vger.kernel.org>; Tue, 26 May 2026 01:41:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1779784865; x=1780389665; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+bivjaMuNT9oJ2l/Y7Zh3L+bPRfO/kPb9uY6ej/NrXA=;
-        b=d+8DKQ+hHJygs0so4Hy/IKWGbrZlfKK0RDhny50H2VCSZRENj2EYt58y7Va6Tilk9q
-         hjlWz89uL3GCk/JFOnLrvQEhX6iDOQQI2iKZ1AgM9dZh3iut8zY939xveV7V2ta2/elp
-         HsZbzUBMermBtteouD5MDHgck2TQ2mbhTUs7VqOQfMlydbKiJixmQfAdSMVzq+ASXzKa
-         86i1SZQuuZHiR1KpjRHkL3EIgaUueT7Jxn0qdfPqpLhRH+Q4+PBFM9EEBTSycxrHNh1B
-         TUb42CDpSPgK2Gmv+Lmg1txcFNOmksA/4N83F9He/0LVJUf9MEZ5scWfnVbJ58ab1rid
-         +ItQ==
+        bh=FBCQDeRY4EmCQ0kla5Ex2x+xLWc/2PXpf9maOMSgAy4=;
+        b=HlAlxkXk11+RmzsSwWzeOP6wHqLu1JXCIRbBeA0ME926Fr4AFZHDYfLQ7Kv+bR2yq/
+         t+AS1Z70PI+2t21ohfzZDMbhXG5NAOgnrqkW1GoosiKgtHLFXgeI8DaGDxf1xUeDu4oZ
+         gwrDRQ/TQZtOuFAp4AG/Q00lqijGW9WHc3b20p0yg8Z76RQj05oWuX2EB4zYPeQjK6v1
+         tzhn6P6Htvd9HjQ2JDKdTXwx+2IHwb7pJ+Xp+HInMhfUBJPhFSQ3BWj/wGBkJvXqU2gy
+         oj6vrsHvcUttAV7mln7i1NCrq515pCgcw1F+XJJgxMksomNr4I4d5Bm8/nb4RLKEDV87
+         o3bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1779784865; x=1780389665;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+bivjaMuNT9oJ2l/Y7Zh3L+bPRfO/kPb9uY6ej/NrXA=;
-        b=aTl2nVAkTbazV8WHOo5rgA/JYxStXisg5DtERDiZ5F/1WywM9iBf0bn/6GU9abhnbB
-         jnBM7X19xOuk8BJmWm8d7gKtQtsufagGlnY66W+csHWdEnQQMX1YNG9B5n2U+a4WWKBm
-         OCMFmNSk2aBHobeALcer4Kc3XPKPhJBFY1lcxw+YdUyA2+wzKcoU1XdBM/FAJDHxzU+D
-         VKf/W9iYHEVH1fFdIMd7/xMDu/2mVqAW161xCSW6MfW1hlt0lcuunLiHQmd4a/fmUeZx
-         0E6yraIdL+4JvqEfsxcjj+kH3YFlVj82blu2exhi9hHivRBqpfMaqocOdoVgRGXXy8zj
-         WMsA==
-X-Gm-Message-State: AOJu0YzisK12KN9pV5ryhn31evMZQJobioMQea6uDlnkMmbRhUQvWgCs
-	OrxbIXaFb4rpOzq3ohXSer4SsjDj0yH5sMW1PrtLEPxNdIE4gbuYDAPrfFLHgMgtDKhUUIddnEH
-	UyyR2HfgdevpmxoXDYTUyd9S2t3LE6hwD8+km
-X-Gm-Gg: Acq92OGskARvVzSNQrgK1dCe58pJ/8cUuLFZkmajs7G6B18txmsr9EWx6mfo+Jy5qMs
-	5DBHceRX2959zhovSKAvI5veCVvjgpEsjF881rqzuWeu9lfWBXhnk/CYZzbn2JszuRuBQ+1NzvZ
-	AV9vQ6jaJEpUhycqOWayYtTBlCLhQcz2pek0qghiik4Ut/1prMkfcKoXlV8O0dUNVyPDkV4T9Hk
-	h2RdeTDpK0zyS4xilxGJuM4/fdDUL2GNK22VBYsrthbTQGdJ9Yqpvs0Vum+0h1lTnbAOEN/wcG7
-	lAK2purNk7eHoUUjvVJs0lVLcEUNI9ua84Z0i85QDscwlv5Tr0N8oAFQqkm58Jh8FW78o04QxUM
-	LUtKD29+JJhc7D2E7dhWrKEcmdqKDuvwga+ohF+jGNllXSLvJqkXS
-X-Received: by 2002:a17:906:23e2:b0:b9c:b069:8ac3 with SMTP id a640c23a62f3a-bdd22a40293mr785056466b.3.1779784865261;
+        bh=FBCQDeRY4EmCQ0kla5Ex2x+xLWc/2PXpf9maOMSgAy4=;
+        b=f9h472z9pv1jgaMR/B6tMoZnt3Ulo6ZdAaLbazKqL35FSYhYnZCRVoa7t3S/5e2hGl
+         QTTJBmU4/U9vwOXmFzI+ld5Ba1FZhHkTty89P+ZzntIgUFkXXJhNbrQVwJdDOKOxgwVm
+         soBRFzQBRaxaTO3RmGVwaqEsDrES4wwQs3ApX7QG7eUTTvgsWrxhAScw5JhFpHNgRdXd
+         ltB5CO5CvWHiwGJTXUUkA3PEaie3bCcQMkoXgeEMHm+Yz3hjCVRVIg8m5PMa2DkhiyUf
+         IZNrWUURLcYDkEErJsoZGK/cwteRSQf+owgGOzIvBxRNNLhxVXN5eUcgkyv3IJ1PU7PY
+         Oc/g==
+X-Gm-Message-State: AOJu0YzcUxYQoOF3VzICti+1TCKBYszG8wjt12eUB+TnnggNTN2jbC/N
+	Fm1NG9QXA85hWkb50wpEXy3jz7Thf3uv5xEn7py6LrVFQoHq/OaxkX6OC0c1qvMHRuO8u3IOhcn
+	KUWDEie2OJmiYg0pKaQ/2LlNXRW5/qdM0QAu6
+X-Gm-Gg: Acq92OHPYHevlYnQ9djKgaXJNGFOiqZXW1QZmMMVxKu/tk5m/Z93bY8EE8dkgz8MXcb
+	epN4bM+TNIcIojE67uANgXZKaTm8c+akCtJPppNsevqDpUjRX+wGiGSLlSoqj6xHqdBxNBBqdx8
+	5miW/woHybJQUQZGNSUQ7SiDWU481sPGs2dqZRh1Ev+SL+RHvLKZWHjumGPv6vjgBcVDrhIcOZX
+	Bu5CU2jvj48zh9kIzLx4p37IM+lJ+Njsgg+3XIHmc56ozVVn2L/OseSu41QIowaLxsEyrlNUzaw
+	Qx1WrwJ/np23H4eEN6fxH3y6LBLwnfuTLWWBhUXDZFFKddwyCLSqwDHc6/Pc0psHmMTYK0Fewoc
+	ZTZbVi5+PJN6ZQuCYetmkrVnpmSag1uZkVpTiRuLTdxfTaJqLEQi4
+X-Received: by 2002:a17:907:1dec:b0:bdc:fafe:bf66 with SMTP id a640c23a62f3a-bdd263c9230mr775348266b.33.1779784865327;
         Tue, 26 May 2026 01:41:05 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 4fb4d7f45d1cf-688bab32430sm554306a12.9.2026.05.26.01.41.05;
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-bddc274f009sm68250666b.25.2026.05.26.01.41.05;
         Tue, 26 May 2026 01:41:05 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 0C0BB124AE;
+	by smtpservice.6wind.com (Postfix) with ESMTP id 1E83C124AF;
 	Tue, 26 May 2026 10:41:05 +0200 (CEST)
 From: Louis Scalbert <louis.scalbert@6wind.com>
 To: netdev@vger.kernel.org
@@ -91,9 +91,9 @@ Cc: andrew+netdev@lunn.ch,
 	maheshb@google.com,
 	jonas.gorski@gmail.com,
 	Louis Scalbert <louis.scalbert@6wind.com>
-Subject: [PATCH net v7 1/6] tools: missed broadcast_neigh if_link uapi header
-Date: Tue, 26 May 2026 10:40:43 +0200
-Message-Id: <20260526084048.1696544-2-louis.scalbert@6wind.com>
+Subject: [PATCH net v7 2/6] netlink: specs: rt-link: missed broadcast-neigh
+Date: Tue, 26 May 2026 10:40:44 +0200
+Message-Id: <20260526084048.1696544-3-louis.scalbert@6wind.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20260526084048.1696544-1-louis.scalbert@6wind.com>
 References: <20260526084048.1696544-1-louis.scalbert@6wind.com>
@@ -111,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-291588-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291587-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -128,33 +128,35 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[6wind.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 0878E5D29C8
+X-Rspamd-Queue-Id: B4DC55D291C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add missing IFLA_BOND_BROADCAST_NEIGH in if_link uapi header.
+Add missed broadcast-neigh.
 
 Fixes: 3d98ee52659c ("net: bonding: add broadcast_neighbor netlink option")
 Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
 ---
- tools/include/uapi/linux/if_link.h | 1 +
- 1 file changed, 1 insertion(+)
+ Documentation/netlink/specs/rt-link.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
-index 7e46ca4cd31b..97a2d4411534 100644
---- a/tools/include/uapi/linux/if_link.h
-+++ b/tools/include/uapi/linux/if_link.h
-@@ -1526,6 +1526,7 @@ enum {
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
- 	IFLA_BOND_COUPLED_CONTROL,
-+	IFLA_BOND_BROADCAST_NEIGH,
- 	__IFLA_BOND_MAX,
- };
- 
+diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
+index f23aa5f229c5..484e0a97b653 100644
+--- a/Documentation/netlink/specs/rt-link.yaml
++++ b/Documentation/netlink/specs/rt-link.yaml
+@@ -1351,6 +1351,9 @@ attribute-sets:
+       -
+         name: coupled-control
+         type: u8
++      -
++        name: broadcast-neigh
++        type: u8
+   -
+     name: bond-ad-info-attrs
+     name-prefix: ifla-bond-ad-info-
 -- 
 2.39.2
 
