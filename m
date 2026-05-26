@@ -1,198 +1,247 @@
-Return-Path: <netdev+bounces-291977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBGhDvotFmpOiwcAu9opvQ
-	(envelope-from <netdev+bounces-291977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:34:18 +0200
+	id uAi1FiwvFmqQiwcAu9opvQ
+	(envelope-from <netdev+bounces-291978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:39:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8995B5DD914
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:34:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 038E75DD939
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:39:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2644A303FF36
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:34:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 834F9304C974
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 23:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB063C7E0E;
-	Tue, 26 May 2026 23:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C540C3CF047;
+	Tue, 26 May 2026 23:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TufWhIIx"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VAkzVLQH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE13358372
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 23:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE2C211A14;
+	Tue, 26 May 2026 23:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779838455; cv=none; b=kLeNQ7DTE/ctp1+gz6jv8Av0ZJfDgotACr6AkDydGMOVUx9MP1I+cfjyGS+Px/TCxXq/OZNqRBa7YsXXg1gRtWdxInjkrFzCy25oZNLvKjRI4bTPD1o2MaFYJ0k27JHwKQnqJLNaAd8WZtTUaXyQ0cFFWqBSaHlqmeCNtPddouM=
+	t=1779838758; cv=none; b=cgE2OJi0dfBoPiNmuSVi8qVtw0PWyfea+LSFwJPPH/p2MB0+ZUpZrbnYpsQAWSdKqXhlmR1DWAykCijsHwZG4OotQNDjyAe6Qk4zMJ8/r+lupHWd55UK6bbvb4LNOXNK+d4QT9Pi72ByUdpJCoDEGZfP13ZxFAn2N0uGJLD01/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779838455; c=relaxed/simple;
-	bh=Su85vreKJE94vmWRu4Je5Q/UyX6qEHc2ztNcNlIH99I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FizTom6wESMhhle31tPGDR/lvnqASCSeB6yD7Ox7TO6Bici5PwxCtvcp4ae6kq0/5FOW9ZVVYxVGARdQuWyrozF+upqNSGmqoP+ia43bnpX8eEwpHA3E7dHGjnESWw1RGC9wcWX/WK+8niz2S7if8o/PT3hwwMeOECsrRmKJIV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TufWhIIx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFE491F000E9;
-	Tue, 26 May 2026 23:34:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779838453;
-	bh=DX95taAFHQPKImUnyS2yke3FkHZRFLqqjSXcP+Dg8y0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=TufWhIIx3PJ6DemMNIcqge8TRHSysL+qcg3SGya+WdNI3+NdGKXXmCGqVvlIb+H3+
-	 ww5tKJkxDk/XDGs8nDakx54kVhpQgNc7FCMvG+Z8sLwYLJdtgPL72STm/Cv9/AeF4t
-	 uVlKwA1xIzYDZga9my32w4A96lhcMtglL3WeJaNlJpFZll1HYq73t6pyD6rWGLIeYZ
-	 +srvdLI9weVz3jZTk9g+mpCj8XAL4YBZsfzGHOJAGmjuqurdAkXM43Usu3b2oOtSmk
-	 nQ2R0mT7HjBqLjvTswI4lL3n0NcioFX1WhWjxsFEF/CivQZmmjXx6eESD/Ia0PDdZ+
-	 MCuWxEqtJJDJg==
-Message-ID: <a0d32a51-1e3d-4a40-abac-94f7be1a66c9@kernel.org>
-Date: Wed, 27 May 2026 09:34:06 +1000
+	s=arc-20240116; t=1779838758; c=relaxed/simple;
+	bh=TCwTU/1zxquo1ICvQGvijvVx7xcBdUFAGIdJDxQciVY=;
+	h=Message-ID:Subject:From:To:Cc:Date:in-reply-to:Content-Type:
+	 MIME-Version; b=OyNKGA8uyZQ7JwgYIdHgZ+Rmk401/15C1e9sA/Is5QLB97xZGdQKCHHWeaGIW1jUJEY3UzBb9lgoA95j/bTKRwhZChiCXAeJZVeE6evaUq2bbH0006Pq79pQipSaru4IfnJI8BUNrc1dAyTPOp5ff17reKUcO1YOG0ynj3ZPkqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VAkzVLQH; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:in-reply-to:
+	Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:References;
+	bh=TCwTU/1zxquo1ICvQGvijvVx7xcBdUFAGIdJDxQciVY=; b=VAkzVLQHfSOmij0iyS2pOPykW+
+	Kg69pY0fdhrAlJKbSM1QyjhsL+lZ8ZvhOdUsdMsnepK2xbtXiVAQ7glMCv5+mIdUOGtvsjKLBQJWB
+	iCTsx4kHjYdKfC5abhHEFPYBEwoQTr8j9qi7bWBi6ddvLHPhCAZQDNim0oQCDMq+Apz4rjfOc0sLk
+	53KNDFhy29inYeE79xSKswc9R9li43pdI8Xd0W9Sk+mI4DSabxUmUVYXKuyWgiqyvKlsVM/XRzafa
+	kbBms3dENMjRg7FvY0pnMd0nj+cW1YXqZwTKbWUvYntYiXXo4mmkK5HKlynNq71KbyhpGOgiBPWIP
+	F/W6zdbg==;
+Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wS1Mb-00000001fO3-1YUa;
+	Tue, 26 May 2026 23:39:09 +0000
+Message-ID: <33a16a3c1d39147b659ebd4f6122461139159cc7.camel@infradead.org>
+Subject: Re: [patch 01/24] timekeeping: Provide ktime_get_snapshot_id()
+From: David Woodhouse <dwmw2@infradead.org>
+To: tglx@kernel.org
+Cc: akiyano@amazon.com, anna-maria@linutronix.de,
+ anthony.l.nguyen@intel.com,  dwmw2@infradead.org, frederic@kernel.org,
+ giometti@enneenne.com,  jacob.e.keller@intel.com, johannes.berg@intel.com,
+ jstultz@google.com,  kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ linux-sound@vger.kernel.org, linux-wireless@vger.kernel.org,
+ maz@kernel.org,  miriam.rachel.korenblit@intel.com, mlichvar@redhat.com,
+ mst@redhat.com,  netdev@vger.kernel.org, oliver.upton@linux.dev,
+ oupton@kernel.org,  peter.hilber@oss.qualcomm.com,
+ richardcochran@gmail.com, saeedm@nvidia.com,  sboyd@kernel.org,
+ thomas.weissschuh@linutronix.de, tiwai@suse.com,  vdonnefort@google.com,
+ virtualization@lists.linux.dev
+Date: Wed, 27 May 2026 00:39:07 +0100
+in-reply-to: <20260526171222.769770418@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-3rBkcF72l7XaUPBwCLw/"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] ethtool: vclock: propagate errors from
- ptp_get_vclocks_index()
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, richardcochran@gmail.com,
- yangbo.lu@nxp.com, kuniyu@google.com, willemb@google.com,
- Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-References: <20260526153650.2779821-1-kuba@kernel.org>
- <willemdebruijn.kernel.178a41a53d041@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Content-Language: fr
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <willemdebruijn.kernel.178a41a53d041@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-291977-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-291978-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,nxp.com,davemloft.net];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FREEMAIL_CC(0.00)[amazon.com,linutronix.de,intel.com,infradead.org,kernel.org,enneenne.com,google.com,lists.linux.dev,vger.kernel.org,redhat.com,linux.dev,oss.qualcomm.com,gmail.com,nvidia.com,suse.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8995B5DD914
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:mid,infradead.org:dkim,amazon.co.uk:email]
+X-Rspamd-Queue-Id: 038E75DD939
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Willem,
 
-Thank you for the Cc!
+--=-3rBkcF72l7XaUPBwCLw/
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 27/05/2026 04:46, Willem de Bruijn wrote:
-> Jakub Kicinski wrote:
->> ptp_get_vclocks_index() was written with sock_timestamping_bind_phc()
->> in mind. Any return <= 0 will get converted to EINVAL by the virtue
->> of sock_timestamping_bind_phc() not finding a matching vclock.
->>
->> ethtool's phc_vclocks_prepare_data(), however, should not be silently
->> returning empty messages on allocation errors or when PHC does not
->> exist at all.
->>
->> Commit c156174a6707 ("ethtool: add a new command for getting PHC virtual
->> clocks") added phc_vclocks_prepare_data(), but let's not treat this
->> as a fix in case some user space app now depends on the failures being
->> silent.
+On Tue, 26 May 2026 19:13:33 +0200, Thomas Gleixner wrote:
+> ktime_get_snapshot() provides a snapshot of the underlying clocksource
+> counter value and the corresponding CLOCK_MONOTONIC_RAW, CLOCK_REALTIME a=
+nd
+> CLOCK_BOOTTIME timestamps.
+>
+> There is no usage of CLOCK_REALTIME and CLOCK_BOOTTIME at the same time a=
+nd
+> CLOCK_BOOTTIME support was just added for the ARM64 KVM tracing mechanism=
+,
+> which needs CLOCK_BOOTTIME and the underlying clocksource counter value.
+>
+> ktime_get_snapshot() is also not suitable for usage with CLOCK_AUX, but
+> that's a prerequisite to support PTP hardware timestamping for CLOCK_AUX
+> steering.
+>
+> As a first step, rename ktime_get_snapshot() to ktime_get_snapshot_id(),
+> which now takes a clockid argument to select the clock which needs to be
+> captured. The result is stored in system_time_snapshot::sys, which will
+> replace the system_time_snapshot::real/boot members once all usage sites
+> have been converted.
+>
+> ktime_get_snapshot() is a simple wrapper which hands in CLOCK_REALTIME as
+> clockid argument for the conversion period. That means CLOCK_REALTIME is
+> now captured twice, but that redunancy is only temporary.
+>
+> No functional change vs. current users of ktime_get_snapshot()
+>
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
 
-(...)
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Tested-by: David Woodhouse <dwmw@amazon.co.uk>
 
->> diff --git a/net/core/sock.c b/net/core/sock.c
->> index b37b664b6eb9..9e33e979a283 100644
->> --- a/net/core/sock.c
->> +++ b/net/core/sock.c
->> @@ -870,6 +870,8 @@ static int sock_timestamping_bind_phc(struct sock *sk, int phc_index)
->>  
->>  	num = ethtool_get_phc_vclocks(dev, &vclock_index);
->>  	dev_put(dev);
->> +	if (num < 0)
->> +		return num;
->>  
->>  	for (i = 0; i < num; i++) {
->>  		if (*(vclock_index + i) == phc_index) {
-> 
-> Not for this patch:
-> 
-> This is called by sk_setsockopt and by MPTCP for every subflow.
-> Apparently MPTCP does not check the return value. Should it?
 
-Good point! I guess there was a confusion between sock_set_timestamp()
-(SO_TIMESTAMPNS) and sock_set_timestamping() (SO_TIMESTAMPING).
+--=-3rBkcF72l7XaUPBwCLw/
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-I can send a patch to fix that.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUyNjIzMzkw
+N1owLwYJKoZIhvcNAQkEMSIEIJHos0HI+S32LV9a8u0fe2mx0JkdrJRp3L9+oFTczE0AMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAcZfoMXGQ1qsB
+J5iHDOahpi9JA5biPjrOYVk2NuQ/vdD7sAPOeQSpjud2PoTTvTLFj1eBwnOeV10TSEdtNDQXkB62
+TLWVKv23P6n9OmOWLIr/uSh4pWbSqVqTN4q0MwApA+kwVVQV9F0bIEWGvZOjAwTVzkOhatDqrLMW
+1LJCpEyNqLgM6WVRWpcQ7ZxSHBoXsmLThWWewMWJh0f5l1/SGA7ZkCEfsJXGh7g1MEryTWyRWprS
+1n5SbkN+5OYGc+wAE6MR5hIB5AiubupxQebqMctABOmUCFyWUBEKptLDHuNjxd/QLavXeg2gzuJg
+HgA2Y5qMY2t49VINPY1IknZdIY34dfBhbHAwEiFFE1ADrgHybhB/CfqhonV3PENCfA6SeV7TZaVi
+WYO5pUPjoFrqsrD/7/JYxQSr8CGZN1TCKOVG4LoYSS4qWWZtJfFx5Xolmzdq+tx9Y2aDV1qm+4eQ
+k5oNkEjUQylTiQ1qwbvXSc/iV3FxGKDNZ4oQbSU3M898NGqldtSm9CO8VTSK/r7pjw9mKTfH0TPK
+JXl6s4RHDUm9UwMPSe5XuguIJ293bC/2NYbigaJ5Zbhd0ntUQlBSDqO3hCW8EKYYv02UpcCdPcif
+0jgfF+ybz0czh48PGHBikalh0xSPhQw7hjDuyXbiBJKRqKYNFuM+24mvzgsKPQYAAAAAAAA=
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
 
+--=-3rBkcF72l7XaUPBwCLw/--
 
