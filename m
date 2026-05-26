@@ -1,193 +1,203 @@
-Return-Path: <netdev+bounces-291924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EDRIiIHFmr/gwcAu9opvQ
-	(envelope-from <netdev+bounces-291924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:48:34 +0200
+	id WNtbKq8HFmpNhAcAu9opvQ
+	(envelope-from <netdev+bounces-291925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:50:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4F65DC74A
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CBA45DC762
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 22:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3EC3301E223
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:47:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8C813022606
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 20:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3C9352C2B;
-	Tue, 26 May 2026 20:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F92F3BB12C;
+	Tue, 26 May 2026 20:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ieGZpX7a"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Rj0TPyz1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8136933C50D
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 20:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222A626C3BD;
+	Tue, 26 May 2026 20:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779828478; cv=none; b=Gztc6eeY9SoUI27rbE8DhNgLtvqoScXI3tLaJmb02X0HXCMwlGvZQSBP4P75YGijOnHyKBd4r07q6S+DyHUods4O4eMMXIfcAK2CshMn9AE008rUsWDnijgZLRqnWc+Q52x7t6Fqfgz9cMiNXsRMhtTQqAfVLpZcBibBG+mrnB0=
+	t=1779828634; cv=none; b=l62os8h7raXqPCHhggfKzE+cf6PPZ0x8migiFIxA1+H+tmpFvUuwEnlk1wOyqElhHKVPXdW2gQNaL7XdDRwlQ7u4l7gfiwIVIGvLMaq8Ez/umNeUbaxneiNOUnH0/Mz9BfC9gxjbJPDwSGwLC3g40+ikK91f0iwkkd7E1o7LDl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779828478; c=relaxed/simple;
-	bh=V5ougp40DY1H9zXzFsmFHsm33ofsao/93epdVKnawqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CNkojmPxgG/MU6Dp2C791i0hsxICli8fm30/1kicep/Vqx0DSu6ueteMmKDY1QpznqyAgbZvH6hCc9ESOZBjH1uO+b7sA4MpULWQUdK/KwrtahfIj1ZOcaEAd6hRJNYgxUDUWWrfgFH52eVm8nM7Z5dT3k3n7qiXvoTEIPSWJQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ieGZpX7a; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 26 May 2026 13:47:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779828464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KnCflD3IDljS85fEYVFf30i3uDGjT7cYAgP9fl0QajM=;
-	b=ieGZpX7a/mWgXww4IgmhPHiQvNDaBwDPsD7pJYVTTd+HUn40TrxoquQgiXUFMY52eYCpBA
-	F2ldPx5tHks9GxGqGWNemrylJFFLNA9ZMVNBts3Uguw9LwGic43703VYBDJxvwAWl+hVUI
-	OhoJ8VNLUdQqj2SiLQBFbId+x5WtcSo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 bpf-next 10/11] bpf: tcp: Add SOCK_OPS rcvlowat hook.
-Message-ID: <202652620435.m7WK.martin.lau@linux.dev>
-References: <20260523083001.2911931-1-kuniyu@google.com>
- <20260523083001.2911931-11-kuniyu@google.com>
+	s=arc-20240116; t=1779828634; c=relaxed/simple;
+	bh=3MsbVQMRlkWyRmM+scobE8Chf8BwX3w2hipiqBeSQuE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=tcHCawQ3etM7n0JwXKDjwgkdgpxqnBor9Wcoy++cb9AKFjNxbL5LpQ8s90nsDF1OegbNJOqFZBp3vemvupHJoWbh/Z5zEx25BgF8JMf0mYIdQA9wDDRJUfVAEHnoNdMu7OvFnK8psIFKAEpLmyMvbqhLNTQGBxQf3LMroKuscSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Rj0TPyz1; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 82ECBA4B47;
+	Tue, 26 May 2026 22:50:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1779828627; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=YxIv+z1i7BXKHKGu2iZTSaCZuD3KwsuMfvkF03U6b30=;
+	b=Rj0TPyz16ddOVcu6NGLZel8fDz+TRyxwiP4+JhzkJZbzWYsOSGIZ+zObP76tXE4Vs5QK29
+	HS9XbmZxA973Zhq+wp7AqhnIAoYUSw5bAJcNkOPsBlrhyMdCJ4AI86DDxYL1GqiA5zhMbj
+	jHtb+DsScJyyz1kBTr1vd5LjhYu1PaFDH8sRCGCSUjkSfhmsKHXAu00wAVEjOKMLvrUlrg
+	gB/SssvHnFNn5m20rHtdf0W3QOrCYChbZYYPwkskWplqnKrS9k0lrXnWrW7Eazy3wwCaEa
+	rReEkauXZOLjZRN1nWhfLRZd30kQPfntTyLJN4DMIT60rpErwd06e/CZ64yv0A==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260523083001.2911931-11-kuniyu@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
+Date: Tue, 26 May 2026 22:50:20 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: "Alexander A. Klimov" <grandmaster@al2klimov.de>
+Cc: Haren Myneni <haren@linux.ibm.com>, Rick Lindsley
+ <ricklind@linux.ibm.com>, Nick Child <nnac123@linux.ibm.com>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
+ <chleroy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Thomas Falcon
+ <tlfalcon@linux.vnet.ibm.com>, Desnes Augusto Nunes do Rosario
+ <desnesn@linux.vnet.ibm.com>, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ibmvnic: fix krealloc() memory leak
+In-Reply-To: <20260526184105.18962-6-grandmaster@al2klimov.de>
+References: <20260526184105.18962-1-grandmaster@al2klimov.de>
+ <20260526184105.18962-6-grandmaster@al2klimov.de>
+Message-ID: <fc74cefb2e0167514f1c3c0c3d6133ec@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-291925-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291924-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FREEMAIL_CC(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.vnet.ibm.com,vger.kernel.org,lists.ozlabs.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bpf_sock_ops.data:url]
-X-Rspamd-Queue-Id: 2E4F65DC74A
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[al2klimov.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0CBA45DC762
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 23, 2026 at 08:29:39AM +0000, Kuniyuki Iwashima wrote:
-> Now, it is time to add the new hooks for BPF_SOCK_OPS_RCVQ_CB.
+Hi Alex
+
+You patch is missing the prefix with the target tree. Please have
+a look at [1] for more details on the workflow.
+
+On 26.5.2026 20:41, Alexander A. Klimov wrote:
+> Don't just overwrite the original pointer passed to krealloc()
+> with its return value without checking latter:
 > 
-> Let's invoke the BPF SOCK_OPS prog when
+>     MEM = krealloc(MEM, SZ, GFP);
 > 
->   1. TCP stack enqueues skb to sk->sk_receive_queue
->      -> tcp_queue_rcv(), tcp_ofo_queue(), and tcp_fastopen_add_skb()
+> If krealloc() returns NULL, that erases the pointer
+> to the still allocated memory, hence leaks this memory.
+> Instead, use a temporary variable, check it's not NULL
+> and only then assign it to the original pointer:
 > 
->   2. TCP recvmsg() completes
->      -> __tcp_cleanup_rbuf()
+>     TMP = krealloc(MEM, SZ, GFP);
+>     if (!TMP) return;
+>     MEM = TMP;
 > 
-> This will allow the BPF prog to parse each skb and dynamically
-> adjust sk->sk_rcvlowat to suppress unnecessary EPOLLIN wakeups
-> until sufficient data (e.g., a full RPC frame) is available
-> in the receive queue.
-> 
-> Note that the direct access to bpf_sock_ops.data is intentionally
-> disabled by passing 0 as end_offset.
-> 
-> Instead, the BPF prog is supposed to use bpf_skb_load_bytes()
-> with bpf_sock_ops because payload is not in the linear area
-> with TCP header/data split on and skb may contain a RPC
-> descriptor in skb frag.  This also simplifies the BPF prog.
-> 
-> The placement of tcp_bpf_rcvlowat() in tcp_ofo_queue() and
-> tcp_fastopen_add_skb() is chosen to provide the same snapshot
-> with tcp_queue_rcv().
-> 
-> For example, if tcp_bpf_rcvlowat() were called before updating
-> TCP_SKB_CB(skb)->seq in tcp_fastopen_add_skb(), BPF prog would
-> need to implement an unlikely if branch to strip SYN.
-> 
-> In addition, TCP stack can queue overlapping skb into recvq.
-> Once rcv_nxt is updated with a new skb, BPF prog cannot infer
-> the previous one from skb->len.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Fixes: 4e6759be28e4 ("ibmvnic: Feature implementation of Vital Product 
+> Data (VPD) for the ibmvnic driver")
+> Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
 > ---
-> v2: Add explanation of tcp_bpf_rcvlowat() placement.
-> ---
->  include/net/tcp.h       | 12 ++++++++++++
->  net/ipv4/tcp.c          |  2 ++
->  net/ipv4/tcp_fastopen.c |  2 ++
->  net/ipv4/tcp_input.c    | 10 ++++++++++
->  4 files changed, 26 insertions(+)
+>  drivers/net/ethernet/ibm/ibmvnic.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 > 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index bc95d8e7b62e..a409f2ea710f 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -2889,12 +2889,24 @@ static inline void bpf_skops_init_skb(struct bpf_sock_ops_kern *skops,
->  	skops->skb = skb;
->  	skops->skb_data_end = skb->data + end_offset;
->  }
-> +
-> +void bpf_skops_rcvlowat(struct sock *sk, struct sk_buff *skb);
-> +
-> +static inline void tcp_bpf_rcvlowat(struct sock *sk, struct sk_buff *skb)
-> +{
-> +	if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_RCVQ_CB_FLAG))
-> +		bpf_skops_rcvlowat(sk, skb);
-> +}
->  #else
->  static inline void bpf_skops_init_skb(struct bpf_sock_ops_kern *skops,
->  				      struct sk_buff *skb,
->  				      unsigned int end_offset)
->  {
->  }
-> +
-> +static inline void tcp_bpf_rcvlowat(struct sock *sk, struct sk_buff *skb)
-> +{
-> +}
->  #endif
->  
->  /* Call BPF_SOCK_OPS program that returns an int. If the return value
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 3afeb69a547a..f7e32891bb4e 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -1602,6 +1602,8 @@ void __tcp_cleanup_rbuf(struct sock *sk, int copied)
->  		tcp_mstamp_refresh(tp);
->  		tcp_send_ack(sk);
+> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c 
+> b/drivers/net/ethernet/ibm/ibmvnic.c
+> index 5a510eed335e..25d1d844ad19 100644
+> --- a/drivers/net/ethernet/ibm/ibmvnic.c
+> +++ b/drivers/net/ethernet/ibm/ibmvnic.c
+> @@ -1761,8 +1761,9 @@ static int ibmvnic_get_vpd(struct ibmvnic_adapter 
+> *adapter)
+>  	union ibmvnic_crq crq;
+>  	int len = 0;
+>  	int rc;
+> +	unsigned char *buff = adapter->vpd->buff;
+
+Should be reverse x-mas tree (longest to shortest).
+
+> 
+> -	if (adapter->vpd->buff)
+> +	if (buff)
+>  		len = adapter->vpd->len;
+> 
+>  	mutex_lock(&adapter->fw_lock);
+> @@ -1788,17 +1789,17 @@ static int ibmvnic_get_vpd(struct 
+> ibmvnic_adapter *adapter)
+>  	if (!adapter->vpd->len)
+>  		return -ENODATA;
+> 
+> -	if (!adapter->vpd->buff)
+> -		adapter->vpd->buff = kzalloc(adapter->vpd->len, GFP_KERNEL);
+> +	if (!buff)
+> +		buff = kzalloc(adapter->vpd->len, GFP_KERNEL);
+>  	else if (adapter->vpd->len != len)
+> -		adapter->vpd->buff =
+> -			krealloc(adapter->vpd->buff,
+> -				 adapter->vpd->len, GFP_KERNEL);
+> +		buff = krealloc(buff,
+> +				adapter->vpd->len, GFP_KERNEL);
+
+Dead branch? The only caller, init_resources(), kzalloc()s a fresh vpd
+right before, and resets run release_vpd_data() first, so vpd->buff is
+always NULL here and kzalloc() above always wins. The leak can't 
+trigger,
+which makes the Fixes tag misleading.
+
+> 
+> -	if (!adapter->vpd->buff) {
+> +	if (!buff) {
+>  		dev_err(dev, "Could allocate VPD buffer\n");
+>  		return -ENOMEM;
 >  	}
-> +
-> +	tcp_bpf_rcvlowat(sk, NULL);
+> +	adapter->vpd->buff = buff;
 
-hmm... so NULL is a way for the bpf prog to tell where it is called?
+If you keep it anyway: on failure the old buffer stays in vpd->buff 
+while
+vpd->len is already the new size, a mismatch the original avoided by
+NULLing. kfree() it (krealloc() does not free on failure) and NULL 
+before
+-ENOMEM.
 
-With skb NULL, what does the bpf prog usually do?
+> 
+>  	adapter->vpd->dma_addr =
+>  		dma_map_single(dev, adapter->vpd->buff, adapter->vpd->len,
+
+[1] https://docs.kernel.org/process/maintainer-netdev.html
+
+Thanks,
+Nicolai
 
