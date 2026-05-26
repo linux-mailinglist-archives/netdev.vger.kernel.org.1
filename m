@@ -1,151 +1,166 @@
-Return-Path: <netdev+bounces-291827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBy6JTXUFWrRcgcAu9opvQ
-	(envelope-from <netdev+bounces-291827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:11:17 +0200
+	id KGpaMYXNFWoTcAcAu9opvQ
+	(envelope-from <netdev+bounces-291828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:42:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB5C85DA639
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 19:11:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E7A25D9E63
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 18:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E91DC30AAECC
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:41:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 946DD300EE8A
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 16:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FC13932C5;
-	Tue, 26 May 2026 16:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473663CF67D;
+	Tue, 26 May 2026 16:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YCWUJxSK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="I9oo1pEj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E23E38F934
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F34C3C583E
+	for <netdev@vger.kernel.org>; Tue, 26 May 2026 16:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779813706; cv=none; b=NHgfvSQjG6/wbVP58X4AMZEYhaHx7JpM9TLDewrVOIcyOVXQBMDWEx7lGd8O0mgfCUIa0oQZGMSf+N4oZk5GNZl027oyZub25/mhHRXsZdYxm/3BS3N1g8HQMFn4tmUPHEp1v7KpK3Xkjl8CKNAxp00VmSV6BElBLecLH2MPXks=
+	t=1779813750; cv=none; b=JasvkrBQVZio3KBxrr0X/2CSkBddLmpMs+w8a2Qo4+tNd3wxn/DUlprMMbkN+uAGR7KRMyCFhMqgCzO3s292fnQOJej9dmBcjg135FZAER/KPhcCZueO+RB4zj3WauEW8+AgvK1DbBEL+llcwBefmTf7vISEB6AJp7xJW5r+8lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779813706; c=relaxed/simple;
-	bh=mG7PBVyeq9eqgY9w0WZ2Aq+R1WotFrAacyI5NUevEPc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GvRjrUVM3rVUsRqi97uVDmDa2eOo3sPt+oAujA2FX20q0VhAQTTTXMrxKTkSw49lyxgz+lTy0X9+321w7W2TeanJ2KCwQ6rrYopBCN5kE5/byV0fDtQRSNZMznJVc5sMIv1LxqJ/f2TouIyTKCo89kZSqg3094eWzOb0SHuvrvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YCWUJxSK; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id A19E44E42D60;
-	Tue, 26 May 2026 16:41:41 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5E1A06011D;
-	Tue, 26 May 2026 16:41:41 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D471C10888986;
-	Tue, 26 May 2026 18:41:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779813700; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=x2zp45sO/tKbVz5eCcWvfkcQYoo+j+EyKM6+LW9VNpQ=;
-	b=YCWUJxSKmSFGKbG0oLl5eCKIqS0gLscEoKxxcldBJjGroYFPYWHouQNba4ycM8u10mhKDi
-	V+TG9K+Cmnj5tgPRnPxXX+4eZ+BO3deJwTsWQ4LsyRgrY/YgBo+cE/eJtEBmyVrj0lQ6ql
-	fEiAE30At8orL75DARDClhawzUSItuT5LExIfNJw10lWs4Qg6mkWWpp4pn/I7BnP8ST8V0
-	m3ivbuIERwMZfgIR8YUiQGAUcndoIZYRuAhwc22l2JXDEbeqCg02EdQBRtqkraU2LxjFmB
-	G56pvr8k+zT4NZakHEOTqbU3fXpqYITGgR4CGFJSFQEdDFBKS7WIwL0ipbxrjQ==
-Message-ID: <8983c764-0977-44da-a311-8c558902b478@bootlin.com>
-Date: Tue, 26 May 2026 18:41:32 +0200
+	s=arc-20240116; t=1779813750; c=relaxed/simple;
+	bh=5+ghzdOAeYiPC10bfdvW7qLblT51mD+e1870yn8q5IM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=m7gW6vA0PRqYuiBdBs99nUrZMm24mCzsx4F0iGQB7UcGSEsU/NHwKN8pe08KX3PX7HcZSsX7ggF+5U6dEheR5wEVEsP41OxnrKDzg7oyhXJ4HasMG6j+SV0sppe842fQQrzL0MVVIdc/S2kyRYlFaJslXZBcDKU52f/fMl1tsx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=I9oo1pEj; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7e612d0693eso3196766a34.3
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 09:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779813747; x=1780418547; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZYtlrVR2dEham7O0YH+Al9z1p1eXpPP2GpFWfv22t8=;
+        b=I9oo1pEjfmyW84aL9PvG+v6a605DHSb1Sbo0NsFtW6JrKKswGpwRudySa+/Po7yUWt
+         megT8bQa/BvOM9/WgE98WvHKSnBAnoAoxGfF6pytX93UZJKb6afDbg55P4sHq3pJTTA1
+         KhEOGvw42u7ckZsBbpVePVTrLtV3yGR1wBefS92iLdUAFCAHEKxkJ0gxFoqnwRiDZwX2
+         gQye4ogV7j1Sf51cQOUxuTcDMQSCXFw2ag+u5PScLLdyBI5hPvy1+Rol54JiBpV0EGKS
+         FBsuz2TIpxXuYU+BpRmhbh4EBLMABOPUbwSU0nUvUVpzTO6iqzghMhh8+yFmwMlxGpLG
+         djJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779813747; x=1780418547;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1ZYtlrVR2dEham7O0YH+Al9z1p1eXpPP2GpFWfv22t8=;
+        b=sp+FqCBnjyWNw6LSUuYOcc6xnBQMdnsRWOuymccHv3zYxg/n+5pthgPayvfAgR0URv
+         U95r9mYnAjp3ia2JMtW2KMfycevBebYrV+BFQMhIwlUoUcg5caNBzC0FqYPDcd/80++c
+         CbHr2SZOHTUNSZjh6OFQeMue1KMqnZTEFbpQkPfQHhtIjJ00ZsEg18fmsfkXRlSSN10c
+         B3ZKEyrp9mmKhA85cTXPtPuBHvGClKtmxu+TwixkeLrcvtOOHbc2WCzCjskEGc0BZ6lM
+         ayrXo+sUjej/qcu8L6PzKC+UxbGIDa9n5sNfdgf/Zv08pB0kPo56YmHOLtJdu9TsNh4R
+         1T6A==
+X-Gm-Message-State: AOJu0Yx0tvDMYV2zor3XudSl2+ty7cIpZL2a/oRAveSNiKUDl/buMMSu
+	IbS57Xf0R6T4ZtqVpkfdL+OI0ANir1KlDzandTrVhSjnewfQaVsgRm/S0rXtx4ImmkM=
+X-Gm-Gg: Acq92OFIFuOLzAvFqLGIxqGJRxnbRo8c1773RPLIEnQPJsqPzMRSrdkoy1dC0ZT1lZ1
+	IrtjOrm8quAKNOvGn1s8sc+U4dCBJyTCZSfldqNA6JjFE8YVLlX1UfpZZ2DG+HswG6ASoi0gwPk
+	hQBWa+eaO6C1KD4MuVeh/LuIwklnSZzATGPPVA8RsyS0E9jXY02/QcOw9+5OBG14++SXydFAD1T
+	R7UqzyEklH9cvnZjAYeJO1EUI07IrLV5AuuAsF0y5jXrLXrppRScf1CG3Vtj++sM2t/kxM0OAsl
+	bkEtUCYlR7FViEyjhCiG7RYCFCzcuaeWlkzAQWzOUIh1pQ2SZxrqAZRpm6zi526JT/PAJvG6Qwf
+	aZWfnSsJzIXXZpownUkCrL8IaNAqTLGiUWNwu/dvJXKarq5gH1ko2dF1+5GZuXuyV+qfbclAksO
+	VjDDXqvDU5Q5PDBtGtW5aODoWLwB9v1+C9E4vaN9xInpJXYNLhtTJsJgGu3+TSXPF+knNGoPMKT
+	V8=
+X-Received: by 2002:a05:6830:4705:b0:7d9:b2b8:e06f with SMTP id 46e09a7af769-7e5feec29damr12084262a34.21.1779813747421;
+        Tue, 26 May 2026 09:42:27 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e606482473sm9585235a34.8.2026.05.26.09.42.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 09:42:25 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org
+In-Reply-To: <cover.1779189667.git.asml.silence@gmail.com>
+References: <cover.1779189667.git.asml.silence@gmail.com>
+Subject: Re: [PATCH 0/8] first zcrx updates for 7.2
+Message-Id: <177981374538.466119.13708830919237773602.b4-ty@b4>
+Date: Tue, 26 May 2026 10:42:25 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 03/10] ethtool: linkstate: fix unbalanced
- ethnl_ops_complete() on PHY lookup error
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, o.rempel@pengutronix.de,
- kory.maincent@bootlin.com, haiyangz@microsoft.com, andrew@lunn.ch
-References: <20260526153533.2779187-1-kuba@kernel.org>
- <20260526153533.2779187-4-kuba@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260526153533.2779187-4-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Mailer: b4 0.15.2
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel-dk.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-291828-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291827-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[kernel.dk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.995];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel-dk.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,lunn.ch:email]
-X-Rspamd-Queue-Id: EB5C85DA639
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20251104.gappssmtp.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6E7A25D9E63
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
 
-On 5/26/26 17:35, Jakub Kicinski wrote:
-> linkstate_prepare_data() calls ethnl_req_get_phydev() before
-> ethnl_ops_begin(), but routes its error path through "goto out"
-> which calls ethnl_ops_complete().
+On Tue, 19 May 2026 12:44:26 +0100, Pavel Begunkov wrote:
+> First batch of zcrx updates for 7.2. The main part is patches 5-8,
+> which add notifications from zcrx to userspace via asynchronous
+> CQE posting about events like allocation failures and copying, and
+> statistics. It's accompanied by relevant query updates. Patches 1-4
+> are general cleanups.
 > 
-> Fixes: fe55b1d401c6 ("ethtool: linkstate: migrate linkstate functions to support multi-PHY setups")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Thanks for fixing this,
-
-Maxime
-
-> ---
-> CC: andrew@lunn.ch
-> CC: maxime.chevallier@bootlin.com
-> CC: o.rempel@pengutronix.de
-> ---
->   net/ethtool/linkstate.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
+> Bertie Tryner (1):
+>   io_uring/zcrx: reorder fd allocation in zcrx_export()
 > 
-> diff --git a/net/ethtool/linkstate.c b/net/ethtool/linkstate.c
-> index 8a5985fd7712..24569e92942c 100644
-> --- a/net/ethtool/linkstate.c
-> +++ b/net/ethtool/linkstate.c
-> @@ -106,10 +106,8 @@ static int linkstate_prepare_data(const struct ethnl_req_info *req_base,
->   
->   	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_LINKSTATE_HEADER,
->   				      info->extack);
-> -	if (IS_ERR(phydev)) {
-> -		ret = PTR_ERR(phydev);
-> -		goto out;
-> -	}
-> +	if (IS_ERR(phydev))
-> +		return PTR_ERR(phydev);
->   
->   	ret = ethnl_ops_begin(dev);
->   	if (ret < 0)
+> [...]
+
+Applied, thanks!
+
+[1/8] io_uring/zcrx: make scrubbing more reliable
+      commit: 74fc9a9b50d43ed473ea2449682000da43e17175
+[2/8] io_uring/zcrx: poison pointers on unregistration
+      commit: e57b44039bc54bbdf3d1511021458356858a4a12
+[3/8] io_uring/zcrx: remove extra ifq close
+      commit: 98f07b0f74b65284ebe0d021505b461d4be6bf07
+[4/8] io_uring/zcrx: reorder fd allocation in zcrx_export()
+      commit: 84f7d0931c42cb0690615a431738cf6913d265f2
+[5/8] io_uring/zcrx: add ctx pointer to zcrx
+      commit: 8503f2de11f7fe78a7fdb87746255c8d02897279
+[6/8] io_uring/zcrx: notify user when out of buffers
+      commit: 0719e10d826aa0ba4840917d0261986eaead9a51
+[7/8] io_uring/zcrx: notify user on frag copy fallback
+      commit: 255180f7034f48aa5b0c8df70228307394bddbb9
+[8/8] io_uring/zcrx: add shared-memory notification statistics
+      commit: 6935f631465f5f60205978a59228a26db4723d51
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
 
