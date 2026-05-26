@@ -1,229 +1,244 @@
-Return-Path: <netdev+bounces-291540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJlFFvcdFWoVSwcAu9opvQ
-	(envelope-from <netdev+bounces-291540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:13:43 +0200
+	id MGDcEGEtFWpmTQcAu9opvQ
+	(envelope-from <netdev+bounces-291542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:19:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D645D09C2
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 06:13:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FE5F5D0CBE
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 07:19:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08C1A3026599
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 04:13:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DAC33018AFD
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 05:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC133BB11D;
-	Tue, 26 May 2026 04:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9871030BBB8;
+	Tue, 26 May 2026 05:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sAQCPTVO"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="asirksYi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010070.outbound.protection.outlook.com [52.101.193.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879543BCD00
-	for <netdev@vger.kernel.org>; Tue, 26 May 2026 04:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779768814; cv=none; b=gtrwPPgU36lcmxUtK40mB3QoCXdj4jOsQrl9xCKaOP5NAPAh5ZaZfEZsnN/JmuWZ14J51OW9zkdyaCVg8DQ5uln5Z45vGIzgQ/sKxAB6HCoFXAUAO9fViEg/5WTiyo5EBD5oFOIKLMAqUU1CrspGZlsU8yho0icjHwIZnO6c8M0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779768814; c=relaxed/simple;
-	bh=xTsHZDYQwum2QlLXYNCH2s59XPiw2BSHIOY5zFmiYa8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o9g/6FW3uagExlP78HRRqcXDDUDewi+sYuS88v4Z5mfWD2r+oA4mEgHHDALJBsYOneOYeAOg0T1WfvJJko3lqMYDtXNArqSKo7xMr7PQn01E4DnoB/IMWlK1Ad4KY4PrzFXlo7oqyf2f7b+CaDL3cm3VSkNO5XFIVT4I13ZZbT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sAQCPTVO; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ba0fc8b1f0so73128565ad.3
-        for <netdev@vger.kernel.org>; Mon, 25 May 2026 21:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779768802; x=1780373602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C0Q5miFwy3tG8zNhMFBCq3/h29OE3WocoHy+YY3lzMM=;
-        b=sAQCPTVOmuY3blXNbz091iDLaCVketnrQpPS5nlboK5orOOaUNAaDQD/6ea5gZkK99
-         cgZ91wF+souanutGl6YESsvIU4y/uJaWME7oqR2stspYaKPiEwqqxuUuCaDxBds0hcJy
-         d/KGtpXrPiDEYM0dQIs+5xCAw4jUgvucunuDbHKMk3dpXjtcOJGpDnOg8yT375giALkW
-         fda2OGcjY/gpX0EChJukADI1dJeovsZzgVncH9rl16s3hyUOAmmVYDHlrMs8/1Z5aAVl
-         3oaTfc2B0+n8hquC6+Ip7jE/V4KrEO2IRunumHo7ZpHK68r9LIrRzbDzlMFMF/VpHTiz
-         OnNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779768802; x=1780373602;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C0Q5miFwy3tG8zNhMFBCq3/h29OE3WocoHy+YY3lzMM=;
-        b=N8MwKtStSQRh8p9juJs25bPi1R5CzCgm7/+O96RJNKTKIvNZnN45X9A8GQsHjn9jFs
-         TbDH+Q76DGt9GfluRiOyZdSKVi4evnkXghwJdvQa1meSlYB1xaTzKAEgrGyQjbpDY3pP
-         0PBUqobaOk0LHd8yuhf1CGWjtT50XrKAuGvvANNaTpEoV0Ji74+EbKitxnvTlM59ZA0M
-         pvRr/Oq3bT8noDjtz4CJ+lyHbwoFSCXqCr2BBjngJqz9eg+DXw0iyftfkhW/+KNvOOhG
-         ZynhtfJGSiVLndn7a6hIHEwjsh8FAFbY6E2yjFLCUGO/j5t82Mkjc+2qk3WNtEfmjbYA
-         R+Fw==
-X-Gm-Message-State: AOJu0YxKBkMnYpSaDY/NKaqhkW6S8bvThE8FKza8oi4naTDVBgjPiiEr
-	gAJhzDUyepKa+jXs0OOta/87TFIinVjCDr5JalmSSfTqgf5krBqikjzbRfxe3JqZHSo=
-X-Gm-Gg: Acq92OEQsUjH++CLa8lXrFhDxHQ8f2Z1/qVGbEtsNE/+uogkUvP9CUyX8PCM9OgRvdE
-	WUATfpwoma/OfsLJu4efPD1rPlJt5PMkSMBy06DnASfVEGfIdvzh3tcXVMFIoFs6n4vnUvL25bP
-	JbOUG2JnkP34MhCY5MO3K/s1sXV5ogjvY3/YviAU/Lu/AJR98ozD3bD8DiOabFx38dHg4zUqMiT
-	cHAAhI5HgHCq/p//dVKoIyRNIRO4xAT2Hlr+NrdV5xKyJ0AVl1OFsN1BVTrTNxOyS9w/BD3Llee
-	LTm3k7QzkSikRXU0Eyi/fIrHSAuOPCm8ShzMYIRFK9NZkkNbFHkEs3zCqTDo1nZvyOhA6y4FGvI
-	9Lx+b4PxxaW84g+eJZZk+7C3ZgU/VmAbeUSELX/LLZyyh6w88WQZ1N7dqcShMisi3o4gpipO1YM
-	6Qyc5fKJ+Bkp2g28fyfdIZMZ5NFwAQPNsLgU0EMQ==
-X-Received: by 2002:a17:902:f60f:b0:2b0:5795:9ead with SMTP id d9443c01a7336-2beb02cb6bamr182900635ad.0.1779768801981;
-        Mon, 25 May 2026 21:13:21 -0700 (PDT)
-Received: from fedora ([2001:ee0:4fc8:5b0:526c:3adf:8a0d:13a8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56f4343sm144349485ad.36.2026.05.25.21.13.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 21:13:21 -0700 (PDT)
-From: lazyming <minhnguyen.080505@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D04AD24;
+	Tue, 26 May 2026 05:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779772766; cv=fail; b=dGC2yXy5vgGFcDAGIkDuzyWSDIS3nGSvMaCwd2Nb0NGBwn8BEeUGRVh0e+LkpEj2Zk9keVXk1YkeccXRjMgjqixFAW7YbQ/eqDdRZ/eGYH63M2VsW28uaQkHXgG/p3FD6Rj7Oz6LPg1vFgnnretnJ+AoeUHkZqDZFZy3E6n8L7o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779772766; c=relaxed/simple;
+	bh=PuY1uxTf26VSsbji8SEQXH9dNJTFnD3IvJdhMh7Oa7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=G/v0LVrHNthka0xZXTlNMPEZxMV8yjcLxlI3FwcUpNCXJ9TSFWbLgn0vCsGQg8I93+ZvwybHgg0ZfdPXeW+yiCyQfFww5sz12FFtoOAb9pTx6kEgVVKBJljSnD9pQbGS3derHjVgWd+hpRKzsRvNpqwhTQZS8zg7mqqTEVrpWhg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=asirksYi; arc=fail smtp.client-ip=52.101.193.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cbtwVvo4OG1HspWPmvateho+MvOmBDBAmE/JsipdWqTVhz6619K7Op6MiU/tpCy4+719XTHO+g0/o32cnPfweoRyUOAxLgt2Tp9fKcaZY8AHds4DlDl5i1Hs5l3rbdIe9hmzn1YiR26W99UZIUm1L3ugTDQFvKee6kR19ysj5WBGmzLMkacswOpsDKz+QYFPgTSRtfbFSRozsnAQ53vuEm6nvIWup7B+gP3lieY4y9PtQPcc7NPmTwT9GlMDajScoJX+/9xCkJ6NAOySeop7mjjp6DM2/mkyhNljKtPaZgasahYhu4bf0hIMz6OLLZkSIamG47NS+9DDV/2pSAU5/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eJ+Vi4+B5kPJUFu/fodRO6Xgp2oKpWw/SA0EwT0Bjy4=;
+ b=fpX8gV1vaypJw4YQ9nu1S+tPN4gyt3qEWcOm7I2dhqm2aMi7jVurnlAlvsYoVx11Rr1EwmP5KyzOmC0QrWP4mAU5KxKyqlC+uxdEQC2t2njc0VSNetFaj7hVNhB+/UQiBUPvQ/RfzRXCE/xUmsfMuURUbDCJ8xvwBZjC6hr5VbEdqTap4dnViKpyvuRsn2VfteCmFxNImJxa0aDLgxUnM5dv2peEOyfIL9UyVQbK61hvc8NoMt8kNOCkQnBG1cw2cgsMUqov7y/bn40QwlwmbSpT9CYlf3um9ULDZ9UVJeAdFJGR3o/oFsdwZHlajMwCJtiWHLAIj4mjHE4PXTXcuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eJ+Vi4+B5kPJUFu/fodRO6Xgp2oKpWw/SA0EwT0Bjy4=;
+ b=asirksYik12U9qwYXLOeFFCVVWPIemLoaA1DG4Djs4JLbGJFOkUuaLzdTRGucjDXQGFbyhML3N5MkM7vi3Sfs1QXM9GH1ADfxqHHRJApjuoWU2eaCi1C3roE08bki5bcFrbq+p2htAydEHf3qucpdxev/xwt2EDWw8L2YBalmDprInxAuWFI5ulsJR4VDr1GOhI27AaDHXUIIX/Kw/v5FXaQLQFCaipLi/qMyzF58KMYEnx7cZImRBaO81Uy6HvHgXz47zWjDyFWJAVuuKNNupqtUz3Fjrc02M2gGlpnczsw0/m24+8R878UX9N/4XhC9YRT3XT1VLzAW7HakXMwbQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
+ by SA1PR03MB989270.namprd03.prod.outlook.com (2603:10b6:806:4f4::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.20; Tue, 26 May
+ 2026 05:19:23 +0000
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.21.0048.019; Tue, 26 May 2026
+ 05:19:22 +0000
+From: muhammad.nazim.amirul.nazle.asmade@altera.com
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	sowmini.varadhan@oracle.com,
-	willemdebruijn.kernel@gmail.com,
-	w@1wt.eu,
-	security@kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	asml.silence@gmail.com,
-	achender@kernel.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	Minh Nguyen <minhnguyen.080505@gmail.com>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net v2] net: skbuff: fix missing zerocopy reference in pskb_carve helpers
-Date: Tue, 26 May 2026 11:12:39 +0700
-Message-ID: <20260526041240.329462-1-minhnguyen.080505@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net: stmmac: Improve Tx timer arm logic further
+Date: Mon, 25 May 2026 22:19:21 -0700
+Message-ID: <20260526051921.14540-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0199.namprd03.prod.outlook.com
+ (2603:10b6:a03:2ef::24) To SJ0PR03MB6964.namprd03.prod.outlook.com
+ (2603:10b6:a03:432::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|SA1PR03MB989270:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43b7257e-7371-469d-1409-08debae658cb
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|55112099003|11063799006|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	PTV++ier5csNlMPFdMFAaJLPmrL94YWJtII/u3E5pvdIMGUngqfNySyhvxBb6A7Y/yu1+SbX1+y+lKqogfULh4YlJN44gSEcTLhGWrTFCPG+nvvG2O0vcLDwfw2CzzKJNMaw9FVpT1DiDqynubTJOH92FN43R5P6CusQ9UkD7P4k+l4uUK9YPorhwl5Lm8glQNeQWQ2xNwOci6XVcPXWU8MQbhRqot12TwZHF/TJP85JN3AHhIt0TIjiyyAEIdksTyQ33lCaPQUGfadBRQjDE+Vt7NCu0n2vksvtrEXVk78WnGI5taEFOyz09VqrwaXj8WMN9syZJ0b4/H6fJ2iTB9Pflk0vsLGGOVt2FOZPwhUkHgIZhsTrxl6RyrnXrnPr2gA353Y3+cMy4ax159LiPUE0Ku+IRALt+IfEPn06tO5bgowR9ZN22ZD1aaYsLU52Zw/sF//sgOY3Ley/6SEtabiMmoUBSTlgyzjilvMaOpJAa9vVfVmuujNcyrOz07yUGMltJ5RN2+Fi0D43jxKv9VDXRw4hnuIjxIF1DWFG23EicgeKq9A8nw2cJMR7zdfmR2lehMtN3xvQrAsXL3CGbOQuMWyX6T8p0i7EYNUvNvYDdVWWGV69Gq7PlSy4AjUzEAQ3ZBEiAxp2yqt+LkWMskCQ7OcGiF6fe5QBurZqookGymdeQMMPJS8eVte+Taxu
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(55112099003)(11063799006)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?u65+tg35OUOV4CLq9G0hzLAos5KvkOP/6fK+1LPFZHboGY/A9K5OYHKRv1xs?=
+ =?us-ascii?Q?bOpYWYqaDy+Pigu+xiT+x7AO45BtgPA/NFoXlO6v5A3ov/RfWCa4lJMvNqAF?=
+ =?us-ascii?Q?OWVeDZQeB3EUhsYh5YY0zn9MDTF029+0qISKwV+NZiv/1tzli/xXkKjEopWg?=
+ =?us-ascii?Q?bVixLS0Uy0EUo3ukwr3vVcwuGYZn/mZCACQgW0OrVGshyBMSj5PMCaMqYXjQ?=
+ =?us-ascii?Q?QG+4vOZ0N2v2fOGUA9MacR2c696fC377wFIepz28+1EX+9ng14N6YW5MJZ5v?=
+ =?us-ascii?Q?2drFfBTXs8pI/gAxzSzvF7Je+CJGFLOCWudP9b+LvW3C0KBTjXEiuxEMoPZR?=
+ =?us-ascii?Q?Pu5ks/FC6pFDJphGbmZubbRHZd1rPzx2iM08R2NT3R0wWp/CZnS7QxiFgo+C?=
+ =?us-ascii?Q?W6Xo89k9ANp+yACqSyhnB/LcAVJrD0O2QaSL/Y+ysoJ4c5aCmF3JdQdYUCne?=
+ =?us-ascii?Q?InjPPg3WsAiexqI1aGuv+AlygHXOdVuT70rxkqruOx/VpQWfSybhamG5cCda?=
+ =?us-ascii?Q?aSYcabD+4fPrUhNzbJSQEvtzeKThHbzTK1rA3DL7NPLoGwh5InJbZUPp3/yW?=
+ =?us-ascii?Q?QRrn2kidBsKE+yg2DubNf8JMO5qZHmcmqHgSVcVNj/qZDWHDLZ3JeYL+J8xK?=
+ =?us-ascii?Q?czbgKJpC0ljEIE5RaU3B9MLG/+KrGfJCaNVJn2EF96ja+PvJA0L8af5jUuXv?=
+ =?us-ascii?Q?nUTWWFAw8mcR7XbLa7+GryqhT7eIEB4F8EqTQsb5l56gfQdd8A5xiOB1Zwcn?=
+ =?us-ascii?Q?7GgMfBM14z0hnb/zusJY9jfYbtZ+ebJA4ply/SZZQ+adbCh+skkizhjoTOMX?=
+ =?us-ascii?Q?heIEpm7/Pf3oaO3OfQaH1GpiPZ1qyLfAZDTMANs1HvMi1x6QPryQmeGeVX80?=
+ =?us-ascii?Q?2d8aZhuEBHmmBnW2FKJ5udmDKlP7D1CoqrisBBjr/pM6OvOrdmvGC/QBck/6?=
+ =?us-ascii?Q?lehUcXqVDmLeVtOl5SUqX5EbSnMCU9suo9sKmnN1lKpQuZWc+joeqTTLmasx?=
+ =?us-ascii?Q?UJ5xOZ4olbAiruAMpuoH8gs6XnnoP0XxIGGZ8u0oXnUzuTnBDaktw+62I1HC?=
+ =?us-ascii?Q?fiPZlZfsZJ6WpjxcXl/fZZ7n8h4s+LafrvmXx/iuGtph+vralrDRmpTVuDAc?=
+ =?us-ascii?Q?QfPcEiESZjj5TPYdSkerJPfvNGr8BKdHfaT3vuX6UJOt9l5s6h06VQoFt+X1?=
+ =?us-ascii?Q?KB4b3yCWJqh4UuCZRnp+P2se7iTcI9UoQJk0runj8bo8+gNQS4pPZKZh4qu2?=
+ =?us-ascii?Q?BN7wm1tXRWSuoBLHkeTDB1TsrAP173p/2T3Or3778TEA1j0+ZYhb7Gk9rJF+?=
+ =?us-ascii?Q?6FxDkT5YX2YJmaL8aewXSXgmM2ePAUXWrzFafecZCtf0ShHTkQuRpwjE8Ra1?=
+ =?us-ascii?Q?Vj/LYlCE2oc0J7Wr2uSLRefGutZXeEkOJzRKBSKb5Qlefz3LhJWD0BsK3/IB?=
+ =?us-ascii?Q?wIdaAM+n+S6SmIMXrI3Q/IQQ7ePZh/5TecHz7gxN92ENKJaKivWzRlYnhsI7?=
+ =?us-ascii?Q?wqGqEgogpkGZZn48vO6FoldLlESP7aBBFGsEnTqRjGxf3SdaUkstXbRcxnm0?=
+ =?us-ascii?Q?88ZOceytMGcsgpW9WqZBF8oPYeA0MMqA5qSI++kRok3ly1l0zP8k+1nnqXD0?=
+ =?us-ascii?Q?bViQSgIXa8UweA1HQLLGtmTl8MbipBlXYu988g5OedWurFveWIK/QdJKCx6H?=
+ =?us-ascii?Q?27/19zeXyINsglNzZjYqcjT/JBr6kk/rVND4kc88vXkxcwzV5MyvYCnADYzx?=
+ =?us-ascii?Q?do2XNe79ZBIuidb5LqM0GAxdiFLrfwh16GfubtBopOOP3SzvP9B1hJOxyr6E?=
+X-MS-Exchange-AntiSpam-MessageData-1: 5vs0yLLhHIAdHw==
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43b7257e-7371-469d-1409-08debae658cb
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 05:19:22.9058
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AQIURGYrut8GK2Y8eHQFTcNDCuvA5bvaNzqtcmHAvFgEMsuPdvPDrCOkz0jN/18Y9LGxxLHnHNEI4E0m9EF7zb3nwSaMTXjqYKFla4T0mdGOSpHyBm7VZ5fPTwxNffh1+SByAyx/PTM8uxTZoxQsUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR03MB989270
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,oracle.com,gmail.com,1wt.eu,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-291542-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-291540-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minhnguyen080505@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A9D645D09C2
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[altera.com:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,altera.com:email,altera.com:mid,altera.com:dkim]
+X-Rspamd-Queue-Id: 7FE5F5D0CBE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Minh Nguyen <minhnguyen.080505@gmail.com>
+From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 
-pskb_carve_inside_header() and pskb_carve_inside_nonlinear() both copy
-the old skb_shared_info header into a new buffer via memcpy(), which
-includes the destructor_arg pointer (uarg) for MSG_ZEROCOPY skbs.
-Neither function calls net_zcopy_get() for the new shinfo, creating an
-unaccounted holder: every skb_shared_info with destructor_arg set will
-call skb_zcopy_clear() once when freed, but the corresponding
-net_zcopy_get() was never called for the new copy. Repeated calls
-drive uarg->refcnt to zero prematurely, freeing ubuf_info_msgzc while
-TX skbs still hold live destructor_arg pointers.
+Calling hrtimer_start() on an already-active txtimer is unnecessary
+and expensive. Skip the restart if the timer is already active by
+adding an hrtimer_active() check before hrtimer_start().
 
-KASAN reports use-after-free on a freed ubuf_info_msgzc:
+This avoids redundant timer restarts under burst traffic and ensures
+NAPI is scheduled within tx_coal_timer microseconds of the first
+packet rather than having the window reset on every packet.
 
-  BUG: KASAN: slab-use-after-free in skb_release_data+0x77b/0x810
-  Read of size 8 at addr ffff88801574d3e8 by task poc/220
+There is no race concern: hrtimer_start() is internally serialized and
+safe to call on an active timer. In the event of a race between
+hrtimer_active() and hrtimer_start(), the worst case is calling
+hrtimer_start() on an already-active timer, which is identical to the
+pre-patch behaviour. The meaning of tx_coal_timer is unchanged.
 
-  Call Trace:
-   skb_release_data+0x77b/0x810
-   kfree_skb_list_reason+0x13e/0x610
-   skb_release_data+0x4cd/0x810
-   sk_skb_reason_drop+0xf3/0x340
-   skb_queue_purge_reason+0x282/0x440
-   rds_tcp_inc_free+0x1e/0x30
-   rds_recvmsg+0x354/0x1780
-   __sys_recvmsg+0xdf/0x180
+Performance on Cyclone V with dwmac-socfpga (iperf3 -u -b 0 -l 64):
+  Before: ~45200 pps
+  After:  ~52300 pps (~15% improvement)
 
-  Allocated by task 219:
-   msg_zerocopy_realloc+0x157/0x7b0
-   tcp_sendmsg_locked+0x2892/0x3ba0
+Additionally, ~10% improvement in UDP throughput observed on Agilex5,
+with hrtimer CPU usage reduced from ~8% to ~0.6%.
 
-  Freed by task 219:
-   ip_recv_error+0x74a/0xb10
-   tcp_recvmsg+0x475/0x530
-
-The skb consuming the late access still referenced the same uarg via
-shinfo->destructor_arg copied by pskb_carve_inside_nonlinear() without
-a refcount bump. This has been verified to be reliably exploitable: a
-working proof-of-concept achieves full root privilege escalation from
-an unprivileged local user on a default kernel configuration.
-
-The fix follows the pattern of pskb_expand_head() which has the same
-memcpy/cloned structure. For pskb_carve_inside_header(), net_zcopy_get()
-is placed after skb_orphan_frags() succeeds, so the orphan error path
-needs no cleanup. For pskb_carve_inside_nonlinear(), net_zcopy_get() is
-placed after all failure points and just before skb_release_data(), so
-no error path needs cleanup at all -- matching pskb_expand_head() more
-closely and avoiding the need for a balancing net_zcopy_put().
-
-Fixes: 6fa01ccd8830 ("skbuff: Add pskb_extract() helper function")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-sonnet-4-6
-Signed-off-by: Minh Nguyen <minhnguyen.080505@gmail.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 ---
-v2:
-- Use real name in From/Signed-off-by (Jakub Kicinski)
-- Add Reviewed-by tag (Willem de Bruijn)
+Changes in v2:
+ - Expanded commit message to address race condition concern and clarify
+   tx_coal_timer semantics (Andrew Lunn)
+ - Added performance numbers to commit message (Andrew Lunn)
+ - Added Agilex5 performance data with hrtimer CPU usage improvement
+ - Added Tested-by and Reviewed-by from Maxime Chevallier
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions()
 
- net/core/skbuff.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 44ac121cf..6a1a2c203 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6810,6 +6810,8 @@ static int pskb_carve_inside_header(struct sk_buff *skb, const u32 off,
- 			skb_kfree_head(data);
- 			return -ENOMEM;
- 		}
-+		if (skb_zcopy(skb))
-+			net_zcopy_get(skb_zcopy(skb));
- 		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++)
- 			skb_frag_ref(skb, i);
- 		if (skb_has_frag_list(skb))
-@@ -6953,6 +6955,8 @@ static int pskb_carve_inside_nonlinear(struct sk_buff *skb, const u32 off,
- 		skb_kfree_head(data);
- 		return -ENOMEM;
- 	}
-+	if (skb_zcopy(skb))
-+		net_zcopy_get(skb_zcopy(skb));
- 	skb_release_data(skb, SKB_CONSUMED);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 3591755ea30b..35da51c26248 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3341,12 +3341,14 @@ static void stmmac_tx_timer_arm(struct stmmac_priv *priv, u32 queue)
+ 	 * Try to cancel any timer if napi is scheduled, timer will be armed
+ 	 * again in the next scheduled napi.
+ 	 */
+-	if (unlikely(!napi_is_scheduled(napi)))
+-		hrtimer_start(&tx_q->txtimer,
+-			      STMMAC_COAL_TIMER(tx_coal_timer),
+-			      HRTIMER_MODE_REL);
+-	else
++	if (unlikely(!napi_is_scheduled(napi))) {
++		if (unlikely(!(hrtimer_active(&tx_q->txtimer))))
++			hrtimer_start(&tx_q->txtimer,
++				      STMMAC_COAL_TIMER(tx_coal_timer),
++				      HRTIMER_MODE_REL);
++	} else {
+ 		hrtimer_try_to_cancel(&tx_q->txtimer);
++	}
+ }
  
- 	skb->head = data;
-
-base-commit: 94e3dd6874bf04d5939bc8431b9f7852f3a4a121
+ /**
 -- 
-2.54.0
+2.43.7
 
 
