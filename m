@@ -1,371 +1,692 @@
-Return-Path: <netdev+bounces-291738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-291739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBSmCLi6FWrKYQcAu9opvQ
-	(envelope-from <netdev+bounces-291738-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:22:32 +0200
+	id SENrJ2bAFWrYZgcAu9opvQ
+	(envelope-from <netdev+bounces-291739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:46:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 747DA5D89A9
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:22:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F22D35D8FF5
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 17:46:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D403531C4ACE
-	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:09:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4602F31D0E68
+	for <lists+netdev@lfdr.de>; Tue, 26 May 2026 15:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10D2413221;
-	Tue, 26 May 2026 15:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15143CFF5F;
+	Tue, 26 May 2026 15:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tO0uhGzL"
+	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="2KFi387o"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012061.outbound.protection.outlook.com [40.93.195.61])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD1A409627;
-	Tue, 26 May 2026 15:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779807860; cv=fail; b=VYI9EKmiPPczIjFR5mWzpuUi4sm6KgHfh20AQ14Rcbn1FYFAw1p9qMB+oCrG0r1FxE04T9BYxR8Bryiz67DCEoOME9nVoYXE2VvE0roXYFIjMHtdAvOBY3a4jBxx97hvp/driM6E9fq4dfxiYE/LKavznSBNrcqjm8x8o8oFMqo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779807860; c=relaxed/simple;
-	bh=4Q4XcZbQwqXojTkAmdrShOd7A1ILLJph4QbyrivmVPc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pyp00raSBDA87uQfJI8KPiseTFM8xRHDKu8tGUbm8Z3rNZaVpqAqOkKPitd8dZxkxWkPb/yrtYuV30XhQEzQh04BIQGBMVCSBzD23YDYDVZbWk2wph/FNhlVtUUSRDt1RYbNT57j/PJtWlY1jrdjTG0YhUj+5fl6z5LmoxnPoWw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tO0uhGzL; arc=fail smtp.client-ip=40.93.195.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m9IKIhlMreyOsk4OeiGMWBuRrqc4TvYUqf51kRdLYhnmlZ/Acyu2Uves1s96/Zy5io7e6XLOWsnCJPX70arF//Ih6uLAatVd8cWjbk5tgYuLBUgxKZeIGbaKa8DriLVnLjhQ229bVBNEmc2zcwQzJllTau7BZwPfvgZC+U1TZNSWHh3gdI9KTvXZA3IpNo1rHvhW9hj+eWpUVZS200E+XQc4czVHk+s1xFkai0nWcw+0W8We2YGUWMfRnt/0qeZEhBpaa9Qyzbb/6ZIJIG9o62x1PbjfToC95xIecHGBT72Cczc8qwd/VYW+4kH1d0Cs3fF6dbj6Omd8SAsfJj7gpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o5LsmQlvPT4UCRK8/ZsryddoJ4qEIqNyt12AwIRBX40=;
- b=jQy3pN3nDFeLfxkccGQrPITIsSpEUv9jQS57qk4qXUfCLcALKMyQEJT/OWd4XEd+RYQ5NusW0vILNsTikdNfKtzdc5gwmt883WFlMygORMekrIacyXxDdRVEUiO7wONAk6NtvJ+egeMRyQYGQRAtBsNjpQMc8IkLyMZ1frEinWREG1ghR9LodRd0KEXOSVgHj4kbGCpcTzJVxE1tuTGU/aZwf5qu0G2K7hPU7sMZfBTxrEUstqGHw7SRKQtPJtQ7Yrhfbr2vU6lcnloo18Gfmov2Epxm2xW9cNJWjaPIsBof7D1I4TtThcfxTTM2IWZl2FmMSYypZh/9Pm7jD8g3KA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o5LsmQlvPT4UCRK8/ZsryddoJ4qEIqNyt12AwIRBX40=;
- b=tO0uhGzLAl6YMtC22LlXV78tuuLWt1vsq20BzGzG9AnSsPXAeueGnVqTQBtq4Aqk4wjx7BFvX7XwvvejZtIKnUyhs5qErxdF15SxbafEX5KBwEeQEWVNt/xOqPp6La9YtGyzB4a3dtpLtoniWb920eZE0cbnvHWlTwyjlQolqzu22Dm+zcWykVgQoNNrfEhcxXLploDg0Un73VDmZeTpL20rpPQJdGNtxH2UxTKmmT5WXf78WpDG56i5qZFKbSO/UYtR6rrCB/kQ7lwzh7RjhPvMMo6u1turWXftO/8uVNY1JvN/7kbh2NKWn0JindnRJM5sbsy8NjYsruQwu1kgEA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by CY8PR12MB8314.namprd12.prod.outlook.com (2603:10b6:930:7b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.12; Tue, 26 May
- 2026 15:04:04 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.21.0048.019; Tue, 26 May 2026
- 15:04:04 +0000
-Message-ID: <9aa7c295-35cb-428b-9031-13a2f507ae4b@nvidia.com>
-Date: Tue, 26 May 2026 18:03:57 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net/mlx5: Apply devlink default eswitch mode
- during init
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- "Borislav Petkov (AMD)" <bp@alien8.de>,
- Andrew Morton <akpm@linux-foundation.org>,
- Randy Dunlap <rdunlap@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
- Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)"
- <peterz@infradead.org>, Tejun Heo <tj@kernel.org>,
- Vlastimil Babka <vbabka@kernel.org>, Feng Tang
- <feng.tang@linux.alibaba.com>, Christian Brauner <brauner@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
- Marco Elver <elver@google.com>, Li RongQing <lirongqing@baidu.com>,
- Eric Biggers <ebiggers@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Shay Drori <shayd@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>
-References: <20260521072434.362624-1-tariqt@nvidia.com>
- <20260521072434.362624-4-tariqt@nvidia.com> <ahVPASuh4BZGOfx0@FV6GYCPJ69>
- <8c8df8da-62a9-49e8-84eb-572d54cfeb1f@nvidia.com>
- <ahWm4NXph9gdazV_@FV6GYCPJ69>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <ahWm4NXph9gdazV_@FV6GYCPJ69>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TLZP290CA0001.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::14) To CH3PR12MB7548.namprd12.prod.outlook.com
- (2603:10b6:610:144::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29DC3CC7CA;
+	Tue, 26 May 2026 15:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.187
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779808045; cv=none; b=m0Mt2SnWxdtbvZxTfzgAkUGw7yVFIcjJ/7gA9bAeD8EvhDISlJb3TFXA5bA4O/uSatEowZaIsG0VvMsjIDOMqxn8TcWEWm4cYd4gOmmHYU/jwb0lNbPpr3iHHu3zLd2F1iW0sR3hIf/qyQPkPJh0PgxmR98YnsYlZaKbeQUOysc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779808045; c=relaxed/simple;
+	bh=aYlSd9OAcssm7q9W8IFiAHwXRxUduuQVeocoxlaEQVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=REgIGeahsHiFjDv8P0vPEugDbByC+YfXpd6aF+2yjmsL4FCrcfsB3mAc/L8QEbZ65+SEgIq4GBsUD3tX2az+NG4bPKEo4htGltRgtnzg7xP57KY9tMzQVNR/EhmK0tYXcbg3+s7Lp5vQqA1nxQzOvYFIJbLy5gvWAkMO7uIYXzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=2KFi387o; arc=none smtp.client-ip=212.227.126.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
+	s=s1-ionos; t=1779808039; x=1780412839; i=simon@schippers-hamm.de;
+	bh=CmARyeB4XxivvBPN3mz3K6Csjm6OL2B3/Uxjahs3kh4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=2KFi387oWebHqyQVFs1bH7afcH2J8tvFBQRYEcO0i8K0qPtAAc42YXkO0p/5BZMc
+	 tfrF9ugYlDXx4pPpWdx7bclfgX36XiJ/sE73u7CnTyjp0NQgBYyOdrCFA8de6vT8X
+	 g649L8KrED7Ld/6bqnn8UKDiRsUm912AKLk9p3+5x2vTBLwdpS+ieHwB6yEtIsrl7
+	 Y2w0G8sE037Ouil80D1KjBKQu+GfZ/ON9jKH6TSoclCR6MwRrLN07DdRaFYX2Oxvw
+	 218R06Q/ounkf7fZf+5qHL1sefTO5/P7wvW2/co2uQXbw+4SxcGoh1J3xmnu0OOZa
+	 l5aEH0y70Of3haDPsw==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue011
+ [212.227.17.165]) with ESMTPSA (Nemesis) id 1Mtf39-1xJzrc21mx-013Zrj; Tue, 26
+ May 2026 17:07:19 +0200
+Message-ID: <e8be86b4-052f-4f4f-9cb9-2fb12d1e8922@schippers-hamm.de>
+Date: Tue, 26 May 2026 17:07:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|CY8PR12MB8314:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4fe02b70-7b7a-46b5-50bf-08debb380725
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7136999003|11062099010|4143699003|6133799003|11063799006|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	XtbFdUYJQ4WeajeniKu1XGh0hXYJDeITCz9e9S0MWQOKJOyocI/YtIQJ1fCUUHr85q2EuRbV/GV0hoeNJHmJM8kF1/Gkz8P3A2uvJJZJzTDad0IzU0oW9X6gLzTzAAIfNUuauw+dH8IIktNw8+ZKvmue6FQG/t8LI2pkdlzXS4fxo4jUiRjLgmLZbLIcN8DHV+uhpQ0dni9CyZxiwHU1lWsRdRonmxEizltlzo03YV6ZWIp2HA3ESvI3FXDS4+bTGCaMbf15A7KbeScGfHBw2CHuo18nGoSl+CktwclS+njjPSkus/lrFHJ6vhMxulrWc9r65IHp42yv4z0T8n7scc7ZSHtcnwhORPzmyC4d9Y/L/iNkRpRFm+w3tG2l65E3+XEHPzBEInKfjmtvLKX6UoiLcEUbg33DbWNfSr8ZAQT27CvwUZgpiUw4Wb4LgcTwKjj35oUCDQGB1NqO+OJfO8vRI2p7D5tDqm/M75MIXB/WMuE07g7Pxo0TOY7cfVlRio7TBoai/CdWWkpTwFpKVvDMOqg3mV/zlQOj8wHqPFmxiobVHmljyapkrsN19/ah6DeHI9rLg9LsDcC1xfRwd9lRuYdCXRZL6p9LTu4j08kBHyg/PuTfULZHri+VUNxprX52CI4vZQOQ6TKw+0LI+DJFZSxjo0Go0aQrjAvlQUVDQJwFeFUXL1HERuh00d94
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7136999003)(11062099010)(4143699003)(6133799003)(11063799006)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?U3lhT2UxVmtkaXgvd2dEZTM0b0VDV3ZzdFZMQXQ2Y3VWejVrNncyNFA2cEZq?=
- =?utf-8?B?T1BkTXE4OUZLaldYcWNBaEdBdkJrbS9pRXljVG1MTUxNaDZwTXFwQTVoWEFr?=
- =?utf-8?B?K3FZeHE1WUlQQlV5anVaek10NjAzNWFvaklBb1hvcnkwTW9YaWpCbHhUZ1ZG?=
- =?utf-8?B?TUtYSFdHYWdjNGR5SUNlc1YzY3cyU09pczJXZG0yK2N0TmkrdVZqVDJxNTNV?=
- =?utf-8?B?NTBKaDBZdW5HYitDVi9RT05uU3BxeTcyYUcvMmxuS0hsYmM4NXkrUFkzMnEv?=
- =?utf-8?B?N0QxMHFpUVRBZmZLVG5KWVNKRnJVSFAvMWJYQmorRndzY1NwMXUwaG1aMHdL?=
- =?utf-8?B?alV5ZmJBMURjM0RpKzhoWVRzUGlSdGNPbHZ4eUJ3WmQ4eWlrRkZwZlVBZ3RK?=
- =?utf-8?B?N3VORjQxUEg1N0FXSDlWRVJPaDFXek1aZEhCck9WazdjL2pmUVlPT0VZM2lo?=
- =?utf-8?B?ZTlhUnpvYUJFcUFvTnVESjZpd3V2anQ5MVVKR2JBaXlhMDI1Vk1zd0EvU1dR?=
- =?utf-8?B?MU9LajFvbzJKRUFIY2dlMHQ2RUtPMFFNV0o2dmllZmdGNTFsWGh3N0k0Rko2?=
- =?utf-8?B?cytPRGYvNEFkZDhOaVFTK0FmQVMycFcvUlFLSzY5c1VFTEJ6Y1d2NkhMOUtK?=
- =?utf-8?B?QjExSmt5a3Z4ekI2dVpDQVdRT0hJZTNxOTEvdVVxNEVzMXU5OW5IZ01vclVX?=
- =?utf-8?B?Tmd1eHROUmd0M2xKT0FnMnc1dVNyeUZ4ZUd1WHJ5ZjdwbWltNGVseDVYYzMz?=
- =?utf-8?B?RjNwVTdHb3NpaC9zTCtRMW4zQ01rU0ZlN0lrV2IySU05cWpJUElZR1F6c29H?=
- =?utf-8?B?RHViZDBaS1M2ZnIvY0l6MzJsZTRyM05Tem9XcTBtZDdoQjVhMGZzbkxuNDdP?=
- =?utf-8?B?UGxUOXNaOW40Vk1HNk93Q1U0MTVxWjJ3aUZaZnNWellYOGRtaStPQlc5dCs3?=
- =?utf-8?B?aUlQUWhNc0FYZ1I1dUZyb0JBUFRwQ2dibFNxMkFRSnN4TXphaHdXQlhKNUZO?=
- =?utf-8?B?bGFpc0VIZjNPREkrYmo0aXBlNWM3d0tqMm8rTW5BNlpmOGJFd2NtYlpmWHFU?=
- =?utf-8?B?QlljOGJxUjBSM3FrZUE0K2JYZVl0UXV1dEpKNFkxTlJTOVREUkNRYWduOUFJ?=
- =?utf-8?B?b2JjdXJoZm8vUXptZVk1ZzZocE1QUjY1TmpCM2psMkpvUUFCekdwKzFaUVNJ?=
- =?utf-8?B?QkQveHdUWk04a0NqTjZIZmFVZFdjNHF5NzEweU92c0FpUnBZYUw0UTB6S1hF?=
- =?utf-8?B?UjlySWJEZHZScHZ4TkNTMXhuSjd1dm9zR1VhdzFUM1R2bnVPbWlUNjJucjBB?=
- =?utf-8?B?ZmNZbkZWS1NiNm9vc0U2TkJMY2hBVWVKVVkrMkxTL0QreWl4MC9iZFd2Y2E0?=
- =?utf-8?B?TC9VVEdscTR3N2paNjhMNWtRTjdLd1JOV0ZjenJXSkZldnFiUVpQTlNHQ2w4?=
- =?utf-8?B?cWNHMC9pbTRSRVFGZ0hkYTlkSHVWQ3BBaEJGbzhtRDJibVJacVFBdnAza3Va?=
- =?utf-8?B?bXM3TUVHR1phbE9jWWgxOE5sM1IrQTJOTjkreXp4OGJrWGhiNjRqamRwR25U?=
- =?utf-8?B?OEQxRlNxYmhiS1JQcnI1bm1DSDQ3VEoyS2tyVkpHSE1VbEZNSmFJSEZEYTM0?=
- =?utf-8?B?NTloQ1U3dzRjTTZkZzVSb0lUeEo5YXdBOVpoTFRVMmlaTFRZcTVZcEt6MlRG?=
- =?utf-8?B?WG5LT2RaU0pMMDRRQ1RPSEJtR1lTWmdKditmeVNncWFUYmtPcnBQUGdNWWtl?=
- =?utf-8?B?NnZyNDZ4MnN1Vk00dWpaVHhCZEU2OGhNZ1p4NUVjTU9mbUxKNDRMZkp5OGFo?=
- =?utf-8?B?S0FNSUx1VkIvamxGZE5GcUYyOUZ3QkVpNk9aNzRILzdRbHRrMEt6R2JiTXg3?=
- =?utf-8?B?bVM2eWIxRVA4WVpDTm9UZm9YTVVKMFFoalNiakxML1VMSXAxU1NJUkpsSnNv?=
- =?utf-8?B?M1pJRE92bmFRSlZDSkcyVGlYU2piMHo1S3U1Z3pTOUxTSElUVTFCT1dMTnp2?=
- =?utf-8?B?TG1WZlhaZzJmQUVpYUo0SVJJL1Vrc1FhQ2ZCNHJ1VERyZEtsQ2ZHeFczY0NR?=
- =?utf-8?B?U1VCTEtSM0MzQ3JGWUw0K1o0RGlKa0ZLaGNmMGpoRHp1NVB4VzNvTHJLVVpX?=
- =?utf-8?B?cG92ZENwVVpJNllpUmdtVjh4VzdNNzB5ZUxwU1VmWkt2c2c4ZGcxbXVRK3Bo?=
- =?utf-8?B?R3AyZ0NNVXpRSG5ZaDFPUFNwaUdSSHB6OTVKTHROMjE5QjFWUHg0M1RScWVZ?=
- =?utf-8?B?cm9Cbi95M0R6QVN4MW5YOEZtS1lVVWNVRjNoN2MxOUxuSlFENTdKY1A5MDQ1?=
- =?utf-8?B?WG4vNVI0YSs2TXJsVmJBbWI2MVIvQjB3VG1ienRaUnFvVk50OUFOZz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fe02b70-7b7a-46b5-50bf-08debb380725
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2026 15:04:04.7886
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Mwj5Ex724esXvkkzTpwx+gdHz9j2Hm/rgiITmosArWl1xhucQ/Iqdxmpu25NVYjnsV4S8x5jQEiQbB99FYUFXg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8314
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
+ for latency reduction
+To: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260505132159.241305-1-hawk@kernel.org>
+ <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
+ <20260508190626.4285fac0@kernel.org>
+ <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
+ <20260510085602.57c7a081@kernel.org>
+ <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
+ <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
+ <b78f002a-8cb9-4857-bf8f-0137e790f644@kernel.org>
+ <873511fa-4316-4411-a76b-ec4c5805abd3@schippers-hamm.de>
+ <18855e57-f050-411f-9958-d4babcc81ba3@kernel.org>
+ <14348957-d061-4124-9bac-45df9cf6686c@schippers-hamm.de>
+ <9a57bb41-114e-492b-9eaa-52237675bb7c@schippers-hamm.de>
+ <4ae9400a-8919-4ffc-8db3-0c334e2aa462@tu-berlin.de>
+ <8e8b877b-a7ce-4b2f-9567-64c8dbb48411@schippers-hamm.de>
+ <463e91cb-6c45-4d91-8737-39779fec5a49@tu-berlin.de>
+ <b1c2d2c1-a70a-4bf4-baff-d0ac2f878722@schippers-hamm.de>
+ <24d10b53-c545-4141-95a5-5c49c35c5d6c@tu-berlin.de>
+ <c5b3a7ef-8ec7-4361-80bb-cf06e910350c@schippers-hamm.de>
+ <d23fd8e0-a0d3-4197-a130-2340d1c28fe0@tu-berlin.de>
+Content-Language: en-US
+From: Simon Schippers <simon@schippers-hamm.de>
+In-Reply-To: <d23fd8e0-a0d3-4197-a130-2340d1c28fe0@tu-berlin.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:ZW2v8ig5je6O7jWi2SMYl5TTwQCnAI1eZDTgyytO00re6svOI89
+ L1n7RTXyvEiERfKcBUE4Nq+HcRakRygfP067PYoMeKXTlD1lur8Rn82nstt9hJt7ICmOry5
+ YkN3Uy2HBc+EAqNcWB8LyorEDVSnnKw0MwmSHmJqdhTKt5O24G3U1L49mwgO2NYNhnJmMiA
+ XgvYz8KUlnEEz3g6fiGKg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:a5UXCWlK6jQ=;10AJXoaWVMGHWwcVmxHzAjy5hme
+ 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
+ EkshuyBQivUZF2fJUYQrAkxbDOfT0f7G
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
+	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	TAGGED_FROM(0.00)[bounces-291738-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-291739-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[schippers-hamm.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: 747DA5D89A9
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,veth_bql_test_virtme.sh:url,schippers-hamm.de:mid,schippers-hamm.de:dkim,veth_bql_bench.sh:url,medium.com:url]
+X-Rspamd-Queue-Id: F22D35D8FF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 26/05/2026 17:07, Jiri Pirko wrote:
-> Tue, May 26, 2026 at 11:44:46AM +0200, mbloch@nvidia.com wrote:
->>
->>
->> On 26/05/2026 10:44, Jiri Pirko wrote:
->>> Thu, May 21, 2026 at 09:24:34AM +0200, tariqt@nvidia.com wrote:
->>>> From: Mark Bloch <mbloch@nvidia.com>
+On 5/26/26 16:55, Jonas K=C3=B6ppeler wrote:
+> On 5/26/26 4:35 PM, Simon Schippers wrote:
+>> On 5/26/26 11:54, Jonas K=C3=B6ppeler wrote:
+>>> On 5/23/26 6:09 PM, Simon Schippers wrote:
+>>>> On 5/22/26 18:26, Jonas K=C3=B6ppeler wrote:
+>>>>> On 5/22/26 10:41, Simon Schippers wrote:
+>>>>>> On 5/22/26 09:14, Jonas K=C3=B6ppeler wrote:
+>>>>>>> On 5/19/26 10:51 PM, Simon Schippers wrote:
+>>>>>>>> On 5/12/26 23:55, Simon Schippers wrote:
+>>>>>>>>> On 5/12/26 15:54, Jesper Dangaard Brouer wrote:
+>>>>>>>>>>>> Nope, I'm using a bpftrace program to keep track of the infli=
+ght/limit
+>>>>>>>>>>>> in a BPF hashmap.  Reading from /sys will not be accurate.
+>>>>>>>>>>> Ah nice.
+>>>>>>>>>> Add the option --hist to have both NAPI and BQL histograms prin=
+ted when
+>>>>>>>>>> script ends.  This will give you an accurate pattern of how inf=
+light and
+>>>>>>>>>> limit evolves.
+>>>>>>>>>>
+>>>>>>>>>>>> I moved the selftests into a github repo [1] to allow us to c=
+ollaborate
+>>>>>>>>>>>> and evaluate the changes more easily.  I explicitly kept the =
+new BPF
+>>>>>>>>>>>> based BQL tracking as a commit[2] for your benefit.
+>>>>>>>>>>>>
+>>>>>>>>>>>>       [1]https://github.com/netoptimizer/veth-backpressure-pe=
+rformance-testing/tree/main/selftests
+>>>>>>>>>>>>
+>>>>>>>>>>>>       [2]https://github.com/netoptimizer/veth-backpressure-pe=
+rformance-testing/commit/f25c5dc92977
+>>>>>>>>>>> Thanks for sharing. After minor issues I was able to set it up
+>>>>>>>>>>> (currently I am just using plain v5, will look at the coalesci=
+ng patch
+>>>>>>>>>>> when I find the time):
+>>>>>>>>>>>
+>>>>>>>>>>> Can confirm the latency reduction with the default settings, i=
+n my case
+>>>>>>>>>>> 4.888ms to 0.241ms.
+>>>>>>>>>>>
+>>>>>>>>>>> With the same script I was also able to see a performance slow=
+ down:
+>>>>>>>>>>> veth_bql_test_virtme.sh --qdisc fq_codel --nrules 0
+>>>>>>>>>>> --> ~510 Kpps
+>>>>>>>>>>> Same with --bql-disable
+>>>>>>>>>>> --> ~570 Kpps
+>>>>>>>>>>> --> 12% faster
+>>>>>>>>>>>
+>>>>>>>>>> Thanks for running these benchmarks.
+>>>>>>>>>>
+>>>>>>>>>> Notice that --nrules 0 can easily result in no-queuing (on aver=
+age),
+>>>>>>>>>> because the veth NAPI consumer is faster than the producer.  Yo=
+u will
+>>>>>>>>>> likely see BQL inflight=3D1 and sink reported avg latency very =
+low
+>>>>>>>>>> (remember it okay that sink get high latency penalty as long at=
+ ping
+>>>>>>>>>> latency remains low, as that show AQM is working).
+>>>>>>>>> I ran the benchmarks with --hist and I see what you mean.
+>>>>>>>>> I have very similar results.
+>>>>>>>>>
+>>>>>>>>> Is Jonas way [1] of modifiying pktgen maybe the best option to e=
+nsure
+>>>>>>>>> that the producer is faster than the consumer?
+>>>>>>>>>
+>>>>>>>>> [1] Link:https://lore.kernel.org/netdev/e8cdba04-aa9a-45c6-9807-=
+8274b62920df@tu-dortmund.de/
+>>>>>>>>>
+>>>>>>>>>> Hi, so what I found is that pktgen does not respect
+>>>>>>>>>> __QUEUE_STATE_STACK_OFF. So the test data above is invalid, sin=
+ce it
+>>>>>>>>>> just sent packets even if the BQL "stopped" the queue. So I pat=
+ched
+>>>>>>>>>> pktgen with the following:
+>>>>>>>>>>
+>>>>>>>>>> -       if (unlikely(netif_xmit_frozen_or_drv_stopped(txq))) {
+>>>>>>>>>> +       if (unlikely(netif_xmit_frozen_or_stopped(txq))) {
+>>>>>>>>> After thinking more about the implementation I see possible issu=
+es:
+>>>>>>>>>
+>>>>>>>>> 1. netdev_tx_completed_queue() never reports more than burst=3D6=
+4 packets:
+>>>>>>>>>
+>>>>>>>>> BQL only increments the limit if the queue was starved. That mea=
+ns:
+>>>>>>>>> "The queue was over-limit in the last interval (the last time co=
+mpletion
+>>>>>>>>> processing ran), and there is no more data in the queue (i.e. it=
+=E2=80=99s
+>>>>>>>>> empty)" [2]
+>>>>>>>>> But as only 64 packets are reported at max, the queue can only g=
+row when
+>>>>>>>>> it is <=3D 64 packets. And then it can only stay at a limit >64 =
+until the
+>>>>>>>>> next decrease of the limit.
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> 2. netdev_tx_completed_queue() is called in irregular intervals:
+>>>>>>>>>
+>>>>>>>>> If the consumer is slow it is called approx each tx_coal_usecs.
+>>>>>>>>> But if the consumer is fast it is called way more frequent, prob=
+ably
+>>>>>>>>> in irregular intervals depending on the scheduling.
+>>>>>>>>> However, "BQL depends on periodic completion interrupts" [2].
+>>>>>>>>>
+>>>>>>>>> --> How about adding something like an interrupt that triggers e=
+very
+>>>>>>>>>         10us and calls netdev_tx_completed_queue() with n_bql co=
+llected from
+>>>>>>>>>         (multiple) veth_xdp_rcv runs? That could solve 1. and 2.
+>>>>>>>> Hi,
+>>>>>>>>
+>>>>>>>> I worked on a new version (see attachment) that addresses both is=
+sues.
+>>>>>>>>
+>>>>>>>> The major change is that instead of tracking the timestamp and pa=
+cket
+>>>>>>>> count as local variables in veth_xdp_rcv(), they are now stored
+>>>>>>>> persistently in veth_rq as struct veth_bql_state. This allows com=
+pletions
+>>>>>>>> to accumulate across multiple NAPI poll calls, so
+>>>>>>>> netdev_tx_completed_queue() can report more than 64 packets at on=
+ce
+>>>>>>>> (see point 1). To get the time I am using (the fast) sched_clock(=
+) with
+>>>>>>>> a trick to avoid issues when switching between CPUs.
+>>>>>>>>
+>>>>>>>> For point 2, the coalescing deadline is now checked both before t=
+he
+>>>>>>>> receive loop (to flush completions that timed out since the previ=
+ous
+>>>>>>>> poll) and after each consumed packet, making completion intervals=
+ more
+>>>>>>>> regular. Still the intervals can be smaller than
+>>>>>>>> VETH_BQL_COAL_TX_USECS, but I guess this is fine.
+>>>>>>>>
+>>>>>>>> I also found out that the BQL limit correlates closely with
+>>>>>>>> VETH_BQL_COAL_TX_USECS. It essentially reflects the latency we ar=
+e
+>>>>>>>> targeting. I raised the default to 100 =C2=B5s to allow DQL to co=
+nverge to a
+>>>>>>>> higher limit (for reaching 255 in the testing below).
+>>>>>>>>
+>>>>>>>> With the patched pktgen (respecting __QUEUE_STATE_STACK_XOFF), te=
+sting
+>>>>>>>> shows:
+>>>>>>>> - --nrules 0: DQL limit reaches (up to) ~255
+>>>>>>>> - --nrules 10000: DQL limit converges to ~0 (with --gro-disable)
+>>>>>>>>
+>>>>>>>> These results are what I would expect from a BQL algorithm, but m=
+ore
+>>>>>>>> testing is needed of course.
+>>>>>>>>
+>>>>>>>> What do you think?
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> This is exactly what I had in mind for implementing the BQL algori=
+thm
+>>>>>>> in this case. I did some testing with pktgen of this patch and als=
+o
+>>>>>>> compared it to the v5 version.
+>>>>>>>
+>>>>>>> You can find an extension of the benchmark script with pktgen here=
+ [1],
+>>>>>>> as well as a wrapper script (veth_bql_bench.sh) to run the test sc=
+ript
+>>>>>>> with and without --bql-disable to report the difference. I also
+>>>>>>> configured pktgen to use the qdisc as suggested by Jesper.
+>>>>>> Great, I will use your pktgen solution from now on.
+>>>>>>
+>>>>>> Didn't know about the qdisc option, is there a performance differen=
+ce
+>>>>>> with/without it? Or is it to have ping working next to pktgen?
+>>>>> Did not see any big difference performance-wise, but as you say, pin=
+g
+>>>>> works better with pktgen then.
+>>>>>
+>>>>>> Consider to do a pull request :)
+>>>>>>
+>>>>>>> Note: bpftrace needs to be disabled, otherwise it becomes the
+>>>>>>> bottleneck (at least on my machine) and pktgen throughput is halve=
+d
+>>>>>>> when enabled.
+>>>>>> Good to know.
+>>>>>>
+>>>>>>> Here are the results:
+>>>>>>>
+>>>>>>> v5 (not time-based):
+>>>>>>> --nrules 0 --pktgen --no-bpftrace
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>> Results (average over 10 runs):
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>>                           BQL on    BQL off
+>>>>>>> ---                    ------    -------
+>>>>>>> Throughput (pps)      1980871    2169898
+>>>>>>> Ping RTT avg (ms)       0.065      0.162
+>>>>>>> Throughput diff         -8.7%   // BQL 8.7% lower throughput
+>>>>>>> RTT diff               -59.9%   // BQL 60% lower latency
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>>
+>>>>>>> Simon's time-based version:
+>>>>>>>
+>>>>>>> Test args: --nrules 0 --pktgen --no-bpftrace
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>> Results (average over 10 runs):
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>>                               BQL on      BQL off
+>>>>>>> ---                        ------      -------
+>>>>>>> Throughput (pps)          2166335      2153398
+>>>>>>> Ping RTT avg (ms)           0.165        0.165
+>>>>>>> Throughput diff              0.6%
+>>>>>>> RTT diff                     0.0%
+>>>>>>>
+>>>>>>> --pktgen --no-bpftrace --nrules 3500
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>> Results (average over 10 runs):
+>>>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>>>                               BQL on      BQL off
+>>>>>>> ---                        ------      -------
+>>>>>>> Throughput (pps)            28569        28696
+>>>>>>> Ping RTT avg (ms)           1.327        8.409
+>>>>>>> Throughput diff             -0.4%
+>>>>>>> RTT diff                   -84.2%
+>>>>>>>
+>>>>>> I think we should run benchmarks against the stock net-next to
+>>>>>> be safe.
+>>>>> --nrules 0 --pktgen --no-bpftrace
+>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>> Results (average over 10 runs):
+>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>>                        net-next
+>>>>> ---                  -------
+>>>>> Throughput (pps)     2285421
+>>>>> Ping RTT avg (ms)    0.161
+>>>>>
+>>>>> (slightly adjusted the output to better communicate the results)
+>>>>>
+>>>>> So in my case this means BQL implementation has ~5% lower throughput
+>>>>> compared to net-next. But please double check.
+>>>>>
+>>>> Yes, I will benchmark myself.
 >>>>
->>>> Apply devlink default eswitch mode for mlx5 devices after successful
->>>> device initialization while holding the devlink instance lock.
+>>>> There are probably some places where we can gain performance.
+>>>> For example, I see ptr_ring_empty() which could be swapped for
+>>>> __ptr_ring_empty() which would save a spinlock and unlock.
 >>>>
->>>> At this point the devlink instance is registered and the mlx5 devlink
->>>> operations are available, so the default eswitch mode can be applied to
->>>> the matching PCI devlink handle.
+>>>>>>> Seems to work now as expected.
+>>>>>> Yes, but I think we have to keep these points in mind:
+>>>>>>
+>>>>>> 1. Limit/Inflight can be bigger than VETH_RING_SIZE, because
+>>>>>>       packets can be enqueued in the same time as they are read out=
+,
+>>>>>>       so netdev_tx_completed_queue() can theoretically be called wi=
+th
+>>>>>>       many number of packets.
+>>>>>>       I do not think it is deal-breaking though.
+>>>>>>       I could see such high limits/inflights when looking at the /s=
+ys
+>>>>>>       BQL statistics..
+>>>>> For me this makes sense, that inflight just means the number of
+>>>>> packets not yet 'completed' or the number of packets that you
+>>>>> can send between two completion calls. I think this is not specific
+>>>>   From my understanding, I do think that this behavior is
+>>>> pretty specific.
 >>>>
->>>> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
->>>> Reviewed-by: Shay Drori <shayd@nvidia.com>
->>>> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
->>>> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->>>> ---
->>>> drivers/net/ethernet/mellanox/mlx5/core/main.c | 17 +++++++++++++++++
->>>> 1 file changed, 17 insertions(+)
->>>>
->>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>>> index 0c6e4efe38c8..4528097f3d84 100644
->>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>>> @@ -1391,6 +1391,21 @@ static void mlx5_unload(struct mlx5_core_dev *dev)
->>>> 	mlx5_free_bfreg(dev, &dev->priv.bfreg);
->>>> }
->>>>
->>>> +static void mlx5_devl_apply_default_esw_mode(struct mlx5_core_dev *dev)
->>>> +{
->>>> +	struct devlink *devlink = priv_to_devlink(dev);
->>>> +	int err;
->>>> +
->>>> +	if (!MLX5_ESWITCH_MANAGER(dev))
->>>> +		return;
->>>> +
->>>> +	devl_assert_locked(devlink);
->>>> +	err = devl_apply_default_esw_mode(devlink);
->>>> +	if (err)
->>>> +		mlx5_core_warn(dev, "Couldn't apply default eswitch mode, err %d\n",
->>>> +			       err);
->>>> +}
->>>> +
->>>> int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->>>> {
->>>> 	bool light_probe = mlx5_dev_is_lightweight(dev);
->>>> @@ -1437,6 +1452,7 @@ int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->>>> 		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
->>>>
->>>> 	mutex_unlock(&dev->intf_state_mutex);
->>>> +	mlx5_devl_apply_default_esw_mode(dev);
+>>>> Typically BQL-enabled NIC drivers clear packets out of some
+>>>> internal buffer in their completion interrupt (or something
+>>>> similar). And after that they call netdev_tx_completed_queue().
+>>> You are right, because descriptors are freed at the same time when the=
+y are accounted for.
 >>>
->>> I wonder how we can make this work for all. I mean, other driver would
->>> silently ignore this command like arg, right? Any idea how to make all
->>> drivers follow the arg from very beginning?
+>>>>> to this implementation. But for long intervals this might result in
+>>>>> some problems because you can just fill the veth_ring to its capacit=
+y
+>>>>> quickly, and increasing latency if the receiver is slow.
+>>>> Yes, but I think the latency can only be approx. as big as the
+>>>> interval (can be higher with GRO enabled).
+>>> I think it's more like ~2.x times added latency in the worst case,
+>>> which is normal BQL behavior, but for large intervals 2x is a lot.
+>>> Of course this value is also capped by the time it takes to process
+>>> the 256 packets that fit in the ring buffer.
 >>>
->>
->> I have a follow-up series that adds the call to all drivers which support
->> setting eswitch mode. When going over the other drivers, what I found is
->> that the right point to apply the default is driver specific, drivers
->> I have patch for:
->>
->> 46e16c6d9836 net: Apply devlink esw mode defaults
->> ab4f54102ba9 bnxt_en: Apply devlink default eswitch mode during init
->> b48cce1607bb liquidio: Apply devlink default eswitch mode during init
->> 4ea54b0fe04a ice: Apply devlink default eswitch mode during init
->> b7faddaa1c90 octeontx2-af: Apply devlink default eswitch mode during init
->> 74b0c22c47b9 octeontx2-pf: Apply devlink default eswitch mode during init
->> 5000e4c3d768 nfp: Apply devlink default eswitch mode during init
->> 97a218e95e41 netdevsim: Apply devlink default eswitch mode during init
->>
->> I don't think doing this generically from devlink is realistic. devlink
->> doesn't really know when a given driver is ready to change eswitch mode.
->> Some drivers need SR-IOV state, representor setup, or other init pieces to
->> be ready first, and the locking is not identical across drivers either.
-> 
-> 
-> Low hanging fruit would be just to call ops->eswitch_mode_set at the end
-> of register. Multiple reasons:
-> 
-> 1) end of devl_register is exactly the point userspace is free to issue
->    the eswitch mode set. Driver should be ready to handle it.
-> 2) all drivers would transparently get this functionality, without
->    actually knowing this kernel command line arg ever existed, without
->    odd wiring call of related exported function. I prefer that stongly.
-> 3) you should add a there warning for the case this arg is passed yet
->    the driver does not implement eswitch_mode_set. User should
->    get a feedback like this, not silent ignore.
-> 
-> The only loose end is see it the void return of devl_register().
-> Multiple ways to handle the possibly failed eswitch_mode_set(). I would
-> probably just go for pr_warn, seems to be the most correct.
-> 
-> Make sense?
-
-I see the point, but I don't think devl_register() (at least not the only place)
-is the right place.
-
-There is a small but important difference between userspace doing
-"devlink eswitch set" after register is done, and devlink core calling
-eswitch_mode_set() from inside the register flow.
-
-Some drivers call devlink_register() while holding the device lock.
-liquidio is one example. If devlink core calls ops->eswitch_mode_set() from
-there, we may start the full eswitch mode change while holding that lock.
-That mode change can create representors, register netdevs, take rtnl,
-allocate resources, etc. I don't think we want this to become an implicit
-side effect of devlink registration.
-
-For mlx5, the placement after intf_state_mutex is also intentional:
-
-mutex_unlock(&dev->intf_state_mutex);
-mlx5_devl_apply_default_esw_mode(dev);
-
-We can't call it while holding intf_state_mutex because the mode set path
-takes it internally, and switchdev mode may also create IB representors.
-
-Also, devl_register() only covers the first registration. The mlx5 call in
-mlx5_load_one_devl_locked() is for reload/fw reset recovery kind of flows.
-In those flows devlink is already registered, so devl_register() is not
-called again, but the driver state was rebuilt and we may need to apply the
-default again.
-
-Same for reload, fw reset and pci recovery in general. If the driver tears
-down and rebuilds eswitch related state, the place to apply the default is
-in that driver's reinit flow, not in devl_register().
-
-When I went over the other drivers, the right place was not always the same
-as devlink registration. I'm not an expert in any of them, so I hope I got
-the details right, but for example octeontx2 AF needs sr-iov and the
-representor switch state to be initialized first. nfp can do it after
-app/vNIC init while the devlink lock is already held. liquidio should do it
-only after dropping the PCI device lock.
-
-Mark
-
-> 
-> 
->>
->> Also, since this knob is only about eswitch mode, I don't think we need to
->> touch every devlink driver. Drivers that don't implement eswitch_mode_set()
->> would just ignore it anyway. The follow-up only wires the default into
->> drivers that actually support changing eswitch mode.
->>
->> Mark
->>
+>>> For example, for a test run with fq_codel and 20K rules, and a ping
+>>> baseline of 1.7 ms without pktgen load, the results are:
+>>> tx-usecs   p99_ping_rtt (ms)
+>>> --------   -----------------
+>>>       0           5.223
+>>>     100           6.910
+>>>     500           7.197
+>>>    1000           6.967
+>>>    5000          16.233
+>>>   10000          25.033
+>>>   20000          44.133
 >>>
->>>> 	return 0;
->>>>
->>>> err_register:
->>>> @@ -1538,6 +1554,7 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
->>>> 		goto err_attach;
->>>>
->>>> 	mutex_unlock(&dev->intf_state_mutex);
->>>> +	mlx5_devl_apply_default_esw_mode(dev);
->>>> 	return 0;
->>>>
->>>> err_attach:
->>>> -- 
->>>> 2.44.0
->>>>
+>>> Also, the interval is sometimes dominated by the processing time of
+>>> a packet batch (and other effects). The default is 8 packets/batch
+>>> (see gro_normal_batch). This means that for 7 packets you see
+>>> processing times on the order of a few hundred nanoseconds, but for
+>>> the 8th you see the processing time of the whole batch (see table belo=
+w).
+>>> With a ruleset > 1000 entries, this exceeds the default tx-usecs value=
+,
+>>> which is why the p99 RTT increase is even larger than 2x tx-usecs
+>>> -- as you can see in the table for tx-usecs values 0-5000.
+>>>
+>>> tx-usecs 0 nrules 0
+>>> Percentile   per-packet processing time (=C2=B5s)
+>>> ----------   -------------
+>>>      p5             0.316
+>>>     p25             0.382
+>>>     p50             0.442
+>>>     p75             0.508 -- fast enqueue to skb_list
+>>>     p95            68.304 -- batch processing time
+>>>
+>>> Setting gro_normal_batch to 1 makes the interval times more
+>>> accurate and improves p99 RTT slightly, though it's still > 2x the
+>>> tx-usecs latency increase.
+>>>
+>>> However, using smaller values > 0 means that you can benefit
+>>> from bql, but the actual interval might be larger than the
+>>> configured value. I do not think this is a deal breaker, but
+>>> something worth noting where the latencies come from.
+>> I understand and agree with your points.
+>> I also do not see anything deal-breaking.
+>> Yes, there is no guarantee for the latency, but BQL
+>> is best-effort anyway.
 >>
+>> I will wait for your new measurements, but there is no argument
+>> against a default tx-usecs of ~100us for now, right?
+>=20
+> Yes, I think 100us is perfectly fine. I guess most of it was
+> just my curiosity why the latency values are as they are :)
 
+Which is great, because I was wondering the same :)
+
+> But it feels like this will need some documentation, because
+> as we have seen, some values are a little different
+> from what you expect from bql. Inflight > veth_ring_size,
+> tx-usecs not necessarily achieving the configured value,
+> inflight can get stuck > 0. Wdyt?
+> But I think it works nicely overall.
+>=20
+
+Exactly, we should get ready for a v6 soon.
+
+And I think we should move the BQL logic into a seperate .h file
+as a library. Then it is also usable for TUN/TAP in the future.
+
+Let's amend the commits. Should we do this on Github?
+
+>>> Also worth noting: using fq_codel is better to use in this
+>>> case because it can fast track sparse flows. using sfq the
+>>> ping packet can get head of line blocked by the current quantum
+>>> of sfq, if my understanding is correct.
+>> Why don't we use a prio qdisc where ping gets prioritized?
+>> Then we do not have to worry about head of line blocking on
+>> the qdisc layer and instead can concentrate on veth.
+>>
+>>>>> To illustrate this have a look at [1]. There are some plots that
+>>>>> show the rtt vs. tx-usec config depending on nrules.
+>>>>>
+>>>>> [1] https://github.com/jkoeppeler/veth-backpressure-performance-test=
+ing/tree/pktgen-and-benchmark/results/tx-usecs
+>>>>>
+>>>> Nice plots! Great for finding a sane default value.
+>>> I did some more measurements to better understand whats
+>>> happening. I will upload the results latest by tomorrow
+>>> to the github repository mentioned above.
+>>>
+>>>>>> 2. sched_clock() is only valid on the same CPU. When a different
+>>>>>>       CPU starts executing its sched_clock() can be in the past com=
+pared
+>>>>>>       to the sched_clock() value saved by the previous CPU.
+>>>>>>       My trick...
+>>>>>>       min(s->time, sched_clock())
+>>>>>>       ... avoids potentially extremely long intervals between
+>>>>>>       netdev_tx_completed_queue() calls but is not perfect of cours=
+e.
+>>>>>>       I think CPU hopping happens rarely enough for this to matter.=
+.
+>>>>>>       And also we have to keep this in mind [1]:
+>>>>>>       "An architecture may or may not provide an implementation of
+>>>>>>       sched_clock() on its own. If a local implementation is not pr=
+ovided,
+>>>>>>       the system jiffy counter will be used as sched_clock()."
+>>>>> So the problem with this is that with jiffies you have like millisec=
+ond
+>>>>> interval granularity, which might be too long in order to work prope=
+rly.
+>>>>> Given the receiver completes 128 packet in 1ms (queue_completed inte=
+rval),
+>>>>> the bql will set the limit at 256. Then the tx thread can quickly fi=
+ll
+>>>>> the ring, and it then basically stopped until the 1ms interval is ov=
+er.
+>>>>>
+>>>> Linux Mint only has 100Hz jiffies :^)
+>>> ok so 10ms granularity. Effectively disables BQL for the most part.
+>>> However, you can still benefit if your receive side is very slow.
+>>>
+>>>> I think you misunderstand something.
+>>>>
+>>>> +    if (peer_txq && state->n_bql && ptr_ring_empty(&rq->xdp_ring)) {
+>>              // Pairs with smp_wmb() in __ptr_ring_produce()
+>>
+>>>> +        smp_rmb();
+>>>> +        if (test_bit(__QUEUE_STATE_STACK_XOFF, &peer_txq->state))
+>>>> +            veth_bql_complete(state, peer_txq);
+>>>> +    }
+>>>>
+>>>> This snippet completes whenever the queue is empty and the
+>>>> netdev queue is stopped due to BQL.
+>>>> So then the interval is smaller than 1ms.
+>>>> I think, that is the reason why the pps is fine for 1ms in
+>>>> your benchmarks.
+>>> Without that snippet the queue stalls during ramp-up and
+>>> throughput never gets off the ground. But once the BQL limit has
+>>> stabilized, the snippet is no longer invoked -- with --nrules 0
+>>> the queue is never stopped, and with a slow receiver the queue is
+>>> not empty. So the snippet is needed for correct ramp-up, but it
+>>> doesn't affect steady-state throughput in these tests. This is also
+>>> confirmed by a test where I measure the time between intervals.
+>>> For 1000us across all nrules configurations the time ranges between
+>>> 1000-1400us.
+>> Yes, I agree. It only acts in the case of starvation (see [1])
+>> and I think it is an advantage that we react faster compared
+>> to other BQL implementations.
+>>
+>> Additionally the snippet is *required* because if the ring
+>> is empty and the txq stopped due to BQL, there are no more
+>> veth_xdp_recv() calls, permanently stalling everything.
+>> That is the reason for the memory barrier pairing in the snippet.
+>>
+>> [1] Link: https://medium.com/@tom_84912/byte-queue-limits-the-unauthori=
+zed-biography-61adc5730b83
+>>
+>>> The variance of the time between intervals is also quite good in
+>>> general, but not always exact the configured value. For most cases
+>>> +-5% from p50 value of the real interval.
+>>> Migrations between CPUs can also shorten an interval: if the new
+>>> CPU's sched_clock() is ahead of the previous one (say by 15 ms),
+>>> the apparent elapsed time within the current interval is inflated,
+>>> so only ~5 ms of real time remains before the deadline fires (with
+>>> the configured tx-usecs at 20 ms). Without migrations the interval
+>>> stays consistently close to the configured value. I don't think
+>>> this is a problem in practice -- it just adds some variance to the
+>>> p5 of the measured interval.
+>> Yes, and then we mistakenly decrease the BQL limit once.
+>> But we react fast on that starvation. So its fine.
+>>
+>>>>> I don't know how much this matters in practice. Not sure which archi=
+tectures still hit the jiffies fallback.When in doubt we could disable BQL=
+ for those, or pin it to a "virtual queue size" via limit_min / limit_max =
+similar to the v5 behavior and call queue_completed for every packet. Wdyt=
+?
+>>>> Yes, probably not relevant, I think I would just disable it for those
+>>>> architectures, avoiding possible regressions.
+>>>>
+>>>>>> 3. Inflight can be stuck at a value>0 for a long time when packet
+>>>>>>       enqueueing stops. Only when packets are enqueued again,
+>>>>>>       (on the next veth_xdp_rcv() call,) netdev_tx_completed_queue(=
+) is
+>>>>>>       executed and inflight is set to 0 again.
+>>>>>>       Can also be seen when looking at the /sys BQL statistics.
+>>>>> This happens if the ring empties before the next queue_completed fir=
+es,
+>>>>> right?
+>>>>>
+>>>> Exactly.
+>>>>
+>>>>> Another thing: Is it counterintuitive to set the tx_usec_coal on the
+>>>>> receive device? Because this is a bql related config that is normall=
+y
+>>>>> configured on the TX side?
+>>>> Yes, I would say so.
+>>>>
+>>>>>> BTW: Yesterday, I worked on and refactored the code into its own .h
+>>>>>>         file as a library and it also works fine for TUN/TAP (+vhos=
+t-net)
+>>>>>>         for me :)
+>>>>> Nice! Thank you.
+>>>>> Jonas
+>>>>>
+>>>>>> Thanks for your work!
+>>>>>> Simon
+>>>>>>
+>>>>>> [1] Link: https://docs.kernel.org/timers/timekeeping.html
+>>>>>>
+>>>>>>> [1]https://github.com/jkoeppeler/veth-backpressure-performance-tes=
+ting/tree/pktgen-and-benchmark
+>>>>>>>
+>>>>>>> Thanks,
+>>>>>>> Jonas
+>>>>>>>
+>>>>>>>> Thanks!
+>>>>>>>>
+>>>>>>>> BTW: I think that this implementation could also work for other
+>>>>>>>>          software interfaces.
+>>>>>>>>
+>>>>>>>>> [2] Link:https://medium.com/@tom_84912/byte-queue-limits-the-una=
+uthorized-biography-61adc5730b83
+>>>>>>>>>
+>>>>>>>>>> There is an important gotcha. We actually have micro-burst of q=
+ueuing
+>>>>>>>>>> (likely due to scheduling noise). Reading BQL stats from /sys w=
+ill show
+>>>>>>>>>> BQL inflight=3D1, but when using the option --hist is it visibl=
+e that
+>>>>>>>>>> @inflight have a long tail (see below signature).  The "qdisc" =
+output
+>>>>>>>>>> line also shows this happening via requeues increasing (approx =
+17/sec in
+>>>>>>>>>> a test with 567Kpps). (this was with the time-based BQL impl).
+>>>>>>>>> I understand..
+>>>>>>>>>
 
