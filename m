@@ -1,210 +1,209 @@
-Return-Path: <netdev+bounces-292321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PEuJwr+FmoJ0QcAu9opvQ
-	(envelope-from <netdev+bounces-292321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:22:02 +0200
+	id sGgDDPL+FmoJ0QcAu9opvQ
+	(envelope-from <netdev+bounces-292322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:25:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 358645E5CB4
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:22:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E205E5D59
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C73A33036FBC
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:21:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5AE4300576C
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51466410D04;
-	Wed, 27 May 2026 14:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ADE42317C;
+	Wed, 27 May 2026 14:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sX/x28YA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLUGKfn1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD43833FE1F
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 14:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779891709; cv=pass; b=YrpBwQ53eDTiStGEBXAl8Uta07swBIdbYgfT0Eqx4NMLe0glLGUZCzF9gvs7l/HdJUj3fT7Ee/KszLs68HrroQjKlPqgDhJb/SNMgLh1UoWyA8xALsMwQILwuPgEFmX8ocZGEGDuQpsXZDQNh3poZT6Yobvu8PJH/gda7K5oPUQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779891709; c=relaxed/simple;
-	bh=YurxwnvFf2EB/iLHQOzX7OV5FxVsG3QNnTbk7azhjlI=;
-	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=Ijxbc/X+cqtuEF1BHZG67pteXKxWQHdaPgpqznm11rYMLircO6VBwQWgfmwWJVOTLLRB8dr/5Z37tAR7dDuJ8ot/yPmuPLTYomwroWJhmj4gVP/OAKgppWYY982RdNe+AOzPwMRqo6q88ZP1gdmlz/sB6AObBCx7qm+Bq7Fssz0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sX/x28YA; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-512f09ecc67so81376701cf.3
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:21:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779891701; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AhkGjjLW4B8KA92k5Rd6JlW6EFASJilyanRYp5shT3Q3iBPSlngv7VKf+6UgpxNlEs
-         79ue9xMqBIwAK6wgmCiA8R9okSKsspr9sC7/Hl+nVX43EJO5gUPY8R0yWoXdnsEaUoUO
-         F/bLxP1SqNv1KAQOZygepjLXHqXxiQ25byffbX1OmJliZD52kVTUgi41vn+o9v+imYE7
-         wg1OOUBg7Qhjb52leJgohGLeHcJLW8zzyWh/bRFHTPeKhd1WccdzhR6ij83Vwo+E6Fg/
-         uTkZupl1snwlCK/X1pebFUkdaT00BuNUoC8F0oZP6UjobQZ9bV2KjfIck1APFG3krrbQ
-         +vFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:from:dkim-signature;
-        bh=z1x64FzaMphQdQHi2P+W5m03uJBZN9PD7YSKPgINeZQ=;
-        fh=jrW8BN5pfxPLUtU6dUYpxwZIpkO+FxpkWTJThX8aZ3E=;
-        b=D0vtfcfh3/SAeJjAdVQXMCHyvTrRFRatEd3m/3YRMtQ4xBBy5gwM9CgkZeV3zvh59m
-         oaN7OZUT1IN4pcqjFEmxyLw1E8HCmUzl3I3zS8mYdvUQcmPEfNOEl7tzhCdQY/HAxNDN
-         YOvuuY6salDoFm6OUmdia/I99giei6ysTMAP4oSXgJHjbgQQ7EHQRYhnqnPRE0iNA7ny
-         2kylxmnom0Kizv7uy0kToTXD+POiBq43NN/cmtf9hO94hBHf8djcU4wVRRPqqGuDMkHw
-         qThdlGOwWEzwPX2jntrIohzwFNT3x/+pziboQAExYxRSsLqk+fIQGzfqjconnpEXov3b
-         uhNQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779891701; x=1780496501; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z1x64FzaMphQdQHi2P+W5m03uJBZN9PD7YSKPgINeZQ=;
-        b=sX/x28YAbTRDHaJkITfi5ZAAbo3ueOM2SSeXqxqOanbxkP9izG7DuYWcLuy54Vtfys
-         5pJf/bsgmOoD/VWSw/lxd+k+oJyMvAZhrhBQ9NQJER4vzIJLC80aHP59TEyoROY9BKPm
-         Lo/jAGLSTVXpmhMq6vz+szBHqwHeMPG6hlM//uE6cgC/CCR6XwrXkSxPuO6PnyERYYN/
-         tTKiE6jcBlBVCkRaths/ZhCzHzoGEcis9EwWHVscjwmrlBWH79R0YI9S8O6179PeG0M3
-         faGnlGGyNfYciqUBMs1eKuMQ15jE7yUIdm9lmBmJck7ntF23M0H4SnmRHrhUvyXDZj0n
-         kdqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779891701; x=1780496501;
-        h=cc:to:subject:message-id:date:mime-version:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z1x64FzaMphQdQHi2P+W5m03uJBZN9PD7YSKPgINeZQ=;
-        b=GqQ5QbrFPRAA+Cr/vTNDFmWbdzOzT2bALSifN+VhD/0V5Crz3O91jqe7p6SmMIwJXj
-         kF1QrUTUuKJBjhH0DR+sV5WS6hTJCQtorHQrVlvt3451vUyQ1BzIe+Vyjg92KF2as17D
-         MAhH0lcIWy/ZEmaXCwYa2d/ENYMweeiJvl22WL+6pcrHEE30lSCXrUmO5ohZFWvMbPfI
-         EUwWZJ3Qn97AREm2Gm9pXPQ9evvJqHzN/M7xrIYPk1fSNikyKJzgyGgeyXbvorDT1hdk
-         tiH0u0hyAopnwqLlMbuAKM1y68MzQ6n8/z7cSZfXB+pwNeVYPjpIMgS8qVBL1A7epBSJ
-         MCcg==
-X-Gm-Message-State: AOJu0YzZ4EeCvv1gqg7dJfvcgWwM4LrfG7YDWXpJKbJ+Aag/IoXHB3GC
-	G95rEyCAINKJrDph8XsKPdLGpzZHEuDkA/SnWvltj54N9uWAHh1Ns7OtoeNQyNMpuSBFfCW0G7z
-	ZEZngUbn+zjHSqa50vWZHOCQ6n4i5lRqpJQ==
-X-Gm-Gg: Acq92OGc+6r99vV62caLm/xMWXe61cW9PtHMnclmsgxfuWqSra1W9JxykWOnIthtEHI
-	hRVKT5Fr4OqC7QhRFLrxMOK7irgjLjB76V7gTKj1PJLleE0sgr+Bp1Vw7EQbKFV66BQXunp3NrH
-	oYq+R/SxU6rToCTFNF+QBZ+pV5xn8ZYfEihVMqxPer1I667UGNqGENx2N44iSllCIWJgQhFX3f2
-	M5emftytXLo+RS2tZ4eueFXERom0o3q8kxFKM2zQ9R2Er3OssDBWhhjqjCCDovcmUQ4s0OinGUg
-	ZpNT//sbuF6LPkGRdU26g3yqDA==
-X-Received: by 2002:a05:622a:8588:b0:50d:97e8:939b with SMTP id
- d75a77b69052e-516d436b32dmr250735241cf.36.1779891700721; Wed, 27 May 2026
- 07:21:40 -0700 (PDT)
-Received: from 1074302158857 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 27 May 2026 07:21:39 -0700
-Received: from 1074302158857 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 27 May 2026 07:21:39 -0700
-From: Stefano Ursino <insalata.fresca@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C5F413D96;
+	Wed, 27 May 2026 14:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779891875; cv=none; b=RbtqPdrlGBxfwk/83gSZscgvnrxh+SZuvEH/UzVte3y4R/sY+kT839w/zJpWgvSJl2wcg3Ex59NQLqFK5P78oiN4kF6jS3CtRyDqDM30Zs3HrWgTsnDddkq+yR/Bt3q3WYaASP+5mp24gA9HfWTc9V5Xu6jdHJqaRIKf4lqL1p0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779891875; c=relaxed/simple;
+	bh=BwH8CQ8PUe+19zdMpT4Z73/ZwLBEFQe+3wiFosM6adI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=HWEoezxHUWfvgNGpi40x4DnH6toi1pzJFaQCZA/nDc+1tNdrvswoWfJ2j6P9i0HCnnqJ2rHIzYUfHYYkNEfGk8vGHW5wThM5OpvafNQ35RfNQjeDNtuuywdBjFUSfrX+zeGHcIJer4dfgkwfenvConJW9B3i6cCOabY32kwmRt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLUGKfn1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 272D91F00A3E;
+	Wed, 27 May 2026 14:24:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779891872;
+	bh=TPU49W2hwaIaGf+pDDgyJSSdFTnXEcdNkRBctuZHsJg=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=bLUGKfn1I3aM9RNqHphi8bVB4PHi5hEmYxJ7dWFDv1srbKu8Ey6qt9vuPBVrO8kNX
+	 Ok4ya71W9mBAaH3kwypKTiZsZzOE9QvkpVDbJQ8cFlZVghWsdz3Iit1kXVMSboqBq7
+	 dCOZIlzQB9hmb6lQ9PS36Lzv3kDyVL1PiBpmbPIl+W8VZ+WBWyodkBPEERhZEJSHix
+	 AchiZhkfM570bXPuhtNDTfSEFy+NAvhcqgIqAIg++F3jg8E8s0jj+vOnkNAb/84tKN
+	 UqGYPotcd3/GaS29RTV0jxnUlP4ZtdDN+P/aCdjx/hoYN7412BeVMI07Txg7NlNK8Q
+	 L2Vvgml0hZvQg==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 589D7F40074;
+	Wed, 27 May 2026 10:24:31 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Wed, 27 May 2026 10:24:31 -0400
+X-ME-Sender: <xms:n_4Waldm0F6Iy00U_W_wyBpr_F4NkrY9YN8DZIQugU-tAceZBhDqgA>
+    <xme:n_4WauCQcEDJv8EW3FNK9CN72oDAY8nm9IgSr1dl9neH3BOuwi9vGDiSdnn8EMv_P
+    HLpZuYUWiNZsReuV2eHsDMX7TFSUwmH5F3TEMZzwDyV15pgyNXSNqo>
+X-ME-Proxy-Cause: dmFkZTFkiGgRNatvhpg/n6hWRe4iphBkR6LbmxVXxr5lu/ub+8c9VoiQl27L8zv87bQ+EI
+    5oMIGijjhLLpIWOZxBhgevrAUKKTUiPP8qjXpZNFuFExctanYfD+CVUUedhh/ORUS2QnkO
+    GBpfW+ofXIiUYXJWdW5LT0mUDt23VZ/qy8Uq9upz6yiZ5YRWhmDxWsdSCDCXa6prIj105V
+    Z+dkhWNitSWwRj9wbkS5LcKvlqyC6EtPFNO+Z1X8GCgMDH4r0UzJEC/OnBMdZ1AJvCoqi0
+    bkeQiGCQylK+aU39FPsfiIJpE5p8XEKf+iGbn3CS1o1llBQofG21vMuVsxD8yCsaX6ciV6
+    xIHRBphWC8b+VdHcj36ExVw8+wFToy4pSwaah2f6p3VO22S1p/4FTFGunhF/tdxFHQ9WUe
+    lVIJbXEvgfaNlXT+0vpjwXpvDMT7l2yFZ/e+rlSJkNYsHHA0rWPaf2bnduTUDFzRM5w87m
+    FwZq+qhfxS2VuLI9J0b/NfauLgtNgJJeueJy8ELXQn3vFW4al+h0wed+fR0IUyWDZXRCpP
+    Xf4++E8gUZEuc4ybHQFUcYx6RchxpsPCerBUj+hwbo3rbLxQo3o3V9jFUAwjmgMhyz5ynJ
+    t5bAmBIXwww/1snZYixhQ/BZSnvCw5+mJhrSINo3IXmhT4HylE21sjQE6rkA
+X-ME-Proxy: <xmx:n_4WalYKMK-TXvg0uVe6A7cV79kvIgenhrn1ozYvS1bmCb1PIB_alw>
+    <xmx:n_4WaiwpcC4q-m5oUdINOywjC8EOb-YaPtuqOxrm1ebTmhwXP7kdFA>
+    <xmx:n_4WakMxPyRr-ZtOz0nnEK9D_UQbQRUlf2j-lzXZLLTgC-cpM8rLRg>
+    <xmx:n_4WahfLWx5S-psgl_YH4yTgIjg0kNbqjwAkfwtN9jOj2_mpFZ36Uw>
+    <xmx:n_4WapQtqikmRpWxM7KRkThODh_Pcf2NKX72Dy9d6R4CVcM9DOHpqGVi>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 324CE780077; Wed, 27 May 2026 10:24:31 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 27 May 2026 07:21:39 -0700
-X-Gm-Features: AVHnY4KmhPOnRJjRKuHtC28hDmEIN-Bbi2WpsUnhpJusgUUhF69092PL4xdV8dI
-Message-ID: <CAAepT2Ta12CHDuvb0+2-=q3GJiYpo+Xo6_oGdamKbudsN8eAVw@mail.gmail.com>
-Subject: pcs: qcom-ipq9574: XPCS USXGMII in-band AN never completes with
- AQR113C (ANINTR stays 0) on a non-RDP board
-To: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Cc: quic_leiwei@quicinc.com, ansuelsmth@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-ThreadId: AnKL6hs-MIXF
+Date: Wed, 27 May 2026 10:24:11 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Hannes Reinecke" <hare@suse.de>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
+Cc: "Chris Mason" <clm@meta.com>, "Christian Brauner" <brauner@kernel.org>,
+ kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, "Chuck Lever" <chuck.lever@oracle.com>
+Message-Id: <eb4de53b-f96c-4905-b67a-90790d5e4007@app.fastmail.com>
+In-Reply-To: <41835be9-ef00-42c7-a5d3-258f092b59eb@suse.de>
+References: <20260525-handshake-file-pin-v3-0-66c616906ead@oracle.com>
+ <20260525-handshake-file-pin-v3-1-66c616906ead@oracle.com>
+ <41835be9-ef00-42c7-a5d3-258f092b59eb@suse.de>
+Subject: Re: [PATCH net v3 1/8] net/handshake: Use spin_lock_bh for hn_lock
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.15 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[quicinc.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-292321-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-292322-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,app.fastmail.com:mid,oracle.com:email];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[insalatafresca@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 358645E5CB4
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 36E205E5D59
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-I'm bringing up the 10G Aquantia (AQR113C) port on an IPQ9574 board (Wallys
-DR9574, AP-AL02-C4) on mainline (kernel 6.12, OpenWrt qualcommbe target) using
-the upstream qcom_ppe + pcs-qcom-ipq9574 + aquantia stack. The in-tree
-ipq9574-rdp433 (AP-AL02-C7) uses the same stack and works. On my board the
-netdev never gets carrier: the PCS get_state reads XPCS_USXG_AN_LINK_STS and it
-never asserts.
 
-DT port (mirrors rdp433): phy-mode="usxgmii"; managed="in-band-status";
-phy-handle=<&aqr>; pcs-handle=<&pcs1_ch0>; the AQR phy node has
-nvmem-cells=<&aqr_fw>.
 
-I instrumented ipq_pcs_get_state_usxgmii() to dump the PCS/XPCS registers (via
-the driver regmap). Stable across all polls, port admin-up, copper line linked
-at 1G:
+On Wed, May 27, 2026, at 4:59 AM, Hannes Reinecke wrote:
+> On 5/25/26 18:51, Chuck Lever wrote:
+>> From: Chuck Lever <chuck.lever@oracle.com>
+>> 
+>> nvmet_tcp_state_change(), a socket callback that runs in BH context,
+>> can reach handshake_req_cancel() via nvmet_tcp_schedule_release_queue()
+>> and tls_handshake_cancel().  handshake_req_cancel() acquires
+>> hn->hn_lock with plain spin_lock().  If a process-context thread on
+>> the same CPU holds hn->hn_lock when a softirq invokes the cancel path,
+>> the lock attempt deadlocks.  This is the only caller that invokes
+>> tls_handshake_cancel() from BH context; every other consumer calls it
+>> from process context.
+>> 
+>> Deferring the cancel to process context in the NVMe target is not
+>> straightforward: nvmet_tcp_schedule_release_queue() must call
+>> tls_handshake_cancel() atomically with its state transition to
+>> DISCONNECTING.  If the cancel were deferred, the handshake completion
+>> callback could fire in the window before the cancel runs, observe the
+>> unexpected state, and return without dropping its kref on the queue.
+>> Reworking that interlock is considerably more invasive than hardening
+>> the handshake lock.  Convert all hn->hn_lock acquisitions from
+>> spin_lock/spin_unlock to spin_lock_bh/spin_unlock_bh so the lock is
+>> never taken with softirqs enabled.
+>> 
+>> Fixes: 675b453e0241 ("nvmet-tcp: enable TLS handshake upcall")
+>> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+>> ---
+>>   net/handshake/netlink.c |  4 ++--
+>>   net/handshake/request.c | 14 +++++++-------
+>>   net/handshake/tlshd.c   |  2 ++
+>>   3 files changed, 11 insertions(+), 9 deletions(-)
+>> 
+> ... and there is always the question whather we should be calling
+> tls_handshake_cancel() in the first place.
+> We already call 'tls_handshake_cancel()' from the handshake timeout
+> handler, and this instance of 'tls_handshake_cancel()' is called
+> from a socket callback (ie when the soecket is closed or something).
+> I would have expected that the handshake code cleans up outstanding
+> requests on socket close already; if so, we can delete the cancel
+> here.
 
-  XPCS_MII_AN_INTR_STS (0x1f8002) = 0x00000000   <- AN_LINK_STS never
-set; NO bits at all
-  PCS_MODE_CTRL        (0x46c)    = 0x00001021    <- PCS_MODE_SEL =
-XPCS (0x10) [OK]
-  PCS_CALIBRATION      (0x1e0)    = 0x00000ac1    <- CALIBRATION_DONE
-(bit7) set [OK]
-  PCS_PLL_RESET        (0x780)    = 0x000002ff
-  XPCS_DIG_CTRL        (0x38000)  = 0x00002200    <- XPCS_USXG_EN
-(bit9) set [OK]
-  XPCS_MII_CTRL        (0x1f0000) = 0x00003140    <- XPCS_MII_AN_EN
-(bit12) set [OK]
-  XPCS_MII_AN_CTRL     (0x1f8001) = 0x00000100    <- XPCS_MII_AN_8BIT
-(bit8) set [OK]
+The handshake layer doesn't auto-cancel on socket close.
 
-AQR113C side (read via mdio-tools), all healthy:
-  PMA(MMD1).1 = 0x0006  -> copper line link UP (1000)
-  VEND1(0x1E).0x031c = 0x0080 -> SERDES_MODE=XFI + RATE_ADAPT_USX (= USXGMII)
-  PHYXS(MMD4).0xC441 bit3 SET -> USXGMII in-band AN enabled (firmware default)
-  PHYXS(MMD4).1 = 0x0006 -> system-side link bit set
-  VEND1(0x1E).0x0020 = 0x0504 -> FW v5.4 loaded (from 0:ETHPHYFW NOR via nvmem)
+handshake_sk_destruct() fires when the sock refcount reaches
+zero, but it only frees the handshake_req and removes it from
+the hash table. It does not set HANDSHAKE_F_REQ_COMPLETED or
+invoke the consumer's done callback. It assumes the request
+was already completed or canceled before the socket reached
+final destruction.
 
-So: XPCS is in XPCS mode, calibrated, USXG_EN + MII_AN_EN + MII_AN_8BIT all set;
-the AQR is in USXGMII with in-band AN enabled and its system-side link bit set;
-copper is up. Yet XPCS_MII_AN_INTR_STS reads 0x00000000 -- the XPCS appears to
-receive no in-band USXGMII signalling from the AQR at all (no AN_LINK_STS, no
-status bits).
+The timeout handler and the state-change path cover different
+failure modes. The timeout fires when tlshd is slow or absent.
+The state-change callback fires when the remote peer resets or
+closes the connection while the handshake is still in
+progress -- that can happen well before the timeout expires.
 
-Things I've already verified / ruled out:
-- All known pcs-qcom-ipq9574 fixes are present (the fsleep(20000) PLL settle
-  after PCS_ANA_SW_RESET; the GCC_UNIPHY1/2_XPCS_RESET reset is in DT and
-  requested by the driver; calibration completes).
-- Not a phy-mode/firmware/AQR-provisioning issue (AQR 4.0xC441 bit3 already set;
-  this is the USXGMII in-band-AN enable bit).
-- Asserting XPCS_USXG_ADPT_RESET in ipq_pcs_config_usxgmii() (instead of only on
-  .pcs_link_up) did not help.
-- It is plain single-port USXGMII (not 10G-QXGMII / multi-port).
+Without the cancel in nvmet_tcp_schedule_release_queue(), the
+race plays out as follows: the state-change callback
+transitions the queue to DISCONNECTING and drops its kref.
+Then tlshd finishes and the handshake layer calls
+nvmet_tcp_tls_handshake_done(). That callback sees the queue
+is not in TLS_HANDSHAKE state, hits the WARN_ON, and returns
+without dropping its own kref -- leaking the queue.
 
-Questions:
-1. With the XPCS configured as above and the AQR sending USXGMII in-band, what
-   would leave XPCS_MII_AN_INTR_STS at 0 (no codewords received)? Is there a
-   UNIPHY/SerDes RX lane bring-up, RX CDR/eq lock, or signal-detect step the
-   public driver relies on the bootloader for that a non-RDP board's U-Boot may
-   not perform?
-2. Is there a UNIPHY/SerDes RX-lock or status register I should check (and how
-   to read it -- it's not in pcs-qcom-ipq9574)?
-3. Any board-specific UNIPHY config (lane/polarity, the AP-AL02-C4 vs C7
-   difference) that the RDP433 bootloader/DTS sets up implicitly?
+The cancel makes the teardown race-free: either cancel wins
+and the completion callback never fires, or completion already
+won and cancel returns false. Either way, exactly one side
+drops the kref.
 
-Happy to provide more register dumps / test patches. The board otherwise works
-(copper line links in U-Boot; the AQR + XPCS both report local link).
+The SunRPC consumers (client and server) avoid this problem by
+blocking a thread on wait_for_completion() during the
+handshake. A socket state change wakes the waiter indirectly
+through the completion callback, and the waiter handles
+cleanup. nvme-tcp's handshake is fully asynchronous -- there
+is no blocked thread to wake, so the state-change callback is
+the only context that can cancel the handshake before queue
+teardown begins.
 
-Thanks,
-Stefano
+-- 
+Chuck Lever
 
