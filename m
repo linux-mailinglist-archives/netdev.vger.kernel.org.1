@@ -1,78 +1,64 @@
-Return-Path: <netdev+bounces-292197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292199-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OaqFoauFmokogcAu9opvQ
-	(envelope-from <netdev+bounces-292197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:46 +0200
+	id MO3SLaawFmokogcAu9opvQ
+	(envelope-from <netdev+bounces-292199-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:51:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570455E140E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134E25E1576
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 84FFA300BC97
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD94B304D728
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20273E0247;
-	Wed, 27 May 2026 08:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EA23E2ACA;
+	Wed, 27 May 2026 08:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="LQrbnJvF"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="SxlWblVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9473B3E0231
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD16E3E2AC1;
+	Wed, 27 May 2026 08:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871348; cv=none; b=jxb9gMYas7/5OkiAY/Egw1kE8ktC95Cw2+QnZERuFsOVujhNN2GguIrzGHC9EBFqVr56x41yWRFNbkGh7TsDJF+YCjEU+QFPQCF4xCv+A5SLNbqmAdkKBGcK9UyIszvxBAoJVHalaOS6X1cAphxyIX0is2eLZiWoMLcJXbQABlk=
+	t=1779871617; cv=none; b=rf4WfXfNLTNmV19DS+AeniGl0Ysd3R5li1PMKAkmJUdhReFuj6QTGwkbLU/B4VfAFPHHaZymp34ON7GYeWgG9eczjivAGrehFlAkNn8l6BtiCKTFW+WXnf0jl/C9QJ1MS9BfljPHYCOWjxOD3cHrBtj+VDlXCR1Uj8Z1OY2jDlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871348; c=relaxed/simple;
-	bh=swfBozmA0alSSP1GENQwNFD/Y/TIQJPLpDao0KjY470=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EFim9/osWG7hnTLHrjr3Rb40Q8MryHl5Af9nn952+bGwbwnOm38ZnjiLmJXJgKxO0IP2RXjF09nwzsDc41j/urk8UzC2twEkZ0QHPf099NgBPNNHU99cbMctkNm5Z6aLyBO2WngrInwIaUctH4VB/hRBHzBPsItbxuGd+RoFw8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=LQrbnJvF; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 06C1A2074F;
-	Wed, 27 May 2026 10:42:14 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s3tmL5Knbl9l; Wed, 27 May 2026 10:42:13 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 761BD20758;
-	Wed, 27 May 2026 10:42:12 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 761BD20758
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1779871332;
-	bh=sKIc5lD819+4Y7cRk1WZSWOTev1gabshzrGV/921qC4=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=LQrbnJvFWIgDspmkFdV0mTh3WMEG91fGq2koe/ly65pd0Lv4ASbjUoBs8VnIIvVrh
-	 bfdiQqbwC6HTmMWk4ZHpvF+UgYP4x7o0j9p6U/D56WFD3nJhDHou3f80Oeh901Dfql
-	 dbM6REubDKncxAGnZnyAohhrnYbK6v86Vqk0Mqt7RTH/VQr6tPKVcimi2H0oty5DyP
-	 emfYnpwyN9JMwAXYSLYM0YFqvcopoAnFqM/VJqepin0PLE++DeW2iZFyLlQMLWYg1Z
-	 rv1WDs3eZmVTSVmXbxeN9wq2LKKT2Qgqs6l+wQlancmJqFXi8t4jiIM6vRg54rxujf
-	 4NaErFwW+qnBw==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 27 May
- 2026 10:42:11 +0200
-Received: (nullmailer pid 3494012 invoked by uid 1000);
-	Wed, 27 May 2026 08:42:01 -0000
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 9/9] xfrm: input: hold netns during deferred transport reinjection
-Date: Wed, 27 May 2026 10:41:27 +0200
-Message-ID: <20260527084148.3489759-10-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260527084148.3489759-1-steffen.klassert@secunet.com>
-References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1779871617; c=relaxed/simple;
+	bh=x0TjYIL/s1gpuGH9FLqzgMf7FxOghlekalySof5ot7o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tgNgn584CtXZRACE3y6ifCzNeALkLTKBwKKuO68WUHn0GjzpZGIRHjaysr0UdHbgJC9VJaYq327kuBfa4XbKFQg9LDWqcp5tedVQ4w5Wqv2Zj9BnWH11LZN9s7pO4kdT3Ki6C5MQArsC/djUx+IKlUemxXp/pAutB8gk3QZEsVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=SxlWblVq; arc=none smtp.client-ip=4.193.249.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=LzJE3
+	O4Qs1Ym9XnI/hVKMeO2kL/geGUsSlJQprhHVG8=; b=SxlWblVqHLKdPpmLRmpDg
+	plbXcaJZcw1W3Z5kLA37KVS41iJ5HOPHfgeOWGWeg0mk1rP4Hhl12mDImmIZunha
+	LDshu1rybPace4G8t88+CKmYPU9zzLVgMxEeiJ99Im4cZY21LNYSsup2iNGB7UCm
+	+ptKyUQVrrOUxy6Y6NFeWA=
+Received: from localhost.localdomain (unknown [211.102.241.99])
+	by web4 (Coremail) with SMTP id ywQGZQDH2J1qrxZq0WnMAQ--.63780S2;
+	Wed, 27 May 2026 16:46:34 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>
+Subject: [PATCH net] net/802/mrp: fix vector attribute event count handling
+Date: Wed, 27 May 2026 16:46:22 +0800
+Message-ID: <20260527084624.43057-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,110 +66,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
- (10.32.0.171)
+X-CM-TRANSID:ywQGZQDH2J1qrxZq0WnMAQ--.63780S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr45ZFyxGFyrAF18Ar1xAFb_yoW8Ww4DpF
+	W3CFyayF97Gry2va9ayrsrWr4rGrWkJrZ7Jr1Fyry0vwn8J3WxWF10gFZ2vryavrZYkF1a
+	vw4jqayUK398XrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbasjUUU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQMAAWoWnq0mawAAsB
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292197-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292199-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 570455E140E
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tsinghua.edu.cn:email,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:dkim,seu.edu.cn:email]
+X-Rspamd-Queue-Id: 134E25E1576
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhengchuan Liang <zcliangcn@gmail.com>
+In mrp_pdu_parse_vecattr(), vector attribute events are encoded three
+per byte and valen tracks the number of events left to process.
 
-Transport-mode reinjection stores a struct net pointer in skb->cb and
-uses it later from xfrm_trans_reinject(). That pointer must stay valid
-until the deferred callback runs.
+The parser decrements valen after processing the first and second events
+from each event byte, but not after processing the third one. When valen
+is exactly a multiple of three, the loop continues after the last valid
+event and consumes the next byte as a new event byte.
 
-Take a netns reference when queueing deferred reinjection work and drop
-it after the callback completes. Use maybe_get_net() so the queueing
-path does not revive a namespace that is already being torn down.
+This can make the parser apply a spurious event to the current vector
+attribute and update the MRP applicant state with an event that was not
+part of the VectorAttribute. For example, a VectorAttribute with valen=3
+and events JOIN_IN, JOIN_IN, LV can be followed by another byte whose
+first encoded event is then incorrectly applied to the third attribute.
 
-This keeps the existing workqueue design and fixes the netns lifetime
-handling in one place for all users of xfrm_trans_queue_net().
+Decrement valen after processing the third event as well.
 
-Fixes: 7b3801927e52 ("xfrm: introduce xfrm_trans_queue_net")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
-Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
-Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Fixes: febf018d2234 ("net/802: Implement Multiple Registration Protocol (MRP)")
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: GLM:GLM-5.1
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 ---
- net/xfrm/xfrm_input.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index f65291eba1f6..e4c2cd24936d 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -797,9 +797,12 @@ static void xfrm_trans_reinject(struct work_struct *work)
- 	spin_unlock_bh(&trans->queue_lock);
- 
- 	local_bh_disable();
--	while ((skb = __skb_dequeue(&queue)))
--		XFRM_TRANS_SKB_CB(skb)->finish(XFRM_TRANS_SKB_CB(skb)->net,
--					       NULL, skb);
-+	while ((skb = __skb_dequeue(&queue))) {
-+		struct net *net = XFRM_TRANS_SKB_CB(skb)->net;
-+
-+		XFRM_TRANS_SKB_CB(skb)->finish(net, NULL, skb);
-+		put_net(net);
-+	}
- 	local_bh_enable();
+diff --git a/net/802/mrp.c b/net/802/mrp.c
+index ff0e805..40cb941 100644
+--- a/net/802/mrp.c
++++ b/net/802/mrp.c
+@@ -753,6 +753,7 @@ static int mrp_pdu_parse_vecattr(struct mrp_applicant *app,
+ 		vaevents %= __MRP_VECATTR_EVENT_MAX;
+ 		vaevent = vaevents;
+ 		mrp_pdu_parse_vecattr_event(app, skb, vaevent);
++		valen--;
+ 	}
+ 	return 0;
  }
- 
-@@ -808,6 +811,7 @@ int xfrm_trans_queue_net(struct net *net, struct sk_buff *skb,
- 				       struct sk_buff *))
- {
- 	struct xfrm_trans_tasklet *trans;
-+	struct net *hold_net;
- 
- 	trans = this_cpu_ptr(&xfrm_trans_tasklet);
- 
-@@ -816,8 +820,12 @@ int xfrm_trans_queue_net(struct net *net, struct sk_buff *skb,
- 
- 	BUILD_BUG_ON(sizeof(struct xfrm_trans_cb) > sizeof(skb->cb));
- 
-+	hold_net = maybe_get_net(net);
-+	if (!hold_net)
-+		return -ENODEV;
-+
- 	XFRM_TRANS_SKB_CB(skb)->finish = finish;
--	XFRM_TRANS_SKB_CB(skb)->net = net;
-+	XFRM_TRANS_SKB_CB(skb)->net = hold_net;
- 	spin_lock_bh(&trans->queue_lock);
- 	__skb_queue_tail(&trans->queue, skb);
- 	spin_unlock_bh(&trans->queue_lock);
--- 
+
+
+--
 2.43.0
 
 
