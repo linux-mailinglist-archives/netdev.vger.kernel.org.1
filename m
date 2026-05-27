@@ -1,112 +1,62 @@
-Return-Path: <netdev+bounces-292376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292377-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kNT7HFYdF2rw5AcAu9opvQ
-	(envelope-from <netdev+bounces-292376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:35:34 +0200
+	id UHV4A6QdF2rw5AcAu9opvQ
+	(envelope-from <netdev+bounces-292377-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:36:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68E05E7D57
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:35:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0145E7DA5
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B4273020D44
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:29:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB444300DF54
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF38438FED;
-	Wed, 27 May 2026 16:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75357436342;
+	Wed, 27 May 2026 16:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g89DOoBA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="D/zrKw1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2946942EEB6
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92952F8EA8;
+	Wed, 27 May 2026 16:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779899351; cv=none; b=HmUsm4tzOxWpJM3ID9J2Nyv+kIFTrsV3CZQQ+tOQbiaVoLt9ps/16V/OQt1IW2tikRYOHFHabKlFSLol/aral+Z/GdB0+WGIRxvRgQo01+h0rDq1w8kbT3HiTo6HftuGnOhy+TnpY7ds4AuJTdfyYEVH5+j3zQ7eYRkqquphGHo=
+	t=1779899389; cv=none; b=GbW+TmrYM7HLDg9O5lxNG3ErhEH3EGSwd21hJRyEB01GtB1eAr2Jc0MqcOUiMTkle9f2vv1IP5xrNz6Ga77Oj2/QQovEz+t2l+CNdlBweflAXyHXqFxWtNTIfuL8c/FmKyXHg2Y+2fmrVVA4TABNpliYtU1kAO8YfaaMhkGT4tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779899351; c=relaxed/simple;
-	bh=MARgWSB2JRyHiWTRwBhBMqTryJPPS2jchIS4w1LrmWc=;
+	s=arc-20240116; t=1779899389; c=relaxed/simple;
+	bh=6LszrVPxGQMkHALIowwsfV8GwP26coKLtL1i0Jfx14w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f5LasXmbBTgCa10E3nSZN2kpunrGBD7o2Rm6idcOVyWe10ZxSEXyxqCUfgENLU6DvMhGt4ns7CtNqcQpfs8j9m1Dm7tdATxz7uU75NiTorgS3/KeZf9NseqJTvA92o8agDVd89Sh8+Ru63jDNs8NzeNtgpuaAzH7s+GgTgxjRo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g89DOoBA; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4891e86fabeso24857965e9.1
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:29:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779899344; x=1780504144; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lp8EUEG6k+uQx75sbagyQs35jMaojHEjO5L3ntgLVNA=;
-        b=g89DOoBAuI83xqPWszuqhCTddZx0ONETKVoZcKFdcASpTkVpc7A18DmvjXbkukKjp3
-         jCzHh6oa0O2O60ft1uy4iEi3QrFypdTqA3bXE63RDDuojo2QkvpTLC4QvG0P5OSzsocv
-         fEU4i5WODBfJsI4QSgvSCYAGpHQwvBou62wMJHBx4Ogc0QB+VeM8xYq14VPYB6aroWft
-         GIJ3NGD/4re4dH4cAL6MU74xJCB/GqsPxFIqXwUz3hgODjcwYrWdL+rCF/7XwdcTaNc6
-         qcAMLG3NeHvmXmJQ2AkRTxH83svDmpqoDBjLEPvCKlLfJwHNtyKbeO75s5nLFLuBMXVh
-         MUhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779899344; x=1780504144;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lp8EUEG6k+uQx75sbagyQs35jMaojHEjO5L3ntgLVNA=;
-        b=LBg8SwYUF7oG5OVFI+CBCvZAVaOdm1kiAuQ9Ydg1q77j7XoIkPUxrbq7u4j45HWT8+
-         gnSiw6vF83znMcvNg1KS9JeFTMvpBWjyjIxqHgWqOAqYE5t3//EYoYqFzb2ih8A3kGTS
-         4OFCGnjZK9x6JnvmgBcx9QEePb6nErvLSTqupoZmFcWzigVs3aXgi5Vx2I2MRiFR8NFJ
-         pTiN05tBWMgoqzfhPtRJCbYNG+kHX55wT1IXNqbNZOK50zAF2U52r1wum8Kr89jTS6P4
-         Lz42g1Zgbgr0gNieTM2x4NEkJ6By/PH9+3oDKsfTICDvcxG2SsdaxdN3ja3QlpHbZBYi
-         hyqA==
-X-Forwarded-Encrypted: i=1; AFNElJ/DNOmSUh4aO1hh54XfXeW2obJ5XlsqQXG1pmT33FYap6jBzY4zqqSXhNCa48AVm9eATLQfOC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywptv2Qc5mCJrufTfr7OK1XnTX2/buBSYADWo9/Wu/ZzVGN/wXP
-	xPi+Db1hHMogb/2Br0cEvpKWveMqAgQ/9gp+D3wCdPxmCSgnHAkMBsXW/oVxsEZWLw==
-X-Gm-Gg: Acq92OH/lqL/NlGtHxC7VaFSAhP7mZhu4FLiWyVz5DoGEDsj20xHirIUmNbN3Tna1In
-	6s+6YooeRdAUIrri5LQBkcCrofJ+o0ZGd4X6utEpqG/CAc7ExQyTwJ0LErJK7dCFyRDq2K0rCbM
-	+4WpT6U+KEKUIbS3yg7EczLtlJkfEQ57fUbCHN6HskdroklYyjU+yFhpGj6sYCaAnue+rqmy97K
-	NvxvjdpyLKILUSbu3DDYiOtuS0jW2AD+prAw6L2Zcsa7EoObGQkJgpsBzvK+fKtnnB13GEx6Mvr
-	dj2d/ViF0cy80A2o2ColYx+hVLLV1rDHlVsyWwt3U4TCZtQqha64PR8wT2cgdJDQpm2kcWu3PSx
-	oY72XiZGkK9hsZgzf1iSmWVy7b7kk1wMdO3r6NmL0ex/iHv1miNK5sn85VtCU6aUMqY3v6bZ6DQ
-	2lr0zwI7G08+wHmZ6N/LZRP8YWoCQIIpFtc+jBwlhR7QCaqTE5CKU6tfr5e48MHPY3Lk20pO/nx
-	xxoEQ==
-X-Received: by 2002:a05:600c:45ce:b0:490:5cd8:d213 with SMTP id 5b1f17b1804b1-4905cd8d33emr244688485e9.15.1779899343733;
-        Wed, 27 May 2026 09:29:03 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904561a160sm466125765e9.9.2026.05.27.09.29.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2026 09:29:03 -0700 (PDT)
-Date: Wed, 27 May 2026 17:28:59 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Miroslav Lichvar <mlichvar@redhat.com>,
-	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	thomas.weissschuh@linutronix.de,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	Takashi Iwai <tiwai@suse.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Peter Hilber <peter.hilber@oss.qualcomm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
-	linux-sound@vger.kernel.org
-Subject: Re: [patch 05/24] KVM: arm64: Use ktime_get_snapshot_id() to
- retrieve CLOCK_BOOTTIME
-Message-ID: <ahcby8senHsmpOBm@google.com>
-References: <20260526165826.392227559@kernel.org>
- <20260526171223.070087856@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OZ3eZPJ5q2ucPX3TzypmuDR1HCVFHxB1ILfwqlZHCgBKOVbGQrfos/NZIyGvDBRXyA5GB5O0ewK8vroSDEUnGoAX+hkt0H0AufHz3r8bHJJ2IazkDFDG5jFYSLDwofcARUNgmrK9qzEHKAEWHEfNnJL/tvW1BUkLgNKbSNOsqx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=D/zrKw1J; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=azqyREQPUhZp6WexCnHwC8ZHeJG3nsxqW9ASbvoFfTw=; b=D/zrKw1Jdd+piVkXNeiIVXTB6B
+	NKdV23L2cOSucXEHu1tyqUY1fE18k79y9xEFBQDtyiyr4jz23NGl6XR/7RgeQfMaTEldanBwV/YaI
+	4GfGZwR1TGCrB6Iz6fmchXtFipgnHITi8boH2Ukd8/EpO+1XH7cQ2oCwkmp1Vcbw9hzU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSH8V-004mFb-F0; Wed, 27 May 2026 18:29:39 +0200
+Date: Wed, 27 May 2026 18:29:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	USB-ML <linux-usb@vger.kernel.org>,
+	NETDEV-ML <netdev@vger.kernel.org>
+Subject: Re: [PATCH] net: usb: asix: ax88772: identify 0x2001/0x1a02 correctly
+Message-ID: <38d43d09-69cf-4c17-9e03-a47d3fcc3eb7@lunn.ch>
+References: <20260527090816.100854-1-xose.vazquez@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -115,86 +65,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260526171223.070087856@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260527090816.100854-1-xose.vazquez@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,linux.dev,lists.linux.dev,enneenne.com,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
-	TAGGED_FROM(0.00)[bounces-292376-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292377-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vdonnefort@google.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email]
-X-Rspamd-Queue-Id: B68E05E7D57
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7F0145E7DA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 07:13:53PM +0200, Thomas Gleixner wrote:
-> ktime_get_snapshot() is replaced by ktime_get_snapshot_id() which allows to
-> request a particular CLOCK ID to be captured along with the clocksource
-> counter.
-> 
-> Convert the tracing mechanism over and use the new
-> system_time_snapshot::sys field, which holds the system timestamp selected
-> by the CLOCK ID argument.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Vincent Donnefort <vdonnefort@google.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: kvmarm@lists.linux.dev
+On Wed, May 27, 2026 at 11:08:15AM +0200, Xose Vazquez Perez wrote:
+> It's 88772B, and s/spaces/tab.
 
-Acked-by: Vincent Donnefort <vdonnefort@google.com>
+ax88772_info -> ax88772b_info is a bug fix. Please base the patch on
+net, and include a Fixes tag.
 
-> ---
->  arch/arm64/kvm/hyp_trace.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> --- a/arch/arm64/kvm/hyp_trace.c
-> +++ b/arch/arm64/kvm/hyp_trace.c
-> @@ -51,8 +51,8 @@ static void __hyp_clock_work(struct work
->  
->  	hyp_clock = container_of(dwork, struct hyp_trace_clock, work);
->  
-> -	ktime_get_snapshot(&snap);
-> -	boot = ktime_to_ns(snap.boot);
-> +	ktime_get_snapshot_id(&snap, CLOCK_BOOTTIME);
-> +	boot = ktime_to_ns(snap.sys);
->  
->  	delta_boot = boot - hyp_clock->boot;
->  	delta_cycles = snap.cycles - hyp_clock->cycles;
-> @@ -118,9 +118,9 @@ static void hyp_trace_clock_enable(struc
->  		hyp_clock->running = false;
->  	}
->  
-> -	ktime_get_snapshot(&snap);
-> +	ktime_get_snapshot_id(&snap, CLOCK_BOOTTIME);
->  
-> -	hyp_clock->boot = ktime_to_ns(snap.boot);
-> +	hyp_clock->boot = ktime_to_ns(snap.sys);
->  	hyp_clock->cycles = snap.cycles;
->  	hyp_clock->mult = 0;
->  
-> 
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+A more verbose commit message would also be good. Because of the
+space/tab change the added b does not stand out, and it took me a
+while to understand what you actually meant.
+
+    Andrew
+
+---
+pw-bot: cr
 
