@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-292098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDjgEPiBFmr6mwcAu9opvQ
-	(envelope-from <netdev+bounces-292098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:32:40 +0200
+	id kHbPH9eBFmr6mwcAu9opvQ
+	(envelope-from <netdev+bounces-292097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:32:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE57C5DF776
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:32:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F14C5DF76E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 91395304C34A
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 05:32:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 29EFD301487A
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 05:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2E02D73A0;
-	Wed, 27 May 2026 05:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D606D2C11F9;
+	Wed, 27 May 2026 05:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RuCVUET9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M2kRKYrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AC08F7D
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 05:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB9B30C615
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 05:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779859917; cv=none; b=SVD1DcNWM7GdOZyDpSvKhU83bzj4WTW/A21DQlMUcf/HZBUHqxxKkJRtFbFkgem3zWHc2EVA5EB0iDY8RCeK6NNGhrJAxXK8ZwWGcSCT76VJfI5OSCL19qHZ0MaDaG8H493O1fMOVFrrKJdpyMNwil//1F1CXM+OoSfs3gesnjA=
+	t=1779859911; cv=none; b=OCWd81HVYgypW7WeM2mdvpdaPp8p4K15nrEGvtyl/DuMgWwtTxoRL0g1UUPPjZx7h5L9MxIfWDWKhlZGJaVIJTaEMaO76gA1nziUALnxUB5WJCN+kGgKrIPnec8U5mP3nmbUgbeqFsIaUdAnxT384YhitEf5ajA1k+QYPQAuLqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779859917; c=relaxed/simple;
-	bh=rBP1B0zsdgZeSNqZnpoqHsJ2GoGSqehpngS+l3OSoys=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U8TSZox21GbIag4qK4dmsrRqCErtHYuc3ojtcFbw64YsysrQmRn8e7DnSwQhqkCGcJxxRkus7mvGJASc/kbqk+Sc8mI4Pq8/KzFS2B6xluKY+nGJPNKD4hybTsuTBdCTZ47fg/8ti5d0XepobXNJcjD7h7GZPcFHWqWpJAUosBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RuCVUET9; arc=none smtp.client-ip=91.218.175.177
+	s=arc-20240116; t=1779859911; c=relaxed/simple;
+	bh=efcP7seEd8eYexEwqH3bu0W16GfYFarnjpUz8goC46I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gg//eMVPQi50saMhA5+jjLp2aHA+m2nsGUagpsiyehriw3CCXGCuJ4GJRnHxmavfP3nyaItrUkdzbtLMgOn6ms6OjzRnK3zKlCIMdcsdZ8mzFnr95LdtkG3VtKlDdhTjZyZJ+PO7zg9trkaXF+/Mptl4sbo2Bkgo1WfOs2zR/C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M2kRKYrS; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779859904;
+	t=1779859908;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=i6GF9NC+0hGkQWtIqtJgv6M4Qu8CawQflj87HW5iRwU=;
-	b=RuCVUET955jNhfQMhFMzRXdBXnmDo2tc8nDuqFsws6qMEMsPQUGbNkaJzkc4tm1pAs9k48
-	owqS7t80tEP6kSnffAUpVSNfkCG9/vmH6Ht/yxgA1jivLRc2zHM9JNQ+MlW7ijJbivFeAZ
-	tn/vJtu+YdnA3bzuudzoX3scKmbPlmc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CubyQoG2dmy5XU3vaYjR4ZF+sYT6/l/kwwPcDhfdO9c=;
+	b=M2kRKYrSC2OLnH0z8siUYxioufoIs0ibXHVFptvHGwYx8K9BkqnFhzQFn93/Ujjs6al4Mh
+	wlAc0tze8fxjUT0puz8AwI286+KBa/6qvw/TyjhmP0pf1jcayIt8DC10gSC5Mop1rd/6YK
+	bhZnEwdJIcCK3j6Br5VljeStTbP+bj4=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
@@ -55,9 +57,11 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Simon Horman <horms@kernel.org>,
 	Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 1/2] ipv6: fix possible infinite loop in rt6_fill_node()
-Date: Wed, 27 May 2026 13:31:30 +0800
-Message-ID: <20260527053133.180695-1-jiayuan.chen@linux.dev>
+Subject: [PATCH net 2/2] ipv6: fix possible infinite loop in fib6_select_path()
+Date: Wed, 27 May 2026 13:31:31 +0800
+Message-ID: <20260527053133.180695-2-jiayuan.chen@linux.dev>
+In-Reply-To: <20260527053133.180695-1-jiayuan.chen@linux.dev>
+References: <20260527053133.180695-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +75,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -80,9 +84,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292098-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292097-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
@@ -92,42 +96,44 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,linux.dev:email,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: AE57C5DF776
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url,linux.dev:email,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: 6F14C5DF76E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Sashiko reported this issue [1]. Apply the same fix as
+Found while auditing the same pattern Sashiko reported in
+rt6_fill_node() [1]. Apply the same fix as
 commit f8d8ce1b515a ("ipv6: fix possible infinite loop in fib6_info_uses_dev()").
 
-Writers holding tb6_lock can list_del_rcu(&rt->fib6_siblings)
-without waiting for RCU readers; rt->fib6_siblings.next then still
-points into the old ring and this softirq-side walker never reaches
-&rt->fib6_siblings, causing a CPU stall. fib6_purge_rt() always
-WRITE_ONCE()s rt->fib6_nsiblings to 0 before list_del_rcu(), so an
-inside-loop check is a reliable detach signal.
+Writers holding tb6_lock can list_del_rcu(&first->fib6_siblings)
+without waiting for RCU readers; first->fib6_siblings.next then
+still points into the old ring and this softirq-side walker never
+reaches &first->fib6_siblings as its terminator. fib6_purge_rt()
+always WRITE_ONCE()s first->fib6_nsiblings to 0 before
+list_del_rcu(), so an inside-loop check is a reliable detach signal.
 
 [1] https://sashiko.dev/#/patchset/20260526020227.4857-1-jiayuan.chen%40linux.dev
 
 Fixes: d9ccb18f83ea ("ipv6: Fix soft lockups in fib6_select_path under high next hop churn")
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- net/ipv6/route.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/ipv6/route.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b106e5fef9cb..dad416fdc585 100644
+index dad416fdc585..636f0120d7e3 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
-@@ -5902,6 +5902,8 @@ static int rt6_fill_node(struct net *net, struct sk_buff *skb,
+@@ -481,6 +481,9 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+ 		const struct fib6_nh *nh = sibling->fib6_nh;
+ 		int nh_upper_bound;
  
- 				goto nla_put_failure;
- 			}
-+			if (!READ_ONCE(rt->fib6_nsiblings))
-+				break;
- 		}
- 
- 		rcu_read_unlock();
++		if (!READ_ONCE(first->fib6_nsiblings))
++			break;
++
+ 		nh_upper_bound = atomic_read(&nh->fib_nh_upper_bound);
+ 		if (hash > nh_upper_bound)
+ 			continue;
 -- 
 2.43.0
 
