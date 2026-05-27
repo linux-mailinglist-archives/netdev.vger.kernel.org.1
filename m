@@ -1,90 +1,92 @@
-Return-Path: <netdev+bounces-292047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOdCJ1NMFmrZkQcAu9opvQ
-	(envelope-from <netdev+bounces-292047-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:43:47 +0200
+	id OCXSIGJMFmrZkQcAu9opvQ
+	(envelope-from <netdev+bounces-292048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:44:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26955DE558
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:43:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD9E55DE566
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BA377307B572
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:41:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B631307F494
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E36302CD5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD10532AABD;
 	Wed, 27 May 2026 01:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JH32DcH7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LqlFi0SP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193])
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1201D326942
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 01:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3B5233134
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 01:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779846083; cv=none; b=Dl8So9XKdU53lxmwLJuh9vd6e6YUHcrnXrsNqbTd2rl+ZE23spXY+/XwBldKCnpbSV4KqNjaD6KdXuJQk/duEHKyyAYsaewjXtjhuHuok30R2+4GNgGxbTQlSjfGmQmpwjVcK45fp9ElsGQYo979o0m9wxbWGGcTGfayf43HpDc=
+	t=1779846083; cv=none; b=OfXi3ghwrcEgu/tjJG3/wJ+WstI30bpg7IuO1YgbyAFxE/uZMPBl1zD2625wkRwWigC0IC1+BTfNB/op91ezD6zRasxWukhdQQMumSapR7Dit3ahNdKkZionr6Qjbu+17Fnq2zI+9wo7ewfbMg9iMbqdfjr41rqp3hNmhkMGfO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779846083; c=relaxed/simple;
-	bh=M6e01UGL9dCMqKJpezSNhfHIRw0TQrxSI27KxMSG4Qk=;
+	bh=CNWW4remKqeDQitFYlFGmPkKomMCfcQ6+mnDtc+ErHs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UVGll8TEW+o9PMLP3kSC7CQZY7OE+MMvhK1yTmKaJ+kZ+lExVwlGPrIdIfS1WBpRGO95zrkVqwTXPYtrNaC5nQo8m66xImBfmUkMMHUE4t6uIlV31XWKIG+o0X9cRlfFHjPoagCaOAPUyxxpzv7x4KIwFIQQQIXqkMHfiy2mnRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JH32DcH7; arc=none smtp.client-ip=209.85.215.193
+	 MIME-Version; b=oGS04qoqScZmysIrlPhWJtCHXl5gEXBI5B7ESJLLhtsFSdeccuR9NUS6ajqbbi+VcOEeoiNCmS47VDGVI7LJxhZw0vLkYWz+mcdQ7cTpehX3WKAWp5pC6a4ZqID4rrliYg9M7+qxR8C27MCp1kAvCM4dZxhCxJ4zZmVBKoZH4tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LqlFi0SP; arc=none smtp.client-ip=209.85.214.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-c80170db7d6so4454661a12.0
-        for <netdev@vger.kernel.org>; Tue, 26 May 2026 18:41:20 -0700 (PDT)
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2bc763e2ba8so56750125ad.3
+        for <netdev@vger.kernel.org>; Tue, 26 May 2026 18:41:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779846080; x=1780450880; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779846081; x=1780450881; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7XQD3rG0rqbKIVDDKlzx6Q/Fhij3jOBMywQxrhZwUFk=;
-        b=JH32DcH7PXNLh8Gw5LXp2tM8czlZSE9yd2/FQy6iyz3hq0vdwYMSqQzgoeX/zzkBV1
-         4a8DlckCstcgZOngEZR2mS9xEfvvQihY/FTaLJUCWj7osrdytyQub4QNjHjzjt8hpOLQ
-         bYzwCF0HSak+QX9ZyIjLnmvaujwNjr3BiL7XKJ90Ng9SwnMdDUAccEjR9MH6USZt1FcH
-         qc0HTIRWn4c2Ojk7P+VRvzfF0kCTVSdNJ+ru9jIivo/nsoWPaWHu3HkW4hs8HM83oefR
-         rr0VUPGFwsV8cllBwJsdo2qLnzLyDvelSq3mk9lUKxy+Enuui/w2qG8nN1yR2vNVuLp5
-         y//A==
+        bh=2xL0f/mOyd/xxbGC1ZakKovT0Q/B0WOE1XCsqCWuALw=;
+        b=LqlFi0SPuqGzjUQWruNCFvrFFrM2Y2YdCXNBBwJ+JRedJtVUO5lagMeB6bQUHiNmjt
+         Rkxn+/pPqwQ74ccDcLa8coctfuWC6Omh8yh/ZyvZ9CvJJvKTC2obUHA/CSa9RDvMqRX3
+         0crqzYyDytdhtMuMR9ZFQijS/Fkm0hmxfVWr5kRWXS4YlBe5pY0xETx8Pysupb0tNa/H
+         EIHCCuHkte+6KCMJfS6opLj8xgHhaSc6hRIBoSTfWfHEphHGlVo7NuHDJk4j1ukZ1QaX
+         DwAZdgPd3VtSySpByEzTnkqjE0nL8habfCVA04jer20xgfQ0CBVspdwVwt8n1xJ5h3+B
+         EOFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779846080; x=1780450880;
+        d=1e100.net; s=20251104; t=1779846081; x=1780450881;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7XQD3rG0rqbKIVDDKlzx6Q/Fhij3jOBMywQxrhZwUFk=;
-        b=htdYq+9NmLWvj8fLKAi0KKXopdGbg6kqbHjYwzqEoUCr94DYETtwN1FNJuZ8eW9zxZ
-         MbXgz0bgxO8nHiUSnCU3Pd1Vzz+WhGwm6hFGjxvcQiVc23FWCG5D2lv4ykSIMvxJcclR
-         N9weg0rEpB5RfabrhR/UcqqPoBQZRIrWOX4xoYIZ4m9FYmPllXmpEGlXbRlX45xNXXa1
-         0sP4godAE4+3F5tlKbfnTwdXG5twvnfvdzh9ggwrmSfEWz/Zst1rHjuBXeYiQeytvlkE
-         iK4eI9txcwnh2EPBIt0IXdBVxH7J5gzZ0OgufsVnCCBIlMbyiIAJXXI1TZ7nhs9HJs++
-         W8AA==
-X-Gm-Message-State: AOJu0YwC7/l9FSRoT16p0JEsXKj2+YsqQQHb9vOI+BTdF25LNna5Zy4g
-	efBqWL+DBeDm5ve80dDwrhILefy1suPiPT+eGvDhiJZQlwTPGKZAiP91sOg6LevD
-X-Gm-Gg: Acq92OGc41Fm4dEf4MwDItOhY5R3vpPCfgR6ZeMTaQAuY/hDQ1SxwvtvZ/4881M9Mxl
-	meQey8v8gktJNPHD2Vc2AvDcWFnZun/0MbAlRCaA8PYAWtsK1XKgpQTz6byga+JrycevNofvMh1
-	Zrf3Jp4gejYMNyBtoQrqB1QlWn3SzY04Gbzq30vq8p3awaLhsEiiIq6BibvIa2cjocFSxhI+3W8
-	JhX9sYb6NuAzkGnIpLiRz+Cl34aerGZMId47nEfnQgfANMe5bhEeffGB8QfqkJJwsAiMeLwfJSI
-	3EjkJskBwrP1S33hC0LqKKSLTDxKgwfVd7Bb1DRZlVxufysfEZqDNEkRDuh1sz/ni2wLsZJophW
-	UlmqjyARd85fZf7LD0KvWHdSZOb1rQP8lRsd1/AfSPHgdfH2ke0JOmrJ6MouV5yLtWDwFHiYvGb
-	SXMzsa+E6nJqSJXnKx45zMxCjNUA==
-X-Received: by 2002:a05:6a21:4d8d:b0:3a2:d79c:4159 with SMTP id adf61e73a8af0-3b3293404c6mr21300530637.32.1779846080431;
-        Tue, 26 May 2026 18:41:20 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:2::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85202902b1sm11200903a12.6.2026.05.26.18.41.19
+        bh=2xL0f/mOyd/xxbGC1ZakKovT0Q/B0WOE1XCsqCWuALw=;
+        b=oTrpa/OBWIBguvPP2tmfr1ns6I4jG0kVPsbBDgiC3Ad4gdfZmkMOazAcR5E3SMCFgc
+         F5mt1NznWMgkpEE9qTXGO6FhxdKGGGKMAcZv08zgaAtN+ZMkBhwaXOqVSM9r8xSbB1jW
+         za3dPD932LHX/5RLVNgTkcWTFRkhntmHQjmvLBMlGjW3nu36dSJkR88Gti2HcZWt2YzX
+         /WHWcRt+h1mxhYsxjAgN30zoYqJz74LokuOf1QlPOLswIKFCBOlGPNqCTXJJFVKshNRW
+         B1hCs3/PiViCfbtqqFxTxBB8p6ouqLyT+d+BHFBveRIpWA8yt1QU7a2qjZqxaR/WxqZT
+         qzag==
+X-Gm-Message-State: AOJu0YwwavoNGhB63m8ZZx5a5u7oal3ZXFNJkd6X6RaRyQhqfrxj8m2P
+	GdD2Hifo2CsU/+upNGIwIBSAjv4cNeYh7c0WN8yAa3DsBCxqEljlZBaKPKMrxkre
+X-Gm-Gg: Acq92OEAQp5hWAtesrsboIzNd7Uuhuq+rkRsFrL40kbad46kUYsvUFjYcFXC0CIW1QX
+	rwXcaE3zjmzNzt00fhejbIALhh7++nMtcX9EgtvL/y618O8gEI6wFTtCDJJvBPSEHCzz2+n+62h
+	BzlN1rb1VuE3yu9OYAa2t3Ywp2+Alls/WFMJpRsXzdgWA2M0tQrcthXZkFLqz0a57O/0pFuk5rm
+	9GOI8ikHcn2te6iBwLxlJWuvFGbTs/ZCFUdY22jPVTLiE0ZbaOPkplmqbQVtoIDSqco3QZv5148
+	Y26c/k/DyrWzgAUVKyLET1s9vLl2MqsoIqvP6PZ9r96FeWw5kC9Z357l4Y5GFydE/6iE7I4/4yI
+	sSiN9olqdkkUmWIIVUojJWrPStMhE6suaBOLPsrG2GUJA2XE8sRpcfqChzxGn8ueS38yh6wdm7u
+	o8ApVLfbHr/B04vme7
+X-Received: by 2002:a17:902:e542:b0:2bd:b585:55f5 with SMTP id d9443c01a7336-2beb069c13dmr231533365ad.8.1779846081526;
+        Tue, 26 May 2026 18:41:21 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:43::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb58fd888sm141587205ad.73.2026.05.26.18.41.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 18:41:20 -0700 (PDT)
+        Tue, 26 May 2026 18:41:21 -0700 (PDT)
 From: Stanislav Fomichev <sdf.kernel@gmail.com>
 X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next 2/3] net: add retry mechanism to ndo_set_rx_mode_async
-Date: Tue, 26 May 2026 18:41:16 -0700
-Message-ID: <20260527014117.1401809-3-sdf@fomichev.me>
+	pabeni@redhat.com,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next 3/3] bnxt: convert to core rx_mode retry mechanism
+Date: Tue, 26 May 2026 18:41:17 -0700
+Message-ID: <20260527014117.1401809-4-sdf@fomichev.me>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260527014117.1401809-1-sdf@fomichev.me>
 References: <20260527014117.1401809-1-sdf@fomichev.me>
@@ -94,224 +96,165 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292047-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292048-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,rx_mode_retry_work.work:url]
-X-Rspamd-Queue-Id: F26955DE558
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,broadcom.com:email]
+X-Rspamd-Queue-Id: DD9E55DE566
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When ndo_set_rx_mode_async returns an error, schedule a retry with
-exponential backoff (1s, 2s, 4s, 8s — 15s total). Give up after the
-4th retry and log an error via netdev_err().
+Remove the driver-specific BNXT_STATE_L2_FILTER_RETRY + timer + sp_task
+retry mechanism and rely on the core stack's ndo_set_rx_mode_async retry
+instead.
 
-This moves retry logic from individual drivers into the core stack.
+bnxt_cfg_rx_mode() now returns errors (including -ENODEV when the VF
+cannot reach the PF), allowing the core stack to schedule retries with
+exponential backoff.
 
+Call core's netif_rx_mode_schedule_retry during reset to handle
+VF reopen.
+
+Cc: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- include/linux/netdevice.h |  5 ++++
- net/core/dev.c            |  7 +++--
- net/core/dev.h            |  2 ++
- net/core/dev_addr_lists.c | 56 +++++++++++++++++++++++++++++++++++++--
- 4 files changed, 66 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++---------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 --
+ 2 files changed, 12 insertions(+), 26 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 07356e784282..ea4eb7d2cad8 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1933,6 +1933,8 @@ enum netdev_reg_state {
-  *	@rx_mode_node:		List entry for rx_mode work processing
-  *	@rx_mode_tracker:	Refcount tracker for rx_mode work
-  *	@rx_mode_addr_cache:	Recycled snapshot entries for rx_mode work
-+ *	@rx_mode_retry_work:	Delayed work for failed rx_mode
-+ *	@rx_mode_retry_delay:	Backoff delay for the next rx_mode attempt
-  *	@uc:			unicast mac addresses
-  *	@mc:			multicast mac addresses
-  *	@dev_addrs:		list of device hw addresses
-@@ -2327,6 +2329,8 @@ struct net_device {
- 	struct list_head	rx_mode_node;
- 	netdevice_tracker	rx_mode_tracker;
- 	struct netdev_hw_addr_list	rx_mode_addr_cache;
-+	struct delayed_work	rx_mode_retry_work;
-+	unsigned long		rx_mode_retry_delay;
- #ifdef CONFIG_LOCKDEP
- 	unsigned char		nested_level;
- #endif
-@@ -5150,6 +5154,7 @@ static inline void __dev_mc_unsync(struct net_device *dev,
- 
- /* Functions used for secondary unicast and multicast support */
- void dev_set_rx_mode(struct net_device *dev);
-+void netif_rx_mode_schedule_retry(struct net_device *dev);
- int netif_set_promiscuity(struct net_device *dev, int inc);
- int dev_set_promiscuity(struct net_device *dev, int inc);
- int netif_set_allmulti(struct net_device *dev, int inc, bool notify);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 26ac8eb9b259..751d6b5c4e23 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1775,6 +1775,8 @@ static void __dev_close_many(struct list_head *head)
- 		if (ops->ndo_stop)
- 			ops->ndo_stop(dev);
- 
-+		netif_rx_mode_cancel_retry(dev);
-+
- 		netif_set_up(dev, false);
- 		netpoll_poll_enable(dev);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 8459a21cf0a9..3186fdaa1fd0 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -11232,8 +11232,14 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
  	}
-@@ -11720,6 +11722,8 @@ void netdev_run_todo(void)
- 			continue;
- 		}
  
-+		if (cancel_delayed_work_sync(&dev->rx_mode_retry_work))
-+			dev_put(dev);
- 		netdev_lock(dev);
- 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERED);
- 		netdev_unlock(dev);
-@@ -12100,8 +12104,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- #endif
+ 	rc = bnxt_cfg_rx_mode(bp, &bp->dev->uc, true);
+-	if (rc)
+-		goto err_out;
++	if (rc) {
++		if (BNXT_VF(bp) && rc == -ENODEV) {
++			netif_rx_mode_schedule_retry(bp->dev);
++			rc = 0;
++		} else {
++			goto err_out;
++		}
++	}
  
- 	mutex_init(&dev->lock);
--	INIT_LIST_HEAD(&dev->rx_mode_node);
--	__hw_addr_init(&dev->rx_mode_addr_cache);
-+	netif_rx_mode_init(dev);
+ skip_rx_mask:
+ 	rc = bnxt_hwrm_set_coal(bp);
+@@ -13716,7 +13722,7 @@ static int bnxt_set_rx_mode(struct net_device *dev,
+ 	if (mask != vnic->rx_mask || uc_update || mc_update) {
+ 		vnic->rx_mask = mask;
  
- 	dev->priv_flags = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
- 	setup(dev);
-diff --git a/net/core/dev.h b/net/core/dev.h
-index 0cf24b8f5008..4352f39c8dfe 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -166,8 +166,10 @@ int dev_change_carrier(struct net_device *dev, bool new_carrier);
+-		bnxt_cfg_rx_mode(bp, uc, uc_update);
++		return bnxt_cfg_rx_mode(bp, uc, uc_update);
+ 	}
  
- void __dev_set_rx_mode(struct net_device *dev);
- int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify);
-+void netif_rx_mode_init(struct net_device *dev);
- bool netif_rx_mode_clean(struct net_device *dev);
- void netif_rx_mode_sync(struct net_device *dev);
-+void netif_rx_mode_cancel_retry(struct net_device *dev);
- 
- void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
- 			unsigned int gchanges, u32 portid,
-diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
-index d73fcb0c6785..c02aa05c9975 100644
---- a/net/core/dev_addr_lists.c
-+++ b/net/core/dev_addr_lists.c
-@@ -23,6 +23,24 @@ static LIST_HEAD(rx_mode_list);
- static DEFINE_SPINLOCK(rx_mode_lock);
- static DECLARE_WORK(rx_mode_work, netdev_rx_mode_work);
- 
-+static void netif_rx_mode_queue(struct net_device *dev);
-+
-+static void netif_rx_mode_retry(struct work_struct *work)
-+{
-+	struct net_device *dev = container_of(work, struct net_device,
-+					      rx_mode_retry_work.work);
-+
-+	netif_rx_mode_queue(dev);
-+	dev_put(dev);
-+}
-+
-+void netif_rx_mode_init(struct net_device *dev)
-+{
-+	INIT_LIST_HEAD(&dev->rx_mode_node);
-+	__hw_addr_init(&dev->rx_mode_addr_cache);
-+	INIT_DELAYED_WORK(&dev->rx_mode_retry_work, netif_rx_mode_retry);
-+}
-+
- /*
-  * General list handling functions
-  */
-@@ -1252,6 +1270,35 @@ static int netif_uc_promisc_update(struct net_device *dev)
  	return 0;
- }
- 
-+void netif_rx_mode_schedule_retry(struct net_device *dev)
-+{
-+	unsigned long delay;
-+
-+	/* Total retry budget: 1+2+4+8 = 15 seconds. */
-+	if (dev->rx_mode_retry_delay >= 8 * HZ) {
-+		netdev_err(dev, "rx_mode retry limit reached, giving up\n");
-+		return;
-+	}
-+
-+	delay = dev->rx_mode_retry_delay ? dev->rx_mode_retry_delay * 2 : HZ;
-+	dev_hold(dev);
-+	if (!schedule_delayed_work(&dev->rx_mode_retry_work, delay)) {
-+		dev_put(dev);
-+		return;
-+	}
-+	if (!dev->rx_mode_retry_delay)
-+		netdev_info(dev, "rx_mode install failed, retrying with backoff\n");
-+	dev->rx_mode_retry_delay = delay;
-+}
-+EXPORT_SYMBOL_GPL(netif_rx_mode_schedule_retry);
-+
-+void netif_rx_mode_cancel_retry(struct net_device *dev)
-+{
-+	if (cancel_delayed_work(&dev->rx_mode_retry_work))
-+		dev_put(dev);
-+	dev->rx_mode_retry_delay = 0;
-+}
-+
- static void netif_rx_mode_run(struct net_device *dev)
- {
- 	struct netdev_hw_addr_list uc_snap, mc_snap, uc_ref, mc_ref;
-@@ -1275,8 +1322,8 @@ static void netif_rx_mode_run(struct net_device *dev)
- 		err = netif_addr_lists_snapshot(dev, &uc_snap, &mc_snap,
- 						&uc_ref, &mc_ref);
- 		if (err) {
--			netdev_WARN(dev, "failed to sync uc/mc addresses\n");
- 			netif_addr_unlock_bh(dev);
-+			netif_rx_mode_schedule_retry(dev);
- 			return;
+@@ -13757,21 +13763,14 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp, struct netdev_hw_addr_list *uc,
+ 	for (i = 1, off = 0; i < vnic->uc_filter_count; i++, off += ETH_ALEN) {
+ 		rc = bnxt_hwrm_set_vnic_filter(bp, 0, i, vnic->uc_list + off);
+ 		if (rc) {
+-			if (BNXT_VF(bp) && rc == -ENODEV) {
+-				if (!test_and_set_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
+-					netdev_warn(bp->dev, "Cannot configure L2 filters while PF is unavailable, will retry\n");
+-				else
+-					netdev_dbg(bp->dev, "PF still unavailable while configuring L2 filters.\n");
+-				rc = 0;
+-			} else {
++			if (BNXT_VF(bp) && rc == -ENODEV)
++				netdev_warn(bp->dev, "Cannot configure L2 filters while PF is unavailable, will retry\n");
++			else
+ 				netdev_err(bp->dev, "HWRM vnic filter failure rc: %x\n", rc);
+-			}
+ 			vnic->uc_filter_count = i;
+ 			return rc;
  		}
+ 	}
+-	if (test_and_clear_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
+-		netdev_notice(bp->dev, "Retry of L2 filter configuration successful.\n");
  
-@@ -1292,12 +1339,17 @@ static void netif_rx_mode_run(struct net_device *dev)
- 		__dev_set_promiscuity(dev, promisc_inc, false);
+ skip_uc:
+ 	if ((vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS) &&
+@@ -14362,9 +14361,6 @@ static void bnxt_timer(struct timer_list *t)
+ 		}
+ 	}
  
- 	if (ops->ndo_set_rx_mode_async) {
--		ops->ndo_set_rx_mode_async(dev, &uc_snap, &mc_snap);
-+		err = ops->ndo_set_rx_mode_async(dev, &uc_snap, &mc_snap);
+-	if (test_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
+-		bnxt_queue_sp_work(bp, BNXT_RX_MASK_SP_EVENT);
+-
+ 	if ((BNXT_CHIP_P5(bp)) && !bp->chip_rev && netif_carrier_ok(dev))
+ 		bnxt_queue_sp_work(bp, BNXT_RING_COAL_NOW_SP_EVENT);
  
- 		netif_addr_lock_bh(dev);
- 		netif_addr_lists_reconcile(dev, &uc_snap, &mc_snap,
- 					   &uc_ref, &mc_ref);
- 		netif_addr_unlock_bh(dev);
-+
-+		if (err)
-+			netif_rx_mode_schedule_retry(dev);
-+		else
-+			netif_rx_mode_cancel_retry(dev);
- 	} else if (ops->ndo_set_rx_mode) {
- 		netif_addr_lock_bh(dev);
- 		ops->ndo_set_rx_mode(dev);
+@@ -14712,7 +14708,6 @@ static void bnxt_ulp_restart(struct bnxt *bp)
+ static void bnxt_sp_task(struct work_struct *work)
+ {
+ 	struct bnxt *bp = container_of(work, struct bnxt, sp_task);
+-	struct net_device *dev = bp->dev;
+ 
+ 	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
+ 	smp_mb__after_atomic();
+@@ -14790,13 +14785,6 @@ static void bnxt_sp_task(struct work_struct *work)
+ 	/* These functions below will clear BNXT_STATE_IN_SP_TASK.  They
+ 	 * must be the last functions to be called before exiting.
+ 	 */
+-	if (test_and_clear_bit(BNXT_RX_MASK_SP_EVENT, &bp->sp_event)) {
+-		bnxt_lock_sp(bp);
+-		if (test_bit(BNXT_STATE_OPEN, &bp->state))
+-			bnxt_cfg_rx_mode(bp, &dev->uc, true);
+-		bnxt_unlock_sp(bp);
+-	}
+-
+ 	if (test_and_clear_bit(BNXT_RESET_TASK_SP_EVENT, &bp->sp_event))
+ 		bnxt_reset(bp, false);
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 61c847b36b9f..c089afdb186d 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2467,7 +2467,6 @@ struct bnxt {
+ #define BNXT_STATE_DRV_REGISTERED	7
+ #define BNXT_STATE_PCI_CHANNEL_IO_FROZEN	8
+ #define BNXT_STATE_NAPI_DISABLED	9
+-#define BNXT_STATE_L2_FILTER_RETRY	10
+ #define BNXT_STATE_FW_ACTIVATE		11
+ #define BNXT_STATE_RECOVER		12
+ #define BNXT_STATE_FW_NON_FATAL_COND	13
+@@ -2622,7 +2621,6 @@ struct bnxt {
+ 
+ 	struct work_struct	sp_task;
+ 	unsigned long		sp_event;
+-#define BNXT_RX_MASK_SP_EVENT		0
+ #define BNXT_RX_NTP_FLTR_SP_EVENT	1
+ #define BNXT_LINK_CHNG_SP_EVENT		2
+ #define BNXT_HWRM_EXEC_FWD_REQ_SP_EVENT	3
 -- 
 2.53.0-Meta
 
