@@ -1,397 +1,171 @@
-Return-Path: <netdev+bounces-292236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yITYNM/AFmrOqgcAu9opvQ
-	(envelope-from <netdev+bounces-292236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:00:47 +0200
+	id aO0mKaTCFmrOqgcAu9opvQ
+	(envelope-from <netdev+bounces-292238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:08:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 753345E24CB
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5301A5E2650
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:08:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3B37B301B3FB
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:00:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C6D733006152
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D0C3EF0C9;
-	Wed, 27 May 2026 10:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C453EDAA4;
+	Wed, 27 May 2026 10:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="k8sjImKM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KWf39Rvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010057.outbound.protection.outlook.com [52.101.84.57])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874E63EDE62;
-	Wed, 27 May 2026 10:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779876019; cv=fail; b=kfNdu1xUK0VmrtZANgpbFgFMnovA+aK28uI4shpciNU9F/0Ai2zFZbzd/LLSz/6IkDNPhS/vHrHCTbIaBwJlPa2gPRfiqCFiJWHHnloum45WF3J2jWQ0Ypzna7DCyxO4H7ap6MrZ0TLxK2cXmI6GEQ9WHs1j7wKZCVZyNJOWIYM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779876019; c=relaxed/simple;
-	bh=UjjHw5toyszrDoVk1jjRSjd5AuQJigrJUZBvok5jEeU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Bl9uTQw9cfZicEPv/+O3TH4Y0CoTNduWSQ761Q8XJMbAqs8Uk7unsDosvF3qxNGJXdeI6Vg9KGKGMZdZoxL9v7U/h2oXTacZIRAckP2Tn2kq416p6aoPdfWDyyGRigYzLT+dvEiJ82kQUovhlkynBUFnlISHWdXn7dB+9zatRPE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=k8sjImKM; arc=fail smtp.client-ip=52.101.84.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lM/EtEkN/LmB/FXMfeKi3sE25X4At4OKCeIapvQ7f8k4vay1DEU3njQt/sc0zx6IHMxeGB+wvesxUfeQO4N9bonoke4pjWHG6d4qp8zJSdCdkVNIzOn4Aq1/J8xIc5deH+Sx+eACBmag/0/8DMPX+c/mm0Uipq0qRYimA+2uXzbfNZkHgqEleqNyf/IdphijHrSbT7CcVkuRBJhXv/1ZZWmQ2D+6VINMeFlaGQkJbpOSV9eBbqtsI1xNrgSM0EKq8n6xF2rhEi9Ts/ObjNf14ZHhyb8wyBNnTD2d7HlIqza6SeA381+eVvlQ8GtgSejujix5+vWfp4eEfvmaNO/xYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8gxbSzSZ1VCPEUMc3S9LTO+U4AB+mhKGP2U/6S0bdRk=;
- b=tZZ48ttLPWN3i99/fzULex4rJGyPpcsMFxZxUeR5yAhV1PhCu+NLeZCYLnDTZvemJ18dvT+LuHWm24X+3aKsKVEea3Urt5Sguzezjt7ED4JFGQXNiLrOA/1WHTk3cw6CQ4Vq17tfYk+oKHIlno1aGOVrK8qyTcxELDbDE41fpRnpcVZcMQ8FsmJfLuHu9Dy3sBWoJPHs6GeEUuT4HGEpGyhxdgEodO7NeKvU7+56nURlfOJelsVoHqwAQurAtlS/K7SdYPRZHMR/eHcgOJmEYR6zXqy+N53qoccr3hRDmj/7PJtFPfb1ux9ijijzQwErOUmWAzCdb3zLmC7cb94pHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8gxbSzSZ1VCPEUMc3S9LTO+U4AB+mhKGP2U/6S0bdRk=;
- b=k8sjImKMakunKdg5FlEI67boMcDaG5uzAgSrLkFdlnDF8Cq+r7T4f71lnBnFpdqPWh3iWsPzJjiup4+GkZqmgjbnrfraqdGQ0tXd9nWDsZPkFVSD42cruA5Q66TYa844TDwTEVgXS4lB9jDXdssrmU1QCgfem51OvLfibQapnsok06x9sRx4OYYJQqQ0Fh8YskXAFWCZJBa6b0OU4S8Y8fPneB87sB+/JoQWbALMIzpLLv57tibN+t2LyQxv4i8Zzy2zFd9zrZpx/Vhhw4EvBNMak5JyId6COPgdCNN5mBCRf2ArWxW+43jcssAVksuFg7jqI2PZtgjTJM0fG+Qqzw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
- by AMBPR04MB12205.eurprd04.prod.outlook.com (2603:10a6:20b:758::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.12; Wed, 27 May
- 2026 10:00:12 +0000
-Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
- ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
- ([fe80::a9a5:cf83:dbe8:1f74%6]) with mapi id 15.21.0048.019; Wed, 27 May 2026
- 10:00:12 +0000
-From: wei.fang@oss.nxp.com
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	chleroy@kernel.org,
-	andrew@lunn.ch,
-	olteanv@gmail.com
-Cc: wei.fang@nxp.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next 9/9] net: dsa: netc: implement dynamic FDB entry aging
-Date: Wed, 27 May 2026 18:02:17 +0800
-Message-Id: <20260527100217.794987-10-wei.fang@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260527100217.794987-1-wei.fang@oss.nxp.com>
-References: <20260527100217.794987-1-wei.fang@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA5P287CA0357.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:219::6) To VE1PR04MB7216.eurprd04.prod.outlook.com
- (2603:10a6:800:1b0::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F86D3ED5C8;
+	Wed, 27 May 2026 10:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779876512; cv=none; b=c5pvSM3bYwL9rTK3NptSKTp7e8wDf6jTefErZR+ZgPBEeEs8WVBMflyAvTi5A0mDgSg/3AwhewucuumIXA6tUx6FrtTARAT5zyTkzVB+I29qHHxlBcjzBorcARGP1x8zoJT5Iv8l2TiiG9N7taq1RhQjzoLDhWfOGzr2RFjO5Fg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779876512; c=relaxed/simple;
+	bh=7Bwdl+lRo1o4SDfnm78z+Ky9F59wDAn+QntQxboCuCo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8mTJdC+X8rk8Hov2ijjqGv7IAtJnXKoXrTs504y0aSkYWR/SFTQ2i9heJCkh6Zx5H+SAHOKzLuOVT55en2CsCOqz8fVBHhkDU2Z2Wfkd1lF7/Cok0q+FFDXcQMHBE5DCmdhD+FXYOb+x3FNaW8Ffq/gVF8gYxIveTvQGD2Wbog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KWf39Rvx; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F07581F000E9;
+	Wed, 27 May 2026 10:08:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779876509;
+	bh=rIpiJo4iCvjtRLJCUK0kvO6KWTuUncctdjuI6Z6+PQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KWf39RvxLmV0Nl+vilSfwl74YjQVWACxnTiCx26aUEnrVpysov1woI1ljZ4EzWiEj
+	 O77lDsCAYY4natY2LkN9j/GTMgByYhWJJVmkx313bM2kkmuoDwcdv0Cy0SDQaTnKwT
+	 FWqBcTOn94EmVWgTzreCduP7PpjwFiiDOAflX+ojBb8JFCvQDo40Wp343CI/zD9AVf
+	 VXZFU0Wx6T7z1y4YJ62BlNIJoRZARcpBPtONaseHqRAw1VyjweXf9nR8+rtsaSbT6D
+	 RYuQn1sgnH1Gr8QNc5c7CxtaWU3cGE/+GyehXFvY3X5d8oBb5F+8w3a6k6fS5ErlM1
+	 ILpuLr0yq0bCQ==
+Date: Wed, 27 May 2026 11:08:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jihong Min <hurryman2212@gmail.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/3] crypto: inside-secure: add EIP93 ESP packet backend
+Message-ID: <20260527100824.GJ2256768@horms.kernel.org>
+References: <20260523121522.3023992-1-hurryman2212@gmail.com>
+ <20260523121522.3023992-3-hurryman2212@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|AMBPR04MB12205:EE_
-X-MS-Office365-Filtering-Correlation-Id: ccaf9b86-826a-4e51-3138-08debbd6be47
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|19092799006|11063799006|56012099006|6133799003|18002099003|22082099003|3023799007|921020;
-X-Microsoft-Antispam-Message-Info:
-	UMgkeymhDKMiCASZUmxEhom9XQ1PthLCNrExEk83JLPIwM9OzJciuNzPBMyzvS8RAZs6LO2yNBj2pxgKtktcb7Mkcoy2YYzSNOfiPR8SNrjsYvDWYlwSeOHoXkNxcvBWcOpIHWAL8+ksM9noEARpfKaNNocxpMdIAsnO7zAHmV45SbornKPcWLHJGjIaJMGeg7uyLlZr1qHSUt/9NksZDt5GoUJDJqzo5IB///2x6T0Ra2fbTMRHtXw+GSkpasgyDwTGPjRFb2P75AiXo0+JVjeCRYLrqEpwUHbGNSqH1IU7uM31tf+7CEJaMvbxSd5Hh4nmyEE1oTiXlwU5mItLiIxVlwqXj+rMWBNs29IsVhQYBpUzaIy+BJMB2P5UzxiqTDFa2/n8KtkTm6cxnJ646iF3sJch8jGudlkJuDzRFOtv+eulh+Zv/xk+kb2P0myDyC+Zfd42N7OxnpPgUY2sSr+an+FqkTQdUyGVdc6Hlt0940GOXhZLW+6w5fAFuGPlqzOVrFzJ1jQuGcGQ3n+vMpVW2r6UUH/oapcV13XShFoZyNbKvq5xs8JTLGT47Z3Cf7p0OYXR9YBtcsRStL5Y0yz1QZlb0oY68aQy8RHG+tlRmbjLIwhJAhc3Rkq8Mv5skt30TXRCh0XnxS9zlEe9vDIgSLJjZo3lWRq7lCaevTsCIlRoFcQ1jFmuXk4P/0361SFu/MHlHnpUnhr2JSU1PnRvcHh8dMEFp2a4QMw+oPE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(19092799006)(11063799006)(56012099006)(6133799003)(18002099003)(22082099003)(3023799007)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?pOp5Wx5CLipjwgmnGsz9ZCyTFe5ouSsVmXm+rVAB2S8IbE7Rc0FjJojNGr4Y?=
- =?us-ascii?Q?92vX3QIev2AIjFb2qIz1Dq+yNZbsd7wnGT8pvCEvab2KiIQQh9rjOmbGJlbU?=
- =?us-ascii?Q?A2tOFtDMzfvkVY/nioalEMsJrZ9eTqvqiuT5spq9OD2WW839mOuJOsbBCqLL?=
- =?us-ascii?Q?94Lw3DOAnSNMDE69sX6ruxZXw7X3Aj7kAD3O0iiwALl//5QmgAqL8+8Ag2P1?=
- =?us-ascii?Q?9wVCzrBQuhhJkTV0I6K/KLv8WfML7oi5WmMQWNqSuSz2DOJubTl7EaKyCwTj?=
- =?us-ascii?Q?09MXl6+a/ffTQR5R3V+iAdgiap9psb0lWmxOhHmjsopHZfDi0mSi1FSE6FJL?=
- =?us-ascii?Q?vS1HrIJvl2YS2qUvLqMErIwfNnnVoUtZN7ldD/YmtMXB/+BSoW+3UMyiyvoL?=
- =?us-ascii?Q?JneJZHojA04XEu//ZSNcwtZWmaWIEkQTFDw5xQIQn5+ChE+n5ccjnx6RYbk4?=
- =?us-ascii?Q?Aw4AjZnfEwI6DWPyVQAtFWs7pXuPAa6drxQPC1jFZ048pXlBlN8rH4/d1Qb4?=
- =?us-ascii?Q?q7jsHp1Y6QnOezFIUZfjF0iVpPz33/wIqPpXV/Ov8jP3ngBWq5GaXur/sraq?=
- =?us-ascii?Q?BWCF1n+DyNBbMJLuj52Es7IJ4hEwcUsKUMazKRPpI/mEIAADSE0p6cqMF1/g?=
- =?us-ascii?Q?cN2AZ0VeZbpyvF4aWvRITlGP27jpt/8ZClXqLBWi/peOcEWkTrhXt0OROJAM?=
- =?us-ascii?Q?MJJNW4h4+l1iKGVRyWWkzJ/aaQlCuh+/DTq/T7m9QXXYGokOf44Br9WO6wm3?=
- =?us-ascii?Q?QUU9kZSib2FdPZmOkNAa0O8AVlEVC6Kto07gDliQEdvGqhuUSzuYBRuEG08u?=
- =?us-ascii?Q?NmbGHmHp7AVd5SyAhn1VGtq4vg0gMiGq1CbVK9+C35CiPHI2H1WDl3N2S5s2?=
- =?us-ascii?Q?yMBPo/ItPWdCkzrIlBbLyB8LmlJCVstWDIIvhZQj6dhAcmdJnEiEWPMgBNpC?=
- =?us-ascii?Q?JWHuJiwkQbID7v+OxeCvLAnuPkGL046b78R5ClnFmHI0rgfkGY509DlX7eDP?=
- =?us-ascii?Q?7MRBdpNaFe9l1+JtUs7CxmDOb27WxajhuB9q9rjMe5crpSRucdcP6er9nWcr?=
- =?us-ascii?Q?Ue0wPRaBFTsuzAroGofZurF6CUdm4ql2AY68eKSyquLb61G1I0UZLNn7uhDW?=
- =?us-ascii?Q?nMnTu6mCy3FYm8PWwtH5wM/nFzBQXH125a+VhcCievuXSZnJ32MS2ap8R+my?=
- =?us-ascii?Q?cVdUvucMoOHz4Hykmx3qT0Hu5KjYzOmgAdrCEXV+C4iQLzbY18AnrUKofIhM?=
- =?us-ascii?Q?ht8bp0htrZcY1e0fatrJbdcz8f041WtAsAQ4H2Yq0uVBvSk5myKqRR8K0Pb7?=
- =?us-ascii?Q?BI2SSDWtqZBkrcL1/9vSHX8mEhKxh6dGCAWYUND27TC2PtLdacTBvLUeSG2A?=
- =?us-ascii?Q?EDPSdbmAbtGAllSgxtwmQJnswmq3WYSi24aHU+2R5EQ3xR0Z5yl/oOREsaLY?=
- =?us-ascii?Q?k+dO5SNE/lX0tL92qJxRHyRLjoJswqt1ULhzBULhrDW8DBGo7DBMiPSmKCCn?=
- =?us-ascii?Q?ONbwT2Ylwz3mrEPMl7hX21c4fLnNoDq6JEE6yZ1Fs0UWvZ+0HfpnDIs81/s0?=
- =?us-ascii?Q?OTN13t6IWSI6o4PC3HN68eGBKTJMKAD5fl5MnYrQ/TRUUkSAAxzGTqFy3WLz?=
- =?us-ascii?Q?IN8q5i9+7uj6kGnZe0URjxIirTerTFAlcJ/cgUsZZJZx9Ub/72uBrHlq9pjS?=
- =?us-ascii?Q?KNawdTxNGbCXCPuIxVd+ANv77MJXyk9ZURfEL+RAtNKFn9KX3nBUxtFpZvkz?=
- =?us-ascii?Q?W2K6dvjSWb6mcBfrZa5kqK2a3vm53JWoFxvPC5VroQWVHzwHmTNV?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ccaf9b86-826a-4e51-3138-08debbd6be47
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2026 10:00:12.4208
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nzGx8SyTL33sP2e/ruEwIPjzJIUpvvLkvwZd4ewZxx/K+WkR14fhr9dFHNq3gca3PGoMMFeNwI0TtR1GBmZrLl6zznS0f4o7JuDx+5RZ4rLdSliObklw7E4D6MJzBDaS
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMBPR04MB12205
-X-Spamd-Result: default: False [3.44 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260523121522.3023992-3-hurryman2212@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-292236-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292238-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,gondor.apana.org.au,davemloft.net,lunn.ch,google.com,redhat.com,secunet.com,vger.kernel.org,lists.infradead.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.984];
-	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.nxp.com:mid,NXP1.onmicrosoft.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nxp.com:email]
-X-Rspamd-Queue-Id: 753345E24CB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,spinics.net:url]
+X-Rspamd-Queue-Id: 5301A5E2650
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Wei Fang <wei.fang@nxp.com>
+On Sat, May 23, 2026 at 09:15:21PM +0900, Jihong Min wrote:
+> Expose an EIP93 packet-mode IPsec backend for netdev drivers that need
+> ESP encapsulation and decapsulation offload without advertising EIP93
+> itself as a netdev.
+> 
+> Add provider selection, capability reporting, SA lifecycle management,
+> IPsec request completion, and provider fault notification around the
+> existing EIP93 descriptor path.
+> 
+> Assisted-by: Codex:gpt-5.5
+> Signed-off-by: Jihong Min <hurryman2212@gmail.com>
 
-The NETC switch does not age out dynamic FDB entries automatically.
-Without software management, stale entries persist after topology
-changes and cause incorrect forwarding.
+...
 
-Add a delayed work that periodically removes entries that have not been
-refreshed within the specified cycles. The effective aging time is:
+> diff --git a/drivers/crypto/inside-secure/eip93/eip93-ipsec.c b/drivers/crypto/inside-secure/eip93/eip93-ipsec.c
 
-  aging_time = fdbt_acteu_interval * fdbt_ageing_act_cnt
+...
 
-Default values are 3s interval and 100 cycles (300s total), matching
-the IEEE 802.1Q default aging time.  The work starts when the first
-port joins a bridge (tracked via br_cnt) and is cancelled when the
-last port leaves.  All FDB operations are serialized under fdbt_lock.
+> +static void eip93_ipsec_abort_requests(struct eip93_ipsec *ipsec, int err)
+> +{
+> +	struct eip93_ipsec_sa *sa;
+> +
+> +	while (true) {
+> +		bool found = false;
+> +
+> +		spin_lock_bh(&ipsec->lock);
+> +		list_for_each_entry(sa, &ipsec->sa_list, node) {
+> +			spin_lock(&sa->lock);
+> +			if (sa->aborting) {
+> +				spin_unlock(&sa->lock);
+> +				continue;
+> +			}
+> +
+> +			sa->aborting = true;
+> +			found = refcount_inc_not_zero(&sa->refcnt);
+> +			spin_unlock(&sa->lock);
+> +			if (found)
+> +				break;
+> +		}
+> +		spin_unlock_bh(&ipsec->lock);
+> +		if (!found)
+> +			return;
+> +
+> +		eip93_ipsec_abort_sa(sa, err);
+> +		eip93_ipsec_sa_put(sa);
 
-Dynamic entries for a departing port are also flushed immediately in
-port_bridge_leave() and netc_mac_link_down(), without waiting for the
-next aging cycle.
+sa is the iterator for the list_for_each_entry loop.
+However, here it is used outside of that context.
 
-Implement set_ageing_time and port_fast_age DSA operations to allow
-the bridge layer to reconfigure aging parameters and trigger per-port
-flushes on demand.
+	"If list_for_each_entry, etc complete a traversal of the list, the
+	iterator variable ends up pointing to an address at an offset from
+	the list head, and not a meaningful structure.  Thus this value
+	should not be used after the end of the iterator.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/dsa/netc/netc_main.c   | 80 ++++++++++++++++++++++++++++++
- drivers/net/dsa/netc/netc_switch.h |  8 +++
- 2 files changed, 88 insertions(+)
+	https://www.spinics.net/lists/linux-kernel-janitors/msg11994.html
 
-diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-index 1fe3b43e0459..cffa479e19b3 100644
---- a/drivers/net/dsa/netc/netc_main.c
-+++ b/drivers/net/dsa/netc/netc_main.c
-@@ -447,6 +447,26 @@ static void netc_free_ntmp_user(struct netc_switch *priv)
- 	netc_free_ntmp_bitmaps(priv);
- }
- 
-+static void netc_clean_fdbt_ageing_entries(struct work_struct *work)
-+{
-+	struct delayed_work *dwork = to_delayed_work(work);
-+	struct netc_switch *priv;
-+
-+	priv = container_of(dwork, struct netc_switch, fdbt_clean);
-+
-+	/* Update the activity element in FDB table */
-+	mutex_lock(&priv->fdbt_lock);
-+	ntmp_fdbt_update_activity_element(&priv->ntmp);
-+	/* Delete the aging entries after the activity element is updated */
-+	ntmp_fdbt_delete_aging_entries(&priv->ntmp,
-+				       READ_ONCE(priv->fdbt_ageing_act_cnt));
-+	mutex_unlock(&priv->fdbt_lock);
-+
-+	if (atomic_read(&priv->br_cnt))
-+		schedule_delayed_work(&priv->fdbt_clean,
-+				      READ_ONCE(priv->fdbt_acteu_interval));
-+}
-+
- static void netc_switch_dos_default_config(struct netc_switch *priv)
- {
- 	struct netc_switch_regs *regs = &priv->regs;
-@@ -860,6 +880,11 @@ static int netc_setup(struct dsa_switch *ds)
- 
- 	INIT_HLIST_HEAD(&priv->fdb_list);
- 	mutex_init(&priv->fdbt_lock);
-+	priv->fdbt_acteu_interval = NETC_FDBT_CLEAN_INTERVAL;
-+	priv->fdbt_ageing_act_cnt = NETC_FDBT_AGEING_ACT_CNT;
-+	atomic_set(&priv->br_cnt, 0);
-+	INIT_DELAYED_WORK(&priv->fdbt_clean,
-+			  netc_clean_fdbt_ageing_entries);
- 	INIT_HLIST_HEAD(&priv->vlan_list);
- 	mutex_init(&priv->vft_lock);
- 
-@@ -924,6 +949,7 @@ static void netc_teardown(struct dsa_switch *ds)
- {
- 	struct netc_switch *priv = ds->priv;
- 
-+	disable_delayed_work_sync(&priv->fdbt_clean);
- 	netc_destroy_all_lists(priv);
- 	netc_free_host_flood_rules(priv);
- 	netc_free_ntmp_user(priv);
-@@ -1918,6 +1944,7 @@ static int netc_port_bridge_join(struct dsa_switch *ds, int port,
- 				 struct netlink_ext_ack *extack)
- {
- 	struct netc_port *np = NETC_PORT(ds, port);
-+	struct netc_switch *priv = ds->priv;
- 	u16 vlan_unaware_pvid;
- 	int err;
- 
-@@ -1944,20 +1971,42 @@ static int netc_port_bridge_join(struct dsa_switch *ds, int port,
- 	np->host_flood = NULL;
- 	netc_port_wr(np, NETC_PIPFCR, 0);
- 
-+	if (atomic_inc_return(&priv->br_cnt) == 1)
-+		schedule_delayed_work(&priv->fdbt_clean,
-+				      READ_ONCE(priv->fdbt_acteu_interval));
-+
- 	return 0;
- }
- 
-+static void netc_port_remove_dynamic_entries(struct netc_port *np)
-+{
-+	struct netc_switch *priv = np->switch_priv;
-+
-+	/* Return if the port is not available */
-+	if (!np->dp)
-+		return;
-+
-+	mutex_lock(&priv->fdbt_lock);
-+	ntmp_fdbt_delete_port_dynamic_entries(&priv->ntmp, np->dp->index);
-+	mutex_unlock(&priv->fdbt_lock);
-+}
-+
- static void netc_port_bridge_leave(struct dsa_switch *ds, int port,
- 				   struct dsa_bridge bridge)
- {
- 	struct netc_port *np = NETC_PORT(ds, port);
- 	struct net_device *ndev = np->dp->user;
-+	struct netc_switch *priv = ds->priv;
- 	u16 vlan_unaware_pvid;
- 	bool mc, uc;
- 
- 	netc_port_set_mlo(np, MLO_DISABLE);
- 	netc_port_set_pvid(np, NETC_STANDALONE_PVID);
- 
-+	if (atomic_dec_and_test(&priv->br_cnt))
-+		cancel_delayed_work_sync(&priv->fdbt_clean);
-+
-+	netc_port_remove_dynamic_entries(np);
- 	uc = ndev->flags & IFF_PROMISC;
- 	mc = ndev->flags & (IFF_PROMISC | IFF_ALLMULTI);
- 
-@@ -1977,6 +2026,34 @@ static void netc_port_bridge_leave(struct dsa_switch *ds, int port,
- 	netc_port_del_vlan_entry(np, vlan_unaware_pvid);
- }
- 
-+static int netc_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-+{
-+	struct netc_switch *priv = ds->priv;
-+	u32 secs = msecs / 1000;
-+	u32 act_cnt, interval;
-+
-+	if (!secs)
-+		secs = 1;
-+
-+	for (interval = 1; interval <= secs; interval++) {
-+		act_cnt = secs / interval;
-+		if (act_cnt <= FDBT_ACT_CNT)
-+			break;
-+	}
-+
-+	WRITE_ONCE(priv->fdbt_acteu_interval, (unsigned long)interval * HZ);
-+	WRITE_ONCE(priv->fdbt_ageing_act_cnt, act_cnt);
-+
-+	return 0;
-+}
-+
-+static void netc_port_fast_age(struct dsa_switch *ds, int port)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+
-+	netc_port_remove_dynamic_entries(np);
-+}
-+
- static void netc_phylink_get_caps(struct dsa_switch *ds, int port,
- 				  struct phylink_config *config)
- {
-@@ -2231,6 +2308,7 @@ static void netc_mac_link_down(struct phylink_config *config,
- 	np = NETC_PORT(dp->ds, dp->index);
- 	netc_port_mac_rx_graceful_stop(np);
- 	netc_port_mac_tx_graceful_stop(np);
-+	netc_port_remove_dynamic_entries(np);
- }
- 
- static const struct phylink_mac_ops netc_phylink_mac_ops = {
-@@ -2260,6 +2338,8 @@ static const struct dsa_switch_ops netc_switch_ops = {
- 	.port_vlan_del			= netc_port_vlan_del,
- 	.port_bridge_join		= netc_port_bridge_join,
- 	.port_bridge_leave		= netc_port_bridge_leave,
-+	.set_ageing_time		= netc_set_ageing_time,
-+	.port_fast_age			= netc_port_fast_age,
- 	.get_pause_stats		= netc_port_get_pause_stats,
- 	.get_rmon_stats			= netc_port_get_rmon_stats,
- 	.get_eth_ctrl_stats		= netc_port_get_eth_ctrl_stats,
-diff --git a/drivers/net/dsa/netc/netc_switch.h b/drivers/net/dsa/netc/netc_switch.h
-index 982c8d3a3fbf..8ad828f7d28c 100644
---- a/drivers/net/dsa/netc/netc_switch.h
-+++ b/drivers/net/dsa/netc/netc_switch.h
-@@ -50,6 +50,9 @@
- /* PAUSE refresh threshold: send refresh when timer reaches this value */
- #define NETC_PAUSE_THRESH		0x7FFF
- 
-+#define NETC_FDBT_CLEAN_INTERVAL	(3 * HZ)
-+#define NETC_FDBT_AGEING_ACT_CNT	100
-+
- struct netc_switch;
- 
- struct netc_switch_info {
-@@ -124,6 +127,11 @@ struct netc_switch {
- 	struct ntmp_user ntmp;
- 	struct hlist_head fdb_list;
- 	struct mutex fdbt_lock; /* FDB table lock */
-+	struct delayed_work fdbt_clean;
-+	/* (interval * act_cnt) is ageing time */
-+	unsigned long fdbt_acteu_interval;
-+	u8 fdbt_ageing_act_cnt; /* maximum is 127 */
-+	atomic_t br_cnt;
- 	struct hlist_head vlan_list;
- 	struct mutex vft_lock; /* VLAN filter table lock */
- 
--- 
-2.34.1
+Flagged by Coccinelle.
 
+> +	}
+> +}
+
+...
 
