@@ -1,79 +1,53 @@
-Return-Path: <netdev+bounces-292057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPCNN/JPFmqxkgcAu9opvQ
-	(envelope-from <netdev+bounces-292057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:59:14 +0200
+	id 4GloL0BQFmqxkgcAu9opvQ
+	(envelope-from <netdev+bounces-292058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:00:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795105DE706
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:59:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2792E5DE74B
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 366223036EFF
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:59:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DF4930305CC
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD31D342177;
-	Wed, 27 May 2026 01:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5816315D21;
+	Wed, 27 May 2026 02:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cv8+aPQM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608812E1F02;
-	Wed, 27 May 2026 01:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1730342177;
+	Wed, 27 May 2026 01:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779847147; cv=none; b=kTY+0YUzLpvX90mq/UefGp9p2+rVl2GRMIogBar53aLIO6wP8JvgATuN7hhZerUwf9IPhU/hhsWrY/6JHvi0hi/cD61Q0q5N+BO5pTU3O6ONZjTCZog4wTcIGDLpURR+5hNjQEMGHZFgVdFzB0U3h006Hx6kURYKuVNulPUKNpE=
+	t=1779847200; cv=none; b=an9/C8tJ/rLXKbjk2yZGQdSGO0USFljJUFRBAfSj36NYzzPtGqYK6HfcwfqE2uTOY5wi8shdTDMQKWvuNE0FULmhNIL20ctmyZinyLGwQF8F2OkeQuQ3jczKbAfUi5DWcEJZClOqGTq+WMCi1B4CxRreQXmfDxKgQdUrnXHwdhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779847147; c=relaxed/simple;
-	bh=iZdO5tfrEC0OdlmnndPXB576cc8IXVl/EBWV1fGg2nM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P4FRvk+BuQvgRTrLhin068rt3XQxoIq9HQ6BuIAfle2u95M1ERA0HAtFtQPvFplfTEz9lgdAyOvVjZ8uYjVCrh5HCBS058tq4KhfR/lpZrmO/6w3sCxcU7CPQowwwrZkLJYqnsU+aA565aUZxBwg/eMOkLE7XyGmNS4naBjUOFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a139f6f4596f11f1aa26b74ffac11d73-20260527
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:7dc124e5-65a4-4075-91ed-138f80733f7d,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:20
-X-CID-META: VersionHash:e7bac3a,CLOUDID:263d9dbfcdbe7f337e09f227b7d10024,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
-	DM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:
-	0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: a139f6f4596f11f1aa26b74ffac11d73-20260527
-X-User: zenghongling@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <zenghongling@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 489762033; Wed, 27 May 2026 09:59:00 +0800
-From: Hongling Zeng <zenghongling@kylinos.cn>
-To: chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neil@brown.name,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	bcodding@redhat.com
-Cc: linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhongling0719@126.com,
-	Hongling Zeng <zenghongling@kylinos.cn>
-Subject: [PATCH] sunrpc: Fix error handling in rpc_sysfs_xprt_switch_add_xprt_store()
-Date: Wed, 27 May 2026 09:58:55 +0800
-Message-Id: <20260527015855.483921-1-zenghongling@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1779847200; c=relaxed/simple;
+	bh=9VgnWe+0iu6IzRhws/A73cl4G2v7zJY+Rke7gujGQxk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eDbgL04lganDHvCgnEJP4AfFJuQ8VEkfSgPdTPkiHVtqw7sak6ayW/x6mBmF3DgIu+D//m7jAgZoiCcmkqCQ8hX+5j/G9T8dqYkMMFFFx1BIlnzR9I0LJiGoO3dVKsPUwu7U02KZGT7gH6tuxpzxYsy1oow51rdIkPUn4mka/JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cv8+aPQM; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EB21F000E9;
+	Wed, 27 May 2026 01:59:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779847199;
+	bh=jrF/RTmW89hmyKXUb11K0BLFoYBzd+jgy4Y0Yg4BjDs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=cv8+aPQMp8QlFGvTBdpDCzkkAtbKdbfmbxeCRmWirCwtA03luGMxsX2ngQAuoar5W
+	 IhlwE2zvGDqe0pXZVm0Py/wmWE8JMQDSmdcqEDsX+hy2qglX0vto73kAJruzWX/Zf0
+	 /voW2TQYIeRmC831+M2a6uanW/+Yeix83hCLaNs8XMqA8gG7FR3KgorVYUlHfp3hIo
+	 VG/Q7YDEyugRbsre0SaodL6lqhDidcXKTilym+90tpCpzNLsTKACSE43ctqLiZ2fyp
+	 mwmBpPsH+X0amArvZKZ9ea24IB8FT8zyTFAK5ojm9k2cILAvpZOab/cyB6sMdLUkHn
+	 0k9KmIpBWwkig==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93BA7380CEED;
+	Wed, 27 May 2026 02:00:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,62 +55,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Subject: Re: [PATCH net v5] ipv6: validate extension header length before
+ copying
+ to cmsg
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177984720515.4049208.7153214735821634479.git-patchwork-notify@kernel.org>
+Date: Wed, 27 May 2026 02:00:05 +0000
+References: <20260523143245.2281415-1-tpluszz77@gmail.com>
+In-Reply-To: <20260523143245.2281415-1-tpluszz77@gmail.com>
+To: Qi Tang <tpluszz77@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
+ willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292057-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[kylinos.cn];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,gmail.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,126.com,kylinos.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zenghongling@kylinos.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292058-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email]
-X-Rspamd-Queue-Id: 795105DE706
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2792E5DE74B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-xprt_create_transport() never returns NULL, only valid pointers or
-error pointers. Using IS_ERR_OR_NULL() is incorrect, and PTR_ERR(NULL)
-would return 0, which indicates EOF in a sysfs store function.
+Hello:
 
-Fix this by using IS_ERR() instead of IS_ERR_OR_NULL().
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fixes: df210d9b0951 ("sunrpc: Add a sysfs file for adding a new xprt")
-Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
----
- net/sunrpc/sysfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sat, 23 May 2026 22:32:45 +0800 you wrote:
+> ip6_datagram_recv_specific_ctl() builds IPV6_{HOPOPTS,DSTOPTS,RTHDR}
+> cmsgs (and their IPV6_2292* legacy counterparts) by trusting the
+> on-wire hdrlen byte (ptr[1]) when computing the put_cmsg() length.
+> The length was validated only at parse time (ipv6_parse_hopopts(),
+> etc.).  An nftables payload-write expression can rewrite hdrlen after
+> parsing and before the skb reaches recvmsg; the write itself is
+> in-bounds but put_cmsg() then reads up to ((hdrlen+1) << 3) = 2040
+> bytes from an 8-byte header.  nftables is reachable from an
+> unprivileged user namespace, so this is an unprivileged
+> slab-out-of-bounds read:
+> 
+> [...]
 
-diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
-index a90480f80154..49686bf740e6 100644
---- a/net/sunrpc/sysfs.c
-+++ b/net/sunrpc/sysfs.c
-@@ -348,7 +348,7 @@ static ssize_t rpc_sysfs_xprt_switch_add_xprt_store(struct kobject *kobj,
- 	xprt_create_args.reconnect_timeout = xprt->max_reconnect_timeout;
- 
- 	new = xprt_create_transport(&xprt_create_args);
--	if (IS_ERR_OR_NULL(new)) {
-+	if (IS_ERR(new)) {
- 		count = PTR_ERR(new);
- 		goto out_put_xprt;
- 	}
+Here is the summary with links:
+  - [net,v5] ipv6: validate extension header length before copying to cmsg
+    https://git.kernel.org/netdev/net/c/dd433671fef3
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
