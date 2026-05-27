@@ -1,215 +1,139 @@
-Return-Path: <netdev+bounces-292121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292120-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNGWF+yXFmq1ngcAu9opvQ
-	(envelope-from <netdev+bounces-292121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:06:20 +0200
+	id kAkOHLqXFmq1ngcAu9opvQ
+	(envelope-from <netdev+bounces-292120-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:05:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79FC5E034D
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:06:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3042A5E0316
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:05:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4B5ED3076A68
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:03:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 596513065283
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1923B7742;
-	Wed, 27 May 2026 07:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DDD3BAD95;
+	Wed, 27 May 2026 07:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cwX3jN73"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Hnk/R+/Z";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/NbW3KnZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088CE305675
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779865390; cv=pass; b=DkdpUMMd32jdsgkgHOw8mTGpbExcCHv6ZKDWP7oVRXTDCbB7T3amI6Y0j9ZN6H3wVh1OnshNRhS9633nKkUQCn4sQUeJF2ZDopucHffl/B0K3QPiQO60ROi5QJkQj0krC7975m9Q4x0oMtveKT7bfaBbzofs2STMn9l/Lf+3ugc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779865390; c=relaxed/simple;
-	bh=3zR0/hiGZ5zk5sjZu84HNs3iUXOsFWvgBJ9fNwyMtGI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DsQAR9UueW9t3I4a7YYvsZ+ad9zsywDEblVgEC7G2lQ0nsydRuLKLbGG4EL/khzVcVZ315zLOZcqWg6xi7GgkuzEqXkz+oz0Z9i5dQKl+N7+HqBYc9ixlJz0ucteLMWKk8F9tHsr0l0y0fDuqB+uszG6MPrIVxhwuHCwaKAdqUo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cwX3jN73; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-132c338a537so7621799c88.0
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 00:03:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779865388; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lHkeme1fzJTiM5CKJMsTJXDKts3Z5MLNKyB7lrU9ApSbMCqtgmVa3M/qzfDCaj/fcn
-         3oUt9jD806Zs86EublkRmilqjXMj8AaY5WdUhpfoj8/wYZscx+tQgI1GOKnKZxdlFqLR
-         +BkF2HIZVzR+Vbfj/oNSau9UZXpQaxZ945NxX8nwFsfL/Pg9YTOgqkOFLd/fdtWVpfoA
-         wGQ6iKvmpzCAs/a8hH0ar7I78qnpYs7jcgg37ZiEqvV6445zVEjZR/oj+maTSwkEQ12A
-         VuP28BFxmDUMkAdmHpiF2Zh1I3/WAQhu4CdyXaL/8Y9OI6W2Qe8h/seLLJaCeziHlc9O
-         18SA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=o1587O+nbv0Z++QExRTV/St5RdeYmeZ7o2BDq4KRWHE=;
-        fh=Ac2SV/pD6yNQuRfKFr/zt++7Ch+A2szbXPBIFpwbLnU=;
-        b=b6EzUGHtEv9XpKw2T4+6NrTyhnsgjpWRI502xWUIhuAVgr+VUpKpCNao14sSAjdQYh
-         Op9tazLB5EvirPucGUmnlIaabs+u49w+dEMUX27vib1ginKgho7nG1rukECcceqWkpy2
-         xMAwWEyDUkKYx3CFK1Rg6MVkHC4JNhPa4tcUkJykuvXYzPMP4Ima31tmWsIKunH4A4Qu
-         IQYX91vqDeB6DGmuIhXDQ0KzcxP19M88cJD9KfMRZTop8fxEkDGUiFGEtN1coyUEVTg2
-         WfJCf3G361huO7npixrBaVBnoxvGqNcw0vwWfBe80W4G/afQZOczJMz/hD2FLeGHYoMT
-         WwEQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1779865388; x=1780470188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o1587O+nbv0Z++QExRTV/St5RdeYmeZ7o2BDq4KRWHE=;
-        b=cwX3jN7326dFXXgnELvFLQK0Ju0aDpFMxHvdYrEuO4+ywqOZejJJSxWp3WjaxSpPBp
-         pb2scCLQn65pkg8TD7lco09/nN9toa2bbOzkO9MjjPXjZ6IoG1zdbKIovL0WV2eGaatD
-         cMHsIw6f1xEOHvW22O13v1zoLq7WBGQVaDbqJzjfiLpa+ef0OEPR5kiLav3jmFj92zgM
-         monHiwGDRQgVAVgwjIVUzZjoBNbb2fLkn0agez/OAvbHkoEQargSaIDOvyFMbmTOywMW
-         ON9qcQiw+VP5VaAEJqgv1xKNSCQznoAb7ocjkK2H7XZptpW71p1bxN4Q9DkElkPR+k+5
-         qmjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779865388; x=1780470188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=o1587O+nbv0Z++QExRTV/St5RdeYmeZ7o2BDq4KRWHE=;
-        b=hLXEtn9i8gd1HAI7V83Kvjs8jHBEd6ij42n8lL6zKc57WARVIndXn9KfLMs1UKbSz8
-         v1/lqUx0VpBXTx7Vf0hv59vXCSJirQhKd94by3sf3hcckvPhY6b4/pueEqaqL0n6kJw+
-         ErRWwF+JVTHq0CaLfvYMBfe2rQdOHEohue7e4X3ff0LWSdgUT1FZ94G+fed4iIagI7Gj
-         kTQTzCMX1axN5B2DbsMnQ6urMbEitq1vF59Z88Zxo5yLqqtdrGeB9uPU63nHC776JJkn
-         1qXH7xU874gpfS6XbIBkr0fRWiYKXHibvV4ksANSNyYkPKHjkK0bx/So7UNK9Rjfzml5
-         958A==
-X-Forwarded-Encrypted: i=1; AFNElJ+ukW8cyayTqunF1fQFOSGsgWTljCCRVg63lpXkwULlY9aUFDlQLMDuoRg4P59/QOQQxS52ndg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+JUpaUIHdMxSykIE6nKa+SXiGUJBKvbE5iJNw+ZQftqF0Rypt
-	egimTaJ2PmOV97r1zL7UFIk1rKaR9MPOuoSgUjleJGbC88BZQqHZuUrlbRYPuM7I80o3ayg8ykY
-	NfGppX7ftO5oV7fHHe1FPzC37U0Gm3kmsQw2c1wco
-X-Gm-Gg: Acq92OH8H4QB/KyIHztjLHXITsVvm5edKma4J11ZnNM76n9oPYFpXN0rHsV89kP8g63
-	WprNpS/35OhxA5bNc+DPgOCttBlFzfPJzXIDXYvzHOIiXaKWOhZiZqYpZlHFqXWSpnq1hnC+4IY
-	Qd/YRvlpfQFQm7/jr244teOgJv9agcwFNZ11McTsjMCEhM8M+39Pxur+6j+lwPnGbXpn4vz+XhL
-	NKG26uMEInGoia4RjdfJW2sMu3t89SrWEpiyzGq+M857tsSa1d0SzIRqOrbLvcxxQ//QHlDWJ2Y
-	ukDQtwjT/+rJ1cDlheDQ/MdERdqaMGcMPlcuRBfP0kXaesDuDm6cb7D5rM9cw01obzK38FcBa2o
-	8zNi8hfOARM1avoKFy6XSLocfzjqImF05LjRPb5hlP6O8YFyvdKyKW1kZbSwQsg==
-X-Received: by 2002:a05:701b:241b:b0:132:133f:63a7 with SMTP id
- a92af1059eb24-1366129c82cmr4190151c88.8.1779865387377; Wed, 27 May 2026
- 00:03:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74623B813C;
+	Wed, 27 May 2026 07:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779865380; cv=none; b=QoLTOuUjoC7z2TREU6Iu/yd90aCARQY0tIUSggZ6n9czP14ajIEUP1D/lhZUj4ZhOypOZIEi6jX2NVfy34WNCDOhDe7HUrEl64CTvS+1nd/VJScLm07ftH6Kwo0/OMCRhywbp/reR7uQyIhqfdqVQbGSRcoJZ1uT/Uv4fDQamT4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779865380; c=relaxed/simple;
+	bh=c/lbAz2GJRu43euWEDcR4+A2SmeBVLc7f/3LVau6Tls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PVWpqc0WTTtvDTEtISm0EJzRFXicK5riLvgVaEtbe/qmKGCGHLc9DuS+i9PqJx6WP+o8CsKCG+cSOVuz+VyC7tHkIjqevBim3MBv9P1Y+aI2vfZWLrcoYGHYHZxRYf61AJBlMp6xUeRZXBqPc+guzAmELOIfiwIoYTpgMtVRiOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Hnk/R+/Z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/NbW3KnZ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 27 May 2026 09:02:56 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1779865377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3dqGqOon+2GOM07qx5SG6uKHFRuQAxL2ViprI4rMtWQ=;
+	b=Hnk/R+/ZClHgNmd1YPb6Lb9VBGimLRgYBD6oWgi7qSDNR/c6G8l/LVF8NpTy4ZEC4hVKmb
+	C5gM7am27PfnMT+ufNOuA2+6yqYsZedWKgxQ+q2Dd6fAw/3IRRrGNo4gp1g/PdJZTejvlr
+	ZHIXzSql6WTr1ZpuI4ApB4D5ynBUx+X+bvROXp+mL2fvO1Wv9Zl5VM+Yq9itInF6klEYiR
+	0ioy2gOa77qg9Wzsa4jNepNGuWH4q1Nb+yjDfbh812uON6OevhQISWGbh92oC+QUEPc0pO
+	FOVYshW1NyuLanSU5JtlFfp7NRY7NCIBLSGlk5maQKrWRTPzIA8V/p2uZo14hg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1779865377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3dqGqOon+2GOM07qx5SG6uKHFRuQAxL2ViprI4rMtWQ=;
+	b=/NbW3KnZg6qdzSIP+6SipMcxG0WvjzysBlXDKgbJUQ4DINIQoFUQ/bv0mvnuy4hOM8Typ9
+	jHsMrTDqNd+Sg0Bw==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
+	Rodolfo Giometti <giometti@enneenne.com>, Oliver Upton <oupton@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, 
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, 
+	linux-sound@vger.kernel.org
+Subject: Re: [patch 05/24] KVM: arm64: Use ktime_get_snapshot_id() to
+ retrieve CLOCK_BOOTTIME
+Message-ID: <20260527090236-93aa6356-c51b-4445-9d64-4022dd2126e1@linutronix.de>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.070087856@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260527065342.2463433-1-jianyu.li@mediatek.com> <20260527065342.2463433-2-jianyu.li@mediatek.com>
-In-Reply-To: <20260527065342.2463433-2-jianyu.li@mediatek.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 27 May 2026 00:02:55 -0700
-X-Gm-Features: AVHnY4K8KrfS0dp6J0nn678O83X4toikUVmK8774N0_wWE99FyU0BxZlOnh_bsA
-Message-ID: <CAAVpQUAz1SLa7oGYb4Wh3d5W0_hRnq5h=oOQfgChvo+dtWBdVw@mail.gmail.com>
-Subject: Re: [PATCH net v1 1/2] af_unix: Fix inq_len update problem in partial read
-To: jianyu.li@mediatek.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	black-ch.chen@mediatek.com, ivan.tseng@mediatek.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260526171223.070087856@kernel.org>
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-292120-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292121-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,linux.dev,lists.linux.dev,enneenne.com,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mediatek.com:email]
-X-Rspamd-Queue-Id: E79FC5E034D
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linutronix.de:email,linutronix.de:mid,linutronix.de:dkim]
+X-Rspamd-Queue-Id: 3042A5E0316
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 11:54=E2=80=AFPM <jianyu.li@mediatek.com> wrote:
->
-> From: Jianyu Li <jianyu.li@mediatek.com>
->
-> Currently inq_len is updated only when the whole skb is consumed.
-> If only part of the data is read, following SIOCINQ query would
-> get value greater than what actually left.
->
-> This change update inq_len timely in unix_stream_read_generic(),
-> and adjust unix_stream_read_skb() accordingly to prevent
-> repetitive update.
->
-> Fixes: f4e1fb04c123 ("af_unix: Use cached value for SOCK_STREAM in unix_i=
-nq_len().")
-> Signed-off-by: Jianyu Li <jianyu.li@mediatek.com>
-> ---
->  net/unix/af_unix.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index dc71ed79b..2f0b73598 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -2886,7 +2886,7 @@ static int unix_stream_read_skb(struct sock *sk, sk=
-b_read_actor_t recv_actor)
->                 return -EAGAIN;
->         }
->
-> -       WRITE_ONCE(u->inq_len, u->inq_len - skb->len);
-> +       WRITE_ONCE(u->inq_len, u->inq_len - unix_skb_len(skb));
->
->  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
->         if (skb =3D=3D u->oob_skb) {
-> @@ -3056,6 +3056,10 @@ static int unix_stream_read_generic(struct unix_st=
-ream_read_state *state,
->                 if (!(flags & MSG_PEEK)) {
->                         UNIXCB(skb).consumed +=3D chunk;
->
-> +                       spin_lock(&sk->sk_receive_queue.lock);
-> +                       WRITE_ONCE(u->inq_len, u->inq_len - chunk);
-> +                       spin_unlock(&sk->sk_receive_queue.lock);
-> +
->                         sk_peek_offset_bwd(sk, chunk);
->
->                         if (UNIXCB(skb).fp) {
-> @@ -3067,7 +3071,6 @@ static int unix_stream_read_generic(struct unix_str=
-eam_read_state *state,
->                                 break;
->
->                         spin_lock(&sk->sk_receive_queue.lock);
-> -                       WRITE_ONCE(u->inq_len, u->inq_len - skb->len);
->                         __skb_unlink(skb, &sk->sk_receive_queue);
->                         spin_unlock(&sk->sk_receive_queue.lock);
+On Tue, May 26, 2026 at 07:13:53PM +0200, Thomas Gleixner wrote:
+> ktime_get_snapshot() is replaced by ktime_get_snapshot_id() which allows to
+> request a particular CLOCK ID to be captured along with the clocksource
+> counter.
+> 
+> Convert the tracing mechanism over and use the new
+> system_time_snapshot::sys field, which holds the system timestamp selected
+> by the CLOCK ID argument.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Cc: Vincent Donnefort <vdonnefort@google.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: kvmarm@lists.linux.dev
 
-Could you combine the two chunks above like this to avoid
-locking dance ?
-
-                        spin_lock(&sk->sk_receive_queue.lock);
-                        WRITE_ONCE(u->inq_len, u->inq_len - chunk);
-                        if (unix_skb_len(skb)) {
-                                spin_unlock(&sk->sk_receive_queue.lock);
-                                break;
-                        }
-                        __skb_unlink(skb, &sk->sk_receive_queue);
-                        spin_unlock(&sk->sk_receive_queue.lock);
-
->
-> --
-> 2.45.2
->
+Reviewed-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
 
