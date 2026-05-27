@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-292191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292195-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDSFD4euFmpHoQcAu9opvQ
-	(envelope-from <netdev+bounces-292191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:47 +0200
+	id mCoUC9quFmokogcAu9opvQ
+	(envelope-from <netdev+bounces-292195-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:44:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA3A05E1415
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 756DB5E1442
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 63162303FF0A
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9FA353037410
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEAF3E0733;
-	Wed, 27 May 2026 08:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2453CE4A8;
+	Wed, 27 May 2026 08:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="JwPi/G8Y"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="YImMVeMi"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7EC2C1595
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4A83E0086
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871335; cv=none; b=E9yKaCtZdEelCAmPkB4Z7upFFn9Jmj5EE1dRLxbcYk0R7mMxB5YZQELR4x1AEzdS7wFhalJmbDGHXq3FZVL4RCgEfTI1PGBQjj4yUiRrgMnKg7K2BOkjhV2QgV0UAchFwvD81P1rpRILtEbEoEztPCBARA62H8ZdJXZET80e+pc=
+	t=1779871345; cv=none; b=NlgWmwrotK3ox6FE3FXtMK8e9iRBsYFoZksirgORKW1DA/LdiLs+uWynroBurRXU+2KsVbDzut51WIPVSZSi/Nk09pyXEQo53sdECR4vjZ1zYWC7q7COrIbuJuoP41Hxz0pdYbYhAzC2wabAbNt6VrEwrDXVHYRux0BitTfIMlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871335; c=relaxed/simple;
-	bh=5okNZD1eu3CviRC5pJL21MYSgVeOfZZbEd76W61e7Wk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cwEPqFhiFJ1fUppkQAXVYHftfDlYJjj/ubBShiF1flJxOBcxpSp4ZzwRiDckFqqcGki8auS1O3ucRxUW3RoHpm5nkyCRQFNzETjUZnf59UQVf2SD0TjYWfZNhxlR2CXnpX803o9KG891fYsaQVS7psqA78qMpmXvPo0jH0s1qFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=JwPi/G8Y; arc=none smtp.client-ip=62.96.220.36
+	s=arc-20240116; t=1779871345; c=relaxed/simple;
+	bh=T6A5ZpOpTm/4dF52Xuk74SuW6krpdilyDUhtEpGPEew=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qPiK0Il5OTUpuUTYO23TnJvLdDK94+/KL/QDW/gl2FDiFvHgyPbV/agyd42JF7F5u+c+cC3BnUx8txyTl8DNJQY38X77VVOorqHqVd1qfeE5Pkgr0On3LjV+eXFIa9d2lweWaOd2Zy6N/Chlwd7zgYngBV3+vzlzyGBL8f9yF2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=YImMVeMi; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id D2102205E3;
-	Wed, 27 May 2026 10:42:02 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 946FD2069C;
+	Wed, 27 May 2026 10:42:13 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IA1lot8kYc4g; Wed, 27 May 2026 10:42:02 +0200 (CEST)
+ with ESMTP id IhZ0z-tMBOmI; Wed, 27 May 2026 10:42:11 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 0B5E420520;
-	Wed, 27 May 2026 10:42:02 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 0B5E420520
+	by mx1.secunet.com (Postfix) with ESMTPS id 30DF12074F;
+	Wed, 27 May 2026 10:42:11 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 30DF12074F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1779871322;
-	bh=U/F8pf5Czlt5KsKgrcsklNM9/tOs+HWlL64tqTzqHcY=;
-	h=From:To:CC:Subject:Date:From;
-	b=JwPi/G8YfL+gt2oVxwCsWgoo/iMK+PDdMoxw/oS5WZTupgOr3X+QtYg2EFrbMRVM8
-	 l/uHgOkJsEA8yAXwRj4ETQ0k2dafvCRkzCkH+MoI6Nx4y3MeTt0I5cNsYApHBheqtj
-	 8EaqyHwZli0YnAvZ/3MOY41wF2+kYGQ4sT4lMrTH6ABX1TfFkkHeh9KMJE7qcdpejA
-	 DAFhEfMwEbSeGGmrIGMfN5ppu7XD0VObLyuOZQBIcChfYAKsGx/Bhb8id4+54OQA4N
-	 43fesF5x0uGVlzS5yAn4TRaqbhE9QcGos+PhelziJnYEsTLvYzlZR3cDuglf6D9X37
-	 8QpH+B3wDyOtg==
+	s=202301; t=1779871331;
+	bh=1P6PdNJCqe/xzZVKy2Mdn5fV8zN7597TavqYs00A8fU=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+	b=YImMVeMiGNprZ94LWLqaAyxKWheCpz17JUdEDnHOBcczz5HXaV3qlmxkqarZUVrOt
+	 1huou9jqqaVfJXjqWGOAwUU27emcvUBL0YdxWP31QUDX9YU6BUICCi75mRLlu4JG35
+	 83rpuRFxOPhl6uP9kDuNvqfmv+15nFuO0XCVIwozNWCQex8re1teGitBjghyQtKP9/
+	 Lq5c+/9z1hVDBjh8aOQhPx6SkvCMoyJNOiZf+Hxo56zJ6AWtE99sCLJeASeO7u5iYZ
+	 pjeRrjJhzjhrKHDxoJzZr3+dC6xodZ+4FuSxQymGdgQ6Yhmpw2aESsutpwL+DvlNDb
+	 Tmee/gAaK/rRg==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 27 May
- 2026 10:42:01 +0200
-Received: (nullmailer pid 3493984 invoked by uid 1000);
+ 2026 10:42:10 +0200
+Received: (nullmailer pid 3493988 invoked by uid 1000);
 	Wed, 27 May 2026 08:42:01 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 0/9] pull request (net): ipsec 2026-05-27
-Date: Wed, 27 May 2026 10:41:18 +0200
-Message-ID: <20260527084148.3489759-1-steffen.klassert@secunet.com>
+Subject: [PATCH 1/9] xfrm: route MIGRATE notifications to caller's netns
+Date: Wed, 27 May 2026 10:41:19 +0200
+Message-ID: <20260527084148.3489759-2-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260527084148.3489759-1-steffen.klassert@secunet.com>
+References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,7 +81,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -91,7 +94,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292191-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292195-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -102,126 +105,179 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,secunet.com:email,secunet.com:mid,secunet.com:dkim,ntu.edu.sg:email];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.998];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: CA3A05E1415
+X-Rspamd-Queue-Id: 756DB5E1442
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-1) xfrm: route MIGRATE notifications to caller's netns
-   Thread the caller's netns through km_migrate() so that
-   MIGRATE notifications go to the issuing netns, fixing both the
-   init_net listener leak and MOBIKE notifications inside
-   non-init netns. From Maoyi Xie.
+From: Maoyi Xie <maoyixie.tju@gmail.com>
 
-2) xfrm: ipcomp: Free destination pages on acomp errors
-   Move the out_free_req label up so that allocated destination
-   pages are released on decompression errors, not only on success.
-   From Herbert Xu.
+xfrm_send_migrate() in net/xfrm/xfrm_user.c and pfkey_send_migrate()
+in net/key/af_key.c both hardcode &init_net for the multicast that
+announces a successful XFRM_MSG_MIGRATE / SADB_X_MIGRATE.
 
-3) xfrm: Check for underflow in xfrm_state_mtu
-   Reject configurations that cause xfrm_state_mtu() to underflow,
-   preventing a negative TFCPAD value from becoming a memset size
-   that triggers an out-of-bounds write of several terabytes.
-   From David Ahern.
+XFRM_MSG_MIGRATE arrives on a per-netns NETLINK_XFRM socket, and the
+rest of the xfrm/af_key netlink path was made netns-aware in 2008.
+The other 14 multicast paths in xfrm_user.c route their event using
+xs_net(x), xp_net(xp) or sock_net(skb->sk); only the migrate path
+was missed.
 
-4) xfrm: ah: use skb_to_full_sk in async output callbacks
-   Convert the possibly-incomplete skb->sk to a full socket pointer
-   in async AH callbacks so that a request_sock or timewait_sock
-   never reaches xfrm_output_resume() downstream consumers.
-   From Michael Bommarito.
+Two consequences of the init_net hardcoding:
 
-5) esp: fix page frag reference leak on skb_to_sgvec failure
-   When the destination scatterlist build fails after old frags were
-   already captured into the source sg, release those old page
-   references before jumping to error_free to avoid leaking pages.
-   From Alessandro Schino.
+  1. The notification (selector, old/new endpoint addresses, and the
+     km_address) is delivered to listeners on init_net's
+     XFRMNLGRP_MIGRATE / pfkey BROADCAST_ALL groups rather than on
+     the issuing netns. An IKE daemon running in init_net therefore
+     receives migration notifications originating from any other
+     netns on the host.
 
-6) xfrm: esp: restore combined single-frag length gate
-   Check the aligned post-trailer combined length against a page limit
-   in the fast path, preventing skb_page_frag_refill() from falling
-   back to a page too small for the destination scatterlist.
-   From Jingguo Tan.
+  2. An IKE daemon running inside a non-init netns and subscribed
+     to its own XFRMNLGRP_MIGRATE / pfkey groups never receives the
+     notification of its own migration. IKEv2 MOBIKE / address-update
+     handling inside a netns is silently broken.
 
-7) xfrm: iptfs: reset runtime state when cloning SAs
-   Reinitialise the clone's mode_data runtime objects before
-   publishing it, preventing queued skbs from being freed with
-   list state copied from the original SA when migration fails.
-   From Shaomin Chen.
+Thread struct net through km_migrate() and the xfrm_mgr.migrate
+function pointer, drop the &init_net override in xfrm_send_migrate()
+and pfkey_send_migrate(), and pass the caller's net (already in
+scope in xfrm_migrate() via sock_net(skb->sk)) all the way down.
+struct xfrm_mgr is in-tree only and not exported as a stable API,
+so the function-pointer signature change is internal.
 
-8) xfrm: move policy_bydst RCU sync from per-netns .exit to .pre_exit
-   Flush policy tables and drain the workqueue in a .pre_exit handler
-   so that cleanup_net() pays one RCU grace period per batch instead
-   of one per namespace, fixing stalls at high CLONE_NEWNET rates.
-   From Usama Arif.
+pfkey_broadcast() is already netns-aware via net_generic(net,
+pfkey_net_id) since the pernet conversion. The five other
+pfkey_broadcast() callers in af_key.c already pass xs_net(x),
+sock_net(sk) or a per-netns net, so this only removes the
+&init_net outlier.
 
-9) xfrm: input: hold netns during deferred transport reinjection
-   Take a netns reference when queueing deferred transport reinjection
-   work and drop it after the callback completes, keeping the skb->cb
-   net pointer valid until the deferred work runs.
-   From Zhengchuan Liang.
+Fixes: 5c79de6e79cd ("[XFRM]: User interface for handling XFRM_MSG_MIGRATE")
+Cc: stable@vger.kernel.org # v5.15+
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ include/net/xfrm.h     | 3 ++-
+ net/key/af_key.c       | 6 +++---
+ net/xfrm/xfrm_policy.c | 2 +-
+ net/xfrm/xfrm_state.c  | 4 ++--
+ net/xfrm/xfrm_user.c   | 5 ++---
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-Please pull or let me know if there are problems.
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 10d3edde6b2f..874409127e29 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -715,6 +715,7 @@ struct xfrm_mgr {
+ 					   const struct xfrm_migrate *m,
+ 					   int num_bundles,
+ 					   const struct xfrm_kmaddress *k,
++					   struct net *net,
+ 					   const struct xfrm_encap_tmpl *encap);
+ 	bool			(*is_alive)(const struct km_event *c);
+ };
+@@ -1891,7 +1892,7 @@ int xfrm_sk_policy_insert(struct sock *sk, int dir, struct xfrm_policy *pol);
+ #ifdef CONFIG_XFRM_MIGRATE
+ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	       const struct xfrm_migrate *m, int num_bundles,
+-	       const struct xfrm_kmaddress *k,
++	       const struct xfrm_kmaddress *k, struct net *net,
+ 	       const struct xfrm_encap_tmpl *encap);
+ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *net,
+ 						u32 if_id);
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index a166a88d8788..9cffeef18cd9 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -3564,7 +3564,7 @@ static int set_ipsecrequest(struct sk_buff *skb,
+ #ifdef CONFIG_NET_KEY_MIGRATE
+ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			      const struct xfrm_migrate *m, int num_bundles,
+-			      const struct xfrm_kmaddress *k,
++			      const struct xfrm_kmaddress *k, struct net *net,
+ 			      const struct xfrm_encap_tmpl *encap)
+ {
+ 	int i;
+@@ -3669,7 +3669,7 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	}
+ 
+ 	/* broadcast migrate message to sockets */
+-	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, &init_net);
++	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, net);
+ 
+ 	return 0;
+ 
+@@ -3680,7 +3680,7 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ #else
+ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			      const struct xfrm_migrate *m, int num_bundles,
+-			      const struct xfrm_kmaddress *k,
++			      const struct xfrm_kmaddress *k, struct net *net,
+ 			      const struct xfrm_encap_tmpl *encap)
+ {
+ 	return -ENOPROTOOPT;
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index c944327ce66c..59968dcbafe1 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -4703,7 +4703,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	}
+ 
+ 	/* Stage 5 - announce */
+-	km_migrate(sel, dir, type, m, num_migrate, k, encap);
++	km_migrate(sel, dir, type, m, num_migrate, k, net, encap);
+ 
+ 	xfrm_pol_put(pol);
+ 
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 686014d39429..395d82411a87 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2837,7 +2837,7 @@ EXPORT_SYMBOL(km_policy_expired);
+ #ifdef CONFIG_XFRM_MIGRATE
+ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	       const struct xfrm_migrate *m, int num_migrate,
+-	       const struct xfrm_kmaddress *k,
++	       const struct xfrm_kmaddress *k, struct net *net,
+ 	       const struct xfrm_encap_tmpl *encap)
+ {
+ 	int err = -EINVAL;
+@@ -2848,7 +2848,7 @@ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	list_for_each_entry_rcu(km, &xfrm_km_list, list) {
+ 		if (km->migrate) {
+ 			ret = km->migrate(sel, dir, type, m, num_migrate, k,
+-					  encap);
++					  net, encap);
+ 			if (!ret)
+ 				err = ret;
+ 		}
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 38a90e5ee3d9..71a4b7278eba 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -3271,10 +3271,9 @@ static int build_migrate(struct sk_buff *skb, const struct xfrm_migrate *m,
+ 
+ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			     const struct xfrm_migrate *m, int num_migrate,
+-			     const struct xfrm_kmaddress *k,
++			     const struct xfrm_kmaddress *k, struct net *net,
+ 			     const struct xfrm_encap_tmpl *encap)
+ {
+-	struct net *net = &init_net;
+ 	struct sk_buff *skb;
+ 	int err;
+ 
+@@ -3292,7 +3291,7 @@ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ #else
+ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			     const struct xfrm_migrate *m, int num_migrate,
+-			     const struct xfrm_kmaddress *k,
++			     const struct xfrm_kmaddress *k, struct net *net,
+ 			     const struct xfrm_encap_tmpl *encap)
+ {
+ 	return -ENOPROTOOPT;
+-- 
+2.43.0
 
-Thanks!
-
-The following changes since commit b266bacba796ff5c4dcd2ae2fc08aacf7ab39153:
-
-  net: ethernet: cortina: Drop half-assembled SKB (2026-05-06 18:43:41 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git tags/ipsec-2026-05-27
-
-for you to fetch changes up to c16f74dc1d75d0e2e7670076d5375deda110ebeb:
-
-  xfrm: input: hold netns during deferred transport reinjection (2026-05-26 10:35:30 +0200)
-
-----------------------------------------------------------------
-ipsec-2026-05-27
-
-----------------------------------------------------------------
-David Ahern (1):
-      xfrm: Check for underflow in xfrm_state_mtu
-
-Herbert Xu (1):
-      xfrm: ipcomp: Free destination pages on acomp errors
-
-Jingguo Tan (1):
-      xfrm: esp: restore combined single-frag length gate
-
-Maoyi Xie (1):
-      xfrm: route MIGRATE notifications to caller's netns
-
-Michael Bommarito (1):
-      xfrm: ah: use skb_to_full_sk in async output callbacks
-
-Shaomin Chen (1):
-      xfrm: iptfs: reset runtime state when cloning SAs
-
-Usama Arif (1):
-      xfrm: move policy_bydst RCU sync from per-netns .exit to .pre_exit
-
-Zhengchuan Liang (1):
-      xfrm: input: hold netns during deferred transport reinjection
-
-e521588 (1):
-      esp: fix page frag reference leak on skb_to_sgvec failure
-
- include/net/xfrm.h     |  3 ++-
- net/ipv4/ah4.c         |  2 +-
- net/ipv4/esp4.c        | 16 +++++++++-------
- net/ipv6/ah6.c         |  2 +-
- net/ipv6/esp6.c        | 16 +++++++++-------
- net/key/af_key.c       |  6 +++---
- net/xfrm/xfrm_input.c  | 16 ++++++++++++----
- net/xfrm/xfrm_ipcomp.c | 12 ++++++++----
- net/xfrm/xfrm_iptfs.c  | 28 +++++++++++++++++++++++-----
- net/xfrm/xfrm_policy.c | 17 +++++++++--------
- net/xfrm/xfrm_state.c  | 23 ++++++++++++++++++-----
- net/xfrm/xfrm_user.c   |  5 ++---
- 12 files changed, 97 insertions(+), 49 deletions(-)
 
