@@ -1,193 +1,176 @@
-Return-Path: <netdev+bounces-292201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FMpFdGwFmoRowcAu9opvQ
-	(envelope-from <netdev+bounces-292201-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:52:33 +0200
+	id 8JMNCqqyFmokogcAu9opvQ
+	(envelope-from <netdev+bounces-292202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:00:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B945E15C0
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:52:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 760185E1752
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6DB13027D90
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:51:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6185F3008224
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B983E315C;
-	Wed, 27 May 2026 08:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A6D3E3C74;
+	Wed, 27 May 2026 08:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A4bj/hmQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abSVkwtP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F5A3E3144;
-	Wed, 27 May 2026 08:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871910; cv=none; b=OPOx11vl4n20Nqukz0DdLWJEHJaWDde8E9y4Q4KnobfxT/RKt8DnenwkkniH9rtjsz+2JMpVWTwaFKkpv7Nt8YC7ci+ixTf2i8jclDsluSP7UN5rDEY6ms2Sih00QlhJrbGBgU54SM35kltNA8CTvZ0zOzjl9WSCjKj80rEktQ4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871910; c=relaxed/simple;
-	bh=+hPcOcfHsa8a3ANFA1UCHnJst8TfVpFirCBR15QJVio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=snCrvFk/6PNMXyqtjawrfSAn2lQ8EUGRHJiehzK6zgvyHGr1QfxOxttUFjhhmf4wr9VHxRZCgYivo7mePBaDrddxR+dhnOnMO2FcuX2izlJoUjHwocdctYssCIIv6zgAnCcYCKAuJicKpE97jE0xkGlV5TVbu9kHRP7CVsAjmEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A4bj/hmQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6AD71F00A3D;
-	Wed, 27 May 2026 08:51:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779871908;
-	bh=cw6Hq3fwY9dORsY8hW5a014rXACoZ3Q9ELeTsBjnSJM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=A4bj/hmQa3H0KsSybQA679jZY8C2M2EBxCmGFd4kLjKqsNk3QWKHZjyPK5mXRkcfX
-	 VpWCAte43G/7b72JGRYwED2VJuyypr5CTDlz+B/TBjr+N205H33pNj87fbEH7GjTMD
-	 f4IzoJPCYeB66bnO4D2+DjO3keQikG9pILexzAijVpqCIMzJOir5m7RmSLWK4oBGUx
-	 HpxXjQHd9D1kqOUe/dWA+5FlGHtZur/fBmi1sPvyfdRgQVFYYfU4QdQGQhpaG5w5EU
-	 Y1D1Hds9rZPfYSD7ptH/l2KRCdPsgF384y4fFB2IicC6PJSaekfzn3Pg06DbJM/mVv
-	 ywTh7ch9dWuXw==
-Message-ID: <e4dcfbc8-2666-452c-90b2-25c4b2c50c9f@kernel.org>
-Date: Wed, 27 May 2026 10:51:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDA63E3C76
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779872106; cv=pass; b=noTUt9m3cirNNuQ3CY2coSSJjL+ODFc4IpHHrmBSU5P6UmH4rpALJMxzBgsp5GOxThRCiXCwp5DK5qBpNz2jvXJvuphLqeHrXuEAVLDXFD21Cs5+Xz8H9zGJUUxDgDvuavPSlj05CzAEeh3fhtFB1NnObGjvN/gRSz6RHth7ULU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779872106; c=relaxed/simple;
+	bh=k/rf0sprghjpMIgMuOwadzixiyngqMOQ9ESziPobPSw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ocvuhDsUNwwVFd+inuRwSZqwHkWicuOlLi4kQX8pgwjF6bEonJYTe0F8VYtdG5/RQ19B6bpeTcZEUWZzB1+00CzVscru/XLbyzVlZtE5lKdbktlqBro2vtPgdY1MoXu3rliETPUs6rdWXNZwfakO8eRpA05NXA1L+KVDWCI0AaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=abSVkwtP; arc=pass smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2f30a4601bbso11719226eec.1
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 01:55:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779872102; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CTCisor3PsWlala1R49742aPBvecR0OqepqcHePay9cJFA7HO0ZJRcE+9qy6r8XSeo
+         zBpNAqtgJUky8qIK9AtdCbtiyKz3bDesqGLRcK5h/8F5HsNDxgfqjyNnSRlbi4Nn1iEY
+         m3AgA2tazBh7OQoki9GoTkEnOcUFd0Lj5XLAwddrl9TQ3dMKZJU4cTbsWXkRUXwy/lyl
+         ShaCbiRdGR0BQAu/f+tT8Vj3aEfvA4o1QkmW5nHxOtQfxdwpSUJa47UVtw4VVW9ViaH9
+         lzSgCZLL1P4fDd+EYpHDqPC6R/xgii+1VrsAw5LADogWUOQhUhzNFGehzFbe8Ir4znRY
+         ZPYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6QWsDCHfCMtM5YM23243b0CJRuPJzWBKJSsV9LUzw/c=;
+        fh=0iXihvq7y77SyWas4tUXU88ZNLDMUwnw2MJyKGTee4A=;
+        b=OSQK+LWPb9eF/9B0XNp340pYFoze+RwAFgzLVG9Im7ZZtBH2m+KFVDyrxL8TWZ5uFv
+         euGw8DFuFFyghsuMw/vVyodt8Q3UY6XveT7WfOepAAG0Ft9YhnFR3YFouPY9Rrm+6B/Q
+         D4oev+hNeb8lQyAJEkiIDdqktl1CSciQzxbRXO++L14fhh7LDfyn4cJeQZuiPROqXxSq
+         uZeJNnp+P4cZLntNc+1sXe6zRMKMXfps4Q4nBW6sUaVs7ri392Rk7x75bx4WgDVBUaBI
+         eW9IFBHMCMQYtOEuc8ImeQzJyf6yIawJhw4OyknoYo9E+ZXrBD5HF4f5c5hrgrDBIU0l
+         Qajg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779872102; x=1780476902; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6QWsDCHfCMtM5YM23243b0CJRuPJzWBKJSsV9LUzw/c=;
+        b=abSVkwtP9wfSyoCEFQTaTLLXaJuBuxo0YqIZ8bg78Xkb/MSaQ3RvlSj/uG4OmLNnBp
+         1qtrzlAhk7T6vrl5F4KBnooy3QUt5VzMaTPn7wEKWcxgyIw2kinnlSxSek7cmZhCHa5d
+         M5Ut2V121RytsTy/joiG6E2tyE732AwsyMaR8C/l/M9OukLXesPNd//ANFOCZxjOsybf
+         VMyi0pVgtiMPaPjoAITpYYcQbWOYVShdWAs0Fzm0/rbErKpPDQrw6udpgBBTqOD345RR
+         H0zZ9Og3dKHUZJji49HqMo4xPF3+G/r0ONojOvpaNWqtDTmpjipGrDGskJdx9swiDoUq
+         y9NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779872102; x=1780476902;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6QWsDCHfCMtM5YM23243b0CJRuPJzWBKJSsV9LUzw/c=;
+        b=mIzuVCXafHNfd9B17QBHGuvMFHVv5zSdzYTAwVFpr7BVYGenF/xMR8REAZF427Krtt
+         sOkv/A2gWDv6HbAXT8rle1u8Rp3B8u+FktQRUGtYOmuEbHlA7F0mBeITGutOfK8B//Do
+         FAzfOk+U0LhW7RgQLKjJXKM9YDr7s5AvlGcYh3rOmRukt1nfbJ/IvNARvKy9rnkB5qTG
+         /hKlbM0YTjRELOHObXDVtWGIEkC1HMK6dN6Io46BiOKXiUszjGf6tAN+p4fw1hjpdHSH
+         nYVvt7BpBBN5Rf0uzl2Lh07teqAXzOyNEZEKA43ckdN+Iw6++IA30j4SV5ewSsVcEkyO
+         uBbg==
+X-Forwarded-Encrypted: i=1; AFNElJ+IGdv0NgNS0BiF5pfA0oX9id5DpAuIgtblnkNsDeasI/s7zFjpwmH+5WxX57d8bZ7k3/UVgUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG2pb1iJGTrYdexD2ZMKjcAZqJ5NswtvR7kVj4bWLON2DqUUjf
+	PZYn4djDah207D3+RPqeZRzkDcmPCtnf2vbxc1wRfwgSuh90uqsc91jzJH2G6UPPuAnk+p8YWeW
+	Jj+anRUnUvPE9anWjba+KxV3l7NJAdhM=
+X-Gm-Gg: Acq92OF1is7RBSgfhaxq5NqOhpJzJOBO3EXKj4gEXYaTTEi2005ItVjrrkLACsnDKi1
+	kZAxI6++7qFXy/n8+f37NW3nj56kiBRk/5oDoi5lPs/8EoQTWX0XwVryXljdWgGwzPoCcOdxrPw
+	BrQ+zCLGZNFG61iEoQvaPOV/ua5u9miIvckXxvl4AEOewsC8CNXgK1TUJCz8HK1hVxqzlktZAkb
+	bIN70Cbdszwj6y27CC5ZKnW1Lmmux6TWyEG2N8H5nQ70YpaY1dj6tSliEf9f0krNO3I841J27ZY
+	9k80DGEL1no/kVDnFzU=
+X-Received: by 2002:a05:7301:d0f:b0:2ea:ed70:3ea8 with SMTP id
+ 5a478bee46e88-304490f574fmr9265322eec.29.1779872102437; Wed, 27 May 2026
+ 01:55:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-To: Christoph Hellwig <hch@lst.de>, Vlastimil Babka <vbabka@kernel.org>,
- Harry Yoo <harry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
- David Rientjes <rientjes@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>, linux-arm-msm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, io-uring@vger.kernel.org,
- kasan-dev@googlegroups.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Matt Fleming <mfleming@cloudflare.com>,
- kernel-team <kernel-team@cloudflare.com>
-References: <20260527070239.2252948-1-hch@lst.de>
- <20260527070239.2252948-2-hch@lst.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20260527070239.2252948-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+References: <20260523084408.50346-1-clamor95@gmail.com> <20260523084408.50346-2-clamor95@gmail.com>
+ <d28799ba-a4af-49b8-a437-3e7b54ed06b8@kernel.org>
+In-Reply-To: <d28799ba-a4af-49b8-a437-3e7b54ed06b8@kernel.org>
+From: Svyatoslav Ryhel <clamor95@gmail.com>
+Date: Wed, 27 May 2026 11:54:51 +0300
+X-Gm-Features: AVHnY4JaYaiHwPLUWc19UBdX6yuMZEQ5-2cdxAvjMlSZR4fbv5UKlVc_P1AsxYk
+Message-ID: <CAPVz0n0wzSkMjbkgy3nveYobruuDnV_Dm1A4gRQ6XOm6dTOrNg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: Document Infineon/Intel XMM6260 modem
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292201-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292202-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lst.de:email]
-X-Rspamd-Queue-Id: C3B945E15C0
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[clamor95@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 760185E1752
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+=D1=81=D1=80, 27 =D1=82=D1=80=D0=B0=D0=B2. 2026=E2=80=AF=D1=80. =D0=BE 11:2=
+3 Krzysztof Kozlowski <krzk@kernel.org> =D0=BF=D0=B8=D1=88=D0=B5:
+>
+> On 23/05/2026 10:44, Svyatoslav Ryhel wrote:
+> > Describe the Infineon/Intel XMM6260, a 3G-focused, slim modem platform
+> > designed for smartphones, data cards, and Machine-to-Machine (M2M)
+> > applications.
+> >
+> > Signed-off-by: Svyatoslav Ryhel <clamor95@gmail.com>
+> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> > ---
+> >  .../bindings/net/infineon,xmm6260.yaml        | 74 +++++++++++++++++++
+> >  1 file changed, 74 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/infineon,xmm6=
+260.yaml
+>
+> Considering that you just sent "power sequencing" device completely
+> independent of this, I think my review tag should be dropped because
+> this is incomplete. Basically you will be changing this and maybe even
+> in backwards incompatible way, thus this should not be accepted in
+> current form.
+>
+> Best regards,
+> Krzysztof
 
-
-On 27/05/2026 09.02, Christoph Hellwig wrote:
-> The kmem_cache_alloc_bulk return value is weird.  It returns the number
-> of allocated objects, but that must always be 0 or the requested number
-> based on the implementations and the handling in the callers, but that
-> assumption is not actually documented anywhere, which confuses automated
-> review tools.
-> 
-
-I remember, this API behavior was requested by AKPM when I developed
-kmem_cache_alloc_bulk.  I trusted AKPM's decision, but I cannot explain
-why this choice was made.
-
-I kept the netdev code usage below. The current napi_skb_cache_get_bulk
-have a retry logic that assumes that a partial bulk number can be
-returned (which it cannot as Hellwig explains).  Cc Alex/Olek please
-review the changes below as you added this retry logic.
-
-
-> Fix this by returning a bool if the allocation succeeded and adding a
-> kerneldoc comment explaining the API.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/gpu/drm/msm/msm_iommu.c       |  6 +--
->   drivers/gpu/drm/panthor/panthor_mmu.c | 12 +++---
->   include/linux/slab.h                  |  6 ++-
->   io_uring/io_uring.c                   | 23 +++++------
->   lib/test_meminit.c                    | 19 +++++----
->   mm/kasan/kasan_test_c.c               |  5 +--
->   mm/kfence/kfence_test.c               |  9 +++--
->   mm/slub.c                             | 58 +++++++++++++++------------
->   net/bpf/test_run.c                    |  7 ++--
->   net/core/skbuff.c                     | 24 ++++++-----
->   tools/include/linux/slab.h            |  2 +-
->   tools/testing/shared/linux.c          | 19 ++++-----
->   12 files changed, 93 insertions(+), 97 deletions(-)
-> 
-
-[...]
-
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 44ac121cfccb..73045b688385 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -288,11 +288,11 @@ static inline struct sk_buff *napi_skb_cache_get(bool alloc)
->   
->   	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
->   	if (unlikely(!nc->skb_count)) {
-> -		if (alloc)
-> -			nc->skb_count = kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> -						GFP_ATOMIC | __GFP_NOWARN,
-> -						NAPI_SKB_CACHE_BULK,
-> -						nc->skb_cache);
-> +		if (alloc && kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> +						   GFP_ATOMIC | __GFP_NOWARN,
-> +						   NAPI_SKB_CACHE_BULK,
-> +						   nc->skb_cache))
-> +			nc->skb_count = NAPI_SKB_CACHE_BULK;
->   		if (unlikely(!nc->skb_count)) {
->   			local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
->   			return NULL;
-> @@ -353,16 +353,18 @@ u32 napi_skb_cache_get_bulk(void **skbs, u32 n)
->   
->   	/* No enough cached skbs. Try refilling the cache first */
->   	bulk = min(NAPI_SKB_CACHE_SIZE - nc->skb_count, NAPI_SKB_CACHE_BULK);
-> -	nc->skb_count += kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> -					       GFP_ATOMIC | __GFP_NOWARN, bulk,
-> -					       &nc->skb_cache[nc->skb_count]);
-> +	if (kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> +				  GFP_ATOMIC | __GFP_NOWARN, bulk,
-> +				  &nc->skb_cache[nc->skb_count]))
-> +		nc->skb_count += bulk;
->   	if (likely(nc->skb_count >= n))
->   		goto get;
->   
->   	/* Still not enough. Bulk-allocate the missing part directly, zeroed */
-> -	n -= kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> -				   GFP_ATOMIC | __GFP_ZERO | __GFP_NOWARN,
-> -				   n - nc->skb_count, &skbs[nc->skb_count]);
-> +	if (kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> +				  GFP_ATOMIC | __GFP_ZERO | __GFP_NOWARN,
-> +				  n - nc->skb_count, &skbs[nc->skb_count]))
-> +		n = nc->skb_count;
->   	if (likely(nc->skb_count >= n))
->   		goto get;
->   
+Noted
 
