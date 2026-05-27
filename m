@@ -1,187 +1,244 @@
-Return-Path: <netdev+bounces-292063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292064-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yB4tAPpXFmo9lgcAu9opvQ
-	(envelope-from <netdev+bounces-292063-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:33:30 +0200
+	id MInYEyRYFmo9lgcAu9opvQ
+	(envelope-from <netdev+bounces-292064-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:34:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D5C5DE918
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:33:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFF5A5DE935
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 496E2301AF61
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:33:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 79AC53033AF0
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435F42FF657;
-	Wed, 27 May 2026 02:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EC22EA48F;
+	Wed, 27 May 2026 02:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="adthIWDU"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="KTDWkDZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012070.outbound.protection.outlook.com [52.101.53.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9DC1B808;
-	Wed, 27 May 2026 02:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779849203; cv=none; b=hFMWiq4wzjj32xCOViqpSkBELoIzI3m3b5kWdoYn2LRrPmUDpga6a7lWAI2GTwRlyCaNU4N3eLBSqIDvVb3nrxIKicPF0cqjdSXqfP0YBqHbo++o/Kqys9Y5/Ad7P0yMt2jgzafukway4b+QFWiOUhQFHRVPtBur3wsrArijEZo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779849203; c=relaxed/simple;
-	bh=8t6TIlrq8lTYCr8mYmTCyfM+uVkhcnM7NGEhdAc/kSo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u0omstrgHIhMoRu1J34gGjyxFGtXiCX57E10Dx66ooFr9mlr5SMIDbF/LVsK/X6YBRb74rn2J+J1B9Y/fpj3NYDLi5PxjlbmZ77rzDBJCiZAMJ3qAFvtQ73lm20zzDXj+fUyIXWd2mt2aXYsKn0ijqQUxw1+lnrufgCOXQE0+NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=adthIWDU; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=9N6WG8+Zu4U/WbEJSIu0ss4C6WrIjKJDWfdin0qydaE=;
-	b=adthIWDUzQwA0DFQsR/sPXxgncKfVMhHNeclfFmdbssxW1U77WicR331TwFbcFt3Srw/Ff8qg
-	Hi/xFChr6gEU1jpo8HR/H5RkH3LcO5QPXhtHan0x6GA8jNw501a6DMiLTup3N6hmtQHbhfbtGs3
-	GBUGa5BU+TUrVzeYOtS/iPc=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4gQD434PQqzcZxp;
-	Wed, 27 May 2026 10:25:23 +0800 (CST)
-Received: from kwepemr200017.china.huawei.com (unknown [7.202.195.7])
-	by mail.maildlp.com (Postfix) with ESMTPS id C06A540561;
-	Wed, 27 May 2026 10:33:09 +0800 (CST)
-Received: from huawei.com (7.227.44.14) by kwepemr200017.china.huawei.com
- (7.202.195.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 27 May
- 2026 10:33:08 +0800
-From: Lin Ma <malin89@huawei.com>
-To: <kuba@kernel.org>, <avkrasnov@salutedevices.com>,
-	<cenxianlong@huawei.com>, <chenzhe@huawei.com>, <cuirongzhen@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <eperezma@redhat.com>,
-	<horms@kernel.org>, <jasowang@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <malin89@huawei.com>, <mst@redhat.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sgarzare@redhat.com>,
-	<stefanha@redhat.com>, <tanjingguo@huawei.com>,
-	<virtualization@lists.linux.dev>, <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH net v2] vsock/virtio: bind uarg before filling zerocopy skb
-Date: Wed, 27 May 2026 10:33:01 +0800
-Message-ID: <20260527023301.1075581-1-malin89@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EE41B808;
+	Wed, 27 May 2026 02:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779849247; cv=fail; b=ITb6WLz+EkdqF9EMXQhUUUywxB0K5lWfRvr/b37IKTKvmbRbcyhLmaWqjbSceK3wNNbYUX6PX1m8jDPrD7uHDyf5rDglmBgs82gYn7sUkxg/dvWG3hLl7wSQhKCYhCsR8wOnZ4zS3QMXrxQER7uQd6ovNEGC/eFi2tmTbC6v4xo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779849247; c=relaxed/simple;
+	bh=PuY1uxTf26VSsbji8SEQXH9dNJTFnD3IvJdhMh7Oa7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=QLAV79KqKebqoVaVgP9dwem0MQf9MO/cuohs0j7UG51ovszo44zCE3zt4biKWN9GOl/Bps+c6EN/f3H5KxJLbWBnZA44TaFjg5QeFctFfTDLVbUbEaKlC5Db5WBQ1mR/MrUnlJ40oLWSkNPfKUuV7vmRfP5x+wMBOO4ezP1xgdM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=KTDWkDZg; arc=fail smtp.client-ip=52.101.53.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JFUVhMNiGO4s3d1ujwkO0I5ucbNJ4NFxVjpr3CMSbRCsidb9pqjA38MFi6i01zmPUNV5CeNtVh2w7MU3qF04az00BaSI9fBdzbKsY3abPXHDESb2ykREpWtHYEJuNUbt4nu4JLh0UVHxfiMdk6s3qp55DtL90kFKT0WmOj9thO24k6loBH68MpNFB2iRmXLAwriueO8KfbXvDdz4nq0eygYWplRnS8m+l42ySKYD0oewKFdCJEUfBQTukF9R7L8gwKzJUid8xoU/IGAtX25TB+BqdQp5LLrkFJAsPzF/UOQaoAwmlJ1qk8UXhVqhUSnYfxCL7ubEnDNFx1rYJS0n8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eJ+Vi4+B5kPJUFu/fodRO6Xgp2oKpWw/SA0EwT0Bjy4=;
+ b=yDQTKILlkKjJ8Dr4Ny/gC2ogar0SeJgAM2a4Fp80iV+BsrpCDmbuKpUeiaCtHuSLh4TtyCi949mkEWJW1L5Ip/IQpJ9atzFAU7pfrMsSuclwGuxu0EvCHW98t9tYJrN90d9nms0wA2F+OvM2/+D7Z9hCNqSM6kqt9DP02m+XhfcoMwPotA3SB9WIYyidsJIQxhWoxYlDEESUyuU6dfpzn/5VDJwJRv6B9Rzpu0i1H7L87jt/VpmTyiNELgCzOsFUyoCgD8xlCK5X2hqhHbZWdAggxIks8N9KiH/dBn1M/Yti7H4oQOaIC2oRsO9p0QfVGIQAMt7jVkVfzKzmHZWsSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eJ+Vi4+B5kPJUFu/fodRO6Xgp2oKpWw/SA0EwT0Bjy4=;
+ b=KTDWkDZgq08Es6uRHO5cB2goYQGBVRb9AdzicJdRbhhAY+Dets9yqWBKyFCIx7mFpaxLosCWRonMeJIAY3Z0K2r9XyanVDkBoh5KvDg4PUfJ3IfxHjfBnRQNLIc7r6RiDc5iCqGajdsUz3OfsrTWuJM0O1jZwNpK1ibZnJ9xMA/fnCQytrsvK/ygtj79vo4yitHc/xISqVpJ/n63RhWTaM/mDeDQqhn3gRBexT3kvWVguDvPtNoOz3FlZgsAUVaoAKHKHVQmh7xewPMSwZRxDfbb3aUJfIvGjHL+mfLC2PER3CC5LYGkf5xBJdjIg/AjDkXXj0A0xO0tMiOkyx7X1Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
+ by MN2PR03MB5069.namprd03.prod.outlook.com (2603:10b6:208:1a2::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.11; Wed, 27 May
+ 2026 02:34:01 +0000
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.21.0048.019; Wed, 27 May 2026
+ 02:34:01 +0000
+From: muhammad.nazim.amirul.nazle.asmade@altera.com
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net: stmmac: Improve Tx timer arm logic further
+Date: Tue, 26 May 2026 19:33:59 -0700
+Message-ID: <20260527023359.18876-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BY5PR13CA0018.namprd13.prod.outlook.com
+ (2603:10b6:a03:180::31) To SJ0PR03MB6964.namprd03.prod.outlook.com
+ (2603:10b6:a03:432::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr200017.china.huawei.com (7.202.195.7)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|MN2PR03MB5069:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5ea7317-261e-4cf6-7441-08debb98691e
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|55112099003|18002099003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	yB7M6wOmRWApJkhcxvi7vW6ti78OC4XwouAr+EkOpyfwMyEoOWZxvgCgAD+2eUK7WVbYUGarlh9TSE5j9uezFZq0lyJHJ8T1QqWeQSl9QZPpTgG2Fw00P4ZbfDT97NIsDzBEKd+86KhqcMhwf3y3OPvcgPmKlVzNcG5bbCXWwMRrcrTdZHmORNqxSO2h/2aydgTF4zKxPO6WaZm49zPOlGKgiMx4X84/LeF7tOpirQc7vk7vqClqcc2Ztoanmm3RGqY6rEha4lIGqpDInJfmmprORw9ghmcvhipd4P6bEuCEje/6JCHArdthpxXBU9II9kjPO8mnm9f7SdUsFS1P2G0wRsa7ZggHViFWWThSUxYO6sOUlcfP/UOkD5TP9C6BO6ZkjzlbrTV0nOuMmyk9tNt3W3hS/TnxXvGQDm/oZ4IjNDRCXwm9js26iOcg+DoBSnH/CmT4G3m/ffRU7xkz1iRhBF6oHoFR2VAPFk6qRFGc0nFmspYq052CL7Re3yIY7YL3F5LnusjAzFDlOk00nQt9VsdVskisNg7aeO6H0+f6OB2AE7IGg3eH+Ywgi+tWtoCxsWWBULM5tUSEhh5eQJf/DHi0DrnOkjqa+8NqyHhyrxKMhpbr2OFcZ6vUFLurq+Kf0WF6J82y0i0ptEMQGcIDL3e3+e+zHmX06TLDpyFrXYovHnhzS0su4q6sCp5B
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(55112099003)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?VCfM0uCrSVssg9w5Ub7EhD01JEQ/aRMIh1RSBBzJlKeSxktdfalDZx6HXWAJ?=
+ =?us-ascii?Q?hV2WhWIGI4KlQQ0aZuSMPSZYrKf7cnYB4btRGLv3IyLMV/gXFSxjCfnK6C0X?=
+ =?us-ascii?Q?F2DSDH6EkVha8z0TQ4W6ZBllgEm24lQD0JrBxc9cgU/e6n6fXGLAEpFzytHD?=
+ =?us-ascii?Q?lbm1CQNzW8oo0xGdm9mO6K+1KbhXxW0cAoNHnZcME13QeA3SchkJidx6jzDx?=
+ =?us-ascii?Q?4sQJCYIi8XT88TJqki1SES9Gyz/8mAd9mrHbZUlaW15yxraBlM+WzviB8qu9?=
+ =?us-ascii?Q?nFwMWBaxyqH41Net5u9SDAObVembNPx7duIVAApC9OFMX7WeByprQGfIEUHv?=
+ =?us-ascii?Q?XDDW1QCV2lfelMI/TSezngTNFTSgTAq1/PDg97H2pYNkpLghJeZdJniBu6yK?=
+ =?us-ascii?Q?BE/1ZrKwne+1hjBH3KsfxpfhKj4uRwOYYAzmg0egLyeDvDo8q5pzKzVkm1u0?=
+ =?us-ascii?Q?jzw82/n+6AHljgQgVmKYFNwnV6EmTsvB58Kq8gvr+tLJ3NNt5LCVZ8V/2mFe?=
+ =?us-ascii?Q?X6MTvTzEQXoom4dxOW588pFkL0UoYKX+innaljmmJzM2EA+qJgC8I/euI1Pu?=
+ =?us-ascii?Q?n82wAogI16Tl6PO2K8K15Wf2crRpsyKInZ+eoUUICx/UpipzfugnWAKLMEt9?=
+ =?us-ascii?Q?+/k8yaFl0k29/npoUIk+4DTHcKuO7U6LxNQt4BYhrrWiDJzI38KoTO5xE2SS?=
+ =?us-ascii?Q?BYRe67fwF6BnJpLkhBj87mK2JGnp0LHNxcNCzrimdwdfF+X66aAcaY8KJYLM?=
+ =?us-ascii?Q?QzXvsTkJkWKMcik4oJckl/5VUWCpXGtHpvkuDMz2Mt4rt808uECuMFd8C3an?=
+ =?us-ascii?Q?h5XVZ45QtXIPY9kyAZNc7uuSJ0HaxsyQz+FoW0kXZEnNAsRjEiXkYUSXEW3+?=
+ =?us-ascii?Q?KgdDrMfoZVPLys567hfUPGzNj51y9Eg/0gFWcvGN4lwApxJIHnXSNcyhW9dd?=
+ =?us-ascii?Q?HMcLZaHTpmihUJkyMMrVmcNQhX1fAT4O2xsjRWECWZEshcHodEJlnAGka9SM?=
+ =?us-ascii?Q?QH5m/plo1ZsfRhQ30qhC6n89WUQGsIBu0/ggQ773TwsL2JYRHijlUYEwf2qe?=
+ =?us-ascii?Q?aTcPocZyWZorjFBbuqZTTfU17BpLSTl6gh8YWYwJ9WTEkAyqP+uMgCb7pU8v?=
+ =?us-ascii?Q?SO4j4CIMPkChn8+cLLBPMYWLZekOIBiyfZPFCBz83RkY3L/szL0MUbuwJ6e9?=
+ =?us-ascii?Q?J4XIIHI6MWOmt5/ZoEMC838Du8DzJlDxsqA4FSJIVgvtgSn05Wp31xh5cxmB?=
+ =?us-ascii?Q?7upY3zF73lrthdP6QPVTEGI8N5SlLiWpaX9O07NEAhidE0UWJaSxepv2Jjw5?=
+ =?us-ascii?Q?AUNM9ShSH37NOXv9ByB/5ZYMdl5drRMaxaD4esthutCTUh1k2pkQgkQ45UaM?=
+ =?us-ascii?Q?9XqpUbxi7jiRrQiccc0p/+V9JD9Be55hlj2tgEI3U2iVU7DVaiOpzDod6eP9?=
+ =?us-ascii?Q?WR9PK6sSVQBUGuFUBBL/cnVtRPfRlvMPwe5hPvDQQNeQs/4pffxtdeUTKYZC?=
+ =?us-ascii?Q?MSiDEp/oSZRfQL1RTG4Hdr9oU3rcsIehh1Lv9teejE0dOckEi1Z5x/NUTEZb?=
+ =?us-ascii?Q?BuqCTH2Jgf4OW+R/I6k4LqPsSOblhLqbqv+Abw+M2QzhRurfiwVS/AlTOU3f?=
+ =?us-ascii?Q?jZZDHvHli5EZ685eKu1pvkpfLVo7kSuPhoMHJZ7YsguJLWbS4njYOrzFiG1Y?=
+ =?us-ascii?Q?dkTe+CmvAEr29vXvAZ3XJ+2CGyS37v7ino91N3yRC+SYVJsF3hHpgeh/2Hw7?=
+ =?us-ascii?Q?lUzQ6XNIAKWC460jpztQr4IOnkiQwJegFw6nEhGHEA8HBJhMrmBSApKPVnO0?=
+X-MS-Exchange-AntiSpam-MessageData-1: nsiR/6ykUIHbsw==
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5ea7317-261e-4cf6-7441-08debb98691e
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2026 02:34:01.1639
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kWym74kbOsupokpOyC9fY00USygOisxoEbEAfl15DKoRyzm1CZSlxbwSKt2zv5uPTA9epu+LCYkKBnoh0YcONyP6yNdUPz9oJvK5UsQH7JRj/RcrbQEndMTmWppfYvDFIDJyteJyLwrx0e7gJ+nxoQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR03MB5069
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
+	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292063-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[malin89@huawei.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292064-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[altera.com:+];
 	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,salutedevices.com:email]
-X-Rspamd-Queue-Id: 49D5C5DE918
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[altera.com:email,altera.com:mid,altera.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BFF5A5DE935
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jingguo Tan <tanjingguo@huawei.com>
+From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 
-virtio_transport_send_pkt_info() allocates or reuses the zerocopy uarg
-before entering the send loop, but virtio_transport_alloc_skb() still
-fills the skb before it inherits that uarg. When fixed-buffer vectored
-zerocopy hits MAX_SKB_FRAGS, io_sg_from_iter() may partially attach
-managed frags and return -EMSGSIZE. The rollback path call kfree_skb()
-to free an skb that carries SKBFL_MANAGED_FRAG_REFS but no uarg, so
-skb_release_data() falls through to ordinary frag unref.
+Calling hrtimer_start() on an already-active txtimer is unnecessary
+and expensive. Skip the restart if the timer is already active by
+adding an hrtimer_active() check before hrtimer_start().
 
-Pass the uarg into virtio_transport_alloc_skb() and bind it immediately
-before virtio_transport_fill_skb(). This keeps control or no-payload skbs
-untouched while ensuring success and rollback share one lifetime rule.
+This avoids redundant timer restarts under burst traffic and ensures
+NAPI is scheduled within tx_coal_timer microseconds of the first
+packet rather than having the window reset on every packet.
 
-Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-Signed-off-by: Lin Ma <malin89@huawei.com>
-Signed-off-by: Rongzhen Cui <cuirongzhen@huawei.com>
-Signed-off-by: Jingguo Tan <tanjingguo@huawei.com>
-Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+There is no race concern: hrtimer_start() is internally serialized and
+safe to call on an active timer. In the event of a race between
+hrtimer_active() and hrtimer_start(), the worst case is calling
+hrtimer_start() on an already-active timer, which is identical to the
+pre-patch behaviour. The meaning of tx_coal_timer is unchanged.
+
+Performance on Cyclone V with dwmac-socfpga (iperf3 -u -b 0 -l 64):
+  Before: ~45200 pps
+  After:  ~52300 pps (~15% improvement)
+
+Additionally, ~10% improvement in UDP throughput observed on Agilex5,
+with hrtimer CPU usage reduced from ~8% to ~0.6%.
+
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 ---
-v1->v2 changes:
-* add acked and review tags.
-* repost to avoid duplicated subject.
+Changes in v2:
+ - Expanded commit message to address race condition concern and clarify
+   tx_coal_timer semantics (Andrew Lunn)
+ - Added performance numbers to commit message (Andrew Lunn)
+ - Added Agilex5 performance data with hrtimer CPU usage improvement
+ - Added Tested-by and Reviewed-by from Maxime Chevallier
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions()
 
- net/vmw_vsock/virtio_transport_common.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index df3b418e0392..73f58925ff72 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -205,6 +205,7 @@ static u16 virtio_transport_get_type(struct sock *sk)
- static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
- 						  size_t payload_len,
- 						  bool zcopy,
-+						  struct ubuf_info *uarg,
- 						  u32 src_cid,
- 						  u32 src_port,
- 						  u32 dst_cid,
-@@ -245,6 +246,11 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
- 	if (info->msg && payload_len > 0) {
- 		int err;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 3591755ea30b..35da51c26248 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3341,12 +3341,14 @@ static void stmmac_tx_timer_arm(struct stmmac_priv *priv, u32 queue)
+ 	 * Try to cancel any timer if napi is scheduled, timer will be armed
+ 	 * again in the next scheduled napi.
+ 	 */
+-	if (unlikely(!napi_is_scheduled(napi)))
+-		hrtimer_start(&tx_q->txtimer,
+-			      STMMAC_COAL_TIMER(tx_coal_timer),
+-			      HRTIMER_MODE_REL);
+-	else
++	if (unlikely(!napi_is_scheduled(napi))) {
++		if (unlikely(!(hrtimer_active(&tx_q->txtimer))))
++			hrtimer_start(&tx_q->txtimer,
++				      STMMAC_COAL_TIMER(tx_coal_timer),
++				      HRTIMER_MODE_REL);
++	} else {
+ 		hrtimer_try_to_cancel(&tx_q->txtimer);
++	}
+ }
  
-+		/* Bind the zerocopy lifetime before filling frags so error rollback
-+		 * frees managed fixed-buffer pages through the uarg-aware path.
-+		 */
-+		skb_zcopy_set(skb, uarg, NULL);
-+
- 		err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
- 		if (err)
- 			goto out;
-@@ -364,6 +370,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 		skb_len = min(max_skb_len, rest_len);
- 
- 		skb = virtio_transport_alloc_skb(info, skb_len, can_zcopy,
-+						 uarg,
- 						 src_cid, src_port,
- 						 dst_cid, dst_port);
- 		if (!skb) {
-@@ -371,8 +378,6 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 			break;
- 		}
- 
--		skb_zcopy_set(skb, uarg, NULL);
--
- 		virtio_transport_inc_tx_pkt(vvs, skb);
- 
- 		ret = t_ops->send_pkt(skb, info->net);
-@@ -1183,7 +1188,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
- 	if (!t)
- 		return -ENOTCONN;
- 
--	reply = virtio_transport_alloc_skb(&info, 0, false,
-+	reply = virtio_transport_alloc_skb(&info, 0, false, NULL,
- 					   le64_to_cpu(hdr->dst_cid),
- 					   le32_to_cpu(hdr->dst_port),
- 					   le64_to_cpu(hdr->src_cid),
+ /**
 -- 
-2.53.0
+2.43.7
+
 
