@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-292188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOOJAmmuFmojogcAu9opvQ
-	(envelope-from <netdev+bounces-292188-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:17 +0200
+	id +OaqFoauFmokogcAu9opvQ
+	(envelope-from <netdev+bounces-292197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349175E13ED
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:16 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 570455E140E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDA4D3029253
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 84FFA300BC97
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3BC3DFC6A;
-	Wed, 27 May 2026 08:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20273E0247;
+	Wed, 27 May 2026 08:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="h/SkTlcn"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="LQrbnJvF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4745F3C81A3
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9473B3E0231
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871333; cv=none; b=oHrNbbfREK+uwPFclMh3Q5f5G9lgybjcYezqK2F3r+1UaUaakPDUKvvPqQItkRb+TcwT6URB3Nl728cH0PcOCvLhj6o1FB70O5Dh5/aztVfNdrs/ducqSwvBztGHpeCIujXx0Qx+FUEEEhkMYt3c31R6NkhtgoaXIeZ6MvdMB20=
+	t=1779871348; cv=none; b=jxb9gMYas7/5OkiAY/Egw1kE8ktC95Cw2+QnZERuFsOVujhNN2GguIrzGHC9EBFqVr56x41yWRFNbkGh7TsDJF+YCjEU+QFPQCF4xCv+A5SLNbqmAdkKBGcK9UyIszvxBAoJVHalaOS6X1cAphxyIX0is2eLZiWoMLcJXbQABlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871333; c=relaxed/simple;
-	bh=9dhDMfEROxTjZNrBlGNCsh+iKL0HiWJECPUSQMm8kf8=;
+	s=arc-20240116; t=1779871348; c=relaxed/simple;
+	bh=swfBozmA0alSSP1GENQwNFD/Y/TIQJPLpDao0KjY470=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bW/eAJ3n+c7ZIcBPoHQRkZphAWKpMI76VT4HLaBI0DaAISzIVxx8IA9spNY+ukMkc7VoUDtLoleUSfudRzDGNBz1Ub8sF2T1w3LiPGBROOCuXmCsx51CltcaJJ34RuDUFRsNFVaWMy9euRm6efWQvJ+xbBeD4wRCEupM5BFiiBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=h/SkTlcn; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=EFim9/osWG7hnTLHrjr3Rb40Q8MryHl5Af9nn952+bGwbwnOm38ZnjiLmJXJgKxO0IP2RXjF09nwzsDc41j/urk8UzC2twEkZ0QHPf099NgBPNNHU99cbMctkNm5Z6aLyBO2WngrInwIaUctH4VB/hRBHzBPsItbxuGd+RoFw8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=LQrbnJvF; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 18815205F0;
-	Wed, 27 May 2026 10:42:04 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 06C1A2074F;
+	Wed, 27 May 2026 10:42:14 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Nqx05LiqWKCK; Wed, 27 May 2026 10:42:03 +0200 (CEST)
+ with ESMTP id s3tmL5Knbl9l; Wed, 27 May 2026 10:42:13 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 53E6E20520;
-	Wed, 27 May 2026 10:42:03 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 53E6E20520
+	by mx1.secunet.com (Postfix) with ESMTPS id 761BD20758;
+	Wed, 27 May 2026 10:42:12 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 761BD20758
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1779871323;
-	bh=RY+ndBRW5bRN4I0j9i4rqRaM+kzkpQoVjhrjBLX+osE=;
+	s=202301; t=1779871332;
+	bh=sKIc5lD819+4Y7cRk1WZSWOTev1gabshzrGV/921qC4=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=h/SkTlcneBOdJ6pykKLTzEi30NB4HvDcTS1yQ9qMaV0oQf8KMU5jb1voBudCTaSIL
-	 Eu0sTp25VHvbJCdJfMg8/axeuHf6SNMCoGlagwBJb1Qu1VMErdUMHnHZtX6klrfUKo
-	 BqWLGNUrFnzjl/+qss9Rj1QmpWbF+Sr3pCOMe31G86kn0DJrou1aVg3PfO0VrMaYZU
-	 Cko6JFdbQRb2W3c03WpA2uzwCuwhQLihE+5kOYfiScd4+g+RUG7m4ud9lsKckF3/F3
-	 Mza5A2Dh+XTcKmn0UQ4ah7SnzTRqmIqKFnMaMOLcJ9ww5UuQlzgEdDcGKIOxPLB0wG
-	 TQ/SWFGOj5iUw==
+	b=LQrbnJvFWIgDspmkFdV0mTh3WMEG91fGq2koe/ly65pd0Lv4ASbjUoBs8VnIIvVrh
+	 bfdiQqbwC6HTmMWk4ZHpvF+UgYP4x7o0j9p6U/D56WFD3nJhDHou3f80Oeh901Dfql
+	 dbM6REubDKncxAGnZnyAohhrnYbK6v86Vqk0Mqt7RTH/VQr6tPKVcimi2H0oty5DyP
+	 emfYnpwyN9JMwAXYSLYM0YFqvcopoAnFqM/VJqepin0PLE++DeW2iZFyLlQMLWYg1Z
+	 rv1WDs3eZmVTSVmXbxeN9wq2LKKT2Qgqs6l+wQlancmJqFXi8t4jiIM6vRg54rxujf
+	 4NaErFwW+qnBw==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 27 May
- 2026 10:42:02 +0200
-Received: (nullmailer pid 3494009 invoked by uid 1000);
+ 2026 10:42:11 +0200
+Received: (nullmailer pid 3494012 invoked by uid 1000);
 	Wed, 27 May 2026 08:42:01 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 8/9] xfrm: move policy_bydst RCU sync from per-netns .exit to .pre_exit
-Date: Wed, 27 May 2026 10:41:26 +0200
-Message-ID: <20260527084148.3489759-9-steffen.klassert@secunet.com>
+Subject: [PATCH 9/9] xfrm: input: hold netns during deferred transport reinjection
+Date: Wed, 27 May 2026 10:41:27 +0200
+Message-ID: <20260527084148.3489759-10-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260527084148.3489759-1-steffen.klassert@secunet.com>
 References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
@@ -81,121 +81,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292188-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292197-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,secunet.com:email,secunet.com:mid,secunet.com:dkim];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.997];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 349175E13ED
+X-Rspamd-Queue-Id: 570455E140E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Usama Arif <usama.arif@linux.dev>
+From: Zhengchuan Liang <zcliangcn@gmail.com>
 
-The struct pernet_operations docstring in include/net/net_namespace.h
-explicitly warns against blocking RCU primitives in .exit handlers:
+Transport-mode reinjection stores a struct net pointer in skb->cb and
+uses it later from xfrm_trans_reinject(). That pointer must stay valid
+until the deferred callback runs.
 
-    Exit methods using blocking RCU primitives, such as
-    synchronize_rcu(), should be implemented via exit_batch.
-    [...]
-    Please, avoid synchronize_rcu() at all, where it's possible.
+Take a netns reference when queueing deferred reinjection work and drop
+it after the callback completes. Use maybe_get_net() so the queueing
+path does not revive a namespace that is already being torn down.
 
-    Note that a combination of pre_exit() and exit() can
-    be used, since a synchronize_rcu() is guaranteed between
-    the calls.
+This keeps the existing workqueue design and fixes the netns lifetime
+handling in one place for all users of xfrm_trans_queue_net().
 
-xfrm_policy_fini() violates this: it calls synchronize_rcu() before
-freeing the policy_bydst hash tables (so no RCU reader is mid-
-traversal at free time), but runs from xfrm_net_ops.exit -- once per
-namespace -- so a cleanup_net() of N namespaces pays N full RCU
-grace periods serially.
-
-Use the documented pre_exit/exit split. Move the policy flush (and
-the workqueue drains it depends on) into a new .pre_exit handler;
-xfrm_policy_fini() then runs in .exit and frees the hash tables
-after the synchronize_rcu_expedited() that cleanup_net() guarantees
-between the two phases. Providing O(1) RCU grace periods per batch
-instead of O(N).
-
-Observed on Linux 6.18 with a workload doing unshare(CLONE_NEWNET)
-at ~13/sec sustained: cleanup_net() and the netns_wq rescuer kthread
-both stuck in xfrm_policy_fini()'s synchronize_rcu(), >300k struct
-net accumulated in the cleanup queue, Percpu in /proc/meminfo climbed
-to 130+ GB on 256-CPU hosts, and memcg OOMs followed. setup_net and
-__put_net counts were balanced, ruling out a refcount leak.
-
-Fixes: 069daad4f2ae ("xfrm: Wait for RCU readers during policy netns exit")
-Signed-off-by: Usama Arif <usama.arif@linux.dev>
+Fixes: 7b3801927e52 ("xfrm: introduce xfrm_trans_queue_net")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
+Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
+Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Assisted-by: Codex:gpt-5.4
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_policy.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ net/xfrm/xfrm_input.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 59968dcbafe1..dd09d2063da2 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4276,21 +4276,21 @@ static int __net_init xfrm_policy_init(struct net *net)
- 	return -ENOMEM;
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index f65291eba1f6..e4c2cd24936d 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -797,9 +797,12 @@ static void xfrm_trans_reinject(struct work_struct *work)
+ 	spin_unlock_bh(&trans->queue_lock);
+ 
+ 	local_bh_disable();
+-	while ((skb = __skb_dequeue(&queue)))
+-		XFRM_TRANS_SKB_CB(skb)->finish(XFRM_TRANS_SKB_CB(skb)->net,
+-					       NULL, skb);
++	while ((skb = __skb_dequeue(&queue))) {
++		struct net *net = XFRM_TRANS_SKB_CB(skb)->net;
++
++		XFRM_TRANS_SKB_CB(skb)->finish(net, NULL, skb);
++		put_net(net);
++	}
+ 	local_bh_enable();
  }
  
--static void xfrm_policy_fini(struct net *net)
-+static void __net_exit xfrm_net_pre_exit(struct net *net)
+@@ -808,6 +811,7 @@ int xfrm_trans_queue_net(struct net *net, struct sk_buff *skb,
+ 				       struct sk_buff *))
  {
--	struct xfrm_pol_inexact_bin *b, *t;
--	unsigned int sz;
--	int dir;
--
- 	disable_work_sync(&net->xfrm.policy_hthresh.work);
--
- 	flush_work(&net->xfrm.policy_hash_work);
- #ifdef CONFIG_XFRM_SUB_POLICY
- 	xfrm_policy_flush(net, XFRM_POLICY_TYPE_SUB, false);
- #endif
- 	xfrm_policy_flush(net, XFRM_POLICY_TYPE_MAIN, false);
-+}
+ 	struct xfrm_trans_tasklet *trans;
++	struct net *hold_net;
  
--	synchronize_rcu();
-+static void xfrm_policy_fini(struct net *net)
-+{
-+	struct xfrm_pol_inexact_bin *b, *t;
-+	unsigned int sz;
-+	int dir;
+ 	trans = this_cpu_ptr(&xfrm_trans_tasklet);
  
- 	WARN_ON(!list_empty(&net->xfrm.policy_all));
+@@ -816,8 +820,12 @@ int xfrm_trans_queue_net(struct net *net, struct sk_buff *skb,
  
-@@ -4368,6 +4368,7 @@ static void __net_exit xfrm_net_exit(struct net *net)
+ 	BUILD_BUG_ON(sizeof(struct xfrm_trans_cb) > sizeof(skb->cb));
  
- static struct pernet_operations __net_initdata xfrm_net_ops = {
- 	.init = xfrm_net_init,
-+	.pre_exit = xfrm_net_pre_exit,
- 	.exit = xfrm_net_exit,
- };
- 
++	hold_net = maybe_get_net(net);
++	if (!hold_net)
++		return -ENODEV;
++
+ 	XFRM_TRANS_SKB_CB(skb)->finish = finish;
+-	XFRM_TRANS_SKB_CB(skb)->net = net;
++	XFRM_TRANS_SKB_CB(skb)->net = hold_net;
+ 	spin_lock_bh(&trans->queue_lock);
+ 	__skb_queue_tail(&trans->queue, skb);
+ 	spin_unlock_bh(&trans->queue_lock);
 -- 
 2.43.0
 
