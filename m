@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-292193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292189-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IO8oIrSuFmokogcAu9opvQ
-	(envelope-from <netdev+bounces-292193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:43:32 +0200
+	id 4JDbOmiuFmpHoQcAu9opvQ
+	(envelope-from <netdev+bounces-292189-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2FCF5E1432
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:43:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 574965E13EE
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A2CC304EA00
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5BD4A300B3F1
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 165933E0236;
-	Wed, 27 May 2026 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC873E0099;
+	Wed, 27 May 2026 08:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="OvDiuJYL"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="kX1hJaLY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62C03E0C45
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501443CE4A8
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871338; cv=none; b=hhiBcYNnmd73QcZcva2PKmcm8tiSI4HdDxvYOxHtlBRZYWK5wWnQHbuWvA3sTFZL1eg/OJJstPhW1cbmitw434CT9WehHPHr4TkV7HdrVXgl0a93PFCR0XONpW32+PqdMfl4Y7Oms/bGS7qk5s1iiUjb0RKvlCr9tYeP/GDYnBY=
+	t=1779871334; cv=none; b=U8xyeahMt9tUphCHcD7iBfXREi8R5F/LCCM+NiKwtA+reSOoeU+UlGYJEXSQL0fbrvHDFq1hdyr5dSEMPfRdTc8oR3zsSt3I7voN4v1VkhlT/mViXUiCu1v13qQCFUulKw4V2D1CVNfhR5uXr9ulH1ktTgOPKey1LXyorbncrLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871338; c=relaxed/simple;
-	bh=1BH9ex9syB2HdC+b4bdVGobcKsiHCXlnvvtpXdswW/E=;
+	s=arc-20240116; t=1779871334; c=relaxed/simple;
+	bh=Tn9Vh6lk4TPwk2plIigFtlOBhE/inXrsEOxnBBemws0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gefSVJsj70GJAFl9/6cepRpiwONqVE7SBnw+20idH2HcJYwKTDjPZLJKfWmHtRCY+pVsCTkJBGNCz40xRVjc428da9ou1RKGWNL8ta39z5QhIXJPP0Jk8Kbx5OG4VWeGYbAkBRVG5yzle9yFaOzewzAQqpfvJwwlNVnl3arnnnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=OvDiuJYL; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=Xmgb0o3CPJU1xkfNlLHH2XsjcgD0iSzNcICfz8oi14mqZ98AhRoXGgJh2n3xONv7iqCq5dqbSNblqB4pa8ToS78XURBo6n0uELEojAicLSVcXvdOa+rc6rcswWMElAM2dqQXbRQFNTv5yMTDxeknbC5Gu9nqwuw13Xsw3t9wtPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=kX1hJaLY; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 283A620748;
-	Wed, 27 May 2026 10:42:08 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 80BA020743;
+	Wed, 27 May 2026 10:42:05 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CpsW8LRZRySw; Wed, 27 May 2026 10:42:07 +0200 (CEST)
+ with ESMTP id V8FspgDEtfJq; Wed, 27 May 2026 10:42:04 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 6FFBB2069C;
-	Wed, 27 May 2026 10:42:07 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 6FFBB2069C
+	by mx1.secunet.com (Postfix) with ESMTPS id 9D3C020520;
+	Wed, 27 May 2026 10:42:04 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 9D3C020520
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1779871327;
-	bh=d3QjTWQjHLogrIkLjBpLCGpaIgakelfnr3OmxyNNkCU=;
+	s=202301; t=1779871324;
+	bh=KB0th1dYDKJrFsi5EBh10y198H1Hzqb/INYAyGXviaQ=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=OvDiuJYLYhUe4/hyTw3iRss6LYWdqv8bEtrTLdmtkfxaQPxN91s3nVbNckFY6eNUf
-	 9REt6A8CLcmX6X6QHjVjUlQorb9mVmo7hQLN0LRex9DFjcdVpW47XLeajP1ppfWR+C
-	 nwMiEOL/0EboWbo+0C9wlRSTwnv6OKJRKJEx9WqFchIxIGkKQi1L/V4VY0zu+2p3N3
-	 1/xhonh02exnVqndUHYPveCNI6wQaAb6tMv6OV+yCLgbBj7dXHMgejdfkW769VJPhG
-	 3uW8Sv3+zOpC7nJJLWqzz4mFpOSxBgfQ3MM2N9s5EsZFrzGAh+1nV6DPqHmJTZc45W
-	 OlSoKqHJZ/VqA==
+	b=kX1hJaLY+Wl0FCZCI6mdBT9TJymyGiK2X/LEreCzWURTw7ahsjPuKvAMj05yTekh8
+	 JXrfMdqw9fP2SA9sda2L7KDXg/2zNg0X+60muNGcXH9kfybUZ+fnpqokn7U0CrCAdA
+	 nO50nZ2MObn86zEkjh7hKU5OE7bhdFd9JiebpAh9y8gEMQjCi1jzaQFB1IAnvDJG22
+	 yoqs1IIIUnOSWNsMBHtfmuVILraEq4tlsogSbfu3nGeePqvzgeeejj8yM8oZbo40NK
+	 7fpOhvarEzN+3JwZ+eCp4iOx9vwKn8+eGFlRzunttMo1b5cy/FkycaOpjzPP47vIYG
+	 mQkKgrwbuvRew==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 27 May
- 2026 10:42:06 +0200
-Received: (nullmailer pid 3493997 invoked by uid 1000);
+ 2026 10:42:04 +0200
+Received: (nullmailer pid 3494000 invoked by uid 1000);
 	Wed, 27 May 2026 08:42:01 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 4/9] xfrm: ah: use skb_to_full_sk in async output callbacks
-Date: Wed, 27 May 2026 10:41:22 +0200
-Message-ID: <20260527084148.3489759-5-steffen.klassert@secunet.com>
+Subject: [PATCH 5/9] esp: fix page frag reference leak on skb_to_sgvec failure
+Date: Wed, 27 May 2026 10:41:23 +0200
+Message-ID: <20260527084148.3489759-6-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260527084148.3489759-1-steffen.klassert@secunet.com>
 References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
@@ -81,121 +81,180 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292193-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292189-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,secunet.com:email,secunet.com:mid,secunet.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.998];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: D2FCF5E1432
+X-Rspamd-Queue-Id: 574965E13EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Michael Bommarito <michael.bommarito@gmail.com>
+From: e521588 <alessandro.schino@sbb.ch>
 
-When AH output is offloaded to an asynchronous crypto provider
-(hardware accelerators such as AMD CCP, or a forced-async software
-shim used for testing), the digest completion fires
-ah_output_done() / ah6_output_done() on a workqueue.  The egress
-skb at that point may have been originated by a TCP listener
-sending a SYN-ACK, which sets skb->sk to a request_sock via
-skb_set_owner_edemux(); it may also have been originated by an
-inet_timewait_sock retransmit.  Neither is a full struct sock, and
-passing the raw skb->sk to xfrm_output_resume() then forwards a
-non-full socket through the rest of the xfrm output chain.
+In esp_output_tail(), when esp->inplace is false, the old skb page frags
+are replaced with a new page from the xfrm page_frag cache. The source
+scatterlist (sg) is built from the old frags before the replacement, and
+esp_ssg_unref() is responsible for releasing the old page references
+after the crypto operation completes.
 
-xfrm_output_resume() and its downstream consumers expect a full
-sk where they dereference at all.  The natural egress path
-through ah_output_done() does not crash today because the
-consumers that read past sock_common are either gated by
-sk_fullsock() or short-circuit on flags that are clear on a fresh
-request_sock; an exhaustive walk of the 50 most plausible
-consumers under sch_fq, dev_queue_xmit, netfilter, tc-egress and
-cgroup-egress BPF found no current unguarded deref.  The bug is
-still a real type confusion that future consumer changes could
-turn into a memory-corruption primitive.
+However, if the second skb_to_sgvec() call (which builds the destination
+scatterlist from the new page) fails, the code jumps to error_free which
+only calls kfree(tmp). The old page frag references captured in the
+source scatterlist are never released:
 
-This is the same bug class fixed for ESP in commit 1620c88887b1
-("xfrm: Fix the usage of skb->sk").  Apply the analogous fix to
-AH: convert skb->sk to a full socket pointer (or NULL) via
-skb_to_full_sk() before handing it to xfrm_output_resume().
+  1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+  2. nr_frags is set to 1 and frag[0] is replaced with the new page
+  3. Second skb_to_sgvec() fails -> goto error_free
+  4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
+  5. kfree_skb() only releases frag[0] (the new page), not the old ones
 
-The same async AH callbacks were touched recently for an
-independent ESN-related ICV layout bug in commit ec54093e6a8f
-("xfrm: ah: account for ESN high bits in async callbacks"); the
-sk type-confusion addressed here is orthogonal.  This patch is
-part of an ongoing audit of the AH callback paths; an ah_output
-ihl-validation hardening series is also currently under review on
-netdev.
+Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+unconditionally unrefs the source scatterlist frags without checking
+req->src and req->dst, since those fields are not yet initialized by
+aead_request_set_crypt() at the point of the error. Existing callers
+pass false to preserve the original behavior.
 
-Reproduced under UML + KASAN + lockdep with a forced-async
-hmac(sha1) shim that registers at priority 9999 and wraps the
-sync in-tree hmac-sha1-lib.  With the shim loaded, ah_output_done
-runs on every SYN-ACK egress through a transport-mode AH SA and
-skb->sk arrives as a request_sock (TCP_NEW_SYN_RECV); after this
-patch, xfrm_output_resume() receives the listener (the result of
-sk_to_full_sk()) and consumer derefs land on full-sock fields as
-intended.
+The same issue exists in both esp4 and esp6 as the code is identical.
 
-Fixes: 9ab1265d5231 ("xfrm: Use actual socket sk instead of skb socket for xfrm_output_resume")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+
+Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/ipv4/ah4.c | 2 +-
- net/ipv6/ah6.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ net/ipv4/esp4.c | 12 +++++++-----
+ net/ipv6/esp6.c | 12 +++++++-----
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
-index 4366cbac3f06..6fd642d2278d 100644
---- a/net/ipv4/ah4.c
-+++ b/net/ipv4/ah4.c
-@@ -143,7 +143,7 @@ static void ah_output_done(void *data, int err)
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 6a5febbdbee4..8314d7bddcb7 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -96,7 +96,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -113,7 +113,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ 	/* Unref skb_frag_pages in the src scatterlist if necessary.
+ 	 * Skip the first sg which comes from skb->data.
+ 	 */
+-	if (req->src != req->dst)
++	if (already_unref || req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+ 			skb_page_unref(page_to_netmem(sg_page(sg)),
+ 				       skb->pp_recycle);
+@@ -220,7 +220,7 @@ static void esp_output_done(void *data, int err)
  	}
  
- 	kfree(AH_SKB_CB(skb)->tmp);
--	xfrm_output_resume(skb->sk, skb, err);
-+	xfrm_output_resume(skb_to_full_sk(skb), skb, err);
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp, skb);
++	esp_ssg_unref(x, tmp, skb, false);
+ 	kfree(tmp);
+ 
+ 	if (xo && (xo->flags & XFRM_DEV_RESUME)) {
+@@ -569,8 +569,10 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 		err = skb_to_sgvec(skb, dsg,
+ 			           (unsigned char *)esph - skb->data,
+ 			           assoclen + ivlen + esp->clen + alen);
+-		if (unlikely(err < 0))
++		if (unlikely(err < 0)) {
++			esp_ssg_unref(x, tmp, skb, true);
+ 			goto error_free;
++		}
+ 	}
+ 
+ 	if ((x->props.flags & XFRM_STATE_ESN))
+@@ -602,7 +604,7 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp, skb);
++		esp_ssg_unref(x, tmp, skb, false);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 9c06c5a1419d..9d0c4957ac62 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -113,7 +113,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
  }
  
- static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
-diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
-index de1e68199a01..76f7a2de9108 100644
---- a/net/ipv6/ah6.c
-+++ b/net/ipv6/ah6.c
-@@ -337,7 +337,7 @@ static void ah6_output_done(void *data, int err)
- 	ah6_restore_hdrs(top_iph, iph_ext, extlen);
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -130,7 +130,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ 	/* Unref skb_frag_pages in the src scatterlist if necessary.
+ 	 * Skip the first sg which comes from skb->data.
+ 	 */
+-	if (req->src != req->dst)
++	if (already_unref || req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+ 			skb_page_unref(page_to_netmem(sg_page(sg)),
+ 				       skb->pp_recycle);
+@@ -254,7 +254,7 @@ static void esp_output_done(void *data, int err)
+ 	}
  
- 	kfree(AH_SKB_CB(skb)->tmp);
--	xfrm_output_resume(skb->sk, skb, err);
-+	xfrm_output_resume(skb_to_full_sk(skb), skb, err);
- }
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp, skb);
++	esp_ssg_unref(x, tmp, skb, false);
+ 	kfree(tmp);
  
- static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
+ 	esp_output_encap_csum(skb);
+@@ -600,8 +600,10 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 		err = skb_to_sgvec(skb, dsg,
+ 			           (unsigned char *)esph - skb->data,
+ 			           assoclen + ivlen + esp->clen + alen);
+-		if (unlikely(err < 0))
++		if (unlikely(err < 0)) {
++			esp_ssg_unref(x, tmp, skb, true);
+ 			goto error_free;
++		}
+ 	}
+ 
+ 	if ((x->props.flags & XFRM_STATE_ESN))
+@@ -634,7 +636,7 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp, skb);
++		esp_ssg_unref(x, tmp, skb, false);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
 -- 
 2.43.0
 
