@@ -1,248 +1,236 @@
-Return-Path: <netdev+bounces-292436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFCZELZHF2qS/QcAu9opvQ
-	(envelope-from <netdev+bounces-292436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 21:36:22 +0200
+	id 0IgbLEJKF2r0/wcAu9opvQ
+	(envelope-from <netdev+bounces-292437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 21:47:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B965E990F
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 21:36:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 489765E99E9
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 21:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1BF4307F4B2
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:35:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 013FE30210F9
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C355738AC9E;
-	Wed, 27 May 2026 19:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06E33B0AE9;
+	Wed, 27 May 2026 19:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CorZZmB2";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bqTYWp3K"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NFmxSNmY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785CD389DF0
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 19:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779910518; cv=pass; b=nS5+xtHvY+fi16wYCnTyp4pWSNg4kVFQeFWnDhw8XedEURo5DIZqTR3q5cd9bO0BUrXGCFgc6IkoD2B8bx/sdU5ltLLH2Uf8BOHPgZldPbyovxP1PtKDls4eYMGHDJEL2LWU+7Uz2ETPu9KLQ+nRlZon1dPeWCazqwtxN8rkvUU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779910518; c=relaxed/simple;
-	bh=UioVoqnLSFh+ScDWF0CUCSjlPvyH3Iqmx7+g1G8fJI8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gNBbU36/SwlSgDYWeAol8apSIiD2DMwi/VUBiZGac72rWkD/mSuN8J8Xqyof+OmaCeGZuRWyrM8KMZ2u+hJjuYYqu1bHh8icjkumtZsAUllezCBD9VhsC/CumulaL60l1BA17d7Ombnsz+TJwiEfMEmzTsvgKR0OzpgzVRRDAXk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CorZZmB2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bqTYWp3K; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779910503;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC8530CD82
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 19:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779911228; cv=none; b=aYhKNKKAfQ/iyKQ22BoGvGX0aU5/tdzHRvVdVKqR+DZxgGPv2pSI8POCcotjbBJeIOFsJVCne75LEXq5TZBR3yie5XBiA1p1WWUyvNg8uW9hr1fDbbP4D9jEI4I0Wx+OmwNZa53XespOdzX02bplFkXF4yhboSJgkimA6/yizN0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779911228; c=relaxed/simple;
+	bh=nN0W4IgzisQvg4h2urXlOh1tScjeO3jHY/naFP2zIJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W2moCu+7eH5NUGbl1NCyZ1hSRcZR68qCXRufYrIoKN7vDixoj3+ulojVkoflbTziWqO3rk67u8GGtS76smLD5ymE7pQXrrXhIBipxc9mm+ODziRBsEmrzUydX4Io2KGlpI63GwZXkHl/3AcTCRSStqXy+SXTa0K4wsj8VBHVBy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NFmxSNmY; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 27 May 2026 12:46:25 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779911223;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eOS9eTOdcJUhMB2b3uxTB3EnkotZkuo43wnh8DbWJcU=;
-	b=CorZZmB2cujnSNi6v8cyj2AL7Y2rwkwI2p3lF26sX9BxL1REBgEvgjNh+VNcfD/kilZBWv
-	62lE76e5+YTXZ1H5IXb3wiKe7NGN4xUcsMGvn3sxL51HhwLFp+B95r1W6oh8RCP0IwFGzo
-	hKTi25PKK0ZOx1egtLgkf+Tb33eZvto=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-228-AU3GhJ-JNn-GKP82NyZuZg-1; Wed, 27 May 2026 15:35:02 -0400
-X-MC-Unique: AU3GhJ-JNn-GKP82NyZuZg-1
-X-Mimecast-MFC-AGG-ID: AU3GhJ-JNn-GKP82NyZuZg_1779910501
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-bdad545342aso274687466b.0
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 12:35:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779910501; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XibxRlWGEs18WwhhqJbmwJbHYK9/4PNug5uCFGGJedPgYz8TwG1ED9wp/6GAE3bIJE
-         gJsNRylS5wJezZUXX6/kXRFf5pX7m1j5NN9wcDQKw1C2oJE/YnHmIsCWhOMeN8NsFcGP
-         lHAs7isOEj9P49u0bjpYYnNjrkgxAHizsop5j8XL4eAjNoggz+2xWizWdLQXjN0Zw7NS
-         GrCtoz4TvChvX13dbFtyzc3b7yDHlS1MEm1fLOGtyFl8ETNViWHpA8t3bkWDrfyU2OyW
-         oD6iLjh+4TFDECgGPIwR4PFAxTwlfNGj2wm9ksxMLWvMb0bmrGSdpKX2IlG+iyc9YAgS
-         E9wg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eOS9eTOdcJUhMB2b3uxTB3EnkotZkuo43wnh8DbWJcU=;
-        fh=ZYdmskVbz8XQjE/yZbllkM39RwYNySgYuzEttdpWtvI=;
-        b=TrESq986RyE3glWs+degs+21WJ/VAD3UZptguXJIMVkAMwb81glb2S6ALlFEqX0Yus
-         rn99lpDJpmvU5qD/V4GpTcPVQDXhfJac2D0Wy5cI0aoqwbKyEBbkVubVHFeVEX6gimCr
-         ndWh4yi5Qvgd4jRhj32t1S+LoFYGzeQpok4Qoe4mInaCOXu0fKUsKARn6rOzL3UPS4mf
-         mEutlWbDUSvdSj7n0iYAtc9+C23AtFsQa4zCRaBw+ZFG3G5STj4ML4+DHRQSK+eou1cT
-         te5OLwdk8y6fgZL2ka4YhTyu6m0RVVvmDaWD0CMDcr/Cok6S+arkqUsC0yn3LN1sTuzw
-         IUAQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779910501; x=1780515301; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eOS9eTOdcJUhMB2b3uxTB3EnkotZkuo43wnh8DbWJcU=;
-        b=bqTYWp3KAOexqkL04Tri5jSW4iRtM1E4wXLApk7oelTmWrqFpY5Iz2azwH/WYllRJr
-         m4ZT6HjWKwgpBCG49YPuKClSV8ndo3qWc7iR3SmwM8kj8qNRDmiYJPZpnBWy1vxjk7VL
-         ch2n2sKwKJHIQrUVQW8M86EibOFAOSCY21BCAwo17eMSCgzqL6YFirLZFPTXUjQSjDtR
-         yEGRQ4NwdxywKcG9clPkILRziqKXQ0OxtK/6LvtjNcqjYzV0UaPJ6v+2WUPo9qRYdFtL
-         tpIKYckwSy2sQ6byLceSET38pblP9RUpU88btF6nfeHHsdGjv8Hf7gIXhqt7+wXaEFmE
-         UOuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779910501; x=1780515301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eOS9eTOdcJUhMB2b3uxTB3EnkotZkuo43wnh8DbWJcU=;
-        b=pNbLnjWuErwlopyom9/eHSItKEQk0SxsGjlbLYf2VLMhPI9BsGrBf/1F6edso4jQjr
-         i/pYvj+etK3ay+KqIrSF2Jyc2upj1UkVjZ1Cwo3TV32k/a+uYWRqM83V3tHx4cG1q6+A
-         k53iue0q1iv34LMCX1G6TJElFlDiaOxTz243z7itV8fKkAQVA05P4FOgCq6cd0r5X3Sw
-         1UjU36WJ9B3ezMo3VgLBA4115AISc7UcKN7RBpVHiUhqQmq2J3yj+uTqQzxpQaJacViN
-         IZDnPrj+38NR8UCjwY/B+UL0aqBca9/h7V3WDjTGemZIcw4qEeIhrBIcEjDT10Krvi0W
-         V0Vw==
-X-Forwarded-Encrypted: i=1; AFNElJ875rgarsWQKlZKLFe4zsI5glmW8g/fvGVgJ4NLhGvbBySKgVDRdkM0InwWoQg7jbgz8Pj+P6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMuZO3rG3IdbsMc2cGtKMR7ywl9bCPCK7otP+z3DuKeeI4GCY+
-	OcGOkfS5U8HNt/hbARP+1skN2MjLXZlOB/cYR/F8Y+3rmIDHII9PbMA5fZBHOpPLl644EjTTK4c
-	+pAy7qtdbFg0/W9gwOK11dznGKM4pN7xp66miXMoQB5OldKnh45IeaPdZ1G9jpU9/B+H/hiknob
-	aG5UiG6qvpFLtY0ndsUkPfSTKxbFdRszi2
-X-Gm-Gg: Acq92OH+1n1fktaWiKvsPBVdCEede6oidk1H25/4tHcqjIhK2EmZcK04F5mokjVrkeE
-	7an/veYpR2FRfPZaeH6m/NAQRE8fY60xgAbk0PNmEg1fOsgjw4H+uYI9hYSFRWuZKCKAbU8+3Jl
-	/1zxSE5aJRN1AIgOQRt3DOFvVISBv59UnuExZzKSkwq+Lz0DPHC+VBdtyzkNyIlen6xax1jHBgm
-	U3z39z/ZNMt+TQBVgEb6+BoJnQX0StqoTjb05A6p/w3kuUEkwBSq69aEIjGKYL5jIHFSGNq4ftK
-	8zE6ywiLaursaKIx+0aJGiAH2wLe9Ea1ib8=
-X-Received: by 2002:a17:907:7848:b0:be2:d66:eb4d with SMTP id a640c23a62f3a-be20d66fad5mr604749066b.44.1779910500770;
-        Wed, 27 May 2026 12:35:00 -0700 (PDT)
-X-Received: by 2002:a17:907:7848:b0:be2:d66:eb4d with SMTP id
- a640c23a62f3a-be20d66fad5mr604747366b.44.1779910500315; Wed, 27 May 2026
- 12:35:00 -0700 (PDT)
+	bh=fLSQHjT20+LiCHPgqnD2jE1WT55KzpuEKobPVOEpYCE=;
+	b=NFmxSNmYeC2eTCyqjySAupnvzmOXB04IjJ6ChNPnF94nMG1v7vLPkZQkVX8mJDCvA8dG7p
+	77mIFMei8i5bIxXue9h99bLgGaxy0wFyo9qxvY0pa1Si6BbdvOCrJK0bA7NBqxLDSjcQL3
+	q54owQWsydjS9Fjl2LHOmGhS5kVHBGk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Tenzin Ukyab <ukyab@berkeley.edu>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 bpf-next 03/11] bpf: tcp: Support bpf_skb_load_bytes()
+ for BPF_SOCK_OPS_RCVQ_CB.
+Message-ID: <2026527192229.olv9.martin.lau@linux.dev>
+References: <20260523083001.2911931-1-kuniyu@google.com>
+ <20260523083001.2911931-4-kuniyu@google.com>
+ <202652620632.prOx.martin.lau@linux.dev>
+ <CAAVpQUA0UNhR8AWfd0WC-krYJeXb0ebNs-V4u9kgweyNw_XHtg@mail.gmail.com>
+ <2026526214538.Vhly.martin.lau@linux.dev>
+ <CAL+tcoCSU9KFZsV33LE2R89iUzb5b3Xm+h6QObs5GOuRYR3sMQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513172443.1128496-1-rrobaina@redhat.com> <20260518173507.2f2529c9@kernel.org>
- <CAHC9VhSs5MQ5sF6rLGVDj=jYJXnUM2omc5tG+7ELkCg9t7aPMw@mail.gmail.com>
-In-Reply-To: <CAHC9VhSs5MQ5sF6rLGVDj=jYJXnUM2omc5tG+7ELkCg9t7aPMw@mail.gmail.com>
-From: Ricardo Robaina <rrobaina@redhat.com>
-Date: Wed, 27 May 2026 16:34:48 -0300
-X-Gm-Features: AVHnY4Kc83ebKqVSHeiSfUT51upa2HdihkVQbYI9amS-pNOG_aGc7MyxSSH-1ZY
-Message-ID: <CAABTaaAO6_OB0EBpttCgo+pDjip8BbpX6CQa1-f+_Ywrgem0-g@mail.gmail.com>
-Subject: Re: [PATCH v2] netlink, audit: prevent false ENOBUFS on timeout expiry
-To: Paul Moore <paul@paul-moore.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, eparis@redhat.com, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, Steve Grubb <sgrubb@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoCSU9KFZsV33LE2R89iUzb5b3Xm+h6QObs5GOuRYR3sMQ@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-292437-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292436-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rrobaina@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,berkeley.edu,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,paul-moore.com:url,paul-moore.com:email]
-X-Rspamd-Queue-Id: B0B965E990F
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:email,linux.dev:mid,linux.dev:dkim,bpf_sock_ops.data:url]
+X-Rspamd-Queue-Id: 489765E99E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 5:54=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
->
-> On Mon, May 18, 2026 at 8:35=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> > On Wed, 13 May 2026 14:24:43 -0300 Ricardo Robaina wrote:
-> > > When auditd is bottlenecked (e.g., by slow disk I/O), kauditd blocks =
-on
-> > > the netlink socket.
+On Wed, May 27, 2026 at 12:01:11PM +0800, Jason Xing wrote:
+> On Wed, May 27, 2026 at 6:19 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
 > >
-> > Holding socket lock during slow IO sounds very wrong. One could say -
-> > that's abuse of the socket lock?
->
-> It's no different than any other kernel subsystem sending netlink
-> packets to userspace, although in some configurations the rate at
-> which audit sends netlink traffic is likely much higher than the
-> majority of netlink users.
->
-> Arguably, audit probably never should have used netlink, but that
-> decision happened a long time ago and there were other issues
-> complicating the decision.
->
-> > > If the wait timeout fully expires (timeo =3D=3D 0),
-> > > netlink mistakenly interprets the zeroed timeout as a non-blocking
-> > > request. It then triggers netlink_overrun that drops the event,
-> > > completely bypassing the audit subsystem's internal retry queue, and
-> > > falsely returns ENOBUFS to user-space, resulting in the following err=
-or:
+> > On Tue, May 26, 2026 at 02:21:56PM -0700, Kuniyuki Iwashima wrote:
+> > > On Tue, May 26, 2026 at 1:34 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+> > > >
+> > > > On Sat, May 23, 2026 at 08:29:32AM +0000, Kuniyuki Iwashima wrote:
+> > > > > When a TCP skb is queued to sk->sk_receive_queue, BPF SOCK_OPS
+> > > > > prog can be called with BPF_SOCK_OPS_RCVQ_CB.
+> > > > >
+> > > > > In this hook, we want to parse the RPC descriptor in the skb
+> > > > > and adjust sk->sk_rcvlowat based on the RPC frame size.
+> > > > >
+> > > > > However, we cannot access payload via bpf_sock_ops.data on
+> > > > > modern NICs with TCP header/data split on as the payload is
+> > > > > not placed in the linear area.
+> > > > >
+> > > > > Let's support bpf_skb_load_bytes() for BPF_SOCK_OPS_RCVQ_CB.
+> > > > >
+> > > > > Three notes:
+> > > > >
+> > > > >   1) bpf_sock_ops_kern.skb will be NULL when the BPF prog is
+> > > > >       invoked from recvmsg().
+> > > > >
+> > > > >   2) Access to bpf_sock_ops.data will be disabled by passing
+> > > > >       0 end_offset to bpf_skops_init_skb().
+> > > > >
+> > > > >   3) ____bpf_skb_load_bytes() is called directly instead of
+> > > > >      __bpf_skb_load_bytes() to allow compilers to inline it
+> > > > >      instead of generating a tail-call.
+> > > >
+> > > > Some observations below.
+> > > >
+> > > > >
+> > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > > > > ---
+> > > > > v2: Explain why using ____ version instead of __
+> > > > > ---
+> > > > >  net/core/filter.c | 34 ++++++++++++++++++++++++++++++++++
+> > > > >  1 file changed, 34 insertions(+)
+> > > > >
+> > > > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > > > index 4a50fe2cd863..fa8a7c7d86eb 100644
+> > > > > --- a/net/core/filter.c
+> > > > > +++ b/net/core/filter.c
+> > > > > @@ -7760,6 +7760,38 @@ static const struct bpf_func_proto bpf_sk_assign_proto = {
+> > > > >       .arg3_type      = ARG_ANYTHING,
+> > > > >  };
+> > > > >
+> > > > > +BPF_CALL_4(bpf_sock_ops_skb_load_bytes, struct bpf_sock_ops_kern *, bpf_sock,
+> > > > > +        u32, offset, void *, to, u32, len)
+> > > > > +{
+> > > > > +     int err;
+> > > > > +
+> > > > > +     if (bpf_sock->op != BPF_SOCK_OPS_RCVQ_CB) {
+> > > >
+> > > > bpf_dynptr_from_skb() and bpf_dynptr_slice() kfunc could also be considered.
+> > > > One less bpf_sock->op check in filter.c to maintain and could also avoid
+> > > > a data copy. There is a bpf_cast_to_kern_ctx() to get to a trusted
+> > > > skops_kern pointer but this will need changes in verifier.c to get to
+> > > > skops_kern->skb (e.g. in type_is_trusted_or_null) and this is the tradeoff.
 > > >
-> > >  auditd[]: Error receiving audit netlink packet (No buffer space avai=
-lable)
-> > >
-> > > Fix this by detecting when a blocking sender's timeout has expired
-> > > (timeo =3D=3D 0 && !nonblock) in netlink_unicast(). In this case, ins=
-tead
-> > > of retrying with timeo=3D0 (which would incorrectly trigger netlink_o=
-verrun
-> > > on the next iteration), safely free the skb and return -EAGAIN, allow=
-ing
-> > > the audit subsystem to gracefully enqueue the pending event into its
-> > > internal backlog.
+> > > Maybe a dumb question, but does it add extra cost (extra dynptr
+> > > function call?) if data overlaps two frags, or can dynptr handle it
+> > > seamlessly with a single bpf_dynptr_slice() ?
 > >
-> > The socket _is_ the queue, normally.
->
-> There is a joke in there about audit and "normal", but I'll leave that
-> as an exercise for the reader.  I will say that audit has a lot of
-> unique requirements regarding queue management and that dictates a lot
-> of the wacky stuff audit has to do with it's record queue; the
-> standard socket buffer functionality doesn't have everything, and I
-> wouldn't want to ask for it to be augmented in a way that satisfies
-> audit.
->
-> > Please explore fixing this in audit?
->
-> Ricardo, I was kinda hoping not to have to do this in audit, but I
-> think you can probably get away with just open-coding
-> netlink_unicast() in audit and then going from there ... we might want
-> to do some other things differently, but let's see what a basic patch
-> looks like before we spend a lot time redesigning it.
->
-> --
-> paul-moore.com
->
+> > Right, there is an extra bpf_dynptr_from_skb(). I don't think we have
+> > benchmarked it.
+> >
+> > If I read it correctly, unlike bpf_xdp_pointer, the skb_header_pointer
+> > will still copy even if the data is in one frag. It works well if the data
+> > is in the headlen and the worst case is to copy, which is the same as
+> > load_bytes.
+> >
+> > It is a readonly use case. Maybe the bpf prog can directly read the frag.
+> > Regardless, it is useful to have a kfunc/helper to read it.
+> >
+> > >
+> > > In our case, the data copy is ~16 bytes, so the cost will not be
+> > > a big problem I think.
+> > >
+> > >
+> > > >
+> > > > If this new rcvq callback is added to the 'bpf_tcp_ops' proposal [1],
+> > > > all this will go away. 'struct sk_buff *skb' can be directly passed to an
+> > > > ops of the 'bpf_tcp_ops'. Supporting '*skb' in a struct_ops has already
+> > > > been done in the bpf_qdisc.
+> > > >
+> > > > [1]: https://lore.kernel.org/bpf/20260519215841.2984970-11-martin.lau@linux.dev/
+> > >
+> > > Oh I missed the series, the struct_ops conversion looks nice !
+> > > Since this work isn't urgent, I can wait for your series if mine
+> > > churns it.
+> > >
+> > > Jason's series is adding a new op, and I guess this can be
+> > > integrated too ?
+> > > https://lore.kernel.org/bpf/20260521135244.40869-5-kerneljasonxing@gmail.com/
+> >
+> > imo, a new sock_ops cb should be added as an ops in struct_ops. For example,
+> > in patch 4 of that series, bpf_skops_rx_timestamping assigns u64 to 'u32
+> > args[4]', which is adding tech debt to the current sock_ops interface.
+> > For the timestamping case, it could be a separate ops for the
+> > 'struct sock' instead of 'struct tcp_sock' because it should
+> > at least work for both TCP and UDP.
+> 
+> Sorry, I don't get it. What is the tech debt in this? And
+> bpf_skops_rx_timestamping() only outputs the timestamps, which has
+> nothing to do with either 'sock' or 'tcp_sock'.
 
-Hi Paul,
+Did I say the tech debt is in bpf_skops_rx_timestamping?
+I said the tech debt of the bpf_sock_ops[_kern] interface.
+Besides always memzero the whole &sockops, the way that the bpf prog
+needs to get a u64 timestamp from u32 is not thrilling in 2026.
+args[4] is also not reliable when the earlier cgroup bpf prog
+writes to replylong. We had already hit some of these in our rx net
+timestamping discussion a few years ago. I suggest you go back
+and revisit.
 
-Thank you for your input here, I appreciate it.
+> 
+> Could you show me what to do next? Thanks in advance. It sounds like
+> the tx side of bpf timestamping should be adjusted accordingly?
 
-Before pursuing the open-coding approach, I wanted to let you know I have
-a v3 patch [1] ready that addresses the concerns raised before.
-It introduces NETLINK_UNICAST_TIMED as an explicit
-opt-in constant (value 2) rather than the broader heuristic in v2.
-
-Would you be open to reviewing this approach first? If you still prefer
-the open-coding route or if v3 gets pushed back, I'm happy to go that direc=
-tion.
-
-[1] https://lore.kernel.org/audit/20260527192150.949400-1-rrobaina@redhat.c=
-om/T/#u
-
-Best regards,
-Ricardo
-
+imo, the bpf_tcp_ops can land first. and then add net timestamping
+ops (existing tx and the new rx) in bpf_sock_ops.
 
