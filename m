@@ -1,62 +1,72 @@
-Return-Path: <netdev+bounces-292259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292260-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHwIDZ3dFmo9uQcAu9opvQ
-	(envelope-from <netdev+bounces-292259-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:03:41 +0200
+	id 0OBgJZTgFmo9uQcAu9opvQ
+	(envelope-from <netdev+bounces-292260-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:16:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D79065E3CB5
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:03:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F6D5E3FFD
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C599A30054D5
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:03:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11959300B631
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AF6275848;
-	Wed, 27 May 2026 12:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D5D2EBB99;
+	Wed, 27 May 2026 12:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTlbxlv2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Zh/CFXTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63F91AB6F1;
-	Wed, 27 May 2026 12:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A41E256C8B;
+	Wed, 27 May 2026 12:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779883418; cv=none; b=t3Ree9xTA1RvlUeIxhogUOrJT897i4ETL2nOOkSctYyl3BJeKlGCbFg3AIbXbMFaU++Zgu7SOgzX8ZJcgOoyAaErmbc0wXjhlR6b2PjzFOQb03mvBGCvN3R9r1K4gi6KDiFSdnxdoMEJa4+YLTYW0tcONONqkHMVws0/jgCeFnA=
+	t=1779883731; cv=none; b=SL5OU0BkkekLESw1SVZRkrMy7jJdWu7X1/bf2dnCGGpyNlWorWzWnXbB666pEG5+YjlrLCj2r+E8qLuVqbC9lM883xiCNm4UTie1S5/mJTVRWgOcss9uPINKfmipdecIrdnB2cX6/V84W6QkjDBuwMlxiVLZ9KEryk6hAM5I36A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779883418; c=relaxed/simple;
-	bh=a496n5sTC7BfmYWW6eYgn0TqTm9K39oP4g8vv+LxFjo=;
+	s=arc-20240116; t=1779883731; c=relaxed/simple;
+	bh=4zOX4y6Aruc8X+mmbvAQlp0KXASTGTcN5BBme+WiecY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KU5WP4IZS6fMHpdeIb7klAuYswl0BkvKKjjY5QYvUIdqXX5v8ki85i5OwiJNdpAVY4f8kw2Ll94e0MozFR7pZUnMI/bKsXuiY+Zdsswbi9Vz3+yvMlBFu5TbNpddo3hcdI6BuNFneilJ7V3sp58pbqfx8gGSx0eJIUmGMlrrb7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTlbxlv2; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C011F000E9;
-	Wed, 27 May 2026 12:03:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779883417;
-	bh=MgyJIuDX8DjcMC2ItkXGm+xZ0l0lqXTDmtritZLXgZ0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MTlbxlv2Ej5I5fbPMMBpHlV8MAjfxrRNflR69autOhX7r3iw+mMialUKnCM9+WQ0p
-	 pAQ5NVccVYPbD8en2OImYICzCvZ5OP6RuR9UObs5wfrfuIAAq/oaApKv6akPly1wSN
-	 NzrUhAd1bjbWc+nvIzmKuQcY3vhgHN5emDXKImSGQ9nsgDnTbtjS5+Exm/+wvqeVeM
-	 8/3nBfjpyNd9bqR7PNo5WCsfzbgCqVje7NgW+ixrGngucGUADZOe2GfUHDcD7HfUs5
-	 7ejvj8JGYFdL5BBdmbjhHhJyDDkog4QVTh85XB6eJo/+f3cdkcYdV/n7F6D6CzINin
-	 nL9y+E5uxg+hg==
-Date: Wed, 27 May 2026 13:03:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Amir Goldstein <amir73il@gmail.com>, Tim Bird <tim.bird@sony.com>,
-	Christian Brauner <brauner@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net/dns_resolver: consolidate namelen checks in
- dns_query
-Message-ID: <20260527120329.GL2256768@horms.kernel.org>
-References: <20260525095400.821912-3-thorsten.blum@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SP452vDz7E8P61IQMMe04ZVg9N5X311DKzHEK0RKPp6E1FT0oiNBY8GXEGKnYB7t5CCi5F/yDo6bQplhcLYhZ1IyJc5XC87z6txkOro1XZsGYUNGTJc0BF23XYGzWSQXS9V4CGKaZRXJzmLRJoI1fCGrQFJZAY5eI1+bFpPPf/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Zh/CFXTr; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2uOGS6PFx1PoazRF6TE6ggG0V1Hfkd9DJj63Ysfrd4o=; b=Zh/CFXTrP4ptmgn7+w8N70lZs3
+	tMC/5fsbxbn2wHOpNU1jVkLqf3ApHx2T2eiV2k/odiQmzSgWVLEejy2NnEYJBR7wSlzRKe9MNdWsb
+	Uz250CCe8+lcaFy+gYDl/SBQlQtRkxsG9gVYJhCzZMWPSzG1MZDgnm8bxM3Co9TERa5A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSD3m-004k5J-LQ; Wed, 27 May 2026 14:08:30 +0200
+Date: Wed, 27 May 2026 14:08:30 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
+ ethtool pause validation
+Message-ID: <81777bc8-b046-4c76-9f53-e33563b6ad62@lunn.ch>
+References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
+ <20260526172447.10ca4b9e@kernel.org>
+ <5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
+ <f9d0b5bf-e285-4694-8147-e7b59164da00@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,45 +75,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260525095400.821912-3-thorsten.blum@linux.dev>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <f9d0b5bf-e285-4694-8147-e7b59164da00@bootlin.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,sony.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-292259-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292260-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: D79065E3CB5
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: E5F6D5E3FFD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 25, 2026 at 11:54:01AM +0200, Thorsten Blum wrote:
-> Consolidate the namelen checks and return -EINVAL early if needed. Drop
-> the namelen == 0 check since it is covered by namelen < 3.
+> As for the kAPI testing, I agree that the end goal is to get driver
+> authors to get their flow control implementation right running this
+> suite.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> But I don't really see how we can validate kAPI itself, as we're down at
+> the ethnl level.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+All we can do is invoke the kAPI in different ways, and test we get
+the expected results. When it fails, it is down to the developer to
+figure out why, which layer. But they have a description of what the
+test is doing, and why? In most reviews, all i need to explain is the
+expected behaviour, and the second version is correct. So a test with
+explanation text should sort cut that process. I don't think we need
+any more.
 
+To some extent, we have an iterative process here. We have never done
+testing of this, we don't know exactly what we need. If we get
+feedback that a test is failing, but they cannot figure out why, we
+might need to help out, and then extend either the text, or add finer
+grain testing to narrow down the problem space. If we get a submission
+which passes all the tests but review turns up problems, we might want
+to ask the developers to extend the tests to catch the failure.
+
+    Andrew
 
