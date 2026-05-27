@@ -1,168 +1,249 @@
-Return-Path: <netdev+bounces-292415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id t+RaMHkqF2oJ7wcAu9opvQ
-	(envelope-from <netdev+bounces-292415-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:31:37 +0200
+	id wJ4CK7AqF2oJ7wcAu9opvQ
+	(envelope-from <netdev+bounces-292416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:32:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76AA25E8559
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:31:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE095E8562
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A81523021D0E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:31:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 21BC4301947C
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE82044BC9A;
-	Wed, 27 May 2026 17:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A5439B49F;
+	Wed, 27 May 2026 17:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ER4Tcxwk";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HB9ursVk"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1SBAOK7k";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DifxZ3a4";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Fy/zUNdl";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mH3+nsXe"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A040C33A6E0
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA10A30AD15
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779903084; cv=none; b=g1T6Vp8bGBhlkc+gQwB+CN6yRybudMMGyY07jEvptqrXiyITugb/G+njswkHsZqWVj3TIgcs+VgW/2sV04PeWBp0oHmUVL89SkjtozrQNH+MVqnpqb0bqpNgicNv+qhGU3lM7BiTFTpzQBVHGAX/6MmBQBuvjPTGtb/QhEJYE3I=
+	t=1779903150; cv=none; b=YuzmYOnr+AObjYPI5pTBl3qqo6ECo4ZZsKVe2twL8vYLV812Si5C+Ujq4Alq13VzPivzkyclbs3b1iN0QfxqeV7bFs74M4I9XEk/Pai2uerADluNJQqb1eGipYiwaP+i1dL61PwQrJSXrlSv4rFg+gInLfVPydUemhzUOXC5X0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779903084; c=relaxed/simple;
-	bh=2VeorrpPrHczu696XCdRJrT6dPA3QYLX9cgIPq74BRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h0uyfKMBk2yotFixrQ18VNx15hlevhgSAUocuIuuwoF28ykmEXCOQq/QiJD+lo40Mr5KvAM+D2zi04caMvYs+qw6URGiTCtv/ekJP5vZT5eQyh391knip3rofTvkkT/vOmkfYmQxb9RThmvRBZKEUd6dtXbZsgQAjA6A6NghwUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ER4Tcxwk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HB9ursVk; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id C31D91400046;
-	Wed, 27 May 2026 13:31:21 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Wed, 27 May 2026 13:31:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1779903081; x=
-	1779989481; bh=R5FD4RckKatd0N17KzDTKl7F8ePX1OOiptYZv8J7wU4=; b=E
-	R4Tcxwk7caJCvT6ZL7M5rIpXDnGSaScjHM5+GjLm83Rw6ol66wZigYZzb96Peb7L
-	nTwBRT0Xhl0myW+Lq/nMzJwYe5fu2PhIzXy++hvLkC2HvuXAbS3OcctCK9vKFbf+
-	iy57n8nOWntgjtzKkByAYBW2lTVneW2SfmXYAiqWKHddhBAeKgrJIsXJUIjDmFpk
-	4CuE+NP6GSOU2J5aDzuTv9ptmjWqpJyzbB4S9ncHySM+U7K1rmMa8Ll8ExSDx3ND
-	4REsorR0JysdUcA8v9gNs6XqiLJivuQ83d+/DJikiIou6zYnQMNt8crca7LS00NM
-	kYn1vTv3nBgZF/aLPiI7g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779903081; x=1779989481; bh=R5FD4RckKatd0N17KzDTKl7F8ePX1OOiptY
-	Zv8J7wU4=; b=HB9ursVk318CA9+aaIhu80xtDTy3xlSb3ZudcmO77hdDoOuEDKt
-	3/X1v1Jg+6nV2qgfXSuUBa4CoV0A/JqeQ6aiN9no8aAf7s7kONiqmRZAgnOEImTL
-	xjXY/zvFRG0xKc4yMYofaptqy5+Q9U/vVhT9g99dLQN4IOSkhV2nvGEhGvcEWIm1
-	U6VOSMvMqFnkiWZan1r/g5x0otFcewtHwkVNZQSikIiOjXhRDqbM1kin6gi85qi8
-	bELhl65g/YWgrSRnQ6S3peIeaXhqcN5YoELQ2pUvgXv7VHkURqbqJ+hWntLUfjVK
-	c5bwR49Zmu+5PJEXc5+B8qSPtl9BVkPBpTw==
-X-ME-Sender: <xms:aSoXan0AviJI1_yc7YYzfYOYtj2R2rkSVG76IKaj1K3_VEDrihtsZA>
-    <xme:aSoXakUJC7vV2-MhyS4dOLgRU2_t9LZ1GDUpeSDcDk533RGnqJQIomGk_hnEk6fvL
-    su3ylEwVDq-K7BnZMpzJM6fEkbgfC-sEH6YGe8VPfDNjHw3hl9hNeM>
-X-ME-Received: <xmr:aSoXahM08ebwEoxkHHTVhOrdAEHdzp6118PuE6Gz6iD0YMLqOo5Y2vHhpk5flyqFQJzvobMRV67V6-kXe9U9N14>
-X-ME-Proxy-Cause: dmFkZTEDZDUUIDQgd4rWMkRe17pf07B6uGR0EWgZ4AAdXAEHa9GXMOU3IBpK0yMEucV81T
-    TcnUNg5hXpY8ggzjVA0WS0VfdwEASuyWv7BcTDfQkuUCh0Kp2saF0IToCFYGjm/ZJ7bgS/
-    JhChU1ipeuxeBzJF0SncXP0J1spmHVTjS15VwZhix6JEDpWvELiuugrAu+sz6O931Skgfl
-    pRaS2JXayeI5F/fn/HCEXYbzIkx6PQFtFuBgDWbARP29WWsmBinePW0BQ3pfZ/cYDgb0st
-    9Rp9v9JlOln6wHcSjEY3M0/PNscT26fGXglYw9Cm5rZivaXe6saO84RjdjceF1LPtDX5MT
-    pHi700mzMRbaVw4l+rAIv93bes3eNXN2+4JCSJTUQzo3bg4zWjtdlFxe9gc5Lzeu6j27OU
-    2kB4/D9BdVbnlPh7/hix6Ss80SqH1H+Gt/FBbMhPMkN/M3L58UJzyN/HIquf8umgO4yrzq
-    oia3mCgx7SwdwUH1VqgmyncUXIoMnuRHtRyjrwXkBYmbBWDYOGpGdhBcnNlwVw5i1oNuWv
-    9W7h8MWR5SN6ppyXFLPPpNukLjqaoEbNXeBUzRiUzaBWXht5APFSD2mZKhBEBrpPXUnDab
-    ri6AzpLSz4CCPB1H2982r0YBtAUuBEiuYkG1/OO5wVrMi73u3E/nqWgVlVfg
-X-ME-Proxy: <xmx:aSoXav0Q5XvRULzS1YawR00NQ8KaJDujgRDeFF8Y2Z30Eqqu7OjT9w>
-    <xmx:aSoXatSk0myVll-5ZBlRlZkYqZaR1sVAg1J3AFXfXx51HPrPjtlU0Q>
-    <xmx:aSoXaikRaB6ltK5mLibW7HgwpNH46nhOvC1Wc4wRqNV-mu-JziLH5g>
-    <xmx:aSoXauNd15lmgYmzpgtn8fXEIIVnuaQ9uieinh3jXO9Ky0qjl9ZZ_A>
-    <xmx:aSoXaoVwE9HcRBagsZoohbYKqBK3oRsACjCUA_-grrbdFXcZN50vowcx>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 May 2026 13:31:20 -0400 (EDT)
-Date: Wed, 27 May 2026 19:31:19 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH net-next v11 4/6] tls: Factor tls_strp_msg_consume() from
- tls_strp_msg_done()
-Message-ID: <ahcqZ7rShtVcReAa@krikkit>
-References: <20260526-tls-read-sock-v11-0-244fe1dc4abd@oracle.com>
- <20260526-tls-read-sock-v11-4-244fe1dc4abd@oracle.com>
+	s=arc-20240116; t=1779903150; c=relaxed/simple;
+	bh=YNq7TjsCf8d/xyo0IQdfUzw6QQqc1A25a5WrXR2mqqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hb+Dia58m5TjTUltWVkNR1GcvqEEZjivjpg1TpZ37EWfR/GD/y1eUpOE/knvqxdWFJk1Li4k9bfh91v/bi/pzah34deKRsne2bINz691B4HsTotC917WGLYFRXbslKWJ0nGjLE/Zc4ch597NVjBwkdiOy5Bpj8Jep4sLjLzdpP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1SBAOK7k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DifxZ3a4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Fy/zUNdl; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mH3+nsXe; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 66A9C6ACD9;
+	Wed, 27 May 2026 17:32:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779903147; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
+	b=1SBAOK7k5G/dKvMqwMLmxLKAN/4AWLOiB6wweE3uAcRfWu2uKENHcxCe0iXRL49BJHCtiD
+	BSVNTrFz7YOId1tk7EvgeQDXMUBkXjAIKitc7y0YR8KRR4TyybgqFisLDIIjDnfBOfVIpL
+	jslwhoHKxQTxy9Vzga15PaD/D+iFhT8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779903147;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
+	b=DifxZ3a4nR4PBQaDIXAqU6wi7vYcyddkNIINHRynyUrZuzn+kO3a4MWhp+oD3Mn1q5o9/L
+	RNCc+jRHCi1JPuBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779903143; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
+	b=Fy/zUNdlkkLzrNMMmVc3XfQSB3CCQx9IhquQGrV31Rxcx/7iquK083SmGmfSStzfgv4EeC
+	FFKjCWz+/Z0XKuyWIq+J2qHLxaLHuTz1pdtrfDmQ910uUNjrMYcMZV/F/L2jHwh+2loCih
+	/wYrVWyFp+FyZQ/ghutFcIWAx+/eqr4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779903143;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
+	b=mH3+nsXeApTs4ZhlMqioy+cZG8MxuKR6XOrNQGZzfGW5kHhjD86crchHop6wpPISKSit97
+	eSI2smTh+TWnz3Bw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BDD665A93A;
+	Wed, 27 May 2026 17:32:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id g1omLKYqF2rhHgAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 27 May 2026 17:32:22 +0000
+Message-ID: <d733383f-534a-4e1a-9f46-8e2b1d07fb41@suse.de>
+Date: Wed, 27 May 2026 19:32:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260526-tls-read-sock-v11-4-244fe1dc4abd@oracle.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/8] net/handshake: Use spin_lock_bh for hn_lock
+To: Chuck Lever <cel@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>,
+ kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
+References: <20260525-handshake-file-pin-v3-0-66c616906ead@oracle.com>
+ <20260525-handshake-file-pin-v3-1-66c616906ead@oracle.com>
+ <41835be9-ef00-42c7-a5d3-258f092b59eb@suse.de>
+ <eb4de53b-f96c-4905-b67a-90790d5e4007@app.fastmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <eb4de53b-f96c-4905-b67a-90790d5e4007@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292415-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,redhat.com,vger.kernel.org,lists.linux.dev,oracle.com,suse.de,wdc.com];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-292416-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 76AA25E8559
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:email,suse.de:email,suse.de:mid,suse.de:dkim]
+X-Rspamd-Queue-Id: 1EE095E8562
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-05-26, 10:21:34 -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
+On 5/27/26 16:24, Chuck Lever wrote:
 > 
-> tls_strp_msg_done() conflates releasing the current record with
-> checking for the next one via tls_strp_check_rcv(). A subsequent
-> patch needs to release a record without immediately triggering
-> that check, so the release step is separated into
-> tls_strp_msg_consume(). tls_strp_msg_done() is preserved as a
-> wrapper for existing callers.
 > 
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  net/tls/tls.h      |  1 +
->  net/tls/tls_strp.c | 11 ++++++++++-
->  2 files changed, 11 insertions(+), 1 deletion(-)
+> On Wed, May 27, 2026, at 4:59 AM, Hannes Reinecke wrote:
+>> On 5/25/26 18:51, Chuck Lever wrote:
+>>> From: Chuck Lever <chuck.lever@oracle.com>
+>>>
+>>> nvmet_tcp_state_change(), a socket callback that runs in BH context,
+>>> can reach handshake_req_cancel() via nvmet_tcp_schedule_release_queue()
+>>> and tls_handshake_cancel().  handshake_req_cancel() acquires
+>>> hn->hn_lock with plain spin_lock().  If a process-context thread on
+>>> the same CPU holds hn->hn_lock when a softirq invokes the cancel path,
+>>> the lock attempt deadlocks.  This is the only caller that invokes
+>>> tls_handshake_cancel() from BH context; every other consumer calls it
+>>> from process context.
+>>>
+>>> Deferring the cancel to process context in the NVMe target is not
+>>> straightforward: nvmet_tcp_schedule_release_queue() must call
+>>> tls_handshake_cancel() atomically with its state transition to
+>>> DISCONNECTING.  If the cancel were deferred, the handshake completion
+>>> callback could fire in the window before the cancel runs, observe the
+>>> unexpected state, and return without dropping its kref on the queue.
+>>> Reworking that interlock is considerably more invasive than hardening
+>>> the handshake lock.  Convert all hn->hn_lock acquisitions from
+>>> spin_lock/spin_unlock to spin_lock_bh/spin_unlock_bh so the lock is
+>>> never taken with softirqs enabled.
+>>>
+>>> Fixes: 675b453e0241 ("nvmet-tcp: enable TLS handshake upcall")
+>>> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+>>> ---
+>>>    net/handshake/netlink.c |  4 ++--
+>>>    net/handshake/request.c | 14 +++++++-------
+>>>    net/handshake/tlshd.c   |  2 ++
+>>>    3 files changed, 11 insertions(+), 9 deletions(-)
+>>>
+>> ... and there is always the question whather we should be calling
+>> tls_handshake_cancel() in the first place.
+>> We already call 'tls_handshake_cancel()' from the handshake timeout
+>> handler, and this instance of 'tls_handshake_cancel()' is called
+>> from a socket callback (ie when the soecket is closed or something).
+>> I would have expected that the handshake code cleans up outstanding
+>> requests on socket close already; if so, we can delete the cancel
+>> here.
+> 
+> The handshake layer doesn't auto-cancel on socket close.
+> 
+> handshake_sk_destruct() fires when the sock refcount reaches
+> zero, but it only frees the handshake_req and removes it from
+> the hash table. It does not set HANDSHAKE_F_REQ_COMPLETED or
+> invoke the consumer's done callback. It assumes the request
+> was already completed or canceled before the socket reached
+> final destruction.
+> 
+> The timeout handler and the state-change path cover different
+> failure modes. The timeout fires when tlshd is slow or absent.
+> The state-change callback fires when the remote peer resets or
+> closes the connection while the handshake is still in
+> progress -- that can happen well before the timeout expires.
+> 
+> Without the cancel in nvmet_tcp_schedule_release_queue(), the
+> race plays out as follows: the state-change callback
+> transitions the queue to DISCONNECTING and drops its kref.
+> Then tlshd finishes and the handshake layer calls
+> nvmet_tcp_tls_handshake_done(). That callback sees the queue
+> is not in TLS_HANDSHAKE state, hits the WARN_ON, and returns
+> without dropping its own kref -- leaking the queue.
+> 
+> The cancel makes the teardown race-free: either cancel wins
+> and the completion callback never fires, or completion already
+> won and cancel returns false. Either way, exactly one side
+> drops the kref.
+> 
+> The SunRPC consumers (client and server) avoid this problem by
+> blocking a thread on wait_for_completion() during the
+> handshake. A socket state change wakes the waiter indirectly
+> through the completion callback, and the waiter handles
+> cleanup. nvme-tcp's handshake is fully asynchronous -- there
+> is no blocked thread to wake, so the state-change callback is
+> the only context that can cancel the handshake before queue
+> teardown begins.
+> 
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Thanks for the clarification. That's what I had (implicitely)
+assumed, so the tls_handshake_cancel() needs to stay.
 
+So you can add my:
+
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
+
+Cheers,
+
+Hannes
 -- 
-Sabrina
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
