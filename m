@@ -1,335 +1,205 @@
-Return-Path: <netdev+bounces-292446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292447-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CtJA85aF2oPBQgAu9opvQ
-	(envelope-from <netdev+bounces-292446-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 22:57:50 +0200
+	id moE1D9xZF2rgCAgAu9opvQ
+	(envelope-from <netdev+bounces-292447-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 22:53:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A9AB5EA482
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 22:57:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A845EA3C7
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 22:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B643F312791B
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:52:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0F778300FB1C
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C133B5F50;
-	Wed, 27 May 2026 20:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735DC3BA241;
+	Wed, 27 May 2026 20:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L1yYhSne"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="RNYOFR4v";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SYR/FQvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A7E3B19BB;
-	Wed, 27 May 2026 20:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779915131; cv=fail; b=UUrYKTZ5xtqKZNQWJw4qsN19zdLW7z93c975+MZ+JKDKHnejvuto9PT6wU0boy4p5xJNtTXNeMwIRF4GLcThbkzu8Tke5co0ll/6n56/hQpt59lX9Mjncln5NjZ3/xaDPyMJXMYP7xGUopMFrhsBtkNNjQ0UBme00A0s6K3bd08=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779915131; c=relaxed/simple;
-	bh=sWW5Yy7yby/Evbo+sBZfgJH74jerPPvCe004ivc9NMQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uRhZD9CStGZOlSF4ZdnpzOzE9gsN3hfeDmn8d0a77rh4vcxBJyLfFop9QaUgcAA3rjmGRvVJdwCnUhDgKcCYYdNFOJDRbpxBoGcR6eRkU7h8/Q2HF4jW2fziPMs6MgkEol/HDEOYWL2tfMo+O9RYoDzvr/Ug4GWfrBGOq+4ot1Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L1yYhSne; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779915130; x=1811451130;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sWW5Yy7yby/Evbo+sBZfgJH74jerPPvCe004ivc9NMQ=;
-  b=L1yYhSne7KjZU7Sns8PogXtZJH+0Kii4lTnRGeUpWWtZhGAw4qeXwkE0
-   +LgY8rH7yPANUrvbSQjaDuNCk/wqwgeToTfaaTYqAzv9xWtb0XiboHWjj
-   ypCMVvi1iDMwwStyNAY94LjHHBY6OWWiIqdQ5Gg2wq72vbPAEnERLVYD7
-   xCEDgARyBIo6pAGmARhsGKcFpWjfMvZuZZaw8wcK99DnllxNpQf0C41Uh
-   65/uUDShz/deYMuNBq0rOYJ348YEkrQuQG9wnKASqkC8UiYyd72Yk0pM1
-   j/UWHOasXPYNfPU+++ZSdVTM22ZfjWlNriWKTi5uljfSR+t83kyIfwegM
-   Q==;
-X-CSE-ConnectionGUID: qzO+r08mTG2I+OERUveE7A==
-X-CSE-MsgGUID: gqMgFfHWSYmn7k/8Imzsig==
-X-IronPort-AV: E=McAfee;i="6800,10657,11799"; a="80610069"
-X-IronPort-AV: E=Sophos;i="6.24,172,1774335600"; 
-   d="scan'208";a="80610069"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2026 13:52:09 -0700
-X-CSE-ConnectionGUID: M8KOiLJuRnCjwwX9z53bHw==
-X-CSE-MsgGUID: ixszWVkFRoyZtbMYDNyZMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,172,1774335600"; 
-   d="scan'208";a="247299567"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2026 13:52:09 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 27 May 2026 13:52:07 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 27 May 2026 13:52:07 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.40) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 27 May 2026 13:52:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SA2H5d8q6vd5uL+Xu1z5o6UKAnKdIJ+aMNSK1/8TU5DZGFQgMYwBFC4j/VXK79qZFY57gHgWlPVwqd+I4AV6oj/W7a+WJOLb/TAMSlGXDwcmMGhyKkfZORvxvuF6aIINp1CD2koAicaR9Vm1vI8kD7Wm5RCVudgFRTdBNhogdbOtimY1hxPJQEbRB2a/oCuAL87Vxbgk7yHWx302UhSZINFkB4CmB5VmaP6zs30RUl87VXu3JfP0crYYc3m16D4M2llSZYpeIMQ5XUuXFj/ppY88SNImUMiTTG5/xnChsrqGxyZEbhe/TkL8hf0qO4dq6rzVuE+zORKDBMdUw6WpFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nhWTrObAM1xou6YPwQqyVLwYNOpGNhWhTpUZ+6VP3iQ=;
- b=DzgVwaF+QNwTCjGow5XL0SF3V7g6G/sB0Nf6lUaWy+tizbuzwhIRHUrbOixRsHTILDIOe4R1JQX3KpvN+fANui0/yfhgmgNX0Wg+1gHQQkp/9kTAPBFEZpbtOqJxqm98/1pScHocPUd6QLBk4h92srDSHXwKwam/P6ODmq7eC8tV5UBPnCdg3xE5YJqnATxp5eY7arGsp6HA4stgo5hxT/oK7XnxwCDEwD+b6WxyeMpAMiNd+mWLkaqKEN1joi+B1sdQ8OZAzE1C3fb4M9FyZ/SRjm9lYJZUK27QeIiSX6JORBOkh0O29V5lnzepQoN6LC5dgVrw8Xgqrcol0DMZOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
- by SA2PR11MB5179.namprd11.prod.outlook.com (2603:10b6:806:112::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.13; Wed, 27 May
- 2026 20:52:04 +0000
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58%5]) with mapi id 15.21.0071.011; Wed, 27 May 2026
- 20:52:04 +0000
-Message-ID: <34d7edf8-1713-455f-ab24-b66f7355e1c7@intel.com>
-Date: Wed, 27 May 2026 13:52:02 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] net: tg3: guard napi_disable and
- pci_disable_device calls
-To: Yury Murashka <yurypm@arista.com>, <pavan.chebbi@broadcom.com>,
-	<mchan@broadcom.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20260527115535.1686932-1-yurypm@arista.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20260527115535.1686932-1-yurypm@arista.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0224.namprd03.prod.outlook.com
- (2603:10b6:303:b9::19) To DS0PR11MB7381.namprd11.prod.outlook.com
- (2603:10b6:8:134::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24BD313520;
+	Wed, 27 May 2026 20:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779915220; cv=none; b=LBbLmP851AbhKwSIyFRhDy0cst41VU975YUOqAKUqBc9lA5samH5KawKEjwWaYqNgsFVHDU+I00HuKJfBHUDdVoBEc90hDXkDeA2dimdwI860izm8PF1i9ONFfB/vS0sEiJuVE9ppbSI68/cEEGSr/3hegdnaijLtCyeG6SsP8M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779915220; c=relaxed/simple;
+	bh=4YfWInZ9CLb2AOWifcQm5snj/1dxglE9jo08vZEeOVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fYVnDN2MmYURVCbiheNB0bjaUaZih8Ltu3kzjIMdTKhbhc3WHkEeqbk1WGcqwB59+1GSlSLFwsRFiR7L70l2ER3s0sDW3X+rLNr7+vcHedYWP/zqLTM9eBN3aT0kARQvC0tOufE6C/zcGyE62dciUR3FzUHKVo2F7MJri1tvmBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=RNYOFR4v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SYR/FQvF; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id A26A0EC0077;
+	Wed, 27 May 2026 16:53:35 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Wed, 27 May 2026 16:53:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1779915215;
+	 x=1780001615; bh=TzsAIWJKWxLMYgzdxaWg1KgQLd4L0BjlB8TYvo0b3Wo=; b=
+	RNYOFR4v5bWL/PM5DIyXR4qJ7Z6D92QH4Cy3LppgJ2E10MJO0PuwTaB/1ZS4mPXs
+	HCy0NsxoHbYMZFe3VwIxnIk7UalNGjMCyXkVRadKJ/QJRllBlcvLK0US9bDnRRwH
+	6klEt3FAKvTL2P4spELYW/PugDCje8LL0Ak2B8lpWgrlMieFy0qqty5mthOK6YVr
+	Rhf9Iewhj29R21KaCbpTOdDzjPQiJ0CmO+Rk7JOctajA/BmSBddG/tAdkJT5GGtW
+	zBuDNHNOx3392bRIFbVn1Ult5hkbN35Ha4jR+7jPRHGfTjrPROxBLy/cGuNVSNd3
+	ViIUKxEjTTS2UcxD0OILWQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779915215; x=
+	1780001615; bh=TzsAIWJKWxLMYgzdxaWg1KgQLd4L0BjlB8TYvo0b3Wo=; b=S
+	YR/FQvFC4ejpPKA5OBsG13goMswKVWLYt6j6dBBPa74VeBdvIyoCVVHp1jCXiqIU
+	07UC5auhDx18L36o7Zewh5c80pfPFKlgetlVnNkUbmTCcPGme4t6P2IrLyA3FYl1
+	2nYaYTArJB2lHcUyoxswLCD9xVmvtAiYlF2pFMU6So7MkExYpS+C+rzrlorO0HIl
+	jBiU6PuyZz+kIvrGRvD213X+hEG3/+Rg7HED7lIYZvRy7Gjz8NdPcJ4wYfnRIUlS
+	fw2ts1qxs9BqHIwWUkgLiWw72+YfKObWsWa7EzK6/QVHc3wQUozvmjRXvnBdLVNX
+	seAoShWn6kLhUu2+63EhQ==
+X-ME-Sender: <xms:z1kXamIPytd-cXsTONJm-Aj97UNRY8erds7YIJI34uyND3oBSi-Z4g>
+    <xme:z1kXaltoxOt0GRjv_2UhRNeWXGOr9itEAPa_TWXD4vrODN9l-pRVdYFbvyClNSOc2
+    GPZWW5WX3-vmnTuTB94M_xbapRKUN0E3HboovE7EYH_6QzzUvDDZg>
+X-ME-Received: <xmr:z1kXamU78RBBOF3LItIWluXvjTR0m2VhE8TZFi-BcVnUEXTlyLXxbu9UCZA>
+X-ME-Proxy-Cause: dmFkZTF1K9viltT52o4ie7G6CQKxrNMh36y//trnUnjN2k5DDgIcr7l1e0mhd521pVUDS/
+    uUGjEBHMKe4uB8HMHx4OURBWT7vcgWNK/HbH2TS03Hxbg5FeReRt7to9/tAI+ydT7I1l89
+    uhh7qF0gDk2T40TaUxMNHZxuF+GSXmiNNkylKLwO+IpzgNQ4v74oMtPuQDE3B0Xiy58k/H
+    OdJyMun/gxHDWJd4SGLl8Pb+k54CNl+UmtkuZYH5bsrFwFICfdDCJITm++6BzDRZXY9DKa
+    O8KAQIwlIxQ9/B+BwQfavF8kkeajVFD2pGqmPEYauMUdU+iLblknNkg8eCzti1XGaihJVh
+    qVoc+YvwS0sBtLpk5V9sfF412d0n5bBVYaDlaUJ5lgZULolELwh4cY5u+BDy6Xjz92ZTQS
+    dKE81COvd/li6hW7NzXrkCXp91IpDu7+2BgrEgE3Zh8JU6ezDH5h+sMjmvg/x7QvHfxIne
+    lDFoJF/TIt1qrWIKqoxk5000z2TjniOuWIRbKYzld7HeHhtoTa7+acr6e0auCJQRsK+tnW
+    Tlu41x61PoLJ2LbQGxryv42A/1+Mnbsx6dlJNiQ5ZutWsX43E5IDzh+73DxHGwzuwVnJLu
+    qICs6bhUv4aZw/7QiJNSkhBaWYhcMLlgqC3xyqr3DgShx8Jfvzey4VBaL0zg
+X-ME-Proxy: <xmx:z1kXaoJn4vy4awOhNB-9NU295v8QIWTpScmh081UN1PvO8WAuPNszA>
+    <xmx:z1kXaj9mjlGWSi9WlnN52HuUcbRJ0U3AjtMA6XsHuhhdoMeuUEryYA>
+    <xmx:z1kXauNgGG1dViSVnY4M55iBNlOuBJ70jXTrL4WK4i9NlB3auC950Q>
+    <xmx:z1kXan1Orfv6sdp6Dbaq5FokGcKR6AgKbOBN6YPa_wJKAhs29pTzjw>
+    <xmx:z1kXag0SGdBPokUwULyB2T-XuxcA1UGmGMn0kcLsKDgBKz-bZMCPSAt_>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 May 2026 16:53:33 -0400 (EDT)
+Date: Wed, 27 May 2026 14:53:32 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Zhiping Zhang <zhipingz@meta.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, Christian Konig
+ <christian.koenig@amd.com>, Bjorn Helgaas <helgaas@kernel.org>,
+ <kvm@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, Keith Busch <kbusch@kernel.org>, Yochai
+ Cohen <yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ alex@shazbot.org
+Subject: Re: [PATCH v5 1/4] PCI/TPH: expose the enabled TPH requester type
+Message-ID: <20260527145332.30412ea4@shazbot.org>
+In-Reply-To: <20260526144401.1485788-2-zhipingz@meta.com>
+References: <20260526144401.1485788-1-zhipingz@meta.com>
+	<20260526144401.1485788-2-zhipingz@meta.com>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|SA2PR11MB5179:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d740e92-c640-49a2-6392-08debc31cee0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|11063799006|18002099003|22082099003|56012099006;
-X-Microsoft-Antispam-Message-Info: cwu0F40NNxYlpUO2JA7Ejjn4vH74PEkY8URgunztM8434Og50HP2Xryin9YoJd7kB/75Z6Aub+1tr9tdo3ERjjjIZ+sKVy599szarFCQE3IS1lO8ugkvXMTZuZNZHgBHXkHucdocmGZ8CgjcQ6yNUbOrjRSvEKudPxSbZUnseRdC0PKrUuwURtZiXh7nhyH4PtsNcNiGwhGYj0+wVYXhI3oRA4aE3hyeeKfSc17XNIrlbp6gWOtPLrLn6c6qRcdkiGbe2pR8yV0RKgzbZAgl/71/g78Hj+zKSEUiXAsLbX28hS1Azf/oxoaYHl2iERVPWQnjOaXcvL20fKJRNUFI5ps3a58vUjO8y+amewJaK/55NOHsWtbmC4/Bbe+aut2WVxrU4ktmexzNpixBwyRLwPUFNVz2a9UgYcgbuh6RNPj4zn3AJYXsR4BwXh0HWxU88uQMl6EupyYtl0Va1jYsjnrK8tJcEkPxuCNDWLQ2oiTBj4v7tN5dovCqwjo+CERDw43XPzqzuRbQx5tdBKH1ACOhe0w62vcM7kXXRLhVEIJQW1yMKUJFUAJiklrnKdCX8Swfsq6dseyHNG4tQwlZVCLSPHk1VQaEqd8dsQaCGqYsrmr6Cy81ygl9tg8Hkuln9cXn4PoVcBqV2JHOhFbYyMe9U8bE4aqeCZZeuonR0SUoJrDXo72PPW5/zTiQ7Ymq
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(11063799006)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c3FuMStlTG5hV1RGQUQ4NFg1UW01dXRQaFYycGZOc2xCZ1hvUmxWQUFLdDdX?=
- =?utf-8?B?MEtoOU9GQ3A5WE54Szl0SFVJN01wblU5aDNhTmlhSGplR3picTlMSDVQYjQv?=
- =?utf-8?B?cVRrSkk3Z3BlWWJTN0o4U0dhOW5QL2JVSDAxYUdJM2ZWTzVzY3BDeGhmRWNr?=
- =?utf-8?B?eThJYXpBbnhsUkJCU3hUMzRFOWJ3WElZUHQwNzF5ZFNRMG1JcDJGNmU5VVNJ?=
- =?utf-8?B?RFF1ZjVaU252dkZZTllJNm9UQzljU0tPd0FPWUppTmpEMEtFYmVVcjFGTk1J?=
- =?utf-8?B?OUhRajZiWHRwREtLNmZuQW0veVQyUG9ITk94Uk40eVptNEc3UE9yZHpjRUNY?=
- =?utf-8?B?UkprUzFrVTZyL1QvRGw2QldTMG9GRFVrM2Y3MUFPUmp2em1KVGZRMXhmY0RE?=
- =?utf-8?B?ZFBac2wwYVZTc0I4dmx6YldJcnQ2Ty8rMGNNNXpXcjFCOEhreW1OY2hjcGhs?=
- =?utf-8?B?Yk9vVzFrRWhBaXg4bHVpeDk1aUJFNGE1UnJ4SGN6aUZmUUNDUE1TOEJOMXho?=
- =?utf-8?B?K2c5TVN0amRoYlF0ZlIyTmVnakwvMDlONkltTUlXTzA0WjZDMW9zaFpTYVFk?=
- =?utf-8?B?Tys3V242blJSZ1NWdEFqbDRiaUtzWGVOYnFyeGpyQWZIOWdrV1R0L0RtZExa?=
- =?utf-8?B?STQ4Mk9sK284ZkZkakFZZ3BMMmp0Q3g0bFBHSFNjcXg0MDlDTldMWHA2TzVr?=
- =?utf-8?B?VlhMeWxoaVRQb0kzNmVybkVDeHdxKy9ldU1rL0pEaXRkS0dSOFNoQWxZWjVG?=
- =?utf-8?B?SXkyV20waTM1WHgwSGJ0a3daVzJqWHNqekh1bEhnNzRLRytGYUxXU0lMTDJN?=
- =?utf-8?B?bHUvYmF3c3FqaDNCRW1sd1NlTlVmdEdHeDFFdzNQQ3lFL1E5UU5vMFlhRUJG?=
- =?utf-8?B?UDIvUUp3ZGdWV253VlplNDVrdElVZmI2S3BmL3NrL0ZqMVVMUVRkUGJuakZj?=
- =?utf-8?B?d2F1VzB3M3NoWmxDbzVIOU5FOTZmMndPelBvdllXYVdLdFRFelRaaldmWW85?=
- =?utf-8?B?Y0tJVjVFUG9RbWcvNmVoVXF2ai9aQnovdTVHa1Y5OXVoUExsYkFYVlpNb1k0?=
- =?utf-8?B?RHp3NXJyVEMzUjBEeXdzaUNFOWFhTlo2UC9tTG5PaXZ4bWh1VUg0VjJWZW9i?=
- =?utf-8?B?amtOVi9aZ3pJK3JmM0Era01SWFhOUGR6L0I3T2MzNS8ybkVLV1NldGkreHNY?=
- =?utf-8?B?QURuMnZQUG1aeUNNS1FLeVZDRnhPMUgwM2w3ZWhFazU2dzQzcW5nUm9IUVNP?=
- =?utf-8?B?UHFaeXIyN2lPeGRpOGlVTWJrNjQxWVNoOXZtajNBaDZyM0ZTYk1TNGtDYnpW?=
- =?utf-8?B?aWJxTDRkQVpta1VobnNBaHhiWk5OYjA0cEJmQlpFTGZPQ3JaMDM3RzV4dWxO?=
- =?utf-8?B?UFR3WTNhODVTZSs0MTlvak9GNHQrSlk2VUFSMVd4VVJkbllrcXRITFJKOXha?=
- =?utf-8?B?QTlEb0RSNDRTRXRvSFlraG9YSFRnVGxGaE9jMmtFRlZYN1djSnQ3WG5tQ2hp?=
- =?utf-8?B?TEdzOW1NWW5SeXhkMElsbkt3dnpIM3VHTXdlWGRhNEUzR1FSbCs0UGlyM29o?=
- =?utf-8?B?MHgyd0tQMHd2bTdHZENCWG9HYWZidml4SjY1RnNDVUNXdFluWHpUaS82T21W?=
- =?utf-8?B?QlRpOUtzMXBoVXZvZk1wT211WEY5eDVtR3lwRHZ4NWlDTXFVRk9kdjhTNzM1?=
- =?utf-8?B?ZjNXNTY3TGt0MkRkQkNCZ1hramN3UTdMT1haMElCM3FsL0YreHlSU0lsNmVo?=
- =?utf-8?B?OSsrZFI0SmZYNCthanA2Z1JsRklPaFBWYUZnbFdSSW9oQVZFL002emc0Tjl3?=
- =?utf-8?B?Zk9ubWVxYm9CSVFLL3JlakZlUVBMZWI5bk1BTDVJQUhNcnJpbjhBcWxVU3pD?=
- =?utf-8?B?RmVkSTI2TTlXaHRUak1Eai9pS20wV1BjVUo3dnRtWU9VYkd1alNzb0lYY2Er?=
- =?utf-8?B?d2N3V3QxQ0hPVHExVU43MGxJaUZjTVNDbTZUd1EyZ2cxUFRYVW5jY2FNTTMr?=
- =?utf-8?B?OS9zeFFkb3VvekZWMDFxRnR1MnordWRXTkFtYTcyNloxZ2s0cHlvUE5pM3N0?=
- =?utf-8?B?eVI1ZU0ybHIrUi91NmNYRW9WZEg5Y05BV29MekJPZTBmV1FyUXZ2TlVvSWov?=
- =?utf-8?B?Z1c5dWc4QlZCNU9ULzZJR2gwV1BOMVpFQjFMVVZoaUMwRUZCQis3UXh3Z25H?=
- =?utf-8?B?aUFaWnQwMU5UUk9DT2kwK2xKQW5wS0MvZHJqY3FVRmRZVkdkaW9uajhaM2ZP?=
- =?utf-8?B?YThHQmVIeE1IdW5PN3N2N2VZVTh4Yi9EeGVJTENZWXhNOWd3NWxVMVhmckNl?=
- =?utf-8?B?RzBldHJON29jQzNiUVhTUlFJMGxLdGw1TStlOXhsUDIzZUtlOWZzUT09?=
-X-Exchange-RoutingPolicyChecked: fnlfwCPDBNXsrLGexq+looFRvafIg3w2+BnTvKazk43gurmowEMLuLzQ97FXJnvZUl+6FUE5TjmAYKV9bORlRDbSTnbgxfPr4kaiA6VgmwU29jpQkTeSqgjHapSePNlJ8Ey3rwxoOdsENvOxIkqvu38tuT+/0KBydxYeHbwVz/6jjCSi4uoTtYSuHv3PzGdT7Qm/Zw5d6XLXsuAy/TTDxhvTpmu8xK7uNt9x5gbTgpBUBmxCuKG0unbp0H3IzGNIPxPZDW3cgkit6Hmzsd51Z/TvDW0ZJoJoH7+jO6qLtbQXb8rOpXajeoaMUJMDUtoxDJrX154LBUchsQgdtrIqjg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d740e92-c640-49a2-6392-08debc31cee0
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2026 20:52:04.4570
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Tq3u10rrqLAmZnKI5tNye15WToltdtZGFUJL73jRKwGZe/f9JMNkFeVmTWUyRbcvjfZwOAMIYvTZn+sBrhoGsklPR6fPnBMfdUkpqMesVm8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5179
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292446-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-292447-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 5A9AB5EA482
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,shazbot.org:mid,shazbot.org:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 26A845EA3C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/27/2026 4:55 AM, Yury Murashka wrote:
-> During PCIe hot-plug events, uncorrectable errors can be reported and
-> AER recovery for the tg3 device is initiated by the AER kernel driver.
-> The tg3_io_error_detected function is the AER error recovery handler.
+On Tue, 26 May 2026 07:43:53 -0700
+Zhiping Zhang <zhipingz@meta.com> wrote:
+
+> Add pcie_tph_enabled_req_type() so drivers can query the enabled TPH
+> requester mode without reaching into pci_dev internals.
 > 
-> From tg3_io_error_detected, we call tg3_netif_stop->tg3_napi_disable->
-> napi_disable and return PCI_ERS_RESULT_NEED_RESET on non-fatal error.
-> We expect that during AER recovery tg3_io_slot_reset and tg3_io_resume
-> will be called. But AER error recovery can fail. For example, when one
-> of PCIe devices on the same bus reports PCI_ERS_RESULT_NO_AER_DRIVER.
-> As a result, tg3_io_slot_reset and tg3_io_resume are not called, PCIe
-> device is disabled and NAPI is disabled (pci_disable_device and
-> napi_disable are called from tg3_io_error_detected). Then we can try to
-> disable PCIe link and napi_disable will be called again:
+> This keeps pci_dev::tph_req_type inside the PCI/TPH code and provides a
+> !CONFIG_PCIE_TPH stub for callers.
 > 
->   napi_disable+0x1b/0x1b0
->   tg3_napi_disable+0x89/0xa0 [tg3]
->   tg3_netif_stop+0x37/0xe3 [tg3]
->   tg3_stop+0x30/0x160 [tg3]
->   tg3_close+0x2a/0x60 [tg3]
->   __dev_close_many+0xad/0x130
->   dev_close_many+0xb2/0x190
->   unregister_netdevice_many_notify+0x19d/0xa00
->   unregister_netdevice_queue+0xf8/0x140
->   unregister_netdev+0x1c/0x30
->   tg3_remove_one+0xaa/0x150 [tg3]
->   pci_device_remove+0x42/0xb0
->   device_release_driver_internal+0x19c/0x200
->   pci_stop_bus_device+0x85/0xb0
->   pci_stop_bus_device+0x2c/0xb0
->   pci_stop_bus_device+0x2c/0xb0
->   pci_stop_and_remove_bus_device+0x12/0x20
->   pciehp_unconfigure_device+0x9f/0x160
->   pciehp_disable_slot+0x67/0x100
->   pciehp_handle_presence_or_link_change+0x77/0x350
-> 
-> This is not expected by napi_disable and a thread can be locked in
-> napi_disable forever. We have pcierr_recovery to cover a similar issue,
-> but for fatal errors. We cannot reuse this flag because it is reset in
-> tg3_io_resume, but it is not called when AER recovery fails.
-> 
-> Similarly, if an AER error is reported and tg3_io_error_detected calls
-> pci_disable_device, a subsequent device removal via tg3_remove_one or
-> tg3_shutdown will call pci_disable_device again for the already-disabled
-> device.
-> 
-> Add a napi_enabled flag to struct tg3 to track whether napi_enable has
-> been called. Guard tg3_napi_disable() so it returns early if NAPI was
-> not previously enabled. Also guard pci_disable_device() calls in
-> tg3_remove_one() and tg3_shutdown() with pci_is_enabled() to avoid
-> disabling an already-disabled device.
-> 
-> Fixes: b45aa2f6192e ("tg3: Add EEH support")
-> Signed-off-by: Yury Murashka <yurypm@arista.com>
+> Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
 > ---
-> v4:
->  - Rebased on the latest net tree and fixed indentation
-> v3:
->  - Removed netdev_err() log from tg3_napi_disable() guard; silently
->    return instead
-> v2:
->  - Rewrote commit message with full problem description and call trace
->  - Added Fixes tag
->  - Added "net" tree prefix to subject
+>  drivers/pci/tph.c       | 12 ++++++++++++
+>  include/linux/pci-tph.h |  2 ++
+>  2 files changed, 14 insertions(+)
 > 
->  drivers/net/ethernet/broadcom/tg3.c | 14 ++++++++++++--
->  drivers/net/ethernet/broadcom/tg3.h |  1 +
->  2 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-> index 73a4b569b..86995e689 100644
-> --- a/drivers/net/ethernet/broadcom/tg3.c
-> +++ b/drivers/net/ethernet/broadcom/tg3.c
-> @@ -7398,6 +7398,11 @@ static void tg3_napi_disable(struct tg3 *tp)
->  	struct tg3_napi *tnapi;
->  	int i;
+> diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+> index 91145e8d9d95..6c4492075ae9 100644
+> --- a/drivers/pci/tph.c
+> +++ b/drivers/pci/tph.c
+> @@ -174,6 +174,18 @@ u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev)
+>  }
+>  EXPORT_SYMBOL(pcie_tph_get_st_table_loc);
 >  
-> +	if (!tp->napi_enabled)
-> +		return;
+> +/**
+> + * pcie_tph_enabled_req_type - Return the device's enabled TPH requester type
+> + * @pdev: PCI device to query
+> + *
+> + * Return: PCI_TPH_REQ_DISABLE, PCI_TPH_REQ_TPH_ONLY or PCI_TPH_REQ_EXT_TPH.
+> + */
+> +u8 pcie_tph_enabled_req_type(struct pci_dev *pdev)
+> +{
+> +	return pdev->tph_req_type;
+> +}
+> +EXPORT_SYMBOL(pcie_tph_enabled_req_type);
 > +
-> +	tp->napi_enabled = false;
-> +
->  	for (i = tp->irq_cnt - 1; i >= 0; i--) {
->  		tnapi = &tp->napi[i];
->  		if (tnapi->tx_buffers) {
-> @@ -7420,6 +7425,8 @@ static void tg3_napi_enable(struct tg3 *tp)
->  	struct tg3_napi *tnapi;
->  	int i;
->  
-> +	tp->napi_enabled = true;
-> +
->  	for (i = 0; i < tp->irq_cnt; i++) {
->  		tnapi = &tp->napi[i];
->  		napi_enable_locked(&tnapi->napi);
-> @@ -17718,6 +17725,7 @@ static int tg3_init_one(struct pci_dev *pdev,
->  	tp->tx_mode = TG3_DEF_TX_MODE;
->  	tp->irq_sync = 1;
->  	tp->pcierr_recovery = false;
-> +	tp->napi_enabled = false;
->  
->  	if (tg3_debug > 0)
->  		tp->msg_enable = tg3_debug;
-> @@ -18099,7 +18107,8 @@ static void tg3_remove_one(struct pci_dev *pdev)
->  		}
->  		free_netdev(dev);
->  		pci_release_regions(pdev);
-> -		pci_disable_device(pdev);
-> +		if (pci_is_enabled(pdev))
-> +			pci_disable_device(pdev);
+>  /*
+>   * Return the size of ST table. If ST table is not in TPH Requester Extended
+>   * Capability space, return 0. Otherwise return the ST Table Size + 1.
+> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+> index be68cd17f2f8..fe572737b409 100644
+> --- a/include/linux/pci-tph.h
+> +++ b/include/linux/pci-tph.h
+> @@ -30,6 +30,7 @@ void pcie_disable_tph(struct pci_dev *pdev);
+>  int pcie_enable_tph(struct pci_dev *pdev, int mode);
+>  u16 pcie_tph_get_st_table_size(struct pci_dev *pdev);
+>  u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev);
+> +u8 pcie_tph_enabled_req_type(struct pci_dev *pdev);
+>  #else
+>  static inline int pcie_tph_set_st_entry(struct pci_dev *pdev,
+>  					unsigned int index, u16 tag)
+> @@ -41,6 +42,7 @@ static inline int pcie_tph_get_cpu_st(struct pci_dev *dev,
+>  static inline void pcie_disable_tph(struct pci_dev *pdev) { }
+>  static inline int pcie_enable_tph(struct pci_dev *pdev, int mode)
+>  { return -EINVAL; }
+> +static inline u8 pcie_tph_enabled_req_type(struct pci_dev *pdev) { return 0; }
 
-Using pci_is_enabled() is ok, because we increment the ref counter when
-we call pci_enable_device, so we know that the driver holds a ref unless
-the io error path happened in which case we need to skip. Thus this
-can't "lose" a pci_disable_device call because in that cause
-pci_is_enabled would be true. Ok.
+nit, s/0/PCI_TPH_REQ_DISABLE/ for consistency.  Thanks,
 
-I was wondering if there was some existing function that folded the
-pci_is_enabled check in, but there doesn't appear to be one. There is
-"pci_disable_enabled_device()" but that skips the refcount and forcibly
-disables the device. It's part of the power management code, not
-intended for drivers to use directly.
+Alex
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
 
