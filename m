@@ -1,69 +1,68 @@
-Return-Path: <netdev+bounces-292371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id II3NJS4aF2ov4gcAu9opvQ
-	(envelope-from <netdev+bounces-292371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:06 +0200
+	id OIIICz4aF2ov4gcAu9opvQ
+	(envelope-from <netdev+bounces-292367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E34ED5E7B01
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE6C5E7B26
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB34E30B5A41
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:13:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A346130343BC
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:13:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C294438FEF;
-	Wed, 27 May 2026 16:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9606A42E011;
+	Wed, 27 May 2026 16:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFTF5F0d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BOJ3gjp3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691594266BA
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183A837C110
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779898405; cv=none; b=ZDZ2I5mGda3LSgDmO3mIafkcWHLruB/dbHS9f1QTvIyK5UM6owpWnKNqsCysLiHIw/jCrpzVuTONwiNqI+Tw/X2HjXwgVMmI3ktcHwV7ixyGYKyZnMtF0hcz9X00FTQ8Qzcxc0A4jaU4WLHi1kWP1+iBhq/hQc7ALX1KrULdLTM=
+	t=1779898395; cv=none; b=q05cP0RPf7xWf/TdR7jAso8bo1hLZZ/pJ0HbRn7XC7YO70eXp+pNJIA3dMC5UszNVpdnXCom/MgQ6dsxOZZakPMNOTdEk7LaW+jKQ1wBaCFqvLVXZPWKwhAvTcOaCSkZeuugf8tCuy+fyKw0Yvs5/XpUIyAZKPLkoRV6LW5xrMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779898405; c=relaxed/simple;
-	bh=j4Jjp6nEOjEmwAmdRBZ09+RgL1Y8Yi6keEPpAPUlVAI=;
+	s=arc-20240116; t=1779898395; c=relaxed/simple;
+	bh=wzZ9TtyjvtSeeVyMtoxrdgiISZT8yVKwIOCSGlKQTbk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VyBaEmHL51Nox1YKFN3q1SaF6hgD+2v3x38D3WbKfjCbTjE6i2SylRrcXgN/y6Qq1EM54IfCkGQWntjc+YuDqO4wG9kRHDDvlGwil6D34/eEEsZjUvQ7VwK2l7AW7A7aKwudjW1E8pQd20ex3V/T5u8GwbRcpMYeoNdlaYCDUf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SFTF5F0d; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=aTQ+d+j9l2oO8EwcH2sSDSGRKoLdoRGKUHlwVXu34Mko5uD6rFmTlf3rB6baJSY1DUkCtmfIalvEN7xBn3SJBE7mCOK2jOybNVpmopK0UbHiVteZ2GQrYXO31j9blTRX+DUZ3GhiQ8hZ159dWWotIqoKeybEQUVwrlUsrL0djBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BOJ3gjp3; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779898400;
+	s=mimecast20190719; t=1779898390;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ow8OirZdS6gb+ZP38FzHIeBgDOLzreU2b2dwfvbHcfw=;
-	b=SFTF5F0dRcgWi5U3hMq1HSs2+wIk47kLKh2vCm49575u4a6wpxeT7YxTk4OHzT2rhwrbpR
-	hGa9X4Z47nsqqFDdIvQfwMU9Jk8uFYtBRDZKoqhBDMj5jwOBJVOI2zDtbYXtle6OzGcqjE
-	jQjjy5JBQomiNZ+P+42ukDUUIYJZ+v8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=k98EUWVLz08EYv1KHteuVs1EnfUpuSib3NUwjojow24=;
+	b=BOJ3gjp3Nkl0lZa3ELyjfIKLYS4vbNV2konuQy56DCEqAqRRXHohYZmR79FYl4iauN5H11
+	BivPiZq5PpwRvGHBtPSOtGB9wCBltAY3pLWvaDEysxafG4QIeMPO+4pD17l0XPsJfZSOWK
+	LmiiQo+X6G3I+TpD1+HAdAab0MKe9X0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-KPkCroZ6PLixzVA9euOwZg-1; Wed,
- 27 May 2026 12:12:55 -0400
-X-MC-Unique: KPkCroZ6PLixzVA9euOwZg-1
-X-Mimecast-MFC-AGG-ID: KPkCroZ6PLixzVA9euOwZg_1779898372
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-sE8uuosRNcOfIaMmJKoZpg-1; Wed,
+ 27 May 2026 12:13:02 -0400
+X-MC-Unique: sE8uuosRNcOfIaMmJKoZpg-1
+X-Mimecast-MFC-AGG-ID: sE8uuosRNcOfIaMmJKoZpg_1779898377
 Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 206031800611;
-	Wed, 27 May 2026 16:12:52 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 095591956059;
+	Wed, 27 May 2026 16:12:57 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.34.40])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C9BDA1681;
-	Wed, 27 May 2026 16:12:47 +0000 (UTC)
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 86C271686;
+	Wed, 27 May 2026 16:12:52 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Jiri Pirko <jiri@nvidia.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
@@ -77,9 +76,9 @@ Cc: Jiri Pirko <jiri@nvidia.com>,
 	Simon Horman <horms@kernel.org>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
-Date: Wed, 27 May 2026 18:12:38 +0200
-Message-ID: <20260527161241.86655-2-ivecera@redhat.com>
+Subject: [PATCH net-next v4 2/4] dpll: zl3073x: use per-operation poll timeouts
+Date: Wed, 27 May 2026 18:12:39 +0200
+Message-ID: <20260527161241.86655-3-ivecera@redhat.com>
 In-Reply-To: <20260527161241.86655-1-ivecera@redhat.com>
 References: <20260527161241.86655-1-ivecera@redhat.com>
 Precedence: bulk
@@ -96,15 +95,15 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-292371-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292367-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -117,112 +116,180 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E34ED5E7B01
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2FE6C5E7B26
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add DPLL_PIN_TYPE_INT_NCO pin type for virtual pins representing
-the NCO mode of a DPLL. When connected as a DPLL input, the DPLL
-enters NCO mode where the output frequency is adjusted by the host
-via the PTP clock interface.
+Replace the single 2s timeout in zl3073x_poll_zero_u8() with a
+per-caller timeout parameter. Different HW operations have different
+expected completion times so using per-operation timeouts improves
+error detection. The timeout values are based on proprietary source
+code provided by Microchip and own measurement.
 
-Update the fractional-frequency-offset and fractional-frequency-
-offset-ppt attribute documentation to note that for INT_NCO pins
-these attributes represent the DPLL's current output frequency
-offset from its nominal frequency.
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
-v2:
-  - Clarify int-nco pin type documentation to describe frequency
-    control via the PTP clock interface instead of generic "controlled
-    by the host".
-  - Tighten FFO attribute documentation for INT_NCO pins to describe
-    the DPLL's output frequency offset from nominal frequency.
-  - Mention both fractional-frequency-offset (PPM) and
-    fractional-frequency-offset-ppt attributes in the commit message.
----
- Documentation/netlink/specs/dpll.yaml | 13 +++++++++++++
- drivers/dpll/dpll_nl.c                |  2 +-
- include/uapi/linux/dpll.h             |  4 ++++
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ drivers/dpll/zl3073x/chan.c |  6 ++++--
+ drivers/dpll/zl3073x/core.c | 29 +++++++++++++++++------------
+ drivers/dpll/zl3073x/core.h | 10 +++++++++-
+ 3 files changed, 30 insertions(+), 15 deletions(-)
 
-diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
-index 91a172617b3a9..5cdb93e8649a0 100644
---- a/Documentation/netlink/specs/dpll.yaml
-+++ b/Documentation/netlink/specs/dpll.yaml
-@@ -162,6 +162,13 @@ definitions:
-       -
-         name: gnss
-         doc: GNSS recovered clock
-+      -
-+        name: int-nco
-+        doc: |
-+          Device internal numerically controlled oscillator.
-+          When connected as a DPLL input, the DPLL enters NCO mode
-+          where the output frequency is adjusted by the host via
-+          the PTP clock interface.
-     render-max: true
-   -
-     type: enum
-@@ -453,6 +460,9 @@ attribute-sets:
-           offset on the media associated with the pin. Inside
-           the pin-parent-device nest it represents the frequency
-           offset between the pin and its parent DPLL device.
-+          For pins of type PIN_TYPE_INT_NCO this represents
-+          the DPLL's current output frequency offset from its
-+          nominal frequency.
-           Value is in PPM (parts per million).
-           This is a lower-precision version of
-           fractional-frequency-offset-ppt.
-@@ -499,6 +509,9 @@ attribute-sets:
-           offset on the media associated with the pin. Inside
-           the pin-parent-device nest it represents the frequency
-           offset between the pin and its parent DPLL device.
-+          For pins of type PIN_TYPE_INT_NCO this represents
-+          the DPLL's current output frequency offset from its
-+          nominal frequency.
-           Value is in PPT (parts per trillion, 10^-12).
-           This is a higher-precision version of
-           fractional-frequency-offset.
-diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
-index b1d9182c7802f..2dab99202764f 100644
---- a/drivers/dpll/dpll_nl.c
-+++ b/drivers/dpll/dpll_nl.c
-@@ -61,7 +61,7 @@ static const struct nla_policy dpll_pin_id_get_nl_policy[DPLL_A_PIN_TYPE + 1] =
- 	[DPLL_A_PIN_BOARD_LABEL] = { .type = NLA_NUL_STRING, },
- 	[DPLL_A_PIN_PANEL_LABEL] = { .type = NLA_NUL_STRING, },
- 	[DPLL_A_PIN_PACKAGE_LABEL] = { .type = NLA_NUL_STRING, },
--	[DPLL_A_PIN_TYPE] = NLA_POLICY_RANGE(NLA_U32, 1, 5),
-+	[DPLL_A_PIN_TYPE] = NLA_POLICY_RANGE(NLA_U32, 1, 6),
- };
+diff --git a/drivers/dpll/zl3073x/chan.c b/drivers/dpll/zl3073x/chan.c
+index 2fe3c3da84bb5..677a920c16254 100644
+--- a/drivers/dpll/zl3073x/chan.c
++++ b/drivers/dpll/zl3073x/chan.c
+@@ -33,7 +33,8 @@ int zl3073x_chan_state_update(struct zl3073x_dev *zldev, u8 index)
  
- /* DPLL_CMD_PIN_GET - do */
-diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-index cb363cccf2e2a..9245827de3cfd 100644
---- a/include/uapi/linux/dpll.h
-+++ b/include/uapi/linux/dpll.h
-@@ -127,6 +127,9 @@ enum dpll_type {
-  * @DPLL_PIN_TYPE_SYNCE_ETH_PORT: ethernet port PHY's recovered clock
-  * @DPLL_PIN_TYPE_INT_OSCILLATOR: device internal oscillator
-  * @DPLL_PIN_TYPE_GNSS: GNSS recovered clock
-+ * @DPLL_PIN_TYPE_INT_NCO: Device internal numerically controlled oscillator.
-+ *   When connected as a DPLL input, the DPLL enters NCO mode where the output
-+ *   frequency is adjusted by the host via the PTP clock interface.
+ 	/* Read df_offset vs tracked reference */
+ 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_DPLL_DF_READ(index),
+-				  ZL_DPLL_DF_READ_SEM);
++				  ZL_DPLL_DF_READ_SEM,
++				  ZL_POLL_DF_READ_TIMEOUT_US);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -43,7 +44,8 @@ int zl3073x_chan_state_update(struct zl3073x_dev *zldev, u8 index)
+ 		return rc;
+ 
+ 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_DPLL_DF_READ(index),
+-				  ZL_DPLL_DF_READ_SEM);
++				  ZL_DPLL_DF_READ_SEM,
++				  ZL_POLL_DF_READ_TIMEOUT_US);
+ 	if (rc)
+ 		return rc;
+ 
+diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+index b3345060490db..02f42fd72aa57 100644
+--- a/drivers/dpll/zl3073x/core.c
++++ b/drivers/dpll/zl3073x/core.c
+@@ -311,17 +311,17 @@ int zl3073x_write_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 val)
+  * @zldev: zl3073x device pointer
+  * @reg: register to poll (has to be 8bit register)
+  * @mask: bit mask for polling
++ * @timeout_us: timeout in microseconds
+  *
+  * Waits for bits specified by @mask in register @reg value to be cleared
+  * by the device.
+  *
+  * Returns: 0 on success, <0 on error
   */
- enum dpll_pin_type {
- 	DPLL_PIN_TYPE_MUX = 1,
-@@ -134,6 +137,7 @@ enum dpll_pin_type {
- 	DPLL_PIN_TYPE_SYNCE_ETH_PORT,
- 	DPLL_PIN_TYPE_INT_OSCILLATOR,
- 	DPLL_PIN_TYPE_GNSS,
-+	DPLL_PIN_TYPE_INT_NCO,
+-int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask)
++int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg,
++			 u8 mask, unsigned int timeout_us)
+ {
+-	/* Register polling sleep & timeout */
+-#define ZL_POLL_SLEEP_US   10
+-#define ZL_POLL_TIMEOUT_US 2000000
++#define ZL_POLL_SLEEP_US 10
+ 	unsigned int val;
  
- 	/* private: */
- 	__DPLL_PIN_TYPE_MAX,
+ 	/* Check the register is 8bit */
+@@ -335,7 +335,7 @@ int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask)
+ 	reg = ZL_REG_ADDR(reg) + ZL_RANGE_OFFSET;
+ 
+ 	return regmap_read_poll_timeout(zldev->regmap, reg, val, !(val & mask),
+-					ZL_POLL_SLEEP_US, ZL_POLL_TIMEOUT_US);
++					ZL_POLL_SLEEP_US, timeout_us);
+ }
+ 
+ int zl3073x_mb_op(struct zl3073x_dev *zldev, unsigned int op_reg, u8 op_val,
+@@ -354,7 +354,8 @@ int zl3073x_mb_op(struct zl3073x_dev *zldev, unsigned int op_reg, u8 op_val,
+ 		return rc;
+ 
+ 	/* Wait for the operation to actually finish */
+-	return zl3073x_poll_zero_u8(zldev, op_reg, op_val);
++	return zl3073x_poll_zero_u8(zldev, op_reg, op_val,
++				    ZL_POLL_MB_TIMEOUT_US);
+ }
+ 
+ /**
+@@ -377,8 +378,8 @@ zl3073x_do_hwreg_op(struct zl3073x_dev *zldev, u8 op)
+ 		return rc;
+ 
+ 	/* Poll for completion - pending bit cleared */
+-	return zl3073x_poll_zero_u8(zldev, ZL_REG_HWREG_OP,
+-				    ZL_HWREG_OP_PENDING);
++	return zl3073x_poll_zero_u8(zldev, ZL_REG_HWREG_OP, ZL_HWREG_OP_PENDING,
++				    ZL_POLL_HWREG_TIMEOUT_US);
+ }
+ 
+ /**
+@@ -609,7 +610,8 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
+ 	 * to be zero to ensure that the measured data are coherent.
+ 	 */
+ 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_PHASE_ERR_READ_RQST,
+-				  ZL_REF_PHASE_ERR_READ_RQST_RD);
++				  ZL_REF_PHASE_ERR_READ_RQST_RD,
++				  ZL_POLL_PHASE_ERR_TIMEOUT_US);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -628,7 +630,8 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
+ 
+ 	/* Wait for finish */
+ 	return zl3073x_poll_zero_u8(zldev, ZL_REG_REF_PHASE_ERR_READ_RQST,
+-				    ZL_REF_PHASE_ERR_READ_RQST_RD);
++				    ZL_REF_PHASE_ERR_READ_RQST_RD,
++				    ZL_POLL_PHASE_ERR_TIMEOUT_US);
+ }
+ 
+ /**
+@@ -648,7 +651,8 @@ zl3073x_ref_freq_meas_latch(struct zl3073x_dev *zldev, u8 type)
+ 
+ 	/* Wait for previous measurement to finish */
+ 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
+-				  ZL_REF_FREQ_MEAS_CTRL);
++				  ZL_REF_FREQ_MEAS_CTRL,
++				  ZL_POLL_FREQ_MEAS_TIMEOUT_US);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -669,7 +673,8 @@ zl3073x_ref_freq_meas_latch(struct zl3073x_dev *zldev, u8 type)
+ 
+ 	/* Wait for finish */
+ 	return zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
+-				    ZL_REF_FREQ_MEAS_CTRL);
++				    ZL_REF_FREQ_MEAS_CTRL,
++				    ZL_POLL_FREQ_MEAS_TIMEOUT_US);
+ }
+ 
+ /**
+diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
+index 99440620407da..d470845ee12ae 100644
+--- a/drivers/dpll/zl3073x/core.h
++++ b/drivers/dpll/zl3073x/core.h
+@@ -7,6 +7,7 @@
+ #include <linux/kthread.h>
+ #include <linux/list.h>
+ #include <linux/mutex.h>
++#include <linux/time64.h>
+ #include <linux/types.h>
+ 
+ #include "chan.h"
+@@ -19,6 +20,12 @@ struct device;
+ struct regmap;
+ struct zl3073x_dpll;
+ 
++/* Per-operation poll timeouts */
++#define ZL_POLL_DF_READ_TIMEOUT_US	(25 * USEC_PER_MSEC)
++#define ZL_POLL_FREQ_MEAS_TIMEOUT_US	(50 * USEC_PER_MSEC)
++#define ZL_POLL_HWREG_TIMEOUT_US	(50 * USEC_PER_MSEC)
++#define ZL_POLL_MB_TIMEOUT_US		(30 * USEC_PER_MSEC)
++#define ZL_POLL_PHASE_ERR_TIMEOUT_US	(50 * USEC_PER_MSEC)
+ 
+ enum zl3073x_flags {
+ 	ZL3073X_FLAG_REF_PHASE_COMP_32_BIT,
+@@ -125,7 +132,8 @@ struct zl3073x_hwreg_seq_item {
+ 
+ int zl3073x_mb_op(struct zl3073x_dev *zldev, unsigned int op_reg, u8 op_val,
+ 		  unsigned int mask_reg, u16 mask_val);
+-int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask);
++int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg,
++			 u8 mask, unsigned int timeout_us);
+ int zl3073x_read_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 *val);
+ int zl3073x_read_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 *val);
+ int zl3073x_read_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 *val);
 -- 
 2.53.0
 
