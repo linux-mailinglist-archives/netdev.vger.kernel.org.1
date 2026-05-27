@@ -1,173 +1,195 @@
-Return-Path: <netdev+bounces-292411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292412-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNNwFlQnF2qu6wcAu9opvQ
-	(envelope-from <netdev+bounces-292411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:18:12 +0200
+	id cB84LiAqF2qn7gcAu9opvQ
+	(envelope-from <netdev+bounces-292412-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:30:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE4C85E841C
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:18:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E2F45E8511
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3178B3048F16
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:17:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15F4A30125FC
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1663C44E027;
-	Wed, 27 May 2026 17:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FC944D00A;
+	Wed, 27 May 2026 17:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="aJ5YCDKp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="d+4Eax1g"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RIW0v5z+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="eOEM50Ys"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E09944A711
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31D732D7F8
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779902272; cv=none; b=Zayltp1zCcQTcHblBuqjt+9AZE1vYpyZ2G88hVnHzs0IQnvXeKSCeKnZAuZP/H8jfST7KySMLIrFl8Hk8hOESoCRVKv46ITeP1P91mt0qe3WgPyREZaYagk1d7wX0ChjmZisJk3qnGXItppUOGjqIrQXbyigi+7RtmbpIfe/NQU=
+	t=1779902527; cv=none; b=XwhJLpHaeDyTpvNMrc+XRWlX+LS9T0VOUh/1OO9p5LM8Osc2Dg+qTCN3lKjBRoQOc/me2l0JX1/4Gq+sKEsr7f2ugE6JNSGpIjirxW9Zk9PQC8t0l6CjPjQc5VccmMRYA6cHnPJTLIR+MUZelTck4srjfz8YJ22SzrWxUA3ZrLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779902272; c=relaxed/simple;
-	bh=LdhMy2TqDpVEh/bRpQRsnqODDlgDJiWCSgmfU1rRCnA=;
+	s=arc-20240116; t=1779902527; c=relaxed/simple;
+	bh=CPbqDF454Z+Ji6GvjieOLoul6JPLkeDeLkJZd8vBXK0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gIjJ8YOwG/S7xrAHozQ2KwCQyQHtJizDUIBcjczfoOzCmUeAP30Vc0Sxb6XEzml+yhPX8rQ0WZL+JjxMqulH3E2Zqp9PjQAUqP5w5S5NKYq1MhhDUwF4wIq/Uz0Gvn/JpVlDec2yUdzM5tCnCmdYqeTl0zSpPhSpJmnlQKcfDYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=aJ5YCDKp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=d+4Eax1g; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id AD218EC01AD;
-	Wed, 27 May 2026 13:17:49 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Wed, 27 May 2026 13:17:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1779902269; x=
-	1779988669; bh=wdl/cunxDmv57X3cGLjkJUXZCQvKZ6HhT3sbER7iTRo=; b=a
-	J5YCDKpl10Apausf766oIm/HGpDrKjX2Qms0cyp5E4+XOgyWNmhsOr4W3DphC6Da
-	+RtwXpuGOrwQ18VrpEROwyLUgdd/oAFxMpgeME+kgToUlM0t/RIBt3e+R8Tj7sLd
-	AEznD+5edGO+wM5BErsbEONIFCQXGCZP2medACq2mLTczvLl/k00GTuLMz8QtRzi
-	CaUNLrHEin2IqcgLUmwp4n7obWCpcTHqaLk7/vsSTJCFkfBCzfJNXhNpyK9svE1C
-	lOXgz8620miirWqZ1d6+EdZGwmz1EBfknWqrWwVNOJc2I4klOmq5ZQMk+vbxlI3t
-	G/ciTtJj6Ja5laHfbv2KQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779902269; x=1779988669; bh=wdl/cunxDmv57X3cGLjkJUXZCQvKZ6HhT3s
-	bER7iTRo=; b=d+4Eax1ghTyo7vB3jvZIXS7aXXPcg/2uxDUIva/Ej1oJtMTGIvO
-	KBCAkKNgYfX8HKJMduBfWJ48q9B10ixjbDfEgrlzPWYYIYMmQIiQcMgOPSWEQmDW
-	N9xmfGvBnXESo/LH32AKB92zGPYPvCEaTEI8Hf96DWmj889Avyua6fYo74CML4Yw
-	R6qU6I4Cl/bq7JkeqQkzFCf3+BYDayvc/bAKGOavSk7V5NRg0WhpkFiT2LSIP8Xe
-	I4F1Tljix5JvPLhHvjFxNVcIlrWRaRxOWnidxhhUfxELEUcmEeNuFYnaYgJ4aB2a
-	3+eQWp3Dnviw086Vq3TI6tgWZGPelKrdv3Q==
-X-ME-Sender: <xms:PScXao6J_1ClONqschl5yxZmcK_79ultpR-DelV2sTpqZLHpq8ihdw>
-    <xme:PScXas8mwDUIajVzg1YnyBAY2lGmuoq6D6XqUWYerhaq-ZUCCwYfy0mUVVm9fDdHu
-    IW87uYr23lR0nDWQzklXxowmE9DLyv-z6q9HAgAoMHZuj7tEY_AAyU>
-X-ME-Received: <xmr:PScXaiFYoCqNqyhquvWWK4ZJlkWnO7LY_A7YL3iqU6VJyOwT7huMNFwF1H013yPnDE4XxBZtV_aR6bDuRSgPHmA>
-X-ME-Proxy-Cause: dmFkZTESGwvqnssqQRHdcUGRa1d/ir4+l5c53sBVWmZ7sFhh9Gg1YbhXbWMsdSofRNpw4c
-    8X6J1yBG8lJGORS4H8ug7yBzAc+zJXo1+DWSanUCh4gNx7UTHEo6p5pZtLHG0B2DYHcNcI
-    kBqRQRn6NjJANtiUSk111tXRv/axeMy1Bbu3636hoyR0B7dL52NEHerAiB1BTichNksFvo
-    5bl2CePXEQk7tl5auoLoaqH4ht+sosG91Xcy0d1bo9eWFzLSyfnBPrCwLRIqHCESF8Y2en
-    ypi4ksgraJsQHzvDGXDv/kXjATuQ2TZI2FT/4xkwe9yE2HKJ8tIdiVhwNxWqWc6rYOTuil
-    OhFYR77hInXgn7wWbGRaf1cmUVmEVv6diDPPQoJgpiVbEmhfZpNY0pG4AlVi6njSBeRdV/
-    afZjO35rhXDYh+tsoyCWobBsELSvkIwug5EFyR3EGbfMG6SJvRknyQN07+25UFAJUHAXV2
-    YyHYN926848eG4xitdPSzmV7KNDEU8QOa3d1A2p5WZXcljCnCZY8uVHSe3OOQAk3NRqSph
-    /eXcKMJg/HseBARJROJQY/V1sRrLMp1eyamkks03HP6UURdj3M9h5FKutar3O+yh2GRvxB
-    8dvXf6lOUA0BUckPY56V92C3fz6epg061ciU0hSTVQLnzTFizXnkNFh0y19A
-X-ME-Proxy: <xmx:PScXapWj4epWigcjJVwLv3FjYcbR0L5z1g6qKSlGClxFq8dnRjuZYA>
-    <xmx:PScXam_tJlL1pZ6amVFtyZS1mkD84_ymSKPX3_xq8_V4ZEfnHPI69A>
-    <xmx:PScXau7iqtovfWdmK0UEpDGSdUBBYTg6tuoOMTdROUE6VKDpobQFZw>
-    <xmx:PScXank1h8M_JFw1VPUrTGFKgPFvodoZkZ8aqXiMGXZjSXrxZj1hxQ>
-    <xmx:PScXagU8rrwNdO_Qq6IO5nAAJR7FoYGtNWrbmIiJsbIkgG3KG5mfwajR>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 May 2026 13:17:48 -0400 (EDT)
-Date: Wed, 27 May 2026 19:17:47 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH net-next v11 1/6] tls: Avoid evaluating freed skb in
- tls_sw_read_sock() loop
-Message-ID: <ahcnO2S7QfhTBNhK@krikkit>
-References: <20260526-tls-read-sock-v11-0-244fe1dc4abd@oracle.com>
- <20260526-tls-read-sock-v11-1-244fe1dc4abd@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=osVW1e8Rg0PHO0xKab2fqOYLR6zFAYJoqEIFAvi2gxl/NgAMEhjnK6phSC1CFcdvI4ZV/iSQFUl2JETsxoz4i4ahsEadDNcmMmYHnS9trDW42tSEXq7lgVJPY8AEizFEGdiNn9vLPwYBnCyfIP+HJ8W0TXsf8N6q68eHHem8AAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RIW0v5z+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=eOEM50Ys; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779902524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O0yXQEHNKQkMY2wBw+4QDVrKj1M+JOLPnqN2RUokaPw=;
+	b=RIW0v5z+/A2bgnSZBypcBlJ4mL6YEVobKJHdPIddruUEvX92N6XNtaIXVoCwoCvyaKIRQC
+	ksCM0v4O+HkxVSB6+HYgdHyRvjmlQWmpWNfZlegUyWMUGsTEgHQa0H8E0ULTiqDsm0iHP+
+	0WWiZt2BBi/Va1YB2bvd0bd7Xtm7CKY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-olVygzYZOSqST5Jvcmh4og-1; Wed, 27 May 2026 13:22:03 -0400
+X-MC-Unique: olVygzYZOSqST5Jvcmh4og-1
+X-Mimecast-MFC-AGG-ID: olVygzYZOSqST5Jvcmh4og_1779902522
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48fe6894f3fso73238975e9.2
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 10:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779902522; x=1780507322; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O0yXQEHNKQkMY2wBw+4QDVrKj1M+JOLPnqN2RUokaPw=;
+        b=eOEM50YsFf+tfxXTQ7WjxZDb37lhfZHvWuJlqo0Wf20yS8b3qx49e0DMDxSPtKizdX
+         s7qBh1XOpGTcNOWBnRhesTo/1RbEaOHHj5L8eYO/e5Yw99wl6DySlWffm7KCfZReH/A1
+         PXzjbywddZeEHLIrX6EOylX0WDukVUPbqJjiggRH7RS9YGh0wEGFuCMtc9ugYgrQ+Ndv
+         hXds6frC6eFoOr7R2Pqm954M4E6ipiT2BmNOqja62Q18vg4E/BJI2ikJHDvsZLT9qhF7
+         Xysrrkxq3OkrrP/n6tBx89utVptf8WmdvHfklhJeSeP4nu1rHSyKl3XT4C4vS+DgjN1c
+         QRCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779902522; x=1780507322;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O0yXQEHNKQkMY2wBw+4QDVrKj1M+JOLPnqN2RUokaPw=;
+        b=p2BYHmToo0hq9f8GeUrAlAEIW4DN+Aa4o4jtz75ytRY2peCp4CmJ5VCHiEnG/0P46E
+         o0JJmF3TqG4jhMAd14QgZ4BlSaN0paaQdghB44EfhgLGYU5paEMdGSSXYZxwSxKAbTA3
+         OyktV3zMuCuTu37fQBRmDJDWvM8WsYq379dCCepKBp/LWaVjWK8ueUbmSTZHV0Srhr8G
+         LGcDhdRQoThiUNCjjYpFU86rLeRMwalBp26zBhCPtpL+3H2TfWG21rKT0lVhcysEUzYz
+         r5V1KeV8KjJng6k8bxPM4A5wmNu2BlomzaSgAC/hvTBVKavLj3vriQerBpHFvZQzFOyL
+         SRHg==
+X-Gm-Message-State: AOJu0YxPTq84BWwvbWpxDAM/LhKHN2ZRKAT4h/5AmViF+blEKKnlUEnd
+	klP/ZUbjFMNIKfHBwIe2O1Hh4RUp6PPnY5ofoy3+aQVoy0uDzpqgf9XiNFV4pdqEyKpljVPa3IE
+	mC/Pho3Kf8F15SIoVE2dXyqshfjXXb5jDhJtOyfLAiV+PX8Sw9f4WkkZ+pg==
+X-Gm-Gg: Acq92OFVQp7rKk/x+yeTnYsKgV9WkniA+Cvef4Wt93j89Z+hJUIAnfG0tsDDoKvQav0
+	m9Kr/KWPKIf3KC/9IYT5DaZkfu9vTqes7b/ivZhAficf+pSP2gAqYBBdaw2LHARDtYfeqdREEvN
+	+8gcGns8Vtpufk2GBnW/4OgiZK+kiwS4ZjPhrC7kTJppNy6IkCCooiZLuBjMBPlSddjhoFR5K+N
+	XukKEgX4sP87dZyRuERkSxmtxv16fcSrRqd8cU3eoYWr4fqr6NOZ/S1wHDnJzXM8oYvAoq3SOz4
+	v6TieD19ZfJdH7a60PhSd2S/fYIUWlV2w2+ZKWwEpF9nf0W91V8CKlQOiGWhyWinwcTru9vOGcN
+	5NLu+jxD8iWhz
+X-Received: by 2002:a05:600c:35c8:b0:48f:f7cc:f703 with SMTP id 5b1f17b1804b1-490428e2d58mr447993275e9.30.1779902522038;
+        Wed, 27 May 2026 10:22:02 -0700 (PDT)
+X-Received: by 2002:a05:600c:35c8:b0:48f:f7cc:f703 with SMTP id 5b1f17b1804b1-490428e2d58mr447992735e9.30.1779902521535;
+        Wed, 27 May 2026 10:22:01 -0700 (PDT)
+Received: from redhat.com ([31.187.78.155])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ee2a12a69sm315565f8f.16.2026.05.27.10.21.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 10:22:00 -0700 (PDT)
+Date: Wed, 27 May 2026 13:21:57 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	virtualization@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Laight <david.laight.linux@gmail.com>
+Subject: Re: [PATCH RESEND net] Revert "vsock/virtio: fix skb overhead
+ overflow on 32-bit builds"
+Message-ID: <20260527132150-mutt-send-email-mst@kernel.org>
+References: <20260527171046.130211-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260526-tls-read-sock-v11-1-244fe1dc4abd@oracle.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+In-Reply-To: <20260527171046.130211-1-sgarzare@redhat.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292411-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292412-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,redhat.com,lists.linux.dev,kernel.org,linux.alibaba.com,google.com,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,redhat.com,vger.kernel.org,lists.linux.dev,oracle.com,grimberg.me];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,grimberg.me:email]
-X-Rspamd-Queue-Id: DE4C85E841C
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0E2F45E8511
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-05-26, 10:21:31 -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
+On Wed, May 27, 2026 at 07:10:46PM +0200, Stefano Garzarella wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> tls_sw_read_sock() ends its receive loop with while (skb), but
-> the else branch in the body calls consume_skb(skb) before the
-> predicate is re-evaluated. A pointer becomes indeterminate when
-> the object it points to reaches end-of-lifetime (C2011 6.2.4p2),
-> and using an indeterminate value is undefined behavior (Annex
-> J.2). The pointer is not dereferenced today -- the predicate
-> either exits the loop or skb is overwritten at the top of the
-> next iteration -- but any future change that adds a dereference
-> between consume_skb() and the predicate would silently introduce
-> a use-after-free.
+> This reverts commit 4157501b9a8f ("vsock/virtio: fix skb overhead
+> overflow on 32-bit builds"). The fix was semantically correct (although
+> it would have been better to use mul_u32_u32(), as David pointed out),
+> but in practice we are estimating the memory used to allocate the SKBs,
+> and this will never cause a 32-bit variable to overflow on a 32-bit
+> system, since the memory would have run out long before that. On 64-bit,
+> SKB_TRUESIZE() already evaluates to size_t, so the multiplication is
+> already in 64-bit arithmetic without the cast.
 > 
-> Replace the do/while form with an explicit for(;;) loop so
-> termination happens through a break statement rather than
-> predicate evaluation of a freed pointer.
+> Let's revert this to avoid unnecessary 64-bit multiplies on the
+> per-packet receive path on 32-bit systems.
 > 
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> Reported-by: David Laight <david.laight.linux@gmail.com>
+> Closes: https://lore.kernel.org/netdev/20260523173557.5cc4f4f6@pumpkin
+> Suggested-by: "Michael S. Tsirkin" <mst@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
 > ---
->  net/tls/tls_sw.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  net/vmw_vsock/virtio_transport_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index b143290a311d..d4d26fba9e37 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -417,7 +417,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+>  					u32 len)
+>  {
+> -	u64 skb_overhead = ((u64)skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
+> +	u64 skb_overhead = (skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
+>  
+>  	/* Allow at most buf_alloc * 2 total budget (payload + overhead),
+>  	 * similar to how SO_RCVBUF is doubled to reserve space for sk_buff
+> -- 
+> 2.54.0
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-
--- 
-Sabrina
 
