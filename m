@@ -1,158 +1,147 @@
-Return-Path: <netdev+bounces-292151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGGVD+KiFmqBnwcAu9opvQ
-	(envelope-from <netdev+bounces-292151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:53:06 +0200
+	id eH9aIaWiFmqBnwcAu9opvQ
+	(envelope-from <netdev+bounces-292152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:52:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D0B75E0A5D
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:53:04 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85CDE5E0A42
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9F0E3007F78
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:51:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0F000300D559
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766993CCFD9;
-	Wed, 27 May 2026 07:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEAE3CF026;
+	Wed, 27 May 2026 07:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="wkt4FGYk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WW3s/h7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2335276049
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC983CDBA9
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779868315; cv=none; b=JGex9jjYVAMGVmfg9aOwOzAN57jvYPXAQijlxBgBLhNevq0VKM+qsrbrpAWKr6D0zUI+PLvx2xw5YvXJWZQJwHfOEVnAG/Jz+GuGNSEUtOBI2DaxW5Q7pVaPhoUshnaXY8ubA7eBes/zZY97iNz+k+9svLuaH4avDDYL5RzO/O8=
+	t=1779868317; cv=none; b=AFohpxGRukXVgvxi9s/6Uqt2mLItQH8Dwe8n8rx9WjnkRNSe7yK3tkUdaj7yYzNhoh0GOwVdn9A4SSCYgL4le8b6R3c8vsFtGnhxiwuHRl36U2SUOLti1jFKjThqiXkhi881FukCTaeWdymbwUfldkXARPztSmEbnbF/C/BRKT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779868315; c=relaxed/simple;
-	bh=NVOHKVXHwnbH81wCzMlzEc+nMaehPnHooU/DuIU4/l0=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=Vt+9Be9FbHbE+rw3lYulL8TI6FnrhBmkXO5nnlrpeFjCRR9UJbGlZmzy6o9IRO1oBVmvEbKZWfFfhbagv5PWYD7fiVtdpnpKu27nkRmDkClB5FVgTKlx5JPAVGJanBxdY/KFrxzEFwC4RcHfl2l8gKhorQ/Zja+LDkoMMGF/hLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=wkt4FGYk; arc=none smtp.client-ip=203.205.221.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1779868285;
-	bh=133mS37I6tuEBHBlaWgDxx3zzPdztDDKTlpPqXQOUTg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=wkt4FGYkJn2xg6Z3jREqKIeN13A98dOA/5f2iL7kk4slTtvSKAA7lrK3r+OdF7YMA
-	 NXwsM0EhE8FwEY2lqs6nhs64hgfL8LJ8zodzbLWui80jonhwVkRz7UhC0+/pabUF89
-	 1fdUK6vbL0RQtTDP3f0YTKBKy6VAwqSGNaYyqzj4=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
-	id CD721E22; Wed, 27 May 2026 15:51:23 +0800
-X-QQ-mid: xmsmtpt1779868283tx38d9w72
-Message-ID: <tencent_F2C58937ADA208EE4219632E34ED23772F08@qq.com>
-X-QQ-XMAILINFO: MMwjR1C73eIs9oQgn7O3W+xV3n1wN3smKCFyuVVTcoMkZJ0GLZ3dXnt4n8QaTf
-	 HHb+J4UnO4Wf6oZ2n8jjSnEaYeTjy5Kw9HZqt4gIpVU2RwV7kBhQuOpfoxQUmGZ880RGWSUng4Ko
-	 p6cRky14kGG5J6RXXdZyiPmvfPwd9Tn9mK2YUSlG9PMtL86MCVNUgPjKb07sopwvQ3D5m60Qswoe
-	 BwTjmTS0WMD/xgTKhFWsoMfkxp9Al+VGBgK4pePMKaoYX4S9f+lQ+zLKNf2IQFAiujlANjk5D/7C
-	 a65JtZC9xM4/5UBGDeKBft+CFYGuhCvKM9/NLUWXoQVG9Saitw15bU6pBlrnyArAK9zkhnrWg/34
-	 y4HrQnBhulNZcniLjFcjvmlTrB1VT7hB1l803c/AHayHPg3b9AMJn4HZz67lOTlgWGy5FLrFSTIj
-	 aN2W78gZv4wSqdxDq0GofiHfzWhc8lotaihT2ZnwwLHX8IPjg2WTvZDSdmDFQz+2mU7u/yaMT1JB
-	 liA87/q0TbyFNN0zx9akuEu63sWnOY3KiyHmNiVu4CqjXjLaRH42UueOp4A/hx2CA7OCFehUtAzY
-	 DMdy4A47QrjL1zo9TMoNWe1LHwGxBAEZY/i2N3QI8exZ4NDLENCsyyC8NKOmilD3GFTqX9UJucDY
-	 TYKqagYzhJFjDFEbeun5gcs3i/y13CZCh0IOw435zRlCLiTMGlUAoNihqmzAzCLwaZlhx5QPRfEm
-	 pSoz5p505G+4eltbsxG8rZcYWS3ARXHliEtbvU4iXcuKNAImqKr9gAjKud4587aJVMB1YJhsaOFX
-	 9m8iDBUnif2WcWLPhr2lFcBoi94kN48vpeJ39rQgBByqiLGVjS9xjG64qBabiq+rogBANLD/aZBV
-	 CGgTLS+HXfUE5U4oX1sfdSzfDuQdZmry7QHXsVRBoQjT/WuQWOg7IzM/7DR0G/QCirf+rBb945J1
-	 5L/VAoi1QfxWmZLytrRUjTEPo77Ya8X/EYPBV9UwOcMRm+mVGTRiyvQwTM2xfPbTT6Clbb9A7+mP
-	 Uo0TaRWgdKrQKfqwbvXy3ezSq2Jp30+WqM5MLiMw5DSKve8Z63
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: kuba@kernel.org
-Cc: aleksander.lobakin@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	winter91@foxmail.com,
-	zhaodongdong@kylinos.cn
-Subject: Re: [PATCH] net: page_pool: check nla_nest_start() return value in
-Date: Wed, 27 May 2026 15:51:22 +0800
-X-OQ-MSGID: <20260527075122.316127-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260526162736.5e95b928@kernel.org>
-References: <20260526162736.5e95b928@kernel.org>
+	s=arc-20240116; t=1779868317; c=relaxed/simple;
+	bh=BAe+EarAbMuIYW0DQUGD5Tt7lDM7vRg8HgwirF3AAvo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NbQbltEFbBTEcl6zdOB8A5+3PUOTc7NXYGfMTwlQr/QJq/C2cid2B71Px7NgxOvbQG7iYn6+qY0WNDFRxq5k/BCwkaS2M9OEphJ/YJhG+O3K6YTgSvPW1HTgUAWIWvM3i1G3vN6VPNn6jyyPEDqlyRgFWKhRkKbuddVmiX6n8Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WW3s/h7W; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779868315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s8MKYKkgpzAFLPjRo1YpVAV+ujkH8ODdIP3anGZt+es=;
+	b=WW3s/h7WRPAq7c/qu6H9dkt3TGUgLmeHrQ+eOtu+EekTb+8J2wOxxOgeXaCEuM/f57Oav1
+	3TAtKQ6PDHWxQ4+H7XG9BTpFyOPkEdA9cYv2G7WyHtTbVgkj+B4rN0/3DPD+LkxifEcM+c
+	mMTsIZefEZQc0VUzE28HK6BZqqSkAIE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-433-nlhaX1s-P6-__aJGyDHRHA-1; Wed,
+ 27 May 2026 03:51:49 -0400
+X-MC-Unique: nlhaX1s-P6-__aJGyDHRHA-1
+X-Mimecast-MFC-AGG-ID: nlhaX1s-P6-__aJGyDHRHA_1779868308
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9820D18005B3;
+	Wed, 27 May 2026 07:51:47 +0000 (UTC)
+Received: from [10.44.48.151] (unknown [10.44.48.151])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A584719560A3;
+	Wed, 27 May 2026 07:51:44 +0000 (UTC)
+Message-ID: <d8226c8e-8821-45b4-9188-be81047ea6ba@redhat.com>
+Date: Wed, 27 May 2026 09:51:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/3] dpll: zl3073x: use __dpll_device_change_ntf() and
+ remove change_work
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Jakub Kicinski <kuba@kernel.org>, Petr Oros <poros@redhat.com>,
+ linux-kernel@vger.kernel.org
+References: <20260526074525.1451008-1-ivecera@redhat.com>
+ <20260526074525.1451008-3-ivecera@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260526074525.1451008-3-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292151-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,davemloft.net,google.com,vger.kernel.org,redhat.com,foxmail.com,kylinos.cn];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[winter91@foxmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[foxmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[foxmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292152-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:mid,foxmail.com:email,foxmail.com:dkim,kylinos.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8D0B75E0A5D
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 85CDE5E0A42
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 26 May 2026 16:27:36 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue, 26 May 2026 18:04:44 +0200 Alexander Lobakin wrote:
-> > From: Zhao Dongdong <winter91@foxmail.com>
-> > Date: Tue, 26 May 2026 14:51:56 +0800
-> > 
-> > > From: Zhao Dongdong <zhaodongdong@kylinos.cn>
-> > > 
-> > > nla_nest_start() can return NULL if the skb runs out of space.
-> > > page_pool_nl_stats_fill() does not check the return value before
-> > > calling nla_nest_end(), which can lead to a NULL pointer dereference.
-> > > Add a NULL check after nla_nest_start() and abort the message if it fails.
-> > > 
-> > > Fixes: d49010adae73 ("net: page_pool: expose page pool stats via netlink")  
-> > 
-> > A "Cc: stable@vger.kernel.org" candidate?
->
-> Not really, the thinking is that if nla_nest_start() failed then the
-> very next nla_put* will also fail (nla_nest_start() is a zero-length
-> attr, any attr we put after must be >= in length).
->
-> IOW the commit message is lying, there's no way for us to reach
-> nla_nest_end(). We will jump to nla_nest_cancel() which handles
-> nest=NULL just fine.
->
-> Zhao Dongdong please confirm this and respin the patch without a Fixes 
-> tag and with an updated commit message. I think we got such a patch
-> in the past, so we should merge it to avoid confusing bots. 
-> But please make it very clear that this code can't crash..
-> -- 
-> pw-bot: cr
+On 5/26/26 9:45 AM, Ivan Vecera wrote:
+> The change_work was introduced to send device change notifications
+> from DPLL device callbacks without deadlocking on dpll_lock, since
+> the callbacks are already invoked under that lock. Now that
+> __dpll_device_change_ntf() is exported for callers that already
+> hold dpll_lock, use it directly and remove the change_work
+> infrastructure entirely.
+> 
+> This eliminates a race condition where change_work could be
+> re-scheduled after cancel_work_sync() during device teardown,
+> potentially causing the handler to dereference a freed or NULL
+> dpll_dev pointer.
+> 
+> Fixes: 9363b4837659 ("dpll: zl3073x: Allow to configure phase offset averaging factor")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Thanks for your review.
-I carefully reviewed the code. Your thinking should be right --I just happened to notice that most call sites of nla_nest_start() include a non-NULL check. Apologies for the noise.
+Hi Kuba & Paolo,
 
+patchwork reported netdev/build_allmodconfig_warn failure for this
+patch. But it looks weird:
 
--- 
-Regards,
-    Zhao Dongdong
+https://netdev-ctrl.bots.linux.dev/logs/build/1100767/14594344/build_allmodconfig_warn/stderr
+
+I don't understand how this is related to this patch.
+
+Thanks,
+Ivan
 
 
