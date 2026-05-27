@@ -1,185 +1,545 @@
-Return-Path: <netdev+bounces-292426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292427-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +P1yN/Y9F2qg9wcAu9opvQ
-	(envelope-from <netdev+bounces-292426-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:54:46 +0200
+	id UOV3Bz48F2qg9wcAu9opvQ
+	(envelope-from <netdev+bounces-292427-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:47:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E64145E9414
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:54:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627985E932E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:47:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 69B8E3007B33
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:42:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38F333009FB2
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785563C37BA;
-	Wed, 27 May 2026 18:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E84A30DEA3;
+	Wed, 27 May 2026 18:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="SIJWy7Cj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Te0+YoKX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yw3yypSa"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD563F58D9
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 18:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779907326; cv=none; b=nhWnRSuExu5vxoEBGIvB4xadjyXhCCRtgjWPtgExBT9nNIgDWrh+mUyJ3/prdfemW/gOI9cbMvmJB5xqjIR4wNFgGfzp8tOrKqNiQJCzO5Z7P5MKGapF+LXhvXMFyECQDnW6PfGZ7LyAYfdAApxMtG/j1T4vSpYWCQAjUTGhkio=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779907326; c=relaxed/simple;
-	bh=1BYY0kaMZ0mypdIHaZf51jeoffCHdk+Myxs0sT/aEmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VV5HzYFbg5XK64vucxoVtqSqzqWazH/p/zFmK1sKAG+qBMBzvt+cG4BulLjejUKjSrcZXjtabtiCI9CeDFeRO/lwhbKEtt8tiiA8kKCjrLVy7TtUzb8AY/Rwciq/Yfp1H7nh9B3/zX17OTN5JCzHWt/m3uCuAa5JL8s3TpTQz/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=SIJWy7Cj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Te0+YoKX; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4E9747A00FA;
-	Wed, 27 May 2026 14:42:02 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Wed, 27 May 2026 14:42:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1779907322; x=1779993722; bh=1MI3yuwkL1mDBPmawBBgvjLsbtFcjkyw
-	t0Xvx5lL4i8=; b=SIJWy7Cj+EEO2XPLzFXqFrkjEACjIMFiNReaE36ZY+qaCUde
-	NjYMorcOgjR9O5MdUAkpaFBijotMBS0KeaV3BaxpWixAYhWWDSN72aTxnvTSmxiC
-	aeVzHgrFHCWqLmdQFapHLODttrnFyn5ysVeN10XTCLXuiL7jGGPo1auEf/Sz2TKu
-	yugNf6xi58vD+LKoyW5Sloouzldj/bnTKyXN9G8FttnoSXp94NbNs/EH9EAd3pf2
-	cGAoe1xZqwNXjSGBC22ztGDhVRLx/GVpdh6IIo+L5QTAoaYbluRUgr7EcVQjezN8
-	BxH7t3Duzs0WDc+/uVjWzdIuZgqSq0RESRwLZw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779907322; x=
-	1779993722; bh=1MI3yuwkL1mDBPmawBBgvjLsbtFcjkywt0Xvx5lL4i8=; b=T
-	e0+YoKXlmrm+2wZqgw/SN85nsxbI+UMWvnl2MMW8NBiRFWGyiZd2isSorU07vbPP
-	Z3+euMBcSKgVvAcNs2aT/hJKDwrSH/mAX+SZYFAh3lxZwwqeZnQEt8pfjdj5QStT
-	yC+fZF0uulXoJM0ZWviYL921OamD7JnVMJOuRs6RMRJDNGQgJXxv5Kf7Z1K6RFn2
-	lvhLJgcWKZ26XxWkqbUitq70WbsCBniM9gXHuNMfgAt9kd0RuvnBUWmAv7Bg+ktN
-	a6VDqipaxhYiYtgvqAoX6sM3jvuxXu1HoL7uBQMcrsHXBHNzORenR6KPQArqT9C5
-	f3aLug+VUEs/eJo7Uka8A==
-X-ME-Sender: <xms:-ToXapaoUozxCGQoAghv27XZFi_yaS9srzzjyq9jyDqMIGbCJoQYfg>
-    <xme:-ToXapXl7IT_kfL-lKL6vO75lnFqiQLrUK3SoIls58_kAHk84ZWBjiWMw5rva0252
-    BUITYyrJSkWhT37uIy_zs14O13sPBhrBn2fGR1ku2PVV3VcGb_QoUc>
-X-ME-Received: <xmr:-ToXanjmtqCjI4Jzq6gxnqF1HxVpBtmj1xUB6RigRF3OuwTM87NdIK3Ymu_70K3RlumdLUGwX351FknWAade-OE>
-X-ME-Proxy-Cause: dmFkZTEENjsluLuzQzvLLSoQ/TvipRS1x1Vv+E1k9UFqb8/7KhxV7BWpDI6lQC9FcKg42n
-    h2Qz7y0P9CO5yyJcqUMa8IVxPwRZ0rA47vzxX3aFiktJvsxY+RGDCHmlwD8NnpwRh0rsbG
-    zkOaAFJFez//+5yUdW9DVOWeVqWwBSascRgGCE5Hg78ed25hWZz3a5Qszy9l5THp0PSXPE
-    V1kt6NJOgROQCVwE9uKkg0swQk/slVaFAt2uN+00vYWcLWY8dYiK8Dvj2dMN7lYyJwM9FU
-    83mcJPRk0TgA6eHG5ktqBOQN4dx5PX2RT0BUeROQRpK/ZBhGdNbr/NhvcAxZTDS7p8aKNs
-    4IqQ+xr/yuHptaEQ2OUs0xmz3wxgY4CPARN/MmY7PLhBQyZ+xZJQbiPJDD73/KyIMY4STe
-    SIVN6PFXlOIvV7+hRRICPt03FzKYiPiwZrHeApBTeZ5FGqHo7npxfM6aF69ozpWsyS93fr
-    po5U76hi1bfcDFKcpDAMpLJo4Z+lbjRLuvwIE+dX8ipFW0wr8vLiYpgo09izE9hgL4ymLZ
-    /qxy/gChBxHvzNmcZzG83I7PhA1DJfyyHrTRgBvnZphBlGLX347tAZv0Mi9Hoa9XZaWAe0
-    6hCHCQMHR6pObE7D376SFjd+CibuYrM7EulK5L3KovMQYL4k24/1OImHB2Lw
-X-ME-Proxy: <xmx:-ToXansyAT-HbTXw4ayJZEj3DSA5JRKY3fpyOir9ywufrK4-_MxQWw>
-    <xmx:-ToXag5bBGN7J5FPjKNS5LVDwdA2yHZNiadrbs54O5MG2m8Vu46rCg>
-    <xmx:-ToXarPIfgtV1fehW736Quo4-AjAqo0v0XOYilKCuKXfIL9bpc7WuA>
-    <xmx:-ToXamsVxnJwN8-WYbJD5pnOIR0ogSWsIGQ5NyRhPh_Qob3-ZgKL_g>
-    <xmx:-joXahZ8QDZ4VSYErTafM_sZkCNP1ZCBdYu5NpZPc_qxh_cPUQ8PjqaI>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 May 2026 14:42:00 -0400 (EDT)
-Date: Wed, 27 May 2026 20:41:58 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Petr Wozniak <petr.wozniak@gmail.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Subject: Re: [PATCH net-next] xfrm: fix xfrm_dev_offload_ok() returning true
- for software SAs
-Message-ID: <ahc69uCgXxxzuoJh@krikkit>
-References: <ahcVbeG79PibbM3M@krikkit>
- <20260527164717.23624-1-petr.wozniak@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2912472AA
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 18:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779907609; cv=pass; b=C1UNWmMDKzLiTSQyOPpwH41UjkZe2f5vSL0ZE+6Z3zyhPwCIMQjWe2/lkocIdli1XQFXtkWNy1CeLGr+LEqH9zZbmFNSvkyNWZKT1sEq6476BZqzsuLvJ+8wQp6+6HvPnfee5CmLs4K2N4b/9wRZcMTXg+WRso7zCX4r+1Mk9e4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779907609; c=relaxed/simple;
+	bh=AvcCT2bpYWyCPUDatXo6nITVkWzKt+JY52IpSQMiMIE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YDuew8z1ZRtXUuLbxUFXtRjk+XhAI7ucN8DxK38pT6VBSjDULUSNcK5FeldkrOwExD5FAVd4Ic31XlSVGFDijhjNOrCkYmcVBPtiqzRICldTxsRe91wNDRIuhMn5HCar+TtaYqYdjB2gY53Qcs4QiMWNz9yVVwBETPwFIrRDCOQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yw3yypSa; arc=pass smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-67c1eea6b4dso598a12.1
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 11:46:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779907606; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a2eOoq6P/QuLrOCF9yDSzLQ9qvvX/BwWyzEF50evFWExoCyA2qrGxK/60MI2Tu+sRb
+         IA84XLGisEhQwKebiDTABfNulFwE4gyaEygEC+ICSA/x+WGXz2IXdTl7jF6j8DROtPJZ
+         8U6Hu7FETM3/NFJ77qLq/Lr8nTjEOtNRUAHppZKQ0zJ/A4cgD4I7bdCLmX13pxHK91hX
+         8Tpe/Ysm4TTr0+w0uztlFg7sXT9S2NRSz2fghoK5c/Wx22bJk/Q918t38tQxJQZ2ZcKo
+         bFEkLegtBYM4vNBccGFudr4aIJ2dUx0OxqjSMkY72RrRQn19A+aNqBCyaiQxugjmjve1
+         ZrXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7ihsnyiEjxeCtiMQ9Slu0ilDxRaV9GRqrLoCUEqFUHU=;
+        fh=/xLGrOgdlhedLDulHZWunSbjCukoXOzbt/YsDRE77Cw=;
+        b=XwTDx6xaC0yl72DEgZJukOYif9+qLRoFOfVNP3WCuSKHi+hiR8vqeOI21+4Gn/8rUI
+         8+e35febwvMTBMxLCJow8K1x8JfGY97/ezDWxyZg0el1X13dDXEBhNbNQGo3jpnau5mG
+         Q/ui9tG6Uz0vswrGCaSG0t0AkgKZgqISZ1ypVkCIoKpmt0P3K3eEhrlk6l7dHG+DI9JX
+         zJTL8W7QvXSbuH6zEmb+KrHpKiNTPvCcQw7wy5rgZ3IFQMMeWek5Wtr4QeNYhYUpshTH
+         n/XohHJUAq6sOHqOOuPDUGqDgfj+sf+MDeI5O/DN3nU0DSh9r7/WU7jg73+dcjuPXYIb
+         zbCg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779907606; x=1780512406; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7ihsnyiEjxeCtiMQ9Slu0ilDxRaV9GRqrLoCUEqFUHU=;
+        b=Yw3yypSaHoHhC+khkyrjmDiVDBoyB+oARHQzf3w7ZohPvbPoZ7AcSbVlEw7RW6+2RN
+         jwqpz0wfroL1l/sTdwOSP2k3BQzjFnjs3QQoDlB3mjF0qd+MneM6A3ETHG9dhoLAYB3g
+         VZLzxH5eHS70qtv0ICGn/eeCfCy/AGD5Suj85qLlOW16huXG2idILDWeTbKfkD+X3AeK
+         9SvxEq3GU2EbwrtTbxgS3yVNvcmT1AGRMnNXDLlJPXUEhsTWxr3q3RywMWATMyN73D9I
+         WYFULapS3PuzkwDiIuB6YkKF+w4NMrP8sYxH5wc0/QZZnuPGkLritAyKQZ9wy6bLD7Ht
+         8Ejg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779907606; x=1780512406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7ihsnyiEjxeCtiMQ9Slu0ilDxRaV9GRqrLoCUEqFUHU=;
+        b=QrklcIJz3Wxa4sReqqjhLEJJHonanM4YsupWBx5sLg021DKeKpGkr6qgofAjNSLp08
+         y6WoKxptH/rdsa7rUW59N8nZ+/9qKNGzZuJy+7ljkIPYkbDuGmhOwgmUyigepaMl5Q0e
+         AmB+lH4mRC5JKR4nvr0HxO/87BDS8dP5Ca0JpcIkcEe4drei2kKEQ2OGlG3FOAWjsvrD
+         DqMBm2WvMRmdRWmtDAb2GiRvYEALfKusPtdztAOOyQ3yd7zC7rRDkIkoyODGfP6qWN+N
+         Kwnoeo7Ovcx69yXuhJLB+Z5dGGOr+Ks0lcav2ZUGm3bzLjN/+E1X8r0qe/Y1HQQ3KH2A
+         RIPw==
+X-Forwarded-Encrypted: i=1; AFNElJ/R5Df1Xx3RLOcfhS3MBcmACi5l3mUD7FSiM9CHlLrsiZPDQBrOoND6UOezlw7Mur5jACsYAKI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrKJXGQUGwSUbZR/a02aNyinmsp9P5n8gQfiGjO608hKiyeuJG
+	bIQ7FRKRBBP6z3jyR+WU/6iIdz9Jomccqcf17RJJeNQT9XZozlaFoKkwiXC/sZcE9F6jpFivxdU
+	5f0+3SueGIWGW/OEnzhXrO1FAQl8ZYJVynrKz4EGD
+X-Gm-Gg: Acq92OENtU7c9xjpMcHynVFcfZ6c1wZ7M8l6+d84iHQtYAKHoli4anFk/N1luvdRW1O
+	ssh27lOJJbTfc7zvBzoOxCRGX1Um2qWhHOjV9OFAu/tv61K1IFr+WKFORPk+ZGYdgy543Fuc6+J
+	YMu7vZYG9DdqVc1ab1zfHYefXL3Ut83LuNPF/NbogpDOOiH/dg1M/p9lcVl3UoHnGq1ieSd9KT9
+	xSxsxrzM7fxTq6YvDOL08zHEAwfy/PD2ImKr7fwR8i/0oFa2IC+RjVmrm+W5JWQY+nlmcPBE4cb
+	5O/YAK23+ezMf3+977+5TaIXje+c7vGuc4c7tlNMngj99ZhYjEhsH63S
+X-Received: by 2002:a05:6402:3049:20b0:68a:e1ba:9cc0 with SMTP id
+ 4fb4d7f45d1cf-68ae9f1ad0dmr484a12.8.1779907605587; Wed, 27 May 2026 11:46:45
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260527164717.23624-1-petr.wozniak@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+References: <20260514225842.110706-1-hramamurthy@google.com>
+ <20260514225842.110706-4-hramamurthy@google.com> <87mrxtwzz9.ffs@tglx> <CA+mzVtuhB9J9MDHSUfmBeV8hdtprGBsBZWrxLRtvdZY_V_NhNA@mail.gmail.com>
+In-Reply-To: <CA+mzVtuhB9J9MDHSUfmBeV8hdtprGBsBZWrxLRtvdZY_V_NhNA@mail.gmail.com>
+From: Jordan Rhee <jordanrhee@google.com>
+Date: Wed, 27 May 2026 11:46:34 -0700
+X-Gm-Features: AVHnY4LRQWryzmy1-Y9ODmlfgPUPFfiPvshhqHxXipf5cWRCKgqVv6_zzSoippw
+Message-ID: <CA+mzVtt==6x0-BK7_5OupH+a=dwNrMY0YT4fGjHH2OM48MgLkA@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org, joshwash@google.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com, 
+	jstultz@google.com, sboyd@kernel.org, willemb@google.com, nktgrg@google.com, 
+	jfraker@google.com, ziweixiao@google.com, maolson@google.com, 
+	thostet@google.com, alok.a.tiwari@oracle.com, pkaligineedi@google.com, 
+	horms@kernel.org, dwmw2@infradead.org, jacob.e.keller@intel.com, 
+	yyd@google.com, jefrogers@google.com, linux-kernel@vger.kernel.org, 
+	Naman Gulati <namangulati@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-292426-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-292427-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,infradead.org,intel.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jordanrhee@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,queasysnail.net:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: E64145E9414
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 627985E932E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-05-27, 18:47:17 +0200, Petr Wozniak wrote:
-> 2026-05-27, Sabrina Dubroca wrote:
-> > Incorrectly? IPsec in SW with GSO is a valid setup. I think you're
-> > breaking that with your patch.
-> 
-> Fair point — SW IPsec with GSO is intentional and the patch is too broad.
+Hello,
 
-(this whole email looks like direct c/p from an LLM...)
+We would like to request the community's guidance on how to proceed with ad=
+ding
+cross-timestamp functionality to GVE. The key challenge is that the
+NIC clock can only be sampled in the hypervisor because the NIC time
+registers are only present on the PF, and a hypercall takes 60-80us.
+To minimize the uncertainty window, the hypervisor takes a TSC
+sandwich around the reading with an uncertainty window of ~1.2us,
+converts it to guest TSC, and returns it to the guest.
 
-> The actual observable bug on this platform (MT7988A, EIP-197 async crypto):
-> 
->   xfrm_dev_offload_ok() → true (SW SA, dev == NULL)
->   → esp4_gso_encap() marks the skb
->   → validate_xmit_xfrm() → esp_xmit() → async crypto → -EINPROGRESS
->   → validate_xmit_xfrm() returns NULL
-> 
-> On bridge interfaces (noqueue qdisc), __dev_queue_xmit() takes the
-> direct branch, initialises rc = -ENOMEM and never overwrites it
-> when skb is NULL → ENOMEM on every packet.
-> 
-> On real netdevs with a qdisc, sch_direct_xmit() handles NULL
-> gracefully and async completion via xfrm_dev_resume() delivers
-> the packet correctly.
+The goals which led to this implementation were to minimize the
+uncertainty window and communicate the uncertainty window up the
+stack. I've reviewed
+https://lore.kernel.org/netdev/20260526165826.392227559@kernel.org/
+but I'm not sure how we would use it, so if it is intended to support
+our use case I would appreciate if someone could explain how we
+should use it.
 
-But the packet is delivered correctly also in the bridge case, right?
-Once we enter async crypto, the original datapath becomes irrelevant.
+Here are some options on how to proceed, but other ideas are welcome.
 
-> Where would you suggest the actual fix should go — in the
-> bridge/noqueue path, or in validate_xmit_xfrm() / sch_direct_xmit()?
+1) resubmit the patch with the same high level approach with the
+feedback addressed. This is our preference since it achieves the smallest
+possible uncertainty window and communicates it up the stack.
+        - move system timestamp sampling and ktime_get_snapshot()
+inside the mutex
+        - remove get_cycles() and the ordering sanity check
+2) implement getcrosstimestamp() and return the midpoint of pre/post,
+but lose the uncertainty window
+3) wait for https://lore.kernel.org/all/20260515164033.6403-1-akiyano@amazo=
+n.com/
+which adds error_bound to getcrosstimestamp()
+   - error_bound calculation: convert TSC delta to nsec using
+tsc_khz/arch_timer_get_cntfrq() =3D> clocks_calc_mult_shift() =3D>
+clocksource_cyc2ns()
+   - since this patch changes usermode interface, chrony/phc2sys would
+need changes to consume the new IOCTLs, and it is unclear whether
+there is an intention to do so
+4) implement gettimex64() using only system timestamps sampled in the
+VM (i.e. remove the precise path). Accept uncertainty window of
+60-80us vs. 1-2us
+5) implement gettimex64() using the midpoint of pre/post to make a
+single call to get_device_system_crosststamp(), then compute the
+pre/post ktimes by adding/subtracting the delta/2 between the TSC
+readings from the firmware
 
-It looks like commit f53c723902d1 ("net: Add asynchronous callbacks
-for xfrm on layer 2.") updated the meaning of validate_xmit_xfrm()
-returning NULL from "packet was dropped" to "packet was stolen (maybe
-dropped, maybe still going)" and this isn't handled well.
+Thank you,
+Jordan
 
-I guess validate_xmit_xfrm() could propagate -EINPROGRESS via
-ERR_PTR(), and validate_xmit_skb() could return that to its callers.
-validate_xmit_skb_list() would need to check IS_ERR_OR_NULL(skb)
-instead of !skb, and __dev_queue_xmit() could now differentiate the
-EINPROGRESS case from a drop.
-
--- 
-Sabrina
+On Wed, May 20, 2026 at 9:35=E2=80=AFPM Jordan Rhee <jordanrhee@google.com>=
+ wrote:
+>
+> Hi Thomas,
+> Thank you for the review. We plan to rework this to use
+> https://lore.kernel.org/all/20260515164033.6403-1-akiyano@amazon.com/,
+> which will let us use the midpoint of pre and post while still
+> propagating the uncertainty window up the stack. I am going to address
+> some of the concerns you raised simply for the record, not because I
+> am trying to convince you one way or another. I do not expect a
+> response. Thank you,
+> Jordan
+>
+> On Wed, May 20, 2026 at 2:08=E2=80=AFPM Thomas Gleixner <tglx@kernel.org>=
+ wrote:
+> >
+> > On Thu, May 14 2026 at 22:58, Harshitha Ramamurthy wrote:
+> > > From: Jordan Rhee <jordanrhee@google.com>
+> > >
+> > > Enable chrony and phc2sys to synchronize system clock to NIC clock.
+> > >
+> > > Two paths are implemented: a precise path using system counter values
+> > > sampled by the device, and a fallback path using system counter value=
+s
+> > > sampled in the driver using ptp_read_system_prets()/postts().
+> > >
+> > > To use the precise path, the current system clocksource must match th=
+e
+> > > units returned by the device, which on x86 is X86_TSC and on ARM64 is
+> > > ARM_ARCH_COUNTER. The clockid requested for the cross-timestamp must
+> > > be either CLOCK_REALTIME or CLOCK_MONOTONIC_RAW. These conditions hol=
+d
+> > > by default on GCP VMs using Chrony, so we expect the precise path to =
+be
+> > > used the vast majority of the time. If the system clocksource is chan=
+ged
+> > > to kvm-clock, it activates the fallback path. Ethtool counters have b=
+een
+> > > added to count how many times each path is used.
+> > >
+> > > The uncertainty window in the precise path is typically around 1-2us,
+> > > while in the fallback path is around 60-80us.
+> > >
+> > > Stub implementions of adjfine and adjtime are added to avoid NULL
+> > > dereference when phc2sys tries to adjust the clock.
+> >
+> > Sorry that I did not react to this earlier, but I was burried in
+> > regressions and allowed myself to take a few days off.
+> >
+> > > +/*
+> > > + * Read NIC clock by issuing the AQ command. The command is subject =
+to
+> > > + * rate limiting and may need to be retried. Requires nic_ts_read_lo=
+ck
+> > > + * to be held.
+> > > + */
+> > > +static int gve_ptp_read_timestamp(struct gve_ptp *ptp, cycles_t *pre=
+_cycles,
+> > > +                               cycles_t *post_cycles)
+> > > +{
+> > > +     unsigned long deadline =3D jiffies + msecs_to_jiffies(100);
+> > > +     unsigned long delay_us =3D 1000;
+> > > +     int err;
+> > > +
+> > > +     lockdep_assert_held(&ptp->nic_ts_read_lock);
+> > > +
+> > > +     do {
+> > > +             *pre_cycles =3D get_cycles();
+> >
+> > This is a completely non-sensical hack. Why do you need get_cycles()
+> > here, which is a horrible and ill-defined interface that others are
+> > trying to get rid of?
+>
+> We use get_cycles() purely as a sanity check against the TSC values
+> returned by firmware. We do not use them in the time conversion.
+> This check found a serious correctness bug in the firmware.
+>
+> >
+> > Just because it's still there is not a good answer and it's actually no=
+t
+> > required at all. See below.
+> >
+> > > +             err =3D gve_adminq_report_nic_ts(ptp->priv,
+> > > +                                            ptp->nic_ts_report_bus);
+> > > +
+> > > +             /* Prevent get_cycles() from being speculatively execut=
+ed
+> > > +              * before the AdminQ command
+> > > +              */
+> > > +             rmb();
+> > > +             *post_cycles =3D get_cycles();
+> > > +             if (likely(err !=3D -EAGAIN))
+> > > +                     return err;
+> > > +
+> > > +             fsleep(delay_us);
+> > > +
+> > > +             /* Exponential backoff */
+> > > +             delay_us *=3D 2;
+> > > +     } while (time_before(jiffies, deadline));
+> > > +
+> > > +     return -ETIMEDOUT;
+> > > +}
+> > > +
+> > >  /* Read the nic timestamp from hardware via the admin queue. */
+> > > -static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw)
+> > > +static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw,
+> > > +                              struct gve_sysclock_sample *sysclock)
+> > >  {
+> > > +     cycles_t host_pre_cycles, host_post_cycles;
+> > > +     struct gve_nic_ts_report *ts_report;
+> > >       int err;
+> > >
+> > >       mutex_lock(&ptp->nic_ts_read_lock);
+> >
+> > Why is this lock taken _after_ the regular (fallback) pre/post
+> > timestamps are aquired?
+> >
+> > What's wrong with doing:
+> >
+> >        do {
+> >                 guard(mutex)(&ptp->nic_ts_read_lock);
+> >
+> >                 ptp_read_system_prets(sts);
+> >                 err =3D read_nic_timestamp(...);
+> >                 ptp_read_system_postts(sts);
+> >        } while (err && !timeout(...));
+> >
+> >        return err;
+> >
+> > which moves the "fallback" timestamp right next to the actual hardware
+> > readout?
+>
+> The lock is taken at the smallest scope possible, which does not
+> include the pre/post TS reading. This routine is called by multiple
+> callers, not all of which need the pre/post timestamp. Options are to:
+>  - move the pre/post TS reading here and add branches to conditionally
+> sample them only when needed
+>  - always capture the pre/post TS readings and discard them when not need=
+ed
+>  - duplicate the locking logic, once for path that needs pre/post TS,
+> once for path that doesn't need pre/post TS
+>
+> Since the fallback path is expected to be rarely used, lock contention
+> and retries are expected to be extremely rare, and chrony is resilient
+> to samples with high uncertainty window, I chose to prioritize
+> cleanliness of the code and keep the pre/post TS reading in the caller
+> where it is actually needed. That said, I do not feel strongly about this
+> and would be open to moving pre/post inside the mutex if I were sending
+> another revision.
+>
+> >
+> > That would make the "fallback" case too precise, right?
+>
+> Moving pre/post inside the mutex makes no measurable difference
+> because the lock is rarely contended. There is 4 orders of
+> magnitude difference in RMS offset between precise and fallback paths.
+>
+> >
+> > After noticing the obvious, I just checked what our new AI review
+> > overlord "sashiko" has to say about this:
+> >
+> >      "Does wrapping the timestamp read outside the locks and retry loop=
+s skew the
+> >       measurements?
+> >
+> >       In the fallback path, ptp_read_system_prets() is captured before =
+calling
+> >       gve_clock_nic_ts_read(), and postts() is captured after it return=
+s. However,
+> >       gve_clock_nic_ts_read() acquires ptp->nic_ts_read_lock and calls
+> >       gve_ptp_read_timestamp(), which can sleep using fsleep() during r=
+etries. This
+> >       means the prets/postts window could include mutex wait times and =
+sleep
+> >       durations."
+> >
+> > It _IS_ actually on spot. So why the heck did this garbage get merged
+> > without addressing this obvious fail?
+>
+> - The fallback path is expected to be rarely used since it requires
+> changing the default configuration
+> -  The lock is rarely contended as there are only 2 callers, one of
+> which only executes once every 250ms,
+>   and retries would only occur if a VM exceeded their rate limits
+> which have been tuned not to occur
+>   under normal chrony calling patterns.
+>
+> >
+> > What "sashiko" actually saw aside of that, which I didn't see myself wh=
+en
+> > looking at this, is:
+> >
+> >    "Similarly, in gve_ptp_read_timestamp(), the get_cycles() bounds are=
+ taken
+> >     outside the gve_adminq_report_nic_ts() call, which acquires the sha=
+red
+> >     priv->adminq_lock. If there is lock contention, the cycle bounds co=
+uld become
+> >     extremely wide."
+> >
+> > Oh well.
+>
+> get_cycles() is only used for sanity checking the values from
+> firmware, not in any time conversion.
+>
+> >
+> > So what you really want is:
+> >
+> >        do {
+> >                 guard(mutex)(&ptp->nic_ts_read_lock);
+> >                 guard(mutex)(&gpe_priv->adminq_lock);
+> >
+> >                 ptp_read_system_prets(sts);
+> >                 err =3D read_nic_timestamp(...) {
+> >                         ...
+> >                         return gve_adminq_execute_cmd_locked(....);
+> >                       }
+> >                 ptp_read_system_postts(sts);
+> >        } while (err && !timeout(...));
+> >
+> >        return err;
+> >
+> > Or just rely on gpe_priv->adminq_lock in the first place. No?
+>
+> adminq_lock is private to the adminq layer and protects adminq shared dat=
+a
+> structures. nic_ts_read_lock protects the global DMA buffer that receives
+> the timestamps. Since retries are a response to rate limiting, we must wa=
+it
+> between retries, so we do not want to hold the adminq lock across
+> these retries as it would block other non rate-limited commands.
+>
+> >
+> > But what's worse and escaped the AI scrutiny is:
+> >
+> >   Your attempt to convert these 'get_cycles()' time stamps after the
+> >   fact and outside of the timekeeping core protection is fundamentally
+> >   wrong.
+> >
+> > get_device_system_crosststamp() does
+> >
+> >       do {
+> >                 seq =3D read_seqcount_begin(&tk_core.seq);
+> >                 take_timestamps(...);
+> >                 convert_timestamps(...)
+> >       } while (read_seqcount_retry(&tk_core.seq, seq));
+> >
+> > which covers the whole sequence of taking the snapshots from the
+> > hardware and the conversion.
+> >
+> > Your abuse of this is completely out of spec. Just because it did not
+> > blow up in your face yet does not make it in any way correct. You do no=
+t
+> > even get bonus points for creative abuse.
+>
+> We use ktime_get_snapshot() to capture a historical snapshot before sampl=
+ing
+> the TSC, and we pass it to get_device_system_crosststamp() which
+> uses the snapshot to interpolate the sample if it occurs before the curre=
+nt
+> timekeeping interval. Perfectly within spec.
+>
+> >
+> >
+> > Now let me look at the "firmware" provided timestamps.
+> >
+> > That's the poor mans emulation of actual hardware timestamps aka PTM.
+> >
+> > Why do you need all this pre_nic/post_nic muck there? Fix your firmware
+> > to actually honor PTM and not provide some made up version of it.
+>
+> This has to run on platforms that don't support PTM.
+>
+> >
+> > Also the whole debug mechanism of comparing the time stamps of
+> > get_cycles() with the timestamps provided by firmware tells me that you=
+r
+> > firmware is a hacked together piece of garbage.
+> >
+> > If you want to use "hardware" timestamps then populate the
+> > ptp.info.getcrosststamp() callback.
+> >
+> > If your firmware really can't do PTM and only provides pre and post
+> > values, then you simply can take the midpoint in your getcrosststamp()
+> > callback:
+> >
+> >       do {
+> >                 guard(mutex)(&ptp->nic_ts_read_lock);
+> >                 err =3D read_nic_timestamp(...);
+> >                 system_counterval->cycles =3D (nic_pre + nic_post) / 2;
+> >       } while (err && !timeout(...));
+>
+> We considered returning the midpoint of pre/post up through
+> getcrosststamp(), but there was
+> no way to communicate the uncertainty interval which is important
+> for some of our use cases.
+> https://lore.kernel.org/all/20260515164033.6403-1-akiyano@amazon.com/
+> fixes that issue, so we can use that when it lands.
+>
+> >
+> > If you do not even trust your firmware then you still can validate it
+> > easily without creating horrible hacks:
+> >
+> >       do {
+> >                 guard(mutex)(...);
+> >
+> >                 ptp_read_system_prets(&ctx->sts);
+> >                 err =3D read_nic_timestamp(...);
+> >                 system_counterval->cycles =3D (nic_pre + nic_post) / 2;
+> >                 ptp_read_system_postts(&ctx->sts);
+> >       } while (err && !timeout(...));
+> >
+> > and then check the ctx->sts timestamps against the results provided by
+> > get_device_system_crosststamp() after conversion in your
+> > ptp.info.getcrosststamp() callback:
+> >
+> >         err =3D get_device_system_crosststamp(..., &ctx);
+> >         if (err)
+> >            return err;
+> >         if (ctx.sts.pre_ts > xtstamp.sys... || ctx.sts.post_ts < xtstam=
+p.sys...)
+> >            return -EBROKENFIRMWARE;
+> >
+> > no?
+>
+> get_device_system_crosststamp() has nontrivial logic that operates on the=
+ system
+> timestamps, so I am not confident that a bad TSC value would be detected
+> if we ran it through get_device_system_crosststamp() first. The check
+> is simplest
+> and strongest when performed against the raw TSC values received from the
+> device, before passing them to any kernel API. But I hear your point
+> about mistrusting
+> the firmware enough to need this check.
+>
+> >
+> > Jakub, please back out this hackery before it makes a precedence for ot=
+hers
+> > to copy from.
+> >
+> > Thanks,
+> >
+> >         tglx
 
