@@ -1,161 +1,126 @@
-Return-Path: <netdev+bounces-292253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIxUAHLQFmowsgcAu9opvQ
-	(envelope-from <netdev+bounces-292253-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:07:30 +0200
+	id 2BLjLOfPFmowsgcAu9opvQ
+	(envelope-from <netdev+bounces-292252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:05:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192CF5E3162
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:07:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00535E3117
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F4084301A2A2
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:07:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 21DEB30095F6
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5728C3C5539;
-	Wed, 27 May 2026 11:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71433E9580;
+	Wed, 27 May 2026 11:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="fdcZNoyt"
+	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="izVqxEVt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0F98F7D;
-	Wed, 27 May 2026 11:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39A28F7D;
+	Wed, 27 May 2026 11:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779880044; cv=none; b=GxiGbKxG0ljZ6Z39z3VlJwEWYmJjj3s+IZc3a+y1WIhRo5G3ic2/JK4cq6v6U5sqCV+/avnMwHnTBWfM8459ggG6jdEJDsnKZaBHCA0D2oCJrDnjaUAPEznlzN9k0y8+VvtGqU1qyzxnXkrg0mT+PJizMj7pVPVPhb9YqxK4H2Y=
+	t=1779879899; cv=none; b=sahtCxhpmtYJsacAr3G7JID1VVzMH5t/ObAAHUF6w0IjuLFrH9wWuiwr+wi+NmhgbZhOWk7L7jh8jw9yPzJSwP79ZwhDNJl8Zkofq8RGtfIdCr2MSJjOiHOr2c2zsCFxHtLX19+wq57RRDAf/BSILs3HIOV5AHgCKfIOKEvJ9lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779880044; c=relaxed/simple;
-	bh=tR2h7ZPXwFL6Np/Sen8hisfqQuCHkJ00R/Jk5VxMWmg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nQi8lu2APquUUWCZVUtcDr4YqeHHYfPGNec8ZNN+jaV8jWlNf1fAFe3OaBAr3j/Rtoc17vORZb/fjvNk1/CK9pv/vLhnlIltP8dcfZqe82fHRJZ0dpu0VpAJJynSTa6nrrLobDZNmyFuJjtPxz3U8PcDFduC8wke7PPKRLBD/UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=fdcZNoyt; arc=none smtp.client-ip=101.71.155.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from DESKTOP-SUEFNF9.taila7e912.ts.net (unknown [221.228.238.82])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 400701e33;
-	Wed, 27 May 2026 19:02:07 +0800 (GMT+08:00)
-From: Dawei Feng <dawei.feng@seu.edu.cn>
-To: anthony.l.nguyen@intel.com
-Cc: przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jesse.brandeburg@intel.com,
-	sln@onemain.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Dawei Feng <dawei.feng@seu.edu.cn>,
-	stable@vger.kernel.org,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH net] i40e: fix netdev leak in i40e_vsi_setup() error paths
-Date: Wed, 27 May 2026 19:02:05 +0800
-Message-Id: <20260527110205.1780595-1-dawei.feng@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1779879899; c=relaxed/simple;
+	bh=o0xh171fdwD+9c0xRLYHo8tZ/vQg88T8RsWQ3V606Ag=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=H1d498rgziKeNYtj5QpFAJazR+LoHkDox6umn1micRjvn0RKUSoEiMk+msE/5plpQJhKtlE7TVmMwUDcSIU1ZAw7TlNNdffzVaqRVsXownACeSm5twWa6zZOCdg+RGPX5uSeKN2KAmrmTE2Y5a+aqSPWVEqMxp3y596EtBcHXeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=izVqxEVt; arc=none smtp.client-ip=216.154.215.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 64RB4Leo009199
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 27 May 2026 12:04:24 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 64RB4Leo009199
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1779879869; bh=o0xh171fdwD+9c0xRLYHo8tZ/vQg88T8RsWQ3V606Ag=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=izVqxEVtUheC+mWoTFjcYaAwvzv7aTvikcq5JRePD1sZ6SxPSSS5HVg892VJkZYS0
+	 yv1y62Ju+cqa/M9Edj7S2O6bZaVivkELahmfGINZSyh9NPY9KkiQrZEo7RFkWgFGK+
+	 VHtvS6w2ppYeaf1CMTP4TLE/WzRLA0ZIyZsDTx/pra/ch0yp2xPaUqLbFMsBJWIL/Q
+	 moYi8E1LUtECViXmuzhtJbuk5cRO+UxAe9lNUMSYdINEjGCfqYVFtb5jq67dBsOKI7
+	 1qWd6qHtHaNLSNjEnA2bhqZnKfsBb4ooNyqZrk0b06++YTb5nOyznkS6Ee39Y0ent3
+	 Db8SAoRU4YZTA==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9e6919500903a2kunmc4d7ecc43a9e3
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCHUNIVk5JQxpOHU9OSElDQlYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUpVSUlDVUlIQ1VDSVlXWRYaDxIVHRRZQVlPS0hVSktJSE
-	5DQ1VKS0tVS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=fdcZNoytiqVTMEEmwEnbmex0Y1AkGfokDoeVK/FAqs8BroYuQVbZIyOOzfT/pJthOVyQUWlIyEEASP8Nmw04wFHf6xUSq7xXW4U962Q3dBcgafEc8V7H2KxzWT+1HIbbJ68BvAt9ys/pEs7Po85jJSNJbEyLPGecLLWlQVQInkc=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=L4JvB8zmfLhyCH5RmecUwJB8gs5HNGzG6nxv4Q9PYZc=;
-	h=date:mime-version:subject:message-id:from;
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: [PATCH net-next 5/6] net: dsa: mv88e6xxx: CBS support
+From: Luke Howard <lukeh@padl.com>
+In-Reply-To: <CABvLYuAYBwbJbNwhTQi=aJ=APdQekVBELog=tyDO3deAr16o=g@mail.gmail.com>
+Date: Wed, 27 May 2026 21:04:10 +1000
+Cc: netdev@vger.kernel.org, Kieran Tyrrell <kieran@sienda.com>,
+        Max Hunter <max@huntershome.org>,
+        Cedric Jehasse <cedric.jehasse@luminex.be>,
+        Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <74040510-EFB6-4BCA-9818-46168CB7014E@padl.com>
+References: <cover.1779841530.git.lukeh@padl.com>
+ <b4279a06b836da86ad0c0137c3a6989a99241427.1779841530.git.lukeh@padl.com>
+ <CABvLYuAYBwbJbNwhTQi=aJ=APdQekVBELog=tyDO3deAr16o=g@mail.gmail.com>
+To: Cedric Jehasse <cedric.jehasse@gmail.com>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-292253-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292252-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dawei.feng@seu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,sienda.com,huntershome.org,luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[padl.com:+];
+	DMARC_DNSFAIL(0.00)[padl.com : query timed out];
+	NEURAL_HAM(-0.00)[-0.821];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:dkim]
-X-Rspamd-Queue-Id: 192CF5E3162
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: F00535E3117
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-i40e_config_netdev() allocates vsi->netdev for main and VMDQ VSIs. If
-i40e_netif_set_realnum_tx_rx_queues(), i40e_devlink_create_port(), or
-register_netdev() fails, i40e_vsi_setup() goes to err_netdev without
-releasing the netdev. The existing cleanup only frees the netdev after a
-successful register_netdev(), so these error paths leak the allocation.
 
-Reorder the error paths at err_netdev to ensure proper cleanup of the
-allocated device.
+> Why is the avb_mode set from the cbs setter?
+> avb_mode is an ingress setting that controls if frames are classified =
+as
+> AVB frames. Cbs configures shaping on egress.
+> Eg. if an AVB stream is received on port 1 and is forwarded by the =
+switch to
+> port 2. AvbMode needs to be set on port 1 and cbs is configured on =
+port 2.
 
-The bug was first flagged by an experimental analysis tool we are
-developing for kernel memory-management bugs while analyzing
-v6.13-rc1. The tool is still under development and is not yet publicly
-available. Manual inspection confirms that the bug is still
-present in v7.1-rc5.
+Sounds like a bug which might explain why enhanced/secure mode didn=E2=80=99=
+t work when I last tested it :)
 
-An x86_64 allyesconfig build showed no new warnings. As we do not have an
-Intel Ethernet Controller XL710 family adapter to test with, no runtime
-testing was able to be performed.
-
-Fixes: 41c445ff0f48 ("i40e: main driver core")
-Cc: stable@vger.kernel.org
-
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 6d4f9218dc68..1ced01b0cc09 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -14491,13 +14491,15 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
- 	if (vsi->netdev_registered) {
- 		vsi->netdev_registered = false;
- 		unregister_netdev(vsi->netdev);
--		free_netdev(vsi->netdev);
--		vsi->netdev = NULL;
- 	}
- err_dl_port:
- 	if (vsi->type == I40E_VSI_MAIN)
- 		i40e_devlink_destroy_port(pf);
- err_netdev:
-+	if (vsi->netdev) {
-+		free_netdev(vsi->netdev);
-+		vsi->netdev = NULL;
-+	}
- 	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
- err_vsi:
- 	i40e_vsi_clear(vsi);
--- 
-2.34.1
-
+I think it might make sense to have CBS just configure the shaper/strict =
+priority (i.e. as your patch does), and then only enable AVB mode if the =
+shaper TC has a MQPRIO parent (retaining the mapping of TCs to AVB =
+classes).=
 
