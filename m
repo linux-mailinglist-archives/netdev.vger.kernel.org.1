@@ -1,243 +1,232 @@
-Return-Path: <netdev+bounces-292341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDcCAxEKF2pB2AcAu9opvQ
-	(envelope-from <netdev+bounces-292341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:13:21 +0200
+	id IK8nHTMKF2pB2AcAu9opvQ
+	(envelope-from <netdev+bounces-292342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:13:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A8A5E6A3A
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:13:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC18F5E6A57
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:13:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ACF36300E5FA
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:07:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A2ED300D956
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7253644C7;
-	Wed, 27 May 2026 15:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F293428838;
+	Wed, 27 May 2026 15:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VumemsVA"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NRkoPhkJ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="z3l60Ve6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D463F380FE9
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 15:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779894425; cv=fail; b=Em9UKBzmP6Fp8LNYPBDQRfvuRqSoIUjhdeVMY2tTw3cPtvUQAjsiXzO1jb6yckC/w+5KzeVmaMfR1C7y67oC6FIKzLc+BM0hGOzalltNzVA61qEeN2G/IpyeouTF6KCNeRpT3AvPoBM72Rye1DVBMcBWqnHdVUcPse1LveBQkFo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779894425; c=relaxed/simple;
-	bh=u5E2z+yhbK7hyM2dq1efp5YVpX0WWq1/jQ1XWYMWmzE=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZW+qWQxUhkAb4YPqh/5d9VY1pb0FFCSNFNXzBZVqZr0K0tt+X5ZU5xfv/uHHGYpSpl9afCNZh5D1B1bev1CobUMx8eletdwthxE5TgHpBCd9sd4uUkk70rh/L5eEqe2m5+Mq9lF1TzWnsiMOSst1/gKuF3AIHraXBHvO3ySj4i8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VumemsVA; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779894423; x=1811430423;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=u5E2z+yhbK7hyM2dq1efp5YVpX0WWq1/jQ1XWYMWmzE=;
-  b=VumemsVAIqnOzDYruU8YTm3l5c85GNmqgaq5jYst6Y4MJccVf8MfmeQy
-   yJLgbxB2IoMbr61xfI3J1dwAQAGLMatpD7mIctKRA9KcSX1cG0HJ7WRiI
-   18lRl1YK6LrzsG2Lg60WNOq8YVarwVER7ksM50AY/UVKcyMXjcHLMY+pQ
-   W8RxBejmPo/uMRMHf7l1DpdNk19TpTYX9q53U2nTXxGnU3oFnnvhgm47q
-   4k8GJ1Im2kqi0YVuTFAnH1vJMsvGsCApkv9T+rd5GAAzyaL6vaokF+/W7
-   fEbPCbbUhfVm9ZsAa3XxQLA2niSA03J431ZVgN+YYR+YT+rGB0nYi5EYW
-   w==;
-X-CSE-ConnectionGUID: YHqVghVBTjSux9/KY8eucg==
-X-CSE-MsgGUID: 5Khl/Y5kT067G7wcVwvahw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11799"; a="80836958"
-X-IronPort-AV: E=Sophos;i="6.24,171,1774335600"; 
-   d="scan'208";a="80836958"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2026 08:07:00 -0700
-X-CSE-ConnectionGUID: HZd15pZ5R0yQ3qAotKbeKg==
-X-CSE-MsgGUID: zsGaaqcPRzSXhUqYiBp+9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,171,1774335600"; 
-   d="scan'208";a="246293366"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2026 08:06:58 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 27 May 2026 08:06:58 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 27 May 2026 08:06:58 -0700
-Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.32) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 27 May 2026 08:06:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a5G7BfxvssZezNma3gh8zv2k4YmeGv4VS+4eznLaVByMFmi2RRKxCJpt3peoGErplgbk9bEwc3I9i3GCaw4Iy8BZdEzo438L1CZeM6xbAvYBY1aMMOXCZyy/PQMwvnuszXPnHa8JFM6q+q2CdtwB6i3c9ijO3HVIecV56E1DRcRjoy2JVr8uHDAnADf5A9B3X03GiMOsOwFQHUhy0VI+em5OFA4gMGy1g5m2AsCgqqYjLzsp6+/ZpnMkCFIMafDengE97PvoBHsdJxnQNddkXoCur9/0F/AQoWUsUi6YrFQu0FCaXInHCSDVBKg0rOGxijp3YzwK9ngS2tynvt8u1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u5E2z+yhbK7hyM2dq1efp5YVpX0WWq1/jQ1XWYMWmzE=;
- b=C4RkJJXjqpVcItChZ+tcKsuamUPPcsR9aCtLw1ny1dhUiKWk4BHDJ3VWuwXJVtiAa0Ru4HLm6K348QgsFaHiP+vf0YwXyMR6CyoEV4dTXzEw8pJOZRCP1/5hIQ47Qt5o4wPcbleXZV0LTOdPizaDl718LGpmgcMh31OPQyaWaS89Q9Y/bjGJMAzREwVEOzOqIKSLC7d1zPh4qXX2Tj1ktGJ/ewXFFGsCEgO+LdBEe0QKc/+TRVR5aluP39vEFbRNzbDK7eU0LbpBejlCSyKYFKENTgM26p5SSKkw/FQSTNKm5WU8yPP8IxGjdvf/wzTzXF+2BBcNol3CK08YxDh1Vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
- by DM3PPF8ABC16DA2.namprd11.prod.outlook.com (2603:10b6:f:fc00::f36) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.13; Wed, 27 May
- 2026 15:06:54 +0000
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e%5]) with mapi id 15.21.0048.016; Wed, 27 May 2026
- 15:06:54 +0000
-From: "Salin, Samuel" <samuel.salin@intel.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"Olech, Milena" <milena.olech@intel.com>, "willemb@google.com"
-	<willemb@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
-	<horms@kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-Subject: RE: [Intel-wired-lan] [PATCH net] idpf: fix mailbox capability for
- set device clock time
-Thread-Topic: [Intel-wired-lan] [PATCH net] idpf: fix mailbox capability for
- set device clock time
-Thread-Index: AQHc3xvEP+hn3pRbOUOVGo6FMVldOrYiFcyQ
-Date: Wed, 27 May 2026 15:06:54 +0000
-Message-ID: <SJ1PR11MB6297B7EF97D30E9200A8CFB99B082@SJ1PR11MB6297.namprd11.prod.outlook.com>
-References: <20260508185123.2422760-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20260508185123.2422760-1-alok.a.tiwari@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|DM3PPF8ABC16DA2:EE_
-x-ms-office365-filtering-correlation-id: 931805e6-838c-4111-ab76-08debc0196d5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014|38070700021|921020|6133799003|56012099006|11063799006|18002099003|22082099003;
-x-microsoft-antispam-message-info: OCV13GOWqHr21hgSL4KAE7Np+swaVZ8TY1+nCGtbXYDBlfnXgUzaqo26F3rJ7jA/g2p6dHQVzs5wALRFrshyTFlH4o5wpi39rBMOr/ZWnB/8bC9Q/sznY10H2z5n5I6F2N2N68Bh3hs04qFAavvQehPvO7G+gxJDH9dBIcU4Oop5APUIDSY71m63qZTz1LC8LmBslPEUZK7Fv0ptHtwCakWkDwp7Ti3sOu4y1xl6jUo/Jybvw5cJ7/MkQ86o2b63wYLroiKZPMfdlyQXHJdOq6sGuoHWIU6FJkXvH8v7RVZJbK0d0xCPfFJXmDpClOXM3PkH54KEgRvkmMReBTSPxLyrG8kYqseLdsKXc9sxZc+DeHUp46rUoby9C9vh38cYTo12dsp2wXL4qz0hjucbxx7Aml01H1x7UZ3kmhwHyyQxiOhvOiSVJsEJcIAd+AVKUNpV2+JL94a094oxZuTAV19fMph49hIcN1aiTwccWR/M+65jhuDf+oFYsgzAcutHFszr++RDECOuNSyx9Uuz9SP1yDpF8A/gINeAQY2T0Th5UJH+sTHsEdM/3g08fZledw7MWxCVzR2qSiGRJ5pJ58rSF2G8zxGHpos37maVpdwGx0XAIbxsvks+K80Gpg+euth3vOgh1NYQ17SUHms0g1LPXey+KrZ4k2z7xolJmvo3jDM9HsDKuMK8aphhzbPQ9iDborbW0sjQqfkCecHcl/4mwdkeGMw3GFlKOY/o/Ym+sONrt6FtxmM/Uv2zlE8b93BQ34mca2VFlfXBRNe6wA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014)(38070700021)(921020)(6133799003)(56012099006)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?eZm6wztL9RoWQVRq9Y0RW8smlh5lpvjaIaphC8utH2SY/z3oaJLs2PP5W4R3?=
- =?us-ascii?Q?NSo1wg59LaoL3hl9QNctY5/mBwjIEKuWrKVbsQAuiATcxQYT7QPOdxNPLtan?=
- =?us-ascii?Q?9Wcqr5cQWsOhJhoKwdTtKcwUt6wVLnrB0kal+71znlgKQLtmaUJliwL6V87+?=
- =?us-ascii?Q?JJLwWOOh1pq/cjPyE72chxEPQg91ehgeUwxSoFxBVrfaiZhBTd8q2AjW28sH?=
- =?us-ascii?Q?RWnU6weaFfwbhpVv5lvLzbXlTceV4X5abbQwxrMoZmQOHCKiEX6jLg7Sudun?=
- =?us-ascii?Q?CBYsP3xa5prc7qw3DMXJVQ32Phz4omHjeCXeRfvmIsc5fzF0Nw0oSHAo7OvL?=
- =?us-ascii?Q?ngMWKdD+PHzkJZTcMO4naNuPbwp5POH381ol+NBYr1aWa4cfDJHdlnwxCSpF?=
- =?us-ascii?Q?MHQ0FPhKSpJXCwt8I/4sQ0v4rXVtYuJHDngT3B7G7RQB8ACskMNOG8BKNc72?=
- =?us-ascii?Q?8MP35ZMT2S+w5YDttAUmVtkXg/5cQRpIa2BnXDog2wC2rlYu9hFWIqjOU3IR?=
- =?us-ascii?Q?7Y4im+35tyxTOMJf/QcwMOvyOb30o5ySq8i+PB+t9xU0SnnI4BAt/UWHAGqf?=
- =?us-ascii?Q?SMVa46mHCfHNMbvFEuN0fk7iL1ur4qAi8sal+0qY2pRjkUyzRZV4Qyc8UtL/?=
- =?us-ascii?Q?rJr7T3a/QIIPs44Jkno3LKeSGAzVBzzhtL59jPoZso413KxWOSMcXryFiaoA?=
- =?us-ascii?Q?Ul8a1hrl1luARYZV+NACY2aeKjsG0VlIjOLprJ7EERldx8D6LslBXLUAM5/a?=
- =?us-ascii?Q?6bzoVYJoStu4EfxjkHpzIfDeGchDTC8xejR9LN9NvLInMWu8dgXqbM2p6+zj?=
- =?us-ascii?Q?/NhEpGjgiLaO3VvL2tNGY1NqMOTRM/m6kO7ZtVhuaeFncJhZIu39+w4/8LpJ?=
- =?us-ascii?Q?HhQBLFJX384Cy4MgT884TSZYgE8NHOAi5Ms2yxiSWGpZjINSoX0REDXmJM7y?=
- =?us-ascii?Q?nfHZQwXG4fbdh+fr8TtwhsPtl2AyCWQF3xW6c+ReRT5kHxDZcTo/ddQYplaF?=
- =?us-ascii?Q?K/3/jDl7Yn4+Z1M8/FqpfucmrgixIipJFV9UATRw5Ln08q3wtbCV7JrBFvk8?=
- =?us-ascii?Q?/cLU6A6eGHHjOLUQv5rQDxCeqVLwH11eOdL3ZZpefE606OWE/V8t1m7w/FL8?=
- =?us-ascii?Q?HLvST1EUMPPwfU4XUeba52H1cw/fIUTVeI4VYuyspEaThGLu/FtM24xRvPqy?=
- =?us-ascii?Q?XMSnUyBplzLi5/xDt/t1AuhQdcblrB2CqPIk0Wm70q3ctp0svY8k3he2M4/4?=
- =?us-ascii?Q?68QsnSh0FySu5f16n+Tm7StkSVya370WIAnSieIamPA6WGqiA4JmYxBq8h0y?=
- =?us-ascii?Q?hjDfQvjBMhytURL+LnscVpdMgprlGnBm5TdQruYh3psDD/6IoZEJm8AayU31?=
- =?us-ascii?Q?AoXUmT/UqwRPw7TsEYXKaY/UCu1BhxLft3h4PBcAOI4fERFMsvt2Iz/vUfVy?=
- =?us-ascii?Q?U7Uw4WSElwBsUeRXPjXIVGBjwt0Ao7KvY+jaHSP0luzk2MZSGQp7OPMWdekG?=
- =?us-ascii?Q?lckHrCzgMkxMlVAy9aY9H/ZWpUjnw/8AZlbiSdBi+6+n0kjZAz1/d9Vt2WhF?=
- =?us-ascii?Q?adzG/pAsjf2bkoQgfYcGI5XnbZRLtmW2jy8X03ITfwZ+d89olws+HZxJsez2?=
- =?us-ascii?Q?MEfqd/C46zBro4Lj/8vAaA2c9YUyc3mn6hkvWITTgnBwZqIen2XJGifDmcq+?=
- =?us-ascii?Q?e8+Hv5XFEWfhT0blN84GoyXXUhE2KBMkemAH9J+mAIG1zSH1?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2552426EA2
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 15:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779894630; cv=none; b=JJVaAjN8GpQp+5MF/I4yfrTSE5Prz47FYY2W+sldTGgu2XKFGQyTRoTr2QXKhjsOsgBGVl4p0yzweRxOtrD2SEQ4H/TX4TPcRsb2En1H4xM0NK17c/WPBNLVX/NaXNY0qCnVBa+tSbFpkcGROUNmQwOZ8PycJxPa5p6YlaGuHNg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779894630; c=relaxed/simple;
+	bh=9ZEieCcrkSYiIOTc4VPlo6oflXZSUXBhpfeNOwskez8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gpS2AdxBw3rUDXDbN5ZmF4B+NZPayw2bHAyLKbEPfZX1Rj6aRt6EjmM0jY5SL2rv0S3Ic0riG1MmFv/8jdW62fQ30FG40HIpiLG2DlVo5qIAY3z/d0z7PPoMvCfispFLNZL+IN+wLPKHRzU4lAK2Gj3NULOmH9pgb7r6u7VxT2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NRkoPhkJ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=z3l60Ve6; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1779894624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pFCeYLW2qz20PLByRkhB8J0SIUN9K+7WWwsKQQL+15k=;
+	b=NRkoPhkJi9kZgfZhzoWZIjK7nVBiZ23VXRDfmPcoMREIIcsOo+wUJ33q/lrqjhLhzpciAW
+	mutU4P9sg0pDGkLxeHJYbDLw0IUFd3ITEYC49UnDLtGPW+DaLe2QvxXy6umDv4aGadoYoN
+	ov4d94kT1LMhEcc9xmnPgmqTOGcZP5hKm7nZ1gPZqt3sAl5KcsvrgqJpVGd79Rbli2To9V
+	bV68Dz+LcgvgaW+1wwBmHEbcarnFXNoJ+0Sqs8/bICB2BJ4RD9T3MeahjF1nllpwHUaK0z
+	n/EC+DxVIXr7O5eNIv24O5RATjGOhvEgoBgRWQz5KUiCRXRko3pWz3jzq5ap1Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1779894624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pFCeYLW2qz20PLByRkhB8J0SIUN9K+7WWwsKQQL+15k=;
+	b=z3l60Ve6X2xNTcKcY8j72AyUAjUC6VWjiVirohCpZXxgrsm8aSBWlOaVHVRzJrvBhUYvSW
+	lx64jUpR9ZZKjsCA==
+To: netdev@vger.kernel.org
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Felix Maurer <fmaurer@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Neelima Muralidharan <neelima@ti.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praneeth Bajjuri <praneeth@ti.com>,
+	Pratheesh Gangadhar TK <pratheesh@ti.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next v5 0/8] hsr: Add additional info to send/ receive skbs
+Date: Wed, 27 May 2026 17:08:50 +0200
+Message-ID: <20260527-hsr_ptp-v5-0-158a7633eac0@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: M2I2esrU7O7FR2Sp9ploExB88ocBr4XoUorB7v2MJBqomkByLiEVj1JR/Vd0jr+ZYVbmG0fAJPjsFAX4mjyWft6I6NT5+ZcR7UXp1tZQhCVAMyBgRuEaSzajGS/HTMdPclwZDtUaci83CZpqoszI2xGuJ+oPVtX4v4vcnIkbz+1hW1GGR6MJlfIv/fptf58a+LW+yPm8ELK6hoEHxOW74BRndl794Mg7oSrIlE92LQ/Xi0EkcXeZoKa1y9EWQUXwP8+kkMJ+j8/er8DjRwYQoc/fXUiMFJ/dR+8C/HVuKLhB2PzI13JigBCI2s6tAMYKMqoEaf8MqbZk2uCpVXukdQ==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 931805e6-838c-4111-ab76-08debc0196d5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2026 15:06:54.4448
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4E9odjjKNNAGsiQtxLWMPQ9I/ExQViGbQjpnUjwAPQYOqxmUOXtgg/XkmD97Cxo55OoRa91ByRa2RjHmXVNNJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF8ABC16DA2
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20260204-hsr_ptp-1f6380f1d35f
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292341-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-292342-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linutronix.de,lunn.ch,ti.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 70A8A5E6A3A
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: BC18F5E6A57
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Alok Tiwari via Intel-wired-lan
-> Sent: Friday, May 8, 2026 11:46 AM
-> To: Lobakin, Aleksander <aleksander.lobakin@intel.com>; Keller, Jacob E
-> <jacob.e.keller@intel.com>; Olech, Milena <milena.olech@intel.com>;
-> willemb@google.com; Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
-> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
-> kuba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org;
-> horms@kernel.org; intel-wired-lan@lists.osuosl.org
-> Cc: alok.a.tiwari@oracle.com
-> Subject: [Intel-wired-lan] [PATCH net] idpf: fix mailbox capability for s=
-et device
-> clock time
->=20
-> The current code incorrectly uses
-> VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME
-> for both direct and mailbox capabilities, causing mailbox-only support to=
- be
-> ignored and potentially reporting IDPF_PTP_NONE.
->=20
-> Fixes: d5dba8f7206da ("idpf: add PTP clock configuration")
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
-> I did not hit a runtime failure directly, but this logic is inconsistent =
-with the
-> capability definitions.
-> ---
-> 2.50.1
+I am trying to extend linuxptp to support PTP over a HSR network.
 
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
+This is the kernel side of the changes. In short PTP over HSR sends its
+packets to a multicast address and every node needs to forward the PTP
+packet (SYNC and FOLLOW-UP for instance) within the HSR ring.
+In order to achieve this, the HSR stack must not duplicate and forward
+the PTP packets as it would do with other packets. The delay caused by
+the duplication and forwarding adds overhead which in turn makes the
+timing information within the PTP packet inaccurate.
+
+My current approach is to open the slave devices (eth0/ eth1) from
+userland in order to receive the PTP packets. Sending happens from the
+hsr0 device. The actual packet has an inline header prepended of type
+struct hsr_inline_header. The size of the header is equivalent to
+ethhdr. The header has a type (h_proto) at the same position as ethhdr
+and expects it to be ETH_P_1588 as this extra meta information is only
+relevant for PTP packets. It makes no sense to send PTP packets via the
+HSR interface because it gets duplicated and the timestamp information
+is lost so this should not break anything. As an additional safe guard
+there is a magic value at h_source position. The value has '0xaf' at the
+most significant byte which makes the address a locally administered
+multicast address.
+
+The header passes two information from userland: On which slave port
+the packet has to be sent and does the HSR stack need to prepend a
+header or not.
+The header is skipped so that the remaining stack sees the actual data
+and can send it as requested.
+
+The PRP packets are sent directly via the SLAVE interface. The standard
+mandates not add a PRP trailer (PRP, redundancy control trailer) to PTP
+packets. There is not really a reason to use hsr interface.
+
+HSR hardware offloading is optional. The driver needs to know if the
+operating mode is HSR or PRP. In PRP mode it needs to check the ether
+type and for ETH_P_1588 it must not perform any offloading.
+In HSR mode, for ether-type ETH_P_1588 there must be no offloading. If
+the ether-type is ETH_P_HSR there must be no offloading if the
+encapsulated protocol is ETH_P_1588.
+
+This has been tested in a pure software environment and in an HW-assisted
+environment where the HW is able to duplicate and duplicate packets
+but does not do it for PTP packets.
+It has not been tested within an environment where the HW is able to
+forward the PTP packet and correctly update the timing information.
+
+---
+v4=E2=80=A6v5: https://lore.kernel.org/r/20260508-hsr_ptp-v4-1-aa19aa7c6a71=
+@linutronix.de
+- Split the patch into smaller pieces
+- Added a test for the added inline header (which signals the port while
+  sending packets).
+- Replaced __pskb_copy() with skb_clone() + skb_cow_head() in
+  hsr_create_tagged_frame() to preserve timestamp request.
+
+v3=E2=80=A6v4: https://lore.kernel.org/r/20260429-hsr_ptp-v3-1-afbf8f200f48=
+@linutronix.de
+- Removed skb extention. The information within HSR is passed via
+  struct hsr_frame_info. Driver with HSR-offloading capabilities need to
+  know the HSR mode (HSR or PRP) and parse the skb to decide what needs
+  to be done (whether to send on both ports and if adding a header is
+  needed).
+
+v2=E2=80=A6v3: https://patch.msgid.link/20260309-hsr_ptp-v2-0-798262aad3a4@=
+linutronix.de
+- Remove af_packet changes entirely.
+- Add an internal header to pass additional information for HSR-PTP
+  packets.
+- Remove PRP, userland will use slave devices directly.
+- Drop all received PTP packets. Userland needs to use the slave device
+  for RX.
+
+v1=E2=80=A6v2: https://patch.msgid.link/20260204-hsr_ptp-v1-0-b421c69a77da@=
+linutronix.de
+- Added PRP support
+- skb extention is used instead of extending struct skb_shared_info
+- in af_packet
+  - packet_sendmsg_spkt() is no longer extended
+  - jump labels are used to avoid the overhead if there no socket that
+    is using this HSR extension.
+
+---
+Sebastian Andrzej Siewior (8):
+      hsr: Add header_ops::parse_protocol
+      hsr: Use skb_clone() while adding the HSR header
+      hsr: Add a magic header for sending PTP packets
+      hsr: Drop received PTP packets
+      hsr: Use the port and header information in hsr_forward_skb()
+      hsr: Assign a socket for cloned skbs
+      hsr: Move struct hsr_ethhdr to a global header
+      selftests: hsr: Add test for the inline PTP header on HSR
+
+ include/linux/if_hsr.h                         |  16 +
+ net/hsr/hsr_device.c                           |  62 +++-
+ net/hsr/hsr_forward.c                          |  77 ++++-
+ net/hsr/hsr_forward.h                          |   3 +-
+ net/hsr/hsr_framereg.h                         |   2 +
+ net/hsr/hsr_main.h                             |   5 -
+ net/hsr/hsr_slave.c                            |  37 ++-
+ tools/testing/selftests/net/hsr/.gitignore     |   1 +
+ tools/testing/selftests/net/hsr/Makefile       |   3 +
+ tools/testing/selftests/net/hsr/hsr_ptp.sh     | 109 ++++++
+ tools/testing/selftests/net/hsr/hsr_ptp_test.c | 438 +++++++++++++++++++++=
+++++
+ 11 files changed, 710 insertions(+), 43 deletions(-)
+---
+base-commit: 9e171fc1d7d7ab847a750c03571c87ac3c17bd84
+change-id: 20260204-hsr_ptp-1f6380f1d35f
+
+Best regards,
+--=20
+Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+
 
