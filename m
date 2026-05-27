@@ -1,139 +1,151 @@
-Return-Path: <netdev+bounces-292363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292364-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJ5pJuQUF2pf3QcAu9opvQ
-	(envelope-from <netdev+bounces-292363-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:59:32 +0200
+	id UN1OFUYXF2px3wcAu9opvQ
+	(envelope-from <netdev+bounces-292364-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:09:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F61D5E7548
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:59:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB82F5E77D1
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:09:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 56A7A302C797
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:58:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 413773066AAE
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E4C382394;
-	Wed, 27 May 2026 15:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277A73128A3;
+	Wed, 27 May 2026 16:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HI52qeAa"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Y5u43nQ/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mxnny7d3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C46937757D;
-	Wed, 27 May 2026 15:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CCA83A14
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779897532; cv=none; b=abM4fMZzBW3Fbgi6Y2K3TD0kpB4TOvVTGYxzG/g9LUXkkXpv6B8PK35NvNsEo+q2phy3p+AzuqYw4mLX4Fc9cf4pPcNw+26yxDeCNGobdSeM+T6HFVk/HuTqOS4uUK2Y4c6F83IdnD+COeXFINSibN+6osPgvdOa4ruNhWe0zCo=
+	t=1779897717; cv=none; b=bIVHjUNMZGME2RkswkGlK7CyjqBR7KWzch71L33XvGZLAUIHLOLDTK/HE/KUYMJOfiytC9IPuH6M/iI7ocJR+/Kh58NsUzoY13f6tEO87TFeQ9HTDddpWuphtuZmag1rgZijj9vqkzkfaYe3SWAgKDf/Af7/RiQT+f+nnHR3Ezc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779897532; c=relaxed/simple;
-	bh=P/q0FkPCbOqbUkrw+u8nkYD8bm9IFRA3W532/HwIFe8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=senNA22VjHmcauyrG5eyK2oc/GivUlWT0J7AYrLUO8Veh03wIbBzgGq8KnCDzAh7gMV4uWfgZoRo9fGc3WLLwX+15Clw1iu7tqLg21EeKxod1zr9p/lsCGfzv5fe52QJKbMrzXHC4YOWxjr0ijWPicsk0G8HqaMPaqDRWGgc0MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HI52qeAa; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 46A771F000E9;
-	Wed, 27 May 2026 15:58:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779897528;
-	bh=qOiVUORxGHoXQHdIH/CnzYXWd5lz7K5U1INIbRfRKIg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=HI52qeAaRyO4Q6E0LSwfS3Av/xt9S4iwpw7+92v2eByeb1/+L10PUigEtdcxRbB2T
-	 YamtaviZWmfWO49VVYpBvsZfAQLf4EIQDIuCnYG206Ok8ubXohZhWnl4ooKkdSbZPX
-	 nq5OyQE2Cv2aFfDXQrhbVQ2piHDtY7tLnafJ5P/lgg6q3JmI+T2NjGEYRUTE780w8L
-	 ANFQ+NC2szcnuVHU9Z+XZSgz5mQX59RNQe0PkzPWiGCzdlNm6frITdN3acntNrp0rQ
-	 6ph4g1ryHdSYDHURey1Z734BfqKq7UHQI5R0mMZFypz+G8tSOzLnlTg0XMqsEEfjyX
-	 yhgW9ueoXM6yQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>, LKML
- <linux-kernel@vger.kernel.org>
-Cc: David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar
- <mlichvar@redhat.com>, John Stultz <jstultz@google.com>, Stephen Boyd
- <sboyd@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Frederic
- Weisbecker <frederic@kernel.org>, thomas.weissschuh@linutronix.de, Arthur
- Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>,
- Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver
- Upton <oupton@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, Johannes Berg
- <johannes.berg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Peter Hilber
- <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
- linux-sound@vger.kernel.org
-Subject: Re: [patch 01/24] timekeeping: Provide ktime_get_snapshot_id()
-In-Reply-To: <5b082d25-9a57-4612-a93e-a4591acd0ea6@intel.com>
-References: <20260526165826.392227559@kernel.org>
- <20260526171222.769770418@kernel.org>
- <5b082d25-9a57-4612-a93e-a4591acd0ea6@intel.com>
-Date: Wed, 27 May 2026 17:58:44 +0200
-Message-ID: <87ldd4lu8b.ffs@tglx>
+	s=arc-20240116; t=1779897717; c=relaxed/simple;
+	bh=UWZmGfX14Wsf3E+sb2AYYiMPkB89DwZq2hYjelGdyg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MU8a0iwmzpPYMH92A2N0nE7Wz5Nawtqpmvf/gIzZqkesQgbwqUlOcCzlErPklG2NKHuN9iZb8Zes6ROvCbg+1LzIU7d4+1wkaTSZtXlvaiYhgjJnw8WKZa4/ZSQaRkZEWB6lv2rdX3Mxyso3x6yDfoAAUgDscWFBlCCuS5mpV8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Y5u43nQ/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mxnny7d3; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 0BD9C1400134;
+	Wed, 27 May 2026 12:01:53 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Wed, 27 May 2026 12:01:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1779897713; x=
+	1779984113; bh=EGiiw28n4iAu8SxxDGLlNevoj8r/P+Cnm8rYvxwf2RU=; b=Y
+	5u43nQ/ueB589NXFhmKQH4aQmAFYRCez+zmU6CZb+xIdQfLLcu19juzPqbl9sGIl
+	mowJLPUJPXyCuPrBJHQ+yYk2TivLpS/6p/CA1kmpNbuUABWpUWnx2xIDq+fCWBIL
+	rkrfpuWEm2bER5vhSDGKzMuaTBLnZtPJWgOV0wIUQkrdLpQU2ONOBOc/A+pl8XyZ
+	1zlqigxvJRGxf/rkXNmMaWOwZt/rKrneJe8OMwJyJhN+VLSaK2oI/ozo8dNiI9sZ
+	YFT5bxm1/P9pLd8xdbrWBmwC5Kcxuo2TlQSsH9kaXAylYl6OPY101OX1YQ7IJjvp
+	OSy0ykIjNgj1tGmhuYVnw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1779897713; x=1779984113; bh=EGiiw28n4iAu8SxxDGLlNevoj8r/P+Cnm8r
+	Yvxwf2RU=; b=mxnny7d3sUYufdxjk41a6qz9a3O3sWlg5D65G9Go+m782DWpzsA
+	T2axPgme+78wuIHVyRe9AAdVMglNf1q3EsLWnsdC57LgazhQzf+mK8xznOtUz8li
+	1skSXeI9XBlO0a9TGlz0auIrEUfezYPqpP439TxIQaHEGOaBlEI4rioJYeZ5iBAz
+	XSWRMLRFrNGhnrkYcXMADWNeef2CJ2dJfKCLCqVFmMz+DyKw3EvWEy+ghhp00yiP
+	G+CxlOqoqqSzruiNqMvzIQChFpItWXLlQk5I7T7/wFpBlK9I4gTJbwivNi19m5xJ
+	tqdbmgGK0mzg3N/sO5E2MWw2QITjY/wy16w==
+X-ME-Sender: <xms:bxUXaufUiRpSe6JFTYwpgpyGFqogFse5LxQJhRR2u4XuO7RVUs7Epg>
+    <xme:bxUXahKK57xkkcnK6V_XjBl-AsPyw2D2lfJdISjjUuFW1-YKsFrRbHxiFBmcnY1Uy
+    BMgC9PlYV6MmiJZmFWzZSl_lHkUuPn0W6WuiOUJIWY2uAjh78qFb7Il>
+X-ME-Received: <xmr:bxUXarE9c6_G_lP8iF2Hw6srxnwxO3BZnSXWegBpTbxzMasMPPQGYeE57pTeFOzEfQm3HZu9CMuNFB40G_s8_cQ>
+X-ME-Proxy-Cause: dmFkZTGUohCGPrIb8d/pC/RnJmn1Mu2U/J7Qb4HFyxMjMz3MPyu4OYioPzBZtGMHhBe/g5
+    354lA0t8phvmeq7IEpijNArMEmKmpoKTLJ12o04Un8Wqr8bLskazzMC9Sc1FMhYVb2uXrW
+    HJZQSaHM2Sdwc4VRuv2qCnJP4msjZgKFzQUvSUZd+k2s/71lH7eSQtXS+NSUO7ddGplkVh
+    VnLVNk9Yw6fIgmU/pj+E2K5yYtd1htslzv6+HAHUWUAwrOPGaR3mH2Kg67ZJAS6iyIEPpC
+    UxZN76o9lQGx/Of8NM2Ssre2DA1klgczVY0Bc/L1JxJjx3/cQZIiMFEmGlKOjNOn9X8iO6
+    cswDwOWLmodvJ8/g3p+H5m7jnJG1oVfmlz5fXrPBGseknRVGf4OfouAn89nNiM+qqYAQwh
+    IrsVHfjpd6/bz5CqWYzAZMh0rqidHt9pKVIeRbkH699kQQO2sR4qnr7JZFdTbJDHlV/Vx2
+    M3IiSSgeAWxB02qorCfjrsdVZtmQw98uwti+vjTefjgLJqnEu9ON8cj4Ca7rLMQgn/hxoM
+    MFN7GFZaaAjpgEbzqjZB4f2mIX6qu9hujzGRYiWtMv4zFHldqu7t7ldeTHptiAHF09w+wx
+    s9xT/Jpe2LRP+al9xNplNq3fPIlIeAzFTZ3jRNuh0pVynWE4m/xGjpNqZS+A
+X-ME-Proxy: <xmx:bxUXasCLG5LVTXco6CJMHY3d6vqTadDr6sBHN8shphiy4sM1weKqBQ>
+    <xmx:bxUXam9bDJORtvgO9jtm8OEhTiM9EurF0LOVo06fUZRF3-0Bv4D4QA>
+    <xmx:bxUXagAYqia2biYUdbNfqEBVzP1ZW19wMp3Ne4jG3WGoGQ3OLNzPKQ>
+    <xmx:bxUXajQHcs7Kd6iyKP-pS3agA86oKswA2VsJ7Hyl7vigUuX3AWYtPw>
+    <xmx:cRUXanuczGdyGCoFVCVxldbPrkyLhTFq5dbaOmHazrCwjW4PKkivRnR7>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 May 2026 12:01:51 -0400 (EDT)
+Date: Wed, 27 May 2026 18:01:49 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Petr Wozniak <petr.wozniak@gmail.com>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net
+Subject: Re: [PATCH net-next] xfrm: fix xfrm_dev_offload_ok() returning true
+ for software SAs
+Message-ID: <ahcVbeG79PibbM3M@krikkit>
+References: <20260527140948.21162-1-petr.wozniak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260527140948.21162-1-petr.wozniak@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292363-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-292364-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.991];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0F61D5E7548
+	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,queasysnail.net:dkim]
+X-Rspamd-Queue-Id: AB82F5E77D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26 2026 at 14:41, Jacob Keller wrote:
-> On 5/26/2026 10:13 AM, Thomas Gleixner wrote:
->> -void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
->> +bool ktime_get_snapshot_id(struct system_time_snapshot *systime_snapshot, clockid_t clock_id)
->>  {
->
-> Since this function now returns a bool would it make sense to add a
-> "Return:" comment to the kdoc to help explain what the return value means?
->
-> I saw that you have a WARN_ON with the ktime_get_snapshot wrapper. I
-> guess it returns false if timekeeping_suspended.
+2026-05-27, 16:09:48 +0200, Petr Wozniak wrote:
+> xfrm_dev_offload_ok() reaches the ok: label when the SA has no
+> offload device (dev == NULL, SW SA) because the guard condition
+> "(!dev || dev == xfrm_dst_path(dst)->dev)" evaluates true for
+> dev == NULL.  The explicit "if (!dev) return true" at ok: then
+> incorrectly routes the SW SA onto the GSO offload path.
 
-...
+Incorrectly? IPsec in SW with GSO is a valid setup. I think you're
+breaking that with your patch.
 
-> This warns here, and the wrapper ktime_get_snapshot also warns. Does
-> that make sense? I guess eventually the ktime_get_snapshot will be removed?
-
-No it does not and it's a leftover from an early version. I later
-switched to have a valid bit in the struct because otherwise I'd need to
-modify a gazillion call sites to propagate the return value through.
-
-Let me remove it.
-
-Thanks,
-
-        tglx
+-- 
+Sabrina
 
