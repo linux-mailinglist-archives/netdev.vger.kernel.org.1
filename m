@@ -1,66 +1,79 @@
-Return-Path: <netdev+bounces-292056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292057-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPfeDBlPFmqxkgcAu9opvQ
-	(envelope-from <netdev+bounces-292056-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:55:37 +0200
+	id aPCNN/JPFmqxkgcAu9opvQ
+	(envelope-from <netdev+bounces-292057-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:59:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 374055DE69B
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:55:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795105DE706
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 03:59:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7F5A330055C1
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:55:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 366223036EFF
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 01:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F773002B3;
-	Wed, 27 May 2026 01:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+rd2iGK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD31D342177;
+	Wed, 27 May 2026 01:59:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959601DE8BE;
-	Wed, 27 May 2026 01:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608812E1F02;
+	Wed, 27 May 2026 01:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779846931; cv=none; b=S5/fPCwJPmPZPZBcoyH+P69ndKW7MnelkHsGR2u63wdIx462N9D4WETlSvjjyoHnDnKpj0pUAeURtQtXeaFyZjxu2ecvhH+0weWZxtikWAV0pTHnpQP4LmA1KP5Y+3ll5t/7g5kxbYViyWnJPN6/jo7chOUpVieIG+lk6PEkpWk=
+	t=1779847147; cv=none; b=kTY+0YUzLpvX90mq/UefGp9p2+rVl2GRMIogBar53aLIO6wP8JvgATuN7hhZerUwf9IPhU/hhsWrY/6JHvi0hi/cD61Q0q5N+BO5pTU3O6ONZjTCZog4wTcIGDLpURR+5hNjQEMGHZFgVdFzB0U3h006Hx6kURYKuVNulPUKNpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779846931; c=relaxed/simple;
-	bh=eeHIn//hSymJGANkZOXokx3u7vbI4MfPEkxeu3jOq94=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KDCr+/WD4YrbopHHw4VVGz9KvJ8uMUrSCwyJdCyzZQ1g/oKJ3kcWbXC33rWLmARnBNykdA4fcu4sTiVROedOIA8Nv/TtEcuzzl9INShijjHV6kdWyX5sPl/b+JPkxEl38025YvJgWviUzjrPzoACf8fHW8jtE5bq9Cb1MiS+XfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+rd2iGK; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB1E31F000E9;
-	Wed, 27 May 2026 01:55:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779846929;
-	bh=Nas175rcdEQu2O5gpSAlT+fPAtMYmxGk8DidoV8D5Fg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=A+rd2iGKDK75E7NM5XvZAXKSfAUJolUDB6Sa09vCLMqfifVOrFuvaqLbMsnIuJ4zi
-	 fkxcyAyXUM2HH7RDdBDqJ0a+nz/0Hax/DqkzUfa+A3y/zhaQLqMvLoSj+pns0ahyZN
-	 JW7rs35M04caKepkuGxhcnHSBBgn5GQKrsKOCdNmZjQorkWjO2oVROVsq5CN1ztjse
-	 xEN97eAKN9Rkb33JzUQ0tnQfFSuChXX3hxqwCLvVn41bdcR+1D1rH6iZUdp+s98+sG
-	 JZ190HPpOVNNF8Mz87uVsRlzwHGQQSz+oVP/N3NSZohfx6OFCDfMie1SdMfCKC37T7
-	 4NthhEV0TMg3w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: mmyangfl@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	hongson.hn@gmail.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
+	s=arc-20240116; t=1779847147; c=relaxed/simple;
+	bh=iZdO5tfrEC0OdlmnndPXB576cc8IXVl/EBWV1fGg2nM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P4FRvk+BuQvgRTrLhin068rt3XQxoIq9HQ6BuIAfle2u95M1ERA0HAtFtQPvFplfTEz9lgdAyOvVjZ8uYjVCrh5HCBS058tq4KhfR/lpZrmO/6w3sCxcU7CPQowwwrZkLJYqnsU+aA565aUZxBwg/eMOkLE7XyGmNS4naBjUOFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: a139f6f4596f11f1aa26b74ffac11d73-20260527
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:7dc124e5-65a4-4075-91ed-138f80733f7d,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:20
+X-CID-META: VersionHash:e7bac3a,CLOUDID:263d9dbfcdbe7f337e09f227b7d10024,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
+	DM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:
+	0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: a139f6f4596f11f1aa26b74ffac11d73-20260527
+X-User: zenghongling@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <zenghongling@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 489762033; Wed, 27 May 2026 09:59:00 +0800
+From: Hongling Zeng <zenghongling@kylinos.cn>
+To: chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	neil@brown.name,
+	okorniev@redhat.com,
+	Dai.Ngo@oracle.com,
+	tom@talpey.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: dsa: yt921x: Add ACL support
-Date: Tue, 26 May 2026 18:55:27 -0700
-Message-ID: <20260527015527.3178315-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260523020704.503966-1-mmyangfl@gmail.com>
-References: <20260523020704.503966-1-mmyangfl@gmail.com>
+	horms@kernel.org,
+	bcodding@redhat.com
+Cc: linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhongling0719@126.com,
+	Hongling Zeng <zenghongling@kylinos.cn>
+Subject: [PATCH] sunrpc: Fix error handling in rpc_sysfs_xprt_switch_add_xprt_store()
+Date: Wed, 27 May 2026 09:58:55 +0800
+Message-Id: <20260527015855.483921-1-zenghongling@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,483 +81,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-292057-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292056-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_NA(0.00)[kylinos.cn];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,126.com,kylinos.cn];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zenghongling@kylinos.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.988];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 374055DE69B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email]
+X-Rspamd-Queue-Id: 795105DE706
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+xprt_create_transport() never returns NULL, only valid pointers or
+error pointers. Using IS_ERR_OR_NULL() is incorrect, and PTR_ERR(NULL)
+would return 0, which indicates EOF in a sysfs store function.
+
+Fix this by using IS_ERR() instead of IS_ERR_OR_NULL().
+
+Fixes: df210d9b0951 ("sunrpc: Add a sysfs file for adding a new xprt")
+Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
 ---
-net: dsa: yt921x: Add ACL support
-
-This adds tc-flower offload support for the YT921x switch family,
-mapping incoming-direction classifiers and a small set of actions onto
-the chip's ACL engine. A few questions about the implementation are
-inline.
-
-> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-> index a652599a4561..f645879817db 100644
-> --- a/drivers/net/dsa/yt921x.c
-> +++ b/drivers/net/dsa/yt921x.c
-
-[ ... ]
-
-> @@ -1457,6 +1467,955 @@ yt921x_dsa_port_setup_tc(struct dsa_switch *ds, int port,
->  	}
->  }
->  
-> +/* ACL: 48 blocks * 8 entries
-> + *
-> + * One rule can span multiple entries, but within a block.
-> + */
-
-[ ... ]
-
-> +	want_dport = false;
-> +	want_sport = false;
-> +	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS)) {
-> +		struct flow_match_ports match;
-> +
-> +		entry = yt921x_acl_entries_find(entries, &size,
-> +						YT921X_ACL_TYPE_L4);
-> +		if (!entry)
-> +			goto err;
-> +
-> +		flow_rule_match_ports(rule, &match);
-> +
-> +		want_dport = !!match.mask->dst;
-> +		want_sport = !!match.mask->src;
-
-[Low]
-Could the L4 entry slot be allocated only when at least one mask is
-non-zero?
-
-The IPV4_ADDRS, IPV6_ADDRS and ETH_ADDRS branches above all compute
-want_dst/want_src first and only call yt921x_acl_entries_find() when a
-mask is set, but here the L4 entry is reserved as soon as the dissector
-key is present.
-
-A rule that exposes the PORTS key with both masks zero will consume one
-of the eight per-block entry slots with an all-zero key/mask, and force
-an L4 type match the user did not request.
-
-> +
-> +		entry->key[0] |= (ntohs(match.key->dst) << 16) |
-> +				 ntohs(match.key->src);
-> +		entry->mask[0] |= (ntohs(match.mask->dst) << 16) |
-> +				  ntohs(match.mask->src);
-> +	}
-> +
-> +	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS_RANGE)) {
-> +		struct flow_match_ports_range match;
-> +
-> +		entry = yt921x_acl_entries_find(entries, &size,
-> +						YT921X_ACL_TYPE_L4);
-> +		if (!entry)
-> +			goto err;
-> +
-> +		flow_rule_match_ports_range(rule, &match);
-> +
-> +		if ((want_dport && !!match.mask->tp.dst) ||
-> +		    (want_sport && !!match.mask->tp.src)) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "Ports and ports range are mutually exclusive");
-> +			return -EINVAL;
-> +		}
-> +
-> +		entry->key[0] |= (ntohs(match.key->tp_min.dst) << 16) |
-> +				 ntohs(match.key->tp_min.src);
-> +		if (match.mask->tp.dst)
-> +			entry->key[1] |= YT921X_ACL_KEYb_L4_DPORT_RANGE_EN;
-> +		if (match.mask->tp.src)
-> +			entry->key[1] |= YT921X_ACL_KEYb_L4_SPORT_RANGE_EN;
-> +		entry->mask[0] |= (ntohs(match.mask->tp_max.dst) << 16) |
-> +				  ntohs(match.mask->tp_max.src);
-> +	}
-
-[High]
-Is the source for the upper bound of the port range correct here?
-
-Looking at fl_set_key_port_range() in net/sched/cls_flower.c, the
-high port number is stored in key->tp_max while mask->tp_max is filled
-with 0xff bytes when the corresponding TCA attribute is present:
-
-    fl_set_key_val(tb, &key->tp_max.dst, TCA_FLOWER_KEY_PORT_DST_MAX,
-                   &mask->tp_max.dst, TCA_FLOWER_UNSPEC,
-                   sizeof(key->tp_max.dst));
-
-So mask->tp_max.{dst,src} is 0xffff whenever the attribute exists, not
-the high port number. Other drivers that consume PORTS_RANGE (for
-example mlxsw_sp_flower_parse_ports_range() in
-drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c) read
-match.key->tp_max.{src,dst} for the upper bound.
-
-Given the comment "Range: turn KEY:MASK into MIN:MAX" in yt921x.h, would
-a tc-flower rule like dst_port 1000-2000 not end up programmed as
-min=1000, max=0xffff in hardware?
-
-[ ... ]
-
-> +	/* Misc only */
-> +	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IP)) {
-> +		struct flow_match_ip match;
-> +
-> +		flow_rule_match_ip(rule, &match);
-> +		if (match.mask->ttl)
-> +			return -EOPNOTSUPP;
-
-[Low]
-Should this rejection set an extack message, similar to the
-"Unsupported keys used" / "Action not supported" / "Rule too complex"
-paths in the same function?
-
-> +
-> +		if (match.mask->tos) {
-
-[ ... ]
-
-> +static int
-> +yt921x_acl_rule_ext_parse_flow_action(struct yt921x_acl_rule_ext *ruleext,
-> +				      const struct flow_action *flow_action,
-> +				      struct netlink_ext_ack *extack,
-> +				      struct yt921x_priv *priv, int port)
-> +{
-> +	const struct flow_action_entry *act;
-> +	u32 *action = ruleext->r.action;
-> +	int res;
-> +	int i;
-> +
-> +	memset(action, 0, 3 * sizeof(*action));
-> +	flow_action_for_each(i, act, flow_action)
-> +		switch (act->id) {
-
-[ ... ]
-
-> +		case FLOW_ACTION_ACCEPT:
-> +			action[2] |= YT921X_ACL_ACTc_REDIR_EN |
-> +				     YT921X_ACL_ACTc_REDIR_FWD;
-> +			break;
-> +		case FLOW_ACTION_DROP:
-> +			action[2] |= YT921X_ACL_ACTc_REDIR_EN |
-> +				     YT921X_ACL_ACTc_REDIR_STEER;
-> +			break;
-> +		case FLOW_ACTION_REDIRECT: {
-> +			struct dsa_port *to_dp;
-> +
-> +			to_dp = dsa_port_from_netdev(act->dev);
-> +			if (IS_ERR(to_dp)) {
-> +				NL_SET_ERR_MSG_MOD(extack,
-> +						   "Destination not a switch port");
-> +				return -EOPNOTSUPP;
-> +			}
-> +
-> +			action[2] |= YT921X_ACL_ACTc_REDIR_EN |
-> +				     YT921X_ACL_ACTc_REDIR_STEER |
-> +				     YT921X_ACL_ACTc_REDIR_DPORTn(to_dp->index);
-> +			break;
-> +		}
-
-[Medium]
-Should this also verify that the redirect target lives on the same
-switch (to_dp->ds == ds)?
-
-dsa_port_from_netdev() only checks dsa_user_dev_check(); in a multi-
-switch DSA tree the returned port can be on a different chip with an
-index >= 11. YT921X_ACL_ACTc_REDIR_DPORTn(port) is BIT(port + 10), and
-YT921X_ACL_ACTc_REDIR_DPORTS_M is GENMASK(20, 10), so an index of 11
-sets bit 21, which is the low bit of YT921X_ACL_ACTc_REDIR_M
-(GENMASK(22, 21)). That promotes the encoded REDIR_STEER (value 2) into
-REDIR_TRAP (value 3), and higher indices spill further into the CTAG
-and STAG fields.
-
-[Low]
-With multiple terminal verdicts in a single action list, does the
-bitwise OR into action[2] produce a deterministic result?
-
-For example, REDIR_STEER (value 2) OR'd with REDIR_TRAP (value 3) in
-the YT921X_ACL_ACTc_REDIR_M field results in REDIR_TRAP, silently
-turning a drop into a CPU trap. Should contradictory verdicts be
-rejected with an extack message instead?
-
-> +		case FLOW_ACTION_TRAP:
-> +			action[2] |= YT921X_ACL_ACTc_REDIR_EN |
-> +				     YT921X_ACL_ACTc_REDIR_TRAP;
-> +			break;
-
-[ ... ]
-
-> +static int
-> +yt921x_acl_rule_ext_parse_flow(struct yt921x_acl_rule_ext *ruleext, int port,
-> +			       const struct flow_cls_offload *cls, bool ingress,
-> +			       struct yt921x_priv *priv)
-> +{
-> +	const struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-> +	struct netlink_ext_ack *extack = cls->common.extack;
-> +	int res;
-> +
-> +	if (!ingress || cls->common.chain_index)
-> +		return -EOPNOTSUPP;
-
-[Low]
-Could this rejection also use NL_SET_ERR_MSG_MOD()?
-
-Other failure paths in this file populate extack ("Unsupported keys
-used", "Rule too complex", etc.); a user passing an egress filter or a
-non-zero chain index will currently see a bare EOPNOTSUPP without any
-diagnostic.
-
-> +
-> +	res = yt921x_acl_rule_ext_parse_flow_action(ruleext, &rule->action,
-> +						    extack, priv, port);
-
-[ ... ]
-
-> +static unsigned int
-> +yt921x_acl_reserve(struct yt921x_priv *priv, unsigned int entscnt,
-> +		   struct netlink_ext_ack *extack)
-> +{
-> +	int candidates[YT921X_ACL_ENT_PER_BLK];
-> +	unsigned int acl_used_cnt = 0;
-> +
-> +	if (WARN_ON(entscnt > YT921X_ACL_ENT_PER_BLK))
-> +		return UINT_MAX;
-> +
-> +	for (unsigned int i = 0; i < ARRAY_SIZE(candidates); i++)
-> +		candidates[i] = -1;
-> +	for (unsigned int i = 0; i < YT921X_ACL_BLK_NUM; i++) {
-> +		unsigned int blk_used_cnt = hweight8(priv->acl_masks[i]);
-> +
-> +		candidates[blk_used_cnt] = i;
-> +		acl_used_cnt += blk_used_cnt;
-> +	}
-
-[Critical]
-Can this overrun candidates[] when a block is fully populated?
-
-YT921X_ACL_ENT_PER_BLK is 8 and priv->acl_masks[i] is a u8, so
-hweight8(priv->acl_masks[i]) ranges over [0..8]. As soon as any block
-has all 8 bins in use (acl_masks[i] == 0xff, reachable by adding rules
-since priv->acl_masks[blkid] |= aclrule->mask accumulates and a single
-rule can have entscnt up to 8), the next call writes:
-
-    candidates[8] = i;
-
-which is one past the end of the eight-element stack array.
-
-Would it work to size the array as YT921X_ACL_ENT_PER_BLK + 1, or to
-skip fully-saturated blocks here?
-
-> +
-> +	if (acl_used_cnt >= YT921X_ACL_NUM) {
-> +		NL_SET_ERR_MSG_MOD(extack, "ACL entry limit reached");
-> +		return UINT_MAX;
-> +	}
-
-[ ... ]
-
-> +static int
-> +yt921x_acl_commit(struct yt921x_priv *priv, unsigned int entid, u8 entsmask)
-> +{
-> +	const struct yt921x_acl_rule *aclrule;
-> +	const struct yt921x_acl_blk *aclblk;
-> +	unsigned int blkid;
-> +	unsigned int binid;
-> +	unsigned long mask;
-> +	u32 zeros[3] = {};
-> +	unsigned int i;
-> +	unsigned int o;
-> +	u32 ctrl;
-> +	int res;
-> +
-> +	blkid = entid / YT921X_ACL_ENT_PER_BLK;
-> +	binid = entid % YT921X_ACL_ENT_PER_BLK;
-> +	aclblk = priv->acl_blks[blkid];
-> +	aclrule = aclblk->rules[binid];
-> +
-> +	/* Open the block */
-> +	ctrl = YT921X_ACL_BLK_CMD_MODIFY | YT921X_ACL_BLK_CMD_BLKID(blkid);
-> +	res = yt921x_reg_write(priv, YT921X_ACL_BLK_CMD, ctrl);
-> +	if (res)
-> +		return res;
-> +
-> +	/* Write keys and masks */
-
-[Medium]
-If any of the register writes between the "Open the block" and
-"Close the block" sequence fails, the function returns immediately
-with the block still latched in MODIFY mode and no compensating close
-is performed.
-
-    res = yt921x_reg_write(priv, YT921X_ACL_BLK_CMD, ctrl);
-    if (res)
-        return res;
-    ...
-    res = yt921x_reg64_write(priv, YT921X_ACLn_KEYm(blkid, o), ...);
-    if (res)
-        return res;       /* block still in MODIFY */
-    ...
-
-Would a goto-style unwind that always issues the close-block command
-and then returns the original error be safer here?
-
-> +	ctrl = 0;
-> +	for (unsigned int i = 0; i < YT921X_ACL_ENT_PER_BLK; i++)
-> +		ctrl |= YT921X_ACL_BLK_KEEP_KEEPn(i);
-
-[ ... ]
-
-> +	res = yt921x_reg_write(priv, YT921X_ACLn_ENTRY(blkid), ctrl);
-> +	if (res)
-> +		return res;
-> +
-> +	/* Close the block */
-> +	ctrl = YT921X_ACL_BLK_CMD_BLKID(blkid);
-> +	res = yt921x_reg_write(priv, YT921X_ACL_BLK_CMD, ctrl);
-> +	if (res)
-> +		return res;
-> +
-> +	/* Write actions */
-> +	res = yt921x_reg96_write(priv, YT921X_ACLn_ACT(entid),
-> +				 aclrule ? aclrule->action : zeros);
-> +	if (res)
-> +		return res;
-> +
-> +	return 0;
-> +}
-
-[Medium]
-Is the activation order between the keys/EN and the action register
-intentional?
-
-The new keys, masks, and the per-block YT921X_ACLn_ENTRY register
-(holding the EN bits) are written inside the MODIFY-bracketed sequence;
-the block is then closed (which is what activates the new keys/EN in
-the data path); only after the close is YT921X_ACLn_ACT(entid) written.
-
-Between the close and the ACT write, packets matching the freshly
-programmed keys would consult the prior contents of the action slot.
-For a freshly allocated entid, that slot is zero, so REDIR_EN is clear
-and the rule's intent (DROP/REDIRECT/TRAP) is briefly not enforced. Is
-there a way to write the action before the EN bit becomes visible to
-the data path?
-
-[ ... ]
-
-> +static int
-> +yt921x_acl_add(struct yt921x_priv *priv,
-> +	       const struct yt921x_acl_rule_ext *ruleext,
-> +	       struct netlink_ext_ack *extack)
-> +{
-> +	bool want_meter = ruleext->r.action[0] & YT921X_ACL_ACTa_METER_EN;
-
-[ ... ]
-
-> +	if (want_meter) {
-> +		meterid = find_first_zero_bit(priv->meters_map,
-> +					      YT921X_METER_NUM);
-> +		if (meterid >= YT921X_METER_NUM) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "No more meters available");
-> +			return -EOPNOTSUPP;
-> +		}
-> +
-> +		res = yt921x_meter_config(priv, meterid, &ruleext->marker);
-> +		if (res)
-> +			return res;
-> +	}
-> +
-> +	/* Prepare acl block ctrlblk */
-> +	blkid = entid / YT921X_ACL_ENT_PER_BLK;
-> +	binid = entid % YT921X_ACL_ENT_PER_BLK;
-> +	aclblk = priv->acl_blks[blkid];
-> +	if (!aclblk) {
-> +		aclblk = devm_kzalloc(dev, sizeof(*aclblk), GFP_KERNEL);
-> +		if (!aclblk)
-> +			return -ENOMEM;
-> +		priv->acl_blks[blkid] = aclblk;
-> +	}
-> +
-> +	/* Prepare acl rule ctrlblk */
-> +	aclrule = devm_kmemdup(dev, &ruleext->r,
-> +			       offsetof(struct yt921x_acl_rule,
-> +					entries[entscnt]),
-> +			       GFP_KERNEL);
-> +	if (!aclrule) {
-> +		res = -ENOMEM;
-> +		goto err;
-> +	}
-
-[Medium]
-What happens to a meter that has been programmed in hardware when one
-of these later steps fails?
-
-yt921x_meter_config() writes YT921X_METERn_CTRL with METER_EN set
-before any of the kernel-side bookkeeping has succeeded. If the
-following devm_kzalloc(aclblk), devm_kmemdup(aclrule), or
-yt921x_acl_commit() call fails, the function returns or jumps to err:
-without:
-
-  - reverting the meter hardware programming, and
-  - reserving the meter id in priv->meters_map.
-
-The slot stays active in hardware with the user's policer config, and
-only set_bit(meterid, priv->meters_map) on the success path tracks it.
-A subsequent successful add will pick the same id from
-find_first_zero_bit() and reprogram it, but in the meantime the device
-polices traffic through that meter.
-
-[ ... ]
-
-> @@ -3766,6 +4747,9 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
->  	.port_policer_del	= yt921x_dsa_port_policer_del,
->  	.port_policer_add	= yt921x_dsa_port_policer_add,
->  	.port_setup_tc		= yt921x_dsa_port_setup_tc,
-> +	/* acl */
-> +	.cls_flower_del		= yt921x_dsa_cls_flower_del,
-> +	.cls_flower_add		= yt921x_dsa_cls_flower_add,
-
-[Low]
-Is there a reason cls_flower_stats is not implemented?
-
-The action register definitions YT921X_ACL_ACTa_FLOWSTAT_EN and
-YT921X_ACL_ACTa_FLOWSTAT_ID_M suggest the hardware can report per-rule
-match counters, but the bits are never set and no stats callback is
-hooked up, so tc -s filter show will not show match counts for
-offloaded rules.
-
->  	/* hsr */
->  	.port_hsr_leave		= dsa_port_simple_hsr_leave,
->  	.port_hsr_join		= dsa_port_simple_hsr_join,
+ net/sunrpc/sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
+index a90480f80154..49686bf740e6 100644
+--- a/net/sunrpc/sysfs.c
++++ b/net/sunrpc/sysfs.c
+@@ -348,7 +348,7 @@ static ssize_t rpc_sysfs_xprt_switch_add_xprt_store(struct kobject *kobj,
+ 	xprt_create_args.reconnect_timeout = xprt->max_reconnect_timeout;
+ 
+ 	new = xprt_create_transport(&xprt_create_args);
+-	if (IS_ERR_OR_NULL(new)) {
++	if (IS_ERR(new)) {
+ 		count = PTR_ERR(new);
+ 		goto out_put_xprt;
+ 	}
 -- 
-pw-bot: cr
+2.25.1
+
 
