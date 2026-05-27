@@ -1,68 +1,63 @@
-Return-Path: <netdev+bounces-292300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6JNYF3vxFmpcxwcAu9opvQ
-	(envelope-from <netdev+bounces-292300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:28:27 +0200
+	id EP9GGOTxFmpcxwcAu9opvQ
+	(envelope-from <netdev+bounces-292301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:30:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D045E4F5C
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:28:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4CC5E4FAF
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 521EC309804A
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:22:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A192302A6F3
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6571E40C5A8;
-	Wed, 27 May 2026 13:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578A7403E94;
+	Wed, 27 May 2026 13:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="vcuUiUsz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="m2x5AERU"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4B9405C3E;
-	Wed, 27 May 2026 13:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A52E29898F;
+	Wed, 27 May 2026 13:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779888140; cv=none; b=CAuFTbmo7f1fjsn2C9Oy3XZzXr/bJ4zPJ2kJrp/A9XC+lWPt15E96njUOMidl+tbErmeFuiBiqQdRPxenBoPvO5ny3M+ETLQ+WAs70TlKRX+tVlqu72YIC/kubcgTnXUiF6Kkl9FbgSfOFd7aoJbXoQ3d9/0z3ZJb/y19iauHwg=
+	t=1779888223; cv=none; b=tq1w+aAActtmiEWCttl3AKiKv6SuNoSVu1AjpjKU4V7w5zHMtjS1G5GfCkFgY48RWCNHuckB64FavmbyTKju0SclVus8lW+VdQeEZKG4rdMiyiHDPyhswDr1MsoH3n2lkJPZI8QEkKaNQTEAjWdW+BMba8JyTPw6ruVFI3dh5aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779888140; c=relaxed/simple;
-	bh=ZaNGpA5HYuZlzIwRGELlOp4CUVtlceg6mH6qVtqr4qs=;
+	s=arc-20240116; t=1779888223; c=relaxed/simple;
+	bh=NlN6jTcVGVQod/T6/pDzvwKHuC9exqNQVAEAnBbEa+c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gr5bOe/Z2xqSQ2e5CLzRZ3DaeIPHpLUIF7wS8ZPpHtRaEgo9HOJWtwuZJWk1yhHy6YFOokBiqREeIOH78UNoefiRV1eOGSHUSn1hxDa6gI8d5Nl1RH3gW+Md8hZ6tpP39sF5p+Dw2Gx+L7YhW2O8OEv48sU8KeUo11oCZ3Vf4Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=vcuUiUsz; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=bOQQcEyuk3Y4GLb+wbT9HyIT+hbK6P/u32spWLnRrCc=; b=vcuUiUszXcNhITfV5q9m4xNxTY
-	n1ft3+W1BoUls6I5vtLKU8U1vsdj7GV4131emFWdPzvmacvG0dC1BefIlZUuocnTDcaFiC5/vuqc5
-	jWLcJEWCGmAS4kZ9EpvK4yUjRW+LisG/vnR52WnB5YuWFVa1w3W8feqi/fPCPfUl5o8oQZ71cp4q2
-	yHfTc6w/+0wjhGVaOnk3R2b/MUIxYU5G+tp6MxJP0NgRgWMeUu/mSstRh9OEbR0cz9ZSnOxl5GNBC
-	rX1h33yhOEw8zmP1/GTnEgYlp22jF8CYG3JHjjWVOcJfnDvMQVLXo1txQGtDd4lDmjz0IM6cAjQjO
-	+rkkRcCg==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wSED1-003BmS-23;
-	Wed, 27 May 2026 13:22:07 +0000
-Date: Wed, 27 May 2026 06:22:02 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	gustavold@gmail.com, asantostc@gmail.com, kernel-team@meta.com
-Subject: Re: [PATCH 0/9] netconsole: stop charging every netpoll user for
- netconsole-only state
-Message-ID: <ahbvRJO-P2tgvmXj@gmail.com>
-References: <20260524-netconsole_move_more-v1-0-909d1ab398b4@debian.org>
- <20260526190053.619cc53d@kernel.org>
- <ahazcZw0KRwu5hUR@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fab7tUCZJJoGZbzBDk2JDX8ScCPZe0+57GRN0LsTw2I8TMhUU6XvjdzalR+eV2qeomLl9swEERK2XmhQfLemJzTI9bDMWx0WjwKsz0YrpIEQ+uPC0PH83pGKStxSI8Lcv0oL9QRO62pb+YXPvpykpxzfkxRVriVdn1KldvAqlfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=m2x5AERU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=H5aprNpB+u2skc8+Um2/wrrPcxGOx+/3mNx0Yo8rNJc=; b=m2x5AERUZNJwUkSZMf6ZhZKxIR
+	WYgKDaRAcJAGkvJ628QXwEnr3pvGdrStV6oi1IwlN5aBSxpkVBBD1ywHsaF/a1ShmOuKetRIediF4
+	uHo19xSDsg5E1l+JU4W+z60TBoBzHxzIVLsyVkawI8gIqFw3FUZsQlW+XBOdyHR+CGvY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSEEI-004ket-GT; Wed, 27 May 2026 15:23:26 +0200
+Date: Wed, 27 May 2026 15:23:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thangaraj.S@microchip.com
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Bryan.Whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+	linux@armlinux.org.uk, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] net: lan743x: read SFP straps from PCI11x1x device
+Message-ID: <af49a018-952a-439a-8beb-2e300a1d266a@lunn.ch>
+References: <20260514105028.42942-1-thangaraj.s@microchip.com>
+ <20260514105028.42942-3-thangaraj.s@microchip.com>
+ <053eaadf-07f3-431f-a0a4-28980adb8213@lunn.ch>
+ <DSWPR11MB971561B42BB157F7C8C436C2EC082@DSWPR11MB9715.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,72 +66,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ahazcZw0KRwu5hUR@gmail.com>
-X-Debian-User: leitao
+In-Reply-To: <DSWPR11MB971561B42BB157F7C8C436C2EC082@DSWPR11MB9715.namprd11.prod.outlook.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292300-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,vger.kernel.org,gmail.com,meta.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292301-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D1D045E4F5C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: AB4CC5E4FAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Jakub and netdev maintainers,
-
-On Wed, May 27, 2026 at 10:07:16AM +0100, Breno Leitao wrote:
-> On Tue, May 26, 2026 at 07:00:53PM +0000, Jakub Kicinski wrote:
-> > On Sun, 24 May 2026 09:12:16 -0700 Breno Leitao wrote:
-> > > struct netpoll is shared by every netpoll consumer in the tree:
-> > > bonding, bridge, team, vlan, macvlan, dsa and netconsole. The non-
-> > > netconsole users only need a per-port handle that lets them transmit
-> > > SKBs.
+> > > Introduce CONFIG_LAN743X_SFP to guard SFP-specific code
 > > 
-> > Are any of the Sashiko reports real?
-> 
-> Yes, there are real pre-existent issues reported by Sashiko.
-> 
-> > At least one seems legit (parallel device and target removal).
-> > If yes we should probably try to fix them before we shuffle the code
-> > around?
-> 
-> Ack, I will get them fixed and them move them around.
+> > Why? Does this add a lot of code? Most MAC drivers don't have such a Kconfig
+> > configuration, so i think this needs some justification.
+> [Thangaraj Samynathan]  CONFIG_LAN743X_SFP was introduced based on
+>   Jakub's v3 review feedback. There are devices on this LAN743x family
+>   of devices (LAN7430, LAN7431, PCI11x1x) that do not support SFP at
+>   all. So while the amount of code in the common LAN743x driver itself
+>   may not be that much, the dependencies could force an intended
+>   minimalistic build of the kernel that wanted to use the lan7430 device
+>   (which is rgmii only capable device) to have to include tons of kernel
+>   code (sfp, i2c, gpio) it does not need otherwise.
 
-I was reading Linus' Linux 7.1-rc5 email[1], and I am wondering if these
-type of "fixes" should go to net or are you planning to change it to net-next.
+In practice distributions turn on nearly everything. So the code is
+likely to be built. Rather than a Kconfig symbol, can you move the
+code into a module, which only gets loaded for pci11x1x?
 
-"""
-   These things are "fixes", sure, but at the same time a lot of them
-   are simply so irrelevant that I think they'd be better off in
-   a linux-next tree and get merged during the merge window.
-""" --linus
-
-Link: https://lore.kernel.org/all/CAHk-=wjt1NiKOdyAMz_DT7NmZ++SizPOhRSi492ukdTnpDzHQw@mail.gmail.com/ [1]
-
-Thanks
---breno
-
+	Andrew
 
