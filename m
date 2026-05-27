@@ -1,222 +1,389 @@
-Return-Path: <netdev+bounces-292378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IAtlM1weF2rw5AcAu9opvQ
-	(envelope-from <netdev+bounces-292378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:39:56 +0200
+	id 4JnXMP4dF2rw5AcAu9opvQ
+	(envelope-from <netdev+bounces-292379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:38:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C515E7E56
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:39:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C7F5E7DFC
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:38:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6287308A95E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:31:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7E94F3051BA1
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725DB43901E;
-	Wed, 27 May 2026 16:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BEFF43637D;
+	Wed, 27 May 2026 16:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="Wl2ijVMk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0VmpCuq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2od+M+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586AA3C5535
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779899494; cv=pass; b=DV2Uot6nSQj7n21NzGfRyxvnjPf0f8uTeIXzhlTeUqiWUFcPIUPExWtkQlcsVHDjyLF1P1FFpSS4tQT8Uz0X4umBZU4v3nSwt/bl62n1S/ckKgmQBqAG0MaH8dLQE/tmg5ko/p+AFtdUT2T1lrU2KO3OLDkRhK/8D7U/texaL3E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779899494; c=relaxed/simple;
-	bh=ZY7rgWI9XA+vyU0QAFA9/Bmy0Vi9PGZqL1JwLat115w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MzgqyNJO3cL0qVgFsyHPGz6JThYGCTiWn/9gpYPUMp+34Pi+TG0JH52pdfQdogKbdsWRcNvbmt0hLZyjiJE/sVlI8Vg+D4LxhUvZxk04OByjzT98E6dt0aZtQ+5+z/wjmVdtQy3VKeqcaP2HaIi/TLEnZX38VeVy6xLZ1ZrqiGs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=Wl2ijVMk; arc=pass smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-36931e4f5e8so11091597a91.2
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:31:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779899488; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hmdEO26dQRR1k+ER+tIBx6z7AG+QHzuGhNew2QH1T124Q+W1XXjDJd1EM3t9cKhyu1
-         1aJwPY6wabBjz5OdyVTJZ5nHpO94Kx4b6zoZOnJo2goGbYsw1Fd7bxAEUnyTHJVHiSz4
-         XzUyYlYPTeq4otNfWPgLWhpDlQhuFIJ/YgxULydm1X1UsjbX1W2hYPwlhDDi3nKrEXWT
-         8oOpEAf8yZbkJrKI5dEBsehboa0mmUp7PQc3abdVEbJVxljRwtsperp74+QkZxHqSgxw
-         VzKUjjYIPvlfl6lVfmPWJGQ4bBh4BBNg8HNvB7sxnmw2fkfK9kzS/nCl3UTasmhcdGhg
-         487g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=RnK3rUPxq8JPD6745RbPCi5d1YGGTd1FVgP59617C+Q=;
-        fh=9fu6koHtNrXasDqcC2Ff8C6hxOV19pBy/H11UAgK7dI=;
-        b=O0v6Y8DYPDy49aHirPQCIx2MgEIkTIWsczNr3glk1p6h4Q+CIZeuI1SrlA+ZfGvm1Y
-         uoFM5M6wBBHfrsUd8NOGT149aLiqOWx3TC4RfeX1RGqtELgmLlOP1a1uM0JuifyD70IY
-         Uxu+7GSQojU5dH3ZynrroP3nw4+c3SwjOPpUkZXP3zWp/Yj7CvbQrjHNfqLzzapten+C
-         ScxWt74lhKhhrTg/lfmNGEzc4M5QLe6TZEGW7gQ1hRpvsCadlUIjIIwxultvQ1k7ElHU
-         AkCHgFUrJqxZZnSY2VkKWv02Qs8wKnumZ1H61K9knT+Wg/WPWDU+EKfRGt7+T13otehv
-         vTwA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722C142B738
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779899541; cv=none; b=S/c3yTNKggzkWnEVoSGatzXz3rMLyU1R4TQomt9kUnJu+hj5P+RsByCEqvco3Bs5tnEPR1DB2860N3rN34P9Lg0eM7ro9tyKeKcji4le6TdmMmK/hLa91Gc3jG8bp5fj1MX/VvdJjaR5XUdwWgxceInjvuwEerc5ssnW3FCXUs0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779899541; c=relaxed/simple;
+	bh=cEVmglzyymIEtjT542+nEwh6s0tSgZWZ100poznSHOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nt+wDfKI37q8ts0UlAe/EiMLUsJRHqJPD7vUNfkbll/T1zWe9yRLSQboLu/UOfESRppG3ItWQXrhmlrMnVbsZBmep14u/SUEf9fe3Fyh/h2sL2nuo2rb2S9XuJTngpTqFjNO9kXiq3bNL6sH3T8FC2e6F4+jIgNZVDxQ2aRYZ1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c0VmpCuq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=W2od+M+Y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779899538;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tm+u0t/wd00+M9ekVI19c+wOtWYQ3WUs+D0eMcleQ4w=;
+	b=c0VmpCuq+rknEci4ndOiOwOD+1THm7cL55eya3Xmg37FB1N4h9IoS89hdqYsmaFJ87jNjy
+	uYUdO/Rra36cth0/YACuXaImPCf1Re2Q+CyHJhgs4G4C9ndlcw591AmdvRB+Gz5GyfqCgG
+	+LBX7fE49ATb2gTjB/uxAue5qrlQJZU=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-251-lsMkfP_-OIiewFrAk_hjNw-1; Wed, 27 May 2026 12:32:16 -0400
+X-MC-Unique: lsMkfP_-OIiewFrAk_hjNw-1
+X-Mimecast-MFC-AGG-ID: lsMkfP_-OIiewFrAk_hjNw_1779899535
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-676fb54c0cdso10143373a12.2
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:32:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779899488; x=1780504288; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RnK3rUPxq8JPD6745RbPCi5d1YGGTd1FVgP59617C+Q=;
-        b=Wl2ijVMkqaJebxHtEmboit9GPbMDqk8qODpSssWo7a6YycSN9h6DlE6A9AfebNR7so
-         EfRiJv9nXLsnHoL6zkESxd0vVrgo9SsySRv+PFa+H6X8tGje/K1D5M3Ce84O3HZx8Nzi
-         zeSfbppN/bDJgT0eDT3NjN191ZvpIk6sUS6l1SNN0s+aKg+zSVf0Fm7gDv6m+DlvtRMj
-         9OYWNb907EB46XM+eYwZbC672UXxA+osFbtrGZvolCdHhT9a29NsgpUB6gjwhei2bu63
-         uf0fcH7InAUAVwVTD6bTL90Z50FXJ5zONxlaV+HyPHXlStqGG83wP8w9hU6LuTL2J+il
-         Q7Sw==
+        d=redhat.com; s=google; t=1779899535; x=1780504335; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tm+u0t/wd00+M9ekVI19c+wOtWYQ3WUs+D0eMcleQ4w=;
+        b=W2od+M+Yp3wi6E/xeuJiILV82JkWO/Lu+a8ylr76R1mKW/9vxQynUMj6uQsO6glqCu
+         22SS8mNlTjz4GgsXMzSW46QLEFYMWtIQNM+0xhaFB7po4ptlC+t3G2a88PCzgsuUP6CP
+         LkqqlqF0+c2B609QIOuO6aoHJ5BxbvKThvWKrjnTSVtLa/nL2qRBTQg1dNHXmQJxjZLD
+         pC061k0PyvDvOgUoJg7qQSl8bYbOeC3SM1+7JPJZcNa1iOEWhZK/syaazI/38Eo7l5bF
+         Bkd/ajNiW7bfqJCexDYokHLu79SpgXrgXApoLt3zPMjrlisETPYryXBXYVxCccsR9o1W
+         UcoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779899488; x=1780504288;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RnK3rUPxq8JPD6745RbPCi5d1YGGTd1FVgP59617C+Q=;
-        b=p3W+yA2pxowpGmzMvNYbTYLxqE1GKwi47IzOhILrJqRFXOhiOkanx1K5i88zlAo1qG
-         3UHr+78rcBmH1/X5DOb+OxKLmpNFebMOcpubCLExoajKY00BvLqHBLSJ/8eBvUGQj9N2
-         y0EergR+5RXo5vBTjap3C7WoGljdUzeN5XtkSqyM49jGrZJgNoQD0oV8dETkNdFQ6FuS
-         bQk7RQ7+MxyIV/TNyOBhSj6bEOiUYldQnnUZOAc7Iz/+7oO/WidjQQZTXp352EcMAN9/
-         CdN90uag5I7IIfVXYnJ1pFh4Bcn4+J8Hq2CexAUL6DWP7bbjT3Qhg7YUKOm5L9uEW6Ah
-         1Bjw==
-X-Forwarded-Encrypted: i=1; AFNElJ89ROBZufNVMu1PdFj74vNq2u2uDmsrmI/j1Gb++Mbm7mH7FljrDW6ky0PV2ED4+vPMnrzNa6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpxfhVhc3eT7oAP2540XiBPjCosbBupCDuyi36SwYJbFepsxP+
-	3+znSzQtuYVwF80/KV3ueC5SoVjsSBA9HpPkw/L0Wu2lH0WoG4WQPrAN7v9rGkXB6kkC448dzd4
-	/toqK321SWxpRnyY7tFir+/sdTdcanybZtfwic/iL
-X-Gm-Gg: Acq92OG8F0MJ6fFCdIdMUBC3zYGaY9BzCFOvBWloE9cXGzTYLvQQWzCn7UCDaTlwIY6
-	sE/Yk9DpIBy5X1fGxosAJSPo1ARE/qiyazf4fGKDeFaPOASV/q63WfE+Tu2yGLCa2YY+20wcuP9
-	W0LCTJrwzTdmgBdNTIFMiF0nvOuFCCTJ1cVbpnm5yrNzxGts/isZnTlH3nzxBsy+qpnA1hTQBxe
-	RHy/oZI+vf/qR7V6bGAnhw3AzKL+znB7qmehrQNnOK8z+qUHLVad7bDjzxH0JAEdqbgbbUgP1lD
-	Esrp48SPPeu5C8pDkWU=
-X-Received: by 2002:a17:90b:2e88:b0:369:a359:b18e with SMTP id
- 98e67ed59e1d1-36a67449708mr22392702a91.9.1779899488267; Wed, 27 May 2026
- 09:31:28 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779899535; x=1780504335;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tm+u0t/wd00+M9ekVI19c+wOtWYQ3WUs+D0eMcleQ4w=;
+        b=RXSc+RjtAn+hJOTqERzJAiRDEctj06YEXTYOJ4InezLOgw1IvpF7mNOeN7oP/+8P+4
+         WXvZAkNFN/zUkvVSp/zZKLTL/nsBvuWs0Au1b0ZUR6M1zMO2vKqP/fyJ14uL3iuY7BkX
+         +lw4Noe8thirs4JoIp8ke4zuKvhdyruzPoGKqeRaUJ44/UVxdE3iFQQuAYbbLm6y8WgF
+         iCnMiaRzaoNaczxavwGNC+XLJlt4oV75poQGFJo53M02xegnV3Z/3ghNcYtm8K4aM9H2
+         zBDUoCMQVAmrdGA2slvnn3dXSLsBoBLKamMnbaPI8IHaVFdxxer+JYMw9xjhRfvDTzlP
+         FkKA==
+X-Gm-Message-State: AOJu0YwRGiLFiER8rblSrf1+4/Kb3hiirATwUlT1qU4M+FgXH0967lww
+	zJvZh6AxrmWQaV2FIgbdQ17jm9qfkt50xtuqfn9pO4MO/99I0M0IfDWEzub2H/1uNzk0N495xJQ
+	71mzrn7JrH97SQ3Co1Oj7e3YYeqjdIHDgXJQA8BNmB2Rs66TUE07uzkohvw==
+X-Gm-Gg: Acq92OHIF7T5LUBOMtXYGUmOs/WksE2+mrNEE44eLLdckHTbksd/g0i1AY1Ah494zZq
+	gHgkE6JPdTNcrPUrlzL92n++yJEWXWH843mtwobbJIMkfox7IMiUuRuJfK24mukOuRXTmB9eddN
+	DFgKFzuChSQKtf3fKuKmpO130LZQW0pbKhnk7/kVwSp/VKCee3KdfYax4O0N+1ZMMVspsbXvndW
+	w0Brbs1TD2eRwKYfBt77hHl7xvUdAnstLUEmkCNyc0nVpfxRDGXg6hiX+WGB2owqD1fl4/UDZwm
+	6pV54rnmlR8ydQzcurSO4nUhKIWvOgvCRO2YV34FLNSs3QwpkwQCQ4YcX+EXf0M42AD2YVwDB2S
+	6l0JmLqgEWLxuJ3LkQHkSp4JKS7nwd4uaSagmdGWw3HKd3f6T9a0v0xYMZA==
+X-Received: by 2002:a05:6402:40cb:b0:678:ce1e:a5cb with SMTP id 4fb4d7f45d1cf-6889cc5f75fmr12192479a12.21.1779899534688;
+        Wed, 27 May 2026 09:32:14 -0700 (PDT)
+X-Received: by 2002:a05:6402:40cb:b0:678:ce1e:a5cb with SMTP id 4fb4d7f45d1cf-6889cc5f75fmr12192451a12.21.1779899534124;
+        Wed, 27 May 2026 09:32:14 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.199])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68a6fa2a017sm943150a12.0.2026.05.27.09.32.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2026 09:32:12 -0700 (PDT)
+Message-ID: <6c4e1859-bd3f-4227-b268-1c7dbe5935cb@redhat.com>
+Date: Wed, 27 May 2026 18:32:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260526220847.28365-1-kylebot@openai.com>
-In-Reply-To: <20260526220847.28365-1-kylebot@openai.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 27 May 2026 12:31:16 -0400
-X-Gm-Features: AVHnY4KqnFYf15k44tGJLi2M3503cgZBYMeLKUZpV0HVdHQraRqFixVVV3H-hMA
-Message-ID: <CAM0EoMnzOMPXcGO14B7nL9veOKEYWn-dwnWrExA6rPuMNC-55w@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: act_api: use mutex in tcf_idr_check_alloc
-To: Kyle Zeng <kylebot@openai.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Vlad Buslov <vladbu@nvidia.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 1/1] geneve: fix Use-After-Free in RX path
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, victor@mojatatu.com,
+ andrew+netdev@lunn.ch, rajat.gupta@oss.qualcomm.com
+References: <20260521131436.748832-1-jhs@mojatatu.com>
+ <d22446ec-d5bd-4950-998f-2af15a46bfea@redhat.com>
+ <CAM0EoM=CPeOaoMUjXEp3eGeBVjomyWYV-2qj0jMOP+DNvjuPMA@mail.gmail.com>
+ <78db23f1-1ac7-4d87-97e5-668b685818c4@redhat.com>
+ <CAM0EoMnaqFgKBYBKrXh4tdbo6-JXC1HBhHWqOx=kQu9yFxk2fQ@mail.gmail.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <CAM0EoMnaqFgKBYBKrXh4tdbo6-JXC1HBhHWqOx=kQu9yFxk2fQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	TAGGED_FROM(0.00)[bounces-292378-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292379-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu-com.20251104.gappssmtp.com:dkim,openai.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 30C515E7E56
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mojatatu.com:email,qualcomm.com:email]
+X-Rspamd-Queue-Id: C4C7F5E7DFC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 6:09=E2=80=AFPM Kyle Zeng <kylebot@openai.com> wrot=
-e:
->
-> Currently, the NEWTFILTER path uses RCU to guard action idr accesses whil=
-e
-> the DELTFILTER path uses mutex to guard action accesses. This
-> inconsistency leads to a race condition scenario, which can lead to
-> erroneous operations on refcount, eventually leading to use-after-free
-> situation.
-> In this patch, we revert the introduction of RCU back to mutex in the
-> NEWFILTER path, which is consistent with the DELFILTER path, avoiding
-> the race condition.
->
-> Fixes: 4b55e86736d5 ("net/sched: act_api: rely on rcu in tcf_idr_check_al=
-loc")
-> Signed-off-by: Kyle Zeng <kylebot@openai.com>
+On 5/27/26 5:34 PM, Jamal Hadi Salim wrote:
+> On Wed, May 27, 2026 at 4:22 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 5/26/26 2:38 PM, Jamal Hadi Salim wrote:
+>>> On Tue, May 26, 2026 at 5:45 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>> On 5/21/26 3:14 PM, Jamal Hadi Salim wrote:
+>>>>> Context: This commit fixes a UAF in Geneve. The UAF component was discovered
+>>>>> because it is triggered by a buggy 'pedit' action[1]. the buggy pedit uses
+>>>>> skb_store_bits() and can write into shared or non-linear data without copying
+>>>>> the entire skb head. The Geneve device invoking either pskb_may_pull() or
+>>>>> iptunnel_pull_header() is much more likely to reallocate the skb head, freeing
+>>>>> the memory pointed to by geneve's stale geneveh pointer.
+>>>>>
+>>>>> Note, although the patch looks big it's mostly re-arranging functions to avoid
+>>>>> forward declaration.
+>>>>>
+>>>>> Sample UAF below:
+>>>>> ....
+>>>>> BUG: KASAN: slab-use-after-free in geneve_udp_encap_recv+0x2e8c/0x3190
+>>>>> Read of size 1 at addr ffff88811bab3c08 by task kworker/u32:1/62
+>>>>>
+>>>>> CPU: 4 UID: 0 PID: 62 Comm: kworker/u32:1 Not tainted 7.1.0-rc3-00182-g0e3e91779b94 #551 PREEMPT(full)
+>>>>> Workqueue: ipv6_addrconf addrconf_dad_work
+>>>>> Call Trace:
+>>>>>  <IRQ>
+>>>>>  dump_stack_lvl+0x8c/0xd0
+>>>>>  print_report+0xce/0x5e0
+>>>>>  ? geneve_udp_encap_recv+0x2e8c/0x3190
+>>>>>  ? srso_alias_return_thunk+0x5/0xfbef5
+>>>>>  ? kasan_complete_mode_report_info+0x80/0x200
+>>>>>  ? geneve_udp_encap_recv+0x2e8c/0x3190
+>>>>>  kasan_report+0xd6/0x110
+>>>>>  ? geneve_udp_encap_recv+0x2e8c/0x3190
+>>>>>  __asan_report_load1_noabort+0x18/0x20
+>>>>>  geneve_udp_encap_recv+0x2e8c/0x3190
+>>>>>  ? get_stack_info+0x38/0xc0
+>>>>>  ? srso_alias_return_thunk+0x5/0xfbef5
+>>>>>  ? __pfx_geneve_udp_encap_recv+0x10/0x10
+>>>>>  ? udp4_lib_lookup2+0x31c/0x700
+>>>>>  ? __pfx_udp_ehashfn+0x10/0x10
+>>>>>  ? srso_alias_return_thunk+0x5/0xfbef5
+>>>>>  ? __xfrm_policy_check2.constprop.0+0x40/0x5b0
+>>>>>  udp_queue_rcv_one_skb+0x65e/0xd20
+>>>>>  udp_queue_rcv_skb+0x142/0xb00
+>>>>>  udp_unicast_rcv_skb+0xd3/0x2c0
+>>>>>  udp_rcv+0x198f/0x2570
+>>>>>  ? srso_alias_return_thunk+0x5/0xfbef5
+>>>>>  ip_protocol_deliver_rcu+0x1f8/0x3c0
+>>>>>  ip_local_deliver_finish+0x362/0x5d0
+>>>>> ....
+>>>>>
+>>>>> [1]https://lore.kernel.org/netdev/20260519033950.2037-1-rajat.gupta@oss.qualcomm.com/
+>>>>> Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
+>>>>> Reported-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+>>>>> Tested-by: Victor Nogueira <victor@mojatatu.com>
+>>>>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>>>>> ---
+>>>>> v1->v2 Address gemini-sashiko.
+>>>>> 1. local variable "len" initialization in geneve_post_decap_hint()
+>>>>>    Although doesnt contribute to the fix, it was introduced in fd0dd796576e
+>>>>> 2. resolve out-of-bounds transport header for non-GSO packets
+>>>>> ---
+>>>>>  drivers/net/geneve.c   | 174 ++++++++++++++++++++++-------------------
+>>>>>  include/linux/skbuff.h |   5 ++
+>>>>>  2 files changed, 98 insertions(+), 81 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+>>>>> index c6563367d382..dc5f5394836a 100644
+>>>>> --- a/drivers/net/geneve.c
+>>>>> +++ b/drivers/net/geneve.c
+>>>>> @@ -256,6 +256,79 @@ static struct geneve_dev *geneve_lookup_skb(struct geneve_sock *gs,
+>>>>>       return NULL;
+>>>>>  }
+>>>>>
+>>>>> +/*
+>>>>> + * Look for GRO hint in the genenve options; if not found or does not pass basic
+>>>>> + * sanitization return 0, otherwise the offset WRT the geneve hdr start.
+>>>>> + */
+>>>>> +static unsigned int
+>>>>> +geneve_opt_gro_hint_off(const struct genevehdr *gh, __be16 *type,
+>>>>> +                     unsigned int *gh_len)
+>>>>> +{
+>>>>> +     struct geneve_opt *opt = (void *)(gh + 1);
+>>>>> +     unsigned int id, opt_len = gh->opt_len;
+>>>>> +     struct geneve_opt_gro_hint *gro_hint;
+>>>>> +
+>>>>> +     while (opt_len >= (GENEVE_OPT_GRO_HINT_SIZE >> 2)) {
+>>>>> +             if (opt->opt_class == htons(GENEVE_OPT_NETDEV_CLASS) &&
+>>>>> +                 opt->type == GENEVE_OPT_GRO_HINT_TYPE &&
+>>>>> +                 opt->length == GENEVE_OPT_GRO_HINT_LEN)
+>>>>> +                     goto found;
+>>>>> +
+>>>>> +             /* check for bad opt len */
+>>>>> +             if (opt->length + 1 >= opt_len)
+>>>>> +                     return 0;
+>>>>> +
+>>>>> +             /* next opt */
+>>>>> +             opt_len -= opt->length + 1;
+>>>>> +             opt = ((void *)opt) + ((opt->length + 1) << 2);
+>>>>> +     }
+>>>>> +     return 0;
+>>>>> +
+>>>>> +found:
+>>>>> +     gro_hint = (struct geneve_opt_gro_hint *)opt->opt_data;
+>>>>> +
+>>>>> +     /*
+>>>>> +      * Sanitize the hinted hdrs: the nested transport is UDP and must fit
+>>>>> +      * the overall hinted hdr size.
+>>>>> +      */
+>>>>> +     if (gro_hint->nested_tp_offset + sizeof(struct udphdr) >
+>>>>> +         gro_hint->nested_hdr_len)
+>>>>> +             return 0;
+>>>>> +
+>>>>> +     if (gro_hint->nested_nh_offset +
+>>>>> +         (gro_hint->nested_is_v6 ? sizeof(struct ipv6hdr) :
+>>>>> +                                   sizeof(struct iphdr)) >
+>>>>> +         gro_hint->nested_tp_offset)
+>>>>> +             return 0;
+>>>>> +
+>>>>> +     /* Allow only supported L2. */
+>>>>> +     id = gro_hint->inner_proto_id;
+>>>>> +     if (id >= ARRAY_SIZE(proto_id_map))
+>>>>> +             return 0;
+>>>>> +
+>>>>> +     *type = proto_id_map[id];
+>>>>> +     *gh_len += gro_hint->nested_hdr_len;
+>>>>> +
+>>>>> +     return (void *)gro_hint - (void *)gh;
+>>>>> +}
+>>>>> +
+>>>>> +static const struct geneve_opt_gro_hint *
+>>>>> +geneve_opt_gro_hint(const struct genevehdr *gh, unsigned int hint_off)
+>>>>> +{
+>>>>> +     return (const struct geneve_opt_gro_hint *)((void *)gh + hint_off);
+>>>>> +}
+>>>>> +
+>>>>> +static unsigned int
+>>>>> +geneve_sk_gro_hint_off(const struct sock *sk, const struct genevehdr *gh,
+>>>>> +                    __be16 *type, unsigned int *gh_len)
+>>>>> +{
+>>>>> +     const struct geneve_sock *gs = rcu_dereference_sk_user_data(sk);
+>>>>> +
+>>>>> +     if (!gs || !gs->gro_hint)
+>>>>> +             return 0;
+>>>>> +     return geneve_opt_gro_hint_off(gh, type, gh_len);
+>>>>> +}
+>>>>> +
+>>>>>  /* geneve receive/decap routine */
+>>>>>  static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
+>>>>>                     struct sk_buff *skb, const struct genevehdr *gnvh)
+>>>>> @@ -299,6 +372,21 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
+>>>>>       if (tun_dst)
+>>>>>               skb_dst_set(skb, &tun_dst->dst);
+>>>>>
+>>>>> +     if (skb->encapsulation) {
+>>>>> +             unsigned int len = 0, hint_off;
+>>>>> +             __be16 p;
+>>>>> +
+>>>>> +             hint_off = geneve_sk_gro_hint_off(gs->sock->sk, gnvh, &p, &len);
+>>>>> +             if (hint_off && len <= skb_headlen(skb)) {
+>>>>> +                     const struct geneve_opt_gro_hint *gro_hint;
+>>>>> +
+>>>>> +                     gro_hint = geneve_opt_gro_hint(gnvh, hint_off);
+>>>>> +                     skb_set_transport_header(skb, gro_hint->nested_tp_offset);
+>>>>> +             }
+>>>>> +     } else {
+>>>>> +             skb_unset_transport_header(skb);
+>>>>> +     }
+>>>>
+>>>> It's not clear to me why the above chunk is needed.
+>>>
+>>> I think you understand this so i may be stating the obvious:
+>>> The main motivation was to isolate the pulls from making the transport
+>>> header stale
+>>> IOW, geneve_hdr(skb) pointer could become "stale" if the packet's head
+>>> was reallocated (because geneve_rx() is called after all the "pull"
+>>> operations) - so this ensures that the inner transport header is only
+>>> set after all header pulling is done - otherwise we get a UAF.
+>>
+>> Uhmm... my questions sparked because this patch adds quite a bit of new
+>> conditionals in the data-path, which I would like to avoid them.
+>>
+>> But I must admit that re-reading the code - I'm likely low on coffee - I
+>> don't see the UaF. This sequence:
+>>
+>>         pskb_may_pull(skb...)
+>>         geneveh = geneve_hdr(skb);
+>>
+>> is correct/does not yield to UaF, and AFAICS `geneveh` is always
+>> reloaded after pskb_may_pull()/iptunnel_pull_header(). Could you please
+>> share a decoded stack trace for the UaF you are observing? So it's clear
+>> where exactly kasan reports the problem.
+>>
+> 
+> The only one i have is what is in the commit. Comments below..
+> 
+>>>> Why can't
+>>>> geneve_post_decap_hint() retain the transport header set in the current
+>>>> place? it would make this patch much shorter.
+>>>>
+>>>
+>>> It was more to ensure clean state for cases where we dont have GRO hints.
+>>> The "else {skb_unset_transport_header(skb);} " handles the case where
+>>> we are missing GRO hints - at that point outer UDP header is stripped
+>>> but tranport header is still pointing to where this outer header used
+>>> to be and something down the road may misintepret the header.
+>>
+>> This looks like an unrelated problem?!? And possibly not a problem at
+>> all?!? Upper layers (outside GSO) are expected to re-evaluate the
+>> transport header as needed.
+> 
+> Let me provide context, maybe that will help explain or provide a way
+> to fix this better.
+> 
+> I received multiple patches (via security) to resolve the pedit issue;
+> Rajat's was the first one.
+> Rajat's repro tricks geneve into having _negative transport offsets_.
+> Does that trigger anything for you? geneve just trusts those headers
+> are valid.
+> It was not Rajat's patch that caused this splat but one of the
+> multiple other reported alternative patches. I would have to dig in to
+> find which patch caused the splat.
+> 
+> Does this help? The key i believe is looking at the effect of negative
+> transport headers.
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Indeed, thank you for the context! My (very) wild guess/first suspect is
+that what really fixes the issue is the transport header reset.
 
-cheers,
-jamal
+> I can send you the repro maybe you will be able to have a better approach.
 
-> ---
->  net/sched/act_api.c | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
->
-> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> index 332fd9695e54..63841c3e4310 100644
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -874,36 +874,34 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u=
-32 *index,
->         u32 max;
->
->         if (*index) {
-> -               rcu_read_lock();
-> +               mutex_lock(&idrinfo->lock);
->                 p =3D idr_find(&idrinfo->action_idr, *index);
->
->                 if (IS_ERR(p)) {
->                         /* This means that another process allocated
->                          * index but did not assign the pointer yet.
->                          */
-> -                       rcu_read_unlock();
-> +                       mutex_unlock(&idrinfo->lock);
->                         return -EAGAIN;
->                 }
->
->                 if (!p) {
->                         /* Empty slot, try to allocate it */
->                         max =3D *index;
-> -                       rcu_read_unlock();
-> +                       mutex_unlock(&idrinfo->lock);
->                         goto new;
->                 }
->
->                 if (!refcount_inc_not_zero(&p->tcfa_refcnt)) {
->                         /* Action was deleted in parallel */
-> -                       rcu_read_unlock();
-> +                       mutex_unlock(&idrinfo->lock);
->                         return -EAGAIN;
->                 }
->
->                 if (bind)
->                         atomic_inc(&p->tcfa_bindcnt);
->                 *a =3D p;
-> -
-> -               rcu_read_unlock();
-> -
-> +               mutex_unlock(&idrinfo->lock);
->                 return 1;
->         } else {
->                 /* Find a slot */
-> --
-> 2.54.0
->
+I think I already have that one. Let me try to use it and do some
+experiments. Unfortunatelly it will require a little calendar time, due
+to obvious EOUTOFTIME :(
+
+/P
+
 
