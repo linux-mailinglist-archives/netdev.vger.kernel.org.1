@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-292348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGAuCOsKF2pB2AcAu9opvQ
-	(envelope-from <netdev+bounces-292348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:16:59 +0200
+	id UF/CGu8KF2qH2QcAu9opvQ
+	(envelope-from <netdev+bounces-292349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:17:03 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF475E6B72
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:16:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 002335E6B7A
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:17:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9B39D30B736E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:10:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EEFE130BDD17
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C6D429809;
-	Wed, 27 May 2026 15:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BE542B726;
+	Wed, 27 May 2026 15:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ak7NQSiU";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Bzk2iJin"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CK3b4fb8";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vQ5KBl94"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E52428859
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 15:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79387429825
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 15:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779894643; cv=none; b=RHXorBWHeQmjTb2/MerLZWpp31JVXVhNHEfiBUyuBMc2r5VN4VzZMcBc+nhV+IMIMEel3LGLANofbkzb8g6b/PzydTdIe0yayaRKEA2YiDjaZ10qhaHLlUapolk4J59Cg6Rt4Zb9N6F5pPMP1rxg8DxE8dOla35q2IQ7gLy62Lg=
+	t=1779894645; cv=none; b=ROf0MWVIYyCl9Dj0cddbSgqqffoBv7XCMmUoByGuTUubNcNh9JyiQTsn4eaCmVCeF55urOohY6e5mNeu7ODUPpVSsGJVtRE9KlQqxQUIlJ/RQs7P//EUIm5Gyx20BRjFSnSQKfh/8yMj7GVBZ7RJKvJLLZqqTHaQic92MMbZfOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779894643; c=relaxed/simple;
-	bh=E9VoVsnQsk3P91ocPGnexmGIN5YrGxzGqL/6CfM3hQg=;
+	s=arc-20240116; t=1779894645; c=relaxed/simple;
+	bh=/Vr8MUDHu7F6px4gQMtOKL2jRf1NKTge6fYFFNck7M4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ElK1NfA3VmqMCbg/7ntROmiR1+eot61Z4ILcJPQmwo5lPKC1hm9ywkt65G9Ayt3Dd7tB/y7Y8WCjdLCOp6TcICVFYl7/yoUTrekkVDS2rl2xm1QtbxZysROOk8GJuw2HXSnkSyFbLvjfAP1pm6JTxgGa0z+BFAAd4+bPCBHwSWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ak7NQSiU; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Bzk2iJin; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version:Content-Type; b=a3vU2XV7gwV48sGIE7WwGcIJeqcPjn5dSN1+zd671FDSyE7JjyzDYACX3y7SWWeYW2br1Km18Peyu0312W+Mn7swAobWQ+Ysh0ywvd7KKRX+V+aJ1xYBj347RErcPlaOwHnQ6EN2oi9LlSmGpBEjn0DGI4OaU9/p+41PLQBIPBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CK3b4fb8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vQ5KBl94; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
@@ -42,21 +42,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NSJQoKMh3BWi0QdTO239aay5yh6x1/YlpiCufIz/6L8=;
-	b=Ak7NQSiUEX882JwHu+6k6WIUWUxzRrhwvmH4My5S6NGbcoqj3T7qcbGKqvuXBua6/T1CjI
-	83+hLjkwnInCPXqBluO84nwJe1bIsH7RV9D2p6mFBsg4oP5FWqCaO1eAp2rspiX3GRbLgF
-	HwejxpvQaAp2kiAos/8mEYoz1/VNlmF9CQz7b5hl6VY5xNamzOYYLMgM4PtrOYm0yM6KQO
-	9A49G/B/zYYxymlevwJWPHlwD8QrQLC3Zf/X5xvK1VeIXozYwBqwNP4xvIuaq+v+uBpAUP
-	mLKVbhenRmbzoNOx3oczPMpRoSM3j7nD4w8qoQQ7kN1iBt3w5S+XSOAfJLrl1w==
+	bh=mGm0hYhahD7tucU4+kR0zzN+Asi3TlqSb3PAzu30CHE=;
+	b=CK3b4fb8KpuiIBp1RljYrFcMSQ7a8KAl3QiPogjq06e7l84jvC18KbGxILxtJ9ePV4HTO3
+	Bm1DAQB/kXj1kdZdfpW027948SJ75sLsg8e05k7p6W9R6mj9BQ2qDZ2Tw4n7n5D9zDbqAF
+	P/cXkw1K9703q6ecGeXQ7nZZRIxTBlmrICGEDuD6udpVSr153buQ2wnoFV84jFnjWjEgBQ
+	anO1X7bgMtAV4PZq7Gf36QKgi1uSRM+jG15jcXdsHQMy7hCxZ2p5/WgS4gIbZ9Tc0IMt0y
+	7SSj0Y902ObQ3rYx1tFI6uNP1x8438qhkdeRq30s4yeAw4Ggr/ttcdNdpombsA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
 	s=2020e; t=1779894631;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NSJQoKMh3BWi0QdTO239aay5yh6x1/YlpiCufIz/6L8=;
-	b=Bzk2iJinR+8+/oa6X8RWmmHSKX16G16DKB5yEtFJYYVLS3fMJgzLXZ1eFnVI0mvUm7MS93
-	j5hFhcx4NCRipmAA==
+	bh=mGm0hYhahD7tucU4+kR0zzN+Asi3TlqSb3PAzu30CHE=;
+	b=vQ5KBl94Ki3BlwQzMODsyGdTMTueP5lfCxPBr2s+TcUVkCl4ZVgCz/aAUFulcv6kdsi9Jr
+	rLZFapgOVBasmZAQ==
 To: netdev@vger.kernel.org
 Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -75,9 +75,9 @@ Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Vignesh Raghavendra <vigneshr@ti.com>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [PATCH net-next v5 6/8] hsr: Assign a socket for cloned skbs
-Date: Wed, 27 May 2026 17:08:56 +0200
-Message-ID: <20260527-hsr_ptp-v5-6-158a7633eac0@linutronix.de>
+Subject: [PATCH net-next v5 7/8] hsr: Move struct hsr_ethhdr to a global header
+Date: Wed, 27 May 2026 17:08:57 +0200
+Message-ID: <20260527-hsr_ptp-v5-7-158a7633eac0@linutronix.de>
 In-Reply-To: <20260527-hsr_ptp-v5-0-158a7633eac0@linutronix.de>
 References: <20260527-hsr_ptp-v5-0-158a7633eac0@linutronix.de>
 Precedence: bulk
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292348-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292349-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[linutronix.de,lunn.ch,ti.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com];
@@ -116,54 +116,55 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,linutronix.de:mid,linutronix.de:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5CF475E6B72
+X-Rspamd-Queue-Id: 002335E6B7A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The cloned skb does not have a socket information recorded of
-the original skb. The original skb is never submitted. This means the
-requested timestamp information gets lost.
+In the offloading case the network driver needs to inspect the HSR
+header to find out if the encapsulated type is a PTP packet where it
+needs suppress offloading of the packet.
 
-Assign the socket of the original skb to the clone so the timestamp is
-forwarded to the user.
+Move the header so it can be included the driver.
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/hsr/hsr_forward.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/linux/if_hsr.h | 5 +++++
+ net/hsr/hsr_main.h     | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index 95ae1d9dad26b..055e5b97fc72f 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -12,6 +12,7 @@
- #include <linux/skbuff.h>
- #include <linux/etherdevice.h>
- #include <linux/if_vlan.h>
-+#include <net/sock.h>
- #include "hsr_main.h"
- #include "hsr_framereg.h"
+diff --git a/include/linux/if_hsr.h b/include/linux/if_hsr.h
+index 1db1bd0fa181d..bdcfe88e023fc 100644
+--- a/include/linux/if_hsr.h
++++ b/include/linux/if_hsr.h
+@@ -49,6 +49,11 @@ struct hsr_tag {
 =20
-@@ -348,6 +349,9 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_fram=
-e_info *frame,
- 	if (!skb)
- 		return NULL;
+ #define HSR_HLEN	6
 =20
-+	if (frame->req_tx_port !=3D HSR_PT_NONE && frame->skb_std->sk)
-+		skb_set_owner_w(skb, frame->skb_std->sk);
++struct hsr_ethhdr {
++	struct ethhdr	ethhdr;
++	struct hsr_tag	hsr_tag;
++} __packed;
 +
- 	if (port->dev->features & NETIF_F_HW_HSR_TAG_INS)
- 		return skb;
+ #if IS_ENABLED(CONFIG_HSR)
+ extern bool is_hsr_master(struct net_device *dev);
+ extern int hsr_get_version(struct net_device *dev, enum hsr_version *ver);
+diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
+index 134e4f3fff603..cf0a3c76a217d 100644
+--- a/net/hsr/hsr_main.h
++++ b/net/hsr/hsr_main.h
+@@ -72,11 +72,6 @@ static inline void set_hsr_tag_LSDU_size(struct hsr_tag =
+*ht, u16 LSDU_size)
+ 				       0xF000) | (LSDU_size & 0x0FFF));
+ }
 =20
-@@ -562,6 +566,8 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
- 		 */
- 		if (frame->has_foreign_header && frame->skb_std) {
- 			skb =3D skb_clone(frame->skb_std, GFP_ATOMIC);
-+			if (skb && frame->skb_std->sk)
-+				skb_set_owner_w(skb, frame->skb_std->sk);
- 			goto inject_into_stack;
- 		}
-=20
+-struct hsr_ethhdr {
+-	struct ethhdr	ethhdr;
+-	struct hsr_tag	hsr_tag;
+-} __packed;
+-
+ struct hsr_vlan_ethhdr {
+ 	struct vlan_ethhdr vlanhdr;
+ 	struct hsr_tag	hsr_tag;
 
 --=20
 2.53.0
