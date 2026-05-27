@@ -1,66 +1,62 @@
-Return-Path: <netdev+bounces-292258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292259-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EwCNNvcFmofuAcAu9opvQ
-	(envelope-from <netdev+bounces-292258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:00:27 +0200
+	id oHwIDZ3dFmo9uQcAu9opvQ
+	(envelope-from <netdev+bounces-292259-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:03:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364B55E3C5F
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:00:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79065E3CB5
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3B6D3047406
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:58:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C599A30054D5
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297AA3F0756;
-	Wed, 27 May 2026 11:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AF6275848;
+	Wed, 27 May 2026 12:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+Jss9j9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTlbxlv2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC3F3E6386;
-	Wed, 27 May 2026 11:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63F91AB6F1;
+	Wed, 27 May 2026 12:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779883124; cv=none; b=FK756K0v5LekUR1raW0AnRaCgaAZJQB3vpA9xQSjSBW65ngRupb9HgpeJ6OfKkTllaVYbrmVuCdwitZwZDj/ob6WCIHdP0xPIkfHZaf/nKeDx+pdRth2kmhfYXqzLgaY1w8lmHFHFa0DhqDimb+mg8pNvCfo6/vxj8SLT0asJN0=
+	t=1779883418; cv=none; b=t3Ree9xTA1RvlUeIxhogUOrJT897i4ETL2nOOkSctYyl3BJeKlGCbFg3AIbXbMFaU++Zgu7SOgzX8ZJcgOoyAaErmbc0wXjhlR6b2PjzFOQb03mvBGCvN3R9r1K4gi6KDiFSdnxdoMEJa4+YLTYW0tcONONqkHMVws0/jgCeFnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779883124; c=relaxed/simple;
-	bh=9YYa628aLbjIs/EGgESPtLNxXxMcW785lrtWIPqTjyA=;
+	s=arc-20240116; t=1779883418; c=relaxed/simple;
+	bh=a496n5sTC7BfmYWW6eYgn0TqTm9K39oP4g8vv+LxFjo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U35MjFMyzktFQ4PXNM9qYN7dxl/Wb9XjNvRoqj9qjFrJ1ItL8g0oUAM7kKpOeDJMuwge6fWe3cLaOkpF5CMM+VcrcLlG7XENf/W66owjan7nI2ZMWQdUAFvKBKtzu3paR2xU7/Ds+Tt3BnAa36+FFBrzHtVcErGGoQlQp/6RZg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+Jss9j9; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 508DA1F000E9;
-	Wed, 27 May 2026 11:58:02 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=KU5WP4IZS6fMHpdeIb7klAuYswl0BkvKKjjY5QYvUIdqXX5v8ki85i5OwiJNdpAVY4f8kw2Ll94e0MozFR7pZUnMI/bKsXuiY+Zdsswbi9Vz3+yvMlBFu5TbNpddo3hcdI6BuNFneilJ7V3sp58pbqfx8gGSx0eJIUmGMlrrb7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTlbxlv2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C011F000E9;
+	Wed, 27 May 2026 12:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779883122;
-	bh=HrN4Efw4Y/a6bQTK/fsG1WgQ1Bf8x3DscanOsqzoDcY=;
+	s=k20260515; t=1779883417;
+	bh=MgyJIuDX8DjcMC2ItkXGm+xZ0l0lqXTDmtritZLXgZ0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=K+Jss9j9WpJRdqCNFMwLay4V8QoWwC+I/if9dLJI+5M1CZVFdTRlB15a0B3SWXxLx
-	 tHGIyKD7ElIQlKyKa1X7nukGQeTyCKOz/c3qmVFyITQWgYmSH0BT0rLSc0JYfDhHbT
-	 7FBn7JQ9rI3M7xDInUWrJ8gk7pHJyTOJdkzcx5686mQ0jlTBssekeR04ReZ0YKKiyR
-	 ULE8ffQumIHvw65o3WNvBeuoHtCXK9N+yqVc6x7Uhqdx99QPyqqifrRJNZ3ZTgRuf1
-	 DgWJlB6+A4oYEykF9nlLCtZcpzF/clOAmbanaHWCMSqDIxI/rZGUzU42LXzpM8xnaV
-	 DLyif9JfSuI7w==
-Date: Wed, 27 May 2026 12:57:55 +0100
+	b=MTlbxlv2Ej5I5fbPMMBpHlV8MAjfxrRNflR69autOhX7r3iw+mMialUKnCM9+WQ0p
+	 pAQ5NVccVYPbD8en2OImYICzCvZ5OP6RuR9UObs5wfrfuIAAq/oaApKv6akPly1wSN
+	 NzrUhAd1bjbWc+nvIzmKuQcY3vhgHN5emDXKImSGQ9nsgDnTbtjS5+Exm/+wvqeVeM
+	 8/3nBfjpyNd9bqR7PNo5WCsfzbgCqVje7NgW+ixrGngucGUADZOe2GfUHDcD7HfUs5
+	 7ejvj8JGYFdL5BBdmbjhHhJyDDkog4QVTh85XB6eJo/+f3cdkcYdV/n7F6D6CzINin
+	 nL9y+E5uxg+hg==
+Date: Wed, 27 May 2026 13:03:29 +0100
 From: Simon Horman <horms@kernel.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: liuhangbin@gmail.com, h-mittal1@ti.com, haokexin@gmail.com,
-	vadim.fedorenko@linux.dev, devnexen@gmail.com,
-	jacob.e.keller@intel.com, arnd@arndb.de, afd@ti.com,
-	basharath@couthit.com, parvathi@couthit.com,
-	vladimir.oltean@nxp.com, rogerq@kernel.org, danishanwar@ti.com,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [PATCH net-next v6 0/2] Add Frame Preemption MAC Merge support
- for ICSSG
-Message-ID: <20260527115755.GK2256768@horms.kernel.org>
-References: <20260525182700.3135858-1-m-malladi@ti.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Amir Goldstein <amir73il@gmail.com>, Tim Bird <tim.bird@sony.com>,
+	Christian Brauner <brauner@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net/dns_resolver: consolidate namelen checks in
+ dns_query
+Message-ID: <20260527120329.GL2256768@horms.kernel.org>
+References: <20260525095400.821912-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,67 +65,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260525182700.3135858-1-m-malladi@ti.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260525095400.821912-3-thorsten.blum@linux.dev>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292258-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,ti.com,linux.dev,intel.com,arndb.de,couthit.com,nxp.com,kernel.org,redhat.com,google.com,davemloft.net,lunn.ch,lists.infradead.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,sony.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292259-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url,linux.dev:url]
-X-Rspamd-Queue-Id: 364B55E3C5F
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: D79065E3CB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 25, 2026 at 11:56:58PM +0530, Meghana Malladi wrote:
-> This patch series adds QoS support to the ICSSG PRUETH driver.
-> The first patch implements mqprio qdisc handling and TC offload hooks
-> so userspace can request TC mappings and queue counts.
+On Mon, May 25, 2026 at 11:54:01AM +0200, Thorsten Blum wrote:
+> Consolidate the namelen checks and return -EINVAL early if needed. Drop
+> the namelen == 0 check since it is covered by namelen < 3.
 > 
-> It also integrates a driver-side mechanism to program the firmware
-> with the IET/FPE preemption mask and to kick the firmware verify state
-> machine when frame preemption is enabled. The second patch adds ethtool
-> perations for the MAC Merge (Frame Preemption) sublayer, exposing .get_mm,
-> .set_mm and .get_mm_stats so admins can view and change MAC Merge
-> parameters and retrieve preemption statistics.
-> 
-> v5: https://lore.kernel.org/all/20260430111723.497113-1-m-malladi@ti.com/
-> 
-> MD Danish Anwar (2):
->   net: ti: icssg-prueth: Add Frame Preemption MAC Merge support
->   net: ti: icssg-prueth: Add ethtool ops for Frame Preemption MAC Merge
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 
-Hi Meghana and MD,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-There is another round of AI-generated reviews for this patch-set available at
-https://netdev-ai.bots.linux.dev/ and https://sashiko.dev/
-
-I would appreciate it if you could look over them and address any
-issues that are either introduced by this patch-set, or directly
-impact it.
-
-I would not suggest expanding this patchset to address any other
-pre-existing issues, but rather address them separately as appropriate.
 
