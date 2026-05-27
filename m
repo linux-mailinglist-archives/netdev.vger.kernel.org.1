@@ -1,215 +1,205 @@
-Return-Path: <netdev+bounces-292162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kA6ANnilFmoOoAcAu9opvQ
-	(envelope-from <netdev+bounces-292162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:04:08 +0200
+	id mEgHNqSjFmoOoAcAu9opvQ
+	(envelope-from <netdev+bounces-292155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:56:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69A385E0CE1
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:04:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97C15E0B4B
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF14830BEE41
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:56:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A6DC53006984
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350F83CDBB7;
-	Wed, 27 May 2026 07:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31A23CD8AD;
+	Wed, 27 May 2026 07:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="LPEWvyU6";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KXOWrSH2"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eUZdS3Dq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349D73CFF42;
-	Wed, 27 May 2026 07:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295743C872E;
+	Wed, 27 May 2026 07:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779868606; cv=none; b=UJYH8hHZ8YwFPcp5L0BUaRfebEDKRPiSaSDjPTFhNaZ7WT9in+edIXhrPvGXRq983D6q+0PMzMDjeg65lEnaA5RjQ8QhREx4GeIUDr6ATqT7ZaOYl0RmFlftH/wxs2Eghewtl1n88vSWOF9RE6ana9SfAftN2bXv2+RUqtpR1IQ=
+	t=1779868575; cv=none; b=Tg+PCNzIWgF5hHJDpq1sbS0eMFWypaDn4fBUhMMDctDL9rDx7Om/Q8iY3dp5aGrZSP4srLs4D7ymM3/O5nGaXvCHzcIqbb8OgdDKrprkSjtFmhi4D1SUOiNLnFunD5HIlz7PcpmBFJaG4XMSBujisGEfkNgUL8PKE/L4xnxxgFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779868606; c=relaxed/simple;
-	bh=VkWEmwKD3t9ZTmY389ZKLUMf5VWzc/cC1v5mWbHzJRs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sVWqRfAEoykoUSZnftWndKyL90elSV690lImZaT0HSMk1d2zU4h2APxxq5Rwatpc3SIM+dOtFFTWM/LqiHGnl5zrH1KGCYJs4tuqt6XsoaSuEoWHKbGfeBMadVQT6/dcU/zv1WODByO3zOc11LM0nTFpnI2QuSSAKgl16LCZZ+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=LPEWvyU6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KXOWrSH2; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 4A332EC0204;
-	Wed, 27 May 2026 03:56:43 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Wed, 27 May 2026 03:56:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1779868603; x=1779955003; bh=S9HgsDpIra
-	Qs6ELmiQhI4YE1ElINdY7ducPtyqsAzJs=; b=LPEWvyU6IKP6HG/y58TZgEdgGX
-	OzvimGQKaFB7zH+4phkALqej/C8T9cWjZtGhLW6tPq6ijaPq0zAscJJEn5RCyfPt
-	WeMn6Q6Gxxiy7mn6sPdL53RYlLrj9o7KRBWOyjiNpCrFkvrZhZLjdN7fugJPTznI
-	LLLanJuiOIZeHNhOWYEfxy6c++TqlpSn/+X6+BdulM8AK6ie57W7Jyx9cF8zaTHd
-	FdUbeM58odwfdR0agh8bmZwU0IWxlzafQSWjf4pQIC5xmppJWFP7+13bf+B5AGLm
-	RTewLRlDqZ6YzvnFFBSCEo7nc64yKD8/yqL5bOkM+9eOKf9xg93jEhdB4TvQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779868603; x=1779955003; bh=S9HgsDpIraQs6ELmiQhI4YE1ElINdY7ducP
-	tyqsAzJs=; b=KXOWrSH2yu5ueAb2ppIceNM9Sj5yKME131hbl2/NrSFzM1XQZut
-	TRH8F29e3I0px5LEBYF5f9VWNNMgbWVKEuR3oQJhoOjY1A3fvn38fkXOykXuo09k
-	WrvGmHnvq3gPi2f/H5Z/RlNebi4AOHH1D0OH9uBnddnhVCdLLpGTl81CrmvqYKRD
-	s/g9+hLYRn02nRK1I+bAVcJ2Tds9kWUHmkJ4SRSULoi6oofQCrA9m9+gorFiw9mh
-	CmtMF6up/DB1l1sqEBqjIITKbTWHIELSm8peXSM8edwEH/K3uv3heUqDgZc/f7+u
-	jFs7LdRT2WLCWb61S5D+IFf3jRVar9NJPZA==
-X-ME-Sender: <xms:uqMWapfbss6hvv6lH8zIyOlSlqt1MPVMECb9Yhk_3RnuhnMpLPQuqA>
-    <xme:uqMWavLfmxj_JweXWHuO3EBDM47JfBILK0oV7yD5HNzvWjpIXC4M8RYkiArUo-i4q
-    C1_42H2fokez9tynWn1du1ey7SUeMDsauET_pmSgJRO2kzRB4c>
-X-ME-Received: <xmr:uqMWapvPT-oYK8fZjko3ZtTwcKPPIVMm78pdmPh4Bfr8uVVpnB9VIKpgzbY>
-X-ME-Proxy-Cause: dmFkZTEBUmseUL0dgwnrJDASI2CZc8hGzGSmLPBl3Fk6XbncYeNh6E7Dz6gb6SdCwaA/ao
-    QJ0T4+3xQyC+VccLcD4YNamgx+jwUz2vu9HqOlqa1BY6iBwipSSsgV2l6f2mXMEOPOBkhy
-    GwBRDCUU9eS1rf1sSubpKeIJA5NxswayFoYK7fl+18m9MC6/HxxXUFXwY2GYP1/0/6caAq
-    50a94NgXQpO9Idx896x3215WdL7Pwwxhlkw+aB/xAfar5BxKwd3GDy31EAdObtLM1kM2V0
-    vM03yBtuyZzX0BC/f3Ms4twBPvqwP3xOKm86hm3oE8rtdXvBT74Fw1TmWcQJjcXX81vXcl
-    sg2zvC4Ru3VkIHwmwYulmqve8tnwGUzeGmxbMoFF1rR4hMom2XJh6qFS9XdPoFXkAnJtzU
-    pwVXOsgswpBr6D0uCsljp/9flUgMNIb6WF+Qr3GPwWjbZuDKSX482slY/1/OjSGmMYFGRI
-    wUrBe8tfSAPHXqMBWXEgKnYjWMXfADba+Yn+eybsgV8KHL+pEWZ968ptswmqI4Q+TMB6+v
-    JDq7fVwuVHf0tAaPcPK9tMJw83CJFtlReLD7y9/3naBfEBVQihdmSmSIjJ69fadhzgO57x
-    gx5hgQgaiSWd+kIkynUOj2Rn4jNN8mlmHk5b8fbrc7vrawzqs1nHUht/wrVQ
-X-ME-Proxy: <xmx:uqMWapYESFqPNZfoqbcg9mv54GEPYfF3ZByFkw6vW9czv0sgyvX1qw>
-    <xmx:uqMWah0KACXUN3mwlmp9V8KSzvPJbRDrIiyz786J_8vipl01vQ419Q>
-    <xmx:uqMWanWUjGcy1EhN6J4FnT8Rh9w9KOlY8acr60f9pmuc1gy9vJ8peA>
-    <xmx:uqMWaktId9BJe-k6W6wvFfgBEilILOz4T47WfEpGgyNxn6K9BhRXDQ>
-    <xmx:u6MWaqhMgYHk34ZYnEt8gP_Ap_ltbXJ2COL9DfYiHYCq-0Hd8QvydPjf>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 May 2026 03:56:42 -0400 (EDT)
-Date: Wed, 27 May 2026 09:55:50 +0200
-From: Greg KH <greg@kroah.com>
-To: Shaoxu Liu <shaoxul@foxmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Add power management op for RNDIS host
-Message-ID: <2026052725-femur-spendable-4ff0@gregkh>
-References: <tencent_513B1F71D30856A55BAA6CBDB22A5E719508@qq.com>
+	s=arc-20240116; t=1779868575; c=relaxed/simple;
+	bh=x8vK8ZWOUhg/tEx5q9P0ai4gwCH4AVza2ffIZnneLCk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PcFu+xHZe8rEA+YGdfXkAqv6ZdCS6nPzW6Ong/7ycQkOT45ihkPWbQO/Zzy8ZSI9Ze7MQ6r5UJn79Y+HK4NxV5q70G5idlvd8A96J3Udl+8pvHvY46oPkxmo1BY+Pvubt4x9/3IwLBHFBIr9w9RlizhbGXCJtlCbSqAtjED9fhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eUZdS3Dq; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=vXgwY22bMiSZf/BdioBEU4Mj0uV+XIo7IVi56h/mHZk=;
+	b=eUZdS3Dqz7Ium6c+xy/NXqn+KtQ3Y9cC1A88qf+OD13w1mtyFLVUsjmKMPIvs7g+tUEXz2RwU
+	jSWTSIchaWfZdxcSKN2aAnCCA4MYOLaZ2iOccstSZ6RgS2I9wpvBQnBeZ85zE1/duAhlGGmB2of
+	7EnUcctMR/tuB4HktgUNpfk=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gQMDk2GXBzLlT6;
+	Wed, 27 May 2026 15:48:22 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 87F1840563;
+	Wed, 27 May 2026 15:56:07 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 27 May 2026 15:56:06 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Ioana Ciornei <ioana.ciornei@nxp.com>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
+	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v06 0/6] net: hinic3: PF initialization
+Date: Wed, 27 May 2026 15:55:55 +0800
+Message-ID: <cover.1779867397.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_513B1F71D30856A55BAA6CBDB22A5E719508@qq.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kroah.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kroah.com:s=fm3,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292162-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[foxmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-292155-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kroah.com:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[greg@kroah.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[huawei.com,h-partners.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,nxp.com,gmail.com];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.987];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,foxmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kroah.com:dkim]
-X-Rspamd-Queue-Id: 69A385E0CE1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,huawei.com:dkim,h-partners.com:mid]
+X-Rspamd-Queue-Id: A97C15E0B4B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 03:47:41PM +0800, Shaoxu Liu wrote:
-> RNDIS host does not manage the USB power, and it will
-> cause more power consumption even when no data transferring.
-> 
-> Adding the power management operator will make the USB
-> enter suspend mode when no data transferring.
-> ---
->  drivers/net/usb/rndis_host.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
-> 
-> diff --git a/drivers/net/usb/rndis_host.c b/drivers/net/usb/rndis_host.c
-> index 7b3739b29..76eb65fd5 100644
-> --- a/drivers/net/usb/rndis_host.c
-> +++ b/drivers/net/usb/rndis_host.c
-> @@ -630,6 +630,17 @@ static const struct driver_info	zte_rndis_info = {
->  	.tx_fixup =	rndis_tx_fixup,
->  };
->  
-> +static const struct driver_info	rndis_info_lowpower = {
-> +	.description =	"RNDIS device",
-> +	.flags =	FLAG_ETHER | FLAG_POINTTOPOINT | FLAG_FRAMING_RN | FLAG_NO_SETINT,
-> +	.bind =		rndis_bind,
-> +	.unbind =	rndis_unbind,
-> +	.status =	rndis_status,
-> +	.rx_fixup =	rndis_rx_fixup,
-> +	.tx_fixup =	rndis_tx_fixup,
-> +	.manage_power =	usbnet_manage_power,
-> +};
-> +
->  /*-------------------------------------------------------------------------*/
->  
->  static const struct usb_device_id	products [] = {
-> @@ -657,6 +668,11 @@ static const struct usb_device_id	products [] = {
->  	/* RNDIS is MSFT's un-official variant of CDC ACM */
->  	USB_INTERFACE_INFO(USB_CLASS_COMM, 2 /* ACM */, 0x0ff),
->  	.driver_info = (unsigned long) &rndis_info,
-> +}, {
-> +	/* RNDIS for Telit Cinterion low power LTE cat1biz modules LE310X1*/
-> +	USB_DEVICE_AND_INTERFACE_INFO(0x1bc7, 0x7030,
-> +				      USB_CLASS_WIRELESS_CONTROLLER, 1, 3),
-> +	.driver_info = (unsigned long)&rndis_info_lowpower,
->  }, {
->  	/* "ActiveSync" is an undocumented variant of RNDIS, used in WM5 */
->  	USB_INTERFACE_INFO(USB_CLASS_MISC, 1, 1),
-> -- 
-> 2.25.1
-> Signed-off-by: Shaoxu Liu <shaoxul@foxmail.com>
-> 
-> 
+This is [3/3] part of hinic3 Ethernet driver second submission.
+With this patch hinic3 becomes a complete Ethernet driver with
+pf and vf.
 
-Hi,
+Add 20 ethtool ops for information of queue, rss, coalesce and eth data.
+Add MTU size validation
+Config netdev watchdog timeout.
+Remove unneed coalesce parameters.
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
+Changes:
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+PATCH 03 V01: https://lore.kernel.org/netdev/cover.1773387649.git.zhuyikai1@h-partners.com/
+* Add rmon/pause/phy/mac/ctrl stats (Ioana Ciornei)
 
-- Your patch does not have a Signed-off-by: line.  Please read the
-  kernel file, Documentation/process/submitting-patches.rst and resend
-  it after adding that line.  Note, the line needs to be in the body of
-  the email, before the patch, not at the bottom of the patch or in the
-  email signature.
+PATCH 03 V02: https://lore.kernel.org/netdev/cover.1774684571.git.zhuyikai1@h-partners.com/
+* Modify "return -EINVAL" intension problem (AI review)
+* Use le16_to_cpu for rss_indir pair.out->buf (AI review)
+* Use u32 instead of int in coalesce_limits to avoid overflow (AI review)
+* Remove redundant u64_stats_update_begin/end when reading stats without
+  concurrent reader (AI review)
+* Modify nic_dev->stats.syncp logic (AI review)
+* Complete rxq/txq stats stats fileds in hinic3_rx/txq_get_stats (AI review)
+* Remove statistics values in rtnl_link_stats64 from ethtool statistics
+  values (AI review)
+* Add channel_cfg_lock & channel_res_lock to protect resources access (AI review)
+* Remove OutOfRangeLengthField, FrameToolong and InRangeLengthErrors (Ioana Ciornei)
+* Remove redundant mtu commit (Maxime Chevialler)
 
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
+PATCH 03 V03: https://lore.kernel.org/netdev/cover.1774940117.git.zhuyikai1@h-partners.com/
+* Change unnedd to unneeded (AI review)
+* Remove packets,bytes,errors and dropped in hinic3_rx/tx_queue_stats (AI review)
+* Remove duplicated entried in hinic3_port_stats[] (AI review)
+* change stats_info.head.status to ps->head.status (AI review)
 
-thanks,
+PATCH 03 V04: https://lore.kernel.org/netdev/cover.1775618797.git.zhuyikai1@h-partners.com/
+* Remove restore_drop_sge in hinic3_rx_queue_stats (AI review)
+* Remove hinic3_nic_stats (AI review)
+* Use old_q_param to store old config and use it in error handling (Mohsin Bashir)
+* Add netdev_info to inform the user that depth is trimmed (Mohsin Bashir)
+* Remove const in hinic3_get_qp_stats_strings parameters (Mohsin Bashir)
+* Change EOPNOTSUPP to ERANGE in is_coalesce_exceed_limit (Mohsin Bashir)
+* Update nic_dev->rss_type after hinic3_set_rss_type (Mohsin Bashir)
+* Modify MGMT_STATUS_CMD_UNSUPPORTED to EOPNOTSUPP for complying with the
+  error code specifications (Mohsin Bashir)
 
-greg k-h's patch email bot
+PATCH 03 V05: https://lore.kernel.org/netdev/cover.1775711066.git.zhuyikai1@h-partners.com/
+* Clear HINIC3_CHANGE_RES_INVALID bit in error handling (AI review)
+* Use low >= high to avoid low=high in is_coalesce_legal (AI review)
+* As tx and rx share interrupts, we only use ETHTOOL_COALESCE_RX_USECS for
+user setting to avoid user misunderstanding. So we do not add
+ETHTOOL_COALESCE_TX_USECS. (Mohsin Bashir & AI review)
+
+PATCH 03 V06:
+* Remove redundant rx_jumbo_pending and rx_mini_pending judgement (Jakub Kicinski)
+* Remove redundant max tx_pending judgement when .get_ringparam already got the
+   max value (Jakub Kicinski)
+* Use extack instead of netdev_err/netdev_info/netdev_warning (Jakub Kicinski)
+* Remove HINIC3_CHANNEL_RES_VALID and only use HINIC3_CHANGE_RES_INVALID
+  bit (Jakub Kicinski)
+* Deference freed pointers in hinic3_change_channel_settings error
+  handling (Jakub Kicinski)
+* Modify hinic3_open_channel (Jakub Kicinski)
+
+Fan Gong (6):
+  hinic3: Add ethtool queue ops
+  hinic3: Add ethtool statistic ops
+  hinic3: Add ethtool coalesce ops
+  hinic3: Add ethtool rss ops
+  hinic3: Configure netdev->watchdog_timeo to set nic tx timeout
+  hinic3: Remove unneeded coalesce parameters
+
+ .../ethernet/huawei/hinic3/hinic3_ethtool.c   | 835 +++++++++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  13 +-
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |   9 +-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |   7 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     |  39 +
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 105 ++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   |  64 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   | 109 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   8 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    |   4 +-
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |   8 +-
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 487 +++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  19 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    |  61 +-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  18 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    |  71 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |   2 +
+ 17 files changed, 1823 insertions(+), 36 deletions(-)
+
+
+base-commit: aa064a614efcfa4c300609d1f01134e99a12ad10
+-- 
+2.43.0
+
 
