@@ -1,68 +1,64 @@
-Return-Path: <netdev+bounces-292018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4BhhKGM+FmomjwcAu9opvQ
-	(envelope-from <netdev+bounces-292018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:44:19 +0200
+	id 4MfDOVQ+FmomjwcAu9opvQ
+	(envelope-from <netdev+bounces-292017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:44:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2FEC5DE04C
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:44:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8458E5DE043
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:44:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 16CE5300981B
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:44:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4A363017240
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606822DC798;
-	Wed, 27 May 2026 00:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE5B2D2496;
+	Wed, 27 May 2026 00:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="OmlI09XK"
+	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="ONq1z6Or"
 X-Original-To: netdev@vger.kernel.org
 Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9F5138490;
-	Wed, 27 May 2026 00:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A248C22D792;
+	Wed, 27 May 2026 00:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779842648; cv=none; b=MiQ1tkzUXnmNJUlHnAYq8B7Yp6ElSLq9BGW6SdsYeOi/053Pf4pxMxC7PwNkInjgPkW2JxwdKEAl2WXEF3sPE9s/9+U1BQTz7q4O4ZOJjNsuLjnKndc9v+qH+nF0JfayewUzWmGv1TfJuxWWMcPhW45vOyYDYr1x/ZeX42WRkzk=
+	t=1779842641; cv=none; b=e+MOUsQ2wd+Ze7Hyx+cm8arZGAThId0XVsnX97YCqg7010b/11HFGxWLSm6/pR18nPDx9AwOlWq9WJouzTfsSt7P2AQqMtlovieHT1RqRpOluwXH6aooN9HGAxxKmfCp9zh0ZJFy++UmBGLGm/+LiRKUNy1jtreTHILlrlR4d3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779842648; c=relaxed/simple;
-	bh=OPvk6kNcEqW9pE2w9TlV94v17TjNQ/zyncqpHm20ogg=;
+	s=arc-20240116; t=1779842641; c=relaxed/simple;
+	bh=HEyBNE2DNL1EoWl/ZyE8HcSo+KSfCa2SAkFZP1AriTE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cYS9N5kVP8JsOxYWakWjs4Uur6rLz1Drl17YQoAAH9+eKRwWpdE3bu0x5QCjwKWhHQvmtOsr91XMpFB/wlztUPCw5lEL9Geulm9fjDeKi8BDaNR1SIKHG8OquDD0Td3FoIih79PT/TTEyQyWdPWoYo3AOYQwmrbkSEODUFh9g4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=OmlI09XK; arc=none smtp.client-ip=216.154.215.154
+	 MIME-Version; b=DY+6NFxBhJaJTdsuoEx2GJl4wrHm9LLJOFdpPrd1z7eU56dG99iAjmnE5jTeV00ey84YRYmkON2vkW/BoE2LHk8UpojRjYvGTAnDMSRbw2Qv+HfxxPdW7UQxdK/O3VRGzdqqjdYvJUkutQL1+29/IMGkfjToUyM/HFYk8JIFRmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=ONq1z6Or; arc=none smtp.client-ip=216.154.215.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
-Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 64R0h2tE030932
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 64R0h2tF030932
 	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 27 May 2026 01:43:08 +0100
-DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 64R0h2tE030932
+	Wed, 27 May 2026 01:43:35 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 64R0h2tF030932
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1779842614; bh=YRieJS/p07GCEeSJQbZsvPsVYeisfBSd+V3RqjVJImE=;
+	t=1779842619; bh=yMFMaIhjIuPbYHiNqCtAsD3cLQymHFHO8lFa6TgR7yU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OmlI09XKg2TBEXair9f5vsglhj84q+wpSsQ+qj5fCvm9wiycbMT3NIwCJttUFlGVn
-	 kY/eNfpK3UcuEKqt4NqyhB1BzVtNcAyl4ZhMCXH0WFa1YiZGGxzqNh5fM5XNy9u4Z1
-	 fZUZy9k0jBlvyhfofKFDb25LIYh9kWh22Yo9bw8Y+OvwYiMLtsKc3s6wbJdeDZAayt
-	 sNSMwOHdACSGLXJVMqcqdnbHQ4Gaq73jzU07dMjCjm6oT+h2lAw/69VC9eMU0Tw9S1
-	 e4iFpWFmR+932hPX8LZj32VZMtgXztZFtlXKnz9pJq7dvO0Yt1zJJzLALKYk4MxPLe
-	 6IziSIVREwuDQ==
+	b=ONq1z6OrknH1LUOoIwxR5YzFgTArzWPX80U1nUe6tH9aKxNsznZ5zGS0i3BC9ggac
+	 /xMgtwG6VR6IZXHEv+nJqEIN5Eyl7AcQ1mfbXFEZcY1kzyNIoRva19uEyiztKK4hGR
+	 4RMZ4XGcijQEIUvxOXHq+WE7FmvlZzHUt/kJ9QRvkKDLftnXMZU/l4RVrj+WV0zj0y
+	 NLDXsoZ0TteAHrRwFKBYb2t8AgDLazvSnB6rGdHOoLEFU93mCrVCx/lBAnfYN61QRe
+	 g/cNR/oL2+silNlPnDWtQc9/iN77fdtq5hkLOrmdauUG8+3q7zzoJHH5LHqjC8/83Z
+	 r3wcj3YxXLLyw==
 From: Luke Howard <lukeh@padl.com>
 To: netdev@vger.kernel.org
 Cc: Luke Howard <lukeh@padl.com>, Kieran Tyrrell <kieran@sienda.com>,
         Max Hunter <max@huntershome.org>,
         Cedric Jehasse <cedric.jehasse@luminex.be>,
-        Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
+        Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        Ido Schimmel <idosch@nvidia.com>, linux-kernel@vger.kernel.org,
-        bridge@lists.linux.dev
-Subject: [PATCH net-next 1/6] net: bridge: mdb: add MDB_FLAGS_STREAM_RESERVED flag
-Date: Wed, 27 May 2026 10:42:47 +1000
-Message-ID: <45e7cd01f9449c8ef15a5affd587fe7645ecddb7.1779841530.git.lukeh@padl.com>
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 2/6] net: dsa: mv88e6xxx: add num_tx_queues to chip info structure
+Date: Wed, 27 May 2026 10:42:48 +1000
+Message-ID: <63f824d7d797d55229d37771fd1bb66f30bd400f.1779841530.git.lukeh@padl.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1779841530.git.lukeh@padl.com>
 References: <cover.1779841530.git.lukeh@padl.com>
@@ -73,21 +69,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-292018-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[padl.com,sienda.com,huntershome.org,luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292017-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -97,216 +93,218 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[padl.com:+];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,padl.com:email,padl.com:mid,padl.com:dkim]
-X-Rspamd-Queue-Id: B2FEC5DE04C
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[padl.com:email,padl.com:mid,padl.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 8458E5DE043
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a new MDB entry flag, MDB_FLAGS_STREAM_RESERVED, that userspace
-can set on RTM_NEWMDB to mark a multicast destination as belonging
-to a reserved stream (e.g. IEEE 802.1Q Stream Reservation Protocol /
-IEEE 1722 / TSN). The bridge core does no admission control on the
-basis of the flag; it is metadata propagated through switchdev to
-hardware drivers that can themselves enforce admission of AVB / SR
-priority traffic only to flagged destinations.
+In preparation for adding 802.1Qav support (FQTSS), add an element to
+struct mv88e6xxx_info indicating the number of transmit queues supported
+by each chip.
 
-The flag is settable via the new nested attribute MDBE_ATTR_FLAGS
-(NLA_U32 bitmask, validated against MDB_FLAGS_SETTABLE_MASK), and is
-reflected in dump output via br_mdb_entry.flags as is done today for
-the OFFLOAD/BLOCKED/STAR_EXCL flags.
-
-Assisted-by: Claude:claude-4.7-opus
 Signed-off-by: Luke Howard <lukeh@padl.com>
 ---
- include/net/switchdev.h        |  4 ++++
- include/uapi/linux/if_bridge.h |  2 ++
- net/bridge/br_mdb.c            | 12 ++++++++++++
- net/bridge/br_private.h        |  2 ++
- net/bridge/br_switchdev.c      | 17 +++++++++++------
- 5 files changed, 31 insertions(+), 6 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c | 23 +++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/chip.h |  3 +++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/include/net/switchdev.h b/include/net/switchdev.h
-index ee500706496b0..03d176708b768 100644
---- a/include/net/switchdev.h
-+++ b/include/net/switchdev.h
-@@ -111,10 +111,14 @@ struct switchdev_obj_port_vlan {
- 	container_of((OBJ), struct switchdev_obj_port_vlan, obj)
- 
- /* SWITCHDEV_OBJ_ID_PORT_MDB */
-+
-+#define SWITCHDEV_MDB_F_STREAM_RESERVED		BIT(0)
-+
- struct switchdev_obj_port_mdb {
- 	struct switchdev_obj obj;
- 	unsigned char addr[ETH_ALEN];
- 	u16 vid;
-+	u32 flags;
- };
- 
- #define SWITCHDEV_OBJ_PORT_MDB(OBJ) \
-diff --git a/include/uapi/linux/if_bridge.h b/include/uapi/linux/if_bridge.h
-index 21a700c02ef76..51ec314994bec 100644
---- a/include/uapi/linux/if_bridge.h
-+++ b/include/uapi/linux/if_bridge.h
-@@ -705,6 +705,7 @@ struct br_mdb_entry {
- #define MDB_FLAGS_STAR_EXCL		(1 << 2)
- #define MDB_FLAGS_BLOCKED		(1 << 3)
- #define MDB_FLAGS_OFFLOAD_FAILED	(1 << 4)
-+#define MDB_FLAGS_STREAM_RESERVED	(1 << 5)
- 	__u8 flags;
- 	__u16 vid;
- 	struct {
-@@ -760,6 +761,7 @@ enum {
- 	MDBE_ATTR_IFINDEX,
- 	MDBE_ATTR_SRC_VNI,
- 	MDBE_ATTR_STATE_MASK,
-+	MDBE_ATTR_FLAGS,
- 	__MDBE_ATTR_MAX,
- };
- #define MDBE_ATTR_MAX (__MDBE_ATTR_MAX - 1)
-diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
-index e0c7020b12f5f..1320ccd81b0a1 100644
---- a/net/bridge/br_mdb.c
-+++ b/net/bridge/br_mdb.c
-@@ -146,6 +146,8 @@ static void __mdb_entry_fill_flags(struct br_mdb_entry *e, unsigned char flags)
- 		e->flags |= MDB_FLAGS_BLOCKED;
- 	if (flags & MDB_PG_FLAGS_OFFLOAD_FAILED)
- 		e->flags |= MDB_FLAGS_OFFLOAD_FAILED;
-+	if (flags & MDB_PG_FLAGS_STREAM_RESERVED)
-+		e->flags |= MDB_FLAGS_STREAM_RESERVED;
- }
- 
- static void __mdb_entry_to_br_ip(struct br_mdb_entry *entry, struct br_ip *ip,
-@@ -664,6 +666,7 @@ static const struct nla_policy br_mdbe_attrs_pol[MDBE_ATTR_MAX + 1] = {
- 						  MCAST_INCLUDE),
- 	[MDBE_ATTR_SRC_LIST] = NLA_POLICY_NESTED(br_mdbe_src_list_pol),
- 	[MDBE_ATTR_RTPROT] = NLA_POLICY_MIN(NLA_U8, RTPROT_STATIC),
-+	[MDBE_ATTR_FLAGS] = NLA_POLICY_MASK(NLA_U32, MDB_FLAGS_STREAM_RESERVED),
- };
- 
- static bool is_valid_mdb_source(struct nlattr *attr, __be16 proto,
-@@ -1072,6 +1075,8 @@ static int br_mdb_add_group(const struct br_mdb_config *cfg,
- 	if (entry->state == MDB_PERMANENT)
- 		flags |= MDB_PG_FLAGS_PERMANENT;
- 
-+	flags |= cfg->pg_flags;
-+
- 	if (br_multicast_is_star_g(&group))
- 		return br_mdb_add_group_star_g(cfg, mp, brmctx, flags, extack);
- 	else
-@@ -1225,6 +1230,13 @@ static int br_mdb_config_attrs_init(struct nlattr *set_attrs,
- 		cfg->rt_protocol = nla_get_u8(mdb_attrs[MDBE_ATTR_RTPROT]);
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index c30e4c13565a5..5d45363c67bbd 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -4106,6 +4106,8 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
+ 			goto unlock;
  	}
  
-+	if (mdb_attrs[MDBE_ATTR_FLAGS]) {
-+		u32 user_flags = nla_get_u32(mdb_attrs[MDBE_ATTR_FLAGS]);
++	ds->num_tx_queues = chip->info->num_tx_queues;
 +
-+		if (user_flags & MDB_FLAGS_STREAM_RESERVED)
-+			cfg->pg_flags |= MDB_PG_FLAGS_STREAM_RESERVED;
-+	}
-+
- 	return 0;
- }
+ 	err = mv88e6xxx_stats_setup(chip);
+ 	if (err)
+ 		goto unlock;
+@@ -5873,6 +5875,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6141_ops,
+ 	},
  
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 02671e648dac7..b9ee19448e38b 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -111,6 +111,7 @@ struct br_mdb_config {
- 	struct br_mdb_src_entry		*src_entries;
- 	int				num_src_entries;
- 	u8				rt_protocol;
-+	unsigned char			pg_flags;
+@@ -5899,6 +5902,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6161_ops,
+ 	},
+ 
+@@ -5924,6 +5928,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6165_ops,
+ 	},
+ 
+@@ -5975,6 +5980,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6172_ops,
+ 	},
+ 
+@@ -6026,6 +6032,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6176_ops,
+ 	},
+ 
+@@ -6073,6 +6080,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.atu_move_port_mask = 0x1f,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6190_ops,
+ 	},
+ 
+@@ -6098,6 +6106,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.atu_move_port_mask = 0x1f,
+ 		.pvt = true,
+ 		.multi_chip = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6190x_ops,
+ 	},
+ 
+@@ -6123,6 +6132,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6191_ops,
+ 	},
+ 
+@@ -6148,6 +6158,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6393x_ops,
+ 	},
+ 
+@@ -6175,6 +6186,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6393x_ops,
+ 	},
+ 
+@@ -6229,6 +6241,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6240_ops,
+ 	},
+ 
+@@ -6278,6 +6291,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6290_ops,
+ 	},
+ 
+@@ -6306,6 +6320,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6320_ops,
+ 	},
+ 
+@@ -6334,6 +6349,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6321_ops,
+ 	},
+ 
+@@ -6361,6 +6377,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6341_ops,
+ 	},
+ 
+@@ -6411,6 +6428,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6351_ops,
+ 	},
+ 
+@@ -6438,6 +6456,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 4,
+ 		.ops = &mv88e6352_ops,
+ 	},
+ 	[MV88E6361] = {
+@@ -6465,6 +6484,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6393x_ops,
+ 	},
+ 	[MV88E6390] = {
+@@ -6493,6 +6513,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_UNDOCUMENTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6390_ops,
+ 	},
+ 	[MV88E6390X] = {
+@@ -6519,6 +6540,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_UNDOCUMENTED,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6390x_ops,
+ 	},
+ 
+@@ -6546,6 +6568,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.num_tx_queues = 8,
+ 		.ops = &mv88e6393x_ops,
+ 	},
  };
- #endif
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index e966e7c4cc5de..146723fbca658 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -176,6 +176,9 @@ struct mv88e6xxx_info {
+ 	/* Supports PTP */
+ 	bool ptp_support;
  
-@@ -317,6 +318,7 @@ struct net_bridge_fdb_flush_desc {
- #define MDB_PG_FLAGS_STAR_EXCL		BIT(3)
- #define MDB_PG_FLAGS_BLOCKED		BIT(4)
- #define MDB_PG_FLAGS_OFFLOAD_FAILED	BIT(5)
-+#define MDB_PG_FLAGS_STREAM_RESERVED	BIT(6)
- 
- #define PG_SRC_ENT_LIMIT	32
- 
-diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
-index 18b558a931ad9..bc05cda2f5350 100644
---- a/net/bridge/br_switchdev.c
-+++ b/net/bridge/br_switchdev.c
-@@ -548,7 +548,8 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
- }
- 
- static void br_switchdev_mdb_populate(struct switchdev_obj_port_mdb *mdb,
--				      const struct net_bridge_mdb_entry *mp)
-+				      const struct net_bridge_mdb_entry *mp,
-+				      const struct net_bridge_port_group *pg)
- {
- 	if (mp->addr.proto == htons(ETH_P_IP))
- 		ip_eth_mc_map(mp->addr.dst.ip4, mdb->addr);
-@@ -560,6 +561,9 @@ static void br_switchdev_mdb_populate(struct switchdev_obj_port_mdb *mdb,
- 		ether_addr_copy(mdb->addr, mp->addr.dst.mac_addr);
- 
- 	mdb->vid = mp->addr.vid;
-+	mdb->flags = 0;
-+	if (pg && (pg->flags & MDB_PG_FLAGS_STREAM_RESERVED))
-+		mdb->flags |= SWITCHDEV_MDB_F_STREAM_RESERVED;
- }
- 
- static void br_switchdev_host_mdb_one(struct net_device *dev,
-@@ -575,7 +579,7 @@ static void br_switchdev_host_mdb_one(struct net_device *dev,
- 		},
- 	};
- 
--	br_switchdev_mdb_populate(&mdb, mp);
-+	br_switchdev_mdb_populate(&mdb, mp, NULL);
- 
- 	switch (type) {
- 	case RTM_NEWMDB:
-@@ -622,6 +626,7 @@ static int br_switchdev_mdb_queue_one(struct list_head *mdb_list,
- 				      unsigned long action,
- 				      enum switchdev_obj_id id,
- 				      const struct net_bridge_mdb_entry *mp,
-+				      const struct net_bridge_port_group *pg,
- 				      struct net_device *orig_dev)
- {
- 	struct switchdev_obj_port_mdb mdb = {
-@@ -632,7 +637,7 @@ static int br_switchdev_mdb_queue_one(struct list_head *mdb_list,
- 	};
- 	struct switchdev_obj_port_mdb *pmdb;
- 
--	br_switchdev_mdb_populate(&mdb, mp);
-+	br_switchdev_mdb_populate(&mdb, mp, pg);
- 
- 	if (action == SWITCHDEV_PORT_OBJ_ADD &&
- 	    switchdev_port_obj_act_is_deferred(dev, action, &mdb.obj)) {
-@@ -671,7 +676,7 @@ void br_switchdev_mdb_notify(struct net_device *dev,
- 	if (!pg)
- 		return br_switchdev_host_mdb(dev, mp, type);
- 
--	br_switchdev_mdb_populate(&mdb, mp);
-+	br_switchdev_mdb_populate(&mdb, mp, pg);
- 
- 	mdb.obj.orig_dev = pg->key.port->dev;
- 	switch (type) {
-@@ -740,7 +745,7 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
- 		if (mp->host_joined) {
- 			err = br_switchdev_mdb_queue_one(&mdb_list, dev, action,
- 							 SWITCHDEV_OBJ_ID_HOST_MDB,
--							 mp, br_dev);
-+							 mp, NULL, br_dev);
- 			if (err) {
- 				spin_unlock_bh(&br->multicast_lock);
- 				goto out_free_mdb;
-@@ -754,7 +759,7 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
- 
- 			err = br_switchdev_mdb_queue_one(&mdb_list, dev, action,
- 							 SWITCHDEV_OBJ_ID_PORT_MDB,
--							 mp, dev);
-+							 mp, p, dev);
- 			if (err) {
- 				spin_unlock_bh(&br->multicast_lock);
- 				goto out_free_mdb;
++	/* Number of TX queues */
++	u8 num_tx_queues;
++
+ 	/* Internal PHY start index. 0 means that internal PHYs range starts at
+ 	 * port 0, 1 means internal PHYs range starts at port 1, etc
+ 	 */
 -- 
 2.43.0
 
