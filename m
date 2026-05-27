@@ -1,139 +1,145 @@
-Return-Path: <netdev+bounces-292073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJuNDBlaFmo9lgcAu9opvQ
-	(envelope-from <netdev+bounces-292073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:42:33 +0200
+	id x14cBmdbFmpTlwcAu9opvQ
+	(envelope-from <netdev+bounces-292074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:48:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B515DEA45
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:42:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 783985DEB1D
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:48:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F0276300D9DB
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:42:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A3793300180E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB0032D0CF;
-	Wed, 27 May 2026 02:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="N81+mgxL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F385C26159E;
+	Wed, 27 May 2026 02:48:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1924528B4E2;
-	Wed, 27 May 2026 02:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA021FECBA;
+	Wed, 27 May 2026 02:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779849748; cv=none; b=XYlwLhQD8ScSsyzr3LaWD+sD3TMhoA4HCOTCTQ8bHzD1ZMcGCSurhV/5En/X/a9B/5oaeDyH82PjwylnPDfR60o1jSS/UTRgk2QODvRLGhwq7tIhGKvvjoSeGCiZK6od1J2heot3O8WP0kRoUbYgj0D+LaTsj73sQG8Z+Mresvk=
+	t=1779850083; cv=none; b=lZfwxfaFQW09xmi4d3OwHHlywQ0W1dlTkYdhuOLox0siern3dv5TR7kyuvD7i4H8sPLPQ+LiqTqJqShaKCCMC579d75CRzYYcK8W+Ex8ui/WIuWaQidBT5wCO4nqU6XTKbq2q7NJsHZwYX3SSrO3NPpskbkiAhWJUvE7IHAP9hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779849748; c=relaxed/simple;
-	bh=LWLxBWu0oUQRieiXt3Qx1lppTPdmdDzSyoQOZ1xnVnU=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=rZgl7fjjIi0D7fUccOx7/UuhlBVOBcC2ShxIF6NKogAlP8E04ulu9ggrY/XS+L+E4xV6Mdkg71fW7ijPle7xm8xOx1nGmqh+AZuQm0KIeP8A94lDwAMrxiEVfjIaz7Ez4qRokQ2ljb6RpqSofuhdd/SUvWZFBpOUYMvWdLZCdV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=N81+mgxL; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=LWLxBWu0oUQRieiXt3Qx1lppTPdmdDzSyoQOZ1xnVnU=;
-	b=N81+mgxLPtVXoU54AzsJhQF4Q8GJIAxAhJ0adTotEs6zdN5jLHxMCkN7uqGR9iHjt/UbC5KCl
-	JhasNzuWfnr/gRtj5IfWjPyzBEFTiBgUv1kTQA+A0q6fsHfWJxw1HVxOuMF0S6VP4KYV8VNhk8K
-	w5dnC/mCBdwEx0we81TjCi0=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4gQDGj6V0pzcb43;
-	Wed, 27 May 2026 10:34:37 +0800 (CST)
-Received: from kwepemr100009.china.huawei.com (unknown [7.202.195.37])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1428A2025F;
-	Wed, 27 May 2026 10:42:24 +0800 (CST)
-Received: from kwepemr200017.china.huawei.com (7.202.195.7) by
- kwepemr100009.china.huawei.com (7.202.195.37) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 27 May 2026 10:42:23 +0800
-Received: from kwepemr200017.china.huawei.com ([7.202.195.7]) by
- kwepemr200017.china.huawei.com ([7.202.195.7]) with mapi id 15.02.1544.011;
- Wed, 27 May 2026 10:42:23 +0800
-From: "malin (R)" <malin89@huawei.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Arseniy Krasnov <avkrasnov@salutedevices.com>, tanjingguo
-	<tanjingguo@huawei.com>, "mst@redhat.com" <mst@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
-	<xuanzhuo@linux.alibaba.com>, "eperezma@redhat.com" <eperezma@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>, "sgarzare@redhat.com"
-	<sgarzare@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>, Chenzhe
-	<chenzhe@huawei.com>, cenxianlong <cenxianlong@huawei.com>, cuirongzhen
-	<cuirongzhen@huawei.com>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] vsock/virtio: bind uarg before filling zerocopy skb
-Thread-Topic: [PATCH net] vsock/virtio: bind uarg before filling zerocopy skb
-Thread-Index: Adztggm6M3GXlP0rSUS4BU76FCpiCg==
-Date: Wed, 27 May 2026 02:42:23 +0000
-Message-ID: <bd2b60d9ee5d4edfae4a7ce58ace71a4@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1779850083; c=relaxed/simple;
+	bh=Wg6jIy1TGMUKPParOsa2byxqyiOfl4Wv3x7svP8hI24=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dQoZe+vTZ/Ieiub2gn4NmnYOeyCGJDzf7huQqOwyLVZdKVoqOHe1/R8JyAEVyxxAjVqhLT+8qBu4J2/E7CV+g9ESARqNZeEk8Pt/TCQ8nwnzaIXrcZeMdazuBmA7YOCMFPPURk4bLFm1M5TqTZdSvVxBkRwYFJcKetoHhxof/3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wS4J8-000000006xq-29Z1;
+	Wed, 27 May 2026 02:47:46 +0000
+Date: Wed, 27 May 2026 03:47:43 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: John Crispin <john@phrozen.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v3 0/4] net: dsa: mxl862xx: SerDes ports and stats
+Message-ID: <cover.1779849840.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	FAKE_REPLY(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292073-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:mid,huawei.com:dkim];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292074-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[phrozen.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[malin89@huawei.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.966];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: A3B515DEA45
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 783985DEB1D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Jakub,
+Add support for the two SerDes PCS interfaces of the MxL862xx switch
+ICs, which can both either be used to connect PHYs or SFP cages, or as
+CPU port(s). 1000Base-X, 2500Base-X, 10GBase-R, 10GBase-KR, SGMII,
+QSGMII and USXGMII (single 10G or quad 2.5G) are supported.
 
-> The email headers are duplicated on this patch.
-> This appears to confuse git am into thinking the patch is empty:
->=20
-> $ git am mbox
-> Patch is empty.
->=20
-> Please fix this and repost (please add the review tags you already
-> received in the repost)
+The firmware only added the API to directly control the PCS as of
+version 1.0.84, so the PCS features are gated behind a version check.
 
-My bad. I have sent the right post with git command.
-https://lore.kernel.org/netdev/20260527023301.1075581-1-malin89@huawei.com/=
-T/#u
+As the driver is growing do some refactoring to break out the phylink
+parts into mxl862xx-phylink.h.
+---
+Changes since v2:
+ * get rid of endian-specific union handling firmware version
+ * replace serdes_active bitmap with atomic_t serdes_refcount
+ * defer mpcs->interface assignment until after firmware ack
+ * handle firmware error codes in pcs_config
+ * set st.usx_lane_mode in pcs_get_state
+ * set lu.usx_subport and lu.usx_lane_mode in pcs_link_up
+ * use phylink_mii_c22_pcs_encode_advertisement() in CL37 adv
+ * rework commit message
 
-Please let me know if there is any other problem.
+Changes since v1:
+ * drop custom ethtool stats (former patch 5/5)
+ * add __{LE,BE}_BITFIELD layouts to ABI structs
+ * per-sub-port QSGMII AN restart via usx_subport / usx_lane_mode
+ * shared-SerDes refcount in pcs_disable via per-XPCS slot bitmap
+ * let every sub-port call pcs_config
+ * cache phy_interface_t instead of firmware type
+ * skip pcs_link_up when inband-AN enabled
+ * gate phylink_get_caps SerDes modes on same FW version as select_pcs
+ * interpret xpcs_pcs_cfg.result as signed (s16)
+ * drop dead MXL862XX_PCS_PORT macro
+ * drop misleading "downshift detection" line from commit message
 
-Thanks
-Lin
+Daniel Golle (4):
+  net: dsa: mxl862xx: store firmware version for feature gating
+  net: dsa: mxl862xx: move phylink stubs to mxl862xx-phylink.c
+  net: dsa: mxl862xx: move API macros to mxl862xx-host.h
+  net: dsa: mxl862xx: add support for SerDes ports
+
+ drivers/net/dsa/mxl862xx/Makefile           |   2 +-
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 302 +++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |   9 +
+ drivers/net/dsa/mxl862xx/mxl862xx-host.h    |   8 +
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 405 ++++++++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |  21 +
+ drivers/net/dsa/mxl862xx/mxl862xx.c         |  54 +--
+ drivers/net/dsa/mxl862xx/mxl862xx.h         |  54 +++
+ 8 files changed, 809 insertions(+), 46 deletions(-)
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
+
+-- 
+2.54.0
 
