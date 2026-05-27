@@ -1,229 +1,211 @@
-Return-Path: <netdev+bounces-292143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HAXFg2dFmq1ngcAu9opvQ
-	(envelope-from <netdev+bounces-292143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:28:13 +0200
+	id oLTUIY+fFmqBnwcAu9opvQ
+	(envelope-from <netdev+bounces-292144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:38:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC50A5E0731
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:28:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D128C5E08A8
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BEB17300DEE2
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:28:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CE563017FB5
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633F13C2B81;
-	Wed, 27 May 2026 07:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E6F3C945B;
+	Wed, 27 May 2026 07:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mKHU9i8W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4lRRXRH"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010061.outbound.protection.outlook.com [52.101.61.61])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE903BFACE;
-	Wed, 27 May 2026 07:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779866891; cv=fail; b=EwnHaM83DZ93UjWbVSbW5F0Ub+6SYxgDpgHI9SDVh7xCfKWkQqKzg9CSVM8nzqiujXyOsa9ggDJY9QLoyJO8qdiDrWwLAccilq5CPczAVyKDg/L5jQZepbAY2L2nA6FUYBo29fnZHQNF4j1L0eEP12mJfg1lt4KqEKSX1IM7/to=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779866891; c=relaxed/simple;
-	bh=czkypZG7ZAtU9jTTACKE+kUJZrWsJE9oh7Vx4BW7LsY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Lql/6NsknnhhnKf2l8UULT/Qcf11ij+JOzgPHFpkSwn1ziuZOkLjyAwNWbCEvXGsb13FTK4LymI0N+OXJwdwg+rudHWBgcAAhhFtva1U9s8G+K3YpK/tcxyFIui3feKXG4f7jooc5p0n0eTUQZNwnEFobKhxTAhqK/ENDEK86Dw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mKHU9i8W; arc=fail smtp.client-ip=52.101.61.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nE4mcxhF1Yw5kiWx+MGNKWK6yM4nFI/djIMD8z5etEoXpusTh5Na8WgsARr5l8ZtXck3OqkEmiMXg9cnFePrk46SAiUch3+sFb5jqFLbMjmhaX3u8apDFt3wbXwcDyLnrJCpPzmlw/1iprCEsPPwGZeQE+iN/I3ewg0bkz4rF5gLxdbtY+j+c9Jhyg+tYhNNsYZ1hHnB+EkIVrmps88SrrZRaLk7v8r5EmZE/BEwQtm82MK4GZlznVjccfj8vCt+pablkPDrpRDEx5JfPaNV4fud9h3bzR0yrdQvdUvAPTQ4eO1DYwR8zZRpNe5MjiZmwBLkX9QNWjMSoAoYaANW9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gZigvuQFlU/iJqoI7ONQ/d9JVJD4ChlMhxDmSlgz78o=;
- b=lWHKy+2v5dp8CxTl08Oo9YQTZnviyhcmDG+pzx1SDqGgkmrQD6L8jfRabyvIqiIn6RTdzTqvGoXhB36xkZTTxwBY7K/z0A9XgcxmGaJgn+vZjgWcIRRxcureGHX/x0oZGjWk0lvqw+c7u2iJ+ncNp2iDODYHXtGop2g6hUDZu7ZFCFe7iwcmWgfoY+b1JX+bOUEleSwjevYe8/f5CDPQ4qwLre9ykJUKpO6mZx1RYYGdiLOOr/8sPQFyLU9u+npmgo4sJcjv4mRq/qJsZcdBM9qogKHPpwGRJGGGSrg7Tepk2pKtBNzM2D5BP5auj0bBs/wZqUoXt0YtaUDiOobdjw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gZigvuQFlU/iJqoI7ONQ/d9JVJD4ChlMhxDmSlgz78o=;
- b=mKHU9i8W7pAr0DKxaWuD+tznr1n5HccjLYos0EMJDH0Zi8BIxI2cIAeeaHgLKRcc0b/kqfdsblDZ9GYUTmoWACAA/AyrC0t866RisfmOarBEtGRhN9ItpRW/PRhSTxlNDM2DEv8xNh57LIBEn5MA9idokkn9W9re1PafJiGzYWmtDAH88CLPWySyu6wp4Q8nazBVlkCFiGlX4oIS2BC3VnhEfNtIACgowN8+IooyLM5cOgGTu/e1IBnfHd4PQGuzV1yko2YProMBskD07BOEHWOE0yRpjLOGR2FwTPEtRarEg8p0+4/kcYvd8nqCiftFy+mG5qfUKZEWLtCtd40dWw==
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
- by DM6PR11MB4627.namprd11.prod.outlook.com (2603:10b6:5:2a2::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.18; Wed, 27 May
- 2026 07:28:06 +0000
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.21.0048.019; Wed, 27 May 2026
- 07:28:06 +0000
-From: <Thangaraj.S@microchip.com>
-To: <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<Bryan.Whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<linux@armlinux.org.uk>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 3/5] net: lan743x: Add support to software-nodes for
- SFP
-Thread-Topic: [PATCH v4 3/5] net: lan743x: Add support to software-nodes for
- SFP
-Thread-Index: AQHc44+Tx03qOqEBGkqYGw5EphtZjbYNe1SAgBQOhjA=
-Date: Wed, 27 May 2026 07:28:06 +0000
-Message-ID:
- <DSWPR11MB97150CCAF4008FFA5193F5FDEC082@DSWPR11MB9715.namprd11.prod.outlook.com>
-References: <20260514105028.42942-1-thangaraj.s@microchip.com>
- <20260514105028.42942-4-thangaraj.s@microchip.com>
- <40f567f0-e6eb-434f-9d54-7f226f0f70fb@lunn.ch>
-In-Reply-To: <40f567f0-e6eb-434f-9d54-7f226f0f70fb@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|DM6PR11MB4627:EE_
-x-ms-office365-filtering-correlation-id: 1ae024b7-2d5e-426c-ffff-08debbc17ef5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|4143699003|11063799006|56012099006|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- kciAmAvQP2hMmttKYy/PHVlI6JC4Dk1w9KnbuwwpQFfZIvSfMFTyUAQcZO/awzEAIrN6NVwfHyafHUmbNu+Lj2oYUTW2mYemPrqbIq1yI7Ee7dVwaCo/3nfdRug0u2I0jVRJJ51WXIkJD8h09NkwN4PYGtdaeGjkMwiyG0Up+PWzvTdAyGyaLZreBBULGifzHStU5IoyGz6VXaU5qkfvj1Kax3eikCuPkrfsaYfT7Yfq04XbXDLHnbXM55g1m1MpymE0ANOrhVQ9G7VSW9bC8G0YomFftlUfxlmbFYBvMZence0d7lcMcYWPGfUvYeWSllKOilqYdPxITh/c0lGyb0ipVQQCj4vlwjidZcQCJUsEVBbRUDmNiboVZUZT5HmaNWY0r3wbEt+eMYmzP88t82mUfpwZh4CUKDi82CqAmEYQRa8KDDpZGRwjqd135oMzkGI0VaoOMb3waqcx1HXYS7U+KVgZ7H+UBVZ9v6RWC6d4EJI9DVczgPPTLt3uQI+PMrtsVhm4ydc51zcrBDfkRUvPpKIo1fWh2deYL2u5bLzBNeaFjpASuD2Dnfpj8x8jf4JfG5SKHW4Cbbi9xkEQfK9+zttrnniw1Zm1HBW9gS0wqG1/qrQgSBCiXzQLukGLQWeEPbu0/47vsVasXkkOG5aDVnMJBkIjB32EdZY0WjPBGz5B+b+T8yGFDmVXai4l3jCrXu0GlIhIudYsfZT33S03y9tp3lTlfRglXOz3ZkEPDzHHL2WTiX3HNDgQlbnq
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(4143699003)(11063799006)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?K74FX5IxqYbmVd4FkXoqPNPCewd+M6ckNTPupkfKZWQI0ayVQ3H9eRxPIduD?=
- =?us-ascii?Q?dvY7bs57HWxCW9EzAoRaShluplwUX+eAGg2fkgGHJx4SM0USZPNQ0uLqxHLG?=
- =?us-ascii?Q?HTQLjn99ovDARmZGFiI6H3UxUNM27kMnoSd3qzwZ2lIr1MqENpHvBNwgDNIg?=
- =?us-ascii?Q?/IlRY+jIfkeRa9O8zI7ZvkEfsAtYXO4+/iVFA2gWs1NOkAtIk5ArAVjuYORt?=
- =?us-ascii?Q?8aAhbdV8WI7xLiVcdCT9ppi4sSYfDjF4tDME8h7be3UQc0hoHTRIZn/32VOi?=
- =?us-ascii?Q?LCoWPk5mBO9VA0FtpCb06R7Ja+k6IvwZzR0NfkWXItuzG/mqS7SHgFlGq6FP?=
- =?us-ascii?Q?nW+P+2eqzdWBktYURwVCd1ipZpiKOlV/mrgazQw4Jv0SXceZGqbuuRbKCtEe?=
- =?us-ascii?Q?xldO+PV/s+PSpb5BMPshSxNLI2Q4AHsd6Yi7eJN5PSBRvRlNCwkTxt/riaCc?=
- =?us-ascii?Q?6U42/5jwIKI16Legtm/gvYGAJQn+0Mi6QorgweyC/UIXTY/lKG3uk9pKJRrS?=
- =?us-ascii?Q?4i3JYXnATa/QGscCpeTP3Q1zYqGHAlaEBl60HjNIFG07pB7K8fgEjEqZDeE3?=
- =?us-ascii?Q?4wtJpsa9d/B9vl4OjLUmb8H3L3XzayPl7/4f3DjwGhR/zBN0PPdYDprN/5nW?=
- =?us-ascii?Q?staswVPsPJzCmqB6slibumUPS+/9Glfhk8t0Wd1L2JGwwE5/skOun+sixz/u?=
- =?us-ascii?Q?hc3Gzv1o7KK6+cn5sufI9VgfaOHEk3BLvRawUglHnDlobZ5RHuRwxBSfGYxr?=
- =?us-ascii?Q?qzaR+ssDDds6OR8gkLg2UZKneBSKb4ja1OIX7unBw1CAr8hR28ykntcqCZAH?=
- =?us-ascii?Q?dZcaFj7ZKa1lf6OMsYFGvcEPpyQ/Sshqm8k4RpE6woKvjFVFihak+qHbHlU+?=
- =?us-ascii?Q?NNQoE+lsXEi/AUE1lLPGZVrrfgVPCq5cxl+O4kVZicGxYvBb2xswdt72t6ju?=
- =?us-ascii?Q?lcpDk88JHEJgGhWHtg+TT+SM0S3rELkbXb9hzjbEfs5edm0gj9P95CTfQsBT?=
- =?us-ascii?Q?0Lf0Xootfi0MJs+8VL3uvRVjoDaE+nzFauDR7K5izt4yw9uunb0WMgBu/GB8?=
- =?us-ascii?Q?bNfnN+hFa8OTqFODbdacQ51sAwPaufneOWTAOjkwFbHsM0TSPMGO5Z3SNXth?=
- =?us-ascii?Q?PmzU9ThReM69Rc48iK1BCO6vjCqyqV5jz1qxR2t21FMH6XdKpOVh1rBbEJgE?=
- =?us-ascii?Q?Jao8YI1b5tleg7SB16UK/I03bSAAjVRt27m+e3p5MQmZfaBRlS8wfLdlUEYe?=
- =?us-ascii?Q?IDO0n+eqk6kV/9Jz+ocdcAj2QQgq296m3DUy0EUM8rvvqFkglMV7bnIHRE9k?=
- =?us-ascii?Q?k0q/1M8aE7Uc58nbIEgvM0EkDyxqcbrWcmTJHVx4azDtfTiGJvjDtATXUB/Y?=
- =?us-ascii?Q?8/ZG8V9T+UHOsleRVj15k7+0VhZ5RshcyFS5ts9lPWMWzSoVzNW1YAnMli0j?=
- =?us-ascii?Q?qFcuXGPa4yLM1MNT7UD1M+yt+P/c1W73F2SwLue36G+l0iUAvoZUoNrZkjhk?=
- =?us-ascii?Q?yn+zthsmCKp8cpyG9wP7mwm73LXWPFvMpcVh6pnloiZdclYaSjZJFgsGARwc?=
- =?us-ascii?Q?XJgmUF+HdgZFQXoZRuTsd+4DG558ezm6VG6iC+EiYra8qRQXTGu55p5iuuzc?=
- =?us-ascii?Q?PAeEnj97o0Uw1wZ0E7jhp8cRRr9j4mbTuB1ZSAeGaOuyc/TK8nuN03kqm2Dj?=
- =?us-ascii?Q?VRfjF0TPz1ieyTeiB16bBOQH3pPmAlyOkwcAw3XssBdWg/+UIrgjPNmxI7d0?=
- =?us-ascii?Q?/ce3ySiyng=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7F13C09F1;
+	Wed, 27 May 2026 07:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779867530; cv=none; b=kCCWwOSomABXIIjyevVljKC+mZINK2SnV0/tyFU8XkoEeT9B96L25oXvfHXx0b/0JZilFtzn65LfMVsPu12ooZ2loGH8mqpKFdQziAibis/LAAueKdjciBE0h0DQOUYNTHlUOpq08eJ6GlqHngspYE4ABKryX0Gh4qz3aUWPqhk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779867530; c=relaxed/simple;
+	bh=SBJb5xXkmlqTV62Zt96/uXBoot0tdI5KLSLDqbjGfHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SGQv4UrxmiyaeKx5noiCrHTSLC8PRh6tYiAhc9lfd1PfR0sTguX8Jf8j+beONUJVWeSoFkwWBXXH5DmNK/yYk9o3eGEaa8Cqi0E1VCcTKBlQyTYaxJApHxMFV+/jB4k+o9V9D4bPPSyf9sxKixT2sqllonv1cqUz/45bYWePtP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4lRRXRH; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AA511F000E9;
+	Wed, 27 May 2026 07:38:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779867529;
+	bh=moBN3GrtjHAhIVhdHLFUyecY8ypcxSI1iGvi0iaI0Vo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=G4lRRXRHg+FOCfpsKaxZaYJl+4GIlVy8ZlBx1CI1XIOb8RqUe5TkBKrROWAXXz4tH
+	 SBKclKS4BL6bq1KwtDTLyumC4F0RatlheWnO7HuljUVdI7CW/W0VStwxz+5H/+hQ63
+	 WB/aPFcKhINMcFnl+LhOmrYaWemFrNnOTNtwxE6X0833dLvD3mJPgbQNCRwYDFYaLO
+	 Q3XnBTWwOM8UJEAptyrp7AD3uJsCrln4ZVMWh1H7V2wAvR3vTEHxN8XFq2DiVmBTuk
+	 hQFJoorjhkV7/N2IS9SHpg3COV1p9YkI6D9WOGXFtC7LkZWEL/cJdfP4COfQ7L7u9o
+	 qpU5HAC6V+npw==
+Message-ID: <80dc574b-f2da-4f04-8bc8-1b0793b1f296@kernel.org>
+Date: Wed, 27 May 2026 09:38:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ae024b7-2d5e-426c-ffff-08debbc17ef5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2026 07:28:06.5979
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZPHzmd8JbkbLNeIHzAwmY/d5WbkpyqDH7EmwkGFide57waQCxa+1TtpyOehgHGQXpNyXAqL8hmh3UN8OVm6eWMF+FurpeCgzfw0SDvcrPa8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4627
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
+ for latency reduction
+To: Simon Schippers <simon@schippers-hamm.de>,
+ =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260505132159.241305-1-hawk@kernel.org>
+ <20260508190626.4285fac0@kernel.org>
+ <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
+ <20260510085602.57c7a081@kernel.org>
+ <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
+ <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
+ <b78f002a-8cb9-4857-bf8f-0137e790f644@kernel.org>
+ <873511fa-4316-4411-a76b-ec4c5805abd3@schippers-hamm.de>
+ <18855e57-f050-411f-9958-d4babcc81ba3@kernel.org>
+ <14348957-d061-4124-9bac-45df9cf6686c@schippers-hamm.de>
+ <9a57bb41-114e-492b-9eaa-52237675bb7c@schippers-hamm.de>
+ <4ae9400a-8919-4ffc-8db3-0c334e2aa462@tu-berlin.de>
+ <8e8b877b-a7ce-4b2f-9567-64c8dbb48411@schippers-hamm.de>
+ <463e91cb-6c45-4d91-8737-39779fec5a49@tu-berlin.de>
+ <b1c2d2c1-a70a-4bf4-baff-d0ac2f878722@schippers-hamm.de>
+ <24d10b53-c545-4141-95a5-5c49c35c5d6c@tu-berlin.de>
+ <c5b3a7ef-8ec7-4361-80bb-cf06e910350c@schippers-hamm.de>
+ <d23fd8e0-a0d3-4197-a130-2340d1c28fe0@tu-berlin.de>
+ <e8be86b4-052f-4f4f-9cb9-2fb12d1e8922@schippers-hamm.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <e8be86b4-052f-4f4f-9cb9-2fb12d1e8922@schippers-hamm.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	TAGGED_FROM(0.00)[bounces-292143-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,armlinux.org.uk:email,DSWPR11MB9715.namprd11.prod.outlook.com:mid,lunn.ch:email]
-X-Rspamd-Queue-Id: EC50A5E0731
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: D128C5E08A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Andrew,
-Thanks for the comments.
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Thursday, May 14, 2026 6:28 PM
-> To: Thangaraj Samynathan - I53494 <Thangaraj.S@microchip.com>
-> Cc: netdev@vger.kernel.org; andrew+netdev@lunn.ch;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; Bryan Whitehead - C21958
-> <Bryan.Whitehead@microchip.com>; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>; linux@armlinux.org.uk; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [PATCH v4 3/5] net: lan743x: Add support to software-nodes f=
-or
-> SFP
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
->=20
-> > +#define PCI11X1X_TX_FAULT_GPIO               46
-> > +#define PCI11X1X_TX_DIS_GPIO         47
-> > +#define PCI11X1X_RATE_SEL0_GPIO              48
-> > +#define PCI11X1X_LOS_GPIO            49
-> > +#define PCI11X1X_MOD_DEF0_GPIO               51
->=20
-> How do you know these values?
->=20
-> Can i buy this device, design my own board, and decide to use a different
-> mapping of GPIO pins to SFP cage pins? Or does the data sheet say you MUS=
-T
-> use this mapping?
->=20
-> Maybe consider drivers/misc/lan966x_pci.dtso.
-[Thangaraj Samynathan] ]  These values are from the Microchip EVB reference=
- design,
-not mandated   by the datasheet. A board designer is free to wire SFP signa=
-ls to
-different GPIO pins.
 
-However, the PCI11x1x is a PCIe add-in card that can also be used in
-standard x86 systems. A .dtso overlay has no base DT to attach to on
-x86, and ACPI _DSD properties require the platform firmware vendor to
-add them - which is not realistic for a PCIe add-in card in the field.
+On 26/05/2026 17.07, Simon Schippers wrote:
+> On 5/26/26 16:55, Jonas Köppeler wrote:
+>> On 5/26/26 4:35 PM, Simon Schippers wrote:
+>>> On 5/26/26 11:54, Jonas Köppeler wrote:
+>>>> On 5/23/26 6:09 PM, Simon Schippers wrote:
+>>>>> On 5/22/26 18:26, Jonas Köppeler wrote:
+>>>>>> On 5/22/26 10:41, Simon Schippers wrote:
+>>>>>>> On 5/22/26 09:14, Jonas Köppeler wrote:
+>>>>>>>> On 5/19/26 10:51 PM, Simon Schippers wrote:
+>>>>>>>>> On 5/12/26 23:55, Simon Schippers wrote:
+>>>>>>>>>> On 5/12/26 15:54, Jesper Dangaard Brouer wrote:
+>>>>>>>>>>>>> Nope, I'm using a bpftrace program to keep track of the inflight/limit
+>>>>>>>>>>>>> in a BPF hashmap.  Reading from /sys will not be accurate.
+>>>>>>>>>>>> Ah nice.
+>>>>>>>>>>> Add the option --hist to have both NAPI and BQL histograms printed when
+>>>>>>>>>>> script ends.  This will give you an accurate pattern of how inflight and
+>>>>>>>>>>> limit evolves.
+>>>>>>>>>>>
+>>>>>>>>>>>>> I moved the selftests into a github repo [1] to allow us to collaborate
+>>>>>>>>>>>>> and evaluate the changes more easily.  I explicitly kept the new BPF
+>>>>>>>>>>>>> based BQL tracking as a commit[2] for your benefit.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>        [1] https://github.com/netoptimizer/veth-backpressure-performance-testing/tree/main/selftests
 
-We propose using the EVB default GPIO values as a fallback when no
-firmware description is present, and reading from DT/ACPI _DSD when
-available. Does this approach seem reasonable?
-=20
->=20
->       Andrew
+[... cut ...]
+
+>>>
+>>> I will wait for your new measurements, but there is no argument
+>>> against a default tx-usecs of ~100us for now, right?
+>> Yes, I think 100us is perfectly fine. I guess most of it was
+>> just my curiosity why the latency values are as they are 🙂
+> Which is great, because I was wondering the same 🙂
+> 
+
+Thank you Jonas and Simon for testing this via[1] on your systems.
+
+One performance concern from my side is if/when BQL limit goes below 8
+packets. This will cause cache-line bouncing and many qdisc requeues
+between the two CPUs.  Notice that 8 packets for the ptr_ring is one
+cache-line. This is why I suggested defaulting BQL min_limit to be 8.
+This would work in combination with the tx-usecs coalesce tuning as a
+lower bound.
+
+
+>> But it feels like this will need some documentation, because
+>> as we have seen, some values are a little different
+>> from what you expect from bql. Inflight > veth_ring_size,
+>> tx-usecs not necessarily achieving the configured value,
+>> inflight can get stuck > 0. Wdyt?
+>> But I think it works nicely overall.
+>>
+> Exactly, we should get ready for a v6 soon.
+>
+
+I want to send out a V6 today (and I'm busy rest of week).
+I'm simply going to include Simon's patch[2]. Then we can iterate on
+that email thread, making it easier for people to reply inline to the
+code changes.
+
+[2] 
+https://lore.kernel.org/all/9a57bb41-114e-492b-9eaa-52237675bb7c@schippers-hamm.de/
+
+> And I think we should move the BQL logic into a seperate .h file
+> as a library. Then it is also usable for TUN/TAP in the future.
+> 
+
+I like the idea, but refactoring into a library seems out-of-scope for
+this patchset.  As a first step, let us see if this works for veth
+driver use-case.  I do encourage Simon to refactor when doing the work
+for TUN/TAP in the future.
+
+Alternatively netdev maintainers can choose to apply V5 patchset and we
+can iterate on finding the right ethtool coalesce parameters for veth
+and create a .h "library" file for this.
+
+
+> Let's amend the commits. Should we do this on Github?
+
+Kernel development for netdev [3] happens on the mailing list with 
+patches via email.
+
+--Jesper
+
+[3] https://kernel.org/doc/html/latest/process/maintainer-netdev.html
+
 
