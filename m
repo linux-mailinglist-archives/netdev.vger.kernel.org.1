@@ -1,129 +1,155 @@
-Return-Path: <netdev+bounces-292475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292476-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMPZA15+F2phHAgAu9opvQ
-	(envelope-from <netdev+bounces-292475-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:29:34 +0200
+	id +LFQI0Z/F2phHAgAu9opvQ
+	(envelope-from <netdev+bounces-292476-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:33:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EB105EAEDA
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:29:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B085EAF09
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 293293044802
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 23:29:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89BA7301D33B
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 23:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C14380FE7;
-	Wed, 27 May 2026 23:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B6D37B415;
+	Wed, 27 May 2026 23:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gLYH8m71"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cPQiM+JQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9457E313E38;
-	Wed, 27 May 2026 23:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1597531E850;
+	Wed, 27 May 2026 23:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779924555; cv=none; b=r07EKTsW0/IdsopZnXORVUudnfdAwtFH0MklwSmcfQVmdJDmcnzt3g9/zW1dzRfBD+OLmQbsHfCobUyRa5P1Dd2rY4SDhHj/BWORHkN35HJ7SYe2adlRr1mGt9nI5+RNiyM2/pwx0fVN0LzNdblHRmgZy+WlbbpKuoVFE8Z2rWA=
+	t=1779924803; cv=none; b=ESe8Zu2mhkIUaYgeoBgMksfJU1ke9L7pNb0ZzkNULKy/X2qqn9IN59HqvlqdtanyCMh3H3JfJPVrszcRHJtyER0YhZfL2uc5YDgan/eH0whtlbnbvEGymaJ9+oZtcP4+EgMgHypJ8tETkRelevA8M1WqMEf7AAjhSKK19fWghdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779924555; c=relaxed/simple;
-	bh=PzqJZF1xdYj9co3AUZLJDg3CFgm+qDYISzsBVSrZRzM=;
+	s=arc-20240116; t=1779924803; c=relaxed/simple;
+	bh=6PUm1E3LDoZ+68223PzWURdi0dxg9skuim3wzk3fRAc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qMu+B9TcpvQp3kEIoYaJ/QzQ8ebhU2SAojTn4jk0tp5UXK79kNXJghA4ediJ5h1P9NPfuZrY0QmifsR3JfhKUbMTq4ATW4C75HjVKMq+31jGI9MWXMI31gySvycByh9mbJ0dmfIFqkn17nz0pzdngCs8fS0nlu/4FuFMgfs2QFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gLYH8m71; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1C721F000E9;
-	Wed, 27 May 2026 23:29:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=g756RLyvQoqzf1luXTZFpWK+m3/CeF1TmlN1Av1OQiJHft5s42MlNXMxNaINzuosWx/DIBuMrCLtXScHdaizD0wvO7STi55fd7KN2OZy0iih3imibNpJ+5MLpP/lk1VyNcwsa/ENeEodDVe7nGGIM85b8uWzojfdreINJUs/CSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cPQiM+JQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 789811F000E9;
+	Wed, 27 May 2026 23:33:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779924554;
-	bh=G6iUvpkAB9d6u96IHBLKPkgcdFU/CX1jIWC6DbQ19Xw=;
+	s=k20260515; t=1779924801;
+	bh=yqhH6oAjdYCLvVyb+keGbP9l49zTVX5ArxLru3gp0Pk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=gLYH8m71qRyKtYHDSsK17h0MzIRzEhXV4nDIxVAJRy16Fd1F+7U7nAPFHFunA/gnM
-	 3BkMTHsJvyNg7zFnF+FYXTVUdPrGxYkq2fSbbCc6UbP0SToAXU6ZXwwQaLn8ofV3mU
-	 fOTHOIchRhvLSwxURPy+J+eyE9MatG+oeXtuca7fmLET/m9stsVQzkEFrrHVau6uYX
-	 LH017auzHTs0QVlvQA4X+/1ZnyZhvl0XsFiEF3SLF8GXTfjifmh3vtozEUuJSwfwAT
-	 LYVE5d0RcBdIvnNE6DlO97fcY2Wb2IzLncXKcMp1WyOwK0kesR+1Omir6mXEQr87MX
-	 xOdTSurVL608g==
-Date: Wed, 27 May 2026 16:29:13 -0700
+	b=cPQiM+JQLxHw4K/XOKiuswzV3nVV1yWoQRRuXEqr/uJs51wRQYQV3QQJjgljkd9lc
+	 e67wWxKJrPbk5HJVSnpKSwnlzJWJOGyw3kNTcqQ1NqgMH1hR7XNUAILEbiI9ZD+QDP
+	 k9f140JN4xpypxhin28fMa5kNIlR0KEkzbSqHrc6lr0FlFHttaHT0uwN+eHHtzbu5L
+	 tTc6IW5dJf7Fgr5V8TA7STdmQ/jQ/kYqXHZBNuu8nQ3pj1hePZiovM5Ynl+kbEaYk3
+	 n3fXyLNVfO9LJl/TL6so++M+Vm7ahbmMPfKpsoe0iGBLQ/6jKVhhwByiY0DmjLKiuU
+	 rDZW6PMpo5pKg==
+Date: Wed, 27 May 2026 16:33:20 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Prathosh
- Satish <Prathosh.Satish@microchip.com>, Petr Oros <poros@redhat.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/3] dpll: zl3073x: use __dpll_device_change_ntf()
- and remove change_work
-Message-ID: <20260527162913.40aa00fa@kernel.org>
-In-Reply-To: <d8226c8e-8821-45b4-9188-be81047ea6ba@redhat.com>
-References: <20260526074525.1451008-1-ivecera@redhat.com>
-	<20260526074525.1451008-3-ivecera@redhat.com>
-	<d8226c8e-8821-45b4-9188-be81047ea6ba@redhat.com>
+To: =?UTF-8?B?UHLDqW5vbT8=?= Ahmed <ahmedabdelmoumen05@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Daniel Borkmann
+ <daniel@iogearbox.net>, David Wei <dw@davidwei.uk>
+Subject: Re: Linux: DMA-after-unmap race in ZCRX via
+ netif_rxq_cleanup_unlease() ordering inversion (netkit + page_pool)
+Message-ID: <20260527163320.407b4af1@kernel.org>
+In-Reply-To: <CAN+TWHTGkGZu4vdbkMY8F-EDe3m8ScBctW-fdtfcpGbj192SyA@mail.gmail.com>
+References: <CAN+TWHTGkGZu4vdbkMY8F-EDe3m8ScBctW-fdtfcpGbj192SyA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-292475-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292476-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5EB105EAEDA
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E2B085EAF09
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 27 May 2026 09:51:43 +0200 Ivan Vecera wrote:
-> On 5/26/26 9:45 AM, Ivan Vecera wrote:
-> > The change_work was introduced to send device change notifications
-> > from DPLL device callbacks without deadlocking on dpll_lock, since
-> > the callbacks are already invoked under that lock. Now that
-> > __dpll_device_change_ntf() is exported for callers that already
-> > hold dpll_lock, use it directly and remove the change_work
-> > infrastructure entirely.
-> > 
-> > This eliminates a race condition where change_work could be
-> > re-scheduled after cancel_work_sync() during device teardown,
-> > potentially causing the handler to dereference a freed or NULL
-> > dpll_dev pointer.
-> > 
-> > Fixes: 9363b4837659 ("dpll: zl3073x: Allow to configure phase offset averaging factor")
-> > Signed-off-by: Ivan Vecera <ivecera@redhat.com>  
-> 
-> Hi Kuba & Paolo,
-> 
-> patchwork reported netdev/build_allmodconfig_warn failure for this
-> patch. But it looks weird:
-> 
-> https://netdev-ctrl.bots.linux.dev/logs/build/1100767/14594344/build_allmodconfig_warn/stderr
-> 
-> I don't understand how this is related to this patch.
+Dropping security lists, security lists are for private discussions,
+it's utterly pointless to CC both them and LKML. Not to mention
+that this bug only exists in -rc kernels.
 
-Sparse randomly generates this once a week on a seemingly random patch,
-I haven't dug into why. Safe to ignore.
+Adding relevant developers. Moving security@ to Bcc
+
+On Wed, 27 May 2026 23:53:45 +0100 Pr=C3=A9nom? Ahmed wrote:
+> Hello,
+>=20
+> I would like to report a source-proven teardown ordering bug in the Linux
+> kernel that can lead to a DMA-after-unmap race condition involving ZCRX
+> (io_uring zero-copy receive), page_pool, and netkit queue leasing.
+>=20
+> ***Reporter:** Ahmed Abdelmoemen **Discovery Date:** 2026-05-26 **Kernel
+> Version:** Linux 7.1.0-rc3*
+>=20
+> Executive Summary
+>=20
+> *A logic error in `netif_rxq_cleanup_unlease()` causes DMA mappings for t=
+he
+> ZCRX memory provider to be revoked **before** the physical NIC RX queue is
+> stopped. This creates a race window during netkit queue lease teardown
+> where the physical device's NAPI can consume stale `net_iov` entries from
+> the page_pool alloc cache containing `dma_addr =3D 0`.*
+>=20
+> The ordering inversion is fully proven at the source level. However, I ha=
+ve
+> **not** performed runtime verification, so actual memory corruption or
+> successful DMA to address 0 has **not** been proven =E2=80=94 it remains =
+hardware
+> and driver dependent.
+>=20
+> The bug is reachable with `CAP_NET_ADMIN` (common in container
+> environments) when using netkit with ZCRX.
+>=20
+> Root Cause
+>=20
+> In `net/core/netdev_rx_queue.c:347-348`:
+>=20
+> ```c __netif_mp_uninstall_rxq(virt_rxq, p); // DMA unmap + dma_addr=3D0
+> __netif_mp_close_rxq(...); // queue stop + NAPI disable (TOO LATE)
+>=20
+> This inverts the correct ordering used in normal device unregistration and
+> io_uring close paths (stop first, then unmap).
+> Impact
+>=20
+>    - *Potential:* NIC DMA write to physical address 0 (or stale mappings
+>    with lazy IOMMU) leading to memory corruption.
+>    - *Requirements:* CAP_NET_ADMIN + netkit queue leasing + ZCRX installed
+>    on the leased queue.
+>    - *Current Status:* No runtime PoC or crash reproduction yet. The race
+>    window exists in theory but its practical exploitability needs confirm=
+ation.
+>=20
+> I am attaching the full detailed analysis.
+> Proposed Fix[image: image.png]
+>=20
+> I am happy to provide more details or assist with testing.
 
