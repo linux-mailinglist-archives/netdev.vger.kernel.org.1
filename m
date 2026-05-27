@@ -1,162 +1,222 @@
-Return-Path: <netdev+bounces-292199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MO3SLaawFmokogcAu9opvQ
-	(envelope-from <netdev+bounces-292199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:51:50 +0200
+	id cNyGO+6wFmokogcAu9opvQ
+	(envelope-from <netdev+bounces-292200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:53:03 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134E25E1576
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0DF5E15DE
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD94B304D728
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:46:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D956F3037F63
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EA23E2ACA;
-	Wed, 27 May 2026 08:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC063E2AC9;
+	Wed, 27 May 2026 08:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="SxlWblVq"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VRjMtZnp"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD16E3E2AC1;
-	Wed, 27 May 2026 08:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74823E2ACE
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871617; cv=none; b=rf4WfXfNLTNmV19DS+AeniGl0Ysd3R5li1PMKAkmJUdhReFuj6QTGwkbLU/B4VfAFPHHaZymp34ON7GYeWgG9eczjivAGrehFlAkNn8l6BtiCKTFW+WXnf0jl/C9QJ1MS9BfljPHYCOWjxOD3cHrBtj+VDlXCR1Uj8Z1OY2jDlM=
+	t=1779871646; cv=none; b=pvxglOBPwaExoqg3E6AsxUC+FdKvdgxYiXIABIK0dsVZB3njWeYgAnqSwYMJmvA37VWggq5XYCm+DNDY0ORJZUuP5vLO+809je12UzhGalBHgNvE2/PpDUh15fiWftkPDAUBRpmxY5d+MNQLzeBM9XVM6XJHNnp7k2f1xxi52+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871617; c=relaxed/simple;
-	bh=x0TjYIL/s1gpuGH9FLqzgMf7FxOghlekalySof5ot7o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tgNgn584CtXZRACE3y6ifCzNeALkLTKBwKKuO68WUHn0GjzpZGIRHjaysr0UdHbgJC9VJaYq327kuBfa4XbKFQg9LDWqcp5tedVQ4w5Wqv2Zj9BnWH11LZN9s7pO4kdT3Ki6C5MQArsC/djUx+IKlUemxXp/pAutB8gk3QZEsVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=SxlWblVq; arc=none smtp.client-ip=4.193.249.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+	s=arc-20240116; t=1779871646; c=relaxed/simple;
+	bh=+S4VYKZ9ptdmSKpoyw5zEZ0qC9zK3GWuSXvh/IZacBk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ucfQ6AB/Hm5PdiiJCbQ8/4270TH/Z4IgcrBT8XJumCJNgbxfpJK5sJ3cUXEaC8WfXxCUzTyRlpvdN7w57XE53zm/M+AkpvwziqlltlvMoKeCvVuA3qc5csIQuqJ2pvzBi/XUlEAHE8/TT6hltR3kMQ9qus1xu12+fOtm2C7J6kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VRjMtZnp; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49056b9f04aso50906435e9.0
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 01:47:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=LzJE3
-	O4Qs1Ym9XnI/hVKMeO2kL/geGUsSlJQprhHVG8=; b=SxlWblVqHLKdPpmLRmpDg
-	plbXcaJZcw1W3Z5kLA37KVS41iJ5HOPHfgeOWGWeg0mk1rP4Hhl12mDImmIZunha
-	LDshu1rybPace4G8t88+CKmYPU9zzLVgMxEeiJ99Im4cZY21LNYSsup2iNGB7UCm
-	+ptKyUQVrrOUxy6Y6NFeWA=
-Received: from localhost.localdomain (unknown [211.102.241.99])
-	by web4 (Coremail) with SMTP id ywQGZQDH2J1qrxZq0WnMAQ--.63780S2;
-	Wed, 27 May 2026 16:46:34 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+        d=suse.com; s=google; t=1779871643; x=1780476443; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SvPbiO/kvHgyF1x18sRDfpJ1LTwDqRquW88o+S2pTM0=;
+        b=VRjMtZnpCKOcXcOF9DTMgqBezQRg/M94etjreoP0KPFMjPt2kMWgqAUEKwNHTRLZk4
+         oY64omlnIYFtPHTVkffnvv7lQLndypfYNUl0HsubOgZ61xs4tkAK8SQRTa08Qi2m6nso
+         yks9j0LgvYs/4UuQJBAnrQ2pkHiWYjBKnwQyn8JkgRCIslpcxkg2WrHBf2H93O3OD7rG
+         mRF5ESWiVzPTC0mh8erPuu3+P1rLE9StT5ocRa6LIaJpUy5xAA5jfSDjqjWxAQZq8Ox3
+         RtHohIqiSiblGpByGNRwYkS2BP1veVP+MW5/xc3EVZJJAMzAIR9ElsG1kVeidqb4ZlZy
+         Dq0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779871643; x=1780476443;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SvPbiO/kvHgyF1x18sRDfpJ1LTwDqRquW88o+S2pTM0=;
+        b=SWU71KVJXWnBtJsZBxdlvn5yY1n2TE5oMCVPdp8J9Ei2f6tbpyqcy2Nv0kSlSP4fIw
+         zLQoDzczqb9ArPnFRRlRiasWiUTRuaQSXk/6WtQUI79uDixO+iIk+cZ7wxToI9O7x+cz
+         p1adIIrAcHGarY6gd5Q6HWeWLZlPaa4M3kg/NGFa98n4eJCl4XBiYmVcD2eo+SG9Ts4P
+         O4PBxfiWnN8wsvIostEL+LovoN26ZYvLTxy+r01EzZFQSjZ6z/vFSejSJ/44SnYWYRHZ
+         0FHNyGzrGcefHy07+J4DwktJUYiq/+4sUtEx8soB5kUsMYlelISkzXUur7e+R6H24fAv
+         /cqg==
+X-Forwarded-Encrypted: i=1; AFNElJ88ofG6EgNgLfn+7pZItgbtpZMTSymjEqTuFxrqXZ3ZLxHIKO/zT8icMmujloN/7aeZbaUVp3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRL7TUgDc93MJnHj6Rx7exEgc3hpA8XbJ1RV066K7s0mI0qARi
+	PYBVDQgNrySIhZ/z00vnAzjFynfY//jKEEqsN13INP2EkaT/4jslW3L4pM5+D91cULk=
+X-Gm-Gg: Acq92OGgTBiGRGdIMqcJJ6Fl8EvqcS0/EwbmZ4lCEM/emSlsfG9FVdU3kWew5yJKNht
+	UNd5D9PMD9oc8nmPrAqcvuDBp10aZOeCFn/tgnDTHcPLFp7JE6sMq6327ovz+T+pz00Djdw/5SH
+	IN6VQtb9C+Xvpcf5+neoARSE9wArLtTLP2yi96M3SPVT1SNBiuYL/X5i2QGFuyN0/bqtgTvO0E3
+	KnecFc3eVAFrjf/32/60JDWL7843mhaqWvuIl93OBtPmASGr/hsGkTnvozlsSFeXltsE28TE/hw
+	6fC7nEvTf6RB23VyOloY2Tu7CEEQPkl9FoAc+I24K74gtIX63kc9D/fxrHgdg0MkCYZaUo/brfm
+	vVEib/n7Td/LV90ygPJeFpq1sMLJ77JTDNms2WXjz9lAPEiLV314BVaMm6did5unqCNF0dpyWd0
+	Fv/jZpm2Aw2HkAHpkTcYNPcR2BIwWXS6WXuH1f7gpUkBZp
+X-Received: by 2002:a05:600c:a402:b0:48f:be94:d82c with SMTP id 5b1f17b1804b1-490426d1a91mr259475015e9.19.1779871643182;
+        Wed, 27 May 2026 01:47:23 -0700 (PDT)
+Received: from localhost (109-81-80-71.rct.o2.cz. [109.81.80.71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4908098f315sm12090405e9.16.2026.05.27.01.47.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 01:47:22 -0700 (PDT)
+Date: Wed, 27 May 2026 10:47:21 +0200
+From: Michal Hocko <mhocko@suse.com>
+To: Hui Zhu <hui.zhu@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>, davem@davemloft.net,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>
-Subject: [PATCH net] net/802/mrp: fix vector attribute event count handling
-Date: Wed, 27 May 2026 16:46:22 +0800
-Message-ID: <20260527084624.43057-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, KP Singh <kpsingh@kernel.org>,
+	Tao Chen <chen.dylane@linux.dev>,
+	Mykyta Yatsenko <yatsenko@meta.com>,
+	Leon Hwang <leon.hwang@linux.dev>,
+	Anton Protopopov <a.s.protopopov@gmail.com>,
+	Amery Hung <ameryhung@gmail.com>,
+	Tobias Klauser <tklauser@distanz.ch>,
+	Eyal Birger <eyal.birger@gmail.com>, Rong Tao <rongtao@cestc.cn>,
+	Hao Luo <haoluo@google.com>, Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>,
+	Tejun Heo <tj@kernel.org>, Jeff Xu <jeffxu@chromium.org>,
+	mkoutny@suse.com, Jan Hendrik Farr <kernel@jfarr.cc>,
+	Christian Brauner <brauner@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Paul Chaignon <paul.chaignon@gmail.com>,
+	Chen Ridong <chenridong@huaweicloud.com>,
+	Lance Yang <lance.yang@linux.dev>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	geliang@kernel.org, baohua@kernel.org, Hui Zhu <zhuhui@kylinos.cn>
+Subject: Re: [RFC PATCH bpf-next v7 00/11] mm: BPF struct_ops for dynamic
+ memory protection and async reclaim
+Message-ID: <ahavmbcdXDX5gNup@tiehlicka>
+References: <cover.1779760876.git.zhuhui@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywQGZQDH2J1qrxZq0WnMAQ--.63780S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr45ZFyxGFyrAF18Ar1xAFb_yoW8Ww4DpF
-	W3CFyayF97Gry2va9ayrsrWr4rGrWkJrZ7Jr1Fyry0vwn8J3WxWF10gFZ2vryavrZYkF1a
-	vw4jqayUK398XrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
-	AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbasjUUU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQMAAWoWnq0mawAAsB
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1779760876.git.zhuhui@kylinos.cn>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-292199-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,cmpxchg.org,linux-foundation.org,davemloft.net,fomichev.me,meta.com,distanz.ch,cestc.cn,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,huaweicloud.com,vger.kernel.org,kvack.org,kylinos.cn];
+	TAGGED_FROM(0.00)[bounces-292200-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mhocko@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[59];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.996];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tsinghua.edu.cn:email,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:dkim,seu.edu.cn:email]
-X-Rspamd-Queue-Id: 134E25E1576
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:dkim]
+X-Rspamd-Queue-Id: 4D0DF5E15DE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In mrp_pdu_parse_vecattr(), vector attribute events are encoded three
-per byte and valen tracks the number of events left to process.
+On Tue 26-05-26 10:20:00, Hui Zhu wrote:
+> From: Hui Zhu <zhuhui@kylinos.cn>
+> 
+> Overview:
+> This series introduces BPF struct_ops support for the memory controller,
+> enabling userspace BPF programs to implement custom, dynamic memory
+> management policies per cgroup. The feature allows BPF programs to hook
+> into the core reclaim and charge paths without requiring kernel
+> modifications, providing a flexible alternative to static knobs such as
+> memory.low and memory.min.
+>  
+> The series enables two complementary use cases.
+>  
+> Dynamic memory protection: static memory protection thresholds
+> (memory.low, memory.min) are poor fits for workloads whose actual memory
+> activity varies over time. A high-priority cgroup holding a large working
+> set but temporarily idle will still suppress reclaim on its siblings,
+> wasting available memory. A BPF-driven approach can observe real workload
+> activity -- page faults, charge/uncharge events -- and activate or
+> withdraw protection dynamically.
 
-The parser decrements valen after processing the first and second events
-from each event byte, but not after processing the third one. When valen
-is exactly a multiple of three, the loop continues after the last valid
-event and consumes the next byte as a new event byte.
+Why the same cannot be achieved by dynamically changing protection?
 
-This can make the parser apply a spurious event to the current vector
-attribute and update the MRP applicant state with an event that was not
-part of the VectorAttribute. For example, a VectorAttribute with valen=3
-and events JOIN_IN, JOIN_IN, LV can be followed by another byte whose
-first encoded event is then incorrectly applied to the third attribute.
+> The test results at the end of this
+> letter quantify the difference: in a scenario where the high-priority
+> cgroup is idle, the BPF-controlled low-priority cgroup achieves roughly
+> 37x higher throughput than with static memory.low.
+>  
+> Asynchronous proactive reclaim: the memcg_charged and memcg_uncharged
+> hooks, combined with the BPF workqueue mechanism and the new
+> bpf_try_to_free_mem_cgroup_pages() kfunc, enable BPF programs to perform
+> proactive background reclaim without blocking the charge path. The
+> pattern works as follows: the memcg_charged callback tracks accumulated
+> memory usage; when usage crosses a configurable threshold, it enqueues an
+> asynchronous work item via bpf_wq_start() and returns immediately without
+> throttling the charging task. The workqueue callback then invokes
+> bpf_try_to_free_mem_cgroup_pages() to reclaim pages from the target
+> cgroup; if usage remains elevated after reclaim, the callback re-enqueues
+> itself to continue. This allows a BPF program to keep a cgroup's
+> footprint below its hard limit (memory.max) entirely in the background,
+> avoiding the OOM killer or direct-reclaim stalls that would otherwise
+> occur.
 
-Decrement valen after processing the third event as well.
-
-Fixes: febf018d2234 ("net/802: Implement Multiple Registration Protocol (MRP)")
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: GLM:GLM-5.1
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
----
-diff --git a/net/802/mrp.c b/net/802/mrp.c
-index ff0e805..40cb941 100644
---- a/net/802/mrp.c
-+++ b/net/802/mrp.c
-@@ -753,6 +753,7 @@ static int mrp_pdu_parse_vecattr(struct mrp_applicant *app,
- 		vaevents %= __MRP_VECATTR_EVENT_MAX;
- 		vaevent = vaevents;
- 		mrp_pdu_parse_vecattr_event(app, skb, vaevent);
-+		valen--;
- 	}
- 	return 0;
- }
-
-
---
-2.43.0
-
+How do you account the overall work done to the specific memcg as the
+large part of the reclaim is done from WQ context?
+Also when introducing a BPF hook please focus on describing why existing
+interfaces fail to achieve what you need. For the async reclaim why it
+is not practical or feasible to use userspace driven memory reclaim.
+-- 
+Michal Hocko
+SUSE Labs
 
