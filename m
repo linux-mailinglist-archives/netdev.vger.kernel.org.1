@@ -1,204 +1,197 @@
-Return-Path: <netdev+bounces-292406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292407-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6GIoDzEjF2rw5AcAu9opvQ
-	(envelope-from <netdev+bounces-292406-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:00:33 +0200
+	id uEckIjgkF2qu6wcAu9opvQ
+	(envelope-from <netdev+bounces-292407-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:04:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B695E81A2
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:00:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6265E822E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:04:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B6CB7301B152
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:00:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B10E3300F9CC
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B643F20E7;
-	Wed, 27 May 2026 17:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48743439003;
+	Wed, 27 May 2026 17:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AW8IM/Nj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tx3XlRy/"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="AaxabphA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iNeyWCtn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFFE3D6CD5
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779901229; cv=pass; b=Gz7j1PtIHE1G9XV0KuChTgRZqckpKxcr5Jd84WOddeUdq9kAtiWrr+4voHan7ubYl0A8yfnuKSjmgKaniED+YdrCiC46eUrO6KQlumX2rntRL5Ij0fogwYXSO3e2NbxjSIpAQzXOwf+XQQZ8HSzviqoAwE2EezxfTjeG9ccHMn0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779901229; c=relaxed/simple;
-	bh=lubCvrF1puiThpi5h2smuHn4grMXYsYs7CCcT4LYEWg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GyaLbPGMSH0VkgnfrhzZznrm5YX6VmN5QDO2+NAUVRYw72/FgHXB8VutWQPswUw3uAJn/NqM6sko3Q5wIleZOo91QbqndwcHC4gzqtwGVjjzlxIZ99C/Ig5BZUtudOt5sHD5oc9IqcHsSGB4aehZWWSCe5TsGkf808oBnfDtqC8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AW8IM/Nj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tx3XlRy/; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779901227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lubCvrF1puiThpi5h2smuHn4grMXYsYs7CCcT4LYEWg=;
-	b=AW8IM/NjES3lHJlAcKe1/t+JoDGQ1Y7UVXjttusRNU64J54jOUNuFmT7O27Su8PjXDaQKM
-	jJgMPjPJI5q0U2DCVQh2qnXQi3Ff8NIA3pGghMG+LEdpRqObCVCM0mXdaFZEI9vbCHE3Gx
-	Vw1V1Agp88dSLNZmTRNw62v8XUEBEj4=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-vRYy2PHQNk2BiGWB0y0paQ-1; Wed, 27 May 2026 13:00:25 -0400
-X-MC-Unique: vRYy2PHQNk2BiGWB0y0paQ-1
-X-Mimecast-MFC-AGG-ID: vRYy2PHQNk2BiGWB0y0paQ_1779901224
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c82ac893940so5817048a12.1
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 10:00:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779901224; cv=none;
-        d=google.com; s=arc-20240605;
-        b=huePN4ae6fhorS8fBhu8mxtCWuk60Uc82KuQ5yxpdPPHzfqCoBhXYSEWMnE9t+dpnB
-         Ur34vm+F12dDlNKHv5/L4Lrv7v7wHEIURBZhBlJY2CxA0dMwY+mX9HOfcz6htQlBYjNK
-         JBRVrsWym6RkJrF24nU3ZI7RbhSgaM51HaNy3soX0HXJOAo+HwlM3LDjwk89FeLOiRqv
-         +yr8Ft6txbe8FJRGdztCIAnfnWYSWTtu60bHT9NAhGXthw7I7BcfffVC2HEIcpxm8JmZ
-         7UfiZCqujDHuN8uDfWuoaw26q8nc0Q1yH8atlw5EzqtgSh5T79IYVMsOGap2CnX+d7SS
-         Exng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=lubCvrF1puiThpi5h2smuHn4grMXYsYs7CCcT4LYEWg=;
-        fh=wizQPkMG6FE0/8a/KqcgYc9l3d9YSZh/fqEwIeLJmyk=;
-        b=EtjoZRkXoFGPdYtL1OcLwgBZGC9KyhR+BKTdWvuah7o6CFNamb6u8Jiz03Ay11xZVZ
-         iNJvhs15n9IK7RnC4skH5yB6heon5llpCdR70uhzTHEt4Ee/iLlpWuWsSSOUlJ7a+SkY
-         h2aQGqcElXMUKSPQUZEPpFbzNjinsz3mE8Mk+jaB1T2kC1u5bUjZwkw/LAl8tIYR72gO
-         a3oD14OSlybrCItFuBlil0ehj8jjq6XT5FWWYR9+gCOQ3CF1pao0nMvOAxxg7+f8CioG
-         U9gbBBuvcQGpH7jG1BXNkFnShGs6APBvpXdfkeyWcwvQ7lOxMQiQdKbKkxTYA29Q7N1H
-         Elbg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779901224; x=1780506024; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lubCvrF1puiThpi5h2smuHn4grMXYsYs7CCcT4LYEWg=;
-        b=tx3XlRy//mpJf80Xf4QL4TxbDy6g/gtoR9banOY/bbyJiOPJxxjLw8yaY/S66gBa3/
-         ixCtYnGPNJj831lROZkCN8rTme5j39qc7g9f8x6nWubtqtJ4y6XUOpj7QNhcX6WYWfn/
-         z3GNHI+o14aUTGQIOOJIOmaJdEZmB7GniYznpFV3ZRY9OmaJXnhr5vw0wObY3wfqTfll
-         JnCdT6/BWvmd5vdskXNtJA40w0fDz/DrnlT50D6a+hFO+xkMQXKKX1wbN1rBW5iV2Lg+
-         55S2GhR1z+FUZeKbCnvU2ZcYIqA5+1ujVXy5At193Hl32oeBzHEkU6d8LMQD2PcuIrXF
-         57Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779901224; x=1780506024;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lubCvrF1puiThpi5h2smuHn4grMXYsYs7CCcT4LYEWg=;
-        b=qQf8n77lAYFySkHaUY3x5mc5seTthWa4ernsPOIruXX4ApvVkL3PYRhVbbBiAOtRC1
-         7aXKn3CYuYYMrsl1Gm9CNftRrmBd21fah85MWgMwdCYCSarnD1tawuTCFWQe1LqfG4ow
-         nnm3bmY7loH3AAKAR7hoteJOzbZEnuhLva7t0F1Ldq5z1ICX7KSNvNyXzn2Fqdk6xo8R
-         kAO8/iLe8BDseXm4ZYKATX3Cte5xrGFZIKvSwB73f8B6PWUVrSfepDjvcWGrvMsFH1hZ
-         ixPxqXQ2HWMiCIlysf7vrrvPs7XAV3H/w/4ZdBD78GDC4OV0BQKjMH8SawijCb/f7Mi6
-         qQGg==
-X-Gm-Message-State: AOJu0YxwU5mNbQjN0m3AW9a92o5mvpx+kWsb5acuDCjNkmqzt4ZFR7OK
-	S2f18p8GStnzJY4nOIwdYH4Wj0FLcuZHymiHwr7xFoakhQ9F+jRpkHhD2PRUMyFtcu+Z8jduuLD
-	VBMqCG78rOVfLm75tfirre2LcbUMYEbAh3X3+x9iiVUqyVpQIqnb0FBxGxZV2LSXmRSK7BliGSf
-	6ifWwOc1i1OWr7uYFFuHs3tKNumNDXVuWMvOss+xLC
-X-Gm-Gg: Acq92OGoHv6Kbj5AocTrnZkhIlEcBBID8DniFMRHIegvtJimudNyM8j6mR1EyijXi0a
-	/KR8djhXbnepjgIzmBAxUloybt/SVRKaCsdK9PZsCERC0quox/snFg5h+1nqbZ1zYb/Mn5eCsHP
-	L6FsjgPXllyR5JS1w3Z83ug3P6dmWzKlaMnt2Nx+APeFxzUAQSQA2xn4NihGqppHFQ+F0E9l7eA
-	Fef61URTHraZlc=
-X-Received: by 2002:a05:6a20:ce44:b0:3a3:56db:919c with SMTP id adf61e73a8af0-3b328c988c7mr21976235637.14.1779901223743;
-        Wed, 27 May 2026 10:00:23 -0700 (PDT)
-X-Received: by 2002:a05:6a20:ce44:b0:3a3:56db:919c with SMTP id
- adf61e73a8af0-3b328c988c7mr21976160637.14.1779901223120; Wed, 27 May 2026
- 10:00:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394B1330B3B;
+	Wed, 27 May 2026 17:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779901428; cv=none; b=PtCB/I5T4kUJR705EqQyadCTtZXZmuefw7Y8J3hQ3dHM0Kc6LGfsezE/iGm+99L9qUen9b7u3fHuY9D2TeD0wyTMAHyhkn6GEvU0Xh/gvcs/uJf5yXDNQs21Rl8DEK2qI2SMlSSdhQpq+Qv5E+ket8RyH9HJmLE/IlU5r57sUCo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779901428; c=relaxed/simple;
+	bh=/xXCIqZg0D8XwLkgfozxgA+43ECEOp+EOCDyToXR2vU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RtFNzwW/pR+K6a9/DdmsbHzw8T//UeASo6XGJd36z/MzKpfzZGgEFdi86kWglczVD324tqxhwNquK/rYVSq/nTBn2ss3JUZEbOH+3yrGUg5CEcubwFz2vyL5B4ID96sIU6EHE5hqSUHZ5ExvPspWRistYb9jDXPuHLdKj9BJFKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=AaxabphA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iNeyWCtn; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 8E1FE7A0073;
+	Wed, 27 May 2026 13:03:43 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Wed, 27 May 2026 13:03:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1779901423;
+	 x=1779987823; bh=W7sJHu3X3lqZ/+F+nLKQX33IaAFOhmRus2xF/6aombA=; b=
+	AaxabphAoo6w78R+giTZxGMumpkaYExgTgANkm0L7z049fjebaxLG34fGrEBRTwM
+	0mxx2Rmc/XguHJmNgAJRNfh9xnVYzOGLT5/6ICaVB4KZ5QugxDThviUsC5lXgzch
+	3nvGnR0ntdAiNEwb6EXszCLOmA0PoFrkuxWbpKaimGJu7fZMzDHtcBmTzrxUxCoU
+	EUj3A/rk1Q8VyYhjtX1jcNtuLkyfY1lHDckAZc7cdPEWn1QXO/Bq3M0lJkvW1bpW
+	2O4cuQs5wJ+5LOwCEMjB4T+YNw1WoHJufNx8jL+/iAAG7doB+Zi7HFwW+43AQeV4
+	6rSZKa8QucaleZHcd4kpnA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779901423; x=
+	1779987823; bh=W7sJHu3X3lqZ/+F+nLKQX33IaAFOhmRus2xF/6aombA=; b=i
+	NeyWCtnDfJBw0XfwXA+Kba/WTFuC7S8UHIh7oJzMJWzOfqAazyIvBfykWzA7ad0S
+	1uDDx5f8qr7Jux/Jp0WNTRJs3UzQ/59RB+qoZwjR5qgqqPocXG5BxiXoQBcN7Uo+
+	EXBRehRLY/PW/uoRSNTZSb7q3MLaW/mKUrtESTUe4uw0lRGkuqhzVwEDwZZPFd7J
+	JrzdSeddUpRJWNcz8DhV9MljEQALYGfbDFwdvpDoYxoVNHqoRgX3Ga4dwAA0Ha6g
+	ZRoPs2Lhs5RpLXVh4LE2en7nQTGhZ8/b+921ib0rCzqYpYP1+wREspJk7qyuyvSr
+	nJDR0DEA84czK18SkF7RQ==
+X-ME-Sender: <xms:7iMXal4seHozvvDvAA9MM-LrnGPT_6AD7eO9VZY8AeIY0kDWpPWqow>
+    <xme:7iMXaqcnQd6i3eyIY0ITia-eu54QBdiVFlQY0zPZNkRXwdaIXxpgIA0gaXXWhcPGR
+    hk6eb9bUYTj8gWVy3On0M5PH-IwtptOJHeahrUluO_fOHWyNj7VFw>
+X-ME-Received: <xmr:7iMXasH2_KW3WwEkhodc8P4Evg3OVr1J3tlDI_K3wVHIEQwXLIBzYFTii3g>
+X-ME-Proxy-Cause: dmFkZTGxcVZESYa1ffk92r9u7bA5CJRTGW5mmmN1n+HTRN9GHNe7b0bEFT1hm4KYChXyqK
+    9nz8ZYt0Fx5NUXMS8jZogLQNwBocT39E50Wwhz9qWYNH+79P69GN3uDGGXdgmSdzLm1r5P
+    bkgWmjCeL5D7oaTsJMN1wmLMkDfnvJaPsjo9Bg7dSmeAEWmgWYzPbiHM+hw4pojGhw7M7c
+    tErY5ufRoYQszzxMddGV/UwNpRRFXmpwO47lEHpXJy6H7e+Rwfv4TXluSH+L6B+C4V1K4q
+    Ti6nlCPzGKfjeQ75Bb/GW7vcsB4DNilTIAYDebmMu3+zwtKnWdEEVDr6wbjaVGnRnbbol2
+    P0A4hcvRhQ8rG11feiZNw4CKpev/4N6/CnNZJfSRCA8Pj5hqTnR6nlvhZer2/3xl4nwp2I
+    BXiW7qCYmtKj/8eWvQ9uZ47s/NjVW0fE+3gDKxmranb0qTfiEzERX1wFjZ2RodeOXtPByW
+    XJAihLMQme1uOfSXE4H0IWYRXxichWw2o6N56L5e3M0sZfDP1469YumJtbC4ge34SXsS5J
+    ocj6+FDqOmbXJYtBBvP9JIfINw8u76k4b/NbuAmgPGdmDT7wI/5SqI5a2rF+AIs+3q1kPL
+    wQm0C478OgWX5LS+0Ch9zSRBvbMtlYI5JCyzN6ry72wEnWsjPec7mTf0mKwQ
+X-ME-Proxy: <xmx:7iMXaq7VBX5LZI_dEfC6hxsiS3uwvkSpIC3WImdJkqseUI6_jw9-ig>
+    <xmx:7iMXavvWL9sCyz_j7015hc7UIAHZDyGnxxuV7p0KCF7oWQmnkVvcNA>
+    <xmx:7iMXau9IbgeRrjkf4NhDd5xYZuNC5I1MjCzwzxtt_Inbh9CStiUDIw>
+    <xmx:7iMXapnjyzMVxA3xzlhxj94f0o_BdY6G-jsscFnXna7OcWjM1_sKkg>
+    <xmx:7yMXamkyoqc9miOMUeqwiZXcioIbaKPYghwpx6v0DHhXoHqQtACSm5o3>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 May 2026 13:03:41 -0400 (EDT)
+Date: Wed, 27 May 2026 11:03:40 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Zhiping Zhang <zhipingz@meta.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, Christian Konig
+ <christian.koenig@amd.com>, Bjorn Helgaas <helgaas@kernel.org>,
+ <kvm@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, Keith Busch <kbusch@kernel.org>, Yochai
+ Cohen <yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ alex@shazbot.org
+Subject: Re: [PATCH v5 2/4] dma-buf: add optional get_tph() callback
+Message-ID: <20260527110340.5547dd30@shazbot.org>
+In-Reply-To: <20260526144401.1485788-3-zhipingz@meta.com>
+References: <20260526144401.1485788-1-zhipingz@meta.com>
+	<20260526144401.1485788-3-zhipingz@meta.com>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260527164843.125054-1-sgarzare@redhat.com> <ahchEKOnRwGJBL2V@sgarzare-redhat>
- <20260527125631-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260527125631-mutt-send-email-mst@kernel.org>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 27 May 2026 19:00:11 +0200
-X-Gm-Features: AVHnY4KtP7u7V_LXADNL0jTnyc1d-DJIC7mxGp_c5gBauU4SsMmfK4ENAnH0PHs
-Message-ID: <CAGxU2F4Jc5Ug+QPoKY4rY89TOfVFRkLF75kiAhxCqUnq0OwAHg@mail.gmail.com>
-Subject: Re: [PATCH net] Revert "vsock/virtio: fix skb overhead overflow on
- 32-bit builds"
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Laight <david.laight.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292406-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-292407-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: B8B695E81A2
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,shazbot.org:mid,shazbot.org:dkim]
+X-Rspamd-Queue-Id: DB6265E822E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 27 May 2026 at 18:57, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, May 27, 2026 at 06:54:21PM +0200, Stefano Garzarella wrote:
-> > On Wed, May 27, 2026 at 06:48:43PM +0200, Stefano Garzarella wrote:
-> > > From: Stefano Garzarella <sgarzare@redhat.com>
-> > >
-> > > This reverts commit 4157501b9a8f ("vsock/virtio: fix skb overhead
-> > > overflow on 32-bit builds"). The fix was semantically correct (although
-> > > it would have been better to use mul_u32_u32(), as David pointed out),
-> > > but in practice we are estimating the memory used to allocate the SKBs,
-> > > and this will never cause a 32-bit variable to overflow on a 32-bit
-> > > system, since the memory would have run out long before that. On 64-bit,
-> > > SKB_TRUESIZE() already evaluates to size_t, so the multiplication is
-> > > already in 64-bit arithmetic without the cast.
-> > >
-> > > Let's revert this to avoid unnecessary 64-bit multiplies on the
-> > > per-packet receive path on 32-bit systems.
-> > >
-> > > Reported-by: David Laight <david.laight.linux@gmail.com>
-> > > Closes: https://lore.kernel.org/netdev/20260523173557.5cc4f4f6@pumpkin
-> > > Suggested-by: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > ---
-> > > net/vmw_vsock/virtio_transport_common.c | 2 +-
-> > > 1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > aaarg, something wrong on my new setup, CC list was missing several people
-> > and mailing lists, including LKML. Please let me know if I should resend
-> > this.
-> >
-> > Sorry for the noise,
-> > Stefano
->
->
-> yea just do it. Put PATCH resend in the subj.
+On Tue, 26 May 2026 07:43:54 -0700
+Zhiping Zhang <zhipingz@meta.com> wrote:
 
-Should I carry your Acked-by ?
-(maybe better no, otherwise should be a v2)
+> Add an optional dma-buf get_tph callback so an exporter can return TPH
+> (TLP Processing Hints) metadata to an importer.
+> 
+> 8-bit ST and 16-bit Extended ST are distinct namespaces in the PCIe TPH
+> ST table and may both be present with different values. The importer
+> passes its supported steering-tag width and the exporter returns the
+> matching value, or -EOPNOTSUPP if no metadata is available for that
+> width.
+> 
+> The first user is VFIO_DEVICE_FEATURE_DMA_BUF_TPH in vfio-pci, with the
+> mlx5 RDMA driver as the first importer.
+> 
+> Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+> ---
+>  include/linux/dma-buf.h | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+> index d1203da56fc5..49eb6ad644a2 100644
+> --- a/include/linux/dma-buf.h
+> +++ b/include/linux/dma-buf.h
+> @@ -113,6 +113,27 @@ struct dma_buf_ops {
+>  	 */
+>  	void (*unpin)(struct dma_buf_attachment *attach);
+>  
+> +	/**
+> +	 * @get_tph:
+> +	 * @dmabuf: DMA buffer for which to retrieve TPH metadata
+> +	 * @steering_tag: Returns the raw TPH steering tag for @st_width
+> +	 * @ph: Returns the TPH processing hint (2-bit value)
+> +	 * @st_width: Consumer's supported steering tag width in bits (8 or 16)
+> +	 *
+> +	 * Return the TPH (TLP Processing Hints) metadata associated with this
+> +	 * DMA buffer for the requested steering-tag width. 8-bit ST and 16-bit
+> +	 * Extended ST are distinct namespaces in the PCIe TPH ST table and may
+> +	 * both be present with different values, so the exporter must select the
+> +	 * value that matches @st_width and must not substitute one for the other.
+> +	 *
+> +	 * Return 0 on success, -EOPNOTSUPP if no metadata is available for the
+> +	 * requested width, or -EINVAL if @st_width is not 8 or 16.
+> +	 *
+> +	 * This callback is optional.
+> +	 */
+> +	int (*get_tph)(struct dma_buf *dmabuf, u16 *steering_tag, u8 *ph,
+> +		       u8 st_width);
 
-Thanks,
-Stefano
+Why not make this `bool extended` rather than `u8 st_width` to avoid
+the entire class of errors involving an invalid width?  Thanks,
 
+Alex
 
