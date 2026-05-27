@@ -1,143 +1,139 @@
-Return-Path: <netdev+bounces-292362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6GW5FsYWF2px3wcAu9opvQ
-	(envelope-from <netdev+bounces-292362-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:07:34 +0200
+	id QJ5pJuQUF2pf3QcAu9opvQ
+	(envelope-from <netdev+bounces-292363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:59:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A623D5E777E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:07:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F61D5E7548
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7619D302B774
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:58:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 56A7A302C797
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3983A381B15;
-	Wed, 27 May 2026 15:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E4C382394;
+	Wed, 27 May 2026 15:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WFmtSNxR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HI52qeAa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62FB37C11B
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 15:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C46937757D;
+	Wed, 27 May 2026 15:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779897524; cv=none; b=DpkaJwVZn83ma3bFLk6vhM0Bx+Utpjwlbmt1e11yS33aWbNYNN+IRjNKUIWxfw5WQKs94FxJfDD/9SYqLU25PEBanpcLAToCIA+BE4VtqLfVmRwGmOrPxC1lYXM4PcUOLSNUuZiO90YV2Xku/5xMJS6FmfKkEQ5rf9uxL8rf9LI=
+	t=1779897532; cv=none; b=abM4fMZzBW3Fbgi6Y2K3TD0kpB4TOvVTGYxzG/g9LUXkkXpv6B8PK35NvNsEo+q2phy3p+AzuqYw4mLX4Fc9cf4pPcNw+26yxDeCNGobdSeM+T6HFVk/HuTqOS4uUK2Y4c6F83IdnD+COeXFINSibN+6osPgvdOa4ruNhWe0zCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779897524; c=relaxed/simple;
-	bh=ZGaVfRe4pwKSIV3A0DKoI5aIPRxMnxWQp5Scj94gPUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zu6PdeUIqB/5uSz+M5E3qxeo21ewinIvIhs3OsrOGisD368bUiVS92BmECtUtUf22GpsjSnMapLqGdpYo/mJgaSkc7M/Hhg41Tn+3816MTtKsv/9XGU1HcuWDSJxwvNkFxqRzwS0jOrWdaS4HEVZJ+HhD0budJu87XCIxrnhV8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WFmtSNxR; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5b617773-92c4-4d8d-831e-a74ef0c76b33@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779897520;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oxn2nvn0dCOHkFr6MxG50HZrEMR0vc9BDbUv8aE3L28=;
-	b=WFmtSNxRJPQ2G05aFbgAd5amJDy+kTP2H5QF97iE97dUoMfX5TxBFLHB6KaiZPH7KGknzr
-	yWc3404aejcrxF6ngr5r83bkdInXeTfqfzLWcsUL2SZSzZkUm4ExRGUCzpTzev3m6fm1XV
-	UbSjAvSxbT7lbMC2/Mo7J2/7qOHKGzg=
-Date: Wed, 27 May 2026 16:58:10 +0100
+	s=arc-20240116; t=1779897532; c=relaxed/simple;
+	bh=P/q0FkPCbOqbUkrw+u8nkYD8bm9IFRA3W532/HwIFe8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=senNA22VjHmcauyrG5eyK2oc/GivUlWT0J7AYrLUO8Veh03wIbBzgGq8KnCDzAh7gMV4uWfgZoRo9fGc3WLLwX+15Clw1iu7tqLg21EeKxod1zr9p/lsCGfzv5fe52QJKbMrzXHC4YOWxjr0ijWPicsk0G8HqaMPaqDRWGgc0MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HI52qeAa; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 46A771F000E9;
+	Wed, 27 May 2026 15:58:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779897528;
+	bh=qOiVUORxGHoXQHdIH/CnzYXWd5lz7K5U1INIbRfRKIg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=HI52qeAaRyO4Q6E0LSwfS3Av/xt9S4iwpw7+92v2eByeb1/+L10PUigEtdcxRbB2T
+	 YamtaviZWmfWO49VVYpBvsZfAQLf4EIQDIuCnYG206Ok8ubXohZhWnl4ooKkdSbZPX
+	 nq5OyQE2Cv2aFfDXQrhbVQ2piHDtY7tLnafJ5P/lgg6q3JmI+T2NjGEYRUTE780w8L
+	 ANFQ+NC2szcnuVHU9Z+XZSgz5mQX59RNQe0PkzPWiGCzdlNm6frITdN3acntNrp0rQ
+	 6ph4g1ryHdSYDHURey1Z734BfqKq7UHQI5R0mMZFypz+G8tSOzLnlTg0XMqsEEfjyX
+	 yhgW9ueoXM6yQ==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>, LKML
+ <linux-kernel@vger.kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar
+ <mlichvar@redhat.com>, John Stultz <jstultz@google.com>, Stephen Boyd
+ <sboyd@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Frederic
+ Weisbecker <frederic@kernel.org>, thomas.weissschuh@linutronix.de, Arthur
+ Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>,
+ Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver
+ Upton <oupton@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, Miri Korenblit
+ <miriam.rachel.korenblit@intel.com>, Johannes Berg
+ <johannes.berg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Peter Hilber
+ <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
+ linux-sound@vger.kernel.org
+Subject: Re: [patch 01/24] timekeeping: Provide ktime_get_snapshot_id()
+In-Reply-To: <5b082d25-9a57-4612-a93e-a4591acd0ea6@intel.com>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171222.769770418@kernel.org>
+ <5b082d25-9a57-4612-a93e-a4591acd0ea6@intel.com>
+Date: Wed, 27 May 2026 17:58:44 +0200
+Message-ID: <87ldd4lu8b.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: remove SIOCSHWTSTAMP and SIOCGHWTSTAMP from
- ndo_eth_ioctl comment
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Florian Fainelli <f.fainelli@gmail.com>
-References: <20260527120936.24169-1-xuanzhuo@linux.alibaba.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260527120936.24169-1-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain
+X-Spamd-Result: default: False [2.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,nxp.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-292362-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292363-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A623D5E777E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0F61D5E7548
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 27/05/2026 13:09, Xuan Zhuo wrote:
-> Since commit 4ee58e1e5680 ("net: promote SIOCSHWTSTAMP and SIOCGHWTSTAMP
-> ioctls to dedicated handlers"), SIOCSHWTSTAMP and SIOCGHWTSTAMP are no
-> longer dispatched through dev_eth_ioctl() / ndo_eth_ioctl(). They are
-> now handled by their own dedicated functions dev_set_hwtstamp() and
-> dev_get_hwtstamp() in the ioctl path.
-> 
-> However, the comment describing ndo_eth_ioctl in netdevice.h still
-> lists these two ioctls, which is misleading for driver developers who
-> may incorrectly assume they need to handle hardware timestamping
-> commands in their ndo_eth_ioctl implementation.
-> 
-> Remove the stale references from the comment to accurately reflect that
-> ndo_eth_ioctl only handles SIOCGMIIPHY, SIOCGMIIREG and SIOCSMIIREG.
-> 
-> Fixes: 4ee58e1e5680 ("net: promote SIOCSHWTSTAMP and SIOCGHWTSTAMP ioctls to dedicated handlers")
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->   include/linux/netdevice.h | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index bf3dd9b2c1a7..7309467d7873 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1149,8 +1149,8 @@ struct netdev_net_notifier {
->    *	SIOCBONDSLAVEINFOQUERY, and SIOCBONDINFOQUERY
->    *
->    * * int (*ndo_eth_ioctl)(struct net_device *dev, struct ifreq *ifr, int cmd);
-> - *	Called for ethernet specific ioctls: SIOCGMIIPHY, SIOCGMIIREG,
-> - *	SIOCSMIIREG, SIOCSHWTSTAMP and SIOCGHWTSTAMP.
-> + *	Called for ethernet specific ioctls: SIOCGMIIPHY, SIOCGMIIREG and
-> + *	SIOCSMIIREG.
->    *
->    * int (*ndo_set_config)(struct net_device *dev, struct ifmap *map);
->    *	Used to set network devices bus interface parameters. This interface
+On Tue, May 26 2026 at 14:41, Jacob Keller wrote:
+> On 5/26/2026 10:13 AM, Thomas Gleixner wrote:
+>> -void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
+>> +bool ktime_get_snapshot_id(struct system_time_snapshot *systime_snapshot, clockid_t clock_id)
+>>  {
+>
+> Since this function now returns a bool would it make sense to add a
+> "Return:" comment to the kdoc to help explain what the return value means?
+>
+> I saw that you have a WARN_ON with the ktime_get_snapshot wrapper. I
+> guess it returns false if timekeeping_suspended.
 
+...
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> This warns here, and the wrapper ktime_get_snapshot also warns. Does
+> that make sense? I guess eventually the ktime_get_snapshot will be removed?
+
+No it does not and it's a leftover from an early version. I later
+switched to have a valid bit in the struct because otherwise I'd need to
+modify a gazillion call sites to propagate the return value through.
+
+Let me remove it.
+
+Thanks,
+
+        tglx
 
