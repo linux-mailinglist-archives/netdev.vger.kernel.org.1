@@ -1,203 +1,179 @@
-Return-Path: <netdev+bounces-292224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJXNG8m+FmrOqgcAu9opvQ
-	(envelope-from <netdev+bounces-292224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:52:09 +0200
+	id +IVHA9LAFmrOqgcAu9opvQ
+	(envelope-from <netdev+bounces-292225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:00:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C83995E2272
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:52:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47FE95E24C8
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACE723014C2F
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:51:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 32E673002B40
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEB53C1F46;
-	Wed, 27 May 2026 09:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED13D3BFE38;
+	Wed, 27 May 2026 09:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="f4Bo7e8K";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NWie4Znc";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Y4wswlU6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sYAtsh/p"
+	dkim=pass (1024-bit key) header.d=snu.ac.kr header.i=@snu.ac.kr header.b="wrL32plP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807863E3D9F
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779875487; cv=none; b=HqtecGdGyOjbBHep9JVN/VGFICz+TViJppRV5YB41YLFAEUebdt7fJ6SDhujjY9ENqo5QGXRYs8+58/bpaLraqtExYoocWUUejXA6cHIZ4PGocZNXer7SkJ6whh5vNEwZPUlhaSaVYT2XKAEotiD6tCMxkIhjT0hzrcP/2EGbIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779875487; c=relaxed/simple;
-	bh=ZiLx+nwXbAzw55MofB7jcB/7mAUOEnbPtGIwaOTJwf8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ppe8XQ+/mEbm8auXFS0uoSRIvTChJrRG5iAbrvaKSv/Yvji9jZoAq65kIxrl0fNjN++59wTaiMU0p03RYvOqpC1SiihsTe0n1HCPndE3dYL5mdgnHYQEYf75PJrD55FcITZ0i/GZdxF5pljHj4Pm0fTLr2Q65BDn42rZEkdqdak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=f4Bo7e8K; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NWie4Znc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Y4wswlU6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sYAtsh/p; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9F69166DA9;
-	Wed, 27 May 2026 09:51:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1779875483; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k2H4Ds2xHRFPE6LU/zFl+RiPaXvfcANNxLP9YZsqiDM=;
-	b=f4Bo7e8KQTaVhDEBtHmrHfdQoUkQ4EgKHaTD4Z3TVbk+yW6f/zViVenDQ0ENZUs6wYPcg9
-	b1SIrc8KL80jVlRhizNnvRMovUM3XC1YNRy1oFME+EbJ4A8jwJuiTDsIqwu2PsiQctcJV9
-	U91HdhlREqSbd+UOH8ULgQ4QtDjzngU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1779875483;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k2H4Ds2xHRFPE6LU/zFl+RiPaXvfcANNxLP9YZsqiDM=;
-	b=NWie4Znc2aHUq+allxUAXf1WwzUMoFi4IwRPwGzNf8ivSLACfy1tPfwHd6MBq+9s05JM9I
-	bisCb/FN2HW380Dw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1779875482; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k2H4Ds2xHRFPE6LU/zFl+RiPaXvfcANNxLP9YZsqiDM=;
-	b=Y4wswlU6aywgHssrQz6TFQALP69d1knBgssqu2U00wnpcDSHm/j7ZobxINjFwEGtNH2M7X
-	HEQbQFlbPTjuJ4uIfKHwR5j3YEnFVFr1apj/6mrWgrXALlCPE3E5CowUGtteVfDoGcCpY9
-	bJocVrtT17RBPA5s9XsqjfVv/4vyrmM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1779875482;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k2H4Ds2xHRFPE6LU/zFl+RiPaXvfcANNxLP9YZsqiDM=;
-	b=sYAtsh/p3pmX3jzlv3UVVgXUWsE9bzrIWvVfxHla4qPLdAHGugPtcaDKtJqhgAVtvMySCT
-	wiYL5H7hAOXHzKDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 776845A782;
-	Wed, 27 May 2026 09:51:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id VKFrHJq+FmpxRgAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 27 May 2026 09:51:22 +0000
-Message-ID: <15b63b82-1572-418d-9ed9-8ccc11217beb@suse.de>
-Date: Wed, 27 May 2026 11:51:22 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD61830E82B
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779875527; cv=pass; b=MxxUh/T8AsfOHnYTmJL3fCwZ4+cpFn2Z0snxn+qOVI4Lb+6Rp5uYEIgSG8/Zb8TpR13zoX1/nqjcJFvmUB0r15Rbf/iKQkc1wWW+cm46xeLiKgA9CaMNQ2PSP3H5WhECFFNH8382i8JNBShGEFOT0Vfgg5UHjShLJA5fTOLKf4s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779875527; c=relaxed/simple;
+	bh=6yk3OmLcvS9yR1IGEnB8s9mzvV1S/+/IzxWTcA1frBk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JY9XBJPnsQkaAu5iFfr7ZKcRQRqhShv0w2RQMZ+dzQ+0rnCBm7yBBv5Nfwx8/7lE22QhyKaAsU/j7N9OwBqyjmWGMVQivrewG7U03qvmlFQi+k39sDJcTu6sx6HU5hR+WG7fnI7OYwVZty76HAjnXO83X/tmpBB9Tn9P739KCM0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=snu.ac.kr; spf=pass smtp.mailfrom=snu.ac.kr; dkim=pass (1024-bit key) header.d=snu.ac.kr header.i=@snu.ac.kr header.b=wrL32plP; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=snu.ac.kr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=snu.ac.kr
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6746d0b2b4aso19457016a12.3
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 02:52:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779875520; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Rs3Tz/+mbgh/VCTfQhhbJ5WURlHlczRhsAdi8dMjsKFA8e3f+F6sIS5hm6GXlHW4Z1
+         EcxVHgph1rF0RKXY3VTFiE36Wc9j3vDzpvvWEv4aoax+QwNU38s8w/044n1pUVex+iCC
+         gdw1CUpOhFFspRU4c3rCMASn/yX8hnb6qQmMZI7R4lX0dNWEzD7gXWmk/3IE2jFBTn2g
+         NjP1rog7CRC8rpOsMuLRnlyOPx1eL1XncYQ2chCma7usbanq/KK/Lm56hovEwCMLihpu
+         txFtCPlEVNT3e440QYTYi57QY9mHzlAFMR+69NHSQwD+9qaW/nZyiBT+3YYidxk7csUX
+         9pLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2PN98aCoYgmIhUzX6WmjhPxG9QNi1I86AbhbpQXMYRA=;
+        fh=xRzzBlP2eoVoi6WgjhQvYbtbW8KYnL1Vv7ht+WoRbMA=;
+        b=L6vf/vJzYn1qZ2OMaXaaw1J240YlM1fWle79D8Xcnoty1NmYsfA/huHddc43yeq48X
+         80mfF6m+J0T5RRkWyPeLi6ua+Bw33e30uPxJ9U9duraUxKluJQCmW9eb7/T1Nf0xaYfp
+         tYEo4prB03J4RiQnNVh6DBO4zT0uS2vlVn5uYTveCcI+ZtQwJBGfu4AqkE8XYdoBHgNF
+         FjgMxhZNjJ2KuIBQiWiBIhrOCKdCJ8u8jy69BqQD907KUwb02Xplho60fHqjiTPyiep7
+         U1ZAJzQJESZGnOxXirjjxBMKS1+qEU/Wx4aSnRB8pp9kjB60paDMzTS1R2tXCOHdVYPZ
+         8u+g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=snu.ac.kr; s=google; t=1779875520; x=1780480320; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2PN98aCoYgmIhUzX6WmjhPxG9QNi1I86AbhbpQXMYRA=;
+        b=wrL32plPML1fnBykAiFWWCw9zUtGYvbeJpsFtjBb/n3ZtvdfqxS3gF6qrVtK7YLyQf
+         xhEMsujGXS0aTvzj0vbLvU4L4Sh/k5xMj7jeifDkfPKidxDaFsGUhCzgFzFt+Px3h95Q
+         IDr9enygsO8+x/5WRNCRn/WNaypTiB8z0wKv0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779875520; x=1780480320;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2PN98aCoYgmIhUzX6WmjhPxG9QNi1I86AbhbpQXMYRA=;
+        b=nJ8/ZU3Po8Ozs0e+fibcMozm2rONC571y1TqVmTutFPFt+krevF9iqDUgXcltHMcZR
+         bERObOML2EP154ERznfCBhSUJX3v+CtfgsRFv1s/aPt20dvNVrUh0B3e9fwcHRaYMVnL
+         l8dvWynOd1/4ZCrrp3mc323vKq696PdoUpx2b+T0EZi4Azlo0rw6DLDYe7uCL/EAWBHd
+         pObSKIMoSNGNFu4zYh9RIJL6VHPdotqmQZtqBPSAQUDwMSAYqcNPvWc/s9oFgFGxV6OK
+         VoDAM2/cm20i4kUkyMAb03WeYBXiGJmNx+jHk0OHoFSlfTWK3nJgCkgCjmfvTppzekP4
+         jpkA==
+X-Forwarded-Encrypted: i=1; AFNElJ+MrypC7AEwXXhBynszqrDzd2eS6TOBNvx2R9TSK9IPk3Q7OswOdbXSZYD5z28003jW7dW4yWE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxusLus7GP8jbByTUJuskrdFGtd1JakXcdOIDFJkJ3dSgl7XY7N
+	Zz9MTwtHwPda1pz8aEx8SN9oSSb26umseXrnt8HeIW0Mq0VPsMfghrjl9IMuaoWfc4MkHjS60PE
+	j4G8piYYZgHirU+/u57DumpdJVELPVz1pyfarZDFKKw==
+X-Gm-Gg: Acq92OF7T1MXKjU+PTtOKuTeJOoc0/KLlqi2qEREyGYzZj8FJrIDG5WwWJy9irV905y
+	8sNCHiDg72jLVyNW1mbi88Aco0Di557VGCDITemJQglciHICWIr/DyRnXk9iGIjJfxAjJB3c/fK
+	sVeh6AaJsO1yyQXKRYWvuBwujetezQaZI1O2MO2TF8Wr6LQQNZN0enU7XRddP4VhU32CE69iNxq
+	HstOofkmeYbJ2MrKKBzmlnB7jVKVTvF4L/aWRV6bYjBNsoWOtdAh1dcn0ou4WzyHqYiQJd4BGM9
+	TeCs3fBPS3QgYsRPDUrCTgaenrL9uPqu+WNbwCsr
+X-Received: by 2002:a05:6402:e10:b0:680:ccda:55b9 with SMTP id
+ 4fb4d7f45d1cf-6889c47031cmr11449807a12.16.1779875520030; Wed, 27 May 2026
+ 02:52:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 5/6] tls: Suppress spurious saved_data_ready
- on all receive paths
-To: Chuck Lever <cel@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
-Cc: Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>
-References: <20260526-tls-read-sock-v11-0-244fe1dc4abd@oracle.com>
- <20260526-tls-read-sock-v11-5-244fe1dc4abd@oracle.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260526-tls-read-sock-v11-5-244fe1dc4abd@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+References: <20260526064835.2233822-1-swan2718@snu.ac.kr> <14018241.uLZWGnKmhe@ripper>
+ <CAL3z5EbfEeMn-2_JrvcXRtuKTtruEf+8MX9tCmn-N9edvvrjwA@mail.gmail.com> <10856691.nUPlyArG6x@ripper>
+In-Reply-To: <10856691.nUPlyArG6x@ripper>
+From: =?UTF-8?B?wq3rsJXsiJjsmYQgLyDtlZnsg50gLyDsu7Ttk6jthLDqs7XtlZnrtoA=?= <swan2718@snu.ac.kr>
+Date: Wed, 27 May 2026 18:51:49 +0900
+X-Gm-Features: AVHnY4IeA4ihcvnDzBQR8GLvg4LxRUs2gOTtjT3c6nUk8tNgpf6NhjYMEVU7tkc
+Message-ID: <CAL3z5EZDr3sK5pOuiQmX4agLy4-6sJx3UMw9kDYfApFJ6uYb-w@mail.gmail.com>
+Subject: Re: [PATCH] batman-adv: fix DAT purge use-after-free on teardown
+To: Sven Eckelmann <sven@narfation.org>
+Cc: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org, 
+	marek.lindner@mailbox.org, sw@simonwunderlich.de, antonio@mandelbit.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, Tejun Heo <tj@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[snu.ac.kr,none];
+	R_DKIM_ALLOW(-0.20)[snu.ac.kr:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-292224-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[narfation.org:query timed out];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292225-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[swan2718@snu.ac.kr,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[snu.ac.kr:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,suse.de:email,suse.de:mid,suse.de:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C83995E2272
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,narfation.org:email,snu.ac.kr:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 47FE95E24C8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/26/26 16:21, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
-> 
-> Each record release via tls_strp_msg_done() triggered
-> tls_strp_check_rcv(), which called tls_rx_msg_ready() and
-> fired saved_data_ready(). During a multi-record receive, the
-> first N-1 wakeups are pure overhead: the caller is already
-> running and will pick up subsequent records on the next loop
-> iteration. The recvmsg and splice_read paths share this waste.
-> 
-> Suppress per-record notifications and emit a single one on
-> reader exit. tls_rx_rec_done() releases the current record
-> and parses the next without announcing; tls_strp_check_rcv()
-> gains a bool announce parameter so callers can request the
-> quiet form. tls_rx_reader_release() fires the deferred
-> announce on exit through tls_rx_msg_maybe_announce(), an
-> idempotent helper that calls saved_data_ready() only when a
-> record is parsed and has not yet been announced.
-> 
-> To keep the final notification idempotent against records that
-> the BH or the worker has already announced, tls_strparser gains
-> a msg_announced bit. tls_rx_msg_maybe_announce() sets the bit
-> when firing saved_data_ready(); the bit is cleared whenever
-> the parsed record is wiped, by tls_strp_msg_consume() on
-> consumption or by tls_strp_msg_load() when the lower socket
-> loses bytes from under the parse. A second call for the same
-> parsed record -- as when recvmsg() satisfies the request from
-> ctx->rx_list without touching the strparser -- becomes a
-> no-op.
-> 
-> With no remaining callers, tls_strp_msg_done() is removed.
-> 
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->   include/net/tls.h  |  5 +++++
->   net/tls/tls.h      |  5 ++---
->   net/tls/tls_main.c |  2 +-
->   net/tls/tls_strp.c | 23 ++++++++++++-----------
->   net/tls/tls_sw.c   | 27 ++++++++++++++++++++++++---
->   5 files changed, 44 insertions(+), 18 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+I was running a modified syzkaller locally and the crash came from
+that setup. I've since lost the original log, and looking back, I may
+have confused an issue in my tooling with a kernel bug. I should have
+verified more carefully before sending this. Sorry for the confusion.
 
-Cheers,
+Soowan Park
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2026=EB=85=84 5=EC=9B=94 26=EC=9D=BC (=ED=99=94) =EC=98=A4=ED=9B=84 11:18, =
+Sven Eckelmann <sven@narfation.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> On Tuesday, 26 May 2026 15:56:58 CEST =C2=AD=EB=B0=95=EC=88=98=EC=99=84 /=
+ =ED=95=99=EC=83=9D / =EC=BB=B4=ED=93=A8=ED=84=B0=EA=B3=B5=ED=95=99=EB=B6=
+=80 wrote:
+> > Hi Sven,
+> >
+> > You're right. I re-examined __cancel_work_sync() and confirmed that it
+> > internally disables the work before flushing, so the re-queue race I
+> > described does not exist. I'll withdraw this patch.
+> >
+> > Thanks for the review.
+>
+> But you said that this was reported by syzkaller. I can't find the report=
+ in
+> the official list [1]. I am guessing you have a reproducer in a private
+> instance and tested with it. And if you tested your patch with it, you ha=
+ve
+> found that your patch fixes it, right?
+>
+> Can you give us more information about this to let us figure out what is
+> actually going on?
+>
+> Regards,
+>         Sven
+>
+> [1] https://syzkaller.appspot.com/upstream/s/batman
 
