@@ -1,98 +1,84 @@
-Return-Path: <netdev+bounces-292416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJ4CK7AqF2oJ7wcAu9opvQ
-	(envelope-from <netdev+bounces-292416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:32:32 +0200
+	id 6NTBHDosF2rd7wcAu9opvQ
+	(envelope-from <netdev+bounces-292417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:39:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EE095E8562
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:32:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 705695E8620
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 19:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21BC4301947C
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:32:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F1752302608C
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 17:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A5439B49F;
-	Wed, 27 May 2026 17:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A8744CF52;
+	Wed, 27 May 2026 17:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1SBAOK7k";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DifxZ3a4";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Fy/zUNdl";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mH3+nsXe"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="brcUSuok"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA10A30AD15
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6563B364EB7
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779903150; cv=none; b=YuzmYOnr+AObjYPI5pTBl3qqo6ECo4ZZsKVe2twL8vYLV812Si5C+Ujq4Alq13VzPivzkyclbs3b1iN0QfxqeV7bFs74M4I9XEk/Pai2uerADluNJQqb1eGipYiwaP+i1dL61PwQrJSXrlSv4rFg+gInLfVPydUemhzUOXC5X0Y=
+	t=1779903536; cv=none; b=dnxTQeQAe/fdhlOdcgPgTlAYS5AmtuwMF+5DPvfLmO+OstyaoE6euQwKQ8PJy7SvE6VTHuqY+6Cqsum85KLotgX5Qfuuze1Hwa7JGsswyyQNTD5QduG7qDjaMO5jgyR0ASxRsM1U1F9rs2JQbGtxBl2sCkIXLegvPv+b+6KF8f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779903150; c=relaxed/simple;
-	bh=YNq7TjsCf8d/xyo0IQdfUzw6QQqc1A25a5WrXR2mqqk=;
+	s=arc-20240116; t=1779903536; c=relaxed/simple;
+	bh=9sBovYNOPoDOq7s4sZP2IsRza7iSK++mMdMeA8dhfYw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hb+Dia58m5TjTUltWVkNR1GcvqEEZjivjpg1TpZ37EWfR/GD/y1eUpOE/knvqxdWFJk1Li4k9bfh91v/bi/pzah34deKRsne2bINz691B4HsTotC917WGLYFRXbslKWJ0nGjLE/Zc4ch597NVjBwkdiOy5Bpj8Jep4sLjLzdpP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1SBAOK7k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DifxZ3a4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Fy/zUNdl; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mH3+nsXe; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 66A9C6ACD9;
-	Wed, 27 May 2026 17:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1779903147; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
-	b=1SBAOK7k5G/dKvMqwMLmxLKAN/4AWLOiB6wweE3uAcRfWu2uKENHcxCe0iXRL49BJHCtiD
-	BSVNTrFz7YOId1tk7EvgeQDXMUBkXjAIKitc7y0YR8KRR4TyybgqFisLDIIjDnfBOfVIpL
-	jslwhoHKxQTxy9Vzga15PaD/D+iFhT8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1779903147;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
-	b=DifxZ3a4nR4PBQaDIXAqU6wi7vYcyddkNIINHRynyUrZuzn+kO3a4MWhp+oD3Mn1q5o9/L
-	RNCc+jRHCi1JPuBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1779903143; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
-	b=Fy/zUNdlkkLzrNMMmVc3XfQSB3CCQx9IhquQGrV31Rxcx/7iquK083SmGmfSStzfgv4EeC
-	FFKjCWz+/Z0XKuyWIq+J2qHLxaLHuTz1pdtrfDmQ910uUNjrMYcMZV/F/L2jHwh+2loCih
-	/wYrVWyFp+FyZQ/ghutFcIWAx+/eqr4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1779903143;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FquF5TRsyuRxxCso6UuAHSdVWzsEcorBxS2pYHqNBzA=;
-	b=mH3+nsXeApTs4ZhlMqioy+cZG8MxuKR6XOrNQGZzfGW5kHhjD86crchHop6wpPISKSit97
-	eSI2smTh+TWnz3Bw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BDD665A93A;
-	Wed, 27 May 2026 17:32:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id g1omLKYqF2rhHgAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 27 May 2026 17:32:22 +0000
-Message-ID: <d733383f-534a-4e1a-9f46-8e2b1d07fb41@suse.de>
-Date: Wed, 27 May 2026 19:32:21 +0200
+	 In-Reply-To:Content-Type; b=MHGTB4+PT8qDowvxljpdrp+kYuk5ar5AY0LacixJc9f0TBoyUtdFlzVlS95BYMRupMP249YIFkKQC6dA1aV6fImKMGukToH7AMVlBcdF/UHpwCXT/y4xZdDx2oQbb0sl5CMB43eyaeYnPUQadjO+Juxuzb7Rg9PpCQChL2nZdnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=brcUSuok; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-9618b8bdc51so1446152241.1
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 10:38:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779903532; x=1780508332; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C+ZMotmKA69XktY7YZVd+0HlOa08ng6yma1cuEVxEak=;
+        b=brcUSuokjsCkY3sOIWXocVz5TaCZ8hZAwxgDaBsoGm3CQBfCWbGv/3p9r+EL/ooCMK
+         Oc19/eU38MECRe6wDgZAbsQA2VD2EoljvzZ2086kq0gx+fBa4QsaaiZv0GEG45AQjpju
+         7zX6N+B1d6X3/ikE6D1OaPKkzZvd94HZAmOyQnTS2Wl/5rjFEijq8YLRFBge4Ue51ejZ
+         UkcbZuapXiQlziOFpCfV/oybGQ8SGf8BEGE1KGtXex1orIcRfb7aMdY5SxJIEsWMqW8u
+         E/sQcwFW+l1b9MmXJUSYJkrTt4UfQMzOSKhhE9+kR5aW80u3nRW+EMVV4qOB46X1xMa8
+         X0Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779903532; x=1780508332;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C+ZMotmKA69XktY7YZVd+0HlOa08ng6yma1cuEVxEak=;
+        b=O6I3ScWNfrNfShdkTug3yLdH5OJuvzGhFMgMLRm9rkZ2A742BhSBR5A1QZX74CK8b7
+         7F3D2YwOThZKe2lVK2VrC4s7vHTi4PsGIbm5D+JGLWaEoZ7ahzDh4/LK1gLQHsckIKsG
+         2kf8S8HIaEL8/DeBCdtZxmykFuQDC/0e8StEvf0hvni34x2ZbizWUVYuG8yXLj7BPiSt
+         Jx00HsKBTBNBDEbKaoeV2eNCzmw2Ig7407O7986C6NuNBq0kgpPCFL96mDbmMwpevDgE
+         6LT+JrdzXekTKdUg1KGunyB92/J29Y+66o1Vb3puylSLxxBZiehrLMAmdSfUF6VtVTvO
+         qHCA==
+X-Forwarded-Encrypted: i=1; AFNElJ+XzVdDJDKHJCeaWcnzCVVfgiKC38hsi713lExuMpqE3/bHmxel1m+OxafURWmML7NYWDhaX5I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdcoVwV0ICfJjFKT39gQa2JMQj9DqtB75K3BtM6Egz+7nm60JO
+	NXTHJVzSi3WJ7ojSneZI4cUzOaz1oZ6EcsDZJVlhQA5DFvwVuF+zjQ43jpfD0xGCMQ==
+X-Gm-Gg: Acq92OFe62+z585R1Z7thGYSRqHxbcGKvHvixEDbbHGWPRZvFpSTmtDxnBp/GfwHsjT
+	HEofcTJhhsjFgyTj0iRrtzWqRfET1mE83kAk1DV5cv+3BNMddWPFm7YSb0tQ7MmgQ4vaS8Zia86
+	uoCB+7+FdeTAspQAVtaRS63+vXlytZaytjUKY2mg046dNJkcas7etq5LCGnwxdDSIiTN1otGEtm
+	w79iEh5IlIzLMaN58nrAve4nQdyd8UGs38ZRdk355g65Gcuc7BvleGVOnBzpzHuATnwmI8EdBhH
+	gbmupczVFNM9tu2OR43DL1d+Lo2k4TGTfFq1P2DmI23LWPJdP49mH+dvmu9mN7f6bK13eClh/uS
+	KizukPrF82ftuOObubBiNv2HC0f1pXdmSPhx88sDGjUjvV15/DBmrnJSg2m+yYSrK4X6IAB0pg7
+	TOeugby4gXMeJQv+KMiphw1IwLH6z6biQNT9eScFCTew==
+X-Received: by 2002:a05:6102:441d:b0:5f7:240f:bbee with SMTP id ada2fe7eead31-67c7490bbe1mr10683274137.1.1779903532192;
+        Wed, 27 May 2026 10:38:52 -0700 (PDT)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-67ff5f0820csm17925711137.11.2026.05.27.10.38.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2026 10:38:51 -0700 (PDT)
+Message-ID: <d1484ff7-2d81-4df4-87bf-ce9f9726eff8@mojatatu.com>
+Date: Wed, 27 May 2026 14:38:46 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,150 +86,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 1/8] net/handshake: Use spin_lock_bh for hn_lock
-To: Chuck Lever <cel@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+Subject: Re: [PATCH net] net/sched: act_api: use mutex in tcf_idr_check_alloc
+To: Kyle Zeng <kylebot@openai.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Jiri Pirko <jiri@resnulli.us>
+Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Chris Mason <clm@meta.com>, Christian Brauner <brauner@kernel.org>,
- kernel-tls-handshake@lists.linux.dev, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
-References: <20260525-handshake-file-pin-v3-0-66c616906ead@oracle.com>
- <20260525-handshake-file-pin-v3-1-66c616906ead@oracle.com>
- <41835be9-ef00-42c7-a5d3-258f092b59eb@suse.de>
- <eb4de53b-f96c-4905-b67a-90790d5e4007@app.fastmail.com>
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Vlad Buslov <vladbu@nvidia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260526220847.28365-1-kylebot@openai.com>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <eb4de53b-f96c-4905-b67a-90790d5e4007@app.fastmail.com>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20260526220847.28365-1-kylebot@openai.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-292416-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-292417-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:email,suse.de:email,suse.de:mid,suse.de:dkim]
-X-Rspamd-Queue-Id: 1EE095E8562
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pctammela@mojatatu.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 705695E8620
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/27/26 16:24, Chuck Lever wrote:
+On 26/05/2026 19:08, Kyle Zeng wrote:
+> Currently, the NEWTFILTER path uses RCU to guard action idr accesses while
+> the DELTFILTER path uses mutex to guard action accesses. This
+> inconsistency leads to a race condition scenario, which can lead to
+> erroneous operations on refcount, eventually leading to use-after-free
+> situation.
+> In this patch, we revert the introduction of RCU back to mutex in the
+> NEWFILTER path, which is consistent with the DELFILTER path, avoiding
+> the race condition.
 > 
-> 
-> On Wed, May 27, 2026, at 4:59 AM, Hannes Reinecke wrote:
->> On 5/25/26 18:51, Chuck Lever wrote:
->>> From: Chuck Lever <chuck.lever@oracle.com>
->>>
->>> nvmet_tcp_state_change(), a socket callback that runs in BH context,
->>> can reach handshake_req_cancel() via nvmet_tcp_schedule_release_queue()
->>> and tls_handshake_cancel().  handshake_req_cancel() acquires
->>> hn->hn_lock with plain spin_lock().  If a process-context thread on
->>> the same CPU holds hn->hn_lock when a softirq invokes the cancel path,
->>> the lock attempt deadlocks.  This is the only caller that invokes
->>> tls_handshake_cancel() from BH context; every other consumer calls it
->>> from process context.
->>>
->>> Deferring the cancel to process context in the NVMe target is not
->>> straightforward: nvmet_tcp_schedule_release_queue() must call
->>> tls_handshake_cancel() atomically with its state transition to
->>> DISCONNECTING.  If the cancel were deferred, the handshake completion
->>> callback could fire in the window before the cancel runs, observe the
->>> unexpected state, and return without dropping its kref on the queue.
->>> Reworking that interlock is considerably more invasive than hardening
->>> the handshake lock.  Convert all hn->hn_lock acquisitions from
->>> spin_lock/spin_unlock to spin_lock_bh/spin_unlock_bh so the lock is
->>> never taken with softirqs enabled.
->>>
->>> Fixes: 675b453e0241 ("nvmet-tcp: enable TLS handshake upcall")
->>> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
->>> ---
->>>    net/handshake/netlink.c |  4 ++--
->>>    net/handshake/request.c | 14 +++++++-------
->>>    net/handshake/tlshd.c   |  2 ++
->>>    3 files changed, 11 insertions(+), 9 deletions(-)
->>>
->> ... and there is always the question whather we should be calling
->> tls_handshake_cancel() in the first place.
->> We already call 'tls_handshake_cancel()' from the handshake timeout
->> handler, and this instance of 'tls_handshake_cancel()' is called
->> from a socket callback (ie when the soecket is closed or something).
->> I would have expected that the handshake code cleans up outstanding
->> requests on socket close already; if so, we can delete the cancel
->> here.
-> 
-> The handshake layer doesn't auto-cancel on socket close.
-> 
-> handshake_sk_destruct() fires when the sock refcount reaches
-> zero, but it only frees the handshake_req and removes it from
-> the hash table. It does not set HANDSHAKE_F_REQ_COMPLETED or
-> invoke the consumer's done callback. It assumes the request
-> was already completed or canceled before the socket reached
-> final destruction.
-> 
-> The timeout handler and the state-change path cover different
-> failure modes. The timeout fires when tlshd is slow or absent.
-> The state-change callback fires when the remote peer resets or
-> closes the connection while the handshake is still in
-> progress -- that can happen well before the timeout expires.
-> 
-> Without the cancel in nvmet_tcp_schedule_release_queue(), the
-> race plays out as follows: the state-change callback
-> transitions the queue to DISCONNECTING and drops its kref.
-> Then tlshd finishes and the handshake layer calls
-> nvmet_tcp_tls_handshake_done(). That callback sees the queue
-> is not in TLS_HANDSHAKE state, hits the WARN_ON, and returns
-> without dropping its own kref -- leaking the queue.
-> 
-> The cancel makes the teardown race-free: either cancel wins
-> and the completion callback never fires, or completion already
-> won and cancel returns false. Either way, exactly one side
-> drops the kref.
-> 
-> The SunRPC consumers (client and server) avoid this problem by
-> blocking a thread on wait_for_completion() during the
-> handshake. A socket state change wakes the waiter indirectly
-> through the completion callback, and the waiter handles
-> cleanup. nvme-tcp's handshake is fully asynchronous -- there
-> is no blocked thread to wake, so the state-change callback is
-> the only context that can cancel the handshake before queue
-> teardown begins.
-> 
+> Fixes: 4b55e86736d5 ("net/sched: act_api: rely on rcu in tcf_idr_check_alloc")
+> Signed-off-by: Kyle Zeng <kylebot@openai.com>
 
-Thanks for the clarification. That's what I had (implicitely)
-assumed, so the tls_handshake_cancel() needs to stay.
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
 
-So you can add my:
+> ---
+>   net/sched/act_api.c | 12 +++++-------
+>   1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+> index 332fd9695e54..63841c3e4310 100644
+> --- a/net/sched/act_api.c
+> +++ b/net/sched/act_api.c
+> @@ -874,36 +874,34 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
+>   	u32 max;
+>   
+>   	if (*index) {
+> -		rcu_read_lock();
+> +		mutex_lock(&idrinfo->lock);
+>   		p = idr_find(&idrinfo->action_idr, *index);
+>   
+>   		if (IS_ERR(p)) {
+>   			/* This means that another process allocated
+>   			 * index but did not assign the pointer yet.
+>   			 */
+> -			rcu_read_unlock();
+> +			mutex_unlock(&idrinfo->lock);
+>   			return -EAGAIN;
+>   		}
+>   
+>   		if (!p) {
+>   			/* Empty slot, try to allocate it */
+>   			max = *index;
+> -			rcu_read_unlock();
+> +			mutex_unlock(&idrinfo->lock);
+>   			goto new;
+>   		}
+>   
+>   		if (!refcount_inc_not_zero(&p->tcfa_refcnt)) {
+>   			/* Action was deleted in parallel */
+> -			rcu_read_unlock();
+> +			mutex_unlock(&idrinfo->lock);
+>   			return -EAGAIN;
+>   		}
+>   
+>   		if (bind)
+>   			atomic_inc(&p->tcfa_bindcnt);
+>   		*a = p;
+> -
+> -		rcu_read_unlock();
+> -
+> +		mutex_unlock(&idrinfo->lock);
+>   		return 1;
+>   	} else {
+>   		/* Find a slot */
 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
