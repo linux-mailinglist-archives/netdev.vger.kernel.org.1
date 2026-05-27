@@ -1,275 +1,185 @@
-Return-Path: <netdev+bounces-292425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YO1IKN83F2os9gcAu9opvQ
-	(envelope-from <netdev+bounces-292425-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:28:47 +0200
+	id +P1yN/Y9F2qg9wcAu9opvQ
+	(envelope-from <netdev+bounces-292426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:54:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F36395E9080
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:28:46 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E64145E9414
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 20:54:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC579302BA52
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:25:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 69B8E3007B33
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CEE3EFD13;
-	Wed, 27 May 2026 18:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785563C37BA;
+	Wed, 27 May 2026 18:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="MeK1NKm9"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="SIJWy7Cj";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Te0+YoKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810E43FD94C
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 18:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779906341; cv=pass; b=DEI9b30nIlNwfH8WkUjLvFx/Czuz19LMcysrk7q8frXed0WPI2ZRGkq0fNiell2BDme8HQcHDWBflW8o4zNDswdOKyl7LT/U2kczrkvkLFV4Zz5yc73uSl8+9eKieeF3n9OSh5lE9B6HMjypPVtjYobjKzwgbow41ozCbFn17j8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779906341; c=relaxed/simple;
-	bh=fyvzl1r3YSuIM4P7Y/9my7fcSb2d/cJ65mLIkItASmc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UjP8wHIrpVNIQdhse03CezCx+dwDb50sTQ4CxyR5I2SgHIVJKbtacRKh3lgGTLC09ovVgYOWSh447CrG2tovrX2HMeKWdoriz4bSI2PXpXlTFSZOSbpQeQULLscmC1Zw9pdpSED4DrFOdSE3UMXfFh5pNGtHHtzH3jCj/GlkU4I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=MeK1NKm9; arc=pass smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c8026aa4d53so8704894a12.3
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 11:25:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779906339; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bLy5bFbw/vZvz4anhaGFJuPzdUqggCoJ4VpKcI58Q+jVs8zw3tM9+AhRTyqnqROQEu
-         T920UH8ubCOUBPy0uo+0sQDZW04SDmboWudZokWgbGnnqjpK5m21032qIt+3BSx/a0pT
-         KOEi0IqdXrAreZ13ot9ze7eIY31ruwqtta7n0uZuE+9BNmaCP/q0+erV+mtjlRoDt2n8
-         e8SaSH6qcAg1H0Kg93uGGDB0tH5+7DfDDXla0itGI/jzblKC1h6EY0ZNM9QnjrG9EKN1
-         pQ2pGrqg+5CDmIVfjVDhqtfFibgl4njyGZfuvgZVgYlg4S5Blkvdr7xl+ec74NxzNzuq
-         s+qA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bYGQXzXXLkAHyIIE6GsTyR2TD2fkA+qDmv25gUpApHI=;
-        fh=rfp4E3aVxlF6BnAAFae0KKakBzRhpfmAG25DFfdn7/o=;
-        b=Z2/WU00mYeYHF2cIh2vrr1Zk8hodhT0pq4g22nrQbTm4VnuQwvUrrsCf89+UxbPlvd
-         mQQPugmyNK8z5mDXpjYzKRVD5oclKA2CG4rS/00I3U4fWEFW91ltgoz2A0hit5Qz+1Ts
-         uhQEIdxrVvtgSgTvOW5Jl3XWlKMAghv9gpQYeMjgU5ziiGIRr2KZ4MOVUag10nozgQKR
-         57bCfBpRnSwLxWXXuzwJU/v3q9w7jrLN0DXT6dJ6GSDAe8E1EUG3i/MsypnPq4/vJjDq
-         aY1YY4VtxFjB6NRfiYN3Jf+aNLEqRU9ROpojEVFp8ehIaQv1hB57Yd7R7QRnw0s3vUXY
-         RnXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1779906339; x=1780511139; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bYGQXzXXLkAHyIIE6GsTyR2TD2fkA+qDmv25gUpApHI=;
-        b=MeK1NKm9wZCdP3ifU8TXxI57amow27qWLK5TiLpm0LFJrDXXVN48xXDbnTURSUoa1r
-         ijsyDw9Q5INPrdJH0XDdv+305gDDyITPqMfTh9TAbU/RzrPfFpVvNjUmepUG2/rbG0Up
-         RbLFvLPtt2bxkXeKKnyMA+QMo2A/EU808FlQPSLf+3XFU0Bt2keDmKlOfDokEbzIBgqX
-         2q1fDH55NlhDsLw9P8Xe/Ynsrlx6HAuSuDI8oYt79qsGjHlbNVulrOpLxwjSS5l4tHvi
-         5ygr/lP8cWoawcf73vWstE7rjRfYVJ8NU3BAU+6oq7z1CFT0R2UUxI13MQK8UNmLaiNX
-         W3iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779906339; x=1780511139;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bYGQXzXXLkAHyIIE6GsTyR2TD2fkA+qDmv25gUpApHI=;
-        b=W796NN1NpdPcaaCwQEpwVa9A5ZVVWSvK356FdDSdfdIccfCrWDY1tW6Rplk2CRK+NZ
-         uWpOgoLLmzA/QbbuRVZXgiCvI7fWUCLkXcWaC5YAWv7SHOuZ5g/LzltXBODMYTz78I3S
-         7psABvkILqPEi9gWJ/8yoBtjBKbcpZ7HfYcSK4grVjL1QO6xZVvJEYuxH2bmWsHptDXu
-         wAnXUree4wqezQIMxSfNtXyQl5iTIscGzuPvqvGOy9U++LA14UWPqQZE2x/KhfGmS5lQ
-         UrPPuIQqeQAcpvix/rFkpWGcle4reBHD1XCoFuTe3bOEWBl9k24Vw7fc1Gv4LA1lgwjz
-         yZ3w==
-X-Forwarded-Encrypted: i=1; AFNElJ9hiWObsfNd7CgvpsNFBMRn26QEKjBgZfHpqylko5Ni6g29q6QY6fZpf5zfmPqbkbt/dRGDKLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6vjRADDw1fwuYSbUEl/2wyG32mqTx9RLgql8BU+X4FEsLei51
-	6pfFIhXoP/tYaPYNxFPtx0kwDnVrj0pA8Ztw4fi/Gr1Y5UYVGQkb+1UG2C3fYIg3h+7rJ0okEty
-	JohvFwe/ew7/ASf5nTzcln/LvTYRRa5eAhThFrsVe
-X-Gm-Gg: Acq92OFkzXKJZ9VUdposzkJ3XwcBCbs6KL0D7cpe+Uer7IOLbxI9gqGE3+0O/4DGFh6
-	O//+MXxntntallJrD12A3F9jJd4W3S0D3voJCyNZaX/owZ1D2bqLEfWPG6gb8yma1ux7+ERUlzR
-	L/zLqc8pTKxBTDixFw6lU7g0jXfjXZMY3c1z5ovXDDdUgCmuAcX4xI6GuVV9rxH4iMqfLx0TfZu
-	/u4BgestibVyZ7FwAGCBnoiHDdm+0Kl8xES6BLma67C5eqCswGo5Ae6PPh/CUKNmsFbbh2+d3ff
-	ttGM7PtSnaVdI98zvaCnTBO0F9NSm1SmQOfUn/Vz
-X-Received: by 2002:a05:6a00:39a6:b0:82c:e83d:a9b0 with SMTP id
- d2e1a72fcca58-8415f552ce6mr22950285b3a.21.1779906338849; Wed, 27 May 2026
- 11:25:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD563F58D9
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 18:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779907326; cv=none; b=nhWnRSuExu5vxoEBGIvB4xadjyXhCCRtgjWPtgExBT9nNIgDWrh+mUyJ3/prdfemW/gOI9cbMvmJB5xqjIR4wNFgGfzp8tOrKqNiQJCzO5Z7P5MKGapF+LXhvXMFyECQDnW6PfGZ7LyAYfdAApxMtG/j1T4vSpYWCQAjUTGhkio=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779907326; c=relaxed/simple;
+	bh=1BYY0kaMZ0mypdIHaZf51jeoffCHdk+Myxs0sT/aEmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VV5HzYFbg5XK64vucxoVtqSqzqWazH/p/zFmK1sKAG+qBMBzvt+cG4BulLjejUKjSrcZXjtabtiCI9CeDFeRO/lwhbKEtt8tiiA8kKCjrLVy7TtUzb8AY/Rwciq/Yfp1H7nh9B3/zX17OTN5JCzHWt/m3uCuAa5JL8s3TpTQz/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=SIJWy7Cj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Te0+YoKX; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 4E9747A00FA;
+	Wed, 27 May 2026 14:42:02 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Wed, 27 May 2026 14:42:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1779907322; x=1779993722; bh=1MI3yuwkL1mDBPmawBBgvjLsbtFcjkyw
+	t0Xvx5lL4i8=; b=SIJWy7Cj+EEO2XPLzFXqFrkjEACjIMFiNReaE36ZY+qaCUde
+	NjYMorcOgjR9O5MdUAkpaFBijotMBS0KeaV3BaxpWixAYhWWDSN72aTxnvTSmxiC
+	aeVzHgrFHCWqLmdQFapHLODttrnFyn5ysVeN10XTCLXuiL7jGGPo1auEf/Sz2TKu
+	yugNf6xi58vD+LKoyW5Sloouzldj/bnTKyXN9G8FttnoSXp94NbNs/EH9EAd3pf2
+	cGAoe1xZqwNXjSGBC22ztGDhVRLx/GVpdh6IIo+L5QTAoaYbluRUgr7EcVQjezN8
+	BxH7t3Duzs0WDc+/uVjWzdIuZgqSq0RESRwLZw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779907322; x=
+	1779993722; bh=1MI3yuwkL1mDBPmawBBgvjLsbtFcjkywt0Xvx5lL4i8=; b=T
+	e0+YoKXlmrm+2wZqgw/SN85nsxbI+UMWvnl2MMW8NBiRFWGyiZd2isSorU07vbPP
+	Z3+euMBcSKgVvAcNs2aT/hJKDwrSH/mAX+SZYFAh3lxZwwqeZnQEt8pfjdj5QStT
+	yC+fZF0uulXoJM0ZWviYL921OamD7JnVMJOuRs6RMRJDNGQgJXxv5Kf7Z1K6RFn2
+	lvhLJgcWKZ26XxWkqbUitq70WbsCBniM9gXHuNMfgAt9kd0RuvnBUWmAv7Bg+ktN
+	a6VDqipaxhYiYtgvqAoX6sM3jvuxXu1HoL7uBQMcrsHXBHNzORenR6KPQArqT9C5
+	f3aLug+VUEs/eJo7Uka8A==
+X-ME-Sender: <xms:-ToXapaoUozxCGQoAghv27XZFi_yaS9srzzjyq9jyDqMIGbCJoQYfg>
+    <xme:-ToXapXl7IT_kfL-lKL6vO75lnFqiQLrUK3SoIls58_kAHk84ZWBjiWMw5rva0252
+    BUITYyrJSkWhT37uIy_zs14O13sPBhrBn2fGR1ku2PVV3VcGb_QoUc>
+X-ME-Received: <xmr:-ToXanjmtqCjI4Jzq6gxnqF1HxVpBtmj1xUB6RigRF3OuwTM87NdIK3Ymu_70K3RlumdLUGwX351FknWAade-OE>
+X-ME-Proxy-Cause: dmFkZTEENjsluLuzQzvLLSoQ/TvipRS1x1Vv+E1k9UFqb8/7KhxV7BWpDI6lQC9FcKg42n
+    h2Qz7y0P9CO5yyJcqUMa8IVxPwRZ0rA47vzxX3aFiktJvsxY+RGDCHmlwD8NnpwRh0rsbG
+    zkOaAFJFez//+5yUdW9DVOWeVqWwBSascRgGCE5Hg78ed25hWZz3a5Qszy9l5THp0PSXPE
+    V1kt6NJOgROQCVwE9uKkg0swQk/slVaFAt2uN+00vYWcLWY8dYiK8Dvj2dMN7lYyJwM9FU
+    83mcJPRk0TgA6eHG5ktqBOQN4dx5PX2RT0BUeROQRpK/ZBhGdNbr/NhvcAxZTDS7p8aKNs
+    4IqQ+xr/yuHptaEQ2OUs0xmz3wxgY4CPARN/MmY7PLhBQyZ+xZJQbiPJDD73/KyIMY4STe
+    SIVN6PFXlOIvV7+hRRICPt03FzKYiPiwZrHeApBTeZ5FGqHo7npxfM6aF69ozpWsyS93fr
+    po5U76hi1bfcDFKcpDAMpLJo4Z+lbjRLuvwIE+dX8ipFW0wr8vLiYpgo09izE9hgL4ymLZ
+    /qxy/gChBxHvzNmcZzG83I7PhA1DJfyyHrTRgBvnZphBlGLX347tAZv0Mi9Hoa9XZaWAe0
+    6hCHCQMHR6pObE7D376SFjd+CibuYrM7EulK5L3KovMQYL4k24/1OImHB2Lw
+X-ME-Proxy: <xmx:-ToXansyAT-HbTXw4ayJZEj3DSA5JRKY3fpyOir9ywufrK4-_MxQWw>
+    <xmx:-ToXag5bBGN7J5FPjKNS5LVDwdA2yHZNiadrbs54O5MG2m8Vu46rCg>
+    <xmx:-ToXarPIfgtV1fehW736Quo4-AjAqo0v0XOYilKCuKXfIL9bpc7WuA>
+    <xmx:-ToXamsVxnJwN8-WYbJD5pnOIR0ogSWsIGQ5NyRhPh_Qob3-ZgKL_g>
+    <xmx:-joXahZ8QDZ4VSYErTafM_sZkCNP1ZCBdYu5NpZPc_qxh_cPUQ8PjqaI>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 May 2026 14:42:00 -0400 (EDT)
+Date: Wed, 27 May 2026 20:41:58 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Petr Wozniak <petr.wozniak@gmail.com>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net
+Subject: Re: [PATCH net-next] xfrm: fix xfrm_dev_offload_ok() returning true
+ for software SAs
+Message-ID: <ahc69uCgXxxzuoJh@krikkit>
+References: <ahcVbeG79PibbM3M@krikkit>
+ <20260527164717.23624-1-petr.wozniak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260526155913.1060694-1-jhs@mojatatu.com> <87wlwq2cxf.fsf@toke.dk>
- <CAM0EoMm_FcS0xSNmCjdXaRMfZh12jU71xM92Z50eVE8uk7tKFQ@mail.gmail.com>
- <20260527171310.0d5ed340@pumpkin> <CAM0EoMkwoiJ_LODqv_taoDTLvfrAYwPyRv2oGyP5P=q1b+1+OQ@mail.gmail.com>
-In-Reply-To: <CAM0EoMkwoiJ_LODqv_taoDTLvfrAYwPyRv2oGyP5P=q1b+1+OQ@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 27 May 2026 14:25:27 -0400
-X-Gm-Features: AVHnY4K-C7n8wn1-bp_373mGPM5SmDZXb9pg5bbXxZwK_fLr6KoIJxehPqN_-LQ
-Message-ID: <CAM0EoMna=w7tkN2GqZXSf74VjNqQ3HWxrr7JxFm4RoL-Aib8Ww@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] net/sched: fix pedit partial COW leading to
- page cache corruption
-To: David Laight <david.laight.linux@gmail.com>
-Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
-	victor@mojatatu.com, yimingqian591@gmail.com, keenanat2000@gmail.com, 
-	2045gemini@gmail.com, rollkingzzc@gmail.com, dcaratti@redhat.com, 
-	security@kernel.org, linux-kernel@vger.kernel.org, 
-	Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260527164717.23624-1-petr.wozniak@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292425-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-292426-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,davemloft.net,google.com,kernel.org,resnulli.us,mojatatu.com,gmail.com,oss.qualcomm.com];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu-com.20251104.gappssmtp.com:dkim,mail.gmail.com:mid,qualcomm.com:email,mojatatu.com:email]
-X-Rspamd-Queue-Id: F36395E9080
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,queasysnail.net:dkim,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: E64145E9414
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 12:48=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
->
-> On Wed, May 27, 2026 at 12:13=E2=80=AFPM David Laight
-> <david.laight.linux@gmail.com> wrote:
-> >
-> > On Wed, 27 May 2026 10:56:57 -0400
-> > Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> >
-> > >  &&
-> > >
-> > > On Tue, May 26, 2026 at 3:22=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgen=
-sen <toke@redhat.com> wrote:
-> > > >
-> > > > Jamal Hadi Salim <jhs@mojatatu.com> writes:
-> > > >
-> > > > > From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> > > > >
-> > > > > tcf_pedit_act() computes the COW range for skb_ensure_writable()
-> > > > > once before the key loop using tcfp_off_max_hint, but the hint do=
-es
-> > > > > not account for the runtime header offset added by typed keys. Th=
-is
-> > > > > can leave part of the write region un-COW'd.
-> > > > >
-> > > > > Fix by moving skb_ensure_writable() inside the per-key loop where
-> > > > > the actual write offset is known, and add overflow checking on th=
-e
-> > > > > offset arithmetic. For negative offsets (e.g. Ethernet header edi=
-ts
-> > > > > at ingress), use skb_cow() to COW the headroom instead. Guard
-> > > > > offset_valid() against INT_MIN, where negation is undefined.
-> > > > >
-> > > > > Additionally, linearize skbs with shared frags upfront to prevent
-> > > > > silent data corruption when pedit operates on zero-copy pages
-> > > > > (e.g. from sendfile).
-> > > > >
-> > > > > Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb=
- is writable")
-> > > > > Reported-by: Yiming Qian <yimingqian591@gmail.com>
-> > > > > Reported-by: Keenan Dong <keenanat2000@gmail.com>
-> > > > > Reported-by: Han Guidong <2045gemini@gmail.com>
-> > > > > Reported-by: Zhang Cen <rollkingzzc@gmail.com>
-> > > > > Tested-by: Victor Nogueira <victor@mojatatu.com>
-> > > > > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > > > > Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> > > >
-> > > > Re-ran the tests, and everything looks good, so:
-> > > >
-> > > > Tested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> > > >
-> > > > Also looked at the code, and I have a few nits below, but I'm reall=
-y
-> > > > nitpicking here, so whether you end up fixing those or not:
-> > > >
-> > > > Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> > > >
-> > > >
-> > > > [...]
-> > > >
-> > > > > @@ -323,7 +324,7 @@ static bool offset_valid(struct sk_buff *skb,=
- int offset)
-> > > > >       if (offset > 0 && offset > skb->len)
-> > > > >               return false;
-> > > > >
-> > > > > -     if  (offset < 0 && -offset > skb_headroom(skb))
-> > > > > +     if (offset < 0 && offset < -(int)skb_headroom(skb))
-> > > > >               return false;
-> > > >
-> > > > This change makes it really obvious that this is really just:
-> > > >
-> > > >         if (offset < -(int)skb_headroom(skb))
-> > > >                 return false;
-> > > >
-> > > > so, well, that would be clearer, IMO.
-> > > >
-> > > > But then I guess the same could be said of the positive case, so:
-> > > >
-> > > > static bool offset_valid(struct sk_buff *skb, int offset)
-> > > > {
-> > > >         if (offset > skb->len || offset < -(int)skb_headroom(skb))
-> > > >                 return false;
-> > > >
-> > > >         return true;
-> > > > }
-> > > >
-> > >
-> > > Yes, that improves readability. If i understood the discussion betwee=
-n
-> > > you and David L. something like this one liner would be reasonable?
-> > >
-> > > if (offset > (int)skb->len || offset < -(int)skb_headroom(skb))
-> >
-> > I doubt it will be measurable whatever you pick.
-> >
-> > Thinks, can 'we' get away with the much more readable:
-> >         offset + (int)skb_headroom(skb) < 0
-> > No need to worry about the '+' wrapping,
->
-> By that you mean if offset was _very large_ then things will overflow
-> and wrap around to a negative number?
->
-> > the first test will fail.
-> > Large -ve offset are going to stay negative.
-> > So it does look all right.
-> >
->
-> To use Toke's code golfing analogy, maybe let's just stay with the
-> last optimization I posted i.e " (offset > (int)skb->len || offset <
-> -(int)skb_headroom(skb))"  ?
->
+2026-05-27, 18:47:17 +0200, Petr Wozniak wrote:
+> 2026-05-27, Sabrina Dubroca wrote:
+> > Incorrectly? IPsec in SW with GSO is a valid setup. I think you're
+> > breaking that with your patch.
+> 
+> Fair point — SW IPsec with GSO is intentional and the patch is too broad.
 
-I sent v3. I added names for Tested-by/Reviewed-by but because i made
-change, even though they are simple, please test if you can. I dont
-expect anything to break and Victor reviewed and tested already.
+(this whole email looks like direct c/p from an LLM...)
 
-Please no more changes. Hold your tongue if you see some missing comma
-or period.
+> The actual observable bug on this platform (MT7988A, EIP-197 async crypto):
+> 
+>   xfrm_dev_offload_ok() → true (SW SA, dev == NULL)
+>   → esp4_gso_encap() marks the skb
+>   → validate_xmit_xfrm() → esp_xmit() → async crypto → -EINPROGRESS
+>   → validate_xmit_xfrm() returns NULL
+> 
+> On bridge interfaces (noqueue qdisc), __dev_queue_xmit() takes the
+> direct branch, initialises rc = -ENOMEM and never overwrites it
+> when skb is NULL → ENOMEM on every packet.
+> 
+> On real netdevs with a qdisc, sch_direct_xmit() handles NULL
+> gracefully and async completion via xfrm_dev_resume() delivers
+> the packet correctly.
 
-cheers,
-jamal
+But the packet is delivered correctly also in the bridge case, right?
+Once we enter async crypto, the original datapath becomes irrelevant.
+
+> Where would you suggest the actual fix should go — in the
+> bridge/noqueue path, or in validate_xmit_xfrm() / sch_direct_xmit()?
+
+It looks like commit f53c723902d1 ("net: Add asynchronous callbacks
+for xfrm on layer 2.") updated the meaning of validate_xmit_xfrm()
+returning NULL from "packet was dropped" to "packet was stolen (maybe
+dropped, maybe still going)" and this isn't handled well.
+
+I guess validate_xmit_xfrm() could propagate -EINPROGRESS via
+ERR_PTR(), and validate_xmit_skb() could return that to its callers.
+validate_xmit_skb_list() would need to check IS_ERR_OR_NULL(skb)
+instead of !skb, and __dev_queue_xmit() could now differentiate the
+EINPROGRESS case from a drop.
+
+-- 
+Sabrina
 
