@@ -1,160 +1,131 @@
-Return-Path: <netdev+bounces-292208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Lc9AWqzFmokogcAu9opvQ
-	(envelope-from <netdev+bounces-292208-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:03:38 +0200
+	id gAsWHX+1FmrFpgcAu9opvQ
+	(envelope-from <netdev+bounces-292209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:12:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F59A5E17CC
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:03:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AA95E1997
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 67E45301301D
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:03:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DEC75302A2DB
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0197F3E4C65;
-	Wed, 27 May 2026 09:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829E03E3C53;
+	Wed, 27 May 2026 09:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSmOoBi5"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="hrBRNfYp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B343CA490;
-	Wed, 27 May 2026 09:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54DF3D6CB6
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779872598; cv=none; b=HWONJl9VUp2ngLNvFAxtK/+kuFoNlGxrdA7LTZ2bcvEItr9uk7z0B75WYa6DcUo2DY6p723BZNRHG79K9vQYEJPLWcE58UNdfeln+AJIr94o6yXwc01y7aJWathmSDa8BSpysGbwbemw8wYKgcAFTZNBPUO5rmbTeZt4Bh457aA=
+	t=1779872752; cv=none; b=Q36VxRq6vp9jkaQ9KzDRQw5UdwxuCXeEWg0VtPQ/0lzNB8kosEGQ1yuSNJOvCkJFL3/hrEel5BQLF4uu/R7bfn/Fw92+eyig2xP0ghdTGauOsj5HLHPU4zw1q6FdUjre9kRqOqBbPfLuMZWLsziHzuwuFKnzAHdztZU5/zUSyas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779872598; c=relaxed/simple;
-	bh=1QPGxVe2YVjIdUHB6ZQpNIFZJ/tNHjuloIjcC5WL6yk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K+h1sOIhVAW0vdBIQcaaaEJBGvUfTfXo7qDMxx7mkDfyfG59r2EBKeHKEszaAcAUB4udYq7cgs1w1WD9b+jt20+eKladFeSvHBVOf3LX4hYzFNTY3o/mmChwh6bD3soCBWhZ/XB7cEOoMgyX6WLv3WQlUc+NAt69qlN8ftd+5V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSmOoBi5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78BE91F000E9;
-	Wed, 27 May 2026 09:03:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779872597;
-	bh=BLbsXnBlvM3iwIqe2tGZckughDYZqFaWG4pE/G8Jl5w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ZSmOoBi534c+Apdrr5BrPxD+73gSRd0jaT/awagOLp3NQC1vdv1yed9m7118mI8zW
-	 N40WhYoaFqbI/0ARxsfyAuno7PslZyegv5sBVoHcD7o5jBMUusY/wE0zWeN1U8oKBL
-	 T9wf0q2/4OrR1aBDayH8jsf8CwAeR9ozQx8Qoyjs2KEiTpAsUsNuf2w/Hcsv2F91zX
-	 T2Eb9ifBaCNZuTncW4sp44fcTY9YzI69o3BAR1tmddC3Z9zSyt26eVFsvo8J61yG/O
-	 s9EOf4W8b6kCQ3NL3qqqdCtXUuw4jf8IKfZRiCzelFdXkEf/W2/B8oy3HIPgbSjZST
-	 FGh6JaxjC8WQQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wSAAV-00000006bac-1rBt;
-	Wed, 27 May 2026 09:03:15 +0000
-Date: Wed, 27 May 2026 10:03:14 +0100
-Message-ID: <86pl2husvh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Miroslav Lichvar <mlichvar@redhat.com>,
-	John Stultz <jstultz@google.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	thomas.weissschuh@linutronix.de,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org,
-	Takashi Iwai <tiwai@suse.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Peter Hilber <peter.hilber@oss.qualcomm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	linux-wireless@vger.kernel.org,
-	linux-sound@vger.kernel.org
-Subject: Re: [patch 06/24] KVM: arm64: Use ktime_get_snapshot_id() to snapshot CLOCK_REALTIME
-In-Reply-To: <20260526171223.144327185@kernel.org>
-References: <20260526165826.392227559@kernel.org>
-	<20260526171223.144327185@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1779872752; c=relaxed/simple;
+	bh=qfsqRf6v/474IB9jMHqiCe11GPPAWUJzFdxIEsT6oeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=kiy9Pv0hBVACoaqinua7u6FieJXKG//fGUrTHVCBP7B8an+zLvg5giwWYtGGdbagIO27fvgQKhTmPCC9IhsYktZrCBswjEUSuDfMIp5UwoKbky8ggZ+0C+RJzmVkEnt0MHzy0VkAWlwpaoW6MV5ANUuVGIZ0ENZhoYqpGCBU8jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=hrBRNfYp; arc=none smtp.client-ip=193.110.157.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
+Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=phenome.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	content-transfer-encoding:content-disposition:content-type
+	:content-type:mime-version:message-id:subject:subject:from:from
+	:date:date:received; s=oak1; t=1779872746; x=1780736747; bh=qfsq
+	Rf6v/474IB9jMHqiCe11GPPAWUJzFdxIEsT6oeg=; b=hrBRNfYpgmTZgaeWY/12
+	eYxY0mk4qo8JfjrZEewfLv0639w4L9DqD69BeIHnLqLT8PPUsqjTycwAAxwKsLAe
+	jJGnxR3Pw5fSuL0FMXYgHJsd4zoeajpCMPpDXjAwPhqv7xtJhnG8jM1bSAGJ6/jN
+	LvCYmJP9bAJg3cfvxShNGKO+jUHkN+zgSDTRSGnaw/kLvVTUe08++5E8QtosRL2b
+	5uh3BeSuqZ+GJKcJimTwFVge+Vk2/a/zkmCDDmLjV8RhFaefH7BuFKSmKzBXlT1P
+	Y2nuLQxMgN9oWYHKp9DqUbr8v+O0dOvWMpYEDmyIaiHFsDcy4COrA0M9h0zuI4lH
+	og==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Wed, 27 May 2026 11:05:46 +0200 (CEST)
+Date: Wed, 27 May 2026 11:05:43 +0200
+From: Antony Antony <antony@phenome.org>
+To: kuba@kernel.org
+Cc: steffen.klassert@secunet.com, netdev@vger.kernel.org
+Subject: nipa: tree selection fails for ipsec-next series?
+Message-ID: <ahaz550I55ZvMRDI@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tglx@kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, mlichvar@redhat.com, jstultz@google.com, sboyd@kernel.org, anna-maria@linutronix.de, frederic@kernel.org, thomas.weissschuh@linutronix.de, akiyano@amazon.com, oupton@kernel.org, kvmarm@lists.linux.dev, giometti@enneenne.com, vdonnefort@google.com, oliver.upton@linux.dev, richardcochran@gmail.com, netdev@vger.kernel.org, tiwai@suse.com, miriam.rachel.korenblit@intel.com, johannes.berg@intel.com, jacob.e.keller@intel.com, anthony.l.nguyen@intel.com, saeedm@nvidia.com, peter.hilber@oss.qualcomm.com, mst@redhat.com, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUBJECT_ENDS_QUESTION(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,lists.linux.dev,enneenne.com,linux.dev,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
-	TAGGED_FROM(0.00)[bounces-292208-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-292209-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[phenome.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:email]
-X-Rspamd-Queue-Id: 6F59A5E17CC
+	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,phenome.org:dkim]
+X-Rspamd-Queue-Id: C1AA95E1997
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 26 May 2026 18:13:58 +0100,
-Thomas Gleixner <tglx@kernel.org> wrote:
-> 
-> ktime_get_snapshot() is replaced by ktime_get_snapshot_id() which allows to
-> request a particular CLOCK ID to be captured along with the clocksource
-> counter.
-> 
-> Convert the usage in kvm_get_ptp_time() over and use the new
-> system_time_snapshot::sys field, which holds the system timestamp selected
-> by the CLOCK ID argument.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> ---
->  arch/arm64/kvm/hypercalls.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Jakub,
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+nipa run, 1101209,  failed tree selection for my v9 series and I wanted to 
+share what I found while diagnosing it. I feel this happens on patches, ipsec-next,  
+too.  In the past, I ignored it. Since this patch set is  long series I 
+looked deeper.
 
-	M.
+https://patchwork.kernel.org/project/netdevbpf/patch/migrate-state-v9-16-ad9947e4ae74@secunet.com/
+"Guessing tree name failed - patch did not apply"
 
--- 
-Without deviation from the norm, progress is not possible.
+Looking at the nipa source, series_tree_name_direct() matches the cover
+letter subject against _trees.keys(). Since ipsec and ipsec-next are not
+in the deployed conf_trees, the match fails and nipa falls back to
+guessing against net-next. I am guessing ipsec-next is missing in the config too.
+Where is the config nipa runs use? I didn't find the exact config nipa bot 
+used.
+
+I also noticed that my v8 (series 1089594) was identified as
+net-next — it applied to net-next at the time, which masked the issue.
+v9 no longer applies to net-next, so the guessing failed visibly this
+time. 
+
+https://patchwork.kernel.org/project/netdevbpf/patch/migrate-state-v8-14-4578fb016965@secunet.com/
+
+Any idea what could be improved? Is it because the e-mails arrive out or 
+order?
+
+Would it make sense to add ipsec and ipsec-next to nipa's [trees] config?
+That way series_tree_name_direct() could match them directly from the
+cover letter subject rather than falling through to guessing.
+
+Thanks,
+Antony
 
