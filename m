@@ -1,131 +1,139 @@
-Return-Path: <netdev+bounces-292209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292210-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gAsWHX+1FmrFpgcAu9opvQ
-	(envelope-from <netdev+bounces-292209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:12:31 +0200
+	id aNYLAUW1FmokogcAu9opvQ
+	(envelope-from <netdev+bounces-292210-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:11:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AA95E1997
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:12:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FC95E1957
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 11:11:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DEC75302A2DB
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:05:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 40C743086174
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829E03E3C53;
-	Wed, 27 May 2026 09:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="hrBRNfYp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB593E5A14;
+	Wed, 27 May 2026 09:07:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54DF3D6CB6
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4691539A805
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779872752; cv=none; b=Q36VxRq6vp9jkaQ9KzDRQw5UdwxuCXeEWg0VtPQ/0lzNB8kosEGQ1yuSNJOvCkJFL3/hrEel5BQLF4uu/R7bfn/Fw92+eyig2xP0ghdTGauOsj5HLHPU4zw1q6FdUjre9kRqOqBbPfLuMZWLsziHzuwuFKnzAHdztZU5/zUSyas=
+	t=1779872840; cv=none; b=cx4Rlv9xTQz9EUIZ/gE9SOjCguFzJXP2FYjOJUDXrONpFWL5CbOhnACCw/WKqGaSOCffXwSK1FROmmG37H+9YZWuDuZhzWNFz/gytW3XmvIjegzFeDHVPFhs2ho8cA+23rkZtmqYNqC++a8OAv2tJ9y/1t/VacD2U0f2xP3+8fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779872752; c=relaxed/simple;
-	bh=qfsqRf6v/474IB9jMHqiCe11GPPAWUJzFdxIEsT6oeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kiy9Pv0hBVACoaqinua7u6FieJXKG//fGUrTHVCBP7B8an+zLvg5giwWYtGGdbagIO27fvgQKhTmPCC9IhsYktZrCBswjEUSuDfMIp5UwoKbky8ggZ+0C+RJzmVkEnt0MHzy0VkAWlwpaoW6MV5ANUuVGIZ0ENZhoYqpGCBU8jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=hrBRNfYp; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	content-transfer-encoding:content-disposition:content-type
-	:content-type:mime-version:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1779872746; x=1780736747; bh=qfsq
-	Rf6v/474IB9jMHqiCe11GPPAWUJzFdxIEsT6oeg=; b=hrBRNfYpgmTZgaeWY/12
-	eYxY0mk4qo8JfjrZEewfLv0639w4L9DqD69BeIHnLqLT8PPUsqjTycwAAxwKsLAe
-	jJGnxR3Pw5fSuL0FMXYgHJsd4zoeajpCMPpDXjAwPhqv7xtJhnG8jM1bSAGJ6/jN
-	LvCYmJP9bAJg3cfvxShNGKO+jUHkN+zgSDTRSGnaw/kLvVTUe08++5E8QtosRL2b
-	5uh3BeSuqZ+GJKcJimTwFVge+Vk2/a/zkmCDDmLjV8RhFaefH7BuFKSmKzBXlT1P
-	Y2nuLQxMgN9oWYHKp9DqUbr8v+O0dOvWMpYEDmyIaiHFsDcy4COrA0M9h0zuI4lH
-	og==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Wed, 27 May 2026 11:05:46 +0200 (CEST)
-Date: Wed, 27 May 2026 11:05:43 +0200
-From: Antony Antony <antony@phenome.org>
-To: kuba@kernel.org
-Cc: steffen.klassert@secunet.com, netdev@vger.kernel.org
-Subject: nipa: tree selection fails for ipsec-next series?
-Message-ID: <ahaz550I55ZvMRDI@Antony2201.local>
+	s=arc-20240116; t=1779872840; c=relaxed/simple;
+	bh=44aT5xfiUtknRAhR5zZlfqChyD0Nm+3QecUxX6O1BjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l48CXSE6zZEj2EesNwkxDjNGg1WeHGh7J0YKVLjWSX7MEXvIkx5CLF0B6fevwf7NCBjb4MQCfDGGBcDcd5dxp5sLzvU/CUz5lHZ28m2c+X92ZekVfKMZUHmrmkAdDovVjL/Jgb8snUBz+V5xTK+uSEy88us4NU6ckVWU6oITVxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-44ce78ab5feso9125782f8f.0
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 02:07:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779872838; x=1780477638;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wyARKihwlaP3a/dCiYNPjiyiHcIHjP8nxEFuraQQzp0=;
+        b=ipsx+UYfL2QetW4766YVs8SjZk/T4T0FnKZwbsQWLQo1OjZw8Ef6EnQslpGEM88giz
+         my3ApoTFgnq1iFfS9QNl6B297vTrpmWB3/dWCbvtEGNK3XayjunihmmU58lpWml/XhEG
+         BnhCjawSNhTJra3McXRFHs9ixIHvXfWQimpY1NSVoS8zzsqH7Wbku8Z+ZHv/Ev+TYs7m
+         J4GLQSW6qGVJCCzyiBbKvA1zOD0c4b/DSe/kofMZWPcSwHfjB5pS0uDoEm924h6KwI0R
+         hDEb7OBxIQOWaX9IoeGT05xGgJ23euEin7i+azovXsoAtzzfxOyJqcyruHBOSWhkmSUL
+         dVeQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+tfARUe/kP65nFLos1OPZUYc7Y6FFccpnB5VPF4dISN6GoxMFGvY8ro7joanJ9ZFi7xwAitvo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/Z7sT+HDybZRjV6pE4u8gMCm2n5R1KRvZLt6kvNmB/6a30T2j
+	lEGxb3yVajRurzLphiHDr+6f979IMoGUYlqJvxVPfKnjuyelhojfr6Cg
+X-Gm-Gg: Acq92OF823FwGSGQSoAXVwsnbE31fTJ382GPGn+PACTyDNGGKFTY+XnwXw+jdKrU2aI
+	HpEEh901uNwYKKG8q0gFf9dRxaFIp0BsCLI2yLEZeVe1gqQrCVD6eKh8Nxg9pVoGA/A5uQEehsL
+	Ra4YFmNRt5f1AKr5/PemAkvqWtcsByUyJdj2v9tUkOrPnPTtfYbT2LiiIO4IoeCbfVk59l9CtgJ
+	HGo5k2gUbLjztanUEGg6ld8NlYXAl7JZ9zkcnO7CxaUAhjQi1JpeDbSHTX1ud9OCM9ElijOb8x1
+	i31S6ZMOTU7HTPfe3uPtjcQ8w9M35U4z+SCbBkEVj+wejkxQMp7J4OgpNLLj5He4sRfWFwSV/jF
+	dbAh6B5hL8XTD5WnA481t2d0+QADvrDN4aC089cak3FmHp9lIrP9jms1EGKgTXHL1TUp6xctliE
+	QxFBnqwgEd9va8oXtYHaLRGhLv3g==
+X-Received: by 2002:a05:6000:1867:b0:45e:9433:f301 with SMTP id ffacd0b85a97d-45eb38df5f5mr40201049f8f.41.1779872837424;
+        Wed, 27 May 2026 02:07:17 -0700 (PDT)
+Received: from gmail.com ([62.197.47.167])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb548dfasm4359821f8f.4.2026.05.27.02.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 02:07:17 -0700 (PDT)
+Date: Wed, 27 May 2026 10:07:16 +0100
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	gustavold@gmail.com, asantostc@gmail.com, kernel-team@meta.com
+Subject: Re: [PATCH 0/9] netconsole: stop charging every netpoll user for
+ netconsole-only state
+Message-ID: <ahazcZw0KRwu5hUR@gmail.com>
+References: <20260524-netconsole_move_more-v1-0-909d1ab398b4@debian.org>
+ <20260526190053.619cc53d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	SUBJECT_ENDS_QUESTION(1.00)[];
+In-Reply-To: <20260526190053.619cc53d@kernel.org>
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[debian.org : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,vger.kernel.org,gmail.com,meta.com];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-292209-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-292210-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,phenome.org:dkim]
-X-Rspamd-Queue-Id: C1AA95E1997
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.938];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 71FC95E1957
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+On Tue, May 26, 2026 at 07:00:53PM +0000, Jakub Kicinski wrote:
+> On Sun, 24 May 2026 09:12:16 -0700 Breno Leitao wrote:
+> > struct netpoll is shared by every netpoll consumer in the tree:
+> > bonding, bridge, team, vlan, macvlan, dsa and netconsole. The non-
+> > netconsole users only need a per-port handle that lets them transmit
+> > SKBs.
+> 
+> Are any of the Sashiko reports real?
 
-nipa run, 1101209,  failed tree selection for my v9 series and I wanted to 
-share what I found while diagnosing it. I feel this happens on patches, ipsec-next,  
-too.  In the past, I ignored it. Since this patch set is  long series I 
-looked deeper.
+Yes, there are real pre-existent issues reported by Sashiko.
 
-https://patchwork.kernel.org/project/netdevbpf/patch/migrate-state-v9-16-ad9947e4ae74@secunet.com/
-"Guessing tree name failed - patch did not apply"
+> At least one seems legit (parallel device and target removal).
+> If yes we should probably try to fix them before we shuffle the code
+> around?
 
-Looking at the nipa source, series_tree_name_direct() matches the cover
-letter subject against _trees.keys(). Since ipsec and ipsec-next are not
-in the deployed conf_trees, the match fails and nipa falls back to
-guessing against net-next. I am guessing ipsec-next is missing in the config too.
-Where is the config nipa runs use? I didn't find the exact config nipa bot 
-used.
-
-I also noticed that my v8 (series 1089594) was identified as
-net-next — it applied to net-next at the time, which masked the issue.
-v9 no longer applies to net-next, so the guessing failed visibly this
-time. 
-
-https://patchwork.kernel.org/project/netdevbpf/patch/migrate-state-v8-14-4578fb016965@secunet.com/
-
-Any idea what could be improved? Is it because the e-mails arrive out or 
-order?
-
-Would it make sense to add ipsec and ipsec-next to nipa's [trees] config?
-That way series_tree_name_direct() could match them directly from the
-cover letter subject rather than falling through to guessing.
+Ack, I will get them fixed and them move them around.
 
 Thanks,
-Antony
+--breno
+
+--
+pw-bot: cr
 
