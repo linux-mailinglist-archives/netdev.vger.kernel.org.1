@@ -1,154 +1,234 @@
-Return-Path: <netdev+bounces-292132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292134-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNTGGVKaFmq1ngcAu9opvQ
-	(envelope-from <netdev+bounces-292132-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:16:34 +0200
+	id QMz3FPOaFmq1ngcAu9opvQ
+	(envelope-from <netdev+bounces-292134-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:19:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091D85E051C
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:16:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A42F05E0597
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:19:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF7AC30170B8
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:16:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A7D530075C1
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7A73BF667;
-	Wed, 27 May 2026 07:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2A33B7B9E;
+	Wed, 27 May 2026 07:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="a+wOgIOt";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xaiocjhj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vHk83MI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A94F3BB69E;
-	Wed, 27 May 2026 07:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779866178; cv=none; b=W8UH/4Pvj3nU38OU52Myf1JZjawClUm+SuAyCL3DLtNsMNhbNV8cMrdO5KLAyCKCTXk4i4I/05UDAAnE0A3iF+wym+QH0lnVR4Axq3tNZbpJee0tSROUrFDB6vZ1AJpBU/YyL/IWhTTkSmV8hsyO5V2ReD1nh4Vu5XVvhinJ99o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779866178; c=relaxed/simple;
-	bh=rwbu1JjOlBHSv0oqanc3D6oxYHRDXPMUDaKegJ/YJTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HJqiLF+NjHnKf7FxHgFr40EjONQmepWlDSTksZM60rmvA2oO+dM8lB215ZIIqd2jY4oCtT4EedRFoS8re1Tpusvp/tp8FephbtQA4dffXyPDgwBXnWYlWUzx7+L1/OKatx+bG5NRRLKPav2ZW0Fu41QfJgS2Tu3ZM6HSHZcRg/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=a+wOgIOt; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xaiocjhj; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 27 May 2026 09:16:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1779866175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AH5sgHy+bL5b68ae+ELbUNqD19ikq6EFa5yg38AqiQo=;
-	b=a+wOgIOtR8tATMIwSqFnGqUekgnHtXGzBojGqkoEW+M5zOzgcnio5D0PJemM37FPwkL4SY
-	+K2NODKDBWPZxNRc9VwdQpXFqLwAdCYsJ/evS2wagXg7Nt8mWsmsyval3cKz5WqecNZhCs
-	8kXNG//JvraGIOfvUnlcADv+8KgS+YkJVa3tO69Z9wc14ttlw9gqWLmV7eiyhCI+GLVyH4
-	6m6feRTjZfCZa4D/63uN9zK2MRIXRTa1VK6JocYiqDCOdoLIaNo5AMzYjDkD+KyY7ekP7s
-	kjNH4zdJ19zCg2E8jYsfIRiTVRZrBK0sxvaYqN167RG952xpWSX8oq8daRefpQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1779866175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AH5sgHy+bL5b68ae+ELbUNqD19ikq6EFa5yg38AqiQo=;
-	b=xaiocjhjSqbBXxEeCWqGysVOh90vzHCbKz2tGHHyqWrRuSWGPZMhAQSRGopAKMHdpb7QlT
-	PQlZH3VDU0OahQAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	James Chapman <jchapman@katalix.com>,
-	Tom Parkin <tparkin@katalix.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>, Kees Cook <kees@kernel.org>,
-	netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] l2tp: use refcount_inc_not_zero in
- l2tp_session_get_by_ifname
-Message-ID: <20260527071614.MwD6LIK5@linutronix.de>
-References: <20260523023423.2568972-1-michael.bommarito@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CEF3BB13F
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779866241; cv=pass; b=iDfNA+e4/b3576KhX3VkDpG93nUEXbyXUU3ambfBZkec0W75VdZUIRMhwl4t61WYbX5tfkQy5H4AcTWvvBQI6HQnVmibhPhQv671ZJoUHIugZZerThVO+nB9MbMB0RMZCNAra2k9erH/rk0QahhESotRXxhPWG21ym+xVB9ULp8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779866241; c=relaxed/simple;
+	bh=h6/4cyU0+iEDqAXcOFF9v4MSTX9KGlsR1mXaiuZLTiA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R36Vcd/Pkk6M4IbxCKi0T58dV485zA+TuF7j+iIRkUXn35v+FOM9+qTxeeDSWQ6mFY5HGIQNDUYmyzfYFp2jGHn6XeCCJTnckW5YoNbS3hzKTVQ4JOMvnbXsMGEQQsuay6b5OX6Rjk8zgdM54WyBfweShNb1cOrWzKDfMmrM4Cw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vHk83MI4; arc=pass smtp.client-ip=74.125.82.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-1370417c01cso3062264c88.1
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 00:17:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779866239; cv=none;
+        d=google.com; s=arc-20240605;
+        b=N2212qhfUGjwlOtl6i3yNISMuE6X0zG85i3lJmS25+jIAv8mK/d+JUHo31PPbS2Uim
+         RnoFDoJZuxppU1ofYvhDx0oA/75n/2+k+QaGI/i4ufXp9PCuvWGHPuhigeaTlvSP+DYM
+         1uDiFeS88xSYcXBwjS7VXXaNLC/R3cgkXLzAhCL8ZJIs7vTBZVtyL1B4GEh2AcTdBoKy
+         ioQBXbqSJGSHqLuJMSCH308vtqv8Q2SxDcc09PmHtYKauck7jjxnG8K5u1hkUbc9e//l
+         d3g5bfBOtTDvCKFZdQeIlph40dViK9Yp8YE9e1dHn5GTj/xR1Qup050I0VfIm0/9kKK0
+         QOTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=AFZzotywTi2mLXKZHjn3ab/EXo/jwO28HmrTN0/MGIE=;
+        fh=p4ypDyYcy4lphYzkswodOJ7uPg2+paBfoShnyoxq8sg=;
+        b=c3rU61L6s/ql8pfgek3LDF9BIbvyqsdruMJqUKXglgLhC5VClCeFx4YNxJwqw7XuyI
+         u4zH9nJWmIU+tMSpgZd7LsYSsMIUviQ6cKJ4PYkmoyzQ4GnIlRAgfST4FD7ueCxtLaSR
+         YegdR+oid6AbSpKClfpqR41+Zq6ORkSrE/DUI7oDjx+XQeF7GPBzuwONJ+wmCvwxTmOL
+         ZrJah5e4gFgRUdTpDL6iz1Z535ORE33FvE0gsySXe2SUpwmSEKFTQhXFFsBV8pbkuLjH
+         rTsmKlGo2K8mNjR8rBNLdPRQFCtha4/VOeUxE5XgIPtXzPcRlOEt1CxiHeMP2F+XI2lq
+         T1ag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779866239; x=1780471039; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AFZzotywTi2mLXKZHjn3ab/EXo/jwO28HmrTN0/MGIE=;
+        b=vHk83MI4HeDV1QJX3gfLMHlZr4F6jKwyt/IQHD+d/nlhNPCcjs2jUbr2C91t4XzDPt
+         aObXUoiUDNpCnBjOhRudD8OHTcNnPc1x8q/4BKga+4XhnSNpfoYGOqhtXYBqqUAWBD4i
+         2aEegaDON994LwRhXDB+vF6Yyosyczu4P66Kkw0o0XF50YwXr8IKUpkmvhgR/EhcXDA4
+         YgyzCpyyGB4dccJcoOdzbbUTwLCwVPaV3dfEOCpG0boJuweXsIs3wPr2MfHsKIB2JkE+
+         3ctpIPlIwiNhQFebed7GKXVNTXa+mdF5xcK8SYhfgddwrqvoBUucY6p5bQziGky2qxqn
+         6B0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779866239; x=1780471039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AFZzotywTi2mLXKZHjn3ab/EXo/jwO28HmrTN0/MGIE=;
+        b=MQ1sVIqEOJxYWHQix+oHupW0uLZMl0Ky0bnyD9mDxsNEaAgiI4nMSTgxtrPiCnMX5e
+         k30pYLobC8Ys2u2u1WeS1kQ4bS8HcBiRgAGlI7Swdnhhp39+cn9x2zh5XcOoCeApKv9b
+         zmgRycuRSQcvTCG3nshLKRKZ2MC36QC7m3hET/IlptiPUa4Q1HLSIGP0SSfzRn469kuT
+         wVw/epSSjATFsoWeiABUMolXew6/CtAroRamZl32kkxem650OCyMFBjJQCThX8DW2BTQ
+         YuFjnvBoutElavHIV+h2qHY+kOK5M1muqEHiJRoFL+2dMTGdEPP/SOTMz7rquAs+t+Ef
+         Up1w==
+X-Forwarded-Encrypted: i=1; AFNElJ+Z6wsdb6HWbwMsSzI0MqZcwc/Ok94c6ujUs4lS+MWrcmC7329FkWMya3Hjfo6iI+EAVN/ECY4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTfNAg17yOYJ8KZLyz8b3NdcgFAZfCDDagUoCfuW6YDVTmZBkA
+	Zk26Ui4BpHW/o3tXq8KzQQNwl8ewMXUFGpMm2mb4qhsQkrd5/RWDBKTPi6l+6QGf7wcuuv+xDGy
+	fC1Sz9js4ixE1TXCCLn0x4V0JveOoq0efpF7xwnkD
+X-Gm-Gg: Acq92OFVAFHMvBYifRbo8BrLeeeJNFqsn2q3eh5ShFc0FRJlEMUVFp3gUlViMhYmVzp
+	18xeEG6pxNNJpFy5spCtlACCeOIew6PCtUzSYvKb/uEJQ4EZsn/o0G63Fp3vF8wlWNsnwh/M36X
+	fsE/RYdYaGqKMaVWvxh4MqlsfqcOWL6zYp9fQ7IHvo2LX1fx65lHcH9m5rkvu52QSWvnCrbGg46
+	VFR3T44heUp9VGV9FZykTSc+0hBBeybM2QkKf1qLU9qppisYH7+2/4bHDPiTOWfxGFa5W5onmK0
+	6Fn3NsKWCDOhrvDyjEtCMpTQ1jOJf0gREhyVmi6GrFRwqWE7ad/XzWlqQSQjUQYEzInEqLRMHoh
+	2J7+sd4r++UkhJ0gsmr3p4XegnDE092W/rCvmI1/O9sLzzHpRe0zjEtU8uCCl0Q==
+X-Received: by 2002:a05:701b:2915:b0:130:6904:8c17 with SMTP id
+ a92af1059eb24-1365f8123fdmr4374499c88.18.1779866238318; Wed, 27 May 2026
+ 00:17:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20260527070824.2677331-1-maoyixie.tju@gmail.com>
+In-Reply-To: <20260527070824.2677331-1-maoyixie.tju@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 27 May 2026 00:17:05 -0700
+X-Gm-Features: AVHnY4LuH0mJ82X9RuVeOnxqRkbFBRS9qGgbhqeLwzp4g8sTUSsMdWiSOgMVGog
+Message-ID: <CAAVpQUBKHhj6h5Rke=N9NyeUOPvVB0RKJSr2=HPkUKgAqQA0Bg@mail.gmail.com>
+Subject: Re: [PATCH net] rtnetlink: Require CAP_NET_ADMIN in link netns for changelink.
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	David Ahern <dsahern@kernel.org>, Xiao Liang <shaw.leon@gmail.com>, 
+	Nikolaos Gkarlis <nickgarlis@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20260523023423.2568972-1-michael.bommarito@gmail.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292132-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292134-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,google.com,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 091D85E051C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ip6_tnl.net:url,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A42F05E0597
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-sorry for being late=E2=80=A6
-
-On 2026-05-22 22:34:23 [-0400], Michael Bommarito wrote:
-=E2=80=A6
-> a slab-use-after-free. On PREEMPT_RT local_bh_disable() is a per-CPU
-> sleeping lock and the preemption window is real;=20
-No, it is not but there is a preemption window, yes.
-
->                                                  on stock PREEMPT
-> kernels local_bh_disable() is a preempt_count increment that closes
-> the cross-CPU race in practice (see below).
-
-It might be that the window is not wide open. I don't see why it should
-not trigger on SMP.
-
-> Use refcount_inc_not_zero() and continue the list walk on failure,
-> matching the other session getters in the file. The ifname getter
-> is the only session getter in net/l2tp/ that still uses the bare
-> refcount_inc() pattern; this change restores file-internal
-> consistency. The success path is unchanged.
-
-This is the right change.
-
-> Fixes: abe7a1a7d0b6 ("l2tp: improve tunnel/session refcount helpers")
-
-This simply removes the wrapper but the logic is the same. Wouldn't
-commit 2777e2ab5a9cf ("l2tp: take a reference on sessions used in
-genetlink handlers") be where it was introduced?
-
+On Wed, May 27, 2026 at 12:08=E2=80=AFAM Maoyi Xie <maoyixie.tju@gmail.com>=
+ wrote:
+>
+> Commit 11b326fb0a37 ("ip6: vti: Use ip6_tnl.net in
+> vti6_changelink().") made vti6_changelink() and vti6_update()
+> mutate the vti6 hash of the device's creation netns. The
+> rtnetlink path into changelink never checks CAP_NET_ADMIN
+> against that netns. The only capability check on the link netns,
+> netlink_ns_capable() against link_net->user_ns, runs solely when
+> the RTM_NEWLINK message carries IFLA_LINK_NETNSID. A plain
+> "ip link set <name> type vti6 ..." does not carry it.
+>
+> So an unprivileged user holding a migrated vti6 device can
+> rewrite an entry in the creation netns vti6 hash. They pick the
+> endpoint addresses. Commit 8b484efd5cb4 ("ip6: vti: Use
+> ip6_tnl.net in vti6_siocdevprivate().") already closed the
+> SIOCCHGTUNNEL path. This patch closes the RTM_NEWLINK path.
+>
+> Other link_types are affected too. Any type that publishes
+> get_link_net and whose changelink touches t->net has the same
+> gap: ipip, gre, sit, ip_vti, ip6_tnl, ip6_gre, xfrm_interface.
+>
+> Check netlink_ns_capable(CAP_NET_ADMIN) against the device's
+> link netns before dispatching to rtnl_changelink(). Types
+> without get_link_net are unaffected. The newlink path has long
+> checked capability in the link netns. The changelink path never
+> did.
+>
+> Reported-by: Xiao Liang <shaw.leon@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CABAhCOSzP1vaThGV35_VnsRCb=3D87_CP=
+jPVsTHbq905k8A+BuUg@mail.gmail.com/
+> Fixes: 06615bed60c1 ("net: Verify permission to link_net in newlink")
 > Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-=E2=80=A6
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+> ---
+>  net/core/rtnetlink.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index df042da422ef..ac7a3bf438d5 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -3969,8 +3969,26 @@ static int __rtnl_newlink(struct sk_buff *skb, str=
+uct nlmsghdr *nlh,
+>                 dev =3D NULL;
+>         }
+>
+> -       if (dev)
+> +       if (dev) {
+> +               /* changelink may mutate the link's creation netns.
+> +                * rtnl_link_get_net_capable() above only checked
+> +                * tgt_net. When the creation netns differs, also
+> +                * require CAP_NET_ADMIN there. Otherwise a migrated
+> +                * device lets a caller with caps only in its current
+> +                * netns mutate the creation netns.
+> +                */
+> +               if (dev->rtnl_link_ops && dev->rtnl_link_ops->get_link_ne=
+t) {
+> +                       struct net *dev_link_net;
+> +
+> +                       dev_link_net =3D dev->rtnl_link_ops->get_link_net=
+(dev);
+> +                       if (!net_eq(dev_link_net, tgt_net) &&
+> +                           !netlink_ns_capable(skb, dev_link_net->user_n=
+s,
+> +                                               CAP_NET_ADMIN))
+> +                               return -EPERM;
 
-Sebastian
+Do all other callers of ->get_link_net(), dev_get_iflink_dev()
+and batadv_getlink_net(), require the same capability check ?
+
+
+> +               }
+> +
+>                 return rtnl_changelink(skb, nlh, ops, dev, tgt_net, tbs, =
+data, extack);
+> +       }
+>
+>         if (!(nlh->nlmsg_flags & NLM_F_CREATE)) {
+>                 /* No dev found and NLM_F_CREATE not set. Requested dev d=
+oes not exist,
+> --
+> 2.34.1
+>
 
