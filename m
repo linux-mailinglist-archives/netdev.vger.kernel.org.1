@@ -1,67 +1,103 @@
-Return-Path: <netdev+bounces-292279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGt8OH/oFmruvgcAu9opvQ
-	(envelope-from <netdev+bounces-292279-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:50:07 +0200
+	id QPl7HQLkFmpIvAcAu9opvQ
+	(envelope-from <netdev+bounces-292274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:30:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75D275E466D
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:50:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F575E434B
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:30:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2D30130059A1
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:50:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7325F310625D
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5203D1CDB;
-	Wed, 27 May 2026 12:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4093F39E5;
+	Wed, 27 May 2026 12:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2PxTaZ1"
+	dkim=pass (2048-bit key) header.d=northecho-dev.20251104.gappssmtp.com header.i=@northecho-dev.20251104.gappssmtp.com header.b="RqnP3vL/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF12261B92;
-	Wed, 27 May 2026 12:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06713F5BC4
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 12:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779886204; cv=none; b=XWM3lpr3c2fSlBWm4uJunrS1agg0iub7J+QWEQQJ9M/1DrQX651i1avYUtmo23il5S2SkdXvT3EqJH0lhCMHmhJy368ibBAEr1+YCrG0mY61eyztOYUabMck5PYX5TNWcj/Pj3yNY67Uw7jmHZi6pcZXW+KZfUbIvXqeAUSCumo=
+	t=1779884710; cv=none; b=YNOIJgWFdfHXNJe7XBP4jj8+Wj+7GdcW08LJPMo8aHaU8PkkADdeHXJLR9LFbZuZooFxSeDDko6VaC4wxsjZOVWTsDwEuX13CWHHa4cGwuzT24/agzRbZJ/mk05MtoFoEH/ibXaRW2zlKKh74lCmsxgG/lfv1RNsmgGO6CKzdQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779886204; c=relaxed/simple;
-	bh=OqrCutP3sa8S9NK1xPuRxZiBxJMgnAMIlpJLT3lcUDU=;
+	s=arc-20240116; t=1779884710; c=relaxed/simple;
+	bh=mjwGIZ2kZHJmgR3R62XVlxDdBSkKuWbIdCvpQcxxNzk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XEZerf7Y2Cf5wqWWsxgeYEH9HnrHpRkSiZmqUq2QnHTmJjYv6tZWmivlo9WjMHg1XDPVeVPELtsxhfR4uJ7KdOkPJScyfvz+roiE7ERMDuqtOk7E9dsfYDeKHg8jfHoul+cgAh3uYzYqA8BnKgkrcRxDOfwcoUWHjM6z4CX5pAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2PxTaZ1; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46AE91F000E9;
-	Wed, 27 May 2026 12:50:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779886202;
-	bh=zxfX9VkuEdLPouDhpnJyfdIJmhG99thSuKPPL/NwenE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=B2PxTaZ1+TMceB/RYfaGG5qL+c3ClCUAnXODPH0cqzmqfFKSLBhtotW/SmnL5qS1V
-	 xuPVsPK2kupf18hMC8l3X8weWP0Kz86d14zcmNV84LyW8o3hbtDCmS5lU+qI4wRNqv
-	 LIEFqM0m4M0MUhd0NqewUJubOYylA5PlG3OBp1l1LA87hkc1PIJnydv87tQx9lx39B
-	 SNEUUtx6RFMaFYkWsR0COUqVxRrBGrLYv/5Y91lVzj0N6zsHuEthnVMpE7HPDAC3xQ
-	 RzNWIo3FhdKFm3rjzX7vZBVccHT9FIZGqGNhLY10OpIfR2x5QT5Le3YGnSkisgvd6H
-	 h7KpN5uOKrTqg==
-From: Simon Horman <horms@kernel.org>
-To: github@szelinsky.de
-Cc: 'Simon Horman' <horms@kernel.org>,
-	o.rempel@pengutronix.de,
-	kory.maincent@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	 MIME-Version; b=lKATEGYSExb2ziBQvbP7/CVbO3RkqAPozZR0/nQJpZovy75sHdGjlPB3c5YLIDYFmi0S5JHQ56CDsE02CaaOa8M9ElTziZqXRGBrwnAiTqGenziUSXaMn/PCK36jyzGqKQiyjLOCD7K4sCibG5TLnq2uMhYrJb1yr+CJudvnuEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=northecho.dev; spf=none smtp.mailfrom=northecho.dev; dkim=pass (2048-bit key) header.d=northecho-dev.20251104.gappssmtp.com header.i=@northecho-dev.20251104.gappssmtp.com header.b=RqnP3vL/; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=northecho.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=northecho.dev
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-48584e7bd2bso302668b6e.2
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 05:25:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=northecho-dev.20251104.gappssmtp.com; s=20251104; t=1779884708; x=1780489508; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OOs/E8rK/exLB/8Zk3Pk8ZyyhyccLxwjQ0Syjke79QM=;
+        b=RqnP3vL/pYGXLZQpnic5o7jfnMb0U7HkWjm2FQW1jsO01TdtGYcKMy4ZHpcsZb1Ycy
+         jiKy35rI5r2hgx+gAtTC8b3a38Qdaf/JFq1Uof2Yg9qsBjgGVqsouKpZbYNqznCDsc1J
+         jWIrb309XqqfCmy6zcGemXybFEfAdPoiFoKb7D+VsLSKIZ+I1iDwTBKQogpX3pPU88BL
+         Q77sjKCU0oyq4/FXhYplL1k1Qihnnp1VOsBw0ayiIj3imdsDCMlXWVnw/ZDhwL+J1/2l
+         fragFjpF3oxlQYeqPOtB3/jflGJ2qxqQiF4XLSDyAAo+r6KKBVxCtsWnnCt2WJbCGfwl
+         h0pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779884708; x=1780489508;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OOs/E8rK/exLB/8Zk3Pk8ZyyhyccLxwjQ0Syjke79QM=;
+        b=pn6nU7VYIrsdRsC53+a1kMT7q3898LNLyswRW2tINxSAoykbpGspTPCKxRx9DQIuvP
+         aXe2lz3coUdKJpitlAnX0ZG9y9vXOicHkAYDownGpDsEu8ugzIRw3WwLkdjptI38oCfF
+         4hNEi4o7KtgBxxcYuaTKZy5kTJjNUq/76THEbxjDrDCLiLEFhSyLFwp1Zdi945x9/2iP
+         J2/8Xn8wb7fuZOdVRmzO4mgfEZR8FF2pFmIMfPwwV0zeyobDLnN9m1gik+430ahgr2dQ
+         X5zed/0gtAD8gOtboZXMEkQX3/o6Jz805+LctXTJsJ4vTqqw2k/RBipPiI1r5J1b3NGn
+         txew==
+X-Forwarded-Encrypted: i=1; AFNElJ96YLSx0QU6Z37tYOUPk0ktc48X0EdPK9IjEQ7a9762ytMyi7j5PwBuVNQpjVDy+SNmdtB5QfY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuhmLwcQ3++euTFR0ZCGJMo8fGPOdAp6G30iLv1kos5N7SU62q
+	d36wbrOA3be0NRvcKGhSYiKv+QMIC16AbkaaH9UMy0moTUWx+BkX2Gh1re63qYRx9oXT
+X-Gm-Gg: Acq92OEGvfbMzNfT0hKJ+IOTB+CLGksU9N1ygRfiPRrxnGcv0r82LOtsx+ClGGMbNFJ
+	vtf+MFjWRYcGzhKNgLB0PhSvG2VIN2/64UlLdIulXmtm3xfOY/iQIHVzICTd0vuXkHEzU6mvNcz
+	j+xqrc6Ez07Y+8rJhua5pBHLEwspWsjJ4Q78swaTrrB8Mty0YbKp4r3KWWFC6/94vLEIGVLE0ry
+	yFz5WzraUp55TmL6wfJHzRb/nZThZ/dei7ctGVxA9zjOe1zyAP9au0NEN8ge8wh1D2ca0B/d6Hp
+	Ujl3yMCRnVJ4faEQ8+kWvNDcY7NX+rnext9yQ7lmf50gnzXDotzhsVR4V90UocXZ83daWN2D+U7
+	8DeoAeuvIkXet5Gm9Ysq5YKvMk0+yK1WJ74nbGAnPjTKAszaTcdc68Vw0WuQunSZCYiPcFm1rxq
+	2RCsG/MjZxDZELniUnT1qjjpOeRko1/e+lhi/08TvKv0WhERmeaXFE/Afnr/8a0vGdDwX0BsM6Y
+	P0EBypzn+Aj7Tk=
+X-Received: by 2002:a05:6808:1523:b0:479:f928:44dd with SMTP id 5614622812f47-48549ecff8amr7221156b6e.1.1779884707715;
+        Wed, 27 May 2026 05:25:07 -0700 (PDT)
+Received: from kelso.tail8e61da.ts.net (99-10-92-174.lightspeed.rlghnc.sbcglobal.net. [99.10.92.174])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-485b5f0661bsm1475842b6e.13.2026.05.27.05.25.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 05:25:06 -0700 (PDT)
+From: Christopher Lusk <clusk@northecho.dev>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net: pse-pd: guard against freed PI data on regulator disable
-Date: Wed, 27 May 2026 13:24:19 +0100
-Message-ID: <20260527122418.2410341-2-horms@kernel.org>
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net: tls: use sync AEAD for sk_msg BPF sockets
+Date: Wed, 27 May 2026 08:24:54 -0400
+Message-ID: <20260527122454.66639-1-clusk@northecho.dev>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260524223306.2570676-3-github@szelinsky.de>
-References: <20260524223306.2570676-3-github@szelinsky.de>
+In-Reply-To: <20260526161101.691d4cb7@kernel.org>
+References: <20260526025154.60607-1-clusk@northecho.dev> <d92bc603-e345-4dee-9ae9-6ad45e4e6642@linux.dev> <20260526161101.691d4cb7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,175 +105,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[northecho-dev.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-292274-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292279-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[northecho.dev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[clusk@northecho.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[northecho-dev.20251104.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 75D275E466D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,northecho-dev.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: E0F575E434B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Tue, 26 May 2026 16:11:01 -0700 Jakub Kicinski wrote:
+> module params aren't a great API. If we want to deprecate it let's just
+> remove the integration in net-next. You have my vote..
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-Subject: net: pse-pd: guard against freed PI data on regulator disable
+Happy to draft the net-next removal series if that's useful.  Let
+me know the scope you'd like (sk_msg verdict path in tls_sw.c +
+the sockmap-attach side + selftest cleanup; or a wider sweep),
+and whether the stable trees should get a narrower fix as a
+separate backport for the 4.20+ tail.
 
-This patch closes a use-after-free reachable from the regulator core's
-deferred-disable flush during driver detach by clearing pcdev->pi after
-freeing it in pse_release_pis() and bailing out in pse_pi_disable() when
-pcdev->pi is NULL.
-
-> diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-> index 1f27884dd4d7..752d987a7004 100644
-> --- a/drivers/net/pse-pd/pse_core.c
-> +++ b/drivers/net/pse-pd/pse_core.c
-> @@ -145,6 +145,7 @@ static void pse_release_pis(struct pse_controller_dev *pcdev)
->  		of_node_put(pcdev->pi[i].np);
->  	}
->  	kfree(pcdev->pi);
-> +	pcdev->pi = NULL;
->  }
-
-[High]
-Is the pcdev->pi = NULL store correctly synchronized with the readers?
-
-The reader side in pse_pi_disable() observes pcdev->pi under
-pcdev->lock:
-
-    mutex_lock(&pcdev->lock);
-    if (!pcdev->pi) {
-            mutex_unlock(&pcdev->lock);
-            return 0;
-    }
-
-But pse_release_pis() does the kfree() and the NULL store without
-acquiring pcdev->lock, and pse_controller_unregister() does not wrap
-the pse_release_pis() call with that lock either:
-
-    void pse_controller_unregister(struct pse_controller_dev *pcdev)
-    {
-            pse_flush_pw_ds(pcdev);
-            if (pcdev->irq)
-                    disable_irq(pcdev->irq);
-            pse_release_pis(pcdev);
-            ...
-    }
-
-In the LIFO devres scenario described in the commit message, the later
-regulator_unregister() does flush_work() on the deferred disable, which
-provides the necessary memory barrier, so that specific case is fixed.
-
-However, regulator consumers in other drivers (PHY/MAC) hold a
-struct regulator * to a PSE PI and can call regulator_disable() (which
-may take the pse_pi_disable() path directly) on a different CPU,
-concurrent with the unbind path running pse_release_pis() on this
-device.
-
-That concurrent reader can take pcdev->lock and observe pcdev->pi as
-still non-NULL while pse_release_pis() is concurrently kfree()-ing the
-array, leading to a UAF in the subsequent _pse_pi_disable(pcdev, id)
-and pcdev->pi[id].admin_state_enabled = 0 dereferences.
-
-Would taking pcdev->lock around the kfree()+NULL store in
-pse_release_pis() (so the NULL observation under pcdev->lock is
-authoritative) close that window? Alternatively, can the regulator
-unregister be ordered to run before pse_release_pis() so no consumer
-can invoke a regulator op while the PI array is being torn down?
-
-> @@ -702,15 +703,21 @@ static int pse_pi_enable(struct regulator_dev *rdev)
->  static int pse_pi_disable(struct regulator_dev *rdev)
->  {
->  	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
-> -	struct pse_pi *pi;
->  	int id, ret;
->  
->  	id = rdev_get_id(rdev);
-> -	pi = &pcdev->pi[id];
->  	mutex_lock(&pcdev->lock);
-> +	/* The controller may already be unregistered (pcdev->pi freed) by the
-> +	 * time the regulator core flushes a deferred disable during
-> +	 * regulator_unregister(). Bail out to avoid touching freed PI data.
-> +	 */
-> +	if (!pcdev->pi) {
-> +		mutex_unlock(&pcdev->lock);
-> +		return 0;
-> +	}
->  	ret = _pse_pi_disable(pcdev, id);
->  	if (!ret)
-> -		pi->admin_state_enabled = 0;
-> +		pcdev->pi[id].admin_state_enabled = 0;
->  
->  	mutex_unlock(&pcdev->lock);
->  	return 0;
-
-[High]
-Should the same NULL guard be applied to pse_pi_is_enabled() and
-pse_pi_enable()?
-
-Both callbacks follow the identical pattern as the disable path:
-rdev_get_drvdata(rdev) -> mutex_lock(&pcdev->lock) -> unconditional
-pcdev->pi[id].* access.
-
-In pse_pi_is_enabled():
-
-    id = rdev_get_id(rdev);
-    mutex_lock(&pcdev->lock);
-    if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[id].pw_d)) {
-            ret = pcdev->pi[id].admin_state_enabled;
-            ...
-
-And in pse_pi_enable():
-
-    id = rdev_get_id(rdev);
-    mutex_lock(&pcdev->lock);
-    if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[id].pw_d)) {
-            if (pcdev->pi[id].isr_pd_detected) {
-                    ...
-            }
-            ...
-
-The lifetime invariant cited in the commit message ("the controller
-may already be unregistered by the time the regulator core flushes...")
-is a property of the LIFO devres unwind order in which
-pse_controller_unregister() runs before the devm-registered regulators
-are torn down.
-
-While regulator_unregister() only flushes disable_work, regulator
-consumers in other drivers that hold a struct regulator * to a PSE PI
-can still call regulator_is_enabled() or regulator_enable() concurrent
-with the in-progress pse_controller_unregister() on the parent device.
-At that point pcdev->pi may already be NULL/freed and the unguarded
-pcdev->pi[id].pw_d / pcdev->pi[id].admin_state_enabled dereferences
-would be a UAF or NULL deref.
-
-Should these two callbacks receive the same guard, or alternatively
-should the unwind order be changed so that no callback can fire after
-the PI array is freed?
+Christopher
 
