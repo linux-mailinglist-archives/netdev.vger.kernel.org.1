@@ -1,103 +1,133 @@
-Return-Path: <netdev+bounces-292009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292010-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OCffAvM6FmpCjgcAu9opvQ
-	(envelope-from <netdev+bounces-292009-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:29:39 +0200
+	id eBHNA2U7FmpCjgcAu9opvQ
+	(envelope-from <netdev+bounces-292010-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:31:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC325DDF29
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:29:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2014B5DDF70
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7961E301547A
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:29:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6086B30158A8
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 00:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280EC211A14;
-	Wed, 27 May 2026 00:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B6A2EF652;
+	Wed, 27 May 2026 00:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QKnsmo4b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NshWSS4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2562127453;
-	Wed, 27 May 2026 00:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CF32DB7B4;
+	Wed, 27 May 2026 00:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779841749; cv=none; b=hzH5ynTTfnQ+HJGE02LebtSKzHNLzr7yT1+H0tt216Mf4cqNG1ncIrnQuazDUh/Hxry2EYVy3pyD7Nh+WG8avrpkpoSmDUj578V1Rz46TTYAcz/dQ1fVKvxDMCrXAtpfzHusEJIVOgUjWG+pzYLKexIVJQR2D/dDzbMkEWQzTaY=
+	t=1779841807; cv=none; b=gOnXd2HyQEfR/If7grJN8+5FC8vb6o37cYr0/qbNLuYfat30zD+hOv9KzDxL8YVVdss9DmfD1Q81ZDw+JEqurd/QFq53DdG0cfq93cChO6P0iPpA6fPabCuL5ekNUldKOhv6xqtsThoPsoScgfN/Zat9QqzP3rs+2VGWtTHY6dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779841749; c=relaxed/simple;
-	bh=QtQXhD3FjA7lG+NqovvqFT7aX9bjY8XQu5/RLsllP1E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oDMq93jATUXmFGAlU86T1xOgdFIsYVZvAx9Fq7CeePxYHRxvMEU62WOTtAb5ayZoRxzNfaSufJmIkgktyYst2qSm+SsVuYrlR1ITfgvFGEGlOBnjpB1yoTkofWnc1xlMD1CrhBeJum8RfSwxwwaYo2CCslS+PLmzctiNkViGMTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QKnsmo4b; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E1131F000E9;
-	Wed, 27 May 2026 00:29:07 +0000 (UTC)
+	s=arc-20240116; t=1779841807; c=relaxed/simple;
+	bh=wp3Tl5CZ+2Ak2nsfCtU4+boSUsUxsqPfF9/tXoZCZ9Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CqYKdn2/QuQVd/eSsef9f9gfhuxLbUNO40y2GSg7BmRPPmRanDTmHwYWifNFN6jTDZFSaLyvR+rrcCoHE1yEnmA0W9uy4Ec3gi5QKs5IVzSUvfqq7c5SlAwfe9ItBnWp0R6fIWrFyKu0bfHBlE8GMYTqtiDIQ8F798OPsnBQTmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NshWSS4r; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 613481F000E9;
+	Wed, 27 May 2026 00:30:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779841747;
-	bh=QtQXhD3FjA7lG+NqovvqFT7aX9bjY8XQu5/RLsllP1E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=QKnsmo4b/6zMV0mkv+rvST9R8KyPjyijjUILTQZqUKAVwWiLCoFQyDwhBSTnjxJFW
-	 JDLqGjsK/Ycb3WgLeB4UeBz9wmvGgNNA42ND0U/DAOAMXx3aJ7TG5KpDzY+6sTLTBU
-	 n3ddztZiNfSvts7dYkNe3aUXnecFuFMhTmFrNLiWm8knZKSa8KWJXkvSJ60BJi/dX2
-	 Md38SwGrnHNG45m2QV0Az2trk137ahdLi7lkhO/Ywjz5y1/NNEi5qPJVdUS9sMAls5
-	 aWOHhT8TcNXbP3SOTNpetqQS9SMyYF7UPWS6IdhNbyy5rCuDYFLwAtz1ZVVVGxzlUy
-	 45ulIgfETU3sw==
-Date: Tue, 26 May 2026 17:29:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next] net: fec_mpc52xx_phy: Add missing
- MODULE_DESCRIPTION()
-Message-ID: <20260526172906.39128273@kernel.org>
-In-Reply-To: <20260522233231.45609-1-rosenp@gmail.com>
-References: <20260522233231.45609-1-rosenp@gmail.com>
+	s=k20260515; t=1779841806;
+	bh=1Z60F6cDVz3kodQ30SO9yMH87eRiv640ER6fhZmMojY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=NshWSS4rinS2kuC7P2tPqV3mbRosme42bFKpCOjYrcCIqRwZp4CZijKvGc6J365ys
+	 JuNmiteSLhoAc16OE71ttAuYcvh1rZHJ461dmPipvfl+fJ4fEcDLvuP2kDJbAU0V2P
+	 En7qCh08cm/zvBg3usEtMaW+Cqqs4zeF7RtFZGDLdCOeycRb2ld6rpCLfRby8LAAUU
+	 mL7d/U7CAr/s2H1PrdQItBXvXBlgL58BNaRfuJWnP58/loAVgLQunULHZbrYcEpWAb
+	 cuRHuhac/TKrxI+rKV7aex2CgIbGiXWv8FX6ksD/J1YE6jHC8kZwev3pgEjXXD8Ff7
+	 NRnpD7+1WuYHw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56B3F380CEED;
+	Wed, 27 May 2026 00:30:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/2] Add OVS packet family YNL spec and
+ unicast
+ notification support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177984181194.4027067.4872626990615141837.git-patchwork-notify@kernel.org>
+Date: Wed, 27 May 2026 00:30:11 +0000
+References: <20260522174154.720293-1-houminxi@gmail.com>
+In-Reply-To: <20260522174154.720293-1-houminxi@gmail.com>
+To: Minxi Hou <houminxi@gmail.com>
+Cc: netdev@vger.kernel.org, donald.hunter@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ aconole@redhat.com, linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292009-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292010-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9AC325DDF29
+X-Rspamd-Queue-Id: 2014B5DDF70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 22 May 2026 16:32:31 -0700 Rosen Penev wrote:
-> +MODULE_DESCRIPTION("MPC52xx FEC MDIO driver");
+Hello:
 
-bus driver?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 23 May 2026 01:41:52 +0800 you wrote:
+> This series adds a YAML netlink spec for the OVS_PACKET_FAMILY genetlink
+> family and a bind-only ntf_bind() helper for receiving unicast
+> notifications.
+> 
+> Changes in v5:
+> - rebase on net-next to resolve conflict with Ilya Maximets'
+>   ntf_listen_all_nsid() (requested by Jakub Kicinski)
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v5,1/2] netlink: specs: add OVS packet family specification
+    https://git.kernel.org/netdev/net-next/c/b82bfddc46e2
+  - [net-next,v5,2/2] tools: ynl: add unicast notification receive support
+    https://git.kernel.org/netdev/net-next/c/b74e71b6a986
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
