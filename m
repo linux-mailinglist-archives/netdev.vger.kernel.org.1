@@ -1,283 +1,313 @@
-Return-Path: <netdev+bounces-292167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gJjeFxyoFmrEoAcAu9opvQ
-	(envelope-from <netdev+bounces-292167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:15:24 +0200
+	id UPVnJWqmFmoOoAcAu9opvQ
+	(envelope-from <netdev+bounces-292164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:08:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661EC5E0F0E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:15:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 839035E0DA2
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:08:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 58B013006821
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:15:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86E993012262
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB0B30B533;
-	Wed, 27 May 2026 08:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140913B7768;
+	Wed, 27 May 2026 08:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="P0pOriXP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SajTCLMV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB933D412A;
-	Wed, 27 May 2026 08:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B3C3BF69A
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 08:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779869719; cv=none; b=gEakJK5CDoCCySCVjkPg7XYV7MeAvWbpF1/yblhaiMTeUl1ZusCh7VlTmNdw9ppQs2u2fSjDfiG+9yxVLk+XgTyw9/TQL7HhGqKKB89AigrYulVzp05wT1ZLX0xKEHOU739u84ZSCarPtJXen+/D5PJL16FB0AmWkcGFWYAlZw4=
+	t=1779869237; cv=none; b=IN+GCyRG1PN5gFTg+0unvlb1+We9uaRMP9qAe49ZvACs5twRQjzVf7g8KmPfLrr+54bOiDGkvG3+pUvPRKvLB5GqnajSkHC0ezzIjU7Q+yTGmIKz+e7TFAhGJlzuteADWSF2IQIhhpXNB9bD+sNJHLj0gUthxcFIE3echgVykpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779869719; c=relaxed/simple;
-	bh=awyugumM3qo46MIVZx+zXmGVa3RYVUzF2YfyxbAk7kY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AXIdEi7zU/8RxkC9zl48ww3pTf9ridGqtJjHg9AqFKD3K9e9zyVLHU9iISd327Mvpdba2IvVmyt4rTC2Oy/6L/5H8P9HLblOEzpf37SdbtbvFJle2g9V4AHw2IWYt+3hHdhLdLoexYyU5ZjS5iyEyvKgoMv+LYM6Mzpm1/4leM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=P0pOriXP; arc=none smtp.client-ip=212.227.17.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
-	s=s1-ionos; t=1779869712; x=1780474512; i=simon@schippers-hamm.de;
-	bh=f3Lohq8QkJslkmRARTq1SuDTwuwePjcsabJjeIQHvZM=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=P0pOriXPUIl8XqZW7PJmHjFxAGPiLg5BQRXTX1/REAqj45p8HfEhk60t2smMaWfu
-	 nYWbK2tNyvhGa2sMMeIhQtDpWiQRCoH67uEq05qvOYx7rxWefETTU5G9TMo29bDso
-	 s6aaAkwChL8ZmNKkUs06JHeoxvKNXelDdsp89+4hx5UiCNDNKR+BluGtV69fLuU/X
-	 O6Pqw+B0uOuplCM3vLG7DRSEG31SYaPVyWKqgmEorb7ko5QN+nf0QSG61ywGKBFFU
-	 dNc1xd+v0Ky7LiUIZWoNRSdTuYiT9ytGzMQEjA0T+RBKn6BYTXqO21snoa5yZnjeP
-	 n7YV+tyVJyYT85WgJA==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
- [212.227.15.153]) with ESMTPSA (Nemesis) id 1M1ZQT-1wU5G93wHT-005ELU; Wed, 27
- May 2026 10:00:07 +0200
-Message-ID: <ab6f0519-0b87-4b57-9a35-92edf3fd7f5a@schippers-hamm.de>
-Date: Wed, 27 May 2026 09:59:56 +0200
+	s=arc-20240116; t=1779869237; c=relaxed/simple;
+	bh=pf0LKLzwVWXDhWNsiU8NvDk5jh6olD3uksGabCLjYMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hG0gdybAUvwPqUJoqJFlHZU2vq0uqrbleQ48HFL54ra6sxqQfNGOPHehd00FTH+iYoy4twIt0pyWF1carAL7rN62g6+0LBzNUnNoWnQfkLv3QTMhkjLlIL+80NzxLf6ev8oGicAOCcl0+VdHbPxWhiiUI1tG4DpakSE9b0Fq060=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SajTCLMV; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-485462d9290so3367820b6e.1
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 01:07:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779869234; x=1780474034; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ezb0aPRXiOggaGXZC6UVQiIgRgnViP2vjaDISs1PSDQ=;
+        b=SajTCLMV3cRArxdaPwDT1ki9eELzLOHcjNIn4P5cILFkXCbsQkq4+xVZS8e+yygNsY
+         t+bFIWjh8QaqjdTlqoWT7GprVygIsc0dEy2lW3zZtE7dvMnrcBGRfzg52S7ZNMNo4Wvp
+         QwCii/5WPEHI+TRWT7n3zieju5iPOWWtATYnH3Tn7Rk/bdd8EEiT6YSuQ3FUUC79Ivd0
+         VuzAL7czOPQ5+Dmz/D2cpF9fMNUxRhiF/XL/rmaHj+Jj1PMfN3tvryftZB54NzM/+rJu
+         M54bOKEEY+t04l23Vk332GXfpHT2WKOSLLoKD0hH8JnA+1E7Yr6xbXEylUMvKyRmO4l6
+         G3cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779869234; x=1780474034;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ezb0aPRXiOggaGXZC6UVQiIgRgnViP2vjaDISs1PSDQ=;
+        b=G/dPeZCIE5YEEdI5r9gcOLCT7ARQ/pc5i6uxa8ebT5TlOsoBBPDN+YFE+j3ImR91G7
+         hrnzgxKb3BAYsdoj0Zyr5yM1dVFUghi/OltZKNaHAzywwkuoO8OAVj8Iko802YvhcvkD
+         zKA06UrHjEfTnzIuyEWVbHLgGhJjq2cxgWk0hpl/H0zFb1FZwjN6Vf0tnxM5+BZN9v+O
+         KQ9B7iGENicjaJGFTvEwG4+TQbrrv/NFDZvn3uY6SAaizK4O9skQqZZYhCDNJowN9QN6
+         Y4+VMS8PU9PcFG1wKJUe5XLpt4WUAjhsr9oCegC6w2zygHWwf7U4OwhmvXzdzJj5rnea
+         kxpQ==
+X-Gm-Message-State: AOJu0Yyhsou1luVb/xAu9z34qQxZnTn4g8uUVEoQ/rXwjUu82Mk94NG6
+	0g9QGtjJEuEtqR7z4nnWmHaHJy3o3o+qcDdkMFjwRS1KXLTnDZ09Zt7F/URWBCijlw0=
+X-Gm-Gg: Acq92OGOo2q0ejMr1AcB+zYuLB6xzJCgupP8SXVrjX+5GiixzcVDCRSVGqceSSq1IF6
+	Eo65SaXiy7DVndSt2HdOGh8gYhKY26fPTzHi3Xi31GFzGP/Em2dmYtFxhJHkWka9fR9Cfp4pxBA
+	/Pc/L6TeUxcT+IcZBopzyw5g5/c6AreNv+pfZllEoJrYOiKBfgWdBE73CjrDfGnFpbIRvtP3pyJ
+	sKy+lw2KL2OB03kF8m/IYazK9tC7/hnEsWujjefem+6EtmpCGD8zcRTzN7H8G40mFqi6J0e3Jhx
+	bTttCzgtRNykAg9VPh1MMJfsCGCuijmz819k7xvlURLrYxc9rvwlk0cD9uT+gAqQJGktjYVUXDs
+	F1/ASU09bLmjhoCel+eoyBZM4fUtbLK4Q/gl2TG5fRiVID1IXoN8Fu082cNGAJfkc9kIaJWQqxV
+	0NPiwd0Ng1dK673R0=
+X-Received: by 2002:a05:6808:190b:b0:485:4c7f:8f51 with SMTP id 5614622812f47-4854c7f9928mr10670285b6e.25.1779869234293;
+        Wed, 27 May 2026 01:07:14 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b63976dacsm15476676fac.11.2026.05.27.01.06.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 01:07:13 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	davem@davemloft.net,
+	echaudro@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	i.maximets@ovn.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v3] selftests: openvswitch: add dec_ttl action support and test
+Date: Wed, 27 May 2026 16:06:01 +0800
+Message-ID: <20260527080601.615607-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
- =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260505132159.241305-1-hawk@kernel.org>
- <20260510085602.57c7a081@kernel.org>
- <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
- <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
- <b78f002a-8cb9-4857-bf8f-0137e790f644@kernel.org>
- <873511fa-4316-4411-a76b-ec4c5805abd3@schippers-hamm.de>
- <18855e57-f050-411f-9958-d4babcc81ba3@kernel.org>
- <14348957-d061-4124-9bac-45df9cf6686c@schippers-hamm.de>
- <9a57bb41-114e-492b-9eaa-52237675bb7c@schippers-hamm.de>
- <4ae9400a-8919-4ffc-8db3-0c334e2aa462@tu-berlin.de>
- <8e8b877b-a7ce-4b2f-9567-64c8dbb48411@schippers-hamm.de>
- <463e91cb-6c45-4d91-8737-39779fec5a49@tu-berlin.de>
- <b1c2d2c1-a70a-4bf4-baff-d0ac2f878722@schippers-hamm.de>
- <24d10b53-c545-4141-95a5-5c49c35c5d6c@tu-berlin.de>
- <c5b3a7ef-8ec7-4361-80bb-cf06e910350c@schippers-hamm.de>
- <d23fd8e0-a0d3-4197-a130-2340d1c28fe0@tu-berlin.de>
- <e8be86b4-052f-4f4f-9cb9-2fb12d1e8922@schippers-hamm.de>
- <80dc574b-f2da-4f04-8bc8-1b0793b1f296@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon@schippers-hamm.de>
-In-Reply-To: <80dc574b-f2da-4f04-8bc8-1b0793b1f296@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:5rcKy/WcrljJurdI9KzFMNJmeY1XyCnPuqniL3I3Wy7nLTefg3Y
- 5NFTTxgwSUMYfrbz+Oc1+wirmx15tK92MNmcYGrvoUFblBsYAe/npGSoUTiZPdAs15edDVR
- wesIU+iHpE1PsaWEBRl9lDJYzSmR1G3SY14HC19QWVZIi42BBOqBCKdxeZPakcbRuyilOLW
- 89dF4ov+DQ17LzbRU7Rtw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:bWSy5q9ZbcQ=;LhDbvD6KyTDnRg0TM/XlN2A64r0
- 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
- H7Rks3Q/tO9SEeURSW2wbesAJbcbLmfa
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
-	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292167-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,ovn.org,openvswitch.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-292164-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[schippers-hamm.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 661EC5E0F0E
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,openvswitch.sh:url]
+X-Rspamd-Queue-Id: 839035E0DA2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/27/26 09:38, Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 26/05/2026 17.07, Simon Schippers wrote:
->> On 5/26/26 16:55, Jonas K=C3=B6ppeler wrote:
->>> On 5/26/26 4:35 PM, Simon Schippers wrote:
->>>> On 5/26/26 11:54, Jonas K=C3=B6ppeler wrote:
->>>>> On 5/23/26 6:09 PM, Simon Schippers wrote:
->>>>>> On 5/22/26 18:26, Jonas K=C3=B6ppeler wrote:
->>>>>>> On 5/22/26 10:41, Simon Schippers wrote:
->>>>>>>> On 5/22/26 09:14, Jonas K=C3=B6ppeler wrote:
->>>>>>>>> On 5/19/26 10:51 PM, Simon Schippers wrote:
->>>>>>>>>> On 5/12/26 23:55, Simon Schippers wrote:
->>>>>>>>>>> On 5/12/26 15:54, Jesper Dangaard Brouer wrote:
->>>>>>>>>>>>>> Nope, I'm using a bpftrace program to keep track of the inf=
-light/limit
->>>>>>>>>>>>>> in a BPF hashmap.  Reading from /sys will not be accurate.
->>>>>>>>>>>>> Ah nice.
->>>>>>>>>>>> Add the option --hist to have both NAPI and BQL histograms pr=
-inted when
->>>>>>>>>>>> script ends.  This will give you an accurate pattern of how i=
-nflight and
->>>>>>>>>>>> limit evolves.
->>>>>>>>>>>>
->>>>>>>>>>>>>> I moved the selftests into a github repo [1] to allow us to=
- collaborate
->>>>>>>>>>>>>> and evaluate the changes more easily.  I explicitly kept th=
-e new BPF
->>>>>>>>>>>>>> based BQL tracking as a commit[2] for your benefit.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>        [1] https://github.com/netoptimizer/veth-backpressur=
-e-performance-testing/tree/main/selftests
->=20
-> [... cut ...]
->=20
->>>>
->>>> I will wait for your new measurements, but there is no argument
->>>> against a default tx-usecs of ~100us for now, right?
->>> Yes, I think 100us is perfectly fine. I guess most of it was
->>> just my curiosity why the latency values are as they are =F0=9F=99=82
->> Which is great, because I was wondering the same =F0=9F=99=82
->>
->=20
-> Thank you Jonas and Simon for testing this via[1] on your systems.
->=20
-> One performance concern from my side is if/when BQL limit goes below 8
-> packets. This will cause cache-line bouncing and many qdisc requeues
-> between the two CPUs.  Notice that 8 packets for the ptr_ring is one
-> cache-line. This is why I suggested defaulting BQL min_limit to be 8.
-> This would work in combination with the tx-usecs coalesce tuning as a
-> lower bound.
->=20
->=20
->>> But it feels like this will need some documentation, because
->>> as we have seen, some values are a little different
->>> from what you expect from bql. Inflight > veth_ring_size,
->>> tx-usecs not necessarily achieving the configured value,
->>> inflight can get stuck > 0. Wdyt?
->>> But I think it works nicely overall.
->>>
->> Exactly, we should get ready for a v6 soon.
->>
->=20
-> I want to send out a V6 today (and I'm busy rest of week).
-> I'm simply going to include Simon's patch[2]. Then we can iterate on
-> that email thread, making it easier for people to reply inline to the
-> code changes.
->=20
-> [2] https://lore.kernel.org/all/9a57bb41-114e-492b-9eaa-52237675bb7c@sch=
-ippers-hamm.de/
->=20
+Add dec_ttl action support to the OVS kernel datapath selftest
+framework:
 
-Sure, but please address those 2 nits:
-- replace unlikely(!ring->size) || __ptr_ring_full(ring)
-  with unlikely(__ptr_ring_check_produce(ring))
-- replace ptr_ring_empty() with __ptr_ring_empty()
+  - Add dec_ttl nested NLA class to ovs-dpctl.py with proper
+    OVS_DEC_TTL_ATTR_ACTION sub-attribute handling
+  - Add parse support for dec_ttl(le_1(<inner_actions>)) action
+    string, consistent with the odp-util.c format where le_1()
+    holds the actions taken when TTL reaches 1
+  - Add dpstr output formatting for dec_ttl actions
+  - Add test_dec_ttl() to openvswitch.sh that verifies:
+    * Normal TTL packets are forwarded after decrement
+    * TTL=1 packets are dropped (TTL expiry)
+    * Graceful skip via ksft_skip if kernel lacks dec_ttl support
 
-Apart from that I think the code is fine.
-Just the commit messages need changes but we can adapt them later.
+The dec_ttl class uses late-binding type resolution to reference
+ovsactions for its inner action list, avoiding circular references
+at class definition time.
 
->> And I think we should move the BQL logic into a seperate .h file
->> as a library. Then it is also usable for TUN/TAP in the future.
->>
->=20
-> I like the idea, but refactoring into a library seems out-of-scope for
-> this patchset.  As a first step, let us see if this works for veth
-> driver use-case.  I do encourage Simon to refactor when doing the work
-> for TUN/TAP in the future.
+Signed-off-by: Minxi Hou <houminxi@gmail.com>
+---
+v3: rename NLA class from DecTtl to dec_ttl (snake_case), consistent
+    with psample, push_vlan, ctact and other nested nla classes in
+    ovs-dpctl.py
+v2: use dec_ttl(le_1(...)) format, consistent with odp-util.c
+    (suggested by Aaron Conole)
 
-Okay, fair point. I do not have a problem with that.
+ .../selftests/net/openvswitch/openvswitch.sh  | 55 +++++++++++++++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 37 ++++++++++++-
+ 2 files changed, 91 insertions(+), 1 deletion(-)
 
-I did this split in [1] but we can ignore that for now.
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 8cd5b3d894ab..3f0e437c34bb 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -29,6 +29,7 @@ tests="
+ 	tunnel_refcount				ovs: test tunnel vport reference cleanup
+ 	drop_reason				drop: test drop reasons are emitted
+ 	pop_vlan				vlan: POP_VLAN action strips tag
++	dec_ttl					ttl: dec_ttl action decrements IP TTL
+ 	psample					psample: Sampling packets with psample"
+ 
+ info() {
+@@ -245,6 +246,60 @@ usage() {
+ }
+ 
+ 
++test_dec_ttl() {
++	sbx_add "test_dec_ttl" || return $?
++	ovs_add_dp "test_dec_ttl" decttl || return 1
++
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "test_dec_ttl" "decttl" "$ns" \
++			"${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
++
++	ip netns exec client ip addr add 10.0.0.1/24 dev c1
++	ip netns exec client ip link set c1 up
++	ip netns exec server ip addr add 10.0.0.2/24 dev s1
++	ip netns exec server ip link set s1 up
++
++	# Probe: check if kernel supports dec_ttl action.
++	ovs_add_flow "test_dec_ttl" decttl \
++		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++		'dec_ttl(le_1())' &>/dev/null
++	if [ $? -ne 0 ]; then
++		info "no support for dec_ttl - skipping"
++		ovs_exit_sig
++		return $ksft_skip
++	fi
++
++	ovs_del_flows "test_dec_ttl" decttl
++
++	# ARP flows (bidirectional)
++	ovs_add_flow "test_dec_ttl" decttl \
++		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_dec_ttl" decttl \
++		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++
++	# IP flows with dec_ttl action
++	ovs_add_flow "test_dec_ttl" decttl \
++		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++		'dec_ttl(le_1()),2' || return 1
++	ovs_add_flow "test_dec_ttl" decttl \
++		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
++		'dec_ttl(le_1()),1' || return 1
++
++	info "verify connectivity with dec_ttl"
++	ovs_sbx "test_dec_ttl" ip netns exec client ping -c 1 -W 2 \
++		10.0.0.2 || return 1
++
++	info "verify TTL=1 is dropped by dec_ttl"
++	ovs_sbx "test_dec_ttl" ip netns exec client ping -c 1 -W 2 \
++		-t 1 10.0.0.2 >/dev/null 2>&1 \
++		&& { info "FAIL: ping should fail with TTL=1 and dec_ttl"
++		     return 1; }
++
++	return 0
++}
++
+ # psample test
+ # - use psample to observe packets
+ test_psample() {
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index 3b6a26e265a4..be9e324be12a 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -388,11 +388,19 @@ class ovsactions(nla):
+         ("OVS_ACTION_ATTR_CLONE", "recursive"),
+         ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
+         ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
+-        ("OVS_ACTION_ATTR_DEC_TTL", "none"),
++        ("OVS_ACTION_ATTR_DEC_TTL", "dec_ttl"),
+         ("OVS_ACTION_ATTR_DROP", "uint32"),
+         ("OVS_ACTION_ATTR_PSAMPLE", "psample"),
+     )
+ 
++    class dec_ttl(nla):
++        nla_flags = NLA_F_NESTED
++
++        nla_map = (
++            ("OVS_DEC_TTL_ATTR_UNSPEC", "none"),
++            ("OVS_DEC_TTL_ATTR_ACTION", "actions"),
++        )
++
+     class psample(nla):
+         nla_flags = NLA_F_NESTED
+ 
+@@ -635,6 +643,13 @@ class ovsactions(nla):
+                 print_str += "ct_clear"
+             elif field[0] == "OVS_ACTION_ATTR_POP_VLAN":
+                 print_str += "pop_vlan"
++            elif field[0] == "OVS_ACTION_ATTR_DEC_TTL":
++                datum = self.get_attr(field[0])
++                print_str += "dec_ttl(le_1("
++                subacts = datum.get_attr("OVS_DEC_TTL_ATTR_ACTION")
++                if subacts and subacts.get("attrs"):
++                    print_str += subacts.dpstr(more)
++                print_str += "))"
+             elif field[0] == "OVS_ACTION_ATTR_PUSH_VLAN":
+                 datum = self.get_attr(field[0])
+                 tpid = datum["vlan_tpid"]
+@@ -786,6 +801,20 @@ class ovsactions(nla):
+                 actstr = actstr[paren + 1:]
+                 parsed = True
+ 
++            elif parse_starts_block(actstr, "dec_ttl(le_1(", False):
++                parencount += 2
++                subacts = ovsactions()
++                actstr = actstr[len("dec_ttl(le_1("):]
++                parsedLen = subacts.parse(actstr)
++                decttl = ovsactions.dec_ttl()
++                decttl["attrs"].append(
++                    ("OVS_DEC_TTL_ATTR_ACTION", subacts)
++                )
++                self["attrs"].append(
++                    ("OVS_ACTION_ATTR_DEC_TTL", decttl)
++                )
++                actstr = actstr[parsedLen:]
++                parsed = True
+             elif parse_starts_block(actstr, "clone(", False):
+                 parencount += 1
+                 subacts = ovsactions()
+@@ -957,6 +986,12 @@ class ovsactions(nla):
+         return (totallen - len(actstr))
+ 
+ 
++# pyroute2 resolves nla_map types via getattr(self, name).
++# dec_ttl needs "actions" to resolve to ovsactions, but
++# ovsactions is not defined when dec_ttl class body runs.
++ovsactions.dec_ttl.actions = ovsactions
++
++
+ class ovskey(nla):
+     nla_flags = NLA_F_NESTED
+     nla_map = (
+-- 
+2.54.0
 
-[1] Link: https://github.com/jkoeppeler/veth-backpressure-performance-test=
-ing/pull/1
-
->=20
-> Alternatively netdev maintainers can choose to apply V5 patchset and we
-> can iterate on finding the right ethtool coalesce parameters for veth
-> and create a .h "library" file for this.
->=20
->=20
->> Let's amend the commits. Should we do this on Github?
->=20
-> Kernel development for netdev [3] happens on the mailing list with patch=
-es via email.
-
-Okay :)
-
-Thanks!
-
->=20
-> --Jesper
->=20
-> [3] https://kernel.org/doc/html/latest/process/maintainer-netdev.html
->=20
 
