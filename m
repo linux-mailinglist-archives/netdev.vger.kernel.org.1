@@ -1,238 +1,234 @@
-Return-Path: <netdev+bounces-292198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAbqEpWvFmokogcAu9opvQ
-	(envelope-from <netdev+bounces-292198-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:47:17 +0200
+	id QKbMOKHFFmrOqgcAu9opvQ
+	(envelope-from <netdev+bounces-292240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:21:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 879675E14A3
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:47:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AA875E28A4
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 12:21:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1ED1305A71E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:45:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0B8393004D3E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 10:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F733DE422;
-	Wed, 27 May 2026 08:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="pNJYof3h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EAC3E6DDC;
+	Wed, 27 May 2026 10:14:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2091.outbound.protection.partner.outlook.cn [139.219.17.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F04E377009;
-	Wed, 27 May 2026 08:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779871504; cv=none; b=bUkJFI5/EP/LwIgxdtJmUsAhOlMAlO/VlHmbBxHqaZmlO1wETaqviLG1k1SX50ATz0sExjyzZ54AXxEYWoebCPSWYxRs6ktr3/j+dso/hMjzv30MRAnAdy71bVct7XW0DHiVcpf1lNMFIIK7j3XPFA/ipWBYsoah3yq3Tmuvm04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779871504; c=relaxed/simple;
-	bh=XX1GbH64x35fuWFNo/SQ2/x+8KQpJKIax2C5VfJhvFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mpNUQroVYEKiyyqBKI+/QdzfK9LWZD5Tznzp1G4bJGEBNxSubrMmqug7pWGWZvJfXZxCHY4SmPa9UCNofXdf6CRJnXrSQSlmcaOcRyA61Cy0SFuJjDf5Cmn2GiAPMDYeW/ihnabYOCqbDHtJz9iLMUcWKYUgcmkuk1UhvJUr/j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=pNJYof3h; arc=none smtp.client-ip=212.227.17.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
-	s=s1-ionos; t=1779871496; x=1780476296; i=simon@schippers-hamm.de;
-	bh=6o+Z8qEV5bOs+HS0eW5p+DnEH2JHVvHeYJoKtbo+yk4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=pNJYof3h16DmZpmP3HmoWfeTUjz9jjaoU/KVQNcmoW4RcG+z6ZvsxXN+jns5u1lg
-	 iNJIGwg7FMsH9TuM7q1bN2a9bHIdlIe1YZiYSW8TzKpkK4bNkBzBAxOk7cBlTunLL
-	 blSPfvspj1kXcI5PWYT29KXqc5huWOMidBM5gVpl+qhqQJZXZNLyGz5v9RhuFJtEN
-	 cwx9JhDOm637wfHD+9GzFqg3ZzUoT9NydN0WkQbs+M2o4TDs0/23S5Uvxz+MSvBMV
-	 5tk1OtjUu0kWlPHB4ewSy1qXMTvE6T7aPMsVV1ftuICaGdR2M/BEOxyWkFSBtcTGJ
-	 FpoZ457WMQNW7uMDnw==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
- [212.227.15.153]) with ESMTPSA (Nemesis) id 1MLQgv-1wjYDM2tQh-00P6ec; Wed, 27
- May 2026 10:38:55 +0200
-Message-ID: <e55f4be1-334c-4623-b030-43d17a25b250@schippers-hamm.de>
-Date: Wed, 27 May 2026 10:38:54 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA0D38F95A;
+	Wed, 27 May 2026 10:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.91
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779876888; cv=fail; b=l9XoqPCOdvdYHwatICm0ZhhH90SPiPp9oaecJd2TquatbJscmHnGTc4898G96V3iZx/thbyAuzd8aBdCDkKO+8/aNleHOiB6Sn6GvlEbyKDvyhhIzO1ETgaYWghMoqrFxF0ePobR/WR2jLixwrDGd9HlA0BpDeTDlKV4VCp966s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779876888; c=relaxed/simple;
+	bh=aqlydTMub5qjooVjAOq/725vfz0+ZHc9YmNOZxtS8rw=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=NfPt2LSPXVqHcH7eY1JVPB9qD1B9JM1MgAUyW3VkRN3EphiADip2kvmrg/rnoeV+BnLMcB60h6DuXIVgpgTgK1MEYUV2AfMlNFm5QhVYB9mXIjuE+sJfRp52Tyj9Qz/lJ8E5fowrQQDqq+RhKJq0hJ0Qp3HqWETe6VKaktWrXNU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G+cRh6IPPIVmJhqQSAYWo8R6nJVvhxzbA+n/kcSMwbE6+MMnpOJ14qFQq6mkBorpqdMSRn/u8bo3WpJ8Y+HZ1GSiX8AmNXaS3Fgvsmtlq+gn6Z512OtUY84Uy/2aRscvSristtoGNbalnMw+OjZIGqtzy6u87rE2JFLuZfJnK7mT+PhMSVhSHCOaxmgs11KHjpthsoKpnoO5JN1SxFZsDPa5LNKN8v/oXHo5m2AZ8mZWQMKdtCWL/aRBsBVU1mTGnWD5aif6aYQ1tl1uPLTrCX5l+PQ0jTBvE15nnK5VDNDFnOWsc59ypUkvvTG6Eea6zPvvFSIgaW53d72e5LES9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5N+EGJ+iUMaM8iD/stUthqHuUXhlEwEtxd1Jc9cX7hU=;
+ b=Lg/ro14sIOqXZTTUO1xm8w4ESf8Z5qtyPxcYjEIjbsJTSsp62xIl+TEH0F2Z4KnT4y/RLyFYDX56NVopQXbaqrElSsQNV6Owh+soVeyJLP6dK7UoNctVOQAcN+b7n4TAGHxf0pf2O5Cj2lDbGorek7U9nD9zF5dtt4yRZphTEV2sDVPxt26jxzXHJF7mZFhYvdxv6lwdPi+bW04xErGqdRlnjJmGi9wtGAAPDH7Bn4Dqfnsu8TG1iPi3GfYkXis8kD3owSqffTGDsPiWIqKjwTUy/NYtyucX+d8kG1OGes8vfxYVhCQaA4Waebt7FdJd+AjHxsJ/F74ShSnDlPMT7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::15) by SHXPR01MB0829.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:26::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Wed, 27 May
+ 2026 08:41:16 +0000
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ ([fe80::9b99:12dc:a115:b90f]) by
+ SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
+ with mapi id 15.20.9891.021; Wed, 27 May 2026 08:41:16 +0000
+From: Minda Chen <minda.chen@starfivetech.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor@kernel.org>,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	devicetree@vger.kernel.org,
+	Minda Chen <minda.chen@starfivetech.com>
+Subject: [net-next v5 0/4] Add StarFive jhb100 soc SGMII GMAC support
+Date: Wed, 27 May 2026 16:41:04 +0800
+Message-Id: <20260527084108.121416-1-minda.chen@starfivetech.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: SH0PR01CA0014.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:5::26) To SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
- =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260505132159.241305-1-hawk@kernel.org>
- <20260510085602.57c7a081@kernel.org>
- <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
- <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
- <b78f002a-8cb9-4857-bf8f-0137e790f644@kernel.org>
- <873511fa-4316-4411-a76b-ec4c5805abd3@schippers-hamm.de>
- <18855e57-f050-411f-9958-d4babcc81ba3@kernel.org>
- <14348957-d061-4124-9bac-45df9cf6686c@schippers-hamm.de>
- <9a57bb41-114e-492b-9eaa-52237675bb7c@schippers-hamm.de>
- <4ae9400a-8919-4ffc-8db3-0c334e2aa462@tu-berlin.de>
- <8e8b877b-a7ce-4b2f-9567-64c8dbb48411@schippers-hamm.de>
- <463e91cb-6c45-4d91-8737-39779fec5a49@tu-berlin.de>
- <b1c2d2c1-a70a-4bf4-baff-d0ac2f878722@schippers-hamm.de>
- <24d10b53-c545-4141-95a5-5c49c35c5d6c@tu-berlin.de>
- <c5b3a7ef-8ec7-4361-80bb-cf06e910350c@schippers-hamm.de>
- <d23fd8e0-a0d3-4197-a130-2340d1c28fe0@tu-berlin.de>
- <e8be86b4-052f-4f4f-9cb9-2fb12d1e8922@schippers-hamm.de>
- <80dc574b-f2da-4f04-8bc8-1b0793b1f296@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon@schippers-hamm.de>
-In-Reply-To: <80dc574b-f2da-4f04-8bc8-1b0793b1f296@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:z28hEpM6RoXsF/wd+cQFLKgP5bi5N/VNjAniYz5iH5qGAb1Qi/O
- fxSNlRqdkSugaiVwrvBiz1pB5znLiveHkxqNv5IzzGrBakGGo14wWHiH+y77ikKyXOduuiE
- bdex+wQlo0Xuomw41NVrS+3NTOpMZ9HoY5GOTo4wr4MQ10ZW0mB/tAsI9v2Eg2M047cqtz9
- 9VrvxgjGdhdOa2eLMCyGQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:zd5ERNlsKjI=;PN+waDjd+U4HiArES2JV+renc3y
- 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
- kJwGobCIJnGBenf8qAg76MI/Jjq/sX3+
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0829:EE_
+X-MS-Office365-Filtering-Correlation-Id: 690fe418-5fad-426c-7831-08debbcbb757
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|7416014|366016|376014|52116014|1800799024|38350700014|921020|56012099006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+ spNVEyeO9Dx4FFfTMx5iyYJpGZa4MOB3/Lg5v39CZIGNAIT1nI+afANNyt33yIP6iQrNeSAcexREwcMMf7/gFnn5fFeISnuKKnWA2JMS+qVuoIBZdhwvjFKZXF/18eG0YyK+OrU63a/mHjmBEWHAuDxY9sZzdXYztM7bxfn/3CMijyseiNnjgx2pJB4Yd6w3vPc2KBbiaxHhHYuwVcZF6eYxaqEAer6KQ1jCVy+EvJqL1vbXpoM+4aOpW5Dwiqf6UWRqrtO+ahxBbZA5ynL59ylQFWB6cw0sy+joup8e3HOj7jpqjs/5HSQnk+VJosqVuZw29JHdeTJIGdfM6nIwfeA3t8Gy0cS5hD3P4uQsgz9iyR4yxp5M8hqK0nT20pqYr9sSrfM6gxnXRaMSkHKI4Q5rN17xZPxsq4adENt9McaFdlq9gz90C9oiAAXR4h5ZcZReEnVNSEXHlWtv4oxNvXqtikNpuJBajT3JW7ZAub2HPGaDdw+2AD862rtfhZ3kdLTWmOqoutwdkc/Dfcoy0ollJCsQqGIgAX8rNBNxB+cuQ44IRaDHXsAwVdZczSmWLy4LeQdm42dwxTnLVs22iQ==
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(52116014)(1800799024)(38350700014)(921020)(56012099006)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?TtgEWQxgNpU0iy8h7c1gnoqiaMvSh0JlfVxQOGKfIF7YsDJIynZVT3fT9JxU?=
+ =?us-ascii?Q?lr2JrZFuZ2O/HIqTAMl9c1boN5zzhNdWv64UB/Obzi6ISp6Q0Ww9WKMGEGQb?=
+ =?us-ascii?Q?6cVVjiYhy2cyjsmE//phNo7DsrSyibjRVZWyndtx3WsgJzaURhkkI3TIbH/8?=
+ =?us-ascii?Q?LE9Ll9kLSDEcQGTLvUlLzvYb/iQwQrLCBpCfzg9gvmIZAQUKSqH8cyLJuPFr?=
+ =?us-ascii?Q?4zOhG3VLL4rMjqH4lxGqldI6iw9EWo8Ol71riOLkcD0M3SypP0uyHidjFq/P?=
+ =?us-ascii?Q?P7JRn/RVEHHrAgGnjnRMeeA23Gv+jTpztAXk2gz3Rb1MHjJ3Xgc3ksEsMdwd?=
+ =?us-ascii?Q?I6r1LjyfoNAF3PuI/LkqbBr8AyXDhJm3nIkRnDIALTOM5FAvM1hi91orurS/?=
+ =?us-ascii?Q?K6P8tRdnXBvAfpcBaDj7GggFzpCWlJwnvNHC4vHqM2u6HChp46Lfg4igN1MH?=
+ =?us-ascii?Q?JuixV1rEoxTnnV3S9U3oaS2ijQ2j0Vp2gWWFdeE0JseQwaQ5svVfLAuQ76sU?=
+ =?us-ascii?Q?35Fca3J3l8uuGjD/CJDRCYdOLE7r90VD+h/Co0WEL0EMIHajbfuuNpZvE/5Y?=
+ =?us-ascii?Q?KEBAvsKG9fPeleGMtdgEB+7jmX92lJ0AnyTPoUQiNTaSm/pCis3wlel7QWhF?=
+ =?us-ascii?Q?9FQ4HkqDzKX8yMev0IYixiRRaSay979ms5nY6XB/m6G/NVqhPhy6ZCNUezGX?=
+ =?us-ascii?Q?sa5AS4DMCEdEqoqcM4uzQqrb84Ys6j7twfkBRi9wiEBZYpc0atNRpLtVtSOX?=
+ =?us-ascii?Q?QhvCfEOIpN0w5BTWtSI0dyr95XgNf/oefqgBBdOZOdt2orFW+Hc6570TJTCu?=
+ =?us-ascii?Q?IeuwFYGDYLOeigPNusimLa4G8i7EQGOy0CWc68sWmRy+AeQuBLALix+hiUMF?=
+ =?us-ascii?Q?IX5ydBZBVzkA86U2iK72oOk8NqGgRkczSF4E1r471M2G11ENldsyuVKFL/Nz?=
+ =?us-ascii?Q?gFITLvXBVFHqN0U9/GL7Hz/EYEBgY06ER/1oqvsHQPDv8xsBJoOqpMUQL3Pq?=
+ =?us-ascii?Q?LbuZfR3KixwAT3bADOdMehluijqW3mk+dz4fYsv5ir0QRrBAjOEIGvVOXwsQ?=
+ =?us-ascii?Q?7uYISWwwkBBK1/srewYVjLW0pKn56mc0DR6JQfxre10RWYyyGuj/paqkIWSn?=
+ =?us-ascii?Q?CqT4KdYfG3oKUrbOicHebpO+BCXkZVo/iNcFg25BJxCAYVAJb8pvAilJwSwb?=
+ =?us-ascii?Q?eA7GTaU20gec8mr6hbjzD2mBBymFe1E3uklZggV2p2DRS0P15S6JDnJrUWAF?=
+ =?us-ascii?Q?rtB2Pga7+NARzxVptOzvNxrlMTR/arXhtZA53ACkevyKGrJGlYaakjGXAERN?=
+ =?us-ascii?Q?llftvrBZjUxfELwVG2WNSQuISJ5yeHf06LeBtu+ip08KgnB7ar6nuEWMlhSH?=
+ =?us-ascii?Q?43j4gQ2SKcDsde1BZr65gAsXVoM78nkwEvUS11rm3sBrYbNdw5xjCXO0cDoF?=
+ =?us-ascii?Q?bpfQAbnliZitX0Vmf/SRwAEqDWA+FGkyLMjMZjZmq4klflnUcBZzZw8soqcJ?=
+ =?us-ascii?Q?l9FN118km/oXZdCh13jsFEDyu0ecDdRCHUqo5rtyEzbJR5rfp7XZQcuZp1MA?=
+ =?us-ascii?Q?gCsEmanraeDXnVn1a9nPrgyg2roGcpyHvX5tvxmezrJSFiR4pTR037jPRh9C?=
+ =?us-ascii?Q?bu0tLKCi6XHNGAac9VBYC4/HbuUHbMU2/X+quOwIS/A0svcZ2ukpzM202GzY?=
+ =?us-ascii?Q?V1QvjH0HD5DiobwAzRuHLNck9p0YjORCdLqFaegD9KXhuds70u0OguUXAQGx?=
+ =?us-ascii?Q?MQe+JTOQKtkTM9rowUpmqID9P6YyJWU=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 690fe418-5fad-426c-7831-08debbcbb757
+X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2026 08:41:16.3010
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mj7Cq3oTckXvxJKUwFOZHqkPEfUlhQ/Ukf8JCqdnWlpDwiUlgrF/Vkf+FsRQ4r4lwzBNwtZ9Xfc/Z473uX6O1jsU5XMGexNZvgq8H2XAPmU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0829
+X-Spamd-Result: default: False [5.04 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
-	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292198-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org];
+	GREYLIST(0.00)[pass,body];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292240-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[schippers-hamm.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 879675E14A3
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.145];
+	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,starfivetech.com:mid]
+X-Rspamd-Queue-Id: 8AA875E28A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/27/26 09:38, Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 26/05/2026 17.07, Simon Schippers wrote:
->> On 5/26/26 16:55, Jonas K=C3=B6ppeler wrote:
->>> On 5/26/26 4:35 PM, Simon Schippers wrote:
->>>> On 5/26/26 11:54, Jonas K=C3=B6ppeler wrote:
->>>>> On 5/23/26 6:09 PM, Simon Schippers wrote:
->>>>>> On 5/22/26 18:26, Jonas K=C3=B6ppeler wrote:
->>>>>>> On 5/22/26 10:41, Simon Schippers wrote:
->>>>>>>> On 5/22/26 09:14, Jonas K=C3=B6ppeler wrote:
->>>>>>>>> On 5/19/26 10:51 PM, Simon Schippers wrote:
->>>>>>>>>> On 5/12/26 23:55, Simon Schippers wrote:
->>>>>>>>>>> On 5/12/26 15:54, Jesper Dangaard Brouer wrote:
->>>>>>>>>>>>>> Nope, I'm using a bpftrace program to keep track of the inf=
-light/limit
->>>>>>>>>>>>>> in a BPF hashmap.  Reading from /sys will not be accurate.
->>>>>>>>>>>>> Ah nice.
->>>>>>>>>>>> Add the option --hist to have both NAPI and BQL histograms pr=
-inted when
->>>>>>>>>>>> script ends.  This will give you an accurate pattern of how i=
-nflight and
->>>>>>>>>>>> limit evolves.
->>>>>>>>>>>>
->>>>>>>>>>>>>> I moved the selftests into a github repo [1] to allow us to=
- collaborate
->>>>>>>>>>>>>> and evaluate the changes more easily.  I explicitly kept th=
-e new BPF
->>>>>>>>>>>>>> based BQL tracking as a commit[2] for your benefit.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>        [1] https://github.com/netoptimizer/veth-backpressur=
-e-performance-testing/tree/main/selftests
->=20
-> [... cut ...]
->=20
->>>>
->>>> I will wait for your new measurements, but there is no argument
->>>> against a default tx-usecs of ~100us for now, right?
->>> Yes, I think 100us is perfectly fine. I guess most of it was
->>> just my curiosity why the latency values are as they are =F0=9F=99=82
->> Which is great, because I was wondering the same =F0=9F=99=82
->>
->=20
-> Thank you Jonas and Simon for testing this via[1] on your systems.
->=20
-> One performance concern from my side is if/when BQL limit goes below 8
-> packets. This will cause cache-line bouncing and many qdisc requeues
-> between the two CPUs.  Notice that 8 packets for the ptr_ring is one
+jhb100 is a Starfive new RISC-V SoC for datacenter BMC (BaseBoard
+Managent Controller). Similar with Aspeed 27x0.
 
-I think the qdisc requeues are an issue of dc82a33297fc ("veth: apply
-qdisc backpressure on full ptr_ring to reduce TX drops").
+The jhb100 minimal system upstream is in progress:
+https://patchwork.kernel.org/project/linux-riscv/cover/20260508053632.818548-1-changhuang.liang@starfivetech.com/
 
-It could be solved by stopping the netdev queue after inserting
-the last element like I did in my tun tap implementation [1].
-I know, you also did this before in a previous implementation, but
-the required re-check used __ptr_ring_empty() which is not allowed as
-producer.
-That is the reason why I introduced the new __ptr_ring_check_produce()
-in [1] which is safe for the producer to call.
+jhb100 GMAC still using designware GMAC core like JH7100 and JH7110,
+and contains 2 SGMII interfaces, 1 RGMII/RMII interface, 1 RMII
+interface. In JH7100/JH7110 dwmac-starfive.c have supported RGMII/RMII
+interface. So require to add SGMII support to dwmac-starfive.c for JHB100.
 
-[1] Link: https://lore.kernel.org/netdev/20260510151529.43895-5-simon.schi=
-ppers@tu-dortmund.de/
+SGMII serdes PHY has been integrated in JHB100 and do not have driver
+setting.
 
-> cache-line. This is why I suggested defaulting BQL min_limit to be 8.
-> This would work in combination with the tx-usecs coalesce tuning as a
-> lower bound.
+In JHB100 EVB board, SGMII connect with motorcomm YT8531s external PHY
+and support RJ45 ethernet port.
 
-Yes, it would work but I think it is fine as-is.
-BQL will only choose such a small limit if the consumer is really
-slow anyway.
+The patch base net-next (base commit list below)
+
+previous patch link:
+v2: https://patchwork.kernel.org/project/netdevbpf/cover/20260417024523.107786-1-minda.chen@starfivetech.com/
+v3: https://patchwork.kernel.org/project/netdevbpf/cover/20260507094115.8355-1-minda.chen@starfivetech.com/
+v4: https://patchwork.kernel.org/project/netdevbpf/cover/20260519101436.111476-1-minda.chen@starfivetech.com/
+
+changes
+v5:
+patch2 add review tag and squash with v4 patch3
+patch3 stmmac_starfive_sgmii_set_clk_rate() not support rate return
+-EINVAL and claim not support 1000basex
+
+v4: patch1 and patch5 add review tag
+patch 3 add sgmii clock dts setting more elegant and simple
+patch 4 remove redundant compatible and (void *)
+
+v3:
+patch2: Add jhb100 attach to jh7110 compatibible, remove redundant commit
+message. just descript the jhb100 hardware.
+patch3: Add oneOf 5 clocks / 6 clocks to claim the clocks and make it
+pass yaml test.
+patch4: Add review tag and unused tag to phy interface.
+
+v2:
+1. patch1 Add the remove reason
+2. patch2 rename rx clock to sgmii_rx
+3. patch4 confirm sgmii rx clock exist, or will probe error
+   sgmii will not call starfive_dwmac_set_mode() 
+
+
+Minda Chen (4):
+  dt-bindings: net: starfive,jh7110-dwmac: Remove jh8100
+  dt-bindings: net: starfive,jh7110-dwmac: Add jhb100 support
+  net: stmmac: starfive: Add jhb100 SGMII interface
+  net: stmmac: starfive: Add STMMAC_FLAG_SPH_DISABLE flag
+
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 31 ++++++----
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 59 ++++++++++++++-----
+ 2 files changed, 65 insertions(+), 25 deletions(-)
+
+
+base-commit: aa064a614efcfa4c300609d1f01134e99a12ad10
+-- 
+2.17.1
 
 
