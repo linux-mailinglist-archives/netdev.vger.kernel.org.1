@@ -1,234 +1,160 @@
-Return-Path: <netdev+bounces-292153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBZsIuWiFmqBnwcAu9opvQ
-	(envelope-from <netdev+bounces-292153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:53:09 +0200
+	id 6Cz6LHijFmoOoAcAu9opvQ
+	(envelope-from <netdev+bounces-292154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:55:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D1D5E0A7D
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:53:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE665E0B1C
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 09:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 56E323008C1E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:53:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E688305509D
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 07:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F323CD8AA;
-	Wed, 27 May 2026 07:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E82F3CDBA9;
+	Wed, 27 May 2026 07:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/LoAvJP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VYVEZxjo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EF13CCFD9;
-	Wed, 27 May 2026 07:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F5C3CD8AD
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779868386; cv=none; b=MZJ51ScsWTpi5VCT5CCiGJL1qroTWrPGv5Z/EiktUHE5c86/kD1Fpi4rFI6tkWZm8jX9SK19cSWxyvRsXtCrdBkIzXlpgo8fl+y5aW+2rMeUZsKZOjycaT8c6rhFVkwaTpTkmoPn+D8hh1YlMbAGr4MhVyL0Q6KmgjutVJ1qfjU=
+	t=1779868429; cv=none; b=F58Rh4FKxkbJIoUKd3t9zDFCSvrZNSawiLsmv/KonNNFHET5np+FYskPwg0g+uhEsGYdhbHksHv71eDEBz0cUhZk9C+/fF7xTDONBYbF3aboyG2uWyws8fnAGi+5eBzQ3e1duouyscyryEGT0vEvvA7jpCYLx2R0oR9SBZYUjBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779868386; c=relaxed/simple;
-	bh=JQfPs4qyF8FMAJp0acXsGiDjC8SL5SQPb/DEVP9U/NY=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=WusN877t/4u+UwmbtMbb10q4NCqiMs7tKvxH1F1pbP4Ym+zj8IOK7p786Ig3fSGWemLzO1zEwxn3OwqYQxAA5DoIolphx7VYdTSRJIIqL+whNtljrcqjxnGZJfT3vJfiexov1Nw/BRkGvXjS+juie6I8qTUQ9/h/J1fB4Wg/Nq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/LoAvJP; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF041F000E9;
-	Wed, 27 May 2026 07:53:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779868384;
-	bh=Y+kGq0uunmREFgzVVLHHxPdC664CmUzrN4A02+MaM5c=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=Y/LoAvJPd3wM9J66save3K6aXvb9rA0mMByndjKNrGjyUpfzpPle8B7OLNvHCqtKg
-	 q7BGrOHY8N0MHjNtOcbmzF0zQhT4xSCFSscIbWL7kmkUaGCge8m7D3HTPOroftHtlV
-	 1Q5YY+9ivs21hp4cFgJyRDziiCPltn4FSaPHz6AMCBGz7DE3IeLw1yK9B7vvkqsGa7
-	 Mxw7Kr0JgyEv1n38pCyiiHR3id5tkI/HG589dmSHxuATcIQ9/yE06ZAXRNRYIsDY/S
-	 m3h6OUojhIoGQAAez+DI/K0q08EYGW28qS67jpy1c6z33xfTR/Ii1mfqznW5u2+/ou
-	 j2P1mnPXDtjbw==
-Content-Type: multipart/mixed; boundary="===============2215855977696880001=="
+	s=arc-20240116; t=1779868429; c=relaxed/simple;
+	bh=LFyioZCTW+ZiNuJCpdoWoxUyVV6b0Xecy4cKfm9Z1Oc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G+NL/sp/t+bI5LwgSuedrZtVdVoxy8ZI0FfVXqc9rAseNQRAmtlQeb6daaQgsWo3aDfBfbdMczfhBH1KDSjsY44PtzlR6FEf9DY1s0LcdnQDIxYl2dF7D2HSifKlmhPJx3alfktmO3y3AJnxByZC0NFA0goyn++Zk0DOQasXKJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VYVEZxjo; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 9FBA21A36DC;
+	Wed, 27 May 2026 07:53:45 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 710AE601A1;
+	Wed, 27 May 2026 07:53:45 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AAD711088805F;
+	Wed, 27 May 2026 09:53:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779868424; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=9YBx2gOkZzjwHTBHcOIgoEuKlLYiwrVY86yq/isaziY=;
+	b=VYVEZxjoHGTF9UHTe0v6QhbyMoScdi4783k3JqBrP8iYBgKPvg8oHXzy9gzxc+ijkZVr46
+	Mnh7v7TstFw4AC5dlbL7+vDH2Gp9EjJcADNPvBpXhETpjmmWUe1OL8xahWEQFaRfd2ZBha
+	eJH2m3thL8N/u94fC2W9KcyaA57hS1uskfmVk0s4tdToCV4ZQ+HXKIYlggvLX0vJkprTel
+	oCBFhBF0ebYabZmJgkfehp74Mx+NTaTMCGB9b/JFcNY3rszCYsvS1/isZd7fSGBo7AFqyd
+	699vnJYTjNDd29K9KuJlkk0o7+z94EcYIZqwOZTt8q2lrvjHyN3WNQoLZjENvQ==
+Message-ID: <7bd6c580-8c0c-4323-ad18-84b93c2b61c7@bootlin.com>
+Date: Wed, 27 May 2026 09:53:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <582275f111aae9b0fb4520a98c60b5014751114022782c3aadeced2c21cbb3c7@mail.kernel.org>
-In-Reply-To: <20260527070239.2252948-2-hch@lst.de>
-References: <20260527070239.2252948-2-hch@lst.de>
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-From: bot+bpf-ci@kernel.org
-To: hch@lst.de,vbabka@kernel.org,harry@kernel.org,akpm@linux-foundation.org
-Cc: hao.li@linux.dev,cl@gentwo.org,rientjes@google.com,roman.gushchin@linux.dev,hawk@kernel.org,linux-arm-msm@vger.kernel.org,dri-devel@lists.freedesktop.org,freedreno@lists.freedesktop.org,linux-kernel@vger.kernel.org,linux-mm@kvack.org,io-uring@vger.kernel.org,kasan-dev@googlegroups.com,bpf@vger.kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Wed, 27 May 2026 07:53:04 +0000 (UTC)
-X-Spamd-Result: default: False [-1.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 06/10] docs: net: refresh netdev feature guidance
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+ vladimir.oltean@nxp.com, willemb@google.com, sdf.kernel@gmail.com,
+ ecree.xilinx@gmail.com, jesse.brandeburg@intel.com, linux-doc@vger.kernel.org
+References: <20260526160151.2793354-1-kuba@kernel.org>
+ <20260526160151.2793354-7-kuba@kernel.org>
+ <422219d6-8377-423c-8ccd-641b2fccaa1a@bootlin.com>
+ <20260526153532.7979b43c@kernel.org>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260526153532.7979b43c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,gentwo.org,google.com,kernel.org,vger.kernel.org,lists.freedesktop.org,kvack.org,googlegroups.com,iogearbox.net,gmail.com,meta.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292154-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-292153-lists,netdev=lfdr.de,bpf-ci];
-	MIME_TRACE(0.00)[0:+,1:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,nxp.com,gmail.com,intel.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: E7D1D5E0A7D
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 1FE665E0B1C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============2215855977696880001==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Jakub
 
-> diff --git a/drivers/gpu/drm/panthor/panthor_mmu.c b/drivers/gpu/drm/panthor/panthor_mmu.c
-> index 75d98dad7b1d..b80d7e1d5123 100644
-> --- a/drivers/gpu/drm/panthor/panthor_mmu.c
-> +++ b/drivers/gpu/drm/panthor/panthor_mmu.c
-> @@ -1274,10 +1274,9 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
->  		goto err_cleanup;
->  	}
->
-> -	ret = kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, pt_count,
-> -				    op_ctx->rsvd_page_tables.pages);
-> -	op_ctx->rsvd_page_tables.count = ret;
-> -	if (ret != pt_count) {
-> +	if (!kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, pt_count,
-> +			op_ctx->rsvd_page_tables.pages)) {
-> +		op_ctx->rsvd_page_tables.count = 0;
->  		ret = -ENOMEM;
->  		goto err_cleanup;
->  	}
+On 5/27/26 00:35, Jakub Kicinski wrote:
+> On Tue, 26 May 2026 20:41:10 +0200 Maxime Chevallier wrote:
+>>>    
+>>>     1. netdev->hw_features set contains features whose state may possibly
+>>>        be changed (enabled or disabled) for a particular device by user's
+>>> -    request.  This set should be initialized in ndo_init callback and not
+>>> -    changed later.
+>>> +    request.  Drivers normally initialize this set before registration or
+>>> +    in the ndo_init callback. Changes after registration should be made
+>>> +    very carefully as other parts of the code may assume hw_features are
+>>> +    static. At the very least changes must be made under rtnl_lock and
+>>> +    the netdev instance lock, and followed by netdev_update_features().
+>> Feel free to keep this description as-is, but can we get somewhere the
+>> actual meaning of "hw" in "hw_features" ? I've seen this cause confusion
+>> before as this is sometimes wrongly interpreted as "Hardware features",
+>> which isn't correct as the hardware may do stuff without allowing users
+>> to change that behaviour.
+>>
+>> I vaguely recall something along the lines of "Host-Writeable features",
+>> but I am not sure at all about that...
+> 
+> Hm. I assumed the hw in hw_features stands for hardware.
+> The magic behavior of host controllable vs hardwired was
+> probably added later without renaming the field.
+> 
+> As you indicate the usual confusion is that it's legal to have
+> a feature in ->features which is not set in ->hw_features which
+> means that features is hardwired "on", it can't be disabled by
+> the user.
+> 
+> The current text does say this: "features whose state may [..]
+> be changed [..] by user's request". But perhaps it's not emphatic
+> enough.
+> 
+> Main question is whether this series should be clarifying
+> this or our criteria is that the series doesn't _add_ confusion,
+> even if it doesn't clarify all the potential confusion points? :)
 
-Does this omit setting op_ctx->rsvd_page_tables.count to pt_count on success?
+Frankly I think your series is good as it is, the text is clear
+enough, and we can redirect people to it if we spot an issue
+on that point during review.
 
-Since op_ctx is initialized via memset previously, the count will remain 0 when
-the allocation succeeds. This could lead to memory leaks when these page tables
-are consumed or cleaned up later, since the cleanup code won't know about the
-allocated page tables.
+Thanks a lot for answering,
 
-The original code set the count to ret on both success and failure. The
-updated code only sets count = 0 in the failure path, but doesn't set
-count = pt_count in the success path.
+Maxime
 
-[ ... ]
-
-> diff --git a/lib/test_meminit.c b/lib/test_meminit.c
-> index 6298f66c964b..3727dee7c262 100644
-> --- a/lib/test_meminit.c
-> +++ b/lib/test_meminit.c
-> @@ -229,14 +229,12 @@ static int __init do_kmem_cache_size(size_t size, bool want_ctor,
->  	for (iter = 0; iter < 10; iter++) {
->  		/* Do a test of bulk allocations */
->  		if (!want_rcu && !want_ctor) {
-> -			int ret;
-> -
-> -			ret = kmem_cache_alloc_bulk(c, alloc_mask, BULK_SIZE, bulk_array);
-> -			if (!ret) {
-> +			if (!kmem_cache_alloc_bulk(c, alloc_mask, BULK_SIZE,
-> +					bulk_array)) {
->  				fail = true;
->  			} else {
->  				int i;
-> -				for (i = 0; i < ret; i++)
-> +				for (i = 0; i < BULK_SIZE; i++)
->  					fail |= check_buf(bulk_array[i], size, want_ctor, want_rcu, want_zero);
->  				kmem_cache_free_bulk(c, ret, bulk_array);
->  			}
-
-Will this cause a compilation error?
-
-The local variable ret is removed from this scope, but it's still used in the
-kmem_cache_free_bulk() call. This should fail to compile because ret is
-undeclared.
-
-The fix should probably replace ret with BULK_SIZE in the free call:
-
-	kmem_cache_free_bulk(c, BULK_SIZE, bulk_array);
-
-
-> @@ -354,17 +352,18 @@ static int __init do_kmem_cache_size_bulk(int size, int *total_failures)
->
->  	c = kmem_cache_create("test_cache", size, size, 0, NULL);
->  	for (iter = 0; (iter < maxiter) && !fail; iter++) {
-> -		num = kmem_cache_alloc_bulk(c, GFP_KERNEL, ARRAY_SIZE(objects),
-> -					    objects);
-> -		for (i = 0; i < num; i++) {
-> +		if (!kmem_cache_alloc_bulk(c, GFP_KERNEL, ARRAY_SIZE(objects),
-> +				objects))
-> +			continue;
-> +
-> +		for (i = 0; i < ARRAY_SIZE(objects); i++) {
->  			bytes = count_nonzero_bytes(objects[i], size);
->  			if (bytes)
->  				fail = true;
->  			fill_with_garbage(objects[i], size);
->  		}
->
-> -		if (num)
-> -			kmem_cache_free_bulk(c, num, objects);
-> +		kmem_cache_free_bulk(c, num, objects);
->  	}
->  	kmem_cache_destroy(c);
->  	*total_failures += fail;
-
-Is num uninitialized here?
-
-It's no longer assigned the result of the allocation call. Passing it to
-kmem_cache_free_bulk() will use indeterminate stack data, which could lead to
-memory corruption. The fix should probably be:
-
-	kmem_cache_free_bulk(c, ARRAY_SIZE(objects), objects);
-
-[ ... ]
-
-> diff --git a/mm/slub.c b/mm/slub.c
-> index a2bf3756ca7d..d9790e7c17f6 100644
-> --- a/mm/slub.c
-> +++ b/mm/slub.c
-
-[ ... ]
-
-> @@ -7352,18 +7362,18 @@ int kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags, size_t size,
->  	 */
->  	unsigned int i = 0;
->  	void *kfence_obj;
->
->  	if (!size)
-> -		return 0;
-> +		return false;
-
-Does this incorrectly report an allocation failure when size is 0?
-
-Previously, callers interpreting the return value against size (ret != size)
-would treat 0 objects allocated for a request of 0 as a success. Returning
-false here contradicts the typical kernel behavior where allocating 0 items is
-a successful no-op.
-
-This might cause callers to incorrectly abort with an error when they request
-0 objects, which should be a valid no-op case.
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26496962101
---===============2215855977696880001==--
 
