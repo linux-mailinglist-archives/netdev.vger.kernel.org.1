@@ -1,341 +1,186 @@
-Return-Path: <netdev+bounces-292368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 41OAL1oaF2rV4wcAu9opvQ
-	(envelope-from <netdev+bounces-292368-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:50 +0200
+	id gD8sClQaF2ov4gcAu9opvQ
+	(envelope-from <netdev+bounces-292372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1C05E7B3B
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9940E5E7B33
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 18:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BFF623024286
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:13:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 387413045442
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2B1426D19;
-	Wed, 27 May 2026 16:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B0D42EED3;
+	Wed, 27 May 2026 16:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPXduZJ8"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Ki5GHB5y";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="omqbMe3s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3536E42B74A
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 16:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF7D236453;
+	Wed, 27 May 2026 16:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779898400; cv=none; b=VqLHTYXq+juoiKGzw371NMei8E+AY9Osb0SW3YV7UAdvBHv7f5uB5lX2gVEfHO0YnSNrSP6SnfH6eAqlazFL7UXEG/xA2kE6ZeV3rhJ0YXgujbTmiXdkfPlcA5SUIv791i22d9yHoUXyYcZ+hrOE+69/RKoYF0QPhtQlwZOpC/I=
+	t=1779898916; cv=none; b=RELNfa3q/sows47FAXrsopkZ0g5a8oNfNg37XHjIFLflnJkltnaD3JAxI4yAaeIysTywZakE8T2ll2NlxKeNbvWyZdkADHnFQUE9K7L5qGx9ct8zhS1ANiGQRbLpJO/j6/u9x07kxMQkaaIeNPMkiMPPIWoBeon1WsXQggUkZXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779898400; c=relaxed/simple;
-	bh=0RJh0S8l5yIgnyegYNtR3CavG8N99KUxlqvuNYBFCS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qpVCvRpspDVKGI2P5m7Hz4BqbX0UWIpyJmb4YE8Hjt9ETUgEZ8cfEy6/F4eunP12fL4HXwBhM58PZ79szDcekOQy9VlT8/5r7WeV5oNZ6HcZ8VXglGn9fkfuIVCqHh3FpqjyiGjUnsp1sOOfHdtssUW8hDlWqz32MJ09axfK5o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPXduZJ8; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-49056b9f04aso56574265e9.0
-        for <netdev@vger.kernel.org>; Wed, 27 May 2026 09:13:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779898393; x=1780503193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=igoUmofFPc+XYuWpnSdFf7iBLvvTLIfNw8ud4q4N9Jk=;
-        b=aPXduZJ85pyu17YhfNmIVL7U7DKgC3hZhZyAjhrBHTnhUrFw0db9OYDmtS+ynphlIs
-         Mvk33RgqSRD1LyFz7QZtue5+VJFsRQI8VmLsuNssC7iVnypQwN4HrtSCtAWGMSucNJcY
-         pa3m4riwfMULSgtiiBGu9l5oVD5EP/8Xd5/YbaEXYuMnJOwEjuI5cxbySy4EeBSQNcnt
-         Q9oYr+8HyOsAYzTAvV4+Hj9TVtQ6Uv6GpF/qSAsJjt6MHf5tfXjf8DqMyV6O/Wh68j7H
-         MvKk4sfWX5tVYWjtlB4UGi+my/jgI0WUR06HWhJ5vKUb5HkeT7wL0RfFkG7p5zqaOLBf
-         pPPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779898393; x=1780503193;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=igoUmofFPc+XYuWpnSdFf7iBLvvTLIfNw8ud4q4N9Jk=;
-        b=O9ayr6tjJRnVz6/k3hr5ov1EUm03cRWL5ymStP1aGxnt+cCMkG3llAiNzS0h3aIBcI
-         OBN2ypr5CQTJwdMJebCrQy82sXDlMvqmyiNGTQzfpbu3BJMe7/Fz+OX38+QyaowHgYNU
-         2yHH7ryihtifQtuSo7ex51EKu05VD3fHmKsCIfCJJ0IlIUir9M8md+xiETkadY9Wzzeb
-         W9ESBDMsMzT026Tm33f6biNTlOR9LqlXYvQZMp52b0cy9dzfwhMs34Hjfa5DCCg2ytcz
-         AmXvAz0Suw6647180Ki6RnsaJ2b3PI+pbV4DF00ttEHQTYRa4MTR0RIAXcbT1AaparIj
-         khhw==
-X-Forwarded-Encrypted: i=1; AFNElJ9/a4z5L6poWqa4yL+8ioJXOe8NsEmFAtX/6UKp5gBTlFMHMt5ekfXnygok1MnRvppgPBSGGVg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoOQk7dpaky2z6uRLfX+hsDycNMdQQ1sYe09c6EokoKPf5Vrmk
-	9F8zQEiHqBdAbonGPLzEX8e+ypx+Dzcs/UzYGSXMucYEcUeLOCz+CdXh
-X-Gm-Gg: Acq92OECAS0NbwYnsoUTL2nTw639NJaSxCPioNEMisWpXn0i1JhFkTwL3hu5qASxtBI
-	2MYCREpaPKGSNo0BWLLUhRh8cLpp4MFiYH47o80GTYond+zYS2H/lnLwe4rMjVskNiRVKHTIvjn
-	DKYbJmtF13PtFjhZ7cfjaZYSuzh63EEICi53TKDZJqwEdPFtO6DF6VV8LBL4klz9BjKB/pcRUHk
-	pDosNM/lJ/nHynWVC3mQKlibP8r/4J+4GOo8DDHerb2aUTZpgOQHchi1wjul9albLTeLdKwzqKV
-	aT8wNesyE6acKK4TzHRmmqmosYr4ykPlmG8gIkCVnxXI5QjTDKvP/km0UCQuvvH43Lf9RA/QVhG
-	QzUs+iUlYlymroSCsU0hIvu2+TGQTjLJmBxhp+HjcYpbVonMs1m9AQdz60Z+aWLiBUUlVY1SGzX
-	PA+EOvZvsxF5ArbzBIsQtSyWVVpvMA6TKks19oscWM6aSFwadBlZiTEMTDth03c12yViPx1/8UV
-	+Q=
-X-Received: by 2002:a05:600c:3b02:b0:48f:e1ac:c94f with SMTP id 5b1f17b1804b1-490424b3938mr408178225e9.10.1779898392535;
-        Wed, 27 May 2026 09:13:12 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490809c785asm20103535e9.32.2026.05.27.09.13.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2026 09:13:12 -0700 (PDT)
-Date: Wed, 27 May 2026 17:13:10 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- victor@mojatatu.com, yimingqian591@gmail.com, keenanat2000@gmail.com,
- 2045gemini@gmail.com, rollkingzzc@gmail.com, dcaratti@redhat.com,
- security@kernel.org, linux-kernel@vger.kernel.org, Rajat Gupta
- <rajat.gupta@oss.qualcomm.com>
-Subject: Re: [PATCH net v2 1/1] net/sched: fix pedit partial COW leading to
- page cache corruption
-Message-ID: <20260527171310.0d5ed340@pumpkin>
-In-Reply-To: <CAM0EoMm_FcS0xSNmCjdXaRMfZh12jU71xM92Z50eVE8uk7tKFQ@mail.gmail.com>
-References: <20260526155913.1060694-1-jhs@mojatatu.com>
-	<87wlwq2cxf.fsf@toke.dk>
-	<CAM0EoMm_FcS0xSNmCjdXaRMfZh12jU71xM92Z50eVE8uk7tKFQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1779898916; c=relaxed/simple;
+	bh=XbT1g+8GUb9HDwonX1DCruD/yWZSK3lGsfCSsSFHSDQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DOh4js1RncqnLn6SS1rZHOffoQOGzpXWAQ685bsAN8KYSWFJzuWL4uOQfoZnkHO0pyr0HUx+XPj1e/JrbD+LIArraGJajJvWjAbCbyrjCRrI2BDOyd9Z0jvFMPds9cSvSBST3v2AyQYgOtXdGg1q3UbIRM3HtMUpf+vvNJjIp6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ki5GHB5y; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=omqbMe3s; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 53CDEEC0098;
+	Wed, 27 May 2026 12:21:52 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Wed, 27 May 2026 12:21:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1779898912; x=
+	1779985312; bh=aEeoFnQGgZEYGi6tSF7m/UIIOpj9D7Uy8UVZJVSQY30=; b=K
+	i5GHB5yDPfoOx3V2hUn0B6nZwBHTupqe+xDnOsM7FbBrKL/n2+1MdaJl2VEAjgaJ
+	uqc0wy5epvrz+zqesRH7BLui6q9laAsR32anFMThVV8tV0rbnbblzjUO6c83qPsG
+	IlZ01V0uk2g+QHSq0mhd++Ed/KihMCP/t6AP4IaVfR1tD8cBb8L+lHJ+8jNKKTjo
+	OA6ysZEXL1eqmJHdqDxKb8fIvPdx6xRQ+Ee/CN5xEPPVCLe4vGLxUyGHE+17muA4
+	YjuwW2gIbG89WpPiPgti0HnIyw0qX+WgxU0VplclNy1awBqXFuvRl7bzS4nwwsgM
+	yZ7gmxQ8dXK7SxH5AHsbA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1779898912; x=1779985312; bh=aEeoFnQGgZEYGi6tSF7m/UIIOpj9D7Uy8UV
+	ZJVSQY30=; b=omqbMe3slTffliWJlYbsMiaBvQEYycaAqQZFTkjFSz5uT3iEkcQ
+	NeJuVdqqMEi9Rkh8NSDAS1tb9NC1cqaWJMkH4eJjkbty4F5k3QAdvqX3mQTLz3EI
+	+Rb/9q5PIit0roqQSb6n8kAQW7waLg9fJK/qybOF9Gbye0Lj21kYc3iKoeztLfuu
+	di6cv9xIidTBvwpIOzhCNNzxckLIznkfHUFBIIbwVhyB/WABbVRXY2YSwLUIl8v4
+	UKXyzi0BIBL/wB/zRCNlMAZMNPyRHN3cLILwqocEq0hFf4JBSM6shp4jiUM6zBJD
+	9jm1T6c3uOoxUf7TqbgrA6ftJfBvoGVQ9mw==
+X-ME-Sender: <xms:HxoXarBJsGggQtI1beDTu-yVFSTkdFmoM0ngHN-1n31aOgmt7VSK6Q>
+    <xme:HxoXanj3hVxew5h-RtAqtmj_mxK2foEyENogjT9gbv_XaR98PHxvUF3jH4nFT00l9
+    YmnxUQIrQyooogtyzp0gFhJ9-TBSFLyQpnRkZFspayG39FM1fOjvQo>
+X-ME-Received: <xmr:HxoXahaXwIclYIxf-N_XhY0ysbkFQGpoCVDGe_ImowQlixOdvFPxiJgtAc7ya6Tey1rtAzUskznozcmMTOvXB4Q>
+X-ME-Proxy-Cause: dmFkZTEg4WRu41kuea+OrnrY7p+6/hEgjnJ8R8tIcuQsRP/DtKZ77PFQYb8vQfWp4gTZ3J
+    WHAz0K53zdRl+3Wq9+owJrFJe4af/d2WIXfsp/juA3cY2LYho8Iv9xOTBmvrpGc4k7d80v
+    KXzAmOucOvmig6EnoGxRy0aI+KtVEo7yeKQLQ/P/GYaXTwVF2biNFA3pgl5xVleNQe/Ogm
+    IAX+AJQvUoSpurVVynAwat4cx3HYXicx81KUM42+11hM4SdRFc7pTFi+X7Ezyf1X0bH49E
+    eFGYoOOwftSRQZjjOO6CJPT17rrfgr7krY8Hsrcw71vRZ+wsGSaoD3Qdc9r9qw71UOgcIW
+    g9dVY5NY45ShdnQu9hBcpA8aj4Rs6PoZrfBeOq0yjaWgLUrkigUixeiS7b0NE4YdSl1cxY
+    NIEWuC/oszjM1ZjEHPtnhtIIBb5pddO2TlUqThvHX/hWo+Qbacf3n4RwoCvfSHysBRcysd
+    wi9kulmu/BAo/Ifjg0pgeywZ2lwyy9va+QanpXHsTAkPcONJdypkmzDfGvqylBmqTA1aC9
+    vZpZn0RBP6YiNZ/xuVQpPDVNxe3K9VnMRcXrIf0VWjzaqTyK9BROyE18jm8VTybV3hZwTg
+    KhahZ/rvs3IrjygYFIDx1GNaBzeKUkWB+ShFE7IcPduHfWDehbMmgOeSz37g
+X-ME-Proxy: <xmx:HxoXagkpePO-ff1LdSIaAiEBsNhzupEc-Qgq12ij9gaH4OWRsopdHA>
+    <xmx:HxoXavhQzsrqhEdd1LlsTk1gEvaVxo9k6rK9OKNM6TjaqkzqvWFuUA>
+    <xmx:HxoXaqTPr82My0Zn0URB7DhnU82GiIY-ZqlVZWo7yQ7h4-gtw1xWdQ>
+    <xmx:HxoXaoYE5yJ-N3ZdMdAChLI_eQoAxtkoAzHUp0fVF8RQYXYpnCIBFA>
+    <xmx:IBoXatU8bphPQYpJGS3j20K7Lg6uH5QHyiXWedVmPCOwn2BP89CUPBS->
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 May 2026 12:21:51 -0400 (EDT)
+Date: Wed, 27 May 2026 18:21:49 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Pavitra Jha <jhapavitra98@gmail.com>
+Cc: antonio@openvpn.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3] ovpn: fix peer refcount leak in TCP error paths
+Message-ID: <ahcaHaYr0LJ8GVY4@krikkit>
+References: <20260523090244.504790-1-jhapavitra98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260523090244.504790-1-jhapavitra98@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292368-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,davemloft.net,google.com,kernel.org,resnulli.us,mojatatu.com,gmail.com,oss.qualcomm.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-292372-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mojatatu.com:email]
-X-Rspamd-Queue-Id: BF1C05E7B3B
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,queasysnail.net:email,queasysnail.net:dkim,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 9940E5E7B33
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 27 May 2026 10:56:57 -0400
-Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+2026-05-23, 05:02:43 -0400, Pavitra Jha wrote:
+> When either the TCP RX or TX error path calls ovpn_peer_hold() followed
+> by schedule_work(&peer->tcp.defer_del_work), and the work item is already
+> pending from the other path, schedule_work() returns false and the work
+> runs only once. Since ovpn_tcp_peer_del_work() calls ovpn_peer_put()
+> exactly once, the extra reference taken by the losing path is never
+> dropped, leaking the peer object.
+> 
+> The race window:
+> 
+>   CPU0 (strparser/RX error):       CPU1 (tcp_tx_work/TX error):
+>   ovpn_peer_hold()   <- refcnt+1   ovpn_peer_hold()   <- refcnt+2
+>   schedule_work()    <- queued      schedule_work()    <- NO-OP
+>                                     (work already pending)
+>   ovpn_tcp_peer_del_work runs:
+>     ovpn_peer_del()
+>     ovpn_peer_put()  <- refcnt+1
+>                                    <- peer never freed
+> 
+> Fix by checking the return value of schedule_work() in both paths and
+> calling ovpn_peer_put() to drop the extra reference if the work was
+> already pending. ovpn_peer_hold() is kept unconditional in the TX path
+> as it cannot fail at that point.
+> 
+> Fixes: a6a5e87b3ee4 ("ovpn: avoid sleep in atomic context in TCP RX error path")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
+> ---
+> Changes since v2:
+>   - Include RX path fix in the diff (was missing from v2)
+>   - Link: https://lore.kernel.org/netdev/20260522091718.270956-1-jhapavitra98@gmail.com/
+> 
+> Changes since v1:
+>   - TX path: keep ovpn_peer_hold() unconditional per Antonio Quartulli's
+>     review; only check schedule_work() return value
+>   - Link: https://lore.kernel.org/netdev/20260521083739.65061-1-jhapavitra98@gmail.com/
+> ---
+>  drivers/net/ovpn/tcp.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
->  &&
->=20
-> On Tue, May 26, 2026 at 3:22=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen =
-<toke@redhat.com> wrote:
-> >
-> > Jamal Hadi Salim <jhs@mojatatu.com> writes:
-> > =20
-> > > From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> > >
-> > > tcf_pedit_act() computes the COW range for skb_ensure_writable()
-> > > once before the key loop using tcfp_off_max_hint, but the hint does
-> > > not account for the runtime header offset added by typed keys. This
-> > > can leave part of the write region un-COW'd.
-> > >
-> > > Fix by moving skb_ensure_writable() inside the per-key loop where
-> > > the actual write offset is known, and add overflow checking on the
-> > > offset arithmetic. For negative offsets (e.g. Ethernet header edits
-> > > at ingress), use skb_cow() to COW the headroom instead. Guard
-> > > offset_valid() against INT_MIN, where negation is undefined.
-> > >
-> > > Additionally, linearize skbs with shared frags upfront to prevent
-> > > silent data corruption when pedit operates on zero-copy pages
-> > > (e.g. from sendfile).
-> > >
-> > > Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is =
-writable")
-> > > Reported-by: Yiming Qian <yimingqian591@gmail.com>
-> > > Reported-by: Keenan Dong <keenanat2000@gmail.com>
-> > > Reported-by: Han Guidong <2045gemini@gmail.com>
-> > > Reported-by: Zhang Cen <rollkingzzc@gmail.com>
-> > > Tested-by: Victor Nogueira <victor@mojatatu.com>
-> > > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > > Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com> =20
-> >
-> > Re-ran the tests, and everything looks good, so:
-> >
-> > Tested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >
-> > Also looked at the code, and I have a few nits below, but I'm really
-> > nitpicking here, so whether you end up fixing those or not:
-> >
-> > Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >
-> >
-> > [...]
-> > =20
-> > > @@ -323,7 +324,7 @@ static bool offset_valid(struct sk_buff *skb, int=
- offset)
-> > >       if (offset > 0 && offset > skb->len)
-> > >               return false;
-> > >
-> > > -     if  (offset < 0 && -offset > skb_headroom(skb))
-> > > +     if (offset < 0 && offset < -(int)skb_headroom(skb))
-> > >               return false; =20
-> >
-> > This change makes it really obvious that this is really just:
-> >
-> >         if (offset < -(int)skb_headroom(skb))
-> >                 return false;
-> >
-> > so, well, that would be clearer, IMO.
-> >
-> > But then I guess the same could be said of the positive case, so:
-> >
-> > static bool offset_valid(struct sk_buff *skb, int offset)
-> > {
-> >         if (offset > skb->len || offset < -(int)skb_headroom(skb))
-> >                 return false;
-> >
-> >         return true;
-> > }
-> > =20
->=20
-> Yes, that improves readability. If i understood the discussion between
-> you and David L. something like this one liner would be reasonable?
->=20
-> if (offset > (int)skb->len || offset < -(int)skb_headroom(skb))
+This looks correct to me:
 
-I doubt it will be measurable whatever you pick.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Thinks, can 'we' get away with the much more readable:
-	offset + (int)skb_headroom(skb) < 0
-No need to worry about the '+' wrapping, the first test will fail.
-Large -ve offset are going to stay negative.
-So it does look all right.
-
->=20
->=20
-> > > @@ -393,18 +394,10 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_b=
-uff *skb,
-> > >       struct tcf_pedit_key_ex *tkey_ex;
-> > >       struct tcf_pedit_parms *parms;
-> > >       struct tc_pedit_key *tkey;
-> > > -     u32 max_offset;
-> > >       int i;
-> > >
-> > >       parms =3D rcu_dereference_bh(p->parms);
-> > >
-> > > -     max_offset =3D (skb_transport_header_was_set(skb) ?
-> > > -                   skb_transport_offset(skb) :
-> > > -                   skb_network_offset(skb)) +
-> > > -                  parms->tcfp_off_max_hint;
-> > > -     if (skb_ensure_writable(skb, min(skb->len, max_offset)))
-> > > -             goto done;
-> > > -
-> > >       tcf_lastuse_update(&p->tcf_tm);
-> > >       tcf_action_update_bstats(&p->common, skb);
-> > >
-> > > @@ -412,9 +405,10 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_bu=
-ff *skb,
-> > >       tkey_ex =3D parms->tcfp_keys_ex;
-> > >
-> > >       for (i =3D parms->tcfp_nkeys; i > 0; i--, tkey++) {
-> > > +             int write_offset, write_len;
-> > >               int offset =3D tkey->off;
-> > >               int hoffset =3D 0;
-> > > -             u32 *ptr, hdata;
-> > > +             u32 *ptr;
-> > >               u32 val;
-> > >               int rc;
-> > >
-> > > @@ -451,15 +445,38 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_b=
-uff *skb,
-> > >                       }
-> > >               }
-> > >
-> > > -             if (!offset_valid(skb, hoffset + offset)) {
-> > > -                     pr_info_ratelimited("tc action pedit offset %d =
-out of bounds\n", hoffset + offset);
-> > > +             if (unlikely(check_add_overflow(hoffset, offset, =20
-> >
-> > It's a bit weird that this has the unlikely(), but the offset_valid()
-> > check doesn't?
-> > =20
->=20
-> I focused on the bigger solution and worried more about timeliness to
-> get this patch in - but it seems the distros had already picked up the
-> first posted patch, so hakuna matata (Still, I should have caught
-> these unlikelies ;->). Yes on the second one you pointed out.
-> Will remove them.
->=20
-> > > +                                             &write_offset))) {
-> > > +                     pr_info_ratelimited("tc action pedit offset ove=
-rflow\n");
-> > >                       goto bad;
-> > >               }
-> > >
-> > > -             ptr =3D skb_header_pointer(skb, hoffset + offset,
-> > > -                                      sizeof(hdata), &hdata);
-> > > -             if (!ptr)
-> > > +             if (!offset_valid(skb, write_offset)) {
-> > > +                     pr_info_ratelimited("tc action pedit offset %d =
-out of bounds\n",
-> > > +                                         write_offset);
-> > >                       goto bad;
-> > > +             }
-> > > +
-> > > +             if (write_offset < 0) {
-> > > +                     if (skb_cow(skb, -write_offset))
-> > > +                             goto bad;
-> > > +                     if (write_offset + (int)sizeof(*ptr) > 0) {
-> > > +                             if (skb_ensure_writable(skb,
-> > > +                                                     min(skb->len,
-> > > +                                                         write_offse=
-t + sizeof(*ptr)))) =20
-> >
-> > Combining these with && instead of the double indentation would be more
-> > readable IMO (shorter lines, aligning the 'goto bad' labels). =20
->=20
-> hrm. So:
-> if ((write_offset < 0 && ((skb_cow(skb, -write_offset)) &&
-> (write_offset + (int)sizeof(*ptr) > 0) &&
-> (skb_ensure_writable(skb,min(skb->len,write_offset + sizeof(*ptr)))) {
->             goto bad;
-> else {
->   ...
-> }
->=20
-> Not sure which is more readable.
-
-I think he meant just the last two 'if'.
-
--- David
-
->=20
-> cheers,
-> jamal
-> > =20
-> > > +                                     goto bad;
-> > > +                     }
-> > > +             } else {
-> > > +                     if (unlikely(check_add_overflow(write_offset,
-> > > +                                                     (int)sizeof(*pt=
-r),
-> > > +                                                     &write_len))) =
-=20
-> >
-> > Same comment wrt unlikely()
-> > =20
-
+-- 
+Sabrina
 
