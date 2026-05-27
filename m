@@ -1,54 +1,70 @@
-Return-Path: <netdev+bounces-292074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292076-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id x14cBmdbFmpTlwcAu9opvQ
-	(envelope-from <netdev+bounces-292074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:48:07 +0200
+	id qCvjL3RbFmpTlwcAu9opvQ
+	(envelope-from <netdev+bounces-292076-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:48:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 783985DEB1D
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:48:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC15A5DEB24
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 04:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A3793300180E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:48:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 60026300B9D3
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 02:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F385C26159E;
-	Wed, 27 May 2026 02:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8A82C0298;
+	Wed, 27 May 2026 02:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gIa5tfSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA021FECBA;
-	Wed, 27 May 2026 02:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C129C2DB781;
+	Wed, 27 May 2026 02:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779850083; cv=none; b=lZfwxfaFQW09xmi4d3OwHHlywQ0W1dlTkYdhuOLox0siern3dv5TR7kyuvD7i4H8sPLPQ+LiqTqJqShaKCCMC579d75CRzYYcK8W+Ex8ui/WIuWaQidBT5wCO4nqU6XTKbq2q7NJsHZwYX3SSrO3NPpskbkiAhWJUvE7IHAP9hM=
+	t=1779850090; cv=none; b=k03/jzR2hs0hvX7uKgIaVaskH99NY/dc6RsRzxYfFfTja4+hc2Tb7cb6XiNb7j4AONOPeeh3liG2gtKsdG7GywZZ09NXWSQhHlBn9+KVBQ0eyIi6CMV2la/lORhT94kZyoYDgjJuHonR5nmglIFg808Z7gqI0q1hcCH+TPnk6oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779850083; c=relaxed/simple;
-	bh=Wg6jIy1TGMUKPParOsa2byxqyiOfl4Wv3x7svP8hI24=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=dQoZe+vTZ/Ieiub2gn4NmnYOeyCGJDzf7huQqOwyLVZdKVoqOHe1/R8JyAEVyxxAjVqhLT+8qBu4J2/E7CV+g9ESARqNZeEk8Pt/TCQ8nwnzaIXrcZeMdazuBmA7YOCMFPPURk4bLFm1M5TqTZdSvVxBkRwYFJcKetoHhxof/3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1wS4J8-000000006xq-29Z1;
-	Wed, 27 May 2026 02:47:46 +0000
-Date: Wed, 27 May 2026 03:47:43 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: John Crispin <john@phrozen.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v3 0/4] net: dsa: mxl862xx: SerDes ports and stats
-Message-ID: <cover.1779849840.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1779850090; c=relaxed/simple;
+	bh=OhArExhyFxW6G7UNwjQaVgZXmRB/nNTrfg+Kxp+BsiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MqwfM1tTVZUtVCozShmmhmyBFaAm5WLe9p5rKcL4Pvze425LLHixEWegbUoU94qEtLtEHS1LDp7yszAdDNVclSa3Vq9x4XxzELBWK7lOwdMviDX3QmSGf/HfZLBQRGDU3mfztDvTCNxPQcCEPh3R1PEzKp2H2/ZE7V1cZ2tvBww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gIa5tfSt; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NqCAB+KvGtFT9+Ag7X3oNMKQy1eE5n7+jCufEcB2qLs=; b=gIa5tfStp4zgdLLUmF0beJ8kmC
+	IURwABeBvUtoEmBv+28aSIJ3xecvXIrHKSKFcjLCAfnO2lYxinUSO79HpUtsBZostQ/qMnEgpyO1g
+	TJ+Xie6gQZ5fyeDwSDkqgoWWXS3Vyg/YX0STx1LxAKCYljyEQ8FujzdjNkRw8qAPld3w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wS4J9-004guy-Ri; Wed, 27 May 2026 04:47:47 +0200
+Date: Wed, 27 May 2026 04:47:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Maxime Chevallier (Netdev Foundation)" <maxime.chevallier@bootlin.com>,
+	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
+ ethtool pause validation
+Message-ID: <5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
+References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
+ <20260526172447.10ca4b9e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,89 +73,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Spamd-Result: default: False [-0.46 / 15.00];
+In-Reply-To: <20260526172447.10ca4b9e@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292074-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
+	TAGGED_FROM(0.00)[bounces-292076-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[phrozen.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.966];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 783985DEB1D
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: BC15A5DEB24
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for the two SerDes PCS interfaces of the MxL862xx switch
-ICs, which can both either be used to connect PHYs or SFP cages, or as
-CPU port(s). 1000Base-X, 2500Base-X, 10GBase-R, 10GBase-KR, SGMII,
-QSGMII and USXGMII (single 10G or quad 2.5G) are supported.
+On Tue, May 26, 2026 at 05:24:47PM -0700, Jakub Kicinski wrote:
+> On Fri, 22 May 2026 19:51:06 +0200 Maxime Chevallier (Netdev
+> Foundation) wrote:
+> >  Documentation/networking/pause_test_plan.rst | 556 +++++++++++++++++++
+> 
+> It'd be great to hear from others but IMHO in the current form this is
+> not suitable for Documentation/networking/ We can commit the "knowledge"
+> part but enumerating the test cases seems odd for Documentation/.
 
-The firmware only added the API to directly control the PCS as of
-version 1.0.84, so the PCS features are gated behind a version check.
+Sorry, not looked too deeply at the actual content yet.
 
-As the driver is growing do some refactoring to break out the phylink
-parts into mxl862xx-phylink.h.
----
-Changes since v2:
- * get rid of endian-specific union handling firmware version
- * replace serdes_active bitmap with atomic_t serdes_refcount
- * defer mpcs->interface assignment until after firmware ack
- * handle firmware error codes in pcs_config
- * set st.usx_lane_mode in pcs_get_state
- * set lu.usx_subport and lu.usx_lane_mode in pcs_link_up
- * use phylink_mii_c22_pcs_encode_advertisement() in CL37 adv
- * rework commit message
+What i was thinking was a python file, which sphinx can ingest to
+produce documentation, and place holders were code would be added to
+implement the actual test during the next phase.
 
-Changes since v1:
- * drop custom ethtool stats (former patch 5/5)
- * add __{LE,BE}_BITFIELD layouts to ABI structs
- * per-sub-port QSGMII AN restart via usx_subport / usx_lane_mode
- * shared-SerDes refcount in pcs_disable via per-XPCS slot bitmap
- * let every sub-port call pcs_config
- * cache phy_interface_t instead of firmware type
- * skip pcs_link_up when inband-AN enabled
- * gate phylink_get_caps SerDes modes on same FW version as select_pcs
- * interpret xpcs_pcs_cfg.result as signed (s16)
- * drop dead MXL862XX_PCS_PORT macro
- * drop misleading "downshift detection" line from commit message
+This is how i've done testing in the past. I would be the evil one who
+thought up the tests and described them in detail using sphinx markup
+in a python test template file. After some review they got passed off
+to a python developer for implementation. And when they got run and
+failed, sometimes the feature developer, the test developer and myself
+got together to figure who made the error.
 
-Daniel Golle (4):
-  net: dsa: mxl862xx: store firmware version for feature gating
-  net: dsa: mxl862xx: move phylink stubs to mxl862xx-phylink.c
-  net: dsa: mxl862xx: move API macros to mxl862xx-host.h
-  net: dsa: mxl862xx: add support for SerDes ports
+I'm not sure we even need sphinx. What i find important is that the
+test is documented. What kAPI calls should be made with what
+parameters. What results we are expected and why? So that when a test
+fails, a developer has the information they need to fix their
+code. The Why? is important, and often missing from the kernel tests.
 
- drivers/net/dsa/mxl862xx/Makefile           |   2 +-
- drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 302 +++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |   9 +
- drivers/net/dsa/mxl862xx/mxl862xx-host.h    |   8 +
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 405 ++++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |  21 +
- drivers/net/dsa/mxl862xx/mxl862xx.c         |  54 +--
- drivers/net/dsa/mxl862xx/mxl862xx.h         |  54 +++
- 8 files changed, 809 insertions(+), 46 deletions(-)
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
-
--- 
-2.54.0
+	Andrew
 
