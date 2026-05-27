@@ -1,133 +1,129 @@
-Return-Path: <netdev+bounces-292108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292109-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOUzLvGSFmrqnQcAu9opvQ
-	(envelope-from <netdev+bounces-292108-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:45:05 +0200
+	id iJrYNieVFmppngcAu9opvQ
+	(envelope-from <netdev+bounces-292109-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:54:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5718E5DFF7E
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:45:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3BB5E00E5
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 08:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B38530651F8
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 06:41:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B412C3003719
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 06:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E930235AC27;
-	Wed, 27 May 2026 06:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40693B5303;
+	Wed, 27 May 2026 06:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="d9s0Bidi"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="kAdjz4eo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0152039902B;
-	Wed, 27 May 2026 06:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3811A08AF
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 06:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779864095; cv=none; b=hKTAPGp0SY29893D6+59Q+lKgod8D9e/Wp2fB2j6I4FVzy7mvHLBX08KmR+s7snPv7pezRKU5IblC9tNLEbLTNoUYPxDEpsQ+HH2XJATWZw26KRJLH42dPQFjDshTRQLxoGUr8m2ZVWFiKM1JpGsyw2QuO1QnhEgwjrQ5wqsjZg=
+	t=1779864847; cv=none; b=kc6ztxTs7UlWKnTFvq2xC2RLP6nPTqXYT1DNdGyohGITWoeTvqbshOwnRVO2fh/uxd5Af+8Whhe9iFnj6z/EJinGMPmdSA8vadhgc9MXrUTCnbbTQavMRx+quRMOWY8PVgmyzacGIP1LbB2t4WRivzeHlyT6RmxsVDbZu9unvt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779864095; c=relaxed/simple;
-	bh=EUWO9pcOg2aJxIzaHagl0pNX57Jt+u5NNryqDjS6kCI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MzmfD4/2zTLzmeJV6OCNvWUyA3uJ0G/CvcIBIBod//cRAEJhKgAlWQhQWLn4+KcWMPXhh8uPDTsX6E1yLH4/M932ufTMdxmjuj9FhdNcvdJDYSQmErIQ1r74wShAIAkBlw64tS8dvoyZq929O+p82iD4JIOXpuUrHAqOuB0OBdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=d9s0Bidi; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 108ACC2C643;
-	Wed, 27 May 2026 06:41:28 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4DBD1601A1;
-	Wed, 27 May 2026 06:41:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ED6AF1088803C;
-	Wed, 27 May 2026 08:41:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779864087; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=0U9YjNb6qykmV1QDXMiTogNVN1srvz5mIIvwxZKo4c4=;
-	b=d9s0BidiuVgyHW4VnvauhXhDpkd+Ys8Qq1JCB9/mMf+0+GhFTUDqpdyTcc/Gr/Dqlvfwgz
-	oXGoo+GDx0cBcacVGOdAzO1vK48A/4r6RXxLe1fuFiG4c3JWNTmYC8Uf90F/1YGMjSgjgY
-	SLyFfJmR5oKbiw7wdgMJE6dp5ikcXVNwjKemWnRVyG/kQcKHmX8W+OJlKGmFy+KxdfHgWx
-	+JKroRQwGHTKKq7RVDccqRR2x0Bu0NiqagpE4CxZ6DPEE6Cl8Z3potgfNv/z+8GtOZUGYM
-	oeFbvMd9+LpcKBnsfTDa3yzNMOZFVztWdQE2ZGCXzetDPM7qpoTKTk54+4sLvg==
-Message-ID: <43569bb0-98c1-4fc5-8b3e-c199d0c68250@bootlin.com>
-Date: Wed, 27 May 2026 08:41:16 +0200
+	s=arc-20240116; t=1779864847; c=relaxed/simple;
+	bh=yEQwL3MUelaw6hKSCMnzIE/HbZBXjhlrn/C4wcCtYKI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q+z2GtowA3gAhj0PL0+mDPIPF1moc7iiTmt9TS3xL/ZFc4xYozqJjJmUeYR0BaI5AJo4cMIfAKwWXg8zDBJcKUL551FWq7M+e9SElWaTazEJdW7b39noSmeTOf07BXHsnaDhf6IA3ygH68kHSIPsA6mBhPL8bBewRoOpzJVqWZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=kAdjz4eo; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: d2888576599811f1b1788b6acf885367-20260527
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=T3IulHUKib8JGWnWMEWHwbse8Aex4qYCKxD3FE3iZdg=;
+	b=kAdjz4eoG1iroKQbNr1e7L71KGla+bnnPbHxZXppBwaUsQmVlsEdZ7gcKgi4+nTXW1r4WeGKPRstkKd62i64nRldUDO8CzEoDVWkIMFSKpDrxZ5ecCEZYKENCQnChyV9Nxmd25X9Jjed58AWcWkv4MSSUUeECpFU7cIN6Zqmx5Q=;
+X-CID-CACHE: Type:Local,Time:202605271431+08,HitQuantity:1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.15,REQID:d4aa7c4c-6c09-4a7c-8c33-4047b55f2eb5,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e276073,CLOUDID:acfee8f9-9444-476a-bc04-9e12dce7d69c,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|123|136|836|865|888|898,TC:-5,Co
+	ntent:0|15|50,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: d2888576599811f1b1788b6acf885367-20260527
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
+	(envelope-from <jianyu.li@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 145209192; Wed, 27 May 2026 14:53:52 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Wed, 27 May 2026 14:53:51 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Wed, 27 May 2026 14:53:51 +0800
+From: <jianyu.li@mediatek.com>
+To: <kuniyu@google.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <black-ch.chen@mediatek.com>,
+	<ivan.tseng@mediatek.com>, <jianyu.li@mediatek.com>
+Subject: [PATCH net v1 0/2] af_unix: Fix inq_len update issue
+Date: Wed, 27 May 2026 14:53:40 +0800
+Message-ID: <20260527065342.2463433-1-jianyu.li@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Florian Fainelli <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
- <20260526172447.10ca4b9e@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260526172447.10ca4b9e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292108-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-292109-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[jianyu.li@mediatek.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mediatek.com:+];
+	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 5718E5DFF7E
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2C3BB5E00E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: Jianyu Li <jianyu.li@mediatek.com>
 
+This series fix the problem that inq_len is inconsistent with
+actual remaining byte count when only part of a skb is consumed.
 
-On 5/27/26 02:24, Jakub Kicinski wrote:
-> On Fri, 22 May 2026 19:51:06 +0200 Maxime Chevallier (Netdev
-> Foundation) wrote:
->>   Documentation/networking/pause_test_plan.rst | 556 +++++++++++++++++++
-> 
-> It'd be great to hear from others but IMHO in the current form this is
-> not suitable for Documentation/networking/ We can commit the "knowledge"
-> part but enumerating the test cases seems odd for Documentation/.
+Jianyu Li (2):
+  af_unix: Fix inq_len update problem in partial read
+  af_unix: Add test for SCM_INQ on partial read
 
-I think the same, I wasn't sure exactly how/where to send that to, so at 
-least in this form you can generate that as a nicer to read html form, 
-but this will likely change given Andrew's feedback
+ net/unix/af_unix.c                            |  7 ++-
+ tools/testing/selftests/net/af_unix/scm_inq.c | 54 ++++++++++++++++++-
+ 2 files changed, 57 insertions(+), 4 deletions(-)
 
-Maxime
+-- 
+2.45.2
+
 
