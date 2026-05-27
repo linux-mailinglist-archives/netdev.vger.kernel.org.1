@@ -1,117 +1,180 @@
-Return-Path: <netdev+bounces-292317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292318-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHidAIv8FmoJ0QcAu9opvQ
-	(envelope-from <netdev+bounces-292317-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:15:39 +0200
+	id wBwMJmv9FmoJ0QcAu9opvQ
+	(envelope-from <netdev+bounces-292318-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:19:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B60E5E5B67
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:15:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 447B45E5C2E
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 16:19:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 83E57315DE64
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:07:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D50513099276
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 14:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454D63246E8;
-	Wed, 27 May 2026 14:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317C727603A;
+	Wed, 27 May 2026 14:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dce7WP0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD23F320A37;
-	Wed, 27 May 2026 14:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DC218A6D4
+	for <netdev@vger.kernel.org>; Wed, 27 May 2026 14:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779890851; cv=none; b=Zv4V9ENb6nGsmUYdoqOX75hGd9DavN3x+3d8qO1Sovi4qPSUeUBM9agZVE81AHwdOzp+dv8ZVeXoN53YnYhco5oBCJ6mRP3eFFUqQE9UrILsi0k2nJWOch8HTQHKoR77ZHUyTWqa6sDqp+qCe1FHrK+XHWpkz93uZ6IEKN2ggfk=
+	t=1779890995; cv=none; b=LRsx6ha2eCc3zSn9WVzkRmRi8Qy/ZLyZR4W9gvBL7rGZOuF4XfA2eMj1Ce1V7NLVNBknBZMJkrDCggEyN+iGg/ZTfgAaEQhPLm+Z+/TwELVdG0k4lbT6x2oeY8kvq/Yaqoj5fJH+WXOyXaaYCRiloxyQg7eCOdpIbi1uQKrTbS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779890851; c=relaxed/simple;
-	bh=gf9Zm7uRt63514Y+7TY7/J/2IFULdGzW2yT8efvrUCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PuZU7YRF20FAknIo/Uw9bCCmWtZ8x87JBPOj5CrzpapJ9I+4VYs7MYVdOdu0JyX3oVNWB73BlrFFxCuup/JILQF+NEzlA+6qp2AFf4zW9MGNgPaRtJcv7uWq4Ajgya0FzARruR8dPzDZpa33+N83WkBqa0EN4xiXVtWCXvx9oJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8156068C4E; Wed, 27 May 2026 16:07:24 +0200 (CEST)
-Date: Wed, 27 May 2026 16:07:24 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Vlastimil Babka <vbabka@kernel.org>,
-	Harry Yoo <harry@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, io-uring@vger.kernel.org,
-	kasan-dev@googlegroups.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Matt Fleming <mfleming@cloudflare.com>,
-	kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-Message-ID: <20260527140724.GA13256@lst.de>
-References: <20260527070239.2252948-1-hch@lst.de> <20260527070239.2252948-2-hch@lst.de> <e4dcfbc8-2666-452c-90b2-25c4b2c50c9f@kernel.org> <777c7229-4285-4c7c-9340-dfaebd2ab291@intel.com>
+	s=arc-20240116; t=1779890995; c=relaxed/simple;
+	bh=N77LSvgSo8xOF1kyjXoXK3LnzE6wLIf0cUM4V4UI2jc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WduH6y4reePudXBetfF8MyHyc5QtQ+tr1FgX8vUqKwMvgCB3oN/zXkfdVTibcPqUfGFTdZPJLSio6KWObX46gzDLDG9FyoaTcK4pa0JinMIwqjbO46PWjX7k6CYTOBoMHolhcahqIKKtuQdk89WvrlcuAAvVVoGOlQrLe4jW57I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dce7WP0z; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-49041e84237so44651545e9.1
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 07:09:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779890992; x=1780495792; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=A9b2NRW2sxpXKdJkqinkCIXe13CjljiKdRRyBQAUL6w=;
+        b=Dce7WP0z/kV524Ns0wC+WvcFc/xcwhXij9h0CJq7T6atqlrmHFGlhQBg+y9sVlwHgI
+         v6fdHjQSRXiS//iEItMw5et4Epdy/46VK2U797zPjfHtJVuVnk6LCtLTKTKE8kep0Uzj
+         Fl8JRMnfY9Dmmjg90eimyL3FeAd7RRoDFULfhC1ch6cUnXR1GZ/I3yPCeYJfVaBr7UCE
+         t2WbunLzBbxujeVo2VJW/FcnGEo979iAmt1S/I+ttQeMIXpYyH1C1w8PpDkRRSgpqrU9
+         yHzOTPLmcil4i9LrDVbfsEEwAs2csXldF45bew9aG9Sp1DyJfrPXjFsssZCkKG3fcM9g
+         ARsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779890992; x=1780495792;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A9b2NRW2sxpXKdJkqinkCIXe13CjljiKdRRyBQAUL6w=;
+        b=f+tnM12oYU0wcSYGp830aEcHQlb7KJcGDm3bLl7OHIw6UtfxWgLfdLfnei7+yl4ZLD
+         LmxfAfEkcPXOzPFyx1WVhx52TrhZZQ48e7h8FQ3Yir7A4hMYcZPvDMtvkdN5iSCRH4xh
+         oqOFQEu9PwhJSJlVCd+XlsKKaBKvP5BtugchRPK8qbIVO/X6lOMssvwT8w55j4rN1DE/
+         QigCvbN0lri6zG3Nm2wSB67UVxGCw6k9K2CLZRDY2lrgG0CT9CUZdupX0koa0mWssOPW
+         cCUJw4gKvT9A2k4twx+t3R5dGxZxjpD3s03SDw2qbC5n5+F+Bmg8JvjspKgAv+h4UXhq
+         mLbg==
+X-Gm-Message-State: AOJu0YzfMSVlP0Brl3E2JkcosvPgOhGuKWg33J3G8DdUOL1JCbP2AJbe
+	hMIRL6rAiwNNuaBhWTj+KzM+hFeKiIwSBhiCyyu/wzui2WSnQ97J8A9s+3SjGJPU
+X-Gm-Gg: Acq92OGATDjwerhZLu4BGwUibUy3mnGAUi2AWswfZHVsZmW7qBoFuFF2y8nWl/y+pbQ
+	sB7aDxnU/1V0B9tB+CSi70fD679xd5Hm3ubdYV2LH9nlzZrjKbIxwKjL/SCnvKoD2JtVZS8L2oe
+	Vv8L+IE16t/R8Yh3NgL2B0xKdwcC72FSqzGkrsOVkQtUf7xcKfRj/X1d2k5fMV/+FqffzYRVIrl
+	oef+oCtx3T/8Ew0KaTN6ZrztmCydlKHlggWefiqN7JuaF3EdZcXjrsqhHZ5gPec6MdL63+yy/rC
+	eV/wdb68N+UL4ik7IaMgDn7iuMjGukdDgo12rYS61Li7V08edMpTODpV1YpNUnmJYx6/02LqkdX
+	3HP+nhbzfdFgE6hm9C+OYYZOZlk4erjF9nuEUM+tB08s7LVBpeqFVMPVKJGu4N7m6xlMWERMJe8
+	FUIC2f8Xg9QNxmlYQG+mlBOds18InervBOMBHwi/p8cg4wyKjkIpuJR3plWXDdExx1RDkKYZ+Su
+	BTp1r65sryRMwQKdQ==
+X-Received: by 2002:a05:600c:4342:b0:490:4035:323 with SMTP id 5b1f17b1804b1-490403503b0mr249325125e9.9.1779890991603;
+        Wed, 27 May 2026 07:09:51 -0700 (PDT)
+Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5a2a73sm6163871f8f.22.2026.05.27.07.09.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 07:09:50 -0700 (PDT)
+From: Petr Wozniak <petr.wozniak@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	petr.wozniak@gmail.com
+Subject: [PATCH net-next] xfrm: fix xfrm_dev_offload_ok() returning true for software SAs
+Date: Wed, 27 May 2026 16:09:48 +0200
+Message-ID: <20260527140948.21162-1-petr.wozniak@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <777c7229-4285-4c7c-9340-dfaebd2ab291@intel.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[lst.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.992];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hch@lst.de,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lst.de:mid];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292317-lists,netdev=lfdr.de];
-	R_DKIM_NA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 8B60E5E5B67
+	TAGGED_FROM(0.00)[bounces-292318-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 447B45E5C2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 03:56:38PM +0200, Alexander Lobakin wrote:
-> >> -    n -= kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> >> -                   GFP_ATOMIC | __GFP_ZERO | __GFP_NOWARN,
-> >> -                   n - nc->skb_count, &skbs[nc->skb_count]);
-> >> +    if (kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-> >> +                  GFP_ATOMIC | __GFP_ZERO | __GFP_NOWARN,
-> >> +                  n - nc->skb_count, &skbs[nc->skb_count]))
-> >> +        n = nc->skb_count;
-> 
-> kmem_cache_alloc_bulk() allocates `n - nc->skb_count`, but here you
-> assign `nc->skb_count` to n.
-> Ah wait,
-> 
-> n -= n - nc->skb_count
-> n = n - (n - nc->skb_count)
-> n = n - n + nc->skb_count
-> n = nc->skb_count
-> 
-> Correct :D
+xfrm_dev_offload_ok() reaches the ok: label when the SA has no
+offload device (dev == NULL, SW SA) because the guard condition
+"(!dev || dev == xfrm_dst_path(dst)->dev)" evaluates true for
+dev == NULL.  The explicit "if (!dev) return true" at ok: then
+incorrectly routes the SW SA onto the GSO offload path.
 
-Exactly the steps I went through when writing this patch :)
+This triggers the following chain on platforms with an async crypto
+engine (e.g. MediaTek EIP-197):
+
+  xfrm_output() -> secpath_set() -> esp4_gso_encap() (no encryption,
+  marks skb) -> validate_xmit_xfrm() -> esp_xmit() -> async crypto
+  -> -EINPROGRESS -> validate_xmit_xfrm returns NULL
+
+On real netdevs (noqueue absent) sch_direct_xmit() handles NULL
+gracefully and async crypto completes the packet via
+xfrm_dev_resume().  On bridge netdevs (noqueue qdisc) the direct
+branch of __dev_queue_xmit() initialises rc to -ENOMEM and never
+overwrites it when skb is NULL, propagating -ENOMEM to userspace as
+"sendmsg: Out of memory" on every packet.
+
+On synchronous platforms (x86/ARM without a dedicated crypto engine)
+crypto_aead_encrypt() completes inline, -EINPROGRESS never occurs,
+and the bug is latent.
+
+Fix: return false for dev == NULL so SW SAs use the normal inline
+path in xfrm_output_one() via esp4_output().  On -EINPROGRESS,
+xfrm_output_resume() converts it to 0 and the async callback
+re-enters xfrm_output_resume() to deliver the encrypted packet
+correctly.  HW offload SAs (dev != NULL) are unaffected.
+
+Fixes: 9e1437937bdd ("xfrm: Add xfrm_dev_offload_ok helper")
+Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
+---
+ net/xfrm/xfrm_device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 550457e4c..5454be0b2 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -434,7 +434,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+ 
+ ok:
+ 	if (!dev)
+-		return true;
++		return false;
+ 
+ 	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
+ 			    x->props.mode == XFRM_MODE_TUNNEL;
+-- 
+2.51.0
 
 
