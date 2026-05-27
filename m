@@ -1,128 +1,266 @@
-Return-Path: <netdev+bounces-292304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292305-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gCxOMkT0Fmo6ygcAu9opvQ
-	(envelope-from <netdev+bounces-292304-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:40:20 +0200
+	id CJxdJsH0Fmo6ygcAu9opvQ
+	(envelope-from <netdev+bounces-292305-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:42:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F975E52FA
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:40:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB145E5379
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 15:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC41E3008D0C
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:35:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0461F30A629A
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 13:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469B130C171;
-	Wed, 27 May 2026 13:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F26740C5C5;
+	Wed, 27 May 2026 13:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aXss1Vx7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lj5vyJlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52B93FD14F
-	for <netdev@vger.kernel.org>; Wed, 27 May 2026 13:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E332405874;
+	Wed, 27 May 2026 13:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779888939; cv=none; b=uz3aAkS+STaoLX8rKnpRvKP51//KoRt/kIE5PFWxRKso7konEnXFaG5Lv6+eskiwFHAzpuDItIvBYMEsCHyyeHTMtI71h8PBk9zelHPbMCg5z3FrKc3jUYvb4CBNtIUZNfKabDK6EIs6EdvJls8qGnY3vkCVEGn9QXvtq6YBPWo=
+	t=1779888997; cv=none; b=bFvEYLvievPm5/VEX7YiW2LfFiSAKV2+4vRbM6njBNdE838e7IBqpBtWrGLuzfjLgWWVCcWSRY/vkqqUt6YHQP+Ec6VglUS1yysdY1o2E7AyHvyhVaszaocVajqcKvDEQriJ5PXzxZP+/EiEDhMz7pM0AmpzD2HUhWMx0g0c35o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779888939; c=relaxed/simple;
-	bh=BlXHFRZYrWKydKNVC6LtW/fFHh/v4i9ECQF0MGnYZlo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0IiTE5e0Q/e/qshzMM+/EmcAF1cfek7P8zJzPaJniQxTRE7XxLCYqhJCMbYqfomfhsAopoTgQPqpetgGnGKn1cM+k4wuzKj8+Shf7wALyQ2QkyxcD9ypJZELnjbDlDVLmrLIjaEnFfyS5kEbdNJKkMyIeqX2CF3XYlBF/RSnCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aXss1Vx7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+0+xv48AwBHVdWtFyRfOuyF+vN2kA2JFjvwPtDj6RKs=; b=aXss1Vx7UdioGIB5S5w/V4ruTN
-	zCyi46/jcwT0Ae9XQWiSMCKCELh9v1865FK1MTiQsDoUOF8rS7oiRLUI563Am7QvsIiCeZw3vHQ3q
-	XB9A6HwfCoKtlveO2yOgN2WbWhAy1zjk/GKeFhZ89JZkGPqSEI39G4IN/POnyCgalXKM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wSEQ2-004kjC-1s; Wed, 27 May 2026 15:35:34 +0200
-Date: Wed, 27 May 2026 15:35:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Walle <mwalle@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-Subject: Re: phylink and an unusual PHY/SFP setup
-Message-ID: <061815ee-e95e-4723-aa2a-d84bc3ad6233@lunn.ch>
-References: <DITB8QZ1OEQF.327XUI9E0SXQ3@kernel.org>
+	s=arc-20240116; t=1779888997; c=relaxed/simple;
+	bh=a+wRMTbwIRA8gHKefUAy8Qer+/Q0gu4oP6SEZpHjGIk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FTadU+O+P2CTmFA9pUs5V4cNA0TXLk8Zyta+10kfTX0z5LlJVobn87gXdxF4Ilm/CVOU/AvjVdogyc/N83HqBiDSXwihr29fXsnSQDJ5AEx7WQOd5gFtI3sqNhZkA4iNMFNJBnP76n+0f5iE3AHDXqQC7ZNqZb2lGN2X2gJN65A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lj5vyJlD; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FA261F00A3D;
+	Wed, 27 May 2026 13:36:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779888995;
+	bh=W93tvAG1gi7b+6memlyo/w2BK1fcNWozBaR+Wh3AtEs=;
+	h=From:To:Subject:Date;
+	b=Lj5vyJlDAczgsaXkWHjvGnbSz3Kncb6V0zAt+uDJv8gao46zUWWvmfjt6rui/VQsL
+	 XhRHVrMxIqdgvvronROdmAmBqu4/7Lo6dF6NUXee+M00bA/vwmdhjvQv0/J8Gp5FT6
+	 xjM6+b4hYHHR18Nc+KVmLgcOqHmBiuzq2IlVOU3NADvPZ8jDBCPjhd/JQv6TInXtSY
+	 LiZNKfjOPs9xjXkzGNhNvcUJZwpct3uqIr29srmbDZUf85+fAcH+144PP1HibsH19D
+	 JfArCp5Vj0JqeksDbui2lUjDK1Nec+ckHR+SWEXhUSkRSkeiZdrwjsV0Jqge8gPDRE
+	 ULz/ieGGH2gDg==
+From: Lee Jones <lee@kernel.org>
+To: lee@kernel.org,
+	James Chapman <jchapman@katalix.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/1] l2tp: pppol2tp: hold reference to session in pppol2tp_ioctl()
+Date: Wed, 27 May 2026 13:36:29 +0000
+Message-ID: <20260527133630.2120612-1-lee@kernel.org>
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DITB8QZ1OEQF.327XUI9E0SXQ3@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TAGGED_FROM(0.00)[bounces-292304-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292305-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 09F975E52FA
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 1BB145E5379
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 10:19:18AM +0200, Michael Walle wrote:
-> Hi,
-> 
-> I have a board with a rather unusual network link setup:
-> 
->  MAC/PCS (fman) <-SerDes-> PHY (M88E1112) <-SerDes-> SFP
-> 
-> or even
-> 
->  MAC/PCS (fman) <-SerDes-> PHY (M88E1112) <-SerDes-> Copper SFP with PHY
+pppol2tp_ioctl() read sock->sk->sk_user_data directly without any
+locks or reference counting.  If a controllable sleep was induced during
+copy_from_user() (e.g. via a userfaultfd page fault sleep), a concurrent
+socket close could trigger pppol2tp_session_close() asynchronously.  This
+frees the l2tp_session structure via the l2tp_session_del_work workqueue.
+Upon resuming, the ioctl thread dereferences the stale session pointer,
+resulting in a Use-After-Free (UAF).
 
-Such setups do exist already, but with a different PHY. The Marvel 10G
-PHY is sometimes placed in the middle like this. And there are other
-PHYs.
+Fix this by securely fetching the session reference using the RCU-safe,
+refcounted helper pppol2tp_sock_to_session(sk) on entry.  This locks the
+session's refcount across the sleep.  We structured the function to exit
+via standard err breaks, guaranteeing that l2tp_session_put() is cleanly
+called on all return paths to drop the reference.
 
-Take a look at
+To preserve existing behavior we validate the session and its magic
+signature only for the specific L2TP commands that require it.  This
+ensures that generic/unknown ioctls called on an unconnected socket
+still return -ENOIOCTLCMD and correctly fall back to generic handlers
+(e.g. in sock_do_ioctl()).
 
-commit 35d1a5464b476aa98b7b76ce41bb4de748cebfc2
-Author: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Date:   Thu Jan 8 09:00:35 2026 +0100
+Signed-off-by: Lee Jones <lee@kernel.org>
 
-    net: phy: marvell10g: Support SFP through phy_port
-    
-    Convert the Marvell10G driver to use the generic SFP handling, through a
-    dedicated .attach_port() handler to populate the port's supported
-    interfaces.
-    
-    As the 88x3310 supports multiple MDI, the .attach_port() logic handles
-    both SFP attach with 10GBaseR support, and support for the "regular"
-    port that usually is a BaseT port.
+---
+v1 => v2: Restrict session validation in pppol2tp_ioctl() to L2TP specific
+          commands to preserve generic socket ioctl fallback and perform
+          checks silently to mitigate WARN_ON() DoS risks.
 
-Also, marvell-88x2222.c.
+ net/l2tp/l2tp_ppp.c | 82 +++++++++++++++++++++++++++------------------
+ 1 file changed, 50 insertions(+), 32 deletions(-)
 
-	Andrew
+diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
+index 99d6582f41de..e0b1915be1a6 100644
+--- a/net/l2tp/l2tp_ppp.c
++++ b/net/l2tp/l2tp_ppp.c
+@@ -1045,64 +1045,76 @@ static int pppol2tp_ioctl(struct socket *sock, unsigned int cmd,
+ {
+ 	struct pppol2tp_ioc_stats stats;
+ 	struct l2tp_session *session;
++	int err = 0;
++
++	session = pppol2tp_sock_to_session(sock->sk);
+ 
++	/* Validate session presence and magic integrity ONLY for commands
++	 * that belong to L2TP and require a valid session.
++	 */
+ 	switch (cmd) {
+ 	case PPPIOCGMRU:
+ 	case PPPIOCGFLAGS:
+-		session = sock->sk->sk_user_data;
++	case PPPIOCSMRU:
++	case PPPIOCSFLAGS:
++	case PPPIOCGL2TPSTATS:
+ 		if (!session)
+ 			return -ENOTCONN;
+ 
+-		if (WARN_ON(session->magic != L2TP_SESSION_MAGIC))
++		if (session->magic != L2TP_SESSION_MAGIC) {
++			l2tp_session_put(session);
+ 			return -EBADF;
++		}
++		break;
++	default:
++		break;
++	}
+ 
++	switch (cmd) {
++	case PPPIOCGMRU:
++	case PPPIOCGFLAGS:
+ 		/* Not defined for tunnels */
+-		if (!session->session_id && !session->peer_session_id)
+-			return -ENOSYS;
++		if (!session->session_id && !session->peer_session_id) {
++			err = -ENOSYS;
++			break;
++		}
+ 
+-		if (put_user(0, (int __user *)arg))
+-			return -EFAULT;
++		if (put_user(0, (int __user *)arg)) {
++			err = -EFAULT;
++			break;
++		}
+ 		break;
+ 
+ 	case PPPIOCSMRU:
+ 	case PPPIOCSFLAGS:
+-		session = sock->sk->sk_user_data;
+-		if (!session)
+-			return -ENOTCONN;
+-
+-		if (WARN_ON(session->magic != L2TP_SESSION_MAGIC))
+-			return -EBADF;
+-
+ 		/* Not defined for tunnels */
+-		if (!session->session_id && !session->peer_session_id)
+-			return -ENOSYS;
++		if (!session->session_id && !session->peer_session_id) {
++			err = -ENOSYS;
++			break;
++		}
+ 
+-		if (!access_ok((int __user *)arg, sizeof(int)))
+-			return -EFAULT;
++		if (!access_ok((int __user *)arg, sizeof(int))) {
++			err = -EFAULT;
++			break;
++		}
+ 		break;
+ 
+ 	case PPPIOCGL2TPSTATS:
+-		session = sock->sk->sk_user_data;
+-		if (!session)
+-			return -ENOTCONN;
+-
+-		if (WARN_ON(session->magic != L2TP_SESSION_MAGIC))
+-			return -EBADF;
+-
+ 		/* Session 0 represents the parent tunnel */
+ 		if (!session->session_id && !session->peer_session_id) {
+ 			u32 session_id;
+-			int err;
+ 
+ 			if (copy_from_user(&stats, (void __user *)arg,
+-					   sizeof(stats)))
+-				return -EFAULT;
++					   sizeof(stats))) {
++				err = -EFAULT;
++				break;
++			}
+ 
+ 			session_id = stats.session_id;
+ 			err = pppol2tp_tunnel_copy_stats(&stats,
+ 							 session->tunnel);
+ 			if (err < 0)
+-				return err;
++				break;
+ 
+ 			stats.session_id = session_id;
+ 		} else {
+@@ -1112,15 +1124,21 @@ static int pppol2tp_ioctl(struct socket *sock, unsigned int cmd,
+ 		stats.tunnel_id = session->tunnel->tunnel_id;
+ 		stats.using_ipsec = l2tp_tunnel_uses_xfrm(session->tunnel);
+ 
+-		if (copy_to_user((void __user *)arg, &stats, sizeof(stats)))
+-			return -EFAULT;
++		if (copy_to_user((void __user *)arg, &stats, sizeof(stats))) {
++			err = -EFAULT;
++			break;
++		}
+ 		break;
+ 
+ 	default:
+-		return -ENOIOCTLCMD;
++		err = -ENOIOCTLCMD;
++		break;
+ 	}
+ 
+-	return 0;
++	if (session)
++		l2tp_session_put(session);
++
++	return err;
+ }
+ 
+ /*****************************************************************************
+-- 
+2.54.0.746.g67dd491aae-goog
+
 
