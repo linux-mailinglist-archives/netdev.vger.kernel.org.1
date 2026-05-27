@@ -1,155 +1,187 @@
-Return-Path: <netdev+bounces-292476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LFQI0Z/F2phHAgAu9opvQ
-	(envelope-from <netdev+bounces-292476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:33:26 +0200
+	id 6PDtBuyDF2rJHggAu9opvQ
+	(envelope-from <netdev+bounces-292477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:53:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B085EAF09
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:33:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE525EB0F0
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89BA7301D33B
-	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 23:33:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1946F302FCF5
+	for <lists+netdev@lfdr.de>; Wed, 27 May 2026 23:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B6D37B415;
-	Wed, 27 May 2026 23:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F723B3C06;
+	Wed, 27 May 2026 23:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cPQiM+JQ"
+	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="sYGMh5qL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1597531E850;
-	Wed, 27 May 2026 23:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F4D2F12CE;
+	Wed, 27 May 2026 23:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779924803; cv=none; b=ESe8Zu2mhkIUaYgeoBgMksfJU1ke9L7pNb0ZzkNULKy/X2qqn9IN59HqvlqdtanyCMh3H3JfJPVrszcRHJtyER0YhZfL2uc5YDgan/eH0whtlbnbvEGymaJ9+oZtcP4+EgMgHypJ8tETkRelevA8M1WqMEf7AAjhSKK19fWghdw=
+	t=1779925990; cv=none; b=EBRoxWggr1+u2gh8C1bCbQQcLho04EDD1S+y0xXiBQ7hA8BvU44XNKtF2MLA1TCGciq4LACfx76XuJUroXmMZFAe6HAOYPs15rND7nyqqvlz5H3t93KZFRqnYTjVutImeAz6R8r2EqdcXUBfI9KvLsFUpW01UPWw9EYjE7O8CpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779924803; c=relaxed/simple;
-	bh=6PUm1E3LDoZ+68223PzWURdi0dxg9skuim3wzk3fRAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g756RLyvQoqzf1luXTZFpWK+m3/CeF1TmlN1Av1OQiJHft5s42MlNXMxNaINzuosWx/DIBuMrCLtXScHdaizD0wvO7STi55fd7KN2OZy0iih3imibNpJ+5MLpP/lk1VyNcwsa/ENeEodDVe7nGGIM85b8uWzojfdreINJUs/CSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cPQiM+JQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 789811F000E9;
-	Wed, 27 May 2026 23:33:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779924801;
-	bh=yqhH6oAjdYCLvVyb+keGbP9l49zTVX5ArxLru3gp0Pk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cPQiM+JQLxHw4K/XOKiuswzV3nVV1yWoQRRuXEqr/uJs51wRQYQV3QQJjgljkd9lc
-	 e67wWxKJrPbk5HJVSnpKSwnlzJWJOGyw3kNTcqQ1NqgMH1hR7XNUAILEbiI9ZD+QDP
-	 k9f140JN4xpypxhin28fMa5kNIlR0KEkzbSqHrc6lr0FlFHttaHT0uwN+eHHtzbu5L
-	 tTc6IW5dJf7Fgr5V8TA7STdmQ/jQ/kYqXHZBNuu8nQ3pj1hePZiovM5Ynl+kbEaYk3
-	 n3fXyLNVfO9LJl/TL6so++M+Vm7ahbmMPfKpsoe0iGBLQ/6jKVhhwByiY0DmjLKiuU
-	 rDZW6PMpo5pKg==
-Date: Wed, 27 May 2026 16:33:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?UHLDqW5vbT8=?= Ahmed <ahmedabdelmoumen05@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Daniel Borkmann
- <daniel@iogearbox.net>, David Wei <dw@davidwei.uk>
-Subject: Re: Linux: DMA-after-unmap race in ZCRX via
- netif_rxq_cleanup_unlease() ordering inversion (netkit + page_pool)
-Message-ID: <20260527163320.407b4af1@kernel.org>
-In-Reply-To: <CAN+TWHTGkGZu4vdbkMY8F-EDe3m8ScBctW-fdtfcpGbj192SyA@mail.gmail.com>
-References: <CAN+TWHTGkGZu4vdbkMY8F-EDe3m8ScBctW-fdtfcpGbj192SyA@mail.gmail.com>
+	s=arc-20240116; t=1779925990; c=relaxed/simple;
+	bh=FiRCXE+ry0UYOfyR61+hOQdaVSijUZEI/X5/4ZSjh0M=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=IZWB1Yd7uLJRJXQihOsRsC1HNBGuD4BjUZauwzBtiESNTQud7qjE+hq1qpzGLkdDrmsw/fjJf9tCT5YnOUH/aYBIiwkafSLO3bwj7HWhGkivarQn0pnGMGNuDpBKdQIrQZks7xR2dF8tMNIh4GZTB+Cofvd9UkcHlMDyHy2gcWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=sYGMh5qL; arc=none smtp.client-ip=216.154.215.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 64RNqcur012679
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 28 May 2026 00:52:40 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 64RNqcur012679
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1779925964; bh=dY+koG+rDbK6oNNjTIXhpa7guFcKUU2M2+I70SQwZ+w=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=sYGMh5qL/5YHjyaAkO3LoafY9T4EODUiVKNsmk2rHpXVaFjRd7PCTmKO3ijkxvhKi
+	 jZRDS7GWYVwZvGf5taK9DhecfjpdYZah3m7oA/59GPhEwuBNYRdc9Mhwc7UT45o7ah
+	 PTkyCXjcVpaZ9ukCzfSB/D1ZW1jNmSQEfq/UbWsnhfnKGWtABMh26M5o/rPxeKspsu
+	 7/BE2j8uldMevFRafe28V0+SB2HOGQmMjhr6AvuUowMoydtDad/rKyKyAoHDgXq/1Y
+	 phL2ES6/WyeWNYIgJC+3bCOlA1UrJhUbTrkAeuyF5leY1OIbNAr1JThFfy5QkAWMA+
+	 /n7Q197m3r8ig==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH net-next 2/2] net: dsa: mv88e6xxx: add support for credit
+ based shaper
+From: Luke Howard <lukeh@padl.com>
+In-Reply-To: <20260522-net-next-mv88e6xxx-cbs-v1-2-c87a8e6bcc0c@luminex.be>
+Date: Thu, 28 May 2026 09:52:27 +1000
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <0FB1CAF0-D30C-4A24-A684-1D1DBEE52FA5@padl.com>
+References: <20260522-net-next-mv88e6xxx-cbs-v1-0-c87a8e6bcc0c@luminex.be>
+ <20260522-net-next-mv88e6xxx-cbs-v1-2-c87a8e6bcc0c@luminex.be>
+To: cedric.jehasse@luminex.be
+X-Mailer: Apple Mail (2.3826.700.81)
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292476-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292477-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[padl.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E2B085EAF09
+	APPLE_MAILER_COMMON(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 6EE525EB0F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Dropping security lists, security lists are for private discussions,
-it's utterly pointless to CC both them and LKML. Not to mention
-that this bug only exists in -rc kernels.
+Hi Cedric,
 
-Adding relevant developers. Moving security@ to Bcc
+In anticipation of potentially rebasing my MQPRIO patch series upon this =
+patch, I have some comments. (My MUA appears to have ruined the =
+indentation, apologies.)
 
-On Wed, 27 May 2026 23:53:45 +0100 Pr=C3=A9nom? Ahmed wrote:
-> Hello,
->=20
-> I would like to report a source-proven teardown ordering bug in the Linux
-> kernel that can lead to a DMA-after-unmap race condition involving ZCRX
-> (io_uring zero-copy receive), page_pool, and netkit queue leasing.
->=20
-> ***Reporter:** Ahmed Abdelmoemen **Discovery Date:** 2026-05-26 **Kernel
-> Version:** Linux 7.1.0-rc3*
->=20
-> Executive Summary
->=20
-> *A logic error in `netif_rxq_cleanup_unlease()` causes DMA mappings for t=
-he
-> ZCRX memory provider to be revoked **before** the physical NIC RX queue is
-> stopped. This creates a race window during netkit queue lease teardown
-> where the physical device's NAPI can consume stale `net_iov` entries from
-> the page_pool alloc cache containing `dma_addr =3D 0`.*
->=20
-> The ordering inversion is fully proven at the source level. However, I ha=
-ve
-> **not** performed runtime verification, so actual memory corruption or
-> successful DMA to address 0 has **not** been proven =E2=80=94 it remains =
-hardware
-> and driver dependent.
->=20
-> The bug is reachable with `CAP_NET_ADMIN` (common in container
-> environments) when using netkit with ZCRX.
->=20
-> Root Cause
->=20
-> In `net/core/netdev_rx_queue.c:347-348`:
->=20
-> ```c __netif_mp_uninstall_rxq(virt_rxq, p); // DMA unmap + dma_addr=3D0
-> __netif_mp_close_rxq(...); // queue stop + NAPI disable (TOO LATE)
->=20
-> This inverts the correct ordering used in normal device unregistration and
-> io_uring close paths (stop first, then unmap).
-> Impact
->=20
->    - *Potential:* NIC DMA write to physical address 0 (or stale mappings
->    with lazy IOMMU) leading to memory corruption.
->    - *Requirements:* CAP_NET_ADMIN + netkit queue leasing + ZCRX installed
->    on the leased queue.
->    - *Current Status:* No runtime PoC or crash reproduction yet. The race
->    window exists in theory but its practical exploitability needs confirm=
-ation.
->=20
-> I am attaching the full detailed analysis.
-> Proposed Fix[image: image.png]
->=20
-> I am happy to provide more details or assist with testing.
+> Some of the chips supported by this driver have credit based shaper
+> support. Support is added for the 6352, 6390 and 6393 families.
+
+Would also be good to add support for the 6341, which as 4 queues but =
+uses the same Qav multipliers as the 6390.
+
+> + if (cbs->enable) {
+> + if (cbs->idleslope <=3D 0 ||
+> +    cbs->idleslope > qav->max_rate ||
+> +    cbs->sendslope >=3D 0 || cbs->hicredit <=3D 0 ||
+> +    cbs->hicredit > qav->hi_limit_mask)
+> + return -ERANGE;
+
+Other drivers (e.g. felix_vsc9959) round up and clamp, rather than =
+validating. I would consider whether this validation is necessary at =
+all, and/or whether it would suffice to omit the idleslope check and =
+check only rate_mask. The idleslope and sendslope zero validation might =
+be better placed in sch_cbs.c.
+
+> + if (!cbs->enable) {
+> + err =3D avb_ops->port_qav_write(chip, port, rate_reg, 0);
+
+The convention is to provide a wrapper function, e.g. =
+mv88e6xxx_port_qav_write(), returning -EOPNOTSUPP if the function =
+pointer is NULL.
+
+> + if (!(chip->ports[port].cbs_active_queues & ~queue_bit)) {
+> + err =3D ops->port_set_scheduling_mode(chip, port, 0);
+> + if (err)
+> + goto unlock;
+> + }
+> + chip->ports[port].cbs_active_queues &=3D ~queue_bit;
+> + goto unlock;
+> + }
+> +
+> + hi_limit =3D cbs->hicredit & qav->hi_limit_mask;
+> + err =3D avb_ops->port_qav_write(chip, port, hilimit_reg, hi_limit);
+> + if (err)
+> + goto unlock;
+> +
+> + err =3D avb_ops->port_qav_write(chip, port, rate_reg, rate);
+> + if (err)
+> + goto unlock;
+> +
+> + err =3D ops->port_set_scheduling_mode(chip, port,
+> +    chip->info->num_tx_queues - 1);
+> + if (err) {
+> + avb_ops->port_qav_write(chip, port, rate_reg, 0);
+> + goto unlock;
+> + }
+> + chip->ports[port].cbs_active_queues |=3D queue_bit;
+> +
+> +unlock:
+> + mv88e6xxx_reg_unlock(chip);
+> +
+> + return err;
+
+This may not matter in practice, but SMI errors will leave the register =
+state in an inconsistent configuration. I would consider having multiple =
+cleanup handlers that revert the state to that on function entry.
+
+With respect to cbs_active_queues, my personal opinion is to not cache =
+state both in the driver and registers where possible (to avoid the =
+possibility they may get out of sync), but it is true that on a device =
+with many queues, determining the CBS state dynamically would be =
+expensive. I would be interested in others=E2=80=99 opinion here.
+
+> +struct mv88e6xxx_qav_info {
+> + u32 max_rate; /* in kbps */
+
+Per above comment, perhaps consider whether max_rate is required. Also, =
+queue_mask can be determined dynamically from chip->info->num_tx_queues, =
+so can be elided.
+
+Cheers,
+Luke=
 
