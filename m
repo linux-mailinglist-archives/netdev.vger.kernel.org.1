@@ -1,163 +1,213 @@
-Return-Path: <netdev+bounces-292561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OO86EZLZF2pCTAgAu9opvQ
-	(envelope-from <netdev+bounces-292561-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:58:42 +0200
+	id gBxeFAjaF2pCTAgAu9opvQ
+	(envelope-from <netdev+bounces-292563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:00:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3AB15ED121
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:58:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC47D5ED15E
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66B123013784
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:54:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 61F133009F99
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C96326938;
-	Thu, 28 May 2026 05:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86A0313545;
+	Thu, 28 May 2026 05:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lxIx6yZg"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lhfVqYVS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882EA31716D;
-	Thu, 28 May 2026 05:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18891A680F;
+	Thu, 28 May 2026 05:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779947640; cv=none; b=DwuKE1MPprYILR7Unvymd21JSZjEV862vghAQCZPQbJFsAl60gwzAnbv7bpeZVwm6YcknwI+SpE63RrgMxz1cyhPGOOY18wftWFEmDtVmorSUhpxTnBEU4E3ZiAH3RsylCt2YZCjYnW+UyTn2MxwfxBrHDhlXx5W6PHJ4NihJaM=
+	t=1779947776; cv=none; b=dl+1uvjzm9/G6QyhnBPYdWz+I3dzc24v1mOVLmTICNVHOJl75F2IomCO41zHDs/paWJcE8J3uhZxnD39wNoUxtpLEiI4Q8OSbXIqcetr3TBND2oXODVqp080CHLV6PKQQa2cPk7nHSxWZLcqUKK1p16aEeUyJCoAzqBjeeW4/+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779947640; c=relaxed/simple;
-	bh=rRmK3zCxvGHCs2iUVKIaSjaAeWQ1gU17AW0Svst8Dy4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rmCkDxXJrKETbNVERu2peUq7+A9PbauIXsMmFZkbPrwnklUM1mswcyX+bSG2ghYWWIf+V4asPWdbfNJA6tzb5C+4R3A7lh4+DTss7anO0pjP30ecrlm1A24IM5SS/g16SgnNoR7bB7A1gnsasGV7Vm6cwSSJOtk/pIS7d1Lqs9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lxIx6yZg; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ac7a32d5-6c31-41a9-8a36-e64be12f45a3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779947627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kVuZxbZ1lnRR8lzuxBuMksaeSxvcrcw4Tz1MmMLYI3w=;
-	b=lxIx6yZgNDE1g/MiMoDQTcoWhS8CYnrSEghVGdC+36zAtEGPxPH1MZaGs76OVkbUUZDjTb
-	FIGLvs7dmM1CgKcJYeYS8uOvSNy4ArN+VAQ4RzrchbiVuca5jb7lWT1Q4MILgreOXXzBsp
-	5ex0Zs8ZH30hUybzqd8YfKBI92jzd8s=
-Date: Thu, 28 May 2026 13:53:25 +0800
+	s=arc-20240116; t=1779947776; c=relaxed/simple;
+	bh=3Pz2/POEIG27/OLincfenN/OFgbzNrurtHLqmbuPSbk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=tcGutWqCAMGbLhthEW1OiYvuJD/RBFgLnrAaLWX49dCzUmAEV9hSMQ+e0RgC7wSzkV0cqntuYkNhf1PLZ5CJ4Zjxy+ylGOpDPUe7eF9kFzC36fg9vh496ElfkacPsx+U7xkLFRmJI9jUTH/ocsbvruMGuK0wHrbArjDON9buWe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lhfVqYVS; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
+	Content-Type; bh=2znY/CshLD06l5CCn5YAkQ481WGsnDnDH3u8+6xLglw=;
+	b=lhfVqYVS1W9k7/ADAZjvNjvCPFZNIDWjZavbtACp6V5AhKigIowywXfnAw7yhu
+	AR2OxMgpMyHXNwkLjqeIjHBYZVpYDtbw1/DncridyMnabzjAJTlrv7Lxwtdi2Rjg
+	KHr1NdHwvjvsohmA+ko3gnK+ninwEBUxPgoBZowvRzOag=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wBHgqCX2BdqeNomAA--.4959S2;
+	Thu, 28 May 2026 13:54:32 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Duoming Zhou <duoming@zju.edu.cn>
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	Arend van Spriel <arend.vanspriel@broadcom.com>,
+	Franky Lin <franky.lin@broadcom.com>,
+	Hante Meuleman <hante.meuleman@broadcom.com>,
+	Chi-hsien Lin <chi-hsien.lin@infineon.com>,
+	Wright Feng <wright.feng@infineon.com>,
+	Chung-hsien Hsu <chung-hsien.hsu@infineon.com>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Piotr Haber <phaber@broadcom.com>,
+	"John W . Linville" <linville@tuxdriver.com>,
+	Pieter-Paul Giesberts <pieterpg@broadcom.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	linux-wireless@vger.kernel.org,
+	brcm80211-dev-list.pdl@broadcom.com,
+	SHA-cyfmac-dev-list@infineon.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15.y] wifi: brcmfmac: fix use-after-free when rescheduling brcmf_btcoex_info work
+Date: Thu, 28 May 2026 13:54:31 +0800
+Message-Id: <20260528055431.4124445-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next v7 04/11] libbpf: introduce
- bpf_map__attach_struct_ops_opts()
-Content-Language: en-US
-To: Yonghong Song <yonghong.song@linux.dev>, Hui Zhu <hui.zhu@linux.dev>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>,
- Jiri Olsa <jolsa@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Muchun Song <muchun.song@linux.dev>,
- JP Kobryn <inwardvessel@gmail.com>, Andrew Morton
- <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
- davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, KP Singh <kpsingh@kernel.org>,
- Tao Chen <chen.dylane@linux.dev>, Mykyta Yatsenko <yatsenko@meta.com>,
- Leon Hwang <leon.hwang@linux.dev>,
- Anton Protopopov <a.s.protopopov@gmail.com>, Amery Hung
- <ameryhung@gmail.com>, Tobias Klauser <tklauser@distanz.ch>,
- Eyal Birger <eyal.birger@gmail.com>, Rong Tao <rongtao@cestc.cn>,
- Hao Luo <haoluo@google.com>, Peter Zijlstra <peterz@infradead.org>,
- Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Kees Cook <kees@kernel.org>, Tejun Heo <tj@kernel.org>,
- Jeff Xu <jeffxu@chromium.org>, mkoutny@suse.com,
- Jan Hendrik Farr <kernel@jfarr.cc>, Christian Brauner <brauner@kernel.org>,
- Randy Dunlap <rdunlap@infradead.org>, Brian Gerst <brgerst@gmail.com>,
- Masahiro Yamada <masahiroy@kernel.org>, Willem de Bruijn
- <willemb@google.com>, Jason Xing <kerneljasonxing@gmail.com>,
- Paul Chaignon <paul.chaignon@gmail.com>,
- Chen Ridong <chenridong@huaweicloud.com>, Lance Yang <lance.yang@linux.dev>,
- Jiayuan Chen <jiayuan.chen@linux.dev>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: geliang@kernel.org, baohua@kernel.org
-References: <cover.1779760876.git.zhuhui@kylinos.cn>
- <20bdaa33cc19364f5f10208c79ef94fe43bd5ac1.1779760876.git.zhuhui@kylinos.cn>
- <2fd62ec0-c594-4ac2-a95d-29eafbcb74d6@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <2fd62ec0-c594-4ac2-a95d-29eafbcb74d6@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-CM-TRANSID:_____wBHgqCX2BdqeNomAA--.4959S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJw1ktFWrCr4fKF4DKw43Awb_yoWrJryfpa
+	y3G34ayry0qrWakrWkJr1kZFy5KanrG3Wqyr48AF43uFsIqF1xGFW0yF12gFW7CFW09ay2
+	yF4Fqry3Jrs8tFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pNii6bUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5Ri8KGoX2JhQigAA3O
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292561-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com,cmpxchg.org,linux-foundation.org,davemloft.net,fomichev.me,meta.com,distanz.ch,cestc.cn,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,huaweicloud.com,vger.kernel.org,kvack.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[163.com];
+	TAGGED_FROM(0.00)[bounces-292563-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[59];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,broadcom.com,infineon.com,codeaurora.org,davemloft.net,kernel.org,tuxdriver.com,163.com,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: B3AB15ED121
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,msgid.link:url,zju.edu.cn:email]
+X-Rspamd-Queue-Id: AC47D5ED15E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 27/5/26 23:43, Yonghong Song wrote:
-> 
-> 
-> On 5/25/26 7:20 PM, Hui Zhu wrote:
->> From: Roman Gushchin <roman.gushchin@linux.dev>
-[...]
->> diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
->> index dfed8d60af05..6105619b5ecf 100644
->> --- a/tools/lib/bpf/libbpf.map
->> +++ b/tools/lib/bpf/libbpf.map
->> @@ -454,6 +454,7 @@ LIBBPF_1.7.0 {
->>           bpf_prog_assoc_struct_ops;
->>           bpf_program__assoc_struct_ops;
->>           btf__permute;
->> +        bpf_map__attach_struct_ops_opts;
-> 
-> Function bpf_map__attach_struct_ops_opts should be in
-> LIBBPF_1.8.0.
-> 
+From: Duoming Zhou <duoming@zju.edu.cn>
 
-Pls also keep it in alphabet order.
+[ Upstream commit 9cb83d4be0b9b697eae93d321e0da999f9cdfcfc ]
 
-Thanks,
-Leon
+The brcmf_btcoex_detach() only shuts down the btcoex timer, if the
+flag timer_on is false. However, the brcmf_btcoex_timerfunc(), which
+runs as timer handler, sets timer_on to false. This creates critical
+race conditions:
 
->>   } LIBBPF_1.6.0;
->>     LIBBPF_1.8.0 {
-> 
-> 
-> 
+1.If brcmf_btcoex_detach() is called while brcmf_btcoex_timerfunc()
+is executing, it may observe timer_on as false and skip the call to
+timer_shutdown_sync().
+
+2.The brcmf_btcoex_timerfunc() may then reschedule the brcmf_btcoex_info
+worker after the cancel_work_sync() has been executed, resulting in
+use-after-free bugs.
+
+The use-after-free bugs occur in two distinct scenarios, depending on
+the timing of when the brcmf_btcoex_info struct is freed relative to
+the execution of its worker thread.
+
+Scenario 1: Freed before the worker is scheduled
+
+The brcmf_btcoex_info is deallocated before the worker is scheduled.
+A race condition can occur when schedule_work(&bt_local->work) is
+called after the target memory has been freed. The sequence of events
+is detailed below:
+
+CPU0                           | CPU1
+brcmf_btcoex_detach            | brcmf_btcoex_timerfunc
+                               |   bt_local->timer_on = false;
+  if (cfg->btcoex->timer_on)   |
+    ...                        |
+  cancel_work_sync();          |
+  ...                          |
+  kfree(cfg->btcoex); // FREE  |
+                               |   schedule_work(&bt_local->work); // USE
+
+Scenario 2: Freed after the worker is scheduled
+
+The brcmf_btcoex_info is freed after the worker has been scheduled
+but before or during its execution. In this case, statements within
+the brcmf_btcoex_handler() — such as the container_of macro and
+subsequent dereferences of the brcmf_btcoex_info object will cause
+a use-after-free access. The following timeline illustrates this
+scenario:
+
+CPU0                            | CPU1
+brcmf_btcoex_detach             | brcmf_btcoex_timerfunc
+                                |   bt_local->timer_on = false;
+  if (cfg->btcoex->timer_on)    |
+    ...                         |
+  cancel_work_sync();           |
+  ...                           |   schedule_work(); // Reschedule
+                                |
+  kfree(cfg->btcoex); // FREE   |   brcmf_btcoex_handler() // Worker
+  /*                            |     btci = container_of(....); // USE
+   The kfree() above could      |     ...
+   also occur at any point      |     btci-> // USE
+   during the worker's execution|
+   */                           |
+
+To resolve the race conditions, drop the conditional check and call
+timer_shutdown_sync() directly. It can deactivate the timer reliably,
+regardless of its current state. Once stopped, the timer_on state is
+then set to false.
+
+Fixes: 61730d4dfffc ("brcmfmac: support critical protocol API for DHCP")
+Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+Link: https://patch.msgid.link/20250822050839.4413-1-duoming@zju.edu.cn
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c
+index f9f18ff451ea..f46e40900217 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c
+@@ -392,10 +392,8 @@ void brcmf_btcoex_detach(struct brcmf_cfg80211_info *cfg)
+ 	if (!cfg->btcoex)
+ 		return;
+ 
+-	if (cfg->btcoex->timer_on) {
+-		cfg->btcoex->timer_on = false;
+-		del_timer_sync(&cfg->btcoex->timer);
+-	}
++	del_timer_sync(&cfg->btcoex->timer);
++	cfg->btcoex->timer_on = false;
+ 
+ 	cancel_work_sync(&cfg->btcoex->work);
+ 
+-- 
+2.34.1
 
 
