@@ -1,154 +1,202 @@
-Return-Path: <netdev+bounces-292567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aAm9K2fgF2rxTggAu9opvQ
-	(envelope-from <netdev+bounces-292567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:27:51 +0200
+	id EEAoCjDkF2otUggAu9opvQ
+	(envelope-from <netdev+bounces-292569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:44:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B5745ED46B
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:27:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 975BA5ED5CB
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:43:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AA04F30015BB
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 06:27:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F7973022AB3
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 06:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074E832C923;
-	Thu, 28 May 2026 06:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9F2335564;
+	Thu, 28 May 2026 06:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="N/22HH52";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6N+IcKdl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwd0bB/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657BC33121F
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 06:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965E232143D
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 06:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779949667; cv=none; b=gw5Ng3je7qwY+W8o4YjxxMPQ2h20JHbpx6YiRUserI78YjC02DuLJt41EyJPkV6DYwTd2kND6eNQ+QI1vs+fbae5qwlhZMzW82QWE2k7qxodfocD/MWHYpqh/cNuFoUpVnGSIaIF8r/UAwSUHJ4zK3FvvbyFkp6jgS1Gp4WZRpk=
+	t=1779950637; cv=none; b=aE/pP7Y2QEF/KtU/zom9DMRjQ8JS80MnkaS6ACipDWQzvsFyN3+1UcJofldFHUL6SyX+gi+M9ImdR7enL9Ogyz09iqEN5CuOY6mhwd9YabotLtVOhFqoqjApWYLjVEl/rZbaHiFcQS14VUPuXD63t0CbQG0LlVYZhpLfgV5/EUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779949667; c=relaxed/simple;
-	bh=rrIpuPhtFOkBtiPO8Uyy1YE1r7l+QH3qO4N1e8wuBEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qZYq9CquTQmmqyJKWGLHIsJ8BUzj8WXgeYdMvhK1dqK8iOy75xIK/y4bN3Cyce3aujgyp8ebKBTRVAkOu9QVaGf7AoS8WIKKHlmZMyoLcHNpidK0Xg114/TRuuvsd3Rx0rgbfCuecTIvqY5obVEBADMJW+tYgKIvGbyBiYiqwrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=N/22HH52; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6N+IcKdl; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 28 May 2026 08:27:42 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1779949663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mwOaY4RNQyDX3FN8D+3gMoORx5Ors6iRbe/5nQOLE0g=;
-	b=N/22HH523c7G3uFErene4NCyMSRk0DIweaYEWlOeL4O2UGBp1qQGRHJGalLXhXFJtmkN87
-	DvqXS4hnozc3RgkAAQXxa3BQVGGoJ4QU/m37I9/Ke/5Z/ld8ibaRNcPJGQt76BmsFXyUUG
-	QxB8FpMmG+RyGeNSH/L2DOPrsNOWAkvpUnbFUkD7lBvHC6/xWxgauIBOQxzStAQ2wgifF/
-	5Sc/yge7ftXdJTpsSqc3FpbS8hBlERaqLqTaPtYYR513BDNaNhOPfbwOVRzLsBnC//kZjA
-	yWf9YGscVLjuA2syvyRESFyhnzuA01MQJPjqP6H9giRNcCT1CEUshwdJGYem9w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1779949663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mwOaY4RNQyDX3FN8D+3gMoORx5Ors6iRbe/5nQOLE0g=;
-	b=6N+IcKdl7y3ZlKSNkTneUwCE0X8A9a3zA79+QpXWtRDin+G0j9kjxIq4qcEQCdYSJF1vPr
-	fv51KpPFqAJ6RMBw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
-	Daolin Qiu <d-qiu@ti.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Neelima Muralidharan <neelima@ti.com>,
-	Paolo Abeni <pabeni@redhat.com>, Praneeth Bajjuri <praneeth@ti.com>,
-	Pratheesh Gangadhar TK <pratheesh@ti.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v5 8/8] selftests: hsr: Add test for the inline
- PTP header on HSR
-Message-ID: <20260528062742.453G-OkS@linutronix.de>
-References: <20260527-hsr_ptp-v5-0-158a7633eac0@linutronix.de>
- <20260527-hsr_ptp-v5-8-158a7633eac0@linutronix.de>
- <20260527121227.40bf085c@kernel.org>
+	s=arc-20240116; t=1779950637; c=relaxed/simple;
+	bh=FVVTsYJTF2e7bLuXg7RDhzR2fz01nujdVpYjmQP3WYw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Hjs3mmmttmcH8qGNlT828NeCZQ2/AIvo4RpjPqKz/R4IbLO+X+acPFRkEd/INzSoX2bBtSHYSpjrUP7t2l8Z3oet0K5f9HfWQ24MZLSdwz9jmHAzctHJPySLsGi8vJcAw6grBlKh3H07asjRO8nlROaAqsBrJEJhpI7+5V1Cu70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwd0bB/D; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43d734223e4so7815867f8f.0
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 23:43:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779950632; x=1780555432; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NIMAjveMjrmBbIqxPwW9V0vcTecYVP+AHHLTYlg+7H8=;
+        b=fwd0bB/DTXksAfd4NNxVwjc72effjrmiSz1t92eRsT+txSnPCpeYNyB6TTwoYvnpyy
+         0Hxu99bKq1YviNXfAx53TYXbcpS7SfkqpGMDHwpWJgCGqdjalhikrpeG1wYM3VxhXkLr
+         4xjZn8GuJgrJWK9nnCNu2zI94LtARD+Fva/scsopY+HnXbkQkNhsnz3P8SfWVSRNehLb
+         ZEfoKKbJcOqMNh8qBKbUj9aX+oQsPkcaBExJdW32jOzViuy+jqVRbFH5SBbSmj8CPEb6
+         m0jL3y8LuX8bB02RwmlXEICPR1nvg9UFltc3MUXoSfm8lAqwAURATr0pdgWi8blxtGgn
+         rTDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779950632; x=1780555432;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NIMAjveMjrmBbIqxPwW9V0vcTecYVP+AHHLTYlg+7H8=;
+        b=nH6JfMRsdw09S/ecRo/EWbu1fE3Wk3Un0z5m1x5FD0ycDYQr6zIDaqL9Cg+E106Jsu
+         iOfs10FFsTzkYWavTtx/6hfQoqrUn0HsQ1SAtJqI7+PLI24kNetOAJa6fRvFQ+z96/3C
+         +YyVq2dmaysiQ2TEXy5Sk0kNtumPULh7UFX8x5y3hFKMk76P4SlE081UoYhZ47J+ZxrQ
+         bLoCowyf0mVJ0hwr6jPk1Lx/zXu6sdNVyJ6wmhFTwjZlaVgFTAp9eBZjHm0hjG2f5O7J
+         CJ4oo/QQ13tLYFheBLQRGLjDetALG2poXYPsJlECbsHlNnm3KkHuFrGMoaIBzhnXM0W/
+         5ikg==
+X-Gm-Message-State: AOJu0Yws4ELxtbV0DuvitvgdNQHxBHpqIA8xdnj41xgy4uRnFoAbdhzp
+	cypVN8cySiutu9Tm84c9DPdzNm8lSrNtuCaZOeQN7OPESRfWXx/3tT9SGSUSFXY1
+X-Gm-Gg: Acq92OEnUS0atkrfkqZqzE9Bh0EgYMq2SYd5WBCrUs7ESIj4+/pGFkvoTQOVeUxNii2
+	MT5R4dvQB6gDGuZ4uaID2wv1CMzcmmGE/FnOuex9VFFpKbjLb4le5hu+4kfzkqvt9W1ijnV73gq
+	BLgPDhqrs/7H3ftT9Ic1Wn8CjLZps4PKwiZ2j0XUgk343NlAK72GcGQL4ro7Xzd4MLrgcZd8GwM
+	izVOaVKfUnBxCWdAO8VQ3UJkmvyCeEyDs0ntM9RVhBLVNbBCrZdnxj/eL00Ub54R4DpKUnJSlxu
+	RwqerQzAy2AtHde3L8nltSgpdqpJGLa44JvEQ4T9qH+1nvLUQ0lwJNnMPatqihjOBX3AOGR70ms
+	IjMrOCbwiq/dOb8txlUVGm7LnkR05T+SPkK6Y6pO1aTwl1SkVo995x8Ik6yPjHHzYMNK74ogfrh
+	SevW3J2093YSIqwbo6WrJG0lyhSTUODsfJc5HNTnk4FpL8Hcxt6ZufuQ2JCF4hdmU/EA==
+X-Received: by 2002:a05:6000:1842:b0:449:cd74:7432 with SMTP id ffacd0b85a97d-45eeba61e70mr456729f8f.15.1779950632210;
+        Wed, 27 May 2026 23:43:52 -0700 (PDT)
+Received: from localhost.localdomain ([87.236.194.191])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5584b8sm10934563f8f.11.2026.05.27.23.43.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 23:43:51 -0700 (PDT)
+From: Petr Wozniak <petr.wozniak@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com,
+	sd@queasysnail.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Petr Wozniak <petr.wozniak@gmail.com>
+Subject: [PATCH net] xfrm: propagate -EINPROGRESS from validate_xmit_xfrm()
+Date: Thu, 28 May 2026 08:43:49 +0200
+Message-ID: <20260528064349.5512-1-petr.wozniak@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260527121227.40bf085c@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-292569-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292567-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,ti.com,davemloft.net,google.com,redhat.com,gmail.com,kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[secunet.com,queasysnail.net,redhat.com,google.com,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,link_faults.sh:url,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 2B5745ED46B
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:email]
+X-Rspamd-Queue-Id: 975BA5ED5CB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-27 12:12:27 [-0700], Jakub Kicinski wrote:
-> On Wed, 27 May 2026 17:08:58 +0200 Sebastian Andrzej Siewior wrote:
-> > Requested-by: Felix Maurer <fmaurer@redhat.com>
-> 
-> Please don't invent tags? If you want to say that Felix asked for this
-> just say it in English.
+validate_xmit_xfrm() returns NULL both when a packet is dropped and
+when it is stolen by async crypto (-EINPROGRESS from the offload xmit
+op).  Callers cannot distinguish the two cases.
 
-okay.
+commit f53c723902d1 ("net: Add asynchronous callbacks for xfrm on
+layer 2.") changed the semantics of validate_xmit_xfrm() returning
+NULL from "packet was dropped" to "packet was stolen (may still be in
+flight)", but __dev_queue_xmit() was not updated to reflect this.
 
-> > --- a/tools/testing/selftests/net/hsr/Makefile
-> > +++ b/tools/testing/selftests/net/hsr/Makefile
-> > @@ -7,8 +7,11 @@ TEST_PROGS := \
-> >  	hsr_redbox.sh \
-> >  	link_faults.sh \
-> >  	prp_ping.sh \
-> > +	hsr_ptp.sh \
-> >  # end of TEST_PROGS
-> >  
-> >  TEST_FILES += hsr_common.sh
-> >  
-> > +TEST_GEN_PROGS := hsr_ptp_test
-> 
-> TEST_GET_FILES otherwise kselftest thinks its a test and tries to run
-> it (which of course fails on
-> 
-> +	if (!slaveA || !slaveB || !hsr_dev) {
-> +		fprintf(stderr, "Missing network devices\n");
-> +		exit(EXIT_FAILURE);
-> +	}
-> 
-> given there are no arguments passed in)
+On devices with a real qdisc, sch_direct_xmit() handles a NULL skb
+gracefully and async completion via xfrm_dev_resume() delivers the
+packet correctly.  On virtual/bridge interfaces (noqueue qdisc),
+however, __dev_queue_xmit() takes the direct branch:
 
-Oh. I did replace it with TEST_GEN_FILES.
+  rc = -ENOMEM;
+  skb = validate_xmit_skb(skb, dev, &again);
+  if (!skb)
+      goto out;          /* returns -ENOMEM to the caller */
 
-Sebastian
+The packet is in fact delivered correctly by the async completion
+path — the -ENOMEM is a misleading return code, not an actual drop.
+
+Fix this by returning ERR_PTR(-EINPROGRESS) from validate_xmit_xfrm()
+for the async case so callers can differentiate it from a real drop.
+Update validate_xmit_skb_list() and __dev_queue_xmit() accordingly.
+__dev_queue_xmit() now returns NET_XMIT_SUCCESS for the async case,
+which accurately reflects that the packet has been accepted.
+
+Fixes: f53c723902d1 ("net: Add asynchronous callbacks for xfrm on layer 2.")
+Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
+---
+ net/core/dev.c        | 10 ++++++----
+ net/xfrm/xfrm_device.c |  2 +-
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index XXXXXXX..XXXXXXX 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3846,7 +3846,7 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *
+ 		skb = validate_xmit_skb(skb, dev, again);
+-		if (!skb)
++		if (IS_ERR_OR_NULL(skb))
+ 			continue;
+ 
+ 		if (!head)
+@@ -4552,8 +4552,10 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+ 
+ 			skb = validate_xmit_skb(skb, dev, &again);
+-			if (!skb)
+-				goto out;
++			if (IS_ERR_OR_NULL(skb)) {
++				if (IS_ERR(skb))
++					rc = 0;
++				goto out;
++			}
+ 
+ 			HARD_TX_LOCK(dev, txq, cpu);
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index XXXXXXX..XXXXXXX 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -191,7 +191,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featu
+ 		err = x->type_offload->xmit(x, skb, esp_features);
+ 		if (err) {
+ 			if (err == -EINPROGRESS)
+-				return NULL;
++				return ERR_PTR(-EINPROGRESS);
+ 
+ 			XFRM_INC_STATS(xs_net(x), LINUX_MIB_XFRMOUTSTATEPROTOERROR);
+ 			kfree_skb(skb);
+-- 
+2.50.1
 
