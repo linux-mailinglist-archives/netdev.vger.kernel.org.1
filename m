@@ -1,206 +1,200 @@
-Return-Path: <netdev+bounces-292751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDbHGYRvGGoSkAgAu9opvQ
-	(envelope-from <netdev+bounces-292751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:38:28 +0200
+	id cGb5OWhtGGrcjggAu9opvQ
+	(envelope-from <netdev+bounces-292753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:29:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2795F5180
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:38:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F109A5F500B
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2E3DD30E35DF
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:06:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 60E163122F50
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7677423158;
-	Thu, 28 May 2026 16:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54E43FC5AA;
+	Thu, 28 May 2026 16:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLst1YZD";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sYRS+faM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyEYliIr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E6F408013
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 16:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8B23F0AA0
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 16:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779984095; cv=none; b=Ou9qmnx0fu7e+FyEQfROD1Mh/EFbc3psZGcgp+ag1TkSfe/9cJIDAZOMWkGmVlCXA0+1/OJQLpAwsRmgzxXNfG+yEqsjYTLlrc2SArm4w74VGhtcPP/Elc0C2K93cwMA6iVhgol/+fsDzKmHDZL1VyJ9by02uuL7m1Q+7vaSf3E=
+	t=1779984204; cv=none; b=KPcRAZebtSqCsyfDRk9/a3x4Amo8f5AaDu6TytEOGYjBQEIbyXM+sfRx+hRT97j+5vjXPsBWXz7jps8yr4SJeerOqlvcJm3XwiHXtfQJZGdbvdZwiH05X15Y68gIdJxSl/d6Szh0bNN020qga4uvHYk1Hm7KZRh/jR7vPUBly0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779984095; c=relaxed/simple;
-	bh=/UWIrCDt0JHQs55xLO8CjfD0M54dmvXpB7PRriNg6Vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C06bhObDgeRRDWjXYyM5woN4J30VCIyX7BYeMtk52CnovuZH81ChMlNicSftJgYLKGfCW+keVldj2Oj2Zf4ukdY0qxcI/UIl0240wTN4Zgt4JEaJD4NVsOjkQ5KCLzn3BJU9t9y4C+/++e4SRGopf2FVQ4Y3aE4jZ93dNxO5uYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BLst1YZD; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sYRS+faM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779984093;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cao5gERt16FVWVNp7KK/pfGkUyLMcAKURayz3il4e7o=;
-	b=BLst1YZDbtgGN/ok2f2lBiAwsS6SfM5Awb9N5UYoqH0m2HlRM8bIzasri/uRH3DUo6r3z+
-	a4xn9+qJm1NHxTQXvsLsTfxAGh/fbuN12HIKUPKeitH70J6Fz5ROJ/+D9Hd0eawusrheHt
-	sryOaob5s5EmAM67Zi5m205EPTcH/4g=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-pAKCLYI7Nm-LVjDVaoOx8g-1; Thu, 28 May 2026 12:01:32 -0400
-X-MC-Unique: pAKCLYI7Nm-LVjDVaoOx8g-1
-X-Mimecast-MFC-AGG-ID: pAKCLYI7Nm-LVjDVaoOx8g_1779984091
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48fd3449e61so5632655e9.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:01:31 -0700 (PDT)
+	s=arc-20240116; t=1779984204; c=relaxed/simple;
+	bh=yCSOHKbwhBjgp5Eie4MpdqNDhpIdZlR1/oBvIklWoBk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KHaIT/dmKSE0jZE+uCioIbT9LkksvXIuXzHmmNrp7DNxcRna30wMxs3LO6HKvqqP6sP6J6MfHDxL8Mjfo0/+KoPHN4oCqM6y/BXxUpUtbPNJPXrIh6yXxDSH1XPM82iPsGsCHSJ94Mfz8UCQvDILUOaL3/aUu+f6LF/TLlHs0c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyEYliIr; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-45e8a834cc2so7912102f8f.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:03:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779984090; x=1780588890; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cao5gERt16FVWVNp7KK/pfGkUyLMcAKURayz3il4e7o=;
-        b=sYRS+faMy8VCJJrdTTWEAQVc72ByxCQSTbr4W0kEOQx4tDoywOy56DE+PiW802aKno
-         92OGwj+fVbQFUQjnVEfn5lITUfbNMhwgIDVByU5yy3EvQOuyFUotaGa1QGBr3bdBJzu+
-         m2fCZHzVSyV8AWlRSznrobru/tqJ9z7KIRoEzjKrekyjFYFVipIVFfJkjsDzA3LmRUzc
-         LB8K5A4dRNvs8al1XQf8/3RzNQMJdDDuWifLXzVaF73lysaWRz1lOZIgRE+ztoLHkysf
-         KE3RED6ldhaZ+JACZMX2nbofuPM+69f9YzFmK1rusH3r6eUkz+rES00yaQGZ1Nuodx4/
-         ZwFg==
+        d=gmail.com; s=20251104; t=1779984201; x=1780589001; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NGAJl71mxdY5fzmkNELb/2UlcEcGhUpJvQPIR8eDu/I=;
+        b=kyEYliIruWPP449zRETAHnQa60KjVIzByRMRjmRY+MjWEkTcPA3pvbkogW4dNCvYLd
+         8HPxeQoMc22q8AT+hagLkm3lW2DfdYNnkRauRverMVHRnJblyhmx9WMkhgVhM7+gLkfA
+         oAHzujiNo2m/aJMlNE5DxeW7F3xK6dVYcnOoY+42GXRbvhLBBYm63qNbV/4DZVf6THTj
+         7PmANuHKiqGzfyIOIoTz4R+Czg9rbhgu6HuUXxexzKL0+78v8NUXRbDqY8OlNSUPN7Vx
+         ShW3PDERh3ULFDK+hovpY832lvxnLT5DIk9/Nd11vFyILWGREtkUNH7qEj+keRGvv/tB
+         tSAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779984090; x=1780588890;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cao5gERt16FVWVNp7KK/pfGkUyLMcAKURayz3il4e7o=;
-        b=se9UGXzMRLJmPjadmax8aexDFFwTUs4evBgZJqgBswJadgJOLgihwK36or3YzRDIBs
-         Ug0xdi8jBTq5nF+LTLnFBYkdY+PPqys85r01iIlk/QVOyULehqAeRn97980I3nVFjB9N
-         eA235yP9JtiGubycETDHPp8XMZ5E2vgCJMmbEVE8GVDnywtfzuz0HhxQb6DyriffDC4z
-         NlWsnuuPTH3qaUNi1kCQif5GSDjyviGOzH8uK2WHNaLX3l8kOW3eiWll5SFU4YYZdx0J
-         svGydNTqG7DK3sHnLhpyV/w43JSGlHCVqVKlZJZsJVuTEPPJy6+gGlsuI8X+DxtodRld
-         GGxQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+oF5tK3cgGg2xysv5EVpSZGptA1pTg7RigvvNXfpuZBXYc+hsrKp7qJhvR0mNskvXTUIcmn4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKaXWalwJ4VHwGBHMIFayq4icaWqYvleVvzs0DP9MCbF42EQ6V
-	OkmXB30qeV8EcUnHrfSUMWi0g1KMG3vVvm59XeEafcYcAdd7J1lHuX0CvEDVdh48zWopeHT5y1a
-	1ITFw7lXCyAX1+omgI/OeTxUTxOogFrKwfMNqIfV7mseoS7JulJzDd6q6
-X-Gm-Gg: Acq92OHPS9G40MxjcISWee3kuckaDb8xsLsW+CFhWzG9JWO6peyYEphQ3yLgtFtYUL5
-	o+a2Q4Lxbu7rY+AHzkVxNm3Y/l5QlHpLX/f0daDLnMsP2EwyRXo7yjB1WuxswredO/opEfYrcvT
-	bdq5flkqi/8m1nR6VZ7eeuSyQZgd2G392YXxCQqYzcCfCApO+JVWYykvzrj86XO80dx7BhnB9Gg
-	PTNVa9vXIBOF8xKhHqoZ/K0ZSn+UaYASRraU0iV4GA3NSJb3QHvy8d5o6Uwi0KXX3I+0k8JOvLo
-	9LFEI7G9XK/H2EUkJEd9+IG+twLnFmCiyMWOBRUQzzWHmXdK0SqoDFBImOZ69zobof6ShvAgllP
-	GoRL90jh+RSmQKJvp9R50lQ==
-X-Received: by 2002:a5d:5f56:0:b0:44c:e7f6:3a5c with SMTP id ffacd0b85a97d-45ee51f1528mr2934775f8f.0.1779984090433;
-        Thu, 28 May 2026 09:01:30 -0700 (PDT)
-X-Received: by 2002:a5d:5f56:0:b0:44c:e7f6:3a5c with SMTP id ffacd0b85a97d-45ee51f1528mr2934730f8f.0.1779984089798;
-        Thu, 28 May 2026 09:01:29 -0700 (PDT)
-Received: from tp ([2a02:29e1:404:f800:9fbc:ecd8:5c1a:509c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5b2bbfsm14995087f8f.32.2026.05.28.09.01.28
+        d=1e100.net; s=20251104; t=1779984201; x=1780589001;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NGAJl71mxdY5fzmkNELb/2UlcEcGhUpJvQPIR8eDu/I=;
+        b=q6zLcdcRgeLh16OHLy3ev2gZ9jf4cC5kUszPwtmUdX1DjchDCK+Lb+whbzuNyaqi9C
+         LW3a/4ZOhlGIVkU0yv6XgqHKcETV1UIZ6CbmAWHQp/8TWgLO2VVDj7CiEDiQynheqwyD
+         wFnYKony+ObMt9Qv4dpKknsGV5kHtQSDLlyYhxaRdoyBOPFQ2mQTook+E++VhWM1lSK1
+         +Y06Q+TXwo5GwMaG5PsuyKF+kBl5/EXImt2bzqkKHcHCT75jCihzr44m9WcDbv07Qy+U
+         Ak4jHFnokMLoIcUyJBjJXLzUm2eUfvIHMJv+pYvuuYWqpEuFq/AS9QdhgYOHG+sWocQz
+         Lh4A==
+X-Forwarded-Encrypted: i=1; AFNElJ+D4r/kIughPMWOrnT6nO3Ocl0NwN5kwg+cp0SdSEH4RT9t66DnSJiGAjKhp76nYo9QGM8jp0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvnKVG56lwZXzpeKCa4i2rtcudL9Ee7N8GmBhEZnfu9XmxuWzV
+	XYAG1kRuxzLKc1lDH/Nxkh667ZaE6mB0ZFHiqjbNaIgNZONBe0dngaEVwC16
+X-Gm-Gg: Acq92OG76S6KDDb8MzRyRrsiYd0Sen9PQgTAfEm2BmrxTTDrP8OnN1ramq/e3EyY23B
+	gePI2zCfH0d+X7JqBJC1J03SYFNqYg1kgmD5UfE0TZx15NpXAXD2DgBEzucXu/Qzkefvl5vY8Ud
+	kg2r7YtSmfJz4smKkVNfuEGEjfkCTsl1tdOfjQtiydIE7gBRyBMljJQaVSSFQZVYHzfYTwGd6n9
+	CfhJQ+CZubrLti6ECQzlnH0aJrYCS1gmbQYDYNmt/r+Rl5L0RkAFeFUyIrxojSnl4gWYTht5J9S
+	wBDiouDGXiWkPb+kmIpMlz4QBUPsKsRwD/E8WRHwJKsh45mYimxAaiQDRMe4k8ttYMC301dq7Wz
+	LZ4PEWl4uuWLZgCkOcf6wHBZyVup21kXOcSS+syLzLyg8dvtvAPe77vyeligHebZSU+7jV5DNrt
+	QuPUQIRpybmHmngNmS
+X-Received: by 2002:a05:6000:144c:b0:43b:498f:dceb with SMTP id ffacd0b85a97d-45eb3692577mr45679938f8f.9.1779984200272;
+        Thu, 28 May 2026 09:03:20 -0700 (PDT)
+Received: from debian.. ([2001:41d0:303:db6b::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eeb36c40asm3739691f8f.13.2026.05.28.09.03.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 09:01:29 -0700 (PDT)
-Date: Thu, 28 May 2026 18:01:27 +0200
-From: Beniamino Galvani <bgalvani@redhat.com>
-To: =?iso-8859-1?B?zfFpZ28=?= Huguet <ihuguet@redhat.com>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Yumei Huang <yuhuang@redhat.com>, Ido Schimmel <idosch@idosch.org>,
-	Justin Iurman <justin.iurman@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Linux kernel regressions list <regressions@lists.linux.dev>
-Subject: Re: Problem with IPv6 privacy addresses in 7.0
-Message-ID: <ahhm1-XfnsWyIWDV@tp>
-References: <675083b4-e015-4ff3-836c-798e0a971194@suse.de>
- <20260528073849.759da84a@elisabeth>
- <baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
- <20260528131250.1352ab48@elisabeth>
- <b21c598b-879c-4f6a-9dc8-27e5c362803b@suse.de>
- <bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info>
- <20260528153202.14900687@elisabeth>
- <CACT4ouf5ZqGgb=RO8_7NovLCvYKLKL4vD70dEe6xUODT1UEcSA@mail.gmail.com>
- <20260528165320.15b90ded@elisabeth>
- <CACT4oue2EMM9Kfsm9Jii2rG9ooi=D37PK=8886cpLuBkwhrOxw@mail.gmail.com>
+        Thu, 28 May 2026 09:03:19 -0700 (PDT)
+From: Tristan Madani <tristmd@gmail.com>
+X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Christian Hopps <chopps@labn.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()
+Date: Thu, 28 May 2026 16:03:18 +0000
+Message-ID: <20260528160318.2631699-1-tristan@talencesecurity.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACT4oue2EMM9Kfsm9Jii2rG9ooi=D37PK=8886cpLuBkwhrOxw@mail.gmail.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292751-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,leemhuis.info,suse.de,kernel.org,vger.kernel.org,idosch.org,gmail.com,gibson.dropbear.id.au,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-292753-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bgalvani@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0F2795F5180
+	DBL_BLOCKED_OPENRESOLVER(0.00)[labn.net:email,talencesecurity.com:mid,talencesecurity.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: F109A5F500B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, May 28, 2026 at 05:24:28PM +0200, Íñigo Huguet wrote:
-> On Thu, May 28, 2026 at 4:53 PM Stefano Brivio <sbrivio@redhat.com> wrote:
-> > I think what's considered UAPI in this case isn't so clear-cut. I guess
-> > it would have been pretty hard for anybody not familiar with
-> > NetworkManager's codebase to imagine that an application would rely on
-> > IPv6 addresses (and only IPv6) to be returned in the reverse order.
-> 
-> IMHO it's not because an application would rely on the order. It's
-> because the order matters, as the first one is considered the primary.
-> This is not NetworkManager specific. Or I am mistaken? I'm speaking by
-> memory
+iptfs_destroy_state() calls hrtimer_cancel() while holding a spinlock
+that the timer callback also acquires, leading to an ABBA deadlock on
+SMP systems.
 
-Yes, exactly. If you do:
+For the output timer (iptfs_timer):
+  - iptfs_destroy_state() holds x->lock, calls hrtimer_cancel()
+  - iptfs_delay_timer() callback takes x->lock
 
- ip addr add dev X 3fff::1/64
- ip addr dev dev X 3fff::2/64
+For the drop timer (drop_timer):
+  - iptfs_destroy_state() holds drop_lock, calls hrtimer_cancel()
+  - iptfs_drop_timer() callback takes drop_lock
 
-then the old kernel chooses the address that was added last as source
-address for outgoing communications. With the new kernel it chooses
-the address that was added first.
+Both timers use HRTIMER_MODE_REL_SOFT, so their callbacks run in softirq
+context.  When hrtimer_cancel() is called for a soft timer that is
+currently executing on another CPU, hrtimer_cancel_wait_running() spins
+on softirq_expiry_lock -- the same lock held by the softirq running the
+callback.  If the callback is blocked waiting for the spinlock held by
+the caller of hrtimer_cancel(), a circular dependency forms:
 
-I think that any script or network management tool that cares about
-the source address selection is impacted. Indeed, the commit had
-effects on one of the selftests, which had to be modified to change
-the order of iproute2 invocations.
+  CPU 0: holds lock_A -> waits for softirq_expiry_lock
+  CPU 1: holds softirq_expiry_lock -> waits for lock_A
+
+Fix this by cancelling both timers before acquiring their respective
+locks.  hrtimer_cancel() is safe to call without holding any lock and
+will wait for any in-progress callback to complete.  The locks are still
+acquired afterwards to synchronize with any in-flight packet processing
+before tearing down the state.
+
+Found by source code audit.
+
+Fixes: 4b3faf610cc6 ("xfrm: iptfs: add new iptfs xfrm mode impl")
+Cc: Christian Hopps <chopps@labn.net>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
+---
+ net/xfrm/xfrm_iptfs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index 97bc979e55baf..fd25b2b230793 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2708,8 +2708,9 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+ 	if (!xtfs)
+ 		return;
  
-> > > If the fix must be in NetworkManager, we only need to parse them in
-> > > non-reverse order like IPv4, I guess.
-> >
-> > But that would then require some form of detection, and, at least
-> > according to Fernando, isn't the most robust option anyway, as ideally
-> > NetworkManager shouldn't rely on the order at all.
-> 
-> True
-
-Correct, if the new behavior is considered better, there should be a
-way to detect which order must be used. Otherwise userspace tools
-won't be able to maintain the same behavior with different kernels.
-
-Beniamino
+-	spin_lock_bh(&xtfs->x->lock);
+ 	hrtimer_cancel(&xtfs->iptfs_timer);
++
++	spin_lock_bh(&xtfs->x->lock);
+ 	__skb_queue_head_init(&list);
+ 	skb_queue_splice_init(&xtfs->queue, &list);
+ 	spin_unlock_bh(&xtfs->x->lock);
+@@ -2717,8 +2718,9 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+ 	while ((skb = __skb_dequeue(&list)))
+ 		kfree_skb(skb);
+ 
+-	spin_lock_bh(&xtfs->drop_lock);
+ 	hrtimer_cancel(&xtfs->drop_timer);
++
++	spin_lock_bh(&xtfs->drop_lock);
+ 	spin_unlock_bh(&xtfs->drop_lock);
+ 
+ 	if (xtfs->ra_newskb)
+-- 
+2.47.3
 
 
