@@ -1,442 +1,207 @@
-Return-Path: <netdev+bounces-292750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kF0eFwNvGGoSkAgAu9opvQ
-	(envelope-from <netdev+bounces-292750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:36:19 +0200
+	id 4GduNXRvGGp6kAgAu9opvQ
+	(envelope-from <netdev+bounces-292752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:38:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C982A5F5106
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:36:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F5B5F5172
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:38:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 747E7328BE7F
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:04:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BE2F73383B29
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E568A3FF8AE;
-	Thu, 28 May 2026 15:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE13D423A6C;
+	Thu, 28 May 2026 16:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqmCgD+V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T0L2C5OB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828433FF1A2;
-	Thu, 28 May 2026 15:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779983734; cv=none; b=CEgX9aSTkx0iGTqqbsQBl1I6zmNv4CTIVaQt4RcoGiyOcjLFiZT1xQTkWppv/uP4RVVeLZNSdBHo8TJoQ+jcfi3Yah+vsxrHBItar/bQXoWaXRS6IXIkotcXFkOVZhqarNsde6bkBliwrDVJo4z2/gsmznZP2MlZot7NB1y5hB0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779983734; c=relaxed/simple;
-	bh=49g/W4nPFGn+vpZROvQnXPRYmRCLYo6lZkJSzpL1b2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=VTed9bnMySxzmcFBdhhndtqs1RtscMyKxi/ZmNCAM4HHL26QaavgDzWtqC4gD8Z4YiFQKEK1u/I2G9Vz4q6Yqfg6rRdDJUBzsNoPbfRT7hYkOVG8Bf9vpeCVgPSZamcZ3u9Ja3zdsaCe3XOcvQMWrZtXDMim4jUAonnoMtPDvz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqmCgD+V; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 787981F000E9;
-	Thu, 28 May 2026 15:55:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779983733;
-	bh=+BWIkJYelMwDM/RJ8EOI6yq0aaQUtuHk+/lFKFUusWg=;
-	h=Date:From:To:Cc:Subject;
-	b=lqmCgD+Vc99G1kH6NNNXA/HlOc+oYucOuw5M5dpElI+mQ20RvBkBFr+l7WUC2wKA+
-	 ikNEEjcCrcbPgive+feZXAY9KFc2LxXwc0RK2Y9eWscYJzxNgV1EvuI9Jg1ToPAcdd
-	 /NH2IPAELi076xjJt0DmX+Do9Z3GseS8HLJ0bCapBaX0cMXBz4k60XzZ+fIgldgljH
-	 2xuWhtyqtY0eCM5UGjQSBTmVTQrgpmRvPiilZRmm6HBWADukPKYMfHr5ZmbtX4Ys4J
-	 In1/lnW9Y4L4gasuZWXqjVhKG8XICaf1AACYPdVzu940ajvPJV9SfupRA8X/K/ckdC
-	 BSk59uDWabdrA==
-Date: Thu, 28 May 2026 16:55:28 +0100
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>,
-	Lucien Jheng <lucienzx159@gmail.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <ahhlcK0ufJn0VEzM@sirena.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D16B423148
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 16:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779984104; cv=pass; b=JGShSt+ZZHHweSwJ8BfW1vPwfirK5+CeDYcGgWh/duuj9hMidlhcycLE1KSGdqEddYRZkoI5pD0iUYYoHy5oIO28FIzAIDxqQC1oHJM4ylAknwGLUR7wDGC52OcD4HNKUfnkMf05hrHfsIv+lPjvzpmvxH5EZOwxzNSDWJNTQi0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779984104; c=relaxed/simple;
+	bh=HoRv3ITsVYotYbByUgMqXQNPFv0UOt3EzvZpSuUdf5g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DH/qHQFAgnYSWmAxV7zF/1SOkCDdD/AW2R+JWiVPd/b4/fcpD2KHo6b7yEFmJSOlzJb046tFIgz2L18BUuehx2zaIrlNiDOAnQpo/7w5gBs25hhPnZ7c0j1PIqEk74Mw07TKz8GEO6lILHmksakw219XPwZJuapXP2TTLWIwvgo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T0L2C5OB; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-516d1ddcdf4so13051cf.0
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:01:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779984102; cv=none;
+        d=google.com; s=arc-20240605;
+        b=I8mgdn6Mr8uZxLYGvjo5SGTIw3HeOr1RZvnXCw6f13gSYM57YFoV1k1f2YJ1OB+Ar4
+         lo46+19VQLzUsl11sFPdC+JFSGLkO4qYmzVoHpD6ADEpT9VQw+kpYibzSiWcSJ2NIMoz
+         46igeaWElJpPOmEsyO47WQGzkklGm1sURk+a9EYS8o3NUQPwWmS42plIeOtQKe925iwo
+         zruXaakpOrJji8HFzLPTmU3afOBil8NUcF2LIfkJLZNiP2jECyJACArP8kxZOo3EDXL5
+         C8Y/82VYZcvE6yBed+PbqMCxEvlHb1TnLIdODi9Zm5RmdIM32DKl3/WocTzvcgXn83c0
+         +qaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=BYsaex7hgpDTcxP9G0jUXkwS6mGFhA1uEqhqBMmQ8iA=;
+        fh=WP0OLf7r9DS1CcsXofT/5rfWcibF2WiYhSDWzzqwFk8=;
+        b=Kpji7ck5jr7v7TlmsHCaz9uRPl/HV+xZ/CL5A7D3/S6e0yXvVPYYC07pDkXmtkrr1m
+         ujsXioNHyC29tRIRic5aZHj+tmN9RisvHDurTxAu59WhAKTXGia1Cs+U6YYrW8pB4n1i
+         tmT/KHRxHkD/LXTeSz4CDi6k0Jn4Uw0aRlUSbKbJH2a4ykjpvZKzbC8QWlVhQlwefG2/
+         zP8uN09Iw5XlQ3rvvaErx0khT1N9bLeRXZysnMBM+ZfJPdsTMu5pPi15j7eRN0YONpx+
+         UFeXX56rg5rewJXs8Azdr0x1ENl7blgknalRZ3YN2haD2/90VI4HxR17JQPcNi0UhFIn
+         Pt4Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779984102; x=1780588902; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BYsaex7hgpDTcxP9G0jUXkwS6mGFhA1uEqhqBMmQ8iA=;
+        b=T0L2C5OB5eyKIPzMHsiPVQNr1viCSihOUZmkYUM5cGPXkhMxoJ6M3OzSgpCKFExWDy
+         szdyZoMpD9zxcItskA+UbPBxYHZTegez2MJySasSWzj6ryqYLVVBCl81AJjBJxO1P++U
+         FtF5D4uKoHrnYsSr5CM9DRAXsFIeVDwgWTITtrt7fuuylaTUZDyK/JH8UvpmtIpQGdlK
+         aYIgu51EvAqaxzk5pXAAJYZHODvlvxsKYeuG1EG5o5/LO5RAwLEQsF+iPzqDwBe1x5C1
+         zEotfoDoz5fHx8B5n808J/IFfRdT7t5Z47BjvXsew4l7v5kLJ0ZNvmwtUDI415N7ev5s
+         n8hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779984102; x=1780588902;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BYsaex7hgpDTcxP9G0jUXkwS6mGFhA1uEqhqBMmQ8iA=;
+        b=FWS8gdq1BK4WRLN8llnEbuitcpqjzFfsD7KglkUiWPC+Itehc+imzusLtfQi/OSmAW
+         GQv7PjSIvzeACZwJdBZnhRWsm5dQxk7eQTa9tHZWkDKjDmBzcEBi73rN+HhPrm/qfHXf
+         OpBUARrB+j++RkaTTF2kfNO227axOPmITutgqGx9NzYJO1AM6nXwlIRi7+wShe4DiD+Q
+         pfeUOVvoBWv/dtEFIW/ithbtRWcVmMMdoL0piY/u5/lDXGOdI6Zodr4F0jM22a9Hkkrk
+         ICrdc/uxXE3BPAgwnhxFJBji9YBEfFmee615w80ue87BCkgCgEzAxMrP5NvSAkUsV/QZ
+         4DbQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8RkgaK2DgW6x0WXlf9NAtCX2QsusyOSYV4XmguXztTCe1wNXX/IhSmjg30L6SUfQuo2pdwIzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTK3npDGZvTLyl4hXwfAasQZ1U8yeshGKZ7Sid0A5KSaFc6CgE
+	DuZ9Qkr/Os8nSTmtnhh8+WXr5iXtLQQrix1yPFF9sxK3XaBoEdPf4tOWeTFGm7w5YQwWIfg/1il
+	g/zDaTISTCosUNZz8Ylm/fIqaVq6VuqT6AR56P6aF
+X-Gm-Gg: Acq92OHXhSXOy3VRMCpEII8uwk7LwOQh+De6MNzWwZpQj/6IWCo2pM9YfbkMvR2gr6J
+	y7cyzgAx4xLPznk2DVghSUxoJo1SCtqq6fjyKrUOZCczgzZuhJxuSNlSht85cVSnSuxmnbS1Lv6
+	aowsxWCwXiAwfmKYTHr1kO5yMdKw0f8mmVpQvlP70zglzXSFz/sR7ymYVoyFxGITKlKAwZHVfXm
+	dzxQXYX/31kcLtLMXGZFwlOwFJX7IHneJcJPNGmMJEzZv8ISx+dz7HzTTO1DS6QPdrtp9uoX9t9
+	ksOTcpsohZkVAM0G8Kjolspop4Nl2DJGuB9FJG96o/zqSrj8hi5r6h7lv1Fw7Jod
+X-Received: by 2002:a05:622a:8c02:b0:516:5709:45e5 with SMTP id
+ d75a77b69052e-51720af90damr6978311cf.14.1779984101530; Thu, 28 May 2026
+ 09:01:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="soxlRVeWDInW4BKF"
-Content-Disposition: inline
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+References: <20260515071504.2054786-2-yuyanghuang@google.com>
+ <2e08eb1ca27a9a2f8ad29e1c24f779b579621b0a648589f7044799d91c5e00f5@mail.kernel.org>
+ <CADXeF1GVtFHNZJb8xwFh6aadR=H19S+kja8rF185XB5=fg0D0Q@mail.gmail.com>
+ <CAADnVQ+42+Th6OFGq2KawzvyKUAykazb4fXh2_uqss-T+R8VCg@mail.gmail.com>
+ <CADXeF1F=7RcxAsW38w_mpFeKCLxTAh5p_XYHd=x2Ru+oajoN3Q@mail.gmail.com>
+ <34b18a3e-50c0-4b0c-8ee6-d7a291619231@linux.dev> <CADXeF1HRe=U7aWx2yx6RFZ_uH-mMbdsxMheofr2tMD9wae46oQ@mail.gmail.com>
+ <6083831a-dc6d-42e4-a1c8-8b7f6b966650@linux.dev> <CAKD1Yr32VMefwq7Bo6_hmhFrDVsttNFwZJZcaXS4P-ACOwWobw@mail.gmail.com>
+In-Reply-To: <CAKD1Yr32VMefwq7Bo6_hmhFrDVsttNFwZJZcaXS4P-ACOwWobw@mail.gmail.com>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Fri, 29 May 2026 00:01:04 +0800
+X-Gm-Features: AVHnY4KYoAqz9rUtz8nGlc7zWjwvk4SuqM2I4D6DnfwQvY05GaYxUOEso4as720
+Message-ID: <CADXeF1EWY0=TyvhFap3iyKdpHNkk5pZuHD-RDnXuqMa5LrNJ2Q@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] bpf: align syscall writeback behavior with
+ caller-declared size
+To: Lorenzo Colitti <lorenzo@google.com>
+Cc: Leon Hwang <leon.hwang@linux.dev>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, bot+bpf-ci@kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard <eddyz87@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Nikolay Aleksandrov <razor@blackwall.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Chris Mason <clm@meta.com>, 
+	Ihor Solodrai <ihor.solodrai@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292750-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,collabora.com,gmail.com];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292752-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,iogearbox.net,kernel.org,lunn.ch,google.com,blackwall.org,redhat.com,fomichev.me,vger.kernel.org,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sirena.org.uk:mid]
-X-Rspamd-Queue-Id: C982A5F5106
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 52F5B5F5172
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+>It seems you haven't convinced Alexei in that thread.
+>Attached below.
 
---soxlRVeWDInW4BKF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for the test program. It proves my hypothesis: you had to
+manually unmap a page boundary to force that `-EFAULT`. The part that
+is still under discussion is whether there is a kernel bug or not. I
+think there is no question about the behavior of when the -EFAULT will
+be triggered.
 
-Hi all,
+> To avoid such stack corruption, you should reserve enough space for the
+> query, e.g., by extracting union bpf_attr from kernel BTF vmlinux.
 
-Today's linux-next merge of the net-next tree got a conflict in:
+I agree that your suggestion to extract the layout from BTF is good
+practice when writing a new program from scratch. However, our focus
+here is on maintaining backward compatibility for existing binaries.
 
-  drivers/net/phy/air_en8811h.c
+I think the core question is: **is a 40-byte query a valid request or not?**
 
-between commit:
+From my understanding, under the syscall ABI contract, passing a
+40-byte buffer (at least for query BPF_CGROUP_INET_INGRESS which has
+been stable and supported since 2017) is 100% valid and legal. **The
+kernel must never break existing userspace on a kernel upgrade**.
 
-  d895767c33781 ("net: phy: air_en8811h: add AN8811HB MCU assert/deassert s=
-upport")
+One example of a syscall that maintains such backward compatibility is
+openat2. The documentation notes it as follows:
 
-=66rom the net tree and commits:
+EINVAL size was smaller than **any known version of struct open_how**.
 
-  dddfadd75197e ("net: phy: Add Airoha phy library for shared code")
-  5226bb6634cdf ("net: phy: air_phy_lib: Factorize BuckPBus register access=
-ors")
-  e08f0ea6daf2e ("net: phy: Rename Airoha common BuckPBus register accessor=
-s")
+If this bpf() syscall want to follow the same way to maintain the ABI
+contract, your `mmap` test actually let kernel return -EINVAL to a
+userspace program that passes a 40-byte buffer (declaring `size =
+40`),  because the kernel unconditionally tries to write to offset 56,
+which happens to be unmapped.
 
-=66rom the net-next tree.
+Are you arguing that the `bpf()` syscall does not need to follow the
+ABI contract to maintain backward compatibility, and that it is
+expected that newer kernels can break binaries compiled against older
+kernels? If you believe that all binaries must be recompiled or
+dynamically updated against the latest vmlinux BTF upon every kernel
+upgrade, please be explicit about it.
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+Thanks,
 
-diff --cc drivers/net/phy/air_en8811h.c
-index a86129ce693c2,a42898ae41358..0000000000000
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@@ -260,218 -229,6 +245,31 @@@ static const unsigned long en8811h_led_
-  					      BIT(TRIGGER_NETDEV_RX)          |
-  					      BIT(TRIGGER_NETDEV_TX);
- =20
-- static int air_phy_read_page(struct phy_device *phydev)
-- {
-- 	return __phy_read(phydev, AIR_EXT_PAGE_ACCESS);
-- }
--=20
-- static int air_phy_write_page(struct phy_device *phydev, int page)
-- {
-- 	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
-- }
--=20
- +static int __air_pbus_reg_write(struct mdio_device *mdiodev,
- +				u32 pbus_reg, u32 pbus_data)
- +{
- +	int ret;
- +
- +	ret =3D __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
- +			      upper_16_bits(pbus_reg));
- +	if (ret < 0)
- +		return ret;
- +
- +	ret =3D __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_ADDR_HIGH,
- +			      FIELD_GET(AIR_PBUS_REG_ADDR_HIGH_MASK, pbus_reg));
- +	if (ret < 0)
- +		return ret;
- +
- +	ret =3D __mdiobus_write(mdiodev->bus, mdiodev->addr,
- +			      FIELD_GET(AIR_PBUS_REG_ADDR_LOW_MASK, pbus_reg),
- +			      lower_16_bits(pbus_data));
- +	if (ret < 0)
- +		return ret;
- +
- +	return __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_DATA_HIGH,
- +			       upper_16_bits(pbus_data));
- +}
- +
-- static int __air_buckpbus_reg_write(struct phy_device *phydev,
-- 				    u32 pbus_address, u32 pbus_data)
-- {
-- 	int ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_MODE, AIR_BPBUS_MODE_ADDR_FIXED);
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_ADDR_HIGH,
-- 			  upper_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_ADDR_LOW,
-- 			  lower_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_DATA_HIGH,
-- 			  upper_16_bits(pbus_data));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_DATA_LOW,
-- 			  lower_16_bits(pbus_data));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	return 0;
-- }
--=20
-- static int air_buckpbus_reg_write(struct phy_device *phydev,
-- 				  u32 pbus_address, u32 pbus_data)
-- {
-- 	int saved_page;
-- 	int ret =3D 0;
--=20
-- 	saved_page =3D phy_select_page(phydev, AIR_PHY_PAGE_EXTENDED_4);
--=20
-- 	if (saved_page >=3D 0) {
-- 		ret =3D __air_buckpbus_reg_write(phydev, pbus_address,
-- 					       pbus_data);
-- 		if (ret < 0)
-- 			phydev_err(phydev, "%s 0x%08x failed: %d\n", __func__,
-- 				   pbus_address, ret);
-- 	}
--=20
-- 	return phy_restore_page(phydev, saved_page, ret);
-- }
--=20
-- static int __air_buckpbus_reg_read(struct phy_device *phydev,
-- 				   u32 pbus_address, u32 *pbus_data)
-- {
-- 	int pbus_data_low, pbus_data_high;
-- 	int ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_MODE, AIR_BPBUS_MODE_ADDR_FIXED);
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_RD_ADDR_HIGH,
-- 			  upper_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_RD_ADDR_LOW,
-- 			  lower_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	pbus_data_high =3D __phy_read(phydev, AIR_BPBUS_RD_DATA_HIGH);
-- 	if (pbus_data_high < 0)
-- 		return pbus_data_high;
--=20
-- 	pbus_data_low =3D __phy_read(phydev, AIR_BPBUS_RD_DATA_LOW);
-- 	if (pbus_data_low < 0)
-- 		return pbus_data_low;
--=20
-- 	*pbus_data =3D pbus_data_low | (pbus_data_high << 16);
-- 	return 0;
-- }
--=20
-- static int air_buckpbus_reg_read(struct phy_device *phydev,
-- 				 u32 pbus_address, u32 *pbus_data)
-- {
-- 	int saved_page;
-- 	int ret =3D 0;
--=20
-- 	saved_page =3D phy_select_page(phydev, AIR_PHY_PAGE_EXTENDED_4);
--=20
-- 	if (saved_page >=3D 0) {
-- 		ret =3D __air_buckpbus_reg_read(phydev, pbus_address, pbus_data);
-- 		if (ret < 0)
-- 			phydev_err(phydev, "%s 0x%08x failed: %d\n", __func__,
-- 				   pbus_address, ret);
-- 	}
--=20
-- 	return phy_restore_page(phydev, saved_page, ret);
-- }
--=20
-- static int __air_buckpbus_reg_modify(struct phy_device *phydev,
-- 				     u32 pbus_address, u32 mask, u32 set)
-- {
-- 	int pbus_data_low, pbus_data_high;
-- 	u32 pbus_data_old, pbus_data_new;
-- 	int ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_MODE, AIR_BPBUS_MODE_ADDR_FIXED);
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_RD_ADDR_HIGH,
-- 			  upper_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_RD_ADDR_LOW,
-- 			  lower_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	pbus_data_high =3D __phy_read(phydev, AIR_BPBUS_RD_DATA_HIGH);
-- 	if (pbus_data_high < 0)
-- 		return pbus_data_high;
--=20
-- 	pbus_data_low =3D __phy_read(phydev, AIR_BPBUS_RD_DATA_LOW);
-- 	if (pbus_data_low < 0)
-- 		return pbus_data_low;
--=20
-- 	pbus_data_old =3D pbus_data_low | (pbus_data_high << 16);
-- 	pbus_data_new =3D (pbus_data_old & ~mask) | set;
-- 	if (pbus_data_new =3D=3D pbus_data_old)
-- 		return 0;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_ADDR_HIGH,
-- 			  upper_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_ADDR_LOW,
-- 			  lower_16_bits(pbus_address));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_DATA_HIGH,
-- 			  upper_16_bits(pbus_data_new));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	ret =3D __phy_write(phydev, AIR_BPBUS_WR_DATA_LOW,
-- 			  lower_16_bits(pbus_data_new));
-- 	if (ret < 0)
-- 		return ret;
--=20
-- 	return 0;
-- }
--=20
-- static int air_buckpbus_reg_modify(struct phy_device *phydev,
-- 				   u32 pbus_address, u32 mask, u32 set)
-- {
-- 	int saved_page;
-- 	int ret =3D 0;
--=20
-- 	saved_page =3D phy_select_page(phydev, AIR_PHY_PAGE_EXTENDED_4);
--=20
-- 	if (saved_page >=3D 0) {
-- 		ret =3D __air_buckpbus_reg_modify(phydev, pbus_address, mask,
-- 						set);
-- 		if (ret < 0)
-- 			phydev_err(phydev, "%s 0x%08x failed: %d\n", __func__,
-- 				   pbus_address, ret);
-- 	}
--=20
-- 	return phy_restore_page(phydev, saved_page, ret);
-- }
--=20
-  static int __air_write_buf(struct phy_device *phydev, u32 address,
-  			   const struct firmware *fw)
-  {
-@@@ -664,16 -373,8 +463,16 @@@ static int an8811hb_load_firmware(struc
-  {
-  	int ret;
- =20
- +	ret =3D an8811hb_mcu_assert(phydev);
- +	if (ret < 0)
- +		return ret;
- +
- +	ret =3D an8811hb_mcu_deassert(phydev);
- +	if (ret < 0)
- +		return ret;
- +
-- 	ret =3D air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-- 				     EN8811H_FW_CTRL_1_START);
-+ 	ret =3D air_phy_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-+ 					 EN8811H_FW_CTRL_1_START);
-  	if (ret < 0)
-  		return ret;
- =20
-@@@ -760,18 -461,8 +559,18 @@@ static int en8811h_restart_mcu(struct p
-  {
-  	int ret;
- =20
- +	if (phy_id_compare_model(phydev->phy_id, AN8811HB_PHY_ID)) {
- +		ret =3D an8811hb_mcu_assert(phydev);
- +		if (ret < 0)
- +			return ret;
- +
- +		ret =3D an8811hb_mcu_deassert(phydev);
- +		if (ret < 0)
- +			return ret;
- +	}
- +
-- 	ret =3D air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-- 				     EN8811H_FW_CTRL_1_START);
-+ 	ret =3D air_phy_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-+ 					 EN8811H_FW_CTRL_1_START);
-  	if (ret < 0)
-  		return ret;
- =20
-@@@ -1324,23 -996,16 +1123,23 @@@ static int an8811hb_probe(struct phy_de
-  	/* Co-Clock Output */
-  	ret =3D an8811hb_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-  	if (ret)
- -		return ret;
- +		goto err_dev_create;
- =20
-  	/* Configure led gpio pins as output */
-- 	ret =3D air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
-- 				      AN8811HB_GPIO_OUTPUT_345,
-- 				      AN8811HB_GPIO_OUTPUT_345);
-+ 	ret =3D air_phy_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
-+ 					  AN8811HB_GPIO_OUTPUT_345,
-+ 					  AN8811HB_GPIO_OUTPUT_345);
-  	if (ret < 0)
- -		return ret;
- +		goto err_dev_create;
- =20
-  	return 0;
- +
- +err_dev_create:
- +	mdio_device_remove(mdiodev);
- +
- +err_dev_free:
- +	mdio_device_free(mdiodev);
- +	return ret;
-  }
- =20
-  static int en8811h_probe(struct phy_device *phydev)
-
---soxlRVeWDInW4BKF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoYZXAACgkQJNaLcl1U
-h9BIPQf9FsVt0wHSY12fYNLGr2wW0yZ0dUWgpbu7VcnG3DoN62kuwcBHvA9PeXLk
-L2g5pfdR1TjNm4g3/FOefDLk7RdfiNIQKJR8OSMdi9tm/eml7PhIeDZpOWRkiMTd
-dNCNqGZofn26mc1Ym7KAf2e7qlSi0sfgPvanZQjS/Jrjz0qRepSvzw8KbY7RD9bq
-CRDugA1D2tSWablPe6QJ4/INddnak7I/qou0Xk5ToIbvlgKPwnsruuZwPey0vxGV
-2S+mf/p/Ukc2FfH2fScds3CfnHx2Zwoy06IHbgGHiCA23xGlco+G0xGPdzMes5N8
-4qNjzJkiUzXpAio0xqs9hovJOxWCkA==
-=qd7/
------END PGP SIGNATURE-----
-
---soxlRVeWDInW4BKF--
+Yuyang
 
