@@ -1,126 +1,213 @@
-Return-Path: <netdev+bounces-292495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292497-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PV3HTKSF2oUJggAu9opvQ
-	(envelope-from <netdev+bounces-292495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:54:10 +0200
+	id MFlELXORF2oUJggAu9opvQ
+	(envelope-from <netdev+bounces-292497-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:50:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C999D5EB6F8
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:54:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B8B5EB695
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 99A7D3000A77
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:50:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 53538300F150
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF8E21FF25;
-	Thu, 28 May 2026 00:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E901EEA3C;
+	Thu, 28 May 2026 00:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hk7hOrcC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnRUg0lW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2471121E097
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 00:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779929403; cv=none; b=onp3n+7j1b09dTZub0e1vrfgVNytquySi5X9+xHC/j7b8M/AEHmMuhVMAur3BkLYI7HRau+uEAdpfJWq5mDB6gXQbnwFfIooi/neDU0zfrOwdxJDICrkroqHwnZ+f7fIR6YBEcHf0DTOe+RQWSmoq32WXCzH5xzJ6b3zQbSwUPE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779929403; c=relaxed/simple;
-	bh=pT6uoE6Oqf5GNB5FJdKfwImYyJM8qnQs0dy3TZ/i/Q0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Uzj+p6a5keDiz0eUhAGT/rMoe1y7WVIHxD5L53WVqpL7aBMn6v3KmY/b5+7Ue+w7B9uYH2W9FsEeGu47U7bj6HdVUtZ4dIjUQ1gjZpYL/vuKiy7RGb+QydcF9ZCJEzJCWrZo+n1wILMXeF73i9icqz0O0hZfs9zd9fjeqMNZDQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hk7hOrcC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BB811F000E9;
-	Thu, 28 May 2026 00:50:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779929400;
-	bh=JilAlvhTQR4Fns/WzNI4hUHEULD/eTtPpCYnVAmlcJs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Hk7hOrcCgmEYeQuKBm9SXvWYxR2hhEE6D1bPldDVRdNeBWwG9iUmDGpoZs7I4cH2d
-	 PTfAi9nPjMp5PBnnbAAEz1e85E+FwwxxsJJ1BnmtGQcMHYPG3GXpaB95GNLyR2pIRo
-	 nKGwJLDd70wi4UtXi4FS2vHe2VJPqeC1bOWGiKl5r96ioeAHG85ixcJaZTa0hSaSqw
-	 WRJk6RVwvdGQ1GQTvSqCyKFamUKTMp6bcWNcttQbyl/rw5eU6rDs5JR/f7jr06ySH1
-	 EyBc+JV/DfqhCyW5RlW4QWi+LvVWK5pEWLGoOCByrRalIt92e6yEFFOSItFnh+DXRu
-	 zNVLxhslWOYTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B4F380CFDE;
-	Thu, 28 May 2026 00:50:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345C01940B0
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 00:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779929457; cv=pass; b=DK19rc/e+3C90urirolrLX7rS3TfWILhY+ktzs7LYyjzDSIJWrhk/UJNpcWu7LwbWJtOQ+ukHJNk/WRGM+yPtwU3E9VrVkZEEz0iC7dgFC3MOd3TJ5Wqep5KhrszaAilbmQA7yBclL2vBY4SRRAglztx5shcZ1HG9PZeRjg/lPM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779929457; c=relaxed/simple;
+	bh=giW7cE2Ul2827hcqIcTdpNfD7jsVV5kq3POoqaLjUfo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vo0GQ6vjYuD5eOkQX1tzGaQ1NQzBaagBXhAkL/N+MxPkGmSYI7LrwwHCU6JwwnK7+RrAG6Fq4NnfJRzAe0sScr8qIN6oIuhcOEGWYpGhMeXQGyppdKU4WCuhXsKFOat/PxOp5oLYKhyK80hWQOCBh3r9d0QZ9XXP0UqKVLcp3Fs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnRUg0lW; arc=pass smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5aa2691db86so12616991e87.3
+        for <netdev@vger.kernel.org>; Wed, 27 May 2026 17:50:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779929454; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KD0bGjOQKUDPVggrgUMM5qSpNQ9ZG1Se2cd2SzI5+5PF3d4sE5oQ8L5+/TfqcHt2fr
+         9kBVsidKL0v6a+CKS2k8Or1cAEUAEw0ByCk3aJfCQhs3GPN4OZNt5gQLR8NmqGWeQUsa
+         1F+WLcpfRw8zKZ9BYket/MIgdTobw69vc8Wc9U5ZuutmdpsFGDu0yf5GEKKh2uWoJSqF
+         qyWKf0OEhp2rPWyvjuHLsvOvi3JDrWZITjDmy2IcvcI3JTkT7l8iDLsFp03i0A/DnPGQ
+         NGCcL1HaoIYnHdO674g1mXXbAAXz2lu/nlIrk591AvosZHQrjT0Q4qWCsF7jQV6m2wBG
+         FmXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BlHi7pwvmhTqmHOFUpaKkZe0PG2OdoCLfoe4VT5AXRo=;
+        fh=t3EeOO4yQBdWog6PEjFFdUsNwE4EXd/80N7IKDFieO4=;
+        b=K8J6ErIqy8KE/H7h8UnvrJF3NWzeD1iStbNn5gMB3va3ehtwDNoSpqV1dXSqvEhW3z
+         dYMmqIyx9+a2fjTPtnCU9L98iTBJLGyji0Dc+TMf0UtAU9hORTGHTpk8sFOBONCPEVMC
+         eyC6Yq5JiK5kqyd10wC5cN6fHFnfBVX7fM2WJEUmzb/1TkLbwG24nykZrNnsYdgGz5/k
+         E/zeKX+U7Q35O2XpVJi+zk0BRoelO73WSUJQ4zkMAgnHVOli9aDKDbpjZonNNVax7LK5
+         y4+97uccGOfuTv/J662mDLW6kRhNwVEWhGbA0IgAzZDNhryvTHqB2ftrN8HgpE9OvJ/3
+         hePg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779929454; x=1780534254; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BlHi7pwvmhTqmHOFUpaKkZe0PG2OdoCLfoe4VT5AXRo=;
+        b=NnRUg0lWgvcmeDKtcUNIPH6r3mE6H+tpcHzMq4S2zJOTXQzvotaAP64KbUMF9jwCp6
+         XCvNrJ3kFBs0umwwGx4xQVz4fxPYVcuuxztA3vY3jTy7vdz9ph1F6hPmYwdpfkqjdwCa
+         xpPdxnFa+K9X/7oG6nNA/sMNqx24x540MqZm371sE+Qpg2y4NT/uPDtdqMRvQth/x1t2
+         8RPK5NedmNMjARr4VzRkmEYUK4sTSd1lwyiDsUWMAqsWobIn+jXZo4j9TStkfJDme8vR
+         SqPFQHpUWFsp84tn2Cm+geC5bBiHU50ysiKUGwYneKHIQ2fNXhcyrHTZRk8maLcDtiXg
+         yCsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779929454; x=1780534254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BlHi7pwvmhTqmHOFUpaKkZe0PG2OdoCLfoe4VT5AXRo=;
+        b=NZobEWYrGpDG0s5p/2ECs55pcSM31YWsoSTU0ftjHCX3VpG/6HhfAhmRE5rSp0YhEV
+         ACZUIs19egAEzapN5ybR/k9gvIIDCHcNxmyadHKC70/YO/s91GPcubUMg9ekgBkOOQAU
+         nwJhSBAioa6F76C96eyeD7s1nN/1wrx6CBAWzljytN3NEZoLc2JjlgRsljp8H0HEURUw
+         wE7NkvjDmpYT1JQqEzQ6xAMCvqipDDNgSptUrV6ykr7RpctL9hJRcpwCDVRu7r3gfo1y
+         6nfygvzJ3pxhNsRyPgeWpEix7OWEoX7FOavLaGd6iVgGkFakgJSexY6A9of0iKkluNcX
+         uNAw==
+X-Forwarded-Encrypted: i=1; AFNElJ/BURSi5xcihwSPbdpjVc62MtTa+5wr06tjCIeBbgJeYLbHHbahc6cbF4sXd2yPJUfTLWGlMgs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzehEDm220IS6WEpQbOYSNeYa0YcsD/VSyRHfsf8zAaLe/3mdcU
+	E8JL6IE+RAPlHl9D01pL1DnN6F1bplFgDVZqRR/JOsLIIqmK9eQ9SwgCOv4xivJz7Ur8yfa3EW7
+	aQbUvX5+lEIZVxOQfQF+KAh0CHhlxZKQ=
+X-Gm-Gg: Acq92OF+y87eUrk2nYVLZMh8tSqF3V4VHF/7gjqe02JDecpdiY9ZOnOAQjgI3rEvQTT
+	1/RM1uY04USIK7TakYDTgDIVpp7raO5mWgQ+hYWzePhl9sTQQN0+7cOCasaOQtGqAjzWQZsZ1LV
+	xEkcszKn1rGSOAmSM1XSgpEcyRKGZiejy45rKGFNLZnfV/Eh4aTzXRY4838OacqGJr9YlES9sWw
+	ncixvEWqi6u6bQOjTE7eX5dgMBpj+uuyBwbz8pt1g8hIspbhKHa9olAl4LILkp93n7eHqKaQQ/N
+	abPeC0+3TIfiBGZnmjJzbiPyG7rurkJeua/D+8ogefPHENNRw3UOszmTn9wZ
+X-Received: by 2002:a05:6512:38c5:b0:5a8:9b6a:5749 with SMTP id
+ 2adb3069b0e04-5aa323a9f51mr4812397e87.28.1779929454248; Wed, 27 May 2026
+ 17:50:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: page_pool: check nla_nest_start() return value in
- page_pool_nl_stats_fill()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177992940540.700169.1846951496298474354.git-patchwork-notify@kernel.org>
-Date: Thu, 28 May 2026 00:50:05 +0000
-References: <tencent_A82EBAB365A8B888B66FDCF115A3DCB8880A@qq.com>
-In-Reply-To: <tencent_A82EBAB365A8B888B66FDCF115A3DCB8880A@qq.com>
-To: Zhao Dongdong <winter91@foxmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, zhaodongdong@kylinos.cn
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+References: <20260521135244.40869-1-kerneljasonxing@gmail.com>
+ <20260521135244.40869-6-kerneljasonxing@gmail.com> <CAAVpQUD8gsYPyZS4Dbyo0DMEjEczBTJRZ3OW51CPZhnLw22YGQ@mail.gmail.com>
+In-Reply-To: <CAAVpQUD8gsYPyZS4Dbyo0DMEjEczBTJRZ3OW51CPZhnLw22YGQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 28 May 2026 08:50:13 +0800
+X-Gm-Features: AVHnY4JtxR6v6tEHKgUcEj2YPTM0SwOnxyZSTt214CNsHr2ghH9-fOy5Tz9QpJE
+Message-ID: <CAL+tcoDmc5eOTPT1BWqagS6tcTZn-pfJuwrsPJ5dvq3ZJd=eGg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/6] bpf: enable bpf timestamping rx in TCP layer
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	jolsa@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292495-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[foxmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292497-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,vger.kernel.org,tencent.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:email]
-X-Rspamd-Queue-Id: C999D5EB6F8
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,tencent.com:email]
+X-Rspamd-Queue-Id: 51B8B5EB695
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Sat, May 23, 2026 at 11:45=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
+>
+> On Thu, May 21, 2026 at 6:53=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Add two if statements to accurately isolate bpf timestamping and so
+> > timestamping. They can work respectively.
+> >
+> > As to so_timestamping, only add a loose condition via report flags
+> > to avoid duplicate strict checks that is done in tcp_recv_timestamp()
+> > and performance impact. If the loose condition is hit,
+> > tcp_recv_timestamp() is able to handle the exact case and doesn't
+> > hamper the existing timestamping feature.
+> >
+> > Make it work in TCP protocol.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/ipv4/tcp.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > index 21ece4c71612..7ad3561dc8cd 100644
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -2353,6 +2353,16 @@ void tcp_recv_timestamp(struct msghdr *msg, cons=
+t struct sock *sk,
+>
+> Simply drop const from here rather than casting to
+> non-const for bpf_skops_rx_timestamping().
+>
+> sk in all callers of tcp_recv_timestamp() is not const.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Will do that. Thanks.
 
-On Tue, 26 May 2026 14:51:56 +0800 you wrote:
-> From: Zhao Dongdong <zhaodongdong@kylinos.cn>
-> 
-> nla_nest_start() can return NULL if the skb runs out of space.
-> page_pool_nl_stats_fill() does not check the return value before
-> calling nla_nest_end(), which can lead to a NULL pointer dereference.
-> Add a NULL check after nla_nest_start() and abort the message if it fails.
-> 
-> [...]
-
-Here is the summary with links:
-  - net: page_pool: check nla_nest_start() return value in page_pool_nl_stats_fill()
-    https://git.kernel.org/netdev/net-next/c/36d0d876c45f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>
+>
+> >         int new_tstamp =3D sock_flag(sk, SOCK_TSTAMP_NEW);
+> >         u32 tsflags =3D READ_ONCE(sk->sk_tsflags);
+> >
+> > +       if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+> > +           SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_RX_TIMESTAMPING))
+> > +               bpf_skops_rx_timestamping((struct sock *)sk, tss,
+> > +                                         BPF_SOCK_OPS_TSTAMP_RCV_CB);
+> > +
+> > +       if (!sock_flag(sk, SOCK_RCVTSTAMP) &&
+> > +           !(tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> > +           !(tsflags & SOF_TIMESTAMPING_RAW_HARDWARE))
+> > +               return;
+> > +
+> >         if (tss->ts[0]) {
+> >                 if (sock_flag(sk, SOCK_RCVTSTAMP)) {
+> >                         struct timespec64 tv =3D ktime_to_timespec64(ts=
+s->ts[0]);
+> > --
+> > 2.43.7
+> >
 
