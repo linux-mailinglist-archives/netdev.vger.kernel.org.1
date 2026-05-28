@@ -1,552 +1,303 @@
-Return-Path: <netdev+bounces-292689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292690-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YI2UHvU8GGo1hggAu9opvQ
-	(envelope-from <netdev+bounces-292689-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:02:45 +0200
+	id QIOmJzs/GGqYhwgAu9opvQ
+	(envelope-from <netdev+bounces-292690-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:12:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B7E5F2661
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:02:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1348F5F2850
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4C063043F81
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:57:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7B23B3040C75
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC133E7BAC;
-	Thu, 28 May 2026 12:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC2E3F164A;
+	Thu, 28 May 2026 13:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecCfVEbS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2UHAKvV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E10D3D3008
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 12:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490503F0AAD;
+	Thu, 28 May 2026 13:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779973065; cv=none; b=NikgNu7/VyCNj/jIIARyKtSSthjTv3mZBqWqr9T/NnqRfvOL3RoEAqsZ7v/rk73I1NTyYCTMGXGvXuMSSFodfYr5pht6A6Rql5kEucdnW0yI70ApAkBNJLDMTv+pQFjKzjVdiLaQfApBk1eXETyqb8Wq+idy/JpN6+4WZMMs24A=
+	t=1779973881; cv=none; b=fXrIWavsX6CiwYjTi/SJmoksjHSxyE5+zHDv/SkI0/jgjt2oQFRWwe0M+sj23O3tP0OMQLoPVSnfFJxKhzVVe5r1EWta+2c/Kg8X4ze0FHv+8vNNJc8uDc8augLoM4Nr7yd0jPnFyB+6arHrzkcFgAdisDaFayWzTWWTqoOTxR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779973065; c=relaxed/simple;
-	bh=Q2pfmdrdKpPUNeA34wrZaMcfbChhqeS4ZLvu1TWS4oQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=BJchMmPP5Q8WZgK0CgfbS1u1TXs7eY2g6tBFh5zi4QTRyfq3d9ynOCwjKUS1LxWq16p9qJa8MitJqHMG8GWk6R4iVfzSuQasebd0vqnvMdIHgDfpz9fVJCLqC66m0hQTOGbT4Bbm1oAnlHNtnmrttFTKDQ0XEBvZS4jNIXtYIJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecCfVEbS; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B5C71F000E9;
-	Thu, 28 May 2026 12:57:43 +0000 (UTC)
+	s=arc-20240116; t=1779973881; c=relaxed/simple;
+	bh=DRxY+IRB0IqAgofhsecYlxPFiYO6P8tDS1HNVNN3odI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j7jeG1jBi3vSxuKAxmjCv8OLEUdoK/eBLN6NA/CVEX/Xo37SIJECOP1cSfyYulbehbOU3QAnwUSwd0koQRxqOitkN9rwEigrAJvxM/v72kfDjTQF9Dr322A7gPc8OlaNNRdEpLK5vJFQnoGS/dRI6+hAz5p1esUy5qNDmJudBng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2UHAKvV; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4393B1F000E9;
+	Thu, 28 May 2026 13:11:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779973063;
-	bh=cY5Pw5Fw5HnSfYI9TBtsN/B4IRA/O/mEHcqrP+bM2Ac=;
-	h=From:Date:Subject:To:Cc;
-	b=ecCfVEbSVg1rXMJTZ7n0bLPHbA1G0wcBPyIJe2sYjmfG/hIfAEwygxxWsF9Z+ko5J
-	 vrRyhRWrBIBVhdwUeOjmD24oihiSYN28Eu3ry+PMEhYMjjZpdngD9n0WuxCicbAPxH
-	 nRAGTLspizCsHenxnegu00e/EgdYjOgBmdb/zq5X3ek9hZZu2oToQU/25cwEG4wLz7
-	 XoUBh4NNABpYtDEIffPMD0qRarhwjmULZJ0OffshNYxF0GI7Y1f1S/HsRe/eS5w6Jk
-	 FaUlHPgSy86tr9Mek1299ehQ3wwnkXPlDQU4xoRypUz8leNpzwELtYKWkL0GkvV0FX
-	 e5EO2w7J4Xrfw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 28 May 2026 14:56:56 +0200
-Subject: [PATCH RFC net-next v3] net: airoha: Add TCP LRO support
+	s=k20260515; t=1779973880;
+	bh=iDEo0j2nHsYSJgSqy1z8dWMjD802zHIig7qC3EKAx/k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=b2UHAKvVDwz9Q8zDeG5+gjEzAwHGNvWPrhFQu4UWecZMGU9oLFnYEUppHdL1JG96W
+	 ZyKfXbFlZkxgErlkIJ9vEDjHqhgkZYeEglVfzfyl1vwgy5OcQX/ILvYNtAw+Fw/u/n
+	 7Rf4HO5aTgBsh8Qrexyv+asWzwUvPXiN0B/LUktlwpZ7GWwIh5oxpK5VedspSPx+Bn
+	 nl+HsmBpJmBcRweXxwoqgm9Olo+josivuYToc2QW7vazCQsXTqNoHWp1knQYF/ENFG
+	 jtLGo1SiiASszWS5aZ18I7jEX0fOy1BKxNFyaZVCVtMBYw8PPdiTBmqYLjDYvMKN77
+	 k31LndrsIUjKg==
+Date: Thu, 28 May 2026 18:41:07 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Amirreza Zarrabi <amirreza.zarrabi@oss.qualcomm.com>
+Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>,
+	Harshal Dev <harshal.dev@oss.qualcomm.com>
+Subject: Re: [PATCH v7 02/15] firmware: qcom: Add a generic PAS service
+Message-ID: <ahg-6-eLus-J7tC8@sumit-xelite>
+References: <20260522115936.201208-1-sumit.garg@kernel.org>
+ <20260522115936.201208-3-sumit.garg@kernel.org>
+ <37fb075c-3f48-4a7c-b05d-090b0b09e04a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260528-airoha-eth-lro-v3-1-dd09c1fb000e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNwQoCIRRFf2VwnTFq42SrIOgD2kYLcV6jNGg8R
- SaG+ffEVRHxVpd7z3kLiYAOIjk0C0HILrrgSxCbhhir/QjUDSUT3nLZdryl2mGwmkKydMJAdTc
- wI6Rge8ZIgZ4IdzdX4ZVczqfGQ6Ie5kRupbUupoCv+i2zuvknzoyW48oYIXopQR0fgB6mbcCxu
- jL/5OUPzwvPd8C1gl4L1X/x67q+Ad6G0DP7AAAA
-X-Change-ID: 20260520-airoha-eth-lro-a5d1c3631811
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- netdev@vger.kernel.org, Madhur Agrawal <madhur.agrawal@airoha.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37fb075c-3f48-4a7c-b05d-090b0b09e04a@oss.qualcomm.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292689-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RSPAMD_URIBL_FAIL(0.00)[airoha.com:query timed out];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292690-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RSPAMD_EMAILBL_FAIL(0.00)[lorenzo.kernel.org:query timed out];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,airoha.com:email]
-X-Rspamd-Queue-Id: 19B7E5F2661
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 1348F5F2850
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add hardware TCP Large Receive Offload (LRO) support to the airoha_eth
-driver, leveraging the EN7581/AN7583 SoC's 8 dedicated LRO hardware queues
-mapped to RX queues 24–31. LRO hw offloading does not support
-Scatter-Gather (SG) so it is required to increase the page_pool allocation
-order to 2 for RX queues 24–31 (LRO queues).
+Hi Amir,
 
-Performance comparison between GRO and hw LRO has been carried out using
-a 10Gbps NIC:
+On Thu, May 28, 2026 at 10:45:32AM +1000, Amirreza Zarrabi wrote:
+> Hi Sumit,
+> 
+> On 5/22/2026 9:59 PM, Sumit Garg wrote:
+> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > 
+> > Qcom platforms has the legacy of using non-standard SCM calls
+> > splintered over the various kernel drivers. These SCM calls aren't
+> > compliant with the standard SMC calling conventions which is a
+> > prerequisite to enable migration to the FF-A specifications from Arm.
+> > 
+> > OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+> > support these non-standard SCM calls. And even for newer architectures
+> > using S-EL2 with Hafnium support, QTEE won't be able to support SCM
+> > calls either with FF-A requirements coming in. And with both OP-TEE
+> > and QTEE drivers well integrated in the TEE subsystem, it makes further
+> > sense to reuse the TEE bus client drivers infrastructure.
+> > 
+> > The added benefit of TEE bus infrastructure is that there is support
+> > for discoverable/enumerable services. With that client drivers don't
+> > have to manually invoke a special SCM call to know the service status.
+> > 
+> > So enable the generic Peripheral Authentication Service (PAS) provided
+> > by the firmware. It acts as the common layer with different TZ
+> > backends plugged in whether it's an SCM implementation or a proper
+> > TEE bus based PAS service implementation.
+> > 
+> > Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
+> > Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
+> > Reviewed-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+> > Tested-by: Vignesh Viswanathan <vignesh.viswanathan@oss.qualcomm.com> # IPQ9650
+> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > ---
+> >  drivers/firmware/qcom/Kconfig          |   8 +
+> >  drivers/firmware/qcom/Makefile         |   1 +
+> >  drivers/firmware/qcom/qcom_pas.c       | 291 +++++++++++++++++++++++++
+> >  drivers/firmware/qcom/qcom_pas.h       |  50 +++++
+> >  include/linux/firmware/qcom/qcom_pas.h |  43 ++++
+> >  5 files changed, 393 insertions(+)
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas.c
+> >  create mode 100644 drivers/firmware/qcom/qcom_pas.h
+> >  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+> > 
+> > diff --git a/drivers/firmware/qcom/Kconfig b/drivers/firmware/qcom/Kconfig
+> > index b477d54b495a..9f66cc774508 100644
+> > --- a/drivers/firmware/qcom/Kconfig
+> > +++ b/drivers/firmware/qcom/Kconfig
+> > @@ -6,6 +6,14 @@
+> >  
+> >  menu "Qualcomm firmware drivers"
+> >  
+> > +config QCOM_PAS
+> > +	tristate "Qualcomm generic PAS interface driver"
+> > +	help
+> > +	  Enable the generic Peripheral Authentication Service (PAS) provided
+> > +	  by the firmware. It acts as the common layer with different TZ
+> > +	  backends plugged in whether it's an SCM implementation or a proper
+> > +	  TEE bus based PAS service implementation.
+> > +
+> >  config QCOM_SCM
+> >  	select QCOM_TZMEM
+> >  	tristate
+> > diff --git a/drivers/firmware/qcom/Makefile b/drivers/firmware/qcom/Makefile
+> > index 0be40a1abc13..dc5ab45f906a 100644
+> > --- a/drivers/firmware/qcom/Makefile
+> > +++ b/drivers/firmware/qcom/Makefile
+> > @@ -8,3 +8,4 @@ qcom-scm-objs += qcom_scm.o qcom_scm-smc.o qcom_scm-legacy.o
+> >  obj-$(CONFIG_QCOM_TZMEM)	+= qcom_tzmem.o
+> >  obj-$(CONFIG_QCOM_QSEECOM)	+= qcom_qseecom.o
+> >  obj-$(CONFIG_QCOM_QSEECOM_UEFISECAPP) += qcom_qseecom_uefisecapp.o
+> > +obj-$(CONFIG_QCOM_PAS)		+= qcom_pas.o
 
-GRO: ~2.7 Gbps
-LRO: ~8.1 Gbps
+<snip>
 
-Please note with respect to the previous implementation, page_pool
-allocation order has been reduced from 5 to 2.
+> > diff --git a/include/linux/firmware/qcom/qcom_pas.h b/include/linux/firmware/qcom/qcom_pas.h
+> > new file mode 100644
+> > index 000000000000..65b1c9564458
+> > --- /dev/null
+> > +++ b/include/linux/firmware/qcom/qcom_pas.h
+> > @@ -0,0 +1,43 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright (c) 2010-2015, 2018-2019 The Linux Foundation. All rights reserved.
+> > + * Copyright (C) 2015 Linaro Ltd.
+> > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> > + */
+> > +
+> > +#ifndef __QCOM_PAS_H
+> > +#define __QCOM_PAS_H
+> > +
+> > +#include <linux/err.h>
+> > +#include <linux/types.h>
+> > +
+> > +struct qcom_pas_context {
+> > +	struct device *dev;
+> > +	u32 pas_id;
+> > +	phys_addr_t mem_phys;
+> > +	size_t mem_size;
+> > +	void *ptr;
+> > +	dma_addr_t phys;
+> > +	ssize_t size;
+> > +	bool use_tzmem;
+> > +};
+> > +
+> > +bool qcom_pas_is_available(void);
+> > +struct qcom_pas_context *devm_qcom_pas_context_alloc(struct device *dev,
+> > +						     u32 pas_id,
+> > +						     phys_addr_t mem_phys,
+> > +						     size_t mem_size);
+> > +int qcom_pas_init_image(u32 pas_id, const void *metadata, size_t size,
+> > +			struct qcom_pas_context *ctx);
+> > +struct resource_table *qcom_pas_get_rsc_table(struct qcom_pas_context *ctx,
+> > +					      void *input_rt, size_t input_rt_size,
+> > +					      size_t *output_rt_size);
+> > +int qcom_pas_mem_setup(u32 pas_id, phys_addr_t addr, phys_addr_t size);
+> > +int qcom_pas_auth_and_reset(u32 pas_id);
+> > +int qcom_pas_prepare_and_auth_reset(struct qcom_pas_context *ctx);
+> > +int qcom_pas_set_remote_state(u32 state, u32 pas_id);
+> > +int qcom_pas_shutdown(u32 pas_id);
+> > +bool qcom_pas_supported(u32 pas_id);
+> > +void qcom_pas_metadata_release(struct qcom_pas_context *ctx);
+> > +
+> > +#endif /* __QCOM_PAS_H */
+> 
+> I have a question about the shape of the generic PAS abstraction.
+> 
+> Looking at the current interface, it seems that pas_id is still treated as
+> the primary identity for most PAS operations, while struct qcom_pas_context
+> is used as optional extended state for the operations that need it. I can see
+> how this maps well to the existing SCM PAS interface and keeps the transition
+> simple.
+> 
+> However, I wonder if this makes the abstraction less generic in the long term.
+> Some callbacks in struct qcom_pas_ops receive only pas_id, while others
+> receive struct qcom_pas_context *ctx. This works as long as pas_id is
+> sufficient for those operations. But if a backend needs per-peripheral
+> private state for operations such as auth_and_reset,
+> shutdown, or set_remote_state, it would need to reconstruct that state from
+> pas_id or maintain a separate pas_id to backend-context mapping.
+> 
+> Would it be cleaner to make struct qcom_pas_context the common
+> per-peripheral object and pass it consistently to all per-peripheral callbacks?
+> Existing backends could still use ctx->pas_id, but future backends would not
+> need to perform a separate lookup only because the callback was passed a raw
+> pas_id.
 
-Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v3:
-- Fix double-free of the page_pool of airoha_qdma_lro_rx_process()
-  fails.
-- Set AIROHA_LRO_PAGE_ORDER according to PAGE_SIZE.
-- Add missig gso metadata for the LRO packet.
-- Link to v2: https://lore.kernel.org/r/20260526-airoha-eth-lro-v2-1-24e2a9e7a397@kernel.org
+The common evolution for a generic abstraction comes when it's needed.
+So once the client driver or the backend comes up with certain
+requirements then the generic PAS layer can be extended as needed. It
+should be possible for more APIs to migrate to using PAS context but
+there should be corresponding use-case requirements.
 
-Changes in RFC v2:
-- Improve performances fixing buf_size computation.
-- Fix possible overflow in REG_CDM_LRO_LIMIT() register configuration.
-- Require the device to be not running before configuring LRO.
-- Fix configuration order in airoha_fe_lro_is_enabled().
-- Check skb header length in airoha_qdma_lro_rx_process().
-- Do not check net_device feature in airoha_qdma_rx_process() before
-  executing airoha_qdma_lro_rx_process() but rely on
-  airoha_qdma_lro_rx_process() logic.
-- Fix possible double recycle in airoha_qdma_rx_process() for LRO
-  packets.
-- Always use AIROHA_RXQ_LRO_MAX_AGG_COUNT macro for max LRO aggregated
-  fragments in airoha_fe_lro_init_rx_queue().
-- Link to v1: https://lore.kernel.org/r/20260520-airoha-eth-lro-v1-1-129cc33766e9@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c  | 222 ++++++++++++++++++++++++++++--
- drivers/net/ethernet/airoha/airoha_eth.h  |  24 ++++
- drivers/net/ethernet/airoha/airoha_regs.h |  22 ++-
- 3 files changed, 256 insertions(+), 12 deletions(-)
+> 
+> I also wonder whether struct qcom_pas_context is exposing some
+> implementation-specific state. Fields such as ptr, phys, size, and
+> use_tzmem seem to describe how the current SCM/QTEE implementations manage
+> metadata memory, rather than generic PAS state. For another backend, the
+> per-operation state might be a tee_shm, an FF-A memory handle, shared or lent
+> memory state, or something else transport-specific.
+> 
+> Would it make sense to keep only the common PAS fields in
+> struct qcom_pas_context, such as dev, pas_id, and possibly the firmware
+> memory address/size if those are truly generic, and add a backend-private
+> pointer for implementation-specific state?
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 6418fe0c9f80..6d9b23ebc13e 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -12,6 +12,7 @@
- #include <net/dst_metadata.h>
- #include <net/page_pool/helpers.h>
- #include <net/pkt_cls.h>
-+#include <net/tcp.h>
- #include <uapi/linux/ppp_defs.h>
- 
- #include "airoha_regs.h"
-@@ -431,6 +432,48 @@ static void airoha_fe_crsn_qsel_init(struct airoha_eth *eth)
- 				 CDM_CRSN_QSEL_Q1));
- }
- 
-+static void airoha_fe_lro_init_rx_queue(struct airoha_eth *eth, int qdma_id,
-+					int lro_queue_index, int qid,
-+					int buf_size)
-+{
-+	int id = qdma_id + 1;
-+
-+	airoha_fe_rmw(eth, REG_CDM_LRO_LIMIT(id),
-+		      CDM_LRO_AGG_NUM_MASK | CDM_LRO_AGG_SIZE_MASK,
-+		      FIELD_PREP(CDM_LRO_AGG_SIZE_MASK, buf_size) |
-+		      FIELD_PREP(CDM_LRO_AGG_NUM_MASK,
-+				 AIROHA_RXQ_LRO_MAX_AGG_COUNT));
-+	airoha_fe_rmw(eth, REG_CDM_LRO_AGE_TIME(id),
-+		      CDM_LRO_AGE_TIME_MASK | CDM_LRO_AGG_TIME_MASK,
-+		      FIELD_PREP(CDM_LRO_AGE_TIME_MASK,
-+				 AIROHA_RXQ_LRO_MAX_AGE_TIME) |
-+		      FIELD_PREP(CDM_LRO_AGG_TIME_MASK,
-+				 AIROHA_RXQ_LRO_MAX_AGG_TIME));
-+	airoha_fe_rmw(eth, REG_CDM_LRO_RXQ(id, lro_queue_index),
-+		      LRO_RXQ_MASK(lro_queue_index),
-+		      __field_prep(LRO_RXQ_MASK(lro_queue_index), qid));
-+	airoha_fe_set(eth, REG_CDM_LRO_EN(id), BIT(lro_queue_index));
-+}
-+
-+static void airoha_fe_lro_disable(struct airoha_eth *eth, int qdma_id)
-+{
-+	int i, id = qdma_id + 1;
-+
-+	airoha_fe_clear(eth, REG_CDM_LRO_EN(id), LRO_RXQ_EN_MASK);
-+	airoha_fe_clear(eth, REG_CDM_LRO_LIMIT(id),
-+			CDM_LRO_AGG_NUM_MASK | CDM_LRO_AGG_SIZE_MASK);
-+	airoha_fe_clear(eth, REG_CDM_LRO_AGE_TIME(id),
-+			CDM_LRO_AGE_TIME_MASK | CDM_LRO_AGG_TIME_MASK);
-+	for (i = 0; i < AIROHA_MAX_NUM_LRO_QUEUES; i++)
-+		airoha_fe_clear(eth, REG_CDM_LRO_RXQ(id, i), LRO_RXQ_MASK(i));
-+}
-+
-+static bool airoha_fe_lro_is_enabled(struct airoha_eth *eth, int qdma_id)
-+{
-+	return airoha_fe_get(eth, REG_CDM_LRO_EN(qdma_id + 1),
-+			     LRO_RXQ_EN_MASK);
-+}
-+
- static int airoha_fe_init(struct airoha_eth *eth)
- {
- 	airoha_fe_maccr_init(eth);
-@@ -587,6 +630,97 @@ static int airoha_qdma_get_gdm_port(struct airoha_eth *eth,
- 	return port >= ARRAY_SIZE(eth->ports) ? -EINVAL : port;
- }
- 
-+static int airoha_qdma_lro_rx_process(struct sk_buff *skb,
-+				      struct airoha_qdma_desc *desc)
-+{
-+	u32 desc_ctrl = le32_to_cpu(READ_ONCE(desc->ctrl));
-+	struct skb_shared_info *shinfo = skb_shinfo(skb);
-+	u32 msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
-+	u32 msg2 = le32_to_cpu(READ_ONCE(desc->msg2));
-+	u32 msg3 = le32_to_cpu(READ_ONCE(desc->msg3));
-+	u32 len, th_off, tcp_ack_seq, agg_count;
-+	u16 tcp_win, l2_len;
-+	struct tcphdr *th;
-+	bool ipv4, ipv6;
-+
-+	agg_count = FIELD_GET(QDMA_ETH_RXMSG_AGG_COUNT_MASK, msg2);
-+	if (agg_count <= 1)
-+		return 0;
-+
-+	ipv4 = FIELD_GET(QDMA_ETH_RXMSG_IP4_MASK, msg1);
-+	ipv6 = FIELD_GET(QDMA_ETH_RXMSG_IP6_MASK, msg1);
-+	if (!ipv4 && !ipv6)
-+		return -EOPNOTSUPP;
-+
-+	l2_len = FIELD_GET(QDMA_ETH_RXMSG_L2_LEN_MASK, msg2);
-+	len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
-+	if (ipv4) {
-+		struct iphdr *iph;
-+
-+		if (!pskb_may_pull(skb, l2_len + sizeof(*iph)))
-+			return -EINVAL;
-+
-+		iph = (struct iphdr *)(skb->data + l2_len);
-+		if (iph->protocol != IPPROTO_TCP)
-+			return -EOPNOTSUPP;
-+
-+		th_off = l2_len + (iph->ihl << 2);
-+		if (!pskb_may_pull(skb, th_off))
-+			return -EINVAL;
-+
-+		iph->tot_len = cpu_to_be16(len - l2_len);
-+		iph->check = 0;
-+		iph->check = ip_fast_csum((void *)iph, iph->ihl);
-+	} else {
-+		struct ipv6hdr *ip6h;
-+
-+		th_off = l2_len + sizeof(*ip6h);
-+		if (!pskb_may_pull(skb, th_off))
-+			return -EINVAL;
-+
-+		ip6h = (struct ipv6hdr *)(skb->data + l2_len);
-+		if (ip6h->nexthdr != NEXTHDR_TCP)
-+			return -EOPNOTSUPP;
-+
-+		ip6h->payload_len = cpu_to_be16(len - th_off);
-+	}
-+
-+	tcp_win = FIELD_GET(QDMA_ETH_RXMSG_TCP_WIN_MASK, msg3);
-+	tcp_ack_seq = le32_to_cpu(READ_ONCE(desc->data));
-+
-+	if (!pskb_may_pull(skb, th_off + sizeof(*th)))
-+		return -EINVAL;
-+
-+	th = (struct tcphdr *)(skb->data + th_off);
-+	th->ack_seq = cpu_to_be32(tcp_ack_seq);
-+	th->window = cpu_to_be16(tcp_win);
-+
-+	/* Check tcp timestamp option */
-+	if (th->doff == (sizeof(*th) + TCPOLEN_TSTAMP_ALIGNED) / 4) {
-+		__be32 *topt;
-+
-+		if (!pskb_may_pull(skb, th_off + (th->doff << 2)))
-+			return -EINVAL;
-+
-+		topt = (__be32 *)(th + 1);
-+		if (*topt == cpu_to_be32((TCPOPT_NOP << 24) |
-+					 (TCPOPT_NOP << 16) |
-+					 (TCPOPT_TIMESTAMP << 8) |
-+					 TCPOLEN_TIMESTAMP)) {
-+			__le32 tcp_ts_reply = READ_ONCE(desc->tcp_ts_reply);
-+
-+			put_unaligned_be32(le32_to_cpu(tcp_ts_reply),
-+					   topt + 2);
-+		}
-+	}
-+
-+	shinfo->gso_size = (len - th_off - (th->doff << 2)) / agg_count;
-+	shinfo->gso_type = ipv4 ? SKB_GSO_TCPV4 : SKB_GSO_TCPV6;
-+	shinfo->gso_segs = agg_count;
-+
-+	return 0;
-+}
-+
- static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- {
- 	enum dma_data_direction dir = page_pool_get_dma_dir(q->page_pool);
-@@ -636,9 +770,16 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 			__skb_put(q->skb, len);
- 			skb_mark_for_recycle(q->skb);
- 			q->skb->dev = port->dev;
--			q->skb->protocol = eth_type_trans(q->skb, port->dev);
- 			q->skb->ip_summed = CHECKSUM_UNNECESSARY;
- 			skb_record_rx_queue(q->skb, qid);
-+
-+			if (airoha_qdma_lro_rx_process(q->skb, desc) < 0) {
-+				dev_kfree_skb(q->skb);
-+				q->skb = NULL;
-+				continue;
-+			}
-+
-+			q->skb->protocol = eth_type_trans(q->skb, port->dev);
- 		} else { /* scattered frame */
- 			struct skb_shared_info *shinfo = skb_shinfo(q->skb);
- 			int nr_frags = shinfo->nr_frags;
-@@ -727,12 +868,10 @@ static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
- static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 				     struct airoha_qdma *qdma, int ndesc)
- {
--	const struct page_pool_params pp_params = {
--		.order = 0,
-+	struct page_pool_params pp_params = {
- 		.pool_size = 256,
- 		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
- 		.dma_dir = DMA_FROM_DEVICE,
--		.max_len = PAGE_SIZE,
- 		.nid = NUMA_NO_NODE,
- 		.dev = qdma->eth->dev,
- 		.napi = &q->napi,
-@@ -740,9 +879,10 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 	struct airoha_eth *eth = qdma->eth;
- 	int qid = q - &qdma->q_rx[0], thr;
- 	dma_addr_t dma_addr;
-+	bool lro_q;
- 
--	q->buf_size = PAGE_SIZE / 2;
- 	q->qdma = qdma;
-+	lro_q = airoha_qdma_is_lro_queue(q);
- 
- 	q->entry = devm_kzalloc(eth->dev, ndesc * sizeof(*q->entry),
- 				GFP_KERNEL);
-@@ -754,6 +894,9 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 	if (!q->desc)
- 		return -ENOMEM;
- 
-+	pp_params.order = lro_q ? AIROHA_LRO_PAGE_ORDER : 0;
-+	pp_params.max_len = PAGE_SIZE << pp_params.order;
-+
- 	q->page_pool = page_pool_create(&pp_params);
- 	if (IS_ERR(q->page_pool)) {
- 		int err = PTR_ERR(q->page_pool);
-@@ -762,6 +905,7 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 		return err;
- 	}
- 
-+	q->buf_size = lro_q ? pp_params.max_len : pp_params.max_len / 2;
- 	q->ndesc = ndesc;
- 	netif_napi_add(eth->napi_dev, &q->napi, airoha_qdma_rx_napi_poll);
- 
-@@ -1993,6 +2137,64 @@ int airoha_get_fe_port(struct airoha_gdm_port *port)
- 	}
- }
- 
-+static int airoha_dev_set_features(struct net_device *dev,
-+				   netdev_features_t features)
-+{
-+	netdev_features_t diff = dev->features ^ features;
-+	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct airoha_qdma *qdma = port->qdma;
-+	struct airoha_eth *eth = qdma->eth;
-+	int qdma_id = qdma - &eth->qdma[0];
-+	int i;
-+
-+	if (!(diff & NETIF_F_LRO))
-+		return 0;
-+
-+	/* reset LRO configuration */
-+	if (features & NETIF_F_LRO) {
-+		int lro_queue_index = 0;
-+
-+		if (airoha_fe_lro_is_enabled(eth, qdma_id))
-+			return 0;
-+
-+		for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
-+			struct airoha_queue *q = &qdma->q_rx[i];
-+			u32 size;
-+
-+			if (!q->ndesc)
-+				continue;
-+
-+			if (!airoha_qdma_is_lro_queue(q))
-+				continue;
-+
-+			size = SKB_WITH_OVERHEAD(AIROHA_RX_LEN(q->buf_size));
-+			size = min_t(u32, size, CDM_LRO_AGG_SIZE_MASK);
-+			airoha_fe_lro_init_rx_queue(eth, qdma_id,
-+						    lro_queue_index, i, size);
-+			lro_queue_index++;
-+		}
-+	} else {
-+		for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
-+			struct airoha_gdm_port *p = eth->ports[i];
-+
-+			if (!p)
-+				continue;
-+
-+			if (p->qdma != qdma)
-+				continue;
-+
-+			if (p->dev == dev)
-+				continue;
-+
-+			if (p->dev->features & NETIF_F_LRO)
-+				return 0;
-+		}
-+		airoha_fe_lro_disable(eth, qdma_id);
-+	}
-+
-+	return 0;
-+}
-+
- static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 				   struct net_device *dev)
- {
-@@ -2892,6 +3094,7 @@ static const struct net_device_ops airoha_netdev_ops = {
- 	.ndo_stop		= airoha_dev_stop,
- 	.ndo_change_mtu		= airoha_dev_change_mtu,
- 	.ndo_select_queue	= airoha_dev_select_queue,
-+	.ndo_set_features	= airoha_dev_set_features,
- 	.ndo_start_xmit		= airoha_dev_xmit,
- 	.ndo_get_stats64        = airoha_dev_get_stats64,
- 	.ndo_set_mac_address	= airoha_dev_set_macaddr,
-@@ -2989,12 +3192,9 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	dev->ethtool_ops = &airoha_ethtool_ops;
- 	dev->max_mtu = AIROHA_MAX_MTU;
- 	dev->watchdog_timeo = 5 * HZ;
--	dev->hw_features = NETIF_F_IP_CSUM | NETIF_F_RXCSUM |
--			   NETIF_F_TSO6 | NETIF_F_IPV6_CSUM |
--			   NETIF_F_SG | NETIF_F_TSO |
--			   NETIF_F_HW_TC;
--	dev->features |= dev->hw_features;
--	dev->vlan_features = dev->hw_features;
-+	dev->hw_features = AIROHA_HW_FEATURES | NETIF_F_LRO;
-+	dev->features |= AIROHA_HW_FEATURES;
-+	dev->vlan_features = AIROHA_HW_FEATURES;
- 	dev->dev.of_node = np;
- 	SET_NETDEV_DEV(dev, eth->dev);
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index d3781103abb5..0cf2439e815f 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -43,6 +43,18 @@
- 	 (_n) == 15 ? 128 :		\
- 	 (_n) ==  0 ? 1024 : 16)
- 
-+#define AIROHA_LRO_PAGE_ORDER		order_base_2(SZ_16K / PAGE_SIZE)
-+#define AIROHA_MAX_NUM_LRO_QUEUES	8
-+#define AIROHA_RXQ_LRO_EN_MASK		0xff000000
-+#define AIROHA_RXQ_LRO_MAX_AGG_COUNT	64
-+#define AIROHA_RXQ_LRO_MAX_AGG_TIME	100
-+#define AIROHA_RXQ_LRO_MAX_AGE_TIME	2000 /* 1ms */
-+
-+#define AIROHA_HW_FEATURES			\
-+	(NETIF_F_IP_CSUM | NETIF_F_RXCSUM |	\
-+	 NETIF_F_TSO6 | NETIF_F_IPV6_CSUM |	\
-+	 NETIF_F_SG | NETIF_F_TSO | NETIF_F_HW_TC)
-+
- #define PSE_RSV_PAGES			128
- #define PSE_QUEUE_RSV_PAGES		64
- 
-@@ -661,6 +673,18 @@ static inline bool airoha_is_7583(struct airoha_eth *eth)
- 	return eth->soc->version == 0x7583;
- }
- 
-+static inline bool airoha_qdma_is_lro_queue(struct airoha_queue *q)
-+{
-+	struct airoha_qdma *qdma = q->qdma;
-+	int qid = q - &qdma->q_rx[0];
-+
-+	/* EN7581 SoC supports at most 8 LRO rx queues */
-+	BUILD_BUG_ON(hweight32(AIROHA_RXQ_LRO_EN_MASK) >
-+		     AIROHA_MAX_NUM_LRO_QUEUES);
-+
-+	return !!(AIROHA_RXQ_LRO_EN_MASK & BIT(qid));
-+}
-+
- int airoha_get_fe_port(struct airoha_gdm_port *port);
- bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 			      struct airoha_gdm_port *port);
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 436f3c8779c1..dfc786583774 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -122,6 +122,20 @@
- #define CDM_CRSN_QSEL_REASON_MASK(_n)	\
- 	GENMASK(4 + (((_n) % 4) << 3),	(((_n) % 4) << 3))
- 
-+#define REG_CDM_LRO_RXQ(_n, _m)		(CDM_BASE(_n) + 0x78 + ((_m) & 0x4))
-+#define LRO_RXQ_MASK(_n)		GENMASK(4 + (((_n) & 0x3) << 3), ((_n) & 0x3) << 3)
-+
-+#define REG_CDM_LRO_EN(_n)		(CDM_BASE(_n) + 0x80)
-+#define LRO_RXQ_EN_MASK			GENMASK(7, 0)
-+
-+#define REG_CDM_LRO_LIMIT(_n)		(CDM_BASE(_n) + 0x84)
-+#define CDM_LRO_AGG_NUM_MASK		GENMASK(23, 16)
-+#define CDM_LRO_AGG_SIZE_MASK		GENMASK(15, 0)
-+
-+#define REG_CDM_LRO_AGE_TIME(_n)	(CDM_BASE(_n) + 0x88)
-+#define CDM_LRO_AGE_TIME_MASK		GENMASK(31, 16)
-+#define CDM_LRO_AGG_TIME_MASK		GENMASK(15, 0)
-+
- #define REG_GDM_FWD_CFG(_n)		GDM_BASE(_n)
- #define GDM_PAD_EN_MASK			BIT(28)
- #define GDM_DROP_CRC_ERR_MASK		BIT(23)
-@@ -883,9 +897,15 @@
- #define QDMA_ETH_RXMSG_SPORT_MASK	GENMASK(25, 21)
- #define QDMA_ETH_RXMSG_CRSN_MASK	GENMASK(20, 16)
- #define QDMA_ETH_RXMSG_PPE_ENTRY_MASK	GENMASK(15, 0)
-+/* RX MSG2 */
-+#define QDMA_ETH_RXMSG_AGG_COUNT_MASK	GENMASK(31, 24)
-+#define QDMA_ETH_RXMSG_L2_LEN_MASK	GENMASK(6, 0)
-+/* RX MSG3 */
-+#define QDMA_ETH_RXMSG_AGG_LEN_MASK	GENMASK(31, 16)
-+#define QDMA_ETH_RXMSG_TCP_WIN_MASK	GENMASK(15, 0)
- 
- struct airoha_qdma_desc {
--	__le32 rsv;
-+	__le32 tcp_ts_reply;
- 	__le32 ctrl;
- 	__le32 addr;
- 	__le32 data;
+Currently, the 2 backends can re-use parts of the PAS context but I
+agree more abstraction can be done as needed for future backends.
 
----
-base-commit: fabcf8cad67b4e2aa51b4c3f79f26fd215b50c8c
-change-id: 20260520-airoha-eth-lro-a5d1c3631811
+> 
+> I may be missing a reason why the pas_id-only callbacks are preferred, but if
+> this is intended to be the long-term generic PAS layer rather than mainly a
+> shim over the existing SCM API shape, using the context consistently and keeping
+> backend-specific state private seems easier to extend.
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+As I mentioned above, the generic PAS layer isn't fixed but it will
+surely go through evolution as needed. Current abstraction handles the
+existing client driver and backend requirments.
 
+Moreover the subsystem maintainers are already complaining about this
+series being too large for the merge to happen.
+
+-Sumit
 
