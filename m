@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-292836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292837-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PCLGzuhGGqblggAu9opvQ
-	(envelope-from <netdev+bounces-292836-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:10:35 +0200
+	id YB5PN02nGGp+lwgAu9opvQ
+	(envelope-from <netdev+bounces-292837-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:36:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E65F75F7FC1
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:10:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDA55F916A
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:36:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0742630FAC96
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:05:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C11D31DB7D4
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34DEB40961F;
-	Thu, 28 May 2026 20:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AA22F8E83;
+	Thu, 28 May 2026 20:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvY4jkyb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ovR6ITyw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CDB42188B
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 20:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884C32D9787;
+	Thu, 28 May 2026 20:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779998707; cv=none; b=FJZ1M8rBdgmwiE/733zcR6g8z5gROiCKU/ey0JToQkCScm8HeZtZO4kuTnDqLnzWrdBjoj+Alasf8MzqMMlVBg/EJSLWZvXv9LPXYl9+H020sgsyeW81SXHcTDIK/XFqrmF70mJ90uKJVmO04qwTZQBbFEDIYFe+rX2r47x6P/Q=
+	t=1779999668; cv=none; b=Pg864k4JHzPnI2ajgxQh3oKudo7FBWY8nO9X1EHATm2oLOycn4QGy/+Q47ISoausYLFMM+Cpw5UxKdflTcbGwJcPPBvt7e7HKA3infrekzxZuAiAlEEsU4wqPGzmGjF3I2V8U3Kt4WG+zKvOwEy3lBYG/vnoyHlIHII9uDNCa6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779998707; c=relaxed/simple;
-	bh=xUeRD4UGilASN7aGNfZrP521YTBbheDyCQmP3FSgDRw=;
+	s=arc-20240116; t=1779999668; c=relaxed/simple;
+	bh=Jwgu1uWohqE8+JEjjhyrCKMGbHKCzl40Xp0G/F4utNU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q7DpNjpPMMpP65fRGyIns/NBS+dqnts4OnRNzb0B5AVDhJ57zM7VzbnAJ+NKRsKl3DGe28d8KLMQp4BxDoLorInHPHyqFSBa+VGAL18wZ7XdM7ZVAp+N+P1SraKismoHegy61m0dQRsdYMnJ0zR/MKPlKBy3Bisz7lX+gblam1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvY4jkyb; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 666F21F000E9;
-	Thu, 28 May 2026 20:05:04 +0000 (UTC)
+	 MIME-Version; b=QSa5c5kMZdM2UxHrXxC8aL11cJrtc30mszCCUzCYLAbbs3kJdaj16jNEFxvTn3tn6+f++TMdhg25ZwzkAURhJ87oxqa+R3l0FIoRgM4c7boOGHy92pMOl+5/Ifw/ijjnjRCe5RvSbz03GndQURPa8h3griALvAph7burV7YIgJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ovR6ITyw; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 198441F000E9;
+	Thu, 28 May 2026 20:21:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779998705;
-	bh=DubbH4uJH9g+7V8V+QOTeyItqg7+pY+vWDmn2+fhis8=;
+	s=k20260515; t=1779999667;
+	bh=5eONnNKTCQ7J+VL/0T2D8f46O9JGX3erMF4ccylrlRA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=KvY4jkybRVLEmsCURitYF+E2Bi3SCn8ZNMBMV7XWq1yro3y66Vs0HqunvZUcYLbPZ
-	 ITtJ091xymPTSB0O/aF2B6aYG1y8KAzLGSEK33tqbuCjg0Y/HOgnCvkzK6UbWuX+Vs
-	 Hd8aLVhDpr8hP/IirYpRtAtnQFo8B3L8hh+MHtnm706V9OrbTj6EMpO2+fbLziutBU
-	 BFRLyJocKayOOF6i1eWfH/7VIwrDjIE8xj8Itoc5TjKwBo+PF3zWhgkzSIj8veHm42
-	 khdRDLt9S6RsYUJZSHlPy1qLoZZIRArjsw+GNxY7FutCXHK6BJYsyWayjvjla069r1
-	 ArbrJEHzYo69A==
+	b=ovR6ITyw4vDUWE3RAN7s5rmwZZT9QGWXAxvYxNiYGVjOQH72Ng1iLDTcMIioCcKh/
+	 7FJhVtQAwPkKYjj/nYaNEQU+Uhzy+GE/GQxqNYp8y9cEGrteoGGf89XT5t1vlK5HgE
+	 AwgZSAhrWKQRAs95eiVfxtgwA5PgbWndNO3wra/2RMpj87u1Us3OMP/ZT0DRBDvN2k
+	 s3dkZmsi2bvL17OAsz5ErZMhM6+IeAAqjvKDfqnTHH7Tyx5wXUSvYO+sFn8cenhIWo
+	 yYj/ZaDR/XKX1lL6+9RM4SwfsANDNeXi8el+udy47j3jS2kJYQefQ+r6xxz+5XkoMe
+	 pY77GVYPSqTNg==
 From: Simon Horman <horms@kernel.org>
 To: kipreyyy@gmail.com
 Cc: 'Simon Horman' <horms@kernel.org>,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
+	david+nfc@ixit.cz,
+	kuba@kernel.org,
+	oe-linux-nfc@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH xfrm] xfrm: vti: hold device reference for tunnel pointer stored in skb cb
-Date: Thu, 28 May 2026 21:04:40 +0100
-Message-ID: <20260528200438.2724831-3-horms@kernel.org>
+Subject: Re: [PATCH nfc] nfc: nci: fix double completion race in nci_data_exchange_complete
+Date: Thu, 28 May 2026 21:16:26 +0100
+Message-ID: <20260528201624.2730799-3-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260526101724.69508-1-kipreyyy@gmail.com>
-References: <20260526101724.69508-1-kipreyyy@gmail.com>
+In-Reply-To: <20260526103121.47957-1-kipreyyy@gmail.com>
+References: <20260526103121.47957-1-kipreyyy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,35 +64,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292836-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-292837-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
-X-Rspamd-Queue-Id: E65F75F7FC1
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3BDA55F916A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -100,210 +101,133 @@ From: 'Simon Horman' <horms@kernel.org>
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+Full review at: https://sashiko.dev
 ---
-xfrm: vti: hold device reference for tunnel pointer stored in skb cb
+Subject: nfc: nci: fix double completion race in nci_data_exchange_complete
 
-This patch adds dev_hold() in vti_input() and vti6_input_proto() when
-stashing the tunnel device pointer into XFRM_TUNNEL_SKB_CB(skb), with
-matching dev_put() calls on every return path of vti_rcv_cb() and
-vti6_rcv_cb() to balance the new reference.
+This patch attempts to resolve a double completion race condition by
+replacing clear_bit() with test_and_clear_bit() on the NCI_DATA_EXCHANGE
+flag. This is intended to prevent a socket refcount underflow when
+nci_close_device() and nci_rx_work() execute concurrently.
 
-> diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
-> index 95b6bb78fcd2..3be298c5a80c 100644
-> --- a/net/ipv4/ip_vti.c
-> +++ b/net/ipv4/ip_vti.c
-> @@ -62,6 +62,7 @@ static int vti_input(struct sk_buff *skb, int nexthdr, __be32 spi,
->  			goto drop;
+> diff --git a/net/nfc/nci/data.c b/net/nfc/nci/data.c
+> index 5f98c73db5afd..4253edea5c8db 100644
+> --- a/net/nfc/nci/data.c
+> +++ b/net/nfc/nci/data.c
+> @@ -46,11 +46,11 @@ void nci_data_exchange_complete(struct nci_dev *ndev, struct sk_buff *skb,
+
+1.
+Simon says: Although the issue flagged below is pre-existing, it appears
+            to be exacerbated by this patch and thus I believe it
+	    needs to be considered in that context.
+
+[Severity: High]
+This is a pre-existing issue, but does an NTF packet with an invalid
+connection ID improperly clear the transceive state?
+
+Looking earlier in nci_data_exchange_complete():
+
+    conn_info = nci_get_conn_info_by_conn_id(ndev, conn_id);
+    if (!conn_info) {
+        kfree_skb(skb);
+        clear_bit(NCI_DATA_EXCHANGE, &ndev->flags);
+        return;
+    }
+
+If a misbehaving or malicious NFC hardware sends an error NTF packet with an
+invalid connection ID while a valid RF transceive operation is active, it
+would execute clear_bit(NCI_DATA_EXCHANGE, &ndev->flags). Would this abort
+the ongoing transceive state machine and drop the actual response when it
+arrives?
+
+2.
+Simon says: Conversely, the issue flagged below seems to be orthogonal
+            to this patch. And I think it can be treated in the context
+	    of possible follow-up.
+
+[Severity: Critical]
+This isn't a bug introduced by this patch, but is there a use-after-free
+race condition in nci_transceive()?
+
+In nci_transceive(), the NCI_DATA_EXCHANGE flag is set using
+test_and_set_bit() before the data_exchange_cb and data_exchange_cb_context
+pointers are updated on the conn_info structure.
+
+Since incoming packets and notifications are processed concurrently by
+nci_rx_work, could an exceptionally fast response or a concurrent interface
+error notification trigger nci_data_exchange_complete() immediately after
+the bit is set but before the callback pointers are updated?
+
+This could cause the lockless reader to fetch the stale callback and context
+pointers from a previous transceive socket and execute them.
+
+>  	timer_delete_sync(&ndev->data_timer);
+>  	clear_bit(NCI_DATA_EXCHANGE_TO, &ndev->flags);
 >  
->  		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 = tunnel;
-> +		dev_hold(tunnel->dev);
->  
->  		if (update_skb_dev)
->  			skb->dev = tunnel->dev;
-
-[High]
-Is the new dev_hold() balanced on the async-resume drop path?
-xfrm_input() with encap_type == -1 does:
-
-    if (encap_type < 0 || ...) {
-        x = xfrm_input_state(skb);
-
-        if (unlikely(x->km.state != XFRM_STATE_VALID)) {
-            ...
-            if (encap_type == -1)
-                dev_put(skb->dev);
-            goto drop;
-        }
-
-        family = x->props.family;
-
-so when the state has been invalidated between submission and async
-completion, the function jumps to drop with family still at its
-function-local default of AF_UNSPEC.
-
-The drop path then calls xfrm_rcv_cb(skb, family, ..., -1).  Since
-xfrm_input_afinfo only has slots populated for AF_INET and AF_INET6,
-xfrm_rcv_cb returns -EAFNOSUPPORT before invoking vti_rcv_cb at all.
-
-Does that mean the dev_hold(tunnel->dev) added in vti_input() is never
-released on this path, leaving the vti netdev unable to be unregistered
-("unregister_netdevice: waiting for vtiN to become free")?
-
-This is the hardware-crypto / pcrypt async path the commit message
-calls out, so does the fix actually cover it?
-
-> @@ -112,6 +113,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
->  	if (err) {
->  		DEV_STATS_INC(dev, rx_errors);
->  		DEV_STATS_INC(dev, rx_dropped);
-> +		dev_put(dev);
->  
->  		return 0;
->  	}
-> @@ -125,6 +127,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
->  		if (inner_mode == NULL) {
->  			XFRM_INC_STATS(dev_net(skb->dev),
->  				       LINUX_MIB_XFRMINSTATEMODEERROR);
-> +			dev_put(dev);
->  			return -EINVAL;
->  		}
->  	}
-> @@ -135,12 +138,15 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
->  	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
->  	skb->mark = orig_mark;
->  
-> -	if (!ret)
-> +	if (!ret) {
-> +		dev_put(dev);
->  		return -EPERM;
+> -	/* Mark the exchange as done before calling the callback.
+> -	 * The callback (e.g. rawsock_data_exchange_complete) may
+> -	 * want to immediately queue another data exchange.
+> -	 */
+> -	clear_bit(NCI_DATA_EXCHANGE, &ndev->flags);
+> +	/* Claim completion atomically -- both close and rx_work may race here */
+> +	if (!test_and_clear_bit(NCI_DATA_EXCHANGE, &ndev->flags)) {
+> +		kfree_skb(skb);
+> +		return;
 > +	}
+
+3.
+Simon says: Like issue 1. I believe the issue below should be considered
+            in the context of this patch.
+
+[Severity: High]
+Will this change cause valid HCI and loopback packets to be dropped?
+
+The NCI_DATA_EXCHANGE bit is only set during RF transceive operations in
+nci_transceive(). Subsystems like HCI (via nci_hci_send_cmd()) and loopback
+send data without setting this global flag.
+
+If valid HCI or loopback data packets arrive, won't they fail this bit
+check, causing the SKB to be dropped and skipping callbacks like
+nci_hci_data_received_cb?
+
+Additionally, if an asynchronous packet arrives concurrently while a valid
+RF transceive is active, could it falsely consume the NCI_DATA_EXCHANGE bit?
+When the actual RF response arrives, it would then fail the check, drop the
+packet, and permanently leak the socket's reference count.
+
 >  
->  	skb_scrub_packet(skb, !net_eq(tunnel->net, dev_net(skb->dev)));
->  	skb->dev = dev;
->  	dev_sw_netstats_rx_add(dev, skb->len);
-> +	dev_put(dev);
->  
->  	return 0;
->  }
+>  	if (cb) {
+>  		/* forward skb to nfc core */
+>  		cb(cb_context, skb, err);
 
-[Critical]
-Can the err == 0 paths that return a non-zero value cause a double
-dev_put()?
+4.
+Simon says: And like issue 3. I believe this is orthogonal to this patch
+            and can be considered in the context of possible follow-up.
 
-xfrm_input() invokes the cb chain twice when the first call returns an
-error:
+[Severity: High]
+This is a pre-existing issue, but does this code leak the SKB when an
+error status is returned?
 
-    err = xfrm_rcv_cb(skb, family, x->type->proto, 0);
+When nci_add_rx_data_frag() processes an incoming fragment with a non-zero
+status byte, it passes both the valid skb and the err code to
+nci_data_exchange_complete(), which forwards them to the cb here.
+
+Looking at core callbacks like rawsock_data_exchange_complete():
+
+net/nfc/rawsock.c:rawsock_data_exchange_complete() {
+    ...
     if (err)
-        goto drop;
+        goto error;
     ...
-drop:
-    ...
-    xfrm_rcv_cb(skb, family, x->type->proto, -1);
+error:
+    sock_put(sk);
+}
 
-In vti_rcv_cb the inner_mode == NULL branch and the !ret branch both
-return a negative value after performing dev_put(dev):
+The error label bypasses the error_skb label where kfree_skb(skb) is called.
+Does this result in an unconditional memory leak of the SKB whenever the
+hardware or external target responds with an error status?
 
-    if (inner_mode == NULL) {
-        ...
-        dev_put(dev);
-        return -EINVAL;
-    }
-    ...
-    if (!ret) {
-        dev_put(dev);
-        return -EPERM;
-    }
-
-Since XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 is not cleared, the second
-invocation enters with err == -1 and reaches:
-
-    dev = tunnel->dev;
-    if (err) {
-        ...
-        dev_put(dev);
-        return 0;
-    }
-
-so the same tunnel->dev is dev_put() twice for a single dev_hold() taken
-in vti_input(), giving a netdev refcount underflow.
-
-Should XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 be cleared after dev_put(),
-or the error-return paths take the dev_put() only once?
-
-> diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
-> index df793c8bfffb..ab5f8480eed7 100644
-> --- a/net/ipv6/ip6_vti.c
-> +++ b/net/ipv6/ip6_vti.c
-> @@ -317,9 +317,10 @@ static int vti6_input_proto(struct sk_buff *skb, int nexthdr, __be32 spi,
->  			goto discard;
->  		}
->  
-> +		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
-> +		dev_hold(t->dev);
->  		rcu_read_unlock();
->  
-> -		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
->  		XFRM_SPI_SKB_CB(skb)->family = AF_INET6;
->  		XFRM_SPI_SKB_CB(skb)->daddroff = offsetof(struct ipv6hdr, daddr);
->  		return xfrm_input(skb, nexthdr, spi, encap_type);
-
-[High]
-Same async-resume question as for vti_input(): if x->km.state becomes
-invalid between submission and the resume call, xfrm_input() goes to
-drop with family still at AF_UNSPEC, xfrm_rcv_cb() bails out via
-xfrm_input_get_afinfo() returning NULL, and vti6_rcv_cb() is never
-called.  Is the dev_hold(t->dev) added here ever released on that path?
-
-> @@ -356,6 +357,7 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
->  	if (err) {
->  		DEV_STATS_INC(dev, rx_errors);
->  		DEV_STATS_INC(dev, rx_dropped);
-> +		dev_put(dev);
->  
->  		return 0;
->  	}
-> @@ -369,6 +371,7 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
->  		if (inner_mode == NULL) {
->  			XFRM_INC_STATS(dev_net(skb->dev),
->  				       LINUX_MIB_XFRMINSTATEMODEERROR);
-> +			dev_put(dev);
->  			return -EINVAL;
->  		}
->  	}
-> @@ -379,12 +382,15 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
->  	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
->  	skb->mark = orig_mark;
->  
-> -	if (!ret)
-> +	if (!ret) {
-> +		dev_put(dev);
->  		return -EPERM;
-> +	}
->  
->  	skb_scrub_packet(skb, !net_eq(t->net, dev_net(skb->dev)));
->  	skb->dev = dev;
->  	dev_sw_netstats_rx_add(dev, skb->len);
-> +	dev_put(dev);
->  
->  	return 0;
->  }
-
-[Critical]
-The same double-put concern applies here.  When inner_mode == NULL the
-function does dev_put(dev) and returns -EINVAL, and when xfrm_policy_check
-fails it does dev_put(dev) and returns -EPERM.  xfrm_input() then re-runs
-the cb chain with err == -1:
-
-    if (err) {
-        ...
-        dev_put(dev);
-        return 0;
-    }
-
-XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 still holds t, so this second
-invocation does not exit at the !t check and performs another dev_put on
-the same tunnel device.  Should the cb pointer be cleared or the put be
-done once?
+>  	} else if (skb) {
+>  		pr_err("no rx callback, dropping rx data...\n");
+[ ... ]
 
