@@ -1,233 +1,145 @@
-Return-Path: <netdev+bounces-292834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHd1CMedGGpAlggAu9opvQ
-	(envelope-from <netdev+bounces-292834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:55:51 +0200
+	id cISbM/afGGpAlggAu9opvQ
+	(envelope-from <netdev+bounces-292835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:05:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30CD85F7745
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:55:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3AA75F7CD7
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:05:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72E483050CA7
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:54:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 036E93049713
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8BE32BF5A;
-	Thu, 28 May 2026 19:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBE740FDA2;
+	Thu, 28 May 2026 20:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nbrqQtiN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QxqrKBO3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A6534040F
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 19:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C33339866;
+	Thu, 28 May 2026 20:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779998085; cv=none; b=HPLUEmspomCBc7E/wSwVGexuxmsaOnLqIXGeQDCfsb+Og6eKavsAKHrosg4aLfEFbyV+byEV5VzAyjVTy2mji4SxCtf9xQ1t9bHg5WXb69mELgFI55S6gaLRg8Nl4pRYasTDNJ8Hztj0F7A0L1C7JC97RbEihJOwOSjj/UsR368=
+	t=1779998679; cv=none; b=Oafhe4Ep1P83uZ3Lgvvxi+aPtZ0vg4y+mFuHch1tTXp4TdzvfmBehL5lvEHQc/8q2eBkEzXxNSuXfmz9+VpppclkWsRSSyaJgeMZBTm3KL3j6SipCQ++ac8VDQFbeHkCJB1lozQVniDRAV/LcrQOm45Syxtqppf8Wxc9p1LhsaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779998085; c=relaxed/simple;
-	bh=WC0d021mnuw5XL6Z5w0j6CYJt9tKOIXjpeT5Am1QL20=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EKrAZJvVx3HdLcIlMbcer5mtj6Ed8V2dAVv48U96YiCX7ZjIRnUQNTPPfemxua4bzecubMWM9//8DO5651MYJkJVjXRN+bk/PIqVL4tKVRDUzBEPMB/Ih/tpDxIan/RmhNqUNdR59SJZZAta1G6xe1TjH3qyCc3YjQQ7naZF7Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nbrqQtiN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D391F00A3A;
-	Thu, 28 May 2026 19:54:42 +0000 (UTC)
+	s=arc-20240116; t=1779998679; c=relaxed/simple;
+	bh=wvzVzBiNNc7pSSiktZyRp3DeDJsrIozwR7fOSJytmMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s5WwBQtTPbDlX63vwePExr5z1NjdbdvzrwLwAF7aMHbYQuytIjFfCFHJ785sOv1ISDS0x0frr4wi1t927oqA1OUisJtqdOQ8iCDs9c9O98RbSIpI4m+AWg92AYaYIsAtCSVD+KYv7BoWg9n0nBUDRTmv2btAX7jXYkPNtLvjg94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QxqrKBO3; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A9321F00A3A;
+	Thu, 28 May 2026 20:04:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779998084;
-	bh=/Te4KWhwxzWlxLU4A1oQPhBmcv0w9HTk8woGej3jEsg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=nbrqQtiNbM+MmCIKJZOGRiTcefHQ1bD7CroBOtTBmSWGXky96ZPFA0EJ+dDyginvt
-	 gGG6WWWnCVchan62pN+dACz1pipsMB+SVqERWL9RavXt0xHbDYNtQieWr75v3NSLxZ
-	 7D8+n+F/XNH//+iS2B7IxDxTV8Ovb6T59m2wzFzmQO9meU0VLQoYoI3YA3Zu5I/5Ac
-	 zDchbRlgUuUCYQf6w7bvdY70Nsn5klU0wujPb20dGHIoL3UAQMC8l4GeGxbZCRTcrK
-	 bmAHIdRM0HckGYB/iIaFwekVJuYr7k+5QWIjvg0owauFa71eXz8WN5AWk3k6IWrMCa
-	 Dr2lIh2DzFKSg==
-From: Simon Horman <horms@kernel.org>
-To: kipreyyy@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	ap420073@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] amt: fix use-after-free in amt_source_work
-Date: Thu, 28 May 2026 20:51:47 +0100
-Message-ID: <20260528195149.2718758-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260526102559.31926-1-kipreyyy@gmail.com>
-References: <20260526102559.31926-1-kipreyyy@gmail.com>
+	s=k20260515; t=1779998677;
+	bh=WVjZ77WKanlIoER/YuUvLPXIh6A2toQ/kFAdLdwWH6g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=QxqrKBO33zRwgngfe8npfS0gioZ/JnMOqrQXJ9uTbSeOiWR0B7dfSKyNf6utog185
+	 U+a4fjR18dzGBLffCbtljBwGoaM4XPEI2rb8r16jyV39pNEC9aVSBkiTePpo8bcJWt
+	 CAoVXWuNiSNo3ayxqYFIjs5T5uAlz5WU+ovW4pY7XRr0rXWkeSpAIcEtsTs6lMt/Iz
+	 2iOYSWlyLEQNscHrctet8rTA7Xd4K9cBACAbXNGkpl9K/Kj/qeMlED2tzOanbcGzL9
+	 XCzXRiOp2/OKqYsAwksQx8c258b8CXvGHCdxVmMHpEuvC1jvBJZ4xe7ZtUN0pDcGMC
+	 Wyiv24TDeqW3g==
+Date: Thu, 28 May 2026 13:04:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>, Lucien Jheng
+ <lucienzx159@gmail.com>
+Cc: Mark Brown <broonie@kernel.org>, David Miller <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20260528130436.450720f9@kernel.org>
+In-Reply-To: <ahhlcK0ufJn0VEzM@sirena.org.uk>
+References: <ahhlcK0ufJn0VEzM@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292834-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292835-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[collabora.com,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url]
-X-Rspamd-Queue-Id: 30CD85F7745
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: B3AA75F7CD7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Thu, 28 May 2026 16:55:28 +0100 Mark Brown wrote:
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
+> diff --cc drivers/net/phy/air_en8811h.c
+> index a86129ce693c2,a42898ae41358..0000000000000
+> --- a/drivers/net/phy/air_en8811h.c
+> +++ b/drivers/net/phy/air_en8811h.c
+> @@@ -260,218 -229,6 +245,31 @@@ static const unsigned long en8811h_led_
+>   					      BIT(TRIGGER_NETDEV_RX)          |
+>   					      BIT(TRIGGER_NETDEV_TX);
+>   
+> - static int air_phy_read_page(struct phy_device *phydev)
+> - {
+> - 	return __phy_read(phydev, AIR_EXT_PAGE_ACCESS);
+> - }
+> - 
+> - static int air_phy_write_page(struct phy_device *phydev, int page)
+> - {
+> - 	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
+> - }
+> - 
+>  +static int __air_pbus_reg_write(struct mdio_device *mdiodev,
+>  +				u32 pbus_reg, u32 pbus_data)
+>  +{
+>  +	int ret;
+>  +
+>  +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
+>  +			      upper_16_bits(pbus_reg));
+>  +	if (ret < 0)
+>  +		return ret;
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-amt: fix use-after-free in amt_source_work
+Unclear to me why this is using __mdiobus_write() instead of __phy_write
+when the callers have access to the phydev..
 
-This patch tries to fix a UAF in amt_source_work() by moving
-rcu_read_lock() before the gnode dereferences and adding an
-amt_lookup_src() check after taking tunnel->lock to verify the source
-node is still present.
+Our PR to Linus is now out, hopefully he pulls soon.
+The AIR_EXT_PAGE_ACCESS define is no longer visible in air_en8811h.c
 
-> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> index f2f3139e38a5..f70d49cca285 100644
-> --- a/drivers/net/amt.c
-> +++ b/drivers/net/amt.c
-> @@ -291,13 +291,18 @@ static void amt_source_work(struct work_struct *work)
->  	struct amt_source_node *snode = container_of(to_delayed_work(work),
->  						     struct amt_source_node,
->  						     source_timer);
-> -	struct amt_group_node *gnode = snode->gnode;
-> -	struct amt_dev *amt = gnode->amt;
-> +	struct amt_group_node *gnode;
-> +	struct amt_dev *amt;
->  	struct amt_tunnel_list *tunnel;
->  
-> +	rcu_read_lock();
-> +	gnode = snode->gnode;
-> +	amt = gnode->amt;
-
-[High]
-Is snode itself guaranteed to still be allocated by the time
-rcu_read_lock() runs here?
-
-amt_destroy_source() calls cancel_delayed_work() (not the _sync()
-variant) and then hands snode off to source_gc_list, where
-__amt_source_gc_work() eventually does kfree_rcu(snode):
-
-drivers/net/amt.c:amt_destroy_source() {
-    ...
-    cancel_delayed_work(&snode->source_timer);
-    hlist_del_init_rcu(&snode->node);
-    ...
-    spin_lock_bh(&source_gc_lock);
-    hlist_add_head_rcu(&snode->node, &source_gc_list);
-    spin_unlock_bh(&source_gc_lock);
-}
-
-Once process_one_work() has already cleared WORK_STRUCT_PENDING but
-not yet entered amt_source_work(), cancel_delayed_work() returns 0
-without waiting.  If the worker is preempted at that point and
-amt_destroy_source(snode) plus the subsequent gc kfree_rcu(snode) run,
-an entire RCU grace period can elapse before the worker reaches
-rcu_read_lock().
-
-Wouldn't the subsequent reads of snode->gnode, gnode->amt,
-gnode->tunnel_list, and snode->source_addr then be operating on freed
-memory?
-
-This window appears to predate this patch, but since the patch's stated
-intent is "rcu_read_lock cannot reclaim the memory while the work
-handler is accessing it", is it worth noting that an already-dispatched
-work is not protected by rcu_read_lock taken inside the work itself?
-
->  	tunnel = gnode->tunnel_list;
->  	spin_lock_bh(&tunnel->lock);
-> -	rcu_read_lock();
-> +	if (!amt_lookup_src(tunnel, gnode, AMT_FILTER_ALL,
-> +			    &snode->source_addr))
-> +		goto unlock;
-
-[Critical]
-Does amt_lookup_src() actually verify that the original snode is still
-present?  It matches by source_addr, not by snode pointer identity:
-
-    if (memcmp(&snode->source_addr, src, sizeof(union amt_addr)))
-        continue;
-    return snode;
-
-Consider this sequence after the worker picks up snode_A's timer but
-before it acquires tunnel->lock:
-
-  IGMP/MLD report path (under tunnel->lock):
-    amt_cleanup_srcs() -> amt_destroy_source(snode_A)
-        cancel_delayed_work(&snode_A->source_timer);
-        hlist_del_init_rcu(&snode_A->node);
-        hlist_add_head_rcu(&snode_A->node, &source_gc_list);
-    amt_add_srcs() allocates snode_B with the same source_addr in
-    gnode->sources.
-
-  amt_source_work() now acquires tunnel->lock and calls:
-    amt_lookup_src(tunnel, gnode, AMT_FILTER_ALL, &snode->source_addr)
-
-Won't this find snode_B and return non-NULL, so the check passes and
-the function then proceeds to amt_destroy_source(snode) on the original
-snode_A pointer obtained via container_of(work)?
-
-If so, several follow-on problems seem to arise:
-
-amt_destroy_source(snode_A) calls hlist_del_init_rcu(&snode_A->node)
-without holding source_gc_lock, while __amt_source_gc_work() serializes
-source_gc_list manipulation under that lock — can this corrupt
-source_gc_list?
-
-It also performs tunnel->nr_sources-- and gnode->nr_sources-- a second
-time, since snode_B's prior insertion incremented them — does this
-underflow accounting on still-live state?
-
-If gnode->filter_mode == MCAST_INCLUDE and the bogus decrement reaches
-zero, amt_del_group(amt, gnode) runs on a still-populated group,
-destroying snode_B and kfree_rcu'ing gnode prematurely — is that
-intended?
-
-Would comparing pointer identity instead, e.g.
-
-    if (amt_lookup_src(tunnel, gnode, AMT_FILTER_ALL,
-                       &snode->source_addr) != snode)
-        goto unlock;
-
-or checking hlist_unhashed(&snode->node) under tunnel->lock, more
-faithfully express "this snode is still on gnode's hash"?
-
->  	if (gnode->filter_mode == MCAST_INCLUDE) {
->  		amt_destroy_source(snode);
->  		if (!gnode->nr_sources)
-> @@ -308,8 +313,9 @@ static void amt_source_work(struct work_struct *work)
->  		 */
->  		snode->status = AMT_SOURCE_STATUS_D_FWD;
->  	}
-> -	rcu_read_unlock();
-> +unlock:
->  	spin_unlock_bh(&tunnel->lock);
-> +	rcu_read_unlock();
->  }
+Louis, I'm going to move the define to the header to keep the merge
+simple. Could you follow up with a cleanup once Linus pulls and I push
+out the merge? Or if you prefer another resolution just show me a diff.
+If I get it before Linus pulls I'll use it.
 
