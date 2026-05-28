@@ -1,267 +1,100 @@
-Return-Path: <netdev+bounces-292593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJeOAUH9F2oTYQgAu9opvQ
-	(envelope-from <netdev+bounces-292593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:30:57 +0200
+	id qHAQMSsBGGrUYwgAu9opvQ
+	(envelope-from <netdev+bounces-292594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:47:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E364D5EE9A9
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:30:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D9875EEE8F
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:47:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 503C03007AF0
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:27:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C3E083076E0C
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5476379960;
-	Thu, 28 May 2026 08:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ErYCF8Mx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B466B381AE0;
+	Thu, 28 May 2026 08:42:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122A5378D87
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 08:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E03380FF7;
+	Thu, 28 May 2026 08:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779956849; cv=none; b=jBsanuoN7Or5HBL8VWJRIM/roqUKpSP69kchM6Ij6y1C50EcMKhu/dNf4JBg6EOQKkHBjyqaXxySEiBAAU/kp/qH+SdGbbD3FOMhWrhrFXHC/893SKL+fFuG1jAUDtBCQxE8eEDso+IlxgWbFAR3Ifa6DEzWbPsrpghW9Oj3Aw4=
+	t=1779957738; cv=none; b=V+JdKHNyaEIfU4LYme1bi+uqAbSKYDm2QG74/u/myApLqtVtWXw5M2jn9hUGD/cZpHuWZkA4QO/lOyekC9b+sXX+MaVNo6EvVF43FAxf24j66RR9FxRcEdCFlgkugiB14b/bZO14nHkRUc8ihMhLzM2PI38He8PoY6qtTiY/+Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779956849; c=relaxed/simple;
-	bh=R83Zk9MPwHlNVvAL1SqF6psKEEdQEoajydtBTiAfb5g=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=fWT63J97rBuX8bAjmNhtJQ3iTlH3f34vBYmbo33aku8p8VKX8wpW4VWr3V6kOY8n5uREdVnrfqisFgBD+gi6gA/E3NqCnHecCzNUtBD0lbS6qzUTl/hGgFQZ+2hyssz2deKUd4tjX/+YkEn/kPF9HXf/qOQd3w3BrqMeb6vNh8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ErYCF8Mx; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1779957738; c=relaxed/simple;
+	bh=xIgos72Cm3IfTWMmCN5oml+JjbfxfQGDyXLbhC97Awo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qHkm2Vo7ghB2+Qc7OYQdh7hs79H0Wn8OVn5seKn63cAYNEDGXxeMdLGcj/71fSP/Z9xnlrO4mcFr7zbEYbp7Et+SN7ly0gUV9YV8NofcyZ9qVP9ALc1RtcKMyUWddLvurb8DlRThCcoG2lr7zz8bnla9BjOcdAGHnBMMv7FxxL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 1FAB968BEB; Thu, 28 May 2026 10:42:11 +0200 (CEST)
+Date: Thu, 28 May 2026 10:42:10 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Geliang Tang <geliang@kernel.org>
+Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Geliang Tang <tanggeliang@kylinos.cn>,
+	linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	John Meneghini <jmeneghi@redhat.com>,
+	Randy Jennings <randyj@purestorage.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	zhenwei pi <zhenwei.pi@linux.dev>, Hui Zhu <zhuhui@kylinos.cn>,
+	Gang Yan <yangang@kylinos.cn>
+Subject: Re: [PATCH 00/11] NVMe over MPTCP
+Message-ID: <20260528084210.GA8141@lst.de>
+References: <cover.1779934709.git.tanggeliang@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779956842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cE5vkgdKA1jGW+pTW446oAunyXUpwHm3Ex1DLaNXHJQ=;
-	b=ErYCF8MxdKKJgJ2bsChhRvd83CNLBlJQsWHOx+SWyZogRkcY9bH5Ny8445eDaQIhL/oUFl
-	8W8sKYUdESXAeK/TMvkxvlL5bS/4Tp66yE/RxcSSx2K35RuksXZ33YwXhFflH1sVFt+0sx
-	ngQJtc4bbMoa1pHEVEYyyAFAFjqk5YU=
-Date: Thu, 28 May 2026 08:27:16 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "teawater" <hui.zhu@linux.dev>
-Message-ID: <1b58d56976202f26818d31dbd0da2ecb2e2460f5@linux.dev>
-TLS-Required: No
-Subject: Re: [RFC PATCH bpf-next v7 00/11] mm: BPF struct_ops for dynamic
- memory protection and async reclaim
-To: "Michal Hocko" <mhocko@suse.com>
-Cc: "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "John Fastabend" <john.fastabend@gmail.com>,
- "Andrii Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau"
- <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar
- Kartikeya Dwivedi" <memxor@gmail.com>, "Song Liu" <song@kernel.org>,
- "Yonghong Song" <yonghong.song@linux.dev>, "Jiri Olsa"
- <jolsa@kernel.org>, "Johannes Weiner" <hannes@cmpxchg.org>, "Roman
- Gushchin" <roman.gushchin@linux.dev>, "Shakeel Butt"
- <shakeel.butt@linux.dev>, "Muchun Song" <muchun.song@linux.dev>, "JP
- Kobryn" <inwardvessel@gmail.com>, "Andrew Morton"
- <akpm@linux-foundation.org>, "Shuah Khan" <shuah@kernel.org>,
- davem@davemloft.net, "Jakub Kicinski" <kuba@kernel.org>, "Jesper Dangaard
- Brouer" <hawk@kernel.org>, "Stanislav Fomichev" <sdf@fomichev.me>, "KP
- Singh" <kpsingh@kernel.org>, "Tao Chen" <chen.dylane@linux.dev>, "Mykyta
- Yatsenko" <yatsenko@meta.com>, "Leon Hwang" <leon.hwang@linux.dev>,
- "Anton Protopopov" <a.s.protopopov@gmail.com>, "Amery Hung"
- <ameryhung@gmail.com>, "Tobias Klauser" <tklauser@distanz.ch>, "Eyal
- Birger" <eyal.birger@gmail.com>, "Rong Tao" <rongtao@cestc.cn>, "Hao Luo"
- <haoluo@google.com>, "Peter Zijlstra" <peterz@infradead.org>, "Miguel
- Ojeda" <ojeda@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Kees
- Cook" <kees@kernel.org>, "Tejun Heo" <tj@kernel.org>, "Jeff Xu"
- <jeffxu@chromium.org>, mkoutny@suse.com, "Jan Hendrik Farr"
- <kernel@jfarr.cc>, "Christian Brauner" <brauner@kernel.org>, "Randy
- Dunlap" <rdunlap@infradead.org>, "Brian Gerst" <brgerst@gmail.com>,
- "Masahiro Yamada" <masahiroy@kernel.org>, "Willem de Bruijn"
- <willemb@google.com>, "Jason Xing" <kerneljasonxing@gmail.com>, "Paul
- Chaignon" <paul.chaignon@gmail.com>, "Chen Ridong"
- <chenridong@huaweicloud.com>, "Lance Yang" <lance.yang@linux.dev>,
- "Jiayuan Chen" <jiayuan.chen@linux.dev>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- geliang@kernel.org, baohua@kernel.org, "Hui Zhu" <zhuhui@kylinos.cn>
-In-Reply-To: <ahavmbcdXDX5gNup@tiehlicka>
-References: <cover.1779760876.git.zhuhui@kylinos.cn>
- <ahavmbcdXDX5gNup@tiehlicka>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1779934709.git.tanggeliang@kylinos.cn>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[lst.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,cmpxchg.org,linux-foundation.org,davemloft.net,fomichev.me,meta.com,distanz.ch,cestc.cn,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,huaweicloud.com,vger.kernel.org,kvack.org,kylinos.cn];
-	TAGGED_FROM(0.00)[bounces-292593-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[59];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hch@lst.de,netdev@vger.kernel.org];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E364D5EE9A9
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292594-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 2D9875EEE8F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->=20
->=20On Tue 26-05-26 10:20:00, Hui Zhu wrote:
->=20
+You need to talk to the NVMe technical working group, not us.
 
-Hi=20Michal,
-
-> >=20
->=20> From: Hui Zhu <zhuhui@kylinos.cn>
-> >=20=20
->=20>  Overview:
-> >  This series introduces BPF struct_ops support for the memory control=
-ler,
-> >  enabling userspace BPF programs to implement custom, dynamic memory
-> >  management policies per cgroup. The feature allows BPF programs to h=
-ook
-> >  into the core reclaim and charge paths without requiring kernel
-> >  modifications, providing a flexible alternative to static knobs such=
- as
-> >  memory.low and memory.min.
-> >=20=20
->=20>  The series enables two complementary use cases.
-> >=20=20
->=20>  Dynamic memory protection: static memory protection thresholds
-> >  (memory.low, memory.min) are poor fits for workloads whose actual me=
-mory
-> >  activity varies over time. A high-priority cgroup holding a large wo=
-rking
-> >  set but temporarily idle will still suppress reclaim on its siblings=
-,
-> >  wasting available memory. A BPF-driven approach can observe real wor=
-kload
-> >  activity -- page faults, charge/uncharge events -- and activate or
-> >  withdraw protection dynamically.
-> >=20
->=20Why the same cannot be achieved by dynamically changing protection?
-
-Dynamically adjusting memory.low or memory.min is indeed an
-option, but it has a practical drawback: in many production
-environments these values are managed and pushed down by a
-cluster-level orchestrator (e.g. a container runtime or resource
-manager). Modifying them from a separate BPF-based agent risks
-conflicts with the orchestrator's own control loop and makes the
-system harder to reason about.
-
-Beyond that, the intended use case requires rapid, short-lived
-adjustments -- reacting to bursts of page faults or PSI spikes
-and reverting just as quickly once the pressure subsides. Mutating
-the static knobs for that purpose feels like the wrong abstraction:
-the knobs express policy intent, while what we need is a transient
-override that sits on top of that policy.
-
-The hooks are therefore not meant to replace the existing limits,
-but to complement them: the orchestrator continues to own
-memory.low / memory.min, while a BPF program makes small, brief
-corrections in response to observed runtime behavior.
-
->=20
->=20>=20
->=20> The test results at the end of this
-> >  letter quantify the difference: in a scenario where the high-priorit=
-y
-> >  cgroup is idle, the BPF-controlled low-priority cgroup achieves roug=
-hly
-> >  37x higher throughput than with static memory.low.
-> >=20=20
->=20>  Asynchronous proactive reclaim: the memcg_charged and memcg_unchar=
-ged
-> >  hooks, combined with the BPF workqueue mechanism and the new
-> >  bpf_try_to_free_mem_cgroup_pages() kfunc, enable BPF programs to per=
-form
-> >  proactive background reclaim without blocking the charge path. The
-> >  pattern works as follows: the memcg_charged callback tracks accumula=
-ted
-> >  memory usage; when usage crosses a configurable threshold, it enqueu=
-es an
-> >  asynchronous work item via bpf_wq_start() and returns immediately wi=
-thout
-> >  throttling the charging task. The workqueue callback then invokes
-> >  bpf_try_to_free_mem_cgroup_pages() to reclaim pages from the target
-> >  cgroup; if usage remains elevated after reclaim, the callback re-enq=
-ueues
-> >  itself to continue. This allows a BPF program to keep a cgroup's
-> >  footprint below its hard limit (memory.max) entirely in the backgrou=
-nd,
-> >  avoiding the OOM killer or direct-reclaim stalls that would otherwis=
-e
-> >  occur.
-> >=20
->=20How do you account the overall work done to the specific memcg as the
-> large part of the reclaim is done from WQ context?
-
-One approach to attribute the reclaim work accurately to the target
-memcg would be to expose a kfunc that creates a kthread_worker and
-attaches it to a specific cgroup. Reclaim work enqueued to that
-worker would then run in a context already associated with the
-target memcg, so the accounting would naturally fall to the right
-cgroup without any extra bookkeeping.
-
-The tradeoff is additional complexity: creating a per-cgroup worker
-introduces resource overhead and lifecycle management concerns
-(e.g. when should the worker be torn down). Whether that cost is
-justified depends on how strictly the caller needs the reclaim to
-be attributed.
-
-That said, I am not certain this is the right direction yet and
-would welcome your thoughts on whether this is worth pursuing, or
-whether there is a simpler mechanism I am overlooking.
-
-
-> Also when introducing a BPF hook please focus on describing why existin=
-g
-> interfaces fail to achieve what you need. For the async reclaim why it
-> is not practical or feasible to use userspace driven memory reclaim.
-
-
-Noted, and thank you for both points. In the next revision I will
-add a dedicated section to each hook's description covering:
-
-Why existing interfaces are insufficient. For the async reclaim
-case specifically, I will explain why userspace-driven reclaim
-(e.g. memory.reclaim, cgroup-aware madvise, or a dedicated
-reclaim daemon) is not practical: userspace cannot react at the
-granularity or latency required, and the round-trip through a
-syscall or procfs write introduces overhead that defeats the
-purpose of proactive reclaim.
-What gap the new hook fills that cannot be closed by tuning
-existing knobs.
-
-Best,
-Hui
-
-
-> --=20
->=20Michal Hocko
-> SUSE Labs
->
 
