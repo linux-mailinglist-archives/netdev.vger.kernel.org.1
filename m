@@ -1,200 +1,126 @@
-Return-Path: <netdev+bounces-292753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292755-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGb5OWhtGGrcjggAu9opvQ
-	(envelope-from <netdev+bounces-292753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:29:28 +0200
+	id CKUAFjhsGGrcjggAu9opvQ
+	(envelope-from <netdev+bounces-292755-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:24:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F109A5F500B
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:29:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B78BE5F4F14
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 60E163122F50
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:08:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B685C32805BA
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54E43FC5AA;
-	Thu, 28 May 2026 16:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyEYliIr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F013F7ABB;
+	Thu, 28 May 2026 16:08:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8B23F0AA0
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 16:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7942202C46;
+	Thu, 28 May 2026 16:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779984204; cv=none; b=KPcRAZebtSqCsyfDRk9/a3x4Amo8f5AaDu6TytEOGYjBQEIbyXM+sfRx+hRT97j+5vjXPsBWXz7jps8yr4SJeerOqlvcJm3XwiHXtfQJZGdbvdZwiH05X15Y68gIdJxSl/d6Szh0bNN020qga4uvHYk1Hm7KZRh/jR7vPUBly0s=
+	t=1779984505; cv=none; b=Cz3nhjvO4ryJfpme34oIZOUhs4eOMzQWf9HGez8frBwSuv4NcVC4UZf6GRrgU6It3X4YfMVe4k6UfBOcNTohS1JkbuYDDOm3YuBUyps5U3PoEMnlzykiaSgiw59cd4sT8bVur9tScs5i6ibM/mebkU9qjBx+gS8qYFSQZH8Yks8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779984204; c=relaxed/simple;
-	bh=yCSOHKbwhBjgp5Eie4MpdqNDhpIdZlR1/oBvIklWoBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KHaIT/dmKSE0jZE+uCioIbT9LkksvXIuXzHmmNrp7DNxcRna30wMxs3LO6HKvqqP6sP6J6MfHDxL8Mjfo0/+KoPHN4oCqM6y/BXxUpUtbPNJPXrIh6yXxDSH1XPM82iPsGsCHSJ94Mfz8UCQvDILUOaL3/aUu+f6LF/TLlHs0c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyEYliIr; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-45e8a834cc2so7912102f8f.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779984201; x=1780589001; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NGAJl71mxdY5fzmkNELb/2UlcEcGhUpJvQPIR8eDu/I=;
-        b=kyEYliIruWPP449zRETAHnQa60KjVIzByRMRjmRY+MjWEkTcPA3pvbkogW4dNCvYLd
-         8HPxeQoMc22q8AT+hagLkm3lW2DfdYNnkRauRverMVHRnJblyhmx9WMkhgVhM7+gLkfA
-         oAHzujiNo2m/aJMlNE5DxeW7F3xK6dVYcnOoY+42GXRbvhLBBYm63qNbV/4DZVf6THTj
-         7PmANuHKiqGzfyIOIoTz4R+Czg9rbhgu6HuUXxexzKL0+78v8NUXRbDqY8OlNSUPN7Vx
-         ShW3PDERh3ULFDK+hovpY832lvxnLT5DIk9/Nd11vFyILWGREtkUNH7qEj+keRGvv/tB
-         tSAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779984201; x=1780589001;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGAJl71mxdY5fzmkNELb/2UlcEcGhUpJvQPIR8eDu/I=;
-        b=q6zLcdcRgeLh16OHLy3ev2gZ9jf4cC5kUszPwtmUdX1DjchDCK+Lb+whbzuNyaqi9C
-         LW3a/4ZOhlGIVkU0yv6XgqHKcETV1UIZ6CbmAWHQp/8TWgLO2VVDj7CiEDiQynheqwyD
-         wFnYKony+ObMt9Qv4dpKknsGV5kHtQSDLlyYhxaRdoyBOPFQ2mQTook+E++VhWM1lSK1
-         +Y06Q+TXwo5GwMaG5PsuyKF+kBl5/EXImt2bzqkKHcHCT75jCihzr44m9WcDbv07Qy+U
-         Ak4jHFnokMLoIcUyJBjJXLzUm2eUfvIHMJv+pYvuuYWqpEuFq/AS9QdhgYOHG+sWocQz
-         Lh4A==
-X-Forwarded-Encrypted: i=1; AFNElJ+D4r/kIughPMWOrnT6nO3Ocl0NwN5kwg+cp0SdSEH4RT9t66DnSJiGAjKhp76nYo9QGM8jp0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvnKVG56lwZXzpeKCa4i2rtcudL9Ee7N8GmBhEZnfu9XmxuWzV
-	XYAG1kRuxzLKc1lDH/Nxkh667ZaE6mB0ZFHiqjbNaIgNZONBe0dngaEVwC16
-X-Gm-Gg: Acq92OG76S6KDDb8MzRyRrsiYd0Sen9PQgTAfEm2BmrxTTDrP8OnN1ramq/e3EyY23B
-	gePI2zCfH0d+X7JqBJC1J03SYFNqYg1kgmD5UfE0TZx15NpXAXD2DgBEzucXu/Qzkefvl5vY8Ud
-	kg2r7YtSmfJz4smKkVNfuEGEjfkCTsl1tdOfjQtiydIE7gBRyBMljJQaVSSFQZVYHzfYTwGd6n9
-	CfhJQ+CZubrLti6ECQzlnH0aJrYCS1gmbQYDYNmt/r+Rl5L0RkAFeFUyIrxojSnl4gWYTht5J9S
-	wBDiouDGXiWkPb+kmIpMlz4QBUPsKsRwD/E8WRHwJKsh45mYimxAaiQDRMe4k8ttYMC301dq7Wz
-	LZ4PEWl4uuWLZgCkOcf6wHBZyVup21kXOcSS+syLzLyg8dvtvAPe77vyeligHebZSU+7jV5DNrt
-	QuPUQIRpybmHmngNmS
-X-Received: by 2002:a05:6000:144c:b0:43b:498f:dceb with SMTP id ffacd0b85a97d-45eb3692577mr45679938f8f.9.1779984200272;
-        Thu, 28 May 2026 09:03:20 -0700 (PDT)
-Received: from debian.. ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eeb36c40asm3739691f8f.13.2026.05.28.09.03.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 09:03:19 -0700 (PDT)
-From: Tristan Madani <tristmd@gmail.com>
-X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Christian Hopps <chopps@labn.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()
-Date: Thu, 28 May 2026 16:03:18 +0000
-Message-ID: <20260528160318.2631699-1-tristan@talencesecurity.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1779984505; c=relaxed/simple;
+	bh=Qed73ts4bhhkI9YN/oNaXj0K0g/+yqN5022z0Oro6Wk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kPXMOJT6NoOfBX3x49lfThOd7067smHfxoGRscCaZVyofqEwy1OnXPGqNOAmCUiJvMT+82afIkjo5G+vi9JzRC6Ui7qCAZmLb/EzNEUPt9Pwfdiss8IM2tUMORHDlwLLxVJikfMLoxcOpkA7Ae2/H0YyEwKZgcwFz7GrFKWpf64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id BF76D60503; Thu, 28 May 2026 18:08:20 +0200 (CEST)
+Date: Thu, 28 May 2026 18:08:20 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Siho Lee <25esihoya@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 net] netfilter: nft_payload: validate offset for all
+ csum_type paths
+Message-ID: <ahhodI4Ou64n9HEq@strlen.de>
+References: <CAOYEF6nkrD4o_Kw_gxbv7Vefxpp=E6N4X_s-3KEcS1f3Hb1uAg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOYEF6nkrD4o_Kw_gxbv7Vefxpp=E6N4X_s-3KEcS1f3Hb1uAg@mail.gmail.com>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292753-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292755-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.984];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[labn.net:email,talencesecurity.com:mid,talencesecurity.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F109A5F500B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,strlen.de:mid]
+X-Rspamd-Queue-Id: B78BE5F4F14
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-iptfs_destroy_state() calls hrtimer_cancel() while holding a spinlock
-that the timer callback also acquires, leading to an ABBA deadlock on
-SMP systems.
+Siho Lee <25esihoya@gmail.com> wrote:
+> For NFT_PAYLOAD_LL_HEADER, offset is computed as:
+>     offset = skb_mac_header(skb) - skb->data - vlan_hlen
+> which evaluates to -14 (or -18 with VLAN) after eth_type_trans()
+> pulls the Ethernet header. This is a valid negative offset that
+> refers to the Ethernet header area (used by bridge/vlan rules).
+> 
+> However, without any bounds check in the csum=NONE path:
+> - skb_ensure_writable(skb, max(offset + priv->len, 0)):
+>   max() converts negative values to 0, making it a no-op.
 
-For the output timer (iptfs_timer):
-  - iptfs_destroy_state() holds x->lock, calls hrtimer_cancel()
-  - iptfs_delay_timer() callback takes x->lock
+Are you sure?
 
-For the drop timer (drop_timer):
-  - iptfs_destroy_state() holds drop_lock, calls hrtimer_cancel()
-  - iptfs_drop_timer() callback takes drop_lock
+> - skb_store_bits(skb, offset, src, priv->len):
+>   A negative offset that exceeds skb headroom writes out of bounds.
 
-Both timers use HRTIMER_MODE_REL_SOFT, so their callbacks run in softirq
-context.  When hrtimer_cancel() is called for a soft timer that is
-currently executing on another CPU, hrtimer_cancel_wait_running() spins
-on softirq_expiry_lock -- the same lock held by the softirq running the
-callback.  If the callback is blocked waiting for the spinlock held by
-the caller of hrtimer_cancel(), a circular dependency forms:
+Sure, but how can that happen?  This should be explained here,
+because I am NOT seeing a bug in the first place.
 
-  CPU 0: holds lock_A -> waits for softirq_expiry_lock
-  CPU 1: holds softirq_expiry_lock -> waits for lock_A
+> Add proper validation after the csum condition block:
+> - Negative offsets: ensure they fall within skb_headroom(skb)
+>   (bridge/vlan rules legitimately access the Ethernet header)
+> - Positive offsets: ensure offset + len does not exceed skb->len
 
-Fix this by cancelling both timers before acquiring their respective
-locks.  hrtimer_cancel() is safe to call without holding any lock and
-will wait for any in-progress callback to complete.  The locks are still
-acquired afterwards to synchronize with any in-flight packet processing
-before tearing down the state.
+Large offset/len should make skb_copy_bits return an error.
 
-Found by source code audit.
+> Also remove the max() wrapper from skb_ensure_writable() since
+> the new validation guarantees the offset is within range.
 
-Fixes: 4b3faf610cc6 ("xfrm: iptfs: add new iptfs xfrm mode impl")
-Cc: Christian Hopps <chopps@labn.net>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
----
- net/xfrm/xfrm_iptfs.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+No, this patch still breaks test cases we have.  Please figure out
+if there is a bug in this code, and if there is, explain it in a way
+that I can understand (e.g. provide broken example that triggers OOB).
 
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 97bc979e55baf..fd25b2b230793 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -2708,8 +2708,9 @@ static void iptfs_destroy_state(struct xfrm_state *x)
- 	if (!xtfs)
- 		return;
- 
--	spin_lock_bh(&xtfs->x->lock);
- 	hrtimer_cancel(&xtfs->iptfs_timer);
-+
-+	spin_lock_bh(&xtfs->x->lock);
- 	__skb_queue_head_init(&list);
- 	skb_queue_splice_init(&xtfs->queue, &list);
- 	spin_unlock_bh(&xtfs->x->lock);
-@@ -2717,8 +2718,9 @@ static void iptfs_destroy_state(struct xfrm_state *x)
- 	while ((skb = __skb_dequeue(&list)))
- 		kfree_skb(skb);
- 
--	spin_lock_bh(&xtfs->drop_lock);
- 	hrtimer_cancel(&xtfs->drop_timer);
-+
-+	spin_lock_bh(&xtfs->drop_lock);
- 	spin_unlock_bh(&xtfs->drop_lock);
- 
- 	if (xtfs->ra_newskb)
--- 
-2.47.3
+Then, git clone https://git.netfilter.org/nftables and make sure the
+tests pass.
 
+> +	if (skb_ensure_writable(skb, offset + priv->len) ||
+
+ensure_writable has unsigned arg, so this -14 + 6 will asks for
+4GB and this aborts here.
 
