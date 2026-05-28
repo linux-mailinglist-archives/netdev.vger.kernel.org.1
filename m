@@ -1,145 +1,309 @@
-Return-Path: <netdev+bounces-292835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292836-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cISbM/afGGpAlggAu9opvQ
-	(envelope-from <netdev+bounces-292835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:05:10 +0200
+	id 4PCLGzuhGGqblggAu9opvQ
+	(envelope-from <netdev+bounces-292836-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:10:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3AA75F7CD7
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:05:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E65F75F7FC1
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 036E93049713
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:04:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0742630FAC96
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBE740FDA2;
-	Thu, 28 May 2026 20:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34DEB40961F;
+	Thu, 28 May 2026 20:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QxqrKBO3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvY4jkyb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C33339866;
-	Thu, 28 May 2026 20:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CDB42188B
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 20:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779998679; cv=none; b=Oafhe4Ep1P83uZ3Lgvvxi+aPtZ0vg4y+mFuHch1tTXp4TdzvfmBehL5lvEHQc/8q2eBkEzXxNSuXfmz9+VpppclkWsRSSyaJgeMZBTm3KL3j6SipCQ++ac8VDQFbeHkCJB1lozQVniDRAV/LcrQOm45Syxtqppf8Wxc9p1LhsaQ=
+	t=1779998707; cv=none; b=FJZ1M8rBdgmwiE/733zcR6g8z5gROiCKU/ey0JToQkCScm8HeZtZO4kuTnDqLnzWrdBjoj+Alasf8MzqMMlVBg/EJSLWZvXv9LPXYl9+H020sgsyeW81SXHcTDIK/XFqrmF70mJ90uKJVmO04qwTZQBbFEDIYFe+rX2r47x6P/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779998679; c=relaxed/simple;
-	bh=wvzVzBiNNc7pSSiktZyRp3DeDJsrIozwR7fOSJytmMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s5WwBQtTPbDlX63vwePExr5z1NjdbdvzrwLwAF7aMHbYQuytIjFfCFHJ785sOv1ISDS0x0frr4wi1t927oqA1OUisJtqdOQ8iCDs9c9O98RbSIpI4m+AWg92AYaYIsAtCSVD+KYv7BoWg9n0nBUDRTmv2btAX7jXYkPNtLvjg94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QxqrKBO3; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A9321F00A3A;
-	Thu, 28 May 2026 20:04:37 +0000 (UTC)
+	s=arc-20240116; t=1779998707; c=relaxed/simple;
+	bh=xUeRD4UGilASN7aGNfZrP521YTBbheDyCQmP3FSgDRw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q7DpNjpPMMpP65fRGyIns/NBS+dqnts4OnRNzb0B5AVDhJ57zM7VzbnAJ+NKRsKl3DGe28d8KLMQp4BxDoLorInHPHyqFSBa+VGAL18wZ7XdM7ZVAp+N+P1SraKismoHegy61m0dQRsdYMnJ0zR/MKPlKBy3Bisz7lX+gblam1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvY4jkyb; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 666F21F000E9;
+	Thu, 28 May 2026 20:05:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779998677;
-	bh=WVjZ77WKanlIoER/YuUvLPXIh6A2toQ/kFAdLdwWH6g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=QxqrKBO33zRwgngfe8npfS0gioZ/JnMOqrQXJ9uTbSeOiWR0B7dfSKyNf6utog185
-	 U+a4fjR18dzGBLffCbtljBwGoaM4XPEI2rb8r16jyV39pNEC9aVSBkiTePpo8bcJWt
-	 CAoVXWuNiSNo3ayxqYFIjs5T5uAlz5WU+ovW4pY7XRr0rXWkeSpAIcEtsTs6lMt/Iz
-	 2iOYSWlyLEQNscHrctet8rTA7Xd4K9cBACAbXNGkpl9K/Kj/qeMlED2tzOanbcGzL9
-	 XCzXRiOp2/OKqYsAwksQx8c258b8CXvGHCdxVmMHpEuvC1jvBJZ4xe7ZtUN0pDcGMC
-	 Wyiv24TDeqW3g==
-Date: Thu, 28 May 2026 13:04:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>, Lucien Jheng
- <lucienzx159@gmail.com>
-Cc: Mark Brown <broonie@kernel.org>, David Miller <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20260528130436.450720f9@kernel.org>
-In-Reply-To: <ahhlcK0ufJn0VEzM@sirena.org.uk>
-References: <ahhlcK0ufJn0VEzM@sirena.org.uk>
+	s=k20260515; t=1779998705;
+	bh=DubbH4uJH9g+7V8V+QOTeyItqg7+pY+vWDmn2+fhis8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=KvY4jkybRVLEmsCURitYF+E2Bi3SCn8ZNMBMV7XWq1yro3y66Vs0HqunvZUcYLbPZ
+	 ITtJ091xymPTSB0O/aF2B6aYG1y8KAzLGSEK33tqbuCjg0Y/HOgnCvkzK6UbWuX+Vs
+	 Hd8aLVhDpr8hP/IirYpRtAtnQFo8B3L8hh+MHtnm706V9OrbTj6EMpO2+fbLziutBU
+	 BFRLyJocKayOOF6i1eWfH/7VIwrDjIE8xj8Itoc5TjKwBo+PF3zWhgkzSIj8veHm42
+	 khdRDLt9S6RsYUJZSHlPy1qLoZZIRArjsw+GNxY7FutCXHK6BJYsyWayjvjla069r1
+	 ArbrJEHzYo69A==
+From: Simon Horman <horms@kernel.org>
+To: kipreyyy@gmail.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH xfrm] xfrm: vti: hold device reference for tunnel pointer stored in skb cb
+Date: Thu, 28 May 2026 21:04:40 +0100
+Message-ID: <20260528200438.2724831-3-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260526101724.69508-1-kipreyyy@gmail.com>
+References: <20260526101724.69508-1-kipreyyy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292835-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292836-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[collabora.com,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B3AA75F7CD7
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
+X-Rspamd-Queue-Id: E65F75F7FC1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 28 May 2026 16:55:28 +0100 Mark Brown wrote:
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
-> 
-> diff --cc drivers/net/phy/air_en8811h.c
-> index a86129ce693c2,a42898ae41358..0000000000000
-> --- a/drivers/net/phy/air_en8811h.c
-> +++ b/drivers/net/phy/air_en8811h.c
-> @@@ -260,218 -229,6 +245,31 @@@ static const unsigned long en8811h_led_
->   					      BIT(TRIGGER_NETDEV_RX)          |
->   					      BIT(TRIGGER_NETDEV_TX);
->   
-> - static int air_phy_read_page(struct phy_device *phydev)
-> - {
-> - 	return __phy_read(phydev, AIR_EXT_PAGE_ACCESS);
-> - }
-> - 
-> - static int air_phy_write_page(struct phy_device *phydev, int page)
-> - {
-> - 	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
-> - }
-> - 
->  +static int __air_pbus_reg_write(struct mdio_device *mdiodev,
->  +				u32 pbus_reg, u32 pbus_data)
->  +{
->  +	int ret;
->  +
->  +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
->  +			      upper_16_bits(pbus_reg));
->  +	if (ret < 0)
->  +		return ret;
+From: 'Simon Horman' <horms@kernel.org>
 
-Unclear to me why this is using __mdiobus_write() instead of __phy_write
-when the callers have access to the phydev..
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+xfrm: vti: hold device reference for tunnel pointer stored in skb cb
 
-Our PR to Linus is now out, hopefully he pulls soon.
-The AIR_EXT_PAGE_ACCESS define is no longer visible in air_en8811h.c
+This patch adds dev_hold() in vti_input() and vti6_input_proto() when
+stashing the tunnel device pointer into XFRM_TUNNEL_SKB_CB(skb), with
+matching dev_put() calls on every return path of vti_rcv_cb() and
+vti6_rcv_cb() to balance the new reference.
 
-Louis, I'm going to move the define to the header to keep the merge
-simple. Could you follow up with a cleanup once Linus pulls and I push
-out the merge? Or if you prefer another resolution just show me a diff.
-If I get it before Linus pulls I'll use it.
+> diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+> index 95b6bb78fcd2..3be298c5a80c 100644
+> --- a/net/ipv4/ip_vti.c
+> +++ b/net/ipv4/ip_vti.c
+> @@ -62,6 +62,7 @@ static int vti_input(struct sk_buff *skb, int nexthdr, __be32 spi,
+>  			goto drop;
+>  
+>  		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 = tunnel;
+> +		dev_hold(tunnel->dev);
+>  
+>  		if (update_skb_dev)
+>  			skb->dev = tunnel->dev;
+
+[High]
+Is the new dev_hold() balanced on the async-resume drop path?
+xfrm_input() with encap_type == -1 does:
+
+    if (encap_type < 0 || ...) {
+        x = xfrm_input_state(skb);
+
+        if (unlikely(x->km.state != XFRM_STATE_VALID)) {
+            ...
+            if (encap_type == -1)
+                dev_put(skb->dev);
+            goto drop;
+        }
+
+        family = x->props.family;
+
+so when the state has been invalidated between submission and async
+completion, the function jumps to drop with family still at its
+function-local default of AF_UNSPEC.
+
+The drop path then calls xfrm_rcv_cb(skb, family, ..., -1).  Since
+xfrm_input_afinfo only has slots populated for AF_INET and AF_INET6,
+xfrm_rcv_cb returns -EAFNOSUPPORT before invoking vti_rcv_cb at all.
+
+Does that mean the dev_hold(tunnel->dev) added in vti_input() is never
+released on this path, leaving the vti netdev unable to be unregistered
+("unregister_netdevice: waiting for vtiN to become free")?
+
+This is the hardware-crypto / pcrypt async path the commit message
+calls out, so does the fix actually cover it?
+
+> @@ -112,6 +113,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+>  	if (err) {
+>  		DEV_STATS_INC(dev, rx_errors);
+>  		DEV_STATS_INC(dev, rx_dropped);
+> +		dev_put(dev);
+>  
+>  		return 0;
+>  	}
+> @@ -125,6 +127,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+>  		if (inner_mode == NULL) {
+>  			XFRM_INC_STATS(dev_net(skb->dev),
+>  				       LINUX_MIB_XFRMINSTATEMODEERROR);
+> +			dev_put(dev);
+>  			return -EINVAL;
+>  		}
+>  	}
+> @@ -135,12 +138,15 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+>  	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
+>  	skb->mark = orig_mark;
+>  
+> -	if (!ret)
+> +	if (!ret) {
+> +		dev_put(dev);
+>  		return -EPERM;
+> +	}
+>  
+>  	skb_scrub_packet(skb, !net_eq(tunnel->net, dev_net(skb->dev)));
+>  	skb->dev = dev;
+>  	dev_sw_netstats_rx_add(dev, skb->len);
+> +	dev_put(dev);
+>  
+>  	return 0;
+>  }
+
+[Critical]
+Can the err == 0 paths that return a non-zero value cause a double
+dev_put()?
+
+xfrm_input() invokes the cb chain twice when the first call returns an
+error:
+
+    err = xfrm_rcv_cb(skb, family, x->type->proto, 0);
+    if (err)
+        goto drop;
+    ...
+drop:
+    ...
+    xfrm_rcv_cb(skb, family, x->type->proto, -1);
+
+In vti_rcv_cb the inner_mode == NULL branch and the !ret branch both
+return a negative value after performing dev_put(dev):
+
+    if (inner_mode == NULL) {
+        ...
+        dev_put(dev);
+        return -EINVAL;
+    }
+    ...
+    if (!ret) {
+        dev_put(dev);
+        return -EPERM;
+    }
+
+Since XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 is not cleared, the second
+invocation enters with err == -1 and reaches:
+
+    dev = tunnel->dev;
+    if (err) {
+        ...
+        dev_put(dev);
+        return 0;
+    }
+
+so the same tunnel->dev is dev_put() twice for a single dev_hold() taken
+in vti_input(), giving a netdev refcount underflow.
+
+Should XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 be cleared after dev_put(),
+or the error-return paths take the dev_put() only once?
+
+> diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+> index df793c8bfffb..ab5f8480eed7 100644
+> --- a/net/ipv6/ip6_vti.c
+> +++ b/net/ipv6/ip6_vti.c
+> @@ -317,9 +317,10 @@ static int vti6_input_proto(struct sk_buff *skb, int nexthdr, __be32 spi,
+>  			goto discard;
+>  		}
+>  
+> +		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
+> +		dev_hold(t->dev);
+>  		rcu_read_unlock();
+>  
+> -		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
+>  		XFRM_SPI_SKB_CB(skb)->family = AF_INET6;
+>  		XFRM_SPI_SKB_CB(skb)->daddroff = offsetof(struct ipv6hdr, daddr);
+>  		return xfrm_input(skb, nexthdr, spi, encap_type);
+
+[High]
+Same async-resume question as for vti_input(): if x->km.state becomes
+invalid between submission and the resume call, xfrm_input() goes to
+drop with family still at AF_UNSPEC, xfrm_rcv_cb() bails out via
+xfrm_input_get_afinfo() returning NULL, and vti6_rcv_cb() is never
+called.  Is the dev_hold(t->dev) added here ever released on that path?
+
+> @@ -356,6 +357,7 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
+>  	if (err) {
+>  		DEV_STATS_INC(dev, rx_errors);
+>  		DEV_STATS_INC(dev, rx_dropped);
+> +		dev_put(dev);
+>  
+>  		return 0;
+>  	}
+> @@ -369,6 +371,7 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
+>  		if (inner_mode == NULL) {
+>  			XFRM_INC_STATS(dev_net(skb->dev),
+>  				       LINUX_MIB_XFRMINSTATEMODEERROR);
+> +			dev_put(dev);
+>  			return -EINVAL;
+>  		}
+>  	}
+> @@ -379,12 +382,15 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
+>  	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
+>  	skb->mark = orig_mark;
+>  
+> -	if (!ret)
+> +	if (!ret) {
+> +		dev_put(dev);
+>  		return -EPERM;
+> +	}
+>  
+>  	skb_scrub_packet(skb, !net_eq(t->net, dev_net(skb->dev)));
+>  	skb->dev = dev;
+>  	dev_sw_netstats_rx_add(dev, skb->len);
+> +	dev_put(dev);
+>  
+>  	return 0;
+>  }
+
+[Critical]
+The same double-put concern applies here.  When inner_mode == NULL the
+function does dev_put(dev) and returns -EINVAL, and when xfrm_policy_check
+fails it does dev_put(dev) and returns -EPERM.  xfrm_input() then re-runs
+the cb chain with err == -1:
+
+    if (err) {
+        ...
+        dev_put(dev);
+        return 0;
+    }
+
+XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 still holds t, so this second
+invocation does not exit at the !t check and performs another dev_put on
+the same tunnel device.  Should the cb pointer be cleared or the put be
+done once?
 
