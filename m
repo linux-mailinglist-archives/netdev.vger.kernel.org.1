@@ -1,178 +1,176 @@
-Return-Path: <netdev+bounces-292719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPmmL8dUGGoQjQgAu9opvQ
-	(envelope-from <netdev+bounces-292719-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:44:23 +0200
+	id CH6fB/JRGGqwiwgAu9opvQ
+	(envelope-from <netdev+bounces-292721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:32:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB0BC5F3E11
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:44:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F6C5F3B86
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1C53230D7F51
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:30:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 420C33016C6A
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E756F3F6C4B;
-	Thu, 28 May 2026 14:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E78E2DC77F;
+	Thu, 28 May 2026 14:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="PM13G3G+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2vp2RVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9683F0AB2
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412633E5575
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779978581; cv=none; b=sLF97cyy5OnPsl74R407eQnb/a+2mCqK2EYT0xTYSUgvnh8cZq/4Lu/0Frx2lrtk1aRDFFllDSqkI6UergNj3B2agwERKowzL4B4xj4BFGMCHYcriYe8l+0EkR+d5wWQHfaB7pzrkwdIQFTBBJrkKs9uY9JpkcvDHwZiTXmvWbs=
+	t=1779978696; cv=none; b=kIPIKuo1cEJP4OvkVmbOgaGUm7JegCnTgF5Qa3o5z1YGTkH4B68Ro8StZrYcSQGGP1FNCntdFN52BmM2kAhK4Z7OU8FTIYmKmrby8+nGRfkghlGlHnwjGFBREe3OjmhPQrStchfQg5bfQ1abH2zsJq9qkzAtC4yFR8FGx05/tM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779978581; c=relaxed/simple;
-	bh=ZmalaQCS82x8DIx/xJmtideFEt10o2S2BXubvRxPcN0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e8W2EluZ2xaxtjMNE0ahdQdkzCrfDgh+9sMs5lZgy2J5IQzj4LcmjxwM2wH9LwPGxkdG2LeALzmVycbl/+7v9UYZ6Wq/eM24pNFm91voyjVQ26kfm22vQC/+Qe2EV6+0cxikosb7lNUJPpHd2ZzdfFYgoSlyQ9+Bs8LsKIo9HI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=PM13G3G+; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1779978576;
+	s=arc-20240116; t=1779978696; c=relaxed/simple;
+	bh=fDuZdXmDJAvG6UyUc59QNJium2OJEAnH0313/JHkFhY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p/MANOxIL8c9NMvaOCxRfPky7DUSZTg05gE6meH+uZ/KpiFs81pV0MgBeYmjgZ0QpTb3KRV5lRI4gjiHqlvjRVfRhCK/22Jokttkq1KoUqyZflWnGc7yN2K95yoTlYtBGRqcIc5OJYc2tt6xFv9TBlH6uP2WdHPp6GwSbKZvFyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B2vp2RVK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779978693;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wU8EADN7q21SEHJNlOIBEzAVqEevDfMMQ8wP/p0bpp0=;
-	b=PM13G3G+giU1PJJeHHUZW31dWIsEbYdcRNPxuP8X/4ECXreF7QVEz4ZjaPHHx8VPJ/oaqm
-	/ie2Sm+EAQuu+nkWaYNKJ/8gLmU5zES4hRS6QUFuMVEXK3nqFhCwl11ZS13SyXc5JmJq8J
-	A3iOAJopH9qyPeUlte3uKSeWQRU53VZAlXwE9UqwsyvEoWND7IikXbV0BB6orTTe320kzN
-	LctYcfjqKjfwPhUK1zEw8IcBBSwVcJdArDVPVs2FAq9MGDGsAomHNs0Fx8jhILX7OT4bUO
-	cYAycRaeVsuQEHTGpkRy7s5xjvc2EI8cn7d07aoQV3J197+oXLu/RntD0N60uw==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net-next 15/15] batman-adv: use neigh_node's orig_node only as id
-Date: Thu, 28 May 2026 16:29:24 +0200
-Message-ID: <20260528142924.329658-16-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260528142924.329658-1-sw@simonwunderlich.de>
-References: <20260528142924.329658-1-sw@simonwunderlich.de>
+	bh=Nosj54CS/w1v8DX+xXPgimYXGQ9UXBm17ySIVHUG2Kk=;
+	b=B2vp2RVKlUY9kVDIxS8yVZVwSMjxUrZHSk+9jAc2/FVvHh62bTDnJQhWmmcxs3TS/on63e
+	p+1JxHUJ3hxk7o2+vcLnl0prk5mMidxtH5HWjim71IKJcj4yfLxYqJwxFNhXj0SuTH2uno
+	M2QqFYQP8zoJNtIG3pRnX3KhjsU1dyg=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-eF-ET-tuPnGdNzgx0pP7mQ-1; Thu,
+ 28 May 2026 10:31:29 -0400
+X-MC-Unique: eF-ET-tuPnGdNzgx0pP7mQ-1
+X-Mimecast-MFC-AGG-ID: eF-ET-tuPnGdNzgx0pP7mQ_1779978688
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9B99E195608E;
+	Thu, 28 May 2026 14:31:28 +0000 (UTC)
+Received: from [10.44.50.40] (unknown [10.44.50.40])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4A40719560A3;
+	Thu, 28 May 2026 14:31:27 +0000 (UTC)
+Message-ID: <e112de51-687b-48de-a0d9-eebbfd5b32f4@redhat.com>
+Date: Thu, 28 May 2026 16:31:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] ice: fix PTP hang for E825C devices
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com
+Cc: netdev@vger.kernel.org
+References: <20260327072332.130320-1-aleksandr.loktionov@intel.com>
+ <20260327072332.130320-4-aleksandr.loktionov@intel.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260327072332.130320-4-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292719-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292721-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: BB0BC5F3E11
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email]
+X-Rspamd-Queue-Id: B9F6C5F3B86
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Sven Eckelmann <sven@narfation.org>
+On 3/27/26 8:23 AM, Aleksandr Loktionov wrote:
+> From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> 
+> Change the order of PTP reconfiguration when port goes down or up
+> (ice_down and ice_up calls) to be more graceful and consistent from
+> timestamp interrupts processing perspective.
+> 
+> For both calls (ice_up and ice_down), accompanying ice_ptp_link_change
+> is called which starts/stops PTP timer. This patch changes the order:
+> - while link goes down: disable net device Tx first (netif_carrier_off,
+>    netif_tx_disable), then call ice_ptp_link_change
+> - while link goes up: ice_ptp_link_change called first, then re-enable
+>    net device Tx (netif_tx_start_all_queues)
+> 
+> Otherwise, there is a narrow window in which PTP timestamp request has
+> been triggered and timestamp processing occurs when PTP timer is not
+> enabled yet (up case) or already disabled (down case). This may lead to
+> undefined behavior and receiving invalid timestamps. This case was
+> observed on E825C devices only.
+> 
+> Fixes: 6b1ff5d39228 ("ice: always call ice_ptp_link_change and make it void")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> 
+>   drivers/net/ethernet/intel/ice/ice_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index e7308e3..8896805 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -6797,10 +6797,10 @@ static int ice_up_complete(struct ice_vsi *vsi)
+>   	    (vsi->port_info->phy.link_info.link_info & ICE_AQ_LINK_UP) &&
+>   	    ((vsi->netdev && (vsi->type == ICE_VSI_PF ||
+>   			      vsi->type == ICE_VSI_SF)))) {
+> +		ice_ptp_link_change(pf, true);
+>   		ice_print_link_msg(vsi, true);
+>   		netif_tx_start_all_queues(vsi->netdev);
+>   		netif_carrier_on(vsi->netdev);
+> -		ice_ptp_link_change(pf, true);
+>   	}
+>   
+>   	/* Perform an initial read of the statistics registers now to
+> @@ -7328,9 +7328,9 @@ int ice_down(struct ice_vsi *vsi)
+>   
+>   	if (vsi->netdev) {
+>   		vlan_err = ice_vsi_del_vlan_zero(vsi);
+> -		ice_ptp_link_change(vsi->back, false);
+>   		netif_carrier_off(vsi->netdev);
+>   		netif_tx_disable(vsi->netdev);
+> +		ice_ptp_link_change(vsi->back, false);
+>   	}
+>   
+>   	ice_vsi_dis_irq(vsi);
 
-The orig_node member of struct batadv_neigh_node is no longer used in
-B.A.T.M.A.N. IV. But batadv_neigh_node_create() is still storing it.
-Only batadv_v_ogm_route_update() uses it to check if we route toward
-it - not needing the data stored in the batadv_orig_node object itself,
-but merely a pointer to identify the originator.
+I cannot find this patch applied anywhere... IWL patchwork indicates 
+Changes Requested... I don't know why...
 
-The field cannot hold a proper reference because that would create a
-reference cycle, so it must never be dereferenced. Rename it to
-orig_node_id and mark it __private to make any future attempt to
-dereference it immediately noticeable.
-
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/bat_v_ogm.c  |  2 +-
- net/batman-adv/originator.c |  5 ++++-
- net/batman-adv/types.h      | 11 +++++++++--
- 3 files changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
-index 2c4dca639709c..5936d0048be01 100644
---- a/net/batman-adv/bat_v_ogm.c
-+++ b/net/batman-adv/bat_v_ogm.c
-@@ -719,7 +719,7 @@ static bool batadv_v_ogm_route_update(struct batadv_priv *bat_priv,
- 	 * don't route towards it
- 	 */
- 	router = batadv_orig_router_get(orig_node, if_outgoing);
--	if (router && router->orig_node != orig_node && !orig_neigh_router) {
-+	if (router && ACCESS_PRIVATE(router, orig_node_id) != orig_node && !orig_neigh_router) {
- 		batadv_dbg(BATADV_DBG_BATMAN, bat_priv,
- 			   "Drop packet: OGM via unknown neighbor!\n");
- 		goto out;
-diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
-index d05c8240426bd..15d660ca79376 100644
---- a/net/batman-adv/originator.c
-+++ b/net/batman-adv/originator.c
-@@ -693,9 +693,12 @@ batadv_neigh_node_create(struct batadv_orig_node *orig_node,
- 	kref_get(&hard_iface->refcount);
- 	ether_addr_copy(neigh_node->addr, neigh_addr);
- 	neigh_node->if_incoming = hard_iface;
--	neigh_node->orig_node = orig_node;
- 	neigh_node->last_seen = jiffies;
- 
-+#ifdef CONFIG_BATMAN_ADV_BATMAN_V
-+	ACCESS_PRIVATE(neigh_node, orig_node_id) = orig_node;
-+#endif
-+
- 	/* increment unique neighbor refcount */
- 	kref_get(&hardif_neigh->refcount);
- 	neigh_node->hardif_neigh = hardif_neigh;
-diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index c3b6af399110b..1fbdd58b59bd9 100644
---- a/net/batman-adv/types.h
-+++ b/net/batman-adv/types.h
-@@ -663,8 +663,15 @@ struct batadv_neigh_node {
- 	/** @list: list node for &batadv_orig_node.neigh_list */
- 	struct hlist_node list;
- 
--	/** @orig_node: pointer to corresponding orig_node */
--	struct batadv_orig_node *orig_node;
-+#ifdef CONFIG_BATMAN_ADV_BATMAN_V
-+	/**
-+	 * @orig_node_id: pointer to corresponding orig_node. It must only be used
-+	 * to identify the node but must NEVER be dereferenced. The reference counter
-+	 * was not increased when this was assigned because it would otherwise create
-+	 * a reference cycle.
-+	 */
-+	struct batadv_orig_node *__private orig_node_id;
-+#endif
- 
- 	/** @addr: the MAC address of the neighboring interface */
- 	u8 addr[ETH_ALEN];
--- 
-2.47.3
+Thanks,
+Ivan
 
 
