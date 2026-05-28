@@ -1,167 +1,175 @@
-Return-Path: <netdev+bounces-292702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDUfLYhNGGomiwgAu9opvQ
-	(envelope-from <netdev+bounces-292702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:13:28 +0200
+	id mE0RDqlNGGomiwgAu9opvQ
+	(envelope-from <netdev+bounces-292703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:14:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1513E5F37BF
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:13:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59A85F37D5
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E11730804F1
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:03:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 51F7730ABCC4
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8215285C91;
-	Thu, 28 May 2026 14:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDB32DAFB0;
+	Thu, 28 May 2026 14:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="h4K1jIWk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpiwwusP"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517A7282F09
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D1D2D8793
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779976986; cv=none; b=mxmzjGb5bYRZEczZgIey97Fhwqr4ejGgq/V4UQi6YSZ9SCzz4C73OlbWEwMKkD3xgYF03WEmuJDWvHAEmpHGyq8vRicXF9O4A5daU4V8dse0P5stF8dQT06jiEhbSGQ4SGKxhrKn7n+ADVT8OT8q1hfNqYetlelogf20JBkdbMA=
+	t=1779977037; cv=none; b=Hv2jU9Ep86B2oZC7ADkqWQis3rzZpiDdlMo0odXGuGpdKrUlr4HKyNtXLtpSsaMifOr8P9jOj2EMaA0hSemotuo0w1tHZ8UEQI7U1F9rOuDyF+FzUwGGYmJV5GugbR4Ynzle7iueicQ8ax9hEcHTp/jabM+RACzAm5A/ohGFGSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779976986; c=relaxed/simple;
-	bh=kZ3olwqP0S+mcZKNEUbMnN/vuJVOB9UNWHQ+IN5erh8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KJwDjAtRyzm+UhVtxUttfzLW6KXa4bjEtJ64InJSHRRsCfpCYaJyCJe+r8NFukzVM+Z/ZAE7QEXQz6aIqzm3BbMjsFWm0espNa17uLTzheNZuevqAiRsUUSIneQQUrN89JOI8b1o35eB9igjvIXXqoYJ1H4bsplh/DG8oiIneYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=h4K1jIWk; arc=none smtp.client-ip=188.68.63.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Received: from mors-relay8203.netcup.net (localhost [127.0.0.1])
-	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4gR7VS71cGz8fTj;
-	Thu, 28 May 2026 14:02:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1779976977;
-	bh=kZ3olwqP0S+mcZKNEUbMnN/vuJVOB9UNWHQ+IN5erh8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=h4K1jIWkV8ffq7pP/BxsjkBzjvLqG/YIpsLPBuVrAU/0Fpkk0RZ0j4npKO520Wylq
-	 xRghI1P96Zhmr7InLyqYZvmmsdTzu3EAZU/oCZNFJT4JWHmTKEi9NX29j3LS4MidPp
-	 ovw/gGSoeEQ28BdqKQi/SITXEQbfvFX2s/qFu0g7ixus/HTzjtDf17eDs2w7w7j8tf
-	 N57DngVIQsVkdDBBZe5xo/atNh8e4MHAnW4OovabKHWs7SWa3gDPlXW12NBWb6YVQ/
-	 seUOFXULpdh5KRjDn89iHT3BCjhsg2CVVtIo7YLQVmPUa9MHvUMzIkazT2cH21uJ49
-	 qciAkDDnK1QVw==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4gR7VS6H2tz8fSf;
-	Thu, 28 May 2026 14:02:56 +0000 (UTC)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gR7VS0JRVz8sZd;
-	Thu, 28 May 2026 16:02:54 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 838C260345;
-	Thu, 28 May 2026 16:02:47 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <80f517c8-8daa-4126-b9b9-f23eba8cfbdc@leemhuis.info>
-Date: Thu, 28 May 2026 16:02:45 +0200
+	s=arc-20240116; t=1779977037; c=relaxed/simple;
+	bh=J17mXSA6Oe8eBAQLMX4fgFo8ZaEX2UnL/Vjqi8sZMZA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R5Fm2/yXF/rWASei1jZ7mG1YP1XeJutuu+PN9qauttSzeXVc9Y1kIz+DnliYAACqxes2p2ZI2sNJbuwM/UgwM2ztAeRZKcnTPSdp3ZN4N3Ichyb/wL3f6Ki9zPrAPMb72b6/R5BrkxNRHF3Xr9DcNC0a60xX3aA5FY0gxeGDFTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NpiwwusP; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-be4344dde59so225409466b.3
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 07:03:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779977034; x=1780581834; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N4Z//wfpA5Gl9EfpgcN16YNbfavUdoFLfDddjZXAiPI=;
+        b=NpiwwusP/qO8kL9HRkRctS6BbjR04vmwHssaZoK8MYvkMoc1fKYbMoJQHgtYnv9RL4
+         M6Nb77WHXJjI3RJ83FIW4Tm0gvq63gFmcraurtmvTU7xrZNqeoZJhsjWMRjzJAqpnmBC
+         RtdW8O2zEpZdWOebkarh6EXOb4q+8VrP7tO2KSfwzTsdk/Jg9HhZ2YZWVlA3KUwxVimM
+         jekRi8HxMGaiHep874p7YOyQLlnifk5AOWUquDKV+5kJuCRYcI7+9qcn2YF+rLI+3Cv+
+         OI6EVbK6bRWohlj/4B0TK3J2he4sjdEaD4RZDLyvQJ49WJS1bmJRFd32ugPSneZqLgwy
+         p4KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779977034; x=1780581834;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N4Z//wfpA5Gl9EfpgcN16YNbfavUdoFLfDddjZXAiPI=;
+        b=CvnDcyYzRbyScOsljwG1GQmvuFGaDv8kcxVJx5N40Yeay3j7aOxjJ1vuoSFPh3Gqn/
+         Hr24y7zaWdv7NQDV1zrCe4ULexTcXJHKlSjpjvBDq5moah+2EZgNT4fZ6l4ubXCuz0Wa
+         Xf7KRwKk3t9XcpxS+Wt9/IPiUBMXcNleNUgs9Oiykv4V8P2+m8osCII1cnWC54noRKWa
+         QirAtwBg1kBKNOfRgKTHltkFk0QfOXNHQGniTBehvGxS2mCnD3cfNpwSl0cnPglJxe2Q
+         OFN76jPMjMrQLbVdR+vtcDlZSYvxkX0zpV+Qm4OX6yCnNghJrGZSsvGuWWJRPdYSy/H0
+         hYNA==
+X-Gm-Message-State: AOJu0YzRnMSWL5pq8y9+sv/oG/e2XuAw8Zsi948CZo9xMl39B+R+MLue
+	U64P/yjQ9BL1dHx/5V3nQ8/XRDIuj43tXW5I0droiq7YW905ciD2xjMhz1yCaQxY
+X-Gm-Gg: Acq92OHIuxrdN6T+8qZH9HrHQuY6IALgDmkWxDbLgLGg/iOWrU0sAehWcV/UddZIehZ
+	PlNJAOC8FAZEtDINKtZZk/Vu9ZABWpbMA0gRn4qBpqty1nj+H1NqVDnl5Zr38lOBXxGuZp10H4z
+	WepV41sXVNczjjF3Ugn6xjEuz85fcGVVUSC64LvBmJ0jM5IMbkVg0IgkUaailMZ5CsSV7BtBY5l
+	rmKwPyINtFumbId06AINl49E6KNwSelCTBPJQRccg49tWFB+m35f4wAQt6Xv0LsgFoPv8z9aGGl
+	x5D4iKS4CUJPnA9AUUz+UNL9JyN0uaFNIMrldRbi1husGyM+UneseRD7ig9y7Z79p3gG9Ik2zwZ
+	fA3F8QNRLpAur1oXMciWquRYXzkZJt4oNV4QVrUspkMAR2Vj5DUHj0vPgWQ7mUfbjFg8HLWSag+
+	eGFffh+rYeP5GR9ZQtqGsgg4b3rcNIcx8N
+X-Received: by 2002:a17:906:c112:b0:bdb:7c37:183f with SMTP id a640c23a62f3a-bdd22944808mr1746438666b.4.1779977031811;
+        Thu, 28 May 2026 07:03:51 -0700 (PDT)
+Received: from oscar-xps.. ([45.128.133.234])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bddc5ece286sm724263266b.40.2026.05.28.07.03.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 07:03:51 -0700 (PDT)
+From: Oscar Maes <oscmaes92@gmail.com>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	Oscar Maes <oscmaes92@gmail.com>
+Subject: [PATCH net] pcnet32: stop holding device spin lock during napi_complete_done
+Date: Thu, 28 May 2026 16:03:20 +0200
+Message-Id: <20260528140320.5556-1-oscmaes92@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Problem with IPv6 privacy addresses in 7.0
-To: Stefano Brivio <sbrivio@redhat.com>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Yumei Huang <yuhuang@redhat.com>, Ido Schimmel <idosch@idosch.org>,
- Justin Iurman <justin.iurman@gmail.com>, David Ahern <dsahern@kernel.org>,
- David Gibson <david@gibson.dropbear.id.au>, ihuguet@redhat.com,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: <20260521135310.GC977@cmadams.net>
- <20260526175743.1f2c3761@kernel.org> <20260527010641.GA21073@cmadams.net>
- <20260526183122.348e44e7@kernel.org> <20260527215135.GB16443@cmadams.net>
- <675083b4-e015-4ff3-836c-798e0a971194@suse.de>
- <20260528073849.759da84a@elisabeth>
- <baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
- <20260528131250.1352ab48@elisabeth>
- <b21c598b-879c-4f6a-9dc8-27e5c362803b@suse.de>
- <bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info>
- <20260528153202.14900687@elisabeth>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <20260528153202.14900687@elisabeth>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <177997696797.895729.11924838714779855892@mxe9fb.netcup.net>
-X-NC-CID: tmXDwoIlLybsVv9Ko5WTER0ZpYVgqykSePmxZbMe8/YpuYIhHig=
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[suse.de,kernel.org,vger.kernel.org,redhat.com,idosch.org,gmail.com,gibson.dropbear.id.au,lists.linux.dev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,gmail.com];
+	TAGGED_FROM(0.00)[bounces-292703-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292702-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[leemhuis.info];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:email,leemhuis.info:email,leemhuis.info:mid,leemhuis.info:dkim];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[oscmaes92@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 1513E5F37BF
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email]
+X-Rspamd-Queue-Id: B59A85F37D5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/28/26 15:32, Stefano Brivio wrote:
-> On Thu, 28 May 2026 14:29:50 +0200
-> Thorsten Leemhuis <regressions@leemhuis.info> wrote:
->> On 5/28/26 13:29, Fernando Fernandez Mancera wrote:
->>> On 5/28/26 1:12 PM, Stefano Brivio wrote:  
->>>> On Thu, 28 May 2026 12:46:05 +0200
->>>> Fernando Fernandez Mancera <fmancera@suse.de> wrote:  
->>>>> On 5/28/26 7:38 AM, Stefano Brivio wrote:  
+napi_complete_done may call gro_flush_normal (though not currently, as GRO
+is unsupported at the moment), which may result in packet TX. This will
+eventually result in calling pcnet32_start_xmit - resulting in a deadlock
+while trying to re-acquire the already locked spin lock.
 
->> But there are ways to fix even this, it's just that most of them are
->> ugly. Like adding some bit somewhere to /proc/ or so that a fixed
->> NetworkManager (if it's the only affected app) could flip by default to
->> change the things from the old behavior to the new one; and one pasta
->> could check that bit and warn. Config options are also an option, but
->> that's even uglier.
-> 
-> Actually, an eventually fixed version of NetworkManager doesn't need to
-> know the behaviour of the kernel: it can just order addresses by
-> timestamps instead, as Fernando mentioned.
+It is safe to split the spinlock block into two, because the hardware
+registers are still protected from concurrent access, and the two blocks
+perform unrelated operations that don't need to happen atomically.
 
-Sure, but the trick I tried to describe is: NetworkManager knows it can
-handle the new way of things (and thus avoid the regression the reporter
-described at the start of the thread) and thus could at boot time tell
-the kernel that by changing some bit in /proc/ -- and make it switch
-from the old to the new order, so that pasta will then do the right
-thing, too.
+Fixes: 5b2ec6f2be51 ("pcnet32: use napi_complete_done()")
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+---
+NOTE: This patch was a part of the following net-next series:
+https://lore.kernel.org/netdev/20260525125437.4061-2-oscmaes92@gmail.com/
 
-But as I said: ugly, even if that uglyness can be removed after a few years.
+ drivers/net/ethernet/amd/pcnet32.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> Are you suggesting that we
-> should anyway try to minimise the temporal impact of this with a revert?
+diff --git a/drivers/net/ethernet/amd/pcnet32.c b/drivers/net/ethernet/amd/pcnet32.c
+index 911808ab13a7..4f3076d4ea34 100644
+--- a/drivers/net/ethernet/amd/pcnet32.c
++++ b/drivers/net/ethernet/amd/pcnet32.c
+@@ -1407,8 +1407,10 @@ static int pcnet32_poll(struct napi_struct *napi, int budget)
+ 		pcnet32_restart(dev, CSR0_START);
+ 		netif_wake_queue(dev);
+ 	}
++	spin_unlock_irqrestore(&lp->lock, flags);
+ 
+ 	if (work_done < budget && napi_complete_done(napi, work_done)) {
++		spin_lock_irqsave(&lp->lock, flags);
+ 		/* clear interrupt masks */
+ 		val = lp->a->read_csr(ioaddr, CSR3);
+ 		val &= 0x00ff;
+@@ -1416,9 +1418,9 @@ static int pcnet32_poll(struct napi_struct *napi, int budget)
+ 
+ 		/* Set interrupt enable. */
+ 		lp->a->write_csr(ioaddr, CSR0, CSR0_INTEN);
++		spin_unlock_irqrestore(&lp->lock, flags);
+ 	}
+ 
+-	spin_unlock_irqrestore(&lp->lock, flags);
+ 	return work_done;
+ }
+ 
+-- 
+2.39.5
 
-I'd like to leave judgement here to the network maintainers, they are
-better equipped to make judgment calls like this.
-
-Ciao, Thorsten
 
