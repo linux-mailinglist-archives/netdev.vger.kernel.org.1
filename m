@@ -1,242 +1,236 @@
-Return-Path: <netdev+bounces-292867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KC3SN4TBGGp4nAgAu9opvQ
-	(envelope-from <netdev+bounces-292867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:28:20 +0200
+	id 7q4ZHVDEGGoWnQgAu9opvQ
+	(envelope-from <netdev+bounces-292868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:40:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25535FAF16
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:28:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C17C35FB0FE
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E4879301FE6D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:28:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC03C3017270
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFB4369D66;
-	Thu, 28 May 2026 22:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FA4369D44;
+	Thu, 28 May 2026 22:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Mzn87fUh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0nCwRC4"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFEE2DECBA;
-	Thu, 28 May 2026 22:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF433546C4
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 22:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780007295; cv=none; b=ocdtPnF/PRuI6Mtol0sa3CPpVcXcGEkPIbeTcDQCwzN0KNDxOEmJ8koSVtZEEMJHus+aIV3lsfny3uHfHPAvhVrO1icKNnq09NXDK3d6He9qeUb3yVWW2jbFALFJnBO9xiH1xvhszJPYziGBm48Det02mRI05BL1K27lCK+lLiE=
+	t=1780007660; cv=none; b=JgqksNgFkjJ3KlTF+WODbg/oIXXHsoBlekN3j1F5nAaZk5mUxzu8pXL7DBN5J/0xnz/6rLYIHhMdqVJ+xBYVCS0r6mTlt9K1fxHbyCqJTLYJY2/cCrRky39zsT81qxoUa4rlAnVeVLpdUdTUtW9z2UZHRD4q8rbSjas4falBXhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780007295; c=relaxed/simple;
-	bh=NSgBkh4h1m3GUmstvliXoCMJgzLxdw2XD4GaDjxNcWQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s0zfx+z9iyRUtYNjJcK2OHCy+xiLe6kaefP+lAK7QF++VF4pONtPCqQsZ8HVoGfwmQdttPH/dL3BsbDgTcELWaptjE7mrD8R5hgKKOQzAtA2FTzB9H7UhZM1C2H/pxMHOzwnbNxVkP3fb6weENzF5pElac1Yo/ieouUcAMLLPwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Mzn87fUh; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=TMBNnpFYJcb4ZYyve5TiuyUrZJ4esed3534C/01rFcg=; b=Mzn87fUhHYqrrM7BIE4PRCYGJc
-	IqiQe1lRra6f+zYwABXVTPYSuudnSHm9NTb60Us3I3skZ0EIVK2M5ERdTyoSQodOGBn38H7HCKN3Z
-	+P+tqSOdDpvaUj1I+QOl4yPxjiCBXK8Sv9fpaW78ryqZs8ZTeqQrWh7OQASwzZJnUWQxln3uVKwTr
-	DVPzN8Rh0eqnH5SeNNB3v2zgU0gomPY3xnHtpc1B5qIIJUKHAbSqcI+HwtUJ+FFr41pUWKc+BTe2i
-	7MmAL7Pw6+Jr0L8sNJzm/l+PdSqpeXkpX2dt3YTrvOX4PUG9FblmFdV58dBUJOUX9tvaTE+hwepZj
-	oOAhaKaw==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wSjCu-000Fci-2p;
-	Fri, 29 May 2026 00:28:04 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wSjCt-000H1F-2x;
-	Fri, 29 May 2026 00:28:04 +0200
-Message-ID: <14ca7b06-55bd-497d-b1ef-bcb95d1fe2ca@iogearbox.net>
-Date: Fri, 29 May 2026 00:28:03 +0200
+	s=arc-20240116; t=1780007660; c=relaxed/simple;
+	bh=xjHdc+vc12MKCZBHKVjl8PEg9uX/avR1IAYxPXPh5jA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ihgiOoQuPKwiE1WHDbd4jZhlRp66Tm3NzUHVy5laRwZRYFiRsjmHXyXF2TVWckdfy5CvqDqVdrGT/SXE6W2l4cR/yoUnq2rDctBN/Dmw1L0SyuPBSOP3liJY1ifKUvR8aSRZl37+tlcqD+wO2xVsxwTrdGYniYQg1160zSZiNrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0nCwRC4; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-49050ff7cbdso58160175e9.2
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 15:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780007657; x=1780612457; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mFy+qmKG40w4ZnEG39ULoB2AQiEuE/T4yBXKnfStJQU=;
+        b=e0nCwRC4MYMX0NUvqz1odXpI04NBxW5keCFo5cwlmQnGVFWktenlyOhOnQ2otR0jfS
+         r7ToCROIfMOTKaX7WtJho+FozZ3UwUyqgBaXEt7QZqJ3pTuMyYKU4Ns9wOdnBfsZBV9V
+         LGq+Gq5HU+QgVUeurKVze5+SRnxAvSwEnvFGRbV4VYT12k0K3gmX/cuuc2pFFPN2G+w5
+         E8nCdTYaiPoMJTOGJvuKLfxcjlqze28mKMhSqfAMxBIuozRfYFD4nO3RjwwAh9I0c+UL
+         wJRaasuqe/d/riPUvqqjXTBonS+kLudh6eXor/fl5LufUDpbBXuzC9/8WYCKZlX5yMC2
+         UG/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780007657; x=1780612457;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mFy+qmKG40w4ZnEG39ULoB2AQiEuE/T4yBXKnfStJQU=;
+        b=FXtCL8fUe2fV1TpyPlrkZdPjZArgdYRWJH6lvMVjwSjwEu3zxf2T0spg2tTFKu+DyC
+         lzTzLcty05rcKI2AXbLL4v+oz5tM20eGsgnsAyaI+iB5Hd4FNHOS8rMuRI1rTfbEFJ0j
+         EOrhs0499ji+SXjxb6hixaKIpAJ90LUGHQV1wjpZXC+iNiqxZ3ryPwU+hPoPOa50/UTv
+         gOWkqLMvwAWwQxSZ+qPe9FGBFgH2/hSdq2agOmL130xLLODee7l8bSspm2gC7ea7BVNd
+         XWXHfca+GFATMmBOS4/XNEVc82su/Ey2JpO1brpEetjnngC2ofnBK8nDa2R4QvGZ5nVy
+         oSBA==
+X-Forwarded-Encrypted: i=1; AFNElJ9+k1Ybqiyf4OgiYSbamx0c2ebrjQDPQda5RLWI6j3CZ/KsQxSxaATdJLXwXpvl4Bt9e+IWvn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+ROYKhJIKv13dDYrjPKQ6JPYp23PwVlSxOtDVjxciOjM95neM
+	Zu1kF4MexP0US06NChyRWSGfVQabX+nFpsTL3nJzlgfVUIPfJLYMwR93
+X-Gm-Gg: Acq92OEsIgWD954Kurjc/KNo2ALm6DGbeAXCoW2RfDqGd+NW3XyKXeRI2yXKWxiZJad
+	y2vxGa+xLVY+xQOW6UEo21HE14W8iZpXZc5ZB7VK5pQOyK/Bhd/n68tWY5IFQ/LqaqgbIiIn1Bl
+	vxn6I9SuHHlsdUUHye83q1H9Hx/SOtK7j7SsEe58Q1NHHaw3dA3XBUa8cYzND5JNaH5hfHdwdjT
+	nTbeZiEOomMiUALnZMXyYZm9RSoXhZ2DDqTat4l5jEdWtXxNZxoBaQczucabs1Ks42SLN9XLdy1
+	ka+ePKmvVPiQETszjOClKgDkwxkbzdCBUowMu8RVUKMmtCGpZwo2+0bx7KASQeMlfIwNnIm80tS
+	URwqfihl7oPh9AZx+l1FjMWyMcrKdoH2RpxVnnQdMJ5zA4QE8AROj3u9ec/g93426tBMiq4WQmB
+	4ex4YY/UNzxmTk8l7JAvgrp7SeUv+CBKKfrwTC8ETTOMFveoHu2OEkCyfJBoUmnbCNZ/KKHy+wW
+	fg0IqX4FvLApchszuk/cwlerzdAhBjeIZNe2mDUTVx+BTx0
+X-Received: by 2002:a05:600c:c047:b0:48a:9540:1a3a with SMTP id 5b1f17b1804b1-4909c07faa8mr4076425e9.8.1780007656895;
+        Thu, 28 May 2026 15:34:16 -0700 (PDT)
+Received: from britney-pc.tail2180da.ts.net (host81-152-149-195.range81-152.btcentralplus.com. [81.152.149.195])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909caa7e17sm2611475e9.9.2026.05.28.15.34.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 15:34:16 -0700 (PDT)
+From: Kacper Kokot <kacper.kokot.44@gmail.com>
+To: netfilter-devel@vger.kernel.org
+Cc: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fmancera@suse.de,
+	fw@strlen.de,
+	david.laight.linux@gmail.com,
+	Kacper Kokot <kacper.kokot.44@gmail.com>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] netfilter: TCPMSS: fix dropped packets when MSS option is unaligned
+Date: Thu, 28 May 2026 23:34:11 +0100
+Message-ID: <20260528223412.27311-1-kacper.kokot.44@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260528204020.7ae744ab@pumpkin>
+References: <20260528204020.7ae744ab@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Linux: DMA-after-unmap race in ZCRX via
- netif_rxq_cleanup_unlease() ordering inversion (netkit + page_pool)
-To: Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?Pr=C3=A9nom=3F_Ahmed?= <ahmedabdelmoumen05@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- David Wei <dw@davidwei.uk>
-References: <CAN+TWHTGkGZu4vdbkMY8F-EDe3m8ScBctW-fdtfcpGbj192SyA@mail.gmail.com>
- <20260527163320.407b4af1@kernel.org>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260527163320.407b4af1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28014/Thu May 28 08:24:59 2026)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292867-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[netfilter.org,suse.de,strlen.de,gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292868-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kacperkokot44@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E25535FAF16
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: C17C35FB0FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Ahmed,
+Padding TCP options with NOPs is optional, so it is legal to send an
+MSS option that is not aligned to a word boundary and therefore not
+aligned for checksum calculation. The current TCPMSS target is not
+robust to this: when the MSS option is unaligned it produces an
+invalid checksum, and the packet is dropped.
 
-On 5/28/26 1:33 AM, Jakub Kicinski wrote:
-> Dropping security lists, security lists are for private discussions,
-> it's utterly pointless to CC both them and LKML. Not to mention
-> that this bug only exists in -rc kernels.
-> 
-> Adding relevant developers. Moving security@ to Bcc
+This has not been observed in any real environment. Senders place the
+MSS at the beginning of the options block, where it is naturally
+aligned, but the spec allows unaligned options and the kernel shouldn't
+silently drop legal packets.
 
-Thanks for the report! I think a fix could look as below. Before submitting,
-I would prefer though if David could check this against real HW supporting
-mem providers e.g. BCM NIC:
+When the changed word is not aligned, the modified bytes straddle two
+checksum words, and using the standard incremental update helper
+(which assumes alignment) produces an invalid checksum:
 
-diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
-index de4dac4c88b3..00a7011eb4d5 100644
---- a/net/core/netdev_rx_queue.c
-+++ b/net/core/netdev_rx_queue.c
-@@ -338,12 +338,12 @@ void __netif_mp_uninstall_rxq(struct netdev_rx_queue *rxq,
-  void netif_rxq_cleanup_unlease(struct netdev_rx_queue *phys_rxq,
-  			       struct netdev_rx_queue *virt_rxq)
-  {
--	struct pp_memory_provider_params *p = &phys_rxq->mp_params;
-  	unsigned int rxq_idx = get_netdev_rx_queue_index(phys_rxq);
-+	struct pp_memory_provider_params p = phys_rxq->mp_params;
-  
--	if (!p->mp_ops)
-+	if (!p.mp_ops)
-  		return;
-  
--	__netif_mp_uninstall_rxq(virt_rxq, p);
--	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, p);
-+	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, &p);
-+	__netif_mp_uninstall_rxq(virt_rxq, &p);
-  }
+    | w1     | w2     |
+OLD |  a  b  |  c  d  |
+NEW |  a  b' |  c' d  |
 
-> On Wed, 27 May 2026 23:53:45 +0100 Prénom? Ahmed wrote:
->> Hello,
->>
->> I would like to report a source-proven teardown ordering bug in the Linux
->> kernel that can lead to a DMA-after-unmap race condition involving ZCRX
->> (io_uring zero-copy receive), page_pool, and netkit queue leasing.
->>
->> ***Reporter:** Ahmed Abdelmoemen **Discovery Date:** 2026-05-26 **Kernel
->> Version:** Linux 7.1.0-rc3*
->>
->> Executive Summary
->>
->> *A logic error in `netif_rxq_cleanup_unlease()` causes DMA mappings for the
->> ZCRX memory provider to be revoked **before** the physical NIC RX queue is
->> stopped. This creates a race window during netkit queue lease teardown
->> where the physical device's NAPI can consume stale `net_iov` entries from
->> the page_pool alloc cache containing `dma_addr = 0`.*
->>
->> The ordering inversion is fully proven at the source level. However, I have
->> **not** performed runtime verification, so actual memory corruption or
->> successful DMA to address 0 has **not** been proven — it remains hardware
->> and driver dependent.
->>
->> The bug is reachable with `CAP_NET_ADMIN` (common in container
->> environments) when using netkit with ZCRX.
->>
->> Root Cause
->>
->> In `net/core/netdev_rx_queue.c:347-348`:
->>
->> ```c __netif_mp_uninstall_rxq(virt_rxq, p); // DMA unmap + dma_addr=0
->> __netif_mp_close_rxq(...); // queue stop + NAPI disable (TOO LATE)
->>
->> This inverts the correct ordering used in normal device unregistration and
->> io_uring close paths (stop first, then unmap).
->> Impact
->>
->>     - *Potential:* NIC DMA write to physical address 0 (or stale mappings
->>     with lazy IOMMU) leading to memory corruption.
->>     - *Requirements:* CAP_NET_ADMIN + netkit queue leasing + ZCRX installed
->>     on the leased queue.
->>     - *Current Status:* No runtime PoC or crash reproduction yet. The race
->>     window exists in theory but its practical exploitability needs confirmation.
->>
->> I am attaching the full detailed analysis.
->> Proposed Fix[image: image.png]
->>
->> I am happy to provide more details or assist with testing.
+Since b' and c' sit across w1 and w2, we could compute the incremental
+checksum in two operations by recalculating w1 and then w2:
+
+    C' = C - w1 + w1' - w2 + w2'
+
+But working it out:
+
+    C' = C - w1 - w2 + w1' + w2'
+       = C - (a * 2^8 + b)  - (c * 2^8 + d)
+           + (a * 2^8 + b') + (c' * 2^8 + d)
+       = C + 2^8 * (a - a + c' - c) + (b' - b + d - d)
+       = C + 2^8 * (c' - c) + (b' - b)
+       = C - (2^8 * c + b) + (2^8 * c' + b')
+
+So an unaligned incremental checksum can be done in a single operation
+by byteswapping the changed bytes before passing them to the helper.
+This patch implements that trick for unaligned MSS option updates.
+
+Signed-off-by: Kacper Kokot <kacper.kokot.44@gmail.com>
+---
+I decided to go with the get_unaligned_be16 suggestion because
+it's idiomatic and it produces shorter assembly on x86-64
+(6 instructions vs 9). SYN processing is a cold path so
+I didn't look into it further.
+
+v2:
+ - Use get_unaligned_be16 (Fernando's suggestion)
+ - Fix alignment check expression (David)
+ - Mention it's a theoretical bug in the commit message
+ - Drop cc stable, the bug is only theoretical
+
+ net/netfilter/xt_TCPMSS.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/xt_TCPMSS.c b/net/netfilter/xt_TCPMSS.c
+index 80e1634bc51f..32c87a520361 100644
+--- a/net/netfilter/xt_TCPMSS.c
++++ b/net/netfilter/xt_TCPMSS.c
+@ -117,8 +117,9 @@ tcpmss_mangle_packet(struct sk_buff *skb,
+ 	for (i = sizeof(struct tcphdr); i <= tcp_hdrlen - TCPOLEN_MSS; i += optlen(opt, i)) {
+ 		if (opt[i] == TCPOPT_MSS && opt[i+1] == TCPOLEN_MSS) {
+ 			u_int16_t oldmss;
++			u16 csum_oldmss, csum_newmss;
+ 
+-			oldmss = (opt[i+2] << 8) | opt[i+3];
++			oldmss = get_unaligned_be16(&opt[i+2]);
+ 
+ 			/* Never increase MSS, even when setting it, as
+ 			 * doing so results in problems for hosts that rely
+@@ -130,8 +131,19 @@ tcpmss_mangle_packet(struct sk_buff *skb,
+ 			opt[i+2] = (newmss & 0xff00) >> 8;
+ 			opt[i+3] = newmss & 0x00ff;
+ 
++			csum_oldmss = htons(oldmss);
++			csum_newmss = htons(newmss);
++
++			/* MSS may be unaligned; fix up the incremental checksum
++			 * to avoid an invalid checksum and a dropped packet.
++			 */
++			if (((char *)&opt[i + 2] - (char *)tcph) & 0x1) {
++				csum_oldmss = swab16(csum_oldmss);
++				csum_newmss = swab16(csum_newmss);
++			}
++
+ 			inet_proto_csum_replace2(&tcph->check, skb,
+-						 htons(oldmss), htons(newmss),
++						 csum_oldmss, csum_newmss,
+ 						 false);
+ 			return 0;
+ 		}
+-- 
+2.43.0
 
 
