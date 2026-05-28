@@ -1,157 +1,310 @@
-Return-Path: <netdev+bounces-292572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292573-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id T89YGzDtF2rYVwgAu9opvQ
-	(envelope-from <netdev+bounces-292572-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:22:24 +0200
+	id aCwPDMTuF2p8VwgAu9opvQ
+	(envelope-from <netdev+bounces-292573-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:29:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B6E5ED99D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:22:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1055EDAC0
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A348A3035881
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:22:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BFEEB301D850
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313B631F99A;
-	Thu, 28 May 2026 07:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84EB32ED58;
+	Thu, 28 May 2026 07:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzvHAbOw"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A6E2F691F;
-	Thu, 28 May 2026 07:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779952939; cv=none; b=uRCqLakLuAMkW8XlpL31QI4nRGtmor3tacLjxCL7MVWqAIteiUKX/McnOtqE1wMxMmFEajL1gBlBV71lgtbbjoQn+aV7XAq6eD8V3SClBKOprj+h8KAqiDdVawnJnJN5UHing0xdYPJogDu7M2dcepRNkffLMCl9o8iUDsTEHlU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779952939; c=relaxed/simple;
-	bh=HQccW3NY6NB8F97899rtJRwOSafIKecHykuhjXPa8is=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rlo479j2do0+8eIFBFMnRzxgSyLDCU3jkJwGVUpYmES+3whRur+HTJCZOX3B072bLvWKbzYMju/Q/qTInF1+Sp7akqMQ9BfBbOQBNk+X4M6Jd0N3gak62IRnSFkljPW8rhoQsGCnahMYrEviuuYX+BLNrrqwqXeHAStEMv1oHQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowAAX_OL+7BdqDZ6tEg--.412S2;
-	Thu, 28 May 2026 15:21:34 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Phil Sutter <phil@nwl.cc>,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] netfilter: ipvs: fix ct refcount leak when template is invalid
-Date: Thu, 28 May 2026 07:21:00 +0000
-Message-Id: <20260528072100.1163109-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D1B3290B7
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 07:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779953342; cv=pass; b=OmPWa3wCWUoHTBBgdA2BQAR6pARvX7xTYRRA4bYPRiBqmHKygbz9wx08KJEZXf9tycK7aFwjWzItjsFu8RcgpWcEG3uPJYjRKdFQZCL9aaDLRsAvsO+m1naCOzEVpFq+p7TKkEIdmXUeQ+skvspP97QGVLHaY2+qVfjVSrnJoOE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779953342; c=relaxed/simple;
+	bh=wqiOoisFzKOSbaN+8DC0Fww/n2SOXx8MsN67erOwx0w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K5yePGiJyxQnS4/tEFlE/Ev447T+ppLEJqVX/GXXo1OmRtWwBZUI/SAApKqIxWl+LEYF2QXvgx7oyZ+fpONUS8gJmy0/CH0uVkHSiJWvzyiP2VfKcjGPm2U8fOmAFk7M8bLIaH0T38qeerWz90A/dyMPbOdgEUPlScTEtGobQJU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzvHAbOw; arc=pass smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-687ed9aabb3so12995160a12.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 00:29:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779953339; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FegoMs/nBTLdmBbMZCCi8xJfzgO+3tE1BWm8gFylbqBrJeZhUhExLilzveznAKU8nk
+         qEM1Ma2L2hHpQ4vSCiY63wIdhWnr0gdX4cMh98ZuQ1A0gmfqySKYYOD92/eSPgJ4JBAC
+         oqmQrdyyfNiMt9fsziFRWZ7PRGQWWQ5jAslM5Ft+3ThWodLGsv3C25x4xyJAhM/RiE85
+         ltqY0/XRsU1h9SDXTiTM3yka5T9PDIkdNTVMvlc39VzwpmXkavUQ0LZrcaaNOgRx6HPs
+         EHChX2MvZwvgo/f8tb6/cTDcvbenkiWXQSrC84K3+OV/M1xihDb88EuwDh8zsnDeHVEp
+         uszQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=N3GD/+VsNhC16OwgV5QFJMhiq/0obH6gESZnNktdYnY=;
+        fh=m+4o3C/duHhwSq2URKi36aJOqdtD7Uo0DvryBiWqpi0=;
+        b=XOtqM/Lw722epZEFXiBWJJOLG2l7vsimj/jI6nwgn5oFH+CFMrvtOyeIM0clMyHURv
+         PHEODzmBS25qr34WbJC90vOmhz10lHYY5iPZGdEXpEwywYLLQwdXgEX+8F1CUk6UxxpO
+         JOcUVckRIUblkBblG3de3sHGxdmJzhEDpkgmJRd+UK5CjZ/MVbIb/e2teBDWICnMJ826
+         EKE19RfmkEvH1g9XGMcv9pTmS8u3oGOfJUej2/woM+48jUj3go9bXlqRhfaLC44CQABL
+         FSEFfiLzYqvQLVJeVV98zUPxfiG76IU4llSfuZUe5mXk14PIOsxY2QuYQgZvc+9R3YbK
+         UNGg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779953339; x=1780558139; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N3GD/+VsNhC16OwgV5QFJMhiq/0obH6gESZnNktdYnY=;
+        b=EzvHAbOwmWJxSDUBuPNkU20W+KD7Y1r2Dfm10PwA4AaT0Ik8PdQmnjAn3hHzsGQ/R5
+         Tbb/qTcpi52Jdt7h6RUaaqby5xCidMrFNPFzPDVASih0+bLdsEt48vg7k0YB5G5sjaJT
+         I1jSLxj+lCR0dvZZSN7IaEWNEjc4iFFLwW6NOMPXiehzRBKyHKo6Gk7Afv5GxJ6DMAe+
+         jYYxNGKVP6LUG9vT3snoI5I3850ntu+eXMzZzdHrS2dkhKbhrKnLK9NRn2lZjOj1ADgL
+         /2NaZHdPjfANh2jaiLQ5Y1rmgs6ICMIN/Iu/g+Xxc62/9sc4vjUqW4XgsKHT9hV27rSc
+         DTMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779953339; x=1780558139;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=N3GD/+VsNhC16OwgV5QFJMhiq/0obH6gESZnNktdYnY=;
+        b=VszeRimSSjb14w07gLCa+tCHjCYzncgJt2w048Nud9Z86rLiF8IPDyaZ/VPqMHUYWx
+         SbQ3ojalKfD+3QyPIWxZ7TFxDi/DBiBQ4LjYDJJv6QupxKIXgbazLSlHDqH0p5jBaXuX
+         aIyn1Ktp5kojYbqmPzVFcnZySRyCW7YAZ97z8aCG5lvnvhrU0I9G3gs5Gp1of8G6bxf7
+         pnCapzKIK20GLvzfgv9mmrW5ffLt2TOky3nYHT3sOiBejVAjbtxoBIb1UXkwECTimoL6
+         /k9leDHMuAH1JqBv1lbJWbD9IcsnleZUN4p1EbqbGJpyTn8VEHcR7CtqwHTAkWjlgiIJ
+         rgaw==
+X-Gm-Message-State: AOJu0YzgZjY2DVAAnqOBdqaFkPKie2kqvRwnBWd1ULEvwrEdRatdhqIO
+	MYcYYtNdEHuAfiX3jP//zkNde96Jt0w/8dmYU2XHts+dcUM/VWEJzSJGG/n10rNd4wVLRdkOFQr
+	249fn5nI7ib74KmvW0WjHsUB8fMKOrHE=
+X-Gm-Gg: Acq92OFm+zNHs8FNm79rp1i2TDNCLAkafEXEMT5uqwkH1/Lk7iRB56pgXrDbMoG2kbB
+	xcz0wvy9IsOAyMO1Za3XcX0+M/4BbClhkrq6/2Kan30TGxA0j3LEV0WXiMM9fwYu6edydo+7ocC
+	aa1PE1aYzRVNqrIJBTnVA9yFOrYIfbkesSLmIG6CSPnPIboLRxjtmOp3Dkca2lgnsDmlQHd0gPo
+	iQd8RPXh0NYqQehIMB/HG2o4xu0+edyiLepndvemXRvyymQ9/ExwHMJ9Lvi6yfl0Xv3QS3jGh5r
+	QN7rVinpjJYRePLinko=
+X-Received: by 2002:a05:6402:1f47:b0:678:f8f4:a7f3 with SMTP id
+ 4fb4d7f45d1cf-6889c2b2e69mr14886065a12.0.1779953338957; Thu, 28 May 2026
+ 00:28:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAAX_OL+7BdqDZ6tEg--.412S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7KryfKFyrZrWUGr43Gw4DArb_yoW8XFy7p3
-	42kry3XrWUGryDGr4kAFyxJryakr4xAF17ur90k3s3Xwn0qF4Uta1a9rya9F48Ar4Yg3y3
-	XF4Fq39xCF95CFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUqeHgUUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwkBA2oXz2JAoAABs9
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+References: <20260527181731.1166373-1-jhs@mojatatu.com>
+In-Reply-To: <20260527181731.1166373-1-jhs@mojatatu.com>
+From: Han Guidong <2045gemini@gmail.com>
+Date: Thu, 28 May 2026 15:28:28 +0800
+X-Gm-Features: AVHnY4IdyClHLMBvKDRCQz7wPmxPiCFTAuKTKuQc0UWWbckNkXddxEvZSEObpa0
+Message-ID: <CAOPYjvYAGvZp892=A8muRexPCPs50k-bPtwEKxibEMeJC3w4sQ@mail.gmail.com>
+Subject: Re: [PATCH net v3 1/1] net/sched: fix pedit partial COW leading to
+ page cache corruption
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
+	victor@mojatatu.com, david.laight.linux@gmail.com, yimingqian591@gmail.com, 
+	keenanat2000@gmail.com, rollkingzzc@gmail.com, toke@redhat.com, 
+	dcaratti@redhat.com, security@kernel.org, linux-kernel@vger.kernel.org, 
+	Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-292572-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	TAGGED_FROM(0.00)[bounces-292573-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com,oss.qualcomm.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A2B6E5ED99D
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[2045gemini@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,qualcomm.com:email,mojatatu.com:email]
+X-Rspamd-Queue-Id: 3B1055EDAC0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ip_vs_sched_persist() calls ip_vs_ct_in_get() to look up an existing
-connection template, which returns ct with a reference held. If the
-template exists but fails the ip_vs_check_template() validation, the
-function can leak the reference in two ways:
+On Thu, May 28, 2026 at 2:17=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+>
+> tcf_pedit_act() computes the COW range for skb_ensure_writable()
+> once before the key loop using tcfp_off_max_hint, but the hint does
+> not account for the runtime header offset added by typed keys. This
+> can leave part of the write region un-COW'd.
+>
+> Fix by moving skb_ensure_writable() inside the per-key loop where
+> the actual write offset is known, and add overflow checking on the
+> offset arithmetic. For negative offsets (e.g. Ethernet header edits
+> at ingress), use skb_cow() to COW the headroom instead. Guard
+> offset_valid() against INT_MIN, where negation is undefined.
+>
+> Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> Reported-by: Keenan Dong <keenanat2000@gmail.com>
+> Reported-by: Han Guidong <2045gemini@gmail.com>
+> Reported-by: Zhang Cen <rollkingzzc@gmail.com>
+> Reviewed-by: Han Guidong <2045gemini@gmail.com>
+> Tested-by: Han Guidong <2045gemini@gmail.com>
+> Reviewed-by: Davide Caratti <dcaratti@redhat.com>
+> Tested-by: Davide Caratti <dcaratti@redhat.com>
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> Tested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+> Tested-by: Victor Nogueira <victor@mojatatu.com>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+> ---
+> Changes v2->v3:
+> 1) Fixup commit log not to talk about linearize
+> 2) Add more optimal boundary checks (Toke & David L.)
+> 3) Fixup if statement for readability (Toke)
 
-1. If no destination is found (scheduler returns NULL), the function
-   returns NULL at the !dest check without calling ip_vs_conn_put(ct).
+Retested this with various debug options enabled, and everything still
+looks good here.
 
-2. If a destination is found and a new template is created via
-   ip_vs_conn_new(), the old ct pointer is overwritten without its
-   reference being released.
+Thanks.
 
-Fix this by adding ip_vs_conn_put(ct) before the early return when no
-destination is found, and before overwriting ct with the new template.
-
-Cc: stable@vger.kernel.org
-Fixes: 5b57a98c1f0d ("IPVS: compact ip_vs_sched_persist()")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/netfilter/ipvs/ip_vs_core.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-index d40b404c1bf6..bdc3f296876a 100644
---- a/net/netfilter/ipvs/ip_vs_core.c
-+++ b/net/netfilter/ipvs/ip_vs_core.c
-@@ -536,6 +536,7 @@ ip_vs_sched_persist(struct ip_vs_service *svc,
- 			IP_VS_DBG(1, "p-schedule: no dest found.\n");
- 			kfree(param.pe_data);
- 			*ignored = 0;
-+			ip_vs_conn_put(ct);
- 			return NULL;
- 		}
- 
-@@ -551,6 +552,7 @@ ip_vs_sched_persist(struct ip_vs_service *svc,
- 		if (ct == NULL) {
- 			kfree(param.pe_data);
- 			*ignored = -1;
-+			ip_vs_conn_put(ct);
- 			return NULL;
- 		}
- 
--- 
-2.34.1
-
+> ---
+>  net/sched/act_pedit.c | 45 +++++++++++++++++++++++++++----------------
+>  1 file changed, 28 insertions(+), 17 deletions(-)
+>
+> diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+> index bc20f08a2789..e01865af8ca0 100644
+> --- a/net/sched/act_pedit.c
+> +++ b/net/sched/act_pedit.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/ip.h>
+>  #include <linux/ipv6.h>
+>  #include <linux/slab.h>
+> +#include <linux/overflow.h>
+>  #include <net/ipv6.h>
+>  #include <net/netlink.h>
+>  #include <net/pkt_sched.h>
+> @@ -323,7 +324,7 @@ static bool offset_valid(struct sk_buff *skb, int off=
+set)
+>         if (offset > 0 && offset > skb->len)
+>                 return false;
+>
+> -       if  (offset < 0 && -offset > skb_headroom(skb))
+> +       if (offset < 0 && offset < -(int)skb_headroom(skb))
+>                 return false;
+>
+>         return true;
+> @@ -393,18 +394,10 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff =
+*skb,
+>         struct tcf_pedit_key_ex *tkey_ex;
+>         struct tcf_pedit_parms *parms;
+>         struct tc_pedit_key *tkey;
+> -       u32 max_offset;
+>         int i;
+>
+>         parms =3D rcu_dereference_bh(p->parms);
+>
+> -       max_offset =3D (skb_transport_header_was_set(skb) ?
+> -                     skb_transport_offset(skb) :
+> -                     skb_network_offset(skb)) +
+> -                    parms->tcfp_off_max_hint;
+> -       if (skb_ensure_writable(skb, min(skb->len, max_offset)))
+> -               goto done;
+> -
+>         tcf_lastuse_update(&p->tcf_tm);
+>         tcf_action_update_bstats(&p->common, skb);
+>
+> @@ -412,9 +405,10 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *=
+skb,
+>         tkey_ex =3D parms->tcfp_keys_ex;
+>
+>         for (i =3D parms->tcfp_nkeys; i > 0; i--, tkey++) {
+> +               int write_offset, write_len;
+>                 int offset =3D tkey->off;
+>                 int hoffset =3D 0;
+> -               u32 *ptr, hdata;
+> +               u32 *ptr;
+>                 u32 val;
+>                 int rc;
+>
+> @@ -451,15 +445,34 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff =
+*skb,
+>                         }
+>                 }
+>
+> -               if (!offset_valid(skb, hoffset + offset)) {
+> -                       pr_info_ratelimited("tc action pedit offset %d ou=
+t of bounds\n", hoffset + offset);
+> +               if (check_add_overflow(hoffset, offset, &write_offset)) {
+> +                       pr_info_ratelimited("tc action pedit offset overf=
+low\n");
+>                         goto bad;
+>                 }
+>
+> -               ptr =3D skb_header_pointer(skb, hoffset + offset,
+> -                                        sizeof(hdata), &hdata);
+> -               if (!ptr)
+> +               if (!offset_valid(skb, write_offset)) {
+> +                       pr_info_ratelimited("tc action pedit offset %d ou=
+t of bounds\n",
+> +                                           write_offset);
+>                         goto bad;
+> +               }
+> +
+> +               if (write_offset < 0) {
+> +                       if (skb_cow(skb, -write_offset))
+> +                               goto bad;
+> +                       if (write_offset + (int)sizeof(*ptr) > 0 &&
+> +                           skb_ensure_writable(skb, min(skb->len,
+> +                                                        write_offset + s=
+izeof(*ptr))))
+> +                               goto bad;
+> +               } else {
+> +                       if (check_add_overflow(write_offset, (int)sizeof(=
+*ptr),
+> +                                              &write_len))
+> +                               goto bad;
+> +                       if (skb_ensure_writable(skb, min_t(int, skb->len,
+> +                                                          write_len)))
+> +                               goto bad;
+> +               }
+> +
+> +               ptr =3D (u32 *)(skb->data + write_offset);
+>                 /* just do it, baby */
+>                 switch (cmd) {
+>                 case TCA_PEDIT_KEY_EX_CMD_SET:
+> @@ -474,8 +487,6 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *s=
+kb,
+>                 }
+>
+>                 *ptr =3D ((*ptr & tkey->mask) ^ val);
+> -               if (ptr =3D=3D &hdata)
+> -                       skb_store_bits(skb, hoffset + offset, ptr, 4);
+>         }
+>
+>         goto done;
+> --
+> 2.34.1
+>
 
