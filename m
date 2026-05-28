@@ -1,107 +1,136 @@
-Return-Path: <netdev+bounces-292479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292480-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAOUEqiGF2quIAgAu9opvQ
-	(envelope-from <netdev+bounces-292479-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:04:56 +0200
+	id EL4eHROIF2oCIQgAu9opvQ
+	(envelope-from <netdev+bounces-292480-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:10:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED91A5EB1DF
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:04:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA9F5EB2DD
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C9FB0303AC22
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:04:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23B6A30D8CF6
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D41343887;
-	Thu, 28 May 2026 00:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA95343895;
+	Thu, 28 May 2026 00:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i9ws8vPx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ElKnlSrB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD9464;
-	Thu, 28 May 2026 00:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B4464;
+	Thu, 28 May 2026 00:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779926690; cv=none; b=Va97kZLACJJRhtsTB3ApnDHjuKHTzpXxnOVMW5mdc5ZbAnh+sk0QE8SHATBhlc8eQS9vHQndZtRat1A2Kgci+Wv2KEYu2IGPZdQRg/snykRL28MQCZ/2CRMneTdH5AJj2i8fTE2k+9oyhuDOQgg528o0qZQBNlOEqbmjMBABjjY=
+	t=1779927001; cv=none; b=Rh7qHIfTrOmpRu40T7JjmyiYLY+rciOV3pWbzsjslPyEpGX2dcWoKsmkfm6u//xPpcX8tl116No8oa/44p9ls0ShFTBRtpVV7q57E33AZqkmN6LKkmM2AxEnG50P9ECFuBB278JV6w9TlG5Jx+RfLFzao6rIwl2LfbkCTmQSqtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779926690; c=relaxed/simple;
-	bh=Y8dPkvHH0k3eqI68OzvyDzuVRrQ/6R6WKZwxFloxU7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hs+GFjrLhXo/8yZTm9GOhPXKvgpK6tKDi6uPSUkePvR+RC1vYvWuDetNfg360CCLj2lFOxgIMbrIKwFanzabRl2I63vhWY1jpwSxXkd6sV7iDRlWrULwMd2+LW0JFVckIZ5NG4nFrxmd1AfR7xYHPw5EPy5Ba524rAqg+z3l9y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i9ws8vPx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBCB41F000E9;
-	Thu, 28 May 2026 00:04:48 +0000 (UTC)
+	s=arc-20240116; t=1779927001; c=relaxed/simple;
+	bh=eol0tiIwyCFO72RMZ+pqsax9PY6UAqssZwJesaYv1t8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pv+03pTrZ3RcomU3zTKFfFMTHHIdi3Hyf2HN3MMtm3Z6ZNdM2/52p0Pbm1rpM/4qQfM9b06xWWqHQDp1gd9Aeh8r1ggJCuJzr3PNL1iv67WTUEKMMwk5NxfLvA8kfGF13zDW3gUFoOVXsiGdKHnUn1pyjBbcaD2eEGak2uHlurU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ElKnlSrB; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C91901F000E9;
+	Thu, 28 May 2026 00:09:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779926689;
-	bh=KpNzEK8ilcsreYFLZ0HInY53a42KARK8PPrBKd+7WlA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=i9ws8vPxNZsQMuIdLNwEsw17ATOgrueS1Xbd6EVtg64N3IohZUl4ACh6twy70BLcw
-	 4IzWyVABbVvjBHOndjUiimveo2vIb4L+JJaOzYj/Er0s40OkX/6JfF5EpAtILqbOCF
-	 5n0JN0LlG74Xo5cRQ/TQhOn40IUNmkOTvjr59BjXhXGbSML/5yNos+mPuiaHfIDCQO
-	 T/+dW713J9w84aZRltnp+LGyjfY8cgWJpLFSUWo+Gt8RPY2fhh/IGGuDcJMwHmc3Yd
-	 sl+GYiLXKz0WGQx7f6rKzrweH+xbAw2+VvUA9u40bGr+BaclHXz+n1LyWICr9BCI+L
-	 USvlJIXrTuiAg==
-Date: Wed, 27 May 2026 17:04:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hungyu Lin <dennylin0707@gmail.com>
-Cc: subash.a.kasiviswanathan@oss.qualcomm.com,
- sean.tranchetti@oss.qualcomm.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: qualcomm: rmnet: clarify MAP command ACK behavior
-Message-ID: <20260527170448.350f1c2d@kernel.org>
-In-Reply-To: <20260523110346.1672-1-dennylin0707@gmail.com>
-References: <20260523110346.1672-1-dennylin0707@gmail.com>
+	s=k20260515; t=1779926999;
+	bh=mKYl/HYfTJ3OVVkadqysY0EZuCoSgDnZPFRe8+oBmRE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ElKnlSrBcCPlABcdn1361XNSHyUc5VdrjFpEsv2GMqriFw8atCIbDqwkciR5BCDvY
+	 HiWjsA3qqT3Fs/3dwdvZrvA38pyhSV6/Hw5Orz8KR/i4lp4aqXdiuun7vMvDLWBFcF
+	 uoqtvFoxNg+nspUFjpgDSkmVeAmNfWcKvSByDv2v6gdQmZDgbxAWOizlPp2vlILbJm
+	 5JDbK/ZSU078v2mO8U9PO5W5iu2aO2455ptiGIt534X92SbSy//ukAB0YMQ4B4hAit
+	 QmcycPzOwIHCPgpYFyevmezY14/ADFUxeEhFf9ybywXjihQEfdA/cMn+7AZBl1tAoZ
+	 V6wqVj9WwGFOg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 09FF2380CFDE;
+	Thu, 28 May 2026 00:10:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] bonding: refuse to enslave CAN devices
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177992700483.690389.17074233805341820738.git-patchwork-notify@kernel.org>
+Date: Thu, 28 May 2026 00:10:04 +0000
+References: <20260526-bonding-candev-v1-1-ba1df400918a@hartkopp.net>
+In-Reply-To: <20260526-bonding-candev-v1-1-ba1df400918a@hartkopp.net>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-can@vger.kernel.org,
+ syzbot+8ed98cbd0161632bce95@syzkaller.appspotmail.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292479-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-292480-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev,8ed98cbd0161632bce95];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: ED91A5EB1DF
+X-Rspamd-Queue-Id: DDA9F5EB2DD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, 23 May 2026 11:03:46 +0000 Hungyu Lin wrote:
-> rmnet_map_command() only sends ACK responses for supported
-> commands. Unsupported commands are dropped without sending
-> a response.
+Hello:
 
-To me the words "as appropriate" express the fact that the ack
-is not always sent sufficiently. This seems like pointless churn.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 26 May 2026 21:33:19 +0200 you wrote:
+> syzbot reported a kernel paging request crash in
+> can_rx_unregister() inside net/can/af_can.c. The crash occurs
+> because a virtual CAN device (vxcan) is being enslaved to a
+> bonding master.
+> 
+> During the enslavement process, the bonding driver mutates
+> and modifies the network device states to fit an Ethernet-like
+> aggregation model. However, CAN devices operate on a completely
+> different Layer 2 architecture, relying on the CAN mid-layer
+> private data structure (can_ml_priv) instead of standard
+> Ethernet structures. Since bonding does not initialize or
+> maintain these CAN structures, subsequent operations on the
+> half-enslaved interface (such as closing associated sockets
+> via isotp_release) lead to a null-pointer dereference when
+> accessing the CAN receiver lists.
+> 
+> [...]
+
+Here is the summary with links:
+  - bonding: refuse to enslave CAN devices
+    https://git.kernel.org/netdev/net/c/8ba68464e478
+
+You are awesome, thank you!
 -- 
-pw-bot: reject
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
