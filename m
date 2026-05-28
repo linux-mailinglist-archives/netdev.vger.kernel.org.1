@@ -1,236 +1,260 @@
-Return-Path: <netdev+bounces-292868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7q4ZHVDEGGoWnQgAu9opvQ
-	(envelope-from <netdev+bounces-292868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:40:16 +0200
+	id QF4nF9nFGGo5nQgAu9opvQ
+	(envelope-from <netdev+bounces-292869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:46:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17C35FB0FE
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:40:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D88E75FB17B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC03C3017270
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:34:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFDA33008758
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FA4369D44;
-	Thu, 28 May 2026 22:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BF13672A5;
+	Thu, 28 May 2026 22:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0nCwRC4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VMZPgwxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF433546C4
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 22:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2236836D9F6
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 22:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780007660; cv=none; b=JgqksNgFkjJ3KlTF+WODbg/oIXXHsoBlekN3j1F5nAaZk5mUxzu8pXL7DBN5J/0xnz/6rLYIHhMdqVJ+xBYVCS0r6mTlt9K1fxHbyCqJTLYJY2/cCrRky39zsT81qxoUa4rlAnVeVLpdUdTUtW9z2UZHRD4q8rbSjas4falBXhQ=
+	t=1780008055; cv=none; b=k6VOP8ADewIuKYAs0S1cLI/6u3ViMpPHos2t6AqSVhvjf+Wg+sS7pksEu+ZDmdDvPZJONGPKjJ6czYrlijPH9wFrku1b1qJM23YbRyclX9aMDuNTre6UPCLReMvfFo9tZfjA6W15qltIQiY2mGBoSLwr7PAjw/Z8cs+RYvkEIAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780007660; c=relaxed/simple;
-	bh=xjHdc+vc12MKCZBHKVjl8PEg9uX/avR1IAYxPXPh5jA=;
+	s=arc-20240116; t=1780008055; c=relaxed/simple;
+	bh=6TBxcT3rXL3rmUxs9dupW13j1+OxzR8YP9/qw/niEwU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ihgiOoQuPKwiE1WHDbd4jZhlRp66Tm3NzUHVy5laRwZRYFiRsjmHXyXF2TVWckdfy5CvqDqVdrGT/SXE6W2l4cR/yoUnq2rDctBN/Dmw1L0SyuPBSOP3liJY1ifKUvR8aSRZl37+tlcqD+wO2xVsxwTrdGYniYQg1160zSZiNrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0nCwRC4; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-49050ff7cbdso58160175e9.2
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 15:34:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780007657; x=1780612457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mFy+qmKG40w4ZnEG39ULoB2AQiEuE/T4yBXKnfStJQU=;
-        b=e0nCwRC4MYMX0NUvqz1odXpI04NBxW5keCFo5cwlmQnGVFWktenlyOhOnQ2otR0jfS
-         r7ToCROIfMOTKaX7WtJho+FozZ3UwUyqgBaXEt7QZqJ3pTuMyYKU4Ns9wOdnBfsZBV9V
-         LGq+Gq5HU+QgVUeurKVze5+SRnxAvSwEnvFGRbV4VYT12k0K3gmX/cuuc2pFFPN2G+w5
-         E8nCdTYaiPoMJTOGJvuKLfxcjlqze28mKMhSqfAMxBIuozRfYFD4nO3RjwwAh9I0c+UL
-         wJRaasuqe/d/riPUvqqjXTBonS+kLudh6eXor/fl5LufUDpbBXuzC9/8WYCKZlX5yMC2
-         UG/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780007657; x=1780612457;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mFy+qmKG40w4ZnEG39ULoB2AQiEuE/T4yBXKnfStJQU=;
-        b=FXtCL8fUe2fV1TpyPlrkZdPjZArgdYRWJH6lvMVjwSjwEu3zxf2T0spg2tTFKu+DyC
-         lzTzLcty05rcKI2AXbLL4v+oz5tM20eGsgnsAyaI+iB5Hd4FNHOS8rMuRI1rTfbEFJ0j
-         EOrhs0499ji+SXjxb6hixaKIpAJ90LUGHQV1wjpZXC+iNiqxZ3ryPwU+hPoPOa50/UTv
-         gOWkqLMvwAWwQxSZ+qPe9FGBFgH2/hSdq2agOmL130xLLODee7l8bSspm2gC7ea7BVNd
-         XWXHfca+GFATMmBOS4/XNEVc82su/Ey2JpO1brpEetjnngC2ofnBK8nDa2R4QvGZ5nVy
-         oSBA==
-X-Forwarded-Encrypted: i=1; AFNElJ9+k1Ybqiyf4OgiYSbamx0c2ebrjQDPQda5RLWI6j3CZ/KsQxSxaATdJLXwXpvl4Bt9e+IWvn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+ROYKhJIKv13dDYrjPKQ6JPYp23PwVlSxOtDVjxciOjM95neM
-	Zu1kF4MexP0US06NChyRWSGfVQabX+nFpsTL3nJzlgfVUIPfJLYMwR93
-X-Gm-Gg: Acq92OEsIgWD954Kurjc/KNo2ALm6DGbeAXCoW2RfDqGd+NW3XyKXeRI2yXKWxiZJad
-	y2vxGa+xLVY+xQOW6UEo21HE14W8iZpXZc5ZB7VK5pQOyK/Bhd/n68tWY5IFQ/LqaqgbIiIn1Bl
-	vxn6I9SuHHlsdUUHye83q1H9Hx/SOtK7j7SsEe58Q1NHHaw3dA3XBUa8cYzND5JNaH5hfHdwdjT
-	nTbeZiEOomMiUALnZMXyYZm9RSoXhZ2DDqTat4l5jEdWtXxNZxoBaQczucabs1Ks42SLN9XLdy1
-	ka+ePKmvVPiQETszjOClKgDkwxkbzdCBUowMu8RVUKMmtCGpZwo2+0bx7KASQeMlfIwNnIm80tS
-	URwqfihl7oPh9AZx+l1FjMWyMcrKdoH2RpxVnnQdMJ5zA4QE8AROj3u9ec/g93426tBMiq4WQmB
-	4ex4YY/UNzxmTk8l7JAvgrp7SeUv+CBKKfrwTC8ETTOMFveoHu2OEkCyfJBoUmnbCNZ/KKHy+wW
-	fg0IqX4FvLApchszuk/cwlerzdAhBjeIZNe2mDUTVx+BTx0
-X-Received: by 2002:a05:600c:c047:b0:48a:9540:1a3a with SMTP id 5b1f17b1804b1-4909c07faa8mr4076425e9.8.1780007656895;
-        Thu, 28 May 2026 15:34:16 -0700 (PDT)
-Received: from britney-pc.tail2180da.ts.net (host81-152-149-195.range81-152.btcentralplus.com. [81.152.149.195])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909caa7e17sm2611475e9.9.2026.05.28.15.34.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 15:34:16 -0700 (PDT)
-From: Kacper Kokot <kacper.kokot.44@gmail.com>
-To: netfilter-devel@vger.kernel.org
-Cc: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fmancera@suse.de,
-	fw@strlen.de,
-	david.laight.linux@gmail.com,
-	Kacper Kokot <kacper.kokot.44@gmail.com>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] netfilter: TCPMSS: fix dropped packets when MSS option is unaligned
-Date: Thu, 28 May 2026 23:34:11 +0100
-Message-ID: <20260528223412.27311-1-kacper.kokot.44@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260528204020.7ae744ab@pumpkin>
-References: <20260528204020.7ae744ab@pumpkin>
+	 MIME-Version:Content-Type; b=Od6reMV8QYaSyFmW3/HpHgKVQLknWhILsTJrfKthZlk5Ox69qOR5M+pYy2gyTvwpL3VqPg/DdXcGbwfl6usjMufE/NRrDgLXh5k2RBNgwWVYYQtU6/1xqL2Qf5N5BivGJx8i8VPOEjkqVOpb/qm5rggUfGxTcNEjBTqliQw2IlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VMZPgwxV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780008052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V1KtjqbZ1swA9x3w676twoyRtYQLwds5/WiKJAslGSU=;
+	b=VMZPgwxVC5UDcRlZTYXAiil/IzJZhrBfxWciaOVCH387htNdtE9njWuLJ5Jc9gilV7Yof9
+	WI7O4bX8IOSuFEgOJcgeoDSxzmXN+3rOq9UhzYbx45dwkMv4gI0Af3etDjuSt9+3r2pTL7
+	a7QwN+kA+uLSwjqdkBDFwN3ITrnb5FQ=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-404-rLRL0CEONtC1BaI3CmqLhA-1; Thu,
+ 28 May 2026 18:40:48 -0400
+X-MC-Unique: rLRL0CEONtC1BaI3CmqLhA-1
+X-Mimecast-MFC-AGG-ID: rLRL0CEONtC1BaI3CmqLhA_1780008047
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 340721956046;
+	Thu, 28 May 2026 22:40:47 +0000 (UTC)
+Received: from x2.localnet (unknown [10.22.65.72])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8A7A319560AB;
+	Thu, 28 May 2026 22:40:45 +0000 (UTC)
+From: Steve Grubb <sgrubb@redhat.com>
+To: Ricardo Robaina <rrobaina@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, paul@paul-moore.com, eparis@redhat.com,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH v2] netlink,
+ audit: prevent false ENOBUFS on timeout expiry
+Date: Thu, 28 May 2026 18:40:44 -0400
+Message-ID: <2143396.Jadu78ljVU@x2>
+Organization: Red Hat
+In-Reply-To: <20260527152936.001d5d28@kernel.org>
+References:
+ <20260513172443.1128496-1-rrobaina@redhat.com>
+ <CAABTaaC98dqM8U-7xkdW=b=50UKu0SQyBO629LDdphQ9DC=P=g@mail.gmail.com>
+ <20260527152936.001d5d28@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[netfilter.org,suse.de,strlen.de,gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292869-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292868-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kacperkokot44@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgrubb@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C17C35FB0FE
+X-Rspamd-Queue-Id: D88E75FB17B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Padding TCP options with NOPs is optional, so it is legal to send an
-MSS option that is not aligned to a word boundary and therefore not
-aligned for checksum calculation. The current TCPMSS target is not
-robust to this: when the MSS option is unaligned it produces an
-invalid checksum, and the packet is dropped.
+On Wednesday, May 27, 2026 6:29:36=E2=80=AFPM Eastern Daylight Time Jakub K=
+icinski=20
+wrote:
+> On Wed, 27 May 2026 16:29:37 -0300 Ricardo Robaina wrote:
+> > On Mon, May 18, 2026 at 9:35=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > > On Wed, 13 May 2026 14:24:43 -0300 Ricardo Robaina wrote:
+> > > > When auditd is bottlenecked (e.g., by slow disk I/O), kauditd blocks
+> > > > on
+> > > > the netlink socket.
+> > >=20
+> > > Holding socket lock during slow IO sounds very wrong. One could say -
+> > > that's abuse of the socket lock?
+> > >=20
+> > > > If the wait timeout fully expires (timeo =3D=3D 0),
+> > > > netlink mistakenly interprets the zeroed timeout as a non-blocking
+> > > > request. It then triggers netlink_overrun that drops the event,
+> > > > completely bypassing the audit subsystem's internal retry queue, and
+> > > >=20
+> > > > falsely returns ENOBUFS to user-space, resulting in the following=20
+error:
+> > > >  auditd[]: Error receiving audit netlink packet (No buffer space
+> > > >  available)
+> > > >=20
+> > > > Fix this by detecting when a blocking sender's timeout has expired
+> > > > (timeo =3D=3D 0 && !nonblock) in netlink_unicast(). In this case, i=
+nstead
+> > > > of retrying with timeo=3D0 (which would incorrectly trigger
+> > > > netlink_overrun
+> > > > on the next iteration), safely free the skb and return -EAGAIN,
+> > > > allowing
+> > > > the audit subsystem to gracefully enqueue the pending event into its
+> > > > internal backlog.
+> > >=20
+> > > The socket _is_ the queue, normally.
+> > >=20
+> > > Please explore fixing this in audit?
+> > > --
+> > > pw-bot: cr
+> >=20
+> > Hi Jakub,
+> >=20
+> > Thanks for reviewing this patch as well.
+> >=20
+> > First, regarding the lock: kauditd does not hold the socket lock during
+> > slow I/O. The sleep in netlink_attachskb() uses schedule_timeout() on
+> > nlk->wait (a wait queue). No socket lock or mutex is held during the
+> > sleep.
+>
+> So you're saying the queue _is_ actually congested?
 
-This has not been observed in any real environment. Senders place the
-MSS at the beginning of the options block, where it is naturally
-aligned, but the spec allows unaligned options and the kernel shouldn't
-silently drop legal packets.
+Yes. the socket buffer is genuinely full because auditd can't drain fast=20
+enough.
 
-When the changed word is not aligned, the modified bytes straddle two
-checksum words, and using the standard incremental update helper
-(which assumes alignment) produces an invalid checksum:
+> netlink_attachskb() sleeps because there's no space left in the socket's
+> rcvbuf? So the skbs are moved to audit_retry_queue "temporarily" until
+> user space drains its socket and kernel can succeed sending?
+>=20
+> Could you confirm this understanding is correct?
 
-    | w1     | w2     |
-OLD |  a  b  |  c  d  |
-NEW |  a  b' |  c' d  |
+Yes. kauditd sleeps in netlink_attachskb, the HZ/10 timeout expires, and th=
+e=20
+skb is moved to audit_retry_queue until auditd drains enough for delivery t=
+o=20
+succeed. The record is not lost.
 
-Since b' and c' sit across w1 and w2, we could compute the incremental
-checksum in two operations by recalculating w1 and then w2:
+> > Second, regarding an audit-only fix: the symptom manifests as sk->sk_err
+> > =3D ENOBUFS set inside netlink_overrun() (called from netlink_attachskb
+> > when timeo =3D=3D 0). Audit has no mechanism to prevent or clear this s=
+ocket
+> > state from the outside. Potential workarounds all fail:
+> >=20
+> > (1) Clearing sk_err after the fact is racy and affects other socket ops
+>=20
+> Why would you clear the sk_err, it's the reader's responsibility to
+> clear the congestion and the reader is AFAIU a user space process.
 
-    C' = C - w1 + w1' - w2 + w2'
+The reader is in a fight to clear the congestion. But 1 reader thread vs 32=
+=20
+cores, the reader can get backlogged. It doesn't happen very often, but it=
+=20
+does once in a great while. The reader doesn't want an ENOBUFS and logs tha=
+t=20
+as an exceptional condition when that happens. It wants to rely on the=20
+kernel's backlog mechanism.
 
-But working it out:
+> > (2) Avoiding timeouts entirely defeats the anti-deadlock mechanism
+>=20
+> What's the anti-deadlock mechanism?
 
-    C' = C - w1 - w2 + w1' + w2'
-       = C - (a * 2^8 + b)  - (c * 2^8 + d)
-           + (a * 2^8 + b') + (c' * 2^8 + d)
-       = C + 2^8 * (a - a + c' - c) + (b' - b + d - d)
-       = C + 2^8 * (c' - c) + (b' - b)
-       = C - (2^8 * c + b) + (2^8 * c' + b')
+sk_sndtimeo =3D HZ/10, set in audit_net_init(). Without it, kauditd would s=
+leep=20
+indefinitely in netlink_attachskb if auditd is stalled or dead. The timeout=
+=20
+lets kauditd escape and route the skb to its retry queue.
 
-So an unaligned incremental checksum can be done in a single operation
-by byteswapping the changed bytes before passing them to the helper.
-This patch implements that trick for unaligned MSS option updates.
+> > (3) A new NETLINK_F_RECV_NO_ENOBUFS socket flag doesn't exist in stable
+> > kernels where this bug is actively impacting users
+>=20
+> Which commit are you referring to? Isn't that flag itself ancient?
 
-Signed-off-by: Kacper Kokot <kacper.kokot.44@gmail.com>
----
-I decided to go with the get_unaligned_be16 suggestion because
-it's idiomatic and it produces shorter assembly on x86-64
-(6 instructions vs 9). SYN processing is a cold path so
-I didn't look into it further.
+You're right, it is. I see how this flag would fix the pathological behavio=
+r=20
+that was reported. But as I have looked at this suggestion, there seems to =
+be=20
+one wrinkle. User space should not need to know that the audit code in the=
+=20
+kernel has this retry mechanism. It seems like the audit subsystem should s=
+et=20
+the flag on auditd's socket at registration time in auditd_set(). The kerne=
+l=20
+is the right place for this because it's the kernel that manages the retry/
+hold queues and sets the sk_sndtimeo that triggers the overrun path - audit=
+d=20
+has no knowledge of these internals.
 
-v2:
- - Use get_unaligned_be16 (Fernando's suggestion)
- - Fix alignment check expression (David)
- - Mention it's a theoretical bug in the commit message
- - Drop cc stable, the bug is only theoretical
+NETLINK_F_RECV_NO_ENOBUFS and nlk_sk are private to net/netlink/af_netlink.=
+h,=20
+so audit.c can't set the flag directly. Should we propose a small exported=
+=20
+helper, netlink_sock_set_no_enobufs(), that mirrors the existing=20
+setsockopt(NETLINK_NO_ENOBUFS) handler? Then the rest of the fix itself liv=
+es=20
+entirely in kernel/audit.c as you suggested.
 
- net/netfilter/xt_TCPMSS.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+Something like:
+void netlink_sock_set_no_enobufs(struct sock *sk)
+{
+	struct netlink_sock *nlk =3D nlk_sk(sk);
 
-diff --git a/net/netfilter/xt_TCPMSS.c b/net/netfilter/xt_TCPMSS.c
-index 80e1634bc51f..32c87a520361 100644
---- a/net/netfilter/xt_TCPMSS.c
-+++ b/net/netfilter/xt_TCPMSS.c
-@ -117,8 +117,9 @@ tcpmss_mangle_packet(struct sk_buff *skb,
- 	for (i = sizeof(struct tcphdr); i <= tcp_hdrlen - TCPOLEN_MSS; i += optlen(opt, i)) {
- 		if (opt[i] == TCPOPT_MSS && opt[i+1] == TCPOLEN_MSS) {
- 			u_int16_t oldmss;
-+			u16 csum_oldmss, csum_newmss;
- 
--			oldmss = (opt[i+2] << 8) | opt[i+3];
-+			oldmss = get_unaligned_be16(&opt[i+2]);
- 
- 			/* Never increase MSS, even when setting it, as
- 			 * doing so results in problems for hosts that rely
-@@ -130,8 +131,19 @@ tcpmss_mangle_packet(struct sk_buff *skb,
- 			opt[i+2] = (newmss & 0xff00) >> 8;
- 			opt[i+3] = newmss & 0x00ff;
- 
-+			csum_oldmss = htons(oldmss);
-+			csum_newmss = htons(newmss);
-+
-+			/* MSS may be unaligned; fix up the incremental checksum
-+			 * to avoid an invalid checksum and a dropped packet.
-+			 */
-+			if (((char *)&opt[i + 2] - (char *)tcph) & 0x1) {
-+				csum_oldmss = swab16(csum_oldmss);
-+				csum_newmss = swab16(csum_newmss);
-+			}
-+
- 			inet_proto_csum_replace2(&tcph->check, skb,
--						 htons(oldmss), htons(newmss),
-+						 csum_oldmss, csum_newmss,
- 						 false);
- 			return 0;
- 		}
--- 
-2.43.0
+	nlk->flags |=3D NETLINK_F_RECV_NO_ENOBUFS;
+	clear_bit(NETLINK_S_CONGESTED, &nlk->state);
+	wake_up_interruptible(&nlk->wait);
+}
+
+and then in audit_set() it calls this as it sets up the connection. Is this=
+=20
+the way you wanted to handle this?
+
+=2DSteve
+
 
 
