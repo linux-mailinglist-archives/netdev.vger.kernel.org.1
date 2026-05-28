@@ -1,303 +1,201 @@
-Return-Path: <netdev+bounces-292690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIOmJzs/GGqYhwgAu9opvQ
-	(envelope-from <netdev+bounces-292690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:12:27 +0200
+	id 4OBZCNBAGGrIhwgAu9opvQ
+	(envelope-from <netdev+bounces-292691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:19:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1348F5F2850
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:12:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C4D5F29BB
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:19:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7B23B3040C75
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:11:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 17E6B3040948
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC2E3F164A;
-	Thu, 28 May 2026 13:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B443F2109;
+	Thu, 28 May 2026 13:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2UHAKvV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYmIINXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490503F0AAD;
-	Thu, 28 May 2026 13:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A623E63AA
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 13:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779973881; cv=none; b=fXrIWavsX6CiwYjTi/SJmoksjHSxyE5+zHDv/SkI0/jgjt2oQFRWwe0M+sj23O3tP0OMQLoPVSnfFJxKhzVVe5r1EWta+2c/Kg8X4ze0FHv+8vNNJc8uDc8augLoM4Nr7yd0jPnFyB+6arHrzkcFgAdisDaFayWzTWWTqoOTxR8=
+	t=1779974333; cv=none; b=kQqZE0b6BSRgV08aqgKX1OL5+daeHz28vK4bdWhDyWUdDUkSVJ8TOdtGUGRnH7KhtNFHLAp/AkpXFF5gJ4EFmHinWXObTp85SFECr1R3HT6iMLPkqUvet3DRegkOb+GUJ+XIeHW2agxovxHpOh+zwdoUhLGMub1xq9JLGRzX6PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779973881; c=relaxed/simple;
-	bh=DRxY+IRB0IqAgofhsecYlxPFiYO6P8tDS1HNVNN3odI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j7jeG1jBi3vSxuKAxmjCv8OLEUdoK/eBLN6NA/CVEX/Xo37SIJECOP1cSfyYulbehbOU3QAnwUSwd0koQRxqOitkN9rwEigrAJvxM/v72kfDjTQF9Dr322A7gPc8OlaNNRdEpLK5vJFQnoGS/dRI6+hAz5p1esUy5qNDmJudBng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2UHAKvV; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4393B1F000E9;
-	Thu, 28 May 2026 13:11:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779973880;
-	bh=iDEo0j2nHsYSJgSqy1z8dWMjD802zHIig7qC3EKAx/k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=b2UHAKvVDwz9Q8zDeG5+gjEzAwHGNvWPrhFQu4UWecZMGU9oLFnYEUppHdL1JG96W
-	 ZyKfXbFlZkxgErlkIJ9vEDjHqhgkZYeEglVfzfyl1vwgy5OcQX/ILvYNtAw+Fw/u/n
-	 7Rf4HO5aTgBsh8Qrexyv+asWzwUvPXiN0B/LUktlwpZ7GWwIh5oxpK5VedspSPx+Bn
-	 nl+HsmBpJmBcRweXxwoqgm9Olo+josivuYToc2QW7vazCQsXTqNoHWp1knQYF/ENFG
-	 jtLGo1SiiASszWS5aZ18I7jEX0fOy1BKxNFyaZVCVtMBYw8PPdiTBmqYLjDYvMKN77
-	 k31LndrsIUjKg==
-Date: Thu, 28 May 2026 18:41:07 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Amirreza Zarrabi <amirreza.zarrabi@oss.qualcomm.com>
-Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>,
-	Harshal Dev <harshal.dev@oss.qualcomm.com>
-Subject: Re: [PATCH v7 02/15] firmware: qcom: Add a generic PAS service
-Message-ID: <ahg-6-eLus-J7tC8@sumit-xelite>
-References: <20260522115936.201208-1-sumit.garg@kernel.org>
- <20260522115936.201208-3-sumit.garg@kernel.org>
- <37fb075c-3f48-4a7c-b05d-090b0b09e04a@oss.qualcomm.com>
+	s=arc-20240116; t=1779974333; c=relaxed/simple;
+	bh=zIvM24MXse+lon+ZHsE1rKlGq4W5y+fx8+rHjDMA/Lc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iBlbf+SclH9MUFa+Am9bB4Jcl3U0sFxVo87xAAWt4BUFabwep50UN1yat+AB6t7iZPsjoIDBL4TbeFHS9XCOKg/4h3k5EucaTZWlPnQezr0QIGG+kdppke2mz0GMN7GZhADF3rfuiiDnO3serEAv99g7/8LlcYptdZoopjNI0Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYmIINXd; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-9618b8bdc51so1720393241.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 06:18:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779974330; x=1780579130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qsL91HmF9kKGrU3q0nx9KAZTzS34MDYjzDPYUtVrxFw=;
+        b=GYmIINXdYI2Now+oRqK2bUsapHGAA06bM9kvBCGW5y+BOjdK++6jDNwbQFdcWs7xwF
+         qGUst1a+Q2vxlp4+1fiMgUdtbD1lakRERJgyWPDydRaaMkcmDBu1VUd3fgozy3oBoxP0
+         WbJEXyYCrdcKhTXc8ZSb01H8LOo1j4xmNV6+DoFI9O/G06Y7XPZKWqUnSLMYFZxXCmbF
+         i3BLH1dxVyl/6wiXbwlBz3nPyrKGG4zq97B/1sAC9BOdRGoHZDrcWoUcDU0NSQKvyzYZ
+         QqWq4xBrmzresxOrAeXLSFMkCscMS5r77O+9AQ5PibuE6lfYYC59U4wjQ0ICnSjPP/xd
+         YrTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779974330; x=1780579130;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qsL91HmF9kKGrU3q0nx9KAZTzS34MDYjzDPYUtVrxFw=;
+        b=R3tn44v5zwdoHpH1jCRLnIhLY/+2FZ3UfP9/4qJuHIgtJkvHS6r7pdx4iyEF/g6ume
+         QX0l/6hL8ACWjj8Cyo+TsU6FXqG/EdRCyBoatsIz9HOI4Jn8uf0bDaJA14wkditKyU4a
+         uLaSVKXealRijLErF4G69OcZyMqZ7Lb/2Ee+Z6BAosK7vMDAOqKIgGcwHPIh0IcBfyg+
+         WIFsbDmgEVzwnzNkCP5RAQB+GVMAnIH3H+5p2a/N/C+EGBsv3S9NWCEomllVNbO2+5X2
+         n0J/I9ncZPconiYTP2fXL8qyaaOyjHqwF4MUI+qjBpGsh+DyQdBLrJDvMkiHKxGFOf5e
+         ZYdg==
+X-Forwarded-Encrypted: i=1; AFNElJ85WsK/ksy5uOjSprJljUddnIFGCe7gLbrM/6/y9xnRC4LBf/7ZecE69n9lOW0zUupTor8YQyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOZ3mlTz8Ir4CQNgEEQncsKKwbWahFxAmFo41iMphAaTFBYAJ8
+	+AoNHgzL8cxXzINlPGUQuivawXLkhHSCAdz1YIs1kyj7hQ7kcMBS1+SZ
+X-Gm-Gg: Acq92OGmQQyAGLmOIygg48ednpMqM8W5CWXkwdFMOugQmg1FW+oI/MtzQqjMelo5A99
+	f5GHVX0cvHbufgoOyyGsO3TiEenN70rVCvCwbTRbAust4u/s2JD6bS6o+eWvnTjgVhzYWIL1MEH
+	g+x3a8PfoT5XIHP6H/ibiE/5PtpQk33Ll8S+SUMGjzOhTLIBCaCsuAd3GAZIszLh6msq9UEPp6y
+	zrNcYxi8VEfivA+aBfXdIBuy1M1ATC/NT9C7eTG/ylKm/8ZT8eL5a5Ar/5qDNHQyX/+rv9kK1xM
+	3S/PuIvsv0ArajACrPNX52DoAiuGhrAkV9LwQ9bmS90D+GBFdtr0PsrjMKkcva6Csq60iNIFdGv
+	+SmSR59ajx9YRHtEAZOzM4gZq9LsFKDRDtr2naMMINjuAW7hkiGzhRtKnixho93OCNzj5tiLfBp
+	R1wGP3hQR2CLOcOWRUPxCBUEl+uuZOoCkfMIhlNJ1jDBWPtBXUPLqyD2v4el474dXlGCb3eLIH5
+	ug3KwXFH2RUiO87Npx3OSgknQ5Qzdvrm9azSb4=
+X-Received: by 2002:a05:6122:289b:b0:56e:f071:d4ef with SMTP id 71dfb90a1353d-586608aba88mr12888889e0c.8.1779974329598;
+        Thu, 28 May 2026 06:18:49 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-963909241d3sm1871940241.2.2026.05.28.06.18.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 06:18:49 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2026-05-28
+Date: Thu, 28 May 2026 09:18:39 -0400
+Message-ID: <20260528131839.462344-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <37fb075c-3f48-4a7c-b05d-090b0b09e04a@oss.qualcomm.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292690-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292691-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 1348F5F2850
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: D6C4D5F29BB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Amir,
+The following changes since commit ab1513597c6cf17cd1ad2a21e3b045421b48e022:
 
-On Thu, May 28, 2026 at 10:45:32AM +1000, Amirreza Zarrabi wrote:
-> Hi Sumit,
-> 
-> On 5/22/2026 9:59 PM, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Qcom platforms has the legacy of using non-standard SCM calls
-> > splintered over the various kernel drivers. These SCM calls aren't
-> > compliant with the standard SMC calling conventions which is a
-> > prerequisite to enable migration to the FF-A specifications from Arm.
-> > 
-> > OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
-> > support these non-standard SCM calls. And even for newer architectures
-> > using S-EL2 with Hafnium support, QTEE won't be able to support SCM
-> > calls either with FF-A requirements coming in. And with both OP-TEE
-> > and QTEE drivers well integrated in the TEE subsystem, it makes further
-> > sense to reuse the TEE bus client drivers infrastructure.
-> > 
-> > The added benefit of TEE bus infrastructure is that there is support
-> > for discoverable/enumerable services. With that client drivers don't
-> > have to manually invoke a special SCM call to know the service status.
-> > 
-> > So enable the generic Peripheral Authentication Service (PAS) provided
-> > by the firmware. It acts as the common layer with different TZ
-> > backends plugged in whether it's an SCM implementation or a proper
-> > TEE bus based PAS service implementation.
-> > 
-> > Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
-> > Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
-> > Reviewed-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> > Tested-by: Vignesh Viswanathan <vignesh.viswanathan@oss.qualcomm.com> # IPQ9650
-> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > ---
-> >  drivers/firmware/qcom/Kconfig          |   8 +
-> >  drivers/firmware/qcom/Makefile         |   1 +
-> >  drivers/firmware/qcom/qcom_pas.c       | 291 +++++++++++++++++++++++++
-> >  drivers/firmware/qcom/qcom_pas.h       |  50 +++++
-> >  include/linux/firmware/qcom/qcom_pas.h |  43 ++++
-> >  5 files changed, 393 insertions(+)
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas.c
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas.h
-> >  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
-> > 
-> > diff --git a/drivers/firmware/qcom/Kconfig b/drivers/firmware/qcom/Kconfig
-> > index b477d54b495a..9f66cc774508 100644
-> > --- a/drivers/firmware/qcom/Kconfig
-> > +++ b/drivers/firmware/qcom/Kconfig
-> > @@ -6,6 +6,14 @@
-> >  
-> >  menu "Qualcomm firmware drivers"
-> >  
-> > +config QCOM_PAS
-> > +	tristate "Qualcomm generic PAS interface driver"
-> > +	help
-> > +	  Enable the generic Peripheral Authentication Service (PAS) provided
-> > +	  by the firmware. It acts as the common layer with different TZ
-> > +	  backends plugged in whether it's an SCM implementation or a proper
-> > +	  TEE bus based PAS service implementation.
-> > +
-> >  config QCOM_SCM
-> >  	select QCOM_TZMEM
-> >  	tristate
-> > diff --git a/drivers/firmware/qcom/Makefile b/drivers/firmware/qcom/Makefile
-> > index 0be40a1abc13..dc5ab45f906a 100644
-> > --- a/drivers/firmware/qcom/Makefile
-> > +++ b/drivers/firmware/qcom/Makefile
-> > @@ -8,3 +8,4 @@ qcom-scm-objs += qcom_scm.o qcom_scm-smc.o qcom_scm-legacy.o
-> >  obj-$(CONFIG_QCOM_TZMEM)	+= qcom_tzmem.o
-> >  obj-$(CONFIG_QCOM_QSEECOM)	+= qcom_qseecom.o
-> >  obj-$(CONFIG_QCOM_QSEECOM_UEFISECAPP) += qcom_qseecom_uefisecapp.o
-> > +obj-$(CONFIG_QCOM_PAS)		+= qcom_pas.o
+  Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del() (2026-05-20 16:35:47 -0400)
 
-<snip>
+are available in the Git repository at:
 
-> > diff --git a/include/linux/firmware/qcom/qcom_pas.h b/include/linux/firmware/qcom/qcom_pas.h
-> > new file mode 100644
-> > index 000000000000..65b1c9564458
-> > --- /dev/null
-> > +++ b/include/linux/firmware/qcom/qcom_pas.h
-> > @@ -0,0 +1,43 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (c) 2010-2015, 2018-2019 The Linux Foundation. All rights reserved.
-> > + * Copyright (C) 2015 Linaro Ltd.
-> > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> > + */
-> > +
-> > +#ifndef __QCOM_PAS_H
-> > +#define __QCOM_PAS_H
-> > +
-> > +#include <linux/err.h>
-> > +#include <linux/types.h>
-> > +
-> > +struct qcom_pas_context {
-> > +	struct device *dev;
-> > +	u32 pas_id;
-> > +	phys_addr_t mem_phys;
-> > +	size_t mem_size;
-> > +	void *ptr;
-> > +	dma_addr_t phys;
-> > +	ssize_t size;
-> > +	bool use_tzmem;
-> > +};
-> > +
-> > +bool qcom_pas_is_available(void);
-> > +struct qcom_pas_context *devm_qcom_pas_context_alloc(struct device *dev,
-> > +						     u32 pas_id,
-> > +						     phys_addr_t mem_phys,
-> > +						     size_t mem_size);
-> > +int qcom_pas_init_image(u32 pas_id, const void *metadata, size_t size,
-> > +			struct qcom_pas_context *ctx);
-> > +struct resource_table *qcom_pas_get_rsc_table(struct qcom_pas_context *ctx,
-> > +					      void *input_rt, size_t input_rt_size,
-> > +					      size_t *output_rt_size);
-> > +int qcom_pas_mem_setup(u32 pas_id, phys_addr_t addr, phys_addr_t size);
-> > +int qcom_pas_auth_and_reset(u32 pas_id);
-> > +int qcom_pas_prepare_and_auth_reset(struct qcom_pas_context *ctx);
-> > +int qcom_pas_set_remote_state(u32 state, u32 pas_id);
-> > +int qcom_pas_shutdown(u32 pas_id);
-> > +bool qcom_pas_supported(u32 pas_id);
-> > +void qcom_pas_metadata_release(struct qcom_pas_context *ctx);
-> > +
-> > +#endif /* __QCOM_PAS_H */
-> 
-> I have a question about the shape of the generic PAS abstraction.
-> 
-> Looking at the current interface, it seems that pas_id is still treated as
-> the primary identity for most PAS operations, while struct qcom_pas_context
-> is used as optional extended state for the operations that need it. I can see
-> how this maps well to the existing SCM PAS interface and keeps the transition
-> simple.
-> 
-> However, I wonder if this makes the abstraction less generic in the long term.
-> Some callbacks in struct qcom_pas_ops receive only pas_id, while others
-> receive struct qcom_pas_context *ctx. This works as long as pas_id is
-> sufficient for those operations. But if a backend needs per-peripheral
-> private state for operations such as auth_and_reset,
-> shutdown, or set_remote_state, it would need to reconstruct that state from
-> pas_id or maintain a separate pas_id to backend-context mapping.
-> 
-> Would it be cleaner to make struct qcom_pas_context the common
-> per-peripheral object and pass it consistently to all per-peripheral callbacks?
-> Existing backends could still use ctx->pas_id, but future backends would not
-> need to perform a separate lookup only because the callback was passed a raw
-> pas_id.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-28
 
-The common evolution for a generic abstraction comes when it's needed.
-So once the client driver or the backend comes up with certain
-requirements then the generic PAS layer can be extended as needed. It
-should be possible for more APIs to migrate to using PAS context but
-there should be corresponding use-case requirements.
+for you to fetch changes up to cdf88b35e06f1b385f7f6228060ae541d44fbb72:
 
-> 
-> I also wonder whether struct qcom_pas_context is exposing some
-> implementation-specific state. Fields such as ptr, phys, size, and
-> use_tzmem seem to describe how the current SCM/QTEE implementations manage
-> metadata memory, rather than generic PAS state. For another backend, the
-> per-operation state might be a tee_shm, an FF-A memory handle, shared or lent
-> memory state, or something else transport-specific.
-> 
-> Would it make sense to keep only the common PAS fields in
-> struct qcom_pas_context, such as dev, pas_id, and possibly the firmware
-> memory address/size if those are truly generic, and add a backend-private
-> pointer for implementation-specific state?
+  Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync() (2026-05-28 08:52:21 -0400)
 
-Currently, the 2 backends can re-use parts of the PAS context but I
-agree more abstraction can be done as needed for future backends.
+----------------------------------------------------------------
+bluetooth pull request for net:
 
-> 
-> I may be missing a reason why the pas_id-only callbacks are preferred, but if
-> this is intended to be the long-term generic PAS layer rather than mainly a
-> shim over the existing SCM API shape, using the context consistently and keeping
-> backend-specific state private seems easier to extend.
+ - hci_core: Rework hci_dev_do_reset() to use hci_sync functions
+ - hci_conn: Fix memory leak in hci_le_big_terminate()
+ - hci_sync: Set HCI_CMD_DRAIN_WORKQUEUE during device close
+ - hci_sync: Reset device counters in hci_dev_close_sync()
+ - hci_sync: fix UAF in hci_le_create_cis_sync
+ - L2CAP: Fix possible crash on l2cap_ecred_conn_rsp
+ - L2CAP: fix chan ref leak in l2cap_chan_timeout() on !conn
+ - L2CAP: use chan timer to close channels in cleanup_listen()
+ - L2CAP: clear chan->ident on ECRED reconfiguration success
+ - ISO: fix UAF in iso_recv_frame
+ - ISO: serialize iso_sock_clear_timer with socket lock
+ - HIDP: fix missing length checks in hidp_input_report()
+ - 6lowpan: check skb_clone() return value in send_mcast_pkt()
+ - btusb: Allow firmware re-download when version matches
+ - hci_qca: Use 100 ms SSR delay for rampatch and NVM loading
 
-As I mentioned above, the generic PAS layer isn't fixed but it will
-surely go through evolution as needed. Current abstraction handles the
-existing client driver and backend requirments.
+----------------------------------------------------------------
+Doruk Tan Ozturk (1):
+      Bluetooth: hci_sync: fix UAF in hci_le_create_cis_sync
 
-Moreover the subsystem maintainers are already complaining about this
-series being too large for the merge to happen.
+Heitor Alves de Siqueira (3):
+      Bluetooth: hci_core: Rework hci_dev_do_reset() to use hci_sync functions
+      Bluetooth: hci_sync: Set HCI_CMD_DRAIN_WORKQUEUE during device close
+      Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync()
 
--Sumit
+Luiz Augusto von Dentz (1):
+      Bluetooth: L2CAP: Fix possible crash on l2cap_ecred_conn_rsp
+
+Muhammad Bilal (3):
+      Bluetooth: HIDP: fix missing length checks in hidp_input_report()
+      Bluetooth: ISO: fix UAF in iso_recv_frame
+      Bluetooth: ISO: serialize iso_sock_clear_timer with socket lock
+
+Pavitra Jha (1):
+      Bluetooth: hci_conn: Fix memory leak in hci_le_big_terminate()
+
+Shuai Zhang (2):
+      Bluetooth: btusb: Allow firmware re-download when version matches
+      Bluetooth: hci_qca: Use 100 ms SSR delay for rampatch and NVM loading
+
+Siwei Zhang (2):
+      Bluetooth: L2CAP: fix chan ref leak in l2cap_chan_timeout() on !conn
+      Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()
+
+Zhao Dongdong (1):
+      Bluetooth: 6lowpan: check skb_clone() return value in send_mcast_pkt()
+
+Zhenghang Xiao (1):
+      Bluetooth: l2cap: clear chan->ident on ECRED reconfiguration success
+
+ drivers/bluetooth/btusb.c   |  8 +++++++-
+ drivers/bluetooth/hci_qca.c |  4 ++--
+ net/bluetooth/6lowpan.c     |  2 ++
+ net/bluetooth/hci_conn.c    |  4 +++-
+ net/bluetooth/hci_core.c    | 43 +++----------------------------------------
+ net/bluetooth/hci_sync.c    | 16 +++++++++++++++-
+ net/bluetooth/hidp/core.c   | 23 ++++++++++++++++++-----
+ net/bluetooth/iso.c         | 12 ++++++++----
+ net/bluetooth/l2cap_core.c  | 41 +++++++++++++++++++++++++++++++++--------
+ net/bluetooth/l2cap_sock.c  | 16 +++++++++-------
+ 10 files changed, 100 insertions(+), 69 deletions(-)
 
