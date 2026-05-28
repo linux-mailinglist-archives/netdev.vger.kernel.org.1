@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-292675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OECCNxozGGpwfggAu9opvQ
-	(envelope-from <netdev+bounces-292675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:20:42 +0200
+	id 2D+LLy40GGpwfggAu9opvQ
+	(envelope-from <netdev+bounces-292676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:25:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411485F1FE5
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:20:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2716A5F20C1
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3374630ABEAB
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:16:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9BFE302DB75
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAA63C1995;
-	Thu, 28 May 2026 12:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NY3SDf4a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954B73E9C0A;
+	Thu, 28 May 2026 12:20:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC913E7BDC
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 12:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF92E3E92BC;
+	Thu, 28 May 2026 12:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779970564; cv=none; b=oeUWgNtnm+Z73w+tM7vQDfyFghCutWHZMh1ghOb/bvT3eu3kteO9+G8IpAdk6aZX5IToFfSWnGkdPn6HAOTivJSD7NQYziYbi7GvhnVtRdMFEnOmSRSWi7z79pu7/Ol/EepLFiKK2WibJ56pzPwNGxFmjvqOrzluxwPR47rO2qk=
+	t=1779970827; cv=none; b=WXlKJ1u3NbLAP2+8eKtrCmXFh+YbUjqqMobBJqiOWzSOiGZ+MbzMEDOzn/CWPL3dKhib7Xy5KLke8ELSdRW0KJeqW0cvzu7G448TnCmrsuWVsze1aSusesO7vTcdl17EYkKodzHr7EzAR3nbTZk7PF7Hyt3yeEFH2QnBOR/Pq/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779970564; c=relaxed/simple;
-	bh=CamgIaj00t7/u1s8NBaExqKh1wc1jw2lnLYIAPBePjs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MFqIZjuG9/YhIe66O8hdN4RAZWZIUNmEO06p4aGjBhrOPXJ8UzdSfMPgbJCgkD7olyXmBIesVUqmFZ3c0tHc0cWmxBHHLxqe+zS2xGWubTqS9IntLsILKapZc3tbfFpZo0iDoskdIl2nqZw/STXtbg3FZq9Vzq3wudM/Q7y3koY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NY3SDf4a; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779970561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PaXUneZhU8CQ9NF6Ce2ctH/nbBN3Z+dK2XdtCVXD+cc=;
-	b=NY3SDf4awyNdhPcH+u0HAgfnjXrc4dMyfn7GVgvwfH/0ZtqNn1k7Fy2ZR7/1ySaBVceZFX
-	i92BOTqOu1Sf+X3N5ZkDgVt1UTY0pcYZ8j/AcP5oo25ompETIYbMMhYbWyr4FZc/7tc497
-	AmvKrlYqBnrQDDc3h15UHC+o2LLF7ig=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-TiH_A2_uNYeWVzpTg7Yksg-1; Thu,
- 28 May 2026 08:15:58 -0400
-X-MC-Unique: TiH_A2_uNYeWVzpTg7Yksg-1
-X-Mimecast-MFC-AGG-ID: TiH_A2_uNYeWVzpTg7Yksg_1779970556
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CD3C1956094;
-	Thu, 28 May 2026 12:15:56 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.88.73])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 613901771;
-	Thu, 28 May 2026 12:15:54 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Minxi Hou <houminxi@gmail.com>
-Cc: netdev@vger.kernel.org,  davem@davemloft.net,  echaudro@redhat.com,
-  edumazet@google.com,  horms@kernel.org,  i.maximets@ovn.org,
-  kuba@kernel.org,  pabeni@redhat.com,  shuah@kernel.org,
-  dev@openvswitch.org,  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3] selftests: openvswitch: add dec_ttl action
- support and test
-In-Reply-To: <20260527080601.615607-1-houminxi@gmail.com> (Minxi Hou's message
-	of "Wed, 27 May 2026 16:06:01 +0800")
-References: <20260527080601.615607-1-houminxi@gmail.com>
-Date: Thu, 28 May 2026 08:15:52 -0400
-Message-ID: <f7ttsrrpw5j.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1779970827; c=relaxed/simple;
+	bh=xt+tIAuY1qRBUbzTBjqohZUCP7nPKpHFgakFTMUkD5o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZV5Q2Thl+ukOmCIJHuKWBajCC39OLBKboMy35IZBcrrBrl1d0nkDEWd5XKRcBNehV/f7S35eodSmSXby+zAQUANMwm1HCTDXqFpwMzI5uyvJ33A+lUksmhI27VYldlhOatm4ypbFX5jf5y1+GarogX7YMl8WywF+NwRJ9AXZAOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wSZiZ-000000007ty-1LZT;
+	Thu, 28 May 2026 12:20:07 +0000
+Date: Thu, 28 May 2026 13:20:04 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: javen <javen_xu@realsil.com.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, freddy_gu@realsil.com.cn, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vladimir.oltean@nxp.com,
+	=?iso-8859-1?Q?Bal=E1zs?= Triszka <info@balika011.hu>
+Subject: Re: [PATCH net-next v1 2/2] net: phy: realtek: load firmware for
+ RTL8261C
+Message-ID: <ahgy9Cce9MmY6KLl@makrotopia.org>
+References: <20260528075226.1054-1-javen_xu@realsil.com.cn>
+ <20260528075226.1054-3-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260528075226.1054-3-javen_xu@realsil.com.cn>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,vger.kernel.org,nxp.com,balika011.hu];
+	TAGGED_FROM(0.00)[bounces-292676-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-292675-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ovs-dpctl.py:url]
-X-Rspamd-Queue-Id: 411485F1FE5
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,realsil.com.cn:email]
+X-Rspamd-Queue-Id: 2716A5F20C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Minxi Hou <houminxi@gmail.com> writes:
+On Thu, May 28, 2026 at 03:52:26PM +0800, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> This patch adds support for loading firmware. Download some parameters
+> for RTL8261C.
 
-> Add dec_ttl action support to the OVS kernel datapath selftest
-> framework:
->
->   - Add dec_ttl nested NLA class to ovs-dpctl.py with proper
->     OVS_DEC_TTL_ATTR_ACTION sub-attribute handling
->   - Add parse support for dec_ttl(le_1(<inner_actions>)) action
->     string, consistent with the odp-util.c format where le_1()
->     holds the actions taken when TTL reaches 1
->   - Add dpstr output formatting for dec_ttl actions
->   - Add test_dec_ttl() to openvswitch.sh that verifies:
->     * Normal TTL packets are forwarded after decrement
->     * TTL=1 packets are dropped (TTL expiry)
->     * Graceful skip via ksft_skip if kernel lacks dec_ttl support
->
-> The dec_ttl class uses late-binding type resolution to reference
-> ovsactions for its inner action list, avoiding circular references
-> at class definition time.
->
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
+I'd like to bring to your attention that the OpenWrt community
+has impemented a more complete support for initial register patching
+using a extremely similar firmware format.
 
-Thanks Minxi - this case will be very helpful.
+https://github.com/openwrt/openwrt/blob/main/target/linux/generic/pending-6.18/742-net-phy-realtek-add-5G-and-10G-PHY-support.patch
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+We used 'RTK_PATCH_OP_*' while this series uses only 'OP_*' as
+macro names defining the initval patching operations.
 
+As the vendor downstream driver had the operations hard-coded in tables
+our community came up with a tool to generate the patching blobs from the
+GPL-licensed vendor driver:
+
+https://github.com/balika011/realtek_phy_firmware
+
+Given the similarity I wonder if this code has been taken from Balázs
+Triszka work (which clearly predates it) without giving him the due
+credit.
 
