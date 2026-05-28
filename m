@@ -1,62 +1,92 @@
-Return-Path: <netdev+bounces-292837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YB5PN02nGGp+lwgAu9opvQ
-	(envelope-from <netdev+bounces-292837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:36:29 +0200
+	id cCc+EXeoGGp+lwgAu9opvQ
+	(envelope-from <netdev+bounces-292838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:41:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BDA55F916A
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:36:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B615F9540
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:41:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C11D31DB7D4
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:21:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7EEB6309E646
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AA22F8E83;
-	Thu, 28 May 2026 20:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45717356A0D;
+	Thu, 28 May 2026 20:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ovR6ITyw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qACQo+rq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884C32D9787;
-	Thu, 28 May 2026 20:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A2E35200F
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 20:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779999668; cv=none; b=Pg864k4JHzPnI2ajgxQh3oKudo7FBWY8nO9X1EHATm2oLOycn4QGy/+Q47ISoausYLFMM+Cpw5UxKdflTcbGwJcPPBvt7e7HKA3infrekzxZuAiAlEEsU4wqPGzmGjF3I2V8U3Kt4WG+zKvOwEy3lBYG/vnoyHlIHII9uDNCa6Q=
+	t=1780000573; cv=none; b=cfxtcEWgSdIm3SphS0bZJfgNrxxOTs4gG9mNSI/wiX4s3B8cnBpubuA7E7+/YBasbRREL0ct0HxAuzF+oLKI4SiOZFqsS0j0MM/acAjip9UdZlWLuHmHSJIplvWF0wpUi2jey6L1XuMmPS5Vtas/rRsrkqFpS1OiPc9ayy9oBgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779999668; c=relaxed/simple;
-	bh=Jwgu1uWohqE8+JEjjhyrCKMGbHKCzl40Xp0G/F4utNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QSa5c5kMZdM2UxHrXxC8aL11cJrtc30mszCCUzCYLAbbs3kJdaj16jNEFxvTn3tn6+f++TMdhg25ZwzkAURhJ87oxqa+R3l0FIoRgM4c7boOGHy92pMOl+5/Ifw/ijjnjRCe5RvSbz03GndQURPa8h3griALvAph7burV7YIgJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ovR6ITyw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 198441F000E9;
-	Thu, 28 May 2026 20:21:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779999667;
-	bh=5eONnNKTCQ7J+VL/0T2D8f46O9JGX3erMF4ccylrlRA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ovR6ITyw4vDUWE3RAN7s5rmwZZT9QGWXAxvYxNiYGVjOQH72Ng1iLDTcMIioCcKh/
-	 7FJhVtQAwPkKYjj/nYaNEQU+Uhzy+GE/GQxqNYp8y9cEGrteoGGf89XT5t1vlK5HgE
-	 AwgZSAhrWKQRAs95eiVfxtgwA5PgbWndNO3wra/2RMpj87u1Us3OMP/ZT0DRBDvN2k
-	 s3dkZmsi2bvL17OAsz5ErZMhM6+IeAAqjvKDfqnTHH7Tyx5wXUSvYO+sFn8cenhIWo
-	 yYj/ZaDR/XKX1lL6+9RM4SwfsANDNeXi8el+udy47j3jS2kJYQefQ+r6xxz+5XkoMe
-	 pY77GVYPSqTNg==
-From: Simon Horman <horms@kernel.org>
-To: kipreyyy@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	david+nfc@ixit.cz,
-	kuba@kernel.org,
-	oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH nfc] nfc: nci: fix double completion race in nci_data_exchange_complete
-Date: Thu, 28 May 2026 21:16:26 +0100
-Message-ID: <20260528201624.2730799-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260526103121.47957-1-kipreyyy@gmail.com>
-References: <20260526103121.47957-1-kipreyyy@gmail.com>
+	s=arc-20240116; t=1780000573; c=relaxed/simple;
+	bh=x6oGcWWWDQfDqcCU7PkoHIAD74jyO7vWkfckEQCPXvM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bGMlzar+fIZFz628G3y5aO/JjqMBoFAOdsBpMmkMBtAqTYBu70JbpeVN/LIIetHiJBK9oLv0x+449Wa9OmVgpPeeAw0M8cccJeRmS2ObCYXAKpUUb9rMgevkYpekNRx+mdEqRoSkHVPnfFZNaa+T9DZ8oJcvmpRc27onCzk+jYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qACQo+rq; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-369002b26f4so7785009a91.3
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 13:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780000571; x=1780605371; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ql2aRaaprs6WrGu8tmGWv8UQcUIzHaXz46Uq9P4wzk=;
+        b=qACQo+rqaNjX3IDEUhvolkl/Lrajil04iTM55vaqtQGEbvDb1BIW1PpyEEzoEyjIDn
+         Doaf6RvQCI51insdXXLtiyofm41WWVJU1zZdIxVvtkoc/6pzirS/4+Y9GiLifMRQmPaZ
+         oSxR87IaCZ+Ki2Y52AgdZZesK4rnnmpu7CqH0wqoVdVleuWJx8LHeso0Kh1nsjk9Sc1S
+         +qyp29pvyNplehKmzMKBhSauoQutDHvyy9AgtOWfjvtNZYEnKogAXyxXF1Md06Ui0DEm
+         ZzZLTQOPkGhiRukJwMygOYGetJWaVWaO8zx40VwNubS08BhFfnpR4BlOfjQr7tR5zE3I
+         F/Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780000571; x=1780605371;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ql2aRaaprs6WrGu8tmGWv8UQcUIzHaXz46Uq9P4wzk=;
+        b=WmW5O4S/Ir825lH0ICNdbPeAco6vaHY/5efpYfxUPoLC3e21a7cLX8E/HC0IH/4fj7
+         xNvbJr4X8YlEudgyaLBzKxnC5zl499c1WJowBO41MIc2vANUpTEz/DnVArgeXGzu3js4
+         2aUlgrWHeggkYUv3fGAuFxdWM06JdX2+GxTulnd2AUcfiUTsHcd5oAFugbBvVwWumJ6d
+         Vlc7S3pb+N4UlGbBNF1+v991j1h387rHewbEfIvT45smPIq01vCekt1GIP1eVBMhA/3Z
+         NROY7zaMKZ8QNtt/dxZKRLva95QI8XHFTmT3kK/EBfsswgr5hR5ZwOe/NIbGQ65whraz
+         aBWA==
+X-Gm-Message-State: AOJu0YxMRxyF9IE1onYYAyDlZe5SjfGielTIWdnjnTEFtF+p3hmbuUhn
+	5mQKr+7QXq+vHHxS5VPr4Rb8CXDBDfhlr6ZHrU6LW8zUej3a42surp2dSavWOFVg
+X-Gm-Gg: Acq92OHi8fKtEJahdZf/0xkELYobIDczaWvQVl4Q78v53P8MtusZZqTO2AI+WUBnxfZ
+	qVTKSoeuT+yM+R4AC6XjY65JUt+Y71/W6bVi+5WQfHX9FYfIxyeWxIktWs6sWsKbh3xjoXne0FE
+	b1man+j1h7afztUa6SomjAuRXeIjiK4cfO7u4FJpP+kg35BNwJ0utIU5SFeE7sd0Kt/BwaSevNW
+	vl6ST5nXLJd/fOZvZm3hV17OPAfBAVGsc+47kMDKZFid+xDOUXseiP128TUhXd84B1exfHd7kly
+	s1i9DfYglcHNJqAZCMxpGNhzfZsYRZtBEi3OVHA8BX43HbKF0YIDE7UlxLwsKmjNJLySamJIrt0
+	hl0X7hW4xFk4+oQ2cY5/mpTqkj+bw/AlZrrlj3I1UAMOvB+HYTvEsFdKZR9Aouwg8ztvchLdMlX
+	WSw2oTPQdPbPWwCjm4LeQ0X/WLlEq/fEJ7UiW2MhIi4xTp/hcAhayRINyDqT3XAbJa05432w==
+X-Received: by 2002:a17:903:18c:b0:2bd:8dbd:17e6 with SMTP id d9443c01a7336-2bf1ed4d997mr3553615ad.35.1780000571010;
+        Thu, 28 May 2026 13:36:11 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([2a09:bac1:7680:d30::4cf:38])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf1e5ca55dsm1870645ad.7.2026.05.28.13.36.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 13:36:10 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: sja1105: flower: reject cross-chip redirect
+Date: Fri, 29 May 2026 04:35:44 +0800
+Message-ID: <20260528203549.1918040-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,170 +94,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-292837-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292838-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3BDA55F916A
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 24B615F9540
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+The driver silently accepts a destination port on a different switch
+chip, then programs its index (on another chip) into the local hardware,
+which redirects to the wrong port or possibly crashes if the port index
+is out of bound locally.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Add a check for it and adjust the extack message.
+
+Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
-Subject: nfc: nci: fix double completion race in nci_data_exchange_complete
+ drivers/net/dsa/sja1105/sja1105_flower.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This patch attempts to resolve a double completion race condition by
-replacing clear_bit() with test_and_clear_bit() on the NCI_DATA_EXCHANGE
-flag. This is intended to prevent a socket refcount underflow when
-nci_close_device() and nci_rx_work() execute concurrently.
+diff --git a/drivers/net/dsa/sja1105/sja1105_flower.c b/drivers/net/dsa/sja1105/sja1105_flower.c
+index fba926f85b47..7547999a113f 100644
+--- a/drivers/net/dsa/sja1105/sja1105_flower.c
++++ b/drivers/net/dsa/sja1105/sja1105_flower.c
+@@ -391,9 +391,9 @@ int sja1105_cls_flower_add(struct dsa_switch *ds, int port,
+ 			struct dsa_port *to_dp;
+ 
+ 			to_dp = dsa_port_from_netdev(act->dev);
+-			if (IS_ERR(to_dp)) {
++			if (IS_ERR(to_dp) || to_dp->ds != ds) {
+ 				NL_SET_ERR_MSG_MOD(extack,
+-						   "Destination not a switch port");
++						   "Destination not a local switch port");
+ 				return -EOPNOTSUPP;
+ 			}
+ 
+-- 
+2.53.0
 
-> diff --git a/net/nfc/nci/data.c b/net/nfc/nci/data.c
-> index 5f98c73db5afd..4253edea5c8db 100644
-> --- a/net/nfc/nci/data.c
-> +++ b/net/nfc/nci/data.c
-> @@ -46,11 +46,11 @@ void nci_data_exchange_complete(struct nci_dev *ndev, struct sk_buff *skb,
-
-1.
-Simon says: Although the issue flagged below is pre-existing, it appears
-            to be exacerbated by this patch and thus I believe it
-	    needs to be considered in that context.
-
-[Severity: High]
-This is a pre-existing issue, but does an NTF packet with an invalid
-connection ID improperly clear the transceive state?
-
-Looking earlier in nci_data_exchange_complete():
-
-    conn_info = nci_get_conn_info_by_conn_id(ndev, conn_id);
-    if (!conn_info) {
-        kfree_skb(skb);
-        clear_bit(NCI_DATA_EXCHANGE, &ndev->flags);
-        return;
-    }
-
-If a misbehaving or malicious NFC hardware sends an error NTF packet with an
-invalid connection ID while a valid RF transceive operation is active, it
-would execute clear_bit(NCI_DATA_EXCHANGE, &ndev->flags). Would this abort
-the ongoing transceive state machine and drop the actual response when it
-arrives?
-
-2.
-Simon says: Conversely, the issue flagged below seems to be orthogonal
-            to this patch. And I think it can be treated in the context
-	    of possible follow-up.
-
-[Severity: Critical]
-This isn't a bug introduced by this patch, but is there a use-after-free
-race condition in nci_transceive()?
-
-In nci_transceive(), the NCI_DATA_EXCHANGE flag is set using
-test_and_set_bit() before the data_exchange_cb and data_exchange_cb_context
-pointers are updated on the conn_info structure.
-
-Since incoming packets and notifications are processed concurrently by
-nci_rx_work, could an exceptionally fast response or a concurrent interface
-error notification trigger nci_data_exchange_complete() immediately after
-the bit is set but before the callback pointers are updated?
-
-This could cause the lockless reader to fetch the stale callback and context
-pointers from a previous transceive socket and execute them.
-
->  	timer_delete_sync(&ndev->data_timer);
->  	clear_bit(NCI_DATA_EXCHANGE_TO, &ndev->flags);
->  
-> -	/* Mark the exchange as done before calling the callback.
-> -	 * The callback (e.g. rawsock_data_exchange_complete) may
-> -	 * want to immediately queue another data exchange.
-> -	 */
-> -	clear_bit(NCI_DATA_EXCHANGE, &ndev->flags);
-> +	/* Claim completion atomically -- both close and rx_work may race here */
-> +	if (!test_and_clear_bit(NCI_DATA_EXCHANGE, &ndev->flags)) {
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-
-3.
-Simon says: Like issue 1. I believe the issue below should be considered
-            in the context of this patch.
-
-[Severity: High]
-Will this change cause valid HCI and loopback packets to be dropped?
-
-The NCI_DATA_EXCHANGE bit is only set during RF transceive operations in
-nci_transceive(). Subsystems like HCI (via nci_hci_send_cmd()) and loopback
-send data without setting this global flag.
-
-If valid HCI or loopback data packets arrive, won't they fail this bit
-check, causing the SKB to be dropped and skipping callbacks like
-nci_hci_data_received_cb?
-
-Additionally, if an asynchronous packet arrives concurrently while a valid
-RF transceive is active, could it falsely consume the NCI_DATA_EXCHANGE bit?
-When the actual RF response arrives, it would then fail the check, drop the
-packet, and permanently leak the socket's reference count.
-
->  
->  	if (cb) {
->  		/* forward skb to nfc core */
->  		cb(cb_context, skb, err);
-
-4.
-Simon says: And like issue 3. I believe this is orthogonal to this patch
-            and can be considered in the context of possible follow-up.
-
-[Severity: High]
-This is a pre-existing issue, but does this code leak the SKB when an
-error status is returned?
-
-When nci_add_rx_data_frag() processes an incoming fragment with a non-zero
-status byte, it passes both the valid skb and the err code to
-nci_data_exchange_complete(), which forwards them to the cb here.
-
-Looking at core callbacks like rawsock_data_exchange_complete():
-
-net/nfc/rawsock.c:rawsock_data_exchange_complete() {
-    ...
-    if (err)
-        goto error;
-    ...
-error:
-    sock_put(sk);
-}
-
-The error label bypasses the error_skb label where kfree_skb(skb) is called.
-Does this result in an unconditional memory leak of the SKB whenever the
-hardware or external target responds with an error status?
-
->  	} else if (skb) {
->  		pr_err("no rx callback, dropping rx data...\n");
-[ ... ]
 
