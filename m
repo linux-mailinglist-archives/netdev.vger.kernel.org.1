@@ -1,640 +1,391 @@
-Return-Path: <netdev+bounces-292635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292636-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LuBO60NGGrMbAgAu9opvQ
-	(envelope-from <netdev+bounces-292635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:41:01 +0200
+	id +PWHEZ4PGGrmbQgAu9opvQ
+	(envelope-from <netdev+bounces-292636-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:49:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A295EFC50
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:41:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B2155EFED2
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 250993065A11
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:35:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C69BE31AB922
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09BD377EC5;
-	Thu, 28 May 2026 09:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9CF3AC0D0;
+	Thu, 28 May 2026 09:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UdwJSlwG"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="3ew0LED+"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56FB3AEF2A;
-	Thu, 28 May 2026 09:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C137130C153;
+	Thu, 28 May 2026 09:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779960892; cv=none; b=QpCNT3JLsR2dLUIgOkTR9vb5QRDuaFfcZDNlo3yxxrhmeo+BEsH3m5wjyTbtIOb4LIohBUh2AW/dPaxni9RtbW4tbWYBHqDd7PbGNobS6f2pC+MPMozy5knXn8DDw9Pge7dkTxS9t4JsVkqsiVtNYx9SZzEsBvNSJ9lepnFvtAk=
+	t=1779961070; cv=none; b=jw4jms9egW4KI4NyBjw6sdXjFBfLwO55zDId/rTsIsF9cwW7KnepxZ+pB4l3kQLOkeXNGg/6l8Jjwr71fseog0pb9H1/+lTijtn8pxgzWQxFAUOVmsk5KDY+FF6sgPY5/BiE/yXEZQD/G1GSas1lBnGDrz8nbCnssEO1kbH+DFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779960892; c=relaxed/simple;
-	bh=A3wQNKh0vEBjXzsNRMEpQzJiUDmEV1RHx3wBChQBF+Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bTw6+6yDeR3pyD1ccBGmf3CpUds4G2tjhghyw0uAlA8jkUmmTYQUQhgdFiL+xyRyCNHCrvq9pTs8mNI9fvKEy99GqSbjMHJx4tEpmlAgdyfk6TEvde8jp87qalVAC6r0qd5zi5VG0XImFunMATO2etEX/C6nYjs+iCRrdcgR9oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UdwJSlwG; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=xIEmh9cJuZ7QDznvu36mC2c+m1LHMnAwVRG0Zaa/+UI=; b=UdwJSlwGYXHY0aNdOlFLgU8+A3
-	Vm9NuAUu1g95X50e49OXca/tWP7AJOY2H8+9U6UnhXgKz2p9bHm0oHf80trs0gK15Yvzk4GTjcOHM
-	9Rc9lH5m976sbim6KrNgYwKtTMKFDTr5Z3dIhVNjBogQcVCZjSTZCCfiY0lkj0xcKsknUd/IRZM74
-	N6khPYl8NimmXOG46IYzL/mvgKko/JrLdmoCVuA8ROO9Lv0JH4uISFs8JuEwqqqtOTfYgr95+pWBU
-	Tp2BN8XGiuZxuUEtzNDo2oqj71V8S/muNgLwVgaAA0Lz7WHywwSs+tVUFPn5oslaC8+s5gNbEPIKk
-	ADWFom2g==;
-Received: from 2a02-8389-2341-5b80-decc-1a96-daaa-a2cc.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:decc:1a96:daaa:a2cc] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wSX8b-00000005WEM-0evp;
-	Thu, 28 May 2026 09:34:49 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Vlastimil Babka <vbabka@kernel.org>,
-	Harry Yoo <harry@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Hao Li <hao.li@linux.dev>,
-	Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	io-uring@vger.kernel.org,
-	kasan-dev@googlegroups.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-Date: Thu, 28 May 2026 11:34:32 +0200
-Message-ID: <20260528093437.2519248-2-hch@lst.de>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260528093437.2519248-1-hch@lst.de>
-References: <20260528093437.2519248-1-hch@lst.de>
+	s=arc-20240116; t=1779961070; c=relaxed/simple;
+	bh=DbeE1O58EkERW09o40h4qA2vpdQndQc9/Kj8M9LJaLE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=XZl7C2paURsusKNtHbk9wurGnRx3+YPe5RMviLr/erR56IHS0MVfDWsQpX9PNb8pgPOl2k9X/mFqup7Yja+E6jyl44uKD2ERG5E56zhSGPxrM4vfw7oSZ3TmFCTIAYIKlgNvZLVXU8U21VUnpzOLRZZynwHIInbU1jy9kFqPaVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=3ew0LED+; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 15C7DA0155;
+	Thu, 28 May 2026 11:37:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1779961065; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=pCC7dcbSgjbz+3b/O6NNkMSBzrVvzuW6akWbwyW2T7k=;
+	b=3ew0LED+1e20K0Eq9g8z/4bCc7+MowrjyVstaFxhzBxKcatd/7lpyh+xjlAh/ZyJ8Wv3il
+	Zeh8X/4bP++ZQRn7cnC2yB8WEd9b1kyRO41XrvotkHiONFpbNY1QKK8UfFnX+NCWhpltWI
+	+F7TpPMF3fc6VstSGlXLR4L9+6T1H4lwDNhO7SjsaDEHVHE2B9jemiDKM+UMANjauQoCT9
+	UAblv3CuCHYPE0US74tDsHl6BW9geps+bKNMsLcH2O5D3xPAVJIm1uStd0Cr0Q0jGHpCtd
+	ONTHYlEDIachCt1rdMSahVmEJGKnHJo5NfuhIBgQaT0m3DFEYOqMIQhsPiMVaw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Date: Thu, 28 May 2026 11:37:43 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: javen <javen_xu@realsil.com.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, freddy_gu@realsil.com.cn, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, daniel@makrotopia.org, vladimir.oltean@nxp.com
+Subject: Re: [PATCH net-next v1 1/2] net: phy: realtek: add support for
+ RTL8261
+In-Reply-To: <20260528075226.1054-2-javen_xu@realsil.com.cn>
+References: <20260528075226.1054-1-javen_xu@realsil.com.cn>
+ <20260528075226.1054-2-javen_xu@realsil.com.cn>
+Message-ID: <d37ead5b1f9549d4903138cc4f70ffd0@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[lst.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-292635-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	TAGGED_FROM(0.00)[bounces-292636-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,vger.kernel.org,makrotopia.org,nxp.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hch@lst.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:mid,lst.de:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:email,infradead.org:dkim]
-X-Rspamd-Queue-Id: F0A295EFC50
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tipi-net.de:mid,tipi-net.de:dkim,realsil.com.cn:email]
+X-Rspamd-Queue-Id: 9B2155EFED2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The kmem_cache_alloc_bulk return value is weird.  It returns the number
-of allocated objects, but that must always be 0 or the requested number
-based on the implementations and the handling in the callers, but that
-assumption is not actually documented anywhere, which confuses automated
-review tools.
+Hi Javen
 
-Fix this by returning a bool if the allocation succeeded and adding a
-kerneldoc comment explaining the API.
+On 28.5.2026 09:52, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> This patch adds support for Realtek phy chip RTL8261. Its PHY id is
+> 0x001cc898 and 0x001cc899.
+> 
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> ---
+>  drivers/net/phy/realtek/realtek_main.c | 315 +++++++++++++++++++++++++
+>  1 file changed, 315 insertions(+)
+> 
+> diff --git a/drivers/net/phy/realtek/realtek_main.c 
+> b/drivers/net/phy/realtek/realtek_main.c
+> index 27268811f564..fe743fd0421b 100644
+> --- a/drivers/net/phy/realtek/realtek_main.c
+> +++ b/drivers/net/phy/realtek/realtek_main.c
+> @@ -22,6 +22,9 @@
+>  #include "../phylib.h"
+>  #include "realtek.h"
+> 
+> +#define RTL_8261C_CG			0x001cc898
+> +#define RTL_8261CE_CG			0x001cc899
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com> # skbuff
----
- drivers/gpu/drm/msm/msm_iommu.c       |  6 +--
- drivers/gpu/drm/panthor/panthor_mmu.c | 13 +++---
- include/linux/slab.h                  |  6 ++-
- io_uring/io_uring.c                   | 23 ++++-------
- lib/test_meminit.c                    | 23 +++++------
- mm/kasan/kasan_test_c.c               |  5 +--
- mm/kfence/kfence_test.c               |  9 ++--
- mm/slub.c                             | 59 +++++++++++++++------------
- net/bpf/test_run.c                    |  7 ++--
- net/core/skbuff.c                     | 24 ++++++-----
- tools/include/linux/slab.h            |  2 +-
- tools/testing/shared/linux.c          | 19 ++++-----
- 12 files changed, 97 insertions(+), 99 deletions(-)
+Imho these should be added below RTL_8261C and not at the top.
 
-diff --git a/drivers/gpu/drm/msm/msm_iommu.c b/drivers/gpu/drm/msm/msm_iommu.c
-index 058c71c82cf5..533104d71f6c 100644
---- a/drivers/gpu/drm/msm/msm_iommu.c
-+++ b/drivers/gpu/drm/msm/msm_iommu.c
-@@ -330,17 +330,15 @@ static int
- msm_iommu_pagetable_prealloc_allocate(struct msm_mmu *mmu, struct msm_mmu_prealloc *p)
- {
- 	struct kmem_cache *pt_cache = get_pt_cache(mmu);
--	int ret;
- 
- 	p->pages = kvmalloc_objs(*p->pages, p->count);
- 	if (!p->pages)
- 		return -ENOMEM;
- 
--	ret = kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, p->count, p->pages);
--	if (ret != p->count) {
-+	if (!kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, p->count, p->pages)) {
- 		kfree(p->pages);
- 		p->pages = NULL;
--		p->count = ret;
-+		p->count = 0;
- 		return -ENOMEM;
- 	}
- 
-diff --git a/drivers/gpu/drm/panthor/panthor_mmu.c b/drivers/gpu/drm/panthor/panthor_mmu.c
-index 75d98dad7b1d..b12c641af46c 100644
---- a/drivers/gpu/drm/panthor/panthor_mmu.c
-+++ b/drivers/gpu/drm/panthor/panthor_mmu.c
-@@ -1274,13 +1274,13 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
- 		goto err_cleanup;
- 	}
- 
--	ret = kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, pt_count,
--				    op_ctx->rsvd_page_tables.pages);
--	op_ctx->rsvd_page_tables.count = ret;
--	if (ret != pt_count) {
-+	if (!kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, pt_count,
-+			op_ctx->rsvd_page_tables.pages)) {
-+		op_ctx->rsvd_page_tables.count = 0;
- 		ret = -ENOMEM;
- 		goto err_cleanup;
- 	}
-+	op_ctx->rsvd_page_tables.count = pt_count;
- 
- 	/* Insert BO into the extobj list last, when we know nothing can fail. */
- 	dma_resv_lock(panthor_vm_resv(vm), NULL);
-@@ -1328,9 +1328,8 @@ static int panthor_vm_prepare_unmap_op_ctx(struct panthor_vm_op_ctx *op_ctx,
- 			goto err_cleanup;
- 		}
- 
--		ret = kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, pt_count,
--					    op_ctx->rsvd_page_tables.pages);
--		if (ret != pt_count) {
-+		if (!kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, pt_count,
-+				op_ctx->rsvd_page_tables.pages)) {
- 			ret = -ENOMEM;
- 			goto err_cleanup;
- 		}
-diff --git a/include/linux/slab.h b/include/linux/slab.h
-index 2b5ab488e96b..6a7b452d43a0 100644
---- a/include/linux/slab.h
-+++ b/include/linux/slab.h
-@@ -815,8 +815,10 @@ kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t flags,
-  */
- void kmem_cache_free_bulk(struct kmem_cache *s, size_t size, void **p);
- 
--int kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags, size_t size, void **p);
--#define kmem_cache_alloc_bulk(...)	alloc_hooks(kmem_cache_alloc_bulk_noprof(__VA_ARGS__))
-+bool kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags,
-+		size_t size, void **p);
-+#define kmem_cache_alloc_bulk(...) \
-+	alloc_hooks(kmem_cache_alloc_bulk_noprof(__VA_ARGS__))
- 
- static __always_inline void kfree_bulk(size_t size, void **p)
- {
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 103b6c88f252..bf847ca823f7 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -978,29 +978,24 @@ __cold bool __io_alloc_req_refill(struct io_ring_ctx *ctx)
- {
- 	gfp_t gfp = GFP_KERNEL | __GFP_NOWARN | __GFP_ZERO;
- 	void *reqs[IO_REQ_ALLOC_BATCH];
--	int ret;
--
--	ret = kmem_cache_alloc_bulk(req_cachep, gfp, ARRAY_SIZE(reqs), reqs);
-+	int nr_reqs = ARRAY_SIZE(reqs);
- 
- 	/*
--	 * Bulk alloc is all-or-nothing. If we fail to get a batch,
--	 * retry single alloc to be on the safe side.
-+	 * Bulk alloc is all-or-nothing. If we fail to get a batch, retry a
-+	 * single allocation to be on the safe side.
- 	 */
--	if (unlikely(ret <= 0)) {
-+	if (!kmem_cache_alloc_bulk(req_cachep, gfp, nr_reqs, reqs)) {
- 		reqs[0] = kmem_cache_alloc(req_cachep, gfp);
- 		if (!reqs[0])
- 			return false;
--		ret = 1;
-+		nr_reqs = 1;
- 	}
- 
--	percpu_ref_get_many(&ctx->refs, ret);
--	ctx->nr_req_allocated += ret;
--
--	while (ret--) {
--		struct io_kiocb *req = reqs[ret];
-+	percpu_ref_get_many(&ctx->refs, nr_reqs);
-+	ctx->nr_req_allocated += nr_reqs;
- 
--		io_req_add_to_cache(req, ctx);
--	}
-+	while (nr_reqs--)
-+		io_req_add_to_cache(reqs[nr_reqs], ctx);
- 	return true;
- }
- 
-diff --git a/lib/test_meminit.c b/lib/test_meminit.c
-index d028a6552cd6..68c3b9da090e 100644
---- a/lib/test_meminit.c
-+++ b/lib/test_meminit.c
-@@ -229,16 +229,14 @@ static int __init do_kmem_cache_size(size_t size, bool want_ctor,
- 	for (iter = 0; iter < 10; iter++) {
- 		/* Do a test of bulk allocations */
- 		if (!want_rcu && !want_ctor) {
--			int ret;
--
--			ret = kmem_cache_alloc_bulk(c, alloc_mask, BULK_SIZE, bulk_array);
--			if (!ret) {
-+			if (!kmem_cache_alloc_bulk(c, alloc_mask, BULK_SIZE,
-+					bulk_array)) {
- 				fail = true;
- 			} else {
- 				int i;
--				for (i = 0; i < ret; i++)
-+				for (i = 0; i < BULK_SIZE; i++)
- 					fail |= check_buf(bulk_array[i], size, want_ctor, want_rcu, want_zero);
--				kmem_cache_free_bulk(c, ret, bulk_array);
-+				kmem_cache_free_bulk(c, BULK_SIZE, bulk_array);
- 			}
- 		}
- 
-@@ -348,23 +346,24 @@ static int __init do_kmem_cache_size_bulk(int size, int *total_failures)
- {
- 	struct kmem_cache *c;
- 	int i, iter, maxiter = 1024;
--	int num, bytes;
-+	int bytes;
- 	bool fail = false;
- 	void *objects[10];
- 
- 	c = kmem_cache_create("test_cache", size, size, 0, NULL);
- 	for (iter = 0; (iter < maxiter) && !fail; iter++) {
--		num = kmem_cache_alloc_bulk(c, GFP_KERNEL, ARRAY_SIZE(objects),
--					    objects);
--		for (i = 0; i < num; i++) {
-+		if (!kmem_cache_alloc_bulk(c, GFP_KERNEL, ARRAY_SIZE(objects),
-+				objects))
-+			continue;
-+
-+		for (i = 0; i < ARRAY_SIZE(objects); i++) {
- 			bytes = count_nonzero_bytes(objects[i], size);
- 			if (bytes)
- 				fail = true;
- 			fill_with_garbage(objects[i], size);
- 		}
- 
--		if (num)
--			kmem_cache_free_bulk(c, num, objects);
-+		kmem_cache_free_bulk(c, ARRAY_SIZE(objects), objects);
- 	}
- 	kmem_cache_destroy(c);
- 	*total_failures += fail;
-diff --git a/mm/kasan/kasan_test_c.c b/mm/kasan/kasan_test_c.c
-index 3f4ed29178b3..b9e167ed5be3 100644
---- a/mm/kasan/kasan_test_c.c
-+++ b/mm/kasan/kasan_test_c.c
-@@ -1225,14 +1225,13 @@ static void kmem_cache_bulk(struct kunit *test)
- 	struct kmem_cache *cache;
- 	size_t size = 200;
- 	char *p[10];
--	bool ret;
- 	int i;
- 
- 	cache = kmem_cache_create("test_cache", size, 0, 0, NULL);
- 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, cache);
- 
--	ret = kmem_cache_alloc_bulk(cache, GFP_KERNEL, ARRAY_SIZE(p), (void **)&p);
--	if (!ret) {
-+	if (!kmem_cache_alloc_bulk(cache, GFP_KERNEL, ARRAY_SIZE(p),
-+			(void **)&p)) {
- 		kunit_err(test, "Allocation failed: %s\n", __func__);
- 		kmem_cache_destroy(cache);
- 		return;
-diff --git a/mm/kfence/kfence_test.c b/mm/kfence/kfence_test.c
-index 10424cd25e5a..c472e66e7242 100644
---- a/mm/kfence/kfence_test.c
-+++ b/mm/kfence/kfence_test.c
-@@ -761,9 +761,10 @@ static void test_memcache_alloc_bulk(struct kunit *test)
- 	timeout = jiffies + msecs_to_jiffies(100 * kfence_sample_interval);
- 	do {
- 		void *objects[100];
--		int i, num = kmem_cache_alloc_bulk(test_cache, GFP_ATOMIC, ARRAY_SIZE(objects),
--						   objects);
--		if (!num)
-+		int i;
-+
-+		if (!kmem_cache_alloc_bulk(test_cache, GFP_ATOMIC,
-+				ARRAY_SIZE(objects), objects))
- 			continue;
- 		for (i = 0; i < ARRAY_SIZE(objects); i++) {
- 			if (is_kfence_address(objects[i])) {
-@@ -771,7 +772,7 @@ static void test_memcache_alloc_bulk(struct kunit *test)
- 				break;
- 			}
- 		}
--		kmem_cache_free_bulk(test_cache, num, objects);
-+		kmem_cache_free_bulk(test_cache, ARRAY_SIZE(objects), objects);
- 		/*
- 		 * kmem_cache_alloc_bulk() disables interrupts, and calling it
- 		 * in a tight loop may not give KFENCE a chance to switch the
-diff --git a/mm/slub.c b/mm/slub.c
-index a2bf3756ca7d..57b2af707e95 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -4981,8 +4981,8 @@ static int __prefill_sheaf_pfmemalloc(struct kmem_cache *s,
- 	return ret;
- }
- 
--static int __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags,
--				   size_t size, void **p);
-+static bool __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags,
-+		size_t size, void **p);
- 
- /*
-  * returns a sheaf that has at least the requested size
-@@ -5154,9 +5154,8 @@ int kmem_cache_refill_sheaf(struct kmem_cache *s, gfp_t gfp,
- 			return __prefill_sheaf_pfmemalloc(s, sheaf, gfp);
- 
- 		if (!__kmem_cache_alloc_bulk(s, gfp, sheaf->capacity - sheaf->size,
--					     &sheaf->objects[sheaf->size])) {
-+					     &sheaf->objects[sheaf->size]))
- 			return -ENOMEM;
--		}
- 		sheaf->size = sheaf->capacity;
- 
- 		return 0;
-@@ -7289,9 +7288,8 @@ refill_objects(struct kmem_cache *s, void **p, gfp_t gfp, unsigned int min,
- 	return refilled;
- }
- 
--static inline
--int __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t size,
--			    void **p)
-+static bool __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags,
-+		size_t size, void **p)
- {
- 	int i;
- 
-@@ -7312,30 +7310,43 @@ int __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t size,
- 		stat_add(s, ALLOC_SLOWPATH, i);
- 	}
- 
--	return i;
-+	return true;
- 
- error:
- 	__kmem_cache_free_bulk(s, i, p);
--	return 0;
--
-+	return false;
- }
- 
--/*
-- * Note that interrupts must be enabled when calling this function and gfp
-- * flags must allow spinning.
-+/**
-+ * kmem_cache_alloc_bulk - Allocate multiple objects
-+ * @s:		The cache to allocate from
-+ * @flags:	GFP_* flags. See kmalloc().
-+ * @size:	Number of objects to allocate
-+ * @p:		Array of allocated objects
-+ *
-+ * Allocate @size objects from @s and places them into @p.  @size must be larger
-+ * than 0.
-+ *
-+ * Interrupts must be enabled when calling this function and @flags must allow
-+ * spinning.
-+ *
-+ * Unlike alloc_pages_bulk(), this function does not check for already allocated
-+ * objects in @p, and thus the caller does not need to zero it.
-+ *
-+ * Return: %true if the allocation succeeded, or %false if it failed.
-  */
--int kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags, size_t size,
--				 void **p)
-+bool kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags,
-+		size_t size, void **p)
- {
- 	unsigned int i = 0;
- 	void *kfence_obj;
- 
- 	if (!size)
--		return 0;
-+		return false;
- 
- 	s = slab_pre_alloc_hook(s, flags);
- 	if (unlikely(!s))
--		return 0;
-+		return false;
- 
- 	/*
- 	 * to make things simpler, only assume at most once kfence allocated
-@@ -7352,18 +7363,18 @@ int kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags, size_t size,
- 	}
- 
- 	i = alloc_from_pcs_bulk(s, flags, size, p);
--
- 	if (i < size) {
- 		/*
- 		 * If we ran out of memory, don't bother with freeing back to
- 		 * the percpu sheaves, we have bigger problems.
- 		 */
--		if (unlikely(__kmem_cache_alloc_bulk(s, flags, size - i, p + i) == 0)) {
-+		if (unlikely(!__kmem_cache_alloc_bulk(s, flags, size - i,
-+				p + i))) {
- 			if (i > 0)
- 				__kmem_cache_free_bulk(s, i, p);
- 			if (kfence_obj)
- 				__kfence_free(kfence_obj);
--			return 0;
-+			return false;
- 		}
- 	}
- 
-@@ -7382,12 +7393,8 @@ int kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags, size_t size,
- 	 * memcg and kmem_cache debug support and memory initialization.
- 	 * Done outside of the IRQ disabled fastpath loop.
- 	 */
--	if (unlikely(!slab_post_alloc_hook(s, NULL, flags, size, p,
--		    slab_want_init_on_alloc(flags, s), s->object_size))) {
--		return 0;
--	}
--
--	return size;
-+	return likely(slab_post_alloc_hook(s, NULL, flags, size, p,
-+			slab_want_init_on_alloc(flags, s), s->object_size));
- }
- EXPORT_SYMBOL(kmem_cache_alloc_bulk_noprof);
- 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 2bc04feadfab..99ab9ddb05e3 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -243,12 +243,11 @@ static int xdp_recv_frames(struct xdp_frame **frames, int nframes,
- 			   struct net_device *dev)
- {
- 	gfp_t gfp = __GFP_ZERO | GFP_ATOMIC;
--	int i, n;
-+	int i;
- 	LIST_HEAD(list);
- 
--	n = kmem_cache_alloc_bulk(net_hotdata.skbuff_cache, gfp, nframes,
--				  (void **)skbs);
--	if (unlikely(n == 0)) {
-+	if (!kmem_cache_alloc_bulk(net_hotdata.skbuff_cache, gfp, nframes,
-+				   (void **)skbs)) {
- 		for (i = 0; i < nframes; i++)
- 			xdp_return_frame(frames[i]);
- 		return -ENOMEM;
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 44ac121cfccb..73045b688385 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -288,11 +288,11 @@ static inline struct sk_buff *napi_skb_cache_get(bool alloc)
- 
- 	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 	if (unlikely(!nc->skb_count)) {
--		if (alloc)
--			nc->skb_count = kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
--						GFP_ATOMIC | __GFP_NOWARN,
--						NAPI_SKB_CACHE_BULK,
--						nc->skb_cache);
-+		if (alloc && kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-+						   GFP_ATOMIC | __GFP_NOWARN,
-+						   NAPI_SKB_CACHE_BULK,
-+						   nc->skb_cache))
-+			nc->skb_count = NAPI_SKB_CACHE_BULK;
- 		if (unlikely(!nc->skb_count)) {
- 			local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 			return NULL;
-@@ -353,16 +353,18 @@ u32 napi_skb_cache_get_bulk(void **skbs, u32 n)
- 
- 	/* No enough cached skbs. Try refilling the cache first */
- 	bulk = min(NAPI_SKB_CACHE_SIZE - nc->skb_count, NAPI_SKB_CACHE_BULK);
--	nc->skb_count += kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
--					       GFP_ATOMIC | __GFP_NOWARN, bulk,
--					       &nc->skb_cache[nc->skb_count]);
-+	if (kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-+				  GFP_ATOMIC | __GFP_NOWARN, bulk,
-+				  &nc->skb_cache[nc->skb_count]))
-+		nc->skb_count += bulk;
- 	if (likely(nc->skb_count >= n))
- 		goto get;
- 
- 	/* Still not enough. Bulk-allocate the missing part directly, zeroed */
--	n -= kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
--				   GFP_ATOMIC | __GFP_ZERO | __GFP_NOWARN,
--				   n - nc->skb_count, &skbs[nc->skb_count]);
-+	if (kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
-+				  GFP_ATOMIC | __GFP_ZERO | __GFP_NOWARN,
-+				  n - nc->skb_count, &skbs[nc->skb_count]))
-+		n = nc->skb_count;
- 	if (likely(nc->skb_count >= n))
- 		goto get;
- 
-diff --git a/tools/include/linux/slab.h b/tools/include/linux/slab.h
-index 6d8e9413d5a4..2e63c2e726aa 100644
---- a/tools/include/linux/slab.h
-+++ b/tools/include/linux/slab.h
-@@ -183,7 +183,7 @@ __kmem_cache_create(const char *name, unsigned int size, unsigned int align,
- 		default: __kmem_cache_create)(__name, __object_size, __args, __VA_ARGS__)
- 
- void kmem_cache_free_bulk(struct kmem_cache *cachep, size_t size, void **list);
--int kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
-+bool kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
- 			  void **list);
- struct slab_sheaf *
- kmem_cache_prefill_sheaf(struct kmem_cache *s, gfp_t gfp, unsigned int size);
-diff --git a/tools/testing/shared/linux.c b/tools/testing/shared/linux.c
-index 8c7257155958..e9c3bc9b3272 100644
---- a/tools/testing/shared/linux.c
-+++ b/tools/testing/shared/linux.c
-@@ -154,7 +154,7 @@ void kmem_cache_shrink(struct kmem_cache *cachep)
- {
- }
- 
--int kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
-+bool kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
- 			  void **p)
- {
- 	size_t i;
-@@ -213,7 +213,7 @@ int kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
- 		pthread_mutex_unlock(&cachep->lock);
- 		if (cachep->callback)
- 			cachep->exec_callback = true;
--		return 0;
-+		return false;
- 	}
- 
- 	for (i = 0; i < size; i++) {
-@@ -224,7 +224,7 @@ int kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
- 			printf("Allocating %p from slab\n", p[i]);
- 	}
- 
--	return size;
-+	return true;
- }
- 
- struct kmem_cache *
-@@ -271,8 +271,8 @@ kmem_cache_prefill_sheaf(struct kmem_cache *s, gfp_t gfp, unsigned int size)
- 
- 	sheaf->cache = s;
- 	sheaf->capacity = capacity;
--	sheaf->size = kmem_cache_alloc_bulk(s, gfp, size, sheaf->objects);
--	if (!sheaf->size) {
-+	sheaf->size = size;
-+	if (!kmem_cache_alloc_bulk(s, gfp, size, sheaf->objects)) {
- 		free(sheaf);
- 		return NULL;
- 	}
-@@ -284,7 +284,6 @@ int kmem_cache_refill_sheaf(struct kmem_cache *s, gfp_t gfp,
- 		 struct slab_sheaf **sheafp, unsigned int size)
- {
- 	struct slab_sheaf *sheaf = *sheafp;
--	int refill;
- 
- 	if (sheaf->size >= size)
- 		return 0;
-@@ -299,12 +298,10 @@ int kmem_cache_refill_sheaf(struct kmem_cache *s, gfp_t gfp,
- 		return 0;
- 	}
- 
--	refill = kmem_cache_alloc_bulk(s, gfp, size - sheaf->size,
--				       &sheaf->objects[sheaf->size]);
--	if (!refill)
-+	if (!kmem_cache_alloc_bulk(s, gfp, size - sheaf->size,
-+			&sheaf->objects[sheaf->size]))
- 		return -ENOMEM;
--
--	sheaf->size += refill;
-+	sheaf->size += (size - sheaf->size);
- 	return 0;
- }
- 
--- 
-2.53.0
+> +
+>  #define RTL8201F_IER_PAGE			0x07
+>  #define RTL8201F_IER				0x13
+>  #define RTL8201F_IER_LINK			BIT(13)
+> @@ -141,6 +144,10 @@
+>  #define RTL8211F_PHYSICAL_ADDR_WORD1		17
+>  #define RTL8211F_PHYSICAL_ADDR_WORD2		18
+> 
+> +#define RTL8261X_EXT_ADDR_REG			0xa436
+> +#define RTL8261X_EXT_DATA_REG			0xa438
+> +#define RTL_8261X_SUB_PHY_ID_ADDR		0x801d
+> +
+>  #define RTL822X_VND1_SERDES_OPTION			0x697a
+>  #define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
+>  #define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
+> @@ -252,6 +259,57 @@
+>  #define RTL_8251B				0x001cc862
+>  #define RTL_8261C				0x001cc890
+> 
+> +#define RTL8261C_CE_MODEL		0x00
+> +#define RTL8261D_MODEL			0x81
+> +#define RTL8261X_PHYSR_REG		0xa434
+> +#define RTL8261X_GBCR_REG		0xa412
+> +#define RTL8261X_IMR			0xa4d2
+> +#define RTL8261X_ISR			0xa4d4
+> +#define RTL8261X_INT_AUTONEG_ERROR	BIT(0)
+> +#define RTL8261X_INT_PAGE_RECV		BIT(2)
+> +#define RTL8261X_INT_AUTONEG_DONE	BIT(3)
+> +#define RTL8261X_INT_LINK_CHG		BIT(4)
+> +#define RTL8261X_INT_PHY_REG_ACCESS	BIT(5)
+> +#define RTL8261X_INT_PME		BIT(7)
+> +#define RTL8261X_INT_ALDPS_CHG		BIT(9)
+> +#define RTL8261X_INT_JABBER		BIT(10)
+> +#define RTL8261X_PHYSR_LINK		BIT(2)
+> +#define RTL8261X_PHYSR_DUPLEX		BIT(3)
+> +#define RTL8261X_PHYSR_SPEED_L		GENMASK(5, 4)
+> +#define RTL8261X_PHYSR_SPEED_H		GENMASK(10, 9)
+> +
+> +/* Concatenated 4-bit speed code values (SPD_H << 2 | SPD_L) */
+> +#define RTL8261X_SPEED_CODE_500M	0x3	/* H=0, L=3 */
+> +#define RTL8261X_SPEED_CODE_1000M	0x7	/* H=1, L=3 */
+> +#define RTL8261X_SPEED_CODE_2500M	0x8	/* H=2, L=0 */
+> +#define RTL8261X_SPEED_CODE_5000M	0x9	/* H=2, L=1 */
+> +#define RTL8261X_SPEED_500		500
 
+500 MBit/s isnt a standard rate which also isnt represented in ethtool.
+Is this just for documentation or intended to be used? If yes, how?
+
+> [...]
+
+> +
+> +static int rtl8261x_get_features(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_c45_pma_read_abilities(phydev);
+> +	if (ret)
+> +		return ret;
+> +	/*
+> +	 * Supplement Multi-Gig speeds that may not be automatically detected
+> +	 * RTL8261X supports 2.5G/5G in addition to standard 10G
+> +	 */
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+> +			 phydev->supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+> +			 phydev->supported);
+
+Feature bits for 2.5 and 5 GBit/s are set unconditionally - even for the 
+generic variant.
+Do all variants have these capabilities? If not better add check for at 
+least the generic one.
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int rtl8261x_config_master_slave(struct phy_device *phydev)
+> +{
+> +	u16 val;
+> +	/*
+> +	 * Configure bits 15:14 of MMD 7.0x0020
+> +	 *
+> +	 * Bit 15 (Enable) | Bit 14 (Value) | Mode
+> +	 * ----------------|----------------|-------------
+> +	 *       0         |       0        | Auto (disabled)
+> +	 *       1         |       0        | Force Slave
+> +	 *       1         |       1        | Force Master
+> +	 */
+> +	switch (phydev->master_slave_set) {
+> +	case MASTER_SLAVE_CFG_MASTER_FORCE:
+> +		val = RTL8261X_MS_MASTER;
+> +		break;
+> +	case MASTER_SLAVE_CFG_SLAVE_FORCE:
+> +		val = RTL8261X_MS_SLAVE;
+> +		break;
+> +	case MASTER_SLAVE_CFG_UNKNOWN:
+> +	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
+> +	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
+> +	default:
+> +		val = RTL8261X_MS_AUTO;
+> +		break;
+> +	}
+> +
+> +	return phy_modify_mmd(phydev, MDIO_MMD_AN, RTL8261X_MULTIG_CTRL,
+> +			      RTL8261X_MASTER_SLAVE_MASK, val);
+> +}
+
+RTL8261X_MULTIG_CTRL is a IEEE-defined register, so it can use 
+MDIO_AN_10GBT_CTRL instead.
+Also the define for RTL8261X_MULTIG_CTRL can be dropped.
+
+While at it I would suggest to add MDIO_AN_10GBT_CTRL_MS_ENABLE (bit 15) 
+and
+MDIO_AN_10GBT_CTRL_MS_VALUE (bit 14) to include/uapi/linux/mdio.h and 
+also make use of it.
+RTL8261X_MS_AUTO would become
+
+   val = MDIO_AN_10GBT_CTRL_MS_ENABLE | MDIO_AN_10GBT_CTRL_MS_VALUE;
+
+> [...]
+
+> +
+> +static int rtl8261x_read_status(struct phy_device *phydev)
+> +{
+> +	int ret, val, speed_code;
+> +
+> +	ret = genphy_c45_read_status(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_PHYSR_REG);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	phydev->link = !!(val & RTL8261X_PHYSR_LINK);
+> +	if (!phydev->link) {
+> +		phydev->speed  = SPEED_UNKNOWN;
+> +		phydev->duplex = DUPLEX_UNKNOWN;
+> +		return 0;
+> +	}
+
+Why does it need to overreide the values from genphy_c45_read_status() ?
+
+> +
+> +	phydev->duplex = (val & RTL8261X_PHYSR_DUPLEX) ? DUPLEX_FULL : 
+> DUPLEX_HALF;
+> +	speed_code = (FIELD_GET(RTL8261X_PHYSR_SPEED_H, val) << 2) |
+> +		      FIELD_GET(RTL8261X_PHYSR_SPEED_L, val);
+> +	switch (speed_code) {
+> +	case RTL8261X_SPEED_CODE_500M:
+> +		phydev->speed = RTL8261X_SPEED_500;
+
+See question above (defines).
+
+> +		break;
+> +	case RTL8261X_SPEED_CODE_1000M:
+> +		phydev->speed = SPEED_1000;
+> +		break;
+> +	case RTL8261X_SPEED_CODE_2500M:
+> +		phydev->speed = SPEED_2500;
+> +		break;
+> +	case RTL8261X_SPEED_CODE_5000M:
+> +		phydev->speed = SPEED_5000;
+> +		break;
+> +	default:
+> +		phydev_warn(phydev, "unknown speed code 0x%x (PHYSR=0x%04x)\n", 
+> speed_code, val);
+> +		phydev->speed = SPEED_UNKNOWN;
+> +	break;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int rtl8261x_config_aneg(struct phy_device *phydev)
+> +{
+> +	u16 adv_1g = 0;
+> +	int ret;
+> +
+> +	if (phydev->autoneg == AUTONEG_DISABLE)
+> +		return genphy_c45_pma_setup_forced(phydev);
+> +
+> +	ret = rtl8261x_config_master_slave(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = genphy_c45_config_aneg(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +			      phydev->advertising))
+> +		adv_1g = BIT(9);
+> +
+> +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND2,
+> +				     RTL8261X_GBCR_REG,
+> +				     BIT(9), adv_1g);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (ret > 0)
+> +		return genphy_c45_restart_aneg(phydev);
+
+This does not take rtl8261x_config_master_slave() into account. So maybe 
+change rtl8261x_config_master_slave
+
+    return phy_modify_mmd_changed ...
+
+and keep the result in a bool and also trigger auto nego restart if 
+needed.
+
+> +
+> +	return 0;
+> +}
+
+
+
+> +
+>  static int rtl821x_probe(struct phy_device *phydev)
+>  {
+>  	struct device *dev = &phydev->mdio.dev;
+> @@ -3001,6 +3292,30 @@ static struct phy_driver realtek_drvs[] = {
+>  		.resume		= genphy_resume,
+>  		.read_mmd	= genphy_read_mmd_unsupported,
+>  		.write_mmd	= genphy_write_mmd_unsupported,
+> +	}, {
+> +		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
+> +		.name             = "Realtek RTL8261C_RTL8261D 10Gbps PHY",
+> +		.probe            = rtl8261x_probe,
+
+RTL8261C/RTL8261D? Or just the c variant as the phy id suggests?
+
+> +		.get_features     = rtl8261x_get_features,
+> +		.config_aneg      = rtl8261x_config_aneg,
+> +		.read_status      = rtl8261x_read_status,
+> +		.config_intr      = rtl8261x_config_intr,
+> +		.handle_interrupt = rtl8261x_handle_interrupt,
+> +		.soft_reset       = rtl8261x_soft_reset,
+> +		.suspend          = genphy_c45_pma_suspend,
+> +		.resume           = genphy_c45_pma_resume,
+> +	}, {
+> +		PHY_ID_MATCH_EXACT(RTL_8261CE_CG),
+> +		.name             = "Realtek RTL8261CE 10Gbps PHY",
+> +		.probe            = rtl8261x_probe,
+> +		.get_features     = rtl8261x_get_features,
+> +		.config_aneg      = rtl8261x_config_aneg,
+> +		.read_status      = rtl8261x_read_status,
+> +		.config_intr      = rtl8261x_config_intr,
+> +		.handle_interrupt = rtl8261x_handle_interrupt,
+> +		.soft_reset       = rtl8261x_soft_reset,
+> +		.suspend          = genphy_c45_pma_suspend,
+> +		.resume           = genphy_c45_pma_resume,
+>  	},
+>  };
+
+Please also make sure for both patches that checkpatch has no further 
+complaints. Thanks.
+
+Nicolai
 
