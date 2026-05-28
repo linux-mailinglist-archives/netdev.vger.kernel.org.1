@@ -1,233 +1,135 @@
-Return-Path: <netdev+bounces-292708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292709-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yL7WEFlRGGpMiwgAu9opvQ
-	(envelope-from <netdev+bounces-292708-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:29:45 +0200
+	id gJwaACVUGGoQjQgAu9opvQ
+	(envelope-from <netdev+bounces-292709-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:41:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A14895F3AC3
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:29:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043095F3D8A
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F12B13011BF1
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:27:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 09E17306FAE5
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4022B31E82A;
-	Thu, 28 May 2026 14:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC423C4B93;
+	Thu, 28 May 2026 14:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ryAF6AR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689373AF677
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9B22475CF
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779978424; cv=none; b=BGONwrSyDQ/49C9OW8sZJmBFBIdXOlZOGqKcATX2mtlgWtR3EJHPjIHY/kYR8gFAsvm9qVTX3m72OsU4EqHduuMspZTHmgJqlLT9u5Or87aE2XENRlSZdqcUfVnIrr8hzeibepwuN/JsZ/Wi7XGEWxt9lpLJBx1eHyKBe6UfuQQ=
+	t=1779978544; cv=none; b=DSzfU253R3jVJZS4UJrIPH38iFwI4Jpgtmc/CW2+4tCkS1horiHaTfeQybK6KFdR6jKAdcX6lTSH6mTDch1I9xrJzzc1PJpxySuNNqsKJ0bYOQtXmvLzrtKgvfbThn35uLW5bDARZiKIIcDL1feTE/TvkQrFBTp3UKXTRy0Hbcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779978424; c=relaxed/simple;
-	bh=8dBQN3u9zxD5Dpe5kimj5AuyF1N0hn16euQa6Q6gauM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Ak1YNNHy6zWV+787dsUgfRc91uC6B3WExZM1XiVCo6NHteibXIoCcLvzI9VQQxQpVxqw7HS3j00BR9nFgAyLsahG+F6MZx2xkijlplF00ztGeRsoOuzYU9Ftadvk/LOsCzMUFd53NT0wcLuosaCDpzmZ6mZPG/lXm5iHg+i8dlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-69db0927573so5540378eaf.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 07:27:02 -0700 (PDT)
+	s=arc-20240116; t=1779978544; c=relaxed/simple;
+	bh=IrefFyAQpAFQqILK1eHAz0Ih9C2ER7OVE5y48RaXZDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K9dbACRp7yY2G1LurhmDX1tL0JDi2nebSxmLl4CFrICr5ELsDCZozVI4Atn7muXd08UUS0LohF1UanWO7g4SEFwCvhGZ2VzlnW2sR+yylY1EcJdyeiilGiiPzSwS2erFw+E2C7pFDB4i/6e7wrjABNtJQc/JKeImIGcmeu+x/TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ryAF6AR9; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48e8132c6d0so81775215e9.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 07:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779978542; x=1780583342; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VQ0PThY26u3CRD4CW+SITP6QP3S+wGr6qROSdUOWaXc=;
+        b=ryAF6AR9lhvGsa/FBKZUM6tHpamYzfDt23bDcrjb9R1IPWmNkz88EHDo3C2qx65pRQ
+         wYNayVUvO7ZL3NL7Jja6Bfa4LZnJllsUGxOFUXv14NN+3WG5wRMLMPHp/fzmzhDiemkW
+         EGGDKfTE/9ujGiaIqxHBXZL6e3ZMk5KjbFHDMmRW/xiR5jxOeh7rnrELAwyRrRg+Nt/7
+         VlqABa8bFqcw+LydOFy2oMgpCLuHz8TUeq9m9w/3xbwzHIzc3bmRHeTCkn2PDsCEfwR5
+         taLveUss9DsHlbUqUx9kKWJ/TZsWeIEdhpRohAo5OjLGggXi/OflU7zwaPua5DsYoX9N
+         nFHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779978421; x=1780583221;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DKd8lNtRk4Q8hVCyCTCRPaKBtTJU7lwZa3WnlORRuvU=;
-        b=HyHfG1AVoo6vbdvZUHwLAS059KnajGw2y0/krvJ2E/aI/RTvlW04/MtTtzwM/GxIY4
-         fgiA4CAP5xf8T9YvlOYpM+OiQokSxvJ/freEPcG43ZogiHJmDYsEy82R03pqanEI4fUt
-         WEQDvTRv8XsjXAttyXIWv/x+h67TNhVpbmEi+r25xhguy13ryUmLJUBcbSA04YOMvVsr
-         3/uz+Q+Ew0BL8ET0CpBZH2PkgYB1PxzzpkCPuRsDXWktuu8oLZxrJL7TdGcCDf3hT/AS
-         AnBTDb1baq+U66LMARSe8GNHrg0XlGhPqRH2sbtjCu/t1dPElawMhCz9KA72ZXkx501+
-         R9Cg==
-X-Forwarded-Encrypted: i=1; AFNElJ9f3lpdWSpm2KvRcuI6jnMvSTQOVRRvmnPKmv+sQ3VR5hu+VtPr0IOu1WvEeqrAO/WtX7YSy0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgiBVihDSwaWsutU5MT8RV45u0ZtZ8JjguK/rv6nhlu3PUrGAm
-	oNOFlj27oAqlqNiSBeqHfyvB1CZadnV/ILpTBjj9VtfDR3QdDlJ2KeD6sTyd2TKoBTUWWupiNgW
-	6GBlrjH6oLKaMC+r/eCLCk6ZSELtesRac07lsCjS4+/zRap2HDIBMOv0N6Yk=
+        d=1e100.net; s=20251104; t=1779978542; x=1780583342;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VQ0PThY26u3CRD4CW+SITP6QP3S+wGr6qROSdUOWaXc=;
+        b=s5q/UNhq647nHo+JP1w6YxFgOuxzbn4NL4kK8fYUduURCJMXE4mtW8NiXFIcPtjt77
+         RPAecLv1k5yvA7xwWXUPNtN0WKq29Bu8xSP5Cq9Z9HpQO82nrruoBuOFfrCFsBzaG7IG
+         IDViLR8S6gtMlvv8xHCIsusvhd1yIi90OWfk/wNhJmaP2M6kBJF9n5heYbJ/q23y4HOc
+         nSiubJ7vC+5cwjP1JLQqwohiLiklVIDeL28wSxmDz0uALspINSTOi1Yb00J4Z+1TQHUT
+         dJZH2jMJ3I56eMixAwoySTE5DRCgD+O/N4XMQMHN1shMZxuctbDeESIAEB1CLm5KMPo0
+         ymVQ==
+X-Gm-Message-State: AOJu0YxuNMt4wwH9qS6PKBQOq1z/6lNjJDP918xEUMu0EUzjn3jHronD
+	KM0rYUphLDSrwxdxuep5iRmDGsLN0oLiDSW0XpVRrvyVcTUWrxd0wX0d
+X-Gm-Gg: Acq92OH1yUehQGfdSm10iaY8tf4si8Zw3Gnak4345a7k4xoctKs0OCjcMviQYzl9bV2
+	WcFLS7gzBb0LKeMt0P2vDdpK2t1oJS9b+n6mRzti+kp/dvICKttvJWaxL6lJkyjPDqdq8E9W7Hx
+	i0E9IPMCKxx2LTKk5JxoSQS3QW6q2KqFkt4xIQBE9sS/baRi95hj8GOHwrquhr9C4Sx6+V1wvYl
+	QqWldNfB7KtC4UgfsLyFDhVDmxWkt6GPPmsyjbycmZ/lxp0utw1HebT3IgUgi/4h2EX399FJF5h
+	YW6Od9mvhEBANtc3mu18h/9bKQ5FeoZG0vNoSuLU/AZYszKFwNLiPB8ZBn2Le9XsfVj10RmSSpM
+	phNXFbKUcWrG4uP6XyaCYlLxB+6CSlGSCSWy6OPCYCqWAHmIA57ZRFBFNiFI2B1BTrNKaRne35E
+	Byi1mtK1aS/TEqkKgYJMQ7gI9udqpUiNQ3zI5CnxnRsH9E+A==
+X-Received: by 2002:a05:600c:1d05:b0:490:890a:da46 with SMTP id 5b1f17b1804b1-490890af5b5mr78417835e9.2.1779978541689;
+        Thu, 28 May 2026 07:29:01 -0700 (PDT)
+Received: from localhost.localdomain ([45.128.133.234])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4908eaada7asm21989115e9.8.2026.05.28.07.28.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 07:29:00 -0700 (PDT)
+Date: Thu, 28 May 2026 16:28:51 +0200
+From: Oscar Maes <oscmaes92@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 2/2] pcnet32: switch to napi_alloc_skb() and
+ napi_gro_receive()
+Message-ID: <20260528142851-oscmaes92@gmail.com>
+References: <20260525125437.4061-1-oscmaes92@gmail.com>
+ <20260525125437.4061-3-oscmaes92@gmail.com>
+ <20260525084528.547fe263@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1c9d:b0:69d:9f6a:9d2f with SMTP id
- 006d021491bc7-69dfa918199mr695672eaf.38.1779978421526; Thu, 28 May 2026
- 07:27:01 -0700 (PDT)
-Date: Thu, 28 May 2026 07:27:01 -0700
-In-Reply-To: <20260528072100.1163109-1-vulab@iscas.ac.cn>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1850b5.586c836d.2e3ab2.0001.GAE@google.com>
-Subject: [syzbot ci] Re: netfilter: ipvs: fix ct refcount leak when template
- is invalid
-From: syzbot ci <syzbot+ci738d8a1aa6d8f478@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, phil@nwl.cc, stable@vger.kernel.org, vulab@iscas.ac.cn
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.36 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260525084528.547fe263@kernel.org>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,googlegroups.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,googlesource.com:url,syzbot.org:url];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292708-lists,netdev=lfdr.de,ci738d8a1aa6d8f478];
-	TO_DN_NONE(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: A14895F3AC3
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292709-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oscmaes92@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 043095F3D8A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the following series
+On Mon, May 25, 2026 at 08:45:28AM -0700, Jakub Kicinski wrote:
+> On Mon, 25 May 2026 14:54:37 +0200 Oscar Maes wrote:
+> > In my testing this resulted in up to a 25% RX throughput increase in iperf3
+> > tests in both directions.
+> 
+> On which platform?
 
-[v1] netfilter: ipvs: fix ct refcount leak when template is invalid
-https://lore.kernel.org/all/20260528072100.1163109-1-vulab@iscas.ac.cn
-* [PATCH] netfilter: ipvs: fix ct refcount leak when template is invalid
-
-and found the following issue:
-general protection fault in ip_vs_conn_put
-
-Full report is available here:
-https://ci.syzbot.org/series/fb773743-f223-4965-9f38-e5ea600ee724
-
-***
-
-general protection fault in ip_vs_conn_put
-
-tree:      nf-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netfilter/nf-next.git
-base:      aa064a614efcfa4c300609d1f01134e99a12ad10
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/3e6a154f-d578-4d43-94af-86e851702925/config
-syz repro: https://ci.syzbot.org/findings/518450a1-bd56-47bd-b214-be945f6ba221/syz_repro
-
-IPVS: sed: FWM 3 0x00000003 - no destination available
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
-CPU: 1 UID: 0 PID: 5812 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:ip_vs_conn_put+0x2b/0x240 net/netfilter/ipvs/ip_vs_conn.c:608
-Code: 0f 1e fa 55 41 57 41 56 41 55 41 54 53 48 89 fb 49 bc 00 00 00 00 00 fc ff df e8 40 cb c1 f7 4c 8d 73 3c 4d 89 f5 49 c1 ed 03 <43> 0f b6 44 25 00 84 c0 0f 85 9f 01 00 00 41 8b 2e 89 ee 81 e6 00
-RSP: 0018:ffffc90003d4eba8 EFLAGS: 00010203
-RAX: ffffffff8a03f980 RBX: 0000000000000000 RCX: ffff888169370000
-RDX: 0000000000000000 RSI: ffffffff8c28b740 RDI: 0000000000000000
-RBP: ffffc90003d4ee30 R08: ffff88823c6247d3 R09: 1ffff110478c48fa
-R10: dffffc0000000000 R11: ffffed10478c48fb R12: dffffc0000000000
-R13: 0000000000000007 R14: 000000000000003c R15: 0000000000000000
-FS:  00007faa344d36c0(0000) GS:ffff8882a9276000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007faa33472780 CR3: 0000000169de6000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- ip_vs_sched_persist net/netfilter/ipvs/ip_vs_core.c:-1 [inline]
- ip_vs_schedule+0x100f/0x1d90 net/netfilter/ipvs/ip_vs_core.c:688
- udp_conn_schedule+0x391/0x7a0 net/netfilter/ipvs/ip_vs_proto_udp.c:78
- ip_vs_try_to_schedule net/netfilter/ipvs/ip_vs_core.c:1659 [inline]
- ip_vs_in_hook+0xc50/0x1bf0 net/netfilter/ipvs/ip_vs_core.c:2231
- nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
- nf_hook_slow+0xc5/0x220 net/netfilter/core.c:619
- nf_hook+0x22a/0x3a0 include/linux/netfilter.h:273
- __ip_local_out+0x558/0x6a0 net/ipv4/ip_output.c:120
- ip_local_out+0x2a/0x190 net/ipv4/ip_output.c:129
- ip_send_skb+0x45/0xc0 net/ipv4/ip_output.c:1510
- udp_send_skb+0x7e4/0xf70 net/ipv4/udp.c:1161
- udp_sendmsg+0x1937/0x21a0 net/ipv4/udp.c:1443
- udpv6_sendmsg+0x996/0x25c0 net/ipv6/udp.c:1523
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x5c7/0x9f0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7faa3359ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007faa344d3028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007faa33815fa0 RCX: 00007faa3359ce59
-RDX: 0000000000000000 RSI: 0000200000000400 RDI: 0000000000000004
-RBP: 00007faa33632d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007faa33816038 R14: 00007faa33815fa0 R15: 00007ffe8bd2ebb8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:ip_vs_conn_put+0x2b/0x240 net/netfilter/ipvs/ip_vs_conn.c:608
-Code: 0f 1e fa 55 41 57 41 56 41 55 41 54 53 48 89 fb 49 bc 00 00 00 00 00 fc ff df e8 40 cb c1 f7 4c 8d 73 3c 4d 89 f5 49 c1 ed 03 <43> 0f b6 44 25 00 84 c0 0f 85 9f 01 00 00 41 8b 2e 89 ee 81 e6 00
-RSP: 0018:ffffc90003d4eba8 EFLAGS: 00010203
-RAX: ffffffff8a03f980 RBX: 0000000000000000 RCX: ffff888169370000
-RDX: 0000000000000000 RSI: ffffffff8c28b740 RDI: 0000000000000000
-RBP: ffffc90003d4ee30 R08: ffff88823c6247d3 R09: 1ffff110478c48fa
-R10: dffffc0000000000 R11: ffffed10478c48fb R12: dffffc0000000000
-R13: 0000000000000007 R14: 000000000000003c R15: 0000000000000000
-FS:  00007faa344d36c0(0000) GS:ffff8882a9276000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007faa335ea540 CR3: 0000000169de6000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	0f 1e fa             	nop    %edx
-   3:	55                   	push   %rbp
-   4:	41 57                	push   %r15
-   6:	41 56                	push   %r14
-   8:	41 55                	push   %r13
-   a:	41 54                	push   %r12
-   c:	53                   	push   %rbx
-   d:	48 89 fb             	mov    %rdi,%rbx
-  10:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
-  17:	fc ff df
-  1a:	e8 40 cb c1 f7       	call   0xf7c1cb5f
-  1f:	4c 8d 73 3c          	lea    0x3c(%rbx),%r14
-  23:	4d 89 f5             	mov    %r14,%r13
-  26:	49 c1 ed 03          	shr    $0x3,%r13
-* 2a:	43 0f b6 44 25 00    	movzbl 0x0(%r13,%r12,1),%eax <-- trapping instruction
-  30:	84 c0                	test   %al,%al
-  32:	0f 85 9f 01 00 00    	jne    0x1d7
-  38:	41 8b 2e             	mov    (%r14),%ebp
-  3b:	89 ee                	mov    %ebp,%esi
-  3d:	81                   	.byte 0x81
-  3e:	e6 00                	out    %al,$0x0
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
+Intel x86
 
