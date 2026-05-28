@@ -1,151 +1,105 @@
-Return-Path: <netdev+bounces-292609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJ25I98DGGqdZggAu9opvQ
-	(envelope-from <netdev+bounces-292609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:59:11 +0200
+	id oBZlKkgIGGoaawgAu9opvQ
+	(envelope-from <netdev+bounces-292611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:18:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE2885EF16D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:59:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CFE05EF6BD
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3BA7D30048D8
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:59:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3A9D43009824
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6527E377EBA;
-	Thu, 28 May 2026 08:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8ABA39F19C;
+	Thu, 28 May 2026 09:05:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D36F37E2F7;
-	Thu, 28 May 2026 08:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E2E39E16B;
+	Thu, 28 May 2026 09:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779958747; cv=none; b=P8hZJKXIYVJXEMGaE/6R9/AGpD16oW2vSV0kjWUpHiTFVsBSHMMdWPeNmFeoqewIFwiGKguzDsgGxBC3E95OmOT6NtEvdXW3bU+bRE7JQt7RGFwIbEEfRsXvl3FAf0pD5yYMjungplCN9CyyK9V/cwZ/FXaWaG0fdiPgAo3krFE=
+	t=1779959116; cv=none; b=p6K/Ibp4txRoAeITXZQoOMr1YN7AeCzBdfAINFTJ8nkWFRz0Z8zjlxm6/m/YHIJnoXPtbVW84GvlzGVwlrtG34PIbn4YD8GUym3tk2b9RmBUxqR2E4yQ5OLySwRiLdu4Bj+omrhcXHrWkEahm0oAehAfugQHwpNW7y+rw8y+CiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779958747; c=relaxed/simple;
-	bh=s/P5s0Vhyy0BHBsMyMc4XZVfOxWlxmPxjQQFWnMA+do=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gFrynfgs4FJbYvRb5qeqhgXDOE0b5lsGnoeH3QYwmcmL1dsshINwobvYfdsHFGCvuDLvCFOiQslj8yEOzTCEYFFCqTCszExa0c9o63zDrOLlKuPwIT67tFlvboUCdSP/7cTEsselJgUxGLMfb25/sbREo649+7ashNOwdNMbg2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowACnv7nOAxhqMDw4AA--.22942S3;
-	Thu, 28 May 2026 16:58:57 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-sctp@vger.kernel.org,
+	s=arc-20240116; t=1779959116; c=relaxed/simple;
+	bh=Wgj1AFhm7MQ7HhTqX39oI5eoayqlItDzxkQczK2qw/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HvgCSXLYDkJIWT0PhBMlaVltF09MWbrosStrVdAHNer8D914QZNTv21t6Ax1v0OjQxtdGnrXmrcqcktziYdXcgkp5l3DcH3p7MKDCMAphYba5f9QaEOzY3o1srus3PHI/ec5RtLMuJCXiJz/RygInKm+OGB4DbbL7IgakapxafE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 454E468B05; Thu, 28 May 2026 11:05:09 +0200 (CEST)
+Date: Thu, 28 May 2026 11:05:08 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Harry Yoo <harry@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, io-uring@vger.kernel.org,
+	kasan-dev@googlegroups.com, bpf@vger.kernel.org,
 	netdev@vger.kernel.org
-Cc: marcelo.leitner@gmail.com,
-	lucien.xin@gmail.com,
-	davem@davemloft.net,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	xuyq21@lenovo.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] sctp: stream: clear current stream on stream teardown
-Date: Thu, 28 May 2026 16:58:49 +0800
-Message-ID: <ad9d7027579442c6c9498e7af84f836747a7620e.1779644468.git.xuyq21@lenovo.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1779644468.git.xuyq21@lenovo.com>
-References: <cover.1779644468.git.xuyq21@lenovo.com>
+Subject: Re: improve the kmem_cache_alloc_bulk API
+Message-ID: <20260528090508.GB8376@lst.de>
+References: <20260527070239.2252948-1-hch@lst.de> <ee817070-cc7a-40d5-92a4-2bd8e9e65fbe@kernel.org> <20260527122148.GA6838@lst.de> <482ee03a-c5b3-4873-a550-cc5743068616@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACnv7nOAxhqMDw4AA--.22942S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WrW8AFyrur4rKrW3JryxZrb_yoW8Xr1rpF
-	ZxurWrtr97JF18Grn7Cw1Fqr4fKan7Gw47KFyYkF4DZr4DJF1FqFyvgrWkJr1kCr4F9FWY
-	vrn0vw12vw4UCrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQABCWoX+s4AogAAsi
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <482ee03a-c5b3-4873-a550-cc5743068616@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[lst.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292609-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,lzu.edu.cn,lenovo.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.922];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: DE2885EF16D
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hch@lst.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292611-lists,netdev=lfdr.de];
+	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 0CFE05EF6BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Yuqi Xu <xuyq21@lenovo.com>
+On Wed, May 27, 2026 at 04:07:12PM +0200, Vlastimil Babka (SUSE) wrote:
+> commit 46dea1744498 ("slab: refill sheaves from all nodes") from this January.
+> Previously it was just interrupts enabled.
+> 
+> > but by requiring separate functions so I somehow doubt that was meant.
+> 
+> Yeah, it's expressed by the _nolock variants. But slab propagates it internally
+> by the gfp flags, and since 46dea1744498 it affects kmem_cache_alloc_bulk().
 
-out_curr caches the outbound stream currently being dequeued. When the
-stream table is replaced, the old stream entries and their ext state
-are freed, so keeping out_curr leaves scheduler state pointing at
-released stream storage.
-
-Clear out_curr in sctp_stream_free(), where the backing stream entries
-are torn down. This keeps the cached scheduler state aligned with the
-lifetime of the stream table for stream updates and any other full
-stream teardown paths.
-
-Fixes: 5bbbbe32a431 ("sctp: introduce stream scheduler foundations")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Yuqi Xu <xuyq21@lenovo.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/sctp/stream.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/sctp/stream.c b/net/sctp/stream.c
-index c2247793c88b..207e0a77f9af 100644
---- a/net/sctp/stream.c
-+++ b/net/sctp/stream.c
-@@ -186,6 +186,7 @@ void sctp_stream_free(struct sctp_stream *stream)
- 	int i;
- 
- 	sched->unsched_all(stream);
-+	stream->out_curr = NULL;
- 	for (i = 0; i < stream->outcnt; i++)
- 		sctp_stream_free_ext(stream, i);
- 	genradix_free(&stream->out);
--- 
-2.54.0
+So what are the GFP flags that affect spinning?  I can't find anything
+related to that in either Documentation/core-api/memory-allocation.rst or
+include/linux/gfp_types.h.
 
 
