@@ -1,186 +1,242 @@
-Return-Path: <netdev+bounces-292866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292867-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJcWEK7AGGp4nAgAu9opvQ
-	(envelope-from <netdev+bounces-292866-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:24:46 +0200
+	id KC3SN4TBGGp4nAgAu9opvQ
+	(envelope-from <netdev+bounces-292867-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:28:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93D645FAEB3
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:24:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E25535FAF16
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:28:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E6063009508
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:23:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E4879301FE6D
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 22:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C3536921E;
-	Thu, 28 May 2026 22:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFB4369D66;
+	Thu, 28 May 2026 22:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYck+3Ya"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Mzn87fUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8007369D7D
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 22:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFEE2DECBA;
+	Thu, 28 May 2026 22:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780007012; cv=none; b=ZsHzrLq9/7wfnP9Xa0GIQWCzpzUtEu7s5F2q8HbEniqJMqaClSIZSy0fc6C54Jh214CpPWaDre8a3M+GgZhLfKvgUHRHBtxJWjounyZx5Rl6dm51JbqDyUkRV1TB3U1MS0KZ1S58yz5C9uvD9D9gWJpT4u9zZIKQG2EhMRcvi/M=
+	t=1780007295; cv=none; b=ocdtPnF/PRuI6Mtol0sa3CPpVcXcGEkPIbeTcDQCwzN0KNDxOEmJ8koSVtZEEMJHus+aIV3lsfny3uHfHPAvhVrO1icKNnq09NXDK3d6He9qeUb3yVWW2jbFALFJnBO9xiH1xvhszJPYziGBm48Det02mRI05BL1K27lCK+lLiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780007012; c=relaxed/simple;
-	bh=2SC0ANVkCKp8E1WQmu3i8e+gSNuNdk0aJRJ5X83hnn8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kpRGyslJrKa/3pLlB7d3XkWGej+FvfqmGxS5BS7W6+sMfuGfirh0QmINWkRaaBOQ0Pm+0gxEENmAcwbbNSfvAVdyF8CX3lkswwqKOVYI/YoRzjGvLp7pLAEmBpyJIa/g6TvXRdREvRdBBpeaDtpCenbvPoTIXUowxIKa4YGpNMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYck+3Ya; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-49048a8ca1bso3566035e9.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 15:23:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780007008; x=1780611808; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dxyZcyLn2H2/+BqmnLphcOMc8sbPDUQAcX0fDWHLlEw=;
-        b=LYck+3Ya6iHZGzADK96KwBBIdr7U86xXOqlQxzHxNOq5cIeT6h2zhEsPl/lCN42sKC
-         OJrNtF5Rj8uo803ohXJhDM9Z+iyahrNOsXEXPRl5Cp2iOjIyjam3ETNkUA5CQKPUyXMi
-         r2/8TxiWIXkU5A6jIPeFtghSHXNNRDXsaXuHd9EtXZUpfZCbtr92ffOpZc1hNaWKOT0G
-         YNjPg56dhl8Rw5AKscWAqFXfR6niUVDUXRxiibjja8n9ZK9bfuUOcaW8gGQELTV1sHP0
-         ibVf2rZ3WDeaDJRQs+MwVtCUtwa2W8yTW5cTAdWSat3uwW0OHDpLFzjkXQJvxzm6L4Eg
-         n3xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780007008; x=1780611808;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dxyZcyLn2H2/+BqmnLphcOMc8sbPDUQAcX0fDWHLlEw=;
-        b=baSDYilR/6vXYDWbIOLO0KTAbf1u8hiwwL66QqzfJg//LPRcPZKQQNLSXIH3TQUbPp
-         TAE78EIu4fjAdYDN2kNK9c1Guhyuu3tlzMtHdjCY5ZfDP7ar/O+80wSljR6L1dzIuh32
-         cOEuvaCRFDslH1Tai5LgMKRlrcoRbP2F6NqwdcxdmBZv7rIL/Bp9/ohAM96DvKUtepGf
-         x5nmdACgdicYxuqkFcbceJG64A0NZfteWvZGIAa50T8BiopLjdrNuOxyzxlU/IShdGlA
-         L4cL9BbuecBqZ7gTfsmNmdvljtcREcWjomo6W2vDanPrCutYwdvVYxl0HtSix6v+Hc7+
-         byYw==
-X-Gm-Message-State: AOJu0YyPq6FcRDXD8rFNmizulUdPlK1+S42itQl/Dgo3sRZxtw7Aj8AC
-	jvlB/+ZkArHW9AcIN8/FAV/RbQvNG+MDh7ZX0xCQNObuspM0qZOnrP4X
-X-Gm-Gg: Acq92OGf6A1eh7smaWIXCth0ytK/MxKP4B+o2dpn9uvBwJFE1zCKmCPEIApBYwv8pUa
-	/OsJONpt75wPxKhr1t/+IAcnvagF0TidMrimEfmmQAVC0NdV94GO0fT52/HZxDxzY251FpOtqjk
-	Srg+SXAjTZbDtiPJiSwIqwqECrWSIXCNVDv9YKykkGKS0+BevZ0wu8qtwQRValavSXAKKCDXAJD
-	+IHdN2EDIo9fHyLzGKHVJpOTm3ooa8rxlZrwmfvioLUsom37h5ZmWcsMVai2DHzevBbT5w+zzop
-	E0Wcw0i/sM7LUaZ5nWoqOUJcitMemxHaeXYQMtQUCYARS1DRrnDHHq1Bc+Uc05Xm1CJfsw+y0IP
-	PXOMt2J9s6P5/RJis34yYVSWuSoQDTW7Q9vcinVvhaYiLnAftYJSZnhGAG4qSULgWqK2xWrmZFf
-	hCeCru1vzey/seVxl341oT+vPoJw==
-X-Received: by 2002:a05:600c:4511:b0:490:6869:e7f5 with SMTP id 5b1f17b1804b1-4909c02bcddmr2412925e9.0.1780007007858;
-        Thu, 28 May 2026 15:23:27 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d305:6000:97f9:e596:8819:1468])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909ca6575csm4326545e9.4.2026.05.28.15.23.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 15:23:27 -0700 (PDT)
-Date: Fri, 29 May 2026 01:23:25 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: sja1105: flower: reject cross-chip
- redirect
-Message-ID: <20260528222325.swzj77wo7lifymoa@skbuf>
-References: <20260528203549.1918040-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1780007295; c=relaxed/simple;
+	bh=NSgBkh4h1m3GUmstvliXoCMJgzLxdw2XD4GaDjxNcWQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s0zfx+z9iyRUtYNjJcK2OHCy+xiLe6kaefP+lAK7QF++VF4pONtPCqQsZ8HVoGfwmQdttPH/dL3BsbDgTcELWaptjE7mrD8R5hgKKOQzAtA2FTzB9H7UhZM1C2H/pxMHOzwnbNxVkP3fb6weENzF5pElac1Yo/ieouUcAMLLPwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Mzn87fUh; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=TMBNnpFYJcb4ZYyve5TiuyUrZJ4esed3534C/01rFcg=; b=Mzn87fUhHYqrrM7BIE4PRCYGJc
+	IqiQe1lRra6f+zYwABXVTPYSuudnSHm9NTb60Us3I3skZ0EIVK2M5ERdTyoSQodOGBn38H7HCKN3Z
+	+P+tqSOdDpvaUj1I+QOl4yPxjiCBXK8Sv9fpaW78ryqZs8ZTeqQrWh7OQASwzZJnUWQxln3uVKwTr
+	DVPzN8Rh0eqnH5SeNNB3v2zgU0gomPY3xnHtpc1B5qIIJUKHAbSqcI+HwtUJ+FFr41pUWKc+BTe2i
+	7MmAL7Pw6+Jr0L8sNJzm/l+PdSqpeXkpX2dt3YTrvOX4PUG9FblmFdV58dBUJOUX9tvaTE+hwepZj
+	oOAhaKaw==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wSjCu-000Fci-2p;
+	Fri, 29 May 2026 00:28:04 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wSjCt-000H1F-2x;
+	Fri, 29 May 2026 00:28:04 +0200
+Message-ID: <14ca7b06-55bd-497d-b1ef-bcb95d1fe2ca@iogearbox.net>
+Date: Fri, 29 May 2026 00:28:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260528203549.1918040-1-mmyangfl@gmail.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: Linux: DMA-after-unmap race in ZCRX via
+ netif_rxq_cleanup_unlease() ordering inversion (netkit + page_pool)
+To: Jakub Kicinski <kuba@kernel.org>,
+ =?UTF-8?Q?Pr=C3=A9nom=3F_Ahmed?= <ahmedabdelmoumen05@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ David Wei <dw@davidwei.uk>
+References: <CAN+TWHTGkGZu4vdbkMY8F-EDe3m8ScBctW-fdtfcpGbj192SyA@mail.gmail.com>
+ <20260527163320.407b4af1@kernel.org>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20260527163320.407b4af1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/28014/Thu May 28 08:24:59 2026)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-292867-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292866-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 93D645FAEB3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E25535FAF16
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 29, 2026 at 04:35:44AM +0800, David Yang wrote:
-> The driver silently accepts a destination port on a different switch
-> chip, then programs its index (on another chip) into the local hardware,
-> which redirects to the wrong port or possibly crashes if the port index
-> is out of bound locally.
+Hi Ahmed,
+
+On 5/28/26 1:33 AM, Jakub Kicinski wrote:
+> Dropping security lists, security lists are for private discussions,
+> it's utterly pointless to CC both them and LKML. Not to mention
+> that this bug only exists in -rc kernels.
 > 
-> Add a check for it and adjust the extack message.
-> 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->  drivers/net/dsa/sja1105/sja1105_flower.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/sja1105/sja1105_flower.c b/drivers/net/dsa/sja1105/sja1105_flower.c
-> index fba926f85b47..7547999a113f 100644
-> --- a/drivers/net/dsa/sja1105/sja1105_flower.c
-> +++ b/drivers/net/dsa/sja1105/sja1105_flower.c
-> @@ -391,9 +391,9 @@ int sja1105_cls_flower_add(struct dsa_switch *ds, int port,
->  			struct dsa_port *to_dp;
->  
->  			to_dp = dsa_port_from_netdev(act->dev);
-> -			if (IS_ERR(to_dp)) {
-> +			if (IS_ERR(to_dp) || to_dp->ds != ds) {
->  				NL_SET_ERR_MSG_MOD(extack,
-> -						   "Destination not a switch port");
-> +						   "Destination not a local switch port");
->  				return -EOPNOTSUPP;
->  			}
->  
-> -- 
-> 2.53.0
-> 
+> Adding relevant developers. Moving security@ to Bcc
 
-The problem is more nuanced, but I agree with the patch. If you want to
-resend to make it more clear in the commit message, fine, if not, oh well.
+Thanks for the report! I think a fix could look as below. Before submitting,
+I would prefer though if David could check this against real HW supporting
+mem providers e.g. BCM NIC:
 
-Basically these days we can do better than rejecting the operation, see
-https://lore.kernel.org/all/20241023135251.1752488-1-vladimir.oltean@nxp.com/
+diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+index de4dac4c88b3..00a7011eb4d5 100644
+--- a/net/core/netdev_rx_queue.c
++++ b/net/core/netdev_rx_queue.c
+@@ -338,12 +338,12 @@ void __netif_mp_uninstall_rxq(struct netdev_rx_queue *rxq,
+  void netif_rxq_cleanup_unlease(struct netdev_rx_queue *phys_rxq,
+  			       struct netdev_rx_queue *virt_rxq)
+  {
+-	struct pp_memory_provider_params *p = &phys_rxq->mp_params;
+  	unsigned int rxq_idx = get_netdev_rx_queue_index(phys_rxq);
++	struct pp_memory_provider_params p = phys_rxq->mp_params;
+  
+-	if (!p->mp_ops)
++	if (!p.mp_ops)
+  		return;
+  
+-	__netif_mp_uninstall_rxq(virt_rxq, p);
+-	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, p);
++	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, &p);
++	__netif_mp_uninstall_rxq(virt_rxq, &p);
+  }
 
-If cls->common.skip_sw is set, sure, but if not, just redirecting to
-dsa_upstream_port(ds, port) should be fine (but not enough).
+> On Wed, 27 May 2026 23:53:45 +0100 Prénom? Ahmed wrote:
+>> Hello,
+>>
+>> I would like to report a source-proven teardown ordering bug in the Linux
+>> kernel that can lead to a DMA-after-unmap race condition involving ZCRX
+>> (io_uring zero-copy receive), page_pool, and netkit queue leasing.
+>>
+>> ***Reporter:** Ahmed Abdelmoemen **Discovery Date:** 2026-05-26 **Kernel
+>> Version:** Linux 7.1.0-rc3*
+>>
+>> Executive Summary
+>>
+>> *A logic error in `netif_rxq_cleanup_unlease()` causes DMA mappings for the
+>> ZCRX memory provider to be revoked **before** the physical NIC RX queue is
+>> stopped. This creates a race window during netkit queue lease teardown
+>> where the physical device's NAPI can consume stale `net_iov` entries from
+>> the page_pool alloc cache containing `dma_addr = 0`.*
+>>
+>> The ordering inversion is fully proven at the source level. However, I have
+>> **not** performed runtime verification, so actual memory corruption or
+>> successful DMA to address 0 has **not** been proven — it remains hardware
+>> and driver dependent.
+>>
+>> The bug is reachable with `CAP_NET_ADMIN` (common in container
+>> environments) when using netkit with ZCRX.
+>>
+>> Root Cause
+>>
+>> In `net/core/netdev_rx_queue.c:347-348`:
+>>
+>> ```c __netif_mp_uninstall_rxq(virt_rxq, p); // DMA unmap + dma_addr=0
+>> __netif_mp_close_rxq(...); // queue stop + NAPI disable (TOO LATE)
+>>
+>> This inverts the correct ordering used in normal device unregistration and
+>> io_uring close paths (stop first, then unmap).
+>> Impact
+>>
+>>     - *Potential:* NIC DMA write to physical address 0 (or stale mappings
+>>     with lazy IOMMU) leading to memory corruption.
+>>     - *Requirements:* CAP_NET_ADMIN + netkit queue leasing + ZCRX installed
+>>     on the leased queue.
+>>     - *Current Status:* No runtime PoC or crash reproduction yet. The race
+>>     window exists in theory but its practical exploitability needs confirmation.
+>>
+>> I am attaching the full detailed analysis.
+>> Proposed Fix[image: image.png]
+>>
+>> I am happy to provide more details or assist with testing.
 
-The problem is that the source user port itself may not belong to a
-switch directly attached to the conduit, and in this case, redirecting
-to the CPU implies programming the upstream switch(es) to also redirect
-that flow to the CPU, for it to be properly processed exclusively in
-software as opposed to flooded. And then there's a risk that the flow
-may have been programmed on that switch already with another target, so
-the operation might fail.
-
-This appears to also be a problem with my patch set linked above, so
-they should be treated together (not necessarily by you, not necessarily
-now).
-
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
