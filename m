@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-292879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qL4dA5zNGGpjnggAu9opvQ
-	(envelope-from <netdev+bounces-292879-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:19:56 +0200
+	id 2AwsIfvNGGpjnggAu9opvQ
+	(envelope-from <netdev+bounces-292880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:21:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B9FC5FB5A1
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:19:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3335FB5DC
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B1FA43045376
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:16:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B1D8B30FD410
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7657A36CE06;
-	Thu, 28 May 2026 23:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E81036A340;
+	Thu, 28 May 2026 23:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIkh2ojJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVRjxFK8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5133636B043
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7F536B048
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780010211; cv=none; b=qCogrsqzxKjeBr5w2otvrtfXelqspt/50tSd4EgD0LrOEimUmyCNOmQSVHHVFvFRxTM9idezTjBuYOm85jomF+Y/yN8rh+nkEoaBA5VY23Z6FxkxcrdI0lmG6xmhKQWv4s1vQp3fBsVUv0wtsWI1NKuPRvvJ8m3m0jnU1ZwjIJs=
+	t=1780010212; cv=none; b=boJV66opgtyHizKKO8nGaITPSEVl/RNwMDGQIj9099mbfvtOMchkJfPxEaRxiHCf+TI9H1RccwhlFTK6caStQWVO2aRAi4wREwfrEvDckuKlG53BwOPI0Mp4YO3ftPLkF16B4jlxbYoUR3FH9ey32pSZUoSLPrc7Uy0DFzKtiUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780010211; c=relaxed/simple;
-	bh=v1ZOeCLyEz7nTH7GHVxWn6EJ2FIIiIakIC5SXGyA9+A=;
+	s=arc-20240116; t=1780010212; c=relaxed/simple;
+	bh=LOaddzPwb4ErTBqRZxhkFtwRmm7X3CWp4KLICp1X0RI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=etTX+8c+afFQedBYXbo2TVY8fH+Hz16dFTYCS1iOdBtCD/vk25nKqNMZLXctV3DCTnUlYpvm5jQRaFa2OsWXxNntRgQdNgbuPag2ntFCeDQAn65xGVTPDKlZyhqGTfjpm/T1rVEPmRO/S0pJD8+wMM9HbHHzS146BmRoeq22AZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIkh2ojJ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 420B21F00A3A;
-	Thu, 28 May 2026 23:16:49 +0000 (UTC)
+	 MIME-Version; b=FfODn0iyzKMLAQ3m3kPQ6L2JgsYxwnOoVOehdL7gpDn+ZVvBXGyaAq0a5J/hqNzvVaIVbaYOn5MEnFbcV4BlrKi2mgQvVKjBcV8o1zpkPbq0H9rhuErcGcdBH4A3S8xyMuZvHR1FOwKu+1Y/2NmTSRQQxohWZwM5bfkVZoApW2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVRjxFK8; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BDF81F000E9;
+	Thu, 28 May 2026 23:16:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1780010210;
-	bh=icdVmE59G7Uc1Xvo1wP+m/s3KjOOVC4niji7aqVlsrA=;
+	bh=iBTy/R6lnS/LJBFnuAjhUsq1Gr/mSXMAs8Tkoj+n0/c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kIkh2ojJyR4z8Oa8k3FLF+Zq1SaU87EukHW4usR71E5V7OpSLeKl5jGNglETfVkl+
-	 pmMJ7xzSR4e34CCWJwflPpaGubkvCYq1wYptk3n8rSt719kais+x8Cvob1e3VPBS/F
-	 Rv5Q3+rQj8MjqzEUbp0LfPjKczXO/wXBV2trz+njtsuLbiZtzOfigFRAaSvF+T3wEf
-	 AXcIxX530pbi06rCM0uVMbqWuHsGvFzgDgHAVUQDhDOqDHKEMCubnfSt++1B6PgWyH
-	 XDLpO0eDv/yKH/3TEqz5x6XtS3BZgfV4wVSVvr6KMhF7ZIoiCCMLOE3apwiAK4MUVb
-	 sTXIaXnfHI99Q==
+	b=YVRjxFK8wMIVdtcMR/fZ4wEt3HAnTRruiim/yDjHgI7WSGqDnEoQp6zWufgazkh2G
+	 e+dl0fMo4N1SA5m8D+iLUYL01h27cL3D+P+mKbMiTaptK5cjSpI6xDvTPwUua3VGXZ
+	 VCn53XlJFKXiPJ3agoJkzyB5p4rRU53hHc5ChnDEq0H6VSIvRFBHyQnrm/BPhdOP2u
+	 YxqAngcjV3MKevsNKWILwNgIExxzZ5eB/L8GzLl4qlcKIh3IOypwA2s9hQBbIaL8TU
+	 wSO8z//3TMW5hy06uMocABNae5yrsSRxHKvKw3d/wpIzopKk1PhNVfJzHocoL6KGsp
+	 DAFVYpO+EjOmg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	danieller@nvidia.com,
 	idosch@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 02/14] net: ethtool: make sure __ethtool_get_link_ksettings() is ops-locked
-Date: Thu, 28 May 2026 16:16:25 -0700
-Message-ID: <20260528231637.251822-3-kuba@kernel.org>
+Subject: [PATCH net-next 03/14] net: ethtool: serialize broadcast notification sequence allocation
+Date: Thu, 28 May 2026 16:16:26 -0700
+Message-ID: <20260528231637.251822-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260528231637.251822-1-kuba@kernel.org>
 References: <20260528231637.251822-1-kuba@kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,bootlin.com,linux.microsoft.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-292879-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292880-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,123 +104,126 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2B9FC5FB5A1
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2C3335FB5DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-__ethtool_get_link_ksettings() is exported and called from sysfs
-and many drivers. Looks like commit 2bcf4772e45a ("net: ethtool:
-try to protect all callback with netdev instance lock")
-missed adding the lock around it. Not treating this as a fix because
-I don't think any driver cares at this point, but if we want to
-remove the rtnl_lock protection this will become critical.
+ethnl_bcast_seq is a global counter stamped into the nlmsg_seq field
+of every multicast notification, allowing userspace to detect dropped
+messages. Today the ordering is achieved by using rtnl_lock()
+
+Moving forward we will want ethtool ops to run under just the netdev
+instance lock so to establish ordering we need a separate lock
+for notifications. With the netdev instance locks operations on
+different devices may bypass each other but the expectation is
+that it should not matter. What we need to prevent is:
+ - notification IDs getting out of order
+ - operations on one device getting out of order
+
+For simplicity defer allocating the ID of the notification right
+before the notification is delivered. This removes the need for
+special handling in ethnl_rss_create_send_ntf().
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/ethtool.h |  2 ++
- net/ethtool/ioctl.c     | 20 +++++++++++++++++---
- net/ethtool/linkinfo.c  |  4 ++--
- net/ethtool/linkmodes.c |  4 ++--
- 4 files changed, 23 insertions(+), 7 deletions(-)
+ net/ethtool/netlink.h |  1 -
+ net/ethtool/netlink.c | 28 +++++++++++++++++-----------
+ net/ethtool/rss.c     |  1 -
+ 3 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 1cb0740ba331..0caaeb91b094 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -325,6 +325,8 @@ struct ethtool_link_ksettings {
- extern int
- __ethtool_get_link_ksettings(struct net_device *dev,
- 			     struct ethtool_link_ksettings *link_ksettings);
-+int ethtool_get_link_ksettings_locked(struct net_device *dev,
-+				      struct ethtool_link_ksettings *link_ksettings);
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 674c9c19529b..f94aaa66379c 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -10,7 +10,6 @@
  
- struct ethtool_keee {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index bd97f9b9bf18..1d74ee67e77a 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -436,10 +436,10 @@ struct ethtool_link_usettings {
- };
+ struct ethnl_req_info;
  
- /* Internal kernel helper to query a device ethtool_link_settings. */
--int __ethtool_get_link_ksettings(struct net_device *dev,
--				 struct ethtool_link_ksettings *link_ksettings)
-+int ethtool_get_link_ksettings_locked(struct net_device *dev,
-+				      struct ethtool_link_ksettings *link_ksettings)
+-u32 ethnl_bcast_seq_next(void);
+ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
+ 			       const struct nlattr *nest, struct net *net,
+ 			       struct netlink_ext_ack *extack,
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index 6cbd13b61bd1..902ff7d0a71d 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -13,6 +13,12 @@
+ static struct genl_family ethtool_genl_family;
+ 
+ static bool ethnl_ok __read_mostly;
++
++/* Serializes broadcast notification sequence allocation with the multicast
++ * send, so that userspace observes nlmsg_seq monotonic in receive order
++ * regardless of which lock the caller holds (rtnl or instance lock).
++ */
++static DEFINE_MUTEX(ethnl_bcast_lock);
+ static u32 ethnl_bcast_seq;
+ 
+ #define ETHTOOL_FLAGS_BASIC (ETHTOOL_FLAG_COMPACT_BITSETS |	\
+@@ -82,12 +88,6 @@ static void ethnl_sock_priv_destroy(void *priv)
+ 	}
+ }
+ 
+-u32 ethnl_bcast_seq_next(void)
+-{
+-	ASSERT_RTNL();
+-	return ++ethnl_bcast_seq;
+-}
+-
+ int ethnl_ops_begin(struct net_device *dev)
  {
+ 	int ret;
+@@ -329,8 +329,7 @@ void *ethnl_dump_put(struct sk_buff *skb, struct netlink_callback *cb, u8 cmd)
+ 
+ void *ethnl_bcastmsg_put(struct sk_buff *skb, u8 cmd)
+ {
+-	return genlmsg_put(skb, 0, ++ethnl_bcast_seq, &ethtool_genl_family, 0,
+-			   cmd);
++	return genlmsg_put(skb, 0, 0, &ethtool_genl_family, 0, cmd);
+ }
+ 
+ void *ethnl_unicast_put(struct sk_buff *skb, u32 portid, u32 seq, u8 cmd)
+@@ -340,8 +339,15 @@ void *ethnl_unicast_put(struct sk_buff *skb, u32 portid, u32 seq, u8 cmd)
+ 
+ int ethnl_multicast(struct sk_buff *skb, struct net_device *dev)
+ {
+-	return genlmsg_multicast_netns(&ethtool_genl_family, dev_net(dev), skb,
+-				       0, ETHNL_MCGRP_MONITOR, GFP_KERNEL);
++	struct nlmsghdr *nlh = nlmsg_hdr(skb);
++	int ret;
++
++	mutex_lock(&ethnl_bcast_lock);
++	nlh->nlmsg_seq = ++ethnl_bcast_seq;
++	ret = genlmsg_multicast_netns(&ethtool_genl_family, dev_net(dev), skb,
++				      0, ETHNL_MCGRP_MONITOR, GFP_KERNEL);
++	mutex_unlock(&ethnl_bcast_lock);
++	return ret;
+ }
+ 
+ /* GET request helpers */
+@@ -1081,7 +1087,7 @@ void ethnl_notify(struct net_device *dev, unsigned int cmd,
+ {
+ 	if (unlikely(!ethnl_ok))
+ 		return;
 -	ASSERT_RTNL();
 +	netdev_ops_assert_locked(dev);
  
- 	if (!dev->ethtool_ops->get_link_ksettings)
- 		return -EOPNOTSUPP;
-@@ -450,6 +450,20 @@ int __ethtool_get_link_ksettings(struct net_device *dev,
- 	memset(link_ksettings, 0, sizeof(*link_ksettings));
- 	return dev->ethtool_ops->get_link_ksettings(dev, link_ksettings);
- }
-+
-+/* Convenience helper for callers that hold only rtnl_lock(). */
-+int __ethtool_get_link_ksettings(struct net_device *dev,
-+				 struct ethtool_link_ksettings *link_ksettings)
-+{
-+	int ret;
-+
-+	ASSERT_RTNL();
-+
-+	netdev_lock_ops(dev);
-+	ret = ethtool_get_link_ksettings_locked(dev, link_ksettings);
-+	netdev_unlock_ops(dev);
-+	return ret;
-+}
- EXPORT_SYMBOL(__ethtool_get_link_ksettings);
+ 	if (likely(cmd < ARRAY_SIZE(ethnl_notify_handlers) &&
+ 		   ethnl_notify_handlers[cmd]))
+diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
+index 53792f53f922..65bad23d5c59 100644
+--- a/net/ethtool/rss.c
++++ b/net/ethtool/rss.c
+@@ -995,7 +995,6 @@ ethnl_rss_create_send_ntf(const struct sk_buff *rsp, struct net_device *dev)
+ 	nlh = nlmsg_hdr(ntf);
+ 	/* Convert the reply into a notification */
+ 	nlh->nlmsg_pid = 0;
+-	nlh->nlmsg_seq = ethnl_bcast_seq_next();
  
- /* convert ethtool_link_usettings in user space to a kernel internal
-diff --git a/net/ethtool/linkinfo.c b/net/ethtool/linkinfo.c
-index 244ff92e2ff9..0cdcf0887b01 100644
---- a/net/ethtool/linkinfo.c
-+++ b/net/ethtool/linkinfo.c
-@@ -34,7 +34,7 @@ static int linkinfo_prepare_data(const struct ethnl_req_info *req_base,
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
- 		return ret;
--	ret = __ethtool_get_link_ksettings(dev, &data->ksettings);
-+	ret = ethtool_get_link_ksettings_locked(dev, &data->ksettings);
- 	if (ret < 0)
- 		GENL_SET_ERR_MSG(info, "failed to retrieve link settings");
- 	ethnl_ops_complete(dev);
-@@ -104,7 +104,7 @@ ethnl_set_linkinfo(struct ethnl_req_info *req_info, struct genl_info *info)
- 	bool mod = false;
- 	int ret;
- 
--	ret = __ethtool_get_link_ksettings(dev, &ksettings);
-+	ret = ethtool_get_link_ksettings_locked(dev, &ksettings);
- 	if (ret < 0) {
- 		GENL_SET_ERR_MSG(info, "failed to retrieve link settings");
- 		return ret;
-diff --git a/net/ethtool/linkmodes.c b/net/ethtool/linkmodes.c
-index 30d703531652..e7999aed9200 100644
---- a/net/ethtool/linkmodes.c
-+++ b/net/ethtool/linkmodes.c
-@@ -39,7 +39,7 @@ static int linkmodes_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret < 0)
- 		return ret;
- 
--	ret = __ethtool_get_link_ksettings(dev, &data->ksettings);
-+	ret = ethtool_get_link_ksettings_locked(dev, &data->ksettings);
- 	if (ret < 0) {
- 		GENL_SET_ERR_MSG(info, "failed to retrieve link settings");
- 		goto out;
-@@ -324,7 +324,7 @@ ethnl_set_linkmodes(struct ethnl_req_info *req_info, struct genl_info *info)
- 	bool mod = false;
- 	int ret;
- 
--	ret = __ethtool_get_link_ksettings(dev, &ksettings);
-+	ret = ethtool_get_link_ksettings_locked(dev, &ksettings);
- 	if (ret < 0) {
- 		GENL_SET_ERR_MSG(info, "failed to retrieve link settings");
- 		return ret;
+ 	genl_hdr = nlmsg_data(nlh);
+ 	genl_hdr->cmd =	ETHTOOL_MSG_RSS_CREATE_NTF;
 -- 
 2.54.0
 
