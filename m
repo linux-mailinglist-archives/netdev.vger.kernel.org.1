@@ -1,146 +1,136 @@
-Return-Path: <netdev+bounces-292574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292575-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CEe8HNHwF2q5WAgAu9opvQ
-	(envelope-from <netdev+bounces-292574-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:37:53 +0200
+	id QMXdHLvzF2q5WAgAu9opvQ
+	(envelope-from <netdev+bounces-292575-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7215EDC7B
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:37:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 171C75EDF67
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 853D83012EAF
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:36:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 534A930A3625
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC5D33FE0A;
-	Thu, 28 May 2026 07:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548FC34DB72;
+	Thu, 28 May 2026 07:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RRj0XWqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B033403F5;
-	Thu, 28 May 2026 07:36:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF76D34C815;
+	Thu, 28 May 2026 07:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779953798; cv=none; b=VQRqMwobS8B0fqJnf5MFT4l8bNeRhhkJ9aITwZVP4/ztNZiVEUQYvt5DqKZZdRAdMw4z3sBChK3bmjlNzPYnkepP3wyxapy8pIZXOJyVxCgrzlt6bW6WWD9dJ4NLATYdYlwXZJPCyxp5X2rzIueouq0eCDf4G68tt2r27F2c2sE=
+	t=1779954310; cv=none; b=OItKjaKPZrsIBA60n487ycsh56eei7K9dTdFUfQM4rwtDzNGfsgjgtnYTaRXMGWv9VyYmY/TcIqkxNxvJbGXaDWR+KTF0vzlHnHI5kml1dgSzle4uYNeWAEcJqbO3U0R458eM2qN3hUNf6zH6/WcJVL1eznUiQg74nrT/OJPvXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779953798; c=relaxed/simple;
-	bh=G+0SBHPfajvCnZMGxHvYX09QmzjENo0xCYn8VkdJW7M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GM9gAJRk91uTctv8q/Rr7ZUyt98WS5Tyvo9t0Zmq7KB7vV1M5Xsl9PJsUPArJhULMfJrvZxSo2iNTP0qzItdiWg4g6xBYUQepqHdhjb7GV43OW5grfhYpAqxoDFxhM8HcOuvILyN54vAfxxsl0m1wcrjGfoBwbMNDRceWnlBf3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowACXsdh78BdqsP6tEg--.9382S2;
-	Thu, 28 May 2026 15:36:27 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kees Cook <kees@kernel.org>,
-	Feng Yang <yangfeng@kylinos.cn>,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] netlink: fix skb refcount leak when dump start fails
-Date: Thu, 28 May 2026 07:36:14 +0000
-Message-Id: <20260528073614.1169858-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1779954310; c=relaxed/simple;
+	bh=EJub6JXBaWWgRu5cZ1gvCapF88tx4Za6Fv68dCVsrMI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XxQu5Hpb9NXXxkjt7H3YA4QG1tlHDGAzh7lWcGwZRB07VtZIm5K9/WAlKDXVWkzQ7YNVwXVQtelgTqpoP06ZufcBI5XmRw7E9m9D4JcNDq4MMXP5xFuKRpnuHsCqQvXG7guWi1juMO8v3rdx+SuIenHZJUhzS//gywnL/J6KPUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RRj0XWqY; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id E4E744E4106B;
+	Thu, 28 May 2026 07:45:06 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B8FE960495;
+	Thu, 28 May 2026 07:45:06 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 422B81088806E;
+	Thu, 28 May 2026 09:45:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1779954305; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=o+jaleTw1PrS9lddrKqjpqnnZcDe+XAxXAP5SJyBXWo=;
+	b=RRj0XWqYSEpbhqlQ28lfttUnTJSiY064TTecno3eu5Mnxy4ThKtkOuZ0AeLc4x+SxANGyT
+	jWAyTaNwuwdW5uB6FfMIjfrMnKjA+qEdqzvJnq9a41EWCaEjbBjJP7gqvbeijwa1e8cfTB
+	uq8YXUjq+foDA41bcXMfmQsX7VParDd9bWIgDGoCcEADUpPUQLxUexMIYIDQdO2F5Qv/TA
+	Tp2a7oLhwDb9/HbhUi9swCax7Meznh/H43E/Cdx9i65klynIbufrqbrG1Ph/40h7+facKt
+	ZppX/0ttMwX0Klsgn0G6VvkU6HjTa+aX84Zvmtaql4ydmmgOI+KUX4fH/6MO3A==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: "syzbot" <syzbot@kernel.org>
+Cc: syzkaller-bugs@googlegroups.com,  "Alexander Aring"
+ <alex.aring@gmail.com>,  "David S. Miller" <davem@davemloft.net>,  "Eric
+ Dumazet" <edumazet@google.com>,  "Jakub Kicinski" <kuba@kernel.org>,
+  <linux-wpan@vger.kernel.org>,  <netdev@vger.kernel.org>,  "Paolo Abeni"
+ <pabeni@redhat.com>,  "Stefan Schmidt" <stefan@datenfreihafen.org>,
+  horms@kernel.org,  linux-kernel@vger.kernel.org,  syzbot@lists.linux.dev
+Subject: Re: [PATCH] ieee802154: fix kernel-infoleak in dgram_recvmsg()
+In-Reply-To: <62795fd9-fc0c-48eb-bb82-05ffc5a57104@mail.kernel.org>
+	(syzbot@kernel.org's message of "Wed, 27 May 2026 20:18:18 +0000
+	(UTC)")
+References: <62795fd9-fc0c-48eb-bb82-05ffc5a57104@mail.kernel.org>
+User-Agent: mu4e 1.12.7; emacs 30.2
+Date: Thu, 28 May 2026 09:45:00 +0200
+Message-ID: <878q94htab.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACXsdh78BdqsP6tEg--.9382S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4UCF4UJr4xCw1fGFW7Arb_yoW8JFWxpF
-	W5KrW5trW5trWIqanrAF4rXFy7Z3WYqr45GryFkan7Ar1rG34jyF48uFZIvr43ZrZ5Kwnr
-	XFnrKF4Y9rs8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbHa0JUUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCREBA2oXzkBytQAAsu
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292575-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-292574-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	FREEMAIL_CC(0.00)[googlegroups.com,gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,redhat.com,datenfreihafen.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[miquel.raynal@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: DB7215EDC7B
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 171C75EDF67
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-__netlink_dump_start() takes an extra reference on the received skb
-via refcount_inc(&skb->users) before storing it in cb->skb for the
-dump callback to consume. If the subsequent netlink_dump() call fails
-(line 2440), the dump was never started so the completion callback
-that would normally release cb->skb will never be invoked.
+Hello,
 
-In this case, the function returns the error directly without calling
-kfree_skb(skb) to release the extra reference taken at entry.
+LGTM.
 
-Add kfree_skb(skb) before returning when netlink_dump() fails, so the
-skb reference is properly released.
+> -	addr->mode =3D mode;
+> -
+> -	if (mode =3D=3D IEEE802154_ADDR_NONE)
+> +	if (mode =3D=3D IEEE802154_ADDR_NONE) {
+> +		memset(addr, 0, sizeof(*addr));
+> +		addr->mode =3D IEEE802154_ADDR_NONE;
+>  		return 0;
+> +	}
+> +
+> +	addr->mode =3D mode;
+>=20=20
+>  	if (!omit_pan) {
+>  		memcpy(&addr->pan_id, buf + pos, 2);
+>
+>
 
-Fixes: b44d211e166b ("netlink: handle errors from netlink_dump()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/netlink/af_netlink.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 2aeb0680807d..d904c1aad35d 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2441,8 +2441,10 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
- 
- 	sock_put(sk);
- 
--	if (ret)
-+	if (ret) {
-+		kfree_skb(skb);
- 		return ret;
-+	}
- 
- 	/* We successfully started a dump, by returning -EINTR we
- 	 * signal not to send ACK even if it was requested.
--- 
-2.34.1
-
+Thanks,
+Miqu=C3=A8l
 
