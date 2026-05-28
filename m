@@ -1,169 +1,129 @@
-Return-Path: <netdev+bounces-292738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4ByAAKBZGGq9jQgAu9opvQ
-	(envelope-from <netdev+bounces-292738-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:05:04 +0200
+	id aAeUJChcGGrVjQgAu9opvQ
+	(envelope-from <netdev+bounces-292739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:15:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B455F41EE
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:05:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB7F5F441C
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5CCE6303EB9E
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:58:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3023F3083229
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E305A3F6C55;
-	Thu, 28 May 2026 14:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7877627E049;
+	Thu, 28 May 2026 15:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="HDHcRRS+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wjl2Z4Jt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3278C3F6C4B
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6915523AB81;
+	Thu, 28 May 2026 15:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779980277; cv=none; b=Q3ilf28gaPeRlrhxKBVS/f2qx6utsgCM1n9kcj5ZyWouPmtwMi5cIFOBQ2zrBEOpaaHYaHZyBe8CwmmoUtUXo3n+nmDN0QvoTZfUvl0U6xm2qsky+Yk68b8b7/lw6P5iiqTiiGOuaIp484IIQLyxJT72MzUGKQCozukuf5gAqB0=
+	t=1779980684; cv=none; b=Lq1yS304nIdvgBWBLWS8vMUh3mW4xBJHpDObeXYh0Qt/71X5YWvjNv5HJZ4E6F2l/0aXV/Aiqccvl0hPpFn7MNQUnCg+16SkB7L8g3+lt08L8KhdPDYQCAXu2OTiIlIm+uTkZugcCAHk7cfIsROlHsO/scFPl+dBzQxQ7LirTMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779980277; c=relaxed/simple;
-	bh=WkU9xz1SrrYw3PUW/US9XbneITDyH6Un2MuRfmc6BpU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=Q09s2favGgiJz5GZ4JctlpCfekw+PX2YK3DAKwJn0G+bgtHP6KBxPbBeL1P3zFdAPNn65gU4xEsMqYW/i4Iopbx45XIv1dwkQYRCSz6U19ofHsrWQI664+YElhd0VQu4iRkn+vbaSvRV0Wd7KwKbemuz+azAfzViyHM+LCL/++0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=HDHcRRS+; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260528145743euoutp02670c2fc4b091e0c4042eb75a6c9bc382~zwp5aE8cc0048700487euoutp029
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:57:43 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260528145743euoutp02670c2fc4b091e0c4042eb75a6c9bc382~zwp5aE8cc0048700487euoutp029
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1779980263;
-	bh=r8mIV8ufMduGj/medyNOciSStQq0smXmRTboOYXyU58=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HDHcRRS+zBXh2RyGK8RBYXremq7uAMsJQPT3ALuD+w8siSGtXzjDaQ3bhWruX197O
-	 xyC4J3YkYQMuit/XJ4C+eTuvlS2dPdLil4iPMY3wYKrFX5Qxb36g/cyBUghhkZPUZC
-	 6QX0MguYU47hlos0PTUkTPeJfHoX/iLbe0+stZdg=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260528145742eucas1p25c5d23dd93d0946689a8867fd95c5db7~zwp5GPv8W2557225572eucas1p2s;
-	Thu, 28 May 2026 14:57:42 +0000 (GMT)
-Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260528145741eusmtip2de8ddf36bc1db3efa926a8877ed46464~zwp4P6Aw61359913599eusmtip2b;
-	Thu, 28 May 2026 14:57:41 +0000 (GMT)
-Date: Thu, 28 May 2026 16:57:38 +0200
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: Ding Hui <dinghui1111@163.com>
-Cc: andrew@lunn.ch, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, "Russell King (Oracle)"
-	<rmk+kernel@armlinux.org.uk>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, Ding Hui <dinghui@lixiang.com>, "open
- list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, "moderated
- list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
-	"moderated list:ARM/STM32 ARCHITECTURE"
-	<linux-arm-kernel@lists.infradead.org>, open list
-	<linux-kernel@vger.kernel.org>, xiasanbo@lixiang.com,
-	yangchen11@lixiang.com, liuxuanjun@lixiang.com
-Subject: Re: [PATCH v2] net: stmmac: fix fatal bus error on resume by
- reinitializing RX buffers
-Message-ID: <ahhX4lIpHwhVekMc@AMDC4622.eu.corp.samsungelectronics.net>
+	s=arc-20240116; t=1779980684; c=relaxed/simple;
+	bh=3H2ORX3LaMZZJhQNMwEmqR2+s/uI166hUZt76ChWUqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oOd0pyJg3XKaofNmxiX5SnqrrZ7j4p+0D9zBd2IOZxwtLXPACSfxeHr5dqwdULieWyJAo+9MCZQxUdY5sSFUYx54Wu+0LC4LNWo/VSbZJ+QsWubVMBE43MwQTPpqjPoKFzz444AkRFuS1GERnuNA3AUk+gq/Lkjz3kMyJS5sv5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wjl2Z4Jt; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 289A81F000E9;
+	Thu, 28 May 2026 15:04:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779980683;
+	bh=okVGivR6JMzRY9m1e/jRPmfakZm7inVaYkf/GPCmAhw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Wjl2Z4JtMKtSu5lAXWKgaLJS3/SZN7RcBzQE86jhYuZSxHSyW0a3haS4ys3U85rG3
+	 p4xSurbpWfuEPR4F+Ekm5Enl6lgUHYLvo4rtC7bLes/pu+cRoL6jmajJMo/BbxOBIj
+	 62XBJpnuiu5sTWO8EHkLe5C8B/nC7vOMcUDVvh12sEGeJGP/du6PNOQP5b3ibtUbhN
+	 TbZJcMMWQch74a0ZzDxk9cBwsjNujfLqIlU0DAwVTn3MRs1lLmF1sW/pFmu0ozFbqu
+	 O/ICRH0+8+DedJhM+JFiChr2lILsFzHa9vWWPW7CbPPrPD92Oz7H7fraJGjzQgMRPW
+	 QA40qw59IXXfQ==
+Date: Thu, 28 May 2026 08:04:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Carlos Llamas <cmllamas@google.com>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Matthew Maurer <mmaurer@google.com>, Miguel
+ Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo
+ <gary@garyguo.net>, "=?UTF-8?B?QmrDtnJu?= Roy Baron"
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Andreas
+ Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, Danilo
+ Krummrich <dakr@kernel.org>, Christian Brauner <brauner@kernel.org>,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v5 1/2] rust: netlink: add raw netlink abstraction
+Message-ID: <20260528080441.01ab1847@kernel.org>
+In-Reply-To: <ahff7OTzS46Rti5c@google.com>
+References: <20260525-binder-netlink-v5-0-a90e2923ebeb@google.com>
+	<20260525-binder-netlink-v5-1-a90e2923ebeb@google.com>
+	<CANiq72kRC_k1cnJLmG+AUSiUH6kDXVsox3nMJnV-c6HkNXOwBA@mail.gmail.com>
+	<ahbAyBD584Hk9Mst@google.com>
+	<20260527192130.21dabf08@kernel.org>
+	<ahff7OTzS46Rti5c@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260526022620.501229-1-dinghui1111@163.com>
-X-CMS-MailID: 20260528145742eucas1p25c5d23dd93d0946689a8867fd95c5db7
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="-----ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_b9169_"
-X-RootMTR: 20260528145742eucas1p25c5d23dd93d0946689a8867fd95c5db7
-X-EPHeader: CA
-X-CMS-RootMailID: 20260528145742eucas1p25c5d23dd93d0946689a8867fd95c5db7
-References: <20260526022620.501229-1-dinghui1111@163.com>
-	<CGME20260528145742eucas1p25c5d23dd93d0946689a8867fd95c5db7@eucas1p2.samsung.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,lixiang.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-292738-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292739-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	DKIM_TRACE(0.00)[samsung.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,linuxfoundation.org,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,garyguo.net,protonmail.com,umich.edu,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 71B455F41EE
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 9AB7F5F441C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_b9169_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+On Thu, 28 May 2026 06:25:48 +0000 Alice Ryhl wrote:
+> > > Netdev maintainers, what do you prefer that I put for these files? I'm
+> > > of course happy to be on the hook for this code.  
+> > 
+> > Can we put it under rust/kernel/net and rust/helpers/net ?
+> > And then add those directories to networking ?
+> > Just so that we don't have to keep wondering with every little piece 
+> > of code.  
+> 
+> Sure, will do.
+> 
+> However, it doesn't look like rust/kernel/net/ is listed under any
+> MAINTAINERS entry either.
 
-On Tue, May 26, 2026 at 10:26:17AM +0800, Ding Hui wrote:
-> From: Ding Hui <dinghui@lixiang.com>
-> +		} else {
-> +			/* Theoretically unreachable: napi_disable() in
-> +			 * stmmac_suspend() ensures all initialized slots
-> +			 * have a valid page before we get here.
-> +			 * Defensive check only.
-> +			 */
-> +			if (!buf->page)
-> +				continue;
-> +
-> +			stmmac_set_desc_addr(priv, p, buf->addr);
-> +			stmmac_set_desc_sec_addr(priv, p, buf->sec_addr,
-> +						 priv->sph_active &&
-> +						 buf->sec_page);
+Which is why I said:
 
-It this generally sufficient?  Or, in fact, isn't that overkill?
-stmmac_rx_refill() generally does a bit more preparation of descriptors.
-The issue seems to be that during suspend there is mismatch,
-caused by writeback format, between rx_dirty and rx_cur pointers and
-there is bad handling of this case, since there is no verification
-of leftover stuff and there will be leftover bad address crashing platform.
-So stmmac needs to refill/reinit descriptors that were consumed but not
-refilled. So isn't going through whole dma_rx_size overkill?
-Wouldn't it be better to iterate over buffer from cur_rx as long as descriptors
-are 0 and only apply refill to those corrupted?
-
-Could you paste panic that occurs during this issue?
-You mention "fatal bus error" which I would assume is system panic?
-
-Thanks
-
-BR
-Jakub Raczynski
-
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_b9169_
-Content-Type: text/plain; charset="utf-8"
-
-
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_b9169_--
+  "And then add those directories to networking ?"
 
