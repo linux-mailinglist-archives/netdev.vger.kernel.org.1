@@ -1,151 +1,121 @@
-Return-Path: <netdev+bounces-292517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GF+RLrekF2oTMAgAu9opvQ
-	(envelope-from <netdev+bounces-292517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:13:11 +0200
+	id gLKHCeSkF2oTMAgAu9opvQ
+	(envelope-from <netdev+bounces-292519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:13:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 386245EBB2E
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:13:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299175EBB5A
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 365BA3011071
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:13:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 32FAE3014B11
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12412EBB9E;
-	Thu, 28 May 2026 02:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087DC2EA749;
+	Thu, 28 May 2026 02:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a7/FfZHM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dZnTR7Wb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E9A2EBBB9
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 02:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22AF223322;
+	Thu, 28 May 2026 02:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779934387; cv=none; b=NwinqrpkjP0UMfc94lDSIudeTY26WZakmFaJLmZybwXIhBLY8MDQ89H/AYBF8bTmrbPDJArHLJIsdlOizh4driokr2qAX4IZVoI1G9lMjRqJx7Sc9+ScM+gNjaDnsQms62hkZpVbG+7Vhsr46iVsj68oo7PDgifp+vZ9OfkgMJo=
+	t=1779934421; cv=none; b=Q2fA/Ri5LocARlfCa1yVORCcWis+Lm0WFLnXypv/KxcR+TI7y6fmeJAj7KnrJ9OvJDhWl/z+a7w7hB9xlAJwTdJS6A2IvES58YDfuIedNDQKswRHWYgxSCUn0XCX/G1+Ykdj4g+O4ANANV/d2gd13GRoWG11DHpkwFIaUQSTlvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779934387; c=relaxed/simple;
-	bh=Ciyr1abHwQgdi4uI8R47i06XGyEvBzYVlL6Morgg8Y8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bm2j/5m4HD+VeyAY2EDJ1Wk8kfuh/tWL5hfU+nvpDGuY7JTPQVuIHx59Whm1/a3EDFkJhs9+NTnpeJiz+uS5LlJLL+6ZnKZFRZ5DKovcw3mLEfkdiPDaOfgryYlT+9HrF+faSu0O/F+0rp5WUGarKZJL5jOS7Vh9j3gllszUvdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a7/FfZHM; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 037EB1F00A3A;
-	Thu, 28 May 2026 02:13:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779934384;
-	bh=I+Edx5fLpNKrzRvGWRlcpKc4RZpUpuSOPh3zkjaQB58=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=a7/FfZHMxCw7kgQjtuwZPHNcsDZTxajzQBQYbjryga9CAbYFdPw9VQup3n/qgk1cf
-	 YV8aEjAPxye6N0iwRjmjNhq7PKyIAFNTtQwQIu0O6aHGjM0eIbleq28g4nN9ttrhaX
-	 sJd/n2oSPUwy33o7fXQWgKP+O8DSz+D1D3mp5nsTkVuuE+h31ey0f613A62w41ieLD
-	 9lMApAYAwdwiInyAXAepM5bVvAd51+N04R6N3vec3vIHAXgggWpt9dPgj5XHp/cvHs
-	 NPFyKQkL3NmzVlqoIgIe7c70Vb/uUzLqg1tHtjkEfXjWQ1kzbe7xRJ9h2cQRInmDkp
-	 AOQ4Umw99OVfQ==
-Date: Wed, 27 May 2026 19:13:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alice Mikityanska <alice.kernel@fastmail.im>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Xin Long <lucien.xin@gmail.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Willem de Bruijn <willemb@google.com>,
- David Ahern <dsahern@kernel.org>, Nikolay Aleksandrov
- <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>, Stanislav Fomichev
- <stfomichev@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
- netdev@vger.kernel.org, Alice Mikityanska <alice@isovalent.com>
-Subject: Re: [PATCH net-next v5 00/11] BIG TCP for UDP tunnels
-Message-ID: <20260527191303.78dfffde@kernel.org>
-In-Reply-To: <20260526161200.1135899-1-alice.kernel@fastmail.im>
-References: <20260526161200.1135899-1-alice.kernel@fastmail.im>
+	s=arc-20240116; t=1779934421; c=relaxed/simple;
+	bh=FnIIRhwHVxhf84QYbjG1naW87w4UL3JLS8AFwtzW2cM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QzmG5wFhK9Kmch7yMH1EFUS9zXzwu9Dzz9CClk+mqAF4ohSnAHPbhDKl32Y2cXPqmTLFWM+xUq/ycxYY0TlRNP6qLS/DHV92nq3lKDV7+y3dhC1DhmxTkrxF3M/ECemWysWmXVMrZqroOst0tHh1x/7zd1ohWoiM3X/GUoQ/7Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dZnTR7Wb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+6hZhN0fsF8RcPZ8QWhufIy7gHA5Gi1Zrz/J4AEwbxo=; b=dZnTR7WbuolpUN1hRSzyk5dRCB
+	dK0JcdzLhslSJvFq5MyRh82olom/sM6CAlxWWztjGX8LLSc0bcK3qFMTIZ8YAhhlhxJXIk9Ygwj6z
+	cUR21pm56u1t5gGXp10HxrXqc9weQN/VX8+fCALo1OrofkvuOhqo4rr93mI8Yo2QnIAY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSQFV-004qFX-UL; Thu, 28 May 2026 04:13:29 +0200
+Date: Thu, 28 May 2026 04:13:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: ciprian.regus@analog.com
+Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v2 04/10] net: ethernet: oa_tc6: Export the C45
+ access functions
+Message-ID: <c2463fa3-7a43-4749-946a-e96f337e7d96@lunn.ch>
+References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
+ <20260527-adin1140-driver-v2-4-37e5c8d4e0a0@analog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260527-adin1140-driver-v2-4-37e5c8d4e0a0@analog.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292517-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292519-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[fastmail.im];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[iogearbox.net,davemloft.net,google.com,redhat.com,gmail.com,kernel.org,blackwall.org,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
-X-Rspamd-Queue-Id: 386245EBB2E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 299175EBB5A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 26 May 2026 18:11:49 +0200 Alice Mikityanska wrote:
-> This series is a follow-up to "BIG TCP without HBH in IPv6", and it adds
-> support for BIG TCP IPv4/IPv6 workloads in vxlan and geneve. Now that
-> IPv6 BIG TCP doesn't require stripping the HBH in all various
-> combinations in tunneled traffic, adding BIG TCP becomes feasible.
+On Wed, May 27, 2026 at 12:51:49AM +0300, Ciprian Regus via B4 Relay wrote:
+> From: Ciprian Regus <ciprian.regus@analog.com>
 > 
-> Patches 01-02 are small fixups to some related code that I'm changing in
-> the series.
+> The C45 access functions can still be used by some Ethernet drivers
+> which set the OA_TC6_BROKEN_PHY flag. Export them.
 > 
-> Patch 03 adds accessors for the length field in the UDP header, as
-> suggested by Paolo in review. The usage of udp_set_len is then added in
-> the following patches that start using length=0 in BIG TCP UDP packets.
-> 
-> Patches 04-06 close the gaps that prevent BIG TCP packets from going
-> through UDP tunnel code.
-> 
-> Patch 07 re-adds proper validation of malformed packets that arrive with
-> length=0 from the wire.
-> 
-> Patch 08 is for proper formatting in tcpdump (set UDP len to 0 rather
-> than a trimmed value on overflow).
-> 
-> Patches 09-10 bump up tso_max_size for VXLAN and GENEVE.
-> 
-> Patch 11 adds selftests.
+> Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
 
-Looks like the selftest fails on debug kernel builds:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-# overriding timeout to 7200
-# selftests: net: big_tcp_tunnels.sh
-# 0.50 [+0.50] Setting up VXLAN over IPv4
-# 0.78 [+0.28] Running IPv4 traffic in the tunnel
-# 5.93 [+5.14] Captured BIG TCP GRO packets: 18138
-# 5.93 [+0.00] Captured BIG TCP GSO packets: 17445
-# 6.01 [+0.08] Setting up VXLAN over IPv4
-# 6.29 [+0.29] Running IPv6 traffic in the tunnel
-# 11.40 [+5.11] Captured BIG TCP GRO packets: 17827
-# 11.40 [+0.00] Captured BIG TCP GSO packets: 16964
-# 11.49 [+0.08] Setting up VXLAN over IPv6
-# 11.78 [+0.29] Running IPv4 traffic in the tunnel
-# 16.89 [+5.11] Captured BIG TCP GRO packets: 8951
-# 16.89 [+0.00] Captured BIG TCP GSO packets: 9063
-not ok 1 selftests: net: big_tcp_tunnels.sh # exit=1
-
-https://netdev-ctrl.bots.linux.dev/logs/vmksft/net-dbg/results/665442/153-big-tcp-tunnels-sh/stdout
-https://netdev-ctrl.bots.linux.dev/logs/vmksft/net-dbg/results/665442/153-big-tcp-tunnels-sh-retry/stdout
+    Andrew
 
