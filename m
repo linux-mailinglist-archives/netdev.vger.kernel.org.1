@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-292881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Vr9IQzOGGqunggAu9opvQ
-	(envelope-from <netdev+bounces-292881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:21:48 +0200
+	id eFh2Ex3OGGpjnggAu9opvQ
+	(envelope-from <netdev+bounces-292882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:22:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC94C5FB5EB
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:21:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A085FB609
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 75B9F3100DEE
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:16:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65DCB3107177
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23EBA36AB4B;
-	Thu, 28 May 2026 23:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DF036EA9F;
+	Thu, 28 May 2026 23:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EI/4jU1t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYoyjxnz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071A136D9F1
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009CE36C581
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780010213; cv=none; b=bCiMQEcTGu1d3EtxAN8KXrUbOq8OTrmrFgO7PaezCSUJLLyS4g12jtrnBKjGG6RgbWUk7SAT9yAyE2Mc42pt70wP8wZX9Pd4PY/ZVgMoyg8gm3mIej09URVEIA3JEB9AILS6lc8vjzU/DhVKXJ3FgjJDsT5JDWup2qcE0brm6lY=
+	t=1780010214; cv=none; b=dKmV/IlxXr68ObLfFsnquiHUNnuuD2kP+2mxQNZB45/h1xaBCATykVb6Sgjo1+t3ZVJtnOoqkWEM2HiY6OfbpzYHQNS9tcQnYT+AztNtpCzZFEWTx25/huqavPU5Ya9ZAwKQWS2JODEHZXMJONwSfnb27rawQwe1L+X/NdAosEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780010213; c=relaxed/simple;
-	bh=zfyyHeJnDdRWKIc4vkSawWyAhpq+EFNvhd4x6nIBXzc=;
+	s=arc-20240116; t=1780010214; c=relaxed/simple;
+	bh=H717zQE6mbYDiJTqD4NN45Lpc7AzByjt5aX5D71uoWY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QJkibMfCzfiUyoKLmub5+t6uuM8VwTop6JjsilYVYIe5g40iYoQlaMGAP27QtciRoUNKC2rZF6H/5pgExxqeQFYBi9sXZWKw1350ZJmsK+VeGCt2nqwoGWu/jLRTp1w56QOKbgstjTWkKuQR1iM+opFaKYKKqBu3G1t7s9f87ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EI/4jU1t; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EEF11F00A3E;
-	Thu, 28 May 2026 23:16:51 +0000 (UTC)
+	 MIME-Version; b=JVGGXsac1jUc7zACDbP0moVJ1tJ5D2JvRctXhdCaIJ8YEgpJcWQ6OLxJorbvwZpld/7ExwvewIoU0BEWuipY8HBcXu5Qja+auNxZM6ZP+CLgMyXsQPqidZu4goSN/HMueumGnwape34BxjNEtSIumEPm7y8XIPfueUep35A+ydI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYoyjxnz; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AFA31F00A3D;
+	Thu, 28 May 2026 23:16:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780010211;
-	bh=nHOlKwzIquzQ01+xq/KHcOSCbRPLnYWPsrIfFWV0qBk=;
+	s=k20260515; t=1780010212;
+	bh=/w1oYXhDApORvFmOXrqg+6qK+1/bj6oJJXQkvfk2iS4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EI/4jU1tqgxP5MKcIKNkFaNmYLNTfXiXkjaobFf7u7aaDY088drW3ftLvAHVYBe1z
-	 Fafh0CrYgxJ3AKNG7Gk53msqwA10H/dVl2hwfsbk71ocWAwfSexm9HsdfLmYQngqgK
-	 MkXkKsae4tr2zNYYA9c0KOzaAvE1p+h+y9YRrbGjBjuVpPRRPH3Muznwmh50N1tNCs
-	 qMee+Vo+fO539UpQm/GoUl1L/f3YrQanFVHDlq+b9XxRr961Y+JosV/9IJn+IZRcT4
-	 B2UIN+WrAGOpxJUhxQtvZMNQh0kAS7Uw2hHx0Dis/AIq/s1q0x7liWVP8A/1EEVt1h
-	 LC+UxmfdqKK+A==
+	b=bYoyjxnzXvwbc6rmyaNZO8jllc7vD2hrgkTgE5N25k8LhwDyo8bWHW87VerXX5Aeb
+	 VwPyC7Y1zMu75nHkBcg7AmsxasWLzNtO8EZ2X2oUH6GMPBavk+wFn8906IaXS1izA2
+	 VDFATrFFsfCXwexX6JnS0KbOPJswCGpxDP2E6nYie+kbtIHDmxAfX/JVjFfLT+I/MZ
+	 3I7vSlgM3NJ9PsHe5n13p0ACDAbm56Ao3QtBtUQNI9+qiBfSkRGNM4G2PbSz9HqTUG
+	 wsjBeUXQgaludCTWCP0NFaAl/W8nOpvI9Dbmw95U0exKaU8HJk2ikLOfzCdhRjxnhW
+	 zmBwmJ0h7ZOLg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	danieller@nvidia.com,
 	idosch@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 04/14] net: ethtool: relax ethnl_req_get_phydev() locking assertion
-Date: Thu, 28 May 2026 16:16:27 -0700
-Message-ID: <20260528231637.251822-5-kuba@kernel.org>
+Subject: [PATCH net-next 05/14] net: ethtool: make dev->hwprov ops-protected
+Date: Thu, 28 May 2026 16:16:28 -0700
+Message-ID: <20260528231637.251822-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260528231637.251822-1-kuba@kernel.org>
 References: <20260528231637.251822-1-kuba@kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,bootlin.com,linux.microsoft.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-292881-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292882-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,102 +104,182 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EC94C5FB5EB
+X-Rspamd-Queue-Id: E9A085FB609
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-phydev <> netdev linking and lifecycle depends on rtnl_lock.
-We want to switch to instance locks for most ethtool ops.
-Let's add an assert that ops locked devices don't use phydev
-today. If one does we can either opt the phy ops out of
-being purely ops locked, or do deeper surgery to make phy
-locking ops-compatible. I don't think there's any fundamental
-challenge to make that work.
+dev->hwprov tracks the active hwtstamp provider for the device.
+Make it ops protected (instance lock if the netdev driver opts
+into holding instance lock around callbacks, otherwise rtnl_lock).
+
+hwprov is written in
+ - drivers/net/phy/phy_device.c
+    phydev and ops protection don't currently mix, add a comment
+ - net/ethtool/
+    as of now holds both rtnl lock and ops lock, this one will
+    soon only hold one lock or the other
+
+read in:
+ - net/core/dev_ioctl.c
+    holds both rtnl lock and ops lock
+ - net/core/timestamping.c
+    RCU reader
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/phy_link_topology.h   | 5 +++++
- drivers/net/phy/phy_link_topology.c | 8 ++++++++
- net/ethtool/netlink.c               | 6 ++++--
- net/ethtool/phy.c                   | 1 -
- 4 files changed, 17 insertions(+), 3 deletions(-)
+ include/linux/netdevice.h           |  3 +++
+ include/net/netdev_lock.h           | 11 +++++++++++
+ drivers/net/phy/phy_device.c        |  3 +++
+ drivers/net/phy/phy_link_topology.c |  4 +++-
+ net/core/dev_ioctl.c                |  4 ++--
+ net/ethtool/tsconfig.c              | 10 ++++++----
+ 6 files changed, 28 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-index 68a59e25821c..95575f68d5bc 100644
---- a/include/linux/phy_link_topology.h
-+++ b/include/linux/phy_link_topology.h
-@@ -36,6 +36,11 @@ struct phy_device_node {
- 	struct phy_device *phy;
- };
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 7309467d7873..2d9a658e9b1a 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2584,6 +2584,9 @@ struct net_device {
+ 	 * Double protects:
+ 	 *	@up, @moving_ns, @nd_net, @xdp_features
+ 	 *
++	 * Ops protects:
++	 *	@hwprov
++	 *
+ 	 * Double ops protects:
+ 	 *	@real_num_rx_queues, @real_num_tx_queues
+ 	 *
+diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+index f4c77899fb86..3eca5465a8e6 100644
+--- a/include/net/netdev_lock.h
++++ b/include/net/netdev_lock.h
+@@ -102,6 +102,14 @@ static inline void netdev_unlock_ops_compat(struct net_device *dev)
+ 		rtnl_unlock();
+ }
  
-+static inline bool phy_link_topo_empty(struct net_device *dev)
++/* Matching "ops protected" category from netdevice.h */
++static inline int netdev_ops_is_locked(const struct net_device *dev)
 +{
-+	return !dev->link_topo;
++	if (netdev_need_ops_lock(dev))
++		return lockdep_is_held(&dev->lock);
++	return lockdep_rtnl_is_held();
 +}
 +
- #if IS_ENABLED(CONFIG_PHYLIB)
- int phy_link_topo_add_phy(struct net_device *dev,
- 			  struct phy_device *phy,
+ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ 				     const struct lockdep_map *b)
+ {
+@@ -138,6 +146,9 @@ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ #define netdev_lock_dereference(p, dev)				\
+ 	rcu_dereference_protected(p, lockdep_is_held(&(dev)->lock))
+ 
++#define netdev_ops_lock_dereference(p, dev)				\
++	rcu_dereference_protected(p, netdev_ops_is_locked(dev))
++
+ int netdev_debug_event(struct notifier_block *nb, unsigned long event,
+ 		       void *ptr);
+ 
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 3370eb822017..ea53e477465d 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1935,6 +1935,9 @@ void phy_detach(struct phy_device *phydev)
+ 	if (dev) {
+ 		struct hwtstamp_provider *hwprov;
+ 
++		/* hwprov may technically be protected by ops lock but
++		 * not for devices with a phydev, see phy_link_topo_add_phy()
++		 */
+ 		hwprov = rtnl_dereference(dev->hwprov);
+ 		/* Disable timestamp if it is the one selected */
+ 		if (hwprov && hwprov->phydev == phydev) {
 diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-index 1f1eb5d59b38..aed3b26c1674 100644
+index aed3b26c1674..4134de7ae313 100644
 --- a/drivers/net/phy/phy_link_topology.c
 +++ b/drivers/net/phy/phy_link_topology.c
-@@ -10,6 +10,7 @@
- #include <linux/phy.h>
- #include <linux/rtnetlink.h>
- #include <linux/xarray.h>
+@@ -38,7 +38,9 @@ int phy_link_topo_add_phy(struct net_device *dev,
+ 
+ 	/* ethtool ops may run without rtnl_lock, and rtnl_lock is what
+ 	 * currently protects the PHY topology. No driver currently mixes
+-	 * the two, flag if someone tries. See also ethnl_req_get_phydev().
++	 * the two, flag if someone tries. See also:
++	 *  - ethnl_req_get_phydev()
++	 *  - phy_detach()
+ 	 */
+ 	if (WARN_ON_ONCE(netdev_need_ops_lock(dev)))
+ 		return -EOPNOTSUPP;
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index f3979b276090..a320e264eaaf 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -260,7 +260,7 @@ int dev_get_hwtstamp_phylib(struct net_device *dev,
+ {
+ 	struct hwtstamp_provider *hwprov;
+ 
+-	hwprov = rtnl_dereference(dev->hwprov);
++	hwprov = netdev_ops_lock_dereference(dev->hwprov, dev);
+ 	if (hwprov) {
+ 		cfg->qualifier = hwprov->desc.qualifier;
+ 		if (hwprov->source == HWTSTAMP_SOURCE_PHYLIB &&
+@@ -337,7 +337,7 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 	bool phy_ts;
+ 	int err;
+ 
+-	hwprov = rtnl_dereference(dev->hwprov);
++	hwprov = netdev_ops_lock_dereference(dev->hwprov, dev);
+ 	if (hwprov) {
+ 		if (hwprov->source == HWTSTAMP_SOURCE_PHYLIB &&
+ 		    hwprov->phydev) {
+diff --git a/net/ethtool/tsconfig.c b/net/ethtool/tsconfig.c
+index 664c3fe49b5b..65df05a05ade 100644
+--- a/net/ethtool/tsconfig.c
++++ b/net/ethtool/tsconfig.c
+@@ -2,6 +2,7 @@
+ 
+ #include <linux/net_tstamp.h>
+ #include <linux/ptp_clock_kernel.h>
 +#include <net/netdev_lock.h>
  
- static int netdev_alloc_phy_link_topology(struct net_device *dev)
- {
-@@ -35,6 +36,13 @@ int phy_link_topo_add_phy(struct net_device *dev,
- 	struct phy_device_node *pdn;
- 	int ret;
+ #include "bitset.h"
+ #include "common.h"
+@@ -57,7 +58,7 @@ static int tsconfig_prepare_data(const struct ethnl_req_info *req_base,
+ 	data->hwtst_config.flags = cfg.flags;
  
-+	/* ethtool ops may run without rtnl_lock, and rtnl_lock is what
-+	 * currently protects the PHY topology. No driver currently mixes
-+	 * the two, flag if someone tries. See also ethnl_req_get_phydev().
-+	 */
-+	if (WARN_ON_ONCE(netdev_need_ops_lock(dev)))
-+		return -EOPNOTSUPP;
-+
- 	if (!topo) {
- 		ret = netdev_alloc_phy_link_topology(dev);
- 		if (ret)
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index 902ff7d0a71d..a91cc4bc964f 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -226,11 +226,13 @@ struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
- {
- 	struct phy_device *phydev;
+ 	data->hwprov_desc.index = -1;
+-	hwprov = rtnl_dereference(dev->hwprov);
++	hwprov = netdev_ops_lock_dereference(dev->hwprov, dev);
+ 	if (hwprov) {
+ 		data->hwprov_desc.index = hwprov->desc.index;
+ 		data->hwprov_desc.qualifier = hwprov->desc.qualifier;
+@@ -213,7 +214,7 @@ static int tsconfig_send_reply(struct net_device *dev, struct genl_info *info)
+ 		return -ENOMEM;
+ 	}
  
 -	ASSERT_RTNL();
--
- 	if (!req_info->dev)
- 		return NULL;
++	netdev_ops_assert_locked(dev);
+ 	reply_data->base.dev = dev;
+ 	ret = tsconfig_prepare_data(&req_info->base, &reply_data->base, info);
+ 	if (ret < 0)
+@@ -316,7 +317,7 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
+ 		struct hwtstamp_provider_desc __hwprov_desc = {.index = -1};
+ 		struct hwtstamp_provider *__hwprov;
  
-+	/* If there is no PHY in sight there's no need for assert locking */
-+	if (!phy_link_topo_empty(req_info->dev))
-+		ASSERT_RTNL();
-+
- 	if (!req_info->phy_index)
- 		return req_info->dev->phydev;
+-		__hwprov = rtnl_dereference(dev->hwprov);
++		__hwprov = netdev_ops_lock_dereference(dev->hwprov, dev);
+ 		if (__hwprov) {
+ 			__hwprov_desc.index = __hwprov->desc.index;
+ 			__hwprov_desc.qualifier = __hwprov->desc.qualifier;
+@@ -414,7 +415,8 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
+ 			goto err_free_hwprov;
  
-diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-index ddc6eab701ed..018b0412be86 100644
---- a/net/ethtool/phy.c
-+++ b/net/ethtool/phy.c
-@@ -78,7 +78,6 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
- 	struct phy_device *phydev;
- 	int ret;
- 
--	/* RTNL is held by the caller */
- 	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PHY_HEADER,
- 				      info->extack);
- 	if (IS_ERR_OR_NULL(phydev))
+ 		/* Change the selected hwtstamp source */
+-		__hwprov = rcu_replace_pointer_rtnl(dev->hwprov, hwprov);
++		__hwprov = rcu_replace_pointer(dev->hwprov, hwprov,
++					       netdev_ops_is_locked(dev));
+ 		if (__hwprov)
+ 			kfree_rcu(__hwprov, rcu_head);
+ 	}
 -- 
 2.54.0
 
