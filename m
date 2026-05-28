@@ -1,154 +1,556 @@
-Return-Path: <netdev+bounces-292529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292530-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFpmIfioF2qhMQgAu9opvQ
-	(envelope-from <netdev+bounces-292529-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:31:20 +0200
+	id KFrJGOaqF2qhMQgAu9opvQ
+	(envelope-from <netdev+bounces-292530-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:39:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F306A5EBCDA
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:31:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D205EBE88
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:39:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F054830154B6
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:31:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24B693014BD2
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA6B2EE611;
-	Thu, 28 May 2026 02:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qscarzia"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8314A2E62B4;
+	Thu, 28 May 2026 02:33:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7569317A2FB;
-	Thu, 28 May 2026 02:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C462EA498;
+	Thu, 28 May 2026 02:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779935477; cv=none; b=B4cXw4iUtEECjw+ylHJgzGy2kDtX6ktt3Nxf0KKxCM8qbAyLmW97bAhpuM9d99mBH79es3m2im4ceEQ7AU5MNrteOUZNCYZX4fZgokCaSf06SGMDso7rhb9UPva5uZ8xn2mc9jTLCiiB91ypVFDEqhx5kZDYVsuxuuHI9rWp7o4=
+	t=1779935586; cv=none; b=IFU2E/wqVbJ0hMXLsbfiypl1EXDr7D4gl4AA+4yK3GRfd/KFnN4bQc/ruI55vfEB0jAHLcHFZ6F5siIXxAuSV/ft/ET/vThhQM1pgD+rrglmsIuv+6aNOwf87FUexlbb2PeT3oAieDkHIgKaa64SMFpZr+10kqTIDK6gEbG0z4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779935477; c=relaxed/simple;
-	bh=QXG4NoFFgfCQ/linVMkGqNEiHmD8eKNJ+CBWQ6RrjuE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KXEnkOIM/4aJ59fPOA9SrTJCiBbP/m6waMwn7irsOmJ0B+/d6ruV418Fakqh8hrxQ1oA+2Z3n7tNQog6WUhuuX6TxKBtDUsMyeI595jhgy2Z6KZD7aYwXr2n/toyuMao8Km9yMY+7LqDdpC91hVF6jcxh28jxGIkV1m+sgsZUCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qscarzia; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=b5cdt+8NA/r12+VI/46tnIxe3zkckBM5TI5/In/7L7k=; b=qscarzia9CKEXoaaOu2DQTVqjp
-	t8tBu1mTcr/372vU1d0hgjOe5jYXZxHHx0zbfm1Z0jKatKeS6PjNVT3bcW+rBUr8812tNQCFM7F8P
-	MLt7A7YCViQs/NYm9zsm1Ki0knFIm/MK4+D2QXJky6OfABi7DKCBYB/68rTCK3mTb8II=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wSQWV-004qLm-Je; Thu, 28 May 2026 04:31:03 +0200
-Date: Thu, 28 May 2026 04:31:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: ciprian.regus@analog.com
-Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 06/10] net: ethernet: oa_tc6: Add MMS
- register formatting macro
-Message-ID: <e0fd44b6-edd8-4da4-98d0-dcb48ff30e10@lunn.ch>
-References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
- <20260527-adin1140-driver-v2-6-37e5c8d4e0a0@analog.com>
+	s=arc-20240116; t=1779935586; c=relaxed/simple;
+	bh=2wD8XWtBZ86wG/ZdZ/tEgs/qqwkBOPbT4jjtKrj9oHI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=hRnqo96dLQCgJeLjt2hh0wmJ62QrUN4Jp8kwEBgefLGlUa7tA7V2/xM/J8cJ/8UQZvChGZmNVCggEi/872P/xEw2EmmNCqr4dj2Sf3UOXCINH35sHssMdEiC+851IDCeTYkZWJPYyF7wbxjTBM8ZvIbooPnm9KoG6hKeBZOUx9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpgz14t1779935521te50821a8
+X-QQ-Originating-IP: iTDLfGfa5xS5+HpwSOIaNz7QSpgAzoWzuJc1cFh8NQQ=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 28 May 2026 10:31:58 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14042579867779889696
+EX-QQ-RecipientCnt: 12
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	danishanwar@ti.com,
+	vadim.fedorenko@linux.dev,
+	horms@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	dong100@mucse.com,
+	yaojun@mucse.com
+Subject: [PATCH net-next v5 0/4] net: rnpgbe: Add TX/RX and link status support
+Date: Thu, 28 May 2026 10:31:46 +0800
+Message-Id: <20260528023150.239532-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260527-adin1140-driver-v2-6-37e5c8d4e0a0@analog.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
+X-QQ-XMAILINFO: Nr9Hl0MTzROZWmdWGJT0Ww58wJjyyJSRHIedp4uB5I7uggxmJqR8XLm9
+	rfYNeocMWIHEIZo1aezPq5dglSgJbIaTwxGG4To6qSpjOp6Q/zerxvfl9U311puC0RRhEmt
+	j8rd4xYfWb4FGaOUGDcNCcTfeMeJ4NkNvVJqqQFY9rTsuPw+tHxj+MB0IApGOyjoYdOl52W
+	mRA75L8i7baUa1ZF6t8/e9rnk/YmlH8MxiOG4ddMcrxlgf+O9DtK+7ogGwPTnaKxDGBeqTN
+	S3VtQKtsGObXhV5z65prbSE9bnn9zxxwKL17ulyIdUJ0o7d/8hd+Tw9JavdOcU17ZpDiaD3
+	e4GoKWrv0UHDdrpCyqCsYkOzQRGKKqJ08LL3/ca8Lc0Lx04yFydYg/TECk9Bmj6G7Ert7nr
+	EDTSg56PceqcfTEXnCtMNF3dDa52WSruTRXR8k8f1JuubhIOXvvPWjJoGNye4FCVkg38omt
+	+vFekeCKoVY2Cs7j53zYG2BN7LVogJ84/YCdU2UaUyukOr8H0VIai1VsmHEFU8IkA9PGpMA
+	NuiJt9s77qw+Eso0lFFgti5xwtYxffmlLPptPmfk8adLJvw+1JIMUSsQ6xSgVWj4vcxzZkY
+	5ZY5A9QHd0uukJrAp1R1Xy/Tgf9RvKSNQYLjuJuCsjQ1OoMN6L6gKU3uQnAlysYRAUdvFHP
+	6bJJKuonK88jHzQO6ogwH8GfUt4SCmb8jGQ+C0F0RdOM4YFjWlkPmZ8QDcNsD5aXlhaVYZN
+	h6gQYm5+xdoQaNyZ75R8As9MqQgL+QrW6RfgKxfLfQiEI+8uf/Z2zdcU6VJThOEcS1nYCJW
+	Z8yj+iue8TRQKOZICalRGu8HfeGqJUSWsv5DuCHKPivwaHt5KFXalbjPMsdSGWcBctxyZpa
+	MMpjAdB/cLq1JQ94ZCo4Jt1QIK768NQkBHiNjhw97T9QGi5qQtHDfWHEqdnFF3CcKJbyVwn
+	vf2ltwRYCYFZdtnUNr02LXf1wzjH+NcJgqnJoFE1+SCX9YL+4KeI2VVPNfiazYVfxLQdPl1
+	kD96cdPhJTVPaf6LxvXzaSIrhTEAlvwB7vQ9RcFmYBnRQB8iCeEMOhcwaq9L8UTcyDpR+Jw
+	w==
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292529-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292530-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mucse.com];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim,analog.com:email]
-X-Rspamd-Queue-Id: F306A5EBCDA
+	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mucse.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: B4D205EBE88
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 12:51:51AM +0300, Ciprian Regus via B4 Relay wrote:
-> From: Ciprian Regus <ciprian.regus@analog.com>
-> 
-> The Open Alliance TC6 standard defines multiple memory maps for the
-> MAC-PHY's register space. These are used to separate standard, vendor
-> and PHY MMD specific registers. Add a macro to make it more clear which
-> memory map each register is part of and allow easier definition.
-> 
-> Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
-> 
-> ---
-> v2 changelog:
->  - New patch
-> ---
->  drivers/net/ethernet/oa_tc6.c | 4 ++--
->  include/linux/oa_tc6.h        | 3 +++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-> index 904bd790159d..876891ca9859 100644
-> --- a/drivers/net/ethernet/oa_tc6.c
-> +++ b/drivers/net/ethernet/oa_tc6.c
-> @@ -471,7 +471,7 @@ int oa_tc6_mdiobus_read_c45(struct mii_bus *bus, int addr, int devnum,
->  	if (ret < 0)
->  		return ret;
->  
-> -	ret = oa_tc6_read_register(tc6, (ret << 16) | regnum, &regval);
-> +	ret = oa_tc6_read_register(tc6, OA_TC6_MMS_REG(ret, regnum), &regval);
+Hi maintainers,
 
-How about:
+This patch series adds the packet transmission, reception, and link status
+management features to the RNPGBE driver, building upon the previously
+introduced mailbox communication and basic driver infrastructure.
 
-	ret = oa_tc6_read_register_mms(tc6, ret, regnum, &regval);
+The series introduces:
+- Msix/msi interrupt handling with NAPI support
+- TX path with scatter-gather DMA and completion handling
+- RX path with page pool buffer management
+- Link status monitoring and carrier management
 
-and let oa_tc6_read_register_mms() combine them in the correct way.
+These changes enable the RNPGBE driver to support basic tx/rx
+network operations.
 
-Maybe also change
+Changelog:
+v4 -> v5:
+1. Rebase onto the latest branch code. (Jakub) 
 
-	ret = oa_tc6_get_phy_c45_mms(devnum);
+v3 -> v4:
+[patch 1/4]:
+1. Use min3 to optimize code. (Vadim Fedorenko)
+2. Setup RING_VECTOR in msi mode. (Sashiko)
+3. Call 'pci_set_drvdata(pdev, NULL)' in err_free_net. (Sashiko)
+4. Move remove_mbx_irq after unregister_netdev. (Sashiko) 
+5. Remove '-1' for snprintf in rnpgbe_request_irq, (Sashiko)
+6. Fix mucse->num_tx_queues and mucse->num_rx_queues after
+   rnpgbe_alloc_q_vector. (Sashiko)
+[patch 2/4]:
+1. Convert tx dropped to atomic. (Sashiko)
+2. Sum stats.dropped into stats->tx_dropped. (Sashiko)
+3. use dma_set_mask_and_coherent in probe. (Sashiko)
+4. Flush TX_START before free or change dma address. (Sashiko)
+5. Don't cost desc for 0 length frags in rnpgbe_tx_map. (Sashiko)
+6. Flush irq mask before synchronize_irq. (Sashiko)
+[patch 3/4]:
+1. Add commit to descript rx size guarantees. (Sashiko)
+2. Add dma_wmb before update rx tail. (Sashiko)
+3. Remove unreachable code in rnpgbe_cleanup_headers. (Sashiko) 
+4. Fix "not without advancing next_to_clean" in drop_status. (Sashiko)
+5. Fix "page leap" when skb failed, then close interfce. (Sashiko)
+6. Flush RX_START before free or change dma address. (Sashiko)
+7. Remove no-used mucse_rx_bufsz define. (Sashiko)
+8. Call dma_sync_single_range_for_device when reuse page. (Sashiko)
+[patch 4/4]:
+1. Add BUILD_BUG_ON in mucse_mbx_fw_reply_handler. (Sashiko)
+2. Call rnpgbe_set_rx in rnpgbe_down. (Sashiko)
+3. Fix hw->link race in rnpgbe_watchdog_subtask. (Sashiko)
+4. Fix reinit_completion in mucse_fw_send_cmd_wait_resp. (Sashiko)
+5. Rename rnpgbe_watchdog_update_link to rnpgbe_process_link_event.
+6. Rename rnpgbe_watchdog_link_is_up to rnpgbe_link_is_up.
+7. Rename rnpgbe_watchdog_link_is_down to rnpgbe_link_is_down.
+8. Rename rnpgbe_watchdog_subtask to rnpgbe_process_link_subtask.
 
-to
+links:
+---
+v1: https://lore.kernel.org/netdev/20260325091204.94015-1-dong100@mucse.com/
+v2: https://lore.kernel.org/netdev/20260403025713.527841-1-dong100@mucse.com/
+v3: https://lore.kernel.org/netdev/20260507081539.171844-1-dong100@mucse.com/
+v4: https://lore.kernel.org/netdev/20260526033539.164061-1-dong100@mucse.com/
 
-	mms = oa_tc6_get_phy_c45_mms(devnum);
+Additional Notes:
+1.
+Sashiko:
+>  static int rnpgbe_open(struct net_device *netdev)
+>  {
+> +     struct mucse *mucse = netdev_priv(netdev);
+> +     int err;
+> +
+> +     err = rnpgbe_request_irq(mucse);
+> +     if (err)
+> +             return err;
+> +
+> +     err = netif_set_real_num_queues(netdev, mucse->num_tx_queues,
+> +                                     mucse->num_rx_queues);
+> +     if (err)
+> +             goto err_free_irqs;
+> +
+> +     rnpgbe_up_complete(mucse);
+Could this sequence lead to a queue stall?
+If an interrupt arrives immediately after rnpgbe_request_irq(), the handler
+will mask the interrupt and call napi_schedule_irqoff(). Since NAPI is not
+yet enabled, the scheduling request is silently dropped.
+When rnpgbe_up_complete() later enables NAPI, the interrupt remains masked
+and the queue stalls. Should NAPI be enabled before requesting the IRQ?
 
-	Andrew
+Answer: The sequence is safe because the hardware cannot generate any Rx/Tx or link
+interrupts until rnpgbe_up_complete() enables DMA engines and interrupt
+sources. There is no race window where an interrupt can arrive before
+NAPI is ready. Therefore no stall can occur.
+
+2. 
+Sashiko:
+> +static bool rnpgbe_cleanup_headers(struct sk_buff *skb)
+> +{
+> +	if (IS_ERR(skb))
+> +		return true;
+> +	/* place header in linear portion of buffer */
+> +	if (!skb_headlen(skb))
+> +		rnpgbe_pull_tail(skb);
+> +	/* if eth_skb_pad returns an error the skb was freed */
+> +	if (eth_skb_pad(skb))
+> +		return true;
+> +
+> +	return false;
+> +}
+If the first hardware descriptor provides a size between 1 and 13 bytes,
+skb_headlen(skb) will be greater than 0, causing this to skip the
+rnpgbe_pull_tail() call.
+When eth_type_trans() is called later, it assumes a full 14 byte header and
+calls __skb_pull(skb, ETH_HLEN). If the packet spans multiple fragments,
+could subtracting 14 from skb->len cause it to drop below skb->data_len,
+triggering the BUG_ON in __skb_pull() and crashing the kernel?
+
+Answer:
+This issue is not reproducible:
+Hardware enforces a minimum packet size of 33 bytes (no 1–13 bytes
+descriptor sizes). Multiple descriptors are only used Format
+frames >1536(M_DEFAULT_SG is 96) bytes; all small packets use a single
+descriptor (no skb fragmentation). Thus the problematic __skb_pull() condition
+cannot occur.
+
+3
+Sashiko:
+> +static int rnpgbe_clean_rx_irq(struct mucse_q_vector *q_vector,
+> +			       struct mucse_ring *rx_ring,
+> +			       int budget)
+> +{
+> +	unsigned int total_rx_bytes = 0, total_rx_packets = 0;
+> +	u16 cleaned_count = mucse_desc_unused_rx(rx_ring);
+> +	bool fail_alloc = false;
+> +
+> +	while (likely(total_rx_packets < budget)) {
+> +		struct mucse_rx_buffer *rx_buffer;
+> +		union rnpgbe_rx_desc *rx_desc;
+> +		struct sk_buff *skb;
+> +		unsigned int size;
+[ ... ]
+> +		/* This memory barrier is needed to keep us from reading
+> +		 * any other fields out of the rx_desc until we know the
+> +		 * descriptor has been written back
+> +		 */
+> +		dma_rmb();
+> +		size = le16_to_cpu(rx_desc->wb.len);
+> +		rx_buffer = rnpgbe_get_buffer(rx_ring, &skb, size);
+Is the size value validated against the allocated page size anywhere?
+If a hardware device provides an oversized length, such as 65535, could this
+cause dma_sync_single_range_for_cpu() to operate out of bounds?
+Additionally, since size is passed to rnpgbe_build_skb() which uses
+__skb_put(), could this cause skb->tail and skb->len to advance beyond the
+allocated linear buffer?
+
+Answer:
+Can not happen, hardware splits data into multiple descs with 1536 bytes
+(M_DEFAULT_SG is 96) for each desc.
+
+4.
+Sashiko:
+> +		if (!size)
+> +			break;
+If size is zero, does this cause an infinite loop? By breaking here, the
+driver doesn't advance rx_ring->next_to_clean or clear the descriptor's DD
+bit. On subsequent NAPI polls, it will examine the exact same descriptor, see
+the DD bit set and size 0, and immediately break again, locking up the CPU in
+softirq context.
+
+Answer:
+No, an infinite loop cannot occur here.The hardware guarantees that the
+descriptor size is always non-zero when writing back the DD (Descriptor Done) bit.
+
+5.
+Sashiko:
+> +static void rnpgbe_configure_rx_ring(struct mucse *mucse,
+> +				     struct mucse_ring *ring)
+> +{
+[ ... ]
+> +	mucse_ring_wr32(ring, RNPGBE_RX_LEN, ring->count);
+> +	ring->tail = ring->ring_addr + RNPGBE_RX_TAIL;
+> +	ring->next_to_clean = mucse_ring_rd32(ring, RNPGBE_RX_HEAD);
+> +	ring->next_to_use = ring->next_to_clean;
+Can RNPGBE_RX_HEAD contain a value greater than or equal to ring->count?
+If the device register holds an out-of-bounds value, it looks like it will be
+directly used as an index into rx_ring->rx_buffer_info[] and by M_RX_DESC(),
+causing an out-of-bounds memory access.
+
+Answer:
+No out-of-bounds risk:
+RNPGBE_RX_HEAD is 0 after hardware reset (always valid).
+This is just driver/hardware sync for queue down/up (no full reset).
+If ring->count changes, a full reset sets head back to 0.
+Head value always stays within valid index rang.
+
+6.
+Sashiko:
+> +static void mucse_mbx_fw_req_handler(struct mucse_hw *hw,
+> +				     struct mbx_fw_cmd_req *req)
+> +{
+> +	struct mucse *mucse = container_of(hw, struct mucse, hw);
+> +	u32 magic = le32_to_cpu(req->link_stat.port_magic);
+> +	unsigned long flags;
+> +
+> +	if (le16_to_cpu(req->opcode) == LINK_CHANGE_EVT) {
+> +		spin_lock_irqsave(&mucse->link_lock, flags);
+> +
+> +		if (le16_to_cpu(req->link_stat.port_status))
+> +			hw->link = true;
+Does this correctly handle multi-port link events?
+        
+Since req->link_stat.port_status is a bitmask of changed ports, checking it
+as a simple boolean might cause this port to process events meant for other
+ports on the same NIC. Additionally, this unconditionally reads from st[0],
+which would cause all ports to adopt the speed and duplex of port 0
+whenever any port changes state.
+
+Answer:
+This driver follows a 1:1 mapping — one PF (Physical Function) corresponds
+to exactly one port. The multi-port bitmask (port_status) and multi-port structure
+definitions in the firmware command are only for forward compatibility interfacethe
+driver-firmware communication interface, to support both multi-port and
+single-port designs.
+
+7.
+Sashiko:
+> +void rnpgbe_set_rx(struct mucse_hw *hw, bool enable)
+> +{
+> +	u32 value = mucse_hw_rd32(hw, GMAC_CONTROL);
+> +
+> +	if (enable)
+> +		value |= GMAC_CONTROL_RE;
+> +	else
+> +		value &= ~GMAC_CONTROL_RE;
+> +
+> +	mucse_hw_wr32(hw, GMAC_CONTROL, value);
+> +
+> +	value = mucse_hw_rd32(hw, GMAC_FRAME_FILTER);
+> +	mucse_hw_wr32(hw, GMAC_FRAME_FILTER, value | BIT(0));
+Does this lockless read-modify-write race with standard network operations
+like ndo_set_rx_mode?
+Answer:
+No race here, ndo_set_rx_mode is not added now. Even in the future,
+GMAC_FRAME_FILTER will not controlled in ndo_set_rx_mode, hw has other register
+to control promiscuous mode.
+
+8.
+Sashiko:
+> +/**
+> + * register_mbx_irq - Register mbx routine
+> + * @mucse: pointer to private structure
+> + *
+> + * @return: 0 on success, negative on failure
+> + **/
+> +int register_mbx_irq(struct mucse *mucse)
+> +{
+> +	struct pci_dev *pdev = mucse->pdev;
+> +	int err = 0;
+> +
+> +	snprintf(mucse->mbx_name, sizeof(mucse->mbx_name),
+> +		 "rnpgbe-mbx:%s", pci_name(pdev));
+> +
+> +	if (mucse->flags & M_FLAG_MSIX_EN) {
+> +		err = request_irq(pci_irq_vector(pdev, 0),
+> +				  rnpgbe_msix_other, 0, mucse->mbx_name,
+> +				  mucse);
+> +	}
+> +
+> +	return err;
+> +}
+Is it intentional that register_mbx_irq() only installs a handler when
+M_FLAG_MSIX_EN is set?
+In MSIX_SINGLE_EN and MSI modes, the mailbox is serviced only through
+the multiplexed rnpgbe_int_single() that rnpgbe_open() registers and
+rnpgbe_close() tears down. Between the end of probe and the first
+open, and again between every close and the next open, there appears
+to be no handler attached to the interrupt that firmware can signal
+through.
+Does that leave a window where a firmware-initiated mailbox interrupt
+in those modes has no registered handler?
+Combined with the empty body of mucse_fw_irq_handler(), how does this
+match the commit message wording:
+>     Add comprehensive interrupt handling for the RNPGBE driver:
+
+Answer:
+Fw only tirg irq after driver set mucse_fw_link_report_en true (in
+rnpgbe_up_complete). So this is not 'no handler attached' contition.
+
+9.
+Sashiko:
+> +static int rnpgbe_set_interrupt_capability(struct mucse *mucse)
+> +{
+> +     int v_budget;
+> +
+> +     v_budget = min_t(int, mucse->num_tx_queues, mucse->num_rx_queues);
+> +     v_budget = min_t(int, v_budget, MAX_Q_VECTORS);
+> +     v_budget = min_t(int, v_budget, num_online_cpus());
+> +     /* add one vector for mbx */
+> +     v_budget += 1;
+> +     v_budget = pci_alloc_irq_vectors(mucse->pdev, 1, v_budget,
+> +                                      PCI_IRQ_MSI | PCI_IRQ_MSIX);
+> +     if (v_budget < 0)
+> +             return v_budget;
+> +
+> +     if (mucse->pdev->msix_enabled) {
+> +             /* q_vector not include mbx */
+> +             if (v_budget > 1) {
+> +                     mucse->flags |= M_FLAG_MSIX_EN;
+> +                     mucse->num_q_vectors = v_budget - 1;
+> +             } else {
+> +                     mucse->flags |= M_FLAG_MSIX_SINGLE_EN;
+> +                     mucse->num_q_vectors = 1;
+> +             }
+> +     } else {
+> +             /* msi use only 1 irq */
+> +             mucse->num_q_vectors = 1;
+> +             mucse->flags |= M_FLAG_MSI_EN;
+> +     }
+> +
+> +     return 0;
+> +}
+If the PCI subsystem allocates multiple MSI vectors because v_budget > 1
+and the device supports Multiple Message MSI, does this code leak the
+unused vectors? It looks like num_q_vectors is forced to 1 and the
+remaining allocated vectors are ignored.
+Answer:
+Hw only suports 1 msi. MSI mode should falls back to single vector.
+
+10.
+Sashiko:
+> +static void rnpgbe_configure_rx_ring(struct mucse *mucse,
+> +                                  struct mucse_ring *ring)
+> +{
+> +     struct mucse_hw *hw = &mucse->hw;
+> +
+> +     /* disable queue to avoid issues while updating state */
+> +     mucse_ring_wr32(ring, RNPGBE_RX_START, 0);
+[ ... ]
+> +     mucse_ring_wr32(ring, RNPGBE_RX_INT_PKTCNT, M_DEFAULT_RX_INT_PKTCNT);
+> +     rnpgbe_alloc_rx_buffers(ring, mucse_desc_unused_rx(ring));
+> +}
+The return value of rnpgbe_alloc_rx_buffers() is discarded here.  If
+the very first population fails under memory pressure, the ring is
+left partially populated (the remaining descriptors keep the zeroed
+contents from dma_alloc_coherent()), and rnpgbe_up_complete() then
+writes RNPGBE_RX_START=1 unconditionally.  When hardware walks into
+one of those zeroed descriptors, it will DMA an incoming packet to an
+invalid address (just fun_id, or 0 if pfvfnum == 0).  Because
+rnpgbe_configure_rx() returns void, rnpgbe_open() returns success and
+the failure is invisible to callers.  Should the allocation failure
+propagate up and unwind RX resources?
+Answer:
+Cannot happen, hw only start request rx descriptors after driver
+update rx_tail(which is only update after desc is write correct with
+memory alloc success).
+
+11.
+Sashiko:
+> +static void rnpgbe_pull_tail(struct sk_buff *skb)
+> +{
+> +     skb_frag_t *frag = &skb_shinfo(skb)->frags[0];
+> +     unsigned int pull_len;
+> +     unsigned char *va;
+> +
+> +     va = skb_frag_address(frag);
+> +     pull_len = eth_get_headlen(skb->dev, va, M_RX_HDR_SIZE);
+Because rnpgbe_build_skb() places the first descriptor's data into the linear
+SKB area, skb_headlen(skb) equals the descriptor's size. This means
+rnpgbe_pull_tail() is only called from rnpgbe_cleanup_headers() if size
+is 0.
+If a 0-length descriptor with EOP is received, nr_frags will be 0. Can this
+code then dereference skb_shinfo(skb)->frags[0], leading to an out-of-bounds
+read on uninitialized memory?
+This could result in a severe length underflow in skb_frag_size_sub() since it
+passes a hardcoded M_RX_HDR_SIZE (256) to eth_get_headlen().
+Answer:
+Cannot happen, hw never writeback 0-size descriptor.
+
+12. 
+Sashiko:
+> +void rnpgbe_set_rx(struct mucse_hw *hw, bool enable)
+> +{
+> +     u32 value = mucse_hw_rd32(hw, GMAC_CONTROL);
+> +
+> +     if (enable)
+> +             value |= GMAC_CONTROL_RE;
+> +     else
+> +             value &= ~GMAC_CONTROL_RE;
+> +
+> +     mucse_hw_wr32(hw, GMAC_CONTROL, value);
+> +
+> +     if (enable)
+> +             mucse_hw_wr32(hw, GMAC_FRAME_FILTER, GMAC_RX_ALL);
+> +     else
+> +             mucse_hw_wr32(hw, GMAC_FRAME_FILTER, 0);
+> +}
+On the DesignWare GMAC block this driver is using (GMAC_CONTROL at MAC
+offset 0x0, GMAC_FRAME_FILTER at 0x4), bit 31 of the frame filter is RA
+(Receive All) and bit 0 is PR (Promiscuous Mode).
+Given:
+        #define GMAC_RX_ALL    (BIT(31) | BIT(0))
+every link-up transition forces both bits on, with no destination-address
+filtering applied at all.  Is that the intended steady-state receive
+configuration for this NIC?
+Also, because rnpgbe_watchdog_link_is_up() re-applies this filter on every
+link change, any future ndo_set_rx_mode() would be overwritten on the
+next carrier flap.  Would a perfect-match filter driven by netdev->flags
+and the uc/mc lists be more appropriate?
+Answer:
+This is intentional for the initial submission. The hardware has a
+separate register set for MAC/promiscuous filtering beyond the standard
+DW GMAC frame filter; full Rx mode management will be added together
+with ndo_set_rx_mode() in a follow-up series. The current GMAC_RX_ALL
+ensures basic connectivity works without packet loss.
+
+
+Dong Yibo (4):
+  net: rnpgbe: Add interrupt handling
+  net: rnpgbe: Add basic TX packet transmission support
+  net: rnpgbe: Add RX packet reception support
+  net: rnpgbe: Add link status handling support
+
+ drivers/net/ethernet/mucse/Kconfig            |    1 +
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |    3 +-
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  197 +-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |   41 +-
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   19 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 2111 +++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |   84 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |   96 +-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |   23 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |    1 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c |  205 +-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |   39 +
+ 12 files changed, 2801 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+
+-- 
+2.25.1
+
 
