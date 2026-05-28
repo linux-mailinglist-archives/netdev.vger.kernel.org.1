@@ -1,87 +1,93 @@
-Return-Path: <netdev+bounces-292794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UOh5ESiGGGq6kggAu9opvQ
-	(envelope-from <netdev+bounces-292794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:15:04 +0200
+	id KOoQHpyGGGq6kggAu9opvQ
+	(envelope-from <netdev+bounces-292795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:17:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82C745F6267
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:15:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F055C5F62AA
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D627303A8F3
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:12:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D32B3080E7F
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0F23FD957;
-	Thu, 28 May 2026 18:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FC340244F;
+	Thu, 28 May 2026 18:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J7vXQVR8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EpycXfcU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4140F2765F5;
-	Thu, 28 May 2026 18:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A223FC5D9
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 18:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779991977; cv=none; b=E2v1WXqaR+F+G9rBC6ru3qdqZiUM458+yj+eybpKB40ANGo0TURHl+L09L71J2Ts9BtcKT6iMm76miTpnIn9BTi4lihKGWUnlpWph9ZL/MFxsGadKE4BCBPCCMSdzcwyxyMymABhikgES7zhdh/FabJp9WbZAoRz20kqGaSV5us=
+	t=1779992013; cv=none; b=TeeODQNcgyfJSe/+OenVvXiRh/8BRtg0JRmWBs7xjDtLsBf9zm4bRabpUG9WO/M6g4Ztc8HslPky6qnNfUvN//IyfDXPGFLNJQ0riFJ1SMNqgZQwyYtrmSkdQmIX6dFSO0ngZ/gBP5O0P0XiQoe7jmkbSxYmk5ksqLigfaDuc9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779991977; c=relaxed/simple;
-	bh=Ctdv0OYabhQxjDPpRvM20MVC5CcJdOQYGsbFnJQvI5U=;
+	s=arc-20240116; t=1779992013; c=relaxed/simple;
+	bh=olgS644GXBJ8sN4D9PdM4exux7HJbLCjd7+u5JgazSM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fyvSwVa5AbiOfoNykguOEOm8jxsWergx4FXOmGxJLKEkmYkslIaFOphAExOxOIiX9eBv+LxrQxUS8tG2DHzTWcx+5oVuDkr+AdN3MxArWrE6qnSQ1we3trUQTDHSRH0M8+pO39Pg9LjG7dA9weUqEC26KxaJo2rsc/AJGR5YIpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J7vXQVR8; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779991975; x=1811527975;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ctdv0OYabhQxjDPpRvM20MVC5CcJdOQYGsbFnJQvI5U=;
-  b=J7vXQVR8A7jQOFwqXBRWZWsdoSxSZGMyoFtr1of1bM1UxKcJ85VdDRG6
-   acvFjTUnuQYHGtr0vtFeE/oOA7Cqtgq0c7WAIuPWuY2HlHuupZEp1hMRR
-   4AUCiDxbgxo8KkX/IShhhYvzMWvC+eI2kiPlhRVOB4T0grFRWb/SY6TNh
-   yQmhHjDNhbD72fAn/9DcMDdhpAaFOe9f0II8DpzOLvRB0JVvd1y1XzSYt
-   kWjj+0SfCmfD7pMVhqq4WoRue7t4wE0cqxqWeWQSR+ytrRhViUYA/I202
-   VfN4dnalwSpam/RejujzumhfYs7EQKFGaECFzWL8VYgdykEjNORIzforU
-   g==;
-X-CSE-ConnectionGUID: xNHxbhBXS6+B/w+NXrIUlA==
-X-CSE-MsgGUID: IER+tMb9S+Om0Yx3czvk1w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11800"; a="80567140"
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="80567140"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 11:12:54 -0700
-X-CSE-ConnectionGUID: b6TCqGmhSmmsToisHUMiNA==
-X-CSE-MsgGUID: jNKatLEgS0yer2qHq6c8sg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="244442960"
-Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 28 May 2026 11:12:51 -0700
-Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wSfDs-000000006HS-0bwD;
-	Thu, 28 May 2026 18:12:48 +0000
-Date: Fri, 29 May 2026 02:11:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kacper Kokot <kacper.kokot.44@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, stable@vger.kernel.org,
-	Kacper Kokot <kacper.kokot.44@gmail.com>
-Subject: Re: [PATCH] netfilter: TCPMSS: fix dropped packets when MSS option
- is unaligned
-Message-ID: <202605290221.PE1wkPWQ-lkp@intel.com>
-References: <20260525201116.407338-2-kacper.kokot.44@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FsRqRFXrcSAV/lnvmT2BRTHHNB5HGPY0G8v7FZUfB48oQbE3BbjcTIhLkdkez3Kr61J5MuVfbuHcI6wQ5Sk6W0Qpmrkk/5fec4rZn6HrptSj7YPhtIzQWpbW8bfNQeD+erSRfx99cWIshlLNl3Vj5q59OLuuALKQV42wcQzpxwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EpycXfcU; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ba856db1c0so95636325ad.3
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 11:13:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779992011; x=1780596811; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dpxsk/T+HI611YA3BXnCwNdpS4kyHfnhJj1enlM0vqI=;
+        b=EpycXfcUm6voEldLgmN0HiW7hPTdOUp6fx4Zgv2wDzUiEy973E0M0+Y0xxAnDt1p0l
+         dIgX78/JUiYLxeLpEFPyYYil6gtohU64dPvZ1Dcl16mX/hKaKVgDLsKp/5KeRbHV8++x
+         eQigHHLT5ZT4IVdWGEeMvK7C9HPvYHW88GyBM7qaznqzYe5PsWAuSmC4kx9COKFszGNW
+         rG9+qqMO1V+06u2avvy5cfYqUQAOFYiT1eJtUGqBfLDMyvP0b4eQoUs2L8fJaZYGAxAU
+         /UKC6H3ZYcPnMJ8xxM5yDXtWfLaMA2PO2ao8DNR5WbYrZwUOq6RaSfhXEc1fGhOZVFFw
+         3EVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779992011; x=1780596811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dpxsk/T+HI611YA3BXnCwNdpS4kyHfnhJj1enlM0vqI=;
+        b=NCA/+wGUHf1lpYKyZXdofHlWx4/+gcUhT4CtYaDFhgZuqxMBhaA2Bg6LTDf1QJHU7R
+         LrdMelN+W4/S9PY+vvtZJj+y3cm4WsRF7NW1whiSiq2mFpBGzPyEHewkfDre0kFC7EIE
+         fT6bsgaI+QtuFgOZAJZnMuIgwD5WqKQdqB+a5NdcadEH+hhpp5SSrTsTg98LefCoYg3T
+         NRVBtu/XrFjzXSV5vGX1eipPpu02KgOaUYR1Zy0VK3sWezbSI55iAnuw0D56wfnTHmiT
+         I6Pejd6QSLJ+HWBYrDwLZ46UMkDcnDrerjpm2bIjp43iDT5dZWE3eqMcz/aIs+jUYHit
+         7PKg==
+X-Forwarded-Encrypted: i=1; AFNElJ8NpqlVPhI9rBXtUj6IUWv14DL4va0GG8fG9xZ6r8mPkOW0IspQGmPX/Ha6Cw2XhypC8cjL8Qc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDDh2YOv5kVBJPEnaZdI+lmz4NPUSPaDZA5vNQm3xk6XVmOkZd
+	HnowB/DqQMKkw3Bovn/UXBLK3C4EdAyNjGxP8VlvIT1fWXoZONUcLoGiMocMsFk1Aw==
+X-Gm-Gg: Acq92OG8bSRhhSd4NunhGgcgAZCbPhf1QYy7K4IZ4mfby76mmlvpYJBQwBq54MskJoy
+	sRt2zCPSHvbQcv+3XRgijizh3o7C+CEn++zPniMrsGRZ5IT6NubQ/URWG7koMQCIi9BYuPjZSMQ
+	3YCU/ittlLhkQNaeH8Z5pAoQV1WD1lfK/n0xDQvrB8KoVf+tw5F+qMUy2/eSP3L1txWQL6pH/sn
+	PuHTA5JWepGfR9ZSREdwvtusqAOtrUa6ApzKgEeP1OhmdOY5P5WT2j12m5XDi/z6Ft8tgbTC33k
+	lmjBNdfblSuMRIMHmLWwVrIJ2y4vN4DsWfQVrER/yaRnZRntg6oMZWSWvroA/f4Usv4DuKoc2xM
+	Zsr63GvMIuiF/tmdT2pfFrYTorj0xrjcETxp3aed12pWVMPtKkxECtepnrbSQOh0CfPCOJ3LjWP
+	ibzKZKELFZd+EwaN6l2J/c0E6ASd3Rs+yRzuVPQceTrHNkKTV+pT53SK56NGpipuMPFNb3Q3KE
+X-Received: by 2002:a17:902:c94a:b0:2bd:9728:5e42 with SMTP id d9443c01a7336-2beb074b967mr322151685ad.31.1779992011034;
+        Thu, 28 May 2026 11:13:31 -0700 (PDT)
+Received: from google.com (56.149.168.34.bc.googleusercontent.com. [34.168.149.56])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf1e38a934sm174895ad.0.2026.05.28.11.13.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 11:13:30 -0700 (PDT)
+Date: Thu, 28 May 2026 18:13:26 +0000
+From: David Matlack <dmatlack@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex@shazbot.org>, kvm@vger.kernel.org,
+	Leon Romanovsky <leon@kernel.org>, linux-kselftest@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	patches@lists.linux.dev
+Subject: Re: [PATCH v2 06/11] selftests: Fix arm64 IO barriers to match kernel
+Message-ID: <ahiFxtmspbETiqWw@google.com>
+References: <0-v2-72e9640932fd+2c64-mlx5st_jgg@nvidia.com>
+ <6-v2-72e9640932fd+2c64-mlx5st_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,221 +96,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260525201116.407338-2-kacper.kokot.44@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+In-Reply-To: <6-v2-72e9640932fd+2c64-mlx5st_jgg@nvidia.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-292794-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-292795-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 82C745F6267
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: F055C5F62AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Kacper,
+On 2026-05-15 02:30 PM, Jason Gunthorpe wrote:
+> The tools/include readl/writel MMIO accessors on arm64 use
+> inner-shareable barriers (dmb ish) while the kernel uses
+> outer-shareable (dmb osh).  Fix them to match.
+> 
+> Add __io_bw() and __io_ar() definitions matching the kernel's
+> arch/arm64/include/asm/io.h, including the dummy control dependency
+> in __io_ar() that orders MMIO reads against all subsequent
+> instructions.
+> 
+> Assisted-by: Claude:claude-opus-4.6
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  tools/arch/arm64/include/asm/barrier.h | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/tools/arch/arm64/include/asm/barrier.h b/tools/arch/arm64/include/asm/barrier.h
+> index abdc64fc3c70f0..3f7fcb2a27541e 100644
+> --- a/tools/arch/arm64/include/asm/barrier.h
+> +++ b/tools/arch/arm64/include/asm/barrier.h
+> @@ -28,6 +28,20 @@
+>  #define dma_rmb()	asm volatile("dmb oshld" ::: "memory")
+>  #define dma_wmb()	asm volatile("dmb oshst" ::: "memory")
+>  
+> +/* Match arch/arm64/include/asm/io.h: use osh barriers for device MMIO */
+> +#define __io_bw()	dma_wmb()
+> +#define __io_ar(v)							\
+> +({									\
+> +	unsigned long tmp;						\
+> +									\
+> +	dma_rmb();							\
+> +									\
+> +	asm volatile("eor	%0, %1, %1\n"				\
+> +		     "cbnz	%0, ."					\
+> +		     : "=r" (tmp) : "r" ((unsigned long)(v))		\
+> +		     : "memory");					\
+> +})
+> +
 
-kernel test robot noticed the following build warnings:
+Let's put these in tools/arch/arm64/include/asm/io.h so that the tools
+headers are more aligned with the kernel headers, and so that the arm64
+io.h overrides are done in the same way as the x86 overrides in
+tools/arch/x86/include/asm/io.h.
 
-[auto build test WARNING on nf-next/main]
-[also build test WARNING on netfilter-nf/main linus/master v7.1-rc5 next-20260527]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Something like this (untested):
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kacper-Kokot/netfilter-TCPMSS-fix-dropped-packets-when-MSS-option-is-unaligned/20260526-041308
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git main
-patch link:    https://lore.kernel.org/r/20260525201116.407338-2-kacper.kokot.44%40gmail.com
-patch subject: [PATCH] netfilter: TCPMSS: fix dropped packets when MSS option is unaligned
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20260529/202605290221.PE1wkPWQ-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260529/202605290221.PE1wkPWQ-lkp@intel.com/reproduce)
+diff --git a/tools/arch/arm64/include/asm/io.h b/tools/arch/arm64/include/asm/io.h
+new file mode 100644
+index 000000000000..8a5de4fe2afd
+--- /dev/null
++++ b/tools/arch/arm64/include/asm/io.h
+@@ -0,0 +1,22 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _TOOLS_ASM_ARM64_IO_H
++#define _TOOLS_ASM_ARM64_IO_H
++
++#include <asm/barrier.h>
++
++#define __io_bw()      dma_wmb()
++#define __io_ar(v)                                                     \
++({                                                                     \
++       unsigned long tmp;                                              \
++                                                                       \
++       dma_rmb();                                                      \
++                                                                       \
++       asm volatile("eor       %0, %1, %1\n"                           \
++                    "cbnz      %0, ."                                  \
++                    : "=r" (tmp) : "r" ((unsigned long)(v))            \
++                    : "memory");                                       \
++})
++
++#include <asm-generic/io.h>
++
++#endif /* _TOOLS_ASM_ARM64_IO_H */
+diff --git a/tools/include/asm/io.h b/tools/include/asm/io.h
+index eed5066f25c4..1090a2c387f4 100644
+--- a/tools/include/asm/io.h
++++ b/tools/include/asm/io.h
+@@ -4,6 +4,8 @@
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605290221.PE1wkPWQ-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/netfilter/xt_TCPMSS.c:140:45: warning: & has lower precedence than !=; != will be evaluated first [-Wparentheses]
-     140 |                         if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
-         |                                                                  ^~~~~~~~~~
-   net/netfilter/xt_TCPMSS.c:140:45: note: place parentheses around the '!=' expression to silence this warning
-     140 |                         if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
-         |                                                                  ^         
-         |                                                                    (       )
-   net/netfilter/xt_TCPMSS.c:140:45: note: place parentheses around the & expression to evaluate it first
-     140 |                         if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
-         |                                                                  ^
-         |                             (                                         )
-   1 warning generated.
+ #if defined(__i386__) || defined(__x86_64__)
+ #include "../../arch/x86/include/asm/io.h"
++#elif defined(__aarch64__)
++#include "../../arch/arm64/include/asm/io.h"
+ #else
+ #include <asm-generic/io.h>
+ #endif
 
 
-vim +140 net/netfilter/xt_TCPMSS.c
-
-    69	
-    70	static int
-    71	tcpmss_mangle_packet(struct sk_buff *skb,
-    72			     const struct xt_action_param *par,
-    73			     unsigned int family,
-    74			     unsigned int tcphoff,
-    75			     unsigned int minlen)
-    76	{
-    77		const struct xt_tcpmss_info *info = par->targinfo;
-    78		struct tcphdr *tcph;
-    79		int len, tcp_hdrlen;
-    80		unsigned int i;
-    81		__be16 oldval;
-    82		u16 newmss;
-    83		u8 *opt;
-    84	
-    85		/* This is a fragment, no TCP header is available */
-    86		if (par->fragoff != 0)
-    87			return 0;
-    88	
-    89		if (skb_ensure_writable(skb, skb->len))
-    90			return -1;
-    91	
-    92		len = skb->len - tcphoff;
-    93		if (len < (int)sizeof(struct tcphdr))
-    94			return -1;
-    95	
-    96		tcph = (struct tcphdr *)(skb_network_header(skb) + tcphoff);
-    97		tcp_hdrlen = tcph->doff * 4;
-    98	
-    99		if (len < tcp_hdrlen || tcp_hdrlen < sizeof(struct tcphdr))
-   100			return -1;
-   101	
-   102		if (info->mss == XT_TCPMSS_CLAMP_PMTU) {
-   103			struct net *net = xt_net(par);
-   104			unsigned int in_mtu = tcpmss_reverse_mtu(net, skb, family);
-   105			unsigned int min_mtu = min(dst_mtu(skb_dst(skb)), in_mtu);
-   106	
-   107			if (min_mtu <= minlen) {
-   108				net_err_ratelimited("unknown or invalid path-MTU (%u)\n",
-   109						    min_mtu);
-   110				return -1;
-   111			}
-   112			newmss = min_mtu - minlen;
-   113		} else
-   114			newmss = info->mss;
-   115	
-   116		opt = (u_int8_t *)tcph;
-   117		for (i = sizeof(struct tcphdr); i <= tcp_hdrlen - TCPOLEN_MSS; i += optlen(opt, i)) {
-   118			if (opt[i] == TCPOPT_MSS && opt[i+1] == TCPOLEN_MSS) {
-   119				u_int16_t oldmss;
-   120				u16 csum_oldmss, csum_newmss;
-   121	
-   122				oldmss = (opt[i+2] << 8) | opt[i+3];
-   123	
-   124				/* Never increase MSS, even when setting it, as
-   125				 * doing so results in problems for hosts that rely
-   126				 * on MSS being set correctly.
-   127				 */
-   128				if (oldmss <= newmss)
-   129					return 0;
-   130	
-   131				opt[i+2] = (newmss & 0xff00) >> 8;
-   132				opt[i+3] = newmss & 0x00ff;
-   133	
-   134				csum_oldmss = htons(oldmss);
-   135				csum_newmss = htons(newmss);
-   136	
-   137				/* MSS may be unaligned; fix up the incremental checksum
-   138				 * to avoid an invalid checksum and a dropped packet.
-   139				 */
- > 140				if (((char *)&opt[i + 2] - (char *)tcph) & 0x1 != 0) {
-   141					csum_oldmss = swab16(csum_oldmss);
-   142					csum_newmss = swab16(csum_newmss);
-   143				}
-   144	
-   145				inet_proto_csum_replace2(&tcph->check, skb,
-   146							 csum_oldmss, csum_newmss,
-   147							 false);
-   148				return 0;
-   149			}
-   150		}
-   151	
-   152		/* There is data after the header so the option can't be added
-   153		 * without moving it, and doing so may make the SYN packet
-   154		 * itself too large. Accept the packet unmodified instead.
-   155		 */
-   156		if (len > tcp_hdrlen)
-   157			return 0;
-   158	
-   159		/* tcph->doff has 4 bits, do not wrap it to 0 */
-   160		if (tcp_hdrlen >= 15 * 4)
-   161			return 0;
-   162	
-   163		/*
-   164		 * MSS Option not found ?! add it..
-   165		 */
-   166		if (skb_tailroom(skb) < TCPOLEN_MSS) {
-   167			if (pskb_expand_head(skb, 0,
-   168					     TCPOLEN_MSS - skb_tailroom(skb),
-   169					     GFP_ATOMIC))
-   170				return -1;
-   171			tcph = (struct tcphdr *)(skb_network_header(skb) + tcphoff);
-   172		}
-   173	
-   174		skb_put(skb, TCPOLEN_MSS);
-   175	
-   176		/*
-   177		 * IPv4: RFC 1122 states "If an MSS option is not received at
-   178		 * connection setup, TCP MUST assume a default send MSS of 536".
-   179		 * IPv6: RFC 2460 states IPv6 has a minimum MTU of 1280 and a minimum
-   180		 * length IPv6 header of 60, ergo the default MSS value is 1220
-   181		 * Since no MSS was provided, we must use the default values
-   182		 */
-   183		if (xt_family(par) == NFPROTO_IPV4)
-   184			newmss = min(newmss, (u16)536);
-   185		else
-   186			newmss = min(newmss, (u16)1220);
-   187	
-   188		opt = (u_int8_t *)tcph + sizeof(struct tcphdr);
-   189		memmove(opt + TCPOLEN_MSS, opt, len - sizeof(struct tcphdr));
-   190	
-   191		inet_proto_csum_replace2(&tcph->check, skb,
-   192					 htons(len), htons(len + TCPOLEN_MSS), true);
-   193		opt[0] = TCPOPT_MSS;
-   194		opt[1] = TCPOLEN_MSS;
-   195		opt[2] = (newmss & 0xff00) >> 8;
-   196		opt[3] = newmss & 0x00ff;
-   197	
-   198		inet_proto_csum_replace4(&tcph->check, skb, 0, *((__be32 *)opt), false);
-   199	
-   200		oldval = ((__be16 *)tcph)[6];
-   201		tcph->doff += TCPOLEN_MSS/4;
-   202		inet_proto_csum_replace2(&tcph->check, skb,
-   203					 oldval, ((__be16 *)tcph)[6], false);
-   204		return TCPOLEN_MSS;
-   205	}
-   206	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>  #define smp_store_release(p, v)						\
+>  do {									\
+>  	union { typeof(*p) __val; char __c[1]; } __u =			\
+> -- 
+> 2.43.0
+> 
 
