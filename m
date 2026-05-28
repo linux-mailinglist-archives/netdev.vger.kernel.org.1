@@ -1,188 +1,165 @@
-Return-Path: <netdev+bounces-292619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292620-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KL2eEuIJGGoaawgAu9opvQ
-	(envelope-from <netdev+bounces-292619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:24:50 +0200
+	id UNawMugLGGpzbAgAu9opvQ
+	(envelope-from <netdev+bounces-292620-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:33:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60995EF88D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:24:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 338D05EFAC1
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1DA3A31077C1
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:15:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 845933019500
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2166725782A;
-	Thu, 28 May 2026 09:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4AD3AB5DA;
+	Thu, 28 May 2026 09:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="g0Nu1mcV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gkuKP4RU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjzqMZ0i"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FD43A4F4B
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65793AB5C7;
+	Thu, 28 May 2026 09:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779959717; cv=none; b=RsuYizZAtdu+3/ES+nCwRObEwiWxL5fAMiShphtIcHosp+ww924u27yANMqETrNSy165rXea4nrDnkN0uii+R7bRbVd+jXjU8hwwXdVBwSv4FsnV4EcZtZo+0kNIUwS1bDqT4kmhrSyIeqBRMYo8wyZyU4zf6Jlo4yRZ5bc+/p0=
+	t=1779959773; cv=none; b=oPd1MMc7KwDT2VWOfIqUT8EyAWaChApxBBxyOWyqQtxRGbPRoFaXx+wtNmrBwZ0ocn9gYKMPZUGM3WePDjLLs6266xgNpSpWmt/NxfyYt/xgt9a0mD9z+Z1sbC7wdjfDh7YnNrbKmgQIz9zNnlOJcXl/+jrj9dIyGwoHGeUT+zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779959717; c=relaxed/simple;
-	bh=rsKE2ntFZgsoNAYlxykrOehP1Ly+cVLd31XcodFdt3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S7++jBuM5UAPQ/Wt4owGnSHHsLUy4WOdReH0Be1ui/bTqixYL4L+HS2OEdcK3oEunCuVYuhziy+H0HlqSdqzW+IV6P7ELJAh3D/wqDy3Xp9b/pKfYTZPmHhVEDvdarftB6Rrt9YVjxg27aQsMgmUKL19ikXyQVE9P9XBIUZhNoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=g0Nu1mcV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gkuKP4RU; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A9399140015F;
-	Thu, 28 May 2026 05:15:14 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Thu, 28 May 2026 05:15:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1779959714; x=
-	1780046114; bh=8TKMosZtoNCLawfUgM4vlnC/yxtsCh7j5xlUZtgwYJs=; b=g
-	0Nu1mcV/Gov7UYaASYQMC6LFRABAM1tMc+wqUfH1XUHGhknYbRcmfONc7RbWJwkk
-	W7DwX72mjX5n0PrJCt2od2tqO48wkCrW8WmgyGCAUujXYP+RfRGPwl9o1ngu1bl7
-	7Toc7wBpOAnOfQnz182+lvkCwMt0c+pNtBtl2mm2aB0k2lsU6aND/kg9mu3TBRtL
-	gdF3e3MOVNL/Y4msFsTTphq8vIU80WOHAdCAQspjAF7mNqCbxngDYyEnqVhGoWIp
-	jqIRT35vW4hjsic37OWvb4Co7A54deYTf34qJo8TLMQNJ0efmB2cyhsQ2RPSzLkZ
-	k597AcGB5e2dT7Yfu7Acg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1779959714; x=1780046114; bh=8TKMosZtoNCLawfUgM4vlnC/yxtsCh7j5xl
-	UZtgwYJs=; b=gkuKP4RUOICFJywd8zdocS1tmkuoVPrZpfJSfwvrzmpVvXtHKVi
-	BlvimM5QQkT6apyTkDI7LcvmXE3CdayOgdBt1izAP0OapN+8cXjQEz0hsfrkNwM5
-	KV96X1X68H8kYkmsHEeRnZZSf6PKtEw5QHTxHoWfIQYHSNbD2RSXPKmjqFatHg9T
-	61nczh9DL1G1KPCG7Cf46SAxrcxOZEANJ9Xax1XMNc6J1cL7sQzF7dJkVlA9E0AB
-	wpN/UCNTrJbpg2Rj+4OfEfsR4pwCJU/VT1nm2u2LbaDDNvljowkYa8MMm3i0PsKW
-	XrGUlhY8MO91nfyGcBSrmckaKCidvr3PYZA==
-X-ME-Sender: <xms:ogcYanaLyAx3tjZjLuZHcxna4ySLeobTRWBpRFGJrBOt6YdZsaJJNg>
-    <xme:ogcYarUaBJHHvteZhLijl70fkW3giwgScLkr862AOWXR51mI3pSA_g3ctvNCKlCrA
-    tDSB62P-Q3WSRMDGje8tia1wPn93b88TNH2TlxCbpC4sn4d7gIYfD9u>
-X-ME-Received: <xmr:ogcYauMsGoXdSyhWYLopGjGzHNNz6EiagY4OjmncO3wh6tkJDtQUJ9a8dFXDCwCxh_hlXcn9BRHlnQbcqKt38M0>
-X-ME-Proxy-Cause: dmFkZTFQiGLwr+by7AW6vFTILuHsMzDswvh+KiHXyxjz8ZUfe2AJ+Zj3cSAaoCZ5lcmfpc
-    zC/3t6rdo8rNpbCVcuxtjkmBoJEtByJNl6MvveZagwWsZqwznrRmJgHjUY8agCSOBX20Yc
-    3KRjnCM0LYoqI9FUCx/540FxaoM0UkNDCgDEnqpS5D4mIhp5QZTY6/Lf72fh1pQJV8r76H
-    1kJ4b963exyCXkRR/uF63QJjcIrgCLoDmSIF68ri6Uu1TpQcHpsLLimOANsOeOKtOqSgbu
-    FEVS2CmJh0hVzGJmxiyZIN7DLXbFULjZCS00hw9FQAqPKWEha1VDy4sRMDVXiMDZ0HCoUp
-    LlnA1sVbWrJWdYwc14XYiCA8tIexGHMkXOL4VI13CwGf2nZ/5m4amRZ1H8k4sJZyqIEYcY
-    B7tweAWhfyhQH2uRjwk/oF7kyjbQQ4c4tQyeWU0onsQhlfj51hBGOo6zW9vANOEMfqEixQ
-    JDcXGvi3dn/me5l9c1FGcme7g/4+b3P0vd9lmvO3czE8fqOIqeL/71HyE4LMuMVpEq1FEt
-    88+YsgbeplsmePvkYnkGG9Bnmo2E0k3Zw2Pvx1IVfpTYkRH26r7X/ysFtqOQ/a56DFpFwU
-    OBZIIon8lkmiCcHYh4EE3ZfWtzStdyY8HvFvtcJsm3vob0QtPX4ZmPnkB6Fg
-X-ME-Proxy: <xmx:ogcYatbEXn33Cz7_D-KrJcmcTDmCZmPQHWUvy6EzfBArf4snQWP3KA>
-    <xmx:ogcYal8PgViMRXEPYvrZug9rdsGlFDkCCR742_CvdAbGY0zzYpu8vA>
-    <xmx:ogcYamTMIqjVNOTVutaQkM5maOU1HrZgR66Lhb2CVAPKxBHoLdpg6Q>
-    <xmx:ogcYancXSXL7h74uvdSGAdPQnX8m3AvDC1Fwq3IjfgIY_Xq5GfO-AA>
-    <xmx:ogcYar_8fxZ_66awg65TMcqbG02cc6FPC6dGdayZI_ctejrJOG4L52Is>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 28 May 2026 05:15:13 -0400 (EDT)
-Date: Thu, 28 May 2026 11:15:12 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH net-next v11 5/6] tls: Suppress spurious saved_data_ready
- on all receive paths
-Message-ID: <ahgHoCb5H6SO4bLg@krikkit>
-References: <20260526-tls-read-sock-v11-0-244fe1dc4abd@oracle.com>
- <20260526-tls-read-sock-v11-5-244fe1dc4abd@oracle.com>
+	s=arc-20240116; t=1779959773; c=relaxed/simple;
+	bh=HxxQjJ5r0lgfP7vltLn+9TJYpcIBEsei94S95U5+g7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=etR9tg69ByphJFvq4ZLOQ3TTXZawTIpyGGAW7PQMQRv4fzbgtJdb7AT04QtuBOG1/KSLK708O8f9fpxbjgpRl9HbMDI6FjhfqjGsNxD4ykQH7ejtZhFRI++mq67tBJV++aPyZFqe0EKyxlJRZUh0Cn/e6REyH/3TLBzMIaVHsXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjzqMZ0i; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB9BF1F000E9;
+	Thu, 28 May 2026 09:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779959772;
+	bh=ZS5mdGBUp9CWgagmhtWPpgUc1bksbZ1JeQXfzhQg4/c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=kjzqMZ0iYUcAMeOp1Hxvzwn3xuYHg95O5ARGQoara35a1RzQsMjBSbwiJ2K/UjBdw
+	 W/YWIS1sk4MJzqYPX7OHOzqRWeK+3Oh9yS8tXK5JwtAUsAa+TfZX5LndWVGrLUbn4L
+	 FJTqBsU7Ce067NcD14cVHe+6wHnmbZz0H1dgjUwt9zCg1EXGBD02o9TDqbUvJ0CtCR
+	 TfC1/sfVcwFzhQzGttl6LMDERb2BPCX/jOweHkTIXtasFj19R3DoxXEyyIWm/69wVn
+	 MuRF8BWDOw23MUvbeiAedX20W/xSco9SwAyaUhsMHIee5+7D0OyIAONtf4F1l+yQa8
+	 ZFFhr/O5cIz6g==
+Message-ID: <bc7e1123-35bd-4bc2-a6e5-39f76d9722b0@kernel.org>
+Date: Thu, 28 May 2026 11:16:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260526-tls-read-sock-v11-5-244fe1dc4abd@oracle.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: improve the kmem_cache_alloc_bulk API
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: Harry Yoo <harry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
+ David Rientjes <rientjes@google.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, linux-arm-msm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, io-uring@vger.kernel.org,
+ kasan-dev@googlegroups.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20260527070239.2252948-1-hch@lst.de>
+ <ee817070-cc7a-40d5-92a4-2bd8e9e65fbe@kernel.org>
+ <20260527122148.GA6838@lst.de>
+ <482ee03a-c5b3-4873-a550-cc5743068616@kernel.org>
+ <20260528090508.GB8376@lst.de>
+From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+Autocrypt: addr=vbabka@kernel.org; keydata=
+ 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
+In-Reply-To: <20260528090508.GB8376@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,redhat.com,vger.kernel.org,lists.linux.dev,oracle.com];
-	TAGGED_FROM(0.00)[bounces-292619-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-292620-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vbabka@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D60995EF88D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 338D05EFAC1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-05-26, 10:21:35 -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
+On 5/28/26 11:05, Christoph Hellwig wrote:
+> On Wed, May 27, 2026 at 04:07:12PM +0200, Vlastimil Babka (SUSE) wrote:
+>> commit 46dea1744498 ("slab: refill sheaves from all nodes") from this January.
+>> Previously it was just interrupts enabled.
+>> 
+>> > but by requiring separate functions so I somehow doubt that was meant.
+>> 
+>> Yeah, it's expressed by the _nolock variants. But slab propagates it internally
+>> by the gfp flags, and since 46dea1744498 it affects kmem_cache_alloc_bulk().
 > 
-> Each record release via tls_strp_msg_done() triggered
-> tls_strp_check_rcv(), which called tls_rx_msg_ready() and
-> fired saved_data_ready(). During a multi-record receive, the
-> first N-1 wakeups are pure overhead: the caller is already
-> running and will pick up subsequent records on the next loop
-> iteration. The recvmsg and splice_read paths share this waste.
-> 
-> Suppress per-record notifications and emit a single one on
-> reader exit. tls_rx_rec_done() releases the current record
-> and parses the next without announcing; tls_strp_check_rcv()
-> gains a bool announce parameter so callers can request the
-> quiet form. tls_rx_reader_release() fires the deferred
-> announce on exit through tls_rx_msg_maybe_announce(), an
-> idempotent helper that calls saved_data_ready() only when a
-> record is parsed and has not yet been announced.
-> 
-> To keep the final notification idempotent against records that
-> the BH or the worker has already announced, tls_strparser gains
-> a msg_announced bit. tls_rx_msg_maybe_announce() sets the bit
-> when firing saved_data_ready(); the bit is cleared whenever
-> the parsed record is wiped, by tls_strp_msg_consume() on
-> consumption or by tls_strp_msg_load() when the lower socket
-> loses bytes from under the parse. A second call for the same
-> parsed record -- as when recvmsg() satisfies the request from
-> ctx->rx_list without touching the strparser -- becomes a
-> no-op.
-> 
-> With no remaining callers, tls_strp_msg_done() is removed.
-> 
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  include/net/tls.h  |  5 +++++
->  net/tls/tls.h      |  5 ++---
->  net/tls/tls_main.c |  2 +-
->  net/tls/tls_strp.c | 23 ++++++++++++-----------
->  net/tls/tls_sw.c   | 27 ++++++++++++++++++++++++---
->  5 files changed, 44 insertions(+), 18 deletions(-)
+> So what are the GFP flags that affect spinning?  I can't find anything
+> related to that in either Documentation/core-api/memory-allocation.rst or
+> include/linux/gfp_types.h.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-
--- 
-Sabrina
+See gfpflags_allow_spinning(). The usage by slab and page allocator users
+was meant to be via _nolock() variants, not by removing the flags when
+calling the normal functions, hence it's not documented. But the abstraction
+has now leaked in the kmem_cache_alloc_bulk() case, hm. I think instead of
+documenting that, we should adjust the implementation in slab, if possible.
+I'll try to look into that.
 
