@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-292551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEuuJ6iyF2p+NggAu9opvQ
-	(envelope-from <netdev+bounces-292551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:12:40 +0200
+	id aBDRJKuyF2p+NggAu9opvQ
+	(envelope-from <netdev+bounces-292552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:12:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FDE45EC1FA
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:12:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ADE05EC201
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D30D301A51B
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:12:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 72A90300D1CB
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB5130AACB;
-	Thu, 28 May 2026 03:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7A3309F1D;
+	Thu, 28 May 2026 03:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QP8YeAS4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jfZcZaK3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4782430AD15;
-	Thu, 28 May 2026 03:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3B92EA172;
+	Thu, 28 May 2026 03:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779937952; cv=none; b=BDNBEY+tgV2tlqyyx/ePZ05P96q6Nby+EQ/qDEwVV/oWoA3LDgfUFUvSBDNIuKpQevTrnkXUngqoMssPuk7A09HlSZWX7sLjLkoNEZmJCZnWbbEuiilIbr93HDTtwV6tNAjNvq8fcDUs4MhvBdecAtQxbK6Lm7FmkaA7jtfXdEU=
+	t=1779937961; cv=none; b=KcVoZJJAllLap4cH2pxyrqV9GElonW6xe7g0rnWwmacC+XEox7PFkjqhKS8V0hh513waXxM7FrusGML4y6ysZB48zadgteF9v/+VP8UM8nvyFI7HUNYMMEoTagpla+YVLJnPDB/NdVWk4KgIiOGszxMOD7MK1eE5fOYsJBJCiO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779937952; c=relaxed/simple;
-	bh=InhEhwWLDbfGGNuVvp/VPuDmqqpBp19W+QbyizVPGo8=;
+	s=arc-20240116; t=1779937961; c=relaxed/simple;
+	bh=sf61uxk63D01Q3MAkUWNDamhBPyWgx2sOEyadYaJBRA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TetvrC4lIrB7Ye58Nk357G5a6S4MUuYqJJitYKvp8N1akkwnwQ2BD2ALms8rvPJnbYsVcXWdsLedtY3wuxPd9rv7zCO5QNNdv0wph3ghR987ZWQBHWPpI36i8KDu4zI4d1Pozj4U/hizNrvjx0Rdvf+aJsB13i2nLK8bm+8KXDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QP8YeAS4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D901F000E9;
-	Thu, 28 May 2026 03:12:24 +0000 (UTC)
+	 MIME-Version; b=cd/HDfz11W19CeuUr3Uoejrmf7Daey2jM+xRE+V4c8514HsDM1YWZtP/hDJ3vxjf8yTxEqXVUKriO1WibyltXHi2nU+bFy0xLZHDCKfDrCJub4ApHmb6g/B+eW30chtW2OztAgaBXFDJ8Ak2i9Bk0suRTuHb3qhH0BQSJjMFGI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jfZcZaK3; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A24761F00A3A;
+	Thu, 28 May 2026 03:12:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779937951;
-	bh=RbKJjq4aWwXODLoBQ2EcVIURob7IqQdQHIVigwRe+nk=;
+	s=k20260515; t=1779937959;
+	bh=X8P7GTkuXAPaVRxKv5xYTCC9g55wmFj/P0mjoLQc7GI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QP8YeAS4fIwzo80dRBc7g3PJYRxnS5eKJbwINn6CQSXFAZl/5RqdfdPOTYwXctYwj
-	 va1dX+U58+6w3T7n0Cl3gTZ2y4xGTkW7bBymsckqqVEI/6L/0T6t5h7YfgJM93eoXq
-	 KsPAl4wEQqfG7DbsMz+OBAxap59fSJ1mV6XrL4RPWCV9b7kO/lA4geMqCyUsQIQGiF
-	 xSwqBo4cxIG5jox+AXaj9QD5js0iphUQ6KQYoO3D15Go+Tyl/ZefWsWmEx7uFCl0XG
-	 j5kq/Cex8AuIGfL810sEkZ6SbAfAIvdLB1Vy1nrCKNI5Co/aSl4RZ2Z7DbQq2uGAqG
-	 GOV1KW8gGB/Fg==
+	b=jfZcZaK320BXXBcEP9/C0gIQk2/GjUKvxQFJCanDywu0D8urfH6ymh6j0klmGa7BB
+	 UTKQveCaBrlZNH9ead2ZzryN+b2LAtrb3gLmkGcpGXj7zPgM2YcrpwOEcAC5VZFtpy
+	 uQAht0lGTY5UbCvRr3M8oxB57iFyBnGmhRUcByuhpPWk/DkIQIXObAGViUk75ZZaaG
+	 u11Urb8cMPkHjO3pkRBGcQNfu4s+/lzcYdu5XSWKzeQzbUXC+Ms3cYbcVdNIKKLA/V
+	 a3TqWqHJhctIx4VebsqSQNeW0mmzf9Kxgd3/phn+KM32X0g0b1exifeJjgUak1o0EH
+	 Ixg/vWq8HJQGQ==
 From: Geliang Tang <geliang@kernel.org>
 To: Keith Busch <kbusch@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>,
@@ -71,9 +71,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	zhenwei pi <zhenwei.pi@linux.dev>,
 	Hui Zhu <zhuhui@kylinos.cn>,
 	Gang Yan <yangang@kylinos.cn>
-Subject: [PATCH 09/11] nvme-tcp: implement host mptcp proto
-Date: Thu, 28 May 2026 11:10:43 +0800
-Message-ID: <a3ceb2b974d74b78d205731353f5e3bbeff2acf4.1779934709.git.tanggeliang@kylinos.cn>
+Subject: [PATCH 10/11] selftests: mptcp: add nvme over mptcp test
+Date: Thu, 28 May 2026 11:10:44 +0800
+Message-ID: <6cd098ba688fb8b761f00b7e03fd0459b4fe8ac1.1779934709.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1779934709.git.tanggeliang@kylinos.cn>
 References: <cover.1779934709.git.tanggeliang@kylinos.cn>
@@ -89,18 +89,18 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292551-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292552-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -109,43 +109,41 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email,suse.de:email,purestorage.com:email]
-X-Rspamd-Queue-Id: 1FDE45EC1FA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email,linux.dev:email,suse.de:email,purestorage.com:email]
+X-Rspamd-Queue-Id: 2ADE05EC201
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-An MPTCP-specific version of struct nvme_tcp_proto is implemented,
-and it is assigned to ctrl->proto when the transport string is "mptcp".
+A test case for NVMe over MPTCP has been implemented. It verifies the
+proper functionality of nvme discover and connect commands to establish
+NVMe over MPTCP connections. The test then evaluates read/write
+performance using fio, and ensures proper cleanup with nvme disconnect.
 
-The socket option setting logic is similar to the target side, except that
-mptcp_sock_set_syncnt is newly defined for the host side.
+This script accepts two positional parameters:
 
-These helpers set the values on all existing subflows of an MPTCP
-connection, except for set_reuseaddr which only applies to the first
-subflow. The values are then synchronized to other newly created
-subflows in sync_socket_options().
+  trtype - Transport type (mptcp|tcp). Default: mptcp
+  path   - Number of multipath (1-4). Default: 1
 
-A separate nvme_mptcp_ctrl_ops structure with .name = "mptcp" is defined
-and used for MPTCP controllers.
+This test simulates four NICs on both target and host sides, each limited
+to 125MB/s. It shows that 'NVMe over MPTCP' delivered bandwidth up to
+four times that of standard TCP with a single NVMe multipath configuration:
 
-"mptcp" is planned to be introduced as a new NVMe transport type into the
-NVMe Base Specification in the future.
+ # ./mptcp_nvme.sh tcp
+   READ: bw=112MiB/s (118MB/s), 112MiB/s-112MiB/s (118MB/s-118MB/s),
+		io=1123MiB (1177MB), run=10018-10018msec
+  WRITE: bw=112MiB/s (117MB/s), 112MiB/s-112MiB/s (117MB/s-117MB/s),
+		io=1118MiB (1173MB), run=10018-10018msec
 
-Currently, the Discovery Log does not yet recognize trtype=4 (MPTCP), and
-will show "trtype: unrecognized" for such entries:
+ # ./mptcp_nvme.sh mptcp
+   READ: bw=427MiB/s (448MB/s), 427MiB/s-427MiB/s (448MB/s-448MB/s),
+		io=4286MiB (4494MB), run=10039-10039msec
+  WRITE: bw=387MiB/s (406MB/s), 387MiB/s-387MiB/s (406MB/s-406MB/s),
+		io=3885MiB (4073MB), run=10043-10043msec
 
- =====Discovery Log Entry 0======
- trtype:  unrecognized
- adrfam:  ipv4
- subtype: current discovery subsystem
- treq:    not specified, sq flow control disable supported
- portid:  23106
- trsvcid: 23601
- subnqn:  nqn.2014-08.org.nvmexpress.discovery
- traddr:  10.1.1.1
- eflags:  none
+It reflects that MPTCP has the same multi-interface bandwidth aggregation
+capability as NVMe multipath.
 
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: John Meneghini <jmeneghi@redhat.com>
@@ -159,168 +157,399 @@ Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- drivers/nvme/host/tcp.c | 34 ++++++++++++++++++++++++++++++++++
- include/net/mptcp.h     | 11 +++++++++++
- net/mptcp/sockopt.c     | 30 +++++++++++++++++++++++++++++-
- 3 files changed, 74 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/mptcp/Makefile    |   1 +
+ tools/testing/selftests/net/mptcp/config      |   8 +
+ .../testing/selftests/net/mptcp/mptcp_lib.sh  |  12 +
+ .../testing/selftests/net/mptcp/mptcp_nvme.sh | 329 ++++++++++++++++++
+ 4 files changed, 350 insertions(+)
+ create mode 100755 tools/testing/selftests/net/mptcp/mptcp_nvme.sh
 
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 305624d59c50..2388a8c443cc 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -2895,6 +2895,24 @@ static const struct nvme_ctrl_ops nvme_tcp_ctrl_ops = {
- 	.get_virt_boundary	= nvmf_get_virt_boundary,
- };
- 
-+#ifdef CONFIG_MPTCP
-+static const struct nvme_ctrl_ops nvme_mptcp_ctrl_ops = {
-+	.name			= "mptcp",
-+	.module			= THIS_MODULE,
-+	.flags			= NVME_F_FABRICS | NVME_F_BLOCKING,
-+	.reg_read32		= nvmf_reg_read32,
-+	.reg_read64		= nvmf_reg_read64,
-+	.reg_write32		= nvmf_reg_write32,
-+	.subsystem_reset	= nvmf_subsystem_reset,
-+	.free_ctrl		= nvme_tcp_free_ctrl,
-+	.submit_async_event	= nvme_tcp_submit_async_event,
-+	.delete_ctrl		= nvme_tcp_delete_ctrl,
-+	.get_address		= nvme_tcp_get_address,
-+	.stop_ctrl		= nvme_tcp_stop_ctrl,
-+	.get_virt_boundary	= nvmf_get_virt_boundary,
-+};
-+#endif
+diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
+index 22ba0da2adb8..7b308447a58b 100644
+--- a/tools/testing/selftests/net/mptcp/Makefile
++++ b/tools/testing/selftests/net/mptcp/Makefile
+@@ -13,6 +13,7 @@ TEST_PROGS := \
+ 	mptcp_connect_sendfile.sh \
+ 	mptcp_connect_splice.sh \
+ 	mptcp_join.sh \
++	mptcp_nvme.sh \
+ 	mptcp_sockopt.sh \
+ 	pm_netlink.sh \
+ 	simult_flows.sh \
+diff --git a/tools/testing/selftests/net/mptcp/config b/tools/testing/selftests/net/mptcp/config
+index 59051ee2a986..e59cf7398f19 100644
+--- a/tools/testing/selftests/net/mptcp/config
++++ b/tools/testing/selftests/net/mptcp/config
+@@ -34,3 +34,11 @@ CONFIG_NFT_SOCKET=m
+ CONFIG_NFT_TPROXY=m
+ CONFIG_SYN_COOKIES=y
+ CONFIG_VETH=y
++CONFIG_BLK_DEV_LOOP=y
++CONFIG_CONFIGFS_FS=y
++CONFIG_NVME_CORE=y
++CONFIG_NVME_FABRICS=y
++CONFIG_NVME_TCP=y
++CONFIG_NVME_TARGET=y
++CONFIG_NVME_TARGET_TCP=y
++CONFIG_NVME_MULTIPATH=y
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_lib.sh b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
+index 5ef6033775c8..e08854ba42bd 100644
+--- a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
++++ b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
+@@ -530,6 +530,18 @@ mptcp_lib_check_tools() {
+ 				exit ${KSFT_SKIP}
+ 			fi
+ 			;;
++		"nvme")
++			if ! nvme --version &> /dev/null; then
++				mptcp_lib_pr_skip "nvme tool not found"
++				exit ${KSFT_SKIP}
++			fi
++			;;
++		"fio")
++			if ! fio -h &> /dev/null; then
++				mptcp_lib_pr_skip "fio tool not found"
++				exit ${KSFT_SKIP}
++			fi
++			;;
+ 		*)
+ 			mptcp_lib_pr_fail "Internal error: unsupported tool: ${tool}"
+ 			exit ${KSFT_FAIL}
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_nvme.sh b/tools/testing/selftests/net/mptcp/mptcp_nvme.sh
+new file mode 100755
+index 000000000000..5b1133dbc2d5
+--- /dev/null
++++ b/tools/testing/selftests/net/mptcp/mptcp_nvme.sh
+@@ -0,0 +1,329 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
- static bool
- nvme_tcp_existing_controller(struct nvmf_ctrl_options *opts)
- {
-@@ -2923,6 +2941,18 @@ static const struct nvme_tcp_proto nvme_tcp_proto = {
- 
- };
- 
-+#ifdef CONFIG_MPTCP
-+static const struct nvme_tcp_proto nvme_mptcp_proto = {
-+	.protocol	= IPPROTO_MPTCP,
-+	.set_syncnt	= mptcp_sock_set_syncnt,
-+	.set_nodelay	= mptcp_sock_set_nodelay,
-+	.no_linger	= mptcp_sock_no_linger,
-+	.set_priority	= mptcp_sock_set_priority,
-+	.set_tos	= __mptcp_sock_set_tos,
-+	.ops		= &nvme_mptcp_ctrl_ops,
-+};
-+#endif
++. "$(dirname "$0")/mptcp_lib.sh"
 +
- static struct nvme_tcp_ctrl *nvme_tcp_alloc_ctrl(struct device *dev,
- 		struct nvmf_ctrl_options *opts)
- {
-@@ -2989,6 +3019,10 @@ static struct nvme_tcp_ctrl *nvme_tcp_alloc_ctrl(struct device *dev,
- 
- 	if (!strcmp(ctrl->ctrl.opts->transport, "tcp")) {
- 		ctrl->proto = &nvme_tcp_proto;
-+#ifdef CONFIG_MPTCP
-+	} else if (!strcmp(ctrl->ctrl.opts->transport, "mptcp")) {
-+		ctrl->proto = &nvme_mptcp_proto;
-+#endif
- 	} else {
- 		ret = -EINVAL;
- 		goto out_free_ctrl;
-diff --git a/include/net/mptcp.h b/include/net/mptcp.h
-index b8ab214a7890..160267e35b13 100644
---- a/include/net/mptcp.h
-+++ b/include/net/mptcp.h
-@@ -238,11 +238,15 @@ void mptcp_sock_no_linger(struct sock *sk);
- 
- void mptcp_sock_set_priority(struct sock *sk, u32 priority);
- 
-+void __mptcp_sock_set_tos(struct sock *sk, int val);
++ret=0
++trtype="${1:-mptcp}"
++path="${2:-1}"
++nqn="nqn.2014-08.org.nvmexpress.${trtype}dev.$$.${RANDOM}"
++ns=1
++port=$((RANDOM % 10000 + 20000))
++trsvcid=$((RANDOM % 64512 + 1024))
++ns1=""
++ns2=""
++temp_file=""
++loop_dev=""
 +
- void mptcp_sock_set_tos(struct sock *sk);
- 
- void mptcp_sock_set_reuseaddr(struct sock *sk);
- 
- void mptcp_sock_set_nodelay(struct sock *sk);
++export trtype path nqn ns port trsvcid
++export loop_dev temp_file
 +
-+int mptcp_sock_set_syncnt(struct sock *sk, int val);
- #else
- 
- static inline void mptcp_init(void)
-@@ -334,11 +338,18 @@ static inline void mptcp_sock_no_linger(struct sock *sk) { }
- 
- static inline void mptcp_sock_set_priority(struct sock *sk, u32 priority) { }
- 
-+static inline void __mptcp_sock_set_tos(struct sock *sk, int val) { }
-+
- static inline void mptcp_sock_set_tos(struct sock *sk) { }
- 
- static inline void mptcp_sock_set_reuseaddr(struct sock *sk) { }
- 
- static inline void mptcp_sock_set_nodelay(struct sock *sk) { }
-+
-+static inline int mptcp_sock_set_syncnt(struct sock *sk, int val)
++usage()
 +{
-+	return 0;
-+}
- #endif /* CONFIG_MPTCP */
- 
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 0adbbe568f6e..7857dac62afc 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -1598,6 +1598,8 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- 	WRITE_ONCE(inet_sk(ssk)->local_port_range, READ_ONCE(inet_sk(sk)->local_port_range));
- 
- 	ssk->sk_reuse = sk->sk_reuse;
-+	if (inet_csk(sk)->icsk_syn_retries > 0)
-+		tcp_sock_set_syncnt(ssk, inet_csk(sk)->icsk_syn_retries);
- }
- 
- void mptcp_sockopt_sync_locked(struct mptcp_sock *msk, struct sock *ssk)
-@@ -1709,7 +1711,7 @@ void mptcp_sock_set_priority(struct sock *sk, u32 priority)
- }
- EXPORT_SYMBOL(mptcp_sock_set_priority);
- 
--static void __mptcp_sock_set_tos(struct sock *sk, int val)
-+void __mptcp_sock_set_tos(struct sock *sk, int val)
- {
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	struct mptcp_subflow_context *subflow;
-@@ -1728,6 +1730,7 @@ static void __mptcp_sock_set_tos(struct sock *sk, int val)
- 	}
- 	release_sock(sk);
- }
-+EXPORT_SYMBOL(__mptcp_sock_set_tos);
- 
- void mptcp_sock_set_tos(struct sock *sk)
- {
-@@ -1783,3 +1786,28 @@ void mptcp_sock_set_nodelay(struct sock *sk)
- 	release_sock(sk);
- }
- EXPORT_SYMBOL(mptcp_sock_set_nodelay);
++	cat << EOF
 +
-+int mptcp_sock_set_syncnt(struct sock *sk, int val)
++Usage:
++
++	$(basename "$0") [trtype] [path]
++
++	trtype   Transport type (tcp|mptcp) - default: mptcp
++	path     Number of multipath (1-4) - default: 1
++
++EOF
++exit ${KSFT_FAIL}
++}
++
++validate_params()
 +{
-+	struct mptcp_sock *msk = mptcp_sk(sk);
-+	struct mptcp_subflow_context *subflow;
-+	struct sock *ssk;
++	if [[ ! "${trtype}" =~ ^(tcp|mptcp)$ ]]; then
++		echo "Invalid trtype ${trtype}. Must be tcp or mptcp"
++		usage
++	fi
 +
-+	if (val < 1 || val > MAX_TCP_SYNCNT)
-+		return -EINVAL;
-+
-+	lock_sock(sk);
-+	sockopt_seq_inc(msk);
-+	inet_csk(sk)->icsk_syn_retries = val;
-+	mptcp_for_each_subflow(msk, subflow) {
-+		ssk = mptcp_subflow_tcp_sock(subflow);
-+		if (ssk) {
-+			lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
-+			tcp_sock_set_syncnt(ssk, val);
-+			release_sock(ssk);
-+		}
-+	}
-+	release_sock(sk);
-+	return 0;
++	if [[ ! "${path}" =~ ^[1-4]$ ]]; then
++		echo "Invalid path count ${path}. Must be between 1 and 4"
++		usage
++	fi
 +}
-+EXPORT_SYMBOL(mptcp_sock_set_syncnt);
++
++# This function is invoked indirectly
++#shellcheck disable=SC2317,SC2329
++ns1_cleanup()
++{
++	pushd /sys/kernel/config/nvmet || exit 1
++
++	for i in $(seq 1 "${path}"); do
++		local portdir=$((port + i))
++
++		rm -rf "ports/${portdir}/subsystems/${nqn}"
++		rmdir "ports/${portdir}"
++	done
++
++	echo 0 > "subsystems/${nqn}/namespaces/${ns}/enable"
++	rmdir "subsystems/${nqn}/namespaces/${ns}"
++	rmdir "subsystems/${nqn}"
++
++	popd || exit 1
++}
++
++# This function is invoked indirectly
++#shellcheck disable=SC2317,SC2329
++ns2_cleanup()
++{
++	nvme disconnect -n "${nqn}" || true
++}
++
++# This function is used in the cleanup trap
++#shellcheck disable=SC2317,SC2329
++cleanup()
++{
++	if ! ip netns exec "$ns2" bash <<- EOF
++		$(declare -f ns2_cleanup)
++		ns2_cleanup
++	EOF
++	then
++		echo "ns2_cleanup failed" >&2
++	fi
++
++	sleep 1
++
++	if ! ip netns exec "$ns1" unshare -m bash <<- EOF
++		mount -t configfs none /sys/kernel/config
++		$(declare -f ns1_cleanup)
++		ns1_cleanup
++	EOF
++	then
++		echo "ns1_cleanup failed" >&2
++	fi
++
++	if [ -n "${loop_dev}" ] && [ -b "${loop_dev}" ]; then
++		losetup -d "${loop_dev}" 2>/dev/null || true
++	fi
++	rm -rf "${temp_file}"
++
++	mptcp_lib_ns_exit "$ns1" "$ns2"
++
++	unset -v trtype path nqn ns port trsvcid
++	unset -v loop_dev temp_file
++}
++
++# $tc_args needs word splitting to pass multiple arguments to netem
++# shellcheck disable=SC2086
++init()
++{
++	local tc_args="rate 1000mbit"
++
++	mptcp_lib_ns_init ns1 ns2
++
++	# ns1		ns2
++	# 10.1.1.1	10.1.1.2
++	# 10.1.2.1	10.1.2.2
++	# 10.1.3.1	10.1.3.2
++	# 10.1.4.1	10.1.4.2
++	for i in {1..4}; do
++		ip link add ns1eth"$i" netns "$ns1" type veth peer \
++					name ns2eth"$i" netns "$ns2"
++		ip -net "$ns1" addr add 10.1."$i".1/24 dev ns1eth"$i"
++		ip -net "$ns1" addr add dead:beef:"$i"::1/64 \
++					dev ns1eth"$i" nodad
++		ip -net "$ns1" link set ns1eth"$i" up
++		ip -net "$ns2" addr add 10.1."$i".2/24 dev ns2eth"$i"
++		ip -net "$ns2" addr add dead:beef:"$i"::2/64 \
++					dev ns2eth"$i" nodad
++		ip -net "$ns2" link set ns2eth"$i" up
++		ip -net "$ns2" route add default via 10.1."$i".1 \
++					dev ns2eth"$i" metric 10"$i"
++		ip -net "$ns2" route add default via dead:beef:"$i"::1 \
++					dev ns2eth"$i" metric 10"$i"
++
++		# Add tc qdisc to both namespaces for bandwidth limiting
++		tc -n "$ns1" qdisc add dev ns1eth"$i" root netem $tc_args
++		tc -n "$ns2" qdisc add dev ns2eth"$i" root netem $tc_args
++
++		tc -n "$ns1" qdisc show dev ns1eth"$i"
++		tc -n "$ns2" qdisc show dev ns2eth"$i"
++	done
++
++	mptcp_lib_pm_nl_set_limits "${ns1}" 8 8
++
++	mptcp_lib_pm_nl_add_endpoint "$ns1" 10.1.1.1 flags signal
++	mptcp_lib_pm_nl_add_endpoint "$ns1" 10.1.2.1 flags signal
++	mptcp_lib_pm_nl_add_endpoint "$ns1" 10.1.3.1 flags signal
++	mptcp_lib_pm_nl_add_endpoint "$ns1" 10.1.4.1 flags signal
++
++	mptcp_lib_pm_nl_set_limits "${ns2}" 8 8
++
++	mptcp_lib_pm_nl_add_endpoint "$ns2" 10.1.1.2 flags subflow
++	mptcp_lib_pm_nl_add_endpoint "$ns2" 10.1.2.2 flags subflow
++	mptcp_lib_pm_nl_add_endpoint "$ns2" 10.1.3.2 flags subflow
++	mptcp_lib_pm_nl_add_endpoint "$ns2" 10.1.4.2 flags subflow
++}
++
++# This function is invoked indirectly
++#shellcheck disable=SC2317,SC2329
++run_target()
++{
++	cd /sys/kernel/config/nvmet/subsystems || exit
++	mkdir -p "${nqn}"
++	cd "${nqn}" || exit
++	echo 1 > attr_allow_any_host
++	mkdir -p namespaces/"${ns}"
++	echo "${loop_dev}" > namespaces/"${ns}"/device_path
++	echo 1 > namespaces/"${ns}"/enable
++
++	# Create ${path} ports, each on a different IP address
++	for i in $(seq 1 "${path}"); do
++		local portdir=$((port + i))
++
++		cd /sys/kernel/config/nvmet/ports || exit
++		mkdir -p "${portdir}"
++		cd "${portdir}" || exit 1
++		echo "${trtype}" > addr_trtype
++		echo ipv4 > addr_adrfam
++		if [ "${path}" -eq 1 ]; then
++			echo "0.0.0.0" > addr_traddr
++		else
++			echo "10.1.${i}.1" > addr_traddr
++		fi
++		echo "${trsvcid}" > addr_trsvcid
++
++		mkdir -p subsystems
++		ln -sf "../../subsystems/${nqn}" "subsystems/${nqn}"
++		cd - >/dev/null || exit
++	done
++}
++
++# This function is invoked indirectly
++#shellcheck disable=SC2317,SC2329
++run_host()
++{
++	local traddr=10.1.1.1
++	local devname
++
++	echo "nvme discover -a ${traddr}"
++	if ! nvme discover -t "${trtype}" -a "${traddr}" \
++			   -s "${trsvcid}"; then
++		echo "Failed to discover ${traddr}"
++		return 1
++	fi
++
++	for i in $(seq 1 "${path}"); do
++		traddr=10.1.${i}.1
++		echo "Connecting to ${traddr}:${trsvcid}"
++		if ! nvme connect -t "${trtype}" -a "${traddr}" \
++				  -s "${trsvcid}" -n "${nqn}"; then
++			echo "Failed to connect to ${traddr}"
++			return 1
++		fi
++	done
++
++	for i in $(seq 1 10); do
++		for dev in /dev/nvme*n1; do
++			if [ -b "$dev" ] 2>/dev/null; then
++				if nvme id-ctrl "$dev" 2>/dev/null |
++				   grep -q "${nqn}"; then
++					devname=$(basename "$dev")
++					break 2
++				fi
++			fi
++		done 2>/dev/null
++		[ -n "$devname" ] && break
++		sleep 1
++	done
++
++	if [ -z "$devname" ]; then
++		echo "No block device found for NQN ${nqn}" >&2
++		return 1
++	fi
++
++	echo "nvme list"
++	if ! nvme list; then
++		echo "nvme list failed" >&2
++		return 1
++	fi
++
++	sleep 1
++
++	echo "fio randread /dev/${devname}"
++	if ! fio --name=global --direct=1 --norandommap --randrepeat=0 \
++		 --ioengine=libaio --thread=1 --blocksize=128k --runtime=10 \
++		 --time_based --rw=randread --numjobs=4 --iodepth=256 \
++		 --group_reporting --size=100% \
++		 --name=libaio_4_256_128k_randread \
++		 --filename="/dev/${devname}"; then
++		echo "fio randread failed"
++		return 1
++	fi
++
++	sleep 1
++
++	echo "fio randwrite /dev/${devname}"
++	if ! fio --name=global --direct=1 --norandommap --randrepeat=0 \
++		 --ioengine=libaio --thread=1 --blocksize=128k --runtime=10 \
++		 --time_based --rw=randwrite --numjobs=4 --iodepth=256 \
++		 --group_reporting --size=100% \
++		 --name=libaio_4_256_128k_randwrite \
++		 --filename="/dev/${devname}"; then
++		echo "fio randwrite failed"
++		return 1
++	fi
++
++	nvme flush "/dev/${devname}"
++}
++
++mptcp_lib_check_tools nvme fio
++validate_params
++
++if ! temp_file=$(mktemp --suffix=.raw /tmp/nvme_test.XXXXXX); then
++	echo "Failed to create temp file"
++	exit 1
++fi
++
++trap cleanup EXIT
++
++if ! dd if=/dev/zero of="${temp_file}" bs=1M count=0 seek=512; then
++	echo "Failed to create backing file" >&2
++	exit 1
++fi
++
++if ! loop_dev=$(losetup -f --show "${temp_file}"); then
++	echo "Failed to create loop device" >&2
++	exit 1
++fi
++
++init
++
++run_test()
++{
++	if ! ip netns exec "$ns1" unshare -m bash <<- EOF
++		mount -t configfs none /sys/kernel/config
++		$(declare -f run_target)
++		run_target
++		exit \$?
++	EOF
++	then
++		ret="${KSFT_FAIL}"
++	fi
++
++	if ! ip netns exec "$ns2" bash <<- EOF
++		$(declare -f run_host)
++		run_host
++		exit \$?
++	EOF
++	then
++		ret="${KSFT_FAIL}"
++	fi
++
++	sleep 1
++}
++
++run_test "$@"
++
++if [ "${ret}" -eq 0 ]; then
++	mptcp_lib_result_pass "nvme over ${trtype} test"
++else
++	mptcp_lib_result_fail "nvme over ${trtype} test"
++fi
++
++mptcp_lib_result_print_all_tap
++exit "$ret"
 -- 
 2.53.0
 
