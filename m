@@ -1,54 +1,98 @@
-Return-Path: <netdev+bounces-292554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292555-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SChVIfzFF2oqQQgAu9opvQ
-	(envelope-from <netdev+bounces-292554-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 06:35:08 +0200
+	id Va3UBdXIF2oyQwgAu9opvQ
+	(envelope-from <netdev+bounces-292555-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 06:47:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15995EC860
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 06:35:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B555EC905
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 06:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C0D2302D110
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:35:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2ECFC3007BB6
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3BE2F2918;
-	Thu, 28 May 2026 04:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1F01DE8BE;
+	Thu, 28 May 2026 04:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="GLBUdznC"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from aer-iport-7.cisco.com (aer-iport-7.cisco.com [173.38.203.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A39248886;
-	Thu, 28 May 2026 04:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01193438B2
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 04:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.38.203.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779942905; cv=none; b=KFz5Y/BQ7W430CJShhBGiEfg7aAi/3p8i9CKjkNrKHXxT00M2obF1CDwOGoQ3jewM6f4T1PylIreY6QcHmoEll1Ik86M97v4tp8em7enFoQYW0CoHcNQnyl6FoWmXB3V5zd1PvK8gDXe7sh9faU5UBl45UawtrgyVXs8PJT01/Q=
+	t=1779943632; cv=none; b=LAgHOFTpMPA7qak0xa2+EPpj0WTGCwTwQy3A91gDXb+27vrDjfT6l/zLQbZ7/Zk15cxm2pKeat2B2E4Z9rwFcvIBVCW/Uj3L0WMofeDVSSOzmCK2pKUeO2komy5XwYYzH91cx1YqXIcPSoKLhvvGHcMBraJyKnB0Fj46H2Yoeis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779942905; c=relaxed/simple;
-	bh=2tOUi+/B16c4Tl7qst8vMP1e9dr6F0GzqQz6Zg/EavQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HhEpEcG7l6xEk68UkwdV3IpVWb92I5cv8oecOyR7IY1SWFRA4L26mea/4dyt0XlANGZ3euJ3E6WPkMm1J6z350b8oCnbI44f+cPyXtloWUHPMcXB/SWBy4+yJlk+jM1d3Iq5I4cO7WYT2aCQcNRwgJ+xi7pQK7lZgOEU7m3AYTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowABXa9LmxRdqBZioEg--.74S2;
-	Thu, 28 May 2026 12:34:46 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: James Chapman <jchapman@katalix.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] l2tp: fix tunnel refcount leak on register failure
-Date: Thu, 28 May 2026 04:34:18 +0000
-Message-Id: <20260528043418.1153320-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1779943632; c=relaxed/simple;
+	bh=dsFjl1mS6Xi/7O3wRpuZD+cTj0HWAt3aoIAXWRM0I/w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BpZUkAe7IRJyGddZAUsZ33T7yxJy4T4HWlILOA+60tOffw3ePYO4zthlTq5mYISWhzu24vSQgLpT7KAx5v8t+CouRW6B0K93VhLq9XrUQU+AH7dLY0ubFJ59YYp2xYUsIt+X7XgV3XvKNaLA+pKMbzCUDyFQz7YtBinQOkCnURs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=GLBUdznC; arc=none smtp.client-ip=173.38.203.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=3302; q=dns/txt;
+  s=iport01; t=1779943631; x=1781153231;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=g90itd9TgsC15zDBlt8rxIpYyEdh7zc3KR8WqzuGN4E=;
+  b=GLBUdznCsdKzjk4c87OUiDA7pygugyToq198H8nzue7FzZKtn3g6F/4N
+   rRI8lxT2rekmdDjo7xVbKHNXfrRHDL7cBK+8HDsL62sQXqnfJl0tD4PPN
+   OfJTiAnVkGjBVERElTiGnTBA/AnDdj0LDGPjJH0uZ0V5LxzMjuLuLSvyl
+   +UDOFXAbzzXc4V/kZu9hgRz3bWhRwiC0AxKHtC9M0miqxSD3O9zRSPcfk
+   5iSdXY/0VWxRcmZMm+b3ymHdy0M136qkxx6HORcTine9hbMD60s2JxRLF
+   nnYjAiZ1HwcKrwxVbXEsGAHcd9zt7bfiSApB+mzgSo4FMK6TDtsfvwokQ
+   g==;
+X-CSE-ConnectionGUID: +/f7KUIgQo6jKpBUhByAWQ==
+X-CSE-MsgGUID: bvU620ILT2Khj5TjOc7THA==
+X-IPAS-Result: =?us-ascii?q?A0A+AgArxxdq/8pK/pBaHgEBCxIMggULgleBUUKXFJhAh?=
+ =?us-ascii?q?V6Bfg8BAQEPUQQBAYUGjTQCJjQJDgECBAMCAwEBAQEBAQEBAQEBCwEBBQEBA?=
+ =?us-ascii?q?QIBBwWBDhOGXIZdKwsBRoFIgwqCdAOyEIF5M4EB3kGBZAELFAGBOI1cgQ+EY?=
+ =?us-ascii?q?CcbgUlEgRWDaIsHBIIigQyPGEiBHgNZLAFVEw0KCwcFgWYDNRIqFW4yHYEjP?=
+ =?us-ascii?q?heBCxsHBYFLdnJqgQWFGCMmA06BLYF/cAMLGA1IESw3FBsEPm4HjVo+gltUR?=
+ =?us-ascii?q?aUooRGEJqFbGjOEBJQWklABLodlkHOjahVZhGiBaDwrgS4zGggbFYMjUhkPj?=
+ =?us-ascii?q?i0W0Ak8cgIHAgcOAwuTZQEB?=
+IronPort-Data: A9a23:Z/Xoe6hc7016o4JsG3s0b82SX161aREKZh0ujC45NGQN5FlHY01je
+ htvD2GOOPneYWHwfIp2Ody18BwEusCByNNhG1FpqylhFCljpJueD7x1DKtf0wB+jyHnZBg6h
+ ynLQoCYdKjYdleF+FH1dOOn9SUgvU2xbuKUIPbePSxsThNTRi4kiBZy88Y0mYcAbeKRW2thg
+ vus5ZeDULOZ82QsaDxMtvjc8EkHUMna4Vv0gHRvPZing3eG/5UlJMp3Db28KXL+Xr5VEoaSL
+ 87fzKu093/u5BwkDNWoiN7TKiXmlZaLYGBiIlIPM0STqkAqSh4ai87XB9JAAatjsAhlqvgqo
+ Dl7WTNcfi9yVkHEsLx1vxC1iEiSN4UekFPMCSDXXcB+UyQqflO0q8iCAn3aMqVbvegoIlxv+
+ sUfdjIudjq+h8in6Y2CH7wEasQLdKEHPasWt2slyXTSCuwrBMiaBa7L/tRfmjw3g6iiH96HO
+ 5ZfM2czKkucJUcXYD/7C7pm9Ausrnn2fzxIqU69rqss6G+Vxwt0uFToGIeFJ43QHZkK9qqej
+ mjYwjqjWjA+CIa8yTjYznCLjbDzvQquDer+E5X9rJaGmma7ymUNBRg+WVKlrPy9jUCiHdRSN
+ yQ89yYzqKEg+VCDQd76UBm15nWDu3Y0WMdaGsU55RuLx66S5ByWbkAcRzRMbt0OrsI6RTU2k
+ FSOmrvBAzFzvLCLYWyS+63Srj6oPyURa2gYakc5oRAt6tT55YV2hRXVQ5M7Sei+j8b+Hnf7x
+ DXiQDUCuoj/RPUjj82TlW0rSRr1znQVZmbZPjnqY18=
+IronPort-HdrOrdr: A9a23:kEr2kKA0IFcOZOflHemY55DYdb4zR+YMi2TDGXocdfUzSL37qy
+ nAppomPHPP4gr5O0tQ+uxoRpPgfZq0z/ccirX5Vo3MYOCJggaVxflZjbfK8nnHBzD08PJb2O
+ NLdqhzD8C1MH1B5PyKhTVR170bsb66GGfCv5a780tQ
+X-Talos-CUID: 9a23:rPYSUGBS8R+Eoej6E2og+hE3J+EqS3qDzlTICXK4I3dAd4TAHA==
+X-Talos-MUID: =?us-ascii?q?9a23=3Am1ruEw7jJrY3xAjhchlM3exbxoxi/ZnwUhgstal?=
+ =?us-ascii?q?cmMmGaBByHDzCsBSeF9o=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.24,172,1774310400"; 
+   d="scan'208";a="58592047"
+Received: from aer-l-core-01.cisco.com ([144.254.74.202])
+  by aer-iport-7.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 28 May 2026 04:45:59 +0000
+Received: from bgl-ads-5123.cisco.com (bgl-ads-5123.cisco.com [64.104.134.251])
+	by aer-l-core-01.cisco.com (Postfix) with ESMTP id DA279D6F04;
+	Thu, 28 May 2026 04:45:57 +0000 (GMT)
+From: Hariom Dixit <hadixit@cisco.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	etmartin@cisco.com,
+	hadixit@cisco.com
+Subject: [RFC] net: soft lockup in netif_close_many() during namespace teardown
+Date: Thu, 28 May 2026 10:15:56 +0530
+Message-Id: <20260528044556.26628-1-hadixit@cisco.com>
+X-Mailer: git-send-email 2.35.6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,85 +100,137 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABXa9LmxRdqBZioEg--.74S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1rJrW5Zw43KFW8WryUWrg_yoW8JFy3pr
-	15Cr4kJFyrtFn3Jw4UZa1kXa45GrZYvay5GFZ8Cw17ZwnxX3yfGay7WFWxWF1UGF4vyw1Y
-	vryjgry8Z3WDJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUqeHgUUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoBA2oXgFzp7gAAsp
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Outbound-Client-TLS: NONE;bgl-ads-5123.cisco.com [64.104.134.251]
+X-Outbound-SMTP-Client: 64.104.134.251, bgl-ads-5123.cisco.com
+X-Outbound-Node: aer-l-core-01.cisco.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[cisco.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[cisco.com:s=iport01];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292554-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[hadixit@cisco.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292555-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[cisco.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A15995EC860
+	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,cisco.com:mid,cisco.com:dkim]
+X-Rspamd-Queue-Id: 97B555EC905
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pppol2tp_tunnel_get() creates a new tunnel via l2tp_tunnel_create()
-which initializes tunnel->ref_count to 1, then increments it to 2 via
-refcount_inc(). If l2tp_tunnel_register() subsequently fails, the
-error path calls kfree(tunnel) directly, bypassing the refcount
-mechanism entirely. This leaves the tunnel's ref_count at 2 with no
-way to properly release it through l2tp_tunnel_put().
+Hi,
 
-Replace kfree(tunnel) with l2tp_tunnel_put(tunnel) to properly release
-the reference through the standard refcount cleanup path, which will
-call l2tp_tunnel_free() when the counter reaches zero.
+We are hitting a reproducible soft lockup in netif_close_many()
+(formerly dev_close_many(), renamed in commit 88d3cec28274) during
+network namespace teardown on systems with ~1700 network devices
+and 30K-65K fib6_nodes.
 
-Cc: stable@vger.kernel.org
-Fixes: 6b9f34239b00 ("l2tp: fix races in tunnel creation")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/l2tp/l2tp_ppp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The NETDEV_DOWN notification loop iterates all devices without
+yielding the CPU. IPv6 notifier callbacks perform full FIB6 tree
+walks for each device, resulting in O(N_devices * M_fib6_nodes)
+work without any scheduling point.
 
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index 99d6582f41de..16672e9df748 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -661,7 +661,7 @@ static struct l2tp_tunnel *pppol2tp_tunnel_get(struct net *net,
- 			refcount_inc(&tunnel->ref_count);
- 			error = l2tp_tunnel_register(tunnel, net, &tcfg);
- 			if (error < 0) {
--				kfree(tunnel);
-+				l2tp_tunnel_put(tunnel);
- 				return ERR_PTR(error);
- 			}
- 
--- 
-2.34.1
+The bug exists in current mainline (v7.1-rc5) at net/core/dev.c
+line 1803 in netif_close_many().
 
+Crash signature (from 6.6.84, function was still dev_close_many):
+
+  watchdog: BUG: soft lockup - CPU#13 stuck for 26s!
+            [kworker/u32:1:6737]
+  Workqueue: netns cleanup_net
+
+  Call Trace:
+   #8  asm_sysvec_apic_timer_interrupt
+       [exception RIP: fib6_age+20]
+   #11 fib6_walk
+   #12 fib6_clean_tree
+   #14 fib6_walk_continue
+   #15 fib6_walk
+   #16 fib6_clean_tree
+   #17 __fib6_clean_all
+   #18 fib6_run_gc
+   #19 ndisc_netdev_event
+   #20 notifier_call_chain
+   #21 raw_notifier_call_chain
+   #22 call_netdevice_notifiers_info
+   #23 dev_close_many
+   #24 unregister_netdevice_many_notify
+   #25 default_device_exit_batch
+   #26 ops_exit_list
+   #27 cleanup_net
+   #28 process_one_work
+   #29 worker_thread
+
+  CPU utilization during lockup (every 4s): 100% system, 0% idle
+
+Analysis:
+
+netif_close_many() dispatches NETDEV_DOWN for each device in a
+tight loop. Two IPv6 notifier callbacks trigger full fib6 tree
+walks per device:
+
+  1. ndisc_netdev_event(NETDEV_DOWN) -> fib6_run_gc
+     -> fib6_clean_all(fib6_age): walks entire fib6 tree per
+     device. During teardown, fib6_age finds nothing to expire
+     (no RTF_EXPIRES routes), so the tree stays full-size across
+     all iterations.
+
+  2. addrconf_notify(NETDEV_DOWN) -> addrconf_ifdown
+     -> rt6_disable_ip -> fib6_clean_all(fib6_ifdown): walks
+     entire fib6 tree per device.
+
+With 1700 devices and 60K+ nodes, the total uninterrupted
+work is ~102M node visits, taking >26 seconds -- well over the
+10-second soft lockup threshold.
+
+Proposed fix (against mainline v7.1-rc5):
+
+Adding cond_resched() after each device's notification dispatch.
+At this point only rtnl_lock (a mutex) is held -- all spinlocks
+and RCU read-side critical sections within the notifier callbacks
+are acquired and released per-device invocation, so sleeping is
+safe.
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1803,6 +1803,7 @@ void netif_close_many(struct list_head *head, bool unlink)
+     list_for_each_entry_safe(dev, tmp, head, close_list) {
+         rtmsg_ifinfo(RTM_NEWLINK, dev, IFF_UP|IFF_RUNNING, GFP_KERNEL, 0, NULL);
+         call_netdevice_notifiers(NETDEV_DOWN, dev);
++        cond_resched();
+         if (unlink)
+             list_del_init(&dev->close_list);
+     }
+
+Testing (on 6.6.84 with equivalent change in dev_close_many):
+  - Without fix: soft lockup panic with 1700 devices + 65K routes
+  - With fix: no crash with 4000 devices + 65K routes
+
+Note: The IPv4 path (fib_netdev_event -> fib_disable_ip ->
+fib_table_flush) also fires from the same NETDEV_DOWN loop, so
+the single cond_resched() covers both IPv4 and IPv6 scenarios.
+
+Question:
+  1. Is cond_resched() the right approach here?
+
+I can send a formal patch if the approach looks reasonable.
+
+Thanks,
+Hariom
 
