@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-292890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +GmZBHjOGGqunggAu9opvQ
-	(envelope-from <netdev+bounces-292890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:23:36 +0200
+	id gF/jNw/OGGpjnggAu9opvQ
+	(envelope-from <netdev+bounces-292891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:21:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96545FB626
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:23:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ACC55FB5FA
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:21:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EC6633042C6E
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:17:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AF685307235D
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4219370D6D;
-	Thu, 28 May 2026 23:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9636937106E;
+	Thu, 28 May 2026 23:17:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbvKf4Qy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MpTLkKjD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6C8370AFF
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A33F370D6C
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780010221; cv=none; b=g+Z0pNuZ7fgIuuFTPq8JffikTUSn/T/J0YZ75GmJd7IQFixXXPPmlKZaTb36x4dsAwNoXcFmt2ZUrFP1IHi3h83DtuNH5kGaIwbYfL5wczfNFrPia2Ps1jwn10jX6ZDXGNTfV73LVK2VRYJ6iaSP78rM9cI2lnPBwkh7gS2fyBM=
+	t=1780010222; cv=none; b=O7XlB33eP3FQ2t9dndgmoxXz3oB5heJr0cKJTunYfuHFNhrsi7RmQC8hNQpiZYKP5SZFGyIRswZ+hWVhhLy1Er800xSDEWX5fFE1dbuiJHpl8CnG22rSxWQEt7Pv8JdlBvx6W6lV+ildW+1KFWXkmweVw798zPlQWlTcVEWLnIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780010221; c=relaxed/simple;
-	bh=fTVAI95Lh9oCCp9TMDIx868bJsKIYD65giPkBfSNzRk=;
+	s=arc-20240116; t=1780010222; c=relaxed/simple;
+	bh=jsqiGrpU20PIjRopejZUhRBiz1JHsnxpsa2oPxoeLLU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QYaZrY1fEDhB/TTreQ3jqdqzp+pKvC9Ki0MLUr2Y1FP9qedS4egjfaLyux6mcwkzCWNEWTqb0FEbJtETp/JLOLPStXtsLipvtU5ylsmB7ZMumgfSjFCqkzKS2ywFdpH0MzDILnW/hZ/7OmWq6IbAUH/4IsXbHUUiNAKkJD3auWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbvKf4Qy; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E731F000E9;
-	Thu, 28 May 2026 23:16:59 +0000 (UTC)
+	 MIME-Version; b=YZas/ihYIpD6oA8gk44w3sTuGJcZrL7SaRo/G/kGYfe51bpzKQ1yTyiZocU/dRNXyALSfiUCs3FHP5OGzMWfOhlLvaVQmJCcEg+xXhmfZE/IHV/01nBNJve5f7G9ETdFO6c3he5Wz3dIvgo/68DFBPWcUvEVc4YX6ou6QUyvFYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MpTLkKjD; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D74C1F00A3C;
+	Thu, 28 May 2026 23:17:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780010220;
-	bh=zhzV6Hqi0dSi/jRYzwL+uYhLe9tpwDqg6K1s+4LC/D0=;
+	s=k20260515; t=1780010221;
+	bh=ZOCnHXmTk8MOEMZGUz4wF0xuk4KWTgdnT46dKntBzNk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UbvKf4QyXY5HHmZENSgJwbi7722BfhH8txQG7BzGqAaPwHo9nHdwVYKQE/HT6M3Sg
-	 0OUGf3jsFt80JFk7u2WiLEXJ4tjpGCnXuIUkjcRELJNsiYcF8/hWa9i1KL7rPAaruh
-	 cUNfbHbviN+/SzM1dIJaolPlooWbLmeqQ6epD2kuZuwoktbyXmNsO1RkJIyE5Pw+Ci
-	 dH0BN8JmsLeOnlDhsNNpFoGTURO8+jD2GgCqUiQeG9yihE1a8SvsS8UdvRMo1BxzOn
-	 AADaHRtuhbYAP5eiP7Mt6sHXWVQRvHeVf4KUb0cmMpFgAqJNGB8c6AYzflOH4xd7Jl
-	 QcfN1EasMXVWg==
+	b=MpTLkKjDIyNOeg8CimoQGWLGSdbK5bndRUJLI8ll3brFbrhBWThZKZNhZQjqM1HWQ
+	 8siKSRBbDPjq35/vTix+6QU+LxhfuKRNUSaukSCDY/aziTLrwn5HXb4rcBfM6rjq9y
+	 z/5nqROyrqagsu3Sq1cAzOaWBfBC6tHvriEkkAgpF6IETMTa8OikfYkVwk6FY4ozgj
+	 RnnOcdPjivOrRiNQGTpaRzwXutFf6hb5jvBuumHbijQVvEe75uVtBcd4y2vPesy0vY
+	 UQDxQJU8GIhtDEnmDjNJz8Xhs0czvyRl6oVaFdlNHGfJovMNk31S9/El5cAKHtU8P1
+	 n8jqMNI8ho19Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	danieller@nvidia.com,
 	idosch@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 13/14] net: ethtool: optionally skip rtnl_lock on IOCTL path
-Date: Thu, 28 May 2026 16:16:36 -0700
-Message-ID: <20260528231637.251822-14-kuba@kernel.org>
+Subject: [PATCH net-next 14/14] docs: net: ethtool: document ops-locked drivers and op_needs_rtnl
+Date: Thu, 28 May 2026 16:16:37 -0700
+Message-ID: <20260528231637.251822-15-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260528231637.251822-1-kuba@kernel.org>
 References: <20260528231637.251822-1-kuba@kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,bootlin.com,linux.microsoft.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-292890-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292891-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,283 +104,95 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B96545FB626
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2ACC55FB5FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert the IOCTL path similarly to how we converted Netlink.
-The device lookup gets a little hairy. We could take rtnl_lock
-unconditionally and drop it before calling the driver (this would
-avoid the reference + liveness check). But I think being able
-to make progress even if rtnl is dead-locked is quite useful.
-
-First extra concern is handling features. List all the cmds which
-modify features and always take rtnl_lock. We could fold this list
-into ethtool_ioctl_needs_rtnl() but seems cleaner to keep
-ethtool_ioctl_needs_rtnl() driver-related. If a driver changed
-features and we were not holding rtnl_lock - warn about it.
-It can only happen on buggy ops locked drivers (buggy because
-they should have set appropriate "I need rtnl for op X" bit).
-
-Second wrinkle is the PHY ID hack which drops the locks while
-sleeping. Convert its static "busy" variable which used to
-be protected by rtnl_lock to a field in struct ethtool_netdev_state.
-This feature is about identifying an adapter or a port within
-a system, so being able to blink multiple LEDs at the same
-time is likely not very useful in practice. But it's the simplest
-fix, we can add a mutex if someone thinks a system should only
-be ID'ing one port at a time.
+Catch up various bits of documentation after the locking changes.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/ethtool.h |  2 +
- net/ethtool/ioctl.c     | 98 ++++++++++++++++++++++++++++++-----------
- 2 files changed, 74 insertions(+), 26 deletions(-)
+ Documentation/networking/netdev-features.rst |  7 +++++++
+ Documentation/networking/netdevices.rst      | 17 ++++++++++-------
+ include/linux/ethtool.h                      | 10 ++++++++--
+ 3 files changed, 25 insertions(+), 9 deletions(-)
 
+diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
+index 6293d47e5b09..f9e1f3921f53 100644
+--- a/Documentation/networking/netdev-features.rst
++++ b/Documentation/networking/netdev-features.rst
+@@ -76,6 +76,13 @@ netdev instance lock, that lock must be held as well. This should not be
+ done from ndo_*_features callbacks. netdev->features should not be modified
+ by driver except by means of ndo_fix_features callback.
+ 
++For "ops locked" drivers (see Documentation/networking/netdevices.rst),
++ethtool callbacks that may end up invoking netdev_update_features() must
++opt back into rtnl_lock by setting the matching ETHTOOL_OP_NEEDS_RTNL_*
++bit in ``ethtool_ops::op_needs_rtnl``. The ethtool core then keeps
++rtnl_lock held across those SET callbacks so the contract above still
++holds.
++
+ ndo_features_check is called for each skb before that skb is passed to
+ ndo_start_xmit. Driver may perform any non-trivial checks (e.g. exact
+ header geometry / length) and withdraw features like HW_CSUM or TSO,
+diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+index 60492d4df2ee..30a4219041d5 100644
+--- a/Documentation/networking/netdevices.rst
++++ b/Documentation/networking/netdevices.rst
+@@ -351,10 +351,6 @@ virtual and the physical device. To prevent deadlocks, the virtual device's
+ lock must always be acquired before the physical device's (see
+ ``netdev_nl_queue_create_doit``).
+ 
+-In the future, there will be an option for individual
+-drivers to opt out of using ``rtnl_lock`` and instead perform their control
+-operations directly under the netdev instance lock.
+-
+ Device drivers are encouraged to rely on the instance lock where possible.
+ 
+ For the (mostly software) drivers that need to interact with the core stack,
+@@ -375,9 +371,16 @@ the instance lock.
+ struct ethtool_ops
+ ------------------
+ 
+-Similarly to ``ndos`` the instance lock is only held for select drivers.
+-For "ops locked" drivers all ethtool ops without exceptions should
+-be called under the instance lock.
++For non-"ops locked" drivers ethtool_ops are executed under ``rtnl_lock``.
++
++For "ops locked" drivers ``ethtool_ops``, unlike ``ndos``, run under
++the instance lock **only**. Driver may request that ``rtnl_lock``
++is held around specific operations (both SET and GET) by setting
++appropriate bits in ``ethtool_ops::op_needs_rtnl`` (if necessary
++``ETHTOOL_OP_NEEDS_RTNL_*`` bit doesn't exist just add it). Commonly
++used core helpers which force drivers to selectively opt-in to
++``rtnl_lock`` protection include ``netdev_update_features()``,
++``netif_set_real_num_*_queues()``, and phylink helpers.
+ 
+ struct netdev_stat_ops
+ ----------------------
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 4f15221119e2..35ee57a0e5fa 100644
+index 35ee57a0e5fa..b62028eaf28e 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -1375,6 +1375,7 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
-  *			within RTNL.
-  * @rss_indir_user_size: Number of user provided entries for the default
-  *			 (context 0) indirection table.
-+ * @phys_id_busy:	Loop blinking the device LED is running.
-  * @wol_enabled:	Wake-on-LAN is enabled
-  * @module_fw_flash_in_progress: Module firmware flashing is in progress.
-  */
-@@ -1382,6 +1383,7 @@ struct ethtool_netdev_state {
- 	struct xarray		rss_ctx;
- 	struct mutex		rss_lock;
- 	u32			rss_indir_user_size;
-+	unsigned		phys_id_busy:1;
- 	unsigned		wol_enabled:1;
- 	unsigned		module_fw_flash_in_progress:1;
- };
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 6c3a7e8644ae..aea087d62fe9 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -543,7 +543,7 @@ static int ethtool_get_link_ksettings(struct net_device *dev,
- 	int err = 0;
- 	struct ethtool_link_ksettings link_ksettings;
- 
--	ASSERT_RTNL();
-+	netdev_ops_assert_locked(dev);
- 	if (!dev->ethtool_ops->get_link_ksettings)
- 		return -EOPNOTSUPP;
- 
-@@ -600,7 +600,7 @@ static int ethtool_set_link_ksettings(struct net_device *dev,
- 	struct ethtool_link_ksettings link_ksettings = {};
- 	int err;
- 
--	ASSERT_RTNL();
-+	netdev_ops_assert_locked(dev);
- 
- 	if (!dev->ethtool_ops->set_link_ksettings)
- 		return -EOPNOTSUPP;
-@@ -674,7 +674,7 @@ static int ethtool_get_settings(struct net_device *dev, void __user *useraddr)
- 	struct ethtool_cmd cmd;
- 	int err;
- 
--	ASSERT_RTNL();
-+	netdev_ops_assert_locked(dev);
- 	if (!dev->ethtool_ops->get_link_ksettings)
- 		return -EOPNOTSUPP;
- 
-@@ -710,7 +710,7 @@ static int ethtool_set_settings(struct net_device *dev, void __user *useraddr)
- 	struct ethtool_cmd cmd;
- 	int ret;
- 
--	ASSERT_RTNL();
-+	netdev_ops_assert_locked(dev);
- 
- 	if (copy_from_user(&cmd, useraddr, sizeof(cmd)))
- 		return -EFAULT;
-@@ -2451,10 +2451,10 @@ void ethtool_puts(u8 **data, const char *str)
- }
- EXPORT_SYMBOL(ethtool_puts);
- 
--static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
-+static int ethtool_phys_id(struct net_device *dev, void __user *useraddr,
-+			   bool has_rtnl_lock)
- {
- 	struct ethtool_value id;
--	static bool busy;
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 	netdevice_tracker dev_tracker;
- 	int rc;
-@@ -2462,7 +2462,7 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
- 	if (!ops->set_phys_id)
- 		return -EOPNOTSUPP;
- 
--	if (busy)
-+	if (dev->ethtool->phys_id_busy)
- 		return -EBUSY;
- 
- 	if (copy_from_user(&id, useraddr, sizeof(id)))
-@@ -2472,13 +2472,14 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
- 	if (rc < 0)
- 		return rc;
- 
--	/* Drop the RTNL lock while waiting, but prevent reentry or
-+	/* Drop the locks while waiting, but prevent reentry or
- 	 * removal of the device.
- 	 */
--	busy = true;
-+	dev->ethtool->phys_id_busy = true;
- 	netdev_hold(dev, &dev_tracker, GFP_KERNEL);
- 	netdev_unlock_ops(dev);
--	rtnl_unlock();
-+	if (has_rtnl_lock)
-+		rtnl_unlock();
- 
- 	if (rc == 0) {
- 		/* Driver will handle this itself */
-@@ -2491,22 +2492,25 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
- 		u64 i = 0;
- 
- 		do {
--			rtnl_lock();
-+			if (has_rtnl_lock)
-+				rtnl_lock();
- 			netdev_lock_ops(dev);
- 			rc = ops->set_phys_id(dev,
- 				    (i++ & 1) ? ETHTOOL_ID_OFF : ETHTOOL_ID_ON);
- 			netdev_unlock_ops(dev);
--			rtnl_unlock();
-+			if (has_rtnl_lock)
-+				rtnl_unlock();
- 			if (rc)
- 				break;
- 			schedule_timeout_interruptible(interval);
- 		} while (!signal_pending(current) && (!id.data || i < count));
- 	}
- 
--	rtnl_lock();
-+	if (has_rtnl_lock)
-+		rtnl_lock();
- 	netdev_lock_ops(dev);
- 	netdev_put(dev, &dev_tracker);
--	busy = false;
-+	dev->ethtool->phys_id_busy = false;
- 
- 	(void) ops->set_phys_id(dev, ETHTOOL_ID_INACTIVE);
- 	return rc;
-@@ -3259,7 +3263,8 @@ static int ethtool_set_fecparam(struct net_device *dev, void __user *useraddr)
- static int
- dev_ethtool_locked(struct net *net, struct net_device *dev,
- 		   void __user *useraddr,
--		   u32 ethcmd, struct ethtool_devlink_compat *devlink_state)
-+		   u32 ethcmd, struct ethtool_devlink_compat *devlink_state,
-+		   bool has_rtnl_lock)
- {
- 	u32 sub_cmd;
- 	int rc;
-@@ -3315,6 +3320,8 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
- 			return -EPERM;
- 	}
- 
-+	netdev_ops_assert_locked(dev);
-+
- 	if (dev->dev.parent)
- 		pm_runtime_get_sync(dev->dev.parent);
- 
-@@ -3402,7 +3409,7 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
- 		rc = ethtool_get_strings(dev, useraddr);
- 		break;
- 	case ETHTOOL_PHYS_ID:
--		rc = ethtool_phys_id(dev, useraddr);
-+		rc = ethtool_phys_id(dev, useraddr, has_rtnl_lock);
- 		break;
- 	case ETHTOOL_GSTATS:
- 		rc = ethtool_get_stats(dev, useraddr);
-@@ -3549,8 +3556,12 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
- 	if (dev->ethtool_ops->complete)
- 		dev->ethtool_ops->complete(dev);
- 
--	if (old_features != dev->features)
--		netdev_features_change(dev);
-+	if (old_features != dev->features) {
-+		if (has_rtnl_lock)
-+			netdev_features_change(dev);
-+		else
-+			netdev_WARN(dev, "unexpected device features change with ethtool cmd %u", ethcmd);
-+	}
- out:
- 	if (dev->dev.parent)
- 		pm_runtime_put(dev->dev.parent);
-@@ -3558,25 +3569,60 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
- 	return rc;
- }
- 
-+/* Commands that may toggle dev->features in net/ethtool/ioctl.c and so
-+ * call into __netdev_update_features(), which still requires rtnl_lock.
-+ * Driver-decided SET commands that may chain into rtnl-only helpers are
-+ * covered by ethtool_ioctl_needs_rtnl()/ETHTOOL_OP_NEEDS_RTNL_*.
-+ */
-+static bool ethtool_cmd_changes_features(u32 ethcmd)
-+{
-+	switch (ethcmd) {
-+	case ETHTOOL_SFEATURES:
-+	case ETHTOOL_SFLAGS:
-+	case ETHTOOL_STXCSUM:
-+	case ETHTOOL_SRXCSUM:
-+	case ETHTOOL_SSG:
-+	case ETHTOOL_STSO:
-+	case ETHTOOL_SGSO:
-+	case ETHTOOL_SGRO:
-+		return true;
-+	}
-+	return false;
-+}
-+
- static int
- __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
- 	      u32 ethcmd, struct ethtool_devlink_compat *devlink_state)
- {
-+	netdevice_tracker dev_tracker;
- 	struct net_device *dev;
-+	bool need_rtnl;
- 	int rc;
- 
--	rtnl_lock();
--	dev = __dev_get_by_name(net, ifr->ifr_name);
--	if (!dev) {
-+	dev = netdev_get_by_name(net, ifr->ifr_name, &dev_tracker, GFP_KERNEL);
-+	if (!dev)
-+		return -ENODEV;
-+
-+	need_rtnl = !netdev_need_ops_lock(dev) ||
-+		    ethtool_cmd_changes_features(ethcmd) ||
-+		    ethtool_ioctl_needs_rtnl(dev, ethcmd);
-+	if (need_rtnl)
-+		rtnl_lock();
-+	netdev_lock_ops(dev);
-+	if (dev->reg_state > NETREG_REGISTERED ||
-+	    dev->moving_ns || !net_eq(dev_net(dev), net)) {
- 		rc = -ENODEV;
--		goto exit_rtnl_unlock;
-+		goto exit_ops_unlock;
- 	}
- 
--	netdev_lock_ops(dev);
--	rc = dev_ethtool_locked(net, dev, useraddr, ethcmd, devlink_state);
-+	rc = dev_ethtool_locked(net, dev, useraddr, ethcmd, devlink_state,
-+				need_rtnl);
-+
-+exit_ops_unlock:
- 	netdev_unlock_ops(dev);
--exit_rtnl_unlock:
--	rtnl_unlock();
-+	if (need_rtnl)
-+		rtnl_unlock();
-+	netdev_put(dev, &dev_tracker);
- 
- 	return rc;
- }
+@@ -1177,8 +1177,14 @@ struct kernel_ethtool_ts_info {
+  * @get_mm_stats: Query the 802.3 MAC Merge layer statistics.
+  *
+  * All operations are optional (i.e. the function pointer may be set
+- * to %NULL) and callers must take this into account.  Callers must
+- * hold the RTNL lock or netdev instance lock (see @op_needs_rtnl).
++ * to %NULL) and callers must take this into account.
++ *
++ * For traditional drivers callers hold ``rtnl_lock`` across the call.
++ * For "ops locked" drivers (see Documentation/networking/netdevices.rst)
++ * callers instead hold the netdev instance lock (``netdev_lock_ops``);
++ * ``rtnl_lock`` is additionally held only for callbacks for which
++ * the driver opts in via the matching ``ETHTOOL_OP_NEEDS_RTNL_*`` bit
++ * in @op_needs_rtnl.
+  *
+  * See the structures used by these operations for further documentation.
+  * Note that for all operations using a structure ending with a zero-
 -- 
 2.54.0
 
