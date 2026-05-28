@@ -1,268 +1,208 @@
-Return-Path: <netdev+bounces-292698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNZYLk5IGGr2iQgAu9opvQ
-	(envelope-from <netdev+bounces-292698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:51:10 +0200
+	id wAo+M6lIGGpSiggAu9opvQ
+	(envelope-from <netdev+bounces-292699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:52:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D765F308A
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:51:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC6495F3148
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2193D30277FA
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:44:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CD01B30722A7
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D88D3E00AE;
-	Thu, 28 May 2026 13:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EE028488D;
+	Thu, 28 May 2026 13:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D31hQX0I";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtNXrsBs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xTzUVy0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36CD3CF977
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 13:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AF626A0DD
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 13:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779975864; cv=none; b=NJhcVXJ0d29WhCBTMUz1+9KeFk6Be1t7kxSq3Sabdtdlj9HZ3CMV+3vmsmyeiBTY75gG+mW/jZL2pMqI3VwbMWfJtbioZt7aK77d8LoHabvoG1VYptIPn/4mbSF6aOA+My/mi0DibnKHnecBfmBCfqpiPsUgj+lkIpMlFlrXfp8=
+	t=1779976145; cv=none; b=mQjmRDXVt/I6f5WvrAR7/BRTkm+Wza3d1Tnl4sSbMhOSX0W8t2iWPI0O9I8yrL2LAqltB+2qNpPUAt3/tfjvuEm/ysvCcUB3/C2l8eiM39hpbBddHW53wCgYT0Frg9HCw8TrJBSp7SwkS5utQOUG/40RsjYptbqzzI3cAe8nz6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779975864; c=relaxed/simple;
-	bh=VHaoDmgCkgTC0UcKu8H53Pd0FdmiriLBjfqSStS2ur4=;
+	s=arc-20240116; t=1779976145; c=relaxed/simple;
+	bh=ZMNSn8FMJhcKftTmwQAwboYvQ5sk+yuXs2A8qvrkjyU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SgBfdAWWFYJKvqLlVEglMENEnPSJdhx8U8LqHAfjytfmIx8nLyg8Pfcf2A+KbapgQUE5gIJGW8uGu/yhPDLTmNFm7twjBnKqYo56FRaORAZI4Jwg9+uQ8Ec/41mjWiDs0/zR736rmdXIDo4QG3nr5I5rNFyiSMAgu4Zj/jEGkzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D31hQX0I; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AtNXrsBs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779975861;
+	 In-Reply-To:Content-Type; b=IDyVCn8DIP6hVkbLQ/bGIcchTmzCDcSPC2sf6gEY++NULpze1BjZF/zCNUz9sIRYevJSKHpi8yf2bqwSWPnWviaOTJmQQ5nhIBE+P0+xt2wUMuC3OLTai3osvemlD+n+FTfHPtjVoi+L0zUYZ/eW0oEXZxUtdAFlSvqbQMrfuS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xTzUVy0n; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b1447f76-0ca4-49b1-a1ba-2670dbbe5eea@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779976131;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IwaHDMlFJk38IE4DVFS/xPewZFhWzBUixHbPcP51qO4=;
-	b=D31hQX0IrCOEH8RNo+FxvbXVtNpku/Npb4opg3u97c4sIwTo/ygJ4vRGzNBQhhJwpH8996
-	0AnD5jPbkWjR2Y0TSFrB4Mz5/sNzPk5xHdPEQHG66X1jEJSaEXdsVzAse5TmpBIKQPm6nS
-	2Cx2fR6LnGEeB9Xk+FQ4SC6E7LwH0r4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-8akXLEDnPZyyKVWAOk_oEA-1; Thu, 28 May 2026 09:44:18 -0400
-X-MC-Unique: 8akXLEDnPZyyKVWAOk_oEA-1
-X-Mimecast-MFC-AGG-ID: 8akXLEDnPZyyKVWAOk_oEA_1779975857
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-449b2a183d3so8143378f8f.0
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 06:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779975857; x=1780580657; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IwaHDMlFJk38IE4DVFS/xPewZFhWzBUixHbPcP51qO4=;
-        b=AtNXrsBsaR/yBxAdBIRgIiERHJd6H3dgfh9ehV4eXSZdFCLO8zY4mG2S23eEA0s1VR
-         OwuDBfdmBPmu/Vh/Ma4XXRT4DpuOqsjzCB/XTvWwz5JuJCUa9C+7EeupZOzbAuZLWj1M
-         HO5ZFvAkjASUhZJrhnxm5tiKf9sF1ddoOTDB7f50idwOTu6U7uSvEgU9KyLyhgF2jTfe
-         BlWmE87D4/c4FdJRTpYBB3CpBu2y2Zkhe5QDNRcJ4zBmQstOkIuVKf6yvIgLhr68WEnd
-         9xjWhs+4CMi90IvPAZHnIDqqkq2I7g2+Slw1TmWzwetKLOjQxEwW7ItQBpS7Xw/bFAks
-         lYsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779975857; x=1780580657;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IwaHDMlFJk38IE4DVFS/xPewZFhWzBUixHbPcP51qO4=;
-        b=Q5rmKYKCrt0Af+E1fFbrLMKa6Pf36Jebbt0s8QVMmgmQrsBDq1bAU/N1dbCQLPjvyr
-         d1sU10wN3qCMdyvrgvezY39/3qQI02RGbVjUkq8bZKFd+ZHLqXvjy+A8Hus0RJL/YDRX
-         j5NUtDRBDMPgdYv3kI8+AeU2N+ld+ajJwXC988Crt7wRs4OPakiB6n6chegPR2lwVcZ5
-         hWTMAZdtaUN0XnGxTDLITzm/NeBlO9ynFuNx6hEMpJ/B/eByyINMSXPmLix4Nq4aFmoe
-         FzqA31kpNdNd+EPz5O+x8kWLGDPRqQ2RibCDkIx6OnQ0Scd0PkOZCx/BNRyDGbYUcsTO
-         hLrw==
-X-Forwarded-Encrypted: i=1; AFNElJ+xkjwSZJfy+Cbklvv4pZOKTpL2rBhvTABfmDl6kSEBq5fKo5Y2BH9MKRuBc16oJFNtBzWcgs4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg8GhM2gtOxkyckXNCF7Skdhl7viwjvQ68/w3nuDoElyth4FHR
-	S/uyHHVhw+s2oY30juituq1p2KnAxpjhRR9zvLyDzFblec00VKKTQ+1wABP1vNFa8LCLTgSxx0P
-	bikJo5ZUkqhtWARB19y9mg7TVzscpePR8+zD0QwAtLacec1RcT/4kn6DMbw==
-X-Gm-Gg: Acq92OHSZ412ZbfM0QJkH7E9kj5D8CzOnpDMt5BCfc+oKTTEEdSosSkeWfPkDSMTWC4
-	TFkDUXvWXTF0eju/IrFKDFNyuZZNalFygXTaoADLEqmzvESQyj9htHJAWKM4hpaSwSyQn4qeIgS
-	Rl2S125JpI+lMurEh12dNiwo4ugYaF3ciM5a8uxv4I3rQRAECSfcSVIIDMy84lIs5TpBxegQwLf
-	8iCJ9F4DcSWp/S3kINlFK+WKcy/CoBQ6G2yaEcmnqWuMW1p7uzNW3g02WjbidfXTBo4VCEphah1
-	gqxOw0CYZM1teoxghA7L5uTe+t08Q2t9bwvRs3A8w0DC9pFMVHEVO0xAJ5CC3iq5+a4k1gluchD
-	PPhJXDZ2TCNlxs3yNDoU5sdXXKE5RNoMIST0g3CetWVIrAH0OD0XtC+m15xJqs31auA==
-X-Received: by 2002:a05:6000:4605:b0:45e:8e69:955a with SMTP id ffacd0b85a97d-45eeba0ce21mr2985063f8f.9.1779975856736;
-        Thu, 28 May 2026 06:44:16 -0700 (PDT)
-X-Received: by 2002:a05:6000:4605:b0:45e:8e69:955a with SMTP id ffacd0b85a97d-45eeba0ce21mr2985018f8f.9.1779975856277;
-        Thu, 28 May 2026 06:44:16 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.12])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5b1a28sm13709292f8f.26.2026.05.28.06.44.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2026 06:44:15 -0700 (PDT)
-Message-ID: <0902bdb9-2746-45fd-ba4d-8e5b96617b8b@redhat.com>
-Date: Thu, 28 May 2026 15:44:14 +0200
+	bh=j1rfDTRW2cmLcCORksVjwMmc2zx0nSP0mJx5m/+xkoI=;
+	b=xTzUVy0nmLvVsdNV3uG0l8Zwz58tcumtzFYVCGuh4e+HPqzDRPWokyUZt+d2aHCOfJgIGx
+	+cuU+1wMFmxfeWhRqt0OqViZCFmKsBC7qLmWuGLD9aa1dTi1HuaiwF8+OxAy+kl9IAQIC1
+	iCxmytlKn8DO0ZoKWjdt69JvS9tbQBU=
+Date: Thu, 28 May 2026 21:48:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/9] esp: fix page frag reference leak on skb_to_sgvec
- failure
-To: Steffen Klassert <steffen.klassert@secunet.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
-References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
- <20260527084148.3489759-6-steffen.klassert@secunet.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260527084148.3489759-6-steffen.klassert@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ipv4: validate ip_forward_options() option fields
+ against skb tail
+To: Qi Tang <tpluszz77@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, idosch@nvidia.com,
+ horms@kernel.org, lyutoon@gmail.com, stable@vger.kernel.org
+References: <20260528111204.482401-1-tpluszz77@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260528111204.482401-1-tpluszz77@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292698-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,nvidia.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-292699-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,redhat.com,google.com];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 16D765F308A
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: EC6495F3148
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/27/26 10:41 AM, Steffen Klassert wrote:
-> From: e521588 <alessandro.schino@sbb.ch>
-> 
-> In esp_output_tail(), when esp->inplace is false, the old skb page frags
-> are replaced with a new page from the xfrm page_frag cache. The source
-> scatterlist (sg) is built from the old frags before the replacement, and
-> esp_ssg_unref() is responsible for releasing the old page references
-> after the crypto operation completes.
-> 
-> However, if the second skb_to_sgvec() call (which builds the destination
-> scatterlist from the new page) fails, the code jumps to error_free which
-> only calls kfree(tmp). The old page frag references captured in the
-> source scatterlist are never released:
-> 
->   1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
->   2. nr_frags is set to 1 and frag[0] is replaced with the new page
->   3. Second skb_to_sgvec() fails -> goto error_free
->   4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
->   5. kfree_skb() only releases frag[0] (the new page), not the old ones
-> 
-> Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
-> unconditionally unrefs the source scatterlist frags without checking
-> req->src and req->dst, since those fields are not yet initialized by
-> aead_request_set_crypt() at the point of the error. Existing callers
-> pass false to preserve the original behavior.
-> 
-> The same issue exists in both esp4 and esp6 as the code is identical.
-> 
-> Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
-> Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
-> 
-> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+
+On 5/28/26 7:12 PM, Qi Tang wrote:
+> ip_forward_options() re-reads the RR/SRR/TS option length byte
+> optptr[1] and pointer byte optptr[2] from the skb on the forwarding
+> path and uses them as indexes for 4-byte writes via
+> ip_rt_get_source() (and a memcmp walk in the SRR branch).
+>
+> __ip_options_compile() validates those bytes at parse time but stores
+> only the option's offset into IPCB(skb)->opt.{rr,srr,ts}.  An nftables
+> FORWARD-chain payload mutation between parse and consume can rewrite
+> the bytes, driving the indexed writes out of bounds and overlapping
+> skb_shared_info.  With optptr[2] mutated the write can land in
+> skb_shared_info.frag_list; the next time the skb is dropped
+> kfree_skb_list_reason() walks the forged list and frees an
+> attacker-controlled pointer, an arbitrary-free primitive (R15 below
+> is the corrupted frag_list):
+>
+>    BUG: unable to handle page fault for address: ffffed10195fd757
+>    Oops: 0000 [#1] SMP KASAN NOPTI
+>    RIP: 0010:kfree_skb_list_reason+0x167/0x5f0
+>    RAX: 1ffff110195fd757 RBX: dffffc0000000000
+>    R15: ffff8880cafebabe
+>    CR2: ffffed10195fd757
+>    Call Trace:
+>     skb_release_data+0x565/0x820
+>     sk_skb_reason_drop+0xc1/0x350
+>     ip_rcv_core+0x7a8/0xcd0
+>     ip_rcv+0x97/0x270
+>     __netif_receive_skb_one_core+0x161/0x1b0
+>     process_backlog+0x1c4/0x5b0
+>     net_rx_action+0x934/0xfa0
+
+
+The bug is real, but I'm curious what kernel version and driver you're on.
+On my side the skb falls into SKB_SMALL_HEAD_CACHE_SIZE (704), so the 
+linear area
+is pretty long, and optptr[2] maxes out at 255, which doesn't look like 
+it can reach frag_list.
+
+May the driver use alloc_skb to allocate small liner buffer?
+
+
+> Bound optptr[2] within optptr[1] before the RR and TS writes, and
+> clamp the SRR walk to the bytes actually present in the skb.  Match
+> the existing error handling in this function: skip the malformed
+> option in place rather than returning, so the single ip_send_check()
+> at the end still recomputes the checksum for any option that was
+> updated earlier.
+>
+> Cc: stable@vger.kernel.org
+> Reported-by: Qi Tang <tpluszz77@gmail.com>
+> Reported-by: Tong Liu <lyutoon@gmail.com>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Qi Tang <tpluszz77@gmail.com>
 > ---
->  net/ipv4/esp4.c | 12 +++++++-----
->  net/ipv6/esp6.c | 12 +++++++-----
->  2 files changed, 14 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> index 6a5febbdbee4..8314d7bddcb7 100644
-> --- a/net/ipv4/esp4.c
-> +++ b/net/ipv4/esp4.c
-> @@ -96,7 +96,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
->  			     __alignof__(struct scatterlist));
->  }
->  
-> -static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
-> +static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
->  {
->  	struct crypto_aead *aead = x->data;
->  	int extralen = 0;
-> @@ -113,7 +113,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
->  	/* Unref skb_frag_pages in the src scatterlist if necessary.
->  	 * Skip the first sg which comes from skb->data.
->  	 */
-> -	if (req->src != req->dst)
-> +	if (already_unref || req->src != req->dst)
->  		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
->  			skb_page_unref(page_to_netmem(sg_page(sg)),
->  				       skb->pp_recycle);
-
-Sashiko points the above is still unsafe:
-
----
-When the new caller passes already_unref = true, can the loop still be
-reached safely?
-Looking at the allocation and request setup in esp_output_tail():
-	tmp = esp_alloc_tmp(aead, esp->nfrags + 2, extralen);
-	...
-	req = esp_tmp_req(aead, iv);
-	sg  = esp_req_sg(aead, req);
-esp_alloc_tmp() calls kmalloc(len, GFP_ATOMIC) — the buffer is not
-zeroed.
-esp_tmp_req() only does aead_request_set_tfm(req, aead), which assigns
-req->base.tfm. It does not touch req->src or req->dst.
-The local variable sg is filled in by skb_to_sgvec(skb, sg, ...) but
-nothing copies sg into req->src; that assignment is performed later by
-aead_request_set_crypt(req, sg, dsg, ivlen + esp->clen, iv).
-In the new error path the call sequence is:
-	err = skb_to_sgvec(skb, dsg, ...);
-	if (unlikely(err < 0)) {
-		esp_ssg_unref(x, tmp, skb, true);   /* before set_crypt */
-		goto error_free;
-	}
-	...
-	aead_request_set_crypt(req, sg, dsg, ivlen + esp->clen, iv);
-Inside esp_ssg_unref() with already_unref = true, the predicate is
-short-circuited but the loop body still dereferences req->src:
-	if (already_unref || req->src != req->dst)
-		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
-			skb_page_unref(page_to_netmem(sg_page(sg)),
-				       skb->pp_recycle);
-Since req->src has not been initialized at this point (the kmalloc
-buffer holds whatever was there before, and aead_request_set_crypt()
-has not yet run), sg_next(req->src) walks an arbitrary pointer,
-sg_page(sg) reads sg->page_link from arbitrary memory, and
-skb_page_unref(page_to_netmem(...), ...) then drops a refcount on a
-fabricated page.
-The commit message also seems to acknowledge this:
-    Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
-    unconditionally unrefs the source scatterlist frags without checking
-    req->src and req->dst, since those fields are not yet initialized by
-    aead_request_set_crypt() at the point of the error.
-If req->src/req->dst are not yet initialized, how can the loop
-sg = sg_next(req->src) be valid?  Should the helper instead walk the
-local sg returned by esp_req_sg(aead, req) (which was actually
-populated by the first skb_to_sgvec()), or should
-aead_request_set_crypt() be moved before the failure check so that
-req->src/req->dst are well defined?
-The same construct appears in net/ipv6/esp6.c:
----
-
-And the SoB is incorrect for this patch. Do you rebase your tree? (I'm
-not suggesting starting that otherwise!!!) If so you could possibly drop
-this patch ?!?
-
-/P
-
+>   net/ipv4/ip_options.c | 27 +++++++++++++++++++--------
+>   1 file changed, 19 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/ipv4/ip_options.c b/net/ipv4/ip_options.c
+> index be8815ce3ac24..36a4e3cc39dd1 100644
+> --- a/net/ipv4/ip_options.c
+> +++ b/net/ipv4/ip_options.c
+> @@ -544,18 +544,26 @@ void ip_forward_options(struct sk_buff *skb)
+>   
+>   	if (opt->rr_needaddr) {
+>   		optptr = (unsigned char *)raw + opt->rr;
+> -		ip_rt_get_source(&optptr[optptr[2]-5], skb, rt);
+> -		opt->is_changed = 1;
+> +		if (optptr + optptr[1] <= skb_tail_pointer(skb) &&
+> +		    optptr[2] >= 5 && optptr[2] <= optptr[1] + 1) {
+> +			ip_rt_get_source(&optptr[optptr[2] - 5], skb, rt);
+> +			opt->is_changed = 1;
+> +		}
+>   	}
+>   	if (opt->srr_is_hit) {
+>   		int srrptr, srrspace;
+>   
+>   		optptr = raw + opt->srr;
+>   
+> -		for ( srrptr = optptr[2], srrspace = optptr[1];
+> -		     srrptr <= srrspace;
+> -		     srrptr += 4
+> -		     ) {
+> +		/* optptr[1] (option length) may have been rewritten after the
+> +		 * parse-time check; if it now runs past the skb the option is
+> +		 * malformed, so skip the source-route rewrite below.
+> +		 */
+> +		srrspace = optptr[1];
+> +		if (optptr + srrspace > skb_tail_pointer(skb))
+> +			srrspace = 0;
+> +
+> +		for (srrptr = optptr[2]; srrptr <= srrspace; srrptr += 4) {
+>   			if (srrptr + 3 > srrspace)
+>   				break;
+>   			if (memcmp(&opt->nexthop, &optptr[srrptr-1], 4) == 0)
+> @@ -572,8 +580,11 @@ void ip_forward_options(struct sk_buff *skb)
+>   		}
+>   		if (opt->ts_needaddr) {
+>   			optptr = raw + opt->ts;
+> -			ip_rt_get_source(&optptr[optptr[2]-9], skb, rt);
+> -			opt->is_changed = 1;
+> +			if (optptr + optptr[1] <= skb_tail_pointer(skb) &&
+> +			    optptr[2] >= 9 && optptr[2] <= optptr[1] + 5) {
+> +				ip_rt_get_source(&optptr[optptr[2] - 9], skb, rt);
+> +				opt->is_changed = 1;
+> +			}
+>   		}
+>   	}
+>   	if (opt->is_changed) {
 
