@@ -1,84 +1,53 @@
-Return-Path: <netdev+bounces-292511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id E5WZKlabF2ohLAgAu9opvQ
-	(envelope-from <netdev+bounces-292511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:33:10 +0200
+	id cG6tAFmfF2rlLQgAu9opvQ
+	(envelope-from <netdev+bounces-292512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:50:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922C35EB915
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:33:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2AD5EB9CE
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABD40302DF8A
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:33:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 298F430AAEC3
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 01:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D712922652D;
-	Thu, 28 May 2026 01:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87961279DC3;
+	Thu, 28 May 2026 01:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZX/DTnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC1735949
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 01:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6597C1F5858;
+	Thu, 28 May 2026 01:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779931986; cv=none; b=f5VhUm9mE5evuQFfL2u4JoxYRDd//zWmCn4VjyHccD4jB4ZBPOhI3P41gf8fN5PF560D0M7/b2J+bTIpBNCG4z1OuRqBhaBVKgEdE5RQ26L8XiwusjHUDK1l2sOdfD0cJ47hfCVcfQGNC+bj2nBxwNdwbvMiYUqzV3LBB4OVVRk=
+	t=1779933012; cv=none; b=NpFQq6hUrqKuOqUuvPS4+i+byaqC/bEVfoanXrBfcO3nM3R32OxwwGRqlaVB49hSjwnFEv0NpNlk7WcNmiCuz/0+b1uvyR5dtaYXqImSrhW3oJIfVgxVYRsRqtSAslrD59Cy8KONkTgEUEwQ+G20kMXELcwdp5qlXfsP7Idqy0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779931986; c=relaxed/simple;
-	bh=4M/V93Ha8JBYGGKQ5YYFAKYJHA1P3iQMZeV6YsHb6dE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J+t2HKSYa07ibVZ31O284BhEwBAFB2CDYpp1/PRZk2PzL5qQ2QcPCnW0Q+TenzW40nigzFElenUcpT3ZnhM8IBcwyOMuYe/CJLxpk5P/x8PoNfd0TCNg2zigmOOzPFiiKibITcSaXelV33OPjzl2ey//MmxI76N2kfwePrazAnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 269d4c685a3511f1aa26b74ffac11d73-20260528
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:9d158488-477d-400b-abe4-bb09981a8aff,IP:10,
-	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:30
-X-CID-INFO: VERSION:1.3.12,REQID:9d158488-477d-400b-abe4-bb09981a8aff,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:30
-X-CID-META: VersionHash:e7bac3a,CLOUDID:a68734fe87d02f4c22b4de400d75e18f,BulkI
-	D:260528093257PPMPQDPJ,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
-	|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:
-	nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,B
-	RE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 269d4c685a3511f1aa26b74ffac11d73-20260528
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 636910384; Thu, 28 May 2026 09:32:55 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net v3] net: txgbe: fix phylink leak on AML init failure
-Date: Thu, 28 May 2026 09:32:58 +0800
-Message-Id: <20260528013258.129146-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1779933012; c=relaxed/simple;
+	bh=4CU6JBS0dQWfLBpm3F8quBrkeVT5U090q0rGX5qMzmE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bXjHB4fTStBV6+UB/ekY04iAZfkdQZ5Iagjv6F5mgPBEIjqRZpeG1zn7Ple+AevJTYw43V6Ms75jVc/1+EEL/PntFga9dOg4KrXXcMlxhsaQVo5DxhpWqoq0MdszCGSo8unaXXoOMCs0oDKTFuAxIX1TBQ88lEJN3a+1n0GTztA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZX/DTnc; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBDD51F000E9;
+	Thu, 28 May 2026 01:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779933011;
+	bh=uOox2uRaVHzcxzDbkU1ncr7dwdyroKxjIXuOl3sptoA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=oZX/DTnc5s5KY+hnrBUXkHaGKUTcrVSXOrneobeG6+kpyp5DlCoKLblCcDIXfwxpr
+	 OcclAJvDXsKKTqcCyL5GYOFn9iWXzb5MyCZaA6Z6jxUFRzqH+dob0X4vbdHS31CyU9
+	 EnNE1fakLRMFjDnk7tD2tTBMZlLN6wYSKHtaOSgTxVFW8Om1iJ6u299CJ+WQ2Uzdx0
+	 nz8OqqFIAKUbUPbMJEhqsus+6jp8oQXUSCgm9xzb2rlie8Eql9fOoowbJH7BIlmtMX
+	 XSt86LNjLEfBOe//QMZR2gpGQEq/0MbqyudmaNZYRLlwVu6iW2TIBWC/hOGK/b729o
+	 MjVc6ZgWNvIXw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19BB5380CFEF;
+	Thu, 28 May 2026 01:50:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,66 +55,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.54 / 15.00];
+Subject: Re: [PATCH net-next v5 0/6] Introduce Airoha AN8801R series Gigabit
+ Ethernet PHY driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177993301589.711996.780315750455117859.git-patchwork-notify@kernel.org>
+Date: Thu, 28 May 2026 01:50:15 +0000
+References: 
+ <20260526-add-airoha-an8801-support-v5-0-01aea8dee69b@collabora.com>
+In-Reply-To: 
+ <20260526-add-airoha-an8801-support-v5-0-01aea8dee69b@collabora.com>
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, angelogioacchino.delregno@collabora.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, kevin-kw.huang@airoha.com,
+ macpaul.lin@mediatek.com, matthias.bgg@gmail.com, kernel@collabora.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292511-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[kylinos.cn];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-292512-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 922C35EB915
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4E2AD5EB9CE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Destroy the phylink instance when fixed-link setup fails.
+Hello:
 
-Fixes: 6f8b4c01a8cd ("net: txgbe: Implement PHYLINK for AML 25G/10G devices")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Reviewed-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
-v3:
- - Adjusted the subject prefix as suggested by Maxime.
-v2:
- https://lore.kernel.org/all/20260526090559.2095680-1-zhaochenguang@kylinos.cn/
-v1:
- https://lore.kernel.org/all/20260522070749.1634542-1-zhaochenguang@kylinos.cn/
----
- drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 1 +
- 1 file changed, 1 insertion(+)
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-index f0514251d4f3..8e301e7d1148 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-@@ -521,6 +521,7 @@ int txgbe_phylink_init_aml(struct txgbe *txgbe)
- 	err = phylink_set_fixed_link(phylink, &state);
- 	if (err) {
- 		wx_err(wx, "Failed to set fixed link\n");
-+		phylink_destroy(phylink);
- 		return err;
- 	}
- 
+On Tue, 26 May 2026 16:58:05 +0200 you wrote:
+> This series introduces the Airoha AN8801R Gigabit Ethernet PHY initial
+> support.
+> 
+> The Airoha AN8801R is a low power single-port Ethernet PHY Transceiver
+> with Single-port serdes interface for 1000Base-X/RGMII.
+> This chip is compliant with 10Base-T, 100Base-TX and 1000Base-T IEEE
+> 802.3(u,ab) and supports:
+>   - Energy Efficient Ethernet (802.3az)
+>   - Full Duplex Control Flow (802.3x)
+>   - auto-negotiation
+>   - crossover detect and autocorrection,
+>   - Wake-on-LAN with Magic Packet
+>   - Jumbo Frame up to 9 Kilobytes.
+> This PHY also supports up to three user-configurable LEDs, which are
+> usually used for LAN Activity, 100M, 1000M indication.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v5,1/6] dt-bindings: net: Add support for Airoha AN8801R GbE PHY
+    https://git.kernel.org/netdev/net-next/c/ed28bd094db3
+  - [net-next,v5,2/6] net: phy: Add Airoha phy library for shared code
+    https://git.kernel.org/netdev/net-next/c/dddfadd75197
+  - [net-next,v5,3/6] net: phy: air_phy_lib: Factorize BuckPBus register accessors
+    https://git.kernel.org/netdev/net-next/c/5226bb6634cd
+  - [net-next,v5,4/6] net: phy: Rename Airoha common BuckPBus register accessors
+    https://git.kernel.org/netdev/net-next/c/e08f0ea6daf2
+  - [net-next,v5,5/6] net: phy: Introduce Airoha AN8801R Gigabit Ethernet PHY driver
+    https://git.kernel.org/netdev/net-next/c/fdb9bf7f1658
+  - [net-next,v5,6/6] net: phy: air_an8801: ensure maximum available speed link use
+    https://git.kernel.org/netdev/net-next/c/f6465e36353f
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
