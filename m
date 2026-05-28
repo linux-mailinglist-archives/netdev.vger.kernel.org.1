@@ -1,252 +1,164 @@
-Return-Path: <netdev+bounces-292654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNWeHygdGGq+dQgAu9opvQ
-	(envelope-from <netdev+bounces-292654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:47:04 +0200
+	id i00jJmsgGGoAeAgAu9opvQ
+	(envelope-from <netdev+bounces-292655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:00:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDC1B5F0D8F
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:47:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1585F0FF6
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 96F293009579
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:46:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 733F0311D7D4
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583113C4B73;
-	Thu, 28 May 2026 10:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458923D45C1;
+	Thu, 28 May 2026 10:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nPQvrFzu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oxbDanOX";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nPQvrFzu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oxbDanOX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lSfpi6Qb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E5D3C4545
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 10:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423163D3CF5;
+	Thu, 28 May 2026 10:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779965183; cv=none; b=NEzjuiupTVa9NDYs/aG9YUc4sUFnmuZdekQCsoOVVbiEpequWeCHP8fji9H8XlM/IrrF0/95SXVM9y2gMe+ShUPGGQXiQ6JuCK43rIRjUCzK2+tb+522Kds8Jsjm3eEWDaF2dHRpgV0mMpx2tF/2lsVvql5iKUt8QglkCSbEeTc=
+	t=1779965723; cv=none; b=ogbyREs78CdFWJtEXDpY0YNtfgupSyHU335ZfRjcdbKlJ6/kwizHZfde7Uf8XzEMR2JH5l4wSRsCAbo5fJUYHQh1dNhy4RwaOcBTEXMoR19+v7mU8ZPpjG6ldFl8BBN8sn+XPuL17gigEFxL33r1QtyNJ5tvjhP0MxxtS8tp6hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779965183; c=relaxed/simple;
-	bh=2/JyH7hqgi0/W7n9Oee47eVVhPHxJ9SNl36JempN2a8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HDYakGZhZ1bHpOuFm/GWbkepmsiIRRA30FeXNmdzz6nLtX3OCnMqxJV1S1ztpIDdGtnxsIpa413cPJuzRhesG0dn6JN1Kzwf104phNkbE+/z4RhM3wY7iPLQWzNW4HxwiGDZfYjqwA1ya21NxJRQ2mChdUs8d0H/r5ruBnti4Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nPQvrFzu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oxbDanOX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nPQvrFzu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oxbDanOX; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B70E06A88A;
-	Thu, 28 May 2026 10:46:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1779965179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
-	b=nPQvrFzucccJVQ5ck0qzJjt5+bMX6E2BkAgVlWIW9L9G6jmB7z52g1Cs+pdOGbrjnxnxkQ
-	Dw29x7CTaYAdkIUbfkwWeqdxNle2B6kUetADc7aZ8umq6+58/XszJ0y5lNTX+Klal0v+v6
-	eMoJC87aCNFb0W6Feg5og4tH0cWLoJk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1779965179;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
-	b=oxbDanOXyaC+I+8zhuLwXuMALixv47D7v+LMSneRq3j7PfDXkRqMPJaOjJ4RBjro229Xhr
-	YYu/+mfIK+B+PbAQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1779965179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
-	b=nPQvrFzucccJVQ5ck0qzJjt5+bMX6E2BkAgVlWIW9L9G6jmB7z52g1Cs+pdOGbrjnxnxkQ
-	Dw29x7CTaYAdkIUbfkwWeqdxNle2B6kUetADc7aZ8umq6+58/XszJ0y5lNTX+Klal0v+v6
-	eMoJC87aCNFb0W6Feg5og4tH0cWLoJk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1779965179;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
-	b=oxbDanOXyaC+I+8zhuLwXuMALixv47D7v+LMSneRq3j7PfDXkRqMPJaOjJ4RBjro229Xhr
-	YYu/+mfIK+B+PbAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3C6995AD45;
-	Thu, 28 May 2026 10:46:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8FXVC/scGGrjFgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 28 May 2026 10:46:19 +0000
-Message-ID: <baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
-Date: Thu, 28 May 2026 12:46:05 +0200
+	s=arc-20240116; t=1779965723; c=relaxed/simple;
+	bh=RQZfWunTveBGTrLi/8LjGUJqz5oKuLD/v0g5KNaOPIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rQHaieJkhx2YUcctlykH4SVEwgU1zNIG6soBMSeSZwFzp1yhfk6gJc2mduNgdUbmWNFwEAN1zW60fO//o4D1xHwFxLHLh3XSDKJfLqAC7FtthlabgOM8FjP8EATbDgcQfyCfJN4/2cDaNE4EZSGWkYZfqQGiBpVdY1b/EmrgZno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lSfpi6Qb; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779965721; x=1811501721;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RQZfWunTveBGTrLi/8LjGUJqz5oKuLD/v0g5KNaOPIw=;
+  b=lSfpi6Qb+GTgR32j0jnCclNJqE+IdX9gm2NjkTOgW7qgXaDaLmuXI82x
+   T2hqDShnBDvbGtF4j0/CjOQmXKQja9dU4CPYGD2WkQoxkG9QU1YmGO+dY
+   x4FZ8VdXzU1ZRZvgjHj5+YmQxEN20did3umAnzrSKNFd9NG1TvMVgAjju
+   VBUdwaWCh9MI8shpN6mVMAr0qMbPwIj++L0YXEbSv665lDTyyQLlHWtuq
+   2hZ76VDvGWZDOmaHCd+jlsajWRpDpl0VzAdX8n3agz6P+8SwpyBpkEfDV
+   eglLdsjY4gcSbZrHGhqH9Y3jk/TZ8c5XTddKpoTn9l9z2+3cyE6ICAsO7
+   w==;
+X-CSE-ConnectionGUID: FJmoocSrQcC4Mqj8oEaTRg==
+X-CSE-MsgGUID: 9YAdbfGBTs+2VrJsqIrung==
+X-IronPort-AV: E=McAfee;i="6800,10657,11799"; a="80796634"
+X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
+   d="scan'208";a="80796634"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 03:55:20 -0700
+X-CSE-ConnectionGUID: FJO8QiD2TSujPQRICqxUhQ==
+X-CSE-MsgGUID: 3rCEFMJ8Q0Omu2SZ5cJmtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
+   d="scan'208";a="266420616"
+Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 28 May 2026 03:55:17 -0700
+Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wSYOQ-000000005sk-03zS;
+	Thu, 28 May 2026 10:55:14 +0000
+Date: Thu, 28 May 2026 18:54:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chuang Wang <nashuiliang@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, Chuang Wang <nashuiliang@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5] net: reduce RFS/ARFS flow updates by
+ checking LLC affinity
+Message-ID: <202605281822.xLK0Dj87-lkp@intel.com>
+References: <20260525025854.13982-1-nashuiliang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Problem with IPv6 privacy addresses in 7.0
-To: Stefano Brivio <sbrivio@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Yumei Huang <yuhuang@redhat.com>,
- Ido Schimmel <idosch@idosch.org>, Justin Iurman <justin.iurman@gmail.com>,
- David Ahern <dsahern@kernel.org>, David Gibson
- <david@gibson.dropbear.id.au>, ihuguet@redhat.com
-References: <20260521135310.GC977@cmadams.net>
- <20260526175743.1f2c3761@kernel.org> <20260527010641.GA21073@cmadams.net>
- <20260526183122.348e44e7@kernel.org> <20260527215135.GB16443@cmadams.net>
- <675083b4-e015-4ff3-836c-798e0a971194@suse.de>
- <20260528073849.759da84a@elisabeth>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260528073849.759da84a@elisabeth>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Score: -2.80
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260525025854.13982-1-nashuiliang@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,idosch.org,gmail.com,kernel.org,gibson.dropbear.id.au];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-292655-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TAGGED_FROM(0.00)[bounces-292654-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,suse.de:email,suse.de:mid,suse.de:dkim]
-X-Rspamd-Queue-Id: EDC1B5F0D8F
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,01.org:url,intel.com:email,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: 5A1585F0FF6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/28/26 7:38 AM, Stefano Brivio wrote:
-> Hi Fernando, Jakub,
-> 
-> On Wed, 27 May 2026 23:59:47 +0200
-> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-> 
->> On 5/27/26 11:51 PM, Chris Adams wrote:
->>> Once upon a time, Jakub Kicinski <kuba@kernel.org> said:
->>>> On Tue, 26 May 2026 20:06:41 -0500 Chris Adams wrote:
->>>>>> Hi! Adding more people to CC. Do you know if you upgraded from 6.18
->>>>>> or 6.19?
->>>>>
->>>>> It was 6.19 to 7.0.
->>>>>   
->>>>>> Would you be able to try testing with some commits reverted?
->>>>>> On a quick look the candidates would be:
->>>>>>
->>>>>> cb3de96eea66 ("ipv6: preserve insertion order for same-scope addresses")
->>>>>
->>>>> It's this one.
->>>>
->>>> Phew, the second one was mine :)
->>>>   
->>>>> I figured out that it happens after stopping a VM (and I usually
->>>>> start/stop a VM for a bit in the morning, which is why it happened more
->>>>> than once).  So I set up a VM with a nested VM, running up-to-date
->>>>> Fedora 44, and then was able to bisect pretty easily, and it landed on
->>>>> this commit.
->>>>>
->>>>> Fedora is using NetworkManager, and IIRC NM does some part of privacy
->>>>> address management (right?).  NM didn't change, so maybe this commit is
->>>>> confusing something in NM?
->>>>
->>>> Sounds plausible, pretty sure we knew this commit was risky to begin
->>>> with, but we had no direct proof that it'd break real life users.
->>>>
->>>> Revert is the right course of action here. Would you be willing/able
->>>> to send the revert with your problem description and a Fixes tag
->>>> pointing to the reverted commit?
->>>
->>> I did want to add a little more test note:
->>>
->>> It's definitely an interaction with NetworkManager.  If I stop NM and
->>> run my VM start/stop test, nothing unexpected happens after.  If NM is
->>> running and I do my VM test, when the next router advertisement is
->>> received, NM replaces the privacy addresses.
->>>    
->>
->> As someone that is experienced in NetworkManager, I can confirm it is
->> related. NetworkManager is querying the IPv6 address and when the
->> connection is configured with ipv6.ip6-privacy=2 (prefer-temp-addr),
->> NetworkManager creates a route to make the system use the temporary
->> address for outgoing connections by default.
->>
->> If the order is messed up, the address picked will likely be too. One
->> could argue that this is partially fault of NetworkManager and that it
->> should check the timestamps or preferred times rather than order.. but
->> well, the rule is "do not break userspace".
->>
->> I hope this clarifies things.
-> 
-> Not entirely. I'm looking into this right now, but note that the purpose
-> of that commit is to *preserve* the order of addresses as they were
-> inserted, not to mess it up.
-> 
-> Before that, addresses were stored and returned via netlink *reversed*
-> compared to the insertion, which is rather surprising, also because
-> it's the opposite of what we do for IPv4 addresses, and caused issues
-> with pasta(1) as it copies addresses into containers in the same order
-> as reported via netlink.
-> 
+Hi Chuang,
 
-Right, to make it clear. I agree with you here. The current order is the 
-*right* or rather intuitive order.
+kernel test robot noticed the following build errors:
 
-> Do you happen to know exactly in which way the order happens to be wrong
-> now?
-> 
+[auto build test ERROR on net-next/main]
 
-It is not wrong, but userspace applications were parsing addresses and 
-expecting them in the previous order whether it was correct or not. Now, 
-that parsing is broken because they are coming in an unexpected (maybe 
-more intuitive) order.
+url:    https://github.com/intel-lab-lkp/linux/commits/Chuang-Wang/net-reduce-RFS-ARFS-flow-updates-by-checking-LLC-affinity/20260525-110036
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260525025854.13982-1-nashuiliang%40gmail.com
+patch subject: [PATCH net-next v5] net: reduce RFS/ARFS flow updates by checking LLC affinity
+config: sh-sh7763rdp_defconfig (https://download.01.org/0day-ci/archive/20260528/202605281822.xLK0Dj87-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260528/202605281822.xLK0Dj87-lkp@intel.com/reproduce)
 
-FWIW; Iñigo Huguet (CC'ed) pointed out that this is breaking a 
-NetworkManager test and they were going to report it.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605281822.xLK0Dj87-lkp@intel.com/
 
-> Also note that userspace was broken and fixed a couple of times:
-> 
->    https://bugs.passt.top/show_bug.cgi?id=175#c10
-> 
-> so I would look into fixing that properly if doable. If it takes too
-> long and this is causing issues for a lot of people meanwhile of course
-> it might make sense to revert, but I'd give it a quick try at least.
-> 
+All errors (new ones prefixed by >>):
 
-I think the solution shouldn't modify the order of the list by default. 
-Maybe we can introduce a flag for the dump operation?
+   sh4-linux-ld: net/ipv4/tcp.o: in function `tcp_splice_read':
+>> tcp.c:(.text+0x3e90): undefined reference to `sock_rps_record_flow'
+   sh4-linux-ld: net/ipv4/tcp.o: in function `tcp_zerocopy_receive':
+   tcp.c:(.text+0x4cf4): undefined reference to `sock_rps_record_flow'
+   sh4-linux-ld: net/ipv4/af_inet.o: in function `inet_send_prepare':
+>> af_inet.c:(.text+0x538): undefined reference to `sock_rps_record_flow'
+   sh4-linux-ld: net/ipv4/af_inet.o: in function `inet_recvmsg':
+   af_inet.c:(.text+0x570): undefined reference to `sock_rps_record_flow'
+   sh4-linux-ld: net/ipv4/af_inet.o: in function `__inet_accept':
+   af_inet.c:(.text+0x644): undefined reference to `sock_rps_record_flow'
+   sh4-linux-ld: net/ipv4/af_inet.o:af_inet.c:(.text+0x2048): more undefined references to `sock_rps_record_flow' follow
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
