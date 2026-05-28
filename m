@@ -1,161 +1,229 @@
-Return-Path: <netdev+bounces-292704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292705-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id zeWGJ+ZNGGpMiwgAu9opvQ
-	(envelope-from <netdev+bounces-292704-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:15:02 +0200
+	id sBS3GkFPGGpMiwgAu9opvQ
+	(envelope-from <netdev+bounces-292705-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:20:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27CFE5F381A
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:15:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 022435F3995
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:20:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8C8F3041A0D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:05:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3643930E9F66
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADC92D978C;
-	Thu, 28 May 2026 14:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7489229B8CF;
+	Thu, 28 May 2026 14:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KSo4J3xP"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FsBfb7e5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QPSw/uUv";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FsBfb7e5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QPSw/uUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7C4262D0B;
-	Thu, 28 May 2026 14:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F160C2D8795
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779977153; cv=none; b=exYLaSd841dx9G60wv8DmfQXLLDAlB76HRdspgEwLw+3C4iNv/0RbFYvpbGnBZ/K9QHyH3wO3Gui3UmngGrsWvVeIc0iTwKQ//HQgOdNJy4ucRpYeYRooyh4BJ+mHdNphTRHYz8u//KheA+MiEUeVUFk23xYJAQBiKpUu92KWx8=
+	t=1779977507; cv=none; b=MpLkg/mjAiUNvujBIxZpqt+KCZX5y8txWy7IBl2I4J3ZM2ENJmR/VGowKyffYVVw734R+isleygTMEYxtyREoibhNV6wK6qPc4V4NoMBgF0J4W5UqKDdXu4gofVLKtb2xONsbNOEs/wFLNAOcoOuSDRgIjMsvOgd3ONoj8HhcA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779977153; c=relaxed/simple;
-	bh=2B+LiktD1pa0YGhkxFn2PP8pHb5/sG7H1Di7+KweH+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mkAWARCuusOO9Gsj2Uj8J+g0mQy1G73xZirGnGWR1uGRLZaeGw6DcTjG4sNjin5XzO17iZdj19rXiTNrMY64cb4MqLH4qT1UFtl0FHMWyxViDo31I+7ORhhRTawwGUOP8yhJ0kVrFtTDdbbs/ydMihB+zF/EclcVZOotK8h0r1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KSo4J3xP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iKxZKPqxsH5uo4pqIkZVW6G4qdRbJWxX6X8Pa63Xnvo=; b=KSo4J3xP9z2BKQp2YtD8YreOy7
-	JeSCicIOC7tMqDe2DyJ3gZuNqZ+BYMq7UwyFX1esBs4k+0kK0zYAYY/CvIi+v9yk6nIIZnpLJvaHo
-	ubs6YYSQlYKT8rFh1GgejQPf1VML8a4GuDCXZGIBDFf3OYYn12/cSaMYmzMqTXOA7Uk0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wSbMc-004uKm-0g; Thu, 28 May 2026 16:05:34 +0200
-Date: Thu, 28 May 2026 16:05:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Regus, Ciprian" <Ciprian.Regus@analog.com>
-Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 10/10] net: ethernet: adi: Add a driver for
- the ADIN1140 MACPHY
-Message-ID: <91ff1b03-d5db-473a-9292-335022a646c5@lunn.ch>
-References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
- <20260527-adin1140-driver-v2-10-37e5c8d4e0a0@analog.com>
- <0aaa9a58-fac1-4de7-90f0-443db37228c8@lunn.ch>
- <72c3a9a8040e4b8990f217d4072872de@analog.com>
+	s=arc-20240116; t=1779977507; c=relaxed/simple;
+	bh=LBWCl1BantiDKJsW270IrKv8RPokJXf21rhBGk/bHus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XG7iahs5dzi0vWtQG5mvuHui4bdSU/jep5enAC+rSsaAf97SxP3kI/vxfGOLUI5B41M2pQi8g8mVg4J02B3HsVR+V8yCaV9Snq6GgUPtWAK2Q/QMpOT+DT4FAa7frubBjCzmW9h2WLMV0x+D38X8x/5t6JcIFHsKeIiT9fN2loU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FsBfb7e5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QPSw/uUv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FsBfb7e5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QPSw/uUv; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 219C36A935;
+	Thu, 28 May 2026 14:11:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779977504; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MDh/OYLNpsk8L7zu3TLrHmfyrdlPNDan14EYQCjWQwI=;
+	b=FsBfb7e5omcoYDmpu+kcF8iwJcwIlimbH7XGOkd4CBRfPqiU5lEiFqBbTezE/1Kn4RLb1R
+	N/AZbRm79peD1JrgBEBWW6zzdx8BibHNdbwUzFnIkY17kPvn4TYTj7//2mBGM1gOPpSK1F
+	r0YJkJe7nc7ePCFE4k0ilH/jBF63cEg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779977504;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MDh/OYLNpsk8L7zu3TLrHmfyrdlPNDan14EYQCjWQwI=;
+	b=QPSw/uUvtpQKggqIra7vgLZzUNwkEUjN3voVcRYWpFs/Uu98SDHshBDVe0IJEWC7/QTDgm
+	o1vcH7WqLxSgybAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779977504; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MDh/OYLNpsk8L7zu3TLrHmfyrdlPNDan14EYQCjWQwI=;
+	b=FsBfb7e5omcoYDmpu+kcF8iwJcwIlimbH7XGOkd4CBRfPqiU5lEiFqBbTezE/1Kn4RLb1R
+	N/AZbRm79peD1JrgBEBWW6zzdx8BibHNdbwUzFnIkY17kPvn4TYTj7//2mBGM1gOPpSK1F
+	r0YJkJe7nc7ePCFE4k0ilH/jBF63cEg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779977504;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MDh/OYLNpsk8L7zu3TLrHmfyrdlPNDan14EYQCjWQwI=;
+	b=QPSw/uUvtpQKggqIra7vgLZzUNwkEUjN3voVcRYWpFs/Uu98SDHshBDVe0IJEWC7/QTDgm
+	o1vcH7WqLxSgybAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 620595AE13;
+	Thu, 28 May 2026 14:11:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NV33FB9NGGqJawAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 28 May 2026 14:11:43 +0000
+Message-ID: <9b7e7ab0-04e4-411f-a0cd-05589fd4c98e@suse.de>
+Date: Thu, 28 May 2026 16:11:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72c3a9a8040e4b8990f217d4072872de@analog.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] Revert "ipv6: preserve insertion order for same-scope
+ addresses"
+To: Stefano Brivio <sbrivio@redhat.com>
+Cc: netdev@vger.kernel.org, yuhuang@redhat.com, justin.iurman@gmail.com,
+ horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
+ Chris Adams <linux@cmadams.net>, david@gibson.dropbear.id.au
+References: <20260528111123.4667-1-fmancera@suse.de>
+ <20260528133524.28d531e6@elisabeth>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260528133524.28d531e6@elisabeth>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292704-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,gibson.dropbear.id.au];
+	TAGGED_FROM(0.00)[bounces-292705-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 27CFE5F381A
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,suse.de:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 022435F3995
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> > Does the standard say anything about this? It seems like something
-> > which could be moved into the core.
+On 5/28/26 1:35 PM, Stefano Brivio wrote:
+> On Thu, 28 May 2026 13:11:23 +0200
+> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
 > 
-> The comment is a mistake on my part, as it doesn't clearly describe why we
-> have to pad the skb. It's a case of a MAC device which doesn't pad a frame to
-> a minimum size when the host wants to transmit less than 64 bytes. I'll update
-> it in v3 to say:
+>> Chris Adams reported that preserving insertion order for same-scope
+>> addresses is causing SSH connections to be dropped after stopping a VM
+>> while running NetworkManager.
+>>
+>> NetworkManager is caching the networking information from the system and
+>> later operating with it. It relies on the order of IPv6 addresses to
+>> configure routes for outgoing traffic.
 > 
-> /* The MAC doesn't automatically pad the frame to a 64 byte minimum size in
->  * case the host sent a shorter skb, so we have to do it in the driver. The FCS
->  * will be added by the MAC.
->  */
-
-Just an FYI: the 64 bytes includes the FCS. So if the MAC is adding
-the FCS, you should pad to 60, not 64.
-
-> As for what the OA TC6 standard says, this is the relevant section
-> (7.3 - Data Transaction Protocol for Ethernet Frames)
+> I think this paragraph should make it clear that NetworkManager relies
+> on a _reversed_ order (first inserted is returned last), and that it's
+> the opposite compared to IPv4.
 > 
-> "Ethernet frames are typically transferred from the SPI host to the MAC-PHY without
-> any padding or frame check sequence (FCS). The MAC will automatically pad the Ethernet
-> frame to the minimum frame size of 64 bytes and append a computed FCS. However, the
-> Ethernet specification allows for the SPI host to optionally perform the frame padding and
-> FCS computation prior to transfer to the MAC-PHY. Similarly, the MAC-PHY will typically
-> strip the FCS from received Ethernet frames prior to transfer to the SPI host. However,
-> the Ethernet specification allows the option for the Ethernet frame to be transferred to the
-> MAC client with the FCS.
+
+FWIW; I still think that NetworkManager relies on the ordering but not 
+for the route.. AFAIU, the route should be for the prefix and should not 
+change at all.
+
+So I need to figure out what is changing and document it properly on the 
+commit.
+
+>> Revert to the previous ordering.
 > 
-> The IEEE Ethernet standard [2] defines the behavior of the MAC and therefore is beyond
-> the scope of this specification. As a result, support for allowing the SPI host to perform frame
-> padding and FCS computation, or passing the FCS to the SPI host is optional. When supported,
-> the method for configuring the MAC-PHY to enable these modes of frame transfer is
-> implementation specific."
+> See my concern from:
 > 
-> As I understand, from the TC6 standard point of view, the padding and FCS offload is optional.
-> So, I think this shouldn't go into the core. 
+>    https://lore.kernel.org/all/20260528131250.1352ab48@elisabeth/
+> 
+> (sorry, I sent that email moments after you sent this patch it seems). It
+> fixes the issue for NetworkManager assuming it's the only issue, but it
+> causes a regression for others.
+> 
+> If this revert is the only practical solution, so be it. I'm just wondering
+> if it really is.
+> 
+>> This reverts commit cb3de96eea66f5e4a580086c6a1be46e765f97f4.
+>>
+>> Fixes: cb3de96eea66 ("ipv6: preserve insertion order for same-scope addresses")
+>> Reported-by: Chris Adams <linux@cmadams.net>
+>> Closes: https://lore.kernel.org/netdev/20260521135310.GC977@cmadams.net/
+>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+>> ---
+>>   net/ipv6/addrconf.c                  | 2 +-
+>>   tools/testing/selftests/net/ioam6.sh | 2 +-
+>>   2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+>> index 5476b6536eb7..bb84a78b80f6 100644
+>> --- a/net/ipv6/addrconf.c
+>> +++ b/net/ipv6/addrconf.c
+>> @@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
+>>   	list_for_each(p, &idev->addr_list) {
+>>   		struct inet6_ifaddr *ifa
+>>   			= list_entry(p, struct inet6_ifaddr, if_list);
+>> -		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
+>> +		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
+>>   			break;
+>>   	}
+>>   
+>> diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
+>> index b2b99889942f..845c26dd01a9 100755
+>> --- a/tools/testing/selftests/net/ioam6.sh
+>> +++ b/tools/testing/selftests/net/ioam6.sh
+>> @@ -273,8 +273,8 @@ setup()
+>>     ip -netns $ioam_node_beta link set ioam-veth-betaR name veth1 &>/dev/null
+>>     ip -netns $ioam_node_gamma link set ioam-veth-gamma name veth0 &>/dev/null
+>>   
+>> -  ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
+>>     ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
+>> +  ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
+>>     ip -netns $ioam_node_alpha link set veth0 up &>/dev/null
+>>     ip -netns $ioam_node_alpha link set lo up &>/dev/null
+>>     ip -netns $ioam_node_alpha route add 2001:db8:2::/64 \
+> 
 
-Thanks for the quotes from the standard. I personally think this was a
-bad decision by the authors of the standard, leaving it ambiguous.
-
-In the end, putting it in the driver seems like a good first
-approach. Maybe as we get more devices following the standard, we see
-it is common to need padding, and we move it into the core controlled
-by a quirk. But that can come later.
-
-   Andrew
 
