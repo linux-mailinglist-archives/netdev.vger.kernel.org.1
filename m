@@ -1,99 +1,63 @@
-Return-Path: <netdev+bounces-292828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAlKM6OZGGr+lQgAu9opvQ
-	(envelope-from <netdev+bounces-292828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:38:11 +0200
+	id aLk2DNeaGGr+lQgAu9opvQ
+	(envelope-from <netdev+bounces-292833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:43:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449C85F739E
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:38:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 287795F7453
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C4FBC306C59F
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:36:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AFB653004D2E
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499CD40911E;
-	Thu, 28 May 2026 19:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA02733A9FC;
+	Thu, 28 May 2026 19:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Smb+A4NU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOoY7UHE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66AB3FD12B
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 19:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B203382CD
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 19:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779996962; cv=none; b=t2Mrtn0hP+7F6JinbmXT/NDbnRW7wSk65YSng6z3RoQEChb7C0dvaFtv+FuowvRFb1pTrBYoj2ze5QdhJDcCJi2bS6F8t7cHnUVUYyQDQnviXGpwrH3oHuhyq94NvJ9BXEAyYuzGhjBiaZiET+BPsNHMaI/YyOd2dnHbL931mPM=
+	t=1779997340; cv=none; b=D0kuxIjbLJkZAS3YyvTIlIyWv7EleAM35EYizMSNn47BObU7QNoiaVRGVm31TJoVMsOJlpQZIo13D7w3IspBrjIMFWrzIlm8IqFpoznu0pySckJwB0bQs3G/Utlwx5UEgV7UKB7ahbRxZqZk6bUc51L38bpfNxGNoe6U6DYW8yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779996962; c=relaxed/simple;
-	bh=xsXICI5h6DgnJjDwpEi8t56/6QfLbeKAlXD1MKlRBHc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GA18t5+ASZ2Mm6pIRPX6XC3YlvCUAwef14NC5HSdcCQ16YCfPUMpYEtICBSCo7QD5QcMOWGhSfOcAInKGa6KK55hln83Us2e6qbrh8qLMk27rtjsIZA0WDTm1GGNkwo7jPESH2bpvgyVdAr2gQVKgd+bFI41Q0m4o6LoeQWMoZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Smb+A4NU; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4906869f0cbso51876655e9.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 12:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779996959; x=1780601759; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1epXm0spYI+xC3YQ0LGbrxeOVg6XYaBQS/no7GVttJg=;
-        b=Smb+A4NUW6hM9UiRxqkHwT/9H9FTOIFO9FFVUvFkwfkUxM8GsD4Ocqo3/QQGVfljq0
-         Xc4IlHAri3PmQGEEWvOcMNK8cjVwZX5dVCeq1YUj9dLkw2AvqZqaBPkCfdybTPyE/2bU
-         nnoeDPsp3XJQkHJWz9fr8xNgwfpu9WDRap7sUszMhdd4tVnMn/Ehm2aZMJQfkT6H4XyY
-         I15xgLO6mntv4zmCkLvPIcS19m0v4J0oCJcl/5gF+0GAxX2Gy0L+3vWcf+s3Cn+qh6Ss
-         QGovE0BqfUK7LanGmmgi50W8ADGGuRzVSSdlcwwzuo/ipS+CXXu93z/qQxYO4nHFosR2
-         Yl4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779996959; x=1780601759;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1epXm0spYI+xC3YQ0LGbrxeOVg6XYaBQS/no7GVttJg=;
-        b=XTZtcxehHGyL8Show7Q8xwhZpkaQ6EZtBHwtWQJXMCa0k2rZjzZImw4jG35eWTHeJr
-         pwxw80NiYsuSt9VkUDyRN7bTNyGhrT//y1i4GNXrinFip/8Gt2pjFt54hzDNPVgcBhBi
-         nn042cycXWW/iGyNNE3f/NQ3TYmrqgReZ2yf1453XnRVn4N1rIWr1cdMBe9YIYGLhlul
-         C3BYhz0C2uIvKrWgoAtwvo2hVQRzRtAgIWf9yWVcQmkW/kQKbHUT3mfZv6/FzaJKOI1Y
-         ltDu1udp7ziz6muDs2ROL2RK4QYMeEobmsIKrpS9oPJ/MOfwLDjwFoAG2BFafgxzKax9
-         U6cw==
-X-Forwarded-Encrypted: i=1; AFNElJ/SCwR94Bg24S53tRD7SPnm1aZygksdjUdH7DoOTRv74WCY8idS4oNaqb0Q7hBmEeOxwso99L0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDC226z5zGtKO2uUbJbmIz7S37sN+ibhrg5ctjYovCBq40mBFz
-	5Dv6vwKhV9UBttc3UDcDDeMqlMBwG9JYJdDdAILOHXtWAvevIic5OmNL
-X-Gm-Gg: Acq92OFv+ynY6BPj7RZM6YNCFVYsOXaQEDy86i99bLdH07hHSLQ0hoGCpQrRFWEznvp
-	wpz9IHRCvBUVhMAd2ctKDM7qMumIbbKKuVm8w8jSrS5GsA+4H+FsBa8UmlM072N8tmqmJ9GVVAc
-	Kjtc9zheQtANg92zsXBZAMnaTqaPUrNSmgCf2v50e9p4+nH/0gM40vUA+MsF5xZtXWxSZoh/1x6
-	NBEyjNT8htvN/rxjLYOmohmTemUvWmb8DqLZp8zVxT2IdpEWBtrNELSbyoyIjahM88NikJTRAgQ
-	PQ00VP6dtldbA5yhtkCio+fszbuGVL/lIepKzKaZQpHMTc1njzCPH1nURdNGTME+SjugfxHsP1v
-	DBCEyzsMhbH5NIe66HltujIeBB/We+S6sMIxtTKWiHetTDDiJDSffsQ4PqkdAFeq1JgCcofHa0a
-	EHNFLdi0Ur5jHji60Lz27FUekIa0w5Usmoh2zgg8WEnXnk03/yGS2vWLj5VWrUqdfk4ivUgJ3Wb
-	nWsnF0=
-X-Received: by 2002:a5d:59c5:0:b0:45e:8526:7dd7 with SMTP id ffacd0b85a97d-45ef05e8290mr823717f8f.27.1779996959084;
-        Thu, 28 May 2026 12:35:59 -0700 (PDT)
-Received: from Ansuel-XPS24 (host-79-42-252-49.retail.telecomitalia.it. [79.42.252.49])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-45eec5eba06sm4220471f8f.22.2026.05.28.12.35.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 12:35:58 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 4/4] net: phy: as21xxx: fill in inband caps
-Date: Thu, 28 May 2026 21:35:44 +0200
-Message-ID: <20260528193545.11160-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260528193545.11160-1-ansuelsmth@gmail.com>
-References: <20260528193545.11160-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1779997340; c=relaxed/simple;
+	bh=Rs3iDXyNPjzIj8+Go08ryVuMRbA8PkG+FiuixgqowGQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=c/TZCkx5K8VD3FqTF1w5gwJ2D/wilAD9/4IANxx8YGKFRZqB14C8A3CWlIJpNBFvH0RAP+2DW20Iqpkl0zcJ5/9YTk57G/r0R278K/vty8d2pGdMYbUmTVlfC0kKQAGQZxX7Ei3Byqmuo1J96JJg/CEWfWFN75gZhF63e9KMt1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOoY7UHE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA821F000E9;
+	Thu, 28 May 2026 19:42:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779997339;
+	bh=RJoq9qarIskm7VxbTKa/s0TS8lTezHfWJfg2CZckn00=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=UOoY7UHE1yxsDOFVhWQOlUEAkT+5tjCT/dmbw3EAFx1URNCAtIlHs8rumQeG1WTW4
+	 /UajF5TmeSYjQKWZulyRD3kdcMSXAPGJux6zeX/2cvOZZ6UZsGpcII9VcMbCNl25qQ
+	 TUncapfB+NwSRd2pT9usID+ZfaWR82gTZND0KbKv9LWzew567d8yfcVJXlIcmzbbvp
+	 D5Kora/2sQ1pw6PGdYT6buw8lL6wZuxyrAcNFJCXFyH/f0raFOphhwrDTsMlXBQE4k
+	 49J+qP7rcqFovQarHfv/i+wxIz0ZpQRqHMXcxVQXGYGXKO1POOj8SyVBWHcj+mGQSQ
+	 u+axHDUebb7DQ==
+From: Simon Horman <horms@kernel.org>
+To: kipreyyy@gmail.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] appletalk: fix use-after-free in atalk_sendmsg due to route lookup race
+Date: Thu, 28 May 2026 20:37:09 +0100
+Message-ID: <20260528193707.2711621-3-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260526085735.61445-1-kipreyyy@gmail.com>
+References: <20260526085735.61445-1-kipreyyy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,144 +68,184 @@ Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292828-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292833-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 449C85F739E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url]
+X-Rspamd-Queue-Id: 287795F7453
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add .inband_caps function that enforce In Band for USXGMII. With further
-test it was discovered that the PHY always require In-Band for USXGMII.
+From: 'Simon Horman' <horms@kernel.org>
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- drivers/net/phy/as21xxx.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Subject: appletalk: fix use-after-free in atalk_sendmsg due to route lookup race
 
-diff --git a/drivers/net/phy/as21xxx.c b/drivers/net/phy/as21xxx.c
-index a6686b4908c6..1b69c2fabc1d 100644
---- a/drivers/net/phy/as21xxx.c
-+++ b/drivers/net/phy/as21xxx.c
-@@ -967,6 +967,15 @@ static int as21xxx_match_phy_device(struct phy_device *phydev,
- 	return ret;
- }
- 
-+static unsigned int as21xxx_inband_caps(struct phy_device *phydev,
-+					phy_interface_t interface)
-+{
-+	if (interface == PHY_INTERFACE_MODE_USXGMII)
-+		return LINK_INBAND_ENABLE;
-+
-+	return 0;
-+}
-+
- static struct phy_driver as21xxx_drivers[] = {
- 	{
- 		/* PHY expose in C45 as 0x7500 0x9410
-@@ -982,6 +991,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21011JB1),
- 		.name		= "Aeonsemi AS21011JB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -994,6 +1004,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21011PB1),
- 		.name		= "Aeonsemi AS21011PB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1006,6 +1017,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21010PB1),
- 		.name		= "Aeonsemi AS21010PB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1018,6 +1030,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21010JB1),
- 		.name		= "Aeonsemi AS21010JB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1030,6 +1043,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21210PB1),
- 		.name		= "Aeonsemi AS21210PB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1042,6 +1056,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21510JB1),
- 		.name		= "Aeonsemi AS21510JB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1054,6 +1069,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21510PB1),
- 		.name		= "Aeonsemi AS21510PB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1066,6 +1082,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21511JB1),
- 		.name		= "Aeonsemi AS21511JB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1078,6 +1095,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21210JB1),
- 		.name		= "Aeonsemi AS21210JB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
-@@ -1090,6 +1108,7 @@ static struct phy_driver as21xxx_drivers[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_AS21511PB1),
- 		.name		= "Aeonsemi AS21511PB1",
- 		.probe		= as21xxx_probe,
-+		.inband_caps	= as21xxx_inband_caps,
- 		.match_phy_device = as21xxx_match_phy_device,
- 		.read_status	= as21xxx_read_status,
- 		.led_brightness_set = as21xxx_led_brightness_set,
--- 
-2.53.0
+This patch attempts to fix a use-after-free in atalk_sendmsg() by deferring 
+route deletion with kfree_rcu() and caching required route fields under 
+rcu_read_lock(). It also takes a reference on the route devices using 
+dev_hold() to prevent them from disappearing during the sleeping allocation.
 
+> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+> index 30a6dc06291c3..2c754378fa088 100644
+> --- a/net/appletalk/ddp.c
+> +++ b/net/appletalk/ddp.c
+> @@ -603,7 +603,7 @@ static int atrtr_delete(struct atalk_addr *addr)
+>  		     tmp->target.s_node == addr->s_node)) {
+>  			*r = tmp->next;
+>  			dev_put(tmp->dev);
+> -			kfree(tmp);
+> +			kfree_rcu(tmp, rcu);
+
+Simon says: while the issue below is flagged as not being introduced by
+            this patch, I think that if it is problem then it prevents
+	    this patch from working as intended.
+
+	    So if it is an issue I suggest addressing it in the context of
+	    this patch, perhaps by adding another patch to this patch-set.
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does the synchronous
+dev_put() allow the network device reference count to drop to zero while
+RCU readers are active?
+
+While kfree_rcu() defers freeing the route, dev_put(tmp->dev) is still
+called synchronously here. If a device is being unregistered and this
+synchronous dev_put() removes the last reference, the device's refcount
+could drop to zero before the RCU grace period ends.
+
+When a concurrent atalk_sendmsg() holding rcu_read_lock() then calls
+dev_hold() on this device, could it increment a zero refcount and cause a
+refcount saturation warning or use-after-free?
+
+[ ... ]
+
+> @@ -628,7 +628,7 @@ static void atrtr_device_down(struct net_device *dev)
+>  		if (tmp->dev == dev) {
+>  			*r = tmp->next;
+>  			dev_put(dev);
+> -			kfree(tmp);
+> +			kfree_rcu(tmp, rcu);
+
+Simon says: likewise for the issue below.
+
+[Severity: High]
+This is a pre-existing issue, but this appears to have the same synchronous
+dev_put() problem as atrtr_delete() above.
+
+[ ... ]
+
+> @@ -1600,6 +1603,7 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>  	/* For headers */
+>  	size = sizeof(struct ddpehdr) + len + ddp_dl->header_length;
+>  
+> +	rcu_read_lock();
+>  	if (usat->sat_addr.s_net || usat->sat_addr.s_node == ATADDR_ANYNODE) {
+>  		rt = atrtr_find(&usat->sat_addr);
+
+Simon says: and the issue below too.
+
+[Severity: High]
+This isn't a bug introduced by this patch, but are there other callers
+of atrtr_find() that are now missing rcu_read_lock() protection?
+
+atrtr_get_dev() calls atrtr_find(), which temporarily takes
+atalk_routes_lock and then returns a raw pointer:
+
+net/appletalk/ddp.c:atrtr_get_dev() {
+	struct atalk_route *atr = atrtr_find(sa);
+	return atr ? atr->dev : NULL;
+}
+
+Since atrtr_get_dev() does not hold rcu_read_lock() when dereferencing
+atr->dev, and this patch uses kfree_rcu() to defer route deletion, could
+a concurrent route deletion free the route before the read occurs?
+
+>  	} else {
+> @@ -1610,29 +1614,38 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>  
+>  		rt = atrtr_find(&at_hint);
+>  	}
+> -	err = -ENETUNREACH;
+> -	if (!rt)
+> +	if (!rt) {
+> +		rcu_read_unlock();
+> +		err = -ENETUNREACH;
+>  		goto out;
+> +	}
+>  
+>  	dev = rt->dev;
+> -
+> -	net_dbg_ratelimited("SK %p: Size needed %d, device %s\n",
+> -			sk, size, dev->name);
+> +	dev_hold(dev);
+
+Simon says: on the other hand, this one looks like it is orthogonal to
+            this patch and should be considered in the context of possible
+	    follow-up.
+
+[Severity: Critical]
+This is a pre-existing issue, but is there a data race on atrtr_default.dev
+that causes a NULL pointer dereference here?
+
+atrtr_device_down() sets the static atrtr_default.dev locklessly to NULL:
+
+net/appletalk/ddp.c:atrtr_device_down() {
+...
+	if (atrtr_default.dev == dev)
+		atrtr_set_default(NULL);
+}
+
+If atrtr_find() locklessly returns &atrtr_default, and atrtr_device_down()
+clears the default route between the lookup and dev = rt->dev, could this
+read a NULL pointer?
+
+Since dev_hold(dev) does not check for NULL, wouldn't it attempt to
+increment the refcount at a NULL offset and cause a kernel crash?
+
+Simon says: While this one seems to warrant further investigation in
+            the context of this patch.
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does the lack of reference
+counting on the default route break the newly added RCU assumptions?
+
+The static atrtr_default route does not hold a reference count on its
+network device (no dev_hold() is performed when atrtr_set_default()
+sets it). Consequently, when the device is unregistered, its refcount
+can drop to zero immediately.
+
+If atalk_sendmsg() retrieves this route and calls dev_hold() inside its
+RCU critical section, could it increment a zero refcount? This would trigger
+the same refcount saturation and use-after-free issues as the synchronous
+dev_put() described earlier.
+
+> +	rt_flags = rt->flags;
+> +	rt_gateway = rt->gateway;
+>  
+>  	hard_header_len = dev->hard_header_len;
 
