@@ -1,128 +1,128 @@
-Return-Path: <netdev+bounces-292491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292492-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Jp6F5yPF2oUJQgAu9opvQ
-	(envelope-from <netdev+bounces-292491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:43:08 +0200
+	id YLk0EfCPF2oUJQgAu9opvQ
+	(envelope-from <netdev+bounces-292492-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:44:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32C95EB506
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:43:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A25735EB598
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8298A308976D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:40:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 364C8300CE63
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939381A6823;
-	Thu, 28 May 2026 00:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9249194A6C;
+	Thu, 28 May 2026 00:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gk8msbES"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYCqy0DA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F287194A6C;
-	Thu, 28 May 2026 00:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FA53438BD
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 00:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779928808; cv=none; b=QKYwtnzRfmj8I5+1K5uLa0bGtrSDAFlVSFD9SlEMJcA22/Om/waEJTJ3hRC6TaUtQTQqDqAlv1eNDB7xtEFgr53NliBNJ/eg6h8469TiGat3LbDHfxH1qA9/oG9x8Ch8XOedPXDmRaGbOPVxgFy7xL/0e3nCN1qTc6r+dfozXNM=
+	t=1779928884; cv=none; b=tI5mzdbzkPOZe71jsY/9YrmiuCTOBWeB/Dg02gVWwU1IXlqneCMRXgfgX2yk5IX0EHUVklFL3T8vgjEc3uqMX+J81y/fgDR9LTXSYTK735VD5M9FQ+jkfzS5xTyF5Y12FqouCH88/IU1HnJSXwSLfZwTLRdRfDiejkIiCYAyN9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779928808; c=relaxed/simple;
-	bh=t66nOEgL3ornetJni2oTz+QuwJDk2gjsW8B0sLYPtXs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iVu/9NAt4iUUt6mmBuSh5LOVc1OGtC1y0uiuKfOjnJo80TPWD18JG/gFeT7F0MlpQjWTqfg8JNfbCrAnmq2ZHVcZqqN+PupMKjFs5FWxyglBlNwsa7GlJIpToTefbL7sa0om7KinzLQ5SRNMTLhfag5trPq1BLk57xsOC+0jd/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gk8msbES; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 266EF1F00A3A;
-	Thu, 28 May 2026 00:40:07 +0000 (UTC)
+	s=arc-20240116; t=1779928884; c=relaxed/simple;
+	bh=v6C910ZVZ4TU9da0jFbExhc6xKyPdrjDHdJT+8Lk1ws=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MmVWkAtCXyVNjW/Oo7OrX7Fu3QvylveuJcA9q9Ij0xTk9RFqNLCHSZiY6MikChjo238CvkvclZShpSc9xFm8N7p7QizUlFZ1EKGPg+W5gB6Ndb404GQHtyBIJ0LB0+thu2zxgRObHmUhcWQBmeZY6nze8Ny/aZDaoMRlcwQsbrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYCqy0DA; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC47B1F000E9;
+	Thu, 28 May 2026 00:41:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779928807;
-	bh=GdCtR5aV9vBP4cypsa0m+ljbgTd5qyfhRQC6c2XNDvA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Gk8msbESO/xILARX12U3y/kaMX9cgK7dRBmSWAXb3XAJhi2vzDryGGJdpP+3exp4K
-	 yzGkcTCaz+PV2N0adv57jybw7Uo66wMhkrSBbWqK8bD71fEN6tOroPSs5pVEKEJecP
-	 XAg/4GcaxzbNYH8zNHfPUGiZZjEHUdIWEoCEElGF0PmztZIxRsaNjuTzAR7m2ijb+6
-	 5y4nPhli1RG8KxSuspz7ExhwZ11SVW90L4Kbeq03ERh7K9QPlru/8RJ/oX65ZbTyKr
-	 CTkcQ6DPhfg8NEK0giXV3HpCNK4UyE0lC/gJOrZei57Imth3vLX5md5WP3miKUsEFk
-	 l5sRvNTnROiYA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56AED380CFDE;
-	Thu, 28 May 2026 00:40:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1779928883;
+	bh=JJYw5b737jgkgHNQdGXuoA1BA71Qd57zejA3L5LPlHY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=SYCqy0DAdwaBnOsfg+2PzdPK8fESyol2ouSdZBVryFtDRk2ee9zEX9mxQ9qTV/+gC
+	 Jv36L4OGG18UUeOTg2A2T0eqTRpbUj/Bj11684/Deq+5icEvIqiUw7xQ2E3JNuBjE3
+	 VQN+u7O1L8iEqHTKsRCTFbK6u0YZZNX5e948zZkjclgKCZtFNLhYk6i+riLAqyYy2Q
+	 YYx6sG4f9Uc0vDoGwc1Ke54eP5mkgaD/WPJhBSoCs0R8vYQyNwkl9lT+vPrwlYsoZL
+	 vRXZ6yS7794U8E1qqsh9aRh5BVEbMboUPPqqYAA3JAAm/8BUMr2Bqv2ZE86D9uDd/x
+	 gxGi44ES1pk2g==
+Date: Wed, 27 May 2026 17:41:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zhao Dongdong <winter91@foxmail.com>
+Cc: aleksander.lobakin@intel.com, davem@davemloft.net, edumazet@google.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, zhaodongdong@kylinos.cn
+Subject: Re: [PATCH] net: page_pool: check nla_nest_start() return value in
+Message-ID: <20260527174121.2289833e@kernel.org>
+In-Reply-To: <tencent_F2C58937ADA208EE4219632E34ED23772F08@qq.com>
+References: <20260526162736.5e95b928@kernel.org>
+	<tencent_F2C58937ADA208EE4219632E34ED23772F08@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: sfp: add quirk for OEM 2.5G optical modules
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177992881189.696403.14388154133198752084.git-patchwork-notify@kernel.org>
-Date: Thu, 28 May 2026 00:40:11 +0000
-References: <20260526055206.1750-1-weixiansen574@163.com>
-In-Reply-To: <20260526055206.1750-1-weixiansen574@163.com>
-To: Wei Qisen <weixiansen574@163.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, avinash.duduskar@gmail.com,
- linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292491-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292492-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[foxmail.com];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B32C95EB506
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,foxmail.com:email]
+X-Rspamd-Queue-Id: A25735EB598
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 26 May 2026 13:52:06 +0800 you wrote:
-> Some OEM-branded SFP modules are incorrectly detected as
-> 1000Base-X and fail to establish link on 2.5G-capable ports.
+On Wed, 27 May 2026 15:51:22 +0800 Zhao Dongdong wrote:
+> On Tue, 26 May 2026 16:27:36 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > On Tue, 26 May 2026 18:04:44 +0200 Alexander Lobakin wrote:  
+> > > From: Zhao Dongdong <winter91@foxmail.com>
+> > > Date: Tue, 26 May 2026 14:51:56 +0800
+> > >   
+>  [...]  
+> > > 
+> > > A "Cc: stable@vger.kernel.org" candidate?  
+> >
+> > Not really, the thinking is that if nla_nest_start() failed then the
+> > very next nla_put* will also fail (nla_nest_start() is a zero-length
+> > attr, any attr we put after must be >= in length).
+> >
+> > IOW the commit message is lying, there's no way for us to reach
+> > nla_nest_end(). We will jump to nla_nest_cancel() which handles
+> > nest=NULL just fine.
+> >
+> > Zhao Dongdong please confirm this and respin the patch without a Fixes 
+> > tag and with an updated commit message. I think we got such a patch
+> > in the past, so we should merge it to avoid confusing bots. 
+> > But please make it very clear that this code can't crash..
+> > -- 
+> > pw-bot: cr  
 > 
-> These modules do not properly advertise 2500Base-X capability
-> in their EEPROM and require forcing the correct SerDes mode.
-> 
-> Add sfp_quirk_2500basex for:
-> 
-> [...]
+> Thanks for your review.
+> I carefully reviewed the code. Your thinking should be right --I just happened to notice that most call sites of nla_nest_start() include a non-NULL check. Apologies for the noise.
 
-Here is the summary with links:
-  - [v2] net: sfp: add quirk for OEM 2.5G optical modules
-    https://git.kernel.org/netdev/net-next/c/5af067bf8a64
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I don't see a v2 so I'm just going to rewrite the commit msg myself and
+commit this.
 
