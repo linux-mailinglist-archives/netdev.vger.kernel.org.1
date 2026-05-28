@@ -1,237 +1,260 @@
-Return-Path: <netdev+bounces-292779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292780-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJnjCit8GGrbkQgAu9opvQ
-	(envelope-from <netdev+bounces-292779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:32:27 +0200
+	id AIx2ILl6GGrbkQgAu9opvQ
+	(envelope-from <netdev+bounces-292780-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:26:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8E35F5A84
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:32:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0BFB5F59C2
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2420D300B877
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:21:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36720302297F
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F0D3BE621;
-	Thu, 28 May 2026 17:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDDD3F9284;
+	Thu, 28 May 2026 17:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXW+SrUb";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ntaja/sN"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Mvg/QVln"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1392FB632
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 17:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85F03EFFC8;
+	Thu, 28 May 2026 17:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779988912; cv=none; b=UBriaJ41uvaerWgCsMsqbsgHQ8ja0ktRxY7hqgMtNHjnhjt0LLN2D6QrSjJEYpyKA8/tlCCRdwuqnukXL5fVxSMdJ3xVUJX21qONa4Aco0R+EuwwSkhVgd6QPDfPByPFs+gOMIzuUb86OyDAi+BylCzQoDHGWEl/LKjlmUce31E=
+	t=1779988940; cv=none; b=TlkZlpewet79BFugdxZGPnVbtKPfj4dHsE0MdLzhEwbyFy3l1HT8CbCwEC47u0mabE/rjhqQUOsizlfPQjzbhAz0OCgXlz2hTXVdLjIOrNF22giCHMrjT3hejUgC6jcBAoSP/GCr32GeX/pwVe9aLkoPwB65q+qf2V/3XtKm4ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779988912; c=relaxed/simple;
-	bh=ak+9VaQCwa+2eObY8aFqnl+wMj19EhLRsG/oy7TP2zo=;
-	h=From:To:Cc:Subject:Message-ID:In-Reply-To:References:MIME-Version:
-	 Content-Type:Date; b=R1NbFpAdPj53gZn1wHNi7B9ddtL7zQ7BEfXOVajXLYRmjE3H/4nsrnQCa18m8jqrMzmwcMUHKFzfcFtg9b3X76qxm350DOJ0FOYE5Og1d2M3GJjN48C/wjoECugINw6HiRLQL7QVDSPFbc3U4+BMHfxDq98t0ZUBcXUZyPzYSUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CXW+SrUb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ntaja/sN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779988910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0IAWVLrtIzQ5xVgTvqwLoqJOfqrR7MpH88SIQQGUoj4=;
-	b=CXW+SrUb3LmUCd1iWW0h/vdvrBy+3e6eTWCS/aC/6NdbskYJpyCsOyWerQfcU2c3r6q9yR
-	vXj8R7VU/NL5M2CQ1BBMRtNpvczI3BYPiizd8zL8MF5dNCM/kbjlbWPiT4VqfONZK6vv7F
-	IQn06j/Yh+aK1JsjkhyQe9Mu0+3FTNE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-l0rh1HDVM2avM2-39NnmrQ-1; Thu, 28 May 2026 13:21:49 -0400
-X-MC-Unique: l0rh1HDVM2avM2-39NnmrQ-1
-X-Mimecast-MFC-AGG-ID: l0rh1HDVM2avM2-39NnmrQ_1779988908
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-43d789cebcfso8711390f8f.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 10:21:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779988907; x=1780593707; darn=vger.kernel.org;
-        h=date:content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0IAWVLrtIzQ5xVgTvqwLoqJOfqrR7MpH88SIQQGUoj4=;
-        b=ntaja/sNUpYOAKtcwsxStszKpOc5F5I9/AUwPTztwzCRSf3Qo1IOjq0ISjX76EIplR
-         ALdaq375z6L9hB9M/LwKHfibWO+/dsbIqDGnR9+h/VcV9kLC3T4gSojMJ7cbdyWVqeFH
-         4xM2JQnWhPMY5uOqy2yapdvkK3qYccxHAX1ot2GlIXM6r/oiwZMHBWHU4ey98P7VWh3j
-         8XZ9xWGyCi/z3WxxFygn4OQHrxX5jDg+Jpf+pewqOqlAHO3Szu02NEjZk3jmp+sJ82WV
-         SwtpqZScPfQvu8VP1IL41LyCMISpFy5oARiYPt8REmYRLCQ82JmoFSCtbBHSQGRCl9E4
-         /T4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779988907; x=1780593707;
-        h=date:content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0IAWVLrtIzQ5xVgTvqwLoqJOfqrR7MpH88SIQQGUoj4=;
-        b=CpSGKMOv/P+KW+IF6vZNLYVTCuTtDoY3FVWrEAkA6ENsTKdMnADwNjy30MszrT0uSC
-         uC/tJvrKTE3Te6htDcl8iYpqB3Cb4ummUxmXgIx9WuqpiTith33gcr8HcPFxiJeyCvv1
-         1AkTc8xfIXjKm9jkL+YNx8G5+V+71XDJCC5NhrD+/fZzM3jRVdU6A17zIWVK9zKkz/m0
-         r+9NagsobYdJXGyYiUG1khEq0iHyjim4KskC/kf9v16kmLRl3IoHCjaJ9WcEgei/wSIN
-         Lo5JzGNEDMVwr4s1WxR2iviujWyx83tBkmyteGb9KjFhuMim+xLmpsJWBAzauiXfSnNV
-         4tEw==
-X-Forwarded-Encrypted: i=1; AFNElJ/XaDd3R+vlIsftlsBFbJiTyFRwO3KHeBSOtIx448UJ2zJg40yp9U3gWVMFAUAUkdnwTj4ioKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKLXTn1XgtR0c/5pvdVEQp8+cc/+Mw+BdeRbDtBDTfrByfJ6Jm
-	RDK6MQAqq+q4HgsnlS7K5HUfEzFUJvHaURV3Y/cDQuPeeGos/tFU1Jvr2TX4POCmi3PUx740EcV
-	au5BeMbcPIIsBPIFFIKd4u/OoNwQnHqixcqTU+sfsWMU16PknqhJl8CIIUw==
-X-Gm-Gg: Acq92OEH+l8Sc70dYtoNnW8SaZk2s8bE9VVXxTKA294oWAWVbsZ2qG9c8g0JZXLAAbd
-	vqv8g4bwF727h/RMW5KWgN72OY9U+soQa4EOYb00Er2ZJtJzj+qZmgx9icNz9eQUySHekY9Y+LI
-	CozlxcdLDXn+urrXpo0EWQIWFTPTCSfh8dEx5DzpQLzeg1p/VK+N/uAHV08lGUDBGQm2PEOHeon
-	+/6L+LpXYwmiiHwikosHAYAyx5CeAl5NPxdm8j6RKAJ4CQgJLIdnD3gck+MRLtz0u3hnyBK4cs6
-	UEV/mJX/7nVE6fZPoX2bzz/9yjQkF6yaQTvbu9NhZ4oJsfbBzQb7bujNU3IfTabrCaCg/+LzVoD
-	FR2TUYazgFhV+JprR1I1LjYoDOv6Be8TtUmJIBXvbJ7I=
-X-Received: by 2002:a05:600c:5359:b0:488:a502:8955 with SMTP id 5b1f17b1804b1-49094777acdmr30132295e9.4.1779988907533;
-        Thu, 28 May 2026 10:21:47 -0700 (PDT)
-X-Received: by 2002:a05:600c:5359:b0:488:a502:8955 with SMTP id 5b1f17b1804b1-49094777acdmr30131815e9.4.1779988907012;
-        Thu, 28 May 2026 10:21:47 -0700 (PDT)
-Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [2a10:fc81:a806:d6a9::1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45edb5b19aasm15998612f8f.25.2026.05.28.10.21.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 10:21:46 -0700 (PDT)
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Beniamino Galvani <bgalvani@redhat.com>
-Cc: =?UTF-8?B?w43DsWlnbw==?= Huguet <ihuguet@redhat.com>, Thorsten Leemhuis
- <regressions@leemhuis.info>, Fernando Fernandez Mancera <fmancera@suse.de>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Yumei Huang
- <yuhuang@redhat.com>, Ido Schimmel <idosch@idosch.org>, Justin Iurman
- <justin.iurman@gmail.com>, David Ahern <dsahern@kernel.org>, David Gibson
- <david@gibson.dropbear.id.au>, Linux kernel regressions list
- <regressions@lists.linux.dev>
-Subject: Re: Problem with IPv6 privacy addresses in 7.0
-Message-ID: <20260528192143.31c9e9ea@elisabeth>
-In-Reply-To: <ahhm1-XfnsWyIWDV@tp>
-References: <675083b4-e015-4ff3-836c-798e0a971194@suse.de>
-	<20260528073849.759da84a@elisabeth>
-	<baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
-	<20260528131250.1352ab48@elisabeth>
-	<b21c598b-879c-4f6a-9dc8-27e5c362803b@suse.de>
-	<bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info>
-	<20260528153202.14900687@elisabeth>
-	<CACT4ouf5ZqGgb=RO8_7NovLCvYKLKL4vD70dEe6xUODT1UEcSA@mail.gmail.com>
-	<20260528165320.15b90ded@elisabeth>
-	<CACT4oue2EMM9Kfsm9Jii2rG9ooi=D37PK=8886cpLuBkwhrOxw@mail.gmail.com>
-	<ahhm1-XfnsWyIWDV@tp>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.49; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1779988940; c=relaxed/simple;
+	bh=i1P5+Xznndi8odiiiRl63REcOgMYs/V8a2xT/cXVUtc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ed14aNNO21HMx++G9rHLVQGqMi9rxPcYTRIQ1xSjkYg/FYnSMY70n9LTVQvDptrtrlASzT2xxRA0ZEZwzUaPEqlI46V4Pp4s6s1ZqJ2oQ2NqJFDna50FqSqETpXZw/FY4nQMnZBgVGcYRC9WgCYrnytblvDdMYBvWuwsTnAL1L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Mvg/QVln; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=NYNUrl4i6PMnZ8nmqslcPbXTjjZX8ZFyFrdYrGsoxVo=; b=Mvg/QVlnTKhM/JFh0dhCXZmXpU
+	Jz2wWtEPpf0q+XSXPyMji+TqazubaU8G7PGPF+FXzTFvlye+lwwICZnMCfYLXYk9J6DzS8ksoehww
+	UEc27agF2BtGcvfAhm0PoGWTUl7ZMY3k1fyXA3qJi8HFq29mXZi16fIMXux8a59aTVw0IERttupvh
+	gC1A6YJxV2v90/P7ObeWXsBiK4dEoIfXwrWTjUSQnnMc7hh2CT2VX851nhr2PRMFpmxQNTnHm3msW
+	5HTNH3mpQ1T9RLYO2Q2QuQPTcEEBmO8NyDPxCAa9w2BtR8VbBWTeV/ScsjF/rbwZswGTiddDkDzKR
+	MrRp0Wyg==;
+Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=edge-cache-150.e-ind6.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wSeQu-00000004ZkM-2ZLr;
+	Thu, 28 May 2026 17:22:12 +0000
+Message-ID: <b02eedc77e180231f6e53eecc62c787e4f383761.camel@infradead.org>
+Subject: Re: [PATCH net-next v8 3/3] gve: implement PTP gettimex64
+From: David Woodhouse <dwmw2@infradead.org>
+To: Thomas Gleixner <tglx@kernel.org>, Harshitha Ramamurthy
+	 <hramamurthy@google.com>, netdev@vger.kernel.org
+Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com,  jstultz@google.com, sboyd@kernel.org,
+ willemb@google.com, nktgrg@google.com,  jfraker@google.com,
+ ziweixiao@google.com, maolson@google.com,  jordanrhee@google.com,
+ thostet@google.com, alok.a.tiwari@oracle.com,  pkaligineedi@google.com,
+ horms@kernel.org, jacob.e.keller@intel.com,  yyd@google.com,
+ jefrogers@google.com, linux-kernel@vger.kernel.org, Naman Gulati
+ <namangulati@google.com>
+Date: Thu, 28 May 2026 18:22:11 +0100
+In-Reply-To: <87mrxtwzz9.ffs@tglx>
+References: <20260514225842.110706-1-hramamurthy@google.com>
+	 <20260514225842.110706-4-hramamurthy@google.com> <87mrxtwzz9.ffs@tglx>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-H/JTx8OIE3J/RE1kVdNA"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 May 2026 19:21:45 +0200 (CEST)
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[redhat.com,leemhuis.info,suse.de,kernel.org,vger.kernel.org,idosch.org,gmail.com,gibson.dropbear.id.au,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-292779-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292780-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sbrivio@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FROM_HAS_DN(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,intel.com,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8D8E35F5A84
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:mid,infradead.org:dkim]
+X-Rspamd-Queue-Id: E0BFB5F59C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 28 May 2026 18:01:27 +0200
-Beniamino Galvani <bgalvani@redhat.com> wrote:
 
-> On Thu, May 28, 2026 at 05:24:28PM +0200, =C3=8D=C3=B1igo Huguet wrote:
-> > On Thu, May 28, 2026 at 4:53=E2=80=AFPM Stefano Brivio <sbrivio@redhat.=
-com> wrote: =20
-> > > I think what's considered UAPI in this case isn't so clear-cut. I gue=
-ss
-> > > it would have been pretty hard for anybody not familiar with
-> > > NetworkManager's codebase to imagine that an application would rely on
-> > > IPv6 addresses (and only IPv6) to be returned in the reverse order. =
-=20
-> >=20
-> > IMHO it's not because an application would rely on the order. It's
-> > because the order matters, as the first one is considered the primary.
+--=-H/JTx8OIE3J/RE1kVdNA
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yes, that's also the case, but:
-
-> > This is not NetworkManager specific. Or I am mistaken? I'm speaking by
-> > memory
-
-...from what I understood of the issue at hand there's a part that's
-specific to NetworkManager here, because NetworkManager replaces /
-deletes the Privacy Extensions addresses, instead of different
-addresses, because it relies on that specific (reversed) order.
-
-Anyway, yes, I see your point about UAPI now.
-
-> Yes, exactly. If you do:
+On Wed, 2026-05-20 at 23:08 +0200, Thomas Gleixner wrote:
 >=20
->  ip addr add dev X 3fff::1/64
->  ip addr dev dev X 3fff::2/64
+> But what's worse and escaped the AI scrutiny is:
 >=20
-> then the old kernel chooses the address that was added last as source
-> address for outgoing communications. With the new kernel it chooses
-> the address that was added first.
+> =C2=A0 Your attempt to convert these 'get_cycles()' time stamps after the
+> =C2=A0 fact and outside of the timekeeping core protection is fundamental=
+ly
+> =C2=A0 wrong.
 >=20
-> I think that any script or network management tool that cares about
-> the source address selection is impacted. Indeed, the commit had
-> effects on one of the selftests, which had to be modified to change
-> the order of iproute2 invocations.
-> =20
-> > > > If the fix must be in NetworkManager, we only need to parse them in
-> > > > non-reverse order like IPv4, I guess. =20
-> > >
-> > > But that would then require some form of detection, and, at least
-> > > according to Fernando, isn't the most robust option anyway, as ideally
-> > > NetworkManager shouldn't rely on the order at all. =20
-> >=20
-> > True =20
+> get_device_system_crosststamp() does
 >=20
-> Correct, if the new behavior is considered better, there should be a
-> way to detect which order must be used. Otherwise userspace tools
-> won't be able to maintain the same behavior with different kernels.
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 do {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0		seq =3D read_seqcount_begin(&tk_cor=
+e.seq);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 take_timestamps(...);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 convert_timestamps(...)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } while (read_seqcount_retry(&tk_core.seq,=
+ seq));
+>=20
+> which covers the whole sequence of taking the snapshots from the
+> hardware and the conversion.
+>=20
+> Your abuse of this is completely out of spec. Just because it did not
+> blow up in your face yet does not make it in any way correct. You do not
+> even get bonus points for creative abuse.
 
-My remark here is about whether NetworkManager needs to detect this at
-all. If it used timestamps to detect recent / older addresses, as
-Fernando mentioned, then you wouldn't need any detection at all, right?
-Or is there something else we're missing?
+I'm not sure I concur. As I understand it, the requirement is that the
+time stamp must be after the snapshot passed in to
+get_device_system_crosststamp() as its 'history_begin' argument.
 
-By the way, if really needed, one could detect that with the equivalent
-of:
+Not that the time stamp is literally within the do{} loop you mention.
 
-  ip a a ::2 dev lo && ip a a ::3 dev lo && [ $(ip -6 -j a | jq -rM '.[] .a=
-ddr_info[0].local') =3D ::3 ] && echo wrong || echo right
+That loop literally has:
 
-...depending on the application, that's not necessarily practical, but
-so far we have no evidence of any application needing to do that at all.
+		interval_start =3D tk->tkr_mono.cycle_last;
+		if (!timestamp_in_interval(interval_start, now, cycles)) {
+			...
+			do_interp =3D true;
 
---=20
-Stefano
+...which triggers the whole adjust_historical_crosststamp() thing
+further down, *none* of which would have any reason to exist if what
+you say above is true, surely?
 
+--=-H/JTx8OIE3J/RE1kVdNA
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUyODE3MjIx
+MVowLwYJKoZIhvcNAQkEMSIEIEbH2UJATvDeFuURFaf+HVrveLjxhb4XaHGlWQNwaEivMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAyNRfFvic4d6d
+TcSuhvmTvhlnir9MkixMGEoliblfDSRn38FBs6x3MPoRBnKPdYXTq1Wo9hbPqHoD8WwbB6a4kz1m
+chGIkVK9MQR0/5pl2Nk1bZjBp46VmQuoksjLENsOW1ONiN65xc6ruv4hSQiMXb+59+/pC7FDBSBL
+z6W+jtOPG8Xl4HTD5vTdoKCGmI8vR5fJRCX+Di1fzo7YkQW422cwYwn5tQm1NHb97+Re9kBvlfky
+LX1xaiH/WtDa7E6JNAEDv+ac5Db91pDplNU2iw80DdcDBJJBAJ9HjTakSQCp1hTIJ73mzJss6HIN
+KqMir4JvM6a6B+ylcha+GztMBQ2jovcxuFAo7VfPIwk2fhJKNJr3mmMWM8uI47XS5wZbmQdhnck8
+BcF/lmrd0Oi6lf27RSmngaZwnymMe7th5n6ogxKM79WUm7QXWSqo2RvV6RPtVHGMPS5q+z31LqFc
+N9HhMVsjc86SvJaoiExGav2yaMtXXi6OU2yyVV3DducJLsAkkkJzpSVbodti2maw3f9Yto839P3X
+IG5HPNbDbo2Wdsi49ncknZ7uElnZjGsHbL0/R07dIx5iv8YyRxD5eHbizu4svNVsCnWFvbRigJKf
+canx89GeneCtCBQrBvH0OYH+ycH+tfv4gVKEWLTm/O6P52Th8e6FNBvB0Dtt/wkAAAAAAAA=
+
+
+--=-H/JTx8OIE3J/RE1kVdNA--
 
