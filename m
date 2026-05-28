@@ -1,259 +1,205 @@
-Return-Path: <netdev+bounces-292694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGrAKT5FGGr5iAgAu9opvQ
-	(envelope-from <netdev+bounces-292694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:38:06 +0200
+	id MEajNuFFGGr5iAgAu9opvQ
+	(envelope-from <netdev+bounces-292695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:40:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ACD45F2D92
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:38:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2A95F2E18
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 15:40:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2256D307F51A
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:32:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6311F3017E8F
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C3A3E8688;
-	Thu, 28 May 2026 13:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9903F6C4A;
+	Thu, 28 May 2026 13:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ba37RqWL";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNndeiZQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lH4d2LxL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1832F3E5A18
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 13:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779975134; cv=none; b=h//cYBuSHN69349Rn7uM0/bo5N4KKbRLmoJzTPurzvG0g9ZlSb8U/aRQcYPysiJR3keuzKVM+YexoxRCflrDRwrNbycPSG7cWm/3lfBDRB/IbSdbhU7cr9hTAmW6drEgL8JoRq0jtZo9P6gaxK+1xiCRdFBwGrBQkltXLL2cg0Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779975134; c=relaxed/simple;
-	bh=vPU45GJtVWhMcvje9QDFhnwGgFdKM2fePKG3Kcsn2hU=;
-	h=From:To:Cc:Subject:Message-ID:In-Reply-To:References:MIME-Version:
-	 Content-Type:Date; b=V9Inx4t+TguOPTFB+IKrjutp8CRrHorXq6znfuoqJOHPkPyPhV0mm9wkccKtyzXvcSWL5fQmqgGbvLp469pE6dnm7EtIs1p3wlQqnym4BNIqNtFTgSCpQS45iZi0brTixVZOG2Co0tKefWv7BpizvhQ077W8lvmzZwjKthxpsc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ba37RqWL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PNndeiZQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779975132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vPU45GJtVWhMcvje9QDFhnwGgFdKM2fePKG3Kcsn2hU=;
-	b=ba37RqWLieoMxxR4ukeVtOHg1zbapMHLa++S9nXV1W5HlzBHRK3IaY3H9enCjzpoeTtWXd
-	KROvvvBjN0JZo712slI5sy+IjyhCwRq4yuvm1MWhQMK0M/rTGsDmUmJMi2Z9JFBvB05xFh
-	rZ3/drzr1CazkmcOJZ/wODMi9HErQj0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-136-_9GnWynYPDq7Ie1MiPYS2g-1; Thu, 28 May 2026 09:32:10 -0400
-X-MC-Unique: _9GnWynYPDq7Ie1MiPYS2g-1
-X-Mimecast-MFC-AGG-ID: _9GnWynYPDq7Ie1MiPYS2g_1779975129
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49051422d55so59360195e9.2
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 06:32:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623613F39CC
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 13:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779975585; cv=pass; b=PAqF5XcVj/PM92KLgMEj4stRS3pWw28rG2dY1fa2kvoWxzzcYKDZB/D34bOfGtOrC9ur6KL5QhTfMSIMiy1ZEKMzWhEplvlsKbmHTyFoqu4eyAUFPQmC1huPUVrC/vMFm3FBHSzUSrfgzpm0kVdeZuZo7cQXJHPNgsFr2mTvZ4k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779975585; c=relaxed/simple;
+	bh=yw019RHIYxycqtwq64UtUDUJDQ24/M2csMV8DlAPgw0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=XHkOIKY7wbzANOHxePxg/etbigvBHyz4zzpuXLUZQ8vbLrSQufSFF99IsoKEoga2F5NQoiVVGzqgfoDe7oRrz1x1iShSTbacpNYmVDk55ZNk9ml55cbNcdd8kWG8APCtewY2cA1kKuFteeH5SAOlk0BKfFx2kQxCjA503MziS88=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lH4d2LxL; arc=pass smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-43bf94534a1so1699550fac.2
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 06:39:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779975582; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Oi6rYQRxxdz3m+qSjEbPilXro2N1ywvOc5lMv1+gkv0JnYMkF6RCWLv9QxwVK2OVv9
+         6wZHYyQwzKq7yEs9AHOULb0p1wV2quMnvYTvh7cUHfywi7h1n2B3HqVAaA7lXXfvp65x
+         tkzepif1s+yz7smUpwSYz8ZbmU0zfvq87A2r4L12ka+kvyFzYhRorGjFZANcz3W3Y6kA
+         vdL4DkDQ9/a/cku5MfEl/ig8mhOu6QrxKfVimm3A+O0FXKlvx4MSomRlrAvJWTBV3XiI
+         iOwqK92pYlbQqgKeKhE+oLwGfGxU30cM92AXML8Az6/z5ExqMtmpuAWKFsqlOGzXQRF7
+         3b1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=OV5MWD99v5jJibwQ0F1rYFH202co2ScZtiupmESToJY=;
+        fh=0jRz+FMK7gBliPzdg9b0FmkgUKY71pCeOt8RD+1bJ/I=;
+        b=HP660mGk1wK2olMONWG05kL6sgJltkNyUZAVh5dBtNk6rN/LTd9L3l5BKpeHm6f4kM
+         ya7mLV/xa1VYOt0Ss/TEgQlPc33F0uiUJbZhEffPdcnhvSpSnf/T4x/mXCGuLfboXZ20
+         vIVcyDNopb+EEiZjtJ0Ou208Mve6bBCh3MZtk99q1TikiCcAKZ3Sg+BDyMMg3k+V6lfT
+         sc5EISIdY6/xogQrwcuW+bW2xyyAChaGPezT86bp7Fc2jsPdwAr9t2eAtQc8AieDerhp
+         a/RrKj6ZI1GN3XcURCWP6wM7gB6rUs8NR+Rgoi98Hx1znseMP6zR5NgA716lNjqSKH6o
+         /xRQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779975129; x=1780579929; darn=vger.kernel.org;
-        h=date:content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vPU45GJtVWhMcvje9QDFhnwGgFdKM2fePKG3Kcsn2hU=;
-        b=PNndeiZQjuonHalpdngY/MQzKjJ7RkE2MJ7xhOnFoH8ESZmarWehU/vfSfyoNOkxw/
-         L+FyznCWFaymIrg8Vsz1NtfiFbXud5vtnwaaht93nDrkuZwXwtAbfjoqyT80BHZLpyPN
-         TJ5wMte8G/uzs4MPr9xyokzoWpYVvukz0cCAlllWB3Ard459phJm1krBuJvQ/RQ/ThjC
-         WREwVInWcClB1VpRyHIaCEq1p37ChxDokZw+hIpJbP0ocAqPkqxsciKs3Vn27wcjYOhP
-         L0+RmyHvvm5wtchjRMYHUqPCC1pmVsrDPSUK+vmHemR6zXgWfiEsEVnWvXZyylaFSPCs
-         Q8NA==
+        d=gmail.com; s=20251104; t=1779975582; x=1780580382; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OV5MWD99v5jJibwQ0F1rYFH202co2ScZtiupmESToJY=;
+        b=lH4d2LxLZepwO3Kezjd4XHcM5OYtiIVmZzGzAYcJLS/mEngBValeUxxK3RV0AHkjCL
+         /K4I/+9N58xw966QiVMiztab/P6EdXYcdHlS7bgC9Q/XgPKEHbVzCCla6yPV0e6lr448
+         820x3Ndwhotnz7ooe/YsjqVy++2Sq6RQ9zPIfW90OcFT9MNgG42XJ6TOfkz3MhZYzzO6
+         H0dMV+wNrIiL4I2iLamLAJ7u46zWj/6BwqTyZUN8ZMayHEg0BBgXZIAGDVCoElj5A1EV
+         ah5596D6oLY370pX364y2rLNqNtQ//OIJlRER1ot9l0Is+5RlJiupjpCr+rRLdEXc4Un
+         cfyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779975129; x=1780579929;
-        h=date:content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:x-gm-gg
+        d=1e100.net; s=20251104; t=1779975582; x=1780580382;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPU45GJtVWhMcvje9QDFhnwGgFdKM2fePKG3Kcsn2hU=;
-        b=HLIBc/S6x/aL1296eAKMTKz+Ke3F9VQsudQ1ErPED4EMY8n5DGZbU/oOp/bOOfHaLC
-         Vp15QrvSc5sDRy1qwBtXtFjRao8PRpZtwNuPzprRRxoemXle9ruD5FeblbWWrihVDdMj
-         oIRDW3179f9gi503V6y6AqSTr2k8gOw0Eyclh3TwgTIf5r4KFxfex/n27CbccNqwTuHn
-         t8CiRaUBs9wrGXT9+8HTZbWaImqt0DE4LIki//MwZzcWRAZBVOzL/6PTAdRyvBWfUQxr
-         ei88nF+s99TWriQJPQ4mqV4GuCnwuHX/SK17sAA8mFilJS6ALsT3mTiSQxYgwAZQrMxu
-         NL6w==
-X-Forwarded-Encrypted: i=1; AFNElJ/A+rYEqVwIh0rfFKdOlKmZ5PbCLGSCHY+R7dSR3XTqQf3VNtQwY1oub9OS7i1evLj1pvMPUAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGr18b3NPtms3moLELef80F0OQLdOydpWzMmIaPow2WeO8M6rj
-	lh+n+gojJ1HcdpY12BkgDhAyejSQQbUvB8pCsEod4nqDezdsbJNSkDD0XqZ3u9KG+y0eU1nrvqg
-	nV5Z9brM5DjgWTB2gPftk/plarkgwPOMawev4TrSWP5bX9ftyNnN10zJikw==
-X-Gm-Gg: Acq92OGNbSLkwXytPpTj0FQPgxqLfZ0qPqDCbZd/E12148m0l12P8+mxIxJPZg+Vf+N
-	QLCGwgQyDDZWOLKs/RoPqISkpD1115f99KcoEiMSu9up5U9iJU5OprX2d/elRSFV37F64ZhWX10
-	oxVmtVExeGbswAvUqVoIHdmbUkvwhCKvO338tXBsBOQDdemQVnL0ewIFxA4WZt0lYBbGvnbEMQ6
-	m717PAh7rAMOOH1z8Ijaa8M8wzwx7dLcm/XXkVRcO804Kj2+JjK74P79iqj2O6tIaZldJUkum8q
-	1pNZz10eDSxQTHZSg+HZG+LePkEXc4NK1fLc6rNqCYNJo8hTaTz24pX+yrc+9GMd3AZoUW57VhG
-	mMG/FwfqD18f4peDJ0bTpCf/y92/EzHk7zdYPX7afeIhUNxGxyl6U4YVtccqB
-X-Received: by 2002:a05:600c:35cf:b0:48a:5c23:cab with SMTP id 5b1f17b1804b1-490426bc737mr501349855e9.19.1779975129020;
-        Thu, 28 May 2026 06:32:09 -0700 (PDT)
-X-Received: by 2002:a05:600c:35cf:b0:48a:5c23:cab with SMTP id 5b1f17b1804b1-490426bc737mr501349195e9.19.1779975128387;
-        Thu, 28 May 2026 06:32:08 -0700 (PDT)
-Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [176.103.220.4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4908f0980d7sm15200665e9.28.2026.05.28.06.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 06:32:07 -0700 (PDT)
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>, Jakub Kicinski
- <kuba@kernel.org>, netdev@vger.kernel.org, Yumei Huang
- <yuhuang@redhat.com>, Ido Schimmel <idosch@idosch.org>, Justin Iurman
- <justin.iurman@gmail.com>, David Ahern <dsahern@kernel.org>, David Gibson
- <david@gibson.dropbear.id.au>, ihuguet@redhat.com, Linux kernel regressions
- list <regressions@lists.linux.dev>
-Subject: Re: Problem with IPv6 privacy addresses in 7.0
-Message-ID: <20260528153202.14900687@elisabeth>
-In-Reply-To: <bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info>
-References: <20260521135310.GC977@cmadams.net>
-	<20260526175743.1f2c3761@kernel.org>
-	<20260527010641.GA21073@cmadams.net>
-	<20260526183122.348e44e7@kernel.org>
-	<20260527215135.GB16443@cmadams.net>
-	<675083b4-e015-4ff3-836c-798e0a971194@suse.de>
-	<20260528073849.759da84a@elisabeth>
-	<baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
-	<20260528131250.1352ab48@elisabeth>
-	<b21c598b-879c-4f6a-9dc8-27e5c362803b@suse.de>
-	<bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.49; x86_64-pc-linux-gnu)
+        bh=OV5MWD99v5jJibwQ0F1rYFH202co2ScZtiupmESToJY=;
+        b=e/FkAAGrNpCkb+/nyzSboKB3aNqT+BoHbGK5Rv3FTXNwfi2KpdQEY7Uo0qRICxZd7O
+         mTx3TN/tGMD2yiZgQn0lghoL2jEl1riNpO6eDovvPVQT4wTBhlSl2TQiyzTt0S32+e6c
+         GPYWWlT9Ybcn/e5GH3v3wB9ij8kXztfrRwFknX1R2fv63i6+R6XmEZ4H1GnVPymCnTpj
+         uOgCs2GpEL3dblVJBUoi/T8eLLKHMbxH1d1rA8Gzf0arYDjhdbYPf1XITmLFOTkS9qzp
+         skatHyAHJLWevYuQIA3nOYO0I32w8Sg7eGTojfm/dOPzSsKcjP35RYspJyB0xSEHLZ4E
+         6jFA==
+X-Forwarded-Encrypted: i=1; AFNElJ9hzRJ2v1Q9LSIrhoE0NIlB9AZABK/3K2Obbfho6rlsZuVMl/cThR96xQtdxtXNstv1w555Mq8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZhBzYKRRgqLteGnXNqTqfMgOeGFu3P1vnp5L8DNtdH22x5Cyg
+	3QEiSySd51AidAenbeoxHDN3o3MzZcD2lIsS7BAhRUs1XfWQKdOyY0KoGPoPLvey9aDglR7vQha
+	mQUr7RMj9m9H04p2HDVGnos57eyX2xVI=
+X-Gm-Gg: Acq92OEKKW4QBejWSAtdY/NZOYa90+NXoxrr7WjiyWHL69xi13QXSEjt7kQUTlCwvT2
+	TtOZFdRgVaKdAbnlXXPbn91+SLBN8OsFn6CoYDKHxZIHRugQtn9AU6WTTWPq2r7KesAj+U/xYbU
+	f3CAfXiFiYO8UXC9u3KhKye0xSqrNnD9G2Ogeid/rBH8T1YrIX9y6NE849O+CZHoX5Zi3CwOC09
+	SgXIDZlvD8EU1W3Lzxi6wjgpJE2g+A/KQaLVJ8uduZbWtNgLnBrQ+dDjQeCcv0YigArW2KKBJBY
+	W9uLamxBQpH4LzUv5Btyhk2Tqw==
+X-Received: by 2002:a05:6820:c203:b0:696:6585:a51 with SMTP id
+ 006d021491bc7-69d7eb66ac7mr12034312eaf.13.1779975582247; Thu, 28 May 2026
+ 06:39:42 -0700 (PDT)
+Received: from 469456477896 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 28 May 2026 08:39:41 -0500
+Received: from 469456477896 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 28 May 2026 08:39:41 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 May 2026 15:32:06 +0200 (CEST)
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+From: Siho Lee <25esihoya@gmail.com>
+Date: Thu, 28 May 2026 08:39:41 -0500
+X-Gm-Features: AVHnY4IjQLe8D3fhmXisoI-4JSwxgrf6oHHC3rTfzHf8ykBiOBRC4gfpxJ5yCMs
+Message-ID: <CAOYEF6nf5-B-P7DHf_cpLaqUSoZC2FJphBqE2s4zE8MygMCb_g@mail.gmail.com>
+Subject: [PATCH net] netfilter: nft_payload: move offset bounds check outside
+ csum condition
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292694-lists,netdev=lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[suse.de,kernel.org,vger.kernel.org,redhat.com,idosch.org,gmail.com,gibson.dropbear.id.au,lists.linux.dev];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292695-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sbrivio@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[25esihoya@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,leemhuis.info:email]
-X-Rspamd-Queue-Id: 0ACD45F2D92
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: EC2A95F2E18
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 28 May 2026 14:29:50 +0200
-Thorsten Leemhuis <regressions@leemhuis.info> wrote:
+From 574604a1b4a98ee130d7f727ad3c8a7df3f3b6f1 Mon Sep 17 00:00:00 2001
+From: Siho Lee <25esihoya@gmail.com>
+Date: Thu, 28 May 2026 22:39:03 +0900
+Subject: [PATCH v1] netfilter: nft_payload: move offset bounds check outside
+ csum condition
 
-> On 5/28/26 13:29, Fernando Fernandez Mancera wrote:
-> > On 5/28/26 1:12 PM, Stefano Brivio wrote: =20
-> >> On Thu, 28 May 2026 12:46:05 +0200
-> >> Fernando Fernandez Mancera <fmancera@suse.de> wrote: =20
-> >>> On 5/28/26 7:38 AM, Stefano Brivio wrote: =20
-> > =20
-> >> - regardless of this, would there be a way to make NetworkManager
-> >> =C2=A0=C2=A0 robust to the order?
-> >>
-> >> =C2=A0=C2=A0 I'm asking this because yes, strictly speaking, you might=
- say this
-> >> =C2=A0=C2=A0 change breaks userspace (NetworkManager), but at the same=
- time it
-> >> =C2=A0=C2=A0 fixes another part of it (pasta), and changing it back wo=
-uld break
-> >> =C2=A0=C2=A0 pasta again (in a way we can't really fix). =20
-> >
-> > Ugh, that is a mess. =20
->=20
-> Well, yes, but one that happens regularly. :-D
->=20
-> The problem here is that it was reported only some months after the
-> culprit landed, as fixing the regression through a revert or so could
-> now cause a bigger regression. Do we assume this to be the case here?
+The bounds check for offset + priv->len was placed inside the csum
+condition block. When csum_type is NFT_PAYLOAD_CSUM_NONE and
+csum_flags is 0, the entire block including the bounds check is
+skipped.
 
-Not a bigger regression, but a regression definitely, even just for 'ip
-address' or 'ip address showdump' which would now go back to display
-/ save addresses in the reversed order for IPv6 (only).
+For NFT_PAYLOAD_LL_HEADER, offset is computed as:
+    offset = skb_mac_header(skb) - skb->data - vlan_hlen
+which evaluates to -14 (or -18 with VLAN) after eth_type_trans()
+pulls the Ethernet header.
 
-> It
-> sounds like pasta would "only" be broken about as much as it was before
-> -- then a revert or something like that is the right solution to get
-> back to the status quo. Or does pasta already depend on the new behavior
-> somehow and would now break even more if we reverted the culprit?
+Without the bounds check, a negative offset reaches:
+    skb_ensure_writable(skb, max(offset + priv->len, 0))
+    skb_store_bits(skb, offset, src, priv->len)
 
-It doesn't specifically depend on it. There might be users depending on
-it because, if they choose to copy container addresses from the host,
-they will be reversed, and also picked by the kernel in the reversed
-order (if all other criteria based on scope and prefix length are the
-same).
+max(-14 + 4, 0) == 0 makes skb_ensure_writable a no-op, and
+skb_store_bits(skb, -14, ...) writes to skb headroom (OOB write).
 
-The likelihood of that breaking setups should be relatively small. It's
-just not zero so if we had another sane option to keep this "fixed" I
-would probably prefer that.
+The signed-unsigned comparison in the bounds check correctly catches
+negative offsets: (unsigned int)(-10) is a large positive value that
+exceeds any valid skb->len.
 
-> Then it's really a mess. :-/
+Move the bounds check outside the csum condition so it applies
+regardless of csum_type/csum_flags.
 
-I guess not so much, it shouldn't be a drama for pasta and containers.
+Fixes: d5953d680f7e ("netfilter: nft_payload: sanitize offset and
+length before calling skb_checksum()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Siho Lee <25esihoya@gmail.com>
+---
+ net/netfilter/nft_payload.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-But then again if we revert this, how do we fix the issue later,
-without resorting to any of the ugly things below?
+diff --git a/net/netfilter/nft_payload.c b/net/netfilter/nft_payload.c
+index 01e13e5255a9..62661e4eeb13 100644
+--- a/net/netfilter/nft_payload.c
++++ b/net/netfilter/nft_payload.c
+@@ -873,13 +873,13 @@ static void nft_payload_set_eval(const struct
+nft_expr *expr,
+ 	csum_offset = offset + priv->csum_offset;
+ 	offset += priv->offset;
 
-> But there are ways to fix even this, it's just that most of them are
-> ugly. Like adding some bit somewhere to /proc/ or so that a fixed
-> NetworkManager (if it's the only affected app) could flip by default to
-> change the things from the old behavior to the new one; and one pasta
-> could check that bit and warn. Config options are also an option, but
-> that's even uglier.
++	if (offset + priv->len > skb->len)
++		goto err;
++
+ 	if ((priv->csum_type == NFT_PAYLOAD_CSUM_INET || priv->csum_flags) &&
+ 	    ((priv->base != NFT_PAYLOAD_TRANSPORT_HEADER &&
+ 	      priv->base != NFT_PAYLOAD_INNER_HEADER) ||
+ 	     skb->ip_summed != CHECKSUM_PARTIAL)) {
+-		if (offset + priv->len > skb->len)
+-			goto err;
+-
+ 		fsum = skb_checksum(skb, offset, priv->len, 0);
+ 		tsum = csum_partial(src, priv->len, 0);
 
-Actually, an eventually fixed version of NetworkManager doesn't need to
-know the behaviour of the kernel: it can just order addresses by
-timestamps instead, as Fernando mentioned.
-
-And I'm not sure how relevant this is, but if we revert the fix,
-current combinations of NetworkManager / kernel versions would be
-anyway affected.
-
-So at this point the only robust / complete fix would be changing
-NetworkManager to sort addresses as needed. Are you suggesting that we
-should anyway try to minimise the temporal impact of this with a revert?
-
-> >> =C2=A0=C2=A0 Now, I suppose NetworkManager is much more universally us=
-ed and it's
-> >> =C2=A0=C2=A0 definitely a more mature project so it's a bigger userspa=
-ce breakage,
-> >> =C2=A0=C2=A0 but at the same time it's a ton of containers (Podman use=
-s pasta by
-> >> =C2=A0=C2=A0 default, Docker/moby optionally via rootlesskit) we might=
- introduce a
-> >> =C2=A0=C2=A0 regression for. =20
-> >=20
-> > I think the main argument here is: while we know it is affecting
-> > NetworkManager, we cannot know if it is breaking something else. The
-> > kernel rule is usually "do not break userspace" and this is likely
-> > considered a regression from my understanding. Cc'ing Thorsten as he is
-> > an expert on regressions. =20
->=20
-> From the mail at the top of the thread it definitely sounds like one.
-
---=20
-Stefano
-
+-- 
+2.43.0
 
