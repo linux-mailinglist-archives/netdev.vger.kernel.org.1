@@ -1,282 +1,252 @@
-Return-Path: <netdev+bounces-292653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOV8EjEeGGocdggAu9opvQ
-	(envelope-from <netdev+bounces-292653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:51:29 +0200
+	id WNWeHygdGGq+dQgAu9opvQ
+	(envelope-from <netdev+bounces-292654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:47:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 421045F0E72
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:51:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC1B5F0D8F
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 12:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 00DD73004CBA
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:45:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 96F293009579
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA263BCD3F;
-	Thu, 28 May 2026 10:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583113C4B73;
+	Thu, 28 May 2026 10:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UDa0q30J"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nPQvrFzu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oxbDanOX";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nPQvrFzu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oxbDanOX"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0053BE621;
-	Thu, 28 May 2026 10:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E5D3C4545
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 10:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779965112; cv=none; b=EIVlTAIqlUPynWC0HVVWMU/qkg6fboFe0+iF7Sfma0u7fdzaaMMSkYRJvN6+prIU8MQjI1dL36Bw5sZG0yewnD3M76ptHa19puSKPGxeTdDJEyThcYhHUmIOFdcgR4IDaJf9gU02iJucnLyZMlbNQ7vETcjGwiDyYamOX3IIxv8=
+	t=1779965183; cv=none; b=NEzjuiupTVa9NDYs/aG9YUc4sUFnmuZdekQCsoOVVbiEpequWeCHP8fji9H8XlM/IrrF0/95SXVM9y2gMe+ShUPGGQXiQ6JuCK43rIRjUCzK2+tb+522Kds8Jsjm3eEWDaF2dHRpgV0mMpx2tF/2lsVvql5iKUt8QglkCSbEeTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779965112; c=relaxed/simple;
-	bh=xCvcxBoi6sSQp5l96sULqTiUk6uS/yJkDVs5eSxOPjA=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HjIzFgKT5W8kS2kAvgGmadfV7+LtScXDh/kPRQTLzulo2Pni1RsBZAtE+SFV9JvADp7MQmcGLj9POhflDhxtSSq1Yu2E7AdO9kV3j90Zpz1bw8u19OI69KEGO/R9rTwX2lUpwZ/wkCDW4+8UankokPZW6DtlEAvxGCTulhAAfI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UDa0q30J; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1779965110; x=1811501110;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=xCvcxBoi6sSQp5l96sULqTiUk6uS/yJkDVs5eSxOPjA=;
-  b=UDa0q30JC21MX9eQGEsefiX3D85CII8XDTCW8I6qM7ALBM1ftZUAC+OG
-   yhO5tcpWAey2H/00IhGot3IJy9H28rsK7wTFF6/ome0TyYy4bvt+6A8aH
-   1U4h0LM+/SdaU0lgQ1q6IDKTEOCoT7EKUe5FJnNeV7quH1fkKpPmnM/gC
-   MyQVMZ43697NAPI23bSjn9iZRCcDcdcuDYl7AdNp83s0h0f+y31X6hzmm
-   TIzXBskS5y2pLl1UBhW/P452jU+pz3PgYsprnpYdnz/SMiw0rGLzuZC0u
-   4UfJfPdDQbdSZ7wrCD/ggdSHGv+t657ADZrMS5bLto7YsAQGTpzsx08X4
-   A==;
-X-CSE-ConnectionGUID: gNyFdhNbTf+LTQLa/3jT3g==
-X-CSE-MsgGUID: K/c9KGiKRO2P0+D5lkFyzQ==
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="289564143"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 03:45:06 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Thu, 28 May 2026 03:45:05 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 28 May 2026 03:45:02 -0700
-Message-ID: <58b1f1e49e97e8cba6611440419c3a9412991ced.camel@microchip.com>
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: add tag driver for LAN9645X
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>, <UNGLinuxDriver@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung Huh
-	<woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
- Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>
-Date: Thu, 28 May 2026 12:45:01 +0200
-In-Reply-To: <2bcddaf2-e3b4-4f72-ae2d-1ac22c2e7553@gmail.com>
-References: <20260527-dsa_lan9645x_switch_driver_base-v6-0-4d409ae64f3c@microchip.com>
-	 <20260527-dsa_lan9645x_switch_driver_base-v6-1-4d409ae64f3c@microchip.com>
-	 <2bcddaf2-e3b4-4f72-ae2d-1ac22c2e7553@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1779965183; c=relaxed/simple;
+	bh=2/JyH7hqgi0/W7n9Oee47eVVhPHxJ9SNl36JempN2a8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HDYakGZhZ1bHpOuFm/GWbkepmsiIRRA30FeXNmdzz6nLtX3OCnMqxJV1S1ztpIDdGtnxsIpa413cPJuzRhesG0dn6JN1Kzwf104phNkbE+/z4RhM3wY7iPLQWzNW4HxwiGDZfYjqwA1ya21NxJRQ2mChdUs8d0H/r5ruBnti4Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nPQvrFzu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oxbDanOX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nPQvrFzu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oxbDanOX; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B70E06A88A;
+	Thu, 28 May 2026 10:46:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779965179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
+	b=nPQvrFzucccJVQ5ck0qzJjt5+bMX6E2BkAgVlWIW9L9G6jmB7z52g1Cs+pdOGbrjnxnxkQ
+	Dw29x7CTaYAdkIUbfkwWeqdxNle2B6kUetADc7aZ8umq6+58/XszJ0y5lNTX+Klal0v+v6
+	eMoJC87aCNFb0W6Feg5og4tH0cWLoJk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779965179;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
+	b=oxbDanOXyaC+I+8zhuLwXuMALixv47D7v+LMSneRq3j7PfDXkRqMPJaOjJ4RBjro229Xhr
+	YYu/+mfIK+B+PbAQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779965179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
+	b=nPQvrFzucccJVQ5ck0qzJjt5+bMX6E2BkAgVlWIW9L9G6jmB7z52g1Cs+pdOGbrjnxnxkQ
+	Dw29x7CTaYAdkIUbfkwWeqdxNle2B6kUetADc7aZ8umq6+58/XszJ0y5lNTX+Klal0v+v6
+	eMoJC87aCNFb0W6Feg5og4tH0cWLoJk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779965179;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NVHtvN9YYBiVjpKwMQ762EafG5nAsVUAL+CmLmCIQmk=;
+	b=oxbDanOXyaC+I+8zhuLwXuMALixv47D7v+LMSneRq3j7PfDXkRqMPJaOjJ4RBjro229Xhr
+	YYu/+mfIK+B+PbAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3C6995AD45;
+	Thu, 28 May 2026 10:46:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 8FXVC/scGGrjFgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 28 May 2026 10:46:19 +0000
+Message-ID: <baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
+Date: Thu, 28 May 2026 12:46:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Problem with IPv6 privacy addresses in 7.0
+To: Stefano Brivio <sbrivio@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Yumei Huang <yuhuang@redhat.com>,
+ Ido Schimmel <idosch@idosch.org>, Justin Iurman <justin.iurman@gmail.com>,
+ David Ahern <dsahern@kernel.org>, David Gibson
+ <david@gibson.dropbear.id.au>, ihuguet@redhat.com
+References: <20260521135310.GC977@cmadams.net>
+ <20260526175743.1f2c3761@kernel.org> <20260527010641.GA21073@cmadams.net>
+ <20260526183122.348e44e7@kernel.org> <20260527215135.GB16443@cmadams.net>
+ <675083b4-e015-4ff3-836c-798e0a971194@suse.de>
+ <20260528073849.759da84a@elisabeth>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260528073849.759da84a@elisabeth>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292653-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,idosch.org,gmail.com,kernel.org,gibson.dropbear.id.au];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-292654-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:email,microchip.com:mid,microchip.com:dkim]
-X-Rspamd-Queue-Id: 421045F0E72
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,suse.de:email,suse.de:mid,suse.de:dkim]
+X-Rspamd-Queue-Id: EDC1B5F0D8F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 2026-05-27 at 17:39 +0200, Jonas Gorski wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> Hi,
->=20
-> On 27/05/2026 16:49, Jens Emil Schulz =C3=83stergaard wrote:
-> > Add tag driver for LAN9645x using a front port as CPU port. This mode
-> > is called an NPI port in the datasheet.
-> > Use long prefix on extraction (RX) and no prefix on injection (TX). A
-> > long prefix on extraction helps get through the conduit port on host
-> > side, since it will see a broadcast MAC.
-> >=20
-> > The LAN9645x chip is in the same design architecture family as ocelot
-> > and lan966x. The tagging protocol has the same structure as these chips=
-,
-> > but the particular fields are different or have different sizes.
-> > Therefore, this tag driver is similar to tag_ocelot.c, but the
-> > differences in fields makes it hard to reuse.
-> >=20
-> > LAN9645x supports 3 different tag formats for extraction/injection of
-> > frames from a CPU port: long prefix, short prefix and no prefix.
-> >=20
-> > The tag is prepended to the frame. The critical data for the chip is
-> > contained in an internal frame header (IFH) which is 28 bytes. The
-> > prefix formats look like this:
-> >=20
-> > Long prefix (16 bytes) + IFH:
-> > - DMAC    =3D 0xffffffffffff on extraction.
-> > - SMAC    =3D 0xfeffffffffff on extraction.
-> > - ETYPE   =3D 0x8880
-> > - payload =3D 0x0011
-> > - IFH
-> >=20
-> > Short prefix (4 bytes) + IFH:
-> > - 0x8880
-> > - 0x0011
-> > - IFH
-> >=20
-> > No prefix:
-> > - IFH
-> >=20
-> > The format can be configured asymmetrically on RX and TX.
-> >=20
-> > The IFH get/set functions are declared as inline. All the field
-> > constants are compile-time known, so when these calls are inlined
-> > efficient code is generated with branches pruned and loops unrolled.
-> > During testing it was observed that without explicit inlining GCC would
-> > have trouble inlining the functions, which hurt performance.
-> >=20
-> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > Signed-off-by: Jens Emil Schulz =C3=98stergaard <jensemil.schulzosterga=
-ard@microchip.com>
->=20
->=20
-> (snip)
->=20
-> > +static struct sk_buff *lan9645x_rcv(struct sk_buff *skb,
-> > +                                 struct net_device *ndev)
-> > +{
-> > +     u32 src_port, qos_class, vlan_tci, tag_type, popcnt, etype_ofs;
-> > +     struct dsa_port *dp;
-> > +     u32 ifh_gap_len =3D 0;
-> > +     u16 vlan_tpid;
-> > +     u8 *ifh;
-> > +
-> > +     /* DSA master already consumed DMAC,SMAC,ETYPE from long prefix. =
-Go back
-> > +      * to beginning of frame.
-> > +      */
-> > +     skb_push(skb, ETH_HLEN);
-> > +
-> > +     if (unlikely(!pskb_may_pull(skb, LAN9645X_TOTAL_TAG_LEN)))
-> > +             return NULL;
-> > +
-> > +     /* IFH starts after our long prefix */
-> > +     ifh =3D skb_pull(skb, LAN9645X_LONG_PREFIX_LEN);
-> > +
-> > +     popcnt =3D lan9645x_ifh_get(ifh, IFH_POP_CNT, IFH_POP_CNT_SZ);
-> > +     etype_ofs =3D lan9645x_ifh_get(ifh, IFH_ETYPE_OFS, IFH_ETYPE_OFS_=
-SZ);
-> > +     src_port =3D lan9645x_ifh_get(ifh, IFH_SRCPORT, IFH_SRCPORT_SZ);
-> > +     tag_type =3D lan9645x_ifh_get(ifh, IFH_TAG_TYPE, IFH_TAG_TYPE_SZ)=
-;
-> > +     vlan_tci =3D lan9645x_ifh_get(ifh, IFH_TCI, IFH_TCI_SZ);
-> > +     qos_class =3D lan9645x_ifh_get(ifh, IFH_QOS_CLASS, IFH_QOS_CLASS_=
-SZ);
-> > +
-> > +     /* Set skb->data at start of real header
-> > +      *
-> > +      * Since REW_PORT_NO_REWRITE=3D0 is required on the NPI port, we =
-need to
-> > +      * account for any tags popped by the hardware, as that will leav=
-e a gap
-> > +      * between the IFH and DMAC.
-> > +      */
-> > +     if (popcnt =3D=3D 0 && etype_ofs =3D=3D 0)
-> > +             ifh_gap_len =3D 2 * VLAN_HLEN;
-> > +     else if (popcnt =3D=3D 3)
-> > +             ifh_gap_len =3D VLAN_HLEN;
-> > +
-> > +     skb_pull(skb, LAN9645X_IFH_LEN);
-> > +
-> > +     if (unlikely(!pskb_may_pull(skb, ifh_gap_len + ETH_HLEN)))
-> > +             return NULL;
-> > +
-> > +     skb_pull(skb, ifh_gap_len);
-> > +     skb_reset_mac_header(skb);
-> > +     skb_set_network_header(skb, ETH_HLEN);
-> > +     skb_reset_mac_len(skb);
-> > +
-> > +     /* Reset skb->data past the actual ethernet header. */
-> > +     skb_pull(skb, ETH_HLEN);
-> > +
-> > +     /* We must deliver the skb so skb->csum only covers the data beyo=
-nd the
-> > +      * real ethernet header. The fake ethernet header in the prefix i=
-s
-> > +      * not part of skb->csum already. We must subtract what remains o=
-f the
-> > +      * prefix, the ifh and the gap.
-> > +      */
-> > +     skb_postpull_rcsum(skb,
-> > +                        skb->data - LAN9645X_TOTAL_TAG_LEN - ifh_gap_l=
-en,
-> > +                        LAN9645X_TOTAL_TAG_LEN + ifh_gap_len);
-> > +
-> > +     skb->dev =3D dsa_conduit_find_user(ndev, 0, src_port);
-> > +     if (WARN_ON_ONCE(!skb->dev)) {
-> > +             /* This should never happen since we have disabled reflec=
-tion
-> > +              * back to CPU_PORT.
-> > +              */
-> > +             return NULL;
-> > +     }
-> > +
-> > +     dsa_default_offload_fwd_mark(skb);
->=20
-> Does the switch (by default) also flood link local traffic (e.g. STP, LAC=
-P,
-> etc)? If not, you should not mark these as fwd offloaded so that the kern=
-el
-> knows that it needs to do that in software if requested.
->=20
-> Is there is a bit in the header that says whether a packet was flooded or
-> trapped to CPU that you can check?
->=20
-> Best regards,
-> Jonas
+On 5/28/26 7:38 AM, Stefano Brivio wrote:
+> Hi Fernando, Jakub,
+> 
+> On Wed, 27 May 2026 23:59:47 +0200
+> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
+> 
+>> On 5/27/26 11:51 PM, Chris Adams wrote:
+>>> Once upon a time, Jakub Kicinski <kuba@kernel.org> said:
+>>>> On Tue, 26 May 2026 20:06:41 -0500 Chris Adams wrote:
+>>>>>> Hi! Adding more people to CC. Do you know if you upgraded from 6.18
+>>>>>> or 6.19?
+>>>>>
+>>>>> It was 6.19 to 7.0.
+>>>>>   
+>>>>>> Would you be able to try testing with some commits reverted?
+>>>>>> On a quick look the candidates would be:
+>>>>>>
+>>>>>> cb3de96eea66 ("ipv6: preserve insertion order for same-scope addresses")
+>>>>>
+>>>>> It's this one.
+>>>>
+>>>> Phew, the second one was mine :)
+>>>>   
+>>>>> I figured out that it happens after stopping a VM (and I usually
+>>>>> start/stop a VM for a bit in the morning, which is why it happened more
+>>>>> than once).  So I set up a VM with a nested VM, running up-to-date
+>>>>> Fedora 44, and then was able to bisect pretty easily, and it landed on
+>>>>> this commit.
+>>>>>
+>>>>> Fedora is using NetworkManager, and IIRC NM does some part of privacy
+>>>>> address management (right?).  NM didn't change, so maybe this commit is
+>>>>> confusing something in NM?
+>>>>
+>>>> Sounds plausible, pretty sure we knew this commit was risky to begin
+>>>> with, but we had no direct proof that it'd break real life users.
+>>>>
+>>>> Revert is the right course of action here. Would you be willing/able
+>>>> to send the revert with your problem description and a Fixes tag
+>>>> pointing to the reverted commit?
+>>>
+>>> I did want to add a little more test note:
+>>>
+>>> It's definitely an interaction with NetworkManager.  If I stop NM and
+>>> run my VM start/stop test, nothing unexpected happens after.  If NM is
+>>> running and I do my VM test, when the next router advertisement is
+>>> received, NM replaces the privacy addresses.
+>>>    
+>>
+>> As someone that is experienced in NetworkManager, I can confirm it is
+>> related. NetworkManager is querying the IPv6 address and when the
+>> connection is configured with ipv6.ip6-privacy=2 (prefer-temp-addr),
+>> NetworkManager creates a route to make the system use the temporary
+>> address for outgoing connections by default.
+>>
+>> If the order is messed up, the address picked will likely be too. One
+>> could argue that this is partially fault of NetworkManager and that it
+>> should check the timestamps or preferred times rather than order.. but
+>> well, the rule is "do not break userspace".
+>>
+>> I hope this clarifies things.
+> 
+> Not entirely. I'm looking into this right now, but note that the purpose
+> of that commit is to *preserve* the order of addresses as they were
+> inserted, not to mess it up.
+> 
+> Before that, addresses were stored and returned via netlink *reversed*
+> compared to the insertion, which is rather surprising, also because
+> it's the opposite of what we do for IPv4 addresses, and caused issues
+> with pasta(1) as it copies addresses into containers in the same order
+> as reported via netlink.
+> 
 
-No the chip is configured to trap these frames, so I think you are right th=
-at
-at the moment we do not honor BR_NO_STP nor group_fwd_mask. I will fix this=
- in the
-next version. I plan to just use is_link_local_ether_addr.
+Right, to make it clear. I agree with you here. The current order is the 
+*right* or rather intuitive order.
 
-Thanks,
-Emil
+> Do you happen to know exactly in which way the order happens to be wrong
+> now?
+> 
 
+It is not wrong, but userspace applications were parsing addresses and 
+expecting them in the previous order whether it was correct or not. Now, 
+that parsing is broken because they are coming in an unexpected (maybe 
+more intuitive) order.
+
+FWIW; Iñigo Huguet (CC'ed) pointed out that this is breaking a 
+NetworkManager test and they were going to report it.
+
+> Also note that userspace was broken and fixed a couple of times:
+> 
+>    https://bugs.passt.top/show_bug.cgi?id=175#c10
+> 
+> so I would look into fixing that properly if doable. If it takes too
+> long and this is causing issues for a lot of people meanwhile of course
+> it might make sense to revert, but I'd give it a quick try at least.
+> 
+
+I think the solution shouldn't modify the order of the list by default. 
+Maybe we can introduce a flag for the dump operation?
 
