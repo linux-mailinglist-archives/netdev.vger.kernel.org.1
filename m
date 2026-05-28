@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-292885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJYWEdjNGGpjnggAu9opvQ
-	(envelope-from <netdev+bounces-292885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:20:56 +0200
+	id YPfJLkrOGGpjnggAu9opvQ
+	(envelope-from <netdev+bounces-292886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:22:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772505FB5CE
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:20:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 359025FB611
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 657AD3046F6D
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:17:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 30F143118EE4
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F008D36F911;
-	Thu, 28 May 2026 23:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF044370AE0;
+	Thu, 28 May 2026 23:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdXlMVnA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmNA9tET"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E387936F433
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D489D36F91D
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 23:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780010216; cv=none; b=usqS9W7IbqCIoDU57Kl/iil8tz13vTBsUM9aCHPIQTqT8o45X2QbBwJHkSjdQ2WE8y+FmY/3n5dqdQ/gYWbxkrjaVw/+EvrgG2fCm1k7jZZz37Ru0Rni0eAPqFZoD2btoI68pHnNF6NwD2XN7+Juj/bzPtTHcGsZC3LinJV/iXc=
+	t=1780010217; cv=none; b=MG4jBAhK7GWH1lMN94EvzrEh9lj05g23ox0ch2hCIACSnC0/6leGaZe3FqaceqwPwyFQLprdY5Br4+9lKr6P/N1+wuxesJQZrM/7Ms5/wv6dccNGM4uS2Yjy4WPbphBdgqPPtucd8vdP9pMI4aZMureXQtQYaFiwQzbD6+szvVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780010216; c=relaxed/simple;
-	bh=UtvTEVsfr9OkLZBLGFDXv2XojfMAMJ/vV5HoCkCfEHQ=;
+	s=arc-20240116; t=1780010217; c=relaxed/simple;
+	bh=0wid0A1WEddsxRmojrquvMvKMMDVKTOnKlJaFTHZbSU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X57nYbQbegFXFQb+dqiNVuH5b0HbCEqHwN5t61kX8cuTRf5vx/xQ/7PkJdxQsI+wLRkDqRlFnItJaFl8oZsw1C0hYmKCBZqMDplzIDiL1hfV7T4N6MqE5jZ1A9UEQcd5GQu9mkG1co/rDv/YrolrxYBEPM0phdWJ3Mjv6pgB1fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdXlMVnA; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05EA41F00A3D;
-	Thu, 28 May 2026 23:16:54 +0000 (UTC)
+	 MIME-Version; b=Y3cS3BXf6zXhSbvjmak3MHYcBpa3JQfWhwb2OvkkDhrKYQh/TSnIAYDRraxPShwiXibaePAgKy41AfwJ4ZaecLpWj/N+oF+jN3a1hheCaSyxsEJR7CM/NkkBNdxBpfpvkKazY9R7VGAX7FBT3cPwJ4i4fWdRhEg7IADCoSW5uF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmNA9tET; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D631F00A3A;
+	Thu, 28 May 2026 23:16:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780010215;
-	bh=H2bxx/LxHkk/q8DJa0K5dR90mP/E2WaPjjgFxfSCXuU=;
+	s=k20260515; t=1780010216;
+	bh=Am0LcCQo3hex/flMBZ8cx5LktRiogWaGlPeQ36V8VDU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MdXlMVnA0OYAC8ZSMZqW4yEq77GLD4+WQEMtK7Eqj/7yJXh0mLEvrkD+VTrgh/kqh
-	 T+XQtLi4QrbLFp6wMqWRI3oF6ZKUMUDPZ0ovsbJRblumw1PH1onEF8D0q4utbZEb57
-	 XNlElnVXG0Ij64SlSjAIuS77k5wrrIP8mpf+5klXbJYgEXk7DT+0Ni2fNGVdHjtHc/
-	 sD3H9BPEAaaiV3QVlSOsZsY3G2sec1tYRF/PkPKukfSb2vX3wNtitD12+10j+pabPD
-	 sZHersDJ0sQb3KK0DQcS+JZX/NIKKBfeNXdQ0l6pq3SoCKTEr9F+jHCP/h1n/PGtPc
-	 CxKR35Sm200Yw==
+	b=EmNA9tETRMYD576p1iSfQIxnY4QiPC7ajohB65tdwHp11DLVX6XhRAJGXDMSBdg4l
+	 16BB/99z11jT2Ik0S2Yh4cMMhshIkFMEXKZiUcOk9e/PgqdyCfRX7Yt7nDVsoFKUeJ
+	 ebZBZmLo9W15l8xmKl93sUkihP1UjZySnALBCfWV8ytqRghFMD4gvuK24L2tcjWdTy
+	 JPTfG/sUgzhHRZxC8epCgQqsIXY/7Mk3h1ut+zxmaen+CbPU/X7TEpavzJjNQSN8+b
+	 hdqXP0Fh8jtx8p9UgantStqqlDMJXfXu2eokWyUQs5bDe1l9c3VDzQX7sceVlATomo
+	 4MczrD/4j+z2g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	danieller@nvidia.com,
 	idosch@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 08/14] net: ethtool: optionally skip rtnl_lock in cable test handlers
-Date: Thu, 28 May 2026 16:16:31 -0700
-Message-ID: <20260528231637.251822-9-kuba@kernel.org>
+Subject: [PATCH net-next 09/14] net: ethtool: optionally skip rtnl_lock in ethnl_tsinfo_dumpit()
+Date: Thu, 28 May 2026 16:16:32 -0700
+Message-ID: <20260528231637.251822-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260528231637.251822-1-kuba@kernel.org>
 References: <20260528231637.251822-1-kuba@kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,bootlin.com,linux.microsoft.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-292885-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292886-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,64 +104,77 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 772505FB5CE
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 359025FB611
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Skip rtnl_lock in cable test handlers. This is really a noop since
-no ops locked device supports these.
+ethnl_tsinfo_dumpit() iterates netdevs and per-netdev PHY topology
+calling ops->get_ts_info(). Switch to the "ops compat locking"
+helpers which take either rtnl_lock or instance lock, depending
+on what the device needs.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ethtool/cabletest.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ net/ethtool/tsinfo.c | 32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/net/ethtool/cabletest.c b/net/ethtool/cabletest.c
-index 8d375dac2a40..9c22d4c767c6 100644
---- a/net/ethtool/cabletest.c
-+++ b/net/ethtool/cabletest.c
-@@ -73,8 +73,7 @@ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info)
+diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
+index 14bf01e3b55c..c9b680a9cc3f 100644
+--- a/net/ethtool/tsinfo.c
++++ b/net/ethtool/tsinfo.c
+@@ -6,6 +6,7 @@
+ #include <linux/ptp_clock_kernel.h>
+ #include <net/netdev_lock.h>
  
- 	dev = req_info.dev;
++#include "../core/dev.h"
+ #include "bitset.h"
+ #include "common.h"
+ #include "netlink.h"
+@@ -473,28 +474,25 @@ int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+ 	struct ethnl_tsinfo_dump_ctx *ctx = (void *)cb->ctx;
+ 	struct net *net = sock_net(skb->sk);
+-	struct net_device *dev;
+ 	int ret = 0;
  
 -	rtnl_lock();
--	netdev_lock_ops(dev);
-+	netdev_lock_ops_compat(dev);
- 	phydev = ethnl_req_get_phydev(&req_info, tb,
- 				      ETHTOOL_A_CABLE_TEST_HEADER,
- 				      info->extack);
-@@ -101,8 +100,7 @@ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info)
- 		ethnl_cable_test_started(phydev, ETHTOOL_MSG_CABLE_TEST_NTF);
- 
- out_unlock:
--	netdev_unlock_ops(dev);
+ 	if (ctx->req_info->base.dev) {
+-		dev = ctx->req_info->base.dev;
+-		netdev_lock_ops(dev);
++		struct net_device *dev = ctx->req_info->base.dev;
++
++		netdev_lock_ops_compat(dev);
+ 		ret = ethnl_tsinfo_dump_one_net_topo(skb, dev, cb);
+-		netdev_unlock_ops(dev);
+-	} else {
+-		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+-			netdev_lock_ops(dev);
+-			ret = ethnl_tsinfo_dump_one_net_topo(skb, dev, cb);
+-			netdev_unlock_ops(dev);
+-			if (ret < 0 && ret != -EOPNOTSUPP)
+-				break;
+-			ctx->pos_phyindex = 0;
+-			ctx->netdev_dump_done = false;
+-			ctx->pos_phcqualifier = HWTSTAMP_PROVIDER_QUALIFIER_PRECISE;
+-		}
++		netdev_unlock_ops_compat(dev);
++		return ret;
++	}
++
++	for_each_netdev_lock_ops_compat_scoped(net, dev, ctx->pos_ifindex) {
++		ret = ethnl_tsinfo_dump_one_net_topo(skb, dev, cb);
++		if (ret < 0 && ret != -EOPNOTSUPP)
++			break;
++		ctx->pos_phyindex = 0;
++		ctx->netdev_dump_done = false;
++		ctx->pos_phcqualifier = HWTSTAMP_PROVIDER_QUALIFIER_PRECISE;
+ 	}
 -	rtnl_unlock();
-+	netdev_unlock_ops_compat(dev);
- 	ethnl_parse_header_dev_put(&req_info);
+ 
  	return ret;
  }
-@@ -342,8 +340,7 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info)
- 	if (ret)
- 		goto out_dev_put;
- 
--	rtnl_lock();
--	netdev_lock_ops(dev);
-+	netdev_lock_ops_compat(dev);
- 	phydev = ethnl_req_get_phydev(&req_info, tb,
- 				      ETHTOOL_A_CABLE_TEST_TDR_HEADER,
- 				      info->extack);
-@@ -371,8 +368,7 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info)
- 					 ETHTOOL_MSG_CABLE_TEST_TDR_NTF);
- 
- out_unlock:
--	netdev_unlock_ops(dev);
--	rtnl_unlock();
-+	netdev_unlock_ops_compat(dev);
- out_dev_put:
- 	ethnl_parse_header_dev_put(&req_info);
- 	return ret;
 -- 
 2.54.0
 
