@@ -1,158 +1,157 @@
-Return-Path: <netdev+bounces-292571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +/fXMXvsF2p8VwgAu9opvQ
-	(envelope-from <netdev+bounces-292571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:19:23 +0200
+	id T89YGzDtF2rYVwgAu9opvQ
+	(envelope-from <netdev+bounces-292572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:22:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A8D25ED96C
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:19:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B6E5ED99D
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F04453010BE8
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:19:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A348A3035881
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305F23195E4;
-	Thu, 28 May 2026 07:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="MckCByxa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313B631F99A;
+	Thu, 28 May 2026 07:22:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068062F691F;
-	Thu, 28 May 2026 07:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A6E2F691F;
+	Thu, 28 May 2026 07:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779952759; cv=none; b=TrzfnG1Gl1xoNVzB62OiHti2MsYF+sF4AIfj7ps/xFbzkrKlpWgwloXmmqR/91r620eq5YGUh86nVhN+kwq63G1bDtlhRpEcXVy0jFgILjVNA5GcC3wciDVEVgei9XCwu6fptDwNKvXcLCGmwylfVD85EtaOBB7YJOyzpJSOmjA=
+	t=1779952939; cv=none; b=uRCqLakLuAMkW8XlpL31QI4nRGtmor3tacLjxCL7MVWqAIteiUKX/McnOtqE1wMxMmFEajL1gBlBV71lgtbbjoQn+aV7XAq6eD8V3SClBKOprj+h8KAqiDdVawnJnJN5UHing0xdYPJogDu7M2dcepRNkffLMCl9o8iUDsTEHlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779952759; c=relaxed/simple;
-	bh=boRg/gV4Z2pel+y5ceTw2ESCXgSC24QIp1dhRJ2mHd4=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=OEWgFr7Ib6SQXJCO0GQ3KBuYbTljaVyMBIhJWn3hnJR/2tKL8CiurFaxdpN/lxT6kOBQGp9MrSe4a5fjOvF0H58hWAIg5ab5DTE6KhnAzezyNTkZBEXBaE3BTO6kGTtQhGiPuIlQOkRz0O4QOhF/qUQhHOlscJlJc0/ry7iymyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=MckCByxa; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CB2F6A0968;
-	Thu, 28 May 2026 09:19:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779952746; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=AJ0jI1SKQMhpjLbBvZP5pomHZtdu2l1lzwGYvInLGx8=;
-	b=MckCByxaCvEsEKXISvbzIXos3ONaGKAGEhcNVaC5W5WM5XRucQZK6SlgMIsmanFUOntOcN
-	XI+64PiSv16MDK3jAdn4zjldEO9m2FnWQPEau1wj5JGopMTxZgkSF3VQXbnwz/KfDGvlhR
-	mudcXAaBpuRoKkUGvTp6fLV7EPjJdRhuTzdDbgWqIE2Eu8mTEyaa/5DH9n8euNCuCR/nPq
-	XaxjDlCRTP+0pIkgyXMrWczllYks+yhiwDInZQIkXnqNFT1oGpkyWKTJP64jk5lq2swEll
-	/ntE+bLRK0MZn+5zZ8sOHXVu5Q+wzEReRZnODjq4gPXX1ckjXECMuhB1S/6vKw==
+	s=arc-20240116; t=1779952939; c=relaxed/simple;
+	bh=HQccW3NY6NB8F97899rtJRwOSafIKecHykuhjXPa8is=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rlo479j2do0+8eIFBFMnRzxgSyLDCU3jkJwGVUpYmES+3whRur+HTJCZOX3B072bLvWKbzYMju/Q/qTInF1+Sp7akqMQ9BfBbOQBNk+X4M6Jd0N3gak62IRnSFkljPW8rhoQsGCnahMYrEviuuYX+BLNrrqwqXeHAStEMv1oHQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
+	by APP-03 (Coremail) with SMTP id rQCowAAX_OL+7BdqDZ6tEg--.412S2;
+	Thu, 28 May 2026 15:21:34 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Phil Sutter <phil@nwl.cc>,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] netfilter: ipvs: fix ct refcount leak when template is invalid
+Date: Thu, 28 May 2026 07:21:00 +0000
+Message-Id: <20260528072100.1163109-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 28 May 2026 09:19:00 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Fidelio Lawson <lawson.fidelio@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Marek Vasut
- <marex@denx.de>, Maxime Chevallier <maxime.chevallier@bootlin.com>, Simon
- Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
- King <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Fidelio Lawson
- <fidelio.lawson@exotec.com>
-Subject: Re: [PATCH net-next v7 1/3] net: dsa: microchip: implement KSZ87xx
- Module 3 low-loss cable errata
-In-Reply-To: <20260524-ksz87xx_errata_low_loss_connections-v7-1-1cd49cfa24f0@exotec.com>
-References: <20260524-ksz87xx_errata_low_loss_connections-v7-0-1cd49cfa24f0@exotec.com>
- <20260524-ksz87xx_errata_low_loss_connections-v7-1-1cd49cfa24f0@exotec.com>
-Message-ID: <77de607f2f8330ae6a593a4803887c8f@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAAX_OL+7BdqDZ6tEg--.412S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KryfKFyrZrWUGr43Gw4DArb_yoW8XFy7p3
+	42kry3XrWUGryDGr4kAFyxJryakr4xAF17ur90k3s3Xwn0qF4Uta1a9rya9F48Ar4Yg3y3
+	XF4Fq39xCF95CFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUqeHgUUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwkBA2oXz2JAoAABs9
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-292571-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk,vger.kernel.org,exotec.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-292572-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,microchip.com:url]
-X-Rspamd-Queue-Id: 5A8D25ED96C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A2B6E5ED99D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Fidelio
+ip_vs_sched_persist() calls ip_vs_ct_in_get() to look up an existing
+connection template, which returns ct with a reference held. If the
+template exists but fails the ip_vs_check_template() validation, the
+function can leak the reference in two ways:
 
-On 24.5.2026 12:44, Fidelio Lawson wrote:
-> Implement the "Module 3: Equalizer fix for short cables" erratum from
-> Microchip document DS80000687C for KSZ87xx switches.
+1. If no destination is found (scheduler returns NULL), the function
+   returns NULL at the !dest check without calling ip_vs_conn_put(ct).
 
-The commit message says this implements Module 3 from DS80000687C, but
-the errata's Work Around 1 writes 0x15 to indirect register 0x3C
-("PHY equalizer register"), and the patch never touches 0x3C. Could you
-please clarify which document the register addresses
-(KSZ87XX_REG_DSP_EQ = 0x08, KSZ87XX_REG_PHY_LPF = 0x4C) come from?
+2. If a destination is found and a new template is created via
+   ip_vs_conn_new(), the old ct pointer is overwritten without its
+   reference being released.
 
-I checked against the the following document:
-https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/Errata/KSZ87xx-Errata-DS80000687C.pdf
+Fix this by adding ip_vs_conn_put(ct) before the early return when no
+destination is found, and before overwriting ct with the new template.
 
-> [...]
-> 
-> +static int ksz87xx_apply_low_loss_preset(struct ksz_device *dev, bool 
-> enable)
-> +{
-> +	/* Apply the Microchip erratum short-cable preset (LPF 62 MHz, EQ 
-> init 0)
-> +	 * providing a conservative configuration for short or low-loss 
-> cables.
-> +	 */
-> +	u8 lpf_bw, eq_init;
-> +	int ret;
-> +
-> +	lpf_bw = KSZ87XX_PHY_LPF_62MHZ;
-> +	eq_init = KSZ87XX_DSP_EQ_INIT_LOW_LOSS;
-> +
-> +	if (!ksz_is_ksz87xx(dev))
-> +		return -EOPNOTSUPP;
-> +
-> +	if (!enable)
-> +		return 0;
+Cc: stable@vger.kernel.org
+Fixes: 5b57a98c1f0d ("IPVS: compact ip_vs_sched_persist()")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ net/netfilter/ipvs/ip_vs_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-This silently returns when enable = false and nothing is written to the 
-registers.
-Either I'm missing something or the short-cable preset cannot be cleared 
-through this tunable?
+diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
+index d40b404c1bf6..bdc3f296876a 100644
+--- a/net/netfilter/ipvs/ip_vs_core.c
++++ b/net/netfilter/ipvs/ip_vs_core.c
+@@ -536,6 +536,7 @@ ip_vs_sched_persist(struct ip_vs_service *svc,
+ 			IP_VS_DBG(1, "p-schedule: no dest found.\n");
+ 			kfree(param.pe_data);
+ 			*ignored = 0;
++			ip_vs_conn_put(ct);
+ 			return NULL;
+ 		}
+ 
+@@ -551,6 +552,7 @@ ip_vs_sched_persist(struct ip_vs_service *svc,
+ 		if (ct == NULL) {
+ 			kfree(param.pe_data);
+ 			*ignored = -1;
++			ip_vs_conn_put(ct);
+ 			return NULL;
+ 		}
+ 
+-- 
+2.34.1
 
-> [...]
-
-Thanks
-Nicolai
 
