@@ -1,157 +1,124 @@
-Return-Path: <netdev+bounces-292892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CK3QAUXPGGqunggAu9opvQ
-	(envelope-from <netdev+bounces-292892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:27:01 +0200
+	id 8OQ3IK/QGGqunggAu9opvQ
+	(envelope-from <netdev+bounces-292893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:33:03 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C75A25FB692
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:26:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0B75FB712
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A1E430D4A23
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:24:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2B683019BA6
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29FB336D9F1;
-	Thu, 28 May 2026 23:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A8A2D9797;
+	Thu, 28 May 2026 23:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="HMvn/BAD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dn7H1iMc"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8475736C0BD;
-	Thu, 28 May 2026 23:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6BF1DBB3A;
+	Thu, 28 May 2026 23:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780010652; cv=none; b=mxWGv9DEEQ07/vyurJaT2fhDxkZbpZ4Wp3onzWBBbQVWJRvp1U1kDXrSG30bGv7Pd8h+X1VlroKP7QgJyreXdr2SJa5PQ2LINIOFStGuArxYr2uOji2fFw0iHYjWBcEdLsuf4V+VSfj90cf1+kSYDkHPhDxyEFNMy3Tq1l9RCEg=
+	t=1780010943; cv=none; b=efqxnyaTYs4HlXaX1SikqmvlDKM3MtMFAjX3jaGcLoxbVktr+4S0LFs1gg/mcyiNet6Yonw7KfKRIfuhxU79pQWTauqCJu7CA7vgAEj5vOlm/J0KeZn3Auoo02IZO9nmY93ItVYF7s1D1tkenxksX6mPAuf3zIKm/HkYzh5Gk5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780010652; c=relaxed/simple;
-	bh=hXRI8pfr26o6q/3esmAA2MiquFHTg5G5hTsEehgBKrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kaaOYgAfYtqzKnaEcLAszE/Hl1C6vzbVWpMVw7EJpVOy2FuFIGgXOO1emAfY/Jc+9oebWjAtaFb+OMBOC/pzf30z5p+ry/DH5flg4LCWZ687QXL2LRJ/DddT++ArbtHPYLvf1QqbExcg+9KaNqFzWt6E0VUS+6RCRoVJRBh4L1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=HMvn/BAD; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=aD/+6gFCYQh5HNcAXs9wYEDF3vBE3AuA9RB/SyyLfAA=; 
-	b=HMvn/BADPsIDm9luuhFAVwZrm92JE01uHvyPY5ACtFqSGons4TDEckc19TkOKc6IYu4uol/MmrL
-	yzzvCYeg273B1VTorRlWV8JZf9xCb5M/iqskusC4Kg6lL7JnjKSnxnVwaySVGMsTys4KLKhJ/o+nw
-	vutgbd9IED0pCpXc5hLhsdCWfr9Ec2o7FpO/CPvL9N/P52QjadqpBZHBY1c3jWQ0UY8Tam+hPG5xC
-	MLSBAtU7ft4fpNtxmxYECeZdN12k4f8SsyocU+RT9zS8VPQRNSSotIgCKEWcsGUf629/IzsnXaSwY
-	iHTjIlnvCgoyN0wus8yQdlRo0wjCHzLgP7Cw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wSk4w-000Z2S-2v;
-	Fri, 29 May 2026 07:23:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2026 07:23:54 +0800
-Date: Fri, 29 May 2026 07:23:54 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Subject: Re: [PATCH net-next 0/6] Remove unused support for crypto tfm cloning
-Message-ID: <ahjOivAIjKclB783@gondor.apana.org.au>
-References: <20260522053028.91165-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1780010943; c=relaxed/simple;
+	bh=JiC2ZXR5o5RuRvWtBMIhBz8Bt7AysbRI+tZGiWA+qEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=liptk5FQWAQE+r5ZuzvYng2Ln/freH76SSyMbQilEwSNRTv10KSEqW2Lf5SB8O0DczN9Bvom+F0Ld8yDgT9eTBw0QDXZeb+rd4GYpVTIJ+DK36YGTGXo5TfPHD4wOGzbU31HtVUaiRtMRYTtSQAhZobdVhI4kQS94H4KbjhHzxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dn7H1iMc; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38C891F000E9;
+	Thu, 28 May 2026 23:29:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780010942;
+	bh=TSbbAi6AxwOZw7EN9L734+yNxSco5cVfngQEMKLubdc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Dn7H1iMcOsAK3rg/m1++i0NJ2OQbnjlXCfN0qBBgfFapxteFR/xKZYhbyme+bAsSp
+	 2AzFYYeEo4/nchah0qH3YzyY6sJkV6ok6XOzcqiuc1MCp+mp2begLQ+6H/FKX77Qlc
+	 C1CkZWI+D7jFWwjJQ+BwdAN4ie78346lNCjWsV//srxxyKhQV75dkDh0TCd8Lw9ATW
+	 zK1jKI5Lkbkn5rKtbhIVYMKnT5ISIvFkyfq+Vvyhm4IioNXINB5efpuNxXVqgGTLTO
+	 FTzuTNiRUlHpaGOXb+z7H+HvHV6OXSvbuLf80qMWsvV0Jg1MDA3i+6pE+eAICPiW2Z
+	 Mc+a2wP6zm1Pw==
+Date: Thu, 28 May 2026 16:29:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Steve Grubb <sgrubb@redhat.com>
+Cc: Ricardo Robaina <rrobaina@redhat.com>, audit@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com,
+ eparis@redhat.com, edumazet@google.com, pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH v2] netlink, audit: prevent false ENOBUFS on timeout
+ expiry
+Message-ID: <20260528162901.2d68e2e0@kernel.org>
+In-Reply-To: <2143396.Jadu78ljVU@x2>
+References: <20260513172443.1128496-1-rrobaina@redhat.com>
+	<CAABTaaC98dqM8U-7xkdW=b=50UKu0SQyBO629LDdphQ9DC=P=g@mail.gmail.com>
+	<20260527152936.001d5d28@kernel.org>
+	<2143396.Jadu78ljVU@x2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260522053028.91165-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-292892-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-292893-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,apana.org.au:url,apana.org.au:email]
-X-Rspamd-Queue-Id: C75A25FB692
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: EC0B75FB712
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 22, 2026 at 12:30:22AM -0500, Eric Biggers wrote:
-> This series is targeting net-next because it depends on
-> "net/tcp: Remove tcp_sigpool".  So far no commits in cryptodev conflict
-> with this, so I suggest that this be taken through net-next for 7.2.
+On Thu, 28 May 2026 18:40:44 -0400 Steve Grubb wrote:
+> > > (3) A new NETLINK_F_RECV_NO_ENOBUFS socket flag doesn't exist in stable
+> > > kernels where this bug is actively impacting users  
+> > 
+> > Which commit are you referring to? Isn't that flag itself ancient?  
 > 
-> This series removes support for transformation cloning from the crypto
-> API.  Now that the TCP-AO and TCP-MD5 code no longer uses it, it no
-> longer has a user.  And it's unlikely that a new one will appear, as the
-> library API solves the problem in a much simpler and more efficient way.
-> 
-> This feature also regressed performance for all crypto API users, since
-> it changed crypto transformation objects into reference-counted objects.
-> That added expensive atomic operations.  The refcount is reverted by
-> this series, thus fixing the performance regression.
-> 
-> A subset of this was previously sent in
-> https://lore.kernel.org/r/20260307224341.5644-1-ebiggers@kernel.org
-> Compared to that version, this version is a bit more comprehensive.
-> 
-> Eric Biggers (6):
->   crypto: hash - Remove support for cloning hash tfms
->   crypto: cipher - Remove crypto_clone_cipher()
->   crypto: api - Remove crypto_clone_tfm()
->   crypto: api - Remove per-tfm refcount
->   crypto: api - Fold __crypto_alloc_tfmgfp() into __crypto_alloc_tfm()
->   crypto: api - Fold crypto_alloc_tfmmem() into crypto_create_tfm_node()
-> 
->  crypto/ahash.c                   | 70 -----------------------------
->  crypto/api.c                     | 76 +++++---------------------------
->  crypto/cipher.c                  | 28 ------------
->  crypto/cmac.c                    | 16 -------
->  crypto/cryptd.c                  | 16 -------
->  crypto/hmac.c                    | 31 -------------
->  crypto/internal.h                | 10 -----
->  crypto/shash.c                   | 37 ----------------
->  include/crypto/hash.h            |  8 ----
->  include/crypto/internal/cipher.h |  2 -
->  include/linux/crypto.h           |  1 -
->  11 files changed, 10 insertions(+), 285 deletions(-)
-> 
-> 
-> base-commit: 1a1f055318d82e64485a6ff8420e5f70b4267998
-> -- 
-> 2.54.0
+> You're right, it is. I see how this flag would fix the pathological behavior 
+> that was reported. But as I have looked at this suggestion, there seems to be 
+> one wrinkle. User space should not need to know that the audit code in the 
+> kernel has this retry mechanism. 
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+It's not about the retry mechanism, at least in my mind - I read 
+your reply as "user space should not know that there was congestion".
+Why? It's not very useful, I get that, but user space can just clear
+the congestion signal and keep going.
+
+> It seems like the audit subsystem should set the flag on auditd's
+> socket at registration time in auditd_set(). The kernel is the right
+> place for this because it's the kernel that manages the retry/ hold
+> queues and sets the sk_sndtimeo that triggers the overrun path -
+> auditd has no knowledge of these internals.
+
+We have to carry this code somewhere, either in user space or in 
+the kernel. I'd prefer not to carry it in the kernel.
 
