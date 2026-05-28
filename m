@@ -1,352 +1,280 @@
-Return-Path: <netdev+bounces-292791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODdpMRWDGGp8kggAu9opvQ
-	(envelope-from <netdev+bounces-292791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:01:57 +0200
+	id AKp2NOmEGGq6kggAu9opvQ
+	(envelope-from <netdev+bounces-292793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:09:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464F85F6056
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:01:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 683215F61DB
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 20:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D04C4309DC86
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 17:59:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C70D33053FCA
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D2827E05F;
-	Thu, 28 May 2026 17:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF9C408007;
+	Thu, 28 May 2026 18:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iFeuO17M"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Ha0wD8K+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F432FF15B
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 17:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779991183; cv=fail; b=WuFaxqUrtqdwOj9ni+FLVo+OrXkguHRzZjLcbeOLD5r8+otg288Y4gAXE2j377SqLOsguLdES7jef6TZloaOeyIBYTPMw/kRXtqN3az4STRQpE/+cd1uRPM8SqQ0hVp5dRQGMKn+jQX1djjV43707W3Hjk1KNkRwsjF6FoE9ZI8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779991183; c=relaxed/simple;
-	bh=BZuvMp6Wq+b3yno7oUmyWTzs4a7jfGGQ1x8qf8wsxb4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Nm4WOx/aXVqoofuD/9kWAfySuFZJdaYvD8d7bnMDvl4rN5SsXJ4vBF29quiPgCUVgB2C31OSwyRjsyIgrahqdrn2stsqEOM15jt9MltihWvUqdkS1wESCXg04FiBIgGoIn9gjpWaWbWaqHARdJ++DcNTNW/eEIxQN8Y6PSclTVk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iFeuO17M; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779991182; x=1811527182;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BZuvMp6Wq+b3yno7oUmyWTzs4a7jfGGQ1x8qf8wsxb4=;
-  b=iFeuO17Ms9jwmRGrTP+Y0wvFmvdnkmwWsSXPM3m2bjVc4DiyTsbwbYTa
-   7LbApdCwyciw1v8h1+DOSxOn8egeT9QBdrP2gJYdw7251+DraCfmhkTNa
-   tAWgv+EGtneVU/Cn3r3yvXELrzrJQ0FcXhmzZjFvOSQnlNuQfLbSsa8tD
-   oWnENZiWjXSf66UoBhReqTvZPQf8l5X30oKQ2CaYDJ4t9VIN10pvu03Ju
-   gcRDVCZ2ReG73Fe6tmmGmd5nsrbCQsTls9hI8FgV12gluownXuSZ6UVmg
-   FLnpVopR/e+VhkeOmycH0ZXX2zUKn4hA7SBTsdCi5Wa04o7KM3ksp/TO+
-   A==;
-X-CSE-ConnectionGUID: yRDWMQMlT2+oBMDQYHc8FA==
-X-CSE-MsgGUID: ESkfsn60T7KBB6xf1WzG2g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11800"; a="80565450"
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="80565450"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 10:59:42 -0700
-X-CSE-ConnectionGUID: gGFCNTsgStGLhzx4Hu7r4A==
-X-CSE-MsgGUID: 7b9brPZBRZqUe59wKcG6uA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="244438180"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 10:59:41 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 28 May 2026 10:59:40 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 28 May 2026 10:59:40 -0700
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.10) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 28 May 2026 10:59:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JruxONSwEzEqpSAXe2h7JOLVrV8SQz4Ok/IFMbQRssFccxR2azK2ZCxIbv+6Q0NA9sVdqjH6KgiUB2ZuZEsVNIezntbKddgWJiX4BIywE+pAt8e4z1lQcVwU+zSNWO2uweVbt1LspIlv13UuOa3BtDrgzjOfCkzKolzJzTPmEoihxRdkFJpPFWDU2czXZzCHjjkCL8nft3v8kDBe5OS4CkZVpqPg2COCfuDqAsALLQ9nyszbbUWPovY226CjCE9iXhH5yoMD66fOC1kyRr1DoX7/09b7qHcrFsX/gsTYJ9j8vVsp8GVtk5s924TXFoIjtjUrua0rdh/rEw0BO9m8qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7qFmurf6xJGGGu7UxU6dwLbEAT8j+Ha3MQpUrSB96Vs=;
- b=fD0mZUdOAHqaZx3mYnc/z9Ob4WlQBo9IL5jv3qmV8PvGr/MIFMymJLrGmaSdFAq4b/DbyzqaXCqLoAucyVTjlt4Qpx85pEmtM/GPdSDkpGCKTn4R1EuxNaEJFde3HmC3icfWJoXH+CD5vGo81yKNNNWEWPGHWeoJF2UbtMk7KTzZV3ju/lnovmIlRCNDi3WgKAtXciSQZWebDWccgSr+ds9Wfw5bvLmsL50OBKE3sCH7dv3h8/6FWFuk1AO1c4KLjiJ4OEYhjWgHA+EtkkVMgm3oRQqsgJJGteAniaGkrWC04P1SwE06eyTfY058vq7NRwZRmtAAOB5keQR8gxb/7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8230.namprd11.prod.outlook.com (2603:10b6:8:158::21)
- by MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Thu, 28 May
- 2026 17:59:33 +0000
-Received: from DS0PR11MB8230.namprd11.prod.outlook.com
- ([fe80::2592:f5a9:a751:be40]) by DS0PR11MB8230.namprd11.prod.outlook.com
- ([fe80::2592:f5a9:a751:be40%3]) with mapi id 15.21.0048.019; Thu, 28 May 2026
- 17:59:33 +0000
-Message-ID: <1d9f1395-1a7f-4f6c-a7e4-309e7f5f834c@intel.com>
-Date: Thu, 28 May 2026 10:59:30 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [RESEND PATCH iwl-net v2 1/3] ice: Convert
- ctrl_pf pointer in struct ice_adapter to RCU
-To: Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>
-References: <20260525143100.2758251-1-sergey.temerkhanov@intel.com>
- <20260525143100.2758251-2-sergey.temerkhanov@intel.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20260525143100.2758251-2-sergey.temerkhanov@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0233.namprd03.prod.outlook.com
- (2603:10b6:303:b9::28) To DS0PR11MB8230.namprd11.prod.outlook.com
- (2603:10b6:8:158::21)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5E1403E8E;
+	Thu, 28 May 2026 18:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779991696; cv=none; b=K1LmYdOrQszGT9n6zbpvT+BaOfeBJO2Dg7EF3nlv5VFkt86snGzEmD6wk1gA/aX+E0TabsD3wR5Ihb0i2PMurmty7x9bryZwWr57C/lJio4cWGyy/q6FliebZ//eXlztm6aHVeDU0UsskXqPa4sIQgpj8qj3guVn0XoGOQedvas=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779991696; c=relaxed/simple;
+	bh=R0170DRurt5KznohmtGzjOoU03o4QnlFYT7pbNh0Mfc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=U3b3MfSesDmGOU8ydmDIu3e5LWpjlq9BndiMRn9uttdDavK5fpmBJ41WYz740fc0MP+qG3dDKwY3hZ38C9SLGNKrdr8FM+/AUDWheUBc2jFG2wPzTNTl5fgindSvnpHNr6wHqx73ZojEZbAfbSA4TwDXSps1P2KizbyPGJNoZOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Ha0wD8K+; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 4EFC620B7167; Thu, 28 May 2026 11:07:58 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4EFC620B7167
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1779991678;
+	bh=fmR34n8OOkEcXeaFsrYkS3bWekx70hrvA5+bSqAYTs4=;
+	h=From:To:Subject:Date:From;
+	b=Ha0wD8K+aRcYuKZoK5XXPNQbpCWAMoEP+bVpi8kt3UfiXApEI5reQFcZeg2Xw5WU3
+	 h7OlrgXF3F0/p1BNLPLyr7Q5w8IqqZAgEYSrhDM3p3rEJIUhUNKsmbaD5+7iGF5cZY
+	 BRJ7lhvs9UaRQp0sY76bhYL8aw4QkJA17O0qze98=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	kees@kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next] net: mana: Cache MANA_QUERY_LINK_CONFIG result to avoid repeated HWC queries
+Date: Thu, 28 May 2026 11:07:51 -0700
+Message-ID: <20260528180757.1536640-1-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8230:EE_|MW3PR11MB4539:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91bcf2f0-157e-4906-c2cd-08debce2df57
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|18002099003|22082099003|11063799006|4143699003|56012099006;
-X-Microsoft-Antispam-Message-Info: 2vfGNs/b+6+DnnZtU3HbvBLcf5pkL1FQ3G42gdEM/RuZVyffGB+htFKP1+HuhoWn36y3IHFG7eJ2Rj+iDn7VO1IBBu3eb02oKVnVRgCVdTiLm2mSEvcC/iIHNq/+GmjmYN16sSnMBEn742W0EhQMQs4FyrPT04jYLNv4rV5sWlEGE642hLHylkvcPUZNtNVNpTNt7HTVxj3QNV/mOdILrR7t+RDmRxTdg81tXyZ/+cvjEPOVbzSyfaBASpb+npDYb4KbK5cf1mPxJm1+gVqEHiJLZBAViMm11BgTfyJQb++whDSP0AfsvrQa4jDNohV1KlaOmPzvBiklJf7wzMDEjlk8LK5HI05olOEQi35RqhXKru2cfjJSGOsUIlClx+QkyPj7jgbWXxIOeYTGfdYTCyYM0ZQkVG3Rt2iqY698SKP+uMdtOXmkImOxVSxz4KwmdPu07yK5CYBLocSzNzo/o6Dm5SIS5ltxy6nvoMF4s7NUEZrNqAwDGxVr+f+u89Xp1CtzgrHQq47gNyjFF925pFCum2aZK+BEG+Z8J6t+XJMppTXVVgozHr1vpYiOoNejDNwfpcm9OkdLshRASFPA6TvPjDJSwEbFzO2IucAfSIFu75Gt2Fc5I5rTf3kUo9NsvFMLDRMUsXb7QQKZNyp6bYetyH2CVFn483nAAGbtt4rNwiF8mGG+VWAkOPWGQGAG9rd8LhultzGr288CmElVrw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8230.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(18002099003)(22082099003)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NTUxZGhEcG0rMU5ERExSRzQrb2Z5UVJLVHIxNTQ0RC9BMnFNZktmc2tuTjE0?=
- =?utf-8?B?QytHSEpJOTEvN2sxNU9oS0dQcFRsYjJyWDRmMHA5ZUdrL3pLNUZhYVBPY05C?=
- =?utf-8?B?OVAwV3MzajZ2NE5kbXVuWTVVbjZPd3dVUE9iS1llSUlObUpJQU1lZE5tdWdR?=
- =?utf-8?B?VGV0YTJOK1BmTXNmc29haHdmWXBKTno2aGI4dlV3T2svRGtiWTZ3QW9UREN2?=
- =?utf-8?B?TEtYNG9MQVRSbmhLS01lTEx6S2lLZDV0NzZCdk82QmJBZ3NKcU9MZHBQbm9U?=
- =?utf-8?B?TXdyWHpuZjR6dmVoVlpHV0ZqZFdkY1dRVldraEFPSWlReGlYRHZaZ1YvdzVq?=
- =?utf-8?B?bVE5UXBUdmpnZXNCdVB1d1RiVWh2TThMa2twcUphS1NFU01ERFR5QjA2NWRR?=
- =?utf-8?B?ZUZJd0Q4M0prcWVwNHJ0S05OVUQrNFhnWWJVT1gzQkVkb2hETmtYb2VhaWNo?=
- =?utf-8?B?dUNIZTBselk1QjR0VHNubGU2b2dvdmJqck5lYWhGQjhSbnFOaE1TTkFxZExX?=
- =?utf-8?B?VkJpVmhyOGZWK3VQUURzTEkvS2RSckFjcS9RZ0MvWXhGZUFmbzU5Z2xvMXFx?=
- =?utf-8?B?SmlUR214bUt5MDFZQnJ5M1RPQXFlMXBtWFhmbk15ZEhPaWVkRTNCZisvbG9p?=
- =?utf-8?B?cUp2MUxTZnhDdTVBeFBnNnlkTytaY2VQMm9hUHpiZ3dKditPZm1rQkJXdGZO?=
- =?utf-8?B?ZXlnek9ucDFNcEFNaENGV0FjWTVQVThDWWpuRGlYRXdVeWJrSnBreFQyVGtq?=
- =?utf-8?B?NXdXMk5NdnBOZnFtZytzVXBWdHNORXRBSFVpMVE2MGhTL2FESk9sNkI0OVZT?=
- =?utf-8?B?Zy9OK2dUWXJkbEJyckNJZkJWL3dZQUlvYTQ2SC9aT2tjZm90VnZVWVhVRGsv?=
- =?utf-8?B?S05LRUhqTU1KcTZ1ZmVMcG1iWndRRE42L1ZpajhoV3ZyMG9JeFRFMHFUUFBa?=
- =?utf-8?B?aVNURjhRa2ZIRDlNTWVwZWpHQ2Y0K0QvL2JnRkVjVm91UVNXRzArQUhiUWN3?=
- =?utf-8?B?eGphU2oybkxQbENOc1RrWkZMT1BtWC9wWFd0SmI2ZTVtazhYa2dQUWd0V2hZ?=
- =?utf-8?B?YS9tZCtRZ2xpdkdwcTUxQUZiaXR3NHZzdkZ5ZjFmSXhmMTF2a3FYYnE4QTdB?=
- =?utf-8?B?eWV6NWprVGNFeVQyZUtycUR5VEpBTXFxRWMvbEFUY0l1M3N6aUduUUxPeGV0?=
- =?utf-8?B?dW1ZNkptZzJqR2F0QzlGdkhlMzBPblVBUERGSlhHNDNISHhhUmNmd3NXU3pn?=
- =?utf-8?B?UFhxRlYvS0JaTUhuK3QwUVMycjdVU2FiZ2lXaHZ1NURnRERhVUpqdEFuVmFr?=
- =?utf-8?B?TE5zczQ1L0FRMG80T3h1RXpLVjM5eUpURjV0OGZ4dERTc1RkZ2t5NXBTZlMw?=
- =?utf-8?B?QUNHMzJObEQ1YXlteUU4TmVBc0JtbWlXTGJtbG5VaUVDWW1FU3lKYmw5elV0?=
- =?utf-8?B?bllubFFaN2dobXJuaDNnNWR6Q3R3OVhGcDBiRkZKQnhCWjB4MldvU01wSmM4?=
- =?utf-8?B?K0NSd3NTMkpKQm9ZYmp5RngxVEk4YjVQVjNtZTNoZ2RQUmxveGdpWnB3eWJs?=
- =?utf-8?B?dDBBeEF0VU5FMk1WUlI2Mml4MlhMSnNyVHZUd1FmeXdDQXNMUncwTTQ0OWlY?=
- =?utf-8?B?bTNGVTRQQTNMTzFRUkJsd1ljVEQ3U0xpaW1DR2RFWGRiNXZ5T0JlTmpxV0ls?=
- =?utf-8?B?NnRsL0VoNC8wdGZlSmhKdDhRNG4zaHdVV0lPdUlESFl6ZWpDSjFKN0NseUQv?=
- =?utf-8?B?Q0RHQ0NlcDd2ODltMmtYNms5SWdOaVhObGQ3V3RCLzdVK3JSdzVZN1B1YjJX?=
- =?utf-8?B?TXRmS2U0Zmp4SzBqZllaK000ZkszOTNpZzd5dmZFSVhxZHk5Z3JzOVRDMkJJ?=
- =?utf-8?B?Y0Z0ei82WU9naUsxaGdYNU0waFVRdytTbUEzc2VhYzE2ODRSNDhaMW10Tnhn?=
- =?utf-8?B?aUJZT1VGK3EvSHdMQm1iTEgvK3A0aVpqbjFKMEVtb3BDSUJxUi9NTzlFNjJW?=
- =?utf-8?B?MFNaakxFajNXbXlKYjVTa1BsYXFnT0pJYUJ4elVLYzdJdE4xTlZGREZ6dTVi?=
- =?utf-8?B?MGx2OUVGcmlRdFhmcEJnS1hpTXNYOTJTYjVRNk0wOHQ1SEJlTmFyeHBwOXBH?=
- =?utf-8?B?aGVNREovQkRWb09WMzBGTk50YTh5S0RzUzNKRWdNY2Z0R3RkdXk2UHg4ZWNO?=
- =?utf-8?B?QjZHTW5SOWtBeTFodlorZ2EwSFd3ei9ZZ2RhcThXT0JLUzJjSG0vblhlZ3gz?=
- =?utf-8?B?U0VTYUZUcGx5Y2Q3d1dGTGdYUXlxM0xZUjc1azFKejNuL0NuQklBOG12VEZO?=
- =?utf-8?B?Y0MzNmNtWnF3NVdFdUp2b1JBNFhiaHExeE5SMHlzNVY0SnBzVDQvckZUbS8x?=
- =?utf-8?Q?+i+LmOWN+tt3NOR8=3D?=
-X-Exchange-RoutingPolicyChecked: oUu/l5Eyi4nao7ypkrbjMcbaaQ2B1JRzR9zK1sm1KwJd+okc4eiCwIUaZii2mto6XS1XNNCwzO/BYC6RQ7qfGGfMVzO+2nUdqsGflTLgFqRbRHLbv/2/lKRypQprWv+sBkOMah+tZeQtVEzSs14pnvmykzYFR9hA1+KIHawXr1H9S3LqLYrTAyK740I0OF3Xi8PePBB9GEVH4O3qsgzxWdLh5n6JvAoQmLwM7NQl/CDrM6rm1Idt7z/l4SpaKPC8qgeTyMOKFNzyDx8uyZpuk7/SL65rINzGsFxBRjwSlAm2CAlg3775u48ECiyVKV6DYf5RoN+ronwW/fhgL78jNg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91bcf2f0-157e-4906-c2cd-08debce2df57
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8230.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2026 17:59:33.1099
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: egtwA44H87tOCWbh3aII2bm2Cb3fYcSyLxs7R+yWj7o+8H1v7Yd/VsiYcIKCaMRAznoIJJzSp7lsITxWOGc8FQ1hNiNNjzNCvrO1zboz9vA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4539
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_SEVEN(0.00)[10];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292791-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292793-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 464F85F6056
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 683215F61DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+mana_query_link_cfg() sends an HWC command to firmware on every call,
+but the link speed and QoS values it returns only change when the
+driver explicitly calls mana_set_bw_clamp(). This function is called
+not only by userspace via ethtool get_link_ksettings, but also
+periodically by hv_netvsc through netvsc_get_link_ksettings and by
+the sysfs speed_show attribute via dev_attr_show, resulting in
+unnecessary HWC traffic every few minutes.
 
+Add a link_cfg_error field to mana_port_context to cache the query
+result. The field uses three states: 1 (not yet queried, initial
+value set during mana_probe_port), 0 (success, speed/max_speed are
+valid), or a negative errno for permanent errors like -EOPNOTSUPP
+when the hardware does not support the command. Transient errors and
+qos_unconfigured responses are not cached so that subsequent calls
+will retry.
 
-On 5/25/2026 7:30 AM, Sergey Temerkhanov wrote:
-> Use RCU to ensure the consistent state of the control PF global
-> pointer contained in struct ice_adapter. Enforce RCU usage on
-> the callers.
-> 
-> Fix a potential invalid pointer return due a TOCTOU issue
-> 
-> Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 devices")
-> 
+To prevent a concurrent mana_set_bw_clamp() from racing with an
+in-flight query and publishing stale pre-clamp speed/max_speed,
+serialize the firmware transaction and the cache update under a new
+per-port mutex (link_cfg_mutex). The mutex covers both the HWC
+request and the subsequent stores in mana_query_link_cfg(), and the
+HWC request and invalidation in mana_set_bw_clamp(). With this lock
+held, two queries can no longer interleave their speed/max_speed
+stores, and an invalidation can no longer slip in between a query's
+response and its publish.
 
-No newline here; please keep all the tags together.
+Invalidate the cache inside mana_set_bw_clamp() on success, so all
+current and future callers that change the link configuration
+automatically trigger a fresh query on the next mana_query_link_cfg()
+call. Also reset link_cfg_error during resume in mana_probe() under
+link_cfg_mutex, so that any slow-path query already in flight cannot
+later store 0 and silently overwrite the post-resume invalidation.
 
-> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Tested-by: Frederick Lawler <fred@cloudflare.com>
-> ---
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 41 +++++++++++++++----
+ include/net/mana/mana.h                       |  4 ++
+ 2 files changed, 36 insertions(+), 9 deletions(-)
 
-...
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 82f1461a48e9..43018bc13dc1 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1456,6 +1456,12 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+ 	struct mana_query_link_config_req req = {};
+ 	int err;
+ 
++	mutex_lock(&apc->link_cfg_mutex);
++
++	err = apc->link_cfg_error;
++	if (err <= 0)
++		goto out;
++
+ 	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_LINK_CONFIG,
+ 			     sizeof(req), sizeof(resp));
+ 
+@@ -1468,10 +1474,11 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+ 	if (err) {
+ 		if (err == -EOPNOTSUPP) {
+ 			netdev_info_once(ndev, "MANA_QUERY_LINK_CONFIG not supported\n");
+-			return err;
++			apc->link_cfg_error = err;
++			goto out;
+ 		}
+ 		netdev_err(ndev, "Failed to query link config: %d\n", err);
+-		return err;
++		goto out;
+ 	}
+ 
+ 	err = mana_verify_resp_hdr(&resp.hdr, MANA_QUERY_LINK_CONFIG,
+@@ -1482,16 +1489,20 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+ 			   resp.hdr.status);
+ 		if (!err)
+ 			err = -EOPNOTSUPP;
+-		return err;
++		goto out;
+ 	}
+ 
+ 	if (resp.qos_unconfigured) {
+ 		err = -EINVAL;
+-		return err;
++		goto out;
+ 	}
+ 	apc->speed = resp.link_speed_mbps;
+ 	apc->max_speed = resp.qos_speed_mbps;
+-	return 0;
++	apc->link_cfg_error = 0;
++	err = 0;
++out:
++	mutex_unlock(&apc->link_cfg_mutex);
++	return err;
+ }
+ 
+ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+@@ -1508,17 +1519,19 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+ 	req.link_speed_mbps = speed;
+ 	req.enable_clamping = enable_clamping;
+ 
++	mutex_lock(&apc->link_cfg_mutex);
++
+ 	err = mana_send_request(apc->ac, &req, sizeof(req), &resp,
+ 				sizeof(resp));
+ 
+ 	if (err) {
+ 		if (err == -EOPNOTSUPP) {
+ 			netdev_info_once(ndev, "MANA_SET_BW_CLAMP not supported\n");
+-			return err;
++			goto out;
+ 		}
+ 		netdev_err(ndev, "Failed to set bandwidth clamp for speed %u, err = %d",
+ 			   speed, err);
+-		return err;
++		goto out;
+ 	}
+ 
+ 	err = mana_verify_resp_hdr(&resp.hdr, MANA_SET_BW_CLAMP,
+@@ -1529,13 +1542,18 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+ 			   resp.hdr.status);
+ 		if (!err)
+ 			err = -EOPNOTSUPP;
+-		return err;
++		goto out;
+ 	}
+ 
+ 	if (resp.qos_unconfigured)
+ 		netdev_info(ndev, "QoS is unconfigured\n");
+ 
+-	return 0;
++	/* Invalidate the cache; next query will re-fetch from firmware. */
++	apc->link_cfg_error = 1;
++	err = 0;
++out:
++	mutex_unlock(&apc->link_cfg_mutex);
++	return err;
+ }
+ 
+ int mana_create_wq_obj(struct mana_port_context *apc,
+@@ -3430,6 +3448,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	apc->port_handle = INVALID_MANA_HANDLE;
+ 	apc->pf_filter_handle = INVALID_MANA_HANDLE;
+ 	apc->port_idx = port_idx;
++	apc->link_cfg_error = 1;
++	mutex_init(&apc->link_cfg_mutex);
+ 	apc->cqe_coalescing_enable = 0;
+ 
+ 	mutex_init(&apc->vport_mutex);
+@@ -3750,6 +3770,9 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 			rtnl_lock();
+ 			apc = netdev_priv(ac->ports[i]);
+ 			enable_work(&apc->queue_reset_work);
++			mutex_lock(&apc->link_cfg_mutex);
++			apc->link_cfg_error = 1;
++			mutex_unlock(&apc->link_cfg_mutex);
+ 			err = mana_attach(ac->ports[i]);
+ 			rtnl_unlock();
+ 			/* Log the port for which the attach failed, stop
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index d9c27310fd04..af772b7297ec 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -555,6 +555,10 @@ struct mana_port_context {
+ 	u32 speed;
+ 	/* Maximum speed supported by the SKU (mbps) */
+ 	u32 max_speed;
++	/* 1 = not queried, 0 = cached success, negative = permanent error */
++	int link_cfg_error;
++	/* Serializes mana_query_link_cfg() and mana_set_bw_clamp(). */
++	struct mutex link_cfg_mutex;
+ 
+ 	bool port_is_up;
+ 	bool port_st_save; /* Saved port state */
+-- 
+2.34.1
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index 07e621813ff5..732964fd7c78 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -4,6 +4,7 @@
->   #include "ice.h"
->   #include "ice_lib.h"
->   #include "ice_trace.h"
-> +#include <linux/rcupdate.h>
-
-I believe preference is to have kernel headers before the local ones.
-
->   
->   static const char ice_pin_names[][64] = {
->   	"SDP0",
-> @@ -54,11 +55,35 @@ static const struct ice_ptp_pin_desc ice_pin_desc_dpll[] = {
->   	{  SDP3, {  3, -1 }, { 0, 0 }},
->   };
->   
-> +/**
-> + * ice_get_ctrl_pf - Get the control PF for a given PF
-> + * @pf: The PF pointer to look up at
-> + *
-> + * The control PF is the PF which owns the PTP clock for the adapter.
-> + * Only the control PF is allowed to perform certain operations on the
-> + * PTP clock such as adjusting the time or configuring the pins.
-> + *
-> + * This function must be called from an RCU read-side critical section.
-> + *
-> + * Return: Pointer to the control PF, or NULL if not found
-> + */
->   static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
->   {
-> -	return !pf->adapter ? NULL : pf->adapter->ctrl_pf;
-> +	return !pf->adapter ? NULL : rcu_dereference(pf->adapter->ctrl_pf);
->   }
->   
-> +/**
-> + * ice_get_ctrl_ptp - Get the PTP structure for the control PF
-> + * @pf: The PF pointer to look up at
-> + *
-> + * The control PF is the PF which owns the PTP clock for the adapter.
-> + * Only the control PF is allowed to perform certain operations on the
-> + * PTP clock such as adjusting the time or configuring the pins.
-> + *
-> + * This function must be called from an RCU read-side critical section.
-> + *
-> + * Return: Pointer to the PTP structure of the control PF, or NULL if not found
-> + */
->   static struct ice_ptp *ice_get_ctrl_ptp(struct ice_pf *pf)
->   {
->   	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
-> @@ -207,6 +232,8 @@ u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
->   	u32 hi, lo, lo2;
->   	u8 tmr_idx;
->   
-> +	guard(rcu)();
-
-This function is a bit big for guard()
-
-"
-Use of guard() is discouraged within any function longer than 20 lines, 
-scoped_guard() is considered more readable. Using normal lock/unlock is 
-still (weakly) preferred.
-"
-
-https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
-
->   	if (!ice_is_primary(hw))
->   		hw = ice_get_primary_hw(pf);
->   
-> @@ -3076,18 +3103,19 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
->   
->   static void ice_ptp_setup_adapter(struct ice_pf *pf)
->   {
-> -	pf->adapter->ctrl_pf = pf;
-> +	rcu_assign_pointer(pf->adapter->ctrl_pf, pf);
->   }
->   
->   static int ice_ptp_setup_pf(struct ice_pf *pf)
->   {
-> -	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
->   	struct ice_ptp *ptp = &pf->ptp;
->   
-> -	if (!ctrl_ptp) {
-> -		dev_info(ice_pf_to_dev(pf),
-> -			 "PTP unavailable: no controlling PF\n");
-> -		return -EOPNOTSUPP;
-> +	scoped_guard(rcu) {
-> +		if (!ice_get_ctrl_ptp(pf)) {
-> +			dev_info(ice_pf_to_dev(pf),
-> +				 "PTP unavailable: no controlling PF\n");
-> +			return -EOPNOTSUPP;
-> +		}
->   	}
->   
->   	if (pf->hw.mac_type == ICE_MAC_UNKNOWN)
-> @@ -3123,11 +3151,16 @@ static void ice_ptp_cleanup_pf(struct ice_pf *pf)
->    */
->   int ice_ptp_clock_index(struct ice_pf *pf)
->   {
-> -	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
-> +	struct ice_ptp *ctrl_ptp;
->   	struct ptp_clock *clock;
->   
-> +	guard(rcu)();
-> +
-> +	ctrl_ptp = ice_get_ctrl_ptp(pf);
-> +
-
-No newline between the call and error check please.
-
-Thanks,
-Tony
-
->   	if (!ctrl_ptp)
->   		return -1;
-> +
->   	clock = ctrl_ptp->clock;
->   
->   	return clock ? ptp_clock_index(clock) : -1;
 
