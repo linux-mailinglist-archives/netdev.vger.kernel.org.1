@@ -1,142 +1,194 @@
-Return-Path: <netdev+bounces-292586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292587-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNflBQ74F2oWXwgAu9opvQ
-	(envelope-from <netdev+bounces-292586-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:08:46 +0200
+	id sLgeKLv4F2oWXwgAu9opvQ
+	(envelope-from <netdev+bounces-292587-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:11:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BCF55EE460
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:08:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA0035EE52E
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 10:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D8CB3115828
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:01:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B0EB93007885
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 08:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B94736B048;
-	Thu, 28 May 2026 08:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39C83655C3;
+	Thu, 28 May 2026 08:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="VWNmy/8p"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92046369D57;
-	Thu, 28 May 2026 08:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C53277C9E;
+	Thu, 28 May 2026 08:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779955242; cv=none; b=NvisZ9anoaejiftI3AKGxbHIBt5wbjXBDehSCAOCm05AVqCzoHuSc9aYixphUwj4yo0eES1Ko/IshDdeabA0Hy2eGZHXFg7xWeiY2EmgeAtCV08duthMxiCqDtXOKZRqkYY6zhLdneumY6OY14k6+SW+w1UhUndhVgBnj6lUJko=
+	t=1779955472; cv=none; b=EXNoiDnCe4loUImdIgiegBLfIt2mnp/rLq7r4uGlacAIXnohqKKujOS0TCWm2JsWOe4nIfam3mzF0d29N+vM7EAOIOtjmbJe6s6W23r7VSrtf3iY+a04ZeaxakcN4Nhl5XbZZ84f0rqyfDDS57KwiYoBmeWulWkqo8CLFkrp2Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779955242; c=relaxed/simple;
-	bh=b3TxRnflY+TEOwZBljptB7XR4EF21EBV/u1kbpxKRt0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q1zayCgOL5JSWv2QtURJNYbcL5WNVHc8upPX7MJ7ON+MyImYzPaltSBHiCL6wTNOR2OgOm8cEuWlOx3qLEZ/gmENo5VhP6C0RpYrcD62NBmKTB/65EvlF0OD0Kurcv7tMX58otwUVP1P7Tp6WKT5K4hm214hb+jRAeVByaQFREs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowAAXOeAh9hdqp6iuEg--.709S2;
-	Thu, 28 May 2026 16:00:33 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Manivannan Sadhasivam <mani@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: qrtr: fix node refcount leak on ctrl packet alloc failure
-Date: Thu, 28 May 2026 08:00:19 +0000
-Message-Id: <20260528080019.1176700-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1779955472; c=relaxed/simple;
+	bh=GWCH/Aonkgn/NPWpyC1bnkTBZ5RLU7iQOKnQqDuOdik=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HrXcZrIVVpxfdLp9LCqEdRemb9Pc3SHFBnOTUs7ZShFq26xb+l5G7+BMU95n0iSKMAKRsAXWB5ZLdlkG9jbOInoXVmtuMQVEKX2dQsyM7xyDO7H6kC8CW1TWQCbHKHTwIq+PbwsgtNCbX7NQ0eyamBLjJYA5mJtmX/UDaAbQVsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=VWNmy/8p; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=CEfwnPgqLrNaYc1mj4Eyf5bsKzEWDOcFqXc4WbjJj3Y=;
+	b=VWNmy/8ppTsOaeH7aF0IkCxzVtF02EKB40Q9n+4FS2a49yqKE93km1cGo7tdMukvd+DizK640
+	vi3iz/xW1BQV8Gi5uBJySJ7LLs+A4yUb35GPILBJVkXEleZVBmRDs/+XWvwt+5lC9/Fs3PEnMDf
+	Z/U2WkMeDuot+idcTJbFv+w=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4gQzMp6R6nzmV6T;
+	Thu, 28 May 2026 15:56:38 +0800 (CST)
+Received: from kwepemk500009.china.huawei.com (unknown [7.202.194.94])
+	by mail.maildlp.com (Postfix) with ESMTPS id 59E7140539;
+	Thu, 28 May 2026 16:04:26 +0800 (CST)
+Received: from [10.67.121.161] (10.67.121.161) by
+ kwepemk500009.china.huawei.com (7.202.194.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 28 May 2026 16:04:25 +0800
+Message-ID: <65b3d63a-271a-4aa8-ba8c-fc2b186349dc@huawei.com>
+Date: Thu, 28 May 2026 16:04:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/4] PCI/TPH: expose the enabled TPH requester type
+To: Zhiping Zhang <zhipingz@meta.com>, Alex Williamson <alex@shazbot.org>
+CC: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, Christian Konig <christian.koenig@amd.com>,
+	Bjorn Helgaas <helgaas@kernel.org>, <kvm@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>, Keith Busch
+	<kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>, Yishai Hadas
+	<yishaih@nvidia.com>
+References: <20260526144401.1485788-1-zhipingz@meta.com>
+ <20260526144401.1485788-2-zhipingz@meta.com>
+ <20260527145332.30412ea4@shazbot.org>
+ <CAH3zFs3Yv2G0rQNE7x8DjBWPE+3sFC_3X6ZtF4x-mPp==h0BQA@mail.gmail.com>
+Content-Language: en-US
+From: fengchengwen <fengchengwen@huawei.com>
+In-Reply-To: <CAH3zFs3Yv2G0rQNE7x8DjBWPE+3sFC_3X6ZtF4x-mPp==h0BQA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAAXOeAh9hdqp6iuEg--.709S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKr4UAFy5WFWxCrWUZr43Wrg_yoWkCrc_G3
-	yjgF9rWw1UtF1kAw4qkw4rZwsI9r1kGw18KFWakay3tayagF1DAr1xJFn8Zr1UWr4Ut3W3
-	GwsrAr9rZrn7ZjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb38FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
-	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
-	cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
-	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUOlkVUUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwsBA2oXz2KD0gAAsP
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk500009.china.huawei.com (7.202.194.94)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292586-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-292587-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fengchengwen@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: 3BCF55EE460
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,meta.com:email,shazbot.org:email]
+X-Rspamd-Queue-Id: BA0035EE52E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-qrtr_send_resume_tx() calls qrtr_node_lookup() which takes a
-reference on the returned node. If the subsequent call to
-qrtr_alloc_ctrl_packet() fails due to memory allocation failure, the
-function returns -ENOMEM without calling qrtr_node_release() to
-release the node reference.
+On 5/28/2026 1:35 PM, Zhiping Zhang wrote:
+> On Wed, May 27, 2026 at 1:53 PM Alex Williamson <alex@shazbot.org> wrote:
+>>
+>>>
+>> On Tue, 26 May 2026 07:43:53 -0700
+>> Zhiping Zhang <zhipingz@meta.com> wrote:
+>>
+>>> Add pcie_tph_enabled_req_type() so drivers can query the enabled TPH
+>>> requester mode without reaching into pci_dev internals.
+>>>
+>>> This keeps pci_dev::tph_req_type inside the PCI/TPH code and provides a
+>>> !CONFIG_PCIE_TPH stub for callers.
+>>>
+>>> Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+>>> ---
+>>>  drivers/pci/tph.c       | 12 ++++++++++++
+>>>  include/linux/pci-tph.h |  2 ++
+>>>  2 files changed, 14 insertions(+)
+>>>
+>>> diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+>>> index 91145e8d9d95..6c4492075ae9 100644
+>>> --- a/drivers/pci/tph.c
+>>> +++ b/drivers/pci/tph.c
+>>> @@ -174,6 +174,18 @@ u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev)
+>>>  }
+>>>  EXPORT_SYMBOL(pcie_tph_get_st_table_loc);
+>>>
+>>> +/**
+>>> + * pcie_tph_enabled_req_type - Return the device's enabled TPH requester type
+>>> + * @pdev: PCI device to query
+>>> + *
+>>> + * Return: PCI_TPH_REQ_DISABLE, PCI_TPH_REQ_TPH_ONLY or PCI_TPH_REQ_EXT_TPH.
+>>> + */
+>>> +u8 pcie_tph_enabled_req_type(struct pci_dev *pdev)
+>>> +{
+>>> +     return pdev->tph_req_type;
+>>> +}
+>>> +EXPORT_SYMBOL(pcie_tph_enabled_req_type);
+>>> +
+>>>  /*
+>>>   * Return the size of ST table. If ST table is not in TPH Requester Extended
+>>>   * Capability space, return 0. Otherwise return the ST Table Size + 1.
+>>> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+>>> index be68cd17f2f8..fe572737b409 100644
+>>> --- a/include/linux/pci-tph.h
+>>> +++ b/include/linux/pci-tph.h
+>>> @@ -30,6 +30,7 @@ void pcie_disable_tph(struct pci_dev *pdev);
+>>>  int pcie_enable_tph(struct pci_dev *pdev, int mode);
+>>>  u16 pcie_tph_get_st_table_size(struct pci_dev *pdev);
+>>>  u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev);
+>>> +u8 pcie_tph_enabled_req_type(struct pci_dev *pdev);
+>>>  #else
+>>>  static inline int pcie_tph_set_st_entry(struct pci_dev *pdev,
+>>>                                       unsigned int index, u16 tag)
+>>> @@ -41,6 +42,7 @@ static inline int pcie_tph_get_cpu_st(struct pci_dev *dev,
+>>>  static inline void pcie_disable_tph(struct pci_dev *pdev) { }
+>>>  static inline int pcie_enable_tph(struct pci_dev *pdev, int mode)
+>>>  { return -EINVAL; }
+>>> +static inline u8 pcie_tph_enabled_req_type(struct pci_dev *pdev) { return 0; }
+>>
+>> nit, s/0/PCI_TPH_REQ_DISABLE/ for consistency.  Thanks,
 
-Add qrtr_node_release(node) before returning on the allocation failure
-path to properly release the reference.
+It need add #include <linux/pci.h> at beginning too, else it will counter compile error like this:
 
-Cc: stable@vger.kernel.org
-Fixes: cb6530b99faf ("net: qrtr: Move resume-tx transmission to recvmsg")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/qrtr/af_qrtr.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+   In file included from drivers/vdpa/mlx5/core/mr.c:8:
+   In file included from include/linux/mlx5/qp.h:36:
+   In file included from include/linux/mlx5/device.h:37:
+   In file included from include/rdma/ib_verbs.h:46:
+>> include/linux/pci-tph.h:48:10: error: use of undeclared identifier 'PCI_TPH_LOC_NONE'
+      48 | { return PCI_TPH_LOC_NONE; }
+         |          ^
+   1 error generated.
 
-diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-index 7cec6a7859b0..c9f892427f7c 100644
---- a/net/qrtr/af_qrtr.c
-+++ b/net/qrtr/af_qrtr.c
-@@ -1009,8 +1009,10 @@ static int qrtr_send_resume_tx(struct qrtr_cb *cb)
- 		return -EINVAL;
- 
- 	skb = qrtr_alloc_ctrl_packet(&pkt, GFP_KERNEL);
--	if (!skb)
-+	if (!skb) {
-+		qrtr_node_release(node);
- 		return -ENOMEM;
-+	}
- 
- 	pkt->cmd = cpu_to_le32(QRTR_TYPE_RESUME_TX);
- 	pkt->client.node = cpu_to_le32(cb->dst_node);
--- 
-2.34.1
+>>
+>> Alex
+>>
+> ack, will do.
+> 
+> Thanks,
+> Zhiping
+> 
 
 
