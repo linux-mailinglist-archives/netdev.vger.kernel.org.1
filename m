@@ -1,391 +1,185 @@
-Return-Path: <netdev+bounces-292636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PWHEZ4PGGrmbQgAu9opvQ
-	(envelope-from <netdev+bounces-292636-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:49:18 +0200
+	id AKmTCUQQGGoxbggAu9opvQ
+	(envelope-from <netdev+bounces-292637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:52:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B2155EFED2
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 670C25EFF65
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C69BE31AB922
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:37:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 93DC4311516C
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9CF3AC0D0;
-	Thu, 28 May 2026 09:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611A83AEF35;
+	Thu, 28 May 2026 09:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="3ew0LED+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pccw+Y3S";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJbiZLeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C137130C153;
-	Thu, 28 May 2026 09:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEAD3AEF21
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779961070; cv=none; b=jw4jms9egW4KI4NyBjw6sdXjFBfLwO55zDId/rTsIsF9cwW7KnepxZ+pB4l3kQLOkeXNGg/6l8Jjwr71fseog0pb9H1/+lTijtn8pxgzWQxFAUOVmsk5KDY+FF6sgPY5/BiE/yXEZQD/G1GSas1lBnGDrz8nbCnssEO1kbH+DFo=
+	t=1779961180; cv=none; b=fO8E35XwBB40r/LJFUI7BnBqbVQYW1OXdi9XbQmq8UYS8+ldLf8ckj39FbLkIiXoffA3+IThMlWeOXwiP0rY/QycYMak4yusLbcVGs23Q4NKW8hvKL68o9blLzubORvtOf623+3pp7hA/rLkW9oiXVsp5qwgZgGD8YR1W9DGmYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779961070; c=relaxed/simple;
-	bh=DbeE1O58EkERW09o40h4qA2vpdQndQc9/Kj8M9LJaLE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=XZl7C2paURsusKNtHbk9wurGnRx3+YPe5RMviLr/erR56IHS0MVfDWsQpX9PNb8pgPOl2k9X/mFqup7Yja+E6jyl44uKD2ERG5E56zhSGPxrM4vfw7oSZ3TmFCTIAYIKlgNvZLVXU8U21VUnpzOLRZZynwHIInbU1jy9kFqPaVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=3ew0LED+; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 15C7DA0155;
-	Thu, 28 May 2026 11:37:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1779961065; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=pCC7dcbSgjbz+3b/O6NNkMSBzrVvzuW6akWbwyW2T7k=;
-	b=3ew0LED+1e20K0Eq9g8z/4bCc7+MowrjyVstaFxhzBxKcatd/7lpyh+xjlAh/ZyJ8Wv3il
-	Zeh8X/4bP++ZQRn7cnC2yB8WEd9b1kyRO41XrvotkHiONFpbNY1QKK8UfFnX+NCWhpltWI
-	+F7TpPMF3fc6VstSGlXLR4L9+6T1H4lwDNhO7SjsaDEHVHE2B9jemiDKM+UMANjauQoCT9
-	UAblv3CuCHYPE0US74tDsHl6BW9geps+bKNMsLcH2O5D3xPAVJIm1uStd0Cr0Q0jGHpCtd
-	ONTHYlEDIachCt1rdMSahVmEJGKnHJo5NfuhIBgQaT0m3DFEYOqMIQhsPiMVaw==
+	s=arc-20240116; t=1779961180; c=relaxed/simple;
+	bh=jtJYzuyrPc3icRwf3HhR0qJzXbstw5UEhTcjKq1TpqM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TyAG2RdrMU7QgsLsPo7z8dLEJgO6fe8kYOW94NeLPm83SJU77sHv8fjeVzzF1YFr4EZsNKTdKo1Gv7lRknQiw/pMZYM3ETmdEx1/p4FH4z0xuN27OGGcGK/cT2KAZNhMqQyvTFLqwPXrv0pisMXFkMjKceLrjt46UObuDbZUANw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pccw+Y3S; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dJbiZLeq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779961177;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ukG6nahpoo1bFNr/ZIwcZ9cfO0mxhtviRjj1KI13Bi0=;
+	b=Pccw+Y3Sd6SEA7Qd8FdG+p8egGabUSfH43swMNEhya3u2TTJ0SFOfLAP6EoCyPAQJuyrXq
+	5n3ikCBwwZlNH0b1orMU7kwMLVEc1xQyWqZ2u6uQW4p2ejXackcEQd3PvxydduTEOcnslJ
+	NVmEHEPlXgFVE4GavfXQ7yIHSpGY7hk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-6uC_0IzsP_mPWs__FON_aA-1; Thu, 28 May 2026 05:39:35 -0400
+X-MC-Unique: 6uC_0IzsP_mPWs__FON_aA-1
+X-Mimecast-MFC-AGG-ID: 6uC_0IzsP_mPWs__FON_aA_1779961175
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-44dad1b938fso7370775f8f.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 02:39:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779961174; x=1780565974; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ukG6nahpoo1bFNr/ZIwcZ9cfO0mxhtviRjj1KI13Bi0=;
+        b=dJbiZLeq6m0Nfbggp8cKIiwEeVGhKtdUS0mKU7e4gBSI8AoTINd+N+4fAiL8Gfv5n6
+         v81vXRPVh85sbDSy+MHL8JQFEuLPiTAF4vXh8rF0vZ5zJNG4IdoS9chh/vLv+mfv052n
+         SAI7sCGDDYfLPI2sfOCr3E/N7bI6lMKlmhXKy8tXsc/UikPH+vPWf8g4CCoJT3bZIItI
+         PhQGw8YakN6XB7mPPQhkPaJKpqPScxJWCxRYaNyVrPh96CUv97skl/yyiykW9uHdzocf
+         IzhcGbVYddABoJ0PzPgjfh9arMbZdh/8KNJ+ZrLYXRyKAxrtxDHwJ+x3awtPSaXaLwYW
+         AcQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779961174; x=1780565974;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ukG6nahpoo1bFNr/ZIwcZ9cfO0mxhtviRjj1KI13Bi0=;
+        b=krjitUylHV6uLB5CsyV6aap0599B5TTWzInGoLo2IHVdMujyjrGZ3ncM0lhG+o4N5Q
+         nDd9NVZgUJfRAu8O4ksABvK9RkUHTW2sUT4V8OzJfPSqXWNEFt6sNcpm+uzF9H+TtPmX
+         0+HhpuN7rcYxfm/P/QODWZA7IM7xFBZSI8JNOaoe/LN1jDRq7Gf87fiLVYqczTgV9Aar
+         0rrZWoKOsvLB3UQ9NchkAM2cs1MMu5jSZlyZqAnsL2KA1lIkrmFJsAXQauX8fYEsMWu/
+         6v6s3tQp7tVWCW9f1VJl/Yv1DrJfTKBMCebADvrCnJh605WR7qgh2ZoPAcYnbaCMG5/k
+         TOMg==
+X-Forwarded-Encrypted: i=1; AFNElJ/SMBbC+Hmuhqh/YMq5knIWKUAgR0fcw5IexokurpefOnJHPecJqOTTrmdd0v9Fln1usA4XoUc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEQ5/jyC6A1miyvXTYWAxNf1oh/QbVyuyfm7sUKmnpLolRBNC5
+	w84SI4ozSz7QGYkaun0+QyBDxqXdxoULf0wlH4FNIn/2ydy/Lkj1l2I5s3+kBG3Bc4r8hHYzKgO
+	lp7goUyVC8rpnvVYjowk5xlVfNc519Qu6gCG2vxkNvRaUNiL1X1JLdOIPNA==
+X-Gm-Gg: Acq92OHuit8Ulcrj4X010/k+LB9DQZlrfwBvEKo2DeyAaFAtd3BF4mNt6rUXB6psSF8
+	+KjGYZpFHWgeQw6VhX/1cgq6pH9l9W+g3R0Pkivht1dWVAyWIa63ycGTc//EPdwa9o47uublMnI
+	c9hlR2q7VBRt3r8ngT8dgPokn4x1h35nDE42oi8xN8N/Z3+Cc6fGkjN8VefM5MqjBJiAPRzp0JP
+	z+EHXQrQBWJVN7Lny9od7Gx/dfGZX+e02O/0s8idsr2mVgvpCbXUeXFyLbgdrbhG7sBJjKWldnl
+	vbmUWupueaSa/0HRnsibcSTKRewv6qi+AiIGYGXpntbpu66A3GAhRL3GTWqbPOw5Z5X10BXnPqQ
+	WZFO4gcx1//0zJBI+w8ByEmDy/GATWV/heJFfB9KFKlC9NEoPL8FXnmRavLroJr0bgQ==
+X-Received: by 2002:a05:600c:4510:b0:490:3d2e:b67d with SMTP id 5b1f17b1804b1-490428eb9aamr410389975e9.30.1779961174588;
+        Thu, 28 May 2026 02:39:34 -0700 (PDT)
+X-Received: by 2002:a05:600c:4510:b0:490:3d2e:b67d with SMTP id 5b1f17b1804b1-490428eb9aamr410389655e9.30.1779961174125;
+        Thu, 28 May 2026 02:39:34 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.12])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909294cb81sm26263475e9.12.2026.05.28.02.39.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 May 2026 02:39:33 -0700 (PDT)
+Message-ID: <00d370e4-b697-492a-85d6-04bd6203327f@redhat.com>
+Date: Thu, 28 May 2026 11:39:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 28 May 2026 11:37:43 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: javen <javen_xu@realsil.com.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, freddy_gu@realsil.com.cn, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, daniel@makrotopia.org, vladimir.oltean@nxp.com
-Subject: Re: [PATCH net-next v1 1/2] net: phy: realtek: add support for
- RTL8261
-In-Reply-To: <20260528075226.1054-2-javen_xu@realsil.com.cn>
-References: <20260528075226.1054-1-javen_xu@realsil.com.cn>
- <20260528075226.1054-2-javen_xu@realsil.com.cn>
-Message-ID: <d37ead5b1f9549d4903138cc4f70ffd0@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/2] net: lan743x: ptp: Fix simultaneous PEROUT on
+ PCI11x1x
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>, netdev@vger.kernel.org
+Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+ richardcochran@gmail.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, andrew+netdev@lunn.ch, Raju.Lakkaraju@microchip.com
+References: <20260525094931.10371-1-thangaraj.s@microchip.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260525094931.10371-1-thangaraj.s@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,kernel.org,google.com,lunn.ch];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-292636-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-292637-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,vger.kernel.org,makrotopia.org,nxp.com];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tipi-net.de:mid,tipi-net.de:dkim,realsil.com.cn:email]
-X-Rspamd-Queue-Id: 9B2155EFED2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 670C25EFF65
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Javen
-
-On 28.5.2026 09:52, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
+On 5/25/26 11:49 AM, Thangaraj Samynathan wrote:
+> The PCI11x1x hardware supports up to 12 PTP-IO pins as simultaneous
+> periodic outputs, but the driver was limited to 2 due to two bugs:
 > 
-> This patch adds support for Realtek phy chip RTL8261. Its PHY id is
-> 0x001cc898 and 0x001cc899.
+> 1. ptp_io_perout[] was sized by LAN743X_PTP_N_PEROUT (2) and n_per_out
+>    was hardcoded to LAN743X_PTP_N_EVENT_CHAN (2), so any perout index
+>    above 1 was rejected immediately by the PTP core.
 > 
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
-> ---
->  drivers/net/phy/realtek/realtek_main.c | 315 +++++++++++++++++++++++++
->  1 file changed, 315 insertions(+)
+> 2. lan743x_ptp_reserve_event_ch() refused to assign a channel already
+>    in use, and lan743x_ptp_release_event_ch() unconditionally tore down
+>    the hardware channel on first release — both preventing multiple pins
+>    from sharing the same event channel.
 > 
-> diff --git a/drivers/net/phy/realtek/realtek_main.c 
-> b/drivers/net/phy/realtek/realtek_main.c
-> index 27268811f564..fe743fd0421b 100644
-> --- a/drivers/net/phy/realtek/realtek_main.c
-> +++ b/drivers/net/phy/realtek/realtek_main.c
-> @@ -22,6 +22,9 @@
->  #include "../phylib.h"
->  #include "realtek.h"
+> Patch 1 introduces PCI11X1X_PTP_IO_MAX_OUT_PINS (12), resizes the
+> arrays, and sets n_per_out conditionally for PCI11x1x devices.
 > 
-> +#define RTL_8261C_CG			0x001cc898
-> +#define RTL_8261CE_CG			0x001cc899
+> Patch 2 fixes the channel assignment logic: maps perout indices to
+> channels via index % 2, adds refcount-based sharing, and guards
+> hardware teardown until the last user releases.
 
-Imho these should be added below RTL_8261C and not at the top.
+IMHO the above are not fixes, but features and should target net-next.
+Also the split is incorrect, as introduces OoB after patch 1. You have
+to split the series differently, i.e. introducing support for multiple
+pin per channel (without raising the limits) in patch 1 and raising the
+pins limit in patch 2, together will all the required buffers adjustment.
 
-> +
->  #define RTL8201F_IER_PAGE			0x07
->  #define RTL8201F_IER				0x13
->  #define RTL8201F_IER_LINK			BIT(13)
-> @@ -141,6 +144,10 @@
->  #define RTL8211F_PHYSICAL_ADDR_WORD1		17
->  #define RTL8211F_PHYSICAL_ADDR_WORD2		18
-> 
-> +#define RTL8261X_EXT_ADDR_REG			0xa436
-> +#define RTL8261X_EXT_DATA_REG			0xa438
-> +#define RTL_8261X_SUB_PHY_ID_ADDR		0x801d
-> +
->  #define RTL822X_VND1_SERDES_OPTION			0x697a
->  #define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
->  #define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
-> @@ -252,6 +259,57 @@
->  #define RTL_8251B				0x001cc862
->  #define RTL_8261C				0x001cc890
-> 
-> +#define RTL8261C_CE_MODEL		0x00
-> +#define RTL8261D_MODEL			0x81
-> +#define RTL8261X_PHYSR_REG		0xa434
-> +#define RTL8261X_GBCR_REG		0xa412
-> +#define RTL8261X_IMR			0xa4d2
-> +#define RTL8261X_ISR			0xa4d4
-> +#define RTL8261X_INT_AUTONEG_ERROR	BIT(0)
-> +#define RTL8261X_INT_PAGE_RECV		BIT(2)
-> +#define RTL8261X_INT_AUTONEG_DONE	BIT(3)
-> +#define RTL8261X_INT_LINK_CHG		BIT(4)
-> +#define RTL8261X_INT_PHY_REG_ACCESS	BIT(5)
-> +#define RTL8261X_INT_PME		BIT(7)
-> +#define RTL8261X_INT_ALDPS_CHG		BIT(9)
-> +#define RTL8261X_INT_JABBER		BIT(10)
-> +#define RTL8261X_PHYSR_LINK		BIT(2)
-> +#define RTL8261X_PHYSR_DUPLEX		BIT(3)
-> +#define RTL8261X_PHYSR_SPEED_L		GENMASK(5, 4)
-> +#define RTL8261X_PHYSR_SPEED_H		GENMASK(10, 9)
-> +
-> +/* Concatenated 4-bit speed code values (SPD_H << 2 | SPD_L) */
-> +#define RTL8261X_SPEED_CODE_500M	0x3	/* H=0, L=3 */
-> +#define RTL8261X_SPEED_CODE_1000M	0x7	/* H=1, L=3 */
-> +#define RTL8261X_SPEED_CODE_2500M	0x8	/* H=2, L=0 */
-> +#define RTL8261X_SPEED_CODE_5000M	0x9	/* H=2, L=1 */
-> +#define RTL8261X_SPEED_500		500
+Also note that sashiko gemini pointed to a few pre-existing issues that
+should be addresses in a separate net series.
 
-500 MBit/s isnt a standard rate which also isnt represented in ethtool.
-Is this just for documentation or intended to be used? If yes, how?
-
-> [...]
-
-> +
-> +static int rtl8261x_get_features(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret = genphy_c45_pma_read_abilities(phydev);
-> +	if (ret)
-> +		return ret;
-> +	/*
-> +	 * Supplement Multi-Gig speeds that may not be automatically detected
-> +	 * RTL8261X supports 2.5G/5G in addition to standard 10G
-> +	 */
-> +	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-> +			 phydev->supported);
-> +	linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
-> +			 phydev->supported);
-
-Feature bits for 2.5 and 5 GBit/s are set unconditionally - even for the 
-generic variant.
-Do all variants have these capabilities? If not better add check for at 
-least the generic one.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static int rtl8261x_config_master_slave(struct phy_device *phydev)
-> +{
-> +	u16 val;
-> +	/*
-> +	 * Configure bits 15:14 of MMD 7.0x0020
-> +	 *
-> +	 * Bit 15 (Enable) | Bit 14 (Value) | Mode
-> +	 * ----------------|----------------|-------------
-> +	 *       0         |       0        | Auto (disabled)
-> +	 *       1         |       0        | Force Slave
-> +	 *       1         |       1        | Force Master
-> +	 */
-> +	switch (phydev->master_slave_set) {
-> +	case MASTER_SLAVE_CFG_MASTER_FORCE:
-> +		val = RTL8261X_MS_MASTER;
-> +		break;
-> +	case MASTER_SLAVE_CFG_SLAVE_FORCE:
-> +		val = RTL8261X_MS_SLAVE;
-> +		break;
-> +	case MASTER_SLAVE_CFG_UNKNOWN:
-> +	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
-> +	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
-> +	default:
-> +		val = RTL8261X_MS_AUTO;
-> +		break;
-> +	}
-> +
-> +	return phy_modify_mmd(phydev, MDIO_MMD_AN, RTL8261X_MULTIG_CTRL,
-> +			      RTL8261X_MASTER_SLAVE_MASK, val);
-> +}
-
-RTL8261X_MULTIG_CTRL is a IEEE-defined register, so it can use 
-MDIO_AN_10GBT_CTRL instead.
-Also the define for RTL8261X_MULTIG_CTRL can be dropped.
-
-While at it I would suggest to add MDIO_AN_10GBT_CTRL_MS_ENABLE (bit 15) 
-and
-MDIO_AN_10GBT_CTRL_MS_VALUE (bit 14) to include/uapi/linux/mdio.h and 
-also make use of it.
-RTL8261X_MS_AUTO would become
-
-   val = MDIO_AN_10GBT_CTRL_MS_ENABLE | MDIO_AN_10GBT_CTRL_MS_VALUE;
-
-> [...]
-
-> +
-> +static int rtl8261x_read_status(struct phy_device *phydev)
-> +{
-> +	int ret, val, speed_code;
-> +
-> +	ret = genphy_c45_read_status(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_PHYSR_REG);
-> +	if (val < 0)
-> +		return val;
-> +
-> +	phydev->link = !!(val & RTL8261X_PHYSR_LINK);
-> +	if (!phydev->link) {
-> +		phydev->speed  = SPEED_UNKNOWN;
-> +		phydev->duplex = DUPLEX_UNKNOWN;
-> +		return 0;
-> +	}
-
-Why does it need to overreide the values from genphy_c45_read_status() ?
-
-> +
-> +	phydev->duplex = (val & RTL8261X_PHYSR_DUPLEX) ? DUPLEX_FULL : 
-> DUPLEX_HALF;
-> +	speed_code = (FIELD_GET(RTL8261X_PHYSR_SPEED_H, val) << 2) |
-> +		      FIELD_GET(RTL8261X_PHYSR_SPEED_L, val);
-> +	switch (speed_code) {
-> +	case RTL8261X_SPEED_CODE_500M:
-> +		phydev->speed = RTL8261X_SPEED_500;
-
-See question above (defines).
-
-> +		break;
-> +	case RTL8261X_SPEED_CODE_1000M:
-> +		phydev->speed = SPEED_1000;
-> +		break;
-> +	case RTL8261X_SPEED_CODE_2500M:
-> +		phydev->speed = SPEED_2500;
-> +		break;
-> +	case RTL8261X_SPEED_CODE_5000M:
-> +		phydev->speed = SPEED_5000;
-> +		break;
-> +	default:
-> +		phydev_warn(phydev, "unknown speed code 0x%x (PHYSR=0x%04x)\n", 
-> speed_code, val);
-> +		phydev->speed = SPEED_UNKNOWN;
-> +	break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rtl8261x_config_aneg(struct phy_device *phydev)
-> +{
-> +	u16 adv_1g = 0;
-> +	int ret;
-> +
-> +	if (phydev->autoneg == AUTONEG_DISABLE)
-> +		return genphy_c45_pma_setup_forced(phydev);
-> +
-> +	ret = rtl8261x_config_master_slave(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = genphy_c45_config_aneg(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-> +			      phydev->advertising))
-> +		adv_1g = BIT(9);
-> +
-> +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND2,
-> +				     RTL8261X_GBCR_REG,
-> +				     BIT(9), adv_1g);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (ret > 0)
-> +		return genphy_c45_restart_aneg(phydev);
-
-This does not take rtl8261x_config_master_slave() into account. So maybe 
-change rtl8261x_config_master_slave
-
-    return phy_modify_mmd_changed ...
-
-and keep the result in a bool and also trigger auto nego restart if 
-needed.
-
-> +
-> +	return 0;
-> +}
+/P
 
 
 
-> +
->  static int rtl821x_probe(struct phy_device *phydev)
->  {
->  	struct device *dev = &phydev->mdio.dev;
-> @@ -3001,6 +3292,30 @@ static struct phy_driver realtek_drvs[] = {
->  		.resume		= genphy_resume,
->  		.read_mmd	= genphy_read_mmd_unsupported,
->  		.write_mmd	= genphy_write_mmd_unsupported,
-> +	}, {
-> +		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
-> +		.name             = "Realtek RTL8261C_RTL8261D 10Gbps PHY",
-> +		.probe            = rtl8261x_probe,
-
-RTL8261C/RTL8261D? Or just the c variant as the phy id suggests?
-
-> +		.get_features     = rtl8261x_get_features,
-> +		.config_aneg      = rtl8261x_config_aneg,
-> +		.read_status      = rtl8261x_read_status,
-> +		.config_intr      = rtl8261x_config_intr,
-> +		.handle_interrupt = rtl8261x_handle_interrupt,
-> +		.soft_reset       = rtl8261x_soft_reset,
-> +		.suspend          = genphy_c45_pma_suspend,
-> +		.resume           = genphy_c45_pma_resume,
-> +	}, {
-> +		PHY_ID_MATCH_EXACT(RTL_8261CE_CG),
-> +		.name             = "Realtek RTL8261CE 10Gbps PHY",
-> +		.probe            = rtl8261x_probe,
-> +		.get_features     = rtl8261x_get_features,
-> +		.config_aneg      = rtl8261x_config_aneg,
-> +		.read_status      = rtl8261x_read_status,
-> +		.config_intr      = rtl8261x_config_intr,
-> +		.handle_interrupt = rtl8261x_handle_interrupt,
-> +		.soft_reset       = rtl8261x_soft_reset,
-> +		.suspend          = genphy_c45_pma_suspend,
-> +		.resume           = genphy_c45_pma_resume,
->  	},
->  };
-
-Please also make sure for both patches that checkpatch has no further 
-complaints. Thanks.
-
-Nicolai
 
