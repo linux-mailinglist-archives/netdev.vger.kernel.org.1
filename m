@@ -1,124 +1,185 @@
-Return-Path: <netdev+bounces-292536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292537-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sO6fEc6pF2qhMQgAu9opvQ
-	(envelope-from <netdev+bounces-292536-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:34:54 +0200
+	id EHoBAWutF2qiNAgAu9opvQ
+	(envelope-from <netdev+bounces-292537-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB4A5EBD7E
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:34:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0960F5EBF97
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 04:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6E9D630612A4
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:34:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A1EF301F487
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7B33002AB;
-	Thu, 28 May 2026 02:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E952FE579;
+	Thu, 28 May 2026 02:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="t0DTNX1u"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ObSWCXVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F88113A258;
-	Thu, 28 May 2026 02:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AAF82FB969;
+	Thu, 28 May 2026 02:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779935633; cv=none; b=WflDq/I4S1PgF+RKQcy+w7qZS8jQYpNAE6ShBAA7lr8LOd7HV8yZ5gq5YwQMdM62pNbQS9ts1o4Sds1/xD/aofeiOiqZ+c7YzHkMJu6gBuBbWw10YR8pmn7m71P11lfuKmNeEz6ba1aUiXIuOwyEoC9B3DI7V2cyqxMaXCwWdgg=
+	t=1779936136; cv=none; b=CqTJEBKBpoRuFG/uWSHa/M6QxtUxt5el6gnIJk8cFin51lXxTXKdQbJwemY7UTDlbchh2QSG6d8WvhHqKEFAzl2yf0SyUEUOzq0aF/GtYvLpWkXk4tE0Fq+66sNHdoTSd7JPkeCpbVLlSlejpLWwsH0gFMwP9pGnFhYf9FoMT0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779935633; c=relaxed/simple;
-	bh=kb2/Yj8883Ry0KYJftKeqRkMC7S0d7pUj9UIOFkR/NU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=klIBU3UBx8+fY3yBCpc514p+2Ih2Jq4v0XuxzMd1yGFaO6WXFVRzKrBMniNWRl+ORCL3k44hVoUu9ssC+OYSaI6jA9qfRh2S4qqAqgcM9BDBY68vj+8134pDlboNkqUVIdG+d7G3dInsdvcy8DqXCNFy7uqn/8XgoA2tBl4Feyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=t0DTNX1u; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IWaVCqIYqMerJX6G7YPSl9UYzPzmFnwijFcFs2+b3h8=; b=t0DTNX1uKeug/pymB+vqLhEwKy
-	4IUviC46SvhK7oQGRer0ZZCZ6WzLjWHGhKk5DcN8344KH0X7fXJ/eX/YUNQdiCbFGH3DcQ0A9ddhi
-	ZUkxYBlgyGBBjyfX04kJuu/E6bS/PT4q3t6JFR2IyZQDXF5v+5EDp5FtpGey3PzX3LNk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wSQZ3-004qOw-U8; Thu, 28 May 2026 04:33:41 +0200
-Date: Thu, 28 May 2026 04:33:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: ciprian.regus@analog.com
-Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1779936136; c=relaxed/simple;
+	bh=Oz0TBB10uvGvDeJ+zBjHHGWpvy5FwYJJOvoadO8Tc34=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TSc/cvToeaKu+jaTbSXpCaylm0ktp4KP1bspZFVDEoPFR80me/Sl1uoGU2g8LN3GO+YZg3Q6043lTDPcJW+sXqVbKlPmG8VuyU1MwumbqCkNH1NZddeHl8v0xlxfSr8SnAl/v+BKuXjHKPSeRw6cfL/nMoqyig+WVlQpmvxOmnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ObSWCXVT; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=11
+	vDLja0v8SRx8kSsI+vKNUnafLwHgPViBsAeNaPlUw=; b=ObSWCXVT7sc4xOtvIU
+	LLiwMbezkxoLODvEIJGGVXn0eCB88KNcHAxaF7yUc98jXp6reBMUicFe6eH4lj8i
+	ti3KlHRDfMydVdg7VIPzQbb0uFGhaoSSlg2OrUo1O4UmJQAJkwv5VaIYeRh9IV9b
+	HsvcpBMIIENHG2eJ8FGU6vagg=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wDH36FVqxdqasgIAA--.1323S2;
+	Thu, 28 May 2026 10:41:27 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Manas <ghandatmanas@gmail.com>,
+	Rakshit Awasthi <rakshitawasthi17@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 08/10] net: phy: microchip-t1s: use generic
- C45 MMD access helpers
-Message-ID: <9ce89e42-8858-4a37-b153-930de0260ae0@lunn.ch>
-References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
- <20260527-adin1140-driver-v2-8-37e5c8d4e0a0@analog.com>
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jarek Poplawski <jarkao2@gmail.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6.1.y] net/sched: sch_red: Replace direct dequeue call with peek and qdisc_dequeue_peeked
+Date: Thu, 28 May 2026 10:41:25 +0800
+Message-Id: <20260528024125.2961945-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260527-adin1140-driver-v2-8-37e5c8d4e0a0@analog.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDH36FVqxdqasgIAA--.1323S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZrWrJw13Kr15XFW7Cw1rJFb_yoWrAr13pr
+	W3tr4DGFW0qr4jyF4UXF18tryakFsxCFn8X3yxWr1xJFWUuF1jqr15Jw42qF95GrWUAwn3
+	tr1DXw10qr1q9aUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pi7KsUUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5hdgy2oXq1erDgAA3+
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-292537-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[163.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292536-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[analog.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 0EB4A5EBD7E
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,google.com,resnulli.us,davemloft.net,163.com,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,msgid.link:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0960F5EBF97
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 12:51:53AM +0300, Ciprian Regus via B4 Relay wrote:
-> From: Ciprian Regus <ciprian.regus@analog.com>
-> 
-> Replace the driver specific lan865x_phy_read_mmd() and
-> lan865x_phy_write_mmd() with the shared genphy_read_mmd_c45() and
-> genphy_write_mmd_c45() helpers.
-> 
-> No functional change.
-> 
-> Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+[ Upstream commit 458d5615272d3de535748342eb68ca492343048c ]
 
-    Andrew
+When red qdisc has children (eg qfq qdisc) whose peek() callback is
+qdisc_peek_dequeued(), we could get a kernel panic. When the parent of such
+qdiscs (eg illustrated in patch #3 as tbf) wants to retrieve an skb from
+its child (red in this case), it will do the following:
+ 1a. do a peek() - and when sensing there's an skb the child can offer, then
+     - the child in this case(red) calls its child's (qfq) peek.
+        qfq does the right thing and will return the gso_skb queue packet.
+        Note: if there wasnt a gso_skb entry then qfq will store it there.
+ 1b. invoke a dequeue() on the child (red). And herein lies the problem.
+     - red will call the child's dequeue() which will essentially just
+       try to grab something of qfq's queue.
+
+[   78.667668][  T363] KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
+[   78.667927][  T363] CPU: 1 UID: 0 PID: 363 Comm: ping Not tainted 7.1.0-rc1-00033-g46f74a3f7d57-dirty #790 PREEMPT(full)
+[   78.668263][  T363] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[   78.668486][  T363] RIP: 0010:qfq_dequeue+0x446/0xc90 [sch_qfq]
+[   78.668718][  T363] Code: 54 c0 e8 dd 90 00 f1 48 c7 c7 e0 03 54 c0 48 89 de e8 ce 90 00 f1 48 8d 7b 48 b8 ff ff 37 00 48 89 fa 48 c1 e0 2a 48 c1 ea 03 <80> 3c 02 00 74 05 e8 ef a1 e1 f1 48 8b 7b 48 48 8d 54 24 58 48 8d
+[   78.669312][  T363] RSP: 0018:ffff88810de573e0 EFLAGS: 00010216
+[   78.669533][  T363] RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+[   78.669790][  T363] RDX: 0000000000000009 RSI: 0000000000000004 RDI: 0000000000000048
+[   78.670044][  T363] RBP: ffff888110dc4000 R08: ffffffffb1b0885a R09: fffffbfff6ba9078
+[   78.670297][  T363] R10: 0000000000000003 R11: ffff888110e31c80 R12: 0000001880000000
+[   78.670560][  T363] R13: ffff888110dc4150 R14: ffff888110dc42b8 R15: 0000000000000200
+[   78.670814][  T363] FS:  00007f66a8f09c40(0000) GS:ffff888163428000(0000) knlGS:0000000000000000
+[   78.671110][  T363] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   78.671324][  T363] CR2: 000055db4c6a30a8 CR3: 000000010da67000 CR4: 0000000000750ef0
+[   78.671585][  T363] PKRU: 55555554
+[   78.671713][  T363] Call Trace:
+[   78.671843][  T363]  <TASK>
+[   78.671936][  T363]  ? __pfx_qfq_dequeue+0x10/0x10 [sch_qfq]
+[   78.672148][  T363]  ? __pfx__printk+0x10/0x10
+[   78.672322][  T363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   78.672496][  T363]  ? lockdep_hardirqs_on_prepare+0xa8/0x1a0
+[   78.672706][  T363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   78.672875][  T363]  ? trace_hardirqs_on+0x19/0x1a0
+[   78.673047][  T363]  red_dequeue+0x65/0x270 [sch_red]
+[   78.673217][  T363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   78.673385][  T363]  tbf_dequeue.cold+0xb0/0x70c [sch_tbf]
+[   78.673566][  T363]  __qdisc_run+0x169/0x1900
+
+The right thing to do in #1b is to grab the skb off gso_skb queue.
+This patchset fixes that issue by changing #1b to use qdisc_dequeue_peeked()
+method instead.
+
+Fixes: 77be155cba4e ("pkt_sched: Add peek emulation for non-work-conserving qdiscs.")
+Reported-by: Manas <ghandatmanas@gmail.com>
+Reported-by: Rakshit Awasthi <rakshitawasthi17@gmail.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20260430152957.194015-2-jhs@mojatatu.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ net/sched/sch_red.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sched/sch_red.c b/net/sched/sch_red.c
+index 3c6b4460cf2c..ea3580d1d19e 100644
+--- a/net/sched/sch_red.c
++++ b/net/sched/sch_red.c
+@@ -153,7 +153,7 @@ static struct sk_buff *red_dequeue(struct Qdisc *sch)
+ 	struct red_sched_data *q = qdisc_priv(sch);
+ 	struct Qdisc *child = q->qdisc;
+ 
+-	skb = child->dequeue(child);
++	skb = qdisc_dequeue_peeked(child);
+ 	if (skb) {
+ 		qdisc_bstats_update(sch, skb);
+ 		qdisc_qstats_backlog_dec(sch, skb);
+-- 
+2.34.1
+
 
