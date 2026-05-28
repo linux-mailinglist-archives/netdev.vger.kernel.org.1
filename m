@@ -1,80 +1,53 @@
-Return-Path: <netdev+bounces-292659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292660-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPaAC4ogGGoAeAgAu9opvQ
-	(envelope-from <netdev+bounces-292659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:01:30 +0200
+	id CN5YJZMiGGocdggAu9opvQ
+	(envelope-from <netdev+bounces-292660-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:10:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D39A25F1003
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:01:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7E35F112C
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 13:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BEF20300AB0B
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:01:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7E1033008D60
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703E03DE423;
-	Thu, 28 May 2026 11:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891E53C09FC;
+	Thu, 28 May 2026 11:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="YdfeNuFt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8kEwjR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8A53DE44C;
-	Thu, 28 May 2026 11:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE433612D8;
+	Thu, 28 May 2026 11:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779966064; cv=none; b=VJ4AmKb5cUAHlXQ4+oystqQvij8ZtIJfUb25s8pA0maTw9MPRQoWqHtJHukGmaxqrN+SbzzAmdwTNONjkPh3T9NO4OaQOF1/Yuu6NmwsmVunybIbbER5G74qddBi3OwKy02MH+3m/IFfJ0FRNFazdtftDMqmDG2YjlRPXx21tGE=
+	t=1779966606; cv=none; b=t1FLEdWEZ3MZcp+ceXHuvAdrNa5INISxUwks67tLfs1dBBrWMQT4NxZx9oUBxBuBl7Vbcxw/0dljAsk/JusyW/LmfgmEIa3NWJxmRQKyOkSfFnnLGU/yD2hjzsMB12ziNSWPMb31VY8ajJ0wfS9+L7lk8ep1MDkJIcPnHWRJ74Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779966064; c=relaxed/simple;
-	bh=jfMP2/YIGECVt7WXBen0qE4CPpSwZJTOgsbfgGPP0xQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e2HSePuADOOHmzB60H0oBUBA99z+SwGhmh3PiN+SOEeCBedgyQewKnzc+LBYkMnv1kQ5IZLv91hH/SQMQRbiT3NQ9vODNqDL1wYmAyqb5toWUKY1/kSIVFMSFv3i/RuvbHt9IHg6lGaQgmq/NrlOfstHX/gkBRrkBYOtoR/Qee8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=YdfeNuFt; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 7e4a18e85a8411f18dc8c9802ae25ab1-20260528
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=nePuq0ucAYgrMYEUliCg9yqtq9YBSdhi22BiKGIV9CY=;
-	b=YdfeNuFtlroyNBydsd3i0GNqOIvr8XFXA5nHTSvHWPe++UAS9GzWWeXD8D68kOjbC3jVOFzipZRqmQfGK96uc8N0gA5Z41FCBBcjw7YVRuSQkFdBHW48LWmSiFxIr9HDWFnCR6udQMWDgUzv97YZ0PTSaLncJzA3939F6zshNTU=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.15,REQID:e36309e9-355d-4426-9efc-8c410aff0c71,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e276073,CLOUDID:9f1c3b01-8ecf-400f-ba4f-4c5e0901de3b,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|123|836|865|888|898,TC:-5,
-	Content:0|15|50,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,C
-	OL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 7e4a18e85a8411f18dc8c9802ae25ab1-20260528
-Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw02.mediatek.com
-	(envelope-from <jianyu.li@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 997163714; Thu, 28 May 2026 19:00:52 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 28 May 2026 19:00:51 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Thu, 28 May 2026 19:00:51 +0800
-From: <jianyu.li@mediatek.com>
-To: <kuniyu@google.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <willemb@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mediatek@lists.infrade>,
-	<black-ch.chen@mediatek.com>, <ivan.tseng@mediatek.com>,
-	<jianyu.li@mediatek.com>
-Subject: [PATCH net v2 2/2] af_unix: Add test for SCM_INQ on partial read
-Date: Thu, 28 May 2026 19:00:33 +0800
-Message-ID: <20260528110033.3327744-3-jianyu.li@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260528110033.3327744-1-jianyu.li@mediatek.com>
-References: <20260528110033.3327744-1-jianyu.li@mediatek.com>
+	s=arc-20240116; t=1779966606; c=relaxed/simple;
+	bh=4DU0LPN6EiPTGjyaeQ7BdEVhgnoVqInntesKuLz/OMw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LgxKrqmI5L+mgislTMy4slfADeZAcnTWz59udS5KgsDCHG/QmB6eKC1kkm2elqhvsE0JVbeKLjrM5OVvnfQjN+Oy5OLxPcd60WPza7JtChMqyj59hN2kfKWRpIpGlTM0JNE6KmvXiFY6xQVgIQBxdwMqZwzM30oHobY7i797mNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8kEwjR9; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09E401F000E9;
+	Thu, 28 May 2026 11:10:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779966605;
+	bh=IzT5A2fkf9wlb9L+8q2V/0+L4doE0luyZKlV8CQO7iM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=L8kEwjR9qpIZjaGyAz56yyu+OKRsqvJhyaApdIv9Q47kgSs+QZ9cjCfU4WR1ydMqZ
+	 uu1wjguGMWOz+JyzjZk5cs5g6TVVGi+1819Ju+A0SdPpO7mOTY9NhofjHYC29AiHsS
+	 QQYtXfm/nCFxTln9SN3r0GkRi9Jo5ghhrRmGXNtoh6zy+ajeBIvL+Oc6RK+DdM9LGd
+	 eKT/jNfLxfGXf24ky2Icy++W1Xr60lQ9bPEXjCbTILgmNgXzFEWSO7visraRiEgWe3
+	 yrLgE9pPC0u5cS/EtRbe8F+xw+naRcEennzKu92p07369zKqUhujyRUTnNYKgq35X7
+	 10uwhH0f+t4vg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0D683811957;
+	Thu, 28 May 2026 11:10:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,135 +55,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
+Subject: Re: [PATCH V3 net 0/2] hibmcge: fix RX packet corruption issue
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177996660939.876481.8290897040840990462.git-patchwork-notify@kernel.org>
+Date: Thu, 28 May 2026 11:10:09 +0000
+References: <20260525144525.94884-1-shaojijie@huawei.com>
+In-Reply-To: <20260525144525.94884-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
+ huangdonghua3@h-partners.com, yangshuaisong@h-partners.com,
+ shiyongbang@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[mediatek.com:+];
+	TAGGED_FROM(0.00)[bounces-292660-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292659-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jianyu.li@mediatek.com,netdev@vger.kernel.org];
 	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mediatek.com:email,mediatek.com:mid,mediatek.com:dkim]
-X-Rspamd-Queue-Id: D39A25F1003
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2F7E35F112C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jianyu Li <jianyu.li@mediatek.com>
+Hello:
 
-Add test to verify that when a skb is partially consumed,
-unix_inq_len() return correct remaining byte count.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Before:
+On Mon, 25 May 2026 22:45:23 +0800 you wrote:
+> This series fixes an RX packet corruption issue observed when SMMU is
+> disabled on the hibmcge driver. The fixes include disabling PCI Relaxed
+> Ordering and correcting the order of DMA barrier operations in the RX
+> data sync path.
+> 
+> ---
+> ChangeLog:
+> v2 -> v3:
+>   - Use pci_save_state () to ensure that Relaxed Ordering is disabled after the reset,
+>     suggested Paolo.
+>   v2: https://lore.kernel.org/all/20260518144253.1568118-2-shaojijie@huawei.com/
+> v1 -> v2:
+>   - Split original single patch into two independent patches,
+>     suggested Jakub
+>   - Remove MODULE_VERSION change, pointed out by Jakub
+>   v1: https://lore.kernel.org/all/20260512123456.3786635-1-shaojijie@huawei.com/
+> 
+> [...]
 
-  #  RUN           scm_inq.stream.partial_read ...
-  # scm_inq.c:165:partial_read:Expected remain (512) == *(int *)CMSG_DATA(cmsg) (768)
-  # partial_read: Test terminated by assertion
-  #          FAIL  scm_inq.stream.partial_read
-  not ok 2 scm_inq.stream.partial_read
+Here is the summary with links:
+  - [V3,net,1/2] net: hibmcge: disable Relaxed Ordering to fix RX packet corruption
+    https://git.kernel.org/netdev/net/c/463a1271aa26
+  - [V3,net,2/2] net: hibmcge: move dma_rmb() after dma_sync_single_for_cpu() in RX path
+    https://git.kernel.org/netdev/net/c/b545b6ea1802
 
-After:
-
-  #  RUN           scm_inq.stream.partial_read ...
-  #            OK  scm_inq.stream.partial_read
-  ok 2 scm_inq.stream.partial_read
-
-Signed-off-by: Jianyu Li <jianyu.li@mediatek.com>
----
-v2: Follow reverse xmas tree ordering in partial_read test case
----
- tools/testing/selftests/net/af_unix/scm_inq.c | 54 ++++++++++++++++++-
- 1 file changed, 52 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/af_unix/scm_inq.c b/tools/testing/selftests/net/af_unix/scm_inq.c
-index 3a86be9bda..49cfa6ef07 100644
---- a/tools/testing/selftests/net/af_unix/scm_inq.c
-+++ b/tools/testing/selftests/net/af_unix/scm_inq.c
-@@ -8,8 +8,9 @@
- 
- #include "kselftest_harness.h"
- 
--#define NR_CHUNKS	100
--#define MSG_LEN		256
-+#define NR_CHUNKS			100
-+#define MSG_LEN				256
-+#define NR_PARTIAL_READS	3
- 
- FIXTURE(scm_inq)
- {
-@@ -120,4 +121,53 @@ TEST_F(scm_inq, basic)
- 	recv_chunks(_metadata, self);
- }
- 
-+TEST_F(scm_inq, partial_read)
-+{
-+	char buf[MSG_LEN * NR_PARTIAL_READS] = {};
-+	char cmsg_buf[CMSG_SPACE(sizeof(int))];
-+	struct msghdr msg = {};
-+	struct iovec iov = {};
-+	struct cmsghdr *cmsg;
-+	int err, inq, ret, i;
-+	int remain;
-+
-+	err = setsockopt(self->fd[1], SOL_SOCKET, SO_INQ, &(int){1}, sizeof(int));
-+	if (variant->type != SOCK_STREAM) {
-+		ASSERT_EQ(-ENOPROTOOPT, -errno);
-+		return;
-+	}
-+	ASSERT_EQ(0, err);
-+
-+	ret = send(self->fd[0], buf, sizeof(buf), 0);
-+	ASSERT_EQ(sizeof(buf), ret);
-+
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = cmsg_buf;
-+	msg.msg_controllen = sizeof(cmsg_buf);
-+
-+	iov.iov_base = buf;
-+	iov.iov_len = MSG_LEN;
-+
-+	for (i = 0; i < NR_PARTIAL_READS; i++) {
-+		remain = MSG_LEN * (NR_PARTIAL_READS - 1 - i);
-+
-+		memset(buf, 0, MSG_LEN);
-+		memset(cmsg_buf, 0, sizeof(cmsg_buf));
-+		ret = recvmsg(self->fd[1], &msg, 0);
-+		ASSERT_EQ(MSG_LEN, ret);
-+
-+		cmsg = CMSG_FIRSTHDR(&msg);
-+		ASSERT_NE(NULL, cmsg);
-+		ASSERT_EQ(CMSG_LEN(sizeof(int)), cmsg->cmsg_len);
-+		ASSERT_EQ(SOL_SOCKET, cmsg->cmsg_level);
-+		ASSERT_EQ(SCM_INQ, cmsg->cmsg_type);
-+		ASSERT_EQ(remain, *(int *)CMSG_DATA(cmsg));
-+
-+		ret = ioctl(self->fd[1], SIOCINQ, &inq);
-+		ASSERT_EQ(0, ret);
-+		ASSERT_EQ(remain, inq);
-+	}
-+}
-+
- TEST_HARNESS_MAIN
+You are awesome, thank you!
 -- 
-2.45.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
