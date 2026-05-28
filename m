@@ -1,351 +1,239 @@
-Return-Path: <netdev+bounces-292577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBmWAEbzF2q5WAgAu9opvQ
-	(envelope-from <netdev+bounces-292577-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:48:22 +0200
+	id eFcqOEz0F2q5WAgAu9opvQ
+	(envelope-from <netdev+bounces-292578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:52:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C245EDEC4
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:48:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8326F5EE032
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 598333026CA3
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:46:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28344317B122
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 07:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B58031195C;
-	Thu, 28 May 2026 07:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB97F35202B;
+	Thu, 28 May 2026 07:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b="R6kE6glJ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wuV2tRdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013062.outbound.protection.outlook.com [40.93.201.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8DF2F7F1B;
-	Thu, 28 May 2026 07:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.149.7.70
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779954366; cv=none; b=dLAXyv0lPlotqcOXtyhlKbPjJDygDT6AYd8sgu1Q1GC7oHylI3LsgvP0K+Y46BivwD84GuA+avTYWvWyEZX38DWVr3tdOYVEjXE/VlxVPk9Lpv9Jl5NCa7MHR0Ot3IxbygrcVPDfy7n+jiE6S5bCnUhpYlQ1UvifuhBqu1TcP5k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779954366; c=relaxed/simple;
-	bh=N5L6aKv4wJWYgCkWMn+fFVo8QHXS7vN4X3b+VYl5r90=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WT8j56Lk4QOtSgVgqloakujGf0jlJR3X6gwOuxicPXFHEBDQB87zm3zS78XO0PU78qmTB0wlwErDdqSKCtunDwCzk5WTAzYn8scCRfGvLPtrfqAGuXvMRWf32ksaNK5DRtDRwGD+8W0XO8oQIQDWrMXixC7IzG5X8BSXwPOjQ7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=R6kE6glJ; arc=none smtp.client-ip=130.149.7.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-berlin.de
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
-  d=tu-berlin.de; s=dkim-tub26; t=1779954364;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ZfyNY1uucZrB283irdiTXLHbacl0PzjBJDzZ20ZxAfk=;
-  b=R6kE6glJNT/MeaOE+E+IeyTZbJ52c7t9BsYu5glXlllUwXANRb6tfPXv
-   LlR225G3x+9Boz9TR8O9El+gx9e1nr+sifhvWsjXxMbzrUTRuanjog3GL
-   6u/IsMFdzLsWU94/UVzqar3My4i0vdrIlfvj5WbeEEWwpFFsdde/jVvLr
-   t07tdeFp4uhVkWaebWzDQnEo0Xmlh+MbLGKYYOz4NvXiuLZfJhrdnPlXs
-   p9yTWrECl32VvMtsPx6tPw/8LPLvrEHGVOYT5lkhbh84e6/AS/27wkxfX
-   6hJQ0yQEOd5nTsWuwR4oAa5tF3SrRiTVHvGRhvILpOlV7/ZDmY+uxDaV0
-   g==;
-X-CSE-ConnectionGUID: MutkEjNRQ1axxcVgohNjBQ==
-X-CSE-MsgGUID: PigEJOYiQAWj7LA1tc1Oog==
-X-IronPort-AV: E=Sophos;i="6.24,173,1774306800"; 
-   d="scan'208";a="47877427"
-Received: from mail.tu-berlin.de ([141.23.12.141])
-  by mailrelay.tu-berlin.de with ESMTP; 28 May 2026 09:46:01 +0200
-Message-ID: <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
-Date: Thu, 28 May 2026 09:46:00 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6F03502A8;
+	Thu, 28 May 2026 07:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779954398; cv=fail; b=jj2eK+OagFg6fN2BmdO5EF8k4ZKEMgTTOoHquTH5j1+/hF7inaJeA4ns4rrrcCbNH0Hmz0bGddar0DvDtpe8MIdmFdy+enc1pVyC6HEDVH+rSfpC2v1W+CDJucSpan/1m/y8pM12AeArDwY825+i4lZTxB9xV/MFF4b2NtWphYc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779954398; c=relaxed/simple;
+	bh=YoCmMSStYE6UgmmHGNBOCAuy1+y6c+u0V7hI0VY2t2M=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=S49I/2YXlvCfjUiyA1dYWNe8cQpCXph2NDEzlmfEGdMpJ4cDHXN+QGbSZreJE8ikKY/oLxAVMVOBIdoYVygnMqvcbXcS7LBx9ECixGLOPgiswqjqKgsuqaKi8W2hhiA5dSjhEPNySCxpSi1SFxAL+plIqgGbeTu4wLV1IAi7HJw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wuV2tRdp; arc=fail smtp.client-ip=40.93.201.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=b4n07kDK1YHSRnthQf7iiOjMPajqbbgd5bIqcHbl+kjY1p2poRFZTVywVBsXThDGkr8JcmcgBCI8iIlOQ4i48YfteMPSFm8lNwARr1f9HmFrB7eagYJLWWRWDs3Yv6t2NpAZF/GiPc9PCeXAM0q8Psjw5DWJIXYtUy6kv/azS4j28QnvPy17Ly9ZLt7efFZb+UrBXsibQTKcJXeNp2SeqDmK5U6yTzWOmoRJ/32Yd4F+NxdNhnjDxQRUxopKKEpG59x+Ns477G7F61q0yzxrFFjQpkha5ZxykzYzmZKqCzVjQ4ZsNeSa8WgVRRt0ztJ7YH1J0YXsGjAw+j0gBUOCiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RNyy9nGJwnTLxOCmqZvcZQYIcHUCzZlZkRYy3B+/3Wk=;
+ b=iFRjOU4m0Zll8gy6wXbXRZTN2yQmjyusN7t4bO4pqFkDbErs4ZuKpCad8dyRmj7q/BqoMUUzK1xA7hRIxKzDNyF/YUIla4tIvKBQFAkzI3DIjWrg1rUcV1Hb0GtzTp3ZviJ1YNMrtrFS0w1M11C1N4KUJcTxeNe5uFRHdcM4ZaKNE7ZpJ+FBLkksPVsF30SXx6K4AjSaelNofOlBb1KChFP6eSgZsYPlKcpbzn7NvWX+QxSM5x9DGkwJvp6FSzsO9BHbmcYhINeuZ2H2TMcHBrbqrnzLGP+j/zf7hMLUpUitc3g/21TtPqWneBBc6T7AkVejBaHd/r4Be15O29j4tA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RNyy9nGJwnTLxOCmqZvcZQYIcHUCzZlZkRYy3B+/3Wk=;
+ b=wuV2tRdpksL32EcNyok321lTxTRWQyJhVb9lhlJzEmWERGTP30bXk6+w4b2kXajMoKPFMmwUNX2u/wHHNNdKemmPkW0RBEaU++SRsdoA6EKD7p7812olUiTLY8phFkKyEQ0IYiPtop9lyZNCnG1+YgjkRBGVS4ycbPjETn9m8bM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by CH2PR12MB9544.namprd12.prod.outlook.com (2603:10b6:610:280::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.13; Thu, 28 May
+ 2026 07:46:34 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0071.011; Thu, 28 May 2026
+ 07:46:34 +0000
+Message-ID: <71302a7a-6b9f-40da-af81-b1862dbd637a@amd.com>
+Date: Thu, 28 May 2026 09:46:29 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/4] vfio/dma-buf: add TPH support for peer-to-peer
+ access
+To: Zhiping Zhang <zhipingz@meta.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Alex Williamson <alex@shazbot.org>,
+ Leon Romanovsky <leon@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Bjorn Helgaas <helgaas@kernel.org>, kvm@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+ Yishai Hadas <yishaih@nvidia.com>
+References: <20260526144401.1485788-1-zhipingz@meta.com>
+ <a8cd01ab-d7aa-465d-bfa3-431f78f33ee1@amd.com>
+ <20260527121438.GJ2487554@ziepe.ca>
+ <ff247643-73e7-44e2-b3d5-8ac0a8efb871@amd.com>
+ <20260527123634.GK2487554@ziepe.ca>
+ <a5ff1930-e9fb-43f5-82ab-9875d7a28421@amd.com>
+ <CAH3zFs2KALuHXReLZG_uoqvBBWvBzU6rHKakmt6HBV7PZEsD=w@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <CAH3zFs2KALuHXReLZG_uoqvBBWvBzU6rHKakmt6HBV7PZEsD=w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR2P281CA0121.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9d::12) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: <hawk@kernel.org>, <netdev@vger.kernel.org>
-CC: Simon Schippers <simon.schippers@tu-dortmund.de>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Stanislav
- Fomichev <sdf@fomichev.me>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-6-hawk@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
-In-Reply-To: <20260527135418.1166665-6-hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|CH2PR12MB9544:EE_
+X-MS-Office365-Filtering-Correlation-Id: 276a91b0-997a-4abb-c353-08debc8d3d6e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|18002099003|6133799003|22082099003|56012099006|5023799004|11063799006|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	Q9FXqnjI9/mCngo2YBuDkS95MHKegrllR0FOJ7y5AaBlhz0gEsalBBfK8I9Dq1ZpEB6+iwYeOFp8aEilvT9MLI2+7YGwrkk66hW+a200Cfg8YZCWkHPkE+4WqWI0MJ9dmneBnI4wEMdE47ZRVPraMQXMYtRZOOxsLch+PN3vrWsIhpNXlFV+2GAzncekMe+xdkopu0iDRrmQgn+tWeZyWmSpxU4CGJzsDCx8D2LhzcxE2RtsNi3GkrVa/VSLV4tZgkhd4BpKHMPEYs+XsbFLI5hHrC2d6QrwMtrbrQV8si/cqks5D5SqDbWZkYqpwjMcWYhfhr0aFvLEx3tQwuxit9AIg4jtOfkKKx+zhl1fP1WSJj/QeOhYWQnN+c/AeS5Tvq9lfxMMDbjEr41ZXskhORrv2Nk0r2u4ONxXpJDMirU3j14p85zkMZOXWwuA63/2m1kI0PSgHaGSb8Chizey5i8FYtq0daeYOisobtecIYoYBlMbbnEKD9l3kIkK+5TdwD3v/4PxUquqOBWv0gV+BYWtiFFaxGzdJACJB00KWqewg/ghmQD1KI87kk1sW8lL38qIDeRmzycogD+XEIabQEa/mJJYPF6mmJ0GDaxfJqJSntpw3ReTBYqC6xErZJWxzCH1+Qh9T/YV+lisrTYfuIJpkXiRt+I00AR/NrdUtQRJHbA48gXSpoaAAOz8fSUy
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(18002099003)(6133799003)(22082099003)(56012099006)(5023799004)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NVZpZ01VQXFyWE1HbWxCcFRTMXYzTkFvNG5HOEhNT1k1b21iWnBYekRva2xP?=
+ =?utf-8?B?cGY1MlozUUVSN1RnME53RzdZdmFrSnNrblZUaTVTVHozVlFUZ21rUkFqZERp?=
+ =?utf-8?B?TW52VVhoYTNLNjBYNXdEMzFWMytraWpjY0xOd2tqb2pyQndjeGh6T1ZCb0po?=
+ =?utf-8?B?V1dqN2hrb1JoWWtydGJZUS9RQUxFeFEwU25OUytQVThZK0p0RVArL1RZUHdQ?=
+ =?utf-8?B?azQzdnYwd0Z2MEM1WGtSWll6SExnWW94SWFuRzZZVDZIRk9WNUdrU2h2M1Er?=
+ =?utf-8?B?eUhXMFFQSUJVU0xUS0xIOXFlVVVsbmJESG1yZXBpalB1ZzNoR1BxTnlUYjcy?=
+ =?utf-8?B?czZNTC9YajJwUjFsSWd1cWFjQVpMNk1sOVdkbHpkN3lEUGZ3U001ZlR6ZWN1?=
+ =?utf-8?B?TlBpT2NzRkdvRzBtUnlUWDNUR1lITWpqRE9VV2Y2bXIxTHJmMW5xcmk1Ynpq?=
+ =?utf-8?B?dTVRZ0d2SXJVWk1kRG5hUk5rV09sK3dxZWhTMzJRNDIrbUw1RTNOcS80a2Fu?=
+ =?utf-8?B?UFFNczdVSzUyb1F0T0crcVNKd3NvVlU4NnNLN0lsK0dUSVZxOVlMMTIrWjV0?=
+ =?utf-8?B?NzJjU1B1dk90dlEvQktEN1A4Yzh5bVZRcTRRUC9KbmZhYWFLUjJOTlFSUE16?=
+ =?utf-8?B?eU5VZDJKKzJqUWE3bG13czVjRHlvaUZOS05hb0pUUGh2clhmT3hPSzNUSFI4?=
+ =?utf-8?B?K21UVEhlUVE5Tk9oeXAvMDdhV24rQmpneDc4R1FKVXZ6Wi9QT0lLZFcvT0FX?=
+ =?utf-8?B?ZVQyTXRmNU1rZEh2R0ZXUUV5T1RXWDJhVlBScHRjWnFwcGhrNXBMd3NGN1JW?=
+ =?utf-8?B?dFdJNTdJSXBZZ05GbEFqWFVpQUZncjA3dWRQekNXRThSY2txV01ocHlmYkk1?=
+ =?utf-8?B?cEhOQ0JONEVHMlVYbWRyRzYyRk1LSVdyWVJmT0wzYjJOZjFMZXE1Zm9jdi9T?=
+ =?utf-8?B?c05Da1lidEY2ZkVvZ2luTFVmVjVBeEFrRVU3bklMVjJJTGpCNVdxMVU2T0hB?=
+ =?utf-8?B?YmhmNWxSYTd3SkhZTmdWNncyYUU5WmdrK1dMYTFybUhIZDdrQ3RSbXUxU2pQ?=
+ =?utf-8?B?M2Y0RjJwandFeWszQXBCRkphc1h4RlRPZFZINTlLek1NUnFieGpldzNxMnpv?=
+ =?utf-8?B?MEEyWEpDenNZWHROZE5oU3dIRXRKU3hSREs5T2dlUVpnb05SaXVhcWVPblV3?=
+ =?utf-8?B?eHVBaG9HclZ4TDAzVkNldlNqYnZndkpGWjhxQkRqMGNuVTVGRVljUEVFQ1JC?=
+ =?utf-8?B?d1J3ek5nUE1VYm4yN3JEMGxiWkdMakpreXI2UmNINDd1UDdqSzJXNWRzM0sy?=
+ =?utf-8?B?ck5jSzdXdFBUdDV2Tk01T3hlYXErd1lZN09VRFd3akkvVXlBSklnQ2ZDK3Zy?=
+ =?utf-8?B?bThXYWE2WkdmelFVLzB1SFlMTnU2V1V5WTgxUnlYWXVKcEt0WGd6MlY5T2VK?=
+ =?utf-8?B?T2dPSUpnUlRZM0F5NDQ0V0ZhSUhJVCtUWGpkUDJxZkhncDVCVnFxbjhnNmtQ?=
+ =?utf-8?B?ZXAwUDlVZmpUaW95cXE5a0ZOUDY3U0NwdnFSeUFNVzFqcDk0UXVtZUVweXli?=
+ =?utf-8?B?bkJQUGwrQVJKYWt5YW92V1l0OXkzS25Bb2N1WEZocUY0V0hkUWgyaFdYYlI2?=
+ =?utf-8?B?M1lJMnFLdWI4RFZxcTJLcnJtcXA1SFpaRUdMSzNmeXdiZUZVUnBqWlZDWExL?=
+ =?utf-8?B?cml0TVh0bzNSbHBzQjd2VnoyQmNsUm1iNEIzbUFwdTFMWm9jS0oxTVpwZ2F4?=
+ =?utf-8?B?MWRhR2E0RkVPZFFlS1FSaW9yNDBRRStGMzU2Q2hyK0ZWS0x4N3VjZVlsbHNY?=
+ =?utf-8?B?WFRQWXczUGRuVVVhUmlTR214S2JsR3FZVExvRWQxTUVRdlowYTZRUHpHTVgz?=
+ =?utf-8?B?QlRnMlFQNDA5S1JjN3RGM1NHeUx6aWMzVGp5OUROVU81V0hub1ZhajVMdTQv?=
+ =?utf-8?B?dTJVZGJGNzRlSnhCb2EvenJRaFpjOFRtdjJnditJZTZ0UnQvcHRmcXZjVC9t?=
+ =?utf-8?B?YzdicEhtODUzVlVNT2pFUGluaVpGZlRHSDBRUlhxZStzVlhyTFZkSjNZY0Z4?=
+ =?utf-8?B?TmN1MVo2QWdzOW9OT1Joc0RBNytoQ1JiSHdaL3BENUt3czZ5em0zZDhoTGZ5?=
+ =?utf-8?B?VW1IeFRTbklqRmFuWEpTUkJ2UTdkZnZpcUdmVEY3b2hxdjlQSDFOK1JUYlhZ?=
+ =?utf-8?B?ZDk3UmlwWVEvN1piVGdHUEtiOVBkUkZjSStoaU1zdllDNktQL2kxaTdESS9k?=
+ =?utf-8?B?Nm5aQ0VoM05Ham8reVZjTkFvYjdDQjZOd0dQTWVERmN3d1o0d3pRSWhYNkk5?=
+ =?utf-8?Q?gNMNA5RwOyl/ClfGur?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 276a91b0-997a-4abb-c353-08debc8d3d6e
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2026 07:46:34.1616
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HULpsEeKgpt0luu7NFNfSXr8giO94Cs0zpLnPNYLilINSgRhSBCsJ6EFC/B7E7XL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9544
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-292578-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292577-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[tu-dortmund.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-berlin.de:+];
+	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tu-berlin.de:email,tu-berlin.de:mid,tu-berlin.de:dkim,tu-dortmund.de:email]
-X-Rspamd-Queue-Id: 76C245EDEC4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:mid,amd.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 8326F5EE032
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/27/26 3:54 PM, hawk@kernel.org wrote:
-> From: Simon Schippers <simon.schippers@tu-dortmund.de>
->
-> Per-packet BQL completion forces DQL to converge on limit=2, causing
-> excessive NAPI scheduling overhead and qdisc requeues.
->
-> Accumulate BQL completions and flush them when a configurable time
-> threshold is exceeded, letting DQL discover a limit that bounds actual
-> queuing delay to the configured interval. Coalescing state persists
-> across NAPI polls in struct veth_rq so completions can accumulate
-> beyond a single budget=64 cycle.
->
-> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
-> setting tx-usecs to 0 disables coalescing and falls back to per-packet
-> completion.
->
->    ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->    ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->
-> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+On 5/28/26 06:55, Zhiping Zhang wrote:
+> On Wed, May 27, 2026 at 5:53 AM Christian König
+> <christian.koenig@amd.com> wrote:
+>>
+>>>
+>> On 5/27/26 14:36, Jason Gunthorpe wrote:
+>>> On Wed, May 27, 2026 at 02:23:46PM +0200, Christian König wrote:
+>>>
+>>>> Yeah that's a good point, I should probably rephrase the question.
+>>>>
+>>>> I'm aware of how TPH works by adding the extra ST to the TLP.
+>>>>
+>>>> But my question is how is that useful to a PCIe endpoint? What is the effect of the ST here?
+>>>
+>>> TBH I've never heard Meta explain what their device is doing with
+>>> it. At least it seems to be super important to their device..
+>>
+>> Yeah I think at least a brief description of what is going on here would be necessary for the review.
+>>
+>> Otherwise we have only the info that the exporter wants to give an opaque ST for the importer to use and no technical description what that is good for, how to test it etc...
+>>
+>> Regards,
+>> Christian.
+>>
+>>>
+>>> Jason
+>>
+> 
+> Fair point — I'll add a couple of paragraphs to the v6 cover letter and the
+> patch's changelog as well.
+> 
+> The short version: in this series the vfio-pci device is the completer
+> of the P2P
+> writes and mlx5 is the requester. As Jason noted, ST semantics on the completer
+> are implementation-defined, so only the driver that owns the completer (here,
+> vfio-pci on behalf of its userspace owner) can hand out a meaningful ST; the
+> importer treats it as opaque and just places it on the TLP.
 
-Tested-by: Jonas Köppeler<j.koeppeler@tu-berlin.de>
+Yeah but that is not really sufficient to justify a driver 2 driver interface.
 
-> ---
->   drivers/net/veth.c | 100 ++++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 98 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index d5675d9d5236..743d17b37223 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -28,6 +28,7 @@
->   #include <linux/bpf_trace.h>
->   #include <linux/net_tstamp.h>
->   #include <linux/skbuff_ref.h>
-> +#include <linux/sched/clock.h>
->   #include <net/page_pool/helpers.h>
->   
->   #define DRV_NAME	"veth"
-> @@ -44,6 +45,8 @@
->   #define VETH_XDP_TX_BULK_SIZE	16
->   #define VETH_XDP_BATCH		16
->   
-> +#define VETH_BQL_COAL_TX_USECS	100 /* default tx-usecs for BQL batching */
-> +
->   struct veth_stats {
->   	u64	rx_drops;
->   	/* xdp */
-> @@ -62,6 +65,11 @@ struct veth_rq_stats {
->   	struct u64_stats_sync	syncp;
->   };
->   
-> +struct veth_bql_state {
-> +	u64	time;	/* sched_clock() when current coalescing window started */
-> +	int	n_bql;	/* BQL completions batched in the current window */
-> +};
-> +
->   struct veth_rq {
->   	struct napi_struct	xdp_napi;
->   	struct napi_struct __rcu *napi; /* points to xdp_napi when the latter is initialized */
-> @@ -69,6 +77,7 @@ struct veth_rq {
->   	struct bpf_prog __rcu	*xdp_prog;
->   	struct xdp_mem_info	xdp_mem;
->   	struct veth_rq_stats	stats;
-> +	struct veth_bql_state	bql_state;
->   	bool			rx_notify_masked;
->   	struct ptr_ring		xdp_ring;
->   	struct xdp_rxq_info	xdp_rxq;
-> @@ -81,6 +90,7 @@ struct veth_priv {
->   	struct bpf_prog		*_xdp_prog;
->   	struct veth_rq		*rq;
->   	unsigned int		requested_headroom;
-> +	unsigned int		tx_coal_usecs;	/* BQL completion coalescing */
->   };
->   
->   struct veth_xdp_tx_bq {
-> @@ -265,7 +275,30 @@ static void veth_get_channels(struct net_device *dev,
->   static int veth_set_channels(struct net_device *dev,
->   			     struct ethtool_channels *ch);
->   
-> +static int veth_get_coalesce(struct net_device *dev,
-> +			     struct ethtool_coalesce *ec,
-> +			     struct kernel_ethtool_coalesce *kernel_coal,
-> +			     struct netlink_ext_ack *extack)
-> +{
-> +	struct veth_priv *priv = netdev_priv(dev);
-> +
-> +	ec->tx_coalesce_usecs = priv->tx_coal_usecs;
-> +	return 0;
-> +}
-> +
-> +static int veth_set_coalesce(struct net_device *dev,
-> +			     struct ethtool_coalesce *ec,
-> +			     struct kernel_ethtool_coalesce *kernel_coal,
-> +			     struct netlink_ext_ack *extack)
-> +{
-> +	struct veth_priv *priv = netdev_priv(dev);
-> +
-> +	priv->tx_coal_usecs = ec->tx_coalesce_usecs;
-> +	return 0;
-> +}
-> +
->   static const struct ethtool_ops veth_ethtool_ops = {
-> +	.supported_coalesce_params = ETHTOOL_COALESCE_TX_USECS,
->   	.get_drvinfo		= veth_get_drvinfo,
->   	.get_link		= ethtool_op_get_link,
->   	.get_strings		= veth_get_strings,
-> @@ -275,6 +308,8 @@ static const struct ethtool_ops veth_ethtool_ops = {
->   	.get_ts_info		= ethtool_op_get_ts_info,
->   	.get_channels		= veth_get_channels,
->   	.set_channels		= veth_set_channels,
-> +	.get_coalesce		= veth_get_coalesce,
-> +	.set_coalesce		= veth_set_coalesce,
->   };
->   
->   /* general routines */
-> @@ -937,13 +972,45 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
->   	return NULL;
->   }
->   
-> +static void veth_bql_complete(struct veth_bql_state *state,
-> +			      struct netdev_queue *peer_txq)
-> +{
-> +	netdev_tx_completed_queue(peer_txq, state->n_bql,
-> +				  state->n_bql * VETH_BQL_UNIT);
-> +	state->n_bql = 0;
-> +	state->time = sched_clock();
-> +}
-> +
-> +static void veth_bql_maybe_complete(struct veth_bql_state *state,
-> +				    struct netdev_queue *peer_txq,
-> +				    u64 coalescing_ns)
-> +{
-> +	if (state->n_bql && sched_clock() >= state->time + coalescing_ns)
-> +		veth_bql_complete(state, peer_txq);
-> +}
-> +
->   static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->   			struct veth_xdp_tx_bq *bq,
->   			struct veth_stats *stats,
->   			struct netdev_queue *peer_txq)
->   {
-> +	struct veth_bql_state *state = &rq->bql_state;
->   	int i, done = 0, n_xdpf = 0;
->   	void *xdpf[VETH_XDP_BATCH];
-> +	struct veth_priv *priv;
-> +	u64 bql_flush_ns;
-> +
-> +	priv = netdev_priv(rq->dev);
-> +	bql_flush_ns = (u64)priv->tx_coal_usecs * 1000;
-> +
-> +	/* Clamp stored timestamp in case we migrated to a CPU with a behind
-> +	 * sched_clock(); prevents the deadline from never firing.
-> +	 */
-> +	state->time = min(state->time, sched_clock());
-> +
-> +	/* Flush completions that timed out since the previous NAPI poll. */
-> +	if (peer_txq && bql_flush_ns)
-> +		veth_bql_maybe_complete(state, peer_txq, bql_flush_ns);
->   
->   	for (i = 0; i < budget; i++) {
->   		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
-> @@ -972,8 +1039,16 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->   			struct sk_buff *skb = veth_ptr_to_skb(ptr);
->   
->   			stats->xdp_bytes += skb->len;
-> -			if (peer_txq && bql_charged)
-> -				netdev_tx_completed_queue(peer_txq, 1, VETH_BQL_UNIT);
-> +			if (peer_txq && bql_charged) {
-> +				if (!bql_flush_ns) {
-> +					netdev_tx_completed_queue(peer_txq, 1,
-> +								  VETH_BQL_UNIT);
-> +				} else {
-> +					state->n_bql++;
-> +					veth_bql_maybe_complete(state, peer_txq,
-> +								bql_flush_ns);
-> +				}
-> +			}
->   
->   			skb = veth_xdp_rcv_skb(rq, skb, bq, stats);
->   			if (skb) {
-> @@ -989,6 +1064,18 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->   	if (n_xdpf)
->   		veth_xdp_rcv_bulk_skb(rq, xdpf, n_xdpf, bq, stats);
->   
-> +	/* If the ring is now empty and the peer TX queue is stalled by DQL
-> +	 * backpressure, release completions immediately to unblock it.
-> +	 */
-> +	if (peer_txq && state->n_bql && __ptr_ring_empty(&rq->xdp_ring)) {
-> +		/* Pairs with smp_wmb() in __ptr_ring_produce(); ensure ring
-> +		 * emptiness is observed before reading peer_txq->state.
-> +		 */
-> +		smp_rmb();
-> +		if (test_bit(__QUEUE_STATE_STACK_XOFF, &peer_txq->state))
-> +			veth_bql_complete(state, peer_txq);
-> +	}
-> +
->   	u64_stats_update_begin(&rq->stats.syncp);
->   	rq->stats.vs.xdp_redirect += stats->xdp_redirect;
->   	rq->stats.vs.xdp_bytes += stats->xdp_bytes;
-> @@ -1093,6 +1180,9 @@ static int __veth_napi_enable_range(struct net_device *dev, int start, int end)
->   
->   		napi_enable(&rq->xdp_napi);
->   		rcu_assign_pointer(priv->rq[i].napi, &priv->rq[i].xdp_napi);
-> +
-> +		rq->bql_state.time = sched_clock();
-> +		rq->bql_state.n_bql = 0;
->   	}
->   
->   	return 0;
-> @@ -1134,6 +1224,8 @@ static void veth_napi_del_range(struct net_device *dev, int start, int end)
->   		struct veth_rq *rq = &priv->rq[i];
->   
->   		rq->rx_notify_masked = false;
-> +		rq->bql_state.n_bql = 0;
-> +		rq->bql_state.time = 0;
->   		ptr_ring_cleanup(&rq->xdp_ring, veth_ptr_free);
->   	}
->   
-> @@ -1813,6 +1905,8 @@ static const struct xdp_metadata_ops veth_xdp_metadata_ops = {
->   
->   static void veth_setup(struct net_device *dev)
->   {
-> +	struct veth_priv *priv = netdev_priv(dev);
-> +
->   	ether_setup(dev);
->   
->   	dev->priv_flags &= ~IFF_TX_SKB_SHARING;
-> @@ -1838,6 +1932,8 @@ static void veth_setup(struct net_device *dev)
->   	dev->max_mtu = ETH_MAX_MTU;
->   	dev->watchdog_timeo = msecs_to_jiffies(16000);
->   
-> +	priv->tx_coal_usecs = VETH_BQL_COAL_TX_USECS;
-> +
->   	dev->hw_features = VETH_FEATURES;
->   	dev->hw_enc_features = VETH_FEATURES;
->   	dev->mpls_features = NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE;
+Which PF driver is backing the vfio-pci and what effect does sending TLPs with ST to it compared to TLPs without an ST?
+
+Regards,
+Christian.
+
+> Validation occurs at two levels: PCIe analyzer captures on P2P TLPs, and the
+>  end-to-end P2P workload yields only expected results.
+> 
+> Thanks,
+> Zhiping
+
 
