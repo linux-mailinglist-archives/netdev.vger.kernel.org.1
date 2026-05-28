@@ -1,137 +1,200 @@
-Return-Path: <netdev+bounces-292638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBrAImYQGGrmbQgAu9opvQ
-	(envelope-from <netdev+bounces-292638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:52:38 +0200
+	id +LStCYUQGGrmbQgAu9opvQ
+	(envelope-from <netdev+bounces-292639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:53:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3776F5EFF81
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:52:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC9625EFF9E
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 11:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7DA6B306A765
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:50:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9B72C30801C2
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 09:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168723B583E;
-	Thu, 28 May 2026 09:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7BF3B2FEB;
+	Thu, 28 May 2026 09:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="2XlRQg5W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1sVsqbv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DkdPAyRh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us.padl.com (us.padl.com [216.154.215.154])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4703B2FF6;
-	Thu, 28 May 2026 09:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6756A3B2FC9
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779961824; cv=none; b=nC2rWfRnOcTXnCAyo+caNCsurxpPz87kJvP9zYSzez3cv9gNEV/QVQD09o4ZD5hz00Z4ED2F7yK218Pcs7U4vuA7rxIxa5Jr0jwXutGIrfucc/90EMolUovXqRAz7iABCr4N0Vq175ZIUXvYB/T46FoPd8tQyV8j95MArPSklcA=
+	t=1779961828; cv=none; b=MtAVjXer3o/DmBIalqpunF+viwdzfvjCiiW+wINTrqPIlbT+RXPJh7nZ2OaiCYSrKbqtIyKTA6clZn9gE54ixvAP8zzNPFduarwo3bapN7Hvm5o7l5xyMVD6mIHFgOOM0nLANmianntn84qj8BoW0TGP4pnibfc7bTqaKyVp71s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779961824; c=relaxed/simple;
-	bh=q/yFETOVxE5lPK77YT6DGCEtEdwwDVTyGeprqe8CyXc=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=neyIabqnIQkf9/WYJ/8JLQaTosct0jDebm3YGs4wXIRt/tK+QJ8zHBYu8I9X9k2hH1J7l6MMMlu6ZyIJ/S8ziOQKrso2ccfn4u7wzbhLy5jn2qSlyzSOQJxF2JxeiLt0ALc8AG6HFsZiO1prn0b6DKIgTWmf+Rs/lnPvO9g6cr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=2XlRQg5W; arc=none smtp.client-ip=216.154.215.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
-Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 64S9nub9018745
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 28 May 2026 10:49:58 +0100
-DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 64S9nub9018745
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1779961802; bh=q/yFETOVxE5lPK77YT6DGCEtEdwwDVTyGeprqe8CyXc=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=2XlRQg5WONXBHiNAzSPWkFSyLQ82I9BfQ5VW2Ezp2j4rpUpfvfFPMGtwkvm+NAuiD
-	 Jo9jHsUkzkEBa/zyWfXiqoQRY2LgTOiVEMPaooOYnMAYfrwsubf7q0LAfRq1yXbDhz
-	 UqRY5lBNEGpNNWzHsPehLk0W+29tzPvaFg/b7lYvcQaA/GCYbjG4ZsP7w/xWZTXyzT
-	 kHf8HeBaY6KaRWVtckKOnPdQg5OIL62OW8QCrHhhyxPuWyVMzUmDTsC0X9iTN3OLIf
-	 zrnpu7PsWBAiIqyLqiut5C62aT+pUq4WRSg2qUqV45xdhsMSrtu+I2X7zLHIRZnddX
-	 Oqsqmj2SDjPDQ==
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1779961828; c=relaxed/simple;
+	bh=bdsXWGJhUs6JDDm8gke69s5CG3isXTKgYUZ3zq3EULE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I0DcUsuZD5L/JInGPP60A7BrhFlELRnRjZcldnBQyXnO8D5843kFA5L3x2dW4tmkF7g5+3kE3W+3jx4oelbEq52+Q49/KCqdWozxXwJdwwzHzxfdE+Kd1gYkHhhQXiL0eJDjtmltCNW+DvJuGkWZO2h3pM97SyGG0EtHQY/9Gjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g1sVsqbv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DkdPAyRh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779961826;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tdVzHsDJy0935yJCy8z3AeQh4RKD4uBZVeTQ9sKVsGs=;
+	b=g1sVsqbvcsabRvcqZcr8EpEcjy0uoBQXp5SzQfxnVamNVZwb4/UlHg4qQohXuUq/uasqPT
+	tR3r4in2G3YXf6pk3UFTHpxUW9iUuY1d/EwhqTCu2HB+K3kJUnn2zulMgr4OA62CvLqtxe
+	kw/gvAS/PyqF1bGesOgc0Ob60iudMKw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-137-ZdmJO9lOMYaIKfaSlD0xSA-1; Thu, 28 May 2026 05:50:24 -0400
+X-MC-Unique: ZdmJO9lOMYaIKfaSlD0xSA-1
+X-Mimecast-MFC-AGG-ID: ZdmJO9lOMYaIKfaSlD0xSA_1779961823
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48fde68e420so97458175e9.0
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 02:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779961823; x=1780566623; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tdVzHsDJy0935yJCy8z3AeQh4RKD4uBZVeTQ9sKVsGs=;
+        b=DkdPAyRhzui+arwO2YF1VUiBQ1/vU/P2O/G157BGzS7LAk2Eyf10TJbyZEKyn4FLNQ
+         ymqgkJnAthRfulpDOAgbLAbiOdkdyHFOgMX3IeUVY/1ObGW3NkHOO+ni8xOy3hS3cOh6
+         Ts3dbfpsq9GS1sofnU4SKeVSKNKILIqujDmOfZdK1z6ZKVunIT4xIuewJXaNN7W3xSyz
+         z4204DdXwu3LYU2czDUMKgEJLo+RNxj4TFrlBm/8lK5KJW88vvyPZ2A6zcyyncvFhRzg
+         5ai47kOJmc/WqHGD9b2fhfszwi4f50pWZ7F+GkBbyq3hYkBGr2sysAg9rWbFJ6FCg8z+
+         KY7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779961823; x=1780566623;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tdVzHsDJy0935yJCy8z3AeQh4RKD4uBZVeTQ9sKVsGs=;
+        b=K2ab8McCgWF3Kj/zMFDXOOqHZIIcYE4qnF8ME3dQrXdFhAfVKX32VDxjVjCakrqeJD
+         qWX/kjblWgIa+6CyhueCkhCEPunOwW3H6Uj+LOhQ8JKbUKRFiqWGoZsXkmMLmjOhoOww
+         27rXUatK2mNd0JCKyXjrmYDRNUBSM5I6PiByNZmoCrRqK99Ij+TzBqv8OETGwp54XaQo
+         oYj8TC5oqDjxoVjW9dkGJNVPi3vGUtQWbrvSpmGALMZ5+6g14VQ9kdoAHNXb3hBxKRGR
+         LnzCRTg7fi+vKWV4Lj+6VH+/sQjAsz1dMNWQKYCreKbo+grRZm8jwAIEt8Vyvlcer/hA
+         GlIQ==
+X-Gm-Message-State: AOJu0Yy5/SAP9hdtrczePV7POW5MDqLFLJQTkWh0/GZNfccBt3q8LjP7
+	vwYkgZG0CoMSMwislbVXfI1ukqO64Ki0dk9+0Eaz+XNKpwwXWQXah3FJ4015csivyQhf9pLJ/ZK
+	KpArBBqbFWRdx7Vnmm6YSza3O5kZQz9Dg7NuhZ0jVkMJnQ1+O2jRVAQdqKQ==
+X-Gm-Gg: Acq92OG9hTy1IoxrSYbgngXG4mU9yF8OW5ZdG/W0TEYaE2VC1fpBJCDk79qKxOfwm6s
+	aqtoOXJ1EsyzjShmeuKfrg8XQ/tCg68RK5kXm4P4GccW0FPh3qL7/+IGazFYtzdd6yvWqzjzWMi
+	IwNcNY2s9YdqYd6Mq3wV6vfSNi03V2D9Ia0kDn03gpBPwJUSNVk1xaJrZVmC7q4hIVd19Vqek72
+	ud80BNifOqvik/gvP5ypkEkhPVNvgIehcKdHOLaCJujClQanEkId3jy+xFRRl5Q23eqY+yZQi/C
+	15UbzzL/XjuhW3pdOz0tyz6GFisxDgaKXdh1voX6MiiZ9C9MZmEYlHfmT5THbcQRm8uz2QpG6yX
+	Kf9r0aMaWjm0Yd2MQKzWJ+ovws7qM49E4gMD5dTSxHOwI7tlrt7VDFGLEVemBOr1LkQ==
+X-Received: by 2002:a05:600c:154d:b0:490:44eb:c1e4 with SMTP id 5b1f17b1804b1-49044ebc273mr405897415e9.26.1779961823128;
+        Thu, 28 May 2026 02:50:23 -0700 (PDT)
+X-Received: by 2002:a05:600c:154d:b0:490:44eb:c1e4 with SMTP id 5b1f17b1804b1-49044ebc273mr405896895e9.26.1779961822657;
+        Thu, 28 May 2026 02:50:22 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.12])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ee2a12a69sm5701309f8f.16.2026.05.28.02.50.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 May 2026 02:50:22 -0700 (PDT)
+Message-ID: <73a2e2d5-cc4b-495e-a7b5-36af411c218d@redhat.com>
+Date: Thu, 28 May 2026 11:50:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Re: [PATCH net-next 2/2] net: dsa: mv88e6xxx: add support for credit
- based shaper
-From: Luke Howard <lukeh@padl.com>
-In-Reply-To: <CABvLYuBZ=U96gVpYqHnnhwBZxp8OZzH-W503MsbNd4JPqLbEpQ@mail.gmail.com>
-Date: Thu, 28 May 2026 19:49:45 +1000
-Cc: cedric.jehasse@luminex.be, Andrew Lunn <andrew@lunn.ch>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4D8553DC-DD24-474C-AAD4-46B1ED80669A@padl.com>
-References: <20260522-net-next-mv88e6xxx-cbs-v1-0-c87a8e6bcc0c@luminex.be>
- <20260522-net-next-mv88e6xxx-cbs-v1-2-c87a8e6bcc0c@luminex.be>
- <0FB1CAF0-D30C-4A24-A684-1D1DBEE52FA5@padl.com>
- <CABvLYuBZ=U96gVpYqHnnhwBZxp8OZzH-W503MsbNd4JPqLbEpQ@mail.gmail.com>
-To: Cedric Jehasse <cedric.jehasse@gmail.com>
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/3] wangxun: improve service task
+ synchronization
+To: Jiawen Wu <jiawenwu@trustnetic.com>, 'Simon Horman' <horms@kernel.org>
+Cc: netdev@vger.kernel.org, 'Mengyuan Lou' <mengyuanlou@net-swift.com>,
+ 'Andrew Lunn' <andrew+netdev@lunn.ch>,
+ "'David S. Miller'" <davem@davemloft.net>,
+ 'Eric Dumazet' <edumazet@google.com>, 'Jakub Kicinski' <kuba@kernel.org>,
+ 'Kees Cook' <kees@kernel.org>, 'Larysa Zaremba' <larysa.zaremba@intel.com>,
+ 'Jacob Keller' <jacob.e.keller@intel.com>
+References: <20260525100543.27140-1-jiawenwu@trustnetic.com>
+ <20260527143114.GM2256768@horms.kernel.org>
+ <065b01dcee49$ab3f2de0$01bd89a0$@trustnetic.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <065b01dcee49$ab3f2de0$01bd89a0$@trustnetic.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
-	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292638-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292639-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[padl.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,padl.com:mid,padl.com:dkim]
-X-Rspamd-Queue-Id: 3776F5EFF81
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sashiko.dev:url,linux.dev:url]
+X-Rspamd-Queue-Id: BC9625EFF9E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On 5/28/26 4:28 AM, Jiawen Wu wrote:
+> On Wed, May 27, 2026 10:31 PM, Simon Horman wrote:
+>> On Mon, May 25, 2026 at 06:05:40PM +0800, Jiawen Wu wrote:
+>>> This series improves synchronization between asynchronous service work,
+>>> device teardown, and module event handling in the Wangxun drivers.
+>>>
+>>> ---
+>>> v2:
+>>> - Check WX_STATE_DOWN before setting WX_STATE_SERVICE_SCHED.
+>>>
+>>> v1: https://lore.kernel.org/all/20260519080048.7448-1-jiawenwu@trustnetic.com
+>>
+>> Hi Jiawen,
+>>
+>> There are AI-generated reviews of this patch-set available at
+>> https://netdev-ai.bots.linux.dev/ and https://sashiko.dev/
+>>
+>> I would appreciate it if you could look over them and address any
+>> issues that are either introduced by this patch-set, or directly
+>> impact it.
+>>
+>> I would not suggest expanding this patchset to address any other
+>> pre-existing issues, but rather address them separately as appropriate.
+> 
+> Hi,
+> 
+> Looked over AI-generated reviews, there are some issues need to be clarified.
+> 
+> Sashiko-nipa exposes an existing issue in the wxvf resume flow.  The VF PM
+> resume path currently calls wx_init_interrupt_scheme() followed by
+> netif_device_attach(), but does not reopen the device when the interface
+> was running before suspend. I plan to address this separately by fixing the
+> wxvf resume flow.
+> 
+> Sashiko-gemini exposes some issues but none of them were introduced by
+> this patch set. And one issue I've clarified in the previous version.
 
-> I think some of these were the result of running the kernel review
-> prompts through Claude. Other drivers are probably from before LLM
-> reviews were introduced.
+IMHO makes sense. I see the commit message somehow touches that point,
+but for future memory a more verbose/explicit wording would have been
+helpful.
 
-It seems to me it would be better to validate idleslope and sendslope in =
-cbs_change() or cbs_enable_offload() so that all drivers can benefit =
-from this? Also stylistically perhaps the comparison could be broken =
-into >1 statements.
+Thanks,
 
-> I have a different opinion. The driver is in control, if these get out =
-of sync
-> you're having bigger problems. Either something else is writing to the =
-device,
-> or the hardware is changing state by itself which means it's unstable.
+Paolo
 
-Valid. :)
-
-> The 6020 family has 4 queues, but only 2 queues support CBS. That's =
-why there's
-> a seperate queue mask, even if CBS support wasn't added for 6020.
-
-Ah, I wasn=E2=80=99t aware of this. I suppose this is the best solution =
-then even though for the majority case it could be inferred.
-
-Luke=
 
