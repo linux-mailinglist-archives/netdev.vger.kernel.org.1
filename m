@@ -1,128 +1,137 @@
-Return-Path: <netdev+bounces-292482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292483-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0O1CO+qHF2oCIQgAu9opvQ
-	(envelope-from <netdev+bounces-292482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:10:18 +0200
+	id mDbKFq2JF2riIQgAu9opvQ
+	(envelope-from <netdev+bounces-292483-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:17:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE705EB2A6
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:10:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5090B5EB341
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 02:17:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A3002304E42F
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:10:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 398AE30069AE
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 00:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4252836F;
-	Thu, 28 May 2026 00:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227E5128395;
+	Thu, 28 May 2026 00:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dv181+Pj"
+	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="SZkeAmLD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBE3DDCD;
-	Thu, 28 May 2026 00:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9115635898;
+	Thu, 28 May 2026 00:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779927008; cv=none; b=qpRzUjHvIcdTBR2jvGECqnpaVxpfNcrlbDgEVzr5l8NKfL1j+PYHsW8CO/qn3G3pn63oOUyBKOJ33AUxIZAoVR+mE3CX99cGKqLVEJ3A1hiaUV6QlRAk+0CYjGWzVSsAG2Sd8+a3r7xlu/PP2UR/fD3I5SJxaHyLMgnWCE10Msg=
+	t=1779927463; cv=none; b=bRnpcoPe+GEPIEBT4tOntc3s1RFT0y76q8LxYbDFpKrIn9M2oUdQuyQ18qMaHvgd9BRW0E9rGXaxJuc/jOHWLV4YSEOr5mO9XFDROy6sEbwMhHq+QH+/ItZFiBcRiGUqgWLOmUYQdbG0zJozcwvtk1ozaCSQy2QRHazKODoDqBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779927008; c=relaxed/simple;
-	bh=PefNJ4hkmQ2TbseJysbOgyHXdl9+enheB80Bj5xMDUg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XfRnUUL3Y4yH0ld1m6qm7muiVtohzIPBH4ZSVXf9aOffN7sCi9wTW/MF6RfSa8HKGg1gpVByppGbmHucY4HzAubtGTO6GW03IERYsn6G9AkbyWMQ4e90rLkVOC5O2ZHTfcyn4/xIfzp8YE663vIrLl//SNqqMHCg5y6GDreEIsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dv181+Pj; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7AC51F000E9;
-	Thu, 28 May 2026 00:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779927006;
-	bh=xD7oYb7DgDb+apONV5pQaciABA1qNuxjDBqgB423VQY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Dv181+PjSElyQAApUI0ZNRkmJ69tkxSxeBs6gpLRaZRFABnf+o1FHm/0IXZg9nyHn
-	 HISVXOxAYpufxA/3QDz9cZ+VKCYH8ki9B5bWE/FJ0mFSV1uJmdnYgIvG+UncNSdIDk
-	 Rr+O5dTOm8Jny2BqE1hCdfwrz4J5Dqr8yMdnJMkqoNJ+d3a7likDegUvxDL4dOU0We
-	 L485USEcGjHwBNwCEu8WrBZWqWI55fkZPSjKY02tPdhPmxCs/dZWKpB0l5RROAOOH6
-	 wR3sj/2g5kGrIYtrpQxoZ+/3GHguV4Yv+HBnoSmZx9VAPoPEungA1ItN0kymcDhJRP
-	 EepqKg+pQlV/Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19A50380CFDE;
-	Thu, 28 May 2026 00:10:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1779927463; c=relaxed/simple;
+	bh=iMkZh9+jTBlqBlgm0lpAXt+Gwj9J1LmyL52HOOTvlAE=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=jyvWH+HVkcAtyMpwDaengXFGN6gtJkylOnS+Od1YwXSwhF5YM/ltfoikADYNpHL1m3dlMVc7ct9lkBeDbu0MpfQIPClt79CzaE8/OMSgrCW4EXjfom82erTEHvXxLNtyqSro64JhZwmwYwu+r4GofrgXf3l40lBTqA0V+Fjufvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=SZkeAmLD; arc=none smtp.client-ip=216.154.215.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 64S0HKRD016947
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 28 May 2026 01:17:22 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 64S0HKRD016947
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1779927446; bh=iMkZh9+jTBlqBlgm0lpAXt+Gwj9J1LmyL52HOOTvlAE=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=SZkeAmLDvSsF/xyCTK8xEUQ8zRQReoyLSrTiI6v1Z7QyB76jAMFOEUtnShLTlkHIU
+	 wEoH7AiPUT8h/RTGN7FZHXhUJPMjzz42OXoUS9Uo3WVbKPtKKZopObLJzmxIQrCKFD
+	 m9oMgJFegcQN2qfH93jRxpw1Z6iVmrKAUl054e7jqdFjl/3d2Q1HdeFuskadS2jUxY
+	 Pi4icrhYPvGn1bzy2ja+6gFHROyW3T62XFUMxYPivrWG2BbTZphiSueFKl2/fV4zwJ
+	 T8pcw2+tCeT44x0RydYMuHSAKxdwHCcM7sky7Jdj2wEWjLTjRmKfC/QYf7pz3Qs+3d
+	 kPHyTKJOaz/bQ==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv6: mcast: annotate data-races around
- mca_users
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177992701164.690389.11147762277523425287.git-patchwork-notify@kernel.org>
-Date: Thu, 28 May 2026 00:10:11 +0000
-References: <20260524022456.20689-1-sigefriedhyy@gmail.com>
-In-Reply-To: <20260524022456.20689-1-sigefriedhyy@gmail.com>
-To: Yuyang Huang <sigefriedhyy@gmail.com>
-Cc: jiayuan.chen@linux.dev, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, idosch@nvidia.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH net-next 2/2] net: dsa: mv88e6xxx: add support for credit
+ based shaper
+From: Luke Howard <lukeh@padl.com>
+In-Reply-To: <PR3P194MB1505960E42BBFB9AD9E8B18DEA0B2@PR3P194MB1505.EURP194.PROD.OUTLOOK.COM>
+Date: Thu, 28 May 2026 10:17:09 +1000
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Kieran Tyrrell <kieran@sienda.com>, Max Hunter <max@huntershome.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <885A5B11-A34A-4F69-9E9F-ABF10159B789@padl.com>
+References: <20260522-net-next-mv88e6xxx-cbs-v1-0-c87a8e6bcc0c@luminex.be>
+ <20260522-net-next-mv88e6xxx-cbs-v1-2-c87a8e6bcc0c@luminex.be>
+ <C0F865AD-24CD-4EA7-B0AB-16D91914ABAD@padl.com>
+ <PR3P194MB1505960E42BBFB9AD9E8B18DEA0B2@PR3P194MB1505.EURP194.PROD.OUTLOOK.COM>
+To: Cedric Jehasse <cedric.jehasse@luminex.be>
+X-Mailer: Apple Mail (2.3826.700.81)
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292482-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,sienda.com,huntershome.org];
+	TAGGED_FROM(0.00)[bounces-292483-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[padl.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	APPLE_MAILER_COMMON(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6AE705EB2A6
+X-Rspamd-Queue-Id: 5090B5EB341
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Hi Cedric,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> On 26 May 2026, at 9:28=E2=80=AFpm, Cedric Jehasse =
+<cedric.jehasse@luminex.be> wrote:
+>=20
+> I don't use MQPRIO hw offload, which i think is a big part of your =
+changes. So it didn't make sense to continue on those patches. This also =
+answers your other question: i haven't submitted another patch set for =
+hardware offloaded MQPRIO.=20
+> I'm trying to upstream changes one topic at a time. Eg. this CBS patch =
+is only for configuring the shaper. How traffic ends up in a certain =
+queue is not relevant for this patch.
 
-On Sun, 24 May 2026 11:24:56 +0900 you wrote:
-> /proc/net/igmp6 walks IPv6 multicast memberships under RCU and prints
-> mca_users without holding idev->mc_lock, while multicast join and leave
-> paths update the field while holding idev->mc_lock. Annotate this
-> intentional lockless snapshot with READ_ONCE() and the matching writers
-> with WRITE_ONCE().
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
-> 
-> [...]
+This actually makes more sense also now that you pointed out that AVB =
+mode is set on the ingress, not egress, port: configuring CBS should =
+stay out of setting any of the AVB mode bits. Are you planning to submit =
+a MQPRIO patch? If not, shall I just wait for your CBS patch to land, =
+and then rebase my AVB patch series on top of net-next?
 
-Here is the summary with links:
-  - [net-next] ipv6: mcast: annotate data-races around mca_users
-    https://git.kernel.org/netdev/net-next/c/56ed77ff6022
+We have different use cases: yours (as I understand it) is =
+host-initiated traffic with as many queues as the hardware supports, and =
+mine is hardware offloaded AVB switching with (essentially) three TCs =
+(one queue per AVB TC). It would be great to find a solution that can =
+support both.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Cheers,
+Luke=
 
