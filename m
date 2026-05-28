@@ -1,63 +1,93 @@
-Return-Path: <netdev+bounces-292833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLk2DNeaGGr+lQgAu9opvQ
-	(envelope-from <netdev+bounces-292833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:43:19 +0200
+	id QEsyLiKaGGr+lQgAu9opvQ
+	(envelope-from <netdev+bounces-292829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:40:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287795F7453
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:43:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33E655F73CE
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 21:40:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AFB653004D2E
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:42:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2FE6730138B2
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 19:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA02733A9FC;
-	Thu, 28 May 2026 19:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F208A33120C;
+	Thu, 28 May 2026 19:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOoY7UHE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1z0JytI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B203382CD
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 19:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C675F258CD7
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 19:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779997340; cv=none; b=D0kuxIjbLJkZAS3YyvTIlIyWv7EleAM35EYizMSNn47BObU7QNoiaVRGVm31TJoVMsOJlpQZIo13D7w3IspBrjIMFWrzIlm8IqFpoznu0pySckJwB0bQs3G/Utlwx5UEgV7UKB7ahbRxZqZk6bUc51L38bpfNxGNoe6U6DYW8yg=
+	t=1779997214; cv=none; b=ZryjBNZJPv9SExlnIF1x8SkMrxkXbhTBfJHp/Yu57i/fRMK/fLBZwHYdEVMS4VrpetoZDBj/4YCFkWG5K6NtU7+EyVQR70L6n8XoAGEPOrZDVWAzwt5Ipy6Lhr/qEbJ2s4HAW+IqZMxydNVxFOchXqCXlU1jKfNJWWxfC8PC+qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779997340; c=relaxed/simple;
-	bh=Rs3iDXyNPjzIj8+Go08ryVuMRbA8PkG+FiuixgqowGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c/TZCkx5K8VD3FqTF1w5gwJ2D/wilAD9/4IANxx8YGKFRZqB14C8A3CWlIJpNBFvH0RAP+2DW20Iqpkl0zcJ5/9YTk57G/r0R278K/vty8d2pGdMYbUmTVlfC0kKQAGQZxX7Ei3Byqmuo1J96JJg/CEWfWFN75gZhF63e9KMt1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOoY7UHE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA821F000E9;
-	Thu, 28 May 2026 19:42:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779997339;
-	bh=RJoq9qarIskm7VxbTKa/s0TS8lTezHfWJfg2CZckn00=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UOoY7UHE1yxsDOFVhWQOlUEAkT+5tjCT/dmbw3EAFx1URNCAtIlHs8rumQeG1WTW4
-	 /UajF5TmeSYjQKWZulyRD3kdcMSXAPGJux6zeX/2cvOZZ6UZsGpcII9VcMbCNl25qQ
-	 TUncapfB+NwSRd2pT9usID+ZfaWR82gTZND0KbKv9LWzew567d8yfcVJXlIcmzbbvp
-	 D5Kora/2sQ1pw6PGdYT6buw8lL6wZuxyrAcNFJCXFyH/f0raFOphhwrDTsMlXBQE4k
-	 49J+qP7rcqFovQarHfv/i+wxIz0ZpQRqHMXcxVQXGYGXKO1POOj8SyVBWHcj+mGQSQ
-	 u+axHDUebb7DQ==
-From: Simon Horman <horms@kernel.org>
-To: kipreyyy@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] appletalk: fix use-after-free in atalk_sendmsg due to route lookup race
-Date: Thu, 28 May 2026 20:37:09 +0100
-Message-ID: <20260528193707.2711621-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260526085735.61445-1-kipreyyy@gmail.com>
-References: <20260526085735.61445-1-kipreyyy@gmail.com>
+	s=arc-20240116; t=1779997214; c=relaxed/simple;
+	bh=K2qUlCqGCf/92jJx+4IF5oKyHHYYJLXgJasaVVc43Co=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GjujIiHN31q40PBWzTAOBev+ZcmTgfK8I/kcvWuVmzYvdkhJhnD8nvBNAf3XzPoMLbmemRQylUGa/QIkHujFg+8sX2EA6fj4Fakd6B7c/lk6DWP967QKNGqe7GUqTgZ+7Jcs9H26/vTaPC4y/PbVMm7h/HVqicCornJv0pP8Lhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h1z0JytI; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-835c98b659eso10448936b3a.0
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 12:40:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779997213; x=1780602013; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=T+CsA+/J1XG/Pr/EQfHy6KOutt5c8etxLwz3i9ZhzAg=;
+        b=h1z0JytIG9k4N1CL71kMHimmgDQ3QMqHkdkCKekrsdLfl4qP1bOU18uq0Xe5PXQoUt
+         HiEjg/UFjFonPqeKO4DXFIwKvvmxHPfHRP+nhzztSN6ZfnChxH8LNJdypthLbO4JPjT4
+         Sdc8GwOPk6WBD1TeEqhvVIkwXMCFWtGx9u3Cm3oRaO27TSTR7AcXQ4k0dJjek5/a+dSG
+         aUEEO1pa+FblNdzxM+Pi3+F8MSkzpos5ip+BgiGKLysQheCmP4GcCL0+QLPxUvLFgSO2
+         8y6yFAi45iVb6Ar5VVNCpTXbcRr27fJMqGynwz14K6xNlKq6gv2tRZVc4OpvfA3waBTy
+         4xRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779997213; x=1780602013;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T+CsA+/J1XG/Pr/EQfHy6KOutt5c8etxLwz3i9ZhzAg=;
+        b=iLc3KZtV31AM4KBKuApLD8HaKRC++v2EIZ4/BXbpRHxeEpH7wfQ3bH1Fv7bLBijR16
+         AR7xc/MQrM31UWyvYesafpv/3coKmIplROY7BWYjdrCX8B+ODfzqnrYM/Th+Y9LDHK8f
+         3L6co2wTZXS1gzo9x21SRF7YnZ6jp6Fa3L0fRynkWuZn9Lxp6ENkjcobWZQ0hrLPOAxS
+         rKIh0jJUz7+QDu9nVGH539v1Ooaof9uFvUodLrnxp6tWuiwvnGeU/tkLg+nCFJFhOEdv
+         nyYzGmd+cQR8zKYZiho337NpG9I6BL11Z9MunO9kTDiIaZnI/V1vYwSzguOKvNKX5sg+
+         MkYg==
+X-Gm-Message-State: AOJu0YxHop7g5dyJeel2BDcys94L3eUtdVAepdFBX0XCV4l2QiQ3nLoR
+	AEUpO7EVLPLpnZ103zvXNQYP6lT05E2s+iWRXUvvT3nTziDlQ11c9TTrqcFI0MmX
+X-Gm-Gg: Acq92OGuBJcPTGNol4kIfsLXNiKbZsj55sRr4ByeJm8LzE4yrma2Pl5AV0qAR55t3HJ
+	UXylafnPsYO8qDNqhvHJhyRKTZiMJy3GleG5/xfoNzMi+OGINFmiqh2Np2o7kQtx18NR3DfUL1+
+	ceUWPmXOCjosi4QkSip8WD3D6QJO4BTjwl0yUUM55Pk/mSXKGGHvlNbqoxLAw0F2zsUWDcWCyvx
+	3DZYZnqdM6esYNvFgjOQz63aKlCwrkeo1XeWxexAOtwmYZphUDzhTcLWBU06V57HozbXq24l1qs
+	+aKAxDD+zk4vj9UxUyB9erMtPQhPq2OWMQ7TfWc+VBD5sv3uSWNtE5+OJno6xrtEzDRCXwd0pFr
+	T/WtfPzO0W5gpRsM213Wb5y65Blr5eBqkZweWf9jzi6h5Z/fMacgeWyPy1GXo0+AL2WtQVd+FOW
+	X1KgWcygz7qRJ509CNT4pHPVOe1D66pNYbGDSxqQ95RJq8DjHxOYZYEkw8W15mEtybrAGlqaOI
+X-Received: by 2002:a05:6a00:2e03:b0:82f:2a78:6302 with SMTP id d2e1a72fcca58-8420cebe803mr289820b3a.26.1779997213194;
+        Thu, 28 May 2026 12:40:13 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([104.28.215.164])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841d6eac68esm5900184b3a.15.2026.05.28.12.40.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2026 12:40:12 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 0/2] net: dsa: yt921x: Add ACL support
+Date: Fri, 29 May 2026 03:37:17 +0800
+Message-ID: <20260528193726.1893365-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,184 +98,57 @@ Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292833-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292829-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url]
-X-Rspamd-Queue-Id: 287795F7453
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 33E655F73CE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+v3: https://lore.kernel.org/r/20260523020704.503966-1-mmyangfl@gmail.com
+  - handle ACL tag code
+  - fix the upper bound for FLOW_DISSECTOR_KEY_PORTS_RANGE
+  - extack messages when possible
+  - check the redirect target for FLOW_ACTION_REDIRECT
+  - fix candidates overrun
+  - fix the activation order for rule and action
+v2: https://lore.kernel.org/r/20260520022242.120640-1-mmyangfl@gmail.com
+  - v1 was mistakenly sent as v2
+v1: https://lore.kernel.org/r/20260514192140.3468543-1-mmyangfl@gmail.com
+  - fix issue reported by test robot
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-Subject: appletalk: fix use-after-free in atalk_sendmsg due to route lookup race
+David Yang (2):
+  net: dsa: tag_yt921x: handle ACL tag code
+  net: dsa: yt921x: Add ACL support
 
-This patch attempts to fix a use-after-free in atalk_sendmsg() by deferring 
-route deletion with kfree_rcu() and caching required route fields under 
-rcu_read_lock(). It also takes a reference on the route devices using 
-dev_hold() to prevent them from disappearing during the sleeping allocation.
+ drivers/net/dsa/yt921x.c | 1013 +++++++++++++++++++++++++++++++++++++-
+ drivers/net/dsa/yt921x.h |  284 +++++++++++
+ net/dsa/tag_yt921x.c     |    2 +
+ 3 files changed, 1296 insertions(+), 3 deletions(-)
 
-> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-> index 30a6dc06291c3..2c754378fa088 100644
-> --- a/net/appletalk/ddp.c
-> +++ b/net/appletalk/ddp.c
-> @@ -603,7 +603,7 @@ static int atrtr_delete(struct atalk_addr *addr)
->  		     tmp->target.s_node == addr->s_node)) {
->  			*r = tmp->next;
->  			dev_put(tmp->dev);
-> -			kfree(tmp);
-> +			kfree_rcu(tmp, rcu);
+-- 
+2.53.0
 
-Simon says: while the issue below is flagged as not being introduced by
-            this patch, I think that if it is problem then it prevents
-	    this patch from working as intended.
-
-	    So if it is an issue I suggest addressing it in the context of
-	    this patch, perhaps by adding another patch to this patch-set.
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does the synchronous
-dev_put() allow the network device reference count to drop to zero while
-RCU readers are active?
-
-While kfree_rcu() defers freeing the route, dev_put(tmp->dev) is still
-called synchronously here. If a device is being unregistered and this
-synchronous dev_put() removes the last reference, the device's refcount
-could drop to zero before the RCU grace period ends.
-
-When a concurrent atalk_sendmsg() holding rcu_read_lock() then calls
-dev_hold() on this device, could it increment a zero refcount and cause a
-refcount saturation warning or use-after-free?
-
-[ ... ]
-
-> @@ -628,7 +628,7 @@ static void atrtr_device_down(struct net_device *dev)
->  		if (tmp->dev == dev) {
->  			*r = tmp->next;
->  			dev_put(dev);
-> -			kfree(tmp);
-> +			kfree_rcu(tmp, rcu);
-
-Simon says: likewise for the issue below.
-
-[Severity: High]
-This is a pre-existing issue, but this appears to have the same synchronous
-dev_put() problem as atrtr_delete() above.
-
-[ ... ]
-
-> @@ -1600,6 +1603,7 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
->  	/* For headers */
->  	size = sizeof(struct ddpehdr) + len + ddp_dl->header_length;
->  
-> +	rcu_read_lock();
->  	if (usat->sat_addr.s_net || usat->sat_addr.s_node == ATADDR_ANYNODE) {
->  		rt = atrtr_find(&usat->sat_addr);
-
-Simon says: and the issue below too.
-
-[Severity: High]
-This isn't a bug introduced by this patch, but are there other callers
-of atrtr_find() that are now missing rcu_read_lock() protection?
-
-atrtr_get_dev() calls atrtr_find(), which temporarily takes
-atalk_routes_lock and then returns a raw pointer:
-
-net/appletalk/ddp.c:atrtr_get_dev() {
-	struct atalk_route *atr = atrtr_find(sa);
-	return atr ? atr->dev : NULL;
-}
-
-Since atrtr_get_dev() does not hold rcu_read_lock() when dereferencing
-atr->dev, and this patch uses kfree_rcu() to defer route deletion, could
-a concurrent route deletion free the route before the read occurs?
-
->  	} else {
-> @@ -1610,29 +1614,38 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
->  
->  		rt = atrtr_find(&at_hint);
->  	}
-> -	err = -ENETUNREACH;
-> -	if (!rt)
-> +	if (!rt) {
-> +		rcu_read_unlock();
-> +		err = -ENETUNREACH;
->  		goto out;
-> +	}
->  
->  	dev = rt->dev;
-> -
-> -	net_dbg_ratelimited("SK %p: Size needed %d, device %s\n",
-> -			sk, size, dev->name);
-> +	dev_hold(dev);
-
-Simon says: on the other hand, this one looks like it is orthogonal to
-            this patch and should be considered in the context of possible
-	    follow-up.
-
-[Severity: Critical]
-This is a pre-existing issue, but is there a data race on atrtr_default.dev
-that causes a NULL pointer dereference here?
-
-atrtr_device_down() sets the static atrtr_default.dev locklessly to NULL:
-
-net/appletalk/ddp.c:atrtr_device_down() {
-...
-	if (atrtr_default.dev == dev)
-		atrtr_set_default(NULL);
-}
-
-If atrtr_find() locklessly returns &atrtr_default, and atrtr_device_down()
-clears the default route between the lookup and dev = rt->dev, could this
-read a NULL pointer?
-
-Since dev_hold(dev) does not check for NULL, wouldn't it attempt to
-increment the refcount at a NULL offset and cause a kernel crash?
-
-Simon says: While this one seems to warrant further investigation in
-            the context of this patch.
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does the lack of reference
-counting on the default route break the newly added RCU assumptions?
-
-The static atrtr_default route does not hold a reference count on its
-network device (no dev_hold() is performed when atrtr_set_default()
-sets it). Consequently, when the device is unregistered, its refcount
-can drop to zero immediately.
-
-If atalk_sendmsg() retrieves this route and calls dev_hold() inside its
-RCU critical section, could it increment a zero refcount? This would trigger
-the same refcount saturation and use-after-free issues as the synchronous
-dev_put() described earlier.
-
-> +	rt_flags = rt->flags;
-> +	rt_gateway = rt->gateway;
->  
->  	hard_header_len = dev->hard_header_len;
 
