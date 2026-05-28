@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-292546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAf6Dn+yF2p+NggAu9opvQ
-	(envelope-from <netdev+bounces-292546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:11:59 +0200
+	id 8JSpK0SzF2p+NggAu9opvQ
+	(envelope-from <netdev+bounces-292547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:15:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5E685EC1DD
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:11:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 147845EC263
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 05:15:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A96D300E151
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:11:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AED4930B2588
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 03:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E327530648C;
-	Thu, 28 May 2026 03:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F36306B3B;
+	Thu, 28 May 2026 03:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1b32Q2K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RyXvSfqj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19822EE262;
-	Thu, 28 May 2026 03:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E3E2EE262;
+	Thu, 28 May 2026 03:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779937916; cv=none; b=Dv4vlm3ee7qZf28YA1MrKlL8LTg9WF9paXnt/TZ2d5uxlyHw0G02Z+B2YcAwzewYIX8Ji5z6LbntED5veW5YwOpRxIBTVkINHn1N+wY+iCjWiX9JNAF1HJVXSu6FTuSf4loDeXSKPmNC4kGURhO6E5qVN3PPNeDP3obFSVzIitc=
+	t=1779937923; cv=none; b=Zs/d7lbmU6BDBCxTrSBODnHK2aZs621OKX49RLlAjkWh7nQjJqBHbTMSMuf1qwspq/ezFsawPgAwO9RcoF5VdSEEIj8nVFhRuY0lVmW9/puK0k/9IrbcTLOwsa26x+v9LcXEHZm57P6zTErkWBKaPrnJ6VZ+O9DXewvG/4td2kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779937916; c=relaxed/simple;
-	bh=arqqSf385H1LtuKqMqaGUKAzC7Y6zn5AWOZbW8EIfgo=;
+	s=arc-20240116; t=1779937923; c=relaxed/simple;
+	bh=9sHaBalzKBamUnYFmIzzwwt8Xktx1D4KSvzdB1bXi9g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QqaOkRnzSZMyHsZuWEKwZP0DItlmDzcLbgyB4imh6edZsm9ocgArMjFYBW322quQd0IXoUPr6XJ73iXgoP4fgPueUNFwxGW/PsfcaJOCsEencHJm0z7dOUNYXuMyDJ9XeHeIgqn3PSRaMj2XJP+ZwrvfOzQRjF0m+R+/2gcYhxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1b32Q2K; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1B511F00A3A;
-	Thu, 28 May 2026 03:11:47 +0000 (UTC)
+	 MIME-Version; b=XFxAwlKMnzSFI4Ljurua45VeuXRBV6beM3ywxlXPw13amxwLpsnGaljfdoRlNK9TdE52y6cteGmGeH86o8IrQYVj3HMPS2H1gX3dqJFhNKc51qtponDMKKgtq6GIwjKqnWQh3GnyVD1v/GdlSZa4rXL8DKuo8LC7jQmas3N9tDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RyXvSfqj; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7C321F000E9;
+	Thu, 28 May 2026 03:11:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779937915;
-	bh=Q1AQ8w8xZnKth/C1FC0s94Oku0WUQ21SRaKh+tq6vys=;
+	s=k20260515; t=1779937921;
+	bh=1F+n6ooRADX4UcHNc88FEQmlqLp1hzczA9EGmgpkhas=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=K1b32Q2Kf91771Loe2KCem565qodyrmBwRqV2nX2enZxad5K6WJeVWA0mDKcCtAOS
-	 M9uKpK+h4w8twx60nxAlJxiPWxO4EYDOeZV8EOeR6++8mBTVmXK7yIL6FaeUswopbu
-	 0RTFqvBpLJhnVVKAJWtkypWqFgkQlCClh94jlxRN0MdIIyxfiYACzroHRyTG3C4qgI
-	 v6sRoVxGqp5KWY8iEL+xPCXyfgbvTPQHR5YbKJ9Kxwd2K/ZWJu4CgTUWc1OoTOlGB0
-	 DYs6XbSRpqLIqUZhOdHsRSBTC3fq3zBjD8mp98BNc3J4QMQXSgyWmKOo7JJ3q7Ucty
-	 W3yHOVnoJL9Tw==
+	b=RyXvSfqjQR3yaBYapgKPN2MlrEdRFvbzjZz0Gs+qCb155kgDneU/17hSVst4mdyzU
+	 INjV7ejl9VLE7WNENyB/l3j8DkcWm0t5sEabaPH+caic2Jdg3h5GMay5/+7jlwm5oA
+	 PpfBcynj/NNQp/qRH46JNCKJtUgA0ZQVUIbvBAtW+lNb+Onx3ddTrHFH6svpNewvsR
+	 Ot+reu2pdSqPo6udjEeclcj3BBPBhOGwKsOAT44RcLvnS33qLpQhR76/1mAjOMn8ks
+	 lgKmBj3WHdLQeYXX34o1PofWdbJEnxZnnAGEE+k3+r3CMD9x1KSZeKvRx0KLWdSR96
+	 duEIpCVg4ftlQ==
 From: Geliang Tang <geliang@kernel.org>
 To: Keith Busch <kbusch@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>,
@@ -71,9 +71,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	zhenwei pi <zhenwei.pi@linux.dev>,
 	Hui Zhu <zhuhui@kylinos.cn>,
 	Gang Yan <yangang@kylinos.cn>
-Subject: [PATCH 04/11] nvmet-tcp: register target mptcp transport
-Date: Thu, 28 May 2026 11:10:38 +0800
-Message-ID: <683214b4c1a396d305056e3f4db77fdd0ef4fc0f.1779934709.git.tanggeliang@kylinos.cn>
+Subject: [PATCH 05/11] nvmet-tcp: implement mptcp listen socket ops
+Date: Thu, 28 May 2026 11:10:39 +0800
+Message-ID: <94d8286242b894e8bc9a9a3391c4d3db778f96c0.1779934709.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1779934709.git.tanggeliang@kylinos.cn>
 References: <cover.1779934709.git.tanggeliang@kylinos.cn>
@@ -89,18 +89,18 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292546-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292547-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -109,26 +109,22 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,kylinos.cn:mid,kylinos.cn:email,linux.dev:email,purestorage.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D5E685EC1DD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,kylinos.cn:mid,kylinos.cn:email,purestorage.com:email,suse.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 147845EC263
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-This patch adds a new nvme target transport type NVMF_TRTYPE_MPTCP for
-MPTCP. And defines a new nvmet_fabrics_ops named nvmet_mptcp_ops, which
-is almost the same as nvmet_tcp_ops except .type. It is registered in
-nvmet_tcp_init() and unregistered in nvmet_tcp_exit().
+An MPTCP-specific version of struct nvmet_tcp_proto_ops is implemented
+for listen sockets. It is assigned to port->proto_ops when the transport
+type is MPTCP.
 
-A MODULE_ALIAS for "nvmet-transport-4" is also added.
-
-Note: NVMF_TRTYPE_MPTCP is temporarily assigned 4, a value currently
-reserved in the NVMe over Fabrics specification. During "NVMe over
-MPTCP" discussion at the LSF/MM/BPF 2026 conference, it was concluded
-that MPTCP should be treated as a new transport type, rather than a
-TCP variant. A request will be submitted to the NVMe working group to
-officially allocate this value for MPTCP.
+Dedicated MPTCP helpers are introduced for setting listen socket options.
+The set_nodelay and set_priority helpers set the values on all existing
+subflows using mptcp_for_each_subflow(). The set_reuseaddr helper only
+applies to the first subflow. The values are then synchronized to other
+newly created subflows in sync_socket_options().
 
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: John Meneghini <jmeneghi@redhat.com>
@@ -142,93 +138,125 @@ Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- drivers/nvme/target/configfs.c |  1 +
- drivers/nvme/target/tcp.c      | 29 +++++++++++++++++++++++++++++
- include/linux/nvme.h           |  1 +
- 3 files changed, 31 insertions(+)
+ drivers/nvme/target/tcp.c | 13 ++++++++++++
+ include/net/mptcp.h       |  8 ++++++++
+ net/mptcp/sockopt.c       | 42 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 63 insertions(+)
 
-diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
-index b88f897f06e2..51fc0f4d0c32 100644
---- a/drivers/nvme/target/configfs.c
-+++ b/drivers/nvme/target/configfs.c
-@@ -37,6 +37,7 @@ static struct nvmet_type_name_map nvmet_transport[] = {
- 	{ NVMF_TRTYPE_RDMA,	"rdma" },
- 	{ NVMF_TRTYPE_FC,	"fc" },
- 	{ NVMF_TRTYPE_TCP,	"tcp" },
-+	{ NVMF_TRTYPE_MPTCP,	"mptcp" },
- 	{ NVMF_TRTYPE_PCI,	"pci" },
- 	{ NVMF_TRTYPE_LOOP,	"loop" },
- };
 diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 83fe001fc619..e2f3de364c2b 100644
+index e2f3de364c2b..8c2dc4bcbcd3 100644
 --- a/drivers/nvme/target/tcp.c
 +++ b/drivers/nvme/target/tcp.c
-@@ -2299,6 +2299,23 @@ static const struct nvmet_fabrics_ops nvmet_tcp_ops = {
- 	.host_traddr		= nvmet_tcp_host_port_addr,
+@@ -2101,6 +2101,15 @@ static const struct nvmet_tcp_proto_ops nvmet_tcp_proto_ops = {
+ 	.set_priority	= sock_set_priority,
  };
  
 +#ifdef CONFIG_MPTCP
-+static bool nvmet_mptcp_registered;
-+
-+static const struct nvmet_fabrics_ops nvmet_mptcp_ops = {
-+	.owner			= THIS_MODULE,
-+	.type			= NVMF_TRTYPE_MPTCP,
-+	.msdbd			= 1,
-+	.add_port		= nvmet_tcp_add_port,
-+	.remove_port		= nvmet_tcp_remove_port,
-+	.queue_response		= nvmet_tcp_queue_response,
-+	.delete_ctrl		= nvmet_tcp_delete_ctrl,
-+	.install_queue		= nvmet_tcp_install_queue,
-+	.disc_traddr		= nvmet_tcp_disc_port_addr,
-+	.host_traddr		= nvmet_tcp_host_port_addr,
++static const struct nvmet_tcp_proto_ops nvmet_mptcp_proto_ops = {
++	.protocol	= IPPROTO_MPTCP,
++	.set_reuseaddr	= mptcp_sock_set_reuseaddr,
++	.set_nodelay	= mptcp_sock_set_nodelay,
++	.set_priority	= mptcp_sock_set_priority,
 +};
 +#endif
 +
- static int __init nvmet_tcp_init(void)
+ static int nvmet_tcp_add_port(struct nvmet_port *nport)
  {
- 	int ret;
-@@ -2312,6 +2329,11 @@ static int __init nvmet_tcp_init(void)
- 	if (ret)
- 		goto err;
+ 	const struct nvmet_tcp_proto_ops *ops;
+@@ -2128,6 +2137,10 @@ static int nvmet_tcp_add_port(struct nvmet_port *nport)
  
+ 	if (nport->disc_addr.trtype == NVMF_TRTYPE_TCP) {
+ 		ops = &nvmet_tcp_proto_ops;
 +#ifdef CONFIG_MPTCP
-+	if (!nvmet_register_transport(&nvmet_mptcp_ops))
-+		nvmet_mptcp_registered = true;
++	} else if (nport->disc_addr.trtype == NVMF_TRTYPE_MPTCP) {
++		ops = &nvmet_mptcp_proto_ops;
 +#endif
+ 	} else {
+ 		ret = -EINVAL;
+ 		goto err_port;
+diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+index bf74dedc578d..b8ab214a7890 100644
+--- a/include/net/mptcp.h
++++ b/include/net/mptcp.h
+@@ -239,6 +239,10 @@ void mptcp_sock_no_linger(struct sock *sk);
+ void mptcp_sock_set_priority(struct sock *sk, u32 priority);
+ 
+ void mptcp_sock_set_tos(struct sock *sk);
 +
- 	return 0;
- err:
- 	destroy_workqueue(nvmet_tcp_wq);
-@@ -2322,6 +2344,10 @@ static void __exit nvmet_tcp_exit(void)
- {
- 	struct nvmet_tcp_queue *queue;
++void mptcp_sock_set_reuseaddr(struct sock *sk);
++
++void mptcp_sock_set_nodelay(struct sock *sk);
+ #else
  
-+#ifdef CONFIG_MPTCP
-+	if (nvmet_mptcp_registered)
-+		nvmet_unregister_transport(&nvmet_mptcp_ops);
-+#endif
- 	nvmet_unregister_transport(&nvmet_tcp_ops);
+ static inline void mptcp_init(void)
+@@ -331,6 +335,10 @@ static inline void mptcp_sock_no_linger(struct sock *sk) { }
+ static inline void mptcp_sock_set_priority(struct sock *sk, u32 priority) { }
  
- 	flush_workqueue(nvmet_wq);
-@@ -2341,3 +2367,6 @@ module_exit(nvmet_tcp_exit);
- MODULE_DESCRIPTION("NVMe target TCP transport driver");
- MODULE_LICENSE("GPL v2");
- MODULE_ALIAS("nvmet-transport-3"); /* 3 == NVMF_TRTYPE_TCP */
-+#ifdef CONFIG_MPTCP
-+MODULE_ALIAS("nvmet-transport-4"); /* 4 == NVMF_TRTYPE_MPTCP */
-+#endif
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 041f30931a90..0eada1e0c652 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -68,6 +68,7 @@ enum {
- 	NVMF_TRTYPE_RDMA	= 1,	/* RDMA */
- 	NVMF_TRTYPE_FC		= 2,	/* Fibre Channel */
- 	NVMF_TRTYPE_TCP		= 3,	/* TCP/IP */
-+	NVMF_TRTYPE_MPTCP	= 4,	/* Multipath TCP */
- 	NVMF_TRTYPE_LOOP	= 254,	/* Reserved for host usage */
- 	NVMF_TRTYPE_MAX,
- };
+ static inline void mptcp_sock_set_tos(struct sock *sk) { }
++
++static inline void mptcp_sock_set_reuseaddr(struct sock *sk) { }
++
++static inline void mptcp_sock_set_nodelay(struct sock *sk) { }
+ #endif /* CONFIG_MPTCP */
+ 
+ #if IS_ENABLED(CONFIG_MPTCP_IPV6)
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index 359b1eb2d0a9..0adbbe568f6e 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -1596,6 +1596,8 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+ 	inet_assign_bit(FREEBIND, ssk, inet_test_bit(FREEBIND, sk));
+ 	inet_assign_bit(BIND_ADDRESS_NO_PORT, ssk, inet_test_bit(BIND_ADDRESS_NO_PORT, sk));
+ 	WRITE_ONCE(inet_sk(ssk)->local_port_range, READ_ONCE(inet_sk(sk)->local_port_range));
++
++	ssk->sk_reuse = sk->sk_reuse;
+ }
+ 
+ void mptcp_sockopt_sync_locked(struct mptcp_sock *msk, struct sock *ssk)
+@@ -1741,3 +1743,43 @@ void mptcp_sock_set_tos(struct sock *sk)
+ 		__mptcp_sock_set_tos(sk, val);
+ }
+ EXPORT_SYMBOL(mptcp_sock_set_tos);
++
++void mptcp_sock_set_reuseaddr(struct sock *sk)
++{
++	struct mptcp_sock *msk = mptcp_sk(sk);
++	struct sock *ssk;
++
++	lock_sock(sk);
++	sockopt_seq_inc(msk);
++	sk->sk_reuse = SK_CAN_REUSE;
++	ssk = __mptcp_nmpc_sk(msk);
++	if (IS_ERR(ssk))
++		goto unlock;
++	lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
++	ssk->sk_reuse = SK_CAN_REUSE;
++	release_sock(ssk);
++unlock:
++	release_sock(sk);
++}
++EXPORT_SYMBOL(mptcp_sock_set_reuseaddr);
++
++void mptcp_sock_set_nodelay(struct sock *sk)
++{
++	struct mptcp_sock *msk = mptcp_sk(sk);
++	struct mptcp_subflow_context *subflow;
++	struct sock *ssk;
++
++	lock_sock(sk);
++	sockopt_seq_inc(msk);
++	msk->nodelay = true;
++	mptcp_for_each_subflow(msk, subflow) {
++		ssk = mptcp_subflow_tcp_sock(subflow);
++		if (ssk) {
++			lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
++			__tcp_sock_set_nodelay(ssk, true);
++			release_sock(ssk);
++		}
++	}
++	release_sock(sk);
++}
++EXPORT_SYMBOL(mptcp_sock_set_nodelay);
 -- 
 2.53.0
 
