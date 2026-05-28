@@ -1,320 +1,227 @@
-Return-Path: <netdev+bounces-292765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDScJbhxGGq4kAgAu9opvQ
-	(envelope-from <netdev+bounces-292765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:47:52 +0200
+	id EFgeC5puGGoSkAgAu9opvQ
+	(envelope-from <netdev+bounces-292766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:34:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403745F5376
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:47:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 840475F50BC
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 18:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 883C2303ED05
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:23:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A18B30036FC
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00C62F5468;
-	Thu, 28 May 2026 16:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDABA316199;
+	Thu, 28 May 2026 16:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNd2R0SK"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="VDV7slXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SY8PR01CU002.outbound.protection.outlook.com (mail-australiaeastazolkn19010076.outbound.protection.outlook.com [52.103.72.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3E33AF65B
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 16:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779985417; cv=none; b=mqKMiZtapxRArdQl+YNzU9veulUop+XIzGqQQaAeQkq4GS/v5bJJ6nRLXszkKUU+Hk00zj050f3VoTXUGMl2XEuduGTn8YvsSAIGp6SBK7Z7Ouwq/k+QLMRby65yeJt8wgfXLV06LMsAFTmMheZRXB3zx93HFZ0ui7vrbolHB2Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779985417; c=relaxed/simple;
-	bh=MIhgDp7K2Bx8ph7rfsCJg4mzM89NfsmfqsGKY+yk07E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mqvYjWaxQ5Zz8BNN7AHB0HYI9JMRupHcEaUjb8aSrTnTZAAr0/vRne0hjcWevE5hOgGZnqxVx7GtjpiwyksMBInyZSq3o2yYfuEzum0kLqII2W3ZV7HWaG0XQJxZoNRCXMXy2CCFLfLfyD9JRKYvYKsOSLZMkD4iSw3316NntAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNd2R0SK; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-304d0ac5e3cso1980447eec.0
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 09:23:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779985415; x=1780590215; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=69Nx/roug+F3DFPV7LqBlxwAPIUI+gEB6ZueMkgnBcM=;
-        b=TNd2R0SKNONImXxxtR/nSSV217k5PC4CguwdTaYthcpNO/W0J974z2g3B6a7kJoePj
-         j/p1KYNXIxGnr2baaFoYl3rOXxdoKQfzwCMGjCTPdb5vup2Lq90JigGoFvrpp+fHafoY
-         L9HXlQqbF5vZ5MPOSJ/ibb1M2Kx/21Ns1bMX/U5UhQ7com3dWcPl3pyafHWPpmp/NBtj
-         BgcFmaq3H4B7/HaXQfxIwd7/0fG626YybeRiJ2uU/4n9kuszHn6CzBS0Tc5GrD2uL/JG
-         Vb5oyJnixmtf1A7Nwpd+IHVvr85dyaXp6c6iGbWCTE/rPgFQfUxSs2GG13GqpLk1yBgY
-         vP/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779985415; x=1780590215;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=69Nx/roug+F3DFPV7LqBlxwAPIUI+gEB6ZueMkgnBcM=;
-        b=WurlmQawCaWvu75i0AO7zlD0sfTWAO87/Lb6WLJP/m390EfLhNr/4iFrVUKSdUtAb4
-         yR81nW0Xg6vWC9lPSMhVZ07vi0MLniaIjXVATC31sIkZQ1lWXjjwEJxuJJ90ivYYNY0i
-         df8fbCfKmWuv3//DFtuRlTL6UeKNdmdTBBUaRUzQIjKuGNuGy8KOrnXZL4pkbI/YtYaD
-         0CutuWK+I8KHOn5LX35YNwO6/OFbLNkiRS3ERRTj1yKmM4UlsjBjFDaRNKanWXwRMHpk
-         Igq9IXHJ/qmxkBBP9zEtVbNnKNJObkTC5UbSOlzc09I9ELPubxd6sTkDTVxI0FluEauK
-         PR5Q==
-X-Gm-Message-State: AOJu0YyAMMmxbfrR21cnby42n2/griDmZWjBhiJ8rf+IXFZtS5TfoAIB
-	lEF+udVS3T4rk6wY9g18UUjK6LbeFPlIMFnLpNV5PgYTGBPRB2rRQWBTAbu8Dm1ikQU=
-X-Gm-Gg: Acq92OHDEOIdcqKC+CxHOkdDfCpSgykQEinABxzYy7zV2x64TpW5WY/OBIUe6jH4z64
-	+GOjaII0T53WyWSZuw8RhCr8zRAq8pDvZaY8v80srpQ/4EbwJcU0geusPtJttC/AJPo+jPO2558
-	mL9WYaA7HPFcQIfEzBbYKPkuynTWzeP4SOSlW4dByEl9dtldvDZtNLbSh4+0WdlASEtyxE605ED
-	mdklGKsUheDp0IyfEuDRpszjDxF3VmSJe9xU17lpvPnDWSLv6QbUHsbIFRm00b9c1GJJT/wbnRa
-	DIvTc5ntdZEQvsSSHyffFlIl4eQz6IN0fVWEiYES7h5h3KQy2ApGoNYI30/yNy72hn4bedB0s4a
-	9D3PLxq4l0PgUIX04zJvW9ph3sFa7U697nhE/f9b6+6BuTE1CCpVRkJtfOA7D/kKf6DRhAligii
-	kBZsr7fkUDYhqBZb7azE/85itJOQ==
-X-Received: by 2002:a05:7300:e424:b0:304:819f:502b with SMTP id 5a478bee46e88-304819f518emr8243260eec.9.1779985414550;
-        Thu, 28 May 2026 09:23:34 -0700 (PDT)
-Received: from houminxi ([166.0.188.190])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30452230f1bsm15396602eec.14.2026.05.28.09.23.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 09:23:34 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	davem@davemloft.net,
-	echaudro@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	i.maximets@ovn.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v4] selftests: openvswitch: add dec_ttl action support and test
-Date: Fri, 29 May 2026 00:23:22 +0800
-Message-ID: <20260528162322.58527-1-houminxi@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B7D3E714C;
+	Thu, 28 May 2026 16:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.72.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779985663; cv=fail; b=XUBqolasI6JhXnBJ/1WnfbwSz/Ls5Iritpg4ry2OtrX3rikcLEmnshGx+JbyzA8DNW9G2HuK2gpWMrRL84MgCFkElsmcSpnZnhgpT7d67rB5Z/8HtHZjuaCKoJoa1VxTyinsSwQc7f2pyH1EOugFW3cSC7LueTBvWFA87NrWZSk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779985663; c=relaxed/simple;
+	bh=6iKNH3Hd9SdxVQgNsiG/sfLGO5rCfs5jUEUBDWd44JQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uD4KSH+M6joeDJpk+tVTgjGAH2eCPrQirujTd/z2knTuZrRzhY3S6M6fFRD1buo9X6nmtQ5ERh6doN9FxYVOVKpUtp/5GIfkjqaopyrW61aK3IOaFkTeLzH51VBYkBWH0RJ1//WVX8A6VBE2gw3DXVNMN2+hpp1jwu7C+GrG2UU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=VDV7slXi; arc=fail smtp.client-ip=52.103.72.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dWuC3iikMonhEoU9xH1AYSx/gTLQdwx+mzGy61yKZjrDa5MgzIRPa8L+uHS+lqBXnxoocLqRqRk5j9GDFLRqUQQOoSOxRMPdzqk9VehKHOnN/u/cZPg1KxE+zvwROxsU8SO/cpbEyBVqYB+8Pt4RrqZeHauSNYj7c+FkfPKfmSNOe0awucLwX5pH3vXFveCUGHXqTboJyb9275D/V0JBI64kM1rvIpMPgWsu6kMM+FmSLetsGQGRTqSIYEZGYBElhQ0fBo97ZqnO1nZjx0vtVbeLWNC3ZBEzNNG5ND6xroC+I4+KeIauyCQDrtY7ej+ISD3ZhUjtXD6paVVkcq9qeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6iKNH3Hd9SdxVQgNsiG/sfLGO5rCfs5jUEUBDWd44JQ=;
+ b=zR49QCquWszPryZivFRQkTidQ7YM83NAPC6cCakU5PfHbXDQnBbbnMIN9ZaFiZ3gFaAr+MjUZmA6bnYdr5SI26DVxCaTwuQS+/Bdf/5Jx3K5ERn/FWK9Yqv5MMHBz4mK2n09FAwyVDZ9j8LUqCOXr7PIy3ATY4Uolm3Eky2GycEGUiLXRlrDpgHAIma2218v3N0wBbFoRx3xj1ugzdZnsSPV4hMIkc4LDgbrnhu2JM1GLC6oIFuRoOOGi5CjPPdzQUuwx8Rn2LwWYyrT0N1MjQSnVsSUpyMfvr4FqsJRYOkEO0YYQflw3txFDyUmy4Hg2DvN/FnmHyAVVb5eIzuRIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6iKNH3Hd9SdxVQgNsiG/sfLGO5rCfs5jUEUBDWd44JQ=;
+ b=VDV7slXiH3MnwHmG8d4feQkcJwx3E9BxtyZI73JKw8vTHWKORIJPn7mzIZweLmZh9Gu5vWZJ+HW7qgbDuPqN8UmoxDddRPRXWO2y0A/3rdfK0tDRMQhaBGLBLYo46IohFExj6kug091yVxcUZ/BMcexXvEsy54zchrMwBvMUUyervURGuZnUqp1NtSunVAsnzx9IKdOwuexPnI63Y1rRNr9E2rNouvAiHa944ZuOfw6PxkWP5qN/Gcm7pkIg4L69Jb4aAY2i71ZGFKsEKWDrZ7BcvJ2+LdhvMCJ1EcY93i8oFDNTiFxYcDFxaERRiJLS/vvDSJpHvBPw0quLQ0RIRg==
+Received: from SYBPR01MB7881.ausprd01.prod.outlook.com (2603:10c6:10:1b0::5)
+ by SYBPR01MB6953.ausprd01.prod.outlook.com (2603:10c6:10:148::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.14; Thu, 28 May
+ 2026 16:27:36 +0000
+Received: from SYBPR01MB7881.ausprd01.prod.outlook.com
+ ([fe80::7cd2:d6e8:3fa0:5f0c]) by SYBPR01MB7881.ausprd01.prod.outlook.com
+ ([fe80::7cd2:d6e8:3fa0:5f0c%3]) with mapi id 15.21.0071.011; Thu, 28 May 2026
+ 16:27:36 +0000
+From: Junrui Luo <moonafterrain@outlook.com>
+To: Geethasowjanya Akula <gakula@marvell.com>
+CC: Jakub Kicinski <kuba@kernel.org>, Yuhao Jiang <danisjiang@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>, Linu Cherian
+	<lcherian@marvell.com>, Hariprasad Kelam <hkelam@marvell.com>, Subbaraya
+ Sundeep Bhatta <sbhatta@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: Re: [EXTERNAL] [PATCH net] octeontx2-af: cn10k: restrict LMTLINE
+ sharing to same PF
+Thread-Topic: [EXTERNAL] [PATCH net] octeontx2-af: cn10k: restrict LMTLINE
+ sharing to same PF
+Thread-Index: AQHc7r7kINcZdMltlE+LU1EXeIHLEQ==
+Date: Thu, 28 May 2026 16:27:36 +0000
+Message-ID: <E32D37DE-5401-4CC8-98F0-8EA944C331D1@outlook.com>
+References:
+ <SYBPR01MB7881F8D11D2930BB84215253AF0D2@SYBPR01MB7881.ausprd01.prod.outlook.com>
+ <20260526180233.4323832d@kernel.org>
+ <CAHYQsXQ4qQa9nLc6re=Oobyojv3FVG9Pc+3KVEq4qKXEq3kXYg@mail.gmail.com>
+ <20260526185224.0c65e38a@kernel.org>
+ <BL1PR18MB4342FD927BAF986D33299F74CD082@BL1PR18MB4342.namprd18.prod.outlook.com>
+In-Reply-To:
+ <BL1PR18MB4342FD927BAF986D33299F74CD082@BL1PR18MB4342.namprd18.prod.outlook.com>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SYBPR01MB7881:EE_|SYBPR01MB6953:EE_
+x-ms-office365-filtering-correlation-id: 77640604-f3e8-4747-acf9-08debcd60742
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|41001999006|12121999013|8062599012|8060799015|19110799012|15080799012|55001999006|31061999003|22091999003|24121999003|51005399006|24021099003|440099028|3412199025|102099032|40105399003;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?d2l2Ti9laXF1bk5ESkxtRStIZUZBU2hwQWg3b2lqR3ZCUXNJbXYvTlN6R3ZM?=
+ =?utf-8?B?QnhDOGV4bVByUVBBOERpa0lka3NmWHhOWUwxRWZVUkczUHhxT3VxcTlMRmhL?=
+ =?utf-8?B?S1FxT2haTUppemtGU2JvTWcrT3B0ZVFjSGZqZWxhWEVOcm0veHc4eGxNNEVo?=
+ =?utf-8?B?WEpIRm9nb2xwenJEb3N2a0prTW5aUTIxWnhMNThVZ3VsZWNYRE53RHZDWlYw?=
+ =?utf-8?B?ZmNwYVgzam0rS0RYTUwzWTloc3V5MDA2bjlwUHpsUEtwUldjb1lGRCs2UFhj?=
+ =?utf-8?B?RFJOVUdKVHh5N3dBSGNFUGY3U1ZubmxjZzdrMkNWSmtldnZHL1hQZU9RUXhj?=
+ =?utf-8?B?NHArREg3ZEdVK2VPc28yQTZJWDkyYkgyOGU5ck5NNTEzU0p2cnBtb1lxM2dL?=
+ =?utf-8?B?WFJoVTdrZUVWN0NtdHpCU2hVQitwZytHTGVhdEdUOXFYcmpSWHZweFoxN2xJ?=
+ =?utf-8?B?WGJFaytuSnhpN0gvL0ZPSE01elJkelJvS2U5aDhmZ0MxV2hFWGhVTmgwUzVU?=
+ =?utf-8?B?Q0I1WlJIUzJod0g3c1ByZ0NDQk9ieDFWcWoxWFdNWmdPR1hpQWg2UlZVaEJp?=
+ =?utf-8?B?VGU2b0dqM2JueGNiYUQrZ0l3SDJRcUZqSVp1d2ZqaTluMWFPQnZKZUt3Um8z?=
+ =?utf-8?B?d3F5TGoyUHlXNW5ENTd2MU96bVlXb3YwbTN5L3ZhV3J6TFlnWW0yRG9EblRM?=
+ =?utf-8?B?TWRDQ05UaVpQckJ4Z3RNSzk2ZDV2ZUpmTjFZdkhzb0JNNzE1ZEI3WFljN0pV?=
+ =?utf-8?B?V25uL0xnU2lkYUJ2ZFUrQ1RnekpSc0lFd0J6bGZwdTRabDdhSzlIWmV2dWk5?=
+ =?utf-8?B?VTZydGhSd1FFWmpSQ1lIcEZBZThENngwNzhoRjUxeTR0NE45NitCZk53TzdP?=
+ =?utf-8?B?ckVtV1NpMVZtSXd5cVFlK1lickVNd1Mrd2FTa0FIdmF6Q0NHQ0lBTmNUVU9G?=
+ =?utf-8?B?endQZkx5MGVpUUN5amRrTUxYNFlzcHZXb2l0azI2c2dycmJmbm5nMDBjSHZw?=
+ =?utf-8?B?NFpDeHBOc254eERlQmtiYXpQeWxCcWQzYlcxZGp6cVB1dGxiaUZwZ3RFZUNC?=
+ =?utf-8?B?UGNiQ21nb1VCc002dzV2c05jb2kyUTY4QmMva09ZT1lwNTUyczQ2WlVUNmpG?=
+ =?utf-8?B?bGpmQ1g2Nlhxb3J3NExxMlJvRVN4TUZwMVF1Y2xyRTdvclJYemlzcUhtYXIr?=
+ =?utf-8?B?WHZnZzR2aVZQbWsrcEJFdGdwOUQrTU9CdGhkcldLN1YyY2N6a21kVEdtRzF1?=
+ =?utf-8?B?NHVqZm9yQ3RmVW1mQWVSNlhmMkFKR2doblRHSjNmSFNhUEFEOUZCcGd5Qytu?=
+ =?utf-8?B?MzBkTkxGK096SWRDK1F1b0NiS0lGVUV2RjZDYXNackhCZ2w0ZWhmYVBTRHVt?=
+ =?utf-8?B?OWtvUnpMOFZOZE4xZmMzbkozR0VZZ0UrN3ZWS3hnUFF5RGw0bGZCUDh4UlJi?=
+ =?utf-8?B?d2ZMdGtJc3FwejV1c295NjZpeW1PRlNBNCszRWtGakJ0Q05OV1hSTmdRdlR6?=
+ =?utf-8?Q?aIw8tw=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?UzV6dWlIcVVKa3ZicGEyWFZ4MitzMTM3VW5XbUgzenJXaGxpdVAzRGVvLzA0?=
+ =?utf-8?B?cThjY0UxcEsyRmcxQVRVdk5IQ0pVS3FrbnBoZGVVR1l3QWNzVjJQd0orOW5w?=
+ =?utf-8?B?YjNva0V5eG5ZZGZ2NVFvZ3k1dytJY1RjSmdFNGx5TlZFWUx6b21IU1hLd25i?=
+ =?utf-8?B?VUhVSkRpVStjVGJURXNvY001M1lVbmlINnU5TnR2WFY1WjFIN0hJVmFoWWVt?=
+ =?utf-8?B?dzFNa1VmcXpZVk16a0FCSWpCK3ptbzhvUG9WOUVwWC9DVlp0YVdXNzVSNHBD?=
+ =?utf-8?B?ZU93c25qaVFtVjhiMDJBbk5VaWxOSFJjZ1cvNVhVQk9LOXpGMDhCZGJmanhm?=
+ =?utf-8?B?MndVbktoaXZGZ25RT25obUdSamVqRDdHNVJUcHJ5d3VkOWczRkpDeFBsL09Z?=
+ =?utf-8?B?RXFqOENmVmg3SXZ0K0F0YU5rN09CSDA0aW1FTFRGZWRnS2s2VnpTZDMvc2pQ?=
+ =?utf-8?B?VzNhd2lkTURSSEhPY014TmJpVnVFMTVWdWpHUmxlRU1XUHE3dWhZSG83d0Ns?=
+ =?utf-8?B?aVhQM2lvS0JacjdsYkNudldyQkVvTEN2cnFWY3dLNXg0Y3NiTzJ0Z2lJNytV?=
+ =?utf-8?B?OTdFUmhkc04wSVFGaWtpZERTV1U4TFhsL1V1Y0VpamhGRFo4bWRobk5LdDNH?=
+ =?utf-8?B?V1ZGdUNveG1kTzJNRlM3VitMMGMwZzZJb2NSblo2REx6aFMrSHlSVjNqQ0Vo?=
+ =?utf-8?B?YURqblpYQXpNN1VRNVRQa2lMTzVIR0duTkpxdDFOUkxnaFRUNkpYSElYV1JZ?=
+ =?utf-8?B?SktwZ2ppS3A2VmlLNzFoSk9VV1NWd3JNcWNqa1o1aWVoY0NRNkJqSisrYVlR?=
+ =?utf-8?B?NVRmNC9La1FZOEpTZ0pGdnd4ZGtINWpvWnVzMDFIaU9sSmFLOHhReEFKS1Ja?=
+ =?utf-8?B?dFljc0VJZkZseXkzcXRjeEJYUzVxOFVkUks3TXNVeEErZ2RSS0xaZlZwUTJZ?=
+ =?utf-8?B?UkY5S3I4Q2FVODJwcVliU2s1Zng4enVUOWRXUVo4b1BGaHR1RzRZV3ZoR1lp?=
+ =?utf-8?B?SUNDV1VPODVGOHhjK0oxS2RCY0daczZFSEYzRE8yRldXYW1qVllkM0JBM3Zi?=
+ =?utf-8?B?V1kvZkg2SE1IcHBnbU0rTmtlZ1pMc2ZqQzRRcDFhR0NidDhCdHZ0ZjBWZnJw?=
+ =?utf-8?B?N2JHcklVb2doeWNvQkVFbWx3K3grSFhwcjdlODdJWWlUY1FxaXNQRWlUQzFt?=
+ =?utf-8?B?NXFxUHB0UDdiNDExaFhZeFdxVWtNYjBUQm1UWUNidEl1WUZzWGg3M2lGcTV1?=
+ =?utf-8?B?NnhrQS9acFVPQWRpRFBXMUlNNUIyZEJEQTc5N3crQWlQVldNZDFEYWpLZFN6?=
+ =?utf-8?B?eno2bWNnUmZnZzRDRmxRSWlQT2RVT3pNQkIrc2M1RlRFa2hpNWF3RXNxRktI?=
+ =?utf-8?B?ekVJMFdTaHcyWFZzdm5vT0tjZmRtSm5WMDhicVlnN0dWd0E5bFlnVlFyNUpa?=
+ =?utf-8?B?dWVSeW0xSkZudUs5KzRDUGFlYzU2V0JCS3B0TnhValVsRTdPaU1TQU0rV0ky?=
+ =?utf-8?B?Y0liZUlTOVh5Z0QxOUE5V2VQZWxFUGtOZ0NtNTBMdkh3UEcxMzByajFad1ow?=
+ =?utf-8?B?R0EyZzhPNG1QVDJEczMwaEI4b1JtaFA5cEtrV3RaVFFKMkZEc3hCckliZ05P?=
+ =?utf-8?B?ZURUTmtFMDk1Yjk5YnBaTWNzMGJEUVFuRHdVZEhDOVQ2UWY2bUMvUHhoSE91?=
+ =?utf-8?B?cGlQbUk1a3lKQi93eDdaT0xTa3pYaHY3YnpZUGF5M1FieWM5SW5mUG9KZUla?=
+ =?utf-8?B?eFhHc1NrdUpPYTZ0NFdteE9NYmdoeGJ5RFdoNW9XU1BHZm5zc1hnWkRlL0Rn?=
+ =?utf-8?B?WG1zalBxREZCNVVhTlREVFFTUzdycEJUQmFjY0NyU0FaaXY3M1BFQ1prUzh5?=
+ =?utf-8?B?RDIzd05Hd1NRSUpLdFRKUTdiWWdISkI5LzdlOFZvVlBIMlE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <683FD110A660864EAB4163F76D50ABAE@ausprd01.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB7881.ausprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77640604-f3e8-4747-acf9-08debcd60742
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 May 2026 16:27:36.3782
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYBPR01MB6953
+X-Spamd-Result: default: False [1.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
+	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,ovn.org,openvswitch.org,vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-292765-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_FROM(0.00)[outlook.com];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,marvell.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292766-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[moonafterrain@outlook.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[outlook.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 403745F5376
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:mid,outlook.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 840475F50BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add dec_ttl action support to the OVS kernel datapath selftest
-framework:
-
-  - Add dec_ttl nested NLA class to ovs-dpctl.py with proper
-    OVS_DEC_TTL_ATTR_ACTION sub-attribute handling
-  - Add parse support for dec_ttl(le_1(<inner_actions>)) action
-    string, consistent with the odp-util.c format where le_1()
-    holds the actions taken when TTL reaches 1
-  - Add dpstr output formatting for dec_ttl actions
-  - Add test_dec_ttl() to openvswitch.sh that verifies:
-    * Normal TTL packets are forwarded after decrement
-    * TTL=1 packets are dropped (TTL expiry)
-    * Graceful skip via ksft_skip if kernel lacks dec_ttl support
-
-The dec_ttl class uses late-binding type resolution to reference
-ovsactions for its inner action list, avoiding circular references
-at class definition time.
-
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
-Reviewed-by: Aaron Conole <aconole@redhat.com>
----
-v4: fix three new pylint warnings introduced in v3:
-    - add docstring to class dec_ttl (C0115)
-    - suppress invalid-name for class dec_ttl (C0103, snake_case
-      is consistent with other nested nla classes in this file)
-    - rename parsedLen to parsed_len in the new parser block (C0103)
-v3: rename NLA class from DecTtl to dec_ttl (snake_case), consistent
-    with psample, push_vlan, ctact and other nested nla classes in
-    ovs-dpctl.py
-v2: use dec_ttl(le_1(...)) format, consistent with odp-util.c
-    (suggested by Aaron Conole)
-
- .../selftests/net/openvswitch/openvswitch.sh  | 55 +++++++++++++++++++
- .../selftests/net/openvswitch/ovs-dpctl.py    | 39 ++++++++++++-
- 2 files changed, 93 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 8cd5b3d894ab..3f0e437c34bb 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -29,6 +29,7 @@ tests="
- 	tunnel_refcount				ovs: test tunnel vport reference cleanup
- 	drop_reason				drop: test drop reasons are emitted
- 	pop_vlan				vlan: POP_VLAN action strips tag
-+	dec_ttl					ttl: dec_ttl action decrements IP TTL
- 	psample					psample: Sampling packets with psample"
- 
- info() {
-@@ -245,6 +246,60 @@ usage() {
- }
- 
- 
-+test_dec_ttl() {
-+	sbx_add "test_dec_ttl" || return $?
-+	ovs_add_dp "test_dec_ttl" decttl || return 1
-+
-+	info "create namespaces"
-+	for ns in client server; do
-+		ovs_add_netns_and_veths "test_dec_ttl" "decttl" "$ns" \
-+			"${ns:0:1}0" "${ns:0:1}1" || return 1
-+	done
-+
-+	ip netns exec client ip addr add 10.0.0.1/24 dev c1
-+	ip netns exec client ip link set c1 up
-+	ip netns exec server ip addr add 10.0.0.2/24 dev s1
-+	ip netns exec server ip link set s1 up
-+
-+	# Probe: check if kernel supports dec_ttl action.
-+	ovs_add_flow "test_dec_ttl" decttl \
-+		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
-+		'dec_ttl(le_1())' &>/dev/null
-+	if [ $? -ne 0 ]; then
-+		info "no support for dec_ttl - skipping"
-+		ovs_exit_sig
-+		return $ksft_skip
-+	fi
-+
-+	ovs_del_flows "test_dec_ttl" decttl
-+
-+	# ARP flows (bidirectional)
-+	ovs_add_flow "test_dec_ttl" decttl \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "test_dec_ttl" decttl \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+
-+	# IP flows with dec_ttl action
-+	ovs_add_flow "test_dec_ttl" decttl \
-+		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
-+		'dec_ttl(le_1()),2' || return 1
-+	ovs_add_flow "test_dec_ttl" decttl \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
-+		'dec_ttl(le_1()),1' || return 1
-+
-+	info "verify connectivity with dec_ttl"
-+	ovs_sbx "test_dec_ttl" ip netns exec client ping -c 1 -W 2 \
-+		10.0.0.2 || return 1
-+
-+	info "verify TTL=1 is dropped by dec_ttl"
-+	ovs_sbx "test_dec_ttl" ip netns exec client ping -c 1 -W 2 \
-+		-t 1 10.0.0.2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should fail with TTL=1 and dec_ttl"
-+		     return 1; }
-+
-+	return 0
-+}
-+
- # psample test
- # - use psample to observe packets
- test_psample() {
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 3b6a26e265a4..3342e295293d 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -388,11 +388,21 @@ class ovsactions(nla):
-         ("OVS_ACTION_ATTR_CLONE", "recursive"),
-         ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
-         ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
--        ("OVS_ACTION_ATTR_DEC_TTL", "none"),
-+        ("OVS_ACTION_ATTR_DEC_TTL", "dec_ttl"),
-         ("OVS_ACTION_ATTR_DROP", "uint32"),
-         ("OVS_ACTION_ATTR_PSAMPLE", "psample"),
-     )
- 
-+    class dec_ttl(nla):  # pylint: disable=invalid-name
-+        """Nested OVS_DEC_TTL_ATTR_* sub-attributes."""
-+
-+        nla_flags = NLA_F_NESTED
-+
-+        nla_map = (
-+            ("OVS_DEC_TTL_ATTR_UNSPEC", "none"),
-+            ("OVS_DEC_TTL_ATTR_ACTION", "actions"),
-+        )
-+
-     class psample(nla):
-         nla_flags = NLA_F_NESTED
- 
-@@ -635,6 +645,13 @@ class ovsactions(nla):
-                 print_str += "ct_clear"
-             elif field[0] == "OVS_ACTION_ATTR_POP_VLAN":
-                 print_str += "pop_vlan"
-+            elif field[0] == "OVS_ACTION_ATTR_DEC_TTL":
-+                datum = self.get_attr(field[0])
-+                print_str += "dec_ttl(le_1("
-+                subacts = datum.get_attr("OVS_DEC_TTL_ATTR_ACTION")
-+                if subacts and subacts.get("attrs"):
-+                    print_str += subacts.dpstr(more)
-+                print_str += "))"
-             elif field[0] == "OVS_ACTION_ATTR_PUSH_VLAN":
-                 datum = self.get_attr(field[0])
-                 tpid = datum["vlan_tpid"]
-@@ -786,6 +803,20 @@ class ovsactions(nla):
-                 actstr = actstr[paren + 1:]
-                 parsed = True
- 
-+            elif parse_starts_block(actstr, "dec_ttl(le_1(", False):
-+                parencount += 2
-+                subacts = ovsactions()
-+                actstr = actstr[len("dec_ttl(le_1("):]
-+                parsed_len = subacts.parse(actstr)
-+                decttl = ovsactions.dec_ttl()
-+                decttl["attrs"].append(
-+                    ("OVS_DEC_TTL_ATTR_ACTION", subacts)
-+                )
-+                self["attrs"].append(
-+                    ("OVS_ACTION_ATTR_DEC_TTL", decttl)
-+                )
-+                actstr = actstr[parsed_len:]
-+                parsed = True
-             elif parse_starts_block(actstr, "clone(", False):
-                 parencount += 1
-                 subacts = ovsactions()
-@@ -957,6 +988,12 @@ class ovsactions(nla):
-         return (totallen - len(actstr))
- 
- 
-+# pyroute2 resolves nla_map types via getattr(self, name).
-+# dec_ttl needs "actions" to resolve to ovsactions, but
-+# ovsactions is not defined when dec_ttl class body runs.
-+ovsactions.dec_ttl.actions = ovsactions
-+
-+
- class ovskey(nla):
-     nla_flags = NLA_F_NESTED
-     nla_map = (
--- 
-2.54.0
-
+T24gV2VkLCBNYXkgMjcsIDIwMjYgYXQgMDU6MjA6MTJBTSArMDAwMCwgR2VldGhhc293amFueWEg
+QWt1bGEgd3JvdGU6DQo+IEhpIEp1bnJ1aSBhbmQgSmFrdWIsDQo+IA0KPiBUaGlzIHBhdGNoIGVu
+Zm9yY2VzIHRoYXQgdGhlIHJlcXVlc3RlcuKAmXMgcGNpZnVuYyBhbmQgcmVxLT5iYXNlX3BjaWZ1
+bmMgYmVsb25nIHRvIHRoZSBzYW1lIFBGLg0KPiBIb3dldmVyLCB0aGlzIGFzc3VtcHRpb24gaXMg
+bm90IGFsd2F5cyB2YWxpZC4NCj4gV2UgaGF2ZSB2YWxpZCB1c2UgY2FzZXMgd2hlcmUgTE1UU1Qg
+bGluZXMgYXJlIGludGVudGlvbmFsbHkgc2hhcmVkIGFjcm9zcyBtdWx0aXBsZSBQRnMuIEluIHN1
+Y2ggc2NlbmFyaW9zLCANCj4gdGhlIGJhc2VfcGNpZnVuYyBtYXkgbGVnaXRpbWF0ZWx5IGJlbG9u
+ZyB0byBhIGRpZmZlcmVudCBQRiwgYW5kIHJlc3RyaWN0aW5nIGFjY2VzcyB0byB0aGUgc2FtZSBQ
+RiB3b3VsZCANCj4gYnJlYWsgdGhlc2UgZXhpc3RpbmcgdXNlIGNhc2VzLg0KICAgDQpUaGFua3Mg
+Zm9yIHRoZSByZXZpZXcuIFRvIHByZXNlcnZlIGNyb3NzLVBGIHNoYXJpbmcgd2hpbGUgc3RpbGwN
+CnJlc3RyaWN0aW5nIFZGIGNhbGxlcnMsIHdvdWxkIHRoZSBjaGVjayBiZWxvdyBtYXRjaCB5b3Vy
+IGV4cGVjdGF0aW9uPw0KDQoJaWYgKGlzX3ZmKHJlcS0+aGRyLnBjaWZ1bmMpICYmDQoJICAgIHJ2
+dV9nZXRfcGYocnZ1LT5wZGV2LCByZXEtPmhkci5wY2lmdW5jKSAhPQ0KCSAgICBydnVfZ2V0X3Bm
+KHJ2dS0+cGRldiwgcmVxLT5iYXNlX3BjaWZ1bmMpKQ0KCSAgICAgICAgcmV0dXJuIC1FUEVSTTsN
+Cg0KVGhhbmtzLA0KSnVucnVpIEx1bw0KDQo=
 
