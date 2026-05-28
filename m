@@ -1,230 +1,233 @@
-Return-Path: <netdev+bounces-292707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292708-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNGhHBJQGGpMiwgAu9opvQ
-	(envelope-from <netdev+bounces-292707-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:24:18 +0200
+	id yL7WEFlRGGpMiwgAu9opvQ
+	(envelope-from <netdev+bounces-292708-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:29:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E10855F3A24
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:24:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A14895F3AC3
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 16:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 828E93038D1F
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:15:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F12B13011BF1
+	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 14:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27282370D6B;
-	Thu, 28 May 2026 14:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+obPDqz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tyo9gDbM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4022B31E82A;
+	Thu, 28 May 2026 14:27:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D3924169D
-	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779977756; cv=pass; b=MBUfP7nibtNI27mfdbeWCvV/JLyaNFVhN12SjQ/djAbh+9J5twEpoGHbmq4hGfJJ7PUHsdFX6Cl9fcJ+0LU73Gk7FQcI0jV1YCSiV0Cqd2aDcNl3/S43OtYe35hcuewdQYenaNUSFtVAWJR5KAhWqL0TAgwWAEEz9GZ8iHOdZJM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779977756; c=relaxed/simple;
-	bh=WCINTFxmfL3sU4xVFntMQBv/3/7s4jrtCmibfDtQPIo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SPlPyELn+L4KLd6X0px3yH0T0O7SMos2deacBLuMT5gGe0n57whVhrM8Yb/3r90RpZMUU8KftQ78WgHwygC8DH1ujtpwUVXwjkvj2hXk2z9nzpIVuxSO6M9OUeBNWEC03sqX41xcms2u8dxRkaQqyt54EaszbGSWebe/tMFdcy0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d+obPDqz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tyo9gDbM; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779977753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WCINTFxmfL3sU4xVFntMQBv/3/7s4jrtCmibfDtQPIo=;
-	b=d+obPDqz1Y4NTAadRfX2Tb/TxSvYh5iSIC7zmebnRExwBdeGIYawyuXTbHAM2eaT+7bQjG
-	epSfw9Ar5dblS4exG4dDYlSgfksBlc5epcodae3A9HsOIKrZmDfVgOjvNR4YCsblnb8b2T
-	jtM1q4A4zLPDuzrvROdKZdIVqe3S7R4=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-m9zkbh4pM7mhopoogcgVsg-1; Thu, 28 May 2026 10:15:51 -0400
-X-MC-Unique: m9zkbh4pM7mhopoogcgVsg-1
-X-Mimecast-MFC-AGG-ID: m9zkbh4pM7mhopoogcgVsg_1779977750
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5a8d66acdbdso6134453e87.1
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 07:15:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779977750; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dbqq2s6OuirTZ6g9DR/dF7hn27S/utAFNNa2JsFFvjK3Mu/Q/q7fMVQEt8H1a59XL3
-         s6dHJYhmG7PjN1nJvUtbSJT41DHB2ygQFRc0hyVh7umgOdqgnCV6A8vAbrs8xpO2KJQY
-         g1C34IQMWOZeEfOurLwHkP+U9l09iWUa1izZEbuu2D5mwDAZGR7V6xTCJnd+ykFgfYFp
-         xgXdKFCMRioS1x1W8VoQhtgkUYJzDLdoevNOt9OHxAX9PlIw8BIvx88Wohe05qIS36cm
-         0lXDxfIQ8dt83te7TbNGSDCrH0LtLCr7LI+QlYIBoCfbP88RP8d3cPbOnzd5HnuUb76d
-         ye/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WCINTFxmfL3sU4xVFntMQBv/3/7s4jrtCmibfDtQPIo=;
-        fh=gbeZ4pXoWUZSTt03PSZdFIYfOlmEs+Cu3GsHJ2Rubxc=;
-        b=IoC14MzIUuwUHWTRUBGQM+Zvf4lVOdv7tm4IcXnzDPoFvrPEmUpfGcOgdH+tNVfK6f
-         YOoEaKQ9s0s37j1t8adhcrgYJtiPzJFauJFfDmtniGnaJO0NS7GO1j53oX835uFX/J7W
-         aoSdDUFhdOEAff5ZVnscli3K0SAIWI4ax0VNYx1hkHRKMd8+K9wU+HyBrysEDpJV79Xk
-         +cBLxD5zKP1Llrh3Q+fUIWJPdNdmL2FhT85u1FW5sptNThmf5TOoqO2fJ1JSB7xA4Zl2
-         Jm0duqx7hRtcpDGsP0WNwxgTeOdX4ZH+ypwxHsueijKub5FmA088YkAdJhzpaoXzCxQ6
-         rC3g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1779977750; x=1780582550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WCINTFxmfL3sU4xVFntMQBv/3/7s4jrtCmibfDtQPIo=;
-        b=Tyo9gDbMA+YWKN8ZLGcInQxuFBrXBcATD48rdgav97S+UQmzNKu6ICWQVI+W3NjP/s
-         KkHY8tcCB/Ujk9FUZ1KWEU6Fjh9ZHTioT8YHaBtgOm5h2Tt/bDfmSwPNSq24jbx4jpOk
-         qc5l4qIb9yZITsPuOxNsoo/ku2G2OIb7AelnSFCePEB1sImxnL84shcDsOn6oRrv2bSG
-         BbYsKHQYzvGm2eAf3dwZKLkktYuPIAPpnWrBqPLM8pT2Q+AMIsAEKMg6/OHZuIWTlgyk
-         TpS3eEZsJ82diFg5FFb8rTDhMC+4Pyh2rVeb9iJ8McrpscsWaHCd26JMyLlMInsa3fxY
-         e2Vg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689373AF677
+	for <netdev@vger.kernel.org>; Thu, 28 May 2026 14:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779978424; cv=none; b=BGONwrSyDQ/49C9OW8sZJmBFBIdXOlZOGqKcATX2mtlgWtR3EJHPjIHY/kYR8gFAsvm9qVTX3m72OsU4EqHduuMspZTHmgJqlLT9u5Or87aE2XENRlSZdqcUfVnIrr8hzeibepwuN/JsZ/Wi7XGEWxt9lpLJBx1eHyKBe6UfuQQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779978424; c=relaxed/simple;
+	bh=8dBQN3u9zxD5Dpe5kimj5AuyF1N0hn16euQa6Q6gauM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=Ak1YNNHy6zWV+787dsUgfRc91uC6B3WExZM1XiVCo6NHteibXIoCcLvzI9VQQxQpVxqw7HS3j00BR9nFgAyLsahG+F6MZx2xkijlplF00ztGeRsoOuzYU9Ftadvk/LOsCzMUFd53NT0wcLuosaCDpzmZ6mZPG/lXm5iHg+i8dlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-69db0927573so5540378eaf.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 07:27:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779977750; x=1780582550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WCINTFxmfL3sU4xVFntMQBv/3/7s4jrtCmibfDtQPIo=;
-        b=orLNqcC+Lsxn3lHrxLCQIrVT6EPFTlx5puuljQlLzH0JFq50ZBw8YenOcvaKQDFVjB
-         zU+g9rlB7YlEK5GKCY/x0NFUcktHKk5L84eCLrx1t2PvvZ5USvs8sauTYTU+wN/y6j6K
-         f/ONE6x5fuIWFfR3wK7x0YOZRnoqYNOXRGGBaZfyJK5zcTwx5oGA/LGKT/VoYLV5BIgH
-         fRRuOWQ7HyxrG/Ct92DtvG5GyHIZlrIytfTDWaEx86OrdRW9rwDupCcyKP/aWhbq6syj
-         hkI+k2Y6FAYARy6Rms6RjLrlkzyv2Bxro4FEBK6NofOu6Ush5BtE6qDHUqcbAJWCfwL6
-         UMlw==
-X-Forwarded-Encrypted: i=1; AFNElJ85dTM4NidliwxF7RH+tFBr52hDa8zsU5I5RdYm8rby6VRxFex60fpsWmiMH2pOFCZa2IzmENM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFKihmo+IKIsKGFf/Sux3FaeJodmDYv0BN6JHKNdagbHCN8qjJ
-	T7SU6KzCQyxogAb3ffnrIww+74Tz5OqSaoB3YX7Vrojinf/YEcNIO56uxY/uQ9y+NzEB9nIyAVu
-	Zb/VqlNPD3I+7zJXyVUAOzJdBOzEGgvG4+194ZTNyT/4CHv7859oUFDn6/rAJ2rUO47JqCJI1iA
-	Za9aw1cSad10VtCotxoE0oiQdcV+pM3nKJ
-X-Gm-Gg: Acq92OHQqWDVfTq8g5CwOx6J4acXMkalqsUqc+sVF9OxjIj+PVzKHO8av0RnY06J3EO
-	BpjYJwRuk/1qxq1pSjcj8hHsCs3ISyHcfTwpb/rAQEhFj8ljSV78uz8Wg4i2cZbOdVQHx2SWmos
-	/s4zYx7wmFGQJ/TJBLrURzDQQB7FnCQlnB+fDgWdcAiAzFvTFt65IcNyZEihsNGuCLR8CIrVMDc
-	0dBHQLEighzLvyE
-X-Received: by 2002:a19:f509:0:b0:5a8:87eb:b118 with SMTP id 2adb3069b0e04-5aa323bbfb5mr5931502e87.22.1779977750296;
-        Thu, 28 May 2026 07:15:50 -0700 (PDT)
-X-Received: by 2002:a19:f509:0:b0:5a8:87eb:b118 with SMTP id
- 2adb3069b0e04-5aa323bbfb5mr5931486e87.22.1779977749776; Thu, 28 May 2026
- 07:15:49 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779978421; x=1780583221;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DKd8lNtRk4Q8hVCyCTCRPaKBtTJU7lwZa3WnlORRuvU=;
+        b=HyHfG1AVoo6vbdvZUHwLAS059KnajGw2y0/krvJ2E/aI/RTvlW04/MtTtzwM/GxIY4
+         fgiA4CAP5xf8T9YvlOYpM+OiQokSxvJ/freEPcG43ZogiHJmDYsEy82R03pqanEI4fUt
+         WEQDvTRv8XsjXAttyXIWv/x+h67TNhVpbmEi+r25xhguy13ryUmLJUBcbSA04YOMvVsr
+         3/uz+Q+Ew0BL8ET0CpBZH2PkgYB1PxzzpkCPuRsDXWktuu8oLZxrJL7TdGcCDf3hT/AS
+         AnBTDb1baq+U66LMARSe8GNHrg0XlGhPqRH2sbtjCu/t1dPElawMhCz9KA72ZXkx501+
+         R9Cg==
+X-Forwarded-Encrypted: i=1; AFNElJ9f3lpdWSpm2KvRcuI6jnMvSTQOVRRvmnPKmv+sQ3VR5hu+VtPr0IOu1WvEeqrAO/WtX7YSy0w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgiBVihDSwaWsutU5MT8RV45u0ZtZ8JjguK/rv6nhlu3PUrGAm
+	oNOFlj27oAqlqNiSBeqHfyvB1CZadnV/ILpTBjj9VtfDR3QdDlJ2KeD6sTyd2TKoBTUWWupiNgW
+	6GBlrjH6oLKaMC+r/eCLCk6ZSELtesRac07lsCjS4+/zRap2HDIBMOv0N6Yk=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260521135310.GC977@cmadams.net> <20260526175743.1f2c3761@kernel.org>
- <20260527010641.GA21073@cmadams.net> <20260526183122.348e44e7@kernel.org>
- <20260527215135.GB16443@cmadams.net> <675083b4-e015-4ff3-836c-798e0a971194@suse.de>
- <20260528073849.759da84a@elisabeth> <baba855a-7cc9-409e-9c20-6e50f35d255a@suse.de>
- <20260528131250.1352ab48@elisabeth> <b21c598b-879c-4f6a-9dc8-27e5c362803b@suse.de>
- <bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info> <20260528153202.14900687@elisabeth>
-In-Reply-To: <20260528153202.14900687@elisabeth>
-From: =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>
-Date: Thu, 28 May 2026 16:15:38 +0200
-X-Gm-Features: AVHnY4IApP7IcvuHODparSrVLAjpWG5XbLoqDsjgPOZVg-TUUjj6l8XXpHkpmrQ
-Message-ID: <CACT4ouf5ZqGgb=RO8_7NovLCvYKLKL4vD70dEe6xUODT1UEcSA@mail.gmail.com>
-Subject: Re: Problem with IPv6 privacy addresses in 7.0
-To: Stefano Brivio <sbrivio@redhat.com>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>, 
-	Fernando Fernandez Mancera <fmancera@suse.de>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Yumei Huang <yuhuang@redhat.com>, Ido Schimmel <idosch@idosch.org>, 
-	Justin Iurman <justin.iurman@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	David Gibson <david@gibson.dropbear.id.au>, 
-	Linux kernel regressions list <regressions@lists.linux.dev>, Beniamino Galvani <bgalvani@redhat.com>
+X-Received: by 2002:a05:6820:1c9d:b0:69d:9f6a:9d2f with SMTP id
+ 006d021491bc7-69dfa918199mr695672eaf.38.1779978421526; Thu, 28 May 2026
+ 07:27:01 -0700 (PDT)
+Date: Thu, 28 May 2026 07:27:01 -0700
+In-Reply-To: <20260528072100.1163109-1-vulab@iscas.ac.cn>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a1850b5.586c836d.2e3ab2.0001.GAE@google.com>
+Subject: [syzbot ci] Re: netfilter: ipvs: fix ct refcount leak when template
+ is invalid
+From: syzbot ci <syzbot+ci738d8a1aa6d8f478@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, stable@vger.kernel.org, vulab@iscas.ac.cn
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [0.25 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_MIXED_CHARSET(0.91)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [-1.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292707-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[leemhuis.info,suse.de,kernel.org,vger.kernel.org,redhat.com,idosch.org,gmail.com,gibson.dropbear.id.au,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,googlegroups.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,googlesource.com:url,syzbot.org:url];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[ihuguet@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: E10855F3A24
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292708-lists,netdev=lfdr.de,ci738d8a1aa6d8f478];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: A14895F3AC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-CCing Beniamino, NetworkManager maintainer.
+syzbot ci has tested the following series
 
-On Thu, May 28, 2026 at 3:32=E2=80=AFPM Stefano Brivio <sbrivio@redhat.com>=
- wrote:
-> Not a bigger regression, but a regression definitely, even just for 'ip
-> address' or 'ip address showdump' which would now go back to display
-> / save addresses in the reversed order for IPv6 (only).
+[v1] netfilter: ipvs: fix ct refcount leak when template is invalid
+https://lore.kernel.org/all/20260528072100.1163109-1-vulab@iscas.ac.cn
+* [PATCH] netfilter: ipvs: fix ct refcount leak when template is invalid
 
-One could argue that the bug had to be fixed in iproute2 and not in
-the kernel, to avoid breaking UAPI.
+and found the following issue:
+general protection fault in ip_vs_conn_put
 
-> Actually, an eventually fixed version of NetworkManager doesn't need to
-> know the behaviour of the kernel: it can just order addresses by
-> timestamps instead, as Fernando mentioned.
+Full report is available here:
+https://ci.syzbot.org/series/fb773743-f223-4965-9f38-e5ea600ee724
 
-If the fix must be in NetworkManager, we only need to parse them in
-non-reverse order like IPv4, I guess.
+***
 
-> And I'm not sure how relevant this is, but if we revert the fix,
-> current combinations of NetworkManager / kernel versions would be
-> anyway affected.
+general protection fault in ip_vs_conn_put
 
-Probably many, for who knows how much time, unless all distros
-backport the NetworkManager patch. Many don't backport much except a
-small bunch of security fixes.
+tree:      nf-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netfilter/nf-next.git
+base:      aa064a614efcfa4c300609d1f01134e99a12ad10
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/3e6a154f-d578-4d43-94af-86e851702925/config
+syz repro: https://ci.syzbot.org/findings/518450a1-bd56-47bd-b214-be945f6ba221/syz_repro
 
-> So at this point the only robust / complete fix would be changing
-> NetworkManager to sort addresses as needed. Are you suggesting that we
-> should anyway try to minimise the temporal impact of this with a revert?
+IPVS: sed: FWM 3 0x00000003 - no destination available
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
+CPU: 1 UID: 0 PID: 5812 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:ip_vs_conn_put+0x2b/0x240 net/netfilter/ipvs/ip_vs_conn.c:608
+Code: 0f 1e fa 55 41 57 41 56 41 55 41 54 53 48 89 fb 49 bc 00 00 00 00 00 fc ff df e8 40 cb c1 f7 4c 8d 73 3c 4d 89 f5 49 c1 ed 03 <43> 0f b6 44 25 00 84 c0 0f 85 9f 01 00 00 41 8b 2e 89 ee 81 e6 00
+RSP: 0018:ffffc90003d4eba8 EFLAGS: 00010203
+RAX: ffffffff8a03f980 RBX: 0000000000000000 RCX: ffff888169370000
+RDX: 0000000000000000 RSI: ffffffff8c28b740 RDI: 0000000000000000
+RBP: ffffc90003d4ee30 R08: ffff88823c6247d3 R09: 1ffff110478c48fa
+R10: dffffc0000000000 R11: ffffed10478c48fb R12: dffffc0000000000
+R13: 0000000000000007 R14: 000000000000003c R15: 0000000000000000
+FS:  00007faa344d36c0(0000) GS:ffff8882a9276000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007faa33472780 CR3: 0000000169de6000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ ip_vs_sched_persist net/netfilter/ipvs/ip_vs_core.c:-1 [inline]
+ ip_vs_schedule+0x100f/0x1d90 net/netfilter/ipvs/ip_vs_core.c:688
+ udp_conn_schedule+0x391/0x7a0 net/netfilter/ipvs/ip_vs_proto_udp.c:78
+ ip_vs_try_to_schedule net/netfilter/ipvs/ip_vs_core.c:1659 [inline]
+ ip_vs_in_hook+0xc50/0x1bf0 net/netfilter/ipvs/ip_vs_core.c:2231
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:619
+ nf_hook+0x22a/0x3a0 include/linux/netfilter.h:273
+ __ip_local_out+0x558/0x6a0 net/ipv4/ip_output.c:120
+ ip_local_out+0x2a/0x190 net/ipv4/ip_output.c:129
+ ip_send_skb+0x45/0xc0 net/ipv4/ip_output.c:1510
+ udp_send_skb+0x7e4/0xf70 net/ipv4/udp.c:1161
+ udp_sendmsg+0x1937/0x21a0 net/ipv4/udp.c:1443
+ udpv6_sendmsg+0x996/0x25c0 net/ipv6/udp.c:1523
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x5c7/0x9f0 net/socket.c:2698
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
+ __sys_sendmsg net/socket.c:2784 [inline]
+ __do_sys_sendmsg net/socket.c:2789 [inline]
+ __se_sys_sendmsg net/socket.c:2787 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7faa3359ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007faa344d3028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007faa33815fa0 RCX: 00007faa3359ce59
+RDX: 0000000000000000 RSI: 0000200000000400 RDI: 0000000000000004
+RBP: 00007faa33632d6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007faa33816038 R14: 00007faa33815fa0 R15: 00007ffe8bd2ebb8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:ip_vs_conn_put+0x2b/0x240 net/netfilter/ipvs/ip_vs_conn.c:608
+Code: 0f 1e fa 55 41 57 41 56 41 55 41 54 53 48 89 fb 49 bc 00 00 00 00 00 fc ff df e8 40 cb c1 f7 4c 8d 73 3c 4d 89 f5 49 c1 ed 03 <43> 0f b6 44 25 00 84 c0 0f 85 9f 01 00 00 41 8b 2e 89 ee 81 e6 00
+RSP: 0018:ffffc90003d4eba8 EFLAGS: 00010203
+RAX: ffffffff8a03f980 RBX: 0000000000000000 RCX: ffff888169370000
+RDX: 0000000000000000 RSI: ffffffff8c28b740 RDI: 0000000000000000
+RBP: ffffc90003d4ee30 R08: ffff88823c6247d3 R09: 1ffff110478c48fa
+R10: dffffc0000000000 R11: ffffed10478c48fb R12: dffffc0000000000
+R13: 0000000000000007 R14: 000000000000003c R15: 0000000000000000
+FS:  00007faa344d36c0(0000) GS:ffff8882a9276000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007faa335ea540 CR3: 0000000169de6000 CR4: 00000000000006f0
+----------------
+Code disassembly (best guess):
+   0:	0f 1e fa             	nop    %edx
+   3:	55                   	push   %rbp
+   4:	41 57                	push   %r15
+   6:	41 56                	push   %r14
+   8:	41 55                	push   %r13
+   a:	41 54                	push   %r12
+   c:	53                   	push   %rbx
+   d:	48 89 fb             	mov    %rdi,%rbx
+  10:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
+  17:	fc ff df
+  1a:	e8 40 cb c1 f7       	call   0xf7c1cb5f
+  1f:	4c 8d 73 3c          	lea    0x3c(%rbx),%r14
+  23:	4d 89 f5             	mov    %r14,%r13
+  26:	49 c1 ed 03          	shr    $0x3,%r13
+* 2a:	43 0f b6 44 25 00    	movzbl 0x0(%r13,%r12,1),%eax <-- trapping instruction
+  30:	84 c0                	test   %al,%al
+  32:	0f 85 9f 01 00 00    	jne    0x1d7
+  38:	41 8b 2e             	mov    (%r14),%ebp
+  3b:	89 ee                	mov    %ebp,%esi
+  3d:	81                   	.byte 0x81
+  3e:	e6 00                	out    %al,$0x0
 
-I don't think it's the "only" robust fix. Normally one would think
-first about not breaking UAPI. Kernel's UAPI is not great or intuitive
-in many places, but normally it's never improved to avoid breaking
-backward compatibility. Adding a GIVE_ME_THE_RIGHT_ORDER flag could
-help too, but I agree that it sounds a bit silly to have an opt-in
-option to force the right behaviour.
 
-Then, the only robust fix would be to fix pasta and iproute2.
+***
 
-Here we know of 2 affected userspace programs, but we don't know if
-more could be discovered in the future.
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
-That said, it is true that this case is very unintuitive. Insertion is
-direct-order for both IPv4 and 6. Dump is reversed, but only for IPv6.
-Userspace programs won't expect this at all. Programs that do it right
-it's probably because they encountered a bug because they were
-initially reading in direct-order, and changed to reverse-order. I
-haven't dug into NetworkManager's history but I bet this was the case.
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
-In this case I would be in favor of not reverting the kernel change,
-and fix NetworkManager, but I'd like to hear Beniamino's opinion, as
-I'm not being much involved in NetworkManager any more.
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
 
---=20
-=C3=8D=C3=B1igo Huguet
-
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
