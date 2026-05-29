@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-293125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293126-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNZ6EUeWGWpPxwgAu9opvQ
-	(envelope-from <netdev+bounces-293125-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:36:07 +0200
+	id oAs1GiiVGWrVxggAu9opvQ
+	(envelope-from <netdev+bounces-293126-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:31:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C79602F03
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:36:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1778602E3F
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3086930752D4
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:29:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D543D30D7C99
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C133368A4;
-	Fri, 29 May 2026 13:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC7A33ADA0;
+	Fri, 29 May 2026 13:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eQ/3hhEX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SoxiBUKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f201.google.com (mail-lj1-f201.google.com [209.85.208.201])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1505D33ADA0
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 13:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B5733BBC5
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 13:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780061375; cv=none; b=RvedSO8ywcZeJY15WEOOlfjMfJvob+V+uR0Yo6MlDuQWF9igNS6TJM5dLl7KXUbiEbQxds3WNtO1MaUc0ToHT0vLzGetI2aQqKRrkUeQqEpywwxtt4AhLxJ44ikwVfJ2+G5mSxJWqEhafU8r7kobl1EGcRbrb04fVCz2iY268AE=
+	t=1780061378; cv=none; b=INXkPNQm8lOBfdu9n/gA2bGvX49nEGxUWImiEanjnWivjxWN4m/3+oYQWDfB8cQD6uTdsp1K2kbPeZkLN0WCsPxsPZz+00Yr4A1e6h27L6ZDgKNZ9osFBAvCRJgnSNPs7vwWVJL5Astsx/sxvhoW5MsjadLc4d7CCIVosFzRbFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780061375; c=relaxed/simple;
-	bh=yDGG5xF8wlnsiwtSGIlOABVRQs6MDqiT5FxwAWF9130=;
+	s=arc-20240116; t=1780061378; c=relaxed/simple;
+	bh=CkLNFLQoIejZn1R53j9upetRYQ373u30vK6NJJ/HCo4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QECqy8tc7QkGGUNyicODe7TCNSH5UIc0bHqbEAzuShGNeb4VkjbFWtr1LK4ByQ8sbGKHpdToFsPAqbrjNnUboiOfuteLYOAiuW/K1vZYW9eOqdkKvjOmMjKFU55nFcR01BPotMVWhQJD7GFP/Y+V0dswRqpLjaPS/2EcQ+RTg4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eQ/3hhEX; arc=none smtp.client-ip=209.85.208.201
+	 To:Cc:Content-Type; b=khb2k7D4wePPESbqTkgnlsp+PvwtzHZsMlnhMT39G9F4QmeKEirHp7GpXm4xuyqHGppYRlQcqSLu5+1+eBpfrsF55/KUJepJC605/Vd2kt5R55K0NGdBibPRoED4w0eQiCaYnFSZZyErvNP+kipfEurIhGaqgx0bjHVYr5inWGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SoxiBUKs; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-lj1-f201.google.com with SMTP id 38308e7fff4ca-3940fc93c77so57815251fa.0
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 06:29:32 -0700 (PDT)
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-48fe6894f3fso86911725e9.2
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 06:29:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780061371; x=1780666171; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780061375; x=1780666175; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2FTeY3NhMYKOPR9wQenEEZNDfB3zMFvPRif+fMRL5ak=;
-        b=eQ/3hhEXss8h/nmIlgxuKiGZ5xrf7pxJ22mDgJ3T3r/Rw2sCj0kORvBOUGoCe+T2mk
-         3XAzAPoXF0r0vEBQLq/HijiVwhbB1Rwu9+fP28Fdcl1HBF+i/MHZjtRlezOis3NrArKn
-         plGTS1t65xIo+ISu1GYP2sMvdAgxPQbP3viXEwU9hINzrhmrdCqgVu8Hevo172anzQKq
-         rhAxi+0TWlZmBMXSa4T96cZw3hs6pygOcQ6eqJ9pYM3tLVr1Xfls9wMjKLYj8jfC1wWe
-         XB25Ape8qPvBHo6O+b4wPxMHjnmudMPVkVTyisNInxnzz46EdQOXH/laJLMbGOLdAiSt
-         WxOA==
+        bh=xHhhVn4vsW86m1Qo+CSANVQihzAV4jC69efY1gMDYX8=;
+        b=SoxiBUKs1DDsBdT2Ef5Pz01DPqkPumNhd+oaxXEsiGFmvT3JMAlRl+/1nWBlqKD+85
+         Ur2GdSkpqvipSUSUTSEhzkS+Q07gfs0mI+0BKt4rk6cn4Z58BRZSYYLtdWt9r7micDeA
+         qsbI5XaarhPzuRSdBqmBXgtGI+t60teTcUqGBZykvETnQ/nPx75zoI0OfoxGDILZIcgi
+         9kD6ChKMlMH27RZPa24isaV2D2lr6xNt9PLwcvkYkyX+827vdgcM765Exst+/GUIx1Rd
+         /rpC9LxmzgfR7UxsdUGZTEu5YkXH2iThHx8hONoBBrOztRNqewcmTHC9z1M4x58DS7q8
+         kxzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780061371; x=1780666171;
+        d=1e100.net; s=20251104; t=1780061375; x=1780666175;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2FTeY3NhMYKOPR9wQenEEZNDfB3zMFvPRif+fMRL5ak=;
-        b=h3ehYMgnp+mhAiGtCcAXbPFDnPcMi7dijtLccn7azILQbd6QItt7CvARF3v4pnokRl
-         ieqY85JIRPF7WdmgnIRwvucOJX4dGg7I6kvZLKHzubYg8MJ5pU/58JlJglnCM+RXbilu
-         TH9BFe0nGiHj5pg9CNLjDE7FWDfLC4iDsbTleHO2aFfXUnXL3zXDRVLm9YawJ1B5W22Z
-         m7QXYlO1GHHiGpkm6Wc0fvB12JML4JNmfD8GJ44SckiZ7CEO5OF/4lUQtPHQMHa4Fgh5
-         J/Z0tRR9AE92Dr+sW26NYgYDgXZVpUKH200BJt1I2rd5385qvYz/neb9EOb97xMJy5ox
-         eiww==
-X-Forwarded-Encrypted: i=1; AFNElJ+eTgKrBejZePo/5Zm4hw4kkmc/L1cQguh438w8xjlUFABXSSiorMlVqOzH+tIU5p+GxViNGmg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqY0MfbBUlVZBcNTUCFI+18ozpCF/0sF5dSNhrYI1/DqYyOnOw
-	52xvkJP+/gEhlYCPl0ifVtdsr9ev31ANinvuMaXAhtYgE+hIbKD+FjUZndlmFXBKJKGAkonHIbG
-	dinKIRGRe8k3CXhLILA==
-X-Received: from ljju12.prod.google.com ([2002:a2e:854c:0:b0:38a:53e5:ea1c])
+        bh=xHhhVn4vsW86m1Qo+CSANVQihzAV4jC69efY1gMDYX8=;
+        b=XI7Qab6Xn37U8yg6vhxvx9S68dUNysnq4BrInxp1TfPNlP89Uz1er7XjawjeULF2Qp
+         aSLbfnbBxiWXtPDSfBT6UquAiVc59TayR3w6PHMhe58/1zCuo4KTJR5vggHfg78IgsDS
+         5iwnKKlicMvTuDEAAzKS9lmbq0KzcGL1x/4lgP3eyribBawQ6u/Q+oypcot6gOtcBttR
+         QXIFL52Ur2FQf3BzghK4haY90uAtHL4aTx4pbHEfBtdzBzNORzIEqhCNZVmhB7bhsEQy
+         hG4qztLiZgQVDbRFW4eVBs7NlLbo0l1wmve74QxVkTt03RQ09vRUE84Hu0sRIt3pVFUv
+         uhPw==
+X-Forwarded-Encrypted: i=1; AFNElJ8pxcwIvsL7mqq3sAM1lmklTnMPl61Lq/qrva6iifDihnEIuvM4YBlgeGLe06xSI0Ez7uUAfRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+Qv+dUQJvXyek3drELbsecD2LNC+mjd5sGHA4M71ieOCSoboB
+	wddNUF2e71FtIX/7bVIOtH9M1cPKTMVHcqE1oTHt8Ju69QUeeZjvztpkNVvUknsGPpzACnwcdW+
+	W72JB/QhIWP15KIHIDA==
+X-Received: from wmbgx17.prod.google.com ([2002:a05:600c:8591:b0:490:11e5:b5aa])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:651c:2359:10b0:394:1c6:6da4 with SMTP id 38308e7fff4ca-396536baf8cmr6619311fa.11.1780061371223;
- Fri, 29 May 2026 06:29:31 -0700 (PDT)
-Date: Fri, 29 May 2026 13:28:39 +0000
+ 2002:a05:600c:e489:10b0:490:9804:afdc with SMTP id 5b1f17b1804b1-4909c0b9586mr38507975e9.23.1780061374856;
+ Fri, 29 May 2026 06:29:34 -0700 (PDT)
+Date: Fri, 29 May 2026 13:28:40 +0000
 In-Reply-To: <20260529-binder-netlink-v6-0-92dd74b6a32e@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,22 +76,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260529-binder-netlink-v6-0-92dd74b6a32e@google.com>
 X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
-X-Developer-Signature: v=1; a=openpgp-sha256; l=15797; i=aliceryhl@google.com;
- h=from:subject:message-id; bh=yDGG5xF8wlnsiwtSGIlOABVRQs6MDqiT5FxwAWF9130=;
- b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBqGZSqnxDmJzUkiImZgSzexKmQ9Do5mXyXg/qWT
- PkgpxyXnFOJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCahmUqgAKCRAEWL7uWMY5
- Rss5EACXuuhN9w22SdmdjXkp3NuHAqBW3iYJpwOWnxtlS1DmJfJHZAoQyUSIeWBcExPDXuDD352
- WPJMVRN14NRFlqD4V3f9210HRVxIf/SAv1BvEwBHYgwEpWZkgv3MPoWDVLz/zBW5WzorinClZQC
- JhvY6MqpIz/IUq1DEDccpFz4Et9UYzaLJZZZ26fTFdcXwtcRk2S/zCXEyWEhpspCNMZ8itOee5t
- v9xelWJ4zpQ/ncolcDeKsnEE0PEy8bVuQRcYiE+Nb/yFw7m/VWXYQUYJYAp4+9dcQ0kddpHLgpN
- nqxvz/T9Mp22hZ2nIhc6i+FpHPW6/r3IRwvW/0IqhCT+RqYnbgNJXuPb24QWCXuD4N4g8d1JmI/
- y/AZjjAN4nwD5j+gcNcYEGdvBbN0bv9/N3hExY+a14Jnfn7vJ/xWcpFyHLCo50ZbhnGigMmhLEK
- b8XnND5zp0zaXyqkPKZyp1v314mtSGLV38OiruhM8TTiIHTxRbGze0oCTCdPSQAb6m18SGSguZy
- DCZK5vWT4wV4qd7q2gZz3KLJC3wn0F/JZzRQaI9SLHhsE8STq5/YGTR0ZQnhxzzSMDBpU1pqvhK
- H5vrYBN7GtKI1CIHDt84FN+6mcf9jTZW1pWmVpVu31SMbzn9puyqgsLalV0JJD1xn8O679vtc2F lRSHci7YovhXBjQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11751; i=aliceryhl@google.com;
+ h=from:subject:message-id; bh=nRyqKbtrahdGEfuNVDlkowtAO1l90fpVZ9tCOqHlNa0=;
+ b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBqGZSqk1tyiKegjAxOAAC2Kcc512v48b5eC7z3o
+ HJtUF2rsTyJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCahmUqgAKCRAEWL7uWMY5
+ Rm/FD/9zhMA18YbeLCfnWk4v9OG5fX0xyWUWcoqwGUWF1Ze64dXrPNPq+FBSfIRYR76oPpNnK5N
+ nAuGbS82gLThJMM10/Aq9w1Eg6SViQ1SHthyAD8ZnkwrRwYmGuuUIE2RbZu7vMZKjJ+GHZwFM6M
+ 9h9fLPs4xnLBRp5/LaECVfRoy7tG3AHl5/URad6VGYAdbNIb58Y599lKMjrA98xxssPLlYQ7ziO
+ RcbaaRMFaUoJWi/udgjqc+8ghIRAhcET8/aYsOdWrVX3kyRIEeKpWe33AJpotrFOAaJc/eXCRZu
+ YYuakVZaisS9seQZlHIO/VCcudTziVYeywxg1SaQmbQUSfmfcf7cDDhnirQy0ryoQtzCVXmlOq8
+ tvK3qg4xAQNXiFezliDgbGZvCxIHOdth3fT0LN4C+Tlzl6a0KBqHxhfliyOWYSf5Cl2WiwVPav+
+ pB6SR2R3dZpgkCVewr01byEWFYsvePXENBM3lvnGtfstW9Dw4F+myIHPDQmA97nkuRLW3ofYGja
+ 9BpCGbW6M6wbaXjeyek95NLmMcKQseQiDb1NGuBBZ9k/Myvr2zOhPq2scZnQ5UIT2fSDUcbgjHV
+ hHvt4foePGyY3zzTWc/DdU3RM4X86/yeAzzihnqH0jRSsS80uYfDkp3LgP+NKx9Vz9DlsBEggS3 zz13KgOGTFoDVjQ==
 X-Mailer: b4 0.14.3
-Message-ID: <20260529-binder-netlink-v6-2-92dd74b6a32e@google.com>
-Subject: [PATCH v6 2/3] rust: netlink: add raw netlink abstraction
+Message-ID: <20260529-binder-netlink-v6-3-92dd74b6a32e@google.com>
+Subject: [PATCH v6 3/3] rust_binder: report netlink transactions
 From: Alice Ryhl <aliceryhl@google.com>
 To: Carlos Llamas <cmllamas@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
 	Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>, 
@@ -111,12 +111,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293125-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293126-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[google.com,linuxfoundation.org,lunn.ch,gmail.com,kernel.org,davemloft.net,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -130,475 +130,323 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,vger.kernel.org,google.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:email]
-X-Rspamd-Queue-Id: 49C79602F03
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E1778602E3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This implements a safe and relatively simple API over the netlink API,
-that allows you to add different attributes to a netlink message and
-broadcast it. As the first user of this API only makes use of broadcast,
-only broadcast messages are supported here.
+From: Carlos Llamas <cmllamas@google.com>
 
-This API is intended to be safe and to be easy to use in *generated*
-code. This is because netlink is generally used with yaml files that
-describe the underlying API, and the python generator outputs C code
-(or, soon, Rust code) that lets you use the API more easily. So for
-example, if there is a string field, the code generator will output a
-method that internall calls `put_string()` with the right attr type.
+The Android Binder driver supports a netlink API that reports
+transaction *failures* to a userspace daemon. This allows devices to
+monitor processes with many failed transactions so that it can e.g. kill
+misbehaving apps.
 
-Reviewed-by: Matthew Maurer <mmaurer@google.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+One very important thing that this monitors is when many oneway messages
+are sent to a frozen process, so there is special handling to ensure
+this scenario is surfaced over netlink.
+
+Signed-off-by: Carlos Llamas <cmllamas@google.com>
+Co-developed-by: Alice Ryhl <aliceryhl@google.com>
 Signed-off-by: Alice Ryhl <aliceryhl@google.com>
 ---
- rust/bindings/bindings_helper.h |   3 +
- rust/helpers/helpers.c          |   1 +
- rust/helpers/net/genetlink.c    |  46 ++++++
- rust/kernel/net/mod.rs          |   2 +
- rust/kernel/net/netlink.rs      | 337 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 389 insertions(+)
+ drivers/android/Kconfig                    |   2 +-
+ drivers/android/binder/netlink.rs          | 117 +++++++++++++++++++++++++++++
+ drivers/android/binder/rust_binder_main.rs |   8 +-
+ drivers/android/binder/thread.rs           |  11 ++-
+ drivers/android/binder/transaction.rs      |  40 ++++++++++
+ rust/uapi/uapi_helper.h                    |   1 +
+ 6 files changed, 175 insertions(+), 4 deletions(-)
 
-diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index 446dbeaf0866..612fa5388b7d 100644
---- a/rust/bindings/bindings_helper.h
-+++ b/rust/bindings/bindings_helper.h
-@@ -92,6 +92,8 @@
- #include <linux/wait.h>
- #include <linux/workqueue.h>
- #include <linux/xarray.h>
-+#include <net/genetlink.h>
-+#include <net/netlink.h>
- #include <trace/events/rust_sample.h>
+diff --git a/drivers/android/Kconfig b/drivers/android/Kconfig
+index e2e402c9d175..606a9d07f774 100644
+--- a/drivers/android/Kconfig
++++ b/drivers/android/Kconfig
+@@ -16,7 +16,7 @@ config ANDROID_BINDER_IPC
  
- /*
-@@ -109,6 +111,7 @@
- const size_t RUST_CONST_HELPER_ARCH_SLAB_MINALIGN = ARCH_SLAB_MINALIGN;
- const size_t RUST_CONST_HELPER_ARCH_KMALLOC_MINALIGN = ARCH_KMALLOC_MINALIGN;
- const size_t RUST_CONST_HELPER_PAGE_SIZE = PAGE_SIZE;
-+const size_t RUST_CONST_HELPER_GENLMSG_DEFAULT_SIZE = GENLMSG_DEFAULT_SIZE;
- const gfp_t RUST_CONST_HELPER_GFP_ATOMIC = GFP_ATOMIC;
- const gfp_t RUST_CONST_HELPER_GFP_KERNEL = GFP_KERNEL;
- const gfp_t RUST_CONST_HELPER_GFP_KERNEL_ACCOUNT = GFP_KERNEL_ACCOUNT;
-diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-index 625921e27dfb..d17eaec76450 100644
---- a/rust/helpers/helpers.c
-+++ b/rust/helpers/helpers.c
-@@ -70,6 +70,7 @@
- #include "maple_tree.c"
- #include "mm.c"
- #include "mutex.c"
-+#include "net/genetlink.c"
- #include "of.c"
- #include "page.c"
- #include "pci.c"
-diff --git a/rust/helpers/net/genetlink.c b/rust/helpers/net/genetlink.c
-new file mode 100644
-index 000000000000..3530b69f6cf7
---- /dev/null
-+++ b/rust/helpers/net/genetlink.c
-@@ -0,0 +1,46 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * Copyright (C) 2026 Google LLC.
-+ */
-+
-+#include <net/genetlink.h>
-+
-+#ifdef CONFIG_NET
-+
-+__rust_helper struct sk_buff *rust_helper_genlmsg_new(size_t payload, gfp_t flags)
-+{
-+	return genlmsg_new(payload, flags);
-+}
-+
-+__rust_helper
-+int rust_helper_genlmsg_multicast(const struct genl_family *family,
-+				  struct sk_buff *skb, u32 portid,
-+				  unsigned int group, gfp_t flags)
-+{
-+	return genlmsg_multicast(family, skb, portid, group, flags);
-+}
-+
-+__rust_helper void rust_helper_genlmsg_cancel(struct sk_buff *skb, void *hdr)
-+{
-+	genlmsg_cancel(skb, hdr);
-+}
-+
-+__rust_helper void rust_helper_genlmsg_end(struct sk_buff *skb, void *hdr)
-+{
-+	genlmsg_end(skb, hdr);
-+}
-+
-+__rust_helper void rust_helper_nlmsg_free(struct sk_buff *skb)
-+{
-+	nlmsg_free(skb);
-+}
-+
-+__rust_helper
-+int rust_helper_genl_has_listeners(const struct genl_family *family,
-+				   struct net *net, unsigned int group)
-+{
-+	return genl_has_listeners(family, net, group);
-+}
-+
-+#endif
-diff --git a/rust/kernel/net/mod.rs b/rust/kernel/net/mod.rs
-index fe415cb369d3..8ecae7577ed2 100644
---- a/rust/kernel/net/mod.rs
-+++ b/rust/kernel/net/mod.rs
-@@ -4,3 +4,5 @@
+ config ANDROID_BINDER_IPC_RUST
+ 	bool "Rust version of Android Binder IPC Driver"
+-	depends on RUST && MMU && !ANDROID_BINDER_IPC
++	depends on RUST && MMU && NET && !ANDROID_BINDER_IPC
+ 	help
+ 	  This enables the Rust implementation of the Binder driver.
  
- #[cfg(CONFIG_RUST_PHYLIB_ABSTRACTIONS)]
- pub mod phy;
-+
-+pub mod netlink;
-diff --git a/rust/kernel/net/netlink.rs b/rust/kernel/net/netlink.rs
+diff --git a/drivers/android/binder/netlink.rs b/drivers/android/binder/netlink.rs
 new file mode 100644
-index 000000000000..22ef3dde36fa
+index 000000000000..beb7ea2edaff
 --- /dev/null
-+++ b/rust/kernel/net/netlink.rs
-@@ -0,0 +1,337 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/drivers/android/binder/netlink.rs
+@@ -0,0 +1,117 @@
++// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++/* Based on: Documentation/netlink/specs/binder.yaml */
 +
-+// Copyright (C) 2026 Google LLC.
-+
-+//! Rust support for generic netlink.
-+//!
-+//! Currently only supports exposing multicast groups.
-+//!
-+//! C header: [`include/net/genetlink.h`](srctree/include/net/genetlink.h)
-+
++#![allow(unreachable_pub, clippy::wrong_self_convention)]
 +use kernel::{
-+    alloc::{self, AllocError},
-+    error::to_result,
-+    prelude::*,
-+    transmute::AsBytes,
-+    types::Opaque,
-+    ThisModule,
++    net::netlink::{
++        Family,
++        GenlMsg,
++        MulticastGroup,
++        NetlinkSkBuff, //
++    },
++    prelude::*, //
 +};
 +
-+use core::{
-+    mem::ManuallyDrop,
-+    ptr::NonNull, //
-+};
++pub static BINDER_NL_FAMILY: Family = Family::const_new(
++    &crate::THIS_MODULE,
++    kernel::uapi::BINDER_FAMILY_NAME,
++    kernel::uapi::BINDER_FAMILY_VERSION,
++    &BINDER_NL_FAMILY_MCGRPS,
++);
 +
-+/// The default netlink message size.
-+pub const GENLMSG_DEFAULT_SIZE: usize = bindings::GENLMSG_DEFAULT_SIZE;
++static BINDER_NL_FAMILY_MCGRPS: [MulticastGroup; 1] = [MulticastGroup::const_new(c"report")];
 +
-+/// A wrapper around `struct sk_buff` for generic netlink messages.
-+///
-+/// This type is intended to be specific for buffers used with netlink only, and other usecases for
-+/// `struct sk_buff` are out-of-scope for this abstraction.
-+///
-+/// # Invariants
-+///
-+/// The pointer has ownership over a valid `sk_buff`.
-+pub struct NetlinkSkBuff {
-+    skb: NonNull<kernel::bindings::sk_buff>,
++/// A multicast event sent to userspace subscribers to notify them about
++/// binder transaction failures. The generated report provides the full
++/// details of the specific transaction that failed. The intention is for
++/// programs to monitor these events and react to the failures as needed.
++pub struct Report {
++    skb: GenlMsg,
 +}
 +
-+impl NetlinkSkBuff {
-+    /// Creates a new `NetlinkSkBuff` with the given size.
-+    pub fn new(size: usize, flags: alloc::Flags) -> Result<NetlinkSkBuff, AllocError> {
-+        // SAFETY: `genlmsg_new` only requires its arguments to be valid integers.
-+        let skb = unsafe { bindings::genlmsg_new(size, flags.as_raw()) };
-+        let skb = NonNull::new(skb).ok_or(AllocError)?;
-+        Ok(NetlinkSkBuff { skb })
-+    }
-+
-+    /// Puts a generic netlink header into the `NetlinkSkBuff`.
-+    pub fn genlmsg_put(
-+        self,
++impl Report {
++    /// Create a new multicast message.
++    pub fn new(
++        size: usize,
 +        portid: u32,
 +        seq: u32,
-+        family: &'static Family,
-+        cmd: u8,
-+    ) -> Result<GenlMsg, AllocError> {
-+        let skb = self.skb.as_ptr();
-+        // SAFETY: The skb and family pointers are valid.
-+        let hdr = unsafe { bindings::genlmsg_put(skb, portid, seq, family.as_raw(), 0, cmd) };
-+        let hdr = NonNull::new(hdr).ok_or(AllocError)?;
-+        Ok(GenlMsg { skb: self, hdr })
++        flags: kernel::alloc::Flags,
++    ) -> Result<Self, kernel::alloc::AllocError> {
++        const BINDER_CMD_REPORT: u8 = kernel::uapi::BINDER_CMD_REPORT as u8;
++        let skb = NetlinkSkBuff::new(size, flags)?;
++        let skb = skb.genlmsg_put(portid, seq, &BINDER_NL_FAMILY, BINDER_CMD_REPORT)?;
++        Ok(Self { skb })
++    }
++
++    /// Broadcast this message.
++    pub fn multicast(self, portid: u32, flags: kernel::alloc::Flags) -> Result {
++        self.skb.multicast(&BINDER_NL_FAMILY, portid, 0, flags)
++    }
++
++    /// Check if this message type has listeners.
++    pub fn has_listeners() -> bool {
++        BINDER_NL_FAMILY.has_listeners(0)
++    }
++
++    /// The enum binder_driver_return_protocol returned to the sender.
++    pub fn error(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_ERROR: c_int = kernel::uapi::BINDER_A_REPORT_ERROR as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_ERROR, val)
++    }
++
++    /// The binder context where the transaction occurred.
++    pub fn context(&mut self, val: &CStr) -> Result {
++        const BINDER_A_REPORT_CONTEXT: c_int = kernel::uapi::BINDER_A_REPORT_CONTEXT as c_int;
++        self.skb.put_string(BINDER_A_REPORT_CONTEXT, val)
++    }
++
++    /// The PID of the sender process.
++    pub fn from_pid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_FROM_PID: c_int = kernel::uapi::BINDER_A_REPORT_FROM_PID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_FROM_PID, val)
++    }
++
++    /// The TID of the sender thread.
++    pub fn from_tid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_FROM_TID: c_int = kernel::uapi::BINDER_A_REPORT_FROM_TID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_FROM_TID, val)
++    }
++
++    /// The PID of the recipient process. This attribute may not be present
++    /// if the target could not be determined.
++    pub fn to_pid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_TO_PID: c_int = kernel::uapi::BINDER_A_REPORT_TO_PID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_TO_PID, val)
++    }
++
++    /// The TID of the recipient thread. This attribute may not be present
++    /// if the target could not be determined.
++    pub fn to_tid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_TO_TID: c_int = kernel::uapi::BINDER_A_REPORT_TO_TID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_TO_TID, val)
++    }
++
++    /// When present, indicates the failed transaction is a reply.
++    pub fn is_reply(&mut self) -> Result {
++        const BINDER_A_REPORT_IS_REPLY: c_int = kernel::uapi::BINDER_A_REPORT_IS_REPLY as c_int;
++        self.skb.put_flag(BINDER_A_REPORT_IS_REPLY)
++    }
++
++    /// The bitmask of enum transaction_flags from the transaction.
++    pub fn flags(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_FLAGS: c_int = kernel::uapi::BINDER_A_REPORT_FLAGS as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_FLAGS, val)
++    }
++
++    /// The application-defined code from the transaction.
++    pub fn code(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_CODE: c_int = kernel::uapi::BINDER_A_REPORT_CODE as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_CODE, val)
++    }
++
++    /// The transaction payload size in bytes.
++    pub fn data_size(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_DATA_SIZE: c_int = kernel::uapi::BINDER_A_REPORT_DATA_SIZE as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_DATA_SIZE, val)
 +    }
 +}
-+
-+impl Drop for NetlinkSkBuff {
-+    fn drop(&mut self) {
-+        // SAFETY: We have ownership over the `sk_buff`, so we may free it.
-+        unsafe { bindings::nlmsg_free(self.skb.as_ptr()) }
-+    }
+diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
+index dc1941cd2407..0dc62ac440ec 100644
+--- a/drivers/android/binder/rust_binder_main.rs
++++ b/drivers/android/binder/rust_binder_main.rs
+@@ -38,6 +38,7 @@
+ mod deferred_close;
+ mod defs;
+ mod error;
++mod netlink;
+ mod node;
+ mod page_range;
+ mod process;
+@@ -288,19 +289,22 @@ fn ptr_align(value: usize) -> Option<usize> {
+ // SAFETY: We call register in `init`.
+ static BINDER_SHRINKER: Shrinker = unsafe { Shrinker::new() };
+ 
+-struct BinderModule {}
++struct BinderModule {
++    _netlink: kernel::net::netlink::Registration,
 +}
-+
-+/// A generic netlink message being constructed.
-+///
-+/// # Invariants
-+///
-+/// `hdr` references the header in this netlink message.
-+pub struct GenlMsg {
-+    skb: NetlinkSkBuff,
-+    hdr: NonNull<c_void>,
-+}
-+
-+impl GenlMsg {
-+    /// Puts an attribute into the message.
-+    #[inline]
-+    fn put<T>(&mut self, attrtype: c_int, value: &T) -> Result
-+    where
-+        T: ?Sized + AsBytes,
-+    {
-+        let skb = self.skb.skb.as_ptr();
-+        let len = size_of_val(value);
-+        let ptr = core::ptr::from_ref(value).cast::<c_void>();
-+        // SAFETY: `skb` is valid by `NetlinkSkBuff` type invariants, and the provided value is
-+        // readable and initialized for its `size_of` bytes.
-+        to_result(unsafe { bindings::nla_put(skb, attrtype, len as c_int, ptr) })
-+    }
-+
-+    /// Puts a `u32` attribute into the message.
-+    #[inline]
-+    pub fn put_u32(&mut self, attrtype: c_int, value: u32) -> Result {
-+        self.put(attrtype, &value)
-+    }
-+
-+    /// Puts a string attribute into the message.
-+    #[inline]
-+    pub fn put_string(&mut self, attrtype: c_int, value: &CStr) -> Result {
-+        self.put(attrtype, value.to_bytes_with_nul())
-+    }
-+
-+    /// Puts a flag attribute into the message.
-+    #[inline]
-+    pub fn put_flag(&mut self, attrtype: c_int) -> Result {
-+        let skb = self.skb.skb.as_ptr();
-+        // SAFETY: `skb` is valid by `NetlinkSkBuff` type invariants, and a null pointer is valid
-+        // when the length is zero.
-+        to_result(unsafe { bindings::nla_put(skb, attrtype, 0, core::ptr::null()) })
-+    }
-+
-+    /// Sends the generic netlink message as a multicast message.
-+    #[inline]
-+    pub fn multicast(
-+        self,
-+        family: &'static Family,
-+        portid: u32,
-+        group: u32,
-+        flags: alloc::Flags,
-+    ) -> Result {
-+        let me = ManuallyDrop::new(self);
-+        // SAFETY: The `skb` and `family` pointers are valid. We pass ownership of the `skb` to
-+        // `genlmsg_multicast` by not dropping `self`.
-+        unsafe {
-+            bindings::genlmsg_end(me.skb.skb.as_ptr(), me.hdr.as_ptr());
-+            to_result(bindings::genlmsg_multicast(
-+                family.as_raw(),
-+                me.skb.skb.as_ptr(),
-+                portid,
-+                group,
-+                flags.as_raw(),
-+            ))
+ 
+ impl kernel::Module for BinderModule {
+     fn init(_module: &'static kernel::ThisModule) -> Result<Self> {
+         // SAFETY: The module initializer never runs twice, so we only call this once.
+         unsafe { crate::context::CONTEXTS.init() };
+ 
++        let netlink = crate::netlink::BINDER_NL_FAMILY.register()?;
+         BINDER_SHRINKER.register(c"android-binder")?;
+ 
+         // SAFETY: The module is being loaded, so we can initialize binderfs.
+         unsafe { kernel::error::to_result(binderfs::init_rust_binderfs())? };
+ 
+-        Ok(Self {})
++        Ok(Self { _netlink: netlink })
+     }
+ }
+ 
+diff --git a/drivers/android/binder/thread.rs b/drivers/android/binder/thread.rs
+index 97d5f31e8fe3..25ea01ce9ecf 100644
+--- a/drivers/android/binder/thread.rs
++++ b/drivers/android/binder/thread.rs
+@@ -1246,7 +1246,6 @@ fn transaction(self: &Arc<Self>, cmd: u32, reader: &mut UserSliceReader) -> Resu
+             self.push_return_work(err.reply);
+             if let Some(source) = &err.source {
+                 info.errno = source.to_errno();
+-                info.reply = err.reply;
+ 
+                 {
+                     let mut ee = self.inner.lock().extended_error;
+@@ -1263,6 +1262,15 @@ fn transaction(self: &Arc<Self>, cmd: u32, reader: &mut UserSliceReader) -> Resu
+             }
+         }
+ 
++        if info.oneway_spam_suspect {
++            // If this is both a oneway spam suspect and a failure, we report it twice. This is
++            // useful in case the transaction failed with BR_TRANSACTION_PENDING_FROZEN.
++            info.report_netlink(BR_ONEWAY_SPAM_SUSPECT, &self.process.ctx);
 +        }
-+    }
-+}
-+impl Drop for GenlMsg {
-+    fn drop(&mut self) {
-+        // SAFETY: The `hdr` pointer references the header of this generic netlink message.
-+        unsafe { bindings::genlmsg_cancel(self.skb.skb.as_ptr(), self.hdr.as_ptr()) };
-+    }
-+}
-+
-+/// Flags for a generic netlink family.
-+struct FamilyFlags {
-+    /// Whether the family supports network namespaces.
-+    netnsok: bool,
-+    /// Whether the family supports parallel operations.
-+    parallel_ops: bool,
-+}
-+
-+impl FamilyFlags {
-+    /// Converts the flags to the bitfield representation used by `genl_family`.
-+    const fn into_bitfield(self) -> bindings::__BindgenBitfieldUnit<[u8; 1]> {
-+        // The below shifts are verified correct by test_family_flags_bitfield() below.
-+        //
-+        // Although bindgen generates helpers to change bitfields based on the C headers, these
-+        // helpers unfortunately can't be used in const context. Since `Family` needs to be filled
-+        // out at build-time, we use this helper instead.
-+        let mut bits = 0;
-+        if self.netnsok {
-+            bits |= 1 << 0;
-+        }
-+        if self.parallel_ops {
-+            bits |= 1 << 1;
-+        }
-+        // Convert from little endian to the target's endianness.
-+        bits = u8::from_le(bits);
-+        // SAFETY: This bitfield is represented as an u8.
-+        unsafe { core::mem::transmute::<u8, bindings::__BindgenBitfieldUnit<[u8; 1]>>(bits) }
-+    }
-+}
-+
-+/// A generic netlink family.
-+#[repr(transparent)]
-+pub struct Family {
-+    inner: Opaque<bindings::genl_family>,
-+}
-+
-+// SAFETY: The `Family` type is thread safe.
-+unsafe impl Sync for Family {}
-+
-+impl Family {
-+    /// Creates a new `Family` instance.
-+    ///
-+    /// Intended to be used from const context only. Will panic if provided with invalid arguments.
-+    ///
-+    /// The name must be a nul-terminated string, but it is taken as `&[u8]` so that it can be used
-+    /// more conveniently with the strings generated by bindgen.
-+    pub const fn const_new(
-+        module: &ThisModule,
-+        name: &[u8],
-+        version: u32,
-+        mcgrps: &'static [MulticastGroup],
-+    ) -> Family {
-+        let n_mcgrps = mcgrps.len() as u8;
-+        if n_mcgrps as usize != mcgrps.len() {
-+            panic!("too many mcgrps");
-+        }
-+        let mut genl_family = bindings::genl_family {
-+            version,
-+            _bitfield_1: FamilyFlags {
-+                netnsok: true,
-+                parallel_ops: true,
-+            }
-+            .into_bitfield(),
-+            module: module.as_ptr(),
-+            mcgrps: mcgrps.as_ptr().cast(),
-+            n_mcgrps,
-+            ..pin_init::zeroed()
-+        };
-+        if CStr::from_bytes_with_nul(name).is_err() {
-+            panic!("genl_family name not nul-terminated");
-+        }
-+        if genl_family.name.len() < name.len() {
-+            panic!("genl_family name too long");
-+        }
-+        let mut i = 0;
-+        while i < name.len() {
-+            genl_family.name[i] = name[i];
-+            i += 1;
-+        }
-+        Family {
-+            inner: Opaque::new(genl_family),
-+        }
-+    }
-+
-+    /// Checks if there are any listeners for the given multicast group.
-+    pub fn has_listeners(&self, group: u32) -> bool {
-+        // SAFETY: The family and init_net pointers are valid.
-+        unsafe {
-+            bindings::genl_has_listeners(self.as_raw(), &raw mut bindings::init_net, group) != 0
-+        }
-+    }
-+
-+    /// Returns a raw pointer to the underlying `genl_family` structure.
-+    pub fn as_raw(&self) -> *mut bindings::genl_family {
-+        self.inner.get()
-+    }
-+}
-+
-+/// A generic netlink multicast group.
-+#[repr(transparent)]
-+pub struct MulticastGroup {
-+    // No Opaque because fully immutable
-+    group: bindings::genl_multicast_group,
-+}
-+
-+// SAFETY: Pure data so thread safe.
-+unsafe impl Sync for MulticastGroup {}
-+
-+impl MulticastGroup {
-+    /// Creates a new `MulticastGroup` instance.
-+    ///
-+    /// Intended to be used from const context only. Will panic if provided with invalid arguments.
-+    pub const fn const_new(name: &CStr) -> MulticastGroup {
-+        let mut group: bindings::genl_multicast_group = pin_init::zeroed();
-+
-+        let name = name.to_bytes_with_nul();
-+        if group.name.len() < name.len() {
-+            panic!("genl_multicast_group name too long");
-+        }
-+        let mut i = 0;
-+        while i < name.len() {
-+            group.name[i] = name[i];
-+            i += 1;
++        if info.reply != 0 {
++            info.report_netlink(info.reply, &self.process.ctx);
 +        }
 +
-+        MulticastGroup { group }
-+    }
-+}
+         Ok(())
+     }
+ 
+@@ -1332,6 +1340,7 @@ fn reply_inner(self: &Arc<Self>, info: &mut TransactionInfo) -> BinderResult {
+             );
+             let reply = Err(BR_FAILED_REPLY);
+             orig.from.deliver_reply(reply, &orig);
++            info.reply = BR_FAILED_REPLY;
+             err.reply = BR_TRANSACTION_COMPLETE;
+             err
+         });
+diff --git a/drivers/android/binder/transaction.rs b/drivers/android/binder/transaction.rs
+index 47d5e4d88b07..ce1b1ccd080a 100644
+--- a/drivers/android/binder/transaction.rs
++++ b/drivers/android/binder/transaction.rs
+@@ -3,6 +3,7 @@
+ // Copyright (C) 2025 Google LLC.
+ 
+ use kernel::{
++    net::netlink::GENLMSG_DEFAULT_SIZE,
+     prelude::*,
+     seq_file::SeqFile,
+     seq_print,
+@@ -17,6 +18,7 @@
+     allocation::{Allocation, TranslatedFds},
+     defs::*,
+     error::{BinderError, BinderResult},
++    netlink::Report,
+     node::{Node, NodeRef},
+     process::{Process, ProcessInner},
+     ptr_align,
+@@ -49,6 +51,44 @@ impl TransactionInfo {
+     pub(crate) fn is_oneway(&self) -> bool {
+         self.flags & TF_ONE_WAY != 0
+     }
 +
-+/// A registration of a generic netlink family.
-+///
-+/// This type represents the registration of a [`Family`]. When an instance of this type is
-+/// dropped, its respective generic netlink family will be unregistered from the system.
-+///
-+/// # Invariants
-+///
-+/// `self.family` always holds a valid reference to an initialized and registered [`Family`].
-+pub struct Registration {
-+    family: &'static Family,
-+}
-+
-+impl Family {
-+    /// Registers the generic netlink family with the kernel.
-+    pub fn register(&'static self) -> Result<Registration> {
-+        // SAFETY: `self.as_raw()` is a valid pointer to a `genl_family` struct.
-+        // The `genl_family` struct is static, so it will outlive the registration.
-+        to_result(unsafe { bindings::genl_register_family(self.as_raw()) })?;
-+        Ok(Registration { family: self })
-+    }
-+}
-+
-+impl Drop for Registration {
-+    fn drop(&mut self) {
-+        // SAFETY: `self.family.as_raw()` is a valid pointer to a registered `genl_family` struct.
-+        // The `Registration` struct ensures that `genl_unregister_family` is called exactly once
-+        // for this family when it goes out of scope.
-+        unsafe { bindings::genl_unregister_family(self.family.as_raw()) };
-+    }
-+}
-+
-+#[macros::kunit_tests(rust_netlink)]
-+mod tests {
-+    use super::*;
-+
-+    #[test]
-+    fn test_family_flags_bitfield() {
-+        for netnsok in [false, true] {
-+            for parallel_ops in [false, true] {
-+                let mut b_fam = bindings::genl_family {
-+                    ..Default::default()
-+                };
-+                b_fam.set_netnsok(if netnsok { 1 } else { 0 });
-+                b_fam.set_parallel_ops(if parallel_ops { 1 } else { 0 });
-+
-+                let c_bitfield = FamilyFlags {
-+                    netnsok,
-+                    parallel_ops,
-+                }
-+                .into_bitfield();
-+
-+                // SAFETY: The bit field is stored as u8.
-+                let b_val: u8 = unsafe { core::mem::transmute(b_fam._bitfield_1) };
-+                // SAFETY: The bit field is stored as u8.
-+                let c_val: u8 = unsafe { core::mem::transmute(c_bitfield) };
-+                assert_eq!(b_val, c_val);
-+            }
++    pub(crate) fn report_netlink(&self, reply: u32, ctx: &crate::Context) {
++        if let Err(err) = self.report_netlink_inner(reply, ctx) {
++            pr_warn!(
++                "{}:{} netlink report failed: {err:?}\n",
++                self.from_pid,
++                self.from_tid
++            );
 +        }
 +    }
-+}
++
++    fn report_netlink_inner(&self, reply: u32, ctx: &crate::Context) -> kernel::error::Result {
++        if !Report::has_listeners() {
++            return Ok(());
++        }
++        let mut report = Report::new(GENLMSG_DEFAULT_SIZE, 0, 0, GFP_KERNEL)?;
++
++        report.error(reply)?;
++        report.context(&ctx.name)?;
++        report.from_pid(self.from_pid as u32)?;
++        report.from_tid(self.from_tid as u32)?;
++        if self.to_pid != 0 {
++            report.to_pid(self.to_pid as u32)?;
++        }
++        if self.to_tid != 0 {
++            report.to_tid(self.to_tid as u32)?;
++        }
++
++        if self.is_reply {
++            report.is_reply()?;
++        }
++        report.flags(self.flags)?;
++        report.code(self.code)?;
++        report.data_size(self.data_size as u32)?;
++
++        report.multicast(0, GFP_KERNEL)?;
++        Ok(())
++    }
+ }
+ 
+ use core::mem::offset_of;
+diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
+index 06d7d1a2e8da..86c7b6b284b0 100644
+--- a/rust/uapi/uapi_helper.h
++++ b/rust/uapi/uapi_helper.h
+@@ -11,6 +11,7 @@
+ #include <uapi/drm/nova_drm.h>
+ #include <uapi/drm/panthor_drm.h>
+ #include <uapi/linux/android/binder.h>
++#include <uapi/linux/android/binder_netlink.h>
+ #include <uapi/linux/mdio.h>
+ #include <uapi/linux/mii.h>
+ #include <uapi/linux/ethtool.h>
 
 -- 
 2.54.0.823.g6e5bcc1fc9-goog
