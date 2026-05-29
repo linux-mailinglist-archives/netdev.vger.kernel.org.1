@@ -1,443 +1,261 @@
-Return-Path: <netdev+bounces-293045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMu/OhJLGWrzuQgAu9opvQ
-	(envelope-from <netdev+bounces-293045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:15:14 +0200
+	id +LSUIjVPGWrzuQgAu9opvQ
+	(envelope-from <netdev+bounces-293047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:32:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E88745FF0D4
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:15:13 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 169BA5FF3E8
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6A7BF3021D2A
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 08:07:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C60CB30187B2
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 08:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8083ACEFE;
-	Fri, 29 May 2026 08:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA41D3B27E9;
+	Fri, 29 May 2026 08:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CKY7stOc"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="srWZBAXv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6E82EC0B0
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 08:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD00E3A3809
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 08:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780042055; cv=none; b=dIFM1C3jLXJtjtWepJz7YEvKpdmqmeWNQsGk9AScvOjyZG1+9OAbcxKEGr3ik5hx7mv8fA9KMaFUUf04Wl9wRLxyOuOHsIcC/3ObhAamJiHdTV2GDpmbciSr0BgemTKppW5x4JGAS+SpBCo2Oz8CYVzPIDNdw9gzlme+HI1733M=
+	t=1780043569; cv=none; b=gNyIttOUJnSNsci5cSgaEK7Q9WcUTSGi4denhmVN2SwlDLYy/PHf75Ih2w/nQYGVpnIoop/Nzd9se5GpmsIqPtRvRpmjIH5yaVAKxqEmIRQ38Z0fApCgOVwN9WYwJGpcsztsu4Sn+tuUUkXPXUgU0CJksCf1Ii03BhNH+QMf/qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780042055; c=relaxed/simple;
-	bh=vPRRXaXjoTYY9dJCQ1fK2GUOqj9LWdoMZQW4RpFc89I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VYQUEOG4+2kV20z8//LFnP2vpO2ROODta+NzJk+AqmGqjGwnAaOgu7qpqJNT84RTIwSRDEDOOzacHstBmgz7Dfd85srxKBed9G1TJhbsEp2PwLpzce7WeIOTRfk04hfpsMV2utkKGXs54wk+K9DhaDRxGjBcSSk0z8/JK0NMJo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CKY7stOc; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 280024E42D83;
-	Fri, 29 May 2026 08:07:31 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E8FC1601FA;
-	Fri, 29 May 2026 08:07:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5936C10888CCC;
-	Fri, 29 May 2026 10:07:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780042034; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=jGlRn1W5ouwjxABCkERxBzbsQlWsYNZ5t3xkrUTSUSY=;
-	b=CKY7stOcVz7q/LljMtLpxhEAP7WzWgJXglKSaenuFWf0om19acmrvNnk3PZCYYPSdBQtOH
-	VqWuH71AU/wjkGCV7drwxgZ4/NqYqHYLiwdMUg390ZugntlcUm1f+ChVI3amuuX+/Cim38
-	wJcUQgmrkHSNQqdnj/LUy4RL8twalD0U3WWsKmDr5ZpvOVcTKUFRTHixnLcoskRaeXi0VF
-	SPV31NqaGzZzKwm20sPCOykc25qYL0V5T64wc6fggVbK4p4Ubb1kb6xaYrOxMQrv7waKqt
-	qp6EzIvRFFQB2IXDBDK65Dl3AOSb+diN/+lSnEOW6UEkuHe8E/fS2+i9b4KaOA==
-Message-ID: <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
-Date: Fri, 29 May 2026 10:07:02 +0200
+	s=arc-20240116; t=1780043569; c=relaxed/simple;
+	bh=I9+U0oeln3wfRg6fgxdb29piHvshQxl/lE3izHy6mP4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JbwpWqAiiTtiGHAVwL38n9FTidzGXqDJ93fMTyif1N2ImPmVxhXjn+LK6GzfAWKcknlpeQRUUVv0PUIiab4biIHlk4Z1tH9lG/v0rQPZF0AOnmtbekYkPjXZrZ7xXf2cjt3mf6qvFzfhpBcf3VHnXYoy0qq1us0SatjwrCRcfz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=srWZBAXv; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 83DAA205CD;
+	Fri, 29 May 2026 10:27:16 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IQTt-PCLn6QJ; Fri, 29 May 2026 10:27:15 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id AA11B20561;
+	Fri, 29 May 2026 10:27:15 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com AA11B20561
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1780043235;
+	bh=OEGzZZ8KG8NtzPdhTrPyJlrhNF1SQWHdKpDMahvuodE=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=srWZBAXvUJe+JFoCCBS5K8cMKHqrMe8x5oYNyN9qKNpB97+DmoMxXjlWG8UojaVid
+	 kq1cAspE1W3ihikhxeRKOf/C7ivZufnXD/DfU2wsCv/meQ56AGgyXjqWDacxe4UGvJ
+	 DPiAQaYaEsqogz0QCwReN3bSMCvfLwjWe23NKIvE+1+L1pDkc3XVbnX5ncuBA8vra6
+	 +C6qd3jaF11yRATwQ4zrY2UOgHGB+20v8uTS8Mh3WDvjmnKRJSu3jDxcWu7NDEYi5I
+	 jEH+a0PTEMxK264uPMomlZMdnhh3L1tZZwPfbPBn4TDSoLjW2IrgPXi6r63vAm/d2K
+	 bdt05wZftonvg==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 29 May
+ 2026 10:27:15 +0200
+Received: (nullmailer pid 3826857 invoked by uid 1000);
+	Fri, 29 May 2026 08:27:14 -0000
+Date: Fri, 29 May 2026 10:27:14 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Paolo Abeni <pabeni@redhat.com>
+CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>,
+	Alessandro Schino <7991aleschino@gmail.com>
+Subject: Re: [PATCH 5/9] esp: fix page frag reference leak on skb_to_sgvec
+ failure
+Message-ID: <ahlN4nG1GPi289rX@secunet.com>
+References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
+ <20260527084148.3489759-6-steffen.klassert@secunet.com>
+ <0902bdb9-2746-45fd-ba4d-8e5b96617b8b@redhat.com>
+ <ahkphzYYBeoCcbRI@secunet.com>
+ <e7124e98-5633-4982-a850-8787c3949174@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Florian Fainelli <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
- <2293244a-c6a9-4642-a721-dada8a081dbc@lunn.ch>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <2293244a-c6a9-4642-a721-dada8a081dbc@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e7124e98-5633-4982-a850-8787c3949174@redhat.com>
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293045-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,gondor.apana.org.au,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-293047-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sbb.ch:email];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: E88745FF0D4
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 169BA5FF3E8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Fri, May 29, 2026 at 09:14:28AM +0200, Paolo Abeni wrote:
+> On 5/29/26 7:52 AM, Steffen Klassert wrote:
+> > Ccing the author of this patch.
+> > 
+> > On Thu, May 28, 2026 at 03:44:14PM +0200, Paolo Abeni wrote:
+> >> On 5/27/26 10:41 AM, Steffen Klassert wrote:
+> >>> From: e521588 <alessandro.schino@sbb.ch>
+> >>>
+> >>> In esp_output_tail(), when esp->inplace is false, the old skb page frags
+> >>> are replaced with a new page from the xfrm page_frag cache. The source
+> >>> scatterlist (sg) is built from the old frags before the replacement, and
+> >>> esp_ssg_unref() is responsible for releasing the old page references
+> >>> after the crypto operation completes.
+> >>>
+> >>> However, if the second skb_to_sgvec() call (which builds the destination
+> >>> scatterlist from the new page) fails, the code jumps to error_free which
+> >>> only calls kfree(tmp). The old page frag references captured in the
+> >>> source scatterlist are never released:
+> >>>
+> >>>   1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+> >>>   2. nr_frags is set to 1 and frag[0] is replaced with the new page
+> >>>   3. Second skb_to_sgvec() fails -> goto error_free
+> >>>   4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
+> >>>   5. kfree_skb() only releases frag[0] (the new page), not the old ones
+> >>>
+> >>> Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+> >>> unconditionally unrefs the source scatterlist frags without checking
+> >>> req->src and req->dst, since those fields are not yet initialized by
+> >>> aead_request_set_crypt() at the point of the error. Existing callers
+> >>> pass false to preserve the original behavior.
+> >>>
+> >>> The same issue exists in both esp4 and esp6 as the code is identical.
+> >>>
+> >>> Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+> >>> Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+> >>>
+> >>> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
+> >>> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> >>> ---
+> >>>  net/ipv4/esp4.c | 12 +++++++-----
+> >>>  net/ipv6/esp6.c | 12 +++++++-----
+> >>>  2 files changed, 14 insertions(+), 10 deletions(-)
+> >>>
+> >>> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+> >>> index 6a5febbdbee4..8314d7bddcb7 100644
+> >>> --- a/net/ipv4/esp4.c
+> >>> +++ b/net/ipv4/esp4.c
+> >>> @@ -96,7 +96,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+> >>>  			     __alignof__(struct scatterlist));
+> >>>  }
+> >>>  
+> >>> -static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+> >>> +static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+> >>>  {
+> >>>  	struct crypto_aead *aead = x->data;
+> >>>  	int extralen = 0;
+> >>> @@ -113,7 +113,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+> >>>  	/* Unref skb_frag_pages in the src scatterlist if necessary.
+> >>>  	 * Skip the first sg which comes from skb->data.
+> >>>  	 */
+> >>> -	if (req->src != req->dst)
+> >>> +	if (already_unref || req->src != req->dst)
+> >>>  		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+> >>>  			skb_page_unref(page_to_netmem(sg_page(sg)),
+> >>>  				       skb->pp_recycle);
+> >>
+> >> Sashiko points the above is still unsafe:
+> > 
+> > For the original patch submission, sashiko reported 'failed
+> > to apply' because it was targeted to the ipsec tree. Now
+> > with the full pull request it applied and it found issues,
+> > but now it is too late for me to fix this.
+> > 
+> > Would it be possible to integrate subtrees of net and net-next
+> > into the netdev CI? This would avoid such problems in future.
+> > 
+> >> ---
+> >> When the new caller passes already_unref = true, can the loop still be
+> >> reached safely?
+> >> Looking at the allocation and request setup in esp_output_tail():
+> >> 	tmp = esp_alloc_tmp(aead, esp->nfrags + 2, extralen);
+> >> 	...
+> >> 	req = esp_tmp_req(aead, iv);
+> >> 	sg  = esp_req_sg(aead, req);
+> >> esp_alloc_tmp() calls kmalloc(len, GFP_ATOMIC) — the buffer is not
+> >> zeroed.
+> >> esp_tmp_req() only does aead_request_set_tfm(req, aead), which assigns
+> >> req->base.tfm. It does not touch req->src or req->dst.
+> >> The local variable sg is filled in by skb_to_sgvec(skb, sg, ...) but
+> >> nothing copies sg into req->src; that assignment is performed later by
+> >> aead_request_set_crypt(req, sg, dsg, ivlen + esp->clen, iv).
+> >> In the new error path the call sequence is:
+> >> 	err = skb_to_sgvec(skb, dsg, ...);
+> >> 	if (unlikely(err < 0)) {
+> >> 		esp_ssg_unref(x, tmp, skb, true);   /* before set_crypt */
+> >> 		goto error_free;
+> >> 	}
+> >> 	...
+> >> 	aead_request_set_crypt(req, sg, dsg, ivlen + esp->clen, iv);
+> >> Inside esp_ssg_unref() with already_unref = true, the predicate is
+> >> short-circuited but the loop body still dereferences req->src:
+> >> 	if (already_unref || req->src != req->dst)
+> >> 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+> >> 			skb_page_unref(page_to_netmem(sg_page(sg)),
+> >> 				       skb->pp_recycle);
+> >> Since req->src has not been initialized at this point (the kmalloc
+> >> buffer holds whatever was there before, and aead_request_set_crypt()
+> >> has not yet run), sg_next(req->src) walks an arbitrary pointer,
+> >> sg_page(sg) reads sg->page_link from arbitrary memory, and
+> >> skb_page_unref(page_to_netmem(...), ...) then drops a refcount on a
+> >> fabricated page.
+> >> The commit message also seems to acknowledge this:
+> >>     Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+> >>     unconditionally unrefs the source scatterlist frags without checking
+> >>     req->src and req->dst, since those fields are not yet initialized by
+> >>     aead_request_set_crypt() at the point of the error.
+> >> If req->src/req->dst are not yet initialized, how can the loop
+> >> sg = sg_next(req->src) be valid?  Should the helper instead walk the
+> >> local sg returned by esp_req_sg(aead, req) (which was actually
+> >> populated by the first skb_to_sgvec()), or should
+> >> aead_request_set_crypt() be moved before the failure check so that
+> >> req->src/req->dst are well defined?
+> >> The same construct appears in net/ipv6/esp6.c:
+> >> ---
+> >>
+> >> And the SoB is incorrect for this patch. Do you rebase your tree? (I'm
+> >> not suggesting starting that otherwise!!!) If so you could possibly drop
+> >> this patch ?!?
+> > 
+> > No, I never rebased the ipsec tree so far. I could revert it, or you can
+> > do so if you don't accept the patch as is. Rebasing would be the last
+> > resort as this creates problems for everyone who cloned my tree.
+> 
+> Sure, I just could not remember if xfrm tree was usually rebased or not.
+> A revert or an incremental patch are just fine.
 
-
-On 5/28/26 03:15, Andrew Lunn wrote:
->> +A.1 : Sanity Checks
->> +~~~~~~~~~~~~~~~~~~~
->> +
->> +Pause autoneg is set to off::
->> +
->> +  ethtool -A <iface> autoneg off
->> +
->> +The 'supported' fields retrieved using the ETHTOOL_MSG_LINKMODES_GET includes
->> +a "Pause" bit and an "Asym" bit.
->> +
->> +The ETHTOOL_MSG_PAUSE_GET command returns the currently configured pause modes
->> +in the "tx" and "rx" attributes.
-> 
-> What you have left unspecified here is the state a link autoneg,
-> 
-> ethtool -s <iface> autoneg on|off
-> 
-> At minimum, it should be specified. I've not read the other tests yet,
-> but we may also want to run this basic test with both possible
-> setting.
-
-True ! With a more formalized test description, it should be easier to
-get non-ambiguous starting conditions here.
-
-> 
-> One possible bug which we are trying to detect is that pause autoneg
-> is off, the values are forced, but -s autoneg is on, it completes, and
-> overwrites the forces values with negotiated values.
-
-I'm trying to cover that on the latter tests indeed
-
-> 
-> 
->> +A.2 : Half-duplex operation
->> +~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> +
->> +Pause settings as exposed with the ethtool API only concern full-duplex modes.
->> +
->> +Test scenario:
->> +--------------
->> +
->> +Set the interface under test in half-duplex mode with::
->> +
->> +  ethtool -s <iface> duplex half
->> +
->> +Expected behaviour::
->> +
->> + - ethtool <iface>
->> +
->> +shows no Pause settings advertised.
-> 
-> Since we are talking about advertisement of pause, i think you actually want
-> 
-> ethtool -A <iface> autoneg on
-> ethtool -s <iface> duplex half autoneg on
-> 
-> If -s autoneg is off, nothing should be advertised. So we need that
-> turned on. And if -A autoneg is off, no pause values should be
-> advertised, so you need that turned on as well.
-> 
-> Also, since we expect this to trigger an autoneg, we probably want a
-> sleep(2) in there before looking at the results, to ensure autoneg has
-> completed.
-> 
-> There is also the possibility that the link does not come up, because
-> the link peer does not support half duplex. This is quite common for
-> 1G interfaces. It could also be the local interface does not support
-> 1G half. So maybe
-> 
-> ethtool -s <iface> duplex half speed 100 autoneg on
-
-I think that
-
-   ethtool -s <iface> duplex half autoneg on
-
-should be enough, the link should still establish at 100M, I've tested
-that on a 1G/FULL 100MHalf+Full interface and this is the result we
-get :)
-
-That said I've tested the following on mcbin, and it seems that acually
-nothing in the code currently deals with Half duplex / Pause 
-interaction, and we don't get any EOPNOTSUPP.
-
-So the broader question is, should we reflect the current behaviour or
-an ideal one ?
-
-And if we reflect the current one, the canonical behaviour is probably
-the phylink one ?
-
-> 
-> Or let it first autoneg unrestricted, look at both the local and LP
-> values, and pick a half duplex link mode both support and set it to do
-> that?
-> 
-> The tests defined so far also don't cover all the possible settings of
-> -A autoneg and -s autoneg. There are combinations:
-> 
-> Link autoneg with pause autoneg
-> Link autoneg with forced pause
-> Force link, with forced pause
-> 
-> It would be good to consider what can be tested for these three. Maybe
-> nothing can be tested with forced link, because that it likely to
-> result in no link, when only the local side can be configured.
-> 
->> +B : Combined devices testing
->> +============================
->> +
->> +Requirements : The interface under test must be connected to a link-partner that
->> +can be actively configured during the tests. It must at least support full-duplex
->> +modes, and optionally (but ideally) symmetric and asymmetric flow-control, as
->> +well as autonegotiation of the Pause parameters.
-> 
-> and forced link parameters.
-> 
->> +
->> +B.1 : Autoneg advertising
->> +~~~~~~~~~~~~~~~~~~~~~~~~~
->> +
->> +Goal: Validate that the *advertised* Pause and AsymDir bits match the configured
->> +pausemarams.
-> 
-> typo.
-> 
->> +
->> +The link-level autonegotiation must be enabled::
->> +
->> +  ethtool <iface> autoneg on
->> +
->> +Pause parameters are set with::
->> +
->> +  ethtool -A <iface> rx <val> tx <val> autoneg on
->> +
->> +Pause advertising is retrieved with::
->> +
->> +  ethtool <iface>
->> +
->> +Case 1
->> +------
->> +
->> +Pause parameters : rx **off** tx **off**
->> +
->> +Expected advertisement : **None** (Pause = 0, AsymDir = 0)
->> +
->> +Case 2
->> +------
->> +
->> +Pause parameters : rx **off** tx **on**
->> +
->> +Expected advertisement : **Transmit-only** (Pause = 0, AsymDir = 1)
->> +
->> +Case 3
->> +------
->> +
->> +Pause parameters : rx **on** tx **off**
->> +
->> +Expected advertisement : **Symmetric receive-only** (Pause = 1, Asymdir = 1)
->> +
->> +Case 4
->> +------
->> +
->> +Pause parameters : rx **on** tx **on**
->> +
->> +Expected advertisement : **Symmetric** (Pause = 1, Asymdir = 0)
-> 
-> We should consider here what happens when the local side only supports
-> symmetric pause. We would expect EOPNOTSUPP, or maybe EINVAL. If
-> ethtool report:
-> 
-> 	Supported pause frame use: Symmetric Receive-only
-> 
-> not getting an error for the asymmetric settings would be a bug.
-
-Ack, I think all test cases will need to account for the local device
-support
-
-> 
->> +
->> +B.2 : Autoneg resolution
->> +~~~~~~~~~~~~~~~~~~~~~~~~
->> +
->> +Goal: Validate that the Pause and AsymDir negotiation translates to the right
->> +TX and RX pause parameters.
->> +
->> +The following table, from the 802.3 standard, exposes the autoneg resolution
->> +result for the advertised pause parameters by each link partner.
->> +
->> ++-------------+--------------+--------------------------+
->> +|Local device | Link partner | Pause settings resolution|
->> ++------+------+-------+------+-----------+--------------+
->> +|Pause | Asym | Pause | Asym | RX        | TX	        |
-> 
-> There is a tab vs space issue here.
-> 
-> 
->> ++======+======+=======+======+===========+==============+
->> +| 0    | 0    | Any   | Any  | No        | No           |
->> ++------+------+-------+------+-----------+--------------+
->> +| 0    | 1    | 0     | Any  | No        | No           |
->> ++------+------+-------+------+-----------+--------------+
->> +| 0    | 1    | 1     | 0    | No        | No           |
->> ++------+------+-------+------+-----------+--------------+
->> +| 0    | 1    | 1     | 1    | No        | Yes          |
->> ++------+------+-------+------+-----------+--------------+
->> +| 1    | 0    | 0     | Any  | No        | No           |
->> ++------+------+-------+------+-----------+--------------+
->> +| 1    | Any  | 1     | Any  | Yes       | Yes          |
->> ++------+------+-------+------+-----------+--------------+
->> +| 1    | 1    | 0     | 0    | No        | No           |
->> ++------+------+-------+------+-----------+--------------+
->> +| 1    | 1    | 0     | 1    | Yes       | No           |
->> ++------+------+-------+------+-----------+--------------+
->> +
->> +The mapping between the configured pause parameters and advertised modes follow
->> +the following truth table :
->> +
->> ++----+----+-------+---------+
->> +| tx | rx | Pause | AsymDir |
->> ++====+====+=======+=========+
->> +| 0  | 0  | 0     | 0       |
->> ++----+----+-------+---------+
->> +| 0  | 1  | 1     | 1       |
->> ++----+----+-------+---------+
->> +| 1  | 0  | 0     | 1       |
->> ++----+----+-------+---------+
->> +| 1  | 1  | 1     | 0       |
->> ++----+----+-------+---------+
->> +
->> +We can boil that down to the following cases to test, keeping the number small
->> +to avoid dealing with the whole combinatory::
-> 
-> Why not do the whole set of combination? There are 16 combinations,
-> autoneg takes a little over 1 second, so we are probably talking 32
-> seconds in total. That is a reasonable runtime for a test.
-
-True, I'll describe the whole set then :)
-
-> 
->> +Case 1
->> +------
->> +
->> +Local device : rx **off**, tx **off**
->> +Remote device : rx **on** tx **on**
->> +
->> +Expected result on local device after autonegotiation completes :
->> +        rx negotiated **off**
->> +        tx negotiated **off**
->> +
-> 
-> ...
-> 
->> +Case 7
->> +------
->> +
->> +Local device : rx **on** tx **on**
->> +Remote device : rx **off** tx **off**
->> +
->> +Expected result on local device after autonegotiation completes :
->> +        rx negotiated **off**
->> +        tx negotiated **off**
->> +
->> +Case 8
->> +------
->> +
->> +Local device : rx **on** tx **on**
->> +Remote device : rx **off** tx **on**
->> +
->> +Expected result on local device after autonegotiation completes :
->> +        rx negotiated **on**
->> +        tx negotiated **off**
-> 
-> what also needs to be considered here is:
-> 
-> What if the local side only supports symmetric pause?
-> What if the LP only supports symmetric pause?
-> 
-> The expect results should take this into account, that the
-> configuration fails, but that is not a test failure, just a hardware
-> limitation.
-> 
->> +
->> +B.3 : Pause Autoneg
->> +~~~~~~~~~~~~~~~~~~~
->> +
->> +Goal: Validate that the Pause autonegotiation flag correctly toggles the
->> +advertised Pause and AsymDir link parameters.
->> +
->> +Test scenario:
->> +--------------
->> +
->> + - Enable pause autoneg and at least rx or tx pause::
->> +
->> +        ethtool -A <iface> rx on tx on autoneg on
->> +
->> + - Check the Advertised pause frame use::
->> +
->> +        ethtool <iface>
->> +
->> +        ...
->> +        Advertised pause frame use: Symmetric Receive-only
->> +
->> + - Disable pause autoneg::
->> +
->> +        ethtool -A <iface> autoneg off
->> +
->> + - Check the Advertised pause frame use, which must be 'No'::
->> +
->> +        ethtool <iface>
->> +
->> +        ...
->> +        Advertised pause frame use: No
-> 
-> Please describe configuration for both sides. This is needed for all
-> the tests when there are two devices involved.
-> 
-> Also, when local pause advertisement is turned off, check what the
-> link partner is reporting it received from its link partner.
-
-Very well, I'll add this.
-
-Thanks for the extensive feedback Andrew,
-
-Maxime
+I'll revert it for now and resend the pull reuest.
 
