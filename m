@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-293056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BkCBs1cGWoLvwgAu9opvQ
-	(envelope-from <netdev+bounces-293056-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:30:53 +0200
+	id sG33OgFdGWoLvwgAu9opvQ
+	(envelope-from <netdev+bounces-293058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:31:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DEB25FFF62
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:30:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 505045FFF9B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 195AC301DCCD
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:26:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A519530FEA8B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E252B3B47D6;
-	Fri, 29 May 2026 09:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C5E3BD64C;
+	Fri, 29 May 2026 09:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="bAdBod3K"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Wmn4e+1G"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412F83446DE
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 09:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807673BFACE
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 09:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780046817; cv=none; b=jI+fRCB7sNpWveiOI7cTvVJjB5u4EYbEIiw0kA5I7ZQvdV8CFviesZSApHqJ/cAfY0dlBZ/gwnrRWy3rwFVg+PstkovZDcM779xPIOpWdck2hstBm8MH+Z7i015Hg2XY+4RpPOOYbbSWJyXFtpQHzLCc4M3CtKD44vo00kJdF7c=
+	t=1780046820; cv=none; b=KB1YJgKCWFuTv3kwQcLk2gomCXBEjm5GRo9Hpu7G/f/jjreRz4TFSaVfs4IPSXAzXCQtvuwzpbTBgaRO7XjqUmftqova7u4x+b8j0F7XxxDhJh01n7plKl3iauP4+HjcRbBWFmJzY+NygQVq9sJmW8UsxXboLpsDPn/V06DMrx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780046817; c=relaxed/simple;
-	bh=Lxa7piGJRpIt58wB4GOoBcG5z2Z6VBCpRWPakuE16xs=;
+	s=arc-20240116; t=1780046820; c=relaxed/simple;
+	bh=/izszOpthDhootIGGTkKGh55bXtyqI+1GS/KFD76RvE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZLC/ZuGTBc4zIJGRut9qRZgFnQENlNA8OU9TUz4AwQRxFZlg5bC5JH8+Hv9iWqBOvCrc5IY8iieQYei5qPHe6/rU9+zPnnVvwUw/b+7rjxoJFef1+4Pj73Ufbad5fmzfInZhX+RjZhszJyXDixcrttYwLRCWRrdu0P1srFyfGSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=bAdBod3K; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=uAkhmXbv2Osc3YxPz8ubO+YR2J/Au8x6Y+CVjVF3DM40oG98I8Maj6NOtp5N0HG7GtMJc5cQ5EuO1yLnJCkVhUHCLpWKEngW12T0nqe4WiZwx4XKWNbXCBTv9bFQ8IS956z6q5nOsDR4w3CBq8RgBDfs2nhz7CF6asHgX4ehlJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Wmn4e+1G; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id D5BED206D0;
-	Fri, 29 May 2026 11:26:53 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 49835207BB;
+	Fri, 29 May 2026 11:26:57 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IvTa74vjEdeq; Fri, 29 May 2026 11:26:53 +0200 (CEST)
+ with ESMTP id D8Re44eSbx8H; Fri, 29 May 2026 11:26:56 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 3C0472019D;
-	Fri, 29 May 2026 11:26:53 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 3C0472019D
+	by mx1.secunet.com (Postfix) with ESMTPS id A0E3C2019D;
+	Fri, 29 May 2026 11:26:56 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com A0E3C2019D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1780046813;
-	bh=ZAwIrpwKprGw0uaudJaQf5Wh/QCSbXX2h/P24ElQh38=;
+	s=202301; t=1780046816;
+	bh=Z51YuHhdd9x3+E62LaZCa9un8uZMFr+Y/Iy0U1//+Qw=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=bAdBod3KZWagFmcgQMNSgJNokZCifV+k6YuRfeSHbKZArfJsgIwlm0JdR9zweUlnk
-	 BzEEJovIOUQ/KJDK8nG2q6htBuyk1dqHchJSCb+70wKHGbMwdjb0Ap1v4UvIo/EzVV
-	 yL7HLfVVSYi4luzIVi8clEeshdlNJeoQVJdMoAqvSFXGLSXuHlX6vDzdNOZnvS7Gqx
-	 upGDUS9or2hsq6ezX9xgeZfaFU4TDvgWHpM07L63LEUskgfOniD7VUoSByGJm//oJR
-	 qCvpjp/8N3TvssHcz8JYTCXxS8UmDjoHWCmrFTlLCiroLldUz23ZQLofEktB7235xJ
-	 m8RqKMo4eR6CA==
+	b=Wmn4e+1G0vGojGqyZL1CvLBPC3CZZy40CcWIT+4THlNjIfenV8pH7hy5nn+0AT5zg
+	 LB5Ie01bJ1uvZopMOMba3URDVbINIUttNYXUwPRdSI1/hzizzWTrINn+1vBLgQg7fd
+	 tLcxU8uEDwEawZuzSQ8SSaeJqWAKsfBwOL179MIzgAt8f/+YLF7OVGtA/QeNCbov0K
+	 0567WCvr/cJnDB0U3jzlU2QmuydxIKjxf1fOFIbklA0ekG5aecoiEfparMAgta6BEa
+	 r0RTqUM4GS+i1SvMH4Evqo3XjA9XWk8aqJNNct4HvWJqKmUo8CwM4AMvwqSCfverjy
+	 XdDKBCXpPoDDQ==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 29 May
- 2026 11:26:52 +0200
-Received: (nullmailer pid 3879705 invoked by uid 1000);
+ 2026 11:26:56 +0200
+Received: (nullmailer pid 3879708 invoked by uid 1000);
 	Fri, 29 May 2026 09:26:51 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 06/10] xfrm: esp: restore combined single-frag length gate
-Date: Fri, 29 May 2026 11:26:08 +0200
-Message-ID: <20260529092648.3878973-7-steffen.klassert@secunet.com>
+Subject: [PATCH 07/10] xfrm: iptfs: reset runtime state when cloning SAs
+Date: Fri, 29 May 2026 11:26:09 +0200
+Message-ID: <20260529092648.3878973-8-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260529092648.3878973-1-steffen.klassert@secunet.com>
 References: <20260529092648.3878973-1-steffen.klassert@secunet.com>
@@ -81,7 +81,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -94,7 +94,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293056-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293058-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -105,71 +105,100 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:email,queasysnail.net:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:email,secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 6DEB25FFF62
+X-Rspamd-Queue-Id: 505045FFF9B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jingguo Tan <tanjingguo@huawei.com>
+From: Shaomin Chen <eeesssooo020@gmail.com>
 
-The ESP out-of-place fast path appends the trailer in esp_output_head()
-before esp_output_tail() allocates the destination page frag. The
-head-side gate currently checks skb->data_len and tailen separately, but
-the tail code allocates a single destination frag from the combined
-post-trailer skb->data_len.
+iptfs_clone_state() clones the IPTFS mode data with kmemdup(). This
+copies runtime objects which must not be shared with the original SA,
+including the embedded sk_buff_head, hrtimers, spinlock, and in-flight
+reassembly/reorder state.
 
-Reject the page-frag fast path when the combined aligned length exceeds a
-page. Otherwise skb_page_frag_refill() may fall back to a single page while
-the destination sg still spans the combined skb->data_len.
+If xfrm_state_migrate() fails after clone_state() but before the later
+init_state() call has reinitialized those fields, the cloned state can be
+destroyed by xfrm_state_gc_task() with list and timer state copied from the
+original SA. With queued packets this lets the clone splice and free skbs
+owned by the original IPTFS queue, leading to use-after-free and
+double-free reports in iptfs_destroy_state() and skb release paths.
 
-Restore this combined-length page gate for both IPv4 and IPv6.
+Reinitialize the clone's runtime state before publishing it through
+x->mode_data. Because clone_state() now publishes a destroyable mode_data
+object before init_state(), take the mode callback module reference there.
+Avoid taking it again from __iptfs_init_state() for the same object.
 
-Fixes: 5bd8baab087d ("esp: limit skb_page_frag_refill use to a single page")
+Fixes: 0e4fbf013fa5 ("xfrm: iptfs: add user packet (tunnel ingress) handling")
 Cc: stable@vger.kernel.org
-Signed-off-by: Lin Ma <malin89@huawei.com>
-Signed-off-by: Chenyuan Mi <michenyuan@huawei.com>
-Signed-off-by: Jingguo Tan <tanjingguo@huawei.com>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Shaomin Chen <eeesssooo020@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/ipv4/esp4.c | 4 ++--
- net/ipv6/esp6.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ net/xfrm/xfrm_iptfs.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 8314d7bddcb7..5d3a8656687e 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -419,8 +419,8 @@ int esp_output_head(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
- 			return err;
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index 97bc979e55ba..6c6bbc040517 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2650,7 +2650,8 @@ static void __iptfs_init_state(struct xfrm_state *x,
+ 	x->props.enc_hdr_len = sizeof(struct ip_iptfs_hdr);
+ 
+ 	/* Always keep a module reference when x->mode_data is set */
+-	__module_get(x->mode_cbs->owner);
++	if (x->mode_data != xtfs)
++		__module_get(x->mode_cbs->owner);
+ 
+ 	x->mode_data = xtfs;
+ 	xtfs->x = x;
+@@ -2658,22 +2659,39 @@ static void __iptfs_init_state(struct xfrm_state *x,
+ 
+ static int iptfs_clone_state(struct xfrm_state *x, struct xfrm_state *orig)
+ {
++	struct skb_wseq *w_saved = NULL;
+ 	struct xfrm_iptfs_data *xtfs;
+ 
+ 	xtfs = kmemdup(orig->mode_data, sizeof(*xtfs), GFP_KERNEL);
+ 	if (!xtfs)
+ 		return -ENOMEM;
+ 
+-	xtfs->ra_newskb = NULL;
+ 	if (xtfs->cfg.reorder_win_size) {
+-		xtfs->w_saved = kzalloc_objs(*xtfs->w_saved,
+-					     xtfs->cfg.reorder_win_size);
+-		if (!xtfs->w_saved) {
++		w_saved = kzalloc_objs(*w_saved, xtfs->cfg.reorder_win_size);
++		if (!w_saved) {
+ 			kfree_sensitive(xtfs);
+ 			return -ENOMEM;
+ 		}
  	}
++	xtfs->w_saved = w_saved;
++
++	__skb_queue_head_init(&xtfs->queue);
++	xtfs->queue_size = 0;
++	hrtimer_setup(&xtfs->iptfs_timer, iptfs_delay_timer, CLOCK_MONOTONIC,
++		      IPTFS_HRTIMER_MODE);
++
++	spin_lock_init(&xtfs->drop_lock);
++	hrtimer_setup(&xtfs->drop_timer, iptfs_drop_timer, CLOCK_MONOTONIC,
++		      IPTFS_HRTIMER_MODE);
  
--	if (ALIGN(tailen, L1_CACHE_BYTES) > PAGE_SIZE ||
--	    ALIGN(skb->data_len, L1_CACHE_BYTES) > PAGE_SIZE)
-+	if (ALIGN(skb->data_len + tailen, L1_CACHE_BYTES) >
-+	    PAGE_SIZE)
- 		goto cow;
++	xtfs->w_seq_set = false;
++	xtfs->w_wantseq = 0;
++	xtfs->w_savedlen = 0;
++	xtfs->ra_newskb = NULL;
++	xtfs->ra_wantseq = 0;
++	xtfs->ra_runtlen = 0;
++
++	__module_get(x->mode_cbs->owner);
+ 	x->mode_data = xtfs;
+ 	xtfs->x = x;
  
- 	if (!skb_cloned(skb)) {
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 9d0c4957ac62..b963b8e72604 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -448,8 +448,8 @@ int esp6_output_head(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
- 			return err;
- 	}
- 
--	if (ALIGN(tailen, L1_CACHE_BYTES) > PAGE_SIZE ||
--	    ALIGN(skb->data_len, L1_CACHE_BYTES) > PAGE_SIZE)
-+	if (ALIGN(skb->data_len + tailen, L1_CACHE_BYTES) >
-+	    PAGE_SIZE)
- 		goto cow;
- 
- 	if (!skb_cloned(skb)) {
 -- 
 2.43.0
 
