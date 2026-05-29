@@ -1,134 +1,156 @@
-Return-Path: <netdev+bounces-293114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFaVKveOGWpTxggAu9opvQ
-	(envelope-from <netdev+bounces-293114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:04:55 +0200
+	id eNq5INSOGWpTxggAu9opvQ
+	(envelope-from <netdev+bounces-293115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:04:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BA92602A28
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:04:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF24602A08
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF3E53062F54
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:02:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D4CEA3013B86
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DA42D3A7C;
-	Fri, 29 May 2026 13:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE7A3195FC;
+	Fri, 29 May 2026 13:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3HhoUKR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tlLWJsVY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139801E7C12;
-	Fri, 29 May 2026 13:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFBE31197C;
+	Fri, 29 May 2026 13:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780059768; cv=none; b=amX1z/I181LsImE9srklGKSnhzq24W3aCG2g1y99Gi8o7o6HGqKNaeU5zGC29weuEeQqF/fyl+UTl3NoXMnXL2qP2JLBpmtVNzJ/FkPBuE1v6P29FYIquUWOG9a0JwYZ1xHC1ZmM7/s7CLd+VVXLN9ISoYLMq4tTAMdWEepOMDk=
+	t=1780059855; cv=none; b=D1GXac6CXPc2CaA6oEm4HH7zwuREXBGH9CAF5rppDezFd5T0KYk0yhIDKstKvKx8Cq42oL91q3eobdJ6lyrkwz3r1plI0zxLGyax2Yrp3Mjtp3RAxvMybAjgmJBp0oBgWOhNjIRZyiJO1X0m21MSVhoErvKcAOZN2PmzJzxorL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780059768; c=relaxed/simple;
-	bh=ApQz1V5CNU9O9EyceeC74ecs8b38MRpfa33XpuXW5mI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Ps9VXsqyKftbQpcKIUKS3fsi4nMkfbn1bLr8GC69D30TWPyZIp6evV9blVCGfbVgBLzIqrYGgSwZ7QzieJSvFF9HzWdSVuL+p5MyC+ziNtC6D6rbnCYtwIK5IbulP26/rEfHPxUq/qZmIdwLG0xipnFrkgjbIIDtDu0fFwXCC50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3HhoUKR; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 757FE1F00893;
-	Fri, 29 May 2026 13:02:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780059767;
-	bh=66jwmabnss1wzjbJ/pG7HLmk7a00oOo/dxDfODb4vpU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=E3HhoUKR/eThbMY+4+yrcHlS/pZyyLblbZn4d5+FNHlnJnEnizR352OFGeJTuCB/1
-	 fPEhuVfPJmr4NEfbWTKB0lHtHEPAjdcvACXXpCx8RwZZRfBH9Xpv2JHt6LoD9t2vyQ
-	 Io2fAnOB/CXyhFowtOqWtinEWkqw5c0UX/yWQw18xPOEGp/Gd0FCB9W66tKyyJWy/1
-	 sK0LuTYiEzwtdlVVDZH5dlH/pOkreTi1ZRDeUqQsJRzzEO8ivUCJK5DZjcWDYOJaym
-	 KFKrbDa46wfJC+p6Ioenp6HPCLM48/ac5dlXEfTJJyrJN1gstWyZUyrvcTU02aRhNh
-	 he+jdftUvhVKg==
-From: Srinivas Kandagatla <srini@kernel.org>
-To: konradybcio@kernel.org, andersson@kernel.org, 
- Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
-Cc: linux-kernel@vger.kernel.org, Alex Elder <elder@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jeff Johnson <jjohnson@kernel.org>, 
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
- Kees Cook <kees@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>, 
- Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
- ath11k@lists.infradead.org, ath12k@lists.infradead.org, 
- linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
- linux-sound@vger.kernel.org
-In-Reply-To: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
-References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH v2 0/4] Use the QMI service IDs from the QMI
- header
-Message-Id: <178005976216.10291.3509337895172854457.b4-ty@kernel.org>
-Date: Fri, 29 May 2026 14:02:42 +0100
+	s=arc-20240116; t=1780059855; c=relaxed/simple;
+	bh=OVQ0tA8+eFU5RLkX369uWTW1RTrTI3CHGxuTvryVfuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lTw76OcRK2GOpMOZ7vTkJetWyf8TLb3RliFLWn/J+OaZdkRUj+DRkzINKrTuN8jkuRoPcUR2RjAh6dpGPR8uE6mXDpqMLJDbBiQB+/zV8l7GzZxNKcQRwf9HnYnnEySl3sJDwvQcjqmVnqeQL/00403CytH9cMYksQOrfXgbopo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tlLWJsVY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BUsVTXtWac4HLSNT5dWtOS8zRSibeIPlKQyEy6fXA8g=; b=tlLWJsVY8p0/R9sesXCKHs094J
+	PosCTQnW6A1Z05qQit3q+/aGqEuX1zhMcb+gezKm0VEXGYC23KIc90iqxTMMFcsVCWJWPdNBvjzYl
+	lba/KNhFT6+GdSzG1ehzr+OyNAp9W9ub7MiLNATP9fRVBSj285n6FbYOmsfbv++53v90=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSwsY-0055SF-7z; Fri, 29 May 2026 15:03:58 +0200
+Date: Fri, 29 May 2026 15:03:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nuno =?iso-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
+Cc: ciprian.regus@analog.com,
+	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v2 10/10] net: ethernet: adi: Add a driver for
+ the ADIN1140 MACPHY
+Message-ID: <a272f9ae-1958-456f-b177-7c966694c047@lunn.ch>
+References: <20260527-adin1140-driver-v2-0-37e5c8d4e0a0@analog.com>
+ <20260527-adin1140-driver-v2-10-37e5c8d4e0a0@analog.com>
+ <ahlY8WSRO_HPmGtK@nsa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahlY8WSRO_HPmGtK@nsa>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293114-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_FROM(0.00)[bounces-293115-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[analog.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[srini@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 4BA92602A28
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 1DF24602A08
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Nuno
 
-On Mon, 16 Mar 2026 18:14:10 +0100, Daniel Lezcano wrote:
-> The different subsystems implementing the QMI service protocol are
-> using their own definition of the service id. It is not a problem but
-> it results on having those duplicated with different names but the
-> same value and without consistency in their name.
+> > +static void adin1140_stats_work(struct work_struct *work)
+> > +{
+> > +	struct delayed_work *dwork = to_delayed_work(work);
+> > +	u64 stat_buff[ADIN1140_STATS_CNT] = {};
+> > +	struct adin1140_priv *priv;
+> > +	u32 reg_val;
+> > +	int ret;
+> > +	u32 i;
+> > +
+> > +	priv = container_of(dwork, struct adin1140_priv, stats_work);
+> > +
+> > +	for (i = 0; i < ARRAY_SIZE(adin1140_stat_regs); i++) {
+> > +		ret = oa_tc6_read_register(priv->tc6, adin1140_stat_regs[i],
+> > +					   &reg_val);
+> > +		if (ret)
+> > +			break;
+> > +
+> > +		stat_buff[i] = reg_val;
+> > +	}
+> > +
+> > +	spin_lock(&priv->stat_lock);
 > 
-> The QMI service IDs are defined in the qmi.h header file. Use those
-> instead of defining the IDs in the protocol implementation file. It
-> will result in unifying and providing a consistent way to represent
-> the supported protocols.
+> Maybe consider using scoped_guard() and similar for other places?
+> Marginal win though so up to you.
+
+Please trim the text when replying so just the needed context is
+provided. It is easy to miss comments when you need to repeatedly page
+down, page down, page down to find something.
+
+> > +	ret = register_netdev(netdev);
+> > +	if (ret) {
+> > +		dev_err(&spi->dev, "Failed to register netdev (%d)", ret);
 > 
-> [...]
+> If we go to devm, this could be return dev_err_probe().
 
-Applied, thanks!
+dev_err_probe() is not really about devm, but handling EPROBE_DEFFER,
+and not issues an error message when it is not wanted. I don't think
+register_netdev() can return EPROBE_DEFFER, so it probably does not
+apply here.
 
-[3/4] slimbus: qcom-ngd-ctrl: Use the unified QMI service ID instead of defining it locally
-      commit: 05f3f5984121e1956867b309c76a750c1d4c9682
-
-Best regards,
--- 
-Srinivas Kandagatla <srini@kernel.org>
-
+    Andrew
 
