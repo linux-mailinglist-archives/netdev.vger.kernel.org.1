@@ -1,248 +1,168 @@
-Return-Path: <netdev+bounces-293028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AFvbFEhDGWqNuAgAu9opvQ
-	(envelope-from <netdev+bounces-293028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:42:00 +0200
+	id 8MQSLjVEGWqNuAgAu9opvQ
+	(envelope-from <netdev+bounces-293029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:45:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1CFB5FEB10
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:41:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1171B5FEC0B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 91E97300909C
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:41:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFCB9301C5B0
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDD934AB14;
-	Fri, 29 May 2026 07:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317443AFCF5;
+	Fri, 29 May 2026 07:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="t9kFSCYy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC263AA182
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 07:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9963AA9F4;
+	Fri, 29 May 2026 07:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780040511; cv=none; b=nsdUzGiTJ6VdhhRAJiYGK7A6QjcwlILwiu1BVe/R4uB40msZ3sygovGEWWGpiksq91sz8UnpHdI/mJHQ36qMOU0NOj1EO1y1g+iVqUWucgiNezPKiIDVM7J64lkxpIyyiDrwMtIj93I197i7P4vBXsw4AC8pqlFROeDHmUNPoz0=
+	t=1780040545; cv=none; b=FKpqfeElxGjz33MjQ7aVhfWuwP45lRPE7sWbSxt6pakwMzE/tmnuXYZRjygvquxHTae+8YxNvk80TjLuTIbcT5ni7W6gOF6nEond3t+kTP1mkmmH8AbWVNioNfohAAfaU88/FF8qVt8jUA6k25nqQBkz2nzHYtt6r3rMJijdEf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780040511; c=relaxed/simple;
-	bh=v8lpAgJb46vLgcg89RxO89NRdtB7MxHrPeaH5wlG62k=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=WIZlC3iVQ8uoIqnb0cz2Kmew9vx/UA+sm4bstm/fRASsG0FE3Ejpj2fixS43zdraNnWmj7jRTOiHM2HTymJmb+y52B83Q1a9dwB3qmQN6nj0RauMImWNuljED3u1okoXpKufrcmKuMpUMwAJn0DRA2XaY7Q11imyITqpGSbOjnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-69d874805ebso8748870eaf.3
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 00:41:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780040509; x=1780645309;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TbaUUegfi4a7R/I5V0EItJ9xoA+CDR/TMitNk0PNxus=;
-        b=IL3aHR7qZMsD+pCm1/SI3DiC5cjpsRFXghLQOl+g2nX138pa+acimz37pQmYYR5hE6
-         Ya/LQJJs4fY61qcAmu4ma1LN1bB1yCmP602q7+NRPUbEMpq3EB6lg6JpyQhutub501SB
-         tCl93tmGCO4WIWDuFHflF78AjARgR/71Yh3eVlIChNiQX+n1xDUO+yC0+Cho4P+zzWW6
-         FLzYqJw/YNkFG9mQRsKkeKT/Qgb8pusIOw+bNwv1vzFZ2TwtxEodsRlmlz7zLA+Mo9NN
-         vRm7MUylhLRobSuHyK4N9MhWt0kJDZD0jK9ak25P+Slnve9vA6pn+iqQ2CxGTlb2zAK2
-         nVFQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/oYpA6rYfNMvJ+9wBmdk/vGplUw+T/p4eLfM2PtcXu55cDeF2qP41I5o7BPemKY6M9mGDjlFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrwi/WsdQSmM9j3f21WbOWOMF7j3vJHAKNsT4RSo0zi6StrR5h
-	Kk+hlERmTWTMrfUEQ2xUX+MnFiB7VzxW7a7XrGQmkm8tRto2/SrCJFp2hMJfG++a2WvDukJQsmo
-	U9gzDWBDquyR3l3T8xUdQlQ3nyCe+sy6g9xsxnmRs9gkvZjWkDjrk6MjLuNQ=
+	s=arc-20240116; t=1780040545; c=relaxed/simple;
+	bh=DhCLGMOZL/w8aCkBuXuDq7mP31RtxM9KjJ0TJxr/Dn0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LShVhnqEMmKBrqubD3AvLDdkLtdhWqie0iaRlR1dKrVg8y1DVmj+23IC42hevxE/dVRAEgAJcLlpxbem/+TpHsFPZNUWMfavMWv631s7UpIwEUiaXn7AYhV6SwCTtw8xYLupQMcflhdPq7ZRlSvv0GiK/nUJmw4FgSP6gXLtraI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=t9kFSCYy; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 82AF61A372D;
+	Fri, 29 May 2026 07:42:19 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 56946601FA;
+	Fri, 29 May 2026 07:42:19 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 058F310888CBE;
+	Fri, 29 May 2026 09:42:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780040538; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=DZ3lfW7SRE9G4rYU9VyZ9PvQOFu+n80p9zGN3rx2H18=;
+	b=t9kFSCYyYsX7Mpm/43AyGd8fYnebRyCopT4YVv1WlV2yeqIP2xi7Z4lzM/NGEDpKfEflqo
+	COl1/50F/BMd2U8vhv2JtY7i/yUoh2uduIOBevb8aCBASp3YSXaTrXbHHEJB/19pHpLnaH
+	wuAz+Ei6HtEaxLhFX537DXLu6YVHHtGiyvXTuvIHiMQM8cxSNsScAflkJ5qQEfnLQIiXC7
+	n/3x9H1RNTntXn2X0fkVHy/1cR6GS/qtm3cOdKcYM89ZkOOZL4kRAEQnC/bknpD4gb0ljv
+	z+90+AwCWwAm2EBd+1dvFrNzaTpWDqoAgPa3KRqzQ8o3LjME2S0L/hhrb7D4Yw==
+Message-ID: <b84a5fe0-a080-45fc-87d1-790402d423e4@bootlin.com>
+Date: Fri, 29 May 2026 09:42:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1b15:b0:69d:6ce6:7437 with SMTP id
- 006d021491bc7-69e03f1ee3emr1080162eaf.19.1780040508819; Fri, 29 May 2026
- 00:41:48 -0700 (PDT)
-Date: Fri, 29 May 2026 00:41:48 -0700
-In-Reply-To: <20260528231637.251822-1-kuba@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a19433c.5099cdd9.8e407.0000.GAE@google.com>
-Subject: [syzbot ci] Re: net: ethtool: let ops locked drivers run without rtnl_lock
-From: syzbot ci <syzbot+ci7bc98d66cbeccac1@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, danieller@nvidia.com, davem@davemloft.net, 
-	edumazet@google.com, ernis@linux.microsoft.com, haiyangz@microsoft.com, 
-	horms@kernel.org, idosch@nvidia.com, joshwash@google.com, 
-	kory.maincent@bootlin.com, kuba@kernel.org, linux@armlinux.org.uk, 
-	maxime.chevallier@bootlin.com, michael.chan@broadcom.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf.kernel@gmail.com, 
-	tariqt@nvidia.com, willemb@google.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.14 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
+ ethtool pause validation
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
+ <20260526172447.10ca4b9e@kernel.org>
+ <5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
+ <20260527162516.0d012503@kernel.org>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260527162516.0d012503@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293028-lists,netdev=lfdr.de,ci7bc98d66cbeccac1];
+	TAGGED_FROM(0.00)[bounces-293029-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,nvidia.com,davemloft.net,google.com,linux.microsoft.com,microsoft.com,kernel.org,bootlin.com,armlinux.org.uk,broadcom.com,vger.kernel.org,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F1CFB5FEB10
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 1171B5FEC0B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the following series
+Hi
 
-[v1] net: ethtool: let ops locked drivers run without rtnl_lock
-https://lore.kernel.org/all/20260528231637.251822-1-kuba@kernel.org
-* [PATCH net-next 01/14] net: ethtool: cmis_cdb: hold instance lock for ops locked devices
-* [PATCH net-next 02/14] net: ethtool: make sure __ethtool_get_link_ksettings() is ops-locked
-* [PATCH net-next 03/14] net: ethtool: serialize broadcast notification sequence allocation
-* [PATCH net-next 04/14] net: ethtool: relax ethnl_req_get_phydev() locking assertion
-* [PATCH net-next 05/14] net: ethtool: make dev->hwprov ops-protected
-* [PATCH net-next 06/14] net: ethtool: optionally skip rtnl_lock on Netlink path for GET ops
-* [PATCH net-next 07/14] net: ethtool: optionally skip rtnl_lock on Netlink path for SET ops
-* [PATCH net-next 08/14] net: ethtool: optionally skip rtnl_lock in cable test handlers
-* [PATCH net-next 09/14] net: ethtool: optionally skip rtnl_lock in ethnl_tsinfo_dumpit()
-* [PATCH net-next 10/14] net: ethtool: optionally skip rtnl_lock in ethnl_act_module_fw_flash()
-* [PATCH net-next 11/14] net: ethtool: optionally skip rtnl_lock in RSS context handlers
-* [PATCH net-next 12/14] net: ethtool: ioctl: concentrate the locking
-* [PATCH net-next 13/14] net: ethtool: optionally skip rtnl_lock on IOCTL path
-* [PATCH net-next 14/14] docs: net: ethtool: document ops-locked drivers and op_needs_rtnl
+On 5/28/26 01:25, Jakub Kicinski wrote:
+> On Wed, 27 May 2026 04:47:47 +0200 Andrew Lunn wrote:
+>>> It'd be great to hear from others but IMHO in the current form this is
+>>> not suitable for Documentation/networking/ We can commit the "knowledge"
+>>> part but enumerating the test cases seems odd for Documentation/.
+>>
+>> Sorry, not looked too deeply at the actual content yet.
+>>
+>> What i was thinking was a python file, which sphinx can ingest to
+>> produce documentation, and place holders were code would be added to
+>> implement the actual test during the next phase.
+>>
+>> This is how i've done testing in the past. I would be the evil one who
+>> thought up the tests and described them in detail using sphinx markup
+>> in a python test template file. After some review they got passed off
+>> to a python developer for implementation. And when they got run and
+>> failed, sometimes the feature developer, the test developer and myself
+>> got together to figure who made the error.
+>>
+>> I'm not sure we even need sphinx. What i find important is that the
+>> test is documented. What kAPI calls should be made with what
+>> parameters. What results we are expected and why? So that when a test
+>> fails, a developer has the information they need to fix their
+>> code. The Why? is important, and often missing from the kernel tests.
+> 
+> All makes sense. The question is primarily how we fit that into
+> the existing project layout we have in the kernel :(
+> 
+> The python tests can be hacked up to print the test case docstring
+> before the failure.
+> 
+> But I think for human and AI reviewer consumption it may be nice
+> to keep the condensed knowledge / common mistakes in Documentation/
+> If we had the ability to exercise the submissions it'd be a different
+> story test output would be a sufficient signal and/or could be fed into
+> the review. But for AI making a guess at whether the submitted driver is
+> correct purely from the driver source - knowledge is useful.
 
-and found the following issue:
-possible deadlock in __ethtool_get_link_ksettings
+Also for the knowledge part, we had Oleksij's series that documented
+more aspects of flow control (not just the pause part) :
 
-Full report is available here:
-https://ci.syzbot.org/series/ada8852f-9efd-4b85-87aa-2f5d8fe16040
+https://lore.kernel.org/netdev/20260304094811.2779953-1-o.rempel@pengutronix.de/
 
-***
+Oleksij, maybe we can merge some of the information here with your
+doc for the Docuentation/networking part ?
 
-possible deadlock in __ethtool_get_link_ksettings
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      9a82e387e27a4422a0d2d9d644180b7bd913e85a
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/2968208d-6483-4d38-be45-de68d3b94775/config
-syz repro: https://ci.syzbot.org/findings/d8670aa1-9241-49be-8108-cdbed56dd4a5/syz_repro
-
-dummy0: entered promiscuous mode
-bridge0: port 3(dummy0) entered blocking state
-bridge0: port 3(dummy0) entered forwarding state
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-syz.1.28/5852 is trying to acquire lock:
-ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2833 [inline]
-ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: __ethtool_get_link_ksettings+0x12b/0x290 net/ethtool/ioctl.c:462
-
-but task is already holding lock:
-ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2833 [inline]
-ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: do_setlink+0x3d2/0x45a0 net/core/rtnetlink.c:3117
-and the lock comparison function returns 0:
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&dev_instance_lock_key#3);
-  lock(&dev_instance_lock_key#3);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by syz.1.28/5852:
- #0: ffffffff8fdd2d80 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8fdd2d80 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #0: ffffffff8fdd2d80 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_setlink+0x6bb/0xb40 net/core/rtnetlink.c:3527
- #1: ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2833 [inline]
- #1: ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- #1: ffff888115f78dc8 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: do_setlink+0x3d2/0x45a0 net/core/rtnetlink.c:3117
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5852 Comm: syz.1.28 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain kernel/locking/lockdep.c:3895 [inline]
- __lock_acquire+0x253f/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
- __mutex_lock_common kernel/locking/mutex.c:646 [inline]
- __mutex_lock+0x1a3/0x1550 kernel/locking/mutex.c:820
- netdev_lock include/linux/netdevice.h:2833 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- __ethtool_get_link_ksettings+0x12b/0x290 net/ethtool/ioctl.c:462
- port_cost+0xc0/0x3a0 net/bridge/br_if.c:39
- br_port_carrier_check+0x12d/0x3f0 net/bridge/br_if.c:80
- br_device_event+0x65c/0x970 net/bridge/br.c:101
- notifier_call_chain+0x1ad/0x3d0 kernel/notifier.c:85
- __dev_notify_flags+0x248/0x310 net/core/dev.c:9804
- netif_change_flags+0xe8/0x1a0 net/core/dev.c:9819
- do_setlink+0xfa5/0x45a0 net/core/rtnetlink.c:3207
- rtnl_setlink+0x792/0xb40 net/core/rtnetlink.c:3537
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:7062
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2556
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f087ad9ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f087bc25028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f087b015fa0 RCX: 00007f087ad9ce59
-RDX: 0000000000000000 RSI: 0000200000000040 RDI: 0000000000000004
-RBP: 00007f087ae32d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f087b016038 R14: 00007f087b015fa0 R15: 00007ffcefdf0348
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
+Maxime
 
