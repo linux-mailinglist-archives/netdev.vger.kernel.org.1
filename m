@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-292899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKD8MsbUGGrSnwgAu9opvQ
-	(envelope-from <netdev+bounces-292899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:50:30 +0200
+	id UHtwGWfZGGpDoAgAu9opvQ
+	(envelope-from <netdev+bounces-292900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:10:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEA85FB850
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:50:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52C05FB9C5
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C78513011778
-	for <lists+netdev@lfdr.de>; Thu, 28 May 2026 23:50:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 25E28303AF1F
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 00:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01CD35B62C;
-	Thu, 28 May 2026 23:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27266FC5;
+	Fri, 29 May 2026 00:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BCZDp3/T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLNClGAz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3AC42C11F1;
-	Thu, 28 May 2026 23:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1F917D6;
+	Fri, 29 May 2026 00:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780012212; cv=none; b=IGvTlUNJM8QiRM5PabGduz9W5cTFnU1GU9WYziBdFPidBWj0lw1vOFYieS1B4AgjTqsD/AzIbaYBY4NbcAp3j2s8ZjB8O9MC0MERRZY/1/0uYnQA2Q2tALMXt0c1PbDdpvII2IOBmwP6cPdCwflmeRS5ITXoJdz1jxkJigzqSQQ=
+	t=1780013411; cv=none; b=HD4kUFxXoVbtFqOcINXy1DGFrOjG0jbHfMDD2d+R8GQlW3x3oPKDMjFOazowVL2YQKum+y9mWxz1NEBPTwIaPMX99Dni441vSGy7eCXQwxbZAWniadfb1k11TBoTEMS8ck7WCNZiz74b55FMoUlP5/88Bk0OF7sww/5ItU0mTSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780012212; c=relaxed/simple;
-	bh=3FV31BSp+eZqefLczGdAKfSOo39mSALwfTNRoZu5iVk=;
+	s=arc-20240116; t=1780013411; c=relaxed/simple;
+	bh=YVXNpvTMQ4pHPjqHlES6U6VBq70HuLFkYtQPJJdF4gk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kz0y2YMbuYf7E6pAKl5Mrga5FjzFYYEv099iH2mYIqtDg6voXmGAJbyqFwQ5h1VrmHjJ06ZXOuQznPv2rtxIJFBKcn3s1xGJlxqHFU96DF/r3PgC79w0RrNwgL7jkEYMLOeIvyMFlinfnChAXxMzd9kSbkhX5TGmmrVocxJ0Hhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BCZDp3/T; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D0541F000E9;
-	Thu, 28 May 2026 23:50:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pUNd3Fw6Jiq6MzJQ0vJci0qIEzsRmL8PDNnpE5xhq7reGZoo8BS2I8LxSGDG+2EmPAxkR6JqU3LMMzv+7LptGnYNVcgQviZaTw+8bzZu3Mv0p8AdXYdDRzfwZL/uk1YBMwr1i+wBQsYLA4BNnv3La0xDO1AxpQFwmfhmjrs2NCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hLNClGAz; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A9C51F000E9;
+	Fri, 29 May 2026 00:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780012211;
-	bh=sY1IZ5Apy/pfqZgdmnIxpk47YIf5ZV18RMEp+0ZQZYc=;
+	s=k20260515; t=1780013410;
+	bh=6dSarYnx7umW7O1HKSVDoVjymXPLhOUzkl9YdCniDlo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=BCZDp3/TphHAvs8dLhWXG+AO85OFHAXgX0ezSuOgwD/hzlzCKNM1Mz6EYR5o4DTA4
-	 hhvXdo5HTEJ8+LWO0USULD0yToQzM+oSrtKiExKDzFANsSzj6geH2SPlYRUJk9jZ+B
-	 IiMgd1EiGX2n9FJfH6Ovg2be+A/JXCwhWrBi1JVaSVAbaVeww2f5h3kBS/EEVhBmHo
-	 h9IOeAhjmHM9Avr3J8Hmhp7NMY8Uc+9h7Cc67Lv9MZCtWYkjU9i1K/D4HyrsT/8aA1
-	 XAcf1jmrp6I3uOvGU5bLHhyCZUAFEGEOXEuNpGlHqpcqjQnr2bDHAF5PqcdLJmIqGf
-	 CD0ck79EObpvQ==
+	b=hLNClGAzipJ65KiTfZ1OfaBo15neta7zODjZekR8TCVjXnZQHEKY6YiNVTo93d37u
+	 MgSpJP9YzZrdl0HJMfE0njgtY0h/kwkFDzn3DKCBMblLEuIxYjsNYXQuSZHS5yGNqO
+	 jCpDwrDpm3q1rcye73D0+Vf1AvjAd9eNqztEC54/bMnt72hcD4jmZXFMLKiIKfar7U
+	 nBUmWmvSuqLBJM0zVNKQc/65dwix9Vk4Lsz6If3ubZDQIGrLwFDpXpOXvEhkthyWO5
+	 0tYkXtMXoG0ud1YObTuNPCyG4A8muKLUsaaZrOCPIHbZ7uM/Edxa5A18LNu8E2IOnQ
+	 XSpDWOv6q3Yuw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93E733811979;
-	Thu, 28 May 2026 23:50:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0EB13811979;
+	Fri, 29 May 2026 00:10:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,39 +55,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] selftests: mptcp: reduce bufferbloat and cleanup
+Subject: Re: [GIT PULL] bluetooth 2026-05-28
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178001221513.1560944.5184668372188033491.git-patchwork-notify@kernel.org>
-Date: Thu, 28 May 2026 23:50:15 +0000
-References: 
- <20260527-net-mptcp-sft-bufferbloat-exit-v1-0-9afc4e742090@kernel.org>
-In-Reply-To: 
- <20260527-net-mptcp-sft-bufferbloat-exit-v1-0-9afc4e742090@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, fw@strlen.de, netdev@vger.kernel.org,
- mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+ <178001341465.1565998.16734911486872086462.git-patchwork-notify@kernel.org>
+Date: Fri, 29 May 2026 00:10:14 +0000
+References: <20260528131839.462344-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260528131839.462344-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292899-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292900-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -95,35 +91,31 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2DEA85FB850
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: D52C05FB9C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This pull request was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 27 May 2026 22:11:33 +1000 you wrote:
-> Bufferbloat is baaaad, even in our selftests: let's kill it (or at least
-> reduce it). By doing that, the tests (seem to) have a more stable
-> transfer, and are then less unstable. That's what patches 1-2 are doing,
-> and they can be backported up to 5.10.
+On Thu, 28 May 2026 09:18:39 -0400 you wrote:
+> The following changes since commit ab1513597c6cf17cd1ad2a21e3b045421b48e022:
 > 
-> Patch 3 is not related: a small fix in the selftests to remove temp
-> files that were not deleted in some conditions, since v5.13.
+>   Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del() (2026-05-20 16:35:47 -0400)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-28
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] selftests: mptcp: simult_flows: disable GSO
-    https://git.kernel.org/netdev/net-next/c/0f1fd73c2204
-  - [net,2/3] selftests: mptcp: simult_flows: adapt limits
-    https://git.kernel.org/netdev/net-next/c/b7c746a8eeea
-  - [net,3/3] selftests: mptcp: sockopt: set EXIT trap earlier
-    https://git.kernel.org/netdev/net-next/c/c8da80af2838
+  - [GIT,PULL] bluetooth 2026-05-28
+    https://git.kernel.org/netdev/net/c/2412591cfe66
 
 You are awesome, thank you!
 -- 
