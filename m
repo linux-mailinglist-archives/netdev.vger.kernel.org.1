@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-293189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iDWyEiTWGWqjzQgAu9opvQ
-	(envelope-from <netdev+bounces-293189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:08:36 +0200
+	id mNC2HGbWGWpmzQgAu9opvQ
+	(envelope-from <netdev+bounces-293190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:09:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DC16070FC
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:08:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB89607154
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:09:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1BE9F300F24E
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:07:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A7B68309F744
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB62E3FE344;
-	Fri, 29 May 2026 18:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8D53EEAF2;
+	Fri, 29 May 2026 18:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJhNyGxC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URHM50TF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCB33603C0;
-	Fri, 29 May 2026 18:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C085D3A875F;
+	Fri, 29 May 2026 18:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780078023; cv=none; b=neXCuxwvzkDVXiJrlehfemU7a4LhPJVqyk6Oei6DT0lc27XpbPvzqE8MqcLrRqQfUQ6sJEbyvPOsztIfHYCDafoyoJPETI/tsWXpRnPZ+7e9OAVg+XNWzKhIm26xiZDroInzYefQekUPZUXd54Iw4TiD2VFnQNsbSO1NKxzuhDg=
+	t=1780078052; cv=none; b=J+BsUxM6t+ERHqPK9f7oBxA0+1g1SqLFiJDEs8PA5SSVkQ9qHhCcpq4p28O6HLix3fYmKGRDTlIxjRkaAKJBr7heToNXsET7ZRNrSt24pqDRS4PfGNkjfE5usCiJAkhC9O2yN8vb1OvUZ0C+jEKWunh9vQ4qhWU25aMr/Z8jawI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780078023; c=relaxed/simple;
-	bh=h3q2IL3PXumO9/JvbBEX/SMuTCApuFPUCdWS8EF/JFw=;
+	s=arc-20240116; t=1780078052; c=relaxed/simple;
+	bh=LEKI81jRUIh8bUsqzRbRzc+SBSrYwf6+bjAnYxN4cgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n9i9D0BWClBuwKqrCep09rN+XLQx0FSt5tSmPZI6BqpKIcbbkIyi2DeezixCj8+3cnVfTCEQkX1WpkzyhNm7jZZdig9uMpqIU77hSQdThswD4jzr4sziWtk3jF2hfU2dgMaVjX0/wYjks/6lrMusVn0+x1Ic0ibPTFblLst+KoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJhNyGxC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E0FF1F00893;
-	Fri, 29 May 2026 18:07:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tHH8dxCnRsxAS+FqHLMc7TgxyaS/S5CT8/w5cnABkZVwVDpwsG7vi8y6bptDvWiQS3hv9DncMmBjwbcwfyUA+UA7j9yrYWonBvlfIRZ7/GHQsQGoVvr1KGC831+YVWjIMrJ7mDeQm3IzUQTPZDR94Ouxyr2IQwYTMdP9h9JPlS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URHM50TF; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7C331F00893;
+	Fri, 29 May 2026 18:07:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780078022;
-	bh=97ojEt1rZdfEz6DESGM5vEbigCIu/Q6LxBoe0cL00sg=;
+	s=k20260515; t=1780078050;
+	bh=EXtho9XboC78QI+YfMO3FJJLz3MkFQIZAyjanmWImWY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cJhNyGxCFcAWDDCrHMagdbI7OtS8Y08/fLym0A14eTdqt8ykBtiM1RhvAhttA4T0F
-	 Gc6s7JopSqw9XSLWKaJiACJy9WQtzB138FwVNbdW+yMb+osx7zFz+h7gHpS31i7KJs
-	 prFkphZHQpuqDBRk/RHr+wcYa6E6Jk1mgPc1z6nkHfVxbMpiUR4S4AOjMMkYqGcgs/
-	 1Rz0mD+S9vBDaB2yVwUxupEQK28Fb7ZBiq6ih9J4lpM594uSsKQJSkU0n5TCGKa77b
-	 8tJC3PQkxVeNA7OPZEMzkMS8adq5S5KguGmU+t+EJ4A97DULKvFzIZh/8J546U39/E
-	 ZAj4qnA4lUncw==
-Date: Fri, 29 May 2026 11:07:00 -0700
+	b=URHM50TFbESjNWgKg7NrAbEpJ8F08WiVi2WMXJL3xuyUoUYHxzO4pX+IYgO7Mlopa
+	 rPbF4HTpY7lcPRcX9lZOoysZ4f93i0h78sKwNPYod4lKDjQ+ipgoJlKPXHxr4BMWvZ
+	 8eJy6rQvbgan7VvhCSMcyl8IMjb/8BlnwIZkXO+OHqDZhpSNuh5G1Fdlk248Wkwvh8
+	 YgKaOJVLt4B3hsicbPogOB15SUozvKpQdmFMl/M96fpIwoVo/w72UODCdXAYTtaxGj
+	 h42mdaqw7SYb6HnDt4kTKXdaRsDoo7SIy7hs9eF4RpyzB0sTDuGd29jxHLmrzXR0DS
+	 JnLzkjAckhQoA==
+Date: Fri, 29 May 2026 11:07:29 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Javen <javen_xu@realsil.com.cn>
 Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "nic_swsd@realtek.com"
@@ -54,13 +54,13 @@ Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "nic_swsd@realtek.com"
  "horms@kernel.org" <horms@kernel.org>, "netdev@vger.kernel.org"
  <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
  <linux-kernel@vger.kernel.org>
-Subject: Re: [Patch net-next v6 1/7] r8169: add support for multi irqs
-Message-ID: <20260529110700.5805ea70@kernel.org>
-In-Reply-To: <6f55096511784f66ae46a217014def79@realsil.com.cn>
+Subject: Re: [Patch net-next v6 2/7] r8169: add support for multi rx queues
+Message-ID: <20260529110729.7fb14344@kernel.org>
+In-Reply-To: <fe97b63208af41fc811ad37db94bc705@realsil.com.cn>
 References: <20260526081117.173-1-javen_xu@realsil.com.cn>
-	<20260526081117.173-2-javen_xu@realsil.com.cn>
-	<20260528180004.58991104@kernel.org>
-	<6f55096511784f66ae46a217014def79@realsil.com.cn>
+	<20260526081117.173-3-javen_xu@realsil.com.cn>
+	<20260528180432.4652dcfa@kernel.org>
+	<fe97b63208af41fc811ad37db94bc705@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,12 +74,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-293189-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293190-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
@@ -96,34 +96,25 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:url]
-X-Rspamd-Queue-Id: 50DC16070FC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0EB89607154
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 29 May 2026 05:43:52 +0000 Javen wrote:
-> >devm_add_action_or_reset() can fail (as the AI bots point out) but this whole
-> >devm_ dance is entirely unnecessary networking stack will automatically
-> >delete NAPI instances when device is unregistered.  
+On Fri, 29 May 2026 06:47:00 +0000 Javen wrote:
+> >> @@ -74,9 +74,13 @@
+> >>  #define NUM_TX_DESC  256     /* Number of Tx descriptor registers */
+> >>  #define NUM_RX_DESC  256     /* Number of Rx descriptor registers */
+> >>  #define R8169_TX_RING_BYTES  (NUM_TX_DESC * sizeof(struct TxDesc))
+> >> -#define R8169_RX_RING_BYTES  (NUM_RX_DESC * sizeof(struct RxDesc))
+> >> +#define R8169_RX_RING_BYTES  ((NUM_RX_DESC + 1) * sizeof(struct
+> >> +RxDesc))  
+> >
+> >AI bots are asking why the "+ 1"?  
 > 
-> Thanks for your review.
-> 
-> In patch v3, link: https://lore.kernel.org/netdev/20260513115543.1730-2-javen_xu@realsil.com.cn/
-> I tried to alloc struct rtl8169_napi dynamically for saving memory according to Heiner's suggestion. I agree with his suggestion because only 8127 rss are enabled.
-> And in this ai review, link: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260520031603.700-1-javen_xu%40realsil.com.cn
-> AI suggested that the lifetime of this devm_kcalloc'd napi array may be compatible with the netdev's napi list. So I add devm_add_action_or_reset in patch v6.
-> I checked the code and agree that the stack auto-deletes NAPI instances in free_netdev() -> netdev_napi_exit(). However, because devres releases resources in LIFO order:
-> 1. kfree for the NAPI array (allocated via devm_kcalloc) will be called first.
-> 2. free_netdev() (registered via devm_alloc_etherdev) will be called second
-> When free_netdev() calls netdev_napi_exit() to iterate over dev->napi_list, the NAPI memory has already been freed by devm, which will cause a Use-After-Free. That's why I added the devm action to explicitly remove it before the memory is freed.
-> 
-> So I wanna know what should I do? Whether keep the action in this
-> patch(dynamically allocate napi array) or patch v2(fix the array
-> size), or any other suggestion will be apperaciated.
+> This + 1 is a workaround for the hardware DMA prefetcher. The H/W might aggressively fetch one more descriptor even after hitting the RingEnd mark. We allocated this extra dummy space as padding to prevent out-of-bounds access and potential IOMMU faults.
 
-Personal preference I guess. IMO it's pretty clear here that the devm_
-help relatively little and they introduce a lot of complexity. You can
-stop using them, or just handle the error on devm_add_action_or_reset().
+Add a brief comment explaining this please
 
