@@ -1,99 +1,103 @@
-Return-Path: <netdev+bounces-293016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6L1RFwo9GWpVtAgAu9opvQ
-	(envelope-from <netdev+bounces-293016-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:15:22 +0200
+	id KFOYDxE+GWpVtAgAu9opvQ
+	(envelope-from <netdev+bounces-293017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:19:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57EB35FE63B
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:15:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F8DD5FE6C7
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1A75230273B1
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:14:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 49371307AE6E
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A811E3AD50B;
-	Fri, 29 May 2026 07:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F533AE6E6;
+	Fri, 29 May 2026 07:14:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AtFHpIao";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yW4glwfL";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="r35SGfEA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="U8fxgeuH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+V68Tla";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gy/uHAGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5757B3557F3
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 07:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3493AF641
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 07:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780038856; cv=none; b=jk0C105So/jvrUVrpWOUZwDXFGlQHI7SZYuDQJykJMlXgnmp6Y9h+nsuisBj4w3Ur4SfI9V82/Tf8gaN+KPS4QARl/ScB1XXvHgcRFRSn/5jpKlOtANPOBlc6H0vNfhFpJEEl1Zr5DDpMTDUb/Lj+7lSa5FcZiwIf7ZX4H2kVQQ=
+	t=1780038876; cv=none; b=YT1L0ABPJ9s0IkI/PSap7nIPF5KqaT5INob1YmmpLAk81LiPM43/ToIL9w5Mue2BiQBRbDPoevMjTAOpQmT2aS+N6UokaCwh7cy0bLEajoJ/TEKqegC94h+6diwlPzOS/0R5k7yfTTvGzPXSPmbtsF2e6ZaRaXIotmstU7AsylI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780038856; c=relaxed/simple;
-	bh=q7saC2uXuq0fRzDHXXZamkwYDVEVpp2BsF+gE6L30qE=;
+	s=arc-20240116; t=1780038876; c=relaxed/simple;
+	bh=AyodW9s6qr7nPQ5UzSde6U08bmL5XV5Bya4M0hb664s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bfWlIJyuY7Wt90xTXVqRZXUvYkLGMxDkZ99TqxXP4snRapCQXadf38bugJph9ynUU38soOzlS+/0PlNXZ2NYEd6u5JTvRijYzZ5PTPih/hAsdQPdojTq9i9ABmsrgHaYLftb6mtOVbC8stw30aw02GP9JH/HHiJEsr7X3riXqp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AtFHpIao; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yW4glwfL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=r35SGfEA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=U8fxgeuH; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 883E06AD6F;
-	Fri, 29 May 2026 07:14:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780038853; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=pkYwC3z52Mj7hJMTnT9+yjE1Gk5Z38/8f4a5Hax0+f6zDa1YRVI1In+uwXd5zCu7HpaAzsWwaid9/RhCwbFDf/fLxjsAeZcRoizGSwLxxv7TwkSzN6y4cqzqeeOuxuuqDXuBMM3+pf67bhwPU2hvYPm35zQN2yc/BgiPjnEJfqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+V68Tla; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gy/uHAGa; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780038874;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sqKJS7VItIryjZpr2+rwnWoyw8ld5FtNpbGI2o/zcxo=;
-	b=AtFHpIaozA7e2lRMSLQxCtXmqUy5hy/GdTzUmzNhB41SKdolstEzuPBAR5H8Gypb8qG/b6
-	Puf9WCZSPhmwrBL0XMjchKozewzJ5hAnLHPNBRFCM2ziLlLQqo1shJDXegZkq0tR+WDwrH
-	2+b82mLjUmJ2+Kk8Hgnp/EjmBNewD4c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780038853;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sqKJS7VItIryjZpr2+rwnWoyw8ld5FtNpbGI2o/zcxo=;
-	b=yW4glwfLOJxCYb+phOUYwdYKWud0QDyLenItGZgiCfXWZpevJYsHRffJgTOJm/SKH/TtUi
-	wGDI4SA1fwKXYlCQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=r35SGfEA;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=U8fxgeuH
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780038852; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sqKJS7VItIryjZpr2+rwnWoyw8ld5FtNpbGI2o/zcxo=;
-	b=r35SGfEAJ2bmNGSgQDpBIW+38k4MQU9+YMFOXR6klctMg+t1/uI5uLQjsAbeMoyqG04E4M
-	BnBSbf+5zacPumI3g005EtS4MpKcHoVVrTcYd0Hjg8SK4U0v1UdiccneUSUcVJskwFQCk0
-	+7PDKTHJzkW4TXLcANLcwzO8y9nRT6Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780038852;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sqKJS7VItIryjZpr2+rwnWoyw8ld5FtNpbGI2o/zcxo=;
-	b=U8fxgeuHnHL3SftnCoVnEX2mZRJsrI7hva0s+8BwDO4MyL2yKRNhIlvCAoSWV0fG+Bk6Bn
-	L0bb9naH0hAX7pBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id AB7095B1FE;
-	Fri, 29 May 2026 07:14:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id zuo1JsM8GWquSwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 29 May 2026 07:14:11 +0000
-Message-ID: <381e22d3-fa30-4dde-bd53-705b4a868a90@suse.de>
-Date: Fri, 29 May 2026 09:14:00 +0200
+	bh=GpgwVwtTE1d0hUiN+aFsOjG2i9VgukmbDWuVMcl4U4I=;
+	b=R+V68TlaeBX5pBAweR/Tqb8QAWZopQliqhgQbkuso/R76bt4i8sFMSmWXclsTz+2SsekNl
+	C/5IpjmmauaCNNVQDa1WNhQAKwgNiSPzBYLS8+NsdWcNHqMqusLKZZrMIBZ5G6CZHc87mO
+	DYQWAp22n7dVcOjssqngg+2MI61dXS4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-220-ON7eCCHvMBm-YhL_nlqrLg-1; Fri, 29 May 2026 03:14:32 -0400
+X-MC-Unique: ON7eCCHvMBm-YhL_nlqrLg-1
+X-Mimecast-MFC-AGG-ID: ON7eCCHvMBm-YhL_nlqrLg_1780038871
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-45ef3aeeb41so86339f8f.1
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 00:14:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1780038871; x=1780643671; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GpgwVwtTE1d0hUiN+aFsOjG2i9VgukmbDWuVMcl4U4I=;
+        b=gy/uHAGazB/WoP+A3X1RX6B0U8xh/cQ+Hz66rRX50cDcemvgLPXnEXy2rsCOh3APkD
+         goNHwerl/jUt4O7pHRXCfWmY24CXaVhUF47yCy+5VhrDVMzKe/WVnU6WS83vqYKSwv7q
+         FhtIdgqMBPZbECDFIUU34EX2nLXIGQRIHNCH/x3+DOR9xcC0+EDi3b7XZzEQVTRI/XzN
+         ius13rLBI4oCT6HuFduvbMzsgbz7RnkZoIBLVOKLcuS+3R7POxJYonZ/n27pOWzMXs0C
+         piEGFBP1LEt078Zm1eK6AOts6SNdJklBncOhjcg7FrMCEELy8bcs6BUPAzMq3q+WrzLv
+         tMeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780038871; x=1780643671;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GpgwVwtTE1d0hUiN+aFsOjG2i9VgukmbDWuVMcl4U4I=;
+        b=pdp877+5wkULcPydJiFRw25CtAa54tu6xprTtn9dfnO/YKZuFkBJO4fGWWWfUehE9h
+         mBsU8wYTsNESo6iq5Roux7YanawWB5vPPUOP58yRqPbs9CLPdlec97wJfHoKFC3px7bQ
+         EJRqpH6QQBKFWvNEXZYOFZi//d8XqYksE1Z0u3NEPEwPtWq3OxqO3VuSgCETthVvBa8q
+         137JZnd/rM2pOjJsvmhx5jFm24zgriQr3gEpUP7CgVgjJVOfMeCI8V+LYTY6mUWp+6Ww
+         OqcYrTFyvZco64uFg0PG7j8BA1fB2J0MW/ahEgXqOh0iQ6WiKm7W3gm0gcd4DoOyRTwz
+         C56Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+SHRTK/EtJlpNsQ/Wkez3JQg8ZW0WoPHlmsPr5KVp+sjnrsKQ51sCGFibtYvcciAxl87kmHLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhffRU86DpJIT1eIvrkzyqSqkiVVBL+HCze253iP3Lna5AVFcA
+	fJWPeGwcngbk9dfavzARYCuTdlpGMO/BZ7sXxFJd4/4xsQRbTyg0BRszpp/9T6ZgyUopHQqNR00
+	RR3nGU9wh5voIGWeAgWLnbQfDBClriXuzzecOH6e8UcnwwhUNIInioOSJV+q9e9FSMw==
+X-Gm-Gg: Acq92OFXftNKPiCYgUveDBhyXg+TveEu5WhbiODQ+IEz9jSosZIFg30XAhfE1ai9ZKu
+	C/jRo1OhaompiOvzw94Dki5Px7LS2phkU4sQL5vZLusHuCui12JCPK0Mq5J5HVe4AqEBiSnTXg2
+	VjqCC2kCPpETfxoHeVeodR9yTkeVfFoWc1wHqp6RaR2SN8S/tY0SGDJpCZ9Vk/1lK3+ydbruM6B
+	AL8uZ0T11Jrw0PaJRSDmF2wuVV+HJvvcy4NJxPBAkQPutfskpfGXXAOJtmCxsjSM0CkwwylKhmZ
+	OBrIMsc3to78j6Kv19htzkElWUgDS3jSkKSa2ScOlN59KGAocRYBWB1LgLmjlWRvdoK+bDvG4N6
+	Q18Y+i2MXPoX6W8kOHm6KKqYAmNyTRT1T2XuE2FOp7Bt8s28NGPIFlv5H9wP90WDWn2A=
+X-Received: by 2002:a05:6000:2081:b0:45e:e561:4184 with SMTP id ffacd0b85a97d-45ef1449478mr2666373f8f.29.1780038870759;
+        Fri, 29 May 2026 00:14:30 -0700 (PDT)
+X-Received: by 2002:a05:6000:2081:b0:45e:e561:4184 with SMTP id ffacd0b85a97d-45ef1449478mr2666313f8f.29.1780038870253;
+        Fri, 29 May 2026 00:14:30 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.150])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34a0374sm1304412f8f.2.2026.05.29.00.14.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 May 2026 00:14:29 -0700 (PDT)
+Message-ID: <e7124e98-5633-4982-a850-8787c3949174@redhat.com>
+Date: Fri, 29 May 2026 09:14:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,133 +105,188 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] netfilter: TCPMSS: fix dropped packets when MSS option
- is unaligned
-To: Kacper Kokot <kacper.kokot.44@gmail.com>, netfilter-devel@vger.kernel.org
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
- david.laight.linux@gmail.com, Phil Sutter <phil@nwl.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260528204020.7ae744ab@pumpkin>
- <20260528223412.27311-1-kacper.kokot.44@gmail.com>
+Subject: Re: [PATCH 5/9] esp: fix page frag reference leak on skb_to_sgvec
+ failure
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+ Alessandro Schino <7991aleschino@gmail.com>
+References: <20260527084148.3489759-1-steffen.klassert@secunet.com>
+ <20260527084148.3489759-6-steffen.klassert@secunet.com>
+ <0902bdb9-2746-45fd-ba4d-8e5b96617b8b@redhat.com>
+ <ahkphzYYBeoCcbRI@secunet.com>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260528223412.27311-1-kacper.kokot.44@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <ahkphzYYBeoCcbRI@secunet.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293016-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,gondor.apana.org.au,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-293017-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 57EB35FE63B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sbb.ch:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,secunet.com:email]
+X-Rspamd-Queue-Id: 8F8DD5FE6C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/29/26 12:34 AM, Kacper Kokot wrote:
-> Padding TCP options with NOPs is optional, so it is legal to send an
-> MSS option that is not aligned to a word boundary and therefore not
-> aligned for checksum calculation. The current TCPMSS target is not
-> robust to this: when the MSS option is unaligned it produces an
-> invalid checksum, and the packet is dropped.
+On 5/29/26 7:52 AM, Steffen Klassert wrote:
+> Ccing the author of this patch.
 > 
-> This has not been observed in any real environment. Senders place the
-> MSS at the beginning of the options block, where it is naturally
-> aligned, but the spec allows unaligned options and the kernel shouldn't
-> silently drop legal packets.
+> On Thu, May 28, 2026 at 03:44:14PM +0200, Paolo Abeni wrote:
+>> On 5/27/26 10:41 AM, Steffen Klassert wrote:
+>>> From: e521588 <alessandro.schino@sbb.ch>
+>>>
+>>> In esp_output_tail(), when esp->inplace is false, the old skb page frags
+>>> are replaced with a new page from the xfrm page_frag cache. The source
+>>> scatterlist (sg) is built from the old frags before the replacement, and
+>>> esp_ssg_unref() is responsible for releasing the old page references
+>>> after the crypto operation completes.
+>>>
+>>> However, if the second skb_to_sgvec() call (which builds the destination
+>>> scatterlist from the new page) fails, the code jumps to error_free which
+>>> only calls kfree(tmp). The old page frag references captured in the
+>>> source scatterlist are never released:
+>>>
+>>>   1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+>>>   2. nr_frags is set to 1 and frag[0] is replaced with the new page
+>>>   3. Second skb_to_sgvec() fails -> goto error_free
+>>>   4. kfree(tmp) frees the sg[] memory but old frags are not unref'd
+>>>   5. kfree_skb() only releases frag[0] (the new page), not the old ones
+>>>
+>>> Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+>>> unconditionally unrefs the source scatterlist frags without checking
+>>> req->src and req->dst, since those fields are not yet initialized by
+>>> aead_request_set_crypt() at the point of the error. Existing callers
+>>> pass false to preserve the original behavior.
+>>>
+>>> The same issue exists in both esp4 and esp6 as the code is identical.
+>>>
+>>> Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+>>> Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+>>>
+>>> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
+>>> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+>>> ---
+>>>  net/ipv4/esp4.c | 12 +++++++-----
+>>>  net/ipv6/esp6.c | 12 +++++++-----
+>>>  2 files changed, 14 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+>>> index 6a5febbdbee4..8314d7bddcb7 100644
+>>> --- a/net/ipv4/esp4.c
+>>> +++ b/net/ipv4/esp4.c
+>>> @@ -96,7 +96,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+>>>  			     __alignof__(struct scatterlist));
+>>>  }
+>>>  
+>>> -static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+>>> +static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb, bool already_unref)
+>>>  {
+>>>  	struct crypto_aead *aead = x->data;
+>>>  	int extralen = 0;
+>>> @@ -113,7 +113,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+>>>  	/* Unref skb_frag_pages in the src scatterlist if necessary.
+>>>  	 * Skip the first sg which comes from skb->data.
+>>>  	 */
+>>> -	if (req->src != req->dst)
+>>> +	if (already_unref || req->src != req->dst)
+>>>  		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+>>>  			skb_page_unref(page_to_netmem(sg_page(sg)),
+>>>  				       skb->pp_recycle);
+>>
+>> Sashiko points the above is still unsafe:
 > 
-> When the changed word is not aligned, the modified bytes straddle two
-> checksum words, and using the standard incremental update helper
-> (which assumes alignment) produces an invalid checksum:
+> For the original patch submission, sashiko reported 'failed
+> to apply' because it was targeted to the ipsec tree. Now
+> with the full pull request it applied and it found issues,
+> but now it is too late for me to fix this.
 > 
->      | w1     | w2     |
-> OLD |  a  b  |  c  d  |
-> NEW |  a  b' |  c' d  |
+> Would it be possible to integrate subtrees of net and net-next
+> into the netdev CI? This would avoid such problems in future.
 > 
-> Since b' and c' sit across w1 and w2, we could compute the incremental
-> checksum in two operations by recalculating w1 and then w2:
+>> ---
+>> When the new caller passes already_unref = true, can the loop still be
+>> reached safely?
+>> Looking at the allocation and request setup in esp_output_tail():
+>> 	tmp = esp_alloc_tmp(aead, esp->nfrags + 2, extralen);
+>> 	...
+>> 	req = esp_tmp_req(aead, iv);
+>> 	sg  = esp_req_sg(aead, req);
+>> esp_alloc_tmp() calls kmalloc(len, GFP_ATOMIC) — the buffer is not
+>> zeroed.
+>> esp_tmp_req() only does aead_request_set_tfm(req, aead), which assigns
+>> req->base.tfm. It does not touch req->src or req->dst.
+>> The local variable sg is filled in by skb_to_sgvec(skb, sg, ...) but
+>> nothing copies sg into req->src; that assignment is performed later by
+>> aead_request_set_crypt(req, sg, dsg, ivlen + esp->clen, iv).
+>> In the new error path the call sequence is:
+>> 	err = skb_to_sgvec(skb, dsg, ...);
+>> 	if (unlikely(err < 0)) {
+>> 		esp_ssg_unref(x, tmp, skb, true);   /* before set_crypt */
+>> 		goto error_free;
+>> 	}
+>> 	...
+>> 	aead_request_set_crypt(req, sg, dsg, ivlen + esp->clen, iv);
+>> Inside esp_ssg_unref() with already_unref = true, the predicate is
+>> short-circuited but the loop body still dereferences req->src:
+>> 	if (already_unref || req->src != req->dst)
+>> 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+>> 			skb_page_unref(page_to_netmem(sg_page(sg)),
+>> 				       skb->pp_recycle);
+>> Since req->src has not been initialized at this point (the kmalloc
+>> buffer holds whatever was there before, and aead_request_set_crypt()
+>> has not yet run), sg_next(req->src) walks an arbitrary pointer,
+>> sg_page(sg) reads sg->page_link from arbitrary memory, and
+>> skb_page_unref(page_to_netmem(...), ...) then drops a refcount on a
+>> fabricated page.
+>> The commit message also seems to acknowledge this:
+>>     Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+>>     unconditionally unrefs the source scatterlist frags without checking
+>>     req->src and req->dst, since those fields are not yet initialized by
+>>     aead_request_set_crypt() at the point of the error.
+>> If req->src/req->dst are not yet initialized, how can the loop
+>> sg = sg_next(req->src) be valid?  Should the helper instead walk the
+>> local sg returned by esp_req_sg(aead, req) (which was actually
+>> populated by the first skb_to_sgvec()), or should
+>> aead_request_set_crypt() be moved before the failure check so that
+>> req->src/req->dst are well defined?
+>> The same construct appears in net/ipv6/esp6.c:
+>> ---
+>>
+>> And the SoB is incorrect for this patch. Do you rebase your tree? (I'm
+>> not suggesting starting that otherwise!!!) If so you could possibly drop
+>> this patch ?!?
 > 
->      C' = C - w1 + w1' - w2 + w2'
-> 
-> But working it out:
-> 
->      C' = C - w1 - w2 + w1' + w2'
->         = C - (a * 2^8 + b)  - (c * 2^8 + d)
->             + (a * 2^8 + b') + (c' * 2^8 + d)
->         = C + 2^8 * (a - a + c' - c) + (b' - b + d - d)
->         = C + 2^8 * (c' - c) + (b' - b)
->         = C - (2^8 * c + b) + (2^8 * c' + b')
-> 
-> So an unaligned incremental checksum can be done in a single operation
-> by byteswapping the changed bytes before passing them to the helper.
-> This patch implements that trick for unaligned MSS option updates.
-> 
-> Signed-off-by: Kacper Kokot <kacper.kokot.44@gmail.com>
-> ---
+> No, I never rebased the ipsec tree so far. I could revert it, or you can
+> do so if you don't accept the patch as is. Rebasing would be the last
+> resort as this creates problems for everyone who cloned my tree.
 
-Just a couple of nits..
+Sure, I just could not remember if xfrm tree was usually rebased or not.
+A revert or an incremental patch are just fine.
 
-Please use nf-next target, like "[PATCH nf-next v3] netfilter: 
-xt_TCPMSS: ...". Let's handle this as an enhancement.
+/P
 
-> I decided to go with the get_unaligned_be16 suggestion because
-> it's idiomatic and it produces shorter assembly on x86-64
-> (6 instructions vs 9). SYN processing is a cold path so
-> I didn't look into it further.
-> 
-> v2:
->   - Use get_unaligned_be16 (Fernando's suggestion)
->   - Fix alignment check expression (David)
->   - Mention it's a theoretical bug in the commit message
->   - Drop cc stable, the bug is only theoretical
-> 
->   net/netfilter/xt_TCPMSS.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/xt_TCPMSS.c b/net/netfilter/xt_TCPMSS.c
-> index 80e1634bc51f..32c87a520361 100644
-> --- a/net/netfilter/xt_TCPMSS.c
-> +++ b/net/netfilter/xt_TCPMSS.c
-> @ -117,8 +117,9 @@ tcpmss_mangle_packet(struct sk_buff *skb,
->   	for (i = sizeof(struct tcphdr); i <= tcp_hdrlen - TCPOLEN_MSS; i += optlen(opt, i)) {
->   		if (opt[i] == TCPOPT_MSS && opt[i+1] == TCPOLEN_MSS) {
->   			u_int16_t oldmss;
-> +			u16 csum_oldmss, csum_newmss;
 
-Please use reversed xmas tree:
-
-+			u16 csum_oldmss, csum_newmss;
-   			u_int16_t oldmss;
-
-Thanks,
-Fernando.
 
