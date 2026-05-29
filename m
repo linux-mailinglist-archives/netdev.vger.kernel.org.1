@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-293202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293203-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHKQGuThGWpmzggAu9opvQ
-	(envelope-from <netdev+bounces-293202-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:58:44 +0200
+	id oIuMARPiGWpmzggAu9opvQ
+	(envelope-from <netdev+bounces-293203-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:59:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49344607976
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:58:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3AA60798E
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6767130A459D
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:48:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 41BA430C7B05
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B392426D03;
-	Fri, 29 May 2026 18:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8EC407CCB;
+	Fri, 29 May 2026 18:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="KYG1F00+"
+	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="DTZP5aVU"
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.151.120])
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D271344A71B
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 18:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.151.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AC8426D0A
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 18:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.153.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780080022; cv=none; b=ZRIwHbWBySlfrprEOtQy+z+gWYjTEPm1leRWooJNmd9sldxY2434oBe8vOCnkqt1GS5gNOA88/khBKNbOkFg4lKdRDmC0V+jMic+s7N0K/KDw7yu/CmlMNndc8+IQyhUhth+IAcrRkkUW27ny6kryoHTkmWAQI/osZu1Mfi+mN4=
+	t=1780080072; cv=none; b=t9cjHkPlnHuv0waEh5X1+5IUgoChYXtz7AIrYi7YiJyqaaD61mEjX6sLDm78kjcAwI7zN8C2oZHRlAfV8w65mtQBKXkGzkWImS4IShpOeCQW2mTzEg7nQrkWqeWgyLtfZ4dxzr2j0S77TwH39KQEVu8O6Py/RCxYnqzEZFsspFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780080022; c=relaxed/simple;
-	bh=bvMPtqhR7cZVRmU7l4btK5R+eUlcDzKBv4gYItFmg5o=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b3QaIEc7bGKFLinunCvhm3tWgSE5Vvx5/5Adb49gREfSw3nsn4ioJQffXkWJVin6kffMxdjR2F2Q4f0t/yjb/EuR/Ez5o2FJksa378FKa4t/obuVomzLaWQwEXfhJZx0JZME0xnPYhnaCovH8ukQMpeZUNKyS5bkmcktKZsrocA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=KYG1F00+; arc=none smtp.client-ip=170.10.151.120
+	s=arc-20240116; t=1780080072; c=relaxed/simple;
+	bh=HSSvSRGbVXVtvRve1O8/hxCcicsVnN039O8dcOE+Fwk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ea0oN2drv5wBGSyowHmirsQzIc5WI/KlqZ56xxYzlOIS2E/EbrtBsIrVK7qSozdE5uJRpfHj5FI0bE7yZ4NdTWDpXAyRwkkPYKTCvxgUcPlx9rQDLebOICWSfKO8aEMMLdbpv7W+UNEZsoyAGzX/rO0pdNq6kmtA5XNSkpx5vgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=DTZP5aVU; arc=none smtp.client-ip=170.10.153.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onsemi.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1780080017;
+	s=mimecast20250127; t=1780080070;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=xKmhOOKewpjlwhHNSo4RVMQ+MvvnV74yC02sRqoRRss=;
-	b=KYG1F00+U1o3a104/9W9FdkGQHG97Ldg/HOUOmCefc/oGIWDxwnfqOmJk0L3q1rlcUj3R3
-	ZvryU8QyKQ73+33RSy0/eW4CNd1NRD0tOxVORb09O0UhbJLig9trhImY+TD1fMO/jcC6oK
-	AXqIr0NCUpXz8yiMxkyqRqfZb4CDETikKxu1ygaLvwjTWrmyMRsR03oZYpdZoaha0AF13P
-	omLAk3BJBDR1CloYCYRDp6o2yV5YiXI3+1bdvRNCOp+c6Yl8cp7UKgp8zB8bmUg9cdOFmt
-	egtQsjcOIPt3JMcyqo3KbfN1GG7VoYPjZdUluvV2Ax0x5+guWgMu+EdCFxxBfA==
-Received: from CO1PR03CU002.outbound.protection.outlook.com
- (mail-westus2azon11010045.outbound.protection.outlook.com [52.101.46.45])
+	bh=HSSvSRGbVXVtvRve1O8/hxCcicsVnN039O8dcOE+Fwk=;
+	b=DTZP5aVUj4dkqsknt2oX0TptiJ7+G3yuKXCAUo9TqqRNAKkbzOXJusgeCpopVciE24I5OP
+	K8NaPKmKLSS2c/W8hAQdQArmj1+rGDMLLMyimTFwnJQVbR6FHY9JVVXkslAOw+QKId0oft
+	0wWcPzv65qk5Ogd3ilRw/8SYZeElneOKf/ZX0goofJG9M5/YbkqXDzfSD7Qt/oqA8m4lsL
+	+ImlPU3x1+XnQK2/npbnFV4IPvfes9eRBC0ZVsMdeOFFyS+qZnwVw/SRGRyVwToHqK5X8L
+	G1mPhS1/bwbPWr5ASmksFdo1ZwwMzJpRiU7xpBu4Ip0guOjMTqamEuDvJsydqg==
+Received: from BN1PR04CU002.outbound.protection.outlook.com
+ (mail-eastus2azon11010022.outbound.protection.outlook.com [52.101.56.22])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id usb-mta-61-3YeMvOMYN8-PHx_wShGUtQ-1; Fri,
- 29 May 2026 11:40:15 -0700
-X-MC-Unique: 3YeMvOMYN8-PHx_wShGUtQ-1
-X-Mimecast-MFC-AGG-ID: 3YeMvOMYN8-PHx_wShGUtQ_1780080014
+ cipher=TLS_AES_256_GCM_SHA384) id usb-mta-64-MdP9mVTsOOy5MvNuo3iEKw-1; Fri,
+ 29 May 2026 11:41:06 -0700
+X-MC-Unique: MdP9mVTsOOy5MvNuo3iEKw-1
+X-Mimecast-MFC-AGG-ID: MdP9mVTsOOy5MvNuo3iEKw_1780080062
 Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
  by PH0PR02MB7399.namprd02.prod.outlook.com (2603:10b6:510:a::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Fri, 29 May
- 2026 18:40:10 +0000
+ 2026 18:41:00 +0000
 Received: from CY8PR02MB9249.namprd02.prod.outlook.com
  ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
  ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.21.0071.011; Fri, 29 May 2026
- 18:40:09 +0000
+ 18:41:00 +0000
 From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
 	"parthiban.veerasooran@microchip.com" <parthiban.veerasooran@microchip.com>,
@@ -68,75 +68,75 @@ To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
 	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v3 07/14] net: ethernet: oa_tc6: Support for vendor
- specific MMS
-Thread-Topic: [PATCH net-next v3 07/14] net: ethernet: oa_tc6: Support for
- vendor specific MMS
-Thread-Index: AdzvmPeE1C2SWPKfQGiUdaQO3o8p1Q==
-Date: Fri, 29 May 2026 18:40:09 +0000
-Message-ID: <CY8PR02MB92492F5D3DB407A8392A36A783162@CY8PR02MB9249.namprd02.prod.outlook.com>
+Subject: [PATCH net-next v3 08/14] net: ethernet: oa_tc6: Remove FCS size in
+ RX frame
+Thread-Topic: [PATCH net-next v3 08/14] net: ethernet: oa_tc6: Remove FCS size
+ in RX frame
+Thread-Index: AdzvmRIV9Yc6XZqaQq2ja4j42ca11A==
+Date: Fri, 29 May 2026 18:41:00 +0000
+Message-ID: <CY8PR02MB9249644F900471DB8417134683162@CY8PR02MB9249.namprd02.prod.outlook.com>
 Accept-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|PH0PR02MB7399:EE_
-x-ms-office365-filtering-correlation-id: 982409b3-0c4a-4916-e74a-08debdb1b656
+x-ms-office365-filtering-correlation-id: 253321f2-ce5d-406d-cd40-08debdb1d4ab
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|18002099003|56012099006|11063799006
-x-microsoft-antispam-message-info: S5ea2dhdok1BjAIrUgMQvJ05NNFnebzaoTM0fKOmcRqjLyGXNFXKzHpKDJdlJz27z0dRWU5vZ2DJ6e0iCa/1dMIvSRSTc++93aM1h6RzTZRZ6D2GSAzYvJd4M/wko0t5pwhSUSMnkcSoEAsRmDeyDdPr3T82VsspxZRx/d/xjDsSXF4Kmfy+RpQm5LrEhJsLIB6yWQrwrGYYQHBQv1hg4bjxW3hud41y1BBEzPutMMMlEIVY9o7CN4+m89EZTuelEBiH17/NWNrpA7DfzzjxInU9jmH4/jJnLNkOth2nvx0k1BTKZdOL7REBvUVdqTX7ls5h7dq6UllfT/wGyBsyHzrX1vsLbzvYbhXDDNybzqqPeT0YuExl0qwL0QhATnnyoUm1YaQeuw+rDl2lhpvbG/wau5W/FvnfH7RaLRTI6P/DTx/DQ/aD7AIj4PmEvk0nTiafVTp/EDSeIEKCKz4/eJneXwUed5Yvnv7OKIXDaVGcMfGRsAQi9jVCyiinpQnGLyYFnyAUgJ5Du/0efN/lYRfUGcSRGcvj3faBYAcUdHef+zKs5+2LjVcShleU2rwjBto/LVyXXyPn65Fr7qXnE/gaQEC8xSjViMrjJuD3iDMl4bp7F/xwQuAc2EByq1hLh8HCpj6PzLBp19hXoJc+jt6/tpTUgkieB43684Q5Gfr7ENs3b7ZBtYLiZkDAx7t5nPBwSjDdJu93g3Q5htIWsfqR0zpOlblhIxevfhg/aBELKfBeHOCax5ARL5yLdG0C
+x-microsoft-antispam-message-info: ibHh7N723V0yEQ+FeE9S7NZLDpjILZLLMdQQ5ftYJFINL4SdS3OpSoMRcYb9oZtYoKMsZRplln8YVcrUTwOPimRkaMdyT8m5dOAXvE20JKmFyXfYI8DIr4gz3XJUl8t7EYAtiZ3KNozCg93v2+HgToINEG99Zq37X7olXaOvY0zJQEms0fY5OQpOXinPCY5nELFbit9Sw5ijAI2L49YEYzf2DG3r6VMHz81vfPvuqEP2exEhV2zLBdxmdfnyTvEe9lQZf7OCd9FxeX4ASkEtztURkNQ+t+m6umo5WikwHFMAjuc9UawlGwrLf/oINW2QDRRhkKSNUQ9oCAoXgQaPgpbnaB2eV9Zb7hQhb3xDLc1NxXtA+m3mepwtIKXsA35m9VphPANPiWXW7xE65EjVWkZ9aJdXg92wqEqoiHIn2kBTLaoVhGlaCxmEwUdf3zD/4wl7moKvPHD6FIwZikbMblJyEbaSgS+kHTg7i8OGe2JbfILFc+8bNdvnpQ8KZM5Z+3GN+a/p1dQbIx5IRkEoS4X0WOLRGgD+zFcaMCVDkt3CDd2bbJjfrxi6yV+hXh/o3Bx0uMrg4EZ5xDL7CMkFU9HUkzjieNTqkhWkDdcqYHN+5aH+Aqu4VE8xtMGz7bniOMS0+XKoSTHgiBuvZGasLArbUiTPBLcoMkH9am7nuChnTih6NqWOdNJltY+uxBFB6yBcJQUw2E7fRgs4aBSOqOzEgQGVUWXVIllyz4Jsqz37kRgDlBCjjcXsiWROGLiD
 x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rPnI4Dts3gMgAy0zpjd5H/MRevhOSm4btdOkyJUeoMo1RB3/pugB2zjgkKzK?=
- =?us-ascii?Q?Tw+lWcfHiO3Np174PF2g52/axid9bbmsuclCsAXoACN702H1klbEndauTkEg?=
- =?us-ascii?Q?UtKq1+3Yh2IcSgP0Cwa/OFD3KuZCyYRCYfiCq3a1u1Xje1Uu1BOdXh01Navh?=
- =?us-ascii?Q?tN3xSfF0UV8Oz/YPIy6vvfVetdTK62V35AbOjmZ9SQu33e/qzmIpIEzZFxJH?=
- =?us-ascii?Q?bvSs4Dm+ksfmXAeP682A9hDUpyAiUQBkyIBKtObPaMP1Q8/nNTiIguQr/cVG?=
- =?us-ascii?Q?wYcDVn1IYKDXf3Au0BMSzLQqgrf8Lie9ZEzzirUzPMPcuocZarbOE9hajYrh?=
- =?us-ascii?Q?3sD1K5XKYUHLTG52irSCu5rH9qyONypo57b7rhoJcA4+X2g76Y7u5648SJMh?=
- =?us-ascii?Q?FJJ226bpL5QfsEBvJrL/TporTMDiYXcNR318lNtPrLnw1dWIhXOg/fwZlmYn?=
- =?us-ascii?Q?c1mUD+DEqlNrgAIWxxfyDmqLTGYHOmUbpyJ7mWIMQ8NWHoP7aXRK54yoJMSw?=
- =?us-ascii?Q?BtxGlwqrnTGvg4d/BYJCrQfi1eikYyXHBQZKuQ6MyurNUEOKhDuZtgVQNzRx?=
- =?us-ascii?Q?z2bEQLcxDm4GgOszritXC8mVQzkyQr6wOslZUylyp1VWQynZKrxVSC5EIPNx?=
- =?us-ascii?Q?B5nmhAONk8XoWHOuGoRPiWhtbLHaES1+y0LOfCwlsG14onZH3HmC6lRGJ3vp?=
- =?us-ascii?Q?Bkfw/CvETiUgks/XELqTw36I5c5RwhNghtR+sPhlTOWAgDx9JSwKOyw0AR2y?=
- =?us-ascii?Q?wA10DpaRAwiWUyhI//XonFVYElZpzSuq7p/qUT9V3ucY6x01OaCKIq+lCfnf?=
- =?us-ascii?Q?A04Vm/w+P7pBMIFRDHh/8qk5pQX9VlX7xKF/4sBr7zvaUPY5yLBu2AQfuSNj?=
- =?us-ascii?Q?fTvcj2w87GaUxGvufLtpKG9ETi2Vg7WWDUlpFnFFBqOYD217+DCnXP7NuLdh?=
- =?us-ascii?Q?GCuf0yVxmivqszIQYE89g36qnwa8DvSCxyG/P25Dy8+w8Eq6F0oupAbv0kNi?=
- =?us-ascii?Q?35OJRm9yWii5szhy3/os4KyEcxQidilZxXFZ01lO7ugz0Ctggz/2IDQlyVY8?=
- =?us-ascii?Q?erkritBkfSd0q58opyedjcK8TdZR/erSDlWB+y1FkNBKnwQRM5F7igkxzwZT?=
- =?us-ascii?Q?bx/geUrpP1UvQtFVKALwxw7qtn6dAyAGDgLf7Zuk8Waz1AyJ7UGLRPK9ss4j?=
- =?us-ascii?Q?SaBGTfaOEkRID6mSv6Kp648zdT3Pta6Yyye0sDgl1Rlx+FXHOTibAxb525L4?=
- =?us-ascii?Q?0FK08jUsqHKDYMdyRTUFIwyejN0cXxfD2IAzVx3kVcFzifzrHI7LIAZzOOjG?=
- =?us-ascii?Q?SQZLn7pO1fOrb91Fz5OyIuV6xD91LXstNZ+4VXSuloSFVehoRFRDbPvEcCj2?=
- =?us-ascii?Q?UXx6eJdmKZXRwzPEU2X+lpIoP53IC3azSHEXFTQmRwGC0USBBmEM7CyQCPU+?=
- =?us-ascii?Q?xf/TLhwYHlTNwMfVK/rJ00ubkUxyqvsOSRo1B0JNseOeVfN1hoLF+mFhEfRZ?=
- =?us-ascii?Q?UXUANOfsCIJAMdPrvp5KeX/jRUe8zQFD2ErjA1VL1FMOKbjuVKDxNK9imrWU?=
- =?us-ascii?Q?l01LUEF0gxkFC+Lz4svpBPf3q8+MAVQUhhcqAoJHiCU6AVy7aq1q3RHOSZV0?=
- =?us-ascii?Q?hmys9sULxsTirclUl+/PwN8BXqO+xu6Y34IARwzeJEfE8DySHLifYvHFpQFW?=
- =?us-ascii?Q?IhNq/14dmttAxEmezK/92Y5MvYcudWOb4/iY4iu3Gc5P+tkslORttdX086Ui?=
- =?us-ascii?Q?x71rvha6hw=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?87Qr8HIr0AFAUbcXp47L7hupW89CIfsV+X+oyCpJPE/a95vdh/vGVOsgJ5s6?=
+ =?us-ascii?Q?JK6Wj2+UNKbd7T2Bs/PLjVs6rGgNW0XSfe6FTZC07QO2XfnFpHbGhYz9r73v?=
+ =?us-ascii?Q?vCvbKhWLOlU/nrzWPKo7B8M0gm50MGO2L/TLx6pMvZGYCLXkpQql2Gw9n0K+?=
+ =?us-ascii?Q?Ef3k70qtU5aty4KTTuzRAWCR6vqEvw67K3D1LAnvQPeRfgWcb6PsoIQz1dWc?=
+ =?us-ascii?Q?NRBkc4mrBIvZ6aa5dYphSQZgjGsdKtjj7gq/EDVCbns5KEpuBZPtMqeQ0JJJ?=
+ =?us-ascii?Q?HvLFl8DNT4FANVnWIH4atluzwR/jzoQmmsTGIAvYoLaep1b4irP4UnMv46sq?=
+ =?us-ascii?Q?emblJCVsOgcJBppXZy6J8QACg3KymGpHaTCCRD31UPZF8ETHRgsa+V84VVW0?=
+ =?us-ascii?Q?AoUbo8bw/ffJy2zDZlxHJiuoY5SIloM7uR8UL8kxdsFcFWk26HPRrt0Q1aQ7?=
+ =?us-ascii?Q?v3Ic2M+lCPs0E002jo4Q7lJVzmMdBRSGXrc8QRYC/t6E6+YI026gUxYEg/fl?=
+ =?us-ascii?Q?DMU/zPtncaocvb2mzpEwKqpNZ71/urx7WlAjT3ah9tYWlp3WhjZLTtgQQvu2?=
+ =?us-ascii?Q?QsOVJS2Tm2iDXN2DPaULfah1vRAECozHrgWmc6cvlwvoGGJi67Hrdb79mlo3?=
+ =?us-ascii?Q?eT+qaPOIrHiS0bVMqtSf4vfO0bHFggfr5Z25P3kbKE0f6D6Q3ODWjuWMi2eN?=
+ =?us-ascii?Q?uwiB0rKlbgph9xBtENfbNHadlrwuseYfVig8zK6lEDc3mfCb+b3tckHvQYfQ?=
+ =?us-ascii?Q?JaMRCUcPcNdIhDqgsNx9lvSbqBs8uqJvY0HovcM3ezI77iyxDmN/O8p7AYgE?=
+ =?us-ascii?Q?iz3bIt88+3dPYb403RNNYvmfKc0Sn84/bp33CYwU4bA5W9OhAQENOILJT7Dh?=
+ =?us-ascii?Q?iL3vzBnmRYa7wSp6gzIgOINRV6RHO/SuvFFk7smJ6SjrOo35afZ2bl0iGRtN?=
+ =?us-ascii?Q?C2i8sLdC2eCx4nJfMs1PnnK+JSokZrXx5R7nlhlfAEvLXODiuvrR42cfg1tE?=
+ =?us-ascii?Q?Tq7+mev5yQbMAad3MDAiS6oVSWduV1AgJVz9opLWAfPjkvJUKry8lPu89uhb?=
+ =?us-ascii?Q?VAQWZYlryuWOseKjfPcTJDD4f+OEovaKH56AAb9lJVhol2C3+HPC5AP08oF/?=
+ =?us-ascii?Q?6WzPkhA8LYcB1KCWFGGAeTH1wxYQUHA+H8jHHIzeXG3tlFy+BYuZuChIyBwf?=
+ =?us-ascii?Q?QSkZ6bYnlqbPSYoFOCvwaKP8QdrsqO2ypTE6uNsfgQgBcqGIvi5Lbpvx6Wp6?=
+ =?us-ascii?Q?+rampkZBzql9BYKmxs/u4QKptRNcdwl6Nr3o3EtgWAXfr7G1bMpwb+Sc8cXj?=
+ =?us-ascii?Q?p5E6YKgMCBAqJUmwM+9mNDMVSSn6BB974Av5oz5cwWwH5TkiJD12WqaJnjHX?=
+ =?us-ascii?Q?UuQjy4BBqtYxYJuDUifiVG1pnr5JMekk13jxhzDOROw2R6ga2sJmuyRv+TdH?=
+ =?us-ascii?Q?qlCarzAejaxpyhBQDczTT+iz9aeaW+BHPZWoRD5PMqUVVMskRVx5RAjt7eVn?=
+ =?us-ascii?Q?c+qU9R1Mkf3ZQBwwpXXJuPWFLmoynHa5F5vMCOGySDaemBTcuVWVb1KiWrZe?=
+ =?us-ascii?Q?KM7FV9Du/ENhG68SS+6dM/2FjeLpaw8ED67S3uTDqRPw5I4RXeAyPQN2iY+h?=
+ =?us-ascii?Q?z86vcEboWYDxam3tgMdvSeVTLnjvxkGk5djQCinNHNzGOHPEgucdJHDoi0C5?=
+ =?us-ascii?Q?u1LG473nwX/XRwIl//GI3RnUc50m51q/MhhS0wa5ryL4kJauoArcmv4AKGgY?=
+ =?us-ascii?Q?PHrNy2HTjQ=3D=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: IYKVAQz7Fpwh62tMX+ICpuWbFF4IKJOnurXc2bQEFeEEni+va7nSkhIFPqm5GOY++oqUZggStSacjsdhGMKr05rHhwdL0eetEdiCqAoTZqzyHl6CoyeLuEgu2Qq+TzmXxrGt8dz0iGW3aAjzp4fNaSm0yvnLjrhFa9Kg5nsfN8zo8AVKE4WEjIerFvN4JCDU0lKMDy/j8iVfpieOXe2LDU9ZY2YgjNHpjlGK3TsVitJNJhG+wjVc8jarumb49mOG45n6SxFTWfBkZkodJf05YNY3Lnm5d7NqDB17HQat9Lg0V81ij6J4l12UO4a+ObAPTgTsU+sf7yE0kjG7Qie0Aw==
+X-Exchange-RoutingPolicyChecked: opxdAyNLb2Tociz2wXEcLL/vIgX64VSFDr1cvLkLi9eG7e1tv2gzw9jb9BpcN1td0kPOnfxpkYZ2dmhR8aRAoFw1PwTP7mBXSLIajxY+URb9eXMG/7qx7mcLYA0CqQMpKcXV055cfL/JUiv7slZKApIDwtsuw8BupfpNo3RlMVAFNIyeLfbCoP0gX0NflpvJJVp7VBi1o5LNSsTUQhAW4zaZ38KD/SMLccl1e1uW6y42SjS0mCR5HW9bFtb7vU3te47eDRQjryxbWDn7BDRFoiYo6XcGVg1zpXAutwgfc4HDptdkxM2pT92gD8QHsp3vK5odFYEZFF1mPChmSyiPGQ==
 X-OriginatorOrg: onsemi.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 982409b3-0c4a-4916-e74a-08debdb1b656
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2026 18:40:09.8685
+X-MS-Exchange-CrossTenant-Network-Message-Id: 253321f2-ce5d-406d-cd40-08debdb1d4ab
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2026 18:41:00.7879
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rCKyhPCUhib0I0bLkUtjkIjDH0T3G9NKRhjToMPetXhNPJfQLLCpDQwQjEMkbCuCvtsOYtlp4yAD0lcsgWXI7maS7qulCfEmH3MxlSQOoTo=
+X-MS-Exchange-CrossTenant-userprincipalname: CnN75tPjubJgb8Vd/1kJ8X640ctpGj6Xc5jZIoUhS/Y+NyrMdSrXsSTbVv7+tFqtVBUo1X4Lk4PalH+t6QUUtptC7GWDRxtz91zr+mhb6hI=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB7399
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: mM5FLrqClKqzbz44kg-MTjWJRbPJMAxAMn3sXsG_cos_1780080014
+X-Mimecast-MFC-PROC-ID: pYvaJDd9m4iAAR_FPzcxJ7Kvm4DsehiNi2_lABzeHzc_1780080062
 X-Mimecast-Originator: onsemi.com
 Content-Language: en-US
 Content-Type: text/plain; charset=WINDOWS-1252
@@ -150,7 +150,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293202-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293203-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -168,104 +168,33 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[onsemi.com:email,onsemi.com:dkim,CY8PR02MB9249.namprd02.prod.outlook.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 49344607976
+X-Rspamd-Queue-Id: 9D3AA60798E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-OPEN Alliance 10BASE-T1x Serial Interface specification, table 6
-allows vendors to use any memory map select (MMS) value between
-10 and 15. This new API interface enables vendor to map one of
-thes MMS values to MDIO_MMD_VEND1.
+When MAC-PHY appends FCS to the incoming frame, FCS,
+it is removed from the frame before passing it to the stack.
 
 Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 ---
- drivers/net/ethernet/oa_tc6/oa_tc6.c | 20 +++++++++++++++++---
- include/linux/oa_tc6.h               |  1 +
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/oa_tc6/oa_tc6.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/net/ethernet/oa_tc6/oa_tc6.c b/drivers/net/ethernet/oa=
 _tc6/oa_tc6.c
-index d49220b49852..d2b05f98765b 100644
+index d2b05f98765b..de5f1548139f 100644
 --- a/drivers/net/ethernet/oa_tc6/oa_tc6.c
 +++ b/drivers/net/ethernet/oa_tc6/oa_tc6.c
-@@ -202,6 +202,17 @@ int oa_tc6_ioctl(struct oa_tc6 *tc6, struct ifreq *rq,=
- int cmd)
- }
- EXPORT_SYMBOL_GPL(oa_tc6_ioctl);
+@@ -786,6 +786,9 @@ static void oa_tc6_submit_rx_skb(struct oa_tc6 *tc6)
+ =09tc6->netdev->stats.rx_packets++;
+ =09tc6->netdev->stats.rx_bytes +=3D tc6->rx_skb->len;
 =20
-+/**
-+ * Add vendor specific MDIO_MMD to OA TC6 MMS mapper value.
-+ * @tc6: oa_tc6 struct.
-+ * @mms: vendor defined MMS value for VEND1 mdio device.
-+ */
-+void oa_tc6_set_vend1_mms(struct oa_tc6 *tc6, int mms)
-+{
-+=09tc6->vend1_mms =3D mms;
-+}
-+EXPORT_SYMBOL_GPL(oa_tc6_set_vend1_mms);
++=09if ((tc6->netdev->hw_features & NETIF_F_RXFCS) !=3D 0)
++=09=09skb_trim(tc6->rx_skb, tc6->rx_skb->len - ETH_FCS_LEN);
 +
- static __be32 oa_tc6_prepare_ctrl_header(u32 addr, u8 length,
- =09=09=09=09=09 enum oa_tc6_register_op reg_op)
- {
-@@ -455,7 +466,7 @@ static int oa_tc6_mdiobus_write(struct mii_bus *bus, in=
-t addr, int regnum,
- =09=09=09=09     val);
- }
+ =09netif_rx(tc6->rx_skb);
 =20
--static int oa_tc6_get_phy_c45_mms(int devnum)
-+static int oa_tc6_get_phy_c45_mms(struct oa_tc6 *tc6, int devnum)
- {
- =09switch (devnum) {
- =09case MDIO_MMD_PCS:
-@@ -468,6 +479,8 @@ static int oa_tc6_get_phy_c45_mms(int devnum)
- =09=09return OA_TC6_PHY_C45_AUTO_NEG_MMS5;
- =09case MDIO_MMD_POWER_UNIT:
- =09=09return OA_TC6_PHY_C45_POWER_UNIT_MMS6;
-+=09case MDIO_MMD_VEND1:
-+=09=09return tc6->vend1_mms;
- =09default:
- =09=09return -EOPNOTSUPP;
- =09}
-@@ -480,7 +493,7 @@ static int oa_tc6_mdiobus_read_c45(struct mii_bus *bus,=
- int addr, int devnum,
- =09u32 regval;
- =09int ret;
-=20
--=09ret =3D oa_tc6_get_phy_c45_mms(devnum);
-+=09ret =3D oa_tc6_get_phy_c45_mms(tc6, devnum);
- =09if (ret < 0)
- =09=09return ret;
-=20
-@@ -497,7 +510,7 @@ static int oa_tc6_mdiobus_write_c45(struct mii_bus *bus=
-, int addr, int devnum,
- =09struct oa_tc6 *tc6 =3D bus->priv;
- =09int ret;
-=20
--=09ret =3D oa_tc6_get_phy_c45_mms(devnum);
-+=09ret =3D oa_tc6_get_phy_c45_mms(tc6, devnum);
- =09if (ret < 0)
- =09=09return ret;
-=20
-@@ -1281,6 +1294,7 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, st=
-ruct net_device *netdev)
- =09SET_NETDEV_DEV(netdev, &spi->dev);
- =09mutex_init(&tc6->spi_ctrl_lock);
- =09spin_lock_init(&tc6->tx_skb_lock);
-+=09tc6->vend1_mms =3D -EOPNOTSUPP;
- =09tc6->tx_ts_idx =3D OA_TC6_TTSCA_REG_ID;
- =09INIT_LIST_HEAD(&tc6->tx_ts_skb_q);
-=20
-diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
-index c1eb1350ff27..f33c9f8f24a0 100644
---- a/include/linux/oa_tc6.h
-+++ b/include/linux/oa_tc6.h
-@@ -45,5 +45,6 @@ void oa_tc6_get_ts_stats(struct oa_tc6 *tc6,
- =09=09=09 struct ethtool_ts_stats *ts_stats);
- int oa_tc6_hwtstamp_set(struct oa_tc6 *tc6,
- =09=09=09struct kernel_hwtstamp_config *cfg);
-+void oa_tc6_set_vend1_mms(struct oa_tc6 *tc6, int mms);
- void oa_tc6_ptp_unregister(struct oa_tc6 *tc6);
- #endif /* _LINUX_OA_TC6_H */
+ =09tc6->rx_skb =3D NULL;
 --=20
 2.43.0
 
