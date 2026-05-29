@@ -1,191 +1,147 @@
-Return-Path: <netdev+bounces-292916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AzekKibmGGruoggAu9opvQ
-	(envelope-from <netdev+bounces-292916-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:04:38 +0200
+	id iHdGNy3oGGruoggAu9opvQ
+	(envelope-from <netdev+bounces-292917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:13:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472EE5FBCCB
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:04:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BBC35FBE50
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:13:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DFF173010638
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:04:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A742F303ACFE
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1922A34D3B5;
-	Fri, 29 May 2026 01:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79B734D910;
+	Fri, 29 May 2026 01:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lyAJKjAk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mUhSMwXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063622A1CF;
-	Fri, 29 May 2026 01:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EF319067C
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 01:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780016675; cv=none; b=QT1DgcP0oOzo3MYQInH0W5pToVPhDlTfgs/mqrybYcvUoZYmrFXtNdZC+FQJxPfKm/DTF8a3CSS4wz4jkFGBH3gvsl57uDWPipNUlNw//vDe62PelSUJyKcfoecDE9qnZ0cheP+R7g/NF6S99h9i5wrvCnoSFYB1aoujxOejaHQ=
+	t=1780017085; cv=none; b=C/KVDXYSuPfarYBS0YP6ZPPgAj582/KcGqigIYeIFY3ItsnJS5XSVMBAVh4jXlkXm1Mh/saKchWabRxDLH8k4PY4+3cIA/AxybCz+AzgpXtApdcqPTyxl4qsHeU9Hcu7+T+WKiGQfKBj1ChZ5Mq9ZjhcxOxkKE3N2XdJtM7iO5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780016675; c=relaxed/simple;
-	bh=hJRm4RCDKJi1JsynDhNj/DYfUp856jZdDii5CBobBO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fke5UynjhJZ83wInwR7spvyOcV7XrixnnQ0othAUJvuKPhqnmIVmYvI/irvur43QWjbKtgOoEJWmSqOL+jIYB91bXa+iTISRkiLDXOpxZC0YWiax1Obpn5e0nZlIoJNEBxmJrcUOOsfvSWhf2rWaX8wSioVKhGZDAc9nbZhZQQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lyAJKjAk; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D901F000E9;
-	Fri, 29 May 2026 01:04:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780016673;
-	bh=K4saZNOe2/RIi84HrgBLX3Cn6YUttN1ZK3cGL8Yp5kE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=lyAJKjAk3w08wH1HRKVnKG2f1ZdilmNnLLRK/WxRN8KUv76iKG+q+xpwE7rpRxEHs
-	 RYn6eMcTDxUpbkTjiX2QV5Crm7SkIX6dRNDuHtH5XaCzk9qp6jI8aIsdpcn1ht9iMm
-	 lSs1rAvBpgQMFDhm/Yfe8QYmpSd1qde2aOAKPPy4QD7VR4r9noZvRk1H8XJ19VyPEu
-	 U8zOvIQMVsVN9wTrGvIOcO6sNdmc46V556TutN5V8k416Yy4ovUM9sWIxGFtbg/iNb
-	 JIYbYs7xgGLLSJLKFWi14kVp6T4oaxBardm+X0McUZoG2x8lhCE8BWY9nNenGFHJOc
-	 5HImxhXgsU77g==
-Date: Thu, 28 May 2026 18:04:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: javen <javen_xu@realsil.com.cn>
-Cc: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <horms@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [Patch net-next v6 2/7] r8169: add support for multi rx queues
-Message-ID: <20260528180432.4652dcfa@kernel.org>
-In-Reply-To: <20260526081117.173-3-javen_xu@realsil.com.cn>
-References: <20260526081117.173-1-javen_xu@realsil.com.cn>
-	<20260526081117.173-3-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1780017085; c=relaxed/simple;
+	bh=IXFFaTUOr5SmQ8Ycsy9ason09ZXFMZg9YIBLODfqgm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LGHlrKujDLUmLRsZXH3WU1lrzJkKy7uthDvV01W1T/muCF4QA881nS7dAiLpgsYeBWgghK4BNJj7dYD8VgED6HJbV9EUljxKGTcZGH8HVhjNbtmm2mYJ127hfkZLKxvXyVBQdm+bO/7DaGcWcp9dNXlqGvg/nYw7BIEYjYXbPHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mUhSMwXr; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Y7aAYuuOXsoIWmHusGu86t4YWqk38FGU7P4VrVz3G8E=; b=mUhSMwXrRHgYZKx06PuD7i8Qo0
+	X+i/cA53n69LmZ9ba7UOINuGse5Oymo51Y70xHzp5y01ee5Q7IFOkI0b4kJQGhY0QAhHd2O1ApRxl
+	vxYMe/ercggYQcTqzLnwPYekE+xacmXsxxxOXXyo3K5Q7SF5je9wGgPYULpRwcYEuu3s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSlkm-004zLp-MQ; Fri, 29 May 2026 03:11:12 +0200
+Date: Fri, 29 May 2026 03:11:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Markus Stockhausen <markus.stockhausen@gmx.de>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
+	daniel@makrotopia.org
+Subject: Re: [PATCH net-next v2 1/4] net: mdio: realtek-rtl9300: provide
+ generic command runner
+Message-ID: <97c23300-8a47-49c2-abf0-3af2e257403a@lunn.ch>
+References: <20260527163449.1294961-1-markus.stockhausen@gmx.de>
+ <20260527163449.1294961-2-markus.stockhausen@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260527163449.1294961-2-markus.stockhausen@gmx.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-292916-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292917-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmx.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 472EE5FBCCB
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,gmx.de:email,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 5BBC35FBE50
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 26 May 2026 16:11:12 +0800 javen wrote:
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 22e843baffc7..62bf77aa1ec8 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -74,9 +74,13 @@
->  #define NUM_TX_DESC	256	/* Number of Tx descriptor registers */
->  #define NUM_RX_DESC	256	/* Number of Rx descriptor registers */
->  #define R8169_TX_RING_BYTES	(NUM_TX_DESC * sizeof(struct TxDesc))
-> -#define R8169_RX_RING_BYTES	(NUM_RX_DESC * sizeof(struct RxDesc))
-> +#define R8169_RX_RING_BYTES	((NUM_RX_DESC + 1) * sizeof(struct RxDesc))
+On Wed, May 27, 2026 at 06:34:46PM +0200, Markus Stockhausen wrote:
+> The current bus read/write commands for C22/C45 are RTL930x specific.
+> Avoid to duplicate those 200 lines of code for the RTL838x, RTL839x and
+> RTL931x targets. Instead provide a generic command runner that is SoC
+> independent. The implementation works as follows:
+> 
+> The runner will take a prepared list of the four MDIO registers. It will
+> feed the data into the registers. This generic write to all registers
+> (or to say "a little bit too much") is no issue. The hardware looks at
+> the to be executed command and will only take the pieces of data that
+> are really required. No side effects have been observed on any of the
+> four SoCs during the time this mechanism exists in downstream OpenWrt.
+> 
+> The last fed register is the C22/command register. This will be enriched
+> with the proper command flags from the caller. The hardware issues the
+> command and the runner will wait for its finalization.
+> 
+> Besides from feeding all registers the runner emulates the behaviour of
+> the old code as best as possible
+> 
+> - check defensively for a running command in advance
+> - Before this commit the driver had different MMIO timeout values.
+>   1000s for command preparation, 100us after writes and 1000us after
+>   reads. The new version uses a consistent 1000us timeout for all
+>   of these.
+> - return -ENXIO in case of hardware failure (fail bit)
+> 
+> As a first consumer of this runner convert the write_c45() function.
+> This is realized in a multi stage approach
+> 
+> - a generic otto_emdio_write_c45() will be called by the bus
+> - this will forward the request to the device specific writer. In this
+>   case otto_emdio_9300_write_c45().
+> - There the command data is filled in and the additional helper
+>   otto_emdio_write_cmd() will be called
+> - That adds the write flag and issues the generic command runner.
+> 
+> With all the above mentioned in place, there is not much left to do in
+> otto_emdio_9300_write_c45(). It just fills the register fields and
+> calls the write helper with the right command bits.
+> 
+> Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
 
-AI bots are asking why the "+ 1"?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
->  #define R8169_TX_STOP_THRS	(MAX_SKB_FRAGS + 1)
->  #define R8169_TX_START_THRS	(2 * R8169_TX_STOP_THRS)
-> +#define R8169_MAX_RX_QUEUES	8
-> +#define R8127_MAX_RX_QUEUES	8
-> +#define R8169_DEFAULT_RX_QUEUES	1
-> +#define R8169_MAX_TX_QUEUES	1
->  
->  #define OCP_STD_PHY_BASE	0xa400
->  
-> @@ -441,6 +445,7 @@ enum rtl8125_registers {
->  	TxPoll_8125		= 0x90,
->  	LEDSEL3			= 0x96,
->  	MAC0_BKP		= 0x19e0,
-> +	RDSAR_Q1_LOW		= 0x4000,
->  	RSS_CTRL_8125		= 0x4500,
->  	Q_NUM_CTRL_8125		= 0x4800,
->  	EEE_TXIDLE_TIMER_8125	= 0x6048,
-> @@ -728,6 +733,21 @@ enum rtl_dash_type {
->  	RTL_DASH_25_BP,
->  };
->  
-> +enum rx_desc_ring_type {
-> +	RX_DESC_RING_TYPE_DEFAULT,
-> +	RX_DESC_RING_TYPE_RSS,
-> +};
-> +
-> +struct rtl8169_rx_ring {
-> +	u32 index;					/* Rx queue index */
-> +	u32 cur_rx;					/* Index of next Rx pkt. */
-> +	u32 dirty_rx;					/* Index for recycling. */
-> +	struct RxDesc *rx_desc_array;			/* array of Rx Desc*/
-> +	dma_addr_t rx_desc_phy_addr[NUM_RX_DESC];	/* Rx data buffer physical dma address */
-> +	dma_addr_t rx_phy_addr;				/* Rx desc physical address */
-> +	struct page *rx_databuff[NUM_RX_DESC];		/* Rx data buffers */
-> +};
-> +
->  struct rtl8169_private {
->  	void __iomem *mmio_addr;	/* memory map physical address */
->  	struct pci_dev *pci_dev;
-> @@ -735,20 +755,18 @@ struct rtl8169_private {
->  	struct phy_device *phydev;
->  	enum mac_version mac_version;
->  	enum rtl_dash_type dash_type;
-> -	u32 cur_rx; /* Index into the Rx descriptor buffer of next Rx pkt. */
->  	u32 cur_tx; /* Index into the Tx descriptor buffer of next Rx pkt. */
->  	u32 dirty_tx;
->  	struct TxDesc *TxDescArray;	/* 256-aligned Tx descriptor ring */
-> -	struct RxDesc *RxDescArray;	/* 256-aligned Rx descriptor ring */
->  	dma_addr_t TxPhyAddr;
-> -	dma_addr_t RxPhyAddr;
-> -	struct page *Rx_databuff[NUM_RX_DESC];	/* Rx data buffers */
->  	struct ring_info tx_skb[NUM_TX_DESC];	/* Tx data buffers */
->  	struct napi_struct *rtl8169_napi;
-> +	struct rtl8169_rx_ring rx_ring[R8169_MAX_RX_QUEUES];
->  	unsigned int num_rx_rings;
->  	u16 cp_cmd;
->  	u16 tx_lpi_timer;
->  	u32 irq_mask;
-> +	unsigned int hw_supp_num_rx_queues;
->  	unsigned int irq_nvecs;
->  	struct clk *clk;
->  
-> @@ -764,6 +782,7 @@ struct rtl8169_private {
->  	unsigned aspm_manageable:1;
->  	unsigned dash_enabled:1;
->  	bool sfp_mode:1;
-> +	bool recheck_desc_ownbit:1;
-
-AI bots ask if this needs to be set for all chips or just some specific
-version. Also, I think this workaround should be added in a dedicated
-commit. For ease of review the introduction of struct rtl8169_rx_ring
-should be a code-reshuffling type of commit, rather than a functional
-change.
-
->  	dma_addr_t counters_phys_addr;
->  	struct rtl8169_counters *counters;
->  	struct rtl8169_tc_offsets tc_offset;
+    Andrew
 
