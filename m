@@ -1,173 +1,141 @@
-Return-Path: <netdev+bounces-293030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGLINjNFGWrHuAgAu9opvQ
-	(envelope-from <netdev+bounces-293030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:50:11 +0200
+	id MNqpI2VGGWrHuAgAu9opvQ
+	(envelope-from <netdev+bounces-293035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:55:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E32EA5FECA4
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:50:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A4C5FEDAF
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 688EA32315C4
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:45:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BED8F30F093C
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD803ACEFE;
-	Fri, 29 May 2026 07:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF193A3E78;
+	Fri, 29 May 2026 07:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="sqUs01N4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KjmIZrLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57243328635;
-	Fri, 29 May 2026 07:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1AE1C860A;
+	Fri, 29 May 2026 07:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780040731; cv=none; b=AhIXY+Rp51IfLDPUWFFb4ebRBuzSOyaq5P2D/CJSzgLlLkKNokK62SnA4TGWr+wJAZ03PxRTk1691IOLfU+ADGlQjMd8KDkqwL8MUgiRDKDZiJRwiLBW0y/VovNMBAmf2+AGccaK+pNWKIteEH8TU2Z6N5/QJKTqNHaPcmjvcVY=
+	t=1780040810; cv=none; b=Gz5e2SET4MiGPr1YbGMmW1wcVflqTdaOhVEGrlSYYRTjMUwWq8vHn2BU4HdXmuei9wX9F1YWsmuDmY2qfyyL9jLuNvg9bMcDo4rkSZRCzfS2AwMKd6OsnMBQwxM92PdRtvu71gU6YKAjYzqeVc8w+dMsCMDcyVaYOscMvFtWles=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780040731; c=relaxed/simple;
-	bh=4/rcVikLzFNIHzwXr/tDb8JuW0A5WAxO1YnN5vnYRJ8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qREvKycvZEYMYbJ9bb00KqOouiErtkM+DqDFFGwIpb7U7g351p8B9NtLRJGhSUH0z7+69v7a2C2xqw0/MdEHiuUF5J9JvG+56hLoh1lO5/bzOA6KN2vhEaDM5g1hP+jMZNEfNJO9fgW20w8NKFpwoKJU24qwqaIfrR8mZTghkgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=sqUs01N4; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=1ZTNUeL1mmdwYNv7ZCEh9fXBBMB8CAmIvFx5V3p+ucI=; b=sqUs01N4kVHhHla4q/ZaVuExLI
-	ZEzaOc2k5JksVh6Re62+iQrdRpVbAQ6Zq7OAa/j4gapgf3AVzhFKqjRdTXKW5tHTffeiuoZHvbiN6
-	zyhysk6SROSavoGHMhMEKKi1VVKYu85HfHUh+gOc1GGfKsQxlC+eK83jnTM1cF1MJcD0WFko0thc8
-	ndJqU4D2R/+D2dqPerwRSICp/3LrZUgqmslJ/XxCXBdKAYghtFgZpg4SAs3DQ/QAnrJoleM3LeTQU
-	KRMaoEk3L3w4qtAXCjU8J9zrWZa4eKQ99P7BdPBEWfYxSq60tKbrMDXHSKiIvOsC5xXjtlw2y9rfD
-	ZKWltt4A==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wSruE-004kM7-2U;
-	Fri, 29 May 2026 07:45:22 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 29 May 2026 03:45:13 -0400
-Subject: [PATCH net 3/3] netconsole: take target_cleanup_list_lock in
- drop_netconsole_target()
+	s=arc-20240116; t=1780040810; c=relaxed/simple;
+	bh=HQYKgt8fOz7gmZSQMa2vpCxt+Zpzmx1pngyO8Rnp5w8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=lfh/bUKdNnjwxqJ1NixyAbocARKIWdz6xwswV227tpNfsseEa9NRHpPsAeFxk9uEvegLjdxFtwcgtRjeeG9g4u5avHNJPNoqsAEAni9ueHQ4G54rDtReEPrHaua0SUyBGLO4GScytZKgSZoXBpHVTesThMttNUehl+qt6qEOoQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KjmIZrLW; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 1545B1A3718;
+	Fri, 29 May 2026 07:46:47 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id DC731601FA;
+	Fri, 29 May 2026 07:46:46 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A1F4D10888CC3;
+	Fri, 29 May 2026 09:46:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780040806; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=c024gKKjc1BP6uOHzo7JwDhVMobKmBODDZE59zQhr2g=;
+	b=KjmIZrLWYMuBX5Ryi0sbKhJ6S0YIpXtTli22Qoe9K29ZjXJm+VJASuKQN5LUGreAwA3TZY
+	58Q0hGSxsZmfypZBHd6JdJB6RJoUCdtZnZuitD4hGpbWe2+jBLG8LUsyoWnR9oWsedJ8Fa
+	5lATLDUktJL7FNVjtB1eK9zHycaSx/is+nVhZhp/N0CBo6LCH/OIJomqKX88B8JWB7yPe1
+	bmjk95lkXiDl/sTME/LvC9yhlJVIw1rZfdhqtC5vFHJNp1HKhYDO5VBziMEJ4wnPtJ8wRb
+	aWeYjyirFWL5DeA3Kavh8LIBoRXNJjRcOZ2W69/WWZNRItY4xIJRBiPDeUFG4g==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260529-netcons_fix_before_move-v1-3-cb2d1426dd75@debian.org>
-References: <20260529-netcons_fix_before_move-v1-0-cb2d1426dd75@debian.org>
-In-Reply-To: <20260529-netcons_fix_before_move-v1-0-cb2d1426dd75@debian.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Neil Horman <nhorman@tuxdriver.com>, 
- Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>, kernel-team@meta.com
-X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1956; i=leitao@debian.org;
- h=from:subject:message-id; bh=4/rcVikLzFNIHzwXr/tDb8JuW0A5WAxO1YnN5vnYRJ8=;
- b=owEBbQKS/ZANAwAKATWjk5/8eHdtAcsmYgBqGUQMqv6yG5bTKI5irUeICW72HQT7N0xNKAQHW
- lf1i/R6JO6JAjMEAAEKAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCahlEDAAKCRA1o5Of/Hh3
- bSzHD/4/0Yu/gfenShs5VNG14I8JjwEwuKf3Djw1DnUanHvNCzpumM3Xpg6UQdkIFv4Gplh7yQC
- HGN2DMuNRGVnSBY4TUrIOnzEO21Lsx0z1ou/MMbjNeRw00LliPCf6DkwtLJqN0Etnas8nvmGGv3
- 2WwJ7QUU/17/wkEGgV8OvPYgFzq2Pmu6CBsH1AWmKsvlA6gy+b6wZgCT8IroJSP9SXH7F/U3IiZ
- ZK1VIddi3g0mPOSmdY6LdCLV9pm/BcRnDMTEpz87afMtjtJr//FrukNhkXt86vFPwB5N1zbG38O
- Lqal2eXrWADl8rFHdOcg3zKqE6HlW2395PQzDAgMr4p7U2bMBC3GpPejSHPtBSCmRC9HMSZZ3Cp
- vS4rHeEiXi2zL8c3WmSOoArYaHldI4FWrQ4+c9jbxMePBFOKnJJE7CwNRp3vO2JErbm0kxFuMWq
- r+bOc9Q2omotWoJc/tgxZt3crzBHWIB4H6X1ebfYNjPBpLXHHGo8Vqq9OkLmXKq87mC1gJs48TB
- iPmqI49x+lRwe0qsTLSsCsPCjdajwhMjw/QdXNQmq3TV8Bw9NmFjkCjN8mj+QugYrKY/CqzuPI2
- 2xN0zCilrpDPLa0krtJz/ifh09adPdkI1FFUfNB3c0IBgweiO0r+6k+FBxTfLmiocVK5APLR+YY
- Qg6r4ImVMNynkAg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 29 May 2026 09:46:40 +0200
+Message-Id: <DIUZSUI8A5G2.E4D5YUXOWX95@bootlin.com>
+Subject: Re: [PATCH net-next v2 3/3] net: macb: add TX stall watchdog to
+ recover from lost TCOMP interrupts
+Cc: <netdev@vger.kernel.org>, "Nicolas Ferre" <nicolas.ferre@microchip.com>,
+ "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>,
+ <linux-rpi-kernel@lists.infradead.org>
+To: "Andrea della Porta" <andrea.porta@suse.com>, "Lukasz Raczylo"
+ <lukasz@raczylo.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <cover.1777064117.git.lukasz@raczylo.com>
+ <20260514215459.36109-1-lukasz@raczylo.com>
+ <20260514215459.36109-4-lukasz@raczylo.com> <ahhom_0PJtqnXsv5@apocalypse>
+In-Reply-To: <ahhom_0PJtqnXsv5@apocalypse>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293030-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,tuxdriver.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293035-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E32EA5FECA4
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: F0A4C5FEDAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-drop_netconsole_target() unlinks the target while only holding
-target_list_lock. However, when the underlying interface has been
-unregistered, netconsole_netdev_event() moves the target from
-target_list to target_cleanup_list, and netconsole_process_cleanups_core()
-walks that list under target_cleanup_list_lock only.
+On Thu May 28, 2026 at 6:08 PM CEST, Andrea della Porta wrote:
+> Has this patch seen a V3 version? I guess the only thing it's needed
+> is something like this:
+>
+> static void macb_tx_timeout(struct net_device *dev, unsigned int txqueue)
+> {
+>         struct macb *bp =3D netdev_priv(dev);
+>         macb_tx_restart(&bp->queues[txqueue]);
+> }
+>
+> and then setting .ndo_tx_timeout =3D macb_tx_timeout in macb_netdev_ops.
 
-If a user removes the configfs target at the same time the cleanup
-worker is iterating target_cleanup_list, list_del() can corrupt the list
-because the two paths take disjoint locks while operating on the same
-list node.
+Agreed! (pointed out here, with more details)
+https://lore.kernel.org/netdev/DIK002QFFNBY.31C3KUX2SQC6W@bootlin.com/
 
-Acquire target_cleanup_list_lock around the list_del() so the unlink is
-serialised against netconsole_process_cleanups_core() regardless of
-which list the target currently belongs to. The state transition that
-downgrades STATE_DEACTIVATED to STATE_DISABLED is left intact and is
-performed under the same combined locking, preserving the existing
-ordering with resume_target().
+s/txqueue/q/ to respect the driver's traditions.
 
-Fixes: 97714695ef90 ("net: netconsole: Defer netpoll cleanup to avoid lock release during list traversal")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/netconsole.c | 2 ++
- 1 file changed, 2 insertions(+)
+Sadly at91ether_netdev_ops cannot have macb_tx_timeout because code is
+too different.
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index a3dcbe713a0b..9e15d4186436 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -1452,6 +1452,7 @@ static void drop_netconsole_target(struct config_group *group,
- 
- 	dynamic_netconsole_mutex_lock();
- 
-+	mutex_lock(&target_cleanup_list_lock);
- 	spin_lock_irqsave(&target_list_lock, flags);
- 	/* Disable deactivated target to prevent races between resume attempt
- 	 * and target removal.
-@@ -1460,6 +1461,7 @@ static void drop_netconsole_target(struct config_group *group,
- 		nt->state = STATE_DISABLED;
- 	list_del(&nt->list);
- 	spin_unlock_irqrestore(&target_list_lock, flags);
-+	mutex_unlock(&target_cleanup_list_lock);
- 
- 	dynamic_netconsole_mutex_unlock();
- 
+Thanks,
 
--- 
-2.51.0
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
