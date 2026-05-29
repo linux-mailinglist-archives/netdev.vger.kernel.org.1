@@ -1,233 +1,211 @@
-Return-Path: <netdev+bounces-293102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CZ86H5F+GWqvxAgAu9opvQ
-	(envelope-from <netdev+bounces-293102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:54:57 +0200
+	id 2HAiEp6CGWobxQgAu9opvQ
+	(envelope-from <netdev+bounces-293103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:12:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418C5601E88
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:54:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E6B602101
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:12:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AD7703028446
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:54:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D63130C7C34
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607083DDDB8;
-	Fri, 29 May 2026 11:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3422B3DF00E;
+	Fri, 29 May 2026 12:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8VZz9V7"
+	dkim=pass (2048-bit key) header.d=cmadams.net header.i=@cmadams.net header.b="nUJ/3ULj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from linode.cmadams.net (linode.cmadams.net [45.33.75.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B613C3BF3;
-	Fri, 29 May 2026 11:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2303E00A9
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 12:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.33.75.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780055695; cv=none; b=RCHQAIG80pyoqi0oWQmB1fd4Nzb6sjBjcQnES6onov1gmepc2zopST4xwrDl7M9LVokaI8AFfQfmqImTC6P8sVzyKxaFtzxiM4oD9TuOSdGourwEfZ/53GJyXTxlsGnL0opGBQbzth/fZO6E9rconb3PDQF0EaSsUb8mKWfpdHA=
+	t=1780056414; cv=none; b=Q1VMQIanTSpAjB3FGPO784il5nIOl6kKMYocsWg4n1NdDcNGe7vFzp5oy5lWkQUVUcnmDayqq/zgHiWgUolrcJX7xpfKXyAXIvmwKcZTorUoXUndQ/7FY2bQtBCEli2V4rjQwgymlXWn8gV6OFU8xTmm/bhpjhMOatORmvjRjVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780055695; c=relaxed/simple;
-	bh=CploV4r1XHi0hyyHrOSw/drP95odjiL6JuuR/nNDCpc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FAku3iLN1Z4Y4uHRBqm8sIZJNZyi9YYm0r0Vdod70qKhvgVNn//U+a+x5FgdrhTI59B8u3rSDAbJt2k1uQJY6WhxpfucJvH+ZNRiaf4V5nNW3yXJcx/mcqNCG8zd4ccVVxW+pxnE6AQCsBUJj/WYwmk2lcEKymmyd3qCmYZz4Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8VZz9V7; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 298511F00893;
-	Fri, 29 May 2026 11:54:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780055693;
-	bh=wDOsRW9HSX03yxtZDtOoclJqvTh9mPV1pfPcH0+q2no=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=L8VZz9V7K1eN2jdYePACCXZ60MYUhFC1fOihSN+0H+7dhVQgUxdGJ9EQdJmCDTbwW
-	 G+lY0xHDWzx6pTWX1lLWl/0EpNCsU5b9yHlXtO5sbBEMs7G5VmlF0dXcZ9v/DGu76f
-	 /viJGQXlwamh7rHUkI0iAX99Shho8pimXeoM0y7KNHlU+cpwDo6MSIljUf43lop+B4
-	 Y/IKFYrX4MCpwS9OMGK+k+HTotpqSCbAaZXWldCVwdTAjK0G+boxDWKQ2C5xXoy/Dg
-	 Frr8k2GRRRiGohLe6GdGc+rFcv3VqLP0ZveFBiJjWHREuNVs5EyBZwfujpGuPitREW
-	 03hx7I5WrTEiQ==
-Message-ID: <5f7f90d8-cb32-4ffb-8f1c-0722aafbe869@kernel.org>
-Date: Fri, 29 May 2026 13:54:48 +0200
+	s=arc-20240116; t=1780056414; c=relaxed/simple;
+	bh=CmfOf/VzsMeNZaPI94AnLpxctRBbBpTYldeoUfxWmnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YT3/RMl+tDkd3Rd++RP506vEbltMn7etHJiuxOTQOKEslCRG7Ay+hWw+FUAwXSEti4PxkdQfGo87O7n16lbCg+9qn/FXM1wKwdb1Iyab2GVTdq0FIK5HduGqZ4p1juYHnWAjIS7B/wZj2mKvxH39gzQsQNb4vcmB2trkx4PEEQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmadams.net; spf=pass smtp.mailfrom=cmadams.net; dkim=pass (2048-bit key) header.d=cmadams.net header.i=@cmadams.net header.b=nUJ/3ULj; arc=none smtp.client-ip=45.33.75.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmadams.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmadams.net
+Received: from localhost (localhost [127.0.0.1])
+	by linode.cmadams.net (Postfix) with ESMTP id 4gRhsw0VDGz6wQT;
+	Fri, 29 May 2026 07:06:44 -0500 (CDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cmadams.net; h=
+	user-agent:in-reply-to:content-disposition:content-type
+	:content-type:mime-version:references:message-id:subject:subject
+	:from:from:date:date:received:received; s=20220404; t=
+	1780056403; x=1780920404; bh=CmfOf/VzsMeNZaPI94AnLpxctRBbBpTYlde
+	oUfxWmnk=; b=nUJ/3ULjmrq1DiZLnMBrTRAbNcE+20UU3sDvtJ3MwSEu22MTjLQ
+	CcumXsv0c5/Kb8wjzoZgbDTN5iN9xvR45g3IxkY40WRulQrsgEIpB6H+HyqIblaN
+	mnjy5Wjj7ZiVG9nkuPwJ3KiWnR99V1KkCBWCyGCeslc1R+nLK/lFJrBT7zaHrPjJ
+	gKiB0rq9dLaFnwQN6rigQBC7eDE6M7j//nHmkpRMJ6I56ZkMBYxF6DOP6v8yp0C6
+	lUgRVAAh5lao7C6tBEMc23gj7Gi8XclzEk3BBNYUhPwBqLdOfrxjUcxFkWh2a8Iu
+	EWk6xK8bxjapqdHkSwyxnhkXVDn4vpuDyNQ==
+X-Virus-Scanned: amavisd-new at cmadams.net
+Received: from linode.cmadams.net ([127.0.0.1])
+ by localhost (linode.cmadams.net [127.0.0.1]) (amavisd-new, port 10031)
+ with ESMTP id uZ8WMMUZnTBK; Fri, 29 May 2026 07:06:43 -0500 (CDT)
+Received: from cmadams.net (localhost [127.0.0.1])
+	by linode.cmadams.net (Postfix) with ESMTP id 4gRhss586Kz6tx7;
+	Fri, 29 May 2026 07:06:41 -0500 (CDT)
+Date: Fri, 29 May 2026 07:06:41 -0500
+From: Chris Adams <linux@cmadams.net>
+To: Stefano Brivio <sbrivio@redhat.com>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org,
+	yuhuang@redhat.com, justin.iurman@gmail.com, horms@kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Beniamino Galvani <bgalvani@redhat.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Andrew Lunn <andrew@lunn.ch>, ihuguet@redhat.com,
+	regressions@lists.linux.dev
+Subject: Re: [PATCH net v2] Revert "ipv6: preserve insertion order for
+ same-scope addresses"
+Message-ID: <20260529120641.GA19331@cmadams.net>
+Mail-Followup-To: Stefano Brivio <sbrivio@redhat.com>,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	netdev@vger.kernel.org, yuhuang@redhat.com, justin.iurman@gmail.com,
+	horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, idosch@nvidia.com,
+	dsahern@kernel.org, David Gibson <david@gibson.dropbear.id.au>,
+	Beniamino Galvani <bgalvani@redhat.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Andrew Lunn <andrew@lunn.ch>, ihuguet@redhat.com,
+	regressions@lists.linux.dev
+References: <20260529112357.5079-1-fmancera@suse.de>
+ <20260529134045.56330243@elisabeth>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Harry Yoo <harry@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>
-Cc: Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
- David Rientjes <rientjes@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Jesper Dangaard Brouer <hawk@kernel.org>, linux-arm-msm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, io-uring@vger.kernel.org,
- kasan-dev@googlegroups.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Boris Brezillon <boris.brezillon@collabora.com>
-References: <20260528093437.2519248-1-hch@lst.de>
- <20260528093437.2519248-2-hch@lst.de>
-From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Autocrypt: addr=vbabka@kernel.org; keydata=
- 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
-In-Reply-To: <20260528093437.2519248-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260529134045.56330243@elisabeth>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[cmadams.net,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[cmadams.net:s=20220404];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293102-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-293103-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vbabka@kernel.org,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[suse.de,vger.kernel.org,redhat.com,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,gibson.dropbear.id.au,leemhuis.info,lunn.ch,lists.linux.dev];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@cmadams.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[cmadams.net:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lst.de:email,intel.com:email]
-X-Rspamd-Queue-Id: 418C5601E88
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cmadams.net:email,cmadams.net:mid,cmadams.net:dkim,suse.de:email]
+X-Rspamd-Queue-Id: A1E6B602101
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/28/26 11:34, Christoph Hellwig wrote:
-> The kmem_cache_alloc_bulk return value is weird.  It returns the number
-> of allocated objects, but that must always be 0 or the requested number
-> based on the implementations and the handling in the callers, but that
-> assumption is not actually documented anywhere, which confuses automated
-> review tools.
+Once upon a time, Stefano Brivio <sbrivio@redhat.com> said:
+> On Fri, 29 May 2026 13:23:57 +0200
+> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
 > 
-> Fix this by returning a bool if the allocation succeeded and adding a
-> kerneldoc comment explaining the API.
+> > Chris Adams reported that preserving insertion order for same-scope
+> > addresses is causing SSH connections to be dropped after stopping a VM
+> > while running NetworkManager.
+> > 
+> > NetworkManager caches the IPv6 address configuration, when a RA arrives,
+> > it determines the list of addresses to configure and checks if the
+> > addresses are already in the right order in the kernel. If they aren't,
+> > NetworkManager removes and re-adds them to achieve the desired order.
+> > 
+> > As the order changes, NetworkManager is confused and reconfigures the
+> > addresses on every update. In addition, this would also affect to cloud
+> > tooling that relies on IPv6 addresses order to identify primary and
+> > secondaries addresses.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com> # skbuff
-> ---
->  drivers/gpu/drm/msm/msm_iommu.c       |  6 +--
->  drivers/gpu/drm/panthor/panthor_mmu.c | 13 +++---
->  include/linux/slab.h                  |  6 ++-
->  io_uring/io_uring.c                   | 23 ++++-------
->  lib/test_meminit.c                    | 23 +++++------
->  mm/kasan/kasan_test_c.c               |  5 +--
->  mm/kfence/kfence_test.c               |  9 ++--
->  mm/slub.c                             | 59 +++++++++++++++------------
->  net/bpf/test_run.c                    |  7 ++--
->  net/core/skbuff.c                     | 24 ++++++-----
->  tools/include/linux/slab.h            |  2 +-
->  tools/testing/shared/linux.c          | 19 ++++-----
->  12 files changed, 97 insertions(+), 99 deletions(-)
+> By the way, I'm still looking into this part, trying to find
+> "problematic" examples.
+> 
+> And I couldn't find any, yet, because it looks like there's always a
+> _single_ IPv6 address being used as a secondary for a primary IPv4
+> address.
 
-Thanks, I applied it to slab/for-7.2/alloc_bulk and merged to slab/for-next
-(it's still yankable in case of issues)
+I hit two cases that triggered the behavior:
 
-Did some fixups below (the comment was stale prior to the patch; restored
-unlikely(), simplified one line).
+- after an overnight suspend/resume cycle (not sure if there's a minimum
+  time suspended)
 
-A test merge into yesterday's -next found a conflict in drivers/gpu/drm/
-panthor/panthor_mmu.c. Commit 1013bf53650e ("drm/panthor: Split
-panthor_vm_prepare_map_op_ctx() to prepare for reclaim") moved the changed
-codeto a new function panthor_vm_op_ctx_prealloc_pts().
-But it's solvable so no need for a complicated coordination I think.
+- with a bridge NIC, after stopping a VM with a NIC on the bridge (which
+  removed an fe80:: link-local address); this is the case I used to
+  bisect since it was easy to script
 
-diff --git a/mm/slub.c b/mm/slub.c
-index 6caf6f3ceeed..711df528c9a6 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -7372,10 +7372,7 @@ bool kmem_cache_alloc_bulk_noprof(struct kmem_cache *s, gfp_t flags,
-        }
- 
- out:
--       /*
--        * memcg and kmem_cache debug support and memory initialization.
--        * Done outside of the IRQ disabled fastpath loop.
--        */
-+       /* memcg and kmem_cache debug support and memory initialization */
-        return likely(slab_post_alloc_hook(s, NULL, flags, size, p,
-                        slab_want_init_on_alloc(flags, s), s->object_size));
- }
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 99ab9ddb05e3..dbf0d8eae8d8 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -246,8 +246,8 @@ static int xdp_recv_frames(struct xdp_frame **frames, int nframes,
-        int i;
-        LIST_HEAD(list);
- 
--       if (!kmem_cache_alloc_bulk(net_hotdata.skbuff_cache, gfp, nframes,
--                                  (void **)skbs)) {
-+       if (unlikely(!kmem_cache_alloc_bulk(net_hotdata.skbuff_cache, gfp,
-+                                           nframes, (void **)skbs))) {
-                for (i = 0; i < nframes; i++)
-                        xdp_return_frame(frames[i]);
-                return -ENOMEM;
-diff --git a/tools/testing/shared/linux.c b/tools/testing/shared/linux.c
-index e9c3bc9b3272..e0a0693df08f 100644
---- a/tools/testing/shared/linux.c
-+++ b/tools/testing/shared/linux.c
-@@ -301,7 +301,7 @@ int kmem_cache_refill_sheaf(struct kmem_cache *s, gfp_t gfp,
-        if (!kmem_cache_alloc_bulk(s, gfp, size - sheaf->size,
-                        &sheaf->objects[sheaf->size]))
-                return -ENOMEM;
--       sheaf->size += (size - sheaf->size);
-+       sheaf->size = size;
-        return 0;
- }
+In both cases, the next IPv6 router-advertisement received was what
+triggered NetworkManager to replace the current privacy addresses.  This
+could be 2-3 minutes after the trigger.
 
+> > This reverts commit cb3de96eea66f5e4a580086c6a1be46e765f97f4.
+> > 
+> > Fixes: cb3de96eea66 ("ipv6: preserve insertion order for same-scope addresses")
+> > Reported-by: Chris Adams <linux@cmadams.net>
+> > Closes: https://lore.kernel.org/netdev/20260521135310.GC977@cmadams.net/
+> > Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> > ---
+> > v2: updated commit description to make it more accurate
+> > ---
+> >  net/ipv6/addrconf.c                  | 2 +-
+> >  tools/testing/selftests/net/ioam6.sh | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> > index 5476b6536eb7..bb84a78b80f6 100644
+> > --- a/net/ipv6/addrconf.c
+> > +++ b/net/ipv6/addrconf.c
+> > @@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
+> >  	list_for_each(p, &idev->addr_list) {
+> >  		struct inet6_ifaddr *ifa
+> >  			= list_entry(p, struct inet6_ifaddr, if_list);
+> > -		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
+> > +		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
+> >  			break;
+> >  	}
+> >  
+> > diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
+> > index b2b99889942f..845c26dd01a9 100755
+> > --- a/tools/testing/selftests/net/ioam6.sh
+> > +++ b/tools/testing/selftests/net/ioam6.sh
+> > @@ -273,8 +273,8 @@ setup()
+> >    ip -netns $ioam_node_beta link set ioam-veth-betaR name veth1 &>/dev/null
+> >    ip -netns $ioam_node_gamma link set ioam-veth-gamma name veth0 &>/dev/null
+> >  
+> > -  ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
+> >    ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
+> > +  ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
+> >    ip -netns $ioam_node_alpha link set veth0 up &>/dev/null
+> >    ip -netns $ioam_node_alpha link set lo up &>/dev/null
+> >    ip -netns $ioam_node_alpha route add 2001:db8:2::/64 \
+> 
+> -- 
+> Stefano
 
-
-
-
-
-
+-- 
+Chris Adams <linux@cmadams.net>
 
