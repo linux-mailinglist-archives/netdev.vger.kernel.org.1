@@ -1,149 +1,153 @@
-Return-Path: <netdev+bounces-293112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GItzFsKNGWpTxggAu9opvQ
-	(envelope-from <netdev+bounces-293112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:59:46 +0200
+	id AHsiK1+OGWpTxggAu9opvQ
+	(envelope-from <netdev+bounces-293113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:02:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4579602957
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:59:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0377E6029C3
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68825303C3FD
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:59:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5CB973006239
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650712DEA95;
-	Fri, 29 May 2026 12:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VIrr0fo0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C80F1EDA0F;
+	Fri, 29 May 2026 13:02:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330E12D949B;
-	Fri, 29 May 2026 12:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD041E7C12;
+	Fri, 29 May 2026 13:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780059582; cv=none; b=Ml7zfiTAM7HAEV89R05ZJGdX6jP3GX23G3OOVEKEy5k/+f+G6Dr+/NXzl0ELyrbrtjtlb8mGITDtTj/JvxbCTfEp++nXrcZXFVMGYN9kzBKuRWDilvCeZ+LA/BRJeS4UFPTMETvLlNSqwtOxBvnSmW20CNGnjeYqw6cojoXiTJ8=
+	t=1780059733; cv=none; b=UunginIIpIeiyRvn/6zNK3wSChZrA6tw2bNi4aPayXzf+6qN/MXRCaVOjli/eQ9LUAgH3tuwPWmqcqxHsWWffH/AqAvvK8wsltzMUBxsMtJHvKFQGrbX0OnBOl+MFnLyxz7RYwF6CXDkJwUUcCUwA9eEpfDWDi//KDSsIefs/u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780059582; c=relaxed/simple;
-	bh=VQJuxRm7Bn2tIF4PNqdXD3fOfowwb5TiwItKks6C9Ug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pwlKGKMxwG22CcowscFIoC/Iz6Kr+2YbZPlyMCR0xekvXFeYEIz5FPa3xfix2X56M37sQ+yDyLNWMa2OO4XbfICs4mNrzPWdIxbcejLzQupfNjqRZN7AHC+tpye/VUAQV+8Du1Q/1K3N4FkMBbsGgijkE0FcgJZqQJm6lHnr4TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VIrr0fo0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ykkqr/AFKCpdnBy5Nwco+T5dKDYCeBVkIM3xxhZU6es=; b=VIrr0fo07jcYrR9Bq93solgY34
-	ROBw9FUsK8Rc06warOLhDDmrxua6WFVNw4PBZQL0Jy0kvG974b0aNzbWdIRw8aeqJCN31vUt1ITBi
-	rtGd5U0LV/lpPlkthqBQCWBntwFVrxAe5CRkI6FNl1YbOfRoHpdl+uqfOh64tEYGIzPc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wSwoB-0055PK-6t; Fri, 29 May 2026 14:59:27 +0200
-Date: Fri, 29 May 2026 14:59:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-Message-ID: <b7de216a-fd1a-42a0-8711-d822a1ad9319@lunn.ch>
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
- <2293244a-c6a9-4642-a721-dada8a081dbc@lunn.ch>
- <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
+	s=arc-20240116; t=1780059733; c=relaxed/simple;
+	bh=LukTOanwzR6Wr1bleanXRdsWVsb7HblPMSLowdokg/c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AkFw8CbJ0aChcHDpVXpM7U2IMPv4Wnq6AX68yv1Qz1wmAAMO4uvO+00BVyzERpZ0EoYehEdtROdeRvF4bBkL4lkg6W5exYBXpONExkZx6njP8kmbnSP0OSD1KCbeZ2XCtWso5uZIqftzJmzI52hCn5mzpKvTyq6uPuKDJKtx3RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.237.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowAC31L47jhlqzRE9AA--.23852S3;
+	Fri, 29 May 2026 21:01:50 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com
+Cc: achender@kernel.org,
+	yanjun.zhu@oracle.com,
+	guanglei.li@oracle.com,
+	davem@davemloft.net,
+	santosh.shilimkar@oracle.com,
+	junxiao.bi@oracle.com,
+	yuantan098@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	xuyq21@lenovo.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] net: rds: clear i_sends on setup unwind
+Date: Fri, 29 May 2026 21:01:44 +0800
+Message-ID: <5a0f7624bb9845a7b67d26166a150b59e7f394ce.1779632468.git.xuyq21@lenovo.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1779632468.git.xuyq21@lenovo.com>
+References: <cover.1779632468.git.xuyq21@lenovo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowAC31L47jhlqzRE9AA--.23852S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFW5JFW8Gr18AF48Cw13CFg_yoW8Gw17pr
+	Za9rsrKFZrtryjka1DAF1I9F129ws3GrW7GrZF9ay29w4DJr92qryv9rWY9anY9rsxWFWY
+	qr1qvrnxZ345ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
+	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0CCWoZTE8FRwAAs1
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293112-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,oracle.com,davemloft.net,gmail.com,lzu.edu.cn,lenovo.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293113-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: B4579602957
+	NEURAL_HAM(-0.00)[-0.958];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	PRECEDENCE_BULK(0.00)[];
+	DMARC_DNSFAIL(0.00)[lzu.edu.cn : query timed out];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: 0377E6029C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> I think that
-> 
->   ethtool -s <iface> duplex half autoneg on
-> 
-> should be enough, the link should still establish at 100M, I've tested
-> that on a 1G/FULL 100MHalf+Full interface and this is the result we
-> get :)
+From: Yuqi Xu <xuyq21@lenovo.com>
 
-Nice.
+The RDS IB connection teardown path is written so it can run during
+partial startup and on repeated shutdown attempts. It uses NULL
+pointers to distinguish resources that are still owned from resources
+that have already been released.
 
-But i still think the test should check the autoneg result and do
-something sensible if the link does not come up. This probably applies
-to all cases where we trigger auto neg.
+When rds_ib_setup_qp() fails after allocating i_sends but before
+allocating i_recvs, the sends_out path frees i_sends without clearing
+the pointer. A later shutdown pass can still treat that stale pointer
+as a live send ring allocation.
 
-> That said I've tested the following on mcbin, and it seems that acually
-> nothing in the code currently deals with Half duplex / Pause interaction,
-> and we don't get any EOPNOTSUPP.
-> 
-> So the broader question is, should we reflect the current behaviour or
-> an ideal one ?
+Clear i_sends after vfree() in the error unwind path so the existing
+shutdown logic continues to use the correct ownership state.
 
-What 802.3 says. If we come across cases where phylib/phylink is
-broken, let me know, and i will fix it. But we will leave driver bugs
-to individual driver developers.
+Fixes: 3b12f73a5c29 ("rds: ib: add error handle")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Yuqi Xu <xuyq21@lenovo.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ net/rds/ib_cm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-But we also need to consider that for some APIs, we have decided that
-a configuration can be set now, which does not actually apply in our
-current conditions, but it will be stored away for when conditions
-change and it is applicable. The half duplex case could fit that. When
-the link is currently half duplex, you can configure pause, but you
-don't expect it to actually change the current behaviour. It only
-kicks in when the link renegotiates to full duplex sometime in the
-future. We have to also consider this the other way around. The link
-is full duplex and pause is configured by the user. Something happens
-with the LP and the link renegotiates to half duplex. The local end
-should not throw away the configuration, it simply cannot apply it
-given the current situation.
+diff --git a/net/rds/ib_cm.c b/net/rds/ib_cm.c
+index 0c64c504f79d..4001de0c4959 100644
+--- a/net/rds/ib_cm.c
++++ b/net/rds/ib_cm.c
+@@ -656,6 +656,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
+ 
+ sends_out:
+ 	vfree(ic->i_sends);
++	ic->i_sends = NULL;
+ 
+ ack_dma_out:
+ 	rds_dma_hdr_free(rds_ibdev->dev, ic->i_ack, ic->i_ack_dma,
+-- 
+2.54.0
 
-	Andrew
 
