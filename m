@@ -1,127 +1,146 @@
-Return-Path: <netdev+bounces-293150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MgZGDesGWpEyQgAu9opvQ
-	(envelope-from <netdev+bounces-293150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 17:09:43 +0200
+	id ANZ1LJK+GWq0yggAu9opvQ
+	(envelope-from <netdev+bounces-293164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:28:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8A1604501
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 17:09:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E84060594B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:28:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF22F31BE234
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:55:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F408C3016693
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 16:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6CD33F8D9;
-	Fri, 29 May 2026 14:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700F73C1992;
+	Fri, 29 May 2026 16:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNaDX/qM"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="tFKhuz7u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181EE3EBF24
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 14:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F7536607D;
+	Fri, 29 May 2026 16:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780066038; cv=none; b=bNmUwe2rCJOSFF1zaongL3K1sDwKcPUf9tYB4wfDrKaflronlrP5gq4sJVdw4oxK0sfKB/l/vf7PV+/TrRvpAG9qcI/0Xg+i2PXVloOVrnlIZspujX4XBkBz6yHdtb6BZRhJ2bKOwww4IBeWZeanNaLcd+/oyWeW0/Iiyq+7xJ0=
+	t=1780071330; cv=none; b=Sa3gVAYJmoxRaJx1L4rTn1HzZ6oLbY9PHtOX1ZzFaswwACXo0aI0LT2Cya8XU+3mrX7PE0H9Lz/FgSoCzFFFj4saeWcoZNsjboVzmhIfD0sxLPJNOI65GPwcX4zj9mb7RsUqUr7GiwDfbcPqMHQqh6jLtUvaWvmax11oGuF3HcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780066038; c=relaxed/simple;
-	bh=ltwZovjUZ2vcGmHBKuZt8cbOq/0lKBsTreqFmZ4Nzx4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tNZOtqtlnM5g+e3txmuG93oB3fCI4Nz6wKNmJmunKYR0ZSK1bb02UcQVyukGQh9DQp7D0b8pj8IIjYbmqVY6DPTq1H6fimbUCpmT/gLCZE9rL8QD7WAXZT+VPS/+3/5839uqBUizQtMjRFPKp/s0n0j6WgDgw/TLgzj/4wPQ9v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNaDX/qM; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0882E1F00893;
-	Fri, 29 May 2026 14:47:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780066036;
-	bh=UvIw1sN5KwmjfI9LyMdRK1j0pBF09VG7im6Gd0W3NWE=;
-	h=From:To:Cc:Subject:Date;
-	b=SNaDX/qM1h9fRG9xqHzMWAt3mYxSb8AObBDWuZzhahIzoRjROzcFUdOTwBZ03JF4w
-	 H5UinznNP6BwQsZ2HpW4fUKskfxcvC2qn6HU3gZleoYoe5NxdwAg3ef6A4bQ0UzRj3
-	 8PLZyY43ZXwBCYUk7Tf61SxDln+vZcS5BmIn4UUXRVTM6i/w1jJ3GI1yHCizncUcsp
-	 5G6g3nkbWC4IpRv6x4veIhw2Xaz/g+y9jUqBq96bhzlMY1OxvgGSwXirDrwDLNKozW
-	 VVNZBYpwesI1do34fWyxWcZ5z3g0jynMrogYULorw3HzTXCtZeV/k3Dr0/ZPadnDKE
-	 7Pardk0e/kCfg==
-From: Antoine Tenart <atenart@kernel.org>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch
-Cc: Antoine Tenart <atenart@kernel.org>,
-	netdev@vger.kernel.org,
-	Sashiko <sashiko-bot@kernel.org>
-Subject: [PATCH net] geneve: fix length used in GRO hint UDP checksum adjustment
-Date: Fri, 29 May 2026 16:47:00 +0200
-Message-ID: <20260529144713.780938-1-atenart@kernel.org>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1780071330; c=relaxed/simple;
+	bh=uL/G0eLfOk3tPLysZ/3wSHOxP3/9s1fHmc95jIWh9Fk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iHbIdwpbVUuoX6zRbz+Or6rR1AV2p5BRc5YbFeT4wY2lExzYTTcBCtC00d7Q7687RcjXE0eH4tqHqTbwwkN2PSSqGigYco5EhRyfDgkADpYuv8GuwXMj1h5Y4r3E3Tyz+Z5O9Fvm7mvk7C15Z1bLeCxW0leWcxTCV0ePY61U0dE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=tFKhuz7u; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1780066303;
+	bh=uL/G0eLfOk3tPLysZ/3wSHOxP3/9s1fHmc95jIWh9Fk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=tFKhuz7u2kk9/OBJF7dXUwCKT5j3ebFa90CpfFcs/ZRH+a9xo0FWeV3Or6WzbqGQv
+	 DzCESRaHuRWtcbpSc2JaXdg0U2Kpi+ZPVsuNZAfIW1EViO8DYBQIFHukyhsYm16J3j
+	 gtQZj/UwCJHnFiG9k/YsEi07l5mCG1QdyyjW4Sww=
+Received: from [129.217.186.252] ([129.217.186.252])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 64TEpf6Q021874
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 29 May 2026 16:51:41 +0200 (CEST)
+Message-ID: <c8650d3a-e488-4279-b28f-549d766c23a1@tu-dortmund.de>
+Date: Fri, 29 May 2026 16:51:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
+ coalescing via ethtool tx-usecs
+To: hawk@kernel.org, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+        bpf@vger.kernel.org
+References: <20260527135418.1166665-1-hawk@kernel.org>
+ <20260527135418.1166665-6-hawk@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260527135418.1166665-6-hawk@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-293164-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293150-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atenart@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 1D8A1604501
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sashiko.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,tu-dortmund.de:email,tu-dortmund.de:mid,tu-dortmund.de:dkim]
+X-Rspamd-Queue-Id: 9E84060594B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In geneve_post_decap_hint the length used for adjusting the UDP checksum
-should be 'skb->len - gro_hint->nested_tp_offset' (UDP length) instead
-of 'skb->len - gro_hint->nested_nh_offset' (IP length).
+On 5/27/26 15:54, hawk@kernel.org wrote:
+> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+> +	/* If the ring is now empty and the peer TX queue is stalled by DQL
+> +	 * backpressure, release completions immediately to unblock it.
+> +	 */
+> +	if (peer_txq && state->n_bql && __ptr_ring_empty(&rq->xdp_ring)) {
+> +		/* Pairs with smp_wmb() in __ptr_ring_produce(); ensure ring
+> +		 * emptiness is observed before reading peer_txq->state.
+> +		 */
+> +		smp_rmb();
+> +		if (test_bit(__QUEUE_STATE_STACK_XOFF, &peer_txq->state))
+> +			veth_bql_complete(state, peer_txq);
+> +	}
 
-Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
-Cc: Paolo Abeni <pabeni@redhat.com>
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://sashiko.dev/#/patchset/20260521131436.748832-1-jhs%40mojatatu.com
-Signed-off-by: Antoine Tenart <atenart@kernel.org>
----
- drivers/net/geneve.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+"Does this leave coalesced BQL completions pending indefinitely if the
+receive ring is empty but the peer TX queue isn't stalled by DQL? [...]"
 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index c6563367d382..715180c3a1b3 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -632,7 +632,7 @@ static int geneve_post_decap_hint(const struct sock *sk, struct sk_buff *skb,
- 	uh = udp_hdr(skb);
- 	uh->len = htons(skb->len - gro_hint->nested_tp_offset);
- 	if (uh->check) {
--		len = skb->len - gro_hint->nested_nh_offset;
-+		len = skb->len - gro_hint->nested_tp_offset;
- 		skb_shinfo(skb)->gso_type |= SKB_GSO_UDP_TUNNEL_CSUM;
- 		if (gro_hint->nested_is_v6)
- 			uh->check = ~udp_v6_check(len, &ipv6h->saddr,
--- 
-2.54.0
+Regarding this by [1]: Yes, this is desired behavior IMO.
+
+From my understanding there should not be a BQL stall caused by
+this (needs to be tested though).
+
+A minor nit is that the observation of the minimum amount of
+slack found over several iterations of the completion processing
+(saved in dql->lowest_slack) is inaccurate and therefore the limit
+might be set to a too low value once (at the next completion call).
+I think it does not matter though.
+
+
+Overall The AI reviews [1] [2] have some valid points.
+
+Apart from that I would consider joining patch 2 and 5.
+
+[1] Link: https://sashiko.dev/#/patchset/20260527135418.1166665-1-hawk%40kernel.org
+[2] Link: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260527135418.1166665-1-hawk%40kernel.org
+
 
 
