@@ -1,361 +1,203 @@
-Return-Path: <netdev+bounces-293168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293169-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mG6GBMLCGWqjywgAu9opvQ
-	(envelope-from <netdev+bounces-293168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:45:54 +0200
+	id +KGJE3zCGWqGywgAu9opvQ
+	(envelope-from <netdev+bounces-293169-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:44:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152FF605E51
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:45:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E94605DB7
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 00C283001872
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 16:38:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C7A03015719
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 16:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF5F3ECBC8;
-	Fri, 29 May 2026 16:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F20E3F1AA0;
+	Fri, 29 May 2026 16:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b="MAeG8+J0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ndKXwALE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E036C3EA968
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 16:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1093F1AD1
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 16:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780072732; cv=none; b=nOPIXdSideRSJBMpdNPeDt3dzM0QyXr/8LSfpWjX/3uzKdrU3JyGnPbzYMwZBWLwPVLjhujguEIZiHtnVBGMHilz3I3t8Pv3bBarlQ2pClyNXFlG1H+Ttz0YCZ8jga5SHHOiZZgRDrAuiDp0hupV34z6/XsQ1qQ97sm9HKsMRmg=
+	t=1780073024; cv=none; b=N+h5HQlQZhvgfgUzR52pbL+QY+UPB7gv7xfRjVQaQDkh/3mVXPU5R5iu8gX8XJyu+Xx+eRmM5h4QZPNE7I6DZmGjdAtONN+wsvnZlMl2by31qho3BezOqiLigGG46NYClTeodn6CiYAjYN2/VmkH2jRERnLSq+uMBy0HQOfRjLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780072732; c=relaxed/simple;
-	bh=jwoe3wjypS3H+lSXKr3FdiiXDyHsR9LQTB7de2+zLnA=;
+	s=arc-20240116; t=1780073024; c=relaxed/simple;
+	bh=P3gTgPgiYnLzTdZV868i5bC4Bz7y8ArfTeXxqJ7yNIE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ADqv4ifknj7SMN6xRKdvVwshzx49kcbp9bzh6qAwW2QwiLu0dI0Nl3BPJFNKeIFKLVfWXlLRNb6lFhEl7rcCffL9hKSFQ7qwlKrxueRgHX0hmAeRum3t/wpCpkV0O/BWdsCZHenc0iSOk6KPdYbtn41pWimuzd/ZPo51cS0cnE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b=MAeG8+J0; arc=none smtp.client-ip=74.125.82.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-304f8e80b7eso31187eec.3
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 09:38:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20251104.gappssmtp.com; s=20251104; t=1780072730; x=1780677530; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/nKnw+x4cl15+kDr2Ce4fuloF/y4l3Bx7DOy+eoD/UI=;
-        b=MAeG8+J0ceRhYuUI9Hy7ZFY56POyzYjaVhjeYGtzokOQO1qbDTY1Yhua38fQHGFxC7
-         0juRnW4WcrAw3JDK4UEZlCzASqo50p0/DC4uI7NWt7V0tEt6HfIzdAXnWPMzfcbgxXQy
-         /yeAfVjwYyXjxmLnjMr8lCRhm2la+Dwc5hn406hePKMKjihVHiQUTtadGQTTs1NKIcwM
-         RK4Eoc9yqUQK37LCqgBHTbWQoi9KOta1GO9+K3SXY60THp7vQh3e0nyuS53xCN56LH3f
-         mLeavCy/jFPPeM0ezWIYJuYJGAMH106J9UbZ4Ge+HTtbOxgMiY1275myytmHjvo1mdpD
-         kkqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780072730; x=1780677530;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/nKnw+x4cl15+kDr2Ce4fuloF/y4l3Bx7DOy+eoD/UI=;
-        b=mL+H7ZBkpFsEp/v5z8yaCpDy7VudIaVRwlsJHi2YwolBpaCVYb9BJ7aCR6nAtPBcYe
-         /qQkS7O3zpTaHNF5xB4CzGa7PoMbvZZCY8xyfokGUEOn3yzapQh/V93eg1CKFV3107Yt
-         j7sHytdepUeUb172w+NFF+YRvhQt2RNxmVGevONp6wlSnTQmtAODPNGcXb1aYoFy9U4y
-         17c4zSol6T4AjsceqBDYYwUIFUYFIdo3m4W8ulgwKlEjdtHrBLS9UPBSrzUvhtcSOuDD
-         B7r225eode26nejKwjQo5fMDp+xEz/cwqCUpvtFeyB9aIDhLqaMc0O0PINp1btiH/tYg
-         uIaQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+M9cRz2hXF+Wbaa6QE1Tev1wR1llQeHL698MvULLUzbv9bs1p8ZfEV3PBMCpZeOyDZUB2fVFU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpHZaLM1yM3IJ8uIwJFafQdUB1C9LnBb1K7hKkBjZx1CGZFdXA
-	HDbijLtPVVfCsewPrsC2DfPNx3ZGgNPfoWYhYRiBVbcNRlXVIp43qz7J5/ud3yy2sLs=
-X-Gm-Gg: Acq92OGkJ2A91IWPId6RITKHxB+7RZrtveJevEuO945FXlJVS8T8wlbCg93G4Vm/Dln
-	Pwl/NfMZOpbG6hMvCpRzGUfA5jqWtQCiMDJYaBcpFppDxCat+tbyXP7roztDMB4Zl54cn61s1bK
-	MwtK8oN3h98wXmwmVc3hfK1bwUgt4GIGV+UjP1ZEygEGflcfzi0lRYUhiBpdkeBRgSJig/iFk9x
-	BWTRdrvPQ/aAseumT5YThSkirLuEfdOL1QbE5Uz3fP7H3tMybEqyXxgPgTg9BQuwAFvISo8oX+u
-	NL+kRxA4PYlZYpa7+qXz5XQmXDLc6djOvcisq9CtvjViRSCME56snAwfMITfo8STI5km7ssu8Oo
-	yQlTA71PNLAFNCdX2F4qNDDIEchvpBQ6HPgcCO6pQlqSpNz27+mLEJPOp2UD3S20NUxcmW3NXwK
-	LwIHeP9L9d1ZqiZBxK8h93pg1h
-X-Received: by 2002:a05:693c:2c8c:b0:2da:b05a:5a7d with SMTP id 5a478bee46e88-304fa31c4a2mr147195eec.0.1780072729955;
-        Fri, 29 May 2026 09:38:49 -0700 (PDT)
-Received: from m2 ([83.171.251.19])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-304ed5a114dsm1741479eec.24.2026.05.29.09.38.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2026 09:38:49 -0700 (PDT)
-Date: Fri, 29 May 2026 09:38:47 -0700
-From: Jordan Rife <jordan@jrife.io>
-To: Mahe Tardy <mahe.tardy@gmail.com>
-Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org, yonghong.song@linux.dev, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH bpf-next v7 4/7] selftests/bpf: add bpf_icmp_send kfunc
- cgroup_skb tests
-Message-ID: <v5xjdjtvowd4h7eo2icpehyg3nz4b7r4bzwa3cow3pqzofsksj@pnxqsomhmp6j>
-References: <20260526153708.279717-1-mahe.tardy@gmail.com>
- <20260526153708.279717-5-mahe.tardy@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O4CjwVlimO08/g8qqDbLG/wH0wZq0wx+nYbCbuaBzwzA5FwwLPdEhZMry31kbRbX4lnVEQdhtqfRmKxYrJ4mLjp0T5SZgwmpmGjxR9miagQZu3Q7DzrnqjdKMy1uCZjyOihoBow2ll10Wvp5Uq28r5lRdaPHOwEQ6298YJf4SWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ndKXwALE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A77B11F00893;
+	Fri, 29 May 2026 16:43:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780073023;
+	bh=wrQB+CqOBdI/ARCQHNMs8ehEw+gtEWGdQDI/WVWbBF4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ndKXwALELUBevwh5WUv1/CJV81w4hrP15MegiMKygG3MM39QE7bMIFmh4Ax2iMc04
+	 7SmT3BoCys9EKsL5izlcxcwpOVOgpP9Y9fh33xJji6iehutnpl8E8kwh/klubnLiBI
+	 p5Hf4A+9DTFClXSkVqrNyfBSDegMv8VxCq4KEKU3OEr4wrR/rgBYMntoLvBIrehSz3
+	 ey6X6Pr3EkX2waPDLAYKJrnWvnTKTBzhc3MzlZ8dVyzP8X0CNAJoh3oqETflmnjY2h
+	 qYJsorlmNqbLzkupPw5NlwLLICtFEVn3R+1fgnIAfSB7ReLNyHdALDGjd/U5DC4FPN
+	 2+E2mAsz65SFw==
+Date: Fri, 29 May 2026 18:43:40 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	Xuegang Lu <xuegang.lu@airoha.com>
+Subject: Re: [PATCH net-next 1/6] net: airoha: Introduce airoha_gdm_dev struct
+Message-ID: <ahnCPDuEATzJdln3@lore-desk>
+References: <20260527-airoha-eth-multi-serdes-preliminary-v1-0-ec6ed73ef7fc@kernel.org>
+ <20260527-airoha-eth-multi-serdes-preliminary-v1-1-ec6ed73ef7fc@kernel.org>
+ <433b9d9a-bd7c-44ad-b387-a789b326488e@intel.com>
+ <ahhonoI-oJ6gJqZ0@lore-desk>
+ <722f177c-0578-4b0b-b2fa-2acd45b2e299@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3d3Dnappu0EpMzD8"
 Content-Disposition: inline
-In-Reply-To: <20260526153708.279717-5-mahe.tardy@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+In-Reply-To: <722f177c-0578-4b0b-b2fa-2acd45b2e299@intel.com>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[jrife-io.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-293169-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293168-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[jrife.io];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,iogearbox.net,gmail.com,kernel.org,google.com,redhat.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jordan@jrife.io,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[jrife-io.20251104.gappssmtp.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[jrife-io.20251104.gappssmtp.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 152FF605E51
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: E9E94605DB7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 03:37:05PM +0000, Mahe Tardy wrote:
-> This test opens a server and client, enters a new cgroup, attach a
-> cgroup_skb program on egress and calls the bpf_icmp_send function from
-> the client egress so that an ICMP unreach control message is sent back
-> to the client. It then fetches the message from the error queue to
-> confirm the correct ICMP unreach code has been sent.
-> 
-> Note that, for the client, we have to connect in non-blocking mode to
-> let the test execute faster. Otherwise, we need to wait for the TCP
-> three-way handshake to timeout in the kernel before reading the errno.
-> 
-> Also note that we don't set IP_RECVERR on the socket in
-> connect_to_fd_nonblock since the error will be transferred anyway in our
-> test because the connection is rejected at the beginning of the TCP
-> handshake. See in net/ipv4/tcp_ipv4.c:tcp_v4_err for more details.
-> 
-> Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
-> ---
->  .../bpf/prog_tests/icmp_send_kfunc.c          | 149 ++++++++++++++++++
->  tools/testing/selftests/bpf/progs/icmp_send.c |  38 +++++
->  2 files changed, 187 insertions(+)
->  create mode 100644 tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
->  create mode 100644 tools/testing/selftests/bpf/progs/icmp_send.c
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c b/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
-> new file mode 100644
-> index 000000000000..0dc6b6ceafb4
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
-> @@ -0,0 +1,149 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <test_progs.h>
-> +#include <network_helpers.h>
-> +#include <linux/errqueue.h>
-> +#include <poll.h>
-> +#include "icmp_send.skel.h"
-> +
-> +#define TIMEOUT_MS 1000
-> +
-> +#define ICMP_DEST_UNREACH 3
-> +
-> +#define ICMP_FRAG_NEEDED 4
-> +#define NR_ICMP_UNREACH 15
-> +
-> +static int connect_to_fd_nonblock(int server_fd)
-> +{
-> +	struct sockaddr_storage addr;
-> +	socklen_t len = sizeof(addr);
-> +	int fd, err;
-> +
-> +	if (getsockname(server_fd, (struct sockaddr *)&addr, &len))
-> +		return -1;
-> +
-> +	fd = socket(addr.ss_family, SOCK_STREAM | SOCK_NONBLOCK, 0);
-> +	if (fd < 0)
-> +		return -1;
-> +
-> +	err = connect(fd, (struct sockaddr *)&addr, len);
-> +	if (err < 0 && errno != EINPROGRESS) {
-> +		close(fd);
-> +		return -1;
-> +	}
-> +
-> +	return fd;
-> +}
-> +
-> +static void read_icmp_errqueue(int sockfd, int expected_code)
-> +{
-> +	struct sock_extended_err *sock_err;
-> +	char ctrl_buf[512];
-> +	struct msghdr msg = {
-> +		.msg_control = ctrl_buf,
-> +		.msg_controllen = sizeof(ctrl_buf),
-> +	};
-> +	struct pollfd pfd = {
-> +		.fd = sockfd,
-> +		.events = POLLERR,
-> +	};
-> +	struct cmsghdr *cm;
-> +	ssize_t n;
-> +
-> +	if (!ASSERT_GE(poll(&pfd, 1, TIMEOUT_MS), 1, "poll_errqueue"))
-> +		return;
-> +
-> +	n = recvmsg(sockfd, &msg, MSG_ERRQUEUE);
-> +	if (!ASSERT_GE(n, 0, "recvmsg_errqueue"))
-> +		return;
-> +
-> +	cm = CMSG_FIRSTHDR(&msg);
-> +	if (!ASSERT_NEQ(cm, NULL, "cm_firsthdr_null"))
-> +		return;
-> +
-> +	for (; cm; cm = CMSG_NXTHDR(&msg, cm)) {
-> +		if (cm->cmsg_level != IPPROTO_IP || cm->cmsg_type != IP_RECVERR)
-> +			continue;
-> +
-> +		sock_err = (struct sock_extended_err *)CMSG_DATA(cm);
-> +
-> +		if (!ASSERT_EQ(sock_err->ee_origin, SO_EE_ORIGIN_ICMP,
-> +			       "sock_err_origin_icmp"))
-> +			return;
-> +		if (!ASSERT_EQ(sock_err->ee_type, ICMP_DEST_UNREACH,
-> +			       "sock_err_type_dest_unreach"))
-> +			return;
-> +		ASSERT_EQ(sock_err->ee_code, expected_code, "sock_err_code");
-> +		return;
-> +	}
-> +
-> +	ASSERT_FAIL("no IP_RECVERR/IPV6_RECVERR control message found");
-> +}
-> +
-> +static void trigger_prog_read_icmp_errqueue(struct icmp_send *skel, int code)
-> +{
-> +	int srv_fd = -1, client_fd = -1;
-> +	struct sockaddr_in addr;
-> +	socklen_t len = sizeof(addr);
-> +
-> +	srv_fd = start_server(AF_INET, SOCK_STREAM, "127.0.0.1", 0, TIMEOUT_MS);
-> +	if (!ASSERT_GE(srv_fd, 0, "start_server"))
-> +		return;
-> +
-> +	if (getsockname(srv_fd, (struct sockaddr *)&addr, &len)) {
-> +		close(srv_fd);
-> +		return;
-> +	}
-> +	skel->bss->server_port = ntohs(addr.sin_port);
-> +	skel->bss->unreach_code = code;
-> +
-> +	client_fd = connect_to_fd_nonblock(srv_fd);
-> +	if (!ASSERT_OK_FD(client_fd, "client_connect_nonblock")) {
-> +		close(srv_fd);
-> +		return;
-> +	}
-> +
-> +	/* Skip reading ICMP error queue if code is invalid */
-> +	if (code >= 0 && code <= NR_ICMP_UNREACH)
-> +		read_icmp_errqueue(client_fd, code);
-> +
-> +	close(client_fd);
-> +	close(srv_fd);
-> +}
-> +
-> +void test_icmp_send_unreach_cgroup(void)
-> +{
-> +	struct icmp_send *skel;
-> +	int cgroup_fd = -1;
-> +
-> +	skel = icmp_send__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "skel_open"))
-> +		goto cleanup;
-> +
-> +	cgroup_fd = test__join_cgroup("/icmp_send_unreach_cgroup");
-> +	if (!ASSERT_OK_FD(cgroup_fd, "join_cgroup"))
-> +		goto cleanup;
-> +
-> +	skel->links.egress =
-> +		bpf_program__attach_cgroup(skel->progs.egress, cgroup_fd);
-> +	if (!ASSERT_OK_PTR(skel->links.egress, "prog_attach_cgroup"))
-> +		goto cleanup;
-> +
-> +	for (int code = 0; code <= NR_ICMP_UNREACH; code++) {
-> +		/* The TCP stack reacts differently when asking for
-> +		 * fragmentation, let's ignore it for now.
-> +		 */
-> +		if (code == ICMP_FRAG_NEEDED)
-> +			continue;
-> +
-> +		trigger_prog_read_icmp_errqueue(skel, code);
-> +		ASSERT_EQ(skel->data->kfunc_ret, 0, "kfunc_ret");
-> +	}
-> +
-> +	/* Test an invalid code */
-> +	trigger_prog_read_icmp_errqueue(skel, -1);
-> +	ASSERT_EQ(skel->data->kfunc_ret, -EINVAL, "kfunc_ret");
-> +
-> +cleanup:
-> +	icmp_send__destroy(skel);
-> +	close(cgroup_fd);
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/icmp_send.c b/tools/testing/selftests/bpf/progs/icmp_send.c
-> new file mode 100644
-> index 000000000000..6d0be0a9afe1
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/icmp_send.c
-> @@ -0,0 +1,38 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include "vmlinux.h"
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_endian.h>
-> +
-> +/* 127.0.0.1 in host byte order */
-> +#define SERVER_IP 0x7F000001
-> +
-> +#define ICMP_DEST_UNREACH 3
-> +
-> +__u16 server_port = 0;
-> +int unreach_code = 0;
-> +int kfunc_ret = -1;
-> +
-> +SEC("cgroup_skb/egress")
-> +int egress(struct __sk_buff *skb)
-> +{
-> +	void *data = (void *)(long)skb->data;
-> +	void *data_end = (void *)(long)skb->data_end;
-> +	struct iphdr *iph;
-> +	struct tcphdr *tcph;
-> +
-> +	iph = data;
-> +	if ((void *)(iph + 1) > data_end || iph->version != 4 ||
-> +	    iph->protocol != IPPROTO_TCP || iph->daddr != bpf_htonl(SERVER_IP))
-> +		return SK_PASS;
-> +
-> +	tcph = (void *)iph + iph->ihl * 4;
-> +	if ((void *)(tcph + 1) > data_end ||
-> +	    tcph->dest != bpf_htons(server_port))
-> +		return SK_PASS;
-> +
-> +	kfunc_ret = bpf_icmp_send(skb, ICMP_DEST_UNREACH, unreach_code);
-> +
-> +	return SK_DROP;
-> +}
-> +
-> +char LICENSE[] SEC("license") = "Dual BSD/GPL";
-> --
-> 2.34.1
-> 
 
-Reviewed-by: Jordan Rife <jordan@jrife.io>
+--3d3Dnappu0EpMzD8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> From: Lorenzo Bianconi <lorenzo@kernel.org>
+> Date: Thu, 28 May 2026 18:09:02 +0200
+>=20
+> > On May 28, Alexander Lobakin wrote:
+> >> From: Lorenzo Bianconi <lorenzo@kernel.org>
+> >> Date: Wed, 27 May 2026 12:21:15 +0200
+> >>
+> >>> EN7581 and AN7583 SoCs support connecting multiple external SerDes to=
+ GDM3
+> >>> or GDM4 ports via a hw arbiter that manages the traffic in a TDM mann=
+er.
+> >>> As a result multiple net_devices can connect to the same GDM{3,4} port
+> >>> and there is a theoretical "1:n" relation between GDM port and
+> >>> net_devices.
+> >>> Introduce airoha_gdm_dev struct to collect net_device related info (e=
+=2Eg.
+> >>> net_device and external phy pointer). Please note this is just a
+> >>> preliminary patch and we are still supporting a single net_device for
+> >>> each GDM port. Subsequent patches will add support for multiple net_d=
+evices
+> >>> connected to the same GDM port.
+> >>>
+> >>> Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
+> >>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> >>
+> >> [...]
+> >>
+> >>> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/e=
+thernet/airoha/airoha_eth.h
+> >>> index d3781103abb5..c78cabbec753 100644
+> >>> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> >>> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> >>> @@ -535,10 +535,15 @@ struct airoha_qdma {
+> >>>  	struct airoha_queue q_rx[AIROHA_NUM_RX_RING];
+> >>>  };
+> >>> =20
+> >>> +struct airoha_gdm_dev {
+> >>> +	struct airoha_gdm_port *port;
+> >>> +	struct net_device *dev;
+> >>
+> >> Nit: we now have priv_to_netdev() (I hope I remember its name
+> >> correctly), so that we no longer need to store a netdev backpointer in
+> >> netdev_priv structures.
+> >> Just an option, up to you.
+> >=20
+> > I think you mean netdev_from_priv(), right?
+>=20
+> Yep, priv_to_netdev() is something I used in the past locally, it went
+> to the kernel as netdev_from_priv() from a different author.
+
+ack
+
+>=20
+> > I guess I can fix if I need to repost, otherwise I will fix with with a
+> > dedicated patch. Agree?
+>=20
+> Sure, up to you anyway whether to use it. Most drivers still use
+> backpointers to netdev in their private structures.
+> From the optimization PoV, netdev_from_priv() should generate a bit
+> better code as it's then clear that it's just a fixed offset from the
+> private structure, not a separate piece of memory.
+
+ack, I am fine with that. I will post a dedicated patch when the current se=
+ries
+is merged (if there are no other comments).
+
+Regards,
+Lorenzo
+
+>=20
+> >=20
+> > Regards,
+> > Lorenzo
+>=20
+> Thanks,
+> Olek
+
+--3d3Dnappu0EpMzD8
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCahnCPAAKCRA6cBh0uS2t
+rAzjAQDaKZufazE0WT4IMiu3/d0c5nm66K6Tv59vaHCvvZ9EqQD+PXMx8the4UVh
+QdwUfhAlYgeCwft32GFenWENmnYHzwM=
+=EHuC
+-----END PGP SIGNATURE-----
+
+--3d3Dnappu0EpMzD8--
 
