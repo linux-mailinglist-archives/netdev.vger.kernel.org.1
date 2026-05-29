@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-292918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKzxEdDoGGruoggAu9opvQ
-	(envelope-from <netdev+bounces-292918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:16:00 +0200
+	id eLyzDSvoGGruoggAu9opvQ
+	(envelope-from <netdev+bounces-292919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:13:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7365FBE9C
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:15:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17635FBE49
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EAA5330048C5
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:12:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 900FD302E32A
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733EC34D3BE;
-	Fri, 29 May 2026 01:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBD034E762;
+	Fri, 29 May 2026 01:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="r+gmjmSO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pecXuBZB"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A58F34B1A6
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 01:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BE434FF55
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 01:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780017132; cv=none; b=E33lqfSfElWHMAfZxjcUQDNWadfhe+jAxZ9heCUxc9NDJ8NsCiyejy/X3M3KDgGL73z/tGaUDLs43COLFPjKrK0qeI6M/qw+DEH40nDnrasiSRQIZkZRL9u6lUBIQrNfULlnxSf44XSRfBH/xjmvQDJUVot8siZYKBNx6zgnKnE=
+	t=1780017191; cv=none; b=OsJBOJLFGzMBXydFPJlON/goO+ooGDp/XiItf1mA5cK73st0IDZfRkMDpnbHjnAJaA2jGke8nzezjEvfXitirfKlllUGwD5Ie5bi7BeYpk2XUiiyF7AEp/h2QMbTS58XV1eeDeF9kpb4yCWBrI6y/Jiwi56pGO6irh0keB/carg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780017132; c=relaxed/simple;
-	bh=UpjEPdoR8PO/VmH8InGlp2kLgNl/owG0NgTDe8FXUcc=;
+	s=arc-20240116; t=1780017191; c=relaxed/simple;
+	bh=8GEMGyAGKy6UVJva9PZGktFdqT8EsP2nwE+Mr4iFgd0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uB3ZgEv+DphtUNYgae3u8vMtrTQ/7Hyg4rO5Md8WJaN2Cz3feDGQTitkX2++RVJxXmfbK7m+O+VwVC0vaxz626hJGyuHslGUaSgk1OnKY1ylUyLb9UqpouwELPaMa8EzfbVgkGmy+ASDaci8OBWTAFCWfOuK8cUe2j8SZaknufo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=r+gmjmSO; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=e3FL614jINsua6fm2GzqdzsadDyrFtLLZaIaBDlAikFiB3ZlF90DG5IqTfWciRv1uTdk9KygmHZ8WK8Ut3ULnwBG1S5JE4wi3d6U1ueFQBqWNjb5ZRWw2eeHEGhmpAenzQ/i9ruGcof5vmpEfDFNNc3cR7EhH5tonm5/wewmlAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pecXuBZB; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,24 +39,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PwNmho1gsKTlAE0X7shECimLhQvpaRLC55trLpCwjMM=; b=r+gmjmSOP2XTNUsyyJsVAp39Gl
-	S0PJXiG+0DeWNLdsdcZuEUJ3piZyyJw/rZrX/Kt6kPi0e/SpmXGBCzG8PDRIFZLOptQ9vo0yXDWqf
-	Y/l3PidozPXfpBzvJURjKKZp/9AiMra0QaEYmaWEzBhPtZq4xzGxrE14+MNPXxxnZ+LU=;
+	bh=TtMR/xDnpmU/Akb/Ar8zNkXGVM2z428HeWHqW6yjirw=; b=pecXuBZB/8O/VKFzBkY7m9JyBQ
+	pQJ5Z16B9iHVaE46t632CayQW3LH/qObjJleH4rgrk/hE2n5q5noXFTZnapk3ksRN82BY92DVfuHj
+	NBuLmGB7afwuMa5RbxJnXn/Ugcdb+O1z/ukFivnBOwtBh4QkQ481b66zB/MsD8tintac=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wSllc-004zMa-66; Fri, 29 May 2026 03:12:04 +0200
-Date: Fri, 29 May 2026 03:12:04 +0200
+	id 1wSlmW-004zNH-5Y; Fri, 29 May 2026 03:13:00 +0200
+Date: Fri, 29 May 2026 03:13:00 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Markus Stockhausen <markus.stockhausen@gmx.de>
 Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
 	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
 	daniel@makrotopia.org
-Subject: Re: [PATCH net-next v2 2/4] net: mdio: realtek-rtl9300: use command
- runner for write_c22()
-Message-ID: <499c484c-b2e6-4ea3-9ff5-a4f491e5332a@lunn.ch>
+Subject: Re: [PATCH net-next v2 3/4] net: mdio: realtek-rtl9300: use command
+ runner for read_c45()
+Message-ID: <9138c28b-25db-497e-9230-b254d13d6e5c@lunn.ch>
 References: <20260527163449.1294961-1-markus.stockhausen@gmx.de>
- <20260527163449.1294961-3-markus.stockhausen@gmx.de>
+ <20260527163449.1294961-4-markus.stockhausen@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,16 +65,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260527163449.1294961-3-markus.stockhausen@gmx.de>
+In-Reply-To: <20260527163449.1294961-4-markus.stockhausen@gmx.de>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-292918-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292919-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -92,18 +92,28 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 4E7365FBE9C
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: D17635FBE49
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, May 27, 2026 at 06:34:47PM +0200, Markus Stockhausen wrote:
-> Now that the driver has a generic command runner make use of it in the
-> write_c22() path. For this.
+On Wed, May 27, 2026 at 06:34:48PM +0200, Markus Stockhausen wrote:
+> Convert the read_c45() path to the new command runner. This needs the
+> additional helper otto_emdio_read_cmd() that can issue the command runner
+> and process a read operation. It is basically nothing more than
 > 
-> - add generic otto_emdio_write_c22() helper that will be called by bus
-> - convert otto_emdio_9300_write_c22() to new command runner logic
+> - run the command
+> - read the command result thorugh the I/O register
+> 
+> With this in place convert the read_c45() like the alread existing write
+> C22/C45 implementation.
+> 
+> - bus calls otto_emdio_read_c45()
+> - this handed over to SoC specific otto_emdio_9300_read_c45()
+> - the registers are filled
+> - the otto_emdio_read_cmd() is issued
+> - that calls the command runner
 > 
 > Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
 
