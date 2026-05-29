@@ -1,230 +1,236 @@
-Return-Path: <netdev+bounces-293050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAFBLWNSGWpnvAgAu9opvQ
-	(envelope-from <netdev+bounces-293050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:46:27 +0200
+	id GGfpLahVGWqYvAgAu9opvQ
+	(envelope-from <netdev+bounces-293051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:00:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32D485FF69D
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:46:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B02F5FFA70
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60A913009993
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 08:43:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CE369301E57E
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 08:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C716E351C20;
-	Fri, 29 May 2026 08:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A91F3B7765;
+	Fri, 29 May 2026 08:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Bq/CyM4e"
+	dkim=pass (2048-bit key) header.d=vaisala.com header.i=@vaisala.com header.b="HBlb4Eb/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11023086.outbound.protection.outlook.com [40.107.159.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390FB2FE074
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 08:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780044203; cv=none; b=QbJySwFpTpK05pHfqzoNQr3sOvWJ+xojUsbGBxUWlCdc15yKfyovWLMSTWP3EEvdT695nPoYftWO//8eMPO3hgW0/ZGXUSAQfnwktLTVUyFMJTL9p6syl5RogKJH5QT5htLf6MWbq9vg49GE9CcPP1yS/CrpEc02mbc3dzmBWwk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780044203; c=relaxed/simple;
-	bh=bP7HlwNOa+zbcUG01FRlzhUrmDFsXC2PUrhS/vC9gLI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tcPVLIYwtZv/2zj+OJ3nTh06uSPW4rGteNLFrN56IUH5m/ryORlqL8Xhn0Rc09Xq9SLF1rIXcrx/dN9Fu9wx5+Bllv0fT8dxkrUvoFWsgJKAQUnAA8o6TOUIjDgZ0xvXbC71bUKnrvDX4bNlD9GrpLKTsPJfvKkJMEdIlVdq+Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Bq/CyM4e; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 9C6081A372B;
-	Fri, 29 May 2026 08:43:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6DBB1601FA;
-	Fri, 29 May 2026 08:43:18 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7E3F110888244;
-	Fri, 29 May 2026 10:43:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780044197; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=yBnxYIyle2Z+kSIkOn5qaNybS63aCUh2dLbncTlrnfE=;
-	b=Bq/CyM4eIx79wIw4ePl+mANvM7XdmBByGjsZgBrk7mKOHzOBZhZxY2A9/y1BCVJ15ngz3H
-	9rUtMkjWj2oupKgBjLVjnFXywnMS9y5FwIl1CT4Ej4Hug9ObIlhz8W7IcVGoeG/OP9OFUG
-	+7NCxrtANF3i0Vfc00HZnM9DggBrC/x0js+S3RHPHz7VmDRpDGuxtAVAuDBeZxdOGNgZwE
-	CT9TrGBciJWiSLhtccGTw0eaFHw1CA3VVxY0z1ri8nhjougCHECGZXstcKilXkZXCHVkQm
-	GEhjSbCfVV9GRQmu+1h/SrgifQakq0ETZwb7f9VyYI5kwXpbbS8zv0e2h0DSUw==
-Message-ID: <70c0a3dc-a522-4141-b98c-2ebc231b20ae@bootlin.com>
-Date: Fri, 29 May 2026 10:43:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A99E3ACA54;
+	Fri, 29 May 2026 08:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780045194; cv=fail; b=e8iHpKHBsuInOJYb4bz8p+kGMA43PsdqiLpf4CD5uI8R0yW59VNFPlJL8R9pP5nAaGhC1MskCbgYdMVoJ0CXxLxo4+VUTHWUdfsO3yFdByPeNmtNEBRzLjYrF7yD3E4HKqrWhtJ9Rp0zi9bOUrLGk/cksKSTqZrO/R581lX9FJ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780045194; c=relaxed/simple;
+	bh=VAkHpnVd7hl1IG7enjFur2ehX6kS8Ug0CWdlKjDp6K8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=u0ye0aUf9UnoNX7I6Zp/wuftDBQOKRktVFR0H3uTw+s6dZQcMIjxySHNHGq5wXuM8qEjEJVwu2evcQZdA5qbIdXZ8RVBOdfaPWC7PAZmuqCrinjgaa5BXxJfC91ZO5LVkP7ob10rbqYE4MxnZmFGVaRqR/mU5fJmUJlRoSs5dLg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vaisala.com; spf=pass smtp.mailfrom=vaisala.com; dkim=pass (2048-bit key) header.d=vaisala.com header.i=@vaisala.com header.b=HBlb4Eb/; arc=fail smtp.client-ip=40.107.159.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vaisala.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vaisala.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fFHeoYu7f34gLULjuqm5GwJQ5blWzeQOC3/i/6XQKyEMNsZ4Qdwac8MjT7JjYkqtyklsNOZHXxSxgQHbbv7LC2CIXbR6UpDZi3BMZdx7kwywaniewUXMA4mvSLOJ2RK1YY6lu1W86/QAw+RG9ML44wEB0tnmtDhsYVmy28Qbiy6Y8A6Dl632j4M9r5RnOGjTycg6lWiTv5RgW906jtTZmTY25jFNRlsN3nw9zyVTtdtSOy78lW4gH3tngM5vzB7nq8yteh9uyoJDM9jVZVmecfLQ3bpnXwuiji8Y9jHlXRH1w3NH+skrRwjuvszAANcXrYDQ17edE3/ViZBDDG/JUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cpH9arenzIdR/TeApQnRgoBovYQTgz24BNA/v2H7p+I=;
+ b=ihMg0MJowpodyZntySf+NUaEuJs/u8LHPvzPpc+HG8sG7kGbVfJR0slH1WhhiB8SNW1QxSlfW2T3ywvmmMwPR56ly+Ix+yxNvBy8tKlOBIJhviAfoKf5TThUqFNcVKcoUGaBVvurtw6ob8IpdWltGp5aDJs1YK2skOl15jA1o6HDmr57jOV/laEyG9yzyKDZkVrhqTBMgQQlIiYUGiGUARUE6gcxY8AufEpgQZu0EryFElK0WgS9fVOEeX2Cpw9Vf1axk4tP8R1xFtCDOMFxHFTtrGjo6kHmxcNDfZIOx//62mRYsDxKurMHop8vMa8dPatdhEK0aKSQSwy94PO0vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vaisala.com; dmarc=pass action=none header.from=vaisala.com;
+ dkim=pass header.d=vaisala.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vaisala.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cpH9arenzIdR/TeApQnRgoBovYQTgz24BNA/v2H7p+I=;
+ b=HBlb4Eb/3fS29Tp6D6uA4NaoKm2yCPMA9mUEnk72T/GHAYbX7fes0vZbO+xn6Zxl90pWcGEz/qXT7C7BUslAq6n7tdUVkwZ6uzxnO9dMKAp7M6dElqqB15UteoS181ztsRqBaFJHmVbwlllE1gAIy3pDG0gWivnD9w/egQM7BAr/llMxnhrXv6KmBFYc5eTa/HQvpTQ3eydJ8l9zOHaXbiusUPe+nv7y/YDiHv9Bu4siatFlda5K5xC92YdDaqzUEQL3PDYR+7d7Gxd3cZd7iR9yssP+Z7idYdxpVwzOUtuBy+SQN9ue+olFs3LvJjy05V+jw6jfGOZ0POhrvqnBSw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vaisala.com;
+Received: from AS5PR06MB9040.eurprd06.prod.outlook.com (2603:10a6:20b:676::22)
+ by DB9PR06MB7770.eurprd06.prod.outlook.com (2603:10a6:10:256::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Fri, 29 May
+ 2026 08:59:47 +0000
+Received: from AS5PR06MB9040.eurprd06.prod.outlook.com
+ ([fe80::923e:d30b:98c0:c69]) by AS5PR06MB9040.eurprd06.prod.outlook.com
+ ([fe80::923e:d30b:98c0:c69%7]) with mapi id 15.21.0071.011; Fri, 29 May 2026
+ 08:59:47 +0000
+Message-ID: <c11e4e11-12c3-4297-b870-b734eb75a580@vaisala.com>
+Date: Fri, 29 May 2026 11:59:45 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] net: fec: fix pinctrl default state restore order on
+ resume
+To: Wei Fang <wei.fang@nxp.com>, Frank Li <frank.li@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Nimrod Andy <B38611@freescale.com>
+Cc: "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260529-b4-fec-resume-pinctrl-order-v3-1-6eda0f592fca@vaisala.com>
+ <DBBPR04MB750094BCF64765DF8463587188162@DBBPR04MB7500.eurprd04.prod.outlook.com>
+Content-Language: en-US
+From: Tapio Reijonen <tapio.reijonen@vaisala.com>
+In-Reply-To: <DBBPR04MB750094BCF64765DF8463587188162@DBBPR04MB7500.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: GV2PEPF000239FD.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:158:400::2af) To AS5PR06MB9040.eurprd06.prod.outlook.com
+ (2603:10a6:20b:676::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 04/14] net: ethtool: relax ethnl_req_get_phydev()
- locking assertion
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com,
- joshwash@google.com, tariqt@nvidia.com, haiyangz@microsoft.com,
- linux@armlinux.org.uk, willemb@google.com, ernis@linux.microsoft.com,
- sdf.kernel@gmail.com, kory.maincent@bootlin.com, danieller@nvidia.com,
- idosch@nvidia.com
-References: <20260528231637.251822-1-kuba@kernel.org>
- <20260528231637.251822-5-kuba@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260528231637.251822-5-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS5PR06MB9040:EE_|DB9PR06MB7770:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b9e19ee-556f-4665-d77d-08debd60a26f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|4143699003|56012099006|11063799006|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	Jn+s0lc6CiF2Mjk6BScZMNky79ZAj+criRg0rHrhPGgqKnggIqtcKWcG8GOihQZbWudGCpJ2OY5FnL8ujpnSoVTNX6QkCg/0J6PKFosO7nS04r04VcWgkParlxbabVXVxAqj70aqiqJ9jgO1L53y8rwyyRH8Vx6GkTT7d2+oePqY5ruksDVUtWlWi09qfCUqfrafcr872oBnLQvv7A3PxauuOnTdy5jAlgvMgNxvBF4wqWXn0DpLBDx8X8+ed3JdMUibjD9QAR1/pOp0iT/gfSgs4TFckAb9DryLFkWi3JKSrjEKSY9+QE1ZkwWncKSbGDQpeeuqMRcAiCU+hDdWUXGM94DXR58VxDzL0NPIJXDg7jIm8aQOw17B87dxDFTNdewQl1uHe96EB3epeQMNJHH0Tw6Elu2zFT2SOVrx6mgdwue/BMkvAJ6L6VnPb03l5qQ09MZIrwCUGA50WFCOolVKu4Xfl6pBe5egVVAWX+3rEACsyTIeMSL6eWgzLsKe18yBu9ukDPsinsnvidMrHZ3IEfR/33B5/verkYWjBtxEfJVWNWcl8cFpncc/P+zaklw9JDgPqXIOjXkGAWkaHDh5gFF0m1znxTeyQ9Fm9fRHiQGK48N7YPB5iCgcykDZpNHMk1xM2dcTsx+GOTS+5LePrS2OGvg0AiPG87T7w8vv04FxdHwjbipLZwDcSSu0
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS5PR06MB9040.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(4143699003)(56012099006)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dXcxblFsVG5pN3NkNmVrWmxSTGhYSGdJd2FDaFJjUUVES0xYZTBRU3NwUXpO?=
+ =?utf-8?B?SVRGZDRyMEpEMkFHV1p3MG9HMDZWbkcrdzZ5ZGtRdnJXS3R1T29aeTJKK3lr?=
+ =?utf-8?B?SzhQTGhnY1ZGWHJVdnZON1ZCcnNTVUlJV2w1ZzhWM1F5VTlxcWRjeFJGczBN?=
+ =?utf-8?B?NUIydEppNmR3Y1lsaTNSNVRpczM0bjNOZ3U3SFNxRE5KbE1Ca0lRL3V6amRF?=
+ =?utf-8?B?djFEVjN6bzFYeFNiWFFiS0hsUDFZbzdQbHBsQ3A5SWFENjZKYm5mbWE5UDVZ?=
+ =?utf-8?B?eHppMWhYLzNLbkhaWndPN1RPOGtmSTB6NHR0anU0L3lNTWFpRHVjNGZZUTR1?=
+ =?utf-8?B?MnhxTHBXL2xvT3U0bWNzRFJKcXNRZzNHb1RaVXNGbFpLSVI5dWVza3lWRCtJ?=
+ =?utf-8?B?VForbDBHbUsveFYzQU5TYVZaYU9ZWkliQTN0djNRajVKYjJTWmlpZ2kyZkpM?=
+ =?utf-8?B?UytMVEp5SVo2WU5nNXNPbWNtaWphbVNjTEVONHNQZFYxSGJEWjk2ZC91Z1dq?=
+ =?utf-8?B?MnJ2dkd3NDA5RHo2NnJ2bGFBbzBJTXFhSDBSN3ovVjlXdm4yQUljb3B1Z2xU?=
+ =?utf-8?B?elNVWlg3blA0UWJNT2xUMmNyYTZlOXJWWi8zQ2JYNzljWEp2M0V2UWhiL0RC?=
+ =?utf-8?B?SUlvYnJxaDBBU0I3T1ZraElKZk9mdlhXNGdyYU1qV2RZTHNyNkhiOEZaUUhh?=
+ =?utf-8?B?K3VOdG0wYlF5SXZoOE5oMWE2NytvRWR3d1JPS0F3MFpIUXhNdzQrZlRPc1Vx?=
+ =?utf-8?B?ODdYenlwcW9rZG1TMGZBcTNpY2tuMitPd1dSRjM4V0tvSnpXZEVlbExrRjBD?=
+ =?utf-8?B?VGpFd3BvNnYzUXZiY28yNGtlekRpSWw1WkpXZ25CbS8xMTQ4ZmJTTmFRY1Na?=
+ =?utf-8?B?eCtQV1pZVzh3enIzTEZpeXZ3VGUrdmxUQzRNK0tKUVZRVHFEdUhMNXRxbUlC?=
+ =?utf-8?B?VmpKb2RMaHgwRWFsaGdiNHU4bUhXdUVtZDFVb3BRQjY3ai92eWQ0V1RMVDln?=
+ =?utf-8?B?ak9aK0lLY3d2S1FBYmFESHBTMDErMGg0M2lSSURWNEtPZ1pyQ3NFMHlFRHFU?=
+ =?utf-8?B?dUd6Sm5VZ0lQdHhxazVDb3dsaXN6R1lLK2c2WUtqSlBmY2svOVI1eUg1Skp0?=
+ =?utf-8?B?NVhIWnBOMzBscFM1RjI3MnViNW5QRzQxcUNNMHh6akJESitRSytVcTBOMmhR?=
+ =?utf-8?B?a3M0S3daNGJaa3NGaVZPQ21tNHlnaE9DekJIOVlVWFVCd2Z6S25Kc0IrdEh1?=
+ =?utf-8?B?UUVINllRVzc2TGFTNUdkbFdhbk9RbDF0RlBaby9GNG10eDF5cjFjaEZ0U2ZV?=
+ =?utf-8?B?ckgzZzBrbFZrQWJ4SjFGcjU0eUY3cnZwSXVCL0ZvUTNKWGNQeEJJOTEvbHJ1?=
+ =?utf-8?B?WjRsdDducWQ2dW5BWmZuVDVhcGdBUmNQSUhJeUJJVUdLVUZyN0NHb0hLMDQv?=
+ =?utf-8?B?czJ3S0dtRnNsdW9uejdhL1hBWTBtdkVtTDE2MEttZ0M4SUtISFdPNVFCbVRJ?=
+ =?utf-8?B?UWJqbjRyendCdEpmUXRTYkR1NG5RMXRGT1lDazJwTEw3eklNYTdGOWw0eGRy?=
+ =?utf-8?B?ck42YzViTGZlM0pYeXJBVmhnNENIZUNsRHozSWFnak1ma2JtUWdJKzhKY1M0?=
+ =?utf-8?B?bHpXaTNqdUszNmw0KzdneDgrdUJWVGtqZE9jRUtLSTkrUUZmR1VMMmhUUkxL?=
+ =?utf-8?B?Wm5POHdRaTYwNkhjeEZnaG9McTYycUJzK3FKd0tKSExXZEkxV3BQOWN1TlRD?=
+ =?utf-8?B?Rjc2Qlg3eWNjVlZSZ2IxSjhnanZUclFONTBVSzRJeXZQUUU4eG9DVTZvOVVr?=
+ =?utf-8?B?ZDlldXFheEs4dmk0M1BJK1Nzamk3T1VtYTd1ZCtidDVvbHRQcDVlZnpMOGQy?=
+ =?utf-8?B?NEc4Y096c3ZrUkZoY2xjNU5TUk43QnhjaDdaQ2RLZkljTFdrdis5RXVJR3hF?=
+ =?utf-8?B?MjdHNzZDdTdJUE5pMDY2RFpZem1tVFVQL0QxcXpINmhFam5CUGhQVUJ4QlNU?=
+ =?utf-8?B?bWtmNWNkTTI4aTIxWU1XNjFCeDdTSzhPcFB3dVphV3dUZmpJYmdrQURHZk1C?=
+ =?utf-8?B?QVZTNFFkb0tWS25ZcU9pWjBMbzltYjNpRUNEVDBNUXFINi9vRys4eG1rSUJj?=
+ =?utf-8?B?ZUJ3UlZXZk5jcjVzdk1ZR3RTVmphVnZ3Z3p5eUIwWGRsQ2xpM0p0Mmw4V1Ev?=
+ =?utf-8?B?SllWbnBiSks5bmFPSVl6UEZyUGJKUXBLSElDZTNUcDF1L2NvcjFQZXNjNHBv?=
+ =?utf-8?B?c2VyUEMxUGRQdm5YSU5rWXhpWVI2ckp6L2NRZ3lZWUp3dkFQWVN4M014S3ZD?=
+ =?utf-8?B?UUhZdFlaS3V1M1pjeE01am5aaXc1eFRNbUM3MmhMTGd5Mis2NzZ2R0R3aERy?=
+ =?utf-8?Q?8nFB+yiGLxmEv0y0=3D?=
+X-OriginatorOrg: vaisala.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b9e19ee-556f-4665-d77d-08debd60a26f
+X-MS-Exchange-CrossTenant-AuthSource: AS5PR06MB9040.eurprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2026 08:59:47.4536
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 6d7393e0-41f5-4c2e-9b12-4c2be5da5c57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sjH9XzpI80elLY7rIxQhN5zISH5DCVaXADzVMOBKoeNEYI9smjnPhES9IMdwNHocY3SlmR6zmpYmU/QuDnQl2IjGx3ek3A32bBradBL16MY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR06MB7770
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[vaisala.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[vaisala.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293050-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293051-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,linux.microsoft.com,gmail.com,bootlin.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[vaisala.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[tapio.reijonen@vaisala.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 32D485FF69D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vaisala.com:mid,vaisala.com:dkim]
+X-Rspamd-Queue-Id: 5B02F5FFA70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Hi Wei,
 
-On 5/29/26 01:16, Jakub Kicinski wrote:
-> phydev <> netdev linking and lifecycle depends on rtnl_lock.
-> We want to switch to instance locks for most ethtool ops.
-> Let's add an assert that ops locked devices don't use phydev
-> today. If one does we can either opt the phy ops out of
-> being purely ops locked, or do deeper surgery to make phy
-> locking ops-compatible. I don't think there's any fundamental
-> challenge to make that work.
-
-Yeah untangling phylink/SFP/phylib from rtnl will be needed soon
-indeed, quite the can of worms...
-
-But for the topo part, this change should do the trick.
-
-At some point we'll need to convert a more embeded-oriented MAC
-driver to being ops-locked, to get a good idea of the amount of
-work in front of us.
-
-Most of the constraints come from the different lifetimes of
-phy_device, sfp-bus and net_device, RTNL is the easy way to
-guarantee that the netdev doesn't dissapear under our feet.
-
-Andrew and Russell were careful to get people to annotate
-the RTNL dependencies with assertions, this should make it easier
-to tackle the conversion :)
-
-For now,
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
+On 5/29/26 11:37, Wei Fang wrote:
+>>   drivers/net/ethernet/freescale/fec_main.c | 3 +--
+>>   1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/freescale/fec_main.c
+>> b/drivers/net/ethernet/freescale/fec_main.c
+>> index
+>> f89aa94ce0202d5f28f37362ce70e0943aa14025..6ebde65d7f1b8728a6c5d28f7
+>> 5cc0b0c4d983969 100644
+>> --- a/drivers/net/ethernet/freescale/fec_main.c
+>> +++ b/drivers/net/ethernet/freescale/fec_main.c
+>> @@ -5594,6 +5594,7 @@ static int fec_resume(struct device *dev)
+>>   		if (fep->rpm_active)
+>>   			pm_runtime_force_resume(dev);
+>>
+>> +		pinctrl_pm_select_default_state(&fep->pdev->dev);
+>>   		ret = fec_enet_clk_enable(ndev, true);
+>>   		if (ret) {
+>>   			rtnl_unlock();
+>> @@ -5610,8 +5611,6 @@ static int fec_resume(struct device *dev)
+>>   			val &= ~(FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+>>   			writel(val, fep->hwp + FEC_ECNTRL);
+>>   			fep->wol_flag &= ~FEC_WOL_FLAG_SLEEP_ON;
+>> -		} else {
+>> -			pinctrl_pm_select_default_state(&fep->pdev->dev);
+>>   		}
+>>   		fec_restart(ndev);
+>>   		netif_tx_lock_bh(ndev);
+>>
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   include/linux/phy_link_topology.h   | 5 +++++
->   drivers/net/phy/phy_link_topology.c | 8 ++++++++
->   net/ethtool/netlink.c               | 6 ++++--
->   net/ethtool/phy.c                   | 1 -
->   4 files changed, 17 insertions(+), 3 deletions(-)
+> It looks good to me, thanks for fixing this issue.
 > 
-> diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-> index 68a59e25821c..95575f68d5bc 100644
-> --- a/include/linux/phy_link_topology.h
-> +++ b/include/linux/phy_link_topology.h
-> @@ -36,6 +36,11 @@ struct phy_device_node {
->   	struct phy_device *phy;
->   };
->   
-> +static inline bool phy_link_topo_empty(struct net_device *dev)
-> +{
-> +	return !dev->link_topo;
-> +}
-> +
->   #if IS_ENABLED(CONFIG_PHYLIB)
->   int phy_link_topo_add_phy(struct net_device *dev,
->   			  struct phy_device *phy,
-> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-> index 1f1eb5d59b38..aed3b26c1674 100644
-> --- a/drivers/net/phy/phy_link_topology.c
-> +++ b/drivers/net/phy/phy_link_topology.c
-> @@ -10,6 +10,7 @@
->   #include <linux/phy.h>
->   #include <linux/rtnetlink.h>
->   #include <linux/xarray.h>
-> +#include <net/netdev_lock.h>
->   
->   static int netdev_alloc_phy_link_topology(struct net_device *dev)
->   {
-> @@ -35,6 +36,13 @@ int phy_link_topo_add_phy(struct net_device *dev,
->   	struct phy_device_node *pdn;
->   	int ret;
->   
-> +	/* ethtool ops may run without rtnl_lock, and rtnl_lock is what
-> +	 * currently protects the PHY topology. No driver currently mixes
-> +	 * the two, flag if someone tries. See also ethnl_req_get_phydev().
-> +	 */
-> +	if (WARN_ON_ONCE(netdev_need_ops_lock(dev)))
-> +		return -EOPNOTSUPP;
-> +
->   	if (!topo) {
->   		ret = netdev_alloc_phy_link_topology(dev);
->   		if (ret)
-> diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-> index 902ff7d0a71d..a91cc4bc964f 100644
-> --- a/net/ethtool/netlink.c
-> +++ b/net/ethtool/netlink.c
-> @@ -226,11 +226,13 @@ struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
->   {
->   	struct phy_device *phydev;
->   
-> -	ASSERT_RTNL();
-> -
->   	if (!req_info->dev)
->   		return NULL;
->   
-> +	/* If there is no PHY in sight there's no need for assert locking */
-> +	if (!phy_link_topo_empty(req_info->dev))
-> +		ASSERT_RTNL();
-> +
->   	if (!req_info->phy_index)
->   		return req_info->dev->phydev;
->   
-> diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-> index ddc6eab701ed..018b0412be86 100644
-> --- a/net/ethtool/phy.c
-> +++ b/net/ethtool/phy.c
-> @@ -78,7 +78,6 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
->   	struct phy_device *phydev;
->   	int ret;
->   
-> -	/* RTNL is held by the caller */
->   	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PHY_HEADER,
->   				      info->extack);
->   	if (IS_ERR_OR_NULL(phydev))
+> Reviewed-by: Wei Fang <wei.fang@nxp.com>
+> 
+> By the way, it seems you posted two identical patches, which might
+> cause confusion.
+> 
+Yes, that was my mistake -- sorry for the noise.
+I aborted the first 'b4 sned' with Ctrl-C, but it looks like the message 
+had already been handed off to the SMTP server by that point, so it went 
+out anyway.
+I'll be more careful next time.
 
+Thanks for the review!
+
+Best regards,
+Tapio Reijonen
 
