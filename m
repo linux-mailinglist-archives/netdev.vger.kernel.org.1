@@ -1,184 +1,217 @@
-Return-Path: <netdev+bounces-293116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFykGamQGWrVxggAu9opvQ
-	(envelope-from <netdev+bounces-293116-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:12:09 +0200
+	id 8DstFZSRGWrVxggAu9opvQ
+	(envelope-from <netdev+bounces-293117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:16:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059B4602B5A
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:12:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CF4F602C15
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5FBC03006819
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:12:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 83CF53002D03
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6247B30FF08;
-	Fri, 29 May 2026 13:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A6E32B135;
+	Fri, 29 May 2026 13:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vn+7Nbq5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZujMBiT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E1D2E62AC
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 13:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9FC1E633C
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 13:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780060327; cv=none; b=sMLeGVpNdZkmASm1mWfRKZ+0Qp/lYW8fnvidnjJ4xxkKUnskh0YNjVSHj8eXlc9Xau54lEn3A+XjuDmjVeUU1HWxVwI+XPIAhsbDCicY8aWOVegSPTkgR4g21JAjw80Aj2NAnb38MHHxVHphL/XE5WH2M/1mOnynhtgVvi2ChuA=
+	t=1780060531; cv=none; b=SuZQnYMgsxXFaJSR7YZWIi8lQwesS1CxDNLadaeem6f4GkATNca2AZDsIaITJMtCnuoKKLmc8DrDbRtRMKl6FA6yb65JcbYgaaCp0NNJuk3puIaNMCoyKmfd8V7wjIHT3f2SMO7eU3E9D9wuDYcZAFWSvbvk86d3k+tVJBIWKLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780060327; c=relaxed/simple;
-	bh=GwEX9eJtbQ5wJgfzBC7aMO5ke+5Npe3dr7tSzbUM8vM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kPWznlRMiIj25VdVa3YgAdeOsyOp0wKMeh067UMR9WSPqOwTL85Qs0YFe2Hhj8J+xp3Sq1nST2oCdAtQKzngU5nwZtcZLQTfPdfSsG975llwQHptZoX2VgG9pgnYFJM0StGo4RZXnCP+kV3YhAXZeOOgUYexsDGSrcEGd10ok1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vn+7Nbq5; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TB8QrT1684674;
-	Fri, 29 May 2026 13:11:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Bxcfn8
-	qam8vTfArNXS1k+iRr/pG/sDyKUfOEy2BYxfk=; b=Vn+7Nbq5GZyoQIwSjd/HRO
-	bOSMW8YSn05RZi91yxOKkfvRefr9n7lDxmSo4uHcLOk+qxn2LeOslzFnUmdo6aG9
-	f+51MWoLsDhmDhfQYj85BjaeKgcOm000bBcYg9LLkl0BOVHyIivebmlEo/VyK+vU
-	l+HVjvmhX1klXiPeJd2sJMcky20DHoinbEPoS8McmKyeSOCoruhublttQuyfMPWe
-	kK63gTeqVqgP63GK57zcDdI/TjkJFiHQ+zkY4hiXtsMHTHnq/V/Mg5yH1/kbdP27
-	G9rPGqtbF8EOpsLGJw4OSNAEmA5iH21n13sUcbkHqAWn+qO678wntJVwMT89DEvQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ee884gsp8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 13:11:54 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64TD99bA027224;
-	Fri, 29 May 2026 13:11:53 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrbdq0d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 May 2026 13:11:53 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64TDBpE728770768
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 May 2026 13:11:51 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C763D2004D;
-	Fri, 29 May 2026 13:11:51 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A07C62004B;
-	Fri, 29 May 2026 13:11:51 +0000 (GMT)
-Received: from [9.111.212.140] (unknown [9.111.212.140])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 May 2026 13:11:51 +0000 (GMT)
-Message-ID: <f664f9ca-30b5-404d-9b3c-268d8dbf2bcb@linux.ibm.com>
-Date: Fri, 29 May 2026 15:11:51 +0200
+	s=arc-20240116; t=1780060531; c=relaxed/simple;
+	bh=WMDFjbQ1IsgxxBmTUVMs5PZRTemd28Shd5aoPXAI/tg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Y9osABexmAu5w+8DpWeWiDfk5/lBg9boygbbfCaejHTQOJlyv2klycSroQQZ7pM8JuNsnlLnquRUw28l2GIeWjDR/PZ/uD3BTDT3MTaFqKJPfD+4Bq8FM7gd/2tL17r17Y1QyTWCVHVFo9rpj95aj+E9szplHBmdQpouOMNs/LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZujMBiT; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7e62b6163c8so2070827a34.2
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 06:15:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780060529; x=1780665329; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8U27PrRBYOTBggCy2kOuybL8Sqy0L0L2agZLGzQ4W+8=;
+        b=eZujMBiTZeALWjDcVzqJJahwU3o9YhoBh3aOYfKJeB0Mvp4URKTYsZYWJtbDMiFY+O
+         2jJuMPExHTIlZetb2p6Ko3n9eMNp14SvEaNoYbnnNAAFHYRHYWXCeOLyN4P9WBrWDDs6
+         NPffLTUyj+D8Pp7O4r0iBMobLCeKFFsQ3E0eXW9kTRw9fSBWJF9HoChFxRMdB0cuvxwi
+         /Z13uCp5NjWMYZSY6gisQ5s30yr/igZpuVftolpJC2pn12/2F6VafNbSBIIBDtyxAA6Z
+         na8AOBZ2IpbIzURK3C301o4D6VLjXwXma/4PzNIzM8JAqy21jfzI6PaTpaviBnka9vD2
+         p3dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780060529; x=1780665329;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8U27PrRBYOTBggCy2kOuybL8Sqy0L0L2agZLGzQ4W+8=;
+        b=n2uO+0ewTgYnCLLiuvj7bExUVucESMm0N6adO5F4de0CDBPqTOmp/D7eLLeOX0pL6W
+         JMwvWNFl3mSOGNRnZU65/iepVdWUekL5ueCf/sRUIxbZ5dsKqr2do0GXKxgsVI72S2iO
+         3olZtMblG1Ax9c9n//gFu83zH/+9vJQvd9853OwkV8I2h2VEY5aEC1/iBjwOAPZoPn0r
+         n0JMgABNg6u6aJT6EdSkqs+zgNwSAbAs7wyrz8rZcOjWniLmfDH1GnjHdI3LwmRLAd/H
+         lPsK3NDfBYpuEFQd47gn+57KdvjsEvd5FGG2PD5zc0Rq1tAQUQzOTk7CqaWw/8D1QyK9
+         2xyg==
+X-Gm-Message-State: AOJu0YwMebZp0jx6O5JvNAHm8GOYn2pIuPfLOK+gslSjVzBoRZRrst5i
+	Vne0OWU4G4uD4QVl7BUa96D5WSR68L+ApiP0R3CRzk5nn1LJ2uyu0Fp/
+X-Gm-Gg: Acq92OFg84S97K1V0FkRIS5B1lhn284+lbx3wf7W/WdZCLpDCCVI1pADi/VBxCcqiEn
+	Kd77KpKN9uV+l50zplSbXDBkKF80zNIlgP8f/lP0zexug1TOv/fbzmq4uluOkJDH2Pxc5vlFfBz
+	JmS8hJrFXOkjmyX0KIs54IpQTpSxiLU3dQP4wtq3UCyBuAYZrscDbJhxsh8MmACLfd9XmBDHRi2
+	kBAxUow2I9Q1+x5UXBYh2T/LrtGrRfNgcT8BM/OuOD7a3pZW+9ETxiudOTrEe75KWp8Uh+IEhmC
+	PRmv+jTM6oEVPZjuEktaSd77aNhlVDk11OyOOVBF5EakVA8vFjO5v0p/dX5osbLymC/rYazvMoE
+	IU0jwd7m2lIkKANx8KXbRsmD7XWEOrOQxNkIEvZDgk9LQUDKXt0BinklfjJ8ajTZpV37ItAOATj
+	54SUNW8VHzl8DsESulemi621EdItVaZ6Y=
+X-Received: by 2002:a05:6830:3748:b0:7dd:5a21:2246 with SMTP id 46e09a7af769-7e694e5c7b3mr1858386a34.25.1780060529098;
+        Fri, 29 May 2026 06:15:29 -0700 (PDT)
+Received: from localhost ([2a03:2880:10ff:42::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e695d69b20sm1407562a34.22.2026.05.29.06.15.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 06:15:28 -0700 (PDT)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+Subject: [PATCH net v2 0/2] netdevsim: psp: fix issues with stats
+ collection
+Date: Fri, 29 May 2026 06:15:26 -0700
+Message-Id: <20260529-fix-psp-stats-v2-0-3a194eacf18e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] dibs: fix use-after-free in dmb lookup functions
-To: Rahul Chandelkar <rc@rexion.ai>, netdev@vger.kernel.org
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>
-References: <4gRZFl1CWvz2x9j@mail.spacemail.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <4gRZFl1CWvz2x9j@mail.spacemail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=fIYJG5ae c=1 sm=1 tr=0 ts=6a19909a cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=84fQ698N_ZbQe8IxvQMA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 3DjxdjLos7bGWS1RwbLW2vRcv5QZo-y8
-X-Proofpoint-GUID: JJRGqGpWEkwJI3haBm71VP8eWgFbP04P
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDEzMSBTYWx0ZWRfX6CTG5kVDMYU5
- QDZpY8bPhulWzPhPGbfKOBVJzx6/j3QZoBFG1GQSCj8JScI9FdafZWG0y+XvaWWHEqSHJsu57d5
- Tk94Lg9YWrdce40MTPSWqxFbEIkZwuv7PXjIPldVE7+q081MQIojHnnKz/nZpJsdta5YWq2je8o
- FZ8gJB295WvJSjl1nOYV++hTUQ3YTmpyAaPXAhPYJC0WXRhkVYh3tmuLkoHZ/YBm0R9ZNL7xJI4
- 9QuXplKrYhR9WmdEfJjlh6qmvY2y106GL6fNFboJVUeJopkxT4vRJ2KHbjkOmfJruXq97FLWwIF
- pS7O/y4GisoIhPSWLvReZNNrnk1FDCYeOCc5JU5VWdlGFZD6qvkgTwW5a9aw/Y3E/0Atr0NBxEe
- FJu87ha3XPPxBlzzpr5+yDkz8D/4gtQ7lXR6l2zNeUu+jBMEsqI4tBDh5FyjPORrOsVDwl9BNuh
- z8AMFL+v7MXiPgyEGqQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-05-29_03,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2605290131
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-B4-Tracking: v=1; b=H4sIAG+RGWoC/12NywrCMBBFf6XM2pEktZG68j+ki5pM2wH7IBOKU
+ vLvhuDK5X2de4BQYBK4VQcE2ll4XbIwpwrc1C8jIfuswShjVaMNDvzGTTaU2EdBaq2zXtnWKw1
+ 5swXKhcJ7wEIRumxOLHENn/Kx6xL9cPUfbteo0Plnra+XwTRmuI9zz6+zW2foUkpfnfWToa8AA
+ AA=
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.13.0
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-293117-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293116-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,rexion.ai:email];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 059B4602B5A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4CF4F602C15
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+It has come to my attention via a sashiko review of my net-next series
+for aes-gcm in netdevsim [1] that there were preexisting issues with
+netdevsim's implementation of psp statistics.
 
+API usage issues:
+1. not calling u64_stats_init() on the u64_stats_sync object during
+   init
+2. not serializing usage of the writer side API during stats update
 
-On 29.05.26 09:08, Rahul Chandelkar wrote:
-> From 68f633e58deb6edffa435a3b2bdc4a12a5e36daf Mon Sep 17 00:00:00 2001
-> From: Rahul Chandelkar <rc@rexion.ai>
-> Date: Fri, 29 May 2026 12:32:34 +0530
-> Subject: [PATCH net] dibs: fix use-after-free in dmb lookup functions
-> 
-> dibs_lo_attach_dmb(), dibs_lo_detach_dmb(), and dibs_lo_unregister_dmb()
-> all release read_lock_bh before operating on the dmb_node pointer found
-> during hash table lookup. A concurrent unregister on the same token can
-> kfree() the node in this window, causing a use-after-free when the
-> original caller subsequently performs refcount_inc_not_zero() or
-> refcount_dec_and_test() on the freed object.
+Logical Bugs:
+1. We were incrementing rx stats on the sending devices stats
+   counters.
 
-As discussed off-list, there is no such problem in the current kernel, as there
-is no such caller.
-I fully agree that this should be improved, but this should go to [net-next]
-as an improvement without a Fixes tag. (This matters, because it removes
-the burden of backporting, porting to Stable etc..)
+Fix the first set of issues by removing the u64_stats_t api entirely,
+and keep track of stats with atomics. Fix the second issue by charging
+events to the right netdevsim object.
 
-> 
-> Fix by performing the refcount operation while still holding read_lock_bh,
-> so the node cannot be freed between lookup and use. Release the lock
-> before any code path that may call __dibs_lo_unregister_dmb(), since that
-> function acquires write_lock_bh internally via hash_del().
-> 
-> Fixes: cb990a45d7f6 ("dibs: Define dibs loopback")
-> Signed-off-by: Rahul Chandelkar <rc@rexion.ai>
-> ---
+[1]: https://sashiko.dev/#/patchset/20260508-nsim-psp-crypto-v1-0-4b50ed09b794%40gmail.com
 
+  TAP version 13
+  1..28
+  ok 1 psp.data_basic_send_v0_ip4
+  ok 2 psp.data_basic_send_v0_ip6
+  ok 3 psp.data_basic_send_v1_ip4
+  ok 4 psp.data_basic_send_v1_ip6
+  ok 5 psp.data_basic_send_v2_ip4
+  ok 6 psp.data_basic_send_v2_ip6
+  ok 7 psp.data_basic_send_v3_ip4
+  ok 8 psp.data_basic_send_v3_ip6
+  ok 9 psp.data_mss_adjust_ip4
+  ok 10 psp.data_mss_adjust_ip6
+  ok 11 psp.dev_list_devices
+  ok 12 psp.dev_get_device
+  ok 13 psp.dev_get_device_bad
+  ok 14 psp.dev_rotate
+  ok 15 psp.dev_rotate_spi
+  ok 16 psp.assoc_basic
+  ok 17 psp.assoc_bad_dev
+  ok 18 psp.assoc_sk_only_conn
+  ok 19 psp.assoc_sk_only_mismatch
+  ok 20 psp.assoc_sk_only_mismatch_tx
+  ok 21 psp.assoc_sk_only_unconn
+  ok 22 psp.assoc_version_mismatch
+  ok 23 psp.assoc_twice
+  ok 24 psp.data_send_bad_key
+  ok 25 psp.data_send_disconnect
+  ok 26 psp.data_stale_key
+  ok 27 psp.removal_device_rx
+  ok 28 psp.removal_device_bi
+  # Totals: pass:28 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Thank you very much for this patch, please allow for some more days
-for me to review and test it.
+Dump stats on both devs tx on one should match rx on other:
+local dev:
+id=5 ifindex=2 stats={'dev-id': 5, 'key-rotations': 0,
+'stale-events': 0, 'rx-packets': 1226, 'rx-bytes': 39244,
+'rx-auth-fail': 0, 'rx-error': 0, 'rx-bad': 0, 'tx-packets': 1931,
+'tx-bytes': 2478908, 'tx-error': 0}
 
+remote dev:
+id=3 ifindex=2 stats={'dev-id': 3, 'key-rotations': 0, 'stale-events':
+0, 'rx-packets': 1931, 'rx-bytes': 2478908, 'rx-auth-fail': 0,
+'rx-error': 0, 'rx-bad': 0, 'tx-packets': 1226, 'tx-bytes': 39244,
+'tx-error': 0}
+
+Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+---
+Changes in v2:
+- get rid of u64_stats_t and use atomics instead
+- Link to v1: https://lore.kernel.org/r/20260513-fix-psp-stats-v1-0-cdb3174f252f@gmail.com
+
+---
+Daniel Zahka (2):
+      netdevsim: psp: update rx stats on the peer netdevsim
+      netdevsim: psp: use atomic64 for psp stats counters
+
+ drivers/net/netdevsim/netdevsim.h | 10 ++++------
+ drivers/net/netdevsim/psp.c       | 27 +++++++++++----------------
+ 2 files changed, 15 insertions(+), 22 deletions(-)
+---
+base-commit: 422b5233b607476ac7176bfa2a101b9a103d7653
+change-id: 20260512-fix-psp-stats-e96c6d069d01
+
+Best regards,
+-- 
+Daniel Zahka <daniel.zahka@gmail.com>
 
 
