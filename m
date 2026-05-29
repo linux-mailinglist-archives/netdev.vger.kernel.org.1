@@ -1,286 +1,191 @@
-Return-Path: <netdev+bounces-293220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MB6GNY/uGWoW0AgAu9opvQ
-	(envelope-from <netdev+bounces-293220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 21:52:47 +0200
+	id EGnFB6zuGWoW0AgAu9opvQ
+	(envelope-from <netdev+bounces-293221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 21:53:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A766080BE
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 21:52:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D61D36080DE
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 21:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 56A773081CDA
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 19:50:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 59F6430373C3
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 19:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AAC3DDDD0;
-	Fri, 29 May 2026 19:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE7B3ACA5D;
+	Fri, 29 May 2026 19:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwCKCvup"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2C73ACF18
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 19:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BF83A8744
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 19:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780084228; cv=none; b=QKRsUG3ULmB+mbuyN1rLx3vYYKIlCDvxQuvKwUpC/xa3GQv8JPwI3VWE++KN3ke3Jsl2tOWku1bdcH+6EtT9r/tJkqTsPFoSj20OOfvmIH+vOcW0oLlQC3k8eZvfzYbYLYFXzG8xm8qkc7QnmPaMXnE3EX9pRfGXv+5QMeGKW9c=
+	t=1780084389; cv=none; b=WtPlFcg9joIW/91iIj4Nl8I9TLX2oHjYgeZHdCk6xUp6vm9PPFpNX2lDc10wpN9C9wPU4mxI7ZEeIPosShEy09LVf6yVLiSBiyL51d+nTAo3EVPyjqTbUdXKd7PJrNiuOxebPb61t96YMnKKQ+Q6lCvMQQ9FWf7+6EN0Fkw2gR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780084228; c=relaxed/simple;
-	bh=4cKI3OzVEC+QhsrwxEGBneTkY3RoyNTLsnJJTtOyd2k=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J6hC1dDmOisQcU+2ytX31Li9DPaIKxZrpmeeaq6ThMHXI7ixLXVFGSNClNOS7W/bATpg8HJCPnszkirMdv1Mq7MvQDw7e29wGPfIV8XDz1TyNidN+lXGZAKgIiX518yeQk4EeQ75RmimhNjb4QUQrUxJzHLodQB+mLWqE/wcnUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-69d874805edso9906674eaf.0
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 12:50:26 -0700 (PDT)
+	s=arc-20240116; t=1780084389; c=relaxed/simple;
+	bh=YLNgU96qgUYguOF6990i0/c6t7GLHzj0zDWTizb3ptY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=EUFyLRqzK7Y5LWZUW2m50pyeGohS20TmAasZ3TY3Kt7AtJy0oPbyroe9UiNV4qToMes6n1Sy26b2uVa+bi3wuaC4hlJmOYvzYPIDcYy3cwDlehSqJjt28p2XTjDARDYgl37odfFFgNpDt7VJ9c8u9rQD3BiOJNK9El70dYwzxEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cwCKCvup; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7dccb5f4b1cso23623817b3.3
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 12:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780084387; x=1780689187; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l0IvgEA3XWc8A2GTKF1x/zibAoh62BV62KMPqPz2FA0=;
+        b=cwCKCvupO+ZlHn+9TM3RU2JkQ/t5UqnnmWEQQBjxyTKaf3pAmPGAgz7uHMTQRR5ZBK
+         gibTu2bi1F9Xr0vf5+HfBE9fvFlPx8/fXmAn8x7bGB1rgDZe3N05BzYbCf1fSwGUM13q
+         Qi2a6+DciWvnwVjP5TofPGgXuXwqzjMaAldv/Arx1KP8vxYk49hhj2ZKCwcHTqPcw+C8
+         RrfGujTy9Bfo3RFhC+3EiC2jRDHSA8eSnmrayTw6lJCEEnVyRIJpz/pYM3w8RCCrYRRM
+         6jF9OX9CwmC74JxMZsasDlI/lVlU5M8LUNP2rNY0gCsCWlYufbhNVb8QVCrtDet7JpTW
+         o+Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780084226; x=1780689026;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20251104; t=1780084387; x=1780689187;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IzI839ybWTlU0/60C79VveyA77L3xaWgGjlAE9/HT58=;
-        b=lVAy+QCKcAxvTt3gB0rDlN22+c2elOA6VS4To1GORw5hiQ1nUsi2a2MJ9Asgd+tGyh
-         +NqGN8LEdaBW61CfdwQk0XEm5FlSuO56z4fGkfWhSG05h0petsQCUmkmJKBjUGVA0JJS
-         yTChKcD2jQ1558pXNi2HWPgJcVclv20UFcmVG1obx+clqStSIFS15IrCOiz2EboNdaeU
-         lFw1n6YlBVv8qOtsh20XSCnUCw1yja49xl8yvCehSLtBJ+q86rCHTXbf+PFmKcUiZb86
-         0QIk41aIIp5Sr+FbZo3RmfTsai3mfrd5EhDl+4UwCLk4FiWn9An8x+DqNTRdJ7jOQ3/Z
-         OaAg==
-X-Forwarded-Encrypted: i=1; AFNElJ8e097pxKYFO7q0YHQqwcSpcG72MTM/JM48A5Ah6nlgro4ovbtDhKf8e746G0BKFCkn0Oi81xY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxow2ku5IWr/s0Q5V1PYW+OeE1aPeCKpncXmAd+I6C9Iimda4A0
-	1f967CoPiTlkOtNYyeooH/j6SKyILCX/p3e+mZiD4+4Rm24RpTq++7E5J0bdebKQa6u/Vcjm3GZ
-	S0OeD0B5D2j6SGA+DT1RwBqSXQukaEOh5hhvB9c7eF1mxc6hzaWTI9ryKEBQ=
+        bh=l0IvgEA3XWc8A2GTKF1x/zibAoh62BV62KMPqPz2FA0=;
+        b=JFc4KLOcowsZogP92+je31IW+2JoEsqvnUeGwc0hkGtqyZlZg/2n/YbIk0XPtIvjUK
+         XcTh9mPGEeBcziiweDHuKXe9qbhzFieLc195wsmI/Li2ej/oygRsfZSGMuy8vvcEBEyM
+         CrzClT7cFLdYnKh6qE7tWaoWSIZnKBqaB2hVVSMqQkOlKpEV7RsokuES+uhRnq1XK39k
+         4UulWUz+wtmE0YdDEJmTyqoEo6+Ymw8MWzuK9AjCCKif1+g86gvO/LWCVasY6FJTZb6E
+         KxsmxuXO5mfziW+0CcIiC9YsYRa6CIWZlSFWDP5H8ZhpE7ry18c4pkIMCMY7iJgyiACj
+         oulQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+hm+oQMeV02MtlD3AzYTfm56n60I+2BWFlRNq9EJDWbj2MJuDmTYmfzEc2I4wsd21w5JvaWh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1zmDwEs5kqQ09SJGnO9R5ER+gRcympImyv4Rc6d9AVlSPjHfG
+	O49taG0yTBpvPJWFOZQIstADNZM1PTIp2/gd8v5be7+8QbJIjw1A9yjK
+X-Gm-Gg: Acq92OFqyXOD+CtczaVSFKD4eL9sDB9M3BZVgbhAVmGJ8zvyMBsNoDsMSI84OzR8ecd
+	xCZ6L5Y8//srGmiKmfiL7Ju5Wn/RuHrEZ3tvP7fumkE+IEMhSWgakMa1jbugygMP34Roaqlbdky
+	/2KFaraTsU6CAaakHXlvMbl7WDMtr9IH7U4GwNHB3wA8Cd2ENklISHn0VS3l2DfFE3108rn4nki
+	tjVUjpfIvz4DsGbkKx76UQYBa4YOaRvRIDy70eOW4CyxbPLCpO2hHG9Br2pm31Y5pViKl8xhj/c
+	z8osV6I2kpwoKcvx/macLRvFAgQ5hx85AeRO1YrHlitsK/2np4WDip62aXrhIUASeZLLch4am4i
+	szfUoZ+WNGnxm5o7F9VNtkGjscCPoYaETEqllCdSOkxpqRnPUhkxsBz34xSALT19LOXfL+JifEI
+	nfNbnQ3vecvzq8/GiJLyxAXDe6BG4b2+Xgdyar5pWd/mbNDRVOKbTEmYGuMsY0Ajr2M2TC4lxCD
+	9fDMfk7x46CmHC91g==
+X-Received: by 2002:a05:690c:f04:b0:7dd:6034:b465 with SMTP id 00721157ae682-7e058283b12mr8728177b3.8.1780084387506;
+        Fri, 29 May 2026 12:53:07 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7de6e963a39sm9743317b3.46.2026.05.29.12.53.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 12:53:06 -0700 (PDT)
+Date: Fri, 29 May 2026 15:53:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ netdev@vger.kernel.org
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Chintan Vankar <c-vankar@ti.com>, 
+ Danish Anwar <danishanwar@ti.com>, 
+ Daolin Qiu <d-qiu@ti.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Felix Maurer <fmaurer@redhat.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Neelima Muralidharan <neelima@ti.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Praneeth Bajjuri <praneeth@ti.com>, 
+ Pratheesh Gangadhar TK <pratheesh@ti.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Vignesh Raghavendra <vigneshr@ti.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Message-ID: <willemdebruijn.kernel.1794b95d53a30@gmail.com>
+In-Reply-To: <20260527-hsr_ptp-v5-1-158a7633eac0@linutronix.de>
+References: <20260527-hsr_ptp-v5-0-158a7633eac0@linutronix.de>
+ <20260527-hsr_ptp-v5-1-158a7633eac0@linutronix.de>
+Subject: Re: [PATCH net-next v5 1/8] hsr: Add header_ops::parse_protocol
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a4a:edc6:0:b0:69d:9e9d:b000 with SMTP id
- 006d021491bc7-69e102bff96mr380821eaf.23.1780084225750; Fri, 29 May 2026
- 12:50:25 -0700 (PDT)
-Date: Fri, 29 May 2026 12:50:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a19ee01.c16d89a8.217f2c.0006.GAE@google.com>
-Subject: [syzbot] [netfilter?] INFO: rcu detected stall in handle_softirqs (3)
-From: syzbot <syzbot+e044a9b6370ed8ca9737@syzkaller.appspotmail.com>
-To: anna-maria@linutronix.de, frederic@kernel.org, fw@strlen.de, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com, tglx@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=35076fd17e60f52f];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-293220-lists,netdev=lfdr.de,e044a9b6370ed8ca9737];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293221-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linutronix.de,lunn.ch,ti.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,storage.googleapis.com:url,goo.gl:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,googlegroups.com:email]
-X-Rspamd-Queue-Id: 95A766080BE
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: D61D36080DE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Sebastian Andrzej Siewior wrote:
+> af_packet uses dev_parse_header_protocol() to assign skb::protocol.
+> The hsr stack does not assign a callback so the field is assigned to 0.
 
-syzbot found the following issue on:
+It does this as a last resort. It is preferable for set protocol.
 
-HEAD commit:    3baa7ba4ab98 eth: dpaa2: constify dpaa2_ethtool_stats and ..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15b8012e580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=35076fd17e60f52f
-dashboard link: https://syzkaller.appspot.com/bug?extid=e044a9b6370ed8ca9737
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1308b92e580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10918086580000
+Either by binding the packet socket to a protocol at socket() or
+bind() time (but that affects which packets will get delivered to it),
+or by passing msg_name (of type sockaddr_ll).
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/05663c9a51b5/disk-3baa7ba4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/53c6c5e94629/vmlinux-3baa7ba4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/021068ae9d1c/bzImage-3baa7ba4.xz
+That said, good to have this backup for senders that fail to do so.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e044a9b6370ed8ca9737@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	1-...!: (1 GPs behind) idle=1944/1/0x4000000000000000 softirq=18067/18074 fqs=140
-rcu: 	(detected by 0, t=10506 jiffies, g=17221, q=496 ncpus=2)
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:hlock_class kernel/locking/lockdep.c:234 [inline]
-RIP: 0010:__lock_acquire+0xa54/0x2cf0 kernel/locking/lockdep.c:5234
-Code: c7 c6 96 5e 0d 8e 67 48 0f b9 3a 90 31 c0 48 83 78 40 00 0f 84 5f 1d 00 00 41 8b 45 20 25 ff 1f 00 00 48 0f a3 05 9c b0 a0 12 <73> 10 48 69 c0 c8 00 00 00 48 8d 80 70 73 e3 93 eb 32 83 3d 63 40
-RSP: 0018:ffffc90000a08b40 EFLAGS: 00000047
-RAX: 0000000000000000 RBX: 00000000aa3bd169 RCX: 0000000033b37d7c
-RDX: 0000000000d3daf7 RSI: 000000004fa421e6 RDI: ffff88801de98000
-RBP: 97064f2600000000 R08: ffffffff84bcde63 R09: ffffffff9a701a18
-R10: dffffc0000000000 R11: fffff520001411ac R12: ffff88801de98c08
-R13: ffff88801de98c08 R14: ffff88801de98000 R15: 0000000000000003
-FS:  0000000000000000(0000) GS:ffff888125376000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fff903adf52 CR3: 00000000768b2000 CR4: 00000000003526f0
-Call Trace:
- <IRQ>
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:132 [inline]
- _raw_spin_lock_irqsave+0x40/0x60 kernel/locking/spinlock.c:166
- debug_object_activate+0x83/0x580 lib/debugobjects.c:835
- debug_hrtimer_activate kernel/time/hrtimer.c:485 [inline]
- debug_activate kernel/time/hrtimer.c:528 [inline]
- enqueue_hrtimer+0xa9/0x2c0 kernel/time/hrtimer.c:1109
- __run_hrtimer kernel/time/hrtimer.c:1946 [inline]
- __hrtimer_run_queues+0x4d2/0xa20 kernel/time/hrtimer.c:1994
- hrtimer_interrupt+0x44b/0x950 kernel/time/hrtimer.c:2113
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
- __sysvec_apic_timer_interrupt+0x102/0x430 arch/x86/kernel/apic/apic.c:1067
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
- sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1061
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:lock_acquire+0x221/0x350 kernel/locking/lockdep.c:5872
-Code: ff ff ff e8 f1 3d 09 0a f7 44 24 08 00 02 00 00 0f 84 3a ff ff ff 65 48 8b 05 db e8 98 11 48 3b 44 24 58 75 33 fb 48 83 c4 60 <5b> 41 5c 41 5d 41 5e 41 5f 5d e9 40 31 0c 0a cc 48 8d 3d c8 dc 92
-RSP: 0018:ffffc900001d75f8 EFLAGS: 00000282
-RAX: 22a67b2282df5a00 RBX: 0000000000000000 RCX: 0000000080000100
-RDX: 00000000cfbe58cb RSI: ffffffff8e22b58a RDI: ffffffff8c28b760
-RBP: ffffffff8176f256 R08: ffffffff8176f256 R09: ffffffff8e95cca0
-R10: ffffc900001d7758 R11: ffffffff81b0f020 R12: 0000000000000002
-R13: ffffffff8e95cca0 R14: 0000000000000000 R15: 0000000000000246
- rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- rcu_read_lock include/linux/rcupdate.h:838 [inline]
- class_rcu_constructor include/linux/rcupdate.h:1181 [inline]
- unwind_next_frame+0xc3/0x2550 arch/x86/kernel/unwind_orc.c:495
- arch_stack_walk+0x11b/0x150 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0xa9/0x100 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2689 [inline]
- __rcu_free_sheaf_prepare+0x12d/0x2a0 mm/slub.c:2940
- rcu_free_sheaf+0x31/0x200 mm/slub.c:5849
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x389/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: rcu_preempt kthread starved for 9805 jiffies! g17221 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27544 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5388 [inline]
- __schedule+0x1821/0x5740 kernel/sched/core.c:7189
- __schedule_loop kernel/sched/core.c:7268 [inline]
- schedule+0x164/0x360 kernel/sched/core.c:7283
- schedule_timeout+0x158/0x2c0 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x312/0x11d0 kernel/rcu/tree.c:2095
- rcu_gp_kthread+0x9e/0x2b0 kernel/rcu/tree.c:2297
- kthread+0x389/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 0 UID: 0 PID: 5766 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:csd_lock_wait kernel/smp.c:342 [inline]
-RIP: 0010:smp_call_function_many_cond+0xfcf/0x13d0 kernel/smp.c:892
-Code: 79 45 8b 2e 44 89 ee 83 e6 01 31 ff e8 7a 06 0c 00 41 83 e5 01 49 bd 00 00 00 00 00 fc ff df 75 07 e8 25 02 0c 00 eb 37 f3 90 <43> 0f b6 04 2c 84 c0 75 10 41 f7 06 01 00 00 00 74 1e e8 0a 02 0c
-RSP: 0018:ffffc9000466f440 EFLAGS: 00000293
-RAX: ffffffff81b9c2b6 RBX: ffff8880b863c148 RCX: ffff88802e6c3d80
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc9000466f580 R08: ffffffff903135f7 R09: 1ffffffff20626be
-R10: dffffc0000000000 R11: fffffbfff20626bf R12: 1ffff110170e8169
-R13: dffffc0000000000 R14: ffff8880b8740b48 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff888125276000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555591cba4e8 CR3: 000000000e74a000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- on_each_cpu_cond_mask+0x3f/0x80 kernel/smp.c:1057
- __flush_tlb_multi arch/x86/include/asm/paravirt.h:46 [inline]
- flush_tlb_multi arch/x86/mm/tlb.c:1361 [inline]
- flush_tlb_mm_range+0x5c3/0x10b0 arch/x86/mm/tlb.c:1451
- tlb_flush arch/x86/include/asm/tlb.h:23 [inline]
- tlb_flush_mmu_tlbonly include/asm-generic/tlb.h:509 [inline]
- tlb_flush_mmu+0x1af/0xa30 mm/mmu_gather.c:423
- tlb_finish_mmu+0xf9/0x230 mm/mmu_gather.c:549
- free_ldt_pgtables+0x19d/0x350 arch/x86/kernel/ldt.c:411
- arch_exit_mmap arch/x86/include/asm/mmu_context.h:229 [inline]
- exit_mmap+0x1af/0x9e0 mm/mmap.c:1285
- __mmput+0x118/0x430 kernel/fork.c:1178
- exit_mm+0x1f6/0x2d0 kernel/exit.c:582
- do_exit+0x6a2/0x22c0 kernel/exit.c:964
- do_group_exit+0x21b/0x2d0 kernel/exit.c:1119
- get_signal+0x1284/0x1330 kernel/signal.c:3037
- arch_do_signal_or_restart+0xbc/0x840 arch/x86/kernel/signal.c:337
- __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
- exit_to_user_mode_loop+0x8c/0x4d0 kernel/entry/common.c:98
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
- do_syscall_64+0x33e/0xf80 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fee6db57fd7
-Code: Unable to access opcode bytes at 0x7fee6db57fad.
-RSP: 002b:00007ffdf5f33f60 EFLAGS: 00000202 ORIG_RAX: 000000000000003d
-RAX: fffffffffffffe00 RBX: 0000555591cba500 RCX: 00007fee6db57fd7
-RDX: 0000000040000000 RSI: 00007ffdf5f33fbc RDI: ffffffffffffffff
-RBP: 00007ffdf5f33fbc R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffdf5f34038
-R13: 0000000000000002 R14: 00007ffdf5f34218 R15: 0000000000000000
- </TASK>
+> The header used by the hsr stack corresponds to the ethernet header for
+> the "first" part so the protocol member is at the same position.
+> 
+> Use eth_header_parse_protocol() for the hsr_header_ops's parse_protocol
+> callback.
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  net/hsr/hsr_device.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+> index 5555b71ab19b5..a999ddccc46c5 100644
+> --- a/net/hsr/hsr_device.c
+> +++ b/net/hsr/hsr_device.c
+> @@ -247,6 +247,7 @@ static netdev_tx_t hsr_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+>  static const struct header_ops hsr_header_ops = {
+>  	.create	 = eth_header,
+>  	.parse	 = eth_header_parse,
+> +	.parse_protocol = eth_header_parse_protocol,
+>  };
+>  
+>  static struct sk_buff *hsr_init_skb(struct hsr_port *master, int extra)
+> 
+> -- 
+> 2.53.0
+> 
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
