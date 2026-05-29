@@ -1,153 +1,134 @@
-Return-Path: <netdev+bounces-293113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293114-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHsiK1+OGWpTxggAu9opvQ
-	(envelope-from <netdev+bounces-293113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:02:23 +0200
+	id MFaVKveOGWpTxggAu9opvQ
+	(envelope-from <netdev+bounces-293114-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:04:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0377E6029C3
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:02:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA92602A28
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:04:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5CB973006239
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:02:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF3E53062F54
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C80F1EDA0F;
-	Fri, 29 May 2026 13:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DA42D3A7C;
+	Fri, 29 May 2026 13:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3HhoUKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD041E7C12;
-	Fri, 29 May 2026 13:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139801E7C12;
+	Fri, 29 May 2026 13:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780059733; cv=none; b=UunginIIpIeiyRvn/6zNK3wSChZrA6tw2bNi4aPayXzf+6qN/MXRCaVOjli/eQ9LUAgH3tuwPWmqcqxHsWWffH/AqAvvK8wsltzMUBxsMtJHvKFQGrbX0OnBOl+MFnLyxz7RYwF6CXDkJwUUcCUwA9eEpfDWDi//KDSsIefs/u4=
+	t=1780059768; cv=none; b=amX1z/I181LsImE9srklGKSnhzq24W3aCG2g1y99Gi8o7o6HGqKNaeU5zGC29weuEeQqF/fyl+UTl3NoXMnXL2qP2JLBpmtVNzJ/FkPBuE1v6P29FYIquUWOG9a0JwYZ1xHC1ZmM7/s7CLd+VVXLN9ISoYLMq4tTAMdWEepOMDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780059733; c=relaxed/simple;
-	bh=LukTOanwzR6Wr1bleanXRdsWVsb7HblPMSLowdokg/c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AkFw8CbJ0aChcHDpVXpM7U2IMPv4Wnq6AX68yv1Qz1wmAAMO4uvO+00BVyzERpZ0EoYehEdtROdeRvF4bBkL4lkg6W5exYBXpONExkZx6njP8kmbnSP0OSD1KCbeZ2XCtWso5uZIqftzJmzI52hCn5mzpKvTyq6uPuKDJKtx3RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.237.72.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowAC31L47jhlqzRE9AA--.23852S3;
-	Fri, 29 May 2026 21:01:50 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com
-Cc: achender@kernel.org,
-	yanjun.zhu@oracle.com,
-	guanglei.li@oracle.com,
-	davem@davemloft.net,
-	santosh.shilimkar@oracle.com,
-	junxiao.bi@oracle.com,
-	yuantan098@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	xuyq21@lenovo.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net: rds: clear i_sends on setup unwind
-Date: Fri, 29 May 2026 21:01:44 +0800
-Message-ID: <5a0f7624bb9845a7b67d26166a150b59e7f394ce.1779632468.git.xuyq21@lenovo.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1779632468.git.xuyq21@lenovo.com>
-References: <cover.1779632468.git.xuyq21@lenovo.com>
+	s=arc-20240116; t=1780059768; c=relaxed/simple;
+	bh=ApQz1V5CNU9O9EyceeC74ecs8b38MRpfa33XpuXW5mI=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Ps9VXsqyKftbQpcKIUKS3fsi4nMkfbn1bLr8GC69D30TWPyZIp6evV9blVCGfbVgBLzIqrYGgSwZ7QzieJSvFF9HzWdSVuL+p5MyC+ziNtC6D6rbnCYtwIK5IbulP26/rEfHPxUq/qZmIdwLG0xipnFrkgjbIIDtDu0fFwXCC50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3HhoUKR; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 757FE1F00893;
+	Fri, 29 May 2026 13:02:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780059767;
+	bh=66jwmabnss1wzjbJ/pG7HLmk7a00oOo/dxDfODb4vpU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=E3HhoUKR/eThbMY+4+yrcHlS/pZyyLblbZn4d5+FNHlnJnEnizR352OFGeJTuCB/1
+	 fPEhuVfPJmr4NEfbWTKB0lHtHEPAjdcvACXXpCx8RwZZRfBH9Xpv2JHt6LoD9t2vyQ
+	 Io2fAnOB/CXyhFowtOqWtinEWkqw5c0UX/yWQw18xPOEGp/Gd0FCB9W66tKyyJWy/1
+	 sK0LuTYiEzwtdlVVDZH5dlH/pOkreTi1ZRDeUqQsJRzzEO8ivUCJK5DZjcWDYOJaym
+	 KFKrbDa46wfJC+p6Ioenp6HPCLM48/ac5dlXEfTJJyrJN1gstWyZUyrvcTU02aRhNh
+	 he+jdftUvhVKg==
+From: Srinivas Kandagatla <srini@kernel.org>
+To: konradybcio@kernel.org, andersson@kernel.org, 
+ Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+Cc: linux-kernel@vger.kernel.org, Alex Elder <elder@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Jeff Johnson <jjohnson@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+ Kees Cook <kees@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>, 
+ Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+ ath11k@lists.infradead.org, ath12k@lists.infradead.org, 
+ linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+ linux-sound@vger.kernel.org
+In-Reply-To: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
+References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v2 0/4] Use the QMI service IDs from the QMI
+ header
+Message-Id: <178005976216.10291.3509337895172854457.b4-ty@kernel.org>
+Date: Fri, 29 May 2026 14:02:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowAC31L47jhlqzRE9AA--.23852S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFW5JFW8Gr18AF48Cw13CFg_yoW8Gw17pr
-	Za9rsrKFZrtryjka1DAF1I9F129ws3GrW7GrZF9ay29w4DJr92qryv9rWY9anY9rsxWFWY
-	qr1qvrnxZ345ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
-	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
-	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0CCWoZTE8FRwAAs1
-X-Spamd-Result: default: False [-0.96 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,oracle.com,davemloft.net,gmail.com,lzu.edu.cn,lenovo.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-293113-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293114-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.958];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	DMARC_DNSFAIL(0.00)[lzu.edu.cn : query timed out];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 0377E6029C3
+	FROM_NEQ_ENVFROM(0.00)[srini@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4BA92602A28
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Yuqi Xu <xuyq21@lenovo.com>
 
-The RDS IB connection teardown path is written so it can run during
-partial startup and on repeated shutdown attempts. It uses NULL
-pointers to distinguish resources that are still owned from resources
-that have already been released.
+On Mon, 16 Mar 2026 18:14:10 +0100, Daniel Lezcano wrote:
+> The different subsystems implementing the QMI service protocol are
+> using their own definition of the service id. It is not a problem but
+> it results on having those duplicated with different names but the
+> same value and without consistency in their name.
+> 
+> The QMI service IDs are defined in the qmi.h header file. Use those
+> instead of defining the IDs in the protocol implementation file. It
+> will result in unifying and providing a consistent way to represent
+> the supported protocols.
+> 
+> [...]
 
-When rds_ib_setup_qp() fails after allocating i_sends but before
-allocating i_recvs, the sends_out path frees i_sends without clearing
-the pointer. A later shutdown pass can still treat that stale pointer
-as a live send ring allocation.
+Applied, thanks!
 
-Clear i_sends after vfree() in the error unwind path so the existing
-shutdown logic continues to use the correct ownership state.
+[3/4] slimbus: qcom-ngd-ctrl: Use the unified QMI service ID instead of defining it locally
+      commit: 05f3f5984121e1956867b309c76a750c1d4c9682
 
-Fixes: 3b12f73a5c29 ("rds: ib: add error handle")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Yuqi Xu <xuyq21@lenovo.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/rds/ib_cm.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/rds/ib_cm.c b/net/rds/ib_cm.c
-index 0c64c504f79d..4001de0c4959 100644
---- a/net/rds/ib_cm.c
-+++ b/net/rds/ib_cm.c
-@@ -656,6 +656,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
- 
- sends_out:
- 	vfree(ic->i_sends);
-+	ic->i_sends = NULL;
- 
- ack_dma_out:
- 	rds_dma_hdr_free(rds_ibdev->dev, ic->i_ack, ic->i_ack_dma,
+Best regards,
 -- 
-2.54.0
+Srinivas Kandagatla <srini@kernel.org>
 
 
