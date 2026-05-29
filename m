@@ -1,202 +1,183 @@
-Return-Path: <netdev+bounces-293091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293092-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGQ6HfJ3GWrewwgAu9opvQ
-	(envelope-from <netdev+bounces-293091-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:26:42 +0200
+	id KHQ1KZx3GWqwwwgAu9opvQ
+	(envelope-from <netdev+bounces-293092-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:25:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7846601960
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:26:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41A53601951
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B17DE30238ED
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:24:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 89FA430394D1
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 11:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136603BF694;
-	Fri, 29 May 2026 11:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F34C3BD638;
+	Fri, 29 May 2026 11:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="06y/6K51";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rjlNw/QX";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GTrv1T6L";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nyueWRl1"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FjOTF4RG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A996E30568E
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 11:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEAF3BED37
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 11:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780053853; cv=none; b=YmY6vyV2E3B+R7RK/HKds2FtCMB9WNzxRvud3fUTUFvUGegfuI1z6vqy50swfMAkQ8qb1DVaMIprhLYDAgrVaI1d9mD5McxE0rynML1/YV3cTu6v/QT/abgw8VeQ+ID+I8AIzSrPChqLuBqCFkYMZ+rZbHoO4BtMCp6qsmUYu0Q=
+	t=1780053914; cv=none; b=dH/VTsplMdoIvMWImNwgT1dySDyK+X4zwo6G82ieyWbTfYmT4Fo+HeEWwr4ITREKsmbiRwBEXSqQAemP4yqegx81qp14Zw3nwlpnreFfq2PSJizPhXr9ZQA1p2KpdxuNeGA7Xj4E4MBzc1VZsxCYfD2E7v/6j5uW4u3XligTzVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780053853; c=relaxed/simple;
-	bh=B1y96rqGwNSiG9tkqeRlG4pFEWX/QUJYaUyiOpBN5nA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uS1VaNwBQaVW5KWT2rLB85WvY2plQ9vaeZxmkwCEDTlK5Wj1Rc/ZNnwveOEJyPlCXGXIJXf70yiwwGqabWsyPExF/k+Oxb6DtUEZnPFgrIJnhdeaW5apV9ASVPTwrBSk4e9jkyrXdOXY+gGUz0SMUwNyzd4ybBpbbjM1knuEeew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=06y/6K51; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rjlNw/QX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GTrv1T6L; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nyueWRl1; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id DD4B866D88;
-	Fri, 29 May 2026 11:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780053850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YTn2G8m1Cj0tWjuCma31TyjVpPXr8sPbadJLHAXAkQc=;
-	b=06y/6K51PjLADS2+PB0UNbSj290BsklO5wS6klkGm3aPWpmH7OH6yrZ5yXcEwyh0NB89sA
-	tHU3nHZDysdCw+mbL/0MTJoJ7yXZ6KWiPM8ZBTdUj8dCd9tgstZPjXwII0ajt89Fx18cUW
-	sh/sgsm260N0+lmbMe5o+01ZMw7067c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780053850;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YTn2G8m1Cj0tWjuCma31TyjVpPXr8sPbadJLHAXAkQc=;
-	b=rjlNw/QXzLzyiKOOHuuZq853SosZk1ZGcX5wYwetCCdFuOSBE3Dh+vzi3QE8S2YEcDOpmp
-	9RnV+XrNG783+nDg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780053849; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YTn2G8m1Cj0tWjuCma31TyjVpPXr8sPbadJLHAXAkQc=;
-	b=GTrv1T6Lby9aBA3hN7+5mkQuQqxrANZM+y1haxskf0srzfynQZqpXiwZ+yrHr/6xfKXoIi
-	4j3scFuVqahJRUGQLm2rLG43oZqS0PpxYPUW1kceMigf0vppcl8tmu6mE5RSy+A1kcixUh
-	f2T1IYrh/hKAc3ROSGGB1o+svgYj7tU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780053849;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=YTn2G8m1Cj0tWjuCma31TyjVpPXr8sPbadJLHAXAkQc=;
-	b=nyueWRl1bEuOoN52wRm8WFjS0O99hf+c/mRHrhYsPpYIlQ+D5dc2O9yYjwHpHROUHj7t7h
-	t5udXbKgNZ3lDfAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 21D0C779A7;
-	Fri, 29 May 2026 11:24:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id FsdABVl3GWo1SAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 29 May 2026 11:24:09 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: yuhuang@redhat.com,
-	justin.iurman@gmail.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	idosch@nvidia.com,
-	dsahern@kernel.org,
-	sbrivio@redhat.com,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	Chris Adams <linux@cmadams.net>
-Subject: [PATCH net v2] Revert "ipv6: preserve insertion order for same-scope addresses"
-Date: Fri, 29 May 2026 13:23:57 +0200
-Message-ID: <20260529112357.5079-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1780053914; c=relaxed/simple;
+	bh=+eeiEBiwDZXVf/Yma7+wmUZ8/hJ44CuOx99QZtohDuA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dEg8/TvQtW4VKEoRxD9DUroXMFXCUIQDSaUbQ7wSqBGDjRrjPYKedX9HCgF1bhoAWkrSGVvbwrc4cfPsgwLcgeSMu4xe6+KTb1NWBIHFXSFuFBQdMEO+10CtGLGNTx8W4uuHQWJOKGP2flL/BS/v6wzMq0KbYldLO/pF154ASAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FjOTF4RG; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6877c719cb0so13503628a12.2
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 04:25:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1780053911; x=1780658711; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gmDRBBHbIK5C8fg4LKh05CW96seLA97Tj4DFPrfVyQE=;
+        b=FjOTF4RGUruGp3myvrkKyUq5cbbTqx+MlYfvgVOwzUfOO+Eh4uImYbXFmUIgK/OJG8
+         IGKy+7pqCvhLDt29Hw1kNlE/bWzF6/zE0hdGvZVXzbRr72YFzpS5MieC+dElsad8Nc6F
+         OnxpvvU8YrJl/XYkpVsVHuK+n+JmW5JOqQSxNaMChDvCJB6KecO8O1fmVUmohiI1Vq8r
+         LjGAWkLqeVTY8X3yYv+vIIP4vjNLsw41cNbg8CVr6Bk30q95rBL9km2V7vUDEDd1wnih
+         d14yB7no2oVhClIEO3j1GU0/y3Aye6zCR31PsDqxZevm4hlpRYOmXsFJgITyRcG3Zl/C
+         QOdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780053911; x=1780658711;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gmDRBBHbIK5C8fg4LKh05CW96seLA97Tj4DFPrfVyQE=;
+        b=F6opBNvFfaKPrQdqCjdCkdBZW40HmjHO+qLDX4Q0IGxeGv07/1YwQmtOghLPmkG59q
+         yZz/xDLwKjj6Rwa9t3PaVJGVfhQnJ0ODMEvaHsgc/dOyeShQMCXJq6mHAgbesFSzECC+
+         IbLH80XOkE9p/5OtTRk/2tCeimCHEQevYanSKjvo44q8Z2pYOatFmE+46uOmtz/1V9VI
+         BibPO8KcYQ9wfx60B8YHW7YFHH3f4V9xob0MZZaUON7evT/NoznjMimPQEqglDnVuEHa
+         YHfgB6Bk19AsgfqGoVXHfkWmBgqMBDAO5M+uYoWFPb+9zk9ORjx5E+r3+Cv/vFing69k
+         FkQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/y1XfhHQSZ5qOfTSajrbwObR9FT+56vLDN2EJMmjdWVqXNKoaaHtmQhB3S2GthQ2/EXRiF/4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFnJKXR+Ty0hFIsZA6lazBYc5bpxkTwtJvza3221671a1T3iF1
+	EF3z/IxtCbhMeva8oqtDjDIWOPV4G9A6TVg74BlJQ4PTYxoWJoACtTHOE6iTURx3mv4=
+X-Gm-Gg: Acq92OFfZeIek1ppkXu6yKIjI2x3Sd7hIamd6goVZW4n++7hfeffrssi2JjuZ0yguPy
+	LWeEnFFRuMloQmEv+v/cN0YdHR1Uofvcm7HPbRbi6qi4Nv7eGDWROBJOaidpuTIUKfnWl0idcub
+	wF3gMLFw3GcdsEM9NMkOX2KdmqKESoTHcSFU8jRUIi8mW+se8w6Lez78uSV5iQNyDJ3Qnz4KpwF
+	L5EqYhFad/0AlQfbuDY38ZGsK/pFp0Xbcy2oMc90M7tccuiNXq9TLxNwsP5m2RvmaAIirCUneiF
+	MzyNBzwbs7upLL46EQARL3dp34AiOboQfTNSC0zJi02WGbD7tbBSszhahmVVa7TW9hHd3sEOVud
+	a+rHlW5tsB2qLDCUV/sWjZoa+ykmYzzKA2k/d+c19GOpQ7WC7908UhGA2kywcD+SXhflIkhmYhZ
+	Cy/OlqDjsDghYmD097sUoreqB9+hu8a2BMotYq
+X-Received: by 2002:a17:907:2670:b0:bc3:7893:3bb1 with SMTP id a640c23a62f3a-be9cfd86f70mr93544066b.41.1780053911240;
+        Fri, 29 May 2026 04:25:11 -0700 (PDT)
+Received: from cloudflare.com ([104.28.21.182])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-be9d63c35easm57312866b.51.2026.05.29.04.25.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 04:25:10 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  michael.chan@broadcom.com,  joshwash@google.com,  tariqt@nvidia.com,
+  haiyangz@microsoft.com,  linux@armlinux.org.uk,
+  maxime.chevallier@bootlin.com,  willemb@google.com,
+  ernis@linux.microsoft.com,  sdf.kernel@gmail.com,
+  kory.maincent@bootlin.com,  danieller@nvidia.com,  idosch@nvidia.com
+Subject: Re: [PATCH net-next 01/14] net: ethtool: cmis_cdb: hold instance
+ lock for ops locked devices
+In-Reply-To: <20260528231637.251822-2-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 28 May 2026 16:16:24 -0700")
+References: <20260528231637.251822-1-kuba@kernel.org>
+	<20260528231637.251822-2-kuba@kernel.org>
+Date: Fri, 29 May 2026 13:25:09 +0200
+Message-ID: <87h5nq5uga.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,suse.de,cmadams.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,bootlin.com,linux.microsoft.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293092-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-293091-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: C7846601960
+X-Rspamd-Queue-Id: 41A53601951
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Chris Adams reported that preserving insertion order for same-scope
-addresses is causing SSH connections to be dropped after stopping a VM
-while running NetworkManager.
+On Thu, May 28, 2026 at 04:16 PM -07, Jakub Kicinski wrote:
+> FW module flashing was written so that the flashing happens
+> without holding rtnl_lock. This allows flashing multiple modules
+> at once. Current drivers can handle that well, but we should
+> let drivers depend on the netdev instance lock. Instance lock
+> is per netdev, and so is the module so we won't break parallel
+> updates.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  include/net/netdev_lock.h    | 6 ++++++
+>  net/ethtool/cmis_cdb.c       | 3 +++
+>  net/ethtool/cmis_fw_update.c | 8 ++------
+>  net/ethtool/module.c         | 2 ++
+>  4 files changed, 13 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+> index 3d3aef80beac..f4c77899fb86 100644
+> --- a/include/net/netdev_lock.h
+> +++ b/include/net/netdev_lock.h
+> @@ -80,6 +80,12 @@ netdev_ops_assert_locked_or_invisible(const struct net_device *dev)
+>  		netdev_ops_assert_locked(dev);
+>  }
+>  
+> +static inline void netdev_assert_locked_if_ops(const struct net_device *dev)
+> +{
+> +	if (netdev_need_ops_lock(dev))
+> +		netdev_assert_locked(dev);
+> +}
+> +
 
-NetworkManager caches the IPv6 address configuration, when a RA arrives,
-it determines the list of addresses to configure and checks if the
-addresses are already in the right order in the kernel. If they aren't,
-NetworkManager removes and re-adds them to achieve the desired order.
+Nit (because in the kernel naming is a competitive sport):
 
-As the order changes, NetworkManager is confused and reconfigures the
-addresses on every update. In addition, this would also affect to cloud
-tooling that relies on IPv6 addresses order to identify primary and
-secondaries addresses.
+How about we name that netdev_assert_locked_ops() so it's clear that
+this checks if netdev_{lock,unlock}_ops() has been called?
 
-This reverts commit cb3de96eea66f5e4a580086c6a1be46e765f97f4.
+I'm guessing the intention behind the name was to make it
+distinguishable from the legacy netdev_ops_assert_locked().
 
-Fixes: cb3de96eea66 ("ipv6: preserve insertion order for same-scope addresses")
-Reported-by: Chris Adams <linux@cmadams.net>
-Closes: https://lore.kernel.org/netdev/20260521135310.GC977@cmadams.net/
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: updated commit description to make it more accurate
----
- net/ipv6/addrconf.c                  | 2 +-
- tools/testing/selftests/net/ioam6.sh | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+My suggestion would be to rename that one to
+netdev_assert_locked_ops_compat() following the
+netdev_{lock,unlock}_ops_compat() naming scheme. That should avoid
+confusion and provide a clear signal which one we're phasing out.
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 5476b6536eb7..bb84a78b80f6 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
- 	list_for_each(p, &idev->addr_list) {
- 		struct inet6_ifaddr *ifa
- 			= list_entry(p, struct inet6_ifaddr, if_list);
--		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
-+		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
- 			break;
- 	}
- 
-diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
-index b2b99889942f..845c26dd01a9 100755
---- a/tools/testing/selftests/net/ioam6.sh
-+++ b/tools/testing/selftests/net/ioam6.sh
-@@ -273,8 +273,8 @@ setup()
-   ip -netns $ioam_node_beta link set ioam-veth-betaR name veth1 &>/dev/null
-   ip -netns $ioam_node_gamma link set ioam-veth-gamma name veth0 &>/dev/null
- 
--  ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
-   ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
-+  ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
-   ip -netns $ioam_node_alpha link set veth0 up &>/dev/null
-   ip -netns $ioam_node_alpha link set lo up &>/dev/null
-   ip -netns $ioam_node_alpha route add 2001:db8:2::/64 \
--- 
-2.54.0
+Symmetry is beautiful :-)
 
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
