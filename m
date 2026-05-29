@@ -1,330 +1,252 @@
-Return-Path: <netdev+bounces-292976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOVYKpIfGWqnqggAu9opvQ
-	(envelope-from <netdev+bounces-292976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:09:38 +0200
+	id OAbCJ90fGWqnqggAu9opvQ
+	(envelope-from <netdev+bounces-292977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:10:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E0D5FD40D
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:09:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 180F75FD41E
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6C922302BFEF
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:09:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6ED9A301876F
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF88738B125;
-	Fri, 29 May 2026 05:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6765B39D6F2;
+	Fri, 29 May 2026 05:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iv/sBu/R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E7439F160
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 05:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780031372; cv=none; b=X/TWI2cc8HZI2iMIOPSEnv30AI4VA2Ymv+j/rJ0J9GmZlBuT5rigSaBX/7/cDMW4nNRMRT9SRbiQ+cM2EH1B1Rz9SL0B1UjKgX5sfTL5oFZjLBiycWG0NWSEjAHTaabmOneiLrVGN0tgLNPnh0lptlKvXpueFEGv87xmvj9VAl8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780031372; c=relaxed/simple;
-	bh=NKcYTPIYqr9Ob6XL6Udn/Il6DnixJy3CvjNRe2/6RC4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=m3DVNQ/li3a/ZzAqeUPRIXtNUmHF6usDtAIWPr+43lL0hT3MUEURIUhV5nQ9vtmLW0ZV7huOBEVHqAOk7JkaZtk/ezgu1cDSVRDYKpDHbca8gG+iWRn7QKSV0s84iHn6a3zkWXB073Ugyny6pwMI+vFSYdClH4latJAU0H8Xuy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-69d874805ebso8652544eaf.3
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 22:09:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD753203B6
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 05:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780031448; cv=pass; b=XL9rCSx6Seqgeo2puDgD13s1xvix4TP7pwbxtsVNW0i3Sd8giQnUfDEyqzJtA3Qu0SAAlzGRLepcXhjnnvVExDle9eTX/VCCWP+Y5mEYY7yp74ZFEtB+7rSQpZLQz46wM47ZXxSOKP/ypWHKA6I+OEfQgHHAhBXYD+TMPMvTN8o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780031448; c=relaxed/simple;
+	bh=CYEw2YeoAn35uS0CcPFkQrw4+W6XQ+Mkl9K7qLxMueY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g4xSXoLptKpg3tTMuOjqCKjhMRKQ+d1F38j/QWxOg6cXS0Ic/3Y5bFeMlGRsw36Od+xt4uUfN2qylXHNlb2nnVuUEaBd4tZHHuQfr/IrXiHX1SO4pU4wTH/JJkVjlIa5hWrIgFJzV0/j9R8wZPD6mbF5QpaR9iHLaoPTxGgW9Sc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iv/sBu/R; arc=pass smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-137bd9ed2b1so126037c88.1
+        for <netdev@vger.kernel.org>; Thu, 28 May 2026 22:10:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780031446; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Ic+mqIPO0CI+6zQohtzJaEimFu9ninwrenD3kEPBh3jewp7f43nwSwstfoocxi/n4J
+         ZYKtrTzvJz2PZE3o3+Mc0D4XjvWiTcjfBx/tZHva6+MFiAJ+rBkStz+yP/rIBfNd7cKc
+         DiL4g/Wqget82/Ki44EMJ11F4VhJJtLYSMct/pXV6BQqDUJI0St0Seo86Z2AMMrCd7DW
+         Y0L7qSBdKE2+6xkJtA+5mKQgVKMVVS3yzZ8KFEegNreWOse49TeYQz8mjhw13qb4nlbh
+         NocqKk0MnrD8pvhFXUijypHSDhWDf88LWXlKR/es//BLrD1c+zQ/+jDyc/C5tjxB6uuZ
+         70fQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mGClNqfUWqmlW8qDs35RSdNZnllW/VcSASYHNWdskbA=;
+        fh=7x/LyHY5pE8qn1lx2Vvk+OlVE01WjBNeKeKrfu5D7J0=;
+        b=iCYXEC/IPkGc69BPfng9IJkVdsGBbSih/5q8freL1KmUvZf/q9ho48sXTkwC2XnVuL
+         mdZuUQYR/Y2gFCWmmRTLLdx/tzvHreZK9332ZwukBgn+P96iCCeKOQAjEvshBLjS/c8+
+         qmuIt/bs+AEySXIlEqzeIGo/mlzK1sQeCFLKTa3ssaqGit4dmlnyH0rvThmnWm+1b4oY
+         3E+0kM3qiPRFjPFF7KM9y0pM3R7qClkt7EQ3WAGg2jcO8omtJlJRKTolXmCKlbWOKcrq
+         2Np7nD/FUkKnuYNJ2PxN7fVUgNGcR/YWPz1fcRady2ipxi0bYRuHvokZowWxigdqxHps
+         +Khg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780031446; x=1780636246; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mGClNqfUWqmlW8qDs35RSdNZnllW/VcSASYHNWdskbA=;
+        b=iv/sBu/RYslKSualZ8pV+8Zem4KK6mbRedWawnvTdBqvx5UcWzkwPOq8K1+5pPM8l7
+         If8szuTy4Oz67kFG5ZyY/pKDzWRZr41iUqoxHOxagAHBfJFpkf3dIrhBpmAyiau+9w6q
+         Cpr50FNVJZ25+g8arUms2IQ2a9V/4w3Ix9USTxKAWKFXFSV1gNMLiu561u3ModrQWWy5
+         JQgG+K2ueEyEtPzcD8i6MDFZGHpggx5w/MelkmItSdCz3oEpDEgGim5S0uTQO+N/qYYS
+         mEp4niCb/iv3vurpSIZey4e5fLNHNV08H4c7Q6Ph1iP37ZM/FuBTEgDU5ZyRuyJsHG1v
+         IMZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780031367; x=1780636167;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v1eTMW0iN770HO3o9T8tICVeXH1P+QKE795ALLtpRqo=;
-        b=SNVMDmGDJ6dZQarOCYNUeh7ADI9c+dD2gXIuOamHUgwmv3e5bDyhWiejBSdjPo2Y4Q
-         nq1FOf6X23zz/aL+ye8ZQMi2HxS4pip6yprdKaCXtJk6GnV8Mu0tjJebv8WzDbluq2d+
-         3mu5wU2qYGLOW+2eUo++Ryem/8zP8wOCA7EniMeUxHAMkt4UtMU6Fs6sk5jr6ZmOHYUf
-         NnQq24nIU2+Vtwz8twg3NN/fxybaNeStySYvFuFGqIw8uWIdlqo3bGIneCY+mqsMSfDV
-         tzDKKpe4ei9TfV9gkrAJ9yFsO5sG6EG6iiezqAwKsZOSpjBYyiw37C0kvFD64e+KbL/9
-         WOKA==
-X-Forwarded-Encrypted: i=1; AFNElJ/gIvM5ogkvRMkcis2/uTIROXmjBU0rCiYGuOiEn83rg8cyHeKhlu1ponZ1eKrBT7JDE6Hv7cA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw65uZZ9HFTMcWsqnAX315NoCrCm4CkUdtovyiKGwXQ81vIiRhm
-	YXkR9c9foIPJng50+1A+UJB0PLBUo/2Y0HiXGMNZMTHZhkEqtP0j5Vli+bH54oaYSF+4or3bafn
-	vIWGhnQAVu6qstsXzaOKI7hyM+5KeCYltnkEAXZIZ7c5rEX9esOipNAWRohU=
+        d=1e100.net; s=20251104; t=1780031446; x=1780636246;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mGClNqfUWqmlW8qDs35RSdNZnllW/VcSASYHNWdskbA=;
+        b=gStOtecdZ5CPw00sMVsbbnvWeiTt9m2JegpAPSYPKTolI4s1nqDr2D15Mz6Ffb//Fn
+         fPJKo8ql534Sb2iEBewBdh3BeSemMN9nQ4wEXh60J14GldqKzk/lRCME7pK0nMNsAbk9
+         NBQSt09NF15DoC5wu0ZKeiMssYPXLbkYWuz+ElrI3W4BOSxk8H36qH6E59V247OG1Hmb
+         gPj9M5Y/spMdmPZgO5m3xH0tysis/giAgPMI0eNrdzspmll161/xSzEATq+gnEthpWZd
+         jDG4E1jpiJF1Ly0amT1kMxuXW35oWQrZYLLJSKFQGq2ZQg+469vQBjp+KOqRvun8rO7N
+         oCUw==
+X-Gm-Message-State: AOJu0Yw77cARhQFX4pu79PbEunowzrxk3cN5Qo+uvETilpMCRz6zTGkW
+	3fnYyZLCx77+S11ysc/lOC1dG8RycA3jOYbpb1wh9LGdzOLKAjH1ekYHPHLt8ug06B9eYGNDtxu
+	NFSVzPyb1DMMjENvN+okYqgmW9W6az/hJDzrNXyYW
+X-Gm-Gg: Acq92OHp61XgFWHe/QfnWbsMtE723HqIyxojXRzcEPjndhgEPyrodoPfiUfLPLIQWGL
+	zpzzGiOJtsegIWkvXMS5wPw2kTFd8jQnpKTzMznu29i9IkZom2oOrNYfUx892UPbSx08XKGXXPH
+	PJiu69Iedse3+6rGU+rnI9raUw9TPLpXOKr9MTyJJFKtJjHlhx53A+yjEEvOx1ViXAApyPYpTJw
+	7Qj1wqetYuJDSGFnyXHE7Q2hZb+x076BQQaptKUY3VF/XFedGP/HI0K/6MeCnNC8Qv5tCmtqDmJ
+	t1r61Wn1Rjsz6YhkoJh475U5aAARIqoTdrjo/qGtNExP6KXP0aFIYkhY+TMI10LxPTK+ngUYC+k
+	gZAtsF7XgkNeNtReVFmEIRrbvx3FEwdHIJeLcl/F6fV56pjt6KCF0eiirE3YUdnk=
+X-Received: by 2002:a05:7022:458d:b0:12d:de3e:cbfe with SMTP id
+ a92af1059eb24-137aeeebfbcmr592760c88.37.1780031445432; Thu, 28 May 2026
+ 22:10:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1f02:b0:69d:d439:b222 with SMTP id
- 006d021491bc7-69e03f01429mr773234eaf.14.1780031367463; Thu, 28 May 2026
- 22:09:27 -0700 (PDT)
-Date: Thu, 28 May 2026 22:09:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a191f87.ce022c6e.138e56.0003.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in ipv6_chk_acast_addr
-From: syzbot <syzbot+819eb928d120d2bdad0e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, idosch@nvidia.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20260529032026.363856-1-jiayuan.chen@linux.dev>
+ <CAAVpQUCJxaPTsA8DJ-KzPpWM2_GQr1LBHfdyEo9ziCA4sEqv-w@mail.gmail.com> <2a64dc4a-ad65-4fbf-a505-f4813886629b@linux.dev>
+In-Reply-To: <2a64dc4a-ad65-4fbf-a505-f4813886629b@linux.dev>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 28 May 2026 22:10:33 -0700
+X-Gm-Features: AVHnY4J7RK_HRj4ZOWhSo1vuYylwWT2QM3QzqUYq1huzp-Tyui3iOidE2JInimI
+Message-ID: <CAAVpQUDHX9o-hRJr8=OFOCac9jSTU-Cu7OUyZSJLf+r6HPFfZQ@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: anycast: insert aca into global hash under idev->lock
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=17ab782ed835fc0e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-292976-lists,netdev=lfdr.de,819eb928d120d2bdad0e];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-292977-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,syzkaller.appspot.com:url,goo.gl:url,storage.googleapis.com:url,googlegroups.com:email]
-X-Rspamd-Queue-Id: 20E0D5FD40D
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 180F75FD41E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+On Thu, May 28, 2026 at 10:03=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.d=
+ev> wrote:
+> On 5/29/26 11:41 AM, Kuniyuki Iwashima wrote:
+> > On Thu, May 28, 2026 at 8:20=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linu=
+x.dev> wrote:
+> >> syzbot reported a splat [1]: a slab-use-after-free in
+> >> ipv6_chk_acast_addr(), which walks the global inet6_acaddr_lst[] hash
+> >> under RCU and dereferences a struct ifacaddr6 that has already been
+> >> freed while still linked in the hash, so a later reader walks into a
+> >> dangling node.
+> >>
+> >> In __ipv6_dev_ac_inc() the aca is allocated with refcount 1, then
+> >> aca_get() bumps it to 2 to keep it alive across the unlocked region.
+> >> It is published to idev->ac_list under idev->lock, but
+> >> ipv6_add_acaddr_hash() runs after write_unlock_bh(). A concurrent
+> >> teardown (ipv6_ac_destroy_dev() from addrconf_ifdown(), under RTNL)
+> >> can slip into that window:
+> >>
+> >>    CPU0 __ipv6_dev_ac_inc           CPU1 ipv6_ac_destroy_dev (RTNL)
+> >>    ------------------------------   ----------------------------------=
+--
+> >>    aca_alloc()              refcnt 1
+> >>    aca_get()               refcnt 2
+> >>    write_lock_bh(idev->lock)
+> >>      add aca to ac_list
+> >>    write_unlock_bh(idev->lock)
+> >>                                     write_lock_bh(idev->lock)
+> >>                                       pull aca off ac_list
+> >>                                     write_unlock_bh(idev->lock)
+> >>                                     ipv6_del_acaddr_hash(aca)
+> >>                                       hlist_del_init_rcu() is a no-op,
+> >>                                       aca is not in the hash yet
+> >>                                     aca_put()           refcnt 2->1
+> >>    ipv6_add_acaddr_hash(aca)
+> >>      aca now inserted into the hash
+> >>    aca_put()                refcnt 1->0
+> >>      call_rcu(aca_free_rcu) -> kfree(aca)
+> >>
+> >> The hash removal becomes a no-op because the insertion has not
+> >> happened yet, so once CPU0 inserts and drops the last reference, the
+> >> aca is freed while still linked in inet6_acaddr_lst[], and readers
+> >> dereference freed memory after the slab slot is reused.
+> >>
+> >> This window opened once RTNL stopped serializing the join path against
+> >> device teardown. Move ipv6_add_acaddr_hash() inside the idev->lock
+> >> section so the ac_list and hash insertions are atomic with respect to
+> >> teardown: a racing remover now either misses the aca entirely or finds
+> >> it in both lists.
+> >>
+> >> [1] https://syzkaller.appspot.com/bug?extid=3Da01df04303c131efbf3a
+> > Closes: and Reported-by ?
+>
+>
+>
+> It has already been closed automatically, so I didn't add a Closes tag.
+> As for the Reported-by tag, it should be carried along with the patch.
 
-syzbot found the following issue on:
+Closes: is not related to the status in the syzbot dashboard.
 
-HEAD commit:    550604d6c9b9 Add linux-next specific files for 20260521
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1726e47e580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=17ab782ed835fc0e
-dashboard link: https://syzkaller.appspot.com/bug?extid=819eb928d120d2bdad0e
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Also, the moderation is the stage before being sent upstream,
+not that the report is closed, I just published it.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+So please add both tags using this link and Reported-by
+tag there.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ea4e4e647faa/disk-550604d6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5ea9373b711c/vmlinux-550604d6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a2f381baa460/bzImage-550604d6.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+819eb928d120d2bdad0e@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in ipv6_chk_acast_addr+0x2c9/0xb20 net/ipv6/anycast.c:504
-Read of size 8 at addr ffff88805f5cd510 by task ktimers/0/16
-
-CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description+0x55/0x1e0 mm/kasan/report.c:378
- print_report+0x58/0x70 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- ipv6_chk_acast_addr+0x2c9/0xb20 net/ipv6/anycast.c:504
- icmp6_send+0x4c3/0x1b50 net/ipv6/icmp.c:679
- icmpv6_send include/linux/icmpv6.h:24 [inline]
- ip6_link_failure+0x3b/0x4c0 net/ipv6/route.c:2862
- dst_link_failure include/net/dst.h:456 [inline]
- ipip6_tunnel_xmit net/ipv6/sit.c:1035 [inline]
- sit_tunnel_xmit+0xa44/0x1b80 net/ipv6/sit.c:1072
- __netdev_start_xmit include/linux/netdevice.h:5394 [inline]
- netdev_start_xmit include/linux/netdevice.h:5403 [inline]
- xmit_one net/core/dev.c:3889 [inline]
- dev_hard_start_xmit+0x2df/0x860 net/core/dev.c:3905
- __dev_queue_xmit+0x1428/0x3900 net/core/dev.c:4872
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip6_output+0x340/0x550 net/ipv6/ip6_output.c:246
- ip6tunnel_xmit+0x226/0x6c0 include/net/ip6_tunnel.h:174
- ip6_tnl_xmit+0x216d/0x2930 net/ipv6/ip6_tunnel.c:1292
- __gre6_xmit+0xa4d/0xd50 net/ipv6/ip6_gre.c:787
- ip6gre_xmit_ipv6 net/ipv6/ip6_gre.c:845 [inline]
- ip6gre_tunnel_xmit+0xc3b/0xf70 net/ipv6/ip6_gre.c:897
- __netdev_start_xmit include/linux/netdevice.h:5394 [inline]
- netdev_start_xmit include/linux/netdevice.h:5403 [inline]
- xmit_one net/core/dev.c:3889 [inline]
- dev_hard_start_xmit+0x2df/0x860 net/core/dev.c:3905
- sch_direct_xmit+0x251/0x4c0 net/sched/sch_generic.c:372
- __dev_xmit_skb net/core/dev.c:4211 [inline]
- __dev_queue_xmit+0x171e/0x3900 net/core/dev.c:4833
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip6_output+0x340/0x550 net/ipv6/ip6_output.c:246
- dst_output include/net/dst.h:488 [inline]
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ndisc_send_skb+0xd0b/0x1670 net/ipv6/ndisc.c:512
- addrconf_rs_timer+0x395/0x6d0 net/ipv6/addrconf.c:4056
- call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
- expire_timers kernel/time/timer.c:1799 [inline]
- __run_timers kernel/time/timer.c:2374 [inline]
- __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
- run_timer_base kernel/time/timer.c:2395 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2405
- handle_softirqs+0x1de/0x6d0 kernel/softirq.c:626
- __do_softirq kernel/softirq.c:660 [inline]
- run_ktimerd+0x69/0x100 kernel/softirq.c:1155
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x389/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Allocated by task 10052:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_node_noprof+0x27d/0x6c0 mm/slub.c:5437
- _kmalloc_node_noprof include/linux/slab.h:1168 [inline]
- __get_vm_area_node+0x13f/0x300 mm/vmalloc.c:3215
- __vmalloc_node_range_noprof+0x36a/0x1750 mm/vmalloc.c:4022
- __vmalloc_node_noprof mm/vmalloc.c:4123 [inline]
- vmalloc_noprof+0xb2/0xe0 mm/vmalloc.c:4158
- bpf_prog_calc_tag+0x4c/0x370 kernel/bpf/core.c:307
- check_and_resolve_insns+0xbd/0x2510 kernel/bpf/verifier.c:18084
- bpf_check+0x12bf/0x51d0 kernel/bpf/verifier.c:19694
- bpf_prog_load+0x1406/0x1a10 kernel/bpf/syscall.c:3128
- __sys_bpf+0xd0b/0xd90 kernel/bpf/syscall.c:6350
- __do_sys_bpf kernel/bpf/syscall.c:6469 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6466 [inline]
- __x64_sys_bpf+0xba/0xd0 kernel/bpf/syscall.c:6466
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 10052:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2700 [inline]
- slab_free mm/slub.c:6284 [inline]
- kfree+0x1c5/0x6c0 mm/slub.c:6599
- bpf_prog_calc_tag+0x315/0x370 kernel/bpf/core.c:334
- check_and_resolve_insns+0xbd/0x2510 kernel/bpf/verifier.c:18084
- bpf_check+0x12bf/0x51d0 kernel/bpf/verifier.c:19694
- bpf_prog_load+0x1406/0x1a10 kernel/bpf/syscall.c:3128
- __sys_bpf+0xd0b/0xd90 kernel/bpf/syscall.c:6350
- __do_sys_bpf kernel/bpf/syscall.c:6469 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6466 [inline]
- __x64_sys_bpf+0xba/0xd0 kernel/bpf/syscall.c:6466
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88805f5cd500
- which belongs to the cache kmalloc-96 of size 96
-The buggy address is located 16 bytes inside of
- freed 96-byte region [ffff88805f5cd500, ffff88805f5cd560)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff88805f5cdd00 pfn:0x5f5cd
-flags: 0x80000000000200(workingset|node=0|zone=1)
-page_type: f5(slab)
-raw: 0080000000000200 ffff88813fe20280 ffffea00009c7810 ffffea000130be50
-raw: ffff88805f5cdd00 0000000800200004 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 10, tgid 10 (kworker/0:1), ts 109626662632, free_ts 109611667027
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f9/0x250 mm/page_alloc.c:1866
- prep_new_page mm/page_alloc.c:1874 [inline]
- get_page_from_freelist+0x265c/0x26e0 mm/page_alloc.c:3953
- __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5296
- alloc_slab_page mm/slub.c:3289 [inline]
- allocate_slab+0x74/0x5e0 mm/slub.c:3404
- new_slab mm/slub.c:3447 [inline]
- refill_objects+0x33c/0x3d0 mm/slub.c:7226
- refill_sheaf mm/slub.c:2827 [inline]
- __pcs_replace_empty_main+0x373/0x720 mm/slub.c:4665
- alloc_from_pcs mm/slub.c:4763 [inline]
- slab_alloc_node mm/slub.c:4897 [inline]
- __kmalloc_cache_noprof+0x44e/0x690 mm/slub.c:5420
- _kmalloc_noprof include/linux/slab.h:967 [inline]
- _kzalloc_noprof include/linux/slab.h:1284 [inline]
- nsim_fib6_rt_create drivers/net/netdevsim/fib.c:547 [inline]
- nsim_fib6_rt_insert drivers/net/netdevsim/fib.c:752 [inline]
- nsim_fib6_event drivers/net/netdevsim/fib.c:856 [inline]
- nsim_fib_event+0xf36/0xa390 drivers/net/netdevsim/fib.c:889
- nsim_fib_event_work+0x26e/0x3e0 drivers/net/netdevsim/fib.c:1493
- process_one_work+0x98b/0x1630 kernel/workqueue.c:3318
- process_scheduled_works kernel/workqueue.c:3401 [inline]
- worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
- kthread+0x389/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-page last free pid 4981 tgid 4981 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- __free_pages_prepare mm/page_alloc.c:1413 [inline]
- __free_frozen_pages+0x10af/0x1190 mm/page_alloc.c:2957
- __slab_free+0x252/0x2a0 mm/slub.c:5646
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x99/0x100 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:350
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4583 [inline]
- slab_alloc_node mm/slub.c:4912 [inline]
- __kmalloc_cache_noprof+0x338/0x690 mm/slub.c:5420
- _kmalloc_noprof include/linux/slab.h:967 [inline]
- _kzalloc_noprof include/linux/slab.h:1284 [inline]
- kernfs_fop_open+0x39a/0xcb0 fs/kernfs/file.c:641
- do_dentry_open+0x83d/0x13e0 fs/open.c:947
- vfs_open+0x3b/0x350 fs/open.c:1052
- do_open fs/namei.c:4688 [inline]
- path_openat+0x2eea/0x3960 fs/namei.c:4847
- do_file_open+0x23e/0x4a0 fs/namei.c:4876
- do_sys_openat2+0x115/0x200 fs/open.c:1344
- do_sys_open fs/open.c:1350 [inline]
- __do_sys_openat fs/open.c:1366 [inline]
- __se_sys_openat fs/open.c:1361 [inline]
- __x64_sys_openat+0x138/0x170 fs/open.c:1361
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff88805f5cd400: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
- ffff88805f5cd480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
->ffff88805f5cd500: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                         ^
- ffff88805f5cd580: 00 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc
- ffff88805f5cd600: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-==================================================================
+https://lore.kernel.org/netdev/6a191f87.ce022c6e.138e56.0003.GAE@google.com=
+/T/
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+>
+> I'll pay attention next time. :)
+>
+> >> Fixes: eb1ac9ff6c4a ("ipv6: anycast: Don't hold RTNL for IPV6_JOIN_ANY=
+CAST.")
+> >> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> > Change itself looks good, thanks
+> >
+> > Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> >
+> >> ---
+> >>   net/ipv6/anycast.c | 4 ++--
+> >>   1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+> >> index 67a42e01dfc3..cd8c02a1ad4c 100644
+> >> --- a/net/ipv6/anycast.c
+> >> +++ b/net/ipv6/anycast.c
+> >> @@ -371,10 +371,10 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, co=
+nst struct in6_addr *addr)
+> >>          aca->aca_next =3D idev->ac_list;
+> >>          rcu_assign_pointer(idev->ac_list, aca);
+> >>
+> >> -       write_unlock_bh(&idev->lock);
+> >> -
+> >>          ipv6_add_acaddr_hash(net, aca);
+> >>
+> >> +       write_unlock_bh(&idev->lock);
+> >> +
+> >>          ip6_ins_rt(net, f6i);
+> >>
+> >>          addrconf_join_solict(idev->dev, &aca->aca_addr);
+> >> --
+> >> 2.43.0
+> >>
 
