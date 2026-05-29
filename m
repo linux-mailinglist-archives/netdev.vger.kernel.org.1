@@ -1,156 +1,155 @@
-Return-Path: <netdev+bounces-292947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNkUI3P2GGqvpQgAu9opvQ
-	(envelope-from <netdev+bounces-292947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:14:11 +0200
+	id wCSgG0z9GGoEpggAu9opvQ
+	(envelope-from <netdev+bounces-292950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:43:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31FB5FC473
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:14:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C125FC72C
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 144A930C6981
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:12:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A09DB311775E
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F2A35F16B;
-	Fri, 29 May 2026 02:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28199367B75;
+	Fri, 29 May 2026 02:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lc2X7KCY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQG2j3cp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284B835F19B
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 02:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CB9366051;
+	Fri, 29 May 2026 02:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780020726; cv=none; b=EYwsow2TisccajVHnBk8Levc/F9IM0UmXS0TmVukP7bU5LTIz5a4Dhi+lZG08eyiG56/vd/qtxOfBEAxPPKZyrgSSKa2LR/jHm4fKHHhdfAzSef9y2OdqBsa9zTz6mBAV7ILbOxVYC9KqWVcUnfRQM0T/5IMamf6BMLMW0VqrX0=
+	t=1780022399; cv=none; b=VKk0Y44Dp0mvuDzLi9sltDGIk7t48uCwfrClsdAOGAxbhx7S8JfhbGTHcLwb5WLb/t9v+QM/99QEnkhY5bY30CE/vjFfT9YcMFUOvOvd7i413r9XhzZKluQvt2fOYOdq3LK/vAW5DSIXydjMVvoZZuOEVH7x25ZDYvwxMCr0ca4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780020726; c=relaxed/simple;
-	bh=MF8FO56Msgy/cx81C5qSunb9zjw5ip5KruUP+aX4g08=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dy2gxdlUNI3x7X/M1BF7e9v969rt7Cz4IphuJLqCTq4/WLG1ADRTwpL4Xsfv08wsdUsfRb9v4JaztSy+zmEgEHxvtZSL9iTfZZGMvVgEHcxWMI572djVJN1SrXVwAVcEMZHCcblDaP64q5XYWOytgOtqKxrH/dnnttp6f6LJDcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lc2X7KCY; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780020722;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mQ7SFJ9UYfHWwn9AJeJt/zd1yG2GZC6kAhdDdPj35U0=;
-	b=lc2X7KCYdxZ6YzxC72PCbcD8iy9PtqYThKq67VJlB3i4HcPDmqGpwz1DjqVhMXN4ZnoH8E
-	E65o/S3+PgJ4oPoEKslk3rfunHX/RWdjOpj7+IJ7mPhdvtA4hav/n+ztsHkSP2J9qMwgYM
-	jRdJcLF1zpoXvc60XqLIjnKmGeaZMqk=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Matthieu Baerts <matttbe@kernel.org>
-Subject: [PATCH net-next v2] selftests: net: add socat syslog for PPPoL2TP
-Date: Fri, 29 May 2026 10:11:42 +0800
-Message-ID: <20260529021146.5739-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1780022399; c=relaxed/simple;
+	bh=+dmzY6pmoRScEDfj8mxsxFsCJ1wWIPvlahbfjeIHrns=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=kreH3vNyVxfur6wijacwsyCwUCaEhW/JKebkN33CiCRxnq3TQ/cLkY7RxgBB3luOTNUC22ZUDgVoVxxFcc8//5oD2478HU+DdSMpGMmTTqN/cI2pkGE4TS9OS14tEhXPfA359HPh9KHxZkHZwKZWa9h9i7rk6EfKe0t5PampPKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQG2j3cp; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 888DC1F00A3A;
+	Fri, 29 May 2026 02:39:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780022397;
+	bh=7Exu8bkw9sfMSpBDR9+l+XlN7rjIeMecmtaIaQjDW/A=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=kQG2j3cpTRnx3G5jBhmwt2vTD29oEINAPvBQlR5xYsj1BZDiA2xw2kPTU87Bf3PSC
+	 nJ+9o19G9xt5s5PIKk3YQNCHRo1PYtAWk+c+ZNnQFvM0nNQ72XoXYqyauKQlzLWY9M
+	 yBzHO9PMhwPMCwMlaIBcZGM1EHEft8LtEQE7WO0BKWBhBXoAonGzmjV889zPR7NQgr
+	 UE61zVwLz/I7PDd/RJcDDoNUokqlAU5f/WtldimpP4XeZ3n39qKALXQflEvb+AIWz8
+	 EREjyk20ONL1K3eqYyrZWFEx67QUhgiexWnhrnPB+UzC8jtUZJCXLgugdGRpTKxGIw
+	 kd9fk4Vr6obVA==
+Content-Type: multipart/mixed; boundary="===============6509139473524102146=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Message-Id: <a46f04ea7c2245d83e07f7aae6c71068a0a441788f63f5a58a31cee3ddc2dad8@mail.kernel.org>
+In-Reply-To: <20260529014936.2811085-3-ameryhung@gmail.com>
+References: <20260529014936.2811085-3-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v6 02/13] bpf: Unify dynptr handling in the verifier
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,martin.lau@kernel.org,mykyta.yatsenko5@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Fri, 29 May 2026 02:39:57 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292947-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-292950-lists,netdev=lfdr.de,bpf-ci];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: E31FB5FC473
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20]
+X-Rspamd-Queue-Id: C2C125FC72C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-As done in pppoe.sh, start socat as the syslog listener. In case the
-test fails, dump its log to see what's going on.
+--===============6509139473524102146==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+> diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
+> index 5cbad3b64130..3a5c226bf1c3 100644
+> --- a/include/linux/bpf_verifier.h
+> +++ b/include/linux/bpf_verifier.h
+> @@ -1438,6 +1438,13 @@ struct bpf_map_desc {
+>  	int uid;
+>  };
+>
+> +/* The last initialized dynptr; Populated by process_dynptr_func() */
+> +struct bpf_dynptr_desc {
+> +	enum bpf_dynptr_type type;
+> +	u32 id;
+> +	u32 ref_obj_id;
+> +};
+
+Mykyta Yatsenko requested inline field comments for the ref_obj_id field
+in v2, noting it would help with clarity. While id and ref_obj_id are
+documented in struct bpf_reg_state earlier in the file, should inline
+comments be added here for consistency?
+
+The CI bot also flagged this in v3 and v4, and it remains unaddressed in
+the final version.
+
+> +
+>  struct bpf_kfunc_call_arg_meta {
+>  	/* In parameters */
+>  	struct btf *btf;
+> @@ -1478,16 +1485,12 @@ struct bpf_kfunc_call_arg_meta {
+>  	struct {
+>  		struct btf_field *field;
+>  	} arg_rbtree_root;
+> -	struct {
+> -		enum bpf_dynptr_type type;
+> -		u32 id;
+> -		u32 ref_obj_id;
+> -	} initialized_dynptr;
+>  	struct {
+>  		u8 spi;
+>  		u8 frameno;
+>  	} iter;
+>  	struct bpf_map_desc map;
+> +	struct bpf_dynptr_desc dynptr;
+>  	u64 mem_size;
+>  };
+
+[ ... ]
+
+
 ---
-v2: move syslog dump to the end and use EXIT_STATUS
-v1: https://lore.kernel.org/netdev/20260526014152.532505-1-qingfang.deng@linux.dev/
- tools/testing/selftests/net/ppp/pppol2tp.sh | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/tools/testing/selftests/net/ppp/pppol2tp.sh b/tools/testing/selftests/net/ppp/pppol2tp.sh
-index 5b592785f1f9..37c4d56c5c6e 100755
---- a/tools/testing/selftests/net/ppp/pppol2tp.sh
-+++ b/tools/testing/selftests/net/ppp/pppol2tp.sh
-@@ -9,10 +9,12 @@ OUTER_IP_SERVER="172.16.1.1"
- OUTER_IP_CLIENT="172.16.1.2"
- 
- PPPOL2TP_DIR=$(mktemp -d /tmp/pppol2tp.XXXXXX)
-+PPPOL2TP_LOG="$PPPOL2TP_DIR/l2tp.log"
- 
- # shellcheck disable=SC2329
- cleanup() {
- 	cleanup_all_ns
-+	[ -n "$SOCAT_PID" ] && kill_process "$SOCAT_PID"
- 	rm -rf "$PPPOL2TP_DIR"
- }
- 
-@@ -31,6 +33,10 @@ ip -netns "$NS_CLIENT" link set "$VETH_CLIENT" up
- ip -netns "$NS_SERVER" address add dev "$VETH_SERVER" "$OUTER_IP_SERVER" peer "$OUTER_IP_CLIENT"
- ip -netns "$NS_CLIENT" address add dev "$VETH_CLIENT" "$OUTER_IP_CLIENT" peer "$OUTER_IP_SERVER"
- 
-+# Start socat as syslog listener
-+socat -v -u UNIX-RECV:/dev/log OPEN:/dev/null > "$PPPOL2TP_LOG" 2>&1 &
-+SOCAT_PID=$!
-+
- # Generate configuration files
- cat > "$PPPOL2TP_DIR/l2tp-server.conf" <<EOF
- [global]
-@@ -92,4 +98,13 @@ check_fail $?
- 
- log_test "PPPoL2TP Recursion"
- 
-+# Dump syslog messages if the test failed
-+if [ "$EXIT_STATUS" -ne 0 ]; then
-+	while read -r _sign _date _time len _from _to
-+	do      len=${len##*=}
-+		read -n "$len" -r LINE
-+		echo "$LINE"
-+	done < "$PPPOL2TP_LOG"
-+fi
-+
- exit "$EXIT_STATUS"
--- 
-2.43.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26613892466
+--===============6509139473524102146==--
 
