@@ -1,162 +1,149 @@
-Return-Path: <netdev+bounces-293111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CAZBGvWMGWpTxggAu9opvQ
-	(envelope-from <netdev+bounces-293111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:56:21 +0200
+	id GItzFsKNGWpTxggAu9opvQ
+	(envelope-from <netdev+bounces-293112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:59:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B896028CA
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:56:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4579602957
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 14:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0F2930283EA
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:55:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68825303C3FD
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4505D2D97BB;
-	Fri, 29 May 2026 12:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650712DEA95;
+	Fri, 29 May 2026 12:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HKme3PJu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VIrr0fo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6B92C21E8;
-	Fri, 29 May 2026 12:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330E12D949B;
+	Fri, 29 May 2026 12:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780059348; cv=none; b=eYuLjFCUiRkTpW9vHJAtjKJH3Orpaf487dqPJFQ1aW3i/ZqN8V87dKqQ5R6FQ++ckPJwvXi0umdBNRRl2xaOdxtrpQNJcsm0Nw5hWTU0lkpvUFxRzv63AmJ5qdA0ErXBoecFzJlSMc8Gx7EPKyKRD7DIj0kHkI1vRKGoGiz7YIg=
+	t=1780059582; cv=none; b=Ml7zfiTAM7HAEV89R05ZJGdX6jP3GX23G3OOVEKEy5k/+f+G6Dr+/NXzl0ELyrbrtjtlb8mGITDtTj/JvxbCTfEp++nXrcZXFVMGYN9kzBKuRWDilvCeZ+LA/BRJeS4UFPTMETvLlNSqwtOxBvnSmW20CNGnjeYqw6cojoXiTJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780059348; c=relaxed/simple;
-	bh=rf9ietTEoUdNUWP+4Xs/on4TPwZiiiKAB2KYgWpPhmg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=I1kTxr6A2QhFCoXObyPg9oLOdWIYUQlAPs6e8Neo7Rg4OpNdfxcFbZAlB/GatxFAeJlPcOF8wC1ffzy9yQNj/Vtv7C06fMqkJ1qHz9zCwJpX/rrmiKUKbD3whm0IUXYuSU57OdJkErnZjt17CAt9CaL9v6ymsAT+HDoEZpVifQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HKme3PJu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF6271F00893;
-	Fri, 29 May 2026 12:55:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780059346;
-	bh=+6AiMcZa3bd0LPjamkN4r9S9jW+Apu//pCbttaoWdDI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=HKme3PJuW/g8Xe3fa9pH4ndcExyYxHcd2cNlg9NECKqK4v1asLZhvhZEXzEeGPFwC
-	 krMU26G83m8iPSglCfYKCqgciw6JWvcuzjQUTI3wFtoI62nF0UChddzGFraXimF9pJ
-	 1k54Uu9U94IdLdsnRGH4hwmLSLP/pSSK0uKpJsDzqk30FcWpIwESOtKLiumR4V+6As
-	 unm055hDnQ1A4hKk4u4dzRoTU87SIvLvelBGdBip7ZDoIZon4MXvQ/IpRhuSbyjuUY
-	 udebOV+LpQuBbeFt6sWaU5lZ0itKuFGMHeMAFQa8OxgbyKZLGpVxsvBB1IjU2d1o4J
-	 48Eb2LMB+rd1A==
-From: Srinivas Kandagatla <srini@kernel.org>
-To: Lee Jones <lee@kernel.org>, 
- Mark Brown <broonie@opensource.wolfsonmicro.com>, 
- Thierry Reding <thierry.reding@avionic-design.de>, 
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Vinod Koul <vkoul@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
- Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>, 
- Saravana Kannan <saravanak@kernel.org>, 
- Madhavan Srinivasan <maddy@linux.ibm.com>, 
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
- Andi Shyti <andi.shyti@kernel.org>, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
- Robin Murphy <robin.murphy@arm.com>, Doug Berger <opendmb@gmail.com>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
- Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, Matthew Brost <matthew.brost@intel.com>, 
- =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>, 
- Simona Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>, 
- Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, 
- Philipp Zabel <p.zabel@pengutronix.de>, 
- Maximilian Luz <luzmaximilian@gmail.com>, Hans de Goede <hansg@kernel.org>, 
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
- Krzysztof Kozlowski <krzk@kernel.org>, 
- Benjamin Herrenschmidt <benh@kernel.crashing.org>, 
- Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: brgl@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
- driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org, 
- iommu@lists.linux.dev, linux-pm@vger.kernel.org, imx@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
- dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
- linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
- stable@vger.kernel.org
-In-Reply-To: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH 00/23] driver core: count references of the
- platform device's fwnode, not OF node
-Message-Id: <178005933352.9337.17178239685242465219.b4-ty@kernel.org>
-Date: Fri, 29 May 2026 13:55:33 +0100
+	s=arc-20240116; t=1780059582; c=relaxed/simple;
+	bh=VQJuxRm7Bn2tIF4PNqdXD3fOfowwb5TiwItKks6C9Ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pwlKGKMxwG22CcowscFIoC/Iz6Kr+2YbZPlyMCR0xekvXFeYEIz5FPa3xfix2X56M37sQ+yDyLNWMa2OO4XbfICs4mNrzPWdIxbcejLzQupfNjqRZN7AHC+tpye/VUAQV+8Du1Q/1K3N4FkMBbsGgijkE0FcgJZqQJm6lHnr4TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VIrr0fo0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ykkqr/AFKCpdnBy5Nwco+T5dKDYCeBVkIM3xxhZU6es=; b=VIrr0fo07jcYrR9Bq93solgY34
+	ROBw9FUsK8Rc06warOLhDDmrxua6WFVNw4PBZQL0Jy0kvG974b0aNzbWdIRw8aeqJCN31vUt1ITBi
+	rtGd5U0LV/lpPlkthqBQCWBntwFVrxAe5CRkI6FNl1YbOfRoHpdl+uqfOh64tEYGIzPc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSwoB-0055PK-6t; Fri, 29 May 2026 14:59:27 +0200
+Date: Fri, 29 May 2026 14:59:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
+ ethtool pause validation
+Message-ID: <b7de216a-fd1a-42a0-8711-d822a1ad9319@lunn.ch>
+References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
+ <2293244a-c6a9-4642-a721-dada8a081dbc@lunn.ch>
+ <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293111-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,oss.qualcomm.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293112-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[66];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[srini@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 64B896028CA
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: B4579602957
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-On Thu, 21 May 2026 10:36:23 +0200, Bartosz Golaszewski wrote:
-> I'd like to first apologize for the long, treewide series and an
-> extensive Cc list but I think it's important to show the big picture and
-> the end result of this rework.
+> I think that
 > 
-> Platform device core provides helper interfaces for dealing with
-> dynamically created platform devices. Most users should use
-> platform_device_register_full() which encapsulates most of the
-> operations but some modules will want to use the split approach of
-> calling platform_device_alloc() + platform_device_add() separately for
-> various reasons.
+>   ethtool -s <iface> duplex half autoneg on
 > 
-> [...]
+> should be enough, the link should still establish at 100M, I've tested
+> that on a 1G/FULL 100MHalf+Full interface and this is the result we
+> get :)
 
-Applied, thanks!
+Nice.
 
-[03/23] slimbus: qcom-ngd-ctrl: fix OF node refcount
-        commit: 0208edaf0b32cae5b922729c4ef52dcd865e2e19
+But i still think the test should check the autoneg result and do
+something sensible if the link does not come up. This probably applies
+to all cases where we trigger auto neg.
 
-Best regards,
--- 
-Srinivas Kandagatla <srini@kernel.org>
+> That said I've tested the following on mcbin, and it seems that acually
+> nothing in the code currently deals with Half duplex / Pause interaction,
+> and we don't get any EOPNOTSUPP.
+> 
+> So the broader question is, should we reflect the current behaviour or
+> an ideal one ?
 
+What 802.3 says. If we come across cases where phylib/phylink is
+broken, let me know, and i will fix it. But we will leave driver bugs
+to individual driver developers.
+
+But we also need to consider that for some APIs, we have decided that
+a configuration can be set now, which does not actually apply in our
+current conditions, but it will be stored away for when conditions
+change and it is applicable. The half duplex case could fit that. When
+the link is currently half duplex, you can configure pause, but you
+don't expect it to actually change the current behaviour. It only
+kicks in when the link renegotiates to full duplex sometime in the
+future. We have to also consider this the other way around. The link
+is full duplex and pause is configured by the user. Something happens
+with the LP and the link renegotiates to half duplex. The local end
+should not throw away the configuration, it simply cannot apply it
+given the current situation.
+
+	Andrew
 
