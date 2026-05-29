@@ -1,277 +1,171 @@
-Return-Path: <netdev+bounces-292955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292957-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QD1BHjcAGWpApggAu9opvQ
-	(envelope-from <netdev+bounces-292955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:55:51 +0200
+	id gPXQNvMGGWr7pggAu9opvQ
+	(envelope-from <netdev+bounces-292957-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:24:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D1C5FC8D4
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:55:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D59A5FCB5A
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:24:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB62E301CFE1
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:55:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2092C301724F
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDA0352000;
-	Fri, 29 May 2026 02:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A014B367B73;
+	Fri, 29 May 2026 03:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="K5QPONpB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZmWvFfw1"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DD6369997;
-	Fri, 29 May 2026 02:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95952E739C
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 03:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780023337; cv=none; b=ln/dtqgwhD2Mxkh016khclDkMBavz8L4ODjYpAfb60h7mRIMtn2l+2GWrLIxN6qo1C0JpDq9FgfQ5qLqK868hai2fb2YbHLXCqHqQMDAZsDsnGYruqoFdHNGyQYrHkKuRGR2tneemW0+AbwTle8VoopuGVEhNPlNOvZiCeqjZ2c=
+	t=1780024845; cv=none; b=JEVCfeVo74pdK0ky8kppfMPmJAIyeUc8mTero5HTmqqjkXIQPiPY/JIWEFGrkDoWQ5pBHDuPE2Kty/dY/JBuKIWKn+Whfe8nYywGCbd1F2+GVmVp9QMUXBV/zf9rFY12W3abqTm7ifb2m33l72s3juVNmXo9tLNuzVNvyb3c114=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780023337; c=relaxed/simple;
-	bh=OFHV1BTtDn0Wr+D2hbOk9tuCqYJkQQm3Z8J9dWEPbIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l4b8A14mVruLajXy5AbnV38vEDO+0l6wU3alpo4VTUJqOiVJpNAdMAbu/4BtPOXwT9EPodNBLSx7gL3ceA4JfFdkjJ/SMj+FAP0pVpaDw1ldooABuCM5ptszoQ4c/++QsWE9bU/zdNX0mSObM/voyr69xdBD/+WDdmZcip89i2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=K5QPONpB; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id E167320B7167; Thu, 28 May 2026 19:55:23 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E167320B7167
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1780023323;
-	bh=p/Ihw9skwc/WtqsO4lhp5vhruouEiS8+vTIgfMcpxJQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K5QPONpBt+q4xPQ06XozU1My1qizxJK3fgYpksBKaVUFXW7ElH508RaQLKT6dVltH
-	 8iO8U7zBwM68HaTAU3i+Gn4Yjmc2ijO7Q/d5VyXraAqk5phVHSSVXYoaLGATZWC3qA
-	 81DncM2EI5CSvfjBEm0/qgORKWQcfSrfmt2vv5ik=
-Date: Thu, 28 May 2026 19:55:23 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	stephen@networkplumber.org, jacob.e.keller@intel.com,
-	dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
-	john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
-	yury.norov@gmail.com
-Subject: Re: [PATCH v8 2/2] net: mana: force full-page RX buffers via ethtool
- private flag
-Message-ID: <ahkAG/EN2YhKIKpi@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260508115100.488506-3-dipayanroy@linux.microsoft.com>
- <20260512022133.856196-1-kuba@kernel.org>
- <aguFpq8+LV+I9oH0@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1780024845; c=relaxed/simple;
+	bh=RB3qOs2Ohx6Lg4He1Ag2kH5Y/QXyI/UlS5MiaZD55JI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OYFcMfnTm6z/rmMG+KboztTJ6bHvw4bACtXdKsogEnVDBP7QyaGxPLhaRAyhRc8rg6L6dDKSXIrH2wXks4lBvY5/gkMBRQi27glaaTkgXI8X6GGhVYBto/M/Gr5QfDkHjZTS6Vmq4JMMaBM1J4HX2VPRUjjqtcTmIKbOI1BeKjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZmWvFfw1; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780024840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Jx7dJ3LrSYHkDmTM3C5e8iRNjYq89+NASBYIOXgzJoU=;
+	b=ZmWvFfw1S5HaZrtgg4Q6iNLHX/ASXIzovM5ogMfXVEwEFIzkvg2vd30VMFbeGb/HWn9wb3
+	foJFayJAzLRjC+TX0EhDaAE1dVjdStrcLhzH8heSNrZzdGLnK1gnEwBnhIqARTBBa03+Kz
+	ZSwHj/KilAjlDhrzgRH3d4xid4C1XgY=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] ipv6: anycast: insert aca into global hash under idev->lock
+Date: Fri, 29 May 2026 11:20:25 +0800
+Message-ID: <20260529032026.363856-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aguFpq8+LV+I9oH0@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292955-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292957-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F2D1C5FC8D4
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,linux.dev:mid,linux.dev:dkim,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 5D59A5FCB5A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, May 18, 2026 at 02:33:26PM -0700, Dipayaan Roy wrote:
-> On Mon, May 11, 2026 at 07:21:33PM -0700, Jakub Kicinski wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > ---
-> > net: mana: force full-page RX buffers via ethtool private flag
-> > 
-> > This patch adds an ethtool private flag "full-page-rx" that forces one
-> > RX buffer per page, bypassing the page_pool fragment path, to address
-> > a 15-20% throughput regression seen on some 4K PAGE_SIZE ARM64
-> > platforms under high connection counts.  Toggling the flag triggers
-> > mana_detach() + mana_attach() to apply the new RX buffer layout.
-> > 
-> > > diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > > index a28ca461c135..dfd222de11d0 100644
-> > > --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > > +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > 
-> > [ ... ]
-> > 
-> > > @@ -590,6 +609,88 @@ static int mana_get_link_ksettings(struct net_device *ndev,
-> > >  	return 0;
-> > >  }
-> > >  
-> > 
-> > [ ... ]
-> > 
-> > > +static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
-> > > +{
-> > > +	struct mana_port_context *apc = netdev_priv(ndev);
-> > > +	u32 changed = apc->priv_flags ^ priv_flags;
-> > > +	u32 old_priv_flags = apc->priv_flags;
-> > > +	bool schedule_port_reset = false;
-> > > +	int err = 0;
-> > > +
-> > > +	if (!changed)
-> > > +		return 0;
-> > > +
-> > > +	/* Reject unknown bits */
-> > > +	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
-> > > +		return -EINVAL;
-> > > +
-> > > +	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
-> > > +		apc->priv_flags = priv_flags;
-> > > +
-> > > +		if (!apc->port_is_up) {
-> > > +			/* Port is down, flag updated to apply on next up
-> > > +			 * so just return.
-> > > +			 */
-> > > +			return 0;
-> > > +		}
-> > > +
-> > > +		/* Pre-allocate buffers to prevent failure in mana_attach
-> > > +		 * later
-> > > +		 */
-> > > +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-> > > +		if (err) {
-> > > +			netdev_err(ndev,
-> > > +				   "Insufficient memory for new allocations\n");
-> > > +			apc->priv_flags = old_priv_flags;
-> > > +			return err;
-> > > +		}
-> > > +
-> > > +		err = mana_detach(ndev, false);
-> > > +		if (err) {
-> > > +			netdev_err(ndev, "mana_detach failed: %d\n", err);
-> > > +			apc->priv_flags = old_priv_flags;
-> > > +
-> > > +			/* Port is in an inconsistent state. Restore
-> > > +			 * 'port_is_up' so that queue reset work handler
-> > > +			 * can properly detach and re-attach.
-> > > +			 */
-> > > +			apc->port_is_up = true;
-> > > +			schedule_port_reset = true;
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > +		err = mana_attach(ndev);
-> > > +		if (err) {
-> > > +			netdev_err(ndev, "mana_attach failed: %d\n", err);
-> > > +			apc->priv_flags = old_priv_flags;
-> > > +
-> > > +			/* Restore 'port_is_up' so the reset work handler
-> > > +			 * can properly detach/attach. Without this,
-> > > +			 * the handler sees port_is_up=false and skips
-> > > +			 * queue allocation, leaving the port dead.
-> > > +			 */
-> > > +			apc->port_is_up = true;
-> > > +			schedule_port_reset = true;
-> > > +		}
-> > > +	}
-> > > +
-> > > +out:
-> > > +	mana_pre_dealloc_rxbufs(apc);
-> > > +
-> > > +	if (schedule_port_reset)
-> > > +		queue_work(apc->ac->per_port_queue_reset_wq,
-> > > +			   &apc->queue_reset_work);
-> > > +
-> > > +	return err;
-> > > +}
-> > 
-> > [High]
-> > Can this failure path oops inside the reset work handler?
-> > 
-> > When mana_attach() fails after mana_detach() has already torn the vport
-> > down, apc->tx_qp has been set to NULL by mana_destroy_txq() and apc->rxqs
-> > has been cleared by mana_cleanup_port_context().  This code then forces
-> > apc->port_is_up back to true and queues apc->queue_reset_work:
-> > 
-> >     apc->port_is_up = true;
-> >     schedule_port_reset = true;
-> > 
-> > When mana_per_port_queue_reset_work_handler runs it calls
-> > mana_detach(ndev, false), which latches port_st_save = port_is_up = true
-> > and, because port_st_save is true, invokes mana_dealloc_queues().  The TX
-> > drain loop there does:
-> > 
-> >     txq = &apc->tx_qp[i].txq;
-> >     atomic_read(&txq->pending_sends);
-> > 
-> > with no NULL check on apc->tx_qp, and mana_destroy_vport further down
-> > iterates apc->rxqs[rxq_idx] while rxqs is NULL.  Would that produce a
-> > NULL pointer dereference in the workqueue worker whenever mana_attach()
-> > fails here (for example on an allocation failure in
-> > mana_init_port_context or mana_create_txq, or a transient HW command
-> > failure in mana_query_vport_cfg / mana_cfg_vport)?
-> > 
-> > The mana_detach() failure path above (goto out) reaches
-> > mana_dealloc_queues() through the same chain and looks to have the same
-> > exposure.
-> Hi Jakub,
-> 
-> Thanks for your comments, I have sent a separate fixes series to the
-> net tree that fixes the possible NULL pointer derefernce issue and also
-> makes the reset handler safe for the case where it runs after a failed
-> attach:
-> https://lore.kernel.org/all/20260518194654.735580-1-dipayanroy@linux.microsoft.com/
-> 
-> 
-> > 
-> > For comparison, mana_change_mtu() handles a mana_attach() failure by
-> > returning the error without scheduling a reset.  Would a similar
-> > treatment here avoid the asynchronous oops, or is there a reason the
-> > reset must be scheduled in this specific failure case?
-> > -- 
-> > pw-bot: cr
-> 
-> The full-page-rx private flag is intended to be driven by a udev rule
-> that fires automatically during VM provisioning on affected platforms.
-> If there is a transient failure, the VM fails to provision, requiring manual
-> intervention.The reset handler retries the attach, giving the port a
-> chance to recover to default config autonomously without intervention.
-> 
-> Regards
-> Dipayaan Roy
+syzbot reported a splat [1]: a slab-use-after-free in
+ipv6_chk_acast_addr(), which walks the global inet6_acaddr_lst[] hash
+under RCU and dereferences a struct ifacaddr6 that has already been
+freed while still linked in the hash, so a later reader walks into a
+dangling node.
 
+In __ipv6_dev_ac_inc() the aca is allocated with refcount 1, then
+aca_get() bumps it to 2 to keep it alive across the unlocked region.
+It is published to idev->ac_list under idev->lock, but
+ipv6_add_acaddr_hash() runs after write_unlock_bh(). A concurrent
+teardown (ipv6_ac_destroy_dev() from addrconf_ifdown(), under RTNL)
+can slip into that window:
 
-Hi Jakub,
+  CPU0 __ipv6_dev_ac_inc           CPU1 ipv6_ac_destroy_dev (RTNL)
+  ------------------------------   ------------------------------------
+  aca_alloc()              refcnt 1
+  aca_get()               refcnt 2
+  write_lock_bh(idev->lock)
+    add aca to ac_list
+  write_unlock_bh(idev->lock)
+                                   write_lock_bh(idev->lock)
+                                     pull aca off ac_list
+                                   write_unlock_bh(idev->lock)
+                                   ipv6_del_acaddr_hash(aca)
+                                     hlist_del_init_rcu() is a no-op,
+                                     aca is not in the hash yet
+                                   aca_put()           refcnt 2->1
+  ipv6_add_acaddr_hash(aca)
+    aca now inserted into the hash
+  aca_put()                refcnt 1->0
+    call_rcu(aca_free_rcu) -> kfree(aca)
 
-As the pre-requisite fixes patches are accepted now:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=17bfe0a8c014
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=5b05aa36ee24
+The hash removal becomes a no-op because the insertion has not
+happened yet, so once CPU0 inserts and drops the last reference, the
+aca is freed while still linked in inet6_acaddr_lst[], and readers
+dereference freed memory after the slab slot is reused.
 
-Can this series be merged now? Let me know if it needs a rebase or
-anything else.
+This window opened once RTNL stopped serializing the join path against
+device teardown. Move ipv6_add_acaddr_hash() inside the idev->lock
+section so the ac_list and hash insertions are atomic with respect to
+teardown: a racing remover now either misses the aca entirely or finds
+it in both lists.
 
-Regards
-Dipayaan Roy
+[1] https://syzkaller.appspot.com/bug?extid=a01df04303c131efbf3a
+
+Fixes: eb1ac9ff6c4a ("ipv6: anycast: Don't hold RTNL for IPV6_JOIN_ANYCAST.")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+---
+ net/ipv6/anycast.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+index 67a42e01dfc3..cd8c02a1ad4c 100644
+--- a/net/ipv6/anycast.c
++++ b/net/ipv6/anycast.c
+@@ -371,10 +371,10 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
+ 	aca->aca_next = idev->ac_list;
+ 	rcu_assign_pointer(idev->ac_list, aca);
+ 
+-	write_unlock_bh(&idev->lock);
+-
+ 	ipv6_add_acaddr_hash(net, aca);
+ 
++	write_unlock_bh(&idev->lock);
++
+ 	ip6_ins_rt(net, f6i);
+ 
+ 	addrconf_join_solict(idev->dev, &aca->aca_addr);
+-- 
+2.43.0
 
 
