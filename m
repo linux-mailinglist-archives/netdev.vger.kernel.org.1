@@ -1,171 +1,164 @@
-Return-Path: <netdev+bounces-292957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPXQNvMGGWr7pggAu9opvQ
-	(envelope-from <netdev+bounces-292957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:24:35 +0200
+	id EJuXMP4GGWr7pggAu9opvQ
+	(envelope-from <netdev+bounces-292958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:24:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D59A5FCB5A
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:24:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F9F5FCB69
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2092C301724F
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:20:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 23BD1307C298
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A014B367B73;
-	Fri, 29 May 2026 03:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A4D36EA8A;
+	Fri, 29 May 2026 03:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZmWvFfw1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hiUB7yU2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95952E739C
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 03:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1343D367B97;
+	Fri, 29 May 2026 03:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780024845; cv=none; b=JEVCfeVo74pdK0ky8kppfMPmJAIyeUc8mTero5HTmqqjkXIQPiPY/JIWEFGrkDoWQ5pBHDuPE2Kty/dY/JBuKIWKn+Whfe8nYywGCbd1F2+GVmVp9QMUXBV/zf9rFY12W3abqTm7ifb2m33l72s3juVNmXo9tLNuzVNvyb3c114=
+	t=1780024901; cv=none; b=i9GbgMR8bv/AjZ5G9OEB9Fmr0gDR6st+/s0YdD4/+zXNK+xevTtcROpuGK62kqqkU0kkRzBZblP8i0GPbp5eP+vxPTp5pfIl39iTxORFTPSeIn/WFsf6q+o4diOPVspx4Aj46eWw3OAxbjL3eK0mRqH1Z1BiOCH45Hf7yeNiJ7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780024845; c=relaxed/simple;
-	bh=RB3qOs2Ohx6Lg4He1Ag2kH5Y/QXyI/UlS5MiaZD55JI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OYFcMfnTm6z/rmMG+KboztTJ6bHvw4bACtXdKsogEnVDBP7QyaGxPLhaRAyhRc8rg6L6dDKSXIrH2wXks4lBvY5/gkMBRQi27glaaTkgXI8X6GGhVYBto/M/Gr5QfDkHjZTS6Vmq4JMMaBM1J4HX2VPRUjjqtcTmIKbOI1BeKjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZmWvFfw1; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780024840;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Jx7dJ3LrSYHkDmTM3C5e8iRNjYq89+NASBYIOXgzJoU=;
-	b=ZmWvFfw1S5HaZrtgg4Q6iNLHX/ASXIzovM5ogMfXVEwEFIzkvg2vd30VMFbeGb/HWn9wb3
-	foJFayJAzLRjC+TX0EhDaAE1dVjdStrcLhzH8heSNrZzdGLnK1gnEwBnhIqARTBBa03+Kz
-	ZSwHj/KilAjlDhrzgRH3d4xid4C1XgY=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] ipv6: anycast: insert aca into global hash under idev->lock
-Date: Fri, 29 May 2026 11:20:25 +0800
-Message-ID: <20260529032026.363856-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1780024901; c=relaxed/simple;
+	bh=Cm3URmuRjb3oHc7YnJt79GGuBWmRvykN9dfCexoODSk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=Fyv7VJWy3ik4WW6XJkwagEXn/75Fuu9hSmHV3ssGsCQoUp2S8IAUxdZl6L+3FKdY2zB948TbynnevhkINYOvozeGNpRBSS292NGm5oRCmqX6z652uXnOPRHjBxKyLZk6cBbRbedw4SgUrT73ea3phzHcMno43JBAjwyY/qmD3aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hiUB7yU2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E9B41F00A3A;
+	Fri, 29 May 2026 03:21:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780024899;
+	bh=lrpbSg9KNngzhEir/aE8axboZPwdgLxXKO6wueAytcs=;
+	h=Date:Subject:To:References:From:Cc:In-Reply-To;
+	b=hiUB7yU25mJB+z0zYd9HIosWIUvywk8lP//R4qkUkPCUNYnZB1PyBuoV+c6wAwwJw
+	 9+uD1P0tzP9jupoNRBT7DbkNvXTOaTPsrb1y3FX+MYrcTEBkvKuNa7Q0AmfJTM3WGR
+	 AivmcvvpTnwHfpZTU3+HW+uSF1ZZ/kWe4oPjNEwuhkQI5JUtpIj+7rRklRlC/IuLUZ
+	 17FUv72W1o1KQNhB/c1YNp2SBqirNQOLf091t/u4BsdGOoa9ixkcuLaTc6IXqLUl+C
+	 y9kLIZseR2Q6GTewDiRnh5oMQiVhIoF78tOSvKoBZKKWSeuhgy04acLQkbYHEX4zK3
+	 /DL7/sk0ClNwg==
+Message-ID: <f4a18ecf-4810-45a9-bf2a-1add45623248@kernel.org>
+Date: Fri, 29 May 2026 13:21:33 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v2] selftests: net: add socat syslog for PPPoL2TP
+Content-Language: fr
+To: Qingfang Deng <qingfang.deng@linux.dev>
+References: <20260529021146.5739-1-qingfang.deng@linux.dev>
+From: Matthieu Baerts <matttbe@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, linux-ppp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260529021146.5739-1-qingfang.deng@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-292958-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292957-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,linux.dev:mid,linux.dev:dkim,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 5D59A5FCB5A
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:url]
+X-Rspamd-Queue-Id: 64F9F5FCB69
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot reported a splat [1]: a slab-use-after-free in
-ipv6_chk_acast_addr(), which walks the global inet6_acaddr_lst[] hash
-under RCU and dereferences a struct ifacaddr6 that has already been
-freed while still linked in the hash, so a later reader walks into a
-dangling node.
+Hi Qingfang,
 
-In __ipv6_dev_ac_inc() the aca is allocated with refcount 1, then
-aca_get() bumps it to 2 to keep it alive across the unlocked region.
-It is published to idev->ac_list under idev->lock, but
-ipv6_add_acaddr_hash() runs after write_unlock_bh(). A concurrent
-teardown (ipv6_ac_destroy_dev() from addrconf_ifdown(), under RTNL)
-can slip into that window:
+On 29/05/2026 12:11, Qingfang Deng wrote:
+> As done in pppoe.sh, start socat as the syslog listener. In case the
+> test fails, dump its log to see what's going on.
+Thank you for the v2, it looks good to me:
 
-  CPU0 __ipv6_dev_ac_inc           CPU1 ipv6_ac_destroy_dev (RTNL)
-  ------------------------------   ------------------------------------
-  aca_alloc()              refcnt 1
-  aca_get()               refcnt 2
-  write_lock_bh(idev->lock)
-    add aca to ac_list
-  write_unlock_bh(idev->lock)
-                                   write_lock_bh(idev->lock)
-                                     pull aca off ac_list
-                                   write_unlock_bh(idev->lock)
-                                   ipv6_del_acaddr_hash(aca)
-                                     hlist_del_init_rcu() is a no-op,
-                                     aca is not in the hash yet
-                                   aca_put()           refcnt 2->1
-  ipv6_add_acaddr_hash(aca)
-    aca now inserted into the hash
-  aca_put()                refcnt 1->0
-    call_rcu(aca_free_rcu) -> kfree(aca)
+Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
 
-The hash removal becomes a no-op because the insertion has not
-happened yet, so once CPU0 inserts and drops the last reference, the
-aca is freed while still linked in inet6_acaddr_lst[], and readers
-dereference freed memory after the slab slot is reused.
+Hopefully this will help you to understand why this test is flaky, so a
+fix can be provided, then this test can be unignored.
 
-This window opened once RTNL stopped serializing the join path against
-device teardown. Move ipv6_add_acaddr_hash() inside the idev->lock
-section so the ac_list and hash insertions are atomic with respect to
-teardown: a racing remover now either misses the aca entirely or finds
-it in both lists.
+https://netdev.bots.linux.dev/contest.html?skip=0&test=pppol2tp-sh
 
-[1] https://syzkaller.appspot.com/bug?extid=a01df04303c131efbf3a
-
-Fixes: eb1ac9ff6c4a ("ipv6: anycast: Don't hold RTNL for IPV6_JOIN_ANYCAST.")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- net/ipv6/anycast.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
-index 67a42e01dfc3..cd8c02a1ad4c 100644
---- a/net/ipv6/anycast.c
-+++ b/net/ipv6/anycast.c
-@@ -371,10 +371,10 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
- 	aca->aca_next = idev->ac_list;
- 	rcu_assign_pointer(idev->ac_list, aca);
- 
--	write_unlock_bh(&idev->lock);
--
- 	ipv6_add_acaddr_hash(net, aca);
- 
-+	write_unlock_bh(&idev->lock);
-+
- 	ip6_ins_rt(net, f6i);
- 
- 	addrconf_join_solict(idev->dev, &aca->aca_addr);
+Cheers,
+Matt
 -- 
-2.43.0
+Sponsored by the NGI0 Core fund.
 
 
