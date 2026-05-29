@@ -1,163 +1,215 @@
-Return-Path: <netdev+bounces-292945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDmXMNjzGGoMpQgAu9opvQ
-	(envelope-from <netdev+bounces-292945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:03:04 +0200
+	id yEP6A036GGqvpQgAu9opvQ
+	(envelope-from <netdev+bounces-292948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:30:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C125FC417
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:03:04 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 802775FC64D
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 04:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8D0E23015D14
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:01:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E40F3028675
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 02:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1698833ADA8;
-	Fri, 29 May 2026 02:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA4D284662;
+	Fri, 29 May 2026 02:22:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2097.outbound.protection.partner.outlook.cn [139.219.17.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2804189F43;
-	Fri, 29 May 2026 02:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780020095; cv=none; b=PBZU5rzIVR260EXzRzZQRvvnE1vyVgH2XnRVw7NRjIYZxlh7FDZCrIUpzZt9is5DqqEELyAjgbToR7LFxxDZMkv0HbOU5c0c4QXvJIl18WcuZehD/O/nMoVHJ6Ftvc/nY6MucYKKbVVN9BQLzfKblkdfd1HuqLV+A5XRYVHw9Ho=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780020095; c=relaxed/simple;
-	bh=PABjILJp1QVmtSZRNSQ0zmobsIJp6cw3kySkJ/jZmyM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j0X1jPq/9FUgl7BuUonOleqz0kjnnePbhwqDPKVryL39bpDs62VrEujpCR5Ws21i/xsj6CiLTIWh4k/rr0QGFRN9ZbJtSdaLRFQpAdPJMPEyplChC1GxopjG+6NmXVIHB0OscWGIJa8DGETgJz0j3jBwqjM54iX4Mtw+Ku/YmcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn; spf=pass smtp.mailfrom=mails.ucas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.ucas.ac.cn
-Received: from fric.. (unknown [36.110.52.2])
-	by APP-01 (Coremail) with SMTP id qwCowAB3GNFd8xhqkJUWAA--.4625S2;
-	Fri, 29 May 2026 10:01:01 +0800 (CST)
-From: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Breno Leitao <leitao@debian.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857AD15B998;
+	Fri, 29 May 2026 02:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.97
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780021325; cv=fail; b=na81KC2DfKlokolr3oT27OI1Q+H6nSEN1VhZCIII7n/EOqR5MoGCdUQCUmL06FYnCLpvPjoC94FTgozD3fbsaoRjmxmIvHtv1W5b3dIXDGTn+I41rYYJvk56/v+TlnxmDNaVtSt9wtGnHB00TDVjAcI7jzoKPpOTXrVsbzyaJgg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780021325; c=relaxed/simple;
+	bh=dsp5VdOcjNN2ezsiiAItx1k7tJLlZCQiZrcx/yN9zpA=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=lV5nMgdllf+pF2IG0hwOsfi3legsBFkDHkjAyHDUgYKGyh4Yds18Iso8RMnVWtIaeEhrR4yPpj6CQjW0yrY7bhmyMYHVYr8+oTPeqoeJQI1TZirLR7egTbTC1jVnocgyxiZBLuaUWOArgqBDH8hLV3l8S129UqAOILLpCd3Q4Xg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UBdGAEljRb/gb/9/W/m+R8I61Qk2ZvguljowFCm5vukCNcRThQ7fuW8xW4PazVoJ1Gwa9ifxhtqMjcBg+q6ZhDgUL2ultHu1lxpCTQpoN0UiQpWZ2nc9PKdeyoZwS/PvHqHDXTVKZAXUktnDhe6mPEF//5IpHhthDFbW0T4wie9sIn06pSCbbgDq9Zppuiy3tIn9y4pWcccXieNbVwEKwktZ7/08HCwCmr/9Z/i6EW1olBQ91q4/UsY8EnetL1NXcQ8Nb3zb6BURKl01181rWJzN3K/azkiSDE8yATLiwtNy7nYa2WGrh6zRJ7spori1UPTYNndg0WG0hYHX924cMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2j34+WJaL3O+8Z1pRcoXqIcirxwJgbAln/9pzJzF3mg=;
+ b=hB+3LvDJnvvTpVpr113TAetsAjkaANcpWE4FSlM/fQ5FCByy+ljSw7LCtLpWgqHqgJK5UqLxZeQH7gt5btjyyMEKL1JiN8b2nfYCj6qLr4wXpck6mcV4vIKAOold+K/XHfEwDvvbrDDES01UHCoaEKiO4LmhpxAs6UzgJbyzeUj+Rk2jB/IrIvlPBUUGdsMLNATqN8WLtOpd0ZCRPGwxEAzVEqkyZgImKqwNU48yT5l5oTupDezNlzoH3Us/v3OR9AgDTcWx9krQCzjwiB3qQVvOcKNbN61hIvyBUAMd/5rQ6JyaA+E8/No3yzw5Fi6puz+kejZxMIBygy1cFJagAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::15) by SHXPR01MB0862.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:27::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Fri, 29 May
+ 2026 02:05:38 +0000
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ ([fe80::9b99:12dc:a115:b90f]) by
+ SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
+ with mapi id 15.20.9891.021; Fri, 29 May 2026 02:05:38 +0000
+From: Minda Chen <minda.chen@starfivetech.com>
+To: Frank <Frank.Sae@motor-comm.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Ernestas Kulik <ernestas.k@iconn-networks.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jiakai Xu <xujiakai24@mails.ucas.ac.cn>,
-	Kees Cook <kees@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v2] llc: Fix race between sock_orphan() and timer callback in llc_sk_free()
-Date: Fri, 29 May 2026 02:00:59 +0000
-Message-Id: <20260529020059.3024038-1-xujiakai24@mails.ucas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Minda Chen <minda.chen@starfivetech.com>
+Subject: [net-next v5 0/3] Add motorcomm 8531s set ds func and 8522 driver
+Date: Fri, 29 May 2026 10:05:27 +0800
+Message-Id: <20260529020530.16856-1-minda.chen@starfivetech.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: NT0PR01CA0017.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c510::6) To SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAB3GNFd8xhqkJUWAA--.4625S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW3WFyfCrWfZrWxZF1DJrb_yoW8Zw4UpF
-	45CFy7KFyqvrZIvFWftF1kGrn3Xan3K3y7CrWDCr4fuwn8Jr15K34rt3yq9Fs0yFs5Cry3
-	Jr4kWr4rCa1kZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBI14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
-	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJV
-	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI2
-	0VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28Icx
-	kI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
-	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42
-	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY
-	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbQVy7UUUUU==
-X-CM-SenderInfo: 50xmxthndljko6pdxz3voxutnvoduhdfq/
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0862:EE_
+X-MS-Office365-Filtering-Correlation-Id: 259d6761-9609-4084-d0f7-08debd26c756
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|366016|52116014|376014|38350700014|18002099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	ZIxFehEuwNgHxAcWDUtMzIz/z/nS2v9nUO+6A8XirpwhivlC6EBGfmdeRlczFeA0yVysYsSXHTg8xaexmzQpltc4GwJa/mZ/bUBe8YyjaypCnqs5F2h+sQYNf2atCIFoKqlTsSSRB+0c/8DOqgJj6bwU1wEsnL3T/LfO/o9+AH51/p9M7CU9TbeLhdl5k4DM0hV1A6V0FLO4/OgNVDwAhLt2Uaa0Z/tG/cXBj79F1ylsdS01/7cd2jYKUh0Mjb8HmHMhwJo1FycCbN4tqLP0xdBdYGmV2xjwV8D28mz88tM8AjXLr/hCH+KPRXvfg6/20HmefGTB4oXRVhXQqE3YIFrVjQSFzng1SOsmXqNVouX7Ro/U88k1lgmoIBIybFFClgJ1/jlEoKWd3FmrCbGmJzeU60M6FpnsjCoRjIl25dKAfQ1IMfECBKxJswJPbxRntP445DJ+rkLo5zY+0Jtber3buLC3bYoE/OT5R2lCwbWw/Uw0kEBFOb2vwos40D8IofYNflwiCd3k84pjBEMc6hqMjFv5B65E2axSW1X1RdXMN8XFeXEuQtURTCcXrcVE
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(52116014)(376014)(38350700014)(18002099003)(56012099006);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?E/SaNY7RvGfRDKk0JFvaZI3dN3cfpcRAiGAPGlxtFtmFhLpxvE/zCGO3ZcBg?=
+ =?us-ascii?Q?fGuxHOlBIEBAgNTjOgAlT8WE3scDiOVWNPk/8D1LBDAum7uubtDdAdHzn6Ih?=
+ =?us-ascii?Q?sKNkpm5qVDcwvJwHLZb3QPwbD4qOrp4PEyXgJ8cjY1KF++Ne8LC3WYf6xoqw?=
+ =?us-ascii?Q?67elq0IG9ppBqOTgPLojR/PmoPZ/ejJJB7ZQlIQsMenGrXTgX0qoKzgTD6gs?=
+ =?us-ascii?Q?oDI0vtXvx5hLcOvD+5z0ArZae8Y5Jyepm/7X5ykaNU1yiGJ8oY1t+qoWkR5s?=
+ =?us-ascii?Q?uOFFhQKPwFhnRVPgGOSU/DyteKgDvkIujVw/c9MYjhhJC2ndpH5Jj/rpLJsP?=
+ =?us-ascii?Q?SLlz8LAwEE84CYNnUWxR2DNCf3zjSD4HZMrSFXwKeZtK6l2ugUq/0+8JCCIu?=
+ =?us-ascii?Q?SW9Om1siSLdL+npl6hMTrKgwXOaI4CtvlcCC1d3erKsVAD+1nedVBIditduY?=
+ =?us-ascii?Q?p+p1B44NFwjSghgqE3W89YUZzyPql+82xP2sQDk3Q4hO7bxcjPfFJz1Hwees?=
+ =?us-ascii?Q?vtUAtCLSCCxdMezSTp/RNeUw1e9Pb59zt7W1+9QlkbBvs7KnCV2Nys/ob/Nt?=
+ =?us-ascii?Q?4UBCOuNrvQTqlrh3egH33zkcH4GqP/W7n/Q8F0ObYl+rCZwbWzRH++EUaWFz?=
+ =?us-ascii?Q?9j7lloVtk9dL9+xgpDu3ITFnnnZaL9BtUsaAbXyNV4AQBwymTz3qgRlvqtrJ?=
+ =?us-ascii?Q?RZXpAz+CaxNVj6Gg1fYhmI2SPlXRwgv6/6ILjhHLEX3njGaldnBR3gFjgXar?=
+ =?us-ascii?Q?HkcMQjHu1PYCPn7fJVdafrNKJ3OC8iwGSz7lwpnB8YLJj30dNNyFrhJRhBxM?=
+ =?us-ascii?Q?VKRSRF9dvA7bvMCzUU+ZY8m0Ks3iMWXihx4lnxnqMkq8yPLfYfinEMgze7OZ?=
+ =?us-ascii?Q?gGeTlOeK/OuxwXpb+PYAm1dFdGYPCKktZBVFLsKDA9QGVTcEAnGGK53HskNb?=
+ =?us-ascii?Q?EnZOJCw2M9+siUwrLQyEbF/la62XCnoxJeQHPHZsRJVhmxiAi2PdDYRtq02j?=
+ =?us-ascii?Q?QcSrI78JQXzshtxX+jFYFb1dZjr/MVHvsRSesNB5qT3lxZHLORHcx5cqPvCL?=
+ =?us-ascii?Q?He7bYno8XR9IPX5xVHzIYY9c/9KV2dKU3yiK2scAW49vUmwy1EuBExQmZUTH?=
+ =?us-ascii?Q?dpXE+iVNlQfhdq1P73ygj60FaSQ/IjKIP69De9n/Q67xQnNAEsoglK454QCQ?=
+ =?us-ascii?Q?AH7PSKwaUf5/u2Q+qjSV+HZZiPgC/wnXfJBIeePa2CQzSRl1rdpB34qmC2hZ?=
+ =?us-ascii?Q?qvJhCQZypz+828jMBjlJTjf1rq9Fj6gX2nIm5WYwp7kZG4UENrJ/mYRzS4iq?=
+ =?us-ascii?Q?BnKTJr10QbRQRSbtO8M+oFxkxl1C1EopukVhFm9HaxL+xdO8Z5WTZX3b/Uld?=
+ =?us-ascii?Q?ZI5Az44HiiEFQUehI+fHf/tVwYQRKZdYGRaq6a56wK3dh8aJo8+MuFHTN2Nm?=
+ =?us-ascii?Q?kQNP2Reon1L7/CA8RRwej43SFbdhAdWLIhKxwk8X+VumnHLWVu3fKliruYcu?=
+ =?us-ascii?Q?QqoQuxc3loI2H5uwY23ccEhs4mMhVB+eI+ck3ppxm8bQDHlzrvI65/4+vIcl?=
+ =?us-ascii?Q?nRyMYcFhHkvfkip6hvgiVyW+GAZwxW5tGXHTbzBBui+Fvz2EllAOdF2fCwDW?=
+ =?us-ascii?Q?Mva0xYghRJiW2RqLzEQaXLRhI5lIWrNsYVPR2SsJP4dI+Ce9vCMoxKv31M8A?=
+ =?us-ascii?Q?EQ19mkXymJypj+W+DYQ723BJL3TaO9/6OnGLwwC6+A+DsthYjetHhggHhMMz?=
+ =?us-ascii?Q?OJ/8VJ9+H2xAUKg68iQmGV/ljlp1IdU=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 259d6761-9609-4084-d0f7-08debd26c756
+X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2026 02:05:38.5436
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GAUXS2JCmsLUZsz39z3oNl6EYQlxQ88zXEnmMQtqvz4jK/o+BdVGutB6kUGJ3UnnlIurXIBugao/I9+G0dc6+QF0mdoxgmSYSchXLRzU5PE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0862
+X-Spamd-Result: default: False [5.04 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[ucas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-292945-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	GREYLIST(0.00)[pass,body];
+	TAGGED_FROM(0.00)[bounces-292948-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[motor-comm.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai24@mails.ucas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,ucas.ac.cn:email]
-X-Rspamd-Queue-Id: 40C125FC417
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.939];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 802775FC64D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In llc_ui_release(), sock_orphan() was called before llc_sk_free()
-stopped all LLC timers. A pending timer callback
-(llc_conn_ack_tmr_cb()->llc_process_tmr_ev()->llc_conn_state_process())
-could fire between these two operations and dereference the
-NULL sk->sk_socket that sock_orphan() sets, causing a kernel
-page fault.
+This patch is for Starfive JHB100 EVB board. JHB100  contain
+1 RGMII/RMII and 1 RMII synopsys GMAC cores. In the EVB board, RGMII
+interface connect with YT8531s Ethernet PHY. RMII interface connect
+with YT8522 ethernet PHY. So patch 1-2 is for RGMII interface
+patch 3 is RMII is for RMII interface.
 
-Fix the race by moving sock_orphan() into llc_sk_free(), after
-llc_sk_stop_all_timers() has completed. This guarantees that
-all timers are stopped before the socket is orphaned, eliminating
-the window for the race.
+JHB100 is a Starfive new RISC-V SoC for datacenter BMC (BaseBoard
+Managent Controller). Similar with Aspeed 27x0.
 
-Fixes: aa2b2eb39348 ("llc: call sock_orphan() at release time")
-Signed-off-by: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
----
-V1 -> V2:
-  - Replaced sk->sk_socket NULL checks with moving sock_orphan()
-    after timer stop, as suggested by Paolo Abeni.
-Link: https://lore.kernel.org/lkml/20260526013541.796307-1-xujiakai24@mails.ucas.ac.cn/T/#u
----
- net/llc/af_llc.c   | 1 -
- net/llc/llc_conn.c | 5 +++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+The JHB100 minimal system upstream is in progress:
+https://patchwork.kernel.org/project/linux-riscv/cover/20260508053632.818548-1-changhuang.liang@starfivetech.com/
 
-diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-index 35278c519a30..92f3576b339a 100644
---- a/net/llc/af_llc.c
-+++ b/net/llc/af_llc.c
-@@ -227,7 +227,6 @@ static int llc_ui_release(struct socket *sock)
- 	}
- 	netdev_put(llc->dev, &llc->dev_tracker);
- 	sock_put(sk);
--	sock_orphan(sk);
- 	sock->sk = NULL;
- 	llc_sk_free(sk);
- out:
-diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
-index 5c0ac243b248..c02285441592 100644
---- a/net/llc/llc_conn.c
-+++ b/net/llc/llc_conn.c
-@@ -977,6 +977,11 @@ void llc_sk_free(struct sock *sk)
- 	llc->state = LLC_CONN_OUT_OF_SVC;
- 	/* Stop all (possibly) running timers */
- 	llc_sk_stop_all_timers(sk, true);
-+	/* Orphan the socket after timers are stopped; otherwise a pending
-+	 * timer callback could dereference the NULL sk->sk_socket that
-+	 * sock_orphan() sets.
-+	 */
-+	sock_orphan(sk);
- #ifdef DEBUG_LLC_CONN_ALLOC
- 	printk(KERN_INFO "%s: unackq=%d, txq=%d\n", __func__,
- 		skb_queue_len(&llc->pdu_unack_q),
+The patch base net-next (base commit list below)
+
+previous commit
+v1: https://patchwork.kernel.org/project/netdevbpf/cover/20260415092654.64907-1-minda.chen@starfivetech.com/
+v2:https://patchwork.kernel.org/project/netdevbpf/cover/20260422083255.29692-1-minda.chen@starfivetech.com/
+v3:
+https://patchwork.kernel.org/project/netdevbpf/cover/20260508094522.3952-1-minda.chen@starfivetech.com/
+v4:https://patchwork.kernel.org/project/netdevbpf/cover/20260520101310.128969-1-minda.chen@starfivetech.com/
+
+The change list:
+v5:
+1. patch1 and patch3 add review tag
+2. patch2 using phydev_id_compare()
+v4:
+1. Add review tag
+2. patch 2 check interface first and Add the reason of checking
+PHY ID in commit message.
+v3:
+1. change some commit message.
+v2:
+1. patch1 move mdio lock out from  yt8531_set_ds().
+2. patch2 changed to phy_interface_is_rgmii().
+
+Minda Chen (3):
+  net: phy: motorcomm: move mdio lock out from yt8531_set_ds()
+  net: motorcomm: phy: set drive strength in YT8531s RGMII
+  net: phy: motorcomm: Add YT8522 100M RMII PHY support
+
+
+ drivers/net/phy/motorcomm.c | 77 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 67 insertions(+), 10 deletions(-)
+
+
+base-commit: 8415598365503ced2e3d019491b0a2756c85c494
 -- 
-2.34.1
+2.17.1
 
 
