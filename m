@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-292991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKXgDEgnGWoSrQgAu9opvQ
-	(envelope-from <netdev+bounces-292991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:42:32 +0200
+	id +BCvKa0nGWoSrQgAu9opvQ
+	(envelope-from <netdev+bounces-292992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:44:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B43A5FD78C
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:42:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED63A5FD7BC
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C20C730EB023
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:40:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AD1B30837D0
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 05:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9887939FCC4;
-	Fri, 29 May 2026 05:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB19339EF2E;
+	Fri, 29 May 2026 05:40:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341033A16AB;
-	Fri, 29 May 2026 05:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950B03A1691;
+	Fri, 29 May 2026 05:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780033204; cv=none; b=Z/tJQzinj8MXeT0x5h55CM9bomRxtbsDqsCNs8dkDqMuKzk1WsMEEuZyoChug8N9J2DixTMEQ1EhsPUecc5ikpsDQ1bkw2COIy4apDgZZMhdlN96zSPi5xn7Ho1JSFJJu1jCBqFcNygEhf44RxW0q00Kcjxd2O+hqoFP4nAOtv4=
+	t=1780033216; cv=none; b=aF12ibJR+Yl+uUYAEbjftBOs9Htcy434+cCibE034S/RVVuwgn0y6t7BCJGGxX72gT/HfavIANXfxcDgI3n9DfB6CDRn48IgW1Xy9eS59qfmHvtURtbxPEHOBWnP2kvtc1BlqhDaD5SNMGM8ozZ8N7mHHtUi9ceDazS5PlW31h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780033204; c=relaxed/simple;
-	bh=u+E5pemDD3VOKY+ED2QU0YCu+rrKByOaaaeqWiUIYIw=;
+	s=arc-20240116; t=1780033216; c=relaxed/simple;
+	bh=1T7qHbu9Z0TcB+LGNmap0D0Fv9MZJK1aaLEcKoRk6+8=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P5PUuBvDqXK8G//sfdWxJXZE7aZsYTyAIfomWfXUB2UkWxzQ93DP5K5tzOWa3eU48OwQ/oPJvAJrdXh68stfduHcVwD/BpfMtNmj115c8hyAVAkxZM1RINvPcm7/0yapVxeuRO65ogVJzLngxztUSKxK7j/BCWhNGempq6O6N4s=
+	 Content-Type:Content-Disposition:In-Reply-To; b=pQr+4IiaE53lk6HWNj6x9zEer24Rm/5VMV/gQdOGyLFcoRZLNYyMLR5gn9YU+OD1qeFcmv7ImaGpxiAGlYdxNRJY6lN/A4clQ3zPwGRZOaGv2RcIstiy5qKK6r8vpAW8hKjmDCTsXRa7AoKhlVDuHG9x1lxPuMYVx95YQmb/oNs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -36,9 +36,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wSpws-000000004Cm-1Bas;
-	Fri, 29 May 2026 05:39:58 +0000
-Date: Fri, 29 May 2026 06:39:55 +0100
+	id 1wSpwz-000000004D9-3R6k;
+	Fri, 29 May 2026 05:40:05 +0000
+Date: Fri, 29 May 2026 06:40:03 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: John Crispin <john@phrozen.org>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -47,9 +47,9 @@ To: John Crispin <john@phrozen.org>, Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v4 1/4] net: dsa: mxl862xx: store firmware version
- for feature gating
-Message-ID: <d4aa5a0116e2b3847d2b24fb42435812c5dfcc7b.1780032869.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v4 2/4] net: dsa: mxl862xx: move phylink stubs to
+ mxl862xx-phylink.c
+Message-ID: <debb2d4a638ac7a1aa13c54eceab06089249a2a0.1780032869.git.daniel@makrotopia.org>
 References: <cover.1780032869.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,12 +63,12 @@ In-Reply-To: <cover.1780032869.git.daniel@makrotopia.org>
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-292991-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-292992-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[makrotopia.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[phrozen.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
@@ -81,104 +81,188 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8B43A5FD78C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,makrotopia.org:mid,makrotopia.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,phrozen.org:email]
+X-Rspamd-Queue-Id: ED63A5FD7BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Query the firmware version at init (already done in wait_ready),
-cache it in priv->fw_version, and provide MXL862XX_FW_VER_MIN()
-for version-gated code paths throughout the driver.
+Move the phylink MAC operations and get_caps callback from mxl862xx.c
+into a dedicated mxl862xx-phylink.c file. This prepares for the SerDes
+PCS implementation which adds substantial phylink/PCS code -- keeping
+it in a separate file avoids function-position churn in the main
+driver file.
 
-MXL862XX_FW_VER() packs major/minor/revision into a u32 with
-bitwise shifts so that versions compare with natural ordering,
-independent of host endianness.
+No functional change.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
 v4: no changes
-v3: use bitwise shifts in macro instead of endian-specific union
+v3: no changes
 v2: no changes
 
- drivers/net/dsa/mxl862xx/mxl862xx.c |  3 +++
- drivers/net/dsa/mxl862xx/mxl862xx.h | 23 +++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ drivers/net/dsa/mxl862xx/Makefile           |  2 +-
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 51 +++++++++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.h | 14 ++++++
+ drivers/net/dsa/mxl862xx/mxl862xx.c         | 38 +--------------
+ 4 files changed, 67 insertions(+), 38 deletions(-)
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
 
+diff --git a/drivers/net/dsa/mxl862xx/Makefile b/drivers/net/dsa/mxl862xx/Makefile
+index d23dd3cd511d..a7be0e6669df 100644
+--- a/drivers/net/dsa/mxl862xx/Makefile
++++ b/drivers/net/dsa/mxl862xx/Makefile
+@@ -1,3 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_NET_DSA_MXL862) += mxl862xx_dsa.o
+-mxl862xx_dsa-y := mxl862xx.o mxl862xx-host.o
++mxl862xx_dsa-y := mxl862xx.o mxl862xx-host.o mxl862xx-phylink.o
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
+new file mode 100644
+index 000000000000..f17c429d1f1d
+--- /dev/null
++++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
+@@ -0,0 +1,51 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Phylink and PCS support for MaxLinear MxL862xx switch family
++ *
++ * Copyright (C) 2024 MaxLinear Inc.
++ * Copyright (C) 2025 John Crispin <john@phrozen.org>
++ * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
++ */
++
++#include <linux/phylink.h>
++#include <net/dsa.h>
++
++#include "mxl862xx.h"
++#include "mxl862xx-phylink.h"
++
++void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
++			       struct phylink_config *config)
++{
++	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
++				   MAC_100 | MAC_1000 | MAC_2500FD;
++
++	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
++		  config->supported_interfaces);
++}
++
++static void mxl862xx_phylink_mac_config(struct phylink_config *config,
++					unsigned int mode,
++					const struct phylink_link_state *state)
++{
++}
++
++static void mxl862xx_phylink_mac_link_down(struct phylink_config *config,
++					   unsigned int mode,
++					   phy_interface_t interface)
++{
++}
++
++static void mxl862xx_phylink_mac_link_up(struct phylink_config *config,
++					 struct phy_device *phydev,
++					 unsigned int mode,
++					 phy_interface_t interface,
++					 int speed, int duplex,
++					 bool tx_pause, bool rx_pause)
++{
++}
++
++const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
++	.mac_config = mxl862xx_phylink_mac_config,
++	.mac_link_down = mxl862xx_phylink_mac_link_down,
++	.mac_link_up = mxl862xx_phylink_mac_link_up,
++};
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
+new file mode 100644
+index 000000000000..c3d5215bdf60
+--- /dev/null
++++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
+@@ -0,0 +1,14 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++
++#ifndef __MXL862XX_PHYLINK_H
++#define __MXL862XX_PHYLINK_H
++
++#include <linux/phylink.h>
++
++#include "mxl862xx.h"
++
++extern const struct phylink_mac_ops mxl862xx_phylink_mac_ops;
++void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
++			       struct phylink_config *config);
++
++#endif /* __MXL862XX_PHYLINK_H */
 diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
-index b60482d93a85..2f22adedfbf6 100644
+index 2f22adedfbf6..a193f3c07d35 100644
 --- a/drivers/net/dsa/mxl862xx/mxl862xx.c
 +++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
-@@ -257,6 +257,9 @@ static int mxl862xx_wait_ready(struct dsa_switch *ds)
- 			 ver.iv_major, ver.iv_minor,
- 			 le16_to_cpu(ver.iv_revision),
- 			 le32_to_cpu(ver.iv_build_num));
-+		priv->fw_version.major = ver.iv_major;
-+		priv->fw_version.minor = ver.iv_minor;
-+		priv->fw_version.revision = le16_to_cpu(ver.iv_revision);
- 		return 0;
+@@ -22,6 +22,7 @@
+ #include "mxl862xx-api.h"
+ #include "mxl862xx-cmd.h"
+ #include "mxl862xx-host.h"
++#include "mxl862xx-phylink.h"
  
- not_ready_yet:
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.h b/drivers/net/dsa/mxl862xx/mxl862xx.h
-index 80053ab40e4c..e3db3711b245 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.h
-@@ -3,6 +3,7 @@
- #ifndef __MXL862XX_H
- #define __MXL862XX_H
+ #define MXL862XX_API_WRITE(dev, cmd, data) \
+ 	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false, false)
+@@ -1424,16 +1425,6 @@ static void mxl862xx_port_teardown(struct dsa_switch *ds, int port)
+ 	priv->ports[port].setup_done = false;
+ }
  
-+#include <asm/byteorder.h>
- #include <linux/mdio.h>
- #include <linux/workqueue.h>
- #include <net/dsa.h>
-@@ -241,6 +242,25 @@ struct mxl862xx_port {
- 	spinlock_t stats_lock; /* protects stats accumulators */
+-static void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
+-				      struct phylink_config *config)
+-{
+-	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
+-				   MAC_100 | MAC_1000 | MAC_2500FD;
+-
+-	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+-		  config->supported_interfaces);
+-}
+-
+ static int mxl862xx_get_fid(struct dsa_switch *ds, struct dsa_db db)
+ {
+ 	struct mxl862xx_priv *priv = ds->priv;
+@@ -2099,33 +2090,6 @@ static const struct dsa_switch_ops mxl862xx_switch_ops = {
+ 	.get_stats64 = mxl862xx_get_stats64,
  };
  
-+/**
-+ * struct mxl862xx_fw_version - firmware version for comparison and display
-+ * @major: firmware major version
-+ * @minor: firmware minor version
-+ * @revision: firmware revision number
-+ */
-+struct mxl862xx_fw_version {
-+	u8 major;
-+	u8 minor;
-+	u16 revision;
-+};
-+
-+#define MXL862XX_FW_VER(maj, min, rev) \
-+	(((u32)(maj) << 24) | ((u32)(min) << 16) | (rev))
-+#define MXL862XX_FW_VER_MIN(priv, maj, min, rev) \
-+	(MXL862XX_FW_VER((priv)->fw_version.major, (priv)->fw_version.minor, \
-+			 (priv)->fw_version.revision) >= \
-+	 MXL862XX_FW_VER(maj, min, rev))
-+
- /* Bit indices for struct mxl862xx_priv::flags */
- #define MXL862XX_FLAG_CRC_ERR		0
- #define MXL862XX_FLAG_WORK_STOPPED	1
-@@ -258,6 +278,8 @@ struct mxl862xx_port {
-  * @drop_meter:         index of the single shared zero-rate firmware meter
-  *                      used to unconditionally drop traffic (used to block
-  *                      flooding)
-+ * @fw_version:         cached firmware version, populated at probe and
-+ *                      compared with MXL862XX_FW_VER_MIN()
-  * @ports:              per-port state, indexed by switch port number
-  * @bridges:            maps DSA bridge number to firmware bridge ID;
-  *                      zero means no firmware bridge allocated for that
-@@ -275,6 +297,7 @@ struct mxl862xx_priv {
- 	struct work_struct crc_err_work;
- 	unsigned long flags;
- 	u16 drop_meter;
-+	struct mxl862xx_fw_version fw_version;
- 	struct mxl862xx_port ports[MXL862XX_MAX_PORTS];
- 	u16 bridges[MXL862XX_MAX_BRIDGES + 1];
- 	u16 evlan_ingress_size;
+-static void mxl862xx_phylink_mac_config(struct phylink_config *config,
+-					unsigned int mode,
+-					const struct phylink_link_state *state)
+-{
+-}
+-
+-static void mxl862xx_phylink_mac_link_down(struct phylink_config *config,
+-					   unsigned int mode,
+-					   phy_interface_t interface)
+-{
+-}
+-
+-static void mxl862xx_phylink_mac_link_up(struct phylink_config *config,
+-					 struct phy_device *phydev,
+-					 unsigned int mode,
+-					 phy_interface_t interface,
+-					 int speed, int duplex,
+-					 bool tx_pause, bool rx_pause)
+-{
+-}
+-
+-static const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
+-	.mac_config = mxl862xx_phylink_mac_config,
+-	.mac_link_down = mxl862xx_phylink_mac_link_down,
+-	.mac_link_up = mxl862xx_phylink_mac_link_up,
+-};
+-
+ static int mxl862xx_probe(struct mdio_device *mdiodev)
+ {
+ 	struct device *dev = &mdiodev->dev;
 -- 
 2.54.0
 
