@@ -1,123 +1,179 @@
-Return-Path: <netdev+bounces-293122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8ExzNrWUGWrVxggAu9opvQ
-	(envelope-from <netdev+bounces-293122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:29:25 +0200
+	id +LmPO4uXGWrVxggAu9opvQ
+	(envelope-from <netdev+bounces-293127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:41:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D351602DD2
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:29:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A7B602FC3
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 27D4A301DD92
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:29:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE11230C011B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4949532B101;
-	Fri, 29 May 2026 13:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB86A33B6C9;
+	Fri, 29 May 2026 13:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DEhxgxh8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+o5Ic8w"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117E41DDA18;
-	Fri, 29 May 2026 13:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9D1330B09
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 13:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780061347; cv=none; b=sRYPuoj6XJ67WbNvpXY8Ev5kC/DOAG02wEqqn00zKfnHeAxGP9zWnmPAJvMzVLO/rwGA65XId65VNO/MLN0m7mGXj6cpgE1VWRlz0JLZlfxOQpPc80zldz26/t89iCnPhMEBi9O+8lP7QnVUmkM2TbW+NIVCRyl5suf6H7spxYY=
+	t=1780061866; cv=none; b=iMfNEo4yJZg3Ebj8aIDuI/cZre7iidnX2wuhX08NjheF5legH4My0dWKRgI9S+U3JPDzKCEgSE4a7cGAUsT2Y+RrpjLWRhFds1LIEnNS7xhj6CvSFwe3sFbSVYvs5OoyMQpbDGOiWfEylnBTjagywbnBdyPR2QlyKcubcUXuxyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780061347; c=relaxed/simple;
-	bh=8zCx3xmJGEJVTxfSVvzIHW091hSzk/vkBkAeCMJKMXo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SE8swHhC70/jyIFXKY0yLlkVvgziNSZKntM4nQnQPWdbIn04MO/XH33ip7U9L8w6L41Sw09D23+9vVw0ed+3hqAlU9Hyzp1mD5aPxnkxG+Zfc3m/hHmCGWxZOYhfoHEabhX6lBhe/lorwVCOzddu0jk9owvPPRsfOtfgPvtZXCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DEhxgxh8; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=kpSdIt40pW1yYSiBqzGx/ZOW/QCilCntdnUlwDZm+IQ=; b=DE
-	hxgxh8CL4VsZe23nP6H5ewPpkKh0SGDu/YUNiHUM7Kq5RW1sZXEwaJpEs50EXLcg86RtCz1+N8GV8
-	gEs53+H1aXx0uoJzxgIKYIU+Hw+p3+Ge7YZq6tRUf425S6os7sgQKynddyo+eJRLX7Vb3wTGQDBsx
-	2k+X4yR4PiBjFss=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wSxGi-0055gZ-Ns; Fri, 29 May 2026 15:28:56 +0200
-Date: Fri, 29 May 2026 15:28:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luke Howard <lukeh@padl.com>
-Cc: Cedric Jehasse <cedric.jehasse@gmail.com>, cedric.jehasse@luminex.be,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Subject: Re: [PATCH net-next v4 2/2] net: dsa: mv88e6xxx: add support for
- credit based shaper
-Message-ID: <6040cfca-0af7-41cf-b7d0-00bd8be837bb@lunn.ch>
-References: <20260528-net-next-mv88e6xxx-cbs-v4-0-8bd13b906457@luminex.be>
- <20260528-net-next-mv88e6xxx-cbs-v4-2-8bd13b906457@luminex.be>
- <DA213B68-5654-498A-B688-B92703923CCE@padl.com>
- <gigqfzdzvtoegjd6kb73g2xv4j7uq7f5s2lkrwspiosni3c44p@him3vof5vzrm>
- <793226E0-82B1-464E-9A18-969F773B70D4@padl.com>
+	s=arc-20240116; t=1780061866; c=relaxed/simple;
+	bh=HBwzeHsQGXLIwUmMdkg94+SWWaGkRZMu5f0/X3LWr0M=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XY5hJ+nAxRurFz07ne3fnHYWdoMhAz10hseVqvBT9LLKgzsam2dJxqiRYVUUbSZmeCdKrKidmMrPTtjjXUuHTTqupVqYTlL/d3xlq4Rh2Z5am0B8CRXck0vkfwQILr2Z2Yy8zImyVeQFrpZNyEMEkSgIh4NwxYyITSTpuPJxeSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+o5Ic8w; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780061864;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=smhejs6fWqL6ERRhW1Bqm9utgrRekBtYZKQntnJMRVE=;
+	b=R+o5Ic8wSAAXGh25hnf4kxkhQZ4ESVGPleN1+2xNykYSMjQDIIqZt2/UsTT8mmIL4lgL5W
+	MDnDIfksX2y7GRpviCKqNQdMCxqZvBsl3EK1MRMD+rXzWfVWygnAN3V6yC7NetROOaaVgv
+	/8ODJoMId1v67bLTFgefAOnnv5DiR5A=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-332-UBwEWF4gPY-X-swh9CUnQQ-1; Fri,
+ 29 May 2026 09:37:41 -0400
+X-MC-Unique: UBwEWF4gPY-X-swh9CUnQQ-1
+X-Mimecast-MFC-AGG-ID: UBwEWF4gPY-X-swh9CUnQQ_1780061859
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB6CB180061F;
+	Fri, 29 May 2026 13:37:38 +0000 (UTC)
+Received: from [10.44.32.215] (unknown [10.44.32.215])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A5D88180075C;
+	Fri, 29 May 2026 13:37:33 +0000 (UTC)
+Message-ID: <ba2db5bb-9016-406a-afb5-ce8abdc02d36@redhat.com>
+Date: Fri, 29 May 2026 15:37:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <793226E0-82B1-464E-9A18-969F773B70D4@padl.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 0/4] dpll: add NCO pin type and zl3073x
+ support
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pasi Vaananen <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Simon Horman <horms@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, linux-kernel@vger.kernel.org
+References: <20260527161241.86655-1-ivecera@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260527161241.86655-1-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293122-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,luminex.be,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293127-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 5D351602DD2
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 71A7B602FC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> > That's not the same logic.
-> > If one of the two function pointer is NULL, the other can still be executed
-> > (Maybe not that likely as that's probably a mistake in the driver)
+On 5/27/26 6:12 PM, Ivan Vecera wrote:
+> Add a new DPLL_PIN_TYPE_INT_NCO pin type for virtual pins representing
+> the NCO mode of a DPLL and implement support for it in the zl3073x driver.
 > 
-> True, but agree also that it shouldn’t happen (would be a driver bug).
+> Patch 1 adds the new pin type to the DPLL netlink spec and UAPI header.
+> 
+> Patch 2 replaces the single 2s poll timeout with per-operation timeouts
+> based on Microchip proprietary source code and own measurement.
+> 
+> Patch 3 adds a per-DPLL serialization mutex taken by all DPLL callbacks
+> and the periodic worker, establishing a single lock that protects all
+> per-channel state. The chan_state_update() call is moved under this lock.
+> 
+> Patch 4 adds a virtual NCO input pin to the zl3073x driver that allows
+> userspace to switch a DPLL channel into NCO mode. The pin reports
+> connected/active state when the channel is in NCO mode and handles
+> the hardware-specific details of mode transitions including automatic
+> df_offset capture and 1PPS phase preservation.
+> 
+> Changes:
+> v4:
+>    - New patch 2: per-operation poll timeouts
+>    - New patch 3: per-DPLL serialization lock
+>    - See individual patches for detailed changelogs.
+> v3:
+>    - fixed SoB position
+> v2:
+>    - See individual patches for detailed changelogs.
+> 
+> Ivan Vecera (4):
+>    dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+>    dpll: zl3073x: use per-operation poll timeouts
+>    dpll: zl3073x: add per-DPLL serialization lock
+>    dpll: zl3073x: add NCO virtual input pin
+> 
+>   Documentation/netlink/specs/dpll.yaml |  13 +
+>   drivers/dpll/dpll_nl.c                |   2 +-
+>   drivers/dpll/zl3073x/chan.c           | 102 +++++-
+>   drivers/dpll/zl3073x/chan.h           |  48 +++
+>   drivers/dpll/zl3073x/core.c           |  47 ++-
+>   drivers/dpll/zl3073x/core.h           |  10 +-
+>   drivers/dpll/zl3073x/dpll.c           | 495 ++++++++++++++++++++++----
+>   drivers/dpll/zl3073x/dpll.h           |   4 +
+>   drivers/dpll/zl3073x/regs.h           |   9 +
+>   include/uapi/linux/dpll.h             |   4 +
+>   10 files changed, 628 insertions(+), 106 deletions(-)
+> 
+> 
+> base-commit: aa064a614efcfa4c300609d1f01134e99a12ad10
 
-However, a kernel splat because you have jumped through a NULL pointer
-makes a good bug report. It is much more obvious what is wrong than a
-report that somebody tried to configure TC, but nothing appeared to
-happen.
+After merge of "[PATCH net 0/3] dpll: zl3073x: various fixes", this
+series is not applicable anymore.
 
-	Andrew
+Will send v5 after adjustment.
+
+Ivan
+
 
