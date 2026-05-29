@@ -1,193 +1,127 @@
-Return-Path: <netdev+bounces-293120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDKFO4uTGWrVxggAu9opvQ
-	(envelope-from <netdev+bounces-293120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:24:27 +0200
+	id yBrZG/aTGWrVxggAu9opvQ
+	(envelope-from <netdev+bounces-293121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:26:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50F3C602CEB
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:24:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9803602D6B
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 15:26:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B375C3050C90
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:20:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 199AA30586C8
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 13:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C82432ED29;
-	Fri, 29 May 2026 13:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A6332ED55;
+	Fri, 29 May 2026 13:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XYX4w9xd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PP/jxdQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D7832B12F;
-	Fri, 29 May 2026 13:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1EE32B101;
+	Fri, 29 May 2026 13:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780060831; cv=none; b=gXLj6O57e03tqxWePRjoLSw0031F4OUkWpWaPD2imkjlr/ZxCFi3D4CQvrnpz8FTLKuuqoMUwjHELTLhnOc6wrXyIDBo3M3KYXJVt3eZuPeKStAsauiVnjcDMedWpfQ92cMh9jt9meLsYkeOowpC0QA7l7CP0nRD18BPMekxxxo=
+	t=1780061065; cv=none; b=OdYC6oR+uXkDkVs5Jaoi63koLUVl9FEdfaeskfUFoPaV0pEn60zPL8RiQMFMbevzXvPnzneUcgAQGY6daoomkt1BadEl4EIArtz5NHH0cVII/xM7tBfVTaG+33ItjqagqCl4h6N92YXEJrjyG1sGhPVcaEFHAK0GDGFPKXjytoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780060831; c=relaxed/simple;
-	bh=1uzMhR3bJtbMNHekAoRuuTpuHLn8hbeLZLlH6OxhlZM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jR8Mmuvz+vNvRk9zsrONom+k4sDQESS41XRPlURcTF7PYgNb80kR53CAc8Tq1dDElZs+0uRylvL7cdBI7YDC1M4DYHA3MILx9G89ek2w4BMFUN4XY/YA7KaBi548RMWUD+kc8vXq2N3AZt6zYG/jZaH9WvWD4spzWMQZAVMggQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XYX4w9xd; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id AB4821A3737;
-	Fri, 29 May 2026 13:20:26 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7E7D8601FA;
-	Fri, 29 May 2026 13:20:26 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D2FF110888244;
-	Fri, 29 May 2026 15:20:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780060825; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=bCAAPrlwJxq0MC6d9Ux1eRB29n5MQsEyAgQNN0bZdZU=;
-	b=XYX4w9xduWOTYWkqcKsFZefM43MaWMq90eh8emIc1k0Nkxqrp8HCJByyY8A0dk5CWtOyTa
-	GKyoGwLDQJxveA2DgnRS/qBT3HK51pKXT+vgihvOBvZJCVgjjzJNIUdad6YKTz0MO9tcd5
-	L15oKynNRVR28vLEJy8KeQwqENonlpRGDxf6NrxdU7fhKenrL+4o9E4c1B4ARuMMygjEBr
-	LpjKTbVmBHm5TWLwLPWDBv9MDRe1L6RoXhiBLMIQHTmP7pulFPW7z6/TD/xMFeUXb+/+ve
-	jO93endsaXSIIIu+gfwdd8U6Gs0YfTJ0A3B7iWTcz9ag+tXrx5WvYykURzVW+g==
-Message-ID: <1dd49a4a-612f-4e07-beb1-c2955a8a4002@bootlin.com>
-Date: Fri, 29 May 2026 15:20:13 +0200
+	s=arc-20240116; t=1780061065; c=relaxed/simple;
+	bh=kpqrWy5SJxGkk6gpwUj5xUbEtnt/Vnw6m6pW0CCCkt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kEjRzuJWWhokHgbUudNgp+prrkg6cdoTNFAL9a98dskvHMZdHh9FTbf6Yxo1uawi0/TPusjpQjPnnO/vRy4P38UtXOI2L9rL8f+Ke/Z6MHicmjs7Uqea73EQS0ajhnT3/v4c0/RLWBRN+4DcR2uYDXTUNjA0idet0540BndQToE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PP/jxdQl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=L71W6lePAyQAQ0UNhTYqMway8i0hVWylqwd07SfHofk=; b=PP/jxdQlobh9WLawMPmB2tmvj+
+	znBkUlplsuLpi4r5BbaqAdoMV+Nu150l9cv6Zc7pg5+sqPYCdnLnUK4zqPbvPc35CE3R5tkvTOUEg
+	L8iBnQTzi5yLiMrmYTY0CPJdGIoNSamfcCUxh/YP0Axf5JekDwQAqeB9j2Z0krXWmGYg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wSxCC-0055eJ-H6; Fri, 29 May 2026 15:24:16 +0200
+Date: Fri, 29 May 2026 15:24:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] net: phy: as21xxx: handle corner case with
+ link and autoneg complete
+Message-ID: <4a372acf-f916-4db7-a4d5-949e40e44098@lunn.ch>
+References: <20260528193545.11160-1-ansuelsmth@gmail.com>
+ <9d3729f0-8d2a-4b21-ae87-aaade72e388a@lunn.ch>
+ <6a193a6c.0c2aff9d.3966d9.f87c@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Florian Fainelli <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
- <2293244a-c6a9-4642-a721-dada8a081dbc@lunn.ch>
- <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
- <b7de216a-fd1a-42a0-8711-d822a1ad9319@lunn.ch>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <b7de216a-fd1a-42a0-8711-d822a1ad9319@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a193a6c.0c2aff9d.3966d9.f87c@mx.google.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-293120-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293121-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 50F3C602CEB
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: D9803602D6B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 5/29/26 14:59, Andrew Lunn wrote:
->> I think that
->>
->>    ethtool -s <iface> duplex half autoneg on
->>
->> should be enough, the link should still establish at 100M, I've tested
->> that on a 1G/FULL 100MHalf+Full interface and this is the result we
->> get :)
+On Fri, May 29, 2026 at 09:04:10AM +0200, Christian Marangi wrote:
+> On Fri, May 29, 2026 at 02:36:07AM +0200, Andrew Lunn wrote:
+> > On Thu, May 28, 2026 at 09:35:41PM +0200, Christian Marangi wrote:
+> > > Add missing case in custom read_link, when autoneg is started, autoneg
+> > > complete bit is reset but link is still not up.
+> > > 
+> > > Fixes: 830877d89edc ("net: phy: Add support for Aeonsemi AS21xxx PHYs")
+> > 
+> > If this is a fix, it should be based on net, not net-next.
+> > 
+> > Otherwise it looks O.K.
+> >
 > 
-> Nice.
-> 
-> But i still think the test should check the autoneg result and do
-> something sensible if the link does not come up. This probably applies
-> to all cases where we trigger auto neg.
+> Hi Andrew I didn't want to introduce patch conflict with the last patch.
+> Should I split this?
 
-Yes indeed, we need some sets of helpers to deal with link management, 
-especially for this kind of ethtool tests, with ways to recover a known
-working configuration.
+Yes.
 
-> 
->> That said I've tested the following on mcbin, and it seems that acually
->> nothing in the code currently deals with Half duplex / Pause interaction,
->> and we don't get any EOPNOTSUPP.
->>
->> So the broader question is, should we reflect the current behaviour or
->> an ideal one ?
-> 
-> What 802.3 says. 
+Post the fixes to net. On Thursdays net get merged to net-next, and
+you can post the remaining patches then, after you solve any
+conflicts.
 
-Ok, this is what I've been using to define the documented cases so far:)
-
-> If we come across cases where phylib/phylink is
-> broken, let me know, and i will fix it. But we will leave driver bugs
-> to individual driver developers.
-> 
-> But we also need to consider that for some APIs, we have decided that
-> a configuration can be set now, which does not actually apply in our
-> current conditions, but it will be stored away for when conditions
-> change and it is applicable. The half duplex case could fit that. When
-> the link is currently half duplex, you can configure pause, but you
-> don't expect it to actually change the current behaviour. It only
-> kicks in when the link renegotiates to full duplex sometime in the
-> future. We have to also consider this the other way around. The link
-> is full duplex and pause is configured by the user. Something happens
-> with the LP and the link renegotiates to half duplex. The local end
-> should not throw away the configuration, it simply cannot apply it
-> given the current situation.
-> 
-
-True, so the end result is that we must not error out when changing the
-pause params while the link is in half duplex, but store the user intent.
-
-Maybe an exception is if we only advertise HD modes ? i.e. HW can't do
-FD, or user forced HD modes ? even then, ethtool will show that we
-aren't advertising any Pause modes, so maybe that's enough.
-
-OK maybe in the end the best course of action is to leave this 
-discussion here and I followup with :
-
-  - Well defined test cases in a machine-readable (or human readable but
-    with much more details) format, including start conditions, a
-    decision tree based on the "supported" fields
-
-   - A list of identified corner cases that may be ill-defined (such as
-    this HD topic) that we can openly discuss and potentially followup
-    with code fixes
-
-  - Human readable doc for developpers and AI to ingest
-
-Maxime
-
-
+    Andrew
 
