@@ -1,205 +1,180 @@
-Return-Path: <netdev+bounces-293254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GrIEA/1GWp/0AgAu9opvQ
-	(envelope-from <netdev+bounces-293254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 22:20:31 +0200
+	id GGB2Lyf0GWp/0AgAu9opvQ
+	(envelope-from <netdev+bounces-293255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 22:16:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF386086E2
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 22:20:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6640E608600
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 22:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BFDC931A37B9
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:07:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5F74B30499A4
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 20:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC69744A71D;
-	Fri, 29 May 2026 20:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA60F348C4A;
+	Fri, 29 May 2026 20:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="iqL7hUhW"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="W6mucJMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.151.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E14B449EB0
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 20:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.151.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67574348C42
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 20:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780085101; cv=none; b=uB1McMsjzdKF7g8sR5CxwrduJE97IvIgI+Ibz0hDcX6KBmVx8qY6qz1inccXuewckJVGgq5hoXXeYCMUTelO86Zeavje4i4V5crgtBGhSjpOAUwXU20sRVz6oF0y/VVlt/Bxffr4p6NkCZ8wr3XVldavesxamL3Apo9VeW32sY8=
+	t=1780085494; cv=none; b=lKn6o9XAvXW7SJUV4yKT9X3u4vJpP0NYygXx12ojiP4nl5kLXzwsQlCtl26aQl7GcNMIhj1pWQTcAyf5PvYpNh4xguU65iqL6uOauRLmGGmgQJjovPbG9wHCWdmgt1YX6vVrNzuA9qf572x9L7lWFqYEIMNmg4AkjG4rd5daRTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780085101; c=relaxed/simple;
-	bh=cboX3d8XkVXIEKowAOjoe4Fu6Sq0Dq4+kvLQFmjQATQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Z9xnuh1fbXIGI2EUJOsw5LROdcstm7I19BgjAm/otET+PL0+sMt0jHvIJZSe9ia/TeH+zTxtdY/c4MvZsdp31BAQVcoqUCDhGWRd+XtWUJWkIJakTz7PlAi8tIjJTo34qSyIeizjJNQf5GQ1OuFuVFXwASNqG8ZoEbu0NAbGHjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=iqL7hUhW; arc=none smtp.client-ip=170.10.151.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onsemi.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1780085100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6z1jfvzQfiPZQlmfQKAx/3yNkDe+kLUmEifZ3V+qmwQ=;
-	b=iqL7hUhWGx3fPoIf4Yyam6eZIfIQD0rdMXDExZqFtZF/ZnjyRas5HifNnSCh/8h5E5GPbP
-	KubRZtoaMt4rAkT1fbbErHsgVlyA0x7YN4aJnOzfUftlLPkEOy+DhBnGeQe5a1AN0tDd2a
-	UdJFhBoDJ35rxa4pS1++pC6s+Ni09kb2GckW17rL1Ja5DHzSUwjm24f9+u83cCLWIo3Hip
-	UvBCOUA+veUtpXTC8qY1CL+RU0lB6CVb0AR0Y28TF1F2u4SCJHg3UYOlv5N9sclx8wWxQI
-	qmKqLgdfVMredDF2OliZc9xVxX/alO9tN49vu8KRTVtDxdvGjO1feRgCqP8+Wg==
-Received: from MW6PR02CU001.outbound.protection.outlook.com
- (mail-westus2azon11012028.outbound.protection.outlook.com [52.101.48.28])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id usb-mta-13-EZSTXzn9ObWJE2oS3EUZTg-1; Fri,
- 29 May 2026 13:04:57 -0700
-X-MC-Unique: EZSTXzn9ObWJE2oS3EUZTg-1
-X-Mimecast-MFC-AGG-ID: EZSTXzn9ObWJE2oS3EUZTg_1780085097
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
- by CO6PR02MB7746.namprd02.prod.outlook.com (2603:10b6:303:a2::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Fri, 29 May
- 2026 20:04:55 +0000
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.21.0071.011; Fri, 29 May 2026
- 20:04:55 +0000
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: "parthiban.veerasooran@microchip.com"
-	<parthiban.veerasooran@microchip.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
-	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net v2 2/2] dt-bindings: net: updated interrupt type to be
- active low, level triggered
-Thread-Topic: [PATCH net v2 2/2] dt-bindings: net: updated interrupt type to
- be active low, level triggered
-Thread-Index: Adzvphv6ynOJ7tFNRMGEE6zUoRwGYA==
-Date: Fri, 29 May 2026 20:04:55 +0000
-Message-ID: <CY8PR02MB92497E67D5AB4C72E7A4C12683162@CY8PR02MB9249.namprd02.prod.outlook.com>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|CO6PR02MB7746:EE_
-x-ms-office365-filtering-correlation-id: 09127b92-27e6-44ec-30ec-08debdbd8db3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021|921020|56012099006|6133799003|11063799006|18002099003
-x-microsoft-antispam-message-info: rt4Yu3r4ynDuvxUZUa3bl+hbOGtZHsku+22j8CdqFqwbx6rDLnXktw4i6MBRk1CElQrTsAJwq5mu2mf7QpgHafNnKjYyeb/ZDgmIvU5sKWq/vBeKh/Ml6uGeYn0fI1JiWvNN4I02DQR7FiH6BRmWVC0DqWuaz7ZGamq/JkafhZ+UaV27EYG56xoI71s0Ne2bJrvQjBB/M7j3zGlGMGHu2cGvE+5M7cD/3yuKT6VieM6ueWCFYUu5Yax7IBT0+nfcPDH6L1SbtMWed6wqizlEf1gCz0GqOzrYDfJQGTQh/ct9ndZ56oYTMbiaIt6eQ4O4SNfggJfie+jwFWDmeR5hNJUJkUuNgwJ8zHJau54f+xD1wcVYxdG6d78RdRx6opQmZn3c5mkwbbTCBJrlUHucDM5OQqZVKb8qvbVZvp/QM9QgegDA0VR4cLpFtC2kfCc2Jmy2XpkQlq7bKPg8FlACzE2jOjqnm4956PgkcuyStaGWWeA8LrJvshszmPwMMnd9dB5bQ9Zfvhw/2gZeK3v6sNqJrJhDYhhzJniK4nph/9MjXrQL4CJRZS6M7xi5Zkg4zxlQjts1fJxfg+VrMqH4qZVRUyeSi8oaTVXfWMS7Duy1jQ4Ow+BIBvmgcloR58BcOSf31z6828nv6rp8ZklIOFXIFMoTlpLbojZWL9mxhAc+b9nd1r/9j957CWCOyXetWE+dNEKg8O49UWICulA2ANhv8r5HUVrWq8wrPyuGuP/FJIp3WnWpR8PYtV1BqTOlZO6gSVfze/vUENoDHVKpfA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021)(921020)(56012099006)(6133799003)(11063799006)(18002099003);DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?EuABdMjcT59jfQElv2uOQBzhB6I0PydCkgkfIFIy94G1UHq3vG6CTD+p1+u2?=
- =?us-ascii?Q?zhHXj2gNah6I0ZQ19IRBmPy1Bq4Shg3m8uXBgrtxUcElhKDeFPCHeYVS8XRM?=
- =?us-ascii?Q?bm/NQvvwARt6ja+iPTGw6VYsC1l4nc8unxE2QBaSdTjSlhI45+lq3iPAYuVf?=
- =?us-ascii?Q?gK1gDZAR2gBPKbcNOX815EjjB9c0SKRGhzQYQO2KHHHd/JHc7T/ygx9ijftV?=
- =?us-ascii?Q?B/W82yw5fuRAisbDdG1AkHCsYbn1HCo36VgOIWbpuHKXJ2cGkSnaU/q72+mB?=
- =?us-ascii?Q?6LcwThlBz3sBvJChVo/z6Z8Zpucb1eriKMz8bgWxSxM8d/O+XsQKeE/hv6QT?=
- =?us-ascii?Q?NZpwzXO7lhUyIaCdCmsAJmoqFEAJbBbNbxUtC6rVJ+jy4+gwIRRhFD3KOJmh?=
- =?us-ascii?Q?M00eBKnJBMhDpRtQwRethb0+Q2f9FpbQIN+pI2gBzGTvE5xpyBCU0DbFGadW?=
- =?us-ascii?Q?C6gAan5InmXsKrpBX/srJ7Yh6gVeEvGzDZlSEHS7JzakN38mMmyYuJ/sEVOx?=
- =?us-ascii?Q?Ywz5zNfJst73smRXBi4Ktzjo4tPyoYvBaW4TeP8oZCRg7Dr9ahP+2hhf1+7I?=
- =?us-ascii?Q?2LsxeeqYy+vR9TOasA/WpqJmDSGT8Sbp4rOYXSG2m4rEUG/M/uQz/nWludiE?=
- =?us-ascii?Q?9szsQ8xylX2qph65K+2YOyU/QJ4eWGEBoIRH//iP57qV1746RiJsLjk7/lIi?=
- =?us-ascii?Q?85XFXu3OXJBkVW/TvcNtjd9Cd8Lu6VPwx/S5ciMTE0JADbB+qjLWyo7mfOfU?=
- =?us-ascii?Q?LqsyrVYmMfdGIopZ8RMwOZLHge6ENelX5l3mhCNT8DYmDXOvn0lQBvmiT/g0?=
- =?us-ascii?Q?we5tSbVYb0g+tQHng9rtI145Y/IrDL0Xgdf3un81TcqbuHxMKvaYLGkcYxZU?=
- =?us-ascii?Q?RYVXMh7UT/v/vRJXdLG7oXGZyK75sGMRMNYoi1kfOgloiMbvI4UhpRFO8fUk?=
- =?us-ascii?Q?sl+jk1jZAgOUqd3dEljNU3OFdVfuqPVUIzNLdhZVCTNN0wOxUusfbtzg4gTc?=
- =?us-ascii?Q?UeVKfC/qwCtlkB78VKdw2noLFhDw3wOIdxDHH15PrOV4f5Lmx6AUX80iMgyu?=
- =?us-ascii?Q?qgSOLETlOOK0BWHKYw98cI0t8VFjzDYuzZg3efypHvEJbqJU1qG008lWldCK?=
- =?us-ascii?Q?AFmJ/K6a82RXUQC0aK0bCsu98CfJkT60ZyD2VrqWpRfcNeErItSi14Y2Bmuu?=
- =?us-ascii?Q?dmOrhb/ejWVFAJRvbBlMc7WOcqVYegkvRGqAAWDb0YsigpEL0iqW+9h39pVd?=
- =?us-ascii?Q?3KpvmSB9XkL0Cs0gj1tm+5+MKg+58a6ZceTw0hHmJFvAcffedW5o/gRs+1cs?=
- =?us-ascii?Q?04+EHpPjQAutfrsC0dJsZvOBVe7vvoyUAp9xUV+a073Ftr47YnqSXL8IgNyT?=
- =?us-ascii?Q?LuwqgLsq3a16bo5M2BriwHnRAoy8KHY8PX+4TcdUx2aYfXOPUicrKp80NghW?=
- =?us-ascii?Q?nVyCrgJ7kJmjkxEYigERwvoUCrPGEOgZRKJVLKLqs0+QX486yGOFrShreHGH?=
- =?us-ascii?Q?UeAEv6ouE3SnOm8Lw98W1LZijcl7MxhWW4PwndCwLs+Pn/wZdwXAGh5zr1iA?=
- =?us-ascii?Q?smE+6xEY7Un9Q6iI7YtHSpmt+t16K7NWKMFHmegpyd9xM5c+PgXDvcxEBylX?=
- =?us-ascii?Q?S0WXGLIpmTCpciYIKpZw/f3EyAdt7xgBgi6k+v9/MpACivFhFCCxtN7uBX53?=
- =?us-ascii?Q?tUx6yQrqSY1isWkAX28XMQSyipbUOTeYJzuCAkRtLXXe7lkkCTIbG0AYHuwG?=
- =?us-ascii?Q?ukQHX0NcFdkKule+DLXw02IVntn6i9c=3D?=
+	s=arc-20240116; t=1780085494; c=relaxed/simple;
+	bh=yIjjEsSzcNVlj5Jerb5VL9COIWs3RWb5zUy94AhWr9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pS/TxtNSB3wdShL4/oV5OHQDYsSY4alSgZt7TFJHTWzy5W0n4Z0StymmTr9LQi3YaW2RQhJl79BFjuvTCGoU8k6wH+eRaH1nNsVCfyT8fgAN7AbmfOXYA04rWF/BdjPullgueZxt+bSs2BJqC4aQNb6NHeeJd5tvEVb8kMzNfSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=W6mucJMI; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-914bd98faafso600212085a.0
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 13:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1780085492; x=1780690292; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=x50nMfXuC2+erTFJFRG2pVEkXmZORi5k9T8WBzn0C8s=;
+        b=W6mucJMILm76P1OvgIkeoQrHk1o7XL8eEki7XJZS1XS2OjCf+Mt31OyMtZjR2qaphh
+         JYplHQ+jawZn32wdHnTUZ7/BfzMzKsTBm8Fig6rF907+pur3pR03NcbXI3r1E4jPnjWi
+         Pj4l7r9Cd2P7VD6P6PcOKOr4ri/urmF4R+FIVF9YA78pTdvWQQSYvF7Z7feosxpyprw7
+         +tFE69MQ32W/Mxl0Hefoqfx48geK4OASrV2q31UfG3eYxFQEg3WoFwURPR8t8K7LU6Z6
+         3WzIrlfGGwk+6WgLZUiy5+fga84k7c35MG0crSnEaA2c5absa3at7TeFsmJ2pdiwI3bK
+         qt4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780085492; x=1780690292;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x50nMfXuC2+erTFJFRG2pVEkXmZORi5k9T8WBzn0C8s=;
+        b=tRHA2MtDE/gcYqf9Lv7TEED40EPRnkEVdlglwltlGwANJ3xbEowy+psnFsE/cAkMzp
+         G0X8BVSw6FUtSynh1Zy1ldVcsfN8TMbC/vAltuhTdmnPHRTz33VQRgpA0UEaYY6GHBSI
+         gdYqN7SW9BsVQm8a3nSgrX7y8/8CO9KGMNIzpKILZUZ7L2dzAn3EL6zHUBRKAGYi+08w
+         WR1ZM4MBBl9x7rlti+jQL1lVUJRMVS8ZiEmdlrEGAdNXQzIKDt8imYLjrHwWnX0jZwMl
+         hVqrelNFWg/X3Vu4LfRLP675OU3FLHuAFkKpi0jAQAQzf4hWKi0LEJ3WVbqMBF4cyGRm
+         skRQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+JbVkLFVpGRbF6WpIeG8w3OS8a+eatWNPKnUZWPSAQsviVt0+iScsnrZiO9rfjdOEwue3d7ZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyN2oEnwRWeF9j7c/OB63TQXDCGvQzXGPd1wBaWhzJhhJYeddA2
+	rxNZRkPg9plCPERj5isso0O0jaLNqVUzcjYjZeQ+QR0F4lJ51v0sTGPX0ufxpsXON0g=
+X-Gm-Gg: Acq92OG9zhcywEcTE8LTFZRuumdOt+zGsP1y7PFi1P+DNtTjvux3vgKSA+jqMKtWJrp
+	iVicE6fXKeNghJe02I9QF5VaDgcUlDXgI9u6N743tmnOfKuzEl5ftPPmwFBpU7vQPl2DBBn+xap
+	HoZxLD8BG+iSA3hoCta/67dXgoBPFJVr7DTia37W//jxzlQIEGlBfF/n6aSQBzYqRGokTbgBLAj
+	jR0aeJjZz7Vcn5xKM35m5qfTlE5KVynPklTxmoGIDs3x38cSDXo+UYbMqBBLWJ10ZulgNfAA3B7
+	Q4sJ6LK/nDaXGr7KZA8SAV4xh8JcMM+zOuQveURgFc078IdVN2I/e/V6d1i4NwyT4Cxksjwof82
+	ShINkc36zXTvIwIlIJSUa+CLgOEaJrdAbvW70htnMw8j32T+KTOK+bfXIrYtiHhHMQQkbUxISaH
+	PXSz6/ZPxEVdl0KCgu43qwjHCaSxn77vZ3oDqW931OWVspAoAOZjrICkZJuL00eUQdRZBaKKVh2
+	FFneuLGVBANNEHc
+X-Received: by 2002:a05:620a:649c:b0:912:671b:d090 with SMTP id af79cd13be357-9153d999728mr194543785a.24.1780085492316;
+        Fri, 29 May 2026 13:11:32 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9153244de53sm312617585a.8.2026.05.29.13.11.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 13:11:31 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wT3YI-00000000q8h-45Mx;
+	Fri, 29 May 2026 17:11:30 -0300
+Date: Fri, 29 May 2026 17:11:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Zhiping Zhang <zhipingz@meta.com>, Alex Williamson <alex@shazbot.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Bjorn Helgaas <helgaas@kernel.org>, kvm@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Linus Torvalds <torvalds@linuxfoundation.org>
+Subject: Re: [PATCH v5 0/4] vfio/dma-buf: add TPH support for peer-to-peer
+ access
+Message-ID: <20260529201130.GU2487554@ziepe.ca>
+References: <20260526144401.1485788-1-zhipingz@meta.com>
+ <a8cd01ab-d7aa-465d-bfa3-431f78f33ee1@amd.com>
+ <20260527121438.GJ2487554@ziepe.ca>
+ <ff247643-73e7-44e2-b3d5-8ac0a8efb871@amd.com>
+ <20260527123634.GK2487554@ziepe.ca>
+ <a5ff1930-e9fb-43f5-82ab-9875d7a28421@amd.com>
+ <CAH3zFs2KALuHXReLZG_uoqvBBWvBzU6rHKakmt6HBV7PZEsD=w@mail.gmail.com>
+ <71302a7a-6b9f-40da-af81-b1862dbd637a@amd.com>
+ <CAH3zFs036sr93duQKx613pCyOYw4t0_x_TdSza1xBCaEmqijyA@mail.gmail.com>
+ <8d9bb0b7-182d-4930-b683-d5d24da6b2ab@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: QeF2c8dXhhqtt7r5PQxETuR8QLHfNGnlN4jCXPISsO20f/XL+IpxQDz5aTTxjxPONVtHJuMpSIuqOu6plVUX9ImrZ5xjid6f6kyK34tdyYjMjgZUas9AsHBdbadf1eWMNVdupE6MwddtfDsaweRc8R27vcqjaMOQWOqVrw4UWy6xt2PjuEkBWaVIMnWhrK+SWQh3nzwk1No/VBKW6gmmagZkozfONeDftdYslzPIdurgkPbYqqazs79w8L5GtHyk6Q+J0dhjCn09WBKXRjErNcNOG+zPLuO+Eses7JW2lm72Pgj1jNp13vTlS+fII1eLhyAGfMG+cLPYR64gFVOb3Q==
-X-OriginatorOrg: onsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09127b92-27e6-44ec-30ec-08debdbd8db3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2026 20:04:55.6623
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: m+bxWNQq3aBQLKXqXhPJSqUY5fpW0u8BXfo2JKcyE+lPe9OoRNHUb8Nxhh3W9d8xv9cruzVkmWiq9k3UHbwZdUPXUFzLxpSdhhPBh2JrOUY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR02MB7746
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 0ul0UaBOOy__cSvjn4pjbYL2GHAzedreFp5Pngbh8ms_1780085097
-X-Mimecast-Originator: onsemi.com
-Content-Language: en-US
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8d9bb0b7-182d-4930-b683-d5d24da6b2ab@amd.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293254-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293255-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	DMARC_NA(0.00)[ziepe.ca];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[CY8PR02MB9249.namprd02.prod.outlook.com:mid,onsemi.com:email,onsemi.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: CBF386086E2
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6640E608600
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-According to OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6)
-specification, interrupt type is active low, level triggered interrupt.
+On Fri, May 29, 2026 at 09:36:00AM +0200, Christian König wrote:
+> On 5/29/26 08:34, Zhiping Zhang wrote:
+> ...
+> > There's no in-tree vendor PF driver
+> 
+> Well I have to admit it's a bit on the edge but this sentence is a
+> show stopper.
 
-Fixes: ac49b950bea9 ("dt-bindings: net: add Microchip's LAN865X 10BASE-T1S =
-MACPHY")
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
----
- Documentation/devicetree/bindings/net/microchip,lan8650.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think he means the device is not SRIOV. vfio-pci is the in-kernel PF
+driver.
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml b=
-/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-index 61e11d4a07c4..766ff58147ae 100644
---- a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-+++ b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-@@ -67,7 +67,7 @@ examples:
-         pinctrl-names =3D "default";
-         pinctrl-0 =3D <&eth0_pins>;
-         interrupt-parent =3D <&gpio>;
--        interrupts =3D <6 IRQ_TYPE_EDGE_FALLING>;
-+        interrupts =3D <6 IRQ_TYPE_LEVEL_LOW>;
-         local-mac-address =3D [04 05 06 01 02 03];
-         spi-max-frequency =3D <15000000>;
-       };
---=20
-2.43.0
+> DMA-buf is an in kernel interface for buffer sharing between drivers
+> and any change to it needs an in kernel driver as justification for
+> the added complexity.
 
+vfio is the in-kernel driver, this series fully shows the in-kernel
+API using vfio as the exporter and mlx5 as the importer. It certainly
+meets the standard required to show in-tree users.
+
+> When you have a complete open source driver stack which utilizes
+> VFIO passthrough as the interface to communicate with the kernel
+> drivers then we can eventually talk about that.
+
+That decision is not up to dmabuf - what VFIO subsystem requires to
+accept a new UAPI is up to the VFIO maintainers.
+
+DRM and VFIO have very different views on what is required to merge a
+new uAPI.
+
+Jason
 
