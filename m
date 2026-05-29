@@ -1,216 +1,169 @@
-Return-Path: <netdev+bounces-293085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHe+KH1sGWrGwQgAu9opvQ
-	(envelope-from <netdev+bounces-293085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:37:49 +0200
+	id eE3xJS9vGWqNwggAu9opvQ
+	(envelope-from <netdev+bounces-293086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:49:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AAB1600F16
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:37:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1178360113C
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 12:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2422B311577C
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:33:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 103C93023E1D
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232873CC334;
-	Fri, 29 May 2026 10:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0B33C8708;
+	Fri, 29 May 2026 10:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SEA5FYq5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpdAWPvL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A65A3CC7F8;
-	Fri, 29 May 2026 10:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF99D3B83FB
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 10:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780050709; cv=none; b=SpOtLsgEeRdOS3jWKp/MoYbU28t23YztvyexMvMaHScxpe9xe3x8YPJRi7negEMpl6mUyEkd5KCcaYvHwmIN3y9oVujAZaXU7KxRbG/ncAUC3RsgPvXN/uWAZf4aYn7nNcZfLlddp44uEmEKMxhYexLAKTAXzOU23uFVemDQtJE=
+	t=1780051453; cv=none; b=i4gEhTdcb+TH+AyEk4CDxM7tnAze1nM7k6nT2OK3+cLq5cuuJHXD5AohKB7sKjBZqaJ+dRx3aCQXtg+k9wZUmcbWCrdUy0lOxvceDP59lPABOV6kipoT3h9FvgfYef4V1HfChN2+yl6x0Va2ebLg5m9TBzB6sudR0GBfdYZvTvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780050709; c=relaxed/simple;
-	bh=ugw3M+UGdOLpcJlOIYx2uYla5lSbmSNk0T33tbmMLJ0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rtyQli7X77OlG0oa6IB/p8Q0GXiCZDW3u0skVyow8M34PN/gRQsAb3Df+Ub7kX8woEuju8GXDI/V66p35pzDReEblBDQFL7n01EIYCms0QMiKyezRliCxIUeSxtcVinBK5TOig3QQ0PLXRnsoG7cBjrmCqBva2LkQ0jUqJCJo/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SEA5FYq5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C5D7AC2BCFA;
-	Fri, 29 May 2026 10:31:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780050708;
-	bh=ugw3M+UGdOLpcJlOIYx2uYla5lSbmSNk0T33tbmMLJ0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=SEA5FYq5NHHo4Z4tcNPAVtIVTI2c3CrENmp61wA2G11LUFctGsc1aEVNxYa4pZgHD
-	 C3TL3Sa4mk9UhTrnKL1trDOi2UvDSwCzjcEIsuwJ71zzq73Or4XFXolPwHSt75Qo5S
-	 NWvpYaTu9nwm1legu7eDUm4u1AZLual54EQMkYPBIZ8qhrzAeERsWv0Y4/f6kHkW8p
-	 IHkvsGWQBMIVlYL2rjkYW/v4V3nxFoZxwxxgNlxTu9RNSCqk0jzrCbS9oeg81YDm0n
-	 WmP8QitiszqxQWoUmtncCoUr1o64bXboamVE2+QfEWP3080IYHqhf+swCpTUq2j9q6
-	 RzXE7N1pwnRlA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF545CD6E4A;
-	Fri, 29 May 2026 10:31:48 +0000 (UTC)
-From: Jack Wu via B4 Relay <devnull+jackbb_wu.compal.com@kernel.org>
-Date: Fri, 29 May 2026 18:31:50 +0800
-Subject: [PATCH 11/11] net: wwan: t9xx: Add maintainers and documentation
+	s=arc-20240116; t=1780051453; c=relaxed/simple;
+	bh=I5S8k/JMKwGUwSZMT68XJfAURo2N9wKPHUe4tpEhYjY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DQoQ0vmuFLHqbYA8KLMZYCZgtoge+oLSoemCWRYyM5xqcK6zv2mB6vvlXfTkyGsxYEGpF03VT8dq0+Fi0WlNe/z+C12Ci1u04tQLJW2hsYLAQEvgMCoV/hNW36ZI7157GiA23Re3YoFJUW9lwvE7hN0C45EnQYd29GfC1DLZrDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jpdAWPvL; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-83945063f70so6640650b3a.0
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 03:44:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780051451; x=1780656251; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dEo/wAF2Vg4x050FkAPkUeP1qeuJRwK4JVX4fGCPq9o=;
+        b=jpdAWPvLXL/6AnocOgYKW9yHV6WwPO4S6Qe4PbHduN8q+13NGQdbe3QxqhfGaz1wHp
+         ePZhwWzaYyY97KEi8jWiO9O0k+h+QY9E3Plvt4v1HsWdcbYDiZdJbJgs5pIusLjuSQXe
+         vF0XqIi39Yzo3ehga8niAMLv1sMQmaOfTJcr9vjLkLuiFJ3ovR07ifEOrhmaBwaAowV5
+         Z8toqXAC08NbV+Ea88z12IKX494x/BV5lfc1Kc4W5o5iMR6mfSfZnA5EsdM8UX4KuAxF
+         iFuKCF1gKT1p+XCbRRmKtHOT6dIdboS9eydTfO2XRjqkVIkQvhNucEG9PjMGAtKfofFI
+         oGdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780051451; x=1780656251;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dEo/wAF2Vg4x050FkAPkUeP1qeuJRwK4JVX4fGCPq9o=;
+        b=o5OQ3lzyA0zz76QUoOimYgZEVxmROrHjXaYJBzeEdDxc6jJqAcfJEvIDuzyGY7Vs1h
+         U1WvG3pRmFnaF3gFejtJX3QEaDl3BjMpCzmDhfDG5udUoF2tYf6SzbHZjZ2nhiZh3SMm
+         +rHZMxTjL5TpkiS3BwJ1J11tb0xDtRYTkc8X8T1H+7TTKfGTtu6BvZU69zLXO72YrSNf
+         2azvRbYNdVITgz6g88UT0R/aAkW2Ps5O3AKWVztWnW5eXrHAmwt0M2QOneYQ/+dsvGEf
+         NCBj0uico3uSgGFRetxzOEsySfSKcUxPI/EvyA/fwhicq2zvii61/b9+rVY4BIXNC7Lp
+         5QQA==
+X-Forwarded-Encrypted: i=1; AFNElJ+fKF4AgvX5cNccj24KC3C1TMN46Ggc+qIm4981Vb9EmTyUtRdYMIuuIPc18Kk5ZYVkEp3Xmss=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9GeeVyOx3XtiunSX/iikipWI0UthCmMP8lJZU3fYLcW1OpabV
+	gD+wSddCGDQFVxEMN1pnUX52ZbGEaTIti9WVY3eunrqo7aqRFtTQDCAA
+X-Gm-Gg: Acq92OH4Vgjp4RRZ2SSeQBkLXp0vU3GBXLL9N5HvR+wu54Iw710jNjUSiz0LMeBchsg
+	/4L++9kVRHf+cN+K3d12+tFF3FeufPw3R3Dvh1tH25xpnyM3juNqa24wHwHzyhZijMC/NfvdAjH
+	k6wL3K4HQFSZikm983tnU0Lqs3wUBCsBWmj80BK0IDpovYjpVFs0fl+n+Go9j9+v/WG7cbCA1NA
+	owRXddFKY07ds1RxWYF1VctaWp6ElivmNnvE5paGm8akJiHwwX1Gedv7nBF8TnajxZpTpDTGlMP
+	Yu3vJJ8oDkvvLfxzCoicrdIouY7sT+6acQZiU8NVOZTAVcc2UAT5TbMQ80CTbG26Ke8Ht6lrxSF
+	/C65D4jn84j6aQTSM0hPAtFZIkILR9IcDhFTZMJwm63rsCXO9YBtS0kT3VSrNpw960VUJV7LgFl
+	xece9HtLDwoQN32c7VF9UreuVXLDpvOwqYbNwL22ATzqwbBVxanTT1r+I=
+X-Received: by 2002:a05:6a00:2905:b0:838:5145:c1c5 with SMTP id d2e1a72fcca58-84210b3b262mr2263498b3a.21.1780051451262;
+        Fri, 29 May 2026 03:44:11 -0700 (PDT)
+Received: from teatimelab.tailcd024.ts.net ([192.129.190.145])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8421bfec5cbsm335418b3a.41.2026.05.29.03.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 03:44:10 -0700 (PDT)
+From: Qi Tang <tpluszz77@gmail.com>
+To: fw@strlen.de
+Cc: jiayuan.chen@linux.dev,
+	pablo@netfilter.org,
+	netfilter-devel@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	dsahern@kernel.org,
+	idosch@nvidia.com,
+	horms@kernel.org,
+	lyutoon@gmail.com,
+	stable@vger.kernel.org,
+	Qi Tang <tpluszz77@gmail.com>
+Subject: Re: [PATCH net] ipv4: validate ip_forward_options() option fields against skb tail
+Date: Fri, 29 May 2026 18:43:56 +0800
+Message-ID: <20260529104356.911666-1-tpluszz77@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <ahlfI38aDciPfG2S@strlen.de>
+References: <ahlfI38aDciPfG2S@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260529-t9xx_driver_v1-v1-11-bdbfe2c01e57@compal.com>
-References: <20260529-t9xx_driver_v1-v1-0-bdbfe2c01e57@compal.com>
-In-Reply-To: <20260529-t9xx_driver_v1-v1-0-bdbfe2c01e57@compal.com>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jack Wu <jackbb_wu@compal.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>, 
- Shi-Wei Yeh <shi-wei.yeh@mediatek.com>, 
- Minano Tseng <Minano.tseng@mediatek.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- linux-doc@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780050705; l=3341;
- i=jackbb_wu@compal.com; s=20260526; h=from:subject:message-id;
- bh=gZ/Ej1LYBDfojFwAl08IAxUspPvBD4Ms/KxsQD2QGDY=;
- b=kngBuXKPlROTIHaDSxrYnkBefpd0CriRtU4rD4eRMfi6UiklYLZpHoraj7G+8IMsOfKLihMqZ
- mPsd53cbmeFCVJngDTeaMuDmGGGc8oKK6cEb/m/bez0EzQLL4rvhGgO
-X-Developer-Key: i=jackbb_wu@compal.com; a=ed25519;
- pk=VH1prTWixNl8OEUPPSfII3p46MzJpQN8J3+ecE1tZXg=
-X-Endpoint-Received: by B4 Relay for jackbb_wu@compal.com/20260526 with
- auth_id=793
-X-Original-From: Jack Wu <jackbb_wu@compal.com>
-Reply-To: jackbb_wu@compal.com
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293085-lists,netdev=lfdr.de,jackbb_wu.compal.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,compal.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org];
+	FREEMAIL_CC(0.00)[linux.dev,netfilter.org,vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,nvidia.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-293086-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[jackbb_wu@compal.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[compal.com:replyto,compal.com:mid,compal.com:email,mediatek.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 2AAB1600F16
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 1178360113C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jack Wu <jackbb_wu@compal.com>
+Florian Westphal <fw@strlen.de> wrote:
+> I'm not sure netfilter is the only facility that can munge data this
+> way nowadays.  The plan is to disable arbitrary network header rewrites:
+>
+> https://lore.kernel.org/netfilter-devel/20260527121147.22076-1-fw@strlen.de/
 
-Adds maintainers and documentation for MediaTek T9XX 5G WWAN modem
-device driver.
+Agreed, the source side is the better place for this on mainline.
 
-Signed-off-by: Jack Wu <jackbb_wu@compal.com>
----
- .../networking/device_drivers/wwan/t9xx.rst        | 48 ++++++++++++++++++++++
- MAINTAINERS                                        | 10 +++++
- 2 files changed, 58 insertions(+)
+I went looking for other ways into the window between option compile
+(ip_rcv_options() in ip_rcv_finish_core, after PREROUTING) and
+ip_forward_options(), and only found nft_payload and nfqueue at the
+FORWARD hook. tc/cls-act run before compile (ingress) or after
+ip_forward_options (egress), BPF at the netfilter hook can't write the
+packet (base helpers only, no bpf_skb_store_bytes), and the LWT_IN BPF
+path is blocked by the verifier. So your two-part restriction closes the
+only in-tree triggers I could find.
 
-diff --git a/Documentation/networking/device_drivers/wwan/t9xx.rst b/Documentation/networking/device_drivers/wwan/t9xx.rst
-new file mode 100644
-index 000000000000..eaba82f18c1b
---- /dev/null
-+++ b/Documentation/networking/device_drivers/wwan/t9xx.rst
-@@ -0,0 +1,48 @@
-+.. SPDX-License-Identifier: GPL-2.0-only
-+
-+.. Copyright (c) 2025, MediaTek Inc.
-+
-+.. _t9xx_driver_doc:
-+
-+====================================================
-+T9XX driver for MTK PCIe based T-series 5G Modem
-+====================================================
-+The T9XX driver is a WWAN PCIe host driver developed
-+for data exchange over PCIe interface between Host platform and MediaTek's
-+T-series 5G modem. The driver exposes control plane and data plane interfaces
-+to applications. The control plane provides device node interfaces for control
-+data transactions. The data plane provides network link interfaces for IP data
-+transactions.
-+
-+Control channel userspace ABI
-+=============================
-+/dev/wwan0at0 character device
-+------------------------------
-+The driver exposes an AT port by implementing AT WWAN Port.
-+The userspace end of the control channel pipe is a /dev/wwan0at0 character
-+device. Application shall use this interface to issue AT commands.
-+
-+/dev/wwan0mbim0 character device
-+--------------------------------
-+The driver exposes an MBIM interface to the MBIM function by implementing
-+MBIM WWAN Port. The userspace end of the control channel pipe is a
-+/dev/wwan0mbim0 character device. Applications shall use this interface
-+for MBIM protocol communication.
-+
-+Data channel userspace ABI
-+==========================
-+wwan0-X network device
-+----------------------
-+The T9XX driver exposes IP link interfaces "wwan0-X" of type "wwan" for IP
-+traffic. Iproute network utility is used for creating "wwan0-X" network
-+interfaces and for associating it with the MBIM IP session.
-+
-+The userspace management application is responsible for creating a new IP link
-+prior to establishing an MBIM IP session where the SessionId is greater than 0.
-+
-+For example, creating a new IP link for an MBIM IP session with SessionId 1:
-+
-+  ip link add dev wwan0-1 parentdev wwan0 type wwan linkid 1
-+
-+The driver will automatically map the "wwan0-1" network device to MBIM IP
-+session 1.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 461a3eed6129..3fab2b47f531 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16494,6 +16494,16 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/wwan/t7xx/
- 
-+MEDIATEK T9XX 5G WWAN MODEM DRIVER
-+M:	Jack Wu <jackbb_wu@compal.com>
-+R:	Wen-Zhi Huang <wen-zhi.huang@mediatek.com>
-+R:	Shi-Wei Yeh <shi-wei.yeh@mediatek.com>
-+R:	Minano Tseng <Minano.tseng@mediatek.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/networking/device_drivers/wwan/t9xx.rst
-+F:	drivers/net/wwan/t9xx/
-+
- MEDIATEK USB3 DRD IP DRIVER
- M:	Chunfeng Yun <chunfeng.yun@mediatek.com>
- L:	linux-usb@vger.kernel.org
+This is just one consumer of the pattern; __ip_options_echo(),
+ipmr_cache_report() and the CIPSO/CALIPSO netlbl_skbuff_getattr() path
+are the same, posted as a series here:
 
--- 
-2.34.1
+  https://lore.kernel.org/netdev/20260524041442.2432071-1-tpluszz77@gmail.com/
 
+so if the source-side restriction is the way to go it probably makes
+more sense to drop these consumer-side checks than to fix each site.
+Your call.
 
+Thanks,
+Qi
 
