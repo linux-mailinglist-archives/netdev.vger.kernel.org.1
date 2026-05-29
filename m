@@ -1,180 +1,173 @@
-Return-Path: <netdev+bounces-293165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNslDsvBGWo1ywgAu9opvQ
-	(envelope-from <netdev+bounces-293165-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:41:47 +0200
+	id gInXI1nCGWqjywgAu9opvQ
+	(envelope-from <netdev+bounces-293166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:44:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE2D605D10
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B528605D91
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 18:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1E26C3045C92
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 16:18:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2E9F73081114
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 16:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2263A3CEBA7;
-	Fri, 29 May 2026 16:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D563E6DD3;
+	Fri, 29 May 2026 16:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jzGnlnXW"
+	dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b="SQlPy5yO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21A53C3442;
-	Fri, 29 May 2026 16:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BBE3E5EF4
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 16:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780071499; cv=none; b=ggSvSC1QjtluW42LG4awOB9/PwlZcDawxEkSgLQ2qye5TJNIDXyv5+1jBDwP4Y0cxLfzn6nHgWMs2qiLqdX6F7rMz7wKyEGtRBoPs+Y3EJLL0GHUrNF6qliyOCbfp63tpykPSlvSC5RQyXpmzUzTvnwFA6HektBiCe+Q3evnHaY=
+	t=1780072435; cv=none; b=Y4ZsRTRsTVxtWDu9VWp4B+p8eyrkl80O4fGB43oGLAn6kewupu83/hpu3EYH9cDwOvzpOrSudY+0VxdKfwEKbxqx6MW072Ln5+CrWoOGalrnB5EMLJSKN3wa0g9/chkpunYh2tHmP/Xsu8BN4LFjsuo++/GNrvznOYdTSDJ7tKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780071499; c=relaxed/simple;
-	bh=LECw0sDPeJcrBgMMcO8z7qr7lxvWA9UJU0IiPs6eK30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r2KRkxOdydOxt/DumqpfE5G2u+H7mUO6IQypXqxXiweBaqH/kB/qtyAzAKDHNHCMW1xreW9zsMXg6g26qiVUVkpAkGFqVp+5zNWp9VVWQyeWgj5Y9oq2MGK39C32HbaC4CMiSzPvjVbRloG8fSgYqXjYx5U6wLbc9w5zIsk3Wg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jzGnlnXW; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 303B01A3739;
-	Fri, 29 May 2026 16:18:15 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E2480601FA;
-	Fri, 29 May 2026 16:18:14 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3925110888CC2;
-	Fri, 29 May 2026 18:18:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780071493; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=gud0LmIIA7BIAO125yPphz5IBoeyc1pFNJtaAjBjvdk=;
-	b=jzGnlnXWwrkOzd4lcqn+HeAYfuAbZ5YSeoMf/s3SWUBFlC1qR3qIAkOFgaPdrjNRV88k9H
-	ebl5OvmMZ+4Ut44lO5H6C9v63aMcl3T1oE1TKVBuv/tVq9na+eTvLnxKBO3cCl9AVhEnpx
-	jkJHHxfV3XOesmfGIbAJSmYUc9c28oiTREJr75PPIfSCSAr4Jtby+rrNWVxTEIb1T34Qn8
-	GcoV+5yFv/f1dounNbU6EhAJu7bo2UvOjL+12xbSB7CpJpku/XM0nw7xQ4cRH/xXpWA+y6
-	i4fMCikrkrYRrWAUmV0v72HzgDBi6p2+9GG1bQL9Oh0xWddcbGFGTsqQZzOz1A==
-Message-ID: <2bf0a2d1-634e-463b-a0bc-a8cbe930d5ad@bootlin.com>
-Date: Fri, 29 May 2026 18:18:07 +0200
+	s=arc-20240116; t=1780072435; c=relaxed/simple;
+	bh=dbF4FQw1JJO9uTpptWLy5jXFCrJD9FS9TarvQIt2lsw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tFip4S6iGCZ09sqVynqnnEFcj8p5cYQ4RRTtYfW20r8WNNO6GKzXjl1iZ6tMIe/Pf1o1t1ECoSknA60fUSrp7NA415jZ949g9XMO5guemz049BAX4QckJ7DowzdzZmW3ueZdWuauDoG2qfgh+mYtcxOUwem65uvmJg0U6RDlG5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b=SQlPy5yO; arc=none smtp.client-ip=74.125.82.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-304eb0fc233so97135eec.3
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 09:33:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20251104.gappssmtp.com; s=20251104; t=1780072434; x=1780677234; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aVaKxvWzuHaKgJULQUrnFqbmKMN/ktVEIETNVpTenYE=;
+        b=SQlPy5yOF1UjrhPKpzB9oln8wDVgzoKyKz933jG/VDOkzetedzucAcpnFhfWAzkXWs
+         D+dCd2tbKpsbiZrw64Vb4UcW0Z2b6PjXm9SKIGGfscCEImcfRzTDkK6Uo6Ia+F/2DEC3
+         1RLMK3wZKbm2nP4CNcUxha0pgVcRTwqMY5l7/qb2047y3dsNpgKNebs0DuhNA1CzJM/J
+         e9I1JMoRHY40EthS9qk1fZwgaOMKdq3uioF359DF8yEmJpvaf+6KQBdm+cYIKpziEyoF
+         i/RY20iYh5v062ldKtHs83MCA43Nv0nMaOEq4k80c5kBVVXZyxYn2zIRmQX6BnH5XsqO
+         Gqog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780072434; x=1780677234;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aVaKxvWzuHaKgJULQUrnFqbmKMN/ktVEIETNVpTenYE=;
+        b=X3fLy8m41rgt0R1NLM1HqzmKC85ZLrEfXG3+q6KLGnKW4TUaCqbf0k6CckMfFBFjln
+         uYl7F1pTZP/mYTM7F+DIFYDp24cLkAwyIiuOhHHVCBSx+d6pZpoXTwdCTLkRVd8ApLSb
+         4G5bCx9SuiODGW/N8sQtt3kxY2NXfHZWsbDHAvTlMCL9Wuo/RZHmEUAunXY178/l3XVO
+         8ftdIZwbURLIJx9OaF47ruebQLBG+VUywCWEDu/ODaad+g5kB2xjpGRTt048lZ8E8i2O
+         CvT3oIoIrYtC1f7EeYeCTOL0QUktsE0SWj3HoVJjYhUFJuaSL+1i8MIgPqn1fUIIZbcI
+         TM/A==
+X-Forwarded-Encrypted: i=1; AFNElJ+e1KXNPG8zieVpjmbojWyatfEq47HHVRczEVPp3PIEknXWDPIgNVMxcC1hIDPe4mWr71WQnrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsC6JM8gGWOMwbLGFKxoSZSIfyTTIHACbDdrlbcEp9gtyqJyD+
+	QO3JIEq4vgwitR8F+m0tWQ8nJ3Cx1aLUSE6U/hiVvEL4C3cIl+D0wJeVTDllBAMyfNg=
+X-Gm-Gg: Acq92OE/YYQHtHKHKGocWx+gWxFZc/ob1AzvwW0o+KWoDlHXYqe7N7sdskd6zdHLQyu
+	8s9kaN1YHiMimNWuKet8kf+f2Elr35TLw+QSU8asO1ywQWWsPO3i+S9MV2A/LAVczXwuh78Eijo
+	0/XEBEa5k5nnBq/IElR9yYBoHcfY3AJUmf/6wUII43jsjWxvwlCfusN//MQnnMZilw5btEslJ+J
+	tm1bTxNnoA2Z8PEFCvI9bl1+gQWRDjICikAtRNjowqh1+Ue0EP548tuQuIDGY2tA2ocuCYgWQiT
+	f29lOGZH2BLMcD0fb6wWeyhYH6cVcpLD6a2egO6ybJt+3DfJh2YmzbxtJc1ueM1Z0CcG2YXKaFH
+	uCF4/GpGuRnBW3mn0wkOS7IxIF6eMTX3Fpb51F/096CKpL836f5nAi1gTlqml2UZ4NDrNsw3e9g
+	sjysbm1alAKrKHUCBKZ/7mbbcc
+X-Received: by 2002:a05:7022:3d8c:b0:134:c6ab:a516 with SMTP id a92af1059eb24-137d42922eamr68702c88.6.1780072433802;
+        Fri, 29 May 2026 09:33:53 -0700 (PDT)
+Received: from m2 ([83.171.251.19])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137b3c7fd47sm1512560c88.14.2026.05.29.09.33.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 09:33:52 -0700 (PDT)
+Date: Fri, 29 May 2026 09:33:48 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Mahe Tardy <mahe.tardy@gmail.com>
+Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org, yonghong.song@linux.dev, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH bpf-next v7 3/7] bpf: add bpf_icmp_send kfunc
+Message-ID: <nnxnmye7f7vbmyhtotcujnbrfo3n56giitq7mwmsy4qc65hode@o44aefu6g2qa>
+References: <20260526153708.279717-1-mahe.tardy@gmail.com>
+ <20260526153708.279717-4-mahe.tardy@gmail.com>
+ <d65aepu3gg5mzqy6umxvhwyvwq7gvpezle3f4u6dla7sorndt3@nirsf36ozbii>
+ <ahlWPCJCXa6DMSwQ@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/3] net: sfp: apply I2C adapter quirks to
- limit block size
-To: Jonas Jelonek <jelonek.jonas@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, Simon Horman <horms@kernel.org>
-References: <20260528205242.971410-1-jelonek.jonas@gmail.com>
- <20260528205242.971410-3-jelonek.jonas@gmail.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260528205242.971410-3-jelonek.jonas@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahlWPCJCXa6DMSwQ@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[jrife-io.20251104.gappssmtp.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293165-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293166-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DMARC_NA(0.00)[jrife.io];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,iogearbox.net,gmail.com,kernel.org,google.com,redhat.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jordan@jrife.io,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[jrife-io.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: BCE2D605D10
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,jrife-io.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 1B528605D91
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jonas,
-
-On 5/28/26 22:52, Jonas Jelonek wrote:
-> The SFP driver assumes all I2C adapters support reading and writing the
-> pre-defined block size SFP_EEPROM_BLOCK_SIZE of 16 bytes. This constant
-> was probably chosen based on good guesses and known limitations of a
-> range of I2C adapters and SFP modules.
+On Fri, May 29, 2026 at 11:02:52AM +0200, Mahe Tardy wrote:
+> On Thu, May 28, 2026 at 03:55:21PM -0700, Jordan Rife wrote:
+> > On Tue, May 26, 2026 at 03:37:04PM +0000, Mahe Tardy wrote:
+> > > [...]
+> > > +__bpf_kfunc int bpf_icmp_send(struct __sk_buff *skb_ctx, int type, int code)
+> > > +{
+> > > +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
+> > > +	struct sk_buff *nskb;
+> > > +	struct sock *sk;
+> > > +
+> > > +	sk = skb_to_full_sk(skb);
+> > > +	if (sk && sk->sk_kern_sock &&
+> > 
+> > Won't this prevent the kfunc from working for traffic emitted from
+> > kernel sockets like those used by NFS/SMB mounts? I can imagine there
+> > being a legitimate use case where you'd want those kind of connections
+> > to fail fast as well by emitting ICMP*_DEST_UNREACH.
 > 
-> However, I2C adapters may even support less and usually need to specify
-> this via I2C quirks. Theoretically, such an adapter may provide full
-> functionality but only support a read and write length of e.g. 8 bytes.
-> Currently, the SFP driver doesn't account for that.
+> I don't know much about NFS/SMB but I'd expect them to use UDP or TCP
+> for their transport protocol, so the second half of the condition check:
 > 
-> Add handling for I2C quirks in SFP I2C configuration taking the fields
-> max_read_len and max_write_len in struct i2c_adapter_quirks into account
-> to further limit the maximum block size if needed.
+> > > +	    (sk->sk_protocol == IPPROTO_ICMP || sk->sk_protocol == IPPROTO_ICMPV6))
+> > > +		return -EBUSY;
 > 
-> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
+> should fail. Meaning that this should be suitable for it.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Not sure how I missed this. Makes sense, thanks for explaining.
 
-Thanks !
-
-Maxime
-
-> ---
->   drivers/net/phy/sfp.c | 12 ++++++++++--
->   1 file changed, 10 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index 376f7232f9ee..60f36cba3d83 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -809,21 +809,29 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
->   
->   static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
->   {
-> +	size_t max_block_size;
-> +
->   	sfp->i2c = i2c;
->   
->   	if (i2c_check_functionality(i2c, I2C_FUNC_I2C)) {
->   		sfp->read = sfp_i2c_read;
->   		sfp->write = sfp_i2c_write;
-> -		sfp->i2c_max_block_size = SFP_EEPROM_BLOCK_SIZE;
-> +		max_block_size = SFP_EEPROM_BLOCK_SIZE;
->   	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA)) {
->   		sfp->read = sfp_smbus_byte_read;
->   		sfp->write = sfp_smbus_byte_write;
-> -		sfp->i2c_max_block_size = 1;
-> +		max_block_size = 1;
->   	} else {
->   		sfp->i2c = NULL;
->   		return -EINVAL;
->   	}
->   
-> +	if (i2c->quirks && i2c->quirks->max_read_len)
-> +		max_block_size = min(max_block_size, i2c->quirks->max_read_len);
-> +	if (i2c->quirks && i2c->quirks->max_write_len)
-> +		max_block_size = min(max_block_size, i2c->quirks->max_write_len);
-> +
-> +	sfp->i2c_max_block_size = max_block_size;
->   	sfp->i2c_block_size = sfp->i2c_max_block_size;
->   	return 0;
->   }
-
+> The goal here was to identify the ICMP kernel sockets, I think this way
+> should be precise enough and does not require new code. The other more
+> precise ways we thought about initially were more invasive:
+> - exposing ipv4_icmp_sk out of net/ipv4/icmp.c to compare the pointer:
+>   not clean as other part of the code could reuse those sockets.
+> - expose a helper like is_kernel_icmp_socket from net/ipv4/icmp.c to be
+>   used in net/core/filter.c: new exported functions.
+> 
+> > > +
+> > > [...]
 
