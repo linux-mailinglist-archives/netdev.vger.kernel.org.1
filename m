@@ -1,200 +1,208 @@
-Return-Path: <netdev+bounces-292928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-292929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBhzBRrvGGo/pAgAu9opvQ
-	(envelope-from <netdev+bounces-292928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:42:50 +0200
+	id 8I3GFQ3wGGo/pAgAu9opvQ
+	(envelope-from <netdev+bounces-292929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:46:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FDE75FC123
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:42:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A19CB5FC185
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 03:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EE2630760B7
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:41:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA161301AF40
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 01:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FC435E1C5;
-	Fri, 29 May 2026 01:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177E735DA49;
+	Fri, 29 May 2026 01:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="hTAuadhE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF59A35E1DB
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 01:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6456310620;
+	Fri, 29 May 2026 01:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780018888; cv=none; b=k9Gwjv88CfqXFK5K+CKLQgmrA1QJbwMQ7Q+iLh7bQ5djAKiwaIW8mX2GxV8DPmGbpkOdSKxsKNF7mdgd+XG6V8aozwX/t6aDP/eaDfzDHWBUaMEI19/fPIyXKiaYzjmNA1UGCZ978V84dx+5Z8EzWd2oN2R4oogKXZMYjVbzMnY=
+	t=1780019068; cv=none; b=aWOHVNJ2j1AFX4DgjyMkIh76f+QLiBlv2cHUOMF4MAzE0GcqpcRTbDcRexUsuzv3/89rSPGkN05qbuuM2/D3R62kZYkP5yteNjsoD7HwcUtANqjcU/mTADs28gHL9yXXWKa32wp71tYcTANDu27obRHRse6G16sIFRNDBYx1Zno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780018888; c=relaxed/simple;
-	bh=120bVSQLdPnl7gzjI00muoHs/i0ZIQoj5jR62It2T+0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gZ30Y31ZgLrWE/IIURk1IS3Xw+WunIDfYYWlOhWX2cSfakbI65GD8n8NpctsUKiZXigKK1DLNEKaNKujLkuv22cB/3bqUMJGr3QK/HPScStT1AujK0P9FobRov/98P25xIYmWB+NnnwZB44qhehMkcN7kxPrOaCkr3MUr54s1s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-43a5232c87eso6868983fac.3
-        for <netdev@vger.kernel.org>; Thu, 28 May 2026 18:41:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780018885; x=1780623685;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yBCnZ43C3H+9ncA/RoRecjFYPKsKHr1k7V623+sXjgo=;
-        b=J4ZS7xrai7MdT3LO1j0D8nkPNvhC5jjoi0EWPn9MQGmU34/+6IJjlUyXfwo98APOoJ
-         C++HuYNuUT9miUWN+fSynttsQWeBWSUuIz31v5ZzxNBSaYl+v3mm6KClp1lsi3sHS8xc
-         oLa1CA4XL8wYyFFJyV8tu/xm5/2onaG0iOptjYOmHcR68k4fYWdzc6nfi+Cf3p7iqbl1
-         hCfKmZNJlJ2OrVQoApTKCzuYzcqimXXmbsZGz8Ncdv4WBywp0wizkXVYDYbsJzPsieNB
-         r6ODxZHlinSTN+0d8BRmF6Btvqdv+7KwL4glawupaHXTUsSuW2KtCNwaT/awYbY1KOvY
-         Ul1g==
-X-Forwarded-Encrypted: i=1; AFNElJ9zH0eI1vgDvj9K3nVB9VdrSWLkxM3toIhT4Zz4sqDsqRplnvTO/Iutjns0IRwsS9C8hHszoXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3KXlnD0bFw9pmtfmddCk+oHJ+d8UNHbUgKRiT2aHUVrX70jGv
-	tcNi+8Tk76E5jeLjX3O+zkXZ3EMF5PSsRd0jAA9bWBU32y2h2GcwVl+MuRzYI524lBGeryEj3ph
-	uZmod3MxMS7xsa5p9KoPXoCZPlhMznKjo5wFjORvk9xIppoxhwT68D1cdwsg=
+	s=arc-20240116; t=1780019068; c=relaxed/simple;
+	bh=mrHccfsQJdLAxkEx5+Qan6OCSIAIJSXu+uPlh0rzW54=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Mi8ptZh5PvP/cFscCCs9BQAoKNeBDxS+FWxrngPQF09EmHYuATR5mV6pSP+RHKKrSVZCArmoH822rEjcmJWhudJxsJH7Y0otfpUqSklei3oIfEK5YcefZXnRa2iPNtidQlQMxQqntRqQ4aJLWH1Cpz3+MhN8JddXCcwmW22mvPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=hTAuadhE; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1780019063;
+	bh=CQK86/u3LLUm7cvQu2/HmsKR9vMG1pdZJ/k5001vO6k=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=hTAuadhE/ui7nE1ZoRvoKWbeSr5vCyE7X2LoGPJxMOVNdZ72tIdEo9h7OKSk2P5nr
+	 nk97umZNwCAaRy/RZC+5PLiQofjvV6eVtUoyFe10EHmSiyWgb6HEKKQhQCLcqZ/54N
+	 bQjokPhuA3bxzakAs/GI2HuvKEIgsJVrPJutgB3eanYVJdH8Aci7hRalE5bxaF1MBD
+	 1ma7mXSxjt01dU7wORRHKdYK9vIIGABw2eE/QO4flkErv+4vk83xh68Seu/N6xkClh
+	 0O/fyXvQZ7GulyyWK9/VxRm3W4zXgLkwaroJnpiKHv6ubgOCUpC5K57J6jDjR9Lalp
+	 YswqMIIEEVk3g==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 22A8764798;
+	Fri, 29 May 2026 09:44:22 +0800 (AWST)
+Message-ID: <8c2a9e591ba22a95962c2c5f7dff5971fc5123df.camel@codeconstruct.com.au>
+Subject: Re: [net-next v44] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Paolo Abeni
+	 <pabeni@redhat.com>, admiyo@os.amperecomputing.com
+Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, sudeep.holla@arm.com,
+ Jonathan.Cameron@huawei.com, 	lihuisong@huawei.com
+Date: Fri, 29 May 2026 09:44:21 +0800
+In-Reply-To: <63aebaed-2456-457d-be70-5211d2f746df@amperemail.onmicrosoft.com>
+References: <20260522193610.234166-1-admiyo@os.amperecomputing.com>
+	 <20260528084611.133703-1-pabeni@redhat.com>
+	 <63aebaed-2456-457d-be70-5211d2f746df@amperemail.onmicrosoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:168d:b0:69d:9e9d:b000 with SMTP id
- 006d021491bc7-69e03ef9ad8mr519546eaf.23.1780018885631; Thu, 28 May 2026
- 18:41:25 -0700 (PDT)
-Date: Thu, 28 May 2026 18:41:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a18eec5.9a649fcc.180209.0002.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in drv_link_info_changed (3)
-From: syzbot <syzbot+c4686c3eb8b64032618f@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=e327ee9a867dd6b9];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-292928-lists,netdev=lfdr.de,c4686c3eb8b64032618f];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-292929-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,storage.googleapis.com:url,appspotmail.com:email,goo.gl:url,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 5FDE75FC123
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[codeconstruct.com.au:mid,codeconstruct.com.au:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A19CB5FC185
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Hi Adam,
 
-syzbot found the following issue on:
+> > [Low]
+> > The Link tag and the body of the commit message both reference
+> > DSP0292_1.0.0WIP50. Is it intentional to merge an in-tree binding
+> > based on a Work-In-Progress draft of the spec rather than the
+> > published 1.0.0?
 
-HEAD commit:    4cbfe4502e3d Merge tag 'v7.1-rc5-ksmbd-server-fixes' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13bb6d96580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e327ee9a867dd6b9
-dashboard link: https://syzkaller.appspot.com/bug?extid=c4686c3eb8b64032618f
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+This is probably worth an update to reference the non-WIP spec version.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> The ACPICA code used to access the PCC region and registers is imported=
+=20
+> an external project, and it hard codes the values to machine, not=20
+> explicitly little endian.=C2=A0 So making this little-endian only ensures=
+=20
+> that the ordering is correct.=C2=A0 The only machines that are going to=
+=20
+> support MCTP over PCC are little endian and 64 bit, so this is strictly=
+=20
+> speaking correct.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-4cbfe450.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ae30bc5ef3ba/vmlinux-4cbfe450.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2547601acb10/bzImage-4cbfe450.xz
+The configuration is less about "which machines you think might use
+this", but more "what does the implementation require".
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c4686c3eb8b64032618f@syzkaller.appspotmail.com
+The LE condition makes sense, as the driver does not support BE. But
+what is requiring 64-bit?
 
-------------[ cut here ]------------
-changed & (BSS_CHANGED_BEACON | BSS_CHANGED_BEACON_ENABLED) && sdata->vif.type != NL80211_IFTYPE_AP && sdata->vif.type != NL80211_IFTYPE_ADHOC && sdata->vif.type != NL80211_IFTYPE_MESH_POINT && sdata->vif.type != NL80211_IFTYPE_OCB
-WARNING: net/mac80211/driver-ops.c:468 at drv_link_info_changed+0x583/0x880 net/mac80211/driver-ops.c:468, CPU#3: syz.5.1844/11254
-Modules linked in:
-CPU: 3 UID: 0 PID: 11254 Comm: syz.5.1844 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:drv_link_info_changed+0x583/0x880 net/mac80211/driver-ops.c:468
-Code: 00 48 89 74 24 10 e8 3c 3d 0f f7 48 8d 3d 75 29 ef 05 48 8b 74 24 10 44 89 f2 67 48 0f b9 3a e9 ae fc ff ff e8 1e 3d 0f f7 90 <0f> 0b 90 e9 bf fe ff ff e8 10 3d 0f f7 90 0f 0b 90 e9 b1 fe ff ff
-RSP: 0018:ffffc900065bee48 EFLAGS: 00010287
-RAX: 000000000000096f RBX: ffff8880277d4e40 RCX: ffffc90007392000
-RDX: 0000000000080000 RSI: ffffffff8af974c2 RDI: ffff88802aa42500
-RBP: 0000000000000200 R08: 0000000000000005 R09: 000000000000000b
-R10: 0000000000000002 R11: 0000000000000000 R12: 0000000000000002
-R13: ffff88805f010f20 R14: 0000000000000200 R15: ffff8880277d6b78
-FS:  00007fae699f66c0(0000) GS:ffff8880d666a000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000044d79000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- ieee80211_link_info_change_notify+0x24b/0x3c0 net/mac80211/main.c:427
- ieee80211_offchannel_stop_vifs+0x328/0x5c0 net/mac80211/offchannel.c:122
- ieee80211_start_sw_scan net/mac80211/scan.c:583 [inline]
- __ieee80211_start_scan+0xfb6/0x1af0 net/mac80211/scan.c:882
- ieee80211_scan+0x4f8/0x6e0 net/mac80211/cfg.c:3343
- rdev_scan+0x148/0x370 net/wireless/rdev-ops.h:467
- cfg80211_scan+0x4dd/0x5d0 net/wireless/scan.c:1077
- cfg80211_conn_scan+0x70e/0xfc0 net/wireless/sme.c:134
- cfg80211_sme_connect net/wireless/sme.c:629 [inline]
- cfg80211_connect+0x17fe/0x1fe0 net/wireless/sme.c:1527
- nl80211_connect+0x17d3/0x2260 net/wireless/nl80211.c:13745
- genl_family_rcv_msg_doit+0x214/0x300 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x560/0x800 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x159/0x420 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x585/0x850 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x8b0/0xda0 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2698
- ___sys_sendmsg+0x190/0x1e0 net/socket.c:2752
- __sys_sendmsg+0x170/0x220 net/socket.c:2784
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x10b/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fae6b79ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fae699f6028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fae6ba15fa0 RCX: 00007fae6b79ce59
-RDX: 0000000000000000 RSI: 00002000000001c0 RDI: 0000000000000004
-RBP: 00007fae6b832d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fae6ba16038 R14: 00007fae6ba15fa0 R15: 00007ffc87f56808
- </TASK>
+> > The header comment says DSP0256 but the URL and the commit message
+> > both say DSP0292. DSP0256 is a different DMTF document (PLDM for
+> > Monitoring and Control). Should the comment read DSP0292?
+> >=20
+> > [ ... ]
+>=20
+> The DMTF DSP0256 is the MCTP Host Interface Specification. It=20
+> standardizes how Management Component Transport Protocol (MCTP) packets=
+=20
+> and messages are communicated between a system's host software and its=
+=20
+> internal management controllers (like a BMC or satellite controller).
+> DSP0292 IS specific to the binding. Neither are PLDM. THis comment is
+> correct
+
+The comment is:
+
+  Implementation of MCTP over PCC DMTF Specification DSP0256
+
+But DSP0256 is not the "MCTP over PCC" transport binding spec. Either
+mention the host interface specifically, or use the correct number for
+the PCC spec. I think the latter would be best, as the host interface
+spec seems less relevant here.
+
+> > > +static void mctp_pcc_client_rx_callback(struct mbox_client *cl, void=
+ *mssg)
+> > > +{
+> > > +	struct acpi_pcct_ext_pcc_shared_memory pcc_header;
+> > > +	struct mctp_pcc_ndev *mctp_pcc_ndev;
+> > > +	struct mctp_pcc_mailbox *inbox;
+> > > +	struct mctp_skb_cb *cb;
+> > > +	struct sk_buff *skb;
+> > > +	int size;
+> > > +
+> > > +	mctp_pcc_ndev =3D container_of(cl, struct mctp_pcc_ndev, inbox.clie=
+nt);
+> > > +	inbox =3D &mctp_pcc_ndev->inbox;
+> > > +	memcpy_fromio(&pcc_header, inbox->chan->shmem, sizeof(pcc_header));
+> > [High]
+> > Can this dereference a NULL shmem during teardown?
+> >=20
+> > Looking at pcc_mbox_free_channel() in drivers/mailbox/pcc.c, the
+> > channel's shmem is iounmapped (and the pointer cleared) before the
+> > shutdown path runs free_irq(). Until free_irq() returns, an inbound
+> > doorbell on another CPU can still fire pcc_mbox_irq, which calls
+> > mbox_chan_received_data(), which calls chan->cl->rx_callback (cl is
+> > still set at that moment) =E2=80=94 landing here.
+> >=20
+> > Existing PCC clients such as drivers/acpi/acpi_pcc.c::pcc_rx_callback
+> > do not touch shmem from their callback, so this driver appears to be
+> > the first one to expose this ordering.
+> >=20
+> > Should the rx_callback bail out when inbox->chan->shmem is NULL, or
+> > should the ordering in pcc_mbox_free_channel() (free_irq before
+> > iounmap) be addressed in the mailbox layer first?
+>=20
+> That needs to be fixed in the PCC layer, and is submitted in a different=
+=20
+> patch.=C2=A0 When that patch is accepted, this issue will be fixed.=C2=A0=
+ I do not=20
+> want to hold up this driver for that issue.
+
+Understood that there's a fix in development for this, but we can't
+introduce a potential null pointer dereference in the interim.
+
+If you want this merged before the fix, how about a guard for a valid
+shmem pointer?
+
+> Yeah, the Big Endian reference is spurious.=C2=A0 If there is another=20
+> iteration I will pull it.
+
+Sounds good.
+
+Cheers,
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Jeremy
 
