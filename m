@@ -1,179 +1,155 @@
-Return-Path: <netdev+bounces-293037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293038-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOMnFxlHGWrHuAgAu9opvQ
-	(envelope-from <netdev+bounces-293037-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:58:17 +0200
+	id IC6fF7xGGWrHuAgAu9opvQ
+	(envelope-from <netdev+bounces-293038-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:56:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB1395FEE2B
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:58:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2CB5FEE12
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 09:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0C787300E5E5
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:51:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C7D18300210A
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 07:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9862939F191;
-	Fri, 29 May 2026 07:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6EC3AA9F4;
+	Fri, 29 May 2026 07:52:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249753403E4
-	for <netdev@vger.kernel.org>; Fri, 29 May 2026 07:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1305D19CCF7
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 07:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780041061; cv=none; b=cD6m5tsIEC/RpUvyGAWfrKGgtLhvQHqGnEVcUULsquhmJWwvqKs2Jnt60T0I9Bzeq7K+Xk3v7VXmsD+EQmJbs/U9QR93yqX/QQPRlT+Rqk//h0B4WyO6rOMvTrJNYuCp5tfFEFfuU5k0njpYztaE8flI9sAOisUAQQYp9oKx6co=
+	t=1780041124; cv=none; b=bFlzjJfqCy+yWEbDjZyT3ON3KvS10AdnqWhQNaLJl9j3La1Y3fcgSxAJEFausr6nTi2l+dQ/RMA+nTUgiBKgY67/G4OJ65pj99IyTzgmqefC4FxReLtLL/m5a+RvPlQlX7EXSJtdFgrqz8rdfxszLBUg3J1l3ASJeYP/Z9r+7xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780041061; c=relaxed/simple;
-	bh=2/CzlDsL6M4D/2uAPuHj1XTFNWRuvfcQP2MZv8JIQOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d6CGe9QiI245Bzr4B1DZeQaNBi3mX+2ZVqn8RxZJTM9UZ++SYfF/re22f/+n4OFJnHz8Eb9l9Yoxxw1Hei9tzqC5O1oAUOVZsCjCCKuWbkEU+SxNQiIgWR0I/fT6rQ4c0f0Siu5+1JLlBKfJXqC+OcBAoPdzxeqaKDjaM6wFeyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wSrzD-0003fa-7B; Fri, 29 May 2026 09:50:31 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wSrz9-0003eI-0Q;
-	Fri, 29 May 2026 09:50:27 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wSrz9-00000005ze4-02Kd;
-	Fri, 29 May 2026 09:50:27 +0200
-Date: Fri, 29 May 2026 09:50:26 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-Message-ID: <ahlFQkjLehH19oDa@pengutronix.de>
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
- <20260526172447.10ca4b9e@kernel.org>
- <5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
- <20260527162516.0d012503@kernel.org>
- <b84a5fe0-a080-45fc-87d1-790402d423e4@bootlin.com>
+	s=arc-20240116; t=1780041124; c=relaxed/simple;
+	bh=cS+qJDGb4BZSsTGha4Gw+txQ2QHJCshBMBVScG17kSc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pf27bhD8GvOfzGYf9r23Cpt4uX+zNrcy4OWcqUymE9A8BaN+PmsQBnTX3UNWDF4SmprOKRFl0XmS8hYeR4+z1XhcgwVkNCaENzblpMLcDjYBb/l+ZNB63hzBNqAaALlQlWCPJ8PNkTLWRDkmZnxLvBQp3zV3XoBZemg/t75Djk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: zesmtpsz8t1780041115tc7b1a8e1
+X-QQ-Originating-IP: gbmraeUwhsZ54weEFniLS8ipb1tlhBwKg3YqunsRn9E=
+Received: from localhost.localdomain ( [183.156.95.204])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 29 May 2026 15:51:53 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 13068928620097599656
+EX-QQ-RecipientCnt: 4
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v3 0/3] net: libwx: improve VF ethtool support
+Date: Fri, 29 May 2026 15:51:44 +0800
+Message-Id: <20260529075147.88398-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b84a5fe0-a080-45fc-87d1-790402d423e4@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
+X-QQ-XMAILINFO: OE3tIrIEWSq4UycHo1aNlzZMufyyLXjDp4erKBQoXLf+zP3zi/biXXfe
+	f1TDf9rJB6RTzGvjIVQ3evqU/QqE7nb5dh4iIDkFb8i+Y+B0LDBjYfRD/jzlqK1RQOyZqLy
+	SeyA/iLnmH/INyu+M3qgZwLMGKF+VveKdsgeGXvS9WlrPxVFeAUKtFDSBlNjkM6oFvBnVkT
+	7fWch7YYRsxgn5sJFc1qG5Z/6/UGOnwHxWGhf48+YwFLvugF1MxQnG1UwO+XBWPT2C1V19F
+	I/oPONuwQE+s6kCv17TtZZsSqrjkbxsU8GeLiZaX3rVxAxKTF/FW301gpcth5BQxmPbZAYJ
+	lcKi1tKGMcjj0kkGeBSixZJrFsKbVLudUR+9PmCz6fIYZty1KKA0vAgUlPYrD7/ghmNmDkW
+	H0Sqcwy+AbcIdPmbt10pMdEcGC8lsQcimeEVeBEq2RRTCAzMm/kWuIXJX6pP0GPoSjnHCg8
+	XWS1XyCW/cjlmveDa+/naoWIRpwddeUveMns7gKlimvmmCH2x6DtvQHeXigVLUYJtiVMVkS
+	PNm9DDId4tQ36RoL9R85G2wgxWxJ2/7St2kHujCbrMkDb5jZVS0M6XAiaW0obsoBaJCQycM
+	DkQJkxpZjkr+lLb+6GRQbbuAqObcOaZ2Ki142R93DMqS05/nw/0n1wr6jJFqZr2sK4WnNZs
+	nQOs8pMUg0ddJQLgsc2e8G1oUB5v8duNaoLmBxfQrSr4D3Uz/wmrAtK0Zw9wQEjVqGnUczi
+	2oYxVAvr30tqlUiMEtPlKh1kt1Stvr3kkFKmQAvjTNZ0riWTPEx1bdFOxP1jxeu4M1ISq/i
+	/XY3CxcjmaytaIS1DZ5c9Oj7a+uasaDn7xdIqv20P8DVir3pr7oq11O7bopJK6PrKKdSFgF
+	lnhoB59r0JlSdgI84Kt81FjEnW/Ne+XTkfkaq/6N7JSLGYsvmCQ4mOOZfqJ3qfAPM3sZxsR
+	4WyPd2T69Cyki1lAwjL7l+4NAa9ZdRozXF7d9PLmWac+0Hmta0bowkPt2GJJw4RcF7HXBxs
+	xqOpB3Vnyg7FdGqDfNWxnZa2g2a7jqVxbZxau9xnJOHWctjvGoRabHr71HhkEbe4ZNbPSmj
+	x+y3iF+oT2DlUirHhdSqkDy3Vu8vdVZAfCIhaoVbVX86KZz+N5ULG8=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+X-QQ-RECHKSPAM: 0
 X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,nxp.com,bootlin.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293037-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.994];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.990];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: CB1395FEE2B
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[net-swift.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293038-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: AF2CB5FEE12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+This series improves ethtool support for Wangxun VF drivers
+(ngbevf and txgbevf) in libwx.
 
-On Fri, May 29, 2026 at 09:42:14AM +0200, Maxime Chevallier wrote:
-> Hi
-> 
-> On 5/28/26 01:25, Jakub Kicinski wrote:
-> > On Wed, 27 May 2026 04:47:47 +0200 Andrew Lunn wrote:
-> > > > It'd be great to hear from others but IMHO in the current form this is
-> > > > not suitable for Documentation/networking/ We can commit the "knowledge"
-> > > > part but enumerating the test cases seems odd for Documentation/.
-> > > 
-> > > Sorry, not looked too deeply at the actual content yet.
-> > > 
-> > > What i was thinking was a python file, which sphinx can ingest to
-> > > produce documentation, and place holders were code would be added to
-> > > implement the actual test during the next phase.
-> > > 
-> > > This is how i've done testing in the past. I would be the evil one who
-> > > thought up the tests and described them in detail using sphinx markup
-> > > in a python test template file. After some review they got passed off
-> > > to a python developer for implementation. And when they got run and
-> > > failed, sometimes the feature developer, the test developer and myself
-> > > got together to figure who made the error.
-> > > 
-> > > I'm not sure we even need sphinx. What i find important is that the
-> > > test is documented. What kAPI calls should be made with what
-> > > parameters. What results we are expected and why? So that when a test
-> > > fails, a developer has the information they need to fix their
-> > > code. The Why? is important, and often missing from the kernel tests.
-> > 
-> > All makes sense. The question is primarily how we fit that into
-> > the existing project layout we have in the kernel :(
-> > 
-> > The python tests can be hacked up to print the test case docstring
-> > before the failure.
-> > 
-> > But I think for human and AI reviewer consumption it may be nice
-> > to keep the condensed knowledge / common mistakes in Documentation/
-> > If we had the ability to exercise the submissions it'd be a different
-> > story test output would be a sufficient signal and/or could be fed into
-> > the review. But for AI making a guess at whether the submitted driver is
-> > correct purely from the driver source - knowledge is useful.
-> 
-> Also for the knowledge part, we had Oleksij's series that documented
-> more aspects of flow control (not just the pause part) :
-> 
-> https://lore.kernel.org/netdev/20260304094811.2779953-1-o.rempel@pengutronix.de/
-> 
-> Oleksij, maybe we can merge some of the information here with your
-> doc for the Docuentation/networking part ?
+This series extends VF support by enabling:
+ring parameter configuration via ethtool -G
+interrupt coalescing configuration via ethtool -C
+hardware statistics reporting via ethtool -S
 
-I have nothing against it. We need a documentation for proper testing
-and implementations too :)
+Patch 1 adds support for set_ringparam in wx_ethtool_ops_vf,
+allowing VF users to adjust TX/RX descriptor ring sizes.
+Patch 2 enables set_coalesce support for VF devices and updates
+EITR programming to use the VF-specific register access helper.
+Patch 3 adds VF hardware statistics support so ethtool -S can
+report useful runtime counters for VF interfaces.
 
-Best Regards,
-Oleksij
+Changes log:
+v3:
+- Patch 3:
+  Drop netdev_stat_ops support from this patch.
+v2: https://lore.kernel.org/all/20260525101115.13151-1-mengyuanlou@net-swift.com
+- Patch 3:
+  Remove some stats which can be replaced by standard stats defined in
+  include/net/netdev_queues.h.
+- Patch 1:
+  Adding a return value to wx_set_ring to make wx_set_ringparam_vf can
+  be passed back to userspace.
+  Remove freeing and requesting of IRQs. Ring resize only updates descriptor
+  resources and does not change MSI-X vector or interrupt configuration,
+  so IRQs do not need to be reallocated.
+v1: https://lore.kernel.org/all/20260514103405.42175-1-mengyuanlou@net-swift.com
+
+Mengyuan Lou (3):
+  net: libwx: add support for set_ringparam in wx_ethtool_ops_vf
+  net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
+  net: libwx: support vf hardware statistics
+
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 98 +++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  4 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  9 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  4 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.c |  7 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.h |  2 +
+ 6 files changed, 109 insertions(+), 15 deletions(-)
+
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.30.1
+
 
