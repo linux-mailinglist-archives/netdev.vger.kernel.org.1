@@ -1,215 +1,239 @@
-Return-Path: <netdev+bounces-293048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293049-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4GqoDPhRGWrzuQgAu9opvQ
-	(envelope-from <netdev+bounces-293048-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:44:40 +0200
+	id QEpDBZRSGWpnvAgAu9opvQ
+	(envelope-from <netdev+bounces-293049-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:47:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B2E5FF613
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:44:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 604DD5FF6BA
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 10:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06233315AB41
-	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 08:37:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 903753062C04
+	for <lists+netdev@lfdr.de>; Fri, 29 May 2026 08:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72695344052;
-	Fri, 29 May 2026 08:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01361340409;
+	Fri, 29 May 2026 08:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PSa9/7HJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dl+Mc6XC";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pg26bVPz"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011000.outbound.protection.outlook.com [40.107.130.0])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED34EDF59;
-	Fri, 29 May 2026 08:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.0
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780043864; cv=fail; b=BYFQqvUk/uOSmFEe4dQ6d/4Dy9ru+evdg6oXrjJoWPk3PaArDxssyJdyA/WQHRePgPC3Cn4rsNQZAhr9n9MWhjawYLu9KAuIFFTS8ygsuTj8GMOIY0WHvjliI+W+OHZFx681//NUCT90PsrdeT2hLSdCp4KPMpchQo2MidW5o4A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780043864; c=relaxed/simple;
-	bh=QG73wwyEjMSQHASIJ+Gb23pofn1X3TxVBS6zl16ZBz4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fKBPsObcmK79lGyK+2NbotuKYm2SbxlQc0IJjkfWQI0F6p5DpA6WsK+CBm40rXw77N0pu47EFE7KjnR4b4murpnxU7obMuC2HbU+NfOr+AetSLEBoBYzgJW7AHGiVBsVZgjcuSzswNZq9VQEZWaKnlfSbFkNAZ9zwGi6FT7l6LY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PSa9/7HJ; arc=fail smtp.client-ip=40.107.130.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p4nIg5P7sj2n9H/klbmIrHhiZVXltI5VeDGB3YYDBugoertaVSMs6rTk1jFL4iDsQIp00bVCTY9hau17ZBR3vTgCZlDttCbr2kfsxiK3NbH9v6jyIhHzmjcOqnOiwvDQBpsZUN6WzYwC9J7rYoZG297zKu7NM+GGqFwLyPthtS7TvkHfzTt0kJkYr1ZR13+coV7pPylQ4O4OtRXor5di5p//GXiYGpT1HmKvciJmg7OEccEBQ2wndkxJ7BlbSerpw5WMlDPqV2rbqXWsgsO19/6aS169xCw+lTIY9FYA/6Znm3ndio1jr1aOvKTDDUc1YhcFC6kewCQzSoYSQdkfNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ABUZQB7Kom4OfUBJn7kPjF+gjp54m10Y7BHaId5Zb+I=;
- b=sPAN8g6gUB7Yd295upf8MgIWZvs3M8ZT1xkggXY0oUsBBqtDrnUWhM3RGSKEGEedq5PYzCtcdazH1sgxzGPC2fWW2UFAWWO0jMb+F6JcM59lRypbEd43vPtBYyd+bRpOxHshxaYH7PLqQQDDP/+iE++6rBxTC3z1m0LBSTe0b3O3vB0j2wYOjFggz7slyQvousmkhXPNJ3K9Y8acEPVUA+8MLdCJlBuq3NNvYWIG1R0dK5K3+p9GctXhAnb3OhzHpq2W1HTWNjYOsUu1waosfRFGv3LKLDqjRdVTxFizpeJI34ih211v4i0CdZ04xIQL6VVHNmNQhLrwD/xKY3/tQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ABUZQB7Kom4OfUBJn7kPjF+gjp54m10Y7BHaId5Zb+I=;
- b=PSa9/7HJWiHHdPFTJyNLE6XBc2UUyBeXENfMZ12eoMGumTx2KKFWH3wpvqA/tib1nFWAL1X+/2C+vhDMCcqWrBNRKhuSSRifiwZoCdHeQJU8HnyZViaQ1bZU8qyKbDyxPJjs34puVjHF4jUyZuSvdpjE/8owx3KimuBX2MH50ZxeaxzJPTU6Xj+bHU2D6qRhQdBMdiXNldSpYZ9fSm6H0ngiIWa2AWIwUrW3zVqeSpJIQGuRx5orDb7b1rgzxbCuucTqOjtHyKw87spKolzxXfcN+xDM/N2QbDOq0aujUw6gLGXe5wi4S6jGedZU06aP188YtolD9VptrdS9zNiCPA==
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by AS1PR04MB9239.eurprd04.prod.outlook.com (2603:10a6:20b:4c5::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Fri, 29 May
- 2026 08:37:38 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.21.0071.014; Fri, 29 May 2026
- 08:37:37 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Tapio Reijonen <tapio.reijonen@vaisala.com>, Frank Li <frank.li@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Nimrod
- Andy <B38611@freescale.com>
-CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3] net: fec: fix pinctrl default state restore order on
- resume
-Thread-Topic: [PATCH v3] net: fec: fix pinctrl default state restore order on
- resume
-Thread-Index: AQHc7zMS3gJSwsZ+wUi8nDE2rQmTALYkrdrg
-Date: Fri, 29 May 2026 08:37:37 +0000
-Message-ID:
- <DBBPR04MB750094BCF64765DF8463587188162@DBBPR04MB7500.eurprd04.prod.outlook.com>
-References:
- <20260529-b4-fec-resume-pinctrl-order-v3-1-6eda0f592fca@vaisala.com>
-In-Reply-To:
- <20260529-b4-fec-resume-pinctrl-order-v3-1-6eda0f592fca@vaisala.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|AS1PR04MB9239:EE_
-x-ms-office365-filtering-correlation-id: 95289759-1d29-4f3a-846a-08debd5d8a02
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|376014|1800799024|366016|38070700021|18002099003|22082099003|56012099006|11063799006;
-x-microsoft-antispam-message-info:
- cgRS+JntTaWhEndGz5zcpf2GP8GJOdwGc1Etw+lBoXgR66kGCv1DBfoU6cJO4abdFtrsewioSPiQvhJKcBp90xYEnYuEE+jNo0u8kDyb3Jw6zGdST1T71MCKUz1VxAxS09YCsbM01WkqNwdhhVwKWYQrWwFdz4z062Avtn4Gp53p4B5WWiM7EXvZC7/ZnkauPpP6VPTc9tT18qWgoguTFeK/9gxkOGL8SUb2jx5Ca0Rthpq0u8pmbiWgcun1L5vKSL4EnvNxpGGzFpSkMszE0h62861HCSznLqA94e63iO+Y/NSvS1pyrOum0mGF4Q1s183AU+CTpSvvSlRwuPWJvVhTOraCjdYDHTSwkeC8IMDH89V6Gm5TNQ8OQxsW9V84Cp5LO9lpJk40PeW9SCu4i3hokDPK7AfhLG3O6XxgxtPFMdO0m7KqxZ0P/5WYOWB+JbnO1RkeQJNM1dNXznmvP8X6+sw3X9vZN/pGuHSlwMUCRIb/R/AJoDS186WnLjNOgonD+Polcv4tC3PL+wixNfjEC9aNJrSgDUMcPMbPSu8Nun/NBRGs3pooAiNTPLV50gDRGjc6TKxSc4mCKTWovsyJJdTZbB5eYGNx0KHpWqdxjRuo8fQR9qvEm7m5Ch9TWQucQOx4H7kA6VJp2WmmUSqvH166buQfGnFyvHI3Bdj5yCvhwFkRczXvaTEAisKamTsvbYabhexwASm/RDjMx+Uj3hd8mD0tQFoikL7/mMeMvc3wU0l8toy0yBugY6Q6
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(1800799024)(366016)(38070700021)(18002099003)(22082099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?e8VnjAsucdix7ZdzJibjpGRKZ5oTxP8/DOnlrQpR1SXO6nRAXppwX2JhiaTR?=
- =?us-ascii?Q?bcjAzfpDNqBozD57bkhg0t4I+yP91Tpp9TySj1zlkheH70IsnPaIltCIvAao?=
- =?us-ascii?Q?h7MIxEbNs4QeJJAiETBw0mUv6hFzBzVUGR9V8SYHO9LmPpM6V88OniIYRglI?=
- =?us-ascii?Q?JRkg+B733zteiePocvvi7wkNI8npcL/AnERlvr8A9cw9IiJU5GCC94ihLkuu?=
- =?us-ascii?Q?jvYfnTU4iBFsgNUE+pRcOCSgnSrSGEafgk7s49kzSr2cG4sMm152KdCXu53e?=
- =?us-ascii?Q?CB76smbrhxlMqfz5ku9yIx3Qk3S1/kpPu5n4jaFRwbF1PIl6Ra9W0d4n8xSs?=
- =?us-ascii?Q?7pXA+TWRMbowSDRlehv4Iu8Admq98SDGsDie40yKdmB+famAvo1eRSSFi3rT?=
- =?us-ascii?Q?h8zJL9fRjUQ8TQwQfPIIjsgbWdWu3ojPCohKY3R30YAhxMHrjL3h20gUOFYV?=
- =?us-ascii?Q?FAuHhFO+QP4X1vP0JWr42LPMxAyZaP1187dEnZzo1rBw1CA6+ea+pKbNkrqE?=
- =?us-ascii?Q?8cyX5c8vtfmXQgNxIooC448wCMn2px3e3vL4KAtWtRVhPI9GphEKA3TNn7Et?=
- =?us-ascii?Q?snvzd+0YbSm+z3unhL5hKKM5pvLpwVpNaN3O3L8xUYlTByn4pIwuRcKckHF2?=
- =?us-ascii?Q?bqBVt9NftDUJKoJZqsmqDlLQD5gbthgs417i+T5Vy6vutJxi9KOJhtNVgfSF?=
- =?us-ascii?Q?JTMQ/yvyeWsKIN05VKwgLaCk3ZrEAXWnBqW0IK5iJXwaoDMlMzE91EFl3f3M?=
- =?us-ascii?Q?1UbUlphl8SD4P1IEqY9S/c22wWsuPLgR0lnj215z+Olw38O40mlQ4BKay0OP?=
- =?us-ascii?Q?rzLTMq1s8E0w6iahvYTDhZ9MKW30zQfqKDOzidNzJhjE394LHwCsjKjXgE9e?=
- =?us-ascii?Q?5pQtLYztLDPHwH34m48XHZHuQr7Hg+cPW5L4sAAtdBonVj66XXKFuFzCw+mN?=
- =?us-ascii?Q?C+kwFsk7IMCwzIFT7GgvNSn8d2EqxfjkhYRqc4qJJ7qFOYVDlzfzMBVeJkPy?=
- =?us-ascii?Q?cznXePklUY8aFMKGCc9UMKV3wHY/3eQUUJMoFP57ThDGIFKv38HziOwWRrDa?=
- =?us-ascii?Q?ad+KmCrz30DrCRPiTUWB4noM2LXd9P++GQ2M20yIsZag7atGUWBM6MMUFbns?=
- =?us-ascii?Q?jm87nDbDs4f4TL5q5RVuUHt8DqKNRqd6RAKAsjLvWgw75OWSXqNaP3wt47i0?=
- =?us-ascii?Q?NdSlaSJKfJqc8WwhT5/LEmpvgC568rDmnoOrUB8hiy/Zxx5Se2PAQI82DHxz?=
- =?us-ascii?Q?EWXEgVj62218gO9u+VO9jr4NwqKLj63cIKaFcmUzen7MgefbsAFCyRBIsROz?=
- =?us-ascii?Q?DFiscDIS2LZt38d5TjFpWdGgPoQXBAR1c87025OQ7S2ACFWLJy5S0VjRssMJ?=
- =?us-ascii?Q?oWq8E7nAe1h40tFjxqR5FaQrzTqV8YPUWOyooYXk70WCpUPiI52yVBtNL7Ld?=
- =?us-ascii?Q?FRTtqEsT5eu6eh9D/pVm8vlBCgGjLXAYUEoTtKb1N613SsRvlrcoI+zHSGEa?=
- =?us-ascii?Q?93QJthqEoZ/BixosLqLGNkPPE3UlXS0HVNkNyexkbo0Tlh03vsZAVIp5XII5?=
- =?us-ascii?Q?9ZbO1Bh1fH324zCyZsxoUrYNXujD9trxtBQKVrXbEc+b+u2fl2WDUalPj6UL?=
- =?us-ascii?Q?We1BozrJIdms1mu+J151FkwpupYUl0Xwta8r36EmBJCzpFgJfuIymeKdrJJ1?=
- =?us-ascii?Q?dKEJnkxxXaZ+c+5kIjHsuRaU80J42ZYYqv0LaY7cZSTiFllM?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD46348C4C
+	for <netdev@vger.kernel.org>; Fri, 29 May 2026 08:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780044038; cv=none; b=bUdFqmGWEWEH6n7xCEVFG3SXxSH4pL63nqDAcRRblmGF1jNFhA90f9PBYoz2GYlwkj+ruuHYLGF8uWK0Y9JeHAVcxcUiZmtcy9dPNDjqDAwsvail5IYbhEdnZw/rtZAEClgksumd2owVLmZ6N/RhjU7hftNsousZuBPfMVqaPtI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780044038; c=relaxed/simple;
+	bh=DWbR6E/vwDX7rj4/4Wy1ycd7hPVUc6e5Q2qPcgbZOis=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iLLzlwPM/Ju99UYIXC+C8k1yAxu2O9UIKE3hwtcSd5+QmcAltx0lDL3TN4k6aYc3WNWty4DfdIs+IeWEyyRPYX53Qkq3z8KfduxWak6tfXL5NAbqKE+t2s7jLGiVPJOUMb8u+3skGMwAF/3nr6KEsAz6pr2dl3SSSTIFD3LvseA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dl+Mc6XC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pg26bVPz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780044035;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E5a0+aTAcs0DOSWUfCr2mbaAPWI9oAKfxBvUlJLFiE8=;
+	b=dl+Mc6XCO5vZdiBxhmBkzqdTMr1hO+5Gz8wOeun9WiYf2OdOfbPvmMEa11Lt6LtU0Y9ovl
+	8Br6YHD/e3RVzKlvQiVXsgygkH+7YIzpx7RjMIZp9B2AXEeo8UdNAWJzgwEak5XbUQocOz
+	AkEp2lVvwXHZD1gJL0DrG+EZDYOMxE8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-FxCy72g0PKmwUxin2O0WGw-1; Fri, 29 May 2026 04:40:34 -0400
+X-MC-Unique: FxCy72g0PKmwUxin2O0WGw-1
+X-Mimecast-MFC-AGG-ID: FxCy72g0PKmwUxin2O0WGw_1780044033
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49020d28986so9455215e9.1
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 01:40:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1780044033; x=1780648833; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=E5a0+aTAcs0DOSWUfCr2mbaAPWI9oAKfxBvUlJLFiE8=;
+        b=pg26bVPzSEL6upQ7+2qvthkR2ysmwFPkzCLtITjZcl/rrvQ+UWQ9fywBUO3Y71XybF
+         brmNjsckSUrcJIAGd6T2Zt0ouNFNct9cj49XWbFOhzl7CAR6Dirj8rhBF/KnpD1l0QId
+         BBoiY3Oi9x5FwZZcGtjDzd7p8xwD3vWQ2x2PUAWbFTgMHBLq0fuEjXDkHszrMztZFp7c
+         VGhs5Z+CbOmeqhYwod4y7ub97m+rwc1wH3Mb0XxnIBk8HVm/Aw4NA8UI/umZgPo33vMx
+         b6DcCaiHGk06PdibTS01YVVdQrys6YD7duvzxoazmmgBvMlq8x6GwyRX6k8vmFqk4l8f
+         mxGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780044033; x=1780648833;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E5a0+aTAcs0DOSWUfCr2mbaAPWI9oAKfxBvUlJLFiE8=;
+        b=L4sF4aav4TW0wpu4YRfWfpZsq4wS6FDmgzqd749URHbdPZ5WXGtwT0mWO/GkPiDM72
+         wcfheb730HkM+CSW3HJALiVaPL4+yYHRKY+xDLzqeYgJj9TmdPNH105rvBz941ma08xM
+         GihmBKkOzP9zc3WBe+ANPnM6HT7sOqaIOq95FaUN4S/7ysa3za5K3s5NnC3gXUT7Glbs
+         rDEyJ3S59x6tzSRkaiQerR977CPfTg4D5+mbxSrsyPZ1bIo2hXz6sCS1SUtIQrtM4n8t
+         RTgJXYkCDafeLMNVW9BWprOS1R6yAR0Reknmq5Fzgb2twyuSQWRgaRPB08zdlP5iZOoN
+         OQTg==
+X-Forwarded-Encrypted: i=1; AFNElJ8/imQ2MsbgTTGl7iKfE9LIwr2kcm5ssvsFt+O6qWFd7VmMpiOT6ex/ef8uuliyClMnZLpbEeo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxToc/W8zf24POLSRhymr+SoQ1tWWJuthEndjsTvs4Hre5NPJ7K
+	7FZkl69OUmOR93lSZdv7BBSm02/gFpyniBuZ/SYt4mJBco59C+n8YYIyx5X9cOcAaL3KmHt22tJ
+	DQavsyTMf09m8324IsskoMD31RzIE/fb613L52FGmEUW7Lkj96WUp/dMn
+X-Gm-Gg: Acq92OFfuImK2+E8NF1jKzcdxpWCpFY6qo3rw9+0l2ff9Qes8+7P6U7BJ9szqm9f/Pe
+	VYx27HzAp+OaPFvygfnrcJpn7TmsLSlAdzS02mqR6/1i8dIY7BJchv9pTS9NnQvm8eY5WYen+qL
+	6TqWCwgzbL3s94+D43AW42UJEvMEUK6fv3rlJKh0Tg/VOsLx15fU1KGg5MwZjnQtA4sx88vRCG6
+	olIJssxCE/Qt0a7uMYaOfZzKluXJ/7QNtw7YYiZeC7mTFdIK+i5L4T8NdJOSOBJV3WhbSzHpms6
+	gNij+8beJcEHrVNi69QUwop1/qBl6bCtp7y4nOvICDTfIYzjM4uGLiXIdZ5h4NACiP4r6Bhjpik
+	Plzx4W+J7n8Q6KsJTwv6l4w==
+X-Received: by 2002:a05:6000:4615:b0:45d:c3ad:b623 with SMTP id ffacd0b85a97d-45ef1459cc5mr1418013f8f.3.1780044032642;
+        Fri, 29 May 2026 01:40:32 -0700 (PDT)
+X-Received: by 2002:a05:6000:4615:b0:45d:c3ad:b623 with SMTP id ffacd0b85a97d-45ef1459cc5mr1417971f8f.3.1780044032015;
+        Fri, 29 May 2026 01:40:32 -0700 (PDT)
+Received: from tp ([2a02:29e1:404:f800:9fbc:ecd8:5c1a:509c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34a0403sm2024984f8f.6.2026.05.29.01.40.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 01:40:31 -0700 (PDT)
+Date: Fri, 29 May 2026 10:40:29 +0200
+From: Beniamino Galvani <bgalvani@redhat.com>
+To: Stefano Brivio <sbrivio@redhat.com>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
+	=?iso-8859-1?B?zfFpZ28=?= Huguet <ihuguet@redhat.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Yumei Huang <yuhuang@redhat.com>, Ido Schimmel <idosch@idosch.org>,
+	Justin Iurman <justin.iurman@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: Problem with IPv6 privacy addresses in 7.0
+Message-ID: <ahlQ_YFS0s_8B03q@tp>
+References: <bd669eaf-64dc-4217-bae0-4a531e473762@leemhuis.info>
+ <20260528153202.14900687@elisabeth>
+ <CACT4ouf5ZqGgb=RO8_7NovLCvYKLKL4vD70dEe6xUODT1UEcSA@mail.gmail.com>
+ <20260528165320.15b90ded@elisabeth>
+ <CACT4oue2EMM9Kfsm9Jii2rG9ooi=D37PK=8886cpLuBkwhrOxw@mail.gmail.com>
+ <ahhm1-XfnsWyIWDV@tp>
+ <20260528192143.31c9e9ea@elisabeth>
+ <ed954836-742a-44c3-8c2d-65dd06c3514e@suse.de>
+ <e91507d6-cbfc-447c-8236-d9b3d91f18c5@suse.de>
+ <20260528212213.4aa613f8@elisabeth>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95289759-1d29-4f3a-846a-08debd5d8a02
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2026 08:37:37.8103
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UD7OnuUNOSM6yEVoV7XrhemaUk8cHFvGi1+mKRYdpoJjCScbxQET/q1i0glg12eIJw8bQsUFSwjfUby2YTF3tQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9239
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260528212213.4aa613f8@elisabeth>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293048-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293049-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[suse.de,redhat.com,leemhuis.info,kernel.org,vger.kernel.org,idosch.org,gmail.com,gibson.dropbear.id.au,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bgalvani@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nxp.com:email,nxp.com:dkim]
-X-Rspamd-Queue-Id: 74B2E5FF613
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 604DD5FF6BA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->  drivers/net/ethernet/freescale/fec_main.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c
-> b/drivers/net/ethernet/freescale/fec_main.c
-> index
-> f89aa94ce0202d5f28f37362ce70e0943aa14025..6ebde65d7f1b8728a6c5d28f7
-> 5cc0b0c4d983969 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -5594,6 +5594,7 @@ static int fec_resume(struct device *dev)
->  		if (fep->rpm_active)
->  			pm_runtime_force_resume(dev);
->=20
-> +		pinctrl_pm_select_default_state(&fep->pdev->dev);
->  		ret =3D fec_enet_clk_enable(ndev, true);
->  		if (ret) {
->  			rtnl_unlock();
-> @@ -5610,8 +5611,6 @@ static int fec_resume(struct device *dev)
->  			val &=3D ~(FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
->  			writel(val, fep->hwp + FEC_ECNTRL);
->  			fep->wol_flag &=3D ~FEC_WOL_FLAG_SLEEP_ON;
-> -		} else {
-> -			pinctrl_pm_select_default_state(&fep->pdev->dev);
->  		}
->  		fec_restart(ndev);
->  		netif_tx_lock_bh(ndev);
->=20
+On Thu, May 28, 2026 at 09:22:14PM +0200, Stefano Brivio wrote:
+> > >>> about the source address selection is impacted. Indeed, the commit
+> > >>> had effects on one of the selftests, which had to be modified to
+> > >>> change the order of iproute2 invocations.
+> > >>>  
+> > >>>>>> If the fix must be in NetworkManager, we only need to parse
+> > >>>>>> them in non-reverse order like IPv4, I guess.  
+> > >>>>>
+> > >>>>> But that would then require some form of detection, and, at
+> > >>>>> least according to Fernando, isn't the most robust option
+> > >>>>> anyway, as ideally NetworkManager shouldn't rely on the order
+> > >>>>> at all.  
+> > >>>>
+> > >>>> True  
+> > >>>
+> > >>> Correct, if the new behavior is considered better, there should be
+> > >>> a way to detect which order must be used. Otherwise userspace
+> > >>> tools won't be able to maintain the same behavior with different
+> > >>> kernels.  
+> > >>
+> > >> My remark here is about whether NetworkManager needs to detect this
+> > >> at all. If it used timestamps to detect recent / older addresses, as 
+> > >> Fernando mentioned, then you wouldn't need any detection at all,
+> > >> right? Or is there something else we're missing?
 
-It looks good to me, thanks for fixing this issue.
+The problem arises from how NetworkManager handles updates (e.g. after
+receiving a Router Advertisement). At each update NM determines the
+list of addresses to configure and checks if the addresses are already
+in the right order in the kernel. If they aren't, NM removes and
+re-adds them in reverse to achieve the desired order. Since kernel
+7.0+, the order changed and the addresses always appear in the reverse
+order.
 
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
+This creates 2 negative effects. First, it breaks source preference:
+if users configured a profile with addr1=A, addr2=B because they
+wanted A to be preferred, now B is preferred. This is not
+NetworkManager-specific, it affects also simple scripts that add two
+addresses (like the selftest that had to be changed in the commit).
 
-By the way, it seems you posted two identical patches, which might
-cause confusion.
+But most importantly, at each commit NM detects that the order is
+wrong and constantly removes and re-adds the addresses. This
+continuous cycle is what causes the bug that Chris reported.
+
+BTW, NM doesn't touch the temporary addresses directly; they are
+automatically removed when the corresponding SLAAC address is
+removed. Since the problem is not only about temporary addresses we
+can't rely on timestamps.
+
+> > > Ohno. Now that Beniamino and Iñigo mentioned it, this will likely break
+> > > many other environments. In essence, many tools relies on the previous 
+> > > ordering to identify which address is the primary one.
+> > > 
+> > > E.g cloud tooling communicating with the metadata server via IMDS(v2) to 
+> > > configure IPv6 primary and secondary addresses. They are likely relying 
+> > > on the ordering for that.
+> 
+> I haven't seen any tool specifically relying on insertion order for
+> this so far and I'm having a hard time believing this kind of tooling
+> wouldn't rely explicitly on home / care-of addresses or different
+> labels -- see RFC 5014 and RFC 6724 Section 5. (or, perhaps clearer,
+> the examples in section 10.1, in particular rule 4. and rule 6.
+
+I'm not familiar with home addresses, reading the RFC it seems that
+setting the flag might have effect not only on source address
+selection but also on other aspects?
+
+> But I'll look for more convincing examples in a bit (maybe you have some
+> at hand?)
+
+I remember we had users reporting issues about the ordering of IPv6
+addresses, I'll try to find links to them.
+
+Beniamino
 
 
