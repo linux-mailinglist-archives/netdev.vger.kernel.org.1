@@ -1,203 +1,183 @@
-Return-Path: <netdev+bounces-293349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293350-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WALXCv7/Gmqn+QgAu9opvQ
-	(envelope-from <netdev+bounces-293349-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 17:19:26 +0200
+	id 0AWIGhAJG2pg+ggAu9opvQ
+	(envelope-from <netdev+bounces-293350-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 17:58:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF40C60DB31
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 17:19:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7C960DD9C
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 17:58:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CB2F63014803
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 15:19:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F4253036E9B
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 15:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9732E2DD2;
-	Sat, 30 May 2026 15:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UTvUu843";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8y4xHm6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427A0339863;
+	Sat, 30 May 2026 15:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC8D23392B
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 15:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF60327C0D;
+	Sat, 30 May 2026 15:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780154362; cv=none; b=Uqs4y/AEff5Z7codvP1vgYoXjiI3ZPHVpZsFh8NE9+uLDKus5igybjRngwaU3pI7WOdj3QlpmIaG6AITxBdNH8yQQkAXixTKZ72pcfVnpo+1hiGZj23OQH88+64x7wSupg7GI2kwi4GGjSwVgtnaiCDwznxRrOSi41XOLDew8vU=
+	t=1780156656; cv=none; b=bhdamjFe2Uzh0EoerWiGdqEMWYosxx5y5jqqln2Hxq3bSgTguJs+rsxUWUrJ3oXKDjb84AU6la+SotyQCUpIyOdKlsnB7ra7tvRnl3hIKwJPOE/1bNqZj+fMIspJKbmNJZYNmXmKr+CpXw/nVK0d4i9sH+AP6yMMEpF2+drXVq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780154362; c=relaxed/simple;
-	bh=dKEZUiL2uRBe4sxxhKgEmKRLXdf3Nh8h47SQUzm1zY8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=J7vVfz+khk5r38b1kpWeVHa5TJ26o6m3jh/VhP/ZewfFxEqtH2uxKNWMQCS79nKrxCJovCq7CdF4tKGKEj0YW2QO6mRsHOuF87NZdSLfgjS/wL9HooOm1tppLlB22aPPGG99w6pkUuxFJ8kOTZ2/qeOgJQ110gJOfI3c3AKx850=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UTvUu843; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=J8y4xHm6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780154360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aE7Th1lp6TsxWlZ15cMU3n+klk6qhPVCeyJ3BKf8a08=;
-	b=UTvUu843cmFhOKNRdNTkRs4vmimzISQq2ItBKEgTkl+juO/dDIL6nkIrW2tCNLQ1IHXPcM
-	mhw60g9yNUuknOc9AfadSZH7LVRSMG2Qq4Dj/McU19lfh6UDezzu1AxFOE91iGD36PyvY0
-	ai7bTSs8IaXYcIwMB7NBGBtCeZaNzhY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-dykBCSa5Mb2jLeeoo6gV7g-1; Sat, 30 May 2026 11:19:18 -0400
-X-MC-Unique: dykBCSa5Mb2jLeeoo6gV7g-1
-X-Mimecast-MFC-AGG-ID: dykBCSa5Mb2jLeeoo6gV7g_1780154357
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-45ef0af9517so1461271f8f.3
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 08:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780154357; x=1780759157; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aE7Th1lp6TsxWlZ15cMU3n+klk6qhPVCeyJ3BKf8a08=;
-        b=J8y4xHm6cA3mNdueb1j9V51DKKJ5UYaddzSVBZp9AnysCSIwxstyIlFOXmvOBSOwcA
-         Bz26XXBgrPIUApIMJOKIGYrPb4waczPN3zBcU7IMyVscqTPCtVQm/GCnVC2H2ccZzxca
-         nL4eUNB3dh5vicC7cSrtkytIybcs3mCz2wNtH6ErAoZu4Hw3ELqz22gNQ+SnRZAkBQmB
-         spWToGAlBCUEvFkls8vJO4K3MrYkJcOrtfA7rA6ET8F+oklXNoJgFm6w/JUTGHkc88j1
-         A7MybJ+LjtQtzplQgoe7+x+QSRlZ0v8rBxSmPFP8uCZlJNDBklBb43vEsaOmYzMBaTI1
-         kr6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780154357; x=1780759157;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aE7Th1lp6TsxWlZ15cMU3n+klk6qhPVCeyJ3BKf8a08=;
-        b=eSkW9eGu5sIQP64UACb5kr2GcsxWXRNkRVhE9k1UQOTfEAf/jktep6iyzYjziDzc++
-         oR5Vmr7Rtua0AsaH5ZZR2azNk1CU+KQFGoyqSkc9jVOupA11UthPNNjM6u+zIHkBKaUu
-         7ZYlRGKO86gMsa6f5hNdSFdh8i3pPOFqrmbal4fMe+Pp66kbL4//shYQm/FJ9wzaduoc
-         ebfYwW4LzJe9cNG02QRtvwusaLO3ypPZ/u3kdVDy+o2Zx9sUijxDQk/lzZHxn5vli8Mn
-         h7YRnkn0KAVtcV1lHTWjyHbZ2NWswTKZDP7sr/JlpGNeCmhyvVekuXDuFyITi7gfkEDw
-         x92g==
-X-Forwarded-Encrypted: i=1; AFNElJ+6/Aw8dL2mzfPF1mXvC+lace9SB3eoaPhe8C0rUGfxtem48lxvSamx6XpauHBpA5kvUNZ5tOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxr+mvtQu1GzZYG3pUB47RpOmvpzd0lXNmewG/ZbsXt6dW6tFUL
-	a5oGnv+Iym3KEpcqLNfLyH2+HmMlu6H81x2uhmV9WbcAPodPGY6NapPA5oRFpsUKKeMvujKzoRT
-	ZmZeLS+E8Iu7hneU+UzUEeSOHPluQlg/LasykxaICSHYi/OL5ktqQxooTpw==
-X-Gm-Gg: Acq92OFBB+UDFJNRz4nwa5NBrP2JreqOh34MKS2UeOYn+JsCXrFNuxQ9nj4FJB48azw
-	3YfKxm5qg0tgK6O7IHvgYmsg0jTjUJn5FecKdWcxGjqiBcD6G9GHremXez4ZmWu2HHhgoKKyzVn
-	mLmZnfzgxkg3RSvKPex1n9JNpvZytPqCasTtskFkp0fpqrw1gRYZ1pR13BsXXo9Sw9/nPRoDC3Y
-	15TjVm7kiTgvXeJtF4wWqVSYyXn53lNkrcObeuUtnnmJK5dVIokEeu3/Q301F8G48W6qVjAJSqC
-	2Rcg982yH/Uy1S3dlpmCLe+zIoeeAM+AN7VEO0lstHwBKHjGoTdw1c0T4ZPIuS0xImsNutfdVVs
-	F142lWVs/kmfYUqDbSQf+sdw/oyAlHjUH7RHbNc6RrqYLUl9VZHAsAoVNTp8=
-X-Received: by 2002:a05:6000:22c7:b0:43d:762e:76ba with SMTP id ffacd0b85a97d-45ef6b19b8emr8296177f8f.17.1780154357285;
-        Sat, 30 May 2026 08:19:17 -0700 (PDT)
-X-Received: by 2002:a05:6000:22c7:b0:43d:762e:76ba with SMTP id ffacd0b85a97d-45ef6b19b8emr8296124f8f.17.1780154356857;
-        Sat, 30 May 2026 08:19:16 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34bcc30sm11630958f8f.12.2026.05.30.08.19.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 May 2026 08:19:16 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id CF8547BA5BE; Sat, 30 May 2026 17:19:11 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- victor@mojatatu.com, david.laight.linux@gmail.com,
- yimingqian591@gmail.com, keenanat2000@gmail.com, 2045gemini@gmail.com,
- rollkingzzc@gmail.com, dcaratti@redhat.com, security@kernel.org,
- linux-kernel@vger.kernel.org, Rajat Gupta <rajat.gupta@oss.qualcomm.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH net v4 1/1] net/sched: fix pedit partial COW leading to
- page cache corruption
-In-Reply-To: <20260530080643.1345521-1-jhs@mojatatu.com>
-References: <20260530080643.1345521-1-jhs@mojatatu.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Sat, 30 May 2026 17:19:11 +0200
-Message-ID: <87bjdx2ads.fsf@toke.dk>
+	s=arc-20240116; t=1780156656; c=relaxed/simple;
+	bh=mnoFnQYhYA2he03EfVbg7R8e4M5dKnw2s3/hleZ2GOQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BJ5BjDgcwpZL2JZGrR22tDFHFzc5LCLuCLuMm4GL3ll38bLuXuQm3AKYVQLlkX9xEvOK8X0atQ7aMMcNQ6ZBTMtLXgIqH9Yt6pJY54b3oJTA4Xpl1ZDWoL03xU3fiCWqJWh6BQ0CuHxJMA2LxKhe/6QzrB8tYd1pe7I+o0O+NsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=207.46.229.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app2 (Coremail) with SMTP id zQmowADXcwvfCBtqe9QUAA--.42739S3;
+	Sat, 30 May 2026 23:57:22 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: marcelo.leitner@gmail.com,
+	lucien.xin@gmail.com,
+	davem@davemloft.net,
+	yuantan098@gmail.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	zzhan461@ucr.edu,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] sctp: diag: reject stale associations in dump_one path
+Date: Sat, 30 May 2026 23:57:14 +0800
+Message-ID: <fac6043fa20a2ff68e12958c431836f692c51268.1780113823.git.zzhan461@ucr.edu>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1780113823.git.zzhan461@ucr.edu>
+References: <cover.1780113823.git.zzhan461@ucr.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQmowADXcwvfCBtqe9QUAA--.42739S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF1ruFWkXr4DWryrWr1fCrg_yoW8Kw1kpF
+	ZxCrWqya4Utry7urnYkrWkZrW2kr4kK347Gryaqws8Z3WkGr1ftryIqw1qqry5ArWSkayY
+	qF1qgFW5Jw15CFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
+	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEDCWoanc8GKQAAsH
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293349-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com,vger.kernel.org,oss.qualcomm.com];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-293350-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,lzu.edu.cn,ucr.edu];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.917];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: AF40C60DB31
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lzu.edu.cn:email,ucr.edu:mid,ucr.edu:email]
+X-Rspamd-Queue-Id: 6A7C960DD9C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Jamal Hadi Salim <jhs@mojatatu.com> writes:
+From: Zhao Zhang <zzhan461@ucr.edu>
 
-> From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
->
-> tcf_pedit_act() computes the COW range for skb_ensure_writable()
-> once before the key loop using tcfp_off_max_hint, but the hint does
-> not account for the runtime header offset added by typed keys. This
-> can leave part of the write region un-COW'd.
->
-> Fix by moving skb_ensure_writable() inside the per-key loop where
-> the actual write offset is known, and add overflow checking on the
-> offset arithmetic. For negative offsets (e.g. Ethernet header edits
-> at ingress), use skb_cow() to COW the headroom instead. Guard
-> offset_valid() against INT_MIN, where negation is undefined.
->
-> Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is writ=
-able")
-> Reported-by: Yiming Qian <yimingqian591@gmail.com>
-> Reported-by: Keenan Dong <keenanat2000@gmail.com>
-> Reported-by: Han Guidong <2045gemini@gmail.com>
-> Reported-by: Zhang Cen <rollkingzzc@gmail.com>
-> Reviewed-by: Han Guidong <2045gemini@gmail.com>
-> Tested-by: Han Guidong <2045gemini@gmail.com>
-> Reviewed-by: Davide Caratti <dcaratti@redhat.com>
-> Tested-by: Davide Caratti <dcaratti@redhat.com>
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Tested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
-> Tested-by: Victor Nogueira <victor@mojatatu.com>
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> ---
-> v3->v4
-> 1) Restore the Fixes tag which was accidentally deleted in v3
-> 2) Remove tcfp_off_max_hint as pointed by sashiko [1]
-> 3) Fix a boundary condition identified by sashiko [1]
-> 4) Add unaligned access support to safely access ptr support to compensat=
-e for
->    removal of skb_header_pointer() / skb_store_bits() which handled it fi=
-ne
->
-> [1]https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260527181731.116=
-6373-1-jhs%40mojatatu.com
+The SCTP exact sock_diag lookup can hold a transport reference, block on
+lock_sock(sk), and then resume after sctp_association_free() has marked
+the association dead and freed its bind address list.
 
-Re-tested and LGTM. Let's hope this is the last one ;)
+When that happens, inet_assoc_attr_size() and
+inet_diag_msg_sctpasoc_fill() can still dereference association state
+that is no longer valid for reporting. In particular,
+inet_diag_msg_sctpasoc_fill() may read an empty bind-address list as a
+real sctp_sockaddr_entry and trigger an out-of-bounds read from
+unrelated association memory.
 
--Toke
+Reject the association after taking the socket lock if it has been
+reaped or detached from the endpoint, and report the lookup as stale.
+This keeps the exact dump-one path from formatting torn association
+state.
+
+Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ net/sctp/diag.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/net/sctp/diag.c b/net/sctp/diag.c
+index 2afb376299fe..d758f5c3e06e 100644
+--- a/net/sctp/diag.c
++++ b/net/sctp/diag.c
+@@ -266,15 +266,15 @@ static int sctp_sock_dump_one(struct sctp_endpoint *ep, struct sctp_transport *t
+ 
+ 	lock_sock(sk);
+ 
+-	rep = nlmsg_new(inet_assoc_attr_size(sk, assoc), GFP_KERNEL);
+-	if (!rep) {
+-		release_sock(sk);
+-		return -ENOMEM;
++	if (ep != assoc->ep || assoc->base.dead) {
++		err = -ESTALE;
++		goto out_unlock;
+ 	}
+ 
+-	if (ep != assoc->ep) {
+-		err = -EAGAIN;
+-		goto out;
++	rep = nlmsg_new(inet_assoc_attr_size(sk, assoc), GFP_KERNEL);
++	if (!rep) {
++		err = -ENOMEM;
++		goto out_unlock;
+ 	}
+ 
+ 	err = inet_sctp_diag_fill(sk, assoc, rep, req, sk_user_ns(NETLINK_CB(skb).sk),
+@@ -289,8 +289,9 @@ static int sctp_sock_dump_one(struct sctp_endpoint *ep, struct sctp_transport *t
+ 	return nlmsg_unicast(sock_net(skb->sk)->diag_nlsk, rep, NETLINK_CB(skb).portid);
+ 
+ out:
+-	release_sock(sk);
+ 	kfree_skb(rep);
++out_unlock:
++	release_sock(sk);
+ 	return err;
+ }
+ 
+-- 
+2.47.3
 
 
