@@ -1,248 +1,207 @@
-Return-Path: <netdev+bounces-293312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sCh3MpGIGmpt5QgAu9opvQ
-	(envelope-from <netdev+bounces-293312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:49:53 +0200
+	id uInGGp+KGmrT5QgAu9opvQ
+	(envelope-from <netdev+bounces-293313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:58:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4503460B7EA
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:49:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF72360B82C
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:58:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 263043060495
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 06:49:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D79A3011F23
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 06:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A65384CE6;
-	Sat, 30 May 2026 06:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EDB36A017;
+	Sat, 30 May 2026 06:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oFgoihqL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JJo2ZKhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA8D199949
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 06:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0007A311C1D
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 06:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780123785; cv=none; b=u1PNGIU1kZougpxtXQYgg8uZy1V6AWyhbOYoTuKlJrHoTYwWpxZlu8Oy5ya1GsE94lCtZYI77LMWU5lgp0vxxObWZ6S5yxg5QY9b/394ncfpkyP429D+bhS9+h2D2tBHpac6RezmPiWkOODnZF0Uxq8ufj373WII2Dp3XAoWTCk=
+	t=1780124316; cv=none; b=XTd9JdAcsMdAJb6QkM8P3avvLYutKp7Stf8fhnTmiejBJvxJMokMHli2j3SyhxevlgMeaSOpZSXpk0yhcgfycK8jqblZXpOnH1GggTJTSCWo66p5oK/JdzmMJFKeXaLV/JqqB7sSGNwDXq2LI5QOitjLOLkR+1ou5VObrt2MSv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780123785; c=relaxed/simple;
-	bh=YJu/hGqCZ/x6BPnocLXNDfK+2HdLM+a6mWCKV6S32gc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=eNLHGpxDBYwmWqPteFtcvr0HKsdl70FJ/qjcQC3RM4knv7W6Q7ascufb4bgz2rkeMbHfs37sLpfA61a3lXIgJKXFN1gh2RFE+G1o0BLQQ+/GCkm5a1sdJc6O2D+5JQTGkZvB+1eufrdoxSj39d1dLvEeY41nnoIhMoMVgaZ4AYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oFgoihqL; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2baca4df358so92581775ad.2
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 23:49:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780123784; x=1780728584; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G8NAUea0YD24JXOa/aqrN+/ZpdlmTLfkczxznQ++dPw=;
-        b=oFgoihqL4KMRI0ciwduW3OIg+3K5HBWEHhnBW10/CroUDOgcK3IWh7nukczVrGpOiP
-         /SUnCo3QWpi6kd/uosH05Vz1aZJdl+O/tQDPG3AyOL60r/nUqSRVzQI/o2BCRz8WCuqW
-         2trPt79zeor4NUfNxO7N/59uxYPpWSDYcrHS0ZXU3efAh7B+j/rg9ddCTj/mBmIvDSep
-         FuHqhpNWip5g0sAkwG69Ng9znHuXL+Z+85zhFpHlVEEhFMlfxPA6kJTP+s8B+IuIm4cP
-         qhE/49xtoTHKsALQ//COUAXrUckqsBzdV84x8q+NSgRAl8rzWDjTxp0+7+bvBorKnvTA
-         6WIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780123784; x=1780728584;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G8NAUea0YD24JXOa/aqrN+/ZpdlmTLfkczxznQ++dPw=;
-        b=bmrhtvJptXs8BPtPf13JoCj4KOE0yQQ6MDN+aZDvxHrLO4wXrTkVYbtx77hkctYRLO
-         ujoObVYO8UwDdI6I4kkBNYoktWjj+H/i0dzObUTkZd8+jnwNW5C1N0O6vGE/s9umBfh5
-         JbE7JxvKo4UDj0DcRXlD7VAvCnz29UWfDMSN9ZGjMMCFTnzHWPmKToZqNslDHvLy1BfG
-         3tP50AqbiyBmCctZ4oTaXxsLFPXK8trIDB4PplVSqPyNiWFhNkg2fZnlSoUilJx4gloB
-         InYkvU2T/xQhZJ9TB6a/Z0S3elzfpceEzv14mR4aORnGbbTtC3YCC8l/p6Mdfqv708YH
-         EnDw==
-X-Gm-Message-State: AOJu0YxAGhXxT4Xas5DuRwhtqwh3DL0DPAZOws7ikpkvaHZBEzagSUKg
-	N7xkF7IRwcE5VgmbBwzF9NLaatSoabmdyZaL7mTMbTtPoSmBf+dvPex4cqipdQ==
-X-Gm-Gg: Acq92OHSqeuZ1yygFON29An/eSm0wuWRBn/AQotiwIz7AfJyR/ElzHPMY7btrYWrdWp
-	yEQutj3dWmpDplLdm+LTv9CBLj6Ndl2+QPLp2he5Kt0VxHcy/PRGDUdWLWgA/S9JjwvfGkRobyR
-	gG1Mb4LEdzz4tu8PYkqxkho1hsKaogcNSV0mM7+3mIgZmPK9Z1kZs9zhNrpRQpTbDq9a7KbPO5Y
-	81Fw8WsDNhbVTZRSBv+JTv3Z8tIUfvekEcaV22Ccn2guSo5o9YYaRXR2xKfxdQiP5HYPIRCTga8
-	CaF1G8FydKh9NuUlArlMRZy0dnDFAvYg6FoxlJ2hBdV3kbJxpRrlGNkT+UD723ie9WTmSGCg7PH
-	cb+n6aylpm2RDE/KSP9EgSSYh/rF0ER7jkTJuHsXZLQpEjcwRno2R5sXmJGgpsqEjdPeyOEfmpB
-	ZUdudzzJW6ZLV3f3Pqg4n76aRpwjoRnHWs8TMG7D42WSJGPHRjHFMVllSFAGHQgV4D
-X-Received: by 2002:a17:903:244d:b0:2bd:c310:f7c9 with SMTP id d9443c01a7336-2bf367b2353mr37205065ad.2.1780123783611;
-        Fri, 29 May 2026 23:49:43 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23a1e095sm43155285ad.32.2026.05.29.23.49.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2026 23:49:43 -0700 (PDT)
-Date: Sat, 30 May 2026 15:49:39 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au
-Cc: netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net] ipv4: protect egress device access in the output path
- with rcu_read_lock
-Message-ID: <ahqIg6vURwYI0LJ5@v4bel>
+	s=arc-20240116; t=1780124316; c=relaxed/simple;
+	bh=9GC+nvGm089STHURZhvaw1HjQysmJhqOGo43lkNVNv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ki44fKL4z0TFhfS6OS6RAm5+i8fR8AKKrt6vKTdpp25cq+QuBZ/Iu3QCJrbhBX1Epwy3paMJKOKKNHZtn5ZPZyebYCLJfCDXytoe680N7emSjP2eXcx+DBfxvtcmMbfM1BQ0Q8pDKlFZrgcJ7hsUwlAARLw5gI7n6pfH2RuVp2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JJo2ZKhA; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 6CDAE4E42D98;
+	Sat, 30 May 2026 06:58:32 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 25CF86073B;
+	Sat, 30 May 2026 06:58:32 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EFDE810888650;
+	Sat, 30 May 2026 08:58:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780124310; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=x9nvez9wtVVvGLqRBtzT4pg4jyQA0HGsCNg6shTRZ2Y=;
+	b=JJo2ZKhA0uokfeXNVjofcZHDUYsQgQthaxmQgCg8Y95pPFO0HquRnlwhANKY4Mp9p8N8ZJ
+	200KH6nCYqa9PEf+uWsv4GPHNuNaoVeLQ42oPjIj9dl/27J4yFo2f6BFvCB/euPkPhdQAD
+	PixPXEPmFSFTrZXg5PijWJmaFodDTj3+3EQ1fev8nHoe/5IRVmtqBd7aPrr0zkauvSyAJO
+	26Cv2a6wEjxs0cCqV8HM1ceXWJMWDJ74K7o8AAWyHQHBQSR2V/3A4xAd8+pyk8dn3CaUyG
+	tVRkokIZJo+wSw+qLJkAcp56YKb2PWo+Gl+NcEkxBkYTJuUJyHhR+IIMcL7/Fw==
+Message-ID: <4a919501-b3f2-489a-ac9d-a7f8709abf6e@bootlin.com>
+Date: Sat, 30 May 2026 08:58:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 02/10] net: phy: phy_link_topology: Track
+ ports in phy_link_topology
+To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Frank Wunderlich <frank.wunderlich@linux.dev>
+References: <20260521121040.1199622-1-maxime.chevallier@bootlin.com>
+ <20260521121040.1199622-3-maxime.chevallier@bootlin.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260521121040.1199622-3-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-293313-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293312-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[vger.kernel.org,bootlin.com,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 4503460B7EA
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,lunn.ch:email]
+X-Rspamd-Queue-Id: BF72360B82C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ip_mc_output(), __ip_local_out() and xfrm4_output() read the egress
-network device from rt->dst.dev / skb_dst_dev(skb) and then pass that
-pointer as the 'out' device argument of NF_HOOK without holding
-rcu_read_lock.
 
-dst->dev is a field protected by RCU. When a device is unregistered its
-value is replaced with blackhole_netdev, and the previous device is
-freed after an RCU grace period. A section that reads dst->dev and uses
-that pointer must therefore hold rcu_read_lock. The three functions
-above are missing this protection, so when the egress device is
-unregistered concurrently with transmission, a LOCAL_OUT / POST_ROUTING
-hook (nft meta oif, selinux_ip_postroute_compat, etc.) can reference a
-device pointer that is no longer valid.
+On 5/21/26 14:10, Maxime Chevallier wrote:
+> phy_port is aimed at representing the various physical interfaces of a
+> net_device. They can be controlled by various components in the link,
+> such as the Ethernet PHY, the Ethernet MAC, and SFP module, etc.
+> 
+> Let's therefore make so we keep track of all the ports connected to a
+> netdev in phy_link_topology. The only ports added for now are phy-driven
+> ports.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  drivers/net/phy/phy_link_topology.c | 53 +++++++++++++++++++++++++++++
+>  include/linux/phy_link_topology.h   | 18 ++++++++++
+>  include/linux/phy_port.h            |  2 ++
+>  net/core/dev.c                      |  1 +
+>  4 files changed, 74 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> index fdfafd951905..207128303ca2 100644
+> --- a/drivers/net/phy/phy_link_topology.c
+> +++ b/drivers/net/phy/phy_link_topology.c
+> @@ -7,6 +7,7 @@
+>   */
+>  
+>  #include <linux/phy_link_topology.h>
+> +#include <linux/phy_port.h>
+>  #include <linux/phy.h>
+>  #include <linux/rtnetlink.h>
+>  #include <linux/xarray.h>
+> @@ -22,6 +23,9 @@ static int netdev_alloc_phy_link_topology(struct net_device *dev)
+>  	xa_init_flags(&topo->phys, XA_FLAGS_ALLOC1);
+>  	topo->next_phy_index = 1;
+>  
+> +	xa_init_flags(&topo->ports, XA_FLAGS_ALLOC1);
+> +	topo->next_port_index = 1;
+> +
+>  	dev->link_topo = topo;
+>  
+>  	return 0;
+> @@ -44,12 +48,45 @@ static struct phy_link_topology *phy_link_topo_get_or_alloc(struct net_device *d
+>  	return dev->link_topo;
+>  }
+>  
+> +int phy_link_topo_add_port(struct net_device *dev, struct phy_port *port)
+> +{
+> +	struct phy_link_topology *topo;
+> +	int ret;
+> +
+> +	topo = phy_link_topo_get_or_alloc(dev);
+> +	if (IS_ERR(topo))
+> +		return PTR_ERR(topo);
+> +
+> +	/* Attempt to re-use a previously allocated port_id */
+> +	if (port->id)
+> +		ret = xa_insert(&topo->ports, port->id, port, GFP_KERNEL);
 
-In all three leaves, wrap the section that reads the device and runs
-NF_HOOK in rcu_read_lock(), and read the device through the RCU
-accessors (skb_dst_dev_rcu() / dst_dev_rcu()). As a result, the RCU
-grace period cannot complete while a transmission is in flight, so the
-egress device is not freed and the hook always references a valid
-device.
+Sashiko says :
 
-Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
- net/ipv4/ip_output.c    | 27 +++++++++++++++++++--------
- net/ipv4/xfrm4_output.c | 13 +++++++++----
- 2 files changed, 28 insertions(+), 12 deletions(-)
+"
+  If this port is moved to a different netdev (which has a separate
+  topology), and its old port->id happens to be in use by another port
+  in the new topology, will xa_insert() return -EBUSY?
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 5bcd73cbdb41..92a70b7e74a6 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -102,6 +102,7 @@ EXPORT_SYMBOL(ip_send_check);
- int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
- 	struct iphdr *iph = ip_hdr(skb);
-+	int err;
- 
- 	IP_INC_STATS(net, IPSTATS_MIB_OUTREQUESTS);
- 
-@@ -117,9 +118,12 @@ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- 	skb->protocol = htons(ETH_P_IP);
- 
--	return nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
--		       net, sk, skb, NULL, skb_dst_dev(skb),
--		       dst_output);
-+	rcu_read_lock();
-+	err = nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
-+		      net, sk, skb, NULL, skb_dst_dev_rcu(skb),
-+		      dst_output);
-+	rcu_read_unlock();
-+	return err;
- }
- 
- int ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
-@@ -368,7 +372,11 @@ static int ip_mc_finish_output(struct net *net, struct sock *sk,
- int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
- 	struct rtable *rt = skb_rtable(skb);
--	struct net_device *dev = rt->dst.dev;
-+	struct net_device *dev;
-+	int ret;
-+
-+	rcu_read_lock();
-+	dev = dst_dev_rcu(&rt->dst);
- 
- 	/*
- 	 *	If the indicated interface is up and running, send the packet.
-@@ -407,6 +415,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- 		if (ip_hdr(skb)->ttl == 0) {
- 			kfree_skb(skb);
-+			rcu_read_unlock();
- 			return 0;
- 		}
- 	}
-@@ -419,10 +428,12 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 				ip_mc_finish_output);
- 	}
- 
--	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
--			    net, sk, skb, NULL, skb->dev,
--			    ip_finish_output,
--			    !(IPCB(skb)->flags & IPSKB_REROUTED));
-+	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-+			   net, sk, skb, NULL, skb->dev,
-+			   ip_finish_output,
-+			   !(IPCB(skb)->flags & IPSKB_REROUTED));
-+	rcu_read_unlock();
-+	return ret;
- }
- 
- int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
-diff --git a/net/ipv4/xfrm4_output.c b/net/ipv4/xfrm4_output.c
-index 0ae67d537499..d5dc084777a3 100644
---- a/net/ipv4/xfrm4_output.c
-+++ b/net/ipv4/xfrm4_output.c
-@@ -30,10 +30,15 @@ static int __xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- int xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
--	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
--			    net, sk, skb, skb->dev, skb_dst_dev(skb),
--			    __xfrm4_output,
--			    !(IPCB(skb)->flags & IPSKB_REROUTED));
-+	int ret;
-+
-+	rcu_read_lock();
-+	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-+			   net, sk, skb, skb->dev, skb_dst_dev_rcu(skb),
-+			   __xfrm4_output,
-+			   !(IPCB(skb)->flags & IPSKB_REROUTED));
-+	rcu_read_unlock();
-+	return ret;
- }
- 
- void xfrm4_local_error(struct sk_buff *skb, u32 mtu)
--- 
-2.43.0
+  Since there is no fallback to xa_alloc_cyclic() on -EBUSY and the
+  stale ID is never reset to 0 upon removal, does this permanently
+  prevent the port from attaching to the new topology?
+"
 
+So we can't move a port to another netdev, the closest thing we can
+conceivably to is unbind/rebind a net_device while the phy_device
+stays alive. Even then, we'll be re-adding this ports to a fresh
+topology, so no collision risk here.
+
+We don't re-set the port id to 0 upon removal on purpose, as implied
+by the comment we try to reuse the id, as a much more common case is
+that we attach/detach the phy_device that controls this port during
+.ndo_open/close, and we don't want the port id to change at each
+link flap
+
+Maxime
 
