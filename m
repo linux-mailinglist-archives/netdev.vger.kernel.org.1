@@ -1,167 +1,242 @@
-Return-Path: <netdev+bounces-293338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DwfFbfDGmpw8QgAu9opvQ
-	(envelope-from <netdev+bounces-293338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:02:15 +0200
+	id sB1IDUPEGmpw8QgAu9opvQ
+	(envelope-from <netdev+bounces-293339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:04:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B893E60C50E
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:02:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F8460C545
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A20DA302292E
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:01:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F7623034309
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646723A8759;
-	Sat, 30 May 2026 11:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAA03A962E;
+	Sat, 30 May 2026 11:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amGc4pmG"
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="hF98J4lt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpcmd0757.aruba.it (smtpcmd0757.aruba.it [62.149.156.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132A539E175
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 11:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780138867; cv=pass; b=U0JhXErBEFhzwjg/rqzNXsbPWukgmXHX8lA1n7DKp4Cp4F0PXquXwbjoN78fxvB3GRFBChorSQjxLWE17LQtq/Ejgrl5wZ+r6QiIZkzQwGVCGlFdoCPolc3S62XmXXyZg+3dJ2Wja+ODJ8ivkfhXo90M2vmolVZtmNEZm7G0Qic=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780138867; c=relaxed/simple;
-	bh=ybVBKI8DM2lMXpchgAZMZBpIjHNkIiTRMS6bngefXNc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jkuzd68rhfbwCaQafWe9tn4GhB3x/yebB5wx4l58oO8AsFg44tyKxeDFIeY1vvHau0zRJuvAJlPOGf/1SJIRCiOL0eimhv+e1hiN68/Pp5DReqOfMFv3mqY1fWHBYKilqBdHP127yzAZ1dRYqgwgW60SOcg3RLiJr9nP7qTxQlk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=amGc4pmG; arc=pass smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-bd0209f25c1so2202511566b.2
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 04:01:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780138864; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OV5BWKXdcbbZyT+jFP4DDbchDaQPiCESlp9DurmsIPNmSsR6Otnx8gGXI+G2v91j2P
-         1T5AK48bHhxAnvscDB9Gwn+MkQMQ5yM2qo8xkltLro4wAEXkUqsBDSYhSARrExAoeeju
-         6V7RWTAwaUYPFNKQIbr2lz9pBYiYui6h7V6DM1ghlovoOb3SePpYa2AcqY5dEzIKTD1y
-         gEYDWHDgWBxO0rrK7OglvS+3Lk+wUYby26eMSF+A5bjNYcU0UfE/uq2Re7Zr4saALl9Z
-         Xv68+BsAGi2uB0C4UPMHj3uzRr68hGhBu7TH/uYy+LivZndVyMVQxVBTWJC6YAOYK1Uz
-         hS0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=ybVBKI8DM2lMXpchgAZMZBpIjHNkIiTRMS6bngefXNc=;
-        fh=P79YPH8ys4RXjt2JINLKqz2jrOvetxrE2Yckm5rFbeU=;
-        b=I/r59lyIG4459qgm8yO2/wCRzWFIJqTeLO+9QJ/J7jJzeKyxLRSSnk/OveUIBQ7u5H
-         dHQW+bWdzwUr9xpZ/c24j0jUyadxYMCuyhkVyL55Ie908UPsgruiXq02Rhx5j/BU/Pjl
-         iARJ9QbEM025AzEaFhwrWrh4KUnjLUgVK2Yg5jZ4UTb5VDmjN7YYUXedm95PAvCJ6drt
-         4iy9m1xbgsk/XUfmwc/Nrtmmcsy4xGbRMoHhT4Hz7IWJVuUrtFPfPaTl7sZCvGGTv5Po
-         n6Zn+BpXHU2BSp6GovdLIe054QQR+DU/PupgvxQrRn1TqVSQuai93ZSZZBGA4Xu8UJni
-         LYrg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780138864; x=1780743664; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ybVBKI8DM2lMXpchgAZMZBpIjHNkIiTRMS6bngefXNc=;
-        b=amGc4pmGwSCOrvuORPXE+fr+FMy2LNPhmjsnxa6/HVr9qMcJDp2PKVGJd3zA+QFY6e
-         TQJiuV7xPjwY9eivN6EJm5TTxzO6yazLGA3oTO/b79N1nFmyX6ydmYNuBuv1cx7IjkyT
-         7GYgk80yQbh+x98BB54o3ot6zpREW6B48Pfv2m0C/b2T4eDFcOjp1ZwzyWWGGbshlDmD
-         4+w72xztVlzKG8vrvjiEbqnf3IvSaAZmfKvLCa4Wc5LpgEf4+jNvdpnSy2jwyNZ6hYno
-         vXpB+CLI5syvL+2y29y8HngT/VqyDYPp9jiQQYEgvG/pVsUeZ9UOFcTyFvPdeGslaYPB
-         nSyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780138864; x=1780743664;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ybVBKI8DM2lMXpchgAZMZBpIjHNkIiTRMS6bngefXNc=;
-        b=ppRGHdhKJXG+XhQUSlJwGme9t9m/NiGFG1TZhEUZ/9XRKpUml4iMYYK1KsAZuqK5td
-         V313au7NU8gwfiyx8I4NMVe+wMsFfKi6L2wIgCOgLfznohr4jX5P0S0uOp0ZBp5l6l4n
-         blL5BqhtloiW4xHywyj6v7V6TpFyJ0YGJ5RouxeoaMupJYhwQnkVVxfp/f7U04hRSvHI
-         2AWGl+ytBGsC2FA4cmSWf6U1/5VHX9oYdIxStDKdFLVxlq66RxR7lwGD/w9At9SkMMLp
-         RHt/PXxXz59E02LzEb9+v3R6RaDuOe48WeirARbUV3eECGAyzpnKYaDA1r5K0K9RovxL
-         kzFw==
-X-Forwarded-Encrypted: i=1; AFNElJ/C+f9ZrkTM+tkRTXni8xQ/562i4+21Cu0BFQyc60HWKeReQW6+DIbhnDRRWtB2V008ID1DGss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysragC5byYpMW7WoP+uzufQAtnrs6beIGAjE+145R146/6XORS
-	H0S7Y35RwynxM7AQ7jfZnPOGWJYjS7dMSivlMvwQkHsXmbFM0rWTlWBiylp1v5GNiBLh6jiAygc
-	tkg3T8G3YLgWcObd41RpJxmOmDmBICo4=
-X-Gm-Gg: Acq92OEugrf+KJaR6hudcnbolocCRPGjN/aOQ+pX0Elx6PqXJKrF003w1vljLTtBnv8
-	66QB5yt/BxbnOBIMnPDirNFGosXkoqyPcpo1AxgThDNLqMS1AjdjbBIsgY7MtmC46ibuiWLHKSJ
-	sf0cbDK3gx272koffGZ/xT6P3Rewh5LAJI97lXkBDLelVV2/bS8dwcW02ZDFB4TKdRjKIbTk13/
-	eeh36yhMcBFLkhRKSULtODOr6MBI5rXkvPD1G3DnV9R6ItQzzMmHj3rbIGn53TAfVDVsUfGPGRv
-	t9uqp9TQ70799m9CqmyluUOI4+TiSwQSJPFAYNfPMgKWXAXWgA==
-X-Received: by 2002:a17:907:3f87:b0:bea:4c62:c2f7 with SMTP id
- a640c23a62f3a-beaafcef58fmr162382266b.8.1780138864064; Sat, 30 May 2026
- 04:01:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB4A39D6FA
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 11:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.156.57
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780139065; cv=none; b=CV32bqrtjDvHsTNi63lzWbvsK0tGBcUwtsPYil7IP8sa7KOFM2nlQ3BON0033weiiQwPKbpvcfbJWSKB4OS0+LJH0JXOsFw8671ngCOsRIaw7vreVCTbrYOpibwk2IVdH9F5xn5Z0VpCDRYWDQnuA0O6VOJL8Ex56uA8Mxt9sDs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780139065; c=relaxed/simple;
+	bh=ql10+8xRiIzQXjadTxmnZisxTkDNSdk8C5q/jqCPnEY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JV2rXxOOJtBMGUZ1Ok48vV4cg0rSGRsXjLKT9/Uw9jZjU9SfKMQmLdrQmXMPm9hmJhCHqpM6K1ERdNq4Q9gb2b7DsZJ9mrtf2XEFBQ2FnPUL6PzwHyuKoNl+OqRDT/UrofdcQTLXjCFl8UQlARcuBR7aquG8bBz0LA84H4B7uKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=hF98J4lt; arc=none smtp.client-ip=62.149.156.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
+Received: from [192.168.0.186] ([109.118.80.246])
+	by Aruba SMTP with ESMTPSA
+	id THUBwvKe7tpTfTHUCwL2Xb; Sat, 30 May 2026 13:04:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1780139054; bh=ql10+8xRiIzQXjadTxmnZisxTkDNSdk8C5q/jqCPnEY=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=hF98J4lt1nU6TI38hjDN7wAYPP66gs0eVJQfVgrs0VkzBH65bs4Z04X+eqAtJ2Cpy
+	 fFMQPIhRx0xJeXdXZvWhhT3uIqZcsYRSsfUIkyCyU7XclnLEBVNtOz3D5mTg6Wc/EQ
+	 N86qIL/WGlwv33vGt1wq+95wpVdMV61kaeO/exL/p/mYXyav1Ip45lF+vyDU5H/VCE
+	 JSlQxaUKjb50HbnEUIvvQvUDF/DHLBDJOmOzYMyhNDTn6Rf/B2lBVD7NFUyqPwH+KA
+	 u4P9RbKPGW4KlUea+gJJTMpYjut46mvcCaDVEnMVwK9QZ6IOuSeJjqW4qNKJ0jdest
+	 zy48G9YUqdgqQ==
+Message-ID: <86b5b571-824d-40b7-924f-6e1d4bf58d8b@enneenne.com>
+Date: Sat, 30 May 2026 13:04:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260529-realtek_forward-v9-0-e7c61872d923@gmail.com> <0c20ceb5-1cf7-4f83-9623-b5f5018f44af@yahoo.com>
-In-Reply-To: <0c20ceb5-1cf7-4f83-9623-b5f5018f44af@yahoo.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sat, 30 May 2026 08:00:51 -0300
-X-Gm-Features: AVHnY4L1xk1GZD33eHumsthGmHMR8soefFEOlixsWzRtNz7srFWcfNuiKEhGWxE
-Message-ID: <CAJq09z7JJVq=0g_-yau4Nh20G8gE3TAcy4ipwjmQnfwrUm512A@mail.gmail.com>
-Subject: Re: [net-next PATCH v9 0/8] net: dsa: realtek: rtl8365mb: bridge
- offloading and VLAN support
-To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Linus Walleij <linusw@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, Yury Norov <ynorov@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch V2 03/25] pps: generators: Use ktime_get_real_ts64()
+ instead of ktime_get_snapshot()
+Content-Language: en-US
+To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+ Miroslav Lichvar <mlichvar@redhat.com>, John Stultz <jstultz@google.com>,
+ Stephen Boyd <sboyd@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Frederic Weisbecker <frederic@kernel.org>, thomas.weissschuh@linutronix.de,
+ Arthur Kiyanovski <akiyano@amazon.com>,
+ Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+ Oliver Upton <oupton@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ Takashi Iwai <tiwai@suse.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev,
+ linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org,
+ David Woodhouse <dwmw@amazon.co.uk>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+References: <20260529193435.921555544@kernel.org>
+ <20260529195557.074439049@kernel.org>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <20260529195557.074439049@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfCJ4L6AvktiBiSjgdZHz6cd9G2cR3VoqAhOyLFZMlg2ukyXgpcoRDfIf42yajPI8mJBtuEmbaYcgebabmcEyNfb5V2AkY0KKGxs4D8kFPqg0j68KJE3J
+ Yvxknvg3dHFQC/aKOSX5dv+Ry5tghm0g49aQk4oM0kY/Gijw5KC7j+eegpXH8Wk8XwVQVCNNkZumNpU/yUAHQw8lft/nr9CCzuIsTNcqR0HJvrOKcdj65QZM
+ 8rye27fAUDEUpLY6Tr89jYlsM/2wPmxhwkmbdBbUVDsYh3C9v38aAIsY4V8aFZjpKraNPFW4903gB3FtMzhAnvKS9+siK5ekieMHnN7gD6KZGQxxu7XPdtxr
+ k0eEpab987THqcDO/6E2HJVt2Tk898anHlepE0cHJuuOfo3mqR+RxlLPL9oLI5RwNR1Jj86BZkC3kkkHoRuW47iSxDqCi+cCbPNR8QT+KCTW4CFOCJnVR4Yo
+ Rs18jeV3qCLoamvFfGjOQOGc7UnOX3VeBJMjYOxM2kGSQL9c1lNQJ9sSJ1091rNF/HKfCkbNfdXpyvJIQp8SGhJa7hNHuAdhTu7BqYUqIoT6nBt8oLg07SVv
+ +DFvG1XNqwxUC2QLYxzy/HT0RwvXLZ4b+xnuah5tQ2knl/5qMJ5JP8f/ZTnsJt4S7MhfxToAgxP6pmC1XrH38iPZp49LKrn3ZyFswbgja8wO29M5cjK71Doa
+ sZgGk06o6xKfAF/v7XzrgK0p6ohngW6G+CQaKrW6hvGzZVCz+P/YuIitQAhDcbBAOn44lQ9kB3rk2PrHCqV133Nha9VjiWRAQAcqsopCelGWdQ5DVKiYGIB8
+ j8RkiRITBwJz7xLLRWGPV9qUOwrRxc5cKAsMzbTCVVQU6u2LbKl87+wnNNTZcVWq3AzwuOD3dw0db67dRKSqlrn6X+YIOn3A/K+oMiO7DnYDipxB5QBu5yuM
+ wVwn2KMT2JC2mDpjNz+V4shk2gKEZz8cMDC0xTZKey2ePfoHada9STI694BrUVNVrP0QGH1/ANPvccrxRMSxKRbEtCIPkXUbQs4ccndlXmrv2Eb9ouVIq3Sl
+ t0MsxK6jwZvU/tiFFhBMBO5PwSkW6A1GzEcJzr5qE/Ecvlgcp/glIAIT8Lrp0gr6Bxzrtv/PLh8vrlTeuETdK1eQQfE8cvoBaqFaClotMSf2bZ4AtbSXuMXc
+ e6BR2eUFWvhou56Zt0WkDA==
+X-Spamd-Result: default: False [-1.56 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[aruba.it:s=a1];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[enneenne.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293338-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[yahoo.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org,nvidia.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293339-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com,amazon.co.uk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,linux.dev:url]
-X-Rspamd-Queue-Id: B893E60C50E
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[giometti@enneenne.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[aruba.it:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,aruba.it:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,amazon.co.uk:email]
+X-Rspamd-Queue-Id: A6F8460C545
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Sashiko found no issues in the v9 code: https://sashiko.dev/#/patchset/20260529-realtek_forward-v9-0-e7c61872d923%40gmail.com
+On 29/05/2026 21:59, Thomas Gleixner wrote:
+> From: Thomas Gleixner <tglx@kernel.org>
+> 
+> There is no reason to use the more complex ktime_get_snapshot() for
+> retrieving CLOCK_REALTIME.
+> 
+> Just use ktime_get_real_ts64(), which avoids the extra timespec64
+> conversion as a bonus.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> Reviewed-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Finally :-) But there is another instance using Opus/Claude at
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260529-realtek_forward-v9-0-e7c61872d923%40gmail.com
+Acked-by: Rodolfo Giometti <giometti@enneenne.com>
 
-I fixed those issues (and a small mask bug I found) and sent v10.
-Let's hope neither Sashiko instance brings up new issues. Sashiko is
-quite good at testing the recovery path. However, in most cases, when
-the error is from reading/writing a register, whether the error
-handling will even work is mostly a matter of luck.
+> ---
+>   drivers/pps/generators/pps_gen-dummy.c |    6 +-----
+>   drivers/pps/generators/pps_gen_tio.c   |    6 +-----
+>   2 files changed, 2 insertions(+), 10 deletions(-)
+> --- a/drivers/pps/generators/pps_gen-dummy.c
+> +++ b/drivers/pps/generators/pps_gen-dummy.c
+> @@ -39,11 +39,7 @@ static void pps_gen_ktimer_event(struct
+>   static int pps_gen_dummy_get_time(struct pps_gen_device *pps_gen,
+>   					struct timespec64 *time)
+>   {
+> -	struct system_time_snapshot snap;
+> -
+> -	ktime_get_snapshot(&snap);
+> -	*time = ktime_to_timespec64(snap.real);
+> -
+> +	ktime_get_real_ts64(time);
+>   	return 0;
+>   }
+>   
+> --- a/drivers/pps/generators/pps_gen_
 
-Regards,
+From: Thomas Gleixner <tglx@kernel.org>
 
-Luiz
+There is no reason to use the more complex ktime_get_snapshot() for
+retrieving CLOCK_REALTIME.
+
+Just use ktime_get_real_ts64(), which avoids the extra timespec64
+conversion as a bonus.
+
+No functional change intended.
+
+Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Reviewed-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+  drivers/pps/generators/pps_gen-dummy.c |    6 +-----
+  drivers/pps/generators/pps_gen_tio.c   |    6 +-----
+  2 files changed, 2 insertions(+), 10 deletions(-)
+--- a/drivers/pps/generators/pps_gen-dummy.c
++++ b/drivers/pps/generators/pps_gen-dummy.c
+@@ -39,11 +39,7 @@ static void pps_gen_ktimer_event(struct
+  static int pps_gen_dummy_get_time(struct pps_gen_device *pps_gen,
+  					struct timespec64 *time)
+  {
+-	struct system_time_snapshot snap;
+-
+-	ktime_get_snapshot(&snap);
+-	*time = ktime_to_timespec64(snap.real);
+-
++	ktime_get_real_ts64(time);
+  	return 0;
+  }
+
+--- a/drivers/pps/generators/pps_gen_tio.c
++++ b/drivers/pps/generators/pps_gen_tio.c
+@@ -189,11 +189,7 @@ static int pps_tio_gen_enable(struct pps
+  static int pps_tio_get_time(struct pps_gen_device *pps_gen,
+  			    struct timespec64 *time)
+  {
+-	struct system_time_snapshot snap;
+-
+-	ktime_get_snapshot(&snap);
+-	*time = ktime_to_timespec64(snap.real);
+-
++	ktime_get_real_ts64(time);
+  	return 0;
+  }
+
+
+tio.c
+> +++ b/drivers/pps/generators/pps_gen_tio.c
+> @@ -189,11 +189,7 @@ static int pps_tio_gen_enable(struct pps
+>   static int pps_tio_get_time(struct pps_gen_device *pps_gen,
+>   			    struct timespec64 *time)
+>   {
+> -	struct system_time_snapshot snap;
+> -
+> -	ktime_get_snapshot(&snap);
+> -	*time = ktime_to_timespec64(snap.real);
+> -
+> +	ktime_get_real_ts64(time);
+>   	return 0;
+>   }
+>   
+> 
+
+
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
 
