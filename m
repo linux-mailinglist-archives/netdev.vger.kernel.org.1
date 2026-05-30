@@ -1,80 +1,51 @@
-Return-Path: <netdev+bounces-293344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293343-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEsMD/3MGmoh9AgAu9opvQ
-	(envelope-from <netdev+bounces-293344-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:41:49 +0200
+	id kEffL9nKGmqA8wgAu9opvQ
+	(envelope-from <netdev+bounces-293343-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:32:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98FCC60C93B
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:41:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4126160C80F
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 13:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1FCC3026C04
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:40:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C01D3020EB0
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D1A3A71BE;
-	Sat, 30 May 2026 11:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5BC36998C;
+	Sat, 30 May 2026 11:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="UE3/KmiN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKrsXYJz"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic316-22.consmr.mail.ne1.yahoo.com (sonic316-22.consmr.mail.ne1.yahoo.com [66.163.187.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B48A3AB283
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 11:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DDB26A0D5;
+	Sat, 30 May 2026 11:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780141234; cv=none; b=khDLzHruxv1bUMudnVH4bewG+1D0LYaldFBKTdvR0mZEStPXwCgIWLPCp8nBVbCnajL+qR17rsTVsko+bFwzFajvwMm6HvDqy1sSnNlCsbApNkSti7l0FlY22/5bjTPsrwxlhcIYo2GKuxtIJqltrknQftV77leyPGR1LhGeJK0=
+	t=1780140757; cv=none; b=EZQzTWyjILFVG2AVw1OkiqusZxdpUukGmCwZRg/s2zwLxosDSSFw0jA7/9OyIjwzCOzdRt+TlJXjuJKnYBQn6mGW50ykf3B6hEi2heaCgwoww9IkRyOvhohRb1rhWw4DOH7M8ALwkMcTU9u0kGLR/mnnltCtlZdbhdE+hKxcG8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780141234; c=relaxed/simple;
-	bh=2nx/Y0k1J+Kt+Xtj67QQ5iTIoJu6A4ttlVfhdTesMeI=;
+	s=arc-20240116; t=1780140757; c=relaxed/simple;
+	bh=iw/iBTqnt/wdfmAetP4wwNxQVpdIqF/qkIZAaqGW+lo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W4rlImwvXJVoItSmHekn99mn5PKlg600E2ledDxIVHsyybrN3kKO0NmRzizGNKDqYXO3X+L7wpCS8lZ7mA8oVO8xBRYpsL6gvhWW5/biql7eCRvjFICKBNKJ3mjgEuLMTt7fElv+LDH4Ea9FNruvThmRBVPr8JJ0NJbIefvm6kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=UE3/KmiN; arc=none smtp.client-ip=66.163.187.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1780141232; bh=DXrz57g5Jtjh4H1cOMWyguqfmFWvXrRNMIeNDJLw9Mw=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=UE3/KmiNcy82ykYz6tBR4c9AROfLvUyZeb/Vr6Z4X9MfaI9zWqgRKos0WS0rmSrt6NTJ8LlQlnhOrfLvs+gm/u7KiOy30VJstzd+CjDLuDlBgG1W07dIv7cESllcnXr2xA1TtC7BsmvrkSRgqf6oeH8pLfCWJ/ULWFGyM0e84bx2EefZJMgzLDOp5hKBsF1nb+42rSI62er1FSvIRWnZRXKNF5MYHlmvlJtGlnMS351mvE7AwNYubARQkYYUYf2y53LDnVgMVH7L0N8NOjt7btIYPlZyXhk6W5F/fiP9S5OyciFB+sgK5Yp4SYYfgBXuPAUKNO0V0+PwqvKESHsVhQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1780141232; bh=cA7IDz4EEmMWJmKXGsknae0JtRxm8b+FJ6q66iHpEAf=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=ZCHaYheoa6p4jlekJ7CedJy2e7fwJksurjM8TeY49EhEfbBLEK73iUF23ZYfhs/eVKeObtrSSu0WwKRmF8I/XLwZVpZHBbrd5wqpILRGFIw8WohP9xgNEppxxChHrChsy4Z3gTa7VTiGw58bT42cpqKOws5PYHJi9lwsDv7CNAJw1XzYDuop60E9wUXDXmz3U681HCLgKG+mnGI4BvATgwNuMZzZas3laxq23fIv3gClwpupdRL5Hn3/WJw6u6d29fVGxjwQWRsbdOyq1m7R57Ib2diJty8U1TC/Z4u9wYfI4BBFHxHMMGRflLq/TrAFDMwCH5g5cx5CkyHOB7vHOA==
-X-YMail-OSG: PmzEeQ4VM1leDkur12rec2XubHgcZYdrfI1WVfdcTc1qu504hnv23dEIv.Bi4_i
- _IqxgsK4HxC.xoYFfo9lljiYWY31BJxcFxNPkxinR7qbSa0wK1tmffB.8JNMG_lzGl0VQvkhil1s
- ZDBgJcRNsQ8lsGivfBVjIenajalsIX4rqiJkzWTn7xQ0gPZlMnYnhkN8VuBtPZMVY2OgPcyh92T4
- dK1.xJyAz59a45rJu7jsqa8xiJdMwk.7rGy4b0oU3TI0i3CMa4NlWXDIufxImkG1K394qrTaMeKj
- BHZZuohKGD9xLJmpSdaQXYGWBf4OJdWfPB2XA_dayhN.ySp7HkGlA.6NeR89cVQfN8z1bUQzqNuO
- FgYo9dojk5JBpUslPbILztm7kHMVcSb8jlVe6Lj5ZL5SQsmKeipi55dEsyuW6YPUoloSls4UUwMB
- XdFIzPXmnCMgoX8D2FD8bRn1HHKTFZUzwDNU7wICsL9M708lCVLTLToJ3O9.ADVNthqcosJduBTL
- RveS2ezzIEbLdcJGoh.hnrnhOabkvnpLMYeLeKLahUGx85L1H4e5up3ZJSzBJksp_SXlo.MsEMYx
- Kc2n2HK5Rfh.3_CJx32q3TUGmKKsyM8Q8bqd.kpDj6d.xR3Ju.Xc3RXcQ.OKf5qkHIdTDFhQkacP
- lgGnQ2jPyEVLmGlX1w5ZXnfIZtflQyxyXFgL0XmAdP7uHy8MZHTM5n9lxByrmoSRxgU7iuVBFzip
- o0nVSJqumA5u49X7nNYsqDPe91xagpyVpNQ2JgzYqPBJNZyr2g5EMgR95lRidc_JCUiSWleQr_YG
- PchkXmoi1aLIjSqDeiOfxyzA0QcbMo9aX5KKFkUhpAgy0uAzr_a98KhJyFlRoaSL6tXnMZ7J.Ibo
- _wC9eN8bMYjJ5NBdI0XwQCtRxnrIaIIjyGoTmXMwuDLg2AYoTB1kbH5GgfJxGFFjwLFryQxZHhT7
- ZRyGp95KPBaU6uZcCdTJixDE_xPptQgMsjiXbf3TDC6fBX7yFirP6zji.KrHwhvzF3bojdYTktzn
- kf0KRWAR8pVbg2YXZP3QrcJXJLO5oIFsbG_TmQQHfYLNWu6YI0Ogz49WTFBjCIhTvdYuqI65qPNX
- mXzg8_AhuwxFISssTQN3eHfS1feUA6AuIT7NRh1goaLR3jXHRBaK8D4bpbdOot01hDRRvK8saxJN
- HKx1rC7ZdCaCBHm7f8EceNAyw04N.OFDOrW67kJ4V9PBRzSG63Uqz0HyZ8wsXW7wN1v0VEKMoC64
- XJ7v_sdBgwSn.Ab8ZES8Niz3r8V7Dr3s1SJG0A5C7qkhMxN.Ma5F5hgsIHwXe3clDNez97b5SJb8
- NU5lwiqBwyRTB1IiSL3JTvjphoKJNiNxW7A.x3djV2gxJNhy2Ujc4PSKqcj6.LSn9RlMhnBanMt.
- s3H.PYPNgRFMrBqpW3PtAfnGvHSu_mFmPX7NtCn6txeukfiI78kJrejdpz3WSkHtD5qiCoANFRcO
- 6mLaNs4sPu7UFitLEb2LxWiKUaBpA.HIL2OwU4E4Yi3cYGGNsQDKaqRTSBmyLHWZHF1LZiivuhtI
- D8CsW_T_QJQJsrOi2cfqGpL6sY3719JCOglZ4t0F1YfUw_5wtZZVhqBABJkRSb9NJFgfF0ncLYPK
- M.y6PFbEkwqONLy7m4zHeOg.S8QRwnHZLYo19.ReFNPY.66G_objjqS0Rjk.ztFQePhwB_euiBs6
- tCAqFo173XDAqV2QbHJS8Mt4eTCZdbMZRCoC29kBCM.1ph.0B8Lgh5cRf3lNOd6l3dOTnYHfudq8
- NpUhqY396yUmq_O4_47Px5xZEuOlGPSwstsAgbuKeKKl4ZD70Vg_Z7C5E1Fa_qe6H8XeeCwjDcjX
- G5SFw4ngbU6Dea2X0ThPwMlXbwRydn9D7QOGXRynlYhQ_3T9ojtAoguJsWD7EZQP0XS7.oVkK8QR
- cVx4Wvm.pFU0hYRBgTklSnMLw29b8Iqc1Zl.wLORaOTGtJN3i.2yM_SklAmRJCTDYOriklUSZ.r9
- NI1x5G2tKDrxZMdIlgFnW1nCDWAYnyTfFFi9mAOXLObWVq1eEODXwRT21V0CVHAr9GHk5FaGKTZY
- YeaLX9pzg0RPPypTsRjEDnQCxJtvJegWTLPaY7iT3aBBCKyQRK6SRW5QnSoVq8OD3LRS6IARJwfX
- 95MIgLD.KUAEmr99qDajNFVsWzX1hvOhYbwA1yjFoIav8GJsoE6t7Gl_6Hcufme4yPlCfED_oUcj
- jpRgphFyq7PzDftke9PPLGH8wVuhip5hq_cBZY2XVFw2HiLrr2hBk5GlAhUcmOHMOiTCWoi0FUd4
- Ikl4OCa_r.wsJImtUruPD4CXFesO1JH1EazZzNP0fGPQ-
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 8f1d50e1-26f3-422f-8462-b75dd615e144
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.ne1.yahoo.com with HTTP; Sat, 30 May 2026 11:40:32 +0000
-Received: by hermes--production-ir2-89844b765-6g7zf (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID cd90452154153824b45b33acc3f9a747;
-          Sat, 30 May 2026 11:19:48 +0000 (UTC)
-Message-ID: <777f3f36-f551-42cd-a5b8-4964b26584b6@yahoo.com>
-Date: Sat, 30 May 2026 13:19:44 +0200
+	 In-Reply-To:Content-Type; b=sySfOGGv07S/vfTubApoeuQ0+kgOl4UuJjxEPK25i9lh/2iQoliX/B61IAkiVDhXegvaxFAJpmBxnCLfXFz4xACqFGiaYeTQ7GasUdU/fYGaOcM3pu0FTooiKZcnc4Iy2ayYLayPAriP08xcvaxhFVyp1dPLx9EdyT/EnWv/6ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKrsXYJz; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64AC71F00893;
+	Sat, 30 May 2026 11:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780140755;
+	bh=GI1x8/6OdfVDZl1aPmam21V1ywS/iL4vmoXMEImOod8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=FKrsXYJzfGx7vRT8v6eVr9IGDTaQ32MpvHe+1HCl7z29JtjSiD4+u/UyOOdVjtB65
+	 dZR2FeIu1U1ONgYKNqEXMhL2es6Fl6X+jZUKeXq8TthZ6d0RjL6yIVNi9Gb3vB5YzP
+	 uHUBTQJXkBLcjff9ff5rZvmtYpjyzaungMSdxZktEaM7hNmCCBVbYmF2wRJZ/vMY5b
+	 sNlYceKG6XAHW345/TjYEw6BeaPl3Sd7UDmmtTOBiO61XKPkERfMiRm22MwPjpURz/
+	 arX+38RGoFQnO4wsXLbPnjABXj1Uvcjmv9xWBKQxYe9QaTNHlpDhCBnbFRMzzZkM2f
+	 7Zpjn6pNosRQQ==
+Message-ID: <7221c136-f126-421d-8b2a-8fed17aba6f2@kernel.org>
+Date: Sat, 30 May 2026 13:32:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,68 +53,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v10 2/9] net: dsa: realtek: rtl8365mb: reject
- unsupported topologies
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Linus Walleij <linusw@kernel.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260530-realtek_forward-v10-0-d14b51e6a69d@gmail.com>
- <20260530-realtek_forward-v10-2-d14b51e6a69d@gmail.com>
-Content-Language: pl
-From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-In-Reply-To: <20260530-realtek_forward-v10-2-d14b51e6a69d@gmail.com>
+Subject: Re: [PATCH v2 2/4] dt-bindings: clock: qcom: Add Qualcomm Shikra SoC
+ Global Clock Controller
+To: Imran Shaik <imran.shaik@oss.qualcomm.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+Cc: Ajit Pandey <ajit.pandey@oss.qualcomm.com>,
+ Taniya Das <taniya.das@oss.qualcomm.com>,
+ Jagadeesh Kona <jagadeesh.kona@oss.qualcomm.com>,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+References: <20260508-shikra-gcc-rpmcc-clks-v2-0-83238ba24060@oss.qualcomm.com>
+ <20260508-shikra-gcc-rpmcc-clks-v2-2-83238ba24060@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260508-shikra-gcc-rpmcc-clks-v2-2-83238ba24060@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.25725 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293344-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293343-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,baylibre.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
-	FREEMAIL_FROM(0.00)[yahoo.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 98FCC60C93B
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 4126160C80F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/30/2026 12:51 PM, Luiz Angelo Daros de Luca wrote:
-> Explicitly enforce the presence of a CPU port (-EINVAL) and reject DSA
-> cascade links (-EOPNOTSUPP) during setup to prevent silent failures.
+On 08/05/2026 06:51, Imran Shaik wrote:
+> Add device tree bindings for the global clock controller on Qualcomm
+> Shikra SoC.
 > 
-> These topologies were already non-functional. Without a CPU port, the
-> driver does not activate CPU tagging. Additionally, the switch hardware
-> was not designed to be cascaded, and DSA links never worked because
-> CPU tagging is not enabled for them.
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Reviewed-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> Signed-off-by: Imran Shaik <imran.shaik@oss.qualcomm.com>
+
+
+NAK, turns out incomplete.
+
+
+Best regards,
+Krzysztof
 
