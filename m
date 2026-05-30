@@ -1,204 +1,261 @@
-Return-Path: <netdev+bounces-293320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PUxDcKtGmqU7QgAu9opvQ
-	(envelope-from <netdev+bounces-293320-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:28:34 +0200
+	id wMZDJm6yGmoH7ggAu9opvQ
+	(envelope-from <netdev+bounces-293322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:48:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D02D560BDA9
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:28:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F3660BF74
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6AC8A300E736
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 09:28:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 02D51301AF03
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 09:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2300B39AD2A;
-	Sat, 30 May 2026 09:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C696636920C;
+	Sat, 30 May 2026 09:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEiIiZ8g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtn8GRiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5DB3955DC
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 09:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A028E39FCDC
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 09:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780133310; cv=none; b=BezJkAmSzzUtdDtHKImlTmHJiOpSx/GYbY80k4sb3BYJnvStG+Q5vVh1E9QmwSd2clqGhBSGNuUT05IN/9sUB5ydmwo20LFIxq5PJ40q+X2Y5QlW2Kfu5L76u2Y0Mn0Tt2S6MgMK8QdM2JCmZCK434Kx3ZX6NWjYNhrg84Z/c3U=
+	t=1780134503; cv=none; b=c7m5gcczISu4uDTD1bnC9S+hwEdAWuZG6mhVTaDhPGslU7UDgz6yKnN+JFhxwfeDM3Y3zpErEseZYqSZY8wgjT4yzLutBYGAimJ/m7rDAdB3V5K7QnBqp+rhQhg+Nl267pE/3AuBd49dd6KwydXggWeXHWghI+rh3+oDk6K0m60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780133310; c=relaxed/simple;
-	bh=Axu2q9OiQlW7NrUR5/tN+MxVX+YXj5nOsIeGUL7II+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tmVBL0F10IKiPY+ecvGQQ9IF9qeiFU2fR2dpcC2OWD3j9+77689EtUToarn9LymQILOhF4YnpjY4gc6X+fjcqXg2bbFJzumj5wcEbGHmhrS73nRSYM3+bUCqeH306IrjylwGt5fzhUuySM1aoiiJqO/kx6l6w5Zle7Yue7TDFxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aEiIiZ8g; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1780134503; c=relaxed/simple;
+	bh=udc1SyCF7VSS4+LIxaWs2+kyiLV1/lJ+NobNmCXau3Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JxibdPubU158OMp2T+mA8uPdibymgbmLKQm4Olhfh971XnhlYGKUi3lauOqU7KXnzhi7sGMc7c8mbH4ghNoZBxyeozej/nV7xPcugmy/q6xP4Z9yC6DeJxYrG+l0L2o1/yGbk1+K9iLSf6JG6SwEFlOhqRDzvVDNbNv1Tstaf/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dtn8GRiD; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4893940bb5eso79031015e9.3
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 02:28:28 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2bd80b3aa13so96588835ad.0
+        for <netdev@vger.kernel.org>; Sat, 30 May 2026 02:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780133307; x=1780738107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AVGWNyN/0YK3gFgYNwL3zKk91DjUbWVPzRQNZkauQoA=;
-        b=aEiIiZ8g0hy0yB/O+bDn7Qw4lOfN43CRMMIOFofGOKWKSLeutjNpsZecxl1PpF6dGq
-         XUr13spfzUEBtwv04kv+5AwqvczVql4/rFzglnoFDWJiGLSUG9LMAKcVLLAPgsa/kU9t
-         zluLvPFhdhGFedsiuZiYQhWDrDHb6RPbzb+RIt1hN1uaQ4DaUE4c2eOFaiBq+m6UXu62
-         vqjV0taBTZDPRazx4yOVz0wossMHj2fIJMBAmv/mXMjZ1WgM365BRb+3Zxn9aYNcpHXd
-         0Zcst7R72wcLfComJvvpx853k9BfRth+OczB8+jks6+1OILp1F2ltb7V2sIbLEMprH8k
-         Me6Q==
+        d=gmail.com; s=20251104; t=1780134501; x=1780739301; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J5P8ezayUktMUJpCuTOw6j295sXtS6RK6x7W/G4VqJg=;
+        b=dtn8GRiDOa5Im12LVdqgWtEzk9ZOwfwegnS8rgLQYVSIVVx6MHTIK6rwGc8twhqxGK
+         sXmqObfrf+QS8woF1U/4g+/Qm1MHgs74OMchssyJbNwGeOQy2Y8ZBpq0poYmmW0rjoIy
+         cBpmPO35Ulk7C2yykt0H25UzmpuLamHKGtIjPvxTi04ppSc5HIkOBzXeGkoq6QxklBUz
+         6jAXSf3iXz5O0BQF5MQ1B7x8XV7HzBIDpWiVc+x1MEyokp6QDg4xjcIf8Dof5N8BFWV7
+         67BOS8rpuKQcleewwHb5S3EQTga+/iKMFrZ1S7rekjPG9hPz4n6UnC/rEWPMAfCVPKT7
+         HuEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780133307; x=1780738107;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AVGWNyN/0YK3gFgYNwL3zKk91DjUbWVPzRQNZkauQoA=;
-        b=YZakReJfMxef2qi04zxp7aTOqjPhYePb4pvJ8gY41CwY1yp/bDV+xeVqGVTF1it32M
-         hBCz7tqjAr1YE661Vef9gU1FfhpyPUMvu/4g5ErMBMwuqL97O+DQSBILsPxT/uqTEavZ
-         Nl2JhUR/VPW3qy1kkcg1UL+QDY+JnC/Awak14vYavgjduZf8j4S85fNCBYV1me/CvcZs
-         DCP6zpkQ0LRA/qu/ltzBU79Ql00FNQYac183oJ+gPAvu2bnukjT4+ou+YA7i5UvvGInk
-         maFScAcAV/Np9zMyeKrYPHY/WyG4UJbdNdwZNDvLHJvKDHuiSWw4HlVSNaTEsLt71LXM
-         kiFg==
-X-Forwarded-Encrypted: i=1; AFNElJ9Yj5u4L23vrIsrdMA4aI4/JBKwp3C0jlNiVhgySUWUvvuXhPPZ+UMjedygsMYFmIn2cLADuJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+KaXGLyy0UaoN/zmpxChn3BNrCLIow9Q1u1PMmsRDN8/9zYQq
-	4gitt6GGAUzI8VULtPxfwW9w+CZWn03n6Ve5FBO0zKQkEi0l/XflNt+h
-X-Gm-Gg: Acq92OFFVmuR16KOQW6LZDc6OJDB9Rs2d5zyT4+vfG9hYn84kbd8pK86IpO3aXx1ZPo
-	ZGFiPjHLGg0+f0uprMfTTlF/LAh6SmA89Kq2oUa0iq6AWdyDWx0Mk6MA8RNc/+CcYsIFwYI3Xfp
-	5BOwvFcL/RwgLZM3Gnk0RnNAyG1tGjGfneF8JBuQb7+FtHj6cWGKPQ+ytgtPjVOK5FabYPrQE8T
-	HtrBxwcPXgcXOsM7/pmCMjZAQWajGUUBZCrQ96Ki5udZgAwic/5pekpyJiovibOjiynFCFxW4Ze
-	VJ5p9U0L8QM5MvgDmjIItSn0/TPyqx8XM0QGMmJD/8Z7VT0c1nQKMfUNKYTjbYCS62yJTWI6q5M
-	gF7GS/xtMlEXRrEldbigwFTdGIWgBFQIwxmaMurbfIUrO0I83gJIidL0ROzIVJAhmulgQ2d5BLG
-	K4gfyPoz7vA1SWBaNVPffO3FHqdSx/zLFAWg4PIpdc51HOM3HUZ3lBTG39Rogv7tNHYpNaf8c=
-X-Received: by 2002:a05:600c:3147:b0:48f:e230:80a3 with SMTP id 5b1f17b1804b1-490a297304bmr47960185e9.33.1780133306950;
-        Sat, 30 May 2026 02:28:26 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909c09acd3sm30659185e9.4.2026.05.30.02.28.26
+        d=1e100.net; s=20251104; t=1780134501; x=1780739301;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J5P8ezayUktMUJpCuTOw6j295sXtS6RK6x7W/G4VqJg=;
+        b=hRdIP01pDJ2BOaBA/WfMPHoHKV8TB+DfP/e8gZ1QQPhZF38FDNqAgXoQupZASiPxsJ
+         c3O3/OBiyvxp1BVm1FnxzyXVwlg77KFvl2wudJXd9Z2WWYCELuokovYiVTVBULOgkGNm
+         U6Yeht10LRPTLBh+OUzRTv5y3/d9f70kgow5d3o0xRbTudzVhrVIa7IhZgBPUvVGyjs3
+         atbBTvWIl3Id+uXhuDoAii3IOOMmeUj/O7blpnQOyX7WDmpMBTnU4Ia3D9cPchPU4MuY
+         /7R0RN0lTxBXhlMn+OHQgdzF3r1od+6b/eWdfPYsYddXS5G9Zq/dwsHLIdw+F6iLpctB
+         yP/g==
+X-Gm-Message-State: AOJu0YwC2xNRhDBQjxorXWUiw3St1Z1hkxgf6Hi1CkHD++m9swXMAM6K
+	8IaVfh4JiNRzA4glu0oeWt228lCeZ5p9c6xGvmfy9jHWy2jZUC9+UG8I
+X-Gm-Gg: Acq92OG/vWR3UaGuIR7XQ2IWpTYwQI4TYl+Zu10XGADorkvvw3GznQkPwihjaxE5wsj
+	5Ldt82GOBeB38Ke6dR2fnIH3VePFooqqtmu6CE1QkhW7PuiphXulcwpH/+P2/lcV21vumLVOJnh
+	6HptD1SMyWQEp3BPCGtr9JIp6f257dT4Mpycz7BlSNtWsqqlfFVyqIVegmKIoUr5U6GYvpcKgoq
+	ItIRzd5fm6oNqbg8mNpmIRjETTjd2yeF5h0XCaNKrP2/P87ZSEgzUk6pGKymLW04vc5rakpwOIc
+	0jjldIv3ME+k+7W3eG0UdRMTMr3FZn+7WUIqQUcLKHwXMOgR9vd1UATF320xMQC/SbsM4PQYfwL
+	OifrCutzuNbk/lqXQNbs2aKVaPYfRFosV65IDvE0KMq61izkmAAvtU5M0SfRYtXvoWDOmncSGgZ
+	vlfx+fcsknRlCXvHL0Q7q8NUlMsycyjHl7wYvjeiAwauoTHL1HLTY5IQ==
+X-Received: by 2002:a17:903:986:b0:2bd:2de3:519a with SMTP id d9443c01a7336-2bf367939b7mr37530755ad.7.1780134500813;
+        Sat, 30 May 2026 02:48:20 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239e5c6dsm43649965ad.17.2026.05.30.02.48.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 May 2026 02:28:26 -0700 (PDT)
-Date: Sat, 30 May 2026 10:28:24 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>,
- kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org, Mark Bloch
- <mbloch@nvidia.com>, netdev@vger.kernel.org, Saeed Mahameed
- <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>, Tariq Toukan
- <tariqt@nvidia.com>, patches@lists.linux.dev
-Subject: Re: [PATCH v2 06/11] selftests: Fix arm64 IO barriers to match
- kernel
-Message-ID: <20260530102824.65ceb098@pumpkin>
-In-Reply-To: <20260529224442.11d7320d@pumpkin>
-References: <0-v2-72e9640932fd+2c64-mlx5st_jgg@nvidia.com>
-	<6-v2-72e9640932fd+2c64-mlx5st_jgg@nvidia.com>
-	<ahiFxtmspbETiqWw@google.com>
-	<20260529134947.GA128816@nvidia.com>
-	<20260529175516.06d5788f@pumpkin>
-	<20260529192933.GD3195266@nvidia.com>
-	<20260529224442.11d7320d@pumpkin>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Sat, 30 May 2026 02:48:20 -0700 (PDT)
+Date: Sat, 30 May 2026 18:48:16 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au
+Cc: netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: Re: [PATCH net] ipv4: protect egress device access in the output
+ path with rcu_read_lock
+Message-ID: <ahqyYBb22QxcyPYN@v4bel>
+References: <ahqIg6vURwYI0LJ5@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahqIg6vURwYI0LJ5@v4bel>
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-293320-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293322-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D02D560BDA9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 97F3660BF74
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 29 May 2026 22:44:42 +0100
-David Laight <david.laight.linux@gmail.com> wrote:
+On Sat, May 30, 2026 at 03:49:39PM +0900, Hyunwoo Kim wrote:
+> ip_mc_output(), __ip_local_out() and xfrm4_output() read the egress
+> network device from rt->dst.dev / skb_dst_dev(skb) and then pass that
+> pointer as the 'out' device argument of NF_HOOK without holding
+> rcu_read_lock.
+> 
+> dst->dev is a field protected by RCU. When a device is unregistered its
+> value is replaced with blackhole_netdev, and the previous device is
+> freed after an RCU grace period. A section that reads dst->dev and uses
+> that pointer must therefore hold rcu_read_lock. The three functions
+> above are missing this protection, so when the egress device is
+> unregistered concurrently with transmission, a LOCAL_OUT / POST_ROUTING
+> hook (nft meta oif, selinux_ip_postroute_compat, etc.) can reference a
+> device pointer that is no longer valid.
+> 
+> In all three leaves, wrap the section that reads the device and runs
+> NF_HOOK in rcu_read_lock(), and read the device through the RCU
+> accessors (skb_dst_dev_rcu() / dst_dev_rcu()). As a result, the RCU
+> grace period cannot complete while a transmission is in flight, so the
+> egress device is not freed and the hook always references a valid
+> device.
+> 
+> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+>  net/ipv4/ip_output.c    | 27 +++++++++++++++++++--------
+>  net/ipv4/xfrm4_output.c | 13 +++++++++----
+>  2 files changed, 28 insertions(+), 12 deletions(-)
+> 
+> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> index 5bcd73cbdb41..92a70b7e74a6 100644
+> --- a/net/ipv4/ip_output.c
+> +++ b/net/ipv4/ip_output.c
+> @@ -102,6 +102,7 @@ EXPORT_SYMBOL(ip_send_check);
+>  int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  {
+>  	struct iphdr *iph = ip_hdr(skb);
+> +	int err;
+>  
+>  	IP_INC_STATS(net, IPSTATS_MIB_OUTREQUESTS);
+>  
+> @@ -117,9 +118,12 @@ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  
+>  	skb->protocol = htons(ETH_P_IP);
+>  
+> -	return nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
+> -		       net, sk, skb, NULL, skb_dst_dev(skb),
+> -		       dst_output);
+> +	rcu_read_lock();
+> +	err = nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
+> +		      net, sk, skb, NULL, skb_dst_dev_rcu(skb),
+> +		      dst_output);
+> +	rcu_read_unlock();
+> +	return err;
+>  }
+>  
+>  int ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+> @@ -368,7 +372,11 @@ static int ip_mc_finish_output(struct net *net, struct sock *sk,
+>  int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  {
+>  	struct rtable *rt = skb_rtable(skb);
+> -	struct net_device *dev = rt->dst.dev;
+> +	struct net_device *dev;
+> +	int ret;
+> +
+> +	rcu_read_lock();
+> +	dev = dst_dev_rcu(&rt->dst);
+>  
+>  	/*
+>  	 *	If the indicated interface is up and running, send the packet.
+> @@ -407,6 +415,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  
+>  		if (ip_hdr(skb)->ttl == 0) {
+>  			kfree_skb(skb);
+> +			rcu_read_unlock();
+>  			return 0;
+>  		}
+>  	}
+> @@ -419,10 +428,12 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  				ip_mc_finish_output);
+>  	}
+>  
+> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+> -			    net, sk, skb, NULL, skb->dev,
+> -			    ip_finish_output,
+> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+> +	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+> +			   net, sk, skb, NULL, skb->dev,
+> +			   ip_finish_output,
+> +			   !(IPCB(skb)->flags & IPSKB_REROUTED));
+> +	rcu_read_unlock();
+> +	return ret;
+>  }
+>  
+>  int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+> diff --git a/net/ipv4/xfrm4_output.c b/net/ipv4/xfrm4_output.c
+> index 0ae67d537499..d5dc084777a3 100644
+> --- a/net/ipv4/xfrm4_output.c
+> +++ b/net/ipv4/xfrm4_output.c
+> @@ -30,10 +30,15 @@ static int __xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  
+>  int xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  {
+> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+> -			    net, sk, skb, skb->dev, skb_dst_dev(skb),
+> -			    __xfrm4_output,
+> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+> +	int ret;
+> +
+> +	rcu_read_lock();
+> +	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+> +			   net, sk, skb, skb->dev, skb_dst_dev_rcu(skb),
+> +			   __xfrm4_output,
+> +			   !(IPCB(skb)->flags & IPSKB_REROUTED));
+> +	rcu_read_unlock();
+> +	return ret;
+>  }
+>  
+>  void xfrm4_local_error(struct sk_buff *skb, u32 mtu)
+> -- 
+> 2.43.0
+> 
 
-> On Fri, 29 May 2026 16:29:34 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Fri, May 29, 2026 at 05:55:16PM +0100, David Laight wrote:  
-...
-> > I can't say, this is copied from the kernel and Will made it:
-> > 
-> >     arm64: io: Ensure calls to delay routines are ordered against prior readX()
-> >     
-> >     A relatively standard idiom for ensuring that a pair of MMIO writes to a
-> >     device arrive at that device with a specified minimum delay between them
-> >     is as follows:
-> >     
-> >             writel_relaxed(42, dev_base + CTL1);
-> >             readl(dev_base + CTL1);
-> >             udelay(10);
-> >             writel_relaxed(42, dev_base + CTL2);
-> >     
-> >     the intention being that the read-back from the device will push the
-> >     prior write to CTL1, and the udelay will hold up the write to CTL1 until
-> >     at least 10us have elapsed.
-> >     
-> >     Unfortunately, on arm64 where the underlying delay loop is implemented
-> >     as a read of the architected counter, the CPU does not guarantee
-> >     ordering from the readl() to the delay loop and therefore the delay loop
-> >     could in theory be speculated and not provide the desired interval
-> >     between the two writes.
-> >     
-> >     Fix this in a similar manner to PowerPC by introducing a dummy control
-> >     dependency on the output of readX() which, combined with the ISB in the
-> >     read of the architected counter, guarantees that a subsequent delay loop
-> >     can not be executed until the readX() has returned its result.  
-> 
-> Hmmm...
-> 
-> Ok so there is some subtlety with the read of the counter that might
-> make it all work.
-> 
-> It is better to make the delay loop have a data dependency on the result
-> of the readl().
-> Something like:
-> 	u32 z = 0;
-> 	OPTIMIZER_HIDE_VAR(z);
-> 	writel_relaxed(42, dev_base + CTL1);
-> 	udelay(10 + (z & readl(dev_base + CTL1)));
-> 	writel_relaxed(42, dev_base + CTL2);
-> That avoids the potentially mispredicted branch and only adds instructions
-> when a delay follows.
-> That sequence is safe for all cpu and doesn't cost much for cpu (like x86)
-> where it (probably) isn't needed (maybe unless you patch the scale for udelay
-> into the code so there are no memory reads, just code).
-> 
-> Probably best refactored as udelay_depends(10, readl(dev_base + CTL1)).
-> Or maybe udelay_after().
+Further analysis confirmed that raw_send_hdrinc(), xfrm_output_resume() 
+and vrf_output() are affected by the same issue.
 
-Sleeping on it, all the code can be put in udelay().
-You just need a read memory barrier, followed by a memory read (of anywhere
-'hot') and then use a data dependency (as above) from the second read
-into the delay loop.
+I will post a v2 covering these additional cases after 24 hours.
 
--- David
 
+Best regards,
+Hyunwoo Kim
 
