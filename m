@@ -1,130 +1,152 @@
-Return-Path: <netdev+bounces-293306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293307-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDy9Odh7GmrW4ggAu9opvQ
-	(envelope-from <netdev+bounces-293306-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:55:36 +0200
+	id BNP7ALJ8GmoR4wgAu9opvQ
+	(envelope-from <netdev+bounces-293307-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:59:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B8260B5EA
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:55:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF2760B638
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D84F53004CB2
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 05:55:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5236C3057637
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 05:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C214825B0A3;
-	Sat, 30 May 2026 05:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BE3266B72;
+	Sat, 30 May 2026 05:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JkD+sz8y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602BD2222D0
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 05:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9E72E7394
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 05:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780120529; cv=none; b=TX+Pr1gvNuzgPMnm1zYFLYCfjn7uaUlf8h5u4s908VNOkHUNBmkqwuJAvBVcMLQazz8F3FeH5usEzYGwxgRgyXYb2iDo0oTqNGYW3cbs+Jum43e2cH9IAXa0WRj+ZFQjmjfON/bl1eCd2Md3wXkqMhXRBmZKV5tjguUNaDKtzCQ=
+	t=1780120751; cv=none; b=UF5xhJ/xrkpRqMMKyTKu5zNUUFrqtFpHQKu4XlA4mZi0AR2QIMzm6MNsj+ZTPGEB5U5Ab5+CrmPex9kssyT56zdPz5hTbcqKYstHDS/zFEYw1L84zpEM8xsLHMcUq7We/tg6NhZp3iXGhdiZSIEMWT6Ef58/oIhVsQBwSKD+Tc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780120529; c=relaxed/simple;
-	bh=EwrszXQ4S2FHDYbiBhzeDind2XSN+5k568R7ehjpp50=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KkL8e5b6ffB3oDA90ouHe/QGw6LrofbrnFamzSZdn9HNywH6F61SITlpKCWcP2c4XT+k+sjpHAWbRo/3+U4Wt+kOfg1pDkiFlP8tsVXQ+g1G99FoYIhKjGELmiJNzedQEB3QZFpHFvLqBLneDuRS8UwBxjA12j5CgRPj0JZEM8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-69de11bef3dso4133043eaf.0
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 22:55:28 -0700 (PDT)
+	s=arc-20240116; t=1780120751; c=relaxed/simple;
+	bh=zzwlK7xMYsFIUvFDgl0pGLWWbKwo52slWaKlbGtHldo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eKrHuUVcFpzC5opnoLMRHdvf0Chpz//ykkgDxDLH0OddogXryMRmEdwyTCz0yTq+czmDchRF4s4boVBh+tOxdADRViZDnbh9USBEAQA4cI6/gvNGMK9fn7PE9XFV1/VfYjMSvgHWcu5hUY/W4+8LX4ulwY99Xj8Ib7JemOgIZ9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JkD+sz8y; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bc763c7256so301310695ad.3
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 22:59:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780120749; x=1780725549; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C2LcpDmpuHwP3zW4VdTaiu9QP4IaJOkTh+F9z4PUgkw=;
+        b=JkD+sz8ymrdzYot65xV9t6tYEI4tYtv4LkaiaNFHS5MgcSTR15zXl0jajmAfuDq3ZZ
+         tvydH4geavaEaeAqT0sKxiysGR7EfiMTYuyeblSUqsFq6RwqOWXPu+o+JU5ev/xHFDCP
+         Y9GCbR6T5WKU0tLIia1lhcRmL9h7H4M4ggJp8/xhg9P1a4yR4i+NWptwwpDWA5nr/cZG
+         +z9USL4XA97sxSXUsP8MFZZLKXl2F9uvQOLuM0I63FB0FQMLf7mLkJYx9HlFuTPBGeO6
+         DfPpFeh/Sax7GwVfG07hvk42t0NCxGrPGdTwABm/19pXKKy1VpJscQqKoQWGvZnVyJCu
+         6mjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780120527; x=1780725327;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20251104; t=1780120749; x=1780725549;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1m7I++Q6yyoUoXwVe9qgrro1GQAwLd9tdhMu6xnQm7U=;
-        b=mYvRug1aK4hLwmmsXq0+zvBssANPugLixM716w/JMNdp3gjfco5obon/nEPcpVomwx
-         V2RVbE8ot8JreQRmBTdrn4HQfWEYIZxjef0wKGUpGPcapGL0YmNaQygFdr4HkYpZGwm/
-         rxOsL1xSSf1BLYjLJRv4VUhaLlX4INvbD6nYzYJpmIBh7S8GBfp8edL/KP5vHiE64110
-         zLglwC0A07TNoQozCoOYeJn5T4bMFKqkE6Rk3u8Sk+qVhXvAg41P5eeDOCyNgMNgI7eO
-         xmFznvh+qq3YYto6bAdhhuSV14tWbC08mMeABE2LM2VRhbf0O2BXfVHRJEz2OGj55OU9
-         VRwg==
-X-Forwarded-Encrypted: i=1; AFNElJ/bef5PfKs/e3ilPm/YmV18HBbsWxvBfXfwjFVVRXKTeyxiQ+ERDHA1+bM0iLjjG5k2zIOCCfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTtPhBBVa/Nw56tXCL1RwACVyvXi6rpF2A+5+u62H5VV7SnLRt
-	inw7muvk0/uRfHlzJ+J9hX5Nr/ukw4G1pA0bIVSqrYJke5XXU/OWP4lkGwIbiVDcKR2XB0z4jnh
-	kb22zx+kh/GXXD0UNxuJLmCKOD9njMq675zseNw8i8/JpbJohfYtOyLlC6GA=
+        bh=C2LcpDmpuHwP3zW4VdTaiu9QP4IaJOkTh+F9z4PUgkw=;
+        b=nJ68gXm/ExOmCn4mysTgE9maw4yEd4M7z4+2CohgjPOtjc+2GIQa5Zcsaj0fa/okQO
+         6FdT+MoSGw966JkSjXCrTOhoFF/1RrMav6fS+uNU8l3RwpHmwwAWHFMN4KeuxiY/Ex52
+         nT/MFpYa4skHdoJOY6ZRdj0DBid7aam1nLt13LX+igTZRKFXhfaLLw5TVenubpNeXwWm
+         2HpFdo+xbalk/bXNuM5stU0EBYLs3Ph6eszVSkDDvtpIp8x/fJ6z/ZMf/qNrG0mHteOP
+         Bnz7FXap9md+X1lWgvlahNkff+z6Bf6MESXuvWqFoX7wYYXAbWXiNORwW6GEo3+UW066
+         5OCw==
+X-Forwarded-Encrypted: i=1; AFNElJ8xXlljXUW4OQIYF0XQRJ+rQXZyd913akTjmU5YkORkUBHm06DIYVUo7uH4xrXXhSvT4q578ag=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/ePDbbf9KpjPgRF7N/JxFfNUIVi+hkAlpOdu+a7h2/qGuVUZ1
+	OKjGmzQCnDsbxsLb28b4PgkS9cVsI7LH13F1j+vMTECzfkjXtYqa6Aebb2FbUbTFTzPidUlhkf1
+	zhNnYdw==
+X-Received: from plbjz14.prod.google.com ([2002:a17:903:430e:b0:2ae:41d1:278d])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ccc8:b0:2b4:5aff:de60
+ with SMTP id d9443c01a7336-2bf36833fefmr33172705ad.22.1780120749356; Fri, 29
+ May 2026 22:59:09 -0700 (PDT)
+Date: Sat, 30 May 2026 05:59:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1c8a:b0:69d:ce78:79a0 with SMTP id
- 006d021491bc7-69e105642f6mr1130878eaf.34.1780120527435; Fri, 29 May 2026
- 22:55:27 -0700 (PDT)
-Date: Fri, 29 May 2026 22:55:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1a7bcf.0a9e871e.332604.000b.GAE@google.com>
-Subject: [syzbot] [net?] WARNING: refcount bug in __inet_csk_reqsk_queue_drop
-From: syzbot <syzbot+e809069bc15f26300526@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
+Message-ID: <20260530055907.280160-1-kuniyu@google.com>
+Subject: [PATCH v1 net] tcp: Add preempt_{disable,enable}_nested() in reqsk_queue_hash_req().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=bd38685893011045];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-293306-lists,netdev=lfdr.de,e809069bc15f26300526];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,storage.googleapis.com:url,appspotmail.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,googlegroups.com:email,syzkaller.appspot.com:url];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293307-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: E9B8260B5EA
+	TAGGED_RCPT(0.00)[netdev,e809069bc15f26300526];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email]
+X-Rspamd-Queue-Id: 5EF2760B638
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+syzbot reported a weird reqsk->rsk_refcnt underflow in
+__inet_csk_reqsk_queue_drop().
 
-syzbot found the following issue on:
+The captured reqsk_put() in __inet_csk_reqsk_queue_drop()
+is called only when it successfully removes reqsk from ehash.
 
-HEAD commit:    eb3f4b7426cf Merge tag 'nfsd-7.1-2' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11e5b673980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bd38685893011045
-dashboard link: https://syzkaller.appspot.com/bug?extid=e809069bc15f26300526
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Moreover, reqsk_timer_handler() calls another reqsk_put()
+after that.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+This indicates that the reqsk was missing both refcnts for
+ehash and the timer itself.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3e8630fd2e70/disk-eb3f4b74.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3a23f2a3eb2a/vmlinux-eb3f4b74.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e102c22c34c3/bzImage-eb3f4b74.xz
+Since all the syzbot reports had PREEMPT_RT enabled, the only
+possible scenario is that reqsk_queue_hash_req() is preempted
+after mod_timer() and before refcount_set(), and then the timer
+triggered after 1s aborts the reqsk due to its listener's close().
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
+Let's wrap mod_timer() and refcount_set() with
+preempt_disable_nested() and preempt_enable_nested().
 
-------------[ cut here ]------------
+Note that inet_ehash_insert() holds the normal spin_lock()
+(mutex in PREEMPT_RT), so it must be called outside of
+preempt_disable_nested(), but this is fine.
+
+The lookup path just ignores 0 sk_refcnt entries in ehash
+and tries to create another reqsk, but this will fail at
+inet_ehash_insert().
+
+[0]:
 refcount_t: underflow; use-after-free.
 WARNING: lib/refcount.c:28 at refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28, CPU#0: ktimers/0/16
 Modules linked in:
-CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
+CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)}
 Tainted: [L]=SOFTLOCKUP
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
 RIP: 0010:refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28
@@ -160,45 +182,39 @@ Call Trace:
  ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
  </TASK>
-----------------
-Code disassembly (best guess):
-   0:	e4 7d                	in     $0x7d,%al
-   2:	d1 0a                	rorl   $1,(%rdx)
-   4:	67 48 0f b9 3a       	ud1    (%edx),%rdi
-   9:	eb 4a                	jmp    0x55
-   b:	e8 38 3d 23 fd       	call   0xfd233d48
-  10:	48 8d 3d e1 7d d1 0a 	lea    0xad17de1(%rip),%rdi        # 0xad17df8
-  17:	67 48 0f b9 3a       	ud1    (%edx),%rdi
-  1c:	eb 37                	jmp    0x55
-  1e:	e8 25 3d 23 fd       	call   0xfd233d48
-  23:	48 8d 3d de 7d d1 0a 	lea    0xad17dde(%rip),%rdi        # 0xad17e08
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	eb 24                	jmp    0x55
-  31:	e8 12 3d 23 fd       	call   0xfd233d48
-  36:	48 8d 3d db 7d d1 0a 	lea    0xad17ddb(%rip),%rdi        # 0xad17e18
-  3d:	67                   	addr32
-  3e:	48                   	rex.W
-  3f:	0f                   	.byte 0xf
 
-
+Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
+Reported-by: syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6a1a7bcf.0a9e871e.332604.000b.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/ipv4/inet_connection_sock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index dbcd37dfdc15..b546ce15ee03 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1145,6 +1145,8 @@ static bool reqsk_queue_hash_req(struct request_sock *req)
+ 	if (!inet_ehash_insert(req_to_sk(req), NULL, &found_dup_sk))
+ 		return false;
+ 
++	preempt_disable_nested();
++
+ 	/* The timer needs to be setup after a successful insertion. */
+ 	req->timeout = tcp_timeout_init((struct sock *)req);
+ 	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
+@@ -1155,6 +1157,9 @@ static bool reqsk_queue_hash_req(struct request_sock *req)
+ 	 */
+ 	smp_wmb();
+ 	refcount_set(&req->rsk_refcnt, 2 + 1);
++
++	preempt_enable_nested();
++
+ 	return true;
+ }
+ 
+-- 
+2.54.0.823.g6e5bcc1fc9-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
