@@ -1,174 +1,204 @@
-Return-Path: <netdev+bounces-293305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293306-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFPdCsp0GmoM4ggAu9opvQ
-	(envelope-from <netdev+bounces-293305-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:25:30 +0200
+	id GDy9Odh7GmrW4ggAu9opvQ
+	(envelope-from <netdev+bounces-293306-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:55:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB2E60B515
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:25:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B8260B5EA
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 07:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A2CC2300A5AA
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 05:25:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D84F53004CB2
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 05:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE711F2B8D;
-	Sat, 30 May 2026 05:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C214825B0A3;
+	Sat, 30 May 2026 05:55:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339032E7394
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 05:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602BD2222D0
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 05:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780118723; cv=none; b=mdHZzsabgecjbinNDojUsH6Sf2bIO2D6YN7ac+Kakd6mMGPYDtGhnB0d74hTzl/hVlh79y5w/fMuXpOPZdJM1zs38BaqHxjTyn9U4kWr2/ner6vh9eUTKWz391iVQfG1HJc/2wQ8ftvrzZKGVY8wACxw0v4hL6LwuH8KSsIKhF8=
+	t=1780120529; cv=none; b=TX+Pr1gvNuzgPMnm1zYFLYCfjn7uaUlf8h5u4s908VNOkHUNBmkqwuJAvBVcMLQazz8F3FeH5usEzYGwxgRgyXYb2iDo0oTqNGYW3cbs+Jum43e2cH9IAXa0WRj+ZFQjmjfON/bl1eCd2Md3wXkqMhXRBmZKV5tjguUNaDKtzCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780118723; c=relaxed/simple;
-	bh=PXndydDzvMMxG/7LvtYcwjSlvFqVag+cmJs6/MAuFxw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cdk73kfAK1cjq7KCssi2/bUvO+sBNTS4Ua2K1lej5kVdFZ3NeHFy1J0Y7d+dEy8toqLY2hIXuyLGieB+vfwhcMvDpb7lR8aZ+rAkHzrWm26EjiZ9bTo8Ikew1COeRDbcgXIr1g52k2NDdgFLkK5EwbTgyvKiHsRAThYYVSL6ee4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowACHqMKsdBpqnfE_AA--.42025S3;
-	Sat, 30 May 2026 13:25:03 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	sd@queasysnail.net,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	bronzed_45_vested@icloud.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH ipsec 1/1] xfrm: espintcp: wait for pending partial send before reuse
-Date: Sat, 30 May 2026 13:24:55 +0800
-Message-ID: <b05daae0607621114d3818722a46c543ab6ec6fb.1780040524.git.bronzed_45_vested@icloud.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1780040524.git.bronzed_45_vested@icloud.com>
-References: <cover.1780040524.git.bronzed_45_vested@icloud.com>
+	s=arc-20240116; t=1780120529; c=relaxed/simple;
+	bh=EwrszXQ4S2FHDYbiBhzeDind2XSN+5k568R7ehjpp50=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KkL8e5b6ffB3oDA90ouHe/QGw6LrofbrnFamzSZdn9HNywH6F61SITlpKCWcP2c4XT+k+sjpHAWbRo/3+U4Wt+kOfg1pDkiFlP8tsVXQ+g1G99FoYIhKjGELmiJNzedQEB3QZFpHFvLqBLneDuRS8UwBxjA12j5CgRPj0JZEM8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-69de11bef3dso4133043eaf.0
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 22:55:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780120527; x=1780725327;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1m7I++Q6yyoUoXwVe9qgrro1GQAwLd9tdhMu6xnQm7U=;
+        b=mYvRug1aK4hLwmmsXq0+zvBssANPugLixM716w/JMNdp3gjfco5obon/nEPcpVomwx
+         V2RVbE8ot8JreQRmBTdrn4HQfWEYIZxjef0wKGUpGPcapGL0YmNaQygFdr4HkYpZGwm/
+         rxOsL1xSSf1BLYjLJRv4VUhaLlX4INvbD6nYzYJpmIBh7S8GBfp8edL/KP5vHiE64110
+         zLglwC0A07TNoQozCoOYeJn5T4bMFKqkE6Rk3u8Sk+qVhXvAg41P5eeDOCyNgMNgI7eO
+         xmFznvh+qq3YYto6bAdhhuSV14tWbC08mMeABE2LM2VRhbf0O2BXfVHRJEz2OGj55OU9
+         VRwg==
+X-Forwarded-Encrypted: i=1; AFNElJ/bef5PfKs/e3ilPm/YmV18HBbsWxvBfXfwjFVVRXKTeyxiQ+ERDHA1+bM0iLjjG5k2zIOCCfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTtPhBBVa/Nw56tXCL1RwACVyvXi6rpF2A+5+u62H5VV7SnLRt
+	inw7muvk0/uRfHlzJ+J9hX5Nr/ukw4G1pA0bIVSqrYJke5XXU/OWP4lkGwIbiVDcKR2XB0z4jnh
+	kb22zx+kh/GXXD0UNxuJLmCKOD9njMq675zseNw8i8/JpbJohfYtOyLlC6GA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACHqMKsdBpqnfE_AA--.42025S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF13uw1fGrW5tFy3ury8Xwb_yoW8trW8pa
-	4fWr9xKFyUtry29Fn7tF10vr4UGw4kXry7Xr9xtasrXr98Xr15ZFyvvF1avFn8uFZ7CrWY
-	krsFva4qyw1UAa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
-	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
-	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsDCWoZTE8LMQAAsK
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Received: by 2002:a05:6820:1c8a:b0:69d:ce78:79a0 with SMTP id
+ 006d021491bc7-69e105642f6mr1130878eaf.34.1780120527435; Fri, 29 May 2026
+ 22:55:27 -0700 (PDT)
+Date: Fri, 29 May 2026 22:55:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a1a7bcf.0a9e871e.332604.000b.GAE@google.com>
+Subject: [syzbot] [net?] WARNING: refcount bug in __inet_csk_reqsk_queue_drop
+From: syzbot <syzbot+e809069bc15f26300526@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
+	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=bd38685893011045];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293305-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,queasysnail.net,gmail.com,lzu.edu.cn,icloud.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.952];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-293306-lists,netdev=lfdr.de,e809069bc15f26300526];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,storage.googleapis.com:url,appspotmail.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,googlegroups.com:email,syzkaller.appspot.com:url];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:mid,icloud.com:email]
-X-Rspamd-Queue-Id: 9DB2E60B515
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: E9B8260B5EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
+Hello,
 
-espintcp keeps a single in-flight transmit in ctx->partial.  Before
-building a new sk_msg, espintcp_sendmsg() first tries to flush that
-state through espintcp_push_msgs().
+syzbot found the following issue on:
 
-For blocking callers, espintcp_push_msgs() may return success while the
-previous partial send is still pending.  espintcp_sendmsg() then
-reinitializes emsg->skmsg and reuses the same ctx->partial slot even
-though the old send has not completed yet.
+HEAD commit:    eb3f4b7426cf Merge tag 'nfsd-7.1-2' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11e5b673980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bd38685893011045
+dashboard link: https://syzkaller.appspot.com/bug?extid=e809069bc15f26300526
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Wait for the pending partial send to drain before reusing ctx->partial.
-Nonblocking callers keep the existing error handling, while blocking
-callers sleep until the partial send can make progress.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-This preserves the one-message-at-a-time design already used by the
-espintcp transmit path and avoids overwriting an in-flight partial send.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3e8630fd2e70/disk-eb3f4b74.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3a23f2a3eb2a/vmlinux-eb3f4b74.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e102c22c34c3/bzImage-eb3f4b74.xz
 
-Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: lib/refcount.c:28 at refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28, CPU#0: ktimers/0/16
+Modules linked in:
+CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28
+Code: e4 7d d1 0a 67 48 0f b9 3a eb 4a e8 38 3d 23 fd 48 8d 3d e1 7d d1 0a 67 48 0f b9 3a eb 37 e8 25 3d 23 fd 48 8d 3d de 7d d1 0a <67> 48 0f b9 3a eb 24 e8 12 3d 23 fd 48 8d 3d db 7d d1 0a 67 48 0f
+RSP: 0000:ffffc90000157948 EFLAGS: 00010246
+RAX: ffffffff84a1301b RBX: 0000000000000003 RCX: ffff88801ca98000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: ffffffff8f72ae00
+RBP: ffffffff99ae3b01 R08: ffff88801ca98000 R09: 0000000000000005
+R10: 0000000000000100 R11: 0000000000000004 R12: ffff8880425ef568
+R13: ffff8880425ef4f8 R14: ffff8880425ef578 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888126386000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f7b46710e9c CR3: 000000000dbb6000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __refcount_sub_and_test include/linux/refcount.h:400 [inline]
+ __refcount_dec_and_test include/linux/refcount.h:432 [inline]
+ refcount_dec_and_test include/linux/refcount.h:450 [inline]
+ reqsk_put include/net/request_sock.h:136 [inline]
+ __inet_csk_reqsk_queue_drop+0x3ce/0x440 net/ipv4/inet_connection_sock.c:1007
+ reqsk_timer_handler+0x651/0xdf0 net/ipv4/inet_connection_sock.c:1137
+ call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
+ expire_timers kernel/time/timer.c:1799 [inline]
+ __run_timers kernel/time/timer.c:2374 [inline]
+ __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
+ run_timer_base kernel/time/timer.c:2395 [inline]
+ run_timer_softirq+0x67/0x170 kernel/time/timer.c:2403
+ handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ run_ktimerd+0x69/0x100 kernel/softirq.c:1151
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	e4 7d                	in     $0x7d,%al
+   2:	d1 0a                	rorl   $1,(%rdx)
+   4:	67 48 0f b9 3a       	ud1    (%edx),%rdi
+   9:	eb 4a                	jmp    0x55
+   b:	e8 38 3d 23 fd       	call   0xfd233d48
+  10:	48 8d 3d e1 7d d1 0a 	lea    0xad17de1(%rip),%rdi        # 0xad17df8
+  17:	67 48 0f b9 3a       	ud1    (%edx),%rdi
+  1c:	eb 37                	jmp    0x55
+  1e:	e8 25 3d 23 fd       	call   0xfd233d48
+  23:	48 8d 3d de 7d d1 0a 	lea    0xad17dde(%rip),%rdi        # 0xad17e08
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	eb 24                	jmp    0x55
+  31:	e8 12 3d 23 fd       	call   0xfd233d48
+  36:	48 8d 3d db 7d d1 0a 	lea    0xad17ddb(%rip),%rdi        # 0xad17e18
+  3d:	67                   	addr32
+  3e:	48                   	rex.W
+  3f:	0f                   	.byte 0xf
+
+
 ---
- net/xfrm/espintcp.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
-index a2756186e13a..f8513a19a3c8 100644
---- a/net/xfrm/espintcp.c
-+++ b/net/xfrm/espintcp.c
-@@ -340,11 +340,20 @@ static int espintcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 
- 	lock_sock(sk);
- 
--	err = espintcp_push_msgs(sk, msg->msg_flags & MSG_DONTWAIT);
--	if (err < 0) {
--		if (err != -EAGAIN || !(msg->msg_flags & MSG_DONTWAIT))
--			err = -ENOBUFS;
--		goto unlock;
-+	while (emsg->len) {
-+		err = espintcp_push_msgs(sk, msg->msg_flags & MSG_DONTWAIT);
-+		if (err < 0) {
-+			if (err != -EAGAIN || !(msg->msg_flags & MSG_DONTWAIT))
-+				err = -ENOBUFS;
-+			goto unlock;
-+		}
-+
-+		if (!emsg->len)
-+			break;
-+
-+		err = sk_stream_wait_memory(sk, &timeo);
-+		if (err)
-+			goto unlock;
- 	}
- 
- 	sk_msg_init(&emsg->skmsg);
--- 
-2.47.3
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
