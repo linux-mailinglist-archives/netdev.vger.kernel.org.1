@@ -1,165 +1,148 @@
-Return-Path: <netdev+bounces-293356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293358-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HGwLH0nG2qS/ggAu9opvQ
-	(envelope-from <netdev+bounces-293356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:07:57 +0200
+	id kEA8ORQnG2qf/ggAu9opvQ
+	(envelope-from <netdev+bounces-293358-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:06:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A9A8611095
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:07:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20477610FDC
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BBA47302AC30
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 17:56:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EEFCF3012347
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 18:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834873B6359;
-	Sat, 30 May 2026 17:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A39433B6C4;
+	Sat, 30 May 2026 18:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KA9E5+zA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kW0s6x5q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0CC2628D
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 17:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8511A29B78B;
+	Sat, 30 May 2026 18:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780163790; cv=none; b=OvL4yKxqDephYiq8qp8AVHAeYhnTAs+unaztZYvheBKCtU8mrhwlsvbnFfbj7lKj/zg3+UP0Wu+DSq0ZrWBNRJcPrL1TcoTrU2SiQ5Ns7jvn7B0HO90W1u3DH9qsDgvgdw+MNXsM5JMAd5xLdwzxREfcjqWg+Lhf8pjI1XUL6K0=
+	t=1780164304; cv=none; b=KIodVAQLP37wZBhajkHc7gxwMF8wW83zQilvlzxn0mEN+bjHlLlf4tpHO2oMzStFviCSKMQ8spIkzRiCTbO94vCLfYnlw2fZqLGf42jroH38Dk7NvvfflEfKyM28ZuZ/XNg3XAgNnV+Ya4SXk9G2+5xl61WNp15S1qwU+wYw/zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780163790; c=relaxed/simple;
-	bh=n3ZSQBD/H2AW1xNyzx0em2UfFE2UePZMJLqt3Gkk5Pw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TQtGl9NyGpU434t0bkns9uws9+gK+mGcrn98M4YOkA0qVVyhOulRQtj9nfLCVALBPy5m/9zvFzMxjNjia27YusL7p65r1Ljx7UUrXG1XTc1evykDM0MnrBE0M3fej4jAA0RLG38mdaFSUcUT/R9eZqF5hE3mYr8OpJpV3R2POOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KA9E5+zA; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2bea7176c72so74175635ad.0
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 10:56:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780163788; x=1780768588; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iroh2YBoq0cKDytA5DDegc2gyEIJygN+FydCkVruV/Q=;
-        b=KA9E5+zATcsaTHEgn20ETk0xQ5NEMw3pjQsWCu3Nj/niC5E0+Qdw6wKqjnyFnbhpwa
-         +p80ugpCltyBSd8B5tXDXlAx0gwvgIO5/+gBTLz8X+hAnnmj9BSVXSjpBWMtLczAjY4n
-         ubIHqdzpFbZW7c0i+01EuJyexxYn7/+5eXDIBjqq33BvRixFd+lht5jcC2+pofuczsPh
-         cpFmrtzJ+lNRljDv7LkyahEti1mtEojhCJkd2Ep7Bx5fOMuMf9dLuTbVDaQKnI7LBtXR
-         xAeV5LU4QmC1am2Uy4Gw1IXErkuxU+h7lkhNcslO2NweDwsLzYIPlT3IuL+OD8Q7kjkx
-         IfLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780163788; x=1780768588;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iroh2YBoq0cKDytA5DDegc2gyEIJygN+FydCkVruV/Q=;
-        b=F+4TIB9gI9FB15DVL0fWq4cWk+nfIXdTDXrU2+bVp96a/xwOffvZTpdUsgZIcWQ3xA
-         FsIZfKjgjmyD5DGRPM481unX13f8yv3GW4tb77x2rleOcGb5RTpRVhf8AE8n8kNR1tv1
-         o8heUJykpND6EaJrm2fgtKqEnsv3/k0/poZvMkdZhtVMb6Zh5i6N0a0es7gYOUWsuDMX
-         cqLnTfp9vQWzOL/abidOyCa0Mu1//FDsltmzrghuuogpI3FHozxugLVJTTE8v2ecKGSv
-         gwHVY66YM7XUOptJnNJx+PR+xonDeBfa+JkTNLTSTZMO6rDLV2gR67VyNu5kPJeMuOCW
-         oG6Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9nVrjRcxmaN4VANu42cXMAlMlKw+BqQqv9l3BEwCe2wDZTJ3G3zi12R+Rn+OHlGyGx7XOaNDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4wlV8fVo3ja94o0aZI0mcfg59H7v2isgViQf5YXs7KP1o3H3P
-	HbPX9tJOyF/YIcIteXBYy9iW0oK9A3w8JIvyIiO8PayvUnNCaKvx5J6i
-X-Gm-Gg: Acq92OFOMoj/675NggiOY699EFrNKke4eHGJouS9b6LLuemEKPH6rhakX/gYjpp2ss9
-	h12xeayum/EnG9TjlDM/xY5mfbxHSGCl+JrivdsN1v1Y3dMTynaz39gssSpXy9+74ktyMNhrb4s
-	her2gbiF4e/R3svQDM8q797D15pM1DroBjEfzBh4tK4rBqAk5rnTJefk7oNTht94T+4YhVYLIT5
-	Bw4B8oIyN2Lujshb6i7kAMSmpPVc2gLGjQP16xNPBE5qqM9i59jUxWAroxiq8XTc17Z4X3R5Mr4
-	oOX8htKylIwfVrkNNBSfs6AnKlMhNNMGDU9EOh0f0y83qeCPdPl7TZq9n2KCXkFYiqVycHtbr+p
-	J3JLd67MBvAf9I3ueIEny7Fg2t89FyeFbfk/0K/bidBzLxVFGERX93gRLHAU7/w8TmUOjwmEg6L
-	jmiGedBXS1vZx5JZWb1pLXf7lJEYC5s3JM0cUIqU2KWQ+ntxXxY1sC5vm6HTknid6bFrkzvJQA6
-	J19
-X-Received: by 2002:a17:902:ea04:b0:2bf:1d01:7b00 with SMTP id d9443c01a7336-2bf3683beb5mr58332515ad.23.1780163787787;
-        Sat, 30 May 2026 10:56:27 -0700 (PDT)
-Received: from Ubuntu.. ([49.37.171.82])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23c580c6sm56791215ad.82.2026.05.30.10.56.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 May 2026 10:56:27 -0700 (PDT)
-From: Manish Baing <manishbaing2789@gmail.com>
-To: jk@codeconstruct.com.au,
-	matt@codeconstruct.com.au
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	manishbaing2789@gmail.com
-Subject: [PATCH] mctp: serial: replace memset with zero-initialization
-Date: Sat, 30 May 2026 17:56:18 +0000
-Message-ID: <20260530175618.135533-1-manishbaing2789@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1780164304; c=relaxed/simple;
+	bh=iFoB49l26PQzgAd+2lC7D6V+iOm8XQrDlyTVU4zeqcw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fKeIIQFx4I824oTbKRftHDXtJk8Zp/9ouK30oGKFbkAg0XxsGAC/cZxaEO7utoYo6BktMnpc5r3lOAjEALclTj2scAKyNJgnkm+OdzeacGZoQJsRzTMH4I9JR+mk0xNmnAFKWdbTLJ4XqjJBjyM+qi/tvIggvmgf70nr0DkJakY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kW0s6x5q; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 596E41F00893;
+	Sat, 30 May 2026 18:05:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780164303;
+	bh=fAjDYJv3ZqoP4U3LWt0qIvFrrnx+oJme8aCuzuadrIQ=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=kW0s6x5qXQMvaoQ6ncHzWrw4+BhHDGeSuccj0kmyw6zG16h/oDqKh3KNGVaDRtEXC
+	 MagaRRBGIKnFhoR6nuxiHm+ZpCFKFQduAiTUNHweeZGQ+kZBBIMdyxulurYjF5eVVV
+	 PeaeoEG4oT/WnlkhPru8ayW2owVJCFLt9LRtO4W30lyzvMx1C3TfUxAnjegNqf9OYy
+	 q+8nZMROrh9ix4jV5GUWwoVU+O7XWlsKkNlhRCIx94qCC7ub46PEvreDvLoGA5t6Dg
+	 FFKErcb1SNmt9bzjrkn/AQgRnpZdS8OtADRULOcln+K2c7qasTy6IeW7mP60dAq2yd
+	 bKVUc+6sSWOnQ==
+Message-ID: <d6f47527f97af2ba8fcbd08cf1bcd49f11124eb9.camel@kernel.org>
+Subject: Re: [PATCH net 1/1] net: rds: clear i_sends on setup unwind
+From: Allison Henderson <achender@kernel.org>
+To: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Cc: yanjun.zhu@oracle.com, guanglei.li@oracle.com, davem@davemloft.net, 
+	santosh.shilimkar@oracle.com, junxiao.bi@oracle.com, yuantan098@gmail.com, 
+	zcliangcn@gmail.com, bird@lzu.edu.cn, xuyq21@lenovo.com
+Date: Sat, 30 May 2026 11:05:01 -0700
+In-Reply-To: <5a0f7624bb9845a7b67d26166a150b59e7f394ce.1779632468.git.xuyq21@lenovo.com>
+References: <cover.1779632468.git.xuyq21@lenovo.com>
+	 <5a0f7624bb9845a7b67d26166a150b59e7f394ce.1779632468.git.xuyq21@lenovo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293356-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293358-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manishbaing2789@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[oracle.com,davemloft.net,gmail.com,lzu.edu.cn,lenovo.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3A9A8611095
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lenovo.com:email]
+X-Rspamd-Queue-Id: 20477610FDC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use empty brace initialization (= {}) instead of explicit memset()
-to zero-initialize stack memory to simplify the code.
+On Fri, 2026-05-29 at 21:01 +0800, Ren Wei wrote:
+> From: Yuqi Xu <xuyq21@lenovo.com>
+>=20
+> The RDS IB connection teardown path is written so it can run during
+> partial startup and on repeated shutdown attempts. It uses NULL
+> pointers to distinguish resources that are still owned from resources
+> that have already been released.
+>=20
+> When rds_ib_setup_qp() fails after allocating i_sends but before
+> allocating i_recvs, the sends_out path frees i_sends without clearing
+> the pointer. A later shutdown pass can still treat that stale pointer
+> as a live send ring allocation.
+>=20
+> Clear i_sends after vfree() in the error unwind path so the existing
+> shutdown logic continues to use the correct ownership state.
+>=20
+> Fixes: 3b12f73a5c29 ("rds: ib: add error handle")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:GPT-5.4
+> Signed-off-by: Yuqi Xu <xuyq21@lenovo.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 
-No functional change.
+Hi Ren Wei,
 
-Signed-off-by: Manish Baing <manishbaing2789@gmail.com>
----
- drivers/net/mctp/mctp-serial.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Looks fine to me. Thanks for the catch!
+Reviewed-by: Allison Henderson <achender@kernel.org>
 
-diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-serial.c
-index 26c9a33fd636..c97ebd1af356 100644
---- a/drivers/net/mctp/mctp-serial.c
-+++ b/drivers/net/mctp/mctp-serial.c
-@@ -537,12 +537,12 @@ struct test_chunk_tx {
- static void test_next_chunk_len(struct kunit *test)
- {
- 	struct mctp_serial devx;
-+	struct mctp_serial devx = { };
- 	struct mctp_serial *dev = &devx;
- 	int next;
- 
- 	const struct test_chunk_tx *params = test->param_value;
- 
--	memset(dev, 0x0, sizeof(*dev));
- 	memcpy(dev->txbuf, params->input, params->input_len);
- 	dev->txlen = params->input_len;
- 
--- 
-2.43.0
+Allison
+> ---
+>  net/rds/ib_cm.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/net/rds/ib_cm.c b/net/rds/ib_cm.c
+> index 0c64c504f79d..4001de0c4959 100644
+> --- a/net/rds/ib_cm.c
+> +++ b/net/rds/ib_cm.c
+> @@ -656,6 +656,7 @@ static int rds_ib_setup_qp(struct rds_connection *con=
+n)
+> =20
+>  sends_out:
+>  	vfree(ic->i_sends);
+> +	ic->i_sends =3D NULL;
+> =20
+>  ack_dma_out:
+>  	rds_dma_hdr_free(rds_ibdev->dev, ic->i_ack, ic->i_ack_dma,
 
 
