@@ -1,146 +1,129 @@
-Return-Path: <netdev+bounces-293347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293348-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8L9ZCjPZGmqE9QgAu9opvQ
-	(envelope-from <netdev+bounces-293347-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 14:33:55 +0200
+	id fkfHBuz4Gmrk+AgAu9opvQ
+	(envelope-from <netdev+bounces-293348-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 16:49:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9757B60CD45
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 14:33:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F7CD60D935
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 16:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7D0E83028665
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 12:33:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93BC8300E924
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 14:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD239478D;
-	Sat, 30 May 2026 12:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331BA30DED0;
+	Sat, 30 May 2026 14:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="0ci+IJtU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1j1e/5JC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D65F35202D;
-	Sat, 30 May 2026 12:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C944C24DCF9;
+	Sat, 30 May 2026 14:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780144432; cv=none; b=WJtuVh/lroRYaB7cwmg/ZVh8w1yUPYpzAUg2tEn4Fb0+QclO9Nqe0BGAmq0OJRE6jDPZKE04oOeCgl2ME6L77tPqvWIsm4T9y2nqcypoZHnvc/sEaGfn5kasfgTcTJvUIRiB/1W169RnWlBISx9HDk2cX6YUvAMOvnvv4CJBPUo=
+	t=1780152548; cv=none; b=Uf4NedfxNQ/O41oFAiTqxFRpxo3tfqPQrzx6nSCq8aTBmVR8qsLDmnu5s9XYHzu4rcHADGawAL4keyp4F+ud7pdHhG/6HlwjhuKibfWK6nqnjdRpW8TbYqqpR5XT1by474olfiPHqFejvepRUmKxsSQIawkPQmggjQ+pJ4Ueigo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780144432; c=relaxed/simple;
-	bh=FVzu+jOauDq6f5xbyxt3UGZcyypS3GCv2v5kSRdGvnY=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=Mek75c1y0KvaNxCWJQw+2NCTUE6Hc8CjD5swZkhqqXGn9qiZxon6ZwwSIBw6cSxxTkc1dlkuSfz2jTZ20A9h2ZwftJbdQ9rmjZKQ7aRYddMWTN4JJvy+fOuxNWEunNTTSsRs6dFTvWA9Zdq9QODzEWYd8cQ3HsUku5SLIg1kK9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=0ci+IJtU; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 34994A08DA;
-	Sat, 30 May 2026 14:33:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1780144419; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=P7PESjsUf1EFCTeforqehft+BJJDknN1xZrEHuBl+1A=;
-	b=0ci+IJtUf2Qy4E2Afy4mp6gUkA6zSnDiEsw/XtavbE/a0b41QoxXzi00FeT5K4FeatFRQF
-	gQSK2pzJ6hCOcNSMqrECLCqPL4nPXUalPRZYNCeEd/pkYDW2xnMVUK7SodwCWBTOuHQNid
-	XCaAMeABje6c77u/Tt5QDYEajMPSlm59whBjkp0HbbBSgRPXCLuHfSsm1F0UQd29q7Bvxr
-	7kPsw91yDUPrVptq6reea8+kjL+4AKHfgBq5bUK3dQ9TR5YYhj7cMJ7o/plI7lVDSaFZ8g
-	hYNvLzdC14ejtNnJWbH4q1IrgPPSrNTMYkU/WaTKsHsXQ4HPPfNLwSNWuyHtTw==
+	s=arc-20240116; t=1780152548; c=relaxed/simple;
+	bh=ASig4cmZLZEuprGqWMRVAL9X+aZ5/BZk8T7Q/hCqzwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F0xvv/AxBhqqrXx/X13kV50NOBmASwI1SmRc5eymb6yle1a2OCpCncQKsL2YUPUPHjxao2vbvYJXaMMayMoJrCwh0x/W8IImMR3xWt6cZHtBQ5rla292cOQwxz8kNGS6unZqqlGxkEtTcYROeLn1PXKDDVUgIFH+tj8RAsQakqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1j1e/5JC; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=s2HEI+58LKyND1xKPNxSFoRUdhuqR9WKZIFIoOUpvTo=; b=1j1e/5JCIGLHI5Tfo2ZzRqIK5Q
+	wUdms5VqGsx6ORpPxFTEOpYxFPhephXobr9zjivxm91DsAy5fv5y3JbexzS70tR0biX/IZqT72W1H
+	P2TcVJyuMHymdNoytwgjcAhH19AHvrQMf9lZ8l1lsp2t2Z51IIPvl7QuJvkuOIwjDd+E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wTKzd-005GQC-2z; Sat, 30 May 2026 16:48:53 +0200
+Date: Sat, 30 May 2026 16:48:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 13/14] dt-bindings: net: add onsemi's S2500
+Message-ID: <4f109e08-9260-452b-8f09-97894faa6e8b@lunn.ch>
+References: <CY8PR02MB92494D02A1209BC9BC72EAC883162@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <20260530-adventurous-venerable-buffalo-edd6d4@quoll>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 30 May 2026 14:33:35 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: "Maxime Chevallier (Netdev Foundation)" <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com
-Subject: Re: [PATCH net] net: phy: clean the sfp upstream if phy probing fails
-In-Reply-To: <20260530072706.3167745-1-maxime.chevallier@bootlin.com>
-References: <20260530072706.3167745-1-maxime.chevallier@bootlin.com>
-Message-ID: <e7237bce1d68920b054da56abddf94ef@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260530-adventurous-venerable-buffalo-edd6d4@quoll>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293347-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293348-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 9757B60CD45
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0F7CD60D935
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Maxime
-
-On 30.5.2026 09:27, Maxime Chevallier (Netdev Foundation) wrote:
-> Sashiko reported that we don't call sfp_bus_del_upstream() in the probe
-> failure path, so let's add it, otherwise the sfp-bus is left with a
-> dangling 'upstream' field, that may be used later on during SFP events.
+On Sat, May 30, 2026 at 11:00:02AM +0200, Krzysztof Kozlowski wrote:
+> On Fri, May 29, 2026 at 06:41:35PM +0000, Selvamani Rajagopal wrote:
+> > Add YAML device tree binding for the onsemi S2500 IEEE 802.3cg
+> > compliant Ethernet transceiver device.
+> > 
+> > Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+> > ---
+> >  .../devicetree/bindings/net/onnn,s2500.yaml   | 62 +++++++++++++++++++
+> >  1 file changed, 62 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/onnn,s2500.yaml
 > 
-> This issue existed before the generic phylib sfp support, back when
-> drivers were calling phy_sfp_probe themselves.
-> 
-> Fixes: 298e54fa810e ("net: phy: add core phylib sfp support")
-> Signed-off-by: Maxime Chevallier (Netdev Foundation) 
-> <maxime.chevallier@bootlin.com>
-> ---
->  drivers/net/phy/phy_device.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/phy/phy_device.c 
-> b/drivers/net/phy/phy_device.c
-> index 3370eb822017..6c2ef91fd197 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -3775,6 +3775,9 @@ static int phy_probe(struct device *dev)
->  	return 0;
-> 
->  out:
+> Where is the rest of patches? Where is any changelog or cover letter? I
+> downloaded entire thread and there is nothing.
 
-While at it, should phy_cleanup_ports() also be added? Failure 
-of_phy_leds() or
-genphy_c45_read_eee_adv() would IMHO also produce a leak.
+Hi Krzysztof
 
-> +	sfp_bus_del_upstream(phydev->sfp_bus);
-> +	phydev->sfp_bus = NULL;
-> +
->  	if (!phydev->is_on_sfp_module)
->  		phy_led_triggers_unregister(phydev);
+The threading is broken. And there is no cover letter. There will be
+another version, so you can wait and review that.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-
-Thanks,
-Nicolai
+    Andrew
 
