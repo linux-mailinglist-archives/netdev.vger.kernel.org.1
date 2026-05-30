@@ -1,261 +1,210 @@
-Return-Path: <netdev+bounces-293322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMZDJm6yGmoH7ggAu9opvQ
-	(envelope-from <netdev+bounces-293322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:48:30 +0200
+	id 0OnGM/q3Gmpn7wgAu9opvQ
+	(envelope-from <netdev+bounces-293323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 12:12:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F3660BF74
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 11:48:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09FE560C095
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 12:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 02D51301AF03
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 09:48:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0450030387A9
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 10:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C696636920C;
-	Sat, 30 May 2026 09:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9138936895D;
+	Sat, 30 May 2026 10:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtn8GRiD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="az2nvJFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A028E39FCDC
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 09:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D11399036
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 10:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780134503; cv=none; b=c7m5gcczISu4uDTD1bnC9S+hwEdAWuZG6mhVTaDhPGslU7UDgz6yKnN+JFhxwfeDM3Y3zpErEseZYqSZY8wgjT4yzLutBYGAimJ/m7rDAdB3V5K7QnBqp+rhQhg+Nl267pE/3AuBd49dd6KwydXggWeXHWghI+rh3+oDk6K0m60=
+	t=1780135926; cv=none; b=NYF3opdshQIf6iAkvZrp+moibRJpcT3IJ9PLNk6zK6hDxvhlCDKF6uAHwQu4mY757DCIr41MsH0fOr+U/55IlxYqIyUecrcoDTOLAm/qq1kQIQoMpNt+HzfooXrzvo4uMlp020RCfhBcB9eLGKslNpuMYoVqGN1+3TF7AjDJVH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780134503; c=relaxed/simple;
-	bh=udc1SyCF7VSS4+LIxaWs2+kyiLV1/lJ+NobNmCXau3Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JxibdPubU158OMp2T+mA8uPdibymgbmLKQm4Olhfh971XnhlYGKUi3lauOqU7KXnzhi7sGMc7c8mbH4ghNoZBxyeozej/nV7xPcugmy/q6xP4Z9yC6DeJxYrG+l0L2o1/yGbk1+K9iLSf6JG6SwEFlOhqRDzvVDNbNv1Tstaf/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dtn8GRiD; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2bd80b3aa13so96588835ad.0
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 02:48:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780134501; x=1780739301; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J5P8ezayUktMUJpCuTOw6j295sXtS6RK6x7W/G4VqJg=;
-        b=dtn8GRiDOa5Im12LVdqgWtEzk9ZOwfwegnS8rgLQYVSIVVx6MHTIK6rwGc8twhqxGK
-         sXmqObfrf+QS8woF1U/4g+/Qm1MHgs74OMchssyJbNwGeOQy2Y8ZBpq0poYmmW0rjoIy
-         cBpmPO35Ulk7C2yykt0H25UzmpuLamHKGtIjPvxTi04ppSc5HIkOBzXeGkoq6QxklBUz
-         6jAXSf3iXz5O0BQF5MQ1B7x8XV7HzBIDpWiVc+x1MEyokp6QDg4xjcIf8Dof5N8BFWV7
-         67BOS8rpuKQcleewwHb5S3EQTga+/iKMFrZ1S7rekjPG9hPz4n6UnC/rEWPMAfCVPKT7
-         HuEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780134501; x=1780739301;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J5P8ezayUktMUJpCuTOw6j295sXtS6RK6x7W/G4VqJg=;
-        b=hRdIP01pDJ2BOaBA/WfMPHoHKV8TB+DfP/e8gZ1QQPhZF38FDNqAgXoQupZASiPxsJ
-         c3O3/OBiyvxp1BVm1FnxzyXVwlg77KFvl2wudJXd9Z2WWYCELuokovYiVTVBULOgkGNm
-         U6Yeht10LRPTLBh+OUzRTv5y3/d9f70kgow5d3o0xRbTudzVhrVIa7IhZgBPUvVGyjs3
-         atbBTvWIl3Id+uXhuDoAii3IOOMmeUj/O7blpnQOyX7WDmpMBTnU4Ia3D9cPchPU4MuY
-         /7R0RN0lTxBXhlMn+OHQgdzF3r1od+6b/eWdfPYsYddXS5G9Zq/dwsHLIdw+F6iLpctB
-         yP/g==
-X-Gm-Message-State: AOJu0YwC2xNRhDBQjxorXWUiw3St1Z1hkxgf6Hi1CkHD++m9swXMAM6K
-	8IaVfh4JiNRzA4glu0oeWt228lCeZ5p9c6xGvmfy9jHWy2jZUC9+UG8I
-X-Gm-Gg: Acq92OG/vWR3UaGuIR7XQ2IWpTYwQI4TYl+Zu10XGADorkvvw3GznQkPwihjaxE5wsj
-	5Ldt82GOBeB38Ke6dR2fnIH3VePFooqqtmu6CE1QkhW7PuiphXulcwpH/+P2/lcV21vumLVOJnh
-	6HptD1SMyWQEp3BPCGtr9JIp6f257dT4Mpycz7BlSNtWsqqlfFVyqIVegmKIoUr5U6GYvpcKgoq
-	ItIRzd5fm6oNqbg8mNpmIRjETTjd2yeF5h0XCaNKrP2/P87ZSEgzUk6pGKymLW04vc5rakpwOIc
-	0jjldIv3ME+k+7W3eG0UdRMTMr3FZn+7WUIqQUcLKHwXMOgR9vd1UATF320xMQC/SbsM4PQYfwL
-	OifrCutzuNbk/lqXQNbs2aKVaPYfRFosV65IDvE0KMq61izkmAAvtU5M0SfRYtXvoWDOmncSGgZ
-	vlfx+fcsknRlCXvHL0Q7q8NUlMsycyjHl7wYvjeiAwauoTHL1HLTY5IQ==
-X-Received: by 2002:a17:903:986:b0:2bd:2de3:519a with SMTP id d9443c01a7336-2bf367939b7mr37530755ad.7.1780134500813;
-        Sat, 30 May 2026 02:48:20 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239e5c6dsm43649965ad.17.2026.05.30.02.48.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 May 2026 02:48:20 -0700 (PDT)
-Date: Sat, 30 May 2026 18:48:16 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au
-Cc: netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH net] ipv4: protect egress device access in the output
- path with rcu_read_lock
-Message-ID: <ahqyYBb22QxcyPYN@v4bel>
-References: <ahqIg6vURwYI0LJ5@v4bel>
+	s=arc-20240116; t=1780135926; c=relaxed/simple;
+	bh=ZVpw9b7iySBIlBvNdq3UByr/PyhAr7hc2TVJArzH5MU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hraPxy+LV7tinxd9rFSGlb572ehqkB/BJ6jZRdolGREWDpmZgx7ZQF36YERAGT30AvOVFTYPj24SG741E9U/xFVdetkyxiubUzTLWFAVw7w8VFYTko1WnLv5+VvVzWiViYOu2w5YUmzUq/gz4buT9g8nFNE8qgxaUGLsO5zywpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=az2nvJFl; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2e23fe05-6152-41c1-9a37-afae35bc0d6c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780135921;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cg3WMgctz68U2WVhip1+prh7ZcPQYzZ+5kUxfiB4kgA=;
+	b=az2nvJFlzkFdwDc4/jcOliG2hgOiTT19Xvy+uusovUgFOyV5ySBnIlva94hvwEgd/oSEKt
+	eSc67/KUNNuKOdWyWc9aT13uciNmDKo/GvGq7F3B5+P55qgscGXv6FpblNyJVRRbEUSEnS
+	Yz8cqeoa21k+20Nbtw3zzWwO+ajFEAk=
+Date: Sat, 30 May 2026 18:11:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ahqIg6vURwYI0LJ5@v4bel>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Subject: Re: [PATCH v1 net] tcp: Add preempt_{disable,enable}_nested() in
+ reqsk_queue_hash_req().
+To: Kuniyuki Iwashima <kuniyu@google.com>, Eric Dumazet
+ <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
+References: <20260530055907.280160-1-kuniyu@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260530055907.280160-1-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293322-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
+	TAGGED_FROM(0.00)[bounces-293323-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 97F3660BF74
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,e809069bc15f26300526];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: 09FE560C095
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 30, 2026 at 03:49:39PM +0900, Hyunwoo Kim wrote:
-> ip_mc_output(), __ip_local_out() and xfrm4_output() read the egress
-> network device from rt->dst.dev / skb_dst_dev(skb) and then pass that
-> pointer as the 'out' device argument of NF_HOOK without holding
-> rcu_read_lock.
-> 
-> dst->dev is a field protected by RCU. When a device is unregistered its
-> value is replaced with blackhole_netdev, and the previous device is
-> freed after an RCU grace period. A section that reads dst->dev and uses
-> that pointer must therefore hold rcu_read_lock. The three functions
-> above are missing this protection, so when the egress device is
-> unregistered concurrently with transmission, a LOCAL_OUT / POST_ROUTING
-> hook (nft meta oif, selinux_ip_postroute_compat, etc.) can reference a
-> device pointer that is no longer valid.
-> 
-> In all three leaves, wrap the section that reads the device and runs
-> NF_HOOK in rcu_read_lock(), and read the device through the RCU
-> accessors (skb_dst_dev_rcu() / dst_dev_rcu()). As a result, the RCU
-> grace period cannot complete while a transmission is in flight, so the
-> egress device is not freed and the hook always references a valid
-> device.
-> 
-> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+
+On 5/30/26 1:59 PM, Kuniyuki Iwashima wrote:
+> syzbot reported a weird reqsk->rsk_refcnt underflow in
+> __inet_csk_reqsk_queue_drop().
+>
+> The captured reqsk_put() in __inet_csk_reqsk_queue_drop()
+> is called only when it successfully removes reqsk from ehash.
+>
+> Moreover, reqsk_timer_handler() calls another reqsk_put()
+> after that.
+>
+> This indicates that the reqsk was missing both refcnts for
+> ehash and the timer itself.
+>
+> Since all the syzbot reports had PREEMPT_RT enabled, the only
+> possible scenario is that reqsk_queue_hash_req() is preempted
+> after mod_timer() and before refcount_set(), and then the timer
+> triggered after 1s aborts the reqsk due to its listener's close().
+>
+> Let's wrap mod_timer() and refcount_set() with
+> preempt_disable_nested() and preempt_enable_nested().
+>
+> Note that inet_ehash_insert() holds the normal spin_lock()
+> (mutex in PREEMPT_RT), so it must be called outside of
+> preempt_disable_nested(), but this is fine.
+>
+> The lookup path just ignores 0 sk_refcnt entries in ehash
+> and tries to create another reqsk, but this will fail at
+> inet_ehash_insert().
+>
+> [0]:
+> refcount_t: underflow; use-after-free.
+> WARNING: lib/refcount.c:28 at refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28, CPU#0: ktimers/0/16
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)}
+> Tainted: [L]=SOFTLOCKUP
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+> RIP: 0010:refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28
+> Code: e4 7d d1 0a 67 48 0f b9 3a eb 4a e8 38 3d 23 fd 48 8d 3d e1 7d d1 0a 67 48 0f b9 3a eb 37 e8 25 3d 23 fd 48 8d 3d de 7d d1 0a <67> 48 0f b9 3a eb 24 e8 12 3d 23 fd 48 8d 3d db 7d d1 0a 67 48 0f
+> RSP: 0000:ffffc90000157948 EFLAGS: 00010246
+> RAX: ffffffff84a1301b RBX: 0000000000000003 RCX: ffff88801ca98000
+> RDX: 0000000000000100 RSI: 0000000000000000 RDI: ffffffff8f72ae00
+> RBP: ffffffff99ae3b01 R08: ffff88801ca98000 R09: 0000000000000005
+> R10: 0000000000000100 R11: 0000000000000004 R12: ffff8880425ef568
+> R13: ffff8880425ef4f8 R14: ffff8880425ef578 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff888126386000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f7b46710e9c CR3: 000000000dbb6000 CR4: 00000000003526f0
+> Call Trace:
+>   <TASK>
+>   __refcount_sub_and_test include/linux/refcount.h:400 [inline]
+>   __refcount_dec_and_test include/linux/refcount.h:432 [inline]
+>   refcount_dec_and_test include/linux/refcount.h:450 [inline]
+>   reqsk_put include/net/request_sock.h:136 [inline]
+>   __inet_csk_reqsk_queue_drop+0x3ce/0x440 net/ipv4/inet_connection_sock.c:1007
+>   reqsk_timer_handler+0x651/0xdf0 net/ipv4/inet_connection_sock.c:1137
+>   call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
+>   expire_timers kernel/time/timer.c:1799 [inline]
+>   __run_timers kernel/time/timer.c:2374 [inline]
+>   __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
+>   run_timer_base kernel/time/timer.c:2395 [inline]
+>   run_timer_softirq+0x67/0x170 kernel/time/timer.c:2403
+>   handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
+>   __do_softirq kernel/softirq.c:656 [inline]
+>   run_ktimerd+0x69/0x100 kernel/softirq.c:1151
+>   smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+>   kthread+0x388/0x470 kernel/kthread.c:436
+>   ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>   </TASK>
+>
+> Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
+> Reported-by: syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/6a1a7bcf.0a9e871e.332604.000b.GAE@google.com/
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
 > ---
->  net/ipv4/ip_output.c    | 27 +++++++++++++++++++--------
->  net/ipv4/xfrm4_output.c | 13 +++++++++----
->  2 files changed, 28 insertions(+), 12 deletions(-)
-> 
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index 5bcd73cbdb41..92a70b7e74a6 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -102,6 +102,7 @@ EXPORT_SYMBOL(ip_send_check);
->  int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
->  {
->  	struct iphdr *iph = ip_hdr(skb);
-> +	int err;
->  
->  	IP_INC_STATS(net, IPSTATS_MIB_OUTREQUESTS);
->  
-> @@ -117,9 +118,12 @@ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
->  
->  	skb->protocol = htons(ETH_P_IP);
->  
-> -	return nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
-> -		       net, sk, skb, NULL, skb_dst_dev(skb),
-> -		       dst_output);
-> +	rcu_read_lock();
-> +	err = nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
-> +		      net, sk, skb, NULL, skb_dst_dev_rcu(skb),
-> +		      dst_output);
-> +	rcu_read_unlock();
-> +	return err;
->  }
->  
->  int ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
-> @@ -368,7 +372,11 @@ static int ip_mc_finish_output(struct net *net, struct sock *sk,
->  int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->  {
->  	struct rtable *rt = skb_rtable(skb);
-> -	struct net_device *dev = rt->dst.dev;
-> +	struct net_device *dev;
-> +	int ret;
+>   net/ipv4/inet_connection_sock.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+>
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+> index dbcd37dfdc15..b546ce15ee03 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -1145,6 +1145,8 @@ static bool reqsk_queue_hash_req(struct request_sock *req)
+>   	if (!inet_ehash_insert(req_to_sk(req), NULL, &found_dup_sk))
+>   		return false;
+>   
+> +	preempt_disable_nested();
 > +
-> +	rcu_read_lock();
-> +	dev = dst_dev_rcu(&rt->dst);
->  
->  	/*
->  	 *	If the indicated interface is up and running, send the packet.
-> @@ -407,6 +415,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->  
->  		if (ip_hdr(skb)->ttl == 0) {
->  			kfree_skb(skb);
-> +			rcu_read_unlock();
->  			return 0;
->  		}
->  	}
-> @@ -419,10 +428,12 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->  				ip_mc_finish_output);
->  	}
->  
-> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-> -			    net, sk, skb, NULL, skb->dev,
-> -			    ip_finish_output,
-> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
-> +	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-> +			   net, sk, skb, NULL, skb->dev,
-> +			   ip_finish_output,
-> +			   !(IPCB(skb)->flags & IPSKB_REROUTED));
-> +	rcu_read_unlock();
-> +	return ret;
->  }
->  
->  int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
-> diff --git a/net/ipv4/xfrm4_output.c b/net/ipv4/xfrm4_output.c
-> index 0ae67d537499..d5dc084777a3 100644
-> --- a/net/ipv4/xfrm4_output.c
-> +++ b/net/ipv4/xfrm4_output.c
-> @@ -30,10 +30,15 @@ static int __xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->  
->  int xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->  {
-> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-> -			    net, sk, skb, skb->dev, skb_dst_dev(skb),
-> -			    __xfrm4_output,
-> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
-> +	int ret;
+>   	/* The timer needs to be setup after a successful insertion. */
+>   	req->timeout = tcp_timeout_init((struct sock *)req);
+>   	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
+> @@ -1155,6 +1157,9 @@ static bool reqsk_queue_hash_req(struct request_sock *req)
+>   	 */
+>   	smp_wmb();
+>   	refcount_set(&req->rsk_refcnt, 2 + 1);
 > +
-> +	rcu_read_lock();
-> +	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-> +			   net, sk, skb, skb->dev, skb_dst_dev_rcu(skb),
-> +			   __xfrm4_output,
-> +			   !(IPCB(skb)->flags & IPSKB_REROUTED));
-> +	rcu_read_unlock();
-> +	return ret;
->  }
->  
->  void xfrm4_local_error(struct sk_buff *skb, u32 mtu)
-> -- 
-> 2.43.0
-> 
-
-Further analysis confirmed that raw_send_hdrinc(), xfrm_output_resume() 
-and vrf_output() are affected by the same issue.
-
-I will post a v2 covering these additional cases after 24 hours.
-
-
-Best regards,
-Hyunwoo Kim
+> +	preempt_enable_nested();
+> +
+>   	return true;
+>   }
+>   
 
