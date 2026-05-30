@@ -1,215 +1,248 @@
-Return-Path: <netdev+bounces-293311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOMaAv+GGmo35QgAu9opvQ
-	(envelope-from <netdev+bounces-293311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:43:11 +0200
+	id sCh3MpGIGmpt5QgAu9opvQ
+	(envelope-from <netdev+bounces-293312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:49:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0227B60B7AE
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:43:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4503460B7EA
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0603E302167C
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 06:43:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 263043060495
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 06:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4E43803C7;
-	Sat, 30 May 2026 06:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A65384CE6;
+	Sat, 30 May 2026 06:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sl68/YLE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oFgoihqL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4662637FF49
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 06:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA8D199949
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 06:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780123383; cv=none; b=T0DSppq6TDDxpjkOgaNhIerwKzHxk0i5Upro7ApgKRBNWTbOCGftKz/XMEAxAv/NhXzTWhnrRnf8Ppd3Vv6TnIqtZuLINYZZw6q6BKCxFj5Tc4VDdzYax6NLq2gp1BJj5yHJxBR7quA+cITZWnutapUoKPUI4wop+Dpfw0RZisw=
+	t=1780123785; cv=none; b=u1PNGIU1kZougpxtXQYgg8uZy1V6AWyhbOYoTuKlJrHoTYwWpxZlu8Oy5ya1GsE94lCtZYI77LMWU5lgp0vxxObWZ6S5yxg5QY9b/394ncfpkyP429D+bhS9+h2D2tBHpac6RezmPiWkOODnZF0Uxq8ufj373WII2Dp3XAoWTCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780123383; c=relaxed/simple;
-	bh=Gm7E/qN7Mm4NFiedRBa8s7HFggRwtXnXY4yoAuN7FFQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V2GY3HR8VYcFwBf3/iCd/Gt3iIaBMimAeSY4xh4wl2gfqAr2EoJ74l7V2J/tqSPVCxwATxaBk2FMLYli4TPLqQm5Ow+PPr1q0jlamdeccqHUD3ASYhD2Vn8srSfOz5T2XoS8HkgEe8HQ1S4tpcIZENisKHSTkIq31rXJ29xGEQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sl68/YLE; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bf11699875so25751505ad.1
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 23:43:02 -0700 (PDT)
+	s=arc-20240116; t=1780123785; c=relaxed/simple;
+	bh=YJu/hGqCZ/x6BPnocLXNDfK+2HdLM+a6mWCKV6S32gc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=eNLHGpxDBYwmWqPteFtcvr0HKsdl70FJ/qjcQC3RM4knv7W6Q7ascufb4bgz2rkeMbHfs37sLpfA61a3lXIgJKXFN1gh2RFE+G1o0BLQQ+/GCkm5a1sdJc6O2D+5JQTGkZvB+1eufrdoxSj39d1dLvEeY41nnoIhMoMVgaZ4AYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oFgoihqL; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2baca4df358so92581775ad.2
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 23:49:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780123381; x=1780728181; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Atve8R+wL0MQUyEhaP7ysWXVXQQXF6kgIBj5kWK4vL0=;
-        b=Sl68/YLEGDPMigxmSMQlvdSVXHf8q3JXfxfDxJp64bOyEtIRpo2KUbbA7crhfo/gx/
-         UQG4GgSmQDATDOqStDQOJR31JXynS7C+n6AzCKTcHNtA42Bq/p8/uH0eyxOybZG3zukY
-         /S79O7Hc9EHwaESpLgdlGHVzPIqYc1tXxXRvXEkwJnpeMBlgQNvm7MVi1HAFl6vFjjHz
-         FnlviieCq96ASt/kU2Z3iDO+4bN28qZ/22rwD/g8cyzu4bViJ06C79qsbaD5ZsuF/XGA
-         D9Axz+R8ilR3aklZ5ortKUrFJG7U5BG4zNVHaKCDuGBzXg4n6ePUOp1EYM+nBHimBxq0
-         uDeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780123381; x=1780728181;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=gmail.com; s=20251104; t=1780123784; x=1780728584; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Atve8R+wL0MQUyEhaP7ysWXVXQQXF6kgIBj5kWK4vL0=;
-        b=ZibGh4cvjY8k+g2EH9tlC9kVJBoNIr80mipmtk48UbxhP2jcaHNZYiSvJRSd3u8JUL
-         iU989qUzQgrhs068xxT8thCjt17z7oJFEKcMbazfLRlQDddzVWi+3IuFeY6pIlkFnWWF
-         UkveijiuQLJzyQwpv/r+tapFUHs0X2Q4GorgTIXwlUqqvXfLEw1qlg/JWX6HOLwsrIQP
-         mNVN8kSLRPVkVCgPjkus0iMsv9lgBitJdqeYb1FAQsyg0M/A+8NwpV9vxl/yL628Vz3C
-         OHBH7Dcui74l3F96Mmgs2KI5bSGA6OMKkBepqNo75Z5JKdbJzxpWcPYqAGg1FYJurhUQ
-         zIhg==
-X-Forwarded-Encrypted: i=1; AFNElJ8rrTSa22gw9Zs3+w3mmlh3bgWnxLU7iL/uz3PkwpIudtRbReF+pl1gu8hAHQYp8FQ+3vAbEt0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzntFc1oR4jsLCmPP/kUfRgMZXJW1MB0X1WmzHl7l87t8aT8zEg
-	SAqkdYlMI2zqm6JC/pOpqJavdGCwvvVAjPuipt7R0FfFaMd7nX7FZZOpzr4xLNMxsz9WR+spqrI
-	DQ+Wv5g==
-X-Received: from plem12.prod.google.com ([2002:a17:902:e40c:b0:2bc:db94:6f34])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2acd:b0:2b2:4bbc:14b0
- with SMTP id d9443c01a7336-2bf20533582mr61071385ad.20.1780123381401; Fri, 29
- May 2026 23:43:01 -0700 (PDT)
-Date: Sat, 30 May 2026 06:42:58 +0000
+        bh=G8NAUea0YD24JXOa/aqrN+/ZpdlmTLfkczxznQ++dPw=;
+        b=oFgoihqL4KMRI0ciwduW3OIg+3K5HBWEHhnBW10/CroUDOgcK3IWh7nukczVrGpOiP
+         /SUnCo3QWpi6kd/uosH05Vz1aZJdl+O/tQDPG3AyOL60r/nUqSRVzQI/o2BCRz8WCuqW
+         2trPt79zeor4NUfNxO7N/59uxYPpWSDYcrHS0ZXU3efAh7B+j/rg9ddCTj/mBmIvDSep
+         FuHqhpNWip5g0sAkwG69Ng9znHuXL+Z+85zhFpHlVEEhFMlfxPA6kJTP+s8B+IuIm4cP
+         qhE/49xtoTHKsALQ//COUAXrUckqsBzdV84x8q+NSgRAl8rzWDjTxp0+7+bvBorKnvTA
+         6WIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780123784; x=1780728584;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G8NAUea0YD24JXOa/aqrN+/ZpdlmTLfkczxznQ++dPw=;
+        b=bmrhtvJptXs8BPtPf13JoCj4KOE0yQQ6MDN+aZDvxHrLO4wXrTkVYbtx77hkctYRLO
+         ujoObVYO8UwDdI6I4kkBNYoktWjj+H/i0dzObUTkZd8+jnwNW5C1N0O6vGE/s9umBfh5
+         JbE7JxvKo4UDj0DcRXlD7VAvCnz29UWfDMSN9ZGjMMCFTnzHWPmKToZqNslDHvLy1BfG
+         3tP50AqbiyBmCctZ4oTaXxsLFPXK8trIDB4PplVSqPyNiWFhNkg2fZnlSoUilJx4gloB
+         InYkvU2T/xQhZJ9TB6a/Z0S3elzfpceEzv14mR4aORnGbbTtC3YCC8l/p6Mdfqv708YH
+         EnDw==
+X-Gm-Message-State: AOJu0YxAGhXxT4Xas5DuRwhtqwh3DL0DPAZOws7ikpkvaHZBEzagSUKg
+	N7xkF7IRwcE5VgmbBwzF9NLaatSoabmdyZaL7mTMbTtPoSmBf+dvPex4cqipdQ==
+X-Gm-Gg: Acq92OHSqeuZ1yygFON29An/eSm0wuWRBn/AQotiwIz7AfJyR/ElzHPMY7btrYWrdWp
+	yEQutj3dWmpDplLdm+LTv9CBLj6Ndl2+QPLp2he5Kt0VxHcy/PRGDUdWLWgA/S9JjwvfGkRobyR
+	gG1Mb4LEdzz4tu8PYkqxkho1hsKaogcNSV0mM7+3mIgZmPK9Z1kZs9zhNrpRQpTbDq9a7KbPO5Y
+	81Fw8WsDNhbVTZRSBv+JTv3Z8tIUfvekEcaV22Ccn2guSo5o9YYaRXR2xKfxdQiP5HYPIRCTga8
+	CaF1G8FydKh9NuUlArlMRZy0dnDFAvYg6FoxlJ2hBdV3kbJxpRrlGNkT+UD723ie9WTmSGCg7PH
+	cb+n6aylpm2RDE/KSP9EgSSYh/rF0ER7jkTJuHsXZLQpEjcwRno2R5sXmJGgpsqEjdPeyOEfmpB
+	ZUdudzzJW6ZLV3f3Pqg4n76aRpwjoRnHWs8TMG7D42WSJGPHRjHFMVllSFAGHQgV4D
+X-Received: by 2002:a17:903:244d:b0:2bd:c310:f7c9 with SMTP id d9443c01a7336-2bf367b2353mr37205065ad.2.1780123783611;
+        Fri, 29 May 2026 23:49:43 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23a1e095sm43155285ad.32.2026.05.29.23.49.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 23:49:43 -0700 (PDT)
+Date: Sat, 30 May 2026 15:49:39 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au
+Cc: netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH net] ipv4: protect egress device access in the output path
+ with rcu_read_lock
+Message-ID: <ahqIg6vURwYI0LJ5@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
-Message-ID: <20260530064300.340793-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] hsr: Remove WARN_ONCE() in hsr_addr_is_self().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Arvid Brodin <arvid.brodin@alten.se>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+652670cf249077eb498b@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,alten.se,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293311-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293312-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,652670cf249077eb498b];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0227B60B7AE
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 4503460B7EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot reported the warning [0] in hsr_addr_is_self(),
-whose assumption is simply wrong.
+ip_mc_output(), __ip_local_out() and xfrm4_output() read the egress
+network device from rt->dst.dev / skb_dst_dev(skb) and then pass that
+pointer as the 'out' device argument of NF_HOOK without holding
+rcu_read_lock.
 
-hsr->self_node is cleared in hsr_del_self_node(), which
-is called from hsr_dellink().
+dst->dev is a field protected by RCU. When a device is unregistered its
+value is replaced with blackhole_netdev, and the previous device is
+freed after an RCU grace period. A section that reads dst->dev and uses
+that pointer must therefore hold rcu_read_lock. The three functions
+above are missing this protection, so when the egress device is
+unregistered concurrently with transmission, a LOCAL_OUT / POST_ROUTING
+hook (nft meta oif, selinux_ip_postroute_compat, etc.) can reference a
+device pointer that is no longer valid.
 
-Since dev->rtnl_link_ops->dellink() is called before
-unregister_netdevice_many(), there is a window when
-user can find the device but without hsr->self_node.
+In all three leaves, wrap the section that reads the device and runs
+NF_HOOK in rcu_read_lock(), and read the device through the RCU
+accessors (skb_dst_dev_rcu() / dst_dev_rcu()). As a result, the RCU
+grace period cannot complete while a transmission is in flight, so the
+egress device is not freed and the hook always references a valid
+device.
 
-Let's remove WARN_ONCE() in hsr_addr_is_self().
-
-[0]:
-HSR: No self node
-WARNING: net/hsr/hsr_framereg.c:39 at hsr_addr_is_self+0x211/0x3f0 net/hsr/hsr_framereg.c:39, CPU#0: syz.4.16848/17220
-Modules linked in:
-CPU: 0 UID: 0 PID: 17220 Comm: syz.4.16848 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)}
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:hsr_addr_is_self+0x211/0x3f0 net/hsr/hsr_framereg.c:39
-Code: 33 2f 41 0f b7 dd 89 ee 09 de 31 ff e8 c8 b4 c6 f6 09 dd 74 54 e8 0f b0 c6 f6 31 ed eb 53 e8 06 b0 c6 f6 48 8d 3d 2f 50 9c 04 <67> 48 0f b9 3a 31 ed eb 42 e8 c1 13 1f 00 89 c5 31 ff 89 c6 e8 96
-RSP: 0018:ffffc900041c70e0 EFLAGS: 00010283
-RAX: ffffffff8afdc6ca RBX: ffffffff8afdc4e6 RCX: 0000000000080000
-RDX: ffffc90010493000 RSI: 0000000000000948 RDI: ffffffff8f9a1700
-RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffc900041c71e8 R11: fffff52000838e3f R12: dffffc0000000000
-R13: ffff888041f9e3c0 R14: ffff888086ee3802 R15: 0000000000000000
-FS:  00007f6fe985d6c0(0000) GS:ffff888126176000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f80bd437dac CR3: 0000000025096000 CR4: 00000000003526f0
-DR0: ffffffffffffffff DR1: 00000000000001f8 DR2: 0000000000000002
-DR3: ffffffffefffff15 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- check_local_dest net/hsr/hsr_forward.c:592 [inline]
- fill_frame_info net/hsr/hsr_forward.c:728 [inline]
- hsr_forward_skb+0xa11/0x2a80 net/hsr/hsr_forward.c:739
- hsr_dev_xmit+0x253/0x370 net/hsr/hsr_device.c:236
- __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
- netdev_start_xmit include/linux/netdevice.h:5377 [inline]
- xmit_one net/core/dev.c:3888 [inline]
- dev_hard_start_xmit+0x2df/0x860 net/core/dev.c:3904
- __dev_queue_xmit+0x1428/0x3900 net/core/dev.c:4870
- neigh_output include/net/neighbour.h:556 [inline]
- ip_finish_output2+0xcec/0x10b0 net/ipv4/ip_output.c:237
- ip_send_skb net/ipv4/ip_output.c:1510 [inline]
- ip_push_pending_frames+0x8b/0x110 net/ipv4/ip_output.c:1530
- raw_sendmsg+0x1547/0x1a50 net/ipv4/raw.c:659
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x7da/0x9c0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0x1c3/0x2a0 net/socket.c:2787
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f6feb62ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f6fe985d028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f6feb8a6090 RCX: 00007f6feb62ce59
-RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000004
-RBP: 00007f6feb6c2d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f6feb8a6128 R14: 00007f6feb8a6090 R15: 00007ffcf01cc488
- </TASK>
-
-Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
-Reported-by: syzbot+652670cf249077eb498b@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a1a861e.b111c304.35cd64.0016.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
-targeting net-next since there is no real bug.
----
- net/hsr/hsr_framereg.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ net/ipv4/ip_output.c    | 27 +++++++++++++++++++--------
+ net/ipv4/xfrm4_output.c | 13 +++++++++----
+ 2 files changed, 28 insertions(+), 12 deletions(-)
 
-diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-index b514e43766ef..a28dfd8490c5 100644
---- a/net/hsr/hsr_framereg.c
-+++ b/net/hsr/hsr_framereg.c
-@@ -35,10 +35,8 @@ bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr)
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 5bcd73cbdb41..92a70b7e74a6 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -102,6 +102,7 @@ EXPORT_SYMBOL(ip_send_check);
+ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct iphdr *iph = ip_hdr(skb);
++	int err;
  
- 	rcu_read_lock();
- 	sn = rcu_dereference(hsr->self_node);
--	if (!sn) {
--		WARN_ONCE(1, "HSR: No self node\n");
-+	if (!sn)
- 		goto out;
--	}
+ 	IP_INC_STATS(net, IPSTATS_MIB_OUTREQUESTS);
  
- 	if (ether_addr_equal(addr, sn->macaddress_A) ||
- 	    ether_addr_equal(addr, sn->macaddress_B))
+@@ -117,9 +118,12 @@ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 
+ 	skb->protocol = htons(ETH_P_IP);
+ 
+-	return nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
+-		       net, sk, skb, NULL, skb_dst_dev(skb),
+-		       dst_output);
++	rcu_read_lock();
++	err = nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT,
++		      net, sk, skb, NULL, skb_dst_dev_rcu(skb),
++		      dst_output);
++	rcu_read_unlock();
++	return err;
+ }
+ 
+ int ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+@@ -368,7 +372,11 @@ static int ip_mc_finish_output(struct net *net, struct sock *sk,
+ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct rtable *rt = skb_rtable(skb);
+-	struct net_device *dev = rt->dst.dev;
++	struct net_device *dev;
++	int ret;
++
++	rcu_read_lock();
++	dev = dst_dev_rcu(&rt->dst);
+ 
+ 	/*
+ 	 *	If the indicated interface is up and running, send the packet.
+@@ -407,6 +415,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 
+ 		if (ip_hdr(skb)->ttl == 0) {
+ 			kfree_skb(skb);
++			rcu_read_unlock();
+ 			return 0;
+ 		}
+ 	}
+@@ -419,10 +428,12 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 				ip_mc_finish_output);
+ 	}
+ 
+-	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+-			    net, sk, skb, NULL, skb->dev,
+-			    ip_finish_output,
+-			    !(IPCB(skb)->flags & IPSKB_REROUTED));
++	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
++			   net, sk, skb, NULL, skb->dev,
++			   ip_finish_output,
++			   !(IPCB(skb)->flags & IPSKB_REROUTED));
++	rcu_read_unlock();
++	return ret;
+ }
+ 
+ int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+diff --git a/net/ipv4/xfrm4_output.c b/net/ipv4/xfrm4_output.c
+index 0ae67d537499..d5dc084777a3 100644
+--- a/net/ipv4/xfrm4_output.c
++++ b/net/ipv4/xfrm4_output.c
+@@ -30,10 +30,15 @@ static int __xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 
+ int xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+-	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+-			    net, sk, skb, skb->dev, skb_dst_dev(skb),
+-			    __xfrm4_output,
+-			    !(IPCB(skb)->flags & IPSKB_REROUTED));
++	int ret;
++
++	rcu_read_lock();
++	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
++			   net, sk, skb, skb->dev, skb_dst_dev_rcu(skb),
++			   __xfrm4_output,
++			   !(IPCB(skb)->flags & IPSKB_REROUTED));
++	rcu_read_unlock();
++	return ret;
+ }
+ 
+ void xfrm4_local_error(struct sk_buff *skb, u32 mtu)
 -- 
-2.54.0.823.g6e5bcc1fc9-goog
+2.43.0
 
 
