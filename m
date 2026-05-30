@@ -1,113 +1,241 @@
-Return-Path: <netdev+bounces-293352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uG0qGesJG2pg+ggAu9opvQ
-	(envelope-from <netdev+bounces-293352-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 18:01:47 +0200
+	id WFUrE0QoG2ra/ggAu9opvQ
+	(envelope-from <netdev+bounces-293357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:11:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABD560DDEC
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 18:01:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3AD2611330
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5BDDD302867A
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 16:01:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17B5930A8CE0
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 17:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4CE31A7E2;
-	Sat, 30 May 2026 16:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9761833032B;
+	Sat, 30 May 2026 17:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ls4NEO6t"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="aWW9r8K/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1DB29D26E;
-	Sat, 30 May 2026 16:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699D1320CAD;
+	Sat, 30 May 2026 17:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780156903; cv=none; b=Be3j5XX18mN8BR1yAE+RltFvPauuyTVuAFh0nk/evhfIS9dI9lESVLSPipQllluDL9GsMxCSnCRYMc/WTeCnSZfT4F0qqJ9nSxua+a4/25ZdtPNyPmGP2un4MgcP2kv80eoj83+hI/2J1IiZxYV+ctxdC2VJNEM6DQwzatDcmik=
+	t=1780163971; cv=none; b=q+KHVY0CDU1cYEtnr8KS3uF/5Nd3vz6/Wn8pZ2Cp87DII0P2UoLsYIvajzmxQXmwBTRCOCpFyOL4uTgpt2D9S+Arjs9GPv6y1E7DxThjOrjE8iMWkkxHgI3hTPO2G3aivIqkRq4tvH0fMMRrs63RgZdZtLu7TpZ5PHfCRw+aJ3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780156903; c=relaxed/simple;
-	bh=RmotepugSboKCrjRbQ7UdOdNYQFVdXVjLt/lyuYOKI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nZy1+UhxlPlMmgwU5OQV8olYjsGWKc6fv9kIXjLbMOHvyliwrdYd1bM4PAEVH3yl0W56IfAH6Kun1Nqpg+qQhofJqf/9OF4lXqU6P82fbe/VaDJSPktB4KMMD6Tiw8s3LEORjqotwFtnYvQ4T9XRfQbRsQ/ZnNHVvJDlyS4HrVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ls4NEO6t; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7741F00893;
-	Sat, 30 May 2026 16:01:38 +0000 (UTC)
+	s=arc-20240116; t=1780163971; c=relaxed/simple;
+	bh=hCG+OIRnaalrgvox5qxUnmKarMAoNkiizvztOdxVyOE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Kjs+/3FhQK8fEtFuuZbCoFBmwD/jagO4NEzK0r5X/Ujz6FZsM3S8SzQlDPNoxQD0qhpm7V2q74Jpw050+BMa5AtsC1c5GbHG59kAsfhkm0DQd2T+gYl+mUW1s1UDtzBxTgmeSa9OLBkR8cJzl7olrW/dMqetz7hb1TFJxHSWrHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=aWW9r8K/; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FC921F00893;
+	Sat, 30 May 2026 17:59:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1780156902;
-	bh=RmotepugSboKCrjRbQ7UdOdNYQFVdXVjLt/lyuYOKI4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ls4NEO6to6vA7kKJVpphRT3t/crc0JjOceHLwJxqsH+2kYqtAyBClmr+WwSSgABGw
-	 v3qPivb9oRm8LsxgDk28udNaKhcPsDROT71z2zyoZu6MndZkNFTh12FXHS4x5YJlpP
-	 P5EPnzl/5o9stVpyyfvjQps6YMagi959o+mtXByQ=
-Date: Sat, 30 May 2026 18:00:37 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Cyber_black <Cyberblackk@proton.me>
-Cc: "security@kernel.org" <security@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"david+nfc@ixit.cz" <david+nfc@ixit.cz>,
-	"oe-linux-nfc@lists.linux.dev" <oe-linux-nfc@lists.linux.dev>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "w@1wt.eu" <w@1wt.eu>
-Subject: Re: NFC/LLCP: unsafe userspace sockaddr handling in bind/connect
- paths
-Message-ID: <2026053008-level-debrief-7f65@gregkh>
-References: <0AJFeQ-7iEFm2WdHkRhf_kX_3FFbc3ONYxT3fxz75i4eAP8glmc1jmY7JOHngN73P9L6yPrflvcZs63EHu_XazAsLhPIe0zUrtdK7cKnC6Q=@proton.me>
+	s=korg; t=1780163970;
+	bh=3yetR+r2N+u+1MYJrfeFDpiLwk3zQ5nbQn/Bif/B7+k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=aWW9r8K//BPDhf8tMyRuFbEdnAL/eQKwAyI4bFY3i0dEHixifCVPgn3GwJTXrSic0
+	 XrxFo3jYDDuYMkYmc2OYHjTgkJCBtBqsSe1V5wcVoGi2sfThn70kiqf/YPu18weaWM
+	 IJwmNe7hGGPutdNqnIRGgLjQR/TV/kle2IzsQGL0=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Andreas Koensgen <ajk@comnets.uni-bremen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.15 416/776] 6pack: propagage new tty types
+Date: Sat, 30 May 2026 18:02:10 +0200
+Message-ID: <20260530160251.226092026@linuxfoundation.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260530160240.228940103@linuxfoundation.org>
+References: <20260530160240.228940103@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0AJFeQ-7iEFm2WdHkRhf_kX_3FFbc3ONYxT3fxz75i4eAP8glmc1jmY7JOHngN73P9L6yPrflvcZs63EHu_XazAsLhPIe0zUrtdK7cKnC6Q=@proton.me>
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293352-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293357-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EABD560DDEC
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: A3AD2611330
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 30, 2026 at 12:15:37PM +0000, Cyber_black wrote:
-> SUGGESTED FIX
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
-<snip>
+------------------
 
-As documented, please just send a real patch for this so that it can be
-applied properly.
+From: Jiri Slaby (SUSE) <jirislaby@kernel.org>
 
-thanks,
+[ Upstream commit 1241b384efa53f4b7a95fe2b34d69359bb3ae1b5 ]
 
-greg k-h
+In tty, u8 is now used for data, ssize_t for sizes (with possible
+negative error codes). Propagate these types to 6pack.
+
+Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Andreas Koensgen <ajk@comnets.uni-bremen.de>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-hams@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Reviewed-by: Jeremy Kerr <jk@codeconstruct.com.au>
+Link: https://lore.kernel.org/r/20240808103549.429349-12-jirislaby@kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Stable-dep-of: bf9a38803b26 ("net: hamradio: 6pack: fix uninit-value in sixpack_receive_buf")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/hamradio/6pack.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
+index 36a9fbb704029..7ccf56a7f0e0c 100644
+--- a/drivers/net/hamradio/6pack.c
++++ b/drivers/net/hamradio/6pack.c
+@@ -94,8 +94,8 @@ struct sixpack {
+ 	unsigned char		*xhead;         /* next byte to XMIT */
+ 	int			xleft;          /* bytes left in XMIT queue  */
+ 
+-	unsigned char		raw_buf[4];
+-	unsigned char		cooked_buf[400];
++	u8			raw_buf[4];
++	u8			cooked_buf[400];
+ 
+ 	unsigned int		rx_count;
+ 	unsigned int		rx_count_cooked;
+@@ -112,8 +112,8 @@ struct sixpack {
+ 	unsigned char		slottime;
+ 	unsigned char		duplex;
+ 	unsigned char		led_state;
+-	unsigned char		status;
+-	unsigned char		status1;
++	u8			status;
++	u8			status1;
+ 	unsigned char		status2;
+ 	unsigned char		tx_enable;
+ 	unsigned char		tnc_state;
+@@ -127,7 +127,7 @@ struct sixpack {
+ 
+ #define AX25_6PACK_HEADER_LEN 0
+ 
+-static void sixpack_decode(struct sixpack *, const unsigned char[], int);
++static void sixpack_decode(struct sixpack *, const u8 *, size_t);
+ static int encode_sixpack(unsigned char *, unsigned char *, int, unsigned char);
+ 
+ /*
+@@ -332,7 +332,7 @@ static void sp_bump(struct sixpack *sp, char cmd)
+ {
+ 	struct sk_buff *skb;
+ 	int count;
+-	unsigned char *ptr;
++	u8 *ptr;
+ 
+ 	count = sp->rcount + 1;
+ 
+@@ -430,7 +430,7 @@ static void sixpack_receive_buf(struct tty_struct *tty,
+ 	const unsigned char *cp, const char *fp, int count)
+ {
+ 	struct sixpack *sp;
+-	int count1;
++	size_t count1;
+ 
+ 	if (!count)
+ 		return;
+@@ -818,9 +818,9 @@ static int encode_sixpack(unsigned char *tx_buf, unsigned char *tx_buf_raw,
+ 
+ /* decode 4 sixpack-encoded bytes into 3 data bytes */
+ 
+-static void decode_data(struct sixpack *sp, unsigned char inbyte)
++static void decode_data(struct sixpack *sp, u8 inbyte)
+ {
+-	unsigned char *buf;
++	u8 *buf;
+ 
+ 	if (sp->rx_count != 3) {
+ 		sp->raw_buf[sp->rx_count++] = inbyte;
+@@ -846,9 +846,9 @@ static void decode_data(struct sixpack *sp, unsigned char inbyte)
+ 
+ /* identify and execute a 6pack priority command byte */
+ 
+-static void decode_prio_command(struct sixpack *sp, unsigned char cmd)
++static void decode_prio_command(struct sixpack *sp, u8 cmd)
+ {
+-	int actual;
++	ssize_t actual;
+ 
+ 	if ((cmd & SIXP_PRIO_DATA_MASK) != 0) {     /* idle ? */
+ 
+@@ -896,9 +896,9 @@ static void decode_prio_command(struct sixpack *sp, unsigned char cmd)
+ 
+ /* identify and execute a standard 6pack command byte */
+ 
+-static void decode_std_command(struct sixpack *sp, unsigned char cmd)
++static void decode_std_command(struct sixpack *sp, u8 cmd)
+ {
+-	unsigned char checksum = 0, rest = 0;
++	u8 checksum = 0, rest = 0;
+ 	short i;
+ 
+ 	switch (cmd & SIXP_CMD_MASK) {     /* normal command */
+@@ -944,10 +944,10 @@ static void decode_std_command(struct sixpack *sp, unsigned char cmd)
+ /* decode a 6pack packet */
+ 
+ static void
+-sixpack_decode(struct sixpack *sp, const unsigned char *pre_rbuff, int count)
++sixpack_decode(struct sixpack *sp, const u8 *pre_rbuff, size_t count)
+ {
+-	unsigned char inbyte;
+-	int count1;
++	size_t count1;
++	u8 inbyte;
+ 
+ 	for (count1 = 0; count1 < count; count1++) {
+ 		inbyte = pre_rbuff[count1];
+-- 
+2.53.0
+
+
+
 
