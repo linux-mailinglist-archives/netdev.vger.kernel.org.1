@@ -1,129 +1,136 @@
-Return-Path: <netdev+bounces-293310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293311-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAufICuGGmrN5AgAu9opvQ
-	(envelope-from <netdev+bounces-293310-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:39:39 +0200
+	id eOMaAv+GGmo35QgAu9opvQ
+	(envelope-from <netdev+bounces-293311-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:43:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8708860B769
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:39:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0227B60B7AE
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 08:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9E0A83021670
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 06:39:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0603E302167C
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 06:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B0937CD33;
-	Sat, 30 May 2026 06:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4E43803C7;
+	Sat, 30 May 2026 06:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sl68/YLE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99DF37CD30
-	for <netdev@vger.kernel.org>; Sat, 30 May 2026 06:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4662637FF49
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 06:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780123170; cv=none; b=DSOQfQpUTZ2Lw/eQ1vA9gYnsZ7mfCCpekLcKaMf9AGeYpZELOmvo7tbrWNeJyQMtuzLWM3ih+i7tyK8QL5JBCEH0S69IkRYBDfn+CyGiPe5sBzzhoHRMo85+ZNC8rZvP73OPJei2aUgH4FVnV8M23qUm2nHSkvwkGApjGti/ZTs=
+	t=1780123383; cv=none; b=T0DSppq6TDDxpjkOgaNhIerwKzHxk0i5Upro7ApgKRBNWTbOCGftKz/XMEAxAv/NhXzTWhnrRnf8Ppd3Vv6TnIqtZuLINYZZw6q6BKCxFj5Tc4VDdzYax6NLq2gp1BJj5yHJxBR7quA+cITZWnutapUoKPUI4wop+Dpfw0RZisw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780123170; c=relaxed/simple;
-	bh=syTcwifVYKHymnjmk+HLWfK3MgN68nevTT6x7bKVS9w=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=j02shAulzC7LmpZuXCdiOV86klp01G43ELo56pJ/3/SusQSPuldC+xHs56+FyM9MwNBJQsAnVCzrD/sqeJm8bIffKt7cbHCxmbZU1BpP9L+MNu1afVs7HB7+rnKgJdWV0Kdwm+DImXVu7XuGNnvyA8ijW3P3KwzButhYTaJk4sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7dcd7302f00so3578534a34.0
-        for <netdev@vger.kernel.org>; Fri, 29 May 2026 23:39:27 -0700 (PDT)
+	s=arc-20240116; t=1780123383; c=relaxed/simple;
+	bh=Gm7E/qN7Mm4NFiedRBa8s7HFggRwtXnXY4yoAuN7FFQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V2GY3HR8VYcFwBf3/iCd/Gt3iIaBMimAeSY4xh4wl2gfqAr2EoJ74l7V2J/tqSPVCxwATxaBk2FMLYli4TPLqQm5Ow+PPr1q0jlamdeccqHUD3ASYhD2Vn8srSfOz5T2XoS8HkgEe8HQ1S4tpcIZENisKHSTkIq31rXJ29xGEQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sl68/YLE; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bf11699875so25751505ad.1
+        for <netdev@vger.kernel.org>; Fri, 29 May 2026 23:43:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780123381; x=1780728181; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Atve8R+wL0MQUyEhaP7ysWXVXQQXF6kgIBj5kWK4vL0=;
+        b=Sl68/YLEGDPMigxmSMQlvdSVXHf8q3JXfxfDxJp64bOyEtIRpo2KUbbA7crhfo/gx/
+         UQG4GgSmQDATDOqStDQOJR31JXynS7C+n6AzCKTcHNtA42Bq/p8/uH0eyxOybZG3zukY
+         /S79O7Hc9EHwaESpLgdlGHVzPIqYc1tXxXRvXEkwJnpeMBlgQNvm7MVi1HAFl6vFjjHz
+         FnlviieCq96ASt/kU2Z3iDO+4bN28qZ/22rwD/g8cyzu4bViJ06C79qsbaD5ZsuF/XGA
+         D9Axz+R8ilR3aklZ5ortKUrFJG7U5BG4zNVHaKCDuGBzXg4n6ePUOp1EYM+nBHimBxq0
+         uDeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780123166; x=1780727966;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20251104; t=1780123381; x=1780728181;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JAKFsRo+eBSAOxTVyhrdDzSE7ZqUOrRDxhcBURVJ8Xg=;
-        b=GuU5enNLWGTNGBmxy4TF8zU/anWnuuJF/5JZK3B3PtbVyrlpplw27a3NRYvPkG4wd9
-         sjEdHCjKcpH3pdH+wc1zf7/danDRy6dUJbRAkr/rBvWDc3yCChUpLKbjniKCZ3Rp8ojs
-         by1ngOVcGslPcDRiU9ILC7yZk2ocBT0VSwr90o1ZRrD+Ngli4T1QGVOsswYcz3Ff+EBy
-         4wzWNI8co/10Rn2gxRg6loksmOvYxvhHaB7eNSL2cD/EaDqacH6k67JhlvxgZIOI/J8+
-         J7r2hLl2mcru+YHaK2CHN7H5mVMnMgXdYEePDznF3krDPwM263uPAsZ/OK684qDyz1p7
-         27Tw==
-X-Forwarded-Encrypted: i=1; AFNElJ8VROUewzcHYatTxmgWSIz5C7v6IK6oj4EjcK+QIMRXHXejynRcYpOUXjpJ2ZYe5ULU55QWCPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztiM3p3mSa7ATOpiFtGPJFrVKsLbEDDQZqhWu2HK1wusBwZo5m
-	fUDOXzbWUNplXnFQQfzrurzFZbYYKueeML75x+axSVfwgybOcN95FUS5sBtSBw75LUIo7BoP7Ak
-	zS4q+MGN64Je2dfIXEQlO3fmodTo4W6fLqGmfKJ7sjpYr1yAbWw2um9rTSdk=
+        bh=Atve8R+wL0MQUyEhaP7ysWXVXQQXF6kgIBj5kWK4vL0=;
+        b=ZibGh4cvjY8k+g2EH9tlC9kVJBoNIr80mipmtk48UbxhP2jcaHNZYiSvJRSd3u8JUL
+         iU989qUzQgrhs068xxT8thCjt17z7oJFEKcMbazfLRlQDddzVWi+3IuFeY6pIlkFnWWF
+         UkveijiuQLJzyQwpv/r+tapFUHs0X2Q4GorgTIXwlUqqvXfLEw1qlg/JWX6HOLwsrIQP
+         mNVN8kSLRPVkVCgPjkus0iMsv9lgBitJdqeYb1FAQsyg0M/A+8NwpV9vxl/yL628Vz3C
+         OHBH7Dcui74l3F96Mmgs2KI5bSGA6OMKkBepqNo75Z5JKdbJzxpWcPYqAGg1FYJurhUQ
+         zIhg==
+X-Forwarded-Encrypted: i=1; AFNElJ8rrTSa22gw9Zs3+w3mmlh3bgWnxLU7iL/uz3PkwpIudtRbReF+pl1gu8hAHQYp8FQ+3vAbEt0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzntFc1oR4jsLCmPP/kUfRgMZXJW1MB0X1WmzHl7l87t8aT8zEg
+	SAqkdYlMI2zqm6JC/pOpqJavdGCwvvVAjPuipt7R0FfFaMd7nX7FZZOpzr4xLNMxsz9WR+spqrI
+	DQ+Wv5g==
+X-Received: from plem12.prod.google.com ([2002:a17:902:e40c:b0:2bc:db94:6f34])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2acd:b0:2b2:4bbc:14b0
+ with SMTP id d9443c01a7336-2bf20533582mr61071385ad.20.1780123381401; Fri, 29
+ May 2026 23:43:01 -0700 (PDT)
+Date: Sat, 30 May 2026 06:42:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:20b:b0:69d:e459:2d98 with SMTP id
- 006d021491bc7-69e103d475fmr1137621eaf.46.1780123166575; Fri, 29 May 2026
- 23:39:26 -0700 (PDT)
-Date: Fri, 29 May 2026 23:39:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1a861e.b111c304.35cd64.0016.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in hsr_addr_is_self
-From: syzbot <syzbot+652670cf249077eb498b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
+Message-ID: <20260530064300.340793-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next] hsr: Remove WARN_ONCE() in hsr_addr_is_self().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Arvid Brodin <arvid.brodin@alten.se>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+652670cf249077eb498b@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f2e8ebfec4636d32];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,alten.se,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-293310-lists,netdev=lfdr.de,652670cf249077eb498b];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293311-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,syzkaller.appspot.com:url,storage.googleapis.com:url,goo.gl:url]
-X-Rspamd-Queue-Id: 8708860B769
+	TAGGED_RCPT(0.00)[netdev,652670cf249077eb498b];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0227B60B7AE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+syzbot reported the warning [0] in hsr_addr_is_self(),
+whose assumption is simply wrong.
 
-syzbot found the following issue on:
+hsr->self_node is cleared in hsr_del_self_node(), which
+is called from hsr_dellink().
 
-HEAD commit:    1d5dcaa3bd65 Merge tag 'probes-fixes-v7.1-rc3' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=119dae36580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f2e8ebfec4636d32
-dashboard link: https://syzkaller.appspot.com/bug?extid=652670cf249077eb498b
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Since dev->rtnl_link_ops->dellink() is called before
+unregister_netdevice_many(), there is a window when
+user can find the device but without hsr->self_node.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Let's remove WARN_ONCE() in hsr_addr_is_self().
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5b889cdb98bd/disk-1d5dcaa3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8953fddf953a/vmlinux-1d5dcaa3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d6e5ef98b3f1/bzImage-1d5dcaa3.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+652670cf249077eb498b@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
+[0]:
 HSR: No self node
 WARNING: net/hsr/hsr_framereg.c:39 at hsr_addr_is_self+0x211/0x3f0 net/hsr/hsr_framereg.c:39, CPU#0: syz.4.16848/17220
 Modules linked in:
-CPU: 0 UID: 0 PID: 17220 Comm: syz.4.16848 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
+CPU: 0 UID: 0 PID: 17220 Comm: syz.4.16848 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)}
 Tainted: [L]=SOFTLOCKUP
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
 RIP: 0010:hsr_addr_is_self+0x211/0x3f0 net/hsr/hsr_framereg.c:39
@@ -175,50 +182,34 @@ RBP: 00007f6feb6c2d6f R08: 0000000000000000 R09: 0000000000000000
 R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
 R13: 00007f6feb8a6128 R14: 00007f6feb8a6090 R15: 00007ffcf01cc488
  </TASK>
-----------------
-Code disassembly (best guess):
-   0:	33 2f                	xor    (%rdi),%ebp
-   2:	41 0f b7 dd          	movzwl %r13w,%ebx
-   6:	89 ee                	mov    %ebp,%esi
-   8:	09 de                	or     %ebx,%esi
-   a:	31 ff                	xor    %edi,%edi
-   c:	e8 c8 b4 c6 f6       	call   0xf6c6b4d9
-  11:	09 dd                	or     %ebx,%ebp
-  13:	74 54                	je     0x69
-  15:	e8 0f b0 c6 f6       	call   0xf6c6b029
-  1a:	31 ed                	xor    %ebp,%ebp
-  1c:	eb 53                	jmp    0x71
-  1e:	e8 06 b0 c6 f6       	call   0xf6c6b029
-  23:	48 8d 3d 2f 50 9c 04 	lea    0x49c502f(%rip),%rdi        # 0x49c5059
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	31 ed                	xor    %ebp,%ebp
-  31:	eb 42                	jmp    0x75
-  33:	e8 c1 13 1f 00       	call   0x1f13f9
-  38:	89 c5                	mov    %eax,%ebp
-  3a:	31 ff                	xor    %edi,%edi
-  3c:	89 c6                	mov    %eax,%esi
-  3e:	e8                   	.byte 0xe8
-  3f:	96                   	xchg   %eax,%esi
 
-
+Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
+Reported-by: syzbot+652670cf249077eb498b@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6a1a861e.b111c304.35cd64.0016.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+targeting net-next since there is no real bug.
+---
+ net/hsr/hsr_framereg.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index b514e43766ef..a28dfd8490c5 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -35,10 +35,8 @@ bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr)
+ 
+ 	rcu_read_lock();
+ 	sn = rcu_dereference(hsr->self_node);
+-	if (!sn) {
+-		WARN_ONCE(1, "HSR: No self node\n");
++	if (!sn)
+ 		goto out;
+-	}
+ 
+ 	if (ether_addr_equal(addr, sn->macaddress_A) ||
+ 	    ether_addr_equal(addr, sn->macaddress_B))
+-- 
+2.54.0.823.g6e5bcc1fc9-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
