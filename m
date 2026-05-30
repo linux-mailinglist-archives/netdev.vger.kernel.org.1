@@ -1,714 +1,516 @@
-Return-Path: <netdev+bounces-293361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDVAAMQ/G2oMAgkAu9opvQ
-	(envelope-from <netdev+bounces-293361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 21:51:32 +0200
+	id +NjKGPVBG2oMAgkAu9opvQ
+	(envelope-from <netdev+bounces-293362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 22:00:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50333613189
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 21:51:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED7B613271
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 22:00:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA9FB3024967
-	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 19:51:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 666263023509
+	for <lists+netdev@lfdr.de>; Sat, 30 May 2026 20:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FBB29BD95;
-	Sat, 30 May 2026 19:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RCW/ll0B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E655B30567B;
+	Sat, 30 May 2026 20:00:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79636233952;
-	Sat, 30 May 2026 19:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03292FA0DF
+	for <netdev@vger.kernel.org>; Sat, 30 May 2026 20:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780170682; cv=none; b=Z/AfWUbM/mxCoSvnVDp3SYLJw8U2RLBxETAPIfb7Cap0bav2fHDNEYKRZQsv9wr5IK0olhiN2DXKvnljyb7Xzzz9syGtSsNhlrgpcnCB7tggB2mpRjIQl9odwTcU2q8mH7zvO4Zx2ZTQ7+GlbsYffZxN4dV65NEe8r3MrTZ9hEc=
+	t=1780171207; cv=none; b=TTcgCCGIvAI1Jk6QfxoPoaorCpmx6FlF93PCah56V3pCNMbV+2PE7kqnYRYYgumUod6J4+5Q5BktcnmImWLW1O2arDUOG7kd4nEHhJN2nhHcbvIr3BsFG52A+51EOzvo3R6iZqhE/VmDk9n1ZOIeg4o/peOoKg0xcJsFoaEGQeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780170682; c=relaxed/simple;
-	bh=95CfneWAt1S7aCos/ViAGhcX8UjxDojb7em6I8E9LhM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Luo8SAOU7mYC3FLxCgCPDh+YUP2A7cfKx8y/oWarKSJXzWxv/gJ4pM8qYOBvwIdY1S41lSvsvLWlXGuc2CjdgF2yEAM9cS3vhovHDmXl8PjCxdv0tRg/cjnILj+6K+SV5uKsbVbgS41JGUQMnhgcbG79Y1FJ2GHd5EC/ux+BW+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RCW/ll0B; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1006)
-	id 7467B20B7166; Sat, 30 May 2026 12:51:02 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7467B20B7166
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1780170662;
-	bh=JkHx7HIOT5Sgk20mbVQQS0xnT+myYBlGKwo31XmYPlc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=RCW/ll0BiGD+uT8IL67or+EI+qFMSMn+TGAM3iYd/l7xS+pAyeqxIqff4uPC0JI0O
-	 /FYmv/FE9oWdGSHD4YKXyeVl3gItMbNiEJ6854cC1w6MC1Iw6tgzkAzLUeh7P5FmQC
-	 hr6hzTTDURSKQuhhLgEAIi1NThyPW2YZBFAkb13s=
-From: Haiyang Zhang <haiyangz@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Aditya Garg <gargaditya@linux.microsoft.com>,
-	Kees Cook <kees@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: paulros@microsoft.com
-Subject: [PATCH net-next] net: mana: Add Interrupt Moderation support
-Date: Sat, 30 May 2026 12:49:40 -0700
-Message-ID: <20260530194957.1690459-1-haiyangz@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1780171207; c=relaxed/simple;
+	bh=ih6ierHD4J01w6rWekYs03uF+/EzVm8E1lmhyZORjX4=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=LyEIU0IXmoa/ZyQxwup3Tjqv7wo5wIIDWtoMGlc2Md9fsFmpbVjcHvcWTVzuh9Vxk0FhRYu8YpbExkIq0UB8njwDBZimclvqGmtDFuIOv8c0pqqL5aZSZH698LyQRwzgcgtUQfKLVwPK6JKLQ7vrqw/Q7a1Y5Ad+fhiaLKxNbUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7e64c83e5c1so5713615a34.2
+        for <netdev@vger.kernel.org>; Sat, 30 May 2026 13:00:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780171205; x=1780776005;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yNnlFM/qR87wC/3rt3jXBRtE6MLOQkhm9JQGvCo87VA=;
+        b=HjFUXznNipwIkdzMGltWGQfZW0G1HijH40EtbgDO77zQH1mmPws9HWv/LJslIhwFuC
+         8fOdma8BeRULqzmzInrOk1LDzb9hju6qo76yNw6AciU49MmPRPEaicy9bSMdgA3xCgKW
+         LHrIaV/BM3sbHcn2T+nsu+mrheuFMtmJV5OGdsnEeM4zxf4YsQ1kfy+kbPVFDdQFB1Z8
+         TlFCGEmTV1GW/Csl4W8psmB2o9wbCURfd+5PpRsXPiRZzGzXkQ8g2tAqJL0AIFHe4uPz
+         C1Qs/+fkdo8UtYoLTYX2Q2ya4dZUHmC/Ov+i+4cdx63z2p1lh9trfW/iw/63FDS1zdQG
+         2xzQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8LqNnfDvvAQJOEVFUhHcsOttMYqeudXbqzv34l50rtTyoRk7hD0/0Tp84SVzJCvmr8fAkN/Cw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrzCCQyP/iJF81hgCnQEpg7d0CXRW2iwiYSis2CKWrIe+yghJD
+	nBVxaSJU1hLDqhBs4PqcikubQjquVoXC8SO/HPE5aW0XCQgx3HmBuDazHXPoz4Xv66BoEGc5H3u
+	czq924xQBJoFEkea7+kEflQY9mx2ZZr2Nq7WRZR+IWsHLT7m/9rnUBN8r+mc=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Received: by 2002:a05:6820:4b03:b0:69d:f0e8:3226 with SMTP id
+ 006d021491bc7-69e101a7414mr1977112eaf.10.1780171204972; Sat, 30 May 2026
+ 13:00:04 -0700 (PDT)
+Date: Sat, 30 May 2026 13:00:04 -0700
+In-Reply-To: <20260530115511.1352487-1-jhs@mojatatu.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a1b41c4.323e8352.141b09.0003.GAE@google.com>
+Subject: [syzbot ci] Re: net/sched: act_api: use RCU with deferred freeing for
+ action lifecycle
+From: syzbot ci <syzbot+ci159f8dfc2e750c24@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, kylebot@openai.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	security@kernel.org, victor@mojatatu.com, vladbu@nvidia.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-293361-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,googlegroups.com:email,appspotmail.com:email,googlesource.com:url];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haiyangz@linux.microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.973];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:mid,linux.microsoft.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 50333613189
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.993];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293362-lists,netdev=lfdr.de,ci159f8dfc2e750c24];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: CED7B613271
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Haiyang Zhang <haiyangz@microsoft.com>
+syzbot ci has tested the following series
 
-Add Static and Dynamic Interrupt Moderation (DIM) support for
-Rx and Tx.
-Update queue creation procedure with new data struct with the related
-settings.
-Add functions to collect stat for DIM, and workers to update DIM data
-and settings.
-Update ethtool handler to get/set the moderation settings from a user.
-By default, adaptive-rx/tx (DIM) are enabled.
+[v1] net/sched: act_api: use RCU with deferred freeing for action lifecycle
+https://lore.kernel.org/all/20260530115511.1352487-1-jhs@mojatatu.com
+* [PATCH net 1/1] net/sched: act_api: use RCU with deferred freeing for action lifecycle
 
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+and found the following issues:
+* BUG: sleeping function called from invalid context in __tcf_chain_put
+* inconsistent lock state in tcf_mirred_release
+
+Full report is available here:
+https://ci.syzbot.org/series/526aa788-9a02-4038-b101-5daf4d3436a2
+
+***
+
+BUG: sleeping function called from invalid context in __tcf_chain_put
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      78ef59e7a6459b16f8102e0ee1c718443323d1af
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/46884a04-6831-455e-8868-d463d6e018db/config
+syz repro: https://ci.syzbot.org/findings/3fb6310c-78f8-44da-bd19-4acd582420fa/syz_repro
+
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:623
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 23, name: ksoftirqd/1
+preempt_count: 100, expected: 0
+RCU nest depth: 0, expected: 0
+1 lock held by ksoftirqd/1/23:
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2611 [inline]
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_core+0x751/0x1070 kernel/rcu/tree.c:2869
+Preemption disabled at:
+[<ffffffff8187d090>] softirq_handle_begin kernel/softirq.c:463 [inline]
+[<ffffffff8187d090>] handle_softirqs+0xb0/0x840 kernel/softirq.c:598
+CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ __might_resched+0x378/0x4d0 kernel/sched/core.c:9163
+ __mutex_lock_common kernel/locking/mutex.c:623 [inline]
+ __mutex_lock+0x11c/0x1550 kernel/locking/mutex.c:820
+ __tcf_chain_put+0x60/0x820 net/sched/cls_api.c:694
+ free_tcf net/sched/act_api.c:130 [inline]
+ tcf_action_cleanup net/sched/act_api.c:370 [inline]
+ tcf_action_rcu_free+0x39d/0x440 net/sched/act_api.c:378
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+=============================
+[ BUG: Invalid wait context ]
+syzkaller #0 Tainted: G        W          
+-----------------------------
+ksoftirqd/1/23 is trying to lock:
+ffff888171e3b0b0 (&block->lock){+.+.}-{4:4}, at: __tcf_chain_put+0x60/0x820 net/sched/cls_api.c:694
+other info that might help us debug this:
+context-{3:3}
+1 lock held by ksoftirqd/1/23:
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2611 [inline]
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_core+0x751/0x1070 kernel/rcu/tree.c:2869
+stack backtrace:
+CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4830 [inline]
+ check_wait_context kernel/locking/lockdep.c:4902 [inline]
+ __lock_acquire+0xec1/0x2cf0 kernel/locking/lockdep.c:5187
+ lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x1a3/0x1550 kernel/locking/mutex.c:820
+ __tcf_chain_put+0x60/0x820 net/sched/cls_api.c:694
+ free_tcf net/sched/act_api.c:130 [inline]
+ tcf_action_cleanup net/sched/act_api.c:370 [inline]
+ tcf_action_rcu_free+0x39d/0x440 net/sched/act_api.c:378
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:623
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/1
+preempt_count: 101, expected: 0
+RCU nest depth: 0, expected: 0
+INFO: lockdep is turned off.
+Preemption disabled at:
+[<0000000000000000>] 0x0
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ __might_resched+0x378/0x4d0 kernel/sched/core.c:9163
+ __mutex_lock_common kernel/locking/mutex.c:623 [inline]
+ __mutex_lock+0x11c/0x1550 kernel/locking/mutex.c:820
+ __tcf_chain_put+0x60/0x820 net/sched/cls_api.c:694
+ free_tcf net/sched/act_api.c:130 [inline]
+ tcf_action_cleanup net/sched/act_api.c:370 [inline]
+ tcf_action_rcu_free+0x39d/0x440 net/sched/act_api.c:378
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x220 kernel/softirq.c:735
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1061
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:63
+Code: 2b 7d 02 c3 cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d 03 c2 1f 00 fb f4 <e9> 7c f7 02 00 cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90
+RSP: 0018:ffffc90000197e20 EFLAGS: 00000246
+RAX: ffff8882a9286000 RBX: ffffffff819a857a RCX: 0000000080000001
+RDX: 0000000000000001 RSI: ffffffff8c28b7c0 RDI: ffffffff819a857a
+RBP: ffffc90000197f10 R08: ffff88823c6339db R09: 1ffff110478c673b
+R10: dffffc0000000000 R11: ffffed10478c673c R12: 0000000000000001
+R13: 1ffff1102c09e000 R14: 0000000000000001 R15: 1ffff1102c09e000
+ arch_safe_halt arch/x86/kernel/process.c:766 [inline]
+ default_idle+0x9/0x20 arch/x86/kernel/process.c:767
+ default_idle_call+0x72/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:199 [inline]
+ do_idle+0x36a/0x5f0 kernel/sched/idle.c:352
+ cpu_startup_entry+0x43/0x60 kernel/sched/idle.c:451
+ start_secondary+0x101/0x110 arch/x86/kernel/smpboot.c:312
+ common_startup_64+0x13e/0x147
+ </TASK>
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:623
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 5742, name: syz-executor
+preempt_count: 100, expected: 0
+RCU nest depth: 0, expected: 0
+INFO: lockdep is turned off.
+Preemption disabled at:
+[<ffffffff8187d090>] softirq_handle_begin kernel/softirq.c:463 [inline]
+[<ffffffff8187d090>] handle_softirqs+0xb0/0x840 kernel/softirq.c:598
+CPU: 1 UID: 0 PID: 5742 Comm: syz-executor Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ __might_resched+0x378/0x4d0 kernel/sched/core.c:9163
+ __mutex_lock_common kernel/locking/mutex.c:623 [inline]
+ __mutex_lock+0x11c/0x1550 kernel/locking/mutex.c:820
+ __tcf_chain_put+0x60/0x820 net/sched/cls_api.c:694
+ free_tcf net/sched/act_api.c:130 [inline]
+ tcf_action_cleanup net/sched/act_api.c:370 [inline]
+ tcf_action_rcu_free+0x39d/0x440 net/sched/act_api.c:378
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x220 kernel/softirq.c:735
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1061
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:qlink_to_object mm/kasan/quarantine.c:140 [inline]
+RIP: 0010:qlink_free mm/kasan/quarantine.c:145 [inline]
+RIP: 0010:qlist_free_all+0x6f/0x100 mm/kasan/quarantine.c:179
+Code: 49 8b 44 04 08 89 c2 83 e2 01 48 ff ca 48 09 c2 48 21 ca 0f b6 42 33 c1 e0 18 3d 00 00 00 f5 49 0f 45 d5 4c 8b 62 08 49 8b 2f <49> 63 84 24 b8 00 00 00 49 29 c7 4c 89 e7 4c 89 fe e8 4b e4 ff ff
+RSP: 0018:ffffc90003e9f440 EFLAGS: 00000246
+RAX: 00000000f5000000 RBX: ffffc90003e9f478 RCX: ffffea0005c84b40
+RDX: ffffea0005c84b40 RSI: ffffea00044f5600 RDI: ffff88817212d150
+RBP: ffff88817263e598 R08: 0000000000000000 R09: ffffffff82310b6e
+R10: dffffc0000000000 R11: fffffbfff2061c3f R12: ffff888160417b40
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88817212d150
+ kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:350
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4570 [inline]
+ slab_alloc_node mm/slub.c:4899 [inline]
+ __do_kmalloc_node mm/slub.c:5295 [inline]
+ __kmalloc_node_noprof+0x498/0x7c0 mm/slub.c:5302
+ kmalloc_node_noprof include/linux/slab.h:1081 [inline]
+ __vmalloc_area_node mm/vmalloc.c:3857 [inline]
+ __vmalloc_node_range_noprof+0x5ef/0x1750 mm/vmalloc.c:4064
+ __vmalloc_node_noprof mm/vmalloc.c:4124 [inline]
+ vzalloc_noprof+0xb2/0xe0 mm/vmalloc.c:4202
+ alloc_counters+0x64/0x5d0 net/ipv4/netfilter/ip_tables.c:799
+ copy_entries_to_user net/ipv4/netfilter/ip_tables.c:821 [inline]
+ get_entries net/ipv4/netfilter/ip_tables.c:1022 [inline]
+ do_ipt_get_ctl+0xada/0x1240 net/ipv4/netfilter/ip_tables.c:1668
+ nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
+ ip_getsockopt+0x19e/0x230 net/ipv4/ip_sockglue.c:1777
+ do_sock_getsockopt+0x51d/0x7e0 net/socket.c:2487
+ __sys_getsockopt net/socket.c:2518 [inline]
+ __do_sys_getsockopt net/socket.c:2525 [inline]
+ __se_sys_getsockopt net/socket.c:2522 [inline]
+ __x64_sys_getsockopt+0x1a4/0x240 net/socket.c:2522
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f326419e62a
+Code: 48 83 ec 10 89 d2 48 63 ff 45 31 c9 6a 2a 45 31 c0 31 c9 e8 d8 99 fb ff 48 83 c4 18 c3 0f 1f 00 49 89 ca b8 37 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 06 c3 0f 1f 44 00 00 48 c7 c2 e8 ff ff ff f7
+RSP: 002b:00007ffd38f686c8 EFLAGS: 00000216 ORIG_RAX: 0000000000000037
+RAX: ffffffffffffffda RBX: 00007ffd38f68750 RCX: 00007f326419e62a
+RDX: 0000000000000041 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 0000000000000003 R08: 00007ffd38f686ec R09: ff78736871746264
+R10: 00007ffd38f68750 R11: 0000000000000216 R12: 00007f32643ecac0
+R13: 00007ffd38f686ec R14: 0000000000000000 R15: 00007f32643ed180
+ </TASK>
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:623
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 23, name: ksoftirqd/1
+preempt_count: 100, expected: 0
+RCU nest depth: 0, expected: 0
+INFO: lockdep is turned off.
+Preemption disabled at:
+[<ffffffff8187d090>] softirq_handle_begin kernel/softirq.c:463 [inline]
+[<ffffffff8187d090>] handle_softirqs+0xb0/0x840 kernel/softirq.c:598
+CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ __might_resched+0x378/0x4d0 kernel/sched/core.c:9163
+ __mutex_lock_common kernel/locking/mutex.c:623 [inline]
+ __mutex_lock+0x11c/0x1550 kernel/locking/mutex.c:820
+ __tcf_chain_put+0x60/0x820 net/sched/cls_api.c:694
+ free_tcf net/sched/act_api.c:130 [inline]
+ tcf_action_cleanup net/sched/act_api.c:370 [inline]
+ tcf_action_rcu_free+0x39d/0x440 net/sched/act_api.c:378
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	2b 7d 02             	sub    0x2(%rbp),%edi
+   3:	c3                   	ret
+   4:	cc                   	int3
+   5:	cc                   	int3
+   6:	cc                   	int3
+   7:	cc                   	int3
+   8:	cc                   	int3
+   9:	cc                   	int3
+   a:	cc                   	int3
+   b:	90                   	nop
+   c:	90                   	nop
+   d:	90                   	nop
+   e:	90                   	nop
+   f:	90                   	nop
+  10:	90                   	nop
+  11:	90                   	nop
+  12:	90                   	nop
+  13:	90                   	nop
+  14:	90                   	nop
+  15:	90                   	nop
+  16:	90                   	nop
+  17:	90                   	nop
+  18:	90                   	nop
+  19:	90                   	nop
+  1a:	90                   	nop
+  1b:	f3 0f 1e fa          	endbr64
+  1f:	eb 07                	jmp    0x28
+  21:	0f 00 2d 03 c2 1f 00 	verw   0x1fc203(%rip)        # 0x1fc22b
+  28:	fb                   	sti
+  29:	f4                   	hlt
+* 2a:	e9 7c f7 02 00       	jmp    0x2f7ab <-- trapping instruction
+  2f:	cc                   	int3
+  30:	cc                   	int3
+  31:	cc                   	int3
+  32:	cc                   	int3
+  33:	cc                   	int3
+  34:	cc                   	int3
+  35:	cc                   	int3
+  36:	cc                   	int3
+  37:	cc                   	int3
+  38:	cc                   	int3
+  39:	cc                   	int3
+  3a:	cc                   	int3
+  3b:	90                   	nop
+  3c:	90                   	nop
+  3d:	90                   	nop
+  3e:	90                   	nop
+  3f:	90                   	nop
+
+
+***
+
+inconsistent lock state in tcf_mirred_release
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      78ef59e7a6459b16f8102e0ee1c718443323d1af
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/46884a04-6831-455e-8868-d463d6e018db/config
+syz repro: https://ci.syzbot.org/findings/339567f1-aefa-440b-b74d-8584664a549d/syz_repro
+
+================================
+WARNING: inconsistent lock state
+syzkaller #0 Not tainted
+--------------------------------
+inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+ksoftirqd/1/23 [HC0[0]:SC1[1]:HE1:SE0] takes:
+ffffffff8fe24698 (mirred_list_lock){+.?.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+ffffffff8fe24698 (mirred_list_lock){+.?.}-{3:3}, at: tcf_mirred_release+0x2c/0x1c0 net/sched/act_mirred.c:78
+{SOFTIRQ-ON-W} state was registered at:
+  lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+  __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
+  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
+  spin_lock include/linux/spinlock.h:342 [inline]
+  mirred_device_event+0x80/0x2c0 net/sched/act_mirred.c:561
+  notifier_call_chain+0x1ad/0x3d0 kernel/notifier.c:85
+  call_netdevice_notifiers_extack net/core/dev.c:2287 [inline]
+  call_netdevice_notifiers net/core/dev.c:2301 [inline]
+  unregister_netdevice_many_notify+0x17a5/0x22c0 net/core/dev.c:12421
+  ops_exit_rtnl_list net/core/net_namespace.c:187 [inline]
+  ops_undo_list+0x3d3/0x940 net/core/net_namespace.c:248
+  cleanup_net+0x56b/0x800 net/core/net_namespace.c:702
+  process_one_work kernel/workqueue.c:3314 [inline]
+  process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+  worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+  kthread+0x389/0x470 kernel/kthread.c:436
+  ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+irq event stamp: 953728
+hardirqs last  enabled at (953728): [<ffffffff8bac5040>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:178 [inline]
+hardirqs last  enabled at (953728): [<ffffffff8bac5040>] _raw_spin_unlock_irqrestore+0x30/0x80 kernel/locking/spinlock.c:198
+hardirqs last disabled at (953727): [<ffffffff8bac4e9a>] __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:130 [inline]
+hardirqs last disabled at (953727): [<ffffffff8bac4e9a>] _raw_spin_lock_irqsave+0x1a/0x60 kernel/locking/spinlock.c:166
+softirqs last  enabled at (953336): [<ffffffff8187fb46>] run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+softirqs last disabled at (953341): [<ffffffff8187fb46>] run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(mirred_list_lock);
+  <Interrupt>
+    lock(mirred_list_lock);
+
+ *** DEADLOCK ***
+
+1 lock held by ksoftirqd/1/23:
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2611 [inline]
+ #0: ffffffff8e95ce00 (rcu_callback){....}-{0:0}, at: rcu_core+0x751/0x1070 kernel/rcu/tree.c:2869
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_usage_bug+0x28b/0x2e0 kernel/locking/lockdep.c:4042
+ valid_state kernel/locking/lockdep.c:4056 [inline]
+ mark_lock_irq+0x410/0x420 kernel/locking/lockdep.c:-1
+ mark_lock+0x115/0x190 kernel/locking/lockdep.c:4753
+ mark_usage kernel/locking/lockdep.c:-1 [inline]
+ __lock_acquire+0x689/0x2cf0 kernel/locking/lockdep.c:5191
+ lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+ __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
+ spin_lock include/linux/spinlock.h:342 [inline]
+ tcf_mirred_release+0x2c/0x1c0 net/sched/act_mirred.c:78
+ tcf_action_cleanup net/sched/act_api.c:367 [inline]
+ tcf_action_rcu_free+0x2bd/0x440 net/sched/act_api.c:378
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
- drivers/net/ethernet/microsoft/Kconfig        |   1 +
- .../net/ethernet/microsoft/mana/gdma_main.c   |  27 ++++
- drivers/net/ethernet/microsoft/mana/mana_en.c | 101 ++++++++++++++-
- .../ethernet/microsoft/mana/mana_ethtool.c    | 120 +++++++++++++++++-
- include/net/mana/gdma.h                       |  24 +++-
- include/net/mana/mana.h                       |  42 ++++++
- 6 files changed, 309 insertions(+), 6 deletions(-)
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/microsoft/Kconfig b/drivers/net/ethernet/microsoft/Kconfig
-index 3f36ee6a8ece..e9be18c92ca5 100644
---- a/drivers/net/ethernet/microsoft/Kconfig
-+++ b/drivers/net/ethernet/microsoft/Kconfig
-@@ -21,6 +21,7 @@ config MICROSOFT_MANA
- 	depends on X86_64 || (ARM64 && !CPU_BIG_ENDIAN)
- 	depends on PCI_HYPERV
- 	select AUXILIARY_BUS
-+	select DIMLIB
- 	select PAGE_POOL
- 	select NET_SHAPER
- 	help
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 712a0881d720..5aa0ea794a00 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -405,6 +405,7 @@ static int mana_gd_disable_queue(struct gdma_queue *queue)
- #define DOORBELL_OFFSET_RQ	0x400
- #define DOORBELL_OFFSET_CQ	0x800
- #define DOORBELL_OFFSET_EQ	0xFF8
-+#define DOORBELL_OFFSET_DIM	0x820
- 
- static void mana_gd_ring_doorbell(struct gdma_context *gc, u32 db_index,
- 				  enum gdma_queue_type q_type, u32 qid,
-@@ -445,6 +446,16 @@ static void mana_gd_ring_doorbell(struct gdma_context *gc, u32 db_index,
- 		addr += DOORBELL_OFFSET_SQ;
- 		break;
- 
-+	case GDMA_DIM:
-+		e.dim.id = qid;
-+		e.dim.mod_usec = tail_ptr;
-+		e.dim.mod_usec_vld = tail_ptr >> 15;
-+		e.dim.mod_comps = tail_ptr >> 16;
-+		e.dim.mod_comps_vld = num_req;
-+
-+		addr += DOORBELL_OFFSET_DIM;
-+		break;
-+
- 	default:
- 		WARN_ON(1);
- 		return;
-@@ -479,6 +490,22 @@ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
- }
- EXPORT_SYMBOL_NS(mana_gd_ring_cq, "NET_MANA");
- 
-+void mana_gd_ring_dim(struct gdma_queue *cq, u32 mod_usec, bool mod_usec_vld,
-+		      u32 mod_comps, bool mod_comps_vld)
-+{
-+	struct gdma_context *gc = cq->gdma_dev->gdma_context;
-+	u32 dim_val;
-+
-+	/* Convert the DIM values to doorbell parameters */
-+	dim_val = (mod_usec & MANA_INTR_MODR_USEC_MAX) |
-+		  (((u32)mod_usec_vld & 1) << 15) |
-+		  ((mod_comps & MANA_INTR_MODR_COMP_MAX) << 16);
-+
-+	mana_gd_ring_doorbell(gc, cq->gdma_dev->doorbell, GDMA_DIM, cq->id,
-+			      dim_val, (u8)mod_comps_vld & 1);
-+}
-+EXPORT_SYMBOL_NS(mana_gd_ring_dim, "NET_MANA");
-+
- #define MANA_SERVICE_PERIOD 10
- 
- static void mana_serv_rescan(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 82f1461a48e9..f1a16f8aca66 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1551,6 +1551,9 @@ int mana_create_wq_obj(struct mana_port_context *apc,
- 
- 	mana_gd_init_req_hdr(&req.hdr, MANA_CREATE_WQ_OBJ,
- 			     sizeof(req), sizeof(resp));
-+
-+	req.hdr.req.msg_version = GDMA_MESSAGE_V3;
-+	req.hdr.resp.msg_version = GDMA_MESSAGE_V2;
- 	req.vport = vport;
- 	req.wq_type = wq_type;
- 	req.wq_gdma_region = wq_spec->gdma_region;
-@@ -1559,6 +1562,9 @@ int mana_create_wq_obj(struct mana_port_context *apc,
- 	req.cq_size = cq_spec->queue_size;
- 	req.cq_moderation_ctx_id = cq_spec->modr_ctx_id;
- 	req.cq_parent_qid = cq_spec->attached_eq;
-+	req.req_cq_moderation = cq_spec->req_cq_moderation;
-+	req.cq_moderation_comp = cq_spec->cq_moderation_comp;
-+	req.cq_moderation_usec = cq_spec->cq_moderation_usec;
- 
- 	err = mana_send_request(apc->ac, &req, sizeof(req), &resp,
- 				sizeof(resp));
-@@ -2253,6 +2259,66 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
- 		xdp_do_flush();
- }
- 
-+static void mana_rx_dim_work(struct work_struct *work)
-+{
-+	struct dim *dim = container_of(work, struct dim, work);
-+	struct mana_cq *cq = container_of(dim, struct mana_cq, dim);
-+	struct dim_cq_moder cur_moder =
-+		net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-+
-+	cur_moder.usec = min_t(u16, cur_moder.usec, MANA_INTR_MODR_USEC_MAX);
-+	cur_moder.pkts = min_t(u16, cur_moder.pkts, MANA_INTR_MODR_COMP_MAX);
-+
-+	mana_gd_ring_dim(cq->gdma_cq, cur_moder.usec, true,
-+			 cur_moder.pkts, true);
-+
-+	dim->state = DIM_START_MEASURE;
-+}
-+
-+static void mana_tx_dim_work(struct work_struct *work)
-+{
-+	struct dim *dim = container_of(work, struct dim, work);
-+	struct mana_cq *cq = container_of(dim, struct mana_cq, dim);
-+	struct dim_cq_moder cur_moder =
-+		net_dim_get_tx_moderation(dim->mode, dim->profile_ix);
-+
-+	cur_moder.usec = min_t(u16, cur_moder.usec, MANA_INTR_MODR_USEC_MAX);
-+	cur_moder.pkts = min_t(u16, cur_moder.pkts, MANA_INTR_MODR_COMP_MAX);
-+
-+	mana_gd_ring_dim(cq->gdma_cq, cur_moder.usec, true,
-+			 cur_moder.pkts, true);
-+
-+	dim->state = DIM_START_MEASURE;
-+}
-+
-+static void mana_update_rx_dim(struct mana_cq *cq)
-+{
-+	struct mana_rxq *rxq = cq->rxq;
-+	struct mana_port_context *apc = netdev_priv(rxq->ndev);
-+	struct dim_sample dim_sample = {};
-+
-+	if (!apc->rx_dim_enabled)
-+		return;
-+
-+	dim_update_sample(READ_ONCE(cq->dim_event_ctr), rxq->stats.packets,
-+			  rxq->stats.bytes, &dim_sample);
-+	net_dim(&cq->dim, &dim_sample);
-+}
-+
-+static void mana_update_tx_dim(struct mana_cq *cq)
-+{
-+	struct mana_txq *txq = cq->txq;
-+	struct mana_port_context *apc = netdev_priv(txq->ndev);
-+	struct dim_sample dim_sample = {};
-+
-+	if (!apc->tx_dim_enabled)
-+		return;
-+
-+	dim_update_sample(READ_ONCE(cq->dim_event_ctr), txq->stats.packets,
-+			  txq->stats.bytes, &dim_sample);
-+	net_dim(&cq->dim, &dim_sample);
-+}
-+
- static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
- {
- 	struct mana_cq *cq = context;
-@@ -2271,7 +2337,13 @@ static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
- 	if (w < cq->budget) {
- 		mana_gd_ring_cq(gdma_queue, SET_ARM_BIT);
- 		cq->work_done_since_doorbell = 0;
--		napi_complete_done(&cq->napi, w);
-+
-+		if (napi_complete_done(&cq->napi, w)) {
-+			if (cq->type == MANA_CQ_TYPE_RX)
-+				mana_update_rx_dim(cq);
-+			else
-+				mana_update_tx_dim(cq);
-+		}
- 	} else if (cq->work_done_since_doorbell >=
- 		   (cq->gdma_cq->queue_size / COMP_ENTRY_SIZE) * 4) {
- 		/* MANA hardware requires at least one doorbell ring every 8
-@@ -2303,6 +2375,7 @@ static void mana_schedule_napi(void *context, struct gdma_queue *gdma_queue)
- {
- 	struct mana_cq *cq = context;
- 
-+	WRITE_ONCE(cq->dim_event_ctr, cq->dim_event_ctr + 1);
- 	napi_schedule_irqoff(&cq->napi);
- }
- 
-@@ -2345,6 +2418,7 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 		if (apc->tx_qp[i]->txq.napi_initialized) {
- 			napi_synchronize(napi);
- 			napi_disable_locked(napi);
-+			cancel_work_sync(&apc->tx_qp[i]->tx_cq.dim.work);
- 			netif_napi_del_locked(napi);
- 			apc->tx_qp[i]->txq.napi_initialized = false;
- 		}
-@@ -2475,6 +2549,10 @@ static int mana_create_txq(struct mana_port_context *apc,
- 		cq_spec.queue_size = cq->gdma_cq->queue_size;
- 		cq_spec.modr_ctx_id = 0;
- 		cq_spec.attached_eq = cq->gdma_cq->cq.parent->id;
-+		cq_spec.req_cq_moderation = apc->tx_dim_enabled ||
-+			(apc->intr_modr_tx_usec && apc->intr_modr_tx_comp);
-+		cq_spec.cq_moderation_usec = apc->intr_modr_tx_usec;
-+		cq_spec.cq_moderation_comp = apc->intr_modr_tx_comp;
- 
- 		err = mana_create_wq_obj(apc, apc->port_handle, GDMA_SQ,
- 					 &wq_spec, &cq_spec,
-@@ -2509,6 +2587,9 @@ static int mana_create_txq(struct mana_port_context *apc,
- 		napi_enable_locked(&cq->napi);
- 		txq->napi_initialized = true;
- 
-+		INIT_WORK(&cq->dim.work, mana_tx_dim_work);
-+		cq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+
- 		mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
- 	}
- 
-@@ -2543,6 +2624,7 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
- 		napi_synchronize(napi);
- 
- 		napi_disable_locked(napi);
-+		cancel_work_sync(&rxq->rx_cq.dim.work);
- 		netif_napi_del_locked(napi);
- 	}
- 
-@@ -2780,6 +2862,10 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
- 	cq_spec.queue_size = cq->gdma_cq->queue_size;
- 	cq_spec.modr_ctx_id = 0;
- 	cq_spec.attached_eq = cq->gdma_cq->cq.parent->id;
-+	cq_spec.req_cq_moderation = apc->rx_dim_enabled ||
-+		(apc->intr_modr_rx_usec && apc->intr_modr_rx_comp);
-+	cq_spec.cq_moderation_usec = apc->intr_modr_rx_usec;
-+	cq_spec.cq_moderation_comp = apc->intr_modr_rx_comp;
- 
- 	err = mana_create_wq_obj(apc, apc->port_handle, GDMA_RQ,
- 				 &wq_spec, &cq_spec, &rxq->rxobj);
-@@ -2815,6 +2901,9 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
- 
- 	napi_enable_locked(&cq->napi);
- 
-+	INIT_WORK(&cq->dim.work, mana_rx_dim_work);
-+	cq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+
- 	mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
- out:
- 	if (!err)
-@@ -3432,6 +3521,16 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	apc->port_idx = port_idx;
- 	apc->cqe_coalescing_enable = 0;
- 
-+	/* Initialize interrupt moderation settings if supported by HW */
-+	if (gc->pf_cap_flags1 & GDMA_PF_CAP_FLAG_1_DYN_INTERRUPT_MODERATION) {
-+		apc->intr_modr_rx_usec = MANA_INTR_MODR_USEC_DEF;
-+		apc->intr_modr_rx_comp = MANA_INTR_MODR_COMP_DEF;
-+		apc->intr_modr_tx_usec = MANA_INTR_MODR_USEC_DEF;
-+		apc->intr_modr_tx_comp = MANA_INTR_MODR_COMP_DEF;
-+		apc->rx_dim_enabled = MANA_ADAPTIVE_RX_DEF;
-+		apc->tx_dim_enabled = MANA_ADAPTIVE_TX_DEF;
-+	}
-+
- 	mutex_init(&apc->vport_mutex);
- 	apc->vport_use_count = 0;
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index 04350973e19e..a90216eba794 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -419,6 +419,15 @@ static int mana_get_coalesce(struct net_device *ndev,
- 	    !kernel_coal->rx_cqe_nsecs)
- 		kernel_coal->rx_cqe_nsecs = MANA_RX_CQE_NSEC_DEF;
- 
-+	ec->rx_coalesce_usecs = apc->intr_modr_rx_usec;
-+	ec->rx_max_coalesced_frames = apc->intr_modr_rx_comp;
-+
-+	ec->tx_coalesce_usecs = apc->intr_modr_tx_usec;
-+	ec->tx_max_coalesced_frames = apc->intr_modr_tx_comp;
-+
-+	ec->use_adaptive_rx_coalesce = apc->rx_dim_enabled;
-+	ec->use_adaptive_tx_coalesce = apc->tx_dim_enabled;
-+
- 	return 0;
- }
- 
-@@ -429,8 +438,28 @@ static int mana_set_coalesce(struct net_device *ndev,
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	u8 saved_cqe_coalescing_enable;
-+	u16 old_rx_usec, old_rx_comp;
-+	u16 old_tx_usec, old_tx_comp;
-+	bool old_rx_dim, old_tx_dim;
-+	bool modr_changed = false;
-+	bool dim_changed = false;
-+	struct gdma_context *gc;
- 	int err;
- 
-+	gc = apc->ac->gdma_dev->gdma_context;
-+
-+	/* Both static and dynamic interrupt moderation (DIM) rely on the
-+	 * same HW capability advertised by the PF.
-+	 */
-+	if ((ec->use_adaptive_rx_coalesce || ec->use_adaptive_tx_coalesce ||
-+	     ec->rx_coalesce_usecs || ec->tx_coalesce_usecs ||
-+	     ec->rx_max_coalesced_frames || ec->tx_max_coalesced_frames) &&
-+	    !(gc->pf_cap_flags1 & GDMA_PF_CAP_FLAG_1_DYN_INTERRUPT_MODERATION)) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Interrupt Moderation is not supported by HW");
-+		return -EOPNOTSUPP;
-+	}
-+
- 	if (kernel_coal->rx_cqe_frames != 1 &&
- 	    kernel_coal->rx_cqe_frames != MANA_RXCOMP_OOB_NUM_PPI) {
- 		NL_SET_ERR_MSG_FMT(extack,
-@@ -440,6 +469,47 @@ static int mana_set_coalesce(struct net_device *ndev,
- 		return -EINVAL;
- 	}
- 
-+	if (ec->rx_coalesce_usecs > MANA_INTR_MODR_USEC_MAX ||
-+	    ec->tx_coalesce_usecs > MANA_INTR_MODR_USEC_MAX) {
-+		NL_SET_ERR_MSG_FMT(extack,
-+				   "coalesce usecs must be <= %u",
-+				   MANA_INTR_MODR_USEC_MAX);
-+		return -EINVAL;
-+	}
-+
-+	if (ec->rx_max_coalesced_frames > MANA_INTR_MODR_COMP_MAX ||
-+	    ec->tx_max_coalesced_frames > MANA_INTR_MODR_COMP_MAX) {
-+		NL_SET_ERR_MSG_FMT(extack,
-+				   "coalesce frames must be <= %u",
-+				   MANA_INTR_MODR_COMP_MAX);
-+		return -EINVAL;
-+	}
-+
-+	if (ec->rx_coalesce_usecs != apc->intr_modr_rx_usec ||
-+	    ec->rx_max_coalesced_frames != apc->intr_modr_rx_comp ||
-+	    ec->tx_coalesce_usecs != apc->intr_modr_tx_usec ||
-+	    ec->tx_max_coalesced_frames != apc->intr_modr_tx_comp)
-+		modr_changed = true;
-+
-+	old_rx_usec = apc->intr_modr_rx_usec;
-+	old_rx_comp = apc->intr_modr_rx_comp;
-+	old_tx_usec = apc->intr_modr_tx_usec;
-+	old_tx_comp = apc->intr_modr_tx_comp;
-+
-+	apc->intr_modr_rx_usec = ec->rx_coalesce_usecs;
-+	apc->intr_modr_rx_comp = ec->rx_max_coalesced_frames;
-+	apc->intr_modr_tx_usec = ec->tx_coalesce_usecs;
-+	apc->intr_modr_tx_comp = ec->tx_max_coalesced_frames;
-+
-+	if (!!ec->use_adaptive_rx_coalesce != apc->rx_dim_enabled ||
-+	    !!ec->use_adaptive_tx_coalesce != apc->tx_dim_enabled)
-+		dim_changed = true;
-+
-+	old_rx_dim = apc->rx_dim_enabled;
-+	old_tx_dim = apc->tx_dim_enabled;
-+	apc->rx_dim_enabled = !!ec->use_adaptive_rx_coalesce;
-+	apc->tx_dim_enabled = !!ec->use_adaptive_tx_coalesce;
-+
- 	saved_cqe_coalescing_enable = apc->cqe_coalescing_enable;
- 	apc->cqe_coalescing_enable =
- 		kernel_coal->rx_cqe_frames == MANA_RXCOMP_OOB_NUM_PPI;
-@@ -447,10 +517,46 @@ static int mana_set_coalesce(struct net_device *ndev,
- 	if (!apc->port_is_up)
- 		return 0;
- 
--	err = mana_config_rss(apc, TRI_STATE_TRUE, false, false);
--	if (err)
--		apc->cqe_coalescing_enable = saved_cqe_coalescing_enable;
-+	if (apc->cqe_coalescing_enable != saved_cqe_coalescing_enable &&
-+	    !modr_changed && !dim_changed) {
-+		/* If only CQE coalescing setting is changed, we can just update
-+		 * RSS configuration.
-+		 */
-+		err = mana_config_rss(apc, TRI_STATE_TRUE, false, false);
-+		if (err) {
-+			netdev_err(ndev, "Change CQE coalescing failed: %d\n",
-+				   err);
-+			apc->cqe_coalescing_enable =
-+				saved_cqe_coalescing_enable;
-+			return err;
-+		}
-+		return 0;
-+	}
-+
-+	if (modr_changed || dim_changed) {
-+		err = mana_detach(ndev, false);
-+		if (err) {
-+			netdev_err(ndev, "mana_detach failed: %d\n", err);
-+			goto restore_modr;
-+		}
-+
-+		err = mana_attach(ndev);
-+		if (err) {
-+			netdev_err(ndev, "mana_attach failed: %d\n", err);
-+			goto restore_modr;
-+		}
-+	}
-+
-+	return 0;
- 
-+restore_modr:
-+	apc->cqe_coalescing_enable = saved_cqe_coalescing_enable;
-+	apc->intr_modr_rx_usec = old_rx_usec;
-+	apc->intr_modr_rx_comp = old_rx_comp;
-+	apc->intr_modr_tx_usec = old_tx_usec;
-+	apc->intr_modr_tx_comp = old_tx_comp;
-+	apc->rx_dim_enabled = old_rx_dim;
-+	apc->tx_dim_enabled = old_tx_dim;
- 	return err;
- }
- 
-@@ -574,7 +680,13 @@ static int mana_get_link_ksettings(struct net_device *ndev,
- }
- 
- const struct ethtool_ops mana_ethtool_ops = {
--	.supported_coalesce_params = ETHTOOL_COALESCE_RX_CQE_FRAMES,
-+	.supported_coalesce_params = ETHTOOL_COALESCE_RX_CQE_FRAMES |
-+				    ETHTOOL_COALESCE_RX_USECS |
-+				    ETHTOOL_COALESCE_RX_MAX_FRAMES |
-+				    ETHTOOL_COALESCE_TX_USECS |
-+				    ETHTOOL_COALESCE_TX_MAX_FRAMES |
-+				    ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
-+				    ETHTOOL_COALESCE_USE_ADAPTIVE_TX,
- 	.get_ethtool_stats	= mana_get_ethtool_stats,
- 	.get_sset_count		= mana_get_sset_count,
- 	.get_strings		= mana_get_strings,
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 70d62bc32837..0a0cc7b080d3 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -47,6 +47,7 @@ enum gdma_queue_type {
- 	GDMA_RQ,
- 	GDMA_CQ,
- 	GDMA_EQ,
-+	GDMA_DIM,
- };
- 
- enum gdma_work_request_flags {
-@@ -126,6 +127,17 @@ union gdma_doorbell_entry {
- 		u64 tail_ptr	: 31;
- 		u64 arm		: 1;
- 	} eq;
-+
-+	struct {
-+		u64 id           : 24;
-+		u64 reserved     : 8;
-+		u64 mod_usec     : 10;
-+		u64 reserve1     : 5;
-+		u64 mod_usec_vld : 1;
-+		u64 mod_comps    : 8;
-+		u64 reserve2     : 7;
-+		u64 mod_comps_vld: 1;
-+	} dim;
- }; /* HW DATA */
- 
- struct gdma_msg_hdr {
-@@ -484,6 +496,9 @@ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit);
- 
- int mana_schedule_serv_work(struct gdma_context *gc, enum gdma_eqe_type type);
- 
-+void mana_gd_ring_dim(struct gdma_queue *cq, u32 mod_usec, bool mod_usec_vld,
-+		      u32 mod_comps, bool mod_comps_vld);
-+
- struct gdma_wqe {
- 	u32 reserved	:24;
- 	u32 last_vbytes	:8;
-@@ -629,6 +644,9 @@ enum {
- /* Driver supports self recovery on Hardware Channel timeouts */
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY BIT(25)
- 
-+/* Driver supports dynamic interrupt moderation - DIM */
-+#define GDMA_DRV_CAP_FLAG_1_DYN_INTERRUPT_MODERATION BIT(27)
-+
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-@@ -643,7 +661,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
- 	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_DYN_INTERRUPT_MODERATION)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-@@ -679,6 +698,9 @@ struct gdma_verify_ver_req {
- 	u8 os_ver_str4[128];
- }; /* HW DATA */
- 
-+/* HW supports dynamic interrupt moderation - DIM */
-+#define GDMA_PF_CAP_FLAG_1_DYN_INTERRUPT_MODERATION BIT(15)
-+
- struct gdma_verify_ver_resp {
- 	struct gdma_resp_hdr hdr;
- 	u64 gdma_protocol_ver;
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index d9c27310fd04..57868a79f23d 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -4,6 +4,7 @@
- #ifndef _MANA_H
- #define _MANA_H
- 
-+#include <linux/dim.h>
- #include <net/xdp.h>
- #include <net/net_shaper.h>
- 
-@@ -64,6 +65,16 @@ enum TRI_STATE {
- /* Maximum number of packets per coalesced CQE */
- #define MANA_RXCOMP_OOB_NUM_PPI 4
- 
-+/* Default/max interrupt moderation settings */
-+#define MANA_INTR_MODR_USEC_DEF 0
-+#define MANA_INTR_MODR_COMP_DEF 0
-+
-+#define MANA_ADAPTIVE_RX_DEF true
-+#define MANA_ADAPTIVE_TX_DEF true
-+
-+#define MANA_INTR_MODR_USEC_MAX 1023
-+#define MANA_INTR_MODR_COMP_MAX 255
-+
- /* Update this count whenever the respective structures are changed */
- #define MANA_STATS_RX_COUNT (6 + MANA_RXCOMP_OOB_NUM_PPI - 1)
- #define MANA_STATS_TX_COUNT 11
-@@ -297,6 +308,10 @@ struct mana_cq {
- 	int work_done;
- 	int work_done_since_doorbell;
- 	int budget;
-+
-+	/* DIM - Dynamic Interrupt Moderation */
-+	struct dim dim;
-+	u16 dim_event_ctr;
- };
- 
- struct mana_recv_buf_oob {
-@@ -562,6 +577,15 @@ struct mana_port_context {
- 	u8 cqe_coalescing_enable;
- 	u32 cqe_coalescing_timeout_ns;
- 
-+	/* Interrupt moderation settings */
-+	u16 intr_modr_rx_usec;
-+	u16 intr_modr_rx_comp;
-+	u16 intr_modr_tx_usec;
-+	u16 intr_modr_tx_comp;
-+
-+	bool rx_dim_enabled;
-+	bool tx_dim_enabled;
-+
- 	struct mana_ethtool_stats eth_stats;
- 
- 	struct mana_ethtool_phy_stats phy_stats;
-@@ -622,6 +646,9 @@ struct mana_obj_spec {
- 	u32 queue_size;
- 	u32 attached_eq;
- 	u32 modr_ctx_id;
-+	u8 req_cq_moderation;
-+	u16 cq_moderation_comp;
-+	u16 cq_moderation_usec;
- };
- 
- enum mana_command_code {
-@@ -753,6 +780,15 @@ struct mana_create_wqobj_req {
- 	u32 cq_size;
- 	u32 cq_moderation_ctx_id;
- 	u32 cq_parent_qid;
-+
-+	/* V2 */
-+	u8 allow_rqwqe_chain;
-+
-+	/* V3 */
-+	u8 req_cq_moderation;
-+	u16 cq_moderation_comp;
-+	u16 cq_moderation_usec;
-+	u8 reserved2[2];
- }; /* HW DATA */
- 
- struct mana_create_wqobj_resp {
-@@ -760,6 +796,12 @@ struct mana_create_wqobj_resp {
- 	u32 wq_id;
- 	u32 cq_id;
- 	mana_handle_t wq_obj;
-+
-+	/* V2 */
-+	u16 cq_moderation_comp;
-+	u16 cq_moderation_usec;
-+	u8 cq_moderation_enabled;
-+	u8 reserved1[3];
- }; /* HW DATA */
- 
- /* Destroy WQ Object */
--- 
-2.34.1
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
 
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
