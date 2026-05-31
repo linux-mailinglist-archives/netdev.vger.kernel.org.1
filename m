@@ -1,178 +1,183 @@
-Return-Path: <netdev+bounces-293470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DlcN7KIHGqQPAkAu9opvQ
-	(envelope-from <netdev+bounces-293470-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 21:14:58 +0200
+	id gB5EO7mPHGpdPQkAu9opvQ
+	(envelope-from <netdev+bounces-293471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 21:44:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4675D6179D2
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 21:14:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB5F617AF3
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 21:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 58ACB3024A4D
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 19:14:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 735BE303BB3F
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 19:44:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A264331A7B;
-	Sun, 31 May 2026 19:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4066133B969;
+	Sun, 31 May 2026 19:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="NdfRqoUM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LOY9mDq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148D12343BE
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 19:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6788C32F749
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 19:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780254894; cv=none; b=SFc47q3dGkjDuH6xjym2qqxAhDfkvxlbzWxgphn+mQ1E1WiGMfywDvT2wocabSMgNf5DLeDEDFWTdWfNYmQbWfOwsp9Z4mmN2P5OtfwQDuePJgQePcV6mAud0D6Aj8yqRG3ml/0kzFEegOP5BHjlVJDyMvjsOqv5fRy7GkC8XhE=
+	t=1780256681; cv=none; b=pUGDgKr7Pj/KLM7z1KDeR2GmQkV8Ufq2fiB/YARaTIrf7IJzM9yNaM4UnrlJh5baFkVftOr5YZp1iiDAiwsXj4TWRkqQFnzk4qlsXMJs0kQGGaJTBu4KfNroV1To2oQEyv5uR2AoPo/L1yFyr1T/j5II946AMRzaCqJ3zXMamhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780254894; c=relaxed/simple;
-	bh=DAHy8J54jxDA6vvUkqeHi0uN69mIZwRZPtr4XANXSCo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g0jRTBtNC4Wjii9SDeTikbIKn5G/WsdnRfE3DoV2pcJuagPpzYAcTzvJdAMUT/V5XOfHy0G56KPeYDu9JekcKC9tChqMZlBzeXEsT6mghe+Qg+8+xdvVruMiFxibj7sJFkGSZWyeTvuCjyhc7Ckp6SzgHq6Yt5VqFPCQjSfqZG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=NdfRqoUM; arc=none smtp.client-ip=74.125.82.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-1363fe80fe8so11084021c88.0
-        for <netdev@vger.kernel.org>; Sun, 31 May 2026 12:14:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1780254892; x=1780859692; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3VLIr2839yosGYrgg+bhtZudSWU2zqH+9k+4w7AMccw=;
-        b=NdfRqoUMWIl+2yP1hR2+A58fAmT7EJjKoORI3q0Jrxac+UK2aesKARW+/gozLeB8qc
-         QSwMls1rhd2hCPo5M5pWikfl3gV2eDZNPw4QFxwGnadE4cOF7kGXPNH00Sdj7VEKyKUS
-         pa4e/Ij28iE6z8np95Qtq//aXnH3u+t7kRkP8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780254892; x=1780859692;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3VLIr2839yosGYrgg+bhtZudSWU2zqH+9k+4w7AMccw=;
-        b=gR98oetyZ95o/c9QP/SABTLCfs4I8i4SEXT7kUaIeRaNodYAoW36VeZ/wpgNpKuUbp
-         iLQJFclJkLRpGaKFjm0JkipQU6Smt0SMQiA218ATozc8NsMiuLqMBMRsxiAO61PlllnU
-         DOXAIgI+z2VaviZUvKJh/WDzXXdJHEQYNXiVrrrB/g60nVxZTg/JPo2H8Oez0zuCjqi6
-         xJUtXy1FRKrGZUaPqxAEY3zBtR45kuKZxUZy57Ji16bP8OOVyF5q8cO1BhUFPrl44qTQ
-         FynOZHrp8xvbwCNNj3hEBftw9XD2SH9AejQUY8Ik3MwtCtIVFWEAtdwboXQFotZIUJpW
-         9XCA==
-X-Gm-Message-State: AOJu0YzE8xZAdKbzVA9K8fTnHKsZ2lUIf1D2M7cgg4pc6p2afvVLBOdL
-	Ah8LfGV/trc/Uv6d0LJgWlVzAFUqU1ls8XZOX1LBnaMihrsqFctHAzOr+HRTbhEFbwsEz1Nd98J
-	c3eA23DibIWt3
-X-Gm-Gg: Acq92OFZ87Uitz194ckXCsnTg7hlMsC8hx/sfbcH7xAoA01li5wLt8dm2YMyGwXGsdm
-	lsaEeaeGVA3cE+rgjPkVt6Mq6qQXCtJ1dWrKP3DSnIiZQaN+Tn88KZe4c5ieV2UGGsg9hSXa4mG
-	/F1Q0UnXF3FzMjrA1s6qhMKojyqqeiCGE4aQEzwlgYiZFOUD9YX+LJomxXq5jvKfqhrEWSLmYDl
-	BSf9GL16IpYAXiVig9Z47CrtepWMx7kg2a5atFtpGzU741qkYeUuFausIymuc7EGtDyeJh6NOMy
-	aVakXW0ZT8SCECN2d2Iwzki0+HujI8Ey1S+HR1Pf0tfSlRXljddWuOcVgnBEdEKD01G4cxBexoN
-	sWnqXrP3u6+COnv0HKUbc7Vw8VbQKb+03jCEAqcVF/cH7Tu40iJBNQBLpy/sxnRixxh9jnJ237z
-	fCKXGg4qWikLZV5V7oVGRuSfV9gtZK7uDJ8MzBne4Anp11tQVJTFGnsb2GRlVtc6ZIMzweTKh7h
-	2Ys1lupkM+TUvAQ9Q==
-X-Received: by 2002:a05:7022:527:b0:136:b45a:4f66 with SMTP id a92af1059eb24-137d3f0f124mr3347405c88.16.1780254892110;
-        Sun, 31 May 2026 12:14:52 -0700 (PDT)
-Received: from com-75606 ([104.241.0.233])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137b2d04287sm6959990c88.0.2026.05.31.12.14.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2026 12:14:51 -0700 (PDT)
-Date: Sun, 31 May 2026 12:14:49 -0700
-From: Kyle Zeng <kylebot@openai.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	victor@mojatatu.com, jiri@resnulli.us, vladbu@nvidia.com,
-	linux-kernel@vger.kernel.org, security@kernel.org,
-	stable@kernel.org, syzbot@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2 1/1] net/sched: act_api: use RCU with deferred
- freeing for action lifecycle
-Message-ID: <ahyIqbpH204OLuDp@com-75606>
-References: <20260531160812.68020-1-jhs@mojatatu.com>
+	s=arc-20240116; t=1780256681; c=relaxed/simple;
+	bh=uvamcTWol4tPyXd7Vz0cuXmQA7Q4aJ7Et6Vv+Z/z2Gs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Eh3Hr+GgULE94JgwWAUvOld/s90xI6WpVKPXecvDEjDDQ/jBoN46lVlaJptuzQfQX063fFT0XuWxdQE0KRuFnWNPNPzdxLLm5VUp+iqekX4V+R/gkjs43KBauuxWpwQ+Er8JV5bBgw1MsOsjtIPdcGulL/y0GjcOh3ViZRViUUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LOY9mDq8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780256678;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7kgY/cPIaDUw1tDlXR1NIsfvxx0BIO2ZXXIoNgu7NtI=;
+	b=LOY9mDq8rs0B7dQjWDRa9NjyG1kDId85Do9T/ybj3C73B385jd8PYFCY949NWOSSrJQGJK
+	lZQxlEBGSPtjw2TAP9RkODl21zhibACmO/eatzRLIsRS/Dac2G7kC8TYD2sw4b4BjsFAB3
+	l24BixOK/LuPWuK0hJuF+z65sXgloaY=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-660--7-vX7djMQKOpJfaWgA5uQ-1; Sun,
+ 31 May 2026 15:44:31 -0400
+X-MC-Unique: -7-vX7djMQKOpJfaWgA5uQ-1
+X-Mimecast-MFC-AGG-ID: -7-vX7djMQKOpJfaWgA5uQ_1780256669
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EEBD319560B5;
+	Sun, 31 May 2026 19:44:28 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.32.62])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7F1091956053;
+	Sun, 31 May 2026 19:44:24 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pasi Vaananen <pvaanane@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 0/4] dpll: add NCO pin type and zl3073x support
+Date: Sun, 31 May 2026 21:44:19 +0200
+Message-ID: <20260531194423.383366-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260531160812.68020-1-jhs@mojatatu.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[openai.com,reject];
-	R_DKIM_ALLOW(-0.20)[openai.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293470-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293471-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[openai.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kylebot@openai.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:email,appspotmail.com:email]
-X-Rspamd-Queue-Id: 4675D6179D2
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5CB5F617AF3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 31, 2026 at 12:08:12PM -0400, Jamal Hadi Salim wrote:
-> When NEWTFILTER and DELFILTER are run concurrently it is possible to create a
-> race with an associated action.
-> 
-> Let's illustrate with CPU0 running NEWTFILTER and CPU1 running DELFILTER:
-> 
->  0: mutex_lock() <-- holds the idr lock
->  0: rcu_read_lock()
->  0: p = idr_find(idr, index) <-- action p is valid (RCU protects IDR)
->  0: mutex_unlock() <-- releases the idr lock
->  1: refcount_dec_and_mutex_lock() <-- refcnt 1->0, mutex held
->  1: idr_remove(idr, index) <-- Action removed from IDR
->  1: mutex_unlock() <-- mutex released allowing us to delete the action
->  1: tcf_action_cleanup(p); kfree(p) <-- Kfrees p immediately, no deferral
->  0: refcount_inc_not_zero(&p->tcfa_refcnt) <-- ouch, UAF p points to freed memory
-> 
-> This patch fixes the race condition between NEWTFILTER and DELFILTER by
-> adding struct rcu_head to tc_action used in the deferral and introducing a
-> call_rcu() in the delete path to defer the final kfree().
-> 
-> Note: this is a revert of commit d7fb60b9cafb ("net_sched: get rid of tcfa_rcu")
-> but also modernization/simplification to directly use kfree_rcu().
-> 
-> Let's illustrate the new restored code path:
-> 
->  0: rcu_read_lock()
->  1: refcount_dec_and_mutex_lock() <-- refcnt 1->0, mutex held
->  1: idr_remove(idr, index)
->  1: mutex_unlock()
->  1: call_rcu(&p->tcfa_rcu, tcf_action_rcu_free) <-- defer kfree after grace period
->  0: p = idr_find(idr, index)
->  0: refcount_inc_not_zero(&p->tcfa_refcnt) <-- fails, refcnt already 0
->  1: rcu_read_unlock() <-- release so freeing can run after grace period
-> 
-> After CPU1 calls idr_remove(), the object is no longer reachable through the IDR.
-> CPU0's subsequent idr_find() will return NULL, and even if it still held a
-> stale pointer, the immediate kfree() is now deferred until after the RCU grace
-> period, so no UAF can occur.
-> 
-> Fixes: d7fb60b9cafb ("net_sched: get rid of tcfa_rcu")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reported-by: Kyle Zeng <kylebot@openai.com>
-> Tested-by: Victor Nogueira <victor@mojatatu.com>
-> Tested-by: syzbot@syzkaller.appspotmail.com
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Add a new DPLL_PIN_TYPE_INT_NCO pin type for virtual pins representing
+the NCO mode of a DPLL and implement support for it in the zl3073x driver.
 
-Tested-by: Kyle Zeng <kylebot@openai.com>
+Patch 1 adds the new pin type to the DPLL netlink spec and UAPI header.
 
-Best,
-Kyle
+Patch 2 replaces the single 2s poll timeout with per-operation timeouts
+based on Microchip proprietary source code and own measurement.
+
+Patch 3 adds a per-DPLL serialization mutex taken by all DPLL callbacks
+and the periodic worker, establishing a single lock that protects all
+per-channel state. The chan_state_update() call is moved under this lock.
+
+Patch 4 adds a virtual NCO input pin to the zl3073x driver that allows
+userspace to switch a DPLL channel into NCO mode. The pin reports
+connected/active state when the channel is in NCO mode and handles
+the hardware-specific details of mode transitions including automatic
+df_offset capture and 1PPS phase preservation.
+
+Changes:
+v5:
+  - Rebased on net-next after the freq_monitor per-device fix
+    landed via net.
+  - Move phase_offset_avg_factor_set notification loop outside lock
+    to avoid lockdep false positive on multi-channel devices (patch 3).
+  - Configure dpll_df_read register before NCO mode switch (patch 4).
+  - Add 5ms delay before reading nco_auto_read captured df_offset,
+    determined by HW testing (patch 4).
+  - Mark df_offset as unknown at probe when firmware left channel
+    in NCO mode (patch 4).
+  - See individual patches for detailed changelogs.
+v4:
+  - New patch 2: per-operation poll timeouts
+  - New patch 3: per-DPLL serialization lock
+  - See individual patches for detailed changelogs.
+v3:
+  - fixed SoB position
+v2:
+  - See individual patches for detailed changelogs.
+
+Ivan Vecera (4):
+  dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+  dpll: zl3073x: use per-operation poll timeouts
+  dpll: zl3073x: add per-DPLL serialization lock
+  dpll: zl3073x: add NCO virtual input pin
+
+ Documentation/netlink/specs/dpll.yaml |  13 +
+ drivers/dpll/dpll_nl.c                |   2 +-
+ drivers/dpll/zl3073x/chan.c           | 124 ++++++-
+ drivers/dpll/zl3073x/chan.h           |  48 +++
+ drivers/dpll/zl3073x/core.c           |  44 +--
+ drivers/dpll/zl3073x/core.h           |  10 +-
+ drivers/dpll/zl3073x/dpll.c           | 488 ++++++++++++++++++++++----
+ drivers/dpll/zl3073x/dpll.h           |   4 +
+ drivers/dpll/zl3073x/regs.h           |  11 +
+ include/uapi/linux/dpll.h             |   4 +
+ 10 files changed, 651 insertions(+), 97 deletions(-)
+
+
+base-commit: 8415598365503ced2e3d019491b0a2756c85c494
+-- 
+2.53.0
+
 
