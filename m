@@ -1,56 +1,66 @@
-Return-Path: <netdev+bounces-293444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBjzFedTHGqeMgkAu9opvQ
-	(envelope-from <netdev+bounces-293444-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:29:43 +0200
+	id uM/nLPZSHGqTMgkAu9opvQ
+	(envelope-from <netdev+bounces-293443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:25:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A81616DDB
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:29:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC01616CFC
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:25:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D86503011BFA
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 15:26:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB64C3015448
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 15:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B49A3914E0;
-	Sun, 31 May 2026 15:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1114639022A;
+	Sun, 31 May 2026 15:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0RhIDHWx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KKNK6V6r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01493909B9;
-	Sun, 31 May 2026 15:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAD018E02A;
+	Sun, 31 May 2026 15:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780241171; cv=none; b=YLVm5WXp5fvWYmA5tZxJS95nI+yRRNRTtV5YgfJCIfxketchvoK+DLS2fVSBMff556JbSjdxx7v5x3dyTtpJPEMOKiU9ogODTRG3D+72ottmSMmrsG7n5Tg3Tswll8o/FM6nnGRTaTvjjP/vOumK0UqrzzrxCDb1K162WBCp9ZM=
+	t=1780241139; cv=none; b=rj4RvQ0kIqd0/A2Tdnyrk1EOB4QPRrWdeoNPJhD1J/kXsqXJ8+E8aHsP4R2icmioHmJWVbZcgL2VOrikHnq+BpaAplsr/qCJN08gqK8emxWYyfbO+hWAVOQTvghC3r0699/gGJ2t/v9Tq9C62Lf3rmjImChZJN2hdthzpXWCw2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780241171; c=relaxed/simple;
-	bh=geeBjAYo+ZS27xmhhVpgu0J99dHFpSPuatjDStqgGJo=;
+	s=arc-20240116; t=1780241139; c=relaxed/simple;
+	bh=QJdRrhZvfINQYg94kjlJQiKsAS/EoDlREda7BlZqvsg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KJb8/IdKR3xOz3EOkHEYHJXeTV704unVTqwwGkE1kA99Dqkqp3beBxUZe/w+mwwLs3s9bNQ+6NdA4a2UdsNntATPYcqH3s6fWk4veqRmq+PZ4CGijeVGjF2spY3hu0hVDAmc05+4o5TvChMf7UX8p+OJ8hnnfZJtlxm/bKQB9is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0RhIDHWx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C017D1F0089B;
-	Sun, 31 May 2026 15:26:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1780241165;
-	bh=Di1SkVeensE68rhHjiGO1dahyj2mqu6/cETPjqdLbcc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=0RhIDHWxuR/gBz86SE/3nyKYg0MJEFuMA3eMpwnathr+EzeUBYKT5rmr7fYa/WnCL
-	 1wkwiGHEojoC6HSDJweVD5LefC40OrhWyFm9a8MQ+X1ctNi0NFnpHwC4Z8SFtly1F0
-	 fgxdGtABIe6yY79DUP/keHC7cPsGHOaBXW903sZo=
-Date: Sun, 31 May 2026 17:25:10 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Grewstad <dogestad24@gmail.com>
-Cc: jic23@kernel.org, jacobsfeder@gmail.com, linux-staging@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	hjk@hansjkoch.de, davem@davemloft.net, netdev@vger.kernel.org
-Subject: Re: [RFC] drivers/staging/axis-fifo: TODO file and subsystem
- direction
-Message-ID: <2026053145-bungee-flyover-840a@gregkh>
-References: <CAD03fjaBJGtNATBxaYO-PAxdKC=HxYgE+M7HQ_a0O+3Sp9Mruw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UHmMn/Glzh36LuWGWeXMhhMCuXTAiXNXKzaDOPEbV7Jb7x7xJjCw3kMim7LxHrJ3FVgcUMCZNQeVjkZ1LtZ+7qht45SO8M4ufNRplazWjMzvX1qoXmW3/6wau6KlGuyrKtyRAwuDDLMpAJ5KGdjY2KXRntjhYK2dluKaTRav3pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KKNK6V6r; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tggoz0W6PHZB8ZgX6WAr7umIoLdUih9Ni/G99H8whns=; b=KKNK6V6rOi6rhPcZWfhaldaaow
+	djS8oJfaAUDEPAQulDUJnvbYngG0/m4L1zoaRe+6kABCzkvnTMlj67VgqtQz5K68O2DB4VK94fNfW
+	NH9aNhBnZWnM8+5ou6vMKcIOtrgP+UUyB1/A3Rx4hUUJnmUD7kUeqhSyiwqgZZUzG80A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wTi2Z-005N6r-IL; Sun, 31 May 2026 17:25:27 +0200
+Date: Sun, 31 May 2026 17:25:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 09/14] net: phy: ncn26000: Support for
+ onsemi's S2500 internal phy
+Message-ID: <5c8e4a0b-339f-46dd-a22b-310797f022d6@lunn.ch>
+References: <CY8PR02MB92496757556AC350E712191883162@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,83 +69,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAD03fjaBJGtNATBxaYO-PAxdKC=HxYgE+M7HQ_a0O+3Sp9Mruw@mail.gmail.com>
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+In-Reply-To: <CY8PR02MB92496757556AC350E712191883162@CY8PR02MB9249.namprd02.prod.outlook.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293444-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lists.linux.dev,lists.infradead.org,vger.kernel.org,hansjkoch.de,davemloft.net];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293443-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linuxfoundation.org:dkim]
-X-Rspamd-Queue-Id: B0A81616DDB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 0EC01616CFC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 31, 2026 at 08:20:35PM +0530, Grewstad wrote:
-> Dear Maintainers,
+On Fri, May 29, 2026 at 06:41:06PM +0000, Selvamani Rajagopal wrote:
+> Adding support for internal PHY of the integrated
+> media access controller S2500. PLCA tx opportunity timer's
+> default value is correct in this device, compared to
+> NCN26000.
 > 
-> I am interested in contributing to the Xilinx AXI-Stream FIFO driver
-> located in drivers/staging/axis-fifo.
-> 
-> While reviewing the driver, I noticed that it does not currently
-> contain a TODO file describing the work required for graduation from
-> staging. I would like to create such a file, but before doing so I
-> would appreciate guidance on the expected long-term direction for the
-> driver.
-> 
-> The driver currently exposes a custom userspace ABI through a
-> miscdevice. While this provides a generic interface to the FIFO, it
-> does not integrate with existing kernel subsystem tooling. One possible
-> incremental improvement in this area could be a transition from
-> miscdevice to a proper character device (cdev) interface, to allow for
-> a more clearly defined and maintainable userspace ABI.
+> Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
-There really is no difference between a miscdevice and a character
-device, the interaction from user/kernel is the same.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> Some possible directions that came to mind are:
-> 
-> - UIO, if the intent is to provide userspace control over a generic
->   AXI-stream FIFO with minimal kernel policy.
-
-UIO provides a mmap of a device to userspace where it is controlled
-directly.  Probably not what you want to do here right?
-
-> - IIO, for data acquisition or SDR-oriented applications that could
->   benefit from existing buffer infrastructure and userspace tooling.
-
-Is that what this device is?
-
-> - Networking, for packet-oriented AXI-stream use cases.
-
-WHat really is this device for?  What is the goal of this hardware and
-how is it used today?  Do you have the hardware to test with it?  Who
-uses it?
-
-thanks,
-
-greg k-h
+    Andrew
 
