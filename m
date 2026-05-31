@@ -1,432 +1,271 @@
-Return-Path: <netdev+bounces-293459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id l6URDLBeHGqANQkAu9opvQ
-	(envelope-from <netdev+bounces-293459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 18:15:44 +0200
+	id OJ5oFq9lHGpjNgkAu9opvQ
+	(envelope-from <netdev+bounces-293460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 18:45:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D7E617166
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 18:15:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA32A6172AA
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 18:45:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D7C7301D6A9
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 16:15:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 278C53012C86
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 16:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B1A38238A;
-	Sun, 31 May 2026 16:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0785390CA6;
+	Sun, 31 May 2026 16:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="biERD9Rk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G3njdyox"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010048.outbound.protection.outlook.com [40.93.198.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7475A79B
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 16:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780244140; cv=none; b=IZ3Ta48YQSH7BIMDF2VNFHHU/+KHdPgcCwAjuXULzjXy+N7MhhQ8NyIMA0vvRzpui9lrFpS+b8Oti6Xphevm4h1CZf0qLzbi9hP3ni4PLWp213FjYa1LV1XAGeushwVQbNlfZ4+Ezw1UVBhep/hwjrpr37FCto/ECtAppfMdvuw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780244140; c=relaxed/simple;
-	bh=/yyRRWfp/60UXBX9gCd6uR9PjndX5VlK/EDuZ/CxTGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ExFmN1fNvaWF+PUwJgOklscAtYTmgViyXgCtKXwUo2wj8HGNL2/3uwSORQvR+Lt1sphlOkOglmmmwKZKc+j0oK/lhSIPyTt5NeAiETkXBP4HrBn7HjBtD3MXaxNjpc+GIvtOqxEjsnu+XwwN9E3WMvZnj7vE1rpyapML7PDCvjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=biERD9Rk; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490a7876f8cso4526505e9.3
-        for <netdev@vger.kernel.org>; Sun, 31 May 2026 09:15:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780244137; x=1780848937; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yNVMmN3rmllA2oQU/96urbR1HqNbHZ9d5MxR1W2xKWk=;
-        b=biERD9RkBYdHZnkSyL0zh9jIiRIvMA6BIfl3nnAtVdfAcJ4k4YLYbGsnW6ESF9B72z
-         5Zp7YsVZaykIcp0rBXl6MzAoCfOuv9/QfeX6eBFC/mJRvbcyH0gooZrPbXo74mM4qOIY
-         mtPvVkM79MtcRVHbNyACMVUxNcTHsxMT2nCTSxd+HaQVyqEdhCHTxBELsfrrLQkQn1Eg
-         BX3UzY9wjNe/ZOVU8/PZc5B6pNs4yVGS2h/7AEc/yYAde0Lw8PSNbJfYgtXRxjROtDTn
-         nboX1evgIKa3iFT0ixF3hBt2QmSheyjc3FbzNwGRqToYBMtn9BwhSYLTmpbCW/Z1Y/lJ
-         KGPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780244137; x=1780848937;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yNVMmN3rmllA2oQU/96urbR1HqNbHZ9d5MxR1W2xKWk=;
-        b=JsqXf2M5BSKNUZfLdpuB8gj/MXmo3HxwKYnuT4HFpKy8XccVt9ntSU0Lw7aPLxZSXI
-         pYWrDv3KF3qujqLILS8vWTyZQh3CepNluk3V6hqsqXY10KjF9+cAW60Ed0dIH73Ib6HB
-         ZjM0Vx8/qowyis+SabmDKkpUCOqZe3OWDIXPTNrqMfTbmWjtXwnzNRt5xmeqJhCrS3a8
-         tbFRd6O8t6rEnHRULVdDG0r5qP/EhobUBEJGf50Y02tYs73viXcBkPPLjFVHpmmZiu1x
-         4La3CyGS8sx6c5lJE8HJtzD6I2jRr9k14B249GYP/pf+mn48xJ1hqrq5siDVM6pZb3/y
-         Euyg==
-X-Gm-Message-State: AOJu0Yy18i2luGn9qYx+VLJ3l5OvgEMsI/HJ+qVtmDuqdPLkcgGCAWdc
-	vhQkKQCSe8sbJEl8u2D9EbGMwgzQZI+4mMlCqYDelGYW9uKycdast6oU
-X-Gm-Gg: Acq92OHhEpyKzvzVpGDnhfWd1SD7sgl4qyBB2GPRDDX3v21IfS/x6huwZPucZOrwl5y
-	xPVXEgSRQnKUZQQ6a34f1DDL4jb9s8kKW/wBwZRk8vkjHw6PqIFHqPHdp5ub0f8K49FPZWZmGY4
-	iqfrp/+59CG7grnfZwdsB8dMn3P2AqgjD9ILLu8Y3gFg+ZC6mIX28IMY8rtsQE3XvfS50MOJXI0
-	fOOszgj2J73zvMrRLPLTo2nzpPOh8LVBgBbYifQVNsaskN8EN8fWK2GOXKdv9J7axuK/xMgceLz
-	1+1xbXYaFz5BbWE0ntbqWKfCqoFgfWYs08TTFCOlqubtBK3xY73ffgCpG78vYiIiCNgrO+jVg6X
-	/sst2YbcOjGzKS7jEc2Ki1/izOUEd5i8PWg17L6DesJvwDerpNLqIZtPz4PxfWw1nGhtx4igLCk
-	Zq+pvdEjClPzOExcbWZSIryzSHMjbaj+1d94rcIRHXVbsOZpHC7SxjOnUzwQ1ZH51zc9z4iAg=
-X-Received: by 2002:a05:600c:1988:b0:488:aa33:dcbd with SMTP id 5b1f17b1804b1-490a2950c9emr137343035e9.26.1780244136926;
-        Sun, 31 May 2026 09:15:36 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909cabfd6esm187661005e9.15.2026.05.31.09.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2026 09:15:36 -0700 (PDT)
-Date: Sun, 31 May 2026 17:15:34 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- victor@mojatatu.com, yimingqian591@gmail.com, keenanat2000@gmail.com,
- 2045gemini@gmail.com, rollkingzzc@gmail.com, toke@redhat.com,
- dcaratti@redhat.com, security@kernel.org, linux-kernel@vger.kernel.org,
- stable@kernel.org, Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-Subject: Re: [PATCH net v5 1/1] net/sched: fix pedit partial COW leading to
- page cache corruption
-Message-ID: <20260531171534.6aae381a@pumpkin>
-In-Reply-To: <20260531123221.48732-1-jhs@mojatatu.com>
-References: <20260531123221.48732-1-jhs@mojatatu.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC7B3914E0;
+	Sun, 31 May 2026 16:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780245930; cv=fail; b=REFJyfnDh1zUC0g6HhZLzXoFUq9PuNZ1gf9B3J66aKMb3ZmVylIrgm5Xui3B2cEGDeBsx0d7CdONTWrfdMooxcikavdULUi+PVRMMJ3KMrwv/XU4RnhR8oYLCH+/kKVHpDPZveWTrgKz6AmQA3xa+nI2fcfNJwm93Jai6qF0uEE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780245930; c=relaxed/simple;
+	bh=BW5wTaT4ISdgRUPRQV2sKj+f29HFhWrMCWHP3s1yIWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Vcq/ubZTuAb9ciHXnkD6kIAPEtXMsSXTqZYVzc24tfllvVgySd2G6Til3ybi28O3/GDkO0ooogNZ6wyjJ2W6MmR82bqpxSOd4MDABDidIHLyhtGDBE4LVUxpFxOxWyylqrWLlCdJ+z2CP2QETHmYn/73E4kf4MwS7MMoka+wjv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G3njdyox; arc=fail smtp.client-ip=40.93.198.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=a3SRj0O8T2xAzJ+IubGUfguj1ONJpW/klRfvnenpW4ebk1nLCzqYyHvCfYjDukM4bJQvyEYN1B5fT7O7SyyOpjb+h+p9dbqPC/MxHFlSLFRATUm34yv2wPnKHYv1Oixsd/tydFsmmf0he+rMNAfDogbnHrYygyrk4mWqC/akJSLd0Xw5nczVi0tovFRT3lndvGnFWa/U075Rj9739w0X1L60hGDqonwGX6Aigq3FSvM2LXT73DnQgZncR7UKCY2JJQ6ZPH0VMIEI8EkuqkBIc70HEjL1xox7R8jjdjpasEhTxDXfzwRIfovKgL+lqcf4JbQwcQUY3HMmfSBeZ3Q+dg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ANJizjQljftgXTaHbe6BRk19bh/U35TMUQjhhF5Oz38=;
+ b=tlusKixbHoWkltr9fT1VUrHDFGnPoeNMLELz74LQNZA5/mZuPpgJ8G35gEj26nIW06RFUE4i1/y9k4+wLKeq615XAReWqdFkod/qf3bTBi+Wbpz2ysGOgxLR4FstlAn8tfvYtXHJNv/w5vdFDnwuns/uuJJnTPYTS7ny0GyX7UtfW8UbRpSva2hcyXYTqZsy8qhVV4YKlX/6ezFIHtRx9v3OzJophumdiQack711GzvAnH0DpfMqFKZNpyANQaWVNQVl4PCzsr4rAKj6A1qggpwm/YHxAVIfQo+K9uKUGdWOLFfp535ayu8jHUBKmjHARabZZ6aWmd54YfDGu298bg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ANJizjQljftgXTaHbe6BRk19bh/U35TMUQjhhF5Oz38=;
+ b=G3njdyoxz4eCqQZHxP9LEdQM8STNzPhaa9uX7zZLJ4Dtw3hd4Vk1Xusdy+WsUg7+cnNtfo5uK5Ea7mi29sy9ADs94Gsa4aYn6yRb8X+1DhYKs5ar1vFqquQUo6tt83EvQz1xDkzl888F3MF5jQ9gLiuz2ezBwElc41cgRi2qYht3AYtP3PZV9ujZJtTQLOk0/QjkKYbksbldgYJZtX0HDKjTf6C1h+/8sK6epJzQCMpGej9yCa7y+r+GguSiDi6PYkOqjzOPc8L6Pjt0yTEG4srlGtj1MYzgMq3dwt9G2jSMqaHVjlharZNzH7WQRgTTf0HT7vEJQusTnALGBNESHA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by MN2PR12MB4375.namprd12.prod.outlook.com (2603:10b6:208:24f::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.19; Sun, 31 May
+ 2026 16:45:24 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0071.015; Sun, 31 May 2026
+ 16:45:24 +0000
+Date: Sun, 31 May 2026 19:45:15 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org,
+	syzbot+819eb928d120d2bdad0e@syzkaller.appspotmail.com,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] ipv6: anycast: insert aca into global hash under
+ idev->lock
+Message-ID: <20260531164515.GA232188@shredder>
+References: <20260529152219.235475-1-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260529152219.235475-1-jiayuan.chen@linux.dev>
+X-ClientProxiedBy: FRYP281CA0017.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::27)
+ To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MN2PR12MB4375:EE_
+X-MS-Office365-Filtering-Correlation-Id: f9076d61-ae83-41b9-dc0d-08debf3402f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|6133799003|11063799006|18002099003|22082099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	JaOcq91TRJDhDFzPDm0aIrFD+MAVZFAav6OyKX2e8Lzyc6ZsN1M+mNeE4zYZqxAvxCUxLZDTiWzecUeSbLgIExRYYjYteISdNnbi8SIb6udE79Sd/DbFp51UefulTtiishz4Y/KXZi1fmIll/cnHl9TXpbKB1HbRqdmzepRdgZ0CYzUolz+h0VymOf85LEyuMgtVcT4xNvIeLXQUPrdNY4X3A7vo0FEuaznF4jfpr89RXYBSxTYK8ogDdfukCiVdlaNeq1griFbBpBJtjpRqe/XUtN/Px0IvTb7acYNClN/Gx/L1n980C5inD6ba5wI8YhGADCSGqVqpkQr3B8IH0+zssqbMT0LABr8ryA5Zb4W5bECcLPyVNJBWRPxXyaDYpLcgPD8nNxRUZM2W1YgVbqUSQ8h+FJ024k5N++/XiYFrQ27ovAnt64LAadn7KCz5hh7262USKcQMkmskZwD0AMPrHYayoVIMGVwahLSUekyQZXeSRjmRT4m6R0rh4DqkhEoKgel9Eq1ypXgweE5VtZSCRz1uk8fTt0ZR1Y9uH614Uxexo7xm7AXUUky4MR+Q/RMYfxLJZbi1lpEuHjO9qghbN5+nNSzlQbGJyLylbDgvSEr/w1WYGy+jZl2D2gQklq0qWDZelKgLXcVp7HsfYVguThdgVjGscC6kesg3zJwAUFv5/GC0HGC6xnq5HvTs
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(6133799003)(11063799006)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qg8n+Zcv1c9sE4aec6u1suOw7k2cmcireHztDbYD3+Oe+aikr6O094lBVAxE?=
+ =?us-ascii?Q?FdajGLJkx/N8EiNld8NgTyOc7MGD+3CFipKuVdZf7vG4fvyffyMvxxCZVku6?=
+ =?us-ascii?Q?xcEMXdhyOvMv9jzosa4GOfip6pN9ilVeS4zyWDZplMvQ86U+nsJ4pfJi5t7b?=
+ =?us-ascii?Q?lS3r99t6qDYE7iRDi0SbeJKem/NABEJZUAW58km0KTGjjIVb4IUoOQf4YHPI?=
+ =?us-ascii?Q?Ldu6+Ga9QOlLSlehKVSsEQOEZjp0jfjeprmBjJAMn1v7OwZKHUJMK0qL8Rio?=
+ =?us-ascii?Q?YFl+3xJLLqO1RNxV0sbj4VNwcYaTiUPd5IxRVHolulu0LvxL5V2YB2aFpb31?=
+ =?us-ascii?Q?ys4H2b66B2UQRMWQ/CDu7+4Tddl3zIe/uHStw3u5uw7qQRt86jW/BJclSYfx?=
+ =?us-ascii?Q?VNsU8UzfoHEWe1TTPavTacQOwLdVZH1ja69NFkTVs3bXVvVNS065aKa+9hVI?=
+ =?us-ascii?Q?kwy2vP2vyZX2u9U7FXOiUS5HycyAtZqktBCx8DEOg5vpJ+qiA3FMfHQudgUr?=
+ =?us-ascii?Q?MXfHdhQO7jNe6FYkRZm5ru91PlT+oDyU8fb/Uxc8Kp4iCaLDsYJ/GZzx7xN0?=
+ =?us-ascii?Q?oxMwX3PYMIPcVfDzCAkqOQvG7ajFivbzp8BLD1gyaWbNAGyeiqhvLef8VtfG?=
+ =?us-ascii?Q?cbuCgpdGrUtfPwnw7jW+NrrWWtXCXJuGcNFPcYI10lE+FSPmMUX6Sj5C3lr3?=
+ =?us-ascii?Q?mRTbbXO4lZ36T/fIB8g5k1gy+nnvYlXvPqFlybx/Jy2S1G0HxcogCf+S+8/E?=
+ =?us-ascii?Q?MH8YtmB81lbIaaoGcTP6764X0AdhpCZ/95ebZUpV8Q/19uF1yrDqKer/9as1?=
+ =?us-ascii?Q?xw+/CGyfmJBiycfU1x7FD060Ct+AVmvSUw4xj8h1WtGsyWFFP2UY0tH/dGsR?=
+ =?us-ascii?Q?uktAAZRgkCWyJIpCDZTsXNeKCB4/jkHDjJ7O6AIPYHyRRXMbGoZWXx1NCrt0?=
+ =?us-ascii?Q?HoavUPFKdaDWRbNtO5uOxaixZtTQz+ppWtpOvl18Bt2NVAi4kCDIpLbh/Rt9?=
+ =?us-ascii?Q?kZ0vn/vC5drz/EJgQGeHmBiQ6uhS7PxNQqwDkNAk3o1LA+2ul8UtL7wrKKFS?=
+ =?us-ascii?Q?vTehiOGCdzZrg9wbW8Nb3ZT9S5MzlHAP3xkPjOPq1hRgdWDEE2wW0MLTKnbn?=
+ =?us-ascii?Q?m/yBpJWt27mAXhCLokXm9J7mJu4pExgtLfBbX2BZeqOmSHeCj6eCP7K5Pqdl?=
+ =?us-ascii?Q?JWZjww24X66t2J0AE3Y55Qu71LNFRaTyCfauFVUDLQgOKNgJbRkmMP22jPAr?=
+ =?us-ascii?Q?HR7Ibax5UxztSjQRMRPpcCkaTen7qhcU6aHl7gcNPmgTEdEGkTHmw1MqAeKp?=
+ =?us-ascii?Q?v2hq6G6vNGQJOyVPVYrhXL0ZMu6IqInRhAvSdYHxUNGsrKoam89N8PYJF6Ie?=
+ =?us-ascii?Q?4X/tzO6YIMczldP85SdtLOFHZBmIdgzLHSLyczzbW6q+RWYlg2rJHqDs+JW/?=
+ =?us-ascii?Q?kKopYw2LV07m1wrj0HNLwOdwwwxVgKtu9D7Fhj688Cz2DmlbCiAWsiFVCD92?=
+ =?us-ascii?Q?spXxemmM+gg5Cz0nTPpQK1J7S3uLoxT7dQpnGXH7vObL7SuBV6ahvfA5bT1P?=
+ =?us-ascii?Q?nf6bw7sZthmBK9z7K/sBEawyzb4pcQyFK7EHlN8fZnETL+JUNUMm93yg5agR?=
+ =?us-ascii?Q?tXB4meIj/HcnUQZenpUN2+zGkCHMuH3di//WXuX1y4Ubm1xF9jbTwIt2faSZ?=
+ =?us-ascii?Q?svlfV73igyG8Q9v//Mr3S3OqPKqEiD8wU8jdFD8/M66mLFEg?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9076d61-ae83-41b9-dc0d-08debf3402f9
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2026 16:45:24.3879
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5t56s2HMAQrJk1yKTL1WSa0dXG2WyxhiKNEoQLVBXsaUtAfoJd0MRerL7TThj2gAI9e8Du+i5B7wdQPKCZCXCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4375
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293459-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com,oss.qualcomm.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-293460-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:email,sashiko.dev:url,linux.dev:url]
-X-Rspamd-Queue-Id: 73D7E617166
+	TAGGED_RCPT(0.00)[netdev,819eb928d120d2bdad0e];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,Nvidia.com:dkim,syzkaller.appspot.com:url,linux.dev:email,appspotmail.com:email]
+X-Rspamd-Queue-Id: CA32A6172AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 31 May 2026 08:32:21 -0400
-Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+On Fri, May 29, 2026 at 11:22:18PM +0800, Jiayuan Chen wrote:
+> syzbot reported a splat [1]: a slab-use-after-free in
+> ipv6_chk_acast_addr(), which walks the global inet6_acaddr_lst[] hash
+> under RCU and dereferences a struct ifacaddr6 that has already been
+> freed while still linked in the hash, so a later reader walks into a
+> dangling node.
+> 
+> In __ipv6_dev_ac_inc() the aca is allocated with refcount 1, then
+> aca_get() bumps it to 2 to keep it alive across the unlocked region.
+> It is published to idev->ac_list under idev->lock, but
+> ipv6_add_acaddr_hash() runs after write_unlock_bh(). A concurrent
+> teardown (ipv6_ac_destroy_dev() from addrconf_ifdown(), under RTNL)
+> can slip into that window:
+> 
+>   CPU0 __ipv6_dev_ac_inc           CPU1 ipv6_ac_destroy_dev (RTNL)
+>   ------------------------------   ------------------------------------
+>   aca_alloc()              refcnt 1
+>   aca_get()               refcnt 2
+>   write_lock_bh(idev->lock)
+>     add aca to ac_list
+>   write_unlock_bh(idev->lock)
+>                                    write_lock_bh(idev->lock)
+>                                      pull aca off ac_list
+>                                    write_unlock_bh(idev->lock)
+>                                    ipv6_del_acaddr_hash(aca)
+>                                      hlist_del_init_rcu() is a no-op,
+>                                      aca is not in the hash yet
+>                                    aca_put()           refcnt 2->1
+>   ipv6_add_acaddr_hash(aca)
+>     aca now inserted into the hash
+>   aca_put()                refcnt 1->0
+>     call_rcu(aca_free_rcu) -> kfree(aca)
+> 
+> The hash removal becomes a no-op because the insertion has not
+> happened yet, so once CPU0 inserts and drops the last reference, the
+> aca is freed while still linked in inet6_acaddr_lst[], and readers
+> dereference freed memory after the slab slot is reused.
+> 
+> This window opened once RTNL stopped serializing the join path against
+> device teardown. Move ipv6_add_acaddr_hash() inside the idev->lock
+> section so the ac_list and hash insertions are atomic with respect to
+> teardown: a racing remover now either misses the aca entirely or finds
+> it in both lists.
+> 
+> acaddr_hash_lock is now nested under idev->lock, which is acquired in
+> softirq context, so switch all acaddr_hash_lock sites to spin_lock_bh()
+> to avoid the irq lock inversion reported in [2].
+> 
+> [1] https://syzkaller.appspot.com/bug?extid=a01df04303c131efbf3a
+> [2] https://lore.kernel.org/netdev/6a194ef7.ba3b1513.1890b4.0000.GAE@google.com/
+> 
+> Reported-by: syzbot+819eb928d120d2bdad0e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/6a191f87.ce022c6e.138e56.0003.GAE@google.com/T/
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Fixes: eb1ac9ff6c4a ("ipv6: anycast: Don't hold RTNL for IPV6_JOIN_ANYCAST.")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-> From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
->=20
-> tcf_pedit_act() computes the COW range for skb_ensure_writable()
-> once before the key loop using tcfp_off_max_hint, but the hint does
-> not account for the runtime header offset added by typed keys. This
-> can leave part of the write region un-COW'd.
->=20
-> Fix by moving skb_ensure_writable() inside the per-key loop where
-> the actual write offset is known, and add overflow checking on the
-> offset arithmetic. For negative offsets (e.g. Ethernet header edits
-> at ingress), use skb_cow() to COW the headroom instead. Guard
-> offset_valid() against INT_MIN, where negation is undefined.
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-This code has all got out of hand somewhere.
-I've only been looking at offset_valid() code.
+There's a comment from Sashiko about UAF / leak with regards to the
+associated route, but I don't think it can happen:
 
-> Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is writ=
-able")
-> Reported-by: Yiming Qian <yimingqian591@gmail.com>
-> Reported-by: Keenan Dong <keenanat2000@gmail.com>
-> Reported-by: Han Guidong <2045gemini@gmail.com>
-> Reported-by: Zhang Cen <rollkingzzc@gmail.com>
-> Reviewed-by: Han Guidong <2045gemini@gmail.com>
-> Tested-by: Han Guidong <2045gemini@gmail.com>
-> Reviewed-by: Davide Caratti <dcaratti@redhat.com>
-> Tested-by: Davide Caratti <dcaratti@redhat.com>
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Tested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
-> Tested-by: Victor Nogueira <victor@mojatatu.com>
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>
-> ---
-> v4->v5:
->  1) Dead code removal obsoleted after removing tcfp_off_max_hint as ident=
-ified
->     by sashiko-claude[1]. Remove dead code updating "cur".
->  2) Addition of hoffset at tkey->at promotes hoffset to unsigned int,
->     wraps on overflow. Claim made by both sashiko-claude[1] and sashiko-g=
-emini[2]
->     I think this is far fetched but possible. Cast tkey->at to int.
->  3) Signedness mismatch in min() macro may potentially cause build issues.
->     Claim made by both sashiko-claude[1] and sashiko-gemini[2].
->     Go back to min_t() for now. David L. can make a better proposal later=
-..
->=20
-> [1]https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260530080643.134=
-5521-1-jhs%40mojatatu.com
-> [2]https://sashiko.dev/#/patchset/20260530080643.1345521-1-jhs%40mojatatu=
-.com
-> ---
->  include/net/tc_act/tc_pedit.h |  1 -
->  net/sched/act_pedit.c         | 77 +++++++++++++++++++----------------
->  2 files changed, 41 insertions(+), 37 deletions(-)
->=20
-> diff --git a/include/net/tc_act/tc_pedit.h b/include/net/tc_act/tc_pedit.h
-> index f58ee15cd858..cb7b82f2cbc7 100644
-> --- a/include/net/tc_act/tc_pedit.h
-> +++ b/include/net/tc_act/tc_pedit.h
-> @@ -15,7 +15,6 @@ struct tcf_pedit_parms {
->  	struct tc_pedit_key	*tcfp_keys;
->  	struct tcf_pedit_key_ex	*tcfp_keys_ex;
->  	int action;
-> -	u32 tcfp_off_max_hint;
->  	unsigned char tcfp_nkeys;
->  	unsigned char tcfp_flags;
->  	struct rcu_head rcu;
-> diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-> index bc20f08a2789..bd3b1da3cd63 100644
-> --- a/net/sched/act_pedit.c
-> +++ b/net/sched/act_pedit.c
-> @@ -16,6 +16,8 @@
->  #include <linux/ip.h>
->  #include <linux/ipv6.h>
->  #include <linux/slab.h>
-> +#include <linux/overflow.h>
-> +#include <linux/unaligned.h>
->  #include <net/ipv6.h>
->  #include <net/netlink.h>
->  #include <net/pkt_sched.h>
-> @@ -242,7 +244,6 @@ static int tcf_pedit_init(struct net *net, struct nla=
-ttr *nla,
->  		goto out_free_ex;
->  	}
-> =20
-> -	nparms->tcfp_off_max_hint =3D 0;
->  	nparms->tcfp_flags =3D parm->flags;
->  	nparms->tcfp_nkeys =3D parm->nkeys;
-> =20
-> @@ -268,14 +269,6 @@ static int tcf_pedit_init(struct net *net, struct nl=
-attr *nla,
->  						   BITS_PER_TYPE(int) - 1,
->  						   nparms->tcfp_keys[i].shift);
-> =20
-> -		/* The AT option can read a single byte, we can bound the actual
-> -		 * value with uchar max.
-> -		 */
-> -		cur +=3D (0xff & offmask) >> nparms->tcfp_keys[i].shift;
-> -
-> -		/* Each key touches 4 bytes starting from the computed offset */
-> -		nparms->tcfp_off_max_hint =3D
-> -			max(nparms->tcfp_off_max_hint, cur + 4);
->  	}
-> =20
->  	p =3D to_pedit(*a);
-> @@ -318,15 +311,12 @@ static void tcf_pedit_cleanup(struct tc_action *a)
->  		call_rcu(&parms->rcu, tcf_pedit_cleanup_rcu);
->  }
-> =20
-> -static bool offset_valid(struct sk_buff *skb, int offset)
-> +static bool offset_valid(struct sk_buff *skb, int offset, int len)
->  {
-> -	if (offset > 0 && offset > skb->len)
-> -		return false;
-> -
-> -	if  (offset < 0 && -offset > skb_headroom(skb))
-> +	if (offset < -(int)skb_headroom(skb))
->  		return false;
-> =20
-> -	return true;
-> +	return offset <=3D (int)skb->len - len;
->  }
-> =20
->  static int pedit_l4_skb_offset(struct sk_buff *skb, int *hoffset, const =
-int header_type)
-> @@ -393,18 +383,10 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff =
-*skb,
->  	struct tcf_pedit_key_ex *tkey_ex;
->  	struct tcf_pedit_parms *parms;
->  	struct tc_pedit_key *tkey;
-> -	u32 max_offset;
->  	int i;
-> =20
->  	parms =3D rcu_dereference_bh(p->parms);
-> =20
-> -	max_offset =3D (skb_transport_header_was_set(skb) ?
-> -		      skb_transport_offset(skb) :
-> -		      skb_network_offset(skb)) +
-> -		     parms->tcfp_off_max_hint;
-> -	if (skb_ensure_writable(skb, min(skb->len, max_offset)))
-> -		goto done;
-> -
->  	tcf_lastuse_update(&p->tcf_tm);
->  	tcf_action_update_bstats(&p->common, skb);
-> =20
-> @@ -412,10 +394,11 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff =
-*skb,
->  	tkey_ex =3D parms->tcfp_keys_ex;
-> =20
->  	for (i =3D parms->tcfp_nkeys; i > 0; i--, tkey++) {
-> +		int write_offset, write_len;
->  		int offset =3D tkey->off;
->  		int hoffset =3D 0;
-> -		u32 *ptr, hdata;
-> -		u32 val;
-> +		u32 cur_val, val;
-> +		u32 *ptr;
->  		int rc;
-> =20
->  		if (tkey_ex) {
-> @@ -433,13 +416,15 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff =
-*skb,
-> =20
->  		if (tkey->offmask) {
->  			u8 *d, _d;
-> +			int at_offset;
-> =20
-> -			if (!offset_valid(skb, hoffset + tkey->at)) {
-> +			if (check_add_overflow(hoffset, (int)tkey->at, &at_offset) ||
+"
+This is a pre-existing issue, but could a race condition here cause a
+use-after-free of the fib6_info object and leak the net_device?
 
-There is no real reason for checking the add.
-All that matters is that offset_valid() and skb_header_pointer() are
-passed the same offset.
-Assigning it to a local would make that clearer.
+Since ip6_ins_rt() is called after dropping the idev->lock, what happens if
+a concurrent device teardown via ipv6_ac_destroy_dev() intervenes?
 
-> +			    !offset_valid(skb, at_offset, sizeof(_d))) {
->  				pr_info_ratelimited("tc action pedit 'at' offset %d out of bounds\n",
->  						    hoffset + tkey->at);
->  				goto bad;
->  			}
-> -			d =3D skb_header_pointer(skb, hoffset + tkey->at,
-> +			d =3D skb_header_pointer(skb, at_offset,
->  					       sizeof(_d), &_d);
->  			if (!d)
->  				goto bad;
-> @@ -451,31 +436,51 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff =
-*skb,
->  			}
->  		}
-> =20
-> -		if (!offset_valid(skb, hoffset + offset)) {
-> -			pr_info_ratelimited("tc action pedit offset %d out of bounds\n", hoff=
-set + offset);
-> +		if (check_add_overflow(hoffset, offset, &write_offset)) {
-> +			pr_info_ratelimited("tc action pedit offset overflow\n");
->  			goto bad;
->  		}
-> =20
-> -		ptr =3D skb_header_pointer(skb, hoffset + offset,
-> -					 sizeof(hdata), &hdata);
-> -		if (!ptr)
-> +		if (!offset_valid(skb, write_offset, sizeof(*ptr))) {
-> +			pr_info_ratelimited("tc action pedit offset %d out of bounds\n",
-> +					    write_offset);
->  			goto bad;
-> +		}
+If ipv6_ac_destroy_dev() acquires the lock right after it is dropped here,
+it would find the newly published aca in idev->ac_list, unlink it, and call
+ip6_del_rt().
 
-Again all that matters is that the same value is passed to offset_valid()
-and skb_header_pointer().
+Since the route isn't inserted yet, ip6_del_rt() fails to remove it but
+still calls fib6_info_release(), dropping the refcount of f6i to zero.
+When this thread resumes, would ip6_ins_rt() then insert the 0-refcount
+route into the FIB tree?
+"
 
-> +
-> +		if (write_offset < 0) {
-> +			if (skb_cow(skb, -write_offset))
-> +				goto bad;
-> +			if (write_offset + (int)sizeof(*ptr) > 0) {
-> +				if (skb_ensure_writable(skb,
-> +							min_t(int, skb->len,
-> +							      write_offset + (int)sizeof(*ptr))))
+I don't believe the reference count drops to 0 since the address is
+still alive and aca_alloc() acquires a reference on the route via
+fib6_info_hold().
 
-That min isn't needed (same as below).
+"
+Since device unregistration has already flushed all routes, it appears this
+orphaned route is never removed. Would this cause unregister_netdevice()
+to hang indefinitely due to the held net_device reference?
 
-> +					goto bad;
-> +			}
-> +		} else {
-> +			if (check_add_overflow(write_offset, (int)sizeof(*ptr),
-> +					       &write_len))
+Could ip6_ins_rt() be moved inside the idev->lock critical section to
+prevent this race?
+"
 
-That can't fail because of the 'return offset <=3D (int)skb->len - len;' ch=
-eck.
+The kernel will emit NETDEV_UNREGISTER until the netdev reference count
+drops to 1 and the route will be cleaned via addrconf_notify() ->
+addrconf_ifdown() -> rt6_disable_ip()
 
-> +				goto bad;
-> +			if (skb_ensure_writable(skb, min_t(int, skb->len,
-> +							   write_len)))
-
-Similarly that min_t() will return 'write_len'.
-But is that even correct?
-The code wants to write 4 bytes at skb->data + write_offset.
-I can't see where the offset is used.
-All the overflow tests have made the logic far too hard to follow.
-
-I think that whole lot can just be:
-	hoffset +=3D offset;
-	if (offset_valid(skb, hoffset, sizeof(hdata)))
-		goto bad;
-=09
-	/* Ensure any needed headroom is writeable */
-	if (hoffset < 0 && skb_cow(skb, -hoffset)
-		goto bad;
-	/* Ensure the skb is writeable to the end of the area to be written.
-	 * The data is pulled into the skb header. */
-	if ((hoffset >=3D 0 || hoffset + (int)sizeof(hdata) > 0) &&
-	    skb_ensure_writable(skb, hoffset + (int)sizeof(hdata))
-		goto bad;
-The call to offset_valid() does all the other checks.
-(The hoffset >=3D 0 check is the inverse of the earlier check and will
-be optimised away - skipping the second second test which is then
-always true.)
-
-If you really want a warning message, put a generic one on 'bad;'.
-
-> +				goto bad;
-> +		}
-> +
-> +		ptr =3D (u32 *)(skb->data + write_offset);
-> +		cur_val =3D get_unaligned(ptr);
-
-Given you are doing an unaligned read you could remove the check in the
-'offmask' path that the final offset is a multiple of 4.
-Nothing checked that tkey->off is a multiple of 4, and I suspect that
-is user-specifiable?
-I'm also not entirely that the mac_header is aligned.
-
--- David
-
->  		/* just do it, baby */
->  		switch (cmd) {
->  		case TCA_PEDIT_KEY_EX_CMD_SET:
->  			val =3D tkey->val;
->  			break;
->  		case TCA_PEDIT_KEY_EX_CMD_ADD:
-> -			val =3D (*ptr + tkey->val) & ~tkey->mask;
-> +			val =3D (cur_val + tkey->val) & ~tkey->mask;
->  			break;
->  		default:
->  			pr_info_ratelimited("tc action pedit bad command (%d)\n", cmd);
->  			goto bad;
->  		}
-> =20
-> -		*ptr =3D ((*ptr & tkey->mask) ^ val);
-> -		if (ptr =3D=3D &hdata)
-> -			skb_store_bits(skb, hoffset + offset, ptr, 4);
-> +		put_unaligned((cur_val & tkey->mask) ^ val, ptr);
->  	}
-> =20
->  	goto done;
-
+Racing addrconf_{join,leave}_solict() also seems fine since
+__ipv6_dev_mc_inc() will be a NOP due to the in6_dev_get() check.
 
