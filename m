@@ -1,229 +1,167 @@
-Return-Path: <netdev+bounces-293465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293466-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMDIDGJ5HGrVOAkAu9opvQ
-	(envelope-from <netdev+bounces-293465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 20:09:38 +0200
+	id rHFxOZ1/HGpzOgkAu9opvQ
+	(envelope-from <netdev+bounces-293466-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 20:36:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896EB6176B1
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 20:09:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 799A8617829
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 20:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F39F83036ED7
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 18:08:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D29F43002300
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 18:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E70392819;
-	Sun, 31 May 2026 18:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8288F306767;
+	Sun, 31 May 2026 18:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="apsnNg01"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrF0q++b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D90391E7C
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 18:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780250935; cv=pass; b=vF100Jl6ZQPivYGRui+U+2vD4JgRlHpKON2ixEOTBRLFRm2x5iPYUX+VvFxBa2HBGdW/1h9Zi01AyP6eNI+UjsYCSVCN11ygNhkF2lwXQCqGOeVcw2sm2N2NRoMip+lRG+nJC4avvoRnK5LC440ZFYN396UTDIU1kgJjI8of/Pw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780250935; c=relaxed/simple;
-	bh=LX4HPkltEGsHPK17yME6ZDWufNBKXuBoPdfhHIdKp8E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gC+BCCYHjpOgb1NIlbIA7n3r8+8Ilv8w79oOcLRJZIX+yQCn51SWRkoXZQzaQEe6uTrf96IMlFlfV085cD6+hHiCoES+DLIkiB4jqEV1c1aDoDv7jY+Vrdul1YRwLhvvxgge0qJ7s+TT2/r6IukiHbIUOSj1iceALAZHiB70RwU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=apsnNg01; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5174a1d78f8so6904011cf.2
-        for <netdev@vger.kernel.org>; Sun, 31 May 2026 11:08:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780250933; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BpbMH+ClZSUZS/CjDQs23Vo0/v+nlC0bL6mTmS4MvxU9elhWVb0sNXG7eUKLLK53nq
-         u4eoi4qi/TNijlZK2KZk2THFG+5tTatXLAenjoaqWsYiyJWdtGb/KH9Z+OE4LOiSJpj9
-         U8Gldc+SlV2usL5bu/IIuM3HxUc6VEictjmB6ndc1y0DvwXcMggJOI8UZcL8MwQ+4SGg
-         XoHBvfQYOCWUkwusBUYWccfF3iccMOqr19cygwycD/15sMr+AcyMSZ5wmHm6ooi8k7H1
-         lN4KQNhaL2A6dAVDvRWmnf3gB9j7hhdXV7BHhihJAF9H8ym7WVeMj0sWDwit8NQAz2c5
-         uNHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=igFYe+C9WOBYLpObw2m/zg4GWFSBeVyEOXzH0bhFKC8=;
-        fh=eUEgOgdUlsJ+TnUoO8By2sjm6VFatlupx8fs9abAOs8=;
-        b=ObNeDzh7MTSn4zeugsRHdj2cQ8TAwJKk5hlF2v0PPBCgjmJlS1pg7tPQJRbtBiwT9W
-         yzW5iawiurv5fTiH0NSGxtMtpgSOsKmIjsErEudzR5vdfRaww2rprqJHednU8yu1zkuS
-         1EbNtAA+uBza+A4DkN3KpIqSAOtC89USM4TEHXXUjC745nDJeGGc9x+HQAaztUm/E5Dn
-         l/4KGXb093tORymc71pSxi3Xgw5qg++LjCP0g3k9sl690Mu4uTgBNvbY5ICvffrYfwEV
-         J0J8Iq0vSvJ1NQJZnI+bsvJEYOtW5rJyAc5Xlb1cBWzN+dAVKL4T88YzX8MZhN5ZNxnf
-         gnCw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCCA1E5201
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 18:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780252570; cv=none; b=C5rgm4tsijjGnMJjcep10AwjlstkAuATkdoxfSEeigoumHZXFmIphUjrfB3lDH1AqNiGjO2S52m4ppNUixsj9iJoQ2w3KIYcg9QtKuk2ehTrOUOHtrJ+gWBApZllIhQ0U5uAxHp/wSz1JeebZN9fDoyUJ4i3JTd5EKdfwUTB5WI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780252570; c=relaxed/simple;
+	bh=sYf5vJUcg8gDiXjElyV7YBcl5qfNddlg3jPvyxZ55Nc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L9Q93WYrNTf1fnerU/HMqSh0J9Kc+PUQdJSCS/YMcBTfZMuzs5Aau745lDGsmfA0f4J3rHAFa8GkOPXhEaDfWlWYSan4dlbP9VWfgbF3VBTEDX/WzM5FI1elreZmYa+3z40VMJ9h7avDArF448nuTpF0flDyCnnLCbNoMS80x5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrF0q++b; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7e3069c43f9so490297b3.3
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 11:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780250933; x=1780855733; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=igFYe+C9WOBYLpObw2m/zg4GWFSBeVyEOXzH0bhFKC8=;
-        b=apsnNg01Ldjc6kkTGoBAFG/3+dB6SlqNw5lzJ5lL7zxKHrUhAOAo2TTQpGG6sWGB8u
-         2wx+fnSfBeYls/D3ZHynkfNxCfFhvnE0Rh8sZGo0AyH56dVFagpYx9kxwx3oJbuScl0e
-         QIJ9/pQTUELVEi53XDx6s68rYbY2puot7IM1G0+D19OiJrEvF6zuMg9OWXObfhaE8X5b
-         XZOlZhAZOa3QcSQ1p05fjOMwoj9WouaS11JZXzGUfJSWa/YsYXP50Sv/l9H6G44rWnVC
-         MZgD0Pd8aRdfOy131GtJjgF/q2qd3iHk5fgGFVUm3Fy6v8c2ynJAWIwuoED0cK24oS6T
-         AEBw==
+        d=gmail.com; s=20251104; t=1780252568; x=1780857368; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=62LyM5KiJ0Nft9Ein3YHp4ZfhIkk8aALTP4Ss5xGs4k=;
+        b=UrF0q++bDKwWTpAQnBJkDt6eO5lr6KgjoP+joMjuXlgUtYe0gUOpE85z3MpiKhVhpM
+         7ARBO92JYG9GmraUPvMVUvpiPc4V46rZ78jtKUtDJ0j3IscSY8xNZjxNMrcJ3g5rzhgC
+         tzWzsjFNuFNHd8HMFiV7XcuINgoCTbwFOgwN2Z+jYtRL6YWN4FmOhJviQIplRefCUDCH
+         uN3B0SXGUfV6g6JHa+F05O9OXHEOJjoW8FSoVpeIkgxkmS8Z67NJaXtUSsdMaKhhm3+q
+         auKz8tuxfnZ3r1oyp1X3OxrdPM7wdMenlVAJjdU/M9d0C17uwOvWrNaxhr1tz2DZPcwI
+         Lwwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780250933; x=1780855733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=igFYe+C9WOBYLpObw2m/zg4GWFSBeVyEOXzH0bhFKC8=;
-        b=Y6kGNTdnGBhQIxa3hu0O/2SlkSAxSfw+53TBwwutujoaSJbnCz9jYDYpykW26QLyuA
-         ZdXbeCebDTJDxIGswj2Ir1gK8y7cnND6IZJt41h3NPfggp+OREDEwjAJ2t4T6WM0NBzL
-         2VQCbkKve6AYt3aiMXm+opNd8UsTPGi3TukpmuK0UfjseDV/ElmAoowhvGrZkMAGU1//
-         Cg6ymZH6++mk0+QN/J8sJYWa4cxmGYZ3zHRva5BqIyHY9MdQShFWn95ltheLub/F/fw9
-         TBkjDOePDSJ/fOSb7iuz3lQfT45Tpp8UgrPUteh6hqMX6iy3TK+h4p7+/Ks8LX443fiy
-         ESGA==
-X-Forwarded-Encrypted: i=1; AFNElJ+W2Y13b3v3/kQXVRs6A4YIYcOMo40tbG+/McUpa8fMj7fmgk48MwMKMXeVAPUq0urT4W35FHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwKh2nKwaqa8sM2HM84HfWB1rhWWE2jdald8Ed7nd5JLYpdjxh
-	Y3ITA5Sk4qTJ+ce9YnIwHJ2tZcRtq4sVq/iH6n+fa6qKLpP79f2HJ23t91Pp2W+hRWiBYMIn4fb
-	bnrprCUut1SUYayxup5RrkuxmDjrV+fQ+gIZp2BJ1I7l7Zb+CWF2Zpap2Z2I=
-X-Gm-Gg: Acq92OHauq8oSTvzpR+sabi8mIXZZ7/ZYdOV5MPSwhCPtlviYq4AM2r1PhyAp5TGw8K
-	bfJiJDsT5tyJSq6qh72wrvIKj+pHHlaAeF3A/dMddkurcwS1xQmIcpRehuJu++rWCLP1UeJxW9V
-	NrYSqDKn6pkshL6I6QraE06wwz4NCnBeOLHb2t5zUimKV3ql0hT9vdgOHPuwBhGKG+oSEgrhg8z
-	72QdcJHtXSTMuPeE+cLDHOukE3e6ESv4zPzX9rnAweVvnOtNng+PgjaVcWGB/VnH5HFzAE962gT
-	zC64ppombcMxEFsmRD2Bg3Gy+Yg5Dsey1RgXuyCqaxpHrT+zTg6KOelCaGsCB2qYgiir9ctJ88L
-	VuooOdVpKyFBZf/3vmdLVsBB+z2KP+kEllFeGJQ==
-X-Received: by 2002:a05:622a:4107:b0:509:1009:e7a6 with SMTP id
- d75a77b69052e-5173a93bd0fmr112626241cf.43.1780250932611; Sun, 31 May 2026
- 11:08:52 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780252568; x=1780857368;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=62LyM5KiJ0Nft9Ein3YHp4ZfhIkk8aALTP4Ss5xGs4k=;
+        b=LUHAbEx/QpWZaPPMswEJWsNYlOZm/83YciLUSy21Q3hWogRR2Z8cL+cwpdBHf9zews
+         s/Qqe5av9+rou0IBctYe2ZA0lVEgOquSI7swiya+st1RObZdcgGE1KYJSz/vrtvTIVyR
+         CZEIm4tkrT5ZaB4shTERTPioTEQG3bYZpImILPkPtkHH0DPt93kg6MNm9qufXrZk5oui
+         xxIFDHR6Ub7MuaOhzdtWq2x0KDTHucNEEQXEMnE8XagMDpdy5w1ou8ZT6P3mNxSd5BOd
+         DSYVXWyHORq+Cx7FmfifjpE8p88f+az/Y50GvkIen0MIGSBT2JWWE9kTYbh1mkrXeHRf
+         kMCg==
+X-Gm-Message-State: AOJu0YwEKEgjLTHzzq1x0W0CHdOQomRsVVDBYV7rf6UmGcmbD4DWDE+z
+	3WoEMnLNR8GO8LRE9lSUefwWJJt6BByW6o/9LnjKZXtcp3fRuAzztutc
+X-Gm-Gg: Acq92OEfcPOiLrlFNh+0hvi/k3i8jJHVAbg05Dg/T5zuE8YMPAl6dWUc1NlpRWV/5lH
+	5ygzL86wtNTC8loKETSEz6NgDFhIWasYhj44q5Oen7kYgYv/wOC4vQUzVCs5zAbkEhKFejeggad
+	8zRfWLy4njp7qKqenA44zqMuDBnCotiUXn4OBtIF+noNLLNMjnR1mIwQqTlbjsBk5meRyGNwXHJ
+	PL48DQC+7p4UenfKszEr6QL+IUQHshoYeDcxB2aHnNuuPQSYXzlcX+0wCkdSOKEltJdh+maZv3c
+	whU6pLAhfCSYyjzZm3BFd57+EUfFgIlxIYqCefdG1AQFOiPw8RcKUVfsjxFQ+L2i4lALNN6UogJ
+	bf3NzSYt8z7xdAwYiHabCjen68uu6T9Y10cmlLrL5iCS4+w4nFTeckKOPKKfDYvwM+iUkdX0SXU
+	KH67NIIstde8Rm/f24X771a+196tM2QvYymDiPRL6AusuvUgkBQe7ik1m3Q5IKNfRd3rai56W7F
+	OJd9nSMmBmYvgMbyRHTfQw=
+X-Received: by 2002:a05:690e:4089:b0:660:6971:db5a with SMTP id 956f58d0204a3-6606971ef16mr3137146d50.2.1780252568237;
+        Sun, 31 May 2026 11:36:08 -0700 (PDT)
+Received: from yes.c.googlers.com.com (232.252.236.35.bc.googleusercontent.com. [35.236.252.232])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-660699a02a0sm2341170d50.16.2026.05.31.11.36.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 May 2026 11:36:07 -0700 (PDT)
+From: Neal Cardwell <ncardwell.sw@gmail.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,
+	Neal Cardwell <ncardwell@google.com>,
+	Yuchung Cheng <ycheng@google.com>,
+	Van Jacobson <vanj@google.com>,
+	Soheil Hassas Yeganeh <soheil@google.com>,
+	Tim Bird <tim.bird@sony.com>
+Subject: [PATCH net-next] tcp_bbr: fix SPDX-License-Identifier to be GPL-2.0 OR BSD-3-Clause
+Date: Sun, 31 May 2026 11:35:57 -0700
+Message-ID: <20260531183558.2337381-1-ncardwell.sw@gmail.com>
+X-Mailer: git-send-email 2.54.0.929.g9b7fa37559-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260531124828.2323406-1-runyu.xiao@seu.edu.cn>
-In-Reply-To: <20260531124828.2323406-1-runyu.xiao@seu.edu.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 31 May 2026 11:08:41 -0700
-X-Gm-Features: AVHnY4Lvjf1C_TM2wnah_-lmgXjYPamVSXQUTpmEplMnYHoO98UurOO7hdKuwdc
-Message-ID: <CANn89i+FMBS31D6onh6cpASh7fApp3FfEn8j4YWCfEwDb8C_4g@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: use READ_ONCE() for bindv6only default in inet6_create()
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293465-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,seu.edu.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 896EB6176B1
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293466-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ncardwellsw@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sony.com:email]
+X-Rspamd-Queue-Id: 799A8617829
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 31, 2026 at 5:48=E2=80=AFAM Runyu Xiao <runyu.xiao@seu.edu.cn> =
-wrote:
->
-> inet6_create() copies net->ipv6.sysctl.bindv6only into sk->sk_ipv6only
-> without any locking. bindv6only is writable through the IPv6 sysctl
-> table via proc_dou8vec_minmax(), and adjacent lockless sysctl reads in
-> the same function already use READ_ONCE().
->
-> This read is reachable whenever AF_INET6 sockets are created while
-> /proc/sys/net/ipv6/bindv6only is being updated. In our QEMU/KCSAN stress
-> test on Linux v6.18.21, one actor repeatedly toggled
-> /proc/sys/net/ipv6/bindv6only while four concurrent readers repeatedly
-> created AF_INET6 stream and datagram sockets and queried IPV6_V6ONLY.
-> The writer completed 75313 sysctl updates in 45 seconds, and the readers
-> created more than 360000 IPv6 sockets in the same window.
->
-> KCSAN reported the following race:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KCSAN: data-race in inet6_create / proc_dou8vec_minmax
->
-> write (marked) to 0xffffffffaa27bbcd of 1 bytes by task 95 on cpu 1:
->  proc_dou8vec_minmax+0x206/0x220
->  proc_sys_call_handler+0x21d/0x300
->  proc_sys_write+0xe/0x20
->  vfs_write+0x559/0x6d0
->  ksys_write+0x88/0x110
->  __x64_sys_write+0x3c/0x50
->  x64_sys_call+0x1016/0x2020
->  do_syscall_64+0xb0/0x2c0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> read to 0xffffffffaa27bbcd of 1 bytes by task 97 on cpu 0:
->  inet6_create+0x351/0x700
->  __sock_create+0x149/0x280
->  __sys_socket+0x9f/0x130
->  __x64_sys_socket+0x3b/0x50
->  x64_sys_call+0x1c76/0x2020
->  do_syscall_64+0xb0/0x2c0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> value changed: 0x01 -> 0x00
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> Wrap the bindv6only read in READ_ONCE() to annotate the intentional
-> lockless access and match the surrounding per-net sysctl reader
-> contract.
->
-> This issue was first flagged by our static analysis tool while scanning
-> lockless sysctl readers, then manually audited and runtime-reproduced
-> with QEMU + KCSAN on Linux v6.18.21.
->
-> Build-tested by compiling net/ipv6/af_inet6.o on x86_64 netdev/main.
-> Runtime-tested with a QEMU/KCSAN stress test that concurrently toggled
-> /proc/sys/net/ipv6/bindv6only and created AF_INET6 sockets.
->
-> Fixes: 9fe516ba3fb2 ("inet: move ipv6only in sock_common")
+From: Neal Cardwell <ncardwell@google.com>
 
-Wrong Fixes: tag, lack of READ_ONCE() was before the patch?
+Since TCP BBR congestion control was introduced in
+commit 0f8782ea1497 ("tcp_bbr: add BBR congestion control")
+it has always been offered as "Dual BSD/GPL":
 
-Also Fixes: tags are going to trigger extra work for many stable
-teams, for no reason.
+  MODULE_LICENSE("Dual BSD/GPL");
 
-> Cc: stable@vger.kernel.org
+A GPL-2.0-only SPDX header was erroneously added in the recent
+commit 2ed4b46b4fc7 ("net: Add SPDX ids to some source files").
 
-No need to CC stable for this kind of patch.
+This commit revises the tcp_bbr.c SPDX-License-Identifier to note that
+this file is licensed as "GPL-2.0 OR BSD-3-Clause".
 
-> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-> ---
->
+Fixes: 2ed4b46b4fc7 ("net: Add SPDX ids to some source files")
+Signed-off-by: Neal Cardwell <ncardwell@google.com>
+Cc: Yuchung Cheng <ycheng@google.com>
+Cc: Van Jacobson <vanj@google.com>
+Cc: Soheil Hassas Yeganeh <soheil@google.com>
+Cc: Tim Bird <tim.bird@sony.com>
+---
+ net/ipv4/tcp_bbr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please cut the verbosity, we do not need to copy/paste fifty lines
-just to explain the obvious.
+diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+index aec7805b1d376..82378a2bfd1e1 100644
+--- a/net/ipv4/tcp_bbr.c
++++ b/net/ipv4/tcp_bbr.c
+@@ -1,4 +1,4 @@
+-// SPDX-License-Identifier: GPL-2.0
++// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+ /* Bottleneck Bandwidth and RTT (BBR) congestion control
+  *
+  * BBR congestion control computes the sending rate based on the delivery
+-- 
+2.54.0.929.g9b7fa37559-goog
 
-I hope you understand there is no serious bug here, KCSAN is a
-debugging feature, not a production one.
-
-One or two lines should be enough, you can take a look at
-f062e8e25102324364aada61b8283356235bc3c1 ("ipv6: annotate data-races
-in net/ipv6/route.c")
 
