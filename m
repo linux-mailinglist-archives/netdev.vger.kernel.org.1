@@ -1,56 +1,96 @@
-Return-Path: <netdev+bounces-293407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFxzKDQuHGoZLQkAu9opvQ
-	(envelope-from <netdev+bounces-293407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:48:52 +0200
+	id 2Hg/BsMvHGqDLQkAu9opvQ
+	(envelope-from <netdev+bounces-293408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:55:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4A18616264
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:48:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B66CC6162DD
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E08E301AD3F
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 12:48:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80CFB301F98D
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 12:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40A61C862D;
-	Sun, 31 May 2026 12:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1FF344DB9;
+	Sun, 31 May 2026 12:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="N5sOpDHY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efJ8OV15"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m60118.netease.com (mail-m60118.netease.com [210.79.60.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518924D8CE;
-	Sun, 31 May 2026 12:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.79.60.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073E5215075
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 12:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780231728; cv=none; b=dyiT7eQzirMJxVbOn5HM0yQ8HRFk3BNdw22KQnLYTeQ/tSPunY40D1+g4J7uTMmSx/OAD3MjANTruYp2AxqKcO3/Pt7jS8YjZNUQZ9Bz/+w7SRuR/JMDqcb1HtK7ptc1+2GqlUlTCkqD1cYwP1qABMk7sDm9FNXxdX1aLxieUCk=
+	t=1780232083; cv=none; b=lpR8NV+bNE60B4qAN6t4thcVYEZPVuzQHHB26NArFXcD918WO60VD04zOHbKq4tsq3oZRa5e/cl9uKS3Bxq/nUY0QNdBMYiE7Gi9PSx39RaIJ5lr35y2RIVeeIe4RGzuMC0dnrZ0A4+q5RslWMoVal4cigb3FJX5d/7wpb3Y+3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780231728; c=relaxed/simple;
-	bh=ga6ao25d1JTHgfYvqJR12MirHM8k1OnptQ9KBUCPdoM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ib7tUv1G/883h8UXntg0W++CP9MJx7KeXZDNdkSHgCF+Rvxg+DRqXE37m5IrGafiHEaf5rj3sCLP1ldWa/HAmYekXdM7v5lZ8q6whMwVWwYpdZmjDSsUuus0KOioMjqXlmXa3JxChJviN427qPhOKPJ3FCFZ5mEDE+8/BX2zBQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=N5sOpDHY; arc=none smtp.client-ip=210.79.60.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from PC-202605011814.localdomain (unknown [221.228.238.82])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 40786b883;
-	Sun, 31 May 2026 20:48:34 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: davem@davemloft.net,
-	dsahern@kernel.org
-Cc: edumazet@google.com,
+	s=arc-20240116; t=1780232083; c=relaxed/simple;
+	bh=91dAAKwKNToHslYj0nEZb0ypxjDjiWcPAE0+mi0F7l0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SEjg6GHDOU7HVknlk+Z0TmDyfJqOx2UOncJiSxv+cv1+vg6NEvmN5IkeNCAYyQNx1O4hE471zoR1QIIU7+i4T6L1l/lBzdTdI1rFG/YIEWBH1h30R9AjYjoJCHoQPW3wlRz4Qkp2tGUyZNDA7/7JwyMsXhM9imbxgtmut2j+6SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efJ8OV15; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36d98c9b596so278102a91.3
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 05:54:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780232081; x=1780836881; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w7PC0ftFSwZs0M7V53XHcTVYt3t+DFZQ2Iz/r+Z4hRs=;
+        b=efJ8OV15IEhXMpMYP/P7pjtvasj6jVDfMrYE+mZxed9d0zq5AmzmsBjX5fKTwY+ZG8
+         /WMmJ5A8/NDn6315MnmYioC7Tp61ZrlXKPvDLngKXW0YhobhCghzJp0qOLO3XeElONCa
+         ly1jRWCWG6Gl9v2PUvM32vmH/e05bfWn+pZjGwyVvQiz312rddwmBmhwRCuSeT95suzo
+         aaAW0adqX0eXZKUgAv7CMvG7BfVba9uQb+Xy88mpxeiISu2jT8EZ7CJObMisPB01tsjb
+         tibSgMEKytAMujkCjKCC1dHfInVP3nOd3eZbe0mwxHbs+3rmUKOn0Z01SrL6uchP8LjM
+         vPhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780232081; x=1780836881;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w7PC0ftFSwZs0M7V53XHcTVYt3t+DFZQ2Iz/r+Z4hRs=;
+        b=nmyLLok/TMVNw/i8VEC09m33fXmoldueb5EKWs5q/o+XMTeKHRPBcwxlVd1J1DZGyR
+         Jbuk7LbP6yYgzb0hzt/TtRAKXCItNsa+9tCImjkiZfBKf3OieGo35HKD+lMtshtu4DEj
+         asC8MMpPvx+ikHxI/ME/sptv8bDn3dAyqVUiD+XuLNH+icf4Z3iHylfKlwObtTHyIgRL
+         9Kt/HumD/GvA0Wba3th3lqTsfys2vB2UqnTWkV491Zv6JkcDlqMTVUErXCNPb4pViQha
+         hx+KGLp6NRaDDDd/yZ6lSxOKZ45shVCtQzt7mVa+y4TLIQsES1tkRFVJ4IGMGz1qgXpo
+         sh1Q==
+X-Gm-Message-State: AOJu0Yxqj0bCM77dVjZaxKv4pRNh1RnbIDeTwvLZ0S7VUOWuYWgG5Y8r
+	kjV2hlqLRmN2SZpTMt+NnNwm/ySIGn3lDI5A5MRRPxVhSIa7nJUTqCkqIKE+55O2B9k=
+X-Gm-Gg: Acq92OFmQLz3pnj1Vbj3nj+XzoSzwAQmmUBdzfi6HkOo5rswYcAwr/EtCU/MpEl868G
+	CnBHpB66r10d2CHPPo7sNt58UICb1bWMPJx00/d+uJlLmn7rD2L+LyltrZDAzMSGzs8xqx8TK70
+	vAG+mfyQcg10BsNqO4wX5ivIc5/c7u6RNuAEZe/z2aBIVzrxudFr3Zc6QdiYEGTBkOQyrKLt0Z2
+	guSC89I9H0hss4eS2dF0haaogJTg/P8jAGlpqLvXQr8Jmgm6f4MAsPWpdRP+4CJXKkqUbCcAhyp
+	35WUBpCS0ney1zNDOLXol7rbdkNl5AIJdvQ0TDMdfgstHrbRjgih/2kz8TyqTSSMzkkCY0LgK1H
+	TLTnrzqdgyujwhI8a+eU0b1agNLLv0oZdHgd9GqgiJ0aGXE0UjhpHGN6EmkTlIUJleRn1nLaaCM
+	k2Wai9XJodNEyg1HkmdTGQF6JqFIcNlpe72IAALcd+takNdbwIcQ==
+X-Received: by 2002:a17:90b:5184:b0:369:971:4888 with SMTP id 98e67ed59e1d1-36c501c74edmr5952856a91.15.1780232081284;
+        Sun, 31 May 2026 05:54:41 -0700 (PDT)
+Received: from Inspiron-14-5420.. ([2402:e280:21c6:671:7f12:602a:a4c6:2b38])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36bbfec391bsm7766670a91.2.2026.05.31.05.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 May 2026 05:54:40 -0700 (PDT)
+From: "Hemendra M. Naik" <hemendranaik@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	netdev@vger.kernel.org,
+	jiri@resnulli.us,
+	jhs@mojatatu.com,
+	shuah@kernel.org,
 	linux-kernel@vger.kernel.org,
-	runyu.xiao@seu.edu.cn,
-	jianhao.xu@seu.edu.cn,
-	stable@vger.kernel.org
-Subject: [PATCH net] ipv6: use READ_ONCE() for bindv6only default in inet6_create()
-Date: Sun, 31 May 2026 20:48:28 +0800
-Message-Id: <20260531124828.2323406-1-runyu.xiao@seu.edu.cn>
+	linux-kselftest@vger.kernel.org,
+	vishy0777@gmail.com,
+	tahiliani@nitk.edu.in,
+	"Hemendra M. Naik" <hemendranaik@gmail.com>
+Subject: [PATCH net-next 0/2] net/sched: sch_fq_pie: add per-flow class statistics
+Date: Sun, 31 May 2026 18:23:12 +0530
+Message-Id: <20260531125314.22492-1-hemendranaik@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,119 +99,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9e7e14362d03a1kunme0273942106092
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZHhhPVh9LHxhNSE1MHUtPGlYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUpVSUlDVUlIQ1VDSVlXWRYaDxIVHRRZQVlPS0hVSktJSE
-	5DQ1VKS0tVS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=N5sOpDHY2/KHq2Zc4utFmwCRKGGg+bl/VqTdWLPqCEX/sWxza8uUDOHNTC/5AWKG+Yz5Z9QqowqPcNgw9wHziJ2b+5gz9TnwdoZoHEtknAEPtrbM8w4bncfgM0zAf1KOilUGU37Kpfq6SFxB6zVkVkaJPGaHW1t50fMIM7JZIow=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=FMFH/MMyaYzGdrx/DaFPZW8M1UXSknLDtVo9O1ZlCYc=;
-	h=date:mime-version:subject:message-id:from;
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293407-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B4A18616264
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,vger.kernel.org,gmail.com,nitk.edu.in];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-293408-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: B66CC6162DD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-inet6_create() copies net->ipv6.sysctl.bindv6only into sk->sk_ipv6only
-without any locking. bindv6only is writable through the IPv6 sysctl
-table via proc_dou8vec_minmax(), and adjacent lockless sysctl reads in
-the same function already use READ_ONCE().
+ FQ-PIE runs an independent PIE controller per flow but exposes no
+ per-flow statistics. This series wires up fq_pie_class_ops to expose
+ per-flow AQM state (prob, delay, deficit, avg_dq_rate) 
+ via 'tc -s class show', following the same pattern as FQ-CoDel.
 
-This read is reachable whenever AF_INET6 sockets are created while
-/proc/sys/net/ipv6/bindv6only is being updated. In our QEMU/KCSAN stress
-test on Linux v6.18.21, one actor repeatedly toggled
-/proc/sys/net/ipv6/bindv6only while four concurrent readers repeatedly
-created AF_INET6 stream and datagram sockets and queried IPV6_V6ONLY.
-The writer completed 75313 sysctl updates in 45 seconds, and the readers
-created more than 360000 IPv6 sockets in the same window.
+Hemendra M. Naik (2):
+  net/sched: sch_fq_pie: add per-flow statistics via class ops
+  selftests: tc-testing: add fq_pie per-flow class stats test
 
-KCSAN reported the following race:
+ include/uapi/linux/pkt_sched.h                |  29 +++-
+ net/sched/sch_fq_pie.c                        | 131 ++++++++++++++++--
+ tools/include/uapi/linux/pkt_sched.h          |   4 +-
+ .../tc-testing/tc-tests/qdiscs/fq_pie.json    |  22 +++
+ 4 files changed, 168 insertions(+), 18 deletions(-)
 
-==================================================================
-BUG: KCSAN: data-race in inet6_create / proc_dou8vec_minmax
-
-write (marked) to 0xffffffffaa27bbcd of 1 bytes by task 95 on cpu 1:
- proc_dou8vec_minmax+0x206/0x220
- proc_sys_call_handler+0x21d/0x300
- proc_sys_write+0xe/0x20
- vfs_write+0x559/0x6d0
- ksys_write+0x88/0x110
- __x64_sys_write+0x3c/0x50
- x64_sys_call+0x1016/0x2020
- do_syscall_64+0xb0/0x2c0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-read to 0xffffffffaa27bbcd of 1 bytes by task 97 on cpu 0:
- inet6_create+0x351/0x700
- __sock_create+0x149/0x280
- __sys_socket+0x9f/0x130
- __x64_sys_socket+0x3b/0x50
- x64_sys_call+0x1c76/0x2020
- do_syscall_64+0xb0/0x2c0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-value changed: 0x01 -> 0x00
-==================================================================
-
-Wrap the bindv6only read in READ_ONCE() to annotate the intentional
-lockless access and match the surrounding per-net sysctl reader
-contract.
-
-This issue was first flagged by our static analysis tool while scanning
-lockless sysctl readers, then manually audited and runtime-reproduced
-with QEMU + KCSAN on Linux v6.18.21.
-
-Build-tested by compiling net/ipv6/af_inet6.o on x86_64 netdev/main.
-Runtime-tested with a QEMU/KCSAN stress test that concurrently toggled
-/proc/sys/net/ipv6/bindv6only and created AF_INET6 sockets.
-
-Fixes: 9fe516ba3fb2 ("inet: move ipv6only in sock_common")
-Cc: stable@vger.kernel.org
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
----
- net/ipv6/af_inet6.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 0a88b376141d..79fc6ce6ff77 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -211,7 +211,7 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
- 	np->pmtudisc	= IPV6_PMTUDISC_WANT;
- 	inet6_assign_bit(REPFLOW, sk, READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
- 				      FLOWLABEL_REFLECT_ESTABLISHED);
--	sk->sk_ipv6only	= net->ipv6.sysctl.bindv6only;
-+	sk->sk_ipv6only	= READ_ONCE(net->ipv6.sysctl.bindv6only);
- 	sk->sk_txrehash = READ_ONCE(net->core.sysctl_txrehash);
- 
- 	/* Init the ipv4 part of the socket since we can have sockets
 -- 
 2.34.1
+
 
