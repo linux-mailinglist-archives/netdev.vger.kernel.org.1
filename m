@@ -1,207 +1,114 @@
-Return-Path: <netdev+bounces-293371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 3fnmDJ6JG2rxDwkAu9opvQ
-	(envelope-from <netdev+bounces-293371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:06:38 +0200
+	id UHW+IUeNG2o3EAkAu9opvQ
+	(envelope-from <netdev+bounces-293372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:22:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7768614185
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:06:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05228614220
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4830307F296
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 01:03:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5361230215B1
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 01:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614AF275AF5;
-	Sun, 31 May 2026 01:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0353133C1B4;
+	Sun, 31 May 2026 01:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCfvO7qB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PFxrjsXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014911BBBFC
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 01:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E61932A3DA;
+	Sun, 31 May 2026 01:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780189388; cv=none; b=WHOWsUKQ0tOKjra42mLC/aGqSdMpL+QOHZ93BI/PnpmByN7cb284iIql5e7OogDKbhGjrTX+Zl+37h2cOfcA5N1ZYDA//v7sjuUBmyOLCoVdL/ZrvaWD+jo4qWqyMhVtnqrGYGSONo301ptJ5Ua0/IHqqQAdXC/T1fk1EU0cy1k=
+	t=1780190507; cv=none; b=S8MOOV4f3vVxgMIB1Yg9qNLcMOmuzz9CryjK57vrMFCqqLWPtwiFTSUcDEPX87kVK/0UN4gQ+MZ/XcI9XNN6WeEfsaT3Mm36MIOYHHiJHRqGP9HVUX8xzi0L3CQ0IQLXud2oJGNDO4T17wjmlTNfeGHaqhMpoiPFpA8IjOQJoQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780189388; c=relaxed/simple;
-	bh=APiFWZXTnRfbG+HwF1DJ9n4FtfK50FyeJSRq8kImSmM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vw1rLOboOHFCMxiQbSu65WmXwC14YAdLLF3MyQbqq4jbG69ZvEXV9mvOQ07QJKLZPvWuFvZLDg1j19B8DQGofKDXZMZp0etNUpRjXAdhg0fPAmdLupHb+OZ9jk6/G7lEY+x+q8vPm9w/je4tkqGrqOuJJbbPAHStG/XyI0vwzZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCfvO7qB; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4908b92904fso37629125e9.0
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 18:03:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780189385; x=1780794185; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+xcR4llDLZ21dX5aGAHoZFyM5vQ6lE/uFW6fHX8pUaI=;
-        b=jCfvO7qBVVXKTcOlfUa6tSZO8/gjbdh1BF6NE9G3o80DPXyDhMitwi1hSC20yG73Zr
-         Di/I9DSUSzgUkdD/Xnhme2MNWHgw679ZK6z8dT+WEPR/B6Mxgfsnu20MZpLqQjLgDz20
-         lzbSB6VVmc/BvsDeK7tPSK90BaGVhabvFMQNyQtoWPVYdbeqUoU6o27XN/xwFNFEwywD
-         dSshlovJ0vlIZaUjuAlnMnrkeUlMmj29U0pB/x3rI0wtn83yzuIWa/d8O8Vwt8IkYmq6
-         jSgQ4EJ+MK+Ie+hCNmf32BtZmbr3w+6rszUuUOCGPtkXRAhjEx+ggatc0Wwe6X+pu3x0
-         U3fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780189385; x=1780794185;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+xcR4llDLZ21dX5aGAHoZFyM5vQ6lE/uFW6fHX8pUaI=;
-        b=WCnzxalrPqCQcs0cHPE1NSGcKIqvf/J8pTgONqn6kVU26SKTMKUxREa1Sg99++ie76
-         9jhaVeNZ9drLRUY3DPN0KSesW5Ubbv48E/RHEvx1r+nCkcIEuvZvf70+KqLwldLutHyO
-         vEpHNjipxsWSM7TxUNgaCwYxDZKL3RLiQy/m7FJDLpo3LtUM/xKf86tkrSghltRCWD20
-         Z1TmpGqoKO9v1UQuCh22CcY3R96XyQr202wMKmVX5sshe+u0j0b3wFqxaMcu8Dsph65r
-         Am1nLCmgISF7dqA/PoHMfKqQN1ajp0Qxq71HMyf7mEicfseW/FoGs+/I1YIeVxC2Lvfj
-         1vfQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9jvt6XtG9HUKjHH26VlcqPcOZL5t9ZGvb3Qa3//qqA0Oh6UTHjBos5lvBjqlTZoZS/J5mLzFQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx35Go1JqjYTkXSmNmVpRurtd+ykDg90X1xWTmKSYmgDgaY0uZw
-	wFBhV7/rINfm3T10erP7tF3bOdUsfOjRQrhm+dRA06Jb9URCw3rWOvpu
-X-Gm-Gg: Acq92OGm0Plo4KoNh9k0L9wn5W6QRtJFlFCxy6/fueRpQRvKGcdTO/2OFZJnMOxILpA
-	Gmz0xKM78SZSpdvn2VV00ae/zzyCOC8kgZt/xqDIZdwKoRG+AFwBwHcSskQATpOI6WLJYCnm31W
-	n4oqnDoxkyh1ZAHXYxbBXbALs8/+s644HQGErLNDohYMqhZiqem7fs3MsZCMojO0ABmTxpfxeiX
-	1z2hr8Ap+ALX4gmrKfVsxK7D96TGk9ScbR3xjmdyhLiqohLfRfcYMuKaXIurDXoesVgMPW8TRdW
-	o1lQWrIxGcKVNn7JP4X3bwUmQt4vyMUKE3sETSWAqcTxxd4kTfkDOqmUacBZHkZlEouR7UslNTD
-	TxVSvAf78van6Zad9BqOQpSVQiplaOoN9jI6Wrj0vtuC2lCnUneV4+z2ndA1pdGaDUIglZFA+dF
-	CFiHovk5Ss1/Sk9xD46w130weev340pA==
-X-Received: by 2002:a05:600c:e489:20b0:490:467e:a3d7 with SMTP id 5b1f17b1804b1-490a2952798mr65855195e9.30.1780189385274;
-        Sat, 30 May 2026 18:03:05 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4909ca6575csm218111405e9.4.2026.05.30.18.03.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 May 2026 18:03:04 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>
-Cc: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-api@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	David Howells <dhowells@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@kernel.org>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	patches@lists.linux.dev
-Subject: [PATCH 3/3] splice: remove PIPE_BUF_FLAG_GIFT
-Date: Sun, 31 May 2026 01:01:07 +0000
-Message-ID: <20260531010107.1953702-4-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260531010107.1953702-1-safinaskar@gmail.com>
-References: <20260531010107.1953702-1-safinaskar@gmail.com>
+	s=arc-20240116; t=1780190507; c=relaxed/simple;
+	bh=EjiLT/+GzYTdvK6MzWqcK2snFg+b2Yy2YUtPZMn5Py0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WzSEzTW0xfL55ef9LrzM4Av3QIZHNDV6KTseziwkQi9Rkt7ftvUOX46ep8pZi5sgc80vtgxkVOprhy0QjJTdGXo9ym4l/1/TWKgrfQUgn3WNWAKwaR7kO9VjvVWO9eAa/yyRdDRTj3CaIqM2qxNkr+JYhDEXT3mC9cHNX7KQO3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PFxrjsXJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IaleJQsTketk5pHC8lyykun5pugCc7TYxddHxj2OsDQ=; b=PFxrjsXJ/jOxF3FhcFSQZd8Xwq
+	rnijp6uMEB5k+UnJfrmhWvTIpG8aDptJkrYZtF7e+2nUTYy8meg1SLiGTp0REiRH4fPvYZiMUHj1p
+	hqivlHO8w8PYBgK5076eAopefifuk2USCh0uN1+Rz8vg3meCSCxVFXdoIFwBWUb9iXeg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wTUrf-005K1W-DH; Sun, 31 May 2026 03:21:19 +0200
+Date: Sun, 31 May 2026 03:21:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Thomas Gleixner <tglx@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: fec_mpc52xx: add missing kernel-doc for
+ @may_sleep
+Message-ID: <4d3eb983-8674-4e3b-8dd8-3ce81e67d6f9@lunn.ch>
+References: <20260531000042.369043-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260531000042.369043-1-rosenp@gmail.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-293372-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293371-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B7768614185
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 05228614220
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-It is unused now.
+On Sat, May 30, 2026 at 05:00:42PM -0700, Rosen Penev wrote:
+> Add the missing @may_sleep parameter description to the
+> mpc52xx_fec_stop kernel-doc comment.
+> 
+> Fixes: c35a0824e88b ("net: fec_mpc52xx: Replace in_interrupt() usage")
+> Assisted-by: opencode:big-pickle
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 
-Signed-off-by: Askar Safin <safinaskar@gmail.com>
----
- fs/fuse/dev.c             | 1 -
- fs/splice.c               | 6 ++----
- include/linux/pipe_fs_i.h | 1 -
- 3 files changed, 2 insertions(+), 6 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
-index 5dda7080f4a9..fb8fe0c96692 100644
---- a/fs/fuse/dev.c
-+++ b/fs/fuse/dev.c
-@@ -2352,7 +2352,6 @@ static ssize_t fuse_dev_splice_write(struct pipe_inode_info *pipe,
- 				goto out_free;
- 
- 			*obuf = *ibuf;
--			obuf->flags &= ~PIPE_BUF_FLAG_GIFT;
- 			obuf->len = rem;
- 			ibuf->offset += obuf->len;
- 			ibuf->len -= obuf->len;
-diff --git a/fs/splice.c b/fs/splice.c
-index b1a4e3713bd6..6ddf7dd72f7b 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -1622,10 +1622,9 @@ static int splice_pipe_to_pipe(struct pipe_inode_info *ipipe,
- 			*obuf = *ibuf;
- 
- 			/*
--			 * Don't inherit the gift and merge flags, we need to
-+			 * Don't inherit the merge flag, we need to
- 			 * prevent multiple steals of this page.
- 			 */
--			obuf->flags &= ~PIPE_BUF_FLAG_GIFT;
- 			obuf->flags &= ~PIPE_BUF_FLAG_CAN_MERGE;
- 
- 			obuf->len = len;
-@@ -1711,10 +1710,9 @@ static ssize_t link_pipe(struct pipe_inode_info *ipipe,
- 		*obuf = *ibuf;
- 
- 		/*
--		 * Don't inherit the gift and merge flag, we need to prevent
-+		 * Don't inherit the merge flag, we need to prevent
- 		 * multiple steals of this page.
- 		 */
--		obuf->flags &= ~PIPE_BUF_FLAG_GIFT;
- 		obuf->flags &= ~PIPE_BUF_FLAG_CAN_MERGE;
- 
- 		if (obuf->len > len)
-diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
-index 7f6a92ac9704..a1eeed800669 100644
---- a/include/linux/pipe_fs_i.h
-+++ b/include/linux/pipe_fs_i.h
-@@ -6,7 +6,6 @@
- 
- #define PIPE_BUF_FLAG_LRU	0x01	/* page is on the LRU */
- #define PIPE_BUF_FLAG_ATOMIC	0x02	/* was atomically mapped */
--#define PIPE_BUF_FLAG_GIFT	0x04	/* page is a gift */
- #define PIPE_BUF_FLAG_PACKET	0x08	/* read() as a packet */
- #define PIPE_BUF_FLAG_CAN_MERGE	0x10	/* can merge buffers */
- #define PIPE_BUF_FLAG_WHOLE	0x20	/* read() must return entire buffer or error */
--- 
-2.47.3
-
+    Andrew
 
