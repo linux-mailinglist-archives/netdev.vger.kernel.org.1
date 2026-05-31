@@ -1,177 +1,137 @@
-Return-Path: <netdev+bounces-293373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GMHH3ObG2pWEgkAu9opvQ
-	(envelope-from <netdev+bounces-293373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 04:22:43 +0200
+	id ZkSKIuSlG2pzFAkAu9opvQ
+	(envelope-from <netdev+bounces-293374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 05:07:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C326143B4
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 04:22:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB6B61443D
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 05:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 50F703003D20
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 02:22:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A08C93025164
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60E01B4156;
-	Sun, 31 May 2026 02:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF332EBBAF;
+	Sun, 31 May 2026 03:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QeMo4PFK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HBRlEiDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F15194A6C
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 02:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C6D13B7A3
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 03:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780194159; cv=none; b=KB7DPYXN/Q/WKVTZWWiaJE+QgP+hTCfnD0OhW2HAxL9NJLWLbK5c26nbL7xw9nxXs04Q7zsSi5/4WKqWpP01CPEJvc0ilu82goB2Ky/Nv+S2mzkLthR22HVo3+B4ngMtp81TJ9sV/I9CZmOW6JGJGQ/dipU5aCic+TIWZou1CNQ=
+	t=1780196831; cv=none; b=k2L1sWgejMLWk6bmjV1VHJVyKBbfHyYVBMqUk8ScfJ12q76KpL4M8a3l51hp+jV/Lw3+XdgV5nBk4wo5FF9D27ryjrYkjni2UJWnLW2gN0hR3cappGjHm0PugmF/FdMtnRRA4N2bBRMBjOqf+k7c35XAKHMzN5sYuTMbIrRGAkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780194159; c=relaxed/simple;
-	bh=cW27X/qs8nPmYocEmOprbNiNOpAaiqTRwBkoXCq9sg8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VE7pAHi++HTg3HlQdw002i7zHCcUUJ2KzNRd5nGYOhxID5ZivIINoamrOgw4t7MWje6ntZrHyRL/uikRdgDk8hFXBEyzyPh2z+FreAzCRi/1neI0Y0rxCGXUZsIEjVnafXoWU2dsZB4HAsAN0gic14O3mh9dF1pbBLkPlu1NHbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QeMo4PFK; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-36b7b7b7a80so1509650a91.1
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 19:22:38 -0700 (PDT)
+	s=arc-20240116; t=1780196831; c=relaxed/simple;
+	bh=aZF8ibfcTpVWXO+FAfE4NlgLei4aig18a2/6Ql+psr8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hg+s/+G6e5JyFo2GV986ThQZiW5pOm7VVqb1PeHKOSzM4+mqh8si9Tq+mOqXJgqYgKk0wAKJ7JsVv2nDQ4Qq1z7a3R2Hav2uoFoM95PHEHFnwVTEjNGRRkkQBLSAa27ttebWk/lL6AHdsjgW6C8asmHyO1YLWmVrp8USRuY0FvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HBRlEiDl; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c8582b167f7so602293a12.0
+        for <netdev@vger.kernel.org>; Sat, 30 May 2026 20:07:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780194158; x=1780798958; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7zdMO1aum1o0cEFtC+dVHwvB8dCMTjDC9zp/l6WfwTQ=;
-        b=QeMo4PFKR4BC/IiHYR5jAfiZ2p9de4ZKyp5qvdAFyx5VJ0GL5eq3Nodk4QKaNhggoI
-         H7gV2v1zDzHdWAwHbma69l+fs2kl6pMkCV3rAq10NzsU1KCkyHN0P11i/S5eoQ8g/Of9
-         I9XEVC2r+bTjREoAvr3OGZmTkb2sIIgyixOIBM7v/BVyPgKchFS+mjs+ZWjHFghWByY5
-         RveZmI3YSM6ESoN5bziiih6oa/Fp6wWPP+QA6WEqeANh3OTPgYWVHw+1icfu/fpjX3PY
-         TLiGcshk5oQBrj6bPXNJURRPPubqUc8OKNziFWoqhHbDo7e4oyznGq/ibhCByTXQOPR5
-         hw7w==
+        d=google.com; s=20251104; t=1780196830; x=1780801630; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wcGe90UENUjqdbuFSlJAzTBdFXFc1tmmAGjowomBLqc=;
+        b=HBRlEiDlmyRcg3hcNZBN2V4X0DaqTEvypfYixNbMGds3WcArO4UTi0O7m+dWmqTXrf
+         OUT67nGUXCHy6AfRuC4qH0Nf9lTvwvW0piXbuG4JPGixr5oFtnF9r1oY8+Wti0NkKpKR
+         wbb2kmrTpLSFNp72e2yDAT9THlY18xkL1m8wdIDHBpHkK1Tx7npuzoEPQhBxbmmgYteq
+         3pGSzjvTmSLqRuTDgFO9kDncLVqlZj1/NzswV9ucBLlGFCU6IlKVYSNzHL7fy7l+Mcv5
+         wgcxnlpZkIA+0EQDYLafg/EzbG2S84WRGUhqmcqz6EHa1+BrISJkhtlC7ClHmaYNclsK
+         3KkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780194158; x=1780798958;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7zdMO1aum1o0cEFtC+dVHwvB8dCMTjDC9zp/l6WfwTQ=;
-        b=gb/Vyh2kKBD5y/f576JKaNymjYgSotWg3wD3Ibw5rqgoyVCCtHRay3JR0UcCH4K/02
-         TY1fihWSxiXjxpuJMODMaq2wG/gJErWUEcpUoY538NVYNUfGaC7l7+M5HWy7d4rL4/Ss
-         gmPs3UR5mz46bvAy5cshvYuS4zJOL0xMDLzaVfNBYhWg2dfmH9ZOTNs6UnP/qgJ7wkxE
-         s/aCnB//GVPT109o5r1WhwOPVQDKifvOnweEsz7zXOOgCKpTkmrsmKaKSPbG6SiBzoXc
-         OKtb/j84PI6O0k3fuf8onWS/KsxCcuLX1nod5Uloe/v7RAQAqSJi9U9j97wlJM0NwQH0
-         961g==
-X-Gm-Message-State: AOJu0YyiWZDKzQhehz2L3o4eGqN6Fivlbot94f5o6tSwTglOfL7G0xOE
-	SW5uy956R+yFssUohg3BAn0tpoDbSh+7g+sxTz8gZe53Ro4rGP+RgNSo+b2ZhB7b
-X-Gm-Gg: Acq92OFzBnpcfq/DDfreEd5WIFMQb/0LwzRmZ0C9J/XLzsqSBODre90pnUDwC7SjjJ+
-	b6l+yuSLji0gkFIry93i1Qpgew29FvjupIIRIQa2vEx+U2wdJIBf76GLyQHR2YjCWrHXdZsowXK
-	JVbSXrzo0+u2AGv7T2B2cG3uHD0IVMjm10VCyf9hV8ZSAseg1x9U3D/NZrFBqh1Ti4WQh2xVTOc
-	QVW4LotTc1W+zSi8b1lRVv2od0H2RDtiki1hU4sqfFqA8L7GGjikeWX+IeAbRsZ81o7OvQn/S02
-	9y6jsjyVlk98PZ+Ie0KjeiAFqv8koGVTWoTsVbVfKRzrwoa0JCjjTyIyRDs46hh6tBRhjLEb7JA
-	zORjc6PVL8H4SEt/xYTNhzUHzDqYk553njR0FXOhArqut/uqq/29o4IJnEEeLZTyr28DSg2U8x2
-	BIOFIFT4sFWg7Q++8ubQi6ERvfwXNkKFsVSoZ4otdqLE+24Hmz3izCuvuicR3rnNVB6Kp//Lnjv
-	U6PVNLMynCN9HIpF1M2WYCWvvJAxEoifhYwDPRAPAQOHA==
-X-Received: by 2002:a17:903:38c5:b0:2c0:ccdf:5e61 with SMTP id d9443c01a7336-2c0ccdf603emr2689255ad.6.1780194157851;
-        Sat, 30 May 2026 19:22:37 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fd7bfsm60576395ad.19.2026.05.30.19.22.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 May 2026 19:22:37 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rosen Penev <rosenp@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: ibm: emac: Fix NULL pointer dereference in emac_probe
-Date: Sat, 30 May 2026 19:22:19 -0700
-Message-ID: <20260531022219.607001-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1780196830; x=1780801630;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wcGe90UENUjqdbuFSlJAzTBdFXFc1tmmAGjowomBLqc=;
+        b=dGY8lOoZSuiZE06GKzIBHQ4soxFFUAeDbURGN25Z1Lpo2JwsxNFZ9L4C7auQI0sjuP
+         3yDHRKvu3AXHpDLm1k/mywd2MZdYxsDtP/SvFnSpffqUgsAGuNg0zK7knCLQZ/hsQBUQ
+         q5mRH5N3P0E8u7vj7oOGHlPjcMtckp1fFiOdkAfhUJilLiVghPneDxgZHKbak5dAsWob
+         iDekFg6CwQhzqwBj8ZrU4C1c1ZDC8oym5+j8l9MVIVxpN/BP5z4Oi5/OtPTr0RwwSuXq
+         dhgLHjlOFRrG4lWI7VzDxeE78JGqRPKLhr/4LpMbWKan1NhWrpej8hzZR2cbS93kC6cd
+         hdtg==
+X-Forwarded-Encrypted: i=1; AFNElJ+J83fpirpWrbj+Pv9ELEEKCmClU5nLnsCMG5PtBL+0Eff16ziURYhv4wGvxpoiABh7fw3mnuU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVHDkgil6sL5+U0lmRGxx96IA6WNk36NWwiA87KsW3Lwn7hYqI
+	8FC33x7FsX5M7SzkFW7MB/2a8BF2D8fiNPtOvHV2NrAwGhWG/GNxvK/PKWukUycXxVWyxq+2lrC
+	/O96m9muZFuydcT6tM0NqMV5xPg==
+X-Received: from pgee24.prod.google.com ([2002:a63:1e18:0:b0:c82:c472:2b9a])
+ (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:6f06:b0:39c:787:f197 with SMTP id adf61e73a8af0-3b427f33690mr5573334637.36.1780196829612;
+ Sat, 30 May 2026 20:07:09 -0700 (PDT)
+Date: Sun, 31 May 2026 11:07:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
+Message-ID: <20260531030705.3754389-1-yuyanghuang@google.com>
+Subject: [PATCH net-next 0/2] ipv4: igmp: annotate diagnostic procfs data races
+From: Yuyang Huang <yuyanghuang@google.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293374-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293373-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 12C326143B4
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: DDB6B61443D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Move devm_request_irq() after devm_platform_ioremap_resource() so that
-dev->emacp is mapped before the interrupt handler can fire.  An early
-interrupt hitting emac_irq() would dereference the NULL dev->emacp and
-crash.
+This patch series addresses several unannotated data races between lockless
+RCU-protected diagnostic reads in /proc/net/igmp (igmp_mc_seq_show())
+and concurrent writes in serialized paths (RTNL and group spinlocks).
 
-Fixes: dcc34ef7c834 ("net: ibm: emac: manage emac_irq with devm")
-Assisted-by: Opencode:Big-Pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/ibm/emac/core.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Following the precedent in commit 061c0aa740d5 ("ipv4: igmp: annotate
+data-races around im->users"), we annotate these intentional data races
+using READ_ONCE() and WRITE_ONCE() macros.
 
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index b060795dace7..3e8ea0b05619 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -3044,6 +3044,13 @@ static int emac_probe(struct platform_device *ofdev)
- 	if (err)
- 		goto err_gone;
+- Patch 1 annotates races around `in_dev->mc_count` (interface-level joins).
+- Patch 2 annotates races around active timer-related state tracking fields
+  (`tm_running`, `reporter`, `expires`) on individual multicast groups.
 
-+	dev->emacp = devm_platform_ioremap_resource(ofdev, 0);
-+	if (IS_ERR(dev->emacp)) {
-+		dev_err(&ofdev->dev, "can't map device registers");
-+		err = PTR_ERR(dev->emacp);
-+		goto err_gone;
-+	}
-+
- 	/* Setup error IRQ handler */
- 	dev->emac_irq = platform_get_irq(ofdev, 0);
- 	err = devm_request_irq(&ofdev->dev, dev->emac_irq, emac_irq, 0, "EMAC",
-@@ -3056,13 +3063,6 @@ static int emac_probe(struct platform_device *ofdev)
+Yuyang Huang (2):
+  ipv4: igmp: annotate data-races around in_dev->mc_count
+  ipv4: igmp: annotate data-races around timer-related fields
 
- 	ndev->irq = dev->emac_irq;
+ net/ipv4/igmp.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
--	dev->emacp = devm_platform_ioremap_resource(ofdev, 0);
--	if (IS_ERR(dev->emacp)) {
--		dev_err(&ofdev->dev, "can't map device registers");
--		err = PTR_ERR(dev->emacp);
--		goto err_gone;
--	}
--
- 	/* Wait for dependent devices */
- 	err = emac_wait_deps(dev);
- 	if (err)
---
-2.54.0
+-- 
+2.54.0.823.g6e5bcc1fc9-goog
 
 
