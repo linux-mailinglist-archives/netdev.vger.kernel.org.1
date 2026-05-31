@@ -1,204 +1,239 @@
-Return-Path: <netdev+bounces-293404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293405-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNLICVAnHGr9KAkAu9opvQ
-	(envelope-from <netdev+bounces-293404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:19:28 +0200
+	id cJlOIKwpHGrqKgkAu9opvQ
+	(envelope-from <netdev+bounces-293405-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:29:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818AB6160A0
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:19:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26476616101
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 14:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7C8C3020014
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 12:17:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DB7283001FF3
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 12:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D7B34BA28;
-	Sun, 31 May 2026 12:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF9F37CD2B;
+	Sun, 31 May 2026 12:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HsKU85y2"
+	dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b="GVclD6ra"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010042.outbound.protection.outlook.com [52.101.201.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556D9373BE0;
-	Sun, 31 May 2026 12:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C275D364EA5
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 12:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.174
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780229846; cv=fail; b=M0KvdfC8h2HtFg4KnLyGq25hy6SjAhqYK76PsGOXUbdroQavvOJ716QXunZtUs+wo5dYmDt89G9kRWd9T61bY9khZ9Wb8N0TopPFChi/xnISeTMBQEtjmXkzPYvuYMKnvBsoQvLWcLfh+k6FfEj2EasaV+1D96Obdd/9bl7vH5g=
+	t=1780230568; cv=pass; b=ErZBPmzzV0PSQYPbXppxdP3xumf8+FjVNGCgfYT17i7wmQ1IoF0h19bnIE7zFVE2dau5T2ulNZEffytZVpPobJf7ckORWH1zMKYXOWORUkhxF+0k9A4MGBJ/8CBJma+IlfM8eHQJWyDuVkBRfOv++ngcxF2xQhzkhrCMO9HrGHc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780229846; c=relaxed/simple;
-	bh=48vxZayvdtHhAy6PNs/yM2dRdorhEBBWQL4ANsWZJnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=POAUHGkkBaR3rYfb/mqsZ3gIJuSGMOE1VOx4wH0TRravjUjEK3fSYvGJe+R7vZjwQkjEv/414zio6Q8kyCfkRcL0qLkwyYYaDi6oHlbm6vbH87+LpdDrKtAh+1vExCeigifvFmS/J6+jWIaIB6ejcy0PYKAjFem1xfb+M7X8qUM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HsKU85y2; arc=fail smtp.client-ip=52.101.201.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fA2sO3tRQ8XxZoz4CfRcizcIaTZXkRxrpWvTMc4bc9ld3WTNMg2P6Ttx0jx5sARYYqobgVHiOA3Bw7j6NA6za05U7czvJeT/PJNasECsdSwly80lD1YJyx3BMV71OUVgeHXP6EwXg8tj84iqJwqlTKdCRRdpqUeqMnnuSFyyU20hBwKwKdMItYqyZBjh/nkGqFaXVJj4IRggmwAgS3iILTOhvs3ncT7RXQCfZodJtfWzIzn9AM1DzV7IORMsVYp0FUwC1UPfzmdC38T6CtC6kp8s7+7bt64EMNROBw8e0+TWKXVm0X1my8QWgkhy6A07Qvu/PIDBjlz/BFuwx1X2Mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DpDSLUDhcZeCY6Mn/X88UhfIufeO+0T8Q8HJS0+36LY=;
- b=i2ZKHLKwwQiHeq/rawIzXuBVfmHzQy0CtykgM7VTsfedhrPTZ6qaufWsQs2y+tcy6qu9al5X/WC2vhQenv6wNVGkltwNVrODqcRYG8U+TojJ+OK1nj/DJ2uIiTb3LFYkvJpLkQY0c88TCGvZ+rhURchMvYv6vtmpmivVbqX5KamwSbM5+5q/RXQ/6BtwpikRZZX3uyFDusGTGVbXupHkSeZjDQWa3f3rBmFQHyTcTFjhParAhKz/4UGleFrGX0rmWCXOi2EDRUZWw3Wrbn6shAhLaJZc9USCMr9LlN97hr/X92xvwhe3V5XUhB+Uq4xNapmYUhaaVFZWptjddOwm4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DpDSLUDhcZeCY6Mn/X88UhfIufeO+0T8Q8HJS0+36LY=;
- b=HsKU85y2VFQC8hNpm4MdyRDz+LB36gwPnH8QIuGQQyAcG6SFlH7rX3+FbPRekxQB5QfpNGZi72AcLVBE0ExStYUCdotEZZK3BDMvc8qmobuUYmyq3rEl+gO3783/moMZgu8TTpASPGHKJjrOaJ3WKni90/vBMPB5p/1RhQFxXoqpA6E8i5gYwXAxjN1OCmL/1+AWFYCDmVvspHbesuInDYOf24jAzGys3OE+W2y5hPeF03jM4cTp1icsSjgAYZfnQ1bnyCjxBeTVwHR7sOwfj7RqGH/B7F1NyuIFU3WvrupfMzOgpQKRIFMZPdlWxAvN6p2yvn4UvOoV+huh3hJuIQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by SJ2PR12MB9209.namprd12.prod.outlook.com (2603:10b6:a03:558::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Sun, 31 May
- 2026 12:17:21 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0071.015; Sun, 31 May 2026
- 12:17:20 +0000
-Date: Sun, 31 May 2026 15:17:11 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Qi Tang <tpluszz77@gmail.com>
-Cc: fw@strlen.de, jiayuan.chen@linux.dev, pablo@netfilter.org,
-	netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	netdev@vger.kernel.org, dsahern@kernel.org, horms@kernel.org,
-	lyutoon@gmail.com, stable@vger.kernel.org
-Subject: Re: [PATCH net] ipv4: validate ip_forward_options() option fields
- against skb tail
-Message-ID: <20260531121711.GA189496@shredder>
-References: <ahlfI38aDciPfG2S@strlen.de>
- <20260529104356.911666-1-tpluszz77@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260529104356.911666-1-tpluszz77@gmail.com>
-X-ClientProxiedBy: FR4P281CA0245.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f5::9) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	s=arc-20240116; t=1780230568; c=relaxed/simple;
+	bh=HlhE5NVSGbTLNcUQbLKcVzX3x6onf9avbYbRkkHlpss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PU/jYH4JjwNEQAKL4SDbcoU739UTARjQq2YdCabvFAYhwHQQYEG32TcMeMRVZh1Eud0GQvrwqh5qWJRPZHnKBKexPF5Y92+ikPZWLJzpGM/rm7ceUGwl1QgA9xSyJdEpqZ5gMzAujit3Y53kLAR9VD7h1zgQwgXoWOUcLYkszyQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=GVclD6ra; arc=pass smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-842358aaf36so191504b3a.2
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 05:29:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780230566; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kvdIiFRkzDdW3FNa9Gujy0gvofAywVSWosejEknBa7EhG/4rVPBF1INQbHg/ltWmiC
+         MIknEJjaiaxj57HRbafRwyMCCk+lMYm5jmqVU8HlB1adi4yw5EQpFyA4pE35uuy/CK0i
+         BhLRwQpU7Xsfn3vHWzfsKGvA1EVfzgf9hcK5WbA1dNPKvrOJg8lPKBxNIe4b9Kq8CtPZ
+         2HfFQPr5xZ/dD7cNe1WlQbQr+yj36/piWN8EoBwhwCSUSxcl9otcOEr7BxHvVnzh0Cqz
+         K3mZLXPPPCVs14/bhJp1BkommwCWZ280piOo5GaPapuETPLWQpnx2USlhya2TUVc1IqW
+         p0/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YFgEcZSfc5yP97jZFxA+JDodaniti4g996XJsD6nFn4=;
+        fh=CZlqreM5+7+5mMHP6qPd1TfrehY9udzjmsxD3tzPdVA=;
+        b=G5KIqgiWPuhSYWNj5nuqsI3Prt02aghoIvMo8ZmOFhU5l26JmS2/u/XVETWO3f7YgV
+         xR6KOVbMWqMzEAmGIAL8/3oEZgS0QpGyBXDJ7332Pl9yzIOniLdRAXD4hjUPLYf+/i32
+         8B6wjvfSFAy5SHGyfPPfIxiO+bCKWHz0BwF7eXgqWqQtD2a2GASb/9XxPdQLwLj7+aVP
+         ItBApDy+8C5VyxTGSZSCQS/e+PRFokzSp5BTv7ApWlS0xUlKrHlQw0/y+aPawak3Wqpa
+         OnRrQNZOAFa/dVmQVFInps3CcZDdcvcz+JJYV+XcruhLs0vqjCXcrnzcqD5qezo1WgVT
+         i2NA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1780230566; x=1780835366; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YFgEcZSfc5yP97jZFxA+JDodaniti4g996XJsD6nFn4=;
+        b=GVclD6rabhX5hq1BNBo1hmoubcQdesgwkul2R2wYjRh5wDI3iPYem2TwLjkdKlhP2k
+         L81KeTdhJfhKJvpf7QrAXICuErzI/4j0ILrSE51QkPltuvMFGG7Ad6A5RHPQbx0KJLcL
+         h49dt0sInqF4tUIvxsAvAy52wrBwt7f4NIb1g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780230566; x=1780835366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YFgEcZSfc5yP97jZFxA+JDodaniti4g996XJsD6nFn4=;
+        b=GR9e6pEtEDWAGFxVjcELa/2M1J1vLm0VNPIYHlLPpjIACQ+LBxIBzXfHP318soZaVI
+         ZwRa39LMjpzxe6W1AKj5nC9RfoUb8hMjTHc9Uk5UCzX4m9DdwQIL2RJLPGC+Dd9cx3ad
+         6StyBzfT+G7dJKZCrZJggpeA6jv5C0Ejt9/4geOb1zZjbk8yLOXGkOv8qwxTeng6IJ8q
+         hK/1cl+3gY0j0RFqxI9hencpKI0yT1S0UPjuKGQ5M3cA/uLgRUrVSU2RpZ9ncthhlMw7
+         6+/5h9y+7xf1DW/+F7XL6Q+q8Y3KXISB/DLHcPx3oaaWnbfJmTVBuhMLQboS1yhQtEZ9
+         ANKA==
+X-Gm-Message-State: AOJu0Yy0DFI4Z2dSZklDrZjvC3hjd6qWYqYk7wZfzEQjpXEWZZ5XEfiZ
+	nidm0gTAaDlTiuzBGs3RSLrnFzI9zaBMbjfjHUaXcZ+eSccHgc1UGgQWk4qDKvgBm/dkJaTfVzR
+	r6BgjpjeHDmROjHeTaD+QClLYuwoOd1m17f37R+NB
+X-Gm-Gg: Acq92OGGrhxhtphj6djJ6ByCYSKg5Ok1GTB3ukixyNX9N3TLfvUVnY7RHs+FhomQMzS
+	6S/mF1iXaQr5i3ppajv2hDX0CHkmTNXxqKlHHob3kYVxACrodEPB5qhh9mTyHL/MDQnuvcsELmJ
+	NsANZ83tJnVdmTzjZFo2eJdGY5oRrKCiuha6vaOKBCWdPfuMgMDhVRk/Cpck3XxtM3ye1gYVg5i
+	EMhOgm1vTQ9T+fDJvJieVU07WOpy/WUs7Gbt3IwYGj7D8amsVLN5vgEzGtx7JPQD7FdtMFqDJWk
+	+iWCDJuuiUu4UBKy5OQ=
+X-Received: by 2002:a05:6a00:3c91:b0:82f:38df:681c with SMTP id
+ d2e1a72fcca58-842253d3c9amr6115185b3a.6.1780230565684; Sun, 31 May 2026
+ 05:29:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SJ2PR12MB9209:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1845237c-32e6-43cf-7d92-08debf0e901d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|56012099006|4143699003|11063799006|18002099003|22082099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	Tp6fdEaupMoGW5IzFyih52LRTeZKckh+6eWbDNxJYCQi3b+iZXmiFnsV4Equa0GUGhKVqoW/JaWHtNzZICr/k6eU+W1uviMHZdBcdXMdsmrA3nFGNY/zLeCekAh0dy0jt0tFRmvuitW8PFemf+tRlzKlprTqhii7JjD85cj6chMnTu2qqTOJmUz/K+F9dgFIjST6s4CqGtHp0BDVDHKFwCZAomm2xvD3+BbS6OPz0M5+RR6CQLkaQt5RRoA0/xXmhL0K//4b4wVlhf8bTkkpL7DHxSSHpklhJh4Cn/hOR7696IsDfU2B1F0EKhIuogdIK+PRBdjDALJztHmyziMGSAo439da2wHnrt1Gm1tysgtUHG/+1AmfDM2OKmy3kF6h4UeCKS682RQpSVsnPjPo6DtP1xRP8HhiLX/SQAsxZhmZqVh04Hkn/YJxip4uSt2Inu/CvfzBtyuz/dggaU1ecTqmofy21yVdo2J53L5K2Yf4joAlfQm2fKZkokn6n9LqBNM0HyTtxXLXJePfv/d972JFM95zcVp+kumURqqua6GKF8wYgweipbRCvjhsM/gztB8zo1tj+vYBmPJJHn6e3ANyE5R9uItHfuc3GgQXjomA+Rc6MAf9sUpEX6myNQOX5WuJALgkNm0jDiwHyCbeYa9a9x5NRSXBAH546gSKVI9nozqqn4cnxMKcqVl19rOExGXrrApFsJJw0HguRgHOvw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(56012099006)(4143699003)(11063799006)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?8o26jfrp5SIkpsQlFmbUDNujQf4+9rwhcUrMY52Xfq7dvHX0Yo01446NkjKF?=
- =?us-ascii?Q?0e9Er/2vtRRtGB4iTBIi82yWmOmS3jv2W+N/fWm+KTh7xI8Zf9oa54PntfuM?=
- =?us-ascii?Q?WO2S3rdTuHY3xI9nLUmrrpl4+Ci4EjywHGTqqpgz4YB3o/FBvyKxzeGYu5oM?=
- =?us-ascii?Q?hftY1bv/60EIpo68KGOdRpvP2lOONQ9WUi3N2gTFvXVHAspoUmXSse+r4AKU?=
- =?us-ascii?Q?oGlIlA4JBVj3vfn4We7PLLyCFp05IEo08TtMrErfqwsddinJFBPaNldB8Jfh?=
- =?us-ascii?Q?BomTb0cYfKLJON4+WYk2DsWiGbaxKA184LlWvbI8m1nKYSSgcdAveqJN9ESx?=
- =?us-ascii?Q?d9bDfgraT0b6ZgW5rLU7umjok4pDvQH9uXBLZT+GGtSKdba8KX5FAauH9O0h?=
- =?us-ascii?Q?rQgJm+5Izp2XxcXjK6DTdfUuju9Shp7hXd3zM0CppJ3qKKOafzgSX72bJxZw?=
- =?us-ascii?Q?tVE3fxQqTFkBF/SHVS3TjaPgQXHCN7+yfOMqaXMoYjTljrjNvTWVu8SHMKJ6?=
- =?us-ascii?Q?xVUHkGbHjl13A6YFgSg1it4Lvuw0Ci0aGCLPwlL7VXepKGemcJ3Fko90tUKS?=
- =?us-ascii?Q?BoARwsReqCihQAyLoEI7fpFiO14vYxH7UD7eh31d/iglD+Chx0ZAHUdOp3QT?=
- =?us-ascii?Q?//ulk6ya1X1gECfbBlfqs8dm5JaJjq4246QrU3h7OYpFkA9zCpNByNCnsgNJ?=
- =?us-ascii?Q?9YfCKzo4rSyaX4GF6pGsyzP74QKoa1tM0eTtesvTl5WgA9l5rsJgGWTWJ4+U?=
- =?us-ascii?Q?6LjdAll/nNvM2McrDjrDeD6vw8tw9mBcw7NVaN7qiQggMOqDok6i+aqUga5S?=
- =?us-ascii?Q?k0PZkB6cqk2q/wqZuUTQe0zeYatnd40MPSVluKFDo6LbARLBu5/84c1aG5AB?=
- =?us-ascii?Q?tK+SgUzD6tCkAXftJ+srp+si1ieHqs2IZuFwjScQlYg9nv2Z/WmYwDz/F7he?=
- =?us-ascii?Q?slewy5vT1hCX4GegMJqfcHDagqFZawYmRxHkwXsuc55VuqcrUytdhRxd2nXM?=
- =?us-ascii?Q?rr8u8e91k0dYgJ2vaHfh6gnvadxjsoFFanZNJ3hodi7Cr1AGEST60L02jieU?=
- =?us-ascii?Q?adNFH+kiwYLLsHc6nw8AGuYTVGcbxy9Ap8/KxbXf7MoVX3twIv3viM8GGMYh?=
- =?us-ascii?Q?/ecG2Qx2knVCqkPek3GLBw/ZPmSkDOqA+n0cvB0t8HEgNNiURC8csNOMyylY?=
- =?us-ascii?Q?lC8uHz3N6mwJhr+ShtjAl77fnm4bkwcxr3rgNS3pDCt7DcSoFHr3ITVGGsPg?=
- =?us-ascii?Q?/9rfNxhfWAwCiQjegqubnzGZKkC7u5gzTSV1jI8A04MKNonAUuv8otEBc9P7?=
- =?us-ascii?Q?hs/oT360ApIa/MaTl026Ng35tLN+5E05yKshciGI5rsZqJBkxOPF0B6XvDZo?=
- =?us-ascii?Q?wtpM2TrIqOBHf7MGGspywDmKiM16AZRuvUCziq4nKdXqY//L1EAHlew7W9KN?=
- =?us-ascii?Q?raJInmjMau0pw9Y2D/VEbdZE6zwaV8zAq8TQmOcy37Vo99xS/ZeYAXRtHDKT?=
- =?us-ascii?Q?81WPALGP5sya6aEGfI8qlsPU0lrPbmY/mFNZS9xSPcw2M9HvQReuLPJiPxuI?=
- =?us-ascii?Q?4K23T+TxHfn0gmJJHFtmVPqFIVzywKjiYjFnnM181g5wAjclFMKRlgakAP5m?=
- =?us-ascii?Q?oUNCylw4yFvx1kh2dBrZhQukS8nbdRpK7fDAf79mCYocIKDBm6h73F2lW0b/?=
- =?us-ascii?Q?m2YVkxt8NUTvntKu+qFRSxe7/UlEosbA/hd4FpooHvR0RGvE?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1845237c-32e6-43cf-7d92-08debf0e901d
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2026 12:17:20.8148
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GVIJgi2moovduHvwSQNz5xNv/0zEwU0TBNqVbS2WIvFomBmUx3ADAkPpd/3t3qvLVIkqCcKrqAK7dlPnqDxkcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9209
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+References: <20260530080643.1345521-1-jhs@mojatatu.com> <87bjdx2ads.fsf@toke.dk>
+ <CAM0EoMmAs6N3xemJEcsKpG8OJZcxyB=U3nRa3vGwo+kbk8azfQ@mail.gmail.com> <CAM0EoMnJ7fjVKP+i8u9NpNZiPP8AQ-RdAbG14jUu8oMsBxhy_w@mail.gmail.com>
+In-Reply-To: <CAM0EoMnJ7fjVKP+i8u9NpNZiPP8AQ-RdAbG14jUu8oMsBxhy_w@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sun, 31 May 2026 08:29:13 -0400
+X-Gm-Features: AVHnY4LwfQHRm1QtZxZZ2XjIRBehSWXw3s0QUn5ZXuJe5TwVZBdEkPgMo8tqado
+Message-ID: <CAM0EoM=CEJvaYi9fC-1BVTLaKjqbfiCNUeTKwEMEAuJytqy5kA@mail.gmail.com>
+Subject: Re: [PATCH net v4 1/1] net/sched: fix pedit partial COW leading to
+ page cache corruption
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
+	victor@mojatatu.com, david.laight.linux@gmail.com, yimingqian591@gmail.com, 
+	keenanat2000@gmail.com, 2045gemini@gmail.com, rollkingzzc@gmail.com, 
+	dcaratti@redhat.com, security@kernel.org, linux-kernel@vger.kernel.org, 
+	Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293404-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[strlen.de,linux.dev,netfilter.org,vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,gmail.com];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	TAGGED_FROM(0.00)[bounces-293405-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com,oss.qualcomm.com];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim]
-X-Rspamd-Queue-Id: 818AB6160A0
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid,mojatatu.com:email,mojatatu.com:dkim]
+X-Rspamd-Queue-Id: 26476616101
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 29, 2026 at 06:43:56PM +0800, Qi Tang wrote:
-> Florian Westphal <fw@strlen.de> wrote:
-> > I'm not sure netfilter is the only facility that can munge data this
-> > way nowadays.  The plan is to disable arbitrary network header rewrites:
+On Sun, May 31, 2026 at 5:58=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> "
+>
+> On Sat, May 30, 2026 at 12:15=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
 > >
-> > https://lore.kernel.org/netfilter-devel/20260527121147.22076-1-fw@strlen.de/
-> 
-> Agreed, the source side is the better place for this on mainline.
-> 
-> I went looking for other ways into the window between option compile
-> (ip_rcv_options() in ip_rcv_finish_core, after PREROUTING) and
-> ip_forward_options(), and only found nft_payload and nfqueue at the
-> FORWARD hook. tc/cls-act run before compile (ingress) or after
-> ip_forward_options (egress), BPF at the netfilter hook can't write the
-> packet (base helpers only, no bpf_skb_store_bytes), and the LWT_IN BPF
-> path is blocked by the verifier. So your two-part restriction closes the
-> only in-tree triggers I could find.
-> 
-> This is just one consumer of the pattern; __ip_options_echo(),
-> ipmr_cache_report() and the CIPSO/CALIPSO netlbl_skbuff_getattr() path
-> are the same, posted as a series here:
-> 
->   https://lore.kernel.org/netdev/20260524041442.2432071-1-tpluszz77@gmail.com/
-> 
-> so if the source-side restriction is the way to go it probably makes
-> more sense to drop these consumer-side checks than to fix each site.
-> Your call.
+> > On Sat, May 30, 2026 at 11:19=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgens=
+en <toke@redhat.com> wrote:
+> > >
+> > > Jamal Hadi Salim <jhs@mojatatu.com> writes:
+> > >
+>
+> [..]
+>
+> > > Re-tested and LGTM. Let's hope this is the last one ;)
+> > >
+> >
+> > Fingers crossed ;-> Let's see what our new overlords say tomorrow morni=
+ng.
+> >
+>
+> Sigh. Now both sashikos are complaining about the min() macro.
+>
+> Sashiko 1:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>  + if (write_offset < 0) {
+>  + if (skb_cow(skb, -write_offset))
+>  + goto bad;
+>  + if (write_offset + (int)sizeof(*ptr) > 0) {
+>  + if (skb_ensure_writable(skb,
+>  + min(skb->len,
+>  +     write_offset + (int)sizeof(*ptr))))
+>
+> Could this min() macro trigger a build failure?
+> skb->len is an unsigned int, but write_offset + (int)sizeof(*ptr) evaluat=
+es
+> to a signed int.
+> The min() macro enforces strict type checking and usually triggers a stat=
+ic
+> assertion failure when mixing signed and unsigned variables.
+> --------
+>
+> And Sashiko 2, on the same issue
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> Will this build?  In the negative-offset arm the call is
+> min(skb->len, write_offset + (int)sizeof(*ptr))
+> skb->len is unsigned int and write_offset is a runtime int local, so
+> the two arguments differ in signedness.  The min() macro in
+> include/linux/minmax.h enforces signedness compatibility:
+> #define __careful_cmp(op, x, y) \
+> __cmp_once_check(op, x, y, ...)
+> with
+> BUILD_BUG_ON_MSG(!__types_ok(ux, uy), #op "(" #x ", " #y ") signedness er=
+ror")
+> __is_nonneg() relies on __builtin_constant_p(), which returns 0 for a
+> runtime int such as write_offset, so the int side ends up signed-only
+> while skb->len is unsigned-only and __types_ok() is 0.
+> The matching positive-offset arm in the same hunk already uses
+> skb_ensure_writable(skb, min_t(int, skb->len, write_len))
+> and existing call sites such as those in net/core/skbuff.c and
+> net/ipv4/tcp_output.c likewise use min_t(int, skb->len, ...).  Should
+> the negative-offset arm use min_t(int, ...) for consistency and to
+> avoid the signedness BUILD_BUG_ON?
+> ------------
+>
+> So i looked at why this thing compiles despite the statements above...
+> I could be wrong but I think the compiler optimizes away with -O2
+> because under that if statement  "if (write_offset + (int)sizeof(*ptr)
+> > 0)" IOW, the compiler already knows this is a positive outcome.
+>
+> David, this is what i had asked in the earlier discussion. It dos feel
+> like it is safe as is,  I suppose given the compiler I am using but is
+> it possible that older compilers may not do this optimization? It will
+> also very likely fail at lower optimizations..
+> Shall i restore to min_t()?
 
-FWIW, I agree that it would be better to go with Florian's patches
-rather than always assuming that we can't trust the data that was parsed
-from the IP options.
+>
+> David, I am going back to min_t.
+
+That was definetely subliminal ;-> I am going to make another update.
+David you can improve things after, I just want this thing to go in so
+going back to min_t.
+
+Although these changes should not affect functionality, to everyone
+who tested and reviewed if you can go ahead and review/test.
+
+cheers,
+jamal
 
