@@ -1,167 +1,148 @@
-Return-Path: <netdev+bounces-293377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id c32SH7S+G2quFwkAu9opvQ
-	(envelope-from <netdev+bounces-293377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 06:53:08 +0200
+	id 8MmSHN3EG2p5GAkAu9opvQ
+	(envelope-from <netdev+bounces-293378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 07:19:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00F261481D
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 06:53:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEA306148DD
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 07:19:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E81F43026C13
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 04:53:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 97A05302F3A5
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 05:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C24277C88;
-	Sun, 31 May 2026 04:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B248130BF5C;
+	Sun, 31 May 2026 05:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="kZJbJqcl"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.168.213])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562F91D54FA;
-	Sun, 31 May 2026 04:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.229.168.213
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77116265620
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 05:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780203181; cv=none; b=J3++kTsL9MoY6iPE/Zs+A1b4gseljGlwFszWBXPPFoRNY76mAMxKTe1RjCoVbckTrJ6ItkpJVyQbk+an0hTi3o18ef6fDVqKTZpu0SIadJlYs1BCAdINDW/RkzOaTsVc8wXHBYSfx5FPdPuDWC8/rwoSlc6KT65Kg9446rMdQH8=
+	t=1780204752; cv=none; b=GkLS2wZdgWTJxNu99mk0WrjPXrVG492qn26xI9cKQRftos9iEAtu4C9ybyw0HA6ZExJfq5Z1KH2eon1XLRZldGq2xrvb6YA2nyxH606GukE+BUcc/4C/YApsrZThSq8G8Ayv0VY7SiXdlE+ViDNSl1d1mx0gWa3zAb+GAugbASM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780203181; c=relaxed/simple;
-	bh=BEgUppDCDRw8PP3X5I+8jBTlt1jboC3EEPYd8erBziQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yef5lY8QirE6PcjmJhmnonjXizHKoMLW+k6Ft1B4vYr0xKLRIGmw9Tc8EH7P/d95eDmwzw8+u7piYjNy6PWEmtlvwm8JrD5ZLe+wSi7afYBDcOJoU4c6epnNs6WkGvVMmOK2BayZSGQGTIkrMrcjTAPuDcOLQTtaxyChJXhiInc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.229.168.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app2 (Coremail) with SMTP id zQmowAA3zwaBvhtqIKkVAA--.20948S3;
-	Sun, 31 May 2026 12:52:22 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: ast@kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	memxor@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	jolsa@kernel.org,
-	toke@redhat.com,
-	yuantan098@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	zzhan461@ucr.edu,
-	n05ec@lzu.edu.cn
-Subject: [PATCH bpf 1/1] bpf: devmap: reject cloning fragmented xdp frames
-Date: Sun, 31 May 2026 12:52:13 +0800
-Message-ID: <4b596825bccc64d03e0c2e0db4dceb12c7f5cf47.1780176829.git.zzhan461@ucr.edu>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1780176829.git.zzhan461@ucr.edu>
-References: <cover.1780176829.git.zzhan461@ucr.edu>
+	s=arc-20240116; t=1780204752; c=relaxed/simple;
+	bh=5YP5jApvSsQhS1zAl7EYN1vNdsOaW+ijBhhUGqpj3Fg=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=UMIHD0dUpDfpzz/VX0d164VhkV5RA/Jg28uPwLOI/8c/0uyH7EwOv5XtdaFNn13COn6EzueBkdTz4y4nMqPXPwb3oFnZat0hyhuNGYKHEBMrls7ZaZePMUbaGT8i1OJywzXNsPCNfGQxEtU2O2gjtH0E8Jb+ygA3bip+EgYsbV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=kZJbJqcl; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1780204748; x=1780463948;
+	bh=5YP5jApvSsQhS1zAl7EYN1vNdsOaW+ijBhhUGqpj3Fg=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=kZJbJqclaqPgmL5KkXHHQMNarWibg5woRKJkwJr+1rRWi9m8G4CEY599+2lrn6G7f
+	 jlQVCO0wHtLPmEIJ9RAOyUvi99BoGwemmW4bCa5dFJE688nueIObBdhHvjE1pw4XBD
+	 4wUVuN45s+4MokFyY2y50cBBjV6G402DlWqSLIhLAl7wjw/E54TU8BgHJq9WsXGhdL
+	 x2lMCgkgEsXMoLjoeVPz3xWTRshG9SwNCLUKh1bzfMsJYMsj//EvRy+vIlHNVLneaE
+	 61X6rxqxK4rVpHJMuxv9YSMoQskZgLjIYF6XXpXrUtqqYUC02kobvBfuxMc4lFxD29
+	 O/jd7gY9fMYqA==
+Date: Sun, 31 May 2026 05:18:55 +0000
+To: netdev@vger.kernel.org
+From: =?utf-8?Q?Gustavo_Kenji_Mendon=C3=A7a_Kaneko?= <kaneko.dev@pm.me>
+Cc: theo.lebrun@bootlin.com, conor.dooley@microchip.com, davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, =?utf-8?Q?Gustavo_Kenji_Mendon=C3=A7a_Kaneko?= <kaneko.dev@pm.me>
+Subject: [PATCH] net: macb: fix ignored return value of clk_prepare_enable() in runtime resume
+Message-ID: <20260531051841.55311-1-kaneko.dev@pm.me>
+Feedback-ID: 165279626:user:proton
+X-Pm-Message-ID: 4b989aed9c341e1b41f02b9284338125aeed274e
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowAA3zwaBvhtqIKkVAA--.20948S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF1UCrWUArW8ArW5Zr1kXwb_yoW8Ar47pa
-	yDXFyDGFWrtr47Ca4jyF4I9rW5Kr4kWay7Kan0gry3Zw1qgF9rW3yagFy3XryYyrWFka1r
-	tF12q3yDG34DX37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEECWoanc8JJwAAsB
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[pm.me,quarantine];
+	R_DKIM_ALLOW(-0.20)[pm.me:s=protonmail3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293377-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293378-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,redhat.com,lzu.edu.cn,ucr.edu];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.890];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[pm.me:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kaneko.dev@pm.me,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ucr.edu:mid,ucr.edu:email]
-X-Rspamd-Queue-Id: F00F261481D
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pm.me:email,pm.me:mid,pm.me:dkim]
+X-Rspamd-Queue-Id: EEA306148DD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhao Zhang <zzhan461@ucr.edu>
+macb_runtime_resume() calls clk_prepare_enable() five times without
+checking the return value. If any clock fails to enable, the driver
+silently continues with potentially unclocked hardware, which can
+cause undefined behavior or system instability on resume from runtime
+suspend.
 
-Devmap broadcast redirects clone xdp_frame instances for all but the
-last destination. That clone path only copies the linear frame data,
-while fragmented XDP frames store skb_shared_info in tailroom outside
-the linear area.
+The existing macb_clks_disable() already uses clk_bulk_disable_unprepare()
+for the symmetric disable path. Align the enable path by using
+clk_bulk_prepare_enable(), which atomically enables all clocks and
+automatically rolls back any successfully enabled clocks on failure.
 
-As a result, broadcasting a fragmented xdp_frame leaves the clone with
-XDP_FLAGS_HAS_FRAGS set but without valid frag metadata. The later free
-path then treats uninitialized tail data as skb_shared_info, leading to
-an out-of-bounds access during frame return.
-
-Reject fragmented frames in dev_map_enqueue_clone(). Devmap already uses
--EOPNOTSUPP for unsupported XDP frag forwarding cases, and the current
-xdp_frame clone model cannot safely represent a cloned fragmented
-frame.
-
-Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Signed-off-by: Gustavo Kenji Mendon=C3=A7a Kaneko <kaneko.dev@pm.me>
 ---
- kernel/bpf/devmap.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index cc0a43ebab6b..2bfebded5329 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -581,6 +581,10 @@ static int dev_map_enqueue_clone(struct bpf_dtab_netdev *obj,
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/etherne=
+t/cadence/macb_main.c
+index a12aa21244e8..85bd4ff0e4e6 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -6185,16 +6185,19 @@ static int __maybe_unused macb_runtime_resume(struc=
+t device *dev)
  {
- 	struct xdp_frame *nxdpf;
- 
-+	/* Frags live outside the linear frame and cannot be cloned safely. */
-+	if (unlikely(xdp_frame_has_frags(xdpf)))
-+		return -EOPNOTSUPP;
+ =09struct net_device *netdev =3D dev_get_drvdata(dev);
+ =09struct macb *bp =3D netdev_priv(netdev);
++=09struct clk_bulk_data clks[] =3D {
++=09=09{ .clk =3D bp->pclk },
++=09=09{ .clk =3D bp->hclk },
++=09=09{ .clk =3D bp->tx_clk },
++=09=09{ .clk =3D bp->rx_clk },
++=09=09{ .clk =3D bp->tsu_clk },
++=09};
+=20
+-=09if (!(device_may_wakeup(dev))) {
+-=09=09clk_prepare_enable(bp->pclk);
+-=09=09clk_prepare_enable(bp->hclk);
+-=09=09clk_prepare_enable(bp->tx_clk);
+-=09=09clk_prepare_enable(bp->rx_clk);
+-=09=09clk_prepare_enable(bp->tsu_clk);
+-=09} else if (!(bp->caps & MACB_CAPS_NEED_TSUCLK)) {
+-=09=09clk_prepare_enable(bp->tsu_clk);
+-=09}
++=09if (!(device_may_wakeup(dev)))
++=09=09return clk_bulk_prepare_enable(ARRAY_SIZE(clks), clks);
 +
- 	nxdpf = xdpf_clone(xdpf);
- 	if (!nxdpf)
- 		return -ENOMEM;
--- 
-2.47.3
++=09if (!(bp->caps & MACB_CAPS_NEED_TSUCLK))
++=09=09return clk_prepare_enable(bp->tsu_clk);
+=20
+ =09return 0;
+ }
+--=20
+2.54.0
+
 
 
