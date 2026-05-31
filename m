@@ -1,196 +1,175 @@
-Return-Path: <netdev+bounces-293382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBSiBFn3G2oNHwkAu9opvQ
-	(envelope-from <netdev+bounces-293382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 10:54:49 +0200
+	id +Mp+LM/7G2rFIAkAu9opvQ
+	(envelope-from <netdev+bounces-293383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 11:13:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61CAB61535A
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 10:54:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21B21615496
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 11:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7DD08300DE32
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 08:54:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F173E300D903
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 09:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA14382298;
-	Sun, 31 May 2026 08:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C4C351C2A;
+	Sun, 31 May 2026 09:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1PfAKGNY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ksGbBsF0";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1PfAKGNY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ksGbBsF0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ayMuswFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851F8381AE7
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 08:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D97833F5A4
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 09:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780217685; cv=none; b=kFFXDn8djoDPddrvMOUqLneHX3SWJFxI+S18rn+RbmNvxMOS4vM6M01mPKepGIkhsxQD8Z406Tue9s1n/YfSVi41TkLFX9YVIzv1Uyo9JW++jAjuu+FhvhxLesGHhZ/3M7G5Tc1mxaO2Ts4rNMawfrfjmKYEG6t4MkwX+8ThX7E=
+	t=1780218763; cv=none; b=mSxE/tT/f+QDAM6/s7sVWKYTpAmvdgFN7ekys9Pt2M5WFmVV3Wdmhs3TStRI+eIj9woMjLaB/cz2RSwxCkCvyn772JcdZOLOm8A2quWKO0O2hSOVh81fBSzezziNb8kj8nLtU0LYWMCQx29Ymxd08u86WM/TKW0JgwUv0OlrT/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780217685; c=relaxed/simple;
-	bh=rwIvYN6/KOpYov6A6govvRNz4aRurtOdWRBbQTzDYe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jckqAd51KdlwwXQCXmLloi5yoJQSbLVPd7dZ4Qbc1VkpEEJmhQweckiPIHtaNmYHDHmbHrL75C61mac/nPzFVQ79Q4X/xQvT5bELcK8aIW6LeakMhaCl4Cn6gPCVfi0JecLZSi76IeWG3J9zgShbXSRFsSaz8y6ANbR8kr8l4TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1PfAKGNY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ksGbBsF0; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1PfAKGNY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ksGbBsF0; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A2B286BA92;
-	Sun, 31 May 2026 08:54:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780217682; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oA5hgG6eSfUw2CEvXNqok4AuUZspexuZlfa6cYW2Y4A=;
-	b=1PfAKGNYLhagnBvHtb+ubUaVyu9eogDCXRol6ohlXDMFxCVLhFUItxHBits6KpctmU2d6t
-	hjOkZY+H+sW25hQOlhwUmoBGxnvWinhWyOjXTFHii5/+Zyi1L4jRc0FGHpofRv/ahs6J5V
-	2o6/tAb0rqCc+3mrBE1xUVyLpmVJQ3Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780217682;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oA5hgG6eSfUw2CEvXNqok4AuUZspexuZlfa6cYW2Y4A=;
-	b=ksGbBsF08j/fhsEIBfTY36miAanUPKePhehRER4eUB5+fCdFIDz6w/p2pNFvC/CmI5vu1X
-	Bh+SJJZVD3cLMxAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=1PfAKGNY;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ksGbBsF0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780217682; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oA5hgG6eSfUw2CEvXNqok4AuUZspexuZlfa6cYW2Y4A=;
-	b=1PfAKGNYLhagnBvHtb+ubUaVyu9eogDCXRol6ohlXDMFxCVLhFUItxHBits6KpctmU2d6t
-	hjOkZY+H+sW25hQOlhwUmoBGxnvWinhWyOjXTFHii5/+Zyi1L4jRc0FGHpofRv/ahs6J5V
-	2o6/tAb0rqCc+3mrBE1xUVyLpmVJQ3Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780217682;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oA5hgG6eSfUw2CEvXNqok4AuUZspexuZlfa6cYW2Y4A=;
-	b=ksGbBsF08j/fhsEIBfTY36miAanUPKePhehRER4eUB5+fCdFIDz6w/p2pNFvC/CmI5vu1X
-	Bh+SJJZVD3cLMxAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6892A779A7;
-	Sun, 31 May 2026 08:54:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wCuGFVH3G2qdXgAAD6G6ig
-	(envelope-from <pfalcato@suse.de>); Sun, 31 May 2026 08:54:41 +0000
-Date: Sun, 31 May 2026 09:54:39 +0100
-From: Pedro Falcato <pfalcato@suse.de>
-To: Askar Safin <safinaskar@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-api@vger.kernel.org, netdev@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Matthew Wilcox <willy@infradead.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>, 
-	David Howells <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	David Hildenbrand <david@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, patches@lists.linux.dev
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for
- preadv2/pwritev2
-Message-ID: <ahv16ogY8Zx3Rtox@pedro-suse.lan>
-References: <20260531010107.1953702-1-safinaskar@gmail.com>
+	s=arc-20240116; t=1780218763; c=relaxed/simple;
+	bh=GtWMjgWA4XR7ByfF2eq+aSGrsmcmeBHRweSqRyAgCGc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ocUsCfnVMe3pAvIz/aRrXA1ku+xVp100NfIwLjHlbMb4H1aRjgc9t80ywLiiKZwQMwhvHoHDE/kEKHAuLcv9q3BfjHwyHM90fvSAP8+NFMXm8J6p7pE5HE50hXDs3u7N3HuMl3zqmqZvgCtbv6KBlp++vNkbyoFxO/yT+DB38YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ayMuswFf; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490a765f2feso3795625e9.1
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 02:12:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780218760; x=1780823560; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DLV/vlYx4oGCZhyGn9UGnBK8+0cqBecf0ZxhiQjsrL8=;
+        b=ayMuswFfQDL5u6RSHtpTCOLwK/KiXK4ouSKHihZEUlQEBGrwMy6oBGFjsRr1tKPbVc
+         XWz1r0dMujZbA/HkyxUNma49Oo6V4uIiMCzMgOtNrxOliytRx/Xjx4sjCPDPuLLphbYW
+         xmDBB6yMZk2rEIkiurRXPHpGQT+LSAprQUPstNTcC3F+lD8JBG7gMryHKUa/zP8KcH6H
+         cKRliEv2QMkdCzDhZVgy/l8Z0+Q6GLeHzXnH8KUoizPHW31hQW7tYmriZYhVPo49Gwn/
+         69xJq5Jo39EOe/mcKw2mpgYguyzulKMF+lbpuNh6jWjrtpEoHUYWnrMj2qYfr2S0lMjL
+         ThEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780218760; x=1780823560;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DLV/vlYx4oGCZhyGn9UGnBK8+0cqBecf0ZxhiQjsrL8=;
+        b=DReyicLvvQvdp/2cG3N3ues5giv648gVsZZ4zPkZGnFkN3aA+pPaczMfK2ULnTVUyH
+         GIxz8bvwp9cT/3N+LTyHNmjPLHPU3DkV8nXYaSMRnDG+atPdmoh+S+AjrwqVU5TtOPG9
+         NbVaAH6pjsQrci2/tJUXF7DX6VcRFQoDHITdOiOnP/NwFJox0FcYaaVtAkrl1lulvqWc
+         QTRmYEIAR4cRRsq2/xXCyLErtwCA5C5C9nMM0TDRsjvwS9u+gmi+2qq38j9ievuneYHK
+         1/yd5+kYGYUNefLlotSMVyzV+aGpXm86xAmbOHe5Nf+xcvjTppdmuQgmhplrYjQIlO6G
+         PJqw==
+X-Forwarded-Encrypted: i=1; AFNElJ8DnL6etswJeUeZlaRpsRzAJbUsJ5WIZpGcyrUaTSmdLvnYLag44dho1LsX1aspgkWAzUbOHGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbFD8sD5E9P3Jitk9UwKVsOp/J0V9vXkyOiNkE71eplMKtt6nY
+	l3dUFeh+p5VJD6VXPOgNAWMIJ1I44kxFnZtP8Rz1WH3Q3x4uXX7oK5Zg
+X-Gm-Gg: Acq92OE4YOkBGlVm4GrdbweS4b9DeRvNaWHRitQMxlBAn5tJ+ebmqSK3nB8mVJRLTv8
+	JWbkkoZOofnkHKm32TGJqnNGGzx3lX44Sz1ir+DpeQz84nKXYGyWLl0nJ1+oAoodaVSdp3pLWcV
+	WqCkunvED4bWw3I6mhPOQ0k22GALiPRWOpjlEajx90sR0DBIo4Eqk/i662fbZ6FTHtgo6pGgOe9
+	3zG3RI9HkiGowvStpXuLiM5vnLflXhAAenEqwj+eWGFfBH876DVjbXGnyHHQIA0QN8DGh5MJlhJ
+	kBYp0CWNspwj38BEDeLzlvj15UVmgDqlwSW1ezDpHiPMPQlcMiDY52PqlKGDtXW6yef5diswC8W
+	+ZduqXQTXQRPZtc1SD3sjVHFbDaZpjEkit+Bq7HJO7AR3PzOf1SVh8g3Vk6BtMe3/ARyCeNMZMf
+	R9rj06nsSPkDnqF4FyYEkVxH7QG4Yer/wOX7cN7n2pFROgqli/5ZaloQREIEIOrq0qHGZf2tE=
+X-Received: by 2002:a05:600c:3487:b0:48f:e1ac:c94f with SMTP id 5b1f17b1804b1-490a2918103mr129996915e9.10.1780218759434;
+        Sun, 31 May 2026 02:12:39 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909d6f3612sm168254415e9.12.2026.05.31.02.12.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 May 2026 02:12:38 -0700 (PDT)
+Date: Sun, 31 May 2026 10:12:37 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Manish Baing <manishbaing2789@gmail.com>
+Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] mctp: serial: replace memset with
+ zero-initialization
+Message-ID: <20260531101237.13c5580d@pumpkin>
+In-Reply-To: <20260530224646.160777-1-manishbaing2789@gmail.com>
+References: <20260530224646.160777-1-manishbaing2789@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260531010107.1953702-1-safinaskar@gmail.com>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293382-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293383-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lwn.net:url]
-X-Rspamd-Queue-Id: 61CAB61535A
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 21B21615496
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 31, 2026 at 01:01:04AM +0000, Askar Safin wrote:
-> This patchset is for VFS.
-> 
-> Recently we got a lot of vulnerabilities in splice/vmsplice.
-> 
-> Also vmsplice already was source of vulnerabilities in the past:
-> CVE-2020-29374 (see https://lwn.net/Articles/849638/ ).
-> 
-> Also vmsplice is problematic for other reasons. Here is what other
-> developers say:
-> 
-> Linus Torvalds in 2023:
-> > So I'd personally be perfectly ok with just making vmsplice() be
-> > exactly the same as write, and turn all of vmsplice() into just "it's
-> > a read() if the pipe is open for read, and a write if it's open for
-> > writing".
-> https://lore.kernel.org/all/CAHk-=wgG_2cmHgZwKjydi7=iimyHyN8aessnbM9XQ9ufbaUz9g@mail.gmail.com/
-> 
-> Christoph Hellwig in May 2026:
-> > vmsplice is the worst, as it is one of the few remaining places that
-> > can incorrectly dirty file backed pages without telling the file system
-> > and cause the other problems fixed by a FOLL_PIN conversion, but it is
-> > the only one where we do not have any idea yet how we could convert it
-> > to FOLL_PIN due to the unbounded pin time.
-> https://lore.kernel.org/all/agwFlBKvKytjURDO@infradead.org/
-> 
-> See recent discussion here:
-> https://lore.kernel.org/all/20260516182126.530498-1-pfalcato@suse.de/T/#u
+On Sat, 30 May 2026 22:46:46 +0000
+Manish Baing <manishbaing2789@gmail.com> wrote:
 
-So, you took an ongoing discussion with an ongoing RFC patchset, and you
-decided to reimplement part of the idea on your own, as a concurrent patchset.
+> Use empty brace initialization (= {}) instead of explicit memset()
+> to zero-initialize stack memory to simplify the code.
+> 
+> No functional change.
 
-Riiiiiight.... I don't think I have to NAK this, do I?
+Isn't it also entirely pointless?
+
+-- David
 
 > 
-> For all these reasons I propose to make vmsplice a simple wrapper for
-> preadv2/pwritev2.
+> Signed-off-by: Manish Baing <manishbaing2789@gmail.com>
+> ---
+> Changes in v2:
+> - Fixed a compilation error caused by a duplicate variable declaration caught 
+>   by the kernel test robot.
 > 
-> vmsplice(fd, vec, vlen, vmsplice_flags) will
-> be equivalent to preadv2(fd, vec, vlen, -1, rw_flags) if you have
-> readable pipe and to pwritev2(fd, vec, vlen, -1, rw_flags) if you have
-> writable pipe.
+>  drivers/net/mctp/mctp-serial.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-serial.c
+> index 26c9a33fd636..df721ca4e07b 100644
+> --- a/drivers/net/mctp/mctp-serial.c
+> +++ b/drivers/net/mctp/mctp-serial.c
+> @@ -536,13 +536,12 @@ struct test_chunk_tx {
+>  
+>  static void test_next_chunk_len(struct kunit *test)
+>  {
+> -	struct mctp_serial devx;
+> +	struct mctp_serial devx = { };
+>  	struct mctp_serial *dev = &devx;
+>  	int next;
+>  
+>  	const struct test_chunk_tx *params = test->param_value;
+>  
+> -	memset(dev, 0x0, sizeof(*dev));
+>  	memcpy(dev->txbuf, params->input, params->input_len);
+>  	dev->txlen = params->input_len;
+>  
 
-This does not work. https://codesearch.debian.net/search?q=vmsplice%28&literal=1
-There are users.
-
--- 
-Pedro
 
