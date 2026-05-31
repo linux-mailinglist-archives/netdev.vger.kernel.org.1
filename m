@@ -1,178 +1,236 @@
-Return-Path: <netdev+bounces-293386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGKrATkMHGq5JAkAu9opvQ
-	(envelope-from <netdev+bounces-293386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 12:23:53 +0200
+	id KESKMYIWHGq/JgkAu9opvQ
+	(envelope-from <netdev+bounces-293387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 13:07:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BBCD615919
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 12:23:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32392615B9C
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 13:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72CFF3020A7B
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 10:23:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 484CC300A3AF
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 11:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C371E368263;
-	Sun, 31 May 2026 10:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C6C3783B4;
+	Sun, 31 May 2026 11:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N5z5fxJD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jjzeQrC2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012066.outbound.protection.outlook.com [40.107.209.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75252341AC7
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 10:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5B73783BB;
+	Sun, 31 May 2026 11:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780223029; cv=pass; b=H54K0s6tsbKKSg4azvCWfirjs42mUb51IuvrtIwFShroIGUHf8x53CvLNX88tR8pzA86l7Yuzp3jTKCtGQguLJJ9ftnzRaUfnyZuNI8svGY+XEFvnpCjJs3mTI99LGrhCF4Wl/gGz6QEdD2huc6z8quvaGlbTUiII2ZgT6E5QWw=
+	t=1780225663; cv=fail; b=bVGQJVg8cdiqpE2Nsetgw+3F06/TFTsceFWkl2M6lRWUGtfWV6REnyzXXbwq6MIsOLa2yvRnF409x7Ye6svtB4olBLycsewGFatrFEfZ3rGLlV1WQz3euplZluFDSj7BshgZm3EZO1ZkTokGwm5mxMzxQcmapkdF+V0vDV+hHwA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780223029; c=relaxed/simple;
-	bh=fLLR8+6bmCGL+3izc0M2O2Lxk4Hx/AsBvEPAyarzO7U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KwchMwkUx8vH5L3xds0G5BUWlbOwy7Kv1P9zRlfpPtLEmYBUtLDjzM3pNqka++3ITTEkC39zyHWnxJ+SF5mGCfiKJk5rg3igKd0YkrWofdWis2MjNCk9ZLUDnTi4LYSoHWJxMKo6qeyl2CeiJPz69q6aL83HLn4VHLIRQczBpyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N5z5fxJD; arc=pass smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490a7682635so4847115e9.3
-        for <netdev@vger.kernel.org>; Sun, 31 May 2026 03:23:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780223027; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UuDRqKSufRsE+7KGsLU+nkvm7RN+htOF1u8xLTiuXc+R7tshNAL1CFbNkLqs3oSgWn
-         YweGef/3548x5acav2rWt/mRvIKyEtzWJFCcMhczbBOpCG52DFD6+a/nk3R2fvXH70CY
-         XnUnyJXghDWbRHyD4Xa6IL2WoQy8w+8O49T7WN8Mor5m7wo3hM9uaqREYvY7T/+cSDLX
-         IvRi16HNAaGaB2d0svJIbnYatKYemMFkqj44/+jO9y6heJmgelPye5JFPiySb7eOo5tD
-         Fs/Yy+FNA4zgm8T04wTFCOlr0vTWPZxRQ8Nnad1gKff3ZvBt/GOU5KOPdzNkQ5ix+mcB
-         rhRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=fLLR8+6bmCGL+3izc0M2O2Lxk4Hx/AsBvEPAyarzO7U=;
-        fh=xHKsPAa7l0vzneEkQKAi8Z4zqC4cRZeuec0ESsta2no=;
-        b=NZ1xpOX5V+pWOsl8YUO6rDvWKlR/+Go1hLTuH5bxab3u03+MYSBD3x7VZPwkHDJbDo
-         tqmsiSzMxbMruPd4kzFzzYvFFCTauaZiGZCxQfLncHe2Uks8xPBd/UlwzC6WIqwSyVz5
-         4btgr7rD7otfMxYEUT/ykEgjBCoaH3KSzzznx+gA168NTMqfx83JT6I3c2hO7cb0aAPP
-         lHmvVkzEWpuaaU8S9h7yfE/k/qgzSS+CZmEtDO8YhcwQQrADGyGbi1NUA9cN8wtLaLag
-         cV5IPnz4BHaywdghVrX/7bbDkeOHiIVsfpM3T/wSP7hfNlpGkWRQP/n1cP+5ZnjZJar6
-         tOFQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780223027; x=1780827827; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fLLR8+6bmCGL+3izc0M2O2Lxk4Hx/AsBvEPAyarzO7U=;
-        b=N5z5fxJDH4HqVdvtuMrFh5WFdzVe40AbFtLTd/6PKAcqHs6oDEzORYCMNZZkMh5PWf
-         bRGaJFKv6rwMPwywdXY/434LbPk1XxHZIb58zVi3mTPhs2P4VRVZjBO8bdHb9Xab3mhG
-         RvNs/1fClAW9wNsxPCBwuxmtbIWHpCb8UJl9kJykbkCMI0QYJzGVZpiCbRhBHjy4AXBc
-         z0x0p0U9A5kkGoBh/68DIvvUst8ZqC5Aj/fmncYMzsQvXvCc48pAiHcVfu/wSI4td6EZ
-         +XsntvK3OYr3+Fghlbjor2LFUjBTmNLho6M+yVLCyQAPFdPsbfcEZqiP/PQh/2V6nxR4
-         zk5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780223027; x=1780827827;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fLLR8+6bmCGL+3izc0M2O2Lxk4Hx/AsBvEPAyarzO7U=;
-        b=BGRgtYIzs4ox9UFC8Zzfnqh31ZOdInjSpU04DGAlcCWWi52SQ2lRSbonDfSRSw692P
-         XXHkmV2JmRy8E8rASku/HqUaPqa2Ha+plbT1qR+OYaI9G15vHhEC1QTM6IUm1do3OFkA
-         G7qm6wPUoL+phhpsfUpYcgye+golscTohsD1udBp8wjjEgWTk4JWooYoRTNE+Uzmz0Ne
-         ek0acF9OZcfYiumUKy4VNXLNprbqvBgMep605O0ax6wHfjZDJQ/jDj9lxIfEBGSX1Y7f
-         Kj+XY/6wnNzx0i/HMnfXTRXeUwwZJy5fkdkXh1mqV9D7gGpw9wLZ/hwYShxvRmhOZsYu
-         7jcg==
-X-Forwarded-Encrypted: i=1; AFNElJ8L9o/552abpJOnaUKlulNmn+7ANXo0LRX8gfBsMWxHbPdswuy7DdsHY6irL/OojYp4xsb2myU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHg7DGsNAfr3x+bh5CX2MDZO1lWDaJMaBfZw5FFR/0+QbtVT4C
-	PZhDT6fkqcY+dfeuEIUr0TCPPbYKdm4pS1tmIBBX3aai8x2j0Us8rCOc3i3VZHRVdCJ/5OgIjlJ
-	Cmuf363RPhAVO4GDWGKpMjvNqxUYP+8c=
-X-Gm-Gg: Acq92OG8nQvh2Yu4F5j+ber4yBydjsrT8tIcqRC55XahgXSACJ+YZY9C8cdUhL1PlbJ
-	0xYuVyDuLA/W/EAkExu0EYlDwfTB6yEU/C+BzrtOrD3F1sTUCN3uW0Xh7PrME4sgyOcEsgwP4ih
-	SWDJzgv+HzFaGYnW/s56U1K4A4TneQoBox71ugH5iaTIQpi3AGT0CnioszvE4zoeVcm4oM/QQf3
-	Yf+/cV7Yn32pSlVt7YltBdpC2UCcCZWYdJgrYAbOhgrksmRrxfWJjVBH2+7d9OuOtxvRNWIRdvd
-	S7GPOJEI4L4svhNGhdZOCWwRc1tP
-X-Received: by 2002:a05:600c:4fc4:b0:490:6889:202 with SMTP id
- 5b1f17b1804b1-490a29639e6mr116698675e9.29.1780223026778; Sun, 31 May 2026
- 03:23:46 -0700 (PDT)
+	s=arc-20240116; t=1780225663; c=relaxed/simple;
+	bh=kn4qRmn4/D/KWUXkQl+wk2LO+qXJ8nkHX957FyH1Jqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=DmznnMzHSra3dr4EDkhUnmjXb90EzVhveqJ8yVdwcKPQn/qRrrfgBHVO/5oivmGs3W9oSfpIifIkWjfMZKBsRvzA0h0Ob9giAJPb9qF9IKGqWZw6P1vUm7zHGbIl79wShWkSReONaQ5i75Z7jAgPTe0DvC9uOXUxRB1GDws1Z1Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jjzeQrC2; arc=fail smtp.client-ip=40.107.209.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=urckQwRW7arUF9VSUkRU706qQu0g7tMWto94DKS8dHsvXgmlHS6KfxGP/jlgPQXlVZaU71pZ2c4+GCt8DLODneONihdVN/+s/0o8CVxfuCuyHitbbpLNqSOE0oKotnbqBu8Hs+pT8tOwkUNnsZuScm/T8yLqaJjXacIjIkqrj9ebNoig5JSEd4L4OAtVLvOl/g0g++rqTQXLFRqB5mh9v20jNTHnx7xcxzFss+Ha8WCcv8Cxjxxrb31qsYFr7n7e8FScVr9u4fPU7yS9Y2dCCAB5mVUWnpgVaYgbUez2LDKORSYr/ERCFFDCgMprW8UzRiJqp0bFb8b5VprcZNHtng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nW7DyxWrSrmAnt6la52HtFrrpBDmkGj9eWyPzQA6lJI=;
+ b=pD90qiItgWwxBWjRFLDqWxCbD4AoQE8EBBy8yItsV32iPUooNcTEHtEOuo4D8jG88TvZYfaS/i5Ncf0f/ZAFpm5QFWtywOJVbkStoi0pm8HffQQgqjNkJROvPhIoVW7xA1eHWHm24ZgLvXx3WRvGlo7jEvh7goQ03YWMrdddGbWcTxwThYprXhx1r0yLUdJTiNiIauLQUengDwQWdD1XezxSRu+Uyh0T1S83IBN/kA24Q48pvShikIIh+Iw1J3InMQDAm2U0NNhKwlFxYJhazux0YRp1UjEyqxIIif/kBMlXB+2/gro+VX90hSp29+61OQOeAWtJ0g7dQ87RXEpNLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nW7DyxWrSrmAnt6la52HtFrrpBDmkGj9eWyPzQA6lJI=;
+ b=jjzeQrC2sFLb6zBbp/Ht39SQA8j4rLYZxUmW8XlQzWGRto8jLhyu5J7yvuWIWP005G8eQFUdhQHydzEXVZKrW7oohiH2vWul0XS1Jhmar8rRqII9ePaYZ3ZB6JJaDDTGqYziBuj+0t2UAZWt2DiFOfHT77Uq8JS+citLhacADz3Fs8+LL6JAdITCjOOS066YY9Seo4Pof7oq78svY9bYBW3iXqJFoo3KN/H2a5OyKe3iYmxc/AicauttJ4r5INcUiV1wHkRs9mB/EjAKSHQAl7av39ex7px92VmEZ+vDv9I00m67REzUUh2HdpyT30aJrZLn6/Nm9vCxZlZEpmyYIg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CYYPR12MB8990.namprd12.prod.outlook.com (2603:10b6:930:ba::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Sun, 31 May
+ 2026 11:07:35 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0071.015; Sun, 31 May 2026
+ 11:07:35 +0000
+Date: Sun, 31 May 2026 14:07:26 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Zijing Yin <yzjaurora@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v2] netdevsim: fib: fix use-after-free of FIB data
+ via debugfs
+Message-ID: <20260531110726.GA179107@shredder>
+References: <20260529135718.1804031-1-yzjaurora@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260529135718.1804031-1-yzjaurora@gmail.com>
+X-ClientProxiedBy: FR2P281CA0092.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::16) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHPEe=GO=2qqWZPwBB4rrXc3mkD0dznp2K78nCsKwF=c-QwxEw@mail.gmail.com>
- <20260527075924.2707856-1-maoyixie.tju@gmail.com> <21df0b14-f530-4e9a-931a-21154ec18c78@suse.de>
- <20260527161849.738b7f1f@kernel.org>
-In-Reply-To: <20260527161849.738b7f1f@kernel.org>
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-Date: Sun, 31 May 2026 18:23:35 +0800
-X-Gm-Features: AVHnY4Lg-drlo1nT7uZW5coIPZFwVZQUv9F4k8fWAy2gBbp-s6mdZBwVD22P17I
-Message-ID: <CAHPEe=F+ii=GgNorkhYJYXZAa4akxjKxG+qFr_H-USQE1F8bRQ@mail.gmail.com>
-Subject: Re: [PATCH net] hsr: broadcast netlink notifications in the device's
- net namespace
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jan Vaclav <jvaclav@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Taehee Yoo <ap420073@gmail.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CYYPR12MB8990:EE_
+X-MS-Office365-Filtering-Correlation-Id: 55e247bc-b12a-459f-056a-08debf04d183
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|22082099003|18002099003|6133799003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	kz8dxxScXOk8XMK3RbuJS2tnCR9kHua2/vZp9vQPAgpgMbAm/HJZwcZzGD53H6UC0o1ZD3GwCLioz2bosHvofIty/RB73TrVMGQNPQs7RzUNcB7Ou49JblDnioACxmi+CakS5JNUhE21rEQF2xj060ybfYyfMf6srqkucgm7H5gRVUEbnaZgwewIPK+czJdkWBTuCkwcX9idcF4i7UiPtOLEDs/fk6VJUS/7osphCEccvAn3KZScslX2sgEVG0dM1S+3zxcoLd2yN8/Sny6Vgq2hN6Q/br/w8/mHAiv1vHrENfY5QT6cNNwPRQlhrcUP74UCO3l3V3rGkNJKncbJznhh6fnrCWJH4XZIV3c0bkXA6POoYYUT406XBwePUFWSaVOTx7qc42dv2GMmzF0WXLL2zpokcv5ScIlSB019RxvqIosSxCeNJWwphDuUmCLyoId/iwk2trZ4AjNYT1kxJfPmVle2cjstrE3ZG1ic3S0gqoBcUcvssTRt9EOJ5nXRxCVj4J5DdcALe3UXOO3inAy/oFhjx7N1lYx4hyjDUOs6wzdqfHaYrVqN4dziy4BO2hu80I+E4TI9hjwTpWhJrkEvkOpP9qPiX8GU+GL/aeJs9GhNQP1RETl8OJ51mXwzOmDAjWNwaf0NDyFwOhTudigrNOXkf8g1XZPuwCX6/U2RQR6vTcgIeeqZBu6+Gfr+ne/sCzHZj3oxdEJv8lVk6Q==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(22082099003)(18002099003)(6133799003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?nBaW9FnWxX48Cq1fnh+TjgvNMJEPsKSlCTJJrtnidbBSgbmkF1WQh8jBImxi?=
+ =?us-ascii?Q?tBWitw7aKj7X904k4uAwSkmMFGYdwOzN8WseZON9h0qo+waxc12GtsBBJnJX?=
+ =?us-ascii?Q?OvIfMeVDmF6Ouqi6u1Ui8EWwdtAaMkK3T79yfIxlwQX638vLNiq/sPZ1YGMG?=
+ =?us-ascii?Q?ux8hzl3loqcfEkfppKMKk3bn4JMaje3AjHSUN4w9N6MUUmKr3IlpEPXkEUyA?=
+ =?us-ascii?Q?5YxFq6W9SBizG6ZX8oZelN1nle8z6XAeI0ZXbWpLq2EyjKl3Dg09+mWeDmKv?=
+ =?us-ascii?Q?0oh7i6+H0hbSfwsJCNypJOdaNVelkpi5Wemk2CJ1iT9tyHBpm/GgeCjSmRTS?=
+ =?us-ascii?Q?r8ePh4wbCbkAHrfl13/IhWEJToJDc4YC/yfvtK4EuJnZlCfscJvSkk56lXkm?=
+ =?us-ascii?Q?e5ApMeqGFThprbsnfjIiJfv0Kn6VYWBtPvF8b3I/L7fDqTCJNgZebM+81wcK?=
+ =?us-ascii?Q?aeFq0sA9/G2Jht0yzbzIVrcGQCtso6KouqvlGclEnoueWyG71AozMf+G+hl+?=
+ =?us-ascii?Q?7UEteBctbI1w05QIcV7Lpb355VJeXwnUtYNVmhix79eNTTj2FfMam1U2WA7k?=
+ =?us-ascii?Q?NNKXYkD/aSeXY5ky2dqhUeTlY7obz/zzz6aR+tMJHZhgzh/Dc7qdDeypHcsJ?=
+ =?us-ascii?Q?0VrI0DS1//ftqIwFkrlHLb5ld7gvNxUT4DYva0gfhhF5QRTdIZuB5j6wEy8i?=
+ =?us-ascii?Q?gpZmf/Y9ap3enfXf9gRvBSFbaPF3TeyMQtvMxDf1hrJVR8mQoijecLe3Ox4F?=
+ =?us-ascii?Q?oEvmYFq+cdYfhfueA71WrSkFMweBAYlAJoyXc+kVyIkEuICerLUGHcKr6hhP?=
+ =?us-ascii?Q?fc7XPxZIlioEs2YEQ5QVzn445bQ0YDhXNPf8Yj1VtfCr2JYJeWSOJ2xw5G9S?=
+ =?us-ascii?Q?QDFXtq++felX35KZRxC8Uhi0jfFNzqvby6mqWe1eYO9ttq2iPzXozR7jejGM?=
+ =?us-ascii?Q?iQWhNSrv3DTOB3/PwlUQnl888q998y1O3nCcXkc1DBeMSNH+Ec0nmgCsSwx0?=
+ =?us-ascii?Q?qyNTxw1EvhqJOun87FSHLwOzhASEBpQKcarL80i/0PF2LYf/lnymoIOPFw9C?=
+ =?us-ascii?Q?2YOPAedtYjJjCtD2fSWM0I7cgFd/1YkcUaCKDXj3BB//iieedQLitWswdgzq?=
+ =?us-ascii?Q?YY6+heoBwmTzT1PPoNjxBUS4pUf6vAAhf88Xz/Z3DO6ujzTxyteevgiPOUsa?=
+ =?us-ascii?Q?VG6IioQbEvXgFodmiwfwcYXPSxGJno6pJvqOF9hLLJ4Gabsn2DWjHsqt9ByR?=
+ =?us-ascii?Q?4NlnsORYyE2CD6WS/eT+tZRYhMJOluI1uyXy9b67w4Te6xhPF18i7FVx8RM5?=
+ =?us-ascii?Q?D9u7lA8+nFQvJCRKuu6AhV9PQZid8FoGdi4AvPFvZPif+x77RcvKlVoJ5iX7?=
+ =?us-ascii?Q?1T7iQ6VV+HPYznzKsLwaYWbSSwe/Bz2rOaltKZwElGX46CDiUNEzTlIj6Ywu?=
+ =?us-ascii?Q?lUVv6UVrzm77o8cIF8pHsDRsnupiufE6QzOJIYLIuecK0yVXDWNRvU5wPMVT?=
+ =?us-ascii?Q?t58YtD1DexjsG8fhFZ/4DxkriK+9jhw7vZceaNSc9ngqCGHp0DJDu9XsAQub?=
+ =?us-ascii?Q?eY65eICZR8QOeRY3u0sECqF3Yj2q06zOpffFx8M0/OTAf98e/Q4P3EyX517a?=
+ =?us-ascii?Q?an/LBU6nKJfZy9ybwzDboI2fjz/tliDb8A1Qw60CMK6Al3de8WbB5XdatBFh?=
+ =?us-ascii?Q?Xsf83TSBeHmvfbVO3H07pNuwtX3MYjx1bPT/x7VI4XxgdUJX?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55e247bc-b12a-459f-056a-08debf04d183
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2026 11:07:35.1447
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: j7hqEAa3/Qh8BN6K67TEx132CEabmObdvU+EIEaoxwa8+eab7eulgaQwW1nOPZHWFAr2Al1Vs6S59EFQfLttSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8990
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293386-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.de,davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,gmail.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-293387-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 5BBCD615919
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:email,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: 32392615B9C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 28 May 2026 07:18, Jakub Kicinski <kuba@kernel.org> wrote:
-> Not sure TBH, we'd need to take a ref on the netns and allocate
-> a tracker (on DEBUG kernels). One could go either way.
+On Fri, May 29, 2026 at 06:57:17AM -0700, Zijing Yin wrote:
+> netdevsim: fib: fix use-after-free of FIB data via debugfs
+> 
+> Writing to the netdevsim debugfs file
+> "netdevsim/netdevsimN/fib/nexthop_bucket_activity" enters
+> nsim_nexthop_bucket_activity_write(), which looks up a nexthop in
+> data->nexthop_ht under rtnl_lock(). If a network namespace teardown,
+> devlink reload or device deletion runs concurrently, nsim_fib_destroy()
+> frees that rhashtable (and the surrounding nsim_fib_data) while the
+> write is still in flight, leading to a slab-use-after-free:
 
-On the RCU side, you're right that moving the net out of the lock
-means taking a ref, and this isn't a hot path where that really pays
-off. So I'd lean towards keeping it as posted, with the multicast
-still inside the rcu_read_lock. Fernando, thanks for the suggestion
-either way.
+[...]
 
-> I'm replying because I wanted to question whether this is Fixes+stable@
-> worthy. Sending the notifications to the namespace where the device is
-> makes sense. But it's as much a behavior changes as it is a fix.
-> The commit in question was merged to 5.6, real users clearly don't care.
+> The freed 1k object is the bucket table of data->nexthop_ht. Shortly
+> after, the dangling table is dereferenced again and the machine also
+> takes a GPF in __rht_bucket_nested() from the same call site.
+> 
+> The root cause is a lifetime mismatch: the debugfs files reference
+> nsim_fib_data (the writer dereferences data->nexthop_ht), but the
+> interface is not bracketed around the lifetime of that data.
+> nsim_fib_destroy() freed both rhashtables and only removed the debugfs
+> directory afterwards, and nsim_fib_create() created the debugfs files
+> before the rhashtables were initialized and, on the error path, freed
+> them before removing the files. debugfs keeps the file itself alive
+> across a ->write() via debugfs_file_get()/debugfs_file_put()
+> (fs/debugfs/file.c), but it does not keep data->nexthop_ht alive, so the
+> in-flight writer dereferenced freed memory. rtnl_lock() in the writer
+> does not help, because the teardown path does not take rtnl around
+> rhashtable_free_and_destroy().
+> 
+> Fix it by bracketing the debugfs interface around the data it exposes,
+> keeping nsim_fib_create() and nsim_fib_destroy() symmetric:
+> 
+>  - In nsim_fib_destroy(), tear down the debugfs files before the data
+>    structures they reference. debugfs_remove_recursive() drops the
+>    initial active-user reference and then waits for every in-flight
+>    ->write() to drop its reference before returning, and rejects new
+>    opens (__debugfs_file_removed(), fs/debugfs/inode.c). Once it returns,
+>    no debugfs accessor can reach the FIB data, so the rhashtables and
+>    nsim_fib_data can be destroyed safely. This also covers the bool knobs
+>    in the same directory, which store pointers into the same
+>    nsim_fib_data, and the final kfree(data).
+> 
+>  - In nsim_fib_create(), create the debugfs files after the rhashtables
+>    and notifiers are set up. This closes the same race on the
+>    error-unwind path, where a concurrent writer could otherwise observe a
+>    half-constructed instance or a table that the unwind has already
+>    freed. (With only the destroy-side change, a writer racing the create
+>    window instead dereferences an uninitialized data->nexthop_ht.)
+> 
+> This is reproducible by racing, in a loop, writes to
+> /sys/kernel/debug/netdevsim/netdevsimN/fib/nexthop_bucket_activity
+> against a teardown of the same netdevsim instance -- a devlink reload
+> ("devlink dev reload netdevsim/netdevsimN"), destroying the network
+> namespace it lives in, or "echo N > /sys/bus/netdevsim/del_device". It
+> was found with syzkaller; a syzkaller reproducer is available. A
+> standalone C reproducer does not trigger it reliably because the race
+> needs the netns-teardown/reload path.
+> 
+> Fixes: c6385c0b67c5 ("netdevsim: Allow reporting activity on nexthop buckets")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Zijing Yin <yzjaurora@gmail.com>
 
-On the Fixes and stable tags, my thinking was that the init_net side
-is an information leak. A privileged listener there ends up seeing
-ring error and node down events from devices in other netns. The
-payload carries the peer MAC and the slave ifindex. That was my reason
-for tagging it.
-
-But I see your point that it is as much a behavior change as a fix,
-and if nobody has hit it since 5.6, the risk is clearly low. I don't
-feel strongly here. If you'd rather take it as a plain net-next
-improvement without the two tags, that is completely fine by me and I
-will respin it that way.
-
-Thanks,
-Maoyi
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
