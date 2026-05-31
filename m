@@ -1,219 +1,167 @@
-Return-Path: <netdev+bounces-293376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293377-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id w662EgmmG2p8FAkAu9opvQ
-	(envelope-from <netdev+bounces-293376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 05:07:53 +0200
+	id c32SH7S+G2quFwkAu9opvQ
+	(envelope-from <netdev+bounces-293377-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 06:53:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C832C61445C
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 05:07:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00F261481D
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 06:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EDB363016C5D
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:07:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E81F43026C13
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 04:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDA5344036;
-	Sun, 31 May 2026 03:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lFxu6+Wj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C24277C88;
+	Sun, 31 May 2026 04:53:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3B53612ED
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 03:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.168.213])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562F91D54FA;
+	Sun, 31 May 2026 04:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.229.168.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780196838; cv=none; b=GvdsAgcnxU/mmvGFbbD7EI1vKmG+tP6E1dR7sDEEoWMvhzOijyWAgIX/jFGPWM+64JrN/2eMf6g70kZDRrgE7/rdoIekDj2lSPGBV//MN73hQ/YPCSWJG73XIEdq4RbLnm3AdUchyVk0OG0U8FueAnCFpbIoZtsBSwZNqsuW9kY=
+	t=1780203181; cv=none; b=J3++kTsL9MoY6iPE/Zs+A1b4gseljGlwFszWBXPPFoRNY76mAMxKTe1RjCoVbckTrJ6ItkpJVyQbk+an0hTi3o18ef6fDVqKTZpu0SIadJlYs1BCAdINDW/RkzOaTsVc8wXHBYSfx5FPdPuDWC8/rwoSlc6KT65Kg9446rMdQH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780196838; c=relaxed/simple;
-	bh=r7jHWy3rqTxJY1sKvw/JEXrPrLy0VTqs8er4fh0Y210=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bNi+/HhRyi77KemfK0g9KG1yZef91n2WmCn0HViafIiF9tcW/dYsbky/5ZpyHLSM5UphkSm896ZG0SBIplaEHkVVXHZfPgnDgchx6Tkou/3od01hvf7fPZvfUtMRYt8BuXhnna/5Sz/u4A2GbCRN3njktV3rgFs9WGmiyFiDrX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lFxu6+Wj; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bf281d523eso8762235ad.0
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 20:07:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780196836; x=1780801636; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+XGHTHkWccB92iEs3+aiLHcXw/qjbvnaI33XklcMc4g=;
-        b=lFxu6+WjxTmqqQDMDLgtViXgpXCmWHviH/Ol9+WVi6Ai7c4aR+TwOo05WHYb154eSC
-         H9hU4hr2foLa/21ORuM47T54qVu0AiQOmVNgnFyfEck5FJVgOkMWgVq64HqAr2aY8qqH
-         cXd0e+gLFGGUt5oMUsx8aaMglG4y4z8s83UTt2FAqvsqeiG6NUIRwjRimxFHf9Av9R7a
-         WlSOPwgJtdt5XI6e1SB/gnNqoy8J39lAdpk73XFIRlizn2PMQ5iDmnwtfMTrsyCbd0Oh
-         Sgg5QUrlg+x4J0oT3sBBE+Fs1QLA+1awnt7N0S7htf7cp+L27Z5itkfDbnW38zipKtJA
-         H7Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780196836; x=1780801636;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+XGHTHkWccB92iEs3+aiLHcXw/qjbvnaI33XklcMc4g=;
-        b=LrDY6z1OG8qfleTl3cALPGUK+zgKDvO2ocap/HFaYe7vx5iVm8DeuDHj7NGgqFgUeN
-         sI6Sj2DRErQNbfk/J+R+3oZdteF4YYIqTC49GOhyYaABHNLvDVURC6CcEBdv/FOSfxqf
-         B+jwYViPaXHlQ5DciyKva7P2hxXaGHpo/76Pj5FzKJ2PG4byM9KY1qbX22Rh2dSsmZQ1
-         7tDSExyAIsbNDujwTHqY2ZiuFhXVhuiUOGj1uxYit9MCXVSquB6BOMr8M8fX+5k+UhRz
-         zhUuH9Peuw/+uu97ddiUoHvXoDMCRSnncFndRR0OHnrMkpqKUJnkRngQI9C7JfV4319Z
-         E+YQ==
-X-Forwarded-Encrypted: i=1; AFNElJ++ZMfIjgFoqh3OcnZo/Hy8sV8NLKXRlwE9BE68XJ5ESX1y6dyG9zrxq1pptnbrbW+hIcNlHGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvHC58cWbxPwmwcGFrYIxfwK9G7ipUuEgBBjI/96tF58UWHGRX
-	bjJeqjlTtZW40sq+O2WEWFjIlrb0dT1OiciGiGWijDnovcmlcnLj++B//00/c1Qi7N4wCdehz0V
-	L9wNnTqS7GkucAj0TXdYns33JiQ==
-X-Received: from plnz4.prod.google.com ([2002:a17:902:8344:b0:2bf:1748:aa9b])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:22c9:b0:2b0:5795:9ead with SMTP id d9443c01a7336-2bf36370f35mr67308815ad.0.1780196835789;
- Sat, 30 May 2026 20:07:15 -0700 (PDT)
-Date: Sun, 31 May 2026 11:07:04 +0800
-In-Reply-To: <20260531030705.3754389-1-yuyanghuang@google.com>
+	s=arc-20240116; t=1780203181; c=relaxed/simple;
+	bh=BEgUppDCDRw8PP3X5I+8jBTlt1jboC3EEPYd8erBziQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Yef5lY8QirE6PcjmJhmnonjXizHKoMLW+k6Ft1B4vYr0xKLRIGmw9Tc8EH7P/d95eDmwzw8+u7piYjNy6PWEmtlvwm8JrD5ZLe+wSi7afYBDcOJoU4c6epnNs6WkGvVMmOK2BayZSGQGTIkrMrcjTAPuDcOLQTtaxyChJXhiInc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.229.168.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app2 (Coremail) with SMTP id zQmowAA3zwaBvhtqIKkVAA--.20948S3;
+	Sun, 31 May 2026 12:52:22 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	memxor@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	jolsa@kernel.org,
+	toke@redhat.com,
+	yuantan098@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	zzhan461@ucr.edu,
+	n05ec@lzu.edu.cn
+Subject: [PATCH bpf 1/1] bpf: devmap: reject cloning fragmented xdp frames
+Date: Sun, 31 May 2026 12:52:13 +0800
+Message-ID: <4b596825bccc64d03e0c2e0db4dceb12c7f5cf47.1780176829.git.zzhan461@ucr.edu>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1780176829.git.zzhan461@ucr.edu>
+References: <cover.1780176829.git.zzhan461@ucr.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260531030705.3754389-1-yuyanghuang@google.com>
-X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
-Message-ID: <20260531030705.3754389-3-yuyanghuang@google.com>
-Subject: [PATCH 2/2] ipv4: igmp: annotate data-races around timer-related fields
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQmowAA3zwaBvhtqIKkVAA--.20948S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJF1UCrWUArW8ArW5Zr1kXwb_yoW8Ar47pa
+	yDXFyDGFWrtr47Ca4jyF4I9rW5Kr4kWay7Kan0gry3Zw1qgF9rW3yagFy3XryYyrWFka1r
+	tF12q3yDG34DX37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEECWoanc8JJwAAsB
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293376-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293377-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,redhat.com,lzu.edu.cn,ucr.edu];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.890];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: C832C61445C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ucr.edu:mid,ucr.edu:email]
+X-Rspamd-Queue-Id: F00F261481D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-/proc/net/igmp walks the multicast list locklessly under RCU and reads
-timer-related fields (im->tm_running, im->reporter, im->timer.expires)
-to print the timer state of multicast memberships. Concurrently, these
-fields are modified under im->lock spinlock in timer management paths
-(igmp_stop_timer(), igmp_start_timer(), and igmp_timer_expire()). Fix this
-intentional lockless snapshot by annotating the lockless reads with
-READ_ONCE() and the updates with WRITE_ONCE().
+From: Zhao Zhang <zzhan461@ucr.edu>
 
-Fixes: 1d7138de878d ("igmp: RCU conversion of in_dev->mc_list")
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+Devmap broadcast redirects clone xdp_frame instances for all but the
+last destination. That clone path only copies the linear frame data,
+while fragmented XDP frames store skb_shared_info in tailroom outside
+the linear area.
+
+As a result, broadcasting a fragmented xdp_frame leaves the clone with
+XDP_FLAGS_HAS_FRAGS set but without valid frag metadata. The later free
+path then treats uninitialized tail data as skb_shared_info, leading to
+an out-of-bounds access during frame return.
+
+Reject fragmented frames in dev_map_enqueue_clone(). Devmap already uses
+-EOPNOTSUPP for unsupported XDP frag forwarding cases, and the current
+xdp_frame clone model cannot safely represent a cloned fragmented
+frame.
+
+Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
- net/ipv4/igmp.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ kernel/bpf/devmap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index fd0faf042fa6..1e958027068b 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -220,8 +220,8 @@ static void igmp_stop_timer(struct ip_mc_list *im)
- 	spin_lock_bh(&im->lock);
- 	if (timer_delete(&im->timer))
- 		refcount_dec(&im->refcnt);
--	im->tm_running = 0;
--	im->reporter = 0;
-+	WRITE_ONCE(im->tm_running, 0);
-+	WRITE_ONCE(im->reporter, 0);
- 	im->unsolicit_count = 0;
- 	spin_unlock_bh(&im->lock);
- }
-@@ -231,7 +231,7 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index cc0a43ebab6b..2bfebded5329 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -581,6 +581,10 @@ static int dev_map_enqueue_clone(struct bpf_dtab_netdev *obj,
  {
- 	int tv = get_random_u32_below(max_delay);
+ 	struct xdp_frame *nxdpf;
  
--	im->tm_running = 1;
-+	WRITE_ONCE(im->tm_running, 1);
- 	if (refcount_inc_not_zero(&im->refcnt)) {
- 		if (mod_timer(&im->timer, jiffies + tv + 2))
- 			ip_ma_put(im);
-@@ -267,7 +267,7 @@ static void igmp_mod_timer(struct ip_mc_list *im, int max_delay)
- 	if (timer_delete(&im->timer)) {
- 		if ((long)(im->timer.expires-jiffies) < max_delay) {
- 			add_timer(&im->timer);
--			im->tm_running = 1;
-+			WRITE_ONCE(im->tm_running, 1);
- 			spin_unlock_bh(&im->lock);
- 			return;
- 		}
-@@ -857,12 +857,12 @@ static void igmp_timer_expire(struct timer_list *t)
- 	struct in_device *in_dev = im->interface;
- 
- 	spin_lock(&im->lock);
--	im->tm_running = 0;
-+	WRITE_ONCE(im->tm_running, 0);
- 
- 	if (im->unsolicit_count && --im->unsolicit_count)
- 		igmp_start_timer(im, unsolicited_report_interval(in_dev));
- 
--	im->reporter = 1;
-+	WRITE_ONCE(im->reporter, 1);
- 	spin_unlock(&im->lock);
- 
- 	if (IGMP_V1_SEEN(in_dev))
-@@ -1325,7 +1325,7 @@ static void __igmp_group_dropped(struct ip_mc_list *im, gfp_t gfp)
- 	    !READ_ONCE(net->ipv4.sysctl_igmp_llm_reports))
- 		return;
- 
--	reporter = im->reporter;
-+	reporter = READ_ONCE(im->reporter);
- 	igmp_stop_timer(im);
- 
- 	if (!in_dev->dead) {
-@@ -2964,6 +2964,7 @@ static int igmp_mc_seq_show(struct seq_file *seq, void *v)
- 		struct igmp_mc_iter_state *state = igmp_mc_seq_private(seq);
- 		char   *querier;
- 		long delta;
-+		int tm_running;
- 
- #ifdef CONFIG_IP_MULTICAST
- 		querier = IGMP_V1_SEEN(state->in_dev) ? "V1" :
-@@ -2980,13 +2981,14 @@ static int igmp_mc_seq_show(struct seq_file *seq, void *v)
- 				   querier);
- 		}
- 
--		delta = im->timer.expires - jiffies;
-+		tm_running = READ_ONCE(im->tm_running);
-+		delta = READ_ONCE(im->timer.expires) - jiffies;
- 		seq_printf(seq,
- 			   "\t\t\t\t%08X %5d %d:%08lX\t\t%d\n",
- 			   im->multiaddr, READ_ONCE(im->users),
--			   im->tm_running,
--			   im->tm_running ? jiffies_delta_to_clock_t(delta) : 0,
--			   im->reporter);
-+			   tm_running,
-+			   tm_running ? jiffies_delta_to_clock_t(delta) : 0,
-+			   READ_ONCE(im->reporter));
- 	}
- 	return 0;
- }
++	/* Frags live outside the linear frame and cannot be cloned safely. */
++	if (unlikely(xdp_frame_has_frags(xdpf)))
++		return -EOPNOTSUPP;
++
+ 	nxdpf = xdpf_clone(xdpf);
+ 	if (!nxdpf)
+ 		return -ENOMEM;
 -- 
-2.54.0.823.g6e5bcc1fc9-goog
+2.47.3
 
 
