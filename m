@@ -1,92 +1,102 @@
-Return-Path: <netdev+bounces-293367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFNfEe96G2oDDgkAu9opvQ
-	(envelope-from <netdev+bounces-293367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 02:03:59 +0200
+	id cBreD7GIG2rMDwkAu9opvQ
+	(envelope-from <netdev+bounces-293368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:02:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A9E613F4B
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 02:03:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4FE614139
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 03:02:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6DDC53007A5D
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 00:03:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 431783014143
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 01:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFAF1FC7;
-	Sun, 31 May 2026 00:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760A028150F;
+	Sun, 31 May 2026 01:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aFCyUC1W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ONPBy+wq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268A118B0A
-	for <netdev@vger.kernel.org>; Sun, 31 May 2026 00:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9901427A
+	for <netdev@vger.kernel.org>; Sun, 31 May 2026 01:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780185834; cv=none; b=KGQuy4eGf422hBQT3XQd+1kdbUztKdlKGW5Rj967sDRo9iRRALAE91NQbICUZCe9myV3DRn3R6Sn7r3Mr6bVrJBVNWoeud6ar/OLh+WlM6cFO5e7MMWjiK6tHK5qsORya6yKW/b7SGG8CyrrN/PMJUxn4pgJnAVeMg+pWhrzzyk=
+	t=1780189313; cv=none; b=CwLE4khmkdz+SNyMJEYcc0IqjSHiFkKtMCQRwmA9Axoqfinf4zAFC8vUQYbdpsOq3fSuQnEaFJqwWWx7JYBiy6bOtK+8pNRj34VVSjzrnbu2C5fdhqzyTYiDM62cZYRQ0O8sNKd2jTwiGnn8n/AKapuiDdH9cL2fE9vUoqzyoYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780185834; c=relaxed/simple;
-	bh=QyBHhcNYCuqZuqlbaH9ljeT9Kq7W+viZwDTY/D6sse0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YGX2elZLstLJIP6XEcVN5k4cll6HE2zJ5qLizQRZT/4v+R/xCSuIGOTUlxCv4TqB5191tIeanINAtgV0y/wLZ153+uWU0xPStPdu5ouwjfFO+3UmK9Sg5xjmKnykNQxyo1jA6hcm0Pu2zmCEzJDQ63VdQrN68qpZEKcw2SlWEa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aFCyUC1W; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1780189313; c=relaxed/simple;
+	bh=zDp1XhZh+e1pWOK/DsDnXaGWcjK6DLDDhCVbs2gw3ZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IewFvYiqDPWoapKGcuFvrZt/xDwtjDWJdQ9wQlyKyIqbilkc/OQpsmUeub77YLILAdnDcJwlOhNIbGYge2mEvzQ8WlnDpJLvDFk8J+KmCIyBU+Th6UDawwalTEd7abHRQdc/eCmPJbJdzSIOT6R2rw3yYjswynLEdQWZd0d0d7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ONPBy+wq; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2bf30d530bdso14423505ad.3
-        for <netdev@vger.kernel.org>; Sat, 30 May 2026 17:03:52 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490686877a1so49172285e9.0
+        for <netdev@vger.kernel.org>; Sat, 30 May 2026 18:01:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780185832; x=1780790632; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780189309; x=1780794109; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iL9btqhhqOWOE8PiDezZ5qlfknrW8Ydi6glTHZIZ+4Y=;
-        b=aFCyUC1WNtEucrYRbk5usd/DOEGK/04McSSVYWirM30xjmLHc6DT0FW73YnHMewKdc
-         BKwbWcDY5iw/4g9lQmzSzBvM/hMcNlp9aHk/n3OTwWbPfGlJqrIkfvXdkbgAnEU9MjLk
-         Yr/nkRqgblmvNwWW2hV6lLe7m6rwEOpq9OMVqNUpb5sCN1GB6m8BD63xiBYq5/eMNNE1
-         xKxaWsNreO/ruy+E/sZp6rWmtO/Kksm2GBmwzmbw5F91uDQkc1ZPMC6ctpikyJ/huoZl
-         ZbWtqm55LWn15GCqckdzA/mBuRqdKbLjRNaBlkjEA5TjhgX4hJ/1sUaVv43RB4uwCWuI
-         UIFw==
+        bh=zPl6w3uFFVNTR71LIvI6Hm9g27LWiqb2gsEEN2QBH30=;
+        b=ONPBy+wq4TbJvSn3LFGXIzPYyx8ZL8H0HYU72wPZVRyrKbZ3ulzc+EdYpWvPewy5+E
+         HceHotkVzpTfwy5ttrDEQripSfGnKvGRaFhDHsXtc4xPtvryIUsW/n8cMtnKWqhWjVLr
+         5PfktqQ0ALXzQVgwDDPr+8rAkWm76N+8vqNhRBIwZuny+k5LKYT/URzgaeAt9ij4cqwR
+         5H33MKZqNPe3/+Dxieo1Mgg7UT2ujBWMZpgVi2MeIgWNbiM6X0ITgl05Jg7oUoq1J4lO
+         3h3UAOnRQ3GVFDTMv+9NbMUeYedFTVX0GHUKUuxma6BOnmivDMq7ziff3UXnxYXACATl
+         unmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780185832; x=1780790632;
+        d=1e100.net; s=20251104; t=1780189309; x=1780794109;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iL9btqhhqOWOE8PiDezZ5qlfknrW8Ydi6glTHZIZ+4Y=;
-        b=E4EjXB5mJMXpCdMD1Kf5Z2EdMIimj5se9aKxiYac+oLDcBheBHfo0rzTBHsXUOgObk
-         KWqcpkBzD8lfr2OKxYtvJWrzYZcCcKmMLZY8pxzBU0TUByYMVuv1XWk4EuyreIxYyjkT
-         iWGxhO5EQUdAg76vcnf8aBxbltbU2KZjgMKjOKG79PjbpIHCTc0+/0dCri4iztOW2NpS
-         IolbyS/JT5Px5V+uc270PKbplLf8JA4MAYBM5DN89DXpz+ZhjbJAz/spSViffOPiFt1h
-         0QZMvROwLKX1msbIRC4bfsJS3yvNGZviOccEtiaZEudZ+oI1913iT/zYn6aFjMW+XOd/
-         hLXA==
-X-Gm-Message-State: AOJu0Yzb12TLCgLsVLy78w9Q4MeKXbBOOyLrJgoSylMn9Q/lHafH77Ez
-	iDFRfrY/i04ijeXAYp5Nth6ZtZ3DyMiPf67XSz+vSwbhYVYGOjwCCL/udjV92RPV
-X-Gm-Gg: Acq92OEXg6uGwuADnze2D97ZdZnkwBXLgm1qaMNAtLIbyC3/yk1z5EpcwHT1xQZC/0E
-	E9nD/0vNZYsPS0r2pWr0ViYsJXvGmiCQNd9yD6cdJsUILGLwIahU5IQr4Cm7MjPaJDmcHpAzWCt
-	AWLxoVYKcxekQF0OWvy1CYwIuF5WAHx74135G4USiHEDEKFnPp7FsigdNL9PZ+rUqwE7uK/IcGU
-	d5K0eBApQ5CWlwCqtx1jrbP+/VEAZb5r3szEo/8joeqXoBc8SEISp6HiEhJVPD5KHqCamo2K+pU
-	PlUA8Ry+EWUlpe687ZVVBnkDDIJBENYyAqfaO/Qvk+JkZu9MbRl0jvjx6r/bMaJgJ1/+ge338MK
-	2QxvwNwekWsiNY8SwT/8JhPAFntHq+kQU8yURG/0vl3bMgS8BmAPDmZPPuzYZFpG+qR62GCTDgD
-	ybNpPou+hKIGLHo/oN9hCcqAqzOsYTFAtg8glYiZ8cUNIxCKMV8kEvFhaiNfjOfr1iNIdYIjObi
-	lCMg2PJN222+dWKxKY+jZHerrslMiQGIGBYesOVZqd12Q==
-X-Received: by 2002:a17:902:cf12:b0:2b2:5503:1b8d with SMTP id d9443c01a7336-2bf36779f68mr62415415ad.6.1780185832345;
-        Sat, 30 May 2026 17:03:52 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23c30646sm58589955ad.68.2026.05.30.17.03.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 May 2026 17:03:51 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] net: b44: use ethtool_puts
-Date: Sat, 30 May 2026 17:03:34 -0700
-Message-ID: <20260531000334.388351-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        bh=zPl6w3uFFVNTR71LIvI6Hm9g27LWiqb2gsEEN2QBH30=;
+        b=RY25OTkvDXgxfIWBtX1a38CrZvls7NAcZd9VeR7Ej7DgLWWOmridwS289ptUjdz3Mr
+         jTqhS5QJC0OY91y7n0qsq8ssanpOgQ2rIZNuoFCLtHSrsciYvHVSX3WNEesIpBzTUGFO
+         Nv4afDJayF69U5kzboLYq7bGbWVrBaqFurjneEdF9NIBrsIZ5dUu33NZIU1e6KEc77+A
+         hSynHJkHC7I3NsvrP3FUQhHlRyiT+r54/4rOn/S2dRt8EwpKFmEZbdT28JPF93MLM7r9
+         ZeoVudS1CCMmABnT+KZ1vrhM7WP6hYbt2/f61cejmLiriq1nHH4KWVG8Ly2oVYRYoI/E
+         lX4w==
+X-Forwarded-Encrypted: i=1; AFNElJ9gYgj7gQjo4AAm9EZnMDMadFP0w6UHUvqAlk4CsnPOdNN/82Lis3V1yWdUrWZxmMNkmOYcZlo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxirDwLGfVHnNw+6bvVkiwOOFQ23zcWuh2PZvGGW95Kg1xUeAIb
+	xwji0miGyHIhjR09NZiL0vio+yNTqE2HxZv+DKoisVoLANCN79vn72EY
+X-Gm-Gg: Acq92OFgbGOfmoK3hWMS8stT5JSMW472jr/T8ZU4uQCqXpRtsmgGoN50PMAj82FmrmZ
+	jEfORtkgznhm/02We35EuvmQGwJEAjOgSdtbl56azaEXMU5s0VT93UcMawa4AndX/rH+tQTzG0X
+	3T1YBL0rWLKpAgZZ3DA2tv72v9GWelnZI1UyNW7xTYNO/0HFiRAPME1XDfH+j9wrsN4QEN/Bqah
+	ufUBfEt5Nj0blvNhsxgzHqXO3Jb+ucpAaH1i7rutImY04CAWv34Ch+bSXVd5VuRcTCUGkYLH5yg
+	gn8yUEvoXP9k4UN7IesABLvLqXMdr5zBq+iZC6LVR4hRWgCwJuF6nMvMB9bkIAUfONARXrgp8p+
+	2E8Jw1WAdkTkFP3eNQdam30SsDIKAgQJvgYjmLB91JIFSkyZSi2pwux5B8aJklyeCNuEAXK2SVl
+	DJn+AlLJDLo2gE/xY6Vh80SnjkNpIn3DOf2TcxUq5g
+X-Received: by 2002:a05:600c:c168:b0:490:5000:917 with SMTP id 5b1f17b1804b1-490a2a02ad9mr75824695e9.1.1780189308943;
+        Sat, 30 May 2026 18:01:48 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4909cab0e79sm261799535e9.13.2026.05.30.18.01.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 30 May 2026 18:01:48 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-api@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	David Howells <dhowells@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	patches@lists.linux.dev
+Subject: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+Date: Sun, 31 May 2026 01:01:04 +0000
+Message-ID: <20260531010107.1953702-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,92 +104,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293367-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293368-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 51A9E613F4B
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 1C4FE614139
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There's a subtle error with the memcpy here, where b44_gstrings should
-not be dereferenced. Dereferening causes the following error with W=1:
+This patchset is for VFS.
 
-In file included from drivers/net/ethernet/broadcom/b44.c:17:
-In file included from ./include/linux/module.h:18:
-In file included from ./include/linux/kmod.h:9:
-In file included from ./include/linux/umh.h:4:
-In file included from ./include/linux/gfp.h:7:
-In file included from ./include/linux/mmzone.h:8:
-In file included from ./include/linux/spinlock.h:56:
-In file included from ./include/linux/preempt.h:79:
-In file included from ./arch/powerpc/include/asm/preempt.h:5:
-In file included from ./include/asm-generic/preempt.h:5:
-In file included from ./include/linux/thread_info.h:23:
-In file included from ./arch/powerpc/include/asm/current.h:13:
-In file included from ./arch/powerpc/include/asm/paca.h:16:
-In file included from ./include/linux/string.h:386:
-./include/linux/fortify-string.h:578:4: error: call to
-'__read_overflow2_field' declared with 'warning' attribute: detected read
-beyond size of field (2nd parameter); maybe use>
-  578 |                        __read_overflow2_field(q_size_field, size);
-      |                         ^
+Recently we got a lot of vulnerabilities in splice/vmsplice.
 
-Instead of fixing the memcpy, use ethtool_puts, which is the proper
-helper for printing ethtool gstrings.
+Also vmsplice already was source of vulnerabilities in the past:
+CVE-2020-29374 (see https://lwn.net/Articles/849638/ ).
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/broadcom/b44.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Also vmsplice is problematic for other reasons. Here is what other
+developers say:
 
-diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
-index 90df02e0039c..f994636fbd5f 100644
---- a/drivers/net/ethernet/broadcom/b44.c
-+++ b/drivers/net/ethernet/broadcom/b44.c
-@@ -2031,11 +2031,11 @@ static int b44_set_pauseparam(struct net_device *dev,
- 
- static void b44_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- {
--	switch(stringset) {
--	case ETH_SS_STATS:
--		memcpy(data, *b44_gstrings, sizeof(b44_gstrings));
--		break;
--	}
-+	if (stringset != ETH_SS_STATS)
-+		return;
-+
-+	for (int i = 0; i < ARRAY_SIZE(b44_gstrings); i++)
-+		ethtool_puts(&data, b44_gstrings[i]);
- }
- 
- static int b44_get_sset_count(struct net_device *dev, int sset)
+Linus Torvalds in 2023:
+> So I'd personally be perfectly ok with just making vmsplice() be
+> exactly the same as write, and turn all of vmsplice() into just "it's
+> a read() if the pipe is open for read, and a write if it's open for
+> writing".
+https://lore.kernel.org/all/CAHk-=wgG_2cmHgZwKjydi7=iimyHyN8aessnbM9XQ9ufbaUz9g@mail.gmail.com/
+
+Christoph Hellwig in May 2026:
+> vmsplice is the worst, as it is one of the few remaining places that
+> can incorrectly dirty file backed pages without telling the file system
+> and cause the other problems fixed by a FOLL_PIN conversion, but it is
+> the only one where we do not have any idea yet how we could convert it
+> to FOLL_PIN due to the unbounded pin time.
+https://lore.kernel.org/all/agwFlBKvKytjURDO@infradead.org/
+
+See recent discussion here:
+https://lore.kernel.org/all/20260516182126.530498-1-pfalcato@suse.de/T/#u
+
+For all these reasons I propose to make vmsplice a simple wrapper for
+preadv2/pwritev2.
+
+vmsplice(fd, vec, vlen, vmsplice_flags) will
+be equivalent to preadv2(fd, vec, vlen, -1, rw_flags) if you have
+readable pipe and to pwritev2(fd, vec, vlen, -1, rw_flags) if you have
+writable pipe.
+
+SPLICE_F_NONBLOCK is translated to RWF_NOWAIT, all other SPLICE_F_*
+flags are ignored.
+
+There is a small change to handling of NONBLOCK-related flags,
+see commit messages for details.
+
+I tested this patch in Qemu.
+
+This patchset was written by me, not by LLMs.
+
+Askar Safin (3):
+  tee: fs/splice.c: remove unused parameter "flags" from "link_pipe"
+  vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+  splice: remove PIPE_BUF_FLAG_GIFT
+
+ fs/fuse/dev.c             |   1 -
+ fs/read_write.c           |  23 +++++
+ fs/splice.c               | 202 +-------------------------------------
+ include/linux/pipe_fs_i.h |   1 -
+ include/linux/skbuff.h    |   4 +-
+ include/linux/splice.h    |   2 +-
+ include/linux/syscalls.h  |   4 +-
+ 7 files changed, 33 insertions(+), 204 deletions(-)
+
+
+base-commit: e7ae89a0c97ce2b68b0983cd01eda67cf373517d (7.1-rc5)
 -- 
-2.54.0
+2.47.3
 
 
