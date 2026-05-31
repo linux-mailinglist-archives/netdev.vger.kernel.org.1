@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-293443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293445-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uM/nLPZSHGqTMgkAu9opvQ
-	(envelope-from <netdev+bounces-293443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:25:42 +0200
+	id mNnyMQpUHGqeMgkAu9opvQ
+	(envelope-from <netdev+bounces-293445-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:30:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC01616CFC
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:25:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A66616E00
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 17:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB64C3015448
-	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 15:25:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 495D23069C30
+	for <lists+netdev@lfdr.de>; Sun, 31 May 2026 15:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1114639022A;
-	Sun, 31 May 2026 15:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EE4391512;
+	Sun, 31 May 2026 15:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KKNK6V6r"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AVWV9et8"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAD018E02A;
-	Sun, 31 May 2026 15:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF273911C5;
+	Sun, 31 May 2026 15:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780241139; cv=none; b=rj4RvQ0kIqd0/A2Tdnyrk1EOB4QPRrWdeoNPJhD1J/kXsqXJ8+E8aHsP4R2icmioHmJWVbZcgL2VOrikHnq+BpaAplsr/qCJN08gqK8emxWYyfbO+hWAVOQTvghC3r0699/gGJ2t/v9Tq9C62Lf3rmjImChZJN2hdthzpXWCw2Y=
+	t=1780241195; cv=none; b=dw0R7m5NQpNQ1l84m6BkChaTDzzkZTAly8XPXHvwZJKA2Rwyin4eu6irSZMIOlwT5q5TbB4YzENY6IUIvJpv4tmhb/4b6vyRn8xNb3yHrXV05Vukw4BOHTcQ3K5czDXTfnmwlfCYRo76mzHCzqs4bpY3a7HaCG1JVHwShcCoGhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780241139; c=relaxed/simple;
-	bh=QJdRrhZvfINQYg94kjlJQiKsAS/EoDlREda7BlZqvsg=;
+	s=arc-20240116; t=1780241195; c=relaxed/simple;
+	bh=tVSVhJ+jtd3KUuQBDtje4A44ZDG/J3xhoMi+m9aE848=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UHmMn/Glzh36LuWGWeXMhhMCuXTAiXNXKzaDOPEbV7Jb7x7xJjCw3kMim7LxHrJ3FVgcUMCZNQeVjkZ1LtZ+7qht45SO8M4ufNRplazWjMzvX1qoXmW3/6wau6KlGuyrKtyRAwuDDLMpAJ5KGdjY2KXRntjhYK2dluKaTRav3pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KKNK6V6r; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xp3oEYHeqfj+7U1gthD7ycdXLb1GDeEprFYCAGMRUNw5HU2WmlN+uonL7HPJboysPR71wIgw1qKrkyHU/GedKjyuPH+mSURS5NXLYY43lJ5FJqewCFn4DEvT6bF21Wbofys2FtNo/fbimc4QpEFABJnk4BhezNFB4+GZ4549ltc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AVWV9et8; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,13 +39,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tggoz0W6PHZB8ZgX6WAr7umIoLdUih9Ni/G99H8whns=; b=KKNK6V6rOi6rhPcZWfhaldaaow
-	djS8oJfaAUDEPAQulDUJnvbYngG0/m4L1zoaRe+6kABCzkvnTMlj67VgqtQz5K68O2DB4VK94fNfW
-	NH9aNhBnZWnM8+5ou6vMKcIOtrgP+UUyB1/A3Rx4hUUJnmUD7kUeqhSyiwqgZZUzG80A=;
+	bh=eaw9BFSli01njN1ANjFgshb0jgxlvs3haCECARd8gsg=; b=AVWV9et8EmL6zAlijtpD4jBY9O
+	LNfyy5hIT2pvEE3YcTlkfDWzETEh+BrX1+ns86rxxw0FYc7HaJ4rxsEz3kBZ22bk6Cu6hkKB2+F5W
+	NuX+KVit3h/71Bnqu36mTuvVHkX4eyk5nhoFRT+IwzK6YLqhDZhrJmOZLAGg86uv5Q1I=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wTi2Z-005N6r-IL; Sun, 31 May 2026 17:25:27 +0200
-Date: Sun, 31 May 2026 17:25:27 +0200
+	id 1wTi3W-005N7Z-Lp; Sun, 31 May 2026 17:26:26 +0200
+Date: Sun, 31 May 2026 17:26:26 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
@@ -57,10 +57,10 @@ Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
 	"pabeni@redhat.com" <pabeni@redhat.com>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 09/14] net: phy: ncn26000: Support for
- onsemi's S2500 internal phy
-Message-ID: <5c8e4a0b-339f-46dd-a22b-310797f022d6@lunn.ch>
-References: <CY8PR02MB92496757556AC350E712191883162@CY8PR02MB9249.namprd02.prod.outlook.com>
+Subject: Re: [PATCH net-next v3 10/14] net: phy: ncn26000: Enable enhanced
+ noise immunity
+Message-ID: <bb0c6ec9-8843-4bf0-9491-f5b5041bafa0@lunn.ch>
+References: <CY8PR02MB9249022FD77BEF360103367283162@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,16 +69,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CY8PR02MB92496757556AC350E712191883162@CY8PR02MB9249.namprd02.prod.outlook.com>
+In-Reply-To: <CY8PR02MB9249022FD77BEF360103367283162@CY8PR02MB9249.namprd02.prod.outlook.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293443-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293445-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -96,17 +96,15 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 0EC01616CFC
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,onsemi.com:email]
+X-Rspamd-Queue-Id: 45A66616E00
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, May 29, 2026 at 06:41:06PM +0000, Selvamani Rajagopal wrote:
-> Adding support for internal PHY of the integrated
-> media access controller S2500. PLCA tx opportunity timer's
-> default value is correct in this device, compared to
-> NCN26000.
+On Fri, May 29, 2026 at 06:41:11PM +0000, Selvamani Rajagopal wrote:
+> By setting ENI bit, noise immunity is improved and it is
+> specifically meant for PLCA enabled nodes.
 > 
 > Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
