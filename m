@@ -1,178 +1,130 @@
-Return-Path: <netdev+bounces-293636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJWaJqtQHWooYwkAu9opvQ
-	(envelope-from <netdev+bounces-293636-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:28:11 +0200
+	id 2LGELUhRHWooYwkAu9opvQ
+	(envelope-from <netdev+bounces-293638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:30:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11D861C6B0
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:28:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2256D61C755
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBE0730A9207
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:20:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B5C9F3044547
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414E13909A7;
-	Mon,  1 Jun 2026 09:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D021390234;
+	Mon,  1 Jun 2026 09:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YLE9ZQqB"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Gc0VUppu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9222B38F935
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C4F3655CF;
+	Mon,  1 Jun 2026 09:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780305598; cv=none; b=VpdPn9sdZC7jDrpxIw121dulEnqD44d28L+LGMpwMKizlzpMJmzrRotdgqjIy3fPhTxQoas187QFToITKxGCmNMxNzf3uVD2XdLMyzajbonD8vYFzIwoffrhUvRqxOGwLd4AD7UbbrLJJXc7tRMmv0Ie0+P6ay1/T7ENqg05MGI=
+	t=1780305839; cv=none; b=AsQZPOPbaA8qBNJorENE8od9Ot9MKP3/3neoXLWnJFZKk4kb/LiDlZEjvJe3li8nab1FL4RX73JA2QM1zXRcs2fyQoYtmgPGj4LxLQfSo1+8wg2PimgXl7vvUlcA54yhKQjikwtVYVCY9qUYpE8yN+qmTdH+Sn6WTqLYAqOUlts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780305598; c=relaxed/simple;
-	bh=IypKpr6nD7CZwdCbgblFS0Y8fXDRMq1O9xnmaFG2Fl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ju8Org+I7e5jNnaKgb0vkNHodIsD9qO2OwpxTTTW66o/L0T/W5dlNavhu4wzm4N6+dzYhL96zIgEzX//ovUiut+7I8kT7qVNfVnu7qcdDWdjhCMl5GDaBBKD1ww58/96cO8459Hd/EOlPRRUMkQ9WMXktDQvf0JZO8JiJsiyQTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YLE9ZQqB; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780305596; x=1811841596;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=IypKpr6nD7CZwdCbgblFS0Y8fXDRMq1O9xnmaFG2Fl4=;
-  b=YLE9ZQqBJllG1xs7NsQqAdPTV1KUDLAK0U1lLJg9vpEFdBH463sVWipc
-   P+mBLtnBU9IeeUG7llYf953mgQgKmPs8DaVKdpz8Bnl6XSPxV6/8MBgiV
-   AmJPjXL3U/QV1iktpwsaFBkeyd2tWp0Q2ELcs8NfMeZ0mgmh+08Bt8hMt
-   q8z9STCA3nMfJWx/DOGWW6JT03XS3F9YI8tJ7p0kBnSQx6V0Q013vAuuD
-   87b5LlthYm3Je8j+cXtadFaQVIJ7oAnzK2dIX7w08377CFqFcVefPWpYD
-   iYdSscsH1ZzfOGM+qQMx/BFTk0cFJsfTROA2mOcCHgY+wiYtVFwq3Sa6m
-   Q==;
-X-CSE-ConnectionGUID: l/cwHZiyQnW4dgkB4xyHEA==
-X-CSE-MsgGUID: ZUEjs7LxT/m/RIbPtBWQdA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11803"; a="80791631"
-X-IronPort-AV: E=Sophos;i="6.24,181,1774335600"; 
-   d="scan'208";a="80791631"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 02:19:56 -0700
-X-CSE-ConnectionGUID: NZFAIRKCSNqh9RlcUX0s5Q==
-X-CSE-MsgGUID: FKGEbHG3R1qJI0RK9wtZHg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,181,1774335600"; 
-   d="scan'208";a="247802574"
-Received: from gnrd8.igk.intel.com (HELO GNRD8) ([10.123.232.137])
-  by orviesa004.jf.intel.com with ESMTP; 01 Jun 2026 02:19:56 -0700
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-net v3 3/3] ice: Cache struct ice_hw pointer for split register reads
-Date: Mon,  1 Jun 2026 09:19:51 +0000
-Message-ID: <20260601091951.3017848-4-sergey.temerkhanov@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260601091951.3017848-1-sergey.temerkhanov@intel.com>
-References: <20260601091951.3017848-1-sergey.temerkhanov@intel.com>
+	s=arc-20240116; t=1780305839; c=relaxed/simple;
+	bh=9cpGroDrLpJMUxxcUm5cBGOinWy7SIB6mxCDnw1EVb8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E3k0H4w6RzCydXzvJ6yZfoGHuQbc4DhwJdYq/FmVkC28m6A6Q2RV71JrXWCfXz/bpHFZhey/B/hMdA0WpwKJ4hoYpnpYR+1Fd53Wz6QqnrKVthkW6yyORr2scwKZ6s9U2FFRsZlfk+J27jgcQoMgoz3AGCIIOCZBAp3cwVRCEiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Gc0VUppu; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 1BFE020B7167; Mon,  1 Jun 2026 02:23:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1BFE020B7167
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1780305825;
+	bh=1dBsl+usX+yNit5uL7Cl+L0xh4XKIwuUK/l5Em4lMN4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gc0VUppuySH6OSGGa44IlxUBt26W6vYFDTARrKiIVzcCNWCKExJMK4v51ZKXUiE7L
+	 9JMRMjVx8SaYOW/bF9YMEu8SR33UiVwg9pO1J1o73UdEyNp6AVmhEWh9m/oHLHyMeA
+	 JYQjkX8fKzc6s3ReVmCH86g/p4UkGhWDdslPI9j4=
+Date: Mon, 1 Jun 2026 02:23:45 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, andriy.shevchenko@linux.intel.com,
+	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net-next v5] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <ah1PoREU8DSqYHxj@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260601091505.1763912-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260601091505.1763912-1-ernis@linux.microsoft.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293636-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_TO(0.00)[marvell.com,ziepe.ca,kernel.org,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.dk,lst.de,samba.org,talpey.com,oracle.com,brown.name,redhat.com,davemloft.net,google.com,linux.intel.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sergey.temerkhanov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-293638-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[43];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,cloudflare.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: F11D861C6B0
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,linux.microsoft.com:dkim,nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 2256D61C755
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Cache the primary ice_hw pointer to ensure consistency between
-calls (both parts of a value will be read from the same NAC).
-ice_get_primary_hw() will never return NULL, but during the
-ctrl_pf cleanup there may be a case when one call will return
-the pointer to the ctrl_pf->hw and the subsequent one - to the
-pf->hw which generally are not the same.
-Struct ice_hw is embedded in the struct ice_pf so it is protected
-by the same critical section - no additional synchronization is
-needed.
+On Mon, Jun 01, 2026 at 02:14:44AM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
+> 
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> ---
+Sorry for the incorrect prefix in v5 (used net-next instead of
+rdma-next).
+Please considerthe next version v6.
 
-Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 devices")
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Tested-by: Frederick Lawler <fred@cloudflare.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 9ea72d5f59cc..a2b7f709f3c0 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -4,6 +4,7 @@
- #include <linux/cleanup.h>
- #include <linux/delay.h>
- #include <linux/iopoll.h>
-+#include "ice.h"
- #include "ice_common.h"
- #include "ice_ptp_hw.h"
- #include "ice_ptp_consts.h"
-@@ -1957,10 +1958,14 @@ static int ice_read_phy_and_phc_time_eth56g(struct ice_hw *hw, u8 port,
- 		zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
- 		lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
- 	} else {
-+		struct ice_hw *pri_hw;
-+
- 		guard(rcu)();
- 
--		zo = rd32(ice_get_primary_hw(pf), GLTSYN_SHTIME_0(tmr_idx));
--		lo = rd32(ice_get_primary_hw(pf), GLTSYN_SHTIME_L(tmr_idx));
-+		pri_hw = ice_get_primary_hw(pf);
-+
-+		zo = rd32(pri_hw, GLTSYN_SHTIME_0(tmr_idx));
-+		lo = rd32(pri_hw, GLTSYN_SHTIME_L(tmr_idx));
- 	}
- 	*phc_time = (u64)lo << 32 | zo;
- 
-@@ -2128,10 +2133,14 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- 		lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
- 		hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
- 	} else {
-+		struct ice_hw *pri_hw;
-+
- 		guard(rcu)();
- 
--		lo = rd32(ice_get_primary_hw(pf), GLTSYN_INCVAL_L(tmr_idx));
--		hi = rd32(ice_get_primary_hw(pf), GLTSYN_INCVAL_H(tmr_idx));
-+		pri_hw = ice_get_primary_hw(pf);
-+
-+		lo = rd32(pri_hw, GLTSYN_INCVAL_L(tmr_idx));
-+		hi = rd32(pri_hw, GLTSYN_INCVAL_H(tmr_idx));
- 	}
- 	incval = (u64)hi << 32 | lo;
- 
--- 
-2.53.0
-
+Thanks,
+Vennela
 
