@@ -1,248 +1,204 @@
-Return-Path: <netdev+bounces-293848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293850-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cHZ1F+a6HWoidQkAu9opvQ
-	(envelope-from <netdev+bounces-293848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:01:26 +0200
+	id SC+MKXC8HWo/dQkAu9opvQ
+	(envelope-from <netdev+bounces-293850-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:08:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D1C622F53
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:01:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CE162307F
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED8B5300AC1E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:57:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 905EE3008285
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C8539DBE1;
-	Mon,  1 Jun 2026 16:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C102D2486;
+	Mon,  1 Jun 2026 17:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4ylPAKx"
+	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="YH3Yu4uN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6DA36A023;
-	Mon,  1 Jun 2026 16:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26BE3DC860
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 17:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.153.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780333045; cv=none; b=jh+FUFMRvZ4LSblAxoB2dF8Qtabi4AVk/J3xm/VewDwHEWiuw2+2oadt+qCAEmJ3CYWAr8unWM0OjAwJ9ogDDrSQsiQ5MlzuvYcxQxals84QpgzmWHEFip5G4Erc52H3FCEjRqTRjEZijLgNhFTXQ6Dg62lSn6vgJBi1ZUnHbnY=
+	t=1780333569; cv=none; b=Q9DARPF4cll/BhVITWxmMfLMer7vuZDCpJSJD+ojOplN+c05yspkJ3h9j1VfF5/FM3vhYr/XmDbfrNTcs+O4y+5HdEvTCLaWkbwBZo2eVmsWAVEb7eeW3KsuFTyqqemQmLJCajMmfcQmgYifjtR/4d3/hcvWDoTu5xG5akcec3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780333045; c=relaxed/simple;
-	bh=xyevwjMyr7vNl7ZzQrplOkY6U4utGgfVUdUraOPnOEM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UMTarWnDxl1xCNj5Ic7acpJDI724z5eND9RJfimySUAJBFrtQHO3fpzx/13Lf/GspBDuXz5akNCUCFy+wXwz7q/9W3PT3XEj9fUjTIFg+IvxBNDpYeO8emnc9L3QK+T3qyc/lJJyBnvZM7s1CRG/G+/eWlRbEdkpPO3pLcv60uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4ylPAKx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC6D1F00893;
-	Mon,  1 Jun 2026 16:57:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780333043;
-	bh=w290A9I5MP2KqxKWsP3Z4me4Ofs//TPogdWk1zGmNOU=;
-	h=From:To:Cc:Subject:Date;
-	b=e4ylPAKxe33GcwzjIzqBzb+z6N1ataV9FHjcSujTtJdg8vP64JGHFhYcX5VYiQ5Uh
-	 xRfMiMVatyJw/RueV5uoT9we3r6eMt1WOVYrmQhpLmfi78FebOOKWr/D3lxCkNqi5+
-	 VSQqfNFIiZMW0CjYZobD+iJ1x+mDvpsLreDbjvCrMcKrmVyIbyye3MhsmM7DsUCYI5
-	 spJCeerKj1UhgUoHz9F17wMz9wahG5Xkp/CT2bsG3s+MuYZsirDjk/QL2GPJu9p6zO
-	 kK5B95dWR+LRYuCYDm7XpClzxtRRo99XlHRJrocIUQOJl1c0VJ0b7qNyNB63mBJrKm
-	 1P9X7Jx8diMHA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>,
-	Kyle Hendry <kylehendrydev@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org
-Subject: [PATCH] [v3] [net-next] net: dsa: b53: hide legacy gpiolib usage on non-mips
-Date: Mon,  1 Jun 2026 18:56:42 +0200
-Message-Id: <20260601165716.648230-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1780333569; c=relaxed/simple;
+	bh=d3H8W/kllpgV+tjss4asHKkfKZtuqTxvHGvVxXWAXgs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=ovAB1q7IT1R1KwhCU/E4He+TqG85kDizvR7/vITBEDzLQ30GSldX7FlCJkEymg4eEUk6+naJuXUd40DH1+cLETEtG1GHny1edtR0gJ06AbRFv06+09lMEyaabEl8GfX0Fg18EOcp0xgMviBxyFnOYtX537LGbsq2wcjha+IYIMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=YH3Yu4uN; arc=none smtp.client-ip=170.10.153.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onsemi.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1780333561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d3H8W/kllpgV+tjss4asHKkfKZtuqTxvHGvVxXWAXgs=;
+	b=YH3Yu4uN82RhKvyw2XSY3lyuSlMisqinEU6q1eYR5ZKAc25Jfn/zeCp4oVSZB6pyx680zU
+	Oeer6imhV991Z8/7SGRUbQR+dVQJDeV1reKoM7cS8+pU6aLPki89hirvKGhD5+ebOZNoDn
+	xXI2JJV3wUxVZ48yxNtLQyDDUk80ZhznzkHChgdJuRvCsBkjWD1lxMDbNzolSCawhkG/3b
+	n4gYK8BjSXUbldSOwPwl+VdLSrk3b3PXFbEB6UI6w+MC0A7imGtxL9Ud7BSHypNtyjdJUM
+	eVI7fMVGRqb7NaATT0kjpoAlXXb1aeKaDN160E78xwR/1a2AsMhkXZDQRwHutg==
+Received: from SN4PR2101CU001.outbound.protection.outlook.com
+ (mail-southcentralusazon11012004.outbound.protection.outlook.com
+ [40.93.195.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ usb-mta-59-K2HO0sA8P72uOfarH5y2Rw-1; Mon, 01 Jun 2026 10:03:52 -0700
+X-MC-Unique: K2HO0sA8P72uOfarH5y2Rw-1
+X-Mimecast-MFC-AGG-ID: K2HO0sA8P72uOfarH5y2Rw_1780333430
+Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
+ by CH2PR02MB6918.namprd02.prod.outlook.com (2603:10b6:610:89::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Mon, 1 Jun 2026
+ 17:03:46 +0000
+Received: from CY8PR02MB9249.namprd02.prod.outlook.com
+ ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
+ ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.21.0071.014; Mon, 1 Jun 2026
+ 17:03:46 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Piergiorgio Beruto <Pier.Beruto@onsemi.com>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next v3 11/14] net: phy: ncn26000: Support for
+ loopback support
+Thread-Topic: [PATCH net-next v3 11/14] net: phy: ncn26000: Support for
+ loopback support
+Thread-Index: AdzvmWh3z2fZMkfqSqmvJbjWwU2cFQBeZp2AADUKyLA=
+Date: Mon, 1 Jun 2026 17:03:46 +0000
+Message-ID: <CY8PR02MB924995564C2FE17062A775DF83152@CY8PR02MB9249.namprd02.prod.outlook.com>
+References: <CY8PR02MB9249BCB1ABC4D1923CE3CAAE83162@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <22496ce0-6d50-4059-bbd4-980513ad2612@lunn.ch>
+In-Reply-To: <22496ce0-6d50-4059-bbd4-980513ad2612@lunn.ch>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|CH2PR02MB6918:EE_
+x-ms-office365-filtering-correlation-id: 9bfd37ad-cc9c-42b6-6a2f-08debfffbe92
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|56012099006|4143699003|11063799006|22082099003|18002099003
+x-microsoft-antispam-message-info: vzHkopfe0AtM/TgCihOdx5w3lfUuPizO3WTaLcKTOxUh6jrbvQcLfq2mabzlaYUxFndwHWMIM96MKJz1efuP0snWX3lq0Hk6+DBCDFScmYgjC+QX9gxrZ9q+fjF90x3gHAzOfRD4H4wOEau0YDxfHaOSH6RC74n4tyfyMO8JfLCtAf3Hr5SfsJ9vXuvDIPwoMJ4t0K1SSTog9EBcU44Me5olA1YjiEgQ55t70PthIN85RRWGXo179sq61Ap0I18eGAWPoWjIikwwbCPY/+2GCVxWEPrw7wXMFDQSxH3jDhjeplAQKH2lvcKF+bPPRBeax4zZSQBYWV9bCqeBGWHR+/AwMiIm3sqn87xE0xvEwQXmbH6J0c8d6PrBeUl1F/sgIitdLAcCVVDvILtwRs30gmbpRaMoMWRenA0LeNzPc8vrK8dLEaByv9/H7fPo0MD/hF8P65EPmUHfB0rOlRTy+oDxtToSkXfgMj5m2v4XpZXZy4MzBADlwUgH9XZ1DfYumbj1lqPVWbS01WIyxXvCmdnnYJYH4cOJp4zSUitULg4CzYLXe4XtqOz5h4jYjv3F+cbJ2l9K3raYlkLDVCEPNThOwxKHQ/3f/EVYNuOGL9fXs4RHeJEFijbOG5OKj6GauISvMxGXuw9vdQ/0zbWdojjYolZphgorUM5kEX5u+dO3n88YarTkhjc6i2QROqjGfGEE/jmJGJPSXRhuFzszKinQN25f5RLjUi5G5qPKvtnBBRuYhO8PEAobXlJMgxdV
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(56012099006)(4143699003)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UW5sSmdTOU1JeWxUNGQxeVRZL0RVZXAzSHNRZHVRUy9UdlFndkhEd1BXczdz?=
+ =?utf-8?B?Nmswb04xRHYwRHcydWJoYllZUitaR1Y4bGdYOVB1WEU2V0ZwRzNPVzU4VDh3?=
+ =?utf-8?B?RlNCWXhiNk5HckhuNm9TWElNOWl1RDIrQ2ZFQ1N1NG5vbXhCZDR3TG1WSTZ6?=
+ =?utf-8?B?d2lWdDVQUVdBT1RMVm90VzAzNHIybmNSRlF2bUcxTE8zK1BOem8yN1ViS0JE?=
+ =?utf-8?B?eTRrcWR4VnhVcHIxVkxGdDIxeWIrTkczbUo0d2lZZWtQOW05VlhRRnRRcTFl?=
+ =?utf-8?B?WmhEeVlSK1IwZW1qazNLdmNpakpZUXppemRDNHF4NzBCV0wyQXpMME9TNjdD?=
+ =?utf-8?B?MWRET3VVNGpxOHd3cGxYNmtiYk1mZ1JPTitEckVTQzBINXRDOEhuem5iV0xO?=
+ =?utf-8?B?Y3V2d09zV2FvQXhvSnFuY050SW9PTGk2dUtyK0dzWk5jUVlsTXhaRmM5TGpN?=
+ =?utf-8?B?dUlOT1p2ZDcwV3FLazUyS1lmeEk3SVhXclVXRGE3emNWUFpkWUp1YkxGQmwx?=
+ =?utf-8?B?TEhWdy9kMXRNM0UxODhvenFQNVFDTXY4d3NLdkp3S0hGei90UFRvOVRlbENy?=
+ =?utf-8?B?a0F5TmpqWW1zUlBZZFc5NS9kWTNyN0E1MThzTDVOV3Jab294VnVueTJwUVh3?=
+ =?utf-8?B?ZDdkZG1ISk45TTVxZk5laGxibkdUMkZuODczeUJjV2tPY2RJWUlJRW0vN1dS?=
+ =?utf-8?B?eHlxOU9samdDRWVEYW1Ta0lIMXVpYTI4ZGo3NEYyRVEwQVR6dTkrdTkxLzky?=
+ =?utf-8?B?K0UyS01TUGRjd2ZTNk00ZWFVcmFwV2FJNW1MT2JDM1JKSXRtTnRyTktnUVdM?=
+ =?utf-8?B?eExXZnJnekR2K2V6Sll3NXJWTU1Kb1JZU2NLKytMSGZ5Mk9OVG1IUno2MTZU?=
+ =?utf-8?B?WWpjalZ0UWRCNTQ3MGNtRU9XclQrQ09tWVRzcGxTbVpEOVlVOWg4Yy8zTjRP?=
+ =?utf-8?B?RXpEUys1amJvNHVJdXN5UzRDZmZudGErL0RUd2c2RlRZZVZpNkt4ZkxLLy9z?=
+ =?utf-8?B?TUl3RU5PWVMvSVhONko0TS9PTUtXOTFBbnliR2QzZ0R1dmllU2pVTHFtNU5I?=
+ =?utf-8?B?aUpIdGlXSi9SU1RHQ21FSDhGdk82dTYxcGxFVE5INzgremFzd1gxVEY5c1d1?=
+ =?utf-8?B?cGFuNExMQWttdHBoN2JnaUJvZnkzWlVwenl4YXZCUHk1MVJ5TXpVSURGSlEz?=
+ =?utf-8?B?MncxYmYxaGo4VjlSOHhOeG50bVk2T2ZqeVpRb3hmaENyY0czWFlNYi9TMDd5?=
+ =?utf-8?B?ZkQvWCtnOE9yMWxJM2xGN1cyZmdTZmVqWDZSMkhDTW4yRUJwaXNCNWtpT1dM?=
+ =?utf-8?B?WlBza0JEeStSUUNUUzFuakpoQk5mK2JCUjIrNkhlYTNOcjFqZVVMQkFYVnpI?=
+ =?utf-8?B?S2czUC8xc0RRdUlYRXFWZGRWRDZzVGlTaVpXNWpMUmVXYmNVT2wrOEd1Tkkx?=
+ =?utf-8?B?dGNOVUp4L2t1SThUSmM3c3gwTGxOWWpPYk9Ua3hORW5OWGlkSm94L3E0RHBJ?=
+ =?utf-8?B?UlYyOUhlZTNOTHBkMkNHRWdkU0ZLSkRZYlR3M1JNODFqYUNxUXZQN3BWZ214?=
+ =?utf-8?B?Mzk4K2I0NHo4LzBtcGFEQjhZdy9kV0hsR3NXeVpRY1diWGw3c0VrVnZYb0gx?=
+ =?utf-8?B?VWFqMjN5NGVxd294enZndy9TbXhocDhmMVRUVXFyUEtyMkJoKzltdXAreVRv?=
+ =?utf-8?B?aEdiU25PTHcwVkxqRGRHcVp6bkJMSTJubTdPUHZ3K3pvTWd3SFREZHVOYnBw?=
+ =?utf-8?B?bkl6eTdXODRKcmNUWXpSb3ZiSW01QXp2Q2IzRXdiajRLUDRCcXZUK2JSOEky?=
+ =?utf-8?B?ZkJRbEpTa2tmUFV1TUtxaUNxRVRvTXVoOTNnSEo4Y3FtRjdpcGFobUtCdXo1?=
+ =?utf-8?B?dlp2Tmh2MFRlZ3VHdnB2RjZhbzR5ck1nazlnODdqS3RMY2E3WmRUN1ZSRlJi?=
+ =?utf-8?B?R2YwMDhhcjVVMis1MjlaZ3R5YXV3SUZGVW9kNmE1WFU1L0NBZzJuSUpSazcv?=
+ =?utf-8?B?WndTYkdjZ25qd1UxQTBUR254R2dhN1JjSHB6b0NtOXhzMnoyOVJ3UjA5eDlK?=
+ =?utf-8?B?dXcvaW1VbDU1TlhBd1JTQklFMkI5ZGRodldYL1Q1VFIrQ1MrMnhmY0MzSmdt?=
+ =?utf-8?B?ZWRKbnJ4NGZoYXdHZnVWTGU2bDk4QkhVUEY1WlN6Q2l6UE4rZHhSZlBJUDEy?=
+ =?utf-8?B?M1BmNE1sVlNUbkFadTJRNXMrMGkxWXRzS3ZtWE0ranMxK2lMV3h4TFVyZStF?=
+ =?utf-8?B?UllQSFFLMGRZQjJta2pvYVlibk9ydkdlK0FkM3plVzE0cTUzY1hyNm41OXB0?=
+ =?utf-8?B?ZGVvNnRNSEtzWFllQlpHVlVMSEhGbVEyeUVZUHBDYWpkOXAwM1JNc2U2cjVG?=
+ =?utf-8?Q?D22MMvLRUnA1cXZA=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Exchange-RoutingPolicyChecked: jornj6jGXBhB37n+5oiGJBp9Xhaom8TLETtNCBZ22PjOs36zPMkLOdS2s6vnM2Cxo4ewpH40oJDz2SkXha+oKkGvzFTSSQ47OgqQXT4KiqCZjZ7Jo0/II8jk1fXHcSjMrfFesegerUalVNEI+RXWK2dwDGuST97V+WWQY6iBKlzrHzuqq7kbGspOHgZdEvAPfnINYOfAFxa2H9TqswB0PukfOAjO2EHO5I9QCB0926x54R2nC0nL0UgtGRXXLPEbhsi+zc35vnZd8rV5UZo80PpFb5mo3BiHq/nU2G0fsvr/vePekLVDlPNKJ520dRE4iTaY0BqnnGHJ+hxGAnCczg==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9bfd37ad-cc9c-42b6-6a2f-08debfffbe92
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2026 17:03:46.7920
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SiTN3/gIF7hDKgUZPWWrYHA5wFwi4MgWNzQczTW7G3/if2cnZy6OeurphuccOEs+JEgM02C5pMpkMn6oZbeQEYbDjSdZB63I2rPdTCtT24U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR02MB6918
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: iwCBjciyzJ_ST0nCEAiNV_Rnf53lHOeRzUA4tgCpHFE_1780333430
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spamd-Result: default: False [-1.06 / 15.00];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[arndb.de,kernel.org,oss.qualcomm.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-293848-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293850-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[broadcom.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RSPAMD_EMAILBL_FAIL(0.00)[arnd.arndb.de:query timed out,bartosz.golaszewski.oss.qualcomm.com:query timed out];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,broadcom.com:email,arndb.de:email]
-X-Rspamd-Queue-Id: 21D1C622F53
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,CY8PR02MB9249.namprd02.prod.outlook.com:mid]
+X-Rspamd-Queue-Id: 20CE162307F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Arnd Bergmann <arnd@arndb.de>
-
-The MIPS bcm53xx platform still uses the legacy gpiolib interfaces based
-on gpio numbers, but other platforms do not.
-
-Hide these interfaces inside of the existing #ifdef block and use the
-modern interfaces in the common parts of the driver to allow building
-it when the gpio_set_value() is left out of the kernel.
-
-Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
-Reviewed-by: Linus Walleij <linusw@kernel.org>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v3: add -EPROBE_DEFER check
----
- drivers/net/dsa/b53/b53_common.c | 20 ++++++++------------
- drivers/net/dsa/b53/b53_priv.h   | 25 +++++++++++++++++++------
- 2 files changed, 27 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 2c4131ed7e30..06b8be8dc4db 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -19,7 +19,7 @@
- 
- #include <linux/delay.h>
- #include <linux/export.h>
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/kernel.h>
- #include <linux/math.h>
- #include <linux/minmax.h>
-@@ -965,17 +965,17 @@ EXPORT_SYMBOL(b53_configure_vlan);
- 
- static void b53_switch_reset_gpio(struct b53_device *dev)
- {
--	int gpio = dev->reset_gpio;
-+	struct gpio_desc *gpio = dev->reset_gpio;
- 
--	if (gpio < 0)
-+	if (IS_ERR(gpio))
- 		return;
- 
- 	/* Reset sequence: RESET low(50ms)->high(20ms)
- 	 */
--	gpio_set_value(gpio, 0);
-+	gpiod_set_value(gpio, 0);
- 	mdelay(50);
- 
--	gpio_set_value(gpio, 1);
-+	gpiod_set_value(gpio, 1);
- 	mdelay(20);
- 
- 	dev->current_page = 0xff;
-@@ -3092,7 +3092,6 @@ static int b53_switch_init(struct b53_device *dev)
- {
- 	u32 chip_id = dev->chip_id;
- 	unsigned int i;
--	int ret;
- 
- 	if (is63xx(dev))
- 		chip_id = BCM63XX_DEVICE_ID;
-@@ -3173,12 +3172,9 @@ static int b53_switch_init(struct b53_device *dev)
- 		return -ENOMEM;
- 
- 	dev->reset_gpio = b53_switch_get_reset_gpio(dev);
--	if (dev->reset_gpio >= 0) {
--		ret = devm_gpio_request_one(dev->dev, dev->reset_gpio,
--					    GPIOF_OUT_INIT_HIGH, "robo_reset");
--		if (ret)
--			return ret;
--	}
-+
-+	if (PTR_ERR(dev->reset_gpio) == -EPROBE_DEFER)
-+		return -EPROBE_DEFER;
- 
- 	return 0;
- }
-diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
-index bd6849e5bb93..cd27a7344e89 100644
---- a/drivers/net/dsa/b53/b53_priv.h
-+++ b/drivers/net/dsa/b53/b53_priv.h
-@@ -148,7 +148,7 @@ struct b53_device {
- 	u8 duplex_reg;
- 	u8 jumbo_pm_reg;
- 	u8 jumbo_size_reg;
--	int reset_gpio;
-+	struct gpio_desc *reset_gpio;
- 	u8 num_arl_bins;
- 	u16 num_arl_buckets;
- 	enum dsa_tag_protocol tag_protocol;
-@@ -467,23 +467,36 @@ static inline void b53_arl_search_read(struct b53_device *dev, u8 idx,
- #ifdef CONFIG_BCM47XX
- 
- #include <linux/bcm47xx_nvram.h>
-+#include <linux/gpio.h>
- #include <bcm47xx_board.h>
--static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
-+static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_device *dev)
- {
- 	enum bcm47xx_board board = bcm47xx_board_get();
-+	int gpio, ret;
- 
- 	switch (board) {
- 	case BCM47XX_BOARD_LINKSYS_WRT300NV11:
- 	case BCM47XX_BOARD_LINKSYS_WRT310NV1:
--		return 8;
-+		gpio = 8;
-+		break;
- 	default:
--		return bcm47xx_nvram_gpio_pin("robo_reset");
-+		gpio = bcm47xx_nvram_gpio_pin("robo_reset");
- 	}
-+
-+	if (!gpio_is_valid(gpio))
-+		return ERR_PTR(-EINVAL);
-+
-+	ret = devm_gpio_request_one(dev->dev, gpio,
-+				    GPIOF_OUT_INIT_HIGH, "robo_reset");
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	return gpio_to_desc(gpio);
- }
- #else
--static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
-+static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_device *dev)
- {
--	return -ENOENT;
-+	return ERR_PTR(-ENODEV);
- }
- #endif
- 
--- 
-2.39.5
+PiA+ICtzdGF0aWMgaW50IG5jbjI2MDAwX2xvb3BiYWNrKHN0cnVjdCBwaHlfZGV2aWNlICpwaHlk
+ZXYsIGJvb2wgZW5hYmxlLA0KPiA+ICsgaW50IHNwZWVkKQ0KPiA+ICt7DQo+ID4gKyB1MTYgbWFz
+ayA9IEJNQ1JfTE9PUEJBQ0s7DQo+ID4gKyB1MTYgY3RsID0gMDsNCj4gPiArDQo+ID4gKyBpZiAo
+ZW5hYmxlKQ0KPiA+ICsgY3RsID0gQk1DUl9MT09QQkFDSzsNCj4gPiArIHJldHVybiBwaHlfbW9k
+aWZ5KHBoeWRldiwgTUlJX0JNQ1IsIG1hc2ssIGN0bCk7DQo+ID4gK30NCj4gDQo+IGRwODM4Njdf
+bG9vcGJhY2soKS4NCj4gDQo+IFRoZXJlIGlzIGFscmVhZHkgZ2VucGh5X2xvb3BiYWNrKCksIHNv
+IGl0IHdpbGwgbmVlZCBhIG5hbWUgdG8gaW5kaWNhdGUNCj4gdGhlIHNwZWVkIGRvZXMgbm90IG1h
+dHRlciwgYmVjYXVzZSBvbmx5IG9uZSBzcGVlZCBpcyBzdXBwb3J0ZWQgZXRjLg0KDQpBbmRyZXcs
+DQoNCkhvdyBhYm91dCBnZW5waHlfbG9vcGJhY2tfZml4ZWRfc3BlZWQuIA0KDQoNCj4gDQo+IEFu
+ZHJldw0KDQo=
 
 
