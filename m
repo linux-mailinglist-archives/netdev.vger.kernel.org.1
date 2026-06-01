@@ -1,190 +1,154 @@
-Return-Path: <netdev+bounces-293681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAD4N5NjHWpHaAkAu9opvQ
-	(envelope-from <netdev+bounces-293681-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:48:51 +0200
+	id EIOoGb1kHWqwaAkAu9opvQ
+	(envelope-from <netdev+bounces-293680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:53:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4AB961DD80
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:48:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E450D61DEB2
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C0C1430087ED
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 10:48:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C02DD3085525
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 10:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C178B39B975;
-	Mon,  1 Jun 2026 10:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74623921E9;
+	Mon,  1 Jun 2026 10:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="uUKi/xO0";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="L//zFvX/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="atPaxXrF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-111.mailbox.org (mout-y-111.mailbox.org [91.198.250.236])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C2934678E;
-	Mon,  1 Jun 2026 10:48:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.236
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94127213E9C
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 10:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780310928; cv=none; b=CST/qlN4lKA8rj9GR4UAEoOR70yhPUpwvwi3z4h+sbkHPW68b3X8k3ak9KhJzWPE3DCUsnl2up5GJFtCqzqZUZfVjIdypEuhHELVzX+d8KfXbfhvt3gCvC+0k/1bVywbTzBCmi2XXmoDnZXykPKgVA5Pvn4nahI4UTZQNjx4MHc=
+	t=1780310712; cv=none; b=d2NN9AxjkVsEijXj/6lg/+CuvsJUykCWoNsOS44weQr78E2nuo865ly6TRRx5xNj8RbEor5L6GPbefeelu8WQ2pM3+UK0CJastWRspS35K/uJ7QB2tEnWuIinGkVxEIRz3EaZHhlknUoG7EcfkpUz5bFs8ry4vnSY9wy06to/5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780310928; c=relaxed/simple;
-	bh=MIpS+FQSsenc9gYHxlEeSq+uYkS+P2ViO0J4kH5OrJg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GjUyZjpzrn53zrNszyFDIXf3VRmjl/Nxn+7IOnYkPIuoKuG+imHpJXfwxrf8t0Hr/9EqwW4pJMjrE4TXxRCXk6I0v95CewqbgFiffbSBZ6i/QQJvgvBsk996DDiCCrz/WSAISBeLfruOqrtfjvbqCJOFsd+vf0jZVI+xUVcliVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=uUKi/xO0; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=L//zFvX/; arc=none smtp.client-ip=91.198.250.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-111.mailbox.org (Postfix) with ESMTPS id 4gTVtb52bcz9sPn;
-	Mon,  1 Jun 2026 12:43:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1780310615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jwNkKrSaO1VdLBnK2BDf0Nq86weYabakK4KTS5UaytU=;
-	b=uUKi/xO03cS9opA5+CjGJ46YdsYvFVafB/c4bA1FUAzOkfVFUOujwyssbgYTe26CSDnR/P
-	r0VCRVXDNx4QAvs3oDN9dQqmSDvLT3WLDCegdjPM+zJ2onSsDQMo39nofiXxDSy+BHExKN
-	2F51f4nNJy7525mV4NWnKZ6mJXsbuQCXeNFEb9cTLkKVZ9zuzRb3Z9mmpUn8kWs40ECkev
-	CZj5APCNwzc030UtHqWgbEC1tm/v2YntACz2/X0JxdQvTcDCiV1BqUbNnLqSxR468W4dGS
-	OGcWqT6HmN1r9CKqO+KMVhsGo1pVAxzNHgaWALzb53dumjU3F5Mzrn2be1g2Eg==
-From: Qing Ming <a0yami@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1780310614;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jwNkKrSaO1VdLBnK2BDf0Nq86weYabakK4KTS5UaytU=;
-	b=L//zFvX/6jXgs1sNI3S0kWvJsFaqVtO0VGS2XKbEQSZ6Wuw4L+JOPnF8EYUTPZLZgfxNOG
-	IVnQiMdMWWxoyTP/TcNPxBW8XF7TI1ixWder5fGjcgjpAlgnpTgD90yBswVKlsQC89D3+d
-	16IRUgacH43yEaIKTJjAWfZhvhoJKdT936eDwfOmEXR6XmNde1sL2l257LmVaIEeDOSci3
-	hvaXxjTCRzuhOZMyuencUjSx+S/0hw5pFzFJETucEWcgVn9ixf8q8hYj7xFwCBtGIVcrkO
-	/hgB0FpTA1f1LCNuiHQuI+l+CKy1pGCkmmqdPMUojrEyRbuKE9gD01aj2fc/cQ==
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>
-Cc: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Shirley <xma@us.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Qing Ming <a0yami@mailbox.org>
-Subject: [PATCH net] vhost/net: complete zerocopy ubufs only once
-Date: Mon,  1 Jun 2026 18:43:00 +0800
-Message-ID: <20260601104300.197210-1-a0yami@mailbox.org>
+	s=arc-20240116; t=1780310712; c=relaxed/simple;
+	bh=C5labr5TltnbCZFWev2l9J64VPXKI2fHbdqayl0yXt4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=OEG+1+454S+jfVl4pXrqIrkaGLAq+a4Qyi1TSoAJEh3R8KRf2dIwQ49cg/WJWCt7/tQ5SOqxSog8HfX6BVOiun54Y1nzhdFCKOsFXrqmEzO1wcvVu20K7pnyxfahpZGlmugAzGQSeHKrFG6z4XgybHEvbNgFgCMDHeBlHh05IaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=atPaxXrF; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6870ad8072eso13026729a12.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 03:45:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1780310708; x=1780915508; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=C5labr5TltnbCZFWev2l9J64VPXKI2fHbdqayl0yXt4=;
+        b=atPaxXrF00+u8w11dIneZFlXxqDi2Iu5BPf7l0ULaEoZcmgJ0xD9Qxgqv6eEolppIm
+         NMotulOPAOg+qTxA8VjvxwvopnEJ0hvbiVE5XuE9Amxy4lS3ZJN4sjF8AtFVtncLWGq1
+         Mt8olpuWpUhzIyDGMiiCsCcys+PE9EFywey3A89MI/YtS7Q+YfBLfTuFAtHVSwHoMt1B
+         Dop7lUKSLDghY7RpgPMTMWY+h+SX/ghBZLAc1kcns25xmPEjJkfKyHKyzwwBLPOpqwYS
+         R/sZyfCM6a2zOlu1Rz5RwkJkxFKzVjofSLBhoySnStkmaxI5P3ny2LyXKP09zZcFG+Vf
+         bptw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780310708; x=1780915508;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C5labr5TltnbCZFWev2l9J64VPXKI2fHbdqayl0yXt4=;
+        b=lnMahxncoUCpmY3e6mj9fwfNDAcwk/kk4DJpf+PCAqNr6SkFjwGy16FqHfYXustKtw
+         x0zgHCsBi7HMD3zeXyILmzGR+Wh7g4gMgDQ6bqCXdAMEziDVNqaTgR0z4liUNjqrZZzB
+         mwpRU+RVywdNYod8yJpw+VWykBjmizMzlaR5uYTXIY+4V1UKuSNIybfOqUMgDnLMa5yh
+         RMSwx6fciai1lxzxg2hJ3+JhR1MZbEUyPJSRDmvU+OP8wX4dbI4i/5RyrTfv8xdziiea
+         /pp9cazcNlFqSSajrtjKJh+ZIkkV6b0lTo3fazO8Ddg/TRxqcRIE0n7B2P+FIecyUbck
+         jPhQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9zBUbp05XQ5OANjvEW1Z4gsiqGCJG88nw8mxgR5XIUQ9q6ERD1+PEnD0GyU/aGt6BOUS5V9nU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/l+NgknXw/rvRDRiTRNRyt6RSB/GqrbTnWdFNrjU2D5LMfM6r
+	6VHc5G2zgWlYaxFRwHqf5mXuZUyNURLCioYIW22ShRCHoh9ulpseFRX+NQ7USXyDUGw=
+X-Gm-Gg: Acq92OEyG/yHF47p2EIB1wn8JJd5VQElsV5lVXbnd99ECrCYarmVMam7GY+qdqGhyei
+	QOynmWopGawTjAfgbyMQj/xoYY0WZDxO0IynxgkxYTeQabxVVGRn9Hvn20RSSljNj6sKPFh6upy
+	6kDrtohzOP9tf2vSFohR5vL3iP+gmBGpUK0fDWXMmgb7PWAyrk4DuubXwgSadxSzAXS0UU/E7RY
+	8LUPTgCwzEWx5Xi9Ei4r8GnmAE13AJcDOS1dGhRmUnrvIlRO0G7yB7Zf3UVIw2KcHdvSYE/5hBU
+	or3MpZunASEluOlVoe79ZLYSCel1sD/+FoQGzotuaZ/u+t2HYtbmYeT7UB70dhkEZl+0E05ICFg
+	uXkEA2nt9XVfH5YUYhkggw61BQqEZxZ8ZW02ouuxLWocUp4HdoKckrlr2XcT6WJsDr1+vnx5DqG
+	p10wXjO6Jyv9G0rE9nDKcTZFjDm+PzdpUPeSwB9LRd3RW821k=
+X-Received: by 2002:a05:6402:a50f:10b0:68d:4284:1821 with SMTP id 4fb4d7f45d1cf-68d42841a88mr1541715a12.4.1780310707721;
+        Mon, 01 Jun 2026 03:45:07 -0700 (PDT)
+Received: from cloudflare.com ([104.28.21.182])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68ceb79188bsm1814610a12.3.2026.06.01.03.45.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 03:45:07 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Willem de Bruijn <willemb@google.com>,  Simon Horman
+ <horms@kernel.org>,  Lorenz Bauer <lmb@cloudflare.com>,  Kuniyuki Iwashima
+ <kuni1840@gmail.com>,  netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net] net: Annotate sk->sk_write_space() for UDP SOCKMAP.
+In-Reply-To: <20260529193941.3897256-1-kuniyu@google.com> (Kuniyuki Iwashima's
+	message of "Fri, 29 May 2026 19:39:23 +0000")
+References: <20260529193941.3897256-1-kuniyu@google.com>
+Date: Mon, 01 Jun 2026 12:45:05 +0200
+Message-ID: <87cxya5yku.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: 9cdff043130c0e47f0b
-X-MBO-RS-META: rficd44fz5imjeeqwe3h79341x7uofr8
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-8.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293681-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[a0yami@mailbox.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	TAGGED_FROM(0.00)[bounces-293680-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,cloudflare.com,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mailbox.org:email,mailbox.org:mid,mailbox.org:dkim]
-X-Rspamd-Queue-Id: A4AB961DD80
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:dkim]
+X-Rspamd-Queue-Id: E450D61DEB2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-vhost-net initializes one ubuf_info per outstanding zerocopy TX
-descriptor and hands it to the backend socket.  The networking stack may
-then clone a zerocopy skb before all skb references are released.  For
-example, batman-adv fragmentation reaches skb_split(), which calls
-skb_zerocopy_clone() and increments the same ubuf_info refcount.
+On Fri, May 29, 2026 at 07:39 PM GMT, Kuniyuki Iwashima wrote:
+> UDP TX skb->destructor() is sock_wfree(), and UDP holds lock_sock()
+> only for UDP_CORK / MSG_MORE sendmsg().
 
-vhost_zerocopy_complete() currently treats every ubuf callback as a
-completed vhost descriptor.  It dereferences ubuf->ctx, writes the
-descriptor completion state, and drops the vhost_net_ubuf_ref even when
-the callback only releases a cloned skb reference.  A backend reset can
-therefore wait for and free the vhost_net_ubuf_ref while another cloned
-skb still carries the same ubuf_info.  A later completion then
-dereferences the freed ubufs pointer.
+Nit: lock_sock() serializes map updates via bpf() syscall. We also have
+sockmap iterator programs which can insert UDP sockets into sockmap. On
+this path, sock_map_update_elem, we grab only bh_lock_sock, so the race
+against UDP_CORK / MSG_MORE sendmsg() path also exists.
 
-KASAN reports the stale completion as:
+> Otherwise, sk->sk_write_space() may be read locklessly while SOCKMAP
+> rewrites sk->sk_write_space().
+>
+> Let's use WRITE_ONCE() and READ_ONCE() for sk->sk_write_space().
+>
+> Note that the write side is annotated by commit 2ef2b20cf4e0
+> ("net: annotate data-races around sk->sk_{data_ready,write_space}").
+>
+> Fixes: 7b98cd42b049 ("bpf: sockmap: Add UDP support")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
 
-  BUG: KASAN: slab-use-after-free in vhost_zerocopy_complete+0x1d7/0x1f0
-  BUG: KASAN: slab-use-after-free in vhost_zerocopy_complete+0x101/0x1f0
-  vhost_zerocopy_complete
-  skb_copy_ubufs
-  __dev_forward_skb2
-  veth_xmit
-
-The freed object was allocated from vhost_net_ioctl() while setting the
-backend and freed through kfree_rcu()/kvfree_rcu_bulk after backend
-removal, while delayed skb completion still reached
-vhost_zerocopy_complete().
-
-Honor the generic ubuf_info refcount before touching vhost state, and run
-the vhost descriptor completion only for the final ubuf reference.  This
-matches the msg_zerocopy_complete() ownership rule for cloned zerocopy
-skbs.
-
-Fixes: bab632d69ee4 ("vhost: vhost TX zero-copy support")
-Signed-off-by: Qing Ming <a0yami@mailbox.org>
----
- drivers/vhost/net.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index c6536cad9c4f..b9af63fb6306 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -390,13 +390,20 @@ static void vhost_zerocopy_signal_used(struct vhost_net *net,
- static void vhost_zerocopy_complete(struct sk_buff *skb,
- 				    struct ubuf_info *ubuf_base, bool success)
- {
--	struct ubuf_info_msgzc *ubuf = uarg_to_msgzc(ubuf_base);
--	struct vhost_net_ubuf_ref *ubufs = ubuf->ctx;
--	struct vhost_virtqueue *vq = ubufs->vq;
-+	struct ubuf_info_msgzc *ubuf;
-+	struct vhost_net_ubuf_ref *ubufs;
-+	struct vhost_virtqueue *vq;
- 	int cnt;
- 
--	rcu_read_lock_bh();
-+	/* Only the final cloned skb reference completes the vhost descriptor. */
-+	if (!refcount_dec_and_test(&ubuf_base->refcnt))
-+		return;
-+
-+	ubuf = uarg_to_msgzc(ubuf_base);
-+	ubufs = ubuf->ctx;
-+	vq = ubufs->vq;
- 
-+	rcu_read_lock_bh();
- 	/* set len to mark this desc buffers done DMA */
- 	vq->heads[ubuf->desc].len = success ?
- 		VHOST_DMA_DONE_LEN : VHOST_DMA_FAILED_LEN;
--- 
-2.53.0
-
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
