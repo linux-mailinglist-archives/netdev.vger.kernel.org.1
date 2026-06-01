@@ -1,195 +1,139 @@
-Return-Path: <netdev+bounces-293493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPVJBaDoHGo2UAkAu9opvQ
-	(envelope-from <netdev+bounces-293493-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 04:04:16 +0200
+	id 6DPmAjTrHGpWUAkAu9opvQ
+	(envelope-from <netdev+bounces-293494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 04:15:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F357618B78
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 04:04:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F80618C74
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 04:15:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B63330125D1
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 02:04:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2A69F3004609
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 02:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE9021CC5C;
-	Mon,  1 Jun 2026 02:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33F2222582;
+	Mon,  1 Jun 2026 02:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RN4V6h6D"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="YDhY5tCu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A57F1C84DC;
-	Mon,  1 Jun 2026 02:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55DC1A6835;
+	Mon,  1 Jun 2026 02:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780279452; cv=none; b=MTuQ5uSQvL1caAmO7CuVogw+5O19l1xs9KRs7Uw7qGaelpLXZl11qKPnMbPXv+OzAKijKEoIlYE9g1aVrjfHiEkNQiiL42AsEoXrc9V5oIpz6mv7cx4OXTSlnrXmmuOfrT6avmYcVTg4X4M6WuK+jaltZ7I2ojWyu2is1xYJSwo=
+	t=1780280111; cv=none; b=IigtTbIYe8iyURIYnjkI4we6gGw+Qkk1u+CaLFrNiGq7Px1Wi7jRTZOcBh61zXVPi3AASFIcsVNQe4JhbgFlJcJa5j2br2xQmHnIM9V3nQjzKK6kHnn7i+Dsx9pRq5/OZv0xLi2V7yutarB146TUuaAwqEVfhsllJ1E0lGVQMAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780279452; c=relaxed/simple;
-	bh=h0Ztc4WJkTtsG1wcuJWedsv2JjTu3Z6o1RPULrAyi9A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HAx0zcnvMjcuhqa+8XtBGh0uje/GKyzp5vNpK1vfx4unH53nSKrRvH6H8/L6/L+nMHx3KXAk/zyknCOu2r8xyJ/FpmK6g7dlWyvnDYXEEv5FoPRqiJOD2XFXf6SL+YfYPz6mXLHln/sbqzVUOoFx5LHZFPlObevxzyfTmtesqx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RN4V6h6D; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4A1C1F00893;
-	Mon,  1 Jun 2026 02:04:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780279450;
-	bh=ZV64leSxu1pkNR1zoe4fbmf6hVyF9H0oVvkHjx4bMbk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=RN4V6h6DCUKy0ZCqCEpUM6QGoCstN/EXlPV3IQrJ53tgwW061pvHoYymXg2Dg6iOu
-	 Lw1Dg4XvfCpoS3dwK9b82KXk4lKCvA4Jdg7hW7q+fgchOFx6Fc2xJafaKJ/PRgkaz/
-	 k/kV/XXG8PJNvNUKvh8xRvnA1Yzmlvb5TF/sB6WrHuR97VBxTF8+sVfSrDy1SoZjFm
-	 aldbkd7Bxlz3QUtbjXPwcc4O1nW1rnacEsHSoe5Ue1WTjKh/CJkNNs1P+ZfupBFkzv
-	 RzCtgDuY//YUUcXgkS5uNhb2jKNi/x93neSDaHDxyP04xJQy/3zWVIL/KVP/9iKzjr
-	 2v6y4wOUPV7YA==
-Message-ID: <5079261a-79e5-421b-bf6a-a511acaaeca4@kernel.org>
-Date: Mon, 1 Jun 2026 12:03:59 +1000
+	s=arc-20240116; t=1780280111; c=relaxed/simple;
+	bh=vBbaaEjFOnXhitNt7LzQ5hS8RgvQDadVLzxxzFUfcQ8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ziq0Vesz/PvoxVeKSGKPz7epZv+33DAqgs71ceuwksh/boYITWNupRfjJnFZfiMe5GED9L7PbLWDXpeA7xHDNmfAV4hTj0Ak6X0eWxJT9A21cJTWSDDVQsVt1hfmiQPTsfjaiezgwf6Jc9/jCGcD/QTNdIvCRW0UiyodD3fD9ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=YDhY5tCu; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6512EX9001735502, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1780280073;
+	bh=vBbaaEjFOnXhitNt7LzQ5hS8RgvQDadVLzxxzFUfcQ8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=YDhY5tCu05Yd5lXlkCPiHnAcSZjgLQoBPRzW2uL1tXxqoAcVBfwC6z/utiZgzOkOr
+	 NnljIkouQ0hKVmP48xtwerVMQsuDaaro5hQ7jzIgnje2Kb3YoU0xPj41MylDe24CoO
+	 dQvS6aSBJVbQOSAosSYGbJ8CiV3Y1Oeh8DIPBfnuxIWZ452Zv37ZHbycRyTJzaSrYp
+	 nJ9pIBUGgszDY7zXgYjXmLUqZzei8J3HIuPRBjBcW8O+n6KyNN9xvazvb/1k8E9SsB
+	 sM0lvYyHg6zjnuc8nLpnQTkVbZUVz042aCgqndecrkCxeU6fTg4HdIvji0+JZIwYG0
+	 ctQWTOSMN0hew==
+Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6512EX9001735502
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 1 Jun 2026 10:14:33 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 1 Jun 2026 10:14:32 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Mon,
+ 1 Jun 2026 10:14:32 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Javen <javen_xu@realsil.com.cn>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Patch net-next v6 0/7] r8169: add RSS support for RTL8127
+Thread-Topic: [Patch net-next v6 0/7] r8169: add RSS support for RTL8127
+Thread-Index: AQHc7Oc7b+/bcfnzn0W+sF0ogwBvf7Yo/aKA
+Date: Mon, 1 Jun 2026 02:14:32 +0000
+Message-ID: <afe8ebc060724eab9619fe237e703d96@realsil.com.cn>
+References: <20260526081117.173-1-javen_xu@realsil.com.cn>
+In-Reply-To: <20260526081117.173-1-javen_xu@realsil.com.cn>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2] Revert "ipv6: preserve insertion order for
- same-scope addresses"
-Content-Language: fr
-To: Stefano Brivio <sbrivio@redhat.com>,
- Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, yuhuang@redhat.com, justin.iurman@gmail.com,
- horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
- Chris Adams <linux@cmadams.net>, David Gibson <david@gibson.dropbear.id.au>,
- Beniamino Galvani <bgalvani@redhat.com>,
- Thorsten Leemhuis <regressions@leemhuis.info>, Andrew Lunn <andrew@lunn.ch>,
- ihuguet@redhat.com, regressions@lists.linux.dev
-References: <20260529112357.5079-1-fmancera@suse.de>
- <20260529134045.56330243@elisabeth>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260529134045.56330243@elisabeth>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293493-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293494-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,gibson.dropbear.id.au,leemhuis.info,lunn.ch,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:email]
-X-Rspamd-Queue-Id: 6F357618B78
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 65F80618C74
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Stefano,
-
-On 29/05/2026 21:41, Stefano Brivio wrote:
-> On Fri, 29 May 2026 13:23:57 +0200
-> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-> 
->> Chris Adams reported that preserving insertion order for same-scope
->> addresses is causing SSH connections to be dropped after stopping a VM
->> while running NetworkManager.
->>
->> NetworkManager caches the IPv6 address configuration, when a RA arrives,
->> it determines the list of addresses to configure and checks if the
->> addresses are already in the right order in the kernel. If they aren't,
->> NetworkManager removes and re-adds them to achieve the desired order.
->>
->> As the order changes, NetworkManager is confused and reconfigures the
->> addresses on every update. In addition, this would also affect to cloud
->> tooling that relies on IPv6 addresses order to identify primary and
->> secondaries addresses.
-> 
-> By the way, I'm still looking into this part, trying to find
-> "problematic" examples.
-> 
-> And I couldn't find any, yet, because it looks like there's always a
-> _single_ IPv6 address being used as a secondary for a primary IPv4
-> address.
-
-FYI, the order change also affected some specific scripts, e.g. here
-with MPTCP and packetdrill:
-
-  https://github.com/multipath-tcp/packetdrill/commit/1b7cd4482ce8
-
-Because the order was not "natural" before, and different from IPv4, a
-workaround was needed to keep the same order. I was happy to remove it,
-but now it looks like I need to re-apply it :)
-
-It would be nice to get the "natural" order back without breaking the
-userspace (or with a way to choose the order).
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+PlRoaXMgcGF0Y2ggc2VyaWVzIGFkZHMgUlNTIChSZWNlaXZlIFNpZGUgU2NhbGluZykgc3VwcG9y
+dCBmb3IgdGhlIHI4MTY5DQo+ZXRoZXJuZXQgZHJpdmVyLCBzcGVjaWZpY2FsbHkgZm9yIFJUTDgx
+MjcgKFJUTF9HSUdBX01BQ19WRVJfODApLg0KPg0KPlJTUyBlbmFibGVzIHBhY2tldCBkaXN0cmli
+dXRpb24gYWNyb3NzIG11bHRpcGxlIHJlY2VpdmUgcXVldWVzLCB3aGljaCBjYW4NCj5zaWduaWZp
+Y2FudGx5IGltcHJvdmUgbmV0d29yayB0aHJvdWdocHV0IG9uIG11bHRpLWNvcmUgc3lzdGVtcyBi
+eSBhbGxvd2luZw0KPnBhcmFsbGVsIHByb2Nlc3Npbmcgb2YgaW5jb21pbmcgcGFja2V0cy4NCj4N
+Cj5LZXkgZmVhdHVyZXM6DQo+LSBNdWx0aS1xdWV1ZSBSWCBzdXBwb3J0ICh1cCB0byA4IHF1ZXVl
+cykNCj4tIE1TSS1YIGludGVycnVwdCB3aXRoIHZlY3RvciBtYXBwaW5nDQo+LSBEeW5hbWljIHF1
+ZXVlIGNvbmZpZ3VyYXRpb24gdmlhIGV0aHRvb2wgKC1MKQ0KPi0gUlNTIGhhc2ggY29tcHV0YXRp
+b24gZm9yIGZsb3cgY2xhc3NpZmljYXRpb24NCj4NCkhpLCBIZWluZXINCg0KQSBnZW50bGUgcGlu
+ZyBvbiB0aGlzIHY2IHBhdGNoLg0KDQpJIGhhdmUgcmVjZWl2ZWQgc29tZSBmZWVkYmFjayBmcm9t
+IG90aGVyIHJldmlld2VycyAoYW5kIEFJIGJvdCkgZHVyaW5nIHRoaXMgd2VlaywgYW5kIEkgaGF2
+ZSBhbHJlYWR5IGFkZHJlc3NlZCB0aG9zZSBjb21tZW50cyBsb2NhbGx5Lg0KDQpCZWZvcmUgSSBz
+ZW5kIG91dCB0aGUgdjcgcGF0Y2hzZXQsIEkgd2FudGVkIHRvIGtpbmRseSBjaGVjayBpZiB5b3Ug
+aGF2ZSBhbnkgYWRkaXRpb25hbCBjb21tZW50cyBvbiB0aGlzIHY2PyBPciB3b3VsZCB5b3UgcHJl
+ZmVyIG1lIHRvIHNlbmQgb3V0IHY3IGRpcmVjdGx5IHdpdGggdGhlIGN1cnJlbnQgZml4ZXMgc28g
+eW91IGNhbiByZXZpZXcgdGhlIGxhdGVzdCB2ZXJzaW9uPw0KDQpUaGFua3MgZm9yIHlvdXIgdGlt
+ZSBhbmQgaGVscCENCg0KQmVzdCByZWdhcmRzLA0KSmF2ZW4NCg==
 
