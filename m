@@ -1,170 +1,158 @@
-Return-Path: <netdev+bounces-293568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLxvFJwkHWq6VwkAu9opvQ
-	(envelope-from <netdev+bounces-293568-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:20:12 +0200
+	id KJ28ALgkHWq6VwkAu9opvQ
+	(envelope-from <netdev+bounces-293569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:20:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 906C461A115
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:20:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FFF061A12A
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A30473013489
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:19:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EAE52300D32A
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F8227FB18;
-	Mon,  1 Jun 2026 06:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E5833AD8B;
+	Mon,  1 Jun 2026 06:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Y4nRvHGF"
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="YRsng8fA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE251531E8;
-	Mon,  1 Jun 2026 06:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADBC27FB18
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 06:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780294765; cv=none; b=b/oJtvKdlzNGInmooNui9ll3NSJ1cuHJhpSI+UV3NKLuEOVuhU05NH1X7QfLbpXfxUljGVcGr2cjZ+ps7W3i71JpBJ7JXEczEjBGSkp/LWp96163P0C0e16fUGDVrwcJNenMf4UFGGVL0n7fjdxyBrdvi6hJ0ufFdGapIozXCVM=
+	t=1780294778; cv=none; b=l8+8aSmYXF6luaHnnP81NH3O05kJbldgyTo4P5VTCfGJjBOujoaSFYcnRN0pUAHqZXUQummQz8KRrjbfT5pVtB5WLA+UXe7WpN/YkQhXFti+0Rsq+ZeovFcaZWysV/L7K7sfLdJ1n9I49F50/jK8jaTFv5sHOZ8HmT5PjOx2kOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780294765; c=relaxed/simple;
-	bh=GEJ30X3Y/jDTunkvJyexa7O+v/l6s7xBV6oFXh6Rg/8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=exsyp0AbjnvpudpZ+g97M7cO+welxEbGnnjU4svrQI7zzB3YqHR7GPg8l6TQfUbFsZddJbnTGT8znDLmSAWSNfanOJW4EMGJzawVy7ZFvTbn0Puz1EuI3XK6cZSAq6j77TO2WaAqZoEMiRq4BGIMvH9e0BZWpRriwBbI4FUdUZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Y4nRvHGF; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 3D70620764;
-	Mon,  1 Jun 2026 08:19:14 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e7JXtIOBHxZb; Mon,  1 Jun 2026 08:19:13 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 18D9C20520;
-	Mon,  1 Jun 2026 08:19:13 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 18D9C20520
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1780294753;
-	bh=aCVW2hII9s0ija3d96EY8+eFESNZ2ahFsHTBD4uBmzQ=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Y4nRvHGFlOfjVHKJAalaAT6mhYAbsXmlHJtCTPjaImLsdQm57j4QO3yZMruTgSFCs
-	 ABewHb7TpojzPCrEtNVfRqFlVnC9CS6vbt/9ghyyD41ZXLJUX73Cjpbr6IytFdJSWY
-	 vPU8rEhv6Ld+RWc9dmJ68xV/XEqAEFd6mFMDGBH01ahJgH1/IGNt0jUsCz2Np9hSvC
-	 Dp5yoAWJIUlxHKbF/t3+wSruYyAr/XF92Q+ns8KwFk1qdw0R89yIC8UshRQyo8ZArZ
-	 Vp/aGC8RU37c6DCc1t+twSAcsXT5je3gXTLqEcFLqTQEDj5PNkS6x7FhIKXP5WmOt0
-	 LeDmTgUgbfTZQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Mon, 1 Jun
- 2026 08:19:12 +0200
-Received: (nullmailer pid 3203635 invoked by uid 1000);
-	Mon, 01 Jun 2026 06:19:11 -0000
-Date: Mon, 1 Jun 2026 08:19:11 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Takao Sato <takaosato1997@gmail.com>
-CC: <netdev@vger.kernel.org>, <w@1wt.eu>, <davem@davemloft.net>,
-	<herbert@gondor.apana.org.au>, <chopps@chopps.org>, <pfalcato@suse.de>,
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH net v5] xfrm: iptfs: preserve shared-frag marker in
- iptfs_consume_frags()
-Message-ID: <ah0kX12B8xvNj3Sy@secunet.com>
-References: <20260526160957.1497109-1-takaosato1997@gmail.com>
+	s=arc-20240116; t=1780294778; c=relaxed/simple;
+	bh=OJf6Jrho7l0BHrvLQhxK/07RMk9wGzkK/7GjX7mRplU=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=mW5JIEb63lNivHLv6qvMRtGqPUDpSQYnCqxb2OcnfUbocqE3qef4U0IOXzk8vQsL0j/ToAwwmHTQJ0/G5As//JnIQXoZZ9RRvXH1swNUHPNBIAU6JoM0YFRhMdvnSdV4sDwffFNmTPo5AY4m3bZu9Npqqc3zQ31u0bEWLzpmngs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=YRsng8fA; arc=none smtp.client-ip=79.135.106.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1780294768; x=1780553968;
+	bh=UGqugeIGGNHkt1QY9TpB8W4urY02c7aWKCiTn3mvj4w=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=YRsng8fAe2LVbNICY1whBeKKsNR98Ml6KAuuOQkDcoBCT+8A0Cca+D8MgBnV5bbMX
+	 BNwuPKhllL2zmfuyjhHFKcaEorT+jb0MW6LmM7o6zRztEzS6f7uNkTlY2BI9wTPKxb
+	 gDPMhcouhnw2OaxAeOqBMjlWXTPDn8za/EQRJcs0brgAPZ1L2h9VJjJ8u+heB3BIqf
+	 UuM19IFdBeKlTMGd/Mct+HcwTJA5Gt3TPK/rUt3onNXTMgVBMiYY7rObgz3jfJMdGk
+	 wMLRZb21GJ0oNg86VYJqR+04rheLfGhwB5pppy7Y7sc5tOwLAcmY2Dld/NxEn/v8qH
+	 RMj/KO8bmQn8g==
+Date: Mon, 01 Jun 2026 06:19:22 +0000
+To: theo.lebrun@bootlin.com, conor.dooley@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+From: =?utf-8?Q?Gustavo_Kenji_Mendon=C3=A7a_Kaneko?= <kaneko.dev@pm.me>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?utf-8?Q?Gustavo_Kenji_Mendon=C3=A7a_Kaneko?= <kaneko.dev@pm.me>
+Subject: [PATCH v2] net: macb: check return value of clk_prepare_enable() in runtime resume
+Message-ID: <20260601061906.127174-1-kaneko.dev@pm.me>
+Feedback-ID: 165279626:user:proton
+X-Pm-Message-ID: dad26ad65a0240fbed8162ade397c178e0e62905
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260526160957.1497109-1-takaosato1997@gmail.com>
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	DMARC_POLICY_ALLOW(-0.50)[pm.me,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[pm.me:s=protonmail3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293568-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	DKIM_TRACE(0.00)[secunet.com:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293569-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kaneko.dev@pm.me,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[pm.me:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 906C461A115
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pm.me:email,pm.me:mid,pm.me:dkim]
+X-Rspamd-Queue-Id: 4FFF061A12A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, May 26, 2026 at 01:09:57PM -0300, Takao Sato wrote:
-> iptfs_consume_frags() transfers paged fragments from one socket buffer
-> to another but fails to propagate the SKBFL_SHARED_FRAG flag. This is
-> the same class of bug that was fixed in skb_try_coalesce() for
-> CVE-2026-46300: when fragments backed by read-only page-cache pages are
-> merged, the marker indicating their shared nature must be preserved so
-> that ESP can decide correctly whether in-place encryption is safe.
-> 
-> Apply the same two-line fix used in skb_try_coalesce() to
-> iptfs_consume_frags().
-> 
-> Fixes: b96ba312e21c ("xfrm: iptfs: share page fragments of inner packets")
-> Cc: stable@vger.kernel.org # 6.14+
-> Signed-off-by: Takao Sato <takaosato1997@gmail.com>
-> ---
-> Changes since v4:
-> - Rebased onto the ipsec tree, as requested by Steffen Klassert. No
->   functional changes; only the diff context was regenerated.
-> 
-> Changes since v3:
-> - Corrected Cc: stable tag from "# 6.8+" to "# 6.14+". IPTFS was
->   introduced in v6.14, so earlier stable branches do not need this
->   fix. Pointed out by Pedro Falcato.
-> 
-> Changes since v2:
-> - Removed security impact paragraph from commit message as requested
->   by Steffen Klassert.
-> 
->  net/xfrm/xfrm_iptfs.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-> index 6c6bbc040517..62ba828632f1 100644
-> --- a/net/xfrm/xfrm_iptfs.c
-> +++ b/net/xfrm/xfrm_iptfs.c
-> @@ -2168,6 +2168,8 @@ static void iptfs_consume_frags(struct sk_buff *to, struct sk_buff *from)
->  	memcpy(&toi->frags[toi->nr_frags], fromi->frags,
->  	       sizeof(fromi->frags[0]) * fromi->nr_frags);
->  	toi->nr_frags += fromi->nr_frags;
-> +	if (fromi->nr_frags)
-> +		toi->flags |= fromi->flags & SKBFL_SHARED_FRAG;
->  	fromi->nr_frags = 0;
->  	from->data_len = 0;
->  	from->len = 0;
+macb_runtime_resume() calls clk_prepare_enable() five times but discards
+the return value each time. clk_prepare_enable() is marked __must_check,
+and if a clock fails to enable the driver would silently continue with
+potentially unclocked hardware.
 
-Sashiko found some issues in iptfs. It is not directly related to this
-patch but looks valid:
+The symmetric disable path, macb_clks_disable(), already uses
+clk_bulk_disable_unprepare(). Convert the enable path to the matching
+clk_bulk_prepare_enable(), which enables the clocks as a group and, on
+failure, unwinds the ones it already enabled before returning the error.
 
-https://sashiko.dev/#/patchset/20260526160957.1497109-1-takaosato1997%40gmail.com
+This was found by code review, not by an observed failure, and I do not
+have macb hardware to test on; it is a robustness fix that propagates the
+clk_prepare_enable() error instead of discarding it.
 
-Chris can you have a look at it?
+Signed-off-by: Gustavo Kenji Mendon=C3=A7a Kaneko <kaneko.dev@pm.me>
+---
+v2:
+ - Reword the commit message: drop the misleading "atomically" wording
+   (there is no locking involved) and describe this as a robustness fix
+   found by code review rather than a fix for an observed bug.
+ - Cc the networking maintainers that were missing from v1.
+
+ drivers/net/ethernet/cadence/macb_main.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/etherne=
+t/cadence/macb_main.c
+index a12aa21244e8..85bd4ff0e4e6 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -6185,16 +6185,19 @@ static int __maybe_unused macb_runtime_resume(struc=
+t device *dev)
+ {
+ =09struct net_device *netdev =3D dev_get_drvdata(dev);
+ =09struct macb *bp =3D netdev_priv(netdev);
++=09struct clk_bulk_data clks[] =3D {
++=09=09{ .clk =3D bp->pclk },
++=09=09{ .clk =3D bp->hclk },
++=09=09{ .clk =3D bp->tx_clk },
++=09=09{ .clk =3D bp->rx_clk },
++=09=09{ .clk =3D bp->tsu_clk },
++=09};
+=20
+-=09if (!(device_may_wakeup(dev))) {
+-=09=09clk_prepare_enable(bp->pclk);
+-=09=09clk_prepare_enable(bp->hclk);
+-=09=09clk_prepare_enable(bp->tx_clk);
+-=09=09clk_prepare_enable(bp->rx_clk);
+-=09=09clk_prepare_enable(bp->tsu_clk);
+-=09} else if (!(bp->caps & MACB_CAPS_NEED_TSUCLK)) {
+-=09=09clk_prepare_enable(bp->tsu_clk);
+-=09}
++=09if (!(device_may_wakeup(dev)))
++=09=09return clk_bulk_prepare_enable(ARRAY_SIZE(clks), clks);
++
++=09if (!(bp->caps & MACB_CAPS_NEED_TSUCLK))
++=09=09return clk_prepare_enable(bp->tsu_clk);
+=20
+ =09return 0;
+ }
+--=20
+2.54.0
+
+
 
