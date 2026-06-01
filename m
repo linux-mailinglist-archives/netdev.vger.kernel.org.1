@@ -1,172 +1,217 @@
-Return-Path: <netdev+bounces-293912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293913-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7SUAGbT8HWqNgQkAu9opvQ
-	(envelope-from <netdev+bounces-293912-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 23:42:12 +0200
+	id 6MQRHvIBHmoiggkAu9opvQ
+	(envelope-from <netdev+bounces-293913-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 00:04:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8CF962597D
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 23:42:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02E49625BF9
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 00:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E698C3038A54
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 21:42:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3393930651D7
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 22:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCFB37DAA8;
-	Mon,  1 Jun 2026 21:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3D0363C6A;
+	Mon,  1 Jun 2026 22:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0j3Nyze"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kZP7fhWC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DC6372ED6
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 21:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780350127; cv=none; b=c09NrJ/xlFc8xP/0sr9auJVWMGMIhquI4rAXK8BTt7MpYfiR6eYJS0IuSBClslvHJINiKMhpVMiP7ix/1exrIo8VyGHwqyxNCfSu4qB+A8RW5YojjPKJeGNnOetfHt3DhpnRqX+UgOkRtfaIbvkHUMFwWdyQ5o4qC4EZ3mwfkX0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780350127; c=relaxed/simple;
-	bh=PsKdNGEJ/GEbniw8+Esy9ECKjpaaqQIGonhyoIBGdU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A5g/CDDCB+p/QyDSZ6u4B+v5q+zaOHxkI4RfFcuvAn0b7Sg6cuLhBXYO8SmR1L+bNYmV2VEfZybMWIPL9Uz3gbsehtjLP8hSUCm/SD7Fg30/JsSmKR8L0bk5X/rrwMsSj1S0/bSxVGp7sR1/eUAI1fOqsWauPJKQvtBssrpqvMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0j3Nyze; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4909e3fa4b2so35247315e9.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 14:42:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62381351C2E
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 22:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780351319; cv=pass; b=Gc+ofAr73/KxjJr4PBGnZSZpYu4B9z5YC+VcMGhztmxjSQpfJdL9DpqkyRnnrGbOoWZ4F24R4IazR9oeemGlFKpudU/Qodms6crFLdaVwECHG61pwQKSpW/7lc1769aoeaa4qhixAMCW7MAny/lt+FC7yYd5KkaCQkKmtDw2iLY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780351319; c=relaxed/simple;
+	bh=Rw/4a/NURQMfsq8MHGhIKpn1A3GRmoCF9WKCmClKTZM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p+IYg71tVbp9Mad0s8lsdtWl6JR6DiTJ1wsKfh4ORj2aS8kckGxmfwgx5Rxj7GIvu6YwcW1I749BftaHptuYb/IXYHwoFKLsvS6DaxgmGk4NdbLsTLnN4lT682tYvNxYGvBM+xUmfmRvPYdaSo1IZRT4x2LPBJm6s7Dumk4HBsE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kZP7fhWC; arc=pass smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2bf22c18ad3so2555ad.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 15:01:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780351317; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iZPxkJ8PBn0cdL4UkRWJDmq0bClBxOPXyHci5ku5DBu6vMgOj5qAjvT1CqpKK1eMKd
+         IF8OVXeKX2XLEDrC/D8PVT22i9W3w2w8Y/gTYZ6zDEgN2APXsNq0ccR9LtOXjWxUc9g+
+         J5LM330sGs1ZnjFZmM7AOQ0SwZVS9Yi4yeIYB5gUG1xKKRynjGh89Egdp5OAxt65LD4U
+         w06cME2BlJ6wiow3fe90/n4UVQv1bry9xBzfWPYP69O8ZmB/lT8p0SFPsodGYZXfvAy8
+         FrDsr8T15LwmTjhvz+W8Yw+WD9NP6N+NiN2kWcMlGnvzMy0hiQmu7XgCCvXtKUL6aZKZ
+         23CQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vF05xsD64swUE1S4mP39pcL6StP9wDO4XWqjCABBN+Q=;
+        fh=Ef9lcZO4ZwrztREP42xReRHLmD9Hg2GQuFQd3HW9yBk=;
+        b=CMOaELaSegnUVF9mU9x0Hds/SC2vsENLhTI1hJhEpemndwO3NKIAwWr2lslunNkYTH
+         BdDLwrUbNWwSNmwkAhNvqCX1gpDYpcsixCZS04v6Kqqk/CcNcXzNNABl2nMD3T+Wq9Dx
+         9I7ZpEXbCspg4tn5B2upCe63pHwisUlFNRppxPKwiM4NMV/1A0UjLUAtjHplFM1MuwSr
+         VR+5QfmR6orQDppn0HMpAoeQEUNjcMjtHaycB438iWgL06EeXGUchsw+bqTYAqwpVtCq
+         4a9TwxmIEXqogzyNutOWjeBUUFoNyYcuYIObM3BHDqcrtmk+VVo/Itvb45o7O1qA8CBc
+         qWoQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780350125; x=1780954925; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1780351317; x=1780956117; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LQGOEh1bZHWnu9Uz0mQ1yk1YZrq6Rissv+4IeOd2hWk=;
-        b=m0j3NyzeKJZWgxrErxSB7h7pH+5t979K8ZMKiy0t+iDQ5uoOZmII4BSr6OSLaKPwzT
-         Q3G1V7CXVDVUR302w+jYayZZ81SF0/GdabZq2+svbs1QIWo5Uili7YhvSSIvGEBtfb5d
-         D/eny2CteC3s1BMbpx19UGZ6OHPYHDovnlf+6oAR3OXikszm5Ep27Be6LfZXTBYUd5CG
-         vHvyNJw8qzhTLxHriYlayc3hxu962eDdw90KIql4Xmfd2jr1ySQfAZ7ra+BO2Asvr553
-         5tqjAbYf4IdpQ+j4Ugfsp6xSdqftp+3G0x3BUPghtzkVhuyfEDxw9qspWCExeujd5aEz
-         556A==
+        bh=vF05xsD64swUE1S4mP39pcL6StP9wDO4XWqjCABBN+Q=;
+        b=kZP7fhWCFMd9s7ldpgtbmCwVvkWcwPnr2/xX3rDjUAvg4sageR5K4KzZOc5W/UHqOW
+         ZFSNV/F3hFjedo4PB+ToOCKNq+ZHrNmLEPo7C0mntEQINc6uAqdIvO1GJV0/eSqkPn32
+         dB9QBr3Zm1mNcTAdM9E/nGZYj58D93quYdfV6GnkKoojU7vHfof0lM9T4To02qlJHb/E
+         eWX/iCkJ1TMrxdbZbo/I1PwC9+sNa8mOHGOmYKGH0YOhey2hb+Vy5IgQfbnAbig5sEMT
+         3cQpB4YR0Zy09M+4Tbk5HAvkGoew7/Q2xjDpyf3tlEcDN+WKFB9ls6DwprKOWyuBcoO1
+         CRDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780350125; x=1780954925;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1780351317; x=1780956117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LQGOEh1bZHWnu9Uz0mQ1yk1YZrq6Rissv+4IeOd2hWk=;
-        b=Rs2Peop4WYAAOcJnCRRx/awtL8P9/Z03lG+031W8UCy1IC0WkTMPyxAZl12KQpw4y4
-         0oypU2GSyFdo4OR6RUyiHEEVoy+nnS5Oc4m8AB2Y2fIE4VOWoLxSeGaqRi2CAgnYfaTX
-         O+Psv2RFQR/hPKMFKgxFf2hplTbWTdShqGEnNTuUkQV8XbLi7hcufwH6HYBgiRGnnDTw
-         d8qYagT0JBLf6M2GCUf3OgQCrFispB969oC3Cu378QwSmHkk8V2XxAr/ibjq32IKBxpf
-         8PEe/8hQITzZmjsjKEDsiFYGO1+JhWnC6AWomyPGCwZVq7GhQ+jk5j2rOn8iSe8rlXOe
-         U44g==
-X-Forwarded-Encrypted: i=1; AFNElJ+cNG1WFd5ywgIQ/sVxvGEzjbrOd5/BxmUC02WB7NfkCGw7yl3Ak5q5HKynwv4l+v0k0aQewrg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVOUM88AWxw/nXnTgFdOCynHT6PMXSBnSYpNama+iCWxYeo3BH
-	83/ns34+LZaSSZpFzC8iC+XAzhdCVXLbIEemLMTgEKcxWooMHcd6dmJ7
-X-Gm-Gg: Acq92OElngTEqBZzIc9U8BDfXYciuZX+CV8qGjTWCR+hHtFUOra7jufMr5DPGl3TmbO
-	wxVFuJI48YP7Oqp042pGe4jn163L9C5ghExBdGz5T2tUFv41FLuuqrJuHm5Y+EBGrr6dwLfeeYW
-	Q3xfhOffYmhqdiMDQy0xlskWxN72w9NBuGNrFMq3Hg8014KMMgYVPGcdPgOm5y7rYsnzIFpxL21
-	BV3r52VM137cQKXkSDVpiw4YudSuXQ0XUpLgK/QRva7sb3E8PCXsh1zWB/Q1gCBB1woDjfnX8Kw
-	OHWkfzI5b2oRcjSXfw7CulehBn05qn9+jpEgfJWKRUWlS0mM1HPbMdJS7JHXRBIE2EHxdjrRlBB
-	hifCHhGVzdqZf0hYaWwp9Jlf3WTdd197eKEz1JKAv3AUFej0QcPylvR0gbnvtb9VViuQerEnzhv
-	NbihwKLvbXiAxZcuav2ZFzi6bIOgPwsSUJz2U+8DwnKQpzL0ogE/rj2bfIG26kPe83GXNnR94=
-X-Received: by 2002:a05:600c:4f0f:b0:490:482c:437e with SMTP id 5b1f17b1804b1-490b08872a6mr31969755e9.23.1780350124761;
-        Mon, 01 Jun 2026 14:42:04 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b0e0f343sm20188985e9.1.2026.06.01.14.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 14:42:04 -0700 (PDT)
-Date: Mon, 1 Jun 2026 22:42:03 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Justin Lai <justinlai0215@realtek.com>, <kuba@kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
- <larry.chiu@realtek.com>
-Subject: Re: [PATCH] rtase: Avoid sleeping in get_stats64()
-Message-ID: <20260601224203.5d282c21@pumpkin>
-In-Reply-To: <f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
-References: <20260601062447.64027-1-justinlai0215@realtek.com>
-	<f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        bh=vF05xsD64swUE1S4mP39pcL6StP9wDO4XWqjCABBN+Q=;
+        b=Xz2YKFaDvXG3wo58vRA4qW/UXfubkvNhjZRkapgwv7MYP9E+x9JuSIgHptC79uWJEF
+         KePwguVEblK91FpmT+2MpKFP6U6RvaDE8fXNtVNn9lkxIfFFAHs9Nc0A313YPXs4ae3t
+         IB0f0NL3VRtpHpskwmVrju9qGAvrI62hp8xuna/lkl0rZCwyyFIr9mCA4r3rE0/x67Ch
+         okoY7o4ycMWoNkjfQRSh8u3GBXqX7WGFeZfcHYv1PvW40utAfhlDJyrofYvqvCS5i07+
+         /hzAmAS5gh0qNDXdBSv6GHVRx6efS6i5UpRYqSMENBCX6yUwMBr4sbOHcJD3dSWTRX1i
+         6LEQ==
+X-Gm-Message-State: AOJu0Yx3ej/+37UHNEn0ZSOIAUZQS7b9JsEgT2NrDSBFcH7LlU1aliZC
+	ADGFPqJ5k4opBYT90GLFsWxXErf/zpsmgWH9gUCT7JmvOtRnWLA279UIj2N/5BsqGf/wvSNiAru
+	xVXD7LCir+1p+Sj0S1hApBfGq4TmZGMMcaR/hpDi9U7853KbGNb9a5pq7Mq4=
+X-Gm-Gg: Acq92OFxyp6SJge2sCK5ParjUmTsSn2arabvDL7q0aENYIsTkFlQ8ybWds/RZG4Ue4L
+	C+xOzHOkFjKX1yfQg2c8Ulx3ULnYu2jiRfkE4DlEd+9XGqVYwUFcNDD3YA/vmzLYwjvz3kd/W41
+	foWEd5nAUCwT3+E+ncwYamUN2ARaMLD1hEOwpv8lg9W3I+7vW6rCZrZSRrExb2c2AV1ZkOKjwMp
+	tfRTxMvRlbiqexrOdsziUCr/IKv/+oh4jJA4WENOWfvFM3qGInLw533Vrw5URiDuvRY30N2MqTM
+	rGzUCxf+rOkMnIwD2ctIChMy5WOSbytjUPScf7HV53O7q2CnK/DAhfO5nmVqiaKa1luVaiGk8pM
+	xSIpyz5s5sk72VpU=
+X-Received: by 2002:a17:902:ecc3:b0:2c0:bf57:8746 with SMTP id
+ d9443c01a7336-2c10eb100e7mr1008545ad.18.1780351315809; Mon, 01 Jun 2026
+ 15:01:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260601175437.3767283-1-hramamurthy@google.com>
+In-Reply-To: <20260601175437.3767283-1-hramamurthy@google.com>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Mon, 1 Jun 2026 15:01:44 -0700
+X-Gm-Features: AVHnY4KQyJtSfT5RIzZL1aSdVjjyck_NGH23XlGFpeG35bMFP6xN4cFz-7dZ_P4
+Message-ID: <CAEAWyHf+G2ts+4Rs75mgVpqQpMa5fK=bdahZGRC0ay79D6U+8w@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/15] gve: AdminQ mode related refactors
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	sdf@fomichev.me, willemb@google.com, jordanrhee@google.com, 
+	jfraker@google.com, nktgrg@google.com, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293912-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-293913-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: B8CF962597D
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 02E49625BF9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 1 Jun 2026 15:14:50 +0200
-Alexander Lobakin <aleksander.lobakin@intel.com> wrote:
+On Mon, Jun 1, 2026 at 10:54=E2=80=AFAM Harshitha Ramamurthy
+<hramamurthy@google.com> wrote:
+>
+> This series is preparing the driver for the addition of a new control
+> plane mode(MailboxQ) by commonizing and reusing as much code as possible.
+> MailboxQ is a new control plane infrastructure which uses mailbox queues.
+> This is a new control plane to communicate with the device when the drive=
+r
+> is running on bare-metal instances as well as newer versions of the devic=
+e.
+>
+> This series contains 2 main changes to the gve driver's existing control
+> plane(AdminQ):
+> 1) refactor some initialization/teardown path methods to make it work for
+>    both control planes.
+> 2) add gve_ctrl_ops structure to the driver for various control plane
+>    operations
+>
+> The refactors are mainly around the init, reset and recover paths so that
+> functionalities could be moved into the control ops like 'set_num_queues'=
+,
+> 'set_num_ntfy_blks' etc.
+>
+> This patch series only sets the control ops for AdminQ mode. This is
+> intended as a preparation for adding MailboxQ mode in upcoming series
+> which will add the new control plane infrastructure and then introduce
+> the corresponding control ops for MailboxQ mode.
+>
+> The entire list of future patches can be found here for reference:
+> https://github.com/hramamurthy12/linux/commits/gve-mailbox-queues/
+>
+> Harshitha Ramamurthy (9):
+>   gve: don't pass in unused parameter to gve_adminq_free
+>   gve: refactor initialization with helper functions
+>   gve: introduce gve_adminq_get_device_properties()
+>   gve: add a few helper functions to set device properties
+>   gve: add struct gve_device_info to hold device properties
+>   gve: introduce control plane operations structure
+>   gve: introduce ctrl ops to set vectors and Qs
+>   gve: refactor gve_init_priv for reset path
+>   gve: add ctrl ops to for queue operations
+>
+> Joshua Washington (6):
+>   gve: simplify reset logic
+>   gve: add gve_ctrl_ops for gve initialization/teardown sequences
+>   gve: split up notify block allocation and setup paths
+>   gve: introduce new methods to handle IRQ doorbells
+>   gve: setup and teardown management interrupts
+>   gve: add link status/speed ctrl ops
+>
 
-> From: Justin Lai <justinlai0215@realtek.com>
-> Date: Mon, 1 Jun 2026 14:24:47 +0800
-> 
-> > The .ndo_get_stats64 callback must not sleep because it can be
-> > called when reading /proc/net/dev.
-> > 
-> > rtase_get_stats64() calls rtase_dump_tally_counter(), which polls
-> > the tally counter dump bit with read_poll_timeout(). This may
-> > sleep while waiting for the hardware counter dump to complete.
-> > 
-> > Use read_poll_timeout_atomic() instead to avoid sleeping in the
-> > get_stats64() path.
-> > 
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>  
-> 
-> Looks legit.
-> 
-> One question: for how long can this poll for in real life scenarios? Up
-> to ~1 ms is okay-ish for atomic, but if longer, then you'd better to
-> split it into shorter polls and reschedule() time to time.
+Apply failure reproduced locally (patch 5 conflict).
+Will send a rebased v2 after the 24h window.
 
-Anyone trying to get a thread running at an RT priority won't thank you
-for spinning for anywhere near that long.
-When an RT processes becomes runnable the scheduler will preempt a lower
-priority process that is running on the cpu the RT process last ran on.
-The RT process won't run until the preempt actually happens.
+Thanks,
+Harshitha
 
-1ms is a very long time.
-
--- David
-
-> 
-> Thanks,
-> Olek
-> 
-
+>  drivers/net/ethernet/google/gve/gve.h         |  91 +-
+>  drivers/net/ethernet/google/gve/gve_adminq.c  | 459 +++++++--
+>  drivers/net/ethernet/google/gve/gve_adminq.h  |  25 +-
+>  drivers/net/ethernet/google/gve/gve_dqo.h     |   2 +-
+>  drivers/net/ethernet/google/gve/gve_ethtool.c |   5 +-
+>  drivers/net/ethernet/google/gve/gve_main.c    | 876 +++++++++---------
+>  6 files changed, 913 insertions(+), 545 deletions(-)
+>
+> --
+> 2.54.0.669.g59709faab0-goog
+>
 
