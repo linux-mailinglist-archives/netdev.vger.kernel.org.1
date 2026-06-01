@@ -1,385 +1,185 @@
-Return-Path: <netdev+bounces-293698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLZyAb5uHWrlagkAu9opvQ
-	(envelope-from <netdev+bounces-293698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 13:36:30 +0200
+	id 4EAgDy5vHWrlagkAu9opvQ
+	(envelope-from <netdev+bounces-293699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 13:38:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7416761E635
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 13:36:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A198561E6AD
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 13:38:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12F1A30A2141
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 11:26:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3994302B0B3
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 11:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504DF3A3E7A;
-	Mon,  1 Jun 2026 11:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA52346782;
+	Mon,  1 Jun 2026 11:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="dXE4OhwR";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="SDUqFKvH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KAAbRrFR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5955D3A48E9;
-	Mon,  1 Jun 2026 11:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780313190; cv=none; b=pzDhV69ujUxpuRpq0fUJtklZWzIHFWlAL8i/q/IU4VopoY1XT5pWPVnVuHABsTybi2N4U9EOccxOWbr70+euPbFHqRmSr6yAQQ1RlF/ctzWpgLUxlpoc3a/FEzBqVRHzv0TOY7XIkiHjZ4gPba9JqEAd4DEvm+FG21MnPE8Aepk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780313190; c=relaxed/simple;
-	bh=39Eherp63PgbSVpCLJUmry6m5KK5nLYtdbWKClfaF9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z0C02CDSll/gYkAG09/7BAVhLocQ+BQ6Ppt0yipO+/JGEkkaDw99zeRYK1K0mx0MPnfus5ExNtcKjUDOAmVw6S42uMC5hF8ksod7rCPn7ntIIOht/zyLledckpqqEpOLv3AK2sHZsDNX/5bMcYf+yhwRYhQvz1IpP6w0xgOFnHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=dXE4OhwR; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=SDUqFKvH; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4gTWqv5C23z9v3b;
-	Mon,  1 Jun 2026 13:26:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1780313179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8KBU725g9ztpudyjGyBfTRldvXjIEvfRn0HBjEM1CLg=;
-	b=dXE4OhwRF5ElEyhAxEIXuUlfq2Qkg+pa6K698Ca53y/kF3YZv0lZvdfJhPUZMBmCHqCHNT
-	PRPVnXvtXOfynnHJmWrTOZV1Er0ktBgGmgG9j583NqzZxg7h93hg3CXJGFTuNxNbEVOiCQ
-	tgFCRLsORexNG1yxx/kSaGal46FkXeS761uC4abCwlqpxyRiaWcW4nz2VtjWbueXnpADxo
-	jC2en9BCme52qd/oWQFuzyL4UDu2nClKZ727nYmJwospAwSgWddPHKyVyie3BIqmU94sA8
-	7pxmqODC1RIuJ7RXFrpgvZGl8s4FJH1DToC/ym7+WU7qivcr/RXx1Qh+C68Clg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=SDUqFKvH;
-	spf=pass (outgoing_mbo_mout: domain of lukasz.majewski@mailbox.org designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=lukasz.majewski@mailbox.org
-From: Lukasz Majewski <lukasz.majewski@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1780313178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8KBU725g9ztpudyjGyBfTRldvXjIEvfRn0HBjEM1CLg=;
-	b=SDUqFKvHw0kslBFhgYQa8SZ+vjrhc/iGSQSRllp/A9iym7vfdv7SvrVhJmCyTAC34fv+UK
-	vscZElYdRLagO8qTmTRFluaRH4p6e3M/86ZdOdMtOUO+Kh0blNrvOC/2eckUEcXwg0OEjl
-	lZUo9ZBiZtaW4K3nQLncK7n4aY9Sg4PO5MNhDS9stJCNGM4zKoZ3ZLSsE9An+KWnpUNWJ/
-	ZALbPiLVc9iHPOJEoy7PE1uq/LfQqvild5IL+rZrccgbMTVr8SQo2eaRyWyG1CzoUz7Hav
-	MjC2P+iqATLOHw5J0PpTdkG3KIWZQK4FiBxZ6iGD3actID2aYbomI0UZOFMdOw==
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Rob Herring <robh@kernel.org>,
-	Lukasz Majewski <lukasz.majewski@mailbox.org>
-Subject: [net-next v24 7/7] net: mtip: Extend the L2 switch driver for imx287 with bridge operations
-Date: Mon,  1 Jun 2026 13:24:36 +0200
-Message-ID: <20260601112437.2216043-8-lukasz.majewski@mailbox.org>
-In-Reply-To: <20260601112437.2216043-1-lukasz.majewski@mailbox.org>
-References: <20260601112437.2216043-1-lukasz.majewski@mailbox.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0043132B122
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 11:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780313520; cv=pass; b=du3tBfvg/KPZOAcxv/g0mjWEf2RlgR7WiHjH2qUy0Y6IVUHW3k0cNjkEtWfhdUy3MI6A3Dz2xBNGbsiBLd803kmn0PiAJ5t6+CVf0CESOrvNKQ9S9Lzf4YhoRMWk4JAZ7MeBfD2jLLw/o9fPUypKikqfoaLOOKVsnfcHI/WNML8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780313520; c=relaxed/simple;
+	bh=yszJgkZCWn8L+J9sz17zUOD/xufK8NMtC/jiWVOFC5Y=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=nbZ9tPrb731hFrmViSK4F/j2Lb/Upsjku77lvS+FD5O6jPYJmL0zcQ4O9XCnIOUYUyTZdsqGQxNE+ZP0S6P0+6esPDuIJIfTEokD6KHREsv1olr02zTK1TsKaXMglMEN963jDxNfwhdAVtDqewZtUofPpTD1vax0RNyv2ycLOcc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KAAbRrFR; arc=pass smtp.client-ip=74.125.82.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-13621cca8f5so7281336c88.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 04:31:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780313518; cv=none;
+        d=google.com; s=arc-20240605;
+        b=E6n2No7ZcjqQCfJSm1qKpUANgwb7pJouNXjilrt7rKuNAclhuwZqKsvSnblzaWtUdg
+         cIcEVjc7jAgT6qN4JhnVJF0lCFqw5Q+iS5kbSHM/k7FYlHGFx8jlDxKi91q9EbaCSz8D
+         F+Ey/evezPvTyZQNq//WaX7+BrGjRYn0k/XY+55PL5xCjcrl1hIEmVt/D2dD1H0OJCAE
+         COC8RJ/QJFrd/WSwWiCO/N+UCBQIWY+ZyU9az0wlGZy30DTFj+G5hToB7/6FnEPfkC4Y
+         lOD579v5ke53qlxyLLfJ1wWaWKJVZXnqcYUTf5tMHEIby28OXydBuXWUF1QcaaSx6Wtn
+         j1wA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=Cqxcp75xtoM57dtYJ+S/ObM2E9rTcqiq8xwIiEu9bBY=;
+        fh=ux221i5Vegz0V5+K8IJ1rqrjTk/dwvh10PidRKp0n+o=;
+        b=cKADPJMz7Q7E3Vu8bgH1RtsCxMXvkBA9q6BedbSQD+zIOY4MxCQefrzTEw+Z7G1xp/
+         0gsR4cs6tMI3hlWY+4OrY7MgxxVfektxNvXhtbwgt2AJezjRwnUGv1MfvEOANUpW7QHF
+         crPjpk80qJww6MSX+nLIx9czlRo2HqTKhQZGx65KNmRNX4QIfIr5XL818vJ7UulYxY4P
+         3Jhfw41Q+EU18wzrj2JOwyaeRmNm1gi0YuZfdUqP4kWSS5oM25rEMcK1LTJnrjvLcKcR
+         djr5ywCUXPdv3eDjN4JNd4BOdbgUtzaVQIV+tsMbzpr1bhAasmHDWLHTXunXPz+qnptg
+         ttSw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780313518; x=1780918318; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Cqxcp75xtoM57dtYJ+S/ObM2E9rTcqiq8xwIiEu9bBY=;
+        b=KAAbRrFRLEY4qF/4mjQ3f1UiUQtiSbfzHtE6YkKMtz4kbv7WMHYZZduU1irdoFu1RG
+         X3H1QVzRlbdcKapY+Mc8CYbiWJ0g+Fb5ht0xpiKaLbf974vZzSHiqR95/SBYCYZXWeGS
+         2apeNvaWbm590C8K8R/UWruGoQAOmWHXuUhI0ZikmsjCvOoF/bjEgk2Nucn8f+8G0YMm
+         5zl0ZYPqH1Jgmlfc/fAqpSjGTK8cyswDZrjoPJ/yZTrIuU4V+6WpqFELU4eLPrDi3sjP
+         Qu00teTpdaKxu5Y5EXqbd0k/wxeZA0Ma7KZ1Oga2j6RFRxHyeFgKIxgPDtyAaYnz/fw8
+         i9kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780313518; x=1780918318;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cqxcp75xtoM57dtYJ+S/ObM2E9rTcqiq8xwIiEu9bBY=;
+        b=tZR2uxRvgFhqolC+AWiL3kgyObR4BApe0gQ2MQ3vaMYq1P74wWu/kGChYv3FTrMhcl
+         IWAxhdIx02x4q+asG6notXXqKdPLgk/Mx4+2UxUDDCuz7XfVFkFLEwyz0ZrKIxMcKR2d
+         urkJaE2SJ94NpaDcfpVS98TQGqUBThP7sOLEFn2OnaaIxtJ0DzG9wu5SJ44tRTMG5kQ0
+         fgCWxza2G/iJzKH8kYdyjZPwuBgCgVo/7TzzA5tYU4TYSxHo4PAtt8/ZeYZGOQIeSMF0
+         OESgEXgDZW8qjM1Pu8P3IdBIN/MsohC6yHFdbCaLp1v5ewATji2Aen39S+VKHKAJ9KiX
+         1Kng==
+X-Forwarded-Encrypted: i=1; AFNElJ92PGeFFvZ8Glo/Nwn86nQP0Tej6Tcf4Cqar8EnPamkRdy2x4AYQ0DhZAHFVJZY9/wKs46W038=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDoxjs+Wlq9O6Mtog1dw/rtgsUFwskI9WvJ0oQT1z9pSH2Svx6
+	8I0MIpduTORwV43NJ2myKHbnnHTNiyFxPGVxIAXZtNBHDYoOTJZOW7IcVlSGRQVK27uViLA5VcQ
+	G7c42U8jZaj3+G6Ykyfxn9pYsuiADCXo=
+X-Gm-Gg: Acq92OEH9IBgocCQYJ+dgEcaiNM8o9qGirlt5qcux4/iycAvR3QlUhZTFY3XdMa35Lm
+	GLeGWBNK+HugfQr6heu7PMDg7QBpC/lnPbL+K6rkNIsCaPKJbdTQz9TQrg7NsdjAc8u/7AJ9mtN
+	mxn+Vhyfa54ltMNofN9cxcIwiqDgb8nqxn1oWSPCfw8ibghh7kEQ7b3NY1qvi0bM//xwoNXiO+z
+	pbjb0m0VvjI5EjsOfmJMBznk5ml6Mpuoxn6SG9G667fRIUddUdcrvxo4aWpVgDRMmNxSKnqA0L9
+	7BqUu33/mM1FQ8AE3l8bwIq1x3Vy
+X-Received: by 2002:a05:7022:392:b0:137:938a:1044 with SMTP id
+ a92af1059eb24-137d425e735mr4514505c88.33.1780313518020; Mon, 01 Jun 2026
+ 04:31:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: uxkcoysem9xins8psb7fymnuwj19pdmr
-X-MBO-RS-ID: 1fa7b8d72bab8a673ed
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_MISSING_CHARSET(0.50)[];
+From: boz baba <bababoz943@gmail.com>
+Date: Mon, 1 Jun 2026 14:31:48 +0300
+X-Gm-Features: AVHnY4IkZaXRztFMyZ0UAa_2Q1e-88z0noe4I9gVIsgWROR6bbGX68MZKK77zWg
+Message-ID: <CAAB7JC+TiyF6-1uvzhOcJ9KeDUhNgLmXk8unHNogY156xSu61g@mail.gmail.com>
+Subject: [PATCH] net: esp4/esp6: missing skb_has_shared_frag() check in 6.1.y
+ (CVE-2026-43284 backport)
+To: stable@vger.kernel.org, steffen.klassert@secunet.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	URIBL_MULTI_FAIL(0.00)[mailbox.org:server fail,sea.lore.kernel.org:server fail,nabladev.com:server fail];
-	TAGGED_FROM(0.00)[bounces-293698-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,lists.infradead.org,mailbox.org];
-	DKIM_TRACE(0.00)[mailbox.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293699-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nabladev.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mailbox.org:email,mailbox.org:mid,mailbox.org:dkim]
-X-Rspamd-Queue-Id: 7416761E635
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bababoz943@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A198561E6AD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-After this change the MTIP L2 switch can be configured as offloading
-device for packet switching when bridge on its interfaces is created.
+Hi stable team,
 
-Signed-off-by: Lukasz Majewski <lukasz.majewski@mailbox.org>
----
+The fix for CVE-2026-43284 ("Dirty Frag", commit f4c50a4034e6) added a
+skb_has_shared_frag() check to the skip_cow path in esp_input() in both
+net/ipv4/esp4.c and net/ipv6/esp6.c. This fix was backported to 6.12.y
+but appears to be missing from the 6.1.y stable branch.
 
-Changes for v13:
-- New patch - created by excluding some code from large (i.e. v12 and
-  earlier) MTIP driver
+Affected: linux-6.1.133 (latest 6.1.y as of 2026-05-31)
+Fixed in: linux-6.12.91, mainline (f4c50a4034e6)
 
-Changes for v14 - v15:
-- None
+Vulnerable pattern in net/ipv4/esp4.c (line 912) and net/ipv6/esp6.c (line 960):
 
-Changes for v16:
-- Enable MTIP ports to support bridge offloading
+  if (!skb_cloned(skb)) {
+      if (!skb_is_nonlinear(skb)) {
+          nfrags = 1;
+          goto skip_cow;
+      } else if (!skb_has_frag_list(skb)) {   /* <-- missing &&
+!skb_has_shared_frag(skb) */
+          nfrags = skb_shinfo(skb)->nr_frags;
+          nfrags++;
+          goto skip_cow;
+      }
+  }
 
-Changes for v17 - v20:
-- None
+The missing check allows an skb with SKBFL_SHARED_FRAG set (e.g. from
+vmsplice()/sendfile()) to bypass skb_cow_data() and proceed to in-place
+aead decryption via:
 
-Changes for v21:
-- Avoid double call of notifier_from_errno() on -EOPNOTSUPP
-- Rollback changes to driver state when switchdev_bridge_port_offload()
-  fails
+  aead_request_set_crypt(req, sg, sg, elen + ivlen, iv);
+  crypto_aead_decrypt(req);
 
-Changes for v22:
-- Reorder setting of br_members and master_dev to successful call of
-  switchdev_bridge_port_offload()
+This is the same page-cache corruption primitive as CVE-2026-43284.
 
-Changes for v23:
-- Update copyright notice
-- Clear the br_offload flag and enable switch port separation
+Please backport commit f4c50a4034e6 to linux-6.1.y.
 
-Changes for v24:
-- None
----
- .../net/ethernet/freescale/mtipsw/Makefile    |   2 +-
- .../net/ethernet/freescale/mtipsw/mtipl2sw.c  |   9 +-
- .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |   2 +
- .../ethernet/freescale/mtipsw/mtipl2sw_br.c   | 138 ++++++++++++++++++
- 4 files changed, 149 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+Affected versions: linux-6.1.x (all versions, fix not present)
+Fixed versions: linux-6.12.91+, mainline
 
-diff --git a/drivers/net/ethernet/freescale/mtipsw/Makefile b/drivers/net/ethernet/freescale/mtipsw/Makefile
-index a99aaf6ddfb2..81e2b0e03e6c 100644
---- a/drivers/net/ethernet/freescale/mtipsw/Makefile
-+++ b/drivers/net/ethernet/freescale/mtipsw/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- obj-$(CONFIG_FEC_MTIP_L2SW) += nxp-mtipl2sw.o
--nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o
-+nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o mtipl2sw_br.o
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-index 76e503e128dd..0a12d115b78b 100644
---- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-@@ -1961,11 +1961,15 @@ static int mtip_sw_probe(struct platform_device *pdev)
- 
- 	mtip_clear_atable(fep);
- 
-+	ret = mtip_register_notifiers(fep);
-+	if (ret)
-+		goto of_free_references;
-+
- 	ret = mtip_switch_dma_init(fep);
- 	if (ret) {
- 		dev_err(&pdev->dev, "%s: ethernet switch init fail (%d)!\n",
- 			__func__, ret);
--		goto of_free_references;
-+		goto unregister_notifiers;
- 	}
- 
- 	ret = mtip_mii_init(fep, pdev);
-@@ -1997,6 +2001,8 @@ static int mtip_sw_probe(struct platform_device *pdev)
- 			  fep->bd_dma);
- 	fep->rx_bd_base = NULL;
- 	fep->tx_bd_base = NULL;
-+ unregister_notifiers:
-+	mtip_unregister_notifiers(fep);
-  of_free_references:
- 	mtip_parse_of_cleanup(fep);
- 
-@@ -2009,6 +2015,7 @@ static void mtip_sw_remove(struct platform_device *pdev)
- 
- 	timer_delete_sync(&fep->timer_mgnt);
- 
-+	mtip_unregister_notifiers(fep);
- 	mtip_ndev_cleanup(fep);
- 
- 	mtip_parse_of_cleanup(fep);
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-index 72784df6c127..49d8454f7cd1 100644
---- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-@@ -640,6 +640,8 @@ int mtip_port_learning_config(struct switch_enet_private *fep, int port,
- int mtip_port_blocking_config(struct switch_enet_private *fep, int port,
- 			      bool enable);
- bool mtip_is_switch_netdev_port(const struct net_device *ndev);
-+int mtip_register_notifiers(struct switch_enet_private *fep);
-+void mtip_unregister_notifiers(struct switch_enet_private *fep);
- int mtip_port_enable_config(struct switch_enet_private *fep, int port,
- 			    bool tx_en, bool rx_en);
- void mtip_clear_atable(struct switch_enet_private *fep);
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
-new file mode 100644
-index 000000000000..c9d9151b0e81
---- /dev/null
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
-@@ -0,0 +1,138 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  L2 switch Controller driver for MTIP block - bridge network interface
-+ *
-+ *  Copyright (C) 2026 NABLADEV Software Engineering GmbH
-+ *  Lukasz Majewski <lukma@nabladev.com>
-+ */
-+
-+#include <linux/etherdevice.h>
-+#include <linux/netdevice.h>
-+#include <linux/platform_device.h>
-+#include <net/switchdev.h>
-+
-+#include "mtipl2sw.h"
-+
-+static int mtip_ndev_port_link(struct net_device *ndev,
-+			       struct net_device *br_ndev,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct mtip_ndev_priv *priv = netdev_priv(ndev), *other_priv;
-+	struct switch_enet_private *fep = priv->fep;
-+	struct net_device *other_ndev;
-+	int err;
-+
-+	/* Check if one port of MTIP switch is already bridged */
-+	if (fep->br_members && !fep->br_offload) {
-+		/* Get the second bridge ndev */
-+		other_ndev = fep->ndev[fep->br_members - 1];
-+		other_priv = netdev_priv(other_ndev);
-+		if (other_priv->master_dev != br_ndev) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "L2 offloading only possible for the same bridge!");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		fep->br_offload = 1;
-+		mtip_switch_dis_port_separation(fep);
-+		mtip_clear_atable(fep);
-+	}
-+
-+	err = switchdev_bridge_port_offload(ndev, ndev, NULL, NULL, NULL,
-+					    false, extack);
-+	if (err) {
-+		dev_err(&ndev->dev, "can't offload bridge port %s [err: %d]\n",
-+			ndev->name, err);
-+
-+		if (fep->br_members && fep->br_offload) {
-+			fep->br_offload = 0;
-+			mtip_switch_en_port_separation(fep);
-+		}
-+
-+		return err;
-+	}
-+
-+	if (!priv->master_dev)
-+		priv->master_dev = br_ndev;
-+
-+	fep->br_members |= BIT(priv->portnum - 1);
-+
-+	dev_dbg(&ndev->dev,
-+		"%s: ndev: %s br: %s fep: %p members: 0x%x offload: %d\n",
-+		__func__, ndev->name,  br_ndev->name, fep, fep->br_members,
-+		fep->br_offload);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static void mtip_netdevice_port_unlink(struct net_device *ndev)
-+{
-+	struct mtip_ndev_priv *priv = netdev_priv(ndev);
-+	struct switch_enet_private *fep = priv->fep;
-+
-+	dev_dbg(&ndev->dev, "%s: ndev: %s members: 0x%x\n", __func__,
-+		ndev->name, fep->br_members);
-+
-+	switchdev_bridge_port_unoffload(ndev, NULL, NULL, NULL);
-+
-+	fep->br_members &= ~BIT(priv->portnum - 1);
-+	priv->master_dev = NULL;
-+
-+	if (fep->br_members && fep->br_offload) {
-+		fep->br_offload = 0;
-+		mtip_switch_en_port_separation(fep);
-+		mtip_clear_atable(fep);
-+	}
-+}
-+
-+/* netdev notifier */
-+static int mtip_netdevice_event(struct notifier_block *unused,
-+				unsigned long event, void *ptr)
-+{
-+	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
-+	struct netdev_notifier_changeupper_info *info = ptr;
-+	struct netlink_ext_ack *extack;
-+	int ret = NOTIFY_DONE;
-+
-+	if (!mtip_is_switch_netdev_port(ndev))
-+		return NOTIFY_DONE;
-+
-+	extack = netdev_notifier_info_to_extack(&info->info);
-+
-+	switch (event) {
-+	case NETDEV_CHANGEUPPER:
-+		if (!netif_is_bridge_master(info->upper_dev))
-+			break;
-+
-+		if (info->linking)
-+			ret = mtip_ndev_port_link(ndev, info->upper_dev,
-+						  extack);
-+		else
-+			mtip_netdevice_port_unlink(ndev);
-+
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	return notifier_from_errno(ret);
-+}
-+
-+static struct notifier_block mtip_netdevice_nb __read_mostly = {
-+	.notifier_call = mtip_netdevice_event,
-+};
-+
-+int mtip_register_notifiers(struct switch_enet_private *fep)
-+{
-+	int ret = register_netdevice_notifier(&mtip_netdevice_nb);
-+
-+	if (ret)
-+		dev_err(&fep->pdev->dev, "can't register netdevice notifier\n");
-+
-+	return ret;
-+}
-+
-+void mtip_unregister_notifiers(struct switch_enet_private *fep)
-+{
-+	unregister_netdevice_notifier(&mtip_netdevice_nb);
-+}
--- 
-2.39.5
+Verified by: source comparison of net/ipv4/esp4.c and net/ipv6/esp6.c
+between linux-6.1.133 and linux-6.12.91.
 
+References:
+- CVE-2026-43284 (Dirty Frag)
+- Fix commit: f4c50a4034e6
+
+Thanks,
+boz
 
