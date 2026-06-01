@@ -1,143 +1,198 @@
-Return-Path: <netdev+bounces-293735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4KLTJih7HWrEbAkAu9opvQ
-	(envelope-from <netdev+bounces-293735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:29:28 +0200
+	id OGK6CvJ8HWrEbAkAu9opvQ
+	(envelope-from <netdev+bounces-293736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:37:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BBEB61F47B
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:29:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0EA361F599
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:37:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 79D7C300B9E7
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:29:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 56207300C336
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CD9377EAF;
-	Mon,  1 Jun 2026 12:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5012637B00C;
+	Mon,  1 Jun 2026 12:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T8Gpi6UG"
+	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="ZK8XN8qJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA313769F2;
-	Mon,  1 Jun 2026 12:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0F9377EDC
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 12:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780316956; cv=none; b=QJhzFdRyo+1fg7kLVvx3Qlam7nBI9eeXXboe1m2Z37UVit8lGFoh6s8tTNK+CC00zT2DlvZN9+KInwBd72ByyxIKTiw4CVBGg1zgs1gVyoL4zja+TPU2ZtUWENnK3DhGbMr/nQqerZN/ATwKZdHFBQjw8LMnJPuhpmFv93qc06E=
+	t=1780317413; cv=none; b=RHxNVWft+5Vrxz+dLEQha6RlGuQCP1ZoySMYfzUz19EZvU865S0XBm2govT+Yoc7LrJJdd/Qmkst/ze1v9xywBq1eN1F/6DYW9fImku0/4/yM8oIu8BiaTDRcgroI/qAitPU7NHic3+HkeghucLBwr2KHfhnKe8SVuDyMgRe7fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780316956; c=relaxed/simple;
-	bh=JPpYKXlBa4RFvW7actu/k5nlkmsuW6+Ne4hRxI8dc78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aijmv5IhknaXmB8EVmdH926u26D/y01lZoVekSrcwngETFijcg0TgiyfKRUAwSsu4Z+67nJbinruQAbvztt13Z3EBD7IpM9froV2XD8Q0nkrY2vM30fFaATlTeZdEUuUgoQY9rLYS/+OwBu6Dg+fvERmlVJ/XD8gd3jOJMfpE4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T8Gpi6UG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=iUNcxP5vUlsQw11K7iw0C8/gbeiciIxg4PjeApBK+Jo=; b=T8
-	Gpi6UGVu9AekjAumqqzMy7OkcbToxxlkqLfNI+lDKx5ijWT96PNJ3sKmBJrssAm7nDzvsSobk2Y7b
-	0eF5hrE0Npnc63i4+vJSmgWtkOwMoUrKqhweKPtkoI1c4SszjTn43MelZI5LNcQ5+Olrtzv502npz
-	zhd2vutXPkvjPuk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wU1lP-005V96-1j; Mon, 01 Jun 2026 14:29:03 +0200
-Date: Mon, 1 Jun 2026 14:29:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Grewstad <dogestad24@gmail.com>
-Cc: gregkh@linuxfoundation.org, jic23@kernel.org, jacobsfeder@gmail.com,
-	linux-staging@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, hjk@hansjkoch.de, davem@davemloft.net,
-	netdev@vger.kernel.org
-Subject: Re: [RFC] drivers/staging/axis-fifo: TODO file and subsystem
- direction
-Message-ID: <8f7eb9c7-6695-450c-81c4-fb96643adbc2@lunn.ch>
-References: <CAD03fjaBJGtNATBxaYO-PAxdKC=HxYgE+M7HQ_a0O+3Sp9Mruw@mail.gmail.com>
- <84d8f2a1-6562-47a9-93d7-2d7ff33c31c0@lunn.ch>
- <CAD03fjah2GMedDtauPQjP0++3USpy6tm3AUemgAjVHS=5Nirtg@mail.gmail.com>
+	s=arc-20240116; t=1780317413; c=relaxed/simple;
+	bh=nIiFM0zUQQ3DATlbqolt5LBx2SnOeqHNUP/dCUB29PE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JXh2Q9bQMUIDuSC4DrMfPNK8Ih2LI1VEWirEMaWAe+iIorRDBwXKmw1J1QxBkMAmuraEK/1RiN8RAuCwQ9aO3p0zpJErTMo/z4xIOZHw4Tkpjjlt605AGFjYNOD4HiJdVYvTdKs1H4G4xXRW8hJWS8Zk+fXEUadE3kaw471FdSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=ZK8XN8qJ; arc=none smtp.client-ip=23.88.38.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
+	s=09092022; t=1780317402;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VAwlRpw3cuwp2rmiwA0Nrn27eTvWbfo8mto76+Q0O6U=;
+	b=ZK8XN8qJO8nLAnBSKyr4xjuEVxi8nB1oAqHTzwf0ySKDSF0+/qJVjyIBo9s6JHEwI+2jNt
+	ul/RmutxaVsgIhgTaaPAtcw7BA2T/zvTKAa7XuLwAcwDVagVX7X7MdZv5wAW35b9zlf9/1
+	/pYZ2zzPvesj5Oc/Ddd+10eJENLI8YOYbPEhjw7xr7UXDwnpanaIhR5BN4oDNY/cqxEWkG
+	NpbHGa73JdRRHPw3WAqrXFU2H+3wgd30VA6CMMWrwrY3eEA9XrnQhz49G0AkRtGy9tA2gM
+	WS7t6bp2e/0+dZ39TVabuYkwiYfm3P4ZatUGeo5+Q4jhUl3yrOkKqP7iqa0gYQ==
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH net-next 00/15] pull request for net-next: batman-adv 2026-06-01
+Date: Mon,  1 Jun 2026 14:36:14 +0200
+Message-ID: <20260601123629.707089-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD03fjah2GMedDtauPQjP0++3USpy6tm3AUemgAjVHS=5Nirtg@mail.gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293735-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,gmail.com,lists.linux.dev,lists.infradead.org,vger.kernel.org,hansjkoch.de,davemloft.net];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293736-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,amd.com:url]
-X-Rspamd-Queue-Id: 5BBEB61F47B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,simonwunderlich.de:mid,simonwunderlich.de:dkim,open-mesh.org:url]
+X-Rspamd-Queue-Id: B0EA361F599
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Jun 01, 2026 at 11:35:14AM +0530, Grewstad wrote:
-> On Mon, Jun 1, 2026 at 1:22 AM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> >
-> > In addition to what GregKH said, look at the vendor information:
-> >
-> > https://docs.amd.com/r/en-US/pg080-axi-fifo-mm-s/Core-Overview
-> >
-> >   The AXI4-Stream FIFO core was designed to provide memory-mapped
-> >   access to an AXI4-Stream interface connected to other IP (such as
-> >   the AXI Ethernet core). Systems must be built through the AMD
-> >   Vivado™ Design Suite to attach the AXI4-Stream FIFO core, AXI
-> >   Ethernet core ...
-> >
-> > when used for Ethernet, a uAPI is not needed. The FIFO driver would
-> > just expose an kernel internal API the Ethernet driver would use. Are
-> > there any Ethernet devices using it? Is there a driver for the AXI
-> > Ethernet core?
-> 
-> As I said to Greg K-H, it's 'chameleon' hardware because we don't know
-> what it'll be used for. It could be SDR or Ethernet or whatever it is
-> programmed for. The main thing is that it is a streaming interface.
-> But we cannot assume the use case.
+Dear net maintainers,
 
-Flip that around. What is it actually used for today? Make sure it has
-the correct APIs needed for what it does now. New APIs can always be
-added latter, especially if they are in-kernel, code to glue it to an
-Ethernet driver for example. 
+here is a cleanup pull request of batman-adv to go into net-next. This
+pull request supersedes batadv-next-pullrequest-20260528 [1]. The
+following minor changes were made (I marked the changed patches with v2):
 
-However, a grep for XIL_AXIS_FIFO suggests nothing in-kernel actually
-uses it.
+* removal of version.h and switch to `init_utsname()->release` to dynamically retrieve linux version
+* switch back packet_size_max to signed integer datatype to match consumers
+* add missing kerneldoc for batadv_wifi_net_devices_init
 
-Are there any real users from user space? You talk about SDR, does GNU
-Radio use it? Using what hardware?
+Please pull or let me know of any problem!
 
-If you have no idea how the code is used, you cannot say what the
-correct interface is....
+Thank you,
+      Simon
 
-	Andrew
+[1] e-mail subject was: [PATCH net-next 00/15] pull request for net-next: batman-adv 2026-05-28
+reference: https://lore.kernel.org/all/20260528142924.329658-1-sw@simonwunderlich.de/
+
+The following changes since commit 68993ced0f618e36cf33388f1e50223e5e6e78cc:
+
+  Merge tag 'net-7.1-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-05-21 14:39:12 -0700)
+
+are available in the Git repository at:
+
+  https://git.open-mesh.org/batadv.git tags/batadv-next-pullrequest-20260601
+
+for you to fetch changes up to 3bd64ca11d9a1672d67d3130a7264c2cf7f93cdf:
+
+  batman-adv: use neigh_node's orig_node only as id (2026-06-01 14:22:03 +0200)
+
+----------------------------------------------------------------
+This batman-adv cleanup patchset includes the following patches, all by
+Sven Eckelmann:
+
+ - drop batman-adv specific version
+
+ - MAINTAINERS housekeeping for batman-adv (two patches)
+
+ - add missing includes
+
+ - use atomic_xchg() for gw.reselect check
+
+ - extract netdev wifi detection information object
+
+ - replace inappropriate atomic access with (READ|WRITE)_ONCE
+   (six patches)
+
+ - tt: replace open-coded overflow check with helper
+
+ - tvlv: avoid unnecessary OGM buffer reallocations
+
+ - use neigh_node's orig_node only as id
+
+----------------------------------------------------------------
+Sven Eckelmann (15):
+      batman-adv: drop batman-adv specific version
+      MAINTAINERS: Rename batman-adv T(ree)
+      MAINTAINERS: Don't send batman-adv patches to netdev
+      batman-adv: add missing includes
+      batman-adv: use atomic_xchg() for gw.reselect check
+      batman-adv: extract netdev wifi detection information object
+      batman-adv: replace non-atomic meshif config fields with (READ|WRITE)_ONCE
+      batman-adv: replace non-atomic hardif config fields with (READ|WRITE)_ONCE
+      batman-adv: replace non-atomic vlan config fields with (READ|WRITE)_ONCE
+      batman-adv: replace non-atomic mesh state with (READ|WRITE)_ONCE
+      batman-adv: replace non-atomic packet_size_max with (READ|WRITE)_ONCE
+      batman-adv: replace non-atomic last_ttvn with (READ|WRITE)_ONCE
+      batman-adv: tt: replace open-coded overflow check with helper
+      batman-adv: tvlv: avoid unnecessary OGM buffer reallocations
+      batman-adv: use neigh_node's orig_node only as id
+
+ MAINTAINERS                            |   4 +-
+ net/batman-adv/Makefile                |   1 +
+ net/batman-adv/bat_iv_ogm.c            |  65 ++++++-----
+ net/batman-adv/bat_v.c                 |  10 +-
+ net/batman-adv/bat_v_elp.c             |  15 ++-
+ net/batman-adv/bat_v_ogm.c             |  46 ++++----
+ net/batman-adv/bridge_loop_avoidance.c |  15 +--
+ net/batman-adv/distributed-arp-table.c |  17 +--
+ net/batman-adv/fragmentation.c         |   1 +
+ net/batman-adv/gateway_client.c        |   9 +-
+ net/batman-adv/gateway_common.c        |  14 +--
+ net/batman-adv/hard-interface.c        | 207 +++++++++++++++++++++++++++++----
+ net/batman-adv/hard-interface.h        |  34 +++++-
+ net/batman-adv/log.h                   |   2 +-
+ net/batman-adv/main.c                  |  42 ++++---
+ net/batman-adv/main.h                  |   4 -
+ net/batman-adv/mesh-interface.c        |  42 +++----
+ net/batman-adv/multicast.c             |   4 +-
+ net/batman-adv/netlink.c               |  80 ++++++-------
+ net/batman-adv/originator.c            |   8 +-
+ net/batman-adv/routing.c               |   6 +-
+ net/batman-adv/send.c                  |   6 +-
+ net/batman-adv/tp_meter.c              |   6 +-
+ net/batman-adv/translation-table.c     |  32 +++--
+ net/batman-adv/tvlv.c                  |  57 +++++----
+ net/batman-adv/tvlv.h                  |   3 +-
+ net/batman-adv/types.h                 | 138 ++++++++++++++--------
+ net/batman-adv/version.c               |  12 ++
+ 28 files changed, 581 insertions(+), 299 deletions(-)
+ create mode 100644 net/batman-adv/version.c
 
