@@ -1,164 +1,291 @@
-Return-Path: <netdev+bounces-293630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2J93BiRQHWooYwkAu9opvQ
-	(envelope-from <netdev+bounces-293630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:25:56 +0200
+	id EDtUKU1QHWooYwkAu9opvQ
+	(envelope-from <netdev+bounces-293631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:26:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD3A61C631
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:25:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B92561C65C
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59B08305A8E7
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:17:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF980308B7AE
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2E63905FD;
-	Mon,  1 Jun 2026 09:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CC538F65C;
+	Mon,  1 Jun 2026 09:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UmUCkA2N";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RkgwEhe8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LIiccJmv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16D6390200
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4324201004
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780305465; cv=none; b=f2G2bjlr1+JcUkMMNmRCByaR4rxzaeun7KvSiT71i/E/9DahX+lUtBxP403nEfjDzI1oF8+gidUZOOip/y750AW35KZ2tsZHsV/bGvTqmYKHp26bE/Oq6PfnjRYZGlzVuJtLAzPrLGdd7Pr4Jk0zD7sIMi0a+Qg5QSRoB263zj0=
+	t=1780305501; cv=none; b=nMXASBHAVECLzF+CRM5QCoc5MscDgC1ql+B1itcGCUn4S6p8iaE4jsy4wWYAC8pL2TitO7q4tUbHdVEguaSKol//Jorzz/E3KYOuXIPLosvJ7XzQe59Ivek+tD3zn1hPstncFx1Mf8YYTl8k/NbBhUw9MGN+wOxqzM97wy3p3CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780305465; c=relaxed/simple;
-	bh=sP7MrsIO97AwpHGDXGET6WA5flYKm1lMdo5clI7N7J8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iSBxz01RrxyMWFm/wCWJmJQUWGDzxLZnLZkO4sIMi95UTZBMaFfYxbKFYB1pGpozvgWG5/xKJAA6g9/nbVwL5lwYdYISUhkaom+rFAVHppcZbJJ3YwZt2O+Y2YspbiDDL6/PynDGgFTjMdsNKJ8foluCdjyLraILIHqycTrkNBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UmUCkA2N; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RkgwEhe8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780305461;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sP7MrsIO97AwpHGDXGET6WA5flYKm1lMdo5clI7N7J8=;
-	b=UmUCkA2N3nNWdKkFRLTaKNM8ys3K20O5NGeJZs3gs4irRfQfUld1WcCTmMeC/jVKqZ8HLH
-	RzoRzpGQHtM0rG9BSvCIbSCnvNUoKGnAgxuYLf2hqCQx13Ser57HKO4l71t+alYJODBiJt
-	9MPQs2yqubmOcCGjUmrMKi5CR9g3Cj0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-WhBcZKOPPlaj9I_rG7w8XA-1; Mon, 01 Jun 2026 05:17:40 -0400
-X-MC-Unique: WhBcZKOPPlaj9I_rG7w8XA-1
-X-Mimecast-MFC-AGG-ID: WhBcZKOPPlaj9I_rG7w8XA_1780305458
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-45efa12a788so976817f8f.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 02:17:40 -0700 (PDT)
+	s=arc-20240116; t=1780305501; c=relaxed/simple;
+	bh=yAnIuIPW6bgr7GNewpLtx74zv46gDD9gKqJDj8TJGxE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=f6mbsmDTleGyNv/aX8lSY7utpBEx8tWfvSJD592nShUoZ9cWqDTX7mN5nJ9kKamkAGU7Czz24tU4i0T6w+2hqzyf9scN7FWnu/stoloTymDIXpyY+jcqAy4L4TRw5alXkG1N0UNR7khpz5AJ4yjHYESktYEI/grDRR7t90C48BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LIiccJmv; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-914b5249bf6so1867287985a.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 02:18:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780305458; x=1780910258; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sP7MrsIO97AwpHGDXGET6WA5flYKm1lMdo5clI7N7J8=;
-        b=RkgwEhe8KZG+12odaE6/2T7DSspl/5hKyHcBjtUE9VKcO/a2u0ltk+N3YImA02IdmB
-         EUr7WS7BVv0mg+N0+hSdtK1skPyZC/mqMMBxlbvHM8YQddwvJhqifV4YHek4bH9ETTMt
-         G43T/1kgpabHEisnlNfJ7rJAGyuJuJf1r+59+x/QN8NpUfrnTRMGPO4QPJDuHjm9qwUZ
-         UP1mA37tGkkbAi0h36FUySWZo1sOwSTu0OfutTGnlyzMkB2B+lrvFeuf8liPFHVG4Q/6
-         M6kUGibiKuoYv5uQclJjPpCyxVJj3anpt5zssU8M0G1S0bJNmHyOQtMGcJRsp4HQjJrF
-         3qYA==
+        d=google.com; s=20251104; t=1780305499; x=1780910299; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+EMjoMJukK2L6kFVJX3+Oxh4XT/xOq7sLXPdrf2ZlVU=;
+        b=LIiccJmvaZHQn+/bwYi3UIgYZVRMoyP9f8ENY0Zlm28Jjj/85ke2togeLYrOriR3Vu
+         h20stZ9Hk762jRyiqOmKeojXaEhdi1XsgXWq7YX3BL/5XblUJzWHMLd8+wVBUAHwISCM
+         bmzYHxLBN5kv7xy5nCl4CQlofDtcxBJyXb+m0PFiIJ0iAR84XysN3xnUge4eX6MV7vWq
+         bMKUypZ2yCp0tCB/Cxq8rfi+BuO4D0VfTx0LFU3ZPxOmg6/5ddMN+2wufRfedSal8JqH
+         lynGowkCMqqzOyV17763oiGRsYAHrFHP1x6CsSZVzptKNtl8LLlMF802/eRD1P9pY9nx
+         Z9ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780305458; x=1780910258;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sP7MrsIO97AwpHGDXGET6WA5flYKm1lMdo5clI7N7J8=;
-        b=gNm9L0KmT8EcxFUUKu2dwzNwaW6DNHHOCzLSHejFsqYg+1Wik456PUbHyo6P2vNhPI
-         Q1ncqstFwXRQbrisB1SoIpexBvkkd/iJ4m1XjdbDViQyLPMGD21g+cEbnEp18uyXKcO/
-         zKZrb26r87xgsaZ5diBaKxVWFf0COirhd8w9ksqhS7Evf76E6uZBXB1GkMdSkmdwl6Gw
-         Ji+g1fWEDBuITbxSc1m3vlETAwjN8keiUudCkQrLqQZCVLj/IWBHK9jEGEsWLYv715hH
-         tSuP+MAzFoF6zQD6ZbxG/SR0IkkyA3z1WhWuKEX3itgBFLLBc/wPYLKqxCRSGlWVSKkr
-         KYdA==
-X-Gm-Message-State: AOJu0YxIi3xcMivS+DruQofMg6p1VFxsX1BMWmCo7DL+GcGp/aT9Qrx/
-	3Mi0WKbPZ2t78cZYHJ1iJEKb/pTJp8rkehYgBwAu8r/ivxUOOL6CibF8UpefDwFWm3CEBB+nD3a
-	71ZcKbrmswHUr8UiU5EY6GON3gllCddz7+i9MKb44ye5IESVyfqp9CIpJ8nJ3GiriSw==
-X-Gm-Gg: Acq92OF5H0FiUX+vImAgw4/AyjcXsmcdeLqUdQ3Ug/1CJKnEQMl1txBwteFBPz72bSI
-	C2SyJcv4lqbQ/d5075UDZmaz8CQYmjQoFdgOJ9/AvDsdtHo3fjIQESNPYwiJYzF9RNRdvRi2DBJ
-	gNuROmSaXSSp5AOPE0/7gbYWRKP87H4LJubGIKtaEZzlK5F90lpCuGNdzlpGSIBXEW9G0/2fhO9
-	XuDljE55xy4VXgeohmlGQ7FCeTuASIjf4Tj6CsCPWTlxJxB33z7rBkjBxskhu+cRXxmHstVhXPM
-	RXmm3VWk2pY10ff1fhiMIP/m1sDSzE7Q6UEVNX6lX76WoPyTr/rO/Lx2G4F7/pQzqfaN9KVHBsR
-	lBLRvF6sIpx9ERT5tkbpjzncHPJzkxNWj1Z3DRCPbhh4+mApqwhujZA0ldYr6Y7fsJ4Hb
-X-Received: by 2002:a05:600d:848a:b0:490:9d1b:f06b with SMTP id 5b1f17b1804b1-490a2943afamr127462525e9.26.1780305458152;
-        Mon, 01 Jun 2026 02:17:38 -0700 (PDT)
-X-Received: by 2002:a05:600d:848a:b0:490:9d1b:f06b with SMTP id 5b1f17b1804b1-490a2943afamr127462225e9.26.1780305457728;
-        Mon, 01 Jun 2026 02:17:37 -0700 (PDT)
-Received: from [192.168.88.32] ([169.155.232.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909d68a925sm361104055e9.2.2026.06.01.02.17.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 02:17:37 -0700 (PDT)
-Message-ID: <94938164-c0bf-4ddd-bb5c-d8e1c4725612@redhat.com>
-Date: Mon, 1 Jun 2026 11:17:36 +0200
+        d=1e100.net; s=20251104; t=1780305499; x=1780910299;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+EMjoMJukK2L6kFVJX3+Oxh4XT/xOq7sLXPdrf2ZlVU=;
+        b=gjEKTKYxzQNGy4IIUFGWs4C73K7KpZRqDAes1sKSbxNddD8AmhobwLIiFn3BlNfdQO
+         VnL+xBxUG1v4TObljzF19/V913pAgK1V5+5OAWNtcUuv0y++d1VpNNtyAbuTCF9hUJtN
+         utybTm3yI7nPRXHSjvFYG72NSVu77R2/ESt6375tDyLHOjfDSF3mxLqitR0tKTRRN4ri
+         KFpBw94NZy4nHBogRuXqswkGGKJeJ0d7ib3d8vUgxZ4IdlwUI0Iqq1wsEE2ZO04m4ItS
+         Qt0MrQEq2YNqV3LWajfj7y1OoaVt+2uqhzvXucysyuWo6TogRN4R1aoXtVHtnFCCkLpy
+         BdXg==
+X-Forwarded-Encrypted: i=1; AFNElJ+6m6fgl8WWJBEag09BFzTeLPTlTSB4DcxOVCRe/rNl6cHcL6VhcmyptbPrPIeZFMgCta3XSoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywp42Uliel0Zj/ZATHhqR08ceOb10NYGAooR2ifkyVG6pMRvWrx
+	dGRnoHxqqSypa1Npjbr9fRDhGCcbLHFHPbJxf/7rxYdCQM2nEFL2m/X1ZOHGfxsWbswbAx2Ebwp
+	xuUxntfGiav/Zrg==
+X-Received: from qkee25-n2.prod.google.com ([2002:a05:620a:2319:20b0:914:ab43:2e46])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:26a4:b0:8cd:9033:1724 with SMTP id af79cd13be357-9153d938381mr1668818785a.9.1780305498443;
+ Mon, 01 Jun 2026 02:18:18 -0700 (PDT)
+Date: Mon,  1 Jun 2026 09:18:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] atm: fix use-after-free in vcc_sendmsg during device
- deregistration
-To: Zhenghang Xiao <kipreyyy@gmail.com>, 3chas3@gmail.com
-Cc: netdev@vger.kernel.org
-References: <20260526103926.1640-1-kipreyyy@gmail.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260526103926.1640-1-kipreyyy@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
+Message-ID: <20260601091816.444738-1-edumazet@google.com>
+Subject: [PATCH net-next] mptcp: change mptcp_established_options() to return opt_size
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293630-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293631-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 6CD3A61C631
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vmlinux.new:url]
+X-Rspamd-Queue-Id: 0B92561C65C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/26/26 12:39 PM, Zhenghang Xiao wrote:
-> vcc_sendmsg() checks VCC state flags (ATM_VF_RELEASED, ATM_VF_CLOSE,
-> ATM_VF_READY) before calling copy_from_iter_full(), but does not re-check
-> after copy returns. copy_from_iter_full() can block on user-space page
-> faults, and if the ATM device is deregistered during that window via
-> atm_dev_deregister() -> atm_dev_release_vccs() -> vcc_release_async(),
-> the driver frees its per-device private state. When sendmsg resumes, it
-> calls vcc->dev->ops->send() which dereferences the freed memory.
+Instead of passing opt_size address to mptcp_established_options(),
+change this function to return it by value.
 
-It looks like that the release path and vcc_sendmsg() do not acquire any
-shared look. If so this does not fix the issue, it just makes the racing
-window smaller and on CONFIG_PREEMPT=y kernel, the racing window could
-be still arbitrary wide.
+This removes the need for an expensive stack canary in
+tcp_established_options() when CONFIG_STACKPROTECTOR_STRONG=y.
 
-/P
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 0/0 grow/shrink: 0/3 up/down: 0/-92 (-92)
+Function                                     old     new   delta
+tcp_options_write.isra                      1423    1407     -16
+mptcp_established_options                   2746    2720     -26
+tcp_established_options                      553     503     -50
+Total: Before=22110750, After=22110658, chg -0.00%
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/mptcp.h   | 18 +++++++++---------
+ net/ipv4/tcp_output.c |  7 ++++---
+ net/mptcp/options.c   | 31 ++++++++++++++++---------------
+ 3 files changed, 29 insertions(+), 27 deletions(-)
+
+diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+index f7263fe2a2e40b507257c3720cc2d78d37357d6d..cd4639beceaa53c573135ddaeb7528a80b4ca824 100644
+--- a/include/net/mptcp.h
++++ b/include/net/mptcp.h
+@@ -149,9 +149,9 @@ bool mptcp_syn_options(struct sock *sk, const struct sk_buff *skb,
+ 		       unsigned int *size, struct mptcp_out_options *opts);
+ bool mptcp_synack_options(const struct request_sock *req, unsigned int *size,
+ 			  struct mptcp_out_options *opts);
+-bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+-			       unsigned int *size, unsigned int remaining,
+-			       struct mptcp_out_options *opts);
++int mptcp_established_options(struct sock *sk, struct sk_buff *skb,
++			      unsigned int remaining,
++			      struct mptcp_out_options *opts);
+ bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
+ 
+ void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *tp,
+@@ -266,13 +266,13 @@ static inline bool mptcp_synack_options(const struct request_sock *req,
+ 	return false;
+ }
+ 
+-static inline bool mptcp_established_options(struct sock *sk,
+-					     struct sk_buff *skb,
+-					     unsigned int *size,
+-					     unsigned int remaining,
+-					     struct mptcp_out_options *opts)
++static inline int mptcp_established_options(struct sock *sk,
++					    struct sk_buff *skb,
++					    unsigned int *size,
++					    unsigned int remaining,
++					    struct mptcp_out_options *opts)
+ {
+-	return false;
++	return -1;
+ }
+ 
+ static inline bool mptcp_incoming_options(struct sock *sk,
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index ef0c10cd31c71ff585a937fde37f2b08b1214b5a..31b459ecbe8307a8660623038fea6fa7b0860f7f 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -1181,10 +1181,11 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
+ 	 */
+ 	if (sk_is_mptcp(sk)) {
+ 		unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+-		unsigned int opt_size = 0;
++		int opt_size;
+ 
+-		if (mptcp_established_options(sk, skb, &opt_size, remaining,
+-					      &opts->mptcp)) {
++		opt_size = mptcp_established_options(sk, skb, remaining,
++						     &opts->mptcp);
++		if (opt_size >= 0) {
+ 			opts->options |= OPTION_MPTCP;
+ 			size += opt_size;
+ 		}
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index 8a1c5698983cff3082d68290626dd8f1e044527f..53528301394d70072dde6614feca6128ea949436 100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -836,13 +836,14 @@ static bool mptcp_established_options_mp_fail(struct sock *sk,
+ 	return true;
+ }
+ 
+-bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+-			       unsigned int *size, unsigned int remaining,
+-			       struct mptcp_out_options *opts)
++int mptcp_established_options(struct sock *sk, struct sk_buff *skb,
++			      unsigned int remaining,
++			      struct mptcp_out_options *opts)
+ {
+ 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(sk);
+ 	struct mptcp_sock *msk = mptcp_sk(subflow->conn);
+ 	unsigned int opt_size = 0;
++	int total_size = 0;
+ 	bool snd_data_fin;
+ 	bool ret = false;
+ 
+@@ -852,20 +853,20 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+ 	 * option space.
+ 	 */
+ 	if (unlikely(__mptcp_check_fallback(msk) && !mptcp_check_infinite_map(skb)))
+-		return true;
++		return 0;
+ 
+ 	if (unlikely(skb && TCP_SKB_CB(skb)->tcp_flags & TCPHDR_RST)) {
+ 		if (mptcp_established_options_fastclose(sk, &opt_size, remaining, opts) ||
+ 		    mptcp_established_options_mp_fail(sk, &opt_size, remaining, opts)) {
+-			*size += opt_size;
++			total_size += opt_size;
+ 			remaining -= opt_size;
+ 		}
+ 		/* MP_RST can be used with MP_FASTCLOSE and MP_FAIL if there is room */
+ 		if (mptcp_established_options_rst(sk, skb, &opt_size, remaining, opts)) {
+-			*size += opt_size;
++			total_size += opt_size;
+ 			remaining -= opt_size;
+ 		}
+-		return true;
++		return total_size;
+ 	}
+ 
+ 	snd_data_fin = mptcp_data_fin_enabled(msk);
+@@ -877,9 +878,9 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+ 		ret = true;
+ 		if (mptcp_established_options_mp_fail(sk, &mp_fail_size,
+ 						      remaining - opt_size, opts)) {
+-			*size += opt_size + mp_fail_size;
++			total_size += opt_size + mp_fail_size;
+ 			remaining -= opt_size - mp_fail_size;
+-			return true;
++			return total_size;
+ 		}
+ 	}
+ 
+@@ -887,27 +888,27 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+ 	 * TCP option space would be fatal
+ 	 */
+ 	if (WARN_ON_ONCE(opt_size > remaining))
+-		return false;
++		return -1;
+ 
+-	*size += opt_size;
++	total_size += opt_size;
+ 	remaining -= opt_size;
+ 	if (mptcp_established_options_add_addr(sk, skb, &opt_size, remaining, opts)) {
+-		*size += opt_size;
++		total_size += opt_size;
+ 		remaining -= opt_size;
+ 		ret = true;
+ 	} else if (mptcp_established_options_rm_addr(sk, &opt_size, remaining, opts)) {
+-		*size += opt_size;
++		total_size += opt_size;
+ 		remaining -= opt_size;
+ 		ret = true;
+ 	}
+ 
+ 	if (mptcp_established_options_mp_prio(sk, &opt_size, remaining, opts)) {
+-		*size += opt_size;
++		total_size += opt_size;
+ 		remaining -= opt_size;
+ 		ret = true;
+ 	}
+ 
+-	return ret;
++	return ret ? total_size : -1;
+ }
+ 
+ bool mptcp_synack_options(const struct request_sock *req, unsigned int *size,
+-- 
+2.54.0.1013.g208068f2d8-goog
 
 
