@@ -1,263 +1,248 @@
-Return-Path: <netdev+bounces-293847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECjkFca5HWoedQkAu9opvQ
-	(envelope-from <netdev+bounces-293847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:56:38 +0200
+	id cHZ1F+a6HWoidQkAu9opvQ
+	(envelope-from <netdev+bounces-293848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:01:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A559C622E56
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:56:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21D1C622F53
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C76093008D2D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:54:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED8B5300AC1E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67504343898;
-	Mon,  1 Jun 2026 16:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C8539DBE1;
+	Mon,  1 Jun 2026 16:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WbGf3Bp1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4ylPAKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A773F39B4BB;
-	Mon,  1 Jun 2026 16:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6DA36A023;
+	Mon,  1 Jun 2026 16:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780332847; cv=none; b=Ov39bbFww1R+vAxjuqkufyncZOcK29dl9vGJ2jMpo3stIdRUt8qvx1aPbr6Bj1y07kMQsZPJnxBH9KZM2fYucPZQIZtyyJMLHBNKejfF92PVIbRf9LAJ3it8YfliIr7gdzgnEhlv2SHkyDpqs/Allff2n4GlCu/DXas1hu5Ftq0=
+	t=1780333045; cv=none; b=jh+FUFMRvZ4LSblAxoB2dF8Qtabi4AVk/J3xm/VewDwHEWiuw2+2oadt+qCAEmJ3CYWAr8unWM0OjAwJ9ogDDrSQsiQ5MlzuvYcxQxals84QpgzmWHEFip5G4Erc52H3FCEjRqTRjEZijLgNhFTXQ6Dg62lSn6vgJBi1ZUnHbnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780332847; c=relaxed/simple;
-	bh=BaHPl2b/jO+xhJdx44dgLRKJvbOveIqbphK/IW0KPG0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IqOt8SnzpcY3XE8bXG0iTD3NMveaabr3AsgY26w6GnfsSWYMTtkMkqxW0qTc510oe2ATSL8DfFF0WITUbsx5Ebn1SpDEGcrYPwaZ9oB0M3T1LrUEsgOEIq0QPi7BjRVnJ6ya2CSzkJehgWvQzH6Ksu3xxdVeaOWoFVoVcawXGSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WbGf3Bp1; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=BaHPl2b/jO+xhJdx44dgLRKJvbOveIqbphK/IW0KPG0=; b=WbGf3Bp1onixyilqJoFLMVuDDX
-	xfwSGdsk87rzEOLDBdp4Bx2c89gOsDAGYPPAdkTfOITephPZag093OgWS3zSuJG/3GVKcUGFC255R
-	BqIYZ8EvldiqEC4KO43RGxfX2YryTuqkrPAnZ3JLCFS3/HnM5+cShi7SckJP/RQT0ScA25etKqMWu
-	CcPUd6IoxebwaMxR+v3PWZ5fZxSW/4f0d+Na04t/6qu1AjKjSxQFgsN90qdGU0J6RxfCe048Ih3HS
-	9DetvR7vgyZd2+mBBygfHDrLzC8BGl2IEb9jMPOix43F0xsKBc9KCFrHfQAv+k8KdhODb78VrzyKj
-	jiP38LJw==;
-Received: from [2001:8b0:10b:5:5b40:b57d:669c:36f4] (helo=u09cd745991455d.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wU5te-00000000RBj-2Hjz;
-	Mon, 01 Jun 2026 16:53:51 +0000
-Message-ID: <0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
- directory split
-From: David Woodhouse <dwmw2@infradead.org>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>, Jakub Kicinski <kuba@kernel.org>, 
- tglx@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com,  pabeni@redhat.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org,  jstultz@google.com, anna-maria@linutronix.de,
- frederic@kernel.org,  daniel.lezcano@kernel.org, sboyd@kernel.org,
- vladimir.oltean@nxp.com,  wei.fang@nxp.com, xiaoning.wang@nxp.com,
- jonathan.lemon@gmail.com,  vadim.fedorenko@linux.dev, yangbo.lu@nxp.com,
- svens@linux.ibm.com,  nick.shi@broadcom.com, ajay.kaher@broadcom.com,
- alexey.makhalov@broadcom.com,  bcm-kernel-feedback-list@broadcom.com,
- linux-fpga@vger.kernel.org,  imx@lists.linux.dev,
- linux-s390@vger.kernel.org, dust.li@linux.alibaba.com, 
- xuanzhuo@linux.alibaba.com, mani@kernel.org, imran.shaik@oss.qualcomm.com, 
- taniya.das@oss.qualcomm.com
-Date: Mon, 01 Jun 2026 17:53:49 +0100
-In-Reply-To: <ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
-References: <20260407104802.34429-1-guwen@linux.alibaba.com>
-	 <20260407104802.34429-3-guwen@linux.alibaba.com>
-	 <20260412084704.743482ad@kernel.org>
-	 <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
-	 <20260412095301.4fe1fe65@kernel.org>
-	 <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
-	 <1088b07d760491deb461d6d01abca631e8f8d86c.camel@infradead.org>
-	 <ahzQZg_v4bxFfGdj@hoboy.vegasvil.org>
-	 <3908843460c4864eef79cced40d897f793c7ae2a.camel@infradead.org>
-	 <ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-VlDPaE1pzXHdYpveufIV"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1780333045; c=relaxed/simple;
+	bh=xyevwjMyr7vNl7ZzQrplOkY6U4utGgfVUdUraOPnOEM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UMTarWnDxl1xCNj5Ic7acpJDI724z5eND9RJfimySUAJBFrtQHO3fpzx/13Lf/GspBDuXz5akNCUCFy+wXwz7q/9W3PT3XEj9fUjTIFg+IvxBNDpYeO8emnc9L3QK+T3qyc/lJJyBnvZM7s1CRG/G+/eWlRbEdkpPO3pLcv60uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4ylPAKx; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC6D1F00893;
+	Mon,  1 Jun 2026 16:57:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780333043;
+	bh=w290A9I5MP2KqxKWsP3Z4me4Ofs//TPogdWk1zGmNOU=;
+	h=From:To:Cc:Subject:Date;
+	b=e4ylPAKxe33GcwzjIzqBzb+z6N1ataV9FHjcSujTtJdg8vP64JGHFhYcX5VYiQ5Uh
+	 xRfMiMVatyJw/RueV5uoT9we3r6eMt1WOVYrmQhpLmfi78FebOOKWr/D3lxCkNqi5+
+	 VSQqfNFIiZMW0CjYZobD+iJ1x+mDvpsLreDbjvCrMcKrmVyIbyye3MhsmM7DsUCYI5
+	 spJCeerKj1UhgUoHz9F17wMz9wahG5Xkp/CT2bsG3s+MuYZsirDjk/QL2GPJu9p6zO
+	 kK5B95dWR+LRYuCYDm7XpClzxtRRo99XlHRJrocIUQOJl1c0VJ0b7qNyNB63mBJrKm
+	 1P9X7Jx8diMHA==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>,
+	Kyle Hendry <kylehendrydev@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Subject: [PATCH] [v3] [net-next] net: dsa: b53: hide legacy gpiolib usage on non-mips
+Date: Mon,  1 Jun 2026 18:56:42 +0200
+Message-Id: <20260601165716.648230-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293847-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[arndb.de,kernel.org,oss.qualcomm.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293848-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[broadcom.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FROM_HAS_DN(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,oss.qualcomm.com];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,infradead.org:mid,infradead.org:dkim]
-X-Rspamd-Queue-Id: A559C622E56
+	RSPAMD_EMAILBL_FAIL(0.00)[arnd.arndb.de:query timed out,bartosz.golaszewski.oss.qualcomm.com:query timed out];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,broadcom.com:email,arndb.de:email]
+X-Rspamd-Queue-Id: 21D1C622F53
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: Arnd Bergmann <arnd@arndb.de>
 
---=-VlDPaE1pzXHdYpveufIV
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The MIPS bcm53xx platform still uses the legacy gpiolib interfaces based
+on gpio numbers, but other platforms do not.
 
-On Mon, 2026-06-01 at 08:20 -0700, Richard Cochran wrote:
-> On Mon, Jun 01, 2026 at 08:03:26AM +0100, David Woodhouse wrote:
-> > If we move all the plain non-network PHC drivers (which, as noted,
-> > is
-> > basically *all* of them) into a drivers/ subdirectory, then perhaps
-> > we
->=20
-> Sorry, just catching up here, so the idea is to have
->=20
-> =C2=A0linux/drivers/ptp/drivers=C2=A0 ?
+Hide these interfaces inside of the existing #ifdef block and use the
+modern interfaces in the common parts of the driver to allow building
+it when the gpio_set_value() is left out of the kernel.
 
-That is my current suggestion.
+Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
+Reviewed-by: Linus Walleij <linusw@kernel.org>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+v3: add -EPROBE_DEFER check
+---
+ drivers/net/dsa/b53/b53_common.c | 20 ++++++++------------
+ drivers/net/dsa/b53/b53_priv.h   | 25 +++++++++++++++++++------
+ 2 files changed, 27 insertions(+), 18 deletions(-)
 
-It stems from Jakub's response in
-https://lore.kernel.org/all/20250815113814.5e135318@kernel.org/ that "I
-really wish someone stepped up and created a separate subsystem for all
-these cloud / vm clocks. They have nothing to do with PTP."
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index 2c4131ed7e30..06b8be8dc4db 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -19,7 +19,7 @@
+ 
+ #include <linux/delay.h>
+ #include <linux/export.h>
+-#include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/kernel.h>
+ #include <linux/math.h>
+ #include <linux/minmax.h>
+@@ -965,17 +965,17 @@ EXPORT_SYMBOL(b53_configure_vlan);
+ 
+ static void b53_switch_reset_gpio(struct b53_device *dev)
+ {
+-	int gpio = dev->reset_gpio;
++	struct gpio_desc *gpio = dev->reset_gpio;
+ 
+-	if (gpio < 0)
++	if (IS_ERR(gpio))
+ 		return;
+ 
+ 	/* Reset sequence: RESET low(50ms)->high(20ms)
+ 	 */
+-	gpio_set_value(gpio, 0);
++	gpiod_set_value(gpio, 0);
+ 	mdelay(50);
+ 
+-	gpio_set_value(gpio, 1);
++	gpiod_set_value(gpio, 1);
+ 	mdelay(20);
+ 
+ 	dev->current_page = 0xff;
+@@ -3092,7 +3092,6 @@ static int b53_switch_init(struct b53_device *dev)
+ {
+ 	u32 chip_id = dev->chip_id;
+ 	unsigned int i;
+-	int ret;
+ 
+ 	if (is63xx(dev))
+ 		chip_id = BCM63XX_DEVICE_ID;
+@@ -3173,12 +3172,9 @@ static int b53_switch_init(struct b53_device *dev)
+ 		return -ENOMEM;
+ 
+ 	dev->reset_gpio = b53_switch_get_reset_gpio(dev);
+-	if (dev->reset_gpio >= 0) {
+-		ret = devm_gpio_request_one(dev->dev, dev->reset_gpio,
+-					    GPIOF_OUT_INIT_HIGH, "robo_reset");
+-		if (ret)
+-			return ret;
+-	}
++
++	if (PTR_ERR(dev->reset_gpio) == -EPROBE_DEFER)
++		return -EPROBE_DEFER;
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
+index bd6849e5bb93..cd27a7344e89 100644
+--- a/drivers/net/dsa/b53/b53_priv.h
++++ b/drivers/net/dsa/b53/b53_priv.h
+@@ -148,7 +148,7 @@ struct b53_device {
+ 	u8 duplex_reg;
+ 	u8 jumbo_pm_reg;
+ 	u8 jumbo_size_reg;
+-	int reset_gpio;
++	struct gpio_desc *reset_gpio;
+ 	u8 num_arl_bins;
+ 	u16 num_arl_buckets;
+ 	enum dsa_tag_protocol tag_protocol;
+@@ -467,23 +467,36 @@ static inline void b53_arl_search_read(struct b53_device *dev, u8 idx,
+ #ifdef CONFIG_BCM47XX
+ 
+ #include <linux/bcm47xx_nvram.h>
++#include <linux/gpio.h>
+ #include <bcm47xx_board.h>
+-static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
++static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_device *dev)
+ {
+ 	enum bcm47xx_board board = bcm47xx_board_get();
++	int gpio, ret;
+ 
+ 	switch (board) {
+ 	case BCM47XX_BOARD_LINKSYS_WRT300NV11:
+ 	case BCM47XX_BOARD_LINKSYS_WRT310NV1:
+-		return 8;
++		gpio = 8;
++		break;
+ 	default:
+-		return bcm47xx_nvram_gpio_pin("robo_reset");
++		gpio = bcm47xx_nvram_gpio_pin("robo_reset");
+ 	}
++
++	if (!gpio_is_valid(gpio))
++		return ERR_PTR(-EINVAL);
++
++	ret = devm_gpio_request_one(dev->dev, gpio,
++				    GPIOF_OUT_INIT_HIGH, "robo_reset");
++	if (ret)
++		return ERR_PTR(ret);
++
++	return gpio_to_desc(gpio);
+ }
+ #else
+-static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
++static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_device *dev)
+ {
+-	return -ENOENT;
++	return ERR_PTR(-ENODEV);
+ }
+ #endif
+ 
+-- 
+2.39.5
 
-There was some further bikeshedding in
-https://lore.kernel.org/netdev/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.a=
-libaba.com/
-around how to split 'emulated' from other hardware drivers, but I don't
-much like that taxonomy. Some of these "virtual" clocks could just as
-easily exist in hardware with PTM too.
-
-My observation is that with the sole exception of ptp_inet.c, *all* of
-the actual PHC drivers that live in drivers/ptp instead of drivers/net
-are "pure clock" drivers, so perhaps we split those all out into
-drivers/ptp/drivers/ and exclude them from the netdev maintenance?
-
-I'm reluctantly prepared to host and help maintain a drivers tree if
-it's necessary, but equally as happy to let you own it.=20
-
-
-
---=-VlDPaE1pzXHdYpveufIV
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYwMTE2NTM0
-OVowLwYJKoZIhvcNAQkEMSIEIM6KxngPB0di1Tja+BOQxhXkaoH9rylPF9YhDjy/9yAOMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAqvOuiJ+HFg1p
-ZRPKKYA4u+TuISYFfF7B0qRzbKya3iTbaiwg4gC6mFKcL66SX3PGEHYBo32VOiYAWVF4FY+xyLGz
-hDvaTyGgqm+gejCwb6g3TdR0AITDEezZa0L6elqwuB3dEKK/tY6JeFNjaUEalhS37mZjkGWKgGEY
-PKQ4zol/zrgrJskOpUMRBSF1L+FYnxpI8HQEa3gFYbyy7V4C4l/kAYdaXU+Ah0CZ//FT0lL07VjD
-Xj0dVbu/96PBWe2gbtnvrOqA9GFzPShrOPUyDhSZ+XycwIaKasiUO46sdJKL3LM5+4kL7ydcHQwh
-0V5zHbVldzgRQRaFrZrNQ6ZnZbqZ4VsPYLaBJPpuvhNMY9uo6wGWm23uLj2kl7gaWETde3Y+Wax/
-RVA9F0SvrBl3cGd0000gF6lVxefnP/3IONZ8omDWZW4XNQssqbkcJmO7SXlOLcogppOiZ0ftgiM3
-hgoL1F6MkqAN7OuyPG6oA+KvXtlhW7v/LTjMqIsti0NctDto81ESAqLJo5rWuUanGHPAzLwVqUYd
-YFdLXxdv7la/CqxDLCbm7xAd5s+aBt4HBfXur9V+3NxWTFLd7uyUK2t62Scz9se176/X9yCC0xf6
-eAtd3NoNnkJY5yLJwhUxRun8xSm5D/aj1LN7WstgAZVnyayCS1hxgY1/s2IVWvkAAAAAAAA=
-
-
---=-VlDPaE1pzXHdYpveufIV--
 
