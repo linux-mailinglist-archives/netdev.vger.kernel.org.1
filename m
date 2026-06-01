@@ -1,220 +1,200 @@
-Return-Path: <netdev+bounces-293844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293845-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OD5yFwO5HWrKdAkAu9opvQ
-	(envelope-from <netdev+bounces-293844-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:53:23 +0200
+	id WMSBDHi5HWrKdAkAu9opvQ
+	(envelope-from <netdev+bounces-293845-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:55:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE970622D6B
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:53:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 829A5622DF5
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:55:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C70D73008A51
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:43:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BFCA1303769C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1049311967;
-	Mon,  1 Jun 2026 16:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55ED032570D;
+	Mon,  1 Jun 2026 16:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="P/vNU1Od";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="PtaSyuwP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0M4qnYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57AA30F52A
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 16:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780332225; cv=none; b=AXYr5txCDtbevLIYa9JZFi/cBNNao8sdjCffp3IjAHgp3shtFw27kH0gx7IWFn+E2XQRhvYQoXax7gs9CvX3mTdMIxNq/e5w/JxHBek6LlcL45sxOnbafi3FXLNa5nRHsyO7qgi6rK8oiQ3hC6i9gimR1VuXsOtlFEaPqESwFyc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780332225; c=relaxed/simple;
-	bh=UlXEm+i+k44CyKC5aSYUVFRZQA/jHSrahJnL46L456E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=clqxq1pgWEW8KThlueK1tm2nwysMpFjFW6JpHv/91lwC+JuDtYkJ3xfI7f34cCMNNmc2p8fNHzJcPGjNHpeLJZwWc7qelxgVWgIOX9u4KVTP0mzPRe0mbzs5kf32D9dqNufvuXB5Y3ZKmguUoJv2Ethw6GZssudfFHSaHyAqmDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=P/vNU1Od; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=PtaSyuwP; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651FND7d145081
-	for <netdev@vger.kernel.org>; Mon, 1 Jun 2026 16:43:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	WtiwZwpjkTnh2Sai/6GSgEosRHj71tYSabTEvDWIVr8=; b=P/vNU1OdypBYaTYN
-	7HRGLgW9SNKj/sxjM2AScepTvqf1G9sMBJFqA9DcylgozKTIpn6COWMZdYl/by+L
-	FsiVaQjYCKbg+0LgRKrxX+oN8cvzDegcvZAXDGdszPJDZH12LDWabgh36s+T2Mqs
-	I5IiIIzT7c5E3JhILSMyYFfCgjDz69vdzttYiLpTtKcaKZI22WB9fzAnlDKjRZkB
-	KZsh1wZHMlMR8BinRz9Xe9KsB/culnKLSyP5PQtoJK+MIKeETzbB+tVCZl4p/K63
-	YrjeqgkVMuCEFTQgVYAkpGfxKXGc1RW3iV9L7IBj7gpJ2VQD8ki7JRt4QXHHGA8P
-	B2Ukxg==
-Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eh6stsy6u-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 16:43:44 +0000 (GMT)
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-304df51ff3eso4354376eec.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 09:43:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28207310779
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 16:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780332363; cv=pass; b=NkhikqPRebcTNAGpISTosBHkAhzKlWIweTJHeiZimi94R89jtj1MY77EX9OnWWHLCkAaHIn0KuaGTO/888iRXz76EDKEk3+8PQZDnM3Jc/882tSauSaIm3xw8+VNGA0JjFNwcTJxXAIqZbSOHAAK3k3nodpU9u4OdShIFNp+0AU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780332363; c=relaxed/simple;
+	bh=nozntogzwu8XrYMaALgJ/9r5EMgDTBdhZKxzPsTSeOg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SqjScm1LBjvdOWQcD+WvAvG0+mAWjGmbMnfu1TolFnxFAmeWB6Y5gvN9WrOX5I0ILQA08S1zyIwEyi66Lxlmlv5esHgG3tqEIv3M+2MEyxymczRQVF9Yxe9eCSn6HAzh4ZKdFYhtVwBnZGpHYoJkk/JMVSptF2Fsgmw0dQShQX8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0M4qnYl; arc=pass smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36dac5d5da0so621790a91.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 09:46:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780332361; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ChxXfrID3OjeuergWWiC78gyTgxWX75++fKjIFcsX7hHuzPD8z7JEZ3TKOQvt/dXOz
+         XgPdypAdZsfJC5XQGEAFURIIup493mp2bN7/EpGtFdusBYDwRlwK8MfZ0vDVjkshskyb
+         MIMpZGFPAN1YLmblSXNdd4f7cH3bSmWgqYHZ2vtdiGFiLilPNq/yZ9G/P4O16f6XZuQo
+         rdMVM0nfLhNu2QpaQ+bEdI4Smem3zJtqxci2jI8OLoiAVcyfJsrdJyG4C+y9cgGrC0oU
+         JPC4n1mUtNC/8GY43Eq3uda4Gnzi5vCEChY4MpEWE+Qct5RclDVagkeAkIRATog0l35s
+         WDjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6ANhlLkwHvRoelO6mK6br0cQySzE0loZY7WZgKnNoyg=;
+        fh=dRE+umWMkh2TIExOs2vQ4m3Zk2GM+Au+WZZWsXoXA6k=;
+        b=GHCJxAm3VaproTAm+rNHEMfhxJ/nwKfXhOkRq3gymHU5CcDgOftGsc/54O+DYwxinq
+         bIhRcxDYJJmwM1YDP6kU4leYQdoH3C1mZuYMdGitY/+XTeIfckjVZ5fE8uRJEO+Xzl93
+         vLcl4mDWsWGHxGU2F/Eh3S1C4KtL6O7VJyhRm1oaQbC+tD5BvXV1ta19NE3yxTdugDnU
+         01OlBppGrc9436pra3RXal70QiVrvRtjTZ5Jxmka1vFaInfesBCIWsoDe5Er0phPIfmU
+         oTzq6zMO4whXqTxCV3AE0OLwDUvJ+DtmDJi3LhJvBCGkqBguZ/jOiC1y1UIeGT2nwRVc
+         YiGg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1780332223; x=1780937023; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WtiwZwpjkTnh2Sai/6GSgEosRHj71tYSabTEvDWIVr8=;
-        b=PtaSyuwPZ3XGpE0z+4TBthpSjd5FKN7hsctfL+eGP1kQHpsPUDESzfH9NFwBFFdMNH
-         rWwOdbTkJxPATo0adD0vHAizWdHaZzJBljCbLkz/CRCWxWwklDTSjRTP/RrZAH3FW0ge
-         0kZu9ai4pSbKnINyN1Z/cWLqGZ1U6e3dNl7wM8r6EBNK40oNlh9YnhPqsPyBYVVVR2U/
-         yCEp1za7O7fKK5wHNSNB6Z1n2tTI9LZVTclQXP6PNH4FjfQo+t6PIAP7g232ReB0Q1AK
-         I7WXmQI+bNFBTlubQv5MbC4hmNkXQb86sWPsP9RDBbzvwBHa7O0Q3/VoudjuJ1qAssGK
-         Mh2A==
+        d=gmail.com; s=20251104; t=1780332361; x=1780937161; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6ANhlLkwHvRoelO6mK6br0cQySzE0loZY7WZgKnNoyg=;
+        b=i0M4qnYlNI7K9IKot6mK0VcIXHVmji37zDfHPwbAA8gtSfkAyShyuLHqrVdL4F7KAE
+         zjoQbT71o5dpCgjaK3Ln9cmgRglZ/3dsu55XM4TQ+QVlJtgu/VFxTs0uNcEF5ZQDU1C/
+         N3lQzFXg/bIcxCsmOuPzG+pvkxzfeR9u5BbIsyPE5mFi/2PV7f5qa0zBTvpf0Q+/dKNa
+         A3AbsoIFOCRsrH8/TS6hNOuhqtQMJJKzMsTfUKtNfsPquptItYaVquA5sjHl2Qq1ZlQR
+         qkPe8h/lE310ySHrWJ+iHR4eqQLsOSMyvDo8YeTGnDuvHfPiuXLsK/UnIus0uICoPlU7
+         I4KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780332223; x=1780937023;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WtiwZwpjkTnh2Sai/6GSgEosRHj71tYSabTEvDWIVr8=;
-        b=GfWu+qdDEt6o+afddb0KNyHnTQ6kxfF7ptddVp4bfdFCIzskgP3ewE8z+jZA0W98QS
-         Hq0lEs8aMpisuqASUPxGaEew2myF21KjhTzAy7j2D7rKs0k71t90fHZvNzcZ5jZgLlHv
-         qdlsUuxYcuym3odr/03OGYkSi+in8TRYRlYIy6MzC8uALO1I8e2MQFhIVgcQuXqq3dT+
-         mDmOKGrCV7OYi7INHBGQSZg3Jz2Fwzc/B3LwHRfq0et2RYLPa83w7SSkhRI1w/LDO3a5
-         AMcJK5bVMjPxvIlENEuG2FD640UdfKafoFWW6mSF7GB4p6N9WZiFKT/8wV4RSswsHzy3
-         /kHA==
-X-Gm-Message-State: AOJu0YyWwkjn9g2Ha497EdhqAQly1tdHQKRjNR4Q8YSjL+qdvMCrb2zv
-	9pfVOoo2vBKk2c8D/kuudvwFuoBB4U1z1Y6z3UhOZgKPyXjSZ1ETJFkb/1JsA7ufTJYcads0rLA
-	QMLLIogWzu0Av855tfw5SqkztStnYbVsIoyBLEdt8I7t4jOZTHz4tK7yMJs2e63xaQQs=
-X-Gm-Gg: Acq92OGGmWG4c5olfzWgb61k/kzbb3qZh5kUsyqubrUoEIgn2A55M1mz5tGmwbrtwP5
-	dhA2W7tUsIv8dOlV1SRiD+7UKy3rER/78lx8znhMaD3ZqbfFUD/26/X6Nx2ta4e2lWPCiem5COL
-	M9JTFYDWtCU5EDAUvx5HdkZLg+tDYF99p0xL5LMNfhlCRK0sk7dfMRDTCouyDGjkrxdn+rmTqeR
-	AB1qL/TMCpfzri+otC9Z8R3tcnq4AuomzLUFLHjUCqIffj2GNgThl86MwAM0WDJVzkB1auqW2b5
-	AshF6UIE5VbKPQTPysIrG8T4026ZiQgUT2Kz9ZxsMQkPE2M2G4HdOIWyEY/bVw9XkC87+jKtdx9
-	UWtgPY2dsO9qPtn/Q1jXxhJapYnjj9B0WNz2qT1yQGfPpKA0BK+STXoyqOzH0yRmfnOQ4+lkP0y
-	NRZz4CXe9Ym3dzCrc2
-X-Received: by 2002:a05:7300:e58b:b0:2f2:5c68:5074 with SMTP id 5a478bee46e88-304fa5163f7mr5520139eec.13.1780332223355;
-        Mon, 01 Jun 2026 09:43:43 -0700 (PDT)
-X-Received: by 2002:a05:7300:e58b:b0:2f2:5c68:5074 with SMTP id 5a478bee46e88-304fa5163f7mr5520118eec.13.1780332222761;
-        Mon, 01 Jun 2026 09:43:42 -0700 (PDT)
-Received: from [10.227.110.203] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-304ed2bdda4sm8487913eec.2.2026.06.01.09.43.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 09:43:42 -0700 (PDT)
-Message-ID: <a28df759-d0e9-41c0-97c7-5f89a18d54e2@oss.qualcomm.com>
-Date: Mon, 1 Jun 2026 09:43:41 -0700
+        d=1e100.net; s=20251104; t=1780332361; x=1780937161;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6ANhlLkwHvRoelO6mK6br0cQySzE0loZY7WZgKnNoyg=;
+        b=Y/g/Bhm0rB0FTlsu7Pd9L7PzD5uS0rHygcXu3Qxv7YcvT3FFy67A3JrvrIBsvwj1wI
+         kDcDwKBNh4S6gXs+xny1Zt7z3qx9ouwF6YVig6ku9+6cdkUh3BukXh44DTdkDQK49sPd
+         DP59n6DjQVXimHTK+DKAEfPWBMS+WKv0+6Rfn4OiVz2ZG34Mh5lrY1JZO0KOLmxnqFJ6
+         noXQJ/Lzw6GrT2NmXCpQDljlZJQuqnG15dvAeyy6pCN+ma9eT7Klfc4cAotzXKQ8OwiJ
+         HktzVh1ZhhxefFi6q4O/W+qKnB3cYk3+38qdenpS0I92wgsIB0TKlQhCkc3S8gAmZmnt
+         LN/Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/7PbyTCllBipvXunKNfzC4QRpK12ID0pWmd154YFTcu+3E1BcKpxOBKch6j/2bwiJQd2gfw0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydMFD0NVGJzYW8j+PrHTrU3RAIWHGyMWRezXq6beBMWXO/ZTJI
+	rhiwX6gKXtTM0mFUz2iEy9sUYZLInXepCGl3x4x+3CH1QeCl80kHwkUF7xhOyRcO6/kQkrxHvzt
+	pmxozkiA3ChXYO8DcSb4ab1U6PBmvjDQ=
+X-Gm-Gg: Acq92OHGE8uGLxBRfKrlFOEhqLhbGpGduy1GOpC8DdTuiG93TQ2kTH9zTwEnArOElGE
+	IhMTunf+/34DSyyLfuVvsDyNmocXHhegDUvDREtol1befvtyzPbwq7xaxLBRB/jC4MMK9l1Qhj5
+	saasVFlxG/p8xG+dHzc7l4oKgR/vrQS6skCs3Ei/leImNUmqfiXCTkDSrf2LAqm8QPIYtiXmgou
+	Q+DufsVAJCt77LvN7zoCb3vW3lg0Xl8xofeum/wGHMHNhJaPjKt40b7pGxnW5Ic8p9aUhXViB4x
+	6/RFqVSTYITwEb/3tCs=
+X-Received: by 2002:a17:90b:3a4e:b0:36b:ba9b:7efb with SMTP id
+ 98e67ed59e1d1-36c4fef39c9mr11682696a91.5.1780332361350; Mon, 01 Jun 2026
+ 09:46:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: net-next 32-bit clang build error in net/netfilter/nf_synproxy_core.o
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-References: <20260528123911.284536-26-johannes@sipsolutions.net>
- <178001352190.1565998.2039430206651171575.git-patchwork-notify@kernel.org>
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <178001352190.1565998.2039430206651171575.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAxMDE2NiBTYWx0ZWRfXwwHpeayyT9gw
- wnSPkhnryQMU2H/RXem/1Nnc5jF55hGS/lxWEEqzH7jx3Qo7bClx54o7OHgak5NLvN/EKcP2rAZ
- JSqm1LhrdP+q+FnHohrvagwv/gxYMci6n+hWfHH69FhS/EohtHcWZPcraD18bVS9gagkWqMGDRn
- WGAYpCAiOxM/oJWYv1ZNhKkl1JYH78Fs8/s+wnPVy2PShHYTHysJ8OHBB3dc36hD/WnsXiwRQ5h
- rfC0mmuC7yEAk22MByG6lp4kwV4uZJJ3MnQ5XgDOL26Idj/2+dvzSnBygYdDEP4CzvFepVDVyTO
- MNTywQ+QWBskAJiNHjULxgzCEivFL3OYLTp2wYDGicEuiRv8mY6OmVbtp+RzV56E7agIDhXvPBC
- wv6IEyNaMZv0FkUb6kkRe/hIB1GvWAPif3JF2nBiDoTwuy+gcHxkewLMogQ5GbVI1wep1mX8I3z
- s3t5v9VlwJefTo2J07w==
-X-Proofpoint-ORIG-GUID: jWELa985_H9BY1yErKLlu-MViyXmM1SN
-X-Authority-Analysis: v=2.4 cv=HrNG3UTS c=1 sm=1 tr=0 ts=6a1db6c0 cx=c_pps
- a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
- a=VwQbUJbxAAAA:8 a=KXNP7wE5b9nUYBElON4A:9 a=QEXdDO2ut3YA:10
- a=bBxd6f-gb0O0v-kibOvt:22
-X-Proofpoint-GUID: jWELa985_H9BY1yErKLlu-MViyXmM1SN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-01_04,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 lowpriorityscore=0 bulkscore=0
- clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0 phishscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2606010166
+References: <CAD03fjaBJGtNATBxaYO-PAxdKC=HxYgE+M7HQ_a0O+3Sp9Mruw@mail.gmail.com>
+ <84d8f2a1-6562-47a9-93d7-2d7ff33c31c0@lunn.ch> <CAD03fjah2GMedDtauPQjP0++3USpy6tm3AUemgAjVHS=5Nirtg@mail.gmail.com>
+ <8f7eb9c7-6695-450c-81c4-fb96643adbc2@lunn.ch>
+In-Reply-To: <8f7eb9c7-6695-450c-81c4-fb96643adbc2@lunn.ch>
+From: Grewstad <dogestad24@gmail.com>
+Date: Mon, 1 Jun 2026 22:15:49 +0530
+X-Gm-Features: AVHnY4KRCdi0h0Pqu6KDLr2ceAipTIZUEfDFKMo7TgmBS2phs0b3-uUhiqQc9gQ
+Message-ID: <CAD03fja5oG3-BrQoy4+LEmCWPYGW_JWDEkaPndjSVz=PbRj4wg@mail.gmail.com>
+Subject: Re: [RFC] drivers/staging/axis-fifo: TODO file and subsystem direction
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: gregkh@linuxfoundation.org, jic23@kernel.org, jacobsfeder@gmail.com, 
+	linux-staging@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, hjk@hansjkoch.de, davem@davemloft.net, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	TAGGED_FROM(0.00)[bounces-293845-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,gmail.com,lists.linux.dev,lists.infradead.org,vger.kernel.org,hansjkoch.de,davemloft.net];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293844-lists,netdev=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:mid,oss.qualcomm.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:dkim];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.994];
+	FROM_NEQ_ENVFROM(0.00)[dogestad24@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: AE970622D6B
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,amd.com:url,lunn.ch:email]
+X-Rspamd-Queue-Id: 829A5622DF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/28/2026 5:12 PM, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
-> 
-> This pull request was applied to netdev/net-next.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
-> 
-> On Thu, 28 May 2026 14:37:26 +0200 you wrote:
->> Hi,
->>
->> Here's a new set of changes, mostly ath and iwlwifi
->> drivers this time.
->>
->> I have a few more things pending, and I expect a few
->> more drivers will have pull requests later too.
->>
->> [...]
-> 
-> Here is the summary with links:
->   - [GIT,PULL] wireless-next-2026-05-28
->     https://git.kernel.org/netdev/net-next/c/e7d6bd24e883
-> 
-> You are awesome, thank you!
+Thanks. My research shows that no user-space application depends on
+this driver. As you said, we cannot determine the subsystem without
+knowing the actual end users.
 
-wireless-next/main has fast-forwarded to e7d6bd24e883 and I'm in the process
-of also fast-forwarding ath/ath-next, but I'm seeing a build failure:
+Thanks,
+Arihan Bhor
 
-In file included from ../net/netfilter/nf_synproxy_core.c:7:
-In file included from ../include/linux/skbuff.h:26:
-In file included from ../include/net/checksum.h:21:
-In file included from ../arch/x86/include/asm/checksum.h:9:
-../arch/x86/include/asm/checksum_32.h:149:6: error: inline assembly requires more registers than available
-  149 |         asm("addl 0(%1), %0     ;\n"
-      |             ^
-1 error generated.
-make[5]: *** [../scripts/Makefile.build:289: net/netfilter/nf_synproxy_core.o] Error 1
-
-This is with "ARCH=i386 LLVM=llvm-19.1.7-x86_64/bin/"
-
-I use a config made via: make $allmodconfig
-
-A lore search doesn't show any recent instances of this issue.
-
-Rebuilding from scratch shows the same issue.
-
-Any thoughts?
-
+On Mon, Jun 1, 2026 at 5:59=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Mon, Jun 01, 2026 at 11:35:14AM +0530, Grewstad wrote:
+> > On Mon, Jun 1, 2026 at 1:22=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wro=
+te:
+> > >
+> > >
+> > > In addition to what GregKH said, look at the vendor information:
+> > >
+> > > https://docs.amd.com/r/en-US/pg080-axi-fifo-mm-s/Core-Overview
+> > >
+> > >   The AXI4-Stream FIFO core was designed to provide memory-mapped
+> > >   access to an AXI4-Stream interface connected to other IP (such as
+> > >   the AXI Ethernet core). Systems must be built through the AMD
+> > >   Vivado=E2=84=A2 Design Suite to attach the AXI4-Stream FIFO core, A=
+XI
+> > >   Ethernet core ...
+> > >
+> > > when used for Ethernet, a uAPI is not needed. The FIFO driver would
+> > > just expose an kernel internal API the Ethernet driver would use. Are
+> > > there any Ethernet devices using it? Is there a driver for the AXI
+> > > Ethernet core?
+> >
+> > As I said to Greg K-H, it's 'chameleon' hardware because we don't know
+> > what it'll be used for. It could be SDR or Ethernet or whatever it is
+> > programmed for. The main thing is that it is a streaming interface.
+> > But we cannot assume the use case.
+>
+> Flip that around. What is it actually used for today? Make sure it has
+> the correct APIs needed for what it does now. New APIs can always be
+> added latter, especially if they are in-kernel, code to glue it to an
+> Ethernet driver for example.
+>
+> However, a grep for XIL_AXIS_FIFO suggests nothing in-kernel actually
+> uses it.
+>
+> Are there any real users from user space? You talk about SDR, does GNU
+> Radio use it? Using what hardware?
+>
+> If you have no idea how the code is used, you cannot say what the
+> correct interface is....
+>
+>         Andrew
 
