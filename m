@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-293876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OJ8NTPMHWrXegkAu9opvQ
-	(envelope-from <netdev+bounces-293876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:15:15 +0200
+	id cJ+rOorLHWrHeQkAu9opvQ
+	(envelope-from <netdev+bounces-293877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:12:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41281623D2D
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:15:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A76D623CC2
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A634830376B7
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:07:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6B9793042C4B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9203E3179;
-	Mon,  1 Jun 2026 18:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4BA3E5577;
+	Mon,  1 Jun 2026 18:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jW5F+J+T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h59ozYOb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A2F3E316D
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E669F3E3C7A
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780337262; cv=none; b=DY1IMCGUdcTTw3Oy3+qswQ6MTaVeJPVczia+HeOOBw8c27pvIwts8V0Juw02pfR8gn+OY2XiaYdSrkvNKHoSLxgPbskL/5/5Rfseuw+tyOslufn0gh1PVr5IVfAGs4tk+8ZPYvMx5rPbPykJCpw1N13GjI1UGHx4BLqaLPsKLYk=
+	t=1780337267; cv=none; b=msNk2YapTjCwJ1x9IKyDUdOUaHvo24QfCXvoGrOTlSx5B8pmZ2O8ZMv8XXtX6XtHGlLg905PmNgfU+XiuxXkODTFhka4Zg35fBf/jqi8zbWmIGMgedJPU8h82IEeopHOVZ6R1wtT+5dF27+N8JMcm3Jhk+OOXR2tayfUjKl/Z1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780337262; c=relaxed/simple;
-	bh=H7aNs2wN7213ow2RavgerurEBbg+1krK7dr1GtyEYHw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o3f0j7JVNQ1eLX5w16/+RGPPlyVqvyGkX0CjlRwseWyIE9IocWCypznMzqnu011BkPWmwHz9QtJsopycDVo9/lHM0WoVnUmPB6NsNjYTfoSgk7dICSM8Ykd1tOIElItOQNPIyjEpthunaIIjwVS/lNCajVoq0v22CdQq1h23wbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jW5F+J+T; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1780337267; c=relaxed/simple;
+	bh=VOiBXoBQlSg//vVKEz2y7OxY1/2p9gdtUZWvw/YqZPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Kyvh5LALL927lBa5Tf9zRByUQprqHlyQeTiGRNdh8cWAhf9/LbG0rfVYfk0IuBzkcqhOZgbogDdQzzzq829Wu3aP0LCjj/3Zy4uXU0U8CUFFPTgFpsW7VSnwGY56cqYB5eM0KUlzrRp8oa4qciglMJSl8cmmS2bWuz3d/VhdCOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h59ozYOb; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8423f53332aso583069b3a.3
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:07:41 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8423f869421so1136045b3a.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:07:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780337261; x=1780942061; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gQie9R+iM/u9UZvBcBXG8EPU7/7n/2I9ejVDjywMwo=;
-        b=jW5F+J+TyrN96HRTzBWrQQyi2zSJboGAl+6aCz+tF8pVGD8gE7C/dqRULuH5bLGu36
-         JK+rUN1mndevMSRCPbkSDswq33QPwtWCKBbjSFEZ06U/AyqI2f7k8VpxBMLXCUJPDpSl
-         zpBrehEtB03atguovHG2tI6Y/NErn1L7ZZTHngTPLAdVg0jw406PQXGAITUv9crLrsoy
-         tGGflFosTTYQex/+4ahvkDqQ5jdlSgnbbMSzz/IweGqZLu+v73qFo3U+Kv6DEGAl634U
-         XzFbnMGJHcsMQ1EA6GAG9G8Le+edD+7igJ/P/f4uBIICw+uZjln/lDylVwv7abS+PWCU
-         rAtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780337261; x=1780942061;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1780337265; x=1780942065; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9gQie9R+iM/u9UZvBcBXG8EPU7/7n/2I9ejVDjywMwo=;
-        b=QSGhy2WNFjd2+MFAA5NUVjvnOKI0pxi5Nuf8syEiI0L6HOfeW567SgbW71fyEqUYUW
-         sSyGT8FLVirB1BHB+65uIwV7yGE76GONwFySmPZ6eQYpQNREyrUM9Zf6FAcZDtiCq5yM
-         xzOzysy6aGAgVxlpJYNngo3J+SAWg2oML6FqmUuJDdkuD8U2D3YTvhEB2bqYCVBC6qxY
-         hEyP/8lWHcOlMuxjVoGu2N+TYxPxI4L4V/pEJg34CWTQFWYD3E102QE1fRLeNyqpzKEN
-         6aN4g4LrDuJzOAlM5jzjaCWjp4Y8jFWiJzDjaK9NPRWn3Vlyt41lxn5sCzcFivYCWMh9
-         E1Aw==
-X-Gm-Message-State: AOJu0YyIEUFOeoEZD4zK6tOyeLh9MiGeFqJHR/gbK40EQV+XGAr9Xbsd
-	bnvKiFNjRo9eZHoxQgjAUDX/caf2fJNUrKTNSonZD26eu3nIB/vN13bv
-X-Gm-Gg: Acq92OEx3QafD7sn/1i5IuccLMqJuXdHurAR7J422FrtIDZJCKwEsQQ0wxkkN6qBoJI
-	G4HzTLoVAivht+cqjlTanNytlUOg6VoX+VmbOyfMbS3+eDPSmO/coIaW4Z7wi3QzTAmnmLG/5UA
-	6MgnwSFx08mM8DzfPOTEo1N6AqpSl6AxOJbNzHjuBQBinOacoEjZgy4DVjK1TytI0P70H4oKbkH
-	o31bA3DCDGDG+hihM+okfIc93L4y10Bu3hHuAfuJaD69G8GxEkaLOIk2gykI4rNkw79cRvq6bx/
-	Rt12ybZ2ltc8XLo2uQF1l0ROhTI8Vi3YLEiTw2UtvY0gM2dBBCJ31ggMMpS0PUKHWp99gk7S/Ny
-	7mkQdgJHD1S4AJCON4JnuEkFhcdLQ6ceDRfFYoTTNL6B3o/Leam820qob4nrcmxFKdmkD+Q/XzI
-	WH7dkCSCP4c8KU/9I11CqZPE6tMEJcuSotHLjOR8lQH6g=
-X-Received: by 2002:a05:6a00:7599:b0:842:3373:f66e with SMTP id d2e1a72fcca58-84233741059mr7935773b3a.28.1780337260635;
-        Mon, 01 Jun 2026 11:07:40 -0700 (PDT)
+        bh=v6ImwceoKhc+jAOboR4IDZozN81GRjqesHGaUtrdZGI=;
+        b=h59ozYObRoBy1PbUCSJg4RtI5W1efa4NDpDuts4ihvyNzrdSul3kfRlltHNdWm44aq
+         kP28DqRymhIMGmWev1nY+po6o19ZvMjZ5Jb1Ictp8VK0nKtC+j+5jhcQSvLDPjMEKcjq
+         nZwl6QQ+NvvWr+POmKyu6n+XX0norKSCNMGXB5nSJM5myYBJKG35lJj+qCqGyAUvv8Tv
+         bsBdVr5P7wv+sElRM4T9prha9zMW//IE1IUV8P9CTCYIKPGxKfBN7eLWfvfKoNWM6hJk
+         MqzIQ51gugHReGoDKMTmcGgT41Wugeh/6YE7YFfODKPzjwxJL+SO/0LW+1CNXPVozv1X
+         EbWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780337265; x=1780942065;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=v6ImwceoKhc+jAOboR4IDZozN81GRjqesHGaUtrdZGI=;
+        b=qAizy+mJNkcN9tfl/X05pvceGoKiDqGDUu5sQfFpYDFj/cX3/fBcA2RH4HgK4hyehC
+         LZ64uHSsYXl3evnKK4d2lQtCBakwhlZUU5elodJ/CCt6KLbwwshG05Xeq7r5n0tdALXp
+         MXO/AyB5zI6jOHGzmQpiugDGA3EIPZySlKQOGhAj9KW0bmk9tdVFAlU/12ova7miTlfy
+         dJKqX5gGK2AvNJoraEYgLggysKEMLHpjQnvGdoOLHEJOYBMWC8nJ70XIfohDfCCGq4tx
+         /SO4QOyoT9dY8hP/uIm2Oo0Jwywlv1jlP/LMhMVbcguSgwltyscVXpX8AxqcKBscnrc5
+         6rnQ==
+X-Gm-Message-State: AOJu0YwU/r/WTX1LdrfunXiI9G838xR0cJ++RAIV1xkeowpB3T6wb+VE
+	uk2q6Ja4LNau1njAgDgCCKetj6dW7+QoULk8Z/z64EocNnRCqexdR/Ek
+X-Gm-Gg: Acq92OHmwlIyJpJMdM2izpB/MwXxrVsf74HooPrexT0hKzE2hYFyk/Cys5JNveohBYC
+	ZF/QbmS9ExcDvtWfbrOy0HeMxmpPJhkWxfs0eu5wlDCBvSEOtSQ4OUXWhRC0Smzq8nCXWDw/tga
+	mxWe5hsnniLaWM0tAnukZWHio8NzRnixOLsLHpsKilq8NQ8Lap8HUKiEvhV/m+AsAQewUxloDzI
+	k2+hI6weoQDyN4NdXR68tTSmyTqsSGbsPA6v+HnCY5utBFxFrrgZ0nJVMipW38r3Ohaiv2UuorO
+	M6scXVfwt1/imVj6BsfvxyXZS3w1ooonNfdbezl1IP8Z5GtHkE18bvgoK9o11e8a0uldrh/qHVr
+	eFSmQs0BNi4Ij/7ogzu+nUFskg+kIJVMBwCLJb5kShcmYkQFiVMaS/+jRRICb17U0OeX7FLtJA1
+	i1JaHkgQBLLUrPECRgOBgqmEdAjtw1Nv/wqxUw0a8Uu1Y=
+X-Received: by 2002:a05:6a00:21d2:b0:842:5a8d:303a with SMTP id d2e1a72fcca58-8425a8d41a0mr3825753b3a.37.1780337265000;
+        Mon, 01 Jun 2026 11:07:45 -0700 (PDT)
 Received: from localhost.localdomain ([212.107.31.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84237a41a3esm7389702b3a.22.2026.06.01.11.07.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84237a41a3esm7389702b3a.22.2026.06.01.11.07.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 11:07:40 -0700 (PDT)
+        Mon, 01 Jun 2026 11:07:43 -0700 (PDT)
 From: Zhenzhong Wu <jt26wzz@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -92,10 +94,12 @@ Cc: netdev@vger.kernel.org,
 	eddyz87@gmail.com,
 	shung-hsi.yu@suse.com,
 	tamird@kernel.org
-Subject: [RFC PATCH 6.1.y 0/2] bpf: backport scalar not-equal tracking fixes
-Date: Tue,  2 Jun 2026 02:03:58 +0800
-Message-ID: <20260601180400.1381736-1-jt26wzz@gmail.com>
+Subject: [RFC PATCH 6.1.y 1/2] bpf: drop knowledge-losing __reg_combine_{32,64}_into_{64,32} logic
+Date: Tue,  2 Jun 2026 02:03:59 +0800
+Message-ID: <20260601180400.1381736-2-jt26wzz@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260601180400.1381736-1-jt26wzz@gmail.com>
+References: <20260601180400.1381736-1-jt26wzz@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,7 +114,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -119,9 +123,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,google.com,suse.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293876-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293877-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
@@ -132,128 +136,142 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 41281623D2D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 6A76D623CC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi BPF maintainers,
+[ Upstream commit 9e314f5d8682e1fe6ac214fb34580a238b6fd3c4 ]
 
-This RFC backports two BPF verifier scalar range-tracking fixes to 6.1.y.
-The series is intended to fix a verifier state-pruning issue where an
-impossible scalar path can be kept while the real success path is pruned.
+When performing 32-bit conditional operation operating on lower 32 bits
+of a full 64-bit register, register full value isn't changed. We just
+potentially gain new knowledge about that register's lower 32 bits.
 
-This is a verifier scalar range-tracking issue, not a helper-specific
-issue.
-The visible failure is that the verifier can prune the real success
-continuation, which should not be skipped, and keep only an impossible one.
-In the reproducer, the traced function returns 15 at runtime, but the
-verifier keeps the path where r7 is treated as 0, hard-wires the opposite
-branch, and the program reports the error branch.
+Unfortunately, __reg_combine_{32,64}_into_{64,32} logic that
+reg_set_min_max() performs as a last step, can lose information in some
+cases due to __mark_reg64_unbounded() and __reg_assign_32_into_64().
+That's bad and completely unnecessary. Especially __reg_assign_32_into_64()
+looks completely out of place here, because we are not performing
+zero-extending subregister assignment during conditional jump.
 
-The minimized reproducer uses fexit/bpf_get_func_ret only because it
-provides a compact way to create the interesting register flow: one scalar
-in r0 for the helper status, and another scalar loaded from the stack for
-the traced function return value. The issue is not specific to
-bpf_get_func_ret itself.
-Because bpf_get_func_ret() was added in v5.17, this particular reproducer
-directly applies to 6.1.y. I have not built a 5.15.y-compatible reproducer.
+So this patch replaced __reg_combine_* with just a normal
+reg_bounds_sync() which will do a proper job of deriving u64/s64 bounds
+from u32/s32, and vice versa (among all other combinations).
 
-The relevant verifier-log bytecode from the reproducer is below. The later
-instructions only store r7 into a map so user space can observe which
-branch the verifier kept.
+__reg_combine_64_into_32() is also used in one more place,
+coerce_reg_to_size(), while handling 1- and 2-byte register loads.
+Looking into this, it seems like besides marking subregister as
+unbounded before performing reg_bounds_sync(), we were also performing
+deduction of smin32/smax32 and umin32/umax32 bounds from respective
+smin/smax and umin/umax bounds. It's now redundant as reg_bounds_sync()
+performs all the same logic more generically (e.g., without unnecessary
+assumption that upper 32 bits of full register should be zero).
 
-  15: (85) call bpf_get_func_ret#184    ; R0_w=scalar() fp-8_w=mmmmmmmm
-  16: (79) r7 = *(u64 *)(r10 -8)        ; R7_w=scalar() R10=fp0
-  17: (15) if r0 == 0x0 goto pc+1       ; R0_w=scalar()
-  18: (bf) r7 = r0                      ; R0=scalar(id=1) R7=scalar(id=1)
-  19: (55) if r0 != 0x0 goto pc+6       ; R0=0
-  20: (67) r7 <<= 32                    ; R7_w=0
-  21: (77) r7 >>= 32                    ; R7_w=0
-  22: (b7) r1 = 1                       ; R1_w=1
-  23: (55) if r7 != 0xf goto pc+1
+Long story short, we remove __reg_combine_64_into_32() completely, and
+coerce_reg_to_size() now only does resetting subreg to unbounded and then
+performing reg_bounds_sync() to recover as much information as possible
+from 64-bit umin/umax and smin/smax bounds, set explicitly in
+coerce_reg_to_size() earlier.
 
-The failure mechanism is:
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+Acked-by: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Link: https://lore.kernel.org/r/20231102033759.2541186-10-andrii@kernel.org
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+[ zhenzhong: adapt to 6.1.y verifier.c layout ]
+Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
+---
+ kernel/bpf/verifier.c | 60 ++++++-------------------------------------
+ 1 file changed, 8 insertions(+), 52 deletions(-)
 
-  1. The program checks "if r0 == 0". The jump target is the success path,
-     and the fallthrough path is the failure path and should imply r0 != 0.
-
-  2. On v6.1.91, the verifier does not record that r0 != 0 fact for the
-     fallthrough path. The following "r7 = r0" then gives r0 and r7 the
-     same scalar id while both are still treated as possibly zero.
-
-  3. At the later "if r0 != 0" check, the verifier still thinks r0 may be
-     zero, so it explores the fallthrough path of that JNE. That path means
-     r0 == 0, and because r7 shares the same scalar id, r7 is narrowed to
-     zero as well. This is an impossible path: it came from the earlier
-     failure path that should have implied r0 != 0.
-
-  4. That impossible continuation reaches the return-value comparison with
-     r7 == 0 and can make the verifier keep only the wrong branch. When the
-     real success path is analyzed later, state pruning considers it safe
-     against the earlier cached verifier state, so the real continuation is
-     not explored.
-
-The relevant pruning point is that regsafe()/states_equal() accepted the
-real success-path state against an earlier cached state where r0 was an
-imprecise scalar and r7 constraints were loose enough to cover the current
-r7.
-
-After confirming the mechanism, I ran git bisect with this minimized C
-reproducer as the test case. The bisect started from the affected 6.7.y
-behavior and the fixed v6.8 behavior, and narrowed the fix to the
-v6.7..v6.8 window:
-
-  https://gist.github.com/swananan/165cca6008f6c81870a28aa7a445d5ea
-
-The bisect identified the upstream fix as:
-
-  d028f87517d6775dccff4ddbca2740826f9e53f1
-  bpf: make the verifier tracks the "not equal" for regs
-
-For 6.1.y, applying d028f87517d6 alone is not sufficient. The older
-verifier code also needs the range-preservation semantics from:
-
-  9e314f5d8682e1fe6ac214fb34580a238b6fd3c4
-  bpf: drop knowledge-losing __reg_combine_{32,64}_into_{64,32} logic
-
-Without that semantic prerequisite, the old range-combining logic can still
-discard the refined bounds after the verifier learns them.
-
-The 6.1.y adaptation is split as follows:
-
-  - patch 1 carries the 6.1.y-relevant part of 9e314f5d8682 by removing the
-    knowledge-losing __reg_combine_{32,64}_into_{64,32} paths and using
-    reg_bounds_sync() after conditional refinement;
-  - patch 2 carries d028f87517d6 in the older reg_set_min_max() layout. In
-    newer kernels, reg_set_min_max() refines the fallthrough branch through
-    rev_opcode(opcode), so the fallthrough branch of BPF_JEQ is handled by
-    the BPF_JNE refinement. In 6.1.y that split does not exist, so the same
-    not-equal fact is expressed directly on BPF_JEQ's false_reg and
-    BPF_JNE's true_reg.
-
-Observed results with that reproducer:
-
-  v6.1.91:               REPRO: BAD  (ran=1 error=1)
-  v6.7.12:               REPRO: BAD  (ran=1 error=1)
-  v6.8:                  REPRO: GOOD (ran=1 error=0)
-  v6.1.91 + this series: REPRO: GOOD (ran=1 error=0)
-
-Because this touches shared verifier scalar range logic, I am sending it as
-RFC and would appreciate BPF maintainer guidance on whether this 6.1.y
-semantic backport should be carried and whether the split in this series is
-reasonable. The same issue should also be relevant to 6.6.y, which still
-has the older verifier logic and predates the v6.8 fix, but this RFC only
-includes the 6.1.y backport.
-
-Zhenzhong Wu (2):
-  bpf: drop knowledge-losing __reg_combine_{32,64}_into_{64,32} logic
-  bpf: make the verifier tracks the "not equal" for regs
-
- kernel/bpf/verifier.c | 92 +++++++++++++++++++------------------------
- 1 file changed, 40 insertions(+), 52 deletions(-)
-
-base-commit: 228da13e907e2b46b7222cfc35290fbfad920bef
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index d8d3616..5e029d1 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -1577,51 +1577,6 @@ static void __reg_assign_32_into_64(struct bpf_reg_state *reg)
+ 	}
+ }
+ 
+-static void __reg_combine_32_into_64(struct bpf_reg_state *reg)
+-{
+-	/* special case when 64-bit register has upper 32-bit register
+-	 * zeroed. Typically happens after zext or <<32, >>32 sequence
+-	 * allowing us to use 32-bit bounds directly,
+-	 */
+-	if (tnum_equals_const(tnum_clear_subreg(reg->var_off), 0)) {
+-		__reg_assign_32_into_64(reg);
+-	} else {
+-		/* Otherwise the best we can do is push lower 32bit known and
+-		 * unknown bits into register (var_off set from jmp logic)
+-		 * then learn as much as possible from the 64-bit tnum
+-		 * known and unknown bits. The previous smin/smax bounds are
+-		 * invalid here because of jmp32 compare so mark them unknown
+-		 * so they do not impact tnum bounds calculation.
+-		 */
+-		__mark_reg64_unbounded(reg);
+-	}
+-	reg_bounds_sync(reg);
+-}
+-
+-static bool __reg64_bound_s32(s64 a)
+-{
+-	return a >= S32_MIN && a <= S32_MAX;
+-}
+-
+-static bool __reg64_bound_u32(u64 a)
+-{
+-	return a >= U32_MIN && a <= U32_MAX;
+-}
+-
+-static void __reg_combine_64_into_32(struct bpf_reg_state *reg)
+-{
+-	__mark_reg32_unbounded(reg);
+-	if (__reg64_bound_s32(reg->smin_value) && __reg64_bound_s32(reg->smax_value)) {
+-		reg->s32_min_value = (s32)reg->smin_value;
+-		reg->s32_max_value = (s32)reg->smax_value;
+-	}
+-	if (__reg64_bound_u32(reg->umin_value) && __reg64_bound_u32(reg->umax_value)) {
+-		reg->u32_min_value = (u32)reg->umin_value;
+-		reg->u32_max_value = (u32)reg->umax_value;
+-	}
+-	reg_bounds_sync(reg);
+-}
+-
+ /* Mark a register as having a completely unknown (scalar) value. */
+ static void __mark_reg_unknown(const struct bpf_verifier_env *env,
+ 			       struct bpf_reg_state *reg)
+@@ -4660,9 +4615,10 @@ static void coerce_reg_to_size(struct bpf_reg_state *reg, int size)
+ 	 * values are also truncated so we push 64-bit bounds into
+ 	 * 32-bit bounds. Above were truncated < 32-bits already.
+ 	 */
+-	if (size >= 4)
+-		return;
+-	__reg_combine_64_into_32(reg);
++	if (size < 4) {
++		__mark_reg32_unbounded(reg);
++		reg_bounds_sync(reg);
++	}
+ }
+ 
+ static bool bpf_map_is_rdonly(const struct bpf_map *map)
+@@ -10114,13 +10070,13 @@ static void reg_set_min_max(struct bpf_reg_state *true_reg,
+ 					     tnum_subreg(false_32off));
+ 		true_reg->var_off = tnum_or(tnum_clear_subreg(true_64off),
+ 					    tnum_subreg(true_32off));
+-		__reg_combine_32_into_64(false_reg);
+-		__reg_combine_32_into_64(true_reg);
++		reg_bounds_sync(false_reg);
++		reg_bounds_sync(true_reg);
+ 	} else {
+ 		false_reg->var_off = false_64off;
+ 		true_reg->var_off = true_64off;
+-		__reg_combine_64_into_32(false_reg);
+-		__reg_combine_64_into_32(true_reg);
++		reg_bounds_sync(false_reg);
++		reg_bounds_sync(true_reg);
+ 	}
+ }
+ 
 -- 
 2.43.0
 
