@@ -1,386 +1,366 @@
-Return-Path: <netdev+bounces-293593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293595-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJA8JOE0HWoqWQkAu9opvQ
-	(envelope-from <netdev+bounces-293593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:29:37 +0200
+	id yAJmGo01HWoqWQkAu9opvQ
+	(envelope-from <netdev+bounces-293595-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:32:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0499E61AE2F
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:29:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA88B61AEB4
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:32:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D89C3037D40
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 07:23:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F312D30547DD
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 07:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC19F382388;
-	Mon,  1 Jun 2026 07:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371BC384CEE;
+	Mon,  1 Jun 2026 07:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sTfl+NJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4371380FD4
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 07:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780298624; cv=none; b=Aj89UJDSSGeDnmGNdAd0VVNeG0/LEPl6QP9Rl5UouGQv693dBxQhe/wQQ93d2jNvfIqL6uUPirou1bJ9mx4ozKOHDtlWHiV6xB5j426tkfp114DDsWncp4JYk3MFq0eA5crOLK8MWVTMX/pTr50OcCN0QlBIMbGLheknmQ3nyTk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780298624; c=relaxed/simple;
-	bh=sdGuJlIaha+vd4QMa92/SwgssaX82Oc5vRqjrS8nGEo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aw8i3sp76flGyeno3QSxkNlUJAtSfIAL2B6PfIwRQ+LkVt/6A7+Krc/d73eu/gW8JLiIa3fLe2/T5Kr2LHmauh9liNF5dqQHQrtG8zb8Mapl5hftOlNAgOfskXE6f59hFr1ZTJf/z2OTnp8JwyNZ5cbXyw2gdJLBwRafoc5LD/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz14t1780298566t91c64bdb
-X-QQ-Originating-IP: gi6eR7pSuVlKHF0OQxsrORlgSVoQYju3dxF2+cmiVq4=
-Received: from lap-jiawenwu.trustnetic.com ( [183.156.95.204])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 01 Jun 2026 15:22:44 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7718099429496775831
-EX-QQ-RecipientCnt: 22
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Joe Damato <joe@dama.to>,
-	Breno Leitao <leitao@debian.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Fabio Baltieri <fabio.baltieri@gmail.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v4 5/5] net: wangxun: implement pci_error_handlers ops
-Date: Mon,  1 Jun 2026 15:22:21 +0800
-Message-Id: <20260601072221.2952-6-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260601072221.2952-1-jiawenwu@trustnetic.com>
-References: <20260601072221.2952-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A133845BC
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 07:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780298814; cv=pass; b=WH46iqSULrfYxbrmqDIRdv9moIqNjq+fmBDUbGjp7Xa95vcCuSy+xO6NSkPIkbEsQUD8Y3kQn5wZp0zttIbQBAgVzUu0EMsRuBCN2UKO0VCQSf/JIXx0DJBt7dCBBrsLa5cr095XHwQBv90y9/4HoC60J79ZpzYuErQHe+IAmlw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780298814; c=relaxed/simple;
+	bh=oZo0Gies88mOxdZUi76BlAfTbLB1IyaI+zeIseUnRZ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UqBi04MEd66eQbV5e8xLm9xww7WgBBg39ytEQSxQwukSTtfEwelWatMjlPT02Yvcpa62sBzfPccNGPqX4q7E8Ol4dI4HVUI+NFvBbHI24jjxyC2m6eNdgsuJYQkIr1pGj1RSiyq6oqUQZ5y9Rhfg8dZ8Fd+j2ppba8PPiOBZkuU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sTfl+NJ9; arc=pass smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-516d15ed2bcso92216981cf.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 00:26:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780298811; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IkiLkEb1+5i+FZskEHZ7ERZO++MHlHTXhsKlV/25R3usSuXTjxTaLUN9rxhqQB8Aku
+         Me1sIX/emGDIKLuyi7XAinV85jwNPnAC3I273BKq7OikRB55v+a5Lyms8WTAyei9uZlj
+         3T48CAIk34DLsfXU+seUQljV35tluEoc3oIu2yt3cTFsIzbpnBfOYCULIKtH5mIeIKdt
+         R5LtcWb2Ep6cuaBNbbxO0o51o4MOj7eX6Ne+f5BP3GUKV9rNfArfJ5mXGIceniS1BlQk
+         JwKpsho5LV8ZcyPb6/klWaQUKR5vqdTcIo4i/sii8XbWeTBoz3SoDKwNqW3ByLckzo4D
+         dR4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0j2fQXrURv2vHABUn/uvXXmbgLtu4ew+Ljyj3acdU54=;
+        fh=HvTETiZgcctTTssaqq9LxZhqwFNWaplZznJv0Eeqs7Q=;
+        b=O7e5KVN+QAkfnzkMCMunhuc8wonxD7hWt2V+hOhfFhnjvg8qheJNd6CKWcywwLB03L
+         x3L9T+8eVsh7ejfM3ACt26CU0MCvpn24BaXoHcEypVhNjEgCIPyd1D/qM5jY+6YpEiN7
+         EwhA4l23NpMi4zBWN7oJ1Qhh5SM9Oxa9OJ6vDTJyOSGuOywGXox92uH6yueqsWXACBBE
+         jqr8haIXAzbSYmCmXjIh5fzZLnEcACXnL0QMIAGMxSMuv3RPNFmKhYbTpwNbVrHCwQkV
+         f8h5raBYINRsV1YCgZGjHg3dDM/IsuHIbVhy/X5wqqYwW82P3LB9C2ftLfh8FtaYJ1bS
+         7oDA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780298811; x=1780903611; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0j2fQXrURv2vHABUn/uvXXmbgLtu4ew+Ljyj3acdU54=;
+        b=sTfl+NJ9lJNXb2F9RcUcGcmVn2VBwo4aD4oJesYrvvb/0Xtn4QVwkZM8L6D1PXV+fk
+         hJq738+Y3AcHgU9/s8VVo1uXoInuGzQpyJmMCcRxRwrOJ0dmYS7lGrMkytvJdPaTUBYG
+         usVyhlzvKcXzYy9Dkxf2Jv2emevMLrWsjmA5RDxeFmkhKzc6mhjgZNjh2dMHhJu9AC2m
+         4Ck/NdTkHWGXSvNTA2K8a5GbVMWnwJ4ueEdxC5BR4E0OKPYOwkgbueQqeJwgdcPO/l+G
+         DhJtfI0k7TVK48VjkOTXftplGlfj8zhTKiJRxxJDV2bLNx67SohnDae0nIvyXzS0UEtL
+         6EHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780298811; x=1780903611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0j2fQXrURv2vHABUn/uvXXmbgLtu4ew+Ljyj3acdU54=;
+        b=Y3SGIdDPQAdddDhcJOtuEQ7Vl1Y86f/x7KU+5oCWF/AmoNWSpcYcLkBEKBIkFQ/9co
+         uKadJVyrsTpuO9te+Q+ZJSGCCHUqPbmT6f+R5lBGm8vW16QVWzkrLoWjpzxkiXKLwjx6
+         xNB96uCVaJMsaSiU5qanYNDVLdmyQ1x7vPxTKgaTLRjW5kzX3hNDYZh+/+LRCkVHPmrM
+         030aqYvMxD6HHiUksdXwj75lRFScj9C6+JeIGq1KE9lOyEFsu32c0QZctzavfcMqwfsB
+         ryWmGpse9HpvnjTrNjUMPKKu1Yo2KrDgL3+/A5QniiStbEGQsPCLGyPyUYgxOkFuHAxL
+         bEqA==
+X-Forwarded-Encrypted: i=1; AFNElJ/91/DNSx9QGAKiJuCJ2TFTso6tZfmDIdTP3LsCG2ruaSguEjNDQgWj1sqCsvNUM0Z9toSgwWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtAyg8c14qQok8duN3lzI6l0jXmKFj2bcTvzcw2dWYIxP4i2BT
+	EecIkSmrCMHKKemaGexvY6M4TIJLaqVHxK+QYGGAq3cKiCpmNVSB/3RUWcuCEFSGzUkfweoBiPV
+	mfHvFwoTz+8DqxGQQRnrxNwc6Nxvv2Ef3xEScTcAC
+X-Gm-Gg: Acq92OEOyIPSfaaidQGy9S8NpGO/M0AAG5w25AYyAfcyEHF/BbYEuLWTD8ErN9EACdF
+	3gDgJFDMR2HigXyYoSMQg8Vdtdj/aV+0QOGRjOYFx8wti79L+PiueJM9oQkf7+f/bwrDSZraIOB
+	veK0pyOLtcx4uLqUmCxn3bozrs8yNqDVmXITJ8FUEYPZH1hn2NJWXB6o+TQwKcxCCX2hlX5QKcY
+	sdiK8PAlP2A8jgeP2CGX6idNY8hOPsLvWafC3G7KQsMy0DKdwVGX5WsJLoFsSUE6zYHAMfdlv5H
+	YbiTqBVt4DzDcPhTNoxaLlpqId5m5osnVHf/stordkwIg6ds+9BWubkIWjmcGI50bqp9uXaWU+M
+	N/laLi+6D58vOqe2Y2T+4fe5UekJaDA==
+X-Received: by 2002:ac8:6f08:0:b0:516:cd8d:c7fa with SMTP id
+ d75a77b69052e-5172dd0622dmr162730461cf.39.1780298810418; Mon, 01 Jun 2026
+ 00:26:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Mk/FYBttBrlYOhU4PhXxW6TLt2hCdQBK0CFDybS30rcYTcePC1VXmEHU
-	bb86945u0rl/i/+o9aCyldnZ6eWkxuy6/3pt+kva0sjSZIBCy9GFpKiskPo1MZ8y9MpAIk9
-	t7+JqZ8EtCOlhJ0M0QJsEAD6rvA0Ai06a1HMfCVIytgXnDhiIN0hkpzRGJt759anbddBBDe
-	mhIiiKwvSSX3lgyRqLYHs2q0nePt+fdP5H2kr48cQJSALg9GZcODR5ulkTwokXikBtxcMMI
-	P6mFW+mmQgalLqNyh1UrCytMpcswP52z21vZ81FY3/OQrabmYJyLllGA4bjUL7bU+M9nk+s
-	I0phk9i8fibykDueocMVNQmwyqRp7CbxQDgknNijoODLyVp9MaifJGiJl61J+Wq9X86RdxO
-	ExSpDWWOp1i2VvltuMH2OJaHABScY2nTjBKrwHG1lJLljuyvd2QBAhtnIXvXR7w31SJdNPX
-	rSRBLUkmcP35gHxaLfEeBctyB/whY/IXB7wdFden/4LtZhVDz8eq4v08rrKdmTwkTd7oq23
-	oYYWMMFLAywRSo3OAkYG8trc4M927FJgsM5/NE4J79Od2p9g5ZYy/yRVucnOf6P7TGOty9g
-	GfLHEmQSHpTVo/e41TYnfTg4r8v4KmG1ZzT2TZkhqE9e+CpQwH/VFU5Rt/NyMPsp7iH2jtd
-	9zv90o289uD1uARN5LXxiY0cORdsDfn5xKxnpiAO8Mj+K95FYODo886c/BIHkTq7UmyFO1Z
-	t16hqDTqGDQ5iari1DWqQc7KMDBpldaVz/I1WZPKcw6piDw1GHVd+B1DCc8JXCMyLFdrXHb
-	NFdzmj8B7mzJdmZVuTZNgubU9unpKCxAPttWlilSzSWNamKhBT1m8laW2DrsbxEHFE10ZOc
-	lvEGD7FZQJdcShcSMnJNvZAjK5yTfYm4BWHv5RXghaoyNXDg6LJymW8w15/GM/739GuoOe5
-	kwrPthEjNhGWHmMCasKu9IFTQXuNgh+euxzZAFrapD7wYMJVIC1UYJOBysSoO7KWlRwAXOx
-	Ns6n85E/qGmLBQFBWfJikAsCxjHc33gyUr6pDkQdgS+rB8I1WDK90MT9owR0eQR8lX7ofUB
-	G7FpYgSnAs20UNmKUwKGCD+hO06mksR9w==
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+References: <20260601-net-next-mptcp-add-addr6-port-ts-v1-0-4fc25dfef62e@kernel.org>
+ <20260601-net-next-mptcp-add-addr6-port-ts-v1-5-4fc25dfef62e@kernel.org>
+ <CANn89iLdwhhwLyO6zRjWMEY3t9g60ZE8ZhOVx33ucg_uRETbmQ@mail.gmail.com> <1f3aea3b-1bb0-4584-8f6d-af14d73df81d@kernel.org>
+In-Reply-To: <1f3aea3b-1bb0-4584-8f6d-af14d73df81d@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 1 Jun 2026 00:26:38 -0700
+X-Gm-Features: AVHnY4KvZ2b3I2Huj1-TUxuXz92NDdjpsYdkctVUOdNphLvQcjd7YsWKT5SPwr0
+Message-ID: <CANn89iLBh-tSEzDuZce5G2dmC6An1agoJ9UNq2qwAAC0+oTuPg@mail.gmail.com>
+Subject: Re: [PATCH net-next 05/11] tcp: allow mptcp to drop TS for some packets
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293593-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-293595-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net,trustnetic.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.949];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:mid,trustnetic.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0499E61AE2F
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vmlinux.new:url]
+X-Rspamd-Queue-Id: BA88B61AEB4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Support AER driver to handle the PCIe errors.
-
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 111 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   9 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   8 +-
- 5 files changed, 127 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index e249cea874be..ae5d14071f3d 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -4,11 +4,122 @@
- 
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
- 
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	if (!wx)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	if (state == pci_channel_io_perm_failure)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev) && wx->soft_quiesce)
-+		wx->soft_quiesce(wx);
-+
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
-+
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all memory operations done before clearing the flag */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_wake_from_d3(pdev, false);
-+
-+		rtnl_lock();
-+		if (wx->do_reset)
-+			wx->do_reset(wx->netdev, false);
-+		rtnl_unlock();
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	pci_aer_clear_nonfatal_status(pdev);
-+
-+	return result;
-+}
-+
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+	int err;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev)) {
-+		err = netdev->netdev_ops->ndo_open(netdev);
-+		if (err) {
-+			wx_err(wx, "Failed to open netdev after reset\n");
-+			goto out;
-+		}
-+	}
-+	netif_device_attach(netdev);
-+out:
-+	rtnl_unlock();
-+}
-+
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
-+
- static void wx_pf_reset_subtask(struct wx *wx)
+On Sun, May 31, 2026 at 11:52=E2=80=AFPM Matthieu Baerts <matttbe@kernel.or=
+g> wrote:
+>
+> Hi Eric,
+>
+> Thank you for the review!
+>
+> On 01/06/2026 16:04, Eric Dumazet wrote:
+> > On Sun, May 31, 2026 at 10:25=E2=80=AFPM Matthieu Baerts (NGI0)
+> > <matttbe@kernel.org> wrote:
+> >>
+> >> With TCP-timestamps (padded) taking 12 bytes and ADD_ADDR IPv6 + port
+> >> taking 30 bytes, the 40-byte limit for the TCP options is reached. In
+> >> this case, it is then not possible to send the address signal.
+> >>
+> >> The idea is to let MPTCP dropping the TCP-timestamps option for some
+> >> specific packets, to be able to send some specific pure ACK carrying >=
+28
+> >> bytes of MPTCP options, like with this specific ADD_ADDR. A new
+> >> parameter is passed from tcp_established_options to the MPTCP side to
+> >> indicate if the TCP TS option is used, and if it should be dropped. Th=
+e
+> >> next commit implements the part on MPTCP side, but split into two
+> >> patches to help TCP maintainers to identify the modifications on TCP
+> >> side. This feature will be controlled by a new add_addr_v6_port_drop_t=
+s
+> >> MPTCP sysctl knob.
+> >>
+> >> It is important to keep in mind that dropping the TCP timestamps optio=
+n
+> >> for one packet of the connection could eventually disrupt some
+> >> middleboxes: even if it should be unlikely, they could drop the packet
+> >> or even block the connection. That's why this new feature will be
+> >> controlled by a sysctl knob.
+> >>
+> >> Note that it would be technically possible to squeeze both options int=
+o
+> >> the header if the ADD_ADDR is first written, and then the TCP timestam=
+ps
+> >> without the NOPs preceding it. But this means more modifications on TC=
+P
+> >> side, plus some middleboxes could still be disrupted by that.
+> >>
+> >> About the implementation, instead of passing a new boolean (drop_ts),
+> >> another option would be to pass the whole option structure (opts),
+> >> but 'struct tcp_out_options' is currently defined in tcp_output.c, and
+> >> would need to be exported. Plus that means the removal of the TCP TS
+> >> option would be done on the MPTCP side, and not here on the TCP side.
+> >> It feels clearer to remove other TCP options from the TCP side, than
+> >> hiding that from the MPTCP side.
+> >>
+> >> Yet an other alternative would be to pass the size already taken by th=
+e
+> >> other TCP options, and have a way to drop them all when needed. But th=
+is
+> >> feels better to target only the timestamps option where dropping it
+> >> should be safe, even if it is currently the only option that would be
+> >> set before MPTCP, when MPTCP is used.
+> >>
+> >> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> >> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> >> ---
+> >> To: Neal Cardwell <ncardwell@google.com>
+> >> To: Kuniyuki Iwashima <kuniyu@google.com>
+> >> ---
+> >>  include/net/mptcp.h   | 3 ++-
+> >>  net/ipv4/tcp_output.c | 6 +++++-
+> >>  net/mptcp/options.c   | 3 ++-
+> >>  3 files changed, 9 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+> >> index f7263fe2a2e4..000b6593bfa4 100644
+> >> --- a/include/net/mptcp.h
+> >> +++ b/include/net/mptcp.h
+> >> @@ -151,7 +151,7 @@ bool mptcp_synack_options(const struct request_soc=
+k *req, unsigned int *size,
+> >>                           struct mptcp_out_options *opts);
+> >>  bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+> >>                                unsigned int *size, unsigned int remain=
+ing,
+> >> -                              struct mptcp_out_options *opts);
+> >> +                              bool *drop_ts, struct mptcp_out_options=
+ *opts);
+> >>  bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
+> >>
+> >>  void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_s=
+ock *tp,
+> >> @@ -270,6 +270,7 @@ static inline bool mptcp_established_options(struc=
+t sock *sk,
+> >>                                              struct sk_buff *skb,
+> >>                                              unsigned int *size,
+> >>                                              unsigned int remaining,
+> >> +                                            bool *drop_ts,
+> >>                                              struct mptcp_out_options =
+*opts)
+> >>  {
+> >>         return false;
+> >> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> >> index ef0c10cd31c7..53ee4c8f5f8c 100644
+> >> --- a/net/ipv4/tcp_output.c
+> >> +++ b/net/ipv4/tcp_output.c
+> >> @@ -1181,12 +1181,16 @@ static unsigned int tcp_established_options(st=
+ruct sock *sk, struct sk_buff *skb
+> >>          */
+> >>         if (sk_is_mptcp(sk)) {
+> >>                 unsigned int remaining =3D MAX_TCP_OPTION_SPACE - size=
+;
+> >> +               bool drop_ts =3D opts->options & OPTION_TS;
+> >>                 unsigned int opt_size =3D 0;
+> >>
+> >>                 if (mptcp_established_options(sk, skb, &opt_size, rema=
+ining,
+> >> -                                             &opts->mptcp)) {
+> >> +                                             &drop_ts, &opts->mptcp))=
  {
- 	if (!test_and_clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index a529bf54eeac..de5d02316230 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
-+
- void wx_check_err_subtask(struct wx *wx);
- int wx_init_err_task(struct wx *wx);
- void wx_check_tx_hang_subtask(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 1b25a52188f7..778e186e4555 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1221,6 +1221,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 2484d3177034..8e5a708ea809 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -589,7 +589,8 @@ static void ngbe_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static void ngbe_shutdown(struct pci_dev *pdev)
-@@ -879,6 +880,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -934,7 +936,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static int ngbe_suspend(struct pci_dev *pdev, pm_message_t state)
-@@ -961,6 +964,7 @@ static int ngbe_resume(struct pci_dev *pdev)
- 		wx_err(wx, "Cannot enable PCI device from suspend\n");
- 		return err;
- 	}
-+	clear_bit(WX_STATE_DISABLED, wx->state);
- 	pci_set_master(pdev);
- 	device_wakeup_disable(&pdev->dev);
- 
-@@ -985,6 +989,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = ngbe_resume,
- 	.shutdown = ngbe_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 816aba4a9099..e913e3553ced 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -570,7 +570,8 @@ static void txgbe_dev_shutdown(struct pci_dev *pdev)
- 
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static void txgbe_shutdown(struct pci_dev *pdev)
-@@ -922,6 +923,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -996,7 +998,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -1006,6 +1009,7 @@ static struct pci_driver txgbe_driver = {
- 	.remove   = txgbe_remove,
- 	.shutdown = txgbe_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
--- 
-2.51.0
+> >>                         opts->options |=3D OPTION_MPTCP;
+> >>                         size +=3D opt_size;
+> >> +
+> >> +                       if (drop_ts)
+> >> +                               opts->options &=3D ~OPTION_TS;
+> >>                 }
+> >>         }
+> >
+> > Passing local variables' addresses forces the compiler to use a stack
+> > canary in this hot function, even for non-MPTCP flows.
+> >
+> > I was about to test the following patch, which removes the current
+> > stack canary caused by MPTCP :/
+>
+> Sorry, I didn't know you were planning to do that.
+>
+> Would that be OK for you if I use an unused bit in opts->mptcp? It's a
+> bit "hackish", but it avoids adding a new local variable address. Or do
+> you have another idea?
+>
+> The modifications in net/ipv4/tcp_output.c would then be limited to:
+>
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index ef0c10cd31c7..f4edc9c4f3fc 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -1181,12 +1181,18 @@ static unsigned int tcp_established_options(struc=
+t sock *sk, struct sk_buff *skb
+>          */
+>         if (sk_is_mptcp(sk)) {
+>                 unsigned int remaining =3D MAX_TCP_OPTION_SPACE - size;
+> +               bool has_ts =3D opts->options & OPTION_TS;
+>                 unsigned int opt_size =3D 0;
+>
+>                 if (mptcp_established_options(sk, skb, &opt_size, remaini=
+ng,
+> -                                             &opts->mptcp)) {
+> +                                             has_ts, &opts->mptcp)) {
+>                         opts->options |=3D OPTION_MPTCP;
+>                         size +=3D opt_size;
+> +
+> +#if IS_ENABLED(CONFIG_MPTCP)
+> +                       if (opts->mptcp.drop_ts)
+> +                               opts->options &=3D ~OPTION_TS;
+> +#endif
 
+SGTM, but maybe the IS_ENABLED() is not needed in this block,
+guarded by  if (sk_is_mptcp(sk))  ?
+
+Also I am unsure opts->mptcp.drop_ts is cleared already before
+reaching  tcp_established_options()?
+
+>                 }
+>         }
+>
+>
+> I can also avoid adding a new parameter in mptcp_established_options
+> (bool has_ts) by setting opts->mptcp.drop_ts before calling it, but
+> that's clearer with this new parameter I think.
+>
+> > $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+> > add/remove: 0/0 grow/shrink: 0/3 up/down: 0/-92 (-92)
+> > Function                                     old     new   delta
+> > tcp_options_write.isra                      1423    1407     -16
+> > mptcp_established_options                   2746    2720     -26
+> > tcp_established_options                      553     503     -50
+> > Total: Before=3D22110750, After=3D22110658, chg -0.00%
+> >
+>
+> Good reduction!
+>
+> (...)
+>
+> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > index ef0c10cd31c71ff585a937fde37f2b08b1214b5a..594ec6ba02d5413d43842f7=
+9aefbf4d8355c4f3f
+> > 100644
+> > --- a/net/ipv4/tcp_output.c
+> > +++ b/net/ipv4/tcp_output.c
+> > @@ -1183,10 +1183,11 @@ static unsigned int
+> > tcp_established_options(struct sock *sk, struct sk_buff *skb
+> >                 unsigned int remaining =3D MAX_TCP_OPTION_SPACE - size;
+> >                 unsigned int opt_size =3D 0;
+> >
+> > -               if (mptcp_established_options(sk, skb, &opt_size, remai=
+ning,
+> > -                                             &opts->mptcp)) {
+> > +               opt_size =3D mptcp_established_options(sk, skb, remaini=
+ng,
+> > +                                                    &opts->mptcp);
+> > +               if (opt_size) {
+> >                         opts->options |=3D OPTION_MPTCP;
+> > -                       size +=3D opt_size;
+> > +                       size +=3D (opt_size & 63);
+>
+> Nice trick! What about returning a negative number when the MPTCP option
+> is not needed? Just to avoid playing with masks in the code?
+
+Yes, that would work, thanks.
+
+I can provide a patch in a couple of hours.
 
