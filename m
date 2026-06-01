@@ -1,291 +1,179 @@
-Return-Path: <netdev+bounces-293631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDtUKU1QHWooYwkAu9opvQ
-	(envelope-from <netdev+bounces-293631-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:26:37 +0200
+	id IDLIF5pOHWrDYgkAu9opvQ
+	(envelope-from <netdev+bounces-293632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:19:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B92561C65C
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:26:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D9261C41F
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF980308B7AE
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:18:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1CE4230022CA
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CC538F65C;
-	Mon,  1 Jun 2026 09:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFA039283C;
+	Mon,  1 Jun 2026 09:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LIiccJmv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GtdnsfUR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4324201004
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D530338E8CD;
+	Mon,  1 Jun 2026 09:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780305501; cv=none; b=nMXASBHAVECLzF+CRM5QCoc5MscDgC1ql+B1itcGCUn4S6p8iaE4jsy4wWYAC8pL2TitO7q4tUbHdVEguaSKol//Jorzz/E3KYOuXIPLosvJ7XzQe59Ivek+tD3zn1hPstncFx1Mf8YYTl8k/NbBhUw9MGN+wOxqzM97wy3p3CI=
+	t=1780305557; cv=none; b=ue9+txd6WO/UVonTBxNoLYQsx4YkG0dCCTOCQlpWClM0BcxSedW54nHpfWM9FZhiR7vhyMDg+ecV4NI0W/ONl32yl6rruMtqBjc4F5dkU1/4OHVGLecvxbHTJvQ8fUOI0BgjoLnhpvw1rh1sFO2rDRc8f1ur9aL9T2+7U8lvNtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780305501; c=relaxed/simple;
-	bh=yAnIuIPW6bgr7GNewpLtx74zv46gDD9gKqJDj8TJGxE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=f6mbsmDTleGyNv/aX8lSY7utpBEx8tWfvSJD592nShUoZ9cWqDTX7mN5nJ9kKamkAGU7Czz24tU4i0T6w+2hqzyf9scN7FWnu/stoloTymDIXpyY+jcqAy4L4TRw5alXkG1N0UNR7khpz5AJ4yjHYESktYEI/grDRR7t90C48BU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LIiccJmv; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-914b5249bf6so1867287985a.3
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 02:18:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780305499; x=1780910299; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+EMjoMJukK2L6kFVJX3+Oxh4XT/xOq7sLXPdrf2ZlVU=;
-        b=LIiccJmvaZHQn+/bwYi3UIgYZVRMoyP9f8ENY0Zlm28Jjj/85ke2togeLYrOriR3Vu
-         h20stZ9Hk762jRyiqOmKeojXaEhdi1XsgXWq7YX3BL/5XblUJzWHMLd8+wVBUAHwISCM
-         bmzYHxLBN5kv7xy5nCl4CQlofDtcxBJyXb+m0PFiIJ0iAR84XysN3xnUge4eX6MV7vWq
-         bMKUypZ2yCp0tCB/Cxq8rfi+BuO4D0VfTx0LFU3ZPxOmg6/5ddMN+2wufRfedSal8JqH
-         lynGowkCMqqzOyV17763oiGRsYAHrFHP1x6CsSZVzptKNtl8LLlMF802/eRD1P9pY9nx
-         Z9ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780305499; x=1780910299;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+EMjoMJukK2L6kFVJX3+Oxh4XT/xOq7sLXPdrf2ZlVU=;
-        b=gjEKTKYxzQNGy4IIUFGWs4C73K7KpZRqDAes1sKSbxNddD8AmhobwLIiFn3BlNfdQO
-         VnL+xBxUG1v4TObljzF19/V913pAgK1V5+5OAWNtcUuv0y++d1VpNNtyAbuTCF9hUJtN
-         utybTm3yI7nPRXHSjvFYG72NSVu77R2/ESt6375tDyLHOjfDSF3mxLqitR0tKTRRN4ri
-         KFpBw94NZy4nHBogRuXqswkGGKJeJ0d7ib3d8vUgxZ4IdlwUI0Iqq1wsEE2ZO04m4ItS
-         Qt0MrQEq2YNqV3LWajfj7y1OoaVt+2uqhzvXucysyuWo6TogRN4R1aoXtVHtnFCCkLpy
-         BdXg==
-X-Forwarded-Encrypted: i=1; AFNElJ+6m6fgl8WWJBEag09BFzTeLPTlTSB4DcxOVCRe/rNl6cHcL6VhcmyptbPrPIeZFMgCta3XSoc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp42Uliel0Zj/ZATHhqR08ceOb10NYGAooR2ifkyVG6pMRvWrx
-	dGRnoHxqqSypa1Npjbr9fRDhGCcbLHFHPbJxf/7rxYdCQM2nEFL2m/X1ZOHGfxsWbswbAx2Ebwp
-	xuUxntfGiav/Zrg==
-X-Received: from qkee25-n2.prod.google.com ([2002:a05:620a:2319:20b0:914:ab43:2e46])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:26a4:b0:8cd:9033:1724 with SMTP id af79cd13be357-9153d938381mr1668818785a.9.1780305498443;
- Mon, 01 Jun 2026 02:18:18 -0700 (PDT)
-Date: Mon,  1 Jun 2026 09:18:16 +0000
+	s=arc-20240116; t=1780305557; c=relaxed/simple;
+	bh=wcQZubXFj92w5s2C5QPjxynJFvtcWsTj+RW8zM8eY3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mp2Uz2iWWS0vVnoHJK6luWyW6fjsR6amWQ2qnCUIa3N75ibkuI53kQlJZo4yMfy/7MSwUuyeyxtg/AR+trzFTKZrD0a2/X2puoKUF3dPpFoJKw3ogEkBECUBk8RzZfxuZgwunfmaFsabQ9wOxOWqh3n7SpeeXRBii2ZZvH9em8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GtdnsfUR; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780305556; x=1811841556;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wcQZubXFj92w5s2C5QPjxynJFvtcWsTj+RW8zM8eY3s=;
+  b=GtdnsfURuPQqFjeDaI4naPJc0x7logSVgd/qBVqjf6DIKSVeYCIMNlWn
+   NisyXHn++5Lx1EmfmpL0N6ir8I1Wfu4iiKWAb6v9Fu5WZcKIKrcdPnOt7
+   VmB1H2Sz2RQCEmbBIkRaJn2uLDu+OXyB01S+7i/XhBhGT+n3bg+apqi9E
+   RKFqrebwH2ZpyjY1sB8J7Q8UViU1u9TwcZqVccuMoJ8JytbrOpDTX+/fC
+   L21qOWCLXcF53G4TjweXNvr8mcmX7TVCGVKjHsSMz2zPRNzSMq/MAHy72
+   kMq5Ftr4Xj5aNCzhSq7PSHAzqcIMDGfCEzvosfOZZeMzKjFRCsOafzJfa
+   A==;
+X-CSE-ConnectionGUID: 2cN371V+RsC0StblyJiksQ==
+X-CSE-MsgGUID: r5Ou1T3ZT9qVjvbRjL5ipQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11803"; a="84948309"
+X-IronPort-AV: E=Sophos;i="6.24,181,1774335600"; 
+   d="scan'208";a="84948309"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 02:19:15 -0700
+X-CSE-ConnectionGUID: yAwssWEbRYOo/Yw4Utq+IA==
+X-CSE-MsgGUID: 777dSKA9Q1moknFX8mAvDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,181,1774335600"; 
+   d="scan'208";a="243619328"
+Received: from unknown (HELO [10.217.160.157]) ([10.217.160.157])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 02:19:12 -0700
+Message-ID: <f8a922da-8463-48b1-8e4b-a6bda0767d32@linux.intel.com>
+Date: Mon, 1 Jun 2026 11:19:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
-Message-ID: <20260601091816.444738-1-edumazet@google.com>
-Subject: [PATCH net-next] mptcp: change mptcp_established_options() to return opt_size
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] i40e: fix netdev leak in
+ i40e_vsi_setup() error paths
+To: Dawei Feng <dawei.feng@seu.edu.cn>, anthony.l.nguyen@intel.com
+Cc: przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ jesse.brandeburg@intel.com, sln@onemain.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn, stable@vger.kernel.org,
+ Zilin Guan <zilin@seu.edu.cn>
+References: <20260527110205.1780595-1-dawei.feng@seu.edu.cn>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20260527110205.1780595-1-dawei.feng@seu.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293631-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-293632-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vmlinux.new:url]
-X-Rspamd-Queue-Id: 0B92561C65C
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,intel.com:dkim,seu.edu.cn:email,linux.intel.com:mid]
+X-Rspamd-Queue-Id: E2D9261C41F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Instead of passing opt_size address to mptcp_established_options(),
-change this function to return it by value.
 
-This removes the need for an expensive stack canary in
-tcp_established_options() when CONFIG_STACKPROTECTOR_STRONG=y.
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/0 grow/shrink: 0/3 up/down: 0/-92 (-92)
-Function                                     old     new   delta
-tcp_options_write.isra                      1423    1407     -16
-mptcp_established_options                   2746    2720     -26
-tcp_established_options                      553     503     -50
-Total: Before=22110750, After=22110658, chg -0.00%
+On 27/05/2026 13:02, Dawei Feng wrote:
+> i40e_config_netdev() allocates vsi->netdev for main and VMDQ VSIs. If
+> i40e_netif_set_realnum_tx_rx_queues(), i40e_devlink_create_port(), or
+> register_netdev() fails, i40e_vsi_setup() goes to err_netdev without
+> releasing the netdev. The existing cleanup only frees the netdev after a
+> successful register_netdev(), so these error paths leak the allocation.
+> 
+> Reorder the error paths at err_netdev to ensure proper cleanup of the
+> allocated device.
+> 
+> The bug was first flagged by an experimental analysis tool we are
+> developing for kernel memory-management bugs while analyzing
+> v6.13-rc1. The tool is still under development and is not yet publicly
+> available. Manual inspection confirms that the bug is still
+> present in v7.1-rc5.
+> 
+> An x86_64 allyesconfig build showed no new warnings. As we do not have an
+> Intel Ethernet Controller XL710 family adapter to test with, no runtime
+> testing was able to be performed.
+> 
+> Fixes: 41c445ff0f48 ("i40e: main driver core")
+> Cc: stable@vger.kernel.org
+> 
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/mptcp.h   | 18 +++++++++---------
- net/ipv4/tcp_output.c |  7 ++++---
- net/mptcp/options.c   | 31 ++++++++++++++++---------------
- 3 files changed, 29 insertions(+), 27 deletions(-)
+We could introduce additional goto label for i40e_config_netdev() instead of
+if condition, but the latter is probably safer in this case (without splitting
+the different VSI types setup to functions).
 
-diff --git a/include/net/mptcp.h b/include/net/mptcp.h
-index f7263fe2a2e40b507257c3720cc2d78d37357d6d..cd4639beceaa53c573135ddaeb7528a80b4ca824 100644
---- a/include/net/mptcp.h
-+++ b/include/net/mptcp.h
-@@ -149,9 +149,9 @@ bool mptcp_syn_options(struct sock *sk, const struct sk_buff *skb,
- 		       unsigned int *size, struct mptcp_out_options *opts);
- bool mptcp_synack_options(const struct request_sock *req, unsigned int *size,
- 			  struct mptcp_out_options *opts);
--bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
--			       unsigned int *size, unsigned int remaining,
--			       struct mptcp_out_options *opts);
-+int mptcp_established_options(struct sock *sk, struct sk_buff *skb,
-+			      unsigned int remaining,
-+			      struct mptcp_out_options *opts);
- bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
- 
- void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *tp,
-@@ -266,13 +266,13 @@ static inline bool mptcp_synack_options(const struct request_sock *req,
- 	return false;
- }
- 
--static inline bool mptcp_established_options(struct sock *sk,
--					     struct sk_buff *skb,
--					     unsigned int *size,
--					     unsigned int remaining,
--					     struct mptcp_out_options *opts)
-+static inline int mptcp_established_options(struct sock *sk,
-+					    struct sk_buff *skb,
-+					    unsigned int *size,
-+					    unsigned int remaining,
-+					    struct mptcp_out_options *opts)
- {
--	return false;
-+	return -1;
- }
- 
- static inline bool mptcp_incoming_options(struct sock *sk,
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index ef0c10cd31c71ff585a937fde37f2b08b1214b5a..31b459ecbe8307a8660623038fea6fa7b0860f7f 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -1181,10 +1181,11 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
- 	 */
- 	if (sk_is_mptcp(sk)) {
- 		unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
--		unsigned int opt_size = 0;
-+		int opt_size;
- 
--		if (mptcp_established_options(sk, skb, &opt_size, remaining,
--					      &opts->mptcp)) {
-+		opt_size = mptcp_established_options(sk, skb, remaining,
-+						     &opts->mptcp);
-+		if (opt_size >= 0) {
- 			opts->options |= OPTION_MPTCP;
- 			size += opt_size;
- 		}
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index 8a1c5698983cff3082d68290626dd8f1e044527f..53528301394d70072dde6614feca6128ea949436 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -836,13 +836,14 @@ static bool mptcp_established_options_mp_fail(struct sock *sk,
- 	return true;
- }
- 
--bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
--			       unsigned int *size, unsigned int remaining,
--			       struct mptcp_out_options *opts)
-+int mptcp_established_options(struct sock *sk, struct sk_buff *skb,
-+			      unsigned int remaining,
-+			      struct mptcp_out_options *opts)
- {
- 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(sk);
- 	struct mptcp_sock *msk = mptcp_sk(subflow->conn);
- 	unsigned int opt_size = 0;
-+	int total_size = 0;
- 	bool snd_data_fin;
- 	bool ret = false;
- 
-@@ -852,20 +853,20 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
- 	 * option space.
- 	 */
- 	if (unlikely(__mptcp_check_fallback(msk) && !mptcp_check_infinite_map(skb)))
--		return true;
-+		return 0;
- 
- 	if (unlikely(skb && TCP_SKB_CB(skb)->tcp_flags & TCPHDR_RST)) {
- 		if (mptcp_established_options_fastclose(sk, &opt_size, remaining, opts) ||
- 		    mptcp_established_options_mp_fail(sk, &opt_size, remaining, opts)) {
--			*size += opt_size;
-+			total_size += opt_size;
- 			remaining -= opt_size;
- 		}
- 		/* MP_RST can be used with MP_FASTCLOSE and MP_FAIL if there is room */
- 		if (mptcp_established_options_rst(sk, skb, &opt_size, remaining, opts)) {
--			*size += opt_size;
-+			total_size += opt_size;
- 			remaining -= opt_size;
- 		}
--		return true;
-+		return total_size;
- 	}
- 
- 	snd_data_fin = mptcp_data_fin_enabled(msk);
-@@ -877,9 +878,9 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
- 		ret = true;
- 		if (mptcp_established_options_mp_fail(sk, &mp_fail_size,
- 						      remaining - opt_size, opts)) {
--			*size += opt_size + mp_fail_size;
-+			total_size += opt_size + mp_fail_size;
- 			remaining -= opt_size - mp_fail_size;
--			return true;
-+			return total_size;
- 		}
- 	}
- 
-@@ -887,27 +888,27 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
- 	 * TCP option space would be fatal
- 	 */
- 	if (WARN_ON_ONCE(opt_size > remaining))
--		return false;
-+		return -1;
- 
--	*size += opt_size;
-+	total_size += opt_size;
- 	remaining -= opt_size;
- 	if (mptcp_established_options_add_addr(sk, skb, &opt_size, remaining, opts)) {
--		*size += opt_size;
-+		total_size += opt_size;
- 		remaining -= opt_size;
- 		ret = true;
- 	} else if (mptcp_established_options_rm_addr(sk, &opt_size, remaining, opts)) {
--		*size += opt_size;
-+		total_size += opt_size;
- 		remaining -= opt_size;
- 		ret = true;
- 	}
- 
- 	if (mptcp_established_options_mp_prio(sk, &opt_size, remaining, opts)) {
--		*size += opt_size;
-+		total_size += opt_size;
- 		remaining -= opt_size;
- 		ret = true;
- 	}
- 
--	return ret;
-+	return ret ? total_size : -1;
- }
- 
- bool mptcp_synack_options(const struct request_sock *req, unsigned int *size,
--- 
-2.54.0.1013.g208068f2d8-goog
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 6d4f9218dc68..1ced01b0cc09 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -14491,13 +14491,15 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
+>  	if (vsi->netdev_registered) {
+>  		vsi->netdev_registered = false;
+>  		unregister_netdev(vsi->netdev);
+> -		free_netdev(vsi->netdev);
+> -		vsi->netdev = NULL;
+>  	}
+>  err_dl_port:
+>  	if (vsi->type == I40E_VSI_MAIN)
+>  		i40e_devlink_destroy_port(pf);
+>  err_netdev:
+> +	if (vsi->netdev) {
+> +		free_netdev(vsi->netdev);
+> +		vsi->netdev = NULL;
+> +	}
+>  	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
+>  err_vsi:
+>  	i40e_vsi_clear(vsi);
 
 
