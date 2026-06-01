@@ -1,234 +1,361 @@
-Return-Path: <netdev+bounces-293804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293805-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFYaLkikHWr5cgkAu9opvQ
-	(envelope-from <netdev+bounces-293804-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 17:24:56 +0200
+	id OGksHimkHWr5cgkAu9opvQ
+	(envelope-from <netdev+bounces-293805-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 17:24:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 156DF621A1F
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 17:24:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 864E3621A0E
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 17:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B826302B092
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 15:15:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 07E6B30225D0
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 15:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88A633D9028;
-	Mon,  1 Jun 2026 15:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B65F3DB62E;
+	Mon,  1 Jun 2026 15:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b="y0Vbt2pO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sy54UBgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0D23D905D
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 15:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42B63DA7F8
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 15:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780326917; cv=none; b=RTRVXdMOUOIRW5n3tZ4eJ7T39OIBJLEefIpRNduPMjVyKOyj5Kaiq8Ua8kxOLX+VAn+c2r+eeAUhs4xKrSeSV9dbxBXcFXmScv/+NF0x3/LSHZz3jLoisjXDKJqh9h0vXJX04g/aJXZ/dR4wssfR6lQd7SE+5ICWFS16ite/jEo=
+	t=1780327086; cv=none; b=bltSJOPjTKH6mcykGbJE+47EzbJhWreaaqV2AEJtE3FeWNeJ+vfwMt/h2iPwyMQ3QhMlB1EIpPVbCHupGIiziBWOb4ttbBYPuovB2BnPv+7kudog7amni7voylVqtxTATeDpfp3fEh4+xslQC+vkcy4VF8c320XyM3wYSw0WPO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780326917; c=relaxed/simple;
-	bh=2MXUrqP50B7XcVz861ZemOFtYgIly9nH4PrO6Ic6ym8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SGM0LOz8wVpc4ewXbzkJcxO+F+XoAv0uUYi0OKNxSfFm2NllLqfYkF8Q8vCFYyCmT+QDPfZ4EPveHCFJFC5OoAiWPxoz690GfBT7cSCOa+A4r434Icy6r1f5iy4GSKmy248brrjQbQ1iX69yY8B6GNwnmliG0GxrPTrQXDujzcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=y0Vbt2pO; arc=none smtp.client-ip=209.85.222.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-9638d15f871so1529366241.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 08:15:13 -0700 (PDT)
+	s=arc-20240116; t=1780327086; c=relaxed/simple;
+	bh=8FFo7QVhD9jTMfiajr2YHuBvqBorAyV2RcTNZD/fVF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DdBTgAdFwENti39GxavfU0yA5VnI+JLDtC0pT2kBbPWi7AoWV/wjufBpoV8NwAN1jhXvyQ7y9vJehfrM5rSoM1eLvca+H4JVg/aCHYELuSSK2l1aQ6HhsRLQD0l1FstQP2qJf4txuJf9vEPdaFSO0UVF6dNUcS08vtAy8TH4GJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sy54UBgo; arc=none smtp.client-ip=209.85.214.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2c0c20f0c0aso10297645ad.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 08:17:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1780326912; x=1780931712; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FPTNIzliAheYDBgMd3OesTJXCtynKcxw/qSbdwpq3CA=;
-        b=y0Vbt2pOvxdqxpI+hzyaT9AZasgy+TKjH8r12s8uerDzhO+lzRltZ0dkteH2qOx64s
-         /U2JSGMSm27D+7eh9g9xVQVpD5zXYzrkEamKzDVjQy42jwV3Nh1JhRBI7oylGbVOlh9E
-         WCb6GFs4aayoqoNDvINj7sGSJdSGwH42rqTY4=
+        d=gmail.com; s=20251104; t=1780327078; x=1780931878; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KEFV9Atlreiumvbd96uJc9jcp+WvYr8pgeQcn+NCl6c=;
+        b=sy54UBgo82Ssvt7qtGI4SGWc4aa0qpSgROUzubh7Ac2qBQJfVP037SLDkYAbnN7PFQ
+         0e15WGblDfbdFgTurseqhETKhkPyO2rtdXzw5CPVnjFPd+uohxqEGLNveIdIsESd1jr8
+         BraBIVeKH/A6t4x6UzkyifSJZNDAzdgOrTQsQbNZ/1KKXk8AaP3VGNgLSWQnwet5AXEP
+         V1ikQjuZDD04sZ6NjsiVDnFiM3VCxm4RHogSXHzsQ+/5Wghaa8o8brsqfWUvd8aq9KkB
+         vJ5w1xYvCmgGUimkxoXRAgl1f85jBdrgEp9MxdMD8pWlprkSqhx86V7GC8iPSNToUmOU
+         t8Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780326912; x=1780931712;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FPTNIzliAheYDBgMd3OesTJXCtynKcxw/qSbdwpq3CA=;
-        b=lPCETnDXZw0AOf6VT/o4nUswWrLERaGs3Ia20ZWFaN8uNB5i7UZ93uOpCnvWHRH7KE
-         J8GNpB+jnOgizuUAPBR/gLhyJqjyYhHItPuyCavVKXwcgS1MNUx8zQgbdVduV2miOaxi
-         ah0bqoTj2TTSt+QuMAqPg7BssRTJoJUcpSaJyMwjHiKOoYvcG9CA408KhKtVjYrskpGd
-         0sgwoOmUJoP+4x5RXcbf9vxb9atU7X15DSWKYSRY6j/xDYaAq26Wt+IQn5/TZmBmLQnY
-         WmGfCBcKi1AgoBfQVwTCap5EBGmFjR7Ueu9OYmTH7xab8zeZ93AYKEfMigP8HuMi5mZW
-         ExHw==
-X-Forwarded-Encrypted: i=1; AFNElJ+BQJxKaOC6z3qIF92uVCmdK/MhagNVCNwADX4Ykibw8ihF57OFWhgOp7xU60y/foPshwHPUeg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5FEGEHMhFpcM9jPxLe+UjnBk6EiZuaoZJhP/XXeja0AEdUYO4
-	EZmgRaurqujJhBiM24QGdSSt0lEzlk0596uAS6Vh3yET8rLsAeyON20xPzR2BZo4aw==
-X-Gm-Gg: Acq92OGGW189DEkKKcCDB30Zj+vDCNsFX/slpf40iatUTFvuOubdyALxcks8vdp7VYS
-	OYSS+1ImFeSGmePLxd7EIYqpK5UIU8wBddQiYfiYtGJPpRVDF+6SbXAPrUtZggRaa4brvBFmlrc
-	cxpRRsgkaCBC1FdHKAjco+epHv5G+LorKmP7qBTWiqyio04BYLT6vXobj1KnzlajKED6H8E0EsJ
-	AWElkOQkyDQZEZGowO8v3/JQSG8jTFoEu6h5MJWcAo7LZ2QWaaYhVJJaht2n5FXdH+KYqT4W0hP
-	MSQAEJKcBo8WC92yB4wGyoQRVHboVvIdtE+bHDExT1xTOYPaxP7EJnWLqp9nIliZFgp7cslzysF
-	Ly/Z9DfqMa8/pQc9Do9doVSjL/D8FFFzqWZS9xORfaSd5DtPjyGq4wYZA66vf5BhTY0NXazlgEd
-	TjKpfyepXofaexm0Zipudn3s0pNN17F4bDnCtnF/b9fw==
-X-Received: by 2002:a05:6122:489a:b0:575:36c4:8900 with SMTP id 71dfb90a1353d-59bf56cc72dmr5061994e0c.14.1780326912250;
-        Mon, 01 Jun 2026 08:15:12 -0700 (PDT)
-Received: from [192.168.50.25] ([179.218.14.134])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-599d4754259sm7314403e0c.7.2026.06.01.08.15.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 08:15:11 -0700 (PDT)
-Message-ID: <b56d8b37-1267-47f4-a254-66726560ca05@mojatatu.com>
-Date: Mon, 1 Jun 2026 12:15:04 -0300
+        d=1e100.net; s=20251104; t=1780327078; x=1780931878;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KEFV9Atlreiumvbd96uJc9jcp+WvYr8pgeQcn+NCl6c=;
+        b=RZ/qn9oQXtrBetfXm5tWWBgXtuF+W1kBQxUfYZeiZnc6s+FNry4PcyvgIvpp0VmTej
+         qzTGve9sk03XWmF5eFuTCqGJSL8opcLarq0GroRGwBlUuxuOzD9jHOa6t/QOaIDGc/5N
+         /+pRaiTazEdpMrkr8EnkUrdtWdf/6h7zw7/2zTLCQjPqmEW6B59HE/DhIVCZU2tcB3/B
+         nMKOtQ8xswNAcRcJNjpYQPUV2wKwREuBNdUIBDVS9TOqvLLpRpS+f+MIninxHi/V5csv
+         /9BexuRKPU2WlXUs0tPYzw7BOc593nvxavQ4XHmKczyBzrWWnmONbrK2S/lNWtntGYAP
+         421g==
+X-Forwarded-Encrypted: i=1; AFNElJ9+BI5iMP7NNQPOwGO5HWai/6XzapMkQlA/AiO5UNjDVTinUeFa7VzdKg34JcXACBAeSZFfwDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSbZOxbwt8vKFAAPbYAji1dGlAWGf1bHNN6jU9eCNamoX2JXY8
+	xv2jJUsYo7gohUwABVPaLOpJUomRyJoM7GMQH+t/TFKLNqPuUHFkNKLZ
+X-Gm-Gg: Acq92OHtC16SMO8lyv23OOdISgCMO0wieQkFPtwvrjWScSAQ0CbtFGObQUOOSfoJEOi
+	d3Xsyhv/dNobq37CFibg4QI6yhSFPNcN+5KKBmWhg7dVVcK7LYZ2zlAF2VdzPRREy3Ma7gvO4gm
+	amNHAyH7vThRmZqbTQdJa0VXLswhk9DCdDBnUEKELTnc+fJJGHVQnKrxfjHnzEg4g6/EnaLXftw
+	Vyc9LHf2KjkJ+Cg649ExhM9XJV/xEzAe8eTGej6FnvIiywGgf/gJIf5JCGFTSTr9ogNC+ghgLIJ
+	EvSB/9Ufs97BgU8S1xTrKHA49kZ90hAvc57/lAFBo85gpDyrDx33xxowejCGuTcQhACb7MWbbr5
+	goHGhIp74X0MS6CgGPXMdtuUw5mHqCEvoosxrLkJ4km3Gw8DQtCD0H2YJc2M7/RU3WoI3mu3fXp
+	dAa4+XNKUrEeUt2oSv8nSxtR8HynwkwsExD44MfA==
+X-Received: by 2002:a17:903:1905:b0:2bf:1486:e6bc with SMTP id d9443c01a7336-2bf36865b6fmr138516175ad.29.1780327077757;
+        Mon, 01 Jun 2026 08:17:57 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:72::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23c2381bsm110037665ad.62.2026.06.01.08.17.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 08:17:57 -0700 (PDT)
+Date: Mon, 1 Jun 2026 08:17:56 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	michael.chan@broadcom.com, joshwash@google.com, tariqt@nvidia.com, haiyangz@microsoft.com, 
+	linux@armlinux.org.uk, maxime.chevallier@bootlin.com, willemb@google.com, 
+	ernis@linux.microsoft.com, kory.maincent@bootlin.com, danieller@nvidia.com, 
+	idosch@nvidia.com
+Subject: Re: [PATCH net-next 13/14] net: ethtool: optionally skip rtnl_lock
+ on IOCTL path
+Message-ID: <ah2hvWMz70qAYmsG@devvm7509.cco0.facebook.com>
+References: <20260528231637.251822-1-kuba@kernel.org>
+ <20260528231637.251822-14-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] net/sched: act_api: use RCU with deferred
- freeing for action lifecycle
-To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, victor@mojatatu.com,
- kylebot@openai.com, jiri@resnulli.us, vladbu@nvidia.com,
- linux-kernel@vger.kernel.org, security@kernel.org, stable@kernel.org,
- syzbot@syzkaller.appspotmail.com
-References: <20260531160812.68020-1-jhs@mojatatu.com>
-Content-Language: en-US
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20260531160812.68020-1-jhs@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260528231637.251822-14-kuba@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-293804-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[mojatatu.com];
+	TAGGED_FROM(0.00)[bounces-293805-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pctammela@mojatatu.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[openai.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:email,mojatatu.com:mid,mojatatu.com:dkim]
-X-Rspamd-Queue-Id: 156DF621A1F
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,devvm7509.cco0.facebook.com:mid]
+X-Rspamd-Queue-Id: 864E3621A0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 31/05/2026 13:08, Jamal Hadi Salim wrote:
-> When NEWTFILTER and DELFILTER are run concurrently it is possible to create a
-> race with an associated action.
+On 05/28, Jakub Kicinski wrote:
+> Convert the IOCTL path similarly to how we converted Netlink.
+> The device lookup gets a little hairy. We could take rtnl_lock
+> unconditionally and drop it before calling the driver (this would
+> avoid the reference + liveness check). But I think being able
+> to make progress even if rtnl is dead-locked is quite useful.
 > 
-> Let's illustrate with CPU0 running NEWTFILTER and CPU1 running DELFILTER:
+> First extra concern is handling features. List all the cmds which
+> modify features and always take rtnl_lock. We could fold this list
+> into ethtool_ioctl_needs_rtnl() but seems cleaner to keep
+> ethtool_ioctl_needs_rtnl() driver-related. If a driver changed
+> features and we were not holding rtnl_lock - warn about it.
+> It can only happen on buggy ops locked drivers (buggy because
+> they should have set appropriate "I need rtnl for op X" bit).
 > 
->   0: mutex_lock() <-- holds the idr lock
->   0: rcu_read_lock()
->   0: p = idr_find(idr, index) <-- action p is valid (RCU protects IDR)
->   0: mutex_unlock() <-- releases the idr lock
->   1: refcount_dec_and_mutex_lock() <-- refcnt 1->0, mutex held
->   1: idr_remove(idr, index) <-- Action removed from IDR
->   1: mutex_unlock() <-- mutex released allowing us to delete the action
->   1: tcf_action_cleanup(p); kfree(p) <-- Kfrees p immediately, no deferral
->   0: refcount_inc_not_zero(&p->tcfa_refcnt) <-- ouch, UAF p points to freed memory
+> Second wrinkle is the PHY ID hack which drops the locks while
+> sleeping. Convert its static "busy" variable which used to
+> be protected by rtnl_lock to a field in struct ethtool_netdev_state.
+> This feature is about identifying an adapter or a port within
+> a system, so being able to blink multiple LEDs at the same
+> time is likely not very useful in practice. But it's the simplest
+> fix, we can add a mutex if someone thinks a system should only
+> be ID'ing one port at a time.
 > 
-> This patch fixes the race condition between NEWTFILTER and DELFILTER by
-> adding struct rcu_head to tc_action used in the deferral and introducing a
-> call_rcu() in the delete path to defer the final kfree().
-> 
-> Note: this is a revert of commit d7fb60b9cafb ("net_sched: get rid of tcfa_rcu")
-> but also modernization/simplification to directly use kfree_rcu().
-> 
-> Let's illustrate the new restored code path:
-> 
->   0: rcu_read_lock()
->   1: refcount_dec_and_mutex_lock() <-- refcnt 1->0, mutex held
->   1: idr_remove(idr, index)
->   1: mutex_unlock()
->   1: call_rcu(&p->tcfa_rcu, tcf_action_rcu_free) <-- defer kfree after grace period
->   0: p = idr_find(idr, index)
->   0: refcount_inc_not_zero(&p->tcfa_refcnt) <-- fails, refcnt already 0
->   1: rcu_read_unlock() <-- release so freeing can run after grace period
-> 
-> After CPU1 calls idr_remove(), the object is no longer reachable through the IDR.
-> CPU0's subsequent idr_find() will return NULL, and even if it still held a
-> stale pointer, the immediate kfree() is now deferred until after the RCU grace
-> period, so no UAF can occur.
-> 
-> Fixes: d7fb60b9cafb ("net_sched: get rid of tcfa_rcu")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reported-by: Kyle Zeng <kylebot@openai.com>
-> Tested-by: Victor Nogueira <victor@mojatatu.com>
-> Tested-by: syzbot@syzkaller.appspotmail.com
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-
-
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> v1->v2
-> 1) syzbot ci found revealed that the cleanup code could be called under
->     softirq/atomic context. Because tcf_action_cleanup() calls  __tcf_chain_put()
->     which grabs a mutex (which can sleep). Fix is to move tcf_action_cleanup()
->     to be invoked before call to rcu.
-> 2) And while looking closely i noticed a bad comment on action code which
->     claims that "actions are always connected to filters" ;-> Tracing back
->     on git i noticed that infact we did have exactly this new change circa 2017
->     that was erronously removed by commit d7fb60b9cafb. Well, at least I
->     am certain what the "Fixes" tag should be now ;->
-> 3) Patch is much much simpler now than it was in v1
-> ---
->   include/net/act_api.h | 1 +
->   net/sched/act_api.c   | 7 +------
->   2 files changed, 2 insertions(+), 6 deletions(-)
+>  include/linux/ethtool.h |  2 +
+>  net/ethtool/ioctl.c     | 98 ++++++++++++++++++++++++++++++-----------
+>  2 files changed, 74 insertions(+), 26 deletions(-)
 > 
-> diff --git a/include/net/act_api.h b/include/net/act_api.h
-> index d11b79107930..fd2967ee08f7 100644
-> --- a/include/net/act_api.h
-> +++ b/include/net/act_api.h
-> @@ -45,6 +45,7 @@ struct tc_action {
->   	struct tc_cookie	__rcu *user_cookie;
->   	struct tcf_chain	__rcu *goto_chain;
->   	u32			tcfa_flags;
-> +	struct rcu_head         tcfa_rcu;
->   	u8			hw_stats;
->   	u8			used_hw_stats;
->   	bool			used_hw_stats_valid;
-> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> index 332fd9695e54..04ea11c90e03 100644
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -112,11 +112,6 @@ struct tcf_chain *tcf_action_set_ctrlact(struct tc_action *a, int action,
->   }
->   EXPORT_SYMBOL(tcf_action_set_ctrlact);
->   
-> -/* XXX: For standalone actions, we don't need a RCU grace period either, because
-> - * actions are always connected to filters and filters are already destroyed in
-> - * RCU callbacks, so after a RCU grace period actions are already disconnected
-> - * from filters. Readers later can not find us.
-> - */
->   static void free_tcf(struct tc_action *p)
->   {
->   	struct tcf_chain *chain = rcu_dereference_protected(p->goto_chain, 1);
-> @@ -129,7 +124,7 @@ static void free_tcf(struct tc_action *p)
->   	if (chain)
->   		tcf_chain_put_by_act(chain);
->   
-> -	kfree(p);
-> +	kfree_rcu(p, tcfa_rcu);
->   }
->   
->   static void offload_action_hw_count_set(struct tc_action *act,
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 4f15221119e2..35ee57a0e5fa 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -1375,6 +1375,7 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
+>   *			within RTNL.
+>   * @rss_indir_user_size: Number of user provided entries for the default
+>   *			 (context 0) indirection table.
+> + * @phys_id_busy:	Loop blinking the device LED is running.
+>   * @wol_enabled:	Wake-on-LAN is enabled
+>   * @module_fw_flash_in_progress: Module firmware flashing is in progress.
+>   */
+> @@ -1382,6 +1383,7 @@ struct ethtool_netdev_state {
+>  	struct xarray		rss_ctx;
+>  	struct mutex		rss_lock;
+>  	u32			rss_indir_user_size;
+> +	unsigned		phys_id_busy:1;
+>  	unsigned		wol_enabled:1;
+>  	unsigned		module_fw_flash_in_progress:1;
+>  };
+> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+> index 6c3a7e8644ae..aea087d62fe9 100644
+> --- a/net/ethtool/ioctl.c
+> +++ b/net/ethtool/ioctl.c
+> @@ -543,7 +543,7 @@ static int ethtool_get_link_ksettings(struct net_device *dev,
+>  	int err = 0;
+>  	struct ethtool_link_ksettings link_ksettings;
+>  
+> -	ASSERT_RTNL();
+> +	netdev_ops_assert_locked(dev);
+>  	if (!dev->ethtool_ops->get_link_ksettings)
+>  		return -EOPNOTSUPP;
+>  
+> @@ -600,7 +600,7 @@ static int ethtool_set_link_ksettings(struct net_device *dev,
+>  	struct ethtool_link_ksettings link_ksettings = {};
+>  	int err;
+>  
+> -	ASSERT_RTNL();
+> +	netdev_ops_assert_locked(dev);
+>  
+>  	if (!dev->ethtool_ops->set_link_ksettings)
+>  		return -EOPNOTSUPP;
+> @@ -674,7 +674,7 @@ static int ethtool_get_settings(struct net_device *dev, void __user *useraddr)
+>  	struct ethtool_cmd cmd;
+>  	int err;
+>  
+> -	ASSERT_RTNL();
+> +	netdev_ops_assert_locked(dev);
+>  	if (!dev->ethtool_ops->get_link_ksettings)
+>  		return -EOPNOTSUPP;
+>  
+> @@ -710,7 +710,7 @@ static int ethtool_set_settings(struct net_device *dev, void __user *useraddr)
+>  	struct ethtool_cmd cmd;
+>  	int ret;
+>  
+> -	ASSERT_RTNL();
+> +	netdev_ops_assert_locked(dev);
+>  
+>  	if (copy_from_user(&cmd, useraddr, sizeof(cmd)))
+>  		return -EFAULT;
+> @@ -2451,10 +2451,10 @@ void ethtool_puts(u8 **data, const char *str)
+>  }
+>  EXPORT_SYMBOL(ethtool_puts);
+>  
+> -static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
+> +static int ethtool_phys_id(struct net_device *dev, void __user *useraddr,
+> +			   bool has_rtnl_lock)
+>  {
+>  	struct ethtool_value id;
+> -	static bool busy;
+>  	const struct ethtool_ops *ops = dev->ethtool_ops;
+>  	netdevice_tracker dev_tracker;
+>  	int rc;
+> @@ -2462,7 +2462,7 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
+>  	if (!ops->set_phys_id)
+>  		return -EOPNOTSUPP;
+>  
+> -	if (busy)
+> +	if (dev->ethtool->phys_id_busy)
+>  		return -EBUSY;
+>  
+>  	if (copy_from_user(&id, useraddr, sizeof(id)))
+> @@ -2472,13 +2472,14 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
+>  	if (rc < 0)
+>  		return rc;
+>  
+> -	/* Drop the RTNL lock while waiting, but prevent reentry or
+> +	/* Drop the locks while waiting, but prevent reentry or
+>  	 * removal of the device.
+>  	 */
+> -	busy = true;
+> +	dev->ethtool->phys_id_busy = true;
+>  	netdev_hold(dev, &dev_tracker, GFP_KERNEL);
+>  	netdev_unlock_ops(dev);
+> -	rtnl_unlock();
+> +	if (has_rtnl_lock)
+> +		rtnl_unlock();
+>  
+>  	if (rc == 0) {
+>  		/* Driver will handle this itself */
+> @@ -2491,22 +2492,25 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
+>  		u64 i = 0;
+>  
+>  		do {
+> -			rtnl_lock();
+> +			if (has_rtnl_lock)
+> +				rtnl_lock();
+>  			netdev_lock_ops(dev);
+>  			rc = ops->set_phys_id(dev,
+>  				    (i++ & 1) ? ETHTOOL_ID_OFF : ETHTOOL_ID_ON);
+>  			netdev_unlock_ops(dev);
+> -			rtnl_unlock();
+> +			if (has_rtnl_lock)
+> +				rtnl_unlock();
+>  			if (rc)
+>  				break;
+>  			schedule_timeout_interruptible(interval);
+>  		} while (!signal_pending(current) && (!id.data || i < count));
+>  	}
+>  
+> -	rtnl_lock();
+> +	if (has_rtnl_lock)
+> +		rtnl_lock();
+>  	netdev_lock_ops(dev);
+>  	netdev_put(dev, &dev_tracker);
+> -	busy = false;
+> +	dev->ethtool->phys_id_busy = false;
+>  
+>  	(void) ops->set_phys_id(dev, ETHTOOL_ID_INACTIVE);
+>  	return rc;
+> @@ -3259,7 +3263,8 @@ static int ethtool_set_fecparam(struct net_device *dev, void __user *useraddr)
+>  static int
+>  dev_ethtool_locked(struct net *net, struct net_device *dev,
+>  		   void __user *useraddr,
+> -		   u32 ethcmd, struct ethtool_devlink_compat *devlink_state)
+> +		   u32 ethcmd, struct ethtool_devlink_compat *devlink_state,
+> +		   bool has_rtnl_lock)
+>  {
+>  	u32 sub_cmd;
+>  	int rc;
+> @@ -3315,6 +3320,8 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
+>  			return -EPERM;
+>  	}
+>  
+> +	netdev_ops_assert_locked(dev);
+> +
+>  	if (dev->dev.parent)
+>  		pm_runtime_get_sync(dev->dev.parent);
+>  
+> @@ -3402,7 +3409,7 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
+>  		rc = ethtool_get_strings(dev, useraddr);
+>  		break;
+>  	case ETHTOOL_PHYS_ID:
+> -		rc = ethtool_phys_id(dev, useraddr);
+> +		rc = ethtool_phys_id(dev, useraddr, has_rtnl_lock);
+>  		break;
+>  	case ETHTOOL_GSTATS:
+>  		rc = ethtool_get_stats(dev, useraddr);
+> @@ -3549,8 +3556,12 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
+>  	if (dev->ethtool_ops->complete)
+>  		dev->ethtool_ops->complete(dev);
+>  
+> -	if (old_features != dev->features)
+> -		netdev_features_change(dev);
+> +	if (old_features != dev->features) {
+> +		if (has_rtnl_lock)
+> +			netdev_features_change(dev);
+> +		else
+> +			netdev_WARN(dev, "unexpected device features change with ethtool cmd %u", ethcmd);
+> +	}
+>  out:
+>  	if (dev->dev.parent)
+>  		pm_runtime_put(dev->dev.parent);
+> @@ -3558,25 +3569,60 @@ dev_ethtool_locked(struct net *net, struct net_device *dev,
+>  	return rc;
+>  }
+>  
+> +/* Commands that may toggle dev->features in net/ethtool/ioctl.c and so
+> + * call into __netdev_update_features(), which still requires rtnl_lock.
+> + * Driver-decided SET commands that may chain into rtnl-only helpers are
+> + * covered by ethtool_ioctl_needs_rtnl()/ETHTOOL_OP_NEEDS_RTNL_*.
+> + */
+> +static bool ethtool_cmd_changes_features(u32 ethcmd)
+> +{
+> +	switch (ethcmd) {
+> +	case ETHTOOL_SFEATURES:
+> +	case ETHTOOL_SFLAGS:
+> +	case ETHTOOL_STXCSUM:
+> +	case ETHTOOL_SRXCSUM:
+> +	case ETHTOOL_SSG:
+> +	case ETHTOOL_STSO:
+> +	case ETHTOOL_SGSO:
+> +	case ETHTOOL_SGRO:
+> +		return true;
 
+GVE's gve_get_ethtool_stats (ETHTOOL_GSTATS) still has ASSERT_RTNL and
+is now reachable with only ops lock?
 
