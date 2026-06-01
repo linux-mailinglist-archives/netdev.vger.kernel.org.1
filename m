@@ -1,228 +1,167 @@
-Return-Path: <netdev+bounces-293882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ePczOffQHWqjewkAu9opvQ
-	(envelope-from <netdev+bounces-293882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:35:35 +0200
+	id 4G1tNevSHWpMfAkAu9opvQ
+	(envelope-from <netdev+bounces-293883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:43:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BB06240F4
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:35:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64BE6242F9
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6DE4330AAAE6
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:21:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 09CAE3017EA2
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AA837268A;
-	Mon,  1 Jun 2026 18:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFEE83EB818;
+	Mon,  1 Jun 2026 18:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NhUOGQ0k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eYA/soCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E853DCDB5
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780338066; cv=none; b=dGNxxleXFWpb2i9+OWORdj4kzE6+TDuB0+EEvqv443CK6pHsp6yl+3/uG9sBsD179Yqwe2GYvBQukdrVeOckBOuuubxI8LMXfVl6m70kDg9LEqmjcphMeOebFa9vSD71W+F78IBu7xp29BFObFPT9wzLevdsiQgZo32KdEzlP0c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780338066; c=relaxed/simple;
-	bh=ziCLaRVETWZVsA1sLjYS0EtIyhi15Of1hgm02DnyZsk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=khJhBcPqBYixKcULVj1yMoJ2tGLImvqp7k1FVS2AKSDsUWqVfnGrQeeNUPhL27AmpmV3Wo8tqoI9bWTi3qp/1o1QAfVTkYeLNRqhCVwTT96XpgtCNKGoxYPrnTgr1r1hq3tKE6S48K2kRPf0c/YbIMwxS6uXTEYR+Tm78cDzPUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NhUOGQ0k; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913BF3E3D96
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780338156; cv=pass; b=niqBmi2cQUgnW9vmmjlcr23JMZc1pbL+e4kSwyQwlSac00CuRf7MPGb3jsdAZwQbHjhhVp9gQh4g3ZkDbxRastNYSU9aBdIBlahPorZCS0gjKa5rnGmjNGtwtj3Eww+BkvziEoJtDLKuKPUXMMIy+bBJyBrxISVpwOpTBVddwWY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780338156; c=relaxed/simple;
+	bh=N1m33x17+XrHfhbN66kkunHt66Z9GPFsEN5R5dqTEyw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lc0k1NUxMAFH4wvrqtOi/gZQluRIy1+7+It/GIgV4hslGS64FRVMQywQIiy7/KA+8S9WND9z3xNVP9EFgsPYomzOgLsyBehg3wcI5hM4nPYxaIwE/bavUBHL+UU2ZKMKvja44lwu0nCdKfa78gaD6FjN1yBsz1IRGatqJ6IiLfQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eYA/soCY; arc=pass smtp.client-ip=74.125.82.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2beff6b6e74so56286915ad.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:21:04 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-137bd9ed2b1so2010862c88.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:22:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780338155; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fpaFpkf+GDS94DOFC9sGkd2MOrGJqh896AN94RJSGBrUP2KV/i46Itz+NVMjgJqkj3
+         OxYbvhzddtCwdbn+k4mk1Elm6xf01C/sQHnbTgdsf+ioi17YzHO26E4rJSYF2M2yP/5F
+         qUfV0t3+PvX8n4Z9uSk/zPXmcaO+TSkq738GL8gvjkPSsjQ0fyKiKOmoH5E/fps4Huho
+         HmQcj7mQ6jF7lTo9VUEPY4RCyy9iXWlcD9gTJuNHakOB9ndCKl9pB7/OJR5F6VzkCh2Y
+         9xGiktSsJADJewLkiqQHY2XioLwzl1Txv4uLIK4KtkMQEzck1gKnr140KIvneb3wg7kT
+         TDuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9VdHPFcJtMuwlab3hfbQKyW9jn3qtuqt1ofPGzn3rD0=;
+        fh=/lelQdmOlpCW9LAk7ZDL5N3lxrSBIcEcPVrlMBwa8Eo=;
+        b=B6qBRi52oZfHQIRKIHdONIDTsnouuCJPDaX1tQPPZY3Ix+sDCZdIKtgi6hCcHcjlur
+         OTeZed+yi/sJIhu1zOsGSaAakW7HOS32IchtA2HJW1F3ZqydsVbl8V57PD6EgNOpBT+k
+         YDTuVCZvz/OduyFCI6h+Cduq4NOAxuqahMb6zcCB7FpPtbke31fUkvl7JydR8LlK29l6
+         bUZ9yXcX+0jEcwrSPlHmN3/SoxlwN8FsGbLQ10xA+vKJUNPlH3Xg8B+BKFSpxJEHcNOl
+         vgIN8gdjlqV5cvXNbHH+A0KzZKquCjhPBTEYniTkq/a3TEl59xScB/uoVh2Oa6tbrR0D
+         VaXw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780338064; x=1780942864; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8nVHEuj662D4R2SfspXOx6nVdszfS+ysxhQZWkZnKlk=;
-        b=NhUOGQ0k/9e0OCAQ54E81DhS8vWscN9+jUlJ/Gafx6y8dmo+qBi5TGip6T+kmJFx2/
-         nrcY5DUW0gVgZqcExqE3xmtEXtZxADA2F3G6IWsHCP3t3b3RwufydM4PSoHMkZaJWmwH
-         Fwz6iXPvnDWVCPVagtwusx2zjMuGaSsyWUwnzA+voVJHvHdzgtKmq507qoX+Yx23Wn+7
-         rq5Y4Y5GzT7Ok6pC5+65k+jr8uu6LxAfH/9Dti9nSI4XxZH1Y03QwsfNVhia/7LWQZP1
-         gH0iPcPb/yaqQrIAXj7l0n2BXjslgDMl7wEQAGnbjbtpR9L3ti2smSvtpHS0iWoKzyMQ
-         trgg==
+        d=google.com; s=20251104; t=1780338155; x=1780942955; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9VdHPFcJtMuwlab3hfbQKyW9jn3qtuqt1ofPGzn3rD0=;
+        b=eYA/soCYFkpf5c4sb6+E/MpEUBL1yD3tZAbhSesBEeC4IhCzswRciYPatVtyOIVlje
+         URalwN1azcFQMgPD8MqR5g354aGpRxcWrY4YQt8pFo9/k8GjN0qC/AgK9OaLnNxwUP0u
+         21Ei28PMWbFjJ349/4KjkBz/9xIKRyFaMJYeDGnSC/jes9buhq5QOkiSotJ5+HyOYarL
+         qhHYfVOTAOFjbTX6OodHp0mNDmULp88ch7Yv6wSpQO/xSfgAmkhjV3v3Gt1ZWuMaItsQ
+         yJpU0xsaQ62/ugrXiZhbr2XxERxXa4tIDJtGXPfUPlWBj+t4ynvGaCyzhG9lA77zYYhN
+         rzmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780338064; x=1780942864;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8nVHEuj662D4R2SfspXOx6nVdszfS+ysxhQZWkZnKlk=;
-        b=NUG8btoJ+Iz9Tx/FczodPVhYnWbAJO/FccC9kpPAps+txO7UNzpAnqw99O0pMYwLq2
-         cSOo6OFrbzjW+R0QRHf1SNH2RGvyHfPsE6OST1GyEZG9LP/vzaVMjF2T+sP0KVJJrR0+
-         lU+FZ/gXJwfEal6ePFJ+l1mC2c5FDtGaB7y7pQX2nfg5KnwbUyPZGdKGc51dVGscAlqK
-         s5qdxPPc43Raqwfc0etbhA+hL2aKhhbO1Yln4C9f1Cvev4a1q63g4xroJJ1X2HDA4JLF
-         zJliYwR3xphWNjKpv+TUSRvd0U8vAIfTO/5CKCU90lItv0BgnbJfeq1mA4H5wJgaEmmQ
-         rkDQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/gIwISLVy7Ex3TDyXf19/Mf/2CHDRXKtiwtBzFKRTMRPxvkFT91b+2+4XLxA/FyBRutXtUwmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfhzjbPrsniHa+x0lINTOb/q+a7I48LlVlB/HIzOFyzWksk2vb
-	Oh0KQSzUrxs6ozsbwmT26ugtY6cFcU/FhcbBMvSLRpvRf4u2F4h5lwagSagdfnIbQd3K1LP7LGz
-	TjZqARQ==
-X-Received: from plbkk16.prod.google.com ([2002:a17:903:710:b0:2b4:62bc:c2a9])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e543:b0:2b2:5857:583e
- with SMTP id d9443c01a7336-2bf368589ccmr134201325ad.31.1780338063542; Mon, 01
- Jun 2026 11:21:03 -0700 (PDT)
-Date: Mon,  1 Jun 2026 18:20:55 +0000
+        d=1e100.net; s=20251104; t=1780338155; x=1780942955;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9VdHPFcJtMuwlab3hfbQKyW9jn3qtuqt1ofPGzn3rD0=;
+        b=F1NTtOsCRFbbmoPflMG8HG4Djvbse091W0sxTtZFHWCfzA8ltlINKekcHaoYv8HhYX
+         7dqnSA4giWVzM7YF3xVv2yKNyHMFz23OnTzerQy5uu8gYnBZWu8IeW4oO7WpggW9Giqn
+         xemvzFVURpIamn0TbLcZ4tog67rV2+OMAkvBfUAPfsK8/7HCp3xI/E1qQeYR47FRRGGY
+         lvTEWzYBDZcmMxnd5IpGBeE2wqzFFeqBrJom+ALmwko/6jEx0MsgoyQPE211uBu0zZQd
+         RYKYi7MTZQ6FwgxNcgJt7hD83F2MakOnop4rWMfxQbkhnm/6Dza8vbN3nADRyyRoluXQ
+         qUiw==
+X-Forwarded-Encrypted: i=1; AFNElJ+bZuC9FpLatUdezvEdffl+PlsQ72VT1pMW1Gjudvi/NfsiA09G2QSdCtVGVZzT/2sDzmCU/pM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylDYt8S5lk0TkPhmUenJsa8l2GB6a05X48jeNLR/M6F24ry7g2
+	yFG53DJYeHtIrt0vwbs+gLczZ53uCOB4wT50fBlQ3zctnaGWZrgrK9o93mQ4Ok9KQJ66BYSQ9gd
+	Hjwa6nxSp/hX2xCicf32YoZFBXOxQ+gO8OLT3AF1S
+X-Gm-Gg: Acq92OEiQgjLa3GXxB/DWKAunWFW1085lpRVYLqd6DXn5db2ZuA3/ZdjMdnNrYxxEnQ
+	VGQVukBE6kWM+16rKb3RKps0v+Zar6eLrZq6vgDzWIe6D31j43S3CyMyjjKKNwcFJqmlYsHeZlk
+	F378FTqtnN+KclnIOC+QOTQHBJpbNXt5m3H+uDo7i6JESzoNqvhyEkg1pTQ86nT1JftRgZ+F7Kg
+	DrOrdyVt/upNuitqR+JsZIabV9pYQtgG11cSX8wwE1ll/3Yn0TjH0IqwEygKqZBL/9rUT8kNjDb
+	wwudAutjIHpSDr1/1pX1hQrj3+YK2wbfLT5Kao+N/MsvNLFA5upVjvM6jvO6NIsHMV0blvd+ObO
+	yPrI18jZrwBgwUUYUf1uxpNk8Bd+ssuIKIlPCGrOZGfWHSHlBVaNj2Wi7QLsS
+X-Received: by 2002:a05:7022:421:b0:12c:8f92:c6ba with SMTP id
+ a92af1059eb24-137d425fce8mr5208824c88.34.1780338153870; Mon, 01 Jun 2026
+ 11:22:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.929.g9b7fa37559-goog
-Message-ID: <20260601182101.3183993-1-kuniyu@google.com>
-Subject: [PATCH v2 net] tcp: Add preempt_{disable,enable}_nested() in reqsk_queue_hash_req().
+MIME-Version: 1.0
+References: <20260601093819.469626-1-edumazet@google.com>
+In-Reply-To: <20260601093819.469626-1-edumazet@google.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
+Date: Mon, 1 Jun 2026 11:22:21 -0700
+X-Gm-Features: AVHnY4KgJvNNCchzlbhCx5D6zIkR6KMeHh_0DnWmM7j0vtDQI8AjQf0NiBucZXI
+Message-ID: <CAAVpQUBL90mSWrNHzSzYf_Vx=wVSw3i3eNZGT7rH7b6ExwCMeA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: change bpf_skops_hdr_opt_len() signature
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293882-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,goodmis.org,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-293883-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,e809069bc15f26300526];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E9BB06240F4
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: D64BE6242F9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot reported a weird reqsk->rsk_refcnt underflow in
-__inet_csk_reqsk_queue_drop().
+On Mon, Jun 1, 2026 at 2:38=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> Some compilers do not inline bpf_skops_hdr_opt_len() from
+> tcp_established_options(), forcing an expensive stack canary
+> when CONFIG_STACKPROTECTOR_STRONG=3Dy.
+>
+> Change bpf_skops_hdr_opt_len() to return @remaining by value
+> to remove this stack canary from TCP fast path.
+>
+> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+> add/remove: 0/0 grow/shrink: 1/1 up/down: 10/-59 (-49)
+> Function                                     old     new   delta
+> bpf_skops_hdr_opt_len                        297     307     +10
+> tcp_established_options                      574     515     -59
+> Total: Before=3D31456795, After=3D31456746, chg -0.00%
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-The captured reqsk_put() in __inet_csk_reqsk_queue_drop()
-is called only when it successfully removes reqsk from ehash.
-
-Moreover, reqsk_timer_handler() calls another reqsk_put()
-after that.
-
-This indicates that the reqsk was missing both refcnts for
-ehash and the timer itself.
-
-Since all the syzbot reports had PREEMPT_RT enabled, the only
-possible scenario is that reqsk_queue_hash_req() is preempted
-after mod_timer() and before refcount_set(), and then the timer
-triggered after 1s aborts the reqsk due to its listener's close().
-
-Let's wrap mod_timer() and refcount_set() with
-preempt_disable_nested() and preempt_enable_nested().
-
-Note that inet_ehash_insert() holds the normal spin_lock()
-(mutex in PREEMPT_RT), so it must be called outside of
-preempt_disable_nested(), but this is fine.
-
-The lookup path just ignores 0 sk_refcnt entries in ehash
-and tries to create another reqsk, but this will fail at
-inet_ehash_insert().
-
-[0]:
-refcount_t: underflow; use-after-free.
-WARNING: lib/refcount.c:28 at refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28, CPU#0: ktimers/0/16
-Modules linked in:
-CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)}
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:refcount_warn_saturate+0xb2/0x110 lib/refcount.c:28
-Code: e4 7d d1 0a 67 48 0f b9 3a eb 4a e8 38 3d 23 fd 48 8d 3d e1 7d d1 0a 67 48 0f b9 3a eb 37 e8 25 3d 23 fd 48 8d 3d de 7d d1 0a <67> 48 0f b9 3a eb 24 e8 12 3d 23 fd 48 8d 3d db 7d d1 0a 67 48 0f
-RSP: 0000:ffffc90000157948 EFLAGS: 00010246
-RAX: ffffffff84a1301b RBX: 0000000000000003 RCX: ffff88801ca98000
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: ffffffff8f72ae00
-RBP: ffffffff99ae3b01 R08: ffff88801ca98000 R09: 0000000000000005
-R10: 0000000000000100 R11: 0000000000000004 R12: ffff8880425ef568
-R13: ffff8880425ef4f8 R14: ffff8880425ef578 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff888126386000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f7b46710e9c CR3: 000000000dbb6000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __refcount_sub_and_test include/linux/refcount.h:400 [inline]
- __refcount_dec_and_test include/linux/refcount.h:432 [inline]
- refcount_dec_and_test include/linux/refcount.h:450 [inline]
- reqsk_put include/net/request_sock.h:136 [inline]
- __inet_csk_reqsk_queue_drop+0x3ce/0x440 net/ipv4/inet_connection_sock.c:1007
- reqsk_timer_handler+0x651/0xdf0 net/ipv4/inet_connection_sock.c:1137
- call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
- expire_timers kernel/time/timer.c:1799 [inline]
- __run_timers kernel/time/timer.c:2374 [inline]
- __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
- run_timer_base kernel/time/timer.c:2395 [inline]
- run_timer_softirq+0x67/0x170 kernel/time/timer.c:2403
- handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- run_ktimerd+0x69/0x100 kernel/softirq.c:1151
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
-Reported-by: syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6a1a7bcf.0a9e871e.332604.000b.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v2: Move preempt_disable_nested() just before mod_timer()
-    to avoid unnecessary latency as much as possible.
-    (tcp_timeout_init() calls SOCK_OPS bpf prog)
-
-v1: https://lore.kernel.org/netdev/20260530055907.280160-1-kuniyu@google.com/
----
- net/ipv4/inet_connection_sock.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index dbcd37dfdc15..5b934ce8d98a 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -1148,6 +1148,9 @@ static bool reqsk_queue_hash_req(struct request_sock *req)
- 	/* The timer needs to be setup after a successful insertion. */
- 	req->timeout = tcp_timeout_init((struct sock *)req);
- 	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
-+
-+	preempt_disable_nested();
-+
- 	mod_timer(&req->rsk_timer, jiffies + req->timeout);
- 
- 	/* before letting lookups find us, make sure all req fields
-@@ -1155,6 +1158,9 @@ static bool reqsk_queue_hash_req(struct request_sock *req)
- 	 */
- 	smp_wmb();
- 	refcount_set(&req->rsk_refcnt, 2 + 1);
-+
-+	preempt_enable_nested();
-+
- 	return true;
- }
- 
--- 
-2.54.0.929.g9b7fa37559-goog
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
