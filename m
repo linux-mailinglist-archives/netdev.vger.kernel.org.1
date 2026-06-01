@@ -1,189 +1,235 @@
-Return-Path: <netdev+bounces-293892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBo4GAPUHWq6fAkAu9opvQ
-	(envelope-from <netdev+bounces-293892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:48:35 +0200
+	id MFsIMAbWHWq6fAkAu9opvQ
+	(envelope-from <netdev+bounces-293893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:57:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6962624404
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:48:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C4B624511
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BC495304B886
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:47:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0D28C300EC63
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6274434C990;
-	Mon,  1 Jun 2026 18:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC673537E5;
+	Mon,  1 Jun 2026 18:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MHfJGsDH"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="g8VwfbQ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99A135202D
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780339617; cv=pass; b=rH2fnxqXuI7JTOzUmuYrrrxgYCp7YYx+x9xDDsXLCHgRpWjyK5HXspWic3aU/cLV6RwXzj3T/c0FJ3Xn8U+LLTXMGLAuBd02yzJ0IwLY1ocIDVE2HWYJvYB8gg6mwyUCXxNtcFNwKQPChWUam+wQS9E3/LK0bv9ufdsP250xSNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780339617; c=relaxed/simple;
-	bh=oXz9Tg4gu33xF/wC9+230+9RrBA3CUmm/0k/7xBqZJs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ny+P92fZquAGNwTLD0C6hKKmpcaSykfnHYij8MHF6NNSGiXOocKRUOEhUTRFoShgYxJjGWPipcpp5h8s8Ns9YpDS03Jf3bX2vjFRGmnIoNv5wDqO3YmzCZTFy2nFhZtmH40yZEdbV67tkSngzGRVyg0sN7z8dAkurafSUkai59g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MHfJGsDH; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-5176096116fso6638891cf.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:46:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780339614; cv=none;
-        d=google.com; s=arc-20240605;
-        b=De7JGQrsu9KNdt/1Aa5shlx9+xGq/GHsgSVOlqeui2aSQJBosWx9Y4Y3J3xkc9kE0x
-         4UxBpJLgCK0K+ndz6cpTgrGiYizPraszZ6A5h+kxFfLA/BymTsCIwp9TGuz3HyuiaGPb
-         53ETw87ksv+sxdm+gLKt0cblYZ/5dl/c8B3m2eyPDMMSAlktQrVgx/7+8SWaiQBToS7A
-         2/cZ7Yd4KEn9FFjDM3mrnh0qqPoy3KODWuoqrUaOa0Po3iljts+yFFaCjCsk7gDy+YAK
-         btdeMKP5QJxFuvSekLbXsGosywWuvAkgV5+vhc2TEN5gCltrm6OmyiTcSgYAbNR6khr0
-         dwnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oXz9Tg4gu33xF/wC9+230+9RrBA3CUmm/0k/7xBqZJs=;
-        fh=v+Vp9ejRwOCZ7oZChAQ8eCkd/zksp4ZfwXxay9MIFbs=;
-        b=ZEpfc3fW3dix5K6hdl/kutnX1y72F+SDnsgp8GJtA2sheLuMlafox3s1HQpFVq1420
-         teNIUqkkrTjv+4dFQkkKHMKP5RZXZifAUNMvqqgai2t/w3U3XW8lbG3i9xVmBgK2nAtV
-         xrCBMe7+q+uvtIxRkO3/uZ9kjbCE1pgrmxA7mRljxhrZ1SAjlZ2/h1h8surqjG4EZq2Y
-         BgLsoFLbPkTduGWjoPTVJnHBK2BtVyMMeH204beEJoRULdm/DTFVc0rxJsqQsKpPoro7
-         +teQJ/uj9ObwRh6nnI9O7SqoBFAzzkjPMyJgblOf4p4zjSCHyPY4B4yq5cnO/AA6NNeh
-         igNQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025B3346AD3
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780339722; cv=none; b=fUMlMwOrrSjV4Cv6QwiVS+KedrZtIQVE5uOqPNx6/I/iuGf4kRtDSuGtBiOGIkgJMMbIc+iPxXRS7nlpDRpEu8JpL/a1Le34+7zJsD0hr/406jApldYwMhioQKLMSeiSuoMPDk4KtmcNwkpxnwccfRqKEFbO0PPVGOQ71WjHGlI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780339722; c=relaxed/simple;
+	bh=dpwh9EurGC8PWJHM2nwOEMbtuDAWOKFskADoJMJikXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NV5ftDgEc6QZcmQ6BD62OMyn+MU8n6qf87YvY9ipabAzrtfz4PGmBIhKrxW8L5ducBoK19ZGwJOM7t/+FefDFbuOl+GLfTmzd3WsDJsaWTrrz7UmOFrsPuvDcau8I28UF6H1UPqBjtf4yoS0aQFkxdHE22pf43wL4wdSC9696rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=g8VwfbQ6; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-91541fa94aaso278444185a.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:48:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780339614; x=1780944414; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oXz9Tg4gu33xF/wC9+230+9RrBA3CUmm/0k/7xBqZJs=;
-        b=MHfJGsDHtxbrC8PK2IWbKxsbAoBoQwVy8OYxyzSx+zVOUYFbmO49A9tGr3GoQko64t
-         O+mbx6bi3F712zr9r47lu8/PLdxZfwg6c1jxnkx56kPCaDDpg8waUC/k1HM8vSGqRGvy
-         BEEgW83PwjVqQrQ1pKbJ4wHCAW/7hRyLKzHBk08faZuOcUjA6EPgL/99WQqV2ek1OiYi
-         +6EXEK8c6MtUDW88ltFQk+c4aGGKu6iTXUYShJk7uNe7kYudMX5p3h+1DnLTj+XDCSnE
-         v9IpyE8+YGUjaYsXHsJPTCaTHxUWDNQtNk3IrebQ53QQ+c6awDhOlvQkjVs3ojzC8tKn
-         g7qQ==
+        d=ziepe.ca; s=google; t=1780339720; x=1780944520; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZOVGBJ+B1pIGsdNReY7mg4M6+73TAYZ+OPVziP9NXJE=;
+        b=g8VwfbQ6/OQdI+ssi72qB/rPbqUxNqrG0AwhNoH/u/48EizSI2O4Hxjc9PC9FiFhle
+         gYaxDuKwklcxwE0R62QrehCjGP4mXnCKCN3rnL5qe1NSzg4geZWep8jezMiDHrUBngID
+         v5bwNcXovAurH+sb4zbeyZbeIN6hQMN6OJb1xp3qn1Xt+16aIU+bvuVU+gCMvpn6NOuT
+         daXS6fCOsUo8SdGhK16F/tUJ3UvyLJQ7r2MpXAZNEhd+kqVZDJgIaKZOwqTHJHHhWYcl
+         /x/yIWCza/NV861UVCqG0H3T1y/6cI/tCPloRGkfJ3irllFEcNi9N+OAxS8MV4Xcxpsa
+         dnoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780339614; x=1780944414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oXz9Tg4gu33xF/wC9+230+9RrBA3CUmm/0k/7xBqZJs=;
-        b=VpN0HJ8Eu708pU858DvLLtKTBJ423OTv35q97jmLFvDZrPAGsMTtToINwIQKaf8/ZQ
-         1v4DXTk3RULtjbn99uVHv4mDoqx4zTTL36h/jp5svOc+m2OLLt2Q2/TkkokQH+Q5IaM3
-         MwXovWQndg1ay6/6nkk4JP+00+O/o3lLq69Mr72LKAdDcdY+xoF+aZuIMS5Lki+4T8G2
-         5DzBchSozDLJHfPXoiA34JRlwYRrLt7YSqTe2N4tXjoBhgF6yc4KVcSWrMiJVn0FG09Q
-         80iBkrKPLp8gLPeJkem46qGxhCwt3jZQ/KFvu+ajUlXUmf1DjbYYvHpqs64NBXJgLPzn
-         b1lg==
-X-Forwarded-Encrypted: i=1; AFNElJ+Lt85007JBbJBkb05ovOJZYsKeuEQro/3Fd6h7+TpOBx6Wgbywsxw6lSxSEu+xt2dazxo3LH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1ypqdKDA2Y57KJnxHIjtdWRVwm0KePcDYiE8ErSjYGvNhPwQp
-	HnhGGCH/rjWqrMd2kwfmPHAPqZcClCoqt9K4+2wsymQlqJWp7p8EmAu/EY7I7BecileQO+6vae2
-	IFfo835eOd09jo3HhbxiZLstvhqpj3V772NwQIcAk
-X-Gm-Gg: Acq92OGiAl7OTBhpbqvx5wou2JBPoqhSXzdstwRchjiLfpkHuio3HbDBv56XilEd+i3
-	r3f2YN8LQYJw7TtFRATAcKSKRs2BLY/g+CTlBu305Jqy3R90MlysaP7jyK8c06EIZjGdNHxlpsA
-	Lk268pW+2cAxu1byYI+SoBCjjy+3uInooG8iqeH0S7vm2gs8cHh1QFcDVGoUh9MdQP8zx07bPwI
-	czRs8jqcyZR4kwhX5pjzs0csDwBFnih/0n13//rzs06UFJUE6BHbtUUW88GcnId9g3mvxxUcrIJ
-	6ZLAU4csQS/L4ZP9+nM+hQ61awGX3jBl/O6b60BCWGSUYoitUxHD5ZYnAtG/8jcZsG1F/ufmvIO
-	373HL/swdFIOVuWnxUkJ/3NTVpA8hRxRmH8scM8Y=
-X-Received: by 2002:a05:622a:1802:b0:50d:900e:c1c1 with SMTP id
- d75a77b69052e-5173a6cdc08mr180423101cf.7.1780339613305; Mon, 01 Jun 2026
- 11:46:53 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780339720; x=1780944520;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZOVGBJ+B1pIGsdNReY7mg4M6+73TAYZ+OPVziP9NXJE=;
+        b=KGUHpBdpcsbkyJDAdfdlIkCzBb6l8rhbEQpErdOj/AETDkJ1eACI+WaLVUgM/BuQe/
+         EJa0TuYty3XwO8aaKrF/57wjXYXramGJDSC/LzGurOJPMrbutmAqytthc98u1zE21DZN
+         ElG4UzUJ+gw1A09mC2tYJxZO21K1mGofzuRsyic4rlF+RFIiQKCAk/QrTg1VVzThFLno
+         MZrWM7EiSYciU3SAYgeYozBYt45DYP8222mWCSVFpRTxqYzLftx23qxEYWyV4NIRhqUj
+         +3T1drQOZaa43TdCQEYMPwtwmVG3LQtWH1djj96LwoAJLCSPkOdHp59S9g24u6sdP2Jm
+         h36Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9V9rKNJS2IXqH1/7NnVKL2XEKGIutE5fy8PcSqpeV4pbgdnRuKw4EVGxu0pO2dlH7nGJnkyWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx278Vl/jybGSSHhONfGEYWx+UM8agodDCR74Q5ShKVWvEwysbn
+	d0fMc7vxUPgZNgDxcaKzTnFTmk/WVIrEBk+GDbt4X/c9IxUB+tKf6r1IJgqIfHk+3OY=
+X-Gm-Gg: Acq92OEv1pa8pZtD8gbKc1BGFtC/8uQP8uqgqxxugSXYODU0ZXbbmeth3dxUD0mbIF7
+	H5OZsNqkyu3XNvuqsXaQFrLz2+1QIna5ROnl+jOlB7pu3qFWjKAnz7f23CqDYvg5r5TB5eMDmq+
+	Ts6LvyyeTujBqwztR28JAccissf0GObz4CJS3yvrVf239jP0xO4QOFzGu4/bHXO2OER/buhSJNZ
+	swYn3z+LjAsOlETvuArNtInPEsmjCbcOzosnlgLvwtAyaIL/pRoA1GawgfWE55tJSC0WMwFzt+G
+	+HWdqnYldzzlCKrLzc9fNRFVd17squ/4HSNBUH7vvD2yir4s96s6mU8bZRcmRe7wSuDLdHUD1wW
+	o8saQ8/rZNc21V8dUDFudr3gjxRVWMDKW50QgnoSmC7HcCT5c7QCYb/qc/2EeNJq56nQJU/UoM7
+	sCzt5xkT8KZ/2AQvIT5JliiXt84I1GL5PDEAxGoGva3X+jUy5qeD7AqHVrPOiuqao/qFg7rAvRW
+	0Wkp3vZ2KiLlrc3
+X-Received: by 2002:a05:620a:630f:20b0:912:1206:ddd1 with SMTP id af79cd13be357-9153d93b157mr1356674885a.1.1780339720004;
+        Mon, 01 Jun 2026 11:48:40 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9153262f45dsm1098180085a.41.2026.06.01.11.48.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 11:48:39 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wU7gk-00000002GHG-3uxy;
+	Mon, 01 Jun 2026 15:48:38 -0300
+Date: Mon, 1 Jun 2026 15:48:38 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Zhiping Zhang <zhipingz@meta.com>, Alex Williamson <alex@shazbot.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Bjorn Helgaas <helgaas@kernel.org>, kvm@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Linus Torvalds <torvalds@linuxfoundation.org>
+Subject: Re: [PATCH v5 0/4] vfio/dma-buf: add TPH support for peer-to-peer
+ access
+Message-ID: <20260601184838.GE2487554@ziepe.ca>
+References: <20260527123634.GK2487554@ziepe.ca>
+ <a5ff1930-e9fb-43f5-82ab-9875d7a28421@amd.com>
+ <CAH3zFs2KALuHXReLZG_uoqvBBWvBzU6rHKakmt6HBV7PZEsD=w@mail.gmail.com>
+ <71302a7a-6b9f-40da-af81-b1862dbd637a@amd.com>
+ <CAH3zFs036sr93duQKx613pCyOYw4t0_x_TdSza1xBCaEmqijyA@mail.gmail.com>
+ <8d9bb0b7-182d-4930-b683-d5d24da6b2ab@amd.com>
+ <20260529201130.GU2487554@ziepe.ca>
+ <190a1eeb-bd70-4b7b-93a4-60e14f0d6c7e@amd.com>
+ <20260601174734.GB2487554@ziepe.ca>
+ <dedd8e8f-118c-4ee5-9552-cd2220dbdd23@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260601182101.3183993-1-kuniyu@google.com>
-In-Reply-To: <20260601182101.3183993-1-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 1 Jun 2026 11:46:40 -0700
-X-Gm-Features: AVHnY4Jkvnq6jOGZ4k-wiN8Wo5fLgJvrdCP8vRujn-7H73ngUutJxZ1ENEumVLo
-Message-ID: <CANn89i+Qg8Ht=N=OEs3wkmT1+65d+2=VN-wLm5i5NtugL+OhKA@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: Add preempt_{disable,enable}_nested() in reqsk_queue_hash_req().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dedd8e8f-118c-4ee5-9552-cd2220dbdd23@amd.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293892-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293893-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	DMARC_NA(0.00)[ziepe.ca];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,linutronix.de,goodmis.org,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,e809069bc15f26300526];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: D6962624404
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ziepe.ca:mid,ziepe.ca:dkim]
+X-Rspamd-Queue-Id: C4C4B624511
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Jun 1, 2026 at 11:21=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> syzbot reported a weird reqsk->rsk_refcnt underflow in
-> __inet_csk_reqsk_queue_drop().
->
-> The captured reqsk_put() in __inet_csk_reqsk_queue_drop()
-> is called only when it successfully removes reqsk from ehash.
->
-> Moreover, reqsk_timer_handler() calls another reqsk_put()
-> after that.
->
-> This indicates that the reqsk was missing both refcnts for
-> ehash and the timer itself.
->
-> Since all the syzbot reports had PREEMPT_RT enabled, the only
-> possible scenario is that reqsk_queue_hash_req() is preempted
-> after mod_timer() and before refcount_set(), and then the timer
-> triggered after 1s aborts the reqsk due to its listener's close().
->
-> Let's wrap mod_timer() and refcount_set() with
-> preempt_disable_nested() and preempt_enable_nested().
->
-> Note that inet_ehash_insert() holds the normal spin_lock()
-> (mutex in PREEMPT_RT), so it must be called outside of
-> preempt_disable_nested(), but this is fine.
->
-> The lookup path just ignores 0 sk_refcnt entries in ehash
-> and tries to create another reqsk, but this will fail at
-> inet_ehash_insert().
->
-> Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
-> Reported-by: syzbot+e809069bc15f26300526@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/6a1a7bcf.0a9e871e.332604.000b.GAE@goo=
-gle.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
+On Mon, Jun 01, 2026 at 08:17:15PM +0200, Christian König wrote:
+> On 6/1/26 19:47, Jason Gunthorpe wrote:
+> > On Mon, Jun 01, 2026 at 11:59:55AM +0200, Christian König wrote:
+> >>>> When you have a complete open source driver stack which utilizes
+> >>>> VFIO passthrough as the interface to communicate with the kernel
+> >>>> drivers then we can eventually talk about that.
+> >>>
+> >>> That decision is not up to dmabuf
+> >>
+> >> Yes it is. This is the DMA-buf API which is added here.
+> > 
+> > It is a DMA-buf kernel API that is added, I think it is overreaching
+> > to try to veto a VFIO uAPI that calls it..
+> 
+> Well as long as that is a private interface between VFIO and mlx5 I
+> have no objection at all.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Well, as you know, we are using dmabuf to mediate many of these
+connections now.
+
+I don't mind a "private" interface as a starting point, but it does
+need to discoverable and negotiated without weird module dependencies
+or symbol_gets.
+
+> But when it starts to affect DMA-buf I need to make sure that it
+> works for everybody. And without even being able to test it that
+> becomes really tricky.
+
+They should have an argument how it can be used for CPU backed memory,
+IMHO.
+
+> > This exposes a PCI SIG defined TPH capability in a reasonable simple
+> > VFIO uAPI that can be re-used by any other device that happens to
+> > support TPH on inbound MMIO. The uAPI has sensible general semantics
+> > based around the PCI spec.
+> 
+> That it's implementing an official PCI spec is a good argument.
+> 
+> But on the other hand looking at the spec it's not really specifying
+> much since everything is architecture specific.
+
+Yeah, spec doesn't say what TPH does when it is received. It is
+intended as an opaque channel between the source and target.
+
+Even on the CPU DRAM side we make an opaque call into ACPI and the
+BIOS returns back the right value to use for the CPU. The whole thing
+is agressively opaque as to what the values mean to any particular
+device.
+
+So I don't have an issue with VFIO supplying a value for MMIO it
+owns, it fits the general architecture.
+
+> > Anyone can repeat the demonstration Meta outlined in their cover
+> > letter: Use this new VFIO uAPI, import the DMABUF to mlx5, use a PCI
+> > analyzer and you will see the PCI SIG defined TPH bits set the way the
+> > VFIO uAPI says they should be set.
+> > 
+> > There is nothing uniquely tied to Meta's device here, or unusable by
+> > someone else's devices. Arguably this is actually a mlx5 feature to
+> > allow VFIO to control its TPH generation HW.
+> 
+> Would it be possible to demonstrate the functionality with some FPGA
+> implementing an PCIe endpoint?
+
+Sure, you don't even need a special endpoint, any endpoint that
+doesn't explode when it receives a TPH is fine to illustrate that mlx5
+is emitting it correctly.
+
+A fpga reference board with an out of the box PCIe IP demo is likely
+entirely sufficient, and you can use a FPGA logic analyzer to inspect
+the packets.
+
+Though keep in mind mlx5 is formally supporting TPH in a growing
+number of kernel contexts, so we do test and verify our device is
+working properly as an initiator. So I wouldn't advocate anyone
+actually use their time on FPGA :)
+
+> Doesn't needs to be anything funky, just the ability to exercise
+> this for basically everybody who can spend a few $ on the HW.
+
+Topologically you also probably need a PCIe switch as the CPU P2P
+likely discards the header.
+
+Jason
+
 
