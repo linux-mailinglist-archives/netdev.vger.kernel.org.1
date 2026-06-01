@@ -1,187 +1,292 @@
-Return-Path: <netdev+bounces-293596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293597-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gM+uGsQ1HWoqWQkAu9opvQ
-	(envelope-from <netdev+bounces-293596-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:33:24 +0200
+	id uNS8JLM1HWoqWQkAu9opvQ
+	(envelope-from <netdev+bounces-293597-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:33:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD6E61AEC8
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:33:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 309CB61AEBF
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DEFD23064458
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 07:27:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5D495300362B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 07:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06F1385509;
-	Mon,  1 Jun 2026 07:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EAD351C11;
+	Mon,  1 Jun 2026 07:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nh5A+/2+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G2xwNyjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA42F3D76;
-	Mon,  1 Jun 2026 07:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780298852; cv=none; b=Z5BglWGegr9mj7CH+WfnNXoscUCDABg8TtPvyFf8jTSUPVTPJhubGL8lq8AK/UeP9rRHmTmZ0N1aa5bQNYnIHOMC/2f8u5+emhM4ZAg65x31FjJcKMDAmkqcgnWLbjcqtFjdKQywvGWG5ZKo1UIFOInqmN7zlZA2t4pl4mvVxQU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780298852; c=relaxed/simple;
-	bh=wMbTWGjuic+ST4Ffoux/6Etu/zn8n6qCExrO5zXlApU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p6NcXb1KqZufz/yJiPP4MzGxLsVHghj0xA4YZZU0SouiHSJReBfppWUu0Tn5WvmqdnJ3xobQVubW4pS8SREf5myT+LIp3RGxBG9Q2Y0RVm0lb/xbrHsT8SWzneZX9CXj+SU3fOiGr83VL/AYIQ5qroX5Sd1iRIj6I98MyZxZwWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nh5A+/2+; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B2C91F00893;
-	Mon,  1 Jun 2026 07:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780298851;
-	bh=7snzxVSxi3ygpRfS5YXqVDVEjeMpSEmeXDAlj457stQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=nh5A+/2+SKdjoxjd86GM0PCvAAeKdRkq/p3dDhUACVQd6trP2iinS0Syj3YdTIWSn
-	 Oui2ZipEIJYLhXkJfaHiTQfRgfcmaAXyK2Lutu2w/zHLSAHjdYXcQE6k2U7EZ0Se1C
-	 gDqQa2HIyhRF3OO3L4YIbOCyGSMWsw9JiW3HFAPAJCziBb7TULD5piMuw/w1/WZNwS
-	 STjZ5DbyCyIKqaH1ZdKv+PDwEdoqanVb9TBdYK1tFeckoGALkOlSJ1m4v6VxhEhywd
-	 QeDrTbKlUYLZvvZoie4GBQ4lHeMmAh28EQzmYMLrGkKpR+j+jXv9y0JGbUXl7ZayTd
-	 4f3XC1igsx/vQ==
-Message-ID: <1e11dea6-a9a4-425e-a31b-ab5f8561f3b8@kernel.org>
-Date: Mon, 1 Jun 2026 17:27:21 +1000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8CE1531E8
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 07:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780299185; cv=pass; b=pL2V+LQsaiQl38YEpn8vmubtFgpucKYW1qbl9WF/O/09xcSdv/acI4qM21H/r0joWQJ7ZhWi1L5TYLJWtA3xbQUnsp34ooo9qA3SeuuBpRb+zLqhf4mGkrsY/uRnDk478dlLNKnzRrkJvOdkkSrF6fF7s6o2kYr8h8Rh6jS9Rds=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780299185; c=relaxed/simple;
+	bh=QC9KnSf8265zfj6rZB/Ra7SXcopwvCjex3DHkdIME5U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MeL3N6H5poqDBCp2Bg6tTTGLEYXkxKol4tM/yc7apNgA036E2j3IwyfXRf9ThlS7m5WbHN/MJOgJSsmDFODBku8qOmyZLxOYKpL1/S7n2hnO6ra3AhND2Oh8pLXonlPeQbSnOrssT8FeKm3yAtdD5Ex5/3aB3356WgQW9vKHcjg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G2xwNyjS; arc=pass smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-91564c3a968so46483885a.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 00:33:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780299183; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cEw76XMYgGatFsEd0B+rxrzEKXcyY5SOpyHtlnzeym2NqIZZ20qcxzczayOT2+IGZs
+         vjiGbnrlmqgKmk6zOPb67r8hSmHSxDpOwePgEc+gBy+cPMggKZGZaX3PNWW53cYEBFl3
+         /0v6yVlrbiF9xc8gYJjFNNB+6RDsTSObfsM+kglyhqt7eF7UsYhfK6SV1cpTIPZXX1DA
+         URMSqHDkHhzOwBpxBGg6ZM+7smqLjWTyhyJqWP9VGek7YZfr9+96yT+ZopeyOjCuZnkv
+         7OxX6Ko6+OQIeIpz0FHEMfxY1ZK9MwbmRPf3ax4IWkoJ2tsfMUeFPm3fKoLir5nK/IMN
+         jVTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=o5E+HN4HxKrgFBvQsvT2KkuRNEP2t4YH3L1p2Scabsk=;
+        fh=bObAVhgmhqGXRza/vjHodDcHGoKD9CXaQH38Vzk6aBI=;
+        b=SPK2SYB19ELsZJXKvo6tOqkZx1FK3EsoRyKCKeMuLWAIKz9t+jOe7KzGtf67Ah8UfI
+         /jxgsiVoVk3deLRymcIlLxA9yrnFh4JEFEj2NdF62nYViPVE1gxxy4+B9pWdTxuh1Pm7
+         iRHYtGt9mm91Pcr91CzxlFy8Fci2cGuvelN0kg4aq8rxGPyqvf6LFr88n9HxJiZVjmVo
+         ghJ4sA6i+Pcoz9AyaWJZy+Bt2oHmLr8i7s7UCNJaTgYHFDAqJspCOfcc5Fw0bGT4PSIr
+         cZLtW776Nw4rJydN+QuOXPXX97uZ+/76buKGU+6HTUgSA2tbiVt9E0rmvelGmeaaBGmW
+         421Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780299183; x=1780903983; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o5E+HN4HxKrgFBvQsvT2KkuRNEP2t4YH3L1p2Scabsk=;
+        b=G2xwNyjSRekknjUgp+HHOCQUEkuvEBoQ6vgVMZ4xC0PrjgYSYCGbBlyZZU/GRHcrO0
+         7EBHlOm5howJgXtMtruGaa6jDp7ovxQNc50NjTRaBOULGs9KZEmCsOM/vwpXX52CRvVg
+         oBudnRmZK/z0wcQroRIPuoSk9JQO8u8jpYEWM1pNsXKLNz0OlgUvVK7r+LqhsCamAvIQ
+         7nflzWTHw/R3pf1A4vq+QT83Q0u3Wd9IJ6wQwQ0mj3b4Vjzil4B+Kt9kZAPpcN0uhHh/
+         XnJzPUuYcygqks0FCcQEuws53yG7Woex7KvBHnBwmUoPbUvtgVzJbBOAOGkTpW9ssOzj
+         OS9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780299183; x=1780903983;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=o5E+HN4HxKrgFBvQsvT2KkuRNEP2t4YH3L1p2Scabsk=;
+        b=l/dVGjVKjQoDgPoGIerWxo8L3haRdC+AKQ7k4RsCyfupBhJ90MfDjYjeHDunldsr+B
+         nY0Lc9XEmVqQU0zzTCQJ2j7MlekwS/jRmSOF300c59N+XIkv40AwNfUwyoCAKU82dguA
+         RoNTeLHRqB0x+bu4MK042o6ETPrK2OM87+v9m9Rx9iBVVN7tRkvv2nOBu0BY4jednpQR
+         YTit+sDFAsg913/e2pBX0W1xQyF54IyRhIwZMUJOf1NTkKHzkw+zXClAQoNVL5TTXHyx
+         NGUIsZfohej6HDhoJfPYh6u+qfSUyXSZxED6l/X1lbNPIQyFM3RiiX03LLe5vh3sRhfH
+         O3eg==
+X-Gm-Message-State: AOJu0YwDIUSQKgopwvnhxnJXLIlNMzCOQ2dS6Ry/3zDQzQHQPzpjvVhI
+	Ptvv+TZDCKhXH0e1iafdeG/90ZXGtZZztuP/jShjnBjBbA+BePkw0sNPbBS9Z/EpZ9HpObPMEX6
+	3k7LZW8UYTz/qh7nrUd2/JNkitpd/2uOZMxSQA2vT
+X-Gm-Gg: Acq92OEwyvgcNLAsH/9mvuXrbu7yjXGX5hXBogZEynaeIQuuYSTXQLqfO9bwsBFlSFB
+	Cfb8OTxaCbNH25Qprm2uNvY46sQlKjkHZk/ea8u6URciEmADnRFi1c/7y1d09wQoS4a53wgc9av
+	wqp1IEy4vSwRCWu9CrfTnPhJQk2EKokPB2L1F9BHaUqeT8mFFJTySiMXXrmY3zQLy/yYQW9bbYO
+	SZDoKkT+VSM/4GsFGwOOEvvqhJtQy33pPAJHhk6pWv3gmFnjSiqqdUZIfstHIHYW7F780GrrUEK
+	vy9Xdf7yEa4cH5pQ/v4eOgZB9kf49bFcknGILTAf8tlMu702NVPDT5nDrLtoj50y5jMtENWzW+d
+	zKEZV1swkIJRmKxtwZLilWU1RdLK2dQ==
+X-Received: by 2002:a05:620a:4085:b0:905:ebde:ffa4 with SMTP id
+ af79cd13be357-9153e121526mr1335868585a.23.1780299182488; Mon, 01 Jun 2026
+ 00:33:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net 09/10] mptcp: pm: avoid sleeping while holding
- rcu_read_lock
-Content-Language: fr
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org,
- Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Hannes Reinecke <hare@kernel.org>, linux-rt-devel@lists.linux.dev
-References: <20260601-net-mptcp-misc-fixes-7-1-rc7-v1-0-a5ae7791754b@kernel.org>
- <20260601-net-mptcp-misc-fixes-7-1-rc7-v1-9-a5ae7791754b@kernel.org>
- <20260601065813.Z8V8Tb6d@linutronix.de>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260601065813.Z8V8Tb6d@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260526101622.38536-1-sayooj@aerlync.com> <20260527094601.23276-1-sayooj@aerlync.com>
+ <CANn89i+KRyU5qKa7x3wh_G=NMqd27-wQOAQdg=NMzm8bC6SONA@mail.gmail.com> <CAFdLOz67Sxne4yXi3hB7Nf0eX=SzE9-P1phG4OzYfrgjQvmcGw@mail.gmail.com>
+In-Reply-To: <CAFdLOz67Sxne4yXi3hB7Nf0eX=SzE9-P1phG4OzYfrgjQvmcGw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 1 Jun 2026 00:32:50 -0700
+X-Gm-Features: AVHnY4L0seTMcKTuaB96kYjQYi1fv7PRPfDeY34GALBeWU1puv2YgBeKsATrq8M
+Message-ID: <CANn89i+KFK5ap6S_wdR2eJUbQc9aqdXtAnGbQ2tqe6R_bGQiSQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net] net/ipv6: icmp: fix is_ineligible() to block
+ errors for Redirect packets
+To: Sayooj Karun <sayooj@aerlync.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, idosch@nvidia.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-kernel@vger.kernel.org, aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293596-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293597-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: BDD6E61AEC8
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 309CB61AEBF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Sebastian,
+On Mon, Jun 1, 2026 at 12:23=E2=80=AFAM Sayooj Karun <sayooj@aerlync.com> w=
+rote:
+>
+> Hi Eric,
+>
+> Thank you for the review.
+> The concern about REJECT becoming DROP for Redirect packets is correct, a=
+nd that is intentional.
+> RFC 4443  section 2.4(e.2) mandates unconditionally that the originator M=
+UST NOT send an ICMPv6 error in response to a Redirect message.
+> There is no exception for netfilter policy.
 
-Thank you for the review!
 
-On 01/06/2026 16:58, Sebastian Andrzej Siewior wrote:
-> On 2026-06-01 13:10:05 [+1000], Matthieu Baerts (NGI0) wrote:
->> sk_stop_timer_sync() calls del_timer_sync(), which spin-waits for the
-> There is no del_timer_sync()
+Really? Have you CC netfilter maintainers?
 
-Indeed, not sure why I put that one. I wanted to say timer_delete_sync()
-
->> timer callback to complete on non-RT kernels. But on PREEMPT_RT, it can
->> sleep. Sleeping inside an RCU read-side critical section might trigger a
->> lockdep splat.
-> 
-> It can not sleep. timer_delete_sync() does not sleep. It can block on
-> spinlock_t and schedule but this is okay within a RCU read section.
-
-Sorry, I got confused by the comment in __timer_delete_sync().
-
-> Do you have a report for this?
-No, sorry. I was exploring the code in timer.c after a related comment
-from Sashiko [1]. I noticed the comment in __timer_delete_sync() about
-being able to sleep on PREEMPT_RT, then saw that timer_delete_sync() was
-called inside a rcu_read_lock(), and I thought it was wrong. I should
-have tried to reproduce the warning on PREEMPT_RT, but I switched to the
-next bug instead :-/
-
-Sorry for the noise, let's drop this patch if it is not needed then.
-
-[1] https://github.com/multipath-tcp/mptcp_net-next/issues/623
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+>
+> To your question "how would the kernel send a reply?" : it cannot, as per=
+ the RFC.
+> A user who writes -j REJECT on ICMPv6 Redirect naturally expects an error=
+ to be sent back, but the protocol leaves no room for that.
+> RFC 4443  Section 2.4(e.2) forbids it outright. The pre-patch behavior (s=
+ending Destination Unreachable in response to Redirect) was the RFC violati=
+on.
+>
+> The same suppression already exists in is_ineligible() for section 2.4(e.=
+1): a REJECT rule targeting any ICMPv6 error type (types 0=E2=80=93127) alr=
+eady silently drops without generating an error, because !(*tp & ICMPV6_INF=
+OMSG_MASK)
+> returns true. This patch applies the same logic to  section 2.4(e.2) (Red=
+irect, type 137). Both are entries in the same "MUST NOT" list in RFC 4443.
+> If the goal is to block incoming Redirects, -j DROP is the right tool. Us=
+ing -j REJECT on Redirect packets was never RFC-compliant. The error respon=
+se it tried to send was never allowed by the protocol.
+>
+> Thanks,
+> Sayooj
+>
+> On Wed, May 27, 2026 at 5:45=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+>>
+>> On Wed, May 27, 2026 at 2:46=E2=80=AFAM Sayooj K Karun <sayooj@aerlync.c=
+om> wrote:
+>> >
+>> > Discovered while reading RFC 4443 and cross-checking the ICMPv6 stack,
+>> > which in section 2.4(e.2) mandates that an ICMPv6 error MUST NOT be
+>> > originated in response to an ICMPv6 Redirect message (type 137).
+>> >
+>> > is_ineligible() is called by icmpv6_send() to decide whether a receive=
+d
+>> > packet is eligible to trigger an ICMPv6 error. It uses
+>> > ICMPV6_INFOMSG_MASK (0x80) to suppress errors for ICMPv6 error types
+>> > (bit 7 clear) while passing informational types (bit 7 set). However,
+>> > NDISC_REDIRECT has type 137 (0x89), which has bit 7 set, so it passes
+>> > the mask check and is_ineligible() returns false and icmpv6_send()
+>> > proceeds to generate an error in response to a Redirect, violating the
+>> > RFC.
+>> >
+>> > A triggerable scenario: a host with an ip6tables/nftables REJECT rule
+>> > applied to incoming ICMPv6 traffic (e.g., dropping Redirects from an
+>> > untrusted router). When the Redirect hits the REJECT rule,
+>> > nf_send_unreach6() calls icmpv6_send() with the Redirect as the
+>> > triggering skb. Without this fix, is_ineligible() returns false and a
+>> > Destination Unreachable is erroneously transmitted in response.
+>> >
+>> > Add an explicit check for NDISC_REDIRECT so that Redirect packets are
+>> > treated as ineligible, suppressing ICMPv6 error generation in response
+>> > to them.
+>> >
+>> > Signed-off-by: Sayooj K Karun <sayooj@aerlync.com>
+>> > ---
+>> > The bug can be triggered via a netfilter REJECT rule targeting ICMPv6
+>> > Redirect packets. Consider a host with the following rule:
+>> >
+>> >   ip6tables -A INPUT -s <untrusted-router> -p icmpv6 --icmpv6-type red=
+irect \
+>> >             -j REJECT --reject-with icmp6-adm-prohibited
+>> >
+>>
+>> You are saying that after your patch, this ip6ables will no longer
+>> send a packet, and will effectively DROP
+>> the packet.
+>> This might break user choice/expectations/policy.
+>> If the user wanted a DROP, they would have instead specified "-j DROP"
+>>
+>> Apart from the netfilter world which is free to implement its own
+>> interpretation of the RFC,
+>> how would the kernel send a reply?
+>>
+>>
+>> > When a Redirect packet (type 137) arrives from that source, the packet
+>> > enters ip6_input(), which invokes NF_HOOK(NF_INET_LOCAL_IN). The
+>> > netfilter framework iterates the registered hook entries via
+>> > nf_hook_slow(), reaches the ip6tables filter table, and evaluates the
+>> > rules. The incoming Redirect matches the rule, causing reject_tg6()
+>> > (net/ipv6/netfilter/ip6t_REJECT.c) to be called as the rule's target
+>> > action. reject_tg6() calls nf_send_unreach6(), which in turn calls
+>> > icmpv6_send() with the Redirect packet as the triggering skb.
+>> >
+>> > Inside icmpv6_send(), is_ineligible() is called to decide whether to
+>> > suppress the error. The function detects that the inner protocol is
+>> > IPPROTO_ICMPV6 and reads the ICMPv6 type byte. NDISC_REDIRECT is
+>> > type 137 (0x89). The check !(*tp & ICMPV6_INFOMSG_MASK) evaluates as
+>> > !(0x89 & 0x80) =3D !(0x80) =3D false, so is_ineligible() falls through=
+ and
+>> > returns false and the kernel proceeds to transmit a Destination Unreac=
+hable
+>> > in response to the Redirect, violating RFC 4443 section 2.4(e.2).
+>> >
+>> > Tested using network namespaces with the above ip6tables rule. Without
+>> > the fix, tcpdump confirms a Destination Unreachable is transmitted in
+>> > response to the Redirect. With the fix applied and verified under QEMU=
+,
+>> > no error is generated.
+>> >
+>> > From the RFC:
+>> > (e) An ICMPv6 error message MUST NOT be originated as a result of
+>> >     receiving the following:
+>> >
+>> >     (e.1) An ICMPv6 error message.
+>> >
+>> >     (e.2) An ICMPv6 redirect message [IPv6-DISC].
+>> >
+>> >     ...
+>> >
+>> >  net/ipv6/icmp.c | 3 ++-
+>> >  1 file changed, 2 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+>> > index efb23807a026..3fdb3a97dd8e 100644
+>> > --- a/net/ipv6/icmp.c
+>> > +++ b/net/ipv6/icmp.c
+>> > @@ -157,7 +157,8 @@ static bool is_ineligible(const struct sk_buff *sk=
+b)
+>> >                  */
+>> >                 if (!tp && frag_off !=3D 0)
+>> >                         return false;
+>> > -               else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK))
+>> > +               else if (!tp || !(*tp & ICMPV6_INFOMSG_MASK) ||
+>> > +                        *tp =3D=3D NDISC_REDIRECT)
+>> >                         return true;
+>> >         }
+>> >         return false;
+>> > --
+>> > 2.53.0
+>> >
 
