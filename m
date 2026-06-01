@@ -1,179 +1,259 @@
-Return-Path: <netdev+bounces-293752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293738-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOsIGWl/HWotbQkAu9opvQ
-	(envelope-from <netdev+bounces-293752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:47:37 +0200
+	id cPXyEP98HWrEbAkAu9opvQ
+	(envelope-from <netdev+bounces-293738-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:37:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B62FF61F81B
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:47:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 384FF61F5A8
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:37:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9030D30AD1B2
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:38:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 427D73010710
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903CB3A4F46;
-	Mon,  1 Jun 2026 12:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBC737B40A;
+	Mon,  1 Jun 2026 12:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="z2EB4Vi4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hoRwrTIE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABB739C002
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 12:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780317422; cv=none; b=oNGefgdYlvVmJbtcCmFFOrUah4idCzG0AiJG6YHqsbFpXaL0tH0HRPwYKG0FOB60eoM7hq/RoKNzHvg37fvT51a3D7++/kZyfyeuUVIcEA9dip4gYnkKE7nxGwSmK/3Izir2uz8qSTY9cFEYu0fvAAqalZFoQxotuCi0SeDFJ6E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780317422; c=relaxed/simple;
-	bh=wmrw5wrwe+ggFhpLIcQZFdDRwpA70SQKMkMWdqZa9uQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KE4zT5Rc+Qhk3fUCD0aq7/oQuRxR/jAxSjXA3RAFgrPNaL9xAewqUKUV7t3J+hbB3B/BZ9+ztHlWaWBD4ncIqpWC5XlxfXBPF8l1l8qNd+kV6URvAOLdlVgYi/CeFQWyrai/pnfMwAPPMqroj3ZpmD1J2yvjeWiQlEWYzjIGFmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=z2EB4Vi4; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1780317414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TQBjcBdGS/HMX5rRf8oCb7YV3unI9WKR8W60FhxEyKk=;
-	b=z2EB4Vi4I+fwLm3aTC3smysJd0qC3PnY97pJ6yKl5B88M6MtCFudnWWu00O7s+chvMHLsi
-	jgkCXtLvbvQLn6nmsmVLZ6p7VQe3fBiPAZnk3tTfuH4PEiKo7zhQ2UZh/7+8YzJDvrm6D5
-	pH80EzEYlzkmISLv7lkB2L2LUCPwWk/l5LfQuM8qGBkfLee2zh6t+GCZZtqVXiryCcTMLp
-	vvrB/kFlOxYb/9QqTeMET4Jhi/T7GAraEdFIgjCBNTTjFuXNXrSazho8w7/TKga0ElIfQJ
-	0IgnW+eBUC38F/JWaH+JTs41GRQaG3WQufZzJsTsS9nTj6TmKNoexXn80uJbjQ==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net-next 15/15] batman-adv: use neigh_node's orig_node only as id
-Date: Mon,  1 Jun 2026 14:36:29 +0200
-Message-ID: <20260601123629.707089-16-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260601123629.707089-1-sw@simonwunderlich.de>
-References: <20260601123629.707089-1-sw@simonwunderlich.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC06C3793D2
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 12:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780317413; cv=pass; b=taEQXeXdoIRoMzxZ5++dE+/j3pmfWS/WtpFPyIW8yYjVnCvFim96ve6L+kPOUa8Ri/7qingkgnk4CSSVK0YJQWS6WHo8vRvbHYxRhfUagh39xVbYm5jkKaZk8rEgG/e/1M8DsE7jAjRJGTckOHNoeSGHs4fyXEnizVJrI8HYFEU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780317413; c=relaxed/simple;
+	bh=nX0cSKYPDYzlavsu/3QhK11Dd6P7lE5yqKAvD5dI/Pg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tqrkVGpYQh69I8JvBcUIFNR09XT0fZxhThTUZTxtSrLgNuKa3Uxs06y/k7K5cfCWQfUfEUkCbxbESA/pm9eM032+LgWCgxK9/H5QMvsk+/xTuAQw1AzjsSAclJ7W+9ncTdJuwnQlJste5+X25XOwPbWDqFXHz32XEX3qfpY0TEQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hoRwrTIE; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-51749fe346cso9307941cf.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 05:36:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780317410; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GQ4n3lAWJVGNOVF7m6SlbxDGC0LiFx7Gut30+Kkf9BgWDeFGogKufPICuwueoJVz1E
+         8Wj3u8jiubag3pekXZjUGzn4pHX35bEOl3cQzYtlU4mCikgB88m2KrTHQNpMueIIcprd
+         DX9iz7y5D42LcpXRbPXIJyXKidPcnL5cIo8zSktrBPPUXI+dw6d6dmjJtF/sgjgUtCsz
+         bBCrJgoy2aZoDodk2RWFxPNestKRuYWh+ARnjV6LiCQNXiSR+h3bBdcMwTCYjOG97S4y
+         DWJ4588ZJuCtS/R15fecvHo5c/OdZpMI/3Iw0exs7XzBr8eYic3znbpgm6wfu0HNOohq
+         MNDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=27KaSPnwlRAhBIR1/gGhKzFPuNaUV3K3DKJ6kQM+qr4=;
+        fh=Xh3ZWLWv5IrFTfJdrWu2G2cQvxxIh9yQ18NoAinTjQE=;
+        b=UrA8B0bRRt+IH9S7l8gQH87dfDvVahGe5UflDhwCPIYe3vzjU+PEE9P7Prk/oQUX5y
+         piHOJ/V9hOO3S8Qc0MuqYyS/Kqq/pz/KIEj5eH8YcscWjbBAhzB0/pY5kfywUZSGM/bn
+         6avt64UCb6nrseXashqsTp7lAthOKJ95AyXpjR5zzJGwElOnqaJ+GDy73QEjMWkjsb/2
+         Pgf9XWaSOlHEaC9lHvjog7d3Np0icmCcDGtTkQQSYyvNhTzMx/v5AxPMifyEfdRPQGof
+         WanU9uwj+4lCoPpYB/ilfk4NRXQPVSorwaON5E0M2KKiAAJNwFkQco5/u0fawTaeJEIh
+         Dr4A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780317410; x=1780922210; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=27KaSPnwlRAhBIR1/gGhKzFPuNaUV3K3DKJ6kQM+qr4=;
+        b=hoRwrTIEHnOlZRv8INSRXAsF9RY6+173lWJYSdGpcSWLesWZVx8MUdZO5MMjqcnMPi
+         LamWbJc9LrTyenFL+MMlhY02lYt7qtQ1UK70f+oVVeQ1GCzzncxxxNAI/bLGmnKRQro2
+         WjLFJMLen3OjOAqOkaVYaMRbmsaL1KqLH74WDxD5NjvjwggJY5HfoGIPz4mGHZ+gaeFz
+         OA/pz95jKZrj3b//S3tL01CzJGSaroQRIgK0fuC5Ns0QKfFVUztS7UQR2II41lLF+cPz
+         wz7rapcmpKzLysNMGwCRLIL2/WeSRb3lVYeJ0YBup7h70QlHCSVN3UDWG6bTuxKmsTfb
+         UPkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780317410; x=1780922210;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=27KaSPnwlRAhBIR1/gGhKzFPuNaUV3K3DKJ6kQM+qr4=;
+        b=O0617skc4uWzETXJ+BWar8oiq+Jy9bIEUhVQOkNTEbdcupPagglByBKOn+C3yEP/fE
+         /JbMeEopjbBXeEVmy1ZmA3WRKb2DMpxBWz4e+3M+jsOtQ42WthiGbXnlNRKs7VAPrA3A
+         s25pUmKKL7Vk8FNMAXeNjEGs+PJKPF2A+zhEWpCRUuUpt5RjeY8Wl5g9wVszd8Gus0mQ
+         zGvc/gIZV3rbRYdon3BUV7O+UvdywvuwhKwbXBKJRKzQzzIGnpX9UCaIqa9yL0pTBghI
+         AMSd0LAZlYYRs5D7HlkXe9tK5A/1Hz4pMSTcueHQIh+sCyUJhI4Jt65ZAVrEu/3a/BbS
+         TB/Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+9qob8AH8DQUH7kZIn1FddRoEWVu+O8p/gFr1hjoCYFkeGNH8XZTVCEUCJ8zbUD32fH3yMJpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhzB+l4ASPYvH0ixAGTBkN40JicZxIbwLem47uU9yhH6GcJ2Tg
+	/z+beXCzZNVFY7qK6McX644ukPnrnulzqvP6WA3HetKHP4RhgkLfD0FbnWt+OsD62Ton1y+bt5a
+	TcAFA3CgeOfLFyCkiekaa695l6GGxkil97tD+5cuC
+X-Gm-Gg: Acq92OE351Tmqg4/JhS987r3m3rQOfX/6xK8K7OZBDwK9hYeCZo7KbyqpgHHIu4+4TF
+	g+LOMENIDkDv+uXcJMau+3IjHwWesImp7kKYL1UBZ9AX6TRQtH9vHqwUBusjm56GKVpcy83jVbY
+	KefaAXDyA0ztqanfQjcLu9SalVst80SJaCMpu+vUiyI3lyDcrxfp33DhDaKrSZqhHr8bvplX8j3
+	o/sKZsKA8TDFQ9Ztd/3vt+1ojiDCZ8ZEnXVP49WSxRvYtGHv3uavMSObecx1/L1IsEJsW+EpqGV
+	CFGfz7hEXTWyOrn2OhlSWz6V1JE1aKwfNSvNHjU83sH9RKZNuQ5AnLPcakmr9cN6hchBWN63ydB
+	3m7Eldh/jPRn90ezr1vzCxbMzLJwE
+X-Received: by 2002:ac8:59c4:0:b0:50f:ba44:ce4e with SMTP id
+ d75a77b69052e-5173a6197bamr168555841cf.6.1780317409230; Mon, 01 Jun 2026
+ 05:36:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260531153946.1627418-1-runyu.xiao@seu.edu.cn> <20260601132245.4be1b32a@pumpkin>
+In-Reply-To: <20260601132245.4be1b32a@pumpkin>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 1 Jun 2026 05:36:37 -0700
+X-Gm-Features: AVHnY4KlUnijWv5Pkux0oZHHU1PNs3xf3C1pnizY3mYdP6D5as5poIPKX1sCnmo
+Message-ID: <CANn89iL5RYPYWPnwdiB2db+5bkgFt0_atBLHw4hopOq3KUK9Rg@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: use READ_ONCE() in ipv6_flowlabel_get()
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Runyu Xiao <runyu.xiao@seu.edu.cn>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-293738-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293752-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,simonwunderlich.de:email,simonwunderlich.de:mid,simonwunderlich.de:dkim,narfation.org:email]
-X-Rspamd-Queue-Id: B62FF61F81B
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,seu.edu.cn:email]
+X-Rspamd-Queue-Id: 384FF61F5A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Sven Eckelmann <sven@narfation.org>
+On Mon, Jun 1, 2026 at 5:22=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Sun, 31 May 2026 23:39:46 +0800
+> Runyu Xiao <runyu.xiao@seu.edu.cn> wrote:
+>
+> > ipv6_flowlabel_get() still reads the shared per-net sysctl fields
+> > flowlabel_consistency and flowlabel_state_ranges with plain loads,
+> > while writers update them through proc_dou8vec_minmax(). These checks
+> > run in the live IPV6_FLOWLABEL_MGR path, so lockless plain reads leave
+> > KCSAN-visible data races and can make the policy checks observe stale o=
+r
+> > inconsistent values.
+> >
+> > The race can be reached on a running system by toggling
+> > /proc/sys/net/ipv6/flowlabel_consistency and
+> > /proc/sys/net/ipv6/flowlabel_state_ranges while another task repeatedly
+> > issues IPV6_FLOWLABEL_MGR requests with IPV6_FL_F_REFLECT or a
+> > state-ranges flow label.
+> >
+> > This issue was first flagged by our static analysis tool while scanning
+> > lockless IPv6 sysctl readers, then manually audited on Linux v6.18.21.
+> > The IPV6_FLOWLABEL_MGR paths were runtime-reproduced with QEMU/KCSAN by
+> > concurrently flipping the two sysctls while TCP reflect and UDP
+> > state-ranges setsockopt actors exercised ipv6_flowlabel_get(). KCSAN
+> > reported races between proc_dou8vec_minmax() and the two plain-load
+> > sites in ipv6_flowlabel_get().
+> >
+> > A narrower second-round UDPv6 + IPV6_AUTOFLOWLABEL send-side reproducer
+> > also hit the inline ip6_make_flowlabel() reader through
+> > __ip6_make_skb() / proc_dou8vec_minmax(), but that site is already
+> > fixed in this tree by commit ded139b59b5d
+> > ("ipv6: annotate data-races from ip6_make_flowlabel()"). The remaining
+> > plain readers in this tree are both in ipv6_flowlabel_get().
+> >
+> > Use READ_ONCE() for those remaining sysctl reads so they follow the sam=
+e
+> > lockless reader contract already used by other IPv6 sysctl readers.
+> >
+> > Build-tested by compiling net/ipv6/ip6_flowlabel.o on x86_64.
+> >
+> > Representative QEMU/KCSAN reports from the two target reader paths:
+> >
+> >   BUG: KCSAN: data-race in ipv6_flowlabel_opt / proc_dou8vec_minmax
+> >   write: proc_dou8vec_minmax+0x206/0x220
+> >   read:  ipv6_flowlabel_opt+0x6d8/0xd20
+> >          do_ipv6_setsockopt+0x873/0x2220
+> >          tcp_setsockopt+0x72/0xb0
+> >
+> >   BUG: KCSAN: data-race in ipv6_flowlabel_opt / proc_dou8vec_minmax
+> >   write: proc_dou8vec_minmax+0x206/0x220
+> >   read:  ipv6_flowlabel_opt+0x129/0xd20
+> >          do_ipv6_setsockopt+0x873/0x2220
+> >          udpv6_setsockopt+0x21/0x40
+> >
+> > Fixes: 6444f72b4b74 ("ipv6: add flowlabel_consistency sysctl")
+> > Fixes: 82a584b7cd36 ("ipv6: Flow label state ranges")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+> > ---
+> >  net/ipv6/ip6_flowlabel.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+> > index b1ccdf0dc646..1ab5ad0dcf24 100644
+> > --- a/net/ipv6/ip6_flowlabel.c
+> > +++ b/net/ipv6/ip6_flowlabel.c
+> > @@ -620,7 +620,7 @@ static int ipv6_flowlabel_get(struct sock *sk, stru=
+ct in6_flowlabel_req *freq,
+> >       int err;
+> >
+> >       if (freq->flr_flags & IPV6_FL_F_REFLECT) {
+> > -             if (net->ipv6.sysctl.flowlabel_consistency) {
+> > +             if (READ_ONCE(net->ipv6.sysctl.flowlabel_consistency)) {
+>
+> That can't actually fix anything.
 
-The orig_node member of struct batadv_neigh_node is no longer used in
-B.A.T.M.A.N. IV. But batadv_neigh_node_create() is still storing it.
-Only batadv_v_ogm_route_update() uses it to check if we route toward
-it - not needing the data stored in the batadv_orig_node object itself,
-but merely a pointer to identify the originator.
+It fixes a KCSAN splat.
 
-The field cannot hold a proper reference because that would create a
-reference cycle, so it must never be dereferenced. Rename it to
-orig_node_id and mark it __private to make any future attempt to
-dereference it immediately noticeable.
+If you think you can fix KCSAN instead, please do so.
 
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/bat_v_ogm.c  |  2 +-
- net/batman-adv/originator.c |  5 ++++-
- net/batman-adv/types.h      | 11 +++++++++--
- 3 files changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
-index 2c4dca639709c..5936d0048be01 100644
---- a/net/batman-adv/bat_v_ogm.c
-+++ b/net/batman-adv/bat_v_ogm.c
-@@ -719,7 +719,7 @@ static bool batadv_v_ogm_route_update(struct batadv_priv *bat_priv,
- 	 * don't route towards it
- 	 */
- 	router = batadv_orig_router_get(orig_node, if_outgoing);
--	if (router && router->orig_node != orig_node && !orig_neigh_router) {
-+	if (router && ACCESS_PRIVATE(router, orig_node_id) != orig_node && !orig_neigh_router) {
- 		batadv_dbg(BATADV_DBG_BATMAN, bat_priv,
- 			   "Drop packet: OGM via unknown neighbor!\n");
- 		goto out;
-diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
-index d05c8240426bd..15d660ca79376 100644
---- a/net/batman-adv/originator.c
-+++ b/net/batman-adv/originator.c
-@@ -693,9 +693,12 @@ batadv_neigh_node_create(struct batadv_orig_node *orig_node,
- 	kref_get(&hard_iface->refcount);
- 	ether_addr_copy(neigh_node->addr, neigh_addr);
- 	neigh_node->if_incoming = hard_iface;
--	neigh_node->orig_node = orig_node;
- 	neigh_node->last_seen = jiffies;
- 
-+#ifdef CONFIG_BATMAN_ADV_BATMAN_V
-+	ACCESS_PRIVATE(neigh_node, orig_node_id) = orig_node;
-+#endif
-+
- 	/* increment unique neighbor refcount */
- 	kref_get(&hardif_neigh->refcount);
- 	neigh_node->hardif_neigh = hardif_neigh;
-diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index 4e25057359b0f..19c7316889b6e 100644
---- a/net/batman-adv/types.h
-+++ b/net/batman-adv/types.h
-@@ -663,8 +663,15 @@ struct batadv_neigh_node {
- 	/** @list: list node for &batadv_orig_node.neigh_list */
- 	struct hlist_node list;
- 
--	/** @orig_node: pointer to corresponding orig_node */
--	struct batadv_orig_node *orig_node;
-+#ifdef CONFIG_BATMAN_ADV_BATMAN_V
-+	/**
-+	 * @orig_node_id: pointer to corresponding orig_node. It must only be used
-+	 * to identify the node but must NEVER be dereferenced. The reference counter
-+	 * was not increased when this was assigned because it would otherwise create
-+	 * a reference cycle.
-+	 */
-+	struct batadv_orig_node *__private orig_node_id;
-+#endif
- 
- 	/** @addr: the MAC address of the neighboring interface */
- 	u8 addr[ETH_ALEN];
--- 
-2.47.3
-
+> If the value can be written concurrently it will still be zero or non-zer=
+o
+> even if the write gets split.
+> So it can only ever be the same as the write happening a bit earlier or
+> a bit later.
+>
+> There might be a real bug if the code looks at
+> net->ipv6.sysctl.flowlabel_consistency again.
+> But a READ_ONCE() in an if won't fix anything.
+>
+> >                       net_info_ratelimited("Can not set IPV6_FL_F_REFLE=
+CT if flowlabel_consistency sysctl is enable\n");
+> >                       return -EPERM;
+> >               }
+> > @@ -633,7 +633,7 @@ static int ipv6_flowlabel_get(struct sock *sk, stru=
+ct in6_flowlabel_req *freq,
+> >
+> >       if (freq->flr_label & ~IPV6_FLOWLABEL_MASK)
+> >               return -EINVAL;
+> > -     if (net->ipv6.sysctl.flowlabel_state_ranges &&
+> > +     if (READ_ONCE(net->ipv6.sysctl.flowlabel_state_ranges) &&
+>
+> Ditto.
+>
+> >           (freq->flr_label & IPV6_FLOWLABEL_STATELESS_FLAG))
+> >               return -ERANGE;
+> >
+>
+> -- David
+>
 
