@@ -1,138 +1,187 @@
-Return-Path: <netdev+bounces-293572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293573-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJJODZUmHWq6VwkAu9opvQ
-	(envelope-from <netdev+bounces-293572-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:28:37 +0200
+	id 6NEeGIYmHWq6VwkAu9opvQ
+	(envelope-from <netdev+bounces-293573-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:28:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B96F61A2A6
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:28:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C2161A298
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5360D3034AA9
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:24:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68133301751F
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17926346E6C;
-	Mon,  1 Jun 2026 06:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="b7Jugmsb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61EE346E6C;
+	Mon,  1 Jun 2026 06:24:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CF1345757;
-	Mon,  1 Jun 2026 06:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC113346FB3;
+	Mon,  1 Jun 2026 06:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780295076; cv=none; b=h7zw4WU/Wps+I4HScbke3vWsUJov6/Us/eJXgG043V/6Gt3mltbOc0xefrBIl6aN7cWxTdRrs19ZHeXJ+YfiVLNrT5uSX/D85+HLMgESYFQrHIMmdEfGNILGz0hdg2U+GKhpfJIFUYYJ6wnQPVRvYqvIpeDstXKUlgnvYm5za2Y=
+	t=1780295099; cv=none; b=cEdcWG+EdBizzhZN9PmxdNAkwh0mDkf57Nz25DtgG8D2YuKo0ijhtUO/Fm0f/imIecoYEZdkgWGtDOiP9l7oJEv0GPOFtXTHjDNMRnppFbzhysxlPI8I8JAig+Dz/dZMHjN3M/fqCPQCCyM+9PZDWT3wk2jiif334vuU+GvsQWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780295076; c=relaxed/simple;
-	bh=vmgAXD09cVpOj90a7laVl88qBf7NWNmKjxtNUYBmm4o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A5cL0SbrAibLOnyQHEdYCgZNpG8DBRSwOaFcPIfxrsZ3Sl6ERRMkacYan506UaTmwfYEfYRfduY1iZVLrHFvK1lrm1LUg39aCBqikHyIknraHJBivpZuisx6FJsVP7pzyxNzKhSRjCb68TZQZ+aKMP/eoWgLd2/M6N97C4bBnFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=b7Jugmsb; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6516OJeI41861201, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1780295059; bh=3qc2Bp/haccANt3EoIOQnj5YGcD4qZRZ64CoK9AA6T8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=b7JugmsbajQYTKEymJMlae6bzVtIFAQdc2YxuGj7VdWzUTe/Tqyy3NEBnh7aSVgOz
-	 9AIo7FqjZcVXMR9SXibIzbtc8MbxxJjI1h9Mj4QZMS/L3b53s5NMTCcV1uEUltq6v5
-	 Js/FfrGoQsSMw+ooBXKa4mfgUuAW9Ly/y/tbHNdpB0XJbWuGuA8MIuHFwkKxWRXrYg
-	 rykEX2Zg55xO7J+FqkAHeeaiaDgCs2OCpWIKqcT44rJ3T7NpdpNTMuOU19FKmutK9w
-	 wL8N0wIDa3Ebb/3qAZ+WzSKlVCNtz2HInpJupzjp3cyTKTl4Yh/syZZ6UueRJKpryu
-	 rkyeglMsETk7g==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6516OJeI41861201
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 1 Jun 2026 14:24:19 +0800
-Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 1 Jun 2026 14:24:19 +0800
-Received: from RTDOMAIN (172.21.42.225) by RTKEXHMBS05.realtek.com.tw
- (10.21.1.55) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Mon, 1 Jun 2026 14:24:19 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-	<larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH] rtase: Reset TX subqueue when clearing TX ring
-Date: Mon, 1 Jun 2026 14:24:18 +0800
-Message-ID: <20260601062418.64004-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1780295099; c=relaxed/simple;
+	bh=Doi08I3OodChG1dLhKeDyfNQ0vyi7tETBhPcvcUeHRs=;
+	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=t2VMT+pwlmPlFYg9KB5NP8CFbdqc5mbafw9G/nlUVbgyc8euysbk3rq3zDX8doTS6X4qw/WDX7Zv8fGAbPZO7EVHDG8eDUoWwKijreFEHu8gITsTFZgzcswhVcZbkUM5/QsM7Bu6K7X6QNJ+qz34ChFylKppC9BXAzmlXam9IcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4gTP7y39Klz58fdK;
+	Mon, 01 Jun 2026 14:24:46 +0800 (CST)
+Received: from njy2app03.zte.com.cn ([10.40.13.14])
+	by mse-fl2.zte.com.cn with SMTP id 6516OcnZ028295;
+	Mon, 1 Jun 2026 14:24:38 +0800 (+08)
+	(envelope-from han.junyang@zte.com.cn)
+Received: from mapi (njy2app08[null])
+	by mapi (Zmail) with MAPI id mid204;
+	Mon, 1 Jun 2026 14:24:40 +0800 (CST)
+X-Zmail-TransId: 2b006a1d25a844f-01f7f
+X-Mailer: Zmail v1.0
+Message-ID: <20260601142440024x-1sx0cQucoMxTHjm7ps3@zte.com.cn>
+Date: Mon, 1 Jun 2026 14:24:40 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+From: <han.junyang@zte.com.cn>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <han.junyang@zte.com.cn>, <ran.ming@zte.com.cn>,
+        <han.chengfei@zte.com.cn>, <zhang.yanze@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY1IDAvMl0gQWRkIFpURSBEaW5nSGFpIEV0aGVybmV0IFBGIGRyaXZlcg==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 6516OcnZ028295
+X-TLS: YES
+X-ENVELOPE-SENDER: han.junyang@zte.com.cn
+X-SOURCE-IP: 10.5.228.133 unknown Mon, 01 Jun 2026 14:24:46 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6A1D25AE.000/4gTP7y39Klz58fdK
+X-Spamd-Result: default: False [2.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293572-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
+	TAGGED_FROM(0.00)[bounces-293573-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8B96F61A2A6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[zte.com.cn:mid,zte.com.cn:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,checkpatch.pl:url]
+X-Rspamd-Queue-Id: B1C2161A298
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-rtase_tx_clear() clears the TX ring and resets the ring indexes.
-However, the TX queue state and BQL accounting are not reset at
-the same time.
+From: Junyang Han <han.junyang@zte.com.cn>
 
-This may leave __QUEUE_STATE_STACK_XOFF asserted after
-rtase_sw_reset(), preventing new TX packets from being scheduled.
+This series adds initial support for the ZTE DingHai Ethernet controller,
+a high-performance PCIe Ethernet device supporting SR-IOV, hardware
+offloading, and advanced virtualization features.
 
-Reset the TX subqueue when clearing the TX ring so the TX queue
-state and BQL accounting are restored together.
+Changes from v4:
+- Fix sparse warning: add __iomem annotation to priv pointer
+- Fix Clang format warning
+- Use "dinghai:" as patch subject prefix
+- Ensure proper patch threading
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- drivers/net/ethernet/realtek/rtase/rtase_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+Note: Sent manually due to temporary git send-email unavailability
+in our environment. Will use git send-email or b4 for future
+submissions. Apologies for any inconvenience.
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 43a4aa275b62..11e9d0feea68 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -240,6 +240,8 @@ static void rtase_tx_clear(struct rtase_private *tp)
- 		rtase_tx_clear_range(ring, ring->dirty_idx, RTASE_NUM_DESC);
- 		ring->cur_idx = 0;
- 		ring->dirty_idx = 0;
-+
-+		netdev_tx_reset_subqueue(tp->dev, i);
- 	}
- }
- 
+Changes from v3:
+- Merged patches 1 and 2: 
+  Combined initial framework with logging infrastructure
+  for better code organization and reduced patch count. This was done because
+  the logging infrastructure now uses Linux's built-in dev_err(), dev_info(),
+  dev_warn(), etc. macros instead of a custom logging system.
+- Removed unnecessary variable initialization: 
+  Fixed "don't initialise variables".
+- Fixed variable declaration order: 
+  Applied "Reverse Christmas tree" ordering with variables
+  declared from longest to shortest line length.
+- Code quality improvements:
+  Fixed all checkpatch.pl issues (alignment, formatting, etc.).
+
+Changes from v2:
+- Address maintainer feedback from v2 review:
+  * Remove meaningless initialization
+  * Change dh_pf_pci_table to static const for better encapsulation
+  * Simplify MODULE_DESCRIPTION for brevity
+- Coding style improvements:
+  * Ensure all lines are within 80-column limit
+  * Use kernel types (u32/u8) consistently throughout
+  * Improve code readability with better formatting
+
+
+Changes from v1 (addressing feedback from AndrewLunn):
+- Update copyright years to 2022-2026
+- Remove DRV_VERSION, MODULE_VERSION and related boilerplate
+- Fix MODULE_AUTHOR to use person with email address
+- Use module_pci_driver() instead of manual init/exit
+- Remove empty suspend/resume callbacks
+- Replace char priv[] flexible array with void *priv + kzalloc
+- Switch logging from printk wrappers to dev_*() based macros
+- Remove dh_helper.h and dh_log.c, simplify to dh_log.h only
+- Fix variable declaration ordering (reverse Christmas tree)
+- Remove unnecessary NULL check in remove and pf_dev=NULL in probe
+- Fix indentation and remove unnecessary type casts
+- Use kernel idiomatic "if (ret)" style
+
+This is the initial submission and only includes the PF (Physical Function)
+driver. The VF (Virtual Function) driver will be submitted separately.
+
+Junyang Han (2):
+  dinghai: add ZTE network driver support
+  dinghai: add hardware register access and PCI capability scanning
+
+ MAINTAINERS                                 |   6 +
+ drivers/net/ethernet/Kconfig                |   1 +
+ drivers/net/ethernet/Makefile               |   1 +
+ drivers/net/ethernet/zte/Kconfig            |  20 +
+ drivers/net/ethernet/zte/Makefile           |   6 +
+ drivers/net/ethernet/zte/dinghai/Kconfig    |  34 ++
+ drivers/net/ethernet/zte/dinghai/Makefile   |  10 +
+ drivers/net/ethernet/zte/dinghai/dh_queue.h |  71 +++
+ drivers/net/ethernet/zte/dinghai/en_pf.c    | 629 ++++++++++++++++++++
+ drivers/net/ethernet/zte/dinghai/en_pf.h    | 132 ++++
+ 10 files changed, 910 insertions(+)
+ create mode 100644 drivers/net/ethernet/zte/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/dh_queue.h
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.c
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.h
+
 -- 
-2.40.1
-
+2.27.0
 
