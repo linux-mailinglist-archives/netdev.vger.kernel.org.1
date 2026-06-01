@@ -1,122 +1,128 @@
-Return-Path: <netdev+bounces-293587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293588-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODvaJf4vHWqtWAkAu9opvQ
-	(envelope-from <netdev+bounces-293587-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:08:46 +0200
+	id KHjWFaczHWoqWQkAu9opvQ
+	(envelope-from <netdev+bounces-293588-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:24:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E2861AB1A
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:08:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C7261AD09
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 09:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 78C573000FFE
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 07:08:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6CE7A304A93C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 07:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1128383325;
-	Mon,  1 Jun 2026 07:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F235F38333E;
+	Mon,  1 Jun 2026 07:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nEhXxRHp";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rSYf5CXT"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="TSigyGnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDFE34753F;
-	Mon,  1 Jun 2026 07:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB843314B9;
+	Mon,  1 Jun 2026 07:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780297723; cv=none; b=koHxs1nGN+u+ycvX9mDId7tACr0S0/A5WL/G158loNsIocs1JA1X4jpQ3U9N6C0rThnabVCW6YWLKaXcPp6cmXucLVeE82k+qAj9bJVRKBN+kwDn6BsgjSJhLR83H35DiDOyvpQxnHvT7PICXMdA57DX/IN+SyV1fkOwfRicEe8=
+	t=1780298067; cv=none; b=aDS6lHnQBivSg0cGGKwmoCFyJwxyIZmuNJe2mTCcgzWN2VvOvsA4Q2fp/3uznkuwlYi1kZHJSHMPZHOFj8FIKYtZp0qZI55wicJ0zSSAZTSC9LnbI3Q7IiFAU6o5wpo19IbAcCMizYFjEe+SYb2Jzu8n+iueQ5EI1AvObgWrvrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780297723; c=relaxed/simple;
-	bh=rWsuciZeawwMUwyRFuFy+QcMoXAdRYH3Ac6BVPJVJa4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DEWRxzJm+Q2RjcbAge+ggESZORHMaq4ApiGw4KeZs4pPIXZJ4fDpBqhRv7SIQfv5IpnUpNzfGS5fqFr5N9wBKVJDz5Dd1Py1Tyh4PnR/o9K5WiTfGyRzfk6XrUpdICeRToFsPNgKli3Ux5gxcETv45tC9+pgcfrk50M778I+uxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nEhXxRHp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rSYf5CXT; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 1 Jun 2026 09:08:39 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1780297721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G0x3Ic0bcpvqvC4Mz9UQdIoh9w18Wwn8oyv/kgdUJUk=;
-	b=nEhXxRHpnfya6wCaY0GOxFIciWYMd8r/Jz29yf6UMqAYivZDcGMR19JixQDnMGi7+G8MEM
-	8T6+htk45loofwRJr8aEGpD9I1oWlGsQbtJjTV8B5Z+cMDPNKPeDACfulnao9+zxI62T59
-	fFYLMlmgG1yr17D0I7Cerve8jutgPX79ITGgWKddbVa6Cl2UBmJsY8bN5AnzUD038ofz4e
-	zgx662y/BseABp3Zo5iA05X9l/Ou2GO7w8gRJC3V6MWDH8BSPGIm+5rCxZqEp68D3ur6h4
-	FgaJmn05v1m9sQqYsLBaTV1stJKAmiWslLE9h717kRGiccvIHzvIlKarYotnVQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1780297721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G0x3Ic0bcpvqvC4Mz9UQdIoh9w18Wwn8oyv/kgdUJUk=;
-	b=rSYf5CXTm2KiLFddpTUmRbgP/zppA2ebX7xOGp5CjQf7AOqH8vNlLpAEoT25wR+MpDZVEC
-	EvhK9G+5XzSnvMDw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: fec_mpc52xx: add missing kernel-doc for
- @may_sleep
-Message-ID: <20260601070839.4UMhibIg@linutronix.de>
-References: <20260531000042.369043-1-rosenp@gmail.com>
+	s=arc-20240116; t=1780298067; c=relaxed/simple;
+	bh=MQwfcj1z/UtX/NPyQTZ9n9JesGHpwsIUTha+9Ml5HZk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L+S+Gi5nqU0dgwdhdSo0YEBjZW70VU1ylb0GmbuLUtCuuJagrSrzBcL914rxyNdql6z5I+Bvn99wk/3PERcpqi5AAdrxLYgeG4MqbFVk6qbn0fZN61oGmKjL5qpXfdSoeNm5MZ5PiBKFkAhcTf4DLcs42zT79kHPs8DnTbXoUTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=TSigyGnc; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 2C79020704;
+	Mon,  1 Jun 2026 09:14:24 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TFRZOm4DRHN5; Mon,  1 Jun 2026 09:14:23 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id A4789206B0;
+	Mon,  1 Jun 2026 09:14:23 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com A4789206B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1780298063;
+	bh=KpFZQlGb/16HVTjMY09rig/HHtsjnSRuWOZla/u0Lw8=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=TSigyGnc2jtgLJSdPlWiWaG5vVIcDP/NHJrryqS3NTJd5i3u6wNqiwPpFIkeo1z4B
+	 5tuezTNa1Xytai1QJ2WhEIeQdNKGA0coHNWq5myumL8+35Xb5hO3cPTMapXazFq4FL
+	 H1l4892dPHuK0flvIPkWjwwpiNYjW0kH02eZeoE+yeMFXAsP5Matv8yPd2C5i1j8HW
+	 tTcSkRjwssAh++sP/PZYVVTjvNOzcMyry4SMo5wHnlLgqinafPSfDZhkZTUvoLEkhu
+	 r/oPFAnaX0gucaxMe1FlkuyZbKaK4/NsYh07UbUEmDIkvBCyrG8fUhXpSsfP5hBdch
+	 CyaUvje3aIZvw==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Mon, 1 Jun
+ 2026 09:14:22 +0200
+Received: (nullmailer pid 3271774 invoked by uid 1000);
+	Mon, 01 Jun 2026 07:14:21 -0000
+Date: Mon, 1 Jun 2026 09:14:21 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Alessandro Schino <7991aleschino@gmail.com>
+CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH ipsec] esp: fix uninitialised req->src dereference in
+ esp_ssg_unref
+Message-ID: <ah0xTcyASTweURna@secunet.com>
+References: <20260529071847.1301-1-7991aleschino@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260531000042.369043-1-rosenp@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260529071847.1301-1-7991aleschino@gmail.com>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293587-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-293588-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linutronix.de:email,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 24E2861AB1A
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: A9C7261AD09
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-05-30 17:00:42 [-0700], Rosen Penev wrote:
-> Add the missing @may_sleep parameter description to the
-> mpc52xx_fec_stop kernel-doc comment.
+On Fri, May 29, 2026 at 09:18:46AM +0200, Alessandro Schino wrote:
+> When esp_ssg_unref() is called with already_unref=true, req->src has
+> not been initialised yet because aead_request_set_crypt() has not been
+> called at that point. Use esp_req_sg() to obtain the source scatterlist
+> directly from the tmp buffer layout instead.
 > 
-> Fixes: c35a0824e88b ("net: fec_mpc52xx: Replace in_interrupt() usage")
-> Assisted-by: opencode:big-pickle
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> Fixes: 2982e599fff6 ("esp: fix page frag reference leak on skb_to_sgvec failure")
+> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
 
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-
-Sebastian
+Please resend the full fixed patch on top of the ipsec tree.
 
