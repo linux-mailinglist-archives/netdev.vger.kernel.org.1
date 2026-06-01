@@ -1,169 +1,160 @@
-Return-Path: <netdev+bounces-293833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOWuACS2HWrKdAkAu9opvQ
-	(envelope-from <netdev+bounces-293833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:41:08 +0200
+	id QBWhHY21HWredAkAu9opvQ
+	(envelope-from <netdev+bounces-293835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:38:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09169622BB2
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:41:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A116622AEA
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 18:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E690B3055C2A
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:25:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 541ED300A63C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 16:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853B92DF13A;
-	Mon,  1 Jun 2026 16:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518932F0C48;
+	Mon,  1 Jun 2026 16:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2xnAnGx"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="t4ZerL+3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D522DF128;
-	Mon,  1 Jun 2026 16:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F962D7DEF
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 16:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780331113; cv=none; b=ft9muFr7fOmWl/aCseQBlZgBh/0BmXN2MAXdSyDRjyLGfqIRDJjb7RhNwL7C86Qb7Gsh0IK4SwiZu8ZC6d65jfbixN3QQ+t2hu0N3JKbCPsmvBIAMYsosb94TS5IcklkW/sYSd/hytQWWObGMa2hUfr2bqDFgRZucQIOa7sM/Zo=
+	t=1780331189; cv=none; b=ZxUPr0zfo5zfyfVzuVTB7+PhVXaXy7YJai89MuX1Ld88rrw6/9C2UOgX6QzY01yVhhvidZo8/VhR8Zqvx9OpnBW0K9tmccO0RL2PVkDdLNFSHAO60LPEvMwcrtcAoNx7JuHV0hc6m597tgdLWEr57UodrQOzk39IKKw7Da2zLdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780331113; c=relaxed/simple;
-	bh=a/2j98RM30qIxdsZ3v45ThNelusFdBWUnni1djAh8jc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I9k1p+6BDl525OlkzkwP6wOyg04++eiS2H71pzbBqO9K/aGGJ5enaDDAOR3ahjOJc5OYvlzG2T16k9csWUrPgnw5Ip3zzni9UzB0sDLte9WMVINu3497+4nbjsaCo6+/LarKxtO7HENTv1hBnw5OcIeq2wsHJuctqjYIUBDsGNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2xnAnGx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6784E1F00898;
-	Mon,  1 Jun 2026 16:25:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780331112;
-	bh=7PAmwkD34UQye33gguhmlEOcOirCvsEcwdFyQYwGycI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=V2xnAnGxwg1z15e7bN9cciloH4mp5HBYj4E/iUO5cssQa7i+KdJ00L+/s5HGtnA87
-	 Q6zu7ffDCd9R5pzrikt2HrRrGPXLIJ1nQOHpnX8TaaJBxFDU/ngSzSIz3LRnNMc/yR
-	 GVn9boqSYVHTYio2Cj64cpx/muw4eiV/4FIa7efhAysIaUOROLYRqjzNxx8RiS2BhN
-	 +EisjUdONtJK2NWxIRDmTUBio3N3iqQf/oqtEAPmmxyTZStHnXtjENmORlgoLLGvFC
-	 lVbpvDpout4AStjVcBhB2jW3VQtvjdubkZzEC80yDf7c+h2jQ9S8E0G90/eCUgit8X
-	 tenLNXJ+JwMSQ==
-Date: Mon, 1 Jun 2026 17:25:06 +0100
-From: Simon Horman <horms@kernel.org>
-To: Carlo Szelinsky <github@szelinsky.de>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: pse-pd: disable IRQ before freeing PI data
- in unregister
-Message-ID: <20260601162506.GY2256768@horms.kernel.org>
-References: <20260527125551.2425511-3-horms@kernel.org>
- <20260530105031.3274303-1-github@szelinsky.de>
+	s=arc-20240116; t=1780331189; c=relaxed/simple;
+	bh=2ILxi6sLoKrLroNCKNtFsKLEyMXxMsNKStp5c2Atbqk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=EQzIKjwa2GZ/pt5iloDXG1AobWxmK/trS0hrNeMvUd/nRFxDmm3VMfacuQOrLqu/tlfp6ls7bETRsodBTjPoQM6uN9iMLkFBvg7tc5jpCYAo9oKL0PbCRcmaCfOpG6djreyUzrAgeK0+vWqxmmEnLjd/Fj+xcmqpPrBZkY7wWWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=t4ZerL+3; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260601162617euoutp02f54cb2486386b773a383c521f1a2ba6d~1AcYCPTTI0606406064euoutp02c
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 16:26:17 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260601162617euoutp02f54cb2486386b773a383c521f1a2ba6d~1AcYCPTTI0606406064euoutp02c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1780331177;
+	bh=6qQRLbBkdKCwMbmSPKvfDONDSMKNMiDbKbY/Uct08dI=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=t4ZerL+3N/lyPmEQYURdkg8UvUmzsKXUAh1oBjA8NDrtoEKSBfWEUbG0kol1OJ1Xy
+	 nlNE3c2iNWEygP48CYVXREEobqPlvzXSDf7+kO67QJywuZWwlAjhLH8znGizL446pj
+	 KnqTb9+UT5rBf/9LwVdGM3XKNpWUohxUdDhEKewQ=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260601162617eucas1p2efc386a4d9f9e7e98e8acb83f9c550d6~1AcXr2QwO0269202692eucas1p2T;
+	Mon,  1 Jun 2026 16:26:17 +0000 (GMT)
+Received: from AMDC4843.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.61]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260601162616eusmtip13a721d88365eb0e92597b7024e014df5~1AcXEWt-s0485104851eusmtip1d;
+	Mon,  1 Jun 2026 16:26:16 +0000 (GMT)
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, linux-kernel@vger.kernel.org,
+	k.domagalski@samsung.com, k.tegowski@samsung.com, cs0617.lee@samsung.com,
+	Jakub Raczynski <j.raczynski@samsung.com>
+Subject: [PATCH net-next v2 0/3] xgmac: Support for 16 MTL/DMA queues
+Date: Mon,  1 Jun 2026 18:25:34 +0200
+Message-Id: <20260601162537.553512-1-j.raczynski@samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260530105031.3274303-1-github@szelinsky.de>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260601162617eucas1p2efc386a4d9f9e7e98e8acb83f9c550d6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260601162617eucas1p2efc386a4d9f9e7e98e8acb83f9c550d6
+X-EPHeader: CA
+X-CMS-RootMailID: 20260601162617eucas1p2efc386a4d9f9e7e98e8acb83f9c550d6
+References: <CGME20260601162617eucas1p2efc386a4d9f9e7e98e8acb83f9c550d6@eucas1p2.samsung.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293833-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,vger.kernel.org,samsung.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293835-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[samsung.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 09169622BB2
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,samsung.com:mid,samsung.com:dkim]
+X-Rspamd-Queue-Id: 0A116622AEA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 30, 2026 at 12:50:31PM +0200, Carlo Szelinsky wrote:
-> Hi Simon,
-> 
-> Thanks for the review.
+New XGMAC datasheets for XGMAC 3.20a and 3.40a list support up to
+16 MTL/DMA queues. This patch series does modifications to accommodate for
+that, by following:
+- Increase MAX value macros (this will increase memory allocation for driver)
+- Add missing registers
+- Modify/fix some functions to split TC and MTL/DMA handling
 
-Hi Carlo,
+Biggest issue is that new hardware does support only 8 TC (traffic classes),
+while supporting more MTL/DMA queues. This is problematic, as current code
+does assume that these are equal which is not true anymore. Fix that by
+applying better context to functions, using TC count read from HW_FEATURE
+register where it applies.
 
-Likewise, thanks for your response.
+For DMA/MTL queues higher than TC count redirect traffic to TC 0.
+This is error in user configuration but quite possible to occur,
+if user does 'one DMA/MTL queue per TC'.
 
-> > pse_flush_pw_ds() runs before disable_irq(), so an interrupt could
-> > hit a freed regulator.
-> 
-> Correct, and it's the same bug. I moved disable_irq() above
-> pse_release_pis(), but pse_flush_pw_ds() still runs while the IRQ is
-> live, and it can free pw_d->supply. The ISR uses that supply via
-> pse_pi_deallocate_pw_budget(). So the race stays open.
-> 
-> Fix: disable the IRQ (and cancel the poll work) before
-> pse_flush_pw_ds() too. I'll fold that into patch 1 for v2.
+This change has been tested on XGMAC based on 3.20a.
+---
+Changes in v2:
+- Remove newly added num_tc value, replace with stmmac_priv pointer,
+  to use numtc value from dma_features struct
+- Change all new WARN_ONCE calls to netdev_err
+- Add Signed-Off for colleague that did similar original patch internally and
+  took part in new version of this patch
+- Apply recommended change for switch case for readability
 
-Ack, sounds good.
+Link to v1:
+https://lore.kernel.org/netdev/20260511165416.3093015-1-j.raczynski@samsung.com/
 
-> > cancel_work_sync() after pse_release_pis() may use freed pcdev->pi.
-> 
-> I don't think so. The worker only touches the kfifo and the
-> pse_control list, not pcdev->pi. The patch 1 message says this.
-> Did I miss a path where the worker reaches pcdev->pi?
+Jakub Raczynski (3):
+  net/stmmac/dwxgmac: Modify DMA functions for future hardware
+  net/stmmac/dwxgmac: Extend MTL/DMA support to 16 queues
+  include/stmmac: Increase max DMA/MTL channel count from 8 to 16
 
-I am concerned that this can occur if pse_send_ntf_worker()
-calls pse_control_put(). In which case __pse_control_release()
-may run, which accesses psec->pcdev->pi[psec->id].admin_state_enabled.
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 +
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 65 ++++++++++++++++++-
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 15 ++++-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  3 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +-
+ include/linux/stmmac.h                        |  6 +-
+ 7 files changed, 85 insertions(+), 9 deletions(-)
 
-> 
-> > Regulator ops still reachable after pcdev->pi is freed.
-> 
-> That is what patch 2 fixes for the disable path. Are you pointing at
-> a different path than the regulator_unregister() disable flush?
+-- 
+2.34.1
 
-I agree this relates to patch 2/2, and I wonder if you may have
-missed the AI-generated review of it that I forwarded.
-
-* https://lore.kernel.org/netdev/20260527122418.2410341-2-horms@kernel.org/
-
-I think the problem here is that wile patch 2/2
-addresses pse_pi_disable by adding a check for !pcdev->pi,
-it doesn't address similar problems in pse_pi_is_enabled()
-and pse_pi_enable().
-
-I'd also like to draw your attention to the issue around synchronising
-access to pcdev->pi in pse_release_pis in the review of 2/2.
-
-> 
-> > device still in the list / external consumers / power domain tied to
-> > devm lifetime.
-> 
-> These look pre-existing and not part of this series. Do you agree, or
-> do you see one of them as caused by this series?
-
-Thanks, agreed.
-
-> The pre-existing items above (list, consumers, devm lifetime) - would
-> you want them fixed inside this net series, or handled separately on
-> top? So I know what to do before sending v2.
-
-For these last three pre-existing items I think it's best to handle them
-separately. To avoid complicating this series more than necessary.
 
