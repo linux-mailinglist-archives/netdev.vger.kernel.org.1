@@ -1,217 +1,185 @@
-Return-Path: <netdev+bounces-293849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKY6D9y8HWo/dQkAu9opvQ
-	(envelope-from <netdev+bounces-293849-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:09:48 +0200
+	id 8EnpGG+/HWpidQkAu9opvQ
+	(envelope-from <netdev+bounces-293851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:20:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CE7C6230ED
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:09:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05311623328
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AEFA30376B9
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:04:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A76B300CC26
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68623DC4A2;
-	Mon,  1 Jun 2026 17:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B863DEAC4;
+	Mon,  1 Jun 2026 17:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b="c8zku+oa"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="VPtcisMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBA23DB65A
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 17:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11ACA3DD861
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 17:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780333439; cv=none; b=oVW35SUGHQZvDrOsfBagrO7jQLWifL+EjzxjtGe3v4fg4zSfnsQu6H+NE/w5pzhSPGZoP7UvXDz4p5O97gaTwVLMjSODIatL2jw3tSU8HNnl9F2kGPiE5TkOCKupWKr0gHYFnpN0IYbqveedvmK19S/1w51q+6XXsW7HjSD5aUU=
+	t=1780334268; cv=none; b=BIMLrskLctkvZXoNCNaOtOFQP38akGDVFrk/MdHRoyrx/DVZHg2lsLbSL4VlumIhampQHB2k7vh7JIGqubsld66HgY2p8pceWKC9Fu3BMffqjMT2sB/ZdkNfgxD8iOcQMCcWCIHXxFZ9xcSjxpbARAIB6Rf7lM/Rmm4xrR1iaV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780333439; c=relaxed/simple;
-	bh=CJv+ORdfM4d1gC+/h8eXW8d3TcRUhKDuN3NsrTLwwrY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=sB8P7+WDQ7LM+Jrvovp0e5fYjzZHT15+fPwshJaPAw/JwIP5Qjgkn1n6ddUr8ONjgBf3gkg2YSU6cZK7WkoaIvsaVEoBcY8VFX/TFO7bY8QFa7eVrcGNXXnb4PDu7objscTXP2rbRomVmXFqb8gbY1I+IHZt7ayLIuL8wBTBdI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=c8zku+oa; arc=none smtp.client-ip=74.125.82.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
-Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-304545f5206so14332363eec.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 10:03:57 -0700 (PDT)
+	s=arc-20240116; t=1780334268; c=relaxed/simple;
+	bh=QOF4HTo9NC+sG07UWNWNGhB1bOa8fZKjrboF6NtGYig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e3+lrpv5pVWeaw452hSPbE75xmlSja/9RIX6JaBJg+WiN6dMyEa1WqnLTv9K8kVKmz6Py8vb3LU69X4vqk/l3dTyia0ZjTq1Zx+A53l35nLJ1JlYmiOkmiECPQs8e3ZdOukaHQnggJ+M32qeNEHOXiATTPfl7nNYFbZog5+V6B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=VPtcisMy; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-beb2a97cc9aso437349766b.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 10:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1780333437; x=1780938237; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aDxjxajjjz+WXaa2HC01+77k69ejzz46zXU7TmxK8gU=;
-        b=c8zku+oaTIE4+vxpg+7KrmNNGHSop9C2WtVqZ0oNF05BPNaGvHUFnuI+zI6GzXfbwe
-         ikqnmpozZwPsBcNwcOMRiaiGeY+Uz/Ei7hVEf1GFRfspgu+JnJWGtvWUvwLzNNBxzmZV
-         C1Jl8n4oCCOf4D+8PkSlfit9DAhknGJU5mkSt4wST1Uakbpbh62lZ2mY8EVCgOVf/t5W
-         EapBjL4E3k85qK76XW5vZn4P8pBMK9m0p4UwoguxdeybgyWnuMfD1ct2hIW/KA5rvMyi
-         hmaw0U5n2Kc6SHQH+69W/JX9K1Ty6GamRqnYNR0jHm5TDEfoaU6EGInEEh1t5+Mzagtp
-         +f7Q==
+        d=linux-foundation.org; s=google; t=1780334263; x=1780939063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8glRJeBkbbvtPfYZZguJlBO/diWKKHW+QvqawLEed2k=;
+        b=VPtcisMyVtMPtLtRjN+qVp9en8QqOm1sevcoPwB5ll5VOlVmsj4DlxJ9BcM0w7v5Qw
+         fysKwa080G28VGidjcLImxS0Z5q42d4ddTdaPHr/EKAJGZb80c6BxTFPdVhvcrnpuJzC
+         AVGsD2RGdaPbXl8AYurf7nfNIpUG4d44mphmA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780333437; x=1780938237;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aDxjxajjjz+WXaa2HC01+77k69ejzz46zXU7TmxK8gU=;
-        b=sar/2JckOKWg+qZNlYlVI8f4LSGJyNiunC6P9YzUWJlJSsS4LZAgxoTxqthgunaDjD
-         2L1yBcrNHYPBzk2pSf1ukba4kH3J5fGcrxGFt/ZUNawiBcijaqfbZu+uc8SWkb/LXb/O
-         UxqkWtsqxsCVjuQFOGwCYLUPY6ya+WPjO33Bvwub3X3sW9KeXJMn73VOU234xJPcly/8
-         RiJvvw2z6BpcrxNxYpTCEVz6ChRuk1XWEMyfh9f/rZtn6/DLqJ7c4UzrEPx2NzPZyMVp
-         MXrk+mMc3y5SPGCTBYEdYK9xpyaakizMSaxSDm3TOPm+x9OIS6tm9eqlG3uv91VDudTS
-         7bXA==
-X-Forwarded-Encrypted: i=1; AFNElJ9PCLFx/o4inXdC/84+tsCl4Of7SbX1q76lty0278V3nyZkgddhPswD0ILm7ItFxF/IBAAY7vY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyV6793YZ7F+DE2HLImsHNVnK5gI7War+C+ImMLa2cKKSKdUAQt
-	sH2yEPrN+vXgngD/hgm81ScPlzdgZP3+MiJU1U47ubQrIa0dKpEj3FGZsewq+vDkQLc=
-X-Gm-Gg: Acq92OE35bVxxAXm7JutphSF/pJxKZvdkyhli+gcE5T+Dmu0oZhCWLPjU03LnJfJTq8
-	W3qiwk3EsSO2DX+VxcN3bPrtBqQgHXGO/Q5qKq3Ewyi969G73JivFfxUa8/4IubWMt9Rv6XYui2
-	fvi58qQ7CPumBnkySTIupNtMyv+gnIPIk+NCR25cXkULzqtb2RkUH+szgoHjRugNq7rtwKE9w5L
-	SJSjvJHdsCWH9aqXuo/4EIz0y6AlD5CaHvdgQI9nHBPgJrOJuTUxcHgqK2tDG0qnNUijyi5E/St
-	DMqMoiwZD+AzNejEggLWGzuLI5SHaHU7xXJvlMWvkJ6/z90VGF0xvC/Fnjg+Alz0+LRu3cf+Ath
-	UMGeuLIh6e1HC2/d8hArLOLNpjqoJx6xa7qNlK/Hq9H8THGZWDJSyZRQU4Dmc4MBCZxcpF7TJBe
-	wHPm7L2miXbpDmLks=
-X-Received: by 2002:a05:7301:1f0d:b0:2ed:e14:42e9 with SMTP id 5a478bee46e88-304fa693628mr6131496eec.34.1780333437177;
-        Mon, 01 Jun 2026 10:03:57 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:600::a996])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-304ed5a0b7dsm9613132eec.22.2026.06.01.10.03.53
+        d=1e100.net; s=20251104; t=1780334263; x=1780939063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8glRJeBkbbvtPfYZZguJlBO/diWKKHW+QvqawLEed2k=;
+        b=o+zqk4DEaEKX2sVRVDd2Phcza0W3gVudVlKAoqt0mVPPX+nnsu0TkO8qdvCEv45Kag
+         o8qjlmqH9eqhY01EBX9Yr0b0p3g7Bl1oXpuiMvoAQMf9OlPxfxfkUg6zWNNKxgKwVlKd
+         hIylG+YebhS1fAWv1uYvDO41GetwLSvkfpgHskZpXHkhvwPF5f8FDQCzqNerItr47nXu
+         ycNiIYnuaqi+qY7fVDwgmUMdwPRNqjqKjPAZXb7xwwXvhlXqkdfzSjgbH6Sr7F6R9Twj
+         2EtYLuk1RRsJbWtsNUHSk9oCFa3fpKj056nVZ1oZpqxx421N597xTqWUxcpKFDpbCOxS
+         IztA==
+X-Forwarded-Encrypted: i=1; AFNElJ+2+RRCeMK8V6rPQv1UVPqESrU5MYvPRyfI02GrwpI3nSHyW82Av8ftaW4yPbeN8kbrj81JLPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVHVqiU0cuHOfYNcKEwPzC+2Up1xZNGb9BR+ftxYwiQqk+UMxR
+	JqeAhPA4kpkwfBpIhlSN4dbjLYrGDEG9Ag7yD2/IMURJdCx6aMFUTbP1mw3Ujo9cWniDRBx9bEu
+	0yCr6lwM=
+X-Gm-Gg: Acq92OGocnKSP1xgGMHW0Op1tB/wtzQQX7c+e85KKH+Q/YoRBlXVwTHi1ruiUMabl1G
+	XUKlnLr03W1xpsmBPK0T8w8w5BHdL99M22EEidO70JxuegPWfG3SG5BR4LLm1qQGhjnYhkVOKMo
+	ZhqmFJfO4a/KrOtCV6GNSfg6PmRFnFgEnGqVjROQAQMW1ehQ02NaA++uJUlAiwEkTqZOKt2EDR1
+	iy1vZlBhw328DQ9V5RcYpzYRmRNzrHIfei8IE+yKNfwBwb/qNWCfCGvHtgdE2RUQBf/DTKV8GCj
+	jQHCPOnXfZB8QAy/bBv2d16ivkauQ4Hh2SAWQMdlBBG/OewDNyLkObb+Xemnbka9KRUyLAzFbA2
+	wKgYUVbF775J7L7u+EsVlZHRyGG/D6Zng5UAIEAxOXN16FxfxY+0dP6FBds9k7mlVbvq00P1EJz
+	RvSyXeXP9h1OwRBl0oZFw51xgbKmRW/JAoAqbPOHa6M9ezHfFdS9xpunfRTFZ1JV7nT6/lrdSA/
+	+BRv2/YthM=
+X-Received: by 2002:a17:907:97d5:b0:bdd:3c8:3348 with SMTP id a640c23a62f3a-beab334d1b5mr750052866b.40.1780334261575;
+        Mon, 01 Jun 2026 10:17:41 -0700 (PDT)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-be9d31dadefsm355465366b.21.2026.06.01.10.17.40
+        for <netdev@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 10:03:55 -0700 (PDT)
+        Mon, 01 Jun 2026 10:17:40 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-bec4639953dso264710566b.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 10:17:40 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/ju7FkLwJ0+rkK+tJuzDkWCjg4OA2m622nWhPAc+rrslP96sZ9cfEHbzflAZpuRz92CmTIDXk=@vger.kernel.org
+X-Received: by 2002:a17:906:4583:b0:bef:12f:347e with SMTP id
+ a640c23a62f3a-bef012f3d6fmr16123966b.24.1780334260114; Mon, 01 Jun 2026
+ 10:17:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 01 Jun 2026 13:03:52 -0400
-Message-Id: <DIXVJ45H90X3.3DOQOUXJB6DVN@etsalapatis.com>
-Cc: "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>, "Alexei
- Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
- "Martin KaFai Lau" <martin.lau@linux.dev>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
- <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
- <shuah@kernel.org>, "Guillaume Nault" <gnault@redhat.com>, "Ido Schimmel"
- <idosch@nvidia.com>, "Fernando Fernandez Mancera" <fmancera@suse.de>,
- "Peter Oskolkov" <posk@google.com>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kernel-patches-bot@fb.com>, "Leon Hwang" <leon.huangfu@shopee.com>
-Subject: Re: [PATCH bpf v3 1/2] bpf: Update transport_header when
- encapsulating UDP tunnel in lwt
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Leon Hwang" <leon.hwang@linux.dev>, <bpf@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260601150203.20352-1-leon.hwang@linux.dev>
- <20260601150203.20352-2-leon.hwang@linux.dev>
-In-Reply-To: <20260601150203.20352-2-leon.hwang@linux.dev>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+MIME-Version: 1.0
+References: <20260531010107.1953702-1-safinaskar@gmail.com> <20260601-enthusiasmus-canceln-anlehnen-0e62317a9784@brauner>
+In-Reply-To: <20260601-enthusiasmus-canceln-anlehnen-0e62317a9784@brauner>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 1 Jun 2026 10:17:23 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wifX_rrDjRGnDnOqE-usptAukuXKrmuPuVDP5bOCBWzGQ@mail.gmail.com>
+X-Gm-Features: AVHnY4KexWf0o1w3H7pefWBidQ5elZSrUhqo_ATAUmEnAO4iwBaX4DnfDRLKUYk
+Message-ID: <CAHk-=wifX_rrDjRGnDnOqE-usptAukuXKrmuPuVDP5bOCBWzGQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+To: Christian Brauner <brauner@kernel.org>
+Cc: Askar Safin <safinaskar@gmail.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-api@vger.kernel.org, netdev@vger.kernel.org, 
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@infradead.org>, David Howells <dhowells@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
+	Pedro Falcato <pfalcato@suse.de>, Miklos Szeredi <miklos@szeredi.hu>, patches@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,nvidia.com,suse.de,vger.kernel.org,fb.com,shopee.com];
-	TAGGED_FROM(0.00)[bounces-293849-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293851-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[etsalapatis.com];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_NA(0.00)[linux-foundation.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kvack.org,infradead.org,kernel.dk,redhat.com,linux-foundation.org,kernel.org,suse.de,szeredi.hu,lists.linux.dev,zeniv.linux.org.uk,suse.cz];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8CE7C6230ED
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-foundation.org:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 05311623328
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon Jun 1, 2026 at 11:02 AM EDT, Leon Hwang wrote:
-> Currently, bpf_lwt_push_ip_encap() does not update skb->transport_header.
-> When a driver, e.g. ice, reuses the stale skb->transport_header to
-> offload checksum computation to NIC hardware, VxLAN packets encapsulated
-> by bpf_lwt_push_encap() helper may be dropped due to incorrect checksum.
+On Mon, 1 Jun 2026 at 09:42, Christian Brauner <brauner@kernel.org> wrote:
 >
-> Update skb->transport_header in bpf_lwt_push_ip_encap() whenever the
-> encapsulated packet uses UDP, so checksum offload works correctly.
->
-> Fixes: 52f278774e79 ("bpf: implement BPF_LWT_ENCAP_IP mode in bpf_lwt_pus=
-h_encap")
-> Cc: Leon Hwang <leon.huangfu@shopee.com>
-> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
-> ---
->  net/core/lwt_bpf.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/net/core/lwt_bpf.c b/net/core/lwt_bpf.c
-> index f71ef82a5f3d..65d1dfbf3312 100644
-> --- a/net/core/lwt_bpf.c
-> +++ b/net/core/lwt_bpf.c
-> @@ -599,6 +599,7 @@ static int handle_gso_encap(struct sk_buff *skb, bool=
- ipv4, int encap_len)
-> =20
->  int bpf_lwt_push_ip_encap(struct sk_buff *skb, void *hdr, u32 len, bool =
-ingress)
->  {
-> +	bool is_udp_tunnel;
->  	struct iphdr *iph;
->  	bool ipv4;
->  	int err;
-> @@ -612,10 +613,16 @@ int bpf_lwt_push_ip_encap(struct sk_buff *skb, void=
- *hdr, u32 len, bool ingress)
->  		ipv4 =3D true;
->  		if (unlikely(len < iph->ihl * 4))
->  			return -EINVAL;
-> +		is_udp_tunnel =3D iph->protocol =3D=3D IPPROTO_UDP;
-> +		if (unlikely(is_udp_tunnel && len < iph->ihl * 4 + sizeof(struct udphd=
-r)))
-> +			return -EINVAL;
->  	} else if (iph->version =3D=3D 6) {
->  		ipv4 =3D false;
->  		if (unlikely(len < sizeof(struct ipv6hdr)))
->  			return -EINVAL;
-> +		is_udp_tunnel =3D ((struct ipv6hdr *)iph)->nexthdr =3D=3D NEXTHDR_UDP;
-> +		if (unlikely(is_udp_tunnel && len < sizeof(struct ipv6hdr) + sizeof(st=
-ruct udphdr)))
-> +			return -EINVAL;
->  	} else {
->  		return -EINVAL;
->  	}
-> @@ -637,6 +644,10 @@ int bpf_lwt_push_ip_encap(struct sk_buff *skb, void =
-*hdr, u32 len, bool ingress)
->  	if (ingress)
->  		skb_postpush_rcsum(skb, iph, len);
->  	skb_reset_network_header(skb);
-> +	if (ipv4 && is_udp_tunnel)
-> +		skb_set_transport_header(skb, skb_network_offset(skb) + iph->ihl * 4);
-> +	else if (!ipv4 && is_udp_tunnel)
-> +		skb_set_transport_header(skb, skb_network_offset(skb) + sizeof(struct =
-ipv6hdr));
+> Applied to the vfs-7.2.vmsplice branch of the vfs/vfs.git tree.
 
-Minor nit: Could we do something like
+Btw, if people want to work further on this - assuming we don't get
+any huge screams of pain from having effectively gotten rid of
+vmsplice() - I don't think it would hurt to look at limiting the
+"regular" splice() too.
 
-if (is_udp_tunnel) {
-	size_t hrdsz =3D ipv4 ? iph->ihl * 4 : sizeof(struct ipv6hdr);
-	skb_set_transport_header(skb9, skb_network_offset(skb)) + hdrsz;
-}
+We already have the code to just turn it into a pure copy on the
+"splice to pipe" case: copy_splice_read(). In many ways it would be
+*lovely* to just always force that path.
 
-to make the logic clearer?
+We already do that explicitly for DAX and O_DIRECT, but we made a lot
+of special files do it implicitly too, so quite a lot of the splice
+reading cases already use that "just read() into a kernel space
+buffer" model for splicing.
 
->  	memcpy(skb_network_header(skb), hdr, len);
->  	bpf_compute_data_pointers(skb);
->  	skb_clear_hash(skb);
+It would be interesting to hear who would even notice if we just
+always used that copy case, and made "f_op->splice_read" never trigger
+at all.
 
+And it turns out that the only thing that ever uses
+"f_op->splice_write" is splice_to_socket. Which was actually the
+problematic buggy case.
+
+Everybody else pretty much seems to just use iter_file_splice_write(),
+which does the "emulate it with just a write from kernel buffers".
+
+So *if* we get rid of f_op->splice_read, we do leave the case that
+really caused problems, but nobody will ever care. Because once splice
+only deals with private buffers that can't be shared with anything
+else, a f_op->splice_write() that gets things wrong is pretty much a
+non-event.
+
+(We'd have to look at 'tee()' too: I don't think anybody really uses
+it, but it does do the "no copy linking" by just incrementing
+refcounts on the pipe buffers. So to really protect against
+splice_write users messing up, that should do copies too, but as long
+as it's all "private ephemeral buffers" that get their refcounts
+updated, I don't think anybody *really* cares)
+
+TLDR: maybe we could ghet rid of "f_op->splice_read". *That* would be
+a big simplification.
+
+                Linus
 
