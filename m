@@ -1,163 +1,175 @@
-Return-Path: <netdev+bounces-293728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4LCnJsh5HWrEbAkAu9opvQ
-	(envelope-from <netdev+bounces-293728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:23:36 +0200
+	id ePeUFA16HWrEbAkAu9opvQ
+	(envelope-from <netdev+bounces-293729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:24:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597ED61F34F
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:23:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7336C61F3A2
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 72D53302834D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:14:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63B20300B62A
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E037649B;
-	Mon,  1 Jun 2026 12:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32011363C53;
+	Mon,  1 Jun 2026 12:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3Ae9hAh"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cea2avz5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22F6331203
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 12:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE062E9730
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 12:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780316062; cv=none; b=ItlFUdfatNOxA6Gu4h3lPKFkzsigcMc4lqP6HlfcWSO0PeGmONcRXDbLfWS9bB/VNHZrki6xAuDi7UopFeTCz43UQyzgJeMMcRIWRYDjtnRviwbf9gnmFQAMvCvDCShlwH5q/aqVUXkpoSl8OX9HNQ4XIDpuz2zM7mCCHUQYEg8=
+	t=1780316275; cv=none; b=a6rLwDKYjuv2RIlHkjIwcnNL/qzg0bamaKVQMKill6GZiYx84RfxOzE9eZNjqt8K56X1WXlKItZQogvaqa+xaM28b/olkoIGqurBa0c8Md9Adn0aelnfTnqe0+3oK9M4pHLDj4rPxBUv9xxWgM1bWtywbHi8nm4zJZAHhycRxGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780316062; c=relaxed/simple;
-	bh=ckB/0OrsFAl0uXjbvDISsyp9MLSMakEeAmw4BaJPm88=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NLOEBDgPVeYCVgxo0a/yybgY4MBfwBetO0z2IyxFDLsdN+DncA6dO1Vc+bDq0yOvoCCNKgB9ewPg/+uNWRIumCDEnZc3mRqJ3n+22VaeF+DzhJeoLDXLI8/HkbnDmBKRtJIJfJbg5ejayMc8fjEWA9STgXUid6+13mleZicCIL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k3Ae9hAh; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490388fd0dbso103604265e9.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 05:14:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780316060; x=1780920860; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LspmPQV/lHUgHA9RJ7Trmk5tXDicO37E7l+XwVPkr/U=;
-        b=k3Ae9hAhCViAGBd5kkfRnCmIEDj9nPEiC2h1k27d6xLf004gk0YZhyqL1jRyZmHOTy
-         3cQvR9UIgL4aWarHwzEXeWXrfZ8tDlHLkjfGeQgsZu1TW8aWJSbppEbXmlmpv5wXpPoj
-         Km2mZe72gDI0c+idsg+Kjwx6R60JfZBlgEqTJcmwuG4+/mVC1BArdt864f9hVoriEfx9
-         Z6xEuq+uj9ID52x/QPtYV4+NRsWJBLI4m4oI7rL3yyLxsbVgJfRHr+4pxVGMPe5m+4mx
-         PfwQpTDH829FiunORZkzoqZt42542qhsB3V03Vfj0tHotgS+Vb89cDSs1lMRIJpvMAUl
-         YVSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780316060; x=1780920860;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LspmPQV/lHUgHA9RJ7Trmk5tXDicO37E7l+XwVPkr/U=;
-        b=k2wsUWxBU2slt/s6VGwrWJZXWzLBInLjGaGsSwKE5VHQpOnoD5+wwI7e+XKl6mUeWh
-         xTZo14DuKB9gCrL53qwqUQLxrjn6R88vdS7A2M8NKoYJzdPBUgQJUZUOtkzM16TQjFrb
-         6n2i6ZUd3AW5JQVi31CvNA8r/6QWzirNFFiUA3M9AnWi0mKfsigepOlOhg30xawFR5h1
-         tVlt3ngm59e61VTF6tTb/uTf4QsHmDtD8cT5qwYaJ+1i9QEpQgePgUPYb2lCeRILOrn7
-         uo/8dCGe8+5PiDoCGooKAcFWO9QdNiwCDpn5I2lh/Nl933v8NUjkc5YButt1kCRilMG6
-         2RFQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+UHRn/6gxsrOo0CrBYaFHOM9bVhzAwwU8dMYSXh8YXmcc2QcajMTuRCYU++lwBry9bXyajHJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0tFFbmgEoP07iFA0icfd3PIu+0h6eQ7eb4JmzTwdIwlZlPFCU
-	F0S3pl/XB4AINtnZVTqcL2kaQ/SW2h+AEO3YgsChk1RPd+91xE9O+QmkG1kTa2jI
-X-Gm-Gg: Acq92OGyt3MKseh1JUJttsZuS83wD2VE5V8PteT38/t0S+xuc+WIR/+0oqMwz2uDfLD
-	d/U33r0yEKabOwWpWxRUVVj1SeaH4RDo3Xn5a90Cu/V+GKzyQoQRITukoGH7BUSf8GsTqp6h5j7
-	rDrTIaGhH4zQ4b4zU7s0Ia7B7pKooZjG9Jy7YaKErIYwh1YvPRCai3DKNEaea4V79Nv8v/71Kh7
-	LScy7g8Pg7dKUswSduM6FUTN/cZQKR4MVrEhAR00kd/s8FGfDsyfg7W9SkDMvPAzhSnw393/sqU
-	NB+2nfINPglAKL5QBn2w7IzOHnAtGFkKya/Yp80q2p3mvMpISZSJ0kb73ISyNLWhnYMdF9hzGL3
-	ZJyRmALwQpelMZbgji2c8bbom2Vkp3KrLh8qIDR5jeYoOQo1s7+DZc2BICrZLJCHbfavx2qEwJE
-	pOdz9Poql0JvDxEuPk1LtH6z3u3i8yNr2MzHZlysG1gJIsgXPhyI4L/bY0CGXQU4ryqiNSG+I=
-X-Received: by 2002:a05:600c:3b09:b0:490:a7ab:bbee with SMTP id 5b1f17b1804b1-490a7abbdcfmr141119495e9.15.1780316059659;
-        Mon, 01 Jun 2026 05:14:19 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909c127befsm77948305e9.31.2026.06.01.05.14.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 05:14:19 -0700 (PDT)
-Date: Mon, 1 Jun 2026 13:14:16 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Yao Sang <sangyao@kylinos.cn>, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, "Gustavo
- A . R . Silva" <gustavoars@kernel.org>, netdev <netdev@vger.kernel.org>,
- linux-rdma <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net] net/mlx4: avoid GCC 10 __bad_copy_from() false
- positive
-Message-ID: <20260601131416.318cfbd6@pumpkin>
-In-Reply-To: <7a018189-021c-44d1-a46d-a75016818a0b@nvidia.com>
-References: <20260520102130.423044-1-sangyao@kylinos.cn>
-	<1780035629778309.247.seg@mailgw.kylinos.cn>
-	<20260529064521.4i5pyilf32au4cnf@sang-pc>
-	<7a018189-021c-44d1-a46d-a75016818a0b@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1780316275; c=relaxed/simple;
+	bh=d3uvhYQD9xJChWxXYsqZSil6tkxxfyHQugVS/A+e1bQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PYLYuxkA2/8PJEW9CgriDejmvC7EPz/EFJCAjWOWiL26aTE8NxhIJ+Rc0O2Suls6KpvNGgPFecUj6gEAWNLQ1UAQhbuO77wb69YpG1JrpK8o/9y/I5+J2gIvFndO5TeyRCr8Q/a3OmWkbmZwvRMHeb8o/hT2EmxLxYukcZSu6HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cea2avz5; arc=none smtp.client-ip=113.46.200.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=9+tYBVRgFlwjvVJ4KFk3CAjWNbcLhRu3+Zof6wPm/BM=;
+	b=cea2avz5hfTAi3tSE+pUiqZCqFpWXvIoRVm7fr61OjWoBIXtC4bmuWFYjFHHgOzej4SRr8zgP
+	KqG/QmjwxypaSTbOrE1H3f57uz4r/xnL1Pus0aZZ9LBhWWH77gfh3OWGaTFX+bWpdtbIqSguXpt
+	y8jTS2Q62l6sm9TrjXJHUyI=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gTXpZ16JczpStx;
+	Mon,  1 Jun 2026 20:10:14 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 46A4540569;
+	Mon,  1 Jun 2026 20:17:49 +0800 (CST)
+Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 1 Jun 2026 20:17:49 +0800
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 1 Jun 2026 20:17:48 +0800
+Message-ID: <70a09730-69bc-49cd-aa61-89e63ba766e3@huawei.com>
+Date: Mon, 1 Jun 2026 20:17:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xfrm: Fix dev use-after-free in xfrm async resumption
+To: Steffen Klassert <steffen.klassert@secunet.com>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <tpluszz77@gmail.com>, <netdev@vger.kernel.org>,
+	<zhangchangzhong@huawei.com>, <xuchunxiao3@huawei.com>
+References: <20260529092111.1089315-1-dongchenchen2@huawei.com>
+ <ah0nmpeq6TNHtQqd@secunet.com>
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+In-Reply-To: <ah0nmpeq6TNHtQqd@secunet.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemq200002.china.huawei.com (7.202.195.90)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293728-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,huawei.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293729-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dongchenchen2@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.994];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email]
-X-Rspamd-Queue-Id: 597ED61F34F
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 7336C61F3A2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 1 Jun 2026 14:00:15 +0300
-Tariq Toukan <tariqt@nvidia.com> wrote:
+> On Fri, May 29, 2026 at 05:21:11PM +0800, Dong Chenchen wrote:
+>> xfrm async resumption hold skb->dev refcnt until after transport_finish.
+>> However, xfrm_rcv_cb may modify skb->dev to tunnel dev without taking
+>> device reference, such as vti_rcv_cb. The subsequent async resumption
+>> will decrement the tunnel device's reference count, which lead to uaf
+>> of tunnel dev and refcnt leak of orig dev as below:
+>>
+>> unregister_netdevice: waiting for vti1 to become free. Usage count = -2
+>>
+>> Release refcnt of the original dev after tunnel rcv modify skb->dev to
+>> fix it.
+>>
+>> Fixes: 1c428b038400 ("xfrm: hold dev ref until after transport_finish NF_HOOK")
+>> Reported-by: Xu Chunxiao <xuchunxiao3@huawei.com>
+>> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+>> ---
+>>   net/xfrm/xfrm_input.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+>> index f65291eba1f6..c979872b6006 100644
+>> --- a/net/xfrm/xfrm_input.c
+>> +++ b/net/xfrm/xfrm_input.c
+>> @@ -467,6 +467,7 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+>>   {
+>>   	const struct xfrm_state_afinfo *afinfo;
+>>   	struct net *net = dev_net(skb->dev);
+>> +	struct net_device *dev = skb->dev;
+>>   	int err;
+>>   	__be32 seq;
+>>   	__be32 seq_hi;
+>> @@ -730,6 +731,10 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+>>   	if (err)
+>>   		goto drop;
+>>   
+>> +	if (async && skb->dev != dev) {
+>> +		dev_put(dev);
+>> +		async = 0;
+>> +	}
+>>   	nf_reset_ct(skb);
+>>   
+>>   	if (decaps) {
+> Sashiko found issues with this patch:
+>
+> https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260529092111.1089315-1-dongchenchen2%40huawei.com
+>
+> Please review!
+>
 
-> On 29/05/2026 9:45, Yao Sang wrote:
-> > On Mon, May 25, 2026 at 01:47:59PM +0300, Tariq Toukan wrote:  
-...
-> > Regarding David's suggestion of using a memset_user() loop, I've also
-> > looked into it, but couldn't locate either of those APIs in the kernel
-> > after check.Please let me know if you have any additional information
-> > or suggestions.
-> > 
-> > If this approach looks good to you, I'll send out the full v2 patch shortly.
-> >   
-> 
-> That would work.
-> Thanks.
-> 
+Hi, Steffen! Thanks a lot for your review.
 
-I wasn't at all sure there was one, but a loop using a 'reasonable size'
-buffer will be reasonably simple and fast.
-I suspect an on-stack 256 byte buffer would be good enough.
-If it were a really hot path there are other options, but this looked
-like initialisation so performance isn't that critical.
-(But you don't want a loop of put_user() because that will be slow.)
+This patch indeed cannot fix all the issues in the branches.
+Maybe we can stash original skb->dev and move dev_put in
+transport_finish to xfrm_input to fix it.
+But there is a question, xfrm_rcv_cb modify skb->dev to tunnel or
+xfrmi dev without taking device reference. Is it safe to directly
+access the new dev from skb in the subsequent async resumption?
+Will this trigger the issue again mentioned in 1c428b038400 ("xfrm:
+hold dev ref until after transport_finish NF_HOOK")? It seems that
+it is difficult to protect new skb->dev within the xfrm_input process.
 
--- David
+Best regards
+Dong Chenchen
 
 
