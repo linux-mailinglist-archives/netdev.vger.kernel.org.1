@@ -1,184 +1,177 @@
-Return-Path: <netdev+bounces-293662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yH08KMBUHWqnYwkAu9opvQ
-	(envelope-from <netdev+bounces-293662-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:45:36 +0200
+	id 6LKGC1NTHWp/YwkAu9opvQ
+	(envelope-from <netdev+bounces-293659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:39:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCD8561CB2E
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3ECE61C9CF
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7D733070F15
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:38:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5279300734C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1614C391E78;
-	Mon,  1 Jun 2026 09:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C67133EB1B;
+	Mon,  1 Jun 2026 09:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BrtihC/2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE92391832
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEDD349CD0
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780306689; cv=none; b=fQK14dBIjh0JO5bcIVCB3QzDxQ1bDhXhf0lczp+p6L8qcf/kL6vd0NqOfn98oFaI1xVNKS1Em0uU0Nawngn8MLtZuijNlvz3PGDMq6EGDphRN5zc+zGBIVDdOS0KyhC67TsLypm+F6afUBdEr3WBRDMOqPLycOBRLi/Z5xU3SR8=
+	t=1780306633; cv=none; b=tIYiU9Q4QvJKNhd6c7aB76ll7qtVn0deCTPi8iqeXfi9UwtdWzC+v32RL2hOB0Ithv4eYEDNB38TdG2J1o3iOkzzQfBAjbsY3fUmP7v9LUcoVdakFguDBzku3+iKcOHVDiEmi1mhWJoDN4iIQtNSnylz2HMvaGIklKyFyHmF0m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780306689; c=relaxed/simple;
-	bh=W0CN6+Pe5vVd9h9r3m8yogaRHx/WcpMzX0+7prQSwlo=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MkbZ5qu8BB139aCCuMo2KRsyDsAlzoae2SMxEFHcmIK3aii6EugHlSut1SKVthypbiFGDGWvtjHyzg7PMtWVHfROb2bw8HzLgktrdpd6mZ+o8+9x1TVX7JJBbLOGTCU6GKn03Qn+/1ONQl2ziFNlFUQ6Y5oOHbWP50RY255815c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas9t1780306621t488t20379
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.156.95.204])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 2833811856653556621
-To: "'Loktionov, Aleksandr'" <aleksandr.loktionov@intel.com>,
-	<netdev@vger.kernel.org>
-Cc: "'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Richard Cochran'" <richardcochran@gmail.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Keller, Jacob E'" <jacob.e.keller@intel.com>,
-	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Kees Cook'" <kees@kernel.org>,
-	"'Zaremba, Larysa'" <larysa.zaremba@intel.com>,
-	"'Ingo Molnar'" <mingo@kernel.org>,
-	"'Joe Damato'" <joe@dama.to>,
-	"'Breno Leitao'" <leitao@debian.org>,
-	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
-	"'Johannes Berg'" <johannes@sipsolutions.net>,
-	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>
-References: <20260601072221.2952-1-jiawenwu@trustnetic.com> <20260601072221.2952-5-jiawenwu@trustnetic.com> <IA3PR11MB89865C937E3065CD6390FFBCE5152@IA3PR11MB8986.namprd11.prod.outlook.com>
-In-Reply-To: <IA3PR11MB89865C937E3065CD6390FFBCE5152@IA3PR11MB8986.namprd11.prod.outlook.com>
-Subject: RE: [PATCH net-next v4 4/5] net: wangxun: introduce soft quiesce callbacks for AER recovery
-Date: Mon, 1 Jun 2026 17:37:00 +0800
-Message-ID: <085601dcf1aa$325b2280$97116780$@trustnetic.com>
+	s=arc-20240116; t=1780306633; c=relaxed/simple;
+	bh=E887M+7PT0Puyz+jFE2Ef0lCMzJk4CHvC5bqfhSZhQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=h14hanhgdzEhPrBQGg7IrDbY7MkZGmqknZ8mNWatt03HxGO5jyloAwzBPBNpWsGvrAtM2hkGtSwgAnnMf92SIX9ls8DqyC3WdpyoIDEBfZP+3KFrst1YFuPTjYSrqdE6GNvlgjSKwaf0tdXxzYEcLN3rbrtZTY6IlxJJs4IRFjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BrtihC/2; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-36d98c9b596so709472a91.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 02:37:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780306631; x=1780911431; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Zp4NhxOeSbWU1mM8p9fVkrdL+x7FYGH77zoCEYu+vNs=;
+        b=BrtihC/2pFl/mFEki8BzvQYtZWFbFhG2YoyPOIiKrSYyra7EOCty3/k1Z8ZG+l2G6G
+         kKAxoFkdvyovFY95tWoOyLowmZJJ6K8amXsTG3XZZ3A9YzFayih809HiO3dxcGHoKIXS
+         qoyvciXK/dZs12zWLCvRTFSKBjT52pukkK9838NAl2BMfiXzZtcnCUKa2sAnhlGE8pZp
+         sXRN3nHmjq9V1Pvs4l1qQxz3uxQETcl0PdhZH5niNebp1eAhYVpeq36Q0zB3UiuqPkMS
+         FaIr5QtRG9wy0m1Q0ZjPhQg99e+p1cvuJyjmYhlAkw9XZTO5mJAP0VrnZoTuTKtYdqT9
+         ICcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780306631; x=1780911431;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Zp4NhxOeSbWU1mM8p9fVkrdL+x7FYGH77zoCEYu+vNs=;
+        b=jjvkWUx8gW8xYkZcGDsYvRIEvhi0hC4SVyxt2gX5x6gLviwbnwKXr/fMYbJ19owyml
+         l9N4b+Nq07SpEOylWoXp0H8JScwkQ06eF7ZD+8zT0wAeO9r4SOkvgE+DaU1gY6D7T5/D
+         TCGmfN8DP2abrIfiv4ee4Zbadci/+bPUtlIPEFhTiNr1kkzXBeihUFEuWUMz/K3RvWnV
+         IL3EWjXCnBOeZWtuoCLBpdW+ZbOVedsUl7H5SW+pvlpsduDPCyhnrVfObXfrsRS5Gkby
+         NgzzILZtesSF91WBQu1tFk0BBfwMQL1Kd3XEt+XEKtWHMpfERvH3jWvBrCsxr+QYTgjA
+         3Dmg==
+X-Gm-Message-State: AOJu0Yx1oAGRk3dQxSDo44ez9f3575W/9DvMbVUH1+BBQZmlmoLpOf39
+	7X6V+8eoAzA3ba9p3Zv0dkXmFkoGVEtMasRWSa8fEaIh5Yq03JCvxncb
+X-Gm-Gg: Acq92OHS9HW53bRW9heE6aXRkrzwxpwV0T71H0uZM/Vf/+ekxPXYHOyfGde79YO7+He
+	FDm3g4AfW01+g8OJ6+95QU86VKGabcmIDY1yYwhfuo8HuPdfXPHN6V6WlUm4XUfecmmB1legiU9
+	+JK+sIg88iDoPAhBbLqZXPd1hErTgA1iM+PRT5aUaeoOuW2D6hR5U3jxJ8soYEzM4RVI8E3NxhG
+	zWdvj/hWayEPUYo9nmBMDiW+MOyZCPMKIHjPmBmU44eq+KH6p3lsSMs58xLSlFZbZBRsUFopd+t
+	Af+WxEJg41fzW4xvWLn75Bt+xeI6lyJsUKmCzNPqZj53vNDRrxp5TrcCSAk+yFxSRlk51OxYgTu
+	kzuFDX5Vw4Meez7xZkcWxtWCfx3gUa3zpJ94UK9wtSpLo8UlPTOh16yutHxoUFMaOWJQzLrIsAv
+	0NvLG22Ht2KfSFzLkGQle5LAw0h6Y2lj6/ysCRet9h1JcDfnPCDDKd0LvWlxjpJCRB
+X-Received: by 2002:a05:6a20:2d13:b0:3aa:f9cb:d43e with SMTP id adf61e73a8af0-3b427eb2dfdmr11140342637.18.1780306631332;
+        Mon, 01 Jun 2026 02:37:11 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8423828159esm5528210b3a.35.2026.06.01.02.37.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 02:37:10 -0700 (PDT)
+Date: Mon, 1 Jun 2026 18:37:07 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH net] inet: frags: fix use-after-free caused by the
+ fqdir_pre_exit() flush
+Message-ID: <ah1Sw2g-I89BRRiT@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQEmZmPiFxLXVQw6wm5cjAUm9/PfJgGkmD0MAfvgRpe3eYNGsA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Mr/o/c6gDciS59L1IPMtMEf9Md+pUJUSD0psYsoB2fPA2VBLaQnT8MlG
-	UGOmeUmdZSEMqq6XFR92zErsTWxV8e2A0Y2ru8R2YmTQoFlLezTSRTU+QVHlzpJty/dZrsC
-	Sx4klyjHp+6uOs9GTXRFvSUVxt4n8hp/sgdZzd/+KxpmSO04Z9l+gW0nhPFcQ9PfWW1gEP8
-	cTkAI4+Qw5s9MZeKhPU2bCJIxYl9FECGz2J85L7aO2fI5oEsTSl0+P5eDjo5S+wCKH9kAwh
-	4e0a7CE343nLQBXKCHtU05keZx3GCHXs+dk5lYP/HyiQRGT/ITJZdWUmzOT07WWfwNeWCtt
-	c6EBoyPk8D0m+shqLRnvMZ+XHVSj1EM4WQkrwnO8VVS35JZFJO7TgXB+ckz43z8jOrX7QTa
-	1DXKoCMYuoC/r5nHTtgOGq7jXpbcB+saOTe+NlDoFyHiDc+aU/+3jsGsIt10RFXMNnN00Md
-	g8h3gh7ekU+1pLcpSvowTeehIb6DbdgvfhtLCOTiVCJvhoBsrkktB5trUvVcYZhPqx1hGiH
-	C1ptkRhmFqW2XPQ/rzT5AYdHmq6x2nI6Y9onpnQv0NRwt0/lEOx8ELdZMND47Onif/eLWQr
-	Fi9WjymNmuboWCDdS+C9kNOmnhWJJdVB1DwrO0wFrAtv8BH1tThDnKZjttox9NQlSIvqxwu
-	ZCXSkGHBtABVVYmnH+DZX1nXALr/Hl+pghAKaVmvc8JXMSLu0N1w+achYO8EoxlEf25eVf8
-	e+b1luFtpQnw3wLOujfc4RuhAWtmIvuZKq3lx6Gygj+mtj7SRvVx/MZFl3HX03IgiUhiqpJ
-	cH0MnOLDX/UGjT1TgZuAR5W5azI8Nwvdu8imrcCFu/OFvz5f2HoA/KyQiyj5JEnGLEepXNs
-	dW9KTGwjizdzMY79OCrlWmMwYTVtsgmIiO+eDT3DsK0Rht+weMe96mVfc56Xb/pPzpEUaDf
-	+YuDzWBN0tqTRQWO1hEFkhuc+wMwRWhkafCftbWLBNWA78G0NYw8bx8fwHjaZeDnNs8IgWh
-	HKJIhTCT2fIIfitRLklo7xiwCdRamxnsCpfE+ADp3JCCeBKwmpsHOF6a6wD7vZMwQ1M4XEd
-	A==
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	FROM_EXCESS_BASE64(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293662-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.974];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293659-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,trustnetic.com:mid]
-X-Rspamd-Queue-Id: CCD8561CB2E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A3ECE61C9CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> > diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> > b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> > index b37c9ed57cf7..816aba4a9099 100644
-> > --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> > +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> > @@ -296,6 +296,27 @@ void txgbe_up(struct wx *wx)
-> >  	txgbe_up_complete(wx);
-> >  }
-> >
-> > +static void txgbe_soft_quiesce(struct wx *wx) {
-> > +	if (test_and_set_bit(WX_STATE_DOWN, wx->state))
-> > +		return;
-> > +
-> > +	wx_ptp_stop(wx);
-> > +	phylink_stop(wx->phylink);
-> > +	pci_clear_master(wx->pdev);
-> > +	wx_napi_disable_all(wx);
-> > +
-> > +	clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
-> > +	timer_delete_sync(&wx->service_timer);
-> > +
-> > +	wx_clean_all_tx_rings(wx);
-> > +	wx_clean_all_rx_rings(wx);
-> > +
-> > +	wx_free_irq(wx);
-> > +	txgbe_free_misc_irq(wx->priv);
-> I think wx_free_isb_resources(wx) is missed here, what Sashiko says?
-> I fill like phylink_disconnect_phy() too.
-> 
-> Can you prove there is no ISB resources leak?
+On netns teardown, fqdir_pre_exit() walks the fqdir rhashtable and
+flushes every fragment queue that is not yet complete using
+inet_frag_queue_flush(). That helper frees all the skbs queued on the
+fragment queue but does not set INET_FRAG_COMPLETE, and leaves
+q->fragments_tail and q->last_run_head pointing at the freed skbs.
+The queue itself stays in the rhashtable.
 
-TXGBE is different from NGBE, wx_free_isb_resources() and phylink_disconnect_phy()
-are not on the close path for TXGBE.
+fqdir_pre_exit() first lowers high_thresh to 0 to stop new queue lookups,
+but it cannot stop a fragment that already obtained the queue through
+inet_frag_find() earlier and stalled just before taking the queue lock.
+Once that fragment resumes after the flush and takes the queue lock,
+it passes the INET_FRAG_COMPLETE check and then dereferences the freed
+fragments_tail. inet_frag_queue_insert() reads FRAG_CB() and ->len of
+that pointer and, on the append path, writes ->next_frag, causing a
+slab use-after-free. IPv6, nf_conntrack_reasm6 and 6lowpan reassembly
+share the same flush path and are affected as well.
 
-> 
-> > +	wx_free_resources(wx);
-> > +}
-> > +
-> >  /**
-> >   *  txgbe_init_type_code - Initialize the shared code
-> >   *  @wx: pointer to hardware structure
-> > @@ -412,6 +433,7 @@ static int txgbe_sw_init(struct wx *wx)
-> >
-> >  	wx->setup_tc = txgbe_setup_tc;
-> >  	wx->do_reset = txgbe_do_reset;
-> > +	wx->soft_quiesce = txgbe_soft_quiesce;
-> >  	set_bit(0, &wx->fwd_bitmask);
-> >
-> >  	switch (wx->mac.type) {
-> > --
-> > 2.51.0
-> 
-> 
+Mark the queue complete and reset its remaining pointers under the same
+lock right after the flush. With INET_FRAG_COMPLETE set, the insert in
+each reassembly path bails out at its check as soon as it takes the
+queue lock and no longer accesses the freed fragments_tail.
+
+Fixes: 006a5035b495 ("inet: frags: flush pending skbs in fqdir_pre_exit()")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ net/ipv4/inet_fragment.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
+index 393770920abd..d532f6182c8a 100644
+--- a/net/ipv4/inet_fragment.c
++++ b/net/ipv4/inet_fragment.c
+@@ -243,8 +243,13 @@ void fqdir_pre_exit(struct fqdir *fqdir)
+ 			continue;
+ 		}
+ 		spin_lock_bh(&fq->lock);
+-		if (!(fq->flags & INET_FRAG_COMPLETE))
++		if (!(fq->flags & INET_FRAG_COMPLETE)) {
+ 			inet_frag_queue_flush(fq, 0);
++			fq->flags |= INET_FRAG_COMPLETE;
++			fq->rb_fragments = RB_ROOT;
++			fq->fragments_tail = NULL;
++			fq->last_run_head = NULL;
++		}
+ 		spin_unlock_bh(&fq->lock);
+ 	}
+ 
+-- 
+2.43.0
 
 
