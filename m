@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-293684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJq+NkpmHWrqaAkAu9opvQ
-	(envelope-from <netdev+bounces-293684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 13:00:26 +0200
+	id sLjdHedkHWqwaAkAu9opvQ
+	(envelope-from <netdev+bounces-293685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:54:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E42F61E073
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 13:00:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 193CA61DEE6
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 58D7D3013484
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 10:54:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 94839300FA88
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 10:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4325E39DBFF;
-	Mon,  1 Jun 2026 10:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6EA39C649;
+	Mon,  1 Jun 2026 10:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHhniPQ8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADCYa61t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA9C39A4BA
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 10:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7A039E167
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 10:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780311236; cv=none; b=FHQIIK7ZQXjxeM/CHP0XZmkw18TPsZSHLWbl5Rtvkk/T1dVi+9qnbIogaVfRsk7hfCsINcdpNa593ylcZXov6G9xIdQ0VByQBTwRVN/llHdjnGUNgSh3xpRl80/tJ/NiZ2A0B/Mk/LkC392pttrryXTOX01B03gOEMFjplnqfD8=
+	t=1780311238; cv=none; b=LSrEYuTuf652F6YKbIsViHAuPGNUGQ2fLox99xVybmJe4qeFVaVCJ/cp9nEGao7MyqUB6srRsINsfM6a+T1DRj11al6O19EBWhi/F5phW1LAfZvLyuEMB4FemQDlCDNDava7iJMjsYTdM0M5Vv5idiXRdHjJ36F2kCqD1wYZ2iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780311236; c=relaxed/simple;
-	bh=YamYR0gB5YpvzrPrfHuKhWssK/k1gQlhxfDHYVzOSrw=;
+	s=arc-20240116; t=1780311238; c=relaxed/simple;
+	bh=oAkF4IXnjMiosmEc9YycpmWPvCaagq8LW8Ceu8nAr60=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KjfKeeG5gi1vFhnGqUQJ/YJ6K4+23BWc6rwUje9/RlNtPP/oS50/nhyWi2ZQjdzIIGyIlKJvS1xzTeIjG8JzSTLwHi1S16NqTlvh+xJVXLdPZxPSFLXu+8Y3Y3VhMeDJGG4Ccd0RNZx3alp33x+0fWwQ6/iD8ej8EAuE/OfPRUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHhniPQ8; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=AfUTM11h65I7+jfi38HBhf/6s2UyNyDU5nw/Hppsz9Te7QO7CknWiGjDgXMfouUUTGbpIbyuckEqzgmT7s6ihrU1m/JPkSa1Y3iv95GBlWWcbBOIUnWUqaDOVjrAxv1xUifBlhcmMbWobqpujm5V/HtpAHz60KPxmJjQZzEnF/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADCYa61t; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-490a7876f8cso10640645e9.3
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 03:53:54 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-45eee266c6cso2718988f8f.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 03:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780311233; x=1780916033; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780311235; x=1780916035; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=a/VphDQS+fwFrSctDzTxKBEr+9CTd6YQLukQQPgTJa4=;
-        b=IHhniPQ8p98FjG4gozuDqUMzHlesNwlf8D3AskSPDhgXIKnnYFsrVAAdaxAmZ249F8
-         q/ZG91DiTsyzr6aGYq4uwWm6vKWN+ZC6qb6m6HFPg9+ZRaXRsQfovr5uQytj4I60tJRX
-         Ao2kfO7idTiRNjo07bJ8hez7/8TaUmvDoH1tvuZslsyLnlMm+URaHl4vFHEvemLxAjoK
-         MIjf6qj+AWN94YydxgGthj4hS9pvR+81I4J1YDZX5b+SeDatNjdDu5yxb4Keh1c62dXy
-         ClI5XgsNE0qgQavXh0TvX3DyNO/OdQAp8VXAmV2LoLDQ8YSPpbRt2COWvtmMnXrcnEoG
-         PuuA==
+        bh=+dozMnH/MzCaOgkZHqZM5eTN7b80tupvfNNp/Xk7R7M=;
+        b=ADCYa61tnx46IBQeUBxYbtBrRjHXEVLn0c1E7OYfzUxKR8FJjxumPjmpvPxKn4Thf2
+         4GHOf9uv7kvqkvU2ms7fEOnN37FYm9fcDJDquOv5Oe09peKCUGRhY+ffnDhhxOKycGbm
+         rSSzph9BI2l+xT1uRHOzFuO1n0E+0bfl7MPQvk65EiqfXYXWJ1l/hslF8US64/Ur2tfC
+         BwqhBGnpTsSUh/HMBFk9sGSlnnjxiiq0d4H8XXwXZe0yWlJ3bet5FMu3YENeZ9lnOsOP
+         wlcsNBoEbXG7hQLAn94AXjNHSKc+7W2fqNa1jfnK1NaoV6Ja7YY9SVjfX6MRhyvjIqvm
+         379g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780311233; x=1780916033;
+        d=1e100.net; s=20251104; t=1780311235; x=1780916035;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=a/VphDQS+fwFrSctDzTxKBEr+9CTd6YQLukQQPgTJa4=;
-        b=XJoDQ1UQm9Td8Vwnf+sjuS9vJ999TLoxw30GOJu1uvzZSjjIB1ebbA7vyQGOK0tbgI
-         cwT02KkrpdYdVJA1dFmllU6KBEiezwh8toxQuDTWSOuRmvlVef3HWsMrxbUQ1QtqiT8w
-         /hjFYfgd7NvMylHa3nTDHe2J4FuysugIINWN2+BSduTJEfCB2bDPgo6O0iWLoHTeWdcS
-         1mdyKS6KSvvPOwKf87x3CAARsEHeVtae4iSPqfMv22oC+9C3lerAevfA4OUVF06n9APn
-         rL89PPnA84s+czLlhl4RyVMVcHqjvYzk30kA61pC8sjKHPyEnuv/rFZ9P+rTR5HL8is2
-         7d6g==
-X-Forwarded-Encrypted: i=1; AFNElJ88X8p28KRx7xOpkdAo1G+Uan1Q6DWisxLSHcWdLo/4OfGS8PcuLy+be6hIeUuIXX05TeoHRwA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybSrHqTU1shvehTxPYXyjrxLvv7tIGbCFONUNWonWRwASEm8+3
-	Cd3KS0axx0LAddTHSqsDCT4CbZ4dURXyhzx7KecD5HMote1A+DRtqpMY
-X-Gm-Gg: Acq92OHaRiu78kmyMUS3C6PMMtFB0nDAKG2yNq98JxDDeLJA9kF79R3SSgiX/VpjdRx
-	zGorVXIm1EJiahGn6vjbnA44GtQ/v9LyNvqZ2W7ubWIHVz9YDxcMDD6bPeMNRbNk9wKymyh5V5o
-	si5osGugZFwURqxUTUik3kbK/iLPbo8lXndDhjo3WDpLxL15fy5fFTeWzrIz9K0EEmUVgNx7IRT
-	17uL61jS3F/r/zZiQ15QsIU+l9x9fVLdnZ5osZbFyn1ODv/lx9IfegeoHp5FK8bho0SS+yeLmLj
-	DF7copQLHAmnic0VYUQsLuuvfXTcv1ZS47B41eh5wn7KoDCP2Gvag2X7tSY5N03Rz/x4IbRkyxc
-	r+Tei0DF0nIHgcthy9WBMbAMLxnlVwrx8XLeDumanTvG0T3jO4FWLULP1OuskpmQ9/fIdgAQvv4
-	7XMs2Dexz+TieGQxr3A7iWgLej9NTtmJJnYQK1ATF/fm1srBZ2P4E8g0BWazYsPrZTXbJNvU1G+
-	l/hLLQ=
-X-Received: by 2002:a05:600c:2242:b0:490:5321:2466 with SMTP id 5b1f17b1804b1-490a2941ea3mr122733095e9.20.1780311233043;
-        Mon, 01 Jun 2026 03:53:53 -0700 (PDT)
+        bh=+dozMnH/MzCaOgkZHqZM5eTN7b80tupvfNNp/Xk7R7M=;
+        b=Rw3AXGA8rARuge6dERUE9WVkz+DAbD7eEkph/qGxH7H0IFoti6I0z3yDAS4Oq+xS6U
+         aQ6w+TszSbwyFuVzXmR3FAbS4+8DMjRbUMwXOj4jxf7iM3jtpnk1RJOfs/Jn9jGnJQwq
+         mjp7TJZ2tmrnNEUv7a69ddzp8l8AYdQW9OoUOGeGgV4B98JVR62DGbgb+xfbyLotCfE2
+         rOYsqvf9AbOsGQ+eKoQ4TqZk6nOJSjKI75nXP5gHodwGa6YQkziMaQ1vZsRM+isiMvWu
+         r7breYy+1zHuyjnwKhst1EvhoHYzE51OgPFmz4jeQWus7DHB+J8aiuMy7sF+SsKl2kUI
+         CwFA==
+X-Forwarded-Encrypted: i=1; AFNElJ+3vXfyxzdUNbdRTC3Q1+xIZPx4IJs42JJOD91WTCntar+QSAW6UqJStgV8nq2UERQNwRmE4Zc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg/yPN2FflmWCHFZJ9jcQA9KnlXCE1OCTSSIrBhTG/E6rDSbQT
+	y6idUCDmPG1bwRZGm6peE+4qfmB/UZX7nvYFVogPeiesa1iN3iSirlK+
+X-Gm-Gg: Acq92OGEa/+lgB4ffIClozt9Sr0ZKF29AsSClpYwOIwGVH5Je3+G2J0inCJxtTsF2Un
+	wE4BwYBqot8gSYRvk1ZCmQ9HgHJzStsD2TTcQhoVt1tXixTtXt+LvPN5H5/PDSmoWOaRNfUoqJk
+	I1BEhovLa24RYmUrUXhEkQOLezPZnSzeNpp+FealJDyeIs+wkBe7ez2uVCJlKYQnKc2EDI1Rzc0
+	gjXIz0HaMTZR0hw90y4r/A7IV0A1mv8kM1GpYsFhvoAGghfyJp55gPYcn30lGha5VnPZqXpDcef
+	kEl55pQrB6qTo9+oM8ZVgr2fL+ElModfmRsT0TdVM0vn97++TF+YGvN3u9luyuYdJadndrZZYSl
+	jXDreuLivWCNzVMM441uwgfUag3RV68LTQQ3qWfJTXhMoCjaNEtEQj+iF1r3s04KgF0pIsyWYB6
+	nV/xIu/8yPb0fkd1XtuKSStxhoPcQVTJuSzoHoZEZIqnLNpZVa/4NpvsFNlWfC2+jZe/ac4OHih
+	9ZyDKA=
+X-Received: by 2002:a05:600c:8b71:b0:490:add9:7f88 with SMTP id 5b1f17b1804b1-490af395bffmr10667175e9.21.1780311234518;
+        Mon, 01 Jun 2026 03:53:54 -0700 (PDT)
 Received: from Ansuel-XPS24 (host-79-42-252-49.retail.telecomitalia.it. [79.42.252.49])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4909c967c77sm257319895e9.1.2026.06.01.03.53.51
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4909c967c77sm257319895e9.1.2026.06.01.03.53.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 03:53:52 -0700 (PDT)
+        Mon, 01 Jun 2026 03:53:54 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -88,9 +88,9 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/3] net: phy: as21xxx: fix read_status speed handling
-Date: Mon,  1 Jun 2026 12:53:36 +0200
-Message-ID: <20260601105342.28865-2-ansuelsmth@gmail.com>
+Subject: [PATCH net 3/3] net: phy: as21xxx: force C45 OPs for AUTONEG
+Date: Mon,  1 Jun 2026 12:53:37 +0200
+Message-ID: <20260601105342.28865-3-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260601105342.28865-1-ansuelsmth@gmail.com>
 References: <20260601105342.28865-1-ansuelsmth@gmail.com>
@@ -107,12 +107,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-293684-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293685-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -128,165 +128,43 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 3E42F61E073
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 193CA61DEE6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-With further test with 2.5G NIC it was discovered that
-phy_resolve_aneg_linkmode is not enough to detect speed higher that 1G
-when autoneg is enabled.
+With further testing with 2.5G NIC, it was discovered that the PHY
+require the C45 OPs to configure and restart ANEG or speed higher than
+1G doesn't function correctly.
 
-Also in the switch case there is a typo where the speed mask is AND with
-VEND1_SPEED_STATUS instead of the correct mask VEND1_SPEED_MASK.
-
-Rework the read_status code to always read the speed from the vendor
-register and parse the generic bit only for the pause frame.
+To force C45 OPs with generic PHY function, clear the C22 bit from
+devices_in_package bitmask.
 
 Fixes: 830877d89edc ("net: phy: Add support for Aeonsemi AS21xxx PHYs")
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/phy/as21xxx.c | 96 +++++++++++++++++++++------------------
- 1 file changed, 53 insertions(+), 43 deletions(-)
+ drivers/net/phy/as21xxx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/net/phy/as21xxx.c b/drivers/net/phy/as21xxx.c
-index 0db82da8dbdf..97ca37c6929f 100644
+index 97ca37c6929f..a6686b4908c6 100644
 --- a/drivers/net/phy/as21xxx.c
 +++ b/drivers/net/phy/as21xxx.c
-@@ -671,7 +671,7 @@ static int as21xxx_read_link(struct phy_device *phydev, int *bmcr)
+@@ -616,6 +616,13 @@ static int as21xxx_probe(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
  
- static int as21xxx_read_c22_lpa(struct phy_device *phydev)
- {
--	int lpagb;
-+	int lpagb, lpa;
- 
- 	/* MII_STAT1000 are only filled in the mapped C22
- 	 * in C45, use that to fill lpagb values and check.
-@@ -698,12 +698,20 @@ static int as21xxx_read_c22_lpa(struct phy_device *phydev)
- 	mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising,
- 					lpagb);
- 
-+	lpa = phy_read_mmd(phydev, MDIO_MMD_AN,
-+			   AS21XXX_MDIO_AN_C22 + MII_LPA);
-+	if (lpa < 0)
-+		return lpa;
++	/* Even if PHY declare support for Clause 22 register,
++	 * Clause 45 register should be used for ANEG configuration
++	 * and restart. Clear the C22 bit for devices_in_package to
++	 * force C45 generic OPs in generic PHY ANGE OPs.
++	 */
++	phydev->c45_ids.devices_in_package &= ~BIT(0);
 +
-+	mii_lpa_mod_linkmode_lpa_t(phydev->lp_advertising, lpa);
-+
- 	return 0;
- }
- 
- static int as21xxx_read_status(struct phy_device *phydev)
- {
- 	int bmcr, old_link = phydev->link;
-+	int speed;
- 	int ret;
- 
- 	ret = as21xxx_read_link(phydev, &bmcr);
-@@ -720,58 +728,60 @@ static int as21xxx_read_status(struct phy_device *phydev)
- 	phydev->asym_pause = 0;
- 
- 	if (phydev->autoneg == AUTONEG_ENABLE) {
--		ret = genphy_c45_read_lpa(phydev);
--		if (ret)
--			return ret;
-+		if (!phydev->autoneg_complete) {
-+			mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising,
-+							0);
-+			mii_lpa_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-+			return 0;
-+		}
- 
- 		ret = as21xxx_read_c22_lpa(phydev);
- 		if (ret)
- 			return ret;
--
--		phy_resolve_aneg_linkmode(phydev);
- 	} else {
--		int speed;
--
- 		linkmode_zero(phydev->lp_advertising);
-+	}
- 
--		speed = phy_read_mmd(phydev, MDIO_MMD_VEND1,
--				     VEND1_SPEED_STATUS);
--		if (speed < 0)
--			return speed;
--
--		switch (speed & VEND1_SPEED_STATUS) {
--		case VEND1_SPEED_10000:
--			phydev->speed = SPEED_10000;
--			phydev->duplex = DUPLEX_FULL;
--			break;
--		case VEND1_SPEED_5000:
--			phydev->speed = SPEED_5000;
--			phydev->duplex = DUPLEX_FULL;
--			break;
--		case VEND1_SPEED_2500:
--			phydev->speed = SPEED_2500;
--			phydev->duplex = DUPLEX_FULL;
--			break;
--		case VEND1_SPEED_1000:
--			phydev->speed = SPEED_1000;
--			if (bmcr & BMCR_FULLDPLX)
--				phydev->duplex = DUPLEX_FULL;
--			else
--				phydev->duplex = DUPLEX_HALF;
--			break;
--		case VEND1_SPEED_100:
--			phydev->speed = SPEED_100;
-+	speed = phy_read_mmd(phydev, MDIO_MMD_VEND1,
-+			     VEND1_SPEED_STATUS);
-+	if (speed < 0)
-+		return speed;
-+
-+	switch (speed & VEND1_SPEED_MASK) {
-+	case VEND1_SPEED_10000:
-+		phydev->speed = SPEED_10000;
-+		phydev->duplex = DUPLEX_FULL;
-+		break;
-+	case VEND1_SPEED_5000:
-+		phydev->speed = SPEED_5000;
-+		phydev->duplex = DUPLEX_FULL;
-+		break;
-+	case VEND1_SPEED_2500:
-+		phydev->speed = SPEED_2500;
-+		phydev->duplex = DUPLEX_FULL;
-+		break;
-+	case VEND1_SPEED_1000:
-+		phydev->speed = SPEED_1000;
-+		if (bmcr & BMCR_FULLDPLX)
- 			phydev->duplex = DUPLEX_FULL;
--			break;
--		case VEND1_SPEED_10:
--			phydev->speed = SPEED_10;
--			phydev->duplex = DUPLEX_FULL;
--			break;
--		default:
--			return -EINVAL;
--		}
-+		else
-+			phydev->duplex = DUPLEX_HALF;
-+		break;
-+	case VEND1_SPEED_100:
-+		phydev->speed = SPEED_100;
-+		phydev->duplex = DUPLEX_FULL;
-+		break;
-+	case VEND1_SPEED_10:
-+		phydev->speed = SPEED_10;
-+		phydev->duplex = DUPLEX_FULL;
-+		break;
-+	default:
-+		return -EINVAL;
- 	}
- 
-+	if (phydev->autoneg == AUTONEG_ENABLE)
-+		phy_resolve_aneg_pause(phydev);
-+
- 	return 0;
- }
- 
+ 	ret = aeon_ipc_sync_parity(phydev, priv);
+ 	if (ret)
+ 		return ret;
 -- 
 2.53.0
 
