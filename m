@@ -1,148 +1,211 @@
-Return-Path: <netdev+bounces-293855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293856-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qA4/Hu3FHWrgdwkAu9opvQ
-	(envelope-from <netdev+bounces-293855-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:48:29 +0200
+	id uEGQJXjHHWrgdwkAu9opvQ
+	(envelope-from <netdev+bounces-293856-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:55:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5ABB62377D
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:48:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02E55623897
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 407E83093317
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:45:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF556301F5C8
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F213E172C;
-	Mon,  1 Jun 2026 17:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6603C3290B8;
+	Mon,  1 Jun 2026 17:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhKqjwH8"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="JBYhAqZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F4F3E1694;
-	Mon,  1 Jun 2026 17:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5513E00BD
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 17:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780335927; cv=none; b=dAPdoCCbOzom1Vkm+JOPrJrqa2fhpEjM/KovXaO3/qqvYuNm5A39/mj7qt6+qL9dE6mjN50CyrJW6U2u4y42aGoScYUcNTA2paLVzjlPfpmT8YGoV/GVhsceBh/FBrSIganPkuUL+1puSj5S8q4A9YCZc2liIlktMxjmgLVSPyc=
+	t=1780336058; cv=none; b=XIU2iaiX7TZe9/kaGWsX02/bpKWHOTxVS3Tvd+3VFnErLXq9H7pP8O3UYpQNzMVE/R4neTzhixyg0LDoV0ZTmqH4SWw7nc0uzLbKMXsS6mUL+StPcdAq/hU8NeCR9VITEVrbEz/QRor+D4QA2RK8kBavBFvGu5MU61IQJAXBiQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780335927; c=relaxed/simple;
-	bh=xC0eNyhxKpECC6dSaSCXTHEjo6rt8dNfk6cTKHB7xG8=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=SM5Ce86PJVrBBSwbX95VHsHxrhE7XdlUmFk99D/rPB4L1KDMfqwI0zUN3RfpI3tOCkflpEbixucRCkJcpY8NZ0R6dFbWgrI9AfGkYa5GIfvAHSkgsZkUP4OUcJP6yYENWkMwxxgsC5bYVSULpDRcpIMK+dInS3mHCKSDWI/HoZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhKqjwH8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B281F00898;
-	Mon,  1 Jun 2026 17:45:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780335925;
-	bh=Sr+l9IhS+1OggHp7pGNXo1FcZicIF17+zu39AovSjBM=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject;
-	b=QhKqjwH8/hIaykq3ejrGpzbOi6RBm+E81MRxycSn+RRWBn84hywzKiYH2GuZLidtG
-	 2PfBG63Cb0RzRDbwO85O/ngaz5abvsw58vOJen7JbVDJXgoaWjDfFOXPC5UoOnVdV7
-	 PgzoL7M34uPYDTaVB2ZZgMBE+aniedFwi35XS+YzjEZ/9pIeNGY5mOMbnW2hBwYIC3
-	 qGmEHlzBM7qLyfFvEMKPA+657Mi8rS+qtKXEogIr7TuuldCzvg+J1tlO8wQk/GjDvG
-	 Wd7JDPXVXHC87yuqixuaaBAyCZqGDfX/zJ9OSl9jwX4shFdmEpBQKxtWadXNAwISL8
-	 u5qN+7Lc/PS6g==
-Date: Mon, 01 Jun 2026 12:45:25 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1780336058; c=relaxed/simple;
+	bh=eDqBBuInzy1c9i8vrcrIJaFNBUagTiKlEOwIxuahu44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H1Yv0dA+8ukbnCjTLrMECRI79umZGfSXaoYsoxSqnSk/sqggYs1uu5lz9PV9cFA/scP9zXApteTZOVo8i5rUvX7kV8VnNuLO9B0Ck7MzFXfY6zkIBYPXo/NFUYhRx/ULiBrMIl7NJd/0ebJxuyW85ZqvljTriU4pZEic0cxykrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=JBYhAqZc; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8ce9df49c5fso25305706d6.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 10:47:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1780336056; x=1780940856; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yZ9wJintER1aMQNJJDa24+/EucywMy/j2tmrZTRhl8o=;
+        b=JBYhAqZcrdFABjH5HkSQ6NJsusDEPyaNx3vvmooevzrPf3fMyIsolj2AUHjspXjR4J
+         F+nNZpzC3j3+xoAlPApfQdRSYv+RnG6xCEZkXzj+zLkyaUM6f07ZA1bK029II7sRJZQ1
+         8mb6mCs7R9a54RwfAQBulmx1bryRUrJlOdCYoJLLDXvqsVZl63EOjr6deLshJ19RTTaX
+         QGzMfSIm+4yCJd6s95DC0nEXdjkww26ZXt8SONmsbMRO20uIg2ozGQXqZWMzQv56i6Vc
+         I3XxWperKVcR5Nh+gvyaYcp/1GBDI9Pz6SOhcKd4W1FuS1+KYCw/MA9B8XunvL20LNGF
+         MGFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780336056; x=1780940856;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yZ9wJintER1aMQNJJDa24+/EucywMy/j2tmrZTRhl8o=;
+        b=V7RCmrCj7QAecDDqN4dvevOhEDpaoPYfjYlC9uYv7pHkCsnrqR8+KN2lVUMqOuAHWL
+         O05RL7JYYLMswrjOzZ/x9xDGcuVkf78Yq72PWpgg9T82JPTiCqubgc7HK2R9/MJWtBNL
+         F0PBAinfWBMPERICVpMzogs3eTC4dqBY0mtiXM6kW1Xk4T4vju2fLBiHcoz9dcQIak/D
+         pWZtR38esery0KoSA10Z4gwMW//9x4GuOJtISAN4D0bGlzITHRM/BY41jTm4icYaC+1D
+         KoZ4MrF0k8bHkiS9sfedzyu72KE/ZOKcPNmniL26MAtqn1xNCou07NfIlvdXbs9B+rMW
+         NBqg==
+X-Forwarded-Encrypted: i=1; AFNElJ9/Oh6pKfXq1ONbiwaovhpDsxPq/KqAIYUcNseuKIvCFrW1Q3482RJYldVSUpLbYPqKGB098f8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzR2f4QoQ0oVTQybHg/0/fJ5/Vawj4NQNl/gPCsJwpKHiDbHwz
+	f7ruytH0aZXK5otr6T8/MvlH4+fGqCWGS8zkNjWPrlvSg7HKOkESW1NMqH940KPgnKY=
+X-Gm-Gg: Acq92OGhECTOln1blL95kNaRSLP+dnVb/FpJ4w5+HIU8o6Aqm5WPqXYpBA7ZEmygfl+
+	CROYLvFqUsHbQCd/c98ffuIEZOynSzUDtMkTgSAXoLRfGYyT48QvL4bB0cz3LGR7JSvOOKVLa+S
+	wgQizGrsr2t6WjpLSXdeyDsUssd3wXE4BkmzQygwUxp6Fwk/GFyXAJ1uaYS6JT8ngANjZHhSEsm
+	gj417kHMapXwUinqLTzlwRVlvpjFX43mIhlMDlm7mIfE2ekDpysZcHxq+nEq52E2EJuqCr1kw2+
+	zFtHEppWrNJ6EKnPWvooYw/6Fd3liLL8A2GYPY6QmfUb3bjv2EewV8x4D6f4ytddVOz1L+S7vaZ
+	GzimQ49f2XOCfQXidqqdnAr9VR8Cde4kNQi43kIY+mS5WmSkdbhfVdvN5yOAKA94CFfgVfBG0j1
+	rzigoZgCGH6MevZTpE4bn+34lGJkjLRNTI7VvNWvs6OBtLn73MO2tkenmJpmL287uikWwWA62RZ
+	/cQovS0njBAFlLj
+X-Received: by 2002:ad4:4eec:0:b0:8ac:b258:71d1 with SMTP id 6a1803df08f44-8ccefb29374mr211892386d6.3.1780336055817;
+        Mon, 01 Jun 2026 10:47:35 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ccea25f64bsm96664256d6.47.2026.06.01.10.47.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 10:47:35 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wU6je-000000027Jd-2qcE;
+	Mon, 01 Jun 2026 14:47:34 -0300
+Date: Mon, 1 Jun 2026 14:47:34 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Zhiping Zhang <zhipingz@meta.com>, Alex Williamson <alex@shazbot.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Bjorn Helgaas <helgaas@kernel.org>, kvm@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Linus Torvalds <torvalds@linuxfoundation.org>
+Subject: Re: [PATCH v5 0/4] vfio/dma-buf: add TPH support for peer-to-peer
+ access
+Message-ID: <20260601174734.GB2487554@ziepe.ca>
+References: <20260527121438.GJ2487554@ziepe.ca>
+ <ff247643-73e7-44e2-b3d5-8ac0a8efb871@amd.com>
+ <20260527123634.GK2487554@ziepe.ca>
+ <a5ff1930-e9fb-43f5-82ab-9875d7a28421@amd.com>
+ <CAH3zFs2KALuHXReLZG_uoqvBBWvBzU6rHKakmt6HBV7PZEsD=w@mail.gmail.com>
+ <71302a7a-6b9f-40da-af81-b1862dbd637a@amd.com>
+ <CAH3zFs036sr93duQKx613pCyOYw4t0_x_TdSza1xBCaEmqijyA@mail.gmail.com>
+ <8d9bb0b7-182d-4930-b683-d5d24da6b2ab@amd.com>
+ <20260529201130.GU2487554@ziepe.ca>
+ <190a1eeb-bd70-4b7b-93a4-60e14f0d6c7e@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, 
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- netdev@vger.kernel.org, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
- Paolo Abeni <pabeni@redhat.com>, Konrad Dybcio <konradybcio@kernel.org>
-To: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <20260601-ipq5018-gephy-clocks-v1-1-2df8287712c3@outlook.com>
-References: <20260601-ipq5018-gephy-clocks-v1-0-2df8287712c3@outlook.com>
- <20260601-ipq5018-gephy-clocks-v1-1-2df8287712c3@outlook.com>
-Message-Id: <178033592356.3996739.1050010038980629699.robh@kernel.org>
-Subject: Re: [PATCH 1/3] dt-bindings: net: qca,ipq5018: Split IPQ5018 PHY
- bindings from ar803x
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <190a1eeb-bd70-4b7b-93a4-60e14f0d6c7e@amd.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[outlook.com];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,oss.qualcomm.com,davemloft.net,google.com,kernel.org,vger.kernel.org,lunn.ch,redhat.com];
-	TAGGED_FROM(0.00)[bounces-293855-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-293856-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	DMARC_NA(0.00)[ziepe.ca];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E5ABB62377D
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 02E55623897
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-On Mon, 01 Jun 2026 17:19:08 +0400, George Moussalem wrote:
-> Move the definition for the Qualcomm IPQ5018 Internal PHY out of the
-> qca,ar803x.yaml binding file and isolate them in a dedicated
-> qca,ipq5018.yaml file. This is necessary due to the restriction of max
-> one clock in ethernet-phy.yaml which ar803x references as further
-> testing revealed that the RX and TX clocks of the IPQ5018 PHY need to
-> be explicitly enabled.
+On Mon, Jun 01, 2026 at 11:59:55AM +0200, Christian König wrote:
+> >> When you have a complete open source driver stack which utilizes
+> >> VFIO passthrough as the interface to communicate with the kernel
+> >> drivers then we can eventually talk about that.
+> > 
+> > That decision is not up to dmabuf
 > 
-> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-> ---
->  .../devicetree/bindings/net/qca,ar803x.yaml        | 43 -------------
->  .../devicetree/bindings/net/qca,ipq5018.yaml       | 75 ++++++++++++++++++++++
->  2 files changed, 75 insertions(+), 43 deletions(-)
+> Yes it is. This is the DMA-buf API which is added here.
+
+It is a DMA-buf kernel API that is added, I think it is overreaching
+to try to veto a VFIO uAPI that calls it..
+
+> > - what VFIO subsystem requires to
+> > accept a new UAPI is up to the VFIO maintainers.
 > 
+> As far as I can see vfio-pci is used as a stub driver to avoid
+> opening up the real driver.
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Yeah, that's probably true.
 
-yamllint warnings/errors:
+Frankly, I'd rather they use VFIO like this than to upstream another
+driver for proprietary custom built HW which nobody except Meta even
+has, let alone can use.
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qca,ipq5018.example.dtb: ethernet-phy@7 (ethernet-phy-id004d.d0c0): clocks: [[4294967295, 36], [4294967295, 37]] is too long
-	from schema $id: http://devicetree.org/schemas/net/ethernet-phy.yaml
+> Upstreaming an API changes only makes sense if others can use it and
+> this here is something completely special to this particular use
+> case, without all components involved nobody else can use it.
 
-doc reference errors (make refcheckdocs):
+It is not 'nobody else can use it', if it was true VFIO wouldn't be
+leaning toward the uAPI being OK.
 
-See https://patchwork.kernel.org/project/devicetree/patch/20260601-ipq5018-gephy-clocks-v1-1-2df8287712c3@outlook.com
+This exposes a PCI SIG defined TPH capability in a reasonable simple
+VFIO uAPI that can be re-used by any other device that happens to
+support TPH on inbound MMIO. The uAPI has sensible general semantics
+based around the PCI spec.
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+Anyone can repeat the demonstration Meta outlined in their cover
+letter: Use this new VFIO uAPI, import the DMABUF to mlx5, use a PCI
+analyzer and you will see the PCI SIG defined TPH bits set the way the
+VFIO uAPI says they should be set.
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
+There is nothing uniquely tied to Meta's device here, or unusable by
+someone else's devices. Arguably this is actually a mlx5 feature to
+allow VFIO to control its TPH generation HW.
 
-pip3 install dtschema --upgrade
+For a long time the general kernel has had a philosophy that as long
+as these niche features are generally implemented and *in theory*
+usable by anyone who wants it is OK. Every knows the initial userspace
+implementations of *alot* of stuff starts locked up in proprietary
+software owned by database, and now cloud, companies. Yes, some
+subystems are stricter, that's OK too.
 
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+> So as far as I can see that here is a no-go. But at the end of the
+> day it's Linus who needs to say if that's ok or not, that's why I
+> put him on CC.
 
+Well, based on what I heard when I argued for fwctl, and the
+discussion with sched_ext, I don't think implementing functionality a
+standards body defined in a logical way is going to raise concerns..
+
+Jason
 
