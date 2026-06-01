@@ -1,591 +1,257 @@
-Return-Path: <netdev+bounces-293884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FJ9JHjOHWpeewkAu9opvQ
-	(envelope-from <netdev+bounces-293884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:24:56 +0200
+	id OK3NJCnRHWqjewkAu9opvQ
+	(envelope-from <netdev+bounces-293885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:36:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A601623E82
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:24:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF8B624119
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 20:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A56413016B48
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:24:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1F789306103D
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 18:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FDA3E1D08;
-	Mon,  1 Jun 2026 18:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B883E275E;
+	Mon,  1 Jun 2026 18:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b="dskOif/v"
+	dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b="QJdsejtH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-001d1705.pphosted.com (mx07-001d1705.pphosted.com [185.132.183.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85AD3112BC
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780338290; cv=none; b=Mb2yZGji5XkGkletZ0PAxHPjFAZhZwlTXMFydnf/Fzg3aSZLgZUZPsrlZIt/USZodcHGJNsYaqlIFy452qa6QYYXnm3n/WdqB0rrOYI52Vozkbsu3o+5De+1McOV8Qb7G/fD/6qZX1yTYJaB2ncfqBSn58zgVRRGEwySx3QCQUw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780338290; c=relaxed/simple;
-	bh=hOILsP+0Eqs3JFb8e2Vfwd5JMTuh4PUjSveLorarlHc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=fTaYrSTqtEU98r2ZdjY9U7QSgVMcb7nnPQHWpujkyH5rz1xGbHo7dG+NhyjfsqxD7f7dgxuo7wyqgJoBVLiHKiB762ORBHsiwwKHVYkfKz1VauM6L4AMBB4oZoioTqWooYmgHX8N8IuS5aLqKUDuApzBFP95dLFaeTx0yH8kWKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=dskOif/v; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-304e83724bfso4567150eec.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 11:24:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1780338287; x=1780943087; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W7IE3lrCAU2wICe64aFr6+14ggCx1eMiEJoUvGWrTOI=;
-        b=dskOif/vbVhzLyxoAG0RkeUJBgqZtAPxs2itYNLaCC05/o7EM9Yb5bH5CP729PhnKP
-         SY/1eIZxPsgdfsyEnQbNDIvXG8n3NO7K+JeND2KCtU7Fa4G/LP6REpwRXn4ILAOwAr+q
-         RXbktZfiAEeXofvjtV57VM/Lgb+CBZ3aLJIjxedvWI0g1lSVcO7o2YV2gOKAzhqSR6D4
-         SJlT+F1e/Sz+P0pS2FueLUVZxjO0uionQJ7oa000G2PFM7k/WHGCdBW/mrNPsBYlDgS+
-         BbHyzkDceIPPkHyPimb0UshvyLsaOWuA/wloGJKNppF+rHgS6mngzgoGN9Z6VKFgkoMU
-         W13w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780338287; x=1780943087;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W7IE3lrCAU2wICe64aFr6+14ggCx1eMiEJoUvGWrTOI=;
-        b=hju+wst/7mgv1VwT39a/fV8HxwRKbDvYEz6gfYaSj6/lEcIKHhPoNUkRpSQ3V2ktqx
-         I65NzYlE7XxDn/OhuQjd3huvqFC9NfBKnXPbJD+/wlwlJBUlAwK2IlhKFbWrvb7DJMQL
-         b4wA4oQqj/Q8M14Z4eQFqs41O1QEWKyFmtwDYJwOkdBRgyMuNpqHbQ+UcZTOPZwUnRsZ
-         0ILFu+kFTurGSZkGl/SPNqRmxBG/denAg4NI+Vvqtvki2hBN+DeF7YEoFx8QloMQhwq8
-         wuiyYHJzy/YhPyQkSIW6DAizDUjO9Tavl9KAGqwuxzYj+++FgaC1Ab0mdb3XFfUyjgna
-         6enw==
-X-Forwarded-Encrypted: i=1; AFNElJ/VF/1lc+kR/fSrbS+NgMXa3Elux+rHC9lh/BUZk9Dtj5gMy+3XgNRa4kA7uFMWEEe/fGLlrY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE8+DWMKpvZvW8c4QpmD8F+2EEV0WcfLzrrkNppVXS01BzJR2J
-	YFOnf/Agnb0GmaFmy6lMWnf/WvYYypvL4mLDoJE214Waf79mNKn4hg9eYZQaULOjkcM=
-X-Gm-Gg: Acq92OFDeYOtLkLJo0cCpr+ZQd3afYw6S/tIGYjr/X5I21j2dPfUsrw1KeK1Ac+XcpF
-	x96FwxYy16JYvfJujT0RVQK4Bldj7N+QtqY2AVIscFLhfro6+sGSXmiURdrq4YjmMB5QrcB7d96
-	CI6/DpfUfpBq2gku+5fqSBx0DBm1Hexi9ifJ5Iv6Yf/26JbKJ6vsJT7ED+DeF5wsNOA2iVZ1khr
-	wRMuHC+XMZf6r9pDmAiT/1jLzl8OMFef91DEHxKcVFZUAacpv3TX+nkwSQfxYDNVu66wtRFPDXJ
-	jRyspyswrOVPCYlkdpfiE4YgeTOHbAuZb4TSOSQAcCFSoI2rtGP4XO52mSW14ft9zDm7ITPlBN5
-	AcM4tfNcxOeBD+wOx0Y7HBbRctaT3WqNO+dZ2mc3aiRwL+6bcaUX6L+GvWHB/RMzndNfAkN3QVe
-	rbRWgVq+YNfPU+PPo=
-X-Received: by 2002:a05:7300:c87:b0:304:2e9b:8f57 with SMTP id 5a478bee46e88-304fa6ef8a1mr5591798eec.34.1780338286453;
-        Mon, 01 Jun 2026 11:24:46 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:600::a996])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-304ee0dd8e1sm12846684eec.21.2026.06.01.11.24.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 11:24:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C9D3ED3BF
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 18:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.132.183.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780338780; cv=fail; b=TsW3ntcKD7D9m/eTQPo+8LcTMzKYMTXLnhy+orDKG3QLxyIfE8bVVdPnJhBEdrUvBM0r89wYdQGGAYHpbzLbkiIUjYzOKX97JoXYff8yl+mUM3kNfdJjKxCUiTlNkvC2Y7fBrMmUCBhrWWa5jRr8Hogz1AlV18Ke+LmEJ62G/Bg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780338780; c=relaxed/simple;
+	bh=LcCyGazZCIW2WlETBv+leK1h90SWSYaxWs1ctwElo1k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=emh1I1kTL6IjLFeCFJel+oK7Kb9yvR6ANVS7cXG0iXybzJFRLkz2cDRtInf6d97/x++Dwtl0yhaAXTCv4EXLUSrRT2hPRADR9BgVarDUvx8DlwY84TUjKurpkgKoWidxR6e0GF5F6y4n6qwjhgO83BfBwdWBB8z6+hNLJrnmXoc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com; spf=pass smtp.mailfrom=sony.com; dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b=QJdsejtH; arc=fail smtp.client-ip=185.132.183.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sony.com
+Received: from pps.filterd (m0209327.ppops.net [127.0.0.1])
+	by mx08-001d1705.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651HhMMZ3454207;
+	Mon, 1 Jun 2026 18:32:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sony.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=p1; bh=LcCyGaz
+	ZCIW2WlETBv+leK1h90SWSYaxWs1ctwElo1k=; b=QJdsejtHWS6Wd5B4GxYpsH9
+	grXTPg+y/wEfHbLywfEIJ380Pd78eP9kGcWWmjr2jkNEy9b+0/lbFENKMFY2MhSM
+	GZQJxRAsoiDtIkQ6xXgFP8Uz6QUmtapM3MDyMkto1rzFb8JMpwd4tN559AmRZdCO
+	00wsKfJ/fqtXTk3FQzvJ7U+Eb8CisJEaDtn+Lrrn3RxRwFBdzo4d0s1dxKU+2Q6O
+	Nk2WKS1JxU9RgGmBgxVJ1S+IxuEqiOrTSJ9ZPCoVgPOvPm6jiSPEBVBWebm1mv7I
+	/PSLt7o2R4s2R0p4cggWWVwdAEaE1PO9ACEPNGmZd3M4OetDEzMDmYonFGQjzzw=
+	=
+Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazon11013030.outbound.protection.outlook.com [40.93.201.30])
+	by mx08-001d1705.pphosted.com (PPS) with ESMTPS id 4efpryajhs-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Mon, 01 Jun 2026 18:32:25 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QRNd1rhDFtTwSpeyNzU+QOsDEgc+fAup16Ilw1VIwHuL96GBvoSklZcBso5FXPXnXnp/YqjCagWYdNh/JsXG7AgSMrU0FCfDAjmDVMaomNeFQ5E7VNZx8xOGZZ4Jgo/3IeTX8ANffC531Cib3ht2jTOlaZOwMp4NpeidA3JsCSjxFB0vDGft9dFKIBaQtGg4YcsI0PqxCDy42fTf0htM0dvDBma/pU5Y50fSQ8hGM0c9T+TfnzESMA/8z+g2skNZ9AJCbU9Pg3gKPB43n66/Omp/fgoocB14pGeax2+VUtr927zi8IMmJZRwT3L6wOea1RtB3qQkffv9woBOTZ8g2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LcCyGazZCIW2WlETBv+leK1h90SWSYaxWs1ctwElo1k=;
+ b=lryu5kdhv869NjazOLkcwP/CjxVx2PKpYZtj9gXT3s0ltktG5DdotMsxDm5Tqey/2mdGSPYO/oahwR9oiCBtqSAyvZgL2o4xLuQ+fX75rvfM+As6KqVlhAdl8+9NF0szKc9xFhzjj8mQfDj3poBgiJiz+fCUA+WMikPmMlgcf7/V3a5aSoA+5ua79zO37VAl7eMumTwF0HE/5T1EHYsfGjLj/zFuBFCUonhNqxlN7Uhni6OAwTd94IcD9l7o+m52q04cBRwzw5eZOG98BisrlxcMZx8jdwwdYDuNwASlyc5CTa4VLBIdhPd+/10B0p6oC9wBWsSW59REniOg5dhwlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=sony.com; dmarc=pass action=none header.from=sony.com;
+ dkim=pass header.d=sony.com; arc=none
+Received: from MW5PR13MB5632.namprd13.prod.outlook.com (2603:10b6:303:197::16)
+ by SJ2PR13MB6094.namprd13.prod.outlook.com (2603:10b6:a03:4fb::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.5; Mon, 1 Jun 2026
+ 18:32:16 +0000
+Received: from MW5PR13MB5632.namprd13.prod.outlook.com
+ ([fe80::29e9:b355:cabf:66f1]) by MW5PR13MB5632.namprd13.prod.outlook.com
+ ([fe80::29e9:b355:cabf:66f1%3]) with mapi id 15.21.0092.005; Mon, 1 Jun 2026
+ 18:32:16 +0000
+From: "Bird, Tim" <Tim.Bird@sony.com>
+To: Neal Cardwell <ncardwell.sw@gmail.com>,
+        David Miller
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Neal Cardwell
+	<ncardwell@google.com>,
+        Yuchung Cheng <ycheng@google.com>, Van Jacobson
+	<vanj@google.com>,
+        Soheil Hassas Yeganeh <soheil@google.com>
+Subject: RE: [PATCH net-next] tcp_bbr: fix SPDX-License-Identifier to be
+ GPL-2.0 OR BSD-3-Clause
+Thread-Topic: [PATCH net-next] tcp_bbr: fix SPDX-License-Identifier to be
+ GPL-2.0 OR BSD-3-Clause
+Thread-Index: AQHc8SxeYP3o4z2OsEGpOIo+M2cyW7YqBwTA
+Date: Mon, 1 Jun 2026 18:32:15 +0000
+Message-ID:
+ <MW5PR13MB5632A50FC7CF62847223F4F7FD152@MW5PR13MB5632.namprd13.prod.outlook.com>
+References: <20260531183558.2337381-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20260531183558.2337381-1-ncardwell.sw@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW5PR13MB5632:EE_|SJ2PR13MB6094:EE_
+x-ms-office365-filtering-correlation-id: e7c1d701-bd5f-4656-3247-08dec00c1b1e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|10070799003|1800799024|366016|56012099006|11063799006|18002099003|22082099003|38070700021;
+x-microsoft-antispam-message-info:
+ bsd73J8nrW/yOSE0gL8f1mwEj2OOT9VWaq/ozT5ojbr89JsgeJPoqc79rmOmZRSxgyqbe/Khmht7XgDfZFVtus57MISmvhFCMHwkQTLAGecuQLyIxu/UKNCMrJ2oNl8PH6EOUl401STLLbMpqUAdPEE1sHZKNYGmNwV/YUqYtBtBoxNOXnS0JOxV6N77dahiZTxkFOpgH3gSdQz7GqsYQ1h1sIUlD4GEIp0trJR3B76sPwCpzGha4YOoCGtDrJ5b1SK+efhZmU9giDo4VeVwhrZVfgHQxLvcIpMTieY/weB3+TPTvDMeb47tuQ0wa4vwhF5xeUbicAvJbKMRzR+ahpeg1YMdMN2tqMDmhjiBn6Ht9L2XM9LVk+XWpXM8/JDJ/9ls9j0m8vdulZM1iOQg0soswWs1qyDllA3Mc1JNNta1n+xz4W2bf6CGC8lSr3oxySFE/zsJHk9iYYzvipLr1S72uHGnpwUqhKCXyHB0gXjIqBiuFVTR+hxgLn5Y4/QlXBdsAQt3mg7WHH9pV6LLYKRbyh6eT8uUFF3amQ8g8eocD77UJSSI6ldG4pz1FChZH2dgAd+W0CEH5aHkbWgBewnNWGbYAtRpl0+t64ksjG8YiwJrginTks7roP9H3ezPmW0Yn9UaSEEMVek5vjmIFefFrHm0cvYgqV41OEtvZP5QtVUkf8F80xy+lrk48goCcs8CaY4dd9BExEIefdzsU1hQFK+hwyQuLr7EZScDlxJ6hyUxUYF4s3TczQEkJ+W7
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR13MB5632.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(10070799003)(1800799024)(366016)(56012099006)(11063799006)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Q29wZ2s4anc2bGozSSsycjJ4eTFtL1ZQVUlIcG53MSs0ZXZHNHYvekdYU0dZ?=
+ =?utf-8?B?aWs4SjBxUFhBeGpxWFJtSzdKbVpNOUJZREJYMGZPOEFQV3Zva3U0N1VpL1B5?=
+ =?utf-8?B?bjBUS3JUMFJlQk1RUDFXanVLVUdBWEUwSmd5MzdhWkdOSmVtRzVyUmdtYVJq?=
+ =?utf-8?B?THNmc0JaVCtUVThxZTUyc0plZGt3QytvRVlJL0VlUVZlRUtnVEtPbTFSYjNP?=
+ =?utf-8?B?U1FsQXdHdmhlRXNZQXVFSExHWGt5S2psa2pEdUxRaHh5bjNHTlpmczlLb3kx?=
+ =?utf-8?B?R0g2NURTa3ZRM29LTWFSc0NOMXJXVk5GWmNSemw3NFFCenNDcHRIOXA2OE9x?=
+ =?utf-8?B?YjJzYlBqbHZxcUhVdTFNTnRJWVEvTzFIV1pQZXhmNVdLOXlmdi9lVHFiN0Iy?=
+ =?utf-8?B?KzRQSmhnL1dhMVczQzZVQlNZUWMyaFN5WkNBaVl2RDdXWUwydlZQRFBsRzhR?=
+ =?utf-8?B?aUxtcldCQ2t1L3NvY1Ixd2pXUXJLazl6d01wRFZWVm8xZnhnOTZTbUcwNGxN?=
+ =?utf-8?B?V2d0UFpESERmSlJqeDh2ejd0TWRHelRVUTBmZWxCb1RjVXUxR09WODFHNlh3?=
+ =?utf-8?B?Z2RGTDNYQU9MUG5jVlBmaTZyYjh6SUliQTJ4cGwyaFVLYmk3YUxIbzhFeGJR?=
+ =?utf-8?B?RWRWTDdlQ0haSitVNGVmVlNrOE8wMTgwOXk2a1l6cUtCL3pPREh2ZDRVN00y?=
+ =?utf-8?B?MTdhNHZ0TDhhY3h3dE10ZWJBbzdlOTRpVGhnZFJsbmxiLy9mUTZwU083TlVW?=
+ =?utf-8?B?dk9jazlkMG1oYTRkQmIwclBreUNyeEpFemVUY2VLSmphQ2dvSi9CTmZFc2Z2?=
+ =?utf-8?B?WkZwUXczc0hibXZuMjZIYkh0dWVUQnorT3ViMkNyMHdvRktnaUR0dFI0N043?=
+ =?utf-8?B?dVJTNDAzODdFTXhVcmtQbUUwZVhLVjRCNFU2eEZCcWNybW9RYTRtRTRkMWtp?=
+ =?utf-8?B?UDZSc2tCNndNYXFYR2NCUE5naWd6bFNHYzNVZzJ4ZWUvZWZ2MmZ6dUhHMThH?=
+ =?utf-8?B?LzhWQStUV0oveVVPUEk3TnRvWWZUbzFWeGpyLzduYzNOZDNMdFFzOEdpdEN2?=
+ =?utf-8?B?Q3JFOW5KQmNJcmNGbEUrZDN3ZFZXNU1vdEp1MGZqZ01TMERpOXI2QmVxTmEv?=
+ =?utf-8?B?RWl1TFRpVWJWd2tsQTlDZWhkeVZoSkNldEpyRlNOR00rSWdPSEtRalpIbG1y?=
+ =?utf-8?B?N3BpTUJKUE9rWTQ1cE4zc1FVQnBvYzR0UE50c3pXQzZPaGFBL1F2WmE1clJ4?=
+ =?utf-8?B?V1FRUmNoMm5EZzhKRkZsc3d4bVY5R3lPa3JEblVRT2JZR1RhYVVKVG5ydmZy?=
+ =?utf-8?B?SEV5SEovaEJMT0RrY3pSUXk5WFhjZW5CQ0F6YU1uSHBkWUlBSEV2WFRPbVE0?=
+ =?utf-8?B?WnoxSjFwTXRTYldaMXFUM1JFVEorRWIzcUhvYXdvYUthb0hmSVl1cW1SaUEz?=
+ =?utf-8?B?MHVnekVJemx3dWF5NHZDWlI3VDRaQnlqZDNyT1B2a0R6SEt4NkFDNHpBRUVU?=
+ =?utf-8?B?TzFUb2dkeDMraUwvcWp1T3ppLzRnS25jNEZVQ1JzNC95Q2dqeDZOUnZLWWdo?=
+ =?utf-8?B?WVpGSkVtN0d1eUxtTUlZSEZEMTBRWFYxK1RSOXpuUERqMXg5YXhaTEdFQzMw?=
+ =?utf-8?B?cVV2aUNQWGQ4MXp3QXdNTHB6VmhvdVB2QjhuTGJkTGdWdXU5U2xCVUpSWTAr?=
+ =?utf-8?B?V29SMEdoNzhHSzdNdHVDcllJQXI0WFlHNXNnQXJmM2tTako3Y2swU2ZlTUd1?=
+ =?utf-8?B?M3pTUWRJTW51VGo4MHZhbkpYQWY5aWFrbml6UzE2NlZFNGd1ajdKWTkycVV0?=
+ =?utf-8?B?WVRlbFByODVxMGFYanYybjhzcklvbE10enIvTlZ5eTYwVk5NVlEzMUZOSmZo?=
+ =?utf-8?B?MWdiUkdJSlN6Q2RDaVZNMUd6aVlqV1FUNHo3aTlDR1I5bjZWV3dEVDVaYjNs?=
+ =?utf-8?B?aS9BdVR1OW0zQjQ4NFJKcXorZ3FGQmNMYWYzQnErdE1wb1YxRzhnMERKNWtR?=
+ =?utf-8?B?RkZSV0JOZ0p3QTZ0RHR5YXRXUVhyRThFaThteTQyTFJFYmZ1azhPNkNhbGh4?=
+ =?utf-8?B?cHltYkJkT2U3YURFUGt0dHkyamNIOElvRGpKK0d1UTdpU1VkUlhaK1VqbU5F?=
+ =?utf-8?B?VlRzVmhBa0toZVM1NjBhdEVVNkd5cWNBSzRnaFVLbVdPQisva2IxUlg0YnR0?=
+ =?utf-8?B?NnlyWjlwNmY2ZWM0Mm9YVlkzSTdlM3Zua3gwR0NHVDFHUEJKM3E1TEZmL1Av?=
+ =?utf-8?B?K3pPRW96ZVdNbnNqRmtWdm9KNlMvL0VtaENqTjV5MDgyNU9tT2Zid1FwS2xz?=
+ =?utf-8?B?V0p0NFpEaUV4ekVGL0RrQVVNUWY0Rmc2QXJlZ1Rlb0NzbVNMY2htS01LZkk2?=
+ =?utf-8?Q?YoUriBljbsbDiS9VTHQR65ZWYumoCgJgvoG7p?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 01 Jun 2026 14:24:43 -0400
-Message-Id: <DIXX90BMJRXM.1XKUMNSDY9OO@etsalapatis.com>
-Cc: "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>, "Alexei
- Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
- "Martin KaFai Lau" <martin.lau@linux.dev>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
- <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
- <shuah@kernel.org>, "Guillaume Nault" <gnault@redhat.com>, "Ido Schimmel"
- <idosch@nvidia.com>, "Fernando Fernandez Mancera" <fmancera@suse.de>,
- "Peter Oskolkov" <posk@google.com>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kernel-patches-bot@fb.com>, "Leon Hwang" <leon.huangfu@shopee.com>
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Add tests to verify the fix
- of encapsulating VxLAN in lwt
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Leon Hwang" <leon.hwang@linux.dev>, <bpf@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260601150203.20352-1-leon.hwang@linux.dev>
- <20260601150203.20352-3-leon.hwang@linux.dev>
-In-Reply-To: <20260601150203.20352-3-leon.hwang@linux.dev>
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+MIME-Version: 1.0
+X-Exchange-RoutingPolicyChecked:
+	s6CpJboFStcL9No+RuxnBN/LjmTB9Bn1ZJOTMJnO3yWQJG0E28eq5bmUKgkomhNzN0RtLM21PzRiH9wEl/SmvQUd5jdH4yXFZUdnckilDIOJFWiyf/31Q5z4Xs7AvcWfChcYdj8hBv7uR3uMmX3ABh334tecrnNURXj/E8YUwiYq/Lhkjw+LxQBF84IaZt3scDrMdj4EDR/eDKn5DZTiW4IRhhP/Sn+a7L39VBJvzidhbLzzPQmZkg3BAXsboZpLIkBQ7JGxBiUjBnKuLEGpNyApfzUJ1Ex1tCZJuyGIHeliudiFyY/Vd4FQS6dc+3jM1P2dq3bLfGgFs5E1tIjXrg==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	IgWGrnTZFuoRIcR8SHA6oWebQ9lTTUG77i87AaEWHMQqOUOFzZBlzMAnwotV6gYRKv1nHuOCWEdzBLnRVBP17LoSx+6a6Qp4PnLz1QJXzSSv5AvOsoixo9rF5RfPCnCJvRCUFgjko7C9HfbzE8sDofJC+ygdZFYeOw5ClplDIqEJYxCQwOwwICASYZl/pvW6iqf1XN+5EYUtSbToJbSBVJLtFjrgSHkc4aVDtSzQO5qKpddfCP6gnyC5IdY6DSe0q65Uy9Jc2imyfhjulQ0JWgTvK4xHc+Zp3LepEnhp5d9NiX6vacriQYLJZu4wXemBdKSMmOZiXTq8CMbN5I4Jzi4ARqeIkg/7vPgiqDpuX0oimnYjcV7grQjbUVk+EGdkLGfNMafPsT7O6tMb5/8dPmw/Z8cty6JY6DM0EW216eNv0fhJu+V+CPWLwSOCL8a2/97FilE3qTOOrq0858puJiIWOwJ74r2ZA/O6srIGnJAsl3TDRDWmATXYHyLZ9tsxyoNWDVyP9tYlrjexOXHqI1Bfw7o4ruU1fF38Zz62riQtSzjFkliXIyFGv4Ip01+L5Gzzu4Fo3q6cvuVYU+S73+rdXUQWs4CYR0DFctvSNITeSinlaxcGMQzctVv6CmJY
+X-OriginatorOrg: sony.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR13MB5632.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7c1d701-bd5f-4656-3247-08dec00c1b1e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2026 18:32:16.0040
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 66c65d8a-9158-4521-a2d8-664963db48e4
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qrwLvC27pfTH+Ulu0GcPvVliuKTRs0ZZns76gTWVqTYJ0AqZGT6A++hFi4HS9DWub/7W2WpqZZ9SyK4lhnBDEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR13MB6094
+X-Proofpoint-ORIG-GUID: PM9sia0LTvl6wv7LhnvnBDldpdLbr1zs
+X-Authority-Analysis: v=2.4 cv=ROeD2Yi+ c=1 sm=1 tr=0 ts=6a1dd039 cx=c_pps
+ a=9fOKxQ6q+1oHddUNM5AUXA==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=FelO9ux0wxsA:10 a=xR56lInIT_wA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=KAb5x4SsHD3PzxGk7EmX:22 a=b20fedWF67CaGdYoUt4Y:22 a=pGLkceISAAAA:8
+ a=1XWaLZrsAAAA:8 a=z6gsHLkEAAAA:8 a=2DcZfJWCmJLYAL7pcoIA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: PM9sia0LTvl6wv7LhnvnBDldpdLbr1zs
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAxMDE4MiBTYWx0ZWRfXxL33BrtRbfA0
+ 1QstyiJwFLdSnWDq5l7Gi/SDReTdNPYiO2+OqPw25refqAn+A75LObv54WMCi6Xn1SLmlKDkzKY
+ h1Ogb1BVKBGBccIQMWPWhthSqxVaj0tYHnYDjE/ziFeQLrnsD8lfk/Km3WItIJJ3FhEKueLGxEI
+ X1VN8RuxDmL65/FfWZRhdGUU/oXWIWFYyV0auhISFEswHg/hVNtbV3qmYwnfXk/iKxHeyA06lEI
+ Rjgg8/mTUZQUM8nEawwTj2xcgLrhE1o00h5T9xHuoDjDEl+DZ3PttHn3wdN3Jsp4b1jbzp4Z156
+ fXjHOcXseL3kIdiVENOHh6mRQxUdVer1+4F/K5PA5nH8qx8QeEknYRk16Pta9zBxjQoMwwAbuvl
+ FRdyckDUCl5q7RW2VJPomYxCOM5Dg75A45xaIIqFq7R0iyQSnqh7e4bZ/by/IssRJn8rBA/oXS5
+ maUtNROtsGiDdnnKrEA==
+X-Sony-Outbound-GUID: PM9sia0LTvl6wv7LhnvnBDldpdLbr1zs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-01_05,2026-05-28_03,2025-10-01_01
+X-Spamd-Result: default: False [2.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[sony.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[sony.com:s=p1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293884-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[etsalapatis.com];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,nvidia.com,suse.de,vger.kernel.org,fb.com,shopee.com];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[etsalapatis.com:mid,linux.dev:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7A601623E82
+	TAGGED_FROM(0.00)[bounces-293885-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[sony.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Tim.Bird@sony.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 0DF8B624119
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon Jun 1, 2026 at 11:02 AM EDT, Leon Hwang wrote:
-> Add two tests to verify the transport header of skb has been set when
-> encapsulate VxLAN using bpf_lwt_push_encap() helper.
->
-> 1. VxLAN over IPv4.
-> 2. VxLAN over IPv6.
->
-> Without the fix, the tests would fail:
->
->  lwt_ip_encap_vxlan:FAIL:transport_hdr offset unexpected transport_hdr of=
-fset: actual 70 !=3D expected 20
->  #208     lwt_ip_encap_vxlan_ipv4:FAIL
->  lwt_ip_encap_vxlan:FAIL:transport_hdr offset unexpected transport_hdr of=
-fset: actual 110 !=3D expected 40
->  #209     lwt_ip_encap_vxlan_ipv6:FAIL
->
-> Assisted-by: Claude:claude-sonnet-4-6
-> Cc: Leon Hwang <leon.huangfu@shopee.com>
-> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
-> ---
->  .../selftests/bpf/prog_tests/lwt_ip_encap.c   | 164 ++++++++++++++++++
->  .../selftests/bpf/progs/test_lwt_ip_encap.c   | 112 ++++++++++++
->  .../bpf/progs/test_lwt_ip_encap_fix.c         |  44 +++++
->  3 files changed, 320 insertions(+)
->  create mode 100644 tools/testing/selftests/bpf/progs/test_lwt_ip_encap_f=
-ix.c
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/lwt_ip_encap.c b/tool=
-s/testing/selftests/bpf/prog_tests/lwt_ip_encap.c
-> index b6391af5f6f9..50104d847fde 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/lwt_ip_encap.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/lwt_ip_encap.c
-> @@ -1,8 +1,11 @@
->  // SPDX-License-Identifier: GPL-2.0-only
-> +#include <linux/ip.h>
-> +#include <linux/ipv6.h>
->  #include <netinet/in.h>
-> =20
->  #include "network_helpers.h"
->  #include "test_progs.h"
-> +#include "test_lwt_ip_encap_fix.skel.h"
-> =20
->  #define BPF_FILE "test_lwt_ip_encap.bpf.o"
-> =20
-> @@ -35,6 +38,10 @@
->  #define IP6_ADDR_SRC IP6_ADDR_1
->  #define IP6_ADDR_DST IP6_ADDR_4
-> =20
-> +/* VxLAN tunnel endpoints, reachable via the bottom route (veth5/6/7/8).=
- */
-> +#define IP4_ADDR_VXLAN  "172.16.17.100"
-> +#define IP6_ADDR_VXLAN  "fb20::1"
-
-There's a whole series of existing IP definitions at the top of the file, w=
-e
-should put those new ones right below them. And fb20 -> fb11 to keep
-with the pattern imo.
-
-> +
->  /* Setup/topology:
->   *
->   *    NS1             NS2             NS3
-> @@ -538,3 +545,160 @@ void test_lwt_ip_encap_ipv4(void)
->  	if (test__start_subtest("ingress"))
->  		lwt_ip_encap(IPV4_ENCAP, INGRESS, "");
->  }
-> +
-> +/*
-> + * VxLAN Setup/topology:
-> + *
-> + * NS1 (IP*_ADDR_1)                NS2                  NS3 (IP*_ADDR_4)
-> + *       [ping src]
-> + *           |                          top route
-> + *         veth1 (LWT encap)  <<-- veth2        veth3  <<-- veth4 (ping =
-dst)
-> + *           |                                                ^
-> + *       (bottom route)                                       | (inner p=
-kt)
-> + *           v                        bottom route            |
-> + *         veth5              -->> veth6        veth7  -->> veth8 (vxlan=
- decap)
-> + *                                                          (IP*_ADDR_VX=
-LAN)
-> + *
-Not sure if this is rendering weird for me but NS2 could be tabbed over
-once more for clarity.
-
-> + * Add the VxLAN endpoint addresses to NS3's veth8, create standard
-> + * VxLAN decap devices bound to those addresses, and install routes so
-> + * NS1/NS2 can reach the endpoints via the bottom route.
-> + */
-> +static int setup_vxlan_routes(const char *ns3, const char *ns1, const ch=
-ar *ns2)
-> +{
-> +	struct nstoken *nstoken;
-> +
-> +	nstoken =3D open_netns(ns3);
-> +	if (!ASSERT_OK_PTR(nstoken, "open ns3 for vxlan"))
-> +		return -1;
-> +
-> +	SYS(fail_close, "ip    a add %s/32  dev veth8", IP4_ADDR_VXLAN);
-> +	SYS(fail_close, "ip -6 a add %s/128 dev veth8", IP6_ADDR_VXLAN);
-> +	/*
-> +	 * Standard VxLAN devices to decap the encapsulated packets.  The inner
-> +	 * Ethernet frame uses a broadcast dst MAC so the IP stack accepts it
-> +	 * without ARP or FDB configuration.
-> +	 */
-> +	SYS(fail_close, "ip link add vxlan4 type vxlan id 1 dstport 4789 local =
-%s dev veth8 nolearning noudpcsum",
-> +	    IP4_ADDR_VXLAN);
-> +	SYS(fail_close, "ip link set vxlan4 up");
-> +	SYS(fail_close, "ip link add vxlan6 type vxlan id 1 dstport 4789 local =
-%s dev veth8 nolearning udp6zerocsumrx",
-> +	    IP6_ADDR_VXLAN);
-> +	SYS(fail_close, "ip link set vxlan6 up");
-> +	close_netns(nstoken);
-> +
-> +	SYS(fail, "ip -n %s    route add %s/32  dev veth5 via %s",
-> +	    ns1, IP4_ADDR_VXLAN, IP4_ADDR_6);
-> +	SYS(fail, "ip -n %s    route add %s/32  dev veth7 via %s",
-> +	    ns2, IP4_ADDR_VXLAN, IP4_ADDR_8);
-> +	SYS(fail, "ip -n %s -6 route add %s/128 dev veth5 via %s",
-> +	    ns1, IP6_ADDR_VXLAN, IP6_ADDR_6);
-> +	SYS(fail, "ip -n %s -6 route add %s/128 dev veth7 via %s",
-> +	    ns2, IP6_ADDR_VXLAN, IP6_ADDR_8);
-> +	return 0;
-> +
-> +fail_close:
-> +	close_netns(nstoken);
-> +fail:
-> +	return -1;
-> +}
-> +
-> +/*
-> + * VxLAN encap tests (IPv4-outer and IPv6-outer variants).
-> + *
-> + * Test 1 - functional: the BPF LWT xmit program encapsulates the packet
-> + *   (protocol=3DUDP, port=3D4789) and re-routes it without dropping it.
-> + *   Verified by ping success.
-> + *
-> + * Test 2 - fix verification: after bpf_lwt_push_ip_encap() the
-> + *   skb->transport_header must point at the outer UDP header, i.e.
-> + *   transport_header - network_header =3D=3D sizeof(outer IP header).
-> + *   Without the fix the transport_header still points at the inner
-> + *   transport layer, giving a wrong (larger) offset.
-> + */
-
-The Test 2 bullet regurgitates the AI's context, can you rephrase it so
-that it's not framed as a fix but as a test?
-
-> +static void lwt_ip_encap_vxlan(bool ipv4_encap)
-> +{
-> +	char ns1[NETNS_NAME_SIZE] =3D NETNS_BASE "-1-";
-> +	char ns2[NETNS_NAME_SIZE] =3D NETNS_BASE "-2-";
-> +	char ns3[NETNS_NAME_SIZE] =3D NETNS_BASE "-3-";
-> +	const char *sec =3D ipv4_encap ? "encap_vxlan" : "encap_vxlan6";
-> +	int expected_offset =3D ipv4_encap ? (int)sizeof(struct iphdr)
-> +					 : (int)sizeof(struct ipv6hdr);
-> +	struct test_lwt_ip_encap_fix *skel =3D NULL;
-> +	int thdr_offset, err;
-> +
-> +	if (!ASSERT_OK(create_ns(ns1, NETNS_NAME_SIZE), "create ns1"))
-> +		goto out;
-> +	if (!ASSERT_OK(create_ns(ns2, NETNS_NAME_SIZE), "create ns2"))
-> +		goto out;
-> +	if (!ASSERT_OK(create_ns(ns3, NETNS_NAME_SIZE), "create ns3"))
-> +		goto out;
-> +
-> +	if (!ASSERT_OK(setup_network(ns1, ns2, ns3, ""), "setup network"))
-> +		goto out;
-> +
-> +	if (!ASSERT_OK(setup_vxlan_routes(ns3, ns1, ns2), "setup vxlan routes")=
-)
-> +		goto out;
-> +
-> +	/*
-> +	 * Attach fexit to bpf_lwt_push_ip_encap() before installing the
-> +	 * LWT route so we don't miss the first encap call.
-> +	 */
-> +	skel =3D test_lwt_ip_encap_fix__open();
-> +	if (!ASSERT_OK_PTR(skel, "test_lwt_ip_encap_fix__open"))
-> +		goto out;
-> +
-> +	skel->rodata->tgt_ip_version =3D ipv4_encap ? 4 : 6;
-> +
-> +	err =3D test_lwt_ip_encap_fix__load(skel);
-> +	if (!ASSERT_OK(err, "test_lwt_ip_encap_fix__load"))
-> +		goto out;
-> +
-> +	err =3D test_lwt_ip_encap_fix__attach(skel);
-> +	if (!ASSERT_OK(err, "test_lwt_ip_encap_fix__attach"))
-> +		goto out;
-> +
-> +	/* Remove the direct NS2->DST route so packets must go via LWT encap. *=
-/
-> +	SYS(out, "ip -n %s    route del %s/32  dev veth3", ns2, IP4_ADDR_DST);
-> +	SYS(out, "ip -n %s -6 route del %s/128 dev veth3", ns2, IP6_ADDR_DST);
-> +
-> +	/* Install the VxLAN BPF LWT xmit route. */
-> +	if (ipv4_encap)
-> +		SYS(out, "ip -n %s route add %s encap bpf xmit obj %s sec %s dev veth1=
-",
-> +		    ns1, IP4_ADDR_DST, BPF_FILE, sec);
-> +	else
-> +		SYS(out, "ip -n %s -6 route add %s encap bpf xmit obj %s sec %s dev ve=
-th1",
-> +		    ns1, IP6_ADDR_DST, BPF_FILE, sec);
-> +
-> +	skel->bss->fexit_triggered =3D false;
-> +	if (ipv4_encap)
-> +		SYS(out, "ip netns exec %s ping  -c 1 -W1 %s", ns1, IP4_ADDR_DST);
-> +	else
-> +		SYS(out, "ip netns exec %s ping6 -c 1 -W1 %s", ns1, IP6_ADDR_DST);
-> +
-> +	/* Test 1: fexit triggered means bpf_lwt_push_ip_encap() succeeded. */
-> +	if (!ASSERT_TRUE(skel->bss->fexit_triggered, "fexit_triggered"))
-> +		goto out;
-> +
-> +	/*
-> +	 * Test 2: transport_header must sit immediately after the outer IP
-> +	 * header, pointing at the UDP header of the VxLAN encap.
-> +	 */
-> +	thdr_offset =3D (int)skel->bss->transport_hdr - (int)skel->bss->network=
-_hdr;
-> +	ASSERT_EQ(thdr_offset, expected_offset, "transport_hdr offset");
-> +
-> +out:
-> +	test_lwt_ip_encap_fix__destroy(skel);
-> +	SYS_NOFAIL("ip netns del %s", ns1);
-> +	SYS_NOFAIL("ip netns del %s", ns2);
-> +	SYS_NOFAIL("ip netns del %s", ns3);
-> +}
-> +
-> +void test_lwt_ip_encap_vxlan_ipv4(void)
-> +{
-> +	lwt_ip_encap_vxlan(IPV4_ENCAP);
-> +}
-> +
-> +void test_lwt_ip_encap_vxlan_ipv6(void)
-> +{
-> +	lwt_ip_encap_vxlan(IPV6_ENCAP);
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/test_lwt_ip_encap.c b/tool=
-s/testing/selftests/bpf/progs/test_lwt_ip_encap.c
-> index d6cb986e7533..36f0fc682ffb 100644
-> --- a/tools/testing/selftests/bpf/progs/test_lwt_ip_encap.c
-> +++ b/tools/testing/selftests/bpf/progs/test_lwt_ip_encap.c
-> @@ -2,8 +2,10 @@
->  #include <stddef.h>
->  #include <string.h>
->  #include <linux/bpf.h>
-> +#include <linux/if_ether.h>
->  #include <linux/ip.h>
->  #include <linux/ipv6.h>
-> +#include <linux/udp.h>
->  #include <bpf/bpf_helpers.h>
->  #include <bpf/bpf_endian.h>
-> =20
-> @@ -82,4 +84,114 @@ int bpf_lwt_encap_gre6(struct __sk_buff *skb)
->  	return BPF_LWT_REROUTE;
->  }
-> =20
-> +struct vxlanhdr {
-> +	__be32 vx_flags;  /* I flag =3D 0x08000000 (valid VNI) */
-> +	__be32 vx_vni;    /* VNI in top 24 bits */
-> +};
-> +
-> +#define VXLAN_PORT  4789
-> +#define VXLAN_FLAGS 0x08000000
-> +#define VXLAN_VNI   1
-> +
-> +static const __u8 bcast[ETH_ALEN] =3D {
-> +	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-> +};
-> +
-q +static const __u8 srcmac[ETH_ALEN] =3D {
-> +	0x02, 0x00, 0x00, 0x00, 0x00, 0x01,
-> +};
-> +
-> +SEC("encap_vxlan")
-> +int bpf_lwt_encap_vxlan(struct __sk_buff *skb)
-> +{
-> +	struct encap_hdr {
-> +		struct iphdr    iph;
-> +		struct udphdr   udph;
-> +		struct vxlanhdr vxh;
-> +		struct ethhdr   eth;
-> +	} __attribute__((__packed__)) /* packed is required to avoid padding */=
- hdr;
-
-Comment is unnecessary here.
-
-> +	int err;
-> +
-> +	memset(&hdr, 0, sizeof(hdr));
-> +
-> +	hdr.iph.ihl      =3D 5;
-> +	hdr.iph.version  =3D 4;
-> +	hdr.iph.ttl      =3D 0x40;
-> +	hdr.iph.protocol =3D 17; /* IPPROTO_UDP */
-> +	hdr.iph.tot_len  =3D bpf_htons(skb->len + sizeof(hdr));
-> +#if __BYTE_ORDER__ =3D=3D __ORDER_LITTLE_ENDIAN__
-> +	hdr.iph.saddr =3D 0x640510ac;  /* 172.16.5.100  */
-> +	hdr.iph.daddr =3D 0x641110ac;  /* 172.16.17.100 */
-
-Ideally want to keep the addresses we are hardcoding here and the
-the addresses we're declaring in the userspace part in sync. Here
-we've hardcoded the addresses three multiple ways (be, le, and string
-in the userspace part).
-
-> +#elif __BYTE_ORDER__ =3D=3D __ORDER_BIG_ENDIAN__
-> +	hdr.iph.saddr =3D 0xac100564;  /* 172.16.5.100 */
-> +	hdr.iph.daddr =3D 0xac101164;  /* 172.16.17.100 */
-> +#else
-> +#error "Fix your compiler's __BYTE_ORDER__?!"
-> +#endif
-> +
-> +	hdr.udph.source =3D bpf_htons(VXLAN_PORT);
-> +	hdr.udph.dest   =3D bpf_htons(VXLAN_PORT);
-> +	hdr.udph.len    =3D bpf_htons(skb->len + sizeof(hdr.udph) + sizeof(hdr.=
-vxh) +
-> +				    sizeof(hdr.eth));
-> +
-> +	hdr.vxh.vx_flags =3D bpf_htonl(VXLAN_FLAGS);
-> +	hdr.vxh.vx_vni   =3D bpf_htonl(VXLAN_VNI << 8);
-> +
-> +	__builtin_memcpy(hdr.eth.h_dest, bcast, ETH_ALEN);
-> +	__builtin_memcpy(hdr.eth.h_source, srcmac, ETH_ALEN);
-> +	hdr.eth.h_proto =3D bpf_htons(ETH_P_IP);
-> +
-> +	err =3D bpf_lwt_push_encap(skb, BPF_LWT_ENCAP_IP, &hdr, sizeof(hdr));
-> +	if (err)
-> +		return BPF_DROP;
-> +
-> +	return BPF_LWT_REROUTE;
-> +}
-> +
-> +SEC("encap_vxlan6")
-> +int bpf_lwt_encap_vxlan6(struct __sk_buff *skb)
-> +{
-> +	struct encap_hdr {
-> +		struct ipv6hdr  ip6hdr;
-> +		struct udphdr   udph;
-> +		struct vxlanhdr vxh;
-> +		struct ethhdr   eth;
-> +	} __attribute__((__packed__)) /* packed is required to avoid padding */=
- hdr;
-> +	int err;
-> +
-> +	memset(&hdr, 0, sizeof(hdr));
-> +
-> +	hdr.ip6hdr.version     =3D 6;
-> +	hdr.ip6hdr.nexthdr     =3D 17; /* IPPROTO_UDP */
-> +	hdr.ip6hdr.hop_limit   =3D 0x40;
-> +	hdr.ip6hdr.payload_len =3D bpf_htons(skb->len + sizeof(hdr.udph) + size=
-of(hdr.vxh) +
-> +					   sizeof(hdr.eth));
-> +	/* fb05::1 */
-> +	hdr.ip6hdr.saddr.s6_addr[0]  =3D 0xfb;
-> +	hdr.ip6hdr.saddr.s6_addr[1]  =3D 0x05;
-> +	hdr.ip6hdr.saddr.s6_addr[15] =3D 1;
-> +	/* fb20::1 */
-> +	hdr.ip6hdr.daddr.s6_addr[0]  =3D 0xfb;
-> +	hdr.ip6hdr.daddr.s6_addr[1]  =3D 0x20;
-> +	hdr.ip6hdr.daddr.s6_addr[15] =3D 1;
-> +
-> +	hdr.udph.source =3D bpf_htons(VXLAN_PORT);
-> +	hdr.udph.dest   =3D bpf_htons(VXLAN_PORT);
-> +	hdr.udph.len    =3D bpf_htons(skb->len + sizeof(hdr.udph) + sizeof(hdr.=
-vxh) +
-> +				    sizeof(hdr.eth));
-> +
-> +	hdr.vxh.vx_flags =3D bpf_htonl(VXLAN_FLAGS);
-> +	hdr.vxh.vx_vni   =3D bpf_htonl(VXLAN_VNI << 8);
-> +
-> +	__builtin_memcpy(hdr.eth.h_dest, bcast, ETH_ALEN);
-> +	__builtin_memcpy(hdr.eth.h_source, srcmac, ETH_ALEN);
-> +	hdr.eth.h_proto =3D bpf_htons(ETH_P_IPV6);
-> +
-> +	err =3D bpf_lwt_push_encap(skb, BPF_LWT_ENCAP_IP, &hdr, sizeof(hdr));
-> +	if (err)
-> +		return BPF_DROP;
-> +
-> +	return BPF_LWT_REROUTE;
-> +}
-> +
->  char _license[] SEC("license") =3D "GPL";
-> diff --git a/tools/testing/selftests/bpf/progs/test_lwt_ip_encap_fix.c b/=
-tools/testing/selftests/bpf/progs/test_lwt_ip_encap_fix.c
-
-We definitely need to change the name here this is straight from the AI.
-
-> new file mode 100644
-> index 000000000000..6945f83b94f2
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/test_lwt_ip_encap_fix.c
-> @@ -0,0 +1,44 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include "vmlinux.h"
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_tracing.h>
-> +#include <bpf/bpf_core_read.h>
-> +
-> +#define NEXTHDR_UDP		17	/* UDP message. */
-
-Unnecessary, we hardcode 17 in the other test.
-
-> +
-> +volatile const int tgt_ip_version;
-> +
-> +__u16 transport_hdr =3D 0;
-> +__u16 network_hdr =3D 0;
-> +bool fexit_triggered =3D false;
-> +
-> +/*
-> + * bpf_lwt_push_ip_encap(struct sk_buff *skb, void *hdr, u32 len, bool i=
-ngress)
-> + *
-> + * After a successful push the transport_header must point at the outer
-> + * transport header (UDP for VxLAN), i.e.
-> + *   transport_header - network_header =3D=3D sizeof(outer IP header)
-> + */
-> +SEC("fexit/bpf_lwt_push_ip_encap")
-> +int BPF_PROG(fexit_lwt_push_ip_encap, struct sk_buff *skb, void *hdr, u3=
-2 len, bool ingress,
-> +	     int retval)
-> +{
-> +	struct iphdr *iph;
-> +
-> +	if (retval || fexit_triggered)
-> +		return 0;
-> +
-> +	iph =3D (typeof(iph)) (skb->head + skb->network_header);
-> +	if (iph->version !=3D tgt_ip_version)
-> +		return 0;
-> +
-> +	if ((iph->version =3D=3D 4 && iph->protocol =3D=3D IPPROTO_UDP) ||
-> +	    (iph->version =3D=3D 6 && ((struct ipv6hdr *)iph)->nexthdr =3D=3D N=
-EXTHDR_UDP)) {
-> +		fexit_triggered =3D true;
-> +		transport_hdr   =3D BPF_CORE_READ(skb, transport_header);
-> +		network_hdr     =3D BPF_CORE_READ(skb, network_header);
-> +	}
-> +	return 0;
-> +}
-> +
-> +char _license[] SEC("license") =3D "GPL";
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBOZWFsIENhcmR3ZWxsIDxuY2Fy
+ZHdlbGwuc3dAZ21haWwuY29tPg0KPiBGcm9tOiBOZWFsIENhcmR3ZWxsIDxuY2FyZHdlbGxAZ29v
+Z2xlLmNvbT4NCj4gDQo+IFNpbmNlIFRDUCBCQlIgY29uZ2VzdGlvbiBjb250cm9sIHdhcyBpbnRy
+b2R1Y2VkIGluDQo+IGNvbW1pdCAwZjg3ODJlYTE0OTcgKCJ0Y3BfYmJyOiBhZGQgQkJSIGNvbmdl
+c3Rpb24gY29udHJvbCIpDQo+IGl0IGhhcyBhbHdheXMgYmVlbiBvZmZlcmVkIGFzICJEdWFsIEJT
+RC9HUEwiOg0KPiANCj4gICBNT0RVTEVfTElDRU5TRSgiRHVhbCBCU0QvR1BMIik7DQo+IA0KPiBB
+IEdQTC0yLjAtb25seSBTUERYIGhlYWRlciB3YXMgZXJyb25lb3VzbHkgYWRkZWQgaW4gdGhlIHJl
+Y2VudA0KPiBjb21taXQgMmVkNGI0NmI0ZmM3ICgibmV0OiBBZGQgU1BEWCBpZHMgdG8gc29tZSBz
+b3VyY2UgZmlsZXMiKS4NCj4gDQo+IFRoaXMgY29tbWl0IHJldmlzZXMgdGhlIHRjcF9iYnIuYyBT
+UERYLUxpY2Vuc2UtSWRlbnRpZmllciB0byBub3RlIHRoYXQNCj4gdGhpcyBmaWxlIGlzIGxpY2Vu
+c2VkIGFzICJHUEwtMi4wIE9SIEJTRC0zLUNsYXVzZSIuDQo+IA0KPiBGaXhlczogMmVkNGI0NmI0
+ZmM3ICgibmV0OiBBZGQgU1BEWCBpZHMgdG8gc29tZSBzb3VyY2UgZmlsZXMiKQ0KPiBTaWduZWQt
+b2ZmLWJ5OiBOZWFsIENhcmR3ZWxsIDxuY2FyZHdlbGxAZ29vZ2xlLmNvbT4NCj4gQ2M6IFl1Y2h1
+bmcgQ2hlbmcgPHljaGVuZ0Bnb29nbGUuY29tPg0KPiBDYzogVmFuIEphY29ic29uIDx2YW5qQGdv
+b2dsZS5jb20+DQo+IENjOiBTb2hlaWwgSGFzc2FzIFllZ2FuZWggPHNvaGVpbEBnb29nbGUuY29t
+Pg0KPiBDYzogVGltIEJpcmQgPHRpbS5iaXJkQHNvbnkuY29tPg0KPiAtLS0NCj4gIG5ldC9pcHY0
+L3RjcF9iYnIuYyB8IDIgKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBk
+ZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL25ldC9pcHY0L3RjcF9iYnIuYyBiL25ldC9p
+cHY0L3RjcF9iYnIuYw0KPiBpbmRleCBhZWM3ODA1YjFkMzc2Li44MjM3OGEyYmZkMWUxIDEwMDY0
+NA0KPiAtLS0gYS9uZXQvaXB2NC90Y3BfYmJyLmMNCj4gKysrIGIvbmV0L2lwdjQvdGNwX2Jici5j
+DQo+IEBAIC0xLDQgKzEsNCBAQA0KPiAtLy8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0y
+LjANCj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wIE9SIEJTRC0zLUNsYXVz
+ZQ0KPiAgLyogQm90dGxlbmVjayBCYW5kd2lkdGggYW5kIFJUVCAoQkJSKSBjb25nZXN0aW9uIGNv
+bnRyb2wNCj4gICAqDQo+ICAgKiBCQlIgY29uZ2VzdGlvbiBjb250cm9sIGNvbXB1dGVzIHRoZSBz
+ZW5kaW5nIHJhdGUgYmFzZWQgb24gdGhlIGRlbGl2ZXJ5DQo+IC0tDQo+IDIuNTQuMC45MjkuZzli
+N2ZhMzc1NTktZ29vZw0KDQpUaGUgY29ycmVjdGVkIGxpY2Vuc2UgaWRlbnRpZmllciBsaW5lIGxv
+b2tzIGdvb2QgdG8gbWUuDQoNClJldmlld2VkLWJ5OiBUaW0gQmlyZA0KDQpNeSBhcG9sb2dpZXMg
+Zm9yIHRoZSBtaXN0YWtlLg0KIC0tIFRpbQ0KDQo=
 
