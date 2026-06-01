@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-293643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEH3IDxSHWpfYwkAu9opvQ
-	(envelope-from <netdev+bounces-293643-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:34:52 +0200
+	id cIksNDBSHWpfYwkAu9opvQ
+	(envelope-from <netdev+bounces-293646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:34:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06FBC61C87C
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:34:51 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA22261C86D
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:34:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7DD963008526
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:31:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 721003010837
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1534D38F25A;
-	Mon,  1 Jun 2026 09:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6373911B6;
+	Mon,  1 Jun 2026 09:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="xn82i8U0"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="ag/zJ4no"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2C5137750;
-	Mon,  1 Jun 2026 09:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7B2390C90;
+	Mon,  1 Jun 2026 09:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780306314; cv=none; b=tYwpANzfyTCRV01EMRLWFpXYryKUd+Mvlew5CF3voXfbYQbuiTFuuip+JWXaArNompBi8DANCSuRGWaZ20DUPEW+yBuRJecMz/anmAS1TRkNhXyw7diVx4edGeYtjXKHfReF/9VX8kUla4YLwOR9XQHCqPkEiioFdK6KxktlbrA=
+	t=1780306329; cv=none; b=Zc6uPGO8K915pk5W2vUL6HULnjonLoRfIXbaA+ZiJzsZMgUCd0E2N27zSm1b6bFzss3FDs8IIaSlQm3fDgZqWFObXAiD1kcNB0yb46plpz8DEPO9c0yA6jaX0ej1nsaUJ1hus7GxV0cCueTiEKFusFnSZJmGa5bOruLL8HJkIuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780306314; c=relaxed/simple;
-	bh=TF4H+xRgtIHYnukALsh/sfFcWGIHpgbeZ8aBfl5cbR4=;
+	s=arc-20240116; t=1780306329; c=relaxed/simple;
+	bh=LqTRlHOp0YHQMBHFAbPqweqf7FuVo4edHss2+mASmZc=;
 	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=Xd+/vcRj7qkOLOblBVEbk2iETPEebGW9gDlKTnAaIAePdXzrXLjGBRAdKHnpoVknoILuT7uHoORiH0C6hte7UeEWoenGJVFCTrPSlV9riw81HoYHI7ShUKPd0rFMeHe0O7OrYxNP0p9aK+OxezqoX5rtnxLDCi4udOh98qJfDls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=xn82i8U0; arc=none smtp.client-ip=194.13.80.246
+	 Message-ID:Content-Type; b=LlYZo/vFFIy9QkX7gFWjhMclhtR+e7JUkQTEZBH1m4KdLrkkyiuLgsfDP70qxMEklEdnABAGkFsFP5qYFck/N6uUFPo+kArh9VdBMChYFui+/cq/wx/EWSJIlz5w5uscB9/KfN8cYF+fB7DDPKAZvdDSzD6uMucH/eHVkkoM1eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=ag/zJ4no; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EB3FEA08DA;
-	Mon,  1 Jun 2026 11:31:49 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D289DA01FB;
+	Mon,  1 Jun 2026 11:32:05 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1780306310; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1780306326; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=mmF2Ndi+ZlnCf6k1s/DWNsOrwKBWTAZ7EpTs89KOEws=;
-	b=xn82i8U0Uf5XCgmQEmLHWovtTyvtIz+RftZ3tBDoCtoDgtLVBYEPxuL7SWXgTBmtDDZ1mw
-	4s5uesglXftigdT8JiJnXX5aDQIJB4ev44b/54PD/msVtf4U7yiFvFiYGmpElkyQvqh8Hf
-	cb4UTxmT8zOVVrqgqQN7xD6Ev2rHRTSbeo8QYZoTHgy1tdriaW1HHd71HShZhXONHXB33t
-	Xw23xo9VdTtnefzxXih0zXM0Lv/TzHtnGT0ZlQjYCyI+tFGzLGuicl9rxvQVkctIhbEisd
-	Z78jk3koZOe+KEmVgda+TpfW5u+Sx4Fo0e/DCIseRA8nDd35Wi+L3Nyl5ScWCA==
+	bh=p7m2ZvTWTpUZsSq2QqocuRSjvRDnNfWr7agiHb4ZjBI=;
+	b=ag/zJ4nogUjrZK2L8q75HmD8aaNXznIk/rxYhiKIKB9IQ9KyiydYqi8gw470gMedsn7gAi
+	F6ZniM/Rjpj0fbRwxaDwyPRuXlhvzGiVXAT16z+n+bFqPDt+P/7k0R+5jZ/zHH4VmJab+n
+	3gixl8E090c5PcY5LlALb+HXicBnnbZF/w1dxSIoZcErvcx+vq6awhFvpy+fhtH4+OcwUb
+	pkFfoINQO68bsVyS2vG7zpcbS3HhuTVTg0i/nSfO4UGmfPyteO9g5HBbRY30NPOSLrOXUJ
+	K6u9T6KmtqvDDo/wc3Lyqhe2oFpvIszqz5H8yhsiV0e4e8bBoVghD1KT/MIMwg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 01 Jun 2026 11:31:49 +0200
+Date: Mon, 01 Jun 2026 11:32:05 +0200
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
@@ -59,11 +59,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
  <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
  <hkallweit1@gmail.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com
-Subject: Re: [PATCH net v2 2/3] net: phy: remove phy ports upon probe failure
-In-Reply-To: <20260601084029.815461-3-maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net v2 3/3] net: phy: don't try to setup PHY-driven SFP
+ cages when using genphy
+In-Reply-To: <20260601084029.815461-4-maxime.chevallier@bootlin.com>
 References: <20260601084029.815461-1-maxime.chevallier@bootlin.com>
- <20260601084029.815461-3-maxime.chevallier@bootlin.com>
-Message-ID: <2823b00cb2aa211d8f4f392a37537351@tipi-net.de>
+ <20260601084029.815461-4-maxime.chevallier@bootlin.com>
+Message-ID: <090d7e9be921e62b94812785d1d8f54c@tipi-net.de>
 X-Sender: nb@tipi-net.de
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
@@ -73,11 +74,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293643-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -96,37 +97,61 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 06FBC61C87C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:dkim,bootlin.com:email]
+X-Rspamd-Queue-Id: DA22261C86D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 On 1.6.2026 10:40, Maxime Chevallier wrote:
-> When phy_probe fails, let's clean the phy_ports that were successfully
-> added already.
+> We don't have support for PHY-driver SFP cages with the genphy code.
 > 
-> Suggested-by: Nicolai Buchwitz <nb@tipi-net.de>
-> Fixes: 589e934d2735 ("net: phy: Introduce PHY ports representation")
+> On top of that, it was found by sashiko that running
+> sfp_bus_add_upstream() for genphy deadlocks, as for genphy the PHY
+> probing runs under RTNL, which isn't the case for non-genphy drivers.
+> 
+> This problem was reproduced, and does lead to a deadlock on RTNL.
+> 
+> Before the blamed commit, the phy_sfp_probe() call was made by
+> individual PHY drivers, so there was no way to get to the SFP probing
+> path when using genphy.
+> 
+> Let's therefore only run phy_sfp_probe when not using genphy.
+> 
+> Fixes: bad869b5e41a ("net: phy: Only rely on phy_port for PHY-driven 
+> SFP")
 > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 > ---
->  drivers/net/phy/phy_device.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/net/phy/phy_device.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 > 
 > diff --git a/drivers/net/phy/phy_device.c 
 > b/drivers/net/phy/phy_device.c
-> index 6ccbfacf7d1d..a171cbe2a74a 100644
+> index a171cbe2a74a..8eace58e9f12 100644
 > --- a/drivers/net/phy/phy_device.c
 > +++ b/drivers/net/phy/phy_device.c
-> @@ -3778,6 +3778,8 @@ static int phy_probe(struct device *dev)
->  	return 0;
+> @@ -3512,9 +3512,14 @@ static int phy_setup_ports(struct phy_device 
+> *phydev)
+>  	if (ret)
+>  		return ret;
 > 
->  out:
-> +	phy_cleanup_ports(phydev);
-> +
->  	sfp_bus_del_upstream(phydev->sfp_bus);
->  	phydev->sfp_bus = NULL;
+> -	ret = phy_sfp_probe(phydev);
+> -	if (ret)
+> -		goto out;
+> +	/* We don't support SFP with genphy drivers. Also, genphy driver 
+> binding
+> +	 * occurs with RTNL help, wich will deadlock the 
+> sfp_bus_add_upstream().
+> +	 */
+> +	if (!phydev->is_genphy_driven) {
+> +		ret = phy_sfp_probe(phydev);
+> +		if (ret)
+> +			goto out;
+> +	}
+> 
+>  	if (phydev->n_ports < phydev->max_n_ports) {
+>  		ret = phy_default_setup_single_port(phydev);
 
 Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
