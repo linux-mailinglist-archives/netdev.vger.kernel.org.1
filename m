@@ -1,296 +1,262 @@
-Return-Path: <netdev+bounces-293531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293532-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFN8NHj9HGoYUwkAu9opvQ
-	(envelope-from <netdev+bounces-293531-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 05:33:12 +0200
+	id uAI+Kov/HGqOUwkAu9opvQ
+	(envelope-from <netdev+bounces-293532-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 05:42:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287F36193B3
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 05:33:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5096B61946E
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 05:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 394A33010BAB
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 03:33:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B3792300B101
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 03:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5904265CD9;
-	Mon,  1 Jun 2026 03:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE87288C2C;
+	Mon,  1 Jun 2026 03:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="OCIYJBm3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vi+nauqQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012019.outbound.protection.outlook.com [52.101.48.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334371C5F13;
-	Mon,  1 Jun 2026 03:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780284789; cv=fail; b=GZiPiTbG5fa1BSMSNCv49rouRXc8i+03gmD5EF4QPjW3LZPw6/GcC/TVObmxPAUEng6vLVFLA3K/3rRV36ZPd6lwY9YnR4kJyMNh6Yzeep0Gfrxujs3RYKwZiY+nMaUYY6YxKpPyTruL+Y2TbDOTtHDlHhdGjmzYNOFuQfzBTSM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780284789; c=relaxed/simple;
-	bh=cGmJ57em/ONXR97G/s/gNtM2TV/DFquFRScWKkpHV8U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VPsMRM/0blh/pQ7gse6gUBp8Vebr6rfoqCAa3l0HelmPEe5tBrzZjyGo2mixp8X5GhjUvGvRcMrdalwNoLq8pyB1sla0oCJF//hi8h0qu3Bg/FG88geQJhODg6rhoy4YXp+SiDtCi1IlLTrGZynjvqKOhImy2xOSSQv5+0HqoP4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=OCIYJBm3; arc=fail smtp.client-ip=52.101.48.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=e/hveto1xCKu9V14yeM9UrqHZwxSww0gSerqNgLd3szkcJuYDSUH/WVGaRx1DfiZgtmVaxWd0ME/pgdfR5EhaRI0Jubw0yssVYR/HGsOgqDl6Xjcf4gOmpG9xZX+aU0mFTJm6WhamTVlQiQUd6N7RzIr693kFlGMdy6D8gJ2UwiYWF023vB467na1uHYN1Lu43BfLWon9DgyzHrwcJ4YYkVu1q0VfiMadi/FdmU8xW71hTKd98NzDFmkWebzXrUQu1P4zJrtM7cbPcAFcbA2sS1XTO82u4bWUSGgpoKzBHSNVVu+Cc7lxfKkou3er9Ph8mfpWA9w8ePp6KnPsvxndw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jk6cLOErD/V2M6Oy+tNR8/SPVcHyS9Dy3ukMKmFsDl8=;
- b=f6nVFMiFQDEGDEdG7Quq0e5+9F9w1O7jLaH3BhDwS/ihe/ui2cEVp0vAuxRgxnnkvnlKORjhZHjTnqkG9liCNKHeOLN0cJ+vn8jQig7U25QyZRMkfHirMrbReZp+2C5l7CdZ4qRI9JCNREHsng0H1zhSYvh325ekgp0ifxQYeLVvEOikViGIfodHiR4skb6jprqsYOCchgL+JHA/ecyfCGHs+ey43NsfB2Q02q5d0ARfDcmeR0x8jJzl5mS1eOv1RoGcqtsMdlu57PLHmGzGK/1k0xd0FcA+po5egvDsg90vIg1cMhBgsonJGS7jemVF6ltEFE2GrT/y8bAVycLbbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jk6cLOErD/V2M6Oy+tNR8/SPVcHyS9Dy3ukMKmFsDl8=;
- b=OCIYJBm3YRQG0r560rc4sIAsEZ8dmWMXeVfUHdAyBcmuPtbeyo3RWaOKp+ODqxGZohmNV45lLu+7t9MD7TRfFx1VaD/BIXczPbuo9f8ybD6T4Y1FCh/SBqeCTJG8JL2E3e4VMo2BwrUBMlD4wLu3GSWhnwTanJtRKrl6Q0iJR6HOTGXfQoUDnSW2yJ7v59sqm0Tq0fVxLoeoD6cR6FnDyWLh5RGdoeMzEajw280dt7sV2hadqQw8sIWUhfN4n+uatBp1o153VBz9tmr2z0qct1qqpT5srX4Ytv6qmoWdtXn245d4RUe6hHDp8dZm9fXqAInyuRe5k/ZpHuxwgtWtrw==
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
- by LV2PR11MB5997.namprd11.prod.outlook.com (2603:10b6:408:17f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Mon, 1 Jun 2026
- 03:33:05 +0000
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.21.0071.011; Mon, 1 Jun 2026
- 03:33:05 +0000
-From: <Thangaraj.S@microchip.com>
-To: <davthompson@nvidia.com>, <Bryan.Whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net v2] net: lan743x: permit VLAN-tagged packets up to
- configured MTU
-Thread-Topic: [PATCH net v2] net: lan743x: permit VLAN-tagged packets up to
- configured MTU
-Thread-Index: AQHc766ckoPeqg0nH0utplhGKt8v47YpDptA
-Date: Mon, 1 Jun 2026 03:33:05 +0000
-Message-ID:
- <DSWPR11MB97159C9E7346B05485AC55D8EC152@DSWPR11MB9715.namprd11.prod.outlook.com>
-References: <20260529210300.433135-1-davthompson@nvidia.com>
-In-Reply-To: <20260529210300.433135-1-davthompson@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|LV2PR11MB5997:EE_
-x-ms-office365-filtering-correlation-id: dca29b5e-e132-41f0-2570-08debf8e7de5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|1800799024|22082099003|18002099003|11063799006|56012099006|38070700021;
-x-microsoft-antispam-message-info:
- 83asy2CPrrutYImRFtHMHlbbIv2/cDDDSMLX79pUyHUkAslgyePyVJap3lM61myd7fHlEgxKSTMDiGZ2hrrycSDy9x2AsWh0crBfnF5HpYohgylhAkbzXzvjGciuY8pE73znyrLAj+Z+S0DKXsD5cnmn9gzFW8YC0uVQyvhnp77ykwGpypjg/Pl9NzdLMoi0aUjK+fOJS0BQJLLYNkDEmODIRmQaB3/NDtwhOpzLKhDhsE58E93Cidq1wciCraA5/QG1ez+x1W7NKgzy9R4C71Hu0Qr4slHWHBn//yLS/3ovcaxTODQtXi2gBOAaM0JYr3MpOI9WsuXY1UYq0I728aJrkc64CN+e+MbKl4a9C83C7UJRc8KOi+tm6oQ81WbIaAyc/R/0MvhK5ABaxbn/71ieJ2yOM7avhS1pQ8gAYXnC4mQ04ixiLuz/O0X8VcvyYj4UGi8WxqEVmnzKsZ9ntyQeq1FkSZuTFiM4+PdpCFLeri6tTjahO/ftqC1sUNvAQ40tuDy7vOvygXF7JCQCx/E7iQ+35BvG1ZUsaqxqw8BIhBnC+axfC9NavPRjRawnrKFn2rfxtFPz+OqwzK/mA/eecwbdAF02r0oX6G+YcO78LeI654XHsVw4qSMQEGqj2V1wJ8G3FRb3uidiJB1F8FUHMbi5B7RVwlHB21pEEh/bQcmdMsQHFrxW/vzOOqUmnJat+zIlHBxdWYgjxkoZMQltzGKvfy1PJcUXhd6xAWM5LZ7c5ssSpnb4u1qSUAiI
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(22082099003)(18002099003)(11063799006)(56012099006)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?MZ6mE2EAr2I5Tzxju+whHeCjJmKY1tPlG8yFFYUrE3iZ+dRpvIHa03JZO7fT?=
- =?us-ascii?Q?ck98uVuTINeAr0kmzBxM9BIL7+SdEOYPQrDwihsd4yQJRl+rnu+ZlrPHNYdz?=
- =?us-ascii?Q?kA1HQUWc3bJ/kmywToS3lw+cIw7xTv1uj1L8/CwKu+z5equkTTrAbSenWn+O?=
- =?us-ascii?Q?N5ZY77Alczwx2Gr7hAFnyVg4wbFtktsKeydHYC/GG4xvvd+pImsnWt68G07i?=
- =?us-ascii?Q?akRjY3d7zaTqLHNUuPcIr70U5xeqMUDHVjJ8qycirlPg28Qti0QQ/eAwH8cG?=
- =?us-ascii?Q?yLFbdsarjfyYAdiHL3MqcIYfk3oVpuRYYpt/wbSt1VInPbRtD1BG77ShyG3l?=
- =?us-ascii?Q?ekqUWlAjjiMl0lshImj84Fx4NscMjfpPgMVcoiGfF2X8IMZfH5tmzA14RgBr?=
- =?us-ascii?Q?5+2WGnCq27d+jppXurSwaUk29YK+/DUBT+HTVe6CTBxCKiZ/9fk5pnXH/X1R?=
- =?us-ascii?Q?QEE8yvYxr7aScA1EF5ejB8HonUBJv1FmiobdSsdlnhrXTAqgZg1XccOeBC1a?=
- =?us-ascii?Q?yEZ+sag3TEgmlH2J/IzmOXgcECWAkCpjLNAq3jIJYmRQ0yY3F0KtPFmJtuup?=
- =?us-ascii?Q?y31x8a4WHWGUnGUsmoCI1IE4Mvog9RaWx2otFd+/1eAzaDcG4CX4hnjX+eu5?=
- =?us-ascii?Q?YsWiEu24NyVG7jGFMsw+Ux2sObwAPDheiUF3A4/dRyWtLQ48mLQKo76CxpNd?=
- =?us-ascii?Q?gkZirZTu+E1XymT3VvsFRBMDC6MoqZOxmLMeBAwZZYWpaVV+SxYU+2xkM9j+?=
- =?us-ascii?Q?LhrorSVzI3OF7tPFa2+LHryQ+TEcLz0rQoFhvz10g7ECoZcUVbIrpbhNLTDm?=
- =?us-ascii?Q?PUVk8L8O0tqMoXECZpTEJj9r8NlAtsKK8CP1BuVC5OfPtukQCPaJSxnCmYY7?=
- =?us-ascii?Q?yKei9yBlMnyVzLLsIFTFldEUOR5oBFZiVHfmJW/bIrcuqeSHmVGI0omDThFS?=
- =?us-ascii?Q?IMbvmrV68kRu7TA7Ui9TBHOBhdQ2EvOJPGWYRfqrcqkSXYA8yrxQAhcenNiT?=
- =?us-ascii?Q?mc/5i+i0kedGN7kJAb7fY70iSxOdkud6+niR1tcKO0jOzLRg0Uk7/7YL6qOi?=
- =?us-ascii?Q?2L42O0xyMblx8jW7h3vs9ePSDzZzUnIlowC1pnGp607bunzqAwhYQU6k+Ys5?=
- =?us-ascii?Q?H5aca9Wq+JoowBdboRNZhjwUZPPTTrXVBRsSn6tPRsybwISVITeYes4oq9pB?=
- =?us-ascii?Q?2EiXSvs/jbLPGxENPUr6NoDpA74htO/bNgro0iBmE1/sutMsUuWrxbgNIaUc?=
- =?us-ascii?Q?8Pw3fey3acTR4XSK3EuCKkK3yhN6PcGuco9p14kUKPQMCGPAL2FTgZw+yRU7?=
- =?us-ascii?Q?MkcNNsHCDbRisSt2K7VXy9gylTmHPuYs59GQdR+XMprB7RmMWy7DnqC0T8QV?=
- =?us-ascii?Q?D8Gws9cheV8Aih1vcIut1lFwiThcAX1dhz5YPmFV+3LqYIdvR6fPBfnXfKt5?=
- =?us-ascii?Q?h8jYY2g//DGp6qo/lWd040HxvNk7skzkC7OkqWXK++ZEvwxlOgopMGfh4s5I?=
- =?us-ascii?Q?oxgVguCYlFI/niOWf3zxXvvxwNq70wKBaf01qkKzAvROkklCUTqkTRu7UASd?=
- =?us-ascii?Q?eSRSqty+ssYxzxRu1ejJmFGsR5aQABdHjyahcXyakSuqEFmQwI0lcXcUt8Ys?=
- =?us-ascii?Q?RS6q6Ld+RWMEyTCOswgck4DCvW+alSowB9Xy5PEUZiUp+xyyd/fDOeQ12/9g?=
- =?us-ascii?Q?O8dVYqooRapJf6AlPRYYzwfT2c1Amfh9ZBJqYt63pwYA20wQY1Z3dJxnc5p7?=
- =?us-ascii?Q?ECc0uqKZZQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE069282F38
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 03:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780285318; cv=none; b=stdkhp0QgYt4/gF5Dc25C1LghHeCf2bdLPNMOS+GFOUZA6gYaYrrRSha8V/EgCy2WZDe9L8ZlLJE7bW4JIAt7LupDiB6gk28qqQ7pF0bjixOxrs4jIAiEzAGMTAfenbA6CNb7J05h6XuAqYPz3E/PUFojLqO/6FLSoF/oxV90zY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780285318; c=relaxed/simple;
+	bh=GEhvFyiVmNJeqdaA6eLWoM9Z2RJA8csZr6MFKMn8Zec=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DK1wFdqsCTBQVwquLi+g9eCWBJj7V38TOg90dlWoulkqv5DRM8xYmk0Uqa/JkmF+bApDDAxJbuTl6LqMVDvfc8OlJOTefL5fWgyVxabH88zKlbczMhoCxrLumm0Mzwp7fRvA3me5sT73aloZx8xqoFcV/yOBCZxXKVK8ahx1jbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vi+nauqQ; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-36c68964315so767227a91.2
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 20:41:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780285315; x=1780890115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZZTE+oP6vZaNBQBkjw1JwOrw7qBKUTRNGV3G9H2hng=;
+        b=Vi+nauqQZzyVIC+xrqrREWIqhHFckOf4FHmSDku3s7Ov2TIBIjlQMwrPt4pij2KRsf
+         wYa8pRQ6preNqnpcJpJEX1bBE/RZVG7gnFawflbdeU39Au2Sobme6Rukpjnm9RLqQgJQ
+         lEbsA/DgLIxe0kzeb+n6v9VlgzPJG3+j7/s5OlNY3jSFZkM1KquFmfYTVHTT6uLTyvqu
+         abbwgX87tXaQ/94kaT6OyS0c+dmP+hCfmc0LPTUAYebPTZUqEuWXTAfEM74Z5cpImDrT
+         v1SzCW8Hs5LwDKNvgy92Eb8cff50FObRq0deVD7Eo059zNA99hpT48mltOR4vfr8WDnl
+         hTnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780285315; x=1780890115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZZZTE+oP6vZaNBQBkjw1JwOrw7qBKUTRNGV3G9H2hng=;
+        b=Sy+JfFLw7CgHRtdNKnRH5pIG71cvNFxFaG4dyhLu1TyNIbHgJ6GQhHdHayO6NgBlzY
+         sU3c6f8Yqo88xKBkCWug5t95deH98rkbMuiy+h6pCx12dykJQBdDtgmYkrTMlldmtUyG
+         P0K8L2yZIfA9AA2bZtoE7ikAB7u/vxtFNfjQfA2E6k7P4BkZ5Z1ILT9T1avuAUQ6pPxy
+         QKC26i+4vrpuhfh4IGbsJYWAO/JZ01jjgSLCats7efGMmJohFyECR99jgByeI7rt551q
+         FPp9+iIknJvx3CrzGbBKT6KsdgIUJrYuasNSGO+EOJRhw8S9CWuxL81JGODFG86RP2qU
+         wN/Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+yEmlbS7JFi38FCevHLBJSSb4HEje8iwSyHJqE+tXNnuzn6WlVg/E/22olwTUP2xj3ZqGiQPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+7ajZ0RsCDh0fHcXNHz+0HC5E5OgE2D4cl4QbmZtd7NXnZb5N
+	AnM8r4OdfkqEdtc+zLji63ObRiUQerxj0ujX7MGYR+1WlTaEZeD5wVYe
+X-Gm-Gg: Acq92OHUMLhQKq2fg/WgDmYAJZ0rqCoV4Cwe4qQYyNg1kWbzjU+s4Nk+yNW6YwLkuyS
+	9qgVVY5kSsC6ZvJR6ABkMcxXt2LsiELwwruAsYx/AowOnNMp827uYe87WLdEubvWVOEM21YVHMc
+	uxtdeKrdrG6+ixYpeiZVSj3fLGhlIcKOYdugCT4eK5h2CaazJOCXz4H7J5c30y1sCW6Voimusfs
+	AtvG/wCg7/ZJD58M4bA6h1YHJZ2mFJezd7pcXnC3yYRTBUKUX+5MPlZfclItBUQnqIJGO9sDM2u
+	KvjUIFGwcBq/8AXP+FFeFjURWFUTUJRlaVuWanubu/BwZ1iUVxP9cF8KrtPXXG54dq9t+kztkHL
+	gAHsqXX6CtPz4vud20s6/6hRqIG/6+wT6wBQEeCVuvibCoOaXQWtNjcjm0VgsMdZOEQeUZmT6Ce
+	ldMfkckO2q6FzcjKc7zx2qEplkPeAuSKynZtsi5J8gQ7CoU0yD0v9EhyZ4+r4=
+X-Received: by 2002:a17:90b:1b0a:b0:36d:b662:708e with SMTP id 98e67ed59e1d1-36db6628d75mr2305338a91.9.1780285314995;
+        Sun, 31 May 2026 20:41:54 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36bbfc90570sm9605036a91.4.2026.05.31.20.41.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 May 2026 20:41:54 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Nikolaos Gkarlis <nickgarlis@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Maoyi Xie <maoyixie.tju@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: require CAP_NET_ADMIN in the device netns for tunnel changelink
+Date: Mon,  1 Jun 2026 11:41:48 +0800
+Message-Id: <20260601034148.1272080-1-maoyixie.tju@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dca29b5e-e132-41f0-2570-08debf8e7de5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2026 03:33:05.1174
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qlFvy+JHEYE20ygtr0eQzBO9bMnr+4RUlMQf/7wECtJbD1wc4HLxzM3jDhvY/9X4kvpW4WqTpFyo4w9+5UMieyesPhbJLgpNQLvbOMLUzLQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB5997
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	TAGGED_FROM(0.00)[bounces-293531-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293532-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:email,microchip.com:dkim,nvidia.com:email,davemloft.net:email]
-X-Rspamd-Queue-Id: 287F36193B3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ip6_tnl.net:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 5096B61946E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+A tunnel changelink mutates the tunnel hash of the device's creation
+netns. ip_tunnel_changelink(), ip6_tnl_changelink(), vti6_changelink(),
+ip6gre_changelink(), ip6erspan_changelink() and xfrmi_changelink() all
+look up and update through t->net.
 
+The rtnl path into changelink only checks CAP_NET_ADMIN against
+tgt_net. After IFLA_NET_NS_FD migration the creation netns differs from
+the caller's netns. A caller with caps only in its current netns can
+then rewrite an entry in the creation netns hash. They pick the
+endpoint addresses. Commit 8b484efd5cb4 ("ip6: vti: Use ip6_tnl.net in
+vti6_siocdevprivate().") added the same check on the ioctl path. This
+adds it on the RTM_NEWLINK path.
 
-> -----Original Message-----
-> From: David Thompson <davthompson@nvidia.com>
-> Sent: Saturday, May 30, 2026 2:33 AM
-> To: Bryan Whitehead - C21958 <Bryan.Whitehead@microchip.com>;
-> UNGLinuxDriver <UNGLinuxDriver@microchip.com>;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
-> kuba@kernel.org; pabeni@redhat.com
-> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; David Thompson
-> <davthompson@nvidia.com>
-> Subject: [PATCH net v2] net: lan743x: permit VLAN-tagged packets up to
-> configured MTU
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
->=20
-> VLAN-tagged interfaces on lan743x devices were previously unreachable via
-> SSH and failed to respond to large ping packets (e.g. "ping -s 1469" give=
-n
-> MTU=3D1500). In these scenarios, "ethtool -S" reports non-zero "RX Oversi=
-ze
-> Frame Errors". According to Microchip AN2948, the MAC_RX FSE (VLAN field
-> size enforcement) bit determines whether frames with VLAN tags exceeding
-> the base MTU plus tag length are discarded.
->=20
-> The driver must set the MAC_RX.FSE bit before setting MAC_RX.RXEN to
-> allow VLAN-tagged frames up to the interface MTU, preventing them from
-> being treated as oversized. As a result, both the base and VLAN-tagged
-> interfaces can use the same MTU without receive errors.
->=20
-> Fixes: 23f0703c125b ("lan743x: Add main source files for new lan743x driv=
-er")
-> Signed-off-by: David Thompson <davthompson@nvidia.com>
+Check ns_capable(t->net->user_ns, CAP_NET_ADMIN) in each changelink
+before the lookup and update. The newlink path has long checked the
+capability in the link netns. The changelink path never did.
 
-Reviewed-by: Thangaraj Samynathan <Thangaraj.s@microchip.com>
-> ---
-> v2:
-> - Added helper function, lan743x_mac_rx_enable_fse(), to set FSE bit prop=
-erly
-> - Added explicit comment about use of distinct write cycle to set FSE bit
-> - Moved setting of FSE from lan743x_mac_open() to lan743x_mac_init(),
-> allowing FSE
->   bit to be set upon probe() path or suspend/resume path. This change fix=
-es an
->   issue raised by Sashiko
-> ---
->  drivers/net/ethernet/microchip/lan743x_main.c | 32 +++++++++++++++++++
-> drivers/net/ethernet/microchip/lan743x_main.h |  1 +
->  2 files changed, 33 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c
-> b/drivers/net/ethernet/microchip/lan743x_main.c
-> index f3332417162e..ffac22883e49 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> @@ -1219,6 +1219,36 @@ static void lan743x_mac_set_address(struct
-> lan743x_adapter *adapter,
->                    "MAC address set to %pM\n", addr);  }
->=20
-> +static void lan743x_mac_rx_enable_fse(struct lan743x_adapter *adapter)
-> +{
-> +       u32 mac_rx;
-> +       bool rxen;
-> +
-> +       mac_rx =3D lan743x_csr_read(adapter, MAC_RX);
-> +       if (mac_rx & MAC_RX_FSE_)
-> +               return;
-> +
-> +       rxen =3D mac_rx & MAC_RX_RXEN_;
-> +       if (rxen) {
-> +               mac_rx &=3D ~MAC_RX_RXEN_;
-> +               lan743x_csr_write(adapter, MAC_RX, mac_rx);
-> +               lan743x_csr_wait_for_bit(adapter, MAC_RX, MAC_RX_RXD_,
-> +                                        1, 1000, 20000, 100);
-> +       }
-> +
-> +       /* Per AN2948, hardware prevents modification of the FSE bit whil=
-e the
-> +        * MAC receiver is enabled (RXEN bit set). Use separate register =
-write
-> +        * to assert the FSE bit before enabling the RXEN bit in MAC_RX
-> +        */
-> +       mac_rx |=3D MAC_RX_FSE_;
-> +       lan743x_csr_write(adapter, MAC_RX, mac_rx);
-> +
-> +       if (rxen) {
-> +               mac_rx |=3D MAC_RX_RXEN_;
-> +               lan743x_csr_write(adapter, MAC_RX, mac_rx);
-> +       }
-> +}
-> +
->  static int lan743x_mac_init(struct lan743x_adapter *adapter)  {
->         bool mac_address_valid =3D true;
-> @@ -1258,6 +1288,8 @@ static int lan743x_mac_init(struct lan743x_adapter
-> *adapter)
->         lan743x_mac_set_address(adapter, adapter->mac_address);
->         eth_hw_addr_set(netdev, adapter->mac_address);
->=20
-> +       lan743x_mac_rx_enable_fse(adapter);
-> +
->         return 0;
->  }
->=20
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.h
-> b/drivers/net/ethernet/microchip/lan743x_main.h
-> index 160d94a7cee6..1573c8f9c993 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.h
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-> @@ -182,6 +182,7 @@
->  #define MAC_RX                         (0x104)
->  #define MAC_RX_MAX_SIZE_SHIFT_         (16)
->  #define MAC_RX_MAX_SIZE_MASK_          (0x3FFF0000)
-> +#define MAC_RX_FSE_                    BIT(2)
->  #define MAC_RX_RXD_                    BIT(1)
->  #define MAC_RX_RXEN_                   BIT(0)
->=20
-> --
-> 2.43.0
+Reported-by: Xiao Liang <shaw.leon@gmail.com>
+Closes: https://lore.kernel.org/netdev/CABAhCOSzP1vaThGV35_VnsRCb=87_CPjPVsTHbq905k8A+BuUg@mail.gmail.com/
+Fixes: d0f418516022 ("net, ip_tunnel: fix namespaces move")
+Fixes: 5311a69aaca3 ("net, ip6_tunnel: fix namespaces move")
+Fixes: 690afc165bb3 ("net: ip6_gre: fix moving ip6gre between namespaces")
+Fixes: f203b76d7809 ("xfrm: Add virtual xfrm interfaces")
+Fixes: 11b326fb0a37 ("ip6: vti: Use ip6_tnl.net in vti6_changelink().")
+Cc: stable@vger.kernel.org
+Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+---
+v2: Reworked per Kuniyuki Iwashima's review. v1 gated the check on
+    dev->rtnl_link_ops->get_link_net in __rtnl_newlink(). That gate is
+    too broad. For peer types like netkit and veth get_link_net returns
+    the peer netns, which changelink does not mutate, so the core check
+    would wrongly require CAP_NET_ADMIN there. Move the check into the
+    changelink path of the tunnel types that mutate t->net, against
+    t->net->user_ns. This mirrors the ioctl side in 8b484efd5cb4.
+
+v1: https://lore.kernel.org/netdev/20260527070824.2677331-1-maoyixie.tju@gmail.com/
+
+ net/ipv4/ip_tunnel.c           | 3 +++
+ net/ipv6/ip6_gre.c             | 6 ++++++
+ net/ipv6/ip6_tunnel.c          | 3 +++
+ net/ipv6/ip6_vti.c             | 3 +++
+ net/xfrm/xfrm_interface_core.c | 3 +++
+ 5 files changed, 18 insertions(+)
+
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index 50d0f5fe4e4c..51d8787318f3 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -1251,6 +1251,9 @@ int ip_tunnel_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct net *net = tunnel->net;
+ 	struct ip_tunnel_net *itn = net_generic(net, tunnel->ip_tnl_net_id);
+ 
++	if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	if (dev == itn->fb_tunnel_dev)
+ 		return -EINVAL;
+ 
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 365b4059eb20..0de4994bc92f 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -2047,6 +2047,9 @@ static int ip6gre_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct ip6gre_net *ign = net_generic(t->net, ip6gre_net_id);
+ 	struct __ip6_tnl_parm p;
+ 
++	if (!ns_capable(t->net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	t = ip6gre_changelink_common(dev, tb, data, &p, extack);
+ 	if (IS_ERR(t))
+ 		return PTR_ERR(t);
+@@ -2266,6 +2269,9 @@ static int ip6erspan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct __ip6_tnl_parm p;
+ 	struct ip6gre_net *ign;
+ 
++	if (!ns_capable(t->net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	ign = net_generic(t->net, ip6gre_net_id);
+ 	t = ip6gre_changelink_common(dev, tb, data, &p, extack);
+ 	if (IS_ERR(t))
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 9d1037ac082f..2834004c7011 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -2102,6 +2102,9 @@ static int ip6_tnl_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct ip6_tnl_net *ip6n = net_generic(net, ip6_tnl_net_id);
+ 	struct ip_tunnel_encap ipencap;
+ 
++	if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	if (dev == ip6n->fb_tnl_dev) {
+ 		if (ip_tunnel_netlink_encap_parms(data, &ipencap)) {
+ 			/* iproute2 always sets TUNNEL_ENCAP_FLAG_CSUM6, so
+diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+index df793c8bfffb..7b05e0c491db 100644
+--- a/net/ipv6/ip6_vti.c
++++ b/net/ipv6/ip6_vti.c
+@@ -1044,6 +1044,9 @@ static int vti6_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct __ip6_tnl_parm p;
+ 	struct vti6_net *ip6n;
+ 
++	if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	ip6n = net_generic(net, vti6_net_id);
+ 	if (dev == ip6n->fb_tnl_dev)
+ 		return -EINVAL;
+diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_core.c
+index 330a05286a56..a1029a829406 100644
+--- a/net/xfrm/xfrm_interface_core.c
++++ b/net/xfrm/xfrm_interface_core.c
+@@ -869,6 +869,9 @@ static int xfrmi_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct net *net = xi->net;
+ 	struct xfrm_if_parms p = {};
+ 
++	if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	xfrmi_netlink_parms(data, &p);
+ 	if (!p.if_id) {
+ 		NL_SET_ERR_MSG(extack, "if_id must be non zero");
+-- 
+2.34.1
 
 
