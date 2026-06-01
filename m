@@ -1,211 +1,250 @@
-Return-Path: <netdev+bounces-293611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293612-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPeYIUxAHWq8XgkAu9opvQ
-	(envelope-from <netdev+bounces-293611-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:18:20 +0200
+	id bczlLUlCHWpJXwkAu9opvQ
+	(envelope-from <netdev+bounces-293612-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:26:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 849E761B5A6
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC66A61B711
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 729DD3006D6F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 08:18:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 764D4300F263
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 08:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23D03890E2;
-	Mon,  1 Jun 2026 08:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DDA389DF3;
+	Mon,  1 Jun 2026 08:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RkQbxeZk";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pOZnbAMW"
+	dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b="jQsUFuAE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442F9387369
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 08:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780301894; cv=none; b=uyJfC7p8kmYcJlGbBsvWsYQDpRBD71a0tFF6Uc8D6APax2juy7PpTy8dMg7ouOJP4kQ/ao9LG7+SCxsYFoEvGWkLfFTBPpzr7AATA1wXe2wFAXBlhS04UAWn2f+fU9BhyJBahVH9XG3wocPvqiagxemf9R59ZZsP+MXbt5l6/Ag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780301894; c=relaxed/simple;
-	bh=6nbwqc7SoK4Z8hnTgJZRBIB6Kjm/CRO/04DycozixlQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PVenSOQ247kYC5W+gWg+xZz4fVvuzgBnW9MdJgxr8tlThdEy8ZCtWhD3B1LJKQXSoB+6fmjkhcdC2x5cXOtp4YcBgyPqMGNjTED+M4A1Z2d5ieApzI0zYYyuTlJtskpUh8/+IfB8zn3UBSvSmHlyV86rJ3Ge3/k7X/OG/G+oDNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RkQbxeZk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pOZnbAMW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780301892;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sEJJ/20SLX0lkU+fV5cPCQW1eeTUdHRlLZryRM9YpJE=;
-	b=RkQbxeZk3Mjr6FuOO9kU4dOsXAUSODlYySS1oPxuUmHoWFCTC2Sk0BRl9QvxOYHVZd0r55
-	5kDATfQl6oDrciVnyx5z9TcjJX1QQ6gYMhbRWdszBOyGnW29wUtvK9SfGdRIf1YZNprqdO
-	qDY1tPTbMgF4QyUAAlmcxtrYzj+MLmo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-N96ey9QkMRmnBC-NDdgVGQ-1; Mon, 01 Jun 2026 04:18:11 -0400
-X-MC-Unique: N96ey9QkMRmnBC-NDdgVGQ-1
-X-Mimecast-MFC-AGG-ID: N96ey9QkMRmnBC-NDdgVGQ_1780301890
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-45ef0af9517so2459340f8f.3
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 01:18:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE53638887D
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 08:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780302399; cv=pass; b=Wb7gmfq9oUdR5up7Ql1nSU62ykkdCOMWFCNXNZjam0ws9jmexuhkd8Wwfd8KoeZrr3mCjWpCM78pmAnA5/37ztZbU1rG/LnwKcXrmj9kr5H2i4vtSOSaX2jMh5/5xL2LFEkWQpGob22PTjxVS5TSVvE0FiqRe1VsZ5L5TkmUFLw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780302399; c=relaxed/simple;
+	bh=rTpz9XB4u7oVrgD+xlX9MxcizZpCPXWTIaEPl24OhKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Easjo85W8n2e4ZEUEB81k2MTU/cHWsgO8/4iAjloz3hK010IwY7+rr8hZeB/It0PDzcnbDbmc3xLbtRyCAt6In1nzOOi/mG4eMU4JrFpW1KUnD7OnOdETf7qMoieYwPPVPNtrAFAZAD05+S0SxGyVLrclvKQ6+tM7GzCOEdfQd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=jQsUFuAE; arc=pass smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8419ab3a297so3007914b3a.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 01:26:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780302396; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gEW1NmK7Co30zND35OxhJuepjvv30/oyT/l75jGuA+NYMumcy3LJHyb2RhuFUFCp18
+         tmgzQU3ra4kdlxce0ZtlLpe1NaYlI2tfUiB+9YXigUWRdYHGevSuRoQqKC7sfK8OlA0r
+         nIBvfQQuzkCPYg91A639Jgxg5wRpm20lvXZHn7lpy+1/zz6rM5tuQOVUkMqTUv4LUnJt
+         89uG5r3LPrQmWJlQSI3lk1s5awQ0ZPhO9L2+z8kYtHcuxWVnyQULhTstASqu4wthbelJ
+         qc5Ek0Df1YUenY81HozD7e/sV9br9u1mh04l3Tw6OkK0ZlKmkaweila6dXejMeiTXHbv
+         47Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8kXinw/e+owotkd2EPS20C4MJ1Z0/naQ3L5ySeyJKio=;
+        fh=lHH5UxlI6QpuRMa2e0O4FidJXT2wDgkl1d+ppxyp5IA=;
+        b=GiHqJ6cXKjz7rbfxOEiFojzyXzOWX67hkwYOg8vX+XeT7S1qv2e17fV460p7ppknUo
+         0cnAPFe0QXR9NAAuD6i0Hl0I28wnrX+85tipA2RjLph8S1s5ZA/b1xqKzrDwZXG7j2kf
+         930p6ZzTUV16dp7JT7pLUoc5sC5keIYp5fN7EW4Jkzf5Zipnz/KJHPsdqk4dB6JUQVrQ
+         obEb9uOuOFG8xveJDkyEefhwaiMdhJ1nwVV9sqBVEf+KfdX9xgYCGAjme+StJqorCKUG
+         LQUaDrAcnVao6uuL9tUrk/MyP0OQ/RxWYFZD9TxlhKLjYwkUarLmGVGCacRhy051Sl84
+         oWJw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780301890; x=1780906690; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sEJJ/20SLX0lkU+fV5cPCQW1eeTUdHRlLZryRM9YpJE=;
-        b=pOZnbAMWmxMvOEwczpaWRk17yId07Pvm3XoEr6//ksaFl48F3dmcBgU5k3qOEOODcq
-         5aF7iR8h9bQsro44pXTqS3PAj3MALmXy4/chAadWwr6FP3if22F2umHQNOt+QlgAm8V4
-         M+e6jRSd9Nu8XGNxynuHKMZHsdwj9+4oo9aFDZmJljKrWGm1gTa1R7BQDRZcBI+TVAKT
-         pAOwMtaqI8ii511oR+qy3SJBhQmPvsm6mRRllAJiRD5Ah8pADjRJr8bqYh4PqpFTeZ2p
-         jsITG9Eb9bGxGK0P6HDA7CImtPfCYJ087zroo8r158HYlnCN7UUYZASYoaMh9i32hLMe
-         6WZA==
+        d=mojatatu.com; s=google; t=1780302396; x=1780907196; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8kXinw/e+owotkd2EPS20C4MJ1Z0/naQ3L5ySeyJKio=;
+        b=jQsUFuAEdpr2nACAlTavbgC3pV9jONXj9U2dyXGnj72aNd9sFmoSxOvoavYtYiBxyh
+         FQvyDhMb0ct5EdR/vU17J08c1enSPoSuq0B0GMZgZiOMShmzJysmysft3NaYSMRmpnTH
+         z2vZRr1/W584EuYZs6+f7F59rGVsaGILU0+io=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780301890; x=1780906690;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sEJJ/20SLX0lkU+fV5cPCQW1eeTUdHRlLZryRM9YpJE=;
-        b=L3OenESheAGcaVyfkGJWw8WXy65Fup1sDMr+7oT5QvmBs4J4GgHvWF85KzEtzXSLmC
-         BZWS8uXNo/hnMqhSMU7Hrdj1Te+l7T4lClAjmn21pcPnHCn42h+BDYNuQwwAFLfsCI/e
-         mn7nyqJCKRptqXgFMkbqkBgvQB+7B//+zmDJ5fkLZCBe7XksqDAp8xjvc9Vsq/QJQeVK
-         jylLNB2GzMa4aWBj83Eq3pANnwVjEYlrlHKyNNv3suLuNfzFKhYOpvl9hdM5PeIdXB2p
-         jX1ocZV1n0s3+95eyFDu/ipBXR3gIFQQUME5nByYDtEYTmwIohWv/hckmL2UEEQkLKip
-         U12Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/h8FxASNlckmesCDLY/wFZGuCohtERXFt3j/TIRBx66UYqwZ5P8E9HpF03zJfwiV+wstExM4s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3feE/ExGEmXu7Vx84AN4+kbT6DqHkTEXB1Ddcx2NCoLrIKNBn
-	EnUTERrgVZmOCohMpx4+qSydP4Nk4mNxSlFaOCd77g1yPp3qBpsqgGzx7HwfaDJyQg4n9P1ZMxr
-	myGGXfZckualOTcPB9WQrfq53aWNVA+02M7AqGVHFf7JeCwumzgJXLemt7shsO1JzMQ==
-X-Gm-Gg: Acq92OFKbx3+LVm+zejk0HDaS9s145P2ZZWG2bQaoqEeUK5AF1RFfFAWBb9Dn8hhl7d
-	hvp3MjgaMOZn8hDoKqi9jnQwWTShrmDVcTf2qdd7BnfoiJG0DPAqeg+dPmTWfnHUHmiQmjQMMtq
-	OWd+4/jVFmTt6r6ROdt7ybjsja9b2duCO/AQ5w95qrKcRAwyt27oqEeUsA6WWXa3WFysw0Jyvpx
-	MQGvp6CsiBjY+gPEPVBfAmG6IAdDjgVLqcETjOyG5sf1QganmfO4M+Ep9nAdsUG6UBJuihN0TaT
-	XxaqIq2UyfiXKejLG6QQ29QBI5JJ1wLjQr5tFNVWEGi3i0Z1rsu+bSlRi14G4Q3ffVP+5YTizoU
-	yC3RY7nVaIpSwSTpjVvbais1kayhM4Hzwn80cVHq8RdzueNTjeW5kFumEEkUaL8mdYYxw
-X-Received: by 2002:adf:ea85:0:b0:45e:f302:95b with SMTP id ffacd0b85a97d-45ef6b8b285mr13537452f8f.37.1780301889926;
-        Mon, 01 Jun 2026 01:18:09 -0700 (PDT)
-X-Received: by 2002:adf:ea85:0:b0:45e:f302:95b with SMTP id ffacd0b85a97d-45ef6b8b285mr13537384f8f.37.1780301889474;
-        Mon, 01 Jun 2026 01:18:09 -0700 (PDT)
-Received: from [192.168.88.32] ([169.155.232.197])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34c3081sm23670057f8f.15.2026.06.01.01.18.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 01:18:09 -0700 (PDT)
-Message-ID: <479e07c4-256e-4b34-9b62-bc6fd31438f5@redhat.com>
-Date: Mon, 1 Jun 2026 10:18:07 +0200
+        d=1e100.net; s=20251104; t=1780302396; x=1780907196;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8kXinw/e+owotkd2EPS20C4MJ1Z0/naQ3L5ySeyJKio=;
+        b=fIRdzZCvXSBvzgIy2UEdhkz+CEoBuM4K9hbIyR+WIMstJYHDD7BISOUmrgjFyEYCAb
+         CeCx9x8LlGw6VqbNWnpPzA4E5t14n3I6FpIvNJ9xR6tD11PWOYqQIId4zETnM5LfKK5V
+         E1kN2NVJiHG0Jt+yLJxBMEz8/uSR2++dqXFmMh0E1DjoXhyc+QPqwmITs1r9r35SxD9i
+         drD6N2y/wuf4bx0Fpgd2Zi56WIcG3La/fbUJ4tfOCPN7rwq4XTg2psdBwdIHAPVao5Md
+         6KchsGyYDPsa6fZrm2oFrTsQIkcC4Q5Xi5QbddeHVDMWSNJRkDOYvlYeA1L9onXAvIF3
+         yatg==
+X-Gm-Message-State: AOJu0YzRxaBrGe/ZsfTj+LOgXeeqKkW+kID0pxgeJoAzE+29BwqFCtCf
+	T46uX2b7rz1AXgMvoppR5mkYxbu29cYUc7MyLo23TQqb/VLzsskL+bCnJEv0XmFrwHHDWpFpQ7U
+	SbsERlHHKaJURSH202jyU2haw1fn5Sk8PEuCqPk+j
+X-Gm-Gg: Acq92OGwRJn3NzG6orZPt1v/EWTrVLbxK5RqVjPB7igIJ6mTDZTpYJtnClIowhUyKJ9
+	+NSQzA3gikwtmpWgbMVPIYbPKJ/NC2Nnfy83zQSK6d2viRkSo3wh8mTZWKkcggZtfdsgsSnMLMh
+	e4JxQ0ifFEtLE6D4vj0vwIUN+Wn9MSEJPj5eeE8N2L1CG72mBM7Tz1Sn2intLm7wc7U5EnLwz1c
+	quN2G84v5O6yXpjK+rCJ0k3st63AzVbzHbXxLJR0r6/uXgqKaBQhJ3/YbtHarx1M87kS0AHcMiq
+	AfYKkHj58DtIRAgSyQw=
+X-Received: by 2002:a05:6a00:1745:b0:842:57e8:1bda with SMTP id
+ d2e1a72fcca58-84257e83a0emr2259511b3a.19.1780302396146; Mon, 01 Jun 2026
+ 01:26:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v7 0/6] bonding: 3ad: fix carrier state with no usable
- slaves
-To: Louis Scalbert <louis.scalbert@6wind.com>, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, jv@jvosburgh.net, edumazet@google.com,
- kuba@kernel.org, fbl@redhat.com, andy@greyhouse.net, shemminger@vyatta.com,
- maheshb@google.com, jonas.gorski@gmail.com
-References: <20260526084048.1696544-1-louis.scalbert@6wind.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260526084048.1696544-1-louis.scalbert@6wind.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+References: <20260531123221.48732-1-jhs@mojatatu.com> <20260531171534.6aae381a@pumpkin>
+ <CAM0EoMnKxEuexh43U7v8s3UwNfr5B=jXUQxw_fCw_tB-Li39cA@mail.gmail.com>
+ <20260531194241.7d5d7e6e@pumpkin> <20260531195218.5fe29990@pumpkin>
+In-Reply-To: <20260531195218.5fe29990@pumpkin>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 1 Jun 2026 04:26:24 -0400
+X-Gm-Features: AVHnY4J30oTNnQBTk-TRm92SP1-NWzFgvjnDB_8_SGtTmRHGng6_DsqxN8mrPC8
+Message-ID: <CAM0EoMk6kKVMrbr0dywSEMoAohtKzYv3DcLQ3Bk9zdBitn5JHQ@mail.gmail.com>
+Subject: Re: [PATCH net v5 1/1] net/sched: fix pedit partial COW leading to
+ page cache corruption
+To: David Laight <david.laight.linux@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
+	victor@mojatatu.com, yimingqian591@gmail.com, keenanat2000@gmail.com, 
+	2045gemini@gmail.com, rollkingzzc@gmail.com, toke@redhat.com, 
+	dcaratti@redhat.com, security@kernel.org, linux-kernel@vger.kernel.org, 
+	stable@kernel.org, Rajat Gupta <rajat.gupta@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,jvosburgh.net,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
+	DMARC_NA(0.00)[mojatatu.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-293611-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293612-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.994];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com,oss.qualcomm.com];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 849E761B5A6
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: AC66A61B711
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/26/26 10:40 AM, Louis Scalbert wrote:
-> Hi everyone,
-> 
-> This series addresses a blackholing issue and a subsequent link-flapping
-> issue in the 802.3ad bonding driver when dealing with inactive slaves
-> and the `min_links` parameter.
-> 
-> When an 802.3ad (LACP) bonding interface has no slaves in the
-> collecting/distributing state, the bonding master still reports
-> carrier as up as long as at least 'min_links' slaves have carrier.
-> 
-> In this situation, only one slave is effectively used for TX/RX,
-> while traffic received on other slaves is dropped. Upper-layer
-> daemons therefore consider the interface operational, even though
-> traffic may be blackholed if the lack of LACP negotiation means
-> the partner is not ready to deal with traffic.
-> 
-> This patchset introduces an optional behavior, widely adopted across
-> the industry, to address this issue. It consists of bringing the
-> bonding master interface down to signal to upper-layer processes
-> that it is not usable.
-> 
-> This patchset depends on the following iproute2 change:
-> ip/bond: add lacp_strict support
-> Link: https://lore.kernel.org/netdev/20260408152409.276358-1-louis.scalbert@6wind.com/
-> 
-> Patch 1 adds the missing IFLA_BOND_BROADCAST_NEIGH in if_link
-> UAPI header.
-> 
-> Patch 2 adds missing broadcast-neigh to YAML rt-link specs.
-> 
-> Patch 3 introduces the lacp_strict configuration knob, which is
-> applied in the subsequent patch. The default (off) mode preserves
-> the existing behavior, while the strict mode (on) is intended to force
-> the bonding master carrier down in this situation.
-> 
-> Patch 4 addresses the core issue when lacp_strict is set to strict.
-> It ensures that carrier is asserted only when at least 'min_links'
-> slaves are in the Collecting/Distributing state.
-> 
-> Patch 5 fixes a side effect of the previous patch. Tightening the carrier
-> logic exposes a state persistence bug: when a physical link goes down, 
-> the LACP collecting/distributing flags remain set. When the link returns, 
-> the interface briefly hallucinates that it is ready, bounces the carrier 
-> up, and then drops it again once LACP renegotiation starts. Fix by
-> resetting Collecting and Distributing state as soon as the link goes
-> down.
-> 
-> Patch 6 adds a test for bonding lacp_strict both modes.
+On Sun, May 31, 2026 at 2:52=E2=80=AFPM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Sun, 31 May 2026 19:42:41 +0100
+> David Laight <david.laight.linux@gmail.com> wrote:
+>
+> > On Sun, 31 May 2026 13:25:36 -0400
+> > Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+> ....
+> > > >
+> > > > > +                             goto bad;
+> > > > > +                     if (skb_ensure_writable(skb, min_t(int, skb=
+->len,
+> > > > > +                                                        write_le=
+n)))
+> >
+> > You've completely missed that the above has to include the write_offset=
+.
+>
+> And I've missed that write_len isn't the length you are going to write :-=
+(
+>
+> This version is unreadable....
+>
+> A few one line comments can make all the difference.
+> I put these two in for a reason.
+> It took some effort to find out exactly what they did.
 
-FTR, the more I look at this series, the more I think it should be
-net-next material, but I'm also ok with Jay's judgement about the actual
-target.
+Double check this so i didnt miss anything you said.
 
-Still I think the sashiko's reported issue on patch 3 is real and should
-be addressed.
+--------
+diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+index bd3b1da3cd63..1607aaff3ed6 100644
+--- a/net/sched/act_pedit.c
++++ b/net/sched/act_pedit.c
+@@ -394,7 +394,7 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *skb=
+,
+        tkey_ex =3D parms->tcfp_keys_ex;
 
-/P
+        for (i =3D parms->tcfp_nkeys; i > 0; i--, tkey++) {
+-               int write_offset, write_len;
++               int write_offset;
+                int offset =3D tkey->off;
+                int hoffset =3D 0;
+                u32 cur_val, val;
+@@ -447,23 +447,16 @@ TC_INDIRECT_SCOPE int tcf_pedit_act(struct sk_buff *s=
+kb,
+                        goto bad;
+                }
 
+-               if (write_offset < 0) {
+-                       if (skb_cow(skb, -write_offset))
+-                               goto bad;
+-                       if (write_offset + (int)sizeof(*ptr) > 0) {
+-                               if (skb_ensure_writable(skb,
+-                                                       min_t(int, skb->len=
+,
+-
+write_offset + (int)sizeof(*ptr))))
+-                                       goto bad;
+-                       }
+-               } else {
+-                       if (check_add_overflow(write_offset, (int)sizeof(*p=
+tr),
+-                                              &write_len))
+-                               goto bad;
+-                       if (skb_ensure_writable(skb, min_t(int, skb->len,
+-                                                          write_len)))
+-                               goto bad;
+-               }
++               /* Check that any needed headroom is writeable */
++               if (write_offset < 0 && skb_cow(skb, -write_offset))
++                       goto bad;
++
++               /* Ensure the skb is writeable upto to the end of the area =
+to be
++                * written. Note: that data is pulled into the skb header
++                */
++               if ((write_offset >=3D 0 || write_offset +
+(int)sizeof(*ptr) > 0) &&
++                   skb_ensure_writable(skb, write_offset + (int)sizeof(*pt=
+r)))
++                       goto bad;
+
+                ptr =3D (u32 *)(skb->data + write_offset);
+                cur_val =3D get_unaligned(ptr);
+--------------
+
+And please _no more_ changes after this. I will only make these
+changes if the bots complain about something meaningful.
+
+cheers,
+jamal
+> > >         /* Ensure any needed headroom is writeable */
+> > >         if (hoffset < 0 && skb_cow(skb, -hoffset)
+> > >                 goto bad;
+> > >         /* Ensure the skb is writeable to the end of the area to be w=
+ritten.
+> > >          * The data is pulled into the skb header. */
+>
+> -- David
 
