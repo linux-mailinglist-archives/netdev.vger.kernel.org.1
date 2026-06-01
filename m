@@ -1,241 +1,201 @@
-Return-Path: <netdev+bounces-293899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLDcEqHfHWpsfQkAu9opvQ
-	(envelope-from <netdev+bounces-293899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 21:38:09 +0200
+	id wPkZNsPkHWpMfwkAu9opvQ
+	(envelope-from <netdev+bounces-293901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 22:00:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4703624B65
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 21:38:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C609F624D7B
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 22:00:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E43D1300D917
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 19:38:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DC13B301402B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 19:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDBF37DE96;
-	Mon,  1 Jun 2026 19:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFD43DC87B;
+	Mon,  1 Jun 2026 19:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cS+XbDN3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPPf1HSE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304F8380FF6
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 19:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D035E3ADBAF;
+	Mon,  1 Jun 2026 19:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780342684; cv=none; b=EqixUIgBMab7PXYzxl5c0G5BYhSNKy/HKWsqAHbfuErPZr5kqmxkS/OnQT7ZNj8kMSFscIbjaJFJH9XNtKdwIEHlz7SgFWB9pRtkDcau5N+A/W/g0tbBAa5yFdrIJa69UkAlzvrNr1Ur2vEslrbBrg0JI/J2j75G+vawKIaGqIk=
+	t=1780343993; cv=none; b=d/14E24sRTgRlzKDWGaFYz0V+XwfPEEaJwl5JrCtVY2iNwg69bHOkp5icX6CPL93fSDtqtgTfv+O0le9Lk2Tu2ljUt8f6gnPbx3GPBMa+ExV5kR2QiK15egkD5xDsLg+3NLRow5HNOTcQ/oGtpZJbT7wCLyxJ7sgryM1yTQCJEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780342684; c=relaxed/simple;
-	bh=yn8QoO6B++RiDRZWpnVl7nEGtcOXXjzMEp/aTYMO544=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XFqf26JU89C9wEth6CPqNin9u0NulqHlOinDXVvuhSvc162j6ZrI7WIdGefNrg320+2+rSCQnxycO9xpd3sQ/AzP7ROtPVndpqSMnbhoK063KF8v/fmUUqs5LMgA/ju6HaagkqvK9HyulQ6Oey/mWLZus/G7AoNOTdMn6hRtTZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cS+XbDN3; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-490af320e2aso6227755e9.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 12:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780342682; x=1780947482; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=koHEWg7rZ9rnh8BMaCzEjh5C53SqOp62+G2T65KEvcg=;
-        b=cS+XbDN33dNX6QGBXctU6aqa6dzqZGTN9FMCsOxo67/jab17BYGzXBwozPFU8Nt3yJ
-         njLbQBnJstHsHJo2l56WkWNUtWtTi88oGOk/iVriakEqUBHu7p1DfNtv5ZrXnWrdGulU
-         vadYC4H53KhMJufNbmbKARd+iz4/FUF+ff/s/7cRTL4XOc1VuRYpY46vHMIAwhpO9gxV
-         XnRp+qWxNjZUHBDcmrOAmVe+/ML4wcpBjWsJQT3Xf1nIfWTCdTVJuBzdSZqFpKOSuJt7
-         cLOZRxuQHo8FZi5w3KfCeuuJe+bgf//VMx1Z8vxmhH1sbonFynJhdRSbv7x8CJKFmiBt
-         Q/Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780342682; x=1780947482;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=koHEWg7rZ9rnh8BMaCzEjh5C53SqOp62+G2T65KEvcg=;
-        b=p2ooXt03jdCJbA81j/sb/5XNfnFUYZ2gZ8m9q9KYAi9AK0BT3IDUTuv1g5ey1+QSOv
-         YpnMLCUVIvxjPdqCWORPt18kKEp8LsNMmm2Nb1WNotPvjrRbdXh1u2greros77wKfYJm
-         M+Usev8980MBCqwp9LukV+ABNs8Kge5pe/6ajfLmhOVa9P+cWdGo0wCDzhkAFNnYDrTO
-         Bp1Nr5eJO8Q5g7eCoFqvCkEtYxFutx5N/5K0yz6CGdo7wR+ba/ZjuZX9QEoku3uB5ao9
-         pRjzsDTtG4TXDTUPKcLLxB35CY++wZYatb/8BnouF50vs7GpXgCOOK3b1fr5ed0mVkwU
-         FzhQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8K9jpmdKtY5TAjW0sReEklt0jUjRzx1amE3r/fR1zSyS4d4tUpF1Webq/JfUv8dwvoLfn5TeA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv1DHkfBJsl7Bwt0YRJpXwHW5SJi7R6TdyEoOzP0fkAxWvAQ0t
-	ocW54L1VJKprDoZgE4qB23kjeJXma02mbyrKboMobRl5jNlYpvWLroBA
-X-Gm-Gg: Acq92OHgJR6aVxxmzFJWAId0JxyO5D8HBKZMAQnq+MdN4CATbRLEMIsgfWXQK5Lsalg
-	LfefGiis3fFPa9Y2jjb1ouJgdxRYvWbsNGOdfRH0dRhS+zsE1GHGDzsPqybEayabjxKQsomrhXB
-	WbwfJMQTFslzpQmsxG6EY2sgdQZ5leAP1SDenAUusgBbDymgIr2hI7lwEGSHD+dOH6a6RcYsl1z
-	8A6vc3UR0g+ClqO24PWIImdBdACcv4OKfyj4ZFkVbP6vIZ44CDMcKVzfnkHvAXRNjuaa9+EUgc7
-	+ZHqc4iq89TOMuXUIYaPmkbRUxTgFzZ32pCpj8ImuVaqhS2fjuvddECNbBgd/UMcC4hwfRycwqV
-	WOCOd0+J6N7NJ5aQ9ozGxn2Vp1Z8eECjCvshQfM5bepSgkhyN2uphqwVHtCI58UpfbDONXvD5ii
-	cXKP0bTfnFXuLmP4bCXw54WALqdLaOLoKkQbpJXWk1BNb0f6xSKKbl00Epb+YNAkV+4HpTUT5BY
-	v4XkkRjCIWmZtf62OrOwA==
-X-Received: by 2002:a05:600c:3b10:b0:490:b0df:9eac with SMTP id 5b1f17b1804b1-490b0dfa72bmr15593725e9.3.1780342681385;
-        Mon, 01 Jun 2026 12:38:01 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd1f:f500:f867:fc8a:5174:5755? ([2a01:4b00:bd1f:f500:f867:fc8a:5174:5755])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b0e20bacsm12546705e9.6.2026.06.01.12.38.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 12:38:00 -0700 (PDT)
-Message-ID: <5b434d06-22fc-4f1e-9122-05261f1237ef@gmail.com>
-Date: Mon, 1 Jun 2026 20:38:00 +0100
+	s=arc-20240116; t=1780343993; c=relaxed/simple;
+	bh=mqezQcqx9istaPeCmmXZaMwR719orDM1w23ry+SfsJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XhtjzjjnZCvHpCBSexyKH1ukDjjZx+ob50B13ShpY/D5MJad40tq/6eMrxGF/3zDBprT/rTURA2QSZD9uQUvOTuGvJwC57gwawuTZuuAYsdCa3e9mMUCSNvdPKQhh1GFxwomn2ucfeJrw86MECp49KuOcRvKBd0ZbxrwGHbmsiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPPf1HSE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D6831F00893;
+	Mon,  1 Jun 2026 19:59:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780343990;
+	bh=XNCn/hiuq2TSQD0/7268qMBjDGPldqx55TcTTgULBQo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jPPf1HSEtTmrOkKgXG7yZ4L4yWlXriv9f4UInH3EUjfr7uRqEixqsswHEVJD66e/i
+	 UYMnZm3AwHRFYgRV2ih8KtH9UMVsaXegF2blXd/AV6FabDLb+h4l5NmMOw9ZVrD++N
+	 KcX2jHWXOHM02LWFJzDj4MfNwHTR6omd404TzjNZvpI6ZIAf59Yvhv/clTseKbIOtO
+	 ETM1funcq4ukCXv67pvcGJzgYBqL/gNfgi123wCjIaYqeaTkJBGmaBAvvqiI5vVIDR
+	 F9G7b/Sg9jjyGT7K98XQKfJ06MeRLxen4rImVcQChLpFwv+lALs23w52eL46/a7lq6
+	 WVHwgppy+tSkw==
+Date: Mon, 1 Jun 2026 12:59:49 -0700
+From: Kees Cook <kees@kernel.org>
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>,
+	Pengpeng Hou <pengpeng@iscas.ac.cn>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Corey Minyard <corey@minyard.net>,
+	Gabriel Somlo <somlo@cmu.edu>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Hannes Reinecke <hare@suse.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>,
+	Tiwei Bie <tiwei.btw@antgroup.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	"David E. Box" <david.e.box@linux.intel.com>,
+	"Maciej W. Rozycki" <macro@orcam.me.uk>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Vinod Koul <vkoul@kernel.org>,
+	Frank Li <Frank.Li@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Aaron Tomlin <atomlin@atomlin.com>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Georgia Garcia <georgia.garcia@canonical.com>, kvm@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-modules@vger.kernel.org,
+	kasan-dev@googlegroups.com, linux-mm@kvack.org,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net, qemu-devel@nongnu.org,
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+	usb-storage@lists.one-eyed-alien.net,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 00/11] Convert moduleparams to seq_buf
+Message-ID: <202606011259.CE6E74CE@keescook>
+References: <20260521133315.work.845-kees@kernel.org>
+ <88c5ca1d-eeda-4023-bc7a-397b92780db9@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v6 12/13] selftests/bpf: Test using file dynptr
- after the reference on file is dropped
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- eddyz87@gmail.com, memxor@gmail.com, martin.lau@kernel.org,
- kernel-team@meta.com
-References: <20260529014936.2811085-1-ameryhung@gmail.com>
- <20260529014936.2811085-13-ameryhung@gmail.com>
- <29eaa2d6-784b-4a12-acb3-099052ba0933@gmail.com>
- <CAMB2axOb0Bi9Xn5RS1J+n0_vdD2oFygAa1xCH6O3JR4JJfihyA@mail.gmail.com>
-Content-Language: en-US
-From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-In-Reply-To: <CAMB2axOb0Bi9Xn5RS1J+n0_vdD2oFygAa1xCH6O3JR4JJfihyA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88c5ca1d-eeda-4023-bc7a-397b92780db9@suse.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	TAGGED_FROM(0.00)[bounces-293899-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,iscas.ac.cn,nod.at,cambridgegreys.com,sipsolutions.net,minyard.net,cmu.edu,redhat.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,acm.org,ziepe.ca,ideasonboard.com,google.com,suse.de,hansenpartnership.com,oracle.com,arm.com,linuxfoundation.org,rowland.harvard.edu,linux.alibaba.com,akamai.com,antgroup.com,orcam.me.uk,infradead.org,linux.ibm.com,alien8.de,zytor.com,atomlin.com,linux-foundation.org,canonical.com,paul-moore.com,namei.org,hallyn.com,vger.kernel.org,googlegroups.com,kvack.org,lists.ubuntu.com,lists.infradead.org,lists.sourceforge.net,nongnu.org,lists.freedesktop.org,lists.ozlabs.org,lists.one-eyed-alien.net,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-293901-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_GT_50(0.00)[98];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kees@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E4703624B65
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: C609F624D7B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 6/1/26 7:42 PM, Amery Hung wrote:
-> On Mon, Jun 1, 2026 at 5:05 AM Mykyta Yatsenko
-> <mykyta.yatsenko5@gmail.com> wrote:
->>
->> On 5/29/26 2:49 AM, Amery Hung wrote:
->>> File dynptr and slice should be invalidated when the parent file's
->>> reference is dropped in the program. Without the verifier tracking
->>> dyntpr's parent referenced object, the dynptr would continute to be
->>> incorrectly used even if the underlying file is being tear down or gone.
->>>
->>> Signed-off-by: Amery Hung <ameryhung@gmail.com>
->>> ---
->>>  .../selftests/bpf/progs/file_reader_fail.c    | 60 +++++++++++++++++++
->>>  1 file changed, 60 insertions(+)
->>>
->>> diff --git a/tools/testing/selftests/bpf/progs/file_reader_fail.c b/tools/testing/selftests/bpf/progs/file_reader_fail.c
->>> index 0739620dea8a..d5fae5e4cf9a 100644
->>> --- a/tools/testing/selftests/bpf/progs/file_reader_fail.c
->>> +++ b/tools/testing/selftests/bpf/progs/file_reader_fail.c
->>> @@ -50,3 +50,63 @@ int xdp_no_dynptr_type(struct xdp_md *xdp)
->>>       bpf_dynptr_file_discard(&dynptr);
->>>       return 0;
->>>  }
->>> +
->>> +SEC("lsm/file_open")
->>> +__failure
->>> +__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
->>> +int use_file_dynptr_after_put_file(void *ctx)
->>> +{
->>> +     struct task_struct *task = bpf_get_current_task_btf();
->>> +     struct file *file = bpf_get_task_exe_file(task);
->>> +     struct bpf_dynptr dynptr;
->>> +     char buf[64];
->>> +
->>> +     if (!file)
->>> +             return 0;
->>> +
->>> +     if (bpf_dynptr_from_file(file, 0, &dynptr))
->>> +             goto out;
->>> +
->>> +     /* this should fail - file dynptr should be discarded first to prevent resource leak */
->>> +     bpf_put_file(file);
->>> +
->>> +     bpf_dynptr_read(buf, sizeof(buf), &dynptr, 0, 0);
->>> +     return 0;
->>> +
->>> +out:
->>> +     bpf_dynptr_file_discard(&dynptr);
->>> +     bpf_put_file(file);
->>> +     return 0;
->>> +}
->>> +
->>> +SEC("lsm/file_open")
->>> +__failure
->>> +__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
->>> +int use_file_dynptr_slice_after_put_file(void *ctx)
->>> +{
->>> +     struct task_struct *task = bpf_get_current_task_btf();
->>> +     struct file *file = bpf_get_task_exe_file(task);
->>> +     struct bpf_dynptr dynptr;
->>> +     char *data;
->>> +
->>> +     if (!file)
->>> +             return 0;
->>> +
->>> +     if (bpf_dynptr_from_file(file, 0, &dynptr))
->>> +             goto out;
->>> +
->>> +     data = bpf_dynptr_data(&dynptr, 0, 1);
->>
->> File dynptr is always read-only, so bpf_dynptr_data() always
->> returns NULL. Verifier does not know this (not sure if we should
->> address it). Maybe it makes sense to remove this call or substitute by
->> probe read, just to avoid confusing example.
->>
+On Tue, May 26, 2026 at 08:53:06AM +0200, Petr Pavlu wrote:
+> On 5/21/26 3:33 PM, Kees Cook wrote:
+> > Hi,
+> > 
+> > I tried to trim the CC list here, but it's still pretty huge...
+> > 
+> > We've had a long-standing issue with "write to a string pointer" callbacks
+> > that don't bounds check the destination (and for which the bounds is
+> > also not part of the callback prototype, even if it is "known" to be
+> > PAGE_SIZE, which sysfs_emit() depends on). Both moduleparams and sysfs
+> > use this pattern. As a first step, and to test the migration method,
+> > migrate moduleparams first.
+> > 
+> > There are 2 "mechanical" treewide patches that are handled by Coccinelle:
+> > - treewide: Convert struct kernel_param_ops initializers to DEFINE_KERNEL_PARAM_OPS
+> > - treewide: Convert custom kernel_param_ops .get callbacks to seq_buf via cocci
+> > 
+> > The last treewide patch is manual, and may need to be broken up into
+> > per-subsystem patches, though I'd prefer to avoid this, as it would
+> > extend the migration from 1 relase to at least 2 releases. (1 to
+> > release the migration infrastructure, then 1 release to collect all the
+> > subsystem changes, and possibly 1 more release to remove the migration
+> > infrastructure.)
+> > 
+> > Thoughts, questions?
 > 
-> Thanks for taking a look at the selftests and pointing this out. Does
-> replacing it with bpf_dynptr_slice() make sense to you?
->
- 
-That'll do, but bpf_dynptr_read() is more straightforward API for reading file
-dynptr, as you always have to copy the data.
+> This looks reasonable to me. I added a few minor comments on the patches
+> but they already look solid.
 
->>> +     if (!data)
->>> +             goto out;
->>> +
->>> +     /* this should fail - file dynptr should be discarded first to prevent resource leak */
->>> +     bpf_put_file(file);
->>> +
->>> +     *data = 'x';
->>> +     return 0;
->>> +
->>> +out:
->>> +     bpf_dynptr_file_discard(&dynptr);
->>> +     bpf_put_file(file);
->>> +     return 0;
->>> +}
->>
+Thanks for the review! I'll get a v2 prepared with your notes addressed. :)
 
+-Kees
+
+-- 
+Kees Cook
 
