@@ -1,44 +1,84 @@
-Return-Path: <netdev+bounces-293725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNXxGHN0HWp8bAkAu9opvQ
-	(envelope-from <netdev+bounces-293725-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:00:51 +0200
+	id aLumHJN1HWqebAkAu9opvQ
+	(envelope-from <netdev+bounces-293726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:05:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F1561EBC8
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:00:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CAC261ED31
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 14:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4F5C13009098
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:00:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BB9C3301137A
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 12:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE35368D6B;
-	Mon,  1 Jun 2026 12:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB1435B645;
+	Mon,  1 Jun 2026 12:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CYvMGZ7I"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A736348C66;
-	Mon,  1 Jun 2026 12:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8C1377561
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 12:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780315249; cv=none; b=DdPKamJF6OT6/Zf88mvqxGjCZwWCZxa8v2kxHBQbFtVTa6zV6TDV8UDbK05HVgxgnLHkb7Z4vJPwDQZC24X1huD7yInQFMMa/+biuehNPLqCe4VJ8q8RfpYTKAn+YWrZAuaLFGUa0nu6ueu5nRokPhlfYSLqLnzXCW1xE4JbkDg=
+	t=1780315510; cv=none; b=kwZc41W+oq8QXyTpxDvq3kJarGBgtotJWr+R8tanSSuobaKCeGglKYHmF9o+0CklhNFh7pAfaNN2EmG1kDvo/njmjLmoeG1AMxHE5zJsGkG+8IHxRDwF75KlfhW8Zq0fG9Gp7Sdd69lZgPnGpORPMqMngUVuZVEdLKaU0S7Wiqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780315249; c=relaxed/simple;
-	bh=s//3fKl0E7I5s8qjeLdZk2A8Doabxg/plPyKTj/66G0=;
+	s=arc-20240116; t=1780315510; c=relaxed/simple;
+	bh=DVPrzP17YUC2/4Q8TVocnAfB26OhfA7HKz6X7OLh/G8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tWDiSK+tkFfBmhVacwYWA9ewNJqfkbKxcpR6fS1HN2zUb6bKdw03J8g4WDTt8LC9irJNeKQegaky+1pMTMzlVbv5eS28zDNxOxIdQ7ibGMzBUc9Um5vGbnInAsEGHaiU5TVNnHUNqe5Ydpi31Gy40v30OHt/ipQOOP1dUxUoyZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.245] ([129.217.186.245])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 651C0IPl003115
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 1 Jun 2026 14:00:18 +0200 (CEST)
-Message-ID: <db5b7f7e-135c-40f0-a740-057bc6623e6c@tu-dortmund.de>
-Date: Mon, 1 Jun 2026 14:00:18 +0200
+	 In-Reply-To:Content-Type; b=s7YL4rr4JyuJaN0pE5kHYb+pP5TQYyFTIgzpua7EtAYCQuRlzSDz9bx8U8g210vJ0jZoRm+Aau14VblZ2cgMWgULHx0/a9wgn1mwBa9JXefsMP5GiNkBLEuqmaea+iaB5reWsh5VosHWhqgZBknklunIGJU9t/d5QlsKqrP/WEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CYvMGZ7I; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-45fd461e4a5so1219958f8f.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 05:05:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780315507; x=1780920307; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w+QgZSYAIQbT1ounnPkdiL3vC6WFojP4CBfbK3LRjyY=;
+        b=CYvMGZ7IVgo8b2n2veePC/gPBQ0KWVmbE/tW8wt7epO4nfctaAsYGHC5PTQcdONGky
+         0/aKXaUOjlqa7+wzqt2sDO1iHzWk3qaJe2rs6DRZgGnWwpGebiJMHSfzxLEwE/5wOZKg
+         bYlSSUKG3IjFzF9jmNzJTFCpIJ0ftaBJbB71jH9wi9I1GGXSqkSWMCNyLCuyCVR/qWop
+         KSpbSAVWHZFrWG9yzJMEloNf2Zgg/Tgaf8/Ywsi66cRlxtOndSf/UUxHXylRm4hTOyvv
+         QjxmiDnaT6o62Qs4j5sl0DdTsBGuAoqanr0bBvTITge6G/DFYz5ZAZPC5pUHeg3sX+X3
+         GJRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780315507; x=1780920307;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w+QgZSYAIQbT1ounnPkdiL3vC6WFojP4CBfbK3LRjyY=;
+        b=QOUO608XzQZ67nvtSrSn6OsAmU6vlcbvmqrXMvjdR7quQXSIhOenDMU5bbzx9y1YP7
+         F+Jbzoo8v8vIia6Ntmo0vl6CW/QYQmRY58asO1mtrceiEyYawvmMjG6F2BZh1W6m6h87
+         Bez7bQSb6ztplLqyFM/H+9b6rGvYVN3oACTG4wprQdCdXZqOnYomzxBQvOkDpy1NTR5Y
+         +YUItnq0ePZl7oWN6/LqxRik9MxzeWQtiZcyxJddxhs+6Of2lOudPhGhuAc0enY0YJJU
+         FPjAc3e0r/FkzGLGD3Jh5iKJPh+G4GTgGuIhtlHiQWhZzIDd7xUNbyeZp2vic6fg9hab
+         9iEQ==
+X-Gm-Message-State: AOJu0Ywv6bprXLO6IoYiZLXUXc+0Wkfsj2wuQHzNLCT5/o9lNLEYuQhv
+	g6AMsLH/JpainW/37BKJP8FDCKreRsB7qtEq4+TpvoWYEN8lUdo61Z6U
+X-Gm-Gg: Acq92OHWG1O4zB40NYQM8oUEXqBEO+QzRIV63z2l21jX6IU54SG02jVq1Cy9RHxSvci
+	vVGmuQ3P0S9fEnGJbBPhx2/CEq3Y1s6MOlrX4sRayB//gRDwDhka1ckgqMrnxuiGpLymJhqhbgF
+	DX/nLwrfFMzrX3Ws/omRhQBu//zy3iXMYTzS6U+xx+hy1gIxBCqBOZX+rqrElS9uNGOseM8gspJ
+	ZTgb+hUoNpTyEFzD/41sZ9iBQ8D0zLYAgHg4uopW7YB6qaLVn7okqNoQkbFAg8dDXtstbeN2m0o
+	HYqYG8psmZNtigBWgBu6rSyrHW2aFRi2M+0fax2wZVoc8QGJjrvc3jNDDtXpExtRJSDkEJIagrt
+	kZbTC6oMiBb4LNaPz4BkXmZIHhZIbtSU6Dfwq+RhL/Mxopyn9qxA9zs9lDW3oO42CL1kJgCMNG1
+	RNWTjQCk1WaUgdgjoWimNgnnqKjaVB8x5L7u7sU8ldMqUDpGwPUX4AMzlw+147LJ94Yl8DZwlW5
+	7ggDdncga93O2gZKWNsuA==
+X-Received: by 2002:adf:f481:0:b0:45e:e513:f451 with SMTP id ffacd0b85a97d-45ef6b0300bmr14395037f8f.7.1780315506890;
+        Mon, 01 Jun 2026 05:05:06 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd1f:f500:f867:fc8a:5174:5755? ([2a01:4b00:bd1f:f500:f867:fc8a:5174:5755])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34b7d6bsm26195159f8f.10.2026.06.01.05.05.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jun 2026 05:05:06 -0700 (PDT)
+Message-ID: <29eaa2d6-784b-4a12-acb3-099052ba0933@gmail.com>
+Date: Mon, 1 Jun 2026 13:05:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,146 +86,137 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
-        hawk@kernel.org, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-6-hawk@kernel.org>
- <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
+Subject: Re: [PATCH bpf-next v6 12/13] selftests/bpf: Test using file dynptr
+ after the reference on file is dropped
+To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com,
+ martin.lau@kernel.org, kernel-team@meta.com
+References: <20260529014936.2811085-1-ameryhung@gmail.com>
+ <20260529014936.2811085-13-ameryhung@gmail.com>
 Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
+From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+In-Reply-To: <20260529014936.2811085-13-ameryhung@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.14 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[tu-dortmund.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293725-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	TAGGED_FROM(0.00)[bounces-293726-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 01F1561EBC8
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 0CAC261ED31
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/28/26 09:46, Jonas Köppeler wrote:
-> On 5/27/26 3:54 PM, hawk@kernel.org wrote:
->> From: Simon Schippers <simon.schippers@tu-dortmund.de>
->>
->> Per-packet BQL completion forces DQL to converge on limit=2, causing
->> excessive NAPI scheduling overhead and qdisc requeues.
->>
->> Accumulate BQL completions and flush them when a configurable time
->> threshold is exceeded, letting DQL discover a limit that bounds actual
->> queuing delay to the configured interval. Coalescing state persists
->> across NAPI polls in struct veth_rq so completions can accumulate
->> beyond a single budget=64 cycle.
->>
->> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
->> setting tx-usecs to 0 disables coalescing and falls back to per-packet
->> completion.
->>
->>    ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->>    ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->>
->> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+On 5/29/26 2:49 AM, Amery Hung wrote:
+> File dynptr and slice should be invalidated when the parent file's
+> reference is dropped in the program. Without the verifier tracking
+> dyntpr's parent referenced object, the dynptr would continute to be
+> incorrectly used even if the underlying file is being tear down or gone.
 > 
-> Tested-by: Jonas Köppeler<j.koeppeler@tu-berlin.de>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  .../selftests/bpf/progs/file_reader_fail.c    | 60 +++++++++++++++++++
+>  1 file changed, 60 insertions(+)
 > 
+> diff --git a/tools/testing/selftests/bpf/progs/file_reader_fail.c b/tools/testing/selftests/bpf/progs/file_reader_fail.c
+> index 0739620dea8a..d5fae5e4cf9a 100644
+> --- a/tools/testing/selftests/bpf/progs/file_reader_fail.c
+> +++ b/tools/testing/selftests/bpf/progs/file_reader_fail.c
+> @@ -50,3 +50,63 @@ int xdp_no_dynptr_type(struct xdp_md *xdp)
+>  	bpf_dynptr_file_discard(&dynptr);
+>  	return 0;
+>  }
+> +
+> +SEC("lsm/file_open")
+> +__failure
+> +__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
+> +int use_file_dynptr_after_put_file(void *ctx)
+> +{
+> +	struct task_struct *task = bpf_get_current_task_btf();
+> +	struct file *file = bpf_get_task_exe_file(task);
+> +	struct bpf_dynptr dynptr;
+> +	char buf[64];
+> +
+> +	if (!file)
+> +		return 0;
+> +
+> +	if (bpf_dynptr_from_file(file, 0, &dynptr))
+> +		goto out;
+> +
+> +	/* this should fail - file dynptr should be discarded first to prevent resource leak */
+> +	bpf_put_file(file);
+> +
+> +	bpf_dynptr_read(buf, sizeof(buf), &dynptr, 0, 0);
+> +	return 0;
+> +
+> +out:
+> +	bpf_dynptr_file_discard(&dynptr);
+> +	bpf_put_file(file);
+> +	return 0;
+> +}
+> +
+> +SEC("lsm/file_open")
+> +__failure
+> +__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
+> +int use_file_dynptr_slice_after_put_file(void *ctx)
+> +{
+> +	struct task_struct *task = bpf_get_current_task_btf();
+> +	struct file *file = bpf_get_task_exe_file(task);
+> +	struct bpf_dynptr dynptr;
+> +	char *data;
+> +
+> +	if (!file)
+> +		return 0;
+> +
+> +	if (bpf_dynptr_from_file(file, 0, &dynptr))
+> +		goto out;
+> +
+> +	data = bpf_dynptr_data(&dynptr, 0, 1);
 
-Thanks for your testing!
+File dynptr is always read-only, so bpf_dynptr_data() always
+returns NULL. Verifier does not know this (not sure if we should
+address it). Maybe it makes sense to remove this call or substitute by
+probe read, just to avoid confusing example.
 
-However, I have issues reproducing.
-I run bare metal (without virtme) with v6 + your pktgen patch
-and I am on the branch pktgen-and-benchmark, commit
-"results: add veth-bql measurements":
-
-1. ping fails with 100% packet loss ~20% of the times with --pktgen.
-   When this happens the avg ping of this run is mistakenly set
-   to 0.0 ms, which distorts the results.
-   I fixed it locally by rerunning when this happens.
-
-2. pktgen runs with > 3 Mpps even with --nrules 10000, see log below.
-   I see that this is because of qdisc drops.
-   I also tried pfifo and sfq but with the same result.
-   I spent quite some time on it but I do not know a fix.
-
-Do you have an idea?
-Thanks!
-
-
-The raw log:
-
-sudo ./veth_bql_test.sh --pktgen --duration 2 --qdisc fq_codel --no-bpftrace --tx-usecs 100 --nrules 10000
-INFO: Setting up veth pair with GRO                                                                                                             
-INFO: Threaded NAPI enabled       
-INFO: Installing qdisc: fq_codel  
-INFO: Loaded 10000 iptables rules in consumer NS
-INFO: kernel: 7.1.0-rc4-patched-20260307+
-INFO: BQL sysfs found: /sys/class/net/veth_bql0/queues/tx-0/byte_queue_limits
-INFO: ethtool tx-usecs set to 100 on veth_bql1 (rx side)   
-INFO: Starting ping to 10.99.0.2 (5/s) to measure latency under load
-INFO: Starting pktgen queue_xmit on veth_bql0 (threads=1 pkt_size=64)
-  [5s] BQL inflight=1 limit=17 watchdog=0
-  [5s] qdisc fq_codel pkts=27417 drops=6591520 requeues=14115 backlog=0 qlen=0 overlimits=0
-  [5s] softnet: processed=27960 time_squeeze=0 multi-CPU(6): cpu0(+5) cpu1(+121) cpu2(+33) cpu3(+116) cpu4(+27641) cpu5(+44)
-INFO: Ping loss: 0% packet loss
-INFO: Ping summary: rtt min/avg/max/mdev = 0.127/1.818/2.703/0.761 ms
-INFO: pktgen results (thread 0):
-Params: count 0  min_pkt_size: 64  max_pkt_size: 64
-     frags: 0  delay: 0  clone_skb: 0  ifname: veth_bql0@0
-     flows: 0 flowlen: 0
-     queue_map_min: 0  queue_map_max: 0
-     dst_min: 10.99.0.2  dst_max: 
-     src_min:   src_max: 
-     src_mac: 0e:aa:4e:05:95:89 dst_mac: c2:e5:a3:4c:2a:7f
-     udp_src_min: 9  udp_src_max: 9  udp_dst_min: 9999  udp_dst_max: 9999
-     src_mac_count: 0  dst_mac_count: 0
-     xmit_mode: xmit_queue
-     Flags: NO_TIMESTAMP  QUEUE_MAP_CPU  SHARED  
-Current:
-     pkts-sofar: 6516031  errors: 102854
-     started: 12246566004us  stopped: 12248535234us idle: 0us
-     seq_num: 6516032  cur_dst_mac_offset: 0  cur_src_mac_offset: 0
-     cur_saddr: 10.99.0.1  cur_daddr: 10.99.0.2
-     cur_udp_dst: 9999  cur_udp_src: 9
-     cur_queue_map: 0
-     flows: 0
-Result: OK: 1969229(c1969229+d0) usec, 6516031 (64byte,0frags)
-  3308924pps 1694Mb/sec (1694169088bps) errors: 102854
-TEST: veth_bql                                                      [ OK ]
-INFO: Results: /home/simon/repos/veth-backpressure-performance-testing/results/selftests/2026-06-01T13-24-51
+> +	if (!data)
+> +		goto out;
+> +
+> +	/* this should fail - file dynptr should be discarded first to prevent resource leak */
+> +	bpf_put_file(file);
+> +
+> +	*data = 'x';
+> +	return 0;
+> +
+> +out:
+> +	bpf_dynptr_file_discard(&dynptr);
+> +	bpf_put_file(file);
+> +	return 0;
+> +}
 
 
