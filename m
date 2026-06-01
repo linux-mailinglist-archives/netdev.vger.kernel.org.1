@@ -1,152 +1,172 @@
-Return-Path: <netdev+bounces-293911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDjWJNP6HWpSgQkAu9opvQ
-	(envelope-from <netdev+bounces-293911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 23:34:11 +0200
+	id 7SUAGbT8HWqNgQkAu9opvQ
+	(envelope-from <netdev+bounces-293912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 23:42:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E8B36258F8
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 23:34:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CF962597D
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 23:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9125E300CEBC
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 21:34:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E698C3038A54
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 21:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6DA363C75;
-	Mon,  1 Jun 2026 21:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCFB37DAA8;
+	Mon,  1 Jun 2026 21:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJ2RPfD8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0j3Nyze"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6523438BF;
-	Mon,  1 Jun 2026 21:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DC6372ED6
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 21:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780349648; cv=none; b=VZ+8YbT4JxXuEnWUnF0PVkKJeBZ1t0ZT0UoHVMlcbC0JdumuGp7etQaUuf0Zs82fjyNmNMMZc0ubPZwpbKzNbUFxVDpQEqHyw1XyRbz33zu6QL0hk/Ab5RorGDohTdwyFH5ALgstMRQwkBQ9DThia4NKu6hOXuCBs1PwgYprpdg=
+	t=1780350127; cv=none; b=c09NrJ/xlFc8xP/0sr9auJVWMGMIhquI4rAXK8BTt7MpYfiR6eYJS0IuSBClslvHJINiKMhpVMiP7ix/1exrIo8VyGHwqyxNCfSu4qB+A8RW5YojjPKJeGNnOetfHt3DhpnRqX+UgOkRtfaIbvkHUMFwWdyQ5o4qC4EZ3mwfkX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780349648; c=relaxed/simple;
-	bh=NRYlCpdmqzmlsxcy7X6opw6mtX5AoHH+z2H6+eNgAw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kTl919pF0ktBRE8Nfu993XBH/tKuLsLbKaLfv2Qgd1cxXnMnAfvsx9AWIJzntTfrrgejIp8Rpj/OFuXStpQH6Njx7V0XXXkm0qHnxyMz7IQ2fF5/TDsGy6ePfgBiynz0HPwO/S0+yLVktkS+zhg1wXeen4zUc+CTATKQBHnyY44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJ2RPfD8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE081F00893;
-	Mon,  1 Jun 2026 21:34:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780349647;
-	bh=ZKKpXcdBFmynzzVydkupi+5KRs0qIrPSOPaKc+4iIZk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZJ2RPfD8I4UwelLYMFUHasUL6X6gINo4dvCqshX6JQ8A3Yhvrh56X5YFTKHXarAiG
-	 Lfmleo4yrJFdVn1+0/6g5vu93BaTnUWPKfd6GZKSa0iF7bxWgp+m4yySl821cCg/xb
-	 XPMihgYXdAGgoQcu6P80cX6a4CBgEjjbV1SBwDE8y0RyDHptTR8ltvFgI00R/M0ic5
-	 VkbCNE7y9avDSzTb1lNq5bSIZBNJ62/GJX9XLo0Wcka95YKLkHEav7/kqRZnAWeAgp
-	 NECb4Mass4UmFriQlCB79gTW/LAvHpkjGQu0LLyUj+DHzNg4UXTOroGyNYGHJjpbYn
-	 IxqX5ON7R5QAA==
-Date: Mon, 1 Jun 2026 16:34:06 -0500
-From: Rob Herring <robh@kernel.org>
-To: lizhi2@eswincomputing.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ningyu@eswincomputing.com, linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com,
-	weishangjuan@eswincomputing.com, sashiko-bot@kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: Re: [PATCH net v2] dt-bindings: ethernet: eswin: fix hsp-sp-csr
- backward compatibility
-Message-ID: <20260601213406.GA26933-robh@kernel.org>
-References: <20260601032852.961-1-lizhi2@eswincomputing.com>
+	s=arc-20240116; t=1780350127; c=relaxed/simple;
+	bh=PsKdNGEJ/GEbniw8+Esy9ECKjpaaqQIGonhyoIBGdU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A5g/CDDCB+p/QyDSZ6u4B+v5q+zaOHxkI4RfFcuvAn0b7Sg6cuLhBXYO8SmR1L+bNYmV2VEfZybMWIPL9Uz3gbsehtjLP8hSUCm/SD7Fg30/JsSmKR8L0bk5X/rrwMsSj1S0/bSxVGp7sR1/eUAI1fOqsWauPJKQvtBssrpqvMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0j3Nyze; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4909e3fa4b2so35247315e9.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 14:42:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780350125; x=1780954925; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LQGOEh1bZHWnu9Uz0mQ1yk1YZrq6Rissv+4IeOd2hWk=;
+        b=m0j3NyzeKJZWgxrErxSB7h7pH+5t979K8ZMKiy0t+iDQ5uoOZmII4BSr6OSLaKPwzT
+         Q3G1V7CXVDVUR302w+jYayZZ81SF0/GdabZq2+svbs1QIWo5Uili7YhvSSIvGEBtfb5d
+         D/eny2CteC3s1BMbpx19UGZ6OHPYHDovnlf+6oAR3OXikszm5Ep27Be6LfZXTBYUd5CG
+         vHvyNJw8qzhTLxHriYlayc3hxu962eDdw90KIql4Xmfd2jr1ySQfAZ7ra+BO2Asvr553
+         5tqjAbYf4IdpQ+j4Ugfsp6xSdqftp+3G0x3BUPghtzkVhuyfEDxw9qspWCExeujd5aEz
+         556A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780350125; x=1780954925;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LQGOEh1bZHWnu9Uz0mQ1yk1YZrq6Rissv+4IeOd2hWk=;
+        b=Rs2Peop4WYAAOcJnCRRx/awtL8P9/Z03lG+031W8UCy1IC0WkTMPyxAZl12KQpw4y4
+         0oypU2GSyFdo4OR6RUyiHEEVoy+nnS5Oc4m8AB2Y2fIE4VOWoLxSeGaqRi2CAgnYfaTX
+         O+Psv2RFQR/hPKMFKgxFf2hplTbWTdShqGEnNTuUkQV8XbLi7hcufwH6HYBgiRGnnDTw
+         d8qYagT0JBLf6M2GCUf3OgQCrFispB969oC3Cu378QwSmHkk8V2XxAr/ibjq32IKBxpf
+         8PEe/8hQITzZmjsjKEDsiFYGO1+JhWnC6AWomyPGCwZVq7GhQ+jk5j2rOn8iSe8rlXOe
+         U44g==
+X-Forwarded-Encrypted: i=1; AFNElJ+cNG1WFd5ywgIQ/sVxvGEzjbrOd5/BxmUC02WB7NfkCGw7yl3Ak5q5HKynwv4l+v0k0aQewrg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVOUM88AWxw/nXnTgFdOCynHT6PMXSBnSYpNama+iCWxYeo3BH
+	83/ns34+LZaSSZpFzC8iC+XAzhdCVXLbIEemLMTgEKcxWooMHcd6dmJ7
+X-Gm-Gg: Acq92OElngTEqBZzIc9U8BDfXYciuZX+CV8qGjTWCR+hHtFUOra7jufMr5DPGl3TmbO
+	wxVFuJI48YP7Oqp042pGe4jn163L9C5ghExBdGz5T2tUFv41FLuuqrJuHm5Y+EBGrr6dwLfeeYW
+	Q3xfhOffYmhqdiMDQy0xlskWxN72w9NBuGNrFMq3Hg8014KMMgYVPGcdPgOm5y7rYsnzIFpxL21
+	BV3r52VM137cQKXkSDVpiw4YudSuXQ0XUpLgK/QRva7sb3E8PCXsh1zWB/Q1gCBB1woDjfnX8Kw
+	OHWkfzI5b2oRcjSXfw7CulehBn05qn9+jpEgfJWKRUWlS0mM1HPbMdJS7JHXRBIE2EHxdjrRlBB
+	hifCHhGVzdqZf0hYaWwp9Jlf3WTdd197eKEz1JKAv3AUFej0QcPylvR0gbnvtb9VViuQerEnzhv
+	NbihwKLvbXiAxZcuav2ZFzi6bIOgPwsSUJz2U+8DwnKQpzL0ogE/rj2bfIG26kPe83GXNnR94=
+X-Received: by 2002:a05:600c:4f0f:b0:490:482c:437e with SMTP id 5b1f17b1804b1-490b08872a6mr31969755e9.23.1780350124761;
+        Mon, 01 Jun 2026 14:42:04 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b0e0f343sm20188985e9.1.2026.06.01.14.42.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 14:42:04 -0700 (PDT)
+Date: Mon, 1 Jun 2026 22:42:03 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Justin Lai <justinlai0215@realtek.com>, <kuba@kernel.org>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+ <larry.chiu@realtek.com>
+Subject: Re: [PATCH] rtase: Avoid sleeping in get_stats64()
+Message-ID: <20260601224203.5d282c21@pumpkin>
+In-Reply-To: <f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
+References: <20260601062447.64027-1-justinlai0215@realtek.com>
+	<f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260601032852.961-1-lizhi2@eswincomputing.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293911-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293912-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,checkpatch.pl:url,qualcomm.com:email]
-X-Rspamd-Queue-Id: 3E8B36258F8
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: B8CF962597D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Jun 01, 2026 at 11:28:52AM +0800, lizhi2@eswincomputing.com wrote:
-> From: Zhi Li <lizhi2@eswincomputing.com>
-> 
-> c36069c6f46c added two optional cells to eswin,hsp-sp-csr, but
-> omitted minItems: 4.
+On Mon, 1 Jun 2026 15:14:50 +0200
+Alexander Lobakin <aleksander.lobakin@intel.com> wrote:
 
-Please run checkpatch.pl and fix the issue it reports with the commit 
-reference.
+> From: Justin Lai <justinlai0215@realtek.com>
+> Date: Mon, 1 Jun 2026 14:24:47 +0800
+> 
+> > The .ndo_get_stats64 callback must not sleep because it can be
+> > called when reading /proc/net/dev.
+> > 
+> > rtase_get_stats64() calls rtase_dump_tally_counter(), which polls
+> > the tally counter dump bit with read_poll_timeout(). This may
+> > sleep while waiting for the hardware counter dump to complete.
+> > 
+> > Use read_poll_timeout_atomic() instead to avoid sleeping in the
+> > get_stats64() path.
+> > 
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>  
+> 
+> Looks legit.
+> 
+> One question: for how long can this poll for in real life scenarios? Up
+> to ~1 ms is okay-ish for atomic, but if longer, then you'd better to
+> split it into shorter polls and reschedule() time to time.
+
+Anyone trying to get a thread running at an RT priority won't thank you
+for spinning for anywhere near that long.
+When an RT processes becomes runnable the scheduler will preempt a lower
+priority process that is running on the cpu the RT process last ran on.
+The RT process won't run until the preempt actually happens.
+
+1ms is a very long time.
+
+-- David
 
 > 
-> As a result, dt-schema implicitly required all 6 cells, which
-> broke backward compatibility with existing 4-cell device trees.
+> Thanks,
+> Olek
 > 
-> Add minItems: 4 to preserve backward compatibility.
-> 
-> Fixes: c36069c6f46c ("dt-bindings: ethernet: eswin: add optional TXD and RXD delay register offsets")
-> Reported-by: Sashiko AI <sashiko-bot@kernel.org>
-> Closes: https://lore.kernel.org/all/20260519022334.35742C2BCB7@smtp.kernel.org/
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
-> ---
-> Changes in v2:
->   - Reference c36069c6f46c explicitly instead of "previous change".
->   - Improve commit message formatting and line wrapping.
->   - No functional change.
->   - Link to v1:
->     https://lore.kernel.org/lkml/20260525052441.1637-1-lizhi2@eswincomputing.com/
-> ---
->  Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-> index b66ae6300faf..65882ff79d8d 100644
-> --- a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-> +++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-> @@ -84,7 +84,8 @@ properties:
->        This reference is provided for background information only.
->      $ref: /schemas/types.yaml#/definitions/phandle-array
->      items:
-> -      - items:
-> +      - minItems: 4
-> +        items:
->            - description: Phandle to HSP(High-Speed Peripheral) device
->            - description: Offset of phy control register for internal
->                           or external clock selection
-> -- 
-> 2.25.1
-> 
-> 
+
 
