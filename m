@@ -1,208 +1,236 @@
-Return-Path: <netdev+bounces-293562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SN3hFi0hHWqiVwkAu9opvQ
-	(envelope-from <netdev+bounces-293562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:05:33 +0200
+	id 6CRcD0siHWq6VwkAu9opvQ
+	(envelope-from <netdev+bounces-293563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:10:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A70F9619F93
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:05:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B17619FBC
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 612D23013495
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:05:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A15EB300901E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D352F342526;
-	Mon,  1 Jun 2026 06:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C06B23403E2;
+	Mon,  1 Jun 2026 06:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PF0iKT62"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ga/zQDCu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010066.outbound.protection.outlook.com [52.101.46.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF7E3403E2
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 06:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F3A1A680A;
+	Mon,  1 Jun 2026 06:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780293928; cv=pass; b=Gg2H+/Jh3D9P4QisIvgLksq1sCV7ESdLbqvvQHSPe7r83S7n6eTOUL9tObWT5DJPHDHap/TW+YEEQCNI/snyRGPr6B3SF2LJFqoHt6kIXk3zdUn8ZDwKDBGzXMRFgR1UbnkU8mavFYl6+2r2EHZbrR/2GEfpCSvWzKYYQEIXR0I=
+	t=1780294216; cv=fail; b=GSPGkMx2jE0yRA3YOPsvuz2q2YBv1yZX6Vyy8KT/+lNUMVTdUun9BNPi1FNXt6cCNnIKv2aOkPqskcj96zex0EHn+weyf7b0wYBU+4P5VXLSyx3x08us80mNBUMMkco1mhbx18tsVc55cTVpBIAUAqI0CcjIsSw5NX3IcCE8kMA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780293928; c=relaxed/simple;
-	bh=B+ge0q+NK7KzDZMKIw1oop+AtAxI77a6GtO2I50sGsQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PWPoYBaK+Ub3B99x0K+Yy/qeMObzx7XjSeKTK6xgfU8JdeVMA7XQ9CwOXAy1FPRzyFl62bMW5hekeP+gIFInFOuG5yRaQMtbO/cDf5tlQvx0xc3Y5uQgByoKwguDzu9ygAdTmr+MQXaDHNEr1lwokGSJc41/7GGR2TFQ03Ig4Bs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PF0iKT62; arc=pass smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-36c68964315so831133a91.2
-        for <netdev@vger.kernel.org>; Sun, 31 May 2026 23:05:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780293927; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fTyEDT6azD9xt61z5NbKNNbhAkm0X9/rntLrLHDAl5dm5ndeiqQGirTJKgzEOVTZ0H
-         iUeWoVSgEsEIIRi7Q5/j64THP08TSovc2gqAe2GBYcuMOoyDa+kCmCjKsxsDSoIW1XtB
-         lSUIknONBZh6orgQbHj6KdmcLlLinhN+eKlVrf2j6HoU2gIRQb2Z0ADm7h9G2zIhcKCI
-         M/Y3M8Sc4Sd2Pze8sx74/FXyFEZZ7+ZRjLetpl1aCpYDIl57KlR0PBn4DMu/4JbliVCv
-         Qp+Q+DY/6Rxh+52a06IjpQ2fAhENXb/uERx7pZFQc9KBwmJ4E18V+zH2/M1qF5tYizH3
-         DoJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=glLTXShkm5YP1+5MR78Yj0KypTdD3fdo1XmOBdHITCM=;
-        fh=hTxh9LXTEs29emjSViRngh2hRY/zS6cins6XRmcBYHc=;
-        b=iSPGqqcIWX+p8rGpOBEuA3TwSBBc+PyEy/3VftPYHRC+fKjNWWpgoBb8Dp/KIgpc0G
-         8BHfpHW13mchNd8QEhZquXD82qO6GucI1GZusiNt7ay1Jqm65iKRWAcwKAJqvheTR7bP
-         b2qg8UwtkD+XgypbIMJfRaary7q7BStXTZrT+xyjGT+99b0eJWpga/hoLcs/AdoWJUhQ
-         n02Q4ez4sCXuEmWLBghhPOO+5Ojinag2w7PK9lPFnYkTeBMNvO5rGJU47ib131UhY24a
-         SBavTkxbbYIaQiTlJKbRooPyQVY8C9sh3mYZJ88l1EX59xr2z09bT/I33QA5usg79VPJ
-         532A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780293927; x=1780898727; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=glLTXShkm5YP1+5MR78Yj0KypTdD3fdo1XmOBdHITCM=;
-        b=PF0iKT62P1JEarosD887TKYlKijqxqqYdUU/Jeamxho/gNRM65TA5jPhg+SRHSASgQ
-         7O4VWHX4ybzY8uRiag09Aq1ZSfRr0NZy6NmVk4dIVeEYbiQ8Qf2hVLAioBzNJ99xq5Nv
-         395PatDEZKSH410UH6NdGHebw1wPpOtYqv2zJBlJmIvg4IRFEVvLluYl9n+6OZ+3esCU
-         t31tL7Rc/dnvacKG2cPdszNFJK03rozo5NwatVNQ09TNT4dgfz31J6a+gNbTduPnAZk9
-         A9eBW5pZcevrrSsQo+tN0pRnjRTqDo08PGpEjvN3CewTZJ1rWGRHAifPHorvmiE4DCqe
-         wi3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780293927; x=1780898727;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=glLTXShkm5YP1+5MR78Yj0KypTdD3fdo1XmOBdHITCM=;
-        b=R79DUU98TPlurfUnFCouWQAOjITryYkrDg3YOsftRnK/xWVsDDqyV0d87Is2VTwUCl
-         dSYHgx2avz/wqlJEOYesgcR5Pf3VCCxY7d8/TOqjcrRZV1yXuBTEJ3p+Y/2djuZXSFj2
-         QEngQrLkaX84PjGMSs8rDxohmgRJejq7+n+OYULWxIbHLJFUTQUjMQKnvWxUltgBqszH
-         lZ4oyFQjvJeYXMBjf79V4w7XI3D+T/IkFeev0t3ca1hsvMpuJCfLU1LzvYPCOFo8BhN2
-         mLWzGLSuUUQUPnB5NYe6ytbb7ANyKRfLs6Nnzgc9CF0rjAQ7eS+MN1fvDeepQOFSxxxa
-         ledg==
-X-Forwarded-Encrypted: i=1; AFNElJ9bA4iU3fR2ahGsqYuI0Y+mjY6+feF6NwkgI9/h36/67W/8RaBQSdZXo0h8y3lT75rjS19wbZ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8NJRP1do4i7i+wpakv9KC+rm78uLL4Zwkg+s0EVAWq11IRGhO
-	ih0HerBD8R+X8aG0wjcDHIxn/2n3rV58Jt+u9AFzj4C3XD0SeQVwjOFHdpFvjSjqvq4i4MDQIzh
-	qWIxCoSPqOhhWxrVn5zrQmksmahZkJZk=
-X-Gm-Gg: Acq92OFkO/B4mr2GJMCdS9Fh/s40OO98l/kEeNEnQxXXcPNkSyXyJTq0B/n0/Rp2IPV
-	ReNBIWo1BkzJaO88DMnaktSsJQ1s/JNOlU9AMfn7XctEkSaf9KvynJhwOZjBJoEx30ZQ2EirEdi
-	73WRQe8yU5jJjvR6vFDI/UFMTlHar3onVGhCHCjV/wmBJjA63xXBZB+svkcAdxfC5BnmO/LbKaY
-	mxAgEbnqGZzqmk42OCbKIxJ8bdShdR/3BQ5U9UNDx3dpd1Y/8G7G3Pj17FZ03KOkuwXrYmPODVe
-	AqikaqcoDjACGvcBHKA=
-X-Received: by 2002:a17:90b:5704:b0:368:b01c:85a0 with SMTP id
- 98e67ed59e1d1-36c501db7b8mr9360839a91.14.1780293926650; Sun, 31 May 2026
- 23:05:26 -0700 (PDT)
+	s=arc-20240116; t=1780294216; c=relaxed/simple;
+	bh=RoXdTE0C7j+OGETe3rvOzpi0SfYvKRLscP8jMUykWno=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CZ99VrqRvBgeEbpATWM/qUAGZCKgC/hfCuBAnLneFcDre8FtQ6teA4wcPO6fCVBVmxshsgNXJm+q5d69VrvAfGOWvbdcsGGVtQ1L08MKP8iRp041aEQwvNVgM04VI1Droo8fNxBOTsICfMFfnzfP6flf9gjRFU5FdwOSzGMdWyI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ga/zQDCu; arc=fail smtp.client-ip=52.101.46.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NPmu8hUOMvER8xAdU4X20jm88fQ7Ey8WYfT4a+n3KO4RO0xPA9IwnQvbyWojGKH0ElOZYR35/j5sqTGrxdfFKMjKCsjaP/+u5wzQAin7uaKZdw8XKmQsC5LzMbz1zrZUip3+w5CxDMufTR+2j9HpSHqnX8IvJBALMOay6mTaAUAn9yMRMtRChFY2a4d+8hUvyNawn1gTElsuP7i0Kx/BP7elXaxaaMK6htPt0Zk3wgkqnRVZLvQIdNAgR+jfDb6DKtK2UOVsl3Ul6Kf/yp9ZvDZEYNIC3laoC/jEybFIDkdujup+EvJtPv897j/GRkje8oQZ2GdlRq4IntnjDn/LVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lTbATlHfzSTkY2brDxOE9wtKoSJLB0vamT0wXqVUEWk=;
+ b=pUXCXj2FTqh+wCZehG640YOXlLGk8Pe9Us96+UKxtHhb2rIfy0HBZouAa5khC+pxBGq3DXcLqLLILS6SaJjB5d+IVGsJj0BEqTTKNhA96m+cW8j8K/iHjSVbTlnoTU8uG1OQVT4dfqO80Z0IqLJHRdHvp3xAVinFeIVKpQljo/djSn7k9jp6NNm7qcR3WHGa2bWVUjN7/mo63dEeiokmYwk0GUPnnYH9FrBTafci9mG/BTKmT2twiRbYZAY7sQr0QTBAqoRbu+GDTZ2U90YYzxFyUb4pcm0OXCigWMAbz0X2lbrQ46VPYByRQg8r07F95itUBCodPw7GMh4dY+yHzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lTbATlHfzSTkY2brDxOE9wtKoSJLB0vamT0wXqVUEWk=;
+ b=Ga/zQDCu5LFNrRHvurEyUBHB3o4mNkZD5wqLXzU7LQiwYXaZSPzP4mUSNDlkCH5OwSCp2A3m6YHEoqaXuejyMU8Ow/zHP029ftyPjJXaLuwq3zTKj0b/HL6thlKVXS51MNMWSUnIXqYu6wwL7MhmGJtAm+fxgjmUq6/Y8odp5mbTt5vFvhaHxY4JLEG8Oh/WjEJVSLbKT9rgtjy/p/ri8Cc7kzuTRZVsVKFXc4VmxzIvNLnucxZQiRgePJeIwP3/YpA2HYzxGH548HonSbIOKP++G3jrXP/a44sjkNv78AMsTw045Lyjje/zQPav9QVNh4L5vnGH7E5+avbR/3cBiw==
+Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
+ by SJ2PR11MB8299.namprd11.prod.outlook.com (2603:10b6:a03:53f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.17; Mon, 1 Jun 2026
+ 06:10:12 +0000
+Received: from DSWPR11MB9715.namprd11.prod.outlook.com
+ ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
+ ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.21.0071.011; Mon, 1 Jun 2026
+ 06:10:12 +0000
+From: <Thangaraj.S@microchip.com>
+To: <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<Bryan.Whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<linux@armlinux.org.uk>, <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v4 2/5] net: lan743x: read SFP straps from PCI11x1x device
+Thread-Topic: [PATCH v4 2/5] net: lan743x: read SFP straps from PCI11x1x
+ device
+Thread-Index: AQHc44+RlfikKcFZCUmHVVUY4T4x8rYNeG6AgBQCtKCAAHW+AIAHRDeQ
+Date: Mon, 1 Jun 2026 06:10:11 +0000
+Message-ID:
+ <DSWPR11MB97156347E4D54CC898A1CA43EC152@DSWPR11MB9715.namprd11.prod.outlook.com>
+References: <20260514105028.42942-1-thangaraj.s@microchip.com>
+ <20260514105028.42942-3-thangaraj.s@microchip.com>
+ <053eaadf-07f3-431f-a0a4-28980adb8213@lunn.ch>
+ <DSWPR11MB971561B42BB157F7C8C436C2EC082@DSWPR11MB9715.namprd11.prod.outlook.com>
+ <af49a018-952a-439a-8beb-2e300a1d266a@lunn.ch>
+In-Reply-To: <af49a018-952a-439a-8beb-2e300a1d266a@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|SJ2PR11MB8299:EE_
+x-ms-office365-filtering-correlation-id: 4666702f-a164-4acd-5d37-08debfa470be
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|1800799024|5023799004|56012099006|11063799006|4143699003|22082099003|18002099003|38070700021|6133799003;
+x-microsoft-antispam-message-info:
+ N4LELQkqLHguxLQCmQ+5Ajda4UvI9T4ZAyLEVUBgz6SDHJt6J056HrqHdrR9ItOOEN8SCcIYKkT6Ko+wm6aulCSywLAS+dTsBNGv89+cgQ527WTysGhOSXRv9GcOrmbzqY+ezV/OTBOJOIjfOzxbqxohqa9DcLh+rmoYMWcdZcJJUx4PvBkajXbG9n9jJzKVXRZ3mNaKcdqzJqZpCSS3axyZZ4HTYbtWwBIWAvn6V3gBzxqIUxzxke3QHC2BDt6CR6hl5p6Y10majj1jGzBRvSVUO68F3lruUxEaLOxQhOdXiSNR08P86saCcYxnYyeJsnifC78a8BOJlue+ZsIsPiJQr6GMDfMzpJtyCMOc1QeLise5x8VnuPAa+mvjXR8+qhMZcQ546VjI6gVRE9cvFOByU2stf2kdRKGGC+Dng1NBihGQK0ErfR00hqTtXkRV4TTVmEJnlyBUkD40r5SJmsbkqrGSx2gqC+GFJJmfXsvIdMCkZk0MQj0z6PFQphhg/9xmw1KnUxS2NDtbjOcmwiEjL34PFmaSGiesxXIybeNS15fHtamScmNV8KjEnizOFDAY4J2cOHxfenzfUzsCC+USGDJNph56BSxWoX2vSG+bRU+b0OvTeOZO7geFnwRWapUk8CpeN9gaQ98SCl+Vw8zdDA3YL1obAKELdbGCWIhJOrODysfji+rpngp5hgMh487S/hSqiNTj7m+Kj0rCK5mygdXP9XzsF1RV4MAonnT03QYAgw1Woq4WzDgyCdrs
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(5023799004)(56012099006)(11063799006)(4143699003)(22082099003)(18002099003)(38070700021)(6133799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?f3BQemWz9gIir/CQOCIzqWBg8TOPqcC+FCGX1brxCbY6FLVyLLDbsVrprTmt?=
+ =?us-ascii?Q?isa/6MDlYiK0pxaEe69k9Y6wCr8F2kzJvdBNKTXpk19uN8dEa0hmSxGGK/bK?=
+ =?us-ascii?Q?KIUkHIogUCw3hgls6aCndYuRYnRamPg9N6A/8BWSQvHK+VGnEfhUiCA/lEca?=
+ =?us-ascii?Q?M7l1u+kcuZl5MdRvOtCJZCsJgtggI4edr2pJRU9PFI6Khx8IHRzCE9Gl7U2i?=
+ =?us-ascii?Q?iFTsNl6rLb3o9rUjHf4uplwSfK5dSbA1lbPE768DGRcSYAw5MyZbYOQXmAFS?=
+ =?us-ascii?Q?vwdFpOUhWXCek5NV3qf6sL1dFG17a4uRscP1BuiiVUxIvDHjT8uOEv9EnJfE?=
+ =?us-ascii?Q?oQX1ZYa2CLu4Q/Hkf7odQPmdlEn7IqseNuDzwdL3GysnrPC9i3pUgVgPicyL?=
+ =?us-ascii?Q?1pcF8ipV/Vk0ZYI4mVEuLsV/l2aq9Id4gRkCnJglyM0c8VRjfiJcQ/WTuGwx?=
+ =?us-ascii?Q?ZI3R1pxMHBSahXm+FLREgpHWmTWm/hEksRBsvT3y3tS1gytBniveWkq/ZpKv?=
+ =?us-ascii?Q?ZIfits0YpgiffW7rONLl9nsni7TXvAgQ0pZTohwBIEDiD4i9Px3/we0Lvv29?=
+ =?us-ascii?Q?ngZ+ZL8l7rTJFArTMjPpIHHKF9DMz7Gafze4/Mk6YnfGr0gdH2XqbWliPQi6?=
+ =?us-ascii?Q?haTnE6sWdNMGTOKeUZg3E+QCyVKLkWi5FuM0G862L1RTXxs0msGnGmLE5Uij?=
+ =?us-ascii?Q?Murjs+y3P2A5lcc8EEAwbUWq+KjqEf5cA+o8d3NoBTYHg806jKU43WCbejCO?=
+ =?us-ascii?Q?adDpwr0jsE1ggR82mhSnbZd2KxVH8MqVTVR4CvV5YsQgN31jey0Vi/wAiQl1?=
+ =?us-ascii?Q?13WVkN0sRWCKQEXSwcEK3FULCc3nZ9dIsueWxPOlOMdERIUzkQJfXo8IcFuZ?=
+ =?us-ascii?Q?qxxto7Ggmvt8xv2XIMHUpNGCpi3pFKtaVoaQC2+AtoOOQ22tIbM2CpolFWNa?=
+ =?us-ascii?Q?Juwaf5FTw7WJeDh0/Jw0ORhKCsxRL6Ez4M5aX2pPDWH9lhuX6MMnrKJS5G95?=
+ =?us-ascii?Q?l7AGjcsai1hM0Mj1mzJnT+52LWJyBG+o0W55ZjMlWUkf55g/wj5zSvT7FeSX?=
+ =?us-ascii?Q?qnJUGqfxmKWlXW+0siud/jPGOrASI4w29SFoXXC7KnSitmlWn/7UuGQQ2nJO?=
+ =?us-ascii?Q?N4jauBSgcpWR/LcPQm8AsAI/d3MSsA7LfpBbGxzNobRzTmOiBWmKLy3e2gYq?=
+ =?us-ascii?Q?8MRFBJZxQYsypt3BytIV4kGwBJkj35w/gnQHED8sYqe4QBHmMMc8oq2Di2E7?=
+ =?us-ascii?Q?w4C4EkbX0YSW/YuV4y9BeLUhyImGGxFdo4fANcmXGbaLAw3dhKCjZBitnn6M?=
+ =?us-ascii?Q?Y45TS86ictpSHD28xP238chuXCVeWJUzfoOHSBlgrKLe/Vd5Lj2hOe1BdF84?=
+ =?us-ascii?Q?bu428KlOjt0zsQ+pkWARyTCFTtyfePEYwDc+X4rb6p+BXJEJUH98brnLZTBa?=
+ =?us-ascii?Q?vJtinHuyPqwWIaF+/QgiA0YtFw9o5TdalvXAIPmYlX0NCWOoPtoa5mxyOKP3?=
+ =?us-ascii?Q?jOa6UewdtFfrWopVsvUEuQTskm3mOvLVevExVquk6PEZ4WP5YMlrM3Ryd3jQ?=
+ =?us-ascii?Q?Uf9BPfIHj0MKZExTKCPkxYPXas1K55Aiwp0vr3gf1f85sqj9MQfDDORolvyp?=
+ =?us-ascii?Q?/8S7y9uRJXVA1loGErZNTfaCrihIg4dkze3deHJQSk4fQW2RD/NKcdI7invK?=
+ =?us-ascii?Q?wwX4Rtl7NWtJ0vHJaK1ZE6gKhH5wHYsZAHgwm82YvXexIdBFeEc12zq2oXXh?=
+ =?us-ascii?Q?MV5qIj8ZKg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAD03fjaBJGtNATBxaYO-PAxdKC=HxYgE+M7HQ_a0O+3Sp9Mruw@mail.gmail.com>
- <84d8f2a1-6562-47a9-93d7-2d7ff33c31c0@lunn.ch>
-In-Reply-To: <84d8f2a1-6562-47a9-93d7-2d7ff33c31c0@lunn.ch>
-From: Grewstad <dogestad24@gmail.com>
-Date: Mon, 1 Jun 2026 11:35:14 +0530
-X-Gm-Features: AVHnY4LKTOZKUlPxUKSEpglGPR9NoZNvIqTRTd9Vh-G5jAMDbvZ2ZfNVIZn_hGU
-Message-ID: <CAD03fjah2GMedDtauPQjP0++3USpy6tm3AUemgAjVHS=5Nirtg@mail.gmail.com>
-Subject: Re: [RFC] drivers/staging/axis-fifo: TODO file and subsystem direction
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: gregkh@linuxfoundation.org, jic23@kernel.org, jacobsfeder@gmail.com, 
-	linux-staging@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, hjk@hansjkoch.de, davem@davemloft.net, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4666702f-a164-4acd-5d37-08debfa470be
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2026 06:10:11.9421
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hlYtuIDeVEGdjDKpcOMgIDUb4mqqI8gqhTV+/mgPh05j80ZrF/o7oY1FSszkkx/rfjXUXRRmUv/VCbwXQiKGIoAFc2A4lNVTz9Ojzjw+FVk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8299
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293562-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,gmail.com,lists.linux.dev,lists.infradead.org,vger.kernel.org,hansjkoch.de,davemloft.net];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	TAGGED_FROM(0.00)[bounces-293563-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dogestad24@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,lunn.ch:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amd.com:url]
-X-Rspamd-Queue-Id: A70F9619F93
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,armlinux.org.uk:email,lunn.ch:email]
+X-Rspamd-Queue-Id: A4B17619FBC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Jun 1, 2026 at 1:22=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
->
-> In addition to what GregKH said, look at the vendor information:
->
-> https://docs.amd.com/r/en-US/pg080-axi-fifo-mm-s/Core-Overview
->
->   The AXI4-Stream FIFO core was designed to provide memory-mapped
->   access to an AXI4-Stream interface connected to other IP (such as
->   the AXI Ethernet core). Systems must be built through the AMD
->   Vivado=E2=84=A2 Design Suite to attach the AXI4-Stream FIFO core, AXI
->   Ethernet core ...
->
-> when used for Ethernet, a uAPI is not needed. The FIFO driver would
-> just expose an kernel internal API the Ethernet driver would use. Are
-> there any Ethernet devices using it? Is there a driver for the AXI
-> Ethernet core?
+Hi Andrew,
+Thanks for the comments.
 
-As I said to Greg K-H, it's 'chameleon' hardware because we don't know
-what it'll be used for. It could be SDR or Ethernet or whatever it is
-programmed for. The main thing is that it is a streaming interface.
-But we cannot assume the use case.
-
-> Does drivers/net/ethernet/xilinx/* duplicate the same
-> code? xilinx_axienet_main.c says:
->
->  * TODO:
->  *  - Add Axi Fifo support.
->
-> which could be this.
->
-> As GregKH said, find some hardware using these IP cores, or synthesise
-> your own, and then work on the driver.
->
->         Andrew
-
-Yes, the Axinet driver's TODO suggests adding AXI FIFO support.
-Currently, it routes
-packets through the AXI DMA engine, but the TODO mentions:
-
- * TODO:
- *  - Add Axi Fifo support.
- * - Factor out Axi DMA code into a separate driver.
-
-This suggests that the AXI FIFO is merely a different configuration of
-the axinet
-driver, allowing a Xilinx AXI FIFO device to be used for ethernet.
-
-It does not, however, establish how the AXI Stream FIFO IP is intended to b=
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Wednesday, May 27, 2026 6:53 PM
+> To: Thangaraj Samynathan - I53494 <Thangaraj.S@microchip.com>
+> Cc: netdev@vger.kernel.org; andrew+netdev@lunn.ch;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; Bryan Whitehead - C21958
+> <Bryan.Whitehead@microchip.com>; UNGLinuxDriver
+> <UNGLinuxDriver@microchip.com>; linux@armlinux.org.uk; linux-
+> kernel@vger.kernel.org
+> Subject: Re: [PATCH v4 2/5] net: lan743x: read SFP straps from PCI11x1x
+> device
+>=20
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
 e
-used outside of the Ethernet context. Since the AXI Stream FIFO is a
-general-purpose IP block used in a variety of FPGA designs, it is not yet
-clear whether the Ethernet use case fully defines its role in the kernel, o=
-r
-whether it should be treated as a more general streaming component with
-multiple potential consumers.
-
-Thanks,
-Arihan Bhor
+> content is safe
+>=20
+> > > > Introduce CONFIG_LAN743X_SFP to guard SFP-specific code
+> > >
+> > > Why? Does this add a lot of code? Most MAC drivers don't have such a
+> > > Kconfig configuration, so i think this needs some justification.
+> > [Thangaraj Samynathan]  CONFIG_LAN743X_SFP was introduced based on
+> >   Jakub's v3 review feedback. There are devices on this LAN743x family
+> >   of devices (LAN7430, LAN7431, PCI11x1x) that do not support SFP at
+> >   all. So while the amount of code in the common LAN743x driver itself
+> >   may not be that much, the dependencies could force an intended
+> >   minimalistic build of the kernel that wanted to use the lan7430 devic=
+e
+> >   (which is rgmii only capable device) to have to include tons of kerne=
+l
+> >   code (sfp, i2c, gpio) it does not need otherwise.
+>=20
+> In practice distributions turn on nearly everything. So the code is likel=
+y to be
+> built. Rather than a Kconfig symbol, can you move the code into a module,
+> which only gets loaded for pci11x1x?
+[Thangaraj Samynathan] Thanks for the suggestion. We agree this is a reason=
+able direction.
+For this series, CONFIG_LAN743X_SFP addresses the dependency concern.
+For distro builds that enable most options, a separate module would
+typically be built and loaded as well, so the practical result is the
+same. For minimal builds, CONFIG_LAN743X_SFP keeps the SFP, I2C, and
+GPIO dependencies optional at compile time without requiring a module
+split.
+Keeping multiple chip variants in one module is also common; for
+example, igb supports 82575, 82576, i210, and i350 in a single
+module. We think the Kconfig option is the simpler solution for this
+series.
+If there is still a preference for splitting this out, we can address it
+in a follow-up. PCI11x1x differs in more areas than SFP support,
+including TX channel count, IRQ vectors, SGMII/XPCS paths, and power
+management. A clean split would likely require an ops structure across
+the driver, which seems better handled as a separate refactoring.
+Would that be acceptable?=20
+>         Andrew
 
