@@ -1,239 +1,198 @@
-Return-Path: <netdev+bounces-293853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293854-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BRFNtjEHWq9dgkAu9opvQ
-	(envelope-from <netdev+bounces-293853-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:43:52 +0200
+	id WLY7Hw/FHWq9dgkAu9opvQ
+	(envelope-from <netdev+bounces-293854-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:44:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 574E1623640
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:43:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99FB623678
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 19:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5AB4F301A518
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:43:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E634E3045CB1
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 17:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C023DD87C;
-	Mon,  1 Jun 2026 17:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2703F3DFC80;
+	Mon,  1 Jun 2026 17:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGw6H8/2"
+	dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b="myHciPDg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311F429CE1
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 17:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AAB29CE1
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 17:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780335828; cv=pass; b=lFBni7Mu3QTe0Z02UXejO1DCaHKYRQD1wlFwZJnS1txcDxortsb1WW9GHQ2wIaWla/Ufh4g08KgVVMw+tfr+NNw3C1QxpjFDEk93gtMBCCO05ke9PCJPO2jJ2cLdcSzJJst1uK/wbL8KRZ7LqJddWuY6DkJeKk9zE8AslmJGEYU=
+	t=1780335854; cv=pass; b=JVxdu8FV832lrMFIqMOHr81UNIAAfShO4RiGjZfW/uk5mDZcMvY1RYQJEOW2WhMbq6KZkzPzmd0WwG03jmRhO559B63WBk7cB6JchmYmqe0ta0sMetwX6pxxQP5j+BisnLPwZWCkpsZ5wV/Fy2/vsNkqJoBEz7cBoeezFPx1ERQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780335828; c=relaxed/simple;
-	bh=vLXM8xPE0000Ywk3cF/Lyt0JOqPAXIsoJJHRt/F9Z34=;
+	s=arc-20240116; t=1780335854; c=relaxed/simple;
+	bh=twruprh43XLoMZkNw8GcKyuX+yx1pog9tQFXq3Gz3+E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q21lNwy9pFOkj279srt+fpnYP+kKszPV/WvrW8KXtlHBFVrQtjdrRzi5c5+MgpLushYPh5w5ZljP5K9cv8cAsSneQ2kwOELI1JJZeG5+HC9KOsn5itrFR4BmmX01ENhVWONHtOMBuUmdDr1S3nmlc26yoX2PTuhuOi0PW84U8sQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGw6H8/2; arc=pass smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36bb3551f6eso3252855a91.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 10:43:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780335826; cv=none;
+	 To:Cc:Content-Type; b=ac5B48tVyc5+O/102D1dRE1MkUTXhDX78vxun+eds5yly0uaPO97KPFMSo53K84By3Agdk2ClJ8G+Sp6NM0gyFTQpzt3m2dCFQIV9bl5mMgbiXGKRAsQfkGGx6BfoIbRAzY5LkV723O67McCp5d2novFqJj+IUHbO4HqVRWbcLk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=myHciPDg; arc=pass smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-7e2cb01a974so20018617b3.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 10:44:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780335851; cv=none;
         d=google.com; s=arc-20240605;
-        b=flSrPodsLNWxnYeZIU1f2jGL/UV/0YlvTcP8PlC2AQqgPObfk91HYeZ8TiJoWVPv8x
-         iflUrIya7By/aLilU/5ZXekz3ZPI0mIYKVSgfWsgQKcyjgK5nTITm+ntUN6/CxjJ1gl5
-         DtvjJUMTMu0euFkM2h3oblOGy62WOvoWdhX+pl+bq8Fom/tEjwyOo2IX6x7NqXCBBe09
-         vMIrCy+uoX+s9eL1DSGuew1dUY80TT9W1y1QMZO0PVHo9ZSAxe0XXPARuVnjOtlNHm7v
-         EwyM1Xn1pnZbmF9vb9gXsC6FUavJiZ+FtmbDyzVVWNFVFN8L18Ekao1PESJFMKKJrf6Z
-         4t4Q==
+        b=GkiWGulIirat/1Oz+GwwIkqjQlrcG9lYiaDfSMGQA3vGLWNC7oEeMPc+JvMt7OlNw/
+         GyuERg8F2TvBhSDRFqxwnHrAKHKEP+htkTwlRaLalYJbi+BUcOpQej6+OyYwImsbQqEE
+         WOxSIT21tUeFtUYYjSsu3QoDZ0UcAXxc1IsKrjf5hqvQY7QY0QTg7sqVFwcinRHXiqme
+         xQuF8i57DwxsqoOrlWMFd8XM3rc9uqa2P4Ct/QYz0ja/L3DtyiR9zFpFmEiOSU9kuHC/
+         a5J13lesidlZtnG5VBmuoZ35mInHQpv9BS7b8zKRa+5/yarbFqLfy3aHh/ULUL5UQmq4
+         TlaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=if4TjlSwdhnRq7L3EQXAnyNltlbHQkoc1jml1ZVRDpE=;
-        fh=vpqt+cRvCgrFBwSRiFwD/JBEMHOYdIjhRkvlyh6lSQU=;
-        b=akiLLDK3J+3io+iG9K+xnP+GI7PVBPmADelmNOgNnSz4A5FL6sJCorm5qBGrkI52iv
-         ilsRiCpglBqrxIDEKqsYf5IZ0brpol02mUPiQoCpYyRBJF5fRxUwSRmW8cCLu/JFQD/T
-         y7azHZEQIZbJ78OMgGXdhRsNkJWiCyI7QofrYiEtDAsTPqq/Lla0o92MZHITmN4ptGYy
-         4RjiQn1U79olqqj+OwMW6ZKqlblQiQsV2R7Wadp2qNi7M0LFw/Gt41KRvr2GtVK5L/or
-         Uix2WaDN6z/44mJ8u8Qr9X8OYxkAz/lNFnP/NXWzGbMHJPMXyoNjRDScWprpl84AusV6
-         x/ZQ==;
+        bh=pqXRFVeeL93aTE5ejiuC4gnumOaUy10wmrQoHsegqwM=;
+        fh=OyW4y0yd6lpGGsJN+qhpayszT5oubUk+IoTQ+QHpRjU=;
+        b=Fm9WJXcKTuiulLvtl3u3fign+Yc14a5D/mr24n60PjGcGV74H3HX+Bqsay49yqymfp
+         TXbFFcmxKvdJHYhhCgoKzi1eL0Yxgk6LrYuRSog4cad5KEjpveYjrB3+iI/EB0iniYsc
+         ABJ8ZqwNSUugCbo2XnLUskzi/iXu/L03b1aC8/ita4fhuXUnqGxNwTq5++mnMnFvm6LO
+         ooUuD1pVXL11m+vukpMkLtAFnb3PjHr2/767KIqv/qco8/6JqlU8xiUm2QJIn1nVqal+
+         alt4fxKIinIc2stCi+PeBoalFOkEcuCdYyakM0gLUZPA93v/Y7yVkpNTHyN2iaWUboUr
+         ehTw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780335826; x=1780940626; darn=vger.kernel.org;
+        d=mojatatu.com; s=google; t=1780335851; x=1780940651; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=if4TjlSwdhnRq7L3EQXAnyNltlbHQkoc1jml1ZVRDpE=;
-        b=gGw6H8/28j/FpPFFE4Er8tLQlYSyM811R6b8ATylwloH4ZcC6WlrihThylKH1yhJC9
-         f8Pggjy55j/mKqnRoubYyAvilhBhLVnGqVb40BrnWrFD8H4UftOdN+qPMCOeZMXQLH2o
-         9aH0PrbFT+OuJOdLj049aIwNvGbrX1xIB4snM03EvUhmcT4rWY2B0rxKNd+h1h42GT/K
-         4qL8862O80OO7Ku7FJ2rVtRpFp1vKBxpGpALtiYCzSHNfbSOk6cw3sHyhmVIsfae8WRl
-         xIjwbjJ+NLM7NZE+H8FvGOF4mSpqFH4KKa47a8OmeTyGOuNnsYVvP0hWYpOWWQ4n8Puf
-         IXLA==
+        bh=pqXRFVeeL93aTE5ejiuC4gnumOaUy10wmrQoHsegqwM=;
+        b=myHciPDgEzcTl4wxKU0j6YgnSp9Z7GI6NQCQOKp6t0ks3/65+GN04g5dKj3fXxcjPq
+         IV8VVQUn0eJKNDxRycWjXgR+qgi9MeMJ9zQsUgIg5npxT0acCLwV6cAgRlrZqVkE1G7Z
+         ClJKROUv9ZauHGHYyHwFJIeeMyytFP6DFdY+A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780335826; x=1780940626;
+        d=1e100.net; s=20251104; t=1780335851; x=1780940651;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=if4TjlSwdhnRq7L3EQXAnyNltlbHQkoc1jml1ZVRDpE=;
-        b=kTYOnSD8s5kXAS0pKU6ZMsMKVr7P0lO47macORSkQnDSY/e7FxNMMOFf0CO7X0H1B6
-         HaHPPEz1sUx+NpJdok3L9SD/e/nCf5+VRW3L9fh9X4dT9OHOMm7/25y+/V+PfAyYS5bO
-         rOJO8vKvK/LS9Ryoo4SJopadESFO4XoirVeh3x5J3bnA00ye2exQNNhKwQGL0mJqgQ3G
-         E+pj1adERnpg5xDCqXNHFLM8fSzNu21S/8sZ57aK+ipXva7UP5l9Slxwxvy3fKIsB+BU
-         jlp+rFRl8Otx+Beq92hLKDvoolySdfRfPtKLx0VVMh/w8iZJZnCQQ+XKyeaeyEE3dZKE
-         25Jw==
-X-Forwarded-Encrypted: i=1; AFNElJ+4V0T+r1ODiHXQKcrlqxgPWn9WJHlGDIyk+7qH5ZkKsJ+lehVEA0jo4QwMZHjx7oBYOpubpJc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgC7ZskC25h/7hg4jpvXrWWOBOdb9hQ1s3gYAAhfPvZgzqIq8v
-	HQv/mRqTRjFuxDXrK7lK9silR5YF2dr9jLLGXnOz8YRHJNlQLeo6ZV6/tF342SrweejFsvjvExG
-	gXiSUjfsgFft80OSCT0EXZd2h+Wk12aZitaS6
-X-Gm-Gg: Acq92OHwDswiC5RsvOJrADBHz4S1gq9/OXuYWbwvLR8a77/XEGNHYLecxxempY/TZBq
-	dcsFXe7oXGlYz1T8SG3CXjRPCWeBDigPvDC9ppOsdgn73cfsiAiNy8FJ8RZCHxDjArWotysRDX7
-	1E90R4OUXApTVS087HecgFf2TeCpOjMA0cN5PL2LInvulgbewhYfWBasTY8ndmAjBk37jk/lAcX
-	O7w9fERLAmZwhJqvNpUevS1Y+tdu+vqCMofCcwyhFBdajN+nULdRV2ELPDaTcn+J5rC45su/AEc
-	E+a+E4PCsMj0W/kyCzJx1GgaGrTsk5YELt6srKhFuMb/pAop2t7UN5c2QUSQ5Qd7Wp8pzrZq85L
-	nSydTvmcIJsAA+IXc
-X-Received: by 2002:a05:6a20:7f99:b0:3b4:7aae:1ee8 with SMTP id
- adf61e73a8af0-3b47aaea4cdmr234461637.14.1780335826407; Mon, 01 Jun 2026
- 10:43:46 -0700 (PDT)
+        bh=pqXRFVeeL93aTE5ejiuC4gnumOaUy10wmrQoHsegqwM=;
+        b=MzunrZ4TBqAkICM6pKVv5CgCyTo4CSiThllxzsVUa0O/G+XQN+pj0c4oM43Y/CUOAr
+         7W/Huro/boB8XLuSL+t7EfGNTtgHgbqtGTd6hy9qMfITp7ZYjr3kNHuDmBZ8jRe4aD6q
+         1Xn8brQZjbHEK03lkL1IZzHBLSVckVzyughwDZCKg6EEY05lyNldu3/7VOhaNAt3sVci
+         rfeVZQgkKJYM4asELGvGHQEcM5uMz7hHmo1nRJhrIYclPtoOa1ZVCelvmTBiaSx1aEcb
+         ApiMFHHR5RGfGi0KOM97pqw1G+oUQG78lZvOTyV87fysPIfqCKsHAc7s7VMvnAQzaHTi
+         jfpA==
+X-Gm-Message-State: AOJu0Yy/smW1SAbjwHi5kFoSMsDnoS3vJppA+aLxn/m8MYs3XIp8OSqV
+	DMZ6FepWEatiHRk+Cciv6YfvPUCb06g7Zp79Kh78NnDUXNoVOZ9PynqdnUcpuCaRH0Y9hWoLWa/
+	rXLCPnCeneMDRO16e9wbBGgUf6ECrjJUMdoFA6Q0o
+X-Gm-Gg: Acq92OG4yO8M3+oC6MxTjdUnUx1TrREidthJmXfnwAFQJ9cf9U62/2gDi33iACsZsxo
+	RcIYsPoswgF+q8lVN+/w2WVC6oZX3Ske5gZusyQa9Q3unbND5vRdg/ueMvBu6AW6KNqSfWNMFv8
+	BGGT5GwHSIKEW+rJGxGjJCpJ3MZPhA+MFGp7ooqO0kLBgtDwePwKVAKJs/YHZrS/3nhK6wjjNWd
+	Y0GpCFUeMsH9PU83xhNNxXJnp45HMxW83QEd2SMHyZsZAFs1ghNgdRByWabXJk+zMc7Hqs+buc6
+	03ZD8GV0M026pGrxR443sjpTY3iNTyTQuZlOSy0ACqfyfN51
+X-Received: by 2002:a05:690c:4b02:b0:7dc:f078:c7cd with SMTP id
+ 00721157ae682-7e05e94eab6mr115484107b3.33.1780335851140; Mon, 01 Jun 2026
+ 10:44:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1780113823.git.zzhan461@ucr.edu> <fac6043fa20a2ff68e12958c431836f692c51268.1780113823.git.zzhan461@ucr.edu>
-In-Reply-To: <fac6043fa20a2ff68e12958c431836f692c51268.1780113823.git.zzhan461@ucr.edu>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 1 Jun 2026 13:43:34 -0400
-X-Gm-Features: AVHnY4IJGYpBMa78OgmnxNoeJQuYyJzvWtUeHhrXHJwWjrmkFwW8vUX_jMUKQ5M
-Message-ID: <CADvbK_cXhGqgEua975KuP+Vu81s7ZjYjE=kTiMrwxcBKLdb0VA@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] sctp: diag: reject stale associations in dump_one path
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
-	marcelo.leitner@gmail.com, davem@davemloft.net, yuantan098@gmail.com, 
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, zcliangcn@gmail.com, 
-	bird@lzu.edu.cn, zzhan461@ucr.edu
+References: <20260531160812.68020-1-jhs@mojatatu.com>
+In-Reply-To: <20260531160812.68020-1-jhs@mojatatu.com>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Mon, 1 Jun 2026 14:43:59 -0300
+X-Gm-Features: AVHnY4JmeuwdKwo5pO9j9diNjrJn8AOUXvIbKHptYiHu918CFg_wgqC8tO64jpc
+Message-ID: <CA+NMeC-BOhnSw336X8DTBa+b01Uqm03omPE4j4xtqEszO_8n0A@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/1] net/sched: act_api: use RCU with deferred
+ freeing for action lifecycle
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kylebot@openai.com, 
+	jiri@resnulli.us, vladbu@nvidia.com, linux-kernel@vger.kernel.org, 
+	security@kernel.org, stable@kernel.org, syzbot@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,lzu.edu.cn,ucr.edu];
-	TAGGED_FROM(0.00)[bounces-293853-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 574E1623640
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293854-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[mojatatu.com:+]
+X-Rspamd-Queue-Id: E99FB623678
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, May 30, 2026 at 11:57=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+On Sun, May 31, 2026 at 1:08=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
 >
-> From: Zhao Zhang <zzhan461@ucr.edu>
+> When NEWTFILTER and DELFILTER are run concurrently it is possible to crea=
+te a
+> race with an associated action.
 >
-> The SCTP exact sock_diag lookup can hold a transport reference, block on
-> lock_sock(sk), and then resume after sctp_association_free() has marked
-> the association dead and freed its bind address list.
+> Let's illustrate with CPU0 running NEWTFILTER and CPU1 running DELFILTER:
 >
-> When that happens, inet_assoc_attr_size() and
-> inet_diag_msg_sctpasoc_fill() can still dereference association state
-> that is no longer valid for reporting. In particular,
-> inet_diag_msg_sctpasoc_fill() may read an empty bind-address list as a
-> real sctp_sockaddr_entry and trigger an out-of-bounds read from
-> unrelated association memory.
+>  0: mutex_lock() <-- holds the idr lock
+>  0: rcu_read_lock()
+>  0: p =3D idr_find(idr, index) <-- action p is valid (RCU protects IDR)
+>  0: mutex_unlock() <-- releases the idr lock
+>  1: refcount_dec_and_mutex_lock() <-- refcnt 1->0, mutex held
+>  1: idr_remove(idr, index) <-- Action removed from IDR
+>  1: mutex_unlock() <-- mutex released allowing us to delete the action
+>  1: tcf_action_cleanup(p); kfree(p) <-- Kfrees p immediately, no deferral
+>  0: refcount_inc_not_zero(&p->tcfa_refcnt) <-- ouch, UAF p points to free=
+d memory
 >
-> Reject the association after taking the socket lock if it has been
-> reaped or detached from the endpoint, and report the lookup as stale.
-> This keeps the exact dump-one path from formatting torn association
-> state.
+> This patch fixes the race condition between NEWTFILTER and DELFILTER by
+> adding struct rcu_head to tc_action used in the deferral and introducing =
+a
+> call_rcu() in the delete path to defer the final kfree().
 >
-> Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
-> Cc: stable@kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Assisted-by: Codex:GPT-5.4
-> Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
->  net/sctp/diag.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
+> Note: this is a revert of commit d7fb60b9cafb ("net_sched: get rid of tcf=
+a_rcu")
+> but also modernization/simplification to directly use kfree_rcu().
 >
-> diff --git a/net/sctp/diag.c b/net/sctp/diag.c
-> index 2afb376299fe..d758f5c3e06e 100644
-> --- a/net/sctp/diag.c
-> +++ b/net/sctp/diag.c
-> @@ -266,15 +266,15 @@ static int sctp_sock_dump_one(struct sctp_endpoint =
-*ep, struct sctp_transport *t
+> Let's illustrate the new restored code path:
 >
->         lock_sock(sk);
+>  0: rcu_read_lock()
+>  1: refcount_dec_and_mutex_lock() <-- refcnt 1->0, mutex held
+>  1: idr_remove(idr, index)
+>  1: mutex_unlock()
+>  1: call_rcu(&p->tcfa_rcu, tcf_action_rcu_free) <-- defer kfree after gra=
+ce period
+>  0: p =3D idr_find(idr, index)
+>  0: refcount_inc_not_zero(&p->tcfa_refcnt) <-- fails, refcnt already 0
+>  1: rcu_read_unlock() <-- release so freeing can run after grace period
 >
-> -       rep =3D nlmsg_new(inet_assoc_attr_size(sk, assoc), GFP_KERNEL);
-> -       if (!rep) {
-> -               release_sock(sk);
-> -               return -ENOMEM;
-> +       if (ep !=3D assoc->ep || assoc->base.dead) {
-> +               err =3D -ESTALE;
-> +               goto out_unlock;
->         }
+> After CPU1 calls idr_remove(), the object is no longer reachable through =
+the IDR.
+> CPU0's subsequent idr_find() will return NULL, and even if it still held =
+a
+> stale pointer, the immediate kfree() is now deferred until after the RCU =
+grace
+> period, so no UAF can occur.
 >
-> -       if (ep !=3D assoc->ep) {
-> -               err =3D -EAGAIN;
-> -               goto out;
-> +       rep =3D nlmsg_new(inet_assoc_attr_size(sk, assoc), GFP_KERNEL);
-> +       if (!rep) {
-> +               err =3D -ENOMEM;
-> +               goto out_unlock;
->         }
->
->         err =3D inet_sctp_diag_fill(sk, assoc, rep, req, sk_user_ns(NETLI=
-NK_CB(skb).sk),
-> @@ -289,8 +289,9 @@ static int sctp_sock_dump_one(struct sctp_endpoint *e=
-p, struct sctp_transport *t
->         return nlmsg_unicast(sock_net(skb->sk)->diag_nlsk, rep, NETLINK_C=
-B(skb).portid);
->
->  out:
-> -       release_sock(sk);
->         kfree_skb(rep);
-> +out_unlock:
-> +       release_sock(sk);
->         return err;
->  }
->
-> --
-> 2.47.3
->
-Thanks for the fix.
+> Fixes: d7fb60b9cafb ("net_sched: get rid of tcfa_rcu")
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Reported-by: Kyle Zeng <kylebot@openai.com>
+> Tested-by: Victor Nogueira <victor@mojatatu.com>
+> Tested-by: syzbot@syzkaller.appspotmail.com
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-Acked-by: Xin Long <lucien.xin@gmail.com>
-
-Note that the issue reported in
-https://sashiko.dev/#/patchset/fac6043fa20a2ff68e12958c431836f692c51268.178=
-0113823.git.zzhan461%40ucr.edu.
-
-I don't think it exists, as sctp_sock_filter() is called via
-sctp_transport_traverse_process() where sctp_transport_get_next() only
-returns primary_path's transport, not each transport.
+Reviewed-by:  Victor Nogueira <victor@mojatatu.com>
 
