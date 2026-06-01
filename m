@@ -1,189 +1,143 @@
-Return-Path: <netdev+bounces-293613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293614-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDBMIGNDHWpbXwkAu9opvQ
-	(envelope-from <netdev+bounces-293613-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:31:31 +0200
+	id COeEE7hGHWpbXwkAu9opvQ
+	(envelope-from <netdev+bounces-293614-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:45:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C276861B7DA
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:31:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CA061BB08
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 10:45:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4424300F9E2
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 08:30:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65860302B80B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 08:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DA433F38B;
-	Mon,  1 Jun 2026 08:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BEB3890F8;
+	Mon,  1 Jun 2026 08:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrG3TDu7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pq+e2udQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8616286891
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 08:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2002B388876;
+	Mon,  1 Jun 2026 08:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780302649; cv=none; b=V+DrCvmjLHWvMbsS7ydUg+gbbonsQpkSvP707+rGIZLBeBKTsxhGvopqLdFMQeQKdwu+2IkJ8Tl8DyyzPI0fqch25aNX/XEcBDfzMScD+q03LYRszT8njozLid4WcaPFJvhbPlQkMbHClNz155EjQB+2vpKQk30Qose7tGyn6rc=
+	t=1780303240; cv=none; b=I/qy7SIkV+anWizQkZWqXk9mHPAbVXBtcn/fcwy1yKzMmt+M4tNuIiYfRGm0owYhT34Md8SFL6Z6a+BhkbBE2casC55ZDlw7j0oikaXYjHmdcIuAZMXq18PlZLkb+n+ND9Q2+BiFk80XYXavtoKsIzOch+GmduR+t3uwyWplRu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780302649; c=relaxed/simple;
-	bh=Y1qVp4utPKZXUH21/T3Oo88OLSEQl2daIWhaSnuy/Fw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WyRBxRxUzZlHP+MnlnlycxBh6fDLttH/YAC+s7S5UWAV1MWubWyQRuT7/8gCeHWB1/mM+9UCpByhCFmxIuj6RLh8JNNcMik7DYNPcyusufR9GLWGkZ7sNDSbhdJ0XkFwL/qIpXox0/YItMR6dN9wQUqfh/4c16zceGAa+H3wh2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrG3TDu7; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490ac357c55so4520285e9.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 01:30:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780302646; x=1780907446; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qwAHLZ3UgcsbO24XSXnLiyviM8jEF0gazKCXykLMo3A=;
-        b=UrG3TDu7nOBXxRwlP4A223WWSeabGqtYiaP93eK92JG27fX3HBMHhXofZQKsPtarhT
-         vTp2GyGwhAQf37z1fKMUp5TB5uQVqaO/GTJOUb2/MGPMQ/1pWxPhKKwD3N0zz2wEpwUq
-         kEhc3m60pLbpj2Ac35ectndeCThI22cWJXUJxnRNAhdAxXVeC5BWWCiheEYVChxTeN66
-         ZWi737hC75ERE803zkKvGiduWITnT63RDnYmKc8IrdG6n9XHVcZDF21Mrh1mJyfzo1e3
-         PgOLvmg2sRwJ30g4cq4DVs3UEo+6aN7XEnhhacmBJMfLBv20U8Rse8zM0OJnhlcpyWk/
-         miSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780302646; x=1780907446;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qwAHLZ3UgcsbO24XSXnLiyviM8jEF0gazKCXykLMo3A=;
-        b=r2eNYpD4hYpK5HRdNi5CUvJjlqiS0MeooSFwagaigmevKZl9HI9YLEZB9RZi/pgFPR
-         PHfaRc/wWz1cG/LXFjtLHNLXabNefE3eU49IDPBlLTyVxWP+C+rUzDgWzBsTPmgO8kC5
-         GegrYkVLra2PTmmsdS8KaQVWIvPtVMU855rnDxMtstm88u61WT9iXAVd6EBAGmROn2AS
-         8C+vkR0oiVeBwXJ29bJVMmlxj9M/jaHoDY3fd42nBSNDryAmZWjSzoDAYv1Tyq63ukfV
-         IDMbTJ3+ltKIun+AN8BoGuJoDTNvlspA1ytj6cBYCjZyn5cD+xH18KQxOpQCZ+CC1R2d
-         MPog==
-X-Forwarded-Encrypted: i=1; AFNElJ8rZ8fAkAO8sgMjpS6ICganQt8IQjTch28PvjEsLWWc+jj2OxGAYdu/Y8X+6eAT2kbV/8HZN8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBMuzDh0ncv+UuiIBFpJqG0GR7YfoLx1K9SXhjuvN8GpflXXmE
-	UwWDGYaHbc2opXZUec696OvfbbfK9vlNbX/uskjXglk8NwSkq4SY5XPq
-X-Gm-Gg: Acq92OEmcJxcgLyuFFbizCThsBvORGwckXPiba43MN/iZZubPNfGvQz9nsMjkaYdNHB
-	caa7QxzHREI5dLmm1PQpuap1VmUk6CESTS5MLqi/45K1q7JlYiSS309vhrT9GUIjxBDUkazAYq3
-	YSRUQ8bzrWA+KwfgAeIiQUcJQ8npPkgVwimPAWTgj1tCT1+z84sBFXE+ywz02BTjZjByAf+kcmj
-	A0jytHUkpoIsG9h5V9jdlVFas4gZxSDb7464sSqO6uERyNR5QIOTn5bDhjDK0w8GHiP/RpPWT+m
-	DJjp1ZMmtxeVNDFF6zicCIQ+EBuug+mQTQZUbgpsxMkyRk85QWYzIwGIn/DGHSoAHNpRZZmH2R1
-	CA1QjmH9ptmP/CfGMOcEcfwibzoMUeaw3e1wZDMJqUcc8qCuoOVA1C70xKcbyPqVfXw5boBjC5l
-	vLdp4sJzutFf+sJ8fCZ8Tg0MbUgJuwfBpFaNznMRIum5krbKH1/Hw44Xa5eGPx1+V+50rSaF8Ps
-	7thkqvYcb5Ihs2GVx1B
-X-Received: by 2002:a05:600c:a214:b0:490:9782:3eb8 with SMTP id 5b1f17b1804b1-490a2948f0cmr112272415e9.25.1780302645969;
-        Mon, 01 Jun 2026 01:30:45 -0700 (PDT)
-Received: from [10.1.0.164] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909ca6db64sm228497705e9.6.2026.06.01.01.30.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 01:30:45 -0700 (PDT)
-Message-ID: <7b7616ef-026e-437b-89de-2a1f67356c5c@gmail.com>
-Date: Mon, 1 Jun 2026 10:30:36 +0200
+	s=arc-20240116; t=1780303240; c=relaxed/simple;
+	bh=DDKD2SJwhyqWOtCckBH8XOrfrqw8hA5OvRQwJ5q76k0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MLFbAccLvmLqfT6VkYlyWNHZsOn6WiEZQQY1F6ifZi9UL0lPI7CMZ6i2Gr6itKyBxOCbOrcD4iKECozWTF/P32KN7xR/PCMrFF8ArcB0LZQJfpLUVVxpunmS+hqBsxheTpNoOYVc4v4lfWAXjidbYx1ElfHf8hvZ7HQukBYoYZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pq+e2udQ; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 506EB4E42DD0;
+	Mon,  1 Jun 2026 08:40:34 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 23F02602AB;
+	Mon,  1 Jun 2026 08:40:34 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9DD7110888076;
+	Mon,  1 Jun 2026 10:40:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780303233; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=pjuI4AEx5LMUF9kRBIZE3sijXPwdpHTr+4agvyYrasE=;
+	b=pq+e2udQuEBuEB6+QrWHvEDeFhEo3qKYdKIijAVSZl3VwRp5o5W+9/LHdv+nFe9UCQeaYw
+	iAVz5fGh9Fxdflu/NNwOEcMGup5jgFu2lHe4K6lhSn7he3rmOGbKBQs3H+iwvlExhmSeE5
+	wmSnImlYJAi3zOts+KrFRhL4gSHOUCG1w8FTXTO0+kRk6q42osm2zFXOzoalplyUYvEqqD
+	zNISQgSrDnIzF3qWYH8XtPOR0sQnakUCeXuosvktTml6oJm2K3AYW98wgjbCcY5Km7RWWe
+	F/60I7Jux/BtuHYXHLrIATO5E6caFSxjBGteFQq3wNvLsPlEFk/f8UJa8nvf6w==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com
+Subject: [PATCH net v2 0/3] net: phy: some cleanups following phy_port SFP
+Date: Mon,  1 Jun 2026 10:40:25 +0200
+Message-ID: <20260601084029.815461-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/3] net: dsa: microchip: implement KSZ87xx
- Module 3 low-loss cable errata
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Marek Vasut <marex@denx.de>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Tristram Ha
- <Tristram.Ha@microchip.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260524-ksz87xx_errata_low_loss_connections-v7-0-1cd49cfa24f0@exotec.com>
- <20260524-ksz87xx_errata_low_loss_connections-v7-1-1cd49cfa24f0@exotec.com>
- <77de607f2f8330ae6a593a4803887c8f@tipi-net.de>
-Content-Language: en-US
-From: Fidelio LAWSON <lawson.fidelio@gmail.com>
-In-Reply-To: <77de607f2f8330ae6a593a4803887c8f@tipi-net.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk,vger.kernel.org,exotec.com];
-	TAGGED_FROM(0.00)[bounces-293613-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-293614-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:url]
-X-Rspamd-Queue-Id: C276861B7DA
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: C0CA061BB08
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 5/28/26 09:19, Nicolai Buchwitz wrote:
-> Hi Fidelio
-> 
-> On 24.5.2026 12:44, Fidelio Lawson wrote:
->> Implement the "Module 3: Equalizer fix for short cables" erratum from
->> Microchip document DS80000687C for KSZ87xx switches.
-> 
-> The commit message says this implements Module 3 from DS80000687C, but
-> the errata's Work Around 1 writes 0x15 to indirect register 0x3C
-> ("PHY equalizer register"), and the patch never touches 0x3C. Could you
-> please clarify which document the register addresses
-> (KSZ87XX_REG_DSP_EQ = 0x08, KSZ87XX_REG_PHY_LPF = 0x4C) come from?
-> 
-> I checked against the the following document:
-> https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ 
-> ProductDocuments/Errata/KSZ87xx-Errata-DS80000687C.pdf
-> 
+While posting the v11 of phy_port netlink, sashiko found some
+pre-existing issues, and following the tentative fix [1], Nicolai found
+some more :)
 
-Hi Nicolai,
+Patch 1 and 2 add some cleanup in the phy_probe error paths, to discard
+all SFP and phy_port that have been set-up when probing fails further
+down the road.
 
-Thanks for the review.
-Regarding the register addresses the definitions used in the 
-implementation are based on the following Microchip support article:
+Patch 3 fixes a sashiko-reported issue that I was able to reproduce,
+where we hit a deadlock when trying to setup PHY-driven SFP ports while
+using genphy. This is because the sfp init logic for PHYs is now
+generic, instead of per-driver, and genphy has the particularity of
+running its .probe() under RTNL, which clashes with the SFP code.
 
-https://support.microchip.com/s/article/Solution-for-Using-CAT-5E-or-CAT-6-Short-Cable-with-a-Link-Issue-for-the-KSZ8795-Family
+One more reason to try and cleanup RTNL handling in PHY/SFP :)
 
-I'll add that clarification to the commit message.
+Thanks Nicolai for the feedback on V1,
 
-> This silently returns when enable = false and nothing is written to the 
-> registers.
-> Either I'm missing something or the short-cable preset cannot be cleared 
-> through this tunable?
-> 
+Maxime
 
-You are correct that the current implementation does not restore any
-configuration when 'enable' is set to false.
+[1] : https://lore.kernel.org/r/20260530072706.3167745-1-maxime.chevallier@bootlin.com
 
-In the next revision, I will update this to apply the default
-settings when disabling the preset, so that the tunable behaves as a
-proper reversible configuration.
+Maxime Chevallier (3):
+  net: phy: clean the sfp upstream if phy probing fails
+  net: phy: remove phy ports upon probe failure
+  net: phy: don't try to setup PHY-driven SFP cages when using genphy
 
-Thanks again for pointing these out.
+ drivers/net/phy/phy_device.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-Best regards,
-Fidelio
+-- 
+2.54.0
 
 
