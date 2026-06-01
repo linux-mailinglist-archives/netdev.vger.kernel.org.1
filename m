@@ -1,182 +1,182 @@
-Return-Path: <netdev+bounces-293554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293556-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGwUDC4bHWoeVwkAu9opvQ
-	(envelope-from <netdev+bounces-293554-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 07:39:58 +0200
+	id 8HGJGVMcHWoeVwkAu9opvQ
+	(envelope-from <netdev+bounces-293556-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 07:44:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8988F619BD0
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 07:39:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055AB619C2D
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 07:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9B3F300B3D1
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 05:39:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 55C6F3003D04
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 05:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3EF335BBB;
-	Mon,  1 Jun 2026 05:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140BC3403E2;
+	Mon,  1 Jun 2026 05:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K84cj3Ct"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eFcOPSmy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78F033123D
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 05:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA8033EB1A
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 05:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780292393; cv=pass; b=I6l7535WdDFQtdUvNFM4aEMIwUsR0zBXRgAdn1AHF4fHLZVf3jJj75flAvllnqIPGRgEJ3quyHUrpOj39eys5ntJSRvUgCLE9dX1ZMXmzd3WeCwKjnUJH6R4GaznIbZvek/yR1XiIRdtShKIuKVYQXz7mGL9MnrHasFVGZKEvts=
+	t=1780292687; cv=pass; b=XeNN7fOFoE+9JLtqImA/h86kVidJh8R7ek4PPodSHWKdtEPbVkAX0aubRh7qFnFy8YBtYzPaWM0HfpfQ3zOXtbFNwYZZRbBcgSM50jrbt6UT1l+Er69Ml0D6syYyYZ2ObcKTo35TH8Lcky8Aj01odiFAE+YQaj1yALICN2LYqtM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780292393; c=relaxed/simple;
-	bh=fhMh7VI+fDjToJYmmaPjtR0k2mbAxzQziy8hOa/+IsU=;
+	s=arc-20240116; t=1780292687; c=relaxed/simple;
+	bh=3SEfUrGpOB+OrS2N/tF2ctbW+WT/uZ3USk5VMcVSXLA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rwSzr9YuAcwB3OfxMas86a/rlcdJIdCIKXsboeufDbOcquB8TfSWxKlxP7/XMbNKo8uoaaknnVV/iivCos74lHtLpR8aBRCfGk1eJl1oVkUlPn5c99gcEq6SkM17/j/q6SK5sC/z/95rRNXLGRTLwVViDHIe+DCF9HegS4FM5uk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K84cj3Ct; arc=pass smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8422a92b6d6so614756b3a.1
-        for <netdev@vger.kernel.org>; Sun, 31 May 2026 22:39:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780292391; cv=none;
+	 To:Cc:Content-Type; b=Bx7K7sfJxrEDKmxOhWcynYkvDcJmCr6PdpquYxbQl8kAgq09L8wf118UMxN/kwsNbRCrJZhvXFCawr0MD4qXgU5tACrq4EkJp1+jii5Uq9xxpsaMQ67tB2EvlIymYP8jkwGTTEV9iyHzF2JQyzbvokZPVNCzOSu+eY5KAayiKNM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eFcOPSmy; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-51758478240so1653621cf.2
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 22:44:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780292685; cv=none;
         d=google.com; s=arc-20240605;
-        b=I4jya0niRm+/HU2ttY2hxd2opXDp5UoOVXty6vTDs/JNwAoUCY50UCWlp4qk1FwBbc
-         LILKwCfZPn0B74sHpD/VjYgvmA3fWRHX9WiGUFhIAIL6vDZdUt2NGCv75YAMeUQeOPWl
-         lI0+yPBvdiqWrZWkShun4Ow1rQ/hg4DddftbK+349L8Ap+TX0yHCr+2s/w+b23hQMH34
-         lxXifolAsE80sqlKhHX6W2/45RK5flE44EApFqCOB5pZNqhL7q3TlVI7q4cFzAk/8vvU
-         07EB3rdL2/iARN+cjF1Fcn7UxUhJuFU/Al1qLif6BrR1SjJMYoRDWT//zLzk+j/Qk10o
-         EL7w==
+        b=CAqedALsigfoijxjY8Ntz1Ux/cdIKb+HN/eL8YIpsQaeNc4xSibiSVJMrnzBnQoJuD
+         DQhsEmrx40sCmcXhmX5ijyCHsY1N+6pmlHFl6jPgTxvX9GpmqTFfilrfkAHFzZ6gFOSU
+         VXXGKGIkzdolHIpI3ITgOaly5kJ1yxX7Ce7iF+NvEQfAInlsjtcJSo0rHRkgOEhMJcoh
+         gF0lhvMfU8H7S0/7kcjJ8j2//5vpuC9p9r7KYRqkYwwSRQTcsjW/LZ+2K40nmNnv6HP2
+         o3BLEd+CehC+pb6XcoBGLzJhLEPRQfCeQ7GkNr6bJv/m2VCRWJtJKDLA/1uuleVfSrX+
+         brxw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=++Hez6BcFzhV60mZuduDVLo3yt8bc2DYA37KVaO+BJI=;
-        fh=D08NPQHx3brbEsLZJeKHltqjLiL+ZJxd2gBXuo1JP3g=;
-        b=LcWb3CkXSPFjh/GblfVQHZrTdR8UE72OQrvtQPpNPaLUypQ1Ghl6Tl2rWLWDTrSbC0
-         2Q0iOq6sQnYz0ht4xfeBpfeiRZdSON9NzXFrBndDJvK6/YR20jSpYt+cFqA5bx8x6UHg
-         AWXZY1RC+5lshS1UUz30lydT2N5wfmR2NMK+FaDLl83vcLBAAJFIi+Kb6xmn1n8t+t5y
-         +pTmdIUY0smJpue7e7SXQrMfAcopN/C/MUAcbSAI4/NvqsQpyWVZu0yYXV9VndvUvAlb
-         KEHwz4mstbwFrOCoaEDE2V5obC/FwxahNfTWVouJfPnklBaMNZ0bN4GvRBootYPwYgKB
-         qBcw==;
+        bh=CYJ9us5FFWuw1Ubnqm5Mv6Rgk1trKuije/O9oTp1I54=;
+        fh=SyFG66jC/oVt8C2dXvxTXwjVeBYCSYA5AG/WV5Zdb7M=;
+        b=IGLSJSvm/aGkpp3dReWyemI9Bd3+JXz5J24bm0yFR6CYfOwhYmVZqjoulGMJ/y0JRZ
+         SuQZXlCsqcq/ihjXwCjuClaoEUUZL/NCHdx7zBShY41sjvfsqV5jpR50Hzm3e0vmZtqr
+         MWLvolK5XqjFlDQpqstd5/N9yC9uhzcBHQnISgBHaXtJZCYz9oDHyR70HtOVubRsp3oE
+         BuB3LaceoiZDkQ7tb5OtBQ4R1U+Voijt8a094nsGiz1s6Y83SwK20KOGJZc3bXgVH6yF
+         nMH7FDOWEsgx645SZFFT8tDRzXJYdrbMAM+pb2vEgRqf9EU/QhxDdDDhWpJrjuFWr6ah
+         OYIw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780292391; x=1780897191; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780292685; x=1780897485; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=++Hez6BcFzhV60mZuduDVLo3yt8bc2DYA37KVaO+BJI=;
-        b=K84cj3CthnomIq0DqtdTK2knnkiTVz+sQ3g05MLRfBUH5e/ybAMdA6sKwebHGI8FrR
-         hShfXT2joZukStWndOGBCDcr/6UfgDVgx3jZKe+lcttm26YVi5QTWiePsw7Hsx2lhD/A
-         rak59RVzFKM4YJQt15dYwAxERW86EbmTN1hziztfN5ZcKPNKeuRiQSYY2tsPJdqO0HZx
-         +w6UtRpVuI1lL+86LRLoHqf6AOG6ICvFwgGI6U0/XkEjyRuJRpvInmqmqHVbnkjq37Wb
-         OBW76qTR/rMt832pq7ESTpR6ULAakL5j68HysWVURayqkzhEGh9ApXptkVfPpKyZzpXp
-         yMBA==
+        bh=CYJ9us5FFWuw1Ubnqm5Mv6Rgk1trKuije/O9oTp1I54=;
+        b=eFcOPSmysNRzKMC/dOMYuTqrR/SkhfUf3KOewI+3rMotMkgegMaWjLmmj7N0Iab4Fo
+         cdEoxnqvSeJupxVKd0Wp+ggTpbzz8lIyxUQhcnGTG7dzt8PP3OJGwWzM01wIpCtQt5ST
+         e501O7hVBPRYiHXcLP2oQvVdXNfBD9WZ40IKM+c5s9CFiziKQnO+jzB78bOespbTdyEY
+         ocsHHaigV7i6t7ihlqzMLoUopjgWfqQjAN1ObeV0pzrKAnl30ZqKwBMWHU06EzTl2Cct
+         CBgeGgjAyCfOgLKWbqBhK1CGzunskMda2fgA8yKeRXZkjGz8I0rG7cGJtNIjJQm6xAqY
+         qb9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780292391; x=1780897191;
+        d=1e100.net; s=20251104; t=1780292685; x=1780897485;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=++Hez6BcFzhV60mZuduDVLo3yt8bc2DYA37KVaO+BJI=;
-        b=lp3CsHqSFKbTjYkvwYsjiWLEiciqzmQaYugLDMeTZXFrQCmxljFbD2N8DPZi25q8sN
-         zXfdl9dLR8aayzArjv1E1/0yMKmVtgGbZkU5COoE6CeowtEDF3C42ZB2+6CDu73Y5Os9
-         TA28oM9KADKOSemkJVEj4fqGtqUKQoKP6SFIeQDvsDqcmcQTx55nvSl1Ckis96Ja/xx+
-         lOthyrFthBLPayPBq2oXVDk1Lp38b7ODsMGqr8j1HwRHVMRHsuhfeQ0WAskRcYhO5yrj
-         C693j1XOhq6uYsHynSKHQfS2nWaltFhsz9TFVTb4YlOQddMKchK8FJRCuqNuM3HEgHh3
-         nsww==
-X-Forwarded-Encrypted: i=1; AFNElJ/scsOxchkcZ9eUUtcP1H7jWSPw1++LSONk4B7hjhz//JZjPJZ0x/WNZKTNeAU4fAdx6IUJRfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVbdg3EiwrmNRc+0pn1EfqcNKDqv087uAgSK2CPTlwCmclkVdp
-	Np6/2QnPlRgAY7cTs6Kvb6/9XMyrUc5KOXc2jWfAwVZvr1ZY0SYXz//SOHqIOmqP1/aji2Y4hIc
-	gT78QZiPy1fjVAHGwsktxUA8XGVSYBQ8=
-X-Gm-Gg: Acq92OE7wKnHMGrctTxBVtQdjl7F4joMrUMYR1d9nNnKyWM3krwH36ZGOf7t5J+2t9s
-	u9A0dW9GoY/uhVzKaeRhCtjbVlPXhRmUS32RwnqingeeYt371OUEU3W0ZxE4XfiJBx+Mo5n0rKH
-	++56pviAV0WCguEM7Ln/UBDf/6wAbqIZfblog1FHWnzQpF/nCbzAIK5ZMZo6pVEUMOMcIYBB1ts
-	391AkPSdchnx9xmotdv048XIeJUV6Bt9V7CLFkpW3qElbi1VCddnPZccYrgJ5KX/S8S+P0KpIt3
-	MfORuvJjdmv2fIlOYk4M8xcDoexIIw==
-X-Received: by 2002:a05:6a00:aa8c:b0:829:b08f:7353 with SMTP id
- d2e1a72fcca58-84225806185mr7434867b3a.7.1780292391030; Sun, 31 May 2026
- 22:39:51 -0700 (PDT)
+        bh=CYJ9us5FFWuw1Ubnqm5Mv6Rgk1trKuije/O9oTp1I54=;
+        b=CwOndl/EmckTfvH/WjgvZFjgz4GVcOhANDHMpKy2BFWLT1/jiHoenujw8hFzAbtcIR
+         JYEdYvVZfaYSQnq6B0QYCqufBkq+h5CBlBy3OMBv1j8DSvE8G/2vBoguoHRp0xUUV32F
+         W7izS8GrD6NN8Bi9ycu2eZe44S/HlN/PDrIGiYeVb9dyHPICq0eCKCi3ElApmJI/+qSI
+         BEuaVxVb8QCSr6CqbkbDI9jp7vKupT0qjFgtv53keKXgH1GBg3m6RLckwt/8QK+efk5W
+         WevOJV7gwV0RYHxH5ML3WCZprQXOhc3xH5wKT52xfZbomyiz/vNBTqtG5ykLp/e54hCT
+         2yeQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+M+48xQDyb7PwIIv8AIwcnBrBz+bXcNjgErqAarNyq4obBsaaAr7qgnjKEGNgBDLE3r5wrA4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIIbgl6TrIdNZwYND/Heae6XTlyYGNwPxEZzl9fMv9XDh/ff8U
+	8dz5FHErJRbb6R8z6MGAQhzYjJzsQuq13+aGoYJwmPSwjEV8FXX7AJG7zbCCW2iniDrtg7VgUrj
+	2JizvVHq09cxwgIYka+wyXPmWFNk8jwW60PnIdzLN
+X-Gm-Gg: Acq92OFYIBqJBFoD7aHmyHFGA5BTug1n3RUZk4loN4r0/5A6GXm4sAiiNuqKnsvkbHk
+	mJ91A2vIWFo2ZDziCAZfeOJhhyK/ilpyEIxldY1odAEaLr7NxjpGz+hIkR0fHrSFXG5NYBjQH61
+	Mne+DHTdoeNpsih7DFxoWPyLse0KtE6ivh8dc7H8AbeM73P9VZ93GTkOeI9iOlQZOCrKL5ceiu/
+	xPncRYRMrOp7RxmhzSvNLrd8ptvdAmUoYpPCfIMkfkY/7uCnWJLxV5mVyNBnp4LChlBa8xtKqFR
+	7GE6noNB2idMSihHA+zaEEJElpag/qyZ7C0l9f/Wudel/oYeKGz7vN6/EiODeyx9ejGFkbOEZg4
+	GqQsXP1zYiJvsM2LZ9yXSQLHLQjs3
+X-Received: by 2002:a05:622a:1106:b0:517:5790:ff7b with SMTP id
+ d75a77b69052e-51757910b7amr22711931cf.57.1780292684284; Sun, 31 May 2026
+ 22:44:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAD03fjaBJGtNATBxaYO-PAxdKC=HxYgE+M7HQ_a0O+3Sp9Mruw@mail.gmail.com>
- <2026053145-bungee-flyover-840a@gregkh>
-In-Reply-To: <2026053145-bungee-flyover-840a@gregkh>
-From: Grewstad <dogestad24@gmail.com>
-Date: Mon, 1 Jun 2026 11:09:36 +0530
-X-Gm-Features: AVHnY4KL0P2TgGuqwzNPsVxgOuqCoiWIuNNwDFufUXPHqDJofsznfpXWQubqhvg
-Message-ID: <CAD03fjaxcS0rfZbNPNQjg7HxAhhTvOBxH=p-Rj_ngaGBPmpXMA@mail.gmail.com>
-Subject: Re: [RFC] drivers/staging/axis-fifo: TODO file and subsystem direction
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: jic23@kernel.org, jacobsfeder@gmail.com, linux-staging@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	hjk@hansjkoch.de, davem@davemloft.net, netdev@vger.kernel.org
+References: <20260601-net-next-mptcp-add-addr6-port-ts-v1-0-4fc25dfef62e@kernel.org>
+ <20260601-net-next-mptcp-add-addr6-port-ts-v1-4-4fc25dfef62e@kernel.org>
+In-Reply-To: <20260601-net-next-mptcp-add-addr6-port-ts-v1-4-4fc25dfef62e@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 31 May 2026 22:44:32 -0700
+X-Gm-Features: AVHnY4IayHyy6cMDi-nQDDjXrYJHGRD4C69UxZMSkBfLGuSFxlZymzrG3JPQpdU
+Message-ID: <CANn89iL=os-60kDKqMDdyiXuPF5CG=eejS0vmthwpDGXz_Bp8A@mail.gmail.com>
+Subject: Re: [PATCH net-next 04/11] mptcp: introduce add_addr_v6_port_drop_ts
+ sysctl knob
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293554-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lists.linux.dev,lists.infradead.org,vger.kernel.org,hansjkoch.de,davemloft.net];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293556-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dogestad24@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 8988F619BD0
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 055AB619C2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, May 31, 2026 at 8:56=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
-> There really is no difference between a miscdevice and a character
-> device, the interaction from user/kernel is the same.
+On Sun, May 31, 2026 at 10:24=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> This sysctl is going to be used in the next commits to drop TCP
+> timestamps option, to be able to send an ADD_ADDR with a v6 IP address
+> and a port number. It is enabled by default.
+>
+> This knob is explicitly disabled in the MPTCP Join selftest, with the
+> "signal addr list progresses after tx drop" subtest, to continue
+> verifying the previous behaviour where the ADD_ADDR is not sent due to a
+> lack of space.
+>
+> While at it, move syn_retrans_before_tcp_fallback down from struct
+> mptcp_pernet, to avoid creating another 3 bytes hole.
+>
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-> UIO provides a mmap of a device to userspace where it is controlled
-> directly.  Probably not what you want to do here right?
+...
 
-Yeah, on second thought, UIO is probably not a great fit here. This device =
-is
-expected to handle streaming workloads, so having a kernel driver manage
-the data path seems like the better approach. Thanks.
+>  };
+> @@ -94,6 +95,11 @@ const char *mptcp_get_scheduler(const struct net *net)
+>         return mptcp_get_pernet(net)->scheduler;
+>  }
+>
+> +unsigned int mptcp_add_addr_v6_port_drop_ts(const struct net *net)
+> +{
+> +       return mptcp_get_pernet(net)->add_addr_v6_port_drop_ts;
+> +}
 
-> Is that what this device is?
-> WHat really is this device for?  What is the goal of this hardware and
-> how is it used today?  Do you have the hardware to test with it?  Who
-> uses it?
-
-Well the hardware is programmable and meant for hobbyists and researchers. =
-It
-could do anything, but SDR/DAQ and low-end networking are common uses. But =
-since
-It is a programmable prototyping board, making it hard to cleanly
-categorize it into any
-one subsystem.
-
-I don't have the hardware, but I plan on testing it using QEMU.
-
-I was looking for guidance on whether the current miscdevice based ABI
-is already the
-best fit, or whether it could integrate into an existing subsystem.
-
-Thanks,
-Arihan Bhor
+Please use READ_ONCE() over sysctls.
+This will avoid future patches from KCSAN bots.
 
