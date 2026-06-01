@@ -1,332 +1,191 @@
-Return-Path: <netdev+bounces-293581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293582-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKH/HHksHWplWAkAu9opvQ
-	(envelope-from <netdev+bounces-293581-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:53:45 +0200
+	id WP6IJXEsHWplWAkAu9opvQ
+	(envelope-from <netdev+bounces-293582-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:53:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9C4761A6F7
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:53:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3788C61A6EF
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8CB48301DC1E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:52:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8D648300398A
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5288336308A;
-	Mon,  1 Jun 2026 06:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4F73803FA;
+	Mon,  1 Jun 2026 06:53:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXDrHH7Q"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hrh4vs05"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011024.outbound.protection.outlook.com [40.93.194.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F160237FF7F;
-	Mon,  1 Jun 2026 06:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780296755; cv=none; b=n9PjZyzdbEPkT6JljoxBqfL703VC9znDxs7pqahG0OBK3G4E6Qt1RfrP/lpnKTdKkaKg2g/+odU4l40JM+K6RJDHT0V6mnHP8CzH9b0hMK8+LjM9FSxPX1fsJmfdFg/tKbecF9A9orxP+izWrFNBI8wAo25Y+T18vvB/N5ZIyeE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780296755; c=relaxed/simple;
-	bh=+Ug0/Jy+//jBtRa0eUFStmHjEAlY5BInHV9s9TRp8M0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dGF2tZ77mtXUoWhqG1ZzbRYScmZjak7AI0y40dmP6Bp1YzPULp5MGkEmwG8gg7NLqo5i8daZ9q/K2vdoyYP4g7EXvayCdIdRoYLD3DWxZow9u4saNyRzHoGIubK5sDACEf5iyxq2lVbhwbDppQI3BJJJ+2pJpR7q2YbwwSnwOus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXDrHH7Q; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53AE1F00893;
-	Mon,  1 Jun 2026 06:52:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780296753;
-	bh=EHNnn+XXAYZpllC658QeNsc4YneQ6lB3Hen3/qyDP4Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=cXDrHH7QoLsLi/Zp+9FhCIInG38Tn7ioFbIqUhujbF4TfVJvVbX5/ym+r7MldeOg0
-	 2E43DrHeVWcMaFPyG8G0JtoPxHUiBoKKQVt0IFoEMKJ/M//8/vyN0F79YBLK+A/qZX
-	 vOVdIq29m+TYg3pse5/hlwXTPSfuLWbPK1N1rzRes0ZT4EF6FxHjsHHMIIxzmv43t/
-	 jXBaD0BRo4cXaucgy9mbZG8nAJVOJmrJMk47RKrXV2BS1e/1eyWCPnRVHvIZSJLS+K
-	 /u18DwmLfroMcrxjNk5krq8rCuk/pl4JpsoBkzTFyNAiFzAHu+LxBeSELvznfWeaAQ
-	 rRVjfwPUhpuIw==
-Message-ID: <1f3aea3b-1bb0-4584-8f6d-af14d73df81d@kernel.org>
-Date: Mon, 1 Jun 2026 16:52:25 +1000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B3537FF7F
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 06:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780296813; cv=fail; b=IAkFVidVMdUBu5nkymD9rJEsG7xKc0knrmZ5Pcoxjer1gnqkFl8TZEhmIaQ72XvQwcDDQRYSwYyXMkvbSPvHjjgBKCrrXDmiWep+BNHY02x9f6ym+t7DX6L3Nc6frONOgEAVX59o7NBeGVFKFHSJpS1K6J/4H6lnjWadSIGAA8Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780296813; c=relaxed/simple;
+	bh=ktvmEoJ6wpOApRD/xA4he+od4V+mAw3NqWmGegPKrbk=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=l9r+b9g5Tx3rYuA8Uk+PIAXVlrTW9Z5a8a/QXLaZIv1kvqcFoAcduvfn0PZaAF/dlv+YW10bFnzzlrjLg8xt0MeZAPHDzNMWBMYtwkVopMI1SiBT+kZ+CS1vdAa928n8mA6bWdMWgCCK3b6I34dpviDyUyc1j6YnlonT7RUBS0U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hrh4vs05; arc=fail smtp.client-ip=40.93.194.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eUV6XAYsM8RsWa91I3Ehuz0ssYmy/8E6XRwTaZjoIGRECbiveDDGINBypm9L4odcadLrGoCTKS9mGCw+TnFnpsxMfrqu507BZXpItJOLAgdUMxzURXIXEHZALA8ADeAqDohwpqchm24VJiNsp8f7WJRiRlky6ppVSfOeGcFWeAcljZ5yVCBT2R6TJIFeuoODQDTT3+v6mCWzQ1cWfRcm9QZgG2qik8dvFbeukVjTsHC5j/kiArCozwZWPyvQvp9HTDFa0eOB0OAFzNuknqYhs3EM4yyLLYoFLqrmINjT1t2U5YNnHse37AubyX/lfMlE+CrOavbuxrsq0Dn0SH6XIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AwCLKGWYj7ku2xKaJRP1k24RQZaS6ROwADZWTJszJHU=;
+ b=TtkUoyQDcKq0wxPs+a+Oy1wCNbVF5IFx206T2qdDWTDopdkC+aoEIwMMVtF1HpTliFqzwEmTKSExF/fVEG7QPGdzdJLMmm4Ymk4Wja5qyaT3AxYc/+wepqBN2RYZOS9gS9Qe2bDCZjwVb30DYplGf9bp+xQIF4RNyKrLYY0fqHHwnFzoTsnwVSkq9TmoFGrYKHVOlDwtMJ5K9fnf3ucHH6eFaAqHc/kr4UAlKd/Y/yGwayWvuXsycukw+OiRTY246voeTREp0gW2iym4IxRKM5twuLmW8m5FlyTZ92xLZLs643vslwPXbNKu31f0mjmW3bPi3nr7l3cO4N8yA01dvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AwCLKGWYj7ku2xKaJRP1k24RQZaS6ROwADZWTJszJHU=;
+ b=hrh4vs05L7wCl105tD0PFymUkjaiY2jc7Oc/QHDnua1SPE3juBTGR5MY8Vs5qjSJgXGYB1C3it60dLNlObl4IWKYjxvAGIJf7i0cMQz35ujXDkgAy25JMOjYpIVih/+C4bp2a2yMY0Q5DSoKn4UGLZr4xdeiqmJAx6pjtrothVFUJbhLBCiurpL+Ywps5af+emelJOvlfXYrGnrHmSrvRaa6y2dabVnxPV94txP3yceWb1TYW4PHp9SJnA+2zcJxY5ocLX70gKy12Hz2LefxnrF+AWmIhu44BlAERYQwa2Nfbl1u4JxNeUEz4KPINtsEzRkQip33XNPjNvQcGJUaYQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SJ5PPF3487F9737.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::990) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.12; Mon, 1 Jun 2026
+ 06:53:29 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0071.015; Mon, 1 Jun 2026
+ 06:53:29 +0000
+From: Ido Schimmel <idosch@nvidia.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	willemb@google.com,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next v2 0/2] ipv6: Honor oif when choosing nexthop for locally generated traffic
+Date: Mon,  1 Jun 2026 09:52:58 +0300
+Message-ID: <20260601065300.267960-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.54.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0080.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cd::15) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 05/11] tcp: allow mptcp to drop TS for some
- packets
-Content-Language: fr
-To: Eric Dumazet <edumazet@google.com>
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>
-References: <20260601-net-next-mptcp-add-addr6-port-ts-v1-0-4fc25dfef62e@kernel.org>
- <20260601-net-next-mptcp-add-addr6-port-ts-v1-5-4fc25dfef62e@kernel.org>
- <CANn89iLdwhhwLyO6zRjWMEY3t9g60ZE8ZhOVx33ucg_uRETbmQ@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iLdwhhwLyO6zRjWMEY3t9g60ZE8ZhOVx33ucg_uRETbmQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SJ5PPF3487F9737:EE_
+X-MS-Office365-Filtering-Correlation-Id: f19b5565-6914-4fb7-a226-08debfaa7cb6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|6133799003|18002099003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	7byZ2nOdths77wdt9ZggAdWUYJY9W1YIUKPDwHpHcfGYRrhrudwePBwFFJNmXSretq3Q2eD6ltW2T8nf/CIu0iaVdAHy6XanZCca/JCQj28a69U22Bbe/Nw8NGhJm2KZiaZw4Z5FrPjNnCFSwe4CoZoCN7DKSJ7CTMemAb62q9XNTbaBKgR77DwXE3K0XxidrH3f6kXztF/8qu1ubF9YT0vxaBNI6WH1ufY3lvaLp/9oKz1ho6CdoB7Wt2pxiXLlYlCqXNyY2KZ+nsD9Ru1ac0MAQazLxBNzBJ8Usfo/PX94tCfSWDmG2kwPCEL8I1Qq66xzQv9j7zS61hu2PpPXZFc7COdfacHMpzXePUwDnbsOtHgWLKhpLlf2hl28AAv5sUbGG9Q4uYNosxVc8f6Z9vZScby8FbwkNupDrJCbyVasZshiqg6Sm0sekN0gjqdlVypnpXcxhRtgj/UszqtJujux+t7Szsc2ThAfcVFZ7js1X+kBSsuvuxgc7aPhk5qs69q8yJX2vBvfold4mA41P7+BdLHU6inFxlSrN/XGpCx39hfMQ/pS+awf8Tdz/QpFeaajmJApQiXO3/64f00dD0F/9uzNljB6MXFkQH4YIiC17m8bzAuhFhqN4c4BZ79pQ3LKIyRAahrATybNDkaGzcbP70RIk6iG8QQK0tBIUtnYEklLrj2qNsNwEVebZmoPPyGKeVc26Zp29hmyBWSIIw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(6133799003)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?YK2BAtRrS+iXbr8nTdJEuxdPpslnmfyi2xV+oX1RBlA4EoKNUILzK9iYc4V4?=
+ =?us-ascii?Q?ZcYXPqpJZiGS7nDaIMZRJ9zJKf4g3OUFaOahmjoZ/uFl9Q7/tF8qO2XXoamg?=
+ =?us-ascii?Q?GP6EnLTLV7JgXjL9eXyPpz8UTm2DJFdI0ZKt/UXRAV5sADHi6E0stSdTuLUv?=
+ =?us-ascii?Q?PGIAfzmjEb2XdhpNZppHjvRdj575CmfLwg24wRRDe/F6iM5P06uQuo9bAuxa?=
+ =?us-ascii?Q?wxBLUR5Fezj7m+rPusOxYdJj66OB/NSGr/Bjbw8EXDFW17oYorZsb6rI6crq?=
+ =?us-ascii?Q?rU32Q50OSC1eNJU2FXdnPYGllwdbKmTXgIVmLr6TboWZIMFx60RsRMB7I+B4?=
+ =?us-ascii?Q?vEY5HVOSBlIYBTBNG/sCZRA6LPZRxOjCU8cSObf8MDZOk5rrS7L87GRRwt28?=
+ =?us-ascii?Q?lQTfpwhYbMEAPdMFQgeX38f0OPqE3KHeuM6fxbnuhYTxwXq58COYTh8PIC4y?=
+ =?us-ascii?Q?8dSD8kEZ3AcSLHJ5lUw88z1ePQznJErZn4uX2uqYuRaSw4XrKNdfqnkQlvwD?=
+ =?us-ascii?Q?tQtrlFglus1g11eohG6CDb+8R24RYfdidno55h82/H30GjLVKHhiZe5RA6Ca?=
+ =?us-ascii?Q?LCZU+WBGR+WaTmYwsquvyrR7dllmZ+8cZUAN+2KIc15fKMLFBq5jxTapIaMN?=
+ =?us-ascii?Q?TQQvgNc+r70oCi7BZWGbgE9wnd59m/lMkD6rWTDfaqy2SmUkHEf5hmUyrJzF?=
+ =?us-ascii?Q?O4l8qN+cjodpuwik/4qF51I5GIqtC6APr94I8/r4e++uBZrJKJkDSONnQN2t?=
+ =?us-ascii?Q?WlYGBKFlj9wdONv/EUbQibr4JqfR0mzSNTGe5rEEC4oI2Afm+A/teZ/+NKhm?=
+ =?us-ascii?Q?d45Fuwy2+FZlH5gT+PnfN7UcZC6KnV34QuSOACSK1A2arClSMSTgFwHXRZXW?=
+ =?us-ascii?Q?sM/LSN+695cFlYi+xaHy9zM1Kd/l6xSlnYt3TYedzyj5VbxV5nnSDC5dF3pc?=
+ =?us-ascii?Q?2j6L9KSFSucX7TrIT8yrIYBS6EsPulmykXKaevwaO9aXz7B0DSP6Dd5qd2aB?=
+ =?us-ascii?Q?8yCNeQu6knizubg1rP6xUaWBqzSfwe5DPxEJOTygI3/lJAsWBWkpcWcDGc8h?=
+ =?us-ascii?Q?QDBWX/XK4iUhaZ5o/vsWj7J614wRh5tdSHP8MCvdjPQfg+FodXl8B5WRY0Pm?=
+ =?us-ascii?Q?bZAQAXUXlD+gv8XcQcVDqWoLmWs85DzOAkG1IqBu61tz8IIH5vyjT24oxLkq?=
+ =?us-ascii?Q?dnbRMBFOzWKXZtZbBY/rhsfhdkWWENFv2s31gS+Na2NvX0fc8FQhxTVYna7n?=
+ =?us-ascii?Q?nVpFKVbROIthUAsfKrAlNlh7FL4RoGQFMWwGJ0Vqlhryxo9pK8bXuos579ND?=
+ =?us-ascii?Q?j+kPKg7Io8kTKacWYpeyXyCKK8oGXXqI5NqTo2W63ZvnUgkLnpwrGiTXc9Dh?=
+ =?us-ascii?Q?eWHGwb8ag5DbIY49YxUkhzeV/ZjvvREAAfK93/CKndiUx8IIuJNJ2QhTI+/K?=
+ =?us-ascii?Q?5132c6TZO3YiKaMtXD1qRq4tgLgD6Jl7ytYwdHGGfTaiEMA6XY9uDfjVv91b?=
+ =?us-ascii?Q?vVpfAvbYTD0nsc6MELS/HClj/L06JViBQoTjHXqIcwseeo0++pxgkdiR9G8H?=
+ =?us-ascii?Q?8yBUgUem02pnHpRUWMDKTsaGT8BmZO8SgOXr4bklEWU7hWnUVc03dIsdhJ3O?=
+ =?us-ascii?Q?Nkigf6cZlJ4EtRgPimC1PFu+8E2vLGBiRr3TGEOkTBq2n5BwZobwwPZybIVl?=
+ =?us-ascii?Q?E3czt7AzrZkICa8wGOlp0GTbmXOHTv1LBQ5+3T4S1u5yKh/G?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f19b5565-6914-4fb7-a226-08debfaa7cb6
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jun 2026 06:53:29.1733
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IY2UfArC11344hXupiB7VX582EZ094kPyK+EcuI1debbdkyTL9LkC5lg2YUDDx95h0GUSyhFCrMaImpGNwQXUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF3487F9737
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293581-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293582-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.987];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vmlinux.new:url]
-X-Rspamd-Queue-Id: D9C4761A6F7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nvidia.com:mid,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: 3788C61A6EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Eric,
+Patch #1 aligns IPv6 with IPv4 and changes IPv6 route lookup to prefer a
+nexthop whose nexthop device matches the specified oif.
 
-Thank you for the review!
+Patch #2 adds a selftest.
 
-On 01/06/2026 16:04, Eric Dumazet wrote:
-> On Sun, May 31, 2026 at 10:25 PM Matthieu Baerts (NGI0)
-> <matttbe@kernel.org> wrote:
->>
->> With TCP-timestamps (padded) taking 12 bytes and ADD_ADDR IPv6 + port
->> taking 30 bytes, the 40-byte limit for the TCP options is reached. In
->> this case, it is then not possible to send the address signal.
->>
->> The idea is to let MPTCP dropping the TCP-timestamps option for some
->> specific packets, to be able to send some specific pure ACK carrying >28
->> bytes of MPTCP options, like with this specific ADD_ADDR. A new
->> parameter is passed from tcp_established_options to the MPTCP side to
->> indicate if the TCP TS option is used, and if it should be dropped. The
->> next commit implements the part on MPTCP side, but split into two
->> patches to help TCP maintainers to identify the modifications on TCP
->> side. This feature will be controlled by a new add_addr_v6_port_drop_ts
->> MPTCP sysctl knob.
->>
->> It is important to keep in mind that dropping the TCP timestamps option
->> for one packet of the connection could eventually disrupt some
->> middleboxes: even if it should be unlikely, they could drop the packet
->> or even block the connection. That's why this new feature will be
->> controlled by a sysctl knob.
->>
->> Note that it would be technically possible to squeeze both options into
->> the header if the ADD_ADDR is first written, and then the TCP timestamps
->> without the NOPs preceding it. But this means more modifications on TCP
->> side, plus some middleboxes could still be disrupted by that.
->>
->> About the implementation, instead of passing a new boolean (drop_ts),
->> another option would be to pass the whole option structure (opts),
->> but 'struct tcp_out_options' is currently defined in tcp_output.c, and
->> would need to be exported. Plus that means the removal of the TCP TS
->> option would be done on the MPTCP side, and not here on the TCP side.
->> It feels clearer to remove other TCP options from the TCP side, than
->> hiding that from the MPTCP side.
->>
->> Yet an other alternative would be to pass the size already taken by the
->> other TCP options, and have a way to drop them all when needed. But this
->> feels better to target only the timestamps option where dropping it
->> should be safe, even if it is currently the only option that would be
->> set before MPTCP, when MPTCP is used.
->>
->> Reviewed-by: Mat Martineau <martineau@kernel.org>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->> ---
->> To: Neal Cardwell <ncardwell@google.com>
->> To: Kuniyuki Iwashima <kuniyu@google.com>
->> ---
->>  include/net/mptcp.h   | 3 ++-
->>  net/ipv4/tcp_output.c | 6 +++++-
->>  net/mptcp/options.c   | 3 ++-
->>  3 files changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/net/mptcp.h b/include/net/mptcp.h
->> index f7263fe2a2e4..000b6593bfa4 100644
->> --- a/include/net/mptcp.h
->> +++ b/include/net/mptcp.h
->> @@ -151,7 +151,7 @@ bool mptcp_synack_options(const struct request_sock *req, unsigned int *size,
->>                           struct mptcp_out_options *opts);
->>  bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
->>                                unsigned int *size, unsigned int remaining,
->> -                              struct mptcp_out_options *opts);
->> +                              bool *drop_ts, struct mptcp_out_options *opts);
->>  bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
->>
->>  void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *tp,
->> @@ -270,6 +270,7 @@ static inline bool mptcp_established_options(struct sock *sk,
->>                                              struct sk_buff *skb,
->>                                              unsigned int *size,
->>                                              unsigned int remaining,
->> +                                            bool *drop_ts,
->>                                              struct mptcp_out_options *opts)
->>  {
->>         return false;
->> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->> index ef0c10cd31c7..53ee4c8f5f8c 100644
->> --- a/net/ipv4/tcp_output.c
->> +++ b/net/ipv4/tcp_output.c
->> @@ -1181,12 +1181,16 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
->>          */
->>         if (sk_is_mptcp(sk)) {
->>                 unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
->> +               bool drop_ts = opts->options & OPTION_TS;
->>                 unsigned int opt_size = 0;
->>
->>                 if (mptcp_established_options(sk, skb, &opt_size, remaining,
->> -                                             &opts->mptcp)) {
->> +                                             &drop_ts, &opts->mptcp)) {
->>                         opts->options |= OPTION_MPTCP;
->>                         size += opt_size;
->> +
->> +                       if (drop_ts)
->> +                               opts->options &= ~OPTION_TS;
->>                 }
->>         }
-> 
-> Passing local variables' addresses forces the compiler to use a stack
-> canary in this hot function, even for non-MPTCP flows.
-> 
-> I was about to test the following patch, which removes the current
-> stack canary caused by MPTCP :/
+v2:
+- Add tests with VRFs.
 
-Sorry, I didn't know you were planning to do that.
+v1: https://lore.kernel.org/netdev/20251224161801.824589-1-idosch@nvidia.com/
 
-Would that be OK for you if I use an unused bit in opts->mptcp? It's a
-bit "hackish", but it avoids adding a new local variable address. Or do
-you have another idea?
+Ido Schimmel (2):
+  ipv6: Honor oif when choosing nexthop for locally generated traffic
+  selftests: fib_tests: Add test cases for route lookup with oif
 
-The modifications in net/ipv4/tcp_output.c would then be limited to:
+ net/ipv6/route.c                         |   5 +-
+ tools/testing/selftests/net/fib_tests.sh | 183 ++++++++++++++++++++++-
+ 2 files changed, 186 insertions(+), 2 deletions(-)
 
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index ef0c10cd31c7..f4edc9c4f3fc 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -1181,12 +1181,18 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
-         */
-        if (sk_is_mptcp(sk)) {
-                unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
-+               bool has_ts = opts->options & OPTION_TS;
-                unsigned int opt_size = 0;
- 
-                if (mptcp_established_options(sk, skb, &opt_size, remaining,
--                                             &opts->mptcp)) {
-+                                             has_ts, &opts->mptcp)) {
-                        opts->options |= OPTION_MPTCP;
-                        size += opt_size;
-+
-+#if IS_ENABLED(CONFIG_MPTCP)
-+                       if (opts->mptcp.drop_ts)
-+                               opts->options &= ~OPTION_TS;
-+#endif
-                }
-        }
- 
-
-I can also avoid adding a new parameter in mptcp_established_options
-(bool has_ts) by setting opts->mptcp.drop_ts before calling it, but
-that's clearer with this new parameter I think.
-
-> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-> add/remove: 0/0 grow/shrink: 0/3 up/down: 0/-92 (-92)
-> Function                                     old     new   delta
-> tcp_options_write.isra                      1423    1407     -16
-> mptcp_established_options                   2746    2720     -26
-> tcp_established_options                      553     503     -50
-> Total: Before=22110750, After=22110658, chg -0.00%
-> 
-
-Good reduction!
-
-(...)
-
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index ef0c10cd31c71ff585a937fde37f2b08b1214b5a..594ec6ba02d5413d43842f79aefbf4d8355c4f3f
-> 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -1183,10 +1183,11 @@ static unsigned int
-> tcp_established_options(struct sock *sk, struct sk_buff *skb
->                 unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
->                 unsigned int opt_size = 0;
-> 
-> -               if (mptcp_established_options(sk, skb, &opt_size, remaining,
-> -                                             &opts->mptcp)) {
-> +               opt_size = mptcp_established_options(sk, skb, remaining,
-> +                                                    &opts->mptcp);
-> +               if (opt_size) {
->                         opts->options |= OPTION_MPTCP;
-> -                       size += opt_size;
-> +                       size += (opt_size & 63);
-
-Nice trick! What about returning a negative number when the MPTCP option
-is not needed? Just to avoid playing with masks in the code?
-
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
+2.54.0
 
 
