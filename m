@@ -1,170 +1,128 @@
-Return-Path: <netdev+bounces-293666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JeODg9XHWpLZQkAu9opvQ
-	(envelope-from <netdev+bounces-293666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:55:27 +0200
+	id KJuvHhBXHWpLZQkAu9opvQ
+	(envelope-from <netdev+bounces-293665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:55:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7E261CDFD
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20BE061CE05
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 11:55:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5654C302989A
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:45:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A0AB30215A9
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 09:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FB6395AE1;
-	Mon,  1 Jun 2026 09:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3143955CD;
+	Mon,  1 Jun 2026 09:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n1eo05PU"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="w6hWpZGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D45638887D
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 09:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2CF3955E2;
+	Mon,  1 Jun 2026 09:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780307128; cv=none; b=Ujcuet/TaTSmhpzL/t0bIqijsYW/+fURvKm70NscHKQzxSGxPgvXlrR9Z/60VE9iQnqlvUPeUEmIVOwnXxdPM2uvd+Jzrkd0p+VG9FmimjpI353ceKyP2wVQFqQbdPjEFZGJIpAHNSKC85qEmeG5KYGhsBr6y6MJ8PA4Y+WOvVE=
+	t=1780307127; cv=none; b=u9bbeC7sTKIaMxA8AqTQMhNvK8A43Kij1dBnNR5r6tN7pc4dhEKVrlz1tn/0ZhRD9e/CYYh4AmGzhu3A3WVQbFbfH96WWsMuXcDydk8jJ6KeE+1x0/tVoLWtm2TDZWY2V+YohGq1mvaH9asE05hYtxG/Cp+fLmYAVuknPX1ntyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780307128; c=relaxed/simple;
-	bh=l0Picw4fs18nY9Kv0T1KHBRrF4f6NuQCKc3xyRlXbls=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dOQ1+N+y8XzthRp0mWhqf1eD+sWIeGt13oM2FXTVzBIbV3KQHMHhKKptHmqEZv4DnB97nm3z2Wl+eJ0VnQg0V8/BrrybvJNmbbHr1txX4l07pYol4FpUf/xsEp+LDNJPNc66MbkWpY9YaGPECEiUt9zvuOf4sOupFWK8GnnT7bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n1eo05PU; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780307122; x=1811843122;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=l0Picw4fs18nY9Kv0T1KHBRrF4f6NuQCKc3xyRlXbls=;
-  b=n1eo05PUO7xl5q8GAuWo/42ohkTRZG5qGRfSR1vN9lDE5D508SLQ+s/D
-   MZCKJt1IAthy9VlkxMJ8kc5phk/Nsb/E5HTkXEo4qvq8oT06JR0y3myI6
-   8RkxkbmHZu99RSCBOjKb7vo5BrrSMsH0j35e3+84FwO3/1O/xLlK1Nw4h
-   lbtVGvCsGiZ+UY8t2QtXgR82blZ/yNoon7tjzLUGL7b0ZlxSXBxP0sxzx
-   wp4Q8UnmI6Y3j1nHPBKkYAigfmwRfVkEFXttZuRxXYjFoyGzpDQytYpLf
-   KHdUeEjm+6+FlkdP/PiJqROc7eOzXjcL3ly4E07hYYpOrj2AjlWlkc61j
-   w==;
-X-CSE-ConnectionGUID: Gam7uwZ8T/Gf5JovnlxCaA==
-X-CSE-MsgGUID: Mj25cTVuTcSpkWlOv60L1w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11803"; a="80200919"
-X-IronPort-AV: E=Sophos;i="6.24,181,1774335600"; 
-   d="scan'208";a="80200919"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 02:45:21 -0700
-X-CSE-ConnectionGUID: E6yG66ftRvi6/K+HeqJKCg==
-X-CSE-MsgGUID: BeD92rN9Tn6kVMq9VYNI5A==
-X-ExtLoop1: 1
-Received: from unknown (HELO [10.217.160.157]) ([10.217.160.157])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 02:45:20 -0700
-Message-ID: <cf39b55c-f9f2-4944-9ca3-14c6a1bff7de@linux.intel.com>
-Date: Mon, 1 Jun 2026 11:45:18 +0200
+	s=arc-20240116; t=1780307127; c=relaxed/simple;
+	bh=rXhfy0OJXSHb6/IJZYenwk8mraVQ6R3qSlOb1bb7sck=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=O2EoM6l4GQ/UvS46hSib0TTtIGPYVQCs2TJ9SE0w/3dFZImkcBYPRLGt+tqpBdPVKvVpe/9S8l0gMmwHLMpoh4fre5inHcI7Zx24pR61FyZXY6Od1/XkRp7fQDBHZYM/6I7/RyjG5FSOnss8jos7nUclTruFb0RcQDuhZWaBltI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=w6hWpZGn; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7D053A4C09;
+	Mon,  1 Jun 2026 11:45:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1780307120; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=c2lq12F95AF0fONDKT9cGLInrpieeMANpi5wpSqUpUU=;
+	b=w6hWpZGn0UR6aM5a2JDPluPYsH724FkbNFbawhFfJhmmkiRVcbwW3cI0oHH37mva6nEjLN
+	0b8UTnribARyA8LFQDN+2yADlEUz8UygW0SiX9+KkHH5vKgpy7zjHc02/8nTOyduMESBUA
+	o0R9TZvtK3WWkJRa0blYe0f9dsDyI1Pd4UNgYSVHqrt52t0u9h8cyjtKiuayTyy2qeCh7E
+	TFltM0aw/UR7wC9yxHs19QDTIZ5OXbulqfTQYEM6+5p6QRyf+F4mfKgYsgLCBjWZa4fI0W
+	8iBhIKudBxgKsEvA6tcytITuDLkKjrFBMBSURMtyR5/4pxtxlv0KAtC5v5zDLg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: reject out-of-range ptype
- in ice_parser_profile_init
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com
-Cc: netdev@vger.kernel.org
-References: <20260527071842.11478-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <20260527071842.11478-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Mon, 01 Jun 2026 11:45:19 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, Simon Horman
+ <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 5/5] net: dsa: ks8995: Delete surplus driver
+In-Reply-To: <20260526-ks8995-to-ksz8-v3-5-c530f651989f@kernel.org>
+References: <20260526-ks8995-to-ksz8-v3-0-c530f651989f@kernel.org>
+ <20260526-ks8995-to-ksz8-v3-5-c530f651989f@kernel.org>
+Message-ID: <8c81f622caa31c526fd8b00585b1cc96@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293665-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-293666-lists,netdev=lfdr.de];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,armlinux.org.uk,vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 7B7E261CDFD
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 20BE061CE05
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Linus
 
+On 26.5.2026 17:59, Linus Walleij wrote:
+> The Microchip ksz driver now handles all switches that the
+> old driver was handling, but better.
+> 
+> Delete the old driver.
+> 
+> Signed-off-by: Linus Walleij <linusw@kernel.org>
 
-On 27/05/2026 09:18, Aleksandr Loktionov wrote:
-> set_bit(rslt->ptype, prof->ptypes) operates on a DECLARE_BITMAP of
-> ICE_FLOW_PTYPE_MAX (1024) bits. Nothing prevents a malicious VF from
-> providing ptype >= 1024 through VIRTCHNL, resulting in a write past
-> the end of the bitmap and a kernel page fault.
-> 
-> Reproduced with a custom kernel module injecting a crafted
-> VIRTCHNL_OP_ADD_RSS_CFG on E810-C QSFP (8086:1592),
-> FW 4.91 0x800214af 1.3909.0, ICE COMMS DDP 1.3.53.0,
-> kernel 7.1.0-rc1.
-> 
-> crash_parser: ice_parser_profile_init @ ffffffffc0d61b60
-> crash_parser: setting ptype=0xffff (max valid=1023)
-> crash_parser: calling ice_parser_profile_init -- expect OOB crash!
-> BUG: kernel NULL pointer dereference, address: 0000000000000000
-> #PF: supervisor write access in kernel mode
-> #PF: error_code(0x0002) - not-present page
-> Oops: Oops: 0002 [#1] SMP NOPTI
-> CPU: 56 UID: 0 PID: 165011 Comm: insmod Kdump: loaded Tainted: G S U OE 7.1.0-rc1 #1
-> Hardware name: Intel Corporation S2600BPB/S2600BPB
-> RIP: 0010:ice_parser_profile_init+0x2d/0x1d0 [ice]
-> Call Trace:
->  <TASK>
->  ? __pfx_ice_parser_profile_init+0x10/0x10 [ice]
->  crash_init+0x127/0xff0 [crash_parser]
->  do_one_initcall+0x45/0x310
->  do_init_module+0x64/0x270
->  init_module_from_file+0xcc/0xf0
->  idempotent_init_module+0x17b/0x280
->  __x64_sys_finit_module+0x6e/0xe0
-> 
-> Bail out early with -EINVAL when ptype is out of range.
-> 
-> Fixes: e312b3a1e209 ("ice: add API for parser profile initialization")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> [...]
 
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Now that the old driver is gone and the three micrel,* compatibles are
+matched by the new ksz_spi driver, should micrel,ks8995.yaml be folded
+into microchip,ksz.yaml? Not a blocker either way.
 
-> ---
->  drivers/net/ethernet/intel/ice/ice_parser.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
-> index f8e6963..3ede4c1 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_parser.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
-> @@ -2368,6 +2368,9 @@ int ice_parser_profile_init(struct ice_parser_result *rslt,
->  	u16 proto_off = 0;
->  	u16 off;
->  
-> +	if (rslt->ptype >= ICE_FLOW_PTYPE_MAX)
-> +		return -EINVAL;
-> +
->  	memset(prof, 0, sizeof(*prof));
->  	set_bit(rslt->ptype, prof->ptypes);
->  	if (blk == ICE_BLK_SW) {
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
+Thanks
+Nicolai
 
