@@ -1,193 +1,466 @@
-Return-Path: <netdev+bounces-293560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293561-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLLnIwUhHWqiVwkAu9opvQ
-	(envelope-from <netdev+bounces-293560-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:04:53 +0200
+	id MIj+JQohHWqmVwkAu9opvQ
+	(envelope-from <netdev+bounces-293561-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:04:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83EE8619F64
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:04:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FE2619F74
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 08:04:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6707C3001396
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:04:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A137330071DD
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 06:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFC83451C8;
-	Mon,  1 Jun 2026 06:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A7834402B;
+	Mon,  1 Jun 2026 06:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4Ta9VL3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NYVVWZh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0223519C553;
-	Mon,  1 Jun 2026 06:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780293869; cv=none; b=YERAbMv5EoAak3dzWoMqVTeEF8HVlrHde4bdCelP2gHJySGTe2uVeOqkw4yk6KP4n1qGgAFlKcFuf/eH7w7abnYRrDhviTplHiXfMG1spaybkYx3guvCsqTgsvMxNP9SEPuJjtCSX0VKAVHt1qoM/H6jlE9XFAPkpbwI9h/Nh94=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780293869; c=relaxed/simple;
-	bh=c9+TcK2OtgFtEotwTZh5fV3sISeDmk1GpFw5vVSwgD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dli6+DOsi+CEiVbGtSa+n+icm/tOClyw+a92OWWgwGYWy1mbCtYXSBwQ3SqCAfAdJ81Ea7aMtCZb0bkzFyyy9BFBTd/tlNups3Jm9gCu//76ckaTfPlRRmfx2QRXMYcReECnUeilmwwY/m1TfKBToSM1Rn+akerLGD3r+oyucU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4Ta9VL3; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D1051F00893;
-	Mon,  1 Jun 2026 06:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780293868;
-	bh=D91toEs75tfN2e3agWNlpL06x7LHPBsNnDRozKPi7mM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=F4Ta9VL3XzCuEHdjY5e3+OEz1hvm7ZmYt5kOdRjFkz/4lWwmjkozEtjxtnvmmXVtr
-	 Yj5ZV9IrVXdHy83y6ZVqS9L4BRHJh/fMADHZMuwFKtojUbJtuzld5+4G2Uf3hVIQpL
-	 lS25IwIVK5O5fndqv9N5qiEtx/+HrvcBEMm935Ql4Nebzho6JAtyFOHUt8m75OW0fv
-	 9gk4qh9kkfFAUWVZeX/tpYLuDSgkzyctRyHmAPak7Ff+rKa9Y/vf0j2iHBmFWbiS57
-	 LOdJ1Y7DRBDTN6FAb+e8g/SrlYa2tW+Z8nFwy4zAMb92w9jwsbsWz6kezrVVU8KwdN
-	 qbYXUx7k5xm/Q==
-Message-ID: <4af33a1a-2bd5-4be7-90f0-2bb3bc88fa81@kernel.org>
-Date: Mon, 1 Jun 2026 16:04:20 +1000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF4C334374
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 06:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780293892; cv=pass; b=mY+AkUB5xEIqTgrHM0kRkhznbu7NEZjKBDMYzl8iKpoCU98S7GfDPusaQuuGw/d6pKdKYNtKEeC2y0s0gPg3YtP0eBUz2PKUZk7b+ASTmXCcV3LovnIhP2E5+Y06UtRSm9CS3fywzeLnzOCJbEeBcVsjQimfSgC4VLIx5bcj/eA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780293892; c=relaxed/simple;
+	bh=6bjVi+JyhAn9xt4CVOuPiBRy6cmGtTm1pQkNQE6CK/8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=scVmISf6juZPCozFHux5N+Jt0+FOHzxqfTTDqUxfxvXaAlI+mRuI/5a3UZn5YvtEzyMM9j6DH7aGcAP7o+9YFg5ITfFnVMULXy10UhT8zRofUqr6cHMgZiafyDeYraK97ji19ZPUdif9hJslzTkdGTAfCzOxykSvTZGYBTMAwRs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NYVVWZh6; arc=pass smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-914bb8e95c2so545518885a.1
+        for <netdev@vger.kernel.org>; Sun, 31 May 2026 23:04:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780293889; cv=none;
+        d=google.com; s=arc-20240605;
+        b=e7zV2mvDmLUawWeo+I/3jh4/FCPpIiTrywRMIrGI1mQnt0YGTnAB5Nk2+qmuN5Gbjd
+         cxbu1KPX66oETOterUg8fKNrR8psDpJpyLNML1JFWzM5ketMUI5ivIaQrs5NkUzQWHY0
+         eb//4dt5i+x+Z5+pbWTmCGulax2ms48eK6l1vktBwFwm76PE2kzwmQakM5IPSK18yYGg
+         XqWUxLeRYCoQ2B+pQKdBCNZfNx0nPrsVz7XXr5sctmgvCH0sbQpef7923lweF9DDvkfF
+         VbPIr9VfO9jf3Za8OheZAb77N/CjnoXfYLrBeTo3Nnbiztp0uUeMUt9rUYRdim3bFMcS
+         gAtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=1Z0a8kVnogWIFbzVGC1LJ7SgvO4GsxX6zRiRVh/+Z7k=;
+        fh=L+WVQ+r5DkZp7AMsnKItt1saAxkOMx0m2kpR1D9urF4=;
+        b=fT5p7mxZWj8DApx78F2VtFemTJe6ACZ7nwSblH40aJvyj26LrSF+KteKzOTVXu2aDD
+         opCEcAlqTvDDoTJrmSZ9x+/Flr/fo6BXeOhJ0LN1I6QAtBXPVC6COSAyZBQ9QCn3w2tZ
+         wWaeoNPDKjMlRHd6Ntil9T6hbrgZjmZSAKxvavpqyBzsjilf/PMwMEc4m388o5zXylIW
+         tNXWNfZATXrOFIwiiw+QqWSBEdID28NSw2b1ufZO23LhGRCg122R/knrvtqIzoC6Wqq+
+         SJW9PM2Eli8lhWiidAanS+/gMdoAuCQrhhZAPNduqEk6a9rYuxekBeOOWSjVHxAv6jZ9
+         Q0Ag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780293889; x=1780898689; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Z0a8kVnogWIFbzVGC1LJ7SgvO4GsxX6zRiRVh/+Z7k=;
+        b=NYVVWZh6WQazn2Bc1f4PqbVF64PmYIY97LxBVtsBnTraPU4wlsPU02NpSdQuNYFWmB
+         OHoJu312FHK0+TWF+jMZe71p0qGMW9DQOyR+HdHRa916NbY0m1uWrmIbY0CHFxY3DzC7
+         K0lS1iRI+SM3C4Rw8bGZ0lkSy7bX6A/2j1/AypUpCfhAadn9R6Lt+idUsd2/vki14aom
+         qqf1sScN6jW3x1OcbBPIHqOlGS4m7VtBT+QZDbi3pBZImcf6wrYeotu0OWq+I7RW8vV6
+         9CGcgsb/J4QV0cyDlfZME+hCeDFGTOw8As1xzUTN56TKZrDF6bkS/3bsF2AD4KjX2KDB
+         Cc1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780293889; x=1780898689;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1Z0a8kVnogWIFbzVGC1LJ7SgvO4GsxX6zRiRVh/+Z7k=;
+        b=OwmwbT8IanPpHLO4/+HLViyEgYNOHy+SBrkaKphUQhDyG4bD4kJV3NxT9/SOTWfD+6
+         HXkuoylA05n96oEdF0UyKDV1SBgmCmZpnY/J0deoDYyqNzc635y5823JYwPgRBvnpOr7
+         9t9Cyaa4fdcDQG7kiv4bbDDlpF43agk9dJ47upIpf90Uq8zaGR6/sXJyiai8cTsIjO3R
+         i0ifbeL4VAf9KAK1772OH4IfqdXpJLkyjqTu+h543iVjP/eQpv8sRCxZ0p7+zPgkBxtb
+         hTVax43FSTJQfRjGJ0RVc/pAwn3eLlIt4fbjHkVtziS3UGpNBkIZ7jWHTYBdqLuFBI4Q
+         NUxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+8qtcxM1UtO7jQ1nnmxqwpBCsbl3cEaMeO6JZLtrdkU33RClKBoh8iYVw7vrcCsQxrQz7yL1k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnwFdBR4xjH3ZP2AOqMM0rxcLn+JjdAquxxXL+dWAwB7SHptGe
+	dhZZjTMCQ+HDNImfYt9wFPzQ2osXyNB/Y2ITfQ3Tg7/SRF+yVgVWZN9/KwHPvk9srDGR3MKr19J
+	UuNo93ySaD+v9AAwHBB1ihW/19XWVjp67DXcPBcY3
+X-Gm-Gg: Acq92OF+PZiEFYqfcA+N7enJHl/qcv3hSlove/MAjrdOBLN4leq3YYx0g9gnNAhZoV9
+	4VdW4B2UJhgTHawt1EB3T6OZcKGrL8dgUZRS1YKgZTe3FAn7b8QtJYsh0pNg+5FdckfJkBo9YCx
+	CMycmnKLX3hoRM9u5cLrRMlaKme0H2gmZcs+S/KuXog1obTtH3vfusqwHRMiQWTZGkrKzhyxl9V
+	wyy1B4ow00aYT/Juy687oN/QuJ4/KxBd87pzV8iu2sC4LP+zwNhi4tcNIxusKs+BA8DHoNnINJb
+	XzI1znYYx+0cnTYIizlrt0/LwIUDPqA4MNBKMxxRH1US9Mie/uCTpvJUUliUSdx/BQfbvj4+m3m
+	psj0tOp+r+IakpFGr/19fHL6prNFpx/IiK3QfwT8=
+X-Received: by 2002:a05:620a:6602:b0:914:b850:bbfd with SMTP id
+ af79cd13be357-9153db7ef4bmr1371910385a.60.1780293888174; Sun, 31 May 2026
+ 23:04:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 04/11] mptcp: introduce add_addr_v6_port_drop_ts
- sysctl knob
-Content-Language: fr
-To: Eric Dumazet <edumazet@google.com>
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
 References: <20260601-net-next-mptcp-add-addr6-port-ts-v1-0-4fc25dfef62e@kernel.org>
- <20260601-net-next-mptcp-add-addr6-port-ts-v1-4-4fc25dfef62e@kernel.org>
- <CANn89iL=os-60kDKqMDdyiXuPF5CG=eejS0vmthwpDGXz_Bp8A@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iL=os-60kDKqMDdyiXuPF5CG=eejS0vmthwpDGXz_Bp8A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+ <20260601-net-next-mptcp-add-addr6-port-ts-v1-5-4fc25dfef62e@kernel.org>
+In-Reply-To: <20260601-net-next-mptcp-add-addr6-port-ts-v1-5-4fc25dfef62e@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 31 May 2026 23:04:37 -0700
+X-Gm-Features: AVHnY4KtflEDqDl6QlWBo9xSnuhW72hFLhTRFeEUu4vzlmrsu5ShhS1fhtCWJF4
+Message-ID: <CANn89iLdwhhwLyO6zRjWMEY3t9g60ZE8ZhOVx33ucg_uRETbmQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 05/11] tcp: allow mptcp to drop TS for some packets
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-293560-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-293561-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 83EE8619F64
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 60FE2619F74
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Eric,
+On Sun, May 31, 2026 at 10:25=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> With TCP-timestamps (padded) taking 12 bytes and ADD_ADDR IPv6 + port
+> taking 30 bytes, the 40-byte limit for the TCP options is reached. In
+> this case, it is then not possible to send the address signal.
+>
+> The idea is to let MPTCP dropping the TCP-timestamps option for some
+> specific packets, to be able to send some specific pure ACK carrying >28
+> bytes of MPTCP options, like with this specific ADD_ADDR. A new
+> parameter is passed from tcp_established_options to the MPTCP side to
+> indicate if the TCP TS option is used, and if it should be dropped. The
+> next commit implements the part on MPTCP side, but split into two
+> patches to help TCP maintainers to identify the modifications on TCP
+> side. This feature will be controlled by a new add_addr_v6_port_drop_ts
+> MPTCP sysctl knob.
+>
+> It is important to keep in mind that dropping the TCP timestamps option
+> for one packet of the connection could eventually disrupt some
+> middleboxes: even if it should be unlikely, they could drop the packet
+> or even block the connection. That's why this new feature will be
+> controlled by a sysctl knob.
+>
+> Note that it would be technically possible to squeeze both options into
+> the header if the ADD_ADDR is first written, and then the TCP timestamps
+> without the NOPs preceding it. But this means more modifications on TCP
+> side, plus some middleboxes could still be disrupted by that.
+>
+> About the implementation, instead of passing a new boolean (drop_ts),
+> another option would be to pass the whole option structure (opts),
+> but 'struct tcp_out_options' is currently defined in tcp_output.c, and
+> would need to be exported. Plus that means the removal of the TCP TS
+> option would be done on the MPTCP side, and not here on the TCP side.
+> It feels clearer to remove other TCP options from the TCP side, than
+> hiding that from the MPTCP side.
+>
+> Yet an other alternative would be to pass the size already taken by the
+> other TCP options, and have a way to drop them all when needed. But this
+> feels better to target only the timestamps option where dropping it
+> should be safe, even if it is currently the only option that would be
+> set before MPTCP, when MPTCP is used.
+>
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+> To: Neal Cardwell <ncardwell@google.com>
+> To: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  include/net/mptcp.h   | 3 ++-
+>  net/ipv4/tcp_output.c | 6 +++++-
+>  net/mptcp/options.c   | 3 ++-
+>  3 files changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+> index f7263fe2a2e4..000b6593bfa4 100644
+> --- a/include/net/mptcp.h
+> +++ b/include/net/mptcp.h
+> @@ -151,7 +151,7 @@ bool mptcp_synack_options(const struct request_sock *=
+req, unsigned int *size,
+>                           struct mptcp_out_options *opts);
+>  bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+>                                unsigned int *size, unsigned int remaining=
+,
+> -                              struct mptcp_out_options *opts);
+> +                              bool *drop_ts, struct mptcp_out_options *o=
+pts);
+>  bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
+>
+>  void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock=
+ *tp,
+> @@ -270,6 +270,7 @@ static inline bool mptcp_established_options(struct s=
+ock *sk,
+>                                              struct sk_buff *skb,
+>                                              unsigned int *size,
+>                                              unsigned int remaining,
+> +                                            bool *drop_ts,
+>                                              struct mptcp_out_options *op=
+ts)
+>  {
+>         return false;
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index ef0c10cd31c7..53ee4c8f5f8c 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -1181,12 +1181,16 @@ static unsigned int tcp_established_options(struc=
+t sock *sk, struct sk_buff *skb
+>          */
+>         if (sk_is_mptcp(sk)) {
+>                 unsigned int remaining =3D MAX_TCP_OPTION_SPACE - size;
+> +               bool drop_ts =3D opts->options & OPTION_TS;
+>                 unsigned int opt_size =3D 0;
+>
+>                 if (mptcp_established_options(sk, skb, &opt_size, remaini=
+ng,
+> -                                             &opts->mptcp)) {
+> +                                             &drop_ts, &opts->mptcp)) {
+>                         opts->options |=3D OPTION_MPTCP;
+>                         size +=3D opt_size;
+> +
+> +                       if (drop_ts)
+> +                               opts->options &=3D ~OPTION_TS;
+>                 }
+>         }
 
-On 01/06/2026 15:44, Eric Dumazet wrote:
-> On Sun, May 31, 2026 at 10:24 PM Matthieu Baerts (NGI0)
-> <matttbe@kernel.org> wrote:
->>
->> This sysctl is going to be used in the next commits to drop TCP
->> timestamps option, to be able to send an ADD_ADDR with a v6 IP address
->> and a port number. It is enabled by default.
->>
->> This knob is explicitly disabled in the MPTCP Join selftest, with the
->> "signal addr list progresses after tx drop" subtest, to continue
->> verifying the previous behaviour where the ADD_ADDR is not sent due to a
->> lack of space.
->>
->> While at it, move syn_retrans_before_tcp_fallback down from struct
->> mptcp_pernet, to avoid creating another 3 bytes hole.
->>
->> Reviewed-by: Mat Martineau <martineau@kernel.org>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> 
-> ...
-> 
->>  };
->> @@ -94,6 +95,11 @@ const char *mptcp_get_scheduler(const struct net *net)
->>         return mptcp_get_pernet(net)->scheduler;
->>  }
->>
->> +unsigned int mptcp_add_addr_v6_port_drop_ts(const struct net *net)
->> +{
->> +       return mptcp_get_pernet(net)->add_addr_v6_port_drop_ts;
->> +}
-> 
-> Please use READ_ONCE() over sysctls.
-> This will avoid future patches from KCSAN bots.
+Passing local variables' addresses forces the compiler to use a stack
+canary in this hot function, even for non-MPTCP flows.
 
-Good point, I will do that.
+I was about to test the following patch, which removes the current
+stack canary caused by MPTCP :/
 
-I see READ_ONCE() should be used over all other MPTCP sysctls. I can
-send fixes to net for those.
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 0/0 grow/shrink: 0/3 up/down: 0/-92 (-92)
+Function                                     old     new   delta
+tcp_options_write.isra                      1423    1407     -16
+mptcp_established_options                   2746    2720     -26
+tcp_established_options                      553     503     -50
+Total: Before=3D22110750, After=3D22110658, chg -0.00%
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+index f7263fe2a2e40b507257c3720cc2d78d37357d6d..f55838fd6cca308908607243735=
+f8768540bb419
+100644
+--- a/include/net/mptcp.h
++++ b/include/net/mptcp.h
+@@ -149,9 +149,9 @@ bool mptcp_syn_options(struct sock *sk, const
+struct sk_buff *skb,
+                       unsigned int *size, struct mptcp_out_options *opts);
+ bool mptcp_synack_options(const struct request_sock *req, unsigned int *si=
+ze,
+                          struct mptcp_out_options *opts);
+-bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+-                              unsigned int *size, unsigned int remaining,
+-                              struct mptcp_out_options *opts);
++u32 mptcp_established_options(struct sock *sk, struct sk_buff *skb,
++                             unsigned int remaining,
++                             struct mptcp_out_options *opts);
+ bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
 
+ void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *=
+tp,
+@@ -266,13 +266,13 @@ static inline bool mptcp_synack_options(const
+struct request_sock *req,
+        return false;
+ }
+
+-static inline bool mptcp_established_options(struct sock *sk,
+-                                            struct sk_buff *skb,
+-                                            unsigned int *size,
+-                                            unsigned int remaining,
+-                                            struct mptcp_out_options *opts=
+)
++static inline u32 mptcp_established_options(struct sock *sk,
++                                           struct sk_buff *skb,
++                                           unsigned int *size,
++                                           unsigned int remaining,
++                                           struct mptcp_out_options *opts)
+ {
+-       return false;
++       return 0;
+ }
+
+ static inline bool mptcp_incoming_options(struct sock *sk,
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index ef0c10cd31c71ff585a937fde37f2b08b1214b5a..594ec6ba02d5413d43842f79aef=
+bf4d8355c4f3f
+100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -1183,10 +1183,11 @@ static unsigned int
+tcp_established_options(struct sock *sk, struct sk_buff *skb
+                unsigned int remaining =3D MAX_TCP_OPTION_SPACE - size;
+                unsigned int opt_size =3D 0;
+
+-               if (mptcp_established_options(sk, skb, &opt_size, remaining=
+,
+-                                             &opts->mptcp)) {
++               opt_size =3D mptcp_established_options(sk, skb, remaining,
++                                                    &opts->mptcp);
++               if (opt_size) {
+                        opts->options |=3D OPTION_MPTCP;
+-                       size +=3D opt_size;
++                       size +=3D (opt_size & 63);
+                }
+        }
+
+diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
+index d96130e49942e2fb878cd1897ad43c1d420fb233..503ebd71d562134431cf0ea3327=
+6c035bddae00c
+100644
+--- a/net/mptcp/ctrl.c
++++ b/net/mptcp/ctrl.c
+@@ -49,7 +49,7 @@ static struct mptcp_pernet *mptcp_get_pernet(const
+struct net *net)
+
+ int mptcp_is_enabled(const struct net *net)
+ {
+-       return mptcp_get_pernet(net)->mptcp_enabled;
++       return READ_ONCE(mptcp_get_pernet(net)->mptcp_enabled);
+ }
+
+ unsigned int mptcp_get_add_addr_timeout(const struct net *net)
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index 8a1c5698983cff3082d68290626dd8f1e044527f..4ac01cecb6bd965f1f95f6f2342=
+515eb2b7591f5
+100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -836,15 +836,15 @@ static bool
+mptcp_established_options_mp_fail(struct sock *sk,
+        return true;
+ }
+
+-bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+-                              unsigned int *size, unsigned int remaining,
+-                              struct mptcp_out_options *opts)
++u32 mptcp_established_options(struct sock *sk, struct sk_buff *skb,
++                             unsigned int remaining,
++                             struct mptcp_out_options *opts)
+ {
+        struct mptcp_subflow_context *subflow =3D mptcp_subflow_ctx(sk);
+        struct mptcp_sock *msk =3D mptcp_sk(subflow->conn);
+        unsigned int opt_size =3D 0;
++       u32 total_size =3D 0;
+        bool snd_data_fin;
+-       bool ret =3D false;
+
+        opts->suboptions =3D 0;
+
+@@ -852,34 +852,33 @@ bool mptcp_established_options(struct sock *sk,
+struct sk_buff *skb,
+         * option space.
+         */
+        if (unlikely(__mptcp_check_fallback(msk) &&
+!mptcp_check_infinite_map(skb)))
+-               return true;
++               return 64;
+
+        if (unlikely(skb && TCP_SKB_CB(skb)->tcp_flags & TCPHDR_RST)) {
+                if (mptcp_established_options_fastclose(sk, &opt_size,
+remaining, opts) ||
+                    mptcp_established_options_mp_fail(sk, &opt_size,
+remaining, opts)) {
+-                       *size +=3D opt_size;
++                       total_size +=3D opt_size;
+                        remaining -=3D opt_size;
+                }
+                /* MP_RST can be used with MP_FASTCLOSE and MP_FAIL if
+there is room */
+                if (mptcp_established_options_rst(sk, skb, &opt_size,
+remaining, opts)) {
+-                       *size +=3D opt_size;
++                       total_size +=3D opt_size;
+                        remaining -=3D opt_size;
+                }
+-               return true;
++               return 64 + total_size;;
+        }
+
+        snd_data_fin =3D mptcp_data_fin_enabled(msk);
+        if (mptcp_established_options_mp(sk, skb, snd_data_fin,
+&opt_size, opts))
+-               ret =3D true;
++               total_size +=3D 64;
+        else if (mptcp_established_options_dss(sk, skb, snd_data_fin,
+&opt_size, opts)) {
+                unsigned int mp_fail_size;
+
+-               ret =3D true;
+                if (mptcp_established_options_mp_fail(sk, &mp_fail_size,
+                                                      remaining -
+opt_size, opts)) {
+-                       *size +=3D opt_size + mp_fail_size;
++                       total_size +=3D opt_size + mp_fail_size;
+                        remaining -=3D opt_size - mp_fail_size;
+-                       return true;
++                       return total_size;
+                }
+        }
+
+@@ -887,27 +886,24 @@ bool mptcp_established_options(struct sock *sk,
+struct sk_buff *skb,
+         * TCP option space would be fatal
+         */
+        if (WARN_ON_ONCE(opt_size > remaining))
+-               return false;
++               return 0;
+
+-       *size +=3D opt_size;
++       total_size +=3D opt_size;
+        remaining -=3D opt_size;
+        if (mptcp_established_options_add_addr(sk, skb, &opt_size,
+remaining, opts)) {
+-               *size +=3D opt_size;
++               total_size +=3D opt_size;
+                remaining -=3D opt_size;
+-               ret =3D true;
+        } else if (mptcp_established_options_rm_addr(sk, &opt_size,
+remaining, opts)) {
+-               *size +=3D opt_size;
++               total_size +=3D opt_size;
+                remaining -=3D opt_size;
+-               ret =3D true;
+        }
+
+        if (mptcp_established_options_mp_prio(sk, &opt_size, remaining, opt=
+s)) {
+-               *size +=3D opt_size;
++               total_size +=3D opt_size;
+                remaining -=3D opt_size;
+-               ret =3D true;
+        }
+
+-       return ret;
++       return total_size;
+ }
+
+ bool mptcp_synack_options(const struct request_sock *req, unsigned int *si=
+ze,
 
