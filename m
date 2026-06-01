@@ -1,236 +1,206 @@
-Return-Path: <netdev+bounces-293675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAWOMc1gHWojZwkAu9opvQ
-	(envelope-from <netdev+bounces-293675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:37:01 +0200
+	id QEdwCMRhHWojZwkAu9opvQ
+	(envelope-from <netdev+bounces-293676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:41:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A3661D9CD
-	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:37:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCF661DB58
+	for <lists+netdev@lfdr.de>; Mon, 01 Jun 2026 12:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C32E93303904
-	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 10:13:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A01233059FF5
+	for <lists+netdev@lfdr.de>; Mon,  1 Jun 2026 10:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E1239023B;
-	Mon,  1 Jun 2026 10:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEA33955EB;
+	Mon,  1 Jun 2026 10:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SzsRNcZZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i9c6H6hS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8560A395D8B
-	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 10:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E57391E60
+	for <netdev@vger.kernel.org>; Mon,  1 Jun 2026 10:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780308710; cv=none; b=dFqvAApPujuP3S/rJzPv1kjWuQEBtcEBjsnNsOXV4nu65mSjfbCiOpXFit2oRCsjGT+5QQ+VZlK9UnbyNbD8UY2Os8soqBvVNCPf0pvLvuBpLwxQxztDE3fGTyTsDl+Er7NDkTYzHhMrWqHmxlRW6fORcL8si5dFSGrNKU5v2Cg=
+	t=1780309038; cv=none; b=nH5t5X7DNe1MFrnDFWvUq9IAnSy/6WjsCAVoOeu36gNA4CxFP/V8cyXOdZ9tu0hCwpU1nH9ftETvLLrcW5xOK/lJ41xtVRiLtDITvXGzU4fzQjhDnmMLWy2cenHsiZ6jdX/a0ZoHThBWBclZJ64QnBNSitX+Olm/yusZMcZSE6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780308710; c=relaxed/simple;
-	bh=20A4jKFUsZEWDr5OgsxLlpo0DE76jxE6xt5gG2U7/lU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vEZoltycjK/glzcaysXAXMPLzESjkMOQB+8MPIv7PJZtiCU9YbvO97+J/C/ijQ6Ikm2LTC+s2sN0OlKDwNdqtmDuIdDkGwoRxEHnhoBrE1oRdpU+JNwOa04cZNubl3jXoJXPwBSsV9+rcVmta2UfM6tXxjgoZSACVi2mjexOde0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SzsRNcZZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780308696;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qkve3oWwZFK6KvMeLa6zJtJtTA+c5ODpXQk5K5Y2AUQ=;
-	b=SzsRNcZZuPiqThUOnyp/qmKQxHOoPr1GPEmoxNvZQ9s2vDkur8dfTyD2/hUNqHZKKzUO0e
-	46Im55+9WqtvFw47ZAUj5gcKOzmkKpydLIjZLc57vB2k37D0juRQGen6iwdBmBJStWLevH
-	u9IA4IB21y08d6v4IXoM8uC61iYr0ds=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-riDcqIBHPUiupzHY8basFg-1; Mon,
- 01 Jun 2026 06:11:33 -0400
-X-MC-Unique: riDcqIBHPUiupzHY8basFg-1
-X-Mimecast-MFC-AGG-ID: riDcqIBHPUiupzHY8basFg_1780308692
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0F55C19560A6;
-	Mon,  1 Jun 2026 10:11:32 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.48.197])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BA1DF1800352;
-	Mon,  1 Jun 2026 10:11:30 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: kipreyyy@gmail.com
-Cc: ap420073@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] amt: fix use-after-free in amt_group_work
-Date: Mon,  1 Jun 2026 12:11:23 +0200
-Message-ID: <20260601101123.148258-1-pabeni@redhat.com>
-In-Reply-To: <20260526105839.19787-1-kipreyyy@gmail.com>
-References: <20260526105839.19787-1-kipreyyy@gmail.com>
+	s=arc-20240116; t=1780309038; c=relaxed/simple;
+	bh=uWlOuCXa4bnkurXnyx79zEnhpqnia4ykwG2l9twooOU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tznsg4J5tQHZ+TsGon/TA6Jwucad0YXGjKxm+6H6/+WiZw6lSrsPrL/92ZuhPoBwLTG2T3SSzGRfowIrrtK6wl6cmn8Mi6hlD4FG/WspmsXQMTCnfl9qTk6oeifhZqNwvO2p+0s1nI5I8cY71ncALgkKUY2BYqwlODT9WcxCXeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i9c6H6hS; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E094B1F00893;
+	Mon,  1 Jun 2026 10:17:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780309035;
+	bh=uoRjNMU2JjynTMyDdWxDdD9y6IYqPiZwPpQfgvbCJO0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=i9c6H6hSt0fmBhsudmLstCXjprJLORgGEMTOFB4wDneg4Z20btcBQJ8KaOiyub69b
+	 7CuVcGVxyqLj4ueLBqhTZmIE3Tlu1Bj+Yl4+xas0ZKBIbeDHO55Qc4+3Dzlq/VXLmd
+	 LlnkEjem5vzx3L/03YV3v+RRUImxlLJ1zi991ZPc8sAdrqPfRs5CLbZ/4geaGVIfBy
+	 WvOcqV7ytXyUE0iunB1tGhIxqXTpipc0gkR6v4DYv22/Hf90KUPJvz5M5VGN4XEWjg
+	 1lvgO8QuWBEPrDz1JyHzgGAnu/zzM/bM5tPu7kI/HIRZLU0QqoQonnLyA16biSJkHB
+	 a44yfslgVmG/Q==
+Message-ID: <e218a832-2321-4758-be2a-0b0a51c700f5@kernel.org>
+Date: Mon, 1 Jun 2026 20:17:06 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] mptcp: change mptcp_established_options() to
+ return opt_size
+Content-Language: fr
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260601091816.444738-1-edumazet@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260601091816.444738-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293675-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-293676-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
-X-Rspamd-Queue-Id: 42A3661D9CD
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vmlinux.new:url]
+X-Rspamd-Queue-Id: 7FCF661DB58
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: AI Reviewer <ai@example.com>
+Hi Eric,
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-amt: fix use-after-free in amt_group_work
+On 01/06/2026 19:18, Eric Dumazet wrote:
+> Instead of passing opt_size address to mptcp_established_options(),
+> change this function to return it by value.
+> 
+> This removes the need for an expensive stack canary in
+> tcp_established_options() when CONFIG_STACKPROTECTOR_STRONG=y.
+> 
+> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+> add/remove: 0/0 grow/shrink: 0/3 up/down: 0/-92 (-92)
+> Function                                     old     new   delta
+> tcp_options_write.isra                      1423    1407     -16
+> mptcp_established_options                   2746    2720     -26
+> tcp_established_options                      553     503     -50
+> Total: Before=22110750, After=22110658, chg -0.00%
 
-This patch wraps the early gnode dereferences in amt_group_work() with
-rcu_read_lock() and switches amt_del_group() to hlist_del_init_rcu() so
-the worker can detect an already-deleted gnode via hlist_unhashed().
-The stated goal is to close a use-after-free window between the
-container_of() in the worker and the spin_lock_bh() acquisition.
-
-> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> index f2f3139e38a5..f937957dbd61 100644
-> --- a/drivers/net/amt.c
-> +++ b/drivers/net/amt.c
-
-[ ... ]
-
-> @@ -412,23 +412,31 @@ static void amt_group_work(struct work_struct *work)
->  	struct amt_group_node *gnode = container_of(to_delayed_work(work),
->  						    struct amt_group_node,
->  						    group_timer);
-> -	struct amt_tunnel_list *tunnel = gnode->tunnel_list;
-> -	struct amt_dev *amt = gnode->amt;
-> +	struct amt_tunnel_list *tunnel;
->  	struct amt_source_node *snode;
->  	bool delete_group = true;
-> +	struct amt_dev *amt;
->  	struct hlist_node *t;
->  	int i, buckets;
+Thank you for looking at that!
+> diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+> index f7263fe2a2e40b507257c3720cc2d78d37357d6d..cd4639beceaa53c573135ddaeb7528a80b4ca824 100644
+> --- a/include/net/mptcp.h
+> +++ b/include/net/mptcp.h
+> @@ -149,9 +149,9 @@ bool mptcp_syn_options(struct sock *sk, const struct sk_buff *skb,
+>  		       unsigned int *size, struct mptcp_out_options *opts);
+>  bool mptcp_synack_options(const struct request_sock *req, unsigned int *size,
+>  			  struct mptcp_out_options *opts);
+> -bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+> -			       unsigned int *size, unsigned int remaining,
+> -			       struct mptcp_out_options *opts);
+> +int mptcp_established_options(struct sock *sk, struct sk_buff *skb,
+> +			      unsigned int remaining,
+> +			      struct mptcp_out_options *opts);
+>  bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb);
 >  
-> +	rcu_read_lock();
-> +	tunnel = gnode->tunnel_list;
-> +	amt = gnode->amt;
-
-[Medium]
-Does this fully close the race the commit message describes?
-
-The worker entry from the workqueue core through container_of() and the
-local variable declarations runs before rcu_read_lock() executes.  If
-amt_group_work() is preempted in that window (permitted under
-PREEMPT_RCU and PREEMPT_RT, since a task that is not currently in a
-read-side critical section is a quiescent state for that task), and on
-another CPU amt_del_group() runs from amt_clear_groups() and the GP it
-was waiting on completes:
-
-- the GP only needs to wait for readers active when call_rcu()/kfree_rcu()
-  was invoked, not for the preempted worker
-- once the caller of amt_clear_groups() drops its rcu_read_lock(), the
-  GP can complete and gnode is freed
-- the preempted worker resumes and calls rcu_read_lock() as a new
-  reader, which does not retroactively extend the already-completed
-  grace period
-
-When the worker resumes, the very first line:
-
-	tunnel = gnode->tunnel_list;
-
-reads from freed memory, and the subsequent hlist_unhashed(&gnode->node)
-check operates on a freed hlist_node whose ->pprev may hold any value.
-
-Would cancel_delayed_work_sync() in the destruction path (with care for
-the self-cancellation case where amt_group_work() itself calls
-amt_del_group()), or taking an explicit reference on gnode at queue
-time, be a more robust fix?
-
->  	buckets = amt->hash_buckets;
+>  void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *tp,
+> @@ -266,13 +266,13 @@ static inline bool mptcp_synack_options(const struct request_sock *req,
+>  	return false;
+>  }
 >  
->  	spin_lock_bh(&tunnel->lock);
-> +	if (hlist_unhashed(&gnode->node)) {
-> +		spin_unlock_bh(&tunnel->lock);
-> +		rcu_read_unlock();
-> +		goto out;
-> +	}
->  	if (gnode->filter_mode == MCAST_INCLUDE) {
->  		/* Not Used */
->  		spin_unlock_bh(&tunnel->lock);
-> +		rcu_read_unlock();
->  		goto out;
->  	}
->  
-> -	rcu_read_lock();
->  	for (i = 0; i < buckets; i++) {
->  		hlist_for_each_entry_safe(snode, t,
->  					  &gnode->sources[i], node) {
+> -static inline bool mptcp_established_options(struct sock *sk,
+> -					     struct sk_buff *skb,
+> -					     unsigned int *size,
+> -					     unsigned int remaining,
+> -					     struct mptcp_out_options *opts)
+> +static inline int mptcp_established_options(struct sock *sk,
+> +					    struct sk_buff *skb,
+> +					    unsigned int *size,
 
-[High]
-Does the same UAF class still apply to amt_source_work() in the same
-file?  It performs the early dereferences before taking either
-tunnel->lock or rcu_read_lock():
+I guess this line should be removed: that's the version when MPTCP is
+not enabled.
 
-static void amt_source_work(struct work_struct *work)
-{
-	struct amt_source_node *snode = container_of(to_delayed_work(work),
-						     struct amt_source_node,
-						     source_timer);
-	struct amt_group_node *gnode = snode->gnode;
-	struct amt_dev *amt = gnode->amt;
-	struct amt_tunnel_list *tunnel;
+Apart from that, the rest looks good to me!
 
-	tunnel = gnode->tunnel_list;
-	spin_lock_bh(&tunnel->lock);
-	rcu_read_lock();
-	...
-}
-
-The destruction path amt_destroy_source() uses cancel_delayed_work()
-(non-sync) and the deferred __amt_source_gc_work() ultimately
-kfree_rcu()s snode.  If amt_source_work() is preempted between
-container_of() and the spin_lock_bh()/rcu_read_lock(), while a
-concurrent destroy of snode runs and completes its grace period, the
-snode->gnode and gnode->tunnel_list reads here become use-after-free of
-snode (and potentially gnode).
-
-This isn't introduced by this patch, but should the same fix be applied
-to amt_source_work() as part of this series, given it is the same bug
-class in the same driver?
+Cheers,
+Matt
 -- 
-This is an AI-generated review.
+Sponsored by the NGI0 Core fund.
 
 
