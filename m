@@ -1,204 +1,178 @@
-Return-Path: <netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CSKPDtrLHmrtVAAAu9opvQ
-	(envelope-from <netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:26:02 +0200
+	id GkvdCOjLHmryVAAAu9opvQ
+	(envelope-from <netdev+bounces-294196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:26:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE5062E03B
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:26:01 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE95962E046
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:26:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=dad6FS5l;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=huawei.com header.s=dkim header.b=1Z5FCDuh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294196-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294196-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 02E7D302E310
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 12:23:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 763833021270
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 12:23:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EC03DC4B8;
-	Tue,  2 Jun 2026 12:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95D33DA5C4;
+	Tue,  2 Jun 2026 12:23:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B82F3DA7C3
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 12:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7343DC4CD;
+	Tue,  2 Jun 2026 12:23:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780403011; cv=none; b=JasNJnZj9JhwiT3zHNAleU5SuzlIrvpsW4ZsbcdELGP0zp2eUBA924E4M2ztOE/jVOmVtO6JZFGc7p7BBdS9NeSXhq1fgEBdno50iRqhwzFcz8JyuIFWcdfsRpACvKhhwkO/ju6AuPfBVWWxRReP0YcqGYLIj+jUDZGHtUhhCt0=
+	t=1780403036; cv=none; b=DUd2t2nIU28Jn1b1Qg0bfAt8ZN/ejwJTB+M2w0ZpQMbQ/+jWsCPb6auvD+2hrqaT7zU3w005cQCp0DMvHLZ3X0JQm6KIxwU/nO68YeHug8oNmJVCJqE/TrHv9zL7GVEyv9V1QB2H/5yrRpmA8MCyzkVQ34UHHVXhPAEfZsXrBok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780403011; c=relaxed/simple;
-	bh=Tww/NsYYipQmKbfKB+KBD/CQ8mSh2rAUi3urIDUefWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RKTXRIfAlCbCCl09Q85M30dkleG580f/2/scu2lZ5PEhPLARzzrTwQAfKq53ixhQ52HIr0nZ3CEGa4JY6z8af0sElIzdByoSmPU8phqD1gbTg91SdF1jpckZGqK3tN0Z9aUnaRT/IV93SS5ZIo8D3B0BP424S30UxXtE8pB7jbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dad6FS5l; arc=none smtp.client-ip=91.218.175.177
-Message-ID: <319850b8-1374-44db-93a6-1203853de498@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780403006;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ultwj2JKNumJYk+h9t8ZZ9dhH3lq4SDUcmsjPUw+W/I=;
-	b=dad6FS5lDuUnimB7j5Q2t7unzBuaA+p8o/uRdWB+86Wyo502UMbvFYT7lcLKX+H+5sHLz2
-	I+iSqPCeJOKfSlBkFQZUCo5IxHJ5N/LFqfgLO18tHcDrWJbJH/VTMUXGTaaftSu2P8bnsC
-	6DL/v8B3+x7KIfwZuMes3yT781Olyzw=
-Date: Tue, 2 Jun 2026 20:23:09 +0800
+	s=arc-20240116; t=1780403036; c=relaxed/simple;
+	bh=uvYQRvn0koVa3714BC7WrIY5vPTTHKciC2aF0uDWm5M=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fEe/ssHdg84AyFPfAQSMi90ZUDXysilp3Da1wm3bhWR3raz3R32U3B0uvwVHokoTO5RtCFmzMqckPzuHVY9/U0iK60YK+pA92R3+3Beseqd/eW/dWMNZ3pLRwBqdeJWA3A/J4FKevbzMjSqLIgksJhnb8O7c91PYzwov0o0Yrr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=1Z5FCDuh; arc=none smtp.client-ip=113.46.200.219
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=1ddtsQxECmx9KGDpzRgapSEpQS/LBWrUlZCqDyezqHY=;
+	b=1Z5FCDuh+jjJW0VdtItzdPLoWkKyWF62A/e5Q+c4JkBvGqsAxviAQ8CrVP4H3JGOxpprmepWp
+	uOov75MitMJ0Xt8BoyEjgbCIc5CcemvcVKeo3jTktntSw00aDxO5hrQxL9XQlcx2juaP8//nKbG
+	zqNVhOMecYURXxIuGk11Kzg=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4gV8td4NkRz1prL9;
+	Tue,  2 Jun 2026 20:15:53 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 846A84048F;
+	Tue,  2 Jun 2026 20:23:45 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 2 Jun 2026 20:23:44 +0800
+Message-ID: <2a075720-f3cd-4b12-8048-8ead10c40322@huawei.com>
+Date: Tue, 2 Jun 2026 20:23:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] rtnetlink: use dev_isalive() in rtnl_getlink()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20260602091319.1753654-1-edumazet@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260602091319.1753654-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Paolo Abeni <pabeni@redhat.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<andrew+netdev@lunn.ch>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
+	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 net-next 0/6] net: hns3: enhance tc flow offload
+ support
+To: Simon Horman <horms@kernel.org>
+References: <20260523105449.661848-1-shaojijie@huawei.com>
+ <20260527095930.GI2256768@horms.kernel.org>
+ <c6dc79ef-5f6e-4c97-97da-fa50eb1d1370@huawei.com>
+ <b0b0ac82-bcbf-4aef-bf6f-7340f9517fc6@redhat.com>
+ <83f34836-c848-469a-9c1c-7f28bf3035fc@huawei.com>
+ <20260529093448.GV2256768@horms.kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260529093448.GV2256768@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294195-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294196-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:shaojijie@huawei.com,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,huawei.com:mid,huawei.com:from_mime,huawei.com:dkim,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9BE5062E03B
+X-Rspamd-Queue-Id: CE95962E046
 
 
-On 6/2/26 5:13 PM, Eric Dumazet wrote:
-> rtnl_getlink() uses an RCU lookup to get the netdevice pointer.
+on 2026/5/29 17:34, Simon Horman wrote:
+> On Thu, May 28, 2026 at 07:24:28PM +0800, Jijie Shao wrote:
+>> on 2026/5/28 17:06, Paolo Abeni wrote:
+>>> On 5/27/26 3:12 PM, Jijie Shao wrote:
+>>>> on 2026/5/27 17:59, Simon Horman wrote:
+>>>>> On Sat, May 23, 2026 at 06:54:43PM +0800, Jijie Shao wrote:
+> ...
 >
-> When/If rtnl_lock() is used, we should check if the netdevice is not
-> being dismantled before potentially perform illegal actions.
+>>>>> Hi Juijie,
+>>>>>
+>>>>> There are AI-generated reviews of this patch-set available at
+>>>>> https://netdev-ai.bots.linux.dev/ and https://sashiko.dev/
+>>>> Hi,
+>>>>
+>>>> I'm sorry, I don't understand how to use https://netdev-ai.bots.linux.dev/, it seems to require an API Token?
+>>>> I find it difficult to locate my own patch-set in Recent Reviews.
+>>> The nipa sashiko instance has the same web UI as sashiko.dev. The full
+>>> URL for the former is:
+>>>
+>>> https://netdev-ai.bots.linux.dev/sashiko/
+>>>
+>>> You can lookup your series by the cover letter title or you can use the
+>>> direct link including the msg id for the cover:
+>>>
+>>> https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260523105449.661848-1-shaojijie%40huawei.com
+>> Thanks,
+>>
+>> It appears that the two URLs mentioned by Simon Horman are the results of the one AI-generated reviews.
+> Hi,
 >
-> Move dev_isalive() out of net/core/net-sysfs.c and make it available
-> in include/linux/netdevice.h
+> Firstly sorry for truncating the netdev-ai URL, that was not my intention.
+> Secondly, let me explain the relationship between the AI-generated review
+> on netdev-ai and sashiko.dev.
 >
-> Return -ENODEV if rtnl_getlink() finds a device which is currently
-> being dismantled and RTNL is requested.
+> Both use the same underlying review engine - Sashiko [1].  But they are
+> using different AI models to run the review.  And I believe that the
+> prompts also differ a little.  Overall, netdev-ai, has been tuned for the
+> Netdev review process.  While sashiko.dev is more general.
 >
-> Fixes: e896e5c0734b ("rtnetlink: do not acquire RTNL in rtnl_getlink() with RTEXT_FILTER_NAME_ONLY")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   include/linux/netdevice.h | 6 ++++++
->   net/core/net-sysfs.c      | 6 ------
->   net/core/rtnetlink.c      | 5 +++++
->   3 files changed, 11 insertions(+), 6 deletions(-)
+> My observation is that netdev-ai tends to flag things relevant to the
+> Netdev development process that may be skipped by sashiko.dev. While
+> sashiko.dev has a tendency to report pre-existing issues that are not
+> strictly related to the topic of the patch under review.
 >
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 74507c006490f180d2fac6594f6dcf2c86d53919..bfc847bc47fd957b58174dc4d2b82e2e8b461405 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -5660,6 +5660,12 @@ static inline const char *netdev_name(const struct net_device *dev)
->   	return dev->name;
->   }
->   
-> +/* Caller holds RTNL, netdev->lock or RCU */
-> +static inline bool dev_isalive(const struct net_device *dev)
-> +{
-> +	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
-> +}
-> +
->   static inline const char *netdev_reg_state(const struct net_device *dev)
->   {
->   	u8 reg_state = READ_ONCE(dev->reg_state);
-> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> index 3318b5666e438fe5bab2bcfed2bb260c7b4d5a63..0e71c9ed41e81d85af33a4339f556a0c5d760243 100644
-> --- a/net/core/net-sysfs.c
-> +++ b/net/core/net-sysfs.c
-> @@ -37,12 +37,6 @@ static const char fmt_uint[] = "%u\n";
->   static const char fmt_ulong[] = "%lu\n";
->   static const char fmt_u64[] = "%llu\n";
->   
-> -/* Caller holds RTNL, netdev->lock or RCU */
-> -static inline int dev_isalive(const struct net_device *dev)
-> -{
-> -	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
-> -}
-> -
->   /* There is a possible ABBA deadlock between rtnl_lock and kernfs_node->active,
->    * when unregistering a net device and accessing associated sysfs files. The
->    * potential deadlock is as follow:
-> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> index 652dd008955a90691403de9a54d8693d64ea7799..9e90d02b73c2909409e12adfcec3940b49dcbaa1 100644
-> --- a/net/core/rtnetlink.c
-> +++ b/net/core/rtnetlink.c
-> @@ -4265,6 +4265,10 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   retry:
->   	if (need_rtnl) {
->   		rtnl_lock();
-> +		if (!dev_isalive(dev)) {
-> +			err = -ENODEV;
-> +			goto unlock;
+> But, as the underling engine is the same there is also a lot of overlap in
+> the output produced by these two instances. And in some cases both
+> instances flag all of the same issues.
+>
+> [1] https://github.com/sashiko-dev/sashiko
 
 
-This does fix the macvlan UAF, thanks.
+Thank you for your detailed introduction.
+In the future, I will proactively check the AI review issues.
 
-But 'nskb' is used uninitialized, so the kfree_skb(nskb) below frees an 
-uninitialized pointer.
-
-+unlock:
-     if (need_rtnl)
-             rtnl_unlock();
-
-     if (err < 0) {
-             kfree_skb(nskb);   /* nskb is uninitialized when reached 
-via goto unlock */
-             ...
-     }
-
-
-> +		}
->   		/* Synchronize the carrier state so we don't report a state
->   		 * that we're not actually going to honour immediately; if
->   		 * the driver just did a carrier off->on transition, we can
-> @@ -4282,6 +4286,7 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   				       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
->   				       0, NULL, 0, netnsid, GFP_KERNEL);
->   
-> +unlock:
->   	if (need_rtnl)
->   		rtnl_unlock();
->   
+Thanks,
+Jijie Shao
 
 
 
