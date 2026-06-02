@@ -1,53 +1,68 @@
-Return-Path: <netdev+bounces-293986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPdeDzlHHmomiQkAu9opvQ
-	(envelope-from <netdev+bounces-293986-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:00:09 +0200
+	id iGcVD8JHHmqbiQkAu9opvQ
+	(envelope-from <netdev+bounces-293988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:02:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C836277E1
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD126627857
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:02:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8218C3039C67
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 03:00:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C58F0300DD42
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 03:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C111A3672AE;
-	Tue,  2 Jun 2026 03:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FD43624C9;
+	Tue,  2 Jun 2026 03:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XjRJsHkY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QMPW/RPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53C13624C9;
-	Tue,  2 Jun 2026 03:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E82B331A56
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 03:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780369204; cv=none; b=kPIQ7250Cyna2hFvxgT/OHVr+XbE5+mk7nT6Hx7P3+JPoKW2iyv+JMe0NxrZV9K9W0R05kE/QY8ona6Mpk9wUI3dKQniPGD6SaOe0jiZyqRbree2EZKrYJK3DQ7nCofOq/vPyW2UASaDkN5RzhLIOcqUld4PeImzW1G7rWja3FA=
+	t=1780369297; cv=none; b=r6xG1WUfo/+Q2Cksn5WgTIWaaBY/UOO0+8xEMqSfG54qtBLbHDW8/3Q9Vk2UhU4DX7S1aC9UEjzcvU+T9cA4SbQAwSJcwcFQ5gHKysykYImD0GtLD0wOOrXV4W3nJUuYOL7BjxpqCMywlWak53ex/FER9ynCWlarqI/JSr3tdbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780369204; c=relaxed/simple;
-	bh=hC08xzOFHhxSowpAYIos9qJAlKWBe6Yu5A/O0TX3C7o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DPOwuejv/utg9NMpk+B1XLdRI6nubrF7nKXQ+gW/oBb5rX/xaWVLq6j0YxV0ACAgbwZVVsbtUlzv1cKjWN0ycaPjhNldtrO5BuCEcwdOtb7+4juCi2h2vCqc6OWB1W4pNTG235y4SIBVMxCTE74b3ar+B31hcaTvNMSXco1sj9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XjRJsHkY; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A57251F00893;
-	Tue,  2 Jun 2026 03:00:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780369203;
-	bh=N5fzIYW9khiUM9j67VS7FJ0b6D8zszEdG6lwHIDhecU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=XjRJsHkYh+th7VPuLBapoL0fUGT9Aylj2XTNpY+Vr81FLZwK/7Wrk5HJoRN6UrzYJ
-	 jsbnOV4ttJC+0AF8JfZuX4AWhdb1i00Sbo0B5HutdEJo1zhwCiyrMStRNqzn0BCSII
-	 sFJ9+NF6MdAq1dGFrU7IEGF5NnGpY0n7PYmCJdYcDaaWBIgAkj90P+sGP0zvfQA0sF
-	 nSLiTf0s8OEIz4Km/h7UnNaGFJ34mqaaNiWsSbwITGKb3tI02fYCxFEm9K74L7sF2W
-	 TwQ7KxBMcA1Wn5uIvGB00zF8IAa0XoDFUGkEvI7I7cIHkDosJ5idbpT/zn4doxhxOF
-	 lhRB1hacdBtnA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 196F338119F9;
-	Tue,  2 Jun 2026 03:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1780369297; c=relaxed/simple;
+	bh=KD639c6qmMAwI9AcMi+WpXp9ZZpEKiKIKB5NVvDbzl4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gewjoCNe5vZ/w9WElNBu0LMsPB/29vYUCb00F/XYvsKpC2uMoV8L5HT7bo/vw87GfM8BFqBkgXMGaJNTniP5iCe3g61u9+s8qHP+DnlToV++mIlC/SU1DjeCKR10VuNkST80pPpk13su8yW/cNksYOhZ7/hkBbCkallMNsNDPd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QMPW/RPK; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780369284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KD639c6qmMAwI9AcMi+WpXp9ZZpEKiKIKB5NVvDbzl4=;
+	b=QMPW/RPKGz+ozun+/dNRDKdCfPalp9eYP2dJ4dUjn/TNltp/Q6/Sbi8FW9NSYuQhOFpHic
+	Jnthpp1wsa3fjYfpQXBQ33p2KnIcBn/yJtYLbLkbIH2bd2Q084c20hK4hqF7Sto3/FsbbW
+	UgZ5jsixZsqWFlMCzcapOBjynn/vXZs=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"parthiban.veerasooran@microchip.com" <parthiban.veerasooran@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 08/14] net: ethernet: oa_tc6: Remove FCS size in RX frame
+Date: Tue,  2 Jun 2026 11:01:06 +0800
+Message-ID: <20260602030108.560-1-qingfang.deng@linux.dev>
+In-Reply-To: <CY8PR02MB92495E274D4194CF06B1048783122@CY8PR02MB9249.namprd02.prod.outlook.com>
+References: <CY8PR02MB9249644F900471DB8417134683162@CY8PR02MB9249.namprd02.prod.outlook.com> <cf87ad90-6ba4-4132-a1eb-beedd796c168@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,76 +70,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] devlink: Release nested relation on devlink free
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178036920566.221457.9205076512445402287.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jun 2026 03:00:05 +0000
-References: <20260528191411.3270532-1-mbloch@nvidia.com>
-In-Reply-To: <20260528191411.3270532-1-mbloch@nvidia.com>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: jiri@nvidia.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, tariqt@nvidia.com,
- leon@kernel.org, saeedm@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- jiri@resnulli.us
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-293986-lists,netdev=lfdr.de,netdevbpf];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,onsemi.com,microchip.com,davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293988-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 81C836277E1
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: CD126627857
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Tue, 2 Jun 2026 at 02:40:13, Selvamani Rajagopal wrote:
+> But strangely ptp4l utility failed with invalid data size. Once we removed FCS, it worked fine.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is because ptp4l misinterprets the FCS as a TLV. There are already
+several discussions and patches about this issue, however the maintainer
+insists that the ethernet driver needs to be fixed instead:
 
-On Thu, 28 May 2026 22:14:10 +0300 you wrote:
-> devlink relation state is normally released from devl_unregister(), which
-> calls devlink_rel_put(). This misses devlink instances that get a nested
-> relation before registration and then fail probe before devl_register() is
-> reached.
-> 
-> That flow can happen for SFs. The child devlink gets linked to its
-> parent before registration, then a later probe error calls devlink_free()
-> directly. Since the instance was never registered, devl_unregister() is not
-> called and devlink->rel is leaked.
-> 
-> [...]
+https://sourceforge.net/p/linuxptp/mailman/message/37858618/
+https://sourceforge.net/p/linuxptp/mailman/linuxptp-devel/thread/20190205170652.476c9676%40redhat.com/#msg36579297
+https://sourceforge.net/p/linuxptp/mailman/linuxptp-devel/thread/CA%2BDf%2BjcRN98GpUi%3DF_4Ls7miEPbUZYb8O-gpSw0TQoqczVqMfw%40mail.gmail.com/#msg37858491
+https://sourceforge.net/p/linuxptp/mailman/linuxptp-devel/thread/8ed1dc74-bf4c-2f13-4ed0-a70d0c4512f6%40cisco.com/#msg37137818
 
-Here is the summary with links:
-  - [net] devlink: Release nested relation on devlink free
-    https://git.kernel.org/netdev/net/c/3522b21fd7e1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards,
+Qingfang
 
