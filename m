@@ -1,132 +1,150 @@
-Return-Path: <netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6B51MF1HH2oljgAAu9opvQ
-	(envelope-from <netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:13:01 +0200
+	id du/XNJVHH2o0jgAAu9opvQ
+	(envelope-from <netdev+bounces-294416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:13:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9139632079
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:13:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F74632090
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:13:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="nS+wTp/j";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=padl.com header.s=default header.b=leG9Z8FI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294416-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294416-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=padl.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EA67530080A7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 21:11:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DCF02300939E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 21:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152B8330D43;
-	Tue,  2 Jun 2026 21:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FB039D6E8;
+	Tue,  2 Jun 2026 21:13:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204652F6931
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 21:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF8F243367;
+	Tue,  2 Jun 2026 21:13:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780434664; cv=none; b=fjVz31Nx1VJTnku6g1Fs+FVzRQ+nuR0l1/BOBRp+sbtUZxYqNDly2jdsH39SgrGF6vcFvMXyPk2UEAm6eEkuuhIPZaPIfanYS21I7bNEBkFYAZwv3tipZAw2025bumipm8bDlduGRXfFDlZWZYpUxASJNR94u5ghJ3bzqLa6BAE=
+	t=1780434800; cv=none; b=oGe748h16tq+v9duntL1oDVFgaQh/gcaERJklKNPQZF/5GYuurUyTv32s4UEj/jXn9H3oWOrJQ/83h0mmxhhXaES+krXlmix8HC272ibbRYxMAjgFH/mYVdppS+cHRrEslYpz8SeImH9UeJ6XPgL3xMScPhpMM3gwlXY4C0MJCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780434664; c=relaxed/simple;
-	bh=207W1+rTsYC5kTUHb1twyIx3nnLOYKr3uJzMkZjmqEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u1K9m6yHF/dkNXpSTPUDo/vmDPVuPC6aUlBxqIAno6umrT5tu7Xa3V9oVtaB1NCmvs0aqUbQvEEk7kN6Qops3IAOef9OoWbjsa/0Ok2y77LDG97gJaeI6xu4aprfn/exrhMyT0U0V2Gb4ZXkmiEzdpxkYy8Dvl+39MGWzdJi2a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nS+wTp/j; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656231F00893;
-	Tue,  2 Jun 2026 21:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780434662;
-	bh=1S5Qy5LiZAtTQ/GWIprciFLm9LRuLR6crDrT+UJfqXc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=nS+wTp/jpTCDQM4/x0oD2VrwNqdQEBd8LcwlOon1f9pRM41BxeWojNcYo8CXjjg5W
-	 g6FQzidFb3SZv3/lo2zxdLNHhoFrrgvGRe0Dt7qR9NuwyElUYQ9E0l2eLpq8b2R7nK
-	 QtSqYvTFxupLGxG3WtyAHT7+BxhkjH9liEDiqGP/C5toC5B8cT2w5Xv5xixZagNM50
-	 b3JQ0b8fnuNzGtJRGbXdhjtCrTEK3vO8jPW/e2e6ENd3Y1t3EOjM4RvNCCacEGgim9
-	 XLL4ZOpOxsoDguZwTwiF7skmBUsawFxgYH61wtWoiYdPFAwFKPcsyaiHzYaLE7cpHt
-	 SPaGhQcOtUi8A==
-Message-ID: <32c20500-8a76-419a-ab79-5ec68d2de6df@kernel.org>
-Date: Tue, 2 Jun 2026 15:11:01 -0600
+	s=arc-20240116; t=1780434800; c=relaxed/simple;
+	bh=HtE+CUeOQe9K5828UtNu62LtqQ103MigfZnxhbdVnDk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=MmpGZLsGwUOP0iemaNi9G41XMEHlgYwri7IHo7Mmb5qFT+TE4qmfreqjf49LsUY2vv/hNrRkx+hOZM27laNAF08QZ2l7aI/V6ueDazezf0CBpBUpU5j4Hzf7lqDb3+xRm2TLpDKpf3vBhxtn02vLAgvMQlJ7j1plEwrU7A39PyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=leG9Z8FI; arc=none smtp.client-ip=216.154.215.154
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 652LCNev015764
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 2 Jun 2026 22:12:25 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 652LCNev015764
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1780434768; bh=HtE+CUeOQe9K5828UtNu62LtqQ103MigfZnxhbdVnDk=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=leG9Z8FIM3pJZ4l6nIiMqriryyD81HF1WcqASUuCAQC8YfQnmGHBXnHR5AcsC0Jrq
+	 gSqqwc7tYZzHhwa2HhW62nORQsr6432wwfL8PK6DaY1cayHxN86pW/bM/HUZO/pK7m
+	 nleseDQe6n0C+CHprDUyKRtdYjFjCVezsm/+DG4MRDHmhD2SLKIjGpH5THZ7Gh8B63
+	 4zU3b21yxROV26YPWKFd85WM4/0H8Oa2DEmZRw8XwDvQqDMZIpD1+gf1JCRvs7KtYj
+	 so1tCNwj9CwPQDYR+Kgjni5Zw1fwzKeSTqUSRYG0mA9lKZYHvTQ6cTINnN0Dz9wpB5
+	 jTOqOPufiACwQ==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next] iplink: add support for setting IPv4
- devconf parameters
-Content-Language: en-US
-To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: stephen@networkplumber.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, Nicolas Dichtel <nicolas.dichtel@6wind.com>
-References: <20260601143242.6729-1-fmancera@suse.de>
- <f97592a2-6690-4511-a98c-dacdeedf6516@kernel.org>
- <bc71f624-e4ce-47b7-9dae-13ad0db76ad1@suse.de>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <bc71f624-e4ce-47b7-9dae-13ad0db76ad1@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH net-next v2 5/6] net: dsa: mv88e6xxx: MQPRIO support
+From: Luke Howard <lukeh@padl.com>
+In-Reply-To: <t44kmhk6gqxnwhdvo7svouexwelwsya7zgukpbv3cxpfsmutqa@y3rjoj3tvqce>
+Date: Wed, 3 Jun 2026 07:12:12 +1000
+Cc: Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bridge@lists.linux.dev, linux-kselftest@vger.kernel.org,
+        Max Hunter <max@huntershome.org>, Kieran Tyrrell <kieran@sienda.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A662D3F9-18DD-43C9-A43D-912E5A8A4360@padl.com>
+References: <20260602-mv88e6xxx-8021qat-mqprio-v2-0-72be14522e7c@padl.com>
+ <20260602-mv88e6xxx-8021qat-mqprio-v2-5-72be14522e7c@padl.com>
+ <t44kmhk6gqxnwhdvo7svouexwelwsya7zgukpbv3cxpfsmutqa@y3rjoj3tvqce>
+To: Cedric Jehasse <cedric.jehasse@gmail.com>
+X-Mailer: Apple Mail (2.3826.700.81)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
+	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294413-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:ivecera@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:shuah@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bridge@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:max@huntershome.org,m:kieran@sienda.com,m:cedric.jehasse@gmail.com,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294416-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:stephen@networkplumber.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:nicolas.dichtel@6wind.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[padl.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[resnulli.us,redhat.com,davemloft.net,google.com,kernel.org,blackwall.org,nvidia.com,lunn.ch,gmail.com,vger.kernel.org,lists.linux.dev,huntershome.org,sienda.com];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	APPLE_MAILER_COMMON(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,padl.com:mid,padl.com:from_mime,padl.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B9139632079
+X-Rspamd-Queue-Id: B4F74632090
 
-On 6/2/26 1:46 PM, Fernando Fernandez Mancera wrote:
-> On 6/2/26 9:36 PM, David Ahern wrote:
->> On 6/1/26 8:32 AM, Fernando Fernandez Mancera wrote:
->>> Currently, modifying IPv4 interface configuration parameters requires
->>> interacting with sysctl (/proc/sys/net/ipv4/conf/*). While
->>> ip-netconf exists for monitoring these values, there has been no native
->>> way to set them directly through iproute2.
->>>
->>> This patch introduces the support for that via 'inet' at the 'ip link
->>> set'. It uses IFLA_INET_CONF netlink attribute to set the parameter.
->>>
->>> Example to enable forwarding on an interface:
->>>
->>> ip link set dev enp8s0 inet forwarding on
->>
->> If an attribute can be set this way, then ip link show needs to show the
->> values. What's the plan on that front?
->>
-> 
-> I could introduce it in a follow-up patch. I guess it makes sense to
-> introduce it for ip -d link show only, right? I am happy to work on it
-> anyway.
+> In case of per port priority mapping, i don't know if this is working =
+as
+> expected, as the IEEE priority mapping is done at ingress.
+> Eg. i think if MQPRIO channel mode is used to configure a pcp to queue =
+mapping
+> on port 1 and a different mapping on port 2. Traffic received on port =
+1 that
+> gets forwarded to port 2 and egresses port 2 will end up in the queue
+> configured by the mapping on port 1. As mqprio is an egress qdisc, i =
+don't
+> think that's expected.
 
-yes, -d only.
+Good point, it=E2=80=99s interesting there is egress mapping on the 6390 =
+but only for FPri to DSCP. The Frame Priority Table set ordinal one =
+would expect for egress QPri mapping is =E2=80=9Creserved for future =
+use=E2=80=9D. (Be nice if it were an undocumented feature.)
 
-Will give Nicolas a chance to review.
+I will remove the per-port mapping for the 6390 so all ports share the =
+same mapping as they do on the 6352.
+
+> I have a patch that hasn't been submitted to the mailing list yet =
+which
+> implements support for the dcb app pcp-prio command. This is also done =
+by
+> configuring the IEEE priority mapping table.
+
+Definitely happy to take a look if and when you submit, but I do plan to =
+continue with this patch series (originally proposed as an RFC in =
+September 2025).
+
+Cheers,
+Luke=
 
