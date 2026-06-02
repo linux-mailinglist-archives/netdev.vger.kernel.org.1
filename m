@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-294229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +dp5MmrfHmqoXAAAu9opvQ
-	(envelope-from <netdev+bounces-294229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 15:49:30 +0200
+	id T/JdN33eHmprWwAAu9opvQ
+	(envelope-from <netdev+bounces-294231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 15:45:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF2362EA79
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 15:49:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808F862E9DB
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 15:45:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=d7NlhSDo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294229-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294229-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=jYNmjA1z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294231-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294231-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2D31130BA1E5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 13:36:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D27DA308CE51
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 13:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D34C3D1A86;
-	Tue,  2 Jun 2026 13:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC503E6DD3;
+	Tue,  2 Jun 2026 13:36:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641773E7BAF
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 13:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D643E1221
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 13:36:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780407376; cv=none; b=ATPIwTCUCnL/TvHc4m/lnn8R2GXKy/+90iWmqUPdzon0A2gh7JULlk4RsGwHpBWGg1pdr/D0FcSgWmnBaKbPahC91+jInTlmilJ+hhEjc4OQPDgvOx3MUkRdbTD3fDGw1vXmqwIrEg3tr8A72T5yxPZ/KnNk6r14HEzOQgcZPD0=
+	t=1780407378; cv=none; b=DUKSglZ8Xx7vbXcPQ4CWSK8ezt4/A1p3mrxK5/AWtqUjkJ3KcnaxOwGbN5qwQRVWsrFQpz3qzG8HvNX/vP079+N852oVgG8csSSQfpYpVp2tv1zt39GyMjdiZ6uUzQFbbfNo4U5nZBX+b7+hu/CuCX6CZnCCH8cScS6p76n/zoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780407376; c=relaxed/simple;
-	bh=SOLS464sCwsXb68FsuH5c593Tm26C1l/iV/hYt7J9QA=;
+	s=arc-20240116; t=1780407378; c=relaxed/simple;
+	bh=7Lj0FqVDmeiNPWCn3u/fKwFl3wYP02Jhmq4tu2IuAwU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lycRUHsnxmW5h5sDlob+R/HDsxdvVdrPEFh0/wo3awLV8LWMcUzKajlkh1wd+ZL9l5IMrIUA+RYfnI9pUWM8L3TA5BsNZu42bLnQ7NWnZ4vyFGscIUcNDl1qXICNXW3CD4fkZszWo6V+Ie5atnBtO0JYHScp6D6kioxf4uLU+k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d7NlhSDo; arc=none smtp.client-ip=209.85.222.173
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-9157b895c57so55206485a.3
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 06:36:12 -0700 (PDT)
+	 MIME-Version; b=P/DMn/Ugz7HorGEAGBcDq+UGvDr3KfFfQiQuh55abmID2dBz+A28FfWD07MGH0fMPjVAR0jh0aZ8wt9CdIONUTgu6Sdpg8LRwb1tx88RsvBfiM23mcuwFaPUh6gfTSVF3QUwgQdmJ9TmkKtr81gan+tvZOPVMlc78M7h7/wqi+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jYNmjA1z; arc=none smtp.client-ip=209.85.222.171
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-9157d3f2098so77452185a.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 06:36:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780407371; x=1781012171; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780407372; x=1781012172; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ILH0OeVmQKxRCdX8NaniLAKrB5+vOEdfNb+IKt6Bl+4=;
-        b=d7NlhSDolCE6yiIhwR99pkdmFT4MCbhsmexwSqDzsRIV+UyBD41QlOUcV7zUGz96pe
-         fGgwFErgzkOayrO9j7HfOqllvhs0tDyCO155j8klujjnleiZ03w/VXLX25vxZZCX/aY4
-         7eBE2QPT2SreD2suke0fIjp5O2KiFnpAEqbfrVTiD2lZtMEPB2lRb3Rrqkp8O0UR5cpw
-         2jpCb0S2R6CkMarqppGDY6qOYFreEYi6CZwZPQ2XyPkdrZy3EIwBb4McESvt+GlmEUQ5
-         SBR3EBvfvPrhD8rZ1tNCBEXEnXe7ArJN8/BD7oQWiN/8eG/rNUQyOOUH5pyP26Pf0jDZ
-         v7mg==
+        bh=vnT0GMlKGTyqTQGZDUa8kd6IyJCEjxPnkabKrmHLnAA=;
+        b=jYNmjA1zDkh2NmlTK4dNah/TJZGUVPPCNVwZ3oWTVxTXPFJsUitP6RhiSQFbI+MYIq
+         XrUI5zc01dqSEkMRx5JpFXIKsPyLTW45DfQ4wXUK8bTKPLvONyR/2jUzjRDeDYoYKbxi
+         eRwdi4dQm82d4KKZSHcatfq2+yKuiqCdo22SHGMTfBRmfddwQdtHkJwC++t3YI3fgLm0
+         db28SbKaWYsfCUr2/zPmLvpwwl5KkZFQgpTe72+O4nQstA68uL6rrbKZRLXVRzh9ekm9
+         lhqejdwD8rg/dRZp08PTBkKp/a92QIYggQliGnSis3wuByRf8EOBx5zLj8OaibGWjq/i
+         GA7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780407371; x=1781012171;
+        d=1e100.net; s=20251104; t=1780407372; x=1781012172;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ILH0OeVmQKxRCdX8NaniLAKrB5+vOEdfNb+IKt6Bl+4=;
-        b=RwspD9PgzCG0/MFFtn2PcC2wldCYcHXVXD2AtFlH6naelEtAXgV2iyCSz9ijSFscNv
-         AMwRPjP0fD0ORNQlwv7lEZzpXw3n0gKzHlR8sDIgNWDSaUTH0rkU1Bh58cV5tIk7c1pg
-         5yCTNZRdD/DlHfzv7zYd+6Y0P/8y5xmF2RCTv6vtNRajXv35ANY4TtwaaMi3tjIBts4Z
-         PYEoChk92yOTFx+twi5aRG6N0/z0lgPO3eJxysnEe3gcxkL+QjRExdIjMaajvfp6yV2n
-         EPKW3Jw9SAYTfNBhdcT8JkBbVkRuehVQPEacYf09s2GPMQuDwNq6uMUh3st11y4Fb+de
-         JWIw==
-X-Forwarded-Encrypted: i=1; AFNElJ93SrvpGMsmOn5pWRXIOz9P+4PZPM5RmD1PeTLbt/g6t6bVSfiIIcnteTCQXPU996zZix8bz9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytBCb/MTdWXbB79Yiy84nmEnZDC7z5l3MnWKoE3YnjHlr181bJ
-	scWkX6vxnuopNdx9tmsMgO/rJ98QTcDOx19npKCj/gIGfdGzvTq+fs81
-X-Gm-Gg: Acq92OFWFXBLyzifMxFif7kSXsAlnVAfWKnX+5Hx9ied2tqpsSHXm/zi5rIUMLDWZLv
-	jBlvXarPz3NbDeE+xRoHzdYKQj6fmbMbqUObSu//MRcl3x338kD2paMlt/M3SpYVVODhkpDXqYx
-	/3M6ZkMgummb1i/7t7XFWBhcBg+hgn3Nutqshp9A7B+Pq3rQqCKrBGh+xIgv/0/eGs0A3LbVU42
-	piVAr7yQ5niz2yZMiqvtWwnLNoeFjG66/R0oIIiPU/Q0SXveYns9LtZnnMhIE3tGjf8mnd5H2TD
-	oQC7ZZIZuPyscdlfPoMB4rQ+1MLYa7pgbdHsC76jwbNYWaLpshGKfdg27yFidWlZBapwNvP3lBU
-	C8e1k9m+4GXNwOR2qHBhXWVHPN22Qp82NtMWddYEDSmlpm6T/IW43m0Oki0verba+QJim7Wy396
-	5jMZ7Hom2S8eqJbRGqv4WW07vRxMwZXp1Iv02cqHyd7jzcGHRw+gi/KgZFCGYVqqrknuBcIPe3J
-	EapFOBxM8QQflH3T2vdVXM+jfHLzwM=
-X-Received: by 2002:a05:620a:284a:b0:915:673a:617b with SMTP id af79cd13be357-915673a62c9mr1075320485a.24.1780407370960;
-        Tue, 02 Jun 2026 06:36:10 -0700 (PDT)
+        bh=vnT0GMlKGTyqTQGZDUa8kd6IyJCEjxPnkabKrmHLnAA=;
+        b=Yqs0+y2Nbfk1Di46eqiAG3GK1gsK9tZmdYpH0/t1KwH/1229LBFXNp7C+4cCedQvJH
+         CQ9otC+t+6oIn5bvCogkay/kWqSzSjOEu5olDyghd0hyB+BlwdSN7JzHN7vR3+77Ca4v
+         Wi2FdwiyJLi8+Tl+dJhOAsVjLLK5e/fKe/2aS1F1dz/8shuaFvrXsF2B3Ew/54MYHf86
+         jYfFBolrO55b8nwTfa92NxbL9lIob1WoOsgmvQIq1hgBXPfi6M3io3WPrbQYBaJuPC4B
+         wfNLHo+k6GcxAWXZatmQ4aVvOd3MO4vb6ntyPO+zN6ADRvTEPm/m8a4h9G2BAk9peZay
+         rkLA==
+X-Forwarded-Encrypted: i=1; AFNElJ+j2PPST+vmi9tRkJfFhG2fVeOfAn989ln0JV1QQqlKGp3CTsijRDbIlydWRtz2DjTF0kxJpUY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM19FAsFn1BDPxj5d1FSlzuAyRQzKoi3/7yrNGaWsdkZg3BgjM
+	SKnLwlc7UACbPin3gm8klBJ5cL0e9iX9e7fznh6Lk/u/ZtLAskofJrfW
+X-Gm-Gg: Acq92OGLeUL7N75GUOkIkC/t9R0sbTqdDAHOCqaOJGQxYJv2z0EejjboJ8M7rvM+xoG
+	btRhW6piQs0wmpA22r13ox1tULyzw8E3YekWvaHS3jhLw11kVZiPd6IObII7O+d8GhKXhxZ6Hy+
+	1rHl6sMjciatT/ASXsaFjjeziJOYuCFZ5f70TvhWBsSpn7WJkO/2Aeb//Fa3ePPIIM9FBepdOZ9
+	UL5VTnRWxVvOGgstOml9Pkf1vXdELOLSm6K9WGN/Zd26JtcQKxgw6qF0RnLY1g1UKdEozEPRx8S
+	4cBF2u1eMFCe3HR+KDzTM3G7cRO//qEC1XltxaShbBKVyZjY6tsmYdczC0Grvc+Fwypyq0PDgdU
+	lhWM3bD/ZiFF6h34J/RdsQMe01ZZqxkXMNDR7f1Ym1dLtQb3tIKxQ27JOhG2Sd/anMo9Lh6j1xy
+	uRlE1g7PCqGNFqR+eHC+mp3byBfzIf4wJZUgmxA/s1tOWIQSJcD0iatFjUZlVZS8EfVclDXjYEd
+	i7ZIkQeVhNt/9/zLR6qOWOuLus10W8=
+X-Received: by 2002:a05:620a:3909:b0:8cd:a3ab:352d with SMTP id af79cd13be357-9153dbabb50mr2601322585a.61.1780407372227;
+        Tue, 02 Jun 2026 06:36:12 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-915721f7d75sm346036285a.18.2026.06.02.06.36.09
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-915721f7d75sm346036285a.18.2026.06.02.06.36.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 06:36:10 -0700 (PDT)
+        Tue, 02 Jun 2026 06:36:11 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Jon Maloy <jmaloy@redhat.com>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -88,9 +88,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
 	tipc-discussion@lists.sourceforge.net,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 1/4] tipc: require net admin for TIPCv2 netlink mutators
-Date: Tue,  2 Jun 2026 09:35:52 -0400
-Message-ID: <20260602133555.769727-2-michael.bommarito@gmail.com>
+Subject: [PATCH net 2/4] tipc: validate discovery message length before reading media address
+Date: Tue,  2 Jun 2026 09:35:53 -0400
+Message-ID: <20260602133555.769727-3-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260602133555.769727-1-michael.bommarito@gmail.com>
 References: <20260602133555.769727-1-michael.bommarito@gmail.com>
@@ -105,12 +105,12 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294229-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294231-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ying.xue@windriver.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
@@ -121,7 +121,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -133,127 +133,61 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DAF2362EA79
+X-Rspamd-Queue-Id: 808F862E9DB
 
-TIPCv2 registers mutating generic-netlink operations without admin
-permission flags. Generic netlink only checks CAP_NET_ADMIN when an
-operation sets GENL_ADMIN_PERM or GENL_UNS_ADMIN_PERM, so a local
-unprivileged process can currently change TIPC state through commands
-such as TIPC_NL_NET_SET, TIPC_NL_KEY_SET, TIPC_NL_KEY_FLUSH, and
-bearer enable/disable.
+tipc_disc_rcv() reads the sender's media address from the fixed
+media-info area of the header (msg_media_addr(), offset
+TIPC_MEDIA_INFO_OFFSET) and, when the peer advertises 128-bit node
+ids, copies a NODE_ID_LEN node id appended after the header. Neither
+read is bounded against the actual received length: tipc_msg_validate()
+only enforces a header size in the range [MIN_H_SIZE, MAX_H_SIZE], so a
+LINK_CONFIG message as short as MIN_H_SIZE (24 bytes) passes validation
+while the media-address read reaches up to MAX_H_SIZE and the node-id
+read reaches MAX_H_SIZE + NODE_ID_LEN.
 
-The legacy TIPC netlink API already checks netlink_net_capable(...,
-CAP_NET_ADMIN) for administrative commands. Give the TIPCv2 mutators
-the equivalent network-namespace-aware generic-netlink gate by setting
-GENL_UNS_ADMIN_PERM.
+A node always builds discovery messages at MAX_H_SIZE + NODE_ID_LEN
+(tipc_disc_init_msg()), so a shorter LINK_CONFIG message is malformed.
+Drop such messages before the reads so the media address and node id
+are taken from received data rather than from uninitialised tail room
+or memory beyond the buffer.
 
-A QEMU/KASAN repro run as uid/gid 65534 with zero effective
-capabilities previously succeeded in changing the network id and node
-identity, setting and flushing key material, and enabling/disabling a
-UDP bearer. With this patch applied the same operations fail with
--EPERM.
+A crafted short LINK_CONFIG datagram otherwise makes tipc_disc_rcv()
+read past the received message data when a bearer is enabled.
 
-Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
-Assisted-by: Codex:gpt-5-5-xhigh
+Fixes: 3d749a6a26b0 ("tipc: Hide media-specific addressing details from generic bearer code")
+Assisted-by: Claude:claude-opus-4-7
 Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
- net/tipc/netlink.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/tipc/discover.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
-index 1a9a5bdaccf4f..8336a9664703f 100644
---- a/net/tipc/netlink.c
-+++ b/net/tipc/netlink.c
-@@ -152,11 +152,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_BEARER_DISABLE,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_bearer_disable,
- 	},
- 	{
- 		.cmd	= TIPC_NL_BEARER_ENABLE,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_bearer_enable,
- 	},
- 	{
-@@ -168,11 +170,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_BEARER_ADD,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_bearer_add,
- 	},
- 	{
- 		.cmd	= TIPC_NL_BEARER_SET,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_bearer_set,
- 	},
- 	{
-@@ -197,11 +201,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_LINK_SET,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_node_set_link,
- 	},
- 	{
- 		.cmd	= TIPC_NL_LINK_RESET_STATS,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit   = tipc_nl_node_reset_link_stats,
- 	},
- 	{
-@@ -213,6 +219,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_MEDIA_SET,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_media_set,
- 	},
- 	{
-@@ -228,6 +235,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_NET_SET,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_net_set,
- 	},
- 	{
-@@ -238,6 +246,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_MON_SET,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_node_set_monitor,
- 	},
- 	{
-@@ -255,6 +264,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_PEER_REMOVE,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_peer_rm,
- 	},
- #ifdef CONFIG_TIPC_MEDIA_UDP
-@@ -269,11 +279,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
- 	{
- 		.cmd	= TIPC_NL_KEY_SET,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_node_set_key,
- 	},
- 	{
- 		.cmd	= TIPC_NL_KEY_FLUSH,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.flags	= GENL_UNS_ADMIN_PERM,
- 		.doit	= tipc_nl_node_flush_key,
- 	},
- #endif
+diff --git a/net/tipc/discover.c b/net/tipc/discover.c
+index 3e54d2df5683a..daf5f11fc82b4 100644
+--- a/net/tipc/discover.c
++++ b/net/tipc/discover.c
+@@ -217,6 +217,20 @@ void tipc_disc_rcv(struct net *net, struct sk_buff *skb,
+ 	}
+ 	hdr = buf_msg(skb);
+ 
++	/* A discovery message carries the sender's media address within the
++	 * fixed-size header and, when 128-bit ids are advertised, a node id
++	 * appended after it.  A node always builds these messages at
++	 * MAX_H_SIZE + NODE_ID_LEN, so drop anything too short to hold what
++	 * is read below and keep msg2addr() and the node-id copy within the
++	 * received data.
++	 */
++	if (skb->len < MAX_H_SIZE ||
++	    ((caps & TIPC_NODE_ID128) && skb->len < MAX_H_SIZE + NODE_ID_LEN)) {
++		pr_warn_ratelimited("Rcv corrupt discovery message\n");
++		kfree_skb(skb);
++		return;
++	}
++
+ 	if (caps & TIPC_NODE_ID128)
+ 		memcpy(peer_id, msg_node_id(hdr), NODE_ID_LEN);
+ 	else
 -- 
 2.53.0
 
