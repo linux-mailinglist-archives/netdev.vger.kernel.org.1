@@ -1,53 +1,65 @@
-Return-Path: <netdev+bounces-293961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293963-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBlhJ+M9HmpriAkAu9opvQ
-	(envelope-from <netdev+bounces-293961-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:20:19 +0200
+	id 6FisHOs/Hmq/iAkAu9opvQ
+	(envelope-from <netdev+bounces-293963-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:28:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C656627292
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:20:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C716E627390
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 18AAD3013A48
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:20:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 087BE303DD70
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99DD35677A;
-	Tue,  2 Jun 2026 02:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285333603DD;
+	Tue,  2 Jun 2026 02:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OS2nuIrO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NporWwG6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03E633D4E5;
-	Tue,  2 Jun 2026 02:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3F22BFC7B;
+	Tue,  2 Jun 2026 02:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780366816; cv=none; b=mZMgyjDl3Y3AS4GAeOyWb94yBNEkv/hOoTcH5RKNQgUaIYh6p1jDm2G9qMUnAhhHIuLjg0SJ9yz4WJ0281zBbhZsjDvVgztkmCrbROLlm3RYhHLh/gWQd/JwdZylWdWnwF8C4RtF1aoB+rMXvzAlO34RE8Ks+Escw3hZygnyyfg=
+	t=1780367091; cv=none; b=YAYGXAy+WsllHV0WWV08ZtRhENIIem+sCc6380nLZBZSKF2Ck51oaYAOSzp3RUSk3uaQfKhrpwaKcYbzxAEBz2qd55Ls2QscQSNzv4DBRt7aIUVIb3Qa2WbegTNlecbiGvEkpNV30ENtuFTFKEG6ZiQISjQIIT7i2np0748BpDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780366816; c=relaxed/simple;
-	bh=t5X+DRQWZC74WnCtGkg2zLQEyNu02H93v8vGBqwVsTc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eKEjn0BcU/vYHjPXbEYF8o4N6Le2Zw5JGPHKRPJVrSxIgwsHmPQw0oNN+YMzsoz4WAO0kEpH/c73XS9FVAXuK71xjyZCwDmfFwOD9DuSpIe8r/hD5Lo2IS3jaWZAR2EjC3SLB01zjnRajPqW2uGpcBAZvwpv6a3Y5uPm5xoKTeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OS2nuIrO; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6647F1F00893;
-	Tue,  2 Jun 2026 02:20:15 +0000 (UTC)
+	s=arc-20240116; t=1780367091; c=relaxed/simple;
+	bh=6KazbM6n0OiSP53uvo9QSRJ+3UJacCU9VCsLGMMdfO4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Y4F2JM6iYHoxV6Qez5dM4VkfHet5Q3mCSwqITtNps5Eg3g2UDsslW4htCkC25Nj+PWjuvJ6EXMYCY4vRKt08PssowQOICOb+7gCA7RNu+5aBnxGAJqMOjGQmbaWA5llDA4VxzWHXY4zosn3vB+CNs2R/Xx/i9TYUKTF/XkhRVvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NporWwG6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6D81F00893;
+	Tue,  2 Jun 2026 02:24:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780366815;
-	bh=bddfpdY48ZCl/6RBk7ol7UbnoFxHmpEvxDO054qNro8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=OS2nuIrOSNWumlFBKV6fC9GitOUUW3Fi7uZZXN9wgHhk06LGn+eF0G8qubKXiRZiv
-	 drrmgYJ1DE1ul/zQvbZ4vDisHewl0g+iC38hJJuSW+KmPf1qNR93cRBmz+ZagLQW3Y
-	 ptea8RB5W7ZZZeOudR7gfNGO3rRzTOmVDodqVOxjVUWPE9R5tJ8Jkrtnt/0FNqQ5pP
-	 BcQ0WO7Y5uCry5aUOXOXvuwv17kRHTTyE3YgYB47T6Jyk+/UFppLqlUgCaX1peIW4C
-	 ugacpdCMxwMHnHf68O7rt/nXwtK2v0Pjaf40Np40LwwlEerZHYV9bB6/gICtFq73IU
-	 RgssFdfrJw55w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0BBB38119F9;
-	Tue,  2 Jun 2026 02:20:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1780367089;
+	bh=CCDZVn3OdV0xCjNZpQTfwvEq8Unt4yFUJjgzpgSVfgc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=NporWwG6Za0FfScH4KAwZpW+Pc1YwUaCO+8pC7g563e0taeRJxj0axXT+9iy4WMTR
+	 V+UTEN+tLO8CvuSBU9DjgBrNz9C0xO/MOSoBd5HbFDPXzuw6TAP32v5umcfQGmZ3fo
+	 gG5dZE+9biyq2XgXxN+50HAowiI5M7NfsVvsEhoMAVr1z9pR8vXVOjZOSJsKlpqbKK
+	 Y8hDcXlHxE0bgig4H4VhC4Xi9NaczyeX3E/czb144QEUualRSzHZF1k521hTplgnbM
+	 4EtaaCNLznQsw9ov94cx1r+cU4MHTgz/C/4GGg1dQnNkwMcMp1Nr46yLosvbJ5AY05
+	 gxVZQiwY9WJ9w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: achender@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	shuah@kernel.org
+Subject: Re: [PATCH net-next v2 3/4] selftests: rds: support RDS built as loadable modules
+Date: Mon,  1 Jun 2026 19:24:46 -0700
+Message-ID: <20260602022446.1634495-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260527023423.387792-4-achender@kernel.org>
+References: <20260527023423.387792-4-achender@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,77 +67,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] mv88e6xxx: SERDES on mv88e6321
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178036681764.209208.7159742822426422600.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jun 2026 02:20:17 +0000
-References: <20260528210310.1365858-1-fidan.aliyeva.ext@ericsson.com>
-In-Reply-To: <20260528210310.1365858-1-fidan.aliyeva.ext@ericsson.com>
-To: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, marek.behun@nic.cz,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nic.cz,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293961-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-293963-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 1C656627292
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: C716E627390
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+selftests: rds: support RDS built as loadable modules
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This commit removes CONFIG_MODULES=n from the rds selftest config to prevent
+unrelated features from being silently dropped. It updates the configuration
+check routines to accept options built as either modules or built-in, and
+adds support for probing the backing modules.
 
-On Thu, 28 May 2026 23:03:07 +0200 you wrote:
-> This patch series add code support to be able to use SERDES feature of
-> mv88e6321 version of Marvel mv88e6xxx series. mv88e6321 has 2 ports to
-> support high speed SERDES but the support is lacking in the driver.
-> 
-> mv88e6321 version has a similar architecture to mv88e6352 version making it
-> possible to reuse its pcs functions. That's why the patch series consist of
-> 2 parts:
-> 
-> [...]
+> diff --git a/tools/testing/selftests/net/rds/rds_run.sh b/tools/testing/selftests/net/rds/rds_run.sh
+> index ef16039be1ae5..c16b30dbdd169 100755
+> --- a/tools/testing/selftests/net/rds/rds_run.sh
+> +++ b/tools/testing/selftests/net/rds/rds_run.sh
+[ ... ]
+> @@ -93,38 +93,58 @@ check_gcov_conf()
+>  	fi
+>  }
+>  
+> +# Checks if a kconfig is enabled (set to =y or =m)
+> +# $1: kconfig symbol to check
+> +# $2: (optional) module name backing $1
+> +#     Ex: check_conf_enabled CONFIG_RDS_TCP rds_tcp
+> +#     Modules for configs set to  =m will be probed
+> +#     If omitted, only a built-in (=y) config is accepted.
+> +# Returns on success.  exits 4 on failure
+>  # Kselftest framework requirement - SKIP code is 4.
+>  check_conf_enabled() {
+> -	if ! grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
+> -		echo "selftests: [SKIP] This test requires $1 enabled"
+> -		echo "Please run tools/testing/selftests/net/rds/config.sh and rebuild the kernel"
+> -		exit 4
+> +	if grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
+> +		return
+>  	fi
+> +	if [ -n "${2:-}" ] && grep -x "$1=m" "$kconfig" > /dev/null 2>&1; then
+> +		probe_module "$2"
+> +		return
+> +	fi
+> +	echo "selftests: [SKIP] This test requires $1 enabled"
+> +	echo "Please run" \
+> +	     "tools/testing/selftests/net/rds/config.sh and rebuild the kernel"
 
-Here is the summary with links:
-  - [net-next,v3,1/3] mv88e6xxx: Add mv88e6352_serdes_get_lane
-    https://git.kernel.org/netdev/net-next/c/1a79978dd271
-  - [net-next,v3,2/3] mv88e6xxx: Refactor 6352's serdes functions
-    https://git.kernel.org/netdev/net-next/c/348a46c93e53
-  - [net-next,v3,3/3] mv88e6xxx: Add SERDES Support for mv88e6321
-    https://git.kernel.org/netdev/net-next/c/f456c9b936b6
+[Severity: Medium]
+Should tools/testing/selftests/net/rds/config.sh also be updated to
+reflect the new module support?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+If a user follows these instructions to run config.sh for missing
+dependencies, that script still explicitly disables CONFIG_MODULES via
+scripts/config --disable CONFIG_MODULES.
 
+Could this undermine the goal of this patch by forcefully disabling modules in
+the user's kernel configuration anyway?
 
+> +	exit 4
+>  }
 
