@@ -1,144 +1,125 @@
-Return-Path: <netdev+bounces-294402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LMt1MfU+H2pljAAAu9opvQ
-	(envelope-from <netdev+bounces-294402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:37:09 +0200
+	id oXRvNy4/H2p1jAAAu9opvQ
+	(envelope-from <netdev+bounces-294403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:38:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21620631C96
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:37:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F414631CB7
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:38:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=GP4gpPxD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294402-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294402-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Nf8zsoAS;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294403-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294403-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9A7A3032810
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:29:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 807CA308195B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E6E3750DC;
-	Tue,  2 Jun 2026 20:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FA22F12AD;
+	Tue,  2 Jun 2026 20:30:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012C218AE2
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3436633D6D5;
+	Tue,  2 Jun 2026 20:30:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780432198; cv=none; b=Yj89wMfA6ERKtaC5jkQi9Lfm7Feb9t1zRdd5J11MAF79jZ/hESztYfz3pAPjNWnsrjxuHNi1ZM4+QAWS+Kx9ev4/kXDS3Nl1vQHuGOLHiokF7sDifMYw6Wdh6xycBN3PBd1l26bHQgy3xfZUq40jlI17ZAkBamVT5iKpz8vYk7g=
+	t=1780432210; cv=none; b=TjAxRP4y0p68YlPRbr3lTmLBG9bDpQtasQjaC8mJIN82HGsf8MY65wGi81kr3XJH3U3rJCBfMbLx3Ih4iX6TbT6lEtfh+HRPhfz1OUQMZtXQ9VfZw2ZcnKQ+sinl+CY3YMkAXhVoXs4rkzWV45VV33Cv2pJUsRFduDodFOcNnaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780432198; c=relaxed/simple;
-	bh=gT6JJSFXPntSgSJXnmFexTLz4ByekJ1Wxaa2ubgue4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IQ6IBdsMx+VPjGKjV2TZ+UQtthp8jqeMnPc7IDi30TVXd+b0fcEsrMsF/alkGXhwN8PowHUVTYk0DNtmAgQhdr1d6kZs/VazAV6uAsVM9hw0EeTns4DXNkFnlVcFgpovEbVt9ntOXsC2Th5ZzC56rtD/t2P8D8rcCRTO7LDRaRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GP4gpPxD; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oYKgn0Ouv7gB691cAUCksoaQk2dpNxcVBdGF+YONLdY=; b=GP4gpPxD7qFWz8lBrZ9taVqTfQ
-	tk1xxKuyAuQ30UBD3B6Jo69p7oYMVv1SFJ54SdenQQSDglJdt0oWOP8mDePZSKPL8nJtn55GVCXMF
-	QdYr1T5v7iBD2PvWDUgHYu4OaLZp2UsQKqlsvaRAQkgn7sKC/UTvk89Q5zUPAsG+dZtc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wUVk4-005kep-Nf; Tue, 02 Jun 2026 22:29:40 +0200
-Date: Tue, 2 Jun 2026 22:29:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
-	daniel@makrotopia.org, mensi@mensi.ch
-Subject: Re: [PATCH net-next 6/8] net: mdio: realtek-rtl9300: relocate
- topology setup
-Message-ID: <1843116c-e84c-47f6-a565-e41bd6918ced@lunn.ch>
-References: <20260602052640.93083-1-markus.stockhausen@gmx.de>
- <20260602052640.93083-7-markus.stockhausen@gmx.de>
- <d56efb0d-c288-43d5-b3c4-922a164fd29e@lunn.ch>
- <02b201dcf28f$e4794470$ad6bcd50$@gmx.de>
- <6ebe2342-fd11-4588-a17a-fdb057335915@lunn.ch>
- <00b401dcf2c0$6e2826c0$4a787440$@gmx.de>
+	s=arc-20240116; t=1780432210; c=relaxed/simple;
+	bh=63Dgdq0YlzvEZBLTeRuw8lb+q989qXocQQexbTPACP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J3pE6IgX0Xaaa0txoKV7NcT/1ZagH/bbVqUpnNHTUSSs9jcme6ZJuBNkAM5ndXpn1jnML9up6xaPABSqhxh0UVWCmeaxi1tuijFScLKsc6HMf/2hQJnMN3kyDzuAjP06prJNV9hfdN0AJ30CGOqe4b9A70l2U8VtVb8w8j0nIxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nf8zsoAS; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C5301F00893;
+	Tue,  2 Jun 2026 20:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780432208;
+	bh=N2dbyBYbKnrRgkKys8ws2C6hc+8tSeDInqk6T4PyfUU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Nf8zsoASy3H8XRRFc/kP6g3TxaRQaqa4svhaPO/d+9SOw8f1K2pXIReu5/BIxSvry
+	 0ApP+PcxRGNrV2a9lnNGUpQj5Iqdbs2tWHwgWQ4tWzgW/Q4x8B441qPmncuLssxmrW
+	 4bvQf1aUekl9xxvdktTakP3N+UHe6+bttAWU+0cYTQKhAfW2MFze9HWIEPX7APEFpf
+	 SHAbHJak7Fxnqor3wfo+9gPTIy+git83HESVLgjJelNJt+iQChMUx4I3dzCnSDtqMH
+	 SgkX0PzEAB4QHVHhYUJLCDtZ526zYxhyh7Y7m/07r/zVY6hqzcAcFCVUZceV1nojOP
+	 OKCNM5XERJSpQ==
+Date: Tue, 2 Jun 2026 13:30:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, Breno Leitao <leitao@debian.org>, Eric Dumazet
+ <edumazet@google.com>, Ernestas Kulik <ernestas.k@iconn-networks.com>, Kees
+ Cook <kees@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2] llc: Fix race between sock_orphan() and timer
+ callback in llc_sk_free()
+Message-ID: <20260602133002.3ed70fc3@kernel.org>
+In-Reply-To: <20260529020059.3024038-1-xujiakai24@mails.ucas.ac.cn>
+References: <20260529020059.3024038-1-xujiakai24@mails.ucas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00b401dcf2c0$6e2826c0$4a787440$@gmx.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294402-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294403-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:markus.stockhausen@gmx.de,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:mensi@mensi.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmx.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org,mensi.ch];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:xujiakai24@mails.ucas.ac.cn,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:leitao@debian.org,m:edumazet@google.com,m:ernestas.k@iconn-networks.com,m:kees@kernel.org,m:kuniyu@google.com,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 21620631C96
+X-Rspamd-Queue-Id: 2F414631CB7
 
-> The hardware polling in these devices is very important for the DSA
-> driver. Especially as a port can be either PHY or SerDes driven. Some
-> MAC operations simply do not work if a wrong state is reported.
+On Fri, 29 May 2026 02:00:59 +0000 Jiakai Xu wrote:
+> In llc_ui_release(), sock_orphan() was called before llc_sk_free()
+> stopped all LLC timers. A pending timer callback
+> (llc_conn_ack_tmr_cb()->llc_process_tmr_ev()->llc_conn_state_process())
+> could fire between these two operations and dereference the
+> NULL sk->sk_socket that sock_orphan() sets, causing a kernel
+> page fault.
+> 
+> Fix the race by moving sock_orphan() into llc_sk_free(), after
+> llc_sk_stop_all_timers() has completed. This guarantees that
+> all timers are stopped before the socket is orphaned, eliminating
+> the window for the race.
 
-And you will get the wrong state if the timing of the poll is in the
-middle of the PHY driver swapping the page to read/write something.
-
-I've not looked at what PHYs you plan to support, but code like
-
-https://elixir.bootlin.com/linux/v7.0.10/source/drivers/net/phy/realtek/realtek_main.c#L907
-
-could be called every 50ms to blink the LEDs. That changes the page,
-writes a register, and then changes back to the original page. If the
-HW polling happens in the middle of that, it will read from the wrong
-place. If that HW poll actually changes the page, without restoring
-it, the write made in that function could go to the wrong page.
-
-So, in order to be able to use the Linux PHY drivers, you need to
-ensure the Linux PHY drivers has exclusive access to the bus when it
-needs it.
-
-All the phy_*_paged() methods call phy_lock_mdio_bus(), do what they
-need to do, and then call phy_unlock_mdio_bus(). You will need to
-extend those calls to disable the HW polling while the bus is locked,
-and re-enable it when the bus is unlocked.
-
-> There is no evidence about any issues in the OpenWrt ecosystem 
-
-Try blinking the LEDs as fast as you can, and see if anything
-breaks. Some PHYs also have hwmon sensors, and statistics. Read them
-as well, as fast as you can, so you create contention on the bus. You
-are then more likely to hit the race conditions.
-
-	Andrew
+Sashiko points out that there's more issues if the timer runs after
+llc_ui_release(). Can you reliably reproduce this? Have you checked
+that this change is sufficient? Sashiko says that llc->dev may
+disappear even tho we don't clear that pointer in _release().
+-- 
+pw-bot: cr
 
