@@ -1,165 +1,171 @@
-Return-Path: <netdev+bounces-294391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vtHtNw83H2oviwAAu9opvQ
-	(envelope-from <netdev+bounces-294391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:03:27 +0200
+	id axbnDF84H2qBiwAAu9opvQ
+	(envelope-from <netdev+bounces-294392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:09:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 558CE6319A3
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:03:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C1E631A6E
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:09:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=0XZ8zm5z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294391-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294391-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=Np7jfkAT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294392-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294392-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 36AE0300B99E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:02:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D5D4E3008461
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD8B282F1F;
-	Tue,  2 Jun 2026 20:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6EF30676C;
+	Tue,  2 Jun 2026 20:06:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D01D25B088
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:02:45 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780430566; cv=none; b=cdyQCERD9igH+w2Cbt6OU+ZFsg4NU4MgpXjcFYspr2Xb5ZG7wEAg/vqDg/70pJ4Mg8aDVnYLiWN6dsXfNqqBTewtEdgU6r7TB/UCAaup0+E2680PNODUxeHjFp6F33guwN3TWR/XykJETixzVztWBSffn7XqXkVZIUVF0pTJFmg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780430566; c=relaxed/simple;
-	bh=ubN7rJhKOz1075OIQcVENw6KgdBshN0T14DBYnp3L0M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q53ehXx9rget5EAurBsCOMWuXWKZwlxb1ZJuRJ7DN+/MYNxFuPyf3fhl7yB67cremLIr52le+ei+SKRaRQCKpWgQxuGJlh3blDD32I2ekC2wAS/x1PqyMMAnAvICnhCFMonEIOkuo5oo5ERxkKGsUSiytI3qbKJl5V50wqCn5cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=0XZ8zm5z; arc=none smtp.client-ip=209.85.167.178
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-4864aea1316so528234b6e.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 13:02:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F88F2F12DA
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:06:46 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780430807; cv=pass; b=uYNn/3i6d2Z2/De6djF1wNLEhefSInEn7tLVjOlATCOYwfd4kEBM2aG+sxP8f/Itn4Ry8LAoPLpp9yTJvp4diU8XwWHYGXGKGiQt45i5XyhYto7kZth3qUSR4DhI/7ybkzd27s9hZqhQoX2iVLqlXbtong9ySijuVwZLcaQDNWQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780430807; c=relaxed/simple;
+	bh=o6glQSSDOO722nG+tP6VFLNvn8Di71tCXdyy4TiaV/U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fWYpc4e/IK3QAFHm873t7DOBhgBJxd1HScpCAj15sAzwUj6FPntShxVsxK6QU6pAVCbb6pLmYjK6AffbV7C847kwsCp/KklGfmvVIumUja2p0ztIAZvr31GgcYtRcH1UrxruwLrET1q8kR7SqCmn0YRFbFyXewV4P0UlUkU/ngY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Np7jfkAT; arc=pass smtp.client-ip=74.125.82.49
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-13721dfd471so11541973c88.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 13:06:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780430805; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JPeeGSSvNiDNMZhR/zbpwxEhUWqTC8F6Iioo6UaWH7DwFmde6mJmiJu54Me2mxODft
+         7JVeJWjkegYCnfXf+2utAOIxGVe8qdsm5KUBz1HaltUMS/F2/VLdDXXo9GL4NyGFMfpo
+         13PrtcYk/emvr3N6fRZ2MWxq9FVGqcfD7io/2IDyRLp5cN/Df9OWyCgxtMnijk/ucRrt
+         0KGKQzx9vDdrGC9mVSSucj+ofVAa5co/wxEqm2T0jBvPiSRnTays4bgENlWZHmONnXNt
+         nOV2aMKzYICT9l4NwMFFM3AnBlXvmoiveZu+VWALG6zZO1z41TOVLQdzYGr2o7P8M1Om
+         jODg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=kjNiWfY3K0FWWLPxuEGqLi07e+1bZMAFrZWIfKQKa8g=;
+        fh=ftisUtbs2zC3yyQl6Tdl6GGCUp9OSygQnfqum638+p0=;
+        b=jkk/1RxkapJBjg3zCciaiafuF+ewN9FU7oTm8ZPNlQpe7cqpgiiBGvyuLA7pCQqZi4
+         JfBygMrknsFdUNBC2H5NYmpLYpW6IakIM1kafOzBt6ctJJzQL30fX8YHKl1r1Ci3V07A
+         8HPOI89l+J/SUR6P7Ts7oWZ6+xaf59evxz020oUsBhXptwv8V26QPdniw3jS3kU9EIIh
+         k63Td0r3kX4XA2HWPvQVqDiGXp7L5R30Os81hePlzJhtWQdQrMGnMHuCgFIdks9lbGlC
+         vDVaPeAj4/l9EJUZvWwYJuZFO61HrdcnMKhkG21Qt1Q1W3E1V+USBXZwimM74h0nUv5D
+         PURw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1780430564; x=1781035364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1780430805; x=1781035605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1BRYLAnGlifz6f71lYVFRYdvZhz3P6e20DcsrrJucHg=;
-        b=0XZ8zm5zhZXWUqypXCOSSGfw2nOvLPJLS5r60RIH2IRCdYig6P8rwCG8p5srDzO+Wl
-         REz2DUAwljlA/7Rj3Xc/T+7zprRuWQbz6rdWJ/q6CxJypuhVtYJyAWN2V8EnDWj+qPOH
-         UcBdI8eBXkgEaGxxCm/V2RWmPIjHjrHIFdpIeaFxju0MdpzwVd8FVfONpae5s1wY5vPO
-         OswfILtowKlf27nySrgwN/bSo9q0KLxW6TyIlYJ2ysreA7qpCM4brYJF+sA6E1iWSdNO
-         InsDZrCbrHObTuv1kUYUYxq+IrE0pYMLaJsNOW5+ZQzl9AC771IUROWQyJGfiFZfm5Tm
-         Vw2w==
+        bh=kjNiWfY3K0FWWLPxuEGqLi07e+1bZMAFrZWIfKQKa8g=;
+        b=Np7jfkATOtOBYqzZvm50SkNSxiM1B1KZ0dsLtoOJlU8m+lyo1wg91xFfJAEmKLhuUY
+         JCYv2B+SdcM4xmwmUOBv5tdgnnifPExJ9WyU5k6XlJzMO7idGtLAGFPzoGpJKJ3X6A8K
+         f7T+pnCXjAangJYxNud4jGdZPb2wHM4EHDGFoQI0LorN65NtqBEDU4UHG4c1PgQDX9uM
+         5rue4a56sA84oXwCYAb9rF8z+rh6D06t05zREvOSfd6lgylnoTQ2eilFxwowCzw8RqUl
+         3SvHsqOGXJckyT6F1tyzu7On4OEINqBWTHpxICtDO7BwtGrqtPkTucf33lsemlnpGlEH
+         /LSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780430564; x=1781035364;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1780430805; x=1781035605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=1BRYLAnGlifz6f71lYVFRYdvZhz3P6e20DcsrrJucHg=;
-        b=A1dIX8Zuoup+lCt8I8/Fc/1uK4IYVBODyV3IswZ7wQlwVu7WAJ3de4tryQYLxyhdMP
-         qpu8pq8Hg0R8q40C2ZnGbSL7iL06mocllgGmgLEU+XYATdjzM9IitNktEtpCvXwR4vx8
-         d1LnHFrTWm3Sx5Ue1M93dwOd/1hQrBgPbYdkNhz7aCTZNc4oCE97u+7qIY4KTbwTvc0K
-         2nlnJ7a40GK8BA4Cz7uhAuFy6X1IIGmOBxGK9WNoRRSl0bGcZTgOARygNqu8E4TsE2kp
-         u0IQ9RiFxWy5CgA7Km9t74Phks2qdO68hSNeE6hhzH2+syL56+S7oWdWG9FOEc0S7GO8
-         TUrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+CofWGOUMSnb2boebTYDW17ZT81DT8ptQSv5ZTQRpCz8FelAcARYbCya20LrwRpnjAyOazOwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9hit0yF9kEldYvpxB7tfjXYiv5C6YuBuS5o/cderomyXIVwE3
-	1m9O0DqjF6/mDgkCErPJM4dmoKkP4pF97Uxwfwzo/hJ3+h1gPh2n+c7QWjIPCaWQrxe/W4Rvom/
-	abyEz
-X-Gm-Gg: Acq92OEiImWdNTTtBLjJXfdZPdI7oXyLcNmTryPzJn6Fw1XvQ1nuPWenaUP+ABnuSjw
-	tJ1vTqEL2dkZXFOXuUIxQZWteVZlvp99VxWjoo1iZTp7EhXDe67t7fRUVc/eAHqmxfACyYAtORL
-	2cdw4LW++DjY7LwHh4m3nrYRaeqS4acbZr4ublsWZx+9fXGISF8FlwxVxlWkM9aNpcN4WgV1Eou
-	icJ5PLMUXjlfXSfq7ReoZ9B6q6zlAa9K/t8z1HRAbWyH/69ku6K/fv6tR7ZI6DeuagiMBJ6oLKG
-	RpGO6sQhjEFfUIfwn82fggLc1ILOUyz2gVlfJZmP8lU+1+baoviTP1lHReu7wp60UT0ENydwlCR
-	mPx/wOILcv/NETTx7uWXmCIxs0c64f7Zr2WyzwsN9EuyYVlVM4+H1JUJkW5873UOKwJvPRaMa44
-	TrJrvwgb3i4c4IPUxWofD+tESMNNTfezjyM0fB2D3V+ikQfW07AgJuVBuRj7ZmdCWdv74rlQwAw
-	vw=
-X-Received: by 2002:a05:6808:1a19:b0:486:4c2c:63d9 with SMTP id 5614622812f47-4865a9c01bamr187350b6e.20.1780430564190;
-        Tue, 02 Jun 2026 13:02:44 -0700 (PDT)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-440d8297311sm550691fac.12.2026.06.02.13.02.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 13:02:44 -0700 (PDT)
-Date: Tue, 2 Jun 2026 13:02:40 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 iproute2-next] iplink_geneve: Support
- IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
-Message-ID: <20260602130240.26c03c7e@phoenix.local>
-In-Reply-To: <20260602185711.129769-1-kuniyu@google.com>
-References: <20260602185711.129769-1-kuniyu@google.com>
+        bh=kjNiWfY3K0FWWLPxuEGqLi07e+1bZMAFrZWIfKQKa8g=;
+        b=Vr1kt+gK4kMlp8rL2HwuZrz3qiMHkSMhq7gyln7pFmURKS+1qHffxJeLgjWO0U61ri
+         YncbdsEKsgTZHm9H+bms8FBQHcWeeB12gifz+e2K7TTFvM/U7S6NDIixnWCMggEnV1Qy
+         /L9I7K+rJrG7Ivj7rQz7tLdXExcCXA2TME9gsqf2rQPOY7ljdJ25fvvBJ9jGH69OLORL
+         XySW5M47FDDFQbpzMtAJqu8nXuoPJ0XPfTVsDym+H/caAVvACQNWZ/XynV4ItZ7WCgNZ
+         3OlmtRZiZY0jYsw4aH+DkEyhFC2zGHcgD1HJUwr8upQBzCylDxGZVI3ls4ksUVLsHfI6
+         8Sqw==
+X-Forwarded-Encrypted: i=1; AFNElJ/b4/U6Tx9jjyYAUoVj/2dQWgetyae5SC2CT3wupI8E1cKweugxOclnf5jQLUUTO4OInuV7t3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6WdzYaaxmydS6/kqUkBrW5x6NJJqOd6c2eQOBBY0lOtCP1x8G
+	/JpZNUO6GjvAVsVVeiFSi/vEkw81DK38EKnWf/EvAFpxNK7Xj4vv2DoI8x23xFEDIAFJOEFiqGV
+	bMFJD/TTsYfEFycSSPFlC35xeiouiZuhTeVtoZZoP
+X-Gm-Gg: Acq92OF5JNiz4kqN4FzMS7cXYvtfs+GgZjEXX2J05KISr3tRwUcwOFtqnP5s/KvktYo
+	FPdheSoQVLYgKEvKj81l/+UYKFX1Hl8/GESsxDGHjeh0b17YSLXTC5b/LolVlhw9kGhx2uQOJgE
+	MSg+NJkNIF9j2G4tW1BwawQ5jpMyTF9wjDIDz0O9EJNHwXrS6ErQeQYDH3mssXI0lrIgjQm93lq
+	s9SKwRg8Scd0KvN+cx2jC6Qbxjj9tW8lh2VkJ7GbAlkrN+474qeAcSRMWtA/NTsARVq4wYfdEFG
+	AG1ONXZkwdSL8BiUkISN0bpJUJ08l+JqTEbBVLv98QFswt+UCZhvttEx6rcN37XkaTifaX1ds5X
+	ljUr72FIC/5ti+CVJ8nIeMEAtCfiB/q25Mi3MxRZ/jerGLn9Rb7cpkOc8shIP9LM=
+X-Received: by 2002:a05:7022:6886:b0:137:ec47:8fef with SMTP id
+ a92af1059eb24-137f6b8397bmr78678c88.14.1780430804786; Tue, 02 Jun 2026
+ 13:06:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260523061102.2762452-1-kuniyu@google.com> <20260602125951.50492267@phoenix.local>
+In-Reply-To: <20260602125951.50492267@phoenix.local>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 2 Jun 2026 13:06:33 -0700
+X-Gm-Features: AVHnY4IqjpQDxkH_Xtk01dGrNRDx0_vieuAceKF6kLPjKUfDg0-v9rHB8IukzXA
+Message-ID: <CAAVpQUBAL_6A3MPcH8w7+EZyfOG9D0i2X3pu5Vhd+fz8Y0=QBA@mail.gmail.com>
+Subject: Re: [PATCH v1 iproute2-next] iplink_geneve: Support IFLA_GENEVE_LOCAL
+ and IFLA_GENEVE_LOCAL6.
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294391-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-294392-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:dsahern@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,networkplumber.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 558CE6319A3
+X-Rspamd-Queue-Id: 21C1E631A6E
 
-On Tue,  2 Jun 2026 18:56:51 +0000
-Kuniyuki Iwashima <kuniyu@google.com> wrote:
+On Tue, Jun 2, 2026 at 12:59=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> On Sat, 23 May 2026 06:10:58 +0000
+> Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>
+> > +             } else if (!matches(*argv, "local")) {
+> > +                     NEXT_ARG();
+> > +                     check_duparg(&attrs, IFLA_GENEVE_LOCAL, "local",
+> > +                                  *argv);
+> > +                     get_addr(&saddr, *argv, AF_UNSPEC);
+> > +                     if (!is_addrtype_inet_not_multi(&saddr))
+> > +                             invarg("invalid local address", *argv);
+>
+> No new code can use matches(), it creates problems with conflicting
+> short arguments.
 
-> +	if (tb[IFLA_GENEVE_LOCAL]) {
-> +		__be32 addr = rta_getattr_u32(tb[IFLA_GENEVE_LOCAL]);
-> +
-> +		print_string(PRINT_ANY,
-> +			     "local",
-> +			     "local %s ",
-> +			     format_host(AF_INET, 4, &addr));
-
-Should use print_color_string(PRINT_ANY, COLOR_INET, ...
-
-> +		struct in6_addr addr;
-> +
-> +		memcpy(&addr, RTA_DATA(tb[IFLA_GENEVE_LOCAL6]), sizeof(struct in6_addr));
-> +		if (!IN6_IS_ADDR_UNSPECIFIED(&addr)) {
-> +			print_string(PRINT_ANY,
-> +				     "local6",
-> +				     "local %s ",
-> +				     format_host(AF_INET6,
-> +						 sizeof(struct in6_addr),
-> +						 &addr));
-
-And print_color_string(PRINT_ANY, COLOR_INET6, ...
-> +		}
-> +	}
+TIL, so the recommendation is simply using !strcmp(*argv, "local")
+or anything else ?
 
