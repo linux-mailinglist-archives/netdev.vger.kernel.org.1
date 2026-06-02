@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-293968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDQsJURBHmraiAkAu9opvQ
-	(envelope-from <netdev+bounces-293968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:34:44 +0200
+	id GFT8GXhBHmr8iAkAu9opvQ
+	(envelope-from <netdev+bounces-293969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:35:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E8A6274AC
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:34:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C58506274E0
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 25C2D304929E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:30:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7528E3091F3B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8839C36165E;
-	Tue,  2 Jun 2026 02:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D9021146C;
+	Tue,  2 Jun 2026 02:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7fwm83B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QdkhlrZ4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8D8360EFF;
-	Tue,  2 Jun 2026 02:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19603624AE;
+	Tue,  2 Jun 2026 02:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780367404; cv=none; b=Xxi2EE8XzmzVe133r3EyJQDi9GKyciWhuUdevuSUZvgLsinX4ryQ6NGiFtO/5KV7F9ZLsKOAK4HA0bocOJDrn1wN3Ig2aTyJrzrxKDBD6d7LPqoOfkoRSLHGujvxREB5FWdgwmKmS7NP7F1CJLa8IzuFW/3Pjnsj/LbBfS0Nvvs=
+	t=1780367410; cv=none; b=hNxq7FjP1BAhzuowSwjASWjgUo0Jhypq3a9GYzRh+oDcFnJ9P4iNpiRN4RS6ykFqljcB4l66uGfcrFpVjTbDNw/XlC8geTqDrsLeO/6B9QEB/NcLZtJboqD9MqC/wNAHEgtMTQyHK1Hv9/iwghLd6o7Gq4q7v7d8uBYOj13WFas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780367404; c=relaxed/simple;
-	bh=nw9/t1jHsZZPhclU5hIT7EIOeyHOsBRGb5Vs4GKUqxU=;
+	s=arc-20240116; t=1780367410; c=relaxed/simple;
+	bh=cPNuRgmaFrMZFm58yTQjYDOhJ8YDN4LOC057+L+4OlY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KxWVFIVXlBawW0fRcMHu9MMvqrqluTghGYdPTU1dWWvuUGAbePddD98vCThmH6OHTPcJ7CwrHSNKBWNHChnLnj2ObsSLoz6d+q+J6dH3OzOpnmGAVO0WhmEcv33cKrxKcPt6x9qG7n4TWqLuJonnsHC8bfk3/3Zru3Udj1xma4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7fwm83B; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 704531F00893;
-	Tue,  2 Jun 2026 02:30:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iTqPF/Tv5l2zWCbTtLpQxVVB9657hcmO9FegVO9ZMKy5VrdMyE/thYAApxMnk/6Y5YcALSc+GpbuONtasSxe4HkwpeojcMX+KXYdTG999fokQ7km23IlMpV7jRSTvqiGRwI2G+QfA/HIOSAeny9XM/mqUhJ/1MxLrqqF+1NvMv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QdkhlrZ4; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1E401F00898;
+	Tue,  2 Jun 2026 02:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780367403;
-	bh=yAq2xlBKXNJacMsYTq0rhFMMvLLHesg2+GnmPVXK+dI=;
+	s=k20260515; t=1780367409;
+	bh=YHwu7fomjzX+8N6OkA+Gu6EpnSS3smxOcORLCVpt1sY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=c7fwm83BcNBRwMcMBnhXNMYryVlyOvLekouG+MMvyYiMLuD8NKddEBWNX6/HPl4Mt
-	 w20/+DLdLeFfQFQAUD50Ybl1h9zKGe3B8IpAw/y8J7Vfzafo4V9oIbdretzVgq+R9B
-	 +Gd+6VWw0ERLpLRxWQVpqvteA89VmLWNADkYuQOQ+Aaim6fN6V+xvxDcRMERIFou2o
-	 3l75Mm0e9vtCea/E+4tc1YP4YzUahkeVizrjL8kNuk9ZqryUptOSp285m2BpHx0uap
-	 ViVsltMI8tVs35tpvOnMIRjZLC/rP2Ui7RzBKuwIRfr73y8gvgxUp7hU+J82WuzD4i
-	 /dRQmxcTVNxXg==
+	b=QdkhlrZ4nBN6czWH2xR2Ye5jErl+omcs0GEFYaqgczUJXZ1Rx5qSxgKe7moA5AiFR
+	 UTQNOLzMj1t0JR8xJAEHndn2KDJbOPD7hm4EEJxgBRep81qrSM1Fve0rKeWuMb9YYs
+	 iTzziGWzWNxz/BNU0iSGIPH2Jn2UzGO3I+ICEqEqfYO8N6OktTyVwo8I19MtixR1GO
+	 X4azV4KHMwgOEhL7S1QtOFVuRWpD94Vd9wQUmnOKNXntJ4uY1wBriS+mPS3PPBCmMS
+	 dOZNcYHAqzp7lu02l5faUhTqxcTatKrtu+C+WYikALgbN9yWh4tMNBgZ3cnotZLyDT
+	 pKI6H8gkiwgbA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A7238119F9;
-	Tue,  2 Jun 2026 02:30:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199B238119F9;
+	Tue,  2 Jun 2026 02:30:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,76 +55,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] 6lowpan: fix off-by-one in multicast context address
- compression
+Subject: Re: [PATCHv2 net-next] net: fec_mpc52xx_phy: Add missing
+ MODULE_DESCRIPTION()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178036740541.211970.3874244656503204922.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jun 2026 02:30:05 +0000
-References: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, alex.aring@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangyx22@mails.tsinghua.edu.cn,
- wangao@seu.edu.cn, fengxw06@126.com, qli01@tsinghua.edu.cn,
- xuke@tsinghua.edu.cn
+ <178036741164.211970.9129060267963522002.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jun 2026 02:30:11 +0000
+References: <20260527025139.10188-1-rosenp@gmail.com>
+In-Reply-To: <20260527025139.10188-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-293968-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-293969-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 29E8A6274AC
+X-Rspamd-Queue-Id: C58506274E0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 27 May 2026 16:18:01 +0800 you wrote:
-> The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
-> &data[1] as destination and &ipaddr->s6_addr[11] as source, but
-> both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
-> respectively.
+On Tue, 26 May 2026 19:51:39 -0700 you wrote:
+> Fixes error during modpost:
 > 
-> This off-by-one has two consequences:
-> 1. data[1] is overwritten with s6_addr[11], corrupting the RIID
->    field in the compressed multicast address
-> 2. data[5] is never written, so uninitialized kernel stack memory
->    is transmitted over the network via lowpan_push_hc_data(),
->    leaking kernel stack contents
+> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/freescale/fec_mpc52xx_phy.o
+> 
+> Assisted-by: Claude:Sonnet-4.6
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] 6lowpan: fix off-by-one in multicast context address compression
-    https://git.kernel.org/netdev/net/c/2a58899d1100
+  - [PATCHv2,net-next] net: fec_mpc52xx_phy: Add missing MODULE_DESCRIPTION()
+    https://git.kernel.org/netdev/net-next/c/996ea50ee957
 
 You are awesome, thank you!
 -- 
