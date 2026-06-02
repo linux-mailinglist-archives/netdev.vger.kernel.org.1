@@ -1,147 +1,277 @@
-Return-Path: <netdev+bounces-293997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLBsJedRHmpqigkAu9opvQ
-	(envelope-from <netdev+bounces-293997-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:45:43 +0200
+	id YOkaFPpTHmqDigkAu9opvQ
+	(envelope-from <netdev+bounces-293998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:54:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D0D627DE8
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:45:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B084A627EA8
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 820B7302C156
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 03:45:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2A6F3035D53
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 03:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11AFF3382DE;
-	Tue,  2 Jun 2026 03:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13951370AE5;
+	Tue,  2 Jun 2026 03:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aehxblWR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vwuvvhur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C240433A711;
-	Tue,  2 Jun 2026 03:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF1036DA15
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 03:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780371903; cv=none; b=VjgXlX/AGPSkmCCzLyb14kf+05JsEZ/rgSjcJ2x/WmVfw+f4mTeFpcRk5oPEjXHTzx8EZKjB+Wi7oZcqAnB3P7+Y/+IX7IUDkYzzwsPXLhtbE3JTpivZO9dFVbGvxmsx2NpEAfQdgzK1opLIGOUawIFr0CYI48pNef2m+7k6qmk=
+	t=1780372432; cv=none; b=aEY0vJael+egwwyIwBwWki8Xo1esbtT2sHtFXxzivOQ+D+yATvB7dguCfnI/m5tVXqHibeRnHSyTfT/UcNzwcPTHB1U7jerHSunnQN3a+F2KdLOgKOe7MB/VxNHLkkmCQetELUTbphsxywPf0zTh6+uqEu+Aj15FhmiXhFHNvEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780371903; c=relaxed/simple;
-	bh=HwpN8nGPHa9vZKd4QTPNieJp5izSBqN3t0ZCSo0JzM4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AzrnP9ngA43W1BwfyZbnY64oNHil8SKQDflAA4PTH5HiwKmh1maqsy3g/x094KyPFeWzoQIPL74j+vb+hrul+K+4Kdfovr7zjOBe6sFQ24jWlXyt5EyRMmbNvJGNtoa6BuyfQYowGzUbxH08WOQwEFKuma4SYWRFJKuRCFtpXt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=aehxblWR; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651KS6Eo1231225;
-	Mon, 1 Jun 2026 20:44:39 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=PuUJc8Sm0SYzpkmzrkULbTtEZ
-	d2zM483fQ4/qp8SBH4=; b=aehxblWRq6qxMyBmV8RmqUZ8FCf0B0vY9yH8H8PPw
-	0mAHN2Q0GsuJQDk1il7YLkHXD8SGYQi/rvWz+zxLMKnw8Rr0T8lNWtPD3buYaMtr
-	E8U+KOwpss5cnBu2QW4u5CHwvBCaEu0fvM6WhtMcFJH8vEI2ceIHGp0Dv6Tyqwt+
-	0eu/sbODkIK4cTjiKKCyfXwoxRbb+A7ast+bHfJ+ZVsLecEET1IUWmPuosfQL/je
-	KaEUJ63QSERrAIKQ0c/mc9yMDTOSmUqj7Z+/Qk3+hlpgmi9VzGY61a9y5v9Xzzhu
-	aPQrDLqYif4UNZZscws6ajrH+T/FsXbdldLj0mlVTEEoA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ega3b6xbq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jun 2026 20:44:38 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 1 Jun 2026 20:44:37 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 1 Jun 2026 20:44:37 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id E820A3F7062;
-	Mon,  1 Jun 2026 20:44:33 -0700 (PDT)
-Date: Tue, 2 Jun 2026 09:14:32 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        "Saeed
- Mahameed" <saeedm@nvidia.com>
-Subject: Re: [PATCH v17 net-next 3/8] devlink: Implement devlink param multi
- attribute nested data values
-Message-ID: <ah5RoH1QwQhTjATn@rkannoth-OptiPlex-7090>
-References: <20260601025844.865865-1-rkannoth@marvell.com>
- <20260601025844.865865-4-rkannoth@marvell.com>
+	s=arc-20240116; t=1780372432; c=relaxed/simple;
+	bh=piaJGw0Lw/G8i0lLqXKLF7hb5NFogwJnH00dTbpo53U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hBPecMEpK2XTxayV+U6KVXU1BxbtMAg/BP2E1IdrdjGSzOo/fDgA/0HeqVOAIg4hWtoIDPgz0dWs6lwAlnpgIE/nRoHNWOu/WXKDIZD1uFZhBxY4rf5/9dfiUooW91v6WrkXE9oo6iIURe9QzhC3oTyl0smoUjBdYCKRu3WOnIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vwuvvhur; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780372430; x=1811908430;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=piaJGw0Lw/G8i0lLqXKLF7hb5NFogwJnH00dTbpo53U=;
+  b=VwuvvhurmpskV07oiPv2PpHOK9xo/w8u+wHuXWWjLIhUezg7BlYHfFpx
+   XiEbwHO/5o1DJssVO6P3Lk0XfKNbEpS+GqAuEVU8Udbg/vZ9uh4zMjAgA
+   R3mpDHm5TKhYs4WWY0E2UXARwDxr6lJ6MzYdHK4amSEFVLNms4zCd+eu2
+   p7A3rcVqCdpZHm7bdjGHgI7IsDrn+mDNaMWjyt1f5pURyMMR2RzWCZYFW
+   P/gAG/mYe+IRLIuBE5fLSKhD2s347tKY2G5FdeKM17iX3g51HZPxjP3Ji
+   tiDD2Obb3U89tOpXx0aDOjYoTLUrvxK1sfcZHhu6Tcx1R0bMlHnYmwhRi
+   Q==;
+X-CSE-ConnectionGUID: +wbMH3ZHRtKJrwaTowbDuw==
+X-CSE-MsgGUID: IBSZfqoyTeCNwl5hcp2qtQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="68694251"
+X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
+   d="scan'208";a="68694251"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 20:53:49 -0700
+X-CSE-ConnectionGUID: RWaTPT0jQ7eOk/ol2HExhQ==
+X-CSE-MsgGUID: oW49JsbbT+qFPgLOmMF5cw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
+   d="scan'208";a="237437717"
+Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 01 Jun 2026 20:53:45 -0700
+Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wUGCE-00000000BSY-3tPw;
+	Tue, 02 Jun 2026 03:53:42 +0000
+Date: Tue, 2 Jun 2026 11:52:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next] mptcp: change mptcp_established_options() to
+ return opt_size
+Message-ID: <202606021113.tfn0OswA-lkp@intel.com>
+References: <20260601091816.444738-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260601025844.865865-4-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDAzMCBTYWx0ZWRfX5zzLhNaY8emk
- D0faT4BjeJGwZ2eFfBb9ixFOmdimgK5xVykoV3LVAu4zApxS2/BPwC+FuZ27CrLoF56OgfhHVe8
- E8Jkb37fb0Hzu4La+VgDc81WJi/8JZovuGuai8lEkZ8OJ54gVwOA5ZoYuBBDMkmN72WNiB1CzYd
- SQ8I5tyeUOx2NzlCSdpohGch5sKi0YsZJgJYBzVnkAvfFOl1Ayv4sJr3JnQdhMqIs/TeGZzZPGR
- PpsfvU7C2sYkWKGqJZEZpuAyZ8aXY4jvXo9so97NTSc5K81q0UYV1OiLY9EHDH/eKuqSEI9H+d9
- zWYCW09MvWAmyXDWDYGOKegzh0XQyRWe39SUctLY05TRf4m0Zcu+aW26c4t5r6VXwRfAlCcOvvQ
- RoD3rR6w5kMi78LZEB/6ogeW00Zstw9Or8vkw8n/DXQleQpG4IgibGOjXpHOwvbRcX9zNoJa+Fd
- NGBXnLYGnzQWDRXJahg==
-X-Authority-Analysis: v=2.4 cv=cLjQdFeN c=1 sm=1 tr=0 ts=6a1e51a6 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
- a=Ikd4Dj_1AAAA:8 a=WgJX6ROffo85cpo7s7MA:9 a=CjuIK1q_8ugA:10 a=ZXulRonScM0A:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 7psVBpbBLPaxDa25zjezEvbOJ_d_-7-P
-X-Proofpoint-GUID: 7psVBpbBLPaxDa25zjezEvbOJ_d_-7-P
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-01_07,2026-05-28_03,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
+In-Reply-To: <20260601091816.444738-1-edumazet@google.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293997-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-293998-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com,nvidia.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:email,marvell.com:email,marvell.com:dkim];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 12D0D627DE8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: B084A627EA8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-06-01 at 08:28:38, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> From: Saeed Mahameed <saeedm@nvidia.com>
->
+Hi Eric,
 
-> +	case DEVLINK_PARAM_TYPE_U64_ARRAY:
->> +		if (val->u64arr.size >= __DEVLINK_PARAM_MAX_ARRAY_SIZE)
->Does this code reject an array that is exactly __DEVLINK_PARAM_MAX_ARRAY_SIZE
->elements long?
+kernel test robot noticed the following build warnings:
 
-ACK.
-pw-bot: changes-requested
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/mptcp-change-mptcp_established_options-to-return-opt_size/20260601-174435
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260601091816.444738-1-edumazet%40google.com
+patch subject: [PATCH net-next] mptcp: change mptcp_established_options() to return opt_size
+config: nios2-defconfig (https://download.01.org/0day-ci/archive/20260602/202606021113.tfn0OswA-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260602/202606021113.tfn0OswA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202606021113.tfn0OswA-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/ipv4/tcp_output.c: In function 'tcp_established_options':
+>> net/ipv4/tcp_output.c:1186:63: warning: passing argument 3 of 'mptcp_established_options' makes pointer from integer without a cast [-Wint-conversion]
+    1186 |                 opt_size = mptcp_established_options(sk, skb, remaining,
+         |                                                               ^~~~~~~~~
+         |                                                               |
+         |                                                               unsigned int
+   In file included from include/net/tcp.h:44,
+                    from net/ipv4/tcp_output.c:40:
+   include/net/mptcp.h:271:59: note: expected 'unsigned int *' but argument is of type 'unsigned int'
+     271 |                                             unsigned int *size,
+         |                                             ~~~~~~~~~~~~~~^~~~
+>> net/ipv4/tcp_output.c:1187:54: warning: passing argument 4 of 'mptcp_established_options' makes integer from pointer without a cast [-Wint-conversion]
+    1187 |                                                      &opts->mptcp);
+         |                                                      ^~~~~~~~~~~~
+         |                                                      |
+         |                                                      struct mptcp_out_options *
+   In file included from include/net/tcp.h:44,
+                    from net/ipv4/tcp_output.c:40:
+   include/net/mptcp.h:272:58: note: expected 'unsigned int' but argument is of type 'struct mptcp_out_options *'
+     272 |                                             unsigned int remaining,
+         |                                             ~~~~~~~~~~~~~^~~~~~~~~
+   net/ipv4/tcp_output.c:1186:28: error: too few arguments to function 'mptcp_established_options'
+    1186 |                 opt_size = mptcp_established_options(sk, skb, remaining,
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from include/net/tcp.h:44,
+                    from net/ipv4/tcp_output.c:40:
+   include/net/mptcp.h:269:19: note: declared here
+     269 | static inline int mptcp_established_options(struct sock *sk,
+         |                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/mptcp_established_options +1186 net/ipv4/tcp_output.c
+
+  1145	
+  1146	/* Compute TCP options for ESTABLISHED sockets. This is not the
+  1147	 * final wire format yet.
+  1148	 */
+  1149	static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb,
+  1150						struct tcp_out_options *opts,
+  1151						struct tcp_key *key)
+  1152	{
+  1153		struct tcp_sock *tp = tcp_sk(sk);
+  1154		unsigned int size = 0;
+  1155		unsigned int eff_sacks;
+  1156	
+  1157		opts->options = 0;
+  1158	
+  1159		/* Better than switch (key.type) as it has static branches */
+  1160		if (tcp_key_is_md5(key)) {
+  1161			opts->options |= OPTION_MD5;
+  1162			size += TCPOLEN_MD5SIG_ALIGNED;
+  1163		} else if (tcp_key_is_ao(key)) {
+  1164			opts->options |= OPTION_AO;
+  1165			size += tcp_ao_len_aligned(key->ao_key);
+  1166		}
+  1167	
+  1168		if (likely(tp->rx_opt.tstamp_ok)) {
+  1169			opts->options |= OPTION_TS;
+  1170			opts->tsval = skb ? tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) +
+  1171					tp->tsoffset : 0;
+  1172			opts->tsecr = tp->rx_opt.ts_recent;
+  1173			size += TCPOLEN_TSTAMP_ALIGNED;
+  1174		}
+  1175	
+  1176		/* MPTCP options have precedence over SACK for the limited TCP
+  1177		 * option space because a MPTCP connection would be forced to
+  1178		 * fall back to regular TCP if a required multipath option is
+  1179		 * missing. SACK still gets a chance to use whatever space is
+  1180		 * left.
+  1181		 */
+  1182		if (sk_is_mptcp(sk)) {
+  1183			unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+  1184			int opt_size;
+  1185	
+> 1186			opt_size = mptcp_established_options(sk, skb, remaining,
+> 1187							     &opts->mptcp);
+  1188			if (opt_size >= 0) {
+  1189				opts->options |= OPTION_MPTCP;
+  1190				size += opt_size;
+  1191			}
+  1192		}
+  1193	
+  1194		eff_sacks = tp->rx_opt.num_sacks + tp->rx_opt.dsack;
+  1195		if (unlikely(eff_sacks)) {
+  1196			const unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+  1197			if (likely(remaining >= TCPOLEN_SACK_BASE_ALIGNED +
+  1198						TCPOLEN_SACK_PERBLOCK)) {
+  1199				opts->num_sack_blocks =
+  1200					min_t(unsigned int, eff_sacks,
+  1201					      (remaining - TCPOLEN_SACK_BASE_ALIGNED) /
+  1202					      TCPOLEN_SACK_PERBLOCK);
+  1203	
+  1204				size += TCPOLEN_SACK_BASE_ALIGNED +
+  1205					opts->num_sack_blocks * TCPOLEN_SACK_PERBLOCK;
+  1206			} else {
+  1207				opts->num_sack_blocks = 0;
+  1208			}
+  1209		} else {
+  1210			opts->num_sack_blocks = 0;
+  1211		}
+  1212	
+  1213		if (tcp_ecn_mode_accecn(tp)) {
+  1214			int ecn_opt = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_ecn_option);
+  1215	
+  1216			if (ecn_opt && tp->saw_accecn_opt &&
+  1217			    (ecn_opt >= TCP_ACCECN_OPTION_PERSIST ||
+  1218			     !tcp_accecn_opt_fail_send(tp)) &&
+  1219			    (ecn_opt >= TCP_ACCECN_OPTION_FULL || tp->accecn_opt_demand ||
+  1220			     tcp_accecn_option_beacon_check(sk))) {
+  1221				opts->use_synack_ecn_bytes = 0;
+  1222				size += tcp_options_fit_accecn(opts, tp->accecn_minlen,
+  1223							       MAX_TCP_OPTION_SPACE - size);
+  1224			}
+  1225		}
+  1226	
+  1227		if (unlikely(BPF_SOCK_OPS_TEST_FLAG(tp,
+  1228						    BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG))) {
+  1229			unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+  1230	
+  1231			bpf_skops_hdr_opt_len(sk, skb, NULL, NULL, 0, opts, &remaining);
+  1232	
+  1233			size = MAX_TCP_OPTION_SPACE - remaining;
+  1234		}
+  1235	
+  1236		return size;
+  1237	}
+  1238	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
