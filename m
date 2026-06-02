@@ -1,95 +1,90 @@
-Return-Path: <netdev+bounces-294100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFboGv6jHmq3IwAAu9opvQ
-	(envelope-from <netdev+bounces-294100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:35:58 +0200
+	id uN7NEyOiHmquDAAAu9opvQ
+	(envelope-from <netdev+bounces-294101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:28:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152EC62BA85
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:35:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3B062B896
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:28:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE5C23085EAF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:18:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6D536306FEBA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B33E383338;
-	Tue,  2 Jun 2026 09:18:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAFF3A8FE8;
+	Tue,  2 Jun 2026 09:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LWb2KaeB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JOZY3BQd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D1E3655E7
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 09:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4FE1F2380;
+	Tue,  2 Jun 2026 09:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780391898; cv=none; b=n7LMNROeeYlU0y4G4M2/AqoWhCpebOWIz/IF5QpPGsKAkOG6PA+BlCw+oYap1HfNLSUAAoQExRPy2TMsgIQGwbPC3vXJRJ+M3dk1CpvH2WllJYJE/fW79vs1f0IE4SjOxcmWUV4xPBbVIAs+PXhc+JMLT0YhijDwUB/Ba3cXxIg=
+	t=1780392037; cv=none; b=rH6OjB7qacdLN2rGhZeLi59ekrIDr+NOg8yIv0kK8X934NPsi8XNDIn54PVCq4Iu8NWskbN91HkkA8aOGvkxDD8oUqPpkv3bzdoJsjzpX2+LnHFVsXmaTsOXJCo8Tb+vfmiVI7gsbE6Cpxdh4Ub7mCD5nrcmkX2FZ0tED6L1Ug0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780391898; c=relaxed/simple;
-	bh=FYGX+z1NHS6G0DY02oZQ6hTTBFd4DJcBw8FAvVlqv/Y=;
+	s=arc-20240116; t=1780392037; c=relaxed/simple;
+	bh=6BQsHpGsUXg2fWEevShYArT8/T1HQSJKUOOi9RFcaco=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Aj1d0shyJXvghQ3eBbVEhV0INJ3Bh8yl3+ffikYmQ96uOJcKJtIaX8BSe2x3U3coMl8Qkwv1Mq5jQrEz/wtDXf1g/Xl7o+oScmYviNRgyJC6bPHJSefd/7eL9r/tXe75CZ2xu/oKJW8xr+S76lXtT7F/15GeRtGFEeMxJLLfK28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LWb2KaeB; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-beb8a08a6c8so405121666b.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 02:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1780391895; x=1780996695; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8weWZwvlicUS0dvAxblKD1HBMYQh1u5mQ2U5bxBouSc=;
-        b=LWb2KaeBuGlQuxF2ygVImG8z4k6CWEfaz8CIF20uqpcIp1Z/93bnC+RGYjgbcyS3DT
-         Bpzm6hJMKdWRjIsE50U5MFlQBwL+kknijzd2EJC0arOwnoenhvloVr3CD/Dsa4VcYEBu
-         GY4VF1Bl1OppX4jipLsrAg4r1QppX6Ry0lBgZRF9dOA2/gbepWfZgfURLWNmuXVwUoYs
-         YaxlUZ+Zfgii3NCsewGG4TRrGe4euGOzb60mmQxXKpVtMk1Wd1CI9dvIna+pKHYCXuUa
-         ijTY/DAk5DAWuF+1uq4KEPQdf3TqZfaUWGocJWqxyi24zbd/ufyOHgYbm2r5OBJkOpYu
-         /vgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780391895; x=1780996695;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8weWZwvlicUS0dvAxblKD1HBMYQh1u5mQ2U5bxBouSc=;
-        b=nE4EKESvt0PiswewRvideFbKn19A9XBW6LZSn2qD4oE6lsXI/r3bJPbv4kmh0umx1B
-         J9SghPNDhhm7L1oxrD6WvHc111g5LRyI515RE55c0Z9kSBCHURVwzBXkRdfC/iP+DN6y
-         ItIwiEEE9J2+pYfwqmFgV0PlHkGTisMj98N3TRoxh1VN0w5qi3uLOyqiMOcHuZXb/65N
-         uCJBrrRVERuBxo4aRE7upUOWFsf6uRUZlrrhzRwE/lJ4kmQt8tTtDn0QP8pPg+JJRj08
-         /y40odYRc0H0ipeXpvAskDC2pdLxYniCUeGZOkBCgIi7joYvuvnIs7nF8R9TzKFVAHEi
-         FrOQ==
-X-Forwarded-Encrypted: i=1; AFNElJ83csJIkOyZ8zYtVcGOxHT43BJm9UgHIN0YJG5pL7sx9sf6NKgU3jRQ/DP7XF8BXOIq5wPz3n8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnHrZ9K+tqlNvDVzWHpAPSZqSSLwAkDzCvTdGTF6GJhVh1kwga
-	8ODZPP3Ej6izFiNadmNR+KigKCCpE1YDSH3lGNRN4QsrTlljsgyF0Dc/Fygy7LbovuI=
-X-Gm-Gg: Acq92OEoSS8PJrB2ucN8fJssra7L/kkW2twVSSEDK9TRKaaUvbglVaV5TE4R7lyEUCi
-	mSnPf7LxuMKVPpBJdcEak6iDth0wSzT8Qo+0q2F50RHVBY9yO6cXXVjC0rFu8MCBctAaA9J52hL
-	DlduEWSmvLDav2CRk9Hb2HxYqRqm2auWmSfM6dSsCyxq2MnitFcW5J8XLHp78GK6U+T/p9ylait
-	kbgE4cyVXoYEQBo6zWBEvjuHl6lgGUcdGbjttS8A+RztzuAZpq6E3Bg8A6RtALrwo7fFJR00x8W
-	wmqAax57NMCznHnhGZNPYGu0tlSCbMEmuJK0m3ckPjefsnd4KTmMDyqYaUQVAHXlbY5MsUbK/KE
-	O5BvE3zDevGysBLfeuopdv6Y3u68xTc1zn5Nw6wPYR8yLZhZivw+oYESadJjdteCdkBbLVOZX6P
-	ZWoXHEQFyRKVKUixeqNtCNKm2g2V/lX+iNKkzKaM4K1iixVT21XnySHw==
-X-Received: by 2002:a17:907:9453:b0:bea:5cc7:95a4 with SMTP id a640c23a62f3a-beab03de8a1mr933593866b.0.1780391895233;
-        Tue, 02 Jun 2026 02:18:15 -0700 (PDT)
-Received: from u94a (27-240-75-84.adsl.fetnet.net. [27.240.75.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36dd91846f8sm2382956a91.4.2026.06.02.02.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 02:18:14 -0700 (PDT)
-Date: Tue, 2 Jun 2026 17:17:59 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: stable@vger.kernel.org, Paul Chaignon <paul.chaignon@gmail.com>, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
-	kpsingh@kernel.org, haoluo@google.com, jolsa@kernel.org, menglong8.dong@gmail.com, 
-	tamird@kernel.org, eddyz87@gmail.com
-Subject: Re: [RFC PATCH 6.1.y 0/2] bpf: backport scalar not-equal tracking
- fixes
-Message-ID: <ah6dLESn8tHAtxS9@u94a>
-References: <20260601180400.1381736-1-jt26wzz@gmail.com>
- <ah5pf25fhVH9WuU-@u94a>
- <ah56iBM2P_9hF3_L@u94a>
+	 Content-Type:Content-Disposition:In-Reply-To; b=D2sP/+hyb9r0Dju4J03hA3/p6pXvbaphO8RoT6NSgYSztxHRYmHsbmQw4+q4VETCh6aTmb6C/24i6OWBYJd6b6yaaTsfXkR8fX2Pe7VbCC1QmGpbgNpzwP7cG86ZoJyY19zMqXVlj+XTQCMoOWyPSdKRiG6e48KGzjopl/t/zHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JOZY3BQd; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780392036; x=1811928036;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6BQsHpGsUXg2fWEevShYArT8/T1HQSJKUOOi9RFcaco=;
+  b=JOZY3BQdS3kMTkEkbHPL+PhTPdPomq/6CjVt1jCKqsn4ClRndtq0QRtl
+   v95wZnSa9JrycFwlOMWdG6/m59ooG+p8+AIKL7RIzL9fpuaSYsWWRlGOT
+   vbdL+LW1yKUADxRu+s5a+XkDYS5BeUiybEQRmOX48hV4mg+aGT2sBI6yV
+   ALnIeGw2r+dhbWPh/oKu/i0kARWGeDbMj8O8BweP4Qrt7O88cNLXHMd2E
+   uxLN3vj3yOL2llmaTyKrBxRc3RzQD/+ZrJ62tfS8kOdGk/PhA97lyFT41
+   GWT+wEXeSf30SZurV1GEJCY9vTJKYjcHJyTl6eFeN7/kjetZ55vqLNQRr
+   g==;
+X-CSE-ConnectionGUID: 0zu+gchYTp2BE+eQpk9Luw==
+X-CSE-MsgGUID: PHRFtguVRByrI0Zwq88vWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="81298075"
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="81298075"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:20:35 -0700
+X-CSE-ConnectionGUID: O7CD12lDRu+OSzqR/16fAw==
+X-CSE-MsgGUID: LeqUzhbQREKqhxz6sCXoyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="240848911"
+Received: from mkosciow-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.229])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:20:26 -0700
+Date: Tue, 2 Jun 2026 12:20:24 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, ebadger@purestorage.com,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net-next v5] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <ah6gWPQP56RO6_ho@ashevche-desk.local>
+References: <20260601091505.1763912-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,81 +93,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ah56iBM2P_9hF3_L@u94a>
-X-Rspamd-Queue-Id: 152EC62BA85
+In-Reply-To: <20260601091505.1763912-1-ernis@linux.microsoft.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Rspamd-Queue-Id: DD3B062B896
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294100-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294101-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[marvell.com,ziepe.ca,kernel.org,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.dk,lst.de,samba.org,talpey.com,oracle.com,brown.name,redhat.com,davemloft.net,google.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[43];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shung-hsi.yu@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,ashevche-desk.local:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Jun 02, 2026 at 02:42:35PM +0800, Shung-Hsi Yu wrote:
-> On Tue, Jun 02, 2026 at 01:47:01PM +0800, Shung-Hsi Yu wrote:
-> ...
-> > On Tue, Jun 02, 2026 at 02:03:58AM +0800, Zhenzhong Wu wrote:
-> > > Hi BPF maintainers,
-> > > 
-> > > This RFC backports two BPF verifier scalar range-tracking fixes to 6.1.y.
-> > > The series is intended to fix a verifier state-pruning issue where an
-> > > impossible scalar path can be kept while the real success path is pruned.
-> > > 
-> > > This is a verifier scalar range-tracking issue, not a helper-specific
-> > > issue.
-> > > The visible failure is that the verifier can prune the real success
-> > > continuation, which should not be skipped, and keep only an impossible one.
-> > ...
-> > 
-> > This sounds somewhat similar to the issue fixed in "backport of iterator
-> > and callback handling fixes" for stable 6.6[1] by @Eduard. Could you try
-> > to test on the latest stable 6.6.y as well at see if you can reproduce
-> > the issue there?
-> ...
+On Mon, Jun 01, 2026 at 02:14:44AM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
 > 
-> My mistake, the reproducer you had doesn't use iterator or callback, so
-> probably not fixed in stable 6.6. I'll take a better look at this later
-> this week.
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
 
-Two more ideas beside testing on latest stable 6.6. 
+...
 
-1. Can you try testing on bpf-next, but with commit d028f87517d6 'bpf:
-   make the verifier tracks the "not equal" for regs' reverted? My
-   concern is that it is possible that commit d028f87517d6 does not
-   address the root cause of incorrect state pruning here.
+>  	attr->max_qp_rd_atom =
+> -	    min(1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> -		attr->max_qp_init_rd_atom);
+> +	    min_t(u32, 1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> +		  attr->max_qp_init_rd_atom);
 
-   If the reproducer _fails_ to reproduce the issue even with commit
-   d028f87517d6 reverted, then it is possible that the root cause was
-   fixed by another commit further down the line.
+Just no. min_t() usage has to be very well justified. It's a beast which may
+stub one in the back. As Linus said in most of the cases one wants clamp()
+rather than min().
 
-2. Have you consider adding your reproducer into BPF selftests? Would be
-   very useful to have in stable (though it needs to first land in
-   bpf-next first).
+Please, redo this and similar pieces.
 
-> > 1: https://lore.kernel.org/stable/20240125001554.25287-1-eddyz87@gmail.com/
-> > 2: https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
