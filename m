@@ -1,154 +1,161 @@
-Return-Path: <netdev+bounces-294289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294293-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gSyJCrMGH2pOdgAAu9opvQ
-	(envelope-from <netdev+bounces-294289-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 18:37:07 +0200
+	id MrtSDTwHH2q1dgAAu9opvQ
+	(envelope-from <netdev+bounces-294293-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 18:39:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256A96303EE
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 18:37:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A85B630470
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 18:39:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mvcRqDZw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294289-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294289-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=g7123H2r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294293-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294293-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 71B6D307FB4A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 16:24:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BBED8301C976
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 16:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05912FDC28;
-	Tue,  2 Jun 2026 16:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C9D36C0BD;
+	Tue,  2 Jun 2026 16:32:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F161DED4C
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 16:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BFC30F534;
+	Tue,  2 Jun 2026 16:32:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780417452; cv=none; b=FbIn8vt5yPmB+qg+feJfKE466JBfq66nk53ICHCNEtocpKQiafmB3BuHCVlO9vCLea83h2rT+igzkGeID7J5eii1yg1SxF/t7vS0zJ3nYDs7Ubx7Wt8jJkIy7BGUDjh9XXrHvAG5+T/vCc2jVxPln4NaQmYIJiHW6i+e6b19Y2E=
+	t=1780417970; cv=none; b=Z+UG9TJlBZZ4CVsT5sQr9dVPCy8YWzAXOcoG2gD/EVc/u9yEFY0LnbN7/KcNAlpGf7XCX13H9vtAZw0x8rD4fPKBIORNjB+P4/ZTRal4hCgFjwG4eVZ6aXXdclrAPmBxSPm/Iw1EoHwgzGlUQXPs7wMj1MqJmYlm2FxnK0RgFfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780417452; c=relaxed/simple;
-	bh=CRGdwPAvPEBYtPkd7lnEduHETK6NV7SLTX+S7ubZAcc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rM5qLXbzIcnDIHAzkOQgENYICvY6bTdeg4ksfgb1u/+mEEmCLuYHFPlnG19twVYe0uDppObUk0KMmKn201IyXCHgvlYcyQ46hBeEKvsVaHdQ8d27zG2E3R//xPYbw7GmaFhWkCPA1xLBqG5bYF/pQfT/hu3HdvrFlA+8lokD78I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvcRqDZw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B07B61F00893;
-	Tue,  2 Jun 2026 16:24:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780417451;
-	bh=fQq97OcpVpZJW8A8V7R0IsPh0j5JD4eAPyErZYPXXOM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=mvcRqDZwjh0F0cqYGHBJATnhwSVFPfRFCuzkFLLiMHtnQ+aQ1sMkIYDXEbTGb1MmH
-	 g9FccXITKivqux5TsTcoId8h6WJqNI2BGsK/6MHLUfA20fGVtkhqjZfTUG8u++8sB8
-	 JByRgu+OTxrYQtFfme4T6eqU1RBzRBpsdZgkCpzrneoHnMNIaAK8bV4QFXYPmL5ElV
-	 dzyf7H3xW/WocE8qawTOrGu3QdAnXoDYRRUT1B6PkYsEmXpPdFGMaS0CnQW/Jszr37
-	 VwweQ3X2M+vURpSxUqy8M8Il4AtgYJ+Qtrxhbh+49AZE6vAIiY45TsfPbT2bLLPhuX
-	 1DtHkVvdld+9g==
-Message-ID: <ad40bbe0-f79c-4fd9-9670-5dab01a8e57f@kernel.org>
-Date: Tue, 2 Jun 2026 10:24:09 -0600
+	s=arc-20240116; t=1780417970; c=relaxed/simple;
+	bh=aafgjk7IkndpTWX6p1gsvH55laMnwGYU5wIA42mzzd8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DzczHwapuIeLfBvsm2bJhuNS5Ia/OuI3V0CMD69etCNbd4wV5I2x447zKyggJp5ovnbjJIl6uUxwxcH0qvQA/k4dVf6sossPHfKzeDUzfjFQ6olll+VgSNI5k3ZWroYryhTCs9NR7uIeuJCLRySBopKnaNsABBpJzwe4tJLkEPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=g7123H2r; arc=none smtp.client-ip=45.254.49.197
+Received: from PC-202605011814.localdomain (unknown [58.241.16.34])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 40c8332c9;
+	Wed, 3 Jun 2026 00:27:36 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	maze@google.com,
+	kuniyu@google.com,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	runyu.xiao@seu.edu.cn
+Subject: [PATCH net v2] raw: annotate data-races in raw_v4_match()
+Date: Wed,  3 Jun 2026 00:27:27 +0800
+Message-Id: <20260602162727.893863-1-runyu.xiao@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: protect egress device access in the output
- path with rcu_read_lock
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, Hyunwoo Kim <imv4bel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, steffen.klassert@secunet.com,
- herbert@gondor.apana.org.au, andrew+netdev@lunn.ch, kuniyu@google.com,
- jlayton@kernel.org, netdev@vger.kernel.org
-References: <ahveCu-zzFlpeVut@v4bel> <20260602154523.GA537996@shredder>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260602154523.GA537996@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9e8929771403a1kunmd096a18c192f09
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaGk8eVh8eTElKTxhKGklISFYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0
+	NVSktLVUtZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=g7123H2r26rFs2xEGPxIf9+gP8BSYgrZBMxxoTL1zzdePYXiJboqkymIQRUuK+MME++kkFnuwYLF1s4ubD244yW1Lg5Sk9hhEdLVK/rTHOnayuyIjfw07/SRcS0FA3onQ3sqLNsVyxTdlZr9RflG8LZ6nwgYMkRZFcCK4LoqKkU=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=VCmpVCwuPaUwKCK0tSVDf99xBwTW6Bmc0cwOI64+CEs=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294289-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:imv4bel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:andrew+netdev@lunn.ch,m:kuniyu@google.com,m:jlayton@kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[nvidia.com,gmail.com];
-	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294293-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:maze@google.com,m:kuniyu@google.com,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:runyu.xiao@seu.edu.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,seu.edu.cn:mid,seu.edu.cn:dkim,seu.edu.cn:from_mime,seu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 256A96303EE
+X-Rspamd-Queue-Id: 8A85B630470
 
-On 6/2/26 9:45 AM, Ido Schimmel wrote:
-> On Sun, May 31, 2026 at 04:06:50PM +0900, Hyunwoo Kim wrote:
->>  drivers/net/vrf.c       | 16 +++++++++++-----
->>  net/ipv4/ip_output.c    | 27 +++++++++++++++++++--------
->>  net/ipv4/raw.c          |  4 +++-
->>  net/ipv4/xfrm4_output.c | 13 +++++++++----
->>  net/xfrm/xfrm_output.c  |  4 +++-
->>  5 files changed, 45 insertions(+), 19 deletions(-)
->>
->> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
->> index 46209917ae4d..e9a1dd961805 100644
->> --- a/drivers/net/vrf.c
->> +++ b/drivers/net/vrf.c
->> @@ -833,17 +833,23 @@ static int vrf_finish_output(struct net *net, struct sock *sk, struct sk_buff *s
->>  
->>  static int vrf_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->>  {
->> -	struct net_device *dev = skb_dst(skb)->dev;
->> +	struct net_device *dev;
->> +	int ret;
->> +
->> +	rcu_read_lock();
->> +	dev = skb_dst_dev_rcu(skb);
->>  
->>  	IP_UPD_PO_STATS(net, IPSTATS_MIB_OUT, skb->len);
->>  
->>  	skb->dev = dev;
->>  	skb->protocol = htons(ETH_P_IP);
->>  
->> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
->> -			    net, sk, skb, NULL, dev,
->> -			    vrf_finish_output,
->> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
->> +	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
->> +			   net, sk, skb, NULL, dev,
->> +			   vrf_finish_output,
->> +			   !(IPCB(skb)->flags & IPSKB_REROUTED));
->> +	rcu_read_unlock();
->> +	return ret;
->>  }
-> 
-> Patch LGTM, thanks, but what about the IPv6 counterpart (vrf_output6())
-> and the other similar existing issues that Sashiko is flagging?
+raw_v4_match() is a lockless match helper under sk_for_each_rcu()
+and still reads inet->inet_num, inet->inet_rcv_saddr and
+sk->sk_bound_dev_if with plain loads.
 
-Common locking at a higher level than dst->output seems like a better
-approach. This function is called under rcu_read_lock for some paths.
+inet_num and sk_bound_dev_if already have WRITE_ONCE() writers, and
+raw_bind() should use WRITE_ONCE() for inet_rcv_saddr as well.
+
+Add matching READ_ONCE()/WRITE_ONCE() annotations.
+
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+---
+v2:
+- Note that inet_num and sk_bound_dev_if already have WRITE_ONCE() writers
+- Add WRITE_ONCE() in raw_bind() for inet_rcv_saddr
+- Previous version: https://lore.kernel.org/r/20260601073937.1137673-1-runyu.xiao@seu.edu.cn
+
+ net/ipv4/raw.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 5aaf9c62c8e1..faa49f3d239a 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -120,11 +120,14 @@ bool raw_v4_match(struct net *net, const struct sock *sk, unsigned short num,
+ 		  __be32 raddr, __be32 laddr, int dif, int sdif)
+ {
+ 	const struct inet_sock *inet = inet_sk(sk);
++	unsigned short match_num = READ_ONCE(inet->inet_num);
++	__be32 match_rcv_saddr = READ_ONCE(inet->inet_rcv_saddr);
++	int match_bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
+ 
+-	if (net_eq(sock_net(sk), net) && inet->inet_num == num	&&
++	if (net_eq(sock_net(sk), net) && match_num == num &&
+ 	    !(inet->inet_daddr && inet->inet_daddr != raddr) 	&&
+-	    !(inet->inet_rcv_saddr && inet->inet_rcv_saddr != laddr) &&
+-	    raw_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
++	    !(match_rcv_saddr && match_rcv_saddr != laddr) &&
++	    raw_sk_bound_dev_eq(net, match_bound_dev_if, dif, sdif))
+ 		return true;
+ 	return false;
+ }
+@@ -727,7 +730,8 @@ static int raw_bind(struct sock *sk, struct sockaddr_unsized *uaddr,
+ 	if (!inet_addr_valid_or_nonlocal(net, inet, addr->sin_addr.s_addr,
+ 					 chk_addr_ret))
+ 		goto out;
+ 
+-	inet->inet_rcv_saddr = inet->inet_saddr = addr->sin_addr.s_addr;
++	inet->inet_saddr = addr->sin_addr.s_addr;
++	WRITE_ONCE(inet->inet_rcv_saddr, addr->sin_addr.s_addr);
+ 	if (chk_addr_ret == RTN_MULTICAST || chk_addr_ret == RTN_BROADCAST)
+ 		inet->inet_saddr = 0;  /* Use device */
+ 	sk_dst_reset(sk);
+-- 
+2.34.1
 
