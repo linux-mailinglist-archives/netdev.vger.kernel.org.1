@@ -1,273 +1,298 @@
-Return-Path: <netdev+bounces-293956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qL/LIaU7HmpriAkAu9opvQ
-	(envelope-from <netdev+bounces-293956-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:10:45 +0200
+	id ABSKIBc9HmpriAkAu9opvQ
+	(envelope-from <netdev+bounces-293955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:16:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14678627198
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:10:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79E562724D
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D13C305AD3F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:10:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8210C307513A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A314B33D6E1;
-	Tue,  2 Jun 2026 02:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E39343899;
+	Tue,  2 Jun 2026 02:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nq3Vc5AZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SrZMVbgp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D20D34C140
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 02:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780366221; cv=none; b=j8wS41cWvAQqM6xCPA07oQzVQXVWfNkN5DPhYIbzvxN3PbOxt/gUZo7FUGmri8bMwuMANhCMcfqMggyTu0WedaIVS9+cMtkEbS5OD4B0acg9yp3swhKnlVPovALGinL8rAoFBW4tWBTVf6LU5PmyTBoaJcOk/xs6ih6dQkYKJx0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780366221; c=relaxed/simple;
-	bh=y7Xd42BcknrLJfoPP64g2rAK+lYNayuuuDtn7l3IJAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M+7W32HWVswJ5uqFOSmXQOwzAIcezQ/x4JS12qa+tEaFzePyTFaT2CVmH61Ip7pGgaOXJnO25Q3sowvqMUwMmkQXojXu/VVr0XIzuz1KQjCUGg/Q4ZHecD8kdSdBHflQb+fBq2+dyh7TRw6PE33oa8YyZZk3cEHKvGQioJqdFro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nq3Vc5AZ; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780366219; x=1811902219;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=y7Xd42BcknrLJfoPP64g2rAK+lYNayuuuDtn7l3IJAQ=;
-  b=Nq3Vc5AZYYkSZRHSvAbpfMpIZE+oWTxmMCY9q0WYVhcbGFu7RAAfq5gv
-   AASKPzVhRiy3tDO2QbDvnXtWAY7jFW9Up6/z4DlQbVjE92g/M5Rj+i97D
-   UBydqqqpTi/ZFCjKV24ISriTDAeoXJOCyQowh6V6y1oHAoeEawa9x4POx
-   n+q4Te2QklmT2QuiuRr5AdSFrBApHYkIOvJI/fU0AEn+4B0GBAQqZ8z4g
-   /wi+ll73SxT7A2d1czrIfP5skMs0L+kCgsoyiWTah1pee8Pxk1+TpRqL8
-   ioH74Qp7awHlWi67D1f/21Fzn3M+4AhxwuKKt/D0ylVYsB+dboLptYssz
-   A==;
-X-CSE-ConnectionGUID: LQNFCGYcT0uMKDKssAkZHA==
-X-CSE-MsgGUID: RVh39GdrQ0KoVPgEyZOXJg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="91709513"
-X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
-   d="scan'208";a="91709513"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 19:10:18 -0700
-X-CSE-ConnectionGUID: bJcqv7MzQa+o128oLimDug==
-X-CSE-MsgGUID: jdiXheh/TvW9ljwlcUxbGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
-   d="scan'208";a="281865857"
-Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 01 Jun 2026 19:10:15 -0700
-Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wUEa4-00000000BMY-1J86;
-	Tue, 02 Jun 2026 02:10:12 +0000
-Date: Tue, 2 Jun 2026 10:09:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next] mptcp: change mptcp_established_options() to
- return opt_size
-Message-ID: <202606021033.Gt2vODEq-lkp@intel.com>
-References: <20260601091816.444738-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715B7348C44
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 02:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780366217; cv=pass; b=nhf/LKytrYv923QoS6PbKyu4s1aoOXyJZaLELmKtNyF17h/ard9i0ZZ8WjD9rDldhgp4Z+jl5qE/CZ3DnVSA0SIqoyji1b1PoMYyg/l0lvuRsU9jZ9Fu/snWwVmVcEUyHJUt+sScfUE4BX/lhwCIloIEBbqwAn2ppwA/0xqEpys=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780366217; c=relaxed/simple;
+	bh=LHS2lhZgKMmZxzsPYW2PXD0tEfpF49HGVgg6ty6nidU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hmJE2PVnIWKAB3tmnF2QQ8A7G0D63IQ5xiLktpEXHC34r7w6FQpZJXcdVh7wn0WK6+8zgzWu5LOiWHQhiI2dtMxaYhv3CarEvLXsPt1rDll7XAb2qm84ndoQg++bRjsaeWRYYzjxHpUJqHo2FuQmSdHYPbaaKtDD0c2eVSHPIoc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SrZMVbgp; arc=pass smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-45efb698ef2so1281097f8f.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 19:10:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780366211; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jxpNQbi4r/3UeGC2aahz2qETrKbonmT4HHJRctlTJ7OQ7eA9EyRKspbdfpjRnB2v5A
+         TwZZ+zGVVhxkIX5md4h1v3Kn6rEzfyAoM7CL60+0pLVIQY4pCEt0ZPBTqHKM7bc0+7x5
+         9l6qooIePXh1dfpbBm0QFH0HsRl+9uLccKeehE4UoWMu0WAVhQg/7lzjzJJuDb0EHMAK
+         hhKljq23nQEle1fQrlJDuJWsF9qr8dgBbBcZdSV8rIBAUdCI4RR0XgqkMww+a3oeKlDi
+         FhQH6Y8j8pbiZfe6uHOuH2nmsu6WA9TPYANYc1gcA4OSXr3Qjj505Uv3/36nQK4bUlg+
+         ws/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iTbhl9+TdhzGMasdKn19jki+NsU7h/pgqeVahMbDzwE=;
+        fh=pY3+gfPV0RqSRoeZEhf0wafiZkkoMrdeVrwQJP4X05M=;
+        b=eA1y6Vxm1zk6g5iPBi+byIDIYoo6fD62xlnR3DxNVtxc0G5i8iT59s/edotcPVjzJd
+         u6Y0CgKRgjdBoHc8u1Bkp6/QzOOeOjuNFP/TNLvS/PmvXQGFNvRMWGaECwxwJOfiuba2
+         2Hu1jbroO/1NKLm8zQKOn1ARyVEiBfYDlUqF2Nfu8ftdnjLePQ8hc4wYH/wYw9ibDJ1v
+         WNTmmPSIToO07ZDDhf6sR1ipdd3e8jK/OMVxf6ehMxeXxVsdgZUObfLEiAOd57zScAlA
+         OHMxVnG41fVu7MWf2kakhsIt2+TMRntQ5lDEHUufz4n9e0saE0DRiia0FxR5PR4AtShk
+         b43g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780366211; x=1780971011; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iTbhl9+TdhzGMasdKn19jki+NsU7h/pgqeVahMbDzwE=;
+        b=SrZMVbgpw1M5vU+9LFvEOoMCKI4tPAMadPvqSSL5WHp/Bx2JA943ZyqY83NiH09jGZ
+         UiNu+wzofGY2+4zrycSUgO2WlzPUB2Lmnvz0pj8YdfaukOIG0srKaQY57C26/Y5NVAre
+         kejImo9RAS4Npx7psbFKp82fVd2de2tXrdpfRg205fHedqssdbtAQfm+n9pABYo1sGq2
+         QuGw4XiTOGl5Gjm3Em63PnukQRcda2GQO+NV7lMNVZ6c1R8UFNbfdW1h810iVCAem+WM
+         LkG1d12P2UJjqC1A5B6/9uZqP1FrG9+Cqjmwh8w6JMIKmPIZhRpjk72g9e/0iBSJjMi+
+         vN1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780366211; x=1780971011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iTbhl9+TdhzGMasdKn19jki+NsU7h/pgqeVahMbDzwE=;
+        b=FYowmSDgg5EQqNV8MDyHtHgEsL/7SXZ3TK14HPQSYyRVcb6lOIJgzkY/EfxftoFvrN
+         HHQweZ/yN3xYvUZ4eKtC3oKT5Kfji8L8WU22Q9kJyesSDq+yzcdYRj4GPIMuxZCB7dvx
+         wIdlJOjzKJ0ecYPog2vkobaLuQjjx6Cd44tEl1IUExLQzFwS+JDLvTYoHngLLnwz473E
+         YA8jSrBsI+eYodbx1yHo0azbicBRgP+Gz36JFbYjNced4wxE9iE7BdXVX/TGmiIBIxG3
+         OUfcMNF2z+0120MRCHKEEnNFAfFc5oRaurTlYsRrND3LjCymIh7hW9QykJn+1922htEm
+         qsXQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/cPxpAlatKj9h4TA+n90GSrZ8lSCI+HCHPgjAMcc/6UObeSLKKdeuWloDNCr9vVAWiH6cHLPk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFy/mrGGSEpkTZEMH8/emSJt2b9M36tDdPvWgvF7JyL2hEe+O2
+	bWRMcNQpiXteOAuW0bBGRMl1cW6AZVvybJ6EGJb1GjuQj4tAs5s/ZMJDGmS4UTSStxPijS0wmPQ
+	G2XBsyOHhRvANvYmpT4Dj4njqHkdnXZQ=
+X-Gm-Gg: Acq92OGtOwKCJCxMO9YJ2gpo0tbziDeQkuxaVGTxHgO8FfHlCW9hSPw4bRMLOcM5Cim
+	MyK+mEILK9tDDKFA+tzfinjWSEj8mtqDFS2Nwzy14W12gFeO5rOYFS75/92s3Yc6xYYZsveYeN+
+	WprvUZUP3CPLD+TxyiiE5jef8UvwqE1fYdGJD6CIxJY4Qh169B6DLyz5iGFc1mEhZn7GB2Mrqec
+	ABYQugINfYLhgI21cM63DmIZZ8g+8Dw1fXOzAHIiZBjeZFA4FI740iW/U4ojll3vrbzpOGCTOiR
+	dxA/wn9FEv6Ae9+RJiQi3N1WurWUmmvVHijKDpIjO8khiOMs0ej8ECessNc=
+X-Received: by 2002:adf:ea87:0:b0:45e:ec27:b4c2 with SMTP id
+ ffacd0b85a97d-45ef6b9300fmr16473165f8f.36.1780366210708; Mon, 01 Jun 2026
+ 19:10:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260601091816.444738-1-edumazet@google.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+References: <20260601034148.1272080-1-maoyixie.tju@gmail.com>
+In-Reply-To: <20260601034148.1272080-1-maoyixie.tju@gmail.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Tue, 2 Jun 2026 10:09:34 +0800
+X-Gm-Features: AVHnY4J9HcySFrlIHPpvZnAh5JRZtt7vCxk9UsX_ASk4WS58ydIafXR_8sRpNFU
+Message-ID: <CABAhCOQ7Sd2G4ZVwNUK7i6cF7v=CwhcYosvYAgopb=32aNimZQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: require CAP_NET_ADMIN in the device netns for
+ tunnel changelink
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Nikolaos Gkarlis <nickgarlis@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-293956-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293955-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,google.com,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shawleon@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,01.org:url]
-X-Rspamd-Queue-Id: 14678627198
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ip6_tnl.net:url]
+X-Rspamd-Queue-Id: D79E562724D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Eric,
+On Mon, Jun 1, 2026 at 11:41=E2=80=AFAM Maoyi Xie <maoyixie.tju@gmail.com> =
+wrote:
+>
+> A tunnel changelink mutates the tunnel hash of the device's creation
+> netns. ip_tunnel_changelink(), ip6_tnl_changelink(), vti6_changelink(),
+> ip6gre_changelink(), ip6erspan_changelink() and xfrmi_changelink() all
+> look up and update through t->net.
+>
+> The rtnl path into changelink only checks CAP_NET_ADMIN against
+> tgt_net. After IFLA_NET_NS_FD migration the creation netns differs from
+> the caller's netns. A caller with caps only in its current netns can
+> then rewrite an entry in the creation netns hash. They pick the
+> endpoint addresses. Commit 8b484efd5cb4 ("ip6: vti: Use ip6_tnl.net in
+> vti6_siocdevprivate().") added the same check on the ioctl path. This
+> adds it on the RTM_NEWLINK path.
+>
+> Check ns_capable(t->net->user_ns, CAP_NET_ADMIN) in each changelink
+> before the lookup and update. The newlink path has long checked the
+> capability in the link netns. The changelink path never did.
+>
+> Reported-by: Xiao Liang <shaw.leon@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CABAhCOSzP1vaThGV35_VnsRCb=3D87_CP=
+jPVsTHbq905k8A+BuUg@mail.gmail.com/
+> Fixes: d0f418516022 ("net, ip_tunnel: fix namespaces move")
+> Fixes: 5311a69aaca3 ("net, ip6_tunnel: fix namespaces move")
+> Fixes: 690afc165bb3 ("net: ip6_gre: fix moving ip6gre between namespaces"=
+)
+> Fixes: f203b76d7809 ("xfrm: Add virtual xfrm interfaces")
+> Fixes: 11b326fb0a37 ("ip6: vti: Use ip6_tnl.net in vti6_changelink().")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+> ---
+> v2: Reworked per Kuniyuki Iwashima's review. v1 gated the check on
+>     dev->rtnl_link_ops->get_link_net in __rtnl_newlink(). That gate is
+>     too broad. For peer types like netkit and veth get_link_net returns
+>     the peer netns, which changelink does not mutate, so the core check
+>     would wrongly require CAP_NET_ADMIN there. Move the check into the
+>     changelink path of the tunnel types that mutate t->net, against
+>     t->net->user_ns. This mirrors the ioctl side in 8b484efd5cb4.
+>
+> v1: https://lore.kernel.org/netdev/20260527070824.2677331-1-maoyixie.tju@=
+gmail.com/
+>
+>  net/ipv4/ip_tunnel.c           | 3 +++
+>  net/ipv6/ip6_gre.c             | 6 ++++++
+>  net/ipv6/ip6_tunnel.c          | 3 +++
+>  net/ipv6/ip6_vti.c             | 3 +++
+>  net/xfrm/xfrm_interface_core.c | 3 +++
+>  5 files changed, 18 insertions(+)
+>
+> diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+> index 50d0f5fe4e4c..51d8787318f3 100644
+> --- a/net/ipv4/ip_tunnel.c
+> +++ b/net/ipv4/ip_tunnel.c
+> @@ -1251,6 +1251,9 @@ int ip_tunnel_changelink(struct net_device *dev, st=
+ruct nlattr *tb[],
+>         struct net *net =3D tunnel->net;
+>         struct ip_tunnel_net *itn =3D net_generic(net, tunnel->ip_tnl_net=
+_id);
+>
+> +       if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
+> +               return -EPERM;
+> +
 
-kernel test robot noticed the following build errors:
+Should modifying params that don't affect tunnel lookup (e.g. GRE_CSUM
+and GRE_SEQ) require CAP_NET_ADMIN in link netns?
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/mptcp-change-mptcp_established_options-to-return-opt_size/20260601-174435
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260601091816.444738-1-edumazet%40google.com
-patch subject: [PATCH net-next] mptcp: change mptcp_established_options() to return opt_size
-config: i386-randconfig-007-20260602 (https://download.01.org/0day-ci/archive/20260602/202606021033.Gt2vODEq-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260602/202606021033.Gt2vODEq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202606021033.Gt2vODEq-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/ipv4/tcp_output.c: In function 'tcp_established_options':
->> net/ipv4/tcp_output.c:1186:63: error: passing argument 3 of 'mptcp_established_options' makes pointer from integer without a cast [-Wint-conversion]
-    1186 |                 opt_size = mptcp_established_options(sk, skb, remaining,
-         |                                                               ^~~~~~~~~
-         |                                                               |
-         |                                                               unsigned int
-   In file included from include/net/tcp.h:44,
-                    from net/ipv4/tcp_output.c:40:
-   include/net/mptcp.h:271:59: note: expected 'unsigned int *' but argument is of type 'unsigned int'
-     271 |                                             unsigned int *size,
-         |                                             ~~~~~~~~~~~~~~^~~~
->> net/ipv4/tcp_output.c:1187:54: error: passing argument 4 of 'mptcp_established_options' makes integer from pointer without a cast [-Wint-conversion]
-    1187 |                                                      &opts->mptcp);
-         |                                                      ^~~~~~~~~~~~
-         |                                                      |
-         |                                                      struct mptcp_out_options *
-   include/net/mptcp.h:272:58: note: expected 'unsigned int' but argument is of type 'struct mptcp_out_options *'
-     272 |                                             unsigned int remaining,
-         |                                             ~~~~~~~~~~~~~^~~~~~~~~
->> net/ipv4/tcp_output.c:1186:28: error: too few arguments to function 'mptcp_established_options'
-    1186 |                 opt_size = mptcp_established_options(sk, skb, remaining,
-         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~
-   include/net/mptcp.h:269:19: note: declared here
-     269 | static inline int mptcp_established_options(struct sock *sk,
-         |                   ^~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/mptcp_established_options +1186 net/ipv4/tcp_output.c
-
-  1145	
-  1146	/* Compute TCP options for ESTABLISHED sockets. This is not the
-  1147	 * final wire format yet.
-  1148	 */
-  1149	static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb,
-  1150						struct tcp_out_options *opts,
-  1151						struct tcp_key *key)
-  1152	{
-  1153		struct tcp_sock *tp = tcp_sk(sk);
-  1154		unsigned int size = 0;
-  1155		unsigned int eff_sacks;
-  1156	
-  1157		opts->options = 0;
-  1158	
-  1159		/* Better than switch (key.type) as it has static branches */
-  1160		if (tcp_key_is_md5(key)) {
-  1161			opts->options |= OPTION_MD5;
-  1162			size += TCPOLEN_MD5SIG_ALIGNED;
-  1163		} else if (tcp_key_is_ao(key)) {
-  1164			opts->options |= OPTION_AO;
-  1165			size += tcp_ao_len_aligned(key->ao_key);
-  1166		}
-  1167	
-  1168		if (likely(tp->rx_opt.tstamp_ok)) {
-  1169			opts->options |= OPTION_TS;
-  1170			opts->tsval = skb ? tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) +
-  1171					tp->tsoffset : 0;
-  1172			opts->tsecr = tp->rx_opt.ts_recent;
-  1173			size += TCPOLEN_TSTAMP_ALIGNED;
-  1174		}
-  1175	
-  1176		/* MPTCP options have precedence over SACK for the limited TCP
-  1177		 * option space because a MPTCP connection would be forced to
-  1178		 * fall back to regular TCP if a required multipath option is
-  1179		 * missing. SACK still gets a chance to use whatever space is
-  1180		 * left.
-  1181		 */
-  1182		if (sk_is_mptcp(sk)) {
-  1183			unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
-  1184			int opt_size;
-  1185	
-> 1186			opt_size = mptcp_established_options(sk, skb, remaining,
-> 1187							     &opts->mptcp);
-  1188			if (opt_size >= 0) {
-  1189				opts->options |= OPTION_MPTCP;
-  1190				size += opt_size;
-  1191			}
-  1192		}
-  1193	
-  1194		eff_sacks = tp->rx_opt.num_sacks + tp->rx_opt.dsack;
-  1195		if (unlikely(eff_sacks)) {
-  1196			const unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
-  1197			if (likely(remaining >= TCPOLEN_SACK_BASE_ALIGNED +
-  1198						TCPOLEN_SACK_PERBLOCK)) {
-  1199				opts->num_sack_blocks =
-  1200					min_t(unsigned int, eff_sacks,
-  1201					      (remaining - TCPOLEN_SACK_BASE_ALIGNED) /
-  1202					      TCPOLEN_SACK_PERBLOCK);
-  1203	
-  1204				size += TCPOLEN_SACK_BASE_ALIGNED +
-  1205					opts->num_sack_blocks * TCPOLEN_SACK_PERBLOCK;
-  1206			} else {
-  1207				opts->num_sack_blocks = 0;
-  1208			}
-  1209		} else {
-  1210			opts->num_sack_blocks = 0;
-  1211		}
-  1212	
-  1213		if (tcp_ecn_mode_accecn(tp)) {
-  1214			int ecn_opt = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_ecn_option);
-  1215	
-  1216			if (ecn_opt && tp->saw_accecn_opt &&
-  1217			    (ecn_opt >= TCP_ACCECN_OPTION_PERSIST ||
-  1218			     !tcp_accecn_opt_fail_send(tp)) &&
-  1219			    (ecn_opt >= TCP_ACCECN_OPTION_FULL || tp->accecn_opt_demand ||
-  1220			     tcp_accecn_option_beacon_check(sk))) {
-  1221				opts->use_synack_ecn_bytes = 0;
-  1222				size += tcp_options_fit_accecn(opts, tp->accecn_minlen,
-  1223							       MAX_TCP_OPTION_SPACE - size);
-  1224			}
-  1225		}
-  1226	
-  1227		if (unlikely(BPF_SOCK_OPS_TEST_FLAG(tp,
-  1228						    BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG))) {
-  1229			unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
-  1230	
-  1231			bpf_skops_hdr_opt_len(sk, skb, NULL, NULL, 0, opts, &remaining);
-  1232	
-  1233			size = MAX_TCP_OPTION_SPACE - remaining;
-  1234		}
-  1235	
-  1236		return size;
-  1237	}
-  1238	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>         if (dev =3D=3D itn->fb_tunnel_dev)
+>                 return -EINVAL;
+>
+> diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+> index 365b4059eb20..0de4994bc92f 100644
+> --- a/net/ipv6/ip6_gre.c
+> +++ b/net/ipv6/ip6_gre.c
+> @@ -2047,6 +2047,9 @@ static int ip6gre_changelink(struct net_device *dev=
+, struct nlattr *tb[],
+>         struct ip6gre_net *ign =3D net_generic(t->net, ip6gre_net_id);
+>         struct __ip6_tnl_parm p;
+>
+> +       if (!ns_capable(t->net->user_ns, CAP_NET_ADMIN))
+> +               return -EPERM;
+> +
+>         t =3D ip6gre_changelink_common(dev, tb, data, &p, extack);
+>         if (IS_ERR(t))
+>                 return PTR_ERR(t);
+> @@ -2266,6 +2269,9 @@ static int ip6erspan_changelink(struct net_device *=
+dev, struct nlattr *tb[],
+>         struct __ip6_tnl_parm p;
+>         struct ip6gre_net *ign;
+>
+> +       if (!ns_capable(t->net->user_ns, CAP_NET_ADMIN))
+> +               return -EPERM;
+> +
+>         ign =3D net_generic(t->net, ip6gre_net_id);
+>         t =3D ip6gre_changelink_common(dev, tb, data, &p, extack);
+>         if (IS_ERR(t))
+> diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+> index 9d1037ac082f..2834004c7011 100644
+> --- a/net/ipv6/ip6_tunnel.c
+> +++ b/net/ipv6/ip6_tunnel.c
+> @@ -2102,6 +2102,9 @@ static int ip6_tnl_changelink(struct net_device *de=
+v, struct nlattr *tb[],
+>         struct ip6_tnl_net *ip6n =3D net_generic(net, ip6_tnl_net_id);
+>         struct ip_tunnel_encap ipencap;
+>
+> +       if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
+> +               return -EPERM;
+> +
+>         if (dev =3D=3D ip6n->fb_tnl_dev) {
+>                 if (ip_tunnel_netlink_encap_parms(data, &ipencap)) {
+>                         /* iproute2 always sets TUNNEL_ENCAP_FLAG_CSUM6, =
+so
+> diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+> index df793c8bfffb..7b05e0c491db 100644
+> --- a/net/ipv6/ip6_vti.c
+> +++ b/net/ipv6/ip6_vti.c
+> @@ -1044,6 +1044,9 @@ static int vti6_changelink(struct net_device *dev, =
+struct nlattr *tb[],
+>         struct __ip6_tnl_parm p;
+>         struct vti6_net *ip6n;
+>
+> +       if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
+> +               return -EPERM;
+> +
+>         ip6n =3D net_generic(net, vti6_net_id);
+>         if (dev =3D=3D ip6n->fb_tnl_dev)
+>                 return -EINVAL;
+> diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_cor=
+e.c
+> index 330a05286a56..a1029a829406 100644
+> --- a/net/xfrm/xfrm_interface_core.c
+> +++ b/net/xfrm/xfrm_interface_core.c
+> @@ -869,6 +869,9 @@ static int xfrmi_changelink(struct net_device *dev, s=
+truct nlattr *tb[],
+>         struct net *net =3D xi->net;
+>         struct xfrm_if_parms p =3D {};
+>
+> +       if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
+> +               return -EPERM;
+> +
+>         xfrmi_netlink_parms(data, &p);
+>         if (!p.if_id) {
+>                 NL_SET_ERR_MSG(extack, "if_id must be non zero");
+> --
+> 2.34.1
+>
 
