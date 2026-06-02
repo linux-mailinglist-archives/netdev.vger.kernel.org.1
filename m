@@ -1,66 +1,63 @@
-Return-Path: <netdev+bounces-294279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Sd1MAi/8HmogbwAAu9opvQ
-	(envelope-from <netdev+bounces-294279-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:52:15 +0200
+	id rRfeCV38HmpAbwAAu9opvQ
+	(envelope-from <netdev+bounces-294281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:53:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A2E62FFC7
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:52:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 312C362FFD0
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:52:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZQSj2Oh5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294279-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294279-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=iI3DhsWn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294281-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294281-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8DC6A305696A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 15:47:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 78872300B1FA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 15:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2925A3F0AB8;
-	Tue,  2 Jun 2026 15:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6983EF652;
+	Tue,  2 Jun 2026 15:51:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D36366046;
-	Tue,  2 Jun 2026 15:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732B33E5A2E
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 15:51:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780415265; cv=none; b=M7kfw1vyXIvXieQvIL8YUoxANm44vE/3ssjKSGwgrFcPsjmFpWT010vGjRcNOsFT4NCeReow7pEqAl0Ws15kIAVVnYxMsXZZkN2xDnFfVoiV0YPCH6qzVPM2uODNEq45zaq/s1C74/onzParP+WFWOUXiIrzeG+fYF3YvpOglVY=
+	t=1780415467; cv=none; b=AFcrKX8HCRLycolD+CXK3BR1dYGUH/2lnaq7HUhLX8M7jAG/REKfLmSxxNqXx6903JVBAEpDPgmp0vH1m0QfD6Y5K5zOIIT/UBcsxgsAE/XmJfYzVVl4w32yTHmrad8qEMeifdvn76HYk8M0mCXYpwi49hJ7Zz6w8puusLlY29s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780415265; c=relaxed/simple;
-	bh=hi12WezZwD1WzYU1hlhwt5AiplPaczFeXs61kDWRjHA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ng/PT+/COvrFXeQJGmAnWBVC29YDt9JLfrkf7IWctA67vuPaVA3UfLm7OUnkdMtZ6+dQ/qWaia0qYl1tHhs7sqAmBCCdyVBZwaH48uy34dq+cpAPET0vr11FoubQKGN4+zWdIyrrUtPeWpsoLpajtzg/hWwGH6Nsz+8bkz6XGek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQSj2Oh5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 704951F00893;
-	Tue,  2 Jun 2026 15:47:43 +0000 (UTC)
+	s=arc-20240116; t=1780415467; c=relaxed/simple;
+	bh=QzNsK7rFLIoeGEIayo5E+3AYoDpfcbywxFbpaKUUE4E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=D3peAC3hBmiLUX7CirJuuTp1SgrHr6v1pP8H6Bb6zGIWDL5mf5KR5xUMVIsk3eCMV9vXVR5zykpz/IYAVlShXpbtpirbEAJ8sL8KjNLz7PraO/ZApW8Qs/oFPUF/kbzqYOsPTGHf/47zyEQELEVawqSUu08za5JHjvXkWAm85LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iI3DhsWn; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E542D1F00893;
+	Tue,  2 Jun 2026 15:51:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780415263;
-	bh=wLutiSegTJHA+jOz/grm9866m5nuAjpYHl81oTHKovM=;
-	h=From:To:Cc:Subject:Date;
-	b=ZQSj2Oh5tKjNbhIIGe99RwvQlsqwNkefrPnoo5XygIkfKYK48wxoy33nXLklLeAIW
-	 UjGofUmSx6GSxATbGem0cK3dmcUhmoQiO9Xr0ZloUgpEU3jFCGYnSBaQEQzI00cSGT
-	 ZvNaAWTGVYuJgpkbcRF9b5AekMr4YLY2S2qBYx3cSvvDeokEg+coAq6jMhR3Cy8GPO
-	 M1SgWZP8LE7d9+yaU03bXzQN26BV5EpcJjNrhzA4ahHZcACEVoh+bNSoEjoItF38Cy
-	 vUlThpwtXAbsrzU6CvsEyFTjqSGFMR+reBNle3Kmir8Ko8eRh9mHYWYBKcJxqVwhal
-	 yiGh3U04OiM3Q==
-From: Chuck Lever <cel@kernel.org>
-To: linux-nfs@vger.kernel.org
-Cc: keyrings@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.de>,
-	David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [RFC] NFS: named client identities for mTLS mounts and a per-namespace .nfs keyring
-Date: Tue,  2 Jun 2026 11:47:37 -0400
-Message-ID: <20260602154740.49861-1-cel@kernel.org>
+	s=k20260515; t=1780415466;
+	bh=7x17cech0QEHBN2xgd52j16S/dxR37CAYobneoa5SV4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=iI3DhsWnCVU2a0zXrhPD8kRbYo6KjkAvdbUzSjpvqTRC47K5OhiXHO1U4sKocvxTY
+	 VBPazaHPZllHPSVnNs8HGvOTjh6Ab0v9axIl4e5rlb5gRINzlpJJ4AO2Tz5tXi/1Ic
+	 S/HJf46ykWDRMb57j89XxAv4dmZ8yqeq0SS28GbYiHFpoqCjoE+/GoVVjqSzkDe23/
+	 5ApjmLDnJxDPu6yCcVu/FdhcUDxSiQ7ECTusOCZd1ZY/2kXutCUWLbuDIjJCnEJ2Bn
+	 YTpeAikbsdu2UX9/KxLxwWkkLOgLXVzYBLnEp/QIdSGvJe3Ur8KT71So+eg9f395q1
+	 qlYHyOepcEZBw==
+From: Simon Horman <horms@kernel.org>
+To: aleksandr.loktionov@intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] ice: validate FDIR action queue index against VF VSI queue count
+Date: Tue,  2 Jun 2026 16:49:12 +0100
+Message-ID: <20260602154911.3594793-2-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260527071842.11478-2-aleksandr.loktionov@intel.com>
+References: <20260527071842.11478-2-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,206 +67,122 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294279-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux-nfs@vger.kernel.org,m:keyrings@vger.kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:netdev@vger.kernel.org,m:trondmy@kernel.org,m:anna@kernel.org,m:hch@lst.de,m:hare@suse.de,m:dhowells@redhat.com,m:jarkko@kernel.org,m:sagi@grimberg.me,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294281-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:aleksandr.loktionov@intel.com,m:horms@kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B3A2E62FFC7
+X-Rspamd-Queue-Id: 312C362FFD0
 
-Today, exactly one x.509 certificate and private key pair can be
-used at a time for all NFS mounts. The location of that pair is
-set in /etc/tlshd/config.
+From: 'Simon Horman' <horms@kernel.org>
 
-We currently have an awkward experimental mechanism for specifying
-an alternative x.509 certificate and private key for an xprtsec=mtls
-NFS mount, but it needs to be completed so it can be documented and
-advertised for use.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+ice: validate FDIR action queue index against VF VSI queue count
 
-I asked Claude to write a rough draft of a design document that
-outlines what needs to be done to finish the work. I would like
-input on the kernel-side mechanism in particular for the
-per-network-namespace keyring and the way userspace reaches it.
+This patch adds a bounds check on the VF-supplied queue index in
+ice_vc_fdir_parse_action() against vsi->num_rxq for both
+VIRTCHNL_ACTION_QUEUE and VIRTCHNL_ACTION_Q_REGION, so a VF cannot
+direct matched FDIR traffic to queues outside its own VSI.
 
+> diff --git a/drivers/net/ethernet/intel/ice/virt/fdir.c b/drivers/net/ethernet/intel/ice/virt/fdir.c
+> index 4f1f3442e52c..1bc524f3616c 100644
+> --- a/drivers/net/ethernet/intel/ice/virt/fdir.c
+> +++ b/drivers/net/ethernet/intel/ice/virt/fdir.c
+> @@ -1152,6 +1152,7 @@ ice_vc_fdir_parse_action(struct ice_vf *vf, struct virtchnl_fdir_add *fltr,
 
-Problem
-=======
+[ ... ]
 
-NFS mutual-TLS mounts (xprtsec=mtls) need the client to present an
-x.509 certificate and prove possession of its private key. The
-handshake runs in userspace in tlshd; the kernel hands tlshd the
-credentials by keyring serial number over the handshake genetlink
-upcall.
+> @@ -1176,11 +1181,21 @@ ice_vc_fdir_parse_action(struct ice_vf *vf, struct virtchnl_fdir_add *fltr,
+>  			break;
+>  		case VIRTCHNL_ACTION_QUEUE:
+>  			dest_num++;
+> +			if (action->act_conf.queue.index >= vsi->num_rxq) {
+> +				dev_dbg(dev, "Invalid queue index %u for VF %d\n",
+> +					action->act_conf.queue.index, vf->vf_id);
+> +				return -EINVAL;
+> +			}
+>  			input->dest_ctl = ICE_FLTR_PRGM_DESC_DEST_DIRECT_PKT_QINDEX;
+>  			input->q_index = action->act_conf.queue.index;
+>  			break;
+>  		case VIRTCHNL_ACTION_Q_REGION:
+>  			dest_num++;
+> +			if (action->act_conf.queue.index >= vsi->num_rxq) {
+> +				dev_dbg(dev, "Invalid queue index %u for VF %d\n",
+> +					action->act_conf.queue.index, vf->vf_id);
+> +				return -EINVAL;
+> +			}
+>  			input->dest_ctl = ICE_FLTR_PRGM_DESC_DEST_DIRECT_PKT_QGROUP;
+>  			input->q_index = action->act_conf.queue.index;
+>  			input->q_region = action->act_conf.queue.region;
 
-The only front end today is two undocumented integer mount options:
+[High]
+For the VIRTCHNL_ACTION_Q_REGION case, does this check fully close the
+steering hole the commit message describes?
 
-    mount -o xprtsec=mtls,cert_serial=723847,privkey_serial=723848 \
-          server:/export /mnt
+The commit message states that the patch validates the action queue
+index for both action types, but the Q_REGION action targets a range
+of 2^q_region consecutive queues starting at queue.index, and
+action->act_conf.queue.region is still copied verbatim into
+input->q_region:
 
-The administrator must load the cert and key into the keyring out of
-band, discover the integer serials, and paste them onto the command
-line. Serials are opaque, non-reproducible across boots, and easy to
-transpose. There is also no isolation: nfs_tls_key_verify() does a
-global key_lookup() on the serial, and the .nfs keyring created in
-fs/nfs/inode.c is module-global and never referenced again -- any tlshd
-that learns a serial can read the key.
+	input->q_index = action->act_conf.queue.index;
+	input->q_region = action->act_conf.queue.region;
 
-This RFC proposes a named, per-mount client-identity interface backed
-by a provisioning CLI, and fixes the keyring to isolate credentials per
-network namespace. The kernel handshake ABI (integer serials over
-genetlink) does not change.
+ice_fdir_fltr documents q_region as:
 
+	/* queue region size (=2^q_region) */
+	u8 q_region;
 
-The cross-subsystem ask: a per-netns .nfs keyring
-=================================================
+and ice_fdir_get_prgm_desc() programs it into the descriptor's TO_Q
+field for the QGROUP destination:
 
-Network namespace is the correct isolation domain. tlshd is bound to a
-network namespace, not a user namespace: it services sockets passed up
-from the kernel over the per-netns handshake genetlink socket, and one
-tlshd runs per network namespace that needs TLS-protected mounts.
+	if (input->dest_ctl ==
+	    ICE_FLTR_PRGM_DESC_DEST_DIRECT_PKT_QGROUP)
+		fdir_fltr_ctx.toq = input->q_region;
+	fdir_fltr_ctx.drop = ICE_FXD_FLTR_QW0_DROP_NO;
+	fdir_fltr_ctx.qindex = input->q_index;
 
-  - Replace the dead module-global .nfs keyring with one keyring per
-    network namespace, held in struct nfs_net (fs/nfs/netns.h) and
-    allocated at nfs_net_init(). The keys subsystem otherwise
-    namespaces on user_namespace, so this is a kernel-held object
-    referenced from nfs_net (like today's global keyring, but one per
-    netns). The DNS resolver's per-netns key scoping (net->key_domain,
-    request_key_net()) is precedent that netns-scoped key handling is
-    acceptable.
+ICE_FXD_FLTR_QW0_TO_Q_M is a 3-bit field (0x7), so q_region can be up
+to 7, i.e. up to 128 queues starting at q_index.
 
-  - tlshd attaches at handshake time, not at launch. This matters: the
-    keyring may be empty or freshly created when tlshd starts, so
-    linking it by name at startup is the wrong model. Instead NFS sets
-    ta_keyring to the netns .nfs keyring serial in
-    xs_tls_handshake_sync(), the kernel sends it as
-    HANDSHAKE_A_ACCEPT_KEYRING, and tlshd links that serial into its
-    session keyring per handshake -- the path tlshd already implements.
-    Linking grants tlshd possession of the keyring and, through it, of
-    the possessor-scoped cert and privkey keys.
+With the new check, a VF can still set queue.index = vsi->num_rxq - 1
+(which passes "index >= vsi->num_rxq") together with queue.region up
+to 7, causing the hardware to spread matched traffic across queues
+beginning at the last valid VF queue and extending past the end of
+the VF's VSI into queues owned by another VF or the PF.
 
-  - Credential keys are created possessor-readable only (no
-    KEY_USR_READ). That is what makes isolation enforceable rather
-    than advisory: a key provisioned in namespace A is absent from B's
-    keyring and unreadable by B's tlshd even if its serial leaks.
-
-Open question, and where I most want input: userspace -- the
-provisioning CLI and mount.nfs -- needs to name the kernel-held netns
-keyring in order to add and search keys. Candidates, modeled on
-KEYCTL_GET_PERSISTENT (security/keys/persistent.c):
-
-  (a) a new keyctl command that links the caller's netns .nfs keyring
-      into a destination keyring and returns its serial;
-  (b) an NFS-specific request_key key type the module instantiates to
-      point at the netns keyring;
-  (c) a per-netns serial exported via procfs or netlink.
-
-The per-netns keyring decision itself I consider settled; the retrieval
-primitive is the open one. There is also a user_namespace accounting
-nuance: keys added by userspace are quota-charged against a key_user
-keyed by user_namespace even though the keyring lives in nfs_net. I
-would like the keyrings folks to confirm the quota and ownership
-interaction is sane when the user_ns and net_ns boundaries do not
-coincide.
-
-
-Userspace front end
-===================
-
-With the keyring in place the front end is straightforward and follows
-the nvme-cli / cifscreds pattern.
-
-A new nfs-utils tool -- working name nfstlskey, fitting the nfsidmap /
-nfsconf family -- manages x.509 client identities:
-
-    nfstlskey add  <identity> --cert cert.pem --key key.pem
-    nfstlskey list
-    nfstlskey remove <identity>
-
-The add subcommand reads the PEM cert and key, converts each to DER,
-and creates two "user" keys on the netns .nfs keyring ("user" because
-tlshd consumes raw DER via keyctl_read_alloc()), with possessor-only
-read. Description convention:
-
-    nfs:x509:<identity>:cert
-    nfs:x509:<identity>:privkey
-
-The mount command names the identity:
-
-    mount -o xprtsec=mtls,tls_identity=<identity> server:/export /mnt
-
-mount.nfs runs in the caller's namespace, searches the .nfs keyring for
-the two descriptions, and passes the existing cert_serial= and
-privkey_serial= options to the kernel. tls_identity= is purely a
-userspace convenience that resolves a name to the serials the kernel
-already accepts; the raw serial options remain as a documented escape
-hatch. Both get documented in nfs(5), with a new nfstlskey(8) page.
-
-tlshd changes are minimal: confirm the per-handshake link of the passed
-keyring happens before the cert and privkey serials are read, and
-retire the now-unnecessary .nfs entry in the keyrings= startup path.
-
-
-Future work: mTLS-protected NFSROOT
-===================================
-
-NFSROOT mounts run in the kernel at boot, in the initial network
-namespace, before any userspace mount.nfs, nfstlskey, or possibly tlshd
-exists. mTLS for NFSROOT therefore cannot rely on userspace
-provisioning: the kernel must obtain the client cert and key itself --
-the leading candidate is extracting key material from a TPM -- and
-place it on the initial-netns .nfs keyring before the handshake, with a
-tlshd available early (initramfs). The kernel-owned per-netns keyring
-chosen here is a prerequisite: a userspace-created keyring could not be
-populated at NFSROOT time. Out of scope for the initial work, but the
-design must not foreclose it, and the same TPM-resident-key path would
-inform an eventual PKCS#11/TPM identity-naming scheme.
-
-
-Alternatives considered
-=======================
-
-  - request-key upcall keyed by server name (the nfsidmap model): most
-    NFS-native and needs no mount option, but makes selection automatic
-    rather than per-mount explicit. Worth revisiting if per-server
-    auto-selection is ever wanted.
-
-  - File paths in the mount options (strongSwan / wpa_supplicant model):
-    forces mount.nfs to read key files and load the keyring on every
-    mount and offers no reusable provisioned identity.
-
-  - Document the raw serials only: does nothing for namespacing.
-
-
-Comments welcome, particularly on the keyring retrieval primitive and
-whether network namespace is the binding you would expect.
-
---
-Chuck Lever
+Should the Q_REGION case additionally bound queue.region and verify
+that queue.index + (1 << queue.region) <= vsi->num_rxq (and possibly
+require queue.index to be aligned to 2^queue.region as is conventional
+for hardware queue groups)?
 
