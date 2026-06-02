@@ -1,544 +1,306 @@
-Return-Path: <netdev+bounces-294367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zeEOL4gpH2oyiQAAu9opvQ
-	(envelope-from <netdev+bounces-294367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:05:44 +0200
+	id Gl2bA9kpH2pCiQAAu9opvQ
+	(envelope-from <netdev+bounces-294368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:07:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E7F3631497
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:05:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796726314BE
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:07:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=EAijr188;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294367-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294367-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b=jDY90QfF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294368-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294368-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=meta.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C195930357C0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 19:05:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B3AEE303C2B5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 19:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D933A641F;
-	Tue,  2 Jun 2026 19:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4873998B7;
+	Tue,  2 Jun 2026 19:07:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2B73A4F46
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 19:04:43 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780427085; cv=none; b=ER9zU3+QpN3TvCg4MS6j+B5x5Nyi8p2S1qBLPPfGoHWYg+16INstDTt7HfwIUZK00+RFrWuL9MM4lZhZDPxWlbvrUnSGaq9LsPaQFq0zl46oeO9TktuKlHyD9Hn6ZkG0TJTe3vPjrDO0DGVNI70LAKAMIxGxavbiCV9XSZ7+3Ks=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780427085; c=relaxed/simple;
-	bh=Gy+Md7iRqxYc+8IDrhaIXQ7CIAWJK4Q7aV6z8tpJ7fc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mG32KDVrLm2Ngkwm4cdTI2qVhgZyXzXqjGStknPsA4XQtH+WFAR9jZxM0B+BDs7Zs63EoIQ8MjS3J6WmX2RVQEyG58cktXltVDKxLsr4FnwU59AUvs+Bq15T+EQDzqTDcgN0H/zP+gE+wyda8eiVEzJEQV3seJbjUUj0If4c6ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EAijr188; arc=none smtp.client-ip=209.85.214.202
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bf3636d6c0so39848675ad.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 12:04:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780427083; x=1781031883; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuHJnu7ES8zBonItBo7fyuw/f+lTC7qqP0va1rz3nJY=;
-        b=EAijr188xx8L+p26ijW7qR7yDY23k6sN8h4tuf/T/0zEuIBEP5JPaAshn2N3da7UAv
-         LhzgUSUnzxdHNvj8T9MRD0UJEwSHDfbaSCKByrGoXA3JtXRez7GqVwyKyYxOCCw9mlkK
-         piUgzYM8D9r/hGu9Jokbfxf1IuK/tffObqbPqNPZw7W/0M+DpmoVlOVuCe+e+lS8KEX1
-         Z/XGxex0QZDCHKepo95As9KvcGxuel+VAh2I1CV1B633KKhSBL/Nk18pUS3+5OR6J7DM
-         Odu/GIJKZRf40hGcX+vc7qihWkzM4rk7U3yjQHGYHQJn1XwU/oqKeMbRX0oYZsVy1a9Q
-         kH2A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C930C3A48CE
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 19:07:00 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780427222; cv=fail; b=CQ5liYyrtPS/ChH/QJKdbpqb632KAq12JFu2vo0C7g1EVAzbFVmEkFuSDGr+hx4ZrVv4qf/AKrP0tRz/9iCiLjfK5tzxFSePUu5YB0guBjDThB/WwdUZY6Wn3fxp0kR5njRP/vH1hxih0CUOaPu0hInIkynQxlEpt9uTrP0AFHM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780427222; c=relaxed/simple;
+	bh=PchiZHbJted883YM7Tsx4MCanuIBbvFzBfb6R7sdrLs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TZzp2mpXd5apSHpILlhtqJDeCnTMD2PrjZWKwLErpAXBYeLKH+12a6fZGK/qC/wPbUPhwb5tAFjykQ+49AG6/WfFt208wwaENdYXXU4RwOGmazXKdcxjVMm00gm2qVVRkJ7Q0a5uyW1T0V9fyvK9cmVrkAzD3ZjR387R4m2b3yQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=jDY90QfF; arc=fail smtp.client-ip=67.231.153.30
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 652EQmek1101920
+	for <netdev@vger.kernel.org>; Tue, 2 Jun 2026 12:06:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=AmdQqVczB19sGPldwgj6uwVjXHVUoAPkK4whM3xvMNM=; b=jDY90QfF/s6g
+	fk1kSwdakA2kyRatMGd5fXtiCwXtbKpXtPrggdCmTCU/5xXBhb/ALSCktzJKFzhg
+	x59KnhFGSJRROfNHqUx73LpxJLa5z0T2xcwwbZjmCCWkdKxXJTwcR7sopaMSbAhP
+	R1eUiexPqWZi9XiS/QR2A0GIfoiXLkfQNRzGG45HeaAV2+yym/NbHznSDRXetfzc
+	psTmX7drT0+T8HaK1VX9g/39Qf6zY/VLeKRyOUuq/8UIHPbj9wfauh1YpBkcviZs
+	RVTZUscLbU6Pr/z0MVl3NqiD5Bezz1FeFitWXS3roU9WfPtb6lrEmxXKepd8NoKG
+	2PwViZfK3w==
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	by m0001303.ppops.net (PPS) with ESMTPS id 4ej0xp200g-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 12:06:59 -0700 (PDT)
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-bdad545342aso980095466b.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 12:06:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780427218; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XUC0O29cElz0Aqj6LTs+GgVJu/1WksojX973VmHVsI4ZoPf2z2CoWOYFuRWa6oE0Ok
+         QHlF5uZGoMCJGecP9CwEHHzii+gdamxr6x8qXHcwZJcuW0eAvpoJ4jy9mvlRal8uN9Ai
+         fkS+nudRzqjnHxruVlbep0FHbI/tvBcF9HCqZlJXwShjZB8SKo/HAGQkGiVqyxE3P7By
+         T43qIvsEBLqyE5JNZb/p3jCdTEiytQwUIaa8u+cd770qZhhA1oQB2V8RU9+35ixRpCYm
+         ywDoncg2a6gU1IoypznbqfxEi2qknJ2gzQMqEfUMUnjdau9WKoH6E6+We5nzomWwK8jz
+         h6KQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=ffyFo/iBrLC5gQgtLpPm5hjGbuSJyPD78waGPloq+jw=;
+        fh=5OjWn7i3wpFahJlHl/K0dHDB+0wA9j0mo0bJlozA1kE=;
+        b=U9ssW4U5gcYMi3uAwRnmLLnpY9RzTOvBiQIgFq/5TSjY7fyHcuPaHOcdW5HGtpouZu
+         Pq24NWdjnDuOIbtxFgCZO0ZHbxgHpr2PkYZ8iAFgm72ufNF8dMZ2CW0KtmNiBwFzSTo9
+         JPjYGDBNmielV6kOd1igZIguHIObgykcnS445qk7OZ3UVIm9IjoBox+EvvOp7Rgdk1Z9
+         BHCw3ST6eZIEN8w/RJAgUTVNKiwPGm6BKLkr6YI3riuTwB+wyJU7kMKkCYWIeUXQtN9o
+         pNVE18hS/jIZePals9f71x8IHLZnXmtZc7MeQ1rbu2YVtmSVFPrtt8eyC3J0JOtiho7l
+         Q6SQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780427083; x=1781031883;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuHJnu7ES8zBonItBo7fyuw/f+lTC7qqP0va1rz3nJY=;
-        b=KWyJeC0KXs+yOvaLsWRgoPZ8mWHR+yMZn8VUBROD9BLptD9/hAFG5j/RX7slQshHrz
-         tn0Dr11SXxLgpLuhDhNzucrOMWDJudrLdhGY0WOLx7w6ZvdxZt7t+x8spQpCZj8rg2oP
-         5vF+UGBYgwvnedU921y2vudo0KxEn2VEOE9zNnjYH4+gLRwNQVpWUj9UNFNLYkvSASAQ
-         x421Gv4+/dTzng/g1azw5GZh4oBspCLz6+/PUx/6sgeRZUxt3DcJr0uJd9SZ13oSVLX9
-         ox6k3cRJpROZOkFnbkNVsAk3xIgC+bJIzBoj0LnnPUMI5cLg+KQkHSPtlMr3JLUo7U+X
-         SUrA==
-X-Forwarded-Encrypted: i=1; AFNElJ8WPt2gNUvKZo43ER0ttk3XBKyAuPoDBSrCfoolYN4FPtrQylWFvDKrNF6MveD7nRhoJp75Xwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf8eEiaIDFe7qUirsyYbUq9DoFPiDt+KP0NE+8ryBQLNl6qM0i
-	1t2XRjJHz93NL/v1y0ue4NRzIAvllQKnl8TthwK7n7jzPoiSSaXdbJA71FYWf0sDzZT7W+HbULx
-	9ywNiXg==
-X-Received: from pjs8.prod.google.com ([2002:a17:90a:c08:b0:369:7bf0:c21c])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:384a:b0:36b:7c2a:263e
- with SMTP id 98e67ed59e1d1-36e32b3d525mr120433a91.20.1780427082362; Tue, 02
- Jun 2026 12:04:42 -0700 (PDT)
-Date: Tue,  2 Jun 2026 19:03:45 +0000
-In-Reply-To: <20260602190436.139591-1-kuniyu@google.com>
+        d=1e100.net; s=20251104; t=1780427218; x=1781032018;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ffyFo/iBrLC5gQgtLpPm5hjGbuSJyPD78waGPloq+jw=;
+        b=opC1lQcZmzhjO12DqNGF8/4CFFs2MBmX/PKj8+a1abNlxDeml9IbIXNKj0VC4vtPoA
+         oyAj5tYWUN7RoXVnp3pTs8WrfG6VWT+qPSyFib/xibyvaXUwyLc2nS0owlfNSJ8qfTf2
+         Y8dx2Yo3y0mex22Y3HcHNzDVgauUE86W4hpqkEkYldQuP1GmtggG2mxfrsjVqphVlBgi
+         hz1+Myk7uYNHY6RPGa0EMt8PFTy7Kh3Qdw9bDwJm4M9LjMOHV2+ovt4LdTO1jnX62iHi
+         T0exQG4d2yt70SbCgjYWuQdyqSjM5QWh/3ltZgmgInLj6tqZv+RKqpM1UXu/rNu+Up0D
+         Nkow==
+X-Gm-Message-State: AOJu0YwsQeC+BXBlkbAby0IPbngA/K1pYIVdfg9p3P5tJIdF7acI5kfw
+	uCnVkHGGflBSlvQTsPWd+pzwHFwBEmt8GHm/wu+nN9kgFqmIDOi7j4lNmC10Vs2SjpEtiv1iNgA
+	xwwxCWrrtyEpeFVrtyyTzAS0wf4LkdGyKEsmN/EZT0nw9x0v0HkVMFIVzD2IPtEse3LvySX2hfc
+	pkXiUX/Kx81pgm2lQx2V1PqeU0cJtODw==
+X-Gm-Gg: Acq92OF4vB8XeBpotjNS6bvaRLbwhMzH0kS6aN9JiFlNCtwKhTpv1zUzr/5XamRjL0J
+	TpRy9j0HoBOSBVuwKdrpMib33Zyh8F34mqVZBuCKC/3jkGKaqhBKLWMVagZGo8jDSvOoTjfNv+b
+	ajhpYdjoQkr+mYpR+x8ZAuzFrv+bOCcNvcfXk4UYRshQ/05QjtPatDLEfVugxQNMnUrNk3+G/AB
+	0Ow5nU9h6BE/18F/A==
+X-Received: by 2002:a17:907:fd8b:b0:bd4:7bed:512a with SMTP id a640c23a62f3a-bf061812fd5mr57147066b.30.1780427218276;
+        Tue, 02 Jun 2026 12:06:58 -0700 (PDT)
+X-Received: by 2002:a17:907:fd8b:b0:bd4:7bed:512a with SMTP id
+ a640c23a62f3a-bf061812fd5mr57145066b.30.1780427217854; Tue, 02 Jun 2026
+ 12:06:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260602190436.139591-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
-Message-ID: <20260602190436.139591-6-kuniyu@google.com>
-Subject: [PATCH v5 net-next 5/5] geneve: Introduce IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stephen Hemminger <stephen@networkplumber.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+MIME-Version: 1.0
+References: <20260602181428.2318919-3-ntspring@meta.com> <8ac88be59633fbdf71337c80ecad1a268a989440e8865df3ef6906d33bbf0837@mail.kernel.org>
+In-Reply-To: <8ac88be59633fbdf71337c80ecad1a268a989440e8865df3ef6906d33bbf0837@mail.kernel.org>
+From: Neil Spring <ntspring@meta.com>
+Date: Tue, 2 Jun 2026 12:06:31 -0700
+X-Gm-Features: AVHnY4I9E97vtJNAItNoiDOxUpsvUBDTWw2Z8iM1jvir4KetPOYHnRI2Ix4qyAE
+Message-ID: <CAGy2EQajXgkqBbYtwCF9qXquHOP7mkLR8MQ+gg-cDjKw+z51KA@mail.gmail.com>
+Subject: Re: [PATCH v11 2/2] selftests: net: add local ECMP rehash test
+To: bot+bpf-ci@kernel.org
+Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
+        kuniyu@google.com, davem@davemloft.net, kuba@kernel.org,
+        dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        shuah@kernel.org, linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+        martin.lau@linux.dev, daniel@iogearbox.net, ast@kernel.org,
+        andrii@kernel.org, martin.lau@kernel.org, eddyz87@gmail.com,
+        yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Authority-Analysis: v=2.4 cv=ZPHnX37b c=1 sm=1 tr=0 ts=6a1f29d3 cx=c_pps
+ a=edIAN7ErZTGbxav20d8A7Q==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=f7IdgyKtn90A:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=_78whYxrdx1mplLwxq1U:22 a=VwQbUJbxAAAA:8 a=iFABrAoMAAAA:20 a=NEAV23lmAAAA:8
+ a=2M8aKpgkrPwFO8N7dvUA:9 a=QEXdDO2ut3YA:10 a=bA3UWDv6hWIuX7UZL3qL:22
+X-Proofpoint-GUID: mnDkUzEPP2lssVClo0Lyknashgx31JDS
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDE4NSBTYWx0ZWRfX/fYEtxL2arFP
+ U2bMW/vYiHYvvX+Je9rc6pA0lQY5PJp0mBqq1bqCYFSLP9QmF7IvTV2b0WJIbuKPUZ4IvoPpYY9
+ q15YcX2A5hDBqNLwW+spK1Hx0o3AcGXd6tp8o7mvDwmmUsiWf0lcQMmHKcyXTX12ZPFMi3uZB8M
+ p+zaC7qjWOmufZvR6nl0vWv+GnpCxmEuNQ/EYz3jOTudM/2ToSomA0BD3vwTUI1scg4M6Hx6xhr
+ B3B+snk/1B7mSXnkwVVaCd/xdeMOQAHyt/nnbALk0UmUpe6zk2SRuYodbSDEZXUGQV/BADpsyaV
+ xaRt1NCcliqLVNUVC869B9iqVzPCjBYXyOgdtMRJDmHiR9Omd59m85mvBCQGhF2UkjBnjOtWPrO
+ 64fgj2fCAb5rGSKl1TPOUQFA6t3Crr5y91BWjj6SQkXUbkM3N9Bc0fyOuerx6nwb+o2AUrbsGFV
+ YHkIkN0u8JsGaempHLw==
+X-Proofpoint-ORIG-GUID: mnDkUzEPP2lssVClo0Lyknashgx31JDS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-02_03,2026-05-28_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294367-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:bot+bpf-ci@kernel.org,m:netdev@vger.kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:dsahern@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:bpf@vger.kernel.org,m:martin.lau@linux.dev,m:daniel@iogearbox.net,m:ast@kernel.org,m:andrii@kernel.org,m:martin.lau@kernel.org,m:eddyz87@gmail.com,m:yonghong.song@linux.dev,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:bot@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:stephen@networkplumber.org,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,google.com,gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-294368-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,linux.dev,iogearbox.net,gmail.com,meta.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[meta.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,udp_conf.family:url]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:from_mime,meta.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5E7F3631497
+X-Rspamd-Queue-Id: 796726314BE
 
-By default, a GENEVE device bind()s its underlying UDP socket(s) to
-the IPv4 or IPv6 wildcard address because there is no way to specify
-a specific local IP address to bind() to.
-
-This prevents deploying multiple GENEVE devices on a multi-homed host
-where each device should be isolated and bound to a different local IP
-address on the same UDP port.
-
-Let's introduce new options, IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6,
-to allow specifying a local IPv4/IPv6 address for the backend UDP
-socket.
-
-By default, when collect metadata mode (IFLA_GENEVE_COLLECT_METADATA)
-is enabled, both IPv4 and IPv6 sockets are created.  However, if a
-source address is specified via the new attributes, only a single
-socket corresponding to that specific address family is created.
-
-Accordingly, geneve_find_sock() and geneve_find_dev() are updated to
-take the source address into account, ensuring that multiple devices
-and sockets configured with different source addresses can coexist
-without conflict.
-
-In addition, the source address is validated in geneve_xmit_skb()
-and geneve6_xmit_skb(), so the BPF prog must set it in bpf_tunnel_key.
-
-With this change, multiple GENEVE devices can be successfully created
-and bound to their respective local IP addresses:
-
-  (*) "local" is the keyword for IFLA_GENEVE_LOCAL / IFLA_GENEVE_LOCAL6
-
-  # for i in $(seq 1 2);
-  do
-          ip link add geneve4_${i} type geneve local 192.168.0.${i} external
-          ip addr add 192.168.0.${i}/24 dev geneve4_${i}
-          ip link set geneve4_${i} up
-
-          ip link add geneve6_${i} type geneve local 2001:9292::${i} external
-          ip addr add 2001:9292::${i}/64 dev geneve6_${i} nodad
-          ip link set geneve6_${i} up
-  done
-
-  # ip -d l | grep geneve
-  9: geneve4_1: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 192.168.0.1 ...
-  10: geneve6_1: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 2001:9292::1 ...
-  11: geneve4_2: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 192.168.0.2 ...
-  12: geneve6_2: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-      geneve external id 0 local 2001:9292::2 ...
-
-  # ss -ua | grep geneve
-  UNCONN 0      0         192.168.0.2:geneve      0.0.0.0:*
-  UNCONN 0      0         192.168.0.1:geneve      0.0.0.0:*
-  UNCONN 0      0      [2001:9292::2]:geneve            *:*
-  UNCONN 0      0      [2001:9292::1]:geneve            *:*
-
-Note that even if the local address is explicitly configured with
-the wildcard address, kernel does not dump it except for devices with
-IFLA_GENEVE_COLLECT_METADATA.  This is consistent with the behaviour
-of is_tnl_info_zero(), which treats the wildcard remote address as not
-configured.
-
-  ## ynl example.
-  # ./tools/net/ynl/pyynl/cli.py \
-    --spec ./Documentation/netlink/specs/rt-link.yaml \
-    --do newlink --create \
-    --json '{"ifname": "geneve0",
-             "linkinfo": {"kind":"geneve",
-	                  "data": {"local": "0.0.0.0",
-			           "collect-metadata": true}}}'
-
-  # ./tools/net/ynl/pyynl/cli.py \
-    --spec ./Documentation/netlink/specs/rt-link.yaml \
-    --do getlink \
-    --json '{"ifname": "geneve0"}' --output-json | \
-    jq .linkinfo.data.local
-  "0.0.0.0"
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-iproute2 patch is here:
-https://lore.kernel.org/netdev/20260602185711.129769-1-kuniyu@google.com/
-
-Changelog:
-v5:
-  * Allow changelink with the same address
-  * Dump LOCAL/LOCAL6 only when configured
-
-v4:
-  * Simplify validation in geneve_nl2info()
-  * Add ynl spec
-
-v3:
-  * Use NLA_POLICY_EXACT_LEN() for IFLA_GENEVE_LOCAL6.
-  * Mention source address in error messages in geneve_configure().
-v2:
-  * Move addr_type to if-block for CONFIG_IPV6=n.
-  * Validate saddr in geneve_xmit_skb() and geneve6_xmit_skb().
----
- Documentation/netlink/specs/rt-link.yaml |   9 ++
- drivers/net/geneve.c                     | 167 +++++++++++++++++++++--
- include/uapi/linux/if_link.h             |   2 +
- 3 files changed, 169 insertions(+), 9 deletions(-)
-
-diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
-index 79c89f204415..e281e58b8414 100644
---- a/Documentation/netlink/specs/rt-link.yaml
-+++ b/Documentation/netlink/specs/rt-link.yaml
-@@ -1939,6 +1939,15 @@ attribute-sets:
-       -
-         name: gro-hint
-         type: flag
-+      -
-+        name: local
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+      -
-+        name: local6
-+        type: binary
-+        display-hint: ipv6
-   -
-     name: linkinfo-hsr-attrs
-     name-prefix: ifla-hsr-
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 3a62d132a8c4..da17b4f6fda5 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -775,9 +775,10 @@ static struct sock *geneve_create_sock(struct net *net,
- 		udp_conf.family = AF_INET6;
- 		udp_conf.ipv6_v6only = 1;
- 		udp_conf.use_udp6_rx_checksums = geneve->cfg.use_udp6_rx_checksums;
-+		udp_conf.local_ip6 = info->key.u.ipv6.src;
- 	} else {
- 		udp_conf.family = AF_INET;
--		udp_conf.local_ip.s_addr = htonl(INADDR_ANY);
-+		udp_conf.local_ip.s_addr = info->key.u.ipv4.src;
- 	}
- 
- 	udp_conf.local_udp_port = info->key.tp_dst;
-@@ -1061,6 +1062,16 @@ static struct geneve_sock *geneve_find_sock(struct net *net,
- 		if (gs->gro_hint != gro_hint)
- 			continue;
- 
-+		if (family == AF_INET &&
-+		    inet_sk(gs->sk)->inet_saddr != info->key.u.ipv4.src)
-+			continue;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+		if (family == AF_INET6 &&
-+		    !ipv6_addr_equal(&gs->sk->sk_v6_rcv_saddr, &info->key.u.ipv6.src))
-+			continue;
-+#endif
-+
- 		return gs;
- 	}
- 
-@@ -1327,6 +1338,12 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	if (IS_ERR(rt))
- 		return PTR_ERR(rt);
- 
-+	if (geneve->cfg.info.key.u.ipv4.src &&
-+	    saddr != geneve->cfg.info.key.u.ipv4.src) {
-+		dst_release(&rt->dst);
-+		return -EADDRNOTAVAIL;
-+	}
-+
- 	err = skb_tunnel_check_pmtu(skb, &rt->dst,
- 				    GENEVE_IPV4_HLEN + info->options_len +
- 				    geneve_build_gro_hint_opt(geneve, skb),
-@@ -1438,6 +1455,12 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	if (IS_ERR(dst))
- 		return PTR_ERR(dst);
- 
-+	if (!ipv6_addr_any(&geneve->cfg.info.key.u.ipv6.src) &&
-+	    !ipv6_addr_equal(&saddr, &geneve->cfg.info.key.u.ipv6.src)) {
-+		dst_release(dst);
-+		return -EADDRNOTAVAIL;
-+	}
-+
- 	err = skb_tunnel_check_pmtu(skb, dst,
- 				    GENEVE_IPV6_HLEN + info->options_len +
- 				    geneve_build_gro_hint_opt(geneve, skb),
-@@ -1729,6 +1752,8 @@ static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] = {
- 	[IFLA_GENEVE_INNER_PROTO_INHERIT]	= { .type = NLA_FLAG },
- 	[IFLA_GENEVE_PORT_RANGE]	= NLA_POLICY_EXACT_LEN(sizeof(struct ifla_geneve_port_range)),
- 	[IFLA_GENEVE_GRO_HINT]		= { .type = NLA_FLAG },
-+	[IFLA_GENEVE_LOCAL]		= { .type = NLA_BE32 },
-+	[IFLA_GENEVE_LOCAL6]		= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
- };
- 
- static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
-@@ -1788,7 +1813,45 @@ static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
- 	return 0;
+On Tue, Jun 2, 2026 at 11:43=E2=80=AFAM <bot+bpf-ci@kernel.org> wrote:
+>
+> >
+> > diff --git a/tools/testing/selftests/net/ecmp_rehash.sh b/tools/testing=
+/selftests/net/ecmp_rehash.sh
+> > new file mode 100755
+> > index 000000000000..ffaacf1d9513
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/net/ecmp_rehash.sh
+> > @@ -0,0 +1,1066 @@
+>
+> [ ... ]
+>
+> > +tc_filter_pkt_count()
+> > +{
+> > +     local ns=3D$1; shift
+> > +     local dev=3D$1; shift
+> > +
+> > +     ip netns exec "$ns" tc -s filter show dev "$dev" parent 1: 2>/dev=
+/null |
+> > +             awk '/Sent .* pkt/ {
+> > +                     for (i=3D1; i<=3DNF; i++)
+> > +                             if ($i =3D=3D "pkt") { print $(i-1); exit=
  }
- 
-+static bool geneve_saddr_wildcard(const struct ip_tunnel_info *info)
-+{
-+	if (ip_tunnel_info_af(info) == AF_INET) {
-+		if (!info->key.u.ipv4.src)
-+			return true;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	} else {
-+		if (ipv6_addr_any(&info->key.u.ipv6.src))
-+			return true;
-+#endif
-+	}
-+
-+	return false;
-+}
-+
-+static bool geneve_saddr_conflict(const struct ip_tunnel_info *a,
-+				  const struct ip_tunnel_info *b)
-+{
-+	if (ip_tunnel_info_af(a) != ip_tunnel_info_af(b))
-+		return false;
-+
-+	if (geneve_saddr_wildcard(a) || geneve_saddr_wildcard(b))
-+		return true;
-+
-+	if (ip_tunnel_info_af(a) == AF_INET) {
-+		if (a->key.u.ipv4.src == b->key.u.ipv4.src)
-+			return true;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	} else {
-+		if (ipv6_addr_equal(&a->key.u.ipv6.src, &b->key.u.ipv6.src))
-+			return true;
-+#endif
-+	}
-+
-+	return false;
-+}
-+
- static struct geneve_dev *geneve_find_dev(struct geneve_net *gn,
-+					  const struct geneve_config *cfg,
- 					  const struct ip_tunnel_info *info,
- 					  bool *tun_on_same_port,
- 					  bool *tun_collect_md)
-@@ -1798,8 +1861,10 @@ static struct geneve_dev *geneve_find_dev(struct geneve_net *gn,
- 	*tun_on_same_port = false;
- 	*tun_collect_md = false;
- 	list_for_each_entry(geneve, &gn->geneve_list, next) {
--		if (info->key.tp_dst == geneve->cfg.info.key.tp_dst) {
--			*tun_collect_md = geneve->cfg.collect_md;
-+		if (info->key.tp_dst == geneve->cfg.info.key.tp_dst &&
-+		    (cfg->dualstack || geneve->cfg.dualstack ||
-+		     geneve_saddr_conflict(info, &geneve->cfg.info))) {
-+			*tun_collect_md |= geneve->cfg.collect_md;
- 			*tun_on_same_port = true;
- 		}
- 		if (info->key.tun_id == geneve->cfg.info.key.tun_id &&
-@@ -1815,7 +1880,12 @@ static bool is_tnl_info_zero(const struct ip_tunnel_info *info)
- 	return !(info->key.tun_id || info->key.tos ||
- 		 !ip_tunnel_flags_empty(info->key.tun_flags) ||
- 		 info->key.ttl || info->key.label || info->key.tp_src ||
--		 memchr_inv(&info->key.u, 0, sizeof(info->key.u)));
-+#if IS_ENABLED(CONFIG_IPV6)
-+		 (ip_tunnel_info_af(info) == AF_INET6 &&
-+		  !ipv6_addr_any(&info->key.u.ipv6.dst)) ||
-+#endif
-+		 (ip_tunnel_info_af(info) == AF_INET &&
-+		  info->key.u.ipv4.dst));
- }
- 
- static bool geneve_dst_addr_equal(struct ip_tunnel_info *a,
-@@ -1846,7 +1916,7 @@ static int geneve_configure(struct net *net, struct net_device *dev,
- 	geneve->net = net;
- 	geneve->dev = dev;
- 
--	t = geneve_find_dev(gn, info, &tun_on_same_port, &tun_collect_md);
-+	t = geneve_find_dev(gn, cfg, info, &tun_on_same_port, &tun_collect_md);
- 	if (t)
- 		return -EBUSY;
- 
-@@ -1864,13 +1934,13 @@ static int geneve_configure(struct net *net, struct net_device *dev,
- 	if (cfg->collect_md) {
- 		if (tun_on_same_port) {
- 			NL_SET_ERR_MSG(extack,
--				       "There can be only one externally controlled device on a destination port");
-+				       "There can be only one externally controlled device on a destination port and a source address");
- 			return -EPERM;
- 		}
- 	} else {
- 		if (tun_collect_md) {
- 			NL_SET_ERR_MSG(extack,
--				       "There already exists an externally controlled device on this destination port");
-+				       "There already exists an externally controlled device on this destination port and the source address");
- 			return -EPERM;
- 		}
- 	}
-@@ -1917,9 +1987,10 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
- 		cfg->dualstack = true;
- 	}
- 
--	if (data[IFLA_GENEVE_REMOTE] && data[IFLA_GENEVE_REMOTE6]) {
-+	if ((data[IFLA_GENEVE_LOCAL] || data[IFLA_GENEVE_REMOTE]) &&
-+	    (data[IFLA_GENEVE_LOCAL6] || data[IFLA_GENEVE_REMOTE6])) {
- 		NL_SET_ERR_MSG(extack,
--			       "Cannot specify both IPv4 and IPv6 Remote addresses");
-+			       "Cannot specify both IPv4/IPv6 Remote/Local addresses");
- 		return -EINVAL;
- 	}
- 
-@@ -1972,6 +2043,65 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
- #endif
- 	}
- 
-+	if (data[IFLA_GENEVE_LOCAL]) {
-+		if (changelink) {
-+			__be32 src = nla_get_in_addr(data[IFLA_GENEVE_LOCAL]);
-+
-+			if (ip_tunnel_info_af(info) == AF_INET6 ||
-+			    src != info->key.u.ipv4.src) {
-+				attrtype = IFLA_GENEVE_LOCAL;
-+				goto change_notsup;
-+			}
-+		} else {
-+			info->key.u.ipv4.src = nla_get_in_addr(data[IFLA_GENEVE_LOCAL]);
-+
-+			if (ipv4_is_multicast(info->key.u.ipv4.src)) {
-+				NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCAL],
-+						    "Local IPv4 address cannot be Multicast");
-+				return -EINVAL;
-+			}
-+
-+			cfg->dualstack = false;
-+		}
-+	}
-+
-+	if (data[IFLA_GENEVE_LOCAL6]) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+		if (changelink) {
-+			struct in6_addr src = nla_get_in6_addr(data[IFLA_GENEVE_LOCAL6]);
-+
-+			if (ip_tunnel_info_af(info) == AF_INET ||
-+			    !ipv6_addr_equal(&src, &info->key.u.ipv6.src)) {
-+				attrtype = IFLA_GENEVE_LOCAL6;
-+				goto change_notsup;
-+			}
-+		} else {
-+			int addr_type;
-+
-+			info->mode = IP_TUNNEL_INFO_IPV6;
-+			info->key.u.ipv6.src = nla_get_in6_addr(data[IFLA_GENEVE_LOCAL6]);
-+
-+			addr_type = ipv6_addr_type(&info->key.u.ipv6.src);
-+			if (addr_type & IPV6_ADDR_LINKLOCAL) {
-+				NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCAL6],
-+						    "Local IPv6 address cannot be link-local");
-+				return -EINVAL;
-+			}
-+			if (addr_type & IPV6_ADDR_MULTICAST) {
-+				NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCAL6],
-+						    "Local IPv6 address cannot be Multicast");
-+				return -EINVAL;
-+			}
-+
-+			cfg->dualstack = false;
-+		}
-+#else
-+		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCAL6],
-+				    "IPv6 support not enabled in the kernel");
-+		return -EPFNOSUPPORT;
-+#endif
-+	}
-+
- 	if (data[IFLA_GENEVE_ID]) {
- 		__u32 vni;
- 		__u8 tvni[3];
-@@ -2265,6 +2395,7 @@ static size_t geneve_get_size(const struct net_device *dev)
- {
- 	return nla_total_size(sizeof(__u32)) +	/* IFLA_GENEVE_ID */
- 		nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_REMOTE{6} */
-+		nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_LOCAL{6} */
- 		nla_total_size(sizeof(__u8)) +  /* IFLA_GENEVE_TTL */
- 		nla_total_size(sizeof(__u8)) +  /* IFLA_GENEVE_TOS */
- 		nla_total_size(sizeof(__u8)) +	/* IFLA_GENEVE_DF */
-@@ -2320,6 +2451,24 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- #endif
- 	}
- 
-+	if (!geneve->cfg.dualstack) {
-+		if (ip_tunnel_info_af(info) == AF_INET) {
-+			if ((info->key.u.ipv4.src ||
-+			     geneve->cfg.collect_md) &&
-+			    nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
-+					    info->key.u.ipv4.src))
-+				goto nla_put_failure;
-+#if IS_ENABLED(CONFIG_IPV6)
-+		} else {
-+			if ((!ipv6_addr_any(&info->key.u.ipv6.src) ||
-+			     geneve->cfg.collect_md) &&
-+			    nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
-+					     &info->key.u.ipv6.src))
-+				goto nla_put_failure;
-+#endif
-+		}
-+	}
-+
- 	if (nla_put_u8(skb, IFLA_GENEVE_TTL, info->key.ttl) ||
- 	    nla_put_u8(skb, IFLA_GENEVE_TOS, info->key.tos) ||
- 	    nla_put_be32(skb, IFLA_GENEVE_LABEL, info->key.label))
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 46413392b402..363526549a01 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1506,6 +1506,8 @@ enum {
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
- 	IFLA_GENEVE_PORT_RANGE,
- 	IFLA_GENEVE_GRO_HINT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
--- 
-2.54.0.1013.g208068f2d8-goog
+> > +             }'
+> > +}
+>
+> These per-device tc filter counters match all TCP IPv6 traffic on the
+> device, with no isolation by port.
+>
+> [ ... ]
+>
+> > +test_ecmp_syncookie_path_consistency()
+> > +{
+>
+> [ ... ]
+>
+> > +     for r in $(seq 1 "$ECMP_REBUILD_ROUNDS"); do
+> > +             local port=3D$((PORT + 3 * ECMP_REBUILD_ROUNDS + r))
+> > +
+> > +             ip netns exec "$NS2" socat -u \
+> > +                     "TCP6-LISTEN:$port,bind=3D[fd00:ff::2],reuseaddr"=
+ \
+> > +                     - >/dev/null &
+> > +             local server_pid=3D$!
+> > +
+> > +             wait_local_port_listen "$NS2" "$port" tcp
+> > +
+> > +             local srv_base0 srv_base1
+> > +             srv_base0=3D$(tc_filter_pkt_count "$NS2" veth0b)
+> > +             srv_base1=3D$(tc_filter_pkt_count "$NS2" veth1b)
+>
+> The baseline is snapshotted here, after the new listener starts, which
+> handles leakage that arrives before this point.
+>
+> [ ... ]
+>
+> > +             local srv_tcp0 srv_tcp1
+> > +             srv_tcp0=3D$(tc_filter_pkt_count "$NS2" veth0b)
+> > +             srv_tcp1=3D$(tc_filter_pkt_count "$NS2" veth1b)
+> > +             local srv_delta0=3D$(( ${srv_tcp0:-0} - ${srv_base0:-0} ))
+> > +             local srv_delta1=3D$(( ${srv_tcp1:-0} - ${srv_base1:-0} ))
+> > +
+> > +             if [ "$srv_delta0" -gt 0 ] && [ "$srv_delta1" -gt 0 ]; th=
+en
+> > +                     path_splits=3D$((path_splits + 1))
+> > +             fi
+> > +
+> > +             kill "$client_pid" 2>/dev/null
+> > +             wait "$client_pid" 2>/dev/null
+> > +             kill "$server_pid" 2>/dev/null
+> > +             wait "$server_pid" 2>/dev/null
+> > +     done
+>
+> The client and server from each round are killed at the end of the
+> round, but the loop moves straight on to the next round.
+>
+> Can asynchronous teardown traffic (FIN/RST/ACK) from the killed client
+> or server of a previous round still be in flight after srv_base0 and
+> srv_base1 are snapshotted for the next round?  Since the counters match
+> all TCP IPv6 traffic on the device rather than the current round's port,
+> would a late teardown packet on one path plus the new round's traffic on
+> the other path increment both srv_delta0 and srv_delta1, satisfying the
+> srv_delta0 > 0 && srv_delta1 > 0 check and recording a spurious split?
+>
+> Would a short quiescence wait or filtering the tc counters by the
+> current round's port make this check more robust against late packets?
 
+Yes, thanks; fixed locally and will appear in v12.  Each round now waits fo=
+r all
+active TCP sockets on the port to close before proceeding to the next round,
+preventing late FIN/RST packets from polluting the next round's tc
+filter baseline.
+
+> > +     if [ "$path_splits" -gt 0 ]; then
+> > +             check_err 1 "$path_splits/$ECMP_REBUILD_ROUNDS had split =
+server path"
+> > +     fi
+>
+> The same pattern appears in ecmp_dst_rebuild_loop(), which also relies
+> on these global per-device counters across rounds.
+
+This was less of an issue since ecmp_dst_rebuild_loop had a threshold number
+of packets that a stray connection termination packet would not reach, but =
+the
+same wait doesn't hurt.
+
+> This was raised by an automated review on an earlier version
+> (v9, https://lore.kernel.org/r/20260530004914.C05121F00898@smtp.kernel.or=
+g )
+> and the counter structure is unchanged in the current version.  It
+> affects test reliability rather than kernel correctness.
+
+Apologies, my error.
+
+-neil
+
+>
+>
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a =
+bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
+E.md
+>
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/268394=
+85409
 
