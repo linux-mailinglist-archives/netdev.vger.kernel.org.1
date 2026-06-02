@@ -1,171 +1,241 @@
-Return-Path: <netdev+bounces-294145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294146-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMmmFUOzHmr7JAAAu9opvQ
-	(envelope-from <netdev+bounces-294145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:41:07 +0200
+	id 6DxSENOzHmr7JAAAu9opvQ
+	(envelope-from <netdev+bounces-294146-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:43:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B8562CC39
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:41:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF90562CCD6
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:43:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 834F4302A7C7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:40:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4E9683004F35
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14973D6476;
-	Tue,  2 Jun 2026 10:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4393D6473;
+	Tue,  2 Jun 2026 10:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="wIKQ42DD"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="CS+WmPha"
 X-Original-To: netdev@vger.kernel.org
-Received: from ixit.cz (ixit.cz [185.100.197.86])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C3B37B021;
-	Tue,  2 Jun 2026 10:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266F2346FB3
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 10:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780396856; cv=none; b=DHzN+X5BlxDQxu0gFVDtg6FlA/2yuXl4ltPl+hGqe6yPpBb1+vXT2B/FQuhMnO1QmqWXuL/Jw3HZ+hyS6SA4va5pAacMwMsLImyezeHUMei/DQUs7lOM9f9ggAm3Gowy5cGGPvGg67wuacitmQsvlwrJ+uIfySDneQVYNcEIpm8=
+	t=1780397008; cv=none; b=IlhLiZ22ajiGjToFTmvq2iGnH4B1kfuIYXsKsb3e5dbP4sW33JmNZoQQAS7FM3pGLM7un3XdBHzQPcs+8qiBqns7YlAkPvMKPTphlGT6EW798PvZP4oQcZgayjQuxiABWjzb0ZB9bMEl3szViz4dDl7f14MV9EsqszbD6I6j1E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780396856; c=relaxed/simple;
-	bh=D2ndvFQ6KXBwpms7kUeXnjQIjVMLfL4gH6jrmX9QHYY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZhXPyqRgPZ9x4vk2Qo03tnim3J+aGxuvX2lMK5Ni9rq/6wRSg8JnQJNcTvPIbRE8QiiRc80lR0sJIJABZ28Y4fGgeF6bS2kJ/RRM7tXcAjEiwIbfslNL/eZM48GxE+BNs6ORgWEUBHz1hr6k3yWqdXtQtQY5wM7s03ww2aFbo4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=wIKQ42DD; arc=none smtp.client-ip=185.100.197.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
-Received: from [172.20.10.2] (37-48-17-230.nat.epc.tmcz.cz [37.48.17.230])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 912695340394;
-	Tue, 02 Jun 2026 12:40:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1780396852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mKe7x4lDvgZbTNI1fBcFxl0hUurmEKNIUM9R5ka0w4E=;
-	b=wIKQ42DDyl92T1QB+GVQoyNg+XtLN1OJjJQAlEpg0ACfNa7iBsIAGVtZCfEwSsVJqyRuEa
-	0ZLbFPIDT5bl6oQ2EPqjwvjecAIhvm70x6mWzkNo2KE8crevhU5uSMvnGTGMu/Rre5O6u8
-	p6EYRQvSH3QcnKGRq7796NMqpGDL4oE=
-Message-ID: <39dfdad5-7cc8-47c7-b2bc-386bec4145dc@ixit.cz>
-Date: Tue, 2 Jun 2026 12:40:51 +0200
+	s=arc-20240116; t=1780397008; c=relaxed/simple;
+	bh=Fa1I9iHLkXmpQldR04kb+uGba86+Bmm0StyNWUksdKA=;
+	h=From:To:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tZ3rocGlUAo+DrtC/F8QGrHV/xmgZ+ovU3EzaW9HIdz2bMjKCnftv88ldFbNsilZ1chHEjattejOdjwHLWymLUETK0/etUf7NDI5HnHBpv6SSZE5O+0OJGva6AnvWwoyo0hYzSVc/tc/Ntomd8MFvGEwL1ftQYRSeiSh4OYbpXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=CS+WmPha; arc=none smtp.client-ip=212.227.17.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1780396972; x=1781001772;
+	i=markus.stockhausen@gmx.de;
+	bh=yj66YVTz0K14afl+Wd9ElsilBQeIoygz+Ne/xrqDMBw=;
+	h=X-UI-Sender-Class:From:To:References:In-Reply-To:Subject:Date:
+	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=CS+WmPhaOqqyrNDV2w7f+kI1GtJb/FA+p4/dF7ouBGKEkmG4W15mEliUNqXZra+c
+	 8l3PYH8ZJL2yvxfJ3VfUbjLRvXyGhjlXXLsCYNnsy303vM9+IurTf9Nozr4BpL62l
+	 vHAB686K9TEPq+/787pW01C7nzaL4m8FrwEsLENaYQgcUdeMhuq4wb1S62hf6dNPO
+	 79Xf8Q2wGjgG/xWuMRwm5EX5jMondtAk4urhFmdU/8wo7gNBiEGwR62zq9ZW1EVEe
+	 Z6Uz5mfzfv3jGgsKaS1t/im/PaNE1/YyGCt76sfb9GvIj/uzrx4JN+ZleSttXORob
+	 ifPdmI0VvPXe8Jm9HQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MxDkm-1xETzP3Fyi-012dPB; Tue, 02
+ Jun 2026 12:42:51 +0200
+From: "Markus Stockhausen" <markus.stockhausen@gmx.de>
+To: "'Jagielski, Jedrzej'" <jedrzej.jagielski@intel.com>,
+	<andrew@lunn.ch>,
+	<hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<netdev@vger.kernel.org>,
+	<chris.packham@alliedtelesis.co.nz>,
+	<daniel@makrotopia.org>,
+	<mensi@mensi.ch>
+References: <20260602052640.93083-1-markus.stockhausen@gmx.de> <20260602052640.93083-4-markus.stockhausen@gmx.de> <PH0PR11MB5902AC16692DAAC68542A76EF0122@PH0PR11MB5902.namprd11.prod.outlook.com>
+In-Reply-To: <PH0PR11MB5902AC16692DAAC68542A76EF0122@PH0PR11MB5902.namprd11.prod.outlook.com>
+Subject: AW: [PATCH net-next 3/8] net: mdio: realtek-rtl9300: harden otto_emdio_map_ports()
+Date: Tue, 2 Jun 2026 12:42:47 +0200
+Message-ID: <013401dcf27c$8fe15cd0$afa41670$@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/2] nfc: llcp: two fixes for nfc_llcp_getsockopt()
-To: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Samuel Ortiz <sameo@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, oe-linux-nfc@lists.linux.dev,
- kernel-team@meta.com
-References: <20260521-fix_llc-v2-0-ab44cc09179c@debian.org>
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Autocrypt: addr=david@ixit.cz; keydata=
- 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
-In-Reply-To: <20260521-fix_llc-v2-0-ab44cc09179c@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 01B8562CC39
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQCd5JwkUMOmloq9EQ3T8rs5/ndXAgJ3Cz4UAlk/OA+4gqi9oA==
+Content-Language: de
+X-Provags-ID: V03:K1:YTlCv8DBJpj+ldbyH+DBztrbS4RTcmQ64pj8DHBS/MUoytnyfPA
+ C+OWwVCKBYrs3ar4rkRc/oR4GzTRbrhdl6SptQiEFAwNu5VY0lwMa77hNUz2L1BZjASPPsQ
+ 8NsFqMAh4SLlndxVxSYTLq+eISg2SUgwvcfdyMXrJpUDQytDW/ClRjOZuht5+QO4dxMd/xo
+ DgWl3i7FngEDSPaSfX1CQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:QO4cNh92YhI=;L9higxuLL1WoJdicNZrjXIZb11N
+ 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
+X-Rspamd-Queue-Id: DF90562CCD6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294145-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[intel.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org,mensi.ch];
+	FREEMAIL_FROM(0.00)[gmx.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-294146-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ixit.cz:+];
+	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmx.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,ixit.cz:mid,ixit.cz:dkim,ixit.cz:email]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,gmx.de:dkim,gmx.de:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bootlin.com:url]
 X-Rspamd-Action: no action
 
-On Thu, 21 May 2026 07:32:08 -0700, Breno Leitao wrote:
- > nfc: llcp: two fixes for nfc_llcp_getsockopt()
- >
- > While converting the NFC LLCP socket layer to the new getsockopt_iter()
- > API, I noticed that nfc_llcp_getsockopt() unconditionally stores four
- > bytes through a (u32 __user *) cast regardless of the caller-supplied
- > optlen, overflowing the user buffer when optlen < 4. Patch 1 adds an
- > explicit length check (with a signed-int guard so a negative optlen
- > cannot slip past it) and is what I originally sent as v1.
- >
- > [...]
+> Von: Jagielski, Jedrzej <jedrzej.jagielski@intel.com>=20
+> Gesendet: Dienstag, 2. Juni 2026 11:38
+> Betreff: RE: [PATCH net-next 3/8] net: mdio: realtek-rtl9300: harden
+otto_emdio_map_ports()
+> ...
+> >+		if (addr >=3D PHY_MAX_ADDR)
+> >+			return dev_err_probe(dev, -EINVAL, "illegal smi
+address %d\n",=20
+> >+addr);
+>
+> Could we have more meaningful error code than EINVAL; EFAULT perhaps if
+that's bad addr case?
+> what do you think?
 
-Applied, thanks!
+EFAULT seems to be the most unusal error code here.
+But looking at other implementations there is no clear
+guidance.
 
-[1/2] nfc: llcp: avoid userspace overflow on invalid optlen
-       commit: 4daea11b40619f91a084db0271cfe095a82cf4be
-[2/2] nfc: llcp: read llcp_sock->local under the socket lock in getsockopt
-       commit: 6a7c71fc20c71d1e41787a25a8b7485abb592e6c
+- phy package uses -EINVAL [1]
+- ax88172a uses -ENODEV [2]
+- altera uses -ENODEV [3]
 
-Best regards,
--- 
-David Heidelberg <david@ixit.cz>
+> Also - is %d convenient for printing address value?
+
+Will take that as it matches the other MDIO outputs.=20
+
+Markus
+
+[1]
+https://elixir.bootlin.com/linux/v6.18.1/source/drivers/net/phy/phy_packag=
+e.
+c#L215=20
+[2]
+https://elixir.bootlin.com/linux/v6.18.1/source/drivers/net/usb/ax88172a.c=
+#L
+213
+[3]
+https://elixir.bootlin.com/linux/v6.18.1/source/drivers/net/ethernet/alter=
+a/
+altera_tse_main.c#L625=20
+
 
