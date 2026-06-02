@@ -1,227 +1,214 @@
-Return-Path: <netdev+bounces-294307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id B40CO1UNH2qMegAAu9opvQ
-	(envelope-from <netdev+bounces-294307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:05:25 +0200
+	id ovCZKWwQH2rLewAAu9opvQ
+	(envelope-from <netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:18:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 434EF630819
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:05:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761C1630A12
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:18:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=rL0tt7Y4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294307-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294307-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=nd7zPxXG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B450E3025293
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:00:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6D4E30976DA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:11:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539DB38D3F1;
-	Tue,  2 Jun 2026 17:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B223F58E5;
+	Tue,  2 Jun 2026 17:11:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E5F35292A
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:00:13 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780419615; cv=pass; b=sjfK6cRp9nt2hsacZEpVhEGduEjIBEoN/iac7Ds2bfMVxtttWqFafrxq095p/yxceBr5hRVYtgCrK4NL9xs5EuQWQwFG5ktxsCr8mJRxHJ46XUyP6DQJiXBFZMoJcBbn/sdFBdpxD7u24CIkZklvojtmZLRBN0z+tPERtP3embY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780419615; c=relaxed/simple;
-	bh=drNlRluABRnJtprucJzGVievS/w8VYPwS2qqj1Vtf9Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=auyYFaq0HwuXdN1gb/c/HrbpnVHbPlMuqw4KtJuocRoQTW2wssU2N/3SYLwC6hnbhf5+gKJ+/ZQ+xxq+Bsa66bXyN/7ql76xTaBS7HQ5XwKzho0ymPoyWJyZKHjF60Zr94dI7LVqmNkFvx0XXfpT7CF1b0AQi7bDRuZ+qXV/nPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rL0tt7Y4; arc=pass smtp.client-ip=209.85.160.170
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-516d634956fso133509881cf.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 10:00:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780419613; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Aw9ADNqBoJc0pT2aPoPMmO4V7hM3xXxq232lZqQCaSAFE1EjskfAQlbOY4vT27RAMP
-         8kP7NGVmFxCvkfRBjv6iMiFn9Bharh4uJZ2erWOVhcBIJH1wJUNpTOGaQ8ATGlUsorRP
-         GECS/uuH15WyymMOp8vjedMfGaK82B6SUozYzwEX7AeRgcSELFiV2VgKnMvLw8m6LE8t
-         tTEP5mmUvu06wO0pSghaIdEhlV45ZpB2k7GjJv0vXFzDlif66T44FYXgImTBV7J6QKp4
-         jVRl5j7ecbTIeh9u3gDIXeSPS9q8KjHrILj2AC2rcIXV8dZTpk/nb5C55qWdRVQyOEXL
-         Z20A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=hBhc8/ih69iZXkvQ+oh7MO055cOwe4gcQ9X1rXZHFqw=;
-        fh=0QcKFhKY5v6vWJpPuRtRclJGTbXrHyjRc0LvrQzggco=;
-        b=WNthvCpdCUk3jR8Zs17ymSpMFdYgu++gbmoccDY0Hr94lizBXICMgQU9D/RLu2j41K
-         IxW3zRBj9NSjgVecnO9NH+WY1iIYs2GVW4zEt4IQPeNj0S5G/6MAJOKEEr+JE/M68iOx
-         yWRPKGM4O9jiO4r4JdEDjKg3T72jv0R+OfXchsbxBBV1dEj4iOrWObKU3gdNNmO95ooJ
-         U2jsRrtBv6NNDiHHKexKxPH1Tz6Z6xMf4xZOifK5+s9VZD3c9WBeZu4rlf+abn/4jLtI
-         HQjw4CbBTczQxfp15hr+2hQG8Z6n6lrExK0yw8zkXE07m3CJgF0izi8i9EaZCbl87ZCf
-         v5HQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197983F5BD6
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:11:13 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780420275; cv=none; b=Kz6ziIPsw7smmdVeJgJNSMpm2DRK8Hosadc7ZOg8n9DgDuFwI57lAKZ1l6hegPC66v03ftVm8haDbB5VaaZbFeoeklEEjMUVW4GwqaGvQOO15QuLEG69k19pyLBie9qcCbUpvVwChLcAA5/3IKBJiEkRDWVDhX0ltY6vq+dvQJY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780420275; c=relaxed/simple;
+	bh=PNMcwBaq3HWYoO3KsicsKTXAF3/1eGOdICmPWCtyf9A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=GtemgvWBEFz0WjLNArj1ij4wSaktJXKUN0SIGNeSRJfIjqbwyvE3wMjgZ1MTYX3FGGv2dYy2Z1GU6Qz2zod7Sp2NSfSgptSeU9pOvC4jQ/d42sy0yCTDSiFPFtUn8OXLlTmoCupjOBadheN/xEcdvFUYMtC0YQt+4vGluMsRIE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=nd7zPxXG; arc=none smtp.client-ip=74.125.82.196
+Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-304545f5206so15972913eec.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 10:11:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780419613; x=1781024413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1780420273; x=1781025073; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hBhc8/ih69iZXkvQ+oh7MO055cOwe4gcQ9X1rXZHFqw=;
-        b=rL0tt7Y4BqoQc+Rp7qJ8672US+Fa6PILit0efVS+0il3lj5vo5sT+/wPNUXA0SUSbg
-         EY1k/Dj2LBR01xKosuY6fUwk7c3S6REfigJ1eTyPWDqJ0IKfqdvkHrhHbAlJs04xo9BD
-         4+7fnUeRjhecxA4UOqRbYY0ZBIfadIfclSMGFqseQWzBC26aDIXiPOss26SX0eUSErF9
-         k/2uYENuF/8kGJo6Dyk3kvo1Vp7oFwZDct0q924sWv/k865DZEQTfZ3BXtLcUzHUDdvX
-         pmj03kCI5FPpIsmZhsYHPvLjyVjdaF+kNkp1cF1dic/DN40VjyNUUNblrAph0HDwf2UA
-         8Qrw==
+        bh=0j05WBgNKiBOQ3j1mPmoNzDYYpZls9Mm5jzp1fNRRDY=;
+        b=nd7zPxXGdX+bnnaZZKs7yqrvNYLKEKTvox7fHrHIYM538vSdbmNbX4ciXg2nbpBqcY
+         XDAcxVl+EDR0+VnBOfmQU3fvZA2ar9GEoUz+LbH4c15LLEZun0zbiknivHaCql43l2Xj
+         1DdfDMVYFIjpLH52fRUr/iPL824e28Qq2JF53RtJVkoRC7xugt49fpQym9IDLoFSMx4B
+         LNnN0ddmc5LkwOulXvSHUm0PEbPqFvxnxG8l9hNzmaUovz0gVCQiJEDN5QhYHUwUvMZO
+         W3VvcpnDAab/gSSOy2BMFn9w+xYa9ULv5VmUOLDHNKUq9mdBHGZHSAonhufW9TikryyM
+         yh3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780419613; x=1781024413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hBhc8/ih69iZXkvQ+oh7MO055cOwe4gcQ9X1rXZHFqw=;
-        b=ieb//lkEAGgOw24mrSIIF49LJbg5Fb25kNWZIsAJwvZPOLgw7gSVHUMesImhc7Sp7w
-         zLLIM08V82UWv1ItWH3aTE/DVOz9B3mABUCQ5m9vcQlGzZ/JOh/B3eXF0SMf1hLZpI1u
-         zOnCADav9jFO52Weus0vEQVzqCOHTg6Tcal4tfuz7wzjPryeutasyEvqJBtkC/aSHrd3
-         8bo0IZHo1XxXxperwvZ6//WYsT+FXzcMvAICl8Ad/LKBv7MCtAnJr1WQWpY2z1z+jGE4
-         2xj0WOOS+6h3WkV7aQI/LON6HrZyvZReS0dgLpQkJdrkuR5W5L3SaR/Q8tniG3nItN7M
-         HXHw==
-X-Gm-Message-State: AOJu0YwLPWWQ+8fXRMQXXXCkfQrbqmUjW0Raml+6W1EHu9mvfYroDIa6
-	x09sJSnzHQSo5OHiJn/4NbzparFkZaEBE8vtBrxcQoVfnQblbFnyRGW2uAT29jVYN5mLVePsR2q
-	+2rsEVmYGnluQ9eC4wgTgMQpAQ4wU669wa8iu7lll
-X-Gm-Gg: Acq92OFTzi9B0qCznGz7QSc/r89DYUBoCJaATTEntEQecbnAKm3931aMj/ntmx2EJeO
-	O+CEpJFEZ9zxmhXdEMzgWVA+m4v66MdDSzTQXjrbFGOQsFIeXkBrxqLL2I/KYBoJKb/dPokmZqp
-	Z2FQO7gQccUnHX24u8NiG6pdZKfDEoyYxZIS08nFgUpCvTmWd2r3swGKwQmQb1S765fEZotkC4P
-	Ta4wu3En7HaOtSNl7nT1J9weOySXiFoiVpOOwd1k3cL9DJ7c6hKtJxhfvCwCOYjq3OM30j88Hm6
-	sAaf09J19SLU/zSDJ/d4OxSCowFyF9yWuE9NUDOOVEQC2k3mOHeI67KOhEm+RQkC4mAhIVHih23
-	tAOk6wnopAmM3+YcFev4ZAgSQArU1ysRDR3VvNO8=
-X-Received: by 2002:a05:622a:588f:b0:50d:9e8d:9837 with SMTP id
- d75a77b69052e-517781045e9mr355731cf.11.1780419610615; Tue, 02 Jun 2026
- 10:00:10 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780420273; x=1781025073;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0j05WBgNKiBOQ3j1mPmoNzDYYpZls9Mm5jzp1fNRRDY=;
+        b=NolbsBbkjqcUPHcGI4Q19Fe6EshMfXyJFGBdbimSNcBIvWsn5Htg37H25lpgSTT+ox
+         yPWkMyvqSOxogJAqqTrfEXtwRiTP4QRb/Ox8lH3MhAcr/dpaLR5n44XUsaafR+IELl7x
+         e/0ESXl/1BzSIot6g32X4haEg5hS5gszO53T9Csz9AcKcYaKj44R1BRTBD5q5PHis4ze
+         6ka8mvtn4YupFRcuL/OxNMMC2MmobElBuUUqXRGDQFJHhroO1t7fSq/p5k5cUdRbONAc
+         r9SQgiwWvF3qT00lEDF7Yt0nenJsOVhpZcv475lpFaji7tDOmNKkoHugF9m5vDBzbVrr
+         gPXA==
+X-Forwarded-Encrypted: i=1; AFNElJ9SC4UKVd8zBj190hNvZw506RSetPvX5GDDX83KI1SDp06OOnVMsp40u/tqn2kKr1M7cJcl+C8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWon6bVzMhGsTgMm5ZxF+TDcM6/Sdv9Yx2UtXV4YCT/pKsSoQ9
+	BVnMi1t8v3XaSuhkSw77q3I/vinkP7Os5oqCAWD+lIgdudKHGLcJsLWfLo4ujfi+KUI=
+X-Gm-Gg: Acq92OE6W5JJL07bwkATusYednJzk1H6+cdiOuQZSsKA/853ZCWyHXKandn7exh1W82
+	LoNZ7YmKJeI0aYY2hmlYwjUP1/CdkkOsW1onC8UWF7tD+GKizdUjV02ARZWyfCcayKSUghq+ebC
+	CQ/Rne+yRKTQ10E8ln5wwrC+KEKrZAXSCb5CXGirnTCv3j95OTpqjaOCxsCp/FespnzJcX15h7R
+	s8HQY61e3UdXyjNHvflkd7kpdTcJ+7vsP3ca2o9QOz8mUd+A7eb3lhSeqN08cXrHi/DDKmUZH13
+	iFY1Esdz9WhTSz8o/zTWeb+XvEAkneCQ63vfLWQEOJTOwtgs/S3umQTo9Mw9YrpkbWunRonRo+b
+	XCA2NX6ELtHTOoXRjo9SPgJJW3eFeyITyn7ags8zy8K5O4Ig/ToTTdUEbdw+e8PxKB6apCjCQ/I
+	Qt09OrowZ+/lqqtE06q2UI0oDhOPzUpKTzfQ==
+X-Received: by 2002:a05:7300:a44c:b0:2da:a813:a5fd with SMTP id 5a478bee46e88-304fa5a7ac4mr7756107eec.22.1780420273037;
+        Tue, 02 Jun 2026 10:11:13 -0700 (PDT)
+Received: from localhost ([163.114.132.129])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137f54db05csm241990c88.8.2026.06.02.10.11.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jun 2026 10:11:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260602162727.893863-1-runyu.xiao@seu.edu.cn>
-In-Reply-To: <20260602162727.893863-1-runyu.xiao@seu.edu.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jun 2026 09:59:59 -0700
-X-Gm-Features: AVHnY4Lh_1oPRlpZANoDxriKJDXUr-c48eEjIKhNsrcPd5qyLhSewz3s74JK6yU
-Message-ID: <CANn89iJYzJ8GDoEeVywvShQsW4FmAM3YCZ8qSZAM-7BZXwT1mg@mail.gmail.com>
-Subject: Re: [PATCH net v2] raw: annotate data-races in raw_v4_match()
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, maze@google.com, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 02 Jun 2026 13:11:08 -0400
+Message-Id: <DIYQB8597KMS.2FSGCPOI9LPCW@etsalapatis.com>
+To: "Ren Wei" <n05ec@lzu.edu.cn>, <netdev@vger.kernel.org>,
+ <bpf@vger.kernel.org>
+Cc: <ast@kernel.org>, <daniel@iogearbox.net>, <davem@davemloft.net>,
+ <kuba@kernel.org>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+ <sdf@fomichev.me>, <andrii@kernel.org>, <martin.lau@linux.dev>,
+ <eddyz87@gmail.com>, <memxor@gmail.com>, <song@kernel.org>,
+ <yonghong.song@linux.dev>, <jolsa@kernel.org>, <toke@redhat.com>,
+ <liuhangbin@gmail.com>, <yuantan098@gmail.com>, <zcliangcn@gmail.com>,
+ <bird@lzu.edu.cn>, <zzhan461@ucr.edu>
+Subject: Re: [PATCH bpf v2] bpf: devmap: reject fragmented frames in
+ clone-based broadcasts
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <21c2d153dd25603d359069a02bf06779b51f6423.1780385378.git.zzhan461@ucr.edu>
+In-Reply-To: <21c2d153dd25603d359069a02bf06779b51f6423.1780385378.git.zzhan461@ucr.edu>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294307-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:toke@redhat.com,m:liuhangbin@gmail.com,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:zzhan461@ucr.edu,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294312-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	DMARC_NA(0.00)[etsalapatis.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:runyu.xiao@seu.edu.cn,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:maze@google.com,m:kuniyu@google.com,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,redhat.com,lzu.edu.cn,ucr.edu];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid,seu.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lzu.edu.cn:email,ucr.edu:email,etsalapatis.com:mid,etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis-com.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 434EF630819
+X-Rspamd-Queue-Id: 761C1630A12
 
-On Tue, Jun 2, 2026 at 9:27=E2=80=AFAM Runyu Xiao <runyu.xiao@seu.edu.cn> w=
-rote:
+On Tue Jun 2, 2026 at 4:43 AM EDT, Ren Wei wrote:
+> From: Zhao Zhang <zzhan461@ucr.edu>
 >
-> raw_v4_match() is a lockless match helper under sk_for_each_rcu()
-> and still reads inet->inet_num, inet->inet_rcv_saddr and
-> sk->sk_bound_dev_if with plain loads.
+> Devmap broadcast redirects clone the packet for all but the last
+> destination.
 >
-> inet_num and sk_bound_dev_if already have WRITE_ONCE() writers, and
-> raw_bind() should use WRITE_ONCE() for inet_rcv_saddr as well.
+> For native XDP, that clone path copies only the linear xdp_frame data,
+> while fragmented frames keep skb_shared_info in tailroom outside the
+> linear area. Cloning such a frame leaves XDP_FLAGS_HAS_FRAGS set but
+> without valid frag metadata, and the later free path can interpret
+> uninitialized tail data as skb_shared_info, leading to an out-of-bounds
+> access during frame return.
 >
-> Add matching READ_ONCE()/WRITE_ONCE() annotations.
+> Reject fragmented native XDP frames in dev_map_enqueue_clone().
 >
-> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+> Add the same restriction to the generic XDP clone path in
+> dev_map_redirect_clone(). Generic XDP represents fragmented packets as
+> nonlinear skbs, and rejecting them here keeps clone-based broadcast
+> support aligned between native and generic XDP.
+>
+> Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support=
+")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:GPT-5.4
+> Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 > ---
-> v2:
-> - Note that inet_num and sk_bound_dev_if already have WRITE_ONCE() writer=
-s
-> - Add WRITE_ONCE() in raw_bind() for inet_rcv_saddr
-> - Previous version: https://lore.kernel.org/r/20260601073937.1137673-1-ru=
-nyu.xiao@seu.edu.cn
+
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+
+> changes in v2:
+> - Add the same fragmented-packet restriction to generic XDP
+>   dev_map_redirect_clone() so clone-based broadcast behavior stays
+>   aligned with the native XDP path.
+> - v1 link: https://lore.kernel.org/all/4b596825bccc64d03e0c2e0db4dceb12c7=
+f5cf47.1780176829.git.zzhan461@ucr.edu/
 >
->  net/ipv4/raw.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  kernel/bpf/devmap.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
-> diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-> index 5aaf9c62c8e1..faa49f3d239a 100644
-> --- a/net/ipv4/raw.c
-> +++ b/net/ipv4/raw.c
-> @@ -120,11 +120,14 @@ bool raw_v4_match(struct net *net, const struct soc=
-k *sk, unsigned short num,
->                   __be32 raddr, __be32 laddr, int dif, int sdif)
+> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> index cc0a43ebab6b..5b9eac5342a9 100644
+> --- a/kernel/bpf/devmap.c
+> +++ b/kernel/bpf/devmap.c
+> @@ -581,6 +581,10 @@ static int dev_map_enqueue_clone(struct bpf_dtab_net=
+dev *obj,
 >  {
->         const struct inet_sock *inet =3D inet_sk(sk);
-> +       unsigned short match_num =3D READ_ONCE(inet->inet_num);
+>  	struct xdp_frame *nxdpf;
+> =20
+> +	/* Frags live outside the linear frame and cannot be cloned safely. */
+> +	if (unlikely(xdp_frame_has_frags(xdpf)))
+> +		return -EOPNOTSUPP;
+> +
+>  	nxdpf =3D xdpf_clone(xdpf);
+>  	if (!nxdpf)
+>  		return -ENOMEM;
+> @@ -726,6 +730,9 @@ static int dev_map_redirect_clone(struct bpf_dtab_net=
+dev *dst,
+>  	struct sk_buff *nskb;
+>  	int err;
+> =20
+> +	if (unlikely(skb_is_nonlinear(skb)))
+> +		return -EOPNOTSUPP;
+> +
+>  	nskb =3D skb_clone(skb, GFP_ATOMIC);
+>  	if (!nskb)
+>  		return -ENOMEM;
 
-I think inet->inet_num is immutable, raw sockets have SOCK_RCU_FREE.
-
-> +       __be32 match_rcv_saddr =3D READ_ONCE(inet->inet_rcv_saddr);
-> +       int match_bound_dev_if =3D READ_ONCE(sk->sk_bound_dev_if);
-
-Why do you need a local variable to store sk->sk_bound_dev_if ?
-
-This forces the compiler to read it (in a register) or store it in a
-temporary variable
-before tests that might short-circuit the read (eg if network
-namespace does not match).
-
->
-> -       if (net_eq(sock_net(sk), net) && inet->inet_num =3D=3D num  &&
-> +       if (net_eq(sock_net(sk), net) && match_num =3D=3D num &&
->             !(inet->inet_daddr && inet->inet_daddr !=3D raddr)    &&
-
-Why isn't inet_daddr covered in your patch?
-
-> -           !(inet->inet_rcv_saddr && inet->inet_rcv_saddr !=3D laddr) &&
-> -           raw_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
-> +           !(match_rcv_saddr && match_rcv_saddr !=3D laddr) &&
-> +           raw_sk_bound_dev_eq(net, match_bound_dev_if, dif, sdif))
->                 return true;
->         return false;
->  }
-> @@ -727,7 +730,8 @@ static int raw_bind(struct sock *sk, struct sockaddr_=
-unsized *uaddr,
->         if (!inet_addr_valid_or_nonlocal(net, inet, addr->sin_addr.s_addr=
-,
->                                          chk_addr_ret))
->                 goto out;
->
-> -       inet->inet_rcv_saddr =3D inet->inet_saddr =3D addr->sin_addr.s_ad=
-dr;
-> +       inet->inet_saddr =3D addr->sin_addr.s_addr;
-> +       WRITE_ONCE(inet->inet_rcv_saddr, addr->sin_addr.s_addr);
->         if (chk_addr_ret =3D=3D RTN_MULTICAST || chk_addr_ret =3D=3D RTN_=
-BROADCAST)
->                 inet->inet_saddr =3D 0;  /* Use device */
->         sk_dst_reset(sk);
-> --
-> 2.34.1
 
