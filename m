@@ -1,163 +1,196 @@
-Return-Path: <netdev+bounces-294045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294046-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INOFNqV8HmrnjgkAu9opvQ
-	(envelope-from <netdev+bounces-294045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:48:05 +0200
+	id oE78Mtp8HmrnjgkAu9opvQ
+	(envelope-from <netdev+bounces-294046-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:48:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4386162925A
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:48:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F503629277
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:48:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A45E30BD895
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 06:42:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 99CA83015E1C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 06:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F142ED15F;
-	Tue,  2 Jun 2026 06:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB41392C39;
+	Tue,  2 Jun 2026 06:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="RSnzM3cH"
+	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="h26xc12x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5473A839B
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 06:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3DB3A5E9F
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 06:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780382572; cv=none; b=WM7TKKCqGbNmSG0duvN/cpfJJXI5RYBt87VhLgzr7dfB42wIEYcNHg9kepT0gtw8KZcgXqal6X2bUTP+3CViBBewMH64eZd/W71OepNIFGPgYQVO+QUspEInmCAqa2anRQ/CabGO/3EJjX2cBraQ7ZjbwE7hiRkOi0BF8+qAhkM=
+	t=1780382667; cv=none; b=tLd2BjKOBCfTJUXBuiwU64Jkzfc/+tEVxIb+DyjE1dw1TwhKCSOoGduVpyPe3cfOxZCyqTuVanseQhhkwVpUyUCSVCt0bp25nQf/nKNn3O51oNuvXmwDtyslh1XqG480FYLpKqbPLMtWFmejWV7iC+ho8c1h3ULc4szBn6suy3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780382572; c=relaxed/simple;
-	bh=qE///xx7EQlY0uI+1+xH8GZBQ0wprBOgoD0QacK7mPI=;
+	s=arc-20240116; t=1780382667; c=relaxed/simple;
+	bh=P5QFLVHqsWJ9RIqgAFo/fgucqYkyOvzv6HwxyGy2U48=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EbCmSmsekI/aaAyJEk99I2Z5KTI4sF/IhGG+OD6c8b/RO5PRsoYqmxlk2CwnPQWPuOClhjHRcEmcRccqkhyqqrZrpQqFqhEhUMm+NGzZNM/o/XR4TzTQ9YaHvnyh1ggGzxJ61y28H/9+0dcTewiznNdj+Sdx4DnIA4uHiOHaJUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=RSnzM3cH; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-45eecb8bf67so3583197f8f.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 23:42:50 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LPXuzoKhuO0kkSdrnTCzEg0EmJG7kLrCNzJm3vIP+JbksWX+dVvPzCOMPGlHwWfgdWWgPexRwT1WsLpP/Jc68a7WAbR3VbwspqnjL0yTdHDrUi73Ok1L/ymS08TodRgT6y3QT0HTzN3U3YTp53tW0Fnzuc4Ym1oZNd61JaU4nV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=h26xc12x; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1780382569; x=1780987369; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2N/m1TM4Ju0vSdiUK1Hy2gxsTSd/KSb52qvXdhc7mG0=;
-        b=RSnzM3cHvYHE3UTZ9p3pZ6e/UntlVl8AHG5/DqSuzSAOJw945T9sAvT3an+z0I7QGr
-         fB5wcnf4toeO9IGAtqKw4OqK8y61RC2PnjA6blbdexKAk2cVjQuZ59KxwcqMDHyWQ5qS
-         nXbvmO/hMkvHTJinb+4nle7UD+6pwkDt0hP6ZqRMze7Ur2kDFg1hk3vlMyg02XzZSY5T
-         6qvaX92Q/dkQLr/GHVE0uwzUfyGb0Op9M+JyHA/GkXG4vNJTE5BC7FdCwzIjWnhjYCl7
-         xrkNaCE9MouLUCM8Zs72X7cIOBxwzjuuzVs+jsiLw2PN+OLNY3/tUO2TnZF6pG8ru1tO
-         UAzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780382569; x=1780987369;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2N/m1TM4Ju0vSdiUK1Hy2gxsTSd/KSb52qvXdhc7mG0=;
-        b=L/97OYbFLgfzN9F7+mcs3qpCSd3jRSb1kNZcKFhK8ZTP9OrJE/8UokzTtIvkqD7QdU
-         nQnGY8+5lSY43yDVl1JUbrbXT7CgVdnge8l7TeIeOQEtq1+EzC7A2KY0L1Z06U+bPZfv
-         +bSygWe4w0dNzaXsxoSR5W8JaD8ZP609t2nLrF3ki4YOg5ctGXSl+J4DcL7cHT0nirpM
-         LfOmiHF46nMvipZNZOKWmhR/FZPaS3QszifAOwELJuVxSTf8KR8oC5e2MxiJiKPWfbxn
-         2pYtTA83OEBHSOGHXawQHTJ9pPwdCJOvTquEahPiSmVk7LLwAP5D6Fi3tvmSsFdAGhUw
-         oFxQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+oDlai3E1nQl8Om8tH+dBQLDfMqUr4/Wvff3WLpN9ONKKa4boGu8Pwj/n6DhXMBlHkbp5tqg0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzU9nslWiBWqV3RQIhO4biIEyh32tFc9uuffvZCLw8/mESXqxmw
-	7MUVS7HBivs4sYMFxF3gk6lI7LmjauKKVP4D0KOrPlpwQMTl/by8klp1CXVgOrG9tn4=
-X-Gm-Gg: Acq92OF8I0xEocjK+GyWKl2zFd3dtRlp3tcIbCi5YjKie4CWxrYJD9qN51Z6nRon2Rt
-	ehKvzVxqYsEcOVeUk4B20WbrxnbA4nSv+rsPdlAb7AhJn2wp/YE0gTE7WOHsBn8kaW1pmx8VHF5
-	VnSdLXTPHAIAeXZvC//ScWcjRW9pXgRPRzN+YsWgHYagW3p+sxZt2ukdk6AJZ3nrf/UJnR+A99j
-	AnDWizHigdVmhyzfm8g3AZ5eImE8Fqo/GmzwI0johcX33Jmd60/iiI976d5OV5g2SaYbj2pFmyQ
-	M0wWSEOTlpv7DminHTR9NsEdSEhhVP4z9Pi7jZHcbdvYhNXop8ScimyM0DdXzkzQjm/qcmOriyf
-	alhM7k55g6qfHNyXdIbAiSW34k8n4rnKi6jRJAj3GUJPBR3o3juasTeQaobPz1hMw8fUmTyL7Xa
-	bujyC8QHc/p2s9qe3ZFS00ShlukBICWMokBuTtWE7drJL8pcaAilqtaAz5ONJQpKGGRQpB5B8ZI
-	t2i
-X-Received: by 2002:a05:600c:a55:b0:48f:e518:d110 with SMTP id 5b1f17b1804b1-490b0717e7dmr51100485e9.32.1780382566124;
-        Mon, 01 Jun 2026 23:42:46 -0700 (PDT)
-Received: from u94a (218-164-49-131.dynamic-ip.hinet.net. [218.164.49.131])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fdf0asm121897245ad.26.2026.06.01.23.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 23:42:45 -0700 (PDT)
-Date: Tue, 2 Jun 2026 14:42:35 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: stable@vger.kernel.org, Paul Chaignon <paul.chaignon@gmail.com>, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
-	kpsingh@kernel.org, haoluo@google.com, jolsa@kernel.org, menglong8.dong@gmail.com, 
-	tamird@kernel.org, eddyz87@gmail.com
-Subject: Re: [RFC PATCH 6.1.y 0/2] bpf: backport scalar not-equal tracking
- fixes
-Message-ID: <ah56iBM2P_9hF3_L@u94a>
-References: <20260601180400.1381736-1-jt26wzz@gmail.com>
- <ah5pf25fhVH9WuU-@u94a>
+	d=gibson.dropbear.id.au; s=202602; t=1780382662;
+	bh=FNKXtTaJGTxhCOEiv4Zix5ECFGGeYyG8sItBjPmcfAs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h26xc12xfAXU7f+HlOxRZKFUA7bRgvbk0Xb31mCNopsIbDK/3/sBf/BhcDuiRJiFT
+	 GrBAcID7WnUpu29C+kx8ZEYBZV7MSV90tfHI2vI/o6ScjAAseRDN+55iuV+TTs/DpX
+	 SU01wnNL2zsyHstMY7/apeXpHyxFAoxrLSRJ1d0wY+OIIVcc39Fub3K3qOWkF8kC4u
+	 cHKZVy020gR+N3kU9xjsDzk3YZ3GK7zHFHa6EUl1s279niAG7fgeXeFEFArzsECGSq
+	 8G3N7E2/Ug8Z+kbHaAaSuOrbp1dIzp4BKsVtWh7LsEEgFwcHn+Hc2GyQg2V6FDysZq
+	 EZLdMqOMvdC8w==
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+	id 4gV1X66J3zz4wLK; Tue, 02 Jun 2026 16:44:22 +1000 (AEST)
+Date: Tue, 2 Jun 2026 16:44:19 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Stefano Brivio <sbrivio@redhat.com>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org,
+	yuhuang@redhat.com, justin.iurman@gmail.com, horms@kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
+	Chris Adams <linux@cmadams.net>,
+	Beniamino Galvani <bgalvani@redhat.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Andrew Lunn <andrew@lunn.ch>, ihuguet@redhat.com,
+	regressions@lists.linux.dev
+Subject: IPv6 address insertion order (was Re: [PATCH net v2] Revert "ipv6:
+ preserve insertion order for same-scope addresses")
+Message-ID: <ah57wxGjL7JBORR1@zatzit>
+References: <20260529112357.5079-1-fmancera@suse.de>
+ <20260529134045.56330243@elisabeth>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SYmMoP7Mi2VNEMht"
 Content-Disposition: inline
-In-Reply-To: <ah5pf25fhVH9WuU-@u94a>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+In-Reply-To: <20260529134045.56330243@elisabeth>
+X-Spamd-Result: default: False [-1.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gibson.dropbear.id.au:s=202602];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294045-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[dropbear.id.au];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-294046-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gibson.dropbear.id.au:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shung-hsi.yu@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@gibson.dropbear.id.au,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[suse.de,vger.kernel.org,redhat.com,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,leemhuis.info,lunn.ch,lists.linux.dev];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:dkim]
-X-Rspamd-Queue-Id: 4386162925A
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 3F503629277
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jun 02, 2026 at 01:47:01PM +0800, Shung-Hsi Yu wrote:
-...
-> On Tue, Jun 02, 2026 at 02:03:58AM +0800, Zhenzhong Wu wrote:
-> > Hi BPF maintainers,
-> > 
-> > This RFC backports two BPF verifier scalar range-tracking fixes to 6.1.y.
-> > The series is intended to fix a verifier state-pruning issue where an
-> > impossible scalar path can be kept while the real success path is pruned.
-> > 
-> > This is a verifier scalar range-tracking issue, not a helper-specific
-> > issue.
-> > The visible failure is that the verifier can prune the real success
-> > continuation, which should not be skipped, and keep only an impossible one.
-> ...
-> 
-> This sounds somewhat similar to the issue fixed in "backport of iterator
-> and callback handling fixes" for stable 6.6[1] by @Eduard. Could you try
-> to test on the latest stable 6.6.y as well at see if you can reproduce
-> the issue there?
-...
 
-My mistake, the reproducer you had doesn't use iterator or callback, so
-probably not fixed in stable 6.6. I'll take a better look at this later
-this week.
+--SYmMoP7Mi2VNEMht
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 1: https://lore.kernel.org/stable/20240125001554.25287-1-eddyz87@gmail.com/
-> 2: https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+I get the impression there's a rough consensus that the best we can do
+now is revert this change (already done), and make a new patch which
+changes the insertion order to the "correct" one conditional on a new
+flag.
+
+Stefano has enough other fires to fight, so I'm taking a look at
+implementing that.  Some initial thoughts, that I'm soliciting
+feedback on:
+
+1) I'm assuming the idea here is to add the new flag to nlmsg_flags in
+   nlmsghdr
+
+ifa_flags in ifaddrmsg would be the other candidate, but it looks like
+it's encoding properties of the address itself, not about the action
+of inserting it.  Plus all its bits are allocated, anyway.
+
+2) Could we re-use NLM_F_APPEND?
+
+The short description of this existing flag in linux/uapi/netlink.h is
+"Add to end of list" which sounds like the right thing.  Looking
+closer, however, it seems like what is' used for so far is things
+where the entity added with the NEW<whatever> operation is itself a
+list, and NLM_F_APPEND causes it to be added to rather than replaced.
+It's not used for addresses at present, AFAICT the list of addresses
+is a semantic level above the address entity itself.
+
+So maybe re-using it for the thing I tentatively called
+NLM_F_INSERT_LAST would be confusing?
+
+On the other hand, it's not used for addresses at the moment, so
+AFAICT there's nothing actually preventing us reusing it for this
+purpose. That would save a bit - we only have 2 general and 4 NEW
+specific bits left, by the looks of it.
+
+3) What other things might need changing to take advantage of the
+   kernel change
+
+My innitial testing suggests that unknown nlmsg_flags bits are
+currently ignored by the kernel.  That means that tools for which the
+new behviour is desirable, but not essential may be able to avoid
+probing - they can set the bit and hope.  I think that includes
+passt/pasta and also iproute's save/restore functionality.
+
+That said, things which might want updating:
+ - iproute2 to use this for save/restore
+ - netlink(7) man page to detail the new flag / new flag semantics
+ - passt/pasta
+ - network-manager, here we require the exact behaviour be maintained,
+   so it would have to attempt the new flag, then apply the existing
+   workaround (reversing the order itself) if that fails.  Maybe more
+   trouble that it's worth?
+
+Any others people can think of?
+
+--=20
+David Gibson (he or they)	| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
+				| around.
+http://www.ozlabs.org/~dgibson
+
+--SYmMoP7Mi2VNEMht
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmoee7UACgkQzQJF27ox
+2GeRIw//Tra3A/IZQ3+OWYtggCStJow1oPkMgg2ONZV3KgdkgqQBU8QinGYBNetv
+IQSLDQ9XHcqjYKuZ71ofnwxSLMMBSsLcvlNzOjpwPSfVbV3dwv1mEEV2dDG8WHPi
+eNvShHdJDlu1axfO5xhxaKD93zotfTUebAi8tKZedzLnsnyob3z9SxrVFswcgN78
+FQy5h5Bc4CsJvsODNTExXbbY4ofpl8rshoO6L9r+EgVtJrjtgnL2KD/Vm0fAUupF
+4KWfoLqc3w9RlOogZUrsWooglilPFGbl/yWLWYFvgIrcLVuv7Kr9D0LTMO8YCcr7
+Adu9/7qDZbavhrtKClpmUEHAAkqK+IhoY1FGXi79A3bsv9gCImi1xhNLzO9A9cTk
+EOdoE52PDKQuL6m57FuYpKnTM901zF/tdPgKKCxXuQykWruMTU8v4KhSGNiVLCS5
+waFQIODHUbDHhFasLZ5B42nn/gdp0IyDj3cBc3k9cpIKY9nm91ZCotwywMeoz/go
+opbdXwGcXxgpLmRkBWosVTOvWo1PfIyrAGo8co7NatVs2HoktbuCQAYNzhr0YAkW
+yW9xvTlSadUBfR0m5ef2PVQAlQKTA8x/fxO+zfu75C1kIgYHz4Ex9H7wj+ftDX2G
+zUb+tlxginRg7aTdQ0LoHVH7K9Pk4h0sKbCPVt5hX70gJZ96/Lc=
+=rYTu
+-----END PGP SIGNATURE-----
+
+--SYmMoP7Mi2VNEMht--
 
