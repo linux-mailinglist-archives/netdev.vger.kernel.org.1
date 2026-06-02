@@ -1,199 +1,205 @@
-Return-Path: <netdev+bounces-294194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H1z1Cj7LHmrLVAAAu9opvQ
-	(envelope-from <netdev+bounces-294194-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:23:26 +0200
+	id CSKPDtrLHmrtVAAAu9opvQ
+	(envelope-from <netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:26:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92AE762DFB3
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:23:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE5062E03B
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:26:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=ZubpUS2B;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294194-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294194-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=dad6FS5l;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294195-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF3863032764
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 12:21:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 02E7D302E310
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 12:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2B73DA5AD;
-	Tue,  2 Jun 2026 12:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EC03DC4B8;
+	Tue,  2 Jun 2026 12:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03613D891C;
-	Tue,  2 Jun 2026 12:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B82F3DA7C3
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 12:23:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780402893; cv=none; b=KEIEYs/KDyZ+834nTByKRbqTHTfNzGaomYMOEYRyEF+xfOBo3l+PVAbmlhyCNg+zNopDCgS+y0HbY+lbdsdaK1n8yedgh+z/PoREwqP99G8UoxOeCUPXXNv0wFdOvom4rlaog48ZZ/AY18X5rOreMKP0T4WVZAgQfkkFXQaTbmg=
+	t=1780403011; cv=none; b=JasNJnZj9JhwiT3zHNAleU5SuzlIrvpsW4ZsbcdELGP0zp2eUBA924E4M2ztOE/jVOmVtO6JZFGc7p7BBdS9NeSXhq1fgEBdno50iRqhwzFcz8JyuIFWcdfsRpACvKhhwkO/ju6AuPfBVWWxRReP0YcqGYLIj+jUDZGHtUhhCt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780402893; c=relaxed/simple;
-	bh=KSIVPzGB/KOFzsRmY+QOMoza4M9dHb1Fwl+9iTGxg9U=;
+	s=arc-20240116; t=1780403011; c=relaxed/simple;
+	bh=Tww/NsYYipQmKbfKB+KBD/CQ8mSh2rAUi3urIDUefWA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IdBEBz2ftBrrZMuFOHoF0j2XBVhvvO5yVDCPvBgWCF5Y14eEMy9mMSIDmmc1zv+vQIUuOrruIeSyeif3f4c6Whxzrc6BA1t3yIV1GsFor/NgmbZ8mYaNFUR9y0OGCnJ4N8YGBV8kUg611vNK3V5wPBXtm3E+42W/aU1zPKm32+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZubpUS2B; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 48B6A4E42DCC;
-	Tue,  2 Jun 2026 12:21:30 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 17DED603BC;
-	Tue,  2 Jun 2026 12:21:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 14A9A108883E7;
-	Tue,  2 Jun 2026 14:21:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780402889; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=JmmUNE8EvUgOeKezAWA5DAJi307Hu7PDjg8cEuhbAUc=;
-	b=ZubpUS2B57BJ1nm8s6L/YQwAmjph1Gm6zY+1RAqDzRNEwpQvWCt9QyP1JzBrUThjLWqc7c
-	mc2dLxSWH/zIVEgrUorDqYF3sX2LULyBMWYonCj9M/rMOW14tk4AMZP9SNzxbRsaaLW3zk
-	rinU5dQVS0/csDtJnZeSvPTY/a3GhpYJnOddc2y1OOZrNfIt2R+DAkxvZMqJgZlwd+/LHi
-	rrvEQyuCxOGCElZKoPJ34IKp6mtKYrCgDMXjaCmyoa//921nCOAWMoVMgz28tXmV93SC43
-	TknnPNaogZdii201900AlXQqHx+rYP4aLXgIW5wMO3nyKap+id4s45v/q9O8+Q==
-Message-ID: <aba1f7f6-612b-4c0f-99fd-4a5f0ee0b221@bootlin.com>
-Date: Tue, 2 Jun 2026 14:21:26 +0200
+	 In-Reply-To:Content-Type; b=RKTXRIfAlCbCCl09Q85M30dkleG580f/2/scu2lZ5PEhPLARzzrTwQAfKq53ixhQ52HIr0nZ3CEGa4JY6z8af0sElIzdByoSmPU8phqD1gbTg91SdF1jpckZGqK3tN0Z9aUnaRT/IV93SS5ZIo8D3B0BP424S30UxXtE8pB7jbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dad6FS5l; arc=none smtp.client-ip=91.218.175.177
+Message-ID: <319850b8-1374-44db-93a6-1203853de498@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780403006;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ultwj2JKNumJYk+h9t8ZZ9dhH3lq4SDUcmsjPUw+W/I=;
+	b=dad6FS5lDuUnimB7j5Q2t7unzBuaA+p8o/uRdWB+86Wyo502UMbvFYT7lcLKX+H+5sHLz2
+	I+iSqPCeJOKfSlBkFQZUCo5IxHJ5N/LFqfgLO18tHcDrWJbJH/VTMUXGTaaftSu2P8bnsC
+	6DL/v8B3+x7KIfwZuMes3yT781Olyzw=
+Date: Tue, 2 Jun 2026 20:23:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/9] net: dsa: microchip: implement
- .support_eee() only if needed
-To: Paolo Abeni <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260526-clean-ksz-3rd-v1-0-5b63e732149a@bootlin.com>
- <20260526-clean-ksz-3rd-v1-5-5b63e732149a@bootlin.com>
- <aa312024-16ae-4984-98bb-d530abb71207@redhat.com>
-Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <aa312024-16ae-4984-98bb-d530abb71207@redhat.com>
+Subject: Re: [PATCH net-next] rtnetlink: use dev_isalive() in rtnl_getlink()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20260602091319.1753654-1-edumazet@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260602091319.1753654-1-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-294195-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux@armlinux.org.uk,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:tristram.ha@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-294194-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:from_mime,bootlin.com:dkim]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 92AE762DFB3
-
-Hi Paolo,
-
-On 6/1/26 10:55 AM, Paolo Abeni wrote:
-> On 5/26/26 11:47 AM, Bastien Curutchet (Schneider Electric) wrote:
->> diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
->> index a39541d29ad5..e0b3724a7558 100644
->> --- a/drivers/net/dsa/microchip/ksz9477.c
->> +++ b/drivers/net/dsa/microchip/ksz9477.c
->> @@ -1909,6 +1909,54 @@ void ksz9477_phylink_mac_link_up(struct phylink_config *config,
->>   	ksz9477_duplex_flowctrl(dev, port, duplex, tx_pause, rx_pause);
->>   }
->>   
->> +/**
->> + * ksz9477_support_eee - Determine Energy Efficient Ethernet (EEE) support for a
->> + *                       port
->> + * @ds: Pointer to the DSA switch structure
->> + * @port: Port number to check
->> + *
->> + * This function also documents devices where EEE was initially advertised but
->> + * later withdrawn due to reliability issues, as described in official errata
->> + * documents. These devices are explicitly listed to record known limitations,
->> + * even if there is no technical necessity for runtime checks.
->> + *
->> + * Returns: true if the internal PHY on the given port supports fully
->> + * operational EEE, false otherwise.
->> + */
->> +static bool ksz9477_support_eee(struct dsa_switch *ds, int port)
->> +{
->> +	struct ksz_device *dev = ds->priv;
->> +
->> +	if (!dev->info->internal_phy[port])
->> +		return false;
->> +
->> +	switch (dev->chip_id) {
->> +	case KSZ8563_CHIP_ID:
->> +	case KSZ9563_CHIP_ID:
->> +	case KSZ9893_CHIP_ID:
->> +		return true;
->> +	default:
->> +		/* KSZ8567R Errata DS80000752C Module 4 */
->> +		/* KSZ9477S Errata DS80000754A Module 4 */
->> +		/* KSZ9567S Errata DS80000756A Module 4 */
->> +		/* KSZ9896C Errata DS80000757A Module 3 */
->> +		/* KSZ9897R Errata DS80000758C Module 4 */
-> 
-> Sashiko noted that errata:
-> 
-> 		/* KSZ879x/KSZ877x/KSZ876x Errata DS80000687C Module 2 */
-> 
-> has been lost above.
-
-Yes that was more or less intended because KSZ879x/KSZ877x/KSZ876x don't 
-belong to the KSZ9477 family. I haven't found a relevant place to move 
-this comment as .support_eee() is removed from ksz8.c, maybe I should 
-have mentioned it in the commit log.
-
-> 
->> diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
->> index f8f220242f7a..4cbbcf7993c9 100644
->> --- a/drivers/net/dsa/microchip/lan937x_main.c
->> +++ b/drivers/net/dsa/microchip/lan937x_main.c
->> @@ -915,7 +915,6 @@ const struct dsa_switch_ops lan937x_switch_ops = {
->>   	.port_txtstamp		= ksz_port_txtstamp,
->>   	.port_rxtstamp		= ksz_port_rxtstamp,
->>   	.port_setup_tc		= ksz_setup_tc,
->> -	.support_eee		= ksz_support_eee,
->>   	.set_mac_eee		= ksz_set_mac_eee,
-> 
-> Sashiko noted that `set_mac_eee` usage is gated by `support_eee` presence,
-> you may want to remove even the set callback.
-> 
-
-True, will do.
+X-Rspamd-Queue-Id: 9BE5062E03B
 
 
+On 6/2/26 5:13 PM, Eric Dumazet wrote:
+> rtnl_getlink() uses an RCU lookup to get the netdevice pointer.
+>
+> When/If rtnl_lock() is used, we should check if the netdevice is not
+> being dismantled before potentially perform illegal actions.
+>
+> Move dev_isalive() out of net/core/net-sysfs.c and make it available
+> in include/linux/netdevice.h
+>
+> Return -ENODEV if rtnl_getlink() finds a device which is currently
+> being dismantled and RTNL is requested.
+>
+> Fixes: e896e5c0734b ("rtnetlink: do not acquire RTNL in rtnl_getlink() with RTEXT_FILTER_NAME_ONLY")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>   include/linux/netdevice.h | 6 ++++++
+>   net/core/net-sysfs.c      | 6 ------
+>   net/core/rtnetlink.c      | 5 +++++
+>   3 files changed, 11 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 74507c006490f180d2fac6594f6dcf2c86d53919..bfc847bc47fd957b58174dc4d2b82e2e8b461405 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -5660,6 +5660,12 @@ static inline const char *netdev_name(const struct net_device *dev)
+>   	return dev->name;
+>   }
+>   
+> +/* Caller holds RTNL, netdev->lock or RCU */
+> +static inline bool dev_isalive(const struct net_device *dev)
+> +{
+> +	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
+> +}
+> +
+>   static inline const char *netdev_reg_state(const struct net_device *dev)
+>   {
+>   	u8 reg_state = READ_ONCE(dev->reg_state);
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index 3318b5666e438fe5bab2bcfed2bb260c7b4d5a63..0e71c9ed41e81d85af33a4339f556a0c5d760243 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -37,12 +37,6 @@ static const char fmt_uint[] = "%u\n";
+>   static const char fmt_ulong[] = "%lu\n";
+>   static const char fmt_u64[] = "%llu\n";
+>   
+> -/* Caller holds RTNL, netdev->lock or RCU */
+> -static inline int dev_isalive(const struct net_device *dev)
+> -{
+> -	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
+> -}
+> -
+>   /* There is a possible ABBA deadlock between rtnl_lock and kernfs_node->active,
+>    * when unregistering a net device and accessing associated sysfs files. The
+>    * potential deadlock is as follow:
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index 652dd008955a90691403de9a54d8693d64ea7799..9e90d02b73c2909409e12adfcec3940b49dcbaa1 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -4265,6 +4265,10 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+>   retry:
+>   	if (need_rtnl) {
+>   		rtnl_lock();
+> +		if (!dev_isalive(dev)) {
+> +			err = -ENODEV;
+> +			goto unlock;
 
-Best regards,
-Bastien
+
+This does fix the macvlan UAF, thanks.
+
+But 'nskb' is used uninitialized, so the kfree_skb(nskb) below frees an 
+uninitialized pointer.
+
++unlock:
+     if (need_rtnl)
+             rtnl_unlock();
+
+     if (err < 0) {
+             kfree_skb(nskb);   /* nskb is uninitialized when reached 
+via goto unlock */
+             ...
+     }
+
+
+> +		}
+>   		/* Synchronize the carrier state so we don't report a state
+>   		 * that we're not actually going to honour immediately; if
+>   		 * the driver just did a carrier off->on transition, we can
+> @@ -4282,6 +4286,7 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+>   				       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
+>   				       0, NULL, 0, netnsid, GFP_KERNEL);
+>   
+> +unlock:
+>   	if (need_rtnl)
+>   		rtnl_unlock();
+>   
+
+
+
 
