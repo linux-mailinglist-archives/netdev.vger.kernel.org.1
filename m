@@ -1,157 +1,139 @@
-Return-Path: <netdev+bounces-294147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JmsAoC3HmrZJgAAu9opvQ
-	(envelope-from <netdev+bounces-294147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:59:12 +0200
+	id kC/BC5K4HmrZJgAAu9opvQ
+	(envelope-from <netdev+bounces-294152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 13:03:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F58B62D0D7
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:59:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D78062D1AB
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 13:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2863B305CBED
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:53:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5892E302EED3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 11:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1496B3D75A6;
-	Tue,  2 Jun 2026 10:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0348374183;
+	Tue,  2 Jun 2026 11:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="GUr7Lo48"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="jBrMwyDm"
 X-Original-To: netdev@vger.kernel.org
-Received: from ixit.cz (ixit.cz [185.100.197.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A2B3D75A9;
-	Tue,  2 Jun 2026 10:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08691303CAB;
+	Tue,  2 Jun 2026 11:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780397401; cv=none; b=g+EkBezQ+W9F1dMhRalQNDNR3c4fRRO8kaN/OW5CdZVHq8QYdkdRgs+b39n3fjpOpzTVTIihxDQ9L1fh8fEkCy0EPyKOohvukUCqXeI8Pkng3wnZNlsi3Xu8xMFSEOdaKYTcNmxEeWGl0/zXB0he9Z3tsYjHr9o2XyzTD6UAbWw=
+	t=1780398036; cv=none; b=YaPoQXyLHHo627YX68LwAzXZMbiZFJxiAfljRuvR/NYiAewCcQin4TLpRLoW8496rUY+DEAuPklHPoEy6+MbVGK3OSRzNIr5ppv+0kNrIKB5miHsOUaEJtCUmb+50iYM3bNM2bv74s1db1hnfez/GXd0M8Ku2d8a4ukUejJlqJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780397401; c=relaxed/simple;
-	bh=dIPo/PPTWgP/xcMdvKfP724UjXU7tvNT6NrVp3JLMRo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=agulMg23RDNRRbaiO+1C7+RGariyYwxoZ1pwk4oGF2GnE2BDS+6bMOKVGtGJXccHU7fEpl0Hjpi3+MT4d7bRL7BTGo80zX3NRA7Ow4C6iA9McpEwe7yLCsVZ6c0UobCpGpAzD7kYxUS2zGh2e3h67dXnbW5uVMjgYt2xlJ5RxJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=GUr7Lo48; arc=none smtp.client-ip=185.100.197.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
-Received: from [172.20.10.2] (37-48-17-230.nat.epc.tmcz.cz [37.48.17.230])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 9DF5D5340427;
-	Tue, 02 Jun 2026 12:49:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1780397396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=E5axnphkJxMCIRsYfz9ckUswSI4tDS6oZrmntnedc08=;
-	b=GUr7Lo48p3uG9IYn/FubBzK2sIRTt6kfgabNAJlxNIRe32BBQww3kPmL1LJE1WsO+4vosK
-	Ii35ubiJRu3b6lgMMblwVQONp9xqzHP6HzrcX0L8k7rloNZyPSwLLVVaP8R+hHKfIDDug4
-	0DkC24sFec1ApuDm3fBsO5N1mSOhh/M=
-Message-ID: <48d99218-2487-4502-acc5-95a5c6621fa7@ixit.cz>
-Date: Tue, 2 Jun 2026 12:49:55 +0200
+	s=arc-20240116; t=1780398036; c=relaxed/simple;
+	bh=bAmLVjrvQ9lb6U8CDeiNeJwg8fFD50jdw68pPGb5KO0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DGbOJrii7k3a5CHAGlcZGHu1ftWWXcKb83WyKOialS1AYU7Fn7Vxy2NySPc+5COt0jujhgxn2Ogwxp78gx45x7gRJR7ovXKTCVcCVl+u6HithuccbMRMQ0YGoeuPWN+hppM864ne3SyoXklsxzDZfwFW3Z8SLchmC27iFBtCils=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=jBrMwyDm; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 652AoCaqD2852325, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1780397412; bh=bAmLVjrvQ9lb6U8CDeiNeJwg8fFD50jdw68pPGb5KO0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=jBrMwyDmiwgj94cPecxui45usjVbaawVB4x9Oxa8toChGnbOzvfQxKFTUjfQVJAT9
+	 mkKM3tBBoULM4XoApmSqNzb40fg8OdOhMfl5XcwdskqXKAkbZrEYqAVIVrvfmrWKEF
+	 jFCWfOfG+M1R7bz0huC0MGqip+H2FkrX4ozdp2+cM0VdlfBYHV5oH+fE6H3qgzTC7d
+	 orWY/sKir+CnbhP2pH80NS1AX/7xOV0mr2kyOLdETqkxaKcwR8y8+GvN+HY/+bviGg
+	 8i+zyHXi6a6It8qxtYBce2VUiHPXZm+eZMUxWJn5TvaFWykofl7smD2N/rT8o1BTce
+	 L1bnxgLoRJMMA==
+Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 652AoCaqD2852325
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 2 Jun 2026 18:50:12 +0800
+Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
+ RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 2 Jun 2026 18:50:13 +0800
+Received: from RTKEXHMBS04.realtek.com.tw ([::1]) by
+ RTKEXHMBS04.realtek.com.tw ([fe80::552f:8b32:656c:c395%6]) with mapi id
+ 15.02.2562.017; Tue, 2 Jun 2026 18:50:13 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>, Ping-Ke Shih
+	<pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH] rtase: Avoid sleeping in get_stats64()
+Thread-Topic: [PATCH] rtase: Avoid sleeping in get_stats64()
+Thread-Index: AQHc8Y9Zk86yDw9UQUiLPdmdwKAAprYpKAUAgAHvlVA=
+Date: Tue, 2 Jun 2026 10:50:13 +0000
+Message-ID: <c3ca6a679d694890828ac9e7cc2d6305@realtek.com>
+References: <20260601062447.64027-1-justinlai0215@realtek.com>
+ <f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
+In-Reply-To: <f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] nfc: nci: fix use of uninitialized memory in
- CORE_INIT_RSP parsing
-To: Yun Zhou <yun.zhou@windriver.com>, horms@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: bongsu.jeon@samsung.com, oe-linux-nfc@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260527052625.3309581-1-yun.zhou@windriver.com>
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Autocrypt: addr=david@ixit.cz; keydata=
- xsFNBF5v1x4BEADS3EddwsNsvVAI1XF8uQKbdYPY/GhjaSLziwVnbwv5BGwqB1tfXoHnccoA
- 9kTgKAbiXG/CiZFhD6l4WCIskQDKzyQN3JhCUIxh16Xyw0lECI7iqoW9LmMoN1dNKcUmCO9g
- lZxQaOl+1bY/7ttd7DapLh9rmBXJ2lKiMEaIpUwb/Nw0d7Enp4Jy2TpkhPywIpUn8CoJCv3/
- 61qbvI9y5utB/UhfMAUXsaAgwEJyGPAqHlC0YZjaTwOu+YQUE3AFzhCbksq95CwDz4U4gdls
- dmv9tkATfu2OmzERZQ6vJTehK0Pu4l5KmCAzYg42I9Dy4E6b17x6NncKbcByQFOXMtG0qVUk
- F1yeeOQUHwu+8t3ZDMBUhCkRL/juuoqLmyDWKMc0hKNNeZ9BNXgB8fXkRLWEUfgDXsFyEkKp
- NxUy5bDRlivf6XfExnikk5kj9l2gGlNQwqROti/46bfbmlmc/a2GM4k8ZyalHNEAdwtXYSpP
- 8JJmlbQ7hNTLkc3HQLRsIocN5th/ur7pPMz1Beyp0gbE9GcOceqmdZQB80vJ01XDyCAihf6l
- AMnzwpXZsjqIqH9r7T7tM6tVEVbPSwPt4eZYXSoJijEBC/43TBbmxDX+5+3txRaSCRQrG9dY
- k3mMGM3xJLCps2KnaqMcgUnvb1KdTgEFUZQaItw7HyRd6RppewARAQABzSBEYXZpZCBIZWlk
- ZWxiZXJnIDxkYXZpZEBpeGl0LmN6PsLBlAQTAQgAPgIbAwULCQgHAgYVCgkICwIEFgIDAQIe
- AQIXgBYhBNd6Cc/u3Cu9U6cEdGACP8TTSSByBQJl+KksBQkPDaAOAAoJEGACP8TTSSBy6IAQ
- AMqFqVi9LLxCEcUWBn82ssQGiVSDniKpFE/tp7lMXflwhjD5xoftoWOmMYkiWE86t5x5Fsp7
- afALx7SEDz599F1K1bLnaga+budu55JEAYGudD2WwpLJ0kPzRhqBwGFIx8k6F+goZJzxPDsf
- loAtXQE62UvEKa4KRRcZmF0GGoRsgA7vE7OnV8LMeocdD3eb2CuXLzauHAfdvqF50IfPH/sE
- jbzROiAZU+WgrwU946aOzrN8jVU+Cy8XAccGAZxsmPBfhTY5f2VN1IqvfaRdkKKlmWVJWGw+
- ycFpAEJKFRdfcc5PSjUJcALn5C+hxzL2hBpIZJdfdfStn+DWHXNgBeRDiZj1x6vvyaC43RAb
- VXvRzOQfG4EaMVMIOvBjBA/FtIpb1gtXA42ewhvPnd5RVCqD9YYUxsVpJ9d+XsAy7uib3BsV
- W2idAEsPtoqhVhq8bCUs/G4sC2DdyGZK8MRFDJqciJSUbqA+5z1ZCuE8UOPDpZKiW6H/OuOM
- zDcjh0lOzr4p+/1TSg1PbUh7fQ+nbMuiT044sC1lLtJK0+Zyn0GwhR82oNM4fldNsaHRW42w
- QGD35+eNo5Pvb3We5XRMlBdhFnj7Siggp4J8/PJ6MJvRyC+RIJPGtbdMB2/RxWunFLn87e5w
- UgwR9jPMHAstuTR1yR23c4SIYoQ2fzkrRzuazsFNBF5v1x4BEADnlrbta2WL87BlEOotZUh0
- zXANMrNV15WxexsirLetfqbs0AGCaTRNj+uWlTUDJRXOVIwzmF76Us3I2796+Od2ocNpLheZ
- 7EIkq8budtLVd1c06qJ+GMraz51zfgSIazVInNMPk9T6fz0lembji5yEcNPNNBA4sHiFmXfo
- IhepHFOBApjS0CiOPqowYxSTPe/DLcJ/LDwWpTi37doKPhBwlHev1BwVCbrLEIFjY0MLM0aT
- jiBBlyLJaTqvE48gblonu2SGaNmGtkC3VoQUQFcVYDXtlL9CVbNo7BAt5gwPcNqEqkUL60Jh
- FtvVSKyQh6gn7HHsyMtgltjZ3NKjv8S3yQd7zxvCn79tCKwoeNevsvoMq/bzlKxc9QiKaRPO
- aDj3FtW7R/3XoKJBY8Hckyug6uc2qYWRpnuXc0as6S0wfek6gauExUttBKrtSbPPHiuTeNHt
- NsT4+dyvaJtQKPBTbPHkXpTO8e1+YAg7kPj3aKFToE/dakIh8iqUHLNxywDAamRVn8Ha67WO
- AEAA3iklJ49QQk2ZyS1RJ2Ul28ePFDZ3QSr9LoJiOBZv9XkbhXS164iRB7rBZk6ZRVgCz3V6
- hhhjkipYvpJ/fpjXNsVL8jvel1mYNf0a46T4QQDQx4KQj0zXJbC2fFikAtu1AULktF4iEXEI
- rSjFoqhd4euZ+QARAQABwsF8BBgBCAAmAhsMFiEE13oJz+7cK71TpwR0YAI/xNNJIHIFAmX4
- qVAFCQ8NoDIACgkQYAI/xNNJIHKN4A/+Ine2Ii7JiuGITjJkcV6pgKlfwYdEs4eFD1pTRb/K
- 5dprUz3QSLP41u9OJQ23HnESMvn31UENk9ffebNoW7WxZ/8cTQY0JY/cgTTrlNXtyAlGbR3/
- 3Q/VBJptf04Er7I6TaKAmqWzdVeKTw33LljpkHp02vrbOdylb4JQG/SginLV9purGAFptYRO
- 8JNa2J4FAQtQTrfOUjulOWMxy7XRkqK3QqLcPW79/CFn7q1yxamPkpoXUJq9/fVjlhk7P+da
- NYQpe4WQQnktBY29SkFnvfIAwqIVU8ix5Oz8rghuCcAdR7lEJ7hCX9bR0EE05FOXdZy5FWL9
- GHvFa/Opkq3DPmFl/0nt4HJqq1Nwrr+WR6d0414oo1n2hPEllge/6iD3ZYwptTvOFKEw/v0A
- yqOoYSiKX9F7Ko7QO+VnYeVDsDDevKic2T/4GDpcSVd9ipiKxCQvUAzKUH7RUpqDTa+rYurm
- zRKcgRumz2Tc1ouHj6qINlzEe3a5ldctIn/dvR1l2Ko7GBTG+VGp9U5NOAEkGpxHG9yg6eeY
- fFYnMme51H/HKiyUlFiE3yd5LSmv8Dhbf+vsI4x6BOOOq4Iyop/Exavj1owGxW0hpdUGcCl1
- ovlwVPO/6l/XLAmSGwdnGqok5eGZQzSst0tj9RC9O0dXO1TZocOsf0tJ8dR2egX4kxM=
-In-Reply-To: <20260527052625.3309581-1-yun.zhou@windriver.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9F58B62D0D7
+X-Rspamd-Queue-Id: 8D78062D1AB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294147-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ixit.cz:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294152-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[realtek.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ixit.cz:mid,ixit.cz:dkim,ixit.cz:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,realtek.com:mid,realtek.com:dkim,realtek.com:email]
 X-Rspamd-Action: no action
 
-On Wed, 27 May 2026 13:26:25 +0800, Yun Zhou wrote:
- > nfc: nci: fix use of uninitialized memory in CORE_INIT_RSP parsing
-
-Applied, thanks!
-
-[1/1] nfc: nci: fix use of uninitialized memory in CORE_INIT_RSP parsing
-       commit: 89c17cf203013dbe3952382aba77bac5962ce754
-
-Best regards,
--- 
-David Heidelberg <david@ixit.cz>
+PiBGcm9tOiBKdXN0aW4gTGFpIDxqdXN0aW5sYWkwMjE1QHJlYWx0ZWsuY29tPg0KPiBEYXRlOiBN
+b24sIDEgSnVuIDIwMjYgMTQ6MjQ6NDcgKzA4MDANCj4gDQo+ID4gVGhlIC5uZG9fZ2V0X3N0YXRz
+NjQgY2FsbGJhY2sgbXVzdCBub3Qgc2xlZXAgYmVjYXVzZSBpdCBjYW4gYmUgY2FsbGVkDQo+ID4g
+d2hlbiByZWFkaW5nIC9wcm9jL25ldC9kZXYuDQo+ID4NCj4gPiBydGFzZV9nZXRfc3RhdHM2NCgp
+IGNhbGxzIHJ0YXNlX2R1bXBfdGFsbHlfY291bnRlcigpLCB3aGljaCBwb2xscyB0aGUNCj4gPiB0
+YWxseSBjb3VudGVyIGR1bXAgYml0IHdpdGggcmVhZF9wb2xsX3RpbWVvdXQoKS4gVGhpcyBtYXkg
+c2xlZXAgd2hpbGUNCj4gPiB3YWl0aW5nIGZvciB0aGUgaGFyZHdhcmUgY291bnRlciBkdW1wIHRv
+IGNvbXBsZXRlLg0KPiA+DQo+ID4gVXNlIHJlYWRfcG9sbF90aW1lb3V0X2F0b21pYygpIGluc3Rl
+YWQgdG8gYXZvaWQgc2xlZXBpbmcgaW4gdGhlDQo+ID4gZ2V0X3N0YXRzNjQoKSBwYXRoLg0KPiA+
+DQo+ID4gU2lnbmVkLW9mZi1ieTogSnVzdGluIExhaSA8anVzdGlubGFpMDIxNUByZWFsdGVrLmNv
+bT4NCj4gDQo+IExvb2tzIGxlZ2l0Lg0KPiANCj4gT25lIHF1ZXN0aW9uOiBmb3IgaG93IGxvbmcg
+Y2FuIHRoaXMgcG9sbCBmb3IgaW4gcmVhbCBsaWZlIHNjZW5hcmlvcz8gVXAgdG8gfjEgbXMNCj4g
+aXMgb2theS1pc2ggZm9yIGF0b21pYywgYnV0IGlmIGxvbmdlciwgdGhlbiB5b3UnZCBiZXR0ZXIg
+dG8gc3BsaXQgaXQgaW50byBzaG9ydGVyDQo+IHBvbGxzIGFuZCByZXNjaGVkdWxlKCkgdGltZSB0
+byB0aW1lLg0KPiANCj4gVGhhbmtzLA0KPiBPbGVrDQoNCkhpIE9sZWssDQogDQpUaGFua3MgZm9y
+IHRoZSByZXZpZXcuDQogDQpPbiBvdXIgdGVzdCBwbGF0Zm9ybSwgdGhlIHRhbGx5IGR1bXAgb3Bl
+cmF0aW9uIHR5cGljYWxseQ0KY29tcGxldGVzIGluIGFib3V0IDI1IHVzLiBUaGUgMjUwIHVzIHRp
+bWVvdXQgaXMgYQ0KY29uc2VydmF0aXZlIHZhbHVlLg0KIA0KSSdsbCBhZGQgdGhlIEZpeGVzIHRh
+ZyBhbmQgcmVzZW5kIHRoaXMgcGF0Y2ggdGFyZ2V0aW5nDQp0aGUgbmV0IHRyZWUuDQogDQpUaGFu
+a3MsDQpKdXN0aW4NCg==
 
