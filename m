@@ -1,131 +1,132 @@
-Return-Path: <netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id r+O5AUdFH2q9jQAAu9opvQ
-	(envelope-from <netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:04:07 +0200
+	id 6B51MF1HH2oljgAAu9opvQ
+	(envelope-from <netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:13:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF40631FCC
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:04:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9139632079
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:13:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=URBRQO8E;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="nS+wTp/j";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294413-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 62BCE301412E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 21:04:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EA67530080A7
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 21:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EFF73537FE;
-	Tue,  2 Jun 2026 21:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152B8330D43;
+	Tue,  2 Jun 2026 21:11:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73154221DB6;
-	Tue,  2 Jun 2026 21:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204652F6931
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 21:11:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780434242; cv=none; b=IQQYCOnKCUXcAtPHqyiHbXOO6Xpt7FzuZQH0eoYUm73uCepLvjjSzKqp3rHjsE4NyOkM/m/uPJandfHt80cuWKrpqsr8TEmjCKzgpBhcdqXu8HTJIh03P0ONcMBFRkwKbem9qUdPfxcrK2sL5iKwz4HA8mz0IbNmRDFozKtcoM0=
+	t=1780434664; cv=none; b=fjVz31Nx1VJTnku6g1Fs+FVzRQ+nuR0l1/BOBRp+sbtUZxYqNDly2jdsH39SgrGF6vcFvMXyPk2UEAm6eEkuuhIPZaPIfanYS21I7bNEBkFYAZwv3tipZAw2025bumipm8bDlduGRXfFDlZWZYpUxASJNR94u5ghJ3bzqLa6BAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780434242; c=relaxed/simple;
-	bh=xcBwUqenQnYMfSBWCxuZu0/kzGfDaLbnZtYKX98y8zk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZA8UVlY/E8lTkdGxRJCpYK8mAAH+D5yAjUo4iiGtHtKn/wvHMLhLrZH6ELALsNjvMUxxELhZBreMj9NaSxuJdZKKHEL+OlReFSP2+qpBYkso/hyWwmafiIipcuctagUqKRSYF6T04c6sU69KhvityHcMN494L0OIISkGj3tvgmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URBRQO8E; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 544E51F00893;
-	Tue,  2 Jun 2026 21:04:00 +0000 (UTC)
+	s=arc-20240116; t=1780434664; c=relaxed/simple;
+	bh=207W1+rTsYC5kTUHb1twyIx3nnLOYKr3uJzMkZjmqEM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u1K9m6yHF/dkNXpSTPUDo/vmDPVuPC6aUlBxqIAno6umrT5tu7Xa3V9oVtaB1NCmvs0aqUbQvEEk7kN6Qops3IAOef9OoWbjsa/0Ok2y77LDG97gJaeI6xu4aprfn/exrhMyT0U0V2Gb4ZXkmiEzdpxkYy8Dvl+39MGWzdJi2a0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nS+wTp/j; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656231F00893;
+	Tue,  2 Jun 2026 21:11:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780434241;
-	bh=szrWBKhghiac2i2mueK/YjJu1FK82B5hSpdAwSlajBM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=URBRQO8EBqqlHB/KHgDkXH5tmEouzPHMlK1s0wDdHL+bZ3gBuynAz+fso8Al8Jrj/
-	 9JQDn+55i4u1Z3eVPrHvnULBNeLDirvQ25E3iDMU+y6qmdfmrr8C8T+UcDLIr+mCO+
-	 0FEni1K10C+s+N+NJYUKd9Kxqk6Sp5Lvgkfwf/qPbSA+Jp9Kw9qancwOhtlaamVQDz
-	 5ldsm636C9d6gkqy4Dnp/z7VGOIK09alUM8om2KAkTVIbDQTL9pwIi5SuexN4HFTki
-	 s96CuKvrux8DwF2d4l9PQDYp/KYZM3zd1Aatv3mJziyjCBU9o2dg6w02HwSlkI5Ckx
-	 a4nUS34yeqC0g==
-Date: Tue, 2 Jun 2026 14:03:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Dust Li
- <dust.li@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia
- Zhang <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
- Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>, Wen Gu
- <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, oliver.yang@linux.alibaba.com, pasic@linux.ibm.com
-Subject: Re: [PATCH net-next 0/2] net/smc: transition to RDMA core CQ
- pooling
-Message-ID: <20260602140359.3b97d180@kernel.org>
-In-Reply-To: <20260528084819.6059-1-alibuda@linux.alibaba.com>
-References: <20260528084819.6059-1-alibuda@linux.alibaba.com>
+	s=k20260515; t=1780434662;
+	bh=1S5Qy5LiZAtTQ/GWIprciFLm9LRuLR6crDrT+UJfqXc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=nS+wTp/jpTCDQM4/x0oD2VrwNqdQEBd8LcwlOon1f9pRM41BxeWojNcYo8CXjjg5W
+	 g6FQzidFb3SZv3/lo2zxdLNHhoFrrgvGRe0Dt7qR9NuwyElUYQ9E0l2eLpq8b2R7nK
+	 QtSqYvTFxupLGxG3WtyAHT7+BxhkjH9liEDiqGP/C5toC5B8cT2w5Xv5xixZagNM50
+	 b3JQ0b8fnuNzGtJRGbXdhjtCrTEK3vO8jPW/e2e6ENd3Y1t3EOjM4RvNCCacEGgim9
+	 XLL4ZOpOxsoDguZwTwiF7skmBUsawFxgYH61wtWoiYdPFAwFKPcsyaiHzYaLE7cpHt
+	 SPaGhQcOtUi8A==
+Message-ID: <32c20500-8a76-419a-ab79-5ec68d2de6df@kernel.org>
+Date: Tue, 2 Jun 2026 15:11:01 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] iplink: add support for setting IPv4
+ devconf parameters
+Content-Language: en-US
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+References: <20260601143242.6729-1-fmancera@suse.de>
+ <f97592a2-6690-4511-a98c-dacdeedf6516@kernel.org>
+ <bc71f624-e4ce-47b7-9dae-13ad0db76ad1@suse.de>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <bc71f624-e4ce-47b7-9dae-13ad0db76ad1@suse.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294412-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294413-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:davem@davemloft.net,m:dust.li@linux.alibaba.com,m:edumazet@google.com,m:pabeni@redhat.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:horms@kernel.org,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:oliver.yang@linux.alibaba.com,m:pasic@linux.ibm.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:stephen@networkplumber.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:nicolas.dichtel@6wind.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BF40631FCC
+X-Rspamd-Queue-Id: B9139632079
 
-On Thu, 28 May 2026 16:48:17 +0800 D. Wythe wrote:
-> This series transitions SMC-R completion handling to RDMA core CQ pooling
-> via the ib_cqe API. The new completion model improves scalability by
-> allowing per-link completion processing across multiple cores and enables
-> DIM-based interrupt moderation.
+On 6/2/26 1:46 PM, Fernando Fernandez Mancera wrote:
+> On 6/2/26 9:36 PM, David Ahern wrote:
+>> On 6/1/26 8:32 AM, Fernando Fernandez Mancera wrote:
+>>> Currently, modifying IPv4 interface configuration parameters requires
+>>> interacting with sysctl (/proc/sys/net/ipv4/conf/*). While
+>>> ip-netconf exists for monitoring these values, there has been no native
+>>> way to set them directly through iproute2.
+>>>
+>>> This patch introduces the support for that via 'inet' at the 'ip link
+>>> set'. It uses IFLA_INET_CONF netlink attribute to set the parameter.
+>>>
+>>> Example to enable forwarding on an interface:
+>>>
+>>> ip link set dev enp8s0 inet forwarding on
+>>
+>> If an attribute can be set this way, then ip link show needs to show the
+>> values. What's the plan on that front?
+>>
 > 
-> As a side effect, the increased concurrency can amplify contention for TX
-> slots on the shared wait queue. Patch 2 addresses this by switching TX slot
-> allocation from non-exclusive wait_event() to prepare_to_wait_exclusive(),
-> which avoids thundering-herd wakeups under contention.
-> 
-> Patch 1 replaces the global per-device CQ and manual tasklet polling model
-> with RDMA core CQ pooling.
-> Patch 2 reduces TX slot contention by using exclusive wait queue entries
-> during allocation.
+> I could introduce it in a follow-up patch. I guess it makes sense to
+> introduce it for ip -d link show only, right? I am happy to work on it
+> anyway.
 
-Sashiko reports a couple of issues on patch 1:
-https://sashiko.dev/#/patchset/20260528084819.6059-2-alibuda@linux.alibaba.com
-Are these legit?
+yes, -d only.
 
-Either way - would be good to get some reviews here from (ohter) SMC
-maintainers.
+Will give Nicolas a chance to review.
 
