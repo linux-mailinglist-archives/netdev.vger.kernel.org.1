@@ -1,144 +1,207 @@
-Return-Path: <netdev+bounces-294179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id voH7BALKHmqNVAAAu9opvQ
-	(envelope-from <netdev+bounces-294179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:18:10 +0200
+	id psK4N0vKHmqUVAAAu9opvQ
+	(envelope-from <netdev+bounces-294180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:19:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 695C962DEDC
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:18:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB0062DEF8
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 14:19:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=oHaM3+dV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294179-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294179-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YUk2+jS1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294180-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294180-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 711243022DD9
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 12:14:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D3B830450B3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 12:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3A53D1CD1;
-	Tue,  2 Jun 2026 12:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15AA3DDDB6;
+	Tue,  2 Jun 2026 12:14:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA9930FF2A
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 12:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA8E3DCDB4;
+	Tue,  2 Jun 2026 12:14:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780402452; cv=none; b=Q8LNsF/8lDzVUAjzKDxf2zPqqerIVGj2gjubEPJLBbwRuLow/XAENt2CcoAw+cNMUlIYmrmmr+93ohuqZbAq41sKUlKRhIXUO4OGXB4JhUekGY3PpMu2mxXdAgNZ7PRipcx6j8YPCejcBPWSjnaTrKTRNQIiw7UwNJo6K+DXl/k=
+	t=1780402483; cv=none; b=S+1iTA0Hh/MUWo969xVcpalu7nbT+ge1S5FWzlWOIqxd7Vr7zjKX2rd6m9rWhbkSHq3dc3EF90AbyKkB4kka6WJD8w0geIwsHJCznU/LsJsm5l7U867QKfpuKaCr04jTAIvq+sKvK99gkMa6qbR657PauSdHMjjNipSCQcezqG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780402452; c=relaxed/simple;
-	bh=LOh/gzAWvvjVXnZ6FqflrWOLErMGSTAHhcWjVTXsKzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZkF/5kXqpT9l93F+rQDNQemr1UFK0gQ7Cja81izMpgYdYdvz3Kkyl/rMt6QNudRA8fX4w3Wxj3OH/cTFRR4Ip2VqA+nG7HnhT/M1w47orpFLZgjLh/w8r8Qpia4bgzSL7V7gf5OYPXd9NX1JEeftVWBW9I583rhQFAvnbqTFV1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oHaM3+dV; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=skChEZ5rNkBdSM26eWlE/MYi8w9c3PNgfltehp4DK2M=; b=oHaM3+dVqjKEtI28bCvH9v/+HS
-	1/OwY3rjTkkmR9bChAZAf89Qdqs/jBwG8/cU7Zh8KiyUQN+gJUvsILIuSCu2I9Fy4myNQD5uujOdc
-	uMvy0z+v9Z+BFg71otE7KDoeILdsh/Ay7lKs1vL/CAwMzsSdpviUIPNFEx2j8ncFluD4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wUO0O-005gN5-D3; Tue, 02 Jun 2026 14:14:00 +0200
-Date: Tue, 2 Jun 2026 14:14:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
-	daniel@makrotopia.org, mensi@mensi.ch
-Subject: Re: [PATCH net-next 3/8] net: mdio: realtek-rtl9300: harden
- otto_emdio_map_ports()
-Message-ID: <0cef9fd1-7686-4eb4-862d-ed4a3fd730f5@lunn.ch>
-References: <20260602052640.93083-1-markus.stockhausen@gmx.de>
- <20260602052640.93083-4-markus.stockhausen@gmx.de>
+	s=arc-20240116; t=1780402483; c=relaxed/simple;
+	bh=oc48MCDuP3aeYaXgHiH7JAddzOG7ZS+ciJx1cavWHk0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jW30uu3dlw2X0sMjDTkRKq17XSHrHapYtW7LMNVRXjwhpgCKDcxnxlU4I5wmOf4dD3b6/ZEWgdVJqcYAiYcBdcClTJadkcIGlbKpLJMrsT9F5BtBnhY9cSR++9LRWm8FJNKYD3Ffzy7t2Zn40tNEUO9MHBDOUweNPAO1w3eWqp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YUk2+jS1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DCF01F00893;
+	Tue,  2 Jun 2026 12:14:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780402482;
+	bh=TrVuRHQhI0OvyGX3Bx4M7qfCICvN1stKotonp9OY6eo=;
+	h=From:Subject:Date:To:Cc;
+	b=YUk2+jS1MVkUMCAfI6uHMJOx/CVxOIXt22dEO7FotCWFi038e0JTHVJnDz3x97An/
+	 UKuGUJp3NiYTtJ4lhO16RWYY7gcfpoEJGd3iHIJbqa6+TvI0WUF1SgZi+yLjV1FNol
+	 gAAPBWf0GE5HYcfEjhD5EQB8zhga3EnaT7GVHXbO/2/aSmoIpoHhJ+553k9mF7Vd85
+	 PPfondxVsXtoQX239f4R4aFFAn6jv2zehubuC8MXukOxPK3pkAjzbLpX4Pm+BHbjUh
+	 bderncYREvUdVOg++wg48h2IP5XQFhCFs3kcmyLXeKItzbNV6dwPOtXI7ypsXfxSOM
+	 aKCwAoVxbIAIg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net v2 00/11] mptcp: misc fixes for v7.1-rc7
+Date: Tue, 02 Jun 2026 22:14:07 +1000
+Message-Id: <20260602-net-mptcp-misc-fixes-7-1-rc7-v2-0-856831229976@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260602052640.93083-4-markus.stockhausen@gmx.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WOQQ6CMBBFr2Jm7Zi2FAquvIdhAWWEqhTSVqIh3
+ N1SD+DyT95/f1bw5Ax5OB9WcLQYbyYbgzgeQA+N7QlNFzMIJgqWZxwtBRznoGccjdd4M2/yqJC
+ j0wozWZZSV62QRQdRMTtKQDRcITah/h39q72TDrt4xwbjw+Q+6YmFJzjtFezP3sKRYZM3pFTFV
+ S7by4Ocpedpcj3U27Z9Af2D/YXgAAAA
+X-Change-ID: 20260531-net-mptcp-misc-fixes-7-1-rc7-34884c9b246d
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
+ Tao Cui <cuitao@kylinos.cn>, Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Gang Yan <yangang@kylinos.cn>, 
+ syzbot+ff020673c5e3d94d9478@syzkaller.appspotmail.com
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2790; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=oc48MCDuP3aeYaXgHiH7JAddzOG7ZS+ciJx1cavWHk0=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBqHsksy8owi15dOVO53RUbRprPAt8yXy9qAJg8P
+ 00ypTnDiAiJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCah7JLAAKCRD2t4JPQmmg
+ c0oUD/wPQdvjeYNrhR5oRrm5edTPqIOPk7KfkQbfIdnqQthouaRv699cv3tpC7gXl2XE275ScTx
+ ZwOJSva3J7ACsXXUbIINvO8UmzEFHWI8pYcih0T5dwU2kCzU1yNn+TCtSbdXsZH9XJ4Fwc8tmUq
+ OKN/SwuXO8KeLK+kOgY14xTV4EO4iO+JqYuKnMIfDy2SWmLZX3EIsAfR01iKY5sbUMCSL5vw6k5
+ siVsV65a4fjChoI7OS2wP/45KesU3x8VCfce1uccTWLkBq2yCvJuIgy2ymKlNPqwXNhYKg3AmwU
+ EI4zzQEtgSmhWpeSgO13hO12yy1cQRhVpQ1ZkOANvlwAptgLv6q9Tj3g0NBULma7TJyDnsyy7p5
+ KJhr9ekl/0CgQxZMuSwobH2zrYxz5tu4bcbHOfrO5XeCpai2VIraHEYVM9bH2ZpPPHGgwlbmtpq
+ 0vgb6w75/k/y3aq3Ye8DUI3DsoBrESAMUf0VnLy+E8BhYx1Cyzl2G284x1MCKQT4ThEiuBARF7K
+ YZGZQWSx05qUrs+CcZ2f3bOsJvArUOOjwpufr6Zm4mFeM3KWx17aNnKduunkMRLSvIpcAGvEK7W
+ mQx2UzY0X4R6CqHp8U5sCvHqcZ754gZbD6XAV5mV4PVWO29cA36TDL5S8NO2pfOsB0IUG3gpylO
+ OiJ0Cw8tm4mFUGg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294179-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:markus.stockhausen@gmx.de,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:mensi@mensi.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmx.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org,mensi.ch];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294180-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:matttbe@kernel.org,m:stable@vger.kernel.org,m:cuitao@kylinos.cn,m:shuah@kernel.org,m:willemdebruijn.kernel@gmail.com,m:yangang@kylinos.cn,m:syzbot+ff020673c5e3d94d9478@syzkaller.appspotmail.com,m:willemdebruijnkernel@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,kernel.org,kylinos.cn,gmail.com,syzkaller.appspotmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,ff020673c5e3d94d9478];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim,vger.kernel.org:from_smtp,gmx.de:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msgid.link:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 695C962DEDC
+X-Rspamd-Queue-Id: 9DB0062DEF8
 
-On Tue, Jun 02, 2026 at 07:26:35AM +0200, Markus Stockhausen wrote:
-> Due to its design the MDIO driver needs to set up a port to bus/address
-> mapping during probing. The "ethernet-ports" subnodes are scanned and
-> from the "phy-handle" property the MDIO nodes are looked up. In case of
-> a malformed device tree the driver might produce out-of-bounds accesses.
-> The PHY address is not checked against the maximum supported address.
-> 
-> Add a sanity check. Do not use the existing (unused) MAX_SMI_ADDR define
-> but drop it in favour of PHY_MAX_ADDR.
-> 
-> Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
-> ---
->  drivers/net/mdio/mdio-realtek-rtl9300.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/mdio/mdio-realtek-rtl9300.c b/drivers/net/mdio/mdio-realtek-rtl9300.c
-> index 381c45e0597b..517b01115f34 100644
-> --- a/drivers/net/mdio/mdio-realtek-rtl9300.c
-> +++ b/drivers/net/mdio/mdio-realtek-rtl9300.c
-> @@ -78,7 +78,6 @@
->  
->  #define MAX_PORTS       28
->  #define MAX_SMI_BUSSES  4
-> -#define MAX_SMI_ADDR	0x1f
->  #define RAW_PAGE(priv)	((priv)->info->num_pages - 1)
->  
->  
-> @@ -495,6 +494,9 @@ static int otto_emdio_map_ports(struct device *dev)
->  		if (err)
->  			return err;
->  
-> +		if (addr >= PHY_MAX_ADDR)
-> +			return dev_err_probe(dev, -EINVAL, "illegal smi address %d\n", addr);
+Here are various unrelated fixes:
 
-Maybe use the existing helper: of_mdio_parse_addr(). It already has
-error handling.
+- Patch 1: fix missing wakeups when multiple threads are reading from
+  the same fd. A fix for v5.7.
 
-	Andrew
+- Patch 2: fix retransmission loop when MPTCP checksum is enabled. A fix
+  for v5.14.
+
+- Patch 3: fix a TOCTOU race while computing rcv_wnd. A fix for v5.11.
+
+- Patch 4: allow subflows receive window to shrink if needed. A fix for
+  v5.19.
+
+- Patches 5-6: avoid 'extra_subflows' to underflow with the userspace
+  PM. A fix for v5.19.
+
+- Patch 7: report errors if one subflow cannot set SO_TIMESTAMPING. A
+  fix for v5.14.
+
+- Patch 8: try to set TCP_MAXSEG on all subflows, before reporting
+  errors, if any. A fix for v6.17.
+
+- Patch 9: check desc->count in read_sock, to act as expected. A fix
+  for v7.0.
+
+- Patch 10: fix an uninit value in mptcp_established_options, reported
+  by syzbot. A fix for v7.1-rc1.
+
+- Patch 11: fix a similar issue than the previous patch, exposed by the
+  same modification from v7.1-rc1, but was already causing issues since
+  v5.15.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- Drop former patch 9
+- Patch 3: add a missing 's' in a comment (NIPA AI)
+- Patches 10-11: new
+- Link to v1: https://patch.msgid.link/20260601-net-mptcp-misc-fixes-7-1-rc7-v1-0-a5ae7791754b@kernel.org
+
+---
+Gang Yan (1):
+      mptcp: check desc->count in read_sock
+
+Matthieu Baerts (NGI0) (3):
+      mptcp: sockopt: check timestamping ret value
+      mptcp: sockopt: set sockopt on all subflows
+      mptcp: add-addr: always drop other suboptions
+
+Paolo Abeni (5):
+      mptcp: fix missing wakeups in edge scenarios
+      mptcp: fix retransmission loop when csum is enabled
+      mptcp: close TOCTOU race while computing rcv_wnd
+      mptcp: allow subflow rcv wnd to shrink
+      mptcp: fix uninit-value in mptcp_established_options
+
+Tao Cui (2):
+      mptcp: pm: fix extra_subflows underflow on userspace PM subflow creation
+      selftests: mptcp: add test for extra_subflows underflow on userspace PM
+
+ include/net/mptcp.h                             |  7 ++-
+ net/mptcp/options.c                             | 79 ++++++++++++-------------
+ net/mptcp/pm.c                                  | 15 ++---
+ net/mptcp/pm_userspace.c                        | 14 +++--
+ net/mptcp/protocol.c                            | 10 ++++
+ net/mptcp/protocol.h                            |  7 +--
+ net/mptcp/sockopt.c                             | 15 +++--
+ tools/testing/selftests/net/mptcp/mptcp_join.sh |  4 ++
+ 8 files changed, 81 insertions(+), 70 deletions(-)
+---
+base-commit: 3522b21fd7e1863d0734537737bd59f1b90d0190
+change-id: 20260531-net-mptcp-misc-fixes-7-1-rc7-34884c9b246d
+
+Best regards,
+--  
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
