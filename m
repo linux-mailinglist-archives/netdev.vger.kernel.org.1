@@ -1,185 +1,218 @@
-Return-Path: <netdev+bounces-294354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TAs8LeUmH2q5iAAAu9opvQ
-	(envelope-from <netdev+bounces-294354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:54:29 +0200
+	id y5ftMx0nH2rTiAAAu9opvQ
+	(envelope-from <netdev+bounces-294355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:55:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF396313B9
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:54:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA776313E4
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:55:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=EqZ6N0at;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294354-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294354-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=SahL2LMQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294355-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294355-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 828133051669
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 18:52:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D4663029D14
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 18:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B19739A068;
-	Tue,  2 Jun 2026 18:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4551B39A070;
+	Tue,  2 Jun 2026 18:53:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f67.google.com (mail-pj1-f67.google.com [209.85.216.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADC527456;
-	Tue,  2 Jun 2026 18:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04A539A7E0
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 18:53:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780426361; cv=none; b=fCXf9leBhtddws+wLdYh4bntmLkOsXiczO/VubEP7x3WmVrOGUBWjuKbfkPJSenbHBTNjgEBtSn8RqXnNclwOwJXjK7UKVyMiteB6lHLU8m9qL/Aj9B2O4SyKkW9gJAtry1DPq2HxCdTRxcfYSr9qc4D2qwuLNCiMTZVVqDI2wY=
+	t=1780426420; cv=none; b=lEZ+u75hYZ90N9+4ARix6VdGbOuAXiU4I5RlexAwejbeW2Ev64Dkk8jLiRTsAScmFgOfeFhwNH6LWPvNzINMfKma8ppsxAgELAztcuBP5p4OAXUxFek3XH1+wVfvpzGoRccdEpy0zbGDBpOBsRRHXnRFCRUntEdff02OZqFXYvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780426361; c=relaxed/simple;
-	bh=yizmoEufT4LuJhOhvRfAjHi3x1bh3w5DKeNV82JMsg0=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=CkWbIECJycXXFyelk1FmqSLLLWkglU42xRY7fQr8ny744glviavGVrICDGukmx3xx/7Ni9K9OizoY+Lw/xAuMJMgT55qwuTIQWyZHJyTSSyuk4MPCL9rLh12pUWpluWabt4WDJg6agfM4M2agTh4W24WJwZGT4/XVjTkC5UPgNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EqZ6N0at; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FB151F00893;
-	Tue,  2 Jun 2026 18:52:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780426359;
-	bh=Bo6aOVo8LDHYo2+MLRqTwaQ3pBoJA7p61l98fgTZFnU=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=EqZ6N0atmayUWpAwRnzKQM1LXZHTW3jRr16qguQTHRm5LYAymnOT39UgqR8nflSAf
-	 2zrgtUADyKkrCKNcBoFBlGshQ7Oym5n07GpvvbOkAsayP6jv94Ckw3LX+r4uSH55QS
-	 UQpn45Q5P28Zqe1wixlNqFPssct8eJ/nB0AHuQZTcRxEXphYNUTeibzVfTLkiLb5GA
-	 8zaDHIoD2fG2O6MqxR2olx+3NcrjDh5Fta1HHcslec1LoH9xFlvR0OiabWJv7UuJLt
-	 v5lZi07Q5MOjXNE5c4Ol4Xphhg8ZT/pXgZOfVHEQT7IlTvubM80ICSIAZOAcFAyifE
-	 4m2G2kdGZiJBg==
-Content-Type: multipart/mixed; boundary="===============8360416226903704082=="
+	s=arc-20240116; t=1780426420; c=relaxed/simple;
+	bh=dHCFaHHiVTLyys9qS9xRrvo0GDTkWtoUDeopNjjVVuI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qaaBo3JV97V70KMfuU5ZNnV+++I4SRh3k0FrGZgMG3Zcr+V53Wj0G0rjY0CWX9nrfUaGxNRxtWUvFryzwJcXBMmSurrPHLOmAbRbMnWN0z+ZyNruPH54SjXGYjfWNGT1IhL/ubVZ2rNnoUWiPiJ3Rot/iCfHOIipm6I1eHS46w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SahL2LMQ; arc=none smtp.client-ip=209.85.216.67
+Received: by mail-pj1-f67.google.com with SMTP id 98e67ed59e1d1-36d98b68d68so1975467a91.2
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 11:53:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780426418; x=1781031218; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dtXDmS2jK1tRfXSemQiff3PJIcryZ2r2uBSPCnvnIts=;
+        b=SahL2LMQRvJm0gdKS87bc5ixiYF7/TDJJzJuesyKo874vJPeDRkNtL62miKaWJQSG6
+         lluALIInsMx7B5yfG4CIVyQJXlKVDl0dgemy+gWK99+QHfB0b4dgLcD/Vv103m25E7Rz
+         5mH+b+dgGwhFGWGtJRaveif2Apvnnj1u4900MOXv5S4YckFeV44EsbUBmLDM3Il54rq7
+         585858IYZiJjUFAt/Cb1Pi0mp5eTlC5INWUaHnYBhsmydMwrNrhEnYChJn7L3OUJ2V8J
+         dAVMcuBhkmpb8kuATiiToM+LCI1uX+uf9Y3bOKuZoonE83M9HOHe2FzQo7/uY9IbYOai
+         pcww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780426418; x=1781031218;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dtXDmS2jK1tRfXSemQiff3PJIcryZ2r2uBSPCnvnIts=;
+        b=R13CHnuYMWGKzE6KBGiqeYAf6lwf+xOx460cG2ZpPf0Jm481QcPIv+JKK41lzo2KLz
+         WZudFsR+J44edc+17r3T4YAwrP7WlCoIsesznWJSc4rJXBzR82w3ew2oHD7vNJ+3Fd9s
+         XrlqjVS/VRYWvVcHMML3JE73mX7X4/JXGXdsqb0/hQl31/9Luz9dW6r1wmyystcYRDS+
+         G+fCvLg+1PvSVSnmr6m3rhQp1HpV+Hpw5KmNFn91sw2FjUrKBp8S0TFy7iwZDCu1KuFz
+         tRpO7t3NJKbcGKYYwfKJp3aEapzr2Z0wATZ8NfW/Y0oSOdBWZWOvXlkK4+Wqw6Vi3xs1
+         wL4A==
+X-Forwarded-Encrypted: i=1; AFNElJ+RvLyYrFVlSeTRRrkVHL639nLVmLjWDpMRRz1brmBs8tnv12W//+VuSgMFRrawcenFhfHHV7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0VwEj8NDbYqabJ9W3mwva3k7s4qcYGPwkZJ9go8S0Kx2AzZ5A
+	10SPZF7jyjQjiFeuwkj+93ce7k6bO14mwHuBoBVMxxggSEAsTJPq+2nW
+X-Gm-Gg: Acq92OH2bOBsQChLIKEO7pXBPr7mpOSwOgmf+MTBLR03//V5hFMBBXGd1rLP2a0CnX9
+	QmG6+OQ2h9WJ4GP8DkNUmJ0lyZ8RQ4VIZ4MUAW13+x+pGIqeDVGInE5ui6iS+nJq/aw+4mvrrSx
+	wWoMummSTaA3TNCA63z1DJ71S6L27ik/kqxog2ToZn2u3nlfNGElpOtfVI9agGueEKPJfnwUe/x
+	kTucWjtdziHv0HEUR1QY8e3SfL+YiIMRgB4mY4bVkufCV6ewPbEd8kBo118vk4OF6yTrxd29xv6
+	+CJeMRsjUNlJaAQTeO0eTA4NhAOlYODim1k7cwR4hnsLd+Ihfus10rQvmWLiA+xTCG8C4Q093Vx
+	heTVGxlLTqgN9mxN7Z0o4jFUB+2t3XSv4wk9bUjs0DCE8u/IQkk1Hfr8I35YV8Y0cxu9fvkCk9W
+	0La+ZETRVsbrHbtbcX1/GYiSnZ0N8=
+X-Received: by 2002:a17:90a:c2c5:b0:36a:c4b:76cf with SMTP id 98e67ed59e1d1-36e3310568dmr85110a91.23.1780426418066;
+        Tue, 02 Jun 2026 11:53:38 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:70::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36e09f58238sm584615a91.0.2026.06.02.11.53.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 11:53:37 -0700 (PDT)
+Date: Tue, 2 Jun 2026 11:53:30 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
+	stfomichev@gmail.com, kuba@kernel.org, kernel-team@meta.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: bnxt_en: suspicious RCU usage in bnxt_fw_reset_task() qdisc path
+ in 7.1-rc6
+Message-ID: <ah8mmctx1TDUIjGn@devvm7509.cco0.facebook.com>
+References: <ah726OtFX-Qw3U-R@gmail.com>
+ <ah8XMZs42IWAJEwU@devvm7509.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <ab4c5a06490725f0b61352897e74199fd78b444c15c55cd06c44f08e6a4d258b@mail.kernel.org>
-In-Reply-To: <20260602181428.2318919-2-ntspring@meta.com>
-References: <20260602181428.2318919-2-ntspring@meta.com>
-Subject: Re: [PATCH v11 1/2] tcp: rehash onto different local ECMP path on retransmit timeout
-From: bot+bpf-ci@kernel.org
-To: ntspring@meta.com,netdev@vger.kernel.org
-Cc: edumazet@google.com,ncardwell@google.com,kuniyu@google.com,davem@davemloft.net,kuba@kernel.org,dsahern@kernel.org,pabeni@redhat.com,horms@kernel.org,shuah@kernel.org,linux-kselftest@vger.kernel.org,ntspring@meta.com,bpf@vger.kernel.org,martin.lau@linux.dev,daniel@iogearbox.net,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue,  2 Jun 2026 18:52:39 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ah8XMZs42IWAJEwU@devvm7509.cco0.facebook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294354-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,meta.com,linux.dev,iogearbox.net,gmail.com];
+	TAGGED_FROM(0.00)[bounces-294355-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:ntspring@meta.com,m:netdev@vger.kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:dsahern@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:bpf@vger.kernel.org,m:martin.lau@linux.dev,m:daniel@iogearbox.net,m:ast@kernel.org,m:andrii@kernel.org,m:martin.lau@kernel.org,m:eddyz87@gmail.com,m:yonghong.song@linux.dev,m:clm@meta.com,m:ihor.solodrai@linux.dev,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[broadcom.com,gmail.com,kernel.org,meta.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:kernel-team@meta.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.kernel.org:mid]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5AF396313B9
+X-Rspamd-Queue-Id: 6AA776313E4
 
---===============8360416226903704082==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 06/02, Stanislav Fomichev wrote:
+> On 06/02, Breno Leitao wrote:
+> > I am hitting a "suspicious RCU usage" lockdep splat from bnxt_en
+> > during a firmware reset on v7.1-rc6 (e43ffb69e043) with PROVE_RCU
+> > and PROVE_LOCKING enabled.
+> > 
+> > The firmware reset path re-opens the device from bnxt_fw_reset_task()
+> > holding only the netdev instance lock (&dev->lock).  bnxt_open() ->
+> > __bnxt_open_nic() -> bnxt_set_real_num_queues() ->
+> > netif_set_real_num_tx_queues() then walks the qdisc tree in
+> > dev_qdisc_change_real_num_tx(), which still dereferences dev->qdisc
+> > with rtnl_dereference() and therefore expects rtnl_lock to be held:
+> > 
+> >   void dev_qdisc_change_real_num_tx(struct net_device *dev,
+> >                                     unsigned int new_real_tx)
+> >   {
+> >         struct Qdisc *qdisc = rtnl_dereference(dev->qdisc);
+> >         ...
+> >   }
+> > 
+> > Since only the instance lock is held in this path, lockdep complains.
+> > 
+> > Splat
+> > -----
+> > 
+> >   =============================
+> >   WARNING: suspicious RCU usage
+> >   7.1.0 #1 Tainted: G            E
+> >   -----------------------------
+> >   net/sched/sch_generic.c:1416 suspicious rcu_dereference_protected() usage!
+> > 
+> >   other info that might help us debug this:
+> > 
+> >   rcu_scheduler_active = 2, debug_locks = 1
+> >   3 locks held by kworker/u208:1/13:
+> >    #0: ((wq_completion)bnxt_pf_wq){+.+.}-{0:0}, at: process_scheduled_works+0x8f7/0x13b0
+> >    #1: ((work_completion)(&(&bp->fw_reset_task)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x917/0x13b0
+> >    #2: (&dev->lock){+.+.}-{4:4}, at: bnxt_fw_reset_task+0x7ed/0x1e80
+> >   stack backtrace:
+> >   CPU: 38 UID: 0 PID: 13 Comm: kworker/u208:1 Tainted: G            E
+> >   Hardware name: Wiwynn Delta Lake MP/Delta Lake-Class1, BIOS Y3DL405 11/21/2025
+> >   Workqueue: bnxt_pf_wq bnxt_fw_reset_task
+> >    <TASK>
+> >    dump_stack_lvl+0x69/0xa0
+> >    lockdep_rcu_suspicious+0x13f/0x1d0
+> >    dev_qdisc_change_real_num_tx+0x54/0xe0
+> >    netif_set_real_num_tx_queues+0x4ed/0xa80
+> >    __bnxt_open_nic+0x9cb/0x3490
+> >    ? bnxt_hwrm_if_change+0x4fd/0x620
+> >    bnxt_open+0x1cb/0x370
+> >    bnxt_fw_reset_task+0x80d/0x1e80
+> >    process_scheduled_works+0x9c1/0x13b0
+> >    worker_thread+0x90d/0xd20
+> >    kthread+0x320/0x3f0
+> >    ret_from_fork+0x2b6/0xb00
+> >    ret_from_fork_asm+0x11/0x20
+> >    </TASK>
+> > 
+> > Bisect / analysis
+> > -----------------
+> > 
+> > This looks like a regression from:
+> > 
+> >   850d9248d2ea ("Revert "bnxt_en: bring back rtnl_lock() in the
+> >                   bnxt_open() path"")
+> > 
+> > That revert dropped rtnl_lock() from the bnxt_open() paths and left
+> > bnxt_fw_reset_task() holding only the instance lock around bnxt_open().
+> > 
+> > I can send a patch restoring rtnl_lock() around the bnxt_open() call in
+> > bnxt_fw_reset_task() (re-taking rtnl before the instance lock, matching the
+> > pre-revert code), but I wanted to report it first to make sure I am in the
+> > right direction.
+> >
+> > Please let me know how you would like to proceed.
+> 
+> I hope (but need to verify) that at this point most of the paths that assign
+> qdisc are under ops lock as well. So the alternative might be to use
+> netdev_ops_lock_dereference from Jakub's recent
+> https://lore.kernel.org/netdev/20260528231637.251822-1-kuba@kernel.org/t/#m3de56e1d53f86b2c1b12ca29d1617dd6635e78cb
 
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index de9f68a9c0cf..3b6565a53b96 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-
-[ ... ]
-
-> @@ -7633,6 +7635,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
->  	tcp_rsk(req)->af_specific = af_ops;
->  	tcp_rsk(req)->ts_off = 0;
->  	tcp_rsk(req)->req_usec_ts = false;
-> +	tcp_rsk(req)->txhash = net_tx_rndhash();
-
-[ ... ]
-
-> @@ -7656,7 +7659,12 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
->  	/* Note: tcp_v6_init_req() might override ir_iif for link locals */
->  	inet_rsk(req)->ir_iif = inet_request_bound_dev_if(sk, skb);
->
-> -	dst = af_ops->route_req(sk, skb, &fl, req, isn);
-> +	if (want_cookie) {
-> +		isn = cookie_init_sequence(af_ops, skb, &req->mss);
-> +		tcp_rsk(req)->txhash = isn;
-> +	}
-
-Should this txhash assignment be guarded so it only applies to IPv6?
-
-For the want_cookie path here, isn is the SYN cookie.  For IPv4 that
-cookie comes from __cookie_v4_init_sequence() -> secure_tcp_syn_cookie(),
-whose low bits encode the mss index (mssind).  tcp_make_synack() then
-does:
-
-net/ipv4/tcp_output.c:tcp_make_synack()
-	skb_set_hash(skb, READ_ONCE(tcp_rsk(req)->txhash),
-		     PKT_HASH_TYPE_L4);
-
-so for IPv4 the SYN-ACK skb->hash becomes the mssind-biased cookie value
-instead of the uniformly-random net_tx_rndhash() the old code assigned
-below.  skb->hash drives TX queue selection (netdev_pick_tx/XPS), so
-under an IPv4 SYN flood the SYN-ACK transmit-queue distribution would be
-biased by mssind.
-
-This seems to be the same bias the commit message says the v4 path
-should avoid:
-
-  IPv4 sockets retain net_tx_rndhash() since IPv4 ECMP does not use
-  sk_txhash and the v4 cookie has mssind bits that would bias queue
-  distribution.
-
-That net_tx_rndhash() guard was applied in cookie_tcp_reqsk_init() (the
-full-socket path), but the parallel assignment here in tcp_conn_request()
-is not guarded by sk_family / AF_INET6.  For IPv6 the cookie-as-txhash
-looks intentional (it keeps the SYN-ACK on the same ECMP path that
-cookie_v6_check() later picks), so only the IPv4 case appears affected.
-
-> +
-> +	dst = af_ops->route_req(sk, skb, &fl, req, want_cookie ? 0 : isn);
->  	if (!dst)
->  		goto drop_and_free;
->
-
-[ ... ]
-
-> @@ -7714,7 +7722,6 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
->  	}
->  #endif
->  	tcp_rsk(req)->snt_isn = isn;
-> -	tcp_rsk(req)->txhash = net_tx_rndhash();
->  	tcp_rsk(req)->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/26839485409
---===============8360416226903704082==--
+Agree with Jakub, this is more than just the assignment :-(
 
