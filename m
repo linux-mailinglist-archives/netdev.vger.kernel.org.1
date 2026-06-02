@@ -1,152 +1,172 @@
-Return-Path: <netdev+bounces-294075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294055-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Mn1M9+MHmoNlAkAu9opvQ
-	(envelope-from <netdev+bounces-294075-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:57:19 +0200
+	id aMJIKI+DHmqhkQkAu9opvQ
+	(envelope-from <netdev+bounces-294055-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:17:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525D4629FC9
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:57:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05382629741
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3BB573027D95
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:53:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03960300B9D6
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18E03B6359;
-	Tue,  2 Jun 2026 07:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C393A8753;
+	Tue,  2 Jun 2026 07:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b="Toge8bLz";
-	dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b="ec+PfJIe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="O+LtoKau"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-138.flowmailer.net (mta-64-138.flowmailer.net [185.136.64.138])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1562536AB7C
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 07:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E773A8746
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 07:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780386815; cv=none; b=U9GIe4BxOK+4VBq2hEjkjHnAoek7FigB5tGKeudN6HEcUCHlSRCzSn4cW7jMv//p+NAeYFJ07wcbt/oHJrSmpq3r76KuIdR0a8pdloN6ROgH0EbGPOUTVzjITr2T9X9SsALiiEyZ3fAsXyKu5pcFzQ0yXQCT16RcFCu+57MORZw=
+	t=1780384459; cv=none; b=f4nfwXBGS61GqmtzIGwWwXFCD03uiKkka/NVyxeBiqzWzYV6IX2s9YX2cnkIt57IIdWh7C7VOakmGJrqjfPtHehuG/IKPQJTHzh1S6MU/Xda089Z5zV1T++GrjEudMFybsbkXv/3+d+V7C2QNinNz9bW08baZQpWHRmeqarFQV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780386815; c=relaxed/simple;
-	bh=rTMmvdqLn8XGVIbwx6QxILaPnIKuu93HhNdO2BLhr54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qo/cLhvHTUVVB8uCFm6JWOzSFS6Pr16mcWDChNEQJ+KwY+I7ymi848fULeF9uWmAccvSliqhe32MkQrpgNWH/Zh5vRjnBKDIGxm869PMgGLMtJ4aijNrtc082ke/Z56nZf+NzldEmUC99RxGTs5JzRDFFjA0Cjc5V2YngWeA1Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com; dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b=Toge8bLz; dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b=ec+PfJIe; arc=none smtp.client-ip=185.136.64.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com
-Received: by mta-64-138.flowmailer.net with ESMTPSA id 20260602071314e68f87e00a0019fd01
-        for <netdev@vger.kernel.org>;
-        Tue, 02 Jun 2026 09:13:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=s1;
- d=flowmailer.net;
- h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
- bh=rTMmvdqLn8XGVIbwx6QxILaPnIKuu93HhNdO2BLhr54=;
- b=Toge8bLz2dyLab0qL8rkthmm38M0DIbWMwxIZTkHCglUndNKtXlsEFzupMzU1i/vzCdijc
- miocQZzlL9bzz0ZuwDfASqzdjU/d6NY+xy09C5rIOtPgu1bTsWHtrNYMYexJC33Ow7Pw9BIh
- 4PggmgbDjvYm9EN9UTfgesMkNvRAg=;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm3;
- d=siemens-energy.com; i=schuster.simon@siemens-energy.com;
- h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
- bh=rTMmvdqLn8XGVIbwx6QxILaPnIKuu93HhNdO2BLhr54=;
- b=ec+PfJIeqY0XmjF70C+uM3vKHeUzZAh1oTg2/qKJ7kPp6hfzDsi97fQ48IoGRskdwuz7Cu
- BGbuFZJ1Q9hHZckYImkEVD3l7jGDitagbUlrsjtMZGp7BQq6QWHs2rCwJGEOP6xEi685QNoj
- Dhxnc4HYfsbAg8Fm/fRfi0hYIxCejI2QpzVxqaXoytvcWrW15vVIQ9nYgGgotDILZbmKgedc
- b8LJKCIxu/nklS6gM/yKotmExl+J8oVb93bKKA61U9r3GprrFfQDONQGoXo5/evBr8Iz8wW4
- xRQAllgjoeOQIpdd6p46Xuo84qL1JvVLvPqgCUmzpiwzXycLeLiQhrYQ==;
-Date: Tue, 2 Jun 2026 09:13:11 +0200
-From: Simon Schuster <schuster.simon@siemens-energy.com>
-To: Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Ethan Nelson-Moore
- <enelsonmoore@gmail.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>,
- Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, Dinh
- Nguyen <dinguyen@kernel.org>, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, workflows@vger.kernel.org, Linux-Arch
- <linux-arch@vger.kernel.org>, dmaengine@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, Netdev
- <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-hardening@vger.kernel.org,
- linux-kbuild@vger.kernel.org, "linux-csky@vger.kernel.org"
- <linux-csky@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
- <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Daniel
- Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang
- Mu <dzm91@hust.edu.cn>, Hu Haowen <2023002089@link.tyut.edu.cn>, Kees Cook
- <kees@kernel.org>, Oleg Nesterov <oleg@redhat.com>, Will Deacon
- <will@kernel.org>, "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Nicholas Piggin
- <npiggin@gmail.com>, Vinod Koul <vkoul@kernel.org>, Frank Li
- <Frank.Li@kernel.org>, Dave Penkler <dpenkler@gmail.com>, Andi Shyti
- <andi.shyti@kernel.org>, Jonathan Cameron <jic23@kernel.org>, David Lechner
- <dlechner@baylibre.com>, =?ISO-8859-1?Q?Nuno_S=E1?= <nuno.sa@analog.com>,
- Andy Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Krzysztof
- WilczyDski <kwilczynski@kernel.org>, Andreas Oetken
- <andreas.oetken@siemens-energy.com>
-Subject: Re: [PATCH] nios2: remove the architecture
-Message-ID: <20260602071311.gtvif43wcjyulphh@dev-vm-schuster>
-References: <20260518042833.272221-1-enelsonmoore@gmail.com>
- <d40b1e80-37fc-4c88-9d7f-dae6458efe6c@app.fastmail.com>
- <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
- <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
- <CADkSEUjhq6HSdg4ignzbuJiN5uXATsTdxFbRJ3BMxs5=WUWLDg@mail.gmail.com>
- <20260519103012.blot4bssgiqfer6p@dev-vm-schuster>
- <CANiq72=6oYtHf0Q1NaLXZ+25uQyYbej2xnvUhtgpHyvozhP7_Q@mail.gmail.com>
- <ah3TN93e7lRpVihW@ashevche-desk.local>
+	s=arc-20240116; t=1780384459; c=relaxed/simple;
+	bh=ggB3SFUBedF/nHlI+XXyHFfTtUtAXXLVMDwiQrW5lDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XuR/TRdmK9sm2pUHYm4IJDP5KyYxWuteLsPVlxwfYZ6HnY3ONKBcsPNQSA7BZusZybtSZmwXRbKUkrAWZGPktTOger7btbvVWDiwt3h5JgGGe363GJnc52gdxJ8EtkzoUdkxjlzoL7bLrhVBKvypXA+J+YbA2q0Ja2YKC0o+aUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=O+LtoKau; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780384452;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=x+yylFIMPR/8vrOHBFj2Pr0z/6HumSH0G5CRMfJ5N6s=;
+	b=O+LtoKaurViSIY1QIl6wpYBx93vKk+sJHfgaPUGlIFpcnvCHvjRQyzI2DWuzqPHKK3EqdF
+	kMFceXT9ig7ANx/7ovYlu4Fe163Zggooqpfj69+ntgw24nPmxA1FmFkjqQZDk/K13VxB2p
+	In1E6t8Thyln3NPyIqLAKM0pyBFEUAw=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Christian Brauner <brauner@kernel.org>,
+	Tim Bird <tim.bird@sony.com>,
+	Amir Goldstein <amir73il@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net/dns_resolver: use kasprintf + kmemdup_nul to simplify dns_query
+Date: Tue,  2 Jun 2026 09:13:41 +0200
+Message-ID: <20260602071343.962830-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ah3TN93e7lRpVihW@ashevche-desk.local>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1870; i=thorsten.blum@linux.dev; h=from:subject; bh=ggB3SFUBedF/nHlI+XXyHFfTtUtAXXLVMDwiQrW5lDk=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFlyTcvzAidcucxoVfn4Gmfdp0tcO8JTHN/us7upbf8+r L6xwUO0o5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACay6CPDX8HFIauW3Tb12FMS Lqk6tYVx88r5ZwqXm03f9UXyX972Z0cYGW7FBFyQmP//U/Gd9oCNL3bwzRbdO0ftlGc7n+XJXPe K/8wA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[siemens-energy.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[flowmailer.net:s=s1,siemens-energy.com:s=fm3];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294075-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,sang-engineering.com,infradead.org,arndb.de,kernel.org,vger.kernel.org,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,link.tyut.edu.cn,redhat.com,linux-foundation.org,baylibre.com,analog.com,lunn.ch,davemloft.net,google.com,siemens-energy.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-294055-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,linux.dev,sony.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[53];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schuster.simon@siemens-energy.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[flowmailer.net:+,siemens-energy.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[siemens-energy.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,flowmailer.net:dkim]
-X-Rspamd-Queue-Id: 525D4629FC9
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 05382629741
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Andy,
+Use kasprintf() for descriptions with a query type and kmemdup_nul()
+otherwise to simplify dns_query().
 
-On Mon, Jun 01, 2026 at 09:45:11PM +0300, Andy Shevchenko wrote:
-> Supported implies that one gets real money for the job. Is this the case here?
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+Changes in v2:
+- Reverse xmas tree (Jakub)
+- v1: https://lore.kernel.org/lkml/20260528222030.1655010-2-thorsten.blum@linux.dev/
+---
+ net/dns_resolver/dns_query.c | 33 ++++++++-------------------------
+ 1 file changed, 8 insertions(+), 25 deletions(-)
 
-Thank you for caring about NIOSII. I'm doing so as part of my
-employment at Siemens Energy; if this is real enough then yes :)
-
-Best regards
-Simon
+diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+index c250d82cad96..14bee83cbe22 100644
+--- a/net/dns_resolver/dns_query.c
++++ b/net/dns_resolver/dns_query.c
+@@ -64,44 +64,27 @@ int dns_query(struct net *net,
+ 	      const char *options, char **_result, time64_t *_expiry,
+ 	      bool invalidate)
+ {
+-	struct key *rkey;
+ 	struct user_key_payload *upayload;
+-	size_t typelen, desclen;
+-	char *desc, *cp;
++	struct key *rkey;
+ 	int ret, len;
++	char *desc;
+ 
+ 	kenter("%s,%*.*s,%zu,%s",
+ 	       type, (int)namelen, (int)namelen, name, namelen, options);
+ 
+ 	if (!name || namelen < 3 || namelen > 255)
+ 		return -EINVAL;
++	if (type && *type == '\0')
++		return -EINVAL;
+ 
+ 	/* construct the query key description as "[<type>:]<name>" */
+-	typelen = 0;
+-	desclen = 0;
+-	if (type) {
+-		typelen = strlen(type);
+-		if (typelen < 1)
+-			return -EINVAL;
+-		desclen += typelen + 1;
+-	}
+-
+-	desclen += namelen + 1;
+-
+-	desc = kmalloc(desclen, GFP_KERNEL);
++	if (type)
++		desc = kasprintf(GFP_KERNEL, "%s:%.*s", type, (int)namelen, name);
++	else
++		desc = kmemdup_nul(name, namelen, GFP_KERNEL);
+ 	if (!desc)
+ 		return -ENOMEM;
+ 
+-	cp = desc;
+-	if (type) {
+-		memcpy(cp, type, typelen);
+-		cp += typelen;
+-		*cp++ = ':';
+-	}
+-	memcpy(cp, name, namelen);
+-	cp += namelen;
+-	*cp = '\0';
+-
+ 	if (!options)
+ 		options = "";
+ 	kdebug("call request_key(,%s,%s)", desc, options);
 
