@@ -1,190 +1,234 @@
-Return-Path: <netdev+bounces-294448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294449-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YiVEJ2lgH2qIlQAAu9opvQ
-	(envelope-from <netdev+bounces-294448-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 00:59:53 +0200
+	id zM/jFZBgH2qclQAAu9opvQ
+	(envelope-from <netdev+bounces-294449-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 01:00:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CB9632BB1
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 00:59:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E27F6632BC5
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 01:00:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=J5lBxgVZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294448-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294448-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=microsoft.com header.s=selector2 header.b="XeBuQBJ/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294449-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294449-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microsoft.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B272A302D956
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 22:54:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E255230B63DE
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 22:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3173C8724;
-	Tue,  2 Jun 2026 22:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31903C8724;
+	Tue,  2 Jun 2026 22:54:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11020084.outbound.protection.outlook.com [52.101.61.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27693BC69D
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 22:54:34 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780440876; cv=none; b=IpriBC7ehHUSNndFmZe9DRjwYrV6554W7GSk7uB9E/ut6ya8GoIV/C0hy5Id4ulB+IajCikYJN7PMrQWu/PjTfBZs4C+4teUqL2r9R3eo6jxVP/9STXX8On/RwGKlowGhdVf9gWBul959VvoaFW2lVdhKMDq0WLDpkKhtqquwfo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780440876; c=relaxed/simple;
-	bh=X+6iZWTfWXpo410W4glUkXVe/Shkkk6QObVykw+rX6c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q8n32Ckb7i5mo12aGq7QMkGFRsnWZ/Et4EkE+ieHfS8olW5UcCjhT+5FF00uDSzlo2I+n17TVl+PbDD3f4Rm15IqoloSqanC9cYFbqsSRPMkmsJnxqelmGAjU3OJcQI7eRDOYii4DssFLChb+9Uequ5mAFCORvegAqWUL6kLJXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J5lBxgVZ; arc=none smtp.client-ip=209.85.221.44
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-45efb698ef2so1971352f8f.3
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 15:54:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780440873; x=1781045673; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Jl73xD6zIPi47mu1jowzc4phm5baQXMI7icQsNN3pI=;
-        b=J5lBxgVZtN2FI/ioqwhDNCosN/jZxozQdxLdEv8Lsv6+u08aS7OxTXrQzGg72R791Y
-         z32rVB76ykLqfRKHMQDiGLQGAmHWCKGHI7AiNnVW1XWIXiMnT2eX5t7ZtVn5WJ9pzdxr
-         bfL67m+3y26zQeyeaJEk577celexSXvREDjuhI0lTlSDWcyIshaKWjaTihfPmJhfCIwd
-         MH7OAX39QaAQh41d1ecKqz0qNgVt+7a3qN85DYTIMQaZ2dwdMsWfE0NHmsWsCaSLpamn
-         zO79gWY9UqRLT9WZWT2xXwMwr6B588h+pNV2K+1vQX1dtxuAKvd+s0Ou1C9kqMvX0vVP
-         NH8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780440873; x=1781045673;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0Jl73xD6zIPi47mu1jowzc4phm5baQXMI7icQsNN3pI=;
-        b=c9rdiC0752P2TpVJ94MD/88a+61b3jESk381t56G3El0vVjHWQBzQw7hUWR8HThd8P
-         9RJMkDcEVhwQZZWd9z0sSBsUvkNdNfk8RZVtDhDng//MHATD3IYgBnCtuO+VlqWeYYEu
-         bBx4N97CQ1+GjsDqrcyHGw9dd9wNc7cOHjnauHg907ngvAkT96Z7HX5xH8oNHn3LK71w
-         qj8crbNqsqnRpHlRJj+d1L0jqHrYQ/zavzDUDlWEQ33+smmZsL6VKpsyGYpZyloGEopf
-         UUuFKORytcPu7Wyxc9LczxvP2fGUf423k/9wEH4aYs/wvtKMrax4lIn5VAmiOw81xJfb
-         SeNw==
-X-Forwarded-Encrypted: i=1; AFNElJ/P4WE9HIdLtLNVTa1mnjLF3COsb6/8pUHpjok7ZE05RsQHYtR3b3npvHAEo46vkOTlqrwpXGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDpGLJufSQs90e96GIK498h0r0oSkmEbMZdI0ycMHpIUro2HIo
-	807x7jkkBp3CsYw+dXoTuJhfe/pjcE9o+zLECPpIYdv6Hoxmu4rz+PDd
-X-Gm-Gg: Acq92OFO8Cm0YMiUYQDKSmxdzDa2JdU64akqM2LC92pcrkvYSDg0ianXLbb+5aSRB5o
-	iK7EXV/EZwF2u/Ghqbowx4tPRgnHaHjth1XOQQOrzT3HXmQOGxPbT8/D3UqK1lM7K8ASSMa24TB
-	fUZu6WWqvVY695JjgDTvasBwdrMnJQEfOv5M/ldTyAx1rZivpuMYwlpnyfchMhZHdoXUTtRci7i
-	A75+RPoLAVsvfTCAZdqdbrotJQT/3w56gXqyObPHJmYobc8xuDBnGvfsz3VOzxtrBKdVYEgMe/t
-	iNC2KlQGAJTJzQsQTl8I14CvF2P9AhPmcDuYJnQJTX2PRY0Rl+s10iMZPlohYPlydgYaZh2EOYk
-	Na/Rw6f6PPX65vB3D23AzWj4V8cXN5Lv6//Ofte7wpaTMZt8pX7o8N4Axa0MbOGwit+C4Ir2xrA
-	sUrDqu5D86Z1AZX8A4UC4y2M49aMM6KcjWtdfkwVZW
-X-Received: by 2002:adf:f58f:0:b0:45d:3cb0:5ab1 with SMTP id ffacd0b85a97d-46021873b26mr407422f8f.38.1780440873290;
-        Tue, 02 Jun 2026 15:54:33 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-4601f2dc577sm2550100f8f.3.2026.06.02.15.54.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jun 2026 15:54:32 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: torvalds@linux-foundation.org
-Cc: akpm@linux-foundation.org,
-	axboe@kernel.dk,
-	brauner@kernel.org,
-	david@kernel.org,
-	dhowells@redhat.com,
-	hch@infradead.org,
-	jack@suse.cz,
-	linux-api@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	miklos@szeredi.hu,
-	netdev@vger.kernel.org,
-	patches@lists.linux.dev,
-	pfalcato@suse.de,
-	safinaskar@gmail.com,
-	viro@zeniv.linux.org.uk,
-	willy@infradead.org
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-Date: Wed,  3 Jun 2026 01:54:26 +0300
-Message-ID: <20260602225426.122258-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
-References: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E483BC69D;
+	Tue,  2 Jun 2026 22:54:46 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780440887; cv=fail; b=qqrk4pg8Gr8nv60rKMCJPb4f5Wc9Z4aavIu8NK/eNKyQKWrlABU7AZf3TITaH4jL9T2ihDMTTdxylRwXCMIKNjTbarvj65a+ho3GQ9IOWMGGfiRaMqqGN63/8Lz337ikgtH2O19ZTAK/9sr45Y2VzxvLi8+gzmwclh8rvypjTS8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780440887; c=relaxed/simple;
+	bh=Xpdk9TaTHorm9HlXjyCoC58kfnqqOoQcrnrDOkPNRm8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hA36sTUEP+ABn9chy03GiywiTSj2TxIKkjMagkJ594kmMnmtjWb9d0kFDhe6ZDINMnh1TyDmRy9TnyyYY8N2+FOmH0fIybAdE/K82EQVC4QbNEbazZRoHXwjMnq123fjHDRwWntfALKIyZcYro2PG1VB+M9nka8Qksrqwaz20Bw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=XeBuQBJ/; arc=fail smtp.client-ip=52.101.61.84
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XQzqmC/7rMTc1Oo/7Mj2ZdlNIjQiAU4jsO02iYZDZSXT62ZaVe9smVWM2MDWBnrEAJz9Xv4BOdDg5XzxaaGvwEl1dO8s/XxuXLwKC8k9d0atcI1lS76D6FJR9SLN0jOFI6Sj00ql5fuZtK7b0QM6Z8AQez7YVGhDZLm4OQGbbPsG+9Z3txsueC0i5lCYyYwUOHAGm8F0dBzVTCSFWyDfWIPg7fs3VONywg2VkLJSaiQjnamhIDXKJMwsLa0vSknnYCGcWE2LxpcIp1OdbtxZNkVa4D3pOfwsY2jokwC7zi15fWnrzBd3VUzdDbO0q6kC6LuTlUMhQ0SDZN318O4UBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xpdk9TaTHorm9HlXjyCoC58kfnqqOoQcrnrDOkPNRm8=;
+ b=pdE0+ONekArjfRXA6PSCuPU2xe7EN3MAoIQCEu1quNpOKWNQcQUx+s4ZoDdirbjJR20rEMwlSMwMiVQ1qNAWRG5E9cUxhX5cw8sSFjcnwONFJeILdRo273ekcAS1SAUvATFgr2KDjhpqHDBHbl2YnCtIGDNA3Klr+0twWjVHnUbArjROs4rD+cPOfjdcEIGtnzSsffCd+jkM+5a0gEHccvMl1ESt4520EGquBRUImpYGA1XmXltci37KQdgRMsgD1RToyHqiSigpn7ztUx2ORAWNuKGyB/6ZgMtpGNSHJbKWaoMWG0doM2WdaidvXFGYl1uS7rj1WdIRMp5ZK2txJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xpdk9TaTHorm9HlXjyCoC58kfnqqOoQcrnrDOkPNRm8=;
+ b=XeBuQBJ/eZ6i4nvkJyVm+50cTDRXG2EGhjJTWRtM01XQkVqKMw+eqP/fgOWy5+ffeJbw0BpwAc5HPXcsVVN8trBQ6Hj1PeJEAJX6yaCZhzqIGqjr+MgVlWvO4BEfIUcpHSeSRq+sBdgUn451OxAYw1saGkAX92p9VV0Ziqi2OSo=
+Received: from BY1PR21MB3870.namprd21.prod.outlook.com (2603:10b6:a03:525::7)
+ by LV9PR21MB4685.namprd21.prod.outlook.com (2603:10b6:408:2e6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.5; Tue, 2 Jun 2026
+ 22:54:43 +0000
+Received: from BY1PR21MB3870.namprd21.prod.outlook.com
+ ([fe80::9faa:4fb0:486b:8267]) by BY1PR21MB3870.namprd21.prod.outlook.com
+ ([fe80::9faa:4fb0:486b:8267%4]) with mapi id 15.21.0071.007; Tue, 2 Jun 2026
+ 22:54:43 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: LeantionX <leontyevantony@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, KY
+ Srinivasan <kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <DECUI@microsoft.com>, Long Li <longli@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] [PATCH net] hv_netvsc: use kmap_local_page in
+ netvsc_copy_to_send_buf
+Thread-Topic: [EXTERNAL] [PATCH net] hv_netvsc: use kmap_local_page in
+ netvsc_copy_to_send_buf
+Thread-Index: AQHc8qfKB0BXHB9Pzk62Qp6U9hmxR7Yr3puA
+Date: Tue, 2 Jun 2026 22:54:43 +0000
+Message-ID:
+ <BY1PR21MB38709E89497445EECE3C931DCA122@BY1PR21MB3870.namprd21.prod.outlook.com>
+References: <20260602155210.90987-1-leontyevanton1995@gmail.com>
+In-Reply-To: <20260602155210.90987-1-leontyevanton1995@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=002d5649-d222-4e97-97ee-254e4c322d46;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-06-02T22:48:41Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY1PR21MB3870:EE_|LV9PR21MB4685:EE_
+x-ms-office365-filtering-correlation-id: 5babe118-683e-4e03-6573-08dec0f9ef9a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|7053199004|6133799003|18002099003|22082099003|11063799006|56012099006;
+x-microsoft-antispam-message-info:
+ I2q0f90AQZITeugzb1pxZi3oG7c3uj5hUGRK6QzlZW1YEdn2K0fvxijjB0sOcVlzjGfwUjZHWP147oBNpQXCUW0h+xQubkaS+z1F8dTe5oMloRaTGJMIP6DcIjDHAHjnPpRCZR6KufkrfZxahNtxwDG5H9F5ekPii2/BuyDGTPL2lvmI7Mypw7dVfMImlTNrEmS2rq/ddHqRKgXbp5/VSKqRgpqN4J0ypsJdaC2I4sV3tKZymho018+ebA+zeTMc3uHgLa+BsztSCdhzEoaj3qfJXQCwWtZ43UOBFjPPPl5Io0V3f4LwJnuBaL5toQD6nGXTIqTIENj118ygjTin1zXkUQvxSqaLH6JRM/NqhXmD6rTxKa2+OZG6+hXfR5QxFJvnspvCAQ1ZTVo8m3uxVBJQrSk+/fLZZUk5jymdVGvwui06crCaxGWvhpQepGCvxuU7OGIVoQP9YaJOpRTOoEJsiC6pesE92+HCWvMagcCPCQ2JpfEjlIe3oJCQWEF9Bhkz6H6FLxzLslGD7z2O9P54h8NDbmG0AUw2o6NOT6vZ+t7II1aApxLgO+rt9r6Lcfsr3u1A9OUW1Xy6wqYDtkEFRJzpYtwCDi6hOkGvdKMOmb1uk6mj3ngqudbpySPx4FjQgrNBXnlKv4+mtKO8XwCCTiH8YoCNXPn2IjxvZ2n/4pYVvsLSwjcUnUHH6wZUVBvNnqWlqJJBLHDecXkY1cfoiiCjuvD3XoGcB1LyT+xRBcTjOSGZIFOtD/neGze4
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY1PR21MB3870.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(7053199004)(6133799003)(18002099003)(22082099003)(11063799006)(56012099006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?/pYa252eFFRrG3d2Fra3pCSJBfFm3nasV5h6MYxyZPeSBmBBeg4Qv44/FD6X?=
+ =?us-ascii?Q?iD/SFhodz5OEsdaV7wON7Ba6f0jxYePYlx7LFh5md0HCQoGZxejQuE8bJzzM?=
+ =?us-ascii?Q?NNq2D5neYxqYOVGpu633u4+1+5SzrUdYXAbW3zjzqlKo27/eQOTpUXcd2O2j?=
+ =?us-ascii?Q?hVhoBMnGwAlSrTfOcIa075thG0+UY4HtCdU0pF1w+VwXKC3ujaQW8jVr7aA1?=
+ =?us-ascii?Q?rO+rqDgJS3fJJm8ya6RTwZxzWg7sKwIFxpMi9OhVfaCGN9ykFeXFbTJsFnkD?=
+ =?us-ascii?Q?9OOG7kGUkv3Am/EPxH9IATWOdq7Kxp5A0JnzrtTuqRrVVOWGzI1+gxwOWq/c?=
+ =?us-ascii?Q?V04Lb00DEx81RpR1lxQgPFOFR1rDN31eRpZRHQeG00k4HFV8GieGdKDJfOr8?=
+ =?us-ascii?Q?abtA9mQ5PzhmBj/7G8y4/aQZ/WAxxyRI/gLkRSDGEneIDcemOy+UVKM3DIXx?=
+ =?us-ascii?Q?sWuUEi7ar/i/kcY7PU5ITY+eJ7o7ardGF0je805Isacojxim0LvUpodyvU8E?=
+ =?us-ascii?Q?pPPMIDF41hTgqLiP9Hk5iRTycBZMSoYOM8JjqFr8WJAMzCykw/8vuc2vyXSG?=
+ =?us-ascii?Q?mw0x0WRVFd4Kzuqu62aZT69DhVqzyJqw/GafibHMkMUqyDnFZeLw6VtJk0Be?=
+ =?us-ascii?Q?nPktSeFn7xeE+QF1K1D/RiHT8tsbv6TIWaG5uA8ilvmuuUac1fVv3EVpMjG/?=
+ =?us-ascii?Q?NQOTszyf10VQK/76CsVkNsBm/11CdPqEuKd0hLNadWJVkqRxvdaJ/fGQl+/2?=
+ =?us-ascii?Q?XpyHLkOmgCpENeAxHI7R8xaYUSU8R+JE1IcOl861Hb/fo0YFNKk5rR17WTLb?=
+ =?us-ascii?Q?F2IINkjtnRhlB2NnZsHoUJbOz0q1+DWIJGj831NIrPp5vVld+FeyIkNvNCzo?=
+ =?us-ascii?Q?9R8zA9x8edEvdVfjyup6ft9HkfMCQ0gRjrrgOJArjM7nYhFIkqdwc4y3hHAp?=
+ =?us-ascii?Q?QlCIjDtGCwsXTpwz9fm5ifApnPQw9qELaoorOaZYVDQ7DyTTbGiO7U4QNNsh?=
+ =?us-ascii?Q?qFzhLSWCa56KMK8z1J7AEEPy2V15yQ296tl1AGOv3sxQ40JohNr+jIt2QrJ0?=
+ =?us-ascii?Q?wFbwTmhj+X5TaDSBIFIZP26iBIB5k8/SstUDMMO7Ms2gqYDYMdZu979ExlK6?=
+ =?us-ascii?Q?dC94F5D/TGYtPmBHJkuBLyTNsAzi9ENbB1xMtHNILzz35IA2Z/JPKFwMG6uI?=
+ =?us-ascii?Q?+fTdP++ClCAZA0m5NbeeZKImoPG/2g0xhAJQHhrncrW+bD6tpNbzQSPBQ+5D?=
+ =?us-ascii?Q?O/2iE0AuUXMy8zB7lt7PtnglzAdWuO+QfR0ZzPzXejCcg6KBzlEYy7/hciS6?=
+ =?us-ascii?Q?RgYGfgyD4CNqkCBazIOP952Ez5mk8OUqwHOvn3L2fyd6HG9Bqth1PjwwpHNO?=
+ =?us-ascii?Q?Mr5ZNIrdKnvmJ7QO1OhIZa1hAMk51Al8LFeWNVTdijt2a3O2wAzpWOs8s89E?=
+ =?us-ascii?Q?cNQIdi66sN7aeWCBUl3fXeGLaA4VZMXNcIMevhn2vyxvyDogd7meJlgWWkkO?=
+ =?us-ascii?Q?mAUD3YR5CuaIag5Js3SegBpVndW1xRQwuf3Q0h2xBx4lR4rx/kFk6F/pMGxM?=
+ =?us-ascii?Q?ORwjDlADzZ+dcuDgFpTBqmmYfSAbdTVO41oIgdS4cJTFHfigBPwWKse4QfB1?=
+ =?us-ascii?Q?qLonZBVPvJE+/pslVmHITIRLfvbgltJ+Ma65katpzwMc73Bg3VnjcuIMCkqM?=
+ =?us-ascii?Q?EWynQxfy4hhuhcnUQ2+3eKM4tekdhIEqO0Yi77pn0zlk+SOGECEmrosl59ug?=
+ =?us-ascii?Q?Hfxyzjcnog=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY1PR21MB3870.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5babe118-683e-4e03-6573-08dec0f9ef9a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2026 22:54:43.1867
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xViHl3BtpW5JSGSvIhd4pPFxlhTFkTgHgUeJKvASfjUjuZAjXAO6CPQEGfJSkVhL8gH+ogv4iefFdx5Sl2sXkQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR21MB4685
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294448-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,gmail.com,zeniv.linux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294449-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:leontyevantony@gmail.com,m:netdev@vger.kernel.org,m:linux-hyperv@vger.kernel.org,m:kys@microsoft.com,m:wei.liu@kernel.org,m:DECUI@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:safinaskar@gmail.com,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microsoft.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux-foundation.org:email,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	REDIRECTOR_URL(0.00)[aka.ms];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[BY1PR21MB3870.namprd21.prod.outlook.com:mid,lunn.ch:email,vger.kernel.org:from_smtp,aka.ms:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 17CB9632BB1
+X-Rspamd-Queue-Id: E27F6632BC5
 
-Linus Torvalds <torvalds@linux-foundation.org>:
-> That isn't what Askar's patch ever did.
-> 
-> You apparently didn't even read it.
-> 
-> Honestly, I think you are the one out of line here.
-> 
-> Askar did something I suggested years ago, and didn't remove any functionality.
-> 
-> It just changes vmsplice to be a copying model (one of the directions
-> already was). It doesn't change regular splice at all.
 
-Pedro is talking here not about this vmsplice patch, but about
-my future hypothetical patch, which will remove splice-pagecache-to-pipe.
 
-Let me clarify, what I want to send: I will make splice-pagecache-to-pipe
-be a copy. I. e. this splice direction will continue to work, but will be
-possibly slower. I. e. I will do something like this (see end of this email)
-(absolutely not tested), and the same thing for other filesystems,
-and also I will remove resulting dead code and remove
-pipe_buf_operations::confirm (it will likely become unneeded).
+> -----Original Message-----
+> From: LeantionX <leontyevantony@gmail.com>
+> Sent: Tuesday, June 2, 2026 11:52 AM
+> To: netdev@vger.kernel.org
+> Cc: linux-hyperv@vger.kernel.org; KY Srinivasan <kys@microsoft.com>;
+> Haiyang Zhang <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> <DECUI@microsoft.com>; Long Li <longli@microsoft.com>;
+> andrew+netdev@lunn.ch; kuba@kernel.org; pabeni@redhat.com;
+> edumazet@google.com; davem@davemloft.net; stable@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Anton Leontev <leontyevantony@gmail.com>
+> Subject: [EXTERNAL] [PATCH net] hv_netvsc: use kmap_local_page in
+> netvsc_copy_to_send_buf
+>=20
+> [You don't often get email from leontyevantony@gmail.com. Learn why this
+> is important at https://aka.ms/LearnAboutSenderIdentification ]
+>=20
+> From: Anton Leontev <leontyevantony@gmail.com>
+>=20
+> netvsc_copy_to_send_buf() copies skb fragment pages into the shared
+> VMBus send buffer using phys_to_virt() on the fragment PFN. On 32-bit
+> x86 with CONFIG_HIGHMEM=3Dy, phys_to_virt() (i.e. __va()) is only valid
+> for LOWMEM addresses below 896 MiB. For a HIGHMEM page it returns an
+> address that has no kernel page table entry and lies outside the
+> kernel direct map, so the subsequent memcpy() faults. As this happens
+> on the transmit softirq path, the fault is fatal.
+Please include the stack trace in patch description.
 
-If Pedro sends this instead, this will be okay.
+> A HIGHMEM fragment reaches this path whenever the page backing an skb
+> fragment lives above the LOWMEM boundary, which is common on a 32-bit
+> guest with several GiB of RAM (for example when the in-kernel NFS
+> server splices page cache pages directly into the reply skb).
+>=20
+> Map the fragment page on demand with kmap_local_page()/kunmap_local()
+> instead. Using pfn_to_page() on pb[i].pfn maps exactly the page
+> described by the page buffer entry. On configurations without HIGHMEM
+> (amd64, i386 without CONFIG_HIGHMEM) kmap_local_page() reduces to
+> page_address(), so this is a no-op there.
 
-diff --git i/fs/ext2/file.c w/fs/ext2/file.c
-index d9b1eb34694a..8edcc3769793 100644
---- i/fs/ext2/file.c
-+++ w/fs/ext2/file.c
-@@ -326,7 +326,7 @@ const struct file_operations ext2_file_operations = {
-        .release        = ext2_release_file,
-        .fsync          = ext2_fsync,
-        .get_unmapped_area = thp_get_unmapped_area,
--       .splice_read    = filemap_splice_read,
-+       .splice_read    = copy_splice_read,
-        .splice_write   = iter_file_splice_write,
-        .setlease       = generic_setlease,
- };
+So, on 64bit kernel, it has no performance impact?
 
--- 
-Askar Safin
+Thanks,
+- Haiyang
+
 
