@@ -1,191 +1,197 @@
-Return-Path: <netdev+bounces-294301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EFdJMY8LH2pPeQAAu9opvQ
-	(envelope-from <netdev+bounces-294301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 18:57:51 +0200
+	id PST0HEINH2p2egAAu9opvQ
+	(envelope-from <netdev+bounces-294302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:05:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA7C6306E1
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 18:57:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8616307FF
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:04:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=Cwxt8lch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294301-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294301-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=ff6Dx7U9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294302-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294302-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=iogearbox.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD90E3029E60
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 16:50:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 89F023030925
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 16:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B6E3806DA;
-	Tue,  2 Jun 2026 16:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7C03806DA;
+	Tue,  2 Jun 2026 16:52:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFA0382287
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 16:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B9D3793CB;
+	Tue,  2 Jun 2026 16:52:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780419042; cv=none; b=GxViJgHJBYucxqUkglNM5cjokigiANwG7U58Dj3XYNZx1V7IYkzynHcTFCgG5iWXmGaCsLpkKcvApDZ+pXbUTgTypq3+X6pJuW15WLp6tBbkbn/cgyC7GhELLNGaXMOF71iB1SX6Dt2YIEGx80kS5aMlj7yzQBCMVGpXkGmLkus=
+	t=1780419149; cv=none; b=A302vT2bc5ummMfyAnWtQgz6oRBjiks0GuUe9aLhEJeaW3T97ILizizzzKXkeJUx+xE/6DsKtx//fK96iVG03QZcolKsFx33tj4+601ajXg0vAP5ujxeC5aYa09Fwla5WvbVQLrRcLfDAAJCV4fxnR7LMgM+HukO8LRtOvP/cnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780419042; c=relaxed/simple;
-	bh=7eMlGmFaqMGm+HHVzDWIR+mgIhi73HauiaZs45xeWx4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HVl2AIVoW7nQcBBEF9v6wvkZ+Mn57riKStw4rNS3NBhPl0DGdoysBYFnNbPPVaRxlD7ToJcREnkD1Oj5hvi7u9Ganh0BIwnrVNvpYNgjnzKDWX7BA6ND8ZL30bkOMky7w4bVyhpTiGM2IO5ghZQAYWER7fJVJrZjQvocCRL44GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cwxt8lch; arc=none smtp.client-ip=209.85.222.201
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-9156cb14b1cso354534085a.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 09:50:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780419037; x=1781023837; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TajIYzrLGZgS2BCjNwAujadaw0bJ+tFhUrgeiG+ry8g=;
-        b=Cwxt8lchZmjWarNr0xmABXx2s12drqFme/v/Yqtke0fHmAGkV1B+yrLUPTl3J39ByB
-         qltppVfQIKXTobmM0WQK8itPI99nhRyKImVRg+Bh1NXOT/VoNEXvxmU7HCXMdt2qUMbq
-         KdWRLAgt95B4ICOGF4N/lopiYQIX12bG0U6MGxnj1G/8K8DxtsZO9MquS3L0aPWWIFZl
-         k+QAYHyv9GkKovD5OizWRSKKb643QhFK6E2Bq28YjYwby2s37x5dpbntiEb0QYs3ec90
-         FSjF7QU5hXiNnm1IMJShgVace9aGp5obrU63Kw9sLm/qoRqrWRNABKa7ZnSGDcSQ3Xmj
-         Y7rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780419037; x=1781023837;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TajIYzrLGZgS2BCjNwAujadaw0bJ+tFhUrgeiG+ry8g=;
-        b=tIUb+hAa0TaEzrRJQ/wzI7MA9JCXwYvHVKfZ8jv72Lg2HU4TkGkbdMtyFLibnhVnab
-         1XUfqjwgM4FGPmBd8G9zuE98vlQlq3HIhOS9kRio2Lro6nptC6aXmi2vp0QqdKn1dcUo
-         +EgYhsVwyi4PVMgue9uEmNIg7LkpyLvvgtZ/Bx+foGU/caWjLVU0iXmRn8DDUjSpUmGS
-         kdtw2RXsV+O1f1USOHtILeY10Eawnh8H4XOkFKmH4tctVjsCbNJtlIKrMD8Q3s15xu7j
-         qwMsoJULcfMg08KGRPD48evv6YSp5Sxw1rlAv4znk24YFKuch2+7AAGRJSXg75t9STY3
-         yHTA==
-X-Forwarded-Encrypted: i=1; AFNElJ/inBix68Lhah8bK7/UNGxUF6kp2i3/f3IKp5W0T22+fxrXHHHTi7Opw1qFzs0WgY9zGKrmbxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0nuKTv0t4NPpDl7Q1AjT9cvvfNvEHPPgdhyU+m7Prx94gAmzD
-	FMm773OYuenR0BK9wCZSXT8/Ljf+yOugEL/CV4c17692krAPFz/getVaXFeCwzWXIdGRGTzJrmN
-	oxJjYAKsZqqK1TQ==
-X-Received: from qknqp29.prod.google.com ([2002:a05:620a:389d:b0:914:babf:d7d1])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:688c:b0:914:ea37:6f1a with SMTP id af79cd13be357-91589fc6d9fmr462585a.6.1780419036935;
- Tue, 02 Jun 2026 09:50:36 -0700 (PDT)
-Date: Tue,  2 Jun 2026 16:50:36 +0000
+	s=arc-20240116; t=1780419149; c=relaxed/simple;
+	bh=NrEl/iRmJ2EVv7PYXwQsEK5HsZiYXinn/HU07XfVJD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a9UaV22YN+1PIqgSkgN8MQghCZt2oMUt8xuFnoxWBPs8mv5k7l5KyoOpeJkg1YipR/++EnX7No4qJokHmsO/vYH3YTPOJdkwlBxsO06tb1fE76AVR0vZ0KGqH8VDt1Lz6+/pH9/T7CkuSaGk9pmAmi+IVKjfwVK9huwqyg8FOBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=ff6Dx7U9; arc=none smtp.client-ip=213.133.104.62
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=uh0+RvhK5DWdQ/wBYRtQ/3iADLmaQ+ZS/EmrOxYuXwk=; b=ff6Dx7U9zYhSEQaCpUH9e7En8H
+	4Dtk5dsIdE8oIBtI/CdJfQkyyq4bKJwDOBMtDDdY1ko4M2CNMo9BDAv/LYyYNr2ycpTGE0JmeS0GM
+	QUgyVBMPD6y1OwqwhD8KrRcpDkkD9R3xpO4tsH1q8443LfU4CybsKPs0xq3DP3O3QzMuO/bWVU7//
+	B/6nrwrct6bdqhS6smB2ez8HLIRHa9pRHnr9MCyK1rS3BZ4KpNoOnoKe77/W3iF6Nrz3DQB6WuWx1
+	XeE/YMjEmlq2LEMuHCb6/fOquYkJUjL2MHroSMT+AGc2/mPDsaLqabmlQUhr5+h6U+Svbu1FmnL4W
+	9q/yKrtg==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wUSLo-0007gP-2h;
+	Tue, 02 Jun 2026 18:52:24 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wUSLo-000Muf-2T;
+	Tue, 02 Jun 2026 18:52:24 +0200
+Message-ID: <f7892d83-64cb-460f-87c8-ebc7fb4476f4@iogearbox.net>
+Date: Tue, 2 Jun 2026 18:52:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
-Message-ID: <20260602165036.2712408-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv4: raw: remove six obsolete EXPORT_SYMBOL_GPL()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: build failure after merge of the security tree
+To: Paul Moore <paul@paul-moore.com>, Mark Brown <broonie@kernel.org>
+Cc: Blaise Boscaccy <bboscaccy@linux.microsoft.com>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <ah8BzqSmZO40xYhS@sirena.org.uk>
+ <CAHC9VhRR4mmkOdWwUCLswmA+_KEjB8RCBBTJ2W4JGiLUWKzxyQ@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <CAHC9VhRR4mmkOdWwUCLswmA+_KEjB8RCBBTJ2W4JGiLUWKzxyQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/28019/Tue Jun  2 08:33:27 2026)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-294302-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294301-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
+	FORGED_RECIPIENTS(0.00)[m:paul@paul-moore.com,m:broonie@kernel.org,m:bboscaccy@linux.microsoft.com,m:ast@kernel.org,m:andrii@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-next@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iogearbox.net:mid,iogearbox.net:from_mime,iogearbox.net:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9AA7C6306E1
+X-Rspamd-Queue-Id: 9C8616307FF
 
-IPv6 can not be a module anymore, we no longer need to export:
+On 6/2/26 6:31 PM, Paul Moore wrote:
+> On Tue, Jun 2, 2026 at 12:16 PM Mark Brown <broonie@kernel.org> wrote:
+>>
+>>
+>> After merging the security tree, today's linux-next build (x86_64
+>> allmodconfig) failed like this:
+>>
+>> /tmp/next/build/security/hornet/hornet_lsm.c:212:36: error: too many arguments to function call, expected 1, have 3
+>>    212 |                         if (map->ops->map_get_hash(map, SHA256_DIGEST_SIZE, hash))
+>>        |                             ~~~~~~~~~~~~~~~~~~~~~~      ^~~~~~~~~~~~~~~~~~~~~~~~
+>> /tmp/next/build/include/crypto/sha2.h:14:33: note: expanded from macro 'SHA256_DIGEST_SIZE'
+>>     14 | #define SHA256_DIGEST_SIZE      32
+>>        |                                 ^
+>>
+>>
+>> Caused by commit
+>>
+>>    c62310df81899 (lsm: introduce the Hornet LSM)
+>>
+>> interacting with
+>>
+>>    c48c3a7e7d5be (bpf: Drop redundant hash_buf from map_get_hash operation)
+>>
+>> from the bpf-next tree.  I have reverted the latter commit, the new LSM
+>> means that the assumption in the changelog that there is only one caller
+>> isn't true and it seems like the most straightforward approach.
+> 
+> Thanks Mark, we're taking a look at it now and should have a
+> fix/answer later today.
 
-- raw_hash_sk()
-- raw_unhash_sk()
-- raw_abort()
-- raw_seq_start()
-- raw_seq_next()
-- raw_seq_stop()
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/raw.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index 68e88cb3e55cbdfd5625705ea557b9d0f88c7a5c..e9fbab6ad9146315bf5fd8fd7968483c8d41bd8c 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -103,7 +103,6 @@ int raw_hash_sk(struct sock *sk)
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(raw_hash_sk);
- 
- void raw_unhash_sk(struct sock *sk)
- {
-@@ -114,7 +113,6 @@ void raw_unhash_sk(struct sock *sk)
- 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
- 	spin_unlock(&h->lock);
- }
--EXPORT_SYMBOL_GPL(raw_unhash_sk);
- 
- bool raw_v4_match(struct net *net, const struct sock *sk, unsigned short num,
- 		  __be32 raddr, __be32 laddr, int dif, int sdif)
-@@ -928,7 +926,6 @@ int raw_abort(struct sock *sk, int err)
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(raw_abort);
- 
- struct proto raw_prot = {
- 	.name		   = "RAW",
-@@ -1009,7 +1006,6 @@ void *raw_seq_start(struct seq_file *seq, loff_t *pos)
- 
- 	return *pos ? raw_get_idx(seq, *pos - 1) : SEQ_START_TOKEN;
- }
--EXPORT_SYMBOL_GPL(raw_seq_start);
- 
- void *raw_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
-@@ -1022,7 +1018,6 @@ void *raw_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 	++*pos;
- 	return sk;
- }
--EXPORT_SYMBOL_GPL(raw_seq_next);
- 
- void raw_seq_stop(struct seq_file *seq, void *v)
- 	__releases(&h->lock)
-@@ -1031,7 +1026,6 @@ void raw_seq_stop(struct seq_file *seq, void *v)
- 
- 	spin_unlock(&h->lock);
- }
--EXPORT_SYMBOL_GPL(raw_seq_stop);
- 
- static void raw_sock_seq_show(struct seq_file *seq, struct sock *sp, int i)
- {
--- 
-2.54.0.1013.g208068f2d8-goog
-
+Sigh, hornet should _not_ be merged to begin with for the many reasons stated.
+Messing around with BPF internals is yet another one aside from a really bad
+user experience of having multiple approaches to BPF signing !
 
