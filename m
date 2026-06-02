@@ -1,98 +1,65 @@
-Return-Path: <netdev+bounces-294087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294088-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LqXD6KWHmrPlAkAu9opvQ
-	(envelope-from <netdev+bounces-294087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:38:58 +0200
+	id GFSELbmYHmoAlQkAu9opvQ
+	(envelope-from <netdev+bounces-294088-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:47:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84BE62AB13
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:38:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E5262ADAE
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1177C300B1C5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:38:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14C3B303B73F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1C23A8FE8;
-	Tue,  2 Jun 2026 08:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pS1R7VQv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAD53C81A9;
+	Tue,  2 Jun 2026 08:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B783C8C48
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 08:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2493C7DF0;
+	Tue,  2 Jun 2026 08:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780389518; cv=none; b=J19dAVpmcfj54n9pycHnAeUSXI+9duTFZih/plej+ueRYL3wBOldwxTIwXvs97jvIb1I3q7aj6SVRGbLRpTLlvv4oMdfEw6au4AQ7UesOp8YYFCI3PhOw5dBuZg1B2Hfd49ZmU1oo9+xw2+BQPvXDd99GV9QFWivr4AsTCGtdAc=
+	t=1780389868; cv=none; b=K/jnEJz1Co4tIAgNT6gIF1zVCuYAFKx1RXtU3sdaF1JoGoJ10MTJN9FCRrBME7LVZU2CXkOq9ndyWr6uy2/RPysOuBAm6DZ815UTw+TnuDOHUgtDKBdqVIUABKqd1Ka5fH7EGx/nKqczGFqrvOi8rcJLtclBKx4jysHxYjYPv04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780389518; c=relaxed/simple;
-	bh=zgl/I/ME2/KGAP5yOH8QMB1u+e5C14S1BPV5p7LkYhg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FYxqXpFkljtYST3qs4yFjtwKghxRBRNXGeZjkwqehYuQo1T23EjTB1J6lYSR19HjqQTtRSo7WK59KnygA+H0510ZmpDZaE4ovgc28UGPwyNgfcz0MgORgey3VnTmnoby3WVHiYYdrAITxd6s3Xz3Qixit6uGU+SnFqlVI1f7ZMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pS1R7VQv; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2c0c1e0d00bso21963035ad.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 01:38:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780389511; x=1780994311; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DUPApA9YiJOCL5FOAaTuUnUkeYM9NIdjLjTu9RZY/ZE=;
-        b=pS1R7VQv9Q9XVY2qT5Ze7QZqWVZv/tPMbsHNV4aaDEF6D7+qtjlKu1R/jVHuhaxXJP
-         M0l6io3osXDRKRNjpxAxdprRmVrgOYdLTTezNBblZxzC7CgFbNFuUcVHgIlJl9D2mybQ
-         P40NC+VkMSgMNBmdaxAEQbOxGY+5XXnPH/GjVg8SainPvvmSJXSnqG3LfnExL2uVLZv/
-         L5V4QjsRMpSsf/kG1mGL8DI+CATEzbXtInJtwZlh/YT2+Rh5CfXJ9SurYQ43zqe2MeCg
-         ZHIb/6OxDulj1BP49TReohWYGkd+/zIYrbk0ZtmvDXeTT33JInzqK22RlNaBDj2ZuHQx
-         13Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780389511; x=1780994311;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DUPApA9YiJOCL5FOAaTuUnUkeYM9NIdjLjTu9RZY/ZE=;
-        b=iqXwt3iPE27mNVZG6OAcYDivElnU+xyO41ztEmAKBBMFJ762rvXMJc6ifMv7l8Pxnz
-         yxfPbAWdCHWQkqD4ajlUxMdNCCDPSJINh8xtQFASmr5YFdPSkpGoKICGOuLT7vzRB3HI
-         xdpXZW0DjbKTAKdHQ8O2zGhfxRN+ztP0Mqnvrmp915mPBoU4650Xi5M5VIqNuBMMqd9U
-         3zbjYkeeNmTwN7PoUjfYs0m0LhF09Y0H5uQ1EE2Klab5XNo2iJnu0ORbDtlJRP39HUc1
-         FgShSmFiXize0jppVj1wztcVYbqVrwU26ZuPdouF85lYTpTMxgul507CIG3Bfnw2Sr/T
-         OQwQ==
-X-Gm-Message-State: AOJu0YwjH9qLarByrK7RUAfzr76M1CX02GmgzvFnezkhtU3zMzNbQVr3
-	ChNSYOubAe16TMW4PY5qT28wubrOg1CEMUqCJcZqFjEzgW6Or0QuEBPeSD2xRXBq
-X-Gm-Gg: Acq92OGhcVGXHHMIhiFjDPKlr41ahq/7p12jw7cO7tnmaBZgXKgAyFOnFpg/xe1zuWp
-	YponQCuay0Hybu7s/O12ZKjZvi8cadsDmo4770FTQ/L3H6y6nUSkEMnMv615aBy31/JQG9KumZh
-	2ViNymm/O+FQwa7tBOElq9eaS6HiTKpVi6W946CjsrZgAsUCuEkcqpELBQQi7+C1BkZm9XT374a
-	/pvPD4B5+24kab3IBMv1TKWCx+tbzeHnwIYT1w2q+qn571ff8P0ET3fOFXBqY2GUsII/lRkhpEl
-	ohjrUu4FYm8tzzyou0PG0TZ7V76G7nztpUHSXuu2NwpxaTXvW9jPuraNxUG67I6cWQjS7y8TeCf
-	OIubaJeoPGwo8kceg/r6sGg4JpKJHAycQXpZdckgDb5rvijv6MeiTtHT/9F9c4K0IqHLCZo3b/C
-	yTftTE0I9CYgY7dnI4nrKA0XrcM3LTxmAyGFNmd4x2d8NCaKZCuEKFHJgh7bs=
-X-Received: by 2002:a17:903:906:b0:2bf:13b6:dafd with SMTP id d9443c01a7336-2bf367ddeecmr172727855ad.18.1780389510847;
-        Tue, 02 Jun 2026 01:38:30 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([2a09:bac1:7680:d30::4cf:38])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23a10165sm122804285ad.31.2026.06.02.01.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 01:38:30 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	hong son Nguyen <hongson.hn@gmail.com>
-Subject: [PATCH net-next v5 2/2] net: dsa: yt921x: Add ACL support
-Date: Tue,  2 Jun 2026 16:37:53 +0800
-Message-ID: <20260602083755.79411-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260602083755.79411-1-mmyangfl@gmail.com>
-References: <20260602083755.79411-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1780389868; c=relaxed/simple;
+	bh=1kJDBklGR+KwBXJLYlvP0UzDZ3rVkkzOoOR4mP/2wLI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j1XSUZOaFDuDzFy7YUvX4ifp5+vXUrxR40/TE8G6gU7kdiOP5oVPYo1hNKmQ3U6+1mRpkIB6/t2vF/nkRlPUfO+yV+xhd/f/CUnaSCC4dO70uICPlhlm+bRxTZMcuvfnACm9aCBGwxsOaCmP1HZPNB02oUkKxlNkUojeMghkUsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACnycO7lx5q0N1PAA--.44848S2;
+	Tue, 02 Jun 2026 16:43:39 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	memxor@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	jolsa@kernel.org,
+	toke@redhat.com,
+	liuhangbin@gmail.com,
+	yuantan098@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	zzhan461@ucr.edu,
+	n05ec@lzu.edu.cn
+Subject: [PATCH bpf v2] bpf: devmap: reject fragmented frames in clone-based broadcasts
+Date: Tue,  2 Jun 2026 16:43:33 +0800
+Message-ID: <21c2d153dd25603d359069a02bf06779b51f6423.1780385378.git.zzhan461@ucr.edu>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,1499 +67,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-CM-TRANSID:ygmowACnycO7lx5q0N1PAA--.44848S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1kXryrXrWfZr45JFWxCrg_yoW8KrWfpa
+	9F9a4DGrZ8tr47Ca4UZ3WI9rW5KF4kW3y3Kan8K3sxZw1qgr1Iga4SqF13JF1Yyr9YkFWa
+	qr12qrWDG3yUXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi_HU3UUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAGCWodQM8TtwABsT
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294087-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-294088-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,redhat.com,lzu.edu.cn,ucr.edu];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_SPAM(0.00)[0.260];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: E84BE62AB13
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ucr.edu:mid,ucr.edu:email]
+X-Rspamd-Queue-Id: 19E5262ADAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Enable filtering of incoming traffics. Note that custom filters are yet
-to be utilized, and thus not all flow dissectors are implemented.
+From: Zhao Zhang <zzhan461@ucr.edu>
 
-Tested-by: hong son Nguyen <hongson.hn@gmail.com>
-Signed-off-by: David Yang <mmyangfl@gmail.com>
+Devmap broadcast redirects clone the packet for all but the last
+destination.
+
+For native XDP, that clone path copies only the linear xdp_frame data,
+while fragmented frames keep skb_shared_info in tailroom outside the
+linear area. Cloning such a frame leaves XDP_FLAGS_HAS_FRAGS set but
+without valid frag metadata, and the later free path can interpret
+uninitialized tail data as skb_shared_info, leading to an out-of-bounds
+access during frame return.
+
+Reject fragmented native XDP frames in dev_map_enqueue_clone().
+
+Add the same restriction to the generic XDP clone path in
+dev_map_redirect_clone(). Generic XDP represents fragmented packets as
+nonlinear skbs, and rejecting them here keeps clone-based broadcast
+support aligned between native and generic XDP.
+
+Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
- drivers/net/dsa/yt921x.c | 1052 +++++++++++++++++++++++++++++++++++++-
- drivers/net/dsa/yt921x.h |  286 +++++++++++
- 2 files changed, 1335 insertions(+), 3 deletions(-)
+changes in v2:
+- Add the same fragmented-packet restriction to generic XDP
+  dev_map_redirect_clone() so clone-based broadcast behavior stays
+  aligned with the native XDP path.
+- v1 link: https://lore.kernel.org/all/4b596825bccc64d03e0c2e0db4dceb12c7f5cf47.1780176829.git.zzhan461@ucr.edu/
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 9cc211b90c6c..95dbbb34790a 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -186,6 +186,16 @@ struct yt921x_reg_mdio {
- #define to_yt921x_priv(_ds) container_of_const(_ds, struct yt921x_priv, ds)
- #define to_device(priv) ((priv)->ds.dev)
- 
-+static u32 ethaddr_hi4_to_u32(const unsigned char *addr)
-+{
-+	return (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) | addr[3];
-+}
-+
-+static u32 ethaddr_lo2_to_u32(const unsigned char *addr)
-+{
-+	return (addr[4] << 8) | addr[5];
-+}
-+
- static int yt921x_reg_read(struct yt921x_priv *priv, u32 reg, u32 *valp)
+ kernel/bpf/devmap.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index cc0a43ebab6b..5b9eac5342a9 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -581,6 +581,10 @@ static int dev_map_enqueue_clone(struct bpf_dtab_netdev *obj,
  {
- 	WARN_ON(!mutex_is_locked(&priv->reg_lock));
-@@ -1457,6 +1467,1017 @@ yt921x_dsa_port_setup_tc(struct dsa_switch *ds, int port,
- 	}
- }
+ 	struct xdp_frame *nxdpf;
  
-+/* ACL: 48 blocks * 8 entries
-+ *
-+ * One rule can span multiple entries, but within a block.
-+ */
-+
-+static void
-+yt921x_acl_entry_set(struct yt921x_acl_entry *entry, unsigned int offset,
-+		     u32 flags, bool set)
-+{
-+	if (set)
-+		entry->key[offset] |= flags;
-+	entry->mask[offset] |= flags;
-+}
-+
-+static unsigned int
-+yt921x_acl_entries_set_is_fragment(struct yt921x_acl_entry *entries,
-+				   unsigned int size, bool set)
-+{
-+	for (unsigned int i = 0; i < size; i++)
-+		switch (FIELD_GET(YT921X_ACL_KEYb_TYPE_M, entries[i].key[1])) {
-+		case YT921X_ACL_TYPE_IPV4_DA:
-+		case YT921X_ACL_TYPE_IPV4_SA:
-+			yt921x_acl_entry_set(&entries[i], 1,
-+					     YT921X_ACL_BINb_IPV4_FRAG, set);
-+			return size;
-+		case YT921X_ACL_TYPE_IPV6_DA3:
-+		case YT921X_ACL_TYPE_IPV6_SA3:
-+			yt921x_acl_entry_set(&entries[i], 1,
-+					     YT921X_ACL_BINb_IPV6_xA3_FRAG,
-+					     set);
-+			return size;
-+		case YT921X_ACL_TYPE_MISC:
-+			yt921x_acl_entry_set(&entries[i], 1,
-+					     YT921X_ACL_BINb_MISC_FRAG, set);
-+			return size;
-+		case YT921X_ACL_TYPE_L4:
-+			yt921x_acl_entry_set(&entries[i], 1,
-+					     YT921X_ACL_BINb_L4_FRAG, set);
-+			return size;
-+		}
-+
-+	if (size >= YT921X_ACL_ENT_PER_BLK)
-+		return 0;
-+
-+	entries[size] = (typeof(*entries)){};
-+	entries[size].key[1] = YT921X_ACL_KEYb_TYPE(YT921X_ACL_TYPE_MISC);
-+	yt921x_acl_entry_set(&entries[size], 1, YT921X_ACL_BINb_MISC_FRAG, set);
-+
-+	return size + 1;
-+}
-+
-+static unsigned int
-+yt921x_acl_entries_set_first_frag(struct yt921x_acl_entry *entries,
-+				  unsigned int size, bool set)
-+{
-+	for (unsigned int i = 0; i < size; i++)
-+		switch (FIELD_GET(YT921X_ACL_KEYb_TYPE_M, entries[i].key[1])) {
-+		case YT921X_ACL_TYPE_IPV6_DA2:
-+		case YT921X_ACL_TYPE_IPV6_SA2:
-+			yt921x_acl_entry_set(&entries[i], 1,
-+					     YT921X_ACL_BINb_IPV6_xA2_FIRST_FRAG,
-+					     set);
-+			return size;
-+		case YT921X_ACL_TYPE_MISC:
-+			yt921x_acl_entry_set(&entries[i], 0,
-+					     YT921X_ACL_BINa_MISC_FIRST_FRAG,
-+					     set);
-+			return size;
-+		}
-+
-+	if (size >= YT921X_ACL_ENT_PER_BLK)
-+		return 0;
-+
-+	entries[size] = (typeof(*entries)){};
-+	entries[size].key[1] = YT921X_ACL_KEYb_TYPE(YT921X_ACL_TYPE_MISC);
-+	yt921x_acl_entry_set(&entries[size], 0,
-+			     YT921X_ACL_BINa_MISC_FIRST_FRAG, set);
-+
-+	return size + 1;
-+}
-+
-+static unsigned int
-+yt921x_acl_entries_set_l3_type(struct yt921x_acl_entry *entries,
-+			       unsigned int size, enum yt921x_l3_type type)
-+{
-+	for (unsigned int i = 0; i < size; i++)
-+		switch (FIELD_GET(YT921X_ACL_KEYb_TYPE_M, entries[i].key[1])) {
-+		case YT921X_ACL_TYPE_MAC_DA0:
-+		case YT921X_ACL_TYPE_MAC_SA0:
-+			entries[i].key[1] |= YT921X_ACL_BINb_MAC_xA0_L3_TYPE(type);
-+			entries[i].mask[1] |= YT921X_ACL_BINb_MAC_xA0_L3_TYPE_M;
-+			return size;
-+		case YT921X_ACL_TYPE_MISC:
-+			entries[i].key[0] |= YT921X_ACL_BINa_MISC_L3_TYPE(type);
-+			entries[i].mask[0] |= YT921X_ACL_BINa_MISC_L3_TYPE_M;
-+			return size;
-+		}
-+
-+	if (size >= YT921X_ACL_ENT_PER_BLK)
-+		return 0;
-+
-+	entries[size] = (typeof(*entries)){};
-+	entries[size].key[0] = YT921X_ACL_BINa_MISC_L3_TYPE(type);
-+	entries[size].key[1] = YT921X_ACL_KEYb_TYPE(YT921X_ACL_TYPE_MISC);
-+	entries[size].mask[0] = YT921X_ACL_BINa_MISC_L3_TYPE_M;
-+
-+	return size + 1;
-+}
-+
-+static unsigned int
-+yt921x_acl_entries_set_l4_type(struct yt921x_acl_entry *entries,
-+			       unsigned int size, enum yt921x_l4_type type)
-+{
-+	for (unsigned int i = 0; i < size; i++)
-+		switch (FIELD_GET(YT921X_ACL_KEYb_TYPE_M, entries[i].key[1])) {
-+		case YT921X_ACL_TYPE_IPV4_DA:
-+		case YT921X_ACL_TYPE_IPV4_SA:
-+			entries[i].key[1] |= YT921X_ACL_BINb_IPV4_L4_TYPE(type);
-+			entries[i].mask[1] |= YT921X_ACL_BINb_IPV4_L4_TYPE_M;
-+			return size;
-+		case YT921X_ACL_TYPE_IPV6_DA0:
-+		case YT921X_ACL_TYPE_IPV6_DA1:
-+		case YT921X_ACL_TYPE_IPV6_DA2:
-+		case YT921X_ACL_TYPE_IPV6_DA3:
-+		case YT921X_ACL_TYPE_IPV6_SA0:
-+		case YT921X_ACL_TYPE_IPV6_SA1:
-+		case YT921X_ACL_TYPE_IPV6_SA2:
-+		case YT921X_ACL_TYPE_IPV6_SA3:
-+			entries[i].key[1] |= YT921X_ACL_BINb_IPV6_L4_TYPE(type);
-+			entries[i].mask[1] |= YT921X_ACL_BINb_IPV6_L4_TYPE_M;
-+			return size;
-+		case YT921X_ACL_TYPE_L4:
-+			entries[i].key[1] |= YT921X_ACL_BINb_L4_TYPE(type);
-+			entries[i].mask[1] |= YT921X_ACL_BINb_L4_TYPE_M;
-+			return size;
-+		case YT921X_ACL_TYPE_MISC:
-+			entries[i].key[1] |= YT921X_ACL_BINb_MISC_L4_TYPE(type);
-+			entries[i].mask[1] |= YT921X_ACL_BINb_MISC_L4_TYPE_M;
-+			return size;
-+		}
-+
-+	if (size >= YT921X_ACL_ENT_PER_BLK)
-+		return 0;
-+
-+	entries[size] = (typeof(*entries)){};
-+	entries[size].key[1] = YT921X_ACL_BINb_MISC_L4_TYPE(type) |
-+			       YT921X_ACL_KEYb_TYPE(YT921X_ACL_TYPE_MISC);
-+	entries[size].mask[1] = YT921X_ACL_BINb_MISC_L4_TYPE_M;
-+
-+	return size + 1;
-+}
-+
-+static struct yt921x_acl_entry *
-+yt921x_acl_entries_new(struct yt921x_acl_entry *entries, unsigned int *sizep,
-+		       u32 type)
-+{
-+	unsigned int size = *sizep;
-+
-+	if (size >= YT921X_ACL_ENT_PER_BLK)
-+		return NULL;
-+
-+	entries[size] = (typeof(*entries)){};
-+	entries[size].key[1] = YT921X_ACL_KEYb_TYPE(type);
-+
-+	(*sizep)++;
-+	return &entries[size];
-+}
-+
-+static struct yt921x_acl_entry *
-+yt921x_acl_entries_find(struct yt921x_acl_entry *entries, unsigned int *sizep,
-+			u32 type)
-+{
-+	for (unsigned int i = 0; i < *sizep; i++)
-+		if (FIELD_GET(YT921X_ACL_KEYb_TYPE_M, entries[i].key[1]) ==
-+		    type)
-+			return &entries[i];
-+	return yt921x_acl_entries_new(entries, sizep, type);
-+}
-+
-+static void
-+yt921x_acl_rule_set_ports(struct yt921x_acl_rule *aclrule, u16 ord,
-+			  u16 ports_mask)
-+{
-+	struct yt921x_acl_entry *entries = aclrule->entries;
-+
-+	for (unsigned int i = 0; i < hweight8(aclrule->mask); i++) {
-+		entries[i].key[1] |= YT921X_ACL_KEYb_SPORTS(ports_mask) |
-+				     YT921X_ACL_KEYb_ORD(ord);
-+	}
-+}
-+
-+struct yt921x_acl_rule_ext {
-+	struct yt921x_acl_rule r;
-+
-+	struct yt921x_marker marker;
-+};
-+
-+static int
-+yt921x_acl_rule_ext_parse_flow_entries(struct yt921x_acl_rule_ext *ruleext,
-+				       const struct flow_cls_offload *cls)
-+{
-+	const struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-+	struct yt921x_acl_entry *entries = ruleext->r.entries;
-+	struct netlink_ext_ack *extack = cls->common.extack;
-+	const struct flow_dissector *dissector;
-+	struct yt921x_acl_entry *entry;
-+	unsigned int size = 0;
-+	bool use_dport;
-+	bool use_sport;
-+
-+	/* Incomplete and probably won't, since it supports custom u32 filters.
-+	 * New adapters are welcome.
-+	 */
-+	dissector = rule->match.dissector;
-+	if (dissector->used_keys &
-+	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS_RANGE) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_IP) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_TCP))) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unsupported keys used");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	/* Entries */
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
-+		struct flow_match_ipv4_addrs match;
-+
-+		flow_rule_match_ipv4_addrs(rule, &match);
-+
-+		if (match.mask->dst) {
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_IPV4_DA);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= ntohl(match.key->dst);
-+			entry->mask[0] |= ntohl(match.mask->dst);
-+		}
-+
-+		if (match.mask->src) {
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_IPV4_SA);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= ntohl(match.key->src);
-+			entry->mask[0] |= ntohl(match.mask->src);
-+		}
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
-+		struct flow_match_ipv6_addrs match;
-+
-+		flow_rule_match_ipv6_addrs(rule, &match);
-+
-+		for (unsigned int i = 0; i < 4; i++) {
-+			if (!match.mask->dst.s6_addr32[i])
-+				continue;
-+
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_IPV6_DA0 + i);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= ntohl(match.key->dst.s6_addr32[i]);
-+			entry->mask[0] |= ntohl(match.mask->dst.s6_addr32[i]);
-+		}
-+
-+		for (unsigned int i = 0; i < 4; i++) {
-+			if (!match.mask->src.s6_addr32[i])
-+				continue;
-+
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_IPV6_SA0 + i);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= ntohl(match.key->src.s6_addr32[i]);
-+			entry->mask[0] |= ntohl(match.mask->src.s6_addr32[i]);
-+		}
-+	}
-+
-+	use_dport = false;
-+	use_sport = false;
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS)) {
-+		struct flow_match_ports match;
-+
-+		entry = yt921x_acl_entries_new(entries, &size,
-+					       YT921X_ACL_TYPE_L4);
-+		if (!entry)
-+			goto err;
-+
-+		flow_rule_match_ports(rule, &match);
-+
-+		use_dport = !!match.mask->dst;
-+		use_sport = !!match.mask->src;
-+
-+		entry->key[0] |= (ntohs(match.key->dst) << 16) |
-+				 ntohs(match.key->src);
-+		entry->mask[0] |= (ntohs(match.mask->dst) << 16) |
-+				  ntohs(match.mask->src);
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS_RANGE)) {
-+		struct flow_match_ports_range match;
-+
-+		entry = yt921x_acl_entries_find(entries, &size,
-+						YT921X_ACL_TYPE_L4);
-+		if (!entry)
-+			goto err;
-+
-+		flow_rule_match_ports_range(rule, &match);
-+
-+		if ((use_dport && match.mask->tp.dst) ||
-+		    (use_sport && match.mask->tp.src)) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Port mask and range are mutually exclusive");
-+			return -EINVAL;
-+		}
-+
-+		if (match.mask->tp.dst) {
-+			entry->key[0] |= ntohs(match.key->tp_min.dst) << 16;
-+			entry->key[1] |= YT921X_ACL_KEYb_L4_DPORT_RANGE_EN;
-+			entry->mask[0] |= ntohs(match.key->tp_max.dst) << 16;
-+		}
-+
-+		if (match.mask->tp.src) {
-+			entry->key[0] |= ntohs(match.key->tp_min.src);
-+			entry->key[1] |= YT921X_ACL_KEYb_L4_SPORT_RANGE_EN;
-+			entry->mask[0] |= ntohs(match.key->tp_max.src);
-+		}
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
-+		struct flow_match_eth_addrs match;
-+		u32 mask;
-+
-+		flow_rule_match_eth_addrs(rule, &match);
-+
-+		mask = ethaddr_hi4_to_u32(match.mask->dst);
-+		if (mask) {
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_MAC_DA0);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= ethaddr_hi4_to_u32(match.key->dst);
-+			entry->mask[0] |= mask;
-+		}
-+
-+		mask = ethaddr_hi4_to_u32(match.mask->src);
-+		if (mask) {
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_MAC_SA0);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= ethaddr_hi4_to_u32(match.key->src);
-+			entry->mask[0] |= mask;
-+		}
-+
-+		mask = (ethaddr_lo2_to_u32(match.mask->dst) << 16) |
-+		       ethaddr_lo2_to_u32(match.mask->src);
-+		if (mask) {
-+			entry = yt921x_acl_entries_new(entries, &size,
-+						       YT921X_ACL_TYPE_MAC_DA1_SA1);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= (ethaddr_lo2_to_u32(match.key->dst) << 16) |
-+					 ethaddr_lo2_to_u32(match.key->src);
-+			entry->mask[0] |= mask;
-+		}
-+	}
-+
-+	/* Entries + Misc */
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
-+		struct flow_match_basic match;
-+
-+		flow_rule_match_basic(rule, &match);
-+
-+		if (match.mask->n_proto) {
-+			enum yt921x_l3_type l3type = YT921X_L3_TYPE_OTHER;
-+
-+			if (match.mask->n_proto == htons(~0))
-+				switch (match.key->n_proto) {
-+				case htons(ETH_P_IP):
-+					l3type = YT921X_L3_TYPE_IPV4;
-+					break;
-+				case htons(ETH_P_IPV6):
-+					l3type = YT921X_L3_TYPE_IPV6;
-+					break;
-+				case htons(ETH_P_ARP):
-+					l3type = YT921X_L3_TYPE_ARP;
-+					break;
-+				case htons(ETH_P_LLDP):
-+					l3type = YT921X_L3_TYPE_LLDP;
-+					break;
-+				case htons(ETH_P_PAE):
-+					l3type = YT921X_L3_TYPE_PAE;
-+					break;
-+				case htons(ETH_P_CFM):
-+					l3type = YT921X_L3_TYPE_ERP;
-+					break;
-+				}
-+
-+			if (l3type != YT921X_L3_TYPE_OTHER) {
-+				size = yt921x_acl_entries_set_l3_type(entries,
-+								      size,
-+								      l3type);
-+				if (!size)
-+					goto err;
-+			} else {
-+				entry = yt921x_acl_entries_new(entries, &size,
-+							       YT921X_ACL_TYPE_ETHERTYPE);
-+				if (!entry)
-+					goto err;
-+
-+				entry->key[0] |= ntohs(match.key->n_proto);
-+				entry->mask[0] |= ntohs(match.mask->n_proto);
-+			}
-+		}
-+
-+		if (match.mask->ip_proto) {
-+			enum yt921x_l4_type l4type = YT921X_L4_TYPE_OTHER;
-+
-+			if (match.mask->ip_proto == (u8)~0)
-+				switch (match.key->ip_proto) {
-+				case IPPROTO_TCP:
-+					l4type = YT921X_L4_TYPE_TCP;
-+					break;
-+				case IPPROTO_UDP:
-+					l4type = YT921X_L4_TYPE_UDP;
-+					break;
-+				case IPPROTO_UDPLITE:
-+					l4type = YT921X_L4_TYPE_UDPLITE;
-+					break;
-+				case IPPROTO_ICMP:
-+					l4type = YT921X_L4_TYPE_ICMP;
-+					break;
-+				case IPPROTO_IGMP:
-+					l4type = YT921X_L4_TYPE_IGMP;
-+					break;
-+				}
-+
-+			if (l4type != YT921X_L4_TYPE_OTHER) {
-+				size = yt921x_acl_entries_set_l4_type(entries,
-+								      size,
-+								      l4type);
-+				if (!size)
-+					goto err;
-+			} else {
-+				entry = yt921x_acl_entries_find(entries, &size,
-+								YT921X_ACL_TYPE_MISC);
-+				if (!entry)
-+					goto err;
-+
-+				entry->key[0] |= YT921X_ACL_BINa_MISC_IP_PROTO(match.key->ip_proto);
-+				entry->mask[0] |= YT921X_ACL_BINa_MISC_IP_PROTO(match.mask->ip_proto);
-+			}
-+		}
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
-+		u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG;
-+		struct flow_match_control match;
-+
-+		flow_rule_match_control(rule, &match);
-+		if (!flow_rule_is_supp_control_flags(supp_flags,
-+						     match.mask->flags, extack))
-+			return -EOPNOTSUPP;
-+
-+		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
-+			bool set = match.key->flags & FLOW_DIS_IS_FRAGMENT;
-+
-+			size = yt921x_acl_entries_set_is_fragment(entries, size,
-+								  set);
-+			if (!size)
-+				goto err;
-+		}
-+		if (match.mask->flags & FLOW_DIS_FIRST_FRAG) {
-+			bool set = match.key->flags & FLOW_DIS_FIRST_FRAG;
-+
-+			size = yt921x_acl_entries_set_first_frag(entries, size,
-+								 set);
-+			if (!size)
-+				goto err;
-+		}
-+	}
-+
-+	/* Misc only */
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IP)) {
-+		struct flow_match_ip match;
-+
-+		flow_rule_match_ip(rule, &match);
-+		if (match.mask->ttl) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Matching on TTL not supported");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		if (match.mask->tos) {
-+			entry = yt921x_acl_entries_find(entries, &size,
-+							YT921X_ACL_TYPE_MISC);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= YT921X_ACL_BINa_MISC_TOS(match.key->tos);
-+			entry->mask[0] |= YT921X_ACL_BINa_MISC_TOS(match.mask->tos);
-+		}
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_TCP)) {
-+		struct flow_match_tcp match;
-+
-+		flow_rule_match_tcp(rule, &match);
-+
-+		if (match.mask->flags) {
-+			entry = yt921x_acl_entries_find(entries, &size,
-+							YT921X_ACL_TYPE_MISC);
-+			if (!entry)
-+				goto err;
-+
-+			entry->key[0] |= YT921X_ACL_BINa_MISC_TCP_FLAGS(ntohs(match.key->flags));
-+			entry->mask[0] |= YT921X_ACL_BINa_MISC_TCP_FLAGS(ntohs(match.mask->flags));
-+		}
-+	}
-+
-+	if (!size) {
-+		NL_SET_ERR_MSG_MOD(extack, "Empty rule generated, this should not happen");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ruleext->r.mask = (1 << size) - 1;
-+	return 0;
-+
-+err:
-+	NL_SET_ERR_MSG_MOD(extack, "Rule too complex");
-+	return -EOPNOTSUPP;
-+}
-+
-+static int
-+yt921x_acl_rule_ext_parse_flow_action(struct yt921x_acl_rule_ext *ruleext,
-+				      const struct flow_cls_offload *cls,
-+				      struct yt921x_priv *priv, int port)
-+{
-+	const struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-+	const struct flow_action *flow_action = &rule->action;
-+	struct netlink_ext_ack *extack = cls->common.extack;
-+	enum flow_action_id redir_act = NUM_FLOW_ACTIONS;
-+	const struct flow_action_entry *act;
-+	u32 *action = ruleext->r.action;
-+	bool seen_priority = false;
-+	const char *reason = NULL;
-+	bool seen_police = false;
-+	unsigned int i;
-+	int res;
-+
-+	memset(action, 0, 3 * sizeof(*action));
-+	flow_action_for_each(i, act, flow_action)
-+		switch (act->id) {
-+		case FLOW_ACTION_ACCEPT:
-+		case FLOW_ACTION_DROP:
-+		case FLOW_ACTION_REDIRECT:
-+			if (redir_act != NUM_FLOW_ACTIONS &&
-+			    redir_act != act->id) {
-+				reason = "Different redirect actions";
-+				goto fallback;
-+			}
-+			redir_act = act->id;
-+
-+			switch (act->id) {
-+			case FLOW_ACTION_ACCEPT:
-+				action[2] |= YT921X_ACL_ACTc_FWD_EN |
-+					     YT921X_ACL_ACTc_FWD_FWD;
-+				break;
-+			case FLOW_ACTION_DROP:
-+				action[2] |= YT921X_ACL_ACTc_FWD_EN |
-+					     YT921X_ACL_ACTc_FWD_REDIR;
-+				break;
-+			case FLOW_ACTION_REDIRECT: {
-+				struct dsa_port *to_dp;
-+
-+				to_dp = dsa_port_from_netdev(act->dev);
-+				if (IS_ERR(to_dp) || to_dp->ds != &priv->ds) {
-+					reason = "Redirect to non-local port";
-+					goto fallback;
-+				}
-+
-+				action[2] |= YT921X_ACL_ACTc_FWD_EN |
-+					     YT921X_ACL_ACTc_FWD_REDIR |
-+					     YT921X_ACL_ACTc_FWD_REDIR_DPORTn(to_dp->index);
-+				break;
-+			}
-+			default:
-+				break;
-+			}
-+			break;
-+		case FLOW_ACTION_PRIORITY:
-+			if (seen_priority) {
-+				action[0] &= ~YT921X_ACL_ACTa_PRIO_EN;
-+				action[1] &= ~YT921X_ACL_ACTb_PRIO_M;
-+
-+				reason = "Multiple priority actions";
-+				goto fallback;
-+			}
-+			seen_priority = true;
-+
-+			if (act->priority >= YT921X_PRIO_NUM) {
-+				NL_SET_ERR_MSG_MOD(extack,
-+						   "Priority value is too high");
-+				return -EOPNOTSUPP;
-+			}
-+			action[0] |= YT921X_ACL_ACTa_PRIO_EN;
-+			action[1] |= YT921X_ACL_ACTb_PRIO(act->priority);
-+			break;
-+		case FLOW_ACTION_POLICE: {
-+			const struct flow_action_police *police = &act->police;
-+
-+			if (seen_police) {
-+				action[0] &= ~YT921X_ACL_ACTa_METER_EN;
-+
-+				reason = "Multiple police actions";
-+				goto fallback;
-+			}
-+			seen_police = true;
-+
-+			res = yt921x_police_validate(police, flow_action, act,
-+						     extack);
-+			if (res)
-+				return res;
-+
-+			res = yt921x_marker_tfm_police(&ruleext->marker, police,
-+						       0, priv, port, extack);
-+			if (res)
-+				return res;
-+
-+			action[0] |= YT921X_ACL_ACTa_METER_EN;
-+			break;
-+		}
-+		default:
-+fallback:
-+			if (cls->common.skip_sw) {
-+				NL_SET_ERR_MSG_FMT_MOD(extack,
-+						       "Action not supported when skip_sw: %s",
-+						       reason);
-+				return -EOPNOTSUPP;
-+			}
-+			fallthrough;
-+		case FLOW_ACTION_TRAP:
-+			redir_act = FLOW_ACTION_TRAP;
-+
-+			action[2] &= ~YT921X_ACL_ACTc_FWD_REDIR_DPORTS_M &
-+				     ~YT921X_ACL_ACTc_FWD_M;
-+			action[2] |= YT921X_ACL_ACTc_FWD_EN |
-+				     YT921X_ACL_ACTc_FWD_REDIR;
-+			break;
-+		}
-+
-+	ruleext->r.sw_assisted = !cls->common.skip_sw;
-+	return 0;
-+}
-+
-+static int
-+yt921x_acl_rule_ext_parse_flow(struct yt921x_acl_rule_ext *ruleext, int port,
-+			       const struct flow_cls_offload *cls, bool ingress,
-+			       struct yt921x_priv *priv)
-+{
-+	struct netlink_ext_ack *extack = cls->common.extack;
-+	int res;
-+
-+	if (!ingress) {
-+		NL_SET_ERR_MSG_MOD(extack, "Only ingress is supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (cls->common.chain_index) {
-+		NL_SET_ERR_MSG(extack, "Only chain 0 is supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	res = yt921x_acl_rule_ext_parse_flow_action(ruleext, cls, priv, port);
-+	if (res)
-+		return res;
-+	res = yt921x_acl_rule_ext_parse_flow_entries(ruleext, cls);
-+	if (res)
-+		return res;
-+
-+	yt921x_acl_rule_set_ports(&ruleext->r, 0, BIT(port));
-+	ruleext->r.tag = cls->cookie;
-+	ruleext->r.type = TC_SETUP_CLSFLOWER;
-+	return 0;
-+}
-+
-+static unsigned int
-+yt921x_acl_find(const struct yt921x_priv *priv, enum tc_setup_type type,
-+		unsigned long tag)
-+{
-+	for (unsigned int blkid = 0; blkid < YT921X_ACL_BLK_NUM; blkid++) {
-+		const struct yt921x_acl_blk *aclblk = priv->acl_blks[blkid];
-+
-+		if (!aclblk)
-+			continue;
-+
-+		for (unsigned int i = 0; i < YT921X_ACL_ENT_PER_BLK; i++)
-+			if (aclblk->rules[i] && aclblk->rules[i]->tag == tag &&
-+			    aclblk->rules[i]->type == type)
-+				return YT921X_ACL_ENT_PER_BLK * blkid + i;
-+	}
-+
-+	return UINT_MAX;
-+}
-+
-+static unsigned int
-+yt921x_acl_reserve(struct yt921x_priv *priv, unsigned int entscnt,
-+		   struct netlink_ext_ack *extack)
-+{
-+	int candidates[YT921X_ACL_ENT_PER_BLK + 1];
-+	unsigned int acl_used_cnt = 0;
-+
-+	if (WARN_ON(entscnt > YT921X_ACL_ENT_PER_BLK))
-+		return UINT_MAX;
-+
-+	for (unsigned int i = 0; i < ARRAY_SIZE(candidates); i++)
-+		candidates[i] = -1;
-+	for (unsigned int i = YT921X_ACL_BLK_NUM; i-- > 0;) {
-+		unsigned int blk_used_cnt = hweight8(priv->acl_masks[i]);
-+
-+		candidates[blk_used_cnt] = i;
-+		acl_used_cnt += blk_used_cnt;
-+	}
-+
-+	if (acl_used_cnt >= YT921X_ACL_NUM) {
-+		NL_SET_ERR_MSG_MOD(extack, "ACL entry limit reached");
-+		return UINT_MAX;
-+	}
-+	if (acl_used_cnt + entscnt <= YT921X_ACL_NUM)
-+		for (unsigned int i = YT921X_ACL_ENT_PER_BLK - entscnt + 1;
-+		     i-- > 0;)
-+			if (candidates[i] >= 0)
-+				return YT921X_ACL_ENT_PER_BLK * candidates[i] +
-+				       ffz(priv->acl_masks[candidates[i]]);
-+
-+	NL_SET_ERR_MSG_MOD(extack,
-+			   "ACL entry allocation failed, simplify your rules or remove existing rules");
-+	return UINT_MAX;
-+}
-+
-+static int
-+yt921x_acl_commit(struct yt921x_priv *priv, unsigned int entid, u8 entsmask)
-+{
-+	const struct yt921x_acl_rule *aclrule;
-+	const struct yt921x_acl_blk *aclblk;
-+	unsigned int blkid;
-+	unsigned int binid;
-+	unsigned long mask;
-+	u32 zeros[3] = {};
-+	unsigned int i;
-+	unsigned int o;
-+	u32 ctrl;
-+	int res;
-+
-+	blkid = entid / YT921X_ACL_ENT_PER_BLK;
-+	binid = entid % YT921X_ACL_ENT_PER_BLK;
-+	aclblk = priv->acl_blks[blkid];
-+	aclrule = aclblk->rules[binid];
-+
-+	/* Write actions */
-+	res = yt921x_reg96_write(priv, YT921X_ACLn_ACT(entid),
-+				 aclrule ? aclrule->action : zeros);
-+	if (res)
-+		return res;
-+
-+	/* Select the block */
-+	ctrl = YT921X_ACL_BLK_CMD_MODIFY | YT921X_ACL_BLK_CMD_BLKID(blkid);
-+	res = yt921x_reg_write(priv, YT921X_ACL_BLK_CMD, ctrl);
-+	if (res)
-+		return res;
-+
-+	/* Write keys and masks */
-+	ctrl = 0;
-+	for (unsigned int i = 0; i < YT921X_ACL_ENT_PER_BLK; i++)
-+		ctrl |= YT921X_ACL_BLK_KEEP_KEEPn(i);
-+
-+	mask = entsmask;
-+	i = 0;
-+	for_each_set_bit(o, &mask, YT921X_ACL_ENT_PER_BLK) {
-+		res = yt921x_reg64_write(priv, YT921X_ACLn_KEYm(blkid, o),
-+					 aclrule ? aclrule->entries[i].key :
-+					 zeros);
-+		if (res)
-+			return res;
-+
-+		res = yt921x_reg64_write(priv, YT921X_ACLn_MASKm(blkid, o),
-+					 aclrule ? aclrule->entries[i].mask :
-+					 zeros);
-+		if (res)
-+			return res;
-+
-+		ctrl &= ~YT921X_ACL_BLK_KEEP_KEEPn(o);
-+		i++;
-+	}
-+
-+	res = yt921x_reg_write(priv, YT921X_ACL_BLK_KEEP, ctrl);
-+	if (res)
-+		return res;
-+
-+	ctrl = 0;
-+	for (unsigned int i = 0; i < YT921X_ACL_ENT_PER_BLK; i++) {
-+		const struct yt921x_acl_rule *other = aclblk->rules[i];
-+
-+		if (!other)
-+			continue;
-+
-+		mask = other->mask;
-+		for_each_set_bit(o, &mask, YT921X_ACL_ENT_PER_BLK)
-+			ctrl |= YT921X_ACL_ENTRY_ENm(o) |
-+				YT921X_ACL_ENTRY_GRPIDm(o, i);
-+	}
-+	res = yt921x_reg_write(priv, YT921X_ACLn_ENTRY(blkid), ctrl);
-+	if (res)
-+		return res;
-+
-+	/* Commit the block */
-+	ctrl = YT921X_ACL_BLK_CMD_BLKID(blkid);
-+	res = yt921x_reg_write(priv, YT921X_ACL_BLK_CMD, ctrl);
-+	if (res)
-+		return res;
-+
-+	return 0;
-+}
-+
-+static int
-+yt921x_acl_del(struct yt921x_priv *priv, enum tc_setup_type type,
-+	       unsigned long tag)
-+{
-+	struct device *dev = to_device(priv);
-+	struct yt921x_acl_rule *aclrule;
-+	struct yt921x_acl_blk *aclblk;
-+	unsigned int binid;
-+	unsigned int blkid;
-+	unsigned int entid;
-+	int res;
-+
-+	entid = yt921x_acl_find(priv, type, tag);
-+	if (entid == UINT_MAX)
-+		return -ENOENT;
-+
-+	blkid = entid / YT921X_ACL_ENT_PER_BLK;
-+	binid = entid % YT921X_ACL_ENT_PER_BLK;
-+	aclblk = priv->acl_blks[blkid];
-+	aclrule = aclblk->rules[binid];
-+
-+	aclblk->rules[binid] = NULL;
-+	res = yt921x_acl_commit(priv, entid, aclrule->mask);
-+	if (res) {
-+		aclblk->rules[binid] = aclrule;
-+		return res;
-+	}
-+
-+	if (aclrule->action[0] & YT921X_ACL_ACTa_METER_EN)
-+		clear_bit(FIELD_GET(YT921X_ACL_ACTa_METER_ID_M,
-+				    aclrule->action[0]),
-+			  priv->meters_map);
-+	priv->acl_masks[blkid] &= ~aclrule->mask;
-+	devm_kfree(dev, aclrule);
-+	if (!priv->acl_masks[blkid]) {
-+		devm_kfree(dev, aclblk);
-+		priv->acl_blks[blkid] = NULL;
-+	}
-+	return 0;
-+}
-+
-+static int
-+yt921x_acl_add(struct yt921x_priv *priv,
-+	       const struct yt921x_acl_rule_ext *ruleext,
-+	       struct netlink_ext_ack *extack)
-+{
-+	bool use_meter = ruleext->r.action[0] & YT921X_ACL_ACTa_METER_EN;
-+	unsigned int entscnt = hweight8(ruleext->r.mask);
-+	struct device *dev = to_device(priv);
-+	struct yt921x_acl_rule *aclrule;
-+	struct yt921x_acl_blk *aclblk;
-+	unsigned int meterid;
-+	unsigned long mask;
-+	unsigned int binid;
-+	unsigned int blkid;
-+	unsigned int entid;
-+	unsigned int o;
-+	int res;
-+
-+	/* Allocate resources */
-+	entid = yt921x_acl_reserve(priv, entscnt, extack);
-+	if (entid == UINT_MAX)
++	/* Frags live outside the linear frame and cannot be cloned safely. */
++	if (unlikely(xdp_frame_has_frags(xdpf)))
 +		return -EOPNOTSUPP;
 +
-+	if (use_meter) {
-+		meterid = find_first_zero_bit(priv->meters_map,
-+					      YT921X_METER_NUM);
-+		if (meterid < YT921X_METER_NUM) {
-+			res = yt921x_meter_config(priv, meterid,
-+						  &ruleext->marker);
-+			if (res)
-+				return res;
-+		} else if (ruleext->r.sw_assisted) {
-+			use_meter = false;
-+		} else {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "No more meters available");
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
-+	/* Prepare acl block ctrlblk */
-+	blkid = entid / YT921X_ACL_ENT_PER_BLK;
-+	binid = entid % YT921X_ACL_ENT_PER_BLK;
-+	aclblk = priv->acl_blks[blkid];
-+	if (!aclblk) {
-+		aclblk = devm_kzalloc(dev, sizeof(*aclblk), GFP_KERNEL);
-+		if (!aclblk)
-+			return -ENOMEM;
-+		priv->acl_blks[blkid] = aclblk;
-+	}
-+
-+	/* Prepare acl rule ctrlblk */
-+	aclrule = devm_kmemdup(dev, &ruleext->r,
-+			       offsetof(struct yt921x_acl_rule,
-+					entries[entscnt]),
-+			       GFP_KERNEL);
-+	if (!aclrule) {
-+		res = -ENOMEM;
-+		goto err;
-+	}
-+
-+	/* Replace the placeholder resource IDs */
-+	aclrule->mask = 0;
-+	mask = priv->acl_masks[blkid];
-+	for_each_clear_bit(o, &mask, YT921X_ACL_ENT_PER_BLK) {
-+		aclrule->mask |= BIT(o);
-+		entscnt--;
-+		if (!entscnt)
-+			break;
-+	}
-+
-+	if (use_meter)
-+		aclrule->action[0] |= YT921X_ACL_ACTa_METER_ID(meterid);
-+	else
-+		aclrule->action[0] &= ~YT921X_ACL_ACTa_METER_EN;
-+
-+	/* Write rules */
-+	aclblk->rules[binid] = aclrule;
-+	res = yt921x_acl_commit(priv, entid, aclrule->mask);
-+	if (res) {
-+		aclblk->rules[binid] = NULL;
-+		devm_kfree(dev, aclrule);
-+		goto err;
-+	}
-+
-+	if (use_meter)
-+		set_bit(meterid, priv->meters_map);
-+	priv->acl_masks[blkid] |= aclrule->mask;
-+	return 0;
-+
-+err:
-+	if (!priv->acl_masks[blkid]) {
-+		devm_kfree(dev, aclblk);
-+		priv->acl_blks[blkid] = NULL;
-+	}
-+	return res;
-+}
-+
-+static int
-+yt921x_dsa_cls_flower_del(struct dsa_switch *ds, int port,
-+			  struct flow_cls_offload *cls, bool ingress)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	int res;
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_acl_del(priv, TC_SETUP_CLSFLOWER, cls->cookie);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
-+}
-+
-+static int
-+yt921x_dsa_cls_flower_add(struct dsa_switch *ds, int port,
-+			  struct flow_cls_offload *cls, bool ingress)
-+{
-+	struct netlink_ext_ack *extack = cls->common.extack;
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	struct yt921x_acl_rule_ext ruleext;
-+	int res;
-+
-+	res = yt921x_acl_rule_ext_parse_flow(&ruleext, port, cls, ingress,
-+					     priv);
-+	if (res)
-+		return res;
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_acl_add(priv, &ruleext, extack);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
-+}
-+
- static int
- yt921x_mirror_del(struct yt921x_priv *priv, int port, bool ingress)
- {
-@@ -1747,12 +2768,12 @@ yt921x_fdb_in01(struct yt921x_priv *priv, const unsigned char *addr,
- 	u32 ctrl;
- 	int res;
+ 	nxdpf = xdpf_clone(xdpf);
+ 	if (!nxdpf)
+ 		return -ENOMEM;
+@@ -726,6 +730,9 @@ static int dev_map_redirect_clone(struct bpf_dtab_netdev *dst,
+ 	struct sk_buff *nskb;
+ 	int err;
  
--	ctrl = (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) | addr[3];
-+	ctrl = ethaddr_hi4_to_u32(addr);
- 	res = yt921x_reg_write(priv, YT921X_FDB_IN0, ctrl);
- 	if (res)
- 		return res;
- 
--	ctrl = ctrl1 | YT921X_FDB_IO1_FID(vid) | (addr[4] << 8) | addr[5];
-+	ctrl = ctrl1 | YT921X_FDB_IO1_FID(vid) | ethaddr_lo2_to_u32(addr);
- 	return yt921x_reg_write(priv, YT921X_FDB_IN1, ctrl);
- }
- 
-@@ -3613,6 +4634,24 @@ static int yt921x_chip_setup_tc(struct yt921x_priv *priv)
- 	return 0;
- }
- 
-+static int yt921x_chip_setup_acl(struct yt921x_priv *priv)
-+{
-+	u32 ctrl;
-+	int res;
++	if (unlikely(skb_is_nonlinear(skb)))
++		return -EOPNOTSUPP;
 +
-+	ctrl = YT921X_ACL_PERMIT_UNMATCH_PORTS_M;
-+	res = yt921x_reg_write(priv, YT921X_ACL_PERMIT_UNMATCH, ctrl);
-+	if (res)
-+		return res;
-+
-+	ctrl = YT921X_ACL_PORT_PORTS_M;
-+	res = yt921x_reg_write(priv, YT921X_ACL_PORT, ctrl);
-+	if (res)
-+		return res;
-+
-+	return 0;
-+}
-+
- static int __maybe_unused yt921x_chip_setup_qos(struct yt921x_priv *priv)
- {
- 	u32 ctrl;
-@@ -3659,7 +4698,7 @@ static int yt921x_chip_setup(struct yt921x_priv *priv)
- 	u32 ctrl;
- 	int res;
- 
--	ctrl = YT921X_FUNC_MIB | YT921X_FUNC_METER;
-+	ctrl = YT921X_FUNC_MIB | YT921X_FUNC_ACL | YT921X_FUNC_METER;
- 	res = yt921x_reg_set_bits(priv, YT921X_FUNC, ctrl);
- 	if (res)
- 		return res;
-@@ -3672,6 +4711,10 @@ static int yt921x_chip_setup(struct yt921x_priv *priv)
- 	if (res)
- 		return res;
- 
-+	res = yt921x_chip_setup_acl(priv);
-+	if (res)
-+		return res;
-+
- #if IS_ENABLED(CONFIG_DCB)
- 	res = yt921x_chip_setup_qos(priv);
- 	if (res)
-@@ -3767,6 +4810,9 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
- 	.port_policer_del	= yt921x_dsa_port_policer_del,
- 	.port_policer_add	= yt921x_dsa_port_policer_add,
- 	.port_setup_tc		= yt921x_dsa_port_setup_tc,
-+	/* acl */
-+	.cls_flower_del		= yt921x_dsa_cls_flower_del,
-+	.cls_flower_add		= yt921x_dsa_cls_flower_add,
- 	/* hsr */
- 	.port_hsr_leave		= dsa_port_simple_hsr_leave,
- 	.port_hsr_join		= dsa_port_simple_hsr_join,
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 70fa780c337f..555046526669 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -24,6 +24,7 @@
- #define  YT921X_RST_SW				BIT(1)
- #define YT921X_FUNC			0x80004
- #define  YT921X_FUNC_METER			BIT(4)
-+#define  YT921X_FUNC_ACL			BIT(2)
- #define  YT921X_FUNC_MIB			BIT(1)
- #define YT921X_CHIP_ID			0x80008
- #define  YT921X_CHIP_ID_MAJOR			GENMASK(31, 16)
-@@ -420,6 +421,10 @@ enum yt921x_app_selector {
- #define  YT921X_CPU_COPY_FORCE_INT_PORT		BIT(2)
- #define  YT921X_CPU_COPY_TO_INT_CPU		BIT(1)
- #define  YT921X_CPU_COPY_TO_EXT_CPU		BIT(0)
-+#define YT921X_ACL_PERMIT_UNMATCH	0x1806a0
-+#define  YT921X_ACL_PERMIT_UNMATCH_PORTS_M	GENMASK(10, 0)
-+#define   YT921X_ACL_PERMIT_UNMATCH_PORTS(x)		FIELD_PREP(YT921X_ACL_PERMIT_UNMATCH_PORTS_M, (x))
-+#define  YT921X_ACL_PERMIT_UNMATCH_PORTn(port)	BIT(port)
- #define YT921X_ACT_UNK_UCAST		0x180734
- #define YT921X_ACT_UNK_MCAST		0x180738
- #define  YT921X_ACT_UNK_MCAST_BYPASS_DROP_RMA	BIT(23)
-@@ -454,6 +459,249 @@ enum yt921x_app_selector {
- #define  YT921X_VLAN_CTRLa_METER_EN		BIT(5)
- #define  YT921X_VLAN_CTRLa_METER_ID_M		GENMASK(4, 0)
- 
-+#define YT921X_ACLn_ACT(n)		(0x1c0000 + 0x10 * (n))
-+#define  YT921X_ACL_ACTc_STAG_M			GENMASK(26, 25)
-+#define   YT921X_ACL_ACTc_STAG(x)			FIELD_PREP(YT921X_ACL_ACTc_STAG_M, (x))
-+#define   YT921X_ACL_ACTc_STAG_DONTCARE			YT921X_ACL_ACTc_STAG(0)
-+#define   YT921X_ACL_ACTc_STAG_UNTAG			YT921X_ACL_ACTc_STAG(1)
-+#define   YT921X_ACL_ACTc_STAG_TAG			YT921X_ACL_ACTc_STAG(2)
-+#define   YT921X_ACL_ACTc_STAG_KEEP			YT921X_ACL_ACTc_STAG(3)
-+#define  YT921X_ACL_ACTc_CTAG_M			GENMASK(24, 23)
-+#define   YT921X_ACL_ACTc_CTAG(x)			FIELD_PREP(YT921X_ACL_ACTc_CTAG_M, (x))
-+#define   YT921X_ACL_ACTc_CTAG_DONTCARE			YT921X_ACL_ACTc_CTAG(0)
-+#define   YT921X_ACL_ACTc_CTAG_UNTAG			YT921X_ACL_ACTc_CTAG(1)
-+#define   YT921X_ACL_ACTc_CTAG_TAG			YT921X_ACL_ACTc_CTAG(2)
-+#define   YT921X_ACL_ACTc_CTAG_KEEP			YT921X_ACL_ACTc_CTAG(3)
-+#define  YT921X_ACL_ACTc_FWD_M			GENMASK(22, 21)
-+#define   YT921X_ACL_ACTc_FWD(x)			FIELD_PREP(YT921X_ACL_ACTc_FWD_M, (x))
-+#define   YT921X_ACL_ACTc_FWD_FWD			YT921X_ACL_ACTc_FWD(0)
-+#define   YT921X_ACL_ACTc_FWD_COPY			YT921X_ACL_ACTc_FWD(1)
-+#define   YT921X_ACL_ACTc_FWD_REDIR			YT921X_ACL_ACTc_FWD(2)
-+#define   YT921X_ACL_ACTc_FWD_TRAP			YT921X_ACL_ACTc_FWD(3)
-+#define  YT921X_ACL_ACTc_FWD_REDIR_DPORTS_M	GENMASK(20, 10)
-+#define   YT921X_ACL_ACTc_FWD_REDIR_DPORTS(x)		FIELD_PREP(YT921X_ACL_ACTc_FWD_REDIR_DPORTS_M, (x))
-+#define  YT921X_ACL_ACTc_FWD_REDIR_DPORTn(port)	BIT((port) + 10)
-+#define  YT921X_ACL_ACTc_FWD_EN			BIT(9)
-+#define  YT921X_ACL_ACTc_SDEI			BIT(8)
-+#define  YT921X_ACL_ACTc_SDEI_REPLACE		BIT(7)
-+#define  YT921X_ACL_ACTc_SPRI_M			GENMASK(6, 4)
-+#define   YT921X_ACL_ACTc_SPRI(x)			FIELD_PREP(YT921X_ACL_ACTc_SPRI_M, (x))
-+#define  YT921X_ACL_ACTc_SPRI_REPLACE		BIT(3)
-+#define  YT921X_ACL_ACTbc_SVID_M		GENMASK_ULL(34, 23)
-+#define   YT921X_ACL_ACTbc_SVID(x)			FIELD_PREP(YT921X_ACL_ACTbc_SVID_M, (x))
-+#define  YT921X_ACL_ACTb_SVID_REPLACE		BIT(22)
-+#define  YT921X_ACL_ACTb_CDEI			BIT(21)
-+#define  YT921X_ACL_ACTb_CDEI_REPLACE		BIT(20)
-+#define  YT921X_ACL_ACTb_CPRI_M			GENMASK(19, 17)
-+#define   YT921X_ACL_ACTb_CPRI(x)			FIELD_PREP(YT921X_ACL_ACTb_CPRI_M, (x))
-+#define  YT921X_ACL_ACTb_CPRI_REPLACE		BIT(16)
-+#define  YT921X_ACL_ACTb_CVID_M			GENMASK(15, 4)
-+#define   YT921X_ACL_ACTb_CVID(x)			FIELD_PREP(YT921X_ACL_ACTb_CVID_M, (x))
-+#define  YT921X_ACL_ACTb_CVID_REPLACE		BIT(3)
-+#define  YT921X_ACL_ACTb_PRIO_M			GENMASK(2, 0)
-+#define   YT921X_ACL_ACTb_PRIO(x)			FIELD_PREP(YT921X_ACL_ACTb_PRIO_M, (x))
-+#define  YT921X_ACL_ACTa_PRIO_EN		BIT(31)
-+#define  YT921X_ACL_ACTa_COLOR_M		GENMASK(30, 29)
-+#define   YT921X_ACL_ACTa_COLOR(x)			FIELD_PREP(YT921X_ACL_ACTa_COLOR_M, (x))
-+#define   YT921X_ACL_ACTa_COLOR_GREEN			YT921X_ACL_ACTa_COLOR(0)
-+#define   YT921X_ACL_ACTa_COLOR_YELLOW			YT921X_ACL_ACTa_COLOR(1)
-+#define   YT921X_ACL_ACTa_COLOR_RED			YT921X_ACL_ACTa_COLOR(2)
-+#define  YT921X_ACL_ACTa_COLOR_EN		BIT(28)
-+#define  YT921X_ACL_ACTa_DSCP_M			GENMASK(27, 22)
-+#define   YT921X_ACL_ACTa_DSCP(x)			FIELD_PREP(YT921X_ACL_ACTa_DSCP_M, (x))
-+#define  YT921X_ACL_ACTa_DSCP_REPLACE		BIT(21)
-+#define  YT921X_ACL_ACTa_METER_ID_M		GENMASK(20, 15)
-+#define   YT921X_ACL_ACTa_METER_ID(x)			FIELD_PREP(YT921X_ACL_ACTa_METER_ID_M, (x))
-+#define  YT921X_ACL_ACTa_METER_EN		BIT(14)
-+#define  YT921X_ACL_ACTa_MIRROR_EN		BIT(13)
-+#define  YT921X_ACL_ACTa_FLOWSTAT_EN		BIT(12)
-+#define  YT921X_ACL_ACTa_FLOWSTAT_ID_M		GENMASK(11, 6)
-+#define   YT921X_ACL_ACTa_FLOWSTAT_ID(x)		FIELD_PREP(YT921X_ACL_ACTa_FLOWSTAT_ID_M, (x))
-+#define  YT921X_ACL_ACTa_GPIO_EN		BIT(5)
-+#define  YT921X_ACL_ACTa_GPIO_PIN_M		GENMASK(4, 1)
-+#define   YT921X_ACL_ACTa_GPIO_PIN(x)			FIELD_PREP(YT921X_ACL_ACTa_GPIO_PIN_M, (x))
-+#define  YT921X_ACL_ACTa_INTR_EN		BIT(0)
-+#define YT921X_ACL_BLK_KEEP		0x201000
-+#define  YT921X_ACL_BLK_KEEP_GRPIDn_M(bin)	(7 << (4 * (bin) + 1))
-+#define   YT921X_ACL_BLK_KEEP_GRPIDn(bin, x)		((x) << (4 * (bin) + 1))
-+#define  YT921X_ACL_BLK_KEEP_KEEPn(bin)		BIT(4 * (bin))
-+#define YT921X_ACL_PORT			0x202000
-+#define  YT921X_ACL_PORT_PORTS_M		GENMASK(10, 0)
-+#define   YT921X_ACL_PORT_PORTS(x)			FIELD_PREP(YT921X_ACL_PORT_PORTS_M, (x))
-+#define  YT921X_ACL_PORT_PORTn(port)		BIT(port)
-+#define YT921X_ACL_BLK_CMD		0x202004
-+#define  YT921X_ACL_BLK_CMD_BLKID_M		GENMASK(6, 1)
-+#define   YT921X_ACL_BLK_CMD_BLKID(x)			FIELD_PREP(YT921X_ACL_BLK_CMD_BLKID_M, (x))
-+#define  YT921X_ACL_BLK_CMD_MODIFY		BIT(0)
-+#define YT921X_ACLn_ENTRY(blk)		(0x203000 + 4 * (blk))
-+#define  YT921X_ACL_ENTRY_GRPIDm_M(bin)		(7 << (4 * (bin) + 1))
-+#define   YT921X_ACL_ENTRY_GRPIDm(bin, x)		((x) << (4 * (bin) + 1))
-+#define  YT921X_ACL_ENTRY_ENm(bin)		BIT(4 * (bin))
-+#define YT921X_ACLn_KEYm(blk, bin)	(0x204000 + 0x200 * (bin) + 8 * (blk))
-+#define  YT921X_ACL_KEYb_ORD_M			GENMASK(29, 21)
-+#define   YT921X_ACL_KEYb_ORD(x)			FIELD_PREP(YT921X_ACL_KEYb_ORD_M, (x))
-+#define  YT921X_ACL_KEYb_SPORTS_M		GENMASK(20, 10)
-+#define   YT921X_ACL_KEYb_SPORTS(x)			FIELD_PREP(YT921X_ACL_KEYb_SPORTS_M, (x))
-+#define  YT921X_ACL_KEYb_SPORTn(port)		BIT((port) + 10)
-+#define  YT921X_ACL_KEYb_REVERSE		BIT(9)	/* reverse match */
-+#define  YT921X_ACL_KEYb_TYPE_M			GENMASK(8, 4)
-+#define   YT921X_ACL_KEYb_TYPE(x)			FIELD_PREP(YT921X_ACL_KEYb_TYPE_M, (x))
-+/* KEY_* fields need no masks */
-+#define YT921X_ACLn_MASKm(blk, bin)	(0x205000 + 0x200 * (bin) + 8 * (blk))
-+
-+enum yt921x_acl_type {
-+	YT921X_ACL_TYPE_NA,
-+	YT921X_ACL_TYPE_MAC_DA0,
-+	YT921X_ACL_TYPE_MAC_SA0,
-+	YT921X_ACL_TYPE_MAC_DA1_SA1,
-+	YT921X_ACL_TYPE_VLAN,
-+	YT921X_ACL_TYPE_VTAG,
-+	YT921X_ACL_TYPE_IPV4_DA,
-+	YT921X_ACL_TYPE_IPV4_SA,
-+	YT921X_ACL_TYPE_IPV6_DA0,
-+	YT921X_ACL_TYPE_IPV6_DA1,
-+	YT921X_ACL_TYPE_IPV6_DA2,
-+	YT921X_ACL_TYPE_IPV6_DA3,
-+	YT921X_ACL_TYPE_IPV6_SA0,
-+	YT921X_ACL_TYPE_IPV6_SA1,
-+	YT921X_ACL_TYPE_IPV6_SA2,
-+	YT921X_ACL_TYPE_IPV6_SA3,
-+	YT921X_ACL_TYPE_MISC,
-+	YT921X_ACL_TYPE_L4,
-+	YT921X_ACL_TYPE_UDF0,
-+	YT921X_ACL_TYPE_UDF1,
-+	YT921X_ACL_TYPE_UDF2,
-+	YT921X_ACL_TYPE_UDF3,
-+	YT921X_ACL_TYPE_UDF4,
-+	YT921X_ACL_TYPE_UDF5,
-+	YT921X_ACL_TYPE_UDF6,
-+	YT921X_ACL_TYPE_UDF7,
-+	YT921X_ACL_TYPE_ETHERTYPE,
-+	YT921X_ACL_TYPE_NUM
-+};
-+
-+/* Range: turn KEY:MASK into MIN:MAX */
-+
-+#define  YT921X_ACL_BINb_MAC_xA0_L3_TYPE_M	GENMASK(3, 0)
-+#define   YT921X_ACL_BINb_MAC_xA0_L3_TYPE(x)		FIELD_PREP(YT921X_ACL_BINb_MAC_xA0_L3_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_MAC_xA0_MAC_xA0_M	GENMASK(31, 0)
-+
-+#define  YT921X_ACL_BINb_MAC_DA1_SA1_L2_TYPE_M	GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_MAC_DA1_SA1_L2_TYPE(x)	FIELD_PREP(YT921X_ACL_BINb_MAC_DA1_SA1_L2_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_MAC_DA1_SA1_MAC_DA1_M	GENMASK(31, 16)
-+#define  YT921X_ACL_BINa_MAC_DA1_SA1_MAC_SA1_M	GENMASK(15, 0)
-+
-+#define  YT921X_ACL_KEYb_VLAN_SVID_RANGE_EN	BIT(31)
-+#define  YT921X_ACL_KEYb_VLAN_CVID_RANGE_EN	BIT(30)
-+#define  YT921X_ACL_BINb_VLAN_CDEI		BIT(3)
-+#define  YT921X_ACL_BINb_VLAN_CPRI_M		GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_VLAN_CPRI(x)			FIELD_PREP(YT921X_ACL_BINb_VLAN_CPRI_M, (x))
-+#define  YT921X_ACL_BINa_VLAN_CTAG_FMT_M	GENMASK(31, 30)
-+#define   YT921X_ACL_BINa_VLAN_CTAG_FMT(x)		FIELD_PREP(YT921X_ACL_BINa_VLAN_CTAG_FMT_M, (x))
-+#define  YT921X_ACL_BINa_VLAN_SDEI		BIT(29)
-+#define  YT921X_ACL_BINa_VLAN_SPRI_M		GENMASK(28, 26)
-+#define   YT921X_ACL_BINa_VLAN_SPRI(x)			FIELD_PREP(YT921X_ACL_BINa_VLAN_SPRI_M, (x))
-+#define  YT921X_ACL_BINa_VLAN_STAG_FMT_M	GENMASK(25, 24)
-+#define   YT921X_ACL_BINa_VLAN_STAG_FMT(x)		FIELD_PREP(YT921X_ACL_BINa_VLAN_STAG_FMT_M, (x))
-+#define  YT921X_ACL_BINa_VLAN_SVID_M		GENMASK(23, 12)
-+#define   YT921X_ACL_BINa_VLAN_SVID(x)			FIELD_PREP(YT921X_ACL_BINa_VLAN_SVID_M, (x))
-+#define  YT921X_ACL_BINa_VLAN_CVID_M		GENMASK(11, 0)
-+#define   YT921X_ACL_BINa_VLAN_CVID(x)			FIELD_PREP(YT921X_ACL_BINa_VLAN_CVID_M, (x))
-+
-+#define  YT921X_ACL_KEYb_VTAG_SVID_RANGE_EN	BIT(31)
-+#define  YT921X_ACL_KEYb_VTAG_CVID_RANGE_EN	BIT(30)
-+#define  YT921X_ACL_BINa_VTAG_CDEI		BIT(31)
-+#define  YT921X_ACL_BINa_VTAG_CPRI_M		GENMASK(30, 28)
-+#define   YT921X_ACL_BINa_VTAG_CPRI(x)			FIELD_PREP(YT921X_ACL_BINa_VTAG_CPRI_M, (x))
-+#define  YT921X_ACL_BINa_VTAG_SDEI		BIT(27)
-+#define  YT921X_ACL_BINa_VTAG_SPRI_M		GENMASK(26, 24)
-+#define   YT921X_ACL_BINa_VTAG_SPRI(x)			FIELD_PREP(YT921X_ACL_BINa_VTAG_SPRI_M, (x))
-+#define  YT921X_ACL_BINa_VTAG_SVID_M		GENMASK(23, 12)
-+#define   YT921X_ACL_BINa_VTAG_SVID(x)			FIELD_PREP(YT921X_ACL_BINa_VTAG_SVID_M, (x))
-+#define  YT921X_ACL_BINa_VTAG_CVID_M		GENMASK(11, 0)
-+#define   YT921X_ACL_BINa_VTAG_CVID(x)			FIELD_PREP(YT921X_ACL_BINa_VTAG_CVID_M, (x))
-+
-+#define  YT921X_ACL_KEYb_IPV4_ADDR_RANGE_EN	BIT(30)
-+#define  YT921X_ACL_BINb_IPV4_FRAG		BIT(3)
-+#define  YT921X_ACL_BINb_IPV4_L4_TYPE_M		GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_IPV4_L4_TYPE(x)		FIELD_PREP(YT921X_ACL_BINb_IPV4_L4_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_IPV4_ADDR_M		GENMASK(31, 0)
-+
-+#define  YT921X_ACL_BINb_IPV6_L4_TYPE_M		GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_IPV6_L4_TYPE(x)		FIELD_PREP(YT921X_ACL_BINb_IPV6_L4_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_IPV6_ADDRx_M		GENMASK(31, 0)
-+
-+#define  YT921X_ACL_BINb_IPV6_xA1_IP_OPTION	BIT(3)
-+
-+#define  YT921X_ACL_BINb_IPV6_xA2_FIRST_FRAG	BIT(3)
-+
-+#define  YT921X_ACL_KEYb_IPV6_xA3_ADDR_RANGE_EN	BIT(30)
-+#define  YT921X_ACL_BINb_IPV6_xA3_FRAG		BIT(3)
-+
-+#define  YT921X_ACL_BINb_MISC_FRAG		BIT(3)
-+#define  YT921X_ACL_BINb_MISC_L4_TYPE_M		GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_MISC_L4_TYPE(x)		FIELD_PREP(YT921X_ACL_BINb_MISC_L4_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_MISC_PPPOE_FLAG	BIT(30)
-+#define  YT921X_ACL_BINa_MISC_FIRST_FRAG	BIT(29)
-+#define  YT921X_ACL_BINa_MISC_IP_OPTION		BIT(28)
-+#define  YT921X_ACL_BINa_MISC_TCP_FLAGS_M	GENMASK(27, 20)
-+#define   YT921X_ACL_BINa_MISC_TCP_FLAGS(x)		FIELD_PREP(YT921X_ACL_BINa_MISC_TCP_FLAGS_M, (x))
-+#define  YT921X_ACL_BINa_MISC_IP_PROTO_M	GENMASK(19, 12)
-+#define   YT921X_ACL_BINa_MISC_IP_PROTO(x)		FIELD_PREP(YT921X_ACL_BINa_MISC_IP_PROTO_M, (x))
-+#define  YT921X_ACL_BINa_MISC_TOS_M		GENMASK(11, 4)
-+#define   YT921X_ACL_BINa_MISC_TOS(x)			FIELD_PREP(YT921X_ACL_BINa_MISC_TOS_M, (x))
-+#define  YT921X_ACL_BINa_MISC_L3_TYPE_M		GENMASK(3, 0)
-+#define   YT921X_ACL_BINa_MISC_L3_TYPE(x)		FIELD_PREP(YT921X_ACL_BINa_MISC_L3_TYPE_M, (x))
-+
-+#define  YT921X_ACL_KEYb_L4_DPORT_RANGE_EN	BIT(31)
-+#define  YT921X_ACL_KEYb_L4_SPORT_RANGE_EN	BIT(30)
-+#define  YT921X_ACL_BINb_L4_FRAG		BIT(3)
-+#define  YT921X_ACL_BINb_L4_TYPE_M		GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_L4_TYPE(x)			FIELD_PREP(YT921X_ACL_BINb_L4_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_L4_DPORT_M		GENMASK(31, 16)
-+#define  YT921X_ACL_BINa_L4_SPORT_M		GENMASK(15, 0)
-+
-+#define  YT921X_ACL_BINb_UDF_IS_IGMP		BIT(0)
-+#define  YT921X_ACL_BINa_UDF_UDF0_M		GENMASK(31, 16)
-+#define   YT921X_ACL_BINa_UDF_UDF0(x)			FIELD_PREP(YT921X_ACL_BINa_UDF_UDF0_M, (x))
-+#define  YT921X_ACL_BINa_UDF_UDF1_M		GENMASK(15, 0)
-+#define   YT921X_ACL_BINa_UDF_UDF1(x)			FIELD_PREP(YT921X_ACL_BINa_UDF_UDF1_M, (x))
-+
-+#define  YT921X_ACL_KEYb_ETHERTYPE_ETHERTYPE_RANGE_EN	BIT(30)
-+#define  YT921X_ACL_BINb_ETHERTYPE_L4_TYPE_M	GENMASK(2, 0)
-+#define   YT921X_ACL_BINb_ETHERTYPE_L4_TYPE(x)		FIELD_PREP(YT921X_ACL_BINb_ETHERTYPE_L4_TYPE_M, (x))
-+#define  YT921X_ACL_BINa_ETHERTYPE_ETHERTYPE_M	GENMASK(15, 0)
-+#define   YT921X_ACL_BINa_ETHERTYPE_ETHERTYPE(x)	FIELD_PREP(YT921X_ACL_BINa_ETHERTYPE_ETHERTYPE_M, (x))
-+
-+enum yt921x_l2_type {
-+	YT921X_L2_TYPE_ETH,
-+	YT921X_L2_TYPE_ETHV2,
-+	YT921X_L2_TYPE_ETHSAP,
-+	YT921X_L2_TYPE_ETHSNAP,
-+};
-+
-+enum yt921x_l3_type {
-+	YT921X_L3_TYPE_OTHER,
-+	YT921X_L3_TYPE_IPV4,
-+	YT921X_L3_TYPE_IPV6,
-+	YT921X_L3_TYPE_ARP,
-+	YT921X_L3_TYPE_LLDP,
-+	YT921X_L3_TYPE_PAE,
-+	YT921X_L3_TYPE_ERP,
-+	YT921X_L3_TYPE_SLOW_PROTOCOL,
-+};
-+
-+enum yt921x_l4_type {
-+	YT921X_L4_TYPE_OTHER,
-+	YT921X_L4_TYPE_TCP,
-+	YT921X_L4_TYPE_UDP,
-+	YT921X_L4_TYPE_UDPLITE,
-+	YT921X_L4_TYPE_ICMP,
-+	YT921X_L4_TYPE_IGMP,
-+	YT921X_L4_TYPE_MLD,
-+	YT921X_L4_TYPE_ND,
-+};
-+
- #define YT921X_TPID_IGRn(x)		(0x210000 + 4 * (x))	/* [0, 3] */
- #define  YT921X_TPID_IGR_TPID_M			GENMASK(15, 0)
- #define YT921X_PORTn_IGR_TPID(port)	(0x210010 + 4 * (port))
-@@ -470,6 +718,14 @@ enum yt921x_app_selector {
- #define  YT921X_LAG_HASH_MAC_SA			BIT(2)
- #define  YT921X_LAG_HASH_MAC_DA			BIT(1)
- #define  YT921X_LAG_HASH_SRC_PORT		BIT(0)
-+#define YT921X_UDFn_CTRL(x)		(0x210094 + 4 * (x))
-+#define  YT921X_UDF_CTRL_UDF_TYPE_M		GENMASK(8, 7)
-+#define   YT921X_UDF_CTRL_UDF_TYPE(x)			FIELD_PREP(YT921X_UDF_CTRL_UDF_TYPE_M, (x))
-+#define   YT921X_UDF_CTRL_UDF_TYPE_ETH			YT921X_UDF_CTRL_UDF_TYPE(0)
-+#define   YT921X_UDF_CTRL_UDF_TYPE_L3			YT921X_UDF_CTRL_UDF_TYPE(1)
-+#define   YT921X_UDF_CTRL_UDF_TYPE_L4			YT921X_UDF_CTRL_UDF_TYPE(2)
-+#define  YT921X_UDF_CTRL_UDF_OFFSET_M		GENMASK(6, 0)
-+#define   YT921X_UDF_CTRL_UDF_OFFSET(x)			FIELD_PREP(YT921X_UDF_CTRL_UDF_OFFSET_M, (x))
- 
- #define YT921X_PORTn_RATE(port)		(0x220000 + 4 * (port))
- #define  YT921X_PORT_RATE_GAP_VALUE		GENMASK(4, 0)	/* default 20 */
-@@ -589,6 +845,11 @@ enum yt921x_fdb_entry_status {
- 
- #define YT921X_TAG_LEN	8
- 
-+#define YT921X_ACL_BLK_NUM	48
-+#define YT921X_ACL_ENT_PER_BLK	8
-+#define YT921X_ACL_NUM		(YT921X_ACL_BLK_NUM * YT921X_ACL_ENT_PER_BLK)
-+#define YT921X_UDF_NUM		8
-+
- /* 8 internal + 2 external + 1 mcu */
- #define YT921X_PORT_NUM			11
- 
-@@ -647,6 +908,26 @@ struct yt921x_mib {
- 	u64 tx_oam;
- };
- 
-+struct yt921x_acl_entry {
-+	u32 key[2];
-+	u32 mask[2];
-+};
-+
-+struct yt921x_acl_rule {
-+	unsigned long tag;
-+	enum tc_setup_type type;
-+
-+	u32 action[3];
-+	bool sw_assisted;
-+
-+	u8 mask;
-+	struct yt921x_acl_entry entries[YT921X_ACL_ENT_PER_BLK];
-+};
-+
-+struct yt921x_acl_blk {
-+	struct yt921x_acl_rule *rules[YT921X_ACL_ENT_PER_BLK];
-+};
-+
- struct yt921x_port {
- 	unsigned char index;
- 
-@@ -686,6 +967,11 @@ struct yt921x_priv {
- 	struct yt921x_port ports[YT921X_PORT_NUM];
- 
- 	u16 eee_ports_mask;
-+
-+	DECLARE_BITMAP(meters_map, YT921X_METER_NUM);
-+
-+	u8 acl_masks[YT921X_ACL_BLK_NUM];
-+	struct yt921x_acl_blk *acl_blks[YT921X_ACL_BLK_NUM];
- };
- 
- #endif
+ 	nskb = skb_clone(skb, GFP_ATOMIC);
+ 	if (!nskb)
+ 		return -ENOMEM;
 -- 
-2.53.0
+2.47.3
 
 
