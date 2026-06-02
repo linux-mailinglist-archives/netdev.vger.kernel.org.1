@@ -1,167 +1,131 @@
-Return-Path: <netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bRjKI2lCH2oRjQAAu9opvQ
-	(envelope-from <netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:51:53 +0200
+	id r+O5AUdFH2q9jQAAu9opvQ
+	(envelope-from <netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:04:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222CE631E3A
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:51:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BF40631FCC
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 23:04:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WsQo944G;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=URBRQO8E;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294412-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 01C2B3033F70
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:51:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 62BCE301412E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 21:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074F3397352;
-	Tue,  2 Jun 2026 20:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EFF73537FE;
+	Tue,  2 Jun 2026 21:04:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00D03932CB
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73154221DB6;
+	Tue,  2 Jun 2026 21:04:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780433496; cv=none; b=aWS3FG1Apl0/VLVplNguLmgOcVrLWx/z0rUeef73a4EIQZDROwsgkbYt/9U5ewYhJMhhJZzFstedOW+dgu4y7OPAPs8AvcgsgMyTMHq9FwAouqhnhONMG+OlWk/LLw6bK1sUuAz8TVd8Prv9U3msJVRULw27OZjMpesWUFxeT1s=
+	t=1780434242; cv=none; b=IQQYCOnKCUXcAtPHqyiHbXOO6Xpt7FzuZQH0eoYUm73uCepLvjjSzKqp3rHjsE4NyOkM/m/uPJandfHt80cuWKrpqsr8TEmjCKzgpBhcdqXu8HTJIh03P0ONcMBFRkwKbem9qUdPfxcrK2sL5iKwz4HA8mz0IbNmRDFozKtcoM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780433496; c=relaxed/simple;
-	bh=KRGTT4AQ+Oey7inw8PS07TanUxbhPBY4tf+cjHXWYBI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jHy4OQiSymgDljAggY+dbRGClqAPjNet3nRtuSEKp2Kq20VhfMyWtVaN3VO12uwlOR8bCOb+9DDIhp4+35DeV1mwPVAs/pJQ+a61GIKhdyrTq+9CMgrKJiR6/1mlSyv+SDhGtjN25SLL2dF6ftjziGbcujsOyoMghlFNre9hmms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WsQo944G; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7ABA1F00A13
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:51:34 +0000 (UTC)
+	s=arc-20240116; t=1780434242; c=relaxed/simple;
+	bh=xcBwUqenQnYMfSBWCxuZu0/kzGfDaLbnZtYKX98y8zk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZA8UVlY/E8lTkdGxRJCpYK8mAAH+D5yAjUo4iiGtHtKn/wvHMLhLrZH6ELALsNjvMUxxELhZBreMj9NaSxuJdZKKHEL+OlReFSP2+qpBYkso/hyWwmafiIipcuctagUqKRSYF6T04c6sU69KhvityHcMN494L0OIISkGj3tvgmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URBRQO8E; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 544E51F00893;
+	Tue,  2 Jun 2026 21:04:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780433494;
-	bh=G6rZ7t6/DhXfpQVj0UlyYqS4gIMH66eg2Oc1gFXbhJ0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=WsQo944GDchg/wLfBxF995MDsIQlWR94qpNUGNWfmtj0cc9Cm6IAvLYK49Jz+sub+
-	 cCz9hX3qvk2i7XzqttjMLfpB2FTj81X0WI8T9GOEFst61x7uetTvHoQlZHBhkw3wj+
-	 pWEXAl35dtpSL5N9q+XzcWkaBdzolGpamWnG3Ut+8eiWiblT+djxuby3gRu3VBbNTW
-	 b5gX5xDdjGnEk3Uf3Rhjs7eEYv4grJDMr3ZOHMMp2kabifDBAot1ZDAITd3RH9n/oV
-	 ENGlOonCAxXOF1Zy8Nr8B/0OQsXqHHxsvHFgQOc4sUtBFr0j9jX5I0vS+C7g/hnM3X
-	 sTT2vS+XYtAaA==
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7e2cb01a974so38861527b3.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 13:51:34 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9Nn5YPrgwnmRfzW7jJlwq/cY+2aalKmFlMWP9uCV8ElndMUVFsriLV8B859xt4ZFJdhqDo9mI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR5b6YrUFsGF6ixC7H94QF3RA30CBcbYcHT7wWGrH3eSjnZzxw
-	pgRFuH8OZ+gGlYLZdhOkvBxcsjRcBrFuWpXaIydL4fFRPsyA3HhKGiHlC9s+eUEHxwnpix8N1ni
-	i2CNmOY7++NxPW/hutT0Anpn5AavxfW4=
-X-Received: by 2002:a05:690c:620f:b0:7b3:edc7:9b97 with SMTP id
- 00721157ae682-7ea4400dc8fmr7795367b3.0.1780433493990; Tue, 02 Jun 2026
- 13:51:33 -0700 (PDT)
+	s=k20260515; t=1780434241;
+	bh=szrWBKhghiac2i2mueK/YjJu1FK82B5hSpdAwSlajBM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=URBRQO8EBqqlHB/KHgDkXH5tmEouzPHMlK1s0wDdHL+bZ3gBuynAz+fso8Al8Jrj/
+	 9JQDn+55i4u1Z3eVPrHvnULBNeLDirvQ25E3iDMU+y6qmdfmrr8C8T+UcDLIr+mCO+
+	 0FEni1K10C+s+N+NJYUKd9Kxqk6Sp5Lvgkfwf/qPbSA+Jp9Kw9qancwOhtlaamVQDz
+	 5ldsm636C9d6gkqy4Dnp/z7VGOIK09alUM8om2KAkTVIbDQTL9pwIi5SuexN4HFTki
+	 s96CuKvrux8DwF2d4l9PQDYp/KYZM3zd1Aatv3mJziyjCBU9o2dg6w02HwSlkI5Ckx
+	 a4nUS34yeqC0g==
+Date: Tue, 2 Jun 2026 14:03:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Dust Li
+ <dust.li@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia
+ Zhang <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
+ Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>, Wen Gu
+ <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, oliver.yang@linux.alibaba.com, pasic@linux.ibm.com
+Subject: Re: [PATCH net-next 0/2] net/smc: transition to RDMA core CQ
+ pooling
+Message-ID: <20260602140359.3b97d180@kernel.org>
+In-Reply-To: <20260528084819.6059-1-alibuda@linux.alibaba.com>
+References: <20260528084819.6059-1-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304-gpio-of-kconfig-v1-0-d597916e79e7@oss.qualcomm.com> <20260304-gpio-of-kconfig-v1-7-d597916e79e7@oss.qualcomm.com>
-In-Reply-To: <20260304-gpio-of-kconfig-v1-7-d597916e79e7@oss.qualcomm.com>
-From: Timur Tabi <timur@kernel.org>
-Date: Tue, 2 Jun 2026 15:50:57 -0500
-X-Gmail-Original-Message-ID: <CAOZdJXXetr-FPZUSX_nzS5nZc+bbv5b1m78sCcZzrDJi7C05vw@mail.gmail.com>
-X-Gm-Features: AVHnY4IltjGxIj5Fh6-JK6uSKIHTP0yZBU085pIyp8WmlCvLfmlYl2sow6Y3Jn0
-Message-ID: <CAOZdJXXetr-FPZUSX_nzS5nZc+bbv5b1m78sCcZzrDJi7C05vw@mail.gmail.com>
-Subject: Re: [PATCH 07/14] pinctrl: Kconfig: drop unneeded dependencies on OF_GPIO
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Alexey Brodkin <abrodkin@synopsys.com>, Vineet Gupta <vgupta@kernel.org>, Scott Wood <oss@buserror.net>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Linus Walleij <linusw@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Dvorkin Dmitry <dvorkin@tibbo.com>, 
-	Wells Lu <wellslutw@gmail.com>, Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>, 
-	Guenter Roeck <linux@roeck-us.net>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Sebastian Reichel <sre@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-amlogic@lists.infradead.org, 
-	linux-leds@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-staging@lists.linux.dev, linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294411-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bartosz.golaszewski@oss.qualcomm.com,m:catalin.marinas@arm.com,m:will@kernel.org,m:abrodkin@synopsys.com,m:vgupta@kernel.org,m:oss@buserror.net,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lgirdwood@gmail.com,m:broonie@kernel.org,m:linusw@kernel.org,m:brgl@kernel.org,m:neil.armstrong@linaro.org,m:khilman@baylibre.com,m:jbrunet@baylibre.com,m:martin.blumenstingl@googlemail.com,m:dvorkin@tibbo.com,m:wellslutw@gmail.com,m:lee@kernel.org,m:pavel@kernel.org,m:linux@roeck-us.net,m:wim@linux-watchdog.org,m:mchehab@kernel.org,m:gregkh@linuxfoundation.org,m:sre@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:linux-snps-arc@lists.infradead.org,m:linuxppc-dev@lists.ozlabs.org,m:netdev@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:linux-amlogic@lists
- .infradead.org,m:linux-leds@vger.kernel.org,m:linux-hwmon@vger.kernel.org,m:linux-watchdog@vger.kernel.org,m:linux-media@vger.kernel.org,m:linux-staging@lists.linux.dev,m:linux-pm@vger.kernel.org,m:martinblumenstingl@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[timur@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[arm.com,kernel.org,synopsys.com,buserror.net,linux.ibm.com,ellerman.id.au,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,baylibre.com,googlemail.com,tibbo.com,roeck-us.net,linux-watchdog.org,linuxfoundation.org,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[timur@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-294412-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:davem@davemloft.net,m:dust.li@linux.alibaba.com,m:edumazet@google.com,m:pabeni@redhat.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:horms@kernel.org,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:oliver.yang@linux.alibaba.com,m:pasic@linux.ibm.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,qualcomm.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 222CE631E3A
+X-Rspamd-Queue-Id: 5BF40631FCC
 
-On Wed, Mar 4, 2026 at 3:07=E2=80=AFAM Bartosz Golaszewski
-<bartosz.golaszewski@oss.qualcomm.com> wrote:
->
-> @@ -557,7 +549,6 @@ config PINCTRL_ST
->  config PINCTRL_STMFX
->         tristate "STMicroelectronics STMFX GPIO expander pinctrl driver"
->         depends on I2C
-> -       depends on OF_GPIO
->         depends on HAS_IOMEM
->         select GENERIC_PINCONF
->         select GPIOLIB_IRQCHIP
+On Thu, 28 May 2026 16:48:17 +0800 D. Wythe wrote:
+> This series transitions SMC-R completion handling to RDMA core CQ pooling
+> via the ib_cqe API. The new completion model improves scalability by
+> allowing per-link completion processing across multiple cores and enables
+> DIM-based interrupt moderation.
+> 
+> As a side effect, the increased concurrency can amplify contention for TX
+> slots on the shared wait queue. Patch 2 addresses this by switching TX slot
+> allocation from non-exclusive wait_event() to prepare_to_wait_exclusive(),
+> which avoids thundering-herd wakeups under contention.
+> 
+> Patch 1 replaces the global per-device CQ and manual tasklet polling model
+> with RDMA core CQ pooling.
+> Patch 2 reduces TX slot contention by using exclusive wait queue entries
+> during allocation.
 
-This change causes the following warning on builds:
+Sashiko reports a couple of issues on patch 1:
+https://sashiko.dev/#/patchset/20260528084819.6059-2-alibuda@linux.alibaba.com
+Are these legit?
 
-WARNING: unmet direct dependencies detected for MFD_STMFX
-Depends on [n]: HAS_IOMEM [=3Dy] && I2C [=3Dy] && OF [=3Dn]
-Selected by [m]:
-- PINCTRL_STMFX [=3Dm] && PINCTRL [=3Dy] && I2C [=3Dy] && HAS_IOMEM [=3Dy]
-
-WARNING: unmet direct dependencies detected for MFD_STMFX
-Depends on [n]: HAS_IOMEM [=3Dy] && I2C [=3Dy] && OF [=3Dn]
-Selected by [m]:
-- PINCTRL_STMFX [=3Dm] && PINCTRL [=3Dy] && I2C [=3Dy] && HAS_IOMEM [=3Dy]
-
-I believe the proper fix is to have PINCTRL_STMFX depend on CONFIG_OF,
-since this driver actually does depend on CONFIG_OF.  The warning
-comes because if CONFIG_OF is disabled, PINCTRL_STMFX can still be
-enabled, but in doing so it selects MFD_STMFX which does depend on
-CONFIG_OF.
-
-Adding "depends on OF" to "config PINCTRL_STMFX" seems to fix the
-problem, but I'm not familiar with this driver so I'm not sure this is
-the right fix.  I'll post a patch.
+Either way - would be good to get some reviews here from (ohter) SMC
+maintainers.
 
