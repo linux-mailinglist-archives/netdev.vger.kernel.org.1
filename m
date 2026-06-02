@@ -1,136 +1,145 @@
-Return-Path: <netdev+bounces-293954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293957-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IAmbMYs7HmpriAkAu9opvQ
-	(envelope-from <netdev+bounces-293954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:10:19 +0200
+	id UJKqJ1c8HmpriAkAu9opvQ
+	(envelope-from <netdev+bounces-293957-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:13:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F9E62717A
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3288B6271F0
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:13:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93AAD3041B87
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:10:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EF404304FFC1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C43349B15;
-	Tue,  2 Jun 2026 02:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C26835DA6C;
+	Tue,  2 Jun 2026 02:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5+Re0xg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GIkV6OIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46AB34A3BF
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 02:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2520348C44
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 02:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780366213; cv=none; b=lxABDpyPUEvH69W/IMxHEcMbJorIZXMuJHEzTh/pDjy09nk2gFoDPLIPrQFLIwtgYx97rjIniwZcP6dnYgLG54EOHqX+LMMm+FwlC8w/3OgyrQY0RbvzbJp+Y9brWa8xp93vc8vtGSsrBLcgu7EAIbKttj41pY9iTd2Y7BXWy6A=
+	t=1780366341; cv=none; b=Tfhhh0WTKHEpZTbPI3lZJBgo7jcQvoxa2jav57iGhja7rps21rWFr/vdu8zVf5SsV4DuOZgfJ2iymKgZnF+QcNFT1Bv3kNYKa9KZKzzu8wlxLwbEcsjcnKXay9nZVdhw3UNEBI4iL/WAdcKjAmPqmwOJft5od/ZBpkgwxwtRSBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780366213; c=relaxed/simple;
-	bh=ObqSEH8lw7wMuJuF8r8WcZkNBaOhhZQRGB9li3MGsPc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=L25KgD9hCUFwilbEhK97CT9wS7/67RdVGm4capWokVI5RBtXApPMuIqRMT2zGuYYfGUzrq6aw4/DJPbEOF3jfUJOntSPiA/XSBbe2ukxYpg6BEJK16bAHsFFuT9GaLmEMitr5Kt0PXDpadqpQEbFSpRxqI3uGqXFR3eSCPPXFqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5+Re0xg; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65A161F00893;
-	Tue,  2 Jun 2026 02:10:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780366212;
-	bh=ffXvVesnE1zNU/Ae4r+Yl9CGNCryk9M03316Oa1BAZE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Y5+Re0xgchLqfdZxV2dCoVec6hHa3/JCZOVx6znaX+R0sgjEflEzMPBm30RhpfBF/
-	 SEutSdlgjJUSYGFnt3oA8bi6/bhtIbQgQ08gwLh0vRCLQ9+JWCXZDAL+zwWDGzCi/8
-	 rCn1G2BRJ/obAQG7dQwelY36U8ByX13eTh9GHhu+GZ6tppwDL6qhOgr8k+u2Ny6Jwc
-	 h1ZbqCqubAv1fU7d0X29FB9Naswkua9sTHFimzOazCweOlvHwVcSOHw8BGfS8Ynfea
-	 zr4Yz1ggkHaGYfP0onCcU/2uYurqn9ujx9aa37vBj+fzhuyw4PFjg8vfPofVYjH4xI
-	 8Lk2WBH+AFabA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0C0A38119F9;
-	Tue,  2 Jun 2026 02:10:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1780366341; c=relaxed/simple;
+	bh=UZe1VQbg/A8h5bszj/xcfUf8HHkK6UavcECVZEQck18=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nMa/WsU46pCd4SNeJY1P60O625Hzw5wd/tUcpLJtsE6lIY1mg50O414xPqHXewOdRsdgbezZRPaE74JGA07ygg2aTKBXn9Lq35J2AtER0bBIhpdnmcpKBw4EYpBp2kSCbH+QDUB84wPorG5k7QXRRHKlEkj+1ch/RO5+gSUTnZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GIkV6OIl; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <021e215a-624f-483d-ba19-7c130122bfb5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780366326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pqqEW4JqlqzJIsw8D3pVFU3QcwiKj674UK8QDudzFI8=;
+	b=GIkV6OIliUEDfFeuec4CXiKrfXyiNHKr0PUsJljCdpUm8oWDz51Vzuomc0rMshfzShlksM
+	IffJfsvzocAoCJUi834S47hnAaBzlGke3NbBEs/t2ayGpnT8O83kNqDqyWgen580enfTHh
+	jhAQQD/S2mWlin1VWAh9EsG2Yfa24DU=
+Date: Tue, 2 Jun 2026 10:11:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] net: mdio: realtek-rtl9300: SoC
- independent
- command runner
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178036621438.206391.9411510358918445434.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jun 2026 02:10:14 +0000
-References: <20260527163449.1294961-1-markus.stockhausen@gmx.de>
-In-Reply-To: <20260527163449.1294961-1-markus.stockhausen@gmx.de>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
- daniel@makrotopia.org
+Subject: Re: [PATCH bpf v3 1/2] bpf: Update transport_header when
+ encapsulating UDP tunnel in lwt
+Content-Language: en-US
+To: Emil Tsalapatis <emil@etsalapatis.com>, bpf@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Guillaume Nault <gnault@redhat.com>,
+ Ido Schimmel <idosch@nvidia.com>,
+ Fernando Fernandez Mancera <fmancera@suse.de>,
+ Peter Oskolkov <posk@google.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-patches-bot@fb.com, Leon Hwang <leon.huangfu@shopee.com>
+References: <20260601150203.20352-1-leon.hwang@linux.dev>
+ <20260601150203.20352-2-leon.hwang@linux.dev>
+ <DIXVJ45H90X3.3DOQOUXJB6DVN@etsalapatis.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leon Hwang <leon.hwang@linux.dev>
+In-Reply-To: <DIXVJ45H90X3.3DOQOUXJB6DVN@etsalapatis.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	TAGGED_FROM(0.00)[bounces-293954-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-293957-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmx.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,nvidia.com,suse.de,vger.kernel.org,fb.com,shopee.com];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 40F9E62717A
+X-Rspamd-Queue-Id: 3288B6271F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 27 May 2026 18:34:45 +0200 you wrote:
-> The Realtek Otto switch platform consist of four different series
+On 2/6/26 01:03, Emil Tsalapatis wrote:
+> On Mon Jun 1, 2026 at 11:02 AM EDT, Leon Hwang wrote:
+[...]
+>> @@ -637,6 +644,10 @@ int bpf_lwt_push_ip_encap(struct sk_buff *skb, void *hdr, u32 len, bool ingress)
+>>  	if (ingress)
+>>  		skb_postpush_rcsum(skb, iph, len);
+>>  	skb_reset_network_header(skb);
+>> +	if (ipv4 && is_udp_tunnel)
+>> +		skb_set_transport_header(skb, skb_network_offset(skb) + iph->ihl * 4);
+>> +	else if (!ipv4 && is_udp_tunnel)
+>> +		skb_set_transport_header(skb, skb_network_offset(skb) + sizeof(struct ipv6hdr));
 > 
-> - RTL838x aka maple   : 28 port 1G Switches
-> - RTL839x aka cypress : 52 port 1G Switches
-> - RTL930x aka longan  : 28 port 1G/2.5G/10G Switches
-> - RTL931x aka mango   : 56 port 1G/2.5G/10G Switches
+> Minor nit: Could we do something like
 > 
-> [...]
+> if (is_udp_tunnel) {
+> 	size_t hrdsz = ipv4 ? iph->ihl * 4 : sizeof(struct ipv6hdr);
+> 	skb_set_transport_header(skb9, skb_network_offset(skb)) + hdrsz;
+> }
+> 
+> to make the logic clearer?
+> 
 
-Here is the summary with links:
-  - [net-next,v2,1/4] net: mdio: realtek-rtl9300: provide generic command runner
-    https://git.kernel.org/netdev/net-next/c/9ccb438210c4
-  - [net-next,v2,2/4] net: mdio: realtek-rtl9300: use command runner for write_c22()
-    https://git.kernel.org/netdev/net-next/c/9cd59932f2d2
-  - [net-next,v2,3/4] net: mdio: realtek-rtl9300: use command runner for read_c45()
-    https://git.kernel.org/netdev/net-next/c/fcce51bfd4ed
-  - [net-next,v2,4/4] net: mdio: realtek-rtl9300: use command runner for read_c22()
-    https://git.kernel.org/netdev/net-next/c/2e3c28c715e9
+Make sense.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks,
+Leon
 
+>>  	memcpy(skb_network_header(skb), hdr, len);
+>>  	bpf_compute_data_pointers(skb);
+>>  	skb_clear_hash(skb);
+> 
 
 
