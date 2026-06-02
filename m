@@ -1,123 +1,109 @@
-Return-Path: <netdev+bounces-294323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294326-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VSQ/La0bH2qZgAAAu9opvQ
-	(envelope-from <netdev+bounces-294323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:06:37 +0200
+	id i58UF3ccH2pHgQAAu9opvQ
+	(envelope-from <netdev+bounces-294326-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:09:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE13630EF9
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:06:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3CE4630F3A
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:09:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Xf9g6v7i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294323-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294323-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=grapheneos.org header.s=default header.b=pNvmjepN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294326-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294326-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=grapheneos.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A7D9B3001CCA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:57:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C98493001BE8
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 18:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF1C3FBB55;
-	Tue,  2 Jun 2026 17:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA9831A576;
+	Tue,  2 Jun 2026 18:09:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.grapheneos.org (mail.grapheneos.org [91.246.30.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93653FBED1
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6BE31987D
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 18:09:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780423048; cv=none; b=NpTWsO0+LZ2paMCAHDdrsq95hx7DjEaqoMG4CKD7So8ojLnS4Kq8Ibbu5ShcxkR4dF0gW/v5S4xCkBcC7WgtHjzjtelTcZDOCu7iMpv3PVkihNJ8ZdruV3RJe3lahZCsJHflf3sFvK0pAhUklDKymIrlkoTrkUc4uhmfgphVRwM=
+	t=1780423795; cv=none; b=SqM+slNSYC8IPf0QrMjS6x59l7kxrUNLOQd1y/fiueBzbEdvZD2swg1CMsvF/vQJQz1Q5ewpTb8VF7N5rhOYFklWl9e8YQTIPHO5JKE/yswn15DgXw9JyfSDmJno2tPUYQAA66cJ+H/dt9Eg3+aKFDENF482lmAjoo1iZyXAOok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780423048; c=relaxed/simple;
-	bh=+H5khT1igs06tcVp2SJ6MrROItDkv5Kidh39fsxTtfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qtRIJUkb3ihcqqekE0yepxyun1JVHzpSYgo5MpcnPbNJm3svVJmFVRsUqDg5Claoewn0itJAJdCp2AZIQTcBA0j1lc8XKzn7XM6heSpriXQuZ89q7eqxcFgM31h7+Em4KNzI9URJPYARlW7RKvvxYnfi1Qc1wT5LiMIH0MS3MO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xf9g6v7i; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4007D1F00893;
-	Tue,  2 Jun 2026 17:57:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780423047;
-	bh=KXVo2+aTdUwzqk7OXEt1bo6fJ/JcSPZbYEmo9RtyLe4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Xf9g6v7ir/DIbk+qMJ0OdZHY7pcx8ih4csvoMZTYrC+dAwp5/CtKfDNrcq2exK6wt
-	 G+XXm+vhVWjd0J5tA5HHwZkPDnrZBQ0519E5dL+KQGvkGplHnkTkZMGBJpCEn9zUIb
-	 5Syean92TTtgIa6bV/wc8tBiCMclFn80xBgVCFpWvVU6tlXWC3n58ONwgRhom4YjWe
-	 ch3BREJx+AC15r3Vtscp3PrhSyrMlfRUAT8tmi2CeIDlCGrzTR4MkLFW7M+mPQ1Ox7
-	 3bkOeec2lExMv+hAc89+wDoM2E6UcA40uS0ksMwPeejpfgvRMWP+j525/NEV95avnn
-	 ABh+bNf+aGWDg==
-Date: Tue, 2 Jun 2026 10:57:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] rtnetlink: use dev_isalive() in rtnl_getlink()
-Message-ID: <20260602105726.0f7f0d8b@kernel.org>
-In-Reply-To: <20260602091319.1753654-1-edumazet@google.com>
-References: <20260602091319.1753654-1-edumazet@google.com>
+	s=arc-20240116; t=1780423795; c=relaxed/simple;
+	bh=b+tJMtici/QxQpneg5L/lApe9epO/pWWupxr66xOIKQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=L/Uggj/BGAMzylIcaOn5biKohTMA9s0rKD3kEHgE3Na9pj2IuInIJBEPOJSrNmsP0FQcYD8/uBd7kwxX5cNo3V8igndAsVKDWj0vAXUHqvvwZKnGuDoCSFqUEdZPSuGebJ4FwH6qHMKIPUq19xquu/AESyGRdYuv+lyLAa1pblo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grapheneos.org; spf=pass smtp.mailfrom=grapheneos.org; dkim=pass (2048-bit key) header.d=grapheneos.org header.i=@grapheneos.org header.b=pNvmjepN; arc=none smtp.client-ip=91.246.30.4
+Received: by mail.grapheneos.org (Postfix) id 997443C08F09E
+	for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 18:00:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grapheneos.org;
+	s=default; t=1780423236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type;
+	bh=6fFGdjST3g/P4faIjxC6n1Ki+ytnfZ1JrGtXnuXlvg4=;
+	b=pNvmjepNfLrOBOdvi59bpKAD4B8uYYNSn1xpVxqdccxYoyTxWx1qkBn0JEkNdEMw0hoRhv
+	P7pGnFZQNYhZu5XTvYPLh0j+WmXwqF7KWZUwc6XYIspZsz2IHon0fphPNmRM5zLVf4MU3q
+	R53PICSKC3SD2i2ZOxi7JCwoC46Rs7e5IjyGZJm0OZj2QR/SrFjIRbzhURhw4rZjJb1l8p
+	PL/LQa6UVnROI7xTe5huRlEHSE+lASAGcrie0M941SX1OuwgNoVhIrcdFpeXCSrhzvMgA7
+	XCWzIJtMPHaG15H+ff8ejATSgivRwHST3qtbKofdDTPV7DyjyeKsvrJ4X49cSQ==
+Date: Tue, 2 Jun 2026 14:00:33 -0400
+From: Andrew Fenton <andrew.fenton@grapheneos.org>
+To: netdev@vger.kernel.org
+Subject: [QUESTION] Packet uid for kernel-generated multicast
+Message-ID: <ah8aQWX60nTiHMLQ@acomputer.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[grapheneos.org,reject];
+	R_DKIM_ALLOW(-0.20)[grapheneos.org:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294323-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,google.com,kernel.org,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294326-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:kuniyu@google.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_ONE(0.00)[1];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER(0.00)[andrew.fenton@grapheneos.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[grapheneos.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew.fenton@grapheneos.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,grapheneos.org:from_mime,grapheneos.org:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CDE13630EF9
+X-Rspamd-Queue-Id: B3CE4630F3A
 
-On Tue,  2 Jun 2026 09:13:19 +0000 Eric Dumazet wrote:
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 74507c006490f180d2fac6594f6dcf2c86d53919..bfc847bc47fd957b58174dc4d2b82e2e8b461405 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -5660,6 +5660,12 @@ static inline const char *netdev_name(const struct net_device *dev)
->  	return dev->name;
->  }
->  
-> +/* Caller holds RTNL, netdev->lock or RCU */
-> +static inline bool dev_isalive(const struct net_device *dev)
-> +{
-> +	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
-> +}
+Certain multicast-related system calls such as setsockopt with options
+IP_ADD_MEMBERSHIP, IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP result in outgoing
+kernel-generated packets that don't have an associated uid.
 
-nit: could you put it in net/core/dev.h ?
+Not having the packet uid set to the uid of the system caller makes it
+difficult to use netfilter to ensure a specific uid can't send any traffic out
+a particular interface. It is possible to use network namespaces or system call
+filtering, but neither of these options are feasible for us working on top of 
+Android Open Source Project.
 
-Or alternatively rename to netif_isalive(). We should try to avoid using
-the dev_ prefix on APIs we export via include/linux/
+If we submit a patch that adds a kernel configuration for setting the packet uid
+to the uid that made the system call, would this get merged? Or is this not a
+viable approach?
 
