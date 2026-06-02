@@ -1,212 +1,169 @@
-Return-Path: <netdev+bounces-294081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFNGE0KTHmqdlAkAu9opvQ
-	(envelope-from <netdev+bounces-294081-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:24:34 +0200
+	id qCrKDUaVHmrPlAkAu9opvQ
+	(envelope-from <netdev+bounces-294083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:33:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B7662A7A7
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:24:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3A2362A979
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24E26309C548
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:18:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A80AB30C7A19
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB56F3BE15F;
-	Tue,  2 Jun 2026 08:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PG9Ka901";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="I8qasZcV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F5E3C455B;
+	Tue,  2 Jun 2026 08:26:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681FB38887B
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 08:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187C13C3C07
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 08:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780388273; cv=none; b=S7i2hRPeUfYqK9YUaZg7RDlCwpE0O+aO4wvM+6NMwsm8W1+oU9yVyM9iSlv6Dej17+TZLaePsjQ+UeOgenbugpSVpcRgLEidZQm4TCzIrM5Z/Z/LWY0Vlgocs3R84D72PlMrQpWawkzsRNY4L1dRPbD44osu2ukwuMLaVGdIdp4=
+	t=1780388762; cv=none; b=p6pGPq0xTdFgInXLgftYhw13dIHNjPOEmXfTiVflDP9KA8k2S+mmuapZwgBnpA2GMQFKzxr2zZ3+2hpsjzTe1A2tTfdkPg23jx16IGFX6pL3D7CohdAQfQk/6tC66HD5c9AERiMdSF7iRcgDl0ikoN5H6Dvc2TkWZ5Afg2Ev1EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780388273; c=relaxed/simple;
-	bh=7pVChPqDHXVqAPAnrlPKVmRgEs201+okE1NCvU9okKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pl9KZP3SwJcR3O/2Y2GAfRjtqkpypzPFhlGxIYMXaM2Y0o61s0Zu4RC5Wn7Akz/LXtcc46Fg7khepT9IJyRrshSMYcIgfp2pIg2S9Cc94OshGyIoQ22dSM4WVG4Vd11kmrikZzfiaonmK8JypXeaiIjFJkz4lu01FFBfJ8fRDGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PG9Ka901; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=I8qasZcV; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 25BC27A0015;
-	Tue,  2 Jun 2026 04:17:47 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Tue, 02 Jun 2026 04:17:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1780388266; x=
-	1780474666; bh=z58S7sTglbowuVwhGQ9uhTys6RnntOs5CEPvlIpADGo=; b=P
-	G9Ka901FFfqs4pRzre8bZQlLkNPYRKwY38lSJmtyinnKsrn3TEfQlfw5mvz+yIwh
-	6pLYp4do7eXrjhrALSf+FLEcIFR2mbed7i9Gt0FiQ2B3Q2+1wUfc/uOSJC8rvtbL
-	JkS46ejGvd0RImlFOFIJvdc7R12cSYV5fbvFGhhaxBDksAdb/HQs9sj3CMETUPym
-	Guy0C2pmpkUGoGeoIj+Y4oWs0oAOpNDoKaMnlsNvCCtUK6RGjR9uPLgJEpbhzO3b
-	4Au19PeLNKnYGAiDdWCMdhl7CxdxA2NcJOH72SLf1+0snPSEpUD0TfxAnIU8D6l/
-	idvt3+u5qz5i+UL5ZiEGA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1780388266; x=1780474666; bh=z58S7sTglbowuVwhGQ9uhTys6RnntOs5CEP
-	vlIpADGo=; b=I8qasZcVy0cExtw94LbL5ffmm+/wOmudTJdWnM3LhCtqLITOZiW
-	enoAiA3ruFCen8HQNNMQ/KVy7xAV+u14F93HDO4CmgG1cs/xLurKJhyMMUjBMDgG
-	r1LrMC6ztS4IxRLqY1TnSyBrnh/1W3Txjw0znkiKIPSnRN78NISfc069j+CuZ/zv
-	oKj1GVgljn45GrLRXHFSLFtqLqoF0oQaOk85+lwivLpuGxikjzm0pqk7D8gaEJ+G
-	tvdovHehidEwr3TLY63vTMesHAMXy+zKee0Jl0t+nPbfgAm6X7fH3wqW2mOvpoC8
-	RnItpo2cKR1l1NCGhsZipSFpGdWXlEmQ5pg==
-X-ME-Sender: <xms:qpEeapT-beDxo-42Cx1mQE2gsEr0Q30354nAvACL8vIQtVZ1MOejFw>
-    <xme:qpEeappDK4WLAaLi6SjTRx4lQ7pYFXaCT9AHqDSbuU6M_ARvHicfeL8x3NVZGKmg3
-    VQiB9rk0XlKm3s2plmkqiQGNyminfPIidvbFOlzCmo0ZxyaP2EXdSU>
-X-ME-Received: <xmr:qpEeanK3MhOsQAo6gIeZvMtq7zcQnMHqIpAR-ov1la8KisUroq0-pjVOb6pugyySlDcukr9hD2amILRgd9QdgdY>
-X-ME-Proxy-Cause: dmFkZTGbw2yjVLcliRVGpFaNLrcv2v5R8eTcxoEmW4D7MW4OaNtZ3pCfCubKuUka6TYIGA
-    0TQvc9yBP/rE0QqZ6hYXbcPq4njJutcIo2/rPuq53LHgBc7DmjQpyPNEsAXsMevd4DBUIT
-    cX+EBsOxHyjly7zNxfsMbU3M7CGmCHpN1F1Q892LW9+KM4o+yS0s3z2fixZBN1FFF7qm/i
-    ZcVJgh7LN+vr8zQf+gpXDAI4CLU3kMzMwnhR9wyM5A9vOYAVdjtpxC/1tekMj3GZc+GKHy
-    Fb/I6HTKXQKkB5GkMC5Qde44k70KO0tXmp77Y29/Ee4ZNKuZYVAszA5vEBPESfc9zxmSJL
-    7oAxExXrLw7ttnkizteUHprynO/nZCF69DoNKge1UhNB3OTGOKt71J5X4G+7SdorhZrB4O
-    gxjtrdfNeyjUNJiKoMxExkKn5wXSMtWI1m8kwsZrcTG0eJraEkzbJNptdO9y9/b6Dl0fnR
-    meK+op13M9wx0IoWfs6oBtYvLLGop08Hk2Ro912ckX9ysAPytkWZHjfjiGUxmZMzQA2PFr
-    /eCdR8tdzeIcbXg2fnD58Pp5qfb63aurxikrzaw1a4zfBt4aRFdAkcTCAD62hQU23pzdCT
-    WOq9Ft423xTopc+BEW6+nu6CAi4HCz38KuoI+/IG8zHCIpZVsC2ZUPHXaNxw
-X-ME-Proxy: <xmx:qpEeasqxITx8LKUKhBly-_x8R4W3k3lmVKU79SERMJ9ocUrFy26XTg>
-    <xmx:qpEeavzrYSeR2-lE7Wa0tGGAgAnxEwHafrBlUHUoD9rLQgd2DPduDA>
-    <xmx:qpEeagM8AtcrYCUGtzYIELlLV_lU-QQIctunlapd1BGK6wspVOH-HA>
-    <xmx:qpEeak6H29ArleXEZwP7L1LK1ZdLWPbJq0WpfDSNSZt5nyLOjyyxlg>
-    <xmx:qpEeapBdGQOyBMZA-2zBv2YeKxHUGEqhJL3BS_PCsJUnNkBIOPg3611Z>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 2 Jun 2026 04:17:45 -0400 (EDT)
-Date: Tue, 2 Jun 2026 10:17:43 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Petr Wozniak <petr.wozniak@gmail.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, pabeni@redhat.com,
-	edumazet@google.com
-Subject: Re: [PATCH net v3] xfrm: propagate -EINPROGRESS from
- validate_xmit_xfrm()
-Message-ID: <ah6Rp00oKj6SVI_H@krikkit>
-References: <20260601155822.20954-1-petr.wozniak@gmail.com>
+	s=arc-20240116; t=1780388762; c=relaxed/simple;
+	bh=ZQkpBhdyPFX8K1AgwsbSqD6e4PBbKm/F+6uEvcBzPyk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Y4tjEEmvszSqkZQT1/Inwbfb676uuONXvH7g0nF1eQBIrmEw13jxJr0+7MiDyWqNHbKgGdSwTVOX6WnRhheCbZ/nvSoKxNDRnavQAGd9H9eopQIKjooLugLiQwc0pQ5C2deyX/Vs6q4xAyIdXBFC+gOH1t4TNP2QvoJpJT4xcJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1wUKQZ-0001Gf-0T; Tue, 02 Jun 2026 10:24:47 +0200
+Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1wUKQT-000iZa-13;
+	Tue, 02 Jun 2026 10:24:41 +0200
+Received: from pza by lupine with local (Exim 4.98.2)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1wUKQT-000000003ba-0TqR;
+	Tue, 02 Jun 2026 10:24:41 +0200
+Message-ID: <6af284545729f03a60d06479339862a2f08c6b7e.camel@pengutronix.de>
+Subject: Re: [PATCH 22/23] reset: rzg2l: use
+ platform_device_set_of_node_from_dev()
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Lee Jones	
+ <lee@kernel.org>, Mark Brown <broonie@opensource.wolfsonmicro.com>, Thierry
+ Reding <thierry.reding@avionic-design.de>, Sebastian Hesselbarth	
+ <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Srinivas Kandagatla <srini@kernel.org>, Greg
+ Kroah-Hartman	 <gregkh@linuxfoundation.org>, Vinod Koul <vkoul@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich
+ <dakr@kernel.org>, Rob Herring <robh@kernel.org>,  Saravana Kannan
+ <saravanak@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
+ Ellerman	 <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Andi Shyti
+ <andi.shyti@kernel.org>, Andy Shevchenko	
+ <andriy.shevchenko@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will
+ Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Doug Berger
+ <opendmb@gmail.com>,  Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list	
+ <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>, 
+ Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team	 <kernel@pengutronix.de>, Fabio Estevam
+ <festevam@gmail.com>, Matthew Brost	 <matthew.brost@intel.com>, Thomas
+ =?ISO-8859-1?Q?Hellstr=F6m?=	 <thomas.hellstrom@linux.intel.com>, Rodrigo
+ Vivi <rodrigo.vivi@intel.com>,  David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>,  Paul
+ Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, Maximilian Luz
+ <luzmaximilian@gmail.com>, Hans de Goede <hansg@kernel.org>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,  Krzysztof
+ Kozlowski	 <krzk@kernel.org>, Benjamin Herrenschmidt
+ <benh@kernel.crashing.org>
+Cc: brgl@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
+	driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
+ iommu@lists.linux.dev, 	linux-pm@vger.kernel.org, imx@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
+	linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Date: Tue, 02 Jun 2026 10:24:41 +0200
+In-Reply-To: <20260521-pdev-fwnode-ref-v1-22-88c324a1b8d2@oss.qualcomm.com>
+References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
+	 <20260521-pdev-fwnode-ref-v1-22-88c324a1b8d2@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260601155822.20954-1-petr.wozniak@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-294081-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294083-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[pengutronix.de];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	FROM_NEQ_ENVFROM(0.00)[p.zabel@pengutronix.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[65];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: A4B7662A7A7
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,pengutronix.de:email,qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A3A2362A979
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-06-01, 17:58:22 +0200, Petr Wozniak wrote:
-> Changes in v2:
->  - Only reset rc to NET_XMIT_SUCCESS when PTR_ERR(skb) == -EINPROGRESS,
->    not for any IS_ERR() result (Sabrina Dubroca)
->  - Add comment explaining why rc is reset and the async delivery path
->  - Fix validate_xmit_skb_list(): track stolen skbs and return
->    ERR_PTR(-EINPROGRESS) when all skbs in the list were stolen by
->    async crypto, not NULL (Sabrina Dubroca)
+On Do, 2026-05-21 at 10:36 +0200, Bartosz Golaszewski wrote:
+> Ahead of reworking the reference counting logic for platform devices,
+> encapsulate the assignment of the OF node from another device for
+> dynamically allocated platform devices with the provided helper.
+>=20
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> ---
+>  drivers/reset/reset-rzg2l-usbphy-ctrl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/reset/reset-rzg2l-usbphy-ctrl.c b/drivers/reset/rese=
+t-rzg2l-usbphy-ctrl.c
+> index fd75d9601a3bfde7b7e3f6db287ec8c5c45a20ab..f003b360629c90bb37ed0ade7=
+a675b5b0f28fa7e 100644
+> --- a/drivers/reset/reset-rzg2l-usbphy-ctrl.c
+> +++ b/drivers/reset/reset-rzg2l-usbphy-ctrl.c
+> @@ -249,7 +249,7 @@ static int rzg2l_usbphy_ctrl_probe(struct platform_de=
+vice *pdev)
+>  	vdev->dev.parent =3D dev;
+>  	priv->vdev =3D vdev;
+> =20
+> -	device_set_of_node_from_dev(&vdev->dev, dev);
+> +	platform_device_set_of_node_from_dev(vdev, dev);
+>  	error =3D platform_device_add(vdev);
+>  	if (error)
+>  		goto err_device_put;
 
-I'm confused by this changelog. Was the "bool stolen" stuff in
-validate_xmit_skb_list added to address my comment on v1 about the
-skb_list_walk_safe() loop?
+Acked-by: Philipp Zabel <p.zabel@pengutronix.de>
 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 0c6c270d9..b77364f83 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4078,6 +4078,7 @@ static struct sk_buff *validate_xmit_skb(struct sk_buff *skb, struct net_device
->  struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *dev, bool *again)
->  {
->  	struct sk_buff *next, *head = NULL, *tail;
-> +	bool stolen = false;
-> 
->  	for (; skb != NULL; skb = next) {
->  		next = skb->next;
-> @@ -4087,8 +4088,11 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
->  		skb->prev = skb;
->  
->  		skb = validate_xmit_skb(skb, dev, again);
-> -		if (!skb)
-> +		if (IS_ERR_OR_NULL(skb)) {
-> +			if (IS_ERR(skb) && PTR_ERR(skb) == -EINPROGRESS)
-> +				stolen = true;
->  			continue;
-> +		}
->  
->  		if (!head)
->  			head = skb;
-> @@ -4099,6 +4103,8 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
->  		 */
->  		tail = skb->prev;
->  	}
-> +	if (!head && stolen)
-> +		return ERR_PTR(-EINPROGRESS);
-
-If you're keeping this code, sch_direct_xmit also needs to be updated
-to handle ERR_PTR, not just __dev_direct_xmit.
-
-(considering that sch_direct_xmit doesn't care, and I don't think
-__dev_direct_xmit callers can reach the -EINPROGRESS path of
-validate_xmit_xfrm, I'd skip all this "bool stolen" logic)
-
->  	return head;
->  }
->  EXPORT_SYMBOL_GPL(validate_xmit_skb_list);
-> @@ -4858,8 +4864,13 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
->  			goto recursion_alert;
->  
->  		skb = validate_xmit_skb(skb, dev, &again);
-> -		if (!skb)
-> +		if (IS_ERR_OR_NULL(skb)) {
-> +			/* -EINPROGRESS: packet stolen by async xfrm crypto,
-> +			 * delivered via xfrm_dev_resume(). */
-
-FWIW, I don't think this comment is that beneficial. A comment above
-validate_xmit_skb describing the possible returns (NULL = dropped,
-EINPROGRESS = stolen) would make sense, but something here and very
-specific to xfrm (there may never be other sources of EINPROGRESS for
-this codepath, but refering to implementation details of xfrm in the
-core feels wrong).
-
--- 
-Sabrina
+regards
+Philipp
 
