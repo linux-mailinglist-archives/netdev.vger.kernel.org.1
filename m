@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-294091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294092-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EpYA7KdHmq5CgAAu9opvQ
-	(envelope-from <netdev+bounces-294091-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:09:06 +0200
+	id EEgHMvidHmq5CgAAu9opvQ
+	(envelope-from <netdev+bounces-294092-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:10:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A5B62B129
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:09:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4975162B156
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FC0F300EA85
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:05:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A3C5303101D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CAF3C585E;
-	Tue,  2 Jun 2026 09:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9171E3C81A9;
+	Tue,  2 Jun 2026 09:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="BBxWCwli"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="C9HD/D2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF22F3C81A9;
-	Tue,  2 Jun 2026 09:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F296D3CA499;
+	Tue,  2 Jun 2026 09:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780391143; cv=none; b=BPlkLOGWCoEgDiE76R+Xx7iOMrGmMr6ud0Kyg2R4vnykjsFZn+Qajjmf4UtWxQFmfpdWRSUVl2qwobVVR80otOwQL1F4hyT62edWkqHKcl2SV/SKXYG29ORmMpeYZHjfzoMNmzrAYm4o+P0VNTg7HM8GZ7vs4wrxur2BNZKhQ4I=
+	t=1780391153; cv=none; b=GKVR+smqaDG2pHs6D8q1JW/IvWFwzxjE4EiIIEP/9OZIRiKRd7/Wexnu3sLRY18qqW0swgOFF/UWs2CPUNrAOM2jq6n9yLuY9DLAMaX+j96VBQEx1bF3hNQ6RALcvpSEJK+SRTq6Hia4vkqWmAIr4LlBLq3unxj7++X+FNtyjJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780391143; c=relaxed/simple;
-	bh=4ISKIg302H0QG5EBCnN1MlangFR1q9sYBrKBVGXrdeM=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=Rv7ZyAg2PWI3qb1UnciFnNfAOAep/hPngun3M1JRVZnjCHx7qDMyFtg9lHxz5aOPIap+qi+XqshXx391j6vquuUfpINygiP6/GeLatYWNimyLswGq0EzStiWxWDFfuRAd1avyoGaF1D2Wz11RNM6JoJMqyrba4XEGCbRtt/TVUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=BBxWCwli; arc=none smtp.client-ip=162.62.57.252
+	s=arc-20240116; t=1780391153; c=relaxed/simple;
+	bh=lweiL+U2j2RD3aMWvkdQnLbv+Zt65R/3p1OBZyuX8zQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=AUhT0+mm/NqQs/9o1rv2CTzs9t5u43db87N8j0Hgdu8EhDaW8bgp5oSZMaVzDiaW1dHYb+0gMAmoDAdBnG2aVy+DBCAf45l8cYH36G0D7IeQPw8KvNkt8Eb/xe9Y1norNv5UGvDVJfL0WQM/Kbt+DrY4sl3QZCM4L9ZffrurhQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=C9HD/D2U; arc=none smtp.client-ip=162.62.58.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1780391134;
-	bh=Q0WNm6g10MFQgiEZ0ypFJR4luc9FuEribuvlDn2kdAg=;
-	h=From:To:Cc:Subject:Date;
-	b=BBxWCwli42+mIHT/jFV4BPL+Jir8hgsWVSCGROlflovCpWoFoE5YQ0hchmS3kenrI
-	 7SHEaHIxcp4VJt2fXHX+i70AhHJZTyIGDLIHeKoDG2R6R5LE+gXpGJgkvNPFLQ5tEw
-	 dZsKPjuQXmGhHTgkmpRT34zgUgbYsFHf5MBBlPIs=
+	s=s201512; t=1780391140;
+	bh=IfXjH9yulXqPjRJqDC6fFJUDuecKipMTki0rT6mscnU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=C9HD/D2UMcYJEAtEdEsfP4iCbaGf5fkzK7QFxl+G1rCusDlMHKo5bqyl3iWxr9ZzI
+	 TzvGZ+fchegXKljQPFp1XwlGNiISrQzm74X2Q5vAx2n6eQcTZyB4K3eSSwCbE1lPGl
+	 2KIiIXN1kp6pq2N2LCeLdbPpsRrW21MphAQ43rvM=
 Received: from localhost.localdomain ([2409:8915:2067:10d5:5f88:ceb0:c03b:f401])
 	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
 	id 15E02E54; Tue, 02 Jun 2026 17:05:30 +0800
-X-QQ-mid: xmsmtpt1780391130twvfyou6u
-Message-ID: <tencent_29CB862D5756CBCBAFD2EE436EBAC98A7E05@qq.com>
-X-QQ-XMAILINFO: OR5rDBBXAGpMjtPEPR6GPwz00IW16RuB49+OJyu68YY5og/IdBpSnq2wgE9PRb
-	 CTVT4AmjpsUqpXomcaERwoW6t8hueu6cRv8Oy7qlWRCQFBQ3gYJLOWQDUrt6rY5FJCBwW3tax/ZL
-	 ZwqrRVOzAWrKwN2EpbkArRN5yPOuS1XtAyBgnO78m45oQhBUNMpOdwa7SNVwo+Bz4OjhGjVclZUs
-	 h1qV/fruRXy0HjILeHqeJWus6GIWZGgXWMF40SJaBn4nl4IP6Koi4J0TVPBU2ceR22hwt0JrCGgS
-	 UmcBGy8+OgIZcrVzstfr0AJTI9Fh1siD7DRwIsMTN1kuSdBV2vZAiojnf9VgpKfbiWJqFKjHU3kD
-	 U1dyY8DjVoMEmaGcO/4LpFzn6CzFE7MF2KCJr8Y/d6BOgGfN5RnEC8bU6/zprlEr5chauYCy4y0R
-	 DktC0MJ6Ag1+o83/c0hUrde4b/IVVpnnrceYTSBVr+nEN9TCoF2lL/dZ220lubnUPANF3yoE99OF
-	 XvhUOIH6WegUiLQH90OsaJYsMLxyckDQbMEf3FCwlYY9OVDdr7/RCSkFXVDeDlWC4mMcBz8OX5S3
-	 WHKvM7VymMbNq76Cvf2VeMlyYTmCme475Qxvmt1upfrOLHIWamVGiw79T+kzhZZWs7b2dDDVNdyd
-	 nzlT+rHCGK69qFKwI8i5FK3S3b0RWl631FBsakOcoyuWQoEBF2TCYpnVX70yihdG2wgB/vvsYdMm
-	 rAJdktgNhI3G3TNYFnkqbOXl29b9M5lYDsVv6EHT7rJjUTjiGVgMCDYlN5KR7nDgP5V73OCs2CeX
-	 1uo+V93fcVaoo2FFYX1KtTCVn8BhlJJ7JpcazSGqWf4wpzCoAOeOtuhuePvl7X4LBOCmmq639YxX
-	 /3dkm4BK0kMbgRdFAjOLzQTTETbjaXIJuEtPXwW/+y9+7t+745MAP+CN11HXp175qrjta1TXd03i
-	 R5jh5coz4kMX1juuulv05KGeZtQnS06W/UptDoGuGIoazTm7WySODw9HAgLkIgV0TJG51bphxU5O
-	 Cv5yMqgqLd6cuZsLzMW56+zyJNBxsrO2Bauok4pXQmYp8I/BXOa7bfqegZr6ORuNWv2LI+WA==
+X-QQ-mid: xmsmtpt1780391134tqodw4ljw
+Message-ID: <tencent_F1AF1F5AD39C56485BD16C6DB2415E5B9508@qq.com>
+X-QQ-XMAILINFO: Mu/Y/wNdJF3zrvDE1bImiIpsfpdFo914hZlhvaTgd4tv7YRXClT9GTL0R20w1i
+	 X676F/B41Pe5YHEgUbKu6BHqlYGaFQPorqh+MylqixeuxrQAdv3CbJEZ1ZODiocgxDNK+ogrBo/V
+	 7ou7jdgoMl6Lifwm0/Ztvb8AXLrKYZxlmsOEa6XjkHuwqa5+uYlns8D2f16//3l4jnebfTNgj2fS
+	 58oZjEyVf/WO3d3mse6lXglUxqvvWSdilsxI80v1fs3nj2yh5ZOWjwO7X048ke05i5etm++90QTD
+	 BuuGxL7dr0HsmsMwL1Vh1Hf8ck/IUOlg4Q/KofU9SbRumkKKH3c21I4+NnPhsl1adHvq8JX1Y4CC
+	 7xoIyCMP1BSGIgcB3qmL2loJAoRBAx9iHm/Mne1qqHGIZ3snU+wSR0tEnzkkgcDv2mGJ7fAf96s6
+	 kafcv/gjiR/RwYjpGwWKO76Ti3P2W4QMvUVCPphV1ZSLS+z8tBCd9VSsrFnOfK5dE3bYvxC36OOS
+	 a3hBrxvIKwBD1Xh5im46OLzrE0hwzbkoO0uEa8P2+SVSNvdZkO4gIwWVimkh8qOBrgHWJlbNAHZG
+	 JHLCOh3QeTbVt1WopdKnkkonjewFh2fWC/8KqycOD2LsEnzI6jsRxK1S75cTIdMja4W7gRC9Q4o/
+	 R+PpMnGICsaW2vZsd5lkMVl11Tf3tGwan+8Szv7eM0eD/sFQ6P8VSRTyyLjRcDJxLM5NIblU0WpE
+	 B8IWchPcDqaQLfqZ38SXMHsLKGoUW6qU/AaWRoC3WaUWR6D2CPhTYAs/y+9sKU9ohK7+yOnJjCtN
+	 Oi3BEcRuAqcRbsbXOwIOmvEWc9BX5fyhEvly63QIG3LClt6EKuXLB0wmZa58zgsaa1DVk1otclHi
+	 M55Xt4+ktN/7dasWMZkhjCg7DwdpNy+vmbc8xlTKqywuX1mQiZVR0yaVJ6IzSiGzB0Qj6jiR8mCn
+	 ktuspkeUaG49Ry+HhNYcJZb6EJV+sBTf7w/ZMqHu0rf3M0nDfdT9jMwNP86UUJWbVzmjcqHNsQwn
+	 gQ6RZXgJt2DdKDYHC3PV8ZO6QoDTT5LiPyCQ/fl5YPQhr2dBTndtBX6f34lKa3Oz3dNRGELg==
 X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
 From: Shaoxu Liu <shaoxul@foxmail.com>
 To: andrew+netdev@lunn.ch,
@@ -71,10 +72,12 @@ Cc: shaoxul@foxmail.com,
 	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 0/2] rndis_host: add LE310X1 ID and enable low-power handling
-Date: Tue,  2 Jun 2026 17:05:26 +0800
-X-OQ-MSGID: <20260602090528.2544-1-shaoxul@foxmail.com>
+Subject: [PATCH net-next v2 1/2] rndis_host: add Telit LE310X1 RNDIS USB ID
+Date: Tue,  2 Jun 2026 17:05:27 +0800
+X-OQ-MSGID: <20260602090528.2544-2-shaoxul@foxmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260602090528.2544-1-shaoxul@foxmail.com>
+References: <20260602090528.2544-1-shaoxul@foxmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +85,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 65A5B62B129
+X-Rspamd-Queue-Id: 4975162B156
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -90,7 +93,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
 	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -99,8 +102,8 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_CC(0.00)[foxmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-294091-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-294092-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[shaoxul@foxmail.com,netdev@vger.kernel.org];
@@ -110,26 +113,36 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	FREEMAIL_FROM(0.00)[foxmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qq.com:mid,foxmail.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[foxmail.com:dkim,foxmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qq.com:mid]
 X-Rspamd-Action: no action
 
-This series adds RNDIS support for Telit Cinterion LE310X1 and then enables
-USB power management for that specific ID.
+Add a device match entry for Telit Cinterion LE310X1 RNDIS interface
+(VID:PID 1bc7:7030).
 
-v2:
-- split v1 single patch into two patches, per review
-- patch 1: add LE310X1 USB ID only
-- patch 2: enable power management only for LE310X1
-- improve commit messages to separate enumeration from behavior change
-- Link to v1: https://lore.kernel.org/netdev/<replace-with-v1-message-id>/
+This is a functional no-op and keeps using the generic rndis_info for now.
+Power-management behavior is handled in a follow-up patch.
 
-Shaoxu Liu (2):
-  rndis_host: add Telit LE310X1 RNDIS USB ID
-  rndis_host: enable power management for Telit LE310X1
+Signed-off-by: Shaoxu Liu <shaoxul@foxmail.com>
+---
+ drivers/net/usb/rndis_host.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
- drivers/net/usb/rndis_host.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
+diff --git a/drivers/net/usb/rndis_host.c b/drivers/net/usb/rndis_host.c
+index 7b3739b29..46eab7bda 100644
+--- a/drivers/net/usb/rndis_host.c
++++ b/drivers/net/usb/rndis_host.c
+@@ -657,6 +657,11 @@ static const struct usb_device_id	products [] = {
+ 	/* RNDIS is MSFT's un-official variant of CDC ACM */
+ 	USB_INTERFACE_INFO(USB_CLASS_COMM, 2 /* ACM */, 0x0ff),
+ 	.driver_info = (unsigned long) &rndis_info,
++}, {
++	/* Telit Cinterion LE310X1 RNDIS */
++	USB_DEVICE_AND_INTERFACE_INFO(0x1bc7, 0x7030,
++				      USB_CLASS_WIRELESS_CONTROLLER, 1, 3),
++	.driver_info = (unsigned long)&rndis_info,
+ }, {
+ 	/* "ActiveSync" is an undocumented variant of RNDIS, used in WM5 */
+ 	USB_INTERFACE_INFO(USB_CLASS_MISC, 1, 1),
 -- 
 2.34.1
 
