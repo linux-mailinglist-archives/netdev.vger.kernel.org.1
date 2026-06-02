@@ -1,88 +1,71 @@
-Return-Path: <netdev+bounces-293949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sGntIAo4Hmr4hwkAu9opvQ
-	(envelope-from <netdev+bounces-293949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 03:55:22 +0200
+	id MCtNEZw6HmpriAkAu9opvQ
+	(envelope-from <netdev+bounces-293950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:06:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D349B626FC6
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 03:55:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96BF5627101
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:06:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F211B3037F41
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 01:52:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9018B305F5BF
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52954337BBD;
-	Tue,  2 Jun 2026 01:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7C5348C44;
+	Tue,  2 Jun 2026 02:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bljXLWJV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv8MOhMk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8322D1F44;
-	Tue,  2 Jun 2026 01:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9502F3431E6;
+	Tue,  2 Jun 2026 02:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780365150; cv=none; b=ktaWfLI4Rno9yanbM7uahloN7yXMAC11nsbM7nU7OdARx4yCthMqMQh7d76BCTNI3DZq3EeilIoICyiYUDMiYFKY0R/UD25EmOVAywDIYuleUAB1tHsqnqGbMea5genHDiplM+4Pdg4DsEtJcQW9Puw6Flc7UUGZKhoK551yKE4=
+	t=1780365760; cv=none; b=J7u8Vw/BF6/Cbv1mJgNLHifGPh5ZnmHwd0n23B3+6zAJZVZdudqlfF5/adWIa7DZgLVIGj0p5a+J1Ow/IUQ3w7dmIrAgq0KsiCbs5d+41lHWaTKctRS3xmX6+qz8CpP2opklWttmxhRhdOjXlLZtbtJFSDsZ4TIN/B9z6xRvdLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780365150; c=relaxed/simple;
-	bh=UbeHIEb23qudY7Yu6sAEN6v7i5GXY37qr3IyEOTwhFo=;
+	s=arc-20240116; t=1780365760; c=relaxed/simple;
+	bh=+R85iHydaGjixH4D85cAGr2LN2rZSBXxrW7q1KqT96o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oNNmAz2rl/sE4sFboFHII2gbFQTatUxmZ5CrBSmCL2lUXXvJpSesgLqeSjkTU/OfZ9A42V88TbDa6le4bzirdXR4dF+07Oo9gZmKal1vNi3nKLTTWD6c5HPRlb0l8Lt8uvg/G2rZ07O1HhZbI789cLC0m/x/uTe6WGhbaBOzacI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bljXLWJV; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F0F81F00893;
-	Tue,  2 Jun 2026 01:52:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=VvscJxzX5JA5WxMmiZp1X+Lj2fz53b5ysnRmMhcgr4h70GsOErTzU7ry4MOzS9Qbzy0qZMu4HTOpB86MGrhkB8Fp1DLE3S/MShD1nd35FdpjBvhwODwZvSOByJ8fVa9OF7tIsUNvXMzXO6cyQacXlDNXUdoxLcvGc96tuI3f/5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv8MOhMk; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C361F00893;
+	Tue,  2 Jun 2026 02:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780365148;
-	bh=UbeHIEb23qudY7Yu6sAEN6v7i5GXY37qr3IyEOTwhFo=;
+	s=k20260515; t=1780365759;
+	bh=G57dt76b/BRFzvZIH60bWFWhhN1lOS3Iz+slVKKPV/U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bljXLWJVhKCQzIrEQUgvjQKwoL4IAsNEvv+tFevNyZTEVXA2DKPgS5KgEWo5fOlfg
-	 kAD4eMVM9s5FG0IoJ3iGq5nZ5b7S5s8/emYRBZYpJ3xw2Y7hFDGg6vkGbBaLM0THn/
-	 Obdgn6fdZrlpoXoIN0jLB1Xs6+Io0zbcY04Iu+GLlO1m//ZqhDM4i/whYxfsJacxsc
-	 zRXhZcHFlmhVQH04C4njokwHJ79ywP9pr+U3dxwqNmVudh9W5U7FI1/v/VW3xMjSAA
-	 PDVQWfm8eCioNiqxuDfM4jShJ4n4uQwNUtrmrgSuMvcW4DJ9GFAHGwyoK4fmGHXRU3
-	 oHC0gYTqR85Vw==
-Date: Mon, 1 Jun 2026 18:52:26 -0700
+	b=Rv8MOhMk1XXrHWduO8x88/ba2omjk6a2ZtcyA9c+q8aecOp/PP3Z5apsFdLtrdJMH
+	 DE/Xeg1IEdM4ab1yRBkBRO/3i04X86YG9FVJ7sduCEc2+WN18QYlSqRHt8xtzXaL8d
+	 5hbrcoYMDNDVq5VL3y5SMT2RM5Z5UfO9SH7zw4mTIpzmxGYUdJqcyxdmRIoano9bgW
+	 uP39VMkPs6VGZeczMjIj6wdx+7Tz5xg2yo5wT5k/mJy0aTlXkVbiQtGcF/SeD7otFQ
+	 sJL4nqHjuq4IcnXAiG9YH7o2Xv9lecet3RGKGQP42lSz/XsXiSj84a6ZuoRaLU95pf
+	 NqNcfdYBFBCdA==
+Date: Mon, 1 Jun 2026 19:02:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, Wen Gu
- <guwen@linux.alibaba.com>, tglx@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jstultz@google.com,
- anna-maria@linutronix.de, frederic@kernel.org, daniel.lezcano@kernel.org,
- sboyd@kernel.org, vladimir.oltean@nxp.com, wei.fang@nxp.com,
- xiaoning.wang@nxp.com, jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
- yangbo.lu@nxp.com, svens@linux.ibm.com, nick.shi@broadcom.com,
- ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, linux-fpga@vger.kernel.org,
- imx@lists.linux.dev, linux-s390@vger.kernel.org, dust.li@linux.alibaba.com,
- xuanzhuo@linux.alibaba.com, mani@kernel.org, imran.shaik@oss.qualcomm.com,
- taniya.das@oss.qualcomm.com
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
- directory split
-Message-ID: <20260601185226.7f43fa75@kernel.org>
-In-Reply-To: <0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
-References: <20260407104802.34429-1-guwen@linux.alibaba.com>
-	<20260407104802.34429-3-guwen@linux.alibaba.com>
-	<20260412084704.743482ad@kernel.org>
-	<4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
-	<20260412095301.4fe1fe65@kernel.org>
-	<ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
-	<1088b07d760491deb461d6d01abca631e8f8d86c.camel@infradead.org>
-	<ahzQZg_v4bxFfGdj@hoboy.vegasvil.org>
-	<3908843460c4864eef79cced40d897f793c7ae2a.camel@infradead.org>
-	<ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
-	<0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
+To: Yuho Choi <dbgh9129@gmail.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>, Linu Cherian
+ <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
+ <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] octeontx2-af: Fix PCI device reference leaks in
+ debugfs
+Message-ID: <20260601190237.76d7d47c@kernel.org>
+In-Reply-To: <20260529052333.1665989-1-dbgh9129@gmail.com>
+References: <20260529052333.1665989-1-dbgh9129@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -92,12 +75,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-293949-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-293950-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linux.alibaba.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,oss.qualcomm.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -112,56 +95,35 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: D349B626FC6
+X-Rspamd-Queue-Id: 96BF5627101
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 01 Jun 2026 17:53:49 +0100 David Woodhouse wrote:
-> On Mon, 2026-06-01 at 08:20 -0700, Richard Cochran wrote:
-> > On Mon, Jun 01, 2026 at 08:03:26AM +0100, David Woodhouse wrote: =20
-> > > If we move all the plain non-network PHC drivers (which, as noted,
-> > > is
-> > > basically *all* of them) into a drivers/ subdirectory, then perhaps
-> > > we =20
-> >=20
-> > Sorry, just catching up here, so the idea is to have
-> >=20
-> > =C2=A0linux/drivers/ptp/drivers=C2=A0 ? =20
->=20
-> That is my current suggestion.
->=20
-> It stems from Jakub's response in
-> https://lore.kernel.org/all/20250815113814.5e135318@kernel.org/ that "I
-> really wish someone stepped up and created a separate subsystem for all
-> these cloud / vm clocks. They have nothing to do with PTP."
->=20
-> There was some further bikeshedding in
-> https://lore.kernel.org/netdev/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux=
-.alibaba.com/
-> around how to split 'emulated' from other hardware drivers, but I don't
-> much like that taxonomy. Some of these "virtual" clocks could just as
-> easily exist in hardware with PTM too.
+On Fri, 29 May 2026 01:23:33 -0400 Yuho Choi wrote:
+> Subject: [PATCH v1] octeontx2-af: Fix PCI device reference leaks in debugfs
+> Date: Fri, 29 May 2026 01:23:33 -0400
+> X-Mailer: git-send-email 2.43.0
+> 
+> cgx_print_stats(), cgx_print_dmac_flt(), and cgx_print_fwdata()
+> look up the RVU AF device with pci_get_device() and pass the returned
+> pointer directly to pci_get_drvdata().  pci_get_device() returns a PCI
+> device with an elevated reference count, so the lookup reference is
+> leaked on every debugfs read.
+> 
+> Store the returned PCI device pointer, check it before reading driver
+> data, and release the lookup reference after pci_get_drvdata(). In
+> cgx_print_dmac_flt(), release the AF lookup reference before reusing
+> pdev for pci_get_domain_bus_and_slot().
 
-Not sure I fully understand what you mean. Practically the distinction
-is very clear - the virt devices are implemented by a hypervisor and/or
-IPU which may have some HW gadgets and PTM support but beyond that are
-software-defined. We don't need help maintaining drivers for
-fixed-ASIC (?) clocks, atomic clocks etc. Those are usually time
-counter + misc. They are not "devices" which know the wall clock time
-better than the host :\
+Looks like cgx struct has a pointer to the pci dev.
+Can we use that instead?
 
-IOW the "does it have a NIC" is not a great distinction.
-A better oneliner would be "does it purport to know real time better=20
-than the host"
+When you repost please add net-next to the subject:
 
-> My observation is that with the sole exception of ptp_inet.c, *all* of
-> the actual PHC drivers that live in drivers/ptp instead of drivers/net
-> are "pure clock" drivers, so perhaps we split those all out into
-> drivers/ptp/drivers/ and exclude them from the netdev maintenance?
->=20
-> I'm reluctantly prepared to host and help maintain a drivers tree if
-> it's necessary, but equally as happy to let you own it.=20
+[PATCH net-next v2] octeontx2-af: Fix ...
 
-No strong feelings here, but atomic clocks will start spilling into
-DPLL and SyncE pretty quickly.
+and make sure you base the change on the net-next tree
+For some reason our CI wasn't able to ingest this change.
+-- 
+pw-bot: cr
 
