@@ -1,199 +1,162 @@
-Return-Path: <netdev+bounces-294052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WF0XJCF+HmrnjgkAu9opvQ
-	(envelope-from <netdev+bounces-294052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:54:25 +0200
+	id wG2GBap9HmrnjgkAu9opvQ
+	(envelope-from <netdev+bounces-294053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:52:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4B06293A1
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:54:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21EE562930B
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 15360308699E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 06:50:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4403D3007AD9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 06:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36363A9852;
-	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAC03A05C2;
+	Tue,  2 Jun 2026 06:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K3CKRjJS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8IElk/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43173A7193;
-	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5204B395AC7
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 06:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780383047; cv=none; b=m/Gv2ysnFLeOe6ZB9unYkn2oekoPOyOCfrDF/B4p718ofZdV7c+v9xbQpmk3fwIUQHanEK1SclMRIXsE5767va0lkQKlItGiToXJHIX3ynDopLx3Bsfv27h78yN5mofSZx8MueDJTyIJ3++PyTLwsdq5VygMgF1EZi0cwhfrgWs=
+	t=1780383141; cv=none; b=AMN8nZdmICr2ExvQ+ps2jkl67Gl2t0I+GgBYJc6mXt7gcRS93/KjLvIGc6yjv2lchURYTihNIXzPWD1c2lfoU3x1hxHOD4WUKua6sEnz3/MnzmqhSytneNpx+5coWFVedZQyLjXmeRqHReANLIqOByU53ghutz82OKTt9NGB3wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780383047; c=relaxed/simple;
-	bh=QG4Z1lJud/2m0d4pUKcPCuFCd9HmCmJz7ekPrVHzQfQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=mgcC/KyyBSpTepTiMca5YWrNop0nLabwPtD449eIKxJJqslQeAil5IQ6LYEVMhQ1VY1URYXbYUbgHzF045buElSeFl4QrSeDggijcwbiKOcZft3eHLsdYPRywJr89iiop+MKVHR0OmH66grxbQ6wwU++HorZObMsQObuM4lqHes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K3CKRjJS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 96194C2BD01;
-	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780383047;
-	bh=QG4Z1lJud/2m0d4pUKcPCuFCd9HmCmJz7ekPrVHzQfQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=K3CKRjJSHdyaAxXOe8jBBMVkMwMzJ6wFfIA/xtQb+xxxDF5JQfbNAl+IJ/VZ4Ow1U
-	 r4nBLISRsoYVekuaYRSN8ybyaZYYMMJ31dT0igxUb6d62hOV1RTkcpvwXdOmNgZcXh
-	 GO2Ys1wuJ8ivTrGXCQLo47yLUVdWJpGbrxWWhyqQAfn0eltX6nbeAynVO8QDqu3OCK
-	 kPgiBua9e9QApHVN4kKzupgxVrWAoR73GEcnI+gKu1hOcmplC2egpDwHsozP0ruFdg
-	 IdxH2og12bZm4bqCnOvl6yMHR0ePDf2reaopW2/UkBd1Y6ApIhoQyKXZb2fCHVtjR1
-	 lb3kc8L3zskVQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDD2CD6E57;
-	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
-From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Tue, 02 Jun 2026 10:50:40 +0400
-Subject: [PATCH v2 4/4] net: phy: at803x: add RX and TX clock management
- for IPQ5018 PHY
+	s=arc-20240116; t=1780383141; c=relaxed/simple;
+	bh=/jurpIGVxras/60V4TOfIMEpfTOxspIKn7fZH7+lQlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YeLY9EEH5Ty0fRKyLfzUCNIGAJpxJ2ng5bd1FFWNZ9WHPVZiWtm/tPn/1LrGlSq0O1Q1SwiClDOIbQEDNuzjIBj7lyXrurWjYial92fExBB3Yp9NuzFAdKW48GJTr/6scZbO4a4+jEQcVqzLQmxtyrWLslRoZ2RPoc1RlHMRuBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8IElk/h; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F199B1F00898;
+	Tue,  2 Jun 2026 06:52:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780383139;
+	bh=ZDSxYnMPY0itqsVM4sIvyNaZq4A9tfxgOPqtLTGH890=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=K8IElk/hVgq6/2y9P/OGKrMAyBQ/0zQwylWD9vpg4553zitHz8Ps5Fv8mD9wzSvpS
+	 xuTYJ6vQ1ZtD6Yn/RAOp3cFFnclPPFkZ0g412Q01VwUB9+YakZFBJTSV1XT6gsxMQd
+	 0HmxjvIEvWavEt29wPCTHDtXddp8TmPSXIKcScI3h+JFDhq/Vl+6Kj2sRiYdfqXlv+
+	 scMjuOgCQtsx0Op4M0BL8hrwFzeQDGcjmsYrto8fvuUaFTxxktpBsiN1MCvRTaIbtr
+	 EAYNFzlxx+wOmYX+fjDfXlxVoAGs2yZ8TBlb8UD5sS5fft+kZQsKXW1xdaURtRdK/w
+	 LmtjxWZABNmEw==
+Date: Tue, 2 Jun 2026 08:52:15 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Felix Fietkau <nbd@nbd.name>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: Possible UaF bug in netdevice teardown path
+Message-ID: <ah59n47KKkhZmt0o@lore-rh-laptop>
+References: <ah1NJMrJ5rEkQlJG@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260602-ipq5018-gephy-clocks-v2-4-65a1f1d881f3@outlook.com>
-References: <20260602-ipq5018-gephy-clocks-v2-0-65a1f1d881f3@outlook.com>
-In-Reply-To: <20260602-ipq5018-gephy-clocks-v2-0-65a1f1d881f3@outlook.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
- linux-arm-msm@vger.kernel.org, 
- George Moussalem <george.moussalem@outlook.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780383045; l=2335;
- i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=k3J1uSCRHsxM9xs2etq4AynajTAyY7ew0xbYTGGX5vo=;
- b=XC5MLpTjeARQV5btxnH3uknIg5JztVn3Er5vSILfOriN654qinR4wnWCSN1B5UZvEJ7YlWLqc
- 0iQjrlnoEJwC2KaGibXI3KCX9TFRvlgCfTjHcqt1nqkAfBJbc8wP2hi
-X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
- pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
-X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
- with auth_id=364
-X-Original-From: George Moussalem <george.moussalem@outlook.com>
-Reply-To: george.moussalem@outlook.com
-X-Spamd-Result: default: False [1.34 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="576asHiwzTTmFSL0"
+Content-Disposition: inline
+In-Reply-To: <ah1NJMrJ5rEkQlJG@strlen.de>
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294052-lists,netdev=lfdr.de,george.moussalem.outlook.com];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[outlook.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[george.moussalem@outlook.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.996];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,oss.qualcomm.com,outlook.com];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-294053-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:replyto,outlook.com:mid,outlook.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: EF4B06293A1
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 21EE562930B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: George Moussalem <george.moussalem@outlook.com>
 
-Acquire and enable the RX and TX clocks for the IPQ5018 PHY. These
-clocks are required for the PHY's datapath to function correctly.
-In addition, gate the clocks upon link state changes for improved power
-management.
+--576asHiwzTTmFSL0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: d46502279a11 ("net: phy: qcom: at803x: Add Qualcomm IPQ5018 Internal PHY support")
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
----
- drivers/net/phy/qcom/at803x.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+On Jun 01, Florian Westphal wrote:
+> Another sashiko drive-by report. TL;DR, do you need to apply this
+> pattern in your driver?
+>=20
+> -       metadata_dst_free(priv->md);
+> +       dst_release(&priv->md->dst);
+>=20
+> Affects:
+> drivers/net/ethernet/airoha/airoha_eth.c
+> drivers/net/ethernet/intel/ice/ice_eswitch.c
+> drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
+>=20
+> Long version:
+> https://sashiko.dev/#/patchset/20260527135751.1031891-1-tristmd%40gmail.c=
+om
+>=20
+> This isn't a bug introduced by this patch, but looking at this fix, do
+> other callers of metadata_dst_free() suffer from the same use-after-free
+> vulnerability?
+> In drivers like ice_eswitch and mlx5 MACsec, a metadata_dst is allocated
+> and references are taken on it via dst_hold() when packets are processed
+> (for example, via skb_dst_set()).
+> However, on their teardown paths, these drivers call metadata_dst_free(),
+> which unconditionally frees the memory without checking the reference cou=
+nt.
+> If packets holding these references are queued (like in a netem qdisc)
+> during teardown, does the memory get freed prematurely, causing a
+> use-after-free when the networking stack eventually calls dst_release()
+> on the dequeued packets?
 
-diff --git a/drivers/net/phy/qcom/at803x.c b/drivers/net/phy/qcom/at803x.c
-index 63726cf98cd4..b7361a14220d 100644
---- a/drivers/net/phy/qcom/at803x.c
-+++ b/drivers/net/phy/qcom/at803x.c
-@@ -19,6 +19,7 @@
- #include <linux/regulator/consumer.h>
- #include <linux/of.h>
- #include <linux/phylink.h>
-+#include <linux/clk.h>
- #include <linux/reset.h>
- #include <linux/phy_port.h>
- #include <dt-bindings/net/qca-ar803x.h>
-@@ -176,6 +177,8 @@ struct at803x_context {
- };
- 
- struct ipq5018_priv {
-+	struct clk *rx_clk;
-+	struct clk *tx_clk;
- 	struct reset_control *rst;
- 	bool set_short_cable_dac;
- };
-@@ -1062,6 +1065,16 @@ static int ipq5018_config_init(struct phy_device *phydev)
- 
- static void ipq5018_link_change_notify(struct phy_device *phydev)
- {
-+	struct ipq5018_priv *priv = phydev->priv;
-+
-+	if (phydev->link) {
-+		clk_enable(priv->rx_clk);
-+		clk_enable(priv->tx_clk);
-+	} else {
-+		clk_disable(priv->rx_clk);
-+		clk_disable(priv->tx_clk);
-+	}
-+
- 	/*
- 	 * Reset the FIFO buffer upon link disconnects to clear any residual data
- 	 * which may cause issues with the FIFO which it cannot recover from.
-@@ -1084,6 +1097,16 @@ static int ipq5018_probe(struct phy_device *phydev)
- 	priv->set_short_cable_dac = of_property_read_bool(dev->of_node,
- 							  "qcom,dac-preset-short-cable");
- 
-+	priv->rx_clk = devm_clk_get_enabled(dev, "rx");
-+	if (IS_ERR(priv->rx_clk))
-+		return dev_err_probe(dev, PTR_ERR(priv->rx_clk),
-+				     "failed to get and enable RX clock\n");
-+
-+	priv->tx_clk = devm_clk_get_enabled(dev, "tx");
-+	if (IS_ERR(priv->tx_clk))
-+		return dev_err_probe(dev, PTR_ERR(priv->tx_clk),
-+				     "failed to get and enable TX clock\n");
-+
- 	priv->rst = devm_reset_control_array_get_exclusive(dev);
- 	if (IS_ERR(priv->rst))
- 		return dev_err_probe(dev, PTR_ERR(priv->rst),
+Hi Florian,
 
--- 
-2.53.0
+For airoha_eth and mtk_eth_soc I think the issue is less severe since we
+destroy the metadata after running unregister_netdev() (that executes
+synchronize_net()), but I guess it is better to fix the problem. I will pos=
+t a
+fix for them.
 
+Regards,
+Lorenzo
 
+--576asHiwzTTmFSL0
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCah59nAAKCRA6cBh0uS2t
+rBbkAP9n6TqudmP6+W+Gls0RKmbOrps5XTC2yBfclupisGuNKgEAzCrWI8aTjg0X
+PL+C1WcMnx5qmRT8MuqbePPE7PitIQs=
+=sBwZ
+-----END PGP SIGNATURE-----
+
+--576asHiwzTTmFSL0--
 
