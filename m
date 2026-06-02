@@ -1,84 +1,57 @@
-Return-Path: <netdev+bounces-294155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8AAuE4y7HmrZJgAAu9opvQ
-	(envelope-from <netdev+bounces-294155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 13:16:28 +0200
+	id ABGUFCy8HmrZJgAAu9opvQ
+	(envelope-from <netdev+bounces-294156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 13:19:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A16962D427
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 13:16:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52AB962D4DC
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 13:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E77DE30433B7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 11:12:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E5AD305FC00
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 11:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD26339708;
-	Tue,  2 Jun 2026 11:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3A03D4112;
+	Tue,  2 Jun 2026 11:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="OYnVs0+1"
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="RX8TF6+d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ixit.cz (ixit.cz [185.100.197.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97899393DDD
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 11:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEED3D75CF
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 11:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780398769; cv=none; b=VEho5GNmGnQ6wpaBQEESQEmrEQKOFvyxKLiLKZROXXApRpdWWKhAh/yQXRjRgUzo4HqoQ2yH+8YNULVvETiF+P63e5M+3sYm2FM2eVAOH4C4+Xj5T50gLfbaLcisN0RdAIgAHexppzroYDzs1858ItxW4p/qA/J9j0+79ZArk64=
+	t=1780398780; cv=none; b=Z2ZnVHuit1WdseAZrDIXUI+MnvjsxDwm+FOpFouWeb8iepLQP9J+TLmw3u+l2o6+R7wOjNTLPTbhFR/7vBzubBoyvFSOySV/mz6E7DwVhBlC9G88lpoCdvRNucjK6rBdo0Bf+Hdj8zw0J3XGQD6wgNhMcw/qMvoyx4vcYQx3TR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780398769; c=relaxed/simple;
-	bh=OR388PN+R8iXCryfYfMn0uk00Bh1a+mLKoUwk2NbhB8=;
+	s=arc-20240116; t=1780398780; c=relaxed/simple;
+	bh=344P/NeH2JRcvHlP3cG+yrdHh5bteiH4ITDXj+AdYUs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rPnJWZl0uZONT1RHz+YwHOJTm7QANL7YkaIz0p66cui8ngpGfOgSYMGDUraaBM6q8WxoXv57gkm/hg5YoLiQy8XUQDMxc/donE5U/38Vh4vAlta405Xp5rPFCIUM3aPzbpuL78bbI4JAcvOAJJzB77C+P5rbwj/pvPDBN4z9esU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=OYnVs0+1; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490acbb0f89so10284605e9.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 04:12:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1780398761; x=1781003561; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YKEseg4pTB9VF+7SmfAwywfYvp28t3PBtR5WqnsSCWw=;
-        b=OYnVs0+1EyzuooQiMhz9iOp1wnAgxLSE8RDTucDoTL8Y4Vb4d+NWfjOz5ShPE+TSRv
-         GfbfLznb2yOG3Vqgjq4xYoZFB2JE4TatGJIZDFTkKc967Gc0I+IWqyTRbVpLQ/Wh5/Km
-         uAGlVLevTfPvWfJmHk9UFVknvVVLPwhF3K+bdtUnPNdkT+ZRyRT/BM4yGtSwp1qHyjuN
-         3GxQKF+T8+Eq61G4/U/gYw61K/4JBegTZSSETaABP1XApFmrYKYQ/srMDcHXQN32EGAD
-         1VGqZIypWLeSlpLgXJ7tazlGcu+tr2GwQAW2TTrqjMLD/5Cg1SKhUhcy+zHE2xrnbeCA
-         XVbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780398761; x=1781003561;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YKEseg4pTB9VF+7SmfAwywfYvp28t3PBtR5WqnsSCWw=;
-        b=FOKb1sV6H47RZm5bhuwY3U2IN83E8oHx/IlNJI9fa/l5M8OR7IpeDXQ7yKysLsoLs5
-         b57UyYxBY/IfusjflCh2+u0F9Bl9Wkh2Hep0UXcZc3GnCrlUAS+cfD5YIMWdUxe7wS7Q
-         wyNpb9EAYbWSds0cCj16A2lCzL2yPO0l6eM5SgPOOfJ5XYh88B87na2JJctw0TGIG59y
-         GQfKYS3W3g7xrOI7IzeM6b85A4cNRN1oOIwZESVeKkPT2UbN/7qjyDgp8tA021X7uzcX
-         01rexX6KrdV5y279MOlncY0CxJeB/7D93E4HZV/yjYFXnU5cYhCPeh/xE5grikbjI2cQ
-         Sirg==
-X-Forwarded-Encrypted: i=1; AFNElJ/eWoICE1OqLvVM/OpHFSMjWouszOMOXSih/P9MKhdFe0rYb6Oez1zqVvnZTD1YMohBaeskuUs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoTUmT0I5z9rVCLUfGyPbviXF3k9I8pO05BhEjuC0KxuMHs4WU
-	JWitFin6oJjMgI62oxBVkPcvi7Yi6I8Ija3dihieCt2zNkY5TFfiQEC/PjvBQ2ZsOg==
-X-Gm-Gg: Acq92OGetnIObvgCZ6IZYRLvSRtCVeiLeaWLauVqPbiboyTbJeZCJv2YtwW3mE9/NMk
-	+Li6qKDHGNP69jl9JABbSom+V4H4azv0eJOmhTzB2tH8tHiTvScrVeGGI+a/2Vu6E98GI3VNj+Y
-	UQ4bO8bWROwZ6dTb8Jipv54stjdjJasr0TLbQ3rAq8O1g2sXEXx9e3hKZpFEaYYKjOOlcsA7cxF
-	ERQy5ETV1vXixO/szAuvUpXObt9HFl3eQJJ/RNnNEoFAAuKC9NWMoEhzKOm0kavjrP1BIA8sx8Q
-	ypsZwDAfZmrXi5AB+ZZI/UyZxaXfcL/5e+waLiy1LUJISijGVBQMrzPVKJsUBcU8+XGllmspeUV
-	oq73EfdVsnSXVpfARb45z5PRbnTfqcQyvwMU+o1RTSS8mqIw6547vADsMB/Lk58zfAhHKmEUIIS
-	cLJko7Fu89AwUMGiIHqmA/IkPRxL+sO3F3gA==
-X-Received: by 2002:a05:600c:1d86:b0:48e:60a3:220a with SMTP id 5b1f17b1804b1-490a28aa789mr287889775e9.0.1780398760904;
-        Tue, 02 Jun 2026 04:12:40 -0700 (PDT)
-Received: from [10.83.43.186] ([159.134.255.34])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b0daefbbsm102675545e9.0.2026.06.02.04.12.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jun 2026 04:12:40 -0700 (PDT)
-Message-ID: <208dc7c2-971b-4335-bd64-a107be8c6018@arista.com>
-Date: Tue, 2 Jun 2026 12:12:39 +0100
+	 In-Reply-To:Content-Type; b=MpVDkoQQ7r6Kyr5UueNagLPhZjFN+HUQiusTUm0XnasoPn+V4vWYgIo3HndnSv2mKgSCXxAxtSfpGQZANLENQEGBJ/LFGU5cD3nUqcK6CnGpOL2QpIo1U/SGsnRFZ2MdCDSuJzH4rMaDqH0U+hf5BcjX+Gm40xa/nI729P0O1+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=RX8TF6+d; arc=none smtp.client-ip=185.100.197.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from [172.20.10.2] (37-48-17-230.nat.epc.tmcz.cz [37.48.17.230])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id 87C4A53403E8;
+	Tue, 02 Jun 2026 13:12:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1780398772;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=jTVK6Nj3WBsBdIxu5xNbizDcaJQIeoyYTAapEgiCsS8=;
+	b=RX8TF6+dCSmmvQ9zeyIxvQsx9v+BkYw/RQPGc1BOzx3xq57ZhMN148NR2Gep8c3BGcIsBa
+	5UeQd0Z9uHz3i7xGo6LFBkPjsaQCcLFUKQSAxJllb+qSGqxSgU30iQoIpmm5SGGr1ARRZQ
+	AnLxMtrGYspRbYMnuq9+DRh07bt2eAU=
+Message-ID: <d3956f77-75c4-4095-903b-d1b1ef29d709@ixit.cz>
+Date: Tue, 2 Jun 2026 13:12:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,63 +59,158 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] net: tg3: guard napi_disable and
- pci_disable_device calls
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: pavan.chebbi@broadcom.com, mchan@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260527115535.1686932-1-yurypm@arista.com>
- <20260601195049.766544fb@kernel.org>
+Subject: Re: [PATCH] nfc: llcp: fix integer underflow and missing bounds
+ checks in TLV parsing
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+Cc: security@kernel.org, netdev@vger.kernel.org, oe-linux-nfc@lists.linux.dev
+References: <20260525202427.67768-1-doruk@0sec.ai>
 Content-Language: en-US
-From: "Yury M." <yurypm@arista.com>
-In-Reply-To: <20260601195049.766544fb@kernel.org>
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <20260525202427.67768-1-doruk@0sec.ai>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9A16962D427
+X-Rspamd-Queue-Id: 52AB962D4DC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
-	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[arista.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294155-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294156-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yurypm@arista.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,arista.com:dkim,arista.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ixit.cz:dkim,ixit.cz:mid,codeberg.org:url]
 X-Rspamd-Action: no action
 
-On 6/2/26 03:50, Jakub Kicinski wrote:
-> On Wed, 27 May 2026 11:55:35 +0000 Yury Murashka wrote:
->> During PCIe hot-plug events, uncorrectable errors can be reported and
->> AER recovery for the tg3 device is initiated by the AER kernel driver.
->> The tg3_io_error_detected function is the AER error recovery handler.
-> IDK, I really hate this NAPI specific tracking. Can we add a callback
-> to struct pci_error_handlers to let the driver know that things went
-> fully belly up and the driver should pack up its toys? Sounds to me
-> like the key issue here is that there's a side exit thru the state
-> machine.
-1. We already have a similar check in the bnxt driver. Please check the 
-BNXT_STATE_NAPI_DISABLED flag.
-2. I'm trying to fix a specific issue in this specific driver.
-3. Your suggested changes are a long-term option for the fix. They 
-require a redesign of the AER feature. Plus, I'm not sure they will be 
-accepted.
+On 25/05/2026 22:24, Doruk Tan Ozturk wrote:
+> Multiple out-of-bounds read vulnerabilities exist in the NFC LLCP TLV
+> parsers:
+> 
+> 1. In nfc_llcp_recv_snl(), when an SDREQ TLV has length == 0,
+>     service_name_len = length - 1 underflows to SIZE_MAX (size_t is
+>     unsigned). The subsequent strncmp() and nfc_llcp_sock_from_sn()
+>     calls then read unbounded kernel heap memory.
+> 
+> 2. All LLCP TLV parsing loops (nfc_llcp_recv_snl, nfc_llcp_connect_sn,
+>     nfc_llcp_parse_gb_tlv, nfc_llcp_parse_connection_tlv) read tlv[0]
+>     and tlv[1] without first verifying that at least 2 bytes remain in
+>     the buffer.
+> 
+> A nearby malicious NFC device can trigger these without authentication --
+> LLCP link activation happens automatically after NFC-DEP.
+> 
+> Fix by adding a minimum length check before the subtraction in the
+> SDREQ case, and adding bounds validation at the top of each TLV loop
+> iteration.
+> 
+> Found by pwnkit (https://github.com/0sec-labs/pwnkit), an automated
+> kernel source review tool by 0sec (https://0sec.ai).
+> 
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> ---
+>   net/nfc/llcp_core.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index XXXXXXX..YYYYYYY 100644
+
+Hello Doruk,
+
+thank you for your patch.
+
+The patch won't apply cleanly, could you please resent patch based against 
+recent https://codeberg.org/linux-nfc/linux/commits/branch/for-next ?
+
+
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -1300,6 +1300,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+>   
+>   	while (offset < tlv_len) {
+> +		if (offset + 2 > tlv_len)
+
+I think it would be more descriptive use define, thus
+
+(offset + LLCP_HEADER_SIZE > tlv_len)
+
+David
+
+
+> +			break;
+> +
+>   		type = tlv[0];
+>   		length = tlv[1];
+>   
+> @@ -1307,6 +1310,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+>   		switch (type) {
+>   		case LLCP_TLV_SDREQ:
+> +			if (length < 1)
+> +				break;
+> +
+>   			tid = tlv[2];
+>   			service_name = (char *) &tlv[3];
+>   			service_name_len = length - 1;
+
+-- 
+David Heidelberg
+
 
