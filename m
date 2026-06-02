@@ -1,204 +1,167 @@
-Return-Path: <netdev+bounces-294410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YsfTKB9CH2oEjQAAu9opvQ
-	(envelope-from <netdev+bounces-294410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:50:39 +0200
+	id bRjKI2lCH2oRjQAAu9opvQ
+	(envelope-from <netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:51:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4DD4631E11
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:50:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 222CE631E3A
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:51:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=CEt49bHc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294410-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294410-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WsQo944G;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294411-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E1B1C3001FA4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:50:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 01C2B3033F70
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22015387566;
-	Tue,  2 Jun 2026 20:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074F3397352;
+	Tue,  2 Jun 2026 20:51:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D4D34BA20
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00D03932CB
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:51:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780433435; cv=none; b=GtxDvKtLbJ+N+ukBVo2Ah/2jLdD/0LmBmQSCcX6jnGSi3/1+na01xPa+24Vv39OoZLTl0XwX3LkVBrocUGL7zaZmJtDABsFb8/ORU/PCWAgsYDHv5EJzWO9xsh7bDWofX/NyBI47dO08RvdWfPm7KcF+9f41/Sk9HziJQ2gfxik=
+	t=1780433496; cv=none; b=aWS3FG1Apl0/VLVplNguLmgOcVrLWx/z0rUeef73a4EIQZDROwsgkbYt/9U5ewYhJMhhJZzFstedOW+dgu4y7OPAPs8AvcgsgMyTMHq9FwAouqhnhONMG+OlWk/LLw6bK1sUuAz8TVd8Prv9U3msJVRULw27OZjMpesWUFxeT1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780433435; c=relaxed/simple;
-	bh=c8bFi1eRju1L7vEtsiQHSIuqFxoYZANvVh7IdYZgZcw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=df/8mFn4ibLCchaJFIuF9nPjU5Ri87viOdj98i8CKnyESTpyQkLu/Gy8OZco4HuB+F6pAPtOrW3g+kHUBxChJfsfbNvhdZknRO+z8x0nEAYiXMwVEhxrqoXnd6UJihFUF0mKbupF9gXoa9Rmw0QL8RYq8erDqf25E/FrRsH89rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEt49bHc; arc=none smtp.client-ip=198.175.65.20
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780433434; x=1811969434;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c8bFi1eRju1L7vEtsiQHSIuqFxoYZANvVh7IdYZgZcw=;
-  b=CEt49bHckzysc78IhGkPWcnN1UOn9FytOyUjr15nrcFLXWd5azWBcW9B
-   X6oNf8glTx7TJ8IeergsfFIUSssSSbcRcD6a6SMfIhYP3qBqs57dZUs6R
-   2LWjuO7IulAo8cFc4Vd55d476PO3oZZWN92uSYb8VrH1DPaF2nzyZNqiq
-   UaDkipsuHj/4N3SzVPc7QLjGN3taShYVe2y8G+Fby0YRp81DCOJjGaeMt
-   2IO0KXrqi7S2oYL0ufY3ZN4Km36tcMnGtmVI9jeUWjo8alEMbrQbres1o
-   WOQ9dZYnOdJXo/vWOjenWoRJW+Etw7b6cJhCP3PBSGpziHHnbCUpmZJd1
-   w==;
-X-CSE-ConnectionGUID: vz+z035ASXC0I6hDjnRLOw==
-X-CSE-MsgGUID: OQLJlqNuRRqOdt8u9Y4cTg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11805"; a="80969319"
-X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
-   d="scan'208";a="80969319"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 13:50:33 -0700
-X-CSE-ConnectionGUID: 6sx5f/l8TGmPjP6Z2GLYZQ==
-X-CSE-MsgGUID: qzsigZNmQHyZ+v3bwCsmzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
-   d="scan'208";a="267653490"
-Received: from igk-lkp-server01.igk.intel.com (HELO 892db79562d4) ([10.211.93.152])
-  by fmviesa002.fm.intel.com with ESMTP; 02 Jun 2026 13:50:30 -0700
-Received: from kbuild by 892db79562d4 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wUW4C-000000001rB-2E0Q;
-	Tue, 02 Jun 2026 20:50:28 +0000
-Date: Tue, 2 Jun 2026 22:49:38 +0200
-From: kernel test robot <lkp@intel.com>
-To: Lei Zhu <zhulei_szu@163.com>, kuba@kernel.org, sukhdeeps@marvell.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: atlantic: aq_utils_obj_{set|clear}
- optimizations
-Message-ID: <202606022243.HUNSnMWR-lkp@intel.com>
-References: <20260602092949.263270-1-zhulei_szu@163.com>
+	s=arc-20240116; t=1780433496; c=relaxed/simple;
+	bh=KRGTT4AQ+Oey7inw8PS07TanUxbhPBY4tf+cjHXWYBI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jHy4OQiSymgDljAggY+dbRGClqAPjNet3nRtuSEKp2Kq20VhfMyWtVaN3VO12uwlOR8bCOb+9DDIhp4+35DeV1mwPVAs/pJQ+a61GIKhdyrTq+9CMgrKJiR6/1mlSyv+SDhGtjN25SLL2dF6ftjziGbcujsOyoMghlFNre9hmms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WsQo944G; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7ABA1F00A13
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:51:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780433494;
+	bh=G6rZ7t6/DhXfpQVj0UlyYqS4gIMH66eg2Oc1gFXbhJ0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=WsQo944GDchg/wLfBxF995MDsIQlWR94qpNUGNWfmtj0cc9Cm6IAvLYK49Jz+sub+
+	 cCz9hX3qvk2i7XzqttjMLfpB2FTj81X0WI8T9GOEFst61x7uetTvHoQlZHBhkw3wj+
+	 pWEXAl35dtpSL5N9q+XzcWkaBdzolGpamWnG3Ut+8eiWiblT+djxuby3gRu3VBbNTW
+	 b5gX5xDdjGnEk3Uf3Rhjs7eEYv4grJDMr3ZOHMMp2kabifDBAot1ZDAITd3RH9n/oV
+	 ENGlOonCAxXOF1Zy8Nr8B/0OQsXqHHxsvHFgQOc4sUtBFr0j9jX5I0vS+C7g/hnM3X
+	 sTT2vS+XYtAaA==
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7e2cb01a974so38861527b3.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 13:51:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9Nn5YPrgwnmRfzW7jJlwq/cY+2aalKmFlMWP9uCV8ElndMUVFsriLV8B859xt4ZFJdhqDo9mI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR5b6YrUFsGF6ixC7H94QF3RA30CBcbYcHT7wWGrH3eSjnZzxw
+	pgRFuH8OZ+gGlYLZdhOkvBxcsjRcBrFuWpXaIydL4fFRPsyA3HhKGiHlC9s+eUEHxwnpix8N1ni
+	i2CNmOY7++NxPW/hutT0Anpn5AavxfW4=
+X-Received: by 2002:a05:690c:620f:b0:7b3:edc7:9b97 with SMTP id
+ 00721157ae682-7ea4400dc8fmr7795367b3.0.1780433493990; Tue, 02 Jun 2026
+ 13:51:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260602092949.263270-1-zhulei_szu@163.com>
+References: <20260304-gpio-of-kconfig-v1-0-d597916e79e7@oss.qualcomm.com> <20260304-gpio-of-kconfig-v1-7-d597916e79e7@oss.qualcomm.com>
+In-Reply-To: <20260304-gpio-of-kconfig-v1-7-d597916e79e7@oss.qualcomm.com>
+From: Timur Tabi <timur@kernel.org>
+Date: Tue, 2 Jun 2026 15:50:57 -0500
+X-Gmail-Original-Message-ID: <CAOZdJXXetr-FPZUSX_nzS5nZc+bbv5b1m78sCcZzrDJi7C05vw@mail.gmail.com>
+X-Gm-Features: AVHnY4IltjGxIj5Fh6-JK6uSKIHTP0yZBU085pIyp8WmlCvLfmlYl2sow6Y3Jn0
+Message-ID: <CAOZdJXXetr-FPZUSX_nzS5nZc+bbv5b1m78sCcZzrDJi7C05vw@mail.gmail.com>
+Subject: Re: [PATCH 07/14] pinctrl: Kconfig: drop unneeded dependencies on OF_GPIO
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Alexey Brodkin <abrodkin@synopsys.com>, Vineet Gupta <vgupta@kernel.org>, Scott Wood <oss@buserror.net>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Linus Walleij <linusw@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Dvorkin Dmitry <dvorkin@tibbo.com>, 
+	Wells Lu <wellslutw@gmail.com>, Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
+	Mauro Carvalho Chehab <mchehab@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Sebastian Reichel <sre@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-amlogic@lists.infradead.org, 
+	linux-leds@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-staging@lists.linux.dev, linux-pm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294410-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[163.com,kernel.org,marvell.com,davemloft.net,lunn.ch];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:zhulei_szu@163.com,m:kuba@kernel.org,m:sukhdeeps@marvell.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:llvm@lists.linux.dev,m:oe-kbuild-all@lists.linux.dev,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-294411-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bartosz.golaszewski@oss.qualcomm.com,m:catalin.marinas@arm.com,m:will@kernel.org,m:abrodkin@synopsys.com,m:vgupta@kernel.org,m:oss@buserror.net,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lgirdwood@gmail.com,m:broonie@kernel.org,m:linusw@kernel.org,m:brgl@kernel.org,m:neil.armstrong@linaro.org,m:khilman@baylibre.com,m:jbrunet@baylibre.com,m:martin.blumenstingl@googlemail.com,m:dvorkin@tibbo.com,m:wellslutw@gmail.com,m:lee@kernel.org,m:pavel@kernel.org,m:linux@roeck-us.net,m:wim@linux-watchdog.org,m:mchehab@kernel.org,m:gregkh@linuxfoundation.org,m:sre@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:linux-snps-arc@lists.infradead.org,m:linuxppc-dev@lists.ozlabs.org,m:netdev@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:linux-amlogic@lists
+ .infradead.org,m:linux-leds@vger.kernel.org,m:linux-hwmon@vger.kernel.org,m:linux-watchdog@vger.kernel.org,m:linux-media@vger.kernel.org,m:linux-staging@lists.linux.dev,m:linux-pm@vger.kernel.org,m:martinblumenstingl@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[timur@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[arm.com,kernel.org,synopsys.com,buserror.net,linux.ibm.com,ellerman.id.au,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,baylibre.com,googlemail.com,tibbo.com,roeck-us.net,linux-watchdog.org,linuxfoundation.org,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[timur@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:from_mime,intel.com:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,01.org:url]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,qualcomm.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A4DD4631E11
+X-Rspamd-Queue-Id: 222CE631E3A
 
-Hi Lei,
+On Wed, Mar 4, 2026 at 3:07=E2=80=AFAM Bartosz Golaszewski
+<bartosz.golaszewski@oss.qualcomm.com> wrote:
+>
+> @@ -557,7 +549,6 @@ config PINCTRL_ST
+>  config PINCTRL_STMFX
+>         tristate "STMicroelectronics STMFX GPIO expander pinctrl driver"
+>         depends on I2C
+> -       depends on OF_GPIO
+>         depends on HAS_IOMEM
+>         select GENERIC_PINCONF
+>         select GPIOLIB_IRQCHIP
 
-kernel test robot noticed the following build errors:
+This change causes the following warning on builds:
 
-[auto build test ERROR on net-next/main]
+WARNING: unmet direct dependencies detected for MFD_STMFX
+Depends on [n]: HAS_IOMEM [=3Dy] && I2C [=3Dy] && OF [=3Dn]
+Selected by [m]:
+- PINCTRL_STMFX [=3Dm] && PINCTRL [=3Dy] && I2C [=3Dy] && HAS_IOMEM [=3Dy]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lei-Zhu/net-atlantic-aq_utils_obj_-set-clear-optimizations/20260602-174147
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260602092949.263270-1-zhulei_szu%40163.com
-patch subject: [PATCH net-next] net: atlantic: aq_utils_obj_{set|clear} optimizations
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20260602/202606022243.HUNSnMWR-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260602/202606022243.HUNSnMWR-lkp@intel.com/reproduce)
+WARNING: unmet direct dependencies detected for MFD_STMFX
+Depends on [n]: HAS_IOMEM [=3Dy] && I2C [=3Dy] && OF [=3Dn]
+Selected by [m]:
+- PINCTRL_STMFX [=3Dm] && PINCTRL [=3Dy] && I2C [=3Dy] && HAS_IOMEM [=3Dy]
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202606022243.HUNSnMWR-lkp@intel.com/
+I believe the proper fix is to have PINCTRL_STMFX depend on CONFIG_OF,
+since this driver actually does depend on CONFIG_OF.  The warning
+comes because if CONFIG_OF is disabled, PINCTRL_STMFX can still be
+enabled, but in doing so it selects MFD_STMFX which does depend on
+CONFIG_OF.
 
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/aquantia/atlantic/aq_main.c:10:
-   In file included from drivers/net/ethernet/aquantia/atlantic/aq_main.h:12:
-   In file included from drivers/net/ethernet/aquantia/atlantic/aq_common.h:17:
->> drivers/net/ethernet/aquantia/atlantic/aq_utils.h:21:38: error: incompatible pointer types passing 'unsigned long *' to parameter of type 'int *' [-Werror,-Wincompatible-pointer-types]
-      21 |         } while (!atomic_try_cmpxchg(flags, &flags_old, flags_new));
-         |                                             ^~~~~~~~~~
-   include/linux/atomic/atomic-instrumented.h:1275:38: note: passing argument to parameter 'old' here
-    1275 | atomic_try_cmpxchg(atomic_t *v, int *old, int new)
-         |                                      ^
-   In file included from drivers/net/ethernet/aquantia/atlantic/aq_main.c:10:
-   In file included from drivers/net/ethernet/aquantia/atlantic/aq_main.h:12:
-   In file included from drivers/net/ethernet/aquantia/atlantic/aq_common.h:17:
-   drivers/net/ethernet/aquantia/atlantic/aq_utils.h:31:38: error: incompatible pointer types passing 'unsigned long *' to parameter of type 'int *' [-Werror,-Wincompatible-pointer-types]
-      31 |         } while (!atomic_try_cmpxchg(flags, &flags_old, flags_new));
-         |                                             ^~~~~~~~~~
-   include/linux/atomic/atomic-instrumented.h:1275:38: note: passing argument to parameter 'old' here
-    1275 | atomic_try_cmpxchg(atomic_t *v, int *old, int new)
-         |                                      ^
-   2 errors generated.
---
-   In file included from drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_a0.c:10:
-   In file included from drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_hw.h:15:
-   In file included from drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_common.h:17:
->> drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_utils.h:21:38: error: incompatible pointer types passing 'unsigned long *' to parameter of type 'int *' [-Werror,-Wincompatible-pointer-types]
-      21 |         } while (!atomic_try_cmpxchg(flags, &flags_old, flags_new));
-         |                                             ^~~~~~~~~~
-   include/linux/atomic/atomic-instrumented.h:1275:38: note: passing argument to parameter 'old' here
-    1275 | atomic_try_cmpxchg(atomic_t *v, int *old, int new)
-         |                                      ^
-   In file included from drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_a0.c:10:
-   In file included from drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_hw.h:15:
-   In file included from drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_common.h:17:
-   drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_utils.h:31:38: error: incompatible pointer types passing 'unsigned long *' to parameter of type 'int *' [-Werror,-Wincompatible-pointer-types]
-      31 |         } while (!atomic_try_cmpxchg(flags, &flags_old, flags_new));
-         |                                             ^~~~~~~~~~
-   include/linux/atomic/atomic-instrumented.h:1275:38: note: passing argument to parameter 'old' here
-    1275 | atomic_try_cmpxchg(atomic_t *v, int *old, int new)
-         |                                      ^
-   2 errors generated.
-
-
-vim +21 drivers/net/ethernet/aquantia/atlantic/aq_utils.h
-
-    13	
-    14	static inline void aq_utils_obj_set(atomic_t *flags, u32 mask)
-    15	{
-    16		unsigned long flags_old, flags_new;
-    17	
-    18		flags_old = atomic_read(flags);
-    19		do {
-    20			flags_new = flags_old | (mask);
-  > 21		} while (!atomic_try_cmpxchg(flags, &flags_old, flags_new));
-    22	}
-    23	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Adding "depends on OF" to "config PINCTRL_STMFX" seems to fix the
+problem, but I'm not familiar with this driver so I'm not sure this is
+the right fix.  I'll post a patch.
 
