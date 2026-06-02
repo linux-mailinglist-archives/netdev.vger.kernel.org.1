@@ -1,214 +1,269 @@
-Return-Path: <netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ovCZKWwQH2rLewAAu9opvQ
-	(envelope-from <netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:18:36 +0200
+	id seq1OQoSH2odfAAAu9opvQ
+	(envelope-from <netdev+bounces-294313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:25:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761C1630A12
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:18:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D0B630AE5
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:25:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=nd7zPxXG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294312-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=infradead.org header.s=casper.20170209 header.b=lGAMQcp1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294313-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294313-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6D4E30976DA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:11:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D302A305EF2D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B223F58E5;
-	Tue,  2 Jun 2026 17:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116CD3F8712;
+	Tue,  2 Jun 2026 17:15:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197983F5BD6
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C34E3F7891;
+	Tue,  2 Jun 2026 17:15:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780420275; cv=none; b=Kz6ziIPsw7smmdVeJgJNSMpm2DRK8Hosadc7ZOg8n9DgDuFwI57lAKZ1l6hegPC66v03ftVm8haDbB5VaaZbFeoeklEEjMUVW4GwqaGvQOO15QuLEG69k19pyLBie9qcCbUpvVwChLcAA5/3IKBJiEkRDWVDhX0ltY6vq+dvQJY=
+	t=1780420540; cv=none; b=NzIsJ6Uiq7brsVW315ZSXBg4gzuv3shaSb6XkZ9vMI2Iie345gVw7tqt25Pm2qhuffnco0V2fLYLEENyxd3XRjV8dAoqZnGXseFehBpfy7B43PiKB38EtcgnPSwNEimd/VP14xdLg/zweONXUsWsUMUrCwvX1nAuYkPUpaFE6P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780420275; c=relaxed/simple;
-	bh=PNMcwBaq3HWYoO3KsicsKTXAF3/1eGOdICmPWCtyf9A=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=GtemgvWBEFz0WjLNArj1ij4wSaktJXKUN0SIGNeSRJfIjqbwyvE3wMjgZ1MTYX3FGGv2dYy2Z1GU6Qz2zod7Sp2NSfSgptSeU9pOvC4jQ/d42sy0yCTDSiFPFtUn8OXLlTmoCupjOBadheN/xEcdvFUYMtC0YQt+4vGluMsRIE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=nd7zPxXG; arc=none smtp.client-ip=74.125.82.196
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-304545f5206so15972913eec.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 10:11:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1780420273; x=1781025073; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0j05WBgNKiBOQ3j1mPmoNzDYYpZls9Mm5jzp1fNRRDY=;
-        b=nd7zPxXGdX+bnnaZZKs7yqrvNYLKEKTvox7fHrHIYM538vSdbmNbX4ciXg2nbpBqcY
-         XDAcxVl+EDR0+VnBOfmQU3fvZA2ar9GEoUz+LbH4c15LLEZun0zbiknivHaCql43l2Xj
-         1DdfDMVYFIjpLH52fRUr/iPL824e28Qq2JF53RtJVkoRC7xugt49fpQym9IDLoFSMx4B
-         LNnN0ddmc5LkwOulXvSHUm0PEbPqFvxnxG8l9hNzmaUovz0gVCQiJEDN5QhYHUwUvMZO
-         W3VvcpnDAab/gSSOy2BMFn9w+xYa9ULv5VmUOLDHNKUq9mdBHGZHSAonhufW9TikryyM
-         yh3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780420273; x=1781025073;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0j05WBgNKiBOQ3j1mPmoNzDYYpZls9Mm5jzp1fNRRDY=;
-        b=NolbsBbkjqcUPHcGI4Q19Fe6EshMfXyJFGBdbimSNcBIvWsn5Htg37H25lpgSTT+ox
-         yPWkMyvqSOxogJAqqTrfEXtwRiTP4QRb/Ox8lH3MhAcr/dpaLR5n44XUsaafR+IELl7x
-         e/0ESXl/1BzSIot6g32X4haEg5hS5gszO53T9Csz9AcKcYaKj44R1BRTBD5q5PHis4ze
-         6ka8mvtn4YupFRcuL/OxNMMC2MmobElBuUUqXRGDQFJHhroO1t7fSq/p5k5cUdRbONAc
-         r9SQgiwWvF3qT00lEDF7Yt0nenJsOVhpZcv475lpFaji7tDOmNKkoHugF9m5vDBzbVrr
-         gPXA==
-X-Forwarded-Encrypted: i=1; AFNElJ9SC4UKVd8zBj190hNvZw506RSetPvX5GDDX83KI1SDp06OOnVMsp40u/tqn2kKr1M7cJcl+C8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWon6bVzMhGsTgMm5ZxF+TDcM6/Sdv9Yx2UtXV4YCT/pKsSoQ9
-	BVnMi1t8v3XaSuhkSw77q3I/vinkP7Os5oqCAWD+lIgdudKHGLcJsLWfLo4ujfi+KUI=
-X-Gm-Gg: Acq92OE6W5JJL07bwkATusYednJzk1H6+cdiOuQZSsKA/853ZCWyHXKandn7exh1W82
-	LoNZ7YmKJeI0aYY2hmlYwjUP1/CdkkOsW1onC8UWF7tD+GKizdUjV02ARZWyfCcayKSUghq+ebC
-	CQ/Rne+yRKTQ10E8ln5wwrC+KEKrZAXSCb5CXGirnTCv3j95OTpqjaOCxsCp/FespnzJcX15h7R
-	s8HQY61e3UdXyjNHvflkd7kpdTcJ+7vsP3ca2o9QOz8mUd+A7eb3lhSeqN08cXrHi/DDKmUZH13
-	iFY1Esdz9WhTSz8o/zTWeb+XvEAkneCQ63vfLWQEOJTOwtgs/S3umQTo9Mw9YrpkbWunRonRo+b
-	XCA2NX6ELtHTOoXRjo9SPgJJW3eFeyITyn7ags8zy8K5O4Ig/ToTTdUEbdw+e8PxKB6apCjCQ/I
-	Qt09OrowZ+/lqqtE06q2UI0oDhOPzUpKTzfQ==
-X-Received: by 2002:a05:7300:a44c:b0:2da:a813:a5fd with SMTP id 5a478bee46e88-304fa5a7ac4mr7756107eec.22.1780420273037;
-        Tue, 02 Jun 2026 10:11:13 -0700 (PDT)
-Received: from localhost ([163.114.132.129])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137f54db05csm241990c88.8.2026.06.02.10.11.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jun 2026 10:11:12 -0700 (PDT)
+	s=arc-20240116; t=1780420540; c=relaxed/simple;
+	bh=kkyXPebYwJ/UpauPaOt24fg6+WUOD4Y08/xBiZarvsY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=n6lDQeDpF51/cL/UfrUot+mbHaIQim0kt38esH0rEKFx9Iyc/x4HlMv/d7t8Cq0W6Ruf1a2LtIIvgjRs0j85+Mow2EH96cq6mOzxCrxwzCnuMug3Ryqgs1J7bKxzv02tagPMU0qLaVoevSoP6NiXwdkklXGlb9jMuk3+NAKvxqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lGAMQcp1; arc=none smtp.client-ip=90.155.50.34
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=kkyXPebYwJ/UpauPaOt24fg6+WUOD4Y08/xBiZarvsY=; b=lGAMQcp1U6l4eDLhRrdmc+i+hK
+	+ykaJocmPqWV//dQk9GAoty1ZemGnXbTg16FLKBPlb155JpUD1l6wAniJ7Ozjc255EnI/cgQgNpDv
+	UjUUTmEEac9PmqABeWHGcK9SFBPqgO7GlqmtqYpNTlh1ZprBIHAhL9DRemdKL19Olpdvs/WOmre/7
+	WoH23nY0KAaQKL0I3bVkZ+9AvdfUBxb833nUrEQnr1ZsNXXIo+rvEiL8bvNx7b6QcTZqxl/P6Qz2r
+	Vgpgyn6PVj8hWYwDZrQljmiqqE5Eu2EhT/z4KoKBKJZsZxvAuFrc1DQ0twHmEm3I/7UopLyC5ub18
+	xdHfrh7A==;
+Received: from [2001:8b0:10b:5:c68:987:fac8:ab00] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wUSi7-00000002KiL-3HEV;
+	Tue, 02 Jun 2026 17:15:28 +0000
+Message-ID: <27ff3ab8ea24a80812c54d18a18bda65acce5c08.camel@infradead.org>
+Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
+ directory split
+From: David Woodhouse <dwmw2@infradead.org>
+To: Wen Gu <guwen@linux.alibaba.com>, Richard Cochran
+ <richardcochran@gmail.com>,  Jakub Kicinski <kuba@kernel.org>
+Cc: tglx@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, jstultz@google.com, anna-maria@linutronix.de, 
+ frederic@kernel.org, daniel.lezcano@kernel.org, sboyd@kernel.org, 
+ vladimir.oltean@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com, 
+ jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev, yangbo.lu@nxp.com, 
+ svens@linux.ibm.com, nick.shi@broadcom.com, ajay.kaher@broadcom.com, 
+ alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
+ linux-fpga@vger.kernel.org, imx@lists.linux.dev,
+ linux-s390@vger.kernel.org,  dust.li@linux.alibaba.com,
+ xuanzhuo@linux.alibaba.com, mani@kernel.org,  imran.shaik@oss.qualcomm.com,
+ taniya.das@oss.qualcomm.com
+Date: Tue, 02 Jun 2026 18:15:27 +0100
+In-Reply-To: <335ae01a-20aa-439e-996c-d35ffd8d476a@linux.alibaba.com>
+References: <20260412084704.743482ad@kernel.org>
+	 <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
+	 <20260412095301.4fe1fe65@kernel.org>
+	 <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
+	 <1088b07d760491deb461d6d01abca631e8f8d86c.camel@infradead.org>
+	 <ahzQZg_v4bxFfGdj@hoboy.vegasvil.org>
+	 <3908843460c4864eef79cced40d897f793c7ae2a.camel@infradead.org>
+	 <ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
+	 <0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
+	 <20260601185226.7f43fa75@kernel.org> <ah5aGMIxA418sxoj@hoboy.vegasvil.org>
+	 <0b3f00bbfa6bcc3badb4d1bb7845326e2dbaa1d4.camel@infradead.org>
+	 <335ae01a-20aa-439e-996c-d35ffd8d476a@linux.alibaba.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-bFbDCAYFbExy0zXwkgt3"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 02 Jun 2026 13:11:08 -0400
-Message-Id: <DIYQB8597KMS.2FSGCPOI9LPCW@etsalapatis.com>
-To: "Ren Wei" <n05ec@lzu.edu.cn>, <netdev@vger.kernel.org>,
- <bpf@vger.kernel.org>
-Cc: <ast@kernel.org>, <daniel@iogearbox.net>, <davem@davemloft.net>,
- <kuba@kernel.org>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
- <sdf@fomichev.me>, <andrii@kernel.org>, <martin.lau@linux.dev>,
- <eddyz87@gmail.com>, <memxor@gmail.com>, <song@kernel.org>,
- <yonghong.song@linux.dev>, <jolsa@kernel.org>, <toke@redhat.com>,
- <liuhangbin@gmail.com>, <yuantan098@gmail.com>, <zcliangcn@gmail.com>,
- <bird@lzu.edu.cn>, <zzhan461@ucr.edu>
-Subject: Re: [PATCH bpf v2] bpf: devmap: reject fragmented frames in
- clone-based broadcasts
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <21c2d153dd25603d359069a02bf06779b51f6423.1780385378.git.zzhan461@ucr.edu>
-In-Reply-To: <21c2d153dd25603d359069a02bf06779b51f6423.1780385378.git.zzhan461@ucr.edu>
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:toke@redhat.com,m:liuhangbin@gmail.com,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:zzhan461@ucr.edu,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294312-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294313-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	DMARC_NA(0.00)[etsalapatis.com];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:guwen@linux.alibaba.com,m:richardcochran@gmail.com,m:kuba@kernel.org,m:tglx@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:jstultz@google.com,m:anna-maria@linutronix.de,m:frederic@kernel.org,m:daniel.lezcano@kernel.org,m:sboyd@kernel.org,m:vladimir.oltean@nxp.com,m:wei.fang@nxp.com,m:xiaoning.wang@nxp.com,m:jonathan.lemon@gmail.com,m:vadim.fedorenko@linux.dev,m:yangbo.lu@nxp.com,m:svens@linux.ibm.com,m:nick.shi@broadcom.com,m:ajay.kaher@broadcom.com,m:alexey.makhalov@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:linux-fpga@vger.kernel.org,m:imx@lists.linux.dev,m:linux-s390@vger.kernel.org,m:dust.li@linux.alibaba.com,m:xuanzhuo@linux.alibaba.com,m:mani@kernel.org,m:imran.shaik@oss.qualcomm.com,m:taniya.das@oss.qualcomm.com,m:andrew@lunn.ch,m:jonathanlemon@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[linux.alibaba.com,gmail.com,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,redhat.com,lzu.edu.cn,ucr.edu];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lzu.edu.cn:email,ucr.edu:email,etsalapatis.com:mid,etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis-com.20251104.gappssmtp.com:dkim]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:mid,infradead.org:from_mime,infradead.org:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 761C1630A12
+X-Rspamd-Queue-Id: 82D0B630AE5
 
-On Tue Jun 2, 2026 at 4:43 AM EDT, Ren Wei wrote:
-> From: Zhao Zhang <zzhan461@ucr.edu>
->
-> Devmap broadcast redirects clone the packet for all but the last
-> destination.
->
-> For native XDP, that clone path copies only the linear xdp_frame data,
-> while fragmented frames keep skb_shared_info in tailroom outside the
-> linear area. Cloning such a frame leaves XDP_FLAGS_HAS_FRAGS set but
-> without valid frag metadata, and the later free path can interpret
-> uninitialized tail data as skb_shared_info, leading to an out-of-bounds
-> access during frame return.
->
-> Reject fragmented native XDP frames in dev_map_enqueue_clone().
->
-> Add the same restriction to the generic XDP clone path in
-> dev_map_redirect_clone(). Generic XDP represents fragmented packets as
-> nonlinear skbs, and rejecting them here keeps clone-based broadcast
-> support aligned between native and generic XDP.
->
-> Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support=
-")
-> Cc: stable@kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Assisted-by: Codex:GPT-5.4
-> Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+--=-bFbDCAYFbExy0zXwkgt3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> changes in v2:
-> - Add the same fragmented-packet restriction to generic XDP
->   dev_map_redirect_clone() so clone-based broadcast behavior stays
->   aligned with the native XDP path.
-> - v1 link: https://lore.kernel.org/all/4b596825bccc64d03e0c2e0db4dceb12c7=
-f5cf47.1780176829.git.zzhan461@ucr.edu/
->
->  kernel/bpf/devmap.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-> index cc0a43ebab6b..5b9eac5342a9 100644
-> --- a/kernel/bpf/devmap.c
-> +++ b/kernel/bpf/devmap.c
-> @@ -581,6 +581,10 @@ static int dev_map_enqueue_clone(struct bpf_dtab_net=
-dev *obj,
->  {
->  	struct xdp_frame *nxdpf;
-> =20
-> +	/* Frags live outside the linear frame and cannot be cloned safely. */
-> +	if (unlikely(xdp_frame_has_frags(xdpf)))
-> +		return -EOPNOTSUPP;
-> +
->  	nxdpf =3D xdpf_clone(xdpf);
->  	if (!nxdpf)
->  		return -ENOMEM;
-> @@ -726,6 +730,9 @@ static int dev_map_redirect_clone(struct bpf_dtab_net=
-dev *dst,
->  	struct sk_buff *nskb;
->  	int err;
-> =20
-> +	if (unlikely(skb_is_nonlinear(skb)))
-> +		return -EOPNOTSUPP;
-> +
->  	nskb =3D skb_clone(skb, GFP_ATOMIC);
->  	if (!nskb)
->  		return -ENOMEM;
+On Tue, 2026-06-02 at 22:03 +0800, Wen Gu wrote:
+>=20
+> > There is some extra stuff we want to do for "Precision RTCs" or
+> > whatever we're going to call them. They might actually have a known TAI
+> > offset, they might convey leap second indications, we might want to set
+> > the kernel's CLOCK_REALTIME from them at boot. And in the case of
+> > VMClock, I'm working on being able to clamp the kernel's timekeeping to
+> > it directly=C2=B2.
+> >=20
+> > So maybe what we want is linux/drivers/phc, to host those read-only
+> > devices which know real time. They can provide a simplified
+> > implementation; maybe *only* a function like vmclock_get_crosststamp(),
+> > which is just called in various different permutations by the various
+> > different PTP methods.
+> >=20
+> > The core linux/drivers/phc code would then handle the interface to the
+> > kernel's core timekeeping *and* wrap them to register a PTP device that
+> > existing userspace can understand. And deal with the kvmclock/TSC
+> > awfulness where needed.
+> >=20
+> > How does that sound?
+> >=20
+>=20
+> I think a dedicated phc core would make the classification of read-only
+> clocks clearer, reducing ambiguity around where they belong. I assume
+> direct timekeeping integration would be optional, drivers providing
+> only a snapshot-based crosststamp would use /dev/ptpX alone, while the
+> timekeeping path would require additional capability (as vmclock provides=
+)?
 
+Yeah. I think they might all want to be able to opt in to setting the
+time at boot? But actually setting the fine-tuning of the kernel's
+timekeeper is probably only something vmclock can do.
+
+--=-bFbDCAYFbExy0zXwkgt3
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYwMjE3MTUy
+N1owLwYJKoZIhvcNAQkEMSIEIBCzzc7M9R7ddx72OwI8EXMtb635v7dJ3qKQmvnHX0+hMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAh4su4NqXBBAL
+aHTsW7EyeMpcQRMKb78TuM8WAk4NkPvx5dJsOhzEzV/DMj6XIaynKDsZjRvSKAugiT6y/dhEDwuf
+kVSaRvyzH/QWgwP4lKocnAiiY7vnqwcXzw2TUvGdpJVXeb2vDjvHdXTiAB53vlkdPx+CtSfPQ2/n
+0LEK1pen8t0BTAUcvaWq5b2en27Y02adLqunPwqzurr2f01ZmtxwF0PBfJ93VovKZ81Wcy4f0I8a
+syAxTNAJJl6ZBZ6G680kTBBWPLdZiTqVC+QTyMryvYddsdr1nX+YhstkFzVh40IYOkqhkYOOVYTk
+crncW3h2E+WTC2bSnS+N4VDbWHv1TWvdMCb+CG4zH5BPqGgA81K7yKs36G5Eq3AhxIFHczmOgck7
+zhvdm8oVW0lva+gPovaLxH/Ld3vw3xt5LCt1Lzti1JtLBIhnE8XB5bHsOZpwaXOJPPnicctM1Yxm
+4fZwt4z7AWX6VdN0LW0gyL5Cd13IMkv5f0cT0ewoUivofe9Lqc4dmATKwW1Ta0JonFbW/MUq3YcN
+0CrfrQ6X5y4ulbNZSFTPYw48B1WyiqD402+OrCyC2KqObRgi9Sv3frPTFufPSpEcEQLiAqsUu7o4
+Tnprnrk4mrHDw2Xj8PdXkF3en4sHyIwXLF6mXoxC7HxWRvPA0etzTwL98zAz9f0AAAAAAAA=
+
+
+--=-bFbDCAYFbExy0zXwkgt3--
 
