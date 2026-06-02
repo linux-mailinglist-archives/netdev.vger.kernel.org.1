@@ -1,243 +1,217 @@
-Return-Path: <netdev+bounces-294277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294278-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id x1kKKID8HmpWbwAAu9opvQ
-	(envelope-from <netdev+bounces-294277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:53:36 +0200
+	id bGCkAJD7HmqnbgAAu9opvQ
+	(envelope-from <netdev+bounces-294278-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:49:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F9062FFE1
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:53:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6DEA62FF51
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 17:49:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=kR+Dy3Ta;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294277-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294277-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=tu-dortmund.de;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b="Q/VzEoUv";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294278-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294278-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 00EA63062F79
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 15:38:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AA2C13029D26
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 15:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3CF3EB809;
-	Tue,  2 Jun 2026 15:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05E53EC2FF;
+	Tue,  2 Jun 2026 15:45:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012008.outbound.protection.outlook.com [40.107.209.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C473655EC;
-	Tue,  2 Jun 2026 15:38:25 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780414709; cv=none; b=QYiylwGllG4F/1EQgXr8161AvJzZxjaib4zoFx6kA6UohG8laLcqN8HgiAh/3hpI4V1J5z8Skte7vbgEbWsWkTQNDg5637lAGJsfpQUUDro81D5EqVfc2UB3Nr93yd+2yI/WvtFyeyp1z6xCM8SbLH9CBWQsPcrMZWYSso7SX4s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780414709; c=relaxed/simple;
-	bh=sw1/94OefMqA9AfMWSwoSn6e8cJqsh0npePFZbzbjhQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lFx2NupFH0jqNjzVz+OcFCL74yRkz9F4iahMESJ23eGxKuYN6FrniSgZjaGO/dTFZfleZQrVyXEbzUe9GBwjs7dJLEdYMf6q/rWFIHJTwU1dkQOb+tOns7yeD1PtyqudI3A+m8PnG+Te3AzkOZTKZbiLMV6lg6mAfWDcsryOYsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=kR+Dy3Ta; arc=none smtp.client-ip=129.217.128.51
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1780414677;
-	bh=sw1/94OefMqA9AfMWSwoSn6e8cJqsh0npePFZbzbjhQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=kR+Dy3Tatk/A+rWyOz8NrA6HpQeYL8RQzC6dICtM183EemFTX48d/JOabxPqJG5M4
-	 3D/rcpM8yZo3iEvRuAO73M8u361gvL+NTLmu/zvSpuzbSDxkL7Pxml5Uuxi8y+K9mB
-	 VkcYHwPLBlTKTKDjXjIFnIPu+SVO9P5MrHJo3jC0=
-Received: from [129.217.186.133] ([129.217.186.133])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 652FbuRY029237
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 2 Jun 2026 17:37:56 +0200 (CEST)
-Message-ID: <53dc682c-f3df-485a-91f6-74212554cd10@tu-dortmund.de>
-Date: Tue, 2 Jun 2026 17:37:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641E336215E
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 15:45:37 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780415139; cv=fail; b=Y51v2LPPb8i27F5Dim/FfxKkDNAEccyapdZ68wT4yWlwAphLWrxYH8K82i2p/fisxjqe1KzMMmBq89lLF3Kz2UuzDBwoXIePUKpG2UyirqSnlVUyQTyaK0eU6PXiuEulAaybYERU+U94ZRFNrEvM/33E8X1IvdgY+xMO66qpG8w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780415139; c=relaxed/simple;
+	bh=vdkcMVG/TbkbsGnUiRMFp85prga/UoGlrNR/pPwoqM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=KPCW20byu2HldSF5YJdvZv0wLSneo7EYAWdcncHylnpnquzoGmjfJjcAjZ3apz5MVGmz3LE1RkOxrDQ6i4/GbkFmFsy9mZUpmxCr/5CDGQnT0a3RPSESeLddC54yjd4MwUiVYb1UctGL/p5P/IKIW4vFQ9lw4yX3uJ2ZnDBZnjc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Q/VzEoUv; arc=fail smtp.client-ip=40.107.209.8
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x/l+vc/l37wIJRQ44+fkr7IZZBVxzM8P1Xi8dIzAjqa+UVZ3VkVtNrv8oWcqaLSFxGFH4thL3NfLVo0ckKw7mjWIqdOeCneqbeTyWZuC/julGVB5N8EUdMVqFThvrpaHvWRyCgvG3B4L/OfONd9mH0spRINP7quLbFxryU6tQrShxRpHLKIhWqEG7VFHZHGbS8K4Sz3VJkbGKPp3hAqDq50nlBhaRCcLBD4+IB+zA/8ujlvi1aHi5Qioo1TIroahEghhFG1O5WphfnPZ0h4Vj5rcy2WvS7YUKOewVPXxb0SSqHRhdRqaYMIQTwxNn4m49B2HToWPjoy1qG3BogmUQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z6V5kjNCRVdqRV1XkjoO1Lc8lVVQ/CnV7XFEbiHatYA=;
+ b=OFwpDfqw2z0hd85U8IU8lgE/ueBr7ycFNgE6EfqHQSsFFcSSbTzudxzYiqFcnXKUatlXWtplaLoC6ZQxOI1prBP7khB+ctJiNYFK6abR32WlNcU/9RlLXw3b+183thhC9uSCj/L6CjNxzHnCECOpAtBCfdZ85OYLkC54W5q00vVDs1gg6x2/mHbRL7BznkiKq/aTO0rtX8d4lQc1Rw43VYvdGNOqHMdMuScSjKZUGwIqUfo0FjodNRYAJg2+2SkgamTSCoRTVIAKAokYuFgjS8yhxzXYMlpqCanj80hiXQV7jNGSplg7hDM05R/O0aIDIekx9UBU376hYo4OSzFwew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z6V5kjNCRVdqRV1XkjoO1Lc8lVVQ/CnV7XFEbiHatYA=;
+ b=Q/VzEoUv6nzfkZuG1GC71njHRNCJ5YbkBsLsDoQy/IZWm8iuPQnJjuNnJFeB37pX49LqHD3LoO+An84LXe8RvhmUzsrA5jyM9HfUXhpIJPStFE6EweQ1O1ki4MA1t5d0Yak6rwT9lqPfShLjyr04bL/D0dkmg7Va61osDldNCzCMrV0vVulMv2CHRSUjfWZku/wu/3SM4dMpny2bL+V3FX1qH8NRvo03noD1Qm00fpLajI/9l+NqmKdbRhXXUvwiubpmo1r1cSmznN1VavezQNd5tqn2UMw6AjsSgtH7zpyKpzIEY4ahHtm49o6m+zD47CrMNtEYrug0osUiVEO/Rw==
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CY8PR12MB7585.namprd12.prod.outlook.com (2603:10b6:930:98::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Tue, 2 Jun 2026
+ 15:45:33 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0092.006; Tue, 2 Jun 2026
+ 15:45:33 +0000
+Date: Tue, 2 Jun 2026 18:45:23 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	andrew+netdev@lunn.ch, kuniyu@google.com, jlayton@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] net: protect egress device access in the output
+ path with rcu_read_lock
+Message-ID: <20260602154523.GA537996@shredder>
+References: <ahveCu-zzFlpeVut@v4bel>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahveCu-zzFlpeVut@v4bel>
+X-ClientProxiedBy: TL0P290CA0013.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::20) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
-        hawk@kernel.org, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-6-hawk@kernel.org>
- <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
- <db5b7f7e-135c-40f0-a740-057bc6623e6c@tu-dortmund.de>
- <865f31e5-4e90-4dc0-890f-b5796948b590@tu-berlin.de>
- <55b23925-9676-4005-8c13-ea7001190abb@tu-dortmund.de>
- <e3d28da7-0fe3-4970-865c-9f51346e01fd@tu-berlin.de>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <e3d28da7-0fe3-4970-865c-9f51346e01fd@tu-berlin.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CY8PR12MB7585:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f90a543-bbc0-4f5d-4a4e-08dec0bdfb1d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|22082099003|18002099003|3023799007|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	N5IPHkdYiTI7VdbjCQb7D+pCgeC8IbEvu0Ch1hLk59OoBkZyrnZ0pu+07vveqw9EqDKg9jsn6IYen5/cwHXYmqWARrYd6yiQvXt9gV/FGuZ+LvpL3gNBW/LIw8/tQJ/WZcf3pVgTEa3qYycLPHLR0dpNAS2tropSMrDlAJLV9+xFLwFs4XCMLdxNUCcff8lzHtwSKU6P7BO1+LdxBbn4W+rj7CIDAMvsuV1JOmcDQPRn+udjIrizX3cQL6T3gTuKcZG7FseLBzBTxc5q+FRyJV13b5ARP3PNiJylqkqMiXWiYHotXZ5I3Rgx60b0wa2vh3nQwryJv2hQhyiEDWK8qVxb2liOJmmFBU2SWLTTK6ib5oZc7zPQEAVqMiwTF44ruPQCj9Tl64eoUcjnTY9/CeJr+SeZ2EB5gKLYnzcAT/lU72hZyJBPdCaZbfaj8a3uD4SBNUkFPgCmsmQ4GtyJWaIRZeP212wl7YogHGHKCNr0XMnh3v+moBDqqcx9mf9MUDD7Y6paI899O2elIZiyzmDVqxPz2w7hvYvAwifWDjwjcjBmX9Z1NYnWkuVpeptl2B/hlaUKJjyoH+7rTSuPTjBAAuJjlJ1GmJKPezsVp7Uu3qT8KlEDmZ7ZjQVx0t/6kQfh/tVNdb6gl274wKytEpJrsIYIHpoxxzOAd6PqblXGaYC/Yq2XyY2VCckBxSd9
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(22082099003)(18002099003)(3023799007)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Qnr+ATE8NfePrEaDOFyYB6K3PnTZy4MJLBpzD9kPeS/RyIizXDQs58Sf7lXB?=
+ =?us-ascii?Q?K5QlEHh/eRQJrqJenlER4qCndeav6BDxDUdZzNkw0kgkhd4D+YQJt1GY2p54?=
+ =?us-ascii?Q?RQRjch8THZYYUsQC8/qkvpzNe9PRv0YnjxTbD51yIeM8HOrVpv956Gg58Vuu?=
+ =?us-ascii?Q?XJhZgTATra55sQhxEC9fNlhXwVycc9Z6yDGbBEAwdkiFQsw2/oFHrEEWVa2G?=
+ =?us-ascii?Q?lBSZ+/jjoKIhQnQJmhBZF+N7VbHNSF858lpfliorbU5O7pIrr9SeIBG9odwe?=
+ =?us-ascii?Q?v3mqZLCskJ069GFbjP56tMI2yHtDkRms9RCSyotrZK5ntMcrW+hRW+7x0Cgt?=
+ =?us-ascii?Q?nMOwdgaSVEWbnugYk8/9jtJhO/9qwNjiIQ2L1SVx4tAT+TyOFVtBe5jI72yS?=
+ =?us-ascii?Q?OJ09Pa6m5inmXpahiSaS3kustM/PXIkQWGPf7sm8d9Zxcmd0jBUP0SXH/obc?=
+ =?us-ascii?Q?WtUXZB/5gLRFKiIuqhKSnoisIKh0ntUsQ6Lf6MKzj/mJgFs/3Wgn1T8UtV23?=
+ =?us-ascii?Q?C38O4TFIFDt2WLFSWeTpjLVFFOkw93kZZ8TtS79i+g+rD5DwYWkfSQ9Q6BE/?=
+ =?us-ascii?Q?TjDlBtQpU3yDhmUde5JTkMeT5xXEqM/9ndKB4Yx2uoZIzt21xF5Ps1TvUwR2?=
+ =?us-ascii?Q?QIZhM1ByzTjlsZYmQ9BkBNJzyJbZpJ9f+Z8lL1yKT5pkxa/YdHSJ3sHyuE+8?=
+ =?us-ascii?Q?Nu4id4p3USp3HCfreDsUCk+c+09CN5snefJrXufafRYE2Px5DRohmPeiR+0D?=
+ =?us-ascii?Q?ksAOjaHIqCC1tVQ23eLIcoQx1pwQCJzqXRG154VGBdLdVNnjOAxLtvzJbgFC?=
+ =?us-ascii?Q?tsXchHLJGHmQJU7j8otya1skqqp0DrrjXrJlbA8GZQDa8c6FrkPopvnMM/mm?=
+ =?us-ascii?Q?FHAQSqD6KbqpGgFsiya3YgN8QNSpqMWSLkTUEm4lc/hAqVid2KtcFIM32cmj?=
+ =?us-ascii?Q?m24N30kNkUHp1QrAfospEMNYfFwB/kUpPh2rrQPcSSRVwPhKuvJSHVXDRXBl?=
+ =?us-ascii?Q?QT0BTjPsb/ku/C9NHE8uF6jbDttOU0VLXkFK7PLi8zt9MNPvsH7FedKlWrE4?=
+ =?us-ascii?Q?2uAS8MSr1ao4/KXr1L4N8qlZkRRcSFGjU9+r+ZhsIPP/p2maWOxtEDYmo0fg?=
+ =?us-ascii?Q?v3j7AHpzbORh8CPmrt16fiPTHubWmtTK/V05MJfiToTJzM+vbPi64eh55isU?=
+ =?us-ascii?Q?JlX4RUP+e6SN0MjzTgbctk0iIXaG8Ghp51cTK2V/tXCOhz8yGd06dDjG7/Av?=
+ =?us-ascii?Q?7hMkyuXPTS3v4zydSrmyKQEii/LIy688LN1C+X8I9Y/ADipQW/EYTFQpG9+g?=
+ =?us-ascii?Q?Z2PrVfDSXt5MrgzHwf6EnAh4T5PmEwx8j8eh1XPsu5rVXQIlFmYsNZMQNViR?=
+ =?us-ascii?Q?yfd6exmYmeelHTGPIIWyJoQ/VpwboXDhzZWqBybwFhF25anGScwN/E+PzqiL?=
+ =?us-ascii?Q?Dn5tv/9vFYxM4TKBZLYDW+KGoepX45F1XSAUnj+faX/13+pU5eH8EiJCOWqf?=
+ =?us-ascii?Q?KxEHhmlNV4K1PT4TcjLvRvixhuHtqUkESAjuIlkm6cXq+mRXbwodQohP4vv5?=
+ =?us-ascii?Q?6Y2unCoBb7pXv4TmqN7t0RyFxIMbZCIbdfJ8RMPtozvw3TJ6DYcjiNxklP5C?=
+ =?us-ascii?Q?1BNu/gDuMjaRUKyg3YWTIb5VMmtTVRwCZqjh5JGQDFn8vXupqX3fpel6kGui?=
+ =?us-ascii?Q?uRnOi8h0cLWQJaIZ6UaAo0mCHzJMUnDfUk12if55hT8ZvkH1?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f90a543-bbc0-4f5d-4a4e-08dec0bdfb1d
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 15:45:32.9982
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iBuWA8OuwDChpto518jPHtUGs7LZo0y5kocmiRJUUhtXH6zKgAvIJOfSlpkpq7FFRzXlJ8UQqaVRrC4Vlz4TCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7585
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-294278-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294277-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:j.koeppeler@tu-berlin.de,m:hawk@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:imv4bel@gmail.com,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:andrew+netdev@lunn.ch,m:kuniyu@google.com,m:jlayton@kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-berlin.de:email,vger.kernel.org:from_smtp,tu-dortmund.de:mid,tu-dortmund.de:dkim,tu-dortmund.de:from_mime,tu-dortmund.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,nvidia.com:from_mime,Nvidia.com:dkim,shredder:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E4F9062FFE1
+X-Rspamd-Queue-Id: A6DEA62FF51
 
-On 6/2/26 09:24, Jonas Köppeler wrote:
-> On 6/1/26 6:16 PM, Simon Schippers wrote:
+On Sun, May 31, 2026 at 04:06:50PM +0900, Hyunwoo Kim wrote:
+>  drivers/net/vrf.c       | 16 +++++++++++-----
+>  net/ipv4/ip_output.c    | 27 +++++++++++++++++++--------
+>  net/ipv4/raw.c          |  4 +++-
+>  net/ipv4/xfrm4_output.c | 13 +++++++++----
+>  net/xfrm/xfrm_output.c  |  4 +++-
+>  5 files changed, 45 insertions(+), 19 deletions(-)
 > 
->> On 6/1/26 16:03, Jonas Köppeler wrote:
->>> On 6/1/26 2:00 PM, Simon Schippers wrote:
->>>> On 5/28/26 09:46, Jonas Köppeler wrote:
->>>>> On 5/27/26 3:54 PM, hawk@kernel.org wrote:
->>>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>
->>>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
->>>>>> excessive NAPI scheduling overhead and qdisc requeues.
->>>>>>
->>>>>> Accumulate BQL completions and flush them when a configurable time
->>>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
->>>>>> queuing delay to the configured interval. Coalescing state persists
->>>>>> across NAPI polls in struct veth_rq so completions can accumulate
->>>>>> beyond a single budget=64 cycle.
->>>>>>
->>>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
->>>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
->>>>>> completion.
->>>>>>
->>>>>>      ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->>>>>>      ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->>>>>>
->>>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>> Tested-by: Jonas Köppeler<j.koeppeler@tu-berlin.de>
->>>>>
->>>> Thanks for your testing!
->>>>
->>>> However, I have issues reproducing.
->>>> I run bare metal (without virtme) with v6 + your pktgen patch
->>>> and I am on the branch pktgen-and-benchmark, commit
->>>> "results: add veth-bql measurements":
->>>>
->>>> 1. ping fails with 100% packet loss ~20% of the times with --pktgen.
->>>>      When this happens the avg ping of this run is mistakenly set
->>>>      to 0.0 ms, which distorts the results.
->>>>      I fixed it locally by rerunning when this happens.
->>>>
->>>> 2. pktgen runs with > 3 Mpps even with --nrules 10000, see log below.
->>>>      I see that this is because of qdisc drops.
->>>>      I also tried pfifo and sfq but with the same result.
->>>>      I spent quite some time on it but I do not know a fix.
->>>>
->>>> Do you have an idea?
->>>> Thanks!
->>> Hi,
->>> yes there are some changes missing in the test script.
->>> I have pushed it now, sorry. This should fix 1.
->> I pulled it and ran...
->>
->> sudo ./veth_bql_sweep.sh --runs 1 --pktgen --duration 20 --qdisc fq_codel --no-bpftrace
->>
->> ... but still 8/32=1/4 of the pings are zero, I do not see
->> a pattern.
->>
->>
->> I grabbed the logs from /tmp and this is what a failing
->> ping looks like:
->>
->> PING 10.99.0.2 (10.99.0.2) 56(84) bytes of data.
->>
->> --- 10.99.0.2 ping statistics ---
->> 97 packets transmitted, 0 received, 100% packet loss, time 19967ms
->>
->>
->> Feels like a race or something..
->> Can you reproduce with the exact command?
->> I think you need --runs 1, else it just averages over multiple
->> runs.
-> 
-> Sorry, no I could not reproduce this. I used the exact same
-> command as you did, and I am using net-next/main + v6 patches.
-> I have 0% ping loss across all tests. Does the ping loss
-> happen regardless of the qdisc?
-> 
+> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+> index 46209917ae4d..e9a1dd961805 100644
+> --- a/drivers/net/vrf.c
+> +++ b/drivers/net/vrf.c
+> @@ -833,17 +833,23 @@ static int vrf_finish_output(struct net *net, struct sock *sk, struct sk_buff *s
+>  
+>  static int vrf_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  {
+> -	struct net_device *dev = skb_dst(skb)->dev;
+> +	struct net_device *dev;
+> +	int ret;
+> +
+> +	rcu_read_lock();
+> +	dev = skb_dst_dev_rcu(skb);
+>  
+>  	IP_UPD_PO_STATS(net, IPSTATS_MIB_OUT, skb->len);
+>  
+>  	skb->dev = dev;
+>  	skb->protocol = htons(ETH_P_IP);
+>  
+> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+> -			    net, sk, skb, NULL, dev,
+> -			    vrf_finish_output,
+> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+> +	ret = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+> +			   net, sk, skb, NULL, dev,
+> +			   vrf_finish_output,
+> +			   !(IPCB(skb)->flags & IPSKB_REROUTED));
+> +	rcu_read_unlock();
+> +	return ret;
+>  }
 
-Yes, it happens for each qdisc I tested.
-As a fix I changed the script to rerun if this happens.
-
-With that I ran the benchmark and also created a script to have
-the result as an ASCII table.
-I think it would make sense to include something like this in
-the commit message.
-
-Throughput (pps)
-==================================================
-nrules |   0us | 100us | 1000us | 10000us || stock
--------+-------+-------+--------+---------++------
-     0 | 1.65M | 1.75M |  1.74M |   1.74M || 1.73M
-   100 |  684K |  755K |   730K |    728K ||  744K
-  1000 |  119K |  126K |   126K |    125K ||  126K
- 10000 |   13K |   12K |    13K |     13K ||   13K
-
-
-Ping RTT ms (avg)
-==================================================
-nrules |   0us | 100us | 1000us | 10000us || stock
--------+-------+-------+--------+---------++------
-     0 | 0.016 | 0.138 |  0.137 |   0.135 || 0.133
-   100 | 0.029 | 0.185 |  0.310 |   0.315 || 0.310
-  1000 | 0.137 | 0.321 |   1.66 |    1.81 ||  1.78
- 10000 |  1.22 |  1.87 |   3.02 |    16.0 ||  17.2
-
->>
->>> Regarding 2.: do not look at the pktgen output, in the
->>> new version you will see something like "goodput",
->>> which is the number you should look for.
->>> Pktgen will report at what speed it enqueued packets in
->>> the qdisc.
->> Exactly. Now it works. Had a single outlier but apart from that
->> everything is fine.
->>
->> Thanks,
->> Simon
->>
->>> Let me know if it worked.
->>> Best,
->>> Jonas
->>>
+Patch LGTM, thanks, but what about the IPv6 counterpart (vrf_output6())
+and the other similar existing issues that Sashiko is flagging?
 
