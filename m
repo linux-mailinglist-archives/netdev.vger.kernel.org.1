@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-294351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id evMWEvMnH2roiAAAu9opvQ
-	(envelope-from <netdev+bounces-294351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:58:59 +0200
+	id 9bVrAY4mH2qsiAAAu9opvQ
+	(envelope-from <netdev+bounces-294352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:53:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4635631414
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:58:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F667631392
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 20:53:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=uiU9KRIJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294351-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294351-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=iJi9CQGC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294352-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294352-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=nvidia.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C267307DFAB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 18:51:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E62733036F8C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 18:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286E739B97F;
-	Tue,  2 Jun 2026 18:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D0939A076;
+	Tue,  2 Jun 2026 18:52:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013070.outbound.protection.outlook.com [40.93.196.70])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013047.outbound.protection.outlook.com [40.107.201.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8563439A7E0;
-	Tue,  2 Jun 2026 18:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A63396D1A;
+	Tue,  2 Jun 2026 18:51:49 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780426309; cv=fail; b=T9GjDpW+ijJO7dlfsBZGdbF+aUlMyTRD5X/TryOZ63nAfJ3HZmq1KRYACBwmr36nJ1mFYz4qehr3PmM+MhzCpp3Te5BZ7C8CxE5OcaOETfsotZMbCBW3+pp3HI5jBPjBU+Cl1YUQY+5a2utXOLD0cqVu5w5fDqwD3B2oyDYP0wU=
+	t=1780426323; cv=fail; b=hBBEIy1GubcE1y39YLTtHFazhGI4VvOv/i82ZkXZS7f7jSR42+9kH2XkWg2U1jnGoUbB7eNzLa+NR0WSj1LeF54n7PneH38VL+TKIK+aMTgSC/LUGi4y3Lr6xlDtSRo2g3eZ6krEHr2knXsx17bmHYiocU3xZhhPXAmaPk1Q4I0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780426309; c=relaxed/simple;
-	bh=HBJ+3unn089UWCPjKKORwN720rbz7P5P4G1hJUcahj0=;
+	s=arc-20240116; t=1780426323; c=relaxed/simple;
+	bh=6GNBkse2fP9naqV+o8XRxSAS3ogI8NwGVtKOH+A3Vso=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZqWtFx6W2i5LL5J/EaFJv3PrGycDcvi2M4W3d4nQEBESzeTgjYtUky/ym4w3T01kcfCQTIdCPbgG16DDByVf/e8i8U32iphNcYBLvZpaLL+Zu4siuXhHY5lo51phYQy1kWZ8lM1sf7zLBY0Fgdikej5QKD47xs56zI9J285zzBg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uiU9KRIJ; arc=fail smtp.client-ip=40.93.196.70
+	 Content-Type:MIME-Version; b=jKFzT+6qqYtE8hKhriUyuAVY1ibMsNROTuAfpJoyt0ipJhG0orq/LC6AOLdKvGeoF9bJjryung+rElVdmGXmMAd383+4bwvGV627VPrkbSU/1d/O7fYjPf97XkH2zc3bw/1FuqCrNruVo5gtc7X8PukAIp1cyKOuNWMHf1sP49g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iJi9CQGC; arc=fail smtp.client-ip=40.107.201.47
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NPPhREmOs2nYn6uar4qRQeN4J0mVMY3nJatewFPd8BIGc9SbcKPDXBqGdhI3PWEwAWJQeglc3/so9CYmsq2ec+Q7kd0XJ7hSQQakgOUTP7vaQEpUAD9eQu6MbOW2VI6dgs1ZH57mawGhT02QOFUVde2Syj1Xtba0z6dOrwey0Hm0aK5V7T91gQFym4pRoLRU8l+0eaY0PyKndKDFxZ5MDXCfEf2yUGlXrKwNpbSFrJazH0NN2an/eHyZvpt809zvorjbEXqgf+siaDLKTtn5W7On5I+AE+/SdI/Q4cVN5qKyfaP61JJpNQAeKOyS+Z2M4Ond8VmqJ1TsKrqk698GcQ==
+ b=G7YyACatgxKEv459lgI9ggOmHADItyPn7JcQNpIK9hYcnyGtYbKieIwoCwA79CLV307zg4BlxehN0yFFeEMZBha6Yo6EpPfTLcIybHFn2qkbR1UUMFyrv45z7LI6975nj3V9DSeQTNIwcxL1o/QuSE0MUdIyhKkiY919brYjY6hNDsbazWkn/dY3fgTsTjKkamncjF6MijzHG6kGKqS80M0qjJ9HM7QtyCc9VTH5YCpURmzJlvgeoIUyIWLDAsAZf0+VALxx93kndgLkT48VQpDnU/UrhUsz1dfMYMXFjVeHNdyx5iFUe7lFYP+1yY4guCo9kHNeizYG77Nxh2C9JQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QIT2U/njn9FDxJoIGAF9nYQk1ETPctpzvDzuFiJzjyQ=;
- b=kk+ynxe3jLfLlYx2x0GOOzEfbZyg1NMU9AUSGY3Uu2PWjjXdQad/gVfEsYeoot4ebZNXOjrDETuERBWTXwOn7AxPL2IInCQj7KgaNRtZSOvap4iTaH5rfvhshNC/d3YDhH3y+HaRis6OyTfnyC7EKNTesm3R6BqozhOso1C0xzWCAJj67mzZvVuPHQx5HwDpjWsKEmm5WSIoqAtzShGAKAvwyGmyeD0/a1prahJmn8cu0E5d6yTZkJBVhT9MDex0U/27RS1aBhoaeeqql1uQZCO5v2VCbR68l0g8aDDhNAuyL35v2E4krhZssO7zwErx59N9Qa/oWqcX0+Ws/40wyA==
+ bh=Oekl1LhEmOXOfptaStQK2mrjRVj5Ojs53yqW6VXv3PA=;
+ b=RdfctUTxK1VkSgmMaqLpuLDnA++KsoIi0PAGZ57wqAD5OmjtIJK9+rpzsNFq2RqsVPdmJRpE+198cxM2/nZPOz+gFGjMRwpj7bMGrJMtsvjhpk7W7hlzpzkfwNKSYgL4BuuplPGYPuywV61nzRdDKmpRaRDXbCuUEIv2n8JZSVaOXM2Is3eMpmFYceDnXLTtfNkZbOKDeoMhoNI5zDCZYnMDOyzokfoIlRQjLlFw/Xd9LRxZG28r5he31pLA3eaFsaw/5fyctntcrI6zJ4C3K0DBbd2vSrm35qZ/+EuR9ubCBB+BQcW4yWing7jCF0s+uWzy4vcv7DqX7mgpMHujEA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QIT2U/njn9FDxJoIGAF9nYQk1ETPctpzvDzuFiJzjyQ=;
- b=uiU9KRIJY+JR6bTXYYiXmdVou8zVwU8EDXQHypksMSbSW+NnR7UqFULxK4FANzlNjCAHPxj1kI9f16DUAaV3b6OYSvdjzAlDcLvXkHjOWR3P8k7UWCzh474nHx/v/Tzn/Vg2bIwd1ZwFojMJHa2JxWR4jddnG3XTygelZo32AFjvKfgqTRjKIS3gMDYn83VbiPR/o4n2m8EljF+S0NGnUopazO3NJH9lACq8gKPRcAN5X142c1iwhY6o/mpJTPUjzbywTdqmnKGJP0Cq6N+7cSc8c+xRZnm/qEiZ0B22qcl9XvCrqodofUtBTzI9/gF+qREWMgNcXPhoy/wjaCxW/A==
+ bh=Oekl1LhEmOXOfptaStQK2mrjRVj5Ojs53yqW6VXv3PA=;
+ b=iJi9CQGCP7Zed5/FG/9Om0NRKm3wyMlzEjyDXWGBZ7o46zvrukYU1l1Q4NIW3lwQk+Prhf/Ubx90UwabrtBBiZCsIWwaNS4aDEwQpV7LgPDx5VzyokaCDJl14gpsy44XloHnmHwjqeg7Fp5IDcqjiurbd8c86J0f0zg4G5ZPQ09n9lvi1sCBE7rs9KepIDdUG8flYBVOtOUC26X7vrKuFESCNOa/3C7dRGiYqbXka/RYLSXUEzsBmBMg9LRIOIlSNxLX8DWYzQ6HnmCDR7bKV+uW5wjvToABTCjM8ODTTlCN90Fm2nR3ZwaD2faeTpFqRESaiKNVIgPyOH0GQgYrRQ==
 Received: from DS7PR12MB8202.namprd12.prod.outlook.com (2603:10b6:8:e1::13) by
- PH7PR12MB9256.namprd12.prod.outlook.com (2603:10b6:510:2fe::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.15; Tue, 2 Jun 2026
- 18:51:42 +0000
+ DM4PR12MB6376.namprd12.prod.outlook.com (2603:10b6:8:a0::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.7; Tue, 2 Jun 2026 18:51:44 +0000
 Received: from DS7PR12MB8202.namprd12.prod.outlook.com
  ([fe80::38fd:4146:aea:639e]) by DS7PR12MB8202.namprd12.prod.outlook.com
  ([fe80::38fd:4146:aea:639e%4]) with mapi id 15.21.0092.006; Tue, 2 Jun 2026
- 18:51:42 +0000
+ 18:51:43 +0000
 From: Andy Roulin <aroulin@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -72,16 +71,16 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Shuah Khan <shuah@kernel.org>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 2/3] vxlan: vnifilter: fix spurious notification on VNI update
-Date: Tue,  2 Jun 2026 11:51:37 -0700
-Message-ID: <20260602185138.253265-3-aroulin@nvidia.com>
+Subject: [PATCH net v2 3/3] selftests: net: add vxlan vnifilter notification test
+Date: Tue,  2 Jun 2026 11:51:38 -0700
+Message-ID: <20260602185138.253265-4-aroulin@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260602185138.253265-1-aroulin@nvidia.com>
 References: <20260602185138.253265-1-aroulin@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BY5PR04CA0021.namprd04.prod.outlook.com
- (2603:10b6:a03:1d0::31) To DS7PR12MB8202.namprd12.prod.outlook.com
+X-ClientProxiedBy: BY3PR05CA0012.namprd05.prod.outlook.com
+ (2603:10b6:a03:254::17) To DS7PR12MB8202.namprd12.prod.outlook.com
  (2603:10b6:8:e1::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -90,59 +89,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB8202:EE_|PH7PR12MB9256:EE_
-X-MS-Office365-Filtering-Correlation-Id: 424434cf-9de4-4ef9-8107-08dec0d7fc9e
+X-MS-TrafficTypeDiagnostic: DS7PR12MB8202:EE_|DM4PR12MB6376:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d4f8315-8089-4357-66e2-08dec0d7fd59
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|1800799024|22082099003|18002099003|56012099006|11063799006|5023799004;
+	BCL:0;ARA:13230040|366016|1800799024|376014|18002099003|6133799003|56012099006|11063799006|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	PRdrzCXzh+oyP0ljp1jMqzu2Z/Zb1zZgqSqlFI3UYZIr2GfyEgTQg6cRoDQFM74hLAkGEUwKZ7nagWIHbMmWLxBLBolTBpmD6mYIWvZKal8nayK/duCPdsA4urUG9YDXSYD67cmOqcEsmpdftKg/s7wvYGtMkSaTXNVDEprwmmqKstXX1muxavquOY2v8aEMkZov2/YNzTTby/lTko61tA2sYdjcyQ/UOlh9XdjzHwhBT84FTBKXS2AiFuopUBLps5RyBxeUmkYkfD6MCzLkxSq86ShdWKYW+nmAQgUpj3bQHrZlbdb6NaEApq7TTuDfJp3pbv8aFLfJ8LLDOkxGdjv1UIkP8W3fFY5Hnjqa/ANQa+xskyUHi3DGd0ylZ6kSXrnzefn712XtCzJ0an5W+XETVUgADjeUhDNpnv0LPOw2+cy0VIWUX5gpI65v+8Ru/ZsSnllbgb4kBhj+GQYXZy/WG5NV2iRRhzoOR4VViFYoSP2GNsX2h0pGTxxnIGZ7yf0hd25+msizbAHb/4iiiBhEM3qygnRfZD1C8ImAweoMmAPdIuVqJz8C8eMywCC/eF+NFjmFL2DJvRs7BqLd8C06V/F044i28VXWmkvWjJHlv4MkMdn/7cEHKrV7KhjhGU53czzlr40frJRq+/JPHmWDDrW3hxIHv3PZlcX+kDQVi3s8gqFooeJngljnI7BV
+	Nlex5UCF9faNr1I/zHOTrpY8LbIA0FMPHmGKiVOt6WXPz8TWvGlYp5rl86hdnbzBE/Y0D7LAQfHpMPsuYdfITfNCGlDc49AtDn96TFmAVPjw/oivoZsqfDTeXqhtNZczqaq96bhoNrQFd05V8DDI2Jona5CiXn8SdZU1/nMjnwXVi/k0l5pHkoYt3QN7yh8GMdeYjb6HM1ieR0Qh6rTVk7XuS2KyzFIh+oBD7jj42FQkTkA68NE5VaHGyecGevPGiwIAeksIZZqo/TfZyYRcG/J5juJwNLQvbzLjQ/ylI5NBASOdoWRhlI1hvXD4GONKMqcSWYqKM4iafXx6L2cSHwFffs6pYw2F01ayzZeMO31Om1bT625UKCaQSO0ihKRNp8IbvY7dvIbdn4nBtXEB1sR01yGptkCPFiRm/FXrTjHJosCh6nSlvFJzbER+LitSjfUR1MC+SYJpTdxTXxo/oXaObiQNHgqqQIWC9wsjQDTkP2S/BPWxQgXSke+ofBupuQBu+snwkV3pnJbjh4/jsoM8uOMVK26YolJxE2VcdevULmf2jKIWbYq8V11cs98QqwIn3HbprrPg+7oUOHmkybG2ORhymRnj10Iru0E9i5AdOXvPP/DVcn1+/Ra8v3tdTJWnPT6yIzBH4QlKeyZnyGT7KQ3C0icwVT9NGEALvD+2BVEmfb+oblW9yQigJrBj
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(22082099003)(18002099003)(56012099006)(11063799006)(5023799004);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(18002099003)(6133799003)(56012099006)(11063799006)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BliQ1NGOhjP/PVHDh1FXx/bsMZmowfTtlHSKLYoNYYHXfaLdge7rBUmYXuI0?=
- =?us-ascii?Q?x00WRWwoRjW0yfqZ5/ItF74XxzzwvHbrxIGg96UuJhqJokfyD4VyxQSu1WQg?=
- =?us-ascii?Q?2Igo9D4qhnAnuP8IViOn18YMzYrsl13jxzxgxxz4tkJLxXTxvoqNXPnN3MQA?=
- =?us-ascii?Q?cs4x3ie4ZC4qWhdIu2SFTfdlX5fKlQWE0JkNlJg77tqTi95JLgJKPmRI7UgT?=
- =?us-ascii?Q?TdV6f1aJng0Ayc3rbFamucBgDlckERtMAjSYEnfSK2T3EeTwglwkIojwFZV/?=
- =?us-ascii?Q?6Sm/bGTMlBtMKetNwVe9fBrAYW/d5pa6td2TDDQbN5r5jevIJgpZPlhVsHzl?=
- =?us-ascii?Q?6rNN5xCmbBX5j5sI/t6n4iU/r9oxyazBs2qw3/+Uj1vex3/MF5SsZ5KeRJMI?=
- =?us-ascii?Q?15pzYcsc7bQ3kIpL9PJDUJKKNU7tTrFu2qh5TUbx0NMUON5IPFBj9WOf+qow?=
- =?us-ascii?Q?FPfeddXj9MumDE+vO0dyME/WZtnRTH6mbXZvNJZ//RD44keJo3aOnx1Ev+sB?=
- =?us-ascii?Q?zzk1ecgeRKyiaO3mL8F2itf+xvHATV+bixjPF3gLG1/BoGh7B693/udU6aC8?=
- =?us-ascii?Q?ygxMSRn6O230RKOcTGKemjwg5zVeWTs//YyRHnEMYOztlQEMRcmqJYsf7HBc?=
- =?us-ascii?Q?siMWt8ANbR8qkC/hwH+S79b3jBZJbskWi0L/KK/7I3ccLgDjMsVtc/k9X4IG?=
- =?us-ascii?Q?SWulqjV/wLv+Ds7hY/tC+uNae9WVZP559JR6YfKlk0VwhCJ2/FflDTDXp8ab?=
- =?us-ascii?Q?C/10yPK+f4/Lo6aBwh9n5GDX178h4AOWbHvCgZjuX3sIqZl3BHw5BLuCut9z?=
- =?us-ascii?Q?UvR+ogdRGBdW/xcb9kJwE4NBXeHD+X6YN/YZ8OmFiN54usDR0kMD5muzhuq2?=
- =?us-ascii?Q?qJqGnxIOkt/lwd+r0XE+xtQ59Z4PAL6YprB0GZcGCKb5y4XpDsSUlkeJzItX?=
- =?us-ascii?Q?1OqfDnEPgjY5EVgWfojS2ogW/kRznwiJOmCw9l62E6mLUpwGh3kFHxDekHOv?=
- =?us-ascii?Q?EiRI54e+665N1mFX3qLddcTTWfdi8wXZlG/MtGmEYbkolQJWxdKQjv0xM7pi?=
- =?us-ascii?Q?DFY4z6RNQ0Ed0xyY8XqSa4Bsp4WpqzsyvFLF2rc81J3wPQe/SfOFUGiZFkck?=
- =?us-ascii?Q?1B+lpidUiX2enhJ53XPlZlIEWE657iI6FKPqg5M2AQCVcgwiMpbkQwhqpYxD?=
- =?us-ascii?Q?mmQG2vhxSibDAn+ffOALNFv9oOLnG7zywYkk+fEZGrTR2Z/dKWNyRnXXX1Hn?=
- =?us-ascii?Q?2SnI7K3iBTKTgjlzh63HVYMXHKlywx1Dd8H1P4pzcmKWIHMVjb1nQ4YwnFGx?=
- =?us-ascii?Q?lbVl54WXfOHMfO3LyKz4U8Vutv0v43pm1g2tDvse29aIdXoMAOWGWI/eLcGN?=
- =?us-ascii?Q?q54sk0rYtW8QKok/8Gsq+9stOAjec2CI+eJS0nQkBEsgl9XMtVoWk2lNQe0i?=
- =?us-ascii?Q?aEjhoOW4iK1zJEie+Tdh0LDnqnY85NT4HDbK++ugE4QlCSk0iTSzchpiannW?=
- =?us-ascii?Q?2twAClahIhc+9iSSlGPEniy/uO4Xu1pWIh4n06998VBkyjlB0VhanaMy0i7B?=
- =?us-ascii?Q?+3yIl/zBYQTx07kKy2vHsWh1g3ajHbA+0QJSzrfm2MEJNS1ijoAMk9r22mqo?=
- =?us-ascii?Q?aSwqJIFUWrYTuf0Oe3Q4hyHKrs93yNbvb1hpBtvP3mtLaD2pzCLmTDGM3+JA?=
- =?us-ascii?Q?9VObWBWSdOikMkIE5sx4Gp6H+ZCBkLE1korhjkXMIdVFtvPTsgpgVGy3PhyV?=
- =?us-ascii?Q?8BqYnZqnow=3D=3D?=
+	=?us-ascii?Q?NHOSAHiC7EF68l5VqhMc8yNW04bIUZ9Djx9VXzErnSMNZOF6O3/YGpRqpkN8?=
+ =?us-ascii?Q?uOkAa2rBWQJtpjivR2lrXBLjeYDbHTtmy4F5PJIXtR/TkGB2x6aWoPgDQtwn?=
+ =?us-ascii?Q?izrnEYl4K8jRMIEKM8KYv+6TF9X934Evi0ODHe4zDZdP6JYI3AmdUkw9nEHZ?=
+ =?us-ascii?Q?ElLzT1cIqPb7hNvviKcNu9DacJuNO0c0GF60YmeUCPT9Aw7NVYmdP8hn1TD+?=
+ =?us-ascii?Q?vUVvgcaxiRnvuaO97Kh7+j2mOGzKyJwZf1M4pz8tLLpZ0htsQOzCSIPmqa4Z?=
+ =?us-ascii?Q?wYVs6B/Me3U7prpyUd35Ez8/vfBpoo+jdZ03VmBRtlCnztTsDGeFnGv30OMl?=
+ =?us-ascii?Q?5RGn/hQOLnWEv16q4j790ETvzXZj82c0bt8Zy98ASEJS9l9xL9Q8+5ODBJnH?=
+ =?us-ascii?Q?45YAiXH7q2jalvhsH+ctylYCmJeOO04MVSsa5ARpowmSgWlJ7vVtAGIFM9UB?=
+ =?us-ascii?Q?fDdYX+yAKUIEC5ENxG6sLaqkbsK1lo7LucXovWopBc8vLz1UsHkYg4MxncH+?=
+ =?us-ascii?Q?jenqaQhMr1hqWGtkWS77Ngb2csxWYv6m/CQ6nkQOyWGawV1D7rdu2Ufp/oA8?=
+ =?us-ascii?Q?0Rkyfr2Fc136mpdwFb1ffA3RmUQ19JCzbZRKlm0Vsi2YC3Le91kVQ4xbcH2O?=
+ =?us-ascii?Q?xoxjOtAB5mdqY2FnEzhvgFNcChlwG7hSxTwMRuMoN+hldN+rP7qZ94uVJy1a?=
+ =?us-ascii?Q?DhLXCYWg+kgPITpQaVC7Wujb9384gxFidA9iswrIhfnW7RAw93DWJ8zJtzKF?=
+ =?us-ascii?Q?hxbLFZ/bLTewyvF3inzHK9mvKH92MYaOwF5Br47VofNrwbExJ1kyjFuBgf0c?=
+ =?us-ascii?Q?UUPPqoy+6Z4lxZ4LD33pM4bBBtJ268/TvpFFZWOtApMK7zAq6Orj7yKXGyLL?=
+ =?us-ascii?Q?Bo/1C93h3jxGz/604jGTluSKOvs4/9ejOwH9MT4yO7sNhs7OKNokq/7zgnkp?=
+ =?us-ascii?Q?GUXzsNG8QqhyI1ZeZg1bBvLvg1o2LHY5+0H2COQqqdsmDsTh5E4BNLdx0Cr0?=
+ =?us-ascii?Q?ZDk1BbOkRKJBmXy0DAVw2JsBOzRt717e4vwk+GYqy0yVBcqf9rsB2y769iAz?=
+ =?us-ascii?Q?ek516hnRsMCowSp5InaWCi56WNsUIQ4LEjnQoJpcjP0cModEAy+xeR8q9XIm?=
+ =?us-ascii?Q?6LJZFGIJ/GOzq1c3/APbrGUfgH8dHtZDmNJcNyDmKehRR0Oj95yOSX0G3d7G?=
+ =?us-ascii?Q?u7Xn208AgEmtPGKyCZQbNfDtpMepSNBkD+vrrFMb/IprA02S//aNAwn8C641?=
+ =?us-ascii?Q?ECpqFThhUC5GMAd6E4+6K7l3o407PqNVTE6s++c1lOOR8gH3DfZPhsOOt03q?=
+ =?us-ascii?Q?xI8uUMuY1uQ4fi6mJxX53VS/H/Y/z5avK71mBi/RXuY1bw7o4i6TkNz0MDJt?=
+ =?us-ascii?Q?H7JnzCIZplyQQXicj2LbyRGBe3GmmxWdq2t9nY7r/hVYzGg517g9NNlvIera?=
+ =?us-ascii?Q?FBQNAAJp10HxVdAsSMH8tfUVKmIkAi5xGyMME04HG9WrzW70bAHmCSDKL6LA?=
+ =?us-ascii?Q?vpy7hlWj1PSgpoARmZVvjTO28uhVVvKMCSrvk+87EMdkDipdjfcSW6+S50c3?=
+ =?us-ascii?Q?Ehp5BMhHxjWgUjfysC18vES4NzVWR+Am/rBB6pWsggbrhMe4FiYD1UDR1YlS?=
+ =?us-ascii?Q?mNu0BYu5rMw0WVTOTJflCWozDBOpb3avo7Sd2qCQTu497GPd+RuuJO4Qj91F?=
+ =?us-ascii?Q?XmJPcXgQXepzQjJfUGocOneR2kDOSxAFhTeooCR0JW1MehmIOWdgkNg4ZRWH?=
+ =?us-ascii?Q?5X6Ahrs8mw=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 424434cf-9de4-4ef9-8107-08dec0d7fc9e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d4f8315-8089-4357-66e2-08dec0d7fd59
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB8202.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 18:51:42.3978
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 18:51:43.7871
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uVd6Iko+TBkOFXwpGd+HeyuLon2bcT/aI5hLUA72sA2WvJIe4CjaGk7txrMTcbdHvznVDE5PAK/ZB8lRD+EGQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9256
+X-MS-Exchange-CrossTenant-UserPrincipalName: j2EDnPdYkX9hPj3VVfb3CouncOAQJBUVDEv6amOoKS73CKy5oyE4iOV/Xiko7FzGjakVDo3LkDD8ry/mI0YKiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6376
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -151,14 +150,14 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[aroulin@nvidia.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-294351-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294352-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -173,53 +172,238 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:from_mime,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:from_mime,nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B4635631414
+X-Rspamd-Queue-Id: 9F667631392
 
-When a VNI is re-added with the same attributes (e.g. same group or no
-group), vxlan_vni_update() sends a spurious RTM_NEWTUNNEL notification
-even though nothing changed.
+Add a selftest for VXLAN vnifilter netlink notifications that verifies
+RTM_NEWTUNNEL and RTM_DELTUNNEL are sent correctly when VNIs are added,
+deleted, or updated, and that no spurious notifications are sent when
+a VNI is re-added with the same attributes.
 
-The bug is that 'if (changed)' tests whether the pointer is non-NULL,
-not the bool value it points to. Since every caller passes a valid
-pointer, the condition is always true and the notification fires
-unconditionally.
-
-Fix by dereferencing the pointer: 'if (*changed)'.
-
-Reproducer:
-
- # ip link add vxlan100 type vxlan dstport 4789 local 10.0.0.1 \
-      nolearning external vnifilter
- # ip link set vxlan100 up
- # bridge monitor vni &
- # bridge vni add vni 1000 dev vxlan100
- # bridge vni add vni 1000 dev vxlan100  # spurious notification
-
-Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
 Signed-off-by: Andy Roulin <aroulin@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+Acked-by: Petr Machata <petrm@nvidia.com>
 Assisted-by: Claude:claude-opus-4-6
 ---
- drivers/net/vxlan/vxlan_vnifilter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
-index f2a202d468928..3e76f4e210944 100644
---- a/drivers/net/vxlan/vxlan_vnifilter.c
-+++ b/drivers/net/vxlan/vxlan_vnifilter.c
-@@ -661,7 +661,7 @@ static int vxlan_vni_update(struct vxlan_dev *vxlan,
- 	if (ret)
- 		return ret;
- 
--	if (changed)
-+	if (*changed)
- 		vxlan_vnifilter_notify(vxlan, vninode, RTM_NEWTUNNEL);
- 
- 	return 0;
+Notes:
+    Changes since v1:
+    - Improved vni_notify_check helper based on review by sashiko.dev:
+      * Bump pre-cmd sleep 0.1s -> 0.5s.
+      * Add /proc/$monitor_pid liveness check and ksft_skip if
+        iproute2 doesn't support 'bridge monitor vni'.
+      * Capture and propagate "$@"'s exit status so check_err
+        $? actually validates the bridge command's return.
+
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../net/test_vxlan_vnifilter_notify.sh        | 184 ++++++++++++++++++
+ 2 files changed, 185 insertions(+)
+ create mode 100755 tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh
+
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index f3da38c54d276..2ed7d803eb548 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -109,6 +109,7 @@ TEST_PROGS := \
+ 	test_vxlan_nh.sh \
+ 	test_vxlan_nolocalbypass.sh \
+ 	test_vxlan_under_vrf.sh \
++	test_vxlan_vnifilter_notify.sh \
+ 	test_vxlan_vnifiltering.sh \
+ 	tfo_passive.sh \
+ 	traceroute.sh \
+diff --git a/tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh b/tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh
+new file mode 100755
+index 0000000000000..9d51a9e02ae0c
+--- /dev/null
++++ b/tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh
+@@ -0,0 +1,184 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# shellcheck disable=SC2034,SC2154,SC2317,SC2329
++#
++# Test for VXLAN vnifilter netlink notifications (RTM_NEWTUNNEL /
++# RTM_DELTUNNEL).
++#
++# Verifies that:
++# - Adding a new VNI sends a notification
++# - Adding a new VNI with a remote sends a notification
++# - Deleting a VNI sends a notification
++# - Re-adding an existing VNI with the same attributes does not send
++#   a spurious notification
++# - Updating an existing VNI's remote sends a notification
++# - Deleting a non-existent VNI does not send a notification
++
++source lib.sh
++
++require_command bridge
++
++VXLAN_DEV=vxlan100
++
++ALL_TESTS="
++	test_vni_add_notify
++	test_vni_add_remote_notify
++	test_vni_del_notify
++	test_vni_readd_no_notify
++	test_vni_update_remote_notify
++	test_vni_del_nonexistent_no_notify
++"
++
++setup_prepare()
++{
++	setup_ns NS1
++	defer cleanup_all_ns
++
++	ip -n "$NS1" link add $VXLAN_DEV type vxlan dstport 4789 \
++		local 10.0.0.1 nolearning external vnifilter
++	ip -n "$NS1" link set $VXLAN_DEV up
++}
++
++# Run bridge monitor in the background, execute a command, then count
++# the notification lines.
++# Usage: vni_notify_check <command> [args...]
++# Sets: NOTIFY_COUNT with the number of notifications observed.
++vni_notify_check()
++{
++	local tmpf cmd_ret monitor_pid
++
++	tmpf=$(mktemp)
++	defer rm "$tmpf"
++
++	defer_scope_push
++		ip netns exec "$NS1" bridge monitor vni > "$tmpf" 2>/dev/null &
++		monitor_pid=$!
++		defer kill_process "$monitor_pid"
++
++		sleep 0.5
++		if [ ! -e "/proc/$monitor_pid" ]; then
++			RET=$ksft_skip
++			log_test "iproute2 'bridge monitor vni' not supported"
++			return "$RET"
++		fi
++
++		"$@"
++		cmd_ret=$?
++		sleep 0.2
++	defer_scope_pop
++
++	NOTIFY_COUNT=$(grep -c "$VXLAN_DEV" "$tmpf")
++	NOTIFY_COUNT=${NOTIFY_COUNT:-0}
++	return "$cmd_ret"
++}
++
++# Adding a brand new VNI should produce a notification.
++test_vni_add_notify()
++{
++	RET=0
++
++	vni_notify_check \
++		bridge -n "$NS1" vni add vni 1000 dev "$VXLAN_DEV"
++	check_err $? "Failed to add VNI"
++
++	[ "$NOTIFY_COUNT" -eq 1 ]
++	check_err $? "Expected 1 notification for VNI add, got $NOTIFY_COUNT"
++
++	bridge -n "$NS1" vni delete vni 1000 dev "$VXLAN_DEV" 2>/dev/null
++
++	log_test "VNI add sends notification"
++}
++
++# Adding a VNI with a remote should produce a notification.
++test_vni_add_remote_notify()
++{
++	RET=0
++
++	vni_notify_check \
++		bridge -n "$NS1" vni add vni 4000 remote 10.0.0.2 dev "$VXLAN_DEV"
++	check_err $? "Failed to add VNI with remote"
++
++	[ "$NOTIFY_COUNT" -eq 1 ]
++	check_err $? "Expected 1 notification for VNI add with remote, got $NOTIFY_COUNT"
++
++	bridge -n "$NS1" vni delete vni 4000 dev "$VXLAN_DEV"
++
++	log_test "VNI add with remote sends notification"
++}
++
++# Deleting a VNI should produce a notification.
++test_vni_del_notify()
++{
++	RET=0
++
++	bridge -n "$NS1" vni add vni 2000 dev "$VXLAN_DEV"
++
++	vni_notify_check \
++		bridge -n "$NS1" vni delete vni 2000 dev "$VXLAN_DEV"
++	check_err $? "Failed to delete VNI"
++
++	[ "$NOTIFY_COUNT" -eq 1 ]
++	check_err $? "Expected 1 notification for VNI del, got $NOTIFY_COUNT"
++
++	log_test "VNI delete sends notification"
++}
++
++# Re-adding an existing VNI with the same attributes should not produce
++# a notification.
++test_vni_readd_no_notify()
++{
++	RET=0
++
++	bridge -n "$NS1" vni add vni 3000 dev "$VXLAN_DEV"
++
++	vni_notify_check \
++		bridge -n "$NS1" vni add vni 3000 dev "$VXLAN_DEV"
++	check_err $? "Failed to re-add VNI"
++
++	[ "$NOTIFY_COUNT" -eq 0 ]
++	check_err $? "Expected 0 notifications for VNI re-add, got $NOTIFY_COUNT"
++
++	bridge -n "$NS1" vni delete vni 3000 dev "$VXLAN_DEV"
++
++	log_test "VNI re-add does not send spurious notification"
++}
++
++# Updating an existing VNI's remote should produce a notification.
++test_vni_update_remote_notify()
++{
++	RET=0
++
++	bridge -n "$NS1" vni add vni 5000 remote 10.0.0.2 dev "$VXLAN_DEV"
++
++	vni_notify_check \
++		bridge -n "$NS1" vni add vni 5000 remote 10.0.0.3 dev "$VXLAN_DEV"
++	check_err $? "Failed to update VNI remote"
++
++	[ "$NOTIFY_COUNT" -eq 1 ]
++	check_err $? "Expected 1 notification for VNI remote update, got $NOTIFY_COUNT"
++
++	bridge -n "$NS1" vni delete vni 5000 dev "$VXLAN_DEV"
++
++	log_test "VNI remote update sends notification"
++}
++
++# Deleting a non-existent VNI should not produce a notification.
++test_vni_del_nonexistent_no_notify()
++{
++	RET=0
++
++	vni_notify_check \
++		bridge -n "$NS1" vni delete vni 9999 dev "$VXLAN_DEV" 2>/dev/null
++
++	[ "$NOTIFY_COUNT" -eq 0 ]
++	check_err $? "Expected 0 notifications for non-existent VNI del, got $NOTIFY_COUNT"
++
++	log_test "Non-existent VNI delete does not send notification"
++}
++
++trap defer_scopes_cleanup EXIT
++
++setup_prepare
++tests_run
++
++exit "$EXIT_STATUS"
 -- 
 2.43.0
 
