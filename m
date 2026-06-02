@@ -1,114 +1,273 @@
-Return-Path: <netdev+bounces-293952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GIqCF3s6HmpriAkAu9opvQ
-	(envelope-from <netdev+bounces-293952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:05:47 +0200
+	id qL/LIaU7HmpriAkAu9opvQ
+	(envelope-from <netdev+bounces-293956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:10:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E61B6270E3
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:05:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14678627198
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:10:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 977EA300A329
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:05:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4D13C305AD3F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B439133B6CC;
-	Tue,  2 Jun 2026 02:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A314B33D6E1;
+	Tue,  2 Jun 2026 02:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ab6aXmc3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nq3Vc5AZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70F329BD9A;
-	Tue,  2 Jun 2026 02:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D20D34C140
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 02:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780365945; cv=none; b=MswBAcQevQXob1d+U3qMLkqwXlviL3YPEFnjz79+oW2vS9rm7c7URSBaEcp2SmfdTeQdA6qHLFMNf63F8XDTbi8gqz+fHNe/+5KSqfwkRtPoOnVJkndlyQ1tAe70Q0qNj/lYzfhuPKiIExwnr7cCkm5JTXvfSwzXCHk3546gPlQ=
+	t=1780366221; cv=none; b=j8wS41cWvAQqM6xCPA07oQzVQXVWfNkN5DPhYIbzvxN3PbOxt/gUZo7FUGmri8bMwuMANhCMcfqMggyTu0WedaIVS9+cMtkEbS5OD4B0acg9yp3swhKnlVPovALGinL8rAoFBW4tWBTVf6LU5PmyTBoaJcOk/xs6ih6dQkYKJx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780365945; c=relaxed/simple;
-	bh=w7M5+j6fJiAOKd5dxDioY+7cIY443e18YGMg4MDNaM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vg21Bj/f9/vFNiyxVlqhUCD5gIuac1IA/jaKgoyFvvBc6Ar2ydf2lYNvtXA1OG54VN9cdvNEP4Dej/OfnVv9cqAnHPAEhwfqahzXkYV/DPrux32jX87fsnLbfzlFDnn7/yytji0fx+OgjqEXPl28dbDHTYNA2fb2FFEh3d0/4to=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ab6aXmc3; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 069701F00893;
-	Tue,  2 Jun 2026 02:05:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780365944;
-	bh=4AjsROMV02U/yvIBd08KPpw+N48FHKFpRq2b7ZoH1hw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Ab6aXmc3kNpZ/JPb6d5/ueMOt9kxuRgk3W+cQ57XapKwR9VpZGQ8fIMwo15CWgZzd
-	 KgSS/zKPVvgQukE4LjLg88xEwxVXvWDi0aHRfFLAw12IaJrp9FuBNo6HD6X2h5LAaN
-	 qnfM32TbkiwbrIEPorNazHW4EtURDbtfVw7SRKl+StYeMutrOjLMQMGv8e0cSzU38d
-	 410TD/5eFuaU2Re8kp7WZzsUz+2UPLSloOOoZErPRdt8g2iq3lJR45xTLKZOEcMbaV
-	 ae/lwZdmfuN0XaP3EaKWX2UiPl7bBh0wCnsth258v/Xn5OV0rGiabdQc53kPoVfo/q
-	 ayzBTG7rUG2sw==
-Date: Mon, 1 Jun 2026 19:05:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- linux-kernel@vger.kernel.org, Yuxiang Yang
- <yangyx22@mails.tsinghua.edu.cn>, Ao Wang <wangao@seu.edu.cn>, Xuewei Feng
- <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, Ke Xu
- <xuke@tsinghua.edu.cn>
-Subject: Re: [PATCH net] vlan: prevent unsigned underflow in VLAN MTU
- calculation over MACsec
-Message-ID: <20260601190543.33d42ef8@kernel.org>
-In-Reply-To: <20260529062135.70490-1-zhaoyz24@mails.tsinghua.edu.cn>
-References: <20260529062135.70490-1-zhaoyz24@mails.tsinghua.edu.cn>
+	s=arc-20240116; t=1780366221; c=relaxed/simple;
+	bh=y7Xd42BcknrLJfoPP64g2rAK+lYNayuuuDtn7l3IJAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M+7W32HWVswJ5uqFOSmXQOwzAIcezQ/x4JS12qa+tEaFzePyTFaT2CVmH61Ip7pGgaOXJnO25Q3sowvqMUwMmkQXojXu/VVr0XIzuz1KQjCUGg/Q4ZHecD8kdSdBHflQb+fBq2+dyh7TRw6PE33oa8YyZZk3cEHKvGQioJqdFro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nq3Vc5AZ; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780366219; x=1811902219;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=y7Xd42BcknrLJfoPP64g2rAK+lYNayuuuDtn7l3IJAQ=;
+  b=Nq3Vc5AZYYkSZRHSvAbpfMpIZE+oWTxmMCY9q0WYVhcbGFu7RAAfq5gv
+   AASKPzVhRiy3tDO2QbDvnXtWAY7jFW9Up6/z4DlQbVjE92g/M5Rj+i97D
+   UBydqqqpTi/ZFCjKV24ISriTDAeoXJOCyQowh6V6y1oHAoeEawa9x4POx
+   n+q4Te2QklmT2QuiuRr5AdSFrBApHYkIOvJI/fU0AEn+4B0GBAQqZ8z4g
+   /wi+ll73SxT7A2d1czrIfP5skMs0L+kCgsoyiWTah1pee8Pxk1+TpRqL8
+   ioH74Qp7awHlWi67D1f/21Fzn3M+4AhxwuKKt/D0ylVYsB+dboLptYssz
+   A==;
+X-CSE-ConnectionGUID: LQNFCGYcT0uMKDKssAkZHA==
+X-CSE-MsgGUID: RVh39GdrQ0KoVPgEyZOXJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="91709513"
+X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
+   d="scan'208";a="91709513"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 19:10:18 -0700
+X-CSE-ConnectionGUID: bJcqv7MzQa+o128oLimDug==
+X-CSE-MsgGUID: jdiXheh/TvW9ljwlcUxbGQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,182,1774335600"; 
+   d="scan'208";a="281865857"
+Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 01 Jun 2026 19:10:15 -0700
+Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wUEa4-00000000BMY-1J86;
+	Tue, 02 Jun 2026 02:10:12 +0000
+Date: Tue, 2 Jun 2026 10:09:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next] mptcp: change mptcp_established_options() to
+ return opt_size
+Message-ID: <202606021033.Gt2vODEq-lkp@intel.com>
+References: <20260601091816.444738-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260601091816.444738-1-edumazet@google.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
-	TAGGED_FROM(0.00)[bounces-293952-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-293956-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 0E61B6270E3
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,01.org:url]
+X-Rspamd-Queue-Id: 14678627198
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 29 May 2026 14:21:33 +0800 Yizhou Zhao wrote:
-> +	if (netif_reduces_vlan_mtu(real_dev)) {
-> +		if (real_dev->mtu < VLAN_HLEN)
-> +			return -EINVAL;
-> +		max_mtu = real_dev->mtu - VLAN_HLEN;
-> +	} else {
-> +		max_mtu = real_dev->mtu;
-> +	}
+Hi Eric,
 
-Does not apply, please rebase on net and repost.
--- 
-pw-bot: cr
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/mptcp-change-mptcp_established_options-to-return-opt_size/20260601-174435
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260601091816.444738-1-edumazet%40google.com
+patch subject: [PATCH net-next] mptcp: change mptcp_established_options() to return opt_size
+config: i386-randconfig-007-20260602 (https://download.01.org/0day-ci/archive/20260602/202606021033.Gt2vODEq-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260602/202606021033.Gt2vODEq-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202606021033.Gt2vODEq-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/ipv4/tcp_output.c: In function 'tcp_established_options':
+>> net/ipv4/tcp_output.c:1186:63: error: passing argument 3 of 'mptcp_established_options' makes pointer from integer without a cast [-Wint-conversion]
+    1186 |                 opt_size = mptcp_established_options(sk, skb, remaining,
+         |                                                               ^~~~~~~~~
+         |                                                               |
+         |                                                               unsigned int
+   In file included from include/net/tcp.h:44,
+                    from net/ipv4/tcp_output.c:40:
+   include/net/mptcp.h:271:59: note: expected 'unsigned int *' but argument is of type 'unsigned int'
+     271 |                                             unsigned int *size,
+         |                                             ~~~~~~~~~~~~~~^~~~
+>> net/ipv4/tcp_output.c:1187:54: error: passing argument 4 of 'mptcp_established_options' makes integer from pointer without a cast [-Wint-conversion]
+    1187 |                                                      &opts->mptcp);
+         |                                                      ^~~~~~~~~~~~
+         |                                                      |
+         |                                                      struct mptcp_out_options *
+   include/net/mptcp.h:272:58: note: expected 'unsigned int' but argument is of type 'struct mptcp_out_options *'
+     272 |                                             unsigned int remaining,
+         |                                             ~~~~~~~~~~~~~^~~~~~~~~
+>> net/ipv4/tcp_output.c:1186:28: error: too few arguments to function 'mptcp_established_options'
+    1186 |                 opt_size = mptcp_established_options(sk, skb, remaining,
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/net/mptcp.h:269:19: note: declared here
+     269 | static inline int mptcp_established_options(struct sock *sk,
+         |                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/mptcp_established_options +1186 net/ipv4/tcp_output.c
+
+  1145	
+  1146	/* Compute TCP options for ESTABLISHED sockets. This is not the
+  1147	 * final wire format yet.
+  1148	 */
+  1149	static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb,
+  1150						struct tcp_out_options *opts,
+  1151						struct tcp_key *key)
+  1152	{
+  1153		struct tcp_sock *tp = tcp_sk(sk);
+  1154		unsigned int size = 0;
+  1155		unsigned int eff_sacks;
+  1156	
+  1157		opts->options = 0;
+  1158	
+  1159		/* Better than switch (key.type) as it has static branches */
+  1160		if (tcp_key_is_md5(key)) {
+  1161			opts->options |= OPTION_MD5;
+  1162			size += TCPOLEN_MD5SIG_ALIGNED;
+  1163		} else if (tcp_key_is_ao(key)) {
+  1164			opts->options |= OPTION_AO;
+  1165			size += tcp_ao_len_aligned(key->ao_key);
+  1166		}
+  1167	
+  1168		if (likely(tp->rx_opt.tstamp_ok)) {
+  1169			opts->options |= OPTION_TS;
+  1170			opts->tsval = skb ? tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) +
+  1171					tp->tsoffset : 0;
+  1172			opts->tsecr = tp->rx_opt.ts_recent;
+  1173			size += TCPOLEN_TSTAMP_ALIGNED;
+  1174		}
+  1175	
+  1176		/* MPTCP options have precedence over SACK for the limited TCP
+  1177		 * option space because a MPTCP connection would be forced to
+  1178		 * fall back to regular TCP if a required multipath option is
+  1179		 * missing. SACK still gets a chance to use whatever space is
+  1180		 * left.
+  1181		 */
+  1182		if (sk_is_mptcp(sk)) {
+  1183			unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+  1184			int opt_size;
+  1185	
+> 1186			opt_size = mptcp_established_options(sk, skb, remaining,
+> 1187							     &opts->mptcp);
+  1188			if (opt_size >= 0) {
+  1189				opts->options |= OPTION_MPTCP;
+  1190				size += opt_size;
+  1191			}
+  1192		}
+  1193	
+  1194		eff_sacks = tp->rx_opt.num_sacks + tp->rx_opt.dsack;
+  1195		if (unlikely(eff_sacks)) {
+  1196			const unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+  1197			if (likely(remaining >= TCPOLEN_SACK_BASE_ALIGNED +
+  1198						TCPOLEN_SACK_PERBLOCK)) {
+  1199				opts->num_sack_blocks =
+  1200					min_t(unsigned int, eff_sacks,
+  1201					      (remaining - TCPOLEN_SACK_BASE_ALIGNED) /
+  1202					      TCPOLEN_SACK_PERBLOCK);
+  1203	
+  1204				size += TCPOLEN_SACK_BASE_ALIGNED +
+  1205					opts->num_sack_blocks * TCPOLEN_SACK_PERBLOCK;
+  1206			} else {
+  1207				opts->num_sack_blocks = 0;
+  1208			}
+  1209		} else {
+  1210			opts->num_sack_blocks = 0;
+  1211		}
+  1212	
+  1213		if (tcp_ecn_mode_accecn(tp)) {
+  1214			int ecn_opt = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_ecn_option);
+  1215	
+  1216			if (ecn_opt && tp->saw_accecn_opt &&
+  1217			    (ecn_opt >= TCP_ACCECN_OPTION_PERSIST ||
+  1218			     !tcp_accecn_opt_fail_send(tp)) &&
+  1219			    (ecn_opt >= TCP_ACCECN_OPTION_FULL || tp->accecn_opt_demand ||
+  1220			     tcp_accecn_option_beacon_check(sk))) {
+  1221				opts->use_synack_ecn_bytes = 0;
+  1222				size += tcp_options_fit_accecn(opts, tp->accecn_minlen,
+  1223							       MAX_TCP_OPTION_SPACE - size);
+  1224			}
+  1225		}
+  1226	
+  1227		if (unlikely(BPF_SOCK_OPS_TEST_FLAG(tp,
+  1228						    BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG))) {
+  1229			unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
+  1230	
+  1231			bpf_skops_hdr_opt_len(sk, skb, NULL, NULL, 0, opts, &remaining);
+  1232	
+  1233			size = MAX_TCP_OPTION_SPACE - remaining;
+  1234		}
+  1235	
+  1236		return size;
+  1237	}
+  1238	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
