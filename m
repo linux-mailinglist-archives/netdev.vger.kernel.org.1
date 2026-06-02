@@ -1,131 +1,177 @@
-Return-Path: <netdev+bounces-294361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QvCFFhYpH2oniQAAu9opvQ
-	(envelope-from <netdev+bounces-294361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:03:50 +0200
+	id CPBuJZ0qH2pfiQAAu9opvQ
+	(envelope-from <netdev+bounces-294362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:10:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECB35631468
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:03:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E63FB631512
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:10:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HEEd3VwM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294361-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294361-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=google.com header.s=20251104 header.b=AWxtUYOd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294362-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294362-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4409B30298E7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 19:03:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28CF3304F235
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 19:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51253A453B;
-	Tue,  2 Jun 2026 19:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708FA3A48F1;
+	Tue,  2 Jun 2026 19:04:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF173A542F
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 19:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B333A3E77
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 19:04:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780427017; cv=none; b=l9LANnQUE9H3SJgM2k6TZ6JE8MPi0FvquWT15duRCk70h2fu6jQTe8O15pqBUv3+uhwF/PdXqW8ig8R7wo9/uE58m9Ua+UD4TuFPDRQMDS51i3OE2Q/qPXnu0eC01OkOLPdMD4ZtXELBnW7BJjQW/0JopAeQg1B1wkVc1ApRDn0=
+	t=1780427080; cv=none; b=Fw0JqoUtBNvGnkvjVOEao5p9+o5AfMraKZMNIUVoYZsUv2GfuSXuO9rYOgHVl6gWTiOrAGP1e8EX5M9Kj5nOqppxxewLrWtsyKtl1/EME4Pdd1PMySdHLigzi9U7vyxoa4li97h5F2zQq4/8941oZHCA5JaXhS7aZ5AFA8v06g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780427017; c=relaxed/simple;
-	bh=cYlfNW7XzyH6xBDOdLScxyRx9aBQ8gBtony+PSxywmY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bUTUBIexTsTFU6JSfZOgS1a0JyiC70NaJTDKqTAfwsldNP4dKS3Z5+E11SWSjxADVYC1U3pTI7cdSxD2wIJgAZrabB4/MuxzNs3SHganqhVzRNw5VqV4fTvuK2XRaoXUAq6aQL9+UcysRpThCSb1/nZQz+MXFUyRyhqD4FG48X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEEd3VwM; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3047A1F00899;
-	Tue,  2 Jun 2026 19:03:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780427016;
-	bh=WkBxYL/1WCijcAl7FpxfTWqyyCe4SUimT2QqCh/7RNU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HEEd3VwMncO8OxIUAkA19YZSCWwklI5YGAr/XuyXxmmv2Q5QA1M1yibnokURIXPTL
-	 e+YCeDlWfiPzykgadk9P+DhuhxgQE4qQA699of+fzMhBGgj/MEIh5Yn128EGqSwEME
-	 eFEPlKRbGtrYkiGVa3FgQc+sunqM1zg/+gVVyjfTIxvj/s3ZHt9tc6dwf+DkmMeuWz
-	 O3ntJeNHBAkfkhUqaOSyvpmtdkNSdRUzPGfBhl1Y7xgo6lLZ49JoHwGjYpMVe5E34p
-	 ZVtOZ5JIB9HKDpzSvLMa1Ldw4Y1H7MWWPbcuJknDMexbpMtowad7YgJhSjIIGPZ4TL
-	 1lIGrcjxwWdVQ==
-Date: Tue, 2 Jun 2026 12:03:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Caio Morais <caiomorais@usp.br>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] mpls: refactor mpls_dev_notify() to use guard(mutex)
-Message-ID: <20260602120335.715c19b7@kernel.org>
-In-Reply-To: <20260601143827.3087733-1-caiomorais@usp.br>
-References: <20260601143827.3087733-1-caiomorais@usp.br>
+	s=arc-20240116; t=1780427080; c=relaxed/simple;
+	bh=4oHClXt4WHSMwWOhlDP3Pv0jkkn/+y3MUybpSmRYXyo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LYSUZhIhmB776C+KVxmQSShf6CSOx9AjcxyranwmSflLbbqH6OG4cVQO8P3AXtufjor4JzcON67pmTlyI4dxdcByMRQ7FSt+Uum2+IyIsRHVW58aam+GNpqOq0Rn+dWFvLAxf5BcOmiAlP612ilTLY3EDvkqO5kqDfUGY/AuJ1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AWxtUYOd; arc=none smtp.client-ip=209.85.216.73
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-36b808bedfaso8703242a91.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 12:04:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780427078; x=1781031878; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=c+UQlkvo93TLdb5AGL7Qa4FBa6P4zv6brAzfEeFQmwM=;
+        b=AWxtUYOd8qHwEBBg69QZxnvWn16RanK8ujSFtOf1LqrQJ72LNktKSNekMVGF+nmOfO
+         8w+F2dwO+fmlLVu4QevNFakBM7wiC7qFyLHhc7WGmZw8kbO5vCEs0MHGLPB4QkoETDZk
+         xyvKK7Z/cBAaH3xGhZ6BBaPpN+9sbIxxJ3rt4RMUBahC8Gaw1TccXMwYRmqlU5RGV7nn
+         P9bcCo4YHbZLCmdrLl95jk7Qm8SNiQvBDaGF+I8SooNP0mblGur0JDFGk48IoyfqUUMz
+         u7kXSODtMwU79XlBuE2m9nQRP+9XDO/eOJir8slzhBkWxRC0chWWsL4anRMmFnq5mjLL
+         Pgmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780427078; x=1781031878;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c+UQlkvo93TLdb5AGL7Qa4FBa6P4zv6brAzfEeFQmwM=;
+        b=sUv1afjsFq6joPHrAFXvfAEtMNhc7Xjbwe/fvs3/oCkp429PaHcY14nbVXOIrAAiQu
+         KpsqBnsQgnisBrEnJ34OXfwxk4m4O7xfxGeL1rVwLafq43lQgNzw+wm1U+0OSQDZ34sm
+         8+EM9Rh5Y0T7y78neRBSzXpHL+slnVpDp1ddOQhVISodBGzzL5kBUCHbD6LwsP85Qpxj
+         Md4RtzGSw9Ac/m1nkm4W1SeE1Uze2MzODZeZhXwXuR3yfsxvfvs/AWv88bb4IlGlWwbT
+         RF9LhBI8NB3qdKZRVPMf0iUILWEiJrI0ugGTeM+h/MWVMrqzc/tgGmC8m1ahMQrN1nwZ
+         LF5w==
+X-Forwarded-Encrypted: i=1; AFNElJ/p/fXuuRBR5ejTQgD4VdzM6jCZ7fmYBrlUtnsXj61oL59Q2gHJxggqswDJ+NpMFEL9M8REcAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdZ7fqVb9w/GEv3EwsPHhActyG6wdpGpJEn6Nb9no9bgDm+35v
+	nf2TBM67JSHG2buzLE4Oq/O9FCVQzDIh21caB1aQonVQ30I5fGt40laQbj7mSqBQ3qJp2sTCs7I
+	JzXLoIw==
+X-Received: from pjyw15.prod.google.com ([2002:a17:90a:ea0f:b0:36b:cb5d:d0e])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:578d:b0:36b:9512:871b
+ with SMTP id 98e67ed59e1d1-36e2fa98077mr167458a91.11.1780427078124; Tue, 02
+ Jun 2026 12:04:38 -0700 (PDT)
+Date: Tue,  2 Jun 2026 19:03:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
+Message-ID: <20260602190436.139591-1-kuniyu@google.com>
+Subject: [PATCH v5 net-next 0/5] geneve: Allow binding UDP socket to a
+ specific address.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stephen Hemminger <stephen@networkplumber.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294361-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:caiomorais@usp.br,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-294362-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:stephen@networkplumber.org,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,google.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ECB35631468
+X-Rspamd-Queue-Id: E63FB631512
 
-On Mon,  1 Jun 2026 11:38:23 -0300 Caio Morais wrote:
-> Replace explicit mutex_lock() and mutex_unlock() calls with the
-> guard(mutex) auto-cleanup helper from <linux/cleanup.h>. 
+By default, a GENEVE device bind()s its underlying UDP socket(s) to
+the IPv4 or IPv6 wildcard address because there is no way to specify
+a specific local IP address to bind() to.
 
-Quoting documentation:
+This prevents deploying multiple GENEVE devices on a multi-homed host
+where each device should be isolated and bound to a different local IP
+address on the same UDP port.
 
-  Using device-managed and cleanup.h constructs
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  Netdev remains skeptical about promises of all "auto-cleanup" APIs,
-  including even ``devm_`` helpers, historically. They are not the preferred
-  style of implementation, merely an acceptable one.
-  
-  Use of ``guard()`` is discouraged within any function longer than 20 lines,
-  ``scoped_guard()`` is considered more readable. Using normal lock/unlock is
-  still (weakly) preferred.
-  
-  Low level cleanup constructs (such as ``__free()``) can be used when building
-  APIs and helpers, especially scoped iterators. However, direct use of
-  ``__free()`` within networking core and drivers is discouraged.
-  Similar guidance applies to declaring variables mid-function.
-  
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
+This series introduces two options to specify local IPv4 or IPv6
+addresses for a GENEVE device.
+
+The corresponding iproute2 patch is here:
+https://lore.kernel.org/netdev/20260602185711.129769-1-kuniyu@google.com/
+
+Once this series and the iproute2 patch land upstream, I'll add
+a small selftest.
 
 
-In general please don't send us arbitrary code cleanup patches
-if you're not actively working on real changes to the code.
+Changes:
+  v5:
+    * Patch 5 : Allow changelink with the same address
+              : Dump LOCAL/LOCAL6 only when configured
+
+  v4: https://lore.kernel.org/netdev/20260528005658.1756248-1-kuniyu@google.com/
+    * Patch 5 : Simplify validation in geneve_nl2info()
+              : Add ynl spec
+
+  v3: https://lore.kernel.org/netdev/20260526015152.2409183-1-kuniyu@google.com/
+    * Patch 5 : Use NLA_POLICY_EXACT_LEN() for IFLA_GENEVE_LOCAL6.
+                Mention source address in error messages in geneve_configure().
+
+  v2: https://lore.kernel.org/netdev/20260525001745.1251640-1-kuniyu@google.com/
+    * Patch 1 : Move addr_type to if-block for CONFIG_IPV6=n
+    * Patch 4 : Don't set cfg->dualstack for IFLA_GENEVE_REMOTE6?
+    * Patch 5 : Validate saddr in geneve_xmit_skb() and geneve6_xmit_skb().
+
+  v1: https://lore.kernel.org/netdev/20260523061654.2767060-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (5):
+  geneve: Reuse ipv6_addr_type() result in geneve_nl2info().
+  geneve: Pass struct geneve_dev to geneve_create_sock().
+  geneve: Pass struct geneve_dev to geneve_find_sock().
+  geneve: Add dualstack flag to struct geneve_config.
+  geneve: Introduce IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
+
+ Documentation/netlink/specs/rt-link.yaml |   9 +
+ drivers/net/geneve.c                     | 254 +++++++++++++++++++----
+ include/uapi/linux/if_link.h             |   2 +
+ 3 files changed, 219 insertions(+), 46 deletions(-)
+
 -- 
-pw-bot: reject
+2.54.0.1013.g208068f2d8-goog
+
 
