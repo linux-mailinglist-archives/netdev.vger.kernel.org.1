@@ -1,210 +1,205 @@
-Return-Path: <netdev+bounces-294067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294068-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCmjF5aGHmqhkQkAu9opvQ
-	(envelope-from <netdev+bounces-294067-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:30:30 +0200
+	id 8HsRCiqJHmr0kgkAu9opvQ
+	(envelope-from <netdev+bounces-294068-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:41:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD479629B6A
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:30:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E97629D2D
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F353300F5FF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:24:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B7F83103C00
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9C363C72;
-	Tue,  2 Jun 2026 07:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2C03A0EB3;
+	Tue,  2 Jun 2026 07:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b="fwOPFrj5"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mCCwsyJC";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="YpaWI8l5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D82534BA20;
-	Tue,  2 Jun 2026 07:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.149.7.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B833A6B6F
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 07:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780385057; cv=none; b=jVQ4cBpELeuCetR/7IGKlkYjSsK6ecURhkIv+X2vBitI9n/dyiJYY2DSYp+HAyOw9exqraxZscurc/2raQ7jBY8j4sDeuaUULmiLuMDgtG+xG0DZM5CkovkX6un4Xq6FJ8txvMOZkKpZbejGEA3CBMR/t9B5A/rbuoRerht8sOU=
+	t=1780385670; cv=none; b=Ssd9KifhdX9wYq/bbgwfe1Mhf/WV/bmozU/FJblMGbBflrZIEtIse8GmnYg1raNwsI+xXku6NHQuEnUigiweLCALb9EBvEL+Wkat3ocTgD3crl33Hlj0dVLFmJOqS3xNTrUVPtxZafnHTwNQKd/XFhK4apZI0qHTVPHK1XtyPRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780385057; c=relaxed/simple;
-	bh=oQna0RVvrecZnyebxJ9KjhtcwD+dEoj05VuZnEkj1SA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=EWa5dT6ypRUPZKV/5HDnUAWni+cI75oP1unOZjOq56lACJUFtOKudYUL93JHra7yoot+u7CBd+hoZBJxUUOC5iMNei6mfNenOmBjKcZspXx124c1L+AWgSFBaOaXROOsnU5rUNr0enPdD1w0oow6EfQ8Y8GcfTMu0cD2pRlb4gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=fwOPFrj5; arc=none smtp.client-ip=130.149.7.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-berlin.de
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
-  d=tu-berlin.de; s=dkim-tub26; t=1780385053;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yQTb2FuY0vYWT4UGQMIuYs5KgW23Da4orzcpQOLj9tI=;
-  b=fwOPFrj5WdKr8GC6WH6Zkbn/eDE3X+BNImkUtKD29AzTp5PSw/RrlFOw
-   h5er9HkjMl2uVi2D0JFMRbGzDV0yzpmwJM6N9VUSCc0/Jz3zsIHjAlzoj
-   7UthdzSM331l1fXijiBQSMuyERjdyb2Ms681xQkWBYMB8Euwk3+dCyyqQ
-   qWvbmMxdfnmW1YfiD4YPQJRf0igPSROBHyO+Ldd14xCT2McNNLyXdXmLM
-   /KzKl46FGNHt70QHqsThZFDiQLnSd2ASOXJI7rdAHT1OxezZQQh2SSQA7
-   tYaLS77cteOx5j4/yviHNRQKPOD1rAdDFWg8d4U7qKRN7IEQPvlFNBgOu
-   g==;
-X-CSE-ConnectionGUID: 8KbqUswITqGrTCiFWhDfEA==
-X-CSE-MsgGUID: y3A5SAgZSoiIRvdisVC3Gw==
-X-IronPort-AV: E=Sophos;i="6.24,182,1774306800"; 
-   d="scan'208";a="62067161"
-Received: from postcard.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.142])
-  by mailrelay.tu-berlin.de with ESMTP; 02 Jun 2026 09:24:10 +0200
-Message-ID: <e3d28da7-0fe3-4970-865c-9f51346e01fd@tu-berlin.de>
-Date: Tue, 2 Jun 2026 09:24:08 +0200
+	s=arc-20240116; t=1780385670; c=relaxed/simple;
+	bh=YVirmTDYaEkiYsJPJUV6u+ccJQzQNksQiW7zP4Dw14U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P6ZZsDpn79dT3NVFa3XSe4/YW4hDMN27KuvGm3uf3k4zjGocBn54JC2uVaXOe9MDy1X9UzM2AAmJome5jRQDfDzf17sn2sH+UQJiunQ+zMmfFCOMDiZzjBZ4mUkwZNTBFdVYj3aQoZq0n6KlcPuHaDN3NpgYg7N4eoNNFhQkDVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mCCwsyJC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=YpaWI8l5; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65230c9A3128015
+	for <netdev@vger.kernel.org>; Tue, 2 Jun 2026 07:34:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=JjC88RteyMdNmZiiaQdoQEc/10QE+WI+V+C
+	6wyLn56Q=; b=mCCwsyJCStiVArdcAakihN+lVucb+RmIJ+esFp/Lm/ZZaBRBOu6
+	qOY/JkoG/OmdTPNQ4MSjGpspHTeLEPUhXfbVMS6F+5oWpFjEsZbrdURfzp1otOI/
+	3T9pauBZz29MgxxlljYGnvdbLUUUIqG6sjn/tJj6TlPGfhiNZZhvWZqLCqY26h/y
+	w0YSTceUkmpxzikPzKCrNV2WCvvzIjDV3PHvu/AbAUeLSECsrVg4aEtpYkvV5JlF
+	cU593s5cNY9XexgMRLTxTbl2REErDsLlp3flxOTFC30m+o8sN8P0y0cQvMk8OzR/
+	bJ1iHW8enyFyn/9yW+eg+0+0GS777U6Ne7w==
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eh9014n5h-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 07:34:22 +0000 (GMT)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51739cdd8a4so47960961cf.2
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 00:34:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1780385662; x=1780990462; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JjC88RteyMdNmZiiaQdoQEc/10QE+WI+V+C6wyLn56Q=;
+        b=YpaWI8l5bYG5dP+5ojcB1/pgG8oUv235TSCdMTe2F3xV+T2zJm7GWFpry6XbvTnsmK
+         54ukSrzDVya1+mrRZgQTjaLbPg/8Tbf/THnyLqeacdYPTuLHOPhKzUfPEvunMV0K4UMg
+         8YktDv0kOFu7uIh+uD9uUY/1TP7ydcZx7QqiexaD4YUmMUEyg9HzJDeTqqYBV7h/niIP
+         96vFY22INf3o/kZ9mBQXJSl9uHaTHP0x4MMEM3wO6KnyIgz3i0DFoOkfNeI24TNNb5US
+         V0R675aTvOwSASn+fSDYdkKKZNzNGSDSfx8EOT8uGyYcosFVhBvQ/dnc/cQhl/LRNbmF
+         Dq3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780385662; x=1780990462;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JjC88RteyMdNmZiiaQdoQEc/10QE+WI+V+C6wyLn56Q=;
+        b=U3nO8MniM3tZqSKr5bQ96mGuksA+BoxxsACqln2maZlWanK5K2c6NsfuHEBnWCnseJ
+         Ur1nzujwYHltSW0aWhPfxKvwMjzWRLf88ejc0hGQcOwbci+5yHHPIxSQNdPAFMXDFXFr
+         K06FW0KJWRyiz9LadxNfwrHAla1DsnTQABTx8Rbfxiarn1sQbyzqyzS9ZxqmOaX3TLVr
+         XN5pTK6W3uAOEpuvM9qob1EgDgwvjmzrS3HyHqqamMFsRsv9IeEA4gkpR5J4vdbV9RT4
+         2nK4nOMTsffu9agg2K18Wq8Tnw1KDn9x5FpgjG17ZdAP/lbSOhnj+y234lY5wJ8vKxCH
+         wR/w==
+X-Gm-Message-State: AOJu0YwEwTdNAP4CWwzdE30HYCp7bcnAeKbY2HT5MMxm8z1ejoXqF+Ob
+	YXDfRA8Wk+KNdAmORJHs+BB1fxkAXNlgiHI9maMEdPtcCfYVtGwSFLNxatuBSbXiPamETxedETM
+	3ZLSi1xpggWeTFA3mUpSppCic6pv+SZ8Fy6bjTHquFPDFEwEfRfouggsVihY=
+X-Gm-Gg: Acq92OGuzrpcCQY3InmvTJZ1dFi/VoRqCAHxcUOBkAGRb5IlEWV6zU5iT29vow62MXb
+	XBVPUMBnpzRRh19LonHxWdMEXmGpBiUaY0hDoc7y1N7jX6ey0n8/pDxm5yqcuMONHM04FyM13Dd
+	X78gMKxxHpKE2fBEuZhbKDbPhWLHVv/fyxb/JtAuVsYwYcz0eveMtMSilmdpusAr59OvQ1LiDXY
+	KeBnIfJrX4+IKEDnP+8yQK13DE7d22bAWud4QqeVCSEDTQYlrObglRLLfOl/w/BPnvSrdAOBnLK
+	bj6kch2/C226gyH4+juSSaQN5mG2jVYQlmLIpp1gjZELcsj7qo9zP1N1PBZ0ozOQs7wsz1M5Txf
+	e5JL1mgUqxqnJ268Gvdd/jYyDNH/z9odRKAiYU1cCld9TpqOsMAjSLCpKjmjMl4gjN3KPZHs1hY
+	aLCxqfNdLIePCTEQ==
+X-Received: by 2002:ac8:5fd4:0:b0:516:daff:7f7e with SMTP id d75a77b69052e-5173a80ffb6mr203814351cf.48.1780385661970;
+        Tue, 02 Jun 2026 00:34:21 -0700 (PDT)
+X-Received: by 2002:ac8:5fd4:0:b0:516:daff:7f7e with SMTP id d75a77b69052e-5173a80ffb6mr203814161cf.48.1780385661519;
+        Tue, 02 Jun 2026 00:34:21 -0700 (PDT)
+Received: from brgl-qcom.local (2-228-54-83.ip190.fastwebnet.it. [2.228.54.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34a0403sm32453424f8f.6.2026.06.02.00.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 00:34:20 -0700 (PDT)
+From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+To: Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, brgl@kernel.org,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        stable@vger.kernel.org
+Subject: [PATCH RESEND net] net: mv643xx: fix OF node refcount
+Date: Tue,  2 Jun 2026 09:34:14 +0200
+Message-ID: <20260602073414.22500-1-bartosz.golaszewski@oss.qualcomm.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: Simon Schippers <simon.schippers@tu-dortmund.de>, <hawk@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-6-hawk@kernel.org>
- <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
- <db5b7f7e-135c-40f0-a740-057bc6623e6c@tu-dortmund.de>
- <865f31e5-4e90-4dc0-890f-b5796948b590@tu-berlin.de>
- <55b23925-9676-4005-8c13-ea7001190abb@tu-dortmund.de>
-Content-Language: en-US
-From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
-In-Reply-To: <55b23925-9676-4005-8c13-ea7001190abb@tu-dortmund.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Authority-Analysis: v=2.4 cv=H6nrBeYi c=1 sm=1 tr=0 ts=6a1e877e cx=c_pps
+ a=WeENfcodrlLV9YRTxbY/uA==:117 a=F4J0OHcPalsv3C1teIDEwQ==:17
+ a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=2glh-Q7MoEu8omcI7JcA:9 a=kacYvNCVWA4VmyqE58fU:22
+X-Proofpoint-ORIG-GUID: _eOWaVFY7duM24UdrlXagjVtDbCKTZj9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDA2OSBTYWx0ZWRfX/2peR7MDcOve
+ Dt1RoXU894Pi6tXA3zjo/qJVjgr8hF3euJcLs3m6R2JYt/ha2e46qYgNTE+ekm1xJYn13JULhbg
+ Rg4UcD/vRxK+anhLY+W9sJNQRe7mCyK59lFATSCQPELOKBFyr02qLumpWLTMhr8GIOF66THTj9l
+ iQogBLgN4ahO/mxJ4RxAdfseWQAu91B7pwoboVc4zHpq6hPRfm+G2ntPmLBGYvedT/6TQATLtpW
+ yK4vJshARkdu/EWxlSK6xzIzwrwit4WRD6LhnTmtLuIJufl0tytBl6Xpp608/DpwhLV0HY0WAEc
+ UViuOB7UY+6cbalb3Mdcw8WMN/3QThsbTiCijf80ammxxXPNTAhOF5TWfXSEMZThc2Am5ouUugt
+ kI4xowRS/bCwpdqb8iZdeGUBdX4l94DXQqjffVOU99zWsJe581mPJ9FuI/sCG2d8qnkcRPlyhU2
+ B4tgoMQ2HuaG7NGut3g==
+X-Proofpoint-GUID: _eOWaVFY7duM24UdrlXagjVtDbCKTZj9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-01_07,2026-05-28_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ bulkscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606020069
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294067-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-294068-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bartosz.golaszewski@oss.qualcomm.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-berlin.de:+];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oss.qualcomm.com:mid,oss.qualcomm.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-berlin.de:email,tu-berlin.de:mid,tu-berlin.de:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tu-dortmund.de:email]
-X-Rspamd-Queue-Id: AD479629B6A
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 78E97629D2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 6/1/26 6:16 PM, Simon Schippers wrote:
+Platform devices created with platform_device_alloc() call
+platform_device_release() when the last reference to the device's
+kobject is dropped. This function calls of_node_put() unconditionally.
+This works fine for devices created with platform_device_register_full()
+but users of the split approach (platform_device_alloc() +
+platform_device_add()) must bump the reference of the of_node they
+assign manually. Add the missing call to of_node_get().
 
-> On 6/1/26 16:03, Jonas Köppeler wrote:
->> On 6/1/26 2:00 PM, Simon Schippers wrote:
->>> On 5/28/26 09:46, Jonas Köppeler wrote:
->>>> On 5/27/26 3:54 PM, hawk@kernel.org wrote:
->>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>
->>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
->>>>> excessive NAPI scheduling overhead and qdisc requeues.
->>>>>
->>>>> Accumulate BQL completions and flush them when a configurable time
->>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
->>>>> queuing delay to the configured interval. Coalescing state persists
->>>>> across NAPI polls in struct veth_rq so completions can accumulate
->>>>> beyond a single budget=64 cycle.
->>>>>
->>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
->>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
->>>>> completion.
->>>>>
->>>>>      ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->>>>>      ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->>>>>
->>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>> Tested-by: Jonas Köppeler<j.koeppeler@tu-berlin.de>
->>>>
->>> Thanks for your testing!
->>>
->>> However, I have issues reproducing.
->>> I run bare metal (without virtme) with v6 + your pktgen patch
->>> and I am on the branch pktgen-and-benchmark, commit
->>> "results: add veth-bql measurements":
->>>
->>> 1. ping fails with 100% packet loss ~20% of the times with --pktgen.
->>>      When this happens the avg ping of this run is mistakenly set
->>>      to 0.0 ms, which distorts the results.
->>>      I fixed it locally by rerunning when this happens.
->>>
->>> 2. pktgen runs with > 3 Mpps even with --nrules 10000, see log below.
->>>      I see that this is because of qdisc drops.
->>>      I also tried pfifo and sfq but with the same result.
->>>      I spent quite some time on it but I do not know a fix.
->>>
->>> Do you have an idea?
->>> Thanks!
->> Hi,
->> yes there are some changes missing in the test script.
->> I have pushed it now, sorry. This should fix 1.
-> I pulled it and ran...
->
-> sudo ./veth_bql_sweep.sh --runs 1 --pktgen --duration 20 --qdisc fq_codel --no-bpftrace
->
-> ... but still 8/32=1/4 of the pings are zero, I do not see
-> a pattern.
->
->
-> I grabbed the logs from /tmp and this is what a failing
-> ping looks like:
->
-> PING 10.99.0.2 (10.99.0.2) 56(84) bytes of data.
->
-> --- 10.99.0.2 ping statistics ---
-> 97 packets transmitted, 0 received, 100% packet loss, time 19967ms
->
->
-> Feels like a race or something..
-> Can you reproduce with the exact command?
-> I think you need --runs 1, else it just averages over multiple
-> runs.
+Cc: stable@vger.kernel.org
+Fixes: 76723bca2802 ("net: mv643xx_eth: add DT parsing support")
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+---
+Resending separately as requested by Jakub
 
-Sorry, no I could not reproduce this. I used the exact same
-command as you did, and I am using net-next/main + v6 patches.
-I have 0% ping loss across all tests. Does the ping loss
-happen regardless of the qdisc?
+ drivers/net/ethernet/marvell/mv643xx_eth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
->> Regarding 2.: do not look at the pktgen output, in the
->> new version you will see something like "goodput",
->> which is the number you should look for.
->> Pktgen will report at what speed it enqueued packets in
->> the qdisc.
-> Exactly. Now it works. Had a single outlier but apart from that
-> everything is fine.
->
-> Thanks,
-> Simon
->
->> Let me know if it worked.
->> Best,
->> Jonas
->>
+diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
+index f9055b3d6fb10..1881583be5ce2 100644
+--- a/drivers/net/ethernet/marvell/mv643xx_eth.c
++++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
+@@ -2780,7 +2780,7 @@ static int mv643xx_eth_shared_of_add_port(struct platform_device *pdev,
+ 		goto put_err;
+ 	}
+ 	ppdev->dev.coherent_dma_mask = DMA_BIT_MASK(32);
+-	ppdev->dev.of_node = pnp;
++	ppdev->dev.of_node = of_node_get(pnp);
+ 
+ 	ret = platform_device_add_resources(ppdev, &res, 1);
+ 	if (ret)
+-- 
+2.47.3
+
 
