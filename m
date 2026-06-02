@@ -1,138 +1,150 @@
-Return-Path: <netdev+bounces-294104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPFgO7WgHmquDAAAu9opvQ
-	(envelope-from <netdev+bounces-294104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:21:57 +0200
+	id CPLxBFukHmq3IwAAu9opvQ
+	(envelope-from <netdev+bounces-294105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:37:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1E1662B5BF
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:21:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6911E62BAC2
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DDA203015318
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:21:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03671311D7F5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1133A8FE8;
-	Tue,  2 Jun 2026 09:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EBB3CE0BB;
+	Tue,  2 Jun 2026 09:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVSpq1LQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LbFO37gP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844803876B5
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 09:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF013CDBC0;
+	Tue,  2 Jun 2026 09:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780392106; cv=none; b=HLw/uy/Ckd5rdmbDut6AYdBHIIEaSuPOTbHW3vAJrScgc1JOzoOzIDNJHq6amenLjOtU33wy5mjvLomp3H6rIiIyjXlAqKa0c8GvnCL2NY3OdGb28ruC8zUpdGJ9lDoBxWYC4fZjBk6ZqydLBeB+QroE6OswgpKrL54jv1fm/hc=
+	t=1780392133; cv=none; b=JuG/vWgp1/y4pmAqm+iXNHaZn+neKZT9b4jhIoo8djEvLrSqNT+XMwPRqj3KwciE3XP1LARXs8sRKvE7Aw/02JTm/j4XSVwqaNaHmtP5B0xQGmn4lBMnb5EEI7vglmW1/jyW0b8mBuvUXXuMs8x/cl3jt2moXtY32Hr9Vikmsu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780392106; c=relaxed/simple;
-	bh=P1gph1y22smAKag+ZQAZAHXDF0jpAebgD6RXmSfuNUw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OgXUlPpuRKmrDSsqXhJspDCjulBvgYpfbW40+rHGQgb/fCbDiElmv9m+9lBm8aijTWvt9TKJdKj0QIY8MpG/1KYkmUv1V/mW0Anex5ikBJf+bXW1Z2jenxsc+Xil4/TcoBRlO+0fa5Z6sa4ciPo7U8mZISMqhPKDflZ/zJiYF8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVSpq1LQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF9151F00893;
-	Tue,  2 Jun 2026 09:21:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780392105;
-	bh=obMdtfq8yyD+RDfcY5uRCDLbGcKdITdA1JJXlKjuEGo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=AVSpq1LQRepemHfmkyFioF6JpRG4mvHRmAL7gjJOpxJDYv+QqlPPCXsgv8nAKfcWX
-	 nd/Oh8nUT6mvSZ8Htm6cRdov5GDWZpJOhawiRmJgKEroe4aGYSwKdKpwC4UNj/y+mb
-	 Z+Btyc/KSqveIkFm6nXkC4y2m2EQG1mAJw9wIX8RdCemmEsAz12uhrnUrip0YVonjp
-	 B2LRiFCEuupz3NM7+ui+I4uZwT18cZPeDvGhvh0tAgBRhNPNM9gBQU1mw/SzPvYfHy
-	 W6V6WKrF+hdkQc4eICsaz8Ha2p+F9iZ+ZQvlY9C+5ZW7dI/ROostQQndH0fUdYdemM
-	 CjwMsh3m1Wj8w==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 02 Jun 2026 11:21:05 +0200
-Subject: [PATCH net 2/2] net: ethernet: mtk_eth_soc: Fix use-after-free in
- metadata dst teardown
+	s=arc-20240116; t=1780392133; c=relaxed/simple;
+	bh=qx9Oyz913PcMyr3DRCcFWEjLHUEyxDQo5cOmQloCccg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I4GxKcz0uzbOUmzxB8ojqWonB6E5OTA2PoF4+U3qKfbiP7ZsmcPqAF2YxKS3Tl0l7bdXw9Yn1jlRN0EsgJVrFgKKoYV7qs5O4Za6GuuW3nIZg2T4XcFFCjUS8aLivFEvSd0Qxb9I4LuSIWZHUwqOKZScCtgYwKD9w/iIUxowetE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LbFO37gP; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780392132; x=1811928132;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qx9Oyz913PcMyr3DRCcFWEjLHUEyxDQo5cOmQloCccg=;
+  b=LbFO37gPZtpEIBpRoMN5RwwLulYWOSEGXShacFCKfeYh8ohbWJyVRpc4
+   Ko7vfb+5NSUmPQmRBISimrX0RYwZzh1mM14WJRAp5r0zYkb695T8+X3vJ
+   D9TzSGQRZon4CYheKURZhJ7t1W7hWctPZcSIixldtC2T3E5US1q5xmCKs
+   YLoEYnl2tgBReC6kaWeG5dih+2a0iDOMHSe6vKJF4B0th19jcG8ofg/2r
+   i09lY0VhR9TabnknHOG3c/oQKTbb9SLH3YS3orNfy/NRQsdqNqmmpZH+4
+   G/bWSd0pFa3KFx0bAIYdOb6+qamToLv8pJ4EP/F+FfT/i14f+tCpFuC+Y
+   Q==;
+X-CSE-ConnectionGUID: fnJgRrf9SomqyMin/LHf8Q==
+X-CSE-MsgGUID: ipooZghzQIeT8N7ZT9JXQg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="103833897"
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="103833897"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:22:11 -0700
+X-CSE-ConnectionGUID: 6MlgT1ArRse4ecPJiJxjWQ==
+X-CSE-MsgGUID: dpH2w+yIR4iKpkksHiG1RQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="281963145"
+Received: from mkosciow-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.229])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:22:01 -0700
+Date: Tue, 2 Jun 2026 12:21:58 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, chuck.lever@oracle.com,
+	jlayton@kernel.org, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, trondmy@kernel.org, anna@kernel.org,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, ebadger@purestorage.com,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH rdma-next v6] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <ah6gtquGDMvEXjcb@ashevche-desk.local>
+References: <20260601092534.1764560-1-ernis@linux.microsoft.com>
+ <5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260602-airoha-mtk-metadata-uaf-fix-v1-2-3aaa99d83351@kernel.org>
-References: <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
-In-Reply-To: <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Felix Fietkau <nbd@nbd.name>, Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Florian Westphal <fw@strlen.de>, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: D1E1662B5BF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d3cac2b-4011-49c5-a142-55c85d38e90f@acm.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Rspamd-Queue-Id: 6911E62BAC2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294104-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com];
+	TAGGED_FROM(0.00)[bounces-294105-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.microsoft.com,marvell.com,ziepe.ca,kernel.org,gmail.com,grimberg.me,nvidia.com,ionos.com,kernel.dk,lst.de,samba.org,talpey.com,oracle.com,brown.name,redhat.com,davemloft.net,google.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[43];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ashevche-desk.local:mid]
 X-Rspamd-Action: no action
 
-mtk_free_dev() calls metadata_dst_free() which frees the metadata_dst
-with kfree() immediately, bypassing the RCU grace period.
-In the RX path, skb_dst_set_noref() sets a non-refcounted pointer from
-the skb to the metadata_dst. This function requires RCU read-side
-protection and the dst must remain valid until all RCU readers complete.
-Since metadata_dst_free() calls kfree() directly, a use-after-free can
-occur if any skb still holds a noref pointer to the dst when the driver
-tears it down.
-Replace metadata_dst_free() with dst_release() which properly goes
-through the refcount path: when the refcount drops to zero, it schedules
-the actual free via call_rcu_hurry(), ensuring all RCU readers have
-completed before the memory is freed.
+On Mon, Jun 01, 2026 at 08:51:40AM -0700, Bart Van Assche wrote:
+> On 6/1/26 2:25 AM, Erni Sri Satya Vennela wrote:
 
-Fixes: 2d7605a72906 ("net: ethernet: mtk_eth_soc: enable hardware DSA untagging")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+...
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 8d225bc9f063..7d771168b990 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -4491,7 +4491,7 @@ static int mtk_free_dev(struct mtk_eth *eth)
- 	for (i = 0; i < ARRAY_SIZE(eth->dsa_meta); i++) {
- 		if (!eth->dsa_meta[i])
- 			break;
--		metadata_dst_free(eth->dsa_meta[i]);
-+		dst_release(&eth->dsa_meta[i]->dst);
- 	}
- 
- 	return 0;
+> > -	sdev->srq_size = min(srpt_srq_size, sdev->device->attrs.max_srq_wr);
+> > +	sdev->srq_size = min_t(u32, srpt_srq_size, sdev->device->attrs.max_srq_wr);
+> 
+> min_t() shouldn't be used if there is an alternative available. For the
+> SRP drivers, please make sure that both arguments of min() are unsigned
+> instead of using min_t().
+
+Ah, I just answered in similar way against v5. I also mentioned clamp() there.
 
 -- 
-2.54.0
+With Best Regards,
+Andy Shevchenko
+
 
 
