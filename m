@@ -1,417 +1,210 @@
-Return-Path: <netdev+bounces-294066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJusF0SHHmr0kgkAu9opvQ
-	(envelope-from <netdev+bounces-294066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:33:24 +0200
+	id qCmjF5aGHmqhkQkAu9opvQ
+	(envelope-from <netdev+bounces-294067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:30:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63C9B629BB2
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:33:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD479629B6A
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 09:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2F61930611AF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:21:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F353300F5FF
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAA0379C37;
-	Tue,  2 Jun 2026 07:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9C363C72;
+	Tue,  2 Jun 2026 07:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="QQwSBGq4"
+	dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b="fwOPFrj5"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013042.outbound.protection.outlook.com [52.101.72.42])
+Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E57B37754D;
-	Tue,  2 Jun 2026 07:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780384874; cv=fail; b=HQljAVOgKE8tmEZ9mIwOkXLnUUpnsblP0jnE4lhz0ASCSeAnxUzdoL5Q+Way1i7FcQwy3JYGmshqdRPPEAAatVMWs73nHECkki/o2xGYkttngtAHC9hA6mOvcI5sOSkq5bl0cFF0FAFSCKtBiIOuBOOwjHrKKld6xZkh9bstO60=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780384874; c=relaxed/simple;
-	bh=6IQGns9+XUAtAvIRCPc3ahHfo9SsH2kpqv/+EeXi2w8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=q8udsGrmuqhnoMC+gzREClOGi90r5hMNvHctowgmeQss3RowoWQm/ucQvO0HLiIeTD2s/9dMiERv4H2kERaGuCKdUQSYauMqQqr39tDBgq/y3IB4EM5wpTQ4OYydaeIGumixEYZpZcUOahhDxaLsHXttTZaFEyw18lScaLBRKDM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=QQwSBGq4; arc=fail smtp.client-ip=52.101.72.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NQkvID4hRyGySJdyoWLN4ByJDRug/be8Gc6nHXmyOLiDEQ2puYw0yRWaVZTqWxOIOFeshubcxLFbu1ZjnvRitnpydT82HFGFmqKiAfI6sIEc8CwhbNT1bj5OwaPgovHQ69HfhcAgsAnETHJcFOGxDLU28OitpZo4zIxM5Ezbg4ZTjW4et9WYqWg2WI0h1fnsNKFxErhGFdwMjMl8NskonPUWdtZgtrN0DxB4PfbaV97bPwoCjovmgT0tFy9ZomEaduVSW9xbH1SeASNNi1rcqdVVtY9kFa4xaGN6lG9igOraeHKiUxQV+URi1AbVYPohzcM/ipoLqNo415VWdx1Qag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SEs1U9efK9z0WeWv84HlI8X/mo7hvn7JuGAfcwOAGzs=;
- b=b8iqh53QfrD23onWcEo/G9/iNekb+n7n2A6GRqjdZkVNFbc8EuwVNGlPoM8hHeWjPZZuWELT+lfoB4z9itz3MxWkF4d3Z9aJi+iv/azlMpnSZR04VtJ/KOvrlKI60DGNHv5Sld+dKEC+R14L1IDPbNuaugCPNVGG1gsl2VlPMgrwuL55gdbvAfBjtmsQFeShghx94T9yqV5MfN5xNgG2VCD+bHlaw2cRTC7cYw71Xs/pqBivBOZozLu58/u6JlU4mB6ktn9G0JhPWtvUv4qKrbklZPapRMUxa5h7Vdum413qH5uNFAkAdbrkyq99cTK1jA6raxw9wrEIQ0uEeBVOGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SEs1U9efK9z0WeWv84HlI8X/mo7hvn7JuGAfcwOAGzs=;
- b=QQwSBGq4XEUrZi9n6pDHBTmuyQ1WxHp0Rrgq0a2wED3llJenBVRwGQrrSjV8A8l02yjt38lt8NWyZKvVcfl6OwFin5bMmNx6Cx3WotWeDiQ/TLyzov0iD++Ebvil0tDaFmles38Wk/IzArqQzKiFpDsPTdbwjHciEuBbvG8QXVFaZJrUGniORGngl5jJSOZC9f5WddUStxrvPI380RhZzG7PoENwsAYNJ4TWYkUSaemgXMRDNbmK+uwvp7V7EP/xt7m/MMUitLls3Km+fDMKU9R2idbbvQ1ws8nnkehOVrvtD/dd0pXhPpCoVvnWw7QoM26pQmceqjcsn1SfTlFXFg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
- by AM9PR04MB7684.eurprd04.prod.outlook.com (2603:10a6:20b:287::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Tue, 2 Jun 2026
- 07:21:09 +0000
-Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
- ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
- ([fe80::a9a5:cf83:dbe8:1f74%3]) with mapi id 15.21.0071.015; Tue, 2 Jun 2026
- 07:21:09 +0000
-From: wei.fang@oss.nxp.com
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	chleroy@kernel.org,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	linux@armlinux.org.uk
-Cc: wei.fang@nxp.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 net-next 9/9] net: dsa: netc: implement dynamic FDB entry ageing
-Date: Tue,  2 Jun 2026 15:23:13 +0800
-Message-Id: <20260602072313.3162120-10-wei.fang@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260602072313.3162120-1-wei.fang@oss.nxp.com>
-References: <20260602072313.3162120-1-wei.fang@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR04CA0216.apcprd04.prod.outlook.com
- (2603:1096:4:187::18) To VE1PR04MB7216.eurprd04.prod.outlook.com
- (2603:10a6:800:1b0::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D82534BA20;
+	Tue,  2 Jun 2026 07:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.149.7.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780385057; cv=none; b=jVQ4cBpELeuCetR/7IGKlkYjSsK6ecURhkIv+X2vBitI9n/dyiJYY2DSYp+HAyOw9exqraxZscurc/2raQ7jBY8j4sDeuaUULmiLuMDgtG+xG0DZM5CkovkX6un4Xq6FJ8txvMOZkKpZbejGEA3CBMR/t9B5A/rbuoRerht8sOU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780385057; c=relaxed/simple;
+	bh=oQna0RVvrecZnyebxJ9KjhtcwD+dEoj05VuZnEkj1SA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=EWa5dT6ypRUPZKV/5HDnUAWni+cI75oP1unOZjOq56lACJUFtOKudYUL93JHra7yoot+u7CBd+hoZBJxUUOC5iMNei6mfNenOmBjKcZspXx124c1L+AWgSFBaOaXROOsnU5rUNr0enPdD1w0oow6EfQ8Y8GcfTMu0cD2pRlb4gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=fwOPFrj5; arc=none smtp.client-ip=130.149.7.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-berlin.de
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
+  d=tu-berlin.de; s=dkim-tub26; t=1780385053;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=yQTb2FuY0vYWT4UGQMIuYs5KgW23Da4orzcpQOLj9tI=;
+  b=fwOPFrj5WdKr8GC6WH6Zkbn/eDE3X+BNImkUtKD29AzTp5PSw/RrlFOw
+   h5er9HkjMl2uVi2D0JFMRbGzDV0yzpmwJM6N9VUSCc0/Jz3zsIHjAlzoj
+   7UthdzSM331l1fXijiBQSMuyERjdyb2Ms681xQkWBYMB8Euwk3+dCyyqQ
+   qWvbmMxdfnmW1YfiD4YPQJRf0igPSROBHyO+Ldd14xCT2McNNLyXdXmLM
+   /KzKl46FGNHt70QHqsThZFDiQLnSd2ASOXJI7rdAHT1OxezZQQh2SSQA7
+   tYaLS77cteOx5j4/yviHNRQKPOD1rAdDFWg8d4U7qKRN7IEQPvlFNBgOu
+   g==;
+X-CSE-ConnectionGUID: 8KbqUswITqGrTCiFWhDfEA==
+X-CSE-MsgGUID: y3A5SAgZSoiIRvdisVC3Gw==
+X-IronPort-AV: E=Sophos;i="6.24,182,1774306800"; 
+   d="scan'208";a="62067161"
+Received: from postcard.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.142])
+  by mailrelay.tu-berlin.de with ESMTP; 02 Jun 2026 09:24:10 +0200
+Message-ID: <e3d28da7-0fe3-4970-865c-9f51346e01fd@tu-berlin.de>
+Date: Tue, 2 Jun 2026 09:24:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|AM9PR04MB7684:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5389801c-f6da-4493-225c-08dec07784b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|1800799024|19092799006|376014|921020|6133799003|3023799007|11063799006|56012099006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	RZrFifGRziMEV9WE5LIlaYyPV8cMuJ7OYmMtzEX2R2GdobVQ+aFb7bAyIME3j3dbUWY8uF1Ub8Aie/nQYDZx5gRdxU4v7XlLvkPxrrsJI7NCClJ3CWqrfLQkQ7IamyT55Xhsc9tA4R4qEMpUboTcyZgFqZqS9gfCjn1A8qSPg7MPQD3SGYr6V6jPd0Hm2vQs5ch8hp+p4cZalPiLyGqwKjQCvDTJro3wy/dwSddT9vrXWjf8gpyh8ejhMlaE8v8375weDQnr33GvfxxS9bb9R/EGEFIKTUW2U+QVr0O8jkhYGfBGXFJP9iQBROI2YEJgJSTgDLx1c0nEv+i9CHRLXQxRZMQQt21unCO1Z63DAc9kjsQH/Is5BiPdOcKix6PQFvCOWr06zSUT4Pxqfh3hIeUh+W+XcgLtpRHySVM1LI2rZ0KkBwpXvkLzsHCQGSNLMtPvEGg1x5qx12ZlJzm16sLV4a87bod8yNVDT14uecxhTlMcsWMepEC0Uqlv4SxB5mvVOGslVEkaAYM4wmvLICftp9wPNUZ8hy4IXwQTJpKuA4ACtiKDvWIvQxspnGoArXKvHt64tcUaCwnbA/FLTpVuc7fVxhBAuDBAiAK+grrQF/XpCNf5eKsmLjau+ljTwkZx+mlS9FM7+0o6WNASft5QZHyJnpbyItfhITxMvJKRDuhLJhXQm58Ok7bqaHGXe25RJ/KNnSh18t7EEO4k9xjY4aodBUZcCC7oGyJ703c=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(19092799006)(376014)(921020)(6133799003)(3023799007)(11063799006)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Qv2Xd1EHaGnhf87Dd5O1sEGMrUwqgJh5Ium4Vdm8Nk016rODtViGadO+5GKq?=
- =?us-ascii?Q?ITXl2VuMq1v33y1CJA65124egod3GR64TaGZdJGPeDQ1q81iLnlEwW8VKpvG?=
- =?us-ascii?Q?Ck4An/svegGwwe2KqatMMP/7laO/vwHKqe/b2f+A1V74KvAgt+jO2q+iFy1F?=
- =?us-ascii?Q?r/jj9iHxjl1Uu9qNne54m7ZjQZ3jJ8S0koCjRFLl3tuwvDf9DS/8aSBCeni8?=
- =?us-ascii?Q?MIygoSIs4ocyNe5RW6P8RoV/RbpICQ8DGk0f8Gj4+meJi2w0VYLAjUUax5dk?=
- =?us-ascii?Q?HwapBEAsO3gBVvB7uqc5aZicQs9a45vGFqeffF+DRKNuAb4exD8ZAmjAJD4T?=
- =?us-ascii?Q?beXbHJVD8lZsFrinXfeK/V6VtpKz9jx+g8jLAhm9mllkeZ6xzLQbfWcrzzAd?=
- =?us-ascii?Q?k97/PunyxtvgqH/1EU/60ar9on4k4UoJpKe9UPWZuCxtkt/8Tayuky6R8Hc2?=
- =?us-ascii?Q?CJKELUmbTBkNqfvZXx0vjrzvug4ARp3i6px4q+Vm0j9lrtBWHNuUZPid1qmD?=
- =?us-ascii?Q?epjEByso8HnoN9UyMOR5RNLIgEr4quCLFroKKasETMPWVJThpFwSp2AhDvFE?=
- =?us-ascii?Q?/3GfGI2k/oA/171yOrkmLLIRAiVInDMNyK3Dfllo6S0r2p3et8EUZVVJRGes?=
- =?us-ascii?Q?ZU5FMi/JpWWu6tVPe04w9xf491zNR2zFJwaE9//oxz+gYKL/zIwzpZv4Wqgn?=
- =?us-ascii?Q?DW5d6aKDyspivYz2XKqotrM4MaJtdLMaoOe9JHPZuD17AJLaCJw4eIt22+km?=
- =?us-ascii?Q?Qi8mjIBYaNXZM5/gyMOJ/3Zgfc+VbZHzC6tA0ZU6rGVl87FfqTUnpRAORV1C?=
- =?us-ascii?Q?ktP9ivQ6FkML7R6alDjFbWRodeKkRnC3Nlfy1vBVx+C7dO7PhKLxOJM/hGGt?=
- =?us-ascii?Q?gW7r598a4MPvCypQ0GcVpNU5h5W0Aar7Z3cHGZCUyNfYaB69SPfZjBhT/MU/?=
- =?us-ascii?Q?9VixLjHYcn1SWdn05xuubAlDz15KfZoUSIbYckT8BDeGfepuggI+TFfK86eF?=
- =?us-ascii?Q?NXAKdZGDgvfUL5DZP1CQkGtuC4zhoLIz6d/VK8PJtPVU15Omb6uu28X7jBDT?=
- =?us-ascii?Q?xFiocQ+Afpcztc/glY6gZ3q2l4DhfzRhG8qml/cVzcjgcAWpxL/kbAntR4/z?=
- =?us-ascii?Q?6qFSZyrPz+/PKMriZ3qTRWeZgye0J9bVseZgAQeS9Q6uSDn7B5h7FSgoC3f5?=
- =?us-ascii?Q?+KgtS+88gEJuJBt65USPSpwpgtjzhSklfwU8GqCP8Wt3JukYTY11LAj9c2PM?=
- =?us-ascii?Q?xjxYzOeNA9UbtTEM3EI8DjtwaVsMiRQnm7IT700noQAtKyR0pxegVppHp3c/?=
- =?us-ascii?Q?BF7IKO50FikFwvlTVKX9+50LTZKvAhNSTH2Qpnh97jdiPXS8ihHCjH40nQ01?=
- =?us-ascii?Q?Z5Yw7OoK/Tx70YEHlwjiXzTckPRiBRwBAPmhQ/P0USNcVySZR90LMIYMz9Ee?=
- =?us-ascii?Q?botEUBhz5ptgUVLVrFZqdkngMslwe4jL6viRimAPPumKdupGhTErpMcpPnnh?=
- =?us-ascii?Q?4/HtUmLZ4oGbMe3hRujCYKVdsjPjQdfoCdbH7p/RmaT7fUELNRj1smUbviMX?=
- =?us-ascii?Q?tS3i0iiwWTVZT4m1peNSCsiD+J/rE4010/ODKoFWSvLdJmpmIRlWX/pJHrXM?=
- =?us-ascii?Q?gVOoUKmBc+K/G/x3B+QNJB8I4SDtfrN9dztbzz+Drk4NlVTHSP/yQop4NJvH?=
- =?us-ascii?Q?8TShn9BIEjErZrR3IHp8FG3H4W2CMqpkmmijzr2ALBmHO59w4hyrQKSCCvfF?=
- =?us-ascii?Q?pCyiWI2E/dglUHycyuhabuv+CkodLDhmD100UEXyBPtQrzeG4kTS?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5389801c-f6da-4493-225c-08dec07784b8
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 07:21:09.5665
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Z/63J6QDfYeFDiiwss+ZLZR7dnOSAZXtJUyawJK3U6o5Bp0b8ifzRFIc3lOyZ6t0XZcalayn0QxnxEWBJiYLIpt/N7ZitR86EyyMHuxhIP30EhslIHalEfWys4CRVLf3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7684
-X-Spamd-Result: default: False [3.44 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
+ coalescing via ethtool tx-usecs
+To: Simon Schippers <simon.schippers@tu-dortmund.de>, <hawk@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+References: <20260527135418.1166665-1-hawk@kernel.org>
+ <20260527135418.1166665-6-hawk@kernel.org>
+ <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
+ <db5b7f7e-135c-40f0-a740-057bc6623e6c@tu-dortmund.de>
+ <865f31e5-4e90-4dc0-890f-b5796948b590@tu-berlin.de>
+ <55b23925-9676-4005-8c13-ea7001190abb@tu-dortmund.de>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
+In-Reply-To: <55b23925-9676-4005-8c13-ea7001190abb@tu-dortmund.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294066-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294067-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-berlin.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,NXP1.onmicrosoft.com:dkim,oss.nxp.com:mid,nxp.com:email]
-X-Rspamd-Queue-Id: 63C9B629BB2
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-berlin.de:email,tu-berlin.de:mid,tu-berlin.de:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tu-dortmund.de:email]
+X-Rspamd-Queue-Id: AD479629B6A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Wei Fang <wei.fang@nxp.com>
+On 6/1/26 6:16 PM, Simon Schippers wrote:
 
-The NETC switch does not age out dynamic FDB entries automatically.
-Without software management, stale entries persist after topology
-changes and cause incorrect forwarding.
+> On 6/1/26 16:03, Jonas Köppeler wrote:
+>> On 6/1/26 2:00 PM, Simon Schippers wrote:
+>>> On 5/28/26 09:46, Jonas Köppeler wrote:
+>>>> On 5/27/26 3:54 PM, hawk@kernel.org wrote:
+>>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>
+>>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
+>>>>> excessive NAPI scheduling overhead and qdisc requeues.
+>>>>>
+>>>>> Accumulate BQL completions and flush them when a configurable time
+>>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
+>>>>> queuing delay to the configured interval. Coalescing state persists
+>>>>> across NAPI polls in struct veth_rq so completions can accumulate
+>>>>> beyond a single budget=64 cycle.
+>>>>>
+>>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
+>>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
+>>>>> completion.
+>>>>>
+>>>>>      ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
+>>>>>      ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
+>>>>>
+>>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> Tested-by: Jonas Köppeler<j.koeppeler@tu-berlin.de>
+>>>>
+>>> Thanks for your testing!
+>>>
+>>> However, I have issues reproducing.
+>>> I run bare metal (without virtme) with v6 + your pktgen patch
+>>> and I am on the branch pktgen-and-benchmark, commit
+>>> "results: add veth-bql measurements":
+>>>
+>>> 1. ping fails with 100% packet loss ~20% of the times with --pktgen.
+>>>      When this happens the avg ping of this run is mistakenly set
+>>>      to 0.0 ms, which distorts the results.
+>>>      I fixed it locally by rerunning when this happens.
+>>>
+>>> 2. pktgen runs with > 3 Mpps even with --nrules 10000, see log below.
+>>>      I see that this is because of qdisc drops.
+>>>      I also tried pfifo and sfq but with the same result.
+>>>      I spent quite some time on it but I do not know a fix.
+>>>
+>>> Do you have an idea?
+>>> Thanks!
+>> Hi,
+>> yes there are some changes missing in the test script.
+>> I have pushed it now, sorry. This should fix 1.
+> I pulled it and ran...
+>
+> sudo ./veth_bql_sweep.sh --runs 1 --pktgen --duration 20 --qdisc fq_codel --no-bpftrace
+>
+> ... but still 8/32=1/4 of the pings are zero, I do not see
+> a pattern.
+>
+>
+> I grabbed the logs from /tmp and this is what a failing
+> ping looks like:
+>
+> PING 10.99.0.2 (10.99.0.2) 56(84) bytes of data.
+>
+> --- 10.99.0.2 ping statistics ---
+> 97 packets transmitted, 0 received, 100% packet loss, time 19967ms
+>
+>
+> Feels like a race or something..
+> Can you reproduce with the exact command?
+> I think you need --runs 1, else it just averages over multiple
+> runs.
 
-Add a delayed work that periodically removes entries that have not been
-refreshed within the specified cycles. The effective aging time is:
+Sorry, no I could not reproduce this. I used the exact same
+command as you did, and I am using net-next/main + v6 patches.
+I have 0% ping loss across all tests. Does the ping loss
+happen regardless of the qdisc?
 
-  ageing_time = fdbt_ageing_delay * 100
-
-Default values are 3s interval and 100 cycles (300s total), matching
-the IEEE 802.1Q default ageing time. The work starts when the first
-port joins a bridge (tracked via br_cnt) and is cancelled when the
-last port leaves. All FDB operations are serialized under fdbt_lock.
-
-When a port leaves the bridge, its dynamic FDB entries are flushed
-right away in port_bridge_leave(), without waiting for the ageing
-cycle. Additionally, when a link down event is detected on a port,
-netc_mac_link_down() will also clear the port's dynamic FDB entries
-via netc_port_remove_dynamic_entries(). Non-bridge ports have no
-dynamic FDB entries, so this call is always safe.
-
-Implement set_ageing_time and port_fast_age DSA operations to allow
-the bridge layer to reconfigure aging parameters and trigger per-port
-flushes on demand.
-
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/dsa/netc/netc_main.c   | 90 ++++++++++++++++++++++++++++++
- drivers/net/dsa/netc/netc_switch.h |  7 +++
- 2 files changed, 97 insertions(+)
-
-diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-index 5b58ce06beb8..3737a852cafc 100644
---- a/drivers/net/dsa/netc/netc_main.c
-+++ b/drivers/net/dsa/netc/netc_main.c
-@@ -447,6 +447,25 @@ static void netc_free_ntmp_user(struct netc_switch *priv)
- 	netc_free_ntmp_bitmaps(priv);
- }
- 
-+static void netc_clean_fdbt_ageing_entries(struct work_struct *work)
-+{
-+	struct delayed_work *dwork = to_delayed_work(work);
-+	struct netc_switch *priv;
-+
-+	priv = container_of(dwork, struct netc_switch, fdbt_ageing_work);
-+
-+	/* Update the activity element in FDB table */
-+	mutex_lock(&priv->fdbt_lock);
-+	ntmp_fdbt_update_activity_element(&priv->ntmp);
-+	/* Delete the ageing entries after the activity element is updated */
-+	ntmp_fdbt_delete_ageing_entries(&priv->ntmp, NETC_FDBT_AGEING_THRESH);
-+	mutex_unlock(&priv->fdbt_lock);
-+
-+	if (atomic_read(&priv->br_cnt))
-+		schedule_delayed_work(&priv->fdbt_ageing_work,
-+				      READ_ONCE(priv->fdbt_ageing_delay));
-+}
-+
- static void netc_switch_dos_default_config(struct netc_switch *priv)
- {
- 	struct netc_switch_regs *regs = &priv->regs;
-@@ -861,6 +880,10 @@ static int netc_setup(struct dsa_switch *ds)
- 
- 	INIT_HLIST_HEAD(&priv->fdb_list);
- 	mutex_init(&priv->fdbt_lock);
-+	priv->fdbt_ageing_delay = NETC_FDBT_AGEING_DELAY;
-+	atomic_set(&priv->br_cnt, 0);
-+	INIT_DELAYED_WORK(&priv->fdbt_ageing_work,
-+			  netc_clean_fdbt_ageing_entries);
- 	INIT_HLIST_HEAD(&priv->vlan_list);
- 	mutex_init(&priv->vft_lock);
- 
-@@ -925,6 +948,7 @@ static void netc_teardown(struct dsa_switch *ds)
- {
- 	struct netc_switch *priv = ds->priv;
- 
-+	disable_delayed_work_sync(&priv->fdbt_ageing_work);
- 	netc_destroy_all_lists(priv);
- 	netc_free_host_flood_rules(priv);
- 	netc_free_ntmp_user(priv);
-@@ -1948,6 +1972,7 @@ static int netc_port_bridge_join(struct dsa_switch *ds, int port,
- 				 struct netlink_ext_ack *extack)
- {
- 	struct netc_port *np = NETC_PORT(ds, port);
-+	struct netc_switch *priv = ds->priv;
- 	u16 vlan_unaware_pvid;
- 	int err;
- 
-@@ -1974,20 +1999,42 @@ static int netc_port_bridge_join(struct dsa_switch *ds, int port,
- 	np->host_flood = NULL;
- 	netc_port_wr(np, NETC_PIPFCR, 0);
- 
-+	if (atomic_inc_return(&priv->br_cnt) == 1)
-+		schedule_delayed_work(&priv->fdbt_ageing_work,
-+				      READ_ONCE(priv->fdbt_ageing_delay));
-+
- 	return 0;
- }
- 
-+static void netc_port_remove_dynamic_entries(struct netc_port *np)
-+{
-+	struct netc_switch *priv = np->switch_priv;
-+
-+	/* Return if the port is not available */
-+	if (!np->dp)
-+		return;
-+
-+	mutex_lock(&priv->fdbt_lock);
-+	ntmp_fdbt_delete_port_dynamic_entries(&priv->ntmp, np->dp->index);
-+	mutex_unlock(&priv->fdbt_lock);
-+}
-+
- static void netc_port_bridge_leave(struct dsa_switch *ds, int port,
- 				   struct dsa_bridge bridge)
- {
- 	struct netc_port *np = NETC_PORT(ds, port);
- 	struct net_device *ndev = np->dp->user;
-+	struct netc_switch *priv = ds->priv;
- 	u16 vlan_unaware_pvid;
- 	bool mc, uc;
- 
- 	netc_port_set_mlo(np, MLO_DISABLE);
- 	netc_port_set_pvid(np, NETC_STANDALONE_PVID);
- 
-+	if (atomic_dec_and_test(&priv->br_cnt))
-+		cancel_delayed_work_sync(&priv->fdbt_ageing_work);
-+
-+	netc_port_remove_dynamic_entries(np);
- 	uc = ndev->flags & IFF_PROMISC;
- 	mc = ndev->flags & (IFF_PROMISC | IFF_ALLMULTI);
- 
-@@ -2007,6 +2054,44 @@ static void netc_port_bridge_leave(struct dsa_switch *ds, int port,
- 	netc_port_del_vlan_entry(np, vlan_unaware_pvid);
- }
- 
-+static int netc_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-+{
-+	struct netc_switch *priv = ds->priv;
-+	unsigned long delay_jiffies;
-+
-+	/* The dynamic FDB entry is deleted when its activity counter reaches
-+	 * NETC_FDBT_AGEING_THRESH (100). Each delayed_work tick increments
-+	 * the counter by 1 if the entry is inactive.
-+	 *
-+	 * Therefore:
-+	 *   msecs (ms)    = NETC_FDBT_AGEING_THRESH * delay_ms (ms)
-+	 *   delay_ms      = msecs / NETC_FDBT_AGEING_THRESH
-+	 *   delay_jiffies = (delay_ms / 1000) * HZ
-+	 *                 = (msecs * HZ) / (1000 * NETC_FDBT_AGEING_THRESH)
-+	 *
-+	 * Use DIV_ROUND_CLOSEST_ULL to perform a single nearest-jiffy
-+	 * rounding, avoiding the two-step rounding error of the intermediate
-+	 * delay_ms approach.
-+	 *   Maximum error = +/-0.5 jiffy * 100 = 50000/HZ ms.
-+	 */
-+	delay_jiffies = DIV_ROUND_CLOSEST_ULL((u64)msecs * HZ,
-+					      1000 * NETC_FDBT_AGEING_THRESH);
-+	WRITE_ONCE(priv->fdbt_ageing_delay, delay_jiffies);
-+
-+	if (atomic_read(&priv->br_cnt))
-+		mod_delayed_work(system_percpu_wq, &priv->fdbt_ageing_work,
-+				 READ_ONCE(priv->fdbt_ageing_delay));
-+
-+	return 0;
-+}
-+
-+static void netc_port_fast_age(struct dsa_switch *ds, int port)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+
-+	netc_port_remove_dynamic_entries(np);
-+}
-+
- static void netc_phylink_get_caps(struct dsa_switch *ds, int port,
- 				  struct phylink_config *config)
- {
-@@ -2261,6 +2346,7 @@ static void netc_mac_link_down(struct phylink_config *config,
- 	np = NETC_PORT(dp->ds, dp->index);
- 	netc_port_mac_rx_graceful_stop(np);
- 	netc_port_mac_tx_graceful_stop(np);
-+	netc_port_remove_dynamic_entries(np);
- }
- 
- static const struct phylink_mac_ops netc_phylink_mac_ops = {
-@@ -2290,6 +2376,8 @@ static const struct dsa_switch_ops netc_switch_ops = {
- 	.port_vlan_del			= netc_port_vlan_del,
- 	.port_bridge_join		= netc_port_bridge_join,
- 	.port_bridge_leave		= netc_port_bridge_leave,
-+	.set_ageing_time		= netc_set_ageing_time,
-+	.port_fast_age			= netc_port_fast_age,
- 	.get_pause_stats		= netc_port_get_pause_stats,
- 	.get_rmon_stats			= netc_port_get_rmon_stats,
- 	.get_eth_ctrl_stats		= netc_port_get_eth_ctrl_stats,
-@@ -2338,6 +2426,8 @@ static int netc_switch_probe(struct pci_dev *pdev,
- 	ds->phylink_mac_ops = &netc_phylink_mac_ops;
- 	ds->fdb_isolation = true;
- 	ds->max_num_bridges = priv->info->num_ports - 1;
-+	ds->ageing_time_min = 1000;
-+	ds->ageing_time_max = U32_MAX;
- 	ds->priv = priv;
- 	priv->ds = ds;
- 
-diff --git a/drivers/net/dsa/netc/netc_switch.h b/drivers/net/dsa/netc/netc_switch.h
-index 982c8d3a3fbf..4abef8b383bd 100644
---- a/drivers/net/dsa/netc/netc_switch.h
-+++ b/drivers/net/dsa/netc/netc_switch.h
-@@ -50,6 +50,9 @@
- /* PAUSE refresh threshold: send refresh when timer reaches this value */
- #define NETC_PAUSE_THRESH		0x7FFF
- 
-+#define NETC_FDBT_AGEING_DELAY		(3 * HZ)
-+#define NETC_FDBT_AGEING_THRESH		100
-+
- struct netc_switch;
- 
- struct netc_switch_info {
-@@ -124,6 +127,10 @@ struct netc_switch {
- 	struct ntmp_user ntmp;
- 	struct hlist_head fdb_list;
- 	struct mutex fdbt_lock; /* FDB table lock */
-+	struct delayed_work fdbt_ageing_work;
-+	/* (fdbt_ageing_delay * ageing_act_cnt) is ageing time */
-+	unsigned long fdbt_ageing_delay;
-+	atomic_t br_cnt;
- 	struct hlist_head vlan_list;
- 	struct mutex vft_lock; /* VLAN filter table lock */
- 
--- 
-2.34.1
-
+>
+>> Regarding 2.: do not look at the pktgen output, in the
+>> new version you will see something like "goodput",
+>> which is the number you should look for.
+>> Pktgen will report at what speed it enqueued packets in
+>> the qdisc.
+> Exactly. Now it works. Had a single outlier but apart from that
+> everything is fine.
+>
+> Thanks,
+> Simon
+>
+>> Let me know if it worked.
+>> Best,
+>> Jonas
+>>
 
