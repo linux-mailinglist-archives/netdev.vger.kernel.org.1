@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-294003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id FkJvCWdYHmoAiwkAu9opvQ
-	(envelope-from <netdev+bounces-294003-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:13:27 +0200
+	id eE7zNn1aHmoWiwkAu9opvQ
+	(envelope-from <netdev+bounces-294005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:22:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DFB627FFC
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:13:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B0086280C9
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ED6BA300B1DC
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 04:13:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A7C0307A7F3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 04:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179D338E5DC;
-	Tue,  2 Jun 2026 04:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E948A3909A4;
+	Tue,  2 Jun 2026 04:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hZhY5NKs"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JfXmo3vD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FF836C598;
-	Tue,  2 Jun 2026 04:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C45438F94C;
+	Tue,  2 Jun 2026 04:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780373605; cv=none; b=cOfThbu0gjKItBYVCtB314xWaRxaSRnEEo3ZczhRSZG75KuDqEUBscQAZDH9r+09KFDRiv+HOcqCfzrewSYtBCpGmhFOOeJ9V9fTjyHJp6P7Uu8qv2IAH5NaOBcyFDODqoxS8UTum+D6yAJq2ETAeAuCOnthKJ/NueeqdhWB5sE=
+	t=1780374051; cv=none; b=KiWtnaGig+YWLBNAGLHFAeUlamcYr22OUwLiSCKz6ueGEMGsT/m9wyK0fQMEeF1OEfFzer0Ys6po381tsZisaCM9hOzdTWnNBMDTH3QCue8jBdFmUndD7MtuGYfFpF7irHz4Oh9v3Mzno5iOKYdveTpXs3hndD0zytuAkuI/ZaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780373605; c=relaxed/simple;
-	bh=VyBxYaUXUu3Gm0Pk9td80arq66oQ0Omao9H3p0G7wfU=;
+	s=arc-20240116; t=1780374051; c=relaxed/simple;
+	bh=Kdkq8TqSgH5/GitlXilN0OQRiqPw42N/da+Gs/wQhqg=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C9eogDBs6U9X6Qu0FtCdgxwDfNxQ0QGs4Uk1uCyxwxPRB6n1VZV2Vl6iecH3Sf2No060n/tpeMjrk0E/VusZ3RR/FAcDsvexzAKP4VoVC2ahPoJMzjG51l+k2pi07GifIxEEWdYbA6Dmbp8PJ+K7mwoyl9jgZyb6fxYJQ17lblY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hZhY5NKs; arc=none smtp.client-ip=67.231.148.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=V6CyL8ZTReaVTcLKkoFgqKk9GaRrSVj8BqSzeOZLHKJp2VlcSHeF/kyX+rogBoPU9t2qDKYAaghq97sYFtzuPUvB46d5Xj0k68U2eT64u8DaK+cR0BaX5WUG3p9tx0jE0M43/r3dtm7tjVldlO3BJ1x1zCF9SUydLgUlZgeoLLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JfXmo3vD; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6520IfBv2859284;
-	Mon, 1 Jun 2026 21:13:13 -0700
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651KreUW2822565;
+	Mon, 1 Jun 2026 21:20:40 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=WA6PZgFBUb+0fck+ztc2wU9u5
-	fohPzyUuEYdJDxOmJY=; b=hZhY5NKsPQMakbM+MH34sbr/5+33f+YZ0qsqwduhP
-	Cf5aNmrMQ2oubl7BZWJJ52OOvW3E05yZBnaJ0LP617MiUB9RA8k/prMzJr2UY1Tc
-	MbrhecILRz4CfRzxxe0DPInBvATTAGvkMDZBZpJA5j9dvzQzZz3dQ5g181eDnz1t
-	oyXQJ+xEP9LB0vpUoaT1+xFuOTSt1YHfyTrLB9CAjS2cClQmA3qxRNMmrKKL9RuP
-	zQjStuZfwrWwmxRjRKPh9y6hfp3223NYw1o/d35r0+JVsXzdDAtpwQr+cak8lI7s
-	d7ClPoZm/SsngluCZc3sbTGAEBTSax8G9aiqYGzT35jGw==
+	:references:subject:to; s=pfpt0220; bh=6QVwi5+YD2Xd151pzvfXfS/4g
+	f36o5dTNgxArtG4NtA=; b=JfXmo3vD23j5h9vCrvYPAZrEa0hw0sqH+f6Pud90x
+	n3UL2SDILOusdizvlcsra8WDI9/+uzSvuYqqw4DgLbNzrF2srHNVEmdsJQAxbU7p
+	W+K67S7YdtC0OrTcGU6YJB8uB8wU76BEcFrPzCIoyKsJa8Z5nv8qbLt3MJEKJ/oc
+	0sRRijuGVak+1eNQBgG1JORknlRoL4VlfLAO1z4VlpAeVAF8L5Jf9W7IQtI51Kke
+	TMptLrlKD+/CLkf+u1YtjqFCRGmy8+URTwee0GdHIwQin8DKrb1nzrxcdy/majPV
+	/T938kZyeiIr3KNjSfvSuBSjXJOLaswPOeHItgCS4Z8WQ==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ehbxra76g-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4egm56nx5j-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jun 2026 21:13:13 -0700 (PDT)
+	Mon, 01 Jun 2026 21:20:40 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 1 Jun 2026 21:13:12 -0700
+ 15.2.1544.25; Mon, 1 Jun 2026 21:20:39 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 1 Jun 2026 21:13:12 -0700
+ Transport; Mon, 1 Jun 2026 21:20:39 -0700
 Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 4CEE53F7062;
-	Mon,  1 Jun 2026 21:13:09 -0700 (PDT)
-Date: Tue, 2 Jun 2026 09:43:08 +0530
+	by maili.marvell.com (Postfix) with SMTP id 3ECF53F7062;
+	Mon,  1 Jun 2026 21:20:36 -0700 (PDT)
+Date: Tue, 2 Jun 2026 09:50:35 +0530
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
 CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
         <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v17 net-next 6/8] octeontx2-af: npc: Support for custom
- KPU profile from filesystem
-Message-ID: <ah5YVLE6cWu-tyMd@rkannoth-OptiPlex-7090>
+Subject: Re: [PATCH v17 net-next 8/8] octeontx2-af: npc: cn20k: Allocate
+ npc_priv and dstats dynamically.
+Message-ID: <ah5aE-oDgy7BzYEc@rkannoth-OptiPlex-7090>
 References: <20260601025844.865865-1-rkannoth@marvell.com>
- <20260601025844.865865-7-rkannoth@marvell.com>
+ <20260601025844.865865-9-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,22 +79,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260601025844.865865-7-rkannoth@marvell.com>
-X-Authority-Analysis: v=2.4 cv=RMaD2Yi+ c=1 sm=1 tr=0 ts=6a1e5859 cx=c_pps
+In-Reply-To: <20260601025844.865865-9-rkannoth@marvell.com>
+X-Proofpoint-GUID: 6m22LUdmqsmOw-2llUmzq6mqOW7MBy6O
+X-Proofpoint-ORIG-GUID: 6m22LUdmqsmOw-2llUmzq6mqOW7MBy6O
+X-Authority-Analysis: v=2.4 cv=ZeYt8MVA c=1 sm=1 tr=0 ts=6a1e5a18 cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8
- a=aGXFfAgDFSogSVCN33EA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDAzNSBTYWx0ZWRfX36++i0FeQ2Mv
- R8WzbuN5wLWT6i5C0+tr0068qIQ6ahaCVImHKNGwqpxZLy+ijNp+unCxuDq4Twhj7IxYhmGDD4D
- BQQdq5D1A8ccd+TGwn9netsf2C8Frw5u9bp/ahnKlXbcS1HiMwdnc9Xs36M8w7p/kLCSLVO1Nnm
- 8767w8PsXkoTBDjphhsk+leeYRuW2VWhg2+XG7LMmEyzve9LkX3pGP5WMBPtIT35yT0/4tT+0B9
- 6ZRCCHu1i7VHwhYz9LISfm05yepw/ImUCdr26df+858otHWf0nZ0ClNZHrSbHqTXH3CDjYDYCw6
- ugAVhVFzG1OUSlIoXdsoAf20KnihjS1tbYFtM8ugcCysRXSxTdR5YEiFv9hML6nHhIPrqArC1ts
- rJZT5ijiNNfSdyBkDRMZb3AA3SQboLdTCG9noMO+HTSy94WXzb5DW6AmpSEbMUYz1r9XI7nLKCp
- Icj90W4DeN4E/sLbjQQ==
-X-Proofpoint-ORIG-GUID: Ix5pn9l773MAT0br6aIfEddv3dbp4VTV
-X-Proofpoint-GUID: Ix5pn9l773MAT0br6aIfEddv3dbp4VTV
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8
+ a=UO200rvEumD2nOZpqV8A:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDAzNiBTYWx0ZWRfX3mmKiKxlYzp7
+ R2dlBl2xAkgPs9tZf/wxPQ33B9rutZLd9wdYHvukRDtIKBazoBWLzGMNkrVxZ+ZuLDibGbWaUBt
+ Ngbt7OzEpOG0eb3D3p4w+ngSO4O4KF6fM6icP8xstYL+zV/XzXRbG/ziygi5xO89LJG7jck55yc
+ /QnoRkYyeMkWc+YdpiSlbk9anuidjbflWby5AIAKVG4GdY9KcoRsHWayV8V3nZyT4PT1BjLE4q2
+ cqK9LZEnbc11nMG27H57rtrUasMPHe6+HOwCi8FaTr2ppvtEoFClS21eaejX21snbmvVt1gZjm9
+ 2kgUiIiuIJ+CfJOnmLuTQVSJjt0oeoUPaJGG978cLqoFZb8gRdCFhNu1hoiT2YUVmkyJdh3DqpX
+ KMlT5VgsqaKGzUlShwZMpSZHbV9I0QMESbV1KrFG6TSgsJEMJj32zfI6rThkaZ1l6YdGohlA0fy
+ Vn7i1Ev7v7cwWKE6phg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-01_07,2026-05-28_03,2025-10-01_01
@@ -103,144 +103,119 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294003-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294005-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: B0DFB627FFC
+X-Rspamd-Queue-Id: 5B0086280C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-06-01 at 08:28:41, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Flashing updated firmware on deployed devices is cumbersome. Provide a
-> mechanism to load a custom KPU (Key Parse Unit) profile directly from
-> the filesystem at module load time.
+On 2026-06-01 at 08:28:43, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Replace the file-scope static npc_priv with a kcalloc'd struct filled
+> from hardware bank/subbank geometry at init (num_banks is no longer a
+> const compile-time constant; drop init_done and use a non-NULL
+> npc_priv pointer for liveness). Thread npc_priv_get() / pointer access
+> through the CN20K NPC code paths, extend teardown to kfree the root
+> struct on failure and in npc_cn20k_deinit, and adjust MCAM section
+> setup to use the discovered subbank count.
 
->> +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
->> +	struct npc_kpu_profile *kpu;
->> +
->> +	kpu = &adapter->kpu[kpu_num];
->> +
->> +	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
->> +				 sizeof(*kpu->cam2), GFP_KERNEL);
->Is it safe to store devm-allocated pointers into this kpu structure?
->Looking at npc_prepare_default_kpu(), the profile->kpu pointer is
->assigned to npc_kpu_profiles, which is a global static array.
->When memory bounded to a specific device via devm_kcalloc is stored
->in this global array, won't multiple devices race to overwrite these
->pointers? Additionally, if the device unbinds, devres will free the memory,
->leaving dangling pointers in the global array that could cause a
->use-after-free for other devices on the system.
-
-There is only one AF device per system.
-
->> +	struct npc_kpu_profile_cam *cam;
->> +	struct npc_kpu_fwdata *fw_kpu;
->> +	int entries, entry, kpu;
+>>  static int npc_mcam_dstats_show(struct seq_file *s, void *unused)
+>>  {
+>>  	struct npc_priv_t *npc_priv;
+>>  	int blkaddr, pf, mcam_idx;
+>[ ... ]
+>>  	npc_priv = npc_priv_get();
+>>  	rvu = s->private;
+>>  	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+>>  	if (blkaddr < 0)
+>>  		return 0;
 >>
->> -	if (is_cn20k(rvu->pdev))
->> -		return npc_cn20k_apply_custom_kpu(rvu, profile);
->> +	fw = rvu->kpu_fwdata;
+>>  	mutex_lock(&stats_lock);
+>>  	seq_puts(s, "idx\tpfunc\tstats\n");
+>> -	for (int bank = npc_priv.num_banks - 1; bank >= 0; bank--) {
+>> -		for (int idx = npc_priv.bank_depth - 1; idx >= 0; idx--) {
+>> +	for (int bank = npc_priv->num_banks - 1; bank >= 0; bank--) {
+>> +		for (int idx = npc_priv->bank_depth - 1; idx >= 0; idx--) {
+>Could this unconditionally dereference a NULL pointer if debugfs is read
+>after initialization fails? Since npc_priv is no longer a static structure,
+>reading from it without checking for NULL will cause a crash here.
+
+if memory allocation fails, debugfs entry wont be created in npc_cn20k_debugfs_init()
+
+>  int npc_cn20k_ref_idx_alloc(struct rvu *rvu, int pcifunc, int key_type,
+>>  			    int prio, u16 *mcam_idx, int ref, int limit,
+>>  			    bool contig, int count, bool virt)
+>>  {
+>>  	bool defrag_candidate = false;
+>>  	int i, eidx, rc, bd;
+>>  	bool ref_valid;
+>>  	u16 vidx;
 >>
->> +	for (kpu = 0; kpu < fw->kpus; kpu++) {
->> +		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
->This is a pre-existing issue, but does this bounds check guarantee enough
->space to safely read fw_kpu->entries below?
->The check ensures the offset reaches the start of the fw_kpu structure,
->but it doesn't appear to verify there are at least sizeof(*fw_kpu) bytes
->remaining in the buffer. If the firmware image is truncated exactly
->at this boundary, could dereferencing fw_kpu->entries read out of
->bounds?
-Pre existing issue; a seperate bug fix patch will be posted to net tree once this series
-is merged.
+>> -	bd = npc_priv.bank_depth;
+>> +	bd = npc_priv->bank_depth;
+>Does this function also need a NULL check for npc_priv before dereferencing
+>it? If the NPC block fails to initialize, this will crash immediately upon
+>entry.
+No. if npc_priv allocation fails, probe() itself will fail.
 
->> +		if (fw_kpu->entries > KPU_MAX_CST_ENT)
->> +			dev_warn(rvu->dev,
->> +				 "Too many custom entries on KPU%d: %d > %d\n",
->> +				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
->> +		entries = min_t(int, fw_kpu->entries, KPU_MAX_CST_ENT);
->> +		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
->> +		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
->> +		action = (struct npc_kpu_profile_action *)(fw->data + offset);
->> +		offset += fw_kpu->entries * sizeof(*action);
->This is a pre-existing issue, but could the offset calculation overflow
->on 32-bit architectures?
-Pre existing issue; a seperate bug fix patch will be posted to net tree once this series
-is merged.
+>>  int rvu_mbox_handler_npc_get_pfl_info(struct rvu *rvu, struct msg_req *req,
+>>  				      struct npc_get_pfl_info_rsp *rsp)
+>>  {
+>>  	if (!is_cn20k(rvu->pdev)) {
+>>  		dev_err(rvu->dev, "Mbox support is only for cn20k\n");
+>>  		return -EOPNOTSUPP;
+>>  	}
+>>
+>> -	rsp->kw_type = npc_priv.kw;
+>> -	rsp->x4_slots = npc_priv.bank_depth;
+>> +	rsp->kw_type = npc_priv->kw;
+>> +	rsp->x4_slots = npc_priv->bank_depth;
+>>  	return 0;
+>>  }
+>If the NPC block is disabled or fails to initialize, npc_priv will remain
+>NULL. Since this mailbox handler doesn't check for NULL before dereferencing,
+>will this cause a kernel panic when triggered by a VF? Previously, reading
+>from the static structure safely yielded zeroes.
+>
+If the NPC block is disabled or fails to initialize, rvu af probe() itself will fail.
 
->The expression sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam)
->evaluates as a 32-bit unsigned size_t. If a maliciously large value is
->provided for fw_kpu->entries, the multiplication could wrap around,
->producing a small offset that passes the bounds check below, leading to
->out-of-bounds memory reads when copying the entries.<F11>
->> +		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
->> +			dev_warn(rvu->dev,
->> +				 "Profile size mismatch on KPU%i parsing.\n",
->> +				 kpu + 1);
->> +			return -EINVAL;
->> +		}
->> +		for (entry = 0; entry < entries; entry++) {
->> +			profile->kpu[kpu].cam[entry] = cam[entry];
->> +			profile->kpu[kpu].action[entry] = action[entry];
->This is a pre-existing issue, but does this permanently corrupt the default
->built-in profile?
-
-Pre existing issue; a seperate bug fix patch will be posted to net tree once this series
-is merged.
-
->> +	/* Binary blob contains ikpu actions entries at start of data[0] */
->> +	profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
->> +				      sizeof(ikpu_action_entries),
->> +				      GFP_KERNEL);
->> +	if (!profile->ikpu2)
->> +		return -ENOMEM;
->> +
->> +	action = (struct npc_kpu_profile_action *)(fw->data + offset);
->> +
->> +	if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
->> +		return -EINVAL;
->> +
->> +	/* The firmware layout does dependent on the internal size of
->> +	 * ikpu_action_entries.
->> +	 */
->> +	memcpy((void *)profile->ikpu2, action, sizeof(ikpu_action_entries));
->> +	offset += sizeof(ikpu_action_entries);
->Will tying the firmware binary layout directly to the size of an
->internal kernel compilation constant cause backward compatibility issues?
-We can't change ikpu structure to add another field as it will break backward compatability.
-So we will keep same number of items in ikpu.
-
->	mkex_extr = rvu->kpu.mcam_kex_prfl.mkex_extr;
->> +	mkex = rvu->kpu.mcam_kex_prfl.mkex;
->> +
->>  	if (is_cn20k(rvu->pdev)) {
->> -		keyx_cfg = mkex_extr->keyx_cfg;
->> +		keyx_cfg = (u64 *)mkex_extr->keyx_cfg;
->>  	} else {
->> -		keyx_cfg = mkex->keyx_cfg;
->> +		keyx_cfg = (u64 *)mkex->keyx_cfg;
->This is a pre-existing issue, but does this cast away the const
->qualifier and modify read-only data? Both mkex_extr and mkex are typed
->as const, and frequently point to the global static npc_mkex_default profile.
-
-Pre existing issue; a seperate bug fix patch will be posted to net tree once this series
-is merged.
+>>  int rvu_mbox_handler_npc_get_pfl_info(struct rvu *rvu, struct msg_req *req,
+>>  				      struct npc_get_pfl_info_rsp *rsp)
+>>  {
+>>  	if (!is_cn20k(rvu->pdev)) {
+>>  		dev_err(rvu->dev, "Mbox support is only for cn20k\n");
+>>  		return -EOPNOTSUPP;
+>>  	}
+>>
+>> -	rsp->kw_type = npc_priv.kw;
+>> -	rsp->x4_slots = npc_priv.bank_depth;
+>> +	rsp->kw_type = npc_priv->kw;
+>> +	rsp->x4_slots = npc_priv->bank_depth;
+>>  	return 0;
+>>  }
+>If the NPC block is disabled or fails to initialize, npc_priv will remain
+>NULL. Since this mailbox handler doesn't check for NULL before dereferencing,
+>will this cause a kernel panic when triggered by a VF? Previously, reading
+>from the static structure safely yielded zeroes.
+There is only one AF device per system, so this case won't happen
 
