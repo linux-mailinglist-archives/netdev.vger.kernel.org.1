@@ -1,169 +1,151 @@
-Return-Path: <netdev+bounces-294404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ok1KOnU9H2oqjAAAu9opvQ
-	(envelope-from <netdev+bounces-294404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:30:45 +0200
+	id InBPMf0/H2qdjAAAu9opvQ
+	(envelope-from <netdev+bounces-294406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:41:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681DA631BFC
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:30:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60181631D2D
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 22:41:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TPz3prVe;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294404-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294404-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294406-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294406-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4AFEC3035F2B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:30:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E01330A714B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 20:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83AB4324B33;
-	Tue,  2 Jun 2026 20:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6833C37BE7C;
+	Tue,  2 Jun 2026 20:32:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5B235838E
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7107322C6D
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 20:32:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780432214; cv=none; b=q9u0K6AFEUSGw6JvonsZxnYyvYw7hHE7gNXJHPSt/VMWnfUSharFKxaj7RCQNdFfmV8jOZNehjnvEXBYstSHTiLmluOguCvQ22xBf4b5Mo1jdjWY3ThuxX3yErdKWE8BRFDpdKdlwOMLPH6NqrQHXiWNAb7EaUgx3jZCy5qe45w=
+	t=1780432350; cv=none; b=cVcMQclFPAdAfaofQP5MqoZhev335Gw4AEYgqU48VpacIYUz3vXmSVFi5b+/PXDNwYhMsskRg4z60JcW8uqvu6Ka8A5Cnclb9TQ0loUgDt0N+/dSLZsUu1QXn8qK504pCPhxFccMd98BKyS/19RZyiwcX+M4MFpVyJwG6DZG15s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780432214; c=relaxed/simple;
-	bh=HjJqMpeHljdTYrToT5sxT92/3e4ZeXSmbeiktWXOx64=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KqB8C6flulXjk0f4Hgv6KhqEvyfL3gQ5pJGSrfb6b99Om7k9TVbRoUDfBhlhNHiJ58DavSAreuSeb6Bwe0q7KXTnYSt4OIiYebmwx7bPhOWV2EpXcvQQKw+TtXtBlcmp1CyRjeVRLGBPoZuBojGtBvfTILqrH9y1GWjaDxZU+/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPz3prVe; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D4A1F00893;
-	Tue,  2 Jun 2026 20:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780432213;
-	bh=gjwMGrTESknD5peX+eFGJBM0//MZxOS4/vrUF8k4h4A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TPz3prVeOVPs6tmHop7zUrzU2L7EkX1/zBZUQPFQIzu3j1/B+Vt0vZh7knErzYWYY
-	 AWSCvweUNkAe8As9Hy/CMzQOjIKgY7+g7d1NhqjaJSN7DYFOfSjXEOyssLEf0saPHl
-	 lJojBMJE/Hfd0+JEFwwyiE8zYTIspelQhFYuVcoTc+qFlKpc5ynQHVE4JtYuwcG1Vo
-	 Y9raz6xnyT3vo3QlCgIaH+oIOlTh3tyJ77U/5VcZDKBXpOJdBaFSm0g+mK4GbQmOQl
-	 BoCgZhi7/HomqVfUoC7THg/LkS08QvPK1UzHX+LuGgIzx0ulUU4bvGhRWa2PlpLog/
-	 DyRGp1RK/lIiA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569AD3811A72;
-	Tue,  2 Jun 2026 20:30:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1780432350; c=relaxed/simple;
+	bh=D451K68YXi0VVvO2lWp+kSDvSLOugmI2bwM3iQUmO3w=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pu9J2yjo5TsizFT3xwbC2fSGXlxo8GNwIPnjvdexhrQ/Ysmb/YyHO9VIg+6IFxRYfTJYtWbns/RkSfP3WaMxsT/9aBi9CUsGSPfA31zIUljUXju66v5hbgpw24vdzTtxGKAdm74UTyknNZqaLnl7lsbLlesYxY4Pbcu4jUWY/Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7e6cb279950so3572170a34.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 13:32:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780432348; x=1781037148;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YL5nMlPraDN24Z7ecvcmfheTXvHmW6igzkP+gzLkuKc=;
+        b=bQqGozdScuRBFMFBYvu/VWjS5bx9SVFIk0/kuFFoKbWRLKEikiR5hbX5OOoaMXP9vW
+         DCLiWOJ7L1MzShr7GQWQvry0keRxtIr+vU3320bXNcXY6nL838B2mRNz1rv431o32zLQ
+         Q/wCcAZ3/5Iv3svvPKKRh7ZHGQwNcpcFmYMXHrBpC2K3hqE629rtXjjcsy0QEdubvlrE
+         zHnRA3rYWGjqH738h7zpqn0F0Rh9GnrVALx6p66ncwKh59a5X46ocxD01gA8jioKlb3m
+         5Ge9PR0VzT/3xppGtzZh55Z26W2cyJG74UsvMWB2gaaj3vkMCpaTTGg714G6N/ocvCq1
+         X1JQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8Vtfak6Y1s7cuHihsAljj+oNh8gqQSmaHMk/J3TN4Ht4uFkOhPNs+j3N6lvjugu21tSxmPUPw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbuGkdDE+kLRujAfPjQ4ycNC9r8Seni66g6nnifDghd+SBycnY
+	gRFDkRPpHN4o6FlDAFe8n5CdKEfwg6jvJaB4OmqoZihBU/+sCyJhIzWVrANyloDBkS57aVXXdS8
+	izW04Kd6SgwT9JZTmIpKA7+pySL0OCSWgwTtx7MINnSxTmjL/xLfeNG1B0SE=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: airoha: Preliminary patches to support
- multiple net_devices connected to the same GDM port
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178043221514.1036678.2722673754198790557.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jun 2026 20:30:15 +0000
-References: 
- <20260527-airoha-eth-multi-serdes-preliminary-v1-0-ec6ed73ef7fc@kernel.org>
-In-Reply-To: 
- <20260527-airoha-eth-multi-serdes-preliminary-v1-0-ec6ed73ef7fc@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, xuegang.lu@airoha.com
+X-Received: by 2002:a05:6820:4d87:b0:69e:35a5:136e with SMTP id
+ 006d021491bc7-69e47ecb87cmr326459eaf.24.1780432347870; Tue, 02 Jun 2026
+ 13:32:27 -0700 (PDT)
+Date: Tue, 02 Jun 2026 13:32:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a1f3ddb.7b89b7e1.205e57.000b.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Jun 2026)
+From: syzbot <syzbot+list14f4c43fd705908896b8@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-294404-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:xuegang.lu@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294406-lists,netdev=lfdr.de,list14f4c43fd705908896b8];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspotmail.com:from_mime,vger.kernel.org:from_smtp,googlegroups.com:email,goo.gl:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 681DA631BFC
+X-Rspamd-Queue-Id: 60181631D2D
 
-Hello:
+Hello wireless maintainers/developers,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-On Wed, 27 May 2026 12:21:14 +0200 you wrote:
-> EN7581 or AN7583 SoCs support connecting multiple external SerDes (e.g.
-> Ethernet or USB SerDes) to GDM3 or GDM4 ports via a hw arbiter that
-> manages the traffic in a TDM manner. As a result multiple net_devices can
-> connect to the same GDM{3,4} port and there is a theoretical "1:n"
-> relation between GDM ports and net_devices.
-> 
->            ┌─────────────────────────────────┐
->            │                                 │    ┌──────┐
->            │                         P1 GDM1 ├────►MT7530│
->            │                                 │    └──────┘
->            │                                 │      ETH0 (DSA conduit)
->            │                                 │
->            │              PSE/FE             │
->            │                                 │
->            │                                 │
->            │                                 │    ┌─────┐
->            │                         P0 CDM1 ├────►QDMA0│
->            │  P4                     P9 GDM4 │    └─────┘
->            └──┬─────────────────────────┬────┘
->               │                         │
->            ┌──▼──┐                 ┌────▼────┐
->            │ PPE │                 │   ARB   │
->            └─────┘                 └─┬─────┬─┘
->                                      │     │
->                                   ┌──▼──┐┌─▼───┐
->                                   │ ETH ││ USB │
->                                   └─────┘└─────┘
->                                    ETH1   ETH2
-> 
-> [...]
+During the period, 1 new issues were detected and 1 were fixed.
+In total, 31 issues are still open and 176 have already been fixed.
+There are also 17 low-priority issues.
 
-Here is the summary with links:
-  - [net-next,1/6] net: airoha: Introduce airoha_gdm_dev struct
-    https://git.kernel.org/netdev/net-next/c/ec6c391bcca7
-  - [net-next,2/6] net: airoha: Move airoha_qdma pointer in airoha_gdm_dev struct
-    https://git.kernel.org/netdev/net-next/c/528c5153a557
-  - [net-next,3/6] net: airoha: Rely on airoha_gdm_dev pointer in airoha_is_lan_gdm_port()
-    https://git.kernel.org/netdev/net-next/c/eca4f59b5367
-  - [net-next,4/6] net: airoha: Move qos_sq_bmap in airoha_gdm_dev struct
-    https://git.kernel.org/netdev/net-next/c/069626af6dfa
-  - [net-next,5/6] net: airoha: Move {cpu,fwd}_tx_packets in airoha_gdm_dev struct
-    https://git.kernel.org/netdev/net-next/c/962c17dd2878
-  - [net-next,6/6] net: airoha: Rename airoha_set_gdm2_loopback in airoha_enable_gdm2_loopback
-    https://git.kernel.org/netdev/net-next/c/842a7ee50d68
+Some of the still happening issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ref  Crashes Repro Title
+<1>  6959    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<2>  1127    Yes   INFO: task hung in reg_process_self_managed_hints
+                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
+<3>  628     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+<4>  316     Yes   INFO: task hung in ath9k_hif_usb_firmware_cb (3)
+                   https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
+<5>  48      No    WARNING in cfg80211_switch_netns
+                   https://syzkaller.appspot.com/bug?extid=3515319a302224e081b4
+<6>  39      Yes   WARNING: ODEBUG bug in ieee80211_led_exit (2)
+                   https://syzkaller.appspot.com/bug?extid=e84ecca6d1fa09a9b3d9
+<7>  38      Yes   KASAN: stack-out-of-bounds Write in carl9170_handle_command_response
+                   https://syzkaller.appspot.com/bug?extid=5c1ca6ccaa1215781cac
+<8>  34      Yes   INFO: task hung in nl80211_pre_doit (3)
+                   https://syzkaller.appspot.com/bug?extid=da14e8c0ada830335981
+<9>  19      Yes   WARNING in __cfg80211_bss_update (2)
+                   https://syzkaller.appspot.com/bug?extid=1a797e1c81be78a2ace7
+<10> 954     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
