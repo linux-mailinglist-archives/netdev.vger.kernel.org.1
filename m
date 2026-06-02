@@ -1,155 +1,217 @@
-Return-Path: <netdev+bounces-294018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294076-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBSJAnhlHmrCiwkAu9opvQ
-	(envelope-from <netdev+bounces-294018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 07:09:12 +0200
+	id 3+xOEXyOHmpHlAkAu9opvQ
+	(envelope-from <netdev+bounces-294076-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:04:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6BF628661
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 07:09:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F51A62A179
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6416A30698B0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 05:07:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4DBCE3053BEC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 07:54:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4BB30DD00;
-	Tue,  2 Jun 2026 05:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UeN/pKUs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6CA395AF6;
+	Tue,  2 Jun 2026 07:54:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2132.outbound.protection.partner.outlook.cn [139.219.17.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5039D301704;
-	Tue,  2 Jun 2026 05:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780376823; cv=none; b=QTJEqfXADppX1vy84t6lZHcV+oOB1WEZ9EPRTF7OYKuxUVHyRavmTzmtqH6xT6ZQKULnFMzIJCH0W3OnkLeoHzz6orRFbdJXoIR4HCthoLCh2+UeWYFAo15+g6OtCre7J8r8VbQiy+yjOUZeENzbM8Zkq3p2k+7EuFo0IcdtVlw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780376823; c=relaxed/simple;
-	bh=2xw4z+denoQtaqUQTWsmf3BYesfCsapdpHSs5vga+Qw=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MrPUQJtQSKCabMLYUeBDgJgKaboDrLCJm7rOrUPQRBWmjp8b2t3MIoh+4lrnRoELJfAvmH4YoWijfI6sO6vSu2Or+JQ4UYb2aD4XVtIiOOEVWvibavU34ups20/2ygj/5E+HFmxUkRwXzoUejYF/h/40/uYd7xCWzPMHGf04UoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UeN/pKUs; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C4321F0089A;
-	Tue,  2 Jun 2026 05:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780376822;
-	bh=gFJ8W6CrDyhZmev0pJLOWqhXjFC1ddwFDwPpjpyRgXk=;
-	h=From:To:Subject:Date:In-Reply-To:References;
-	b=UeN/pKUsymmpU95tafi+ZF8dofQOQsE2iqGDbtkpmfL7NVdZEbOMciEjFhT/kzxPn
-	 ppclcD9USPu5PSxvLNDwjt0UP+LDB6yvYMzGz9/13SmVyvB6iBWpMkHmN3NednYMsu
-	 +ecQsIextJsXphEZq1ysJcfk7AEi1CMixPscqCzub8CA4gygG6WKQfqVHm86F6lVsq
-	 TgyFrEHSBMwUXxMpl+D+vxiZj86uuUdfY701D9I4nVecuNkGfP2Nkx41exoFcPyM1D
-	 NGgkYo6f2cF7jATVFFQ57/Rv+A6dCQVZY4m0eEBXquP4azu10y4RS4YETS5qqZfux3
-	 J5J8VG2WyGsdg==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	achender@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org
-Subject: [PATCH net-next v3 4/4] selftests: rds: report missing RDMA prereqs as XFAIL
-Date: Mon,  1 Jun 2026 22:06:57 -0700
-Message-Id: <20260602050657.26389-5-achender@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260602050657.26389-1-achender@kernel.org>
-References: <20260602050657.26389-1-achender@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CBD372060;
+	Tue,  2 Jun 2026 07:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.132
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780386852; cv=fail; b=DveYm6MFmbIyEIX2rSMR2vhp0y9Cc7B82fsD+M0CXJ4goNCgEIZk/rdKfAhe87sutSVNNo7Adu7muc6pxV95knSn39PgWTCaKQQ/QKq9WljtXu5ZOBPdsfD1dPLOwNIwZAMrKRiFm8tuXAt+CLImI3/mryNI4o4mNioSA/cgQBE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780386852; c=relaxed/simple;
+	bh=JzUzjHRtiz9EtGngGMh09CX5i/kw6pD2E+Gh4eT2wFg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CQcEYgTrSss9fEt2Nxve5H7r0UzE02J5bQ9OxlMeLELPw3fqB7u31hyW/5KZOU/p7CAMBfuS9AvppnVSlKVuyJZ4B7hsEPKfW4CYCoNpQvU8fOxNxK3NZ8kuRQiqv7FH5+3yiYDOP93fKRV+tBrL0oAZTZV7y8qZjz295zOoems=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hdxx9fCZmONX/TrRczfHiuPqLI7sp+NuMVM5gEwAp31hsSUEeF1dcXspfmwtyygoDvB9a82fC0sAOJWDazpaeO3KhA+Q/Xba6RyqQsG88nngfPk9D6q4t67TNmzZKQlHKlI51Jov4AE68P30wxrxPZ1HNIM4L1SVlP87wL9G/PSGZtTIjRZ2eq97oDX2CnFU1cdhKchzDancgiRbjxobPM+9lHyJ6gZLeru/ndQwU5M5ygVPSYIaxqSKdIHe1lvYtyMMQXgZaogYxyAaaUI+wkOle8Y3dAkhqaZCPuvBeEV4qX+52bepP15IX1nR8rLhbG0t7eV/2rv567R+H6+1Vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V3mevj0wkzdwzydZBh2PncwK5aAQtxo9Ah9Wn1BkkYY=;
+ b=QEUv/8mB2gYIb8I+KFMysQXAQdDrErxglL+ekvHy5C/ZUOZndsSZYhiVAye7M+wfA58sN3IB/PZH7PVQ0VMp6XQgBfVlZVhV2/CcoRrFO5l0XdfVFpi4TuxjyhwP9Pn7xS1T1UDyOzFPorunDieZZJdUrUBlxyrqGTZOojhIcQiq011dGacyr7zdw8pwckpqQxXhO0dxJde3hhfAw4kVnU1InL4Mz8f9p+vQMHiNgcf7aZUILBsvUpASnkz/XBeT3mTRDh/bt9+DL6H75mrwp9T25xF/nXexedgyZkLNF43v7GADJ+ablFB748AtcWGL16lvC7sHPOjYSg8TXTPr2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::15) by SHXPR01MB0718.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.18; Tue, 2 Jun 2026
+ 05:19:23 +0000
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ ([fe80::9b99:12dc:a115:b90f]) by
+ SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
+ with mapi id 15.20.9891.021; Tue, 2 Jun 2026 05:19:22 +0000
+From: Minda Chen <minda.chen@starfivetech.com>
+To: Frank <Frank.Sae@motor-comm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next v5 3/3] net: phy: motorcomm: Add YT8522 100M RMII PHY
+ support
+Thread-Topic: [net-next v5 3/3] net: phy: motorcomm: Add YT8522 100M RMII PHY
+ support
+Thread-Index: AQHc7w+mH9U4hq4iQ02b/QTmPjv+rrYqwJ0w
+Date: Tue, 2 Jun 2026 05:19:22 +0000
+Message-ID:
+ <SHXPR01MB08633585004218C86DD44D27E6122@SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn>
+References: <20260529020530.16856-1-minda.chen@starfivetech.com>
+ <20260529020530.16856-4-minda.chen@starfivetech.com>
+In-Reply-To: <20260529020530.16856-4-minda.chen@starfivetech.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SHXPR01MB0863:EE_|SHXPR01MB0718:EE_
+x-ms-office365-filtering-correlation-id: 7edf5915-43f7-49ec-6818-08dec06681b5
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|18002099003|22082099003|4143699003|56012099006;
+x-microsoft-antispam-message-info:
+ yyZ4ys9tPuvHGPShNfy9VsotiKa+B/EmKT5LTgSCsjfdo+EmUWM5pnIT0Ql1y4Htvf4dQuRvXi1+Cgcem3UW15D+4e1S1MFkuLdadsrCchuzZTscKmVNI+ez65iJ7GnCCijEjM09V3qQn3vhOKneTkRj65KDVOzS0U3qWsLMh74SA9K/FavzDRRWcwXPv+zBjpaUuqaAJl6YGmKMLIrDNw3jps5lHFq3UK6gRsVDdhFPLWPYWfBbYhyWEU22QB3e2yRYNXlfGtj/Tbx2s/8QVlekYxxumkjfP6liJ+dSZzXY2VYNtDJuV5HgjmeQVH16BN19VyFRoaKh0E5RrC4k6m9Zbv7LlzihQmjAWiNvDje1ANsGyGzviDfhGJK77EbllPZlY02LqZQ5rPclMarbjRWnBLXj+EWeU6CRvlH1JNBOOdtUViGvRNbou3TclnqA7JmfRTq4Y1RKmitDIcNdyv9QS5rlIqTAELYVNFU0VE4XAC/tgt3x1+0NwqxIGh0EQ1b8UrI7yUJyINCNRYxgK8H4otFrtN+wN/5MQJuwf/8=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(18002099003)(22082099003)(4143699003)(56012099006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?zt3aNP0GW5M/NpvNLhltp8YaWTnwqG2vgY6g3+jLQtLgyR9kMkayPAU1SS3U?=
+ =?us-ascii?Q?H6xJSKVL30i74NZBewqVZbtkGL8ZwGFPwmwYWEHN0MRyY0bh4FDhZiPwjxX6?=
+ =?us-ascii?Q?PiBTIiOu2WV4ghj57zt/pjF9GqzmAyd3cz6e6j5BpXoWRn6ZmEDOiYqiLBjr?=
+ =?us-ascii?Q?SMFuN3bo87TcvMPHza8eGJI3Z7gAJupvhQejri+MWyrou/NkRS6DzLYroQI6?=
+ =?us-ascii?Q?PkXRaTLTqr+n6TQQzOcpbaeOzCNQBIK6A/FuiHDI2V2tUEvAvHI+K4UKUZ68?=
+ =?us-ascii?Q?G2M+7GWFwjmyWFZN50bL4b6fOTBEETcR7KOrpePGJpsCsLkTB5V9m8ZTqcQT?=
+ =?us-ascii?Q?QNcilXbQ+PbsWWuaSIpPav8E+euABowF2dlEd+bcskDyZIWKSChBsC8tkgqg?=
+ =?us-ascii?Q?O8IQQ9gfhRxefu3RLG0C/NfGh+TbdnwdjB38GIJdfjYjAwh3e6tWmDI4qm4x?=
+ =?us-ascii?Q?M86Uz6J3a01skI+s/W3YDLAslMYHSLOhwk+CQuDVwXIgBQ5XL8dFDK86Lfdk?=
+ =?us-ascii?Q?UB8P3M20QjweglTmJafw1F1d2UK5yhtqWae0K7SsYVXFeL5MIaq9vI3ZR0BU?=
+ =?us-ascii?Q?vci4qKYX4hxF9rI9EWHG3nwuANLq+gTqg3Slf3prZyTAxvhqwFsYMZabW0qw?=
+ =?us-ascii?Q?3zKANJ0xBpbz20oPFWkmTCW+WTWm1o2HAi1TM3DAbvHwlyg97Vbp0fCAarLE?=
+ =?us-ascii?Q?LAY0qlF5KgEKr6T5DB8TrBalFNP1S+i3QJeH+UutuVHA4mJ9tZMy86bYABxO?=
+ =?us-ascii?Q?mXAt0OnwI+JZphdqJH2UWK8nKni2Q3joiQAgQRQCOe5MxrKKrKic1w6EHFVZ?=
+ =?us-ascii?Q?jBfbvVWqvGqv43dwtvpz4+F5jPZDAkteeqNg7BG4YvA9So2Nqh3ILbxqU5ia?=
+ =?us-ascii?Q?/O2tClnbHyMbrcZxVQ7LZbuv2PPOGtg1OZOFJv96hqqfREuY2SAr2Q7rplxn?=
+ =?us-ascii?Q?FnC087Zg+ZQEFaRUeReZgKCii4popoNfKyMCtxN/xN/hmZB8wDbmZdc79XbK?=
+ =?us-ascii?Q?FJ5fP+HXZVKG455SmyaDHxHgYhUKvhLDdo2UNM13tqQW31KOdBW0n3tvj9vL?=
+ =?us-ascii?Q?LC69TA0Iqa8NwLB+VhkNdwodk8k++Hp6FHSH/PXqrMhfuHYyPSfBDVwHLslA?=
+ =?us-ascii?Q?v6jUv3LsdK/+tsdyI3KFij5EhxUabrkygEz8QPYoo7SKjYSb/yrlhY6dtR4g?=
+ =?us-ascii?Q?mqYqEnF45gw0tV5oq9D3yEdG9BgC6L5YMpS9dKQG03wFn6Xaof+8k/aTy1OL?=
+ =?us-ascii?Q?i6nSvlH6t9cQHj+qjA8j6QL3nOC2rceUeRdQsAKWfsEFNsBmCZAG0cY2U3oh?=
+ =?us-ascii?Q?GXHhTAXZhQISApvKEUF7ti7m2TLIQmvwBhB94tZIMyeavdgaaZuPvv/k1ZS4?=
+ =?us-ascii?Q?JwqIT5aelWH/sWDIcPbloBtFpofV5dQvcuvhBmSceNl3nywYYuVCli/xv70F?=
+ =?us-ascii?Q?4w3Rzo09lyJlMYi/aAAsVl2w4DqwQtaWPaLk/duTr8XAj+7BZ7GG5G6fQ/BE?=
+ =?us-ascii?Q?QhfSAQN6sQ23MBAKlW+/sEOezBpiC2JSh+cLP+wLcye+/Uw9OMJTM9nTvPYx?=
+ =?us-ascii?Q?BfOMS+K81nbn/of2L0ZhHbApeTO5YXH5HJJWrvZAynguILGT0Td0LMrlOD5+?=
+ =?us-ascii?Q?Tl20YufKbzid+BA5wq33IV3YhuQS/fDQkmApr+g8deGxSALynolFmlCawL7N?=
+ =?us-ascii?Q?r1n+xP/cVJt8aWfEnXoY4HlDVugRpQpk5JhbqOIugmjiCZRJPwjwuY7uGzuk?=
+ =?us-ascii?Q?vJj9V6VPPQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7edf5915-43f7-49ec-6818-08dec06681b5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2026 05:19:22.8025
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iWzgaII9kL7kdRiXXsvgfi+c5Dll2ZdzQWk0fs8hTp0rY3CkQmM1ui0pFyMcgakDqlpR+3eH6hSeT/qz117eTas+svIYGaLWLVGSkiOe2BE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0718
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-294018-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294076-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[motor-comm.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7E6BF628661
+	DBL_BLOCKED_OPENRESOLVER(0.00)[motor-comm.com:email,SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn:mid,lunn.ch:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,starfivetech.com:email]
+X-Rspamd-Queue-Id: 3F51A62A179
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Make the RDMA test return XFAIL rather than skip when RXE is not
-available, since the RDMA datapath is not run in netdev CI.
 
-Change the three RDMA-prerequisite checks in check_rdma_conf() and
-check_rdma_conf_enabled() to exit with KSFT_XFAIL (2) and tag their
-messages [XFAIL] instead of [SKIP].
 
-Signed-off-by: Allison Henderson <achender@kernel.org>
----
- tools/testing/selftests/net/rds/rds_run.sh | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+> Add YT8522 100M RMII ethernet PHY base driver support, including PHY ID a=
+nd
+> base config init function.
+>=20
+> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/phy/motorcomm.c | 49
+> ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 48 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+> index dcba50007451..a202015d3869 100644
+> --- a/drivers/net/phy/motorcomm.c
+> +++ b/drivers/net/phy/motorcomm.c
+> @@ -1,6 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0+
+>  /*
+> - * Motorcomm 8511/8521/8531/8531S/8821 PHY driver.
+> + * Motorcomm 8511/8521/8522/8531/8531S/8821 PHY driver.
+>   *
+>   * Author: Peter Geis <pgwipeout@gmail.com>
+>   * Author: Frank <Frank.Sae@motor-comm.com> @@ -14,6 +14,7 @@
+>=20
+>  #define PHY_ID_YT8511		0x0000010a
+>  #define PHY_ID_YT8521		0x0000011a
+> +#define PHY_ID_YT8522		0x4f51e928
+>  #define PHY_ID_YT8531		0x4f51e91b
+>  #define PHY_ID_YT8531S		0x4f51e91a
+>  #define PHY_ID_YT8821		0x4f51ea19
+> @@ -227,6 +228,13 @@
+>  #define YT8521_LED_100_ON_EN			BIT(5)
+>  #define YT8521_LED_10_ON_EN			BIT(4)
+>=20
+> +#define YT8522_EXTREG_SLEEP_CONTROL		0x2027
+> +#define YT8522_EN_SLEEP_SW			15
+> +
 
-diff --git a/tools/testing/selftests/net/rds/rds_run.sh b/tools/testing/selftests/net/rds/rds_run.sh
-index f01c81415331f..cdf487ec97dcc 100755
---- a/tools/testing/selftests/net/rds/rds_run.sh
-+++ b/tools/testing/selftests/net/rds/rds_run.sh
-@@ -123,10 +123,10 @@ check_rdma_conf_enabled() {
- 		probe_module "$2"
- 		return
- 	fi
--	echo "selftests: [SKIP] rdma transport requires $1 enabled"
-+	echo "selftests: [XFAIL] rdma transport requires $1 enabled"
- 	echo "To enable, run" \
- 	     "tools/testing/selftests/net/rds/config.sh -r and rebuild"
--	exit 4
-+	exit 2
- }
- 
- # Load the module backing a config that is built as a loadable module
-@@ -148,7 +148,7 @@ check_conf() {
- }
- 
- # Check kernel config and host environment for RDS-RDMA support.
--# Exits with SKIP (4) if the user requested rdma but prerequisites
-+# Exits with XFAIL (2) if the user requested rdma but prerequisites
- # are not met.
- check_rdma_conf()
- {
-@@ -163,9 +163,9 @@ check_rdma_conf()
- 	check_rdma_conf_enabled CONFIG_RDS_RDMA rds_rdma
- 
- 	if ! which rdma > /dev/null 2>&1; then
--		echo "selftests: [SKIP] rdma transport requires the 'rdma'" \
--		      " tool (iproute2)"
--		exit 4
-+		echo "selftests: [XFAIL] rdma transport requires the 'rdma'" \
-+		      "tool (iproute2)"
-+		exit 2
- 	fi
- }
- 
--- 
-2.25.1
+Thanks for the checking script, This should be BIT(15). I am sorry about th=
+is.
+I will send v6 in next week.=20
+
+Hi Andrew
+  Do you have any comment to patch 2?
 
 
