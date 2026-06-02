@@ -1,281 +1,147 @@
-Return-Path: <netdev+bounces-293996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293997-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CK8VLmtOHmrmiQkAu9opvQ
-	(envelope-from <netdev+bounces-293996-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:30:51 +0200
+	id QLBsJedRHmpqigkAu9opvQ
+	(envelope-from <netdev+bounces-293997-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:45:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F15627C82
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:30:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D0D627DE8
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 05:45:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C6F9301389A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 03:25:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 820B7302C156
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 03:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C44E3546E9;
-	Tue,  2 Jun 2026 03:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11AFF3382DE;
+	Tue,  2 Jun 2026 03:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KsIHo38i"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aehxblWR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287BB2C234A
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 03:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780370740; cv=pass; b=GHtstnXQJdhWNxxtWa4NPqvXcheJAhlMG0H1tAeV9OX+dyzMPZvRy9nO7m5hvRSlKRRKIv9Db6cuzM0eZyEpMhCQDF43NENlH0QOAWpTSfh8Bf6EkIWqDPn3+2Of21RwhpT7MW7Vb9Rr3NHklrYmJ0ZZUUF32VLc45OHrZ2TIx0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780370740; c=relaxed/simple;
-	bh=kVrya8B+QGvpgOLDt4XJgDg1K9yEMjFPjkc8boPgxEM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gK5m1vwn9BsZpxyJNg19e98Ap2q3AnB598IowUIn6EaXwEHceRC0Tvg+Xn5ZP5wBTQwLxMu8PGDGY+OYkEMdnQCu9au+VdKngMADsezZgx7OIlWo+Z5WVr5e2VIA7SX44cfCId7iKrA8Ct8FKLVC+R54X6nYGPCKuAhSW5ki1ys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KsIHo38i; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-137f0aa125bso132574c88.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 20:25:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780370738; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YOTXIkmQcobb96BkKnmfxR1IOd9E8cybL8cL2bwPW8eUfd7HZMZYLuBPDx14fYimnm
-         yix0HaV0M7wZyfO0NPRz9ie6ttLG4p5N+bvATGrEEnfpBBv+vM6DuVSMSf3ojWLpMjDa
-         nFpKDZr72hXVmmrKE16kcvgQjpfFiinC9WdQ771ZuKRmhGKxq60Oi9awtqscwfOtoj23
-         Ep16DV+jBZVlEZgMUYQC/N7praqM3NBaOPq8nyDLPpJIq/vLDGf3VVxCtOEwrnVq4bRD
-         Oz03eleMtOUWcKP9vORMv9JmmcAa8BuAo8itG8tudIAFNeYbp0anGyDMz564ZU6Ire8O
-         dIOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oKKAOhBxBZxfSeOOd1SZs8syItBH55TT6/f2ePXeYLw=;
-        fh=k47ySQKDBqISrLIPvpQ3loIQzCVh5fjhXnt97VOHDAQ=;
-        b=N6gfzHNw0ooMde5tIVLM0Ia2N10t4ZV8wpS8jrBjNd7DI4ibIg/gjjbil+6Ly/dARz
-         z0ehqs+Uo5XU8DZ7xQLWzjx/zOe6ZepTsM7vDmaPhCJe8VrGflE/r6jUoBc9SlCgaRIv
-         9hlh5SRiCdZG8MBHawvZR8ZnC4jDyaWQIAyM3P0PQi03XZa+b/khKqB2OR6x90wM9jA/
-         Ju4ALWRMUNwufg8vC6kdSg5XZyHc1zX4rqx2HZ6+Fp9cjVS5yEMoySvkGIv/pDTg6ul3
-         /O51ZPQIUUrE13IwL2DQIESoXUa4B9Qr5oaDMihg+mPdR9Xo2+IQoU0NBblgkUV6JaKX
-         8FSw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780370738; x=1780975538; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oKKAOhBxBZxfSeOOd1SZs8syItBH55TT6/f2ePXeYLw=;
-        b=KsIHo38iNM4pzwFjWSgOZh4M5O5SsgkalIUwgJtbNOT3OA3Ay2LkdAkon9mfcVkiiP
-         acYS0D3B0eZLgqKO1JEoEVCFXicQMVm/rkmTYJ04+cg7P5KkUIxaeH98KqhxPeVWFn45
-         q1wXlwykepUgaX5HQZg7Hxh/V7pqF/X4+aCrJ9FtyLBoMN4Z4o/bcjdqm+w2sNyyNdiA
-         u1sOk5VNaQHzt6MiQVjbypuOfYyqokyLtOvVN9spDMzfKUMOirMfSTAlK43VE9R63iie
-         DIgrFFzfi3EOG8tfZF+GiB5R+GygFXvL2qRANPsdlwCdRq/rICvgen6A/4MvJGNBNnV6
-         dmNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780370738; x=1780975538;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oKKAOhBxBZxfSeOOd1SZs8syItBH55TT6/f2ePXeYLw=;
-        b=Cwr0xb8GAgPpc63RzOqEUr2zYJw3fF+m/VtCVD8sPXomeg2pmC8I+SKnS5r+2yT66G
-         sQcnB8gw4PhcQSEVN7YldxHSBZ2GdIq3GBa0ao4NH0GbDlVbi6HQ2Sxrr2FVB2q07Knq
-         qRAHNLMLg8HRSWk7piI2al25syd6/+UgubBcXt7VD0tsxnEniTpDt7AUuqKp6S9t3Sgk
-         SbvgGkOrnkcJwhpTzIDrksbLRXLj8N7w8/Uvv2U6TsNFSg2jZZcs8DzwHjC3hHqyQUS7
-         exzoQ+wAxy2YZac7Rmqfyq+Ny3uZ5gxonGx+NWO6ZISPk1LHQ0wZLsqJ4h9pqnZy1VCN
-         T1fw==
-X-Forwarded-Encrypted: i=1; AFNElJ/cAhBwS3Vp0prHl8PyHsoo+bWxikEHmqaL5xbyvfZizYOcFIdR+YifLfoIuq4W5d7aQNLipfM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK3OSTmp5CHOWBLx3YQF4AfkpjQQe8T+QPaH7mHDP81pGGWfbp
-	rRhOHYgwDkUS9OrbwcGCfsz5tkpu+BTLrcGY2216hVPP58qChFyqBvEiwcIn4dgtpt+HG6KiQft
-	4TPnIRLVnD3vKE2l0bGzx/cMjcBs3GltKSdH1jU35
-X-Gm-Gg: Acq92OF6YoAY8WQ0eTnoVnUip9rFMAEeLQNvFsO/UoUn+ouM8VUbYwU7lRv1xW/RlVe
-	vXnWgTJ5CvHgBEDj0rAVJUlzuqjtTfs9heFowVfeo7x5T6VLbR6hlKt04YZEucRBqkK/niI4PDb
-	qBVsYJU1hGOjpYoRw2/d7wDC2AhHvHrtY24XLyEfAl6p5VAYeX7hCILJDiiyFhRkHqOWq3pT/1U
-	j3FeZkMtxKr7wjhsiEHD2njGUWqbTj4m6wXUhLMinVeqjZ9Gh96m/3aVK7ut/7337xWX/ocj/gq
-	8is5YjByLV9C5f/SjUnm8cZjb/+MI954DwAsqA7YVLfmlEzLGLeOnub/R2L/iENj82BAE13PpPO
-	BQkGu/V+7r8aR72D9hjgEsAEKJQVgeG4Kr2tIVKSzFdCiCoSzgDxzOVi4WGcEfj8=
-X-Received: by 2002:a05:7022:3d8c:b0:11a:3734:3db3 with SMTP id
- a92af1059eb24-137d42926a8mr5813595c88.32.1780370737587; Mon, 01 Jun 2026
- 20:25:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C240433A711;
+	Tue,  2 Jun 2026 03:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780371903; cv=none; b=VjgXlX/AGPSkmCCzLyb14kf+05JsEZ/rgSjcJ2x/WmVfw+f4mTeFpcRk5oPEjXHTzx8EZKjB+Wi7oZcqAnB3P7+Y/+IX7IUDkYzzwsPXLhtbE3JTpivZO9dFVbGvxmsx2NpEAfQdgzK1opLIGOUawIFr0CYI48pNef2m+7k6qmk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780371903; c=relaxed/simple;
+	bh=HwpN8nGPHa9vZKd4QTPNieJp5izSBqN3t0ZCSo0JzM4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AzrnP9ngA43W1BwfyZbnY64oNHil8SKQDflAA4PTH5HiwKmh1maqsy3g/x094KyPFeWzoQIPL74j+vb+hrul+K+4Kdfovr7zjOBe6sFQ24jWlXyt5EyRMmbNvJGNtoa6BuyfQYowGzUbxH08WOQwEFKuma4SYWRFJKuRCFtpXt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=aehxblWR; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651KS6Eo1231225;
+	Mon, 1 Jun 2026 20:44:39 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=PuUJc8Sm0SYzpkmzrkULbTtEZ
+	d2zM483fQ4/qp8SBH4=; b=aehxblWRq6qxMyBmV8RmqUZ8FCf0B0vY9yH8H8PPw
+	0mAHN2Q0GsuJQDk1il7YLkHXD8SGYQi/rvWz+zxLMKnw8Rr0T8lNWtPD3buYaMtr
+	E8U+KOwpss5cnBu2QW4u5CHwvBCaEu0fvM6WhtMcFJH8vEI2ceIHGp0Dv6Tyqwt+
+	0eu/sbODkIK4cTjiKKCyfXwoxRbb+A7ast+bHfJ+ZVsLecEET1IUWmPuosfQL/je
+	KaEUJ63QSERrAIKQ0c/mc9yMDTOSmUqj7Z+/Qk3+hlpgmi9VzGY61a9y5v9Xzzhu
+	aPQrDLqYif4UNZZscws6ajrH+T/FsXbdldLj0mlVTEEoA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ega3b6xbq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jun 2026 20:44:38 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 1 Jun 2026 20:44:37 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 1 Jun 2026 20:44:37 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id E820A3F7062;
+	Mon,  1 Jun 2026 20:44:33 -0700 (PDT)
+Date: Tue, 2 Jun 2026 09:14:32 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        "Saeed
+ Mahameed" <saeedm@nvidia.com>
+Subject: Re: [PATCH v17 net-next 3/8] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <ah5RoH1QwQhTjATn@rkannoth-OptiPlex-7090>
+References: <20260601025844.865865-1-rkannoth@marvell.com>
+ <20260601025844.865865-4-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260528005658.1756248-6-kuniyu@google.com> <20260602023402.1647750-1-kuba@kernel.org>
-In-Reply-To: <20260602023402.1647750-1-kuba@kernel.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 1 Jun 2026 20:25:24 -0700
-X-Gm-Features: AVHnY4LvVvl8qHegwUjRyZnM7UBQgGtb9RmGPhLGKTKTDOMURYPTphXn271ieGw
-Message-ID: <CAAVpQUD23owCGnbX0nxGgOGfjwr7At1sYncimrs6Sab6=rZ8yg@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 5/5] geneve: Introduce IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org, 
-	stephen@networkplumber.org, kuni1840@gmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260601025844.865865-4-rkannoth@marvell.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDAzMCBTYWx0ZWRfX5zzLhNaY8emk
+ D0faT4BjeJGwZ2eFfBb9ixFOmdimgK5xVykoV3LVAu4zApxS2/BPwC+FuZ27CrLoF56OgfhHVe8
+ E8Jkb37fb0Hzu4La+VgDc81WJi/8JZovuGuai8lEkZ8OJ54gVwOA5ZoYuBBDMkmN72WNiB1CzYd
+ SQ8I5tyeUOx2NzlCSdpohGch5sKi0YsZJgJYBzVnkAvfFOl1Ayv4sJr3JnQdhMqIs/TeGZzZPGR
+ PpsfvU7C2sYkWKGqJZEZpuAyZ8aXY4jvXo9so97NTSc5K81q0UYV1OiLY9EHDH/eKuqSEI9H+d9
+ zWYCW09MvWAmyXDWDYGOKegzh0XQyRWe39SUctLY05TRf4m0Zcu+aW26c4t5r6VXwRfAlCcOvvQ
+ RoD3rR6w5kMi78LZEB/6ogeW00Zstw9Or8vkw8n/DXQleQpG4IgibGOjXpHOwvbRcX9zNoJa+Fd
+ NGBXnLYGnzQWDRXJahg==
+X-Authority-Analysis: v=2.4 cv=cLjQdFeN c=1 sm=1 tr=0 ts=6a1e51a6 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
+ a=Ikd4Dj_1AAAA:8 a=WgJX6ROffo85cpo7s7MA:9 a=CjuIK1q_8ugA:10 a=ZXulRonScM0A:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: 7psVBpbBLPaxDa25zjezEvbOJ_d_-7-P
+X-Proofpoint-GUID: 7psVBpbBLPaxDa25zjezEvbOJ_d_-7-P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-01_07,2026-05-28_03,2025-10-01_01
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-293997-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,networkplumber.org,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-293996-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:email,marvell.com:email,marvell.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 40F15627C82
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 12D0D627DE8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Jun 1, 2026 at 7:34=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On 2026-06-01 at 08:28:38, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
 >
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> geneve: Introduce IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.
->
-> This patch adds IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6 attributes so a
-> GENEVE device's underlying UDP socket can be bound to a specific local
-> IPv4 or IPv6 address rather than the wildcard, and updates lookup paths
-> and xmit paths accordingly.
->
-> > diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> > index 3a62d132a8c4..c5372b33a305 100644
-> > --- a/drivers/net/geneve.c
-> > +++ b/drivers/net/geneve.c
->
-> [ ... ]
->
-> > @@ -1972,6 +2043,55 @@ static int geneve_nl2info(struct nlattr *tb[], s=
-truct nlattr *data[],
-> >  #endif
-> >       }
-> >
-> > +     if (data[IFLA_GENEVE_LOCAL]) {
-> > +             if (changelink) {
-> > +                     attrtype =3D IFLA_GENEVE_LOCAL;
-> > +                     goto change_notsup;
-> > +             }
-> > +
-> > +             info->key.u.ipv4.src =3D nla_get_in_addr(data[IFLA_GENEVE=
-_LOCAL]);
-> > +
-> > +             if (ipv4_is_multicast(info->key.u.ipv4.src)) {
-> > +                     NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCA=
-L],
-> > +                                         "Local IPv4 address cannot be=
- Multicast");
-> > +                     return -EINVAL;
-> > +             }
-> > +
-> > +             cfg->dualstack =3D false;
-> > +     }
-> > +
-> > +     if (data[IFLA_GENEVE_LOCAL6]) {
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +             int addr_type;
-> > +
-> > +             if (changelink) {
-> > +                     attrtype =3D IFLA_GENEVE_LOCAL6;
-> > +                     goto change_notsup;
-> > +             }
->
-> [Medium]
-> Should the changelink rejection here mirror the IFLA_GENEVE_REMOTE
-> behavior in this same function? IFLA_GENEVE_REMOTE only fails the
-> changelink when the family changes:
 
-REMOTE can be changed easily for each xmit, but LOCAL requires
-re-bind(), which would unnecessarily complicate the code, so
-I just disallowed changelink for simplicity.
+> +	case DEVLINK_PARAM_TYPE_U64_ARRAY:
+>> +		if (val->u64arr.size >= __DEVLINK_PARAM_MAX_ARRAY_SIZE)
+>Does this code reject an array that is exactly __DEVLINK_PARAM_MAX_ARRAY_SIZE
+>elements long?
 
-
->
->         if (data[IFLA_GENEVE_REMOTE]) {
->                 if (changelink && (ip_tunnel_info_af(info) =3D=3D AF_INET=
-6)) {
->                         attrtype =3D IFLA_GENEVE_REMOTE;
->                         goto change_notsup;
->                 }
->
-> whereas IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6 fail unconditionally
-> whenever the attribute is present, even when the value matches the
-> existing configuration.
->
-> Combined with the geneve_fill_info() change below, would this break the
-> common dump-then-changelink round trip used by some management tools on
-> pre-existing devices, returning -EOPNOTSUPP even though LOCAL was never
-> explicitly configured?
->
-> [ ... ]
->
-> > @@ -2320,6 +2441,20 @@ static int geneve_fill_info(struct sk_buff *skb,=
- const struct net_device *dev)
-> >  #endif
-> >       }
-> >
-> > +     if (!geneve->cfg.dualstack) {
-> > +             if (ip_tunnel_info_af(info) =3D=3D AF_INET) {
-> > +                     if (nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
-> > +                                         info->key.u.ipv4.src))
-> > +                             goto nla_put_failure;
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +             } else {
-> > +                     if (nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
-> > +                                          &info->key.u.ipv6.src))
-> > +                             goto nla_put_failure;
-> > +#endif
-> > +             }
-> > +     }
-> > +
->
-> [Medium]
-> Does this emit IFLA_GENEVE_LOCAL or IFLA_GENEVE_LOCAL6 on every
-> non-collect_md device, including legacy devices created without any
-> local address?
->
-> cfg->dualstack is only set true for collect_md devices, so for any
-> device where the user never specified a local address, info->key.u.ipv4.s=
-rc
-> is 0 (or info->key.u.ipv6.src is ::) but the attribute is still emitted.
-> This would change the visible output of ip -d link show and netlink
-> dumps for existing GENEVE devices, adding a synthetic local 0.0.0.0 or
-> local :: that was not present before.
->
-> Would gating this on a non-zero source address (or tracking whether the
-> user explicitly set LOCAL) avoid the dump-output change for unaffected
-> devices?
-
-Honestly I don't have strong preference on this.
-
-New iproute2 will show 0.0.0.0 or :: even for devices created without
-the attribute indeed, but I guess it's almost always the case that
-the dump command shows every attribute when we add a new one...?
-
-
->
-> The commit message describes the new behavior on devices that set
-> LOCAL/LOCAL6 but does not mention that fill_info now emits these
-> attributes for every previously-created non-collect_md device, nor that
-> changelink will reject any presence of LOCAL/LOCAL6 even when the value
-> is unchanged. Could the commit message call out these compatibility
-> implications?
+ACK.
+pw-bot: changes-requested
 
