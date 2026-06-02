@@ -1,222 +1,141 @@
-Return-Path: <netdev+bounces-294314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294308-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id daxvF+oQH2rhewAAu9opvQ
-	(envelope-from <netdev+bounces-294314-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:20:42 +0200
+	id HhPgGMEOH2pKewAAu9opvQ
+	(envelope-from <netdev+bounces-294308-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:11:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3E3630A5E
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:20:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A0C6308E9
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:11:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="C/g2TYcQ";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294314-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294314-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=eCH5oOBX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294308-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294308-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 46E653030D62
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:16:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1855C3040C2B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BFC3F8899;
-	Tue,  2 Jun 2026 17:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4E23B2AA;
+	Tue,  2 Jun 2026 17:09:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09B73F787E
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B013F54C4
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:09:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780420607; cv=none; b=Ka0bi/PMuzRZZMKK/SMYkHUMBwSgPKSaWshsU46M5pZl9SPtg+WsCv2vbA2ghDDAkCVuQK2y7VTLlfCFGh5EIOG7w0f8YAPWvhZR+q2TGA/jhEFeAsepQtCVL68dmUl+dGdVIRVjkDHPbmUXNWF/9/thK/S1HuvVIxGIkQiugHU=
+	t=1780420173; cv=none; b=M6nFC+6TOI3+xeFxFn1SXlYmCWoJ2unTiRYGQrS9dbAlKZ3aOtL/gKsU8OZOcExoAAmP7yaryik7oZg5qXD5pVfG18VvovMt05BgVpAu5ld4TnIcgZJEorcML+1+uvDvo3/eM6Lwsp90ZQLqtRQPGNFchPMpszWbhL6IhfA2SJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780420607; c=relaxed/simple;
-	bh=aChVinTtW06DYJMgsEjII6deRz2m7lW+ZvBbR/sgFp0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=b6zLY4S5suhH99rNeWKx/lWdJRo9CNgFLTD6khVtsZ7SDGlOkWAcxr7gpeLaM1XZ/fOIoI9A3r4s9ReXYq+R9H1rmz7iA/T7d+++CL4APHxS7HnXN92+EqTY5sRiaJVLpbf+yEW/tylYQIjEMvFCsX4iiy5A/auvPUxrAnoDy7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/g2TYcQ; arc=none smtp.client-ip=209.85.128.53
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4904fd4f6aeso98700595e9.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 10:16:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780420603; x=1781025403; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Gv92Sloivp2yvi05t2PfMcNMHYPgBL5QlmVi6nWQAxs=;
-        b=C/g2TYcQ7E373WeF2fovbXhoO9+zp8KqKPOaF/ZYOs2ezuMYr0oKzHOC9mxGiJTGlV
-         mfW6hLwOGcIcNirCEGrdtb3VEJT3dOB8wrm3/QOqe88ZwND826HLNoUK/hBAGSPKv4jR
-         FItFrpXXdMz1QJoqI3YPuUKVXuBxbI3prf+dSrBSfttu18o6Lodr6xlG5XulDFTxFfqE
-         4hxn6nBmBm+4BfoAGOuqpbk1hdK+JgeW/PoUKSRpWvQqwj5xV8+volXlqRtK/fYUnA75
-         G1ZMuh87aCdgPf3galDntMv8MLZmIO2HfT+nmTr6iLumafkUiIpx/+E60M/qr/v9O9W7
-         CsSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780420603; x=1781025403;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Gv92Sloivp2yvi05t2PfMcNMHYPgBL5QlmVi6nWQAxs=;
-        b=ariJIYaMz85exmlQxkTehnmW7fn0lswDZ9wPE12/ZcMPnGgs75WAGdVOUPiSmnXwsr
-         27CUAYQgLEuOEbfVwPf/UIXC0W1sODTFxoCrZt6GIjxXA31VGr7wQKHsRfA23GDBGbyc
-         VCitwSNx9Z/sdFTZ5STcQcaa5eVmuhuot8feE9dlyMnXdR875TrjvFCjwy2eq6oWr8OS
-         dYqAumslDjW5Sk+sUT6jTga3NMhtt+v49XXEUfgsXDGeRmBC6EuAxs+mQZLYPu65I6KT
-         chGOMYsq26HXeq0B+4s5alm/qg8s3MoBlqCfiSVHq6GU4NlaWXJiTIKflXWZjUTaPcjS
-         uKLA==
-X-Forwarded-Encrypted: i=1; AFNElJ+5guQyPvj1vqks8fRfQmOrumdA49kbmfnuPhauV7amOUimijgNzApWMd1Dg81o7cZpiGb7eio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKl2j4WF8dbv+6pbJVgMkgm+ZQexWvgH2zyssh/py2UYdqbD+b
-	c0C9AW3jdUI0IUzldXqofd8xdyEG+6jQYInEx5XzI9gqsTulnMRSn6I=
-X-Gm-Gg: Acq92OHX40dxCbS96FiZes2NcUczjkSwgE45RfT1pn70K8ZeEm7oXyIvZXTAHZQP9Lq
-	h0LokHBYrfGNf1M5gjY+NurxfciaXLlC8mij/d4KO2tLDrR9BvrhleGGR2cQkJCwEfe2IzKq0Dt
-	kpDxYmhzd2C4lEbDeBVKYjjjvs0S8gd3kvKQIlDAwto/ZhxYQU84tBOQYdP/MuMLFN0vh4BjivG
-	EWGMFMfWpiM8MIzxReyy001oexRxyyvRnNBTSJY1ncADuxMOF02Ct0Js+t+b1FddKDZlTaFOIQy
-	6AxsDOIFKwOa90pDbIH7B+sQLDLz1ZaxumQGSBKZXyQ2oA0Zcs0pYh6Ct8HW6L9Zce5AsipDVDo
-	SIbmiQKrycwN11/tYWhnN6noREeRknKnGz3VYNLnEznGCS02lvAuUY49w92Yz0WyrWoym3vin0B
-	RQVtwp8K86osL/ZQ==
-X-Received: by 2002:a05:600c:3f0d:b0:490:6e11:c303 with SMTP id 5b1f17b1804b1-490b50800dcmr11794235e9.13.1780420603115;
-        Tue, 02 Jun 2026 10:16:43 -0700 (PDT)
-Received: from debian ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b575aaa4sm544745e9.3.2026.06.02.10.16.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 10:16:42 -0700 (PDT)
-From: Tristan Madani <tristmd@gmail.com>
-X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
-To: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, chopps@labn.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: [PATCH v2] xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()
-Date: Tue, 02 Jun 2026 17:16:41 -0000
-Message-ID: <178042060186.32887.17301018074622852112@talencesecurity.com>
-In-Reply-To: <ah6rCd7up8i6173I@secunet.com>
-References: <20260528160318.2631699-1-tristan@talencesecurity.com>
- <ah6rCd7up8i6173I@secunet.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1780420173; c=relaxed/simple;
+	bh=zV8mJg/ulwrxR+PEa19yPUKXBMuYknTDOr05srO4sXU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o30n6xbwoUT/ZPZnlBKSbS7wc2coxsGPyFLPjRe0nw4BdM6sUys7JwDcgB9QW19uvvPBGwnMIkDfxQCdTAOG/+n72VwjqEFIKiB7rmUv6a7SZP8TZpxbmX/mh/XtZuuOzwdjdvbOXfOgHEMQk8lMfHOI1gw0MTJjGjc4sCPykYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eCH5oOBX; arc=none smtp.client-ip=192.198.163.17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780420173; x=1811956173;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zV8mJg/ulwrxR+PEa19yPUKXBMuYknTDOr05srO4sXU=;
+  b=eCH5oOBXs57DNV1PYYYADZkWm+D/eTk2iizEFcD+GQqa7U+mFXkSLNen
+   zFFViZeVESX1u8D2VD625RBz84j+ILpxkAtP7+gpDFgCFhySsyZxkTMMv
+   h/2EcHVPShH0qjeWfQqrwJ0GQOlr/V5CtLELR3cB52OxBtrEijmM3G6U/
+   2t7kg0G0dAklTeTzGICAfCKRE13Lc/BMegsJtX9Yj9O1bxlvcgAwLkBTw
+   Ukq+Al0Vg4u7mjHBqWRbVBqkbn51OKnLMeK3PCG5S9OP54VrzPC5VQiZN
+   UGhaj37cUQT2o0aFNXlcaU+/1NsqyjUCi5EOAyhM+ZEFdeitcYM6MMly+
+   A==;
+X-CSE-ConnectionGUID: uVtmYjvwRHGlcqTA+Mvr9g==
+X-CSE-MsgGUID: Huc5eSg3ThqwD+xOZ/VSXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11805"; a="81074144"
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="81074144"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 10:09:32 -0700
+X-CSE-ConnectionGUID: 96dHYEVyQCSSfybcPWMgKA==
+X-CSE-MsgGUID: Q5t1NlO3Tf+ZAuzRdz3W0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="241475795"
+Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
+  by fmviesa008.fm.intel.com with ESMTP; 02 Jun 2026 10:09:31 -0700
+From: Joshua Hay <joshua.a.hay@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Subject: [Intel-wired-lan][PATCH net v2 0/3] idpf: queue based scheduling fixes
+Date: Tue,  2 Jun 2026 10:20:21 -0700
+Message-Id: <20260602172024.2285947-1-joshua.a.hay@intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-294314-lists,netdev=lfdr.de];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294308-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:chopps@labn.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
+	FORGED_SENDER(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:from_mime,intel.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AD3E3630A5E
+X-Rspamd-Queue-Id: A4A0C6308E9
 
-Hi Steffen,
+This series fixes some TxQ scheduling mode issues exposed by recent FW
+changes, as well as some issues reported by Sashiko.
 
-You are right - the lock/unlock pair around the drop_timer cancel was
-only needed to serialize with the timer callback, which hrtimer_cancel()
-already handles. Since the xfrm state refcount has reached zero by the
-time the destructor runs, no concurrent iptfs_input() can be accessing
-drop_lock-protected state either. The empty lock/unlock is dead code.
+Patch 1 prevents XDP from being enabled if queue based scheduling is not
+supported by the firmware.
 
-v2 below removes it entirely.
+Patch 2 fixes a data race when accessing next_to_clean in
+IDPF_DESC_UNUSED. 
 
----
+Patch 3 fixes a NULL ptr dereference in the Tx path when queue based
+scheduling is enabled, and also adds support to process both 4 and 8
+byte completion descriptors to avoid timeouts in queue based scheduling
+mode.
 
-From: Tristan Madani <tristan@talencesecurity.com>
-Subject: [PATCH v2] xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()
 
-iptfs_destroy_state() calls hrtimer_cancel() while holding a spinlock
-that the timer callback also acquires, leading to an ABBA deadlock on
-SMP systems.
+Joshua Hay (3):
+  idpf: do not enable XDP if queue based scheduling is not supported
+  idpf: fix next_to_clean data races
+  idpf: fix skb datapath queue based scheduling crashes and timeouts
 
-For the output timer (iptfs_timer):
-  - iptfs_destroy_state() holds x->lock, calls hrtimer_cancel()
-  - iptfs_delay_timer() callback takes x->lock
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  3 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 60 ++++++++++++-------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 15 +++--
+ drivers/net/ethernet/intel/idpf/xdp.c         | 10 ++++
+ 4 files changed, 62 insertions(+), 26 deletions(-)
 
-For the drop timer (drop_timer):
-  - iptfs_destroy_state() holds drop_lock, calls hrtimer_cancel()
-  - iptfs_drop_timer() callback takes drop_lock
-
-Both timers use HRTIMER_MODE_REL_SOFT, so their callbacks run in softirq
-context.  When hrtimer_cancel() is called for a soft timer that is
-currently executing on another CPU, hrtimer_cancel_wait_running() spins
-on softirq_expiry_lock -- the same lock held by the softirq running the
-callback.  If the callback is blocked waiting for the spinlock held by
-the caller of hrtimer_cancel(), a circular dependency forms:
-
-  CPU 0: holds lock_A -> waits for softirq_expiry_lock
-  CPU 1: holds softirq_expiry_lock -> waits for lock_A
-
-Fix by calling hrtimer_cancel() before acquiring the respective locks.
-hrtimer_cancel() is safe to call without holding any lock and will wait
-for any in-progress callback to complete.  For the output timer, the
-lock is still acquired afterwards to drain the packet queue.  For the
-drop timer, the lock/unlock pair is removed entirely since it only
-existed to serialize with the timer callback, which hrtimer_cancel()
-already guarantees.
-
-Found by source code audit.
-
-Fixes: 4b3faf610cc6 ("xfrm: iptfs: add new iptfs xfrm mode impl")
-Cc: Christian Hopps <chopps@labn.net>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
----
-v2: remove the now-useless empty drop_lock/unlock pair (Steffen)
----
- net/xfrm/xfrm_iptfs.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 97bc979e55baf..82c52bbf25e1a 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -2708,8 +2708,9 @@ static void iptfs_destroy_state(struct xfrm_state *x)
- 	if (!xtfs)
- 		return;
- 
--	spin_lock_bh(&xtfs->x->lock);
- 	hrtimer_cancel(&xtfs->iptfs_timer);
-+
-+	spin_lock_bh(&xtfs->x->lock);
- 	__skb_queue_head_init(&list);
- 	skb_queue_splice_init(&xtfs->queue, &list);
- 	spin_unlock_bh(&xtfs->x->lock);
-@@ -2717,9 +2718,7 @@ static void iptfs_destroy_state(struct xfrm_state *x)
- 	while ((skb = __skb_dequeue(&list)))
- 		kfree_skb(skb);
- 
--	spin_lock_bh(&xtfs->drop_lock);
- 	hrtimer_cancel(&xtfs->drop_timer);
--	spin_unlock_bh(&xtfs->drop_lock);
- 
- 	if (xtfs->ra_newskb)
- 		kfree_skb(xtfs->ra_newskb);
 -- 
-2.47.3
+2.39.2
 
-Best,
-Tristan
 
