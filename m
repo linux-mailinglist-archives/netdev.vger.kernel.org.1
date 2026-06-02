@@ -1,196 +1,189 @@
-Return-Path: <netdev+bounces-294098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uG9IDTKgHmquDAAAu9opvQ
-	(envelope-from <netdev+bounces-294098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:19:46 +0200
+	id CGiLBNGhHmquDAAAu9opvQ
+	(envelope-from <netdev+bounces-294099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:26:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EAAD62B4C2
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:19:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B729562B797
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 11:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6D2EC3004692
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:16:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D4F533005382
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 09:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DBD3CCFC4;
-	Tue,  2 Jun 2026 09:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348A7385D97;
+	Tue,  2 Jun 2026 09:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X14OFgqS"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="W4XA5YLm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A62383323
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 09:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780391681; cv=pass; b=jbkMsUjIuikaDETju6nnXFOhgzea5obiHSwXkIAf9sL2klQ40VNFSKsMhhD3PqWnEoH8WGxu6/bEkj062+gPcZcKlwHcisQ3dFmigMZ6j8zpQDJ5D7JNL2oLTdQcFacpJ05vLjfJCq1Db7vcaS4B+XgVwN/5RZ2Cdc9dr/xxuNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780391681; c=relaxed/simple;
-	bh=Thb8rnvMXKOzLq+3rzbZD2QbzY7ih0kabUxEPV3mvR0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OHTomJEnTyLnsOSP6pWw7q5sSw17SQSXy5wa52m01XecbifTJHrlXs0Ip6V1HSMaKzTrbGbStT4kYD4iqJ+5uMq0qj73BA4AWujnlQb0GGb1lh8pJHOmPdZvx7k+wAf9r46xBmiNUMO2QBiymlAxki6ct/eygjeGU8xeYCfzFb0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X14OFgqS; arc=pass smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-9157b94a07aso53961085a.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 02:14:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780391680; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PuA3Nic7dubATTSdFTNAd7llvIE4DdFQ0i22Z8d5fS+zMj78hvs5UBmMHlSEscLxbL
-         Tj3gLZjZZSyr0T0FW0BUZKB/Hd7UuxU8F04/DjR9uujIvi8WISOxqxuicYdkuW8sq/7V
-         mMjVfvmO3ss+CYrXgr1PcKkddzMxilJnLX/hE/0LyVH+eRY7yaYS6o3ST5sbhndB998+
-         ZfGtIqMxGHFqV14mUDQjvdVpjChmYds6BCrrTeGAQDEoGcLrJ6ruIhqOYTb/ezJ/F69c
-         dhtPV16lKLNY5VTYNwTHDRgIEg3eEPcpD2tiqLbzZtfmEC1IS1BT0r2jAE0G7NBxXhUj
-         R2lQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=g3j92x6WEIOH7fOsQ+0GySgS/ybsvoUHbq6+YbJw3Oc=;
-        fh=D9T77AnLx4sGRSkZPPwSbpunRx9eSm9REMmOU/WKK+8=;
-        b=O7JLVMvP4n+t+HEoSvUC9iaM4EX1zYlRLtn+Jql4pf763unFIo9qAJhMxt+uvhSeBx
-         rWmymgNPJBkGb5ABfu1/PSECymE0mRI+Yq+0eVmg26pTdIR9tamg+r7s+jXOB93nU9Gy
-         VoWSJ5Ts05lQLAasOCG9VCoCWOe8PDH+9uAa7zIKNoK0s7OXq81CIVmdy65/wqZ6EpAh
-         PWF/yk3WCq+ZqCjbVN5bvli4hhc0QkOsL+SeAHK9sJ9SDjAkmKPBfvj1dRZ8Y68HyREY
-         Dg2SeFnWSFsuAVXXbRLPBGNcRQ21WPxeukwDguLKIkwYMMgr74AcBDhonGTb3+prXNIh
-         MHqg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A963B383338
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 09:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780391875; cv=none; b=oGpSHO8Jt838YK5XyXcQ43KWcki5JrxN3ITwtn+9H4kr13f+couQT8M7sPFh3gi18PHhtXu3fqqzuGRaDrEP+J91IsRXE5jeq2olx48wT4Ee/mUCXNaWNlvs6xicEs+es/FcXuVdxHiM3XksdjcbNAV4lDz53FdPbOUdLEWKxYw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780391875; c=relaxed/simple;
+	bh=lkoq18BJdFHaWQIhUQGJgSq0KL5ZtbgMks2pAZGWVl4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=IO0xlAa4E5gLwwR2x/Hy9FM3XC2eac/mehEfi1lDTHKpNIlIDyqZexF/1zGs7muCRt/0AyQTwycnv+HUWf0i97IHIb6gvTdKCnUdGdoV2Zzlun+ATCfnfcvEx2j4/oNF1GUo/LukCxue4TJFUmhrTUvF3++r23X4340FrF2Xc/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=W4XA5YLm; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-68ae265815aso8738229a12.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 02:17:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780391680; x=1780996480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g3j92x6WEIOH7fOsQ+0GySgS/ybsvoUHbq6+YbJw3Oc=;
-        b=X14OFgqSTi6Fxm6zR+6PPYKR2P26Xhm6if7wXeVeW49nM9lzntbJ6hbI0hd/FTWupI
-         1S+SE3zDW0FxKpROxNmA6Qf5e8SROnZAhtoG2BuF7voQ4hETObN2wWznE2ZkrNxl4gEe
-         PY+BD+o03Sd/RMp0fC0vu2g3O63w8+cuqkEiggGt4yWUoCcMIIt1jC+HyMRWrFT7af7/
-         1wTWj1Wz/2VPky1YogpWnoI+piKuRBU9bnctb4bUy1xCCNdgmWgbG32aTD+twf4wie4d
-         SSiC/K3ImZCdV6/0riNYb44Pdess0eRDGQC3DF+zQjB5gZvwZ+F8ZZrKHLx8Zeckxidw
-         /PKQ==
+        d=cloudflare.com; s=google09082023; t=1780391872; x=1780996672; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2t84N2IgJ4tv3CtpNoJS+773Ydo4nGG6xDktxtswRtU=;
+        b=W4XA5YLmtnufSMmI4lRMqSzGyLbGGS2RUrfckCzR3358QplZvMghEVHRHbQ5UCNqc0
+         hKPN5IFcAo1xUJ/4mFGc9/orB232bKu93R4wPMB8/oArJlMC40cU8rE8BE01ZCZMsq5D
+         3iJcrVCxhnXsF5efvcSIJuykmHtQ4TlEhPkPHg6jVIl/rtvgp3nJDmYYN9FVkXe6T4ug
+         ljiUofG6m/c799HLEAPWpCYaAWpckE7Ce7EWNeWdgYEgdqJt1Zv+i+tD0PmkEOSY5QV5
+         w0IE/8Wq0XP92Oomi3aLVP0jlOqHowaUF7Yc4wPh3MPQBpfTIOJxu5+QZzJcMWeyCj+M
+         duxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780391680; x=1780996480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=g3j92x6WEIOH7fOsQ+0GySgS/ybsvoUHbq6+YbJw3Oc=;
-        b=lTlXvFLU68Eyu6MhulD+N/TQILCEsnV5GwHLrheAzyvpdyVJBE9cUwVX6+AByJdhMU
-         DpBVEDyIE+H7kYDTEB0VjKyfBuhpk0fUHGn4tVJ3q1WCjSFgSZnYIMulA7x8p5jrGp3E
-         zJunKGLs+yZo34+eZ22ni60p6fLAiIsS7Mf2Yon2S2s1bj5ajl2XrYkhEmSk6OrMOQrM
-         O59Gw69jqw/4HRnJE4XtBrYC75E+kSdx4cAFN4krmMSINTFA65Iu7qYPZJcV6IhfROno
-         dCJs2VN00SbJh1FcNs4GjEr24JKxpjjP5vNKyXyzbaRpR5S2NdlUJYTgppAVCOVhZtZ3
-         U+Vg==
-X-Forwarded-Encrypted: i=1; AFNElJ98TvZJW86kk3VJX5JruGX+0tYUWwxdMCV/exVzuF+tZhy3O+7RvByuo58Sfb4cwonlaFd0WuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLmr2foL6uLbga5qwsxXtHVUH5s+jyypLkb9YTBNsvRirUVO6G
-	RZ9fvEk6Vxg3LwISKAUQMzzx7RrT28vTO+kYEZIkK622G1+VTeud9u7UfeRKZuQ7svC24k7yRq/
-	ow7GVO+OFTCL/nZE+na4dgzh8XZLGqb0fN9+Hw3K5
-X-Gm-Gg: Acq92OFXnXFxC8MgGC+ctsV5YsE/qwWaDtP4+k+/mKCMwl8D3byRsjVQLWOPl/u3Aqz
-	f0RoeMj/zxujg++0g2QiRTZp78z41PNIlatgizA4rS8MBVj6JrOxJtr+VlRNwA7DO1nG7F7Kwkj
-	VtZGSihiWjHQxZYMliV05oxwqEBjkYUpc3g+NCzDTgbzE6CyfWjReRrchO5ofYqBNZLAT3kTfwe
-	83rhVi5lDPfQ/90mXJbiQV++VlMggLKpbbYtbY15f+v5HK1ZwfmFCANmI4R+K+mbKbTEv6wrru/
-	lfIHDDox3zS4tpul0Qhlg2c/0tzTvnWuA1fH/AscxzMuD3GKAvD8dqM2unZUZqzm/4/FUhw937F
-	573TwuC49iobQ+Meqyz9LFILvC9KH
-X-Received: by 2002:a05:622a:2505:b0:50d:9b4a:e6f with SMTP id
- d75a77b69052e-5173a5e8040mr213274941cf.1.1780391679041; Tue, 02 Jun 2026
- 02:14:39 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780391872; x=1780996672;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2t84N2IgJ4tv3CtpNoJS+773Ydo4nGG6xDktxtswRtU=;
+        b=XfINCWuLOb2TosXTZ0wN4lQ+3NIBc2GzNYl6dkA58561YbGj5bJjZNwTz0gYtFZ0Rz
+         4q6/2xdf3kFqZawnaQoVaXBNF//mMRw2MwT4xqpNCSbmbnG4jF36jdiEZNNVzVaS5Tab
+         tsi/p7xrI4vnsr+Ul9HWY8ld3zLFDmh68myYpSEhRxhpH44cTC22d55vaMtycAVBGGjL
+         kXL6HxQNZ8fGDW3lUuWvGEBlFt0z2q5tGuxFwjApPdQf2rpL2OPfI5fmBqLeskTLNR3k
+         G2DGO0iMJ6X1/R/y8OFhUu3HFvg54j0lOS91tUEQDjRctqGaVcyxkT/plbBiqxrJ0LtE
+         CgCA==
+X-Forwarded-Encrypted: i=1; AFNElJ+yjn9N2N1Hf6KtDU36Vh84uG+upu9qc1uBqU7U102f3s5h1Om4jZ1Oox11NSiTTVYkb0uoy3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9koxLK0O3Rqz/n5s+0TmOSf8VE5lmbZqkV3Q69QSPH94VFlAP
+	0ZKkjathLdlvgE75Vw0eAQHhschuPOq2l8cMZZ3jKgD/DKbjR/Rhsd6RGEYA38/xyjA=
+X-Gm-Gg: Acq92OEmSQBvPiR53Pgtit1vkURIUboQ8st9xG9OF18eVyTkPRCpxRK3UY24dEAicky
+	fYGJ3NCuvw6f0hA7EN46NrBeb3MKtZPI69Ci6kCSflaedy0/rRY2jZmvq6S3EoaO6c6o3pmq1rT
+	LjlviG3STrJSjyNsYrHwCxzsb2o/+1p1dTo7NgAL+0a+0LoKHULuQzfSYW9z8y4CWu1U5KSvVV1
+	tBpLed5vHVd0VWfjZf/3DPiCRPC5ae0KJWKe21/ADILFf0iZ2rMjLAlF0S3xkImGf8aeEnPnxZq
+	OL+CHCCYbeZci9SsrKry4SBD1/16GYTw/gZJXwyGXnLkMSXZ6YeDz9+GYIa4mQCSAZwOe9UEVAW
+	5Ux+JnbMi9l2thA8DRv139DqXDdq9XVELJAqeQ/dh3qfqCtZanXCh2m88EPvkoDQB2NLv9mdr3n
+	V8FryGZ+iD+FM/s6+/phKennxONloy3rPinVXr
+X-Received: by 2002:a50:c946:0:b0:68c:7f5e:5261 with SMTP id 4fb4d7f45d1cf-68c8a3732d0mr6294414a12.5.1780391871878;
+        Tue, 02 Jun 2026 02:17:51 -0700 (PDT)
+Received: from cloudflare.com ([104.28.21.182])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68ceb7916e9sm3152537a12.6.2026.06.02.02.17.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 02:17:51 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  michael.chan@broadcom.com,  joshwash@google.com,  tariqt@nvidia.com,
+  haiyangz@microsoft.com,  linux@armlinux.org.uk,
+  maxime.chevallier@bootlin.com,  willemb@google.com,
+  ernis@linux.microsoft.com,  sdf.kernel@gmail.com,
+  kory.maincent@bootlin.com,  danieller@nvidia.com,  idosch@nvidia.com
+Subject: Re: [PATCH net-next 02/14] net: ethtool: make sure
+ __ethtool_get_link_ksettings() is ops-locked
+In-Reply-To: <20260528231637.251822-3-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 28 May 2026 16:16:25 -0700")
+References: <20260528231637.251822-1-kuba@kernel.org>
+	<20260528231637.251822-3-kuba@kernel.org>
+Date: Tue, 02 Jun 2026 11:17:50 +0200
+Message-ID: <878q8x5mip.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260601061304.344248-1-jiayuan.chen@linux.dev> <20260602005915.3474979-1-kuniyu@google.com>
-In-Reply-To: <20260602005915.3474979-1-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jun 2026 02:14:27 -0700
-X-Gm-Features: AVHnY4Jp08Gasiud5lSa-TXdDMVtxAEieTG_UEDGa40z59uWSH6511403_aKwxI
-Message-ID: <CANn89iKsSPqeVsYLtWiwkSMbF9oKig-Fwc-MOC4BY-a0Y+w4kg@mail.gmail.com>
-Subject: Re: [PATCH net-next] macvlan: fix use-after-free of macvlan_port in macvlan_fill_info()
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: jiayuan.chen@linux.dev, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2EAAD62B4C2
+Content-Type: text/plain
+X-Rspamd-Queue-Id: B729562B797
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,nvidia.com,microsoft.com,armlinux.org.uk,bootlin.com,linux.microsoft.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294098-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294099-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,linux.dev:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cloudflare.com:dkim,cloudflare.com:mid]
 X-Rspamd-Action: no action
 
-On Mon, Jun 1, 2026 at 5:59=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
+On Thu, May 28, 2026 at 04:16 PM -07, Jakub Kicinski wrote:
+> __ethtool_get_link_ksettings() is exported and called from sysfs
+> and many drivers. Looks like commit 2bcf4772e45a ("net: ethtool:
+> try to protect all callback with netdev instance lock")
+> missed adding the lock around it. Not treating this as a fix because
+> I don't think any driver cares at this point, but if we want to
+> remove the rtnl_lock protection this will become critical.
 >
-> From: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Date: Mon,  1 Jun 2026 14:13:03 +0800
-> > This issue was reported by our internal syzkaller [1].
-> >
-> > rtnl_link_ops->macvlan_fill_info() reads and dereferences
-> > 'port =3D vlan->port'.
-> >
-> > However, when we delete the underlying physical device of a
-> > macvlan (e.g., eth0), we traverse all child macvlan devices and call
-> > ndo_uninit -> macvlan_uninit.
-> >
-> > Each child goes through ndo_uninit -> macvlan_uninit, which
-> > synchronously kfree()s the shared port once the last child is gone, but
-> > does not clear vlan->port. The child netdevice itself is NOT freed here=
-:
-> > its free_netdev() is deferred to netdev_run_todo(), and a concurrent
-> > rtnl_getlink() additionally holds a reference via netdev_hold(). So the
-> > netdevice stays alive with a now-dangling vlan->port, which
-> > macvlan_fill_info() later dereferences -> use-after-free.
-> >
-> > Here, we set vlan->port =3D NULL after kfree(port), and then add a NULL=
- check
-> > in macvlan_fill_info(). Both kfree(port) and vlan->port =3D NULL are at=
-omic
-> > under the protection of the rtnl lock, so this is safe.
-> >
-> > In macvlan_fill_info(), if port does not exist, we should simply ignore=
- it
-> > and not goto nla_put_failure; otherwise, it would trigger WARN_ON_ONCE(=
-1)
-> > in rtnl_getlink().
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  include/linux/ethtool.h |  2 ++
+>  net/ethtool/ioctl.c     | 20 +++++++++++++++++---
+>  net/ethtool/linkinfo.c  |  4 ++--
+>  net/ethtool/linkmodes.c |  4 ++--
+>  4 files changed, 23 insertions(+), 7 deletions(-)
 >
-> The splat implies the same class of issues in other devices, so
-> I don't think this macvlan-specific fix is the right approach.
->
-> We should give up dumping if dev->reg_state is not NETREG_REGISTERED
-> after acquiring RTNL, and I think Eric was preparing such a patch ?
->
-> https://lore.kernel.org/netdev/CANn89i+UMyx-rKO0ScZkcJYG_vk=3D_kddcQC+Sxb=
-bYSEyUTPgGw@mail.gmail.com/
->
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 1cb0740ba331..0caaeb91b094 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -325,6 +325,8 @@ struct ethtool_link_ksettings {
+>  extern int
+>  __ethtool_get_link_ksettings(struct net_device *dev,
+>  			     struct ethtool_link_ksettings *link_ksettings);
+> +int ethtool_get_link_ksettings_locked(struct net_device *dev,
+> +				      struct ethtool_link_ksettings *link_ksettings);
+>  
+>  struct ethtool_keee {
+>  	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
+> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+> index bd97f9b9bf18..1d74ee67e77a 100644
+> --- a/net/ethtool/ioctl.c
+> +++ b/net/ethtool/ioctl.c
+> @@ -436,10 +436,10 @@ struct ethtool_link_usettings {
+>  };
+>  
+>  /* Internal kernel helper to query a device ethtool_link_settings. */
+> -int __ethtool_get_link_ksettings(struct net_device *dev,
+> -				 struct ethtool_link_ksettings *link_ksettings)
+> +int ethtool_get_link_ksettings_locked(struct net_device *dev,
+> +				      struct ethtool_link_ksettings *link_ksettings)
+>  {
+> -	ASSERT_RTNL();
+> +	netdev_ops_assert_locked(dev);
 
-Indeed!
+Not sure why we're using the "compat" assertion here, which falls back
+to check if RTNL is held, instead of the newly introduced
+netdev_assert_locked_if_ops().
 
-https://lore.kernel.org/netdev/20260602091319.1753654-1-edumazet@google.com=
-/T/#u
+The contract here is that all callers are expected to hold the
+netdev lock (if needed), IIUC.
 
-Thanks!
+[...]
 
