@@ -1,199 +1,229 @@
-Return-Path: <netdev+bounces-294139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294140-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPcMNIayHmr7JAAAu9opvQ
-	(envelope-from <netdev+bounces-294139-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:37:58 +0200
+	id +Fp/KDSzHmr7JAAAu9opvQ
+	(envelope-from <netdev+bounces-294140-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:40:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03D462CB83
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:37:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4229C62CC1D
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 792A03006924
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:21:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 973A2302D0A5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8AF3D3D09;
-	Tue,  2 Jun 2026 10:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75173D349A;
+	Tue,  2 Jun 2026 10:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgq40C9T"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="iU/zv8Wu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486FA1A6811
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 10:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FD536A03A
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 10:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780395671; cv=none; b=rVhcurt/5wvRMnkSkp4+SzJHtjefmqMRWJSPm2EZtyS2N6pLnAk+Zb+tTuyG69UcQW3jz5BnzBA5tozr6w0tYGpcWSG7+Ijn+ejA+R+9KHFnl9inF6w2XDmTvaTnhgztFkG67oax3+QWBKBuVm5zIOAUaL828lNhdwGfBpRAY1U=
+	t=1780395837; cv=none; b=py0XhqjARTArs2bhDYtDQAsXS3jYmqJR5u/HAGipWS35z+TtdiT2nM2Xom7QD3RDp6fr3G5NibX9B/XmbB42ZKQQQ4KAv9bgCeygFIkR9EbJF5Ub4pOjGk3KjysBrilFfrhME4mZbzQSREPRjxauw7pm6eZPaDribA8cKOf/nkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780395671; c=relaxed/simple;
-	bh=+4cHcDc8kuAJc5aNRNtmAM0yDMNGCgeOgwIdNSW4zwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hCnHD3KWO2KZSLen6krIOpQ5ioJLaEDtLQtVU38vNZHl3zKf6pHhKd4TQU0XfJ0qiBHR2+0xMpRU7ku4tqsOMRjqvUGSJ0pJ33xV/9s34V0ILghpX5qG2Ic6IT4rNNJIin/8WlK9PUHbt3O1xacOBqkRbAl2hy8YTh5Ih+J1xvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgq40C9T; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2c0b9328c4aso18448615ad.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 03:21:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780395669; x=1781000469; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ikY1El5docE8q+sLqTg4r7/Wm1ohIOfVrhz9dhSUA/E=;
-        b=fgq40C9TYIWL+fv6LbkJpmGDIES7/9bEpbivS4wivAPUci37biZSP+rPFqqaIMxhS6
-         qnIUtqObTORqhzVwkpuXuaOI2ez/UPLocoqASPhZsIiyN3YzKUiEMX8TmK35BWmofEI4
-         lfZ7sC/hTGwzDe0JDm8GPtF4Q+9emyjx+K/RGNKMT27PRU8UgTtKo0vpCYuL+vVp/L5L
-         NOLo85kmNenkdZE0O8MDxw4NFcyoYT7pgeLyrOSUPtqGpdbqZf04bU6undTc6zsh5y1k
-         fs57pfvYZWacYIfqwr+JdxGTcGy9oW5naS9jpJ9NEZgxFV0KcwGN6EmnKyI2z1/1BUSo
-         guOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780395669; x=1781000469;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ikY1El5docE8q+sLqTg4r7/Wm1ohIOfVrhz9dhSUA/E=;
-        b=aOriEIcu76INKd/rmjpecg99MzQkGF+0J9sNHwQxCaz9iS+1SA4x5QYK4Cg81xj5gi
-         2zEoy7v3jn1dwAa80cSgIcIghppySnSDI5kHBo90D4Sw0y0V1XzVDjlTDRUzqnF8ixAJ
-         yKSmLugmBj8xDXCWelWLYeEyh83r+/YgNbl0hwS/hs2RSCnrW9PipQIzZ8bJpwMsk3q8
-         pKYidnyDY8+PXHTXxxz2fHhwLckERVOPmxX29IcizNr8IA2zoB0g+soL11j/o7oWFf46
-         SZtur0chrJIqa+ly72CpqmDmjaYhax2dWNbxBxpb6GtXZrYmNlId7qkhIOSHiCjPo65S
-         B5OA==
-X-Forwarded-Encrypted: i=1; AFNElJ+F6e/C+KK+zWuMaGbAwQyPxIp9aTRh1DHKqSL65FqvRhwJMZlH5kPsoxNgMWAb6weXWvFOjtY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMXH6yGqYBEknh8ualWrkWCxwRB2oaIGXWJBmjGVI0dRsFIL2q
-	Dx1AXMfvCdWwTFgpF9gDWkUaHXpEu4IxMwHPEvmVKUnlFZf11sgPhFsn
-X-Gm-Gg: Acq92OHtdkXdn6SrqII9RHHyBpmDqsCpBNj1Gqj5H4dr6vSmv/EFGr0KaNuk/WYD/Py
-	qD769e9wvuZADBtGQUVacjOfWP5imFti6iMkQnql4LUMVvMqlGXavQ1RqUcXmLDhpuJZtgOg34V
-	YAcHMPPILHLuZDtM3NqVjpK+Jr9O1La8HDh1wANkDBvZDFo34nH5ennu1gLiMPkWCYekVwL98KQ
-	YKvXL1nAOQl10hnOS37oPdzbsGVVlE808KVRzx54ltkwwWBYq8bHMsr4Tw8I1ihw11E3HGVwb6Q
-	jpW7v78N0IYPTDV/GjbdWGWn07/rNNI7asxgad0APWI1CBXmePxT5KnNsNEf4Ur5eUeXmJzBo0D
-	P9UQpsTVrLWh9PmER0i7kxR3CBTm+TpCN9u53q1Fjf+1fFnj9ZrUefBWva6mK4iBEC0CCk6wIrH
-	fIEmvjIU0mwKGriS5yjJp96QWpQ3BVnYmAUycP+mClfzaJRa/puxpN/Y4cxgoJTLcP
-X-Received: by 2002:a17:903:1c6:b0:2ba:25ca:b49f with SMTP id d9443c01a7336-2bf367d6cf2mr167163525ad.17.1780395669392;
-        Tue, 02 Jun 2026 03:21:09 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23a2dbfbsm131215415ad.37.2026.06.02.03.21.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 03:21:08 -0700 (PDT)
-Date: Tue, 2 Jun 2026 19:21:05 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net v2] inet: frags: fix use-after-free caused by the
- fqdir_pre_exit() flush
-Message-ID: <ah6ukYq5G98LshdA@v4bel>
+	s=arc-20240116; t=1780395837; c=relaxed/simple;
+	bh=GX0E5kFJRL4Iy6TUg0ciKUMKrxqHAtk2c2ZsdcByY2Y=;
+	h=From:To:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Kr5OVppjA+9UgfFBAZHk1xwnYlwqs8gsz9/bbmdHsmIGX/j2tey0irD9yDgmDAvaxrfaEMGpPAhl38jddM9qxdqebjg+Bx0Cp0+NmV1hjACgtUcPZr78q3lL4wl7mbQHQRqSY8F5xFKqozD2iurMsfTa4ks/IWf618QOp/pdKuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=iU/zv8Wu; arc=none smtp.client-ip=212.227.17.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1780395809; x=1781000609;
+	i=markus.stockhausen@gmx.de;
+	bh=GX0E5kFJRL4Iy6TUg0ciKUMKrxqHAtk2c2ZsdcByY2Y=;
+	h=X-UI-Sender-Class:From:To:References:In-Reply-To:Subject:Date:
+	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=iU/zv8Wu40Ze/wo07r9hnH2Q3V21ySj7gKVjrCb737cNmOJveLBBxMUZxC1Xvjde
+	 ai1TC1GxIrWTers1B+Xm7+dIq07eVd7b6Qll4s3aavggYQxQxypkOToGq5xusUg0E
+	 Bg0ZMCj8vai2w/NDSb7S+aHg41n/U/1ELTxC9oA+BksQDj7fpu4Tx7lxAE7qbaiIC
+	 mSRCWH9ebGmhiumQatyZXNHRNnVWxHxBEIeRg0syeg89uvZgAhLnGBpDAfcFA+Qgl
+	 S22uUpYPsJ5pduy4CrY6KK0UJTGC8yKvfuwLYMvmNe+OO9RdTrrNhWE+qMdhsc1wo
+	 WuV8BxipBOSpLGyfPA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MMofc-1wkvED2IOy-00Z09C; Tue, 02
+ Jun 2026 12:23:29 +0200
+From: "Markus Stockhausen" <markus.stockhausen@gmx.de>
+To: "'Jagielski, Jedrzej'" <jedrzej.jagielski@intel.com>,
+	<andrew@lunn.ch>,
+	<hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<netdev@vger.kernel.org>,
+	<chris.packham@alliedtelesis.co.nz>,
+	<daniel@makrotopia.org>,
+	<mensi@mensi.ch>
+References: <20260602052640.93083-1-markus.stockhausen@gmx.de> <20260602052640.93083-3-markus.stockhausen@gmx.de> <PH0PR11MB59021E62692FC52557016A9DF0122@PH0PR11MB5902.namprd11.prod.outlook.com>
+In-Reply-To: <PH0PR11MB59021E62692FC52557016A9DF0122@PH0PR11MB5902.namprd11.prod.outlook.com>
+Subject: AW: [PATCH net-next 2/8] net: mdio: realtek-rtl9300: Correctly handle ethernet-phy-package
+Date: Tue, 2 Jun 2026 12:23:27 +0200
+Message-ID: <012f01dcf279$db256d60$91704820$@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Rspamd-Queue-Id: F03D462CB83
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQCd5JwkUMOmloq9EQ3T8rs5/ndXAgD+IiDDAudyO3S4ifyGgA==
+Content-Language: de
+X-Provags-ID: V03:K1:CidbYGg6OwP0dtBsm3zl9VbnWeeJ6Clb5hFknRh58MPUk0kczMY
+ FUJm3MT6VnaRQDkdJSyPWTmH02d2RtxsU6/pvju7dgouwMAyp5Ww6xHVnFn28PGtXLtYG08
+ hQpUak49IR2xxj4EtZYhofMhU6B4ctcMQQ2KuTx+yxT5z+I1uw4QBJoWZg9CCwbzp2ORbQa
+ kWfbTQX+Pmfu6xlX/6Lrg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:X8/ZUkaSJus=;C95YVgozyhlRmD4XfruUdBHkECj
+ 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
+X-Rspamd-Queue-Id: 4229C62CC1D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-294139-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[intel.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org,mensi.ch];
+	FREEMAIL_FROM(0.00)[gmx.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-294140-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmx.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gmx.de:mid,gmx.de:dkim,gmx.de:email,mensi.ch:email]
 X-Rspamd-Action: no action
 
-On netns teardown, fqdir_pre_exit() walks the fqdir rhashtable and
-flushes every fragment queue that is not yet complete using
-inet_frag_queue_flush(). That helper frees all the skbs queued on the
-fragment queue but does not set INET_FRAG_COMPLETE, and leaves
-q->fragments_tail and q->last_run_head pointing at the freed skbs.
-The queue itself stays in the rhashtable.
+> Von: Jagielski, Jedrzej <jedrzej.jagielski@intel.com>=20
+> Gesendet: Dienstag, 2. Juni 2026 11:32
+> Betreff: RE: [PATCH net-next 2/8] net: mdio: realtek-rtl9300: Correctly
+handle ethernet-phy-package
+> ...
+> >Signed-off-by: Manuel Stocker <mensi@mensi.ch>
+> >Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
+>=20
+> Hi Markus
+> quite unclear (at least for me) what's Manuel's role on that patch.
+> If he's a co-author please add proper tag, if you are sending Manuel's
+patch on his behalf please change authorship.=20
 
-fqdir_pre_exit() first lowers high_thresh to 0 to stop new queue lookups,
-but it cannot stop a fragment that already obtained the queue through
-inet_frag_find() earlier and stalled just before taking the queue lock.
-Once that fragment resumes after the flush and takes the queue lock,
-it passes the INET_FRAG_COMPLETE check and then dereferences the freed
-fragments_tail. inet_frag_queue_insert() reads FRAG_CB() and ->len of
-that pointer and, on the append path, writes ->next_frag, causing a
-slab use-after-free. IPv6, nf_conntrack_reasm6 and 6lowpan reassembly
-share the same flush path and are affected as well.
+Unsure about this but situation as follows:
 
-Reset rb_fragments, fragments_tail and last_run_head in
-inet_frag_queue_flush() so a flushed queue no longer points at the
-freed skbs. A fragment that resumes after the flush and takes the
-queue lock then finds an empty queue and starts a new run instead of
-dereferencing the freed fragments_tail. ip_frag_reinit() already
-performed this reset after its own flush, so drop the now duplicate
-code there.
+- Manuel identified the issue downstream and sent a patch [1]
+- I advised to make that a separate function.
+- Manuel sent a new version that I merged
+- Now I'm sending the same upstream
 
-Cc: stable@vger.kernel.org
-Fixes: 006a5035b495 ("inet: frags: flush pending skbs in fqdir_pre_exit()")
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
-Changes in v2:
-- Move the queue pointer reset into inet_frag_queue_flush() to remove the
-duplicate reset in ip_frag_reinit().
-- Drop the INET_FRAG_COMPLETE setting since it leaks the queue on the
-fqdir_pre_exit() path.
-- v1: https://lore.kernel.org/all/ah1Sw2g-I89BRRiT@v4bel/
----
- net/ipv4/inet_fragment.c | 3 +++
- net/ipv4/ip_fragment.c   | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Please advise how I need to reflect this here.
 
-diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-index 393770920abd..1127519b8416 100644
---- a/net/ipv4/inet_fragment.c
-+++ b/net/ipv4/inet_fragment.c
-@@ -328,6 +328,9 @@ void inet_frag_queue_flush(struct inet_frag_queue *q,
- 	reason = reason ?: SKB_DROP_REASON_FRAG_REASM_TIMEOUT;
- 	sum = inet_frag_rbtree_purge(&q->rb_fragments, reason);
- 	sub_frag_mem_limit(q->fqdir, sum);
-+	q->rb_fragments = RB_ROOT;
-+	q->fragments_tail = NULL;
-+	q->last_run_head = NULL;
- }
- EXPORT_SYMBOL(inet_frag_queue_flush);
- 
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index 56b0f738d2f2..c790d2f49487 100644
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -250,9 +250,6 @@ static int ip_frag_reinit(struct ipq *qp)
- 	qp->q.flags = 0;
- 	qp->q.len = 0;
- 	qp->q.meat = 0;
--	qp->q.rb_fragments = RB_ROOT;
--	qp->q.fragments_tail = NULL;
--	qp->q.last_run_head = NULL;
- 	qp->iif = 0;
- 	qp->ecn = 0;
- 
--- 
-2.43.0
+Markus
+
+[1] https://github.com/openwrt/openwrt/pull/23591
+
+
+
 
 
