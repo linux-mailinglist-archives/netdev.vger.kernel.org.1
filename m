@@ -1,386 +1,278 @@
-Return-Path: <netdev+bounces-294465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294466-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DBpUN3xtH2p0lwAAu9opvQ
-	(envelope-from <netdev+bounces-294465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 01:55:40 +0200
+	id zTy4GsNtH2p2lwAAu9opvQ
+	(envelope-from <netdev+bounces-294466-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 01:56:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45761633065
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 01:55:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD783633070
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 01:56:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=aHkIL0Vo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294465-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294465-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294466-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294466-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=hotmail.com (policy=none);
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3E753045EE4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 23:54:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B011030597BC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 23:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBED390618;
-	Tue,  2 Jun 2026 23:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB1D3C457C;
+	Tue,  2 Jun 2026 23:55:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745812C326D
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 23:54:12 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780444454; cv=fail; b=Kh8qDSr4+rm8yo5IIRi0tGCCoisLwVDABLu5U9JAo0rPAka9gCulz0gIv6wF89qA4IKwh3eY2pZvvRnpUNsl9PFpA+LfAjOFw8L0Z1CmZl2+BSJq7S5ZT3IwV8oVEYBYYTPqpH9060kyRIOFu8C4LbwvWE/BgdDhKBYAcXn0gXo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780444454; c=relaxed/simple;
-	bh=IJ+gmN3LiJum1sij1I8hO9MpaGGrFtydr8OFlUNNFEQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=aswOup/X4K3iVB4DpFvsyWpR5wHILw0r2W/JUAQQ5yCmmSHYFyY4cfgY+SG6sgljyp1lW4rwmLQU0boRX06LKJawh5sSmrRbhNvAcZNt27JKDFubp2HlrDcgzMN/GBXRxqq52sjx6ZsX4lL5/4uHsyBhIhnEnCkIL95zIW3GZPQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aHkIL0Vo; arc=fail smtp.client-ip=198.175.65.16
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780444453; x=1811980453;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IJ+gmN3LiJum1sij1I8hO9MpaGGrFtydr8OFlUNNFEQ=;
-  b=aHkIL0Vo/PngV26BF4IIBA8izkSwRY71X6o5eC+UTw5xZAEd+OYf7nhE
-   PY3N2st7klGL+9S9swS1Kosl7IzNS7ig/lexdSujS6c2Wb8ajYFR3SpeR
-   2ym93hlMV46WQ0CFUeQT7NndVL67d4ZRPIXC8ZqaaYIOwi84n1sZhlbZ7
-   jpyRov/uupPKt+MEuC/OxQgnzD324dZEK/GzUvvh+PLRs/P9moZRxoOe+
-   u8yyFH12x4Sd6jJxIQXIaOydOeGiYRTR5EUgdpT6eqzDCngpc0PNW4crc
-   11+X8cTp8N4CorRbrz2zbKJ8B0pMSIkaEAy33LgyOEP2r7cuhKUqnZLt0
-   g==;
-X-CSE-ConnectionGUID: GvxP0ILoRxeeCS4tFhS3Xg==
-X-CSE-MsgGUID: 2cbeonDJQQSWCVMClkFhBA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11805"; a="81424968"
-X-IronPort-AV: E=Sophos;i="6.24,184,1774335600"; 
-   d="scan'208";a="81424968"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 16:54:12 -0700
-X-CSE-ConnectionGUID: L2zf9TwCQ9yZ3hwdA9QAQg==
-X-CSE-MsgGUID: hqWd7jYjTEq8Bd4YOYrzrA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,184,1774335600"; 
-   d="scan'208";a="267926293"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 16:54:11 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 2 Jun 2026 16:54:10 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 2 Jun 2026 16:54:10 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.32) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 2 Jun 2026 16:54:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P/3J4MopvnjDBjbWi8cVZP5f3JwOt8KaUk4ljTaPzUCaP6S2RKrpEPfIuRxjW6VG0beM30b9sqpHkt9orZtv9CeIWOhqFXMgPPIU0FP5X+YsriJpbEzK4JgwSO6acAAIDaBkTVNlNtzrkQC/1F+v7lHMtEoALjUJg+6lHn37Eg1+oNLOQjKF0jARUyW2AZ3ew3Jug9/O0ivFpYkhAkGLpWYaqypyJtzDp2zaU1mw+HiwN2sd0LO9Dq3gozdFSBgPwnFNGcXmie5lljqWQh//GG1xOr9UdXiOTNnL+6H0T4DFlnxQpfImvaj8AU8AwE6d6so2x6wlw1CF22zQY4OSkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aXKF2qoc0BYRMYarNfY5vrnWSG8tGsHP53VdpcOh5mY=;
- b=vkTa4EryMO8TUaMa9iM68PxlafPM902KmFYhdIXFaq7S/8lg3YVntxZUt8DPBGH2xID+muhXaWJDECCRLNDjYoV/GsBjVgiTuMyRum4ecLCpOikU9/QTOpGP/HkBqrxNIR88MnsIKn7KlTHOS75MMNQvNpqWyQ+ydFEHnyiauZUcrc90KwUDWAV4ALtEVeS+EGNMTR6/oXXcJxZAdXuN82bBQArrdghbNiG4xyu9st6wrKEBGGgJDmm1wSWRT6LLM2Yx6GrgUynCjCZTptSmM5ORHqoGpIeW4Hbpzps7LVyWF6GnhAnfpJWivMKIGhzsuP+hrmU5s5jWbLGdS3Jl5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
- by DS4PPFABF58482A.namprd11.prod.outlook.com (2603:10b6:f:fc02::45) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Tue, 2 Jun 2026
- 23:54:03 +0000
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58%5]) with mapi id 15.21.0092.006; Tue, 2 Jun 2026
- 23:54:03 +0000
-Message-ID: <30e43464-2219-475c-b4e6-4d2dfa94dbfc@intel.com>
-Date: Tue, 2 Jun 2026 16:54:00 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: fix E810 low latency
- timestamp interrupt handling
-To: Marcin Szycik <marcin.szycik@linux.intel.com>, Intel Wired LAN
-	<intel-wired-lan@lists.osuosl.org>, Grzegorz Nitka
-	<grzegorz.nitka@intel.com>, Arkadiusz Kubalewski
-	<arkadiusz.kubalewski@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>, Przemyslaw Korba
-	<przemyslaw.korba@intel.com>, Anthony Nguyen <anthony.l.nguyen@intel.com>
-CC: <netdev@vger.kernel.org>
-References: <20260529-jk-fix-e810-ll-interface-function-v1-1-ec84a408af7e@intel.com>
- <961dca76-3025-45a4-b11e-0ee8f241d290@linux.intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <961dca76-3025-45a4-b11e-0ee8f241d290@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P221CA0028.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::33) To DS0PR11MB7381.namprd11.prod.outlook.com
- (2603:10b6:8:134::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7AD3A6EFC
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 23:55:30 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780444533; cv=none; b=MyBrqW2F06WUmr5wtUmMIgXqLfQxTj61K7pWbPVn2Xx83p4Woh/NDXyzPu0yj6TuBTKWnylFe7DeJnzjYwncoKaC9ImjKWB4DsnXwDiOIIEfiHdS0l4LUwwF/vJOg6pr+2DKy59cfqy0qc5KNGLKP3WS53hKatr2tZ3jzuNZJfQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780444533; c=relaxed/simple;
+	bh=wpBrehQFmNvRP0r6KS8akDFh40prvkx7Ba1gqXcCN9o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H63cjD/w7z9VEGUQ8irkRy1MgqSY4dyxY2x1CKrY3Hhl2ZhSITTcqK4oNbe9KCKOE8DWSz6Iny7GAT2JmwxNOOuoK+mZDBpU+MLoxGsZ1pfuwaWXYwsZHiZjKKV0pT3I62QQKuaVBk6uLYHXxJnYdV9dc53CeTr5siC7XzFlRFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.178
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5174a3a025aso31961901cf.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 16:55:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780444530; x=1781049330;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zzZ6s0AznRAk34C0Bcc3By/ncVdYtLX2scOr3Lki/eU=;
+        b=Q1AqJO/kt/zeT1+0BhmkkBXCwDGS0pBVyXjwjfYMW9B448G/FBVU9GqRbNZo8kBhEa
+         b2SefiQIGc60m338S99RA2xMiamdI3KdFMI6omKlV7jUr1z6uEygeAERQH6t/5IxZwWU
+         A9gWnHusccu1Wma6QTXnDYZZm9vriUhhSK6TX5UtMumcGzxWZICDHc+Rbs/8gyV2ULSv
+         Broc4szpNjznRejC+6bPSQu/A7z6fYtD2u5xABxnIbFHxY3ef9N0PKBshhhprm6ssT65
+         /9Lyj1aRa+LU411dKNq6w5NesbM+aFcyZTZ2e4sC21UYXw/oSkULKZybNVDUOgkpyexj
+         d3+w==
+X-Gm-Message-State: AOJu0YzfpFyfMUQD6WrtFqy5VJmVVv/lqmtjYVea/HTqwg5EOEy4tDuD
+	7ycklxdwGAYy06K71Yq7tZrQEpVzFWO6m0EOGQ/lZNmrE6UcSt3Ba8/9
+X-Gm-Gg: Acq92OFgGcxmklgVqr5ohxVuc/8CkZ13SJDcsl07Fr1TmqgpTSfHNEe69mblDVUjhRA
+	oafQhqZX7bqRMuqTea93zTcf8i6jF4K81VXyBtMztIJ8KfP1PoODjwvQpAWO0GrfKHC/ZT/aM0t
+	jkRh1EIBkhS6CL4BpUO2V7S1Le9a6OPtb7HIsNJ6htLJT+K63POGGBogWDwm5qmsX9mWZ7jaqvy
+	YawX38QR902fSbsIb74BQ78zwd4TTkgMvWmaQiPzvOy1lA2seUwAsgdvUnCPCUo7o1x8454edLp
+	6xyOaelwV/I3XfgsXB0wLTiVOvwLT6M3zh02tyDM1kqNFIvobohL41KH7ckES4btpAzhwmPOQfi
+	07t+ig+2oPhXn/Eh7kCmIK13AuRz2ArI9FY8/pAv1KMGLewg8iDK0rNDeW2CSYq2b6+/h/5nu8m
+	BD3Bj8WmikyX4ywZTBBnG7HzO0FEuRrD2olRauFy5siJNUodsFyvtGKVXC7nOqik/idEfjnpqVY
+	1juHW1vM4djvjW1dn4Fm6g6dZlSv39v
+X-Received: by 2002:a05:622a:346:b0:50d:d1ea:65dd with SMTP id d75a77b69052e-517785cd83cmr21015931cf.14.1780444529845;
+        Tue, 02 Jun 2026 16:55:29 -0700 (PDT)
+Received: from lxc-docker-tertiary.local (pool-108-45-26-115.washdc.fios.verizon.net. [108.45.26.115])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ceccdb5e92sm5810016d6.11.2026.06.02.16.55.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 16:55:29 -0700 (PDT)
+From: Greg Patrick <gregspatrick@hotmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v1] net: phy: sfp: detect presence via I2C when no MOD_DEF0 GPIO
+Date: Tue,  2 Jun 2026 23:55:28 +0000
+Message-ID: <20260602235528.2795028-1-gregspatrick@hotmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|DS4PPFABF58482A:EE_
-X-MS-Office365-Filtering-Correlation-Id: e84e677f-4846-46f8-0ef4-08dec1023975
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|56012099006|4143699003|5023799004|11063799006|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info: 6gXHEzBrB2EDM0p3NN6sTg3u8BueboF/wGwlIgIh6CMUommd1hlkgSXvLuu4kFSn9Gx/bmlXc1bpyVgfYtsS4qbqXI4pikYWsnEsSirW/duNlqmNWbFkEkHKxmxCV4UdVDbcoa51dGQx5TgprxS0kq15qV9MUQDFzXG5Ry6Du9jF2xeXe9IPjk7eLy1J+70H5Y2rDWOadqx0AIZaON9cgDpO+n1UThZfrN1DXz+9bworbgvuYV8yEbiqKb+1lH8tOJT2iEpkFsvu2zlFDjDiUT6s4KyUjYNQAVjiN4kk7QSc/327FAGD4Myv6MY6rqhIoKZfuKEvDmY6Mi5tHnzqtxytpqZ0SH8zmBB6TQEbs0fGQLSHZyVJQmZM/EEod3BlPcJ1okrP9SxgA/Aa/ENMUni/JpBSYvEDlVdETmrTtr7qvdcOjE2mOFL8Q1una4HnLR7Bm5xqpIfTkNwKE+1y72DIRjy2mBIcn2mAoKpfdxvw7I4iEoYLyUFXgUNQL3JpB/SkK7UEIM4MMQS3yDlAcYqf4FiWchjGpgcX9qm0TIZrmuDzIlbFzre0tKuc9zUtXCK4Rv42Nx50sMEAtl30YZSp39MOH/w2ohz0ydfgpUkQNEPi0oTs/LeebWGV5vLSl1cwjubt45JI29VEg4hh1oUca43JZlAFw5cD+e7Uke9kmXUhv2JyUqsTDvOZmhbR
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(56012099006)(4143699003)(5023799004)(11063799006)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c0drOVpjRkJFOG53UVlyVGQ4ZjZadisrc0hSa0JvYmhWNEcwWjFvbm40Mm96?=
- =?utf-8?B?Z0R0TC9EWkJVU3F0dDVZNGZYZ2NkaWNMT2RoR3BxQ3ZGWnBONi9qbFNBdE0x?=
- =?utf-8?B?eUtPeEVGYnZGZkgvdDNJVCthM0JZUnpsZWtmOXZ5dGNqelJlWUlYSDQ0STJF?=
- =?utf-8?B?ZFVLQUZaQ0VTY3poUDRzNEVnYjg2d200Wlp5U3Zmd0hRLzB3aHViNDlNc3Jh?=
- =?utf-8?B?bFVEL2tJTWkyVldkWE1SRzRnSno2N2IrQ0tPT2VoUmNUQS96SVFRK0UySEdp?=
- =?utf-8?B?NXVtYXR5b0xvaUU5TDhHZzA1Y29oUHJBbWZ3L25yeHQ0SnFTazBlM1hsZ0ZY?=
- =?utf-8?B?N3lyNWlLY3Rxb1lDVFl6U3ZGS3hKYmZsa0FtT1R4dGNYa0o5eWZFWlJQZjBr?=
- =?utf-8?B?N3d1LzBZY3V3cWJBK3pWQzg3ZTBTRU1KdlcvTHlvemFIMm01SlQ4Szg5MVRT?=
- =?utf-8?B?YjYxNE5WYnZtQzh1UlFGWjZZK3d2L1JMTnRUZDVpSTR0ZkVXTENHRE0yZllZ?=
- =?utf-8?B?aTZiU2pZbi9SbndnSEc1dW5DM1hyNlRsbTJneStDYjAxZm5kSmRKYXBBalI3?=
- =?utf-8?B?M05qNzFUVVJ0WFcyMC9ZNHV2UkYrQ2owcEplNEo0Zk9Xb3k2MW10NTdHdmp1?=
- =?utf-8?B?bTRXN2JlSUVIVEFvV000UXcxOFdQL25YL3FqQ09peC9xK3JZYXFzYXFpcVZ1?=
- =?utf-8?B?MlFEWlA4Sm5TdUcwTzBYZjNjeXZ4L256cDR0eTJBeWV5a01ac1BWc2xVRFg4?=
- =?utf-8?B?TDdXR3FENkhycVlXTmZKcjROMFkyeEhTc2d0VlJSd04xdlA1Q0Z4RzU0Qi9Y?=
- =?utf-8?B?TzQzdkZ4dFhzRk95VWZGamxEM0dFOVp0QnM0TGlPcERFVXNOajAyTUNzVDhE?=
- =?utf-8?B?Sm10ZVBKWTlia2JJZU9wMm5aM0FRWmdGdWVhdko5Vk9oZFNCemwxWWU1NVNW?=
- =?utf-8?B?VWw4RHdvbXNxN3pKUHFhZERIZEpNaVJxdCswMGxnZ29QQk5DMDFHR3UydVZD?=
- =?utf-8?B?Vy84RG05UFVHam94RTA4ZktwdEljU3RhOWJuYmlXOGw2bGVHNWhDTVpsR0dO?=
- =?utf-8?B?anA0SnRoaVhmQXFOcVo3L3RwczhFQ2NlZisrK2hrcEtuUGkzdzBYaVNlZkxP?=
- =?utf-8?B?cmh1Rm1YWXFJZjgyM0ZzbmZ4Q1BDT0FZd2NXZGJ3V24rTnhoa29VUGRyNnJy?=
- =?utf-8?B?VGlEOUgrOTEvRHFzMUE0Y2ZCTmNLajJ4bGxGMVcrVU44WDM0cXZZVThvemls?=
- =?utf-8?B?NWVqZ3RqZzh3YzVtZS9ZTHRXK1dOSkNEQ2xRNEI5SFJuZCsrY1pzN3RtbGRW?=
- =?utf-8?B?OVlUSlc3OXpTZ2RRWlllYlMraGU2TVdCNFVmdWJzMWU0SWdiUm40Q2gvUTBO?=
- =?utf-8?B?Y0g1K3BSL1N1VVlkSzZLN1FJQXJxRFZ1aytJRGl5MSt1dDZCZGxWbVlCTHhl?=
- =?utf-8?B?bStLYzhwbi9xZ1QxTFpJS2lPcHNhbUFhNWhYbG55RmJLRk9ldFlPem5hL2ZI?=
- =?utf-8?B?WkYrQWdSOThVK2V0eUR4NU84ZVRPME4vRkFNd3NpVXU2aE4yTmMrV1IzSFpj?=
- =?utf-8?B?Y0NVK0Y3THZvNk1zVUh6ZURqaDBwdis5NlNTbmFCb0FIT1ltVlNPWFNmVFdM?=
- =?utf-8?B?UkFjM3BYSnRxdjg3TU0vUnh3OHhxTHprMmY5TGpoQldNMCtNYzkzcnhXSnRB?=
- =?utf-8?B?QURkMDVqcFZoZmp1Z2pneCtNRjY5WUpIdVRGbmFvdjNxbkpRaU1neklpSTdj?=
- =?utf-8?B?STF4V3VJTXBJTnJPZVRqblNSK09NZWRkQ3BKUEdtU2QySFNPOVB5a2E4UzNY?=
- =?utf-8?B?WXJnVFQ2alFheGJwMzlhbU5iK3hsa05Dc2Zyb1lVU05UQzZTVHdpNUtwVEhw?=
- =?utf-8?B?OC96MXE5MkFQdysxaFcvcTNWVlJwZDRxdExlTXVXODhTUGdzSHZibVJ0WXNY?=
- =?utf-8?B?VmliS2FaNWhWN0FFUDYxL3pnZzJGUGRXU0xycUdpSGh0WkxvUE9DRVMxbWFE?=
- =?utf-8?B?eTdSN0xQRVoySnBTWjJUVkx1cDJkcmR0OGd3MVVFRkhDc2hjMkpuaEZueWNt?=
- =?utf-8?B?RFZQRFNPdmwzQUxHVVA4Ym5yWHR0NGQ2N0h1aWhGcFZVbVVKcDlCMWFaMXN2?=
- =?utf-8?B?RzRkcE1WMjN0ZVdmUEVvOFN0QXpuUEs1ZDhKUkhLdVR4Vm1YZTg0b3hYM3hZ?=
- =?utf-8?B?bG11RUlENXhlcnoxWGkrTTU3M1ZYbkxGVzU2TlZlMjlQbkREck8xWGtac1V4?=
- =?utf-8?B?S0FWTThrYWxuUUhrMHVKUVdja3p1RTVhVTQ2NDhqYjNrbUNGZkFteWlJeVJ2?=
- =?utf-8?B?alJCemhjaUZITE5oVXlCMFhNV28valZ5V251RXdSU3YyLytoZE9lQT09?=
-X-Exchange-RoutingPolicyChecked: SmOBJP0tfHxrGBk/vxiNqQ8euWCbHMhptK386vUTH9/wjDwtQuqvKQWuyno7sfyzdXe3otCwr1kTFLSXaJW00dIwkGGdZ1R3sJCQvJTfZ0a0GOvolWsPfLTBIU3pIv0hBvmfkjR48JxhL4JlfMtvjefiwl+CI7s2VU1/h+TuwY603Ox+Xf0r0/ZjAkoQJsgZejVkSQKibQA5Jsj6qZZBrCvAOHQoaMRflBo2Mzk5pshkSEubY/7O88vn8FV+LnsuW/6P/W79kbejm2c8qlekeR/6ty4MqUmY7pHWKJCiIFhsbwtMPsC/IuPsGK4UC5jjCVeD/zFmdI3JYc+8tCTQBQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: e84e677f-4846-46f8-0ef4-08dec1023975
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 23:54:03.3322
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XFjlKoJwSDBG1eQSWRTy2voPen5nnfhjbwxWxeoiLwnCHYRAIFeMGrC62ut1bGMPnFlU0fAIHfD2QKvSFY3MsjtQ1+oBq2S5vA3G6Vm4kwk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPFABF58482A
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[hotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294465-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:from_mime,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS(0.00)[m:marcin.szycik@linux.intel.com,m:intel-wired-lan@lists.osuosl.org,m:grzegorz.nitka@intel.com,m:arkadiusz.kubalewski@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksandr.loktionov@intel.com,m:przemyslaw.korba@intel.com,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER(0.00)[gregspatrick@hotmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294466-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregspatrick@hotmail.com,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[hotmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 45761633065
+X-Rspamd-Queue-Id: BD783633070
 
-On 6/2/2026 3:15 AM, Marcin Szycik wrote:
-> 
-> 
-> On 29/05/2026 22:22, Jacob Keller wrote:
->> The driver has supported a low latency timestamp interface since commit
->> 82e71b226e0e ("ice: Enable SW interrupt from FW for LL TS").
->>
->> This interface is triggered by calling ice_ptp_req_tx_single_tstamp(),
->> which is called by ice_ptp_ts_irq(), which in turn is called when the
->> driver gets an interrupt from hardware indicating that a timestamp is
->> available.
->>
->> This function doesn't check if a timestamp request is already in progress,
->> and as a result could trash an existing outstanding requests when called.
->> It turns out that this is unlikely in practice due to a number of
->> circumstances that prevent most of the ways that could happen.
->>
->> 1. The ice_misc_intr_thread_fn() might trigger a software-generated
->>    interrupt with the PFINT_OICR_TSYN_TX flag. However, we don't enter the
->>    thread function since ice_ptp_ts_irq() always returns IRQ_HANDLED for
->>    E810 devices which support the low latency firmware interface.
->>
->> 2. The ice_ptp_maybe_trigger_tx_interrupt() function might trigger a
->>    software-generated interrupt if it detects waiting timetstamps. However
->>    it checks ptp.port.tx.has_ready_bitmap which is always false for E810,
->>    so never enters the code path.
->>
->> However, it is still possible that another Tx timestamp request could
->> happen and complete and race with the firmware completing the outstanding
->> low latency timestamp request.
->>
->> This doesn't happen often in practice because many applications only
->> trigger a single outstanding Tx timestamp at once. However, if the user
->> runs multiple copies of ptp4l or uses other userspace stack which does,
->> they might miss timestamps or get corrupted timestamp data.
->>
->> To fix this, have the ice_ptp_req_tX_single_tstamp() function check and
->> only begin the operation if the ATQBAL_FLAGS_INTR_IN_PROGRESS flag was not
->> yet set. This prevents a new possible request from trashing an outstanding
->> request. Note that on completion of a request, the ice_ll_ts_intr()
->> function will initiate a request for the next outstanding timestamp, so no
->> timestamps will be lost.
->>
->> Additionally, although the ice_ptp_tx_tstamps_pending() function doesn't
->> currently get called for E810 devices, it should still not return true for
->> devices which support the low latency interrupt. If for some reason code is
->> refactored and the miscellaneous thread function does execute, it should
->> not trigger a new software interrupt for devices using the low latency
->> interrupt interface. Add an explicit check to make this function always
->> return false when the device is operating in this mode.
->>
->> Finally, convert the atqbal_flags to DECLARE_BITMAP and use test/set bit
->> functions. This helps in clarity as we can use test_and_set_bit and
->> test_and_clear_bit.
->>
->> Fixes: 82e71b226e0e ("ice: Enable SW interrupt from FW for LL TS")
->> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> + some nits
-> 
+Boards that do not wire the SFP cage MOD_DEF0 signal to a GPIO (for
+example the NicGiga S100-0800S-M, where the I/O expander is fully
+consumed by TX_DISABLE) currently use sff_gpio_get_state(), which
+unconditionally reports the module as present. An empty cage therefore
+fails its probe and is parked in SFP_MOD_ERROR forever; because
+SFP_F_PRESENT never deasserts there is no REMOVE event to recover the
+state machine, so a module inserted after boot is never detected.
 
-Thanks for the review. The nits are minor, but I think its probably best
-to clean them up because of the possible confusion.
->> ---
->> This was originally motivated by changes in our out-of-tree release where
->> the issue of a software-generated interrupt was causing significantly more
->> issues. After further investigation it seems that the upstream
->> implementation is more robust, preventing the thread function from running
->> for E810. However, there appears to be a small window where issues can crop
->> up if multiple outstanding timestamps are requested near concurrently. This
->> change is motivated at closing that gap and ensuring consistency of
->> timestamps returned through the low latency interface.
->>
->> To trigger the issue you will need to issue multiple Tx timestamp requests
->> near but not quite simultaneously, and it may be quite a rare race
->> condition.
->> ---
->>  drivers/net/ethernet/intel/ice/ice_type.h   |  8 ++++++--
->>  drivers/net/ethernet/intel/ice/ice_ptp.c    | 24 +++++++++++++++++++-----
->>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 12 ++++++------
->>  3 files changed, 31 insertions(+), 13 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
->> index 1e82f4c40b32..7035ea6c59db 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_type.h
->> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
->> @@ -859,12 +859,16 @@ struct ice_mbx_data {
->>  #define ICE_PORTS_PER_QUAD	4
->>  #define ICE_GET_QUAD_NUM(port) ((port) / ICE_PORTS_PER_QUAD)
->>  
->> -#define ATQBAL_FLAGS_INTR_IN_PROGRESS	BIT(0)
->> +enum ice_atqbal_flags {
->> +	ATQBAL_FLAGS_INTR_IN_PROGRESS,
->> +
->> +	ATQBAL_FLAGS_NBITS, /* must be last */
-> 
-> Nit: no comma
-> 
+Derive presence from a throttled single-byte I2C read of the module
+EEPROM instead: an ACK asserts SFP_F_PRESENT, two consecutive failures
+clear it (to ride out a transient error on a live module). The existing
+poll then emits SFP_E_INSERT / SFP_E_REMOVE normally, giving working
+hot-plug and avoiding the boot-time -EIO spam on empty cages.
 
-Fair. This one never changes and is always last so no comma makes sense.
-My habbit is generally to always include commas on the last element in
-enums since it keeps things uniform but I agree it makes sense in this case.
+Signed-off-by: Greg Patrick <gregspatrick@hotmail.com>
+---
+Posting for review per a downstream discussion (OpenWrt PR #23579) on adding
+the NicGiga S100-0800S-M, an RTL9303 8x SFP+ switch that wires none of the
+cage sideband signals to a software-visible GPIO. I'd value your steer before
+this is carried downstream.
 
->> +};
->>  
->>  struct ice_e810_params {
->>  	/* The wait queue lock also protects the low latency interface */
->>  	wait_queue_head_t atqbal_wq;
->> -	unsigned int atqbal_flags;
->> +	DECLARE_BITMAP(atqbal_flags, ATQBAL_FLAGS_NBITS);
->>  };
->>  
->>  struct ice_eth56g_params {
->> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
->> index 36df742c326c..11059deb5d41 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
->> @@ -382,6 +382,7 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
->>  	struct ice_ptp_port *ptp_port;
->>  	unsigned long flags;
->>  	struct sk_buff *skb;
->> +	struct device *dev;
->>  	struct ice_pf *pf;
->>  
->>  	if (!tx->init)
->> @@ -389,6 +390,7 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
->>  
->>  	ptp_port = container_of(tx, struct ice_ptp_port, tx);
->>  	pf = ptp_port_to_pf(ptp_port);
->> +	dev = ice_pf_to_dev(pf);
->>  	params = &pf->hw.ptp.phy.e810;
->>  
->>  	/* Drop packets which have waited for more than 2 seconds */
->> @@ -408,7 +410,13 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
->>  
->>  	spin_lock_irqsave(&params->atqbal_wq.lock, flags);
->>  
->> -	params->atqbal_flags |= ATQBAL_FLAGS_INTR_IN_PROGRESS;
->> +	if (test_and_set_bit(ATQBAL_FLAGS_INTR_IN_PROGRESS,
->> +			     params->atqbal_flags)) {
->> +		dev_dbg(dev, "%s: low latency interrupt request already in progress?\n",
-> 
-> Why the '?', are we not certain it's in progress?
-> 
+Open design question: this changes behaviour for *all* boards without a
+MOD_DEF0 GPIO, from "always present" (sff_gpio_get_state) to I2C-probed
+presence. That fixes hot-plug and the empty-cage -EIO spam on boards that
+simply lack a wired MOD_ABS, but it also affects boards that intentionally
+carry a permanently-fitted module and relied on the always-present path.
+Would you prefer this gated behind a DT opt-in property rather than changing
+the default? Happy to respin either way. The 2s re-probe interval is likewise
+a first guess.
 
-It was more intended to invoke a note of "surprise" as in "why is this
-happening??". Its obvious that it *has* happened, but it wasn't supposed
-to be possible. However, I think that was a statement made before I
-realized the case where two near simultaneous timestamps could cause us
-to enter this function again. In the original "bug" this was happening
-because our interrupt handler was being forcibly re-scheduled via
-software triggered interrupt.. but that only happened due to flukes in
-code that never got in-tree, and the assessment was wrong.
+Tested on a NicGiga S100-0800S-M (RTL9303, 8x SFP+, no MOD_DEF0 GPIO):
+inserting a module into a cage that was empty at boot now links within ~2s,
+removal is detected, and the boot-time -EIO burst on empty cages is gone. No
+behaviour change observed on cages populated at boot.
 
-I think this is worth fixing, so I'll send a v2 after I double check
-feedback on Sashiko.
+ drivers/net/phy/sfp.c | 74 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 66 insertions(+), 8 deletions(-)
 
->> +			__func__);
->> +		spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
->> +		return;
-> 
-> Nit: could be an unroll.
-> 
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 376c705a9..fd99638e9 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -206,6 +206,11 @@ static const enum gpiod_flags gpio_flags[] = {
+ #define T_PROBE_RETRY_SLOW	msecs_to_jiffies(5000)
+ #define R_PROBE_RETRY_SLOW	12
+ 
++/* Interval at which sfp_i2c_get_state() re-probes the I2C bus for module
++ * presence on boards without a MOD_DEF0 GPIO (see sfp_i2c_get_state()).
++ */
++#define T_PROBE_PRESENT		msecs_to_jiffies(2000)
++
+ /* SFP modules appear to always have their PHY configured for bus address
+  * 0x56 (which with mdio-i2c, translates to a PHY address of 22).
+  * RollBall SFPs access phy via SFP Enhanced Digital Diagnostic Interface
+@@ -249,6 +254,13 @@ struct sfp {
+ 
+ 	bool need_poll;
+ 
++	/* I2C-probed presence, for boards without a MOD_DEF0 GPIO.
++	 * Access rules: st_mutex held (updated from the poll/state machine).
++	 */
++	bool i2c_present;
++	u8 i2c_present_nak;
++	unsigned long i2c_present_next;
++
+ 	/* Access rules:
+ 	 * state_hw_drive: st_mutex held
+ 	 * state_hw_mask: st_mutex held
+@@ -651,11 +663,6 @@ static unsigned int sfp_gpio_get_state(struct sfp *sfp)
+ 	return state;
+ }
+ 
+-static unsigned int sff_gpio_get_state(struct sfp *sfp)
+-{
+-	return sfp_gpio_get_state(sfp) | SFP_F_PRESENT;
+-}
+-
+ static void sfp_gpio_set_state(struct sfp *sfp, unsigned int state)
+ {
+ 	unsigned int drive;
+@@ -863,6 +870,44 @@ static int sfp_read(struct sfp *sfp, bool a2, u8 addr, void *buf, size_t len)
+ 	return sfp->read(sfp, a2, addr, buf, len);
+ }
+ 
++/* Probe whether a module is physically present by attempting a single-byte
++ * I2C read of the EEPROM identifier (an empty cage NAKs). Used as the presence
++ * source on boards that do not wire MOD_DEF0 to a GPIO.
++ */
++static bool sfp_module_present_i2c(struct sfp *sfp)
++{
++	u8 id;
++
++	return sfp_read(sfp, false, SFP_PHYS_ID, &id, sizeof(id)) == sizeof(id);
++}
++
++/* get_state variant for boards without a MOD_DEF0 GPIO. Instead of assuming
++ * the module is always present, derive SFP_F_PRESENT from a throttled I2C
++ * probe so that hot-insertion and removal are detected. A single ACK asserts
++ * presence; two consecutive failures clear it, to ride out a transient I2C
++ * error on a live module.
++ */
++static unsigned int sfp_i2c_get_state(struct sfp *sfp)
++{
++	unsigned int state = sfp_gpio_get_state(sfp);
++
++	if (time_after_eq(jiffies, sfp->i2c_present_next)) {
++		if (sfp_module_present_i2c(sfp)) {
++			sfp->i2c_present = true;
++			sfp->i2c_present_nak = 0;
++		} else if (sfp->i2c_present && ++sfp->i2c_present_nak >= 2) {
++			sfp->i2c_present = false;
++			sfp->i2c_present_nak = 0;
++		}
++		sfp->i2c_present_next = jiffies + T_PROBE_PRESENT;
++	}
++
++	if (sfp->i2c_present)
++		state |= SFP_F_PRESENT;
++
++	return state;
++}
++
+ static int sfp_write(struct sfp *sfp, bool a2, u8 addr, void *buf, size_t len)
+ {
+ 	return sfp->write(sfp, a2, addr, buf, len);
+@@ -3168,9 +3213,22 @@ static int sfp_probe(struct platform_device *pdev)
+ 	sfp->get_state = sfp_gpio_get_state;
+ 	sfp->set_state = sfp_gpio_set_state;
+ 
+-	/* Modules that have no detect signal are always present */
+-	if (!(sfp->gpio[GPIO_MODDEF0]))
+-		sfp->get_state = sff_gpio_get_state;
++	/* Boards with no MOD_DEF0 GPIO have no hardware presence signal. Rather
++	 * than assume the module is always present (which traps an empty cage
++	 * in MOD_ERROR and never detects hot-insertion), derive presence from a
++	 * throttled I2C probe and poll for changes. sfp_i2c_configure() has
++	 * already set i2c_max_block_size; seed i2c_block_size so the presence
++	 * read does not issue a zero-length transfer before the first probe.
++	 * Seed i2c_present_next to jiffies so the first probe happens
++	 * immediately (a zero value would be in the past relative to the
++	 * negative INITIAL_JIFFIES at boot and delay detection).
++	 */
++	if (!(sfp->gpio[GPIO_MODDEF0])) {
++		sfp->get_state = sfp_i2c_get_state;
++		sfp->i2c_block_size = sfp->i2c_max_block_size;
++		sfp->i2c_present_next = jiffies;
++		sfp->need_poll = true;
++	}
+ 
+ 	device_property_read_u32(&pdev->dev, "maximum-power-milliwatt",
+ 				 &sfp->max_power_mW);
+-- 
+2.53.0
 
-Fair. I had also considered using (scoped_)guard but netdev maintainers
-don't like that as much. I often don't bother with an unroll goto unless
-there are multiple places where we have to cleanup.
 
