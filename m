@@ -1,250 +1,212 @@
-Return-Path: <netdev+bounces-294317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294318-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id X3pGFCkVH2rsfAAAu9opvQ
-	(envelope-from <netdev+bounces-294317-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:38:49 +0200
+	id xkxhDS8XH2qCfQAAu9opvQ
+	(envelope-from <netdev+bounces-294318-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:47:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB471630C5C
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:38:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADF67630D1F
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 19:47:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=NWVYn8MS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294317-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294317-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=onsemi.com;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=rmueofPU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1J0yLW4+;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=rmueofPU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1J0yLW4+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294318-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294318-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1A75B302F4CE
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:36:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E808130144CE
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 17:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F803FB077;
-	Tue,  2 Jun 2026 17:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DB03FE64B;
+	Tue,  2 Jun 2026 17:46:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.151.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDDA360751
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B643FDBFD
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 17:46:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780421793; cv=none; b=luYGwXltCbdnHmOpCwwwKUX9Do6dUSzkY41mQr8V2rlra9lu2bXt4ZueEEhmNOTNv8jmnesymvn/fnKfBrvXVpMK8smKUECKLi6w0ARjCsqFqQ59CP4EtCsULXyPo42fDz5nwXPnkHRPHjBDdxTkCXJXqhr4bjgrbT40uU9UcUs=
+	t=1780422410; cv=none; b=jPbtcCCRN9AKq/7XSxVVSn09h6T3mZiP72bEhpV42Wirg0iyt0s0DBwEvwvrTRtHz8jPCoWPJIwlc/Df7c9UknteiOVXpEE80YgNXfhs2fA4ItzAOj3Dd8SweZ9QFaX8R3VxIuvh7VRUeYBdpq2101s81dHYavm+1qoq3t4H8SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780421793; c=relaxed/simple;
-	bh=kU44ua9zCp8ll1fLBy15XMwJwYdnGmtNusO0OU6ty+U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=FGNFt5t4wv40wLYE4dijPXQ9RD+4gh9yM1FBGdfhisFGqCARRCeq+iOHm7z2Lxj65Dp14eqQhswO8Bnw6abQ5sTIkzeft+dHf+3Zf4ZlvvAwnzyO641EZ8wf8yz1UzP9D4sxtjrE4MmOc0R8S0mysl6FVxR/fAPuuhBArQah+0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=NWVYn8MS; arc=none smtp.client-ip=170.10.151.120
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1780421785;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1780422410; c=relaxed/simple;
+	bh=lkXExpOq/3CFxUJ56vajrxY8zubhNMYaVnoxW5VnrOQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X8g20hw/cGOB3dpRxsqeiyvIK4zsVWKnNrH/QJABqCN/A8O6W8XJtj0hhyChM9Dr1dVgbU4sorZepWglnKgRaBFiICH435j0F4cPsxpRQfTgpWM2+s6uU8KKUfG5GOBL69IetOpmqXy9NawuykmsahO6uNqjwu3uIUXQ4d0dxHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rmueofPU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1J0yLW4+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rmueofPU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1J0yLW4+; arc=none smtp.client-ip=195.135.223.131
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 44B7A75BE5;
+	Tue,  2 Jun 2026 17:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780422405; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Zk5vOx05IzPipW4sWH/3wDxd/uENlbEQbtAA/VkpEpM=;
-	b=NWVYn8MSJrsIj/1I6xoNLEE/YJ7C66v33LJ8tG8fRqqwzuFiKqxDCBAwX9WxUdUmmMX69C
-	iK3WQpw/hBjPNoTbtX+REn0Gi8w2xTVxwCgoDIcwjGMnnz3Xv1ohR/r6oJKKCAU6buJZpS
-	HNFTuho0FihSY7t2q3WycpkoR/fWZilKjZz0TGgNGNLj5IMmrGX1gf4L4jfHa9AHI7PTpn
-	gWBC+seAE2JAaF7ztS3iln1u+xBOqoUqsMtuGyqCQjdOJfN+sDP5wZqOpDJz4RQAj4mU+o
-	x1y0LQbtZQl5vZkmyEshNGhwAUPs8nHmGNHPBZCsmbqqb5wZ3Mf3OUKOmnmB5g==
-Received: from SA9PR02CU001.outbound.protection.outlook.com
- (mail-southcentralusazon11013011.outbound.protection.outlook.com
- [40.93.196.11]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- usb-mta-61-Uef7MDb4OBup4M0QNzpsPA-1; Tue, 02 Jun 2026 10:36:21 -0700
-X-MC-Unique: Uef7MDb4OBup4M0QNzpsPA-1
-X-Mimecast-MFC-AGG-ID: Uef7MDb4OBup4M0QNzpsPA_1780421779
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
- by SJ0PR02MB7549.namprd02.prod.outlook.com (2603:10b6:a03:329::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Tue, 2 Jun 2026
- 17:36:17 +0000
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.21.0092.006; Tue, 2 Jun 2026
- 17:36:17 +0000
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: Conor Dooley <conor@kernel.org>
-CC: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Piergiorgio Beruto
-	<Pier.Beruto@onsemi.com>, Andrew Lunn <andrew@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Conor Dooley
-	<conor.dooley@microchip.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>
-Subject: RE: [PATCH net v3 2/2] dt-bindings: net: updated interrupt type to be
- active low, level triggered
-Thread-Topic: [PATCH net v3 2/2] dt-bindings: net: updated interrupt type to
- be active low, level triggered
-Thread-Index: AQHc8eDLvWzkHnbXI0KmrY/VvMfuDrYrecyAgAALlpA=
-Date: Tue, 2 Jun 2026 17:36:16 +0000
-Message-ID: <CY8PR02MB92493D2E5491AAE5416C05A283122@CY8PR02MB9249.namprd02.prod.outlook.com>
-References: <20260601-level-trigger-v3-0-da73e7010532@onsemi.com>
- <20260601-level-trigger-v3-2-da73e7010532@onsemi.com>
- <20260602-rebel-snide-5036c97e410d@spud>
-In-Reply-To: <20260602-rebel-snide-5036c97e410d@spud>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|SJ0PR02MB7549:EE_
-x-ms-office365-filtering-correlation-id: 5a2e7b49-d4d4-4023-a2f6-08dec0cd7368
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021|56012099006|4143699003|11063799006|18002099003|22082099003|6133799003
-x-microsoft-antispam-message-info: 2ZsOy/u17ptcB/hnoWJ821mU5G8G51N/a+5EL9kuyuGN+5NtwaGQ/AnQdvuRgQnvcrhXJarXp4iLKCqDA58uEC/SRw14Qs/CycZvIbSlL6n9y54Cri+hINvj7nU56hi7DMOM7MRq6dc7ILR3Lc9EFj0RO7u3BfJntUk7hygS9PdRulr1pjVJocFHW0rqg0Gf3GLV5q3s4qIRkN8HnatQFzvByhDtDLC3r4r+CXI/dB0Ui/3NoUurIOZ5H1rKCjds2T2sZpmn9+gHCuW4pDmh9glMs6JnwliDfXdFi8AVhqlZiVSsyTLAEZ0qCYh5N3dwKoeHE+7nTHhzYfp3kALFhfVAUF+7L1JcgItk84Wsl9Wmk7gpT7BYBSAcg1SgJooEhkLwmXvmKomJhtr/ElwHgegMMIJv+lB7CPjKieIV0t8jBpX09l/jiSrgL8W552AbmYSz7KRS8WOXoAjBjoBYy6oU7vzG1q7Tp1FYW7DH6/V2AAUh+C0uIazu97ZKxJqB/T9D0hwxQxCRnGxebwJhPSYOkUt/CWsoNV84giaYZZmTm2LQOxQzdrU2YcjR3q5EzCEppZD41Xlg4NKARoY4FlYkSzftD2aq0a9Icn5Y6ZHQHzCVGQhvlx7jx4dZR+eeTdafKpHJzceFkwItlIOLOJ29OrVtnWta00OM0MjKBPy+Opo78GZ1mPo1XFrRBMSnKfpCfnCFLMgC8zyVToREfhjNaMcAyygKApmtxqcPq50gA1uguxH9H9Mopbl2bS+L
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021)(56012099006)(4143699003)(11063799006)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ZuBFIxFqQZjKWclrSozTrVNCtsTSjVugLEw0wVxCmwMG13VE2SBUAAvTq1kG?=
- =?us-ascii?Q?hRCBAmCVDn/AbrBIp+Y3lbkWGF8tav+1S5t+AkhFJrX80Ba0kVmtwowYAhf9?=
- =?us-ascii?Q?zVg+jpSNLxp2Eiv7bQGBqkW28uUcC3f9/ZTJR6JrRMm42JrM/XH7yaQb9ZkP?=
- =?us-ascii?Q?UzQsLcVXWTyfgQuBykdjlsaPgCcG1d+/fEBpZWLErR8s5P/cRwJsLi9ck6Ho?=
- =?us-ascii?Q?8gLFtdwKF4/Qv6ln0EoZcXU3h7VWRJasTw4hXACIe4o0v4YS8yz5qyMC6KT4?=
- =?us-ascii?Q?Xrq5hu+Akoc1YKfOtkAw0Ol0++vVCOi+hsXYaQ/zF1zV1HMQhnJZaX09pDwK?=
- =?us-ascii?Q?yRF5XpRRJKPRX0EXRA8RqNZyKfWVmBteNAQKR9xFsshcuoM47S4zHbQkARKT?=
- =?us-ascii?Q?7kcN9JFiGF+LalMcmPSVjlzoD22FF+bpxAYS7J9sjmGVcnS2wFf0aqah031i?=
- =?us-ascii?Q?u7PC+YzxQcwV+TxF4hieWaK93GEevpdxH9jzGMjB6NX+IS5KJjYP9ZMlnW0M?=
- =?us-ascii?Q?/pbJ8g92bvykbZnVnn7qJVHHOSnZnusSIF/5JwIMxXzANqiWDPodAnQ18l+A?=
- =?us-ascii?Q?cd8OT8wI+vzJcKFuBlFPpc/9PczjtgULfnkxvcgGO4lDq6B/YXMp8je4iR58?=
- =?us-ascii?Q?TPBhHYPlo83IY9BMtP/kmwd956qYzZvOmUzKk+NQy1u3s9W0l0OFPBpshYHl?=
- =?us-ascii?Q?MuNBFZdkX6h/Tfh4FzP6Y/tq6PPJc17+qI529KSfgUEe3nZXos0l7Uk3RkUs?=
- =?us-ascii?Q?kHMGF4dj/zflYjV6llha0QxEo2ATSHFHb8G11qg4KD+Ax17pt6ysAIDKyrGc?=
- =?us-ascii?Q?f+U2hOfUee1aYcQ4WiHHBUy16mMSZkRdumqPf1ry9XFZ9+yUYqP9TkIYeW1z?=
- =?us-ascii?Q?NHHbzI5DTrqHXhRLc2CvBeqZpBeLbUE4YMNmdQa8+38u8aQyIXT+Bv+h1fNV?=
- =?us-ascii?Q?WR3bE22jV/nUz0s3oELB4mRNI8MqRzXS+Pz76pdB73c4006KJSOxSnOyi7Vv?=
- =?us-ascii?Q?UHEnjHPhXBgcyM3RKvvwpoV0Zf6sGABd6KPbeI91cppGPcEEV+s0CnrQgMND?=
- =?us-ascii?Q?OP/zMyI0nI1cBNfaYNew/nYmYJEspuJClO3/FWoAWdaDp/C3yNMDQRO6e30M?=
- =?us-ascii?Q?LUzibjYZDh0MGZicURCMY2ExnP9a1CNM5+ByVK/V36Ol/PjX12C+1zzicr1x?=
- =?us-ascii?Q?OMoy8g2TP506Ne1me/OoXJSS3NfOjccRPYEus9lJzEfSUVbxIR9yfp/3WAwu?=
- =?us-ascii?Q?yChlWwo+IKyVlag2p7LUMmHBU0S4nZjj3CWuUrRyqK09WiN4mJQJ859F+1Wu?=
- =?us-ascii?Q?GLZtIvDwBPXk8SJthdKcd8necznKMiDI40Rza6EwJcpz867LdnFGJivnSBLV?=
- =?us-ascii?Q?M228zxRz/+EH7K68hsjJ+VGFpYdLjpqafVCQKWYu6wQS8l+E89DYY27Pz1Uv?=
- =?us-ascii?Q?sXcaKyh9XNawJf93lQRWwa3ZOYEmngureplQv9UIhqc2iOwDaBuCQfCJsbVY?=
- =?us-ascii?Q?lhrl/RH0cyeJnvIc/BDgqeJ0rTNYhUYA4xgnnbtMrWYiliW4tKOVtDW8FRQw?=
- =?us-ascii?Q?v1GUSZrZdCXRM+VdeKQxvNHb2nAx2hoU5OCgxbsOTYyebR3Dz9L3awudGhk+?=
- =?us-ascii?Q?14uoR3yvioZsEPpHzLN5TU2quAKUzyX7qNpwqR9zQEWfBkvhKBYT9hgfZEMi?=
- =?us-ascii?Q?W/etNrYmAQjW+q+Hx/dRSAFg20DO2gX2Jm79sgnwjINFHzo6lkLBlUkQ/IdM?=
- =?us-ascii?Q?jeR7Sif4wdCQI8Pv+TIEPsTngCfZuQM=3D?=
+	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
+	b=rmueofPUpwNGSqHiFDJaUhIJ62NzunhrtUKpJ2lWNdQARu6er7L6mkDxEeQR07ZNJiQmPo
+	XG8jXV4z+lO8vvshD4sxjISDa9SPpGHSmdzd+vUBIWzCftPz1pzCT4TOxZh0hmq9VDEwWW
+	KAls6WFHzvR0oQUuF8ApHpSgetNht1s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780422405;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
+	b=1J0yLW4+sa8fhyp7971bnnTPekDKreYZio0Su5wxx0kVl7vjt/u6VsTGsxYBAmZjOexqXa
+	OIonz/LImpd5iJCg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780422405; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
+	b=rmueofPUpwNGSqHiFDJaUhIJ62NzunhrtUKpJ2lWNdQARu6er7L6mkDxEeQR07ZNJiQmPo
+	XG8jXV4z+lO8vvshD4sxjISDa9SPpGHSmdzd+vUBIWzCftPz1pzCT4TOxZh0hmq9VDEwWW
+	KAls6WFHzvR0oQUuF8ApHpSgetNht1s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780422405;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XBPeD93nc5hxvHMZc8DnnBow0Wo6CxVrYE8MsKc6QzA=;
+	b=1J0yLW4+sa8fhyp7971bnnTPekDKreYZio0Su5wxx0kVl7vjt/u6VsTGsxYBAmZjOexqXa
+	OIonz/LImpd5iJCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8739F779A7;
+	Tue,  2 Jun 2026 17:46:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ZOTVHwQXH2qNNAAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Tue, 02 Jun 2026 17:46:44 +0000
+Date: Tue, 02 Jun 2026 19:46:44 +0200
+Message-ID: <87v7c0ygvv.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Miroslav Lichvar <mlichvar@redhat.com>,
+	John Stultz <jstultz@google.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	thomas.weissschuh@linutronix.de,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	Rodolfo Giometti <giometti@enneenne.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	Takashi Iwai <tiwai@suse.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Peter Hilber <peter.hilber@oss.qualcomm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	virtualization@lists.linux.dev,
+	linux-wireless@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [patch V2 21/25] ALSA: hda/common: Use system_device_crosststamp::sys_systime
+In-Reply-To: <20260529195557.995298795@kernel.org>
+References: <20260529193435.921555544@kernel.org>
+	<20260529195557.995298795@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/30.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: sQNQtz0z65nceJbO3UC11/CeYRaMzNsZeRKP80QSgGNbAD5sXejyudoWXiEQXiz2bpMrs81q0APuSE5GjQIZncjCuj4mKRLynNJgVdilCapa3qsNvLZjIu0qounr6nrG4JKHQL5aG+E4ZUAMUR+2vloeW4pqPYOaS0XZuC1Qx7Idc+ynmL5xdqzhn9TifZBMj8vEdnypWLFyILkshYQmoYRPq/aX25HtJwjVZ5FyfW/qdNVkllbmTjJsMn/XvJs07JXacdi030ABflbvL6gf1M1y4Z5oBtyBTr/ig6YN8EEgVVpf8mmYgYy0WRn7cQf/YFcfOFh9YqsBSea/h8z7VQ==
-X-OriginatorOrg: onsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a2e7b49-d4d4-4023-a2f6-08dec0cd7368
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2026 17:36:16.9912
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hYj1NVfNQttkzEtDKWXF449YBK8Sjs51YKc6G5C+Mdx054ywjHbaG/noPx2B/Il+fHNuD7Nx1nfxA9QT4MDuxMyFzLnFach3vaHMsHpXZCM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB7549
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: axFMDYWIiWq1oPqvTX7p4H_Cm6BDH6q6YeO9MBVQCf0_1780421779
-X-Mimecast-Originator: onsemi.com
-Content-Language: en-US
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Flag: NO
+X-Spam-Score: -3.30
+X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294317-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Pier.Beruto@onsemi.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:conor.dooley@microchip.com,m:devicetree@vger.kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com,amazon.co.uk];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	TAGGED_FROM(0.00)[bounces-294318-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:tglx@kernel.org,m:linux-kernel@vger.kernel.org,m:dwmw2@infradead.org,m:mlichvar@redhat.com,m:jstultz@google.com,m:sboyd@kernel.org,m:anna-maria@linutronix.de,m:frederic@kernel.org,m:thomas.weissschuh@linutronix.de,m:akiyano@amazon.com,m:giometti@enneenne.com,m:vdonnefort@google.com,m:maz@kernel.org,m:oliver.upton@linux.dev,m:kvmarm@lists.linux.dev,m:oupton@kernel.org,m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:tiwai@suse.com,m:miriam.rachel.korenblit@intel.com,m:johannes.berg@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:saeedm@nvidia.com,m:peter.hilber@oss.qualcomm.com,m:mst@redhat.com,m:virtualization@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-sound@vger.kernel.org,m:dwmw@amazon.co.uk,m:vadim.fedorenko@linux.dev,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[tiwai@suse.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tiwai@suse.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[CY8PR02MB9249.namprd02.prod.outlook.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,onsemi.com:dkim,onsemi.com:from_mime,onsemi.com:email,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,suse.de:mid,suse.de:dkim,suse.de:from_mime,suse.de:email,vger.kernel.org:from_smtp,amazon.co.uk:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AB471630C5C
+X-Rspamd-Queue-Id: ADF67630D1F
+
+On Fri, 29 May 2026 22:01:13 +0200,
+Thomas Gleixner wrote:
+> 
+> From: Thomas Gleixner <tglx@kernel.org>
+> 
+> sys_systime is an alias for sys_realtime. The latter will be removed so
+> switch the code over to the new naming scheme.
+> 
+> No functional change.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Acked-by: Takashi Iwai <tiwai@suse.de>
 
 
+thanks,
 
-> -----Original Message-----
-> Subject: Re: [PATCH net v3 2/2] dt-bindings: net: updated interrupt type =
-to be active low,
-> level triggered
->=20
-> > According to OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6)
-> > specification, interrupt type is active low, level triggered interrupt.
->=20
-> Have you checked the documentation for this device etc to make sure that
-> the device actually follows the spec?
-> Maybe Parthiban can confirm this for us?
+Takashi
 
-Though I coordinated with Parthiban well ahead about this change, He is the=
- one who could confirm.=20
-
-To answer your question, I looked at the datasheet. In one occasion, it men=
-tions "once RESET_N is deasserted, device asserts IRQ_N.
-When software clears RESETC bit of OA_STATUS0, device deasserts IRQ_N. This=
- gives me an indication that the interrupt is level triggered.
-
-From our side, I checked with our engineer, who is part of the team that pu=
-t together the specification, Pier, copied in this email, confirmed that it=
- is level triggered.
-
->=20
-> Cheers,
-> Conor.
->=20
-> >
-> > Fixes: ac49b950bea9 ("dt-bindings: net: add Microchip's LAN865X 10BASE-=
-T1S
-> MACPHY")
-> > Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-> > ---
-> >  Documentation/devicetree/bindings/net/microchip,lan8650.yaml | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/microchip,lan8650.ya=
-ml
-> b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-> > index 61e11d4a07c4..766ff58147ae 100644
-> > --- a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-> > +++ b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-> > @@ -67,7 +67,7 @@ examples:
-> >          pinctrl-names =3D "default";
-> >          pinctrl-0 =3D <&eth0_pins>;
-> >          interrupt-parent =3D <&gpio>;
-> > -        interrupts =3D <6 IRQ_TYPE_EDGE_FALLING>;
-> > +        interrupts =3D <6 IRQ_TYPE_LEVEL_LOW>;
-> >          local-mac-address =3D [04 05 06 01 02 03];
-> >          spi-max-frequency =3D <15000000>;
-> >        };
-> >
-> > --
-> > 2.43.0
-> >
-> >
-
+> ---
+>  sound/hda/common/controller.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> --- a/sound/hda/common/controller.c
+> +++ b/sound/hda/common/controller.c
+> @@ -525,7 +525,7 @@ static int azx_get_time_info(struct snd_
+>  			break;
+>  
+>  		default:
+> -			*system_ts = ktime_to_timespec64(xtstamp.sys_realtime);
+> +			*system_ts = ktime_to_timespec64(xtstamp.sys_systime);
+>  			break;
+>  
+>  		}
+> 
+> 
+> 
 
