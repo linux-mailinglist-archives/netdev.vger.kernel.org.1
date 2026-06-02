@@ -1,393 +1,319 @@
-Return-Path: <netdev+bounces-294079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBqLFqmRHmodlAkAu9opvQ
-	(envelope-from <netdev+bounces-294079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:17:45 +0200
+	id 2A6ADMiRHmodlAkAu9opvQ
+	(envelope-from <netdev+bounces-294080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:18:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B84462A5F8
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:17:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E82362A617
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5503D301CEDE
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:04:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1979F3015454
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41543C0A1F;
-	Tue,  2 Jun 2026 08:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0093B961B;
+	Tue,  2 Jun 2026 08:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oTehBGre"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f0a5ISYK"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD5E3C0A1B;
-	Tue,  2 Jun 2026 08:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780387487; cv=none; b=kkZ2vIvfDkki6dDbpQCVnuc4lcd7Sg0Ps1H4KFpBg4PrT1ZMwRqRX1q4NWQglPKoDqfCrkTisKF8x3C5LsPWX3u81iYuqbWKKlFIIsW0OjXstYMJB73U8sSFtPemQVfkC2ww6kAmJEfCSUdiliPxZAFcMNBmkwQFvx5UUvAR5ls=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780387487; c=relaxed/simple;
-	bh=f4u9eepWT9EhiP3VPEm3hQVTwZ2X4AC4lmvrh96dahY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QWiGWwEZ8rrYg+UyZIRysxwzBu0DNQcnkLkcjuhGkJ44ADHcXItMhl/WT7WtyVcwYAbsvdjFMFZSkQpzrYJkncSsHpkiX8o2WQ6s7Q7iu52qf6HcRRCVR6kpO7gpE84GW+EQ72RTEJU41xydS/eiTiiDLLx4ukyhrrCVd3VKoUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oTehBGre; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=f4u9eepWT9EhiP3VPEm3hQVTwZ2X4AC4lmvrh96dahY=; b=oTehBGreEofBqSsOK74pBu8aZZ
-	Zt2Lq86bNImr0qcS+eg1kN2zXBRfcQVAJ4ksZtpgkYRAmYnk06/qNQjzBGFhHcgkH2yTyH8HpRHB+
-	sLV6WsyZjkdrmKp7PaoBqWt4yuLi+tN+MaRL9WYhDk8xOcK7kahHJUZM8FX5ZCmCUirvfTm5hKdrY
-	zZwojafRxk0ZsLN927/mu8UyU9dch1xSYvZbnTjmfCWNQHxwXnucJz6Mr9pWo+k7KEhpPxjDGH45W
-	+1yK0skFCXEsa/ofHlpVTFeG4EjFBQQylSF6fYFLZ61Rbn4Ciyk1rICWE0eAI3BsXO9Md4lAjpiRA
-	ZIYtlvBA==;
-Received: from [2001:8b0:10b:5:5b40:b57d:669c:36f4] (helo=2001-08b0-010b-0005-5b40-b57d-669c-36f4.ip6.reverse-dns.uk)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wUK6t-00000001ZaP-2w49;
-	Tue, 02 Jun 2026 08:04:28 +0000
-Message-ID: <0b3f00bbfa6bcc3badb4d1bb7845326e2dbaa1d4.camel@infradead.org>
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
- directory split
-From: David Woodhouse <dwmw2@infradead.org>
-To: Richard Cochran <richardcochran@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: Wen Gu <guwen@linux.alibaba.com>, tglx@kernel.org,
- andrew+netdev@lunn.ch,  davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com,  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- jstultz@google.com,  anna-maria@linutronix.de, frederic@kernel.org,
- daniel.lezcano@kernel.org,  sboyd@kernel.org, vladimir.oltean@nxp.com,
- wei.fang@nxp.com, xiaoning.wang@nxp.com,  jonathan.lemon@gmail.com,
- vadim.fedorenko@linux.dev, yangbo.lu@nxp.com,  svens@linux.ibm.com,
- nick.shi@broadcom.com, ajay.kaher@broadcom.com, 
- alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
- linux-fpga@vger.kernel.org, imx@lists.linux.dev,
- linux-s390@vger.kernel.org,  dust.li@linux.alibaba.com,
- xuanzhuo@linux.alibaba.com, mani@kernel.org,  imran.shaik@oss.qualcomm.com,
- taniya.das@oss.qualcomm.com
-Date: Tue, 02 Jun 2026 09:04:27 +0100
-In-Reply-To: <ah5aGMIxA418sxoj@hoboy.vegasvil.org>
-References: <20260412084704.743482ad@kernel.org>
-	 <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
-	 <20260412095301.4fe1fe65@kernel.org>
-	 <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
-	 <1088b07d760491deb461d6d01abca631e8f8d86c.camel@infradead.org>
-	 <ahzQZg_v4bxFfGdj@hoboy.vegasvil.org>
-	 <3908843460c4864eef79cced40d897f793c7ae2a.camel@infradead.org>
-	 <ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
-	 <0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
-	 <20260601185226.7f43fa75@kernel.org> <ah5aGMIxA418sxoj@hoboy.vegasvil.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-RP0sFoYLKy91Bkl5IsXb"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F98F2798F8
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 08:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780387864; cv=pass; b=OKlhMGc3mz5TgjGPBRtD3GuuAi7iTfctYHefLKLTGfXbktCaQxNEyq0Y8/9MddnUlpyw289diGBB/Pk47hc6k5FDlQ/v/37AHu6TnMWC74UDbyQf8RkZEv0ffj6TENREcVdE5Gl9Eu3C7Y/esMGvmI3OX5fCPrtGLwS5iX38wpA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780387864; c=relaxed/simple;
+	bh=A3mR+iXVh3aOXVYw2xIWqsEP1lq/3bB4I6ut/MByTZw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oPMS8wpu//GDlcxjrQBa6WGIAk4JKvRFQLtc5MWpk6JMYFcqyDrqCOs8P34wJsUf5I0br5BCTPbwJhvX1UI9k8Z43pXngZ5Yo6GmdF5Kj0D0Nyc8LH57aLPXqhGLpbZtd4vrgtDqhWYMY6/YRe7NetcFaQUhClSw4YLt7m2hfIo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f0a5ISYK; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-51749ff0a97so19463971cf.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 01:11:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780387862; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GYRRiP5oD3BxRqK4O+Xsru/7pLjO9ywqn80FjtgGyde55kYVfHZmqRV6gipBk4YtrR
+         OQLrmtOC2n0MDAG7j46X+wKSiwWQsXfBFim2i99Lx2pgyf6z+govwiJjoWqQKWK6QEgC
+         a5XcBvsRLyyRx8GOo4dhyVJP9DKLxnmhtpj1w+ay9pguZQZkqbrITXL/Kjn4CskdxwFR
+         b6lvQ05wS5SaMQYg+7Kj6CUsIZRL+by9oIpGRwubmqloqisNSgzfaPRFmGluVkczRTr7
+         NIFWUq+CWVasX6siuznht2Yq7v7MqJFShMCRWNa9je2E4gHUW5JrD0qCHfyvDsKtuoyd
+         eu1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=NzBskLRV9A992XU5x25VpjtHm9D7sWNRRIF8Dm5gpJo=;
+        fh=dnxZLxqmraij2+NXuV7Sp3eATjXoqP3MYro6Gd+5jhU=;
+        b=K+/mvNLnZ7CAqWHTVppsy+EW1Tbe7iD/ZZdUbLArjx1THCjNJ3hjE5CMvyaDZFeco6
+         zMdAzHYkc6GOnlDM5+kfa/Os40xoPqMmbXRz3UiQs6PAACYDpx8agvtQeadGDSRk6tom
+         J9slAoYWzCSw8UIKAjlby3RbTr7AFNbizpjYPdthx9TLukdX6iTLLhQf0cxe4KoCguLD
+         ebB9D6ZcBM2yaHBNcb3qjjQgkWMbTiwfAcdrkBa72nLZsAw3y4fZlMx5k4F+mRLPQJ0X
+         MjauobK2bpYOh6G+Gay2C2ghVbmPeES6BqpkUgdrXMvftE6nokNUxxwmXoVmd+mPOlnk
+         ezBg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780387862; x=1780992662; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NzBskLRV9A992XU5x25VpjtHm9D7sWNRRIF8Dm5gpJo=;
+        b=f0a5ISYKtrGSrxYUrm1ZOR5uMnC54IG2Fxjn4ADg4ezdKYlSQf8B3lzm1bg9umayw0
+         xc27uot4T5qKG+ZbqSiRMU7/TcfOZejs2RKd5+AkwdBlPuSJ9r1KIJp8clbXrb5U+TVv
+         dwtRzu/F+obRhGJozdh5uzpVK4DYUzcpkhG2L7QFegXDN/LV1b6SdUxWuvkVHCZqxuoV
+         dzH4BIQKCHAdCFeVC6Bm+pU8NNFQ++A2fI+nKPybmFiP+lHlHmNGpNhbjvBA2tu7dUAv
+         ChTwDou9MRRl4D3xRGBmrGVaky7n9M9S157XqK/Ylp9PrSYy3hteXM9TafBieIHmh7sL
+         MMwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780387862; x=1780992662;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NzBskLRV9A992XU5x25VpjtHm9D7sWNRRIF8Dm5gpJo=;
+        b=WNLzlayBwgL2iKlR6gu7kJ9pqbsHr6f5RG7U4f5LMisAl2iQM1gMSkBGf3SZTvYm/4
+         gXQJbDtzjhuq6s9LQROoQ9ivfBxSG8borN/sMlAi0p6cnIKRc5JRzJ7rVN5HumsVzawk
+         YVY43guBJSM7NjMVlEBXEjQfBxcfegr0ptEU8ThAF5LvHqdWDXE28Y9mBI8r/3oNmpoU
+         I52kHarUpsnLeLeyb+wDamcnWKo4vR5wX47vjghSWY/872c/3iLCU4sTxI7GR2dk+NlT
+         t1oSeDETPJPFbZEGtyx4JixHdTbXIvXdR5GPnQwC6S9YECgOV18VK96U6Y7bcCvJs6jc
+         t+pw==
+X-Forwarded-Encrypted: i=1; AFNElJ+xs5hApF0OiesF5nJBIt2XcmTRdT4wemZPcAsqafn08UMYfY4pXPMdGfOEcYyw7QANxKacjQw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4s+2N2WBtLToC7vYL9tuhz1CJOFLCMsLwIQRrOQCqy1Y/FCiM
+	JkOrMjoPhBtsg3guPAhYhN58A6kZJhIX2BVnqS40FC0ErTFtDTD0sOpz2uhrmU0LRR870mRQQ1v
+	8rXSy8kkhHBv43K5mZEK2bB23mROmUmJEFCWQL12u
+X-Gm-Gg: Acq92OEdTBYN4GuDkeVnkigIBDzEHL80qIJy5fJ021NwyrFh53jQm7uD87G2ASowWOD
+	aKRBrjvicNvDncjTshxEubZHtQN7wUYBdNgpvdpy7lcb3Ljh6ae36TW7/lfdWOKfE/HoZoHiZz+
+	3o2yZlnM2C9zv8iWupQPtG0/wugkmmfyA3pAMWECdW92ds1q7a+v9ktHjqiDi5VoiU9V89LLT+w
+	s2TdFwBJLnotxMYPhZI9ybQ3yOyEV+aW6L3ncTddvGJPsJvRkjaiLLSnpEuzahzCQkUZJqj8BB+
+	5TMYDbloshTs8XlKm2uF0A49m6NZxycVvfEHzKp4eVuUnIwn14eMOeW0Tf343oSZPh3kNLZ7yTP
+	Hdo6BCiMdSZFLtEKxYvObMsaXZxbvjd4GAkIpUUo=
+X-Received: by 2002:a05:622a:a952:b0:516:e086:89a with SMTP id
+ d75a77b69052e-5173a851803mr161842911cf.26.1780387861190; Tue, 02 Jun 2026
+ 01:11:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+References: <20260601223122.63c0d23f@pumpkin> <20260601231546.3407019-1-kuniyu@google.com>
+ <20260602090034.7a5c243e@pumpkin>
+In-Reply-To: <20260602090034.7a5c243e@pumpkin>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Jun 2026 01:10:49 -0700
+X-Gm-Features: AVHnY4KP_nX7QZuUeMLjJ5JNn9w6rkz9mTStypuDH-1VO1YDn32yD1IF-mxwy38
+Message-ID: <CANn89iJWcG6UH0ZqLnjRaCr0Ky6WeEYhj-pyeyrPf3oJcHU5KQ@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: use READ_ONCE() in ipv6_flowlabel_get()
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, davem@davemloft.net, dsahern@kernel.org, 
+	horms@kernel.org, idosch@nvidia.com, jianhao.xu@seu.edu.cn, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	runyu.xiao@seu.edu.cn, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-294080-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294079-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,oss.qualcomm.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,uapi-group.org:url,infradead.org:mid,infradead.org:dkim]
-X-Rspamd-Queue-Id: 9B84462A5F8
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: 7E82362A617
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Tue, Jun 2, 2026 at 1:00=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Mon,  1 Jun 2026 23:14:44 +0000
+> Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>
+> > From: David Laight <david.laight.linux@gmail.com>
+> > Date: Mon, 1 Jun 2026 22:31:22 +0100
+> > > On Mon, 1 Jun 2026 05:36:37 -0700
+> > > Eric Dumazet <edumazet@google.com> wrote:
+> > >
+> > > > On Mon, Jun 1, 2026 at 5:22=E2=80=AFAM David Laight
+> > > > <david.laight.linux@gmail.com> wrote:
+> > > > >
+> > > > > On Sun, 31 May 2026 23:39:46 +0800
+> > > > > Runyu Xiao <runyu.xiao@seu.edu.cn> wrote:
+> > > > >
+> > > > > > ipv6_flowlabel_get() still reads the shared per-net sysctl fiel=
+ds
+> > > > > > flowlabel_consistency and flowlabel_state_ranges with plain loa=
+ds,
+> > > > > > while writers update them through proc_dou8vec_minmax(). These =
+checks
+> > > > > > run in the live IPV6_FLOWLABEL_MGR path, so lockless plain read=
+s leave
+> > > > > > KCSAN-visible data races and can make the policy checks observe=
+ stale or
+> > > > > > inconsistent values.
+> > > > > >
+> > > > > > The race can be reached on a running system by toggling
+> > > > > > /proc/sys/net/ipv6/flowlabel_consistency and
+> > > > > > /proc/sys/net/ipv6/flowlabel_state_ranges while another task re=
+peatedly
+> > > > > > issues IPV6_FLOWLABEL_MGR requests with IPV6_FL_F_REFLECT or a
+> > > > > > state-ranges flow label.
+> > > > > >
+> > > > > > This issue was first flagged by our static analysis tool while =
+scanning
+> > > > > > lockless IPv6 sysctl readers, then manually audited on Linux v6=
+.18.21.
+> > > > > > The IPV6_FLOWLABEL_MGR paths were runtime-reproduced with QEMU/=
+KCSAN by
+> > > > > > concurrently flipping the two sysctls while TCP reflect and UDP
+> > > > > > state-ranges setsockopt actors exercised ipv6_flowlabel_get(). =
+KCSAN
+> > > > > > reported races between proc_dou8vec_minmax() and the two plain-=
+load
+> > > > > > sites in ipv6_flowlabel_get().
+> > > > > >
+> > > > > > A narrower second-round UDPv6 + IPV6_AUTOFLOWLABEL send-side re=
+producer
+> > > > > > also hit the inline ip6_make_flowlabel() reader through
+> > > > > > __ip6_make_skb() / proc_dou8vec_minmax(), but that site is alre=
+ady
+> > > > > > fixed in this tree by commit ded139b59b5d
+> > > > > > ("ipv6: annotate data-races from ip6_make_flowlabel()"). The re=
+maining
+> > > > > > plain readers in this tree are both in ipv6_flowlabel_get().
+> > > > > >
+> > > > > > Use READ_ONCE() for those remaining sysctl reads so they follow=
+ the same
+> > > > > > lockless reader contract already used by other IPv6 sysctl read=
+ers.
+> > > > > >
+> > > > > > Build-tested by compiling net/ipv6/ip6_flowlabel.o on x86_64.
+> > > > > >
+> > > > > > Representative QEMU/KCSAN reports from the two target reader pa=
+ths:
+> > > > > >
+> > > > > >   BUG: KCSAN: data-race in ipv6_flowlabel_opt / proc_dou8vec_mi=
+nmax
+> > > > > >   write: proc_dou8vec_minmax+0x206/0x220
+> > > > > >   read:  ipv6_flowlabel_opt+0x6d8/0xd20
+> > > > > >          do_ipv6_setsockopt+0x873/0x2220
+> > > > > >          tcp_setsockopt+0x72/0xb0
+> > > > > >
+> > > > > >   BUG: KCSAN: data-race in ipv6_flowlabel_opt / proc_dou8vec_mi=
+nmax
+> > > > > >   write: proc_dou8vec_minmax+0x206/0x220
+> > > > > >   read:  ipv6_flowlabel_opt+0x129/0xd20
+> > > > > >          do_ipv6_setsockopt+0x873/0x2220
+> > > > > >          udpv6_setsockopt+0x21/0x40
+> > > > > >
+> > > > > > Fixes: 6444f72b4b74 ("ipv6: add flowlabel_consistency sysctl")
+> > > > > > Fixes: 82a584b7cd36 ("ipv6: Flow label state ranges")
+> > > > > > Cc: stable@vger.kernel.org
+> > > > > > Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+> > > > > > ---
+> > > > > >  net/ipv6/ip6_flowlabel.c | 4 ++--
+> > > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > > > >A
+> > > > > > diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.=
+c
+> > > > > > index b1ccdf0dc646..1ab5ad0dcf24 100644
+> > > > > > --- a/net/ipv6/ip6_flowlabel.c
+> > > > > > +++ b/net/ipv6/ip6_flowlabel.c
+> > > > > > @@ -620,7 +620,7 @@ static int ipv6_flowlabel_get(struct sock *=
+sk, struct in6_flowlabel_req *freq,
+> > > > > >       int err;
+> > > > > >
+> > > > > >       if (freq->flr_flags & IPV6_FL_F_REFLECT) {
+> > > > > > -             if (net->ipv6.sysctl.flowlabel_consistency) {
+> > > > > > +             if (READ_ONCE(net->ipv6.sysctl.flowlabel_consiste=
+ncy)) {
+> > > > >
+> > > > > That can't actually fix anything.
+> > > >
+> > > > It fixes a KCSAN splat.
+> > > >
+> > > > If you think you can fix KCSAN instead, please do so.
+>
+> ipv6.h has:
+>         u8 flowlabel_consistency;
+>
+> KCSAN probably shouldn't care about byte reads.
 
---=-RP0sFoYLKy91Bkl5IsXb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+KCSAN detects more than just load/store tearing. Here is a summary:
 
-On Mon, 2026-06-01 at 21:20 -0700, Richard Cochran wrote:
->=20
-> Sorry for replying to David here via Jakub's message.=C2=A0 Somehow my
-> brilliant Gmail doesn't have David's reply...
+Purpose: KCSAN identifies data races, which are a common source of
+correctness, stability,
+and security bugs in concurrent systems like the Linux kernel.
 
-Yeah, Gmail. Here's a nickel, kid... :)
+Mechanism: It is a compiler-instrumentation-based tool. During
+compilation, special code is added to monitor memory accesses.
+At runtime, KCSAN detects when multiple threads access the same memory
+location without proper synchronization,
+and at least one of those accesses is a write.
 
-> On Mon, Jun 01, 2026 at 06:52:26PM -0700, Jakub Kicinski wrote:
-> > On Mon, 01 Jun 2026 17:53:49 +0100 David Woodhouse wrote:
-> > > On Mon, 2026-06-01 at 08:20 -0700, Richard Cochran wrote:
-> > > > Sorry, just catching up here, so the idea is to have
-> > > >=20
-> > > > =C2=A0linux/drivers/ptp/drivers=C2=A0 ?=C2=A0=20
-> > >=20
-> > > That is my current suggestion.
->=20
-> drivers/../drivers seems a bit silly to me
+Operation: KCSAN performs its analysis at runtime, reporting data
+races that actually occur or nearly occur during code execution.
+While powerful and scalable across the entire kernel, this
+instrumentation can significantly slow down kernel execution.
 
-It wouldn't be the first, but yeah =E2=80=94 more conventional would be to =
-have
-the core elsewhere and the drivers under linux/drivers/.=20
-
-That maybe involves moving the PTP core to kernel/time/ptp[/*] while
-leaving the drivers where they are?
-
-But first we have to know the problem we're trying to solve, and Jakub
-has just revised my understanding of what he was originally asking for.
-
-> > > It stems from Jakub's response in
-> > > https://lore.kernel.org/all/20250815113814.5e135318@kernel.org/=C2=A0=
-that "I
-> > > really wish someone stepped up and created a separate subsystem for a=
-ll
-> > > these cloud / vm clocks. They have nothing to do with PTP."
-> > >=20
-> > > There was some further bikeshedding in
-> > > https://lore.kernel.org/netdev/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@l=
-inux.alibaba.com/
->=20
-> The idea of categorizing core, NIC-related, vm, and stand alone clock
-> devices makes some sense to me.
->=20
-> > > around how to split 'emulated' from other hardware drivers, but I don=
-'t
-> > > much like that taxonomy. Some of these "virtual" clocks could just as
-> > > easily exist in hardware with PTM too.
->=20
-> So the whole in-kernel API in ptp_clock_kernel.h with ptp_clock_info,
-> etc, was poorly named (by me) back around Linux 3.0.=C2=A0 After all, the
-> abbreviation, "PTP", stands for a network protocol.=C2=A0 At the time, Al=
-an
-> Cox pointed that out and complained, but somehow the code got merged
-> anyhow.
->=20
-> The term PHC is a better one, since PTP Hardware Clock means clock
-> device whose purpose is to support network time keeping together with
-> a NIC.
->=20
-> > > My observation is that with the sole exception of ptp_inet.c, *all* o=
-f
-> > > the actual PHC drivers that live in drivers/ptp instead of drivers/ne=
-t
-> > > are "pure clock" drivers,
->=20
-> No, that is not quite right.=C2=A0 The clockmatrix, idt82p33, ines, and
-> qoriq drivers wouldn't be very useful without an attached NIC.
-
-Ah, OK. Moderately confused because ines is the only one where I see
-any evidence of hwtstamp support, and the rest just seem to provide a
-PHC, but I'll take your word for it.
-
-> > > so perhaps we split those all out into
-> > > drivers/ptp/drivers/ and exclude them from the netdev maintenance?
->=20
-> Originally the idea was that the rate of patches would be low enough
-> that netdev would be the place to post and review them, and that no
-> separate tree or mailing list were needed.=20
-
-I think that assumption about the rate of patches should still be true.
-If I end up owning a tree for the 'virt' drivers, I'd mostly be
-answering "no, use VMClock instead". There's a reason I found a home
-for that as a vendor-agnostic specification=C2=B9 and built the QEMU and
-guest kernel support before even pushing it out at $DAYJOB.
-
-=C2=B9 https://uapi-group.org/specifications/specs/vmclock/
-
-> Even though the "PTP" naming was an unfortunate choice way back when,
-> still I'm not a big fan of moving stuff around "just because".
->=20
-> But moving forward, I would suggest starting a new area for pure
-> hardware clock devices.=C2=A0=20
-
-I think that ties relatively well to Jakub's "does it purport to know
-real time better than the host" criterion?
-
-Although... ENA *both* purports to know real time better than the host
-*and* does packet timestamping, and it looks like GVE is attempting to
-do the same?
-
-> =C2=A0=C2=A0 "Clock Devices" ?
-> =C2=A0=C2=A0 linux/drivers/cd
->=20
-> Too short!
->=20
-> =C2=A0=C2=A0 "Time Keeping Devices" ?
-> =C2=A0=C2=A0 linux/drivers/tkd
->=20
-> Confuses core time keeping!
-
-That isn't necessarily a bad thing... (qv)
-
-> =C2=A0=C2=A0 "Advanced Clock Devices" ?
-> =C2=A0=C2=A0 linux/drivers/acd
->=20
-> Let's come up with a fitting name.
->=20
-> Still, I don't understand why these new (non-network related ) device
-> drivers can't be implemented in their own class using
-> posix_clock_register()
-> etc.
->=20
-> Any of the useful bits (like sysfs interfaces) can be refactored out
-> of ptp_clock.c and shared as a common layer.
-
-The key is that userspace wants to get snapshots of the reference clock
-either precisely synchronized with the system clock where possible, or
-sandwiched as closely together as possible with ABA readings of the
-system, reference, system clock.
-
-Those *are* the PTP_SYS_OFFSET* ioctls, which tools like chrony already
-support with 'refclock PHC /dev/ptp=E2=80=A6'.
-
-I'm not sure how factoring those out into separate POSIX AUX clocks
-would help? I think they do want to present as /dev/ptp*.
-
-There is some extra stuff we want to do for "Precision RTCs" or
-whatever we're going to call them. They might actually have a known TAI
-offset, they might convey leap second indications, we might want to set
-the kernel's CLOCK_REALTIME from them at boot. And in the case of
-VMClock, I'm working on being able to clamp the kernel's timekeeping to
-it directly=C2=B2.
-
-So maybe what we want is linux/drivers/phc, to host those read-only
-devices which know real time. They can provide a simplified
-implementation; maybe *only* a function like vmclock_get_crosststamp(),
-which is just called in various different permutations by the various
-different PTP methods.
-
-The core linux/drivers/phc code would then handle the interface to the
-kernel's core timekeeping *and* wrap them to register a PTP device that
-existing userspace can understand. And deal with the kvmclock/TSC
-awfulness where needed.
-
-How does that sound?=20
-
-
-=C2=B2 https://lore.kernel.org/all/20260520135207.37826-9-dwmw2@infradead.o=
-rg/
+Impact: KCSAN has been instrumental in finding and fixing numerous
+concurrency bugs.
+For example, it has led to the addition of annotations like
+READ_ONCE() and WRITE_ONCE()
+in kernel code (e.g., in the TCP/IPv6 stack) to properly handle
+lockless reads and writes and resolve reported data races.
 
 
 
 
+>
+> > >
+> > > It is a false positive.
+> >
+> > It's not.
+> >
+> >
+> > > (Which I think you also said in a different email.
+> >
+> > I guess you meant this one ?
+> > https://lore.kernel.org/netdev/20260601074201.1186061-1-runyu.xiao@seu.=
+edu.cn/
+> >
+> > This is different because, in addition to Eric's comment, IPv6
+> > address is 128-bit and data-race is inevitable without locking
+> > unless CPU supports native 128-bit read/write; we already do
+> > load/store-tearing of 128bit with u32/u64.
+>
+> But the code isn't looking at a 128bit value, it is only doing a check
+> for zero (and READ_ONCE() doesn't support 128bit values).
+> If there is no locking the value can change just before/after the test.
+> Even if it were subject to read/write tearing absolutely the worst that
+> could happen is a zero being detected when the value changes between
+> two non-zero values.
+> That isn't relevant here - it is just a boolean.
 
-
---=-RP0sFoYLKy91Bkl5IsXb
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYwMjA4MDQy
-N1owLwYJKoZIhvcNAQkEMSIEIIGcKIP2EPstYmZEUerRVfVfjJLflCgkwLcbjoG2nZCKMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIArByzGoa3JuPd
-rSLvIUVRy+Iu1AI3hFh/pZm5GW7hstctYsHMnVPBgy/L1X5g/Edz1/ylEMrftxsfTi8ctXwR5YoN
-BsAdVa+4imGrX+700zm/iLtUXqFPSxJ5H/RbKmioqqf3poQLHJIjHlzW9S6wZRaQOLjOctQwUC+8
-umC4SdZ5YyoM6NiFEtEtui5GemWcflX1ALtSE5Mtk2qCP1DOuFBOsciSjj8TU7ItjnHAmyInzsUk
-VdiFKdix0a9DbKR6bMyOFelC2Yh7TNlY4jgb1EWTMvEQTRl3vmMq0nv0JU+idUPrOtxq3GYouNGt
-OwngMK4h+Jg5alOEHCOiYXWsTbv5c+vZHxdENMttm/tWKGyfRtRtWKHSmBYtVUymkTm1jd84o12a
-uC2U5AEYyQcO6AvwitBt/KO30xi5ZJUzBbNOjz60nKO8hqaxqnVW1I28bmg737hIb1ItxiomgfDI
-NERZbsZEBBL5dIyAF1WK35KSVwhG8lcmMJX88PSE8+ajFQGZnWI7NVyn0LO8nSFtGBjA0JGxUnzC
-4l51keV8bgXIRF8xq4pFJ35zo6gp58BDbhqDCg18RpHx/3jDphJqSwUkSWYb42H8O9nzHJYJfBN2
-/guiO/bKQA8H7jjYVYyg2EbFTB7905J7i+mGZ/iurGTuPKQqBtZ1cNR58uw0QRQAAAAAAAA=
-
-
---=-RP0sFoYLKy91Bkl5IsXb--
+It is completely relevant. If you disagree, please fix KCSAN.
 
