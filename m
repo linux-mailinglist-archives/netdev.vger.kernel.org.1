@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-294049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGEIHwB+HmrnjgkAu9opvQ
-	(envelope-from <netdev+bounces-294049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:53:52 +0200
+	id cP0lKwp+HmrnjgkAu9opvQ
+	(envelope-from <netdev+bounces-294051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:54:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28286629356
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:53:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9F2629388
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 08:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 53872305023B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 06:50:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 042CD305663D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 06:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E1C3A8743;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42CC3A9605;
 	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ByfxNs6z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ks/0I1Qk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96523A05C2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83CC3A6EFC;
 	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780383047; cv=none; b=Fkkn+6pwthRSG1nwsga2ptG5lQzdLUoOZGZM2mC6UBL9DtWjpnmgaE+U7bCzmPe1vk2E7MFfLmfX9/HysLO4eGgqZV+pr5Jlczik9nAaqvJzPUpuyUWg5I5hJObmescurzYlIgYXGZQQNBuioFdb3kLneGA87o0jXQVn/dIFbeg=
+	t=1780383047; cv=none; b=XWp05nhhQYcLOmLAkHoNmTD/GYMJ4HVAq/5KXOdP5VcuDyMD2KVpYCNho6QNIMJclFit+Jgh1dYBBoAj6fTu1FYwUyhdbx9S0UEnAQS9AzCFhUIVFkVchIi587mmK8NwoT3S6xTUrrMPUH6NfvWL8TrCIKl1uY8c2yfEeGQ05c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780383047; c=relaxed/simple;
-	bh=kIefg/1GFOBugtxjwANZjrxgWJw8zIE16yRu6PaEZ6I=;
+	bh=ShW9Ricl3pdsDQmWHAT9WtSifRMHSURnw6DOL8FJBD0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DQNiK6FobdAXump1YCaefEVUnYdbAXM0APvdD3z980CxB+LJiywJhQ5DPIZz4nkeRVXgIiQaBheBkuj6MnJ7kSiDp1gsXeM7gG75vxKpyOARSYuO3ZxSs6eNMEaUkVFuMblRHqn/XW8laoHaYETB1EjoSNx9WwMpceDGEY0RRjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ByfxNs6z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 688E6C2BCF6;
+	 In-Reply-To:To:Cc; b=FMmrDt9vgowyjPap7FUkm2JgabOb4nQMC84LhUI/Ei8WaIXDotfigcAdHlIXYk6bDtZEeOoqfuEPTO6HhDGMbEsJroTBc2FanmPRHxm9JKL6ilIaOywVddbk2MTHHxbYZxNT+c/X8i2jE3fqerabZA7Br71vjL4JIf2XZSn3GLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ks/0I1Qk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 80243C2BCC4;
 	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1780383047;
-	bh=kIefg/1GFOBugtxjwANZjrxgWJw8zIE16yRu6PaEZ6I=;
+	bh=ShW9Ricl3pdsDQmWHAT9WtSifRMHSURnw6DOL8FJBD0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ByfxNs6zvTKxwN2P1uUJZf/V2cfF0O3x5Gb4TWJU33UHKp5GlOMsFgUWR0g4cGAb8
-	 WmrMAzHwFZ9YPdPYIY8OkTvtOstxvbHx7KU5sq/eJ6wrNOXUlCgKH7abbAWG+0dQfw
-	 8yOBOLWoUVA/Il01Qh0/9NJoFXWBGU300mpL5MH/70Mpj2LAedyj2jBI3M8eqQs+ME
-	 CNGhupECmWGlXxwj7bMtCfg/a0/R+wgsQfTKXULxkTpVOsbz7GxeQii43eW/hvAfAL
-	 guaiHbY4DJ4ydJf+P6sUT5mhAjGMtZwQQrZYLr3pTf3yeud/+iUhInPBUk50ZXa4M6
-	 4hj0KBgVG5/Vg==
+	b=ks/0I1QkCboBfPIu7jQzGBYk3u3jhbcrijgtmc+FG2uudMAbVZx6e65Pk9m3V3/QW
+	 dpshW/DZnXZwAa7Bna/OZlukGgiRICjgTGCawdEggwurc/eDOlOcAQUWQOqaK8E2t0
+	 afVb9mOuhooUJBcRWeJwGxZWZ0ARDwjmDBgiYLfirHPnDChyJKCbTwUw+r7Y8NQ7JP
+	 4t2OloccJiZy19sUK6wGveLfxjRCzwOxmUPLAqua/RGycjgl7PZLI50idIfoVmc845
+	 wgbk1juWUVK61NL7tqIHkEifmxzd8wC8wGSHwasmeMS9rLkIYW2P+8hed8P0dtkT5W
+	 qpgH8c2cAekJA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E3CBCD6E4A;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5FACD6E61;
 	Tue,  2 Jun 2026 06:50:47 +0000 (UTC)
 From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Tue, 02 Jun 2026 10:50:38 +0400
-Subject: [PATCH v2 2/4] dt-bindings: net: qca,ar803x: Add clocks property
- for IPQ5018 PHY
+Date: Tue, 02 Jun 2026 10:50:39 +0400
+Subject: [PATCH v2 3/4] arm64: qcom: ipq5018: Add GEPHY RX and TX clocks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260602-ipq5018-gephy-clocks-v2-2-65a1f1d881f3@outlook.com>
+Message-Id: <20260602-ipq5018-gephy-clocks-v2-3-65a1f1d881f3@outlook.com>
 References: <20260602-ipq5018-gephy-clocks-v2-0-65a1f1d881f3@outlook.com>
 In-Reply-To: <20260602-ipq5018-gephy-clocks-v2-0-65a1f1d881f3@outlook.com>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
@@ -76,11 +75,11 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, 
  George Moussalem <george.moussalem@outlook.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780383045; l=1550;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780383045; l=821;
  i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=rp75ghzSXcjDqIvT5opgDmpxqQkfyYFvfhT3Z1yNuHo=;
- b=Usttx2e8YKj6zXboagFAnbpDINjy3YqTzY2if/dIYtg3G4sMensrQbZYOGUT1lOykjyPhygM5
- NY8rA1NJG3sDWI7ObRa3WovAWDWe/MKbUPmlyx/iCNx/zG72OMrrrd5
+ bh=ZUcDzKT3pAn1GyMp8FWZKORP9V8n09/s7Z10uOma/1w=;
+ b=hYmsbMQ3fMK4DDwf3ak4gIISvaF2g/SUFPxa+jH6K/jRD+NdcwfZrCKIF2+fxWqVJc4XB2d5y
+ yYpto1t9q0jBUCeVMlkeTguvV5chLRkX84lzcm7RqAD2dI/lHrWH9RR
 X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
  pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
 X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
@@ -98,7 +97,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294049-lists,netdev=lfdr.de,george.moussalem.outlook.com];
+	TAGGED_FROM(0.00)[bounces-294051-lists,netdev=lfdr.de,george.moussalem.outlook.com];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -109,7 +108,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	HAS_REPLYTO(0.00)[george.moussalem@outlook.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.996];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[vger.kernel.org,oss.qualcomm.com,outlook.com];
@@ -118,61 +117,35 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,outlook.com:replyto,outlook.com:mid,outlook.com:email]
-X-Rspamd-Queue-Id: 28286629356
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,0.0.0.7:email,outlook.com:replyto,outlook.com:mid,outlook.com:email]
+X-Rspamd-Queue-Id: 5C9F2629388
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: George Moussalem <george.moussalem@outlook.com>
 
-Further testing revealed that the RX and TX clocks of the IPQ5018 PHY
-need to be explicitly enabled. As such, add the clocks property to the
-schema.
+Add RX and TX clocks for the IPQ5018 GEPHY to enable the datapath.
 
+Fixes: f5f2b835e316 ("arm64: dts: qcom: ipq5018: Add GE PHY to internal mdio bus")
 Signed-off-by: George Moussalem <george.moussalem@outlook.com>
 ---
- Documentation/devicetree/bindings/net/qca,ar803x.yaml | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm64/boot/dts/qcom/ipq5018.dtsi | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/qca,ar803x.yaml b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-index 7ae5110e7aa2..07615640b0ed 100644
---- a/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-+++ b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-@@ -28,6 +28,16 @@ allOf:
-         reg:
-           const: 7  # This PHY is always at MDIO address 7 in the IPQ5018 SoC
+diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+index 6f8004a22a1f..60c27a6f2b10 100644
+--- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
++++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+@@ -229,6 +229,9 @@ ge_phy: ethernet-phy@7 {
+ 				compatible = "ethernet-phy-id004d.d0c0";
+ 				reg = <7>;
  
-+        clocks:
-+          items:
-+            - description: RX clock
-+            - description: TX clock
-+
-+        clock-names:
-+          items:
-+            - const: rx
-+            - const: tx
-+
-         resets:
-           items:
-             - description:
-@@ -162,6 +172,7 @@ examples:
-         };
-     };
-   - |
-+    #include <dt-bindings/clock/qcom,gcc-ipq5018.h>
-     #include <dt-bindings/reset/qcom,gcc-ipq5018.h>
- 
-     mdio {
-@@ -172,6 +183,9 @@ examples:
-             compatible = "ethernet-phy-id004d.d0c0";
-             reg = <7>;
- 
-+            clocks = <&gcc GCC_GEPHY_RX_CLK>,
-+                     <&gcc GCC_GEPHY_TX_CLK>;
-+            clock-names = "rx", "tx";
-             resets = <&gcc GCC_GEPHY_MISC_ARES>;
-         };
-     };
++				clocks = <&gcc GCC_GEPHY_RX_CLK>,
++					 <&gcc GCC_GEPHY_TX_CLK>;
++				clock-names = "rx", "tx";
+ 				resets = <&gcc GCC_GEPHY_MISC_ARES>;
+ 			};
+ 		};
 
 -- 
 2.53.0
