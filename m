@@ -1,70 +1,55 @@
-Return-Path: <netdev+bounces-294369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294370-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Dh3oHq4rH2qCiQAAu9opvQ
-	(envelope-from <netdev+bounces-294369-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:14:54 +0200
+	id cRosEI8qH2pZiQAAu9opvQ
+	(envelope-from <netdev+bounces-294370-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:10:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC92A631559
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:14:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB58631500
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 21:10:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mLewJqOw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294369-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294369-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HVvU3Vky;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294370-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294370-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61641307AF32
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 19:07:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A3EC53027DBB
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 19:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA143A48DF;
-	Tue,  2 Jun 2026 19:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8E639EF3F;
+	Tue,  2 Jun 2026 19:10:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197ED3812F7;
-	Tue,  2 Jun 2026 19:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62F13A48E2;
+	Tue,  2 Jun 2026 19:10:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780427226; cv=none; b=nXaJgOlz2bmYxWBK8f/w5ReYuZ1Lw3xZwupaGiPeJbRl8MhyFiL2k/KjY2d8vkzdZlEDJ2+2l169BsDsAMeub8UghnN5jt6v74IX2Tlhda7t12bRB57oDLo6tj3wS/+ok9wQqC9daP5m+7mw9EJE0eAzBYzwLn4/XhDI+nc1Wj0=
+	t=1780427404; cv=none; b=NKl5CORAA9kY7NGHqUTNJXVA1fL0XPIMUjEvLUGr8YFPaqcj3z4bjhoE1Z2mbNV4i0dZetCtmOZV4sy8zsMDHj03V6OMo/hrXgv2s+/EXt8p2O3MaA26xsJDNU/YO+MgVZ0mEhOcfjTlGB/a7ldPM8uou3XhROBrWmh7stHI2jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780427226; c=relaxed/simple;
-	bh=dnHosAXl/coXl6ucrNy+LCig5YvUbBl/NXma3SYL6CM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fw+15eE/LyFdWW0LDWbNac+LepZjOiC4/re7eTRhRN1vpBQEArICPN4F2lXRiD/LgjfRzsMeat6num64IRgOXw/VuMDo3105E/Ylx+H5R2rM8c+CJCjaEK8JORA9sXiivo6DIDdai5QHpO5snYEjIzzuTJ97+alE2UB5hX5+oWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLewJqOw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 410D51F00893;
-	Tue,  2 Jun 2026 19:07:04 +0000 (UTC)
+	s=arc-20240116; t=1780427404; c=relaxed/simple;
+	bh=be5AKohs9VfuCdFtEEcL5+RpBBDiAxbaXM4gzXF0PaI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EXYGA8ggbeOtyIBEsXl26rGhyiNK7HnJw8NeMHTzKFBZ5eqXUgoi1oK9j1laLfeI6eD3lPg96G/xREbofpAZkil6bNmF2fwA0U1qQe3AXPQktQj8HOPPof8tmIpXjSctC4fW6J5mv7d7x1A7t4YzZNOwAJHgABfBGj0AGyLsnz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HVvU3Vky; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 842161F00893;
+	Tue,  2 Jun 2026 19:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780427224;
-	bh=PLN3wsI49Icr4aZEVDsCDDfXyKhloHxXkuEhGkxIAvM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=mLewJqOwmufLT5DSW/Astfb2BCGp6Ee2fhxWTsKLvFgk7Y2kggVJkYwxT0w0/7VsI
-	 7wjX9O8K912c4y/CDMlo/xOJ3dCJ5X36KuV1eL4C0miY8aSq4lOARs4Y7RaetshpIn
-	 6vV9Ty+rHJcBMjdhac4WgPl/SkTAYx9meWabg3aO99D/IfjNHbt0T7AVIGBflWZMTO
-	 5x0jcLKwFUgGZVGLCreojzkGLh7Tpg6HCuiZqEqSdcdechhq4W95Byn+6lZfoFZnBb
-	 6Mwo+tb7WIkneTtisdwB9vmL51g5+GrEdpgn+gDqfkOnu18Uj6Txx8jILJtSyJ0LWm
-	 X+Uq9RT2nG0sQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: maoyixie.tju@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	fmancera@suse.de,
-	jvaclav@redhat.com,
-	andrew@lunn.ch,
-	ap420073@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] hsr: broadcast netlink notifications in the device's net namespace
-Date: Tue,  2 Jun 2026 12:06:59 -0700
-Message-ID: <20260602190700.1920420-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260601022014.1175348-1-maoyixie.tju@gmail.com>
-References: <20260601022014.1175348-1-maoyixie.tju@gmail.com>
+	s=k20260515; t=1780427403;
+	bh=yXVsAin2aMEpAJMaB8RYDCVaVZtL4AZzPKvQvGUBlew=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=HVvU3VkyfQa7XeXwPTfgHZOK1CGHPsp4xEp/twYg2A+QiVLKnCt81T2W3VM93cNhH
+	 2wpAyzstkMRz4WTGuFZ2JoT7stisKj6OGZg2O7gpeKhP1rj8de7JHw9Q1ZeEOGDNNN
+	 bMtdsbX48zBgJ+JWqA85+aBihlP7sqMPFTNY11Yw5DTpeHFkxFy0tmCGNBIf2E5ARS
+	 zCN5b9bRsb0qpm+Gj2RUp4AITRD3pWnIF8l4GkqzHKxn89dXCAqe8NPccmYJnczGK5
+	 TqqHZOaBDQpa3oA7CK7cz73OURxUvgLT5f90fLumLjEum8dxuRtKSuFTwY9anzCYRU
+	 +ViW2OyA+M7yQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 997453811A6C;
+	Tue,  2 Jun 2026 19:10:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,97 +57,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next 1/1] bpf: Silence unused-but-set-variable warning
+ in
+ bpf_for_each_reg_in_vstate_mask
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178042740541.1010994.11013299870656363791.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jun 2026 19:10:05 +0000
+References: <20260602175204.624401-1-ameryhung@gmail.com>
+In-Reply-To: <20260602175204.624401-1-ameryhung@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+ andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com,
+ martin.lau@kernel.org, kernel-team@meta.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-294370-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294369-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:fmancera@suse.de,m:jvaclav@redhat.com,m:andrew@lunn.ch,m:ap420073@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:maoyixietju@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,suse.de,lunn.ch,gmail.com,vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BC92A631559
+X-Rspamd-Queue-Id: 9BB58631500
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-hsr: broadcast netlink notifications in the device's net namespace
+Hello:
 
-This commit modifies the HSR subsystem to broadcast generic netlink
-notifications in the device's network namespace instead of init_net. It updates
-hsr_nl_ringerror() and hsr_nl_nodedown() to use genlmsg_multicast_netns().
+This patch was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-> diff --git a/net/hsr/hsr_netlink.c b/net/hsr/hsr_netlink.c
-> index f0ca23da3ab99..eb6d222535d8b 100644
-> --- a/net/hsr/hsr_netlink.c
-> +++ b/net/hsr/hsr_netlink.c
-[ ... ]
-> @@ -288,8 +289,17 @@ void hsr_nl_nodedown(struct hsr_priv *hsr, unsigned char addr[ETH_ALEN])
->  	if (res < 0)
->  		goto nla_put_failure;
->  
-> +	rcu_read_lock();
-> +	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
-> +	if (!master) {
-> +		rcu_read_unlock();
-> +		goto nla_put_failure;
+On Tue,  2 Jun 2026 10:52:04 -0700 you wrote:
+> The macro requires callers to pass a stack variable, but not all
+> callbacks use it. Add (void)__stack to suppress the clang W=1 warning.
+> 
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  include/linux/bpf_verifier.h | 1 +
+>  1 file changed, 1 insertion(+)
 
-[Severity: High]
-Does jumping to nla_put_failure here cause a NULL pointer dereference?
+Here is the summary with links:
+  - [bpf-next,1/1] bpf: Silence unused-but-set-variable warning in bpf_for_each_reg_in_vstate_mask
+    https://git.kernel.org/bpf/bpf-next/c/c169a2a5fd9c
 
-If master is NULL, the code jumps to nla_put_failure, which frees the skb
-and then falls through to the fail label:
-
-nla_put_failure:
-	kfree_skb(skb);
-
-fail:
-	rcu_read_lock();
-	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
-	netdev_warn(master->dev, "Could not send HSR node down\n");
-	rcu_read_unlock();
-
-Since master was not found previously, the re-fetch will likely still be NULL,
-meaning the dereference of master->dev in netdev_warn() will crash.
-
-> +	}
-> +
->  	genlmsg_end(skb, msg_head);
-> -	genlmsg_multicast(&hsr_genl_family, skb, 0, 0, GFP_ATOMIC);
-> +	genlmsg_multicast_netns(&hsr_genl_family, dev_net(master->dev),
-> +				skb, 0, 0, GFP_ATOMIC);
-> +	rcu_read_unlock();
->  
->  	return;
->
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
