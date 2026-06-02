@@ -1,154 +1,114 @@
-Return-Path: <netdev+bounces-293931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293934-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJpfGsQjHmoohgkAu9opvQ
-	(envelope-from <netdev+bounces-293931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 02:28:52 +0200
+	id gDGTFbslHmo9hgkAu9opvQ
+	(envelope-from <netdev+bounces-293934-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 02:37:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCE126268B5
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 02:28:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D966269E3
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 02:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D24F5304C9D1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 00:28:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 223823042598
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 00:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3D72EBB84;
-	Tue,  2 Jun 2026 00:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2BC2F1FE3;
+	Tue,  2 Jun 2026 00:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TwGEmlgk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LrT4R1Fn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888873BB57;
-	Tue,  2 Jun 2026 00:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25262BE65B;
+	Tue,  2 Jun 2026 00:34:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780360107; cv=none; b=jGGk+SxMbIBR8BO2H0ngBRSSZq/dcaEGiGqCX2k1ucyPaxuML6ZSlgTGYlakNGjxftEk3qIB4y9ueHdNAM0WSm3o8K7ZcY4C+lJy+RymGjbCb4go0BiwxgZu3MgLh4SVy+I22As55dFuDQZcOw5qozxJUb2RiCp1H6JxWG02uBY=
+	t=1780360444; cv=none; b=ODi3Ky4NomIqnt0jSCKqEt5gW/nS1lmeJ+xjV+WoBaipxl8uCEreMvAXg0OhUFq3iEndP6nS5x5TSTKFeP8QUfPqMOatxILbHSIBehSc5PPM/5JB0jbQ5quqeDgARF/96GOAsUk/mMCsMHa7QrPbMfbqHkxAehV05sgsBp/CzaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780360107; c=relaxed/simple;
-	bh=+a2ZO95kxdHvWsGSafCiYuXUQ71T5a+8Z3XcVsOahyE=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=BSDYR1px7bQm5kPtmSgwEcsIhR38nyaD6BUYmVGrScKK0x9mExYC6oimaS06hXtavUZ9DhbMOuXFI4GZI2UhrRVnLVU9+Igli1VTiFHuHJPUJtUZowGRt+8SL7qNceyXIT3nnUwNyntzs+nvJPpDrk/oCVzxe915veEaPv0ApSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TwGEmlgk; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A011F00893;
-	Tue,  2 Jun 2026 00:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux-foundation.org; s=korg; t=1780360106;
-	bh=Slg9d12DIpflrilD7A2AKj3teZ7pACuCN0yNTcRFtLQ=;
+	s=arc-20240116; t=1780360444; c=relaxed/simple;
+	bh=qZ7bCQSddA9GP4Q26qjJGXv0MQXMsd36Q5gss9jKA4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BPVNotyjdRINfDYoPmXa8QlNLfubnh//KhDHZRK3bV3CDkWdt7O6OEb9OAhn6LT/hY+2mksuIjhc8hvsY90+xBwjat4MaoGBoD2pzzVq+zz0PoXX1KWgMk8vjSoCOHcF1hTA13AfMTKJqTRGXtIN1Vei/16v2xIblrMbfzqdrIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LrT4R1Fn; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A733E1F00893;
+	Tue,  2 Jun 2026 00:34:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780360443;
+	bh=XSv5f2xonG2jwEtIkq1PsvlV+gdAZE4pvna2aJ3ZHYg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TwGEmlgkOSCqITM58gG6pT8IVelTAcsMweMr/i4OOMCAtucX/zJUxGFLy723fHJ1G
-	 2zlZx5fxbmhgSh+6f1UJERPZ+etSvyv8toosvcWhnhuWo6IZGx2gdxEPCnM2ebBfjO
-	 WPCRazYPlC4PvMA51SubT1XwysVby5d6Cgb2Sz3c=
-Date: Mon, 1 Jun 2026 17:28:25 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, Linus Torvalds
- <torvalds@linux-foundation.org>, Christian Brauner <brauner@kernel.org>,
- Askar Safin <safinaskar@gmail.com>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-api@vger.kernel.org, netdev@vger.kernel.org,
- Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@infradead.org>, David Howells <dhowells@redhat.com>,
- David Hildenbrand <david@kernel.org>, Pedro Falcato <pfalcato@suse.de>,
- Miklos Szeredi <miklos@szeredi.hu>, patches@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for
- preadv2/pwritev2
-Message-Id: <20260601172825.a51a588ec1c32617a0e12d78@linux-foundation.org>
-In-Reply-To: <20260601160455.2c187574@gandalf.local.home>
-References: <20260531010107.1953702-1-safinaskar@gmail.com>
-	<20260601-enthusiasmus-canceln-anlehnen-0e62317a9784@brauner>
-	<CAHk-=wifX_rrDjRGnDnOqE-usptAukuXKrmuPuVDP5bOCBWzGQ@mail.gmail.com>
-	<20260601173325.GH2636677@ZenIV>
-	<20260601160455.2c187574@gandalf.local.home>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	b=LrT4R1FnMFeZReAD7nfvr5RIo8JWtky/udCbBY2ZhqtUi+Q76cohHUOPZEQPcXUps
+	 /Wj/tNIkm21gcNkRQqvwgEaMJsPAuURBo/GbsQiq5cFFN0tkEBlVPx7i/uVfJC7tQF
+	 wnAlEDYIXPyXCrf+GobQyRYufJVMTSwCUzIitoFrSEY34U6fvlPL5Ur9kaeBbEkAY+
+	 myNvh3CyNWI90Ti4L4ErSZvJS0Fsr+z07/P7LS6Elm648euQ6BzA/kxhi+gaCFHoVi
+	 so0N9r4ezQYgbcSKF/7yU6B1PE6RMNVv9KDF62FV/0Sr6Y5/FxFfEbECoKmrjnHaDF
+	 TBiI9b+sUDkaA==
+Date: Mon, 1 Jun 2026 17:34:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jack Wu via B4 Relay <devnull+jackbb_wu.compal.com@kernel.org>
+Cc: jackbb_wu@compal.com, Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>,
+ Shi-Wei Yeh <shi-wei.yeh@mediatek.com>, Minano Tseng
+ <Minano.tseng@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH 00/11] net: wwan: t9xx: Add MediaTek T9XX WWAN driver
+Message-ID: <20260601173401.2c892526@kernel.org>
+In-Reply-To: <20260529-t9xx_driver_v1-v1-0-bdbfe2c01e57@compal.com>
+References: <20260529-t9xx_driver_v1-v1-0-bdbfe2c01e57@compal.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-293934-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-293931-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[linux-foundation.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[compal.com,oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,redhat.com,mediatek.com,collabora.com,kernel.org,lwn.net,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,linux-foundation.org,kernel.org,gmail.com,vger.kernel.org,kvack.org,infradead.org,kernel.dk,redhat.com,suse.de,szeredi.hu,lists.linux.dev,suse.cz];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,jackbb_wu.compal.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.org.uk:email,goodmis.org:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux-foundation.org:mid,linux-foundation.org:dkim]
-X-Rspamd-Queue-Id: DCE126268B5
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A8D966269E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 1 Jun 2026 16:04:55 -0400 Steven Rostedt <rostedt@goodmis.org> wrote:
+On Fri, 29 May 2026 18:31:39 +0800 Jack Wu via B4 Relay wrote:
+>  43 files changed, 14761 insertions(+)
 
-> On Mon, 1 Jun 2026 18:33:25 +0100
-> Al Viro <viro@zeniv.linux.org.uk> wrote:
-> 
-> > On Mon, Jun 01, 2026 at 10:17:23AM -0700, Linus Torvalds wrote:
-> > 
-> > > TLDR: maybe we could ghet rid of "f_op->splice_read". *That* would be
-> > > a big simplification.  
-> > 
-> > FUSE might be interesting - fuse_dev_splice_read() and its ilk.
-> > Communications between the kernel and fuse server at least used to
-> > seriously want that, so that would be one place to look for unhappy
-> > userland...
-> > 
-> > splice-related logics in fs/fuse/dev.c is interesting; another place
-> > like this is kernel/trace/, but I'm less familiar with that one.
-> > 
-> > rostedt Cc'd (miklos already had been)
-> 
-> Thanks for the Cc. The tracing ring buffer was specifically made to be used
-> by splice and the libtracefs has a lot of code to use it as well. As
-> reading the ring buffer literally swaps out the write portion with a blank
-> read portion, that portion (sub-buffer) is used to be directly fed into
-> splice, providing a zero-copy of the trace data from the write of the event
-> to going into a file.
-> 
-> trace-cmd defaults to using splice to copy the tracing ring buffer directly
-> into files to avoid as much copying during live recordings as possible.
-> 
-> Whatever changes we make, I would like to make sure there's no regressions
-> in performance of trace-cmd record.
+Please try to cut this down to ~5kLoC for the initial submission.
+Whatever the absolute minimum sensible chunk of code is.
 
-Well yes, The patchset seems sensible from a quality POV.  But to make
-a decision we should first have a decent understanding of its downside
-impact.
-
-I haven't seen a description of that impact in the discussion thus far.
-And that description is owed, please.
-
-I assume a small number of specialized applications are using
-vmsplice() to great effect?  What are those applications?  What is the
-impact of this change?
-
-Once we are armed with that information, is there some middle ground in
-which we de-feature vmsplice()?  Fall back to pread/pwrite in the
-tricky cases and still permit vmsplicing if the application is
-appropriately restrictive in it usage?
+Each patch must build cleanly with W=1
 
