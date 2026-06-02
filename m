@@ -1,166 +1,180 @@
-Return-Path: <netdev+bounces-294250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pDLsEQ3lHmo9YwAAu9opvQ
-	(envelope-from <netdev+bounces-294250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 16:13:33 +0200
+	id LzT3H5blHmpkYwAAu9opvQ
+	(envelope-from <netdev+bounces-294251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 16:15:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95C9562F316
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 16:13:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9662762F35C
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 16:15:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=piM+xKgf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294250-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294250-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=RbkPcLak;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294251-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294251-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF6A8307E9B5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 14:06:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8ECC4303CE16
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 14:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9100A3E95BD;
-	Tue,  2 Jun 2026 14:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0443E8C55;
+	Tue,  2 Jun 2026 14:07:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0393E9C1C;
-	Tue,  2 Jun 2026 14:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857BA3DA7DC
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 14:07:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780409175; cv=none; b=WzJyh6EBswINKj5mxmvxqpI5f6HADOstp+rawSjKcIoFCQlyzexeh4AJvb4Wude33FGAtuWmx4cyVsYd2HitYbOuZIaU5jCpFVrg/SDp9EQHrkYtsDSFxKtE1Ekl+xpUWv9UcSmJ0sOFFuXjHkRXIeX/u1td0qWB0XB/rl7sd5g=
+	t=1780409237; cv=none; b=awNPp4HZA/1zsVji5Dm8mdK4I54wqqaCtuwRyh3h6JmL6fNs4uIBxqXjACHhAmrVH48isX3fN+p9WUmLCXp0ILo8vQK2Rte3zOwT4KIHpQ/f7iqkUj9QmC/2R/FLoYsOYEPCpmejHFoeEII60RtU3PXSl5TPOlulDq9b7YwZIdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780409175; c=relaxed/simple;
-	bh=GxfaAHTJvymW9iUhiFO+Sx6ymhlxBbVQjaoTEvnickA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ipB7k+s9Zh+bzqeYxlPLqIw7IPqWodOj8ML+8JrrpXyZCT3jTfUisG+yEg7xlCFzet0BbIRpQ+51iKkqSxZhqeD2LiBhgNt7k6Wi96SEZPl50Em16pbvfknsfQ14mOH+xiJs6U8CVwZdyiIIaGkMvlXwpFnRzLb09lychNTvycY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=piM+xKgf; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 7231B1A37D0;
-	Tue,  2 Jun 2026 14:06:10 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 435A7603BC;
-	Tue,  2 Jun 2026 14:06:10 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3148D108883E7;
-	Tue,  2 Jun 2026 16:06:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780409169; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=sCyHaYS6wI1h5bixiKt7mgCwRJBOeMLVJ44ZFdmSaVU=;
-	b=piM+xKgfrxuHRh/h5Uw8okxfHQUx5IpIjFRZFzCnnvFvUPU+j6JCa6lQxI3cVW80sr6xV7
-	/46dPc5FzM0rY5/LNiyovDBVBD5LuCrGvo2yz4Lwrup2qV9zhwrdoiu9JeUk6YOm+DS1c+
-	PBeTi4wdvwcQtKPoukuSsqoxCmvfmGNOCjf/4y2GT6rO5G8X0C2aOoEyhm8UTub4GMJJaw
-	YeZfiZ4AKrnZhpBCReaPz31Jz2DsOyKMTSFt7o5WsJyd1OaBb4yB7kghV6judL4+5yBAyc
-	FR+95msSRVuUClAcz5oc9SjxKRGUa7ufAe8nIKwpitJc2RYbkEhPFBdgqltaEQ==
-Message-ID: <20276935-8e9d-4c6b-a4e4-d73b6bcef6a0@bootlin.com>
-Date: Tue, 2 Jun 2026 16:06:02 +0200
+	s=arc-20240116; t=1780409237; c=relaxed/simple;
+	bh=llc5H9WBHGaxlcUbzKdk4lxBlagtHnWVxD05or7i6o0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DoaJG7XJD8ZJ21T55EwRVV1FLaIkta4ioznJX5pmGsezDcxx16YkDmBNnNqwrE3fZo1eYMD3Y5mCW3K099TRSRrNiJBRMp73jR+bs+GbSLmGc7Q7CCm9NB6olhm9q41M1U3gYq2DdsH8M285j2DbxeKOBzC9FROBL3KUUfyETN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RbkPcLak; arc=none smtp.client-ip=209.85.128.49
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-49068493267so66115885e9.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 07:07:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780409235; x=1781014035; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ySKFRHOtwilW2CZ876p5LxsR0YIkNmJvgodgRlHIUfo=;
+        b=RbkPcLakCPipOO7j1h1DnMZ4888DX4wyESYSAl5TjMk0uQ5400EuSAcXs4S82+NvFk
+         8uC79L/jKF6So23jtLL7Lq97W1jMIFqDLGG7gJJ5LC1aUCBLG9YPOmLD8/dcTkPS/HRz
+         SK4XbIHl8q2HylV4ppb3afi6y3a4ZcMYBLd/YxiQiRveUtQZ0qR31vDQ9scSdMG2B2CI
+         RcetsBPvNkxZJkRKruyhg6I0GdZRUFXD3C3bAUbRmL0mxoo4UtjojhqECaR2tpCj6q6N
+         NQpZ36vdOGF1FEaHBYirp8Fo0Rt2dcfa7AtBstDaugMdN3e8TW8SZlpf5IOEpxOf2jwn
+         vYiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780409235; x=1781014035;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ySKFRHOtwilW2CZ876p5LxsR0YIkNmJvgodgRlHIUfo=;
+        b=jA/G1dRRF895A3o6hqS948ePQT0bOV3LKOuZGqh7iXiZu7qeePX8BQfUYmTXTWOasP
+         VUK68sP2Mmjrcx2TzG//AZxSb8vuZO3XuoNvyTqOO9X0CDjIz7XEYm3VcRUd3rZsZLZa
+         aLVelEOtcJ4PJOt3VS8jP8AkPeQn3jqBKIET+WH5CaUlml9Ry8Xt683itErydqkmxelJ
+         gh+NxIckKhqsYT3GDn0vzt33AyFxSFPeskY/DjzJa9IdTDjRi8VZ+nfNR5DO84kerrVI
+         l0t4KYx9vHx45rbyaLbiOoXBd2ztXcZFXWUh7I2OJd93BbakwucvzWX0nUow6nsoqBVd
+         v2lg==
+X-Forwarded-Encrypted: i=1; AFNElJ8jgiqmLCd4cNzy5IKHQ9GlwuoVxghDLJ843RYtms2zrmUJqZe1L37K4XpUkIcOSTl110Or2ms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytYrF4SQHXGE24/JDFjWZumw2gUIEbRz0Onup/EdmQGkSzXwLT
+	gbIwS0BeB7ENXLyaKQuKvlrizLrh8IfUVgCecK+eXYlpdPCx5xcne1p5
+X-Gm-Gg: Acq92OFLHzfbmAouMsObW/3IMTmWuur+7np33S9+AGSMqquve91sY+kjqEfDzH11/3I
+	P4X1cn1gBZTAUj1fWMGpSs53+gMwa99cMvrPGCgIHHVXD9qEbhReGFkRG9m8HRvcrEqI6B8YTlr
+	vDX6yB7TOawZSWLu7J95a7R+Q4Kwooao0xnq9N6B7+75lk5ftpk3KeaBiFPm3Oe+6Twv5pScSfh
+	EaYyktpCUXNGthKZjPIRkEXM2KafWQM0Ck9m55X/lSaGSsGbOqxvFE9K19GGfZBdjjzlzBmLUPe
+	UEx/fc4pG63wO91avXv7kNI51mgq4UpIw5Jw0FKA/yIkqfP9YuyX5WAI/bzzvy4tU6nmvhf0kpI
+	/xAe/8tuFxd3AbFEPFer0ZY0SS9XnOf5U3p6ZFxQUFH7roROAi6rrJU1FINv8qVBZlCWvpQpLQg
+	V5DhPANUVNlEA8qPfEoK0flr815AcZFoPny+6x5LKBA0ECGybEv1sPUftbVkuFx3PxHD+8sno=
+X-Received: by 2002:a05:600c:2a8a:b0:490:44eb:c1ec with SMTP id 5b1f17b1804b1-490a293cf3bmr198249765e9.27.1780409234775;
+        Tue, 02 Jun 2026 07:07:14 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef354bb62sm32057112f8f.19.2026.06.02.07.07.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 07:07:14 -0700 (PDT)
+Date: Tue, 2 Jun 2026 15:07:12 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>, Piergiorgio Beruto
+ <Pier.Beruto@onsemi.com>, "parthiban.veerasooran@microchip.com"
+ <parthiban.veerasooran@microchip.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+ <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 08/14] net: ethernet: oa_tc6: Remove FCS
+ size in RX frame
+Message-ID: <20260602150712.5b28d58b@pumpkin>
+In-Reply-To: <cf87ad90-6ba4-4132-a1eb-beedd796c168@lunn.ch>
+References: <CY8PR02MB9249644F900471DB8417134683162@CY8PR02MB9249.namprd02.prod.outlook.com>
+	<cf87ad90-6ba4-4132-a1eb-beedd796c168@lunn.ch>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/9] net: dsa: microchip: implement port_hsr_join
- for KSZ9477 only
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-To: Paolo Abeni <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260526-clean-ksz-3rd-v1-0-5b63e732149a@bootlin.com>
- <20260526-clean-ksz-3rd-v1-7-5b63e732149a@bootlin.com>
- <ccd6cc44-1ade-4b29-9d7c-8e440de1651e@redhat.com>
- <0a79ac7d-2a57-4679-bd35-92fea2575b19@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <0a79ac7d-2a57-4679-bd35-92fea2575b19@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-294251-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux@armlinux.org.uk,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:tristram.ha@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-294250-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:Selvamani.Rajagopal@onsemi.com,m:Pier.Beruto@onsemi.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:mid,bootlin.com:from_mime,bootlin.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pumpkin:mid,vger.kernel.org:from_smtp,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 95C9562F316
+X-Rspamd-Queue-Id: 9662762F35C
 
-Hi again Paolo,
+On Sun, 31 May 2026 16:50:35 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On 6/2/26 2:35 PM, Bastien Curutchet wrote:
-> Hi Paolo,
+> On Fri, May 29, 2026 at 06:41:00PM +0000, Selvamani Rajagopal wrote:
+> > When MAC-PHY appends FCS to the incoming frame, FCS,
+> > it is removed from the frame before passing it to the stack.  
+
+If the MAC appends the FCS to an incoming frame it must be removed
+before passing the frame into the stack.
+
 > 
-> On 6/1/26 11:03 AM, Paolo Abeni wrote:
->> On 5/26/26 11:47 AM, Bastien Curutchet (Schneider Electric) wrote:
->>> @@ -1744,12 +1784,20 @@ void ksz9477_hsr_join(struct dsa_switch *ds, 
->>> int port, struct net_device *hsr)
->>>       /* Setup HW supported features for lan HSR ports */
->>>       user = dsa_to_port(ds, port)->user;
->>>       user->features |= KSZ9477_SUPPORTED_HSR_FEATURES;
->>> +
->>> +    dev->hsr_dev = hsr;
->>> +    dev->hsr_ports |= BIT(port);
->>> +
->>> +    return 0;
->>>   }
->>> -void ksz9477_hsr_leave(struct dsa_switch *ds, int port, struct 
->>> net_device *hsr)
->>> +static int ksz9477_hsr_leave(struct dsa_switch *ds, int port,
->>> +                 struct net_device *hsr)
->>>   {
->>>       struct ksz_device *dev = ds->priv;
->>> +    WARN_ON(dev->chip_id != KSZ9477_CHIP_ID);
->>
->> Since the new op is used only by the relevant switch version, I think
->> you could/should remove the above warning.
->>
+> What is missing from this commit message is an answer to the question
+> "Why?". Does the stack do something wrong if there is a FCS at the end
+> of the frame?
+
+Unexpected padding ought to be an error.
+If anything tries to parse LLC frames (with a length not an ethertype)
+then padding is only expected on short frames.
+
+Even for IP a frame with an length that is otherwise too short
+might pick up the crc bytes as valid data instead of it being
+discarded as invalid.
+
+More of a question is why request the MAC append the FCS at all.
+You can use it for error correction - but no one every does.
+(A 2k frame has 32-14=18 crc bits for each bit offset which means
+you have an 'average chance' of finding an 18bit error burst that
+will fix every crc error. If you find an 8bit burst error that matches
+the crc error there is a reasonable chance it is what caused the error.
+Single error bursts are the most likely errors and easy to locate.)
+
+-- David
+
 > 
-> Ack, will do.
+>    Andrew
 > 
 
-I'm having second thoughts now that I'm about to do it.
-
-This HSR feature is only supported by the KSZ9477 itself, not by all the 
-switches using ksz9477_switch_ops. A check is done against the 
-KSZ9477_CHIP_ID in ksz9477_hsr_join(). This WARN_ON is kind of symmetric 
-with the ksz9477_hsr_join()'s check so, IMHO, it makes sense to keep it.
-
-
-
-Best regards,
-Bastien
 
