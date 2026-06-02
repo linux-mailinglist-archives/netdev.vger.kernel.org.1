@@ -1,319 +1,212 @@
-Return-Path: <netdev+bounces-294080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294081-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2A6ADMiRHmodlAkAu9opvQ
-	(envelope-from <netdev+bounces-294080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:18:16 +0200
+	id gFNGE0KTHmqdlAkAu9opvQ
+	(envelope-from <netdev+bounces-294081-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:24:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E82362A617
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:18:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B7662A7A7
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 10:24:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1979F3015454
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:11:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24E26309C548
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 08:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0093B961B;
-	Tue,  2 Jun 2026 08:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB56F3BE15F;
+	Tue,  2 Jun 2026 08:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f0a5ISYK"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PG9Ka901";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="I8qasZcV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F98F2798F8
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 08:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780387864; cv=pass; b=OKlhMGc3mz5TgjGPBRtD3GuuAi7iTfctYHefLKLTGfXbktCaQxNEyq0Y8/9MddnUlpyw289diGBB/Pk47hc6k5FDlQ/v/37AHu6TnMWC74UDbyQf8RkZEv0ffj6TENREcVdE5Gl9Eu3C7Y/esMGvmI3OX5fCPrtGLwS5iX38wpA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780387864; c=relaxed/simple;
-	bh=A3mR+iXVh3aOXVYw2xIWqsEP1lq/3bB4I6ut/MByTZw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oPMS8wpu//GDlcxjrQBa6WGIAk4JKvRFQLtc5MWpk6JMYFcqyDrqCOs8P34wJsUf5I0br5BCTPbwJhvX1UI9k8Z43pXngZ5Yo6GmdF5Kj0D0Nyc8LH57aLPXqhGLpbZtd4vrgtDqhWYMY6/YRe7NetcFaQUhClSw4YLt7m2hfIo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f0a5ISYK; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-51749ff0a97so19463971cf.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 01:11:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780387862; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GYRRiP5oD3BxRqK4O+Xsru/7pLjO9ywqn80FjtgGyde55kYVfHZmqRV6gipBk4YtrR
-         OQLrmtOC2n0MDAG7j46X+wKSiwWQsXfBFim2i99Lx2pgyf6z+govwiJjoWqQKWK6QEgC
-         a5XcBvsRLyyRx8GOo4dhyVJP9DKLxnmhtpj1w+ay9pguZQZkqbrITXL/Kjn4CskdxwFR
-         b6lvQ05wS5SaMQYg+7Kj6CUsIZRL+by9oIpGRwubmqloqisNSgzfaPRFmGluVkczRTr7
-         NIFWUq+CWVasX6siuznht2Yq7v7MqJFShMCRWNa9je2E4gHUW5JrD0qCHfyvDsKtuoyd
-         eu1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NzBskLRV9A992XU5x25VpjtHm9D7sWNRRIF8Dm5gpJo=;
-        fh=dnxZLxqmraij2+NXuV7Sp3eATjXoqP3MYro6Gd+5jhU=;
-        b=K+/mvNLnZ7CAqWHTVppsy+EW1Tbe7iD/ZZdUbLArjx1THCjNJ3hjE5CMvyaDZFeco6
-         zMdAzHYkc6GOnlDM5+kfa/Os40xoPqMmbXRz3UiQs6PAACYDpx8agvtQeadGDSRk6tom
-         J9slAoYWzCSw8UIKAjlby3RbTr7AFNbizpjYPdthx9TLukdX6iTLLhQf0cxe4KoCguLD
-         ebB9D6ZcBM2yaHBNcb3qjjQgkWMbTiwfAcdrkBa72nLZsAw3y4fZlMx5k4F+mRLPQJ0X
-         MjauobK2bpYOh6G+Gay2C2ghVbmPeES6BqpkUgdrXMvftE6nokNUxxwmXoVmd+mPOlnk
-         ezBg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780387862; x=1780992662; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NzBskLRV9A992XU5x25VpjtHm9D7sWNRRIF8Dm5gpJo=;
-        b=f0a5ISYKtrGSrxYUrm1ZOR5uMnC54IG2Fxjn4ADg4ezdKYlSQf8B3lzm1bg9umayw0
-         xc27uot4T5qKG+ZbqSiRMU7/TcfOZejs2RKd5+AkwdBlPuSJ9r1KIJp8clbXrb5U+TVv
-         dwtRzu/F+obRhGJozdh5uzpVK4DYUzcpkhG2L7QFegXDN/LV1b6SdUxWuvkVHCZqxuoV
-         dzH4BIQKCHAdCFeVC6Bm+pU8NNFQ++A2fI+nKPybmFiP+lHlHmNGpNhbjvBA2tu7dUAv
-         ChTwDou9MRRl4D3xRGBmrGVaky7n9M9S157XqK/Ylp9PrSYy3hteXM9TafBieIHmh7sL
-         MMwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780387862; x=1780992662;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NzBskLRV9A992XU5x25VpjtHm9D7sWNRRIF8Dm5gpJo=;
-        b=WNLzlayBwgL2iKlR6gu7kJ9pqbsHr6f5RG7U4f5LMisAl2iQM1gMSkBGf3SZTvYm/4
-         gXQJbDtzjhuq6s9LQROoQ9ivfBxSG8borN/sMlAi0p6cnIKRc5JRzJ7rVN5HumsVzawk
-         YVY43guBJSM7NjMVlEBXEjQfBxcfegr0ptEU8ThAF5LvHqdWDXE28Y9mBI8r/3oNmpoU
-         I52kHarUpsnLeLeyb+wDamcnWKo4vR5wX47vjghSWY/872c/3iLCU4sTxI7GR2dk+NlT
-         t1oSeDETPJPFbZEGtyx4JixHdTbXIvXdR5GPnQwC6S9YECgOV18VK96U6Y7bcCvJs6jc
-         t+pw==
-X-Forwarded-Encrypted: i=1; AFNElJ+xs5hApF0OiesF5nJBIt2XcmTRdT4wemZPcAsqafn08UMYfY4pXPMdGfOEcYyw7QANxKacjQw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4s+2N2WBtLToC7vYL9tuhz1CJOFLCMsLwIQRrOQCqy1Y/FCiM
-	JkOrMjoPhBtsg3guPAhYhN58A6kZJhIX2BVnqS40FC0ErTFtDTD0sOpz2uhrmU0LRR870mRQQ1v
-	8rXSy8kkhHBv43K5mZEK2bB23mROmUmJEFCWQL12u
-X-Gm-Gg: Acq92OEdTBYN4GuDkeVnkigIBDzEHL80qIJy5fJ021NwyrFh53jQm7uD87G2ASowWOD
-	aKRBrjvicNvDncjTshxEubZHtQN7wUYBdNgpvdpy7lcb3Ljh6ae36TW7/lfdWOKfE/HoZoHiZz+
-	3o2yZlnM2C9zv8iWupQPtG0/wugkmmfyA3pAMWECdW92ds1q7a+v9ktHjqiDi5VoiU9V89LLT+w
-	s2TdFwBJLnotxMYPhZI9ybQ3yOyEV+aW6L3ncTddvGJPsJvRkjaiLLSnpEuzahzCQkUZJqj8BB+
-	5TMYDbloshTs8XlKm2uF0A49m6NZxycVvfEHzKp4eVuUnIwn14eMOeW0Tf343oSZPh3kNLZ7yTP
-	Hdo6BCiMdSZFLtEKxYvObMsaXZxbvjd4GAkIpUUo=
-X-Received: by 2002:a05:622a:a952:b0:516:e086:89a with SMTP id
- d75a77b69052e-5173a851803mr161842911cf.26.1780387861190; Tue, 02 Jun 2026
- 01:11:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681FB38887B
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 08:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780388273; cv=none; b=S7i2hRPeUfYqK9YUaZg7RDlCwpE0O+aO4wvM+6NMwsm8W1+oU9yVyM9iSlv6Dej17+TZLaePsjQ+UeOgenbugpSVpcRgLEidZQm4TCzIrM5Z/Z/LWY0Vlgocs3R84D72PlMrQpWawkzsRNY4L1dRPbD44osu2ukwuMLaVGdIdp4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780388273; c=relaxed/simple;
+	bh=7pVChPqDHXVqAPAnrlPKVmRgEs201+okE1NCvU9okKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pl9KZP3SwJcR3O/2Y2GAfRjtqkpypzPFhlGxIYMXaM2Y0o61s0Zu4RC5Wn7Akz/LXtcc46Fg7khepT9IJyRrshSMYcIgfp2pIg2S9Cc94OshGyIoQ22dSM4WVG4Vd11kmrikZzfiaonmK8JypXeaiIjFJkz4lu01FFBfJ8fRDGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PG9Ka901; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=I8qasZcV; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 25BC27A0015;
+	Tue,  2 Jun 2026 04:17:47 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Tue, 02 Jun 2026 04:17:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1780388266; x=
+	1780474666; bh=z58S7sTglbowuVwhGQ9uhTys6RnntOs5CEPvlIpADGo=; b=P
+	G9Ka901FFfqs4pRzre8bZQlLkNPYRKwY38lSJmtyinnKsrn3TEfQlfw5mvz+yIwh
+	6pLYp4do7eXrjhrALSf+FLEcIFR2mbed7i9Gt0FiQ2B3Q2+1wUfc/uOSJC8rvtbL
+	JkS46ejGvd0RImlFOFIJvdc7R12cSYV5fbvFGhhaxBDksAdb/HQs9sj3CMETUPym
+	Guy0C2pmpkUGoGeoIj+Y4oWs0oAOpNDoKaMnlsNvCCtUK6RGjR9uPLgJEpbhzO3b
+	4Au19PeLNKnYGAiDdWCMdhl7CxdxA2NcJOH72SLf1+0snPSEpUD0TfxAnIU8D6l/
+	idvt3+u5qz5i+UL5ZiEGA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1780388266; x=1780474666; bh=z58S7sTglbowuVwhGQ9uhTys6RnntOs5CEP
+	vlIpADGo=; b=I8qasZcVy0cExtw94LbL5ffmm+/wOmudTJdWnM3LhCtqLITOZiW
+	enoAiA3ruFCen8HQNNMQ/KVy7xAV+u14F93HDO4CmgG1cs/xLurKJhyMMUjBMDgG
+	r1LrMC6ztS4IxRLqY1TnSyBrnh/1W3Txjw0znkiKIPSnRN78NISfc069j+CuZ/zv
+	oKj1GVgljn45GrLRXHFSLFtqLqoF0oQaOk85+lwivLpuGxikjzm0pqk7D8gaEJ+G
+	tvdovHehidEwr3TLY63vTMesHAMXy+zKee0Jl0t+nPbfgAm6X7fH3wqW2mOvpoC8
+	RnItpo2cKR1l1NCGhsZipSFpGdWXlEmQ5pg==
+X-ME-Sender: <xms:qpEeapT-beDxo-42Cx1mQE2gsEr0Q30354nAvACL8vIQtVZ1MOejFw>
+    <xme:qpEeappDK4WLAaLi6SjTRx4lQ7pYFXaCT9AHqDSbuU6M_ARvHicfeL8x3NVZGKmg3
+    VQiB9rk0XlKm3s2plmkqiQGNyminfPIidvbFOlzCmo0ZxyaP2EXdSU>
+X-ME-Received: <xmr:qpEeanK3MhOsQAo6gIeZvMtq7zcQnMHqIpAR-ov1la8KisUroq0-pjVOb6pugyySlDcukr9hD2amILRgd9QdgdY>
+X-ME-Proxy-Cause: dmFkZTGbw2yjVLcliRVGpFaNLrcv2v5R8eTcxoEmW4D7MW4OaNtZ3pCfCubKuUka6TYIGA
+    0TQvc9yBP/rE0QqZ6hYXbcPq4njJutcIo2/rPuq53LHgBc7DmjQpyPNEsAXsMevd4DBUIT
+    cX+EBsOxHyjly7zNxfsMbU3M7CGmCHpN1F1Q892LW9+KM4o+yS0s3z2fixZBN1FFF7qm/i
+    ZcVJgh7LN+vr8zQf+gpXDAI4CLU3kMzMwnhR9wyM5A9vOYAVdjtpxC/1tekMj3GZc+GKHy
+    Fb/I6HTKXQKkB5GkMC5Qde44k70KO0tXmp77Y29/Ee4ZNKuZYVAszA5vEBPESfc9zxmSJL
+    7oAxExXrLw7ttnkizteUHprynO/nZCF69DoNKge1UhNB3OTGOKt71J5X4G+7SdorhZrB4O
+    gxjtrdfNeyjUNJiKoMxExkKn5wXSMtWI1m8kwsZrcTG0eJraEkzbJNptdO9y9/b6Dl0fnR
+    meK+op13M9wx0IoWfs6oBtYvLLGop08Hk2Ro912ckX9ysAPytkWZHjfjiGUxmZMzQA2PFr
+    /eCdR8tdzeIcbXg2fnD58Pp5qfb63aurxikrzaw1a4zfBt4aRFdAkcTCAD62hQU23pzdCT
+    WOq9Ft423xTopc+BEW6+nu6CAi4HCz38KuoI+/IG8zHCIpZVsC2ZUPHXaNxw
+X-ME-Proxy: <xmx:qpEeasqxITx8LKUKhBly-_x8R4W3k3lmVKU79SERMJ9ocUrFy26XTg>
+    <xmx:qpEeavzrYSeR2-lE7Wa0tGGAgAnxEwHafrBlUHUoD9rLQgd2DPduDA>
+    <xmx:qpEeagM8AtcrYCUGtzYIELlLV_lU-QQIctunlapd1BGK6wspVOH-HA>
+    <xmx:qpEeak6H29ArleXEZwP7L1LK1ZdLWPbJq0WpfDSNSZt5nyLOjyyxlg>
+    <xmx:qpEeapBdGQOyBMZA-2zBv2YeKxHUGEqhJL3BS_PCsJUnNkBIOPg3611Z>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 2 Jun 2026 04:17:45 -0400 (EDT)
+Date: Tue, 2 Jun 2026 10:17:43 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Petr Wozniak <petr.wozniak@gmail.com>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, pabeni@redhat.com,
+	edumazet@google.com
+Subject: Re: [PATCH net v3] xfrm: propagate -EINPROGRESS from
+ validate_xmit_xfrm()
+Message-ID: <ah6Rp00oKj6SVI_H@krikkit>
+References: <20260601155822.20954-1-petr.wozniak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260601223122.63c0d23f@pumpkin> <20260601231546.3407019-1-kuniyu@google.com>
- <20260602090034.7a5c243e@pumpkin>
-In-Reply-To: <20260602090034.7a5c243e@pumpkin>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jun 2026 01:10:49 -0700
-X-Gm-Features: AVHnY4KP_nX7QZuUeMLjJ5JNn9w6rkz9mTStypuDH-1VO1YDn32yD1IF-mxwy38
-Message-ID: <CANn89iJWcG6UH0ZqLnjRaCr0Ky6WeEYhj-pyeyrPf3oJcHU5KQ@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: use READ_ONCE() in ipv6_flowlabel_get()
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, davem@davemloft.net, dsahern@kernel.org, 
-	horms@kernel.org, idosch@nvidia.com, jianhao.xu@seu.edu.cn, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	runyu.xiao@seu.edu.cn, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260601155822.20954-1-petr.wozniak@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294080-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-294081-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Queue-Id: 7E82362A617
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+X-Rspamd-Queue-Id: A4B7662A7A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jun 2, 2026 at 1:00=E2=80=AFAM David Laight
-<david.laight.linux@gmail.com> wrote:
->
-> On Mon,  1 Jun 2026 23:14:44 +0000
-> Kuniyuki Iwashima <kuniyu@google.com> wrote:
->
-> > From: David Laight <david.laight.linux@gmail.com>
-> > Date: Mon, 1 Jun 2026 22:31:22 +0100
-> > > On Mon, 1 Jun 2026 05:36:37 -0700
-> > > Eric Dumazet <edumazet@google.com> wrote:
-> > >
-> > > > On Mon, Jun 1, 2026 at 5:22=E2=80=AFAM David Laight
-> > > > <david.laight.linux@gmail.com> wrote:
-> > > > >
-> > > > > On Sun, 31 May 2026 23:39:46 +0800
-> > > > > Runyu Xiao <runyu.xiao@seu.edu.cn> wrote:
-> > > > >
-> > > > > > ipv6_flowlabel_get() still reads the shared per-net sysctl fiel=
-ds
-> > > > > > flowlabel_consistency and flowlabel_state_ranges with plain loa=
-ds,
-> > > > > > while writers update them through proc_dou8vec_minmax(). These =
-checks
-> > > > > > run in the live IPV6_FLOWLABEL_MGR path, so lockless plain read=
-s leave
-> > > > > > KCSAN-visible data races and can make the policy checks observe=
- stale or
-> > > > > > inconsistent values.
-> > > > > >
-> > > > > > The race can be reached on a running system by toggling
-> > > > > > /proc/sys/net/ipv6/flowlabel_consistency and
-> > > > > > /proc/sys/net/ipv6/flowlabel_state_ranges while another task re=
-peatedly
-> > > > > > issues IPV6_FLOWLABEL_MGR requests with IPV6_FL_F_REFLECT or a
-> > > > > > state-ranges flow label.
-> > > > > >
-> > > > > > This issue was first flagged by our static analysis tool while =
-scanning
-> > > > > > lockless IPv6 sysctl readers, then manually audited on Linux v6=
-.18.21.
-> > > > > > The IPV6_FLOWLABEL_MGR paths were runtime-reproduced with QEMU/=
-KCSAN by
-> > > > > > concurrently flipping the two sysctls while TCP reflect and UDP
-> > > > > > state-ranges setsockopt actors exercised ipv6_flowlabel_get(). =
-KCSAN
-> > > > > > reported races between proc_dou8vec_minmax() and the two plain-=
-load
-> > > > > > sites in ipv6_flowlabel_get().
-> > > > > >
-> > > > > > A narrower second-round UDPv6 + IPV6_AUTOFLOWLABEL send-side re=
-producer
-> > > > > > also hit the inline ip6_make_flowlabel() reader through
-> > > > > > __ip6_make_skb() / proc_dou8vec_minmax(), but that site is alre=
-ady
-> > > > > > fixed in this tree by commit ded139b59b5d
-> > > > > > ("ipv6: annotate data-races from ip6_make_flowlabel()"). The re=
-maining
-> > > > > > plain readers in this tree are both in ipv6_flowlabel_get().
-> > > > > >
-> > > > > > Use READ_ONCE() for those remaining sysctl reads so they follow=
- the same
-> > > > > > lockless reader contract already used by other IPv6 sysctl read=
-ers.
-> > > > > >
-> > > > > > Build-tested by compiling net/ipv6/ip6_flowlabel.o on x86_64.
-> > > > > >
-> > > > > > Representative QEMU/KCSAN reports from the two target reader pa=
-ths:
-> > > > > >
-> > > > > >   BUG: KCSAN: data-race in ipv6_flowlabel_opt / proc_dou8vec_mi=
-nmax
-> > > > > >   write: proc_dou8vec_minmax+0x206/0x220
-> > > > > >   read:  ipv6_flowlabel_opt+0x6d8/0xd20
-> > > > > >          do_ipv6_setsockopt+0x873/0x2220
-> > > > > >          tcp_setsockopt+0x72/0xb0
-> > > > > >
-> > > > > >   BUG: KCSAN: data-race in ipv6_flowlabel_opt / proc_dou8vec_mi=
-nmax
-> > > > > >   write: proc_dou8vec_minmax+0x206/0x220
-> > > > > >   read:  ipv6_flowlabel_opt+0x129/0xd20
-> > > > > >          do_ipv6_setsockopt+0x873/0x2220
-> > > > > >          udpv6_setsockopt+0x21/0x40
-> > > > > >
-> > > > > > Fixes: 6444f72b4b74 ("ipv6: add flowlabel_consistency sysctl")
-> > > > > > Fixes: 82a584b7cd36 ("ipv6: Flow label state ranges")
-> > > > > > Cc: stable@vger.kernel.org
-> > > > > > Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-> > > > > > ---
-> > > > > >  net/ipv6/ip6_flowlabel.c | 4 ++--
-> > > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > > >A
-> > > > > > diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.=
-c
-> > > > > > index b1ccdf0dc646..1ab5ad0dcf24 100644
-> > > > > > --- a/net/ipv6/ip6_flowlabel.c
-> > > > > > +++ b/net/ipv6/ip6_flowlabel.c
-> > > > > > @@ -620,7 +620,7 @@ static int ipv6_flowlabel_get(struct sock *=
-sk, struct in6_flowlabel_req *freq,
-> > > > > >       int err;
-> > > > > >
-> > > > > >       if (freq->flr_flags & IPV6_FL_F_REFLECT) {
-> > > > > > -             if (net->ipv6.sysctl.flowlabel_consistency) {
-> > > > > > +             if (READ_ONCE(net->ipv6.sysctl.flowlabel_consiste=
-ncy)) {
-> > > > >
-> > > > > That can't actually fix anything.
-> > > >
-> > > > It fixes a KCSAN splat.
-> > > >
-> > > > If you think you can fix KCSAN instead, please do so.
->
-> ipv6.h has:
->         u8 flowlabel_consistency;
->
-> KCSAN probably shouldn't care about byte reads.
+2026-06-01, 17:58:22 +0200, Petr Wozniak wrote:
+> Changes in v2:
+>  - Only reset rc to NET_XMIT_SUCCESS when PTR_ERR(skb) == -EINPROGRESS,
+>    not for any IS_ERR() result (Sabrina Dubroca)
+>  - Add comment explaining why rc is reset and the async delivery path
+>  - Fix validate_xmit_skb_list(): track stolen skbs and return
+>    ERR_PTR(-EINPROGRESS) when all skbs in the list were stolen by
+>    async crypto, not NULL (Sabrina Dubroca)
 
-KCSAN detects more than just load/store tearing. Here is a summary:
+I'm confused by this changelog. Was the "bool stolen" stuff in
+validate_xmit_skb_list added to address my comment on v1 about the
+skb_list_walk_safe() loop?
 
-Purpose: KCSAN identifies data races, which are a common source of
-correctness, stability,
-and security bugs in concurrent systems like the Linux kernel.
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 0c6c270d9..b77364f83 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4078,6 +4078,7 @@ static struct sk_buff *validate_xmit_skb(struct sk_buff *skb, struct net_device
+>  struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *dev, bool *again)
+>  {
+>  	struct sk_buff *next, *head = NULL, *tail;
+> +	bool stolen = false;
+> 
+>  	for (; skb != NULL; skb = next) {
+>  		next = skb->next;
+> @@ -4087,8 +4088,11 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
+>  		skb->prev = skb;
+>  
+>  		skb = validate_xmit_skb(skb, dev, again);
+> -		if (!skb)
+> +		if (IS_ERR_OR_NULL(skb)) {
+> +			if (IS_ERR(skb) && PTR_ERR(skb) == -EINPROGRESS)
+> +				stolen = true;
+>  			continue;
+> +		}
+>  
+>  		if (!head)
+>  			head = skb;
+> @@ -4099,6 +4103,8 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
+>  		 */
+>  		tail = skb->prev;
+>  	}
+> +	if (!head && stolen)
+> +		return ERR_PTR(-EINPROGRESS);
 
-Mechanism: It is a compiler-instrumentation-based tool. During
-compilation, special code is added to monitor memory accesses.
-At runtime, KCSAN detects when multiple threads access the same memory
-location without proper synchronization,
-and at least one of those accesses is a write.
+If you're keeping this code, sch_direct_xmit also needs to be updated
+to handle ERR_PTR, not just __dev_direct_xmit.
 
-Operation: KCSAN performs its analysis at runtime, reporting data
-races that actually occur or nearly occur during code execution.
-While powerful and scalable across the entire kernel, this
-instrumentation can significantly slow down kernel execution.
+(considering that sch_direct_xmit doesn't care, and I don't think
+__dev_direct_xmit callers can reach the -EINPROGRESS path of
+validate_xmit_xfrm, I'd skip all this "bool stolen" logic)
 
-Impact: KCSAN has been instrumental in finding and fixing numerous
-concurrency bugs.
-For example, it has led to the addition of annotations like
-READ_ONCE() and WRITE_ONCE()
-in kernel code (e.g., in the TCP/IPv6 stack) to properly handle
-lockless reads and writes and resolve reported data races.
+>  	return head;
+>  }
+>  EXPORT_SYMBOL_GPL(validate_xmit_skb_list);
+> @@ -4858,8 +4864,13 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+>  			goto recursion_alert;
+>  
+>  		skb = validate_xmit_skb(skb, dev, &again);
+> -		if (!skb)
+> +		if (IS_ERR_OR_NULL(skb)) {
+> +			/* -EINPROGRESS: packet stolen by async xfrm crypto,
+> +			 * delivered via xfrm_dev_resume(). */
 
+FWIW, I don't think this comment is that beneficial. A comment above
+validate_xmit_skb describing the possible returns (NULL = dropped,
+EINPROGRESS = stolen) would make sense, but something here and very
+specific to xfrm (there may never be other sources of EINPROGRESS for
+this codepath, but refering to implementation details of xfrm in the
+core feels wrong).
 
-
-
->
-> > >
-> > > It is a false positive.
-> >
-> > It's not.
-> >
-> >
-> > > (Which I think you also said in a different email.
-> >
-> > I guess you meant this one ?
-> > https://lore.kernel.org/netdev/20260601074201.1186061-1-runyu.xiao@seu.=
-edu.cn/
-> >
-> > This is different because, in addition to Eric's comment, IPv6
-> > address is 128-bit and data-race is inevitable without locking
-> > unless CPU supports native 128-bit read/write; we already do
-> > load/store-tearing of 128bit with u32/u64.
->
-> But the code isn't looking at a 128bit value, it is only doing a check
-> for zero (and READ_ONCE() doesn't support 128bit values).
-> If there is no locking the value can change just before/after the test.
-> Even if it were subject to read/write tearing absolutely the worst that
-> could happen is a zero being detected when the value changes between
-> two non-zero values.
-> That isn't relevant here - it is just a boolean.
-
-It is completely relevant. If you disagree, please fix KCSAN.
+-- 
+Sabrina
 
