@@ -1,215 +1,440 @@
-Return-Path: <netdev+bounces-294142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294143-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OPJbAeWxHmr7JAAAu9opvQ
-	(envelope-from <netdev+bounces-294142-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:35:17 +0200
+	id WJEQAU6xHmr7JAAAu9opvQ
+	(envelope-from <netdev+bounces-294143-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:32:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9067762CAFB
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:35:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B27062C9DF
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:32:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A55293004F10
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:30:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74CF33027DB6
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03DC36CE1E;
-	Tue,  2 Jun 2026 10:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA753D5670;
+	Tue,  2 Jun 2026 10:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lT0fRyn7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iQ4c62C1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CDB362157;
-	Tue,  2 Jun 2026 10:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780396231; cv=none; b=rVU2PVP/SK/NM/IJJIWuHfQNrBIbs8C1pRzLlSHZ6CHKlZtwZtd2gm0RYS41IAKBDynfmtArmnWMdnkxCzgoe5Ewdvxj+40sisew/Frem9GfyRaYIRECc52Z/q05H6Sy1HY7WnKztDi52NFPFWczABSg76/4NVMI5H0XO+AR5Fs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780396231; c=relaxed/simple;
-	bh=NE1OqSIt7ukKYqI+ur79rCE5U8kMNy8Vv6Yn7QlkNjQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fTnl9E1aoPFaTQdqD8ySjzV/fpV0+R3ZPGcEVtijI5o81IV36PbJ5JKU8X/vpf8NV7FC3QgUd2u9qFXmB+IlRjRNbLMxsORf/cWyECJnaVh/DGccqrXwMC3YrEWjgE7FyAhsM0ytoxlsNC+0oNJxvejYbeH9glXLnbzOwQZ2Onc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lT0fRyn7; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D12481F00893;
-	Tue,  2 Jun 2026 10:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780396230;
-	bh=bNU4fIrzngFSSwf0R1b07WL70c6k5jlUbeVOklYE7wM=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=lT0fRyn7IWezMe0az9xY1tS8PpndmKrdLgDZd1GiEFHRRS31s97gVfIWWUjtPYTZH
-	 PTneBfKYuxWKYwSLY6AN2MCzMvS07D3pUdJkY/6uOtvAD/z680RlkAD7uw/H/y5rI4
-	 9PvgalAk1YDZdAVnRzPkRa2CPTjIQkeGT45NGUOaQ5WTnX11Uhj6EEYfwlihi6OTWb
-	 vJoFuVPI62MXwC227vAGpAASGLtll4O7T6FtK4BUqApn7WyTcS8mnwWnPWq7PfcKZp
-	 Tv5/xgH3Tgjul5bAI+j3ddqomUPM2I44Q8k2LdknXF5qptFh01tfUA6EZ9Q/ycGNai
-	 HCuaU5e1q8Ggg==
-Message-ID: <c08c6d6588111d6f60f8ec1a25756e5a8b375eea.camel@kernel.org>
-Subject: Re: [PATCH] sunrpc: fix uninitialized xprt_create_args structure
-From: Jeff Layton <jlayton@kernel.org>
-To: Hongling Zeng <zenghongling@kylinos.cn>, chuck.lever@oracle.com, 
-	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, 
-	trondmy@kernel.org, anna@kernel.org, davem@davemloft.net,
- edumazet@google.com, 	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- zhongling0719@126.com, 	stable@vger.kernel.org
-Date: Tue, 02 Jun 2026 06:30:26 -0400
-In-Reply-To: <20260602083205.183807-1-zenghongling@kylinos.cn>
-References: <20260602083205.183807-1-zenghongling@kylinos.cn>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EA436F8F0
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 10:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780396345; cv=fail; b=dxDz8g6FwBDCfYQ8FMqCOMc+Z4QQJievBfmPageF4HRQJjrN5+f71bnj05gn0RtuSw0TH6lLTan1fEhizsdPi56jWhmreqLlKbao+DjjMxiMmQ0dihEVH0ai0K5Eszv5ejEkyTVfiUfCEwPyJZzVuWDaSKAmygiNRRzVLb72XDI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780396345; c=relaxed/simple;
+	bh=dctboe37gp4qv3cIwEQ5c+T/qNFLQJsDcE7pviPusVE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=XZbNveNEq6Z99ZDo2u5pZpumx5d2il9UTeOH+WKanEyJJV9btnmQWXLqfOBEg26nKVWllmOh8hnbCl/ZsgJg2JHkjrjxU1Cp2Ws2gUCWCOwjk2S0LThWpoSPWd6iuHQHZshx7MMafLdAFE0tq9riFF84TgCXBdsb1pudRxAf1FA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iQ4c62C1; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780396343; x=1811932343;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=dctboe37gp4qv3cIwEQ5c+T/qNFLQJsDcE7pviPusVE=;
+  b=iQ4c62C1g1xyPUCzQmP8BBvxguQWgA7QIo8G8oqmmxxTRUTPvtxPBnju
+   t0NjG3zZlQrj1vHeVBoSUQSUXzrlammU4hL+KRyzpE8UIpEjSwR/qc2So
+   Ye+JsJwZN0ydu9jcWFb3I8pElTxrj3QzRlMLRs3zDnOnStwajGJn6lydJ
+   DGHPlzOZuhIl9wdBYlxy0mzz7qvyTOgyGBAmz881qqk7mb/BctkdKds8r
+   ILf+jngzo6I0L32Xhg6MyZLIHPH7zYqmxeEz9UqVWIAHRYqCyibtRem8H
+   4hFrMNXaXaldA8Nr8chSFCdrCMpzd+8iyPo/HK5o93Nn/5tf/Iq3wceDD
+   A==;
+X-CSE-ConnectionGUID: R4Tjh19tQjqkVWCsU+juBQ==
+X-CSE-MsgGUID: vrqcs3RQRRGAggOp7qiSdA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="91485060"
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="91485060"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 03:32:23 -0700
+X-CSE-ConnectionGUID: 9FFCVU4nQ+qb9ieZp81IPw==
+X-CSE-MsgGUID: QbBLH4wyR1SCqH5bLP1XbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="239703005"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 03:32:22 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 2 Jun 2026 03:32:21 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 2 Jun 2026 03:32:21 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.0) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 2 Jun 2026 03:32:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wySftgiWmBrMdZG3fBi6MEAXmYcl8GKjCy3exYzb8HNd0ddY7xMThwxaG+iBDf2Oy15B0qNJU8JVctNHsYyZVexYdsI1rQ7zIGFIuL4BiOB32+uMVmo1WermZAibo0SaQqJyoGZVnmiEj5XmgJoUNI6PurJYTfcOumc7kf8yt991n/OArF6HgCxbGYviF4KbYhmnIDtRjBhABZ6zG1Ey7JGAovA7tZUF0f2SWvCkCWtzI2vbyZayJjO+4tRvwtG5JBCX1IoNifD55EmBCgv++aCk+L8fw3XyO8fXL4uTfZDuJ8brSJFs3fEFN5iusD40YTeabL+Yyr/xpLmCD1kuRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T1h3S1bWov5DQ4PVBGOaFARdYo8czyw29Agy7vC17OU=;
+ b=eOy27PTdx6Vj+qJRzljMoD47rJl5bog/+qwfyqUOtXk7ATtjmNNPotubTov+NMEA1nLnJQCimuI7Phr8SFQ9JRmMQEIcbG8iU2lPAxEhjQyuaWbw8K+aktTOhf4SraKoAYn5w+9ePdCFEolh2kTE884v4ahf2nxb5QzA6AMnvgj/yIB2kFeib4aIxtH7wQ4f5gkRnAz7yOuOD8L96RnoZjplpYWba6pVReAJqMmAYrnUprPxyyAJ+rtEWyrn+ifWWx9kKMUREXQ4RHqtikmlpOa9d3Y/09qeneTP3UFIm2IFbHYHaXJW+RZSX6I5GldNZ1gZm4ScEm2iyeoXcQ9Bsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by DS0PR11MB8082.namprd11.prod.outlook.com (2603:10b6:8:157::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Tue, 2 Jun 2026
+ 10:32:19 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2edd:5c6d:169c:389b%6]) with mapi id 15.21.0071.015; Tue, 2 Jun 2026
+ 10:32:18 +0000
+Date: Tue, 2 Jun 2026 12:32:06 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+CC: <netdev@vger.kernel.org>, Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>, Jacob
+ Keller <jacob.e.keller@intel.com>, "Michal Swiatkowski"
+	<michal.swiatkowski@linux.intel.com>, Simon Horman <horms@kernel.org>, Kees
+ Cook <kees@kernel.org>, Ingo Molnar <mingo@kernel.org>, Joe Damato
+	<joe@dama.to>, Breno Leitao <leitao@debian.org>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, Uwe
+ =?iso-8859-1?Q?Kleine-K=F6nig_=28The_Capable_Hub=29?=
+	<u.kleine-koenig@baylibre.com>, Johannes Berg <johannes@sipsolutions.net>,
+	Fabio Baltieri <fabio.baltieri@gmail.com>
+Subject: Re: [PATCH net-next v4 2/5] net: wangxun: add Tx timeout process
+Message-ID: <ah6xJgZjplSbVKvl@soc-5CG4396X81.clients.intel.com>
+References: <20260601072221.2952-1-jiawenwu@trustnetic.com>
+ <20260601072221.2952-3-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260601072221.2952-3-jiawenwu@trustnetic.com>
+X-ClientProxiedBy: VI1PR07CA0127.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::14) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 9067762CAFB
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|DS0PR11MB8082:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0bccfef2-3fc5-46cf-6c7d-08dec09238ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|10070799003|7416014|376014|22082099003|18002099003|6133799003|56012099006|11063799006|4143699003;
+X-Microsoft-Antispam-Message-Info: AaOkbTt4zlcMwQ1qTkUDrBAcfh7pL4nIHQo251mPv3xZD0lEgDLs6el8jMI/HOlTOlXSMssPnSB8W0A63xGQNYZFi8RAs5zjf/kAwHAaDsFD+pkzGdu2q/Yr7JsmCj2nVcNcTDNItK0d8oIg+Mp7GJZwyI1lOhec6SMvVkXk83NcHRgClew6F5y8T3GEHFsms5w9nGO+x9EM1n+kMl/DOD85ntGDHWJdOLsR5W0ly+dqbi7bGVIXXbNxTC4kB5uya/73k5FYx71Y1+KLd02WkiGdY+eDdachTL3wMcmDqNWUqrGRSYZ1HYJe0BadVD8prAl9pTpuEHh1VN51CyJ9WIw+K9vx6iNL3xm6kUUREoQ6aCvlSSkXw0Tro7ej/PIqTzLtcYW/IPMJC1q1EiO7XRQqV/BYJtfarb/okxp/xVzkRC+5Cv89qqQLBClU3nTT1Ggg5ClFPFw7tuQ3MLVgETRwCiuSZrRvSjWDv6KgDUg183WXOySnOGC25Ghc9qPCIP0T0lsjSM6b3YvjKpYBr0DaP9pPJiHckszxu8pvLSD82iD4W4UTbA7aU0qJtsYTOYVX8amVZeV78hIZhYIlsAeZfWd25FRsa4DyRAN6ddrdxKgLj4TXQnIRInJVmxJsPAm0/hVG2iJli3ZrvnHtgNBfAr1xVVysRLu/eWgRLTnQeLoylVBDbDX5N2qfgKFM
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(7416014)(376014)(22082099003)(18002099003)(6133799003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LjoHpMqTLcj7T5WDD1AeXZvqOG4+DO6Xs8cIo8FNtkDdaiwAxRxdySJP1MUV?=
+ =?us-ascii?Q?QufxqbHfggvlZiNumExFYTiY6pAIwG053RHxYpu5IZWjkooi9WUPVfZslmJI?=
+ =?us-ascii?Q?/qHiQpFRtHAllJCrkvikcagfOeTd12qS37ImK9VZr41HlPo0Nc95CTtp6I5W?=
+ =?us-ascii?Q?ING1e2/eiy7ZScNUp5505UT/2ow00LxrcN9PkWTfNF16DO0wn89bRfHhGylu?=
+ =?us-ascii?Q?Y4sC0rmri7eDM1Yt+xwEAmz7Wr7NHiKqYCguaELclzL6VdU1uV1MjZ/rP7pu?=
+ =?us-ascii?Q?2iOTy8lUGxxkVXdoqfuOBJw7zHCOO/AhC3DENxecMziGrobDQYAMR0K49e7l?=
+ =?us-ascii?Q?WwVo5GUpkVvae/cn8k2uD0hzJdlrpe8cflPaLpYzn1z3zvxoRBbN4qPxeCOZ?=
+ =?us-ascii?Q?AuVqdQrOD1qFkLoe+z57e71PSjzGjLhfo5uf0NX4SF/pvx0xpFwdezBykscg?=
+ =?us-ascii?Q?CkPvMZNkJMJK2MTr6CUqoj/BM/3SJlZ3p3uqYj1rpjkIt3qTboOPOO1H09k0?=
+ =?us-ascii?Q?IolvAgGejE9YWTqrzkfwufZNSH2Rurypo4O0/SUEoinmvBELdUKNR+HWUAVj?=
+ =?us-ascii?Q?vrPHM0nnlHMMFgRjV3L9/CzPPF76cluu3bqnjU20+hER2yOyi/it4zvfe7lB?=
+ =?us-ascii?Q?Yz9/tNF532vjh4EGwE2D5R2ME+TlyAZe3ZIH2GtX9ehPvIybbpJwpm1P97Jr?=
+ =?us-ascii?Q?ppYYA6/K9SigYIXgm56J74fb03/iwBwrg+NYzx2iM7ZygIwCdiFNHd7w48+0?=
+ =?us-ascii?Q?Dk3fN2NVCm9hIq1x9KidTYLxxmfT6uAXjGbFuD9aRuqgHnlKpHJ5oQoAh1Yu?=
+ =?us-ascii?Q?Fqn7lk7RWgiYB9XfL5zx42AD/a4A0oA6eHyBPwBumEQVhq3r5PUJ3i5nzmYt?=
+ =?us-ascii?Q?WhHusf73zqkX1akTdJoy0YCole5s8bKYNF2KMfZMAkF3VagJ5doN3Cbac/6L?=
+ =?us-ascii?Q?ijQ7YYqmUMrsNnUIeNnK8FuRYMtTHPAX0PVXpvN1UddJJQpGrihHIRYC6UX6?=
+ =?us-ascii?Q?eCoBzpBdl/wuwGBNgFH0AVI74Jd6VL5TK+vEmIlzknvqJ3Ekv9Jn5RhZFVj0?=
+ =?us-ascii?Q?U3VD8A8TL9gDbYbWsaBO6lplTrPjv5Qa1xhpoyJUrfcJqfsw73t9ZrQYpat6?=
+ =?us-ascii?Q?a/Yn3RIeBeGQhhSgRSNqr+J2GA1ntLJrt9GZx7xUHAeWxvjsRAiZi5d+vHn4?=
+ =?us-ascii?Q?jKZaDqNlBkfdVCb2CHiaGx2e5tKZoijMSWSgbQGGdkO65xe3zY3IZEOZqGYV?=
+ =?us-ascii?Q?2KTJzFIooXl0bBZtlLHISedV+yVn50JU+bvEOwYQ8xkn9ePfgkWW8t4gXNFm?=
+ =?us-ascii?Q?VqM+F+33Dt8P+g2D+YONHtVKQiOoBaAzb5cq/ATpb0sqoDMZ+fEw9dl0ZIje?=
+ =?us-ascii?Q?kL97x7bx8n2M88FnrqKq2crEVNJhVBOjs/X+GMe44Nl3xLRojM50XEah8KvY?=
+ =?us-ascii?Q?or7JnGQmBOFPidlqSo+w6l2ZCdiQzQNR1y9hrI4EorZSn06auGOY+99XbgQC?=
+ =?us-ascii?Q?POrh4Qn4SYIAirYaF4SuvLHaIiy13JLx7IvTd8vfA72+inw8Ve8ueXjUD1P1?=
+ =?us-ascii?Q?U5M6HuMGcZz37Umz6Ot3uHEL0ylqdJl5ZQpbVWRi/xjuCRyHvFGLgmYqc8/E?=
+ =?us-ascii?Q?tCqSK6gKYX6mo0J4CkG80X54mujeez3L57lKEoJFYK5MrMbRtUcQxWb6stEj?=
+ =?us-ascii?Q?TircTgdyjrGaoVXy7FRJJjpC0hR39K/Sy49/HajP2uQGNCyZvB8Swu4DH3oY?=
+ =?us-ascii?Q?sT5YORA/oNsuHnVCn53dBAv/wRKliuS57PcoahBwjUW5IBfLyo+RMclDFY4k?=
+X-MS-Exchange-AntiSpam-MessageData-1: d952gjThtTiVE3u0c6kYHvNaIiZ3Va+PZko=
+X-Exchange-RoutingPolicyChecked: We2R/lqR88kSwYg1OW468oAg/LSFN3C1AY+b/g4WSlQpUBa2NQEUiP/W7ahu7c16usWY3CTLEnenepD6mhK8Bb91QiJTJ78sERypg8viO94tEFyrqWqxgSXOrmRk0111K7UsHRA7UOoDrPBPHOChWWF2IYTtxcyfm6Jc3nAxVtvJA5NcyrlEBXmHqAlQk9vSoRG18zmOWreS8SfwkO6oYZxGDvYTScyur/9CuPq7Kw65c0Rr4YAVwhexeay2fVxXxh5ylM0BBureSVUeBuQRrObDwrX++j/gSzp+Wahl8Grr+MLRqIiI41gjvy87MpFMMxC+nkh7WbYPa1EWbihF+w==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0bccfef2-3fc5-46cf-6c7d-08dec09238ca
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 10:32:18.7001
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KqHVWtpZqu/HkBYigb8kOq34BSxmAFi/CVmxQWsUbBwIoLul2C9wVTp1NFMCLhgyqrGgvtMx3lmXdu+CFdrZfEqdwop0h4fo4XFAykaulys=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8082
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 8B27062C9DF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294142-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,126.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-294143-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,trustnetic.com:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jlayton@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,kylinos.cn:email]
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-On Tue, 2026-06-02 at 16:32 +0800, Hongling Zeng wrote:
-> The xprt_create_args structure is allocated on the stack without
-> initialization in rpc_sysfs_xprt_switch_add_xprt_store(). While some
-> fields are manually populated, critical fields like srcaddr, bc_xps,
-> and flags contain uninitialized stack garbage.
->=20
-> This can lead to:
-> 1. Kernel panic when xs_setup_xprt() dereferences garbage srcaddr
-> 2. Information leak if srcaddr points to sensitive stack data
-> 3. Unpredictable behavior if flags has random bits set
->=20
-> The fix is to zero-initialize the structure to ensure all unused
-> fields are NULL/0, preventing the transport setup code from acting
-> on garbage data.
->=20
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
+On Mon, Jun 01, 2026 at 03:22:18PM +0800, Jiawen Wu wrote:
+> Implement .ndo_tx_timeout to handle Tx side timeout event. When a Tx
+> timeout event occur, it will trigger driver into reset process.
+> 
+> The WX_HANG_CHECK_ARMED bit is set to indicate a potential hang. It will
+> be cleared if a pause frame is received to avoid false hang detection
+> caused by pause frames.
+
+In general, logic seems sound, below 1 small nit.
+There is also a seemingly sensible comment from Sashiko (pasted below), which I 
+agree with. If you not schedule NAPI every time to check for hang, then without 
+Rx you are relying on dev_watchdog anyway, so maybe internal hang detection is 
+not that necessary?
+
+> 
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 > ---
->  net/sunrpc/sysfs.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
-> index a90480f80154..0a99d0f1eb4c 100644
-> --- a/net/sunrpc/sysfs.c
-> +++ b/net/sunrpc/sysfs.c
-> @@ -333,6 +333,7 @@ static ssize_t rpc_sysfs_xprt_switch_add_xprt_store(s=
-truct kobject *kobj,
->  	if (!xprt_switch)
->  		return 0;
-> =20
-> +	memset(&xprt_create_args, 0, sizeof(xprt_create_args));
->  	xprt =3D rpc_xprt_switch_get_main_xprt(xprt_switch);
->  	if (!xprt)
->  		goto out;
+>  drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+>  drivers/net/ethernet/wangxun/libwx/wx_err.c   | 170 ++++++++++++++++++
+>  drivers/net/ethernet/wangxun/libwx/wx_err.h   |  16 ++
+>  drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  17 +-
+>  drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  37 ++++
+>  drivers/net/ethernet/wangxun/libwx/wx_type.h  |  19 +-
+>  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  14 ++
+>  .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  14 ++
+>  8 files changed, 284 insertions(+), 5 deletions(-)
+>  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_err.c
+>  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_err.h
+> 
+> diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
+> index a71b0ad77de3..c8724bb129aa 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/Makefile
+> +++ b/drivers/net/ethernet/wangxun/libwx/Makefile
+> @@ -4,5 +4,5 @@
+>  
+>  obj-$(CONFIG_LIBWX) += libwx.o
+>  
+> -libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_ptp.o wx_mbx.o wx_sriov.o
+> +libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_ptp.o wx_mbx.o wx_sriov.o wx_err.o
+>  libwx-objs += wx_vf.o wx_vf_lib.o wx_vf_common.o
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> new file mode 100644
+> index 000000000000..982a438d009e
+> --- /dev/null
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> @@ -0,0 +1,170 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2015 - 2026 Beijing WangXun Technology Co., Ltd. */
+> +/* Copyright (c) 1999 - 2026 Intel Corporation. */
+> +
+> +#include <linux/netdevice.h>
+> +#include <linux/pci.h>
+> +
+> +#include "wx_type.h"
+> +#include "wx_lib.h"
+> +#include "wx_err.h"
+> +
+> +static void wx_pf_reset_subtask(struct wx *wx)
+> +{
+> +	if (!test_and_clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
+> +		return;
+> +
+> +	wx_warn(wx, "Reset adapter.\n");
+> +	if (wx->do_reset)
+> +		wx->do_reset(wx->netdev);
+> +}
+> +
+> +static void wx_reset_task(struct work_struct *work)
+> +{
+> +	struct wx *wx = container_of(work, struct wx, reset_task);
+> +
+> +	rtnl_lock();
+> +
+> +	if (test_bit(WX_STATE_DOWN, wx->state) ||
+> +	    test_bit(WX_STATE_RESETTING, wx->state))
+> +		goto out;
+> +
+> +	wx_pf_reset_subtask(wx);
+> +
+> +out:
+> +	rtnl_unlock();
+> +}
+> +
+> +void wx_check_err_subtask(struct wx *wx)
+> +{
+> +	if (test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
+> +		queue_work(wx->reset_wq, &wx->reset_task);
+> +}
+> +EXPORT_SYMBOL(wx_check_err_subtask);
+> +
+> +int wx_init_err_task(struct wx *wx)
+> +{
+> +	wx->reset_wq = alloc_workqueue("wx_reset_wq", WQ_UNBOUND | WQ_HIGHPRI, 1);
+> +	if (!wx->reset_wq) {
+> +		pr_err("Failed to create wx_reset_wq workqueue\n");
 
-Good catch. You could also just use an initializer here at declaration.
-A'la:
+This driver does not generally use pr_err().
 
-	struct xprt_create xprt_create_args =3D {};
+> +		return -ENOMEM;
+> +	}
+> +
+> +	INIT_WORK(&wx->reset_task, wx_reset_task);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(wx_init_err_task);
+> +
+> +static bool wx_ring_tx_pending(struct wx *wx)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < wx->num_tx_queues; i++) {
+> +		struct wx_ring *tx_ring = wx->tx_ring[i];
+> +
+> +		if (tx_ring->next_to_use != tx_ring->next_to_clean)
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static bool wx_vf_tx_pending(struct wx *wx)
+> +{
+> +	struct wx_ring_feature *vmdq = &wx->ring_feature[RING_F_VMDQ];
+> +	u32 q_per_pool = __ALIGN_MASK(1, ~vmdq->mask);
+> +	u32 i, j;
+> +
+> +	if (!wx->num_vfs)
+> +		return false;
+> +
+> +	for (i = 0; i < wx->num_vfs; i++) {
+> +		for (j = 0; j < q_per_pool; j++) {
+> +			u32 h, t;
+> +
+> +			h = rd32(wx, WX_PX_TR_RP_PV(q_per_pool, i, j));
+> +			t = rd32(wx, WX_PX_TR_WP_PV(q_per_pool, i, j));
+> +
+> +			if (h != t)
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static void wx_watchdog_flush_tx(struct wx *wx)
+> +{
+> +	if (!netif_running(wx->netdev))
+> +		return;
+> +	if (netif_carrier_ok(wx->netdev))
+> +		return;
+> +
+> +	if (wx_ring_tx_pending(wx) || wx_vf_tx_pending(wx)) {
+> +		/* We've lost link, so the controller stops DMA,
+> +		 * but we've got queued Tx work that's never going
+> +		 * to get done, so reset controller to flush Tx.
+> +		 * (Do the reset outside of interrupt context).
+> +		 */
+> +		wx_warn(wx, "initiating reset due to lost link with pending Tx work\n");
+> +		set_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+> +	}
+> +}
+> +
+> +static void wx_check_tx_hang(struct wx *wx)
+> +{
+> +	int i;
+> +
+> +	/* If we're down or resetting, just bail */
+> +	if (!netif_running(wx->netdev) ||
+> +	    test_bit(WX_STATE_RESETTING, wx->state))
+> +		return;
+> +
+> +	/* Force detection of hung controller */
+> +	if (netif_carrier_ok(wx->netdev)) {
+> +		for (i = 0; i < wx->num_tx_queues; i++)
+> +			set_bit(WX_TX_DETECT_HANG, wx->tx_ring[i]->state);
 
-...but this works too, of course.
+Sashiko says:
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+If a software interrupt is not triggered, wouldn't the evaluation of this
+flag in wx_clean_tx_irq() fail to run unless incoming Rx traffic happens
+to arrive on the same interrupt vector?
+
+> +	}
+> +}
+> +
+> +void wx_check_tx_hang_subtask(struct wx *wx)
+> +{
+> +	wx_watchdog_flush_tx(wx);
+> +	wx_check_tx_hang(wx);
+> +}
+> +EXPORT_SYMBOL(wx_check_tx_hang_subtask);
+> +
+> +static void wx_tx_timeout_reset(struct wx *wx)
+> +{
+> +	if (test_bit(WX_STATE_DOWN, wx->state))
+> +		return;
+> +
+> +	set_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+> +	wx_warn(wx, "initiating reset due to tx timeout\n");
+> +	wx_service_event_schedule(wx);
+> +}
+> +
+> +void wx_tx_timeout(struct net_device *netdev, unsigned int __always_unused txqueue)
+> +{
+> +	struct wx *wx = netdev_priv(netdev);
+> +
+> +	wx_tx_timeout_reset(wx);
+> +}
+> +EXPORT_SYMBOL(wx_tx_timeout);
+> +
+> +void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next)
+> +{
+> +	struct wx *wx = netdev_priv(tx_ring->netdev);
+> +
+> +	wx_warn(wx,
+> +		"Detected Tx Unit Hang: Queue %d, TDH %x, TDT %x, ntu %x, ntc %x, ntc.time_stamp %lx, jiffies %lx\n",
+> +		tx_ring->queue_index,
+> +		rd32(wx, WX_PX_TR_RP(tx_ring->reg_idx)),
+> +		rd32(wx, WX_PX_TR_WP(tx_ring->reg_idx)),
+> +		tx_ring->next_to_use, next,
+> +		tx_ring->tx_buffer_info[next].time_stamp, jiffies);
+> +
+> +	netif_stop_subqueue(tx_ring->netdev, tx_ring->queue_index);
+> +
+> +	wx_tx_timeout_reset(wx);
+> +}
+
+[...]
 
