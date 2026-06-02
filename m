@@ -1,262 +1,356 @@
-Return-Path: <netdev+bounces-294233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294234-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /kfVB5biHmrLYQAAu9opvQ
-	(envelope-from <netdev+bounces-294233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 16:03:02 +0200
+	id LJb6GdHhHmpPYQAAu9opvQ
+	(envelope-from <netdev+bounces-294234-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 15:59:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D7862F1E9
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 16:03:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00F9662F16F
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 15:59:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=KhvHqRNx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294233-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294233-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmx.net header.s=s31663417 header.b=bOr5Qr6z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294234-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294234-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=gmx.net;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 51EDA300868A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 13:43:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 241A53081EA9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 13:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B513DB33F;
-	Tue,  2 Jun 2026 13:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DA23E3165;
+	Tue,  2 Jun 2026 13:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164C13939BF;
-	Tue,  2 Jun 2026 13:43:15 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780407797; cv=fail; b=M60EDLi67Bvufo49wSWhCJVRrHiI6RaaikkfFxL/sEueQdNu0ba11tStDrdwTkzKG6iKWZO6AxaxNo1YOLbIZtT27a5mcViSwJtzPWzm13IM3MSnxqln35aaQVsb43VVZ1PqtqLC39TDOcyMIXhrhR40QkkQaDI3EkTgyZXy73A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780407797; c=relaxed/simple;
-	bh=vgRu9HV9yiuJb2/BU9nLNB8r5gebtn16g9ya6wql8D4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=s8+IoCR/ykQKIXfk+vl2aJx25jl2MyT/wiY32gRuuysNh2JXCmjxZ63/Z/0PjF7thmPfDxKwE+tMMNL3yOzdgfeubIsSuV1SdA7blRM6ZIR2ait2BWDyYiGpXwkJATmDTF5Xc6cgoHWSF5Wf6iveoUWj6f3Fa5jUMy9UuH6VZIQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KhvHqRNx; arc=fail smtp.client-ip=198.175.65.19
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780407796; x=1811943796;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=vgRu9HV9yiuJb2/BU9nLNB8r5gebtn16g9ya6wql8D4=;
-  b=KhvHqRNxd+ta2aB1yISB7i1MaJhtH5hr6ZQhdB1QdJNyhfSKlAaGhZRV
-   u9XvxrvloTs1+CKW3opAoj/I0jwdjhQRWDgsLq1ib7EuJb2AbNz73iTZ8
-   d33amza+DMrdjYJr5gJP2vlS1Ds8eXpgr1yPygEnjyYwgQ8eymGWSXy58
-   63oESB8sql5YD0MAaWTy6wu/919b+ScdknkxADJGAhDAaTfLfIrWWHH6P
-   vuNRJE+DdPCOBeHQtV8u4pqK+s07/UX8MNjB1d36QBhsIzkl+p9xcjGSF
-   2NXM6VV7XjOdC8Ghncqworxm7aZ5PtxSCS1oMgXOL13d9aOntn2aJZV4Q
-   A==;
-X-CSE-ConnectionGUID: kWWfVY0rRuaa1OcwEy/xtg==
-X-CSE-MsgGUID: f2sXQcg/RnO0MoX0r3yroA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11805"; a="81161579"
-X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
-   d="scan'208";a="81161579"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 06:43:15 -0700
-X-CSE-ConnectionGUID: muAYffzRSTWaiosCG6OMAw==
-X-CSE-MsgGUID: nSBmvaPJQuiPQfbz6SuvrQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
-   d="scan'208";a="267548892"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 06:43:15 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 2 Jun 2026 06:43:14 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 2 Jun 2026 06:43:14 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.62) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 2 Jun 2026 06:43:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uw2+0WCw+pv9zKqYuJmpQDcJBfeG8pi6ULUnKfrnwFRuCL9MO4EKK5j9vtDcdhcqSMNuw9dw217daJlbgsH/SIn6nFwLYq9kt09HBwRqCTKdqPO3Pm2OmX+Gf+GdbCaSyo0HIMbePmk66/7QQFLFsStqTB0Mh9ERzK3FKLpNJVNygODDjpG9rlfPNCqJVOyGpahwektqcZc3tInzFjGpUVRyT+vLV/UsfTmqxFeX5VbpgTh4Rhve1QuGN0NHsZNfu4q3RaND0H7rADPpQxi0j9bGuSP0awKkMU9pDHi5ny0BaFhXw6nhqmYlwD9Vs+RwiTmL0se+Y3imKN8wJnsexQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lLR3dLX68GBeyXr9JLtfRJ5UzAdCGZbSVrdTZaohsmw=;
- b=VDBcQVt9ORb4FYHDxZo1hIwm/+UPDnexu+67RSKFZVE0zdPSrOgCHGksvUIYWlMuvFE0ljUj1swa+bLm03hQTXkq305WcptHFO5BApP4GUSPbJxdYxnE43EcSPX4+sXUr3lDoBraoNkFRPYQSmGqD9WO+dxmYyB9yKc2MfKTQRZFh6JX03UVQI2YyDMYhUBdSv40K7rjrRlasCg6QaIcaJOGkcAXebiGkCNXBS3myQOn4nSUnW/v86IBlYxFLzwJBZ2AtwMEdiF4rHYZJokb49BO12vIsA9uX5VL3muN0N0LY0ZQBDIRoE9nQGgdaB7s3Qo4m3Ccd5rEihUUYeaGFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by BL3PR11MB6481.namprd11.prod.outlook.com (2603:10b6:208:3bc::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Tue, 2 Jun 2026
- 13:43:11 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c%4]) with mapi id 15.21.0092.006; Tue, 2 Jun 2026
- 13:43:11 +0000
-Message-ID: <d84e7de2-d30d-4ec1-bdfd-6d5e25d0271a@intel.com>
-Date: Tue, 2 Jun 2026 15:43:04 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rtase: Avoid sleeping in get_stats64()
-To: David Laight <david.laight.linux@gmail.com>
-CC: Justin Lai <justinlai0215@realtek.com>, <kuba@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-	<larry.chiu@realtek.com>
-References: <20260601062447.64027-1-justinlai0215@realtek.com>
- <f4b96c08-c6f7-422f-aceb-aa48fa2bfef6@intel.com>
- <20260601224203.5d282c21@pumpkin>
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20260601224203.5d282c21@pumpkin>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0347.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b8::20) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FAF9463
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 13:47:45 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780408068; cv=none; b=sWRLETYRmwcYWKy9fK88hupsichxai6Kr3rr/L8ve0qFX/7RhxNEuDgQMFG68IFWTktLiv+hjxgMRzxGXXe20UHuwvF0IKZEqffYHTRtcA0+2UzdXkMzmHLOihIpz2B8xR+LNfN9gzXcwH+iakxWb++8kOjnfPSblUYGSwfp15M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780408068; c=relaxed/simple;
+	bh=y/Fa9vPqin9CvFFuxiSSOCnsnKWAsLazPH8p/Ou2sX0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZSGXTDmh8kl3n5w7Pez+m1mNXXGDCVqYS0ZR5WX30fek0TegYU2ZpmDPhwlccf//G2BbXzul8sPEZxAWjH/p+i99Opx+0x44SBFuHIgOF0xKyJCNbhK3nOUBCO1uQIpwwaoT8lj1Mq+ui7ppkrvd6wBTy7q7AYOB7IfJR1ZwMP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=bOr5Qr6z; arc=none smtp.client-ip=212.227.15.15
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1780408055; x=1781012855; i=wahrenst@gmx.net;
+	bh=rvz1aHdoWu7joD1m4gygfrAwE4GeJm3FcU5AYqv3Xyk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=bOr5Qr6zxrJwKSTtve0T1+shs3wh2SCnzDuZWT2jcrqYF6UhU7imYiKfUF3FBuj2
+	 laWxjlvwb+38folMePx+ryMKtFIRhdqz2F8cnThV2PBDDxzKcYPYej8JKQCZwLeX7
+	 LwnsHUsiwLnLU2vyxrzji7zdb19jTg96OTxuJZrZ1Yjoil/RoiovpiTP1ZKAjhctq
+	 9GDTwHQXXJdKJmHcyCtIsxHj4MZJLasr5pCtbzVUdL8Bvuk9P2yeULgnAJhBN6mWZ
+	 jKMlpjlF4c/bbnuVRtSUJ+XN70aNaBdCr4OUTetp8FKHXcY9/QyvgOJdpnvv5o71v
+	 e38kii6AZ9D/mVFsbQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mi2Jn-1wzKQo0LHV-00dKLW; Tue, 02
+ Jun 2026 15:47:35 +0200
+Message-ID: <9dc8482d-a4cf-42b1-b1c4-230f160af4b3@gmx.net>
+Date: Tue, 2 Jun 2026 15:47:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|BL3PR11MB6481:EE_
-X-MS-Office365-Filtering-Correlation-Id: dfa77eee-e678-4107-dbcc-08dec0ace2c3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|22082099003|18002099003|6133799003|56012099006|11063799006|4143699003;
-X-Microsoft-Antispam-Message-Info: jVsq4zRhq1fbPlzgmhF7UERCoDRtggbwwv8w1v/YvClM7+YWnlBgfwPii1MG3w44RrU8wfpEeluOmb3fEPZZjirn9oRsnrWBxf90kzXVYyxECeUrQtObNVhRTQ3oLx47v8XhCEGqLu059tpkron6EPYQ2AYb8tb+Cw9TzhcVpzzgAPYHv8UUX3IU/v3z6dz2Ot1QdqRo5Hyr9Mlq40MeBikLkzpZQQ0K7JdinLSnf760iWlALeCZtRUc1GrXYvlyOBt3Ejp59FPzxn8q2zsyD/11z3PZyUpsDK7sxR4V98HmIOjUbnOeiF0AYEdklAtHhNpF4qDrni1P96qtmYqLcrnqWfUduKRJ9jyap1j2LbVcxip7g9dOerc/T0UXF9PDGWQiysSafn9OAc8Xy0JHCWzdN1+0VNiHcDg+iEk/hxEHnw3/VQqz5CmdS9c44QLQ6WOXLHziEAVTgc7XJ/a7WxglPaouqkLINF0QGYeuKr3OSuVoq/cA9xE/16UjC0cMxcDINXTBUFaVYk7SEm60hlr1yyzuOB9LrsWGxRVZbqvgMoAzx5jqkywgDf+kNDGx/JhLnwlHRiBdl4WWQQXvKs2gh4xK2Ic33c1FS0+OhNR8v3XmGz0ZC2BM3nWD1v5Gj/IVTh0ZttGv5nH1glijBrAdyLM8pvh0zWic0Syr5aT6zCbngLbFrRVHNyokCpF0
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(22082099003)(18002099003)(6133799003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ME1EM3VIQnI1ayticE1JbG9jdHJWWlRaMkpzYlZ1QnVsMmdBakVZUitNcklh?=
- =?utf-8?B?NnNMemkxSnpFdWNvenBhMUZjMHVxYXRwckR2d2FaSU1GYUJkd3FPaEEzU29w?=
- =?utf-8?B?V3dVTFpDOWQreHZ2eUZuMmlmcHAzOFhxNm9zSlBUMTNQTGpHL3haZitlQU8x?=
- =?utf-8?B?ODNQN3hoWHhQV0huREc4ZkI5cmZmY0tRbDU4K3poTHFpamZtM0tWekdUVnU5?=
- =?utf-8?B?SDNMMXVObUt2dzJBTlJNREpNdDdRaTI0NWRMaEZqMEYwbzdlb2t1VFBpMyti?=
- =?utf-8?B?RTlpNENCdlpMN05lSVE3WndrR3BzRDVzUmJkZVlVS3hzek5wek1CdGExQkJ4?=
- =?utf-8?B?ZDBXUkNLb1ZWMnR4UFNTc1IwT0pFVEtCTlZ0U1NuMERUbXhSWGxDZWlJeHJO?=
- =?utf-8?B?YXZTZlBHT293cTJVTTU3emE1TWZuaUl0azJ5RjJTQ0ZvWi83aWV0alo3Z2Iz?=
- =?utf-8?B?VG4rMW9jYzhmQVZFSS84NHdURlVsK0o1d2xybkxEa2p6OHVlVEFRUHdydFUx?=
- =?utf-8?B?ZUE2K0x0UkhXYkoraUE5QmtGNFNRN1plTnRQUlc2ajR3ZW9KOUd4a0hrYlhY?=
- =?utf-8?B?Q0F6aGwxRm9xY3V0ZXVJbzhnb3hueVNPNmJjWngyVmhIWkhzVHdFUktkRU5y?=
- =?utf-8?B?NUFOdXdhTlJCSlFyRVZTUktRdkxzcnNKMy9lVWUvZHZYdTgvdjRvdmR1S2xU?=
- =?utf-8?B?UlVscmM1VG9xSGtlaHRLVS9nWXp6V3RKL1NNZFZCSjVqYk9hWnEzNXVJMmR3?=
- =?utf-8?B?ZU9XNko2MlJwQmpmWlhkUjkyU3NVZXJZZENQTC8rZWlQYnh4amV3dW43TzUx?=
- =?utf-8?B?WHh3eWJnRHNlaVJBSkJNTVVEUHFQNDUvb0dBQUZVVVRmbVp4RlIvZTdKVFBo?=
- =?utf-8?B?VHpPWVk4V2tpQzNNWFl5QmJDdkMvWjlxNUNiZlkyN2hBUVppaEQ0MlZpTUlr?=
- =?utf-8?B?UCtuZUFJNU8ydVoyZ1pjU0h4bXZldkplc1ZyQmg5OVg4MER3MDNuN3ZVOEtC?=
- =?utf-8?B?TmNGZktLR3BFcDR6UENwK25aeWlIam1NYVFhTForeUZhNytkTis3NU9KQkNp?=
- =?utf-8?B?WnYwbzNqeEh2aGd0SXMwNzFjQTlLaWV2OThLMzBQdmcxVU0vVWhZQlhMb3Fl?=
- =?utf-8?B?anNFVGZWY3F5c0psYUJPOEFRMis3Yk1zNFlnd2YxWHh3NHArY0hvVXZZYXZi?=
- =?utf-8?B?WWJ1MCtaN0NBem9WeVZGdFNzUDJET2NJdlRqOEJCTnBJYjgvampabTBaSk1r?=
- =?utf-8?B?R1gvTGxaaVI2SVJBOEZzZEN3b2RkQThlMGtHLzdWanEyYmNVUVVZbjZKd1k1?=
- =?utf-8?B?SnBacTRYdUJHZUE3Z3dhN3RvMDNuTVd6UU1QSlY4blB3THE4NHpHN0dwK0ds?=
- =?utf-8?B?MS9Cd3ZYcGQ1bkFNWm1hYXRlZER4WFZHK0RPL0ZBM0E1V1U1Q3VuQ3pLMTI4?=
- =?utf-8?B?K21nbE5GVURadlNTTWVSOEtmUTBoK3o4T2R0U2gwbVN0a3dQNGhHTVV3YmpT?=
- =?utf-8?B?STMrbFJqNkEyQ281WEg0dUFxa2Zid3REOVZsQSszS1NWU1U4RC9lVEQyWmF5?=
- =?utf-8?B?dUhCbUZPVTNZL2lQSWw4Rzg5VlZVUGxXZEovV1dUeWlhMkhJUHAzdHVXYTNp?=
- =?utf-8?B?Yk1zRjcyTE5NbDZnSk1xRUdkaHExRnR4VXM1eEpTclVSVnFqSmJ5TnRRMlQx?=
- =?utf-8?B?YUJKMytUOHhRaGJjY1NUUDhzMTJ6OS8xd0xhOXlHUmJnVjg5UjRXakNQVm1E?=
- =?utf-8?B?dlJoeWVRMC9ERXRLZ0RnZkJpQkozQlpBVlpNSERvQVFwQ1V4S1ZyYUxGbklO?=
- =?utf-8?B?N0RsOXpxR3d0N1pROTJRWjg5am1FNGpMZXR5NXQxektEbjkwZkNzOXBzUzl3?=
- =?utf-8?B?Q0xUd1lHaVRTQ3NEZkx4anpiSkIrQVFMMkQwbm5pWlBJYUhHczJ2UXI0dGtu?=
- =?utf-8?B?a2ZVL0hPZkdzY1NaekVyNHJsdzBCa1lMYUROUGRLcEFYc3RDNnJCU29FKzUz?=
- =?utf-8?B?MXl1VHRWRjBhU1M1d0RocFV6dkhyeVZxUzh0QjluUExFL2kwcHVGV1ZCenhC?=
- =?utf-8?B?Q0NYVVpOWHEwbm52WVBnb21yUGNxWDl1WXN4blhnaUJ5Q0FySUx2Q09TVGRt?=
- =?utf-8?B?UElWU2V5M3U3VkVYb2lyVGtpNzBLeTFaT3JUVWwrRitIRmdsRkVoWlVMNjFI?=
- =?utf-8?B?ZjZQeG5GanMrMFZqMm0wRUZYWXN3eDRTOEdDZ1RveWN6aVB2Yzh6TG1NUVNF?=
- =?utf-8?B?aHdjVWNZSXpXN0V6VDl4VFpGU2JCeVhhZ1l2ak1wNnZsbUc1RU5RTGJMM1lU?=
- =?utf-8?B?RjZtKzdXSGtrcE9zSzJ4blhwMWRNTEhWZlNHTVc1VHFwSUVKbERqZU1yMWtj?=
- =?utf-8?Q?Kcdqp7drIe4fB8bk=3D?=
-X-Exchange-RoutingPolicyChecked: DGOgJ69JBnmb7ZDUg0LjqzHcBBYUlh44BGq3mZTFCFbc/ucPQnGMfu0bSauCqWSEhAYDyByfFQVCYP6Z04huSkOLle7HX8z057GjHDECoT+Iciea47NmGN2rdWUst/suhxhScfANGlCQ+UPn6qzAVYDjsaZLllsmMSVAn8FlEtGNa/9qpqSQd9EEdlEV8EHCOu5Pmz+VT+vqBG+WBmRYW634w7o6on1G/OP4QkCRVG6rJs1lT8a4hn7zQdrMCPn7cc+9rP9bF79fQiAxWuh4Vutj2xTg5hBO2BkUcu6ySkxdqea/5UJ3dyakMTss/dgQ5aFYfbM24MkIXMZoLXXJCg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: dfa77eee-e678-4107-dbcc-08dec0ace2c3
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2026 13:43:11.0154
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bt4+NMlqhDoeAwomfMHzYYdvVb8VQhpkimMgD3rD8oSMcYq8AyiuJ1xmdarxoZjv0uhHJJtZLiVZl+5yr4SIjra6OXV4oAVFQLz0QwlTJbQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6481
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 2/2] net: phy: dp83822: Add optional external PHY clock
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20260528184642.33424-1-wahrenst@gmx.net>
+ <20260528184642.33424-3-wahrenst@gmx.net>
+ <20260601200122.17d1cea2@kernel.org>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+Autocrypt: addr=wahrenst@gmx.net; keydata=
+ xjMEZ1dOJBYJKwYBBAHaRw8BAQdA7H2MMG3q8FV7kAPko5vOAeaa4UA1I0hMgga1j5iYTTvN
+ IFN0ZWZhbiBXYWhyZW4gPHdhaHJlbnN0QGdteC5uZXQ+wo8EExYIADcWIQT3FXg+ApsOhPDN
+ NNFuwvLLwiAwigUCZ1dOJAUJB4TOAAIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEG7C8svCIDCK
+ JQ4BAP4Y9uuHAxbAhHSQf6UZ+hl5BDznsZVBJvH8cZe2dSZ6AQCNgoc1Lxw1tvPscuC1Jd1C
+ TZomrGfQI47OiiJ3vGktBc44BGdXTiQSCisGAQQBl1UBBQEBB0B5M0B2E2XxySUQhU6emMYx
+ f5QR/BrEK0hs3bLT6Hb9WgMBCAfCfgQYFggAJhYhBPcVeD4Cmw6E8M000W7C8svCIDCKBQJn
+ V04kBQkHhM4AAhsMAAoJEG7C8svCIDCKJxoA/i+kqD5bphZEucrJHw77ujnOQbiKY2rLb0pE
+ aHMQoiECAQDVbj827W1Yai/0XEABIr8Ci6a+/qZ8Vz6MZzL5GJosAA==
+In-Reply-To: <20260601200122.17d1cea2@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:yhN5Psqz82TPNX9muUDZW73+w0/Co+vdrrPK5kytPkVihuTOElG
+ 6dcXNNgB6dARUUqtNtZfr7uYwz5oy6ZmGqQUPWtF1PcP5lJDsDKAJ1Wu+9S5W51SvfVjiuT
+ ttLZUmNBKuAfLopU57s8OyehXE6RxqtmEiIYx8F9ghnvh9zlaX/eb70bCnAWPY7PJO/YZEF
+ 1VqMZ3PsqrBM/La7JXjxw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:RizFXEMO41o=;pl8QwraBKFXudRBfdnNsIvjOtcD
+ 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
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.net,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmx.net:s=s31663417];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-294234-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294233-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:justinlai0215@realtek.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:davidlaightlinux@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realtek.com:email,intel.com:mid,intel.com:dkim,intel.com:from_mime,intel.com:email];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[wahrenst@gmx.net,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wahrenst@gmx.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmx.net:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FREEMAIL_FROM(0.00)[gmx.net];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 83D7862F1E9
+X-Rspamd-Queue-Id: 00F9662F16F
 
-From: David Laight <david.laight.linux@gmail.com>
-Date: Mon, 1 Jun 2026 22:42:03 +0100
+Hi Jakub,
 
-> On Mon, 1 Jun 2026 15:14:50 +0200
-> Alexander Lobakin <aleksander.lobakin@intel.com> wrote:
-> 
->> From: Justin Lai <justinlai0215@realtek.com>
->> Date: Mon, 1 Jun 2026 14:24:47 +0800
+Am 02.06.26 um 05:01 schrieb Jakub Kicinski:
+> On Thu, 28 May 2026 20:46:42 +0200 Stefan Wahren wrote:
+>> In some cases, the PHY can use an external ref clock source instead of =
+a
+>> crystal.
 >>
->>> The .ndo_get_stats64 callback must not sleep because it can be
->>> called when reading /proc/net/dev.
->>>
->>> rtase_get_stats64() calls rtase_dump_tally_counter(), which polls
->>> the tally counter dump bit with read_poll_timeout(). This may
->>> sleep while waiting for the hardware counter dump to complete.
->>>
->>> Use read_poll_timeout_atomic() instead to avoid sleeping in the
->>> get_stats64() path.
->>>
->>> Signed-off-by: Justin Lai <justinlai0215@realtek.com>  
->>
->> Looks legit.
->>
->> One question: for how long can this poll for in real life scenarios? Up
->> to ~1 ms is okay-ish for atomic, but if longer, then you'd better to
->> split it into shorter polls and reschedule() time to time.
-> 
-> Anyone trying to get a thread running at an RT priority won't thank you
-> for spinning for anywhere near that long.
-> When an RT processes becomes runnable the scheduler will preempt a lower
-> priority process that is running on the cpu the RT process last ran on.
-> The RT process won't run until the preempt actually happens.
-> 
-> 1ms is a very long time.
+>> Add an optional clock in the PHY node to make sure that the clock sourc=
+e
+>> is enabled, if specified, before probing.
+>
+>> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+>> index d8c5b5cd1bc0..6fc86be9d593 100644
+>> --- a/drivers/net/phy/dp83822.c
+>> +++ b/drivers/net/phy/dp83822.c
+>> @@ -4,6 +4,7 @@
+>>    * Copyright (C) 2017 Texas Instruments Inc.
+>>    */
+>>  =20
+>> +#include <linux/clk.h>
+>>   #include <linux/ethtool.h>
+>>   #include <linux/etherdevice.h>
+>>   #include <linux/kernel.h>
+>> @@ -986,11 +987,18 @@ static int dp8382x_probe(struct phy_device *phyde=
+v)
+>>   {
+>>   	struct device *dev =3D &phydev->mdio.dev;
+>>   	struct dp83822_private *dp83822;
+>> +	struct clk *clk;
+>>  =20
+>>   	dp83822 =3D devm_kzalloc(dev, sizeof(*dp83822), GFP_KERNEL);
+>>   	if (!dp83822)
+>>   		return -ENOMEM;
+>>  =20
+>> +	clk =3D devm_clk_get_optional_enabled(dev, NULL);
+>> +	if (IS_ERR(clk)) {
+>> +		return dev_err_probe(dev, PTR_ERR(clk),
+>> +				     "Failed to request ref clock\n");
+>> +	}
+> nit: unnecessary parenthesis
+I didn't provide the whole story behind this patch. I have a custom=20
+i.MX93 board, which have 2 different Ethernet MAC (fec + stmmac). Each=20
+of the MACs are connected to one TI DP83825 PHY. Those PHYs share the=20
+same MDIO bus and the same input reference clock (RMII slave) from the=20
+i.MX93 processor. The MDIO is handled by the fec driver. Since the fec=20
+is only aware of a single reference clock (tied to the MAC), it's=20
+possible that during probe the reference clock is disabled because the=20
+refcount is zero. So the idea is to avoid glitches by adding another=20
+clock user (tied to the second PHY).
 
-That's why I wrote "okay-ish". Ideally atomic polling should not go past
-100 us, I usually used it for no longer than 10-50 us.
+Here is the device tree extract:
+&fec {
+ =C2=A0 =C2=A0 pinctrl-names =3D "default";
+ =C2=A0 =C2=A0 pinctrl-0 =3D <&pinctrl_fec>;
+ =C2=A0 =C2=A0 phy-mode =3D "rmii";
+ =C2=A0 =C2=A0 phy-handle =3D <&ethphy1>;
+ =C2=A0 =C2=A0 assigned-clocks =3D <&clk IMX93_CLK_ENET_TIMER1>,
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <&clk IMX93_CLK_ENET_REF=
+>,
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <&clk IMX93_CLK_ENET_REF=
+_PHY>;
+ =C2=A0 =C2=A0 assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV=
+2>,
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<&clk IMX93=
+_CLK_SYS_PLL_PFD1_DIV2>,
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<&clk IMX93=
+_CLK_SYS_PLL_PFD1_DIV2>;
+ =C2=A0 =C2=A0 assigned-clock-rates =3D <100000000>, <50000000>, <50000000=
+>;
+ =C2=A0 =C2=A0 status =3D "okay";
 
-The author says that it usually takes around 25 us which is acceptable
-I'd say.
+ =C2=A0 =C2=A0 mdio: mdio {
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 clock-frequency =3D <5000000>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 #address-cells =3D <1>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 #size-cells =3D <0>;
 
-Thanks,
-Olek
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 ethphy1: ethernet-phy@1 {
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 compatible =3D "ethernet-phy-ie=
+ee802.3-c22";
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reg =3D <1>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reset-gpios =3D <&gpio4 23 GPIO=
+_ACTIVE_HIGH>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reset-assert-us =3D <30>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 };
+
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 ethphy2: ethernet-phy@2 {
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reg =3D <2>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 compatible =3D "ethernet-phy-id=
+2000.a140",=20
+"ethernet-phy-ieee802.3-c22";
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 clocks =3D <&clk IMX93_CLK_ENET=
+_REF_PHY>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reset-gpios =3D <&gpio4 13 GPIO=
+_ACTIVE_HIGH>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reset-assert-us =3D <30>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 reset-deassert-us =3D <50000>;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 };
+ =C2=A0 =C2=A0 };
+};
+
+&eqos {
+ =C2=A0 =C2=A0 phy-mode =3D "rmii";
+ =C2=A0 =C2=A0 phy-handle =3D <&ethphy2>;
+ =C2=A0 =C2=A0 assigned-clocks =3D <&clk IMX93_CLK_ENET_TIMER2>,
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <&clk IMX93_CLK_ENET>;
+ =C2=A0 =C2=A0 assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV=
+2>,
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<&clk IMX93=
+_CLK_SYS_PLL_PFD1_DIV2>;
+ =C2=A0 =C2=A0 assigned-clock-rates =3D <100000000>, <50000000>;
+
+ =C2=A0 =C2=A0 status =3D "okay";
+};
+> The AI says:
+>
+>    Does this initialization sequence violate the DP83822 power-on
+>    requirements? The PHY framework deasserts the hardware reset line bef=
+ore
+>    invoking the probe callback. By enabling the external clock here,
+>    the clock starts after the hardware reset is already deasserted.
+The behavior description is correct, but i'm not sure this is really a=20
+violation. I assume that we should also declare PHY_RST_AFTER_CLK_EN in=20
+the flags in order to get the PHY reset after clock has been enabled right=
+?
+>    The datasheet requires the reset signal to be asserted for at least
+>    50 ms after power and clocks are stable. Without performing a subsequ=
+ent
+>    hardware reset here, could the PHY be left in an undefined state or
+>    lead to initialization failures?
+>
+> Did it really read the datasheet or is this a hallucination?
+I don't know where these 50 ms comes from, because I found under "7.7=20
+Timing Requirements, Power-Up With Unstable XI Clock" a value of 10 us.
+>
+> FWIW it also says:
+>
+>    Should this clock pointer be saved in the driver's private data
+>    structure (struct dp83822_private) instead of a local variable?
+>
+>    Without storing it, the dp83822_suspend callback cannot disable the c=
+lock
+>    when Wake-on-LAN is disabled, which could prevent the clock provider =
+from
+>    entering low-power states.
+I wasn't aware that additional power saving during runtime PM must be=20
+part of this change. So this is required?
 
