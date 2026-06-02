@@ -1,170 +1,134 @@
-Return-Path: <netdev+bounces-294131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294132-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oA0LGsWuHmr7JAAAu9opvQ
-	(envelope-from <netdev+bounces-294131-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:21:57 +0200
+	id AB4wDPCuHmr7JAAAu9opvQ
+	(envelope-from <netdev+bounces-294132-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:22:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF56762C76F
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:21:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B33D062C79D
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 12:22:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5084C30E3D62
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:12:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5ECDE305420A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 10:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB39F3DA7C4;
-	Tue,  2 Jun 2026 10:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BDA3E5EF2;
+	Tue,  2 Jun 2026 10:12:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b="gu7wyZxO"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="jQlix4Dg"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-pp-o93.zoho.in (sender-pp-o93.zoho.in [103.117.158.93])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68ED83D524F;
-	Tue,  2 Jun 2026 10:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=103.117.158.93
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780395038; cv=pass; b=TbO/cZGi35hFDd9edE6RKed5kT804jwF76g12FjXOgo1FgkaX6FOtXJb0p5q0vI5EndJaawJxqbJ0oK+H3xdRSs+QPzQaawAzdCfgjg/9AdCa8HY/WM8+5khpDQoHu8U2Yo7mo7AGNP6SYUbxNSQsMSyYRRyYHNyE5lx88F+20k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780395038; c=relaxed/simple;
-	bh=Y4wZPnf/awuTixocw2x7Q1R7OQj44xPBwiBkL9SThfU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r9hPhnXgX3tq446LME8WlsEamILLalkuM/MVwxFcigkYqGp27CfWpw/QY+HyZX1l5Q3mV3shG1wrlFB1/e+LnwwW/6PStikixzlA6IKBu6Rc1TunjOR+lVArdOOjQmb7MmuxgPCsiplC4GANdntW3S3RLyiNmhcB/4XBYiQSFAQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in; spf=pass smtp.mailfrom=zohomail.in; dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b=gu7wyZxO; arc=pass smtp.client-ip=103.117.158.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zohomail.in
-ARC-Seal: i=1; a=rsa-sha256; t=1780394986; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=MUy3vAfdYE8/oKhAoPXB20T8Wp3vAJFoOrQY90RUMfAtgm6QhP3LX28qsT3EIJ4DCLBKlLtfq1lEFqZW5X5NNz5vZWWSb8yrMjqLNwrh82FhkvXoRrYXyU0XlKydJCKEKQPqTsD6rwwupdVcs13Nl85nXDkNFgsX8TCbmWt6aro=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1780394986; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=MR0Lsgq+PHZRBwFD+0O5DuR2QLpLWp2we9s5q3tK/G8=; 
-	b=f81NkU5bMuN5Far+phTq4Dbf+pQxWpbTCH1bEBvBN8FhuR1LzisWfHQs4czzwHoBP2ATzXFhRylswX+skFPjxSWkAm9ma6NbaNItEuMZ8bUIdaH0EvW7p5r8ut+YYfQ2ty0ZYjuhe83sCd1jlN+DLx9bcQJbdQtFbVpWP/W7aRU=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=zohomail.in;
-	spf=pass  smtp.mailfrom=kshitiz.bartariya@zohomail.in;
-	dmarc=pass header.from=<kshitiz.bartariya@zohomail.in>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1780394986;
-	s=zoho; d=zohomail.in; i=kshitiz.bartariya@zohomail.in;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=MR0Lsgq+PHZRBwFD+0O5DuR2QLpLWp2we9s5q3tK/G8=;
-	b=gu7wyZxO32BKCCtl7ZC8jt03EON9frmf+0KqjDUz6AzgL2Rk5U7VvWhi0WcWJK3L
-	UNP4P3f7JBoecN3c0SlFeJ06Jx+pH6G6Y5zSykjDr5jhf00qwRapj+eiVS6dKQfdqrA
-	7fZcf0ENFOXQSTneY3nVDUptH5i5xGu5WD1cyxJI=
-Received: by mx.zoho.in with SMTPS id 1780394978142936.8750900178738;
-	Tue, 2 Jun 2026 15:39:38 +0530 (IST)
-From: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	aleksandr.loktionov@intel.com,
-	jacob.e.keller@intel.com
-Cc: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] ixgbe: implement get_queue_stats_rx
-Date: Tue,  2 Jun 2026 15:39:26 +0530
-Message-ID: <20260602100932.21838-1-kshitiz.bartariya@zohomail.in>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972D03DB338;
+	Tue,  2 Jun 2026 10:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780395143; cv=none; b=aJZVHhZJMHYBa+A9kC0SYlyYBb137RRDBye1g9df+T2DFelPdVy75fQy7eaW30mJEgb2hcR8cqoe0CMDCNZJAjz/rxKyoFq1gWr13U9U9ZZEdl+zNfaklOFaKXyw2sgA/yXBN6s0mlUuTUX86HvuCK22z5NdJscfbUC+eL8rEDI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780395143; c=relaxed/simple;
+	bh=2NAio0MHv8BYG7XK3tUkFUn1ovnM+InLLL2mQgwAYTo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pxzVxVjb7K7a1eyhfND9Lrri608lo6JUpRDwyQRRCel1Oubh+GML7mvhrwRjbhCy818mB5BlJlPHQvbYOSsD1snxEHZ/C+Eqor4f0HclhU+fQSUtNz6jtJzH97CmmbZoEWu8CzN9wdtaPsyjAJkVyXjqn7llD68x1gCMs6Gor7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=jQlix4Dg; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id B43902074F;
+	Tue,  2 Jun 2026 12:12:19 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gZYpSn90M4hU; Tue,  2 Jun 2026 12:12:19 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 333142050A;
+	Tue,  2 Jun 2026 12:12:19 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 333142050A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1780395139;
+	bh=MTsU1Y41x4+rjB1nFr7GfXqK79SwNq7FbfNTTogCOtA=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=jQlix4DgD/WIIuRzp6z4h1Z86o3c3C7vAXydKvcN2cTKShwX10kDw2FTp3VDLerCA
+	 QLo/ejzntWuI6IncrhBD6MpVkJcMoAcL97bhMFmJ3gYJFQVnV+ZMUuqTP1MfT2UOU5
+	 mfYPuvYpsHOtnN/ylL0IQLpAyUH6gew1sh8lTyE0M8mPUnrFFNMSsYWbzSztu/um9L
+	 QgXm54RlCIe6oab5/OoQG4m8ph/uVySA1BCwc3RS8UaHByTPg78amY+XlhLKRJyg2F
+	 lJLd/XOPjDdisKXlpv83z/Kx1f4lQkIWWW1j7PIc4EYJdOiWBIw6N7UKkOOcZ9ZX0K
+	 SpbTdBrdhCaCw==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 2 Jun
+ 2026 12:12:18 +0200
+Received: (nullmailer pid 529991 invoked by uid 1000);
+	Tue, 02 Jun 2026 10:12:17 -0000
+Date: Tue, 2 Jun 2026 12:12:17 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Takao Sato <takaosato1997@gmail.com>
+CC: <netdev@vger.kernel.org>, <w@1wt.eu>, <davem@davemloft.net>,
+	<herbert@gondor.apana.org.au>, <chopps@chopps.org>, <pfalcato@suse.de>,
+	<stable@vger.kernel.org>
+Subject: Re: [PATCH net v5] xfrm: iptfs: preserve shared-frag marker in
+ iptfs_consume_frags()
+Message-ID: <ah6sgVwMHiWVZsNB@secunet.com>
+References: <20260526160957.1497109-1-takaosato1997@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
-X-Rspamd-Queue-Id: BF56762C76F
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260526160957.1497109-1-takaosato1997@gmail.com>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Rspamd-Queue-Id: B33D062C79D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[zohomail.in,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[zohomail.in:s=zoho];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294131-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,secunet.com:dkim,secunet.com:mid];
+	TAGGED_FROM(0.00)[bounces-294132-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[zohomail.in:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kshitiz.bartariya@zohomail.in,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,zohomail.in:mid,zohomail.in:dkim,zohomail.in:email]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-Hook into the netdev_stat_ops interface to expose per RX queue
-statistics through the netdev generic netlink API.
+On Tue, May 26, 2026 at 01:09:57PM -0300, Takao Sato wrote:
+> iptfs_consume_frags() transfers paged fragments from one socket buffer
+> to another but fails to propagate the SKBFL_SHARED_FRAG flag. This is
+> the same class of bug that was fixed in skb_try_coalesce() for
+> CVE-2026-46300: when fragments backed by read-only page-cache pages are
+> merged, the marker indicating their shared nature must be preserved so
+> that ESP can decide correctly whether in-place encryption is safe.
+> 
+> Apply the same two-line fix used in skb_try_coalesce() to
+> iptfs_consume_frags().
+> 
+> Fixes: b96ba312e21c ("xfrm: iptfs: share page fragments of inner packets")
+> Cc: stable@vger.kernel.org # 6.14+
+> Signed-off-by: Takao Sato <takaosato1997@gmail.com>
 
-The following counters are filled:
-
- - alloc_fail: sum of alloc_rx_page_failed and alloc_rx_buff_failed
-
- - csum_bad: maps directly to csum_err, which is incremented for both
-   IP header and L4 checksum errors in ixgbe_rx_checksum().
-
-Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
----
-This patch was previously discussed for the net tree:
-Link: https://lore.kernel.org/lkml/20260526074744.36315-1-kshitiz.bartariya@zohomail.in/
-
-Sending to net-next as suggested by Jacob Keller and Aleksandr Loktionov.
-
-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index bc16e4c93fd4..05d4b8aff1fc 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -9759,6 +9759,21 @@ static void ixgbe_get_stats64(struct net_device *netdev,
- 	stats->rx_missed_errors	= netdev->stats.rx_missed_errors;
- }
- 
-+static void ixgbe_get_queue_stats_rx(struct net_device *dev, int idx,
-+				     struct netdev_queue_stats_rx *stats)
-+{
-+	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
-+	struct ixgbe_ring *ring = adapter->rx_ring[idx];
-+
-+	stats->alloc_fail = ring->rx_stats.alloc_rx_page_failed +
-+			    ring->rx_stats.alloc_rx_buff_failed;
-+	stats->csum_bad = ring->rx_stats.csum_err;
-+}
-+
-+static const struct netdev_stat_ops ixgbe_stat_ops = {
-+	.get_queue_stats_rx	= ixgbe_get_queue_stats_rx,
-+};
-+
- static int ixgbe_ndo_get_vf_stats(struct net_device *netdev, int vf,
- 				  struct ifla_vf_stats *vf_stats)
- {
-@@ -11662,6 +11677,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	hw->phy.mdio.mdio_write = ixgbe_mdio_write;
- 
- 	netdev->netdev_ops = &ixgbe_netdev_ops;
-+	netdev->stat_ops   = &ixgbe_stat_ops;
- 	ixgbe_set_ethtool_ops(netdev);
- 	netdev->watchdog_timeo = 5 * HZ;
- 	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
--- 
-2.50.1 (Apple Git-155)
-
+Applied, thanks a lot!
 
