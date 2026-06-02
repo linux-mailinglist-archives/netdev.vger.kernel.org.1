@@ -1,236 +1,224 @@
-Return-Path: <netdev+bounces-294004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBflG2RaHmoWiwkAu9opvQ
-	(envelope-from <netdev+bounces-294004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:21:56 +0200
+	id iKQsBkZfHmo/iwkAu9opvQ
+	(envelope-from <netdev+bounces-294006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:42:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303D26280C2
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:21:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C869628279
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F896306C308
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 04:20:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 610A530074BD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 04:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A399138E5D4;
-	Tue,  2 Jun 2026 04:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7475D2DA759;
+	Tue,  2 Jun 2026 04:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="II2P7NY7"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="GbLiTLtN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD31348C5E
-	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 04:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AF81A681B;
+	Tue,  2 Jun 2026 04:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780374049; cv=none; b=Zf8Uhm8UTX57Y+iz1ZmtuyGiWns7DgOT27EvqD+1LXggND8H0DqnTPo/dLqN/VBwf8dcbVhkiAoJSZQqUkM4jGFcSuIPyOOuuvYt2Bw4gv9V8p3rhGZV0YXLUmzsrvXm4uBW//qDVzsvH+Cp5ItPxxF05lKz0WJeVaIu3hd4IU4=
+	t=1780375363; cv=none; b=D0rKUaOo2c7Iq/S0JaBmh4eH8+yWQs+rBU3jG6Emx+Uz7Hs+Nnhj3VHDBGGfFtYSOftKLoNNxX9fgGmyHlqD41yMLa2lLDUL2SWygUcjJ3pIZ1MIfLNFK0BvhGTRQZYsjQ3yemYCopnAORP4dbQD7BQTd+PmlvEtlARezT+FDa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780374049; c=relaxed/simple;
-	bh=5Xm8IPwfY0dyellfnNLjdKdpNFj+MktK6q6JKPEvMiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gZsTsP9Wpf7Whn+vdLSbZOoZ92wQ8dA9UuQpDJRh3ku8iGxz8J1MvFwQ6vLEleLtXEHl9QBOksEE+gCaWRDorG1jIKadhn3S+3+9bysRyvgts0Ge98ePDmsNenVT7+rJhmWCwjJkN0iLYgOJyjxXZ6Q1MYlG4Ug61hT3b1Q6OG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=II2P7NY7; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7e6db226e1fso42389a34.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 21:20:47 -0700 (PDT)
+	s=arc-20240116; t=1780375363; c=relaxed/simple;
+	bh=EoDGM05HXWjuTq3h2T/ekMFwXsbC68N2TZ/7J2Uojj4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fjwBs/JkbI5hztPyIP+GvgeZR+CEBHUYKRbvrt0PrIW1zdRep/GjvMJDfQBPnRUal9TQCk53Yl7Cw7wJOzgbSSXbjSKlgk5Y/kg1oKPsdPt5aai5vjk3c+uTT0h1FTE7ZOUXK8yNqPU6KG22vQ5Fl/rxzCi/BBruQYIwVOBAb04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=GbLiTLtN; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780374047; x=1780978847; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uT7QUUK+LXQxZ5prqCoLyUCjjU+3++St9mdBXfj/SbU=;
-        b=II2P7NY7whDL8gSXkA0nJrCaJP0nMQT94ZDscIeBT9DgwHU/V35pqK7uY6yYRa4op8
-         Pkriu1woUtnmCkf9dRhaKVkxTDJzkiptqF1cP7S7BEL01TOy353DSAjRyC12WQHMHkQZ
-         apk1coIgC8Z70VXwLZzGdVNJQYzrDqFmXnU/GyJDa7TJjr1fnmdXdaVfWID116A2fhDk
-         1K/Hg1foLg5ou1H9wOGFIktUQbWDygnupcRp7jXTPCti15nfqZNv5XQ1nO0QOgJO6Kce
-         T25RXUKAXg1qu4W9ersVT0vZd9lo8oB/vlmke+FRzkDgzA3jUdFHHG7btfiP9iZgcm6t
-         lfuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780374047; x=1780978847;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uT7QUUK+LXQxZ5prqCoLyUCjjU+3++St9mdBXfj/SbU=;
-        b=jp9W5zCdPH34AXfne/yQr8mZw63YZeVKA1rKRUZhW5oN6THynKme7utJ0AaXPsFO0w
-         lLZqE/mbXaCc+adwBmwcMKAmoXFb47H6DgacsUMc6QB5LRkZLab2CvP/vzodDb6dP4pG
-         XNM+LHCrAYITaips1g1j6qBAtKl1mr/a5/YSjtaFkJKlJuGspmV2uPMhAGbcCz1YW3A4
-         vcRdLIKrXY7Yod8zkXbndjlkPV/oaDgq5Z6CqXw8SEacCCjaMHag+9K9ZP79SGIMeaqf
-         kpS7G1kTtL6GuRrMaJAB/9h1pCTEq14CQLc7VHboinuohcFrGs87qQi2wcDR+O1EjjKB
-         jkCA==
-X-Forwarded-Encrypted: i=1; AFNElJ/amnBOyorZhTolKZGBRF8hoqQx73VmVFo+y+QQl2iho8ALMBxRXANzBqSctkK1GAl4IF7t8jw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnChXfSRGpoqHTPWWOzq0PHe2CS0UZuF5+cgzC71rm+dXZqAax
-	/Wn23LGFWJdBZL3LTN4GL+Cz5hgBzZcETiTdpUZi06ig/WT6lt6DQUcn
-X-Gm-Gg: Acq92OH2spnkh0innfyzAMJm6yky4tDqtzL2JjMzygb0TaiXXnXoa8abekTnCZ93CKf
-	/UwIq0hZ33zrEPlw7xVGWtMQ2/b5lJGWGsdjZYfYZ7pOUm29gq4KEMWlKsP6QP8nrlvj6nsnrol
-	ARafDYcPHjaiqgT9Cuk4Y/ZN1+2YTBNauNBKPCl4a78bp58Z5nApVoZTIgao/8M8V6dXqJnST4E
-	hR5Vf1aDc0efVP5Et3r14bhj7sEovFgo+axt0WJoo4ualDRRFbdUr7yHJNGAaEl/4UMIDDW8Wyn
-	puIgKtI4scqZJYcfeBbY4F/fL4FPWwrf5vN22Gm7CQlnQDcAGpDn1b6JlfhRSryQ4U56BUvfP+e
-	F0XOfj337sWDshpV1y7FCeHz50TwcCFwAN5HLAfJA7flMP+1E4VXk7B7+tmtDr4QnBk3ny4QiOp
-	SS2Xh8+AtP9pDoYfH1/+lMxVshngy6RJUDszdlUrb1D9kJLwPIyMEF
-X-Received: by 2002:a05:6830:600d:b0:7d9:ad90:5670 with SMTP id 46e09a7af769-7e6a1db34c7mr10067817a34.18.1780374046933;
-        Mon, 01 Jun 2026 21:20:46 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e695d176dasm9333689a34.16.2026.06.01.21.20.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 21:20:45 -0700 (PDT)
-Date: Mon, 1 Jun 2026 21:20:40 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Woodhouse <dwmw2@infradead.org>, Wen Gu <guwen@linux.alibaba.com>,
-	tglx@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	jstultz@google.com, anna-maria@linutronix.de, frederic@kernel.org,
-	daniel.lezcano@kernel.org, sboyd@kernel.org,
-	vladimir.oltean@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com,
-	jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
-	yangbo.lu@nxp.com, svens@linux.ibm.com, nick.shi@broadcom.com,
-	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, linux-fpga@vger.kernel.org,
-	imx@lists.linux.dev, linux-s390@vger.kernel.org,
-	dust.li@linux.alibaba.com, xuanzhuo@linux.alibaba.com,
-	mani@kernel.org, imran.shaik@oss.qualcomm.com,
-	taniya.das@oss.qualcomm.com
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
- directory split
-Message-ID: <ah5aGMIxA418sxoj@hoboy.vegasvil.org>
-References: <20260412084704.743482ad@kernel.org>
- <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
- <20260412095301.4fe1fe65@kernel.org>
- <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
- <1088b07d760491deb461d6d01abca631e8f8d86c.camel@infradead.org>
- <ahzQZg_v4bxFfGdj@hoboy.vegasvil.org>
- <3908843460c4864eef79cced40d897f793c7ae2a.camel@infradead.org>
- <ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
- <0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
- <20260601185226.7f43fa75@kernel.org>
+	d=codeconstruct.com.au; s=2022a; t=1780375353;
+	bh=EoDGM05HXWjuTq3h2T/ekMFwXsbC68N2TZ/7J2Uojj4=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=GbLiTLtNS+D3650iDlcyxvyCkEbcuABSIpionpaj5tRMv0vkpSbI1HzNeXi2wVMKG
+	 qBMDGfs3EX8phWilgcIaO4yGR9FlH8B6ftqLCwftCk8LAQ2/b6tyXXXp1A82tQdgZO
+	 IM+Cfy6e1wCmIj6DSUFC2k4Pp1MjNw9TtCAJuIj+2uFtylcG/G3yRvcsX+K5L5w0/6
+	 v2gA7jyMARgDLPvfuTr3k7M80nFHyIS8wjABcpfKJI+xMrAdXWFJ3/glbHDShfbmR3
+	 NTO/r3ts4DgPxCkmVW5j5v721wMyFHBoKGviN0sLsrkmEPbCTgRomVRmdlrQpMyudy
+	 pQ76EaszVP0IA==
+Received: from [192.168.72.161] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 7FA526024D;
+	Tue,  2 Jun 2026 12:42:31 +0800 (AWST)
+Message-ID: <068cd5ffb49aac3bfd2184df7289093cbcd524ee.camel@codeconstruct.com.au>
+Subject: Re: [net-next v44] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Paolo Abeni
+	 <pabeni@redhat.com>, admiyo@os.amperecomputing.com
+Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, sudeep.holla@arm.com,
+ Jonathan.Cameron@huawei.com,  lihuisong@huawei.com
+Date: Tue, 02 Jun 2026 12:42:30 +0800
+In-Reply-To: <4fabc99f-52c1-422e-9513-69e2190bc91a@amperemail.onmicrosoft.com>
+References: <20260522193610.234166-1-admiyo@os.amperecomputing.com>
+	 <20260528084611.133703-1-pabeni@redhat.com>
+	 <63aebaed-2456-457d-be70-5211d2f746df@amperemail.onmicrosoft.com>
+	 <8c2a9e591ba22a95962c2c5f7dff5971fc5123df.camel@codeconstruct.com.au>
+	 <4fabc99f-52c1-422e-9513-69e2190bc91a@amperemail.onmicrosoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260601185226.7f43fa75@kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294004-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[infradead.org,linux.alibaba.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,oss.qualcomm.com];
+	TAGGED_FROM(0.00)[bounces-294006-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[richardcochran@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 303D26280C2
+X-Rspamd-Queue-Id: 9C869628279
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Adam,
 
-Sorry for replying to David here via Jakub's message.  Somehow my
-brilliant Gmail doesn't have David's reply...
+> > The LE condition makes sense, as the driver does not support BE. But
+> > what is requiring 64-bit?
+> The code itself will not, as written, work on a 32 Bit system, as there=
+=20
+> are 64 bit specific code.
 
-On Mon, Jun 01, 2026 at 06:52:26PM -0700, Jakub Kicinski wrote:
-> On Mon, 01 Jun 2026 17:53:49 +0100 David Woodhouse wrote:
-> > On Mon, 2026-06-01 at 08:20 -0700, Richard Cochran wrote:
-> > > Sorry, just catching up here, so the idea is to have
-> > > 
-> > >  linux/drivers/ptp/drivers  ?  
-> > 
-> > That is my current suggestion.
+Yeah, that was more my question - what is 64-bit specific about the
+code?
 
-drivers/../drivers seems a bit silly to me
+> > The comment is:
+> >=20
+> > =C2=A0=C2=A0 Implementation of MCTP over PCC DMTF Specification DSP0256
+> >=20
+> > But DSP0256 is not the "MCTP over PCC" transport binding spec. Either
+> > mention the host interface specifically, or use the correct number for
+> > the PCC spec. I think the latter would be best, as the host interface
+> > spec seems less relevant here.
+>=20
+> Yeah, just going to drop that line as it is redundant with other info in=
+=20
+> the header.
 
-> > It stems from Jakub's response in
-> > https://lore.kernel.org/all/20250815113814.5e135318@kernel.org/ that "I
-> > really wish someone stepped up and created a separate subsystem for all
-> > these cloud / vm clocks. They have nothing to do with PTP."
-> > 
-> > There was some further bikeshedding in
-> > https://lore.kernel.org/netdev/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com/
+OK.
 
-The idea of categorizing core, NIC-related, vm, and stand alone clock
-devices makes some sense to me.
+> > > > > +static void mctp_pcc_client_rx_callback(struct mbox_client *cl, =
+void *mssg)
+> > > > > +{
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct acpi_pcct_ext_p=
+cc_shared_memory pcc_header;
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mctp_pcc_ndev *=
+mctp_pcc_ndev;
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mctp_pcc_mailbo=
+x *inbox;
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mctp_skb_cb *cb=
+;
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct sk_buff *skb;
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int size;
+> > > > > +
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mctp_pcc_ndev =3D cont=
+ainer_of(cl, struct mctp_pcc_ndev, inbox.client);
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0inbox =3D &mctp_pcc_nd=
+ev->inbox;
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memcpy_fromio(&pcc_hea=
+der, inbox->chan->shmem, sizeof(pcc_header));
+> > > > [High]
+> > > > Can this dereference a NULL shmem during teardown?
+> > > >=20
+> > > > Looking at pcc_mbox_free_channel() in drivers/mailbox/pcc.c, the
+> > > > channel's shmem is iounmapped (and the pointer cleared) before the
+> > > > shutdown path runs free_irq(). Until free_irq() returns, an inbound
+> > > > doorbell on another CPU can still fire pcc_mbox_irq, which calls
+> > > > mbox_chan_received_data(), which calls chan->cl->rx_callback (cl is
+> > > > still set at that moment) =E2=80=94 landing here.
+> > > >=20
+> > > > Existing PCC clients such as drivers/acpi/acpi_pcc.c::pcc_rx_callba=
+ck
+> > > > do not touch shmem from their callback, so this driver appears to b=
+e
+> > > > the first one to expose this ordering.
+> > > >=20
+> > > > Should the rx_callback bail out when inbox->chan->shmem is NULL, or
+> > > > should the ordering in pcc_mbox_free_channel() (free_irq before
+> > > > iounmap) be addressed in the mailbox layer first?
+> > > That needs to be fixed in the PCC layer, and is submitted in a differ=
+ent
+> > > patch.=C2=A0 When that patch is accepted, this issue will be fixed.=
+=C2=A0 I do not
+> > > want to hold up this driver for that issue.
+> > Understood that there's a fix in development for this, but we can't
+> > introduce a potential null pointer dereference in the interim.
+> >=20
+> > If you want this merged before the fix, how about a guard for a valid
+> > shmem pointer?
+>=20
+> The mutux used to control access to the create-teardown path is static=
+=20
+> to drivers/mailbox/mailbox.c
 
-> > around how to split 'emulated' from other hardware drivers, but I don't
-> > much like that taxonomy. Some of these "virtual" clocks could just as
-> > easily exist in hardware with PTM too.
+You can't acquire that mutex here anyway, you're in atomic context.
 
-So the whole in-kernel API in ptp_clock_kernel.h with ptp_clock_info,
-etc, was poorly named (by me) back around Linux 3.0.  After all, the
-abbreviation, "PTP", stands for a network protocol.  At the time, Alan
-Cox pointed that out and complained, but somehow the code got merged
-anyhow.
+> I could run mincore
 
-The term PHC is a better one, since PTP Hardware Clock means clock
-device whose purpose is to support network time keeping together with
-a NIC.
+No, that wouldn't work (and would be moderately horrific)
 
-> > My observation is that with the sole exception of ptp_inet.c, *all* of
-> > the actual PHC drivers that live in drivers/ptp instead of drivers/net
-> > are "pure clock" drivers,
+Since you did not answer the guard question, are you implying that the
+shmem pointer may be unstable *during* the rx_complete call? (ie.,
+rather than being invalidated before the call, and so a simple `if
+(chan->shmem)` guard would not suffice?)
 
-No, that is not quite right.  The clockmatrix, idt82p33, ines, and
-qoriq drivers wouldn't be very useful without an attached NIC.
+The Sashiko review seems to be incorrect in that you are not the first
+user of the shmem data; there are other uses of chan->shmem that do not
+seem to have any intrinsic exclusion between the rx callback and the
+free_channel() paths, nor check the validity of shmem in their rx
+callback.
 
-> > so perhaps we split those all out into
-> > drivers/ptp/drivers/ and exclude them from the netdev maintenance?
+However, the closest existing use - the xgene i2c driver - seems like it
+can not free the pcc mailbox while a rx irq might occur, with the i2c
+locking in place. You could do something similar here, possibly via a
+spinlock acquired in both the ndo_stop handler, and the rx callback.
 
-Originally the idea was that the rate of patches would be low enough
-that netdev would be the place to post and review them, and that no
-separate tree or mailing list were needed. 
+But if your proposed change to the iounmap() ordering works, that would
+be a neater solution here.
 
-Even though the "PTP" naming was an unfortunate choice way back when,
-still I'm not a big fan of moving stuff around "just because".
+> The patch that this gates on is:
+>=20
+> https://lore.kernel.org/lkml/20260522205220.237355-1-admiyo@os.amperecomp=
+uting.com/
+>=20
+> Please comment on that one to move it along.
 
-But moving forward, I would suggest starting a new area for pure
-hardware clock devices.  
+As you can probably tell, the pcc mailbox interface is definitely not my
+area of expertise.
 
-   "Clock Devices" ?
-   linux/drivers/cd
+Cheers,
 
-Too short!
 
-   "Time Keeping Devices" ?
-   linux/drivers/tkd
-
-Confuses core time keeping!
-
-   "Advanced Clock Devices" ?
-   linux/drivers/acd
-
-Let's come up with a fitting name.
-
-Still, I don't understand why these new (non-network related ) device
-drivers can't be implemented in their own class using posix_clock_register()
-etc.
-
-Any of the useful bits (like sysfs interfaces) can be refactored out
-of ptp_clock.c and shared as a common layer.
-
-Thanks,
-Richard
+Jeremy
 
