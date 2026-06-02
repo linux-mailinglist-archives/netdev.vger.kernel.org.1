@@ -1,221 +1,236 @@
-Return-Path: <netdev+bounces-294005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294004-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eE7zNn1aHmoWiwkAu9opvQ
-	(envelope-from <netdev+bounces-294005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:22:21 +0200
+	id mBflG2RaHmoWiwkAu9opvQ
+	(envelope-from <netdev+bounces-294004-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:21:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0086280C9
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:22:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 303D26280C2
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 06:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8A7C0307A7F3
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 04:21:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1F896306C308
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 04:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E948A3909A4;
-	Tue,  2 Jun 2026 04:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A399138E5D4;
+	Tue,  2 Jun 2026 04:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JfXmo3vD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="II2P7NY7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C45438F94C;
-	Tue,  2 Jun 2026 04:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD31348C5E
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 04:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780374051; cv=none; b=KiWtnaGig+YWLBNAGLHFAeUlamcYr22OUwLiSCKz6ueGEMGsT/m9wyK0fQMEeF1OEfFzer0Ys6po381tsZisaCM9hOzdTWnNBMDTH3QCue8jBdFmUndD7MtuGYfFpF7irHz4Oh9v3Mzno5iOKYdveTpXs3hndD0zytuAkuI/ZaY=
+	t=1780374049; cv=none; b=Zf8Uhm8UTX57Y+iz1ZmtuyGiWns7DgOT27EvqD+1LXggND8H0DqnTPo/dLqN/VBwf8dcbVhkiAoJSZQqUkM4jGFcSuIPyOOuuvYt2Bw4gv9V8p3rhGZV0YXLUmzsrvXm4uBW//qDVzsvH+Cp5ItPxxF05lKz0WJeVaIu3hd4IU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780374051; c=relaxed/simple;
-	bh=Kdkq8TqSgH5/GitlXilN0OQRiqPw42N/da+Gs/wQhqg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V6CyL8ZTReaVTcLKkoFgqKk9GaRrSVj8BqSzeOZLHKJp2VlcSHeF/kyX+rogBoPU9t2qDKYAaghq97sYFtzuPUvB46d5Xj0k68U2eT64u8DaK+cR0BaX5WUG3p9tx0jE0M43/r3dtm7tjVldlO3BJ1x1zCF9SUydLgUlZgeoLLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JfXmo3vD; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651KreUW2822565;
-	Mon, 1 Jun 2026 21:20:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=6QVwi5+YD2Xd151pzvfXfS/4g
-	f36o5dTNgxArtG4NtA=; b=JfXmo3vD23j5h9vCrvYPAZrEa0hw0sqH+f6Pud90x
-	n3UL2SDILOusdizvlcsra8WDI9/+uzSvuYqqw4DgLbNzrF2srHNVEmdsJQAxbU7p
-	W+K67S7YdtC0OrTcGU6YJB8uB8wU76BEcFrPzCIoyKsJa8Z5nv8qbLt3MJEKJ/oc
-	0sRRijuGVak+1eNQBgG1JORknlRoL4VlfLAO1z4VlpAeVAF8L5Jf9W7IQtI51Kke
-	TMptLrlKD+/CLkf+u1YtjqFCRGmy8+URTwee0GdHIwQin8DKrb1nzrxcdy/majPV
-	/T938kZyeiIr3KNjSfvSuBSjXJOLaswPOeHItgCS4Z8WQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4egm56nx5j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jun 2026 21:20:40 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 1 Jun 2026 21:20:39 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 1 Jun 2026 21:20:39 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 3ECF53F7062;
-	Mon,  1 Jun 2026 21:20:36 -0700 (PDT)
-Date: Tue, 2 Jun 2026 09:50:35 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v17 net-next 8/8] octeontx2-af: npc: cn20k: Allocate
- npc_priv and dstats dynamically.
-Message-ID: <ah5aE-oDgy7BzYEc@rkannoth-OptiPlex-7090>
-References: <20260601025844.865865-1-rkannoth@marvell.com>
- <20260601025844.865865-9-rkannoth@marvell.com>
+	s=arc-20240116; t=1780374049; c=relaxed/simple;
+	bh=5Xm8IPwfY0dyellfnNLjdKdpNFj+MktK6q6JKPEvMiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gZsTsP9Wpf7Whn+vdLSbZOoZ92wQ8dA9UuQpDJRh3ku8iGxz8J1MvFwQ6vLEleLtXEHl9QBOksEE+gCaWRDorG1jIKadhn3S+3+9bysRyvgts0Ge98ePDmsNenVT7+rJhmWCwjJkN0iLYgOJyjxXZ6Q1MYlG4Ug61hT3b1Q6OG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=II2P7NY7; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7e6db226e1fso42389a34.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jun 2026 21:20:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780374047; x=1780978847; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uT7QUUK+LXQxZ5prqCoLyUCjjU+3++St9mdBXfj/SbU=;
+        b=II2P7NY7whDL8gSXkA0nJrCaJP0nMQT94ZDscIeBT9DgwHU/V35pqK7uY6yYRa4op8
+         Pkriu1woUtnmCkf9dRhaKVkxTDJzkiptqF1cP7S7BEL01TOy353DSAjRyC12WQHMHkQZ
+         apk1coIgC8Z70VXwLZzGdVNJQYzrDqFmXnU/GyJDa7TJjr1fnmdXdaVfWID116A2fhDk
+         1K/Hg1foLg5ou1H9wOGFIktUQbWDygnupcRp7jXTPCti15nfqZNv5XQ1nO0QOgJO6Kce
+         T25RXUKAXg1qu4W9ersVT0vZd9lo8oB/vlmke+FRzkDgzA3jUdFHHG7btfiP9iZgcm6t
+         lfuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780374047; x=1780978847;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uT7QUUK+LXQxZ5prqCoLyUCjjU+3++St9mdBXfj/SbU=;
+        b=jp9W5zCdPH34AXfne/yQr8mZw63YZeVKA1rKRUZhW5oN6THynKme7utJ0AaXPsFO0w
+         lLZqE/mbXaCc+adwBmwcMKAmoXFb47H6DgacsUMc6QB5LRkZLab2CvP/vzodDb6dP4pG
+         XNM+LHCrAYITaips1g1j6qBAtKl1mr/a5/YSjtaFkJKlJuGspmV2uPMhAGbcCz1YW3A4
+         vcRdLIKrXY7Yod8zkXbndjlkPV/oaDgq5Z6CqXw8SEacCCjaMHag+9K9ZP79SGIMeaqf
+         kpS7G1kTtL6GuRrMaJAB/9h1pCTEq14CQLc7VHboinuohcFrGs87qQi2wcDR+O1EjjKB
+         jkCA==
+X-Forwarded-Encrypted: i=1; AFNElJ/amnBOyorZhTolKZGBRF8hoqQx73VmVFo+y+QQl2iho8ALMBxRXANzBqSctkK1GAl4IF7t8jw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnChXfSRGpoqHTPWWOzq0PHe2CS0UZuF5+cgzC71rm+dXZqAax
+	/Wn23LGFWJdBZL3LTN4GL+Cz5hgBzZcETiTdpUZi06ig/WT6lt6DQUcn
+X-Gm-Gg: Acq92OH2spnkh0innfyzAMJm6yky4tDqtzL2JjMzygb0TaiXXnXoa8abekTnCZ93CKf
+	/UwIq0hZ33zrEPlw7xVGWtMQ2/b5lJGWGsdjZYfYZ7pOUm29gq4KEMWlKsP6QP8nrlvj6nsnrol
+	ARafDYcPHjaiqgT9Cuk4Y/ZN1+2YTBNauNBKPCl4a78bp58Z5nApVoZTIgao/8M8V6dXqJnST4E
+	hR5Vf1aDc0efVP5Et3r14bhj7sEovFgo+axt0WJoo4ualDRRFbdUr7yHJNGAaEl/4UMIDDW8Wyn
+	puIgKtI4scqZJYcfeBbY4F/fL4FPWwrf5vN22Gm7CQlnQDcAGpDn1b6JlfhRSryQ4U56BUvfP+e
+	F0XOfj337sWDshpV1y7FCeHz50TwcCFwAN5HLAfJA7flMP+1E4VXk7B7+tmtDr4QnBk3ny4QiOp
+	SS2Xh8+AtP9pDoYfH1/+lMxVshngy6RJUDszdlUrb1D9kJLwPIyMEF
+X-Received: by 2002:a05:6830:600d:b0:7d9:ad90:5670 with SMTP id 46e09a7af769-7e6a1db34c7mr10067817a34.18.1780374046933;
+        Mon, 01 Jun 2026 21:20:46 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e695d176dasm9333689a34.16.2026.06.01.21.20.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 21:20:45 -0700 (PDT)
+Date: Mon, 1 Jun 2026 21:20:40 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, Wen Gu <guwen@linux.alibaba.com>,
+	tglx@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	jstultz@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+	daniel.lezcano@kernel.org, sboyd@kernel.org,
+	vladimir.oltean@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com,
+	jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
+	yangbo.lu@nxp.com, svens@linux.ibm.com, nick.shi@broadcom.com,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com, linux-fpga@vger.kernel.org,
+	imx@lists.linux.dev, linux-s390@vger.kernel.org,
+	dust.li@linux.alibaba.com, xuanzhuo@linux.alibaba.com,
+	mani@kernel.org, imran.shaik@oss.qualcomm.com,
+	taniya.das@oss.qualcomm.com
+Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
+ directory split
+Message-ID: <ah5aGMIxA418sxoj@hoboy.vegasvil.org>
+References: <20260412084704.743482ad@kernel.org>
+ <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
+ <20260412095301.4fe1fe65@kernel.org>
+ <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
+ <1088b07d760491deb461d6d01abca631e8f8d86c.camel@infradead.org>
+ <ahzQZg_v4bxFfGdj@hoboy.vegasvil.org>
+ <3908843460c4864eef79cced40d897f793c7ae2a.camel@infradead.org>
+ <ah2jIt2DqI1ZZJx8@hoboy.vegasvil.org>
+ <0e023f951c102fe2ee7070e490c579783b2817d5.camel@infradead.org>
+ <20260601185226.7f43fa75@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260601025844.865865-9-rkannoth@marvell.com>
-X-Proofpoint-GUID: 6m22LUdmqsmOw-2llUmzq6mqOW7MBy6O
-X-Proofpoint-ORIG-GUID: 6m22LUdmqsmOw-2llUmzq6mqOW7MBy6O
-X-Authority-Analysis: v=2.4 cv=ZeYt8MVA c=1 sm=1 tr=0 ts=6a1e5a18 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8
- a=UO200rvEumD2nOZpqV8A:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAyMDAzNiBTYWx0ZWRfX3mmKiKxlYzp7
- R2dlBl2xAkgPs9tZf/wxPQ33B9rutZLd9wdYHvukRDtIKBazoBWLzGMNkrVxZ+ZuLDibGbWaUBt
- Ngbt7OzEpOG0eb3D3p4w+ngSO4O4KF6fM6icP8xstYL+zV/XzXRbG/ziygi5xO89LJG7jck55yc
- /QnoRkYyeMkWc+YdpiSlbk9anuidjbflWby5AIAKVG4GdY9KcoRsHWayV8V3nZyT4PT1BjLE4q2
- cqK9LZEnbc11nMG27H57rtrUasMPHe6+HOwCi8FaTr2ppvtEoFClS21eaejX21snbmvVt1gZjm9
- 2kgUiIiuIJ+CfJOnmLuTQVSJjt0oeoUPaJGG978cLqoFZb8gRdCFhNu1hoiT2YUVmkyJdh3DqpX
- KMlT5VgsqaKGzUlShwZMpSZHbV9I0QMESbV1KrFG6TSgsJEMJj32zfI6rThkaZ1l6YdGohlA0fy
- Vn7i1Ev7v7cwWKE6phg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-01_07,2026-05-28_03,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260601185226.7f43fa75@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	TAGGED_FROM(0.00)[bounces-294005-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294004-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[infradead.org,linux.alibaba.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,oss.qualcomm.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[richardcochran@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 5B0086280C9
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 303D26280C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-06-01 at 08:28:43, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Replace the file-scope static npc_priv with a kcalloc'd struct filled
-> from hardware bank/subbank geometry at init (num_banks is no longer a
-> const compile-time constant; drop init_done and use a non-NULL
-> npc_priv pointer for liveness). Thread npc_priv_get() / pointer access
-> through the CN20K NPC code paths, extend teardown to kfree the root
-> struct on failure and in npc_cn20k_deinit, and adjust MCAM section
-> setup to use the discovered subbank count.
 
->>  static int npc_mcam_dstats_show(struct seq_file *s, void *unused)
->>  {
->>  	struct npc_priv_t *npc_priv;
->>  	int blkaddr, pf, mcam_idx;
->[ ... ]
->>  	npc_priv = npc_priv_get();
->>  	rvu = s->private;
->>  	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
->>  	if (blkaddr < 0)
->>  		return 0;
->>
->>  	mutex_lock(&stats_lock);
->>  	seq_puts(s, "idx\tpfunc\tstats\n");
->> -	for (int bank = npc_priv.num_banks - 1; bank >= 0; bank--) {
->> -		for (int idx = npc_priv.bank_depth - 1; idx >= 0; idx--) {
->> +	for (int bank = npc_priv->num_banks - 1; bank >= 0; bank--) {
->> +		for (int idx = npc_priv->bank_depth - 1; idx >= 0; idx--) {
->Could this unconditionally dereference a NULL pointer if debugfs is read
->after initialization fails? Since npc_priv is no longer a static structure,
->reading from it without checking for NULL will cause a crash here.
+Sorry for replying to David here via Jakub's message.  Somehow my
+brilliant Gmail doesn't have David's reply...
 
-if memory allocation fails, debugfs entry wont be created in npc_cn20k_debugfs_init()
+On Mon, Jun 01, 2026 at 06:52:26PM -0700, Jakub Kicinski wrote:
+> On Mon, 01 Jun 2026 17:53:49 +0100 David Woodhouse wrote:
+> > On Mon, 2026-06-01 at 08:20 -0700, Richard Cochran wrote:
+> > > Sorry, just catching up here, so the idea is to have
+> > > 
+> > >  linux/drivers/ptp/drivers  ?  
+> > 
+> > That is my current suggestion.
 
->  int npc_cn20k_ref_idx_alloc(struct rvu *rvu, int pcifunc, int key_type,
->>  			    int prio, u16 *mcam_idx, int ref, int limit,
->>  			    bool contig, int count, bool virt)
->>  {
->>  	bool defrag_candidate = false;
->>  	int i, eidx, rc, bd;
->>  	bool ref_valid;
->>  	u16 vidx;
->>
->> -	bd = npc_priv.bank_depth;
->> +	bd = npc_priv->bank_depth;
->Does this function also need a NULL check for npc_priv before dereferencing
->it? If the NPC block fails to initialize, this will crash immediately upon
->entry.
-No. if npc_priv allocation fails, probe() itself will fail.
+drivers/../drivers seems a bit silly to me
 
->>  int rvu_mbox_handler_npc_get_pfl_info(struct rvu *rvu, struct msg_req *req,
->>  				      struct npc_get_pfl_info_rsp *rsp)
->>  {
->>  	if (!is_cn20k(rvu->pdev)) {
->>  		dev_err(rvu->dev, "Mbox support is only for cn20k\n");
->>  		return -EOPNOTSUPP;
->>  	}
->>
->> -	rsp->kw_type = npc_priv.kw;
->> -	rsp->x4_slots = npc_priv.bank_depth;
->> +	rsp->kw_type = npc_priv->kw;
->> +	rsp->x4_slots = npc_priv->bank_depth;
->>  	return 0;
->>  }
->If the NPC block is disabled or fails to initialize, npc_priv will remain
->NULL. Since this mailbox handler doesn't check for NULL before dereferencing,
->will this cause a kernel panic when triggered by a VF? Previously, reading
->from the static structure safely yielded zeroes.
->
-If the NPC block is disabled or fails to initialize, rvu af probe() itself will fail.
+> > It stems from Jakub's response in
+> > https://lore.kernel.org/all/20250815113814.5e135318@kernel.org/ that "I
+> > really wish someone stepped up and created a separate subsystem for all
+> > these cloud / vm clocks. They have nothing to do with PTP."
+> > 
+> > There was some further bikeshedding in
+> > https://lore.kernel.org/netdev/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com/
 
->>  int rvu_mbox_handler_npc_get_pfl_info(struct rvu *rvu, struct msg_req *req,
->>  				      struct npc_get_pfl_info_rsp *rsp)
->>  {
->>  	if (!is_cn20k(rvu->pdev)) {
->>  		dev_err(rvu->dev, "Mbox support is only for cn20k\n");
->>  		return -EOPNOTSUPP;
->>  	}
->>
->> -	rsp->kw_type = npc_priv.kw;
->> -	rsp->x4_slots = npc_priv.bank_depth;
->> +	rsp->kw_type = npc_priv->kw;
->> +	rsp->x4_slots = npc_priv->bank_depth;
->>  	return 0;
->>  }
->If the NPC block is disabled or fails to initialize, npc_priv will remain
->NULL. Since this mailbox handler doesn't check for NULL before dereferencing,
->will this cause a kernel panic when triggered by a VF? Previously, reading
->from the static structure safely yielded zeroes.
-There is only one AF device per system, so this case won't happen
+The idea of categorizing core, NIC-related, vm, and stand alone clock
+devices makes some sense to me.
+
+> > around how to split 'emulated' from other hardware drivers, but I don't
+> > much like that taxonomy. Some of these "virtual" clocks could just as
+> > easily exist in hardware with PTM too.
+
+So the whole in-kernel API in ptp_clock_kernel.h with ptp_clock_info,
+etc, was poorly named (by me) back around Linux 3.0.  After all, the
+abbreviation, "PTP", stands for a network protocol.  At the time, Alan
+Cox pointed that out and complained, but somehow the code got merged
+anyhow.
+
+The term PHC is a better one, since PTP Hardware Clock means clock
+device whose purpose is to support network time keeping together with
+a NIC.
+
+> > My observation is that with the sole exception of ptp_inet.c, *all* of
+> > the actual PHC drivers that live in drivers/ptp instead of drivers/net
+> > are "pure clock" drivers,
+
+No, that is not quite right.  The clockmatrix, idt82p33, ines, and
+qoriq drivers wouldn't be very useful without an attached NIC.
+
+> > so perhaps we split those all out into
+> > drivers/ptp/drivers/ and exclude them from the netdev maintenance?
+
+Originally the idea was that the rate of patches would be low enough
+that netdev would be the place to post and review them, and that no
+separate tree or mailing list were needed. 
+
+Even though the "PTP" naming was an unfortunate choice way back when,
+still I'm not a big fan of moving stuff around "just because".
+
+But moving forward, I would suggest starting a new area for pure
+hardware clock devices.  
+
+   "Clock Devices" ?
+   linux/drivers/cd
+
+Too short!
+
+   "Time Keeping Devices" ?
+   linux/drivers/tkd
+
+Confuses core time keeping!
+
+   "Advanced Clock Devices" ?
+   linux/drivers/acd
+
+Let's come up with a fitting name.
+
+Still, I don't understand why these new (non-network related ) device
+drivers can't be implemented in their own class using posix_clock_register()
+etc.
+
+Any of the useful bits (like sysfs interfaces) can be refactored out
+of ptp_clock.c and shared as a common layer.
+
+Thanks,
+Richard
 
