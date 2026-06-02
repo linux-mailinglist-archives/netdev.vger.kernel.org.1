@@ -1,309 +1,155 @@
-Return-Path: <netdev+bounces-293966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-293967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMolLOpAHmrviAkAu9opvQ
-	(envelope-from <netdev+bounces-293966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:33:14 +0200
+	id SLj2FxRBHmrviAkAu9opvQ
+	(envelope-from <netdev+bounces-293967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:33:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1CA62742E
-	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:33:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A356D627461
+	for <lists+netdev@lfdr.de>; Tue, 02 Jun 2026 04:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3649302A2E7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:27:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B1BE30305E9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jun 2026 02:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7B2360EFF;
-	Tue,  2 Jun 2026 02:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U0R0CsIp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E5131F986;
+	Tue,  2 Jun 2026 02:29:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E72314B76;
-	Tue,  2 Jun 2026 02:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF60362120
+	for <netdev@vger.kernel.org>; Tue,  2 Jun 2026 02:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780367265; cv=none; b=VgscZ7q6vGThQW05e8MkANZXv3vhj9CuWcwlNKMayrtixiFECeUlr32xwL4oMTOxDtg7KDWXCCeYrB0HouQ0DdjegIQSl++DR0eIX+yeDAU4TZLyaLCObf3LJM8Y3FrkqKHFAfLI30qSk8h06LxkVrjlpzeL54Ypw+CEay3WNPE=
+	t=1780367363; cv=none; b=FBa7nWxYH2C9qQCs1H8ORDNEtHu2XvoIgfuol0iCA0kObSd12hhWb0gafqZWzYXufSIb5uPMeVAHfE5vCZ+7QHpSQvYUIAnqNyPFrDOifmPCZelvY2K3zOtC3SZ1egTT93JCuhtHrFe9QQxy34zzQ898jUH1c6fbI1/Gp6xPmas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780367265; c=relaxed/simple;
-	bh=wWwnc1fD7B7ogdr99JZMcUfN7ebO7guXwXu26EM+nQc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SfoW9hd/ksinVh3/1aOr6REU2LbiM8r32AywvIogGv6oX6XmN5wnvWJleVm6E+8BiF76jWUO2ffDkViKrZVoM0EDt3A9RW7bGiXvZBvx6hWpKLqzEeCPe9NzUqR4Y9NQD520ng6Oq3lhTRUSzi1WtZoenWnhMpp1yhSYVMCvNXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U0R0CsIp; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9a7b8678-2bfd-48fd-83e3-52aa693eb540@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780367260;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TrffuvfK4t1FtFy20xwpdt6crWuCsSg9rHUJ/9RMZ6M=;
-	b=U0R0CsIpwwaer9N9alDAlJNV/r5u+H/+PrpTmhpcS/wj3O5sLqtq5LE9zlrXpiMDiSjgPd
-	ZGwEyehO1Usc+bj8AwptHpDuB05fNRHBFurv0DTQ6kmyEYEfWsiH9em5De2CKaIreIASDx
-	50jaT0F9JDbMYFB+DWf5wOL0XbM1emI=
-Date: Tue, 2 Jun 2026 10:27:18 +0800
+	s=arc-20240116; t=1780367363; c=relaxed/simple;
+	bh=n4O2NE6UtB48+17crp094/J1QXN2t88qmRSnJQVmQvA=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qjXFAr/oEe8wS3k7gSgolHPFI9ni/bqDaZ324fv4Uncc8AJkIPbQuAgyroEiuAMTVoK1i2c1cOWlLXETCbVwsRlkbxcbddinZXztBDnOdJpD3Gwu23Bp1a+oyaWvgTlT+GQzrfHrJzDdYUDnLAWLQQtVNENssG5ON05rk3xlMDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas4t1780367290t846t11888
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.207.111])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 9419051175110529402
+To: "'Loktionov, Aleksandr'" <aleksandr.loktionov@intel.com>,
+	<netdev@vger.kernel.org>
+Cc: "'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Keller, Jacob E'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Simon Horman'" <horms@kernel.org>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Zaremba, Larysa'" <larysa.zaremba@intel.com>,
+	"'Ingo Molnar'" <mingo@kernel.org>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Johannes Berg'" <johannes@sipsolutions.net>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>
+References: <20260601072221.2952-1-jiawenwu@trustnetic.com> <20260601072221.2952-6-jiawenwu@trustnetic.com> <IA3PR11MB8986104B1CB7F3582CE9D5D8E5152@IA3PR11MB8986.namprd11.prod.outlook.com>
+In-Reply-To: <IA3PR11MB8986104B1CB7F3582CE9D5D8E5152@IA3PR11MB8986.namprd11.prod.outlook.com>
+Subject: RE: [PATCH net-next v4 5/5] net: wangxun: implement pci_error_handlers ops
+Date: Tue, 2 Jun 2026 10:28:09 +0800
+Message-ID: <088f01dcf237$73f9dc30$5bed9490$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Add tests to verify the fix of
- encapsulating VxLAN in lwt
-Content-Language: en-US
-To: Emil Tsalapatis <emil@etsalapatis.com>, bpf@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Guillaume Nault <gnault@redhat.com>,
- Ido Schimmel <idosch@nvidia.com>,
- Fernando Fernandez Mancera <fmancera@suse.de>,
- Peter Oskolkov <posk@google.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-patches-bot@fb.com, Leon Hwang <leon.huangfu@shopee.com>
-References: <20260601150203.20352-1-leon.hwang@linux.dev>
- <20260601150203.20352-3-leon.hwang@linux.dev>
- <DIXX90BMJRXM.1XKUMNSDY9OO@etsalapatis.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <DIXX90BMJRXM.1XKUMNSDY9OO@etsalapatis.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQEmZmPiFxLXVQw6wm5cjAUm9/PfJgEIHjjLAeFJaVK3gFXTIA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: OZiu3a4l9JB5MBVwUbBqAsPP7UeZ/zkXh6UvLYvqXYpFiAY8pAsAmMpt
+	Md8SBgKZA5u1bp0XkIk4zAM3QpXa5jAN0FgRgq5FrnwJ3pzaI4kJG0E0/j60599cdIpzN/9
+	iMOsr8GV7MZ62G1FkOTT3HBMz57rDmQTCUGr4glSyW5koHukX3gl0xqwiCpo0TR6EgVw/9L
+	B8YPTnrzlIGibMdLJnd8nHW8o+/i7/1Ka9iRHRJRrs6zjp578t6IO6lr0AUjhj9ZgibJ9xi
+	eRXfebRPJQGc0op+Th3Bhlhv3rTxYfXiDedO2jMhJDJaUG0U/Fz7p9xs9T73/OKMdfXtsAr
+	XQ8EkbOoINhrjx0Rw0B6GVsw9Jg9yfM9njQd4C3fjv03aUrSfGcw+xr00l05rl+SSBfcgp7
+	5JnnMZWcGpfKv0euiPv9ty1YboS6Mk870LVXNuIzcComf+47rQmJMQ8fgZHqwSDXbg6k6V5
+	O4WM1NLSg0NTrcmJUsZX/dGOL7gFR542Nd3Yffzdiu6Kt4GosHaK9pNgb+aQBcM0AZHILrE
+	nr7l+FAoGq/zfBGH0kll1eOdzXOKeFVx09csLbkPrx2vufVBR39yLTOBQURnodqUhbNxXZJ
+	pZDrEQWOoxGY/3ay49/v5aRg6GdElRVbCfnhim4C+UbqJuJ+fFVUjhy3jhyYImYx21+w7NP
+	IQnASu6v2hkyE5y+v5n4A7pahZhM/oc28J4AkE2pBbFwIoJuEGLkfbsPCUiPyZxAQLTjC1I
+	UXYMV/D7XhyMbZ/ExTTrkiknf3Uj+ikv5Y5AEuzPDloGjkBJ4v+xHS1EuXqY3FMOoSC9Ggj
+	Ywt6c4KBNCSeU0r7BLPqxuUb1aZ/O37gYaIIPaSJwT77XVJ7E+XH8IWNXzyxW5e/UNZQ3wW
+	fuurq6kxcgVzMndNxS+SJdkh4WngauSrG94FD7PinD0gdDBT7YIG9n+9s5NT0YoI/+pOpIx
+	XgkFJOuTDMNIdZhr7/j56ujSUgeo6OGvqrDbDt7vD2gBhUek0hnvoyCgKyd31W9HtcuWcSr
+	h8C+bxLdwvanW1a1BVDqXk9ObQAEj58P5Qw+0wEBQMRtrBPQZDEPwATFPcIZPILWjmc1xrO
+	A==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.54 / 15.00];
+	FROM_EXCESS_BASE64(1.50)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,nvidia.com,suse.de,vger.kernel.org,fb.com,shopee.com];
-	TAGGED_FROM(0.00)[bounces-293966-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-293967-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[trustnetic.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.974];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 0F1CA62742E
+X-Rspamd-Queue-Id: A356D627461
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2/6/26 02:24, Emil Tsalapatis wrote:
-> On Mon Jun 1, 2026 at 11:02 AM EDT, Leon Hwang wrote:
-[...]
->> @@ -35,6 +38,10 @@
->>  #define IP6_ADDR_SRC IP6_ADDR_1
->>  #define IP6_ADDR_DST IP6_ADDR_4
->>  
->> +/* VxLAN tunnel endpoints, reachable via the bottom route (veth5/6/7/8). */
->> +#define IP4_ADDR_VXLAN  "172.16.17.100"
->> +#define IP6_ADDR_VXLAN  "fb20::1"
-> 
-> There's a whole series of existing IP definitions at the top of the file, we
-> should put those new ones right below them. And fb20 -> fb11 to keep
-> with the pattern imo.
-> 
+> > +static void wx_io_resume(struct pci_dev *pdev)
+> > +{
+> > +	struct wx *wx = pci_get_drvdata(pdev);
+> > +	struct net_device *netdev;
+> > +	int err;
+> > +
+> > +	netdev = wx->netdev;
+> > +	rtnl_lock();
+> > +	if (netif_running(netdev)) {
+> > +		err = netdev->netdev_ops->ndo_open(netdev);
+> > +		if (err) {
+> > +			wx_err(wx, "Failed to open netdev after
+> > reset\n");
+> If you jump over the netif_device_attach(netdev);
+> I'm afraid the interface probably will be UP (IFF_UP set, because netif_running() returned true)
+> but permanently "detached" - the kernel's watchdog, TX queue wakeups,
+> and carrier-change notifications all check netif_device_present() and
+> will silently no-op.
 
-Ack.
+If .ndo_open() fails during recovery, the device has not been successfully
+reinitialized and therefore should remain detached. 
+Calling netif_device_attach() unconditionally would expose an interface whose
+queues, interrupts or other resources may not have been restored successfully.
 
->> +
->>  /* Setup/topology:
->>   *
->>   *    NS1             NS2             NS3
->> @@ -538,3 +545,160 @@ void test_lwt_ip_encap_ipv4(void)
->>  	if (test__start_subtest("ingress"))
->>  		lwt_ip_encap(IPV4_ENCAP, INGRESS, "");
->>  }
->> +
->> +/*
->> + * VxLAN Setup/topology:
->> + *
->> + * NS1 (IP*_ADDR_1)                NS2                  NS3 (IP*_ADDR_4)
->> + *       [ping src]
->> + *           |                          top route
->> + *         veth1 (LWT encap)  <<-- veth2        veth3  <<-- veth4 (ping dst)
->> + *           |                                                ^
->> + *       (bottom route)                                       | (inner pkt)
->> + *           v                        bottom route            |
->> + *         veth5              -->> veth6        veth7  -->> veth8 (vxlan decap)
->> + *                                                          (IP*_ADDR_VXLAN)
->> + *
-> Not sure if this is rendering weird for me but NS2 could be tabbed over
-> once more for clarity.
-> 
-
-NS2 here is to make sure the LWT-encap VxLAN packets can be routed
-correctly like other lwt tests.
-
->> + * Add the VxLAN endpoint addresses to NS3's veth8, create standard
->> + * VxLAN decap devices bound to those addresses, and install routes so
->> + * NS1/NS2 can reach the endpoints via the bottom route.
->> + */
-[...]
->> +fail_close:
->> +	close_netns(nstoken);
->> +fail:
->> +	return -1;
->> +}
->> +
->> +/*
->> + * VxLAN encap tests (IPv4-outer and IPv6-outer variants).
->> + *
->> + * Test 1 - functional: the BPF LWT xmit program encapsulates the packet
->> + *   (protocol=UDP, port=4789) and re-routes it without dropping it.
->> + *   Verified by ping success.
->> + *
->> + * Test 2 - fix verification: after bpf_lwt_push_ip_encap() the
->> + *   skb->transport_header must point at the outer UDP header, i.e.
->> + *   transport_header - network_header == sizeof(outer IP header).
->> + *   Without the fix the transport_header still points at the inner
->> + *   transport layer, giving a wrong (larger) offset.
->> + */
-> 
-> The Test 2 bullet regurgitates the AI's context, can you rephrase it so
-> that it's not framed as a fix but as a test?
-> 
-
-Hmm, better to drop this comment, I think.
-
->> +static void lwt_ip_encap_vxlan(bool ipv4_encap)
->> +{
->> +	char ns1[NETNS_NAME_SIZE] = NETNS_BASE "-1-";
->> +	char ns2[NETNS_NAME_SIZE] = NETNS_BASE "-2-";
->> +	char ns3[NETNS_NAME_SIZE] = NETNS_BASE "-3-";
->> +	const char *sec = ipv4_encap ? "encap_vxlan" : "encap_vxlan6";
-[...]
->> +
->> +SEC("encap_vxlan")
->> +int bpf_lwt_encap_vxlan(struct __sk_buff *skb)
->> +{
->> +	struct encap_hdr {
->> +		struct iphdr    iph;
->> +		struct udphdr   udph;
->> +		struct vxlanhdr vxh;
->> +		struct ethhdr   eth;
->> +	} __attribute__((__packed__)) /* packed is required to avoid padding */ hdr;
-> 
-> Comment is unnecessary here.
-> 
-
-Ack.
-
->> +	int err;
->> +
->> +	memset(&hdr, 0, sizeof(hdr));
->> +
->> +	hdr.iph.ihl      = 5;
->> +	hdr.iph.version  = 4;
->> +	hdr.iph.ttl      = 0x40;
->> +	hdr.iph.protocol = 17; /* IPPROTO_UDP */
->> +	hdr.iph.tot_len  = bpf_htons(skb->len + sizeof(hdr));
->> +#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
->> +	hdr.iph.saddr = 0x640510ac;  /* 172.16.5.100  */
->> +	hdr.iph.daddr = 0x641110ac;  /* 172.16.17.100 */
-> 
-> Ideally want to keep the addresses we are hardcoding here and the
-> the addresses we're declaring in the userspace part in sync. Here
-> we've hardcoded the addresses three multiple ways (be, le, and string
-> in the userspace part).
-> 
-
-I think it's OK to hardcode them here like the gre tests.
-
->> +#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
->> +	hdr.iph.saddr = 0xac100564;  /* 172.16.5.100 */
->> +	hdr.iph.daddr = 0xac101164;  /* 172.16.17.100 */
->> +#else
->> +#error "Fix your compiler's __BYTE_ORDER__?!"
->> +#endif
->> +
->> +	hdr.udph.source = bpf_htons(VXLAN_PORT);
->> +	hdr.udph.dest   = bpf_htons(VXLAN_PORT);
->> +	hdr.udph.len    = bpf_htons(skb->len + sizeof(hdr.udph) + sizeof(hdr.vxh) +
->> +				    sizeof(hdr.eth));
->> +
->> +	hdr.vxh.vx_flags = bpf_htonl(VXLAN_FLAGS);
->> +	hdr.vxh.vx_vni   = bpf_htonl(VXLAN_VNI << 8);
->> +
->> +	__builtin_memcpy(hdr.eth.h_dest, bcast, ETH_ALEN);
->> +	__builtin_memcpy(hdr.eth.h_source, srcmac, ETH_ALEN);
->> +	hdr.eth.h_proto = bpf_htons(ETH_P_IP);
->> +
->> +	err = bpf_lwt_push_encap(skb, BPF_LWT_ENCAP_IP, &hdr, sizeof(hdr));
->> +	if (err)
->> +		return BPF_DROP;
->> +
->> +	return BPF_LWT_REROUTE;
->> +}
->> +
->> +SEC("encap_vxlan6")
->> +int bpf_lwt_encap_vxlan6(struct __sk_buff *skb)
->> +{
->> +	struct encap_hdr {
->> +		struct ipv6hdr  ip6hdr;
->> +		struct udphdr   udph;
->> +		struct vxlanhdr vxh;
->> +		struct ethhdr   eth;
->> +	} __attribute__((__packed__)) /* packed is required to avoid padding */ hdr;
-
-Will drop the comment.
-
->> +	int err;
->> +
-[...]
->> +	return BPF_LWT_REROUTE;
->> +}
->> +
->>  char _license[] SEC("license") = "GPL";
->> diff --git a/tools/testing/selftests/bpf/progs/test_lwt_ip_encap_fix.c b/tools/testing/selftests/bpf/progs/test_lwt_ip_encap_fix.c
-> 
-> We definitely need to change the name here this is straight from the AI.
-> 
-
-Will fold it into test_lwt_ip_encap.c to avoid creating a new file.
-
->> new file mode 100644
->> index 000000000000..6945f83b94f2
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/progs/test_lwt_ip_encap_fix.c
->> @@ -0,0 +1,44 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +#include "vmlinux.h"
->> +#include <bpf/bpf_helpers.h>
->> +#include <bpf/bpf_tracing.h>
->> +#include <bpf/bpf_core_read.h>
->> +
->> +#define NEXTHDR_UDP		17	/* UDP message. */
-> 
-> Unnecessary, we hardcode 17 in the other test.
-> 
-
-Ack.
-
-Thanks,
-Leon
-
-[...]
+ 
 
 
