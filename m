@@ -1,242 +1,225 @@
-Return-Path: <netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5ebeLp+WH2oGngAAu9opvQ
-	(envelope-from <netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:51:11 +0200
+	id nfyWCe6WH2oRngAAu9opvQ
+	(envelope-from <netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:52:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A31633B6D
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:51:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 224D0633B89
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:52:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=AiUW4t0H;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF3C13030EA3
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:51:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 473853003BF9
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB603DC4CC;
-	Wed,  3 Jun 2026 02:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A45E3D8115;
+	Wed,  3 Jun 2026 02:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FDA191F98
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 02:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE25F191F98
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 02:52:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780455068; cv=none; b=Sy0h7JBGyCRceVpyzS+eMgxtQeatrX5D6vBtUSRa8jQovk8eigd9VjGzIboNzw/+5vyIdLyNgqTv3wvthrZKIzK9iSoSUmevraNqMkbNtPh8r4BCOQ9BRfACWoUKnsuY9slEscsZk+veWzc+k01Dk8H7bXJYfuLK6ZuZw35ez1Q=
+	t=1780455144; cv=none; b=Y7kFJCo/VCEFu9bTYmcqyX5FPabrusjBnugLVFH56Dxb6bs4t8F50BQK9pF7kVh6N/OpCsXqce8RQRL2LFOd4wCbob0Nn17IaswuFCWw3KgaTPa26mzHRKoh664hg4k+oqDfZ+6rnVJPxJPcxuzdQf80x8WrXd0zuwHuMbw6YdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780455068; c=relaxed/simple;
-	bh=eEq8iNXQCACbV78K62R7s3Cn5kOKlLHTcV5KQZJYgcA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FDWhgrCe8PYYJE4HrbsvRsbuXE7gAxCYAqvB3QkJbb0z7+zMtDqMSLTKi6Q8nyRdh1Wi7BFLcZFybmOsalqkH79oVRcS4mBbZHabIKu0Pq7lS9Xwa7UguGh3gXyYiq2+KhRamtiPa/lr+ckxgpsB5pfEaDEY2NMgB2rTN8vHpto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AiUW4t0H; arc=none smtp.client-ip=91.218.175.183
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780455054;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MQLPpaSkYjgDNM6V9ukCVjB+PUc9tCwTjIjPYJtPcK4=;
-	b=AiUW4t0HEnL+VMo6ZR1/oy6Nfs0ndz2lo8yfecgsCm7O/jakEFvHqO6Dk68YV5q3g1U9Qa
-	8QIwnqtf5VKxa3GH7Fqj/4E99iillce4dd3aUnJU2OPmATaApv0iU4eWTWKyZMxnVu4j+8
-	FqcIGvJfHAntZKPRBUVLckMcpKkrx1Y=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Qingfang Deng <qingfang.deng@linux.dev>
-Subject: [PATCH nf-next] netfilter: flowtable: remove inline segmentation
-Date: Wed,  3 Jun 2026 10:50:46 +0800
-Message-ID: <20260603025047.32839-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1780455144; c=relaxed/simple;
+	bh=Q6eR0SAT/uKHN/6h7YuGqZBEURlSyy2gNsq2bj3TXiY=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kh5s9wC7t9BNOoMkUBFdidrGG3yFC92JBrskoM7oj6AWyDSJf/I+7nvKPh7GYdYutYKCFtOn5kIHBGm4jGanodHZCl8y4LWHAkrzm0FSyWasOZJZeqK/8/7/IXUwm1vCDCzyENGzOaqWBvlJgEn7KxhjPxftnCV3TA2IVXvzjyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
+X-QQ-mid:Yeas8t1780455089t594t31214
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.207.111])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 486067191020761161
+To: "'Larysa Zaremba'" <larysa.zaremba@intel.com>
+Cc: <netdev@vger.kernel.org>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Simon Horman'" <horms@kernel.org>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Ingo Molnar'" <mingo@kernel.org>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Johannes Berg'" <johannes@sipsolutions.net>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
+	<netdev@vger.kernel.org>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Simon Horman'" <horms@kernel.org>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Ingo Molnar'" <mingo@kernel.org>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Johannes Berg'" <johannes@sipsolutions.net>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>
+References: <20260601072221.2952-1-jiawenwu@trustnetic.com> <20260601072221.2952-6-jiawenwu@trustnetic.com> <ah6-x9CJHwxh_3Qt@soc-5CG4396X81.clients.intel.com>
+In-Reply-To: <ah6-x9CJHwxh_3Qt@soc-5CG4396X81.clients.intel.com>
+Subject: RE: [PATCH net-next v4 5/5] net: wangxun: implement pci_error_handlers ops
+Date: Wed, 3 Jun 2026 10:51:28 +0800
+Message-ID: <095a01dcf303$e03d08a0$a0b719e0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQEmZmPiFxLXVQw6wm5cjAUm9/PfJgEIHjjLAbXhlRG3g0pdsA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MKut7GF+UZm9gj21eL6U7wzx7XMwbtj1SL/jq616fwfP5IKufGn3D5l3
+	pse0sxhBzsDeHA+Rg8HJHa7VOKg7K7lVhfq9ipnMwnetTIb5F/G/wypWuPtpuTUv+LW1yFz
+	s62FfErEB4iDbAMWpTWrFFSYBASdJJ3MFJf5kLyL8xvURAGzjaJ5hhLF9grTJk2Z/4GOHci
+	ZlNnEmhQSgTz1G/Ih0DBRUxPH2rRYH6USI/BmpygmjZhCtC+eZUtYF3k/k+QCKm3qqH14Pa
+	Nv5DZmPhpu71MpBPW/XLjH3kC5HakPCPbc6KY29LBqBiDNxINaPLLvrybZI0XilV/4g1onT
+	EyX3y/ZsIbUbHlEJOvBJTFIW0ewAVSpKRBpXWZo4nsUMfPzzfAqp7bGKqOqo4jzGBThWvm4
+	/6mEBLLMC4bABU7o5ug0M7JnxkvYcb/IFScfhAsJXuMHWlEPm0a/Rn3xO9NC7NoAbEVx8zM
+	Pk3WDpAKET20weOu4YQiU8qmtefBPAq7Mim5cYljqXq9QkvznYhrzn7EPGhA+ST87IQ/hYx
+	/jaC7Mp29duKkpvtYcT7jMK001WloKOsZqF+/H/UG52e4R7tHFIyyA4judGbcLphxoGet7w
+	fHIgPSh4AT1wRtCSAaQCMUFbzMB19h0qu1W2ZizYlzeqURaN4w3kjOPywENbdrcLmdM3wgq
+	RF2s4xcmXFYHbVAG+DxIqV3RhJ99aKSo9ycTvXEIbthoPpZNCSHtLjgpGkDkZHqWJNLhB66
+	CNWte4XCPtkGI6RReQLV7COeBzO4a8XbOQGlnsTIwJ/htE5RO5a8W2bk35Cb9ZbZGHzeCPA
+	UC8CmY75sz+mrR3hkTjXwWIgrYuBRxPSMddChFbWCdsNe8OcLpMq84PtLMoYs3SSoga5E9W
+	8nctKyl+t/V/Nk7Df1tXDmiyTDyLHs0yH9xczTuSoyXA146Mm6ySlZzh3uTni2NZTedv5Er
+	Kl17aQmR3hOq/LC+e3FkAsYHs0PoWQnQOmjNTW/Vru71AmCBn8Ja359e+YmzGFAuHOxsgbR
+	DAbn9BRp5zyBRPkb08imnEcN+om/jH+24kw7Is1SYExf1fVTDGQkTWxB9xzMDGFTrjqyrYv
+	MlbcpR0MEqS03znEUvjjueFHlZboMNtDXLuKlxvIEZFpHWJX4NC6/Tv4blE1QC0sA==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:larysa.zaremba@intel.com,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:mingo@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:aleksandr.loktionov@intel.com,m:u.kleine-koenig@baylibre.com,m:johannes@sipsolutions.net,m:fabio.baltieri@gmail.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294531-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:qingfang.deng@linux.dev,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	TAGGED_FROM(0.00)[bounces-294532-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:dkim,linux.dev:from_mime,linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,trustnetic.com:mid,trustnetic.com:from_mime,trustnetic.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 12A31633B6D
+X-Rspamd-Queue-Id: 224D0633B89
 
-Now that PPPoE driver has proper GSO support, this is no longer needed.
+On Tue, Jun 2, 2026 7:30 PM, Larysa Zaremba wrote:
+> On Mon, Jun 01, 2026 at 03:22:21PM +0800, Jiawen Wu wrote:
+> > Support AER driver to handle the PCIe errors.
+> >
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > ---
+> >  drivers/net/ethernet/wangxun/libwx/wx_err.c   | 111 ++++++++++++++++++
+> >  drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
+> >  drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
+> >  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   9 +-
+> >  .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   8 +-
+> >  5 files changed, 127 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> > index e249cea874be..ae5d14071f3d 100644
+> > --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> > @@ -4,11 +4,122 @@
+> >
+> >  #include <linux/netdevice.h>
+> >  #include <linux/pci.h>
+> > +#include <linux/aer.h>
+> >
+> >  #include "wx_type.h"
+> >  #include "wx_lib.h"
+> >  #include "wx_err.h"
+> >
+> > +/**
+> > + * wx_io_error_detected - called when PCI error is detected
+> > + * @pdev: Pointer to PCI device
+> > + * @state: The current pci connection state
+> > + *
+> > + * Return: pci_ers_result_t.
+> > + *
+> > + * This function is called after a PCI bus error affecting
+> > + * this device has been detected.
+> > + */
+> > +static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
+> > +					     pci_channel_state_t state)
+> > +{
+> > +	struct wx *wx = pci_get_drvdata(pdev);
+> > +	struct net_device *netdev;
+> > +
+> > +	if (!wx)
+> > +		return PCI_ERS_RESULT_DISCONNECT;
+> > +
+> > +	netdev = wx->netdev;
+> > +	if (!netif_device_present(netdev))
+> > +		return PCI_ERS_RESULT_DISCONNECT;
+> > +
+> > +	if (state == pci_channel_io_perm_failure)
+> > +		return PCI_ERS_RESULT_DISCONNECT;
+> > +
+> > +	rtnl_lock();
+> > +	netif_device_detach(netdev);
+> 
+> Sashiko says:
+> 
+>  "Calling netif_device_detach() stops new packets from entering the TX queue but
+>   doesn't wait for currently executing ndo_start_xmit operations to complete,
+>   which netif_tx_disable() would do."
+> 
+> Device detaching does not grab __netif_tx_lock(), so it does seem like
+> netif_device_detach() leaves some race possibilities.
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
- include/net/netfilter/nf_flow_table.h |  1 -
- net/netfilter/nf_flow_table_core.c    |  1 -
- net/netfilter/nf_flow_table_ip.c      | 34 ---------------------------
- net/netfilter/nf_flow_table_path.c    |  3 ---
- 4 files changed, 39 deletions(-)
-
-diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
-index 7b23b245a5a8..61ee74e95d2b 100644
---- a/include/net/netfilter/nf_flow_table.h
-+++ b/include/net/netfilter/nf_flow_table.h
-@@ -151,7 +151,6 @@ struct flow_offload_tuple {
- 	u16				dir:2,
- 					xmit_type:3,
- 					encap_num:2,
--					needs_gso_segment:1,
- 					tun_num:2,
- 					in_vlan_ingress:2;
- 	u16				mtu;
-diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
-index 785d8c244a77..2c4140e6f53c 100644
---- a/net/netfilter/nf_flow_table_core.c
-+++ b/net/netfilter/nf_flow_table_core.c
-@@ -122,7 +122,6 @@ static int flow_offload_fill_route(struct flow_offload *flow,
+netif_tx_disable() is missed in soft_quiesce(). I'll add it.
  
- 	flow_tuple->tun = route->tuple[dir].in.tun;
- 	flow_tuple->encap_num = route->tuple[dir].in.num_encaps;
--	flow_tuple->needs_gso_segment = route->tuple[dir].out.needs_gso_segment;
- 	flow_tuple->tun_num = route->tuple[dir].in.num_tuns;
- 
- 	switch (route->tuple[dir].xmit_type) {
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 9c05a50d6013..9ec44ea2bcd2 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -771,7 +771,6 @@ struct nf_flow_xmit {
- 	const void		*source;
- 	struct net_device	*outdev;
- 	struct flow_offload_tuple *tuple;
--	bool			needs_gso_segment;
- };
- 
- static void __nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
-@@ -792,41 +791,10 @@ static void __nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
- 	dev_queue_xmit(skb);
- }
- 
--static unsigned int nf_flow_encap_gso_xmit(struct net *net, struct sk_buff *skb,
--					   struct nf_flow_xmit *xmit)
--{
--	struct sk_buff *segs, *nskb;
--
--	segs = skb_gso_segment(skb, 0);
--	if (IS_ERR(segs))
--		return NF_DROP;
--
--	if (segs)
--		consume_skb(skb);
--	else
--		segs = skb;
--
--	skb_list_walk_safe(segs, segs, nskb) {
--		skb_mark_not_on_list(segs);
--
--		if (nf_flow_encap_push(segs, xmit->tuple, xmit->outdev) < 0) {
--			kfree_skb(segs);
--			kfree_skb_list(nskb);
--			return NF_STOLEN;
--		}
--		__nf_flow_queue_xmit(net, segs, xmit);
--	}
--
--	return NF_STOLEN;
--}
--
- static unsigned int nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
- 				       struct nf_flow_xmit *xmit)
- {
- 	if (xmit->tuple->encap_num) {
--		if (skb_is_gso(skb) && xmit->needs_gso_segment)
--			return nf_flow_encap_gso_xmit(net, skb, xmit);
--
- 		if (nf_flow_encap_push(skb, xmit->tuple, xmit->outdev) < 0)
- 			return NF_DROP;
- 	}
-@@ -910,7 +878,6 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 		return NF_DROP;
- 	}
- 	xmit.tuple = other_tuple;
--	xmit.needs_gso_segment = tuplehash->tuple.needs_gso_segment;
- 
- 	return nf_flow_queue_xmit(state->net, skb, &xmit);
- }
-@@ -1231,7 +1198,6 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
- 		return NF_DROP;
- 	}
- 	xmit.tuple = other_tuple;
--	xmit.needs_gso_segment = tuplehash->tuple.needs_gso_segment;
- 
- 	return nf_flow_queue_xmit(state->net, skb, &xmit);
- }
-diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
-index 9e88ea6a2eef..700a6ae34aa3 100644
---- a/net/netfilter/nf_flow_table_path.c
-+++ b/net/netfilter/nf_flow_table_path.c
-@@ -86,7 +86,6 @@ struct nft_forward_info {
- 	u8 ingress_vlans;
- 	u8 h_source[ETH_ALEN];
- 	u8 h_dest[ETH_ALEN];
--	bool needs_gso_segment;
- 	enum flow_offload_xmit_type xmit_type;
- };
- 
-@@ -142,7 +141,6 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
- 			if (path->type == DEV_PATH_PPPOE) {
- 				memcpy(info->h_dest, path->encap.h_dest, ETH_ALEN);
- 				info->xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
--				info->needs_gso_segment = 1;
- 			}
- 			break;
- 		case DEV_PATH_BRIDGE:
-@@ -283,7 +281,6 @@ static void nft_dev_forward_path(const struct nft_pktinfo *pkt,
- 		memcpy(route->tuple[dir].out.h_dest, info.h_dest, ETH_ALEN);
- 		route->tuple[dir].xmit_type = info.xmit_type;
- 	}
--	route->tuple[dir].out.needs_gso_segment = info.needs_gso_segment;
- }
- 
- int nft_flow_route(const struct nft_pktinfo *pkt, const struct nf_conn *ct,
--- 
-2.43.0
 
 
