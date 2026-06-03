@@ -1,224 +1,150 @@
-Return-Path: <netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294640-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pYhkNRnaH2qArAAAu9opvQ
-	(envelope-from <netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:39:05 +0200
+	id 40ziGGXbH2oArQAAu9opvQ
+	(envelope-from <netdev+bounces-294640-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:44:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319AA6354BF
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:39:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AAF635575
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:44:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294640-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294640-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 82BA63165219
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:29:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3A17A31568AB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE8F3FF899;
-	Wed,  3 Jun 2026 07:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A69402B8F;
+	Wed,  3 Jun 2026 07:28:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996F03F0AA9
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBC73FE35F;
+	Wed,  3 Jun 2026 07:28:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471657; cv=none; b=OC5BvDLCo32Fj0qra6leRh6TolAZPOcFeamJjjGzSNU3uPwQel6DE037+1aYHFFW3CtL8OIsnTiDrXyo+C65libxMgC8eRQlvL2+gz3utPVz0kIaqOPioEOMzkrg7LL+ORF1617OYWUxzB7YUtZTyPbBKytqgX7N+Wor3YgFbV0=
+	t=1780471703; cv=none; b=Ra8C/6QGsOHV1EiKc4Nuc1ft/3vqpMLfo+P7cCBiB9xnEAtKmGuEa0TcSSrzhhQgmBkr/YN8VAesBu7CX3CgZg00pjC4Xx80voY3tr+vkru9gLvUOW+f7TuRejKli6NPgGGkunHLLP9FGJNroS4N1ulOY6+HHKig4heDs9t70xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471657; c=relaxed/simple;
-	bh=iSImYBRI7UBlesDbd2QGdqtdS5zqWMc/RbpuZaikRF4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=f4WutX+YCfObO+qmyJve8uUEgtWX9xM0r/3wayd3diPO9ssuNRUzhszJ9fK+XrZSjNseG6agAwlGk+8t6P3tLIUSUKxWAbzD+K6uRF62ef+JVHcnQM1eXGh7VZCrtFUADjJFCDYdTjfKafjgEd2aEVwUO5BzO4FXVkeAyedC3x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-69de23f28d5so9272273eaf.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 00:27:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780471651; x=1781076451;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZtrFMzo+uNmFnPibicXyTEkj5A/kWJ433kEg8stsr6k=;
-        b=frESwfRAoed7A7qVJDezh4QaKUAkzdaDbo/yZEoOAR9GU9QLVtO/MaMrSZazIUBw99
-         4pqJ8YcVtev09q53PnC31LD48tVJZlqAJnNJqwCVUmuMoCCQIqAgxPCBGmXB4s5JzDZb
-         AuSQtisz4sgxzcCOrIpTW9d21/tyGcpS0EmZLi9jRqh4t+A+l8lvjWV4+60K/eyMxr5O
-         5oPPdQM4tU4F+xmZcLPnesI4eXrYI3OPhEepWpxLuKBxX25EJRFaAKcy/xeDa//iAHhB
-         6DnBoQu5HRa56O/+dyE6Su0C1t7Ljbhc2ONRjNdF5tGtvUbOgA0mbT5dnirrWTcPCOQh
-         AJQg==
-X-Forwarded-Encrypted: i=1; AFNElJ9LfneWWdq5bHtY2nG+sWBbwp10BCoFL4vpIuM9pthv5PrOxx1DM1wV6RSxFz1NLurqELDy864=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZYhJStkAaBKUhaJcJ+VfGRyQ0kENnbeFUoMxhWkCBBuzSl2uB
-	XvutYk9VmJtPhBnx284WM3J+WvWr7GPFNYaOzKB81zLxgFEdo9UgLcCaG7IOzck+AAR8Bvh11LN
-	I1Kc4gdoXx0KDMpjmXFKsxRg2XLyl6pggMA8j2I2n2S8WW+OI7kd5r3hc+FE=
+	s=arc-20240116; t=1780471703; c=relaxed/simple;
+	bh=xA7UfIjsdzjpfP0ypjSbyTGSceSJkM4ZFBm5jJ7NLcs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bRcSnjumNz4UKIxs/ehUgL4UG5iLuoWdHKshAPNsBsJyebLvncI3oWUBqjYzm1EPop0vQpRpDQLbOuPrOOKsgjFVtSS4Ia2+ERlQLT+0YlIXvBGoMu8xYnyOX8OLQP/ICR77lfPTMzenoWWp6b/ufFe1Hh5P99NG1s0FC+U10DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+X-UUID: c689eb545f1d11f1aa26b74ffac11d73-20260603
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:8a7ad3f5-a62e-46e2-a6ac-ab11e6ea4dfe,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:20
+X-CID-META: VersionHash:e7bac3a,CLOUDID:36e271051fba172e530ea51f5dec6a70,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
+	DM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:
+	0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: c689eb545f1d11f1aa26b74ffac11d73-20260603
+X-User: yanlonglong@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <yanlonglong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 2125374877; Wed, 03 Jun 2026 15:28:11 +0800
+From: longlong yan <yanlonglong@kylinos.cn>
+To: antonio@openvpn.net
+Cc: sd@queasysnail.net,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	horms@kernel.org,
+	longlong yan <yanlonglong@kylinos.cn>
+Subject: [PATCH] selftests/net: ovpn: fix getaddrinfo memory leak in ovpn_parse_remote()
+Date: Wed,  3 Jun 2026 15:27:41 +0800
+Message-ID: <20260603072741.1097-1-yanlonglong@kylinos.cn>
+X-Mailer: git-send-email 2.47.1.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2c03:b0:69d:7bdb:ade2 with SMTP id
- 006d021491bc7-69e47f76495mr867512eaf.32.1780471651515; Wed, 03 Jun 2026
- 00:27:31 -0700 (PDT)
-Date: Wed, 03 Jun 2026 00:27:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1fd763.278b5b03.2bcf39.0049.GAE@google.com>
-Subject: [syzbot] [wpan?] KMSAN: uninit-value in lowpan_xmit
-From: syzbot <syzbot+f13c19f75e1097abd116@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=91978e795dcd971b];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294639-lists,netdev=lfdr.de,f13c19f75e1097abd116];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-wpan@vger.kernel.org,m:miquel.raynal@bootlin.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:stefan@datenfreihafen.org,m:syzkaller-bugs@googlegroups.com,m:alexaring@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,bootlin.com,redhat.com,datenfreihafen.org,googlegroups.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[kylinos.cn];
+	FORGED_RECIPIENTS(0.00)[m:antonio@openvpn.net,m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:horms@kernel.org,m:yanlonglong@kylinos.cn,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-294640-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[yanlonglong@kylinos.cn,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yanlonglong@kylinos.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,kylinos.cn:mid,kylinos.cn:from_mime,kylinos.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 319AA6354BF
+X-Rspamd-Queue-Id: C1AAF635575
 
-Hello,
+The ovpn_parse_remote() function has two memory management issues:
 
-syzbot found the following issue on:
+1. When both 'host' and 'vpnip' are non-NULL, the first getaddrinfo()
+   allocation is leaked because 'result' is overwritten by the second
+   getaddrinfo() call without freeing the first allocation.
 
-HEAD commit:    e8c2f9fdadee Merge tag 'for-7.1/hpfs-fixes' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10883b06580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=91978e795dcd971b
-dashboard link: https://syzkaller.appspot.com/bug?extid=f13c19f75e1097abd116
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+2. When both 'host' and 'vpnip' are NULL, 'result' is an uninitialized
+   stack variable passed to freeaddrinfo(), which is undefined behavior.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Fix by initializing 'result' to NULL and calling freeaddrinfo() after
+the first getaddrinfo() result is consumed.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6d28568f6ffa/disk-e8c2f9fd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/68a9eec5e7f1/vmlinux-e8c2f9fd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e6a7381a5e55/bzImage-e8c2f9fd.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f13c19f75e1097abd116@syzkaller.appspotmail.com
-
- dev_queue_xmit include/linux/netdevice.h:3418 [inline]
- tx+0xb6/0x440 drivers/block/aoe/aoenet.c:62
- kthread+0x17d/0x370 drivers/block/aoe/aoecmd.c:1241
- kthread+0x53a/0x5f0 kernel/kthread.c:436
- ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
----[ end trace 0000000000000000 ]---
-=====================================================
-BUG: KMSAN: uninit-value in lowpan_header net/ieee802154/6lowpan/tx.c:240 [inline]
-BUG: KMSAN: uninit-value in lowpan_xmit+0xa6b/0x1d00 net/ieee802154/6lowpan/tx.c:282
- lowpan_header net/ieee802154/6lowpan/tx.c:240 [inline]
- lowpan_xmit+0xa6b/0x1d00 net/ieee802154/6lowpan/tx.c:282
- __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
- netdev_start_xmit include/linux/netdevice.h:5377 [inline]
- xmit_one net/core/dev.c:3888 [inline]
- dev_hard_start_xmit+0x22f/0xa80 net/core/dev.c:3904
- __dev_queue_xmit+0x2990/0x5a00 net/core/dev.c:4870
- dev_queue_xmit include/linux/netdevice.h:3418 [inline]
- tx+0xb6/0x440 drivers/block/aoe/aoenet.c:62
- kthread+0x17d/0x370 drivers/block/aoe/aoecmd.c:1241
- kthread+0x53a/0x5f0 kernel/kthread.c:436
- ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Uninit was stored to memory at:
- lowpan_header net/ieee802154/6lowpan/tx.c:231 [inline]
- lowpan_xmit+0x68f/0x1d00 net/ieee802154/6lowpan/tx.c:282
- __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
- netdev_start_xmit include/linux/netdevice.h:5377 [inline]
- xmit_one net/core/dev.c:3888 [inline]
- dev_hard_start_xmit+0x22f/0xa80 net/core/dev.c:3904
- __dev_queue_xmit+0x2990/0x5a00 net/core/dev.c:4870
- dev_queue_xmit include/linux/netdevice.h:3418 [inline]
- tx+0xb6/0x440 drivers/block/aoe/aoenet.c:62
- kthread+0x17d/0x370 drivers/block/aoe/aoecmd.c:1241
- kthread+0x53a/0x5f0 kernel/kthread.c:436
- ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4577 [inline]
- slab_alloc_node mm/slub.c:4899 [inline]
- kmem_cache_alloc_node_noprof+0x3cd/0x12c0 mm/slub.c:4951
- kmalloc_reserve net/core/skbuff.c:613 [inline]
- __alloc_skb+0x855/0x1190 net/core/skbuff.c:713
- alloc_skb include/linux/skbuff.h:1383 [inline]
- new_skb+0x4a/0x550 drivers/block/aoe/aoecmd.c:66
- aoecmd_cfg_pkts drivers/block/aoe/aoecmd.c:430 [inline]
- aoecmd_cfg+0x2c2/0xb70 drivers/block/aoe/aoecmd.c:1374
- discover_timer+0x64/0x80 drivers/block/aoe/aoemain.c:25
- call_timer_fn+0x4c/0x510 kernel/time/timer.c:1748
- expire_timers kernel/time/timer.c:1799 [inline]
- __run_timers kernel/time/timer.c:2374 [inline]
- __run_timer_base+0x80a/0xdb0 kernel/time/timer.c:2386
- run_timer_base kernel/time/timer.c:2395 [inline]
- run_timer_softirq+0x3a/0x70 kernel/time/timer.c:2405
- handle_softirqs+0x171/0x7b0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x9a/0x1e0 kernel/softirq.c:735
- irq_exit_rcu+0x12/0x20 kernel/softirq.c:752
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
- sysvec_apic_timer_interrupt+0x84/0x90 arch/x86/kernel/apic/apic.c:1061
- asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:697
-
-CPU: 0 UID: 0 PID: 1310 Comm: aoe_tx0 Tainted: G        W           syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-=====================================================
-
-
+Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
+Signed-off-by: longlong yan <yanlonglong@kylinos.cn>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ tools/testing/selftests/net/ovpn/ovpn-cli.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+index d40953375c86..f4effa7580c0 100644
+--- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
++++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+@@ -1785,7 +1785,7 @@ static int ovpn_parse_remote(struct ovpn_ctx *ovpn, const char *host,
+ 			     const char *service, const char *vpnip)
+ {
+ 	int ret;
+-	struct addrinfo *result;
++	struct addrinfo *result = NULL;
+ 	struct addrinfo hints = {
+ 		.ai_family = ovpn->sa_family,
+ 		.ai_socktype = SOCK_DGRAM,
+@@ -1809,6 +1809,8 @@ static int ovpn_parse_remote(struct ovpn_ctx *ovpn, const char *host,
+ 		}
+ 
+ 		memcpy(&ovpn->remote, result->ai_addr, result->ai_addrlen);
++		freeaddrinfo(result);
++		result = NULL;
+ 	}
+ 
+ 	if (vpnip) {
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
