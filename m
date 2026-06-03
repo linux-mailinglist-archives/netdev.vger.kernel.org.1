@@ -1,195 +1,246 @@
-Return-Path: <netdev+bounces-294694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OhUNOrLzH2qLtAAAu9opvQ
-	(envelope-from <netdev+bounces-294694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:28:18 +0200
+	id kWOvDZL2H2pItQAAu9opvQ
+	(envelope-from <netdev+bounces-294695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:40:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C61163626E
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:28:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C290C6363C7
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:40:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TKILIWfd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294694-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294694-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=WFSM4T+g;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294695-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294695-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF044301BA56
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 09:27:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3C44D3016010
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 09:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C2F392C39;
-	Wed,  3 Jun 2026 09:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497F2371D13;
+	Wed,  3 Jun 2026 09:40:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D67D395DB9;
-	Wed,  3 Jun 2026 09:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B05432F748;
+	Wed,  3 Jun 2026 09:40:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780478849; cv=none; b=dbjORhxRaWg08Jsne8ZVfLLVQ56MPnvVd525oTsPP52t8Bh/jsbmvFQNYOfOT/8Va1+y5DweWuYS/WCz9PGuXogeAYH9XWUotikEtqU42tslzXiH9ZCkx58GWMDoXlBThczf2jxGZKsH3XsmlbzcNsYL2Fc2rzUU6r4d3a9oz+s=
+	t=1780479632; cv=none; b=Hem3EzDYE3u3fyQAYoaqyxh2VwiQUnKNAefNqLr/V68ko5RTxHWgipQYvGYzKgOtgbTA2cUfNxdLAwHFok0bvdBjig8/X29xBocnQXK5o9NP1uOOb8XGhj9UNJ/yElXuFLT0uOZ4p5DvIfpMXhgmJjxtbGEyEPCmBSQELMoIn1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780478849; c=relaxed/simple;
-	bh=odWU+nMmgrZPsGI6Xf9THDXw3O7NLl9Nsnlu+uV4Uo8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Whm9k/ES4NvSbAkaqN0xPP6mUTwKqwVZb7cUiXllGLeH+IhPiClbVSGfwjpiBu96W+jfBigJ8dj3hnvL2Mrc/QAxKalYBuF6oedRpMYUIP1e4knyvd9CxJB5NjjQOuC0odRk+ibmpmve2m+L1Dc8ppPIQyPW/1obhl8tHJw7UtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKILIWfd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 718561F00898;
-	Wed,  3 Jun 2026 09:27:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780478847;
-	bh=D2Vmo6upMxKY5OWoPHtpqjiCYXj8F/9MoHUlPOVDBmw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=TKILIWfd3KWnP8EFTrzOWIFHzUt1wYdP6k7N24Xi7uchwZMrvB5IB5Sy8tSV+8iN6
-	 ABLqVv8R4iKCtYYlY7onZjCm1LVhN2oRjA8oFGOUA6YIR+j6lMX6Ajwzx4YrdZvt0a
-	 WxlvY/ztjkWns1xEXkxu01vkAsI6dLLCpUpRBIWFXFmDUMqPgRCwAVhaMMbAUQAiZO
-	 uCpJWBnml8k1p0vmY/EygAPnTnNssrQZj/UDDFgq7MBL71faLUifaOKrnu6XqGqxye
-	 jgGN7uCn4nO29K2ZY2W78aZQ0/DDsqbyFV+Nb9A8H90o8EHSlg0tH574n2SyV3ax5P
-	 sln/A4MS74phg==
-Message-ID: <f0df3ca1-793d-4985-995c-50227fd5123d@kernel.org>
-Date: Wed, 3 Jun 2026 19:27:17 +1000
+	s=arc-20240116; t=1780479632; c=relaxed/simple;
+	bh=yQU5uxKCuvTWj9NYbGX9RJsxegG7Qa2aqWfLUsaX0PY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QKG8ryZnq9KG2/w6d1chITgkSnmiDZND/zWggVJmPgjfk8UyTTDsl4+o2d0SQx1xRSM+5CvgFeTdsD9Icaa6xZSdCY1TKUDKIN0wXOSLnsnqY+qAge0xvdi693LZJF1w/wzFlNzWXjbJcMKKw6neVgl+X5xptuOxNWggACN4jDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=WFSM4T+g; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 7B1D760181;
+	Wed,  3 Jun 2026 11:40:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1780479627;
+	bh=IL1jl4vJrDFDGOhV9fUmeyIYcPAKb510iG1fLGUGpUo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WFSM4T+gquf0QdAQNjlrXj93e45nR4irbXwFgpJVMrXs7y1nvWma/FXTqx+TUAdLT
+	 01unEORz2XGjRsvsB8AcZj831NB+iLaIWCEIDfxJE/r5vta0I5YUtuevR7yKTChq2e
+	 GWKHr0DyloybsDT3Es9zu8JzpNkqSR6UU3WwPBtmxNjmYYvGtTpLnvMElGr7YaUBRT
+	 JIurpVUDN2xxOXYtOYyz9AyV1Q9EEcqFJkfGbEYD84s7d4vcey1RrANf64xzeCn1fj
+	 7hfhraimGpe8pPytWzNj4YdbPCWwdg6t6+iEmQBSnwoO9F9Hgk16DNrfkucykcgPG5
+	 9YVbU9unOMuig==
+Date: Wed, 3 Jun 2026 11:40:25 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: fw@strlen.de, phil@nwl.cc, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xmei5@asu.edu
+Subject: Re: [PATCH nf] netfilter: nf_conntrack: destroy stale expectfn
+ expectations on unregister
+Message-ID: <ah_2idoVuJMG38PN@chamomile>
+References: <20260603073815.2159603-3-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2] Revert "ipv6: preserve insertion order for
- same-scope addresses"
-Content-Language: fr
-To: =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
- Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org,
- yuhuang@redhat.com, justin.iurman@gmail.com, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
- Chris Adams <linux@cmadams.net>, David Gibson <david@gibson.dropbear.id.au>,
- Beniamino Galvani <bgalvani@redhat.com>,
- Thorsten Leemhuis <regressions@leemhuis.info>, Andrew Lunn <andrew@lunn.ch>,
- regressions@lists.linux.dev
-References: <20260529112357.5079-1-fmancera@suse.de>
- <20260529134045.56330243@elisabeth>
- <5079261a-79e5-421b-bf6a-a511acaaeca4@kernel.org>
- <20260601153525.546746a8@elisabeth>
- <CACT4oueDv=KRZmJw=1N58EN7eoFz5AqbBBMP8FE4=+rQ99oFEg@mail.gmail.com>
- <8e9cbf0a-caff-4575-afb7-fe852df8a51a@kernel.org>
- <CACT4oueJ3GsVvnWcZHgYVL-fCjpt5nOw+2=0BTmiz-9xKY4B0w@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CACT4oueJ3GsVvnWcZHgYVL-fCjpt5nOw+2=0BTmiz-9xKY4B0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260603073815.2159603-3-bestswngs@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294694-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ihuguet@redhat.com,m:sbrivio@redhat.com,m:fmancera@suse.de,m:netdev@vger.kernel.org,m:yuhuang@redhat.com,m:justin.iurman@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:linux@cmadams.net,m:david@gibson.dropbear.id.au,m:bgalvani@redhat.com,m:regressions@leemhuis.info,m:andrew@lunn.ch,m:regressions@lists.linux.dev,m:justiniurman@gmail.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[redhat.com,suse.de,vger.kernel.org,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,gibson.dropbear.id.au,leemhuis.info,lunn.ch,lists.linux.dev];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294695-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:email,netfilter.org:from_mime,netfilter.org:dkim,chamomile:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4C61163626E
+X-Rspamd-Queue-Id: C290C6363C7
 
-Hi Íñigo,
-
-On 03/06/2026 16:53, Íñigo Huguet wrote:
-> On Wed, Jun 3, 2026 at 7:46 AM Matthieu Baerts <matttbe@kernel.org> wrote:
->> I guess it is safer not to break UAPI and not reapplying the patch,
->> especially when there is no clear way to know which order is taken by
->> the kernel.
->>
->> What about clearly stating that the default order is "random", except
->> when an additional flag is set to sort them chronologically or the opposite?
+On Wed, Jun 03, 2026 at 12:38:17AM -0700, Weiming Shi wrote:
+> NAT helpers such as nf_nat_h323 store a raw pointer to module text in
+> exp->expectfn (e.g. ip_nat_q931_expect). nf_ct_helper_expectfn_unregister()
+> only unlinks the callback descriptor and never walks the expectation table,
+> so an expectation pending at module removal survives with a dangling
+> exp->expectfn into freed module text.
 > 
-> Stating that the order is "random" implies that someone will change
-> the default insertion order in the future, as the documentation says
-> that it's not UAPI. So they'll cause the UAPI breakage that we are
-> trying to avoid now. Moreover, if we consider the default order
-> "random" and state that userspace programs must not rely on it, why
-> can't we change it now?
+> When the expected connection arrives, init_conntrack() invokes
+> exp->expectfn(), now a stale pointer into the unloaded module. Reproduced
+> on a KASAN build by loading the H.323 helpers, creating a Q.931
+> expectation, unloading nf_nat_h323, then connecting to the expected port:
+> 
+>  Oops: int3: 0000 [#1] SMP KASAN NOPTI
+>  RIP: 0010:0xffffffffa06102d1
+>   init_conntrack.isra.0 (net/netfilter/nf_conntrack_core.c:1862)
+>   nf_conntrack_in (net/netfilter/nf_conntrack_core.c:2049)
+>   ipv4_conntrack_local (net/netfilter/nf_conntrack_proto.c:223)
+>   nf_hook_slow (net/netfilter/core.c:619)
+>   __ip_local_out (net/ipv4/ip_output.c:120)
+>   __tcp_transmit_skb (net/ipv4/tcp_output.c:1715)
+>   tcp_connect (net/ipv4/tcp_output.c:4374)
+>   tcp_v4_connect (net/ipv4/tcp_ipv4.c:345)
+>   __sys_connect (net/socket.c:2167)
+>  Modules linked in: nf_conntrack_h323 [last unloaded: nf_nat_h323]
+> 
+> Reaching the dangling state requires CAP_SYS_MODULE in the initial user
+> namespace to remove a NAT helper that still has live expectations, so this
+> is a robustness fix; leaving an expectation pointing at freed text is wrong
+> regardless.
+> 
+> Add nf_ct_helper_expectfn_destroy(), which walks the expectation table and
+> drops every expectation whose ->expectfn matches the descriptor being torn
+> down. Call it from each NAT helper's exit path after the existing RCU grace
+> period, so no expectation outlives the code it points at and no extra
+> synchronize_rcu() is introduced. With the fix, the same reproducer runs to
+> completion without the Oops.
 
-I was only suggesting "random", simply to force userspace programs to
-ask for a specific order when the order matters. But also to avoid
-having to describe the current order, which is different in v4 and v6
-for entries of the same scope.
+Missing unregistration, patch LGTM.
 
-I know the order is not random, and even if it is confusing, I don't
-think we can change it without breaking stuff.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+> Fixes: f587de0e2feb ("[NETFILTER]: nf_conntrack/nf_nat: add H.323 helper port")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> ---
+>  include/net/netfilter/nf_conntrack_helper.h |  1 +
+>  net/ipv4/netfilter/nf_nat_h323.c            |  2 ++
+>  net/netfilter/nf_conntrack_helper.c         | 19 +++++++++++++++++++
+>  net/netfilter/nf_nat_core.c                 |  2 ++
+>  net/netfilter/nf_nat_sip.c                  |  1 +
+>  5 files changed, 25 insertions(+)
+> 
+> diff --git a/include/net/netfilter/nf_conntrack_helper.h b/include/net/netfilter/nf_conntrack_helper.h
+> index de2f956abf34..24cf3d2d9745 100644
+> --- a/include/net/netfilter/nf_conntrack_helper.h
+> +++ b/include/net/netfilter/nf_conntrack_helper.h
+> @@ -155,6 +155,7 @@ void nf_ct_helper_log(struct sk_buff *skb, const struct nf_conn *ct,
+>  
+>  void nf_ct_helper_expectfn_register(struct nf_ct_helper_expectfn *n);
+>  void nf_ct_helper_expectfn_unregister(struct nf_ct_helper_expectfn *n);
+> +void nf_ct_helper_expectfn_destroy(const struct nf_ct_helper_expectfn *n);
+>  struct nf_ct_helper_expectfn *
+>  nf_ct_helper_expectfn_find_by_name(const char *name);
+>  struct nf_ct_helper_expectfn *
+> diff --git a/net/ipv4/netfilter/nf_nat_h323.c b/net/ipv4/netfilter/nf_nat_h323.c
+> index faee20af4856..10e1b0837731 100644
+> --- a/net/ipv4/netfilter/nf_nat_h323.c
+> +++ b/net/ipv4/netfilter/nf_nat_h323.c
+> @@ -555,6 +555,8 @@ static void __exit nf_nat_h323_fini(void)
+>  	nf_ct_helper_expectfn_unregister(&q931_nat);
+>  	nf_ct_helper_expectfn_unregister(&callforwarding_nat);
+>  	synchronize_rcu();
+> +	nf_ct_helper_expectfn_destroy(&q931_nat);
+> +	nf_ct_helper_expectfn_destroy(&callforwarding_nat);
+>  }
+>  
+>  /****************************************************************************/
+> diff --git a/net/netfilter/nf_conntrack_helper.c b/net/netfilter/nf_conntrack_helper.c
+> index 17e971bd4c74..2c5a71735561 100644
+> --- a/net/netfilter/nf_conntrack_helper.c
+> +++ b/net/netfilter/nf_conntrack_helper.c
+> @@ -283,6 +283,25 @@ void nf_ct_helper_expectfn_unregister(struct nf_ct_helper_expectfn *n)
+>  }
+>  EXPORT_SYMBOL_GPL(nf_ct_helper_expectfn_unregister);
+>  
+> +static bool expect_iter_expectfn(struct nf_conntrack_expect *exp, void *data)
+> +{
+> +	const struct nf_ct_helper_expectfn *n = data;
+> +
+> +	/* Relies on registered expectfn descriptors having unique ->expectfn
+> +	 * pointers, which holds for the in-tree NAT helpers.
+> +	 */
+> +	return exp->expectfn == n->expectfn;
+> +}
+> +
+> +/* Destroy expectations still pointing at @n->expectfn; call after the
+> + * caller's RCU grace period so none outlives the (often modular) callback.
+> + */
+> +void nf_ct_helper_expectfn_destroy(const struct nf_ct_helper_expectfn *n)
+> +{
+> +	nf_ct_expect_iterate_destroy(expect_iter_expectfn, (void *)n);
+> +}
+> +EXPORT_SYMBOL_GPL(nf_ct_helper_expectfn_destroy);
+> +
+>  /* Caller should hold the rcu lock */
+>  struct nf_ct_helper_expectfn *
+>  nf_ct_helper_expectfn_find_by_name(const char *name)
+> diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
+> index 74ec224ce0d6..2bbf5163c0e2 100644
+> --- a/net/netfilter/nf_nat_core.c
+> +++ b/net/netfilter/nf_nat_core.c
+> @@ -1341,6 +1341,7 @@ static int __init nf_nat_init(void)
+>  		RCU_INIT_POINTER(nf_nat_hook, NULL);
+>  		nf_ct_helper_expectfn_unregister(&follow_master_nat);
+>  		synchronize_net();
+> +		nf_ct_helper_expectfn_destroy(&follow_master_nat);
+>  		unregister_pernet_subsys(&nat_net_ops);
+>  		kvfree(nf_nat_bysource);
+>  	}
+> @@ -1358,6 +1359,7 @@ static void __exit nf_nat_cleanup(void)
+>  	RCU_INIT_POINTER(nf_nat_hook, NULL);
+>  
+>  	synchronize_net();
+> +	nf_ct_helper_expectfn_destroy(&follow_master_nat);
+>  	kvfree(nf_nat_bysource);
+>  	unregister_pernet_subsys(&nat_net_ops);
+>  }
+> diff --git a/net/netfilter/nf_nat_sip.c b/net/netfilter/nf_nat_sip.c
+> index 9fbfc6bff0c2..00838c0cc5bb 100644
+> --- a/net/netfilter/nf_nat_sip.c
+> +++ b/net/netfilter/nf_nat_sip.c
+> @@ -655,6 +655,7 @@ static void __exit nf_nat_sip_fini(void)
+>  	RCU_INIT_POINTER(nf_nat_sip_hooks, NULL);
+>  	nf_ct_helper_expectfn_unregister(&sip_nat);
+>  	synchronize_rcu();
+> +	nf_ct_helper_expectfn_destroy(&sip_nat);
+>  }
+>  
+>  static const struct nf_nat_sip_hooks sip_hooks = {
+> -- 
+> 2.43.0
+> 
 
