@@ -1,143 +1,174 @@
-Return-Path: <netdev+bounces-294612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fxMwFYnXH2p/qwAAu9opvQ
-	(envelope-from <netdev+bounces-294612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:28:09 +0200
+	id 4nXECCvcH2o2rQAAu9opvQ
+	(envelope-from <netdev+bounces-294613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:47:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B53E63534C
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:28:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B456355DB
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:47:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=QCym67S5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294612-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294612-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=ktaJSYfV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294613-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294613-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=simonwunderlich.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA87A3030E82
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:21:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BDC413080E0C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED1F3A0E99;
-	Wed,  3 Jun 2026 07:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4843F8EB7;
+	Wed,  3 Jun 2026 07:25:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32DC39B95D;
-	Wed,  3 Jun 2026 07:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4B53FBEDF
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:25:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471260; cv=none; b=cK/Yy0PQZ0B2zFUaLeiJJmlvGv2mF6qlM+lmrgrnP9spPnNiRGMkwSzk+TW7uGp2+CYabJ9E90D7dupWxfIQlJlz2mmlFF0hK/5bCGfvNV3IJc/NgfOiirG3HkbUShb1vob84gBJ3jjmMTywcpglgmRhVKHDriS2pGiprhaR0I0=
+	t=1780471539; cv=none; b=GXhUIhM5R/je7mxSsGbXQoq2L85AUuQNQwMgaiWv/PCIRfW3LJyfRvxdYrfVN2vIHi89Ow6jX547uCAzaSZ8vH4vQwFJCM7jvHGURlybSB1wSXfOT0vrCfjcSTIbLJIJmWw2FjvIwuTNlQIaGCE9p5TUAaE3buvNvWRlW/HU+OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471260; c=relaxed/simple;
-	bh=Y9vLGOj4ICVsi17I/8jLeBr4sz39f6x5VIQKq1H427s=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=lvQANtfPp9tVsxJ9Ktbm/EaqCP3tNr09J2xBWhdIbtefXHYqlT/4Qh+cT8jKO/29LE6yu2h8UeCUs1nycfWUOv5imT3Cv1UmzM6qtag27M1Wzv2n1poTVXBshaXGYrug0KaO040lgJSChSmkwg8dKIcQXrL3OJia6OrJL9pX78Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=QCym67S5; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D48CFA03C2;
-	Wed,  3 Jun 2026 09:20:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1780471256; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=d78Y0rgghtQryF8HguMHQnLEcRVBz4Hrp5YENnoJQhg=;
-	b=QCym67S58FjOuEiGfvlJ1bmXrz/iX6ycC5Pyux2crsXKFpfDSv8WW9hXZiicGmnjUM9CWi
-	W4zJORwBjTxD8ZoohvaXLdRsfw+sF6PwKsY1gElTIHJ0G/JdQVvL1N5O1Qj6hA6FQMSKph
-	aA41En1Rl77YjsxjG69Yn11z8Y+a5IFblULSqm3xdIEKdJWRhRHaD5QMlho8sKaP1mAD+M
-	TRIxU0bCjX5en/YqijlAvU1fQ6HU9qS3wqFwHep7RLryih6GQm5qFO/AKwJIR4Yd0ON84c
-	02BxjsJ1H4/3Lqx8b5hMDSjYLuGEXyWKCsl1ZI2A5kJa7Ipazv64DF19dgJDdw==
+	s=arc-20240116; t=1780471539; c=relaxed/simple;
+	bh=lOFrGIB0RXuE+tI/wl5OfkNPREXS18NGpdjBWvnxaFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kvPkUcDVtdONIeUPx8JQI7a7+jr6+N9SFZqxqn+KxEgVU3WMRBAmzwrmHQaTwgh6ODvKoDooVLgnfILYW9PcTIYYx0IB68ZZe34uxWVO4tQ0DPHgVfv+LyJWywt9Q8tp+m8S7s5KrqpcGYH+IfJ/dGfT3FW9FIAbkECEPUMKB+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=ktaJSYfV; arc=none smtp.client-ip=23.88.38.48
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
+	s=09092022; t=1780471528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1sxZPgU99qOXY+5M+wANcE85GhLL1lWamNFd4yIpqUI=;
+	b=ktaJSYfVJdGU6SVFMJBv7Y5EIB/tPeulo7JNNbgfceV4d1cKNABUOjYjHbWf2d3GjNaOWN
+	KT4tncoCpOyynvRsqY8wmOAt+TSHC7+OpZMvBnWTh8ZbIovrKHdJL5WuBbaTEvOQ5a/2tT
+	1NKjId+CFZa6qMIlGEH21Z6wNQnk6JRDeYb4VVwcF6VFxZ/XiSbEi6kQHR+pHHNj3n+E/Z
+	vbzdbQuwaEZN84mxQIw4CR0oeQIdGKCYHqn3AcBe5xaZzMj3y6oF7K9h730xMkH0tmMbxF
+	trkF3vpti48pV3X93lj39kJfqaGk+lZD4gcPDcpRPUovo1HRDlI1EBKkC43avA==
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH net-next 00/15] pull request for net-next: batman-adv 2026-06-03
+Date: Wed,  3 Jun 2026 09:25:11 +0200
+Message-ID: <20260603072527.174487-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 03 Jun 2026 09:20:53 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jakub@cloudflare.com, maxime.chevallier@bootlin.com, lee@kernel.org,
- linux-leds@vger.kernel.org, pavel@kernel.org, jv@jvosburgh.net,
- michael.chan@broadcom.com, jhs@mojatatu.com, vinicius.gomes@intel.com,
- idosch@nvidia.com, razor@blackwall.org, hare@suse.de, jhasan@marvell.com,
- danieller@nvidia.com
-Subject: Re: [PATCH net-next v2 05/11] net: bonding: don't recurse on the
- slave's netdev ops lock
-In-Reply-To: <20260603012840.2254293-6-kuba@kernel.org>
-References: <20260603012840.2254293-1-kuba@kernel.org>
- <20260603012840.2254293-6-kuba@kernel.org>
-Message-ID: <ab1671e499127b38a7ee3cdfe5038143@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
+	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-294612-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-294613-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:from_mime,tipi-net.de:email]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[open-mesh.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,simonwunderlich.de:mid,simonwunderlich.de:from_mime,simonwunderlich.de:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3B53E63534C
+X-Rspamd-Queue-Id: 23B456355DB
 
-Hi Jakub
+Dear net maintainers,
 
-On 3.6.2026 03:28, Jakub Kicinski wrote:
-> bond_update_speed_duplex() calls __ethtool_get_link_ksettings() on
-> the slave, which will soon take the slave's ops lock. One of its
-> callers already holds it and the other three don't, so the function
-> would either deadlock or run unprotected depending on the path.
-> 
-> Make the helper expect the slave's ops lock held and switch to
-> netif_get_link_ksettings(). Wrap the three call sites that don't
-> already hold it:
-> 
->   * bond_enslave() (rtnl held; core drops the lower's ops lock
->     around ->ndo_add_slave).
->   * bond_miimon_commit() (rtnl_trylock'd from the mii workqueue).
->   * bond_ethtool_get_link_ksettings() (rtnl held via ethtool layer,
->     bond device itself is not ops locked).
-> 
-> The call site which does already hold the ops lock is
-> bond_slave_netdev_event() via NETDEV_UP / NETDEV_CHANGE notifiers,
-> so it stays as-is.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+here is another cleanup pull request of batman-adv to go into net-next.
 
-> [...]
+Note that this pull request includes multiple fixes which we consider
+non-critical and/or minor, and therefore want to send them via net-next
+instead of net as per Linus' direction [1].
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Please pull or let me know of any problem!
 
-Thanks
-Nicolai
+Thank you,
+      Simon
+
+[1] https://lore.kernel.org/lkml/CAHk-=wjt1NiKOdyAMz_DT7NmZ++SizPOhRSi492ukdTnpDzHQw@mail.gmail.com/T/#u
+
+The following changes since commit 3bd64ca11d9a1672d67d3130a7264c2cf7f93cdf:
+
+  batman-adv: use neigh_node's orig_node only as id (2026-06-01 14:22:03 +0200)
+
+are available in the Git repository at:
+
+  https://git.open-mesh.org/batadv.git tags/batadv-next-pullrequest-20260603
+
+for you to fetch changes up to 626fd14371614b7a8177f79b357fd323a7b91032:
+
+  batman-adv: tt: directly retrieve wifi flags of net_device (2026-06-03 08:27:17 +0200)
+
+----------------------------------------------------------------
+This cleanup patchset includes the following patches, all by
+Sven Eckelmann:
+
+- tp_meter: fix various minor issues (8 patches)
+
+- tp_meter: split generic session type in sender and receiver type
+
+- tp_meter: consolidate locking for congestion control (2 patches)
+
+- bla: annotate lasttime access with READ/WRITE_ONCE
+
+- elp: prevent transmission interval underflow
+
+- tt: sync local and global tvlv preparation return values
+
+- tt: directly retrieve wifi flags of net_device
+
+----------------------------------------------------------------
+Sven Eckelmann (15):
+      batman-adv: tp_meter: keep unacked list in ascending ordered
+      batman-adv: tp_meter: initialize dup_acks explicitly
+      batman-adv: tp_meter: initialize dec_cwnd explicitly
+      batman-adv: tp_meter: avoid window underflow
+      batman-adv: tp_meter: avoid divide-by-zero for dec_cwnd
+      batman-adv: tp_meter: fix fast recovery precondition
+      batman-adv: tp_meter: handle seqno wrap-around for fast recovery detection
+      batman-adv: tp_meter: add only finished tp_vars to lists
+      batman-adv: tp_meter: split vars into sender and receiver types
+      batman-adv: tp_meter: use locking for all congestion control variables
+      batman-adv: tp_meter: consolidate congestion control variables
+      batman-adv: bla: annotate lasttime access with READ/WRITE_ONCE
+      batman-adv: prevent ELP transmission interval underflow
+      batman-adv: tt: sync local and global tvlv preparation return values
+      batman-adv: tt: directly retrieve wifi flags of net_device
+
+ net/batman-adv/bridge_loop_avoidance.c |  28 +-
+ net/batman-adv/hard-interface.c        |  25 +-
+ net/batman-adv/hard-interface.h        |   1 +
+ net/batman-adv/main.c                  |   3 +-
+ net/batman-adv/netlink.c               |   8 +-
+ net/batman-adv/tp_meter.c              | 739 +++++++++++++++++++--------------
+ net/batman-adv/translation-table.c     |  32 +-
+ net/batman-adv/types.h                 | 141 ++++---
+ 8 files changed, 572 insertions(+), 405 deletions(-)
 
