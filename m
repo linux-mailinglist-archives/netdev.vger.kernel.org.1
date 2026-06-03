@@ -1,194 +1,161 @@
-Return-Path: <netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id j/zVArvWH2ouqwAAu9opvQ
-	(envelope-from <netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:24:43 +0200
+	id Ip5JBXXXH2p3qwAAu9opvQ
+	(envelope-from <netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:27:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A266352C1
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:24:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABF0635333
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:27:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=leemhuis.info header.s=key2 header.b=PZo8u9ES;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A7B3030698AE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:18:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 50FF9311F4B8
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D5E39BFED;
-	Wed,  3 Jun 2026 07:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219E839C00F;
+	Wed,  3 Jun 2026 07:18:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [194.59.206.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2002D73B8;
-	Wed,  3 Jun 2026 07:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D0839A4D6
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:18:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471081; cv=none; b=lA1tXNzPcIPl5uwHTfN817jDxgfAoZq4XfCV3I+iF352UgJCXC7N2UV34xaPVf8j9dZibuQmx4iWRCIEZbVDfe47PyX+wQnmg9FTuLJqy/Pnj7TWajWP24tVl92U8emnpz619Poxn0eOJs9wFLQ0ZUimj14V8T8XhEx0gn3+iLU=
+	t=1780471104; cv=none; b=IiykWsvRLChcHgmAJO4y2mlO6iKgMo0YvNVCeIeq6bWP4DHKDg9ypgRylKZV/n3PJkWuj/DodpifKOPEtNwzH9dl1QPTiqYpNdz3wEySpFJi9i4HSPMILTYKbn0iW3dDy7HkPyI9wfCilUSxVMQMgSFgOIRlWecBWA3SsC13tOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471081; c=relaxed/simple;
-	bh=eGMA2kfukIoeyI725SFDEiyovjQe2K1z/IFmf/wWKd8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vfs2/XI88Xjy0IFQpGwL1Cihyat6ZIqx1DxpIdlwJRIqllNz7JQH9EI3+UWV49CfXckZR0sPCJ1u/XUV9iBY4v2Zp7G3I/5fIRsBGbUczKiugZnI0QJCNoM/mkobsoaD0S5O0+4SQRlk0zl4vfqNiJMmc+ewWknZB9BqyGlZzy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Received: from localhost.localdomain (unknown [36.112.3.223])
-	by APP-01 (Coremail) with SMTP id qwCowAC3XNUK1R9q8eqAAA--.1949S2;
-	Wed, 03 Jun 2026 15:17:30 +0800 (CST)
-From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-To: skalluru@marvell.com,
-	manishc@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ariele@broadcom.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] bnx2x: clean up VF PCI resources on probe failure
-Date: Wed,  3 Jun 2026 15:17:29 +0800
-Message-Id: <20260603071729.799370-1-lihaoxiang@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1780471104; c=relaxed/simple;
+	bh=6AZli0waDkqPPv4RYfw4UTCBZr6umj22h0dhXR1Jr4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M4P4LYaFwPgMKFmUBCD9FCeCy7OuNfPYklExcWFewMEDGWBYXormECXzBdAZDK4kPT7S06qz0IrqvQnEKK8fI3BiZNrZ1DRUqI6OdGs1rpiFhAuRld1RdIvr//6H5kzmoNccwUkw7TxF7NvVP6EyWvhSkblmMyHZYMVNPuTaUkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=PZo8u9ES; arc=none smtp.client-ip=194.59.206.189
+Received: from relay02-mors.netcup.net (localhost [127.0.0.1])
+	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4gVfDK1zM1z44TC;
+	Wed,  3 Jun 2026 09:17:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1780471073;
+	bh=6AZli0waDkqPPv4RYfw4UTCBZr6umj22h0dhXR1Jr4Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PZo8u9ES/eDEnOLUv4zPK5PT0RYgcx0DzP3CNid17so5QbcNr4mNP3zXV7GzevQph
+	 jVeen7yRdabS2ngfW2VxsarG4/o4Uqu+NFfdRrUz685pLJLrlDhsZHajvG1pT9ONwL
+	 F14AMkiodK4oLDhlXLdPdowPukLu3HYDYzTvFUEvTfMyrERizr8mBWVR5igbwVKzMi
+	 tiQeFAqy82C7jKLXGFEiMG8aR2mvOAVJNuCm4xCPSpBeC3CzG+FHBjCqtYU5qG01yG
+	 fWCEwji0RQk7SGUGK+46P7BXUzjROEIkYn+O3G+FTw4sqpFvLQyNtSwiaFhJCSC40g
+	 1+Zwi6fLifhbg==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4gVfDK1FmZz7x8R;
+	Wed,  3 Jun 2026 09:17:53 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gVfDF24yqz8sb8;
+	Wed,  3 Jun 2026 09:17:49 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id E18645F96B;
+	Wed,  3 Jun 2026 09:17:47 +0200 (CEST)
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <eba11df5-3ae6-4bc4-bbe7-be358a0d4717@leemhuis.info>
+Date: Wed, 3 Jun 2026 09:17:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] Revert "ipv6: preserve insertion order for
+ same-scope addresses"
+To: =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>
+Cc: Stefano Brivio <sbrivio@redhat.com>,
+ Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org,
+ yuhuang@redhat.com, justin.iurman@gmail.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
+ Chris Adams <linux@cmadams.net>, David Gibson <david@gibson.dropbear.id.au>,
+ Beniamino Galvani <bgalvani@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+ regressions@lists.linux.dev
+References: <20260529112357.5079-1-fmancera@suse.de>
+ <20260529134045.56330243@elisabeth>
+ <5079261a-79e5-421b-bf6a-a511acaaeca4@kernel.org>
+ <20260601153525.546746a8@elisabeth>
+ <CACT4oueDv=KRZmJw=1N58EN7eoFz5AqbBBMP8FE4=+rQ99oFEg@mail.gmail.com>
+ <8e9cbf0a-caff-4575-afb7-fe852df8a51a@kernel.org>
+ <CACT4oueJ3GsVvnWcZHgYVL-fCjpt5nOw+2=0BTmiz-9xKY4B0w@mail.gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: 
+ <CACT4oueJ3GsVvnWcZHgYVL-fCjpt5nOw+2=0BTmiz-9xKY4B0w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAC3XNUK1R9q8eqAAA--.1949S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF13Wry7KF4xAw48tF4xWFg_yoW5Gw1fpa
-	9rXFy5Xr18GrsxAa1UXFWUAFnxA398t34UKayUJ3yavryYyF98JF47Ka47ZrW8GrZ5CF4S
-	qw4jvwn8W3WYvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiCRAHE2ofveVYpAAAsc
+X-PPP-Message-ID: 
+ <178047106860.2884229.11167975002197488257@mxe9fb.netcup.net>
+X-NC-CID: oXfrpjjwOSKR5sEbKrJBTtL/u+qg0NyG0cVHx0QSERX9DU+6VGE=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294609-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:skalluru@marvell.com,m:manishc@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ariele@broadcom.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lihaoxiang@isrc.iscas.ac.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294610-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ihuguet@redhat.com,m:matttbe@kernel.org,m:sbrivio@redhat.com,m:fmancera@suse.de,m:netdev@vger.kernel.org,m:yuhuang@redhat.com,m:justin.iurman@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:linux@cmadams.net,m:david@gibson.dropbear.id.au,m:bgalvani@redhat.com,m:andrew@lunn.ch,m:regressions@lists.linux.dev,m:justiniurman@gmail.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FORGED_SENDER(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DMARC_NA(0.00)[leemhuis.info];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[redhat.com,suse.de,vger.kernel.org,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,gibson.dropbear.id.au,lunn.ch,lists.linux.dev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[leemhuis.info:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iscas.ac.cn:email]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E0A266352C1
+X-Rspamd-Queue-Id: BABF0635333
 
-bnx2x_init_one() allocates VF PCI resources by calling
-bnx2x_vf_pci_alloc(), but later error paths fall through
-the common cleanup path without calling bnx2x_vf_pci_dealloc().
+On 6/3/26 08:53, Íñigo Huguet wrote:
+> Stating that the order is "random" implies that someone will change
+> the default insertion order in the future, as the documentation says
+> that it's not UAPI. So they'll cause the UAPI breakage that we are
+> trying to avoid now. Moreover, if we consider the default order
+> "random" and state that userspace programs must not rely on it, why
+> can't we change it now?
 
-This can leak the VF PCI resources allocated for the VF
-when probe fails after bnx2x_vf_pci_alloc() succeeds.
+Because the UAPI is only indirectly important, as it's "something that
+used to work doesn't anymore" is what matters; you in fact can break the
+UAPI all you want, as long as everything continues to work. Or to quote
+Linus from:
 
-Add a VF-specific error label to call bnx2x_vf_pci_dealloc()
-before falling through to the existing common cleanup path.
+https://www.kernel.org/doc/html/latest/process/handling-regressions.html#on-what-qualifies-as-userspace-interface-abi-api-documented-interfaces-etc
 
-Fixes: 6411280ac94d ("bnx2x: Segregate SR-IOV code")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
----
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+"I just wanted to point out that the argument about whether it's an ABI
+change or not is irrelevant. If it turns out that some program - not a
+test script, but something with relevance to conscious user expectations
+~ depended on the old broken behavior, then it needs to be done some
+other way.""
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index da0f8c353e6a..acb0379d94b9 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -13932,13 +13932,13 @@ static int bnx2x_init_one(struct pci_dev *pdev,
- 		dev_err(&bp->pdev->dev,
- 			"Cannot map doorbell space, aborting\n");
- 		rc = -ENOMEM;
--		goto init_one_freemem;
-+		goto init_one_vf_pci_dealloc;
- 	}
- 
- 	if (IS_VF(bp)) {
- 		rc = bnx2x_vfpf_acquire(bp, tx_count, rx_count);
- 		if (rc)
--			goto init_one_freemem;
-+			goto init_one_vf_pci_dealloc;
- 
- #ifdef CONFIG_BNX2X_SRIOV
- 		/* VF with OLD Hypervisor or old PF do not support filtering */
-@@ -13952,7 +13952,7 @@ static int bnx2x_init_one(struct pci_dev *pdev,
- 	/* Enable SRIOV if capability found in configuration space */
- 	rc = bnx2x_iov_init_one(bp, int_mode, BNX2X_MAX_NUM_OF_VFS);
- 	if (rc)
--		goto init_one_freemem;
-+		goto init_one_vf_pci_dealloc;
- 
- 	/* calc qm_cid_count */
- 	bp->qm_cid_count = bnx2x_set_qm_cid_count(bp);
-@@ -13971,7 +13971,7 @@ static int bnx2x_init_one(struct pci_dev *pdev,
- 	rc = bnx2x_set_int_mode(bp);
- 	if (rc) {
- 		dev_err(&pdev->dev, "Cannot set interrupts\n");
--		goto init_one_freemem;
-+		goto init_one_vf_pci_dealloc;
- 	}
- 	BNX2X_DEV_INFO("set interrupts successfully\n");
- 
-@@ -13979,7 +13979,7 @@ static int bnx2x_init_one(struct pci_dev *pdev,
- 	rc = register_netdev(dev);
- 	if (rc) {
- 		dev_err(&pdev->dev, "Cannot register net device\n");
--		goto init_one_freemem;
-+		goto init_one_vf_pci_dealloc;
- 	}
- 	BNX2X_DEV_INFO("device name after netdev register %s\n", dev->name);
- 
-@@ -14001,6 +14001,10 @@ static int bnx2x_init_one(struct pci_dev *pdev,
- 
- 	return 0;
- 
-+init_one_vf_pci_dealloc:
-+	if (IS_VF(bp))
-+		bnx2x_vf_pci_dealloc(bp);
-+
- init_one_freemem:
- 	bnx2x_free_mem_bp(bp);
- 
--- 
-2.25.1
+Yes, he talks about ABIs here, but it's the same for APIs.
 
+Ciao, Thorsten
 
