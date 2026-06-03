@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6gPXD1vBIGpW7gAAu9opvQ
-	(envelope-from <netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:05:47 +0200
+	id kV06GGzBIGpd7gAAu9opvQ
+	(envelope-from <netdev+bounces-294978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:06:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFA563BF93
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:05:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7EE363BFAF
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:06:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=OEvlEsa6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=anbKf9+6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294978-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294978-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 90AA730BF300
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 00:00:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3224E30C397A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 00:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD024DD6E0;
-	Thu,  4 Jun 2026 00:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E4324DD6D7;
+	Thu,  4 Jun 2026 00:00:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A303A168C
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9454DD6D0
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:59:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780531200; cv=none; b=mLp0y8q4PgWpips9OPlnWr2CfRKfnwvI4quFN2JiVZEmFMQyI8mI3QhUoJR3n2sPQkvLaXgJvc4lr6ULgIgDKzWfgDq1wqpNDUUkWL/c8KkRuUzhm+abgRf97laSFt1r6ukTmMX3eTqmEHRm5G4ksUwU/DqKNRiNv4/3ZtT9oXY=
+	t=1780531200; cv=none; b=WQeHYV5dm6uQkKERUwZsy5hN7oseQHSDIZJ/GgBlSWeQAmdVVxz1TpwV/QjtOcSur573/0DtaZh8zUT33GbDnzjvwyCNYpWnx6+8j6ztoSqG5V9RWfVDpHnoPvTlsVjwTonV8gUFAhOLx8axn0pk3WBnY9lpANomvtgH5uG2BI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780531200; c=relaxed/simple;
-	bh=n8jvIh8rSy5l4r1sikRBZ0KKujywm2brYKxHwyQnGmM=;
+	bh=iJbBRl9K/I68pFQ5Sv+M/lNSXaUqcmRfL+kD5ISEqsU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I+UFA6zDzOaOxHsZQJmJFHB8B6qv44M5MVcjcjL3F07DBgfpH7QZcfGNudtdGXK9UEFxGxcdx6BYRVPk9N1s+bh6+wbBfglRE4BDZe5f4qUlqkoSIihMuwK+ZpP2sG4ufwS5KuOYKWwSlNGuLdILDKme7Tub/Cisa6DslyFsbPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OEvlEsa6; arc=none smtp.client-ip=74.125.224.50
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-6603d54b317so25221d50.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:59:58 -0700 (PDT)
+	 MIME-Version; b=iJeVhBoS5H/5RciqA1tfEYY1DnVjgsi/Gh15BMW5Lft4f7B/JQ7ZBJseqNe8LDGWJ3VGHh8nLoTocKi7aYlJtNrPU/2Fry814cdvTqaNktQnIWmBVxItsL/ML5YvXdbYe5mfVGkXEJ5s62AbFMbtxIEWrL99iFsKJRvHLA5Aye8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=anbKf9+6; arc=none smtp.client-ip=74.125.224.51
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-66042b348a8so20673d50.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:59:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1780531198; x=1781135998; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K41qv9ZHZPYFOsHREWMOzv3cTvIXZflhgrFt4tffsU8=;
-        b=OEvlEsa61vOFIWQmSMlNvSGMqrKyfEKEHAKWXY+F2o2Nb94thWAmKu95wjZV3ka4qk
-         jF33qdFEYc38oCJmgl8deGEhG7k8CcsaQG3a5ABHAkmMp8O3eUpA0knNPB5/3kBdWXgL
-         9mOOKD4Kbs96Op4pM/1wqXE3TI8LlacwxePXHipeVjb4KPR+Y6ttw1Csqxfi1hWdwdkD
-         I07fXzMF7oeBNq3xPTlVR0vckvbcxJYm287wr4lWSp2In1hUtAJSFZA2Ox08o23Lqiyl
-         u5gnIo2gsVTMA2/rwn5ppyzB5t+qVM4jNGiQBeGUBOFN5ugwi8AjilW7rwV3Kvi6GacP
-         EesQ==
+        bh=o/6ZuBOG43wI0XV1LNowOZ5Qyn8haY2GSHMaGgLDZj4=;
+        b=anbKf9+6YM/QceD/M31lfhE3ybV22rpZVwTsR0ILy7foY4agnrS/Vg+yySG6odzdGv
+         LDtm1Il6vebhMW9bALcNhb6ZMkOhxY4Awy7jqKK4dhdHVqISZiANaVhg25BY3Hl3mlBs
+         iFw6k9s8NcxbTHprrwChVLca02PMBaVy2de8jHPP9J3qHuS1gtmwO0maFJSjehvnj5ui
+         XfgsI8a6d5Jp8T4RDT1+nFNZ5YNJPYr4ZEoLIQ8j2jzznIs/Fjj3oQQ0EsKeh1QeH/qO
+         rQkHHdw2w/Kbg+VERKuF97MStl8a1WZMFoIOErv0GCPKz8IGEnVhhULdYfJIs8AHCG8v
+         rtNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1780531198; x=1781135998;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=K41qv9ZHZPYFOsHREWMOzv3cTvIXZflhgrFt4tffsU8=;
-        b=T290UK87l6LNxt/hfmKObJnkly3t1kd8BjsqbIfnjZ+PnPadXmdgq97DkfTUV+sEEq
-         fL9swhYt0hYb/QurrutEyBSEjKpg6G0pkhQyGAbJ4IGT+/8kyCVlx6OXaDflmc64pPQa
-         qnGwit61BPM8G7kmFbrsaMimNiKvS8IDOvJN5Lcd75J1WKBxcxDC2iP89e4EXp5RQQNm
-         fU6vB33kJ/m5edrO75WkGkSO0wee8BWwnTXYbc6wT3yU63F5pmll/cvAZHNWJnTEsaJM
-         epfQtH1YiwrvwnKbU5GuABD8/CHnQsIIzxHJou/KazU2THV7jOPQU3AnMSY6hDAojLYh
-         8ZFA==
-X-Gm-Message-State: AOJu0YwUByAC71G5RUSOOHCTWwyU8oBf09osCPCqaBHZ0/zdmVcawshF
-	8E1q/sRov8tz+y9fLIRQCl6z4X9Xizli2vpdF4L90r070Lf2L18QpwKDi6O4Ow==
-X-Gm-Gg: Acq92OHIGWHdlvprR7tstYLBHBW1lh1piV4Q74Ea9xQtG17YqTKPD8tK8+QORI4TkmV
-	iFhrzOGM67sP8bDqRH7v6tovGC8kJ4rSpg5ogDWLkgkSDlqVXKKfX8zxjMSOU37WaHpUHcmP294
-	GwduZB5sdvbvA5/Ss2NLVrlkH64yZ8/hoguG6KhPHrj7smrfptlLTL6meYYHG6MzA1bhlPsq7AA
-	+VUWrMaebRYOYCC5rDCv6Cvlv9nWmqbScHctKFHKVa2OsajK7JZ/aswNQ5KNg2wp/ohsZyWpvu9
-	ySpTOGahAk9Jy2/bp++S4jsI4s+cuPwyV2kOUbJATYcZZETbik5PlrCjZdjPZdhE1Aj9ri82Iv0
-	er+QPpIt7dE4XZHCcmLbUybs/BEsXJarfYM18xq4BsP8i7X0SVJECtsNMOAbfpqA1LW+qt+69sK
-	zfa/y5NgwT+ZdVQKHwFNejTwS33zXMm9ZlGw==
-X-Received: by 2002:a05:690c:3481:b0:7db:b065:fe71 with SMTP id 00721157ae682-7ebda6ad51cmr2577127b3.7.1780531197859;
-        Wed, 03 Jun 2026 16:59:57 -0700 (PDT)
-Received: from localhost ([2a03:2880:21ff:1::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-660d62046efsm2851847d50.11.2026.06.03.16.59.57
+        bh=o/6ZuBOG43wI0XV1LNowOZ5Qyn8haY2GSHMaGgLDZj4=;
+        b=d6Zy7Hl1LmJpaL9REasOQhnjkLkw8swZo+K4NqaeLKmMCxjQTK2fWvCLKXlDgoc7D3
+         yLdU2MM7dCYo4EkgHsXYqKCsWPsSbqSRQGBOWbViUo0NQhuOE9uOIfF60spR4Xw8d1aF
+         VBDgyjQyG6E9Sqny9JyePTQhwgIlG37UmdqH7kojCRJPXFsYB358bw58HjHjwMiPn+bO
+         j+2Z+yhVeZXWDBiUzJmTtryCsGYZ/G9ap6rxLYjEvX60Z099urrhN/rLhPYje6Il8yWT
+         B+PzP16+TbGemKpRWK09/bPlNxOJdya0DKeamrUIF4kg390rbLFZwLWmcjGL/AhdwLWb
+         Fo6Q==
+X-Gm-Message-State: AOJu0YzscsKBrcsLhre2CZXAvpsgilA14l8eEh7DkGFrtyt7qgQY9RxF
+	syBu2YuF7NHlnHOJ2W1qGhR0eUUkszfpJS/R/SdzYdQ9LHUKvKJFtJ4ZDoDc8w==
+X-Gm-Gg: Acq92OGM87bOS5zVBn/s3HJbJcK40mUzwdMdN6vvxcohBCcEsu/1k7pcMf3lmlnpGdo
+	DM8HhIHFro7d0nDksRfljrTcQf5oPU9+i1/0mG4NE8UoFIxGjTqqJLFDnsYaw7ddykuXJstAyW9
+	AoTt1GeucjKF3TXPf27EBkREQXEVHPtvtcIrEDr/isb8NKhbM8BkQ/sVoPbHInTffDBUpvgsV3E
+	bJe3Z6vXkYuMlUMUc+G7gE7fUToSyX5/ccnubIMx2AJzEzNgut81giOQ0azEYbGCBf/nKg/0Zho
+	DU6fPu0A8jjTmZ9z7PZ3sf97b9nSdvsWFbdtW+q32+QLE+RgLXs6MEYQrgSZvkXBL+pkJfCgHSE
+	FsuRp0UDOd91qpaRRIOxpToC3WlHscP6OZzkqdwr9mmYW9DDzTeifgkxLb2tjkBsBBCxzd/4kNh
+	ro+NTGPE4A+Vzll/FHFz+J/1JmhnLlUD4=
+X-Received: by 2002:a05:690e:bcb:b0:65c:27b5:414c with SMTP id 956f58d0204a3-660dc4bbd3dmr3346093d50.5.1780531198485;
+        Wed, 03 Jun 2026 16:59:58 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-660d5f39fedsm2879784d50.1.2026.06.03.16.59.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 16:59:57 -0700 (PDT)
+        Wed, 03 Jun 2026 16:59:58 -0700 (PDT)
 From: Wei Wang <weibunny.kernel@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -87,9 +87,9 @@ To: netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>
 Cc: Wei Wang <weibunny@fb.com>
-Subject: [PATCH v15 net-next 08/10] selftests/net: psp: add dev-assoc data path test
-Date: Wed,  3 Jun 2026 16:59:37 -0700
-Message-ID: <20260603235947.2986110-9-weibunny.kernel@gmail.com>
+Subject: [PATCH v15 net-next 09/10] selftests/net: psp: add cross-namespace notification tests
+Date: Wed,  3 Jun 2026 16:59:38 -0700
+Message-ID: <20260603235947.2986110-10-weibunny.kernel@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260603235947.2986110-1-weibunny.kernel@gmail.com>
 References: <20260603235947.2986110-1-weibunny.kernel@gmail.com>
@@ -114,7 +114,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294977-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294978-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,redhat.com];
@@ -138,120 +138,107 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.py:url,vger.kernel.org:from_smtp,fb.com:email,netns.name:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9BFA563BF93
+X-Rspamd-Queue-Id: B7EE363BFAF
 
 From: Wei Wang <weibunny@fb.com>
 
-Add _assoc_check_list() test that associates nk_guest with the PSP
-device and verifies the assoc-list is correctly populated.
+Add tests that verify PSP notifications are delivered to listeners in
+associated namespaces:
 
-Add _data_basic_send_netkit_psp_assoc() which tests PSP data send
-through a netkit interface associated with a PSP device. The test
-associates nk_guest with the PSP device, then sends PSP-encrypted
-traffic from the guest namespace.
+- _key_rotation_notify_multi_ns_netkit: triggers key rotation and
+  verifies the notification is received in both main and guest namespaces
+- _dev_change_notify_multi_ns_netkit: triggers dev_set and verifies the
+  dev_change notification is received in both namespaces
 
 Signed-off-by: Wei Wang <weibunny@fb.com>
 ---
- tools/testing/selftests/drivers/net/psp.py | 72 ++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ tools/testing/selftests/drivers/net/psp.py | 59 +++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-index 015af92c8d7b..f07d0becfede 100755
+index f07d0becfede..78682a425886 100755
 --- a/tools/testing/selftests/drivers/net/psp.py
 +++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -19,6 +19,7 @@ from lib.py import ksft_variants, KsftNamedVariant
- from lib.py import KsftSkipEx
+@@ -16,7 +16,7 @@ from lib.py import ksft_run, ksft_exit, ksft_pr
+ from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises
+ from lib.py import ksft_not_none
+ from lib.py import ksft_variants, KsftNamedVariant
+-from lib.py import KsftSkipEx
++from lib.py import KsftSkipEx, KsftFailEx
  from lib.py import NetDrvEpEnv, NetDrvContEnv
  from lib.py import NlError, PSPFamily
-+from lib.py import NetNSEnter
- from lib.py import bkg, rand_port, wait_port_listen
- from lib.py import ip
- 
-@@ -602,6 +603,71 @@ def data_mss_adjust(cfg, ipver):
-     _data_mss_adjust(cfg, ipver)
+ from lib.py import NetNSEnter
+@@ -668,6 +668,61 @@ def data_basic_send_netkit_psp_assoc(cfg, version, ipver):
+     _data_basic_send_netkit_psp_assoc(cfg, version, ipver)
  
  
-+def _check_assoc_list(cfg, psp_dev_id, ifindex, nsid=None):
-+    """Verify assoc-list contains device with given ifindex, no duplicates."""
-+    dev_info = cfg.pspnl.dev_get({'id': psp_dev_id})
-+
-+    ksft_true('assoc-list' in dev_info,
-+              "No assoc-list in dev_get() response after association")
-+    found = False
-+    for assoc in dev_info['assoc-list']:
-+        if assoc['ifindex'] != ifindex:
-+            continue
-+        if nsid is not None and assoc['nsid'] != nsid:
-+            continue
-+        ksft_eq(found, False, "Duplicate assoc entry found")
-+        found = True
-+    ksft_eq(found, True,
-+            "Associated device not found in dev_get() response")
-+
-+
-+def _data_basic_send_netkit_psp_assoc(cfg, version, ipver):
-+    """
-+    Test basic data send with netkit interface associated with PSP dev.
-+    """
++def _key_rotation_notify_multi_ns_netkit(cfg):
++    """ Test key rotation notifications across multiple namespaces using netkit """
 +    _assoc_nk_guest(cfg)
 +
-+    # Enter guest namespace (netns) to run PSP test
++    # Create listener in guest namespace; socket stays bound to that ns
 +    with NetNSEnter(cfg.netns.name):
-+        cfg.pspnl = PSPFamily()
++        peer_pspnl = PSPFamily()
++        peer_pspnl.ntf_subscribe('use')
 +
-+        sock = _make_psp_conn(cfg, version, ipver)
++    # Create listener in main namespace
++    main_pspnl = PSPFamily()
++    main_pspnl.ntf_subscribe('use')
 +
-+        rx_assoc = cfg.pspnl.rx_assoc({"version": version,
-+                                       "dev-id": cfg.psp_dev_id,
-+                                       "sock-fd": sock.fileno()})
-+        rx_key = rx_assoc['rx-key']
-+        tx_key = _spi_xchg(sock, rx_key)
++    # Trigger key rotation on the PSP device
++    cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
 +
-+        cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
-+                            "version": version,
-+                            "tx-key": tx_key,
-+                            "sock-fd": sock.fileno()})
-+
-+        data_len = _send_careful(cfg, sock, 100)
-+        _check_data_rx(cfg, data_len)
-+        _close_psp_conn(cfg, sock)
++    # Poll both sockets from main thread
++    for pspnl, label in [(main_pspnl, "main"), (peer_pspnl, "guest")]:
++        for ntf in pspnl.poll_ntf(duration=10):
++            if ntf['msg'].get('id') == cfg.psp_dev_id:
++                break
++        else:
++            raise KsftFailEx(
++                f"No key rotation notification received"
++                f" in {label} namespace")
 +
 +
-+def _assoc_check_list(cfg):
-+    """Test that assoc-list is correctly populated after dev-assoc."""
++def _dev_change_notify_multi_ns_netkit(cfg):
++    """ Test dev_change notifications across multiple namespaces using netkit """
 +    _assoc_nk_guest(cfg)
-+    _check_assoc_list(cfg, cfg.psp_dev_id, cfg.nk_guest_ifindex,
-+                      cfg.psp_dev_peer_nsid)
 +
++    # Create listener in guest namespace; socket stays bound to that ns
++    with NetNSEnter(cfg.netns.name):
++        peer_pspnl = PSPFamily()
++        peer_pspnl.ntf_subscribe('mgmt')
 +
-+def _get_psp_ver_ip6_variants():
-+    for ver in range(4):
-+        yield KsftNamedVariant(f"v{ver}_ip6", ver, "6")
++    # Create listener in main namespace
++    main_pspnl = PSPFamily()
++    main_pspnl.ntf_subscribe('mgmt')
 +
++    # Trigger dev_change by calling dev_set (notification is always sent)
++    cfg.pspnl.dev_set({'id': cfg.psp_dev_id,
++                       'psp-versions-ena': cfg.psp_info['psp-versions-cap']})
 +
-+@ksft_variants(_get_psp_ver_ip6_variants())
-+def data_basic_send_netkit_psp_assoc(cfg, version, ipver):
-+    """Test PSP data send via netkit with dev-assoc."""
-+    cfg.require_ipver(ipver)
-+    _data_basic_send_netkit_psp_assoc(cfg, version, ipver)
++    # Poll both sockets from main thread
++    for pspnl, label in [(main_pspnl, "main"), (peer_pspnl, "guest")]:
++        for ntf in pspnl.poll_ntf(duration=10):
++            if ntf['msg'].get('id') == cfg.psp_dev_id:
++                break
++        else:
++            raise KsftFailEx(
++                f"No dev_change notification received"
++                f" in {label} namespace")
 +
 +
  def _try_disassoc(cfg, psp_dev_id, ifindex, nsid=None):
      """Best-effort disassociate, ignoring errors if already removed."""
      try:
-@@ -713,6 +779,12 @@ def main() -> None:
+@@ -783,6 +838,8 @@ def main() -> None:
+                     cases += [
+                         _assoc_check_list,
+                         data_basic_send_netkit_psp_assoc,
++                        _key_rotation_notify_multi_ns_netkit,
++                        _dev_change_notify_multi_ns_netkit,
+                     ]
  
-                 cases = [data_basic_send, data_mss_adjust]
- 
-+                if has_cont:
-+                    cases += [
-+                        _assoc_check_list,
-+                        data_basic_send_netkit_psp_assoc,
-+                    ]
-+
                  ksft_run(cases=cases, globs=globals(),
-                          case_pfx={"dev_", "data_", "assoc_", "removal_"},
-                          args=(cfg, ))
 -- 
 2.52.0
 
