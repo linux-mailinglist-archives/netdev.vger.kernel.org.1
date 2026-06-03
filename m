@@ -1,179 +1,171 @@
-Return-Path: <netdev+bounces-294721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294722-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kG7XA1wSIGrYvQAAu9opvQ
-	(envelope-from <netdev+bounces-294721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:39:08 +0200
+	id opqYOjwTIGoLvgAAu9opvQ
+	(envelope-from <netdev+bounces-294722-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:42:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B243637234
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:39:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B136372AF
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:42:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=samsung.com header.s=mail20170921 header.b=WW85VgGe;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294721-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294721-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=samsung.com;
+	dkim=pass header.d=sipsolutions.net header.s=mail header.b=bUzjJYbp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294722-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294722-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89E9330F36DF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 11:23:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B67A30CFC41
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 11:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F087E3CF664;
-	Wed,  3 Jun 2026 11:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4103B47CB;
+	Wed,  3 Jun 2026 11:32:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5152A2DC334
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 11:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EEE44E038;
+	Wed,  3 Jun 2026 11:32:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780485823; cv=none; b=HuiiGT1RIl2MtZPtwdQELhLBG9JUZEtgisvh46shaP08+62j5pr9FQ+QO5aqtuTihCr7gkWg4Zn5H7DkNeIz9W1LT+A4nRGmsk9tTsiWe1NIAhaII8UldfVl+EXW6ZdvRMGDcZBuFu1vCE2KVgCo1U5tWoX8SsQn/QAl3jmZZC0=
+	t=1780486335; cv=none; b=BkwP+KmXqdtL72rCS7d6UdMpcGuXrgwcWj/8+VasdX4jRVOP57ukMTYJYPKljlLsa24itEHlKjJ/isI+hNHAneADj8eBBoMaaixqw00t4CRLfwRZluZ5kXZD6CW9JFhWqE3xeUfxEJ5QEhXB8E43d+E7AIKWYmQ/6RH7E+6nKs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780485823; c=relaxed/simple;
-	bh=2kWXiCHi92nvKi/QTqY8tZ968lNNnX1Gw/uZfgeXfH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=uIUbQLG4Lm+5pGOiJXogw3oeR80ifS8p65hpslNx6pQD7HjY0O9kScJrRuxawum4Q5OpfNP3Kx81MBwMBtYNW5G9K5qszKsItTJv/ENjtIH7N94F7gxt17PwPBwGgsITyn9KZiMiD5+nTOW9eAeLYI6RIAahVpHNthz1yc/q0HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=WW85VgGe; arc=none smtp.client-ip=210.118.77.11
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260603112339euoutp012216d9e3463f174ff4cae72919dfd4ce~1jmtgzg9k0340003400euoutp01D
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 11:23:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260603112339euoutp012216d9e3463f174ff4cae72919dfd4ce~1jmtgzg9k0340003400euoutp01D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1780485819;
-	bh=jv2NZDjCmqpJ6i3N0i8aFFmqp0/dthJadelXYP91Vuo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WW85VgGeRJIAjkVn0BCJm446CNFu9QnAATEQRgJ1/8mNOHFWH3LWNmnpEBQJrHVCh
-	 Oli/Zoc7R0/7JJ0oTIpzssKfHBRswvHEa7MH1/cqtkxGOwY8tlO05xRtHPdnFVPZY4
-	 YjBHwZTdnhXw19GZ96SuY2E/AlcAeWxo2xjhuxK4=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260603112339eucas1p2cd5715cf813f8328d391177f057d3f82~1jmtIucSo1667116671eucas1p2W;
-	Wed,  3 Jun 2026 11:23:39 +0000 (GMT)
-Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260603112338eusmtip1bf193be958356b3f7da362d226643219~1jmsMvpKs2273522735eusmtip1r;
-	Wed,  3 Jun 2026 11:23:38 +0000 (GMT)
-Date: Wed, 3 Jun 2026 13:23:34 +0200
-From: Jakub Raczynski <j.raczynski@samsung.com>
+	s=arc-20240116; t=1780486335; c=relaxed/simple;
+	bh=pCDoyBf5uPusqtWnqqYqcwcm/dibKpLzPR3UQtm+MqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qUbWPiwHxJ2MqB9+vlNrWnxVi2h1p4cLTywG/R5aEN8sBxUwuZa4eiJGhU+fPlRcOHhCepSOo7WFVZoYbp6pOi6M8TOj54kmE9KunXdMkQEOHAk7QhT39cxR/HJPl9emSoicstsXzREy71UHaFtuTn+8OU72d/v5jl2i2KL0yIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=bUzjJYbp; arc=none smtp.client-ip=168.119.38.16
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=wq1BxYgyTqInpfevdpxaUw/6SPUNQSybMXqUxDLHxcs=; t=1780486334; x=1781695934; 
+	b=bUzjJYbpinjKL85bfU3YegKlS4u42IudQVKSLcyeQtL5B67mSwQp5pI5K60iZaZO6wNmo7eWPtO
+	LcBka5rneCyNtEz7EZD3F/BmONKOhOGl3vctSddOGp4ZyJkGtC0QSzbBKpR/YQc4kUIRhArUfG5Q/
+	a/l2WmQUbw3IReK4YzcFdUPqB9L2SFJTmZr27qRlW5evIIHi1VWbMeO0Gt5gEfe7nLlc9suWeasmo
+	D8w0OuvxoajkmgJV2lk55YFuCl5MexzHSYrnkOACWfFXGr13IN0hnLxuDkJXAPxV0X0v5qSpqu/x6
+	cFYYrdUEugsJe3gwXq+SPulCsXJ2Dm4upN0g==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1wUjpT-0000000H5Ij-1Pa7;
+	Wed, 03 Jun 2026 13:32:11 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
 To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, linux-kernel@vger.kernel.org,
-	k.domagalski@samsung.com, k.tegowski@samsung.com, cs0617.lee@samsung.com
-Subject: Re: [PATCH net-next v2 1/2] net/stmmac: Check for STMMAC_DOWN flag
- in all XDP paths
-Message-ID: <aiAOthinXOZexBnw@AMDC4622.eu.corp.samsungelectronics.net>
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-06-03
+Date: Wed,  3 Jun 2026 13:31:24 +0200
+Message-ID: <20260603113208.171874-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260601163258.554300-2-j.raczynski@samsung.com>
-X-CMS-MailID: 20260603112339eucas1p2cd5715cf813f8328d391177f057d3f82
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="-----ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_e99d4_"
-X-RootMTR: 20260601163313eucas1p20203ee427dc9d3733a9218835f4f7ed3
-X-EPHeader: CA
-X-CMS-RootMailID: 20260601163313eucas1p20203ee427dc9d3733a9218835f4f7ed3
-References: <20260601163258.554300-1-j.raczynski@samsung.com>
-	<CGME20260601163313eucas1p20203ee427dc9d3733a9218835f4f7ed3@eucas1p2.samsung.com>
-	<20260601163258.554300-2-j.raczynski@samsung.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,vger.kernel.org,samsung.com];
-	TAGGED_FROM(0.00)[bounces-294721-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux-kernel@vger.kernel.org,m:k.domagalski@samsung.com,m:k.tegowski@samsung.com,m:cs0617.lee@samsung.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294722-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[AMDC4622.eu.corp.samsungelectronics.net:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samsung.com:from_mime,samsung.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:mid,sipsolutions.net:from_mime,sipsolutions.net:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5B243637234
+X-Rspamd-Queue-Id: 47B136372AF
 
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_e99d4_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+Hi,
 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index 3591755ea30be..3a66f28425275 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -5267,6 +5267,9 @@ static int stmmac_xdp_xmit_back(struct stmmac_priv *priv,
-> >  	if (unlikely(!xdpf))
-> >  		return STMMAC_XDP_CONSUMED;
-> >  
-> > +	if (unlikely(test_bit(STMMAC_DOWN, &priv->state)))
-> > +		return STMMAC_XDP_CONSUMED;
-> Does returning STMMAC_XDP_CONSUMED here cause a memory leak and a double-free
-> in the zero-copy path?
-> Since this check occurs after xdp_convert_buff_to_frame() is called earlier
-> in stmmac_xdp_xmit_back(), the conversion has already transferred ownership. 
-> In zero-copy mode, xdp_convert_buff_to_frame() allocates a new page and frees
-> the original buffer.
-> Returning STMMAC_XDP_CONSUMED at this point leaks the newly allocated page
-> because xdp_return_frame(xdpf) is not called.
-> Furthermore, the caller stmmac_rx_zc() handles STMMAC_XDP_CONSUMED by freeing
-> the buffer again:
-> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:stmmac_rx_zc() {
-> 	...
-> 	case STMMAC_XDP_CONSUMED:
-> 		xsk_buff_free(buf->xdp);
-> 		fallthrough;
-> 	...
-> }
-> Could this result in a double-free? Would it be safer to check the STMMAC_DOWN
-> flag before the buffer conversion takes place?
+And yet more things ... I'm going to defer a number of driver
+things to wireless-next though, e.g. a PCIe device IRQ race.
 
-Gonna respond to Sashiko review.
+Please pull and let us know if there's any problem.
 
-Funny how in first version of the patch Sashiko wanted XDP_CONSUMED instead
-of error and now it considers it error, but thats beauty of AI. But 1st concern
-was valid.
-
-As for this, same issue would be when if(unlikely(!xdpf)) triggers,
-or even worse, because it would free page that failed in stmmac_rx_zc().
-
-Issue regarding ownership is valid though and this should be fixed -
-it is freed by xdp_convert_buff_to_frame() but is dangling so should either
-specifically free xdpf or xdp_return_frame().
-
-"Would checking this before buffer conversion take place be safer?"
-Sure, why not, but it will make code bit more ugly.
-
-BR
-Jakub Raczynski
-
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_e99d4_
-Content-Type: text/plain; charset="utf-8"
+Thanks,
+johannes
 
 
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_e99d4_--
+
+The following changes since commit f3be0c984ecbcb82b0bec408022c4ef738cb3843:
+
+  Merge tag 'net-7.1-rc6-2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-05-29 15:46:40 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-06-03
+
+for you to fetch changes up to cb9959ab5f99611d27a06586add84811fe8102dc:
+
+  wifi: cfg80211: enforce HE/EHT cap/oper consistency (2026-06-03 13:25:19 +0200)
+
+----------------------------------------------------------------
+Things are finally quieting down:
+ - iwlwifi:
+   - FW reset handshake removal for older devices
+   - NIC access fix in fast resume
+   - avoid too large command for some BIOSes
+   - fix TX power constraints in AP mode
+ - cfg80211:
+   - fix netlink parse overflow
+   - fix potential 6 GHz scan memory leak
+   - enforce HE/EHT consistency to avoid mac80211 crash
+ - mac80211: guard radiotap antenna parsing
+
+----------------------------------------------------------------
+Deepanshu Kartikey (1):
+      wifi: mac80211: limit injected antenna index in ieee80211_parse_tx_radiotap
+
+Emmanuel Grumbach (3):
+      wifi: iwlwifi: mvm: don't support the reset handshake for old firmwares
+      wifi: iwlwifi: mvm: avoid oversized UATS command copy
+      wifi: iwlwifi: pcie: simplify the resume flow if fast resume is not used
+
+Fedor Pchelkin (1):
+      wifi: fix leak if split 6 GHz scanning fails
+
+Johannes Berg (2):
+      Merge tag 'iwlwifi-fixes-2026-05-31' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+      wifi: cfg80211: enforce HE/EHT cap/oper consistency
+
+Pagadala Yesu Anjaneyulu (1):
+      wifi: iwlwifi: mld: send tx power constraints before link activation
+
+Yuqi Xu (1):
+      wifi: nl80211: reject oversized EMA RNR lists
+
+ drivers/net/wireless/intel/iwlwifi/mld/ap.c       |  4 --
+ drivers/net/wireless/intel/iwlwifi/mld/mac80211.c |  7 +++
+ drivers/net/wireless/intel/iwlwifi/mld/power.c    |  2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c       | 28 +++++++++---
+ drivers/net/wireless/intel/iwlwifi/mvm/ops.c      |  6 +++
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c     | 56 +++++++++++++----------
+ net/mac80211/tx.c                                 |  4 +-
+ net/wireless/nl80211.c                            |  9 ++++
+ net/wireless/scan.c                               |  9 +++-
+ 9 files changed, 88 insertions(+), 37 deletions(-)
 
