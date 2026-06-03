@@ -1,269 +1,217 @@
-Return-Path: <netdev+bounces-294900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qV5wOH+HIGr04gAAu9opvQ
-	(envelope-from <netdev+bounces-294900-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 21:58:55 +0200
+	id H6mEKMuHIGoG4wAAu9opvQ
+	(envelope-from <netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 22:00:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D8263B058
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 21:58:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9FA63B075
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 22:00:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oAVYziE5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294900-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294900-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linux-foundation.org header.s=google header.b=E5WQL0eE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DC52F3018144
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 19:58:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93922301E6C2
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 20:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39103909A4;
-	Wed,  3 Jun 2026 19:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258803A6412;
+	Wed,  3 Jun 2026 20:00:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD49739E9D5
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 19:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9583A5E99
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 20:00:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780516730; cv=none; b=RmAjNDjzW4ZhiYIYlNsyG2QlWio2zDBCmWhnFvYZGgvqKinwUkuUIsr7Q6QTz1mdhDv/ouiKO0CsUtIu+DCnA4IhnY3FfBh6dWfZzY44ktt538NG2USSIbfaRCh6gx7DPf7AKct6FX2Fe3PE/HswXElOLPa9nomLc7+4aVrSRt0=
+	t=1780516803; cv=none; b=gYfHQrPdJ/2Xt7bikul/qzU5cneAAPudGpid5qF4vwOUBtsDXmN+qZhfhkcKjLQ/dhWip5aKh/gT1C8SbOK/ga97dgsEfsgNpm1GU2emt4mvUuExJ6/WIFck/H4aiVu7urXxKNJ3PsBCK99BOhmXu4p8EJ9juFnl7F1klxc4AHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780516730; c=relaxed/simple;
-	bh=hJDm0TGcNDYbdbKcQRxv0dE0EdXmmALt5begQmD/AME=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nsxuquPPf7cknbEqTMCCglWrAuzjwG6LD0kZo8HfYkWCa/XOFYLw6of0jp1GYrolbD1AKXLYu6K5dd4FqcsDFTfkI7EWtlgAGpJ/TUqP2swUhAZa7J9u7JhT9ttXKV1B44vsOTyH0skWXZ4gymXrdXWy+Lr+pcOpE2EZFhMI/tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oAVYziE5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D29121F00893;
-	Wed,  3 Jun 2026 19:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780516729;
-	bh=KKztiED9hy6zkgkyjZPTXiaI/GO9VpJlGOa695N0ZWE=;
-	h=From:To:Cc:Subject:Date;
-	b=oAVYziE5W1wbNvlzV45mJ+PLOEH684VD0+yfWLCJQdrHfCsnv1w69jaK3EcqoWiAI
-	 LgYDT7+zwLazX2n7/JhWebbmCgEDgBP8g7eluttbVQ6rtd2x96zjhROUU1aWWdfAjL
-	 WR3jwU9+/MFi05WUpUAcy9aIttdVxlddhfpu5YyQSUtHYDPG9UTqfc93DXtS8yfvSP
-	 2tSEAMDOJBBlrUL7hGB6w1hRvCvU1+siUzB9IApJoTx7NWiZoQZwCvCwjCx8nHaP4U
-	 Bt83jWV9G4jjpGYrDFRqVdMpS4lWDY+edv9K1DB3EjqbjFEKNDd6zErs4J4NuAbJ8I
-	 i16CsdYfmXxlQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	sdf@fomichev.me,
-	aleksandr.loktionov@intel.com
-Subject: [PATCH net] Reapply "bnxt_en: bring back rtnl_lock() in the bnxt_open() path"
-Date: Wed,  3 Jun 2026 12:58:45 -0700
-Message-ID: <20260603195845.2574426-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1780516803; c=relaxed/simple;
+	bh=cJCdMggMBtlaRufFOzf56NF2SmvXVse1UnTO+KmUUY8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JYjrhXyW6Bc+t8cUhVW2Ug8pwu9mfNIAFpH2vtnlXSE1i/EtV+p4SBBZqEYFjaDJDZKLqMd6E35KGZvLrxKMchvdOMVOU9p9th0IW1RkFgZv5cPAF7cxibqMkvxKTfyY1b9wlBKqpMeunUL5sTOB0yKHSvl4GK1FZNQ7Ra5PGrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=E5WQL0eE; arc=none smtp.client-ip=209.85.216.44
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36b95eb4bb4so3397501a91.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 13:00:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1780516800; x=1781121600; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLwU6+VwyCgHprpb82bpoZ1vCU00viaTeQ4mjhQKQr0=;
+        b=E5WQL0eE5SCkORdDgmaH/6yh0Q+bkb2AAXJDvh0D9Qt3t3+ma6m0+1u9F2rEHJVllH
+         udnnnxaDFUrroLqW14J517iMyS1wSC4j3ZPETGbQkkkkzIh6FzQyDfxqMojqgmNnFHeA
+         r4172xi+9r/CMdbECOO1j4unC9zKjDm9l3DzE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780516800; x=1781121600;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rLwU6+VwyCgHprpb82bpoZ1vCU00viaTeQ4mjhQKQr0=;
+        b=sja+hkm900N4Ric8Mdrh8CQzwkvmPoBfIrcXnBiVrccQZNV7CngF6fYSZ9vTAsrnCE
+         eTF4n1vWAEv5mAn3sOMt7zqhTxezUkVpTo+jpyqB4s/wIzh4PrTOFfjdVuDg7WnA2fMm
+         eRDLNkREB7PO8k6fY3Ji3gsvzvsEtxjugy6ZbmW0joDdd9iy5nca8gnhBf6pTVgfeCyO
+         f9JpKC6MlMVH2/knwIctY83gSKYrYtt6KApRfK+Oasv0+JWNr2bcHbFoRSIs86IOmCu9
+         kixIrP28B/J15UNTDBCrkV5kYu6s97gXFamyjanGCf/pYXbhvp1GnG2yMPiI0Ioyd4On
+         tLTA==
+X-Forwarded-Encrypted: i=1; AFNElJ8wTROTkxMC9vGMkvuWSqTW/2WhJAHLr38Di3posD++CFgrzJvpfeGcxEiiYCfIVs2yHjOszjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjrYC67G5eClk5rv/k596eUr7UPXOGojD35XKKpXysWTJ4UZiD
+	s68FsmM1Ox4ty59O039K6OIJNvzaUc8EBQNzsh6S7dHD9UA9Cv8PeRinCDcmzhEcr6BDaJLwjZc
+	ij3lal7GtwQ==
+X-Gm-Gg: Acq92OFogCYBrOcR99/QuBARNOkcXHDIrIcJZ8giJevRr6oYUvZHuMrS1sX1xCosoYA
+	ZV2RlIi0fm7g3sLMjVYR4Qs4ajhmRmBQn5xApPOakt10h6euf9E/1zoPnl1rQO4qK5UQANQGpbG
+	aw+FFuNHDdlwkiskWdXcO8sdpOiFRrwGHB6c/V8z6+7G06JUwW9By6CNJ8OTcmRJYIL1fTYx1dA
+	Psq38nekplDyICkowKEGJQ8SAoWIwdBo++BnOudXaJukcNc2EEOu41/cr0rkHldW6atPcEbue43
+	op5jkDQG1d8NJvaOtvQTwwuYiPoT/WDnj0E0gS8Cm98JhZQ+MwxPGUyLRLqulnpiI+yBM2qYBpl
+	W7aDc6qjidmwUbGrhu+lJapr/7wD7xmsbWoHj4zqxNAR2/54RZnej0I+1yL6KFxNf24/fqcwuW/
+	LxpD/nwzTxDFGV27W6gnT6dbmHlnLLBTlYIlICoaOGT+aZ42cEaKoKNCHlGtiPLhT3y003DDPSM
+	G7qBv9D57s=
+X-Received: by 2002:a17:902:ecc8:b0:2c0:cea4:3df4 with SMTP id d9443c01a7336-2c1644cb12bmr48064515ad.40.1780516800175;
+        Wed, 03 Jun 2026 13:00:00 -0700 (PDT)
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com. [209.85.216.44])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c1664950aesm31788165ad.69.2026.06.03.12.59.58
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jun 2026 12:59:58 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36babe2c4bdso3878720a91.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 12:59:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9KDN+YzfrAcYSOqgaAbEd03FmY5Zg2p9Wp98POC4PuNg463gvpC1EsepV/29aLc5DYx0WmaXA=@vger.kernel.org
+X-Received: by 2002:a17:90b:2f86:b0:36b:77b9:5c8c with SMTP id
+ 98e67ed59e1d1-36e3237e125mr4484034a91.17.1780516797989; Wed, 03 Jun 2026
+ 12:59:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
+ <20260602225426.122258-1-safinaskar@gmail.com> <CAHk-=wgKy4dP0oQCNKyMQQf3-uVpaigmDyH6_T0Via76gWST9g@mail.gmail.com>
+ <CALCETrWx8-Q5-rK1KnAPCxCbXaWCd=Yfs_Pr8qVMa8k8L6of1w@mail.gmail.com>
+ <CAHk-=wizkDXRut5xLXRF-CVUVYMaZ5AOexxeghOAoXPb4yAvQg@mail.gmail.com>
+ <CALCETrXzxubt4eWue3+wv7Fq9C2m7uu6bWPstqFh6Mo57bPwQQ@mail.gmail.com> <CAHk-=wiEwSjfbjfO74xu=UmkkdHXkJg5QNQ8pP-3iYmunmeV9g@mail.gmail.com>
+In-Reply-To: <CAHk-=wiEwSjfbjfO74xu=UmkkdHXkJg5QNQ8pP-3iYmunmeV9g@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 3 Jun 2026 12:59:36 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whkGbMoP-Dym8pAd3hV21=BZST+6sK++1X038+9Q-TgeA@mail.gmail.com>
+X-Gm-Features: AVHnY4Jw9pwWVUIawcRWYEJbSOr_4eFJHRjDI61fxjs_qgnMfY70yBDODQXhxd4
+Message-ID: <CAHk-=whkGbMoP-Dym8pAd3hV21=BZST+6sK++1X038+9Q-TgeA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: Askar Safin <safinaskar@gmail.com>, akpm@linux-foundation.org, axboe@kernel.dk, 
+	brauner@kernel.org, david@kernel.org, dhowells@redhat.com, hch@infradead.org, 
+	jack@suse.cz, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, miklos@szeredi.hu, 
+	netdev@vger.kernel.org, patches@lists.linux.dev, pfalcato@suse.de, 
+	viro@zeniv.linux.org.uk, willy@infradead.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuba@kernel.org,m:leitao@debian.org,m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:sdf@fomichev.me,m:aleksandr.loktionov@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-294900-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294901-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:luto@amacapital.net,m:safinaskar@gmail.com,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[linux-foundation.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[gmail.com,linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,fomichev.me:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,linux-foundation.org:dkim,linux-foundation.org:from_mime,linux-foundation.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D4D8263B058
+X-Rspamd-Queue-Id: DB9FA63B075
 
-This reverts commit 850d9248d2eac662f869c766a598c877690c74e5.
-This reapplies commit 325eb217e41f ("bnxt_en: bring back rtnl_lock()
-in the bnxt_open() path").
+On Wed, 3 Jun 2026 at 11:28, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> But even then you need to have a *handle* to the buffers for the
+> general case, and that's what the pipe fd ends up then still
+> effectively being.
 
-Breno reports a lockdep warning in bnxt. During FW reset the driver
-may end up calling netif_set_real_num_tx_queues() (if queue count
-changes), so calls to bnxt_open() still require rtnl_lock.
+Again: for sendfile, you don't need the handle, because you can just
+"read the file data again".
 
-  net/sched/sch_generic.c:1416 suspicious rcu_dereference_protected() usage!
+But the the handle is needed for any buffering that can't do that -
+iow pretty much *any* other case than a file-backed source.
 
-   dev_qdisc_change_real_num_tx+0x54/0xe0
-   netif_set_real_num_tx_queues+0x4ed/0xa80
-   __bnxt_open_nic+0x9cb/0x3490
-   bnxt_open+0x1cb/0x370
-   bnxt_fw_reset_task+0x80d/0x1e80
-   process_scheduled_works+0x9c1/0x13b0
+So the original use-cases included things like copying media data from
+a TV capture card to a GPU for outputting in a window.
 
-The reverted commit was just an optimization / experiment
-so let's go back to taking the lock.
+There it's actually the intermediate buffer that is the important
+thing, and it needs to have a lifetime that is independent of the
+system call itself, because the system call may be interrupted by
+signals etc, and you can't just "read the data again" when you
+restart.
 
-Reported-by: Breno Leitao <leitao@debian.org>
-Link: https://lore.kernel.org/ah726OtFX-Qw3U-R@gmail.com
-Fixes: 850d9248d2ea ("Revert "bnxt_en: bring back rtnl_lock() in the bnxt_open() path"")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: michael.chan@broadcom.com
-CC: pavan.chebbi@broadcom.com
-CC: sdf@fomichev.me
-CC: aleksandr.loktionov@intel.com
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++++++++++-----
- 1 file changed, 29 insertions(+), 7 deletions(-)
+So the whole idea with splice() is that you have an input, an output,
+and a stateful buffer between the two that has a lifetime.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 008c34cff7b4..35e1f8f663c7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -14388,13 +14388,28 @@ static void bnxt_unlock_sp(struct bnxt *bp)
- 	netdev_unlock(bp->dev);
- }
- 
-+/* Same as bnxt_lock_sp() with additional rtnl_lock */
-+static void bnxt_rtnl_lock_sp(struct bnxt *bp)
-+{
-+	clear_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
-+	rtnl_lock();
-+	netdev_lock(bp->dev);
-+}
-+
-+static void bnxt_rtnl_unlock_sp(struct bnxt *bp)
-+{
-+	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
-+	netdev_unlock(bp->dev);
-+	rtnl_unlock();
-+}
-+
- /* Only called from bnxt_sp_task() */
- static void bnxt_reset(struct bnxt *bp, bool silent)
- {
--	bnxt_lock_sp(bp);
-+	bnxt_rtnl_lock_sp(bp);
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state))
- 		bnxt_reset_task(bp, silent);
--	bnxt_unlock_sp(bp);
-+	bnxt_rtnl_unlock_sp(bp);
- }
- 
- /* Only called from bnxt_sp_task() */
-@@ -14402,9 +14417,9 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- {
- 	int i;
- 
--	bnxt_lock_sp(bp);
-+	bnxt_rtnl_lock_sp(bp);
- 	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
--		bnxt_unlock_sp(bp);
-+		bnxt_rtnl_unlock_sp(bp);
- 		return;
- 	}
- 	/* Disable and flush TPA before resetting the RX ring */
-@@ -14443,7 +14458,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- 	}
- 	if (bp->flags & BNXT_FLAG_TPA)
- 		bnxt_set_tpa(bp, true);
--	bnxt_unlock_sp(bp);
-+	bnxt_rtnl_unlock_sp(bp);
- }
- 
- static void bnxt_fw_fatal_close(struct bnxt *bp)
-@@ -15358,15 +15373,17 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		bp->fw_reset_state = BNXT_FW_RESET_STATE_OPENING;
- 		fallthrough;
- 	case BNXT_FW_RESET_STATE_OPENING:
--		while (!netdev_trylock(bp->dev)) {
-+		while (!rtnl_trylock()) {
- 			bnxt_queue_fw_reset_work(bp, HZ / 10);
- 			return;
- 		}
-+		netdev_lock(bp->dev);
- 		rc = bnxt_open(bp->dev);
- 		if (rc) {
- 			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
- 			bnxt_fw_reset_abort(bp, rc);
- 			netdev_unlock(bp->dev);
-+			rtnl_unlock();
- 			goto ulp_start;
- 		}
- 
-@@ -15386,6 +15403,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			bnxt_dl_health_fw_status_update(bp, true);
- 		}
- 		netdev_unlock(bp->dev);
-+		rtnl_unlock();
- 		bnxt_ulp_start(bp);
- 		bnxt_reenable_sriov(bp);
- 		netdev_lock(bp->dev);
-@@ -16379,7 +16397,7 @@ static int bnxt_queue_start(struct net_device *dev,
- 		   rc);
- 	napi_enable_locked(&bnapi->napi);
- 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
--	bnxt_reset_task(bp, true);
-+	netif_close(dev);
- 	return rc;
- }
- 
-@@ -17230,6 +17248,7 @@ static int bnxt_resume(struct device *device)
- 	struct bnxt *bp = netdev_priv(dev);
- 	int rc = 0;
- 
-+	rtnl_lock();
- 	netdev_lock(dev);
- 	rc = pci_enable_device(bp->pdev);
- 	if (rc) {
-@@ -17274,6 +17293,7 @@ static int bnxt_resume(struct device *device)
- 
- resume_exit:
- 	netdev_unlock(bp->dev);
-+	rtnl_unlock();
- 	if (!rc) {
- 		bnxt_ulp_start(bp);
- 		bnxt_reenable_sriov(bp);
-@@ -17445,6 +17465,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 	int err;
- 
- 	netdev_info(bp->dev, "PCI Slot Resume\n");
-+	rtnl_lock();
- 	netdev_lock(netdev);
- 
- 	err = bnxt_hwrm_func_qcaps(bp);
-@@ -17462,6 +17483,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 		netif_device_attach(netdev);
- 
- 	netdev_unlock(netdev);
-+	rtnl_unlock();
- 	if (!err) {
- 		bnxt_ulp_start(bp);
- 		bnxt_reenable_sriov(bp);
--- 
-2.54.0
+Having just a iov_iter isn't enough - even with the current much more
+capable iov_iter we have now (compared to when splice came to be: two
+decades ago when the modern iov_iter didn't even exist). You have to
+have that notion of a buffer with a lifetime.
 
+(iov_iter came a couple of years later, but it then took many many
+years for it to become the powerful thing it is today where you can
+put almost arbitrary data into it - it started as purely a user space
+iovec iterator, all the bvec/kvec etc stuff that you need for IO
+buffering came a decade later)
+
+So there's historical reasons for the use of pipes, but there really
+is a very fundamental reason for it too: wanting to *generic* data
+transfer between two points, not sendfile.
+
+It's worth noticing that in the generic case, zero-copy isn't really
+even an issue.
+
+When you think operations like "splice TV capture input to a pipe",
+you typically need to allocate the pages that you then DMA into
+*anyway*, and you'd just put those pages into the pipe. And the facty
+that you can then just take the data directly from those pages when
+you splice from the pipe to whatever GPU engine that does the decoding
+is kind of secondary.
+
+So again: the big deal with splice() and the pipe isn't really about
+zero-copy. It's the in-kernel buffers where the drivers control the
+allocation and you don't have some "user space allocates memory, then
+kernel looks that allocation up and uses it" model.
+
+Having less copies is kind of incidental. It *might* happen just
+because it's natural when some streaming device just gives it data
+away and doesn't care after the fact.
+
+The problem with splicing from a file has been exactly the fact that
+it's *not* streaming data, and the filesystem zero-copy case gave
+direct access to the long-term cache.
+
+Which is undoubtedly good for performance. But it fundamentally
+*requires* that the sink is trustworthy. Which has been problematic.
+
+That's why sendfile() is bad. Not because splice itself is a bad
+concept, but because you have to have that absolute trust across
+components.
+
+          Linus
 
