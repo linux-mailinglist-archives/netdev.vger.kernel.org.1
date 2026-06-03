@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-294883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d1QeGmd8IGrQ4AAAu9opvQ
-	(envelope-from <netdev+bounces-294883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 21:11:35 +0200
+	id xueGNFx7IGqb4AAAu9opvQ
+	(envelope-from <netdev+bounces-294884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 21:07:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFD5563AC53
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 21:11:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2E163AC1C
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 21:07:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZPDdKGTm;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294883-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294883-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="PlB3wvP/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294884-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294884-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06ACD3059009
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 19:02:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8AE0F30E4E12
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 19:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2761F3290D0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC24835B644;
 	Wed,  3 Jun 2026 19:02:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7891313535
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 19:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A131331F986
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 19:02:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780513371; cv=none; b=DPWcCkJaAK4IRj4uGqWKemVKSHfFMHBnQrsZLXRQ/F7/twJms7FnzwiQ72LXoCEJMsEunp4rDnTKzma9ZDo1PbgOHqRTCV9aFlIN9ZBWq/18Ae6LSu3fOcR9+AUwnXyUXejxza2GgiCqnknsIwL5vyqPEaLRMf8tK8NkX3N3FzQ=
+	t=1780513371; cv=none; b=kmijWl9/ieHUVEjUiQRwLl80vP+s2U3StG0I/TlLnt3WP6YNmvn2eZl29yGyg/R7zSP7toS5+QopPFp6firqSnfR/qd6wnqbF0D8u4Fge8zcXb8su/9TJzx34tV6OWEXaXwZhxnYJvLx6jx0IEB1f/qvTnqZrCyUPSDasoK+0pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780513371; c=relaxed/simple;
-	bh=NrWA9b/vdpafPcNn28QdKsys9t/shOLi7eTYLoaJlMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RFIgbJUr6dW95aGF3cOCjhm5Ug0cE5d8lUDrRMRUKYl9t2pMF4IZCm3hpj9bz28mju0wK+KndQoULmDSks2MzJ6UyVsRcBOplteLFfzF6HTnok5RvH1yTLYle+jxgt5xvummocrI6K3KtNNxhih1gleNmGzf8rB+i6gGP14xTi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZPDdKGTm; arc=none smtp.client-ip=209.85.128.171
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7e87602f26aso13473617b3.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 12:02:49 -0700 (PDT)
+	bh=aVGKaPtFUH/Rof/ivHV29vM8CafgJ+NHADRqHFp5zLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CJCNoZO1tuutD8Cp3akkk3ohEkUrva/YfZ3qIVAxzqCLhvpaT1BRJjFg9F4NlVlkefkySfnNBxouYg69mPL9ixIDzSJhIepW/JI0aBlZnmN1FVuT4C903iVorRpXDHEMucnBIu6F7VF1MiL0eXFLyM/7dKIVb3BVSZzrGT5L1ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PlB3wvP/; arc=none smtp.client-ip=209.85.128.179
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7dbcb505578so79837477b3.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 12:02:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780513369; x=1781118169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=31SxK4fP+71fOfnYmycGPePs/i0qkE+P837JeBio4E8=;
-        b=ZPDdKGTm37irktC4h157wybFG1AEuOC+YNdtS538f4Rc6WhHrS4ULdYnT6HSqvXBWb
-         tSALroiUuI+yizNkKEjoS5K3hcfy47kwtfObS09PugzIW1ARvAy1TP0V0rn5wFxfaTXb
-         8h8r+cyuhar8tRakMMRAuuDzGmzgXxu9xfgmKUhNvC36MzJ0irhc/f6VJO8Zq9sdKALs
-         u/E1ASunhdC9UyzcnLpAsRXMV89mHkjVZORQsrD4Gz5UplNv7Xgh8DXPlBe4XuKAF4yo
-         /IaZjsHn77/Q2V0Osjhq5OhujLBnm55dijQd5PI+lF7M8+7kzEUcVg2Tocw1wZxa5Aa0
-         Tnxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780513369; x=1781118169;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1780513370; x=1781118170; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=31SxK4fP+71fOfnYmycGPePs/i0qkE+P837JeBio4E8=;
-        b=QIbtgeoxkx8fQSnC8OfxEUiDjLKZQQ1YoYvs+mS0FW1x69uLGUpTlhcFyCVBy/YzON
-         AUjKj6L2FHm7b0Ws4mpCHNgYWT7WebSvTTlSpdogL8BnzKZv56JGc9E0fsQnsCHheeTi
-         p/33kc00OT+0yVrksQAhR3+kaAT+ebrLgPCN9BOPhgH2XUHjCHWTJL9TSXqgX1bnD2rG
-         rJi0K5TakUiaW+mAKjgKtpLgQ40a/aAZ9B2QYIKQESJHlmIc52GEeTxmWdLJsUWYIt6N
-         BcYsd5+d/unchzv6OmDDN+TRQdYowTloL5rE2GRQD8I3Nav0vUp0DOApKkB4LZY/GA/K
-         Ajeg==
-X-Gm-Message-State: AOJu0YxlMYtJY0PLldzysLIFwbBV1pJjDoHcoiq8DD471x4tOjdl76wI
-	8pcR3vnyR2yFam74aU5mol7XLT1NCOxNX7iXKnvRST7jRpqPuCP2NSKDdM0k0Q==
-X-Gm-Gg: Acq92OHOgsXWqVnlde5dr3ITHmkvjBrE10fjToJ4BYQOG05It/XM8FwL2rkIiUbIaOG
-	lhNCySl6SxCxMmUgDN8JZ5SQQ9tNHQs3GeLlMoeBopkrMLh6WKa676Vww+K8KX/ZYZEWgO255E9
-	oaOUAsIl9HsB50ZxR2uLFD5ts/x79/6YCxdvHGfHysWQR7vJ5AzL0YbKzrnYOJiKxDpIssNpqr/
-	spBA30VKi+y/+XfAfVUOZ5PWyXJ27nyGzytuer4WI9XoyzvfQZlfaCnQOF64eTuDtadCf73UrpF
-	8EbNFde5pvMsIoM3TUgcIBOFD1Hxt/aiBr3BTi3SlWvJtVwbm2r0bAFT2YVOoAcn+1VdaVLPaPE
-	ukkMBxiKLUYqpFsIaAFFL3PJTfsvVmq8Wo9dVflpqT/pyAnlbivTo5+y+6/n85smM4y0rj+3UBs
-	7oDZx6eIaFVO0DEpfqsRoUMvaNd24Y0Gi/U+eUzVr48Ilx8fUooUHiTRrF9JL1dkPueXbJsM7Hw
-	q/U0ZuYlze6EH6sJB74xMFjfjB0N8dEPikvExMF
-X-Received: by 2002:a05:690c:e372:b0:79a:b49a:cb4e with SMTP id 00721157ae682-7eb8ae8f419mr6408837b3.6.1780513368951;
-        Wed, 03 Jun 2026 12:02:48 -0700 (PDT)
+        bh=yKeJyPb+u8/MUCiabIYpuG6X8kzxIOQHsYa/HqPJEFY=;
+        b=PlB3wvP/YRv8pzkXj6IWBWZTCtT2sDGiFGDPwFfQBVhUKWs7GS5hmxCfHWM4TKgvBH
+         n+VFZub8tgZCeooi3Tc5odLJg16UsdhUjqC8QscistMP5WJw7RC8lykb2Sa9Y85R9hQt
+         EiT8pX/++yZp1GYGrGfs/epBEe6O5TAnqPw8HZrCIGojVPwUNtaWqf5igtDsPqoeJOC0
+         s+/AteGzX4vtLl1VPUW16KwpvOjwRzEFQXycBRHPQP79Yn7KF1ICDH6KOV11w+5qUyfB
+         72CCZUp/8Gs95Z2fjt1Djw3EDPM9xCVH8QLrei7bAk9rsT/gWcCJTtKnZfqsY6edFXnL
+         QOWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780513370; x=1781118170;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yKeJyPb+u8/MUCiabIYpuG6X8kzxIOQHsYa/HqPJEFY=;
+        b=Ls08l8ExyrPV5/u84xP8zfvgJ2uGQB5htykt3KmaW/P6M+2XssrTXqLM9akfI6EgYY
+         gJPrweT2CQMCzQt19XimEYUjezU/t+dWkDgy1AhIs9tJPHtPwc6MgG5B7DeanzUEtIPl
+         Rp2BzRX0QJImg3i2nwaaqoahyIZXVDlYwqGYeuA3Dtvsv1m20QgCLaSWxB2dASUV4weL
+         47lFED8BRBI4ekZy1Rvs4AcQJuOms91wKkKotpfvoM6g2mvT5MusTSMLdDhyB9336IQ3
+         b7qsVx7diVHSptNyCw+58AWuYf/zsmfavSh7E+ktOTsrWYLBLJkiizCecnOcsATgK7gB
+         5A3A==
+X-Gm-Message-State: AOJu0YySH+jRwT81LYO2Rxs/U4/DcyodVqUkIjU1pSoYMTjvgNT/JW+A
+	MdtdrZCE56ZifStFCB7jbdAPAf0DqFlb0zOVC5iHqOoduSWLAPRPQF0GNbUZ7Q==
+X-Gm-Gg: Acq92OFZICSRVqOM6p70+6a55yW3/gfaTjTyqyeQBVc2HtZ+CYaaiheUE4SyYQf2DRe
+	qYTj9T+Qi69R8BxewXvIf6xMVr/L60Malgm8AMDMBQEk9HChx8VvjPTIwJYIxQ/FTB5nwGocJ03
+	4u05fiZkRzma8L05Q0n6Y2jvJBs6Xf63+e6D38hEOG4PMQEby4snZWA0zXHcD35Fwu1mRDgDZxK
+	fwOUfveEU24BaAta3jL98ufFY74gtMfMV8c9yjq+Fo/AajIRzbHxkUuN+P1krahchv8cGk0LqhX
+	GgTg/WqlTiKktjw++Y5F5F1yU9IiUjpgNiDXFu14oRRkIOVttzUSIwEVzftC10WZ6av0E47xn9E
+	nPtN4mLSN2+S8zh1Uu1UmVrSOK7I7TtXKpwkhof1+39iNqciYRyBzeNCK8hQsX2y8yBec4gyeuP
+	c27Z+LrgeAlZvlZSpk2NW3rFCbnbgpIVuBdHJdGxpDTpjj/d2TaCoXThum1LLr/hahPLlE/Hm/4
+	zZrWgPUFN/guEqFgzlhRKC3rxSUe8DSqzajrzVN
+X-Received: by 2002:a05:690c:b87:b0:7b6:f4f:f057 with SMTP id 00721157ae682-7ea4c1b7868mr43175187b3.24.1780513369603;
+        Wed, 03 Jun 2026 12:02:49 -0700 (PDT)
 Received: from willemb.c.googlers.com.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea20ea8186sm22350467b3.4.2026.06.03.12.02.47
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea20ea8186sm22350467b3.4.2026.06.03.12.02.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 12:02:47 -0700 (PDT)
+        Wed, 03 Jun 2026 12:02:49 -0700 (PDT)
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -82,10 +84,12 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	horms@kernel.org,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 0/3] SO_TXTIME improvements
-Date: Wed,  3 Jun 2026 15:01:27 -0400
-Message-ID: <20260603190243.2789335-1-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next 1/3] net: ensure SCM_TXTIME delivery time is no older than system boot
+Date: Wed,  3 Jun 2026 15:01:28 -0400
+Message-ID: <20260603190243.2789335-2-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
+In-Reply-To: <20260603190243.2789335-1-willemdebruijn.kernel@gmail.com>
+References: <20260603190243.2789335-1-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,13 +102,13 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294883-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294884-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:willemb@google.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -124,41 +128,93 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AFD5563AC53
+X-Rspamd-Queue-Id: 5A2E163AC1C
 
 From: Willem de Bruijn <willemb@google.com>
 
-FQ targets monotonic timestamps as generated by the TCP stack.
+Limit input to sane values to avoid having to add tests later in the
+kernel hot path, e.g., in FQ.
 
-But SO_TXTIME was later added, which can send skbs with timestamps
-against other clocks. It is now possible to detect these through skb
-tstamp_type.
+SCM_TXTIME timestamps are converted to signed ktime_t when assigned to
+skb->tstamp. Avoid having negative values overflow into large positive
+ones when again used as u64, e.g., in FQ time_to_send.
 
-Make FQ robust by converting these timestamps for use in FQ (patch 2).
+For CLOCK_MONOTONIC, only allow positive values.
 
-This also requires testing against out-of-bounds values. Prefer to do
-this at the source, when parsing SCM_TXTIME (patch 1). But, tests in
-the hot path are still needed, to handle BPF sources.
+For CLOCK_REALTIME and CLOCK_TAI, allow equivalent values, i.e., no
+older than the boot of the machine.
 
-Extend the so_txtime selftest to handle this new case (patch 3).
+skb->tstamp zero is a special case signaling feature off. This is not
+converted between clockids.
 
-The last patch would have a conflict in net. This is not stable
-material, fine to go to net-next only.
+Handle the special case where the realtime clock is set so small that
+real - mono is negative, however unlikely in practice.
 
-Willem de Bruijn (3):
-  net: ensure SCM_TXTIME delivery time is no older than system boot
-  net_sched: sch_fq: convert skb->tstamp if not monotonic
-  selftests: drv-net: extend so_txtime with FQ with other clocks
+Ideally we would also set a sane upper bound, but that would require
+reading the clock, which is an expensive operation. Continue to defer
+that validation to users of the data. FQ already does this.
 
- net/core/sock.c                               | 32 +++++++++++++-
- net/sched/sch_fq.c                            | 43 ++++++++++++++++---
- .../selftests/drivers/net/so_txtime.py        | 18 ++++++--
- 3 files changed, 83 insertions(+), 10 deletions(-)
+Bound rather than return error on older timestamps. This is the
+existing policy e.g., in FQ.
 
+Fixes: 80b14dee2bea ("net: Add a new socket option for a future transmit time.")
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ net/core/sock.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/sock.c b/net/core/sock.c
+index f362e3ce1efb..dff48ef49a8c 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3041,12 +3041,42 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+ 		sockc->tsflags |= tsflags;
+ 		break;
+ 	case SCM_TXTIME:
++	{
++		ktime_t tmin;
++		u64 txtime;
++
+ 		if (!sock_flag(sk, SOCK_TXTIME))
+ 			return -EINVAL;
+ 		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u64)))
+ 			return -EINVAL;
+-		sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
++
++		txtime = get_unaligned((u64 *)CMSG_DATA(cmsg));
++
++		/* Allow sending without a delivery time: zero special case */
++		if (!txtime) {
++			sockc->transmit_time = 0;
++			break;
++		}
++
++		switch (sk->sk_clockid) {
++		case CLOCK_MONOTONIC:
++			tmin = 1;
++			break;
++		case CLOCK_REALTIME:
++			tmin = max(ktime_mono_to_real(0), 1);
++			break;
++		case CLOCK_TAI:
++			tmin = max(ktime_mono_to_any(0, TK_OFFS_TAI), 1);
++			break;
++		default:
++			tmin = 1;
++			WARN_ON_ONCE(1);
++			break;
++		};
++
++		sockc->transmit_time = max_t(ktime_t, txtime, tmin);
+ 		break;
++	}
+ 	case SCM_TS_OPT_ID:
+ 		if (sk_is_tcp(sk))
+ 			return -EINVAL;
 -- 
 2.54.0.1032.g2f8565e1d1-goog
 
