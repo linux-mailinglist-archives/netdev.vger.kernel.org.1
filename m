@@ -1,224 +1,158 @@
-Return-Path: <netdev+bounces-294728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294730-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3BBAJ/AVIGp8vgAAu9opvQ
-	(envelope-from <netdev+bounces-294728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:54:24 +0200
+	id OryeBKYdIGplwAAAu9opvQ
+	(envelope-from <netdev+bounces-294730-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 14:27:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA79F6373D4
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:54:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 580706377D2
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 14:27:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=SxYiqVKU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294728-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294728-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=a42iGW0J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294730-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294730-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 91C0330D40AC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 11:46:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3444833216C8
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 12:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9852C46AECD;
-	Wed,  3 Jun 2026 11:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4F446AEEA;
+	Wed,  3 Jun 2026 12:06:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5089E3ACA50
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 11:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BF846AF32;
+	Wed,  3 Jun 2026 12:06:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780487202; cv=none; b=mq/tYf/ldWcUUu/lRzg4lD9tYDQhmSLaLhvzelE/NcGt+Jm5DAYeN3InMrEoQwk6CybX6vGQN+UBBbRtIBcu2qukqbQJCbiUr3chBkY1lWSkAkJP/7/OlRpy9Yd5PKYCvGhEQwFU/TZoUF8dFE63pofxg5lOGrC/tOtLf+EPZPc=
+	t=1780488369; cv=none; b=HrDgRQDi2bqCowNTijQ1w1ORD1112IoV9UXFG9ZWFbzsjRNKoWiScEjhUChwZ5YYGTTerA94mk1sygTITu14uegqKHa8w/HrJss4PX6M8WxzQqzgr/D03P14/Dx5dg98DR9OFAu3/uCdMLYL1Z2+dBElnrNnaUF5MSiQ8Mbl/+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780487202; c=relaxed/simple;
-	bh=twJh+v61YmVOCdD3LU+n0f4tRtzRHvzSF5fUmm2ShPs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f/OnPzS5+wBocu6A9hBsJ+0R/BHmY5fox/P1nwr5i9TwLF2Gm2zsOhTPXbO4Y8o/noXwFiX51Ll70e4Vt9OdKxJyGcVazHtNvC8BpGLcg9Cpt44/8Xx1e5VkVh/QIGpo1F4VbLUcB2O4jMEXr6fFlgbt0aVBgU7RCTjrT9ksajY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SxYiqVKU; arc=none smtp.client-ip=192.198.163.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780487201; x=1812023201;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=twJh+v61YmVOCdD3LU+n0f4tRtzRHvzSF5fUmm2ShPs=;
-  b=SxYiqVKUf0+sacIKojMlNSMktdYJPkYmkIof3zluey4ehvM/63geSNCJ
-   jZbzUjCblM7iLhrVxnL66KOYa6rNjoKRTmh7ngNDA4DQMgjk4a3xscmo/
-   l18mXRhy+s2Dqa3A34L496UZvTxX4KMaMzk3/pR+1BxDy+RZg2wXOGB6l
-   uqoOyL5oI1AIewIXIZJJ9I+tWq2jHkybK5JeWyKeADn+JO+IpFrxtpzAC
-   SzL3Zit2OJX/AUL+xcsoMtLtU5p/qV6gjZFaHih6aOS6bjFzk2oOrkmVG
-   U2Ch05Z1MG1mzDh0G7w/GrUuqY7MVVpLp4PQesR6HCa0upMlso7Jzfz0z
-   w==;
-X-CSE-ConnectionGUID: 6REY10y6S6mxvILLRKDYXg==
-X-CSE-MsgGUID: DUrUnVyIRkG8dMZGjCS00g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11805"; a="81419466"
-X-IronPort-AV: E=Sophos;i="6.24,185,1774335600"; 
-   d="scan'208";a="81419466"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2026 04:46:41 -0700
-X-CSE-ConnectionGUID: UVJKNZSJR9G/qmzudOipxQ==
-X-CSE-MsgGUID: mYXpDeZ9R3K0PZ6JyTLlVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,185,1774335600"; 
-   d="scan'208";a="274446175"
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by orviesa002.jf.intel.com with ESMTP; 03 Jun 2026 04:46:38 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	aleksander.lobakin@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>
-Subject: [PATCH iwl-net v2] ice: fall back to SBQ when LL PHY timer interface times out
-Date: Wed,  3 Jun 2026 13:48:15 +0200
-Message-ID: <20260603114904.1297713-1-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1780488369; c=relaxed/simple;
+	bh=NmbHAu3ennAhplnj1Fpl+AtY5FcQ1oI8xfGz2tyLEoA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cz7wYt1MFolsx2KHkyXlkZZqmml8gGLxyN/Yf1NGbPcrWjvMqDohTRgdwR/pB9tK4t6kIB0Ymr/i4/rE8ubWcP6SEVr4CrkbGFb/hZM0e5v6AAsdz1LhcNmdcQo/9zn/EuNUYmHUvsgePt1HBWQI9PYiXrStafdXYsUqUs/HV4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a42iGW0J; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881281F00893;
+	Wed,  3 Jun 2026 12:06:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780488367;
+	bh=SZjPOv/TL2eeyJ8ESJhG8XL+zmnlxOPUTLCatLVqHlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=a42iGW0JUpcYV2qY/MmDEti2VM5i4sPIqbLHsIRFi/y2KjhHu8TmCQNTFGvDGr32v
+	 6wRIvMROqZ6C0KgIfI+DeDzezHgazqtF2qD9k4fSu9hwYr6vL2fcoG18BytF5M3cU2
+	 P68ddb6gMv7nIw7J/4+4DRrLXXbv6BQVKz/iarLRZU2ZBJGpEZ8WFAqVx5X7MZtjsR
+	 bWKwnBt9Quu5/EEUTnPQS6ydUpItZc1VXaD88HdUaE5EdkQzXrmpeITiBe3yhDmNsy
+	 rcrDh1Q73hicr2K7IuqmOLga+cU5VfatSYXOGmNUSovwuO5Gg115Oh1+KuHNFIvJ/t
+	 q4EhDHH5l1zfg==
+Date: Wed, 3 Jun 2026 13:06:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Gui-Dong Han <hanguidong02@gmail.com>
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com,
+	ecree.xilinx@gmail.com, linux-kernel@vger.kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, baijiaju1990@gmail.com
+Subject: Re: [PATCH] sfc: Use acquire/release for irq_soft_enabled
+Message-ID: <20260603120603.GD3410996@horms.kernel.org>
+References: <20260528092838.2099352-1-hanguidong02@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260528092838.2099352-1-hanguidong02@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294728-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksander.lobakin@intel.com,m:przemyslaw.korba@intel.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-294730-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,amd.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_RECIPIENTS(0.00)[m:hanguidong02@gmail.com,m:netdev@vger.kernel.org,m:linux-net-drivers@amd.com,m:ecree.xilinx@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:baijiaju1990@gmail.com,m:ecreexilinx@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:from_mime,intel.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EA79F6373D4
+X-Rspamd-Queue-Id: 580706377D2
 
-The low-latency (LL) PHY timer interface relies on a tight, atomic poll
-of the PF_SB_ATQBAL register with a 2ms timeout. After an NVM update /
-EMPR, FW may need significantly longer than 2ms to start responding to
-ATQBAL commands. The first PHY adjust or incval write issued by
-ice_ptp_rebuild_owner() fails with -ETIMEDOUT.
+On Thu, May 28, 2026 at 05:28:38PM +0800, Gui-Dong Han wrote:
+> irq_soft_enabled is a lockless gate for interrupt handlers. When clear,
+> handlers must only acknowledge interrupts and must not touch channel state.
+> 
+> Channel reallocation disables this gate, swaps and initializes channel
+> pointers, frees old channels, and then enables the gate again. READ_ONCE()
+> does not provide an acquire barrier, so an IRQ handler can observe the gate
+> as enabled while still seeing stale channel pointers or channel state.
+> 
+> Use release stores when updating the gate and acquire loads in interrupt
+> handlers before touching channels. Keep the existing smp_wmb() after gate
+> updates, preserving the current ordering with event queue start and stop.
+> 
+> Add small helpers to document the ordering and avoid repeating barrier
+> comments at every caller. Without the comments, checkpatch warns about
+> memory barriers without comments.
+> 
+> Fixes: d829118705f8 ("sfc: Rework IRQ enable/disable")
+> Fixes: 8127d661e77f ("sfc: Add support for Solarflare SFC9100 family")
+> Fixes: 5a6681e22c14 ("sfc: separate out SFC4000 ("Falcon") support into new sfc-falcon driver")
+> Fixes: 51b35a454efd ("sfc: skeleton EF100 PF driver")
+> Fixes: 6e173d3b4af9 ("sfc: Copy shared files needed for Siena (part 1)")
+> Signed-off-by: Gui-Dong Han <hanguidong02@gmail.com>
+> ---
+>  drivers/net/ethernet/sfc/ef10.c               |  4 ++--
+>  drivers/net/ethernet/sfc/ef100_nic.c          |  2 +-
+>  drivers/net/ethernet/sfc/efx_channels.c       |  4 ++--
+>  drivers/net/ethernet/sfc/falcon/efx.c         |  4 ++--
+>  drivers/net/ethernet/sfc/falcon/falcon.c      |  2 +-
+>  drivers/net/ethernet/sfc/falcon/farch.c       |  4 ++--
+>  drivers/net/ethernet/sfc/falcon/net_driver.h  | 12 ++++++++++++
+>  drivers/net/ethernet/sfc/net_driver.h         | 12 ++++++++++++
+>  drivers/net/ethernet/sfc/siena/efx_channels.c |  4 ++--
+>  drivers/net/ethernet/sfc/siena/farch.c        |  4 ++--
+>  drivers/net/ethernet/sfc/siena/net_driver.h   | 12 ++++++++++++
+>  11 files changed, 50 insertions(+), 14 deletions(-)
 
-Fix this by falling back to the existing SBQ-based PHY register write
-path when LL times out. This makes sure PTP is initialized when FW takes
-longer than expected to come back online.
+I'm not sure if it would be worth breaking this up, say on a per-driver
+basis. My main thinking here is that it might assist in backporting.
 
-Steps to reproduce:
-./nvmupdate64e -if devlink -f
-Update E810 card with nvmupdate64e, and observe dmesg errors:
-  Failed to write PHC increment value, status -110
-  PTP reset failed, error: -110 (-ETIMEDOUT)
+But, OTOH, I wonder if this should be targeted at net-next without
+the Fixes tag - can this manifest in an actual bug that effects users?
 
-Fixes: ef9a64c07294 ("ice: implement low latency PHY timer updates")
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
----
-v2:
-* add TIMEDOUT check in ice_prep_phy_adj_e810
-v1:
-https://lore.kernel.org/intel-wired-lan/20260511095830.1095984-1-przemyslaw.korba@intel.com/
----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 40 +++++++++++----------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+FTR, there is an Ai-generated review of this patch available on sashiko.dev.
+However, I believe that all the issues flagged there are pre-existing and
+can be examined in the context of possible follow-up. I do not believe they
+should block progress of this patch.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 2c18e16fe053..9cd323bd9739 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -4771,15 +4771,12 @@ static int ice_ptp_prep_phy_adj_ll_e810(struct ice_hw *hw, s32 adj)
- 				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
- 				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
- 				       REG_LL_PROXY_H);
--	if (err) {
--		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment using low latency interface\n");
--		spin_unlock_irq(&params->atqbal_wq.lock);
--		return err;
--	}
--
- 	spin_unlock_irq(&params->atqbal_wq.lock);
- 
--	return 0;
-+	if (err)
-+		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment using low latency interface\n");
-+
-+	return err;
- }
- 
- /**
-@@ -4800,8 +4797,13 @@ static int ice_ptp_prep_phy_adj_e810(struct ice_hw *hw, s32 adj)
- 	u8 tmr_idx;
- 	int err;
- 
--	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
--		return ice_ptp_prep_phy_adj_ll_e810(hw, adj);
-+	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update) {
-+		err = ice_ptp_prep_phy_adj_ll_e810(hw, adj);
-+		if (!err)
-+			return 0;
-+		ice_debug(hw, ICE_DBG_PTP, "LL adj failed (%d), falling back to SBQ\n",
-+			  err);
-+	}
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
-@@ -4864,15 +4866,12 @@ static int ice_ptp_prep_phy_incval_ll_e810(struct ice_hw *hw, u64 incval)
- 				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
- 				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
- 				       REG_LL_PROXY_H);
--	if (err) {
--		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment using low latency interface\n");
--		spin_unlock_irq(&params->atqbal_wq.lock);
--		return err;
--	}
--
- 	spin_unlock_irq(&params->atqbal_wq.lock);
- 
--	return 0;
-+	if (err)
-+		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment using low latency interface\n");
-+
-+	return err;
- }
- 
- /**
-@@ -4890,8 +4889,13 @@ static int ice_ptp_prep_phy_incval_e810(struct ice_hw *hw, u64 incval)
- 	u8 tmr_idx;
- 	int err;
- 
--	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
--		return ice_ptp_prep_phy_incval_ll_e810(hw, incval);
-+	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update) {
-+		err = ice_ptp_prep_phy_incval_ll_e810(hw, incval);
-+		if (!err)
-+			return 0;
-+		ice_debug(hw, ICE_DBG_PTP, "LL incval failed (%d), falling back to SBQ\n",
-+			  err);
-+	}
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 	low = lower_32_bits(incval);
+Overall, this looks good to me.
 
-base-commit: 80b47e88f7ead00b0795e9f2833f1d0cafe11d90
--- 
-2.43.0
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
