@@ -1,163 +1,139 @@
-Return-Path: <netdev+bounces-294523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294526-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lK7aEwyTH2pjnQAAu9opvQ
-	(envelope-from <netdev+bounces-294523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:35:56 +0200
+	id RPLtNGKUH2qTnQAAu9opvQ
+	(envelope-from <netdev+bounces-294526-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:41:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF80633AC1
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:35:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D53A8633AE9
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:41:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=cBhK3Jv9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294523-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294523-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=Wi4ymjTG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294526-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294526-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 312593045D09
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:35:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1E0C4301A2ED
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9023D6CDC;
-	Wed,  3 Jun 2026 02:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BD93DC4B1;
+	Wed,  3 Jun 2026 02:41:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2E11B983F;
-	Wed,  3 Jun 2026 02:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD563822AA;
+	Wed,  3 Jun 2026 02:41:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780454151; cv=none; b=O1WE0HCowhYXe4FJ/arspjgUdrmAXXhEA8XBcqpxW/269RexmtJM2D4uG43CpdeR3eeftrZNYMo7LyDxkHLMklX56W19z6WUnavE9tSunoklrBqwkd/XldesuT+rXRoxzOkT34jOE4VMTeCMVZhPnqj7fYR34K+NBi2wBA0GyXA=
+	t=1780454491; cv=none; b=D4w1uu6QkJzuc9ZhHJL1nfuSYUHKc32fmsyNi2JVWx95sfxl3AShvfuOWtV2ZxTyNKjRyvDf6xgzzJOBBQhKt64NUmXSHsiU83tFVVzXNG8gLBXnBNIpSTjBHM0erIFhBsmpGc7lQdwOeNzksnqrr7TjEoGogILxXr86pbbJpx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780454151; c=relaxed/simple;
-	bh=WB5c4KZVKOvzdRK9kuSId8bTDm+bZtQ/TyrYLqjejYE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rP6fu850PyoUjQz250b9MKw9GV0sLzYBFOzs1P2m37b+CGw8ksR7w5xqmQx3nx65JwGU1DDwP3Cj2emqApa2RNC9+aKlYHd4d/S0fpLE3gbiYJi19NEZW5yKAH8shul0WJf8ASYnHFriOuJSgkYI9R44NwSAG4wzBu53otYKfCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=cBhK3Jv9; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6532Z8Rt83479927, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1780454109;
-	bh=WB5c4KZVKOvzdRK9kuSId8bTDm+bZtQ/TyrYLqjejYE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=cBhK3Jv94REoZRjZe0/dSVNl1XDYcqS+fPFms/g43gCgnOASpIhb8bv+I5X0NqZsd
-	 F/iyKdO+3gOV69NCRNqWanz1VihWaglqye9cL9AkLZXkhrOF1irBVwf7P34XyzR7Rf
-	 6cNncKSHFDMT2g7dCZMVAWUi/YVznOHbLvyYczu1kSFtk+jUjEOx5lq+U/OOZQYff4
-	 TQ2TG+MRkNOn4voGYH1xRWAoqnPV8dLO7Ro1xbep6aNa9jjMaYOd2IAqHoDRsEzkFX
-	 m/BgAaVhb2OzzhzPu0w+v7drPi5i2WoOv9BuQ6lKd08S4it5sIzRPfYYQVnLX9BnHr
-	 ptefXbrFIUVQg==
-Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6532Z8Rt83479927
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 3 Jun 2026 10:35:08 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 3 Jun 2026 10:35:07 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Wed,
- 3 Jun 2026 10:35:07 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Andrew Lunn <andrew@lunn.ch>, Nicolai Buchwitz <nb@tipi-net.de>
-CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	=?gb2312?B?ucvP/r78?= <freddy_gu@realsil.com.cn>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "daniel@makrotopia.org"
-	<daniel@makrotopia.org>, "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>
-Subject: RE: [PATCH net-next v1 1/2] net: phy: realtek: add support for
- RTL8261
-Thread-Topic: [PATCH net-next v1 1/2] net: phy: realtek: add support for
- RTL8261
-Thread-Index: AQHc7ncQCbYjlfoUyUunc+IUY0+96LYkLbmegAf4TOA=
-Date: Wed, 3 Jun 2026 02:35:07 +0000
-Message-ID: <b7a623057b07403fbf52061ae1d6dc09@realsil.com.cn>
-References: <20260528075226.1054-1-javen_xu@realsil.com.cn>
- <20260528075226.1054-2-javen_xu@realsil.com.cn>
- <d37ead5b1f9549d4903138cc4f70ffd0@tipi-net.de>
- <048a1319-f3c6-487f-901b-f303c7d40a1b@lunn.ch>
-In-Reply-To: <048a1319-f3c6-487f-901b-f303c7d40a1b@lunn.ch>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1780454491; c=relaxed/simple;
+	bh=SvFxDoSmTme3bag0LC+3wu3y0fsNiyyEDYrRWLDqLMA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hdg6qjk1YQKkM0sxnoAK9jgIktcJ3/fLVgCA45Qlqljgg5eKfeXSOZWS6PQZjCPvE/2tuBDdI71tnDFBW+iw32nrvjH8P+fK2sGXbwJvmmKbz+w2b0nxr1bFSPJsGyUQfMNFi9LBEbwW+LhqSXNOwBnKj9Ve1BmaSCHHbZMd7Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Wi4ymjTG; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=D37xiTtxF0fUm4ed9JLFHPGoRO7k+Z17+W07ncHTMTA=; b=Wi4ymjTGgcL6Ix7S3gtL1OKlPx
+	KA4C5pr9335Z6phBWyyaPL+5LzUJIMLp0xmFaSPnX04ukvu2fkHfNjv6jzf2/kqJZ8wNJQBTWsxyL
+	Hna0AAGbu9fJYTdWFbtXtOLTEbOcHSnmQvnudP8Wtu91I9a1jJADImoMs+XhBCaNewvY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wUbXd-005oLe-LW; Wed, 03 Jun 2026 04:41:13 +0200
+Date: Wed, 3 Jun 2026 04:41:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Luke Howard <lukeh@padl.com>
+Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bridge@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, Max Hunter <max@huntershome.org>,
+	Kieran Tyrrell <kieran@sienda.com>
+Subject: Re: [PATCH net-next v2 5/6] net: dsa: mv88e6xxx: MQPRIO support
+Message-ID: <72af0cfc-9011-4713-9862-710eea5f1cb0@lunn.ch>
+References: <20260602-mv88e6xxx-8021qat-mqprio-v2-0-72be14522e7c@padl.com>
+ <20260602-mv88e6xxx-8021qat-mqprio-v2-5-72be14522e7c@padl.com>
+ <t44kmhk6gqxnwhdvo7svouexwelwsya7zgukpbv3cxpfsmutqa@y3rjoj3tvqce>
+ <A662D3F9-18DD-43C9-A43D-912E5A8A4360@padl.com>
+ <8C6AD966-2C28-4BEF-95C4-1B2AC3751513@padl.com>
+ <29c09316-c911-456e-acc5-e18402da4bd4@lunn.ch>
+ <0402DFFF-634A-40C4-BC1E-B038F20926FF@padl.com>
+ <89BA4203-110E-4767-895C-A2808602FAF8@padl.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89BA4203-110E-4767-895C-A2808602FAF8@padl.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294523-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:nb@tipi-net.de,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,vger.kernel.org,makrotopia.org,nxp.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294526-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lukeh@padl.com,m:cedric.jehasse@gmail.com,m:jiri@resnulli.us,m:ivecera@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:shuah@kernel.org,m:olteanv@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bridge@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:max@huntershome.org,m:kieran@sienda.com,m:cedricjehasse@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,redhat.com,davemloft.net,google.com,kernel.org,blackwall.org,nvidia.com,lunn.ch,vger.kernel.org,lists.linux.dev,huntershome.org,sienda.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,realsil.com.cn:mid,realsil.com.cn:from_mime,realsil.com.cn:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DCF80633AC1
+X-Rspamd-Queue-Id: D53A8633AE9
 
-Pg0KPj4gPiArc3RhdGljIGludCBydGw4MjYxeF9jb25maWdfbWFzdGVyX3NsYXZlKHN0cnVjdCBw
-aHlfZGV2aWNlICpwaHlkZXYpDQo+PiA+ICt7DQo+PiA+ICsgICB1MTYgdmFsOw0KPj4gPiArICAg
-LyoNCj4+ID4gKyAgICAqIENvbmZpZ3VyZSBiaXRzIDE1OjE0IG9mIE1NRCA3LjB4MDAyMA0KPj4g
-PiArICAgICoNCj4+ID4gKyAgICAqIEJpdCAxNSAoRW5hYmxlKSB8IEJpdCAxNCAoVmFsdWUpIHwg
-TW9kZQ0KPj4gPiArICAgICogLS0tLS0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tfC0tLS0t
-LS0tLS0tLS0NCj4+ID4gKyAgICAqICAgICAgIDAgICAgICAgICB8ICAgICAgIDAgICAgICAgIHwg
-QXV0byAoZGlzYWJsZWQpDQo+PiA+ICsgICAgKiAgICAgICAxICAgICAgICAgfCAgICAgICAwICAg
-ICAgICB8IEZvcmNlIFNsYXZlDQo+PiA+ICsgICAgKiAgICAgICAxICAgICAgICAgfCAgICAgICAx
-ICAgICAgICB8IEZvcmNlIE1hc3Rlcg0KPj4gPiArICAgICovDQo+PiA+ICsgICBzd2l0Y2ggKHBo
-eWRldi0+bWFzdGVyX3NsYXZlX3NldCkgew0KPj4gPiArICAgY2FzZSBNQVNURVJfU0xBVkVfQ0ZH
-X01BU1RFUl9GT1JDRToNCj4+ID4gKyAgICAgICAgICAgdmFsID0gUlRMODI2MVhfTVNfTUFTVEVS
-Ow0KPj4gPiArICAgICAgICAgICBicmVhazsNCj4+ID4gKyAgIGNhc2UgTUFTVEVSX1NMQVZFX0NG
-R19TTEFWRV9GT1JDRToNCj4+ID4gKyAgICAgICAgICAgdmFsID0gUlRMODI2MVhfTVNfU0xBVkU7
-DQo+PiA+ICsgICAgICAgICAgIGJyZWFrOw0KPj4gPiArICAgY2FzZSBNQVNURVJfU0xBVkVfQ0ZH
-X1VOS05PV046DQo+PiA+ICsgICBjYXNlIE1BU1RFUl9TTEFWRV9DRkdfTUFTVEVSX1BSRUZFUlJF
-RDoNCj4+ID4gKyAgIGNhc2UgTUFTVEVSX1NMQVZFX0NGR19TTEFWRV9QUkVGRVJSRUQ6DQo+PiA+
-ICsgICBkZWZhdWx0Og0KPj4gPiArICAgICAgICAgICB2YWwgPSBSVEw4MjYxWF9NU19BVVRPOw0K
-Pj4gPiArICAgICAgICAgICBicmVhazsNCj4+ID4gKyAgIH0NCj4+ID4gKw0KPj4gPiArICAgcmV0
-dXJuIHBoeV9tb2RpZnlfbW1kKHBoeWRldiwgTURJT19NTURfQU4sDQo+UlRMODI2MVhfTVVMVElH
-X0NUUkwsDQo+PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgUlRMODI2MVhfTUFTVEVSX1NM
-QVZFX01BU0ssIHZhbCk7IH0NCj4+DQo+PiBSVEw4MjYxWF9NVUxUSUdfQ1RSTCBpcyBhIElFRUUt
-ZGVmaW5lZCByZWdpc3Rlciwgc28gaXQgY2FuIHVzZQ0KPj4gTURJT19BTl8xMEdCVF9DVFJMIGlu
-c3RlYWQuDQo+PiBBbHNvIHRoZSBkZWZpbmUgZm9yIFJUTDgyNjFYX01VTFRJR19DVFJMIGNhbiBi
-ZSBkcm9wcGVkLg0KPj4NCj4+IFdoaWxlIGF0IGl0IEkgd291bGQgc3VnZ2VzdCB0byBhZGQgTURJ
-T19BTl8xMEdCVF9DVFJMX01TX0VOQUJMRSAoYml0DQo+PiAxNSkgYW5kIE1ESU9fQU5fMTBHQlRf
-Q1RSTF9NU19WQUxVRSAoYml0IDE0KSB0bw0KPj4gaW5jbHVkZS91YXBpL2xpbnV4L21kaW8uaCBh
-bmQgYWxzbyBtYWtlIHVzZSBvZiBpdC4NCj4+IFJUTDgyNjFYX01TX0FVVE8gd291bGQgYmVjb21l
-DQo+DQo+SWYgdGhpcyBpcyBhbGwganVzdCBzdGFuZGFyZCA4MDIuMywgdGhlIGZ1bmN0aW9uIHNo
-b3VsZCBiZSBhZGRlZCB0byBwaHktYzQ1LmMsIHNvDQo+aXQgY2FuIGJlIHVzZWQgYnkgYW55IFBI
-WSBkcml2ZXIuDQo+DQo+ICAgICAgICBBbmRyZXcNCg0KVGhhbmtzIGZvciB5b3Ugc3VnZ2VzdGlv
-bnMuIEFsbCB0aGUgY2hhbmdlcyB3aWxsIGJlIGFkZGVkIGludG8gbmV4dCB2ZXJzaW9uLg0KDQpC
-UnMsDQpKYXZlbg0K
+> We could add (e.g.) bridge_setup_tc to dsa_switch_ops, which (in the
+> mv88e6xxx implementation) could validate the bridge contained all
+> user ports. But it would not be possible to block a port from
+> leaving as port_bridge_leave cannot return an error, and tearing
+> MQPRIO config down silently would be a different sort of bad.
+
+There can be multiple bridges, even as far as one bridge per port.
+
+For switch wide properties, you basically have to allow the first user
+to configure it, refcount additional users get added and removed, and
+only allow the last user to change it.
+
+The alternative is return -EOPNOTSUPP, and let the kernel do it in
+software, if a user wants something different to the global
+setting. The hardware is only there to accelerate what Linux can
+already do in software. That is the model we use.
+
+     Andrew
 
