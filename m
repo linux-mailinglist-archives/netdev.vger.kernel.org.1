@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-294813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294814-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zo5PFmNSIGoV1AAAu9opvQ
-	(envelope-from <netdev+bounces-294813-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 18:12:19 +0200
+	id CdZiKT9JIGrV0AAAu9opvQ
+	(envelope-from <netdev+bounces-294814-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:33:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADE1F639957
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 18:12:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 430136393B6
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:33:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eiwB42KR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294813-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294813-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jK2FSdBv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294814-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294814-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A92D330C4741
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 15:27:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 253103072E2C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 15:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84613CD8BB;
-	Wed,  3 Jun 2026 15:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03D63D9DCF;
+	Wed,  3 Jun 2026 15:24:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900213D522C
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 15:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69E53D905D
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 15:24:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780500239; cv=none; b=OOagyOjrvn/siv4pnWvSjyqLK26aAxFqdVRFYNvIRGsHmAEG1W6gvoloa8Jf2vKA47H2HfDxTj8+JjQuHvcFtrmMwgSFRWn8lx5AsGn5KC+HCxMABK1NUM82ZXkp+ebcV6B1lIYNPmBgD1E2sjUX34LxrzeoMni0WhZB4Hccof0=
+	t=1780500274; cv=none; b=PWwwBK4YoES6PKQdjRw4caW2J53YgXovHGG1c7KmIV9hKV8isWrF9630iPirvC04t1xIGTJ+nVLILjpe+NGX+/L2etVE2E4XF63GBFGCIjGHwKkE75bjlO2VxMre43VOxMzsfOgeM9Ye6QRQutO+x5CLHO+wKs/e5vfxnHllnMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780500239; c=relaxed/simple;
-	bh=vRPY8IVMxncuydJzDvs9L/UnNO6Y3NL0spYHvmZmZt8=;
+	s=arc-20240116; t=1780500274; c=relaxed/simple;
+	bh=XaIM7zKG2oULZ98oxTQyUI/WBSYxtPGx4M0SHKrpMUk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kReGmQWClG2hi7DaGxnYeBxF0K0Qo9sTW9FNGZvWEdLASSJ8kui94RZLimfCHml2kFLPMLmCQY1+UWvoJfoXgLynJgNNMbAoKMcZHKIO8WryyZEw8TtotHPVNxvAy21mCj5GnVBGlQP/fWALhGXxgB9WdCueaYKOneIh2QRzS7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eiwB42KR; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 163661F00893;
-	Wed,  3 Jun 2026 15:23:56 +0000 (UTC)
+	 MIME-Version; b=fN2oU69SnYbJDOQ7+CzpC4oUUlpVSOi65ec4ecRqQGQ7ggdAzQ9TeqZqEe3/yYAoX91okR87fVScloDGm4mNDQSPplK61T5YkZSY/tcmQhf4pCH+q7jBX3LcVVvr2eG7Avm3QPc6OhRUshymKH12WS5Nb4z5eKyTEz+lMF+qjTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jK2FSdBv; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C44F1F00893;
+	Wed,  3 Jun 2026 15:24:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780500238;
-	bh=wvfRUZtfuJ4psmTYEeP0sco4QIXX7+GAYLk2Oha/pJ8=;
+	s=k20260515; t=1780500273;
+	bh=XssGD0QMEZ8GmnbPrn0JxuHA1sjmRZjJxeTvc9w73C8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eiwB42KRJLTaOthJna0ARn4hTQJP2hoNty36f8hzpja8Eyj6R+r+w4KCa2j7aEVv2
-	 nWshDXPI5ddGFaRxLQ2wwKZbVpw86wKHyQdG4ws+wx83OVYppN1DHsGAIaAWaTTTsT
-	 5d+d2u+qwEMiZTLLcMhCCZysdWSPy4jpgoYqEKVCNW5bnoWJLZ/GaQQIG78BYM+Vb8
-	 cUOOWAqIz8QEocg1kwuXnX2xTXawdoXqYrMpRmg3cWENn4Yv3X8lHq/9eyLyyKoBmu
-	 LQ762lD8fTSh9ZD9Aiy2WsnQGreGqw/NlZOYInRwFge8fc9bvX+qDL4TDGI0tpkZEv
-	 9vilpYAhcDLCg==
+	b=jK2FSdBv/M44B2x84UHgef1IqURmLSZFFcQ3it195veF2CTt4GLb9d/Z/SqhJGvP4
+	 p385FX4SsJGgH5Xxoe3o+mBND9HWi/4ltieoJ+BJrDmOYod7BQ598sfLaGVNBQdXHO
+	 tYO2ZUO9l5hwJa2IydtG96N2P3FBescSPwbCzsogV5tRDssEqoiyolrTFdo/2QTFDY
+	 ySCMzJcyXqPVAsizkftK4hgTiAQc51j9cyRBFOZVc1X+llH1Moz/KVkAl0NFkxeJXu
+	 rQLPRrzvrCDdG7DyKk1hOeTWB9MhdPMAmkWCGPxOFX9ngnTSdrlrV4ib1QH+VCNcVr
+	 oQuyEXCxBOgtg==
 From: Simon Horman <horms@kernel.org>
 To: mengyuanlou@net-swift.com
 Cc: 'Simon Horman' <horms@kernel.org>,
 	netdev@vger.kernel.org,
 	jiawenwu@trustnetic.com,
 	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net-next v3 2/3] net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
-Date: Wed,  3 Jun 2026 16:23:25 +0100
-Message-ID: <20260603152324.3795898-2-horms@kernel.org>
+Subject: Re: [PATCH net-next v3 3/3] net: libwx: support vf hardware statistics
+Date: Wed,  3 Jun 2026 16:24:18 +0100
+Message-ID: <20260603152417.3797775-2-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260529075147.88398-3-mengyuanlou@net-swift.com>
-References: <20260529075147.88398-3-mengyuanlou@net-swift.com>
+In-Reply-To: <20260529075147.88398-4-mengyuanlou@net-swift.com>
+References: <20260529075147.88398-4-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,14 +71,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294813-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294814-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:mengyuanlou@net-swift.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -95,11 +95,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ADE1F639957
+X-Rspamd-Queue-Id: 430136393B6
 
 From: 'Simon Horman' <horms@kernel.org>
 
@@ -107,119 +107,138 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev
 ---
-net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
+net: libwx: support vf hardware statistics
 
-This change wires wx_set_coalesce() into wx_ethtool_ops_vf and
-dispatches the per-vector ITR write through wx_write_eitr_vf() when
-operating on a virtual function.
+This patch adds an ethtool -S path for Wangxun VF netdevs, introduces a
+VF-specific stats string array, and gates the hardware register reads in
+wx_update_stats() so that VF callers skip them.
 
 > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> index 6d8fcddde6fa..30c6ef6103ac 100644
+> index 30c6ef6103ac..a12e1205ce80 100644
 > --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
 > +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> @@ -488,7 +489,10 @@ int wx_set_coalesce(struct net_device *netdev,
->  		else
->  			/* rx only or mixed */
->  			q_vector->itr = rx_itr_param;
-> -		wx_write_eitr(q_vector);
-> +		if (wx->pdev->is_virtfn)
-> +			wx_write_eitr_vf(q_vector);
-> +		else
-> +			wx_write_eitr(q_vector);
->  	}
-
-[High]
-After this change wx_set_coalesce() is reachable on the VF path, but
-the validation and the values computed for q_vector->itr come from
-the PF logic earlier in the same function:
-
-	switch (wx->mac.type) {
-	case wx_mac_sp:
-		max_eitr = WX_SP_MAX_EITR;
-		rx_itr_param = WX_20K_ITR;
-		tx_itr_param = WX_12K_ITR;
-		break;
-	case wx_mac_aml:
-	case wx_mac_aml40:
-		max_eitr = WX_AML_MAX_EITR;
-		rx_itr_param = WX_20K_ITR;
-		tx_itr_param = WX_12K_ITR;
-		break;
-	default:
-		max_eitr = WX_EM_MAX_EITR;
-		rx_itr_param = WX_7K_ITR;
-		tx_itr_param = WX_7K_ITR;
-		break;
-	}
-
-	if ((ec->rx_coalesce_usecs > (max_eitr >> 2)) ||
-	    (ec->tx_coalesce_usecs > (max_eitr >> 2)))
-		return -EINVAL;
-
-The VF write helper masks with a 9-bit field:
-
-void wx_write_eitr_vf(struct wx_q_vector *q_vector)
-{
-	...
-	itr_reg = q_vector->itr & WX_VXITR_MASK;
-	...
-}
-
-with WX_VXITR_MASK = GENMASK(8, 0) = 0x1FF, while the PF max_eitr
-constants used to bound ec->rx_coalesce_usecs / ec->tx_coalesce_usecs
-are WX_SP_MAX_EITR=0xFF8, WX_AML_MAX_EITR=0xFFF and
-WX_EM_MAX_EITR=0x7FFC.
-
-Can any q_vector->itr value greater than 511 be silently truncated by
-this VF path?  For example, on a wx_mac_sp VF, an
-ec->rx_coalesce_usecs of 128 yields q_vector->itr = 512, which
-becomes register value 0 (no coalescing) after the mask, while
-wx_get_coalesce() reports back the original wx->rx_itr_setting and
-hides the mismatch from the user.
-
-Does the wx_mac_em default also misbehave here?  When adaptive is
-disabled and the defaults are picked, rx_itr_param/tx_itr_param =
-WX_7K_ITR = 595, and 595 & 0x1FF = 83, so the VF programs a value
-unrelated to the requested 7K rate.
-
-[High]
-For wx_mac_aml / wx_mac_aml40, wx_set_coalesce() computes the same
-q_vector->itr for PF and VF, but the two write helpers differ in how
-they encode it:
-
-void wx_write_eitr(struct wx_q_vector *q_vector)
-{
-	...
-	case wx_mac_aml:
-	case wx_mac_aml40:
-		itr_reg = (q_vector->itr >> 3) & WX_AML_MAX_EITR;
-		break;
-	...
-}
-
-void wx_write_eitr_vf(struct wx_q_vector *q_vector)
-{
-	...
-	itr_reg = q_vector->itr & WX_VXITR_MASK;
-	...
-}
-
-txgbevf_sw_init() sets wx->mac.type = wx_mac_aml, so on aml VFs the
-same ec->rx_coalesce_usecs setting now programs the hardware with a
-value 8x different from the equivalent PF setting.
-
-Is the VF ITR register on aml expected to have the same time-base as
-the PF (in which case the >>3 scaling is missing in
-wx_write_eitr_vf() for aml), or a different time-base (in which case
-the rx_itr_param / tx_itr_param defaults shared with the PF in the
-wx_mac_aml case of wx_set_coalesce() do not match the VF)?
-
-> @@ -844,6 +848,7 @@ static const struct ethtool_ops wx_ethtool_ops_vf = {
->  	.set_ringparam		= wx_set_ringparam_vf,
->  	.get_msglevel		= wx_get_msglevel,
->  	.get_coalesce		= wx_get_coalesce,
-> +	.set_coalesce		= wx_set_coalesce,
->  	.get_ts_info		= ethtool_op_get_ts_info,
->  	.get_link_ksettings	= wx_get_link_ksettings_vf,
+> @@ -48,6 +48,10 @@ static const struct wx_stats wx_gstrings_stats[] = {
+>  	WX_STAT("rx_hwtstamp_cleared", rx_hwtstamp_cleared),
 >  };
+>  
+> +static const struct wx_stats wx_gstrings_stats_vf[] = {
+> +	WX_STAT("non_eop_descs", non_eop_descs),
+> +};
+
+[Medium]
+The subject says "support vf hardware statistics" and the changelog says
+"Add support to show hardware statistics for ethtool -S ethx", but the
+only entry in wx_gstrings_stats_vf[] is non_eop_descs, which is a pure
+software counter accumulated from per-ring rx_stats.non_eop_descs by the
+driver fast path in wx_lib.c rather than read from any hardware register.
+
+[Low]
+Is there a reason only non_eop_descs is exposed for VFs? wx_update_stats()
+already aggregates six per-queue software counters that are equally valid
+on a VF (non_eop_descs, alloc_rx_buff_failed, hw_csum_rx_good,
+hw_csum_rx_error, restart_queue, tx_busy), and the ethtool -S string list
+is in practice a stable interface that monitoring tools key on by name, so
+each future addition will churn it.
+
+> +
+>  static const struct wx_stats wx_gstrings_fdir_stats[] = {
+>  	WX_STAT("fdir_match", stats.fdirmatch),
+>  	WX_STAT("fdir_miss", stats.fdirmiss),
+> @@ -69,7 +73,9 @@ static const struct wx_stats wx_gstrings_rsc_stats[] = {
+>  #define WX_QUEUE_STATS_LEN ( \
+>  		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
+>  		(sizeof(struct wx_queue_stats) / sizeof(u64)))
+> -#define WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
+> +#define WX_GLOBAL_STATS_LEN (wx->pdev->is_virtfn ? \
+> +		ARRAY_SIZE(wx_gstrings_stats_vf) : \
+> +		ARRAY_SIZE(wx_gstrings_stats))
+
+[Low]
+WX_GLOBAL_STATS_LEN was previously a compile-time constant. The new
+definition silently requires every caller of WX_GLOBAL_STATS_LEN /
+WX_STATS_LEN to have a local variable named exactly wx of type
+struct wx * already initialised in scope.
+
+That hidden contract is the reason wx_get_drvinfo() had to be reordered in
+this same patch:
+
+-	unsigned int stats_len = WX_STATS_LEN;
+ 	struct wx *wx = netdev_priv(netdev);
++	unsigned int stats_len;
+
++	stats_len = WX_STATS_LEN;
+
+A future caller using a different identifier (priv, adapter), reaching
+the macro before wx is initialised, or using it as a static initialiser /
+array size, will fail in non-obvious ways. Would a static inline helper
+such as wx_global_stats_len(struct wx *wx) be preferable to a function-like
+macro that captures an identifier from the caller's scope?
+
+>  #define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
+>  #define WX_RSC_STATS_LEN  ARRAY_SIZE(wx_gstrings_rsc_stats)
+>  #define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> index 260e14d5d541..ce172b6deb80 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> @@ -2917,6 +2917,9 @@ void wx_update_stats(struct wx *wx)
+>  	wx->restart_queue = restart_queue;
+>  	wx->tx_busy = tx_busy;
+>  
+> +	if (wx->pdev->is_virtfn)
+> +		goto skip_hw_stats;
+> +
+
+[Medium]
+With this skip in place, none of the values exposed for a VF originate
+from hardware, every rd32/rd64 against MMIO is bypassed. Should the
+subject and changelog be reworded to describe what the patch actually
+does, for example exposing VF software per-queue counters via ethtool -S?
+
+>  	wx_update_xoff_rx_lfc(wx);
+>  
+>  	hwstats->gprc += rd32(wx, WX_RDM_PKT_CNT);
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+> index 26de78e9a69e..ee0b10c71b56 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+> @@ -336,6 +337,7 @@ void wxvf_down(struct wx *wx)
+>  	netif_tx_disable(netdev);
+>  	netif_carrier_off(netdev);
+>  	wx_napi_disable_all(wx);
+> +	wx_update_stats(wx);
+>  	wx_reset_vf(wx);
+
+[Medium]
+Is this wx_update_stats(wx) call reachable as anything other than a
+no-op? wxvf_down() begins with:
+
+	if (test_and_set_bit(WX_STATE_DOWN, wx->state))
+		return;
+
+so by the time the new call runs, WX_STATE_DOWN is already set. And
+wx_update_stats() starts with:
+
+	if (test_bit(WX_STATE_DOWN, wx->state) ||
+	    test_bit(WX_STATE_RESETTING, wx->state))
+		return;
+
+The reset path has the same property, since wxvf_reinit_locked() sets
+WX_STATE_RESETTING before calling wxvf_down().
+
+If the intent is to fold the final per-queue counters into the wx
+aggregates before wx_reset_vf() and the ring cleanup, would it work to
+move the call before WX_STATE_DOWN is set, or use a path that bypasses
+the gating bits?
+
+>  
+>  	wx_clean_all_tx_rings(wx);
+
+[ ... ]
 
