@@ -1,619 +1,1782 @@
-Return-Path: <netdev+bounces-294626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qA5SDnzZH2pCrAAAu9opvQ
-	(envelope-from <netdev+bounces-294626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:36:28 +0200
+	id tuznLfjcH2pvrQAAu9opvQ
+	(envelope-from <netdev+bounces-294633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:51:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C3063545B
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:36:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF83D63563F
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:51:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=PqTJgpRT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294626-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294626-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=simonwunderlich.de;
+	dkim=pass header.d=microchip.com header.s=mchp header.b=A4QURAms;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294633-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294633-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microchip.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 379C5310FC51
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:26:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CF1D3032593
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F13A402426;
-	Wed,  3 Jun 2026 07:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1D94048A7;
+	Wed,  3 Jun 2026 07:26:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4533FF1D9
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB08C403E98;
+	Wed,  3 Jun 2026 07:26:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471545; cv=none; b=EojRGh6Ojpn+tgMWPVmurWTjUzenKc6PCf+ZhQwnhK81LhVLgkZXyiUXFOMDCBH70XlWSIRu/YBhnMs9h10TsXLBAZqligoG+qPEUyQ9ITgqqHVaskswSJHKBYO1yKWsN7xlUdWZQDtn8uiBIlHSBQ/n21jbQXDaEJlcuNzZkAM=
+	t=1780471587; cv=none; b=hccxDhDHwJcVJbwMM/JQ0i3hNJ1iRTntgNnax5La6l7qjtP2YDbuV6u8zDjd5o7aRb/PcV/oyS1hG5LnQVrUGIsppzOuzYgjL/6BjlEQDi75jF95RmR7qruaqBfQBzpgCkPjssSfbbe3dwbAu4BmqhT9W0afClyaeNZjMuWrM3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471545; c=relaxed/simple;
-	bh=MVP92nb0TuJX8iwUdVVgoPQgzmngGDXMnyQANrasxDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lpx8uWG4dwq3dGDzofDxrVz3Ryt8JzKmt0cORX3QZP1yhPqDYqgiTyJTke7MOvN9HfTtIMLUdMKD1/OJHPc6IRATyZohztGywIFhGQuJgmLf2L2FeNOVQ+mJfuyFW8qx6/t034xrm0d3tPyzDL7/+U4DRNWws2Xk90XEAla3grA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=PqTJgpRT; arc=none smtp.client-ip=23.88.38.48
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1780471536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/+tmZFZ4ZG3zm0KZmDyNH0yR4CYfqYO1qwrdz0gNBz4=;
-	b=PqTJgpRTrKCsjsCYTTPo+aIyNHTjpPd8US7+2+7Cfs/DzaXVR20cXjlN66MrZv35vuhOYx
-	yniMELdEX+iGaauD8hYi1txLMkJIKlMgiiO7TWUFuLwSomXfqpIcnc/2r/k2cowZsuAJ1O
-	Y2t+5K11t6KEQ18zoxx0c8ZKKu3wsMiCtwrnhOM4Q4c/+oCZ9919N80CNNDD84+qXcwRO6
-	QaMK/C1HjC4bP/tyubnE/fUXDAxYq8hELyzj5XJoMyGT9zeMqi2e6Xbdezc3WOIC80qGmp
-	KSnDYMnjyXrEMO+7lHGd3p2rSz/IMU31Y08Y3+zpc+QhpNOf0ZKV/4RK1sDZjQ==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net-next 11/15] batman-adv: tp_meter: consolidate congestion control variables
-Date: Wed,  3 Jun 2026 09:25:22 +0200
-Message-ID: <20260603072527.174487-12-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260603072527.174487-1-sw@simonwunderlich.de>
-References: <20260603072527.174487-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1780471587; c=relaxed/simple;
+	bh=XbcjWcENgjOMiCNfkTcUcO7q8iqN2ffSdDY4J+UUiHA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=p4a71wU55/833CKizuxEawHvFIUhtn+bHrIzfXx52VKWgadLIQGWFgWUgOk0WhBuDx629QtKgYJJ6rJANpgdmd5gMyd6WAgI1j1h3R/SPQ9J+jzQi+0TOgR5v7TyPN44LN0/IIE6BlfRrwihXLFpEMEzDtN0G/nEXsVRX//sWEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=A4QURAms; arc=none smtp.client-ip=68.232.154.123
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1780471583; x=1812007583;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=XbcjWcENgjOMiCNfkTcUcO7q8iqN2ffSdDY4J+UUiHA=;
+  b=A4QURAmskRskF0kr62lT80vPIKlPmT+7UOMNUATGavvQBvrmg9ykx3DM
+   DOvVlqrmD89EV0NiQ0SOsXZifWBM7FeWnha4DYg3J8XxPbEp0EJgvWJOM
+   LprceYeZUm5GRTqMe1MANhcLSBF6qnS09Jf03q457/4MNBWAM0u2B5tuV
+   CMvlS0pln2BYM2yiyVz8v00Mv9JLyGlk1pkoIf8O/UyCfee50PtVwGQ2l
+   CytxDoUH5FcNPS4qWljYccChTj+EeN4hekX8V3PQtjUjYdk9xcbDor6as
+   KbogX3DaEDPeNHlgIpe3d3wTjSlhg61lYwLSGANmOIConV0xuzYw8hpVC
+   A==;
+X-CSE-ConnectionGUID: O7sBt27RReW9QKl38FRGCQ==
+X-CSE-MsgGUID: +GMCbeLPTZ+GQB4Hc6kNOg==
+X-IronPort-AV: E=Sophos;i="6.24,184,1774335600"; 
+   d="scan'208";a="57703106"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Jun 2026 00:26:22 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Wed, 3 Jun 2026 00:26:21 -0700
+Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Wed, 3 Jun 2026 00:26:18 -0700
+From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+Date: Wed, 3 Jun 2026 09:25:23 +0200
+Subject: [PATCH net-next v7 4/9] net: dsa: lan9645x: add basic dsa driver
+ for LAN9645X
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-ID: <20260603-dsa_lan9645x_switch_driver_base-v7-4-b2f90e676707@microchip.com>
+References: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
+In-Reply-To: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
+ Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Russell King
+	<linux@armlinux.org.uk>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+X-Mailer: b4 0.15-dev
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294626-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-294633-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:woojung.huh@microchip.com,m:linux@armlinux.org.uk,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:jensemil.schulzostergaard@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[narfation.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,simonwunderlich.de:mid,simonwunderlich.de:dkim,simonwunderlich.de:from_mime,simonwunderlich.de:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:mid,microchip.com:dkim,microchip.com:from_mime,microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C5C3063545B
+X-Rspamd-Queue-Id: DF83D63563F
 
-From: Sven Eckelmann <sven@narfation.org>
+Add the LAN9645X basic DSA driver with initialization, parent regmap
+requests, port module initialization for NPI, CPU ports and front ports,
+and phylink integration for MAC side configuration.
 
-Congestion control variables in batadv_tp_sender were scattered across the
-struct without clear grouping, making it difficult to reason about which
-fields require cwnd_lock (now "cc_lock") protection. These should be
-combined in a structure to make it more easily visible which variable
-should be read/modified with the cc_lock held.
+This patch only wires up the internal CuPHYs (ports 0-4) and the RGMII
+paths for ports 4, 7 and 8. The supported SerDes-based modes: SGMII,
+QSGMII, 1000BASE-X and 2500BASE-X on ports 5-8 are deferred, and support
+will be added in follow-up patches. Port 5-6 have no usable interface
+mode in this patch, and should not be declared in DT until SerDes
+support lands.
 
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+The intended way to bind this driver is using a parent MFD driver,
+responsible for the register IO protocol, and distributing regmaps to
+child devices. The goal is to use the same approach as the MFD driver in
+drivers/mfd/ocelot-spi.c.
+
+This driver expects to request named regmaps from a parent device. This
+approach is similar to the DSA driver
+
+drivers/net/dsa/ocelot/ocelot_ext.c
+
+which supports being driven by an external CPU via SPI with parent
+device drivers/mfd/ocelot-spi.c.
+
+The MFD driver will come in a later series, because there are
+requirements on the number of child devices before a driver qualifies as
+a MFD device.
+
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 ---
- net/batman-adv/tp_meter.c | 170 +++++++++++++++++++-------------------
- net/batman-adv/types.h    |  80 +++++++++---------
- 2 files changed, 128 insertions(+), 122 deletions(-)
+Changes in v7:
+- use cpu queue LAN9645X_CPUQ_TRAP for bpdu frames
 
-diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
-index e9ba1c45a285d..978e32d94e6c3 100644
---- a/net/batman-adv/tp_meter.c
-+++ b/net/batman-adv/tp_meter.c
-@@ -143,12 +143,12 @@ static u32 batadv_tp_cwnd(u32 base, u32 increment, u32 min)
-  * increased by MSS * MSS / CWND for every unique received ACK
-  */
- static void batadv_tp_update_cwnd(struct batadv_tp_sender *tp_vars, u32 mss)
--	__must_hold(&tp_vars->cwnd_lock)
-+	__must_hold(&tp_vars->cc_lock)
- {
- 	/* slow start... */
--	if (tp_vars->cwnd <= tp_vars->ss_threshold) {
--		tp_vars->dec_cwnd = 0;
--		tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd, mss, mss);
-+	if (tp_vars->cc.cwnd <= tp_vars->cc.ss_threshold) {
-+		tp_vars->cc.dec_cwnd = 0;
-+		tp_vars->cc.cwnd = batadv_tp_cwnd(tp_vars->cc.cwnd, mss, mss);
- 		return;
- 	}
+Changes in v5:
+- remove dd_dis and tsn_dis, and add SKU supported port validation
+  during setup
+- phylink: remove MAC_2500FD
+- phylink: add comment about empty supported_interfaces for port 5-6.
+- phylink: fix 2:1 rgmii port muxing for port module 4 and 7 to be fully
+  dynamic and validate requested mux settings.
+- phylink: add comment about 2:1 rgmii port muxing for port module 4
+  and 7.
+- rx/tx-internal-delay-ps checked against support 2ns value
+- update commit message
+- init lan9645x->npi = -1 at probe and check port < 0 in npi_deinit
+
+Changes in v4:
+- add comment to QSYS_RES_CFG configuration
+- phylink_mac_prepare: fix to make sure we can dynamically change rgmii
+  on port 4
+- move ports allocation to probe
+- tag_npi_setup: reject cascaded setups
+- skip WARN_ON in lan9645x_to_port
+
+Changes in v3:
+- move DEV_MAC_TAGS_CFG config to port setup, for vlan overhead in port
+  frame maxlen
+- remove code disabling ipv6 on conduit
+- use of_property_read_u32 for {rx,tx}-internal-delay-ps
+- use dsa_user_ports(ds) instead of
+  GENMASK(lan9645x->num_phys_ports - 1, 0) as base flood mask.
+- update obey vlan comment
+
+Changes in v2:
+- source Kconfig from drivers/net/dsa/Kconfig
+- sorting in Kconfig and Makefiles
+- remove unused struct fields
+- remote path delays
+- use port_setup and dp->dn instead of DTS parsing
+- phylink: split rgmii setup into dll and speed config
+- phylink: remove pcs/sgmii/qsgmii related code
+- phylink: simplify mac_prepare
+- phylink: remove phylink_ops wrappers
+- phylink: remove unrelated config from link up
+- phylink: reorder functions according to phylink call order
+---
+ drivers/net/dsa/Kconfig                            |   2 +
+ drivers/net/dsa/microchip/Makefile                 |   1 +
+ drivers/net/dsa/microchip/lan9645x/Kconfig         |  11 +
+ drivers/net/dsa/microchip/lan9645x/Makefile        |   8 +
+ drivers/net/dsa/microchip/lan9645x/lan9645x_main.c | 446 +++++++++++++++++++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_main.h | 328 +++++++++++++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c  |  83 ++++
+ .../net/dsa/microchip/lan9645x/lan9645x_phylink.c  | 409 +++++++++++++++++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_port.c | 212 ++++++++++
+ 9 files changed, 1500 insertions(+)
+
+diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+index 4ab567c5bbaf..91431ef6c425 100644
+--- a/drivers/net/dsa/Kconfig
++++ b/drivers/net/dsa/Kconfig
+@@ -72,6 +72,8 @@ config NET_DSA_MV88E6060
  
-@@ -156,13 +156,13 @@ static void batadv_tp_update_cwnd(struct batadv_tp_sender *tp_vars, u32 mss)
- 	mss = min_t(u32, mss, (1U << 14) - 1);
+ source "drivers/net/dsa/microchip/Kconfig"
  
- 	/* increment CWND at least of 1 (section 3.1 of RFC5681) */
--	tp_vars->dec_cwnd += max_t(u32, 1U << 3,
--				   ((mss * mss) << 3) / tp_vars->cwnd);
--	if (tp_vars->dec_cwnd < (mss << 3))
-+	tp_vars->cc.dec_cwnd += max_t(u32, 1U << 3,
-+				      ((mss * mss) << 3) / tp_vars->cc.cwnd);
-+	if (tp_vars->cc.dec_cwnd < (mss << 3))
- 		return;
- 
--	tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd, mss, mss);
--	tp_vars->dec_cwnd = 0;
-+	tp_vars->cc.cwnd = batadv_tp_cwnd(tp_vars->cc.cwnd, mss, mss);
-+	tp_vars->cc.dec_cwnd = 0;
- }
- 
- /**
-@@ -172,7 +172,7 @@ static void batadv_tp_update_cwnd(struct batadv_tp_sender *tp_vars, u32 mss)
-  */
- static void batadv_tp_update_rto(struct batadv_tp_sender *tp_vars,
- 				 u32 new_rtt)
--	__must_hold(&tp_vars->cwnd_lock)
-+	__must_hold(&tp_vars->cc_lock)
- {
- 	long m = new_rtt;
- 
-@@ -182,24 +182,24 @@ static void batadv_tp_update_rto(struct batadv_tp_sender *tp_vars,
- 	 * It's tricky to understand. Don't lose hair please.
- 	 * Inspired by tcp_rtt_estimator() tcp_input.c
- 	 */
--	if (tp_vars->srtt != 0) {
--		m -= (tp_vars->srtt >> 3); /* m is now error in rtt est */
--		tp_vars->srtt += m; /* rtt = 7/8 srtt + 1/8 new */
-+	if (tp_vars->cc.srtt != 0) {
-+		m -= (tp_vars->cc.srtt >> 3); /* m is now error in rtt est */
-+		tp_vars->cc.srtt += m; /* rtt = 7/8 srtt + 1/8 new */
- 		if (m < 0)
- 			m = -m;
- 
--		m -= (tp_vars->rttvar >> 2);
--		tp_vars->rttvar += m; /* mdev ~= 3/4 rttvar + 1/4 new */
-+		m -= (tp_vars->cc.rttvar >> 2);
-+		tp_vars->cc.rttvar += m; /* mdev ~= 3/4 rttvar + 1/4 new */
- 	} else {
- 		/* first measure getting in */
--		tp_vars->srtt = m << 3; /* take the measured time to be srtt */
--		tp_vars->rttvar = m << 1; /* new_rtt / 2 */
-+		tp_vars->cc.srtt = m << 3; /* take the measured time to be srtt */
-+		tp_vars->cc.rttvar = m << 1; /* new_rtt / 2 */
- 	}
- 
- 	/* rto = srtt + 4 * rttvar.
- 	 * rttvar is scaled by 4, therefore doesn't need to be multiplied
- 	 */
--	WRITE_ONCE(tp_vars->rto, (tp_vars->srtt >> 3) + tp_vars->rttvar);
-+	WRITE_ONCE(tp_vars->cc.rto, (tp_vars->cc.srtt >> 3) + tp_vars->cc.rttvar);
- }
- 
- /**
-@@ -450,11 +450,11 @@ static void batadv_tp_sender_end(struct batadv_priv *bat_priv,
- 
- 	batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
- 		   "Last timing stats: SRTT=%ums RTTVAR=%ums RTO=%ums\n",
--		   tp_vars->srtt >> 3, tp_vars->rttvar >> 2, tp_vars->rto);
-+		   tp_vars->cc.srtt >> 3, tp_vars->cc.rttvar >> 2, tp_vars->cc.rto);
- 
- 	batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
- 		   "Final values: cwnd=%u ss_threshold=%u\n",
--		   tp_vars->cwnd, tp_vars->ss_threshold);
-+		   tp_vars->cc.cwnd, tp_vars->cc.ss_threshold);
- 
- 	session_cookie = batadv_tp_session_cookie(tp_vars->common.session,
- 						  tp_vars->icmp_uid);
-@@ -521,7 +521,7 @@ static void batadv_tp_reset_sender_timer(struct batadv_tp_sender *tp_vars)
- 		return;
- 
- 	mod_timer(&tp_vars->common.timer,
--		  jiffies + msecs_to_jiffies(READ_ONCE(tp_vars->rto)));
-+		  jiffies + msecs_to_jiffies(READ_ONCE(tp_vars->cc.rto)));
- }
- 
- /**
-@@ -540,11 +540,11 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
- 	if (batadv_tp_sender_stopped(tp_vars))
- 		return;
- 
--	spin_lock_bh(&tp_vars->cwnd_lock);
-+	spin_lock_bh(&tp_vars->cc_lock);
- 
- 	/* if the user waited long enough...shutdown the test */
--	if (unlikely(tp_vars->rto >= BATADV_TP_MAX_RTO)) {
--		spin_unlock_bh(&tp_vars->cwnd_lock);
-+	if (unlikely(tp_vars->cc.rto >= BATADV_TP_MAX_RTO)) {
-+		spin_unlock_bh(&tp_vars->cc_lock);
- 		batadv_tp_sender_shutdown(tp_vars,
- 					  BATADV_TP_REASON_DST_UNREACHABLE);
- 		return;
-@@ -553,22 +553,22 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
- 	/* RTO exponential backoff
- 	 * Details in Section 5.5 of RFC6298
- 	 */
--	WRITE_ONCE(tp_vars->rto, tp_vars->rto * 2);
-+	WRITE_ONCE(tp_vars->cc.rto, tp_vars->cc.rto * 2);
- 
--	tp_vars->ss_threshold = tp_vars->cwnd >> 1;
--	if (tp_vars->ss_threshold < BATADV_TP_PLEN * 2)
--		tp_vars->ss_threshold = BATADV_TP_PLEN * 2;
-+	tp_vars->cc.ss_threshold = tp_vars->cc.cwnd >> 1;
-+	if (tp_vars->cc.ss_threshold < BATADV_TP_PLEN * 2)
-+		tp_vars->cc.ss_threshold = BATADV_TP_PLEN * 2;
- 
- 	batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
- 		   "Meter: RTO fired during test towards %pM! cwnd=%u new ss_thr=%u, resetting last_sent to %u\n",
--		   tp_vars->common.other_end, tp_vars->cwnd, tp_vars->ss_threshold,
--		   tp_vars->last_acked);
-+		   tp_vars->common.other_end, tp_vars->cc.cwnd, tp_vars->cc.ss_threshold,
-+		   tp_vars->cc.last_acked);
- 
--	tp_vars->cwnd = BATADV_TP_PLEN * 3;
-+	tp_vars->cc.cwnd = BATADV_TP_PLEN * 3;
- 
--	WRITE_ONCE(tp_vars->last_sent, tp_vars->last_acked);
-+	WRITE_ONCE(tp_vars->cc.last_sent, tp_vars->cc.last_acked);
- 
--	spin_unlock_bh(&tp_vars->cwnd_lock);
-+	spin_unlock_bh(&tp_vars->cc_lock);
- 
- 	/* resend the non-ACKed packets.. */
- 	wake_up(&tp_vars->more_bytes);
-@@ -698,81 +698,81 @@ static enum batadv_tp_ack_reaction
- batadv_tp_handle_ack(struct batadv_priv *bat_priv,
- 		     struct batadv_tp_sender *tp_vars,
- 		     u32 recv_ack, size_t mss)
--	__must_hold(&tp_vars->cwnd_lock)
-+	__must_hold(&tp_vars->cc_lock)
- {
- 	enum batadv_tp_ack_reaction reaction;
- 
--	if (batadv_seq_before(recv_ack, tp_vars->last_acked))
-+	if (batadv_seq_before(recv_ack, tp_vars->cc.last_acked))
- 		return BATADV_TP_ACK_REACTION_OLD_ACK;
- 
- 	/* check if this ACK is a duplicate */
--	if (tp_vars->last_acked == recv_ack) {
-+	if (tp_vars->cc.last_acked == recv_ack) {
- 		/* if this is the third duplicate ACK do Fast Retransmit */
--		if (tp_vars->dup_acks > 3)
-+		if (tp_vars->cc.dup_acks > 3)
- 			return BATADV_TP_ACK_REACTION_IGNORE;
- 
--		tp_vars->dup_acks++;
--		if (tp_vars->dup_acks != 3)
-+		tp_vars->cc.dup_acks++;
-+		if (tp_vars->cc.dup_acks != 3)
- 			return BATADV_TP_ACK_REACTION_IGNORE;
- 
--		if (!batadv_seq_before(tp_vars->recover, recv_ack))
-+		if (!batadv_seq_before(tp_vars->cc.recover, recv_ack))
- 			return BATADV_TP_ACK_REACTION_IGNORE;
- 
- 		/* Fast Recovery */
--		tp_vars->fast_recovery = true;
-+		tp_vars->cc.fast_recovery = true;
- 
- 		/* Set recover to the last outstanding seqno when Fast Recovery
- 		 * is entered. RFC6582, Section 3.2, step 1
- 		 */
--		tp_vars->recover = tp_vars->last_sent;
--		tp_vars->ss_threshold = tp_vars->cwnd >> 1;
-+		tp_vars->cc.recover = tp_vars->cc.last_sent;
-+		tp_vars->cc.ss_threshold = tp_vars->cc.cwnd >> 1;
- 		batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
- 			   "Meter: Fast Recovery, (cur cwnd=%u) ss_thr=%u last_sent=%u recv_ack=%u\n",
--			   tp_vars->cwnd, tp_vars->ss_threshold,
--			   tp_vars->last_sent, recv_ack);
--		tp_vars->cwnd = batadv_tp_cwnd(tp_vars->ss_threshold, 3 * mss,
--					       mss);
--		tp_vars->dec_cwnd = 0;
--		WRITE_ONCE(tp_vars->last_sent, recv_ack);
-+			   tp_vars->cc.cwnd, tp_vars->cc.ss_threshold,
-+			   tp_vars->cc.last_sent, recv_ack);
-+		tp_vars->cc.cwnd = batadv_tp_cwnd(tp_vars->cc.ss_threshold, 3 * mss,
-+						  mss);
-+		tp_vars->cc.dec_cwnd = 0;
-+		WRITE_ONCE(tp_vars->cc.last_sent, recv_ack);
- 
- 		return BATADV_TP_ACK_REACTION_RESEND_WAKEUP;
- 	}
- 
- 	/* count the acked data */
--	atomic64_add(recv_ack - tp_vars->last_acked, &tp_vars->tot_sent);
-+	atomic64_add(recv_ack - tp_vars->cc.last_acked, &tp_vars->tot_sent);
- 
- 	/* reset the duplicate ACKs counter */
--	tp_vars->dup_acks = 0;
-+	tp_vars->cc.dup_acks = 0;
- 
--	if (tp_vars->fast_recovery) {
-+	if (tp_vars->cc.fast_recovery) {
- 		/* partial ACK */
--		if (batadv_seq_before(recv_ack, tp_vars->recover)) {
-+		if (batadv_seq_before(recv_ack, tp_vars->cc.recover)) {
- 			/* this is another hole in the window. React
- 			 * immediately as specified by NewReno (see
- 			 * Section 3.2 of RFC6582 for details)
- 			 */
- 			reaction = BATADV_TP_ACK_REACTION_RESEND_WAKEUP;
--			tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd,
--						       mss, mss);
-+			tp_vars->cc.cwnd = batadv_tp_cwnd(tp_vars->cc.cwnd,
-+							  mss, mss);
- 		} else {
--			tp_vars->fast_recovery = false;
-+			tp_vars->cc.fast_recovery = false;
- 			/* set cwnd to the value of ss_threshold at the
- 			 * moment that Fast Recovery was entered.
- 			 * RFC6582, Section 3.2, step 3
- 			 */
--			tp_vars->cwnd = batadv_tp_cwnd(tp_vars->ss_threshold,
--						       0, mss);
-+			tp_vars->cc.cwnd = batadv_tp_cwnd(tp_vars->cc.ss_threshold,
-+							  0, mss);
- 			reaction = BATADV_TP_ACK_REACTION_WAKEUP;
- 		}
- 	} else {
--		if (recv_ack - tp_vars->last_acked >= mss)
-+		if (recv_ack - tp_vars->cc.last_acked >= mss)
- 			batadv_tp_update_cwnd(tp_vars, mss);
- 
- 		reaction = BATADV_TP_ACK_REACTION_WAKEUP;
- 	}
- 
- 	/* move the Transmit Window */
--	WRITE_ONCE(tp_vars->last_acked, recv_ack);
-+	WRITE_ONCE(tp_vars->cc.last_acked, recv_ack);
- 
- 	return reaction;
- }
-@@ -814,7 +814,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- 		goto out;
- 
- 	/* old ACK? silently drop it.. */
--	if (batadv_seq_before(recv_ack, READ_ONCE(tp_vars->last_acked)))
-+	if (batadv_seq_before(recv_ack, READ_ONCE(tp_vars->cc.last_acked)))
- 		goto out;
- 
- 	primary_if = batadv_primary_if_get_selected(bat_priv);
-@@ -825,14 +825,14 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- 	if (unlikely(!orig_node))
- 		goto out;
- 
--	spin_lock_bh(&tp_vars->cwnd_lock);
-+	spin_lock_bh(&tp_vars->cc_lock);
- 	/* update RTO with the new sampled RTT, if any */
- 	rtt = jiffies_to_msecs(jiffies) - ntohl(icmp->timestamp);
- 	if (icmp->timestamp && rtt)
- 		batadv_tp_update_rto(tp_vars, rtt);
- 
- 	reaction = batadv_tp_handle_ack(bat_priv, tp_vars, recv_ack, mss);
--	spin_unlock_bh(&tp_vars->cwnd_lock);
-+	spin_unlock_bh(&tp_vars->cc_lock);
- 
- 	if (reaction == BATADV_TP_ACK_REACTION_OLD_ACK)
- 		goto out;
-@@ -873,16 +873,16 @@ static bool batadv_tp_avail(struct batadv_tp_sender *tp_vars,
- {
- 	u32 win_left, win_limit;
- 
--	spin_lock_bh(&tp_vars->cwnd_lock);
-+	spin_lock_bh(&tp_vars->cc_lock);
- 
--	win_limit = tp_vars->last_acked + tp_vars->cwnd;
-+	win_limit = tp_vars->cc.last_acked + tp_vars->cc.cwnd;
- 
--	if (batadv_seq_before(tp_vars->last_sent, win_limit))
--		win_left = win_limit - tp_vars->last_sent;
-+	if (batadv_seq_before(tp_vars->cc.last_sent, win_limit))
-+		win_left = win_limit - tp_vars->cc.last_sent;
- 	else
- 		win_left = 0;
- 
--	spin_unlock_bh(&tp_vars->cwnd_lock);
-+	spin_unlock_bh(&tp_vars->cc_lock);
- 
- 	return win_left >= payload_len;
- }
-@@ -964,7 +964,7 @@ static int batadv_tp_send(void *arg)
- 		 * the size of the unicast header
- 		 */
- 		packet_len = payload_len + sizeof(struct batadv_unicast_packet);
--		last_sent = READ_ONCE(tp_vars->last_sent);
-+		last_sent = READ_ONCE(tp_vars->cc.last_sent);
- 
- 		err = batadv_tp_send_msg(tp_vars, primary_if->net_dev->dev_addr,
- 					 orig_node, last_sent, packet_len,
-@@ -983,10 +983,10 @@ static int batadv_tp_send(void *arg)
- 
- 		/* right-shift the TWND */
- 		if (!err) {
--			spin_lock_bh(&tp_vars->cwnd_lock);
--			if (tp_vars->last_sent == last_sent)
--				WRITE_ONCE(tp_vars->last_sent, last_sent + payload_len);
--			spin_unlock_bh(&tp_vars->cwnd_lock);
-+			spin_lock_bh(&tp_vars->cc_lock);
-+			if (tp_vars->cc.last_sent == last_sent)
-+				WRITE_ONCE(tp_vars->cc.last_sent, last_sent + payload_len);
-+			spin_unlock_bh(&tp_vars->cc_lock);
- 		}
- 
- 		cond_resched();
-@@ -1104,30 +1104,30 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
- 	memcpy(tp_vars->common.session, session_id, sizeof(session_id));
- 	tp_vars->icmp_uid = icmp_uid;
- 
--	WRITE_ONCE(tp_vars->last_sent, BATADV_TP_FIRST_SEQ);
--	WRITE_ONCE(tp_vars->dup_acks, 0);
--	WRITE_ONCE(tp_vars->last_acked, BATADV_TP_FIRST_SEQ);
--	tp_vars->fast_recovery = false;
--	tp_vars->recover = BATADV_TP_FIRST_SEQ;
-+	WRITE_ONCE(tp_vars->cc.last_sent, BATADV_TP_FIRST_SEQ);
-+	WRITE_ONCE(tp_vars->cc.dup_acks, 0);
-+	WRITE_ONCE(tp_vars->cc.last_acked, BATADV_TP_FIRST_SEQ);
-+	tp_vars->cc.fast_recovery = false;
-+	tp_vars->cc.recover = BATADV_TP_FIRST_SEQ;
- 
- 	/* initialise the CWND to 3*MSS (Section 3.1 in RFC5681).
- 	 * For batman-adv the MSS is the size of the payload received by the
- 	 * mesh_interface, hence its MTU
- 	 */
--	tp_vars->cwnd = BATADV_TP_PLEN * 3;
--	tp_vars->dec_cwnd = 0;
-+	tp_vars->cc.cwnd = BATADV_TP_PLEN * 3;
-+	tp_vars->cc.dec_cwnd = 0;
- 
- 	/* at the beginning initialise the SS threshold to the biggest possible
- 	 * window size, hence the AWND size
- 	 */
--	tp_vars->ss_threshold = BATADV_TP_AWND;
-+	tp_vars->cc.ss_threshold = BATADV_TP_AWND;
- 
- 	/* RTO initial value is 3 seconds.
- 	 * Details in Section 2.1 of RFC6298
- 	 */
--	WRITE_ONCE(tp_vars->rto, 1000);
--	tp_vars->srtt = 0;
--	tp_vars->rttvar = 0;
-+	WRITE_ONCE(tp_vars->cc.rto, 1000);
-+	tp_vars->cc.srtt = 0;
-+	tp_vars->cc.rttvar = 0;
- 
- 	atomic64_set(&tp_vars->tot_sent, 0);
- 
-@@ -1143,7 +1143,7 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
- 	spin_lock_init(&tp_vars->common.unacked_lock);
- 	INIT_LIST_HEAD(&tp_vars->common.unacked_list);
- 
--	spin_lock_init(&tp_vars->cwnd_lock);
-+	spin_lock_init(&tp_vars->cc_lock);
- 
- 	tp_vars->prerandom_offset = 0;
- 	spin_lock_init(&tp_vars->prerandom_lock);
-diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index c782f04aea9c4..5eb0371def83a 100644
---- a/net/batman-adv/types.h
-+++ b/net/batman-adv/types.h
-@@ -1367,6 +1367,45 @@ struct batadv_tp_vars_common {
- 	struct rcu_head rcu;
- };
- 
-+/** struct batadv_tp_sender_cc - congestion control variables */
-+struct batadv_tp_sender_cc {
-+	/** @fast_recovery: true if in Fast Recovery mode */
-+	bool fast_recovery:1;
++source "drivers/net/dsa/microchip/lan9645x/Kconfig"
 +
-+	/** @dup_acks: duplicate ACKs counter */
-+	u8 dup_acks;
+ source "drivers/net/dsa/mv88e6xxx/Kconfig"
+ 
+ source "drivers/net/dsa/mxl862xx/Kconfig"
+diff --git a/drivers/net/dsa/microchip/Makefile b/drivers/net/dsa/microchip/Makefile
+index 9347cfb3d0b5..e75f17888f75 100644
+--- a/drivers/net/dsa/microchip/Makefile
++++ b/drivers/net/dsa/microchip/Makefile
+@@ -12,3 +12,4 @@ endif
+ obj-$(CONFIG_NET_DSA_MICROCHIP_KSZ9477_I2C)	+= ksz9477_i2c.o
+ obj-$(CONFIG_NET_DSA_MICROCHIP_KSZ_SPI)		+= ksz_spi.o
+ obj-$(CONFIG_NET_DSA_MICROCHIP_KSZ8863_SMI)	+= ksz8863_smi.o
++obj-$(CONFIG_NET_DSA_MICROCHIP_LAN9645X)	+= lan9645x/
+diff --git a/drivers/net/dsa/microchip/lan9645x/Kconfig b/drivers/net/dsa/microchip/lan9645x/Kconfig
+new file mode 100644
+index 000000000000..4d9fdf34104e
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/Kconfig
+@@ -0,0 +1,11 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config NET_DSA_MICROCHIP_LAN9645X
++	tristate "Microchip Lan9645x switch support"
++	depends on NET_DSA
++	select NET_DSA_TAG_LAN9645X
++	help
++	  This driver adds DSA support for Microchip Lan9645x switch chips.
++	  The lan9645x switch is a multi-port Gigabit AVB/TSN Ethernet Switch
++	  with five integrated 10/100/1000Base-T PHYs. In addition to the
++	  integrated PHYs, it supports up to 2 RGMII/RMII, up to 2
++	  BASE-X/SERDES/2.5GBASE-X and one Quad-SGMII/Quad-USGMII interfaces.
+diff --git a/drivers/net/dsa/microchip/lan9645x/Makefile b/drivers/net/dsa/microchip/lan9645x/Makefile
+new file mode 100644
+index 000000000000..7cc0ae0ada40
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_NET_DSA_MICROCHIP_LAN9645X) += mchp-lan9645x.o
 +
-+	/** @dec_cwnd: decimal part of the cwnd used during linear growth */
-+	u16 dec_cwnd;
++mchp-lan9645x-objs := \
++	lan9645x_main.o \
++	lan9645x_npi.o \
++	lan9645x_phylink.o \
++	lan9645x_port.o \
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
+new file mode 100644
+index 000000000000..5ae032c03018
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
+@@ -0,0 +1,446 @@
++// SPDX-License-Identifier: GPL-2.0+
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
 +
-+	/** @cwnd: current size of the congestion window */
-+	u32 cwnd;
++#include <linux/platform_device.h>
 +
-+	/**
-+	 * @ss_threshold: Slow Start threshold. Once cwnd exceeds this value the
-+	 *  connection switches to the Congestion Avoidance state
-+	 */
-+	u32 ss_threshold;
++#include "lan9645x_main.h"
 +
-+	/** @last_acked: last acked byte */
-+	u32 last_acked;
-+
-+	/** @last_sent: last sent byte, not yet acked */
-+	u32 last_sent;
-+
-+	/** @recover: last sent seqno when entering Fast Recovery */
-+	u32 recover;
-+
-+	/** @rto: sender timeout */
-+	u32 rto;
-+
-+	/** @srtt: smoothed RTT scaled by 2^3 */
-+	u32 srtt;
-+
-+	/** @rttvar: RTT variation scaled by 2^2 */
-+	u32 rttvar;
++static const char *lan9645x_resource_names[NUM_TARGETS + 1] = {
++	[TARGET_GCB]          = "gcb",
++	[TARGET_QS]           = "qs",
++	[TARGET_CHIP_TOP]     = "chip_top",
++	[TARGET_REW]          = "rew",
++	[TARGET_SYS]          = "sys",
++	[TARGET_HSIO]         = "hsio",
++	[TARGET_DEV]          = "dev",
++	[TARGET_DEV + 1]      = "dev1",
++	[TARGET_DEV + 2]      = "dev2",
++	[TARGET_DEV + 3]      = "dev3",
++	[TARGET_DEV + 4]      = "dev4",
++	[TARGET_DEV + 5]      = "dev5",
++	[TARGET_DEV + 6]      = "dev6",
++	[TARGET_DEV + 7]      = "dev7",
++	[TARGET_DEV + 8]      = "dev8",
++	[TARGET_QSYS]         = "qsys",
++	[TARGET_AFI]          = "afi",
++	[TARGET_ANA]          = "ana",
++	[NUM_TARGETS]         = NULL,
 +};
 +
- /**
-  * struct batadv_tp_sender - sender tp meter private variables per session
-  */
-@@ -1383,15 +1422,6 @@ struct batadv_tp_sender {
- 	 */
- 	atomic_t send_result;
- 
--	/** @last_sent: last sent byte, not yet acked */
--	u32 last_sent;
--
--	/** @fast_recovery: true if in Fast Recovery mode */
--	bool fast_recovery:1;
--
--	/** @recover: last sent seqno when entering Fast Recovery */
--	u32 recover;
--
- 	/** @finish_work: work item for the finishing procedure */
- 	struct delayed_work finish_work;
- 
-@@ -1404,39 +1434,15 @@ struct batadv_tp_sender {
- 	/** @icmp_uid: local ICMP "socket" index */
- 	u8 icmp_uid;
- 
--	/** @dec_cwnd: decimal part of the cwnd used during linear growth */
--	u16 dec_cwnd;
--
--	/** @cwnd: current size of the congestion window */
--	u32 cwnd;
--
--	/** @cwnd_lock: lock do protect congestion control variables */
--	spinlock_t cwnd_lock;
--
--	/**
--	 * @ss_threshold: Slow Start threshold. Once cwnd exceeds this value the
--	 *  connection switches to the Congestion Avoidance state
--	 */
--	u32 ss_threshold;
-+	/** @cc: congestion control variables */
-+	struct batadv_tp_sender_cc cc;
- 
--	/** @last_acked: last acked byte */
--	u32 last_acked;
-+	/** @cc_lock: lock do protect @cc */
-+	spinlock_t cc_lock;
- 
- 	/** @tot_sent: amount of data sent/ACKed so far */
- 	atomic64_t tot_sent;
- 
--	/** @dup_acks: duplicate ACKs counter */
--	u8 dup_acks;
--
--	/** @rto: sender timeout */
--	u32 rto;
--
--	/** @srtt: smoothed RTT scaled by 2^3 */
--	u32 srtt;
--
--	/** @rttvar: RTT variation scaled by 2^2 */
--	u32 rttvar;
--
- 	/**
- 	 * @more_bytes: waiting queue anchor when waiting for more ack/retry
- 	 *  timeout
++static int lan9645x_tag_npi_setup(struct dsa_switch *ds)
++{
++	struct dsa_port *dp, *first_cpu_dp = NULL;
++	struct lan9645x *lan9645x = ds->priv;
++
++	dsa_switch_for_each_user_port(dp, ds) {
++		if (dp->cpu_dp->ds != ds) {
++			dev_err(ds->dev,
++				"NPI port on a remote switch is not supported\n");
++			return -EINVAL;
++		}
++
++		if (first_cpu_dp && dp->cpu_dp != first_cpu_dp) {
++			dev_err(ds->dev, "Multiple NPI ports not supported\n");
++			return -EINVAL;
++		}
++
++		first_cpu_dp = dp->cpu_dp;
++	}
++
++	if (!first_cpu_dp)
++		return -EINVAL;
++
++	lan9645x_npi_port_init(lan9645x, first_cpu_dp);
++
++	return 0;
++}
++
++static enum dsa_tag_protocol lan9645x_get_tag_protocol(struct dsa_switch *ds,
++						       int port,
++						       enum dsa_tag_protocol tp)
++{
++	return DSA_TAG_PROTO_LAN9645X;
++}
++
++static void lan9645x_teardown(struct dsa_switch *ds)
++{
++	struct lan9645x *lan9645x = ds->priv;
++
++	lan9645x_npi_port_deinit(lan9645x, lan9645x->npi);
++}
++
++static int lan9645x_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
++{
++	return lan9645x_port_set_maxlen(ds->priv, port, new_mtu);
++}
++
++static int lan9645x_get_max_mtu(struct dsa_switch *ds, int port)
++{
++	struct lan9645x *lan9645x = ds->priv;
++	int max_mtu;
++
++	/* Actual MAC max MTU is around 16KB. We set 10000 - overhead which
++	 * should be sufficient for all jumbo frames. Larger frames can cause
++	 * problems especially with flow control, since we only have 160K queue
++	 * buffer.
++	 */
++	max_mtu = 10000 - ETH_HLEN - ETH_FCS_LEN;
++
++	if (port == lan9645x->npi) {
++		max_mtu -= LAN9645X_IFH_LEN;
++		max_mtu -= LAN9645X_LONG_PREFIX_LEN;
++	}
++
++	return max_mtu;
++}
++
++static int lan9645x_reset_switch(struct lan9645x *lan9645x)
++{
++	int val = 0;
++	int err;
++
++	lan_wr(SYS_RESET_CFG_CORE_ENA_SET(0), lan9645x, SYS_RESET_CFG);
++	lan_wr(SYS_RAM_INIT_RAM_INIT_SET(1), lan9645x, SYS_RAM_INIT);
++	err = lan9645x_rd_poll_timeout(lan9645x, SYS_RAM_INIT, val,
++				       SYS_RAM_INIT_RAM_INIT_GET(val) == 0);
++	if (err) {
++		dev_err(lan9645x->dev, "Failed to init chip RAM.\n");
++		return err;
++	}
++	lan_wr(SYS_RESET_CFG_CORE_ENA_SET(1), lan9645x, SYS_RESET_CFG);
++
++	return 0;
++}
++
++static int lan9645x_setup(struct dsa_switch *ds)
++{
++	struct lan9645x *lan9645x = ds->priv;
++	struct device *dev = lan9645x->dev;
++	int supported, used = 0;
++	struct dsa_port *dp;
++	u32 front_ports;
++	int err;
++
++	lan9645x->num_phys_ports = ds->num_ports;
++	front_ports = dsa_user_ports(ds);
++	supported = lan9645x->num_phys_ports - lan9645x->num_port_dis;
++
++	dsa_switch_for_each_available_port(dp, ds)
++		used++;
++
++	if (used > supported) {
++		dev_err(ds->dev,
++			"%d physical ports in use in DT, SKU supports at most %d\n",
++			used, supported);
++		return -EINVAL;
++	}
++
++	err = lan9645x_reset_switch(lan9645x);
++	if (err)
++		return err;
++
++	err = lan9645x_tag_npi_setup(ds);
++	if (err) {
++		dev_err(dev, "Failed to setup NPI port.\n");
++		return err;
++	}
++
++	/* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
++	lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
++	       ANA_AGGR_CFG_AC_DMAC_ENA,
++	       lan9645x, ANA_AGGR_CFG);
++
++	/* Flush queues */
++	lan_wr(GENMASK(1, 0), lan9645x, QS_XTR_FLUSH);
++
++	/* Allow to drain */
++	usleep_range(1000, 2000);
++
++	/* All Queues normal */
++	lan_wr(0x0, lan9645x, QS_XTR_FLUSH);
++
++	/* Set MAC age time to default value, the entry is aged after
++	 * 2 * AGE_PERIOD
++	 */
++	lan_wr(ANA_AUTOAGE_AGE_PERIOD_SET(BR_DEFAULT_AGEING_TIME / 2 / HZ),
++	       lan9645x, ANA_AUTOAGE);
++
++	/* Disable learning for frames discarded by VLAN ingress filtering */
++	lan_rmw(ANA_ADVLEARN_VLAN_CHK_SET(1),
++		ANA_ADVLEARN_VLAN_CHK,
++		lan9645x, ANA_ADVLEARN);
++
++	/* Queue system frame ageing. We target 2s ageing.
++	 *
++	 * Register unit is 1024 cycles.
++	 *
++	 * ASIC: 165.625 Mhz  ~ 6.0377 ns period
++	 *
++	 * 1024 * 6.0377 ns =~ 6182 ns
++	 * val = 2000000000ns / 6182ns
++	 */
++	lan_wr(SYS_FRM_AGING_AGE_TX_ENA_SET(1) |
++	       SYS_FRM_AGING_MAX_AGE_SET((2000000000 / 6182)),
++	       lan9645x,  SYS_FRM_AGING);
++
++	/* Setup flooding PGIDs for IPv4/IPv6 multicast. Control and dataplane
++	 * use the same masks. Control frames are redirected to CPU, and
++	 * the network stack is responsible for forwarding these.
++	 * The dataplane is forwarding according to the offloaded MDB entries.
++	 */
++	lan_wr(ANA_FLOODING_IPMC_FLD_MC4_DATA_SET(PGID_MCIPV4) |
++	       ANA_FLOODING_IPMC_FLD_MC4_CTRL_SET(PGID_MC) |
++	       ANA_FLOODING_IPMC_FLD_MC6_DATA_SET(PGID_MCIPV6) |
++	       ANA_FLOODING_IPMC_FLD_MC6_CTRL_SET(PGID_MC),
++	       lan9645x, ANA_FLOODING_IPMC);
++
++	/* There are 8 priorities */
++	for (int prio = 0; prio < 8; ++prio)
++		lan_wr(ANA_FLOODING_FLD_MULTICAST_SET(PGID_MC) |
++		       ANA_FLOODING_FLD_UNICAST_SET(PGID_UC) |
++		       ANA_FLOODING_FLD_BROADCAST_SET(PGID_BC),
++		       lan9645x, ANA_FLOODING(prio));
++
++	/* Allow VLAN table to control whether cpu copy from the pgid table is
++	 * enabled. Index PGID_ENTRIES is CPU src pgid, so we skip it as the
++	 * configuration makes little sense here.
++	 */
++	for (int i = 0; i < PGID_ENTRIES; ++i)
++		lan_wr(ANA_PGID_CFG_OBEY_VLAN_SET(1),
++		       lan9645x, ANA_PGID_CFG(i));
++
++	/* Disable bridging by default */
++	for (int p = 0; p < lan9645x->num_phys_ports; p++) {
++		lan_wr(0, lan9645x, ANA_PGID(PGID_SRC + p));
++
++		/* Do not forward BPDU frames to the front ports and copy them
++		 * to CPU
++		 */
++		lan_wr(ANA_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA,
++		       lan9645x, ANA_CPU_FWD_BPDU_CFG(p));
++	}
++
++	for (int i = 0; i < 16; i++) {
++		/* The register instance number corresponds to the
++		 * address of the extracted frame. For instance:
++		 * CPUQ_8021_CFG[4].CPUQ_BPDU_VAL
++		 * is the cpu extraction queue used for BPDU frames
++		 * with address 01-80-C2-00-00-04
++		 */
++		lan_rmw(ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL_SET(LAN9645X_CPUQ_TRAP),
++			ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL,
++			lan9645x, ANA_CPUQ_8021_CFG(i));
++	}
++
++	/* Reserve ~1700 bytes of buffer memory per (port, prio) for source
++	 * tracking (resource 0, indices 0..95) and destination tracking
++	 * (resource 2, indices 512..607). These are access watermarks, not
++	 * pre-allocations: a flow draws from its reservation first, then
++	 * from the shared pool. Keeping the reservation above a max-size
++	 * Ethernet frame prevents a single frame from spilling into the
++	 * shared pool, and cause pause frames to be emitted without actual
++	 * congestion.
++	 */
++	for (int i = 0; i <= QSYS_Q_RSRV; ++i) {
++		lan_wr(QS_SRC_BUF_RSV / 64, lan9645x, QSYS_RES_CFG(i));
++		lan_wr(QS_SRC_BUF_RSV / 64, lan9645x, QSYS_RES_CFG(512 + i));
++	}
++
++	lan9645x_port_cpu_init(lan9645x);
++
++	/* Multicast to all front ports */
++	lan_wr(front_ports, lan9645x, ANA_PGID(PGID_MC));
++
++	/* IP multicast to all front ports */
++	lan_wr(front_ports, lan9645x, ANA_PGID(PGID_MCIPV4));
++	lan_wr(front_ports, lan9645x, ANA_PGID(PGID_MCIPV6));
++
++	/* Unicast to all front ports */
++	lan_wr(front_ports, lan9645x, ANA_PGID(PGID_UC));
++
++	/* Broadcast to cpu and all front ports */
++	lan_wr(BIT(CPU_PORT) | front_ports, lan9645x, ANA_PGID(PGID_BC));
++
++	lan9645x_port_set_tail_drop_wm(lan9645x);
++
++	ds->mtu_enforcement_ingress = true;
++	ds->assisted_learning_on_cpu_port = true;
++	ds->fdb_isolation = true;
++
++	dev_info(lan9645x->dev,
++		 "SKU features: max_ports=%d\n",
++		 lan9645x->num_phys_ports - lan9645x->num_port_dis);
++
++	return 0;
++}
++
++static void lan9645x_port_phylink_get_caps(struct dsa_switch *ds, int port,
++					   struct phylink_config *config)
++{
++	lan9645x_phylink_get_caps(ds->priv, port, config);
++}
++
++static const struct dsa_switch_ops lan9645x_switch_ops = {
++	.get_tag_protocol		= lan9645x_get_tag_protocol,
++
++	.setup				= lan9645x_setup,
++	.teardown			= lan9645x_teardown,
++	.port_setup			= lan9645x_port_setup,
++
++	/* Phylink integration */
++	.phylink_get_caps		= lan9645x_port_phylink_get_caps,
++
++	/* MTU  */
++	.port_change_mtu		= lan9645x_change_mtu,
++	.port_max_mtu			= lan9645x_get_max_mtu,
++};
++
++static int lan9645x_request_target_regmaps(struct lan9645x *lan9645x)
++{
++	const char *resource_name;
++	struct regmap *tgt_map;
++
++	for (int i = 0; i < NUM_TARGETS; i++) {
++		resource_name = lan9645x_resource_names[i];
++		if (!resource_name)
++			continue;
++
++		tgt_map = dev_get_regmap(lan9645x->dev->parent, resource_name);
++		if (IS_ERR_OR_NULL(tgt_map)) {
++			dev_err(lan9645x->dev, "Failed to get regmap=%d\n", i);
++			return -ENODEV;
++		}
++
++		lan9645x->rmap[i] = tgt_map;
++	}
++
++	return 0;
++}
++
++static void lan9645x_set_feat_dis(struct lan9645x *lan9645x)
++{
++	u32 feat_dis;
++
++	/* The features which can be physically disabled on some SKUs are:
++	 * 1) Number of ports can be 5, 7 or 9. Any ports can be used, the chip
++	 *    tracks how many are active.
++	 * 2) HSR/PRP. The duplicate discard table can be disabled.
++	 * 3) TAS, frame preemption and PSFP can be disabled.
++	 */
++	feat_dis = lan_rd(lan9645x, GCB_FEAT_DISABLE);
++
++	lan9645x->num_port_dis =
++		GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS_GET(feat_dis);
++}
++
++static int lan9645x_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct lan9645x *lan9645x;
++	struct dsa_switch *ds;
++	int err = 0;
++
++	lan9645x = devm_kzalloc(dev, sizeof(*lan9645x), GFP_KERNEL);
++	if (!lan9645x)
++		return dev_err_probe(dev, -ENOMEM,
++				     "Failed to allocate LAN9645X");
++
++	dev_set_drvdata(dev, lan9645x);
++	lan9645x->dev = dev;
++
++	err = lan9645x_request_target_regmaps(lan9645x);
++	if (err)
++		return dev_err_probe(dev, err, "Failed to request regmaps");
++
++	ds = devm_kzalloc(dev, sizeof(*ds), GFP_KERNEL);
++	if (!ds)
++		return dev_err_probe(dev, -ENOMEM,
++				     "Failed to allocate DSA switch");
++
++	lan9645x->ports = devm_kcalloc(lan9645x->dev, NUM_PHYS_PORTS,
++				       sizeof(struct lan9645x_port *),
++				       GFP_KERNEL);
++	if (!lan9645x->ports)
++		return dev_err_probe(dev, -ENOMEM,
++				     "Failed to allocate switch ports");
++
++	for (int port = 0; port < NUM_PHYS_PORTS; port++) {
++		struct lan9645x_port *p;
++
++		p = devm_kzalloc(lan9645x->dev, sizeof(*p), GFP_KERNEL);
++		if (!p)
++			return dev_err_probe(dev, -ENOMEM,
++					     "Failed to allocate switch port");
++
++		p->lan9645x = lan9645x;
++		p->chip_port = port;
++		lan9645x->ports[port] = p;
++	}
++
++	ds->dev = dev;
++	ds->num_ports = NUM_PHYS_PORTS;
++	ds->num_tx_queues = NUM_PRIO_QUEUES;
++	ds->dscp_prio_mapping_is_global = true;
++
++	ds->ops = &lan9645x_switch_ops;
++	ds->phylink_mac_ops = &lan9645x_phylink_mac_ops;
++	ds->priv = lan9645x;
++
++	lan9645x->ds = ds;
++	lan9645x->shared_queue_sz = LAN9645X_BUFFER_MEMORY;
++	lan9645x->npi = -1;
++
++	lan9645x_set_feat_dis(lan9645x);
++
++	err = dsa_register_switch(ds);
++	if (err)
++		return dev_err_probe(dev, err, "Failed to register DSA switch");
++
++	return 0;
++}
++
++static void lan9645x_remove(struct platform_device *pdev)
++{
++	struct lan9645x *lan9645x = dev_get_drvdata(&pdev->dev);
++
++	if (!lan9645x)
++		return;
++
++	/* Calls lan9645x DSA .teardown */
++	dsa_unregister_switch(lan9645x->ds);
++	dev_set_drvdata(&pdev->dev, NULL);
++}
++
++static void lan9645x_shutdown(struct platform_device *pdev)
++{
++	struct lan9645x *lan9645x = dev_get_drvdata(&pdev->dev);
++
++	if (!lan9645x)
++		return;
++
++	dsa_switch_shutdown(lan9645x->ds);
++
++	dev_set_drvdata(&pdev->dev, NULL);
++}
++
++static const struct of_device_id lan9645x_switch_of_match[] = {
++	{ .compatible = "microchip,lan96455s-switch" },
++	{},
++};
++MODULE_DEVICE_TABLE(of, lan9645x_switch_of_match);
++
++static struct platform_driver lan9645x_switch_driver = {
++	.driver = {
++		.name = "lan96455s-switch",
++		.of_match_table = lan9645x_switch_of_match,
++	},
++	.probe = lan9645x_probe,
++	.remove = lan9645x_remove,
++	.shutdown = lan9645x_shutdown,
++};
++module_platform_driver(lan9645x_switch_driver);
++
++MODULE_DESCRIPTION("Lan9645x Switch Driver");
++MODULE_AUTHOR("Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
+new file mode 100644
+index 000000000000..3a1046d3584e
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
+@@ -0,0 +1,328 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
++
++#ifndef __LAN9645X_MAIN_H__
++#define __LAN9645X_MAIN_H__
++
++#include <linux/dsa/lan9645x.h>
++#include <linux/if_bridge.h>
++#include <linux/regmap.h>
++#include <net/dsa.h>
++
++#include "lan9645x_regs.h"
++
++/* Ports 0-8 are front ports
++ * Ports 9-10 are CPU ports
++ *
++ * CPU ports are logical ports in the chip intended for management. The frame
++ * delivery mechanism can vary: direct register injection/extraction or one can
++ * use a front port as CPU port, called a Node Processor Interface (NPI).
++ *
++ * This is the approach used by LAN9645X.
++ */
++#define NUM_PHYS_PORTS		9
++#define CPU_PORT		9
++#define NUM_PRIO_QUEUES		8
++#define LAN9645X_NUM_TC		8
++
++#define QS_SRC_BUF_RSV		1700
++
++/* Reserved amount for (SRC, PRIO) at index 8*SRC + PRIO
++ * See QSYS:RES_CTRL[*]:RES_CFG description
++ */
++#define QSYS_Q_RSRV			95
++
++#define LAN9645X_ISDX_MAX		128
++#define LAN9645X_ESDX_MAX		128
++#define LAN9645X_SFID_MAX		128
++
++/* Reserved VLAN IDs. */
++#define UNAWARE_PVID			0
++#define HOST_PVID			4095
++#define VLAN_MAX			(HOST_PVID - 1)
++
++/* 160KiB / 1.25Mbit */
++#define LAN9645X_BUFFER_MEMORY	(160 * 1024)
++
++/* Port Group Identifiers (PGID) are port-masks applied to all frames.
++ * The replicated registers are organized like so in HW:
++ *
++ * 0-63:         Destination analysis
++ * 64-79:        Aggregation analysis
++ * 80-(80+10-1): Source port analysis
++ *
++ * Destination: By default the first 9 port masks == BIT(port_num). Never change
++ * these except for aggregation. Remaining dst masks are for L2 MC and
++ * flooding. (See FLOODING and FLOODING_IPMC).
++ *
++ * Aggregation: Used to pick a port within an aggregation group. If no
++ * aggregation is configured, these are all-ones.
++ *
++ * Source: Control which ports a given source port can forward to. A frame that
++ * is received on port n, uses mask 80+n as a mask to filter out destination
++ * ports. The default values are that all bits are set except for the index
++ * number (no loopback).
++ *
++ * We reserve destination PGIDs at the end of the range.
++ */
++
++#define PGID_AGGR			64
++#define PGID_SRC			80
++#define PGID_ENTRIES			89
++
++#define PGID_AGGR_NUM			(PGID_SRC - PGID_AGGR)
++
++/* General purpose PGIDs. */
++#define PGID_GP_START			CPU_PORT
++#define PGID_GP_END			PGID_MRP
++
++/* Reserved PGIDs.
++ * PGID_MRP is a blackhole PGID
++ */
++#define PGID_MRP			(PGID_AGGR - 7)
++#define PGID_CPU			(PGID_AGGR - 6)
++#define PGID_UC				(PGID_AGGR - 5)
++#define PGID_BC				(PGID_AGGR - 4)
++#define PGID_MC				(PGID_AGGR - 3)
++#define PGID_MCIPV4			(PGID_AGGR - 2)
++#define PGID_MCIPV6			(PGID_AGGR - 1)
++
++/* Flooding PGIDS:
++ * PGID_UC
++ * PGID_MC*
++ * PGID_BC
++ */
++
++#define GWM_MULTIPLIER_BIT		BIT(8)
++#define LAN9645X_BUFFER_CELL_SZ		64
++
++#define RD_SLEEP_US			3
++#define RD_SLEEPTIMEOUT_US		100000
++#define SLOW_RD_SLEEP_US		1000
++#define SLOW_RD_SLEEPTIMEOUT_US		4000000
++
++#define lan9645x_rd_poll_timeout(_lan9645x, _reg_macro, _val, _cond)     \
++	regmap_read_poll_timeout(lan_rmap((_lan9645x), _reg_macro),	\
++				 lan_rel_addr(_reg_macro), (_val),	\
++				 (_cond), RD_SLEEP_US, RD_SLEEPTIMEOUT_US)
++
++#define lan9645x_rd_poll_slow(_lan9645x, _reg_macro, _val, _cond)	\
++	regmap_read_poll_timeout(lan_rmap((_lan9645x), _reg_macro),	\
++				 lan_rel_addr(_reg_macro), (_val),	\
++				 (_cond), SLOW_RD_SLEEP_US,		\
++				 SLOW_RD_SLEEPTIMEOUT_US)
++
++/* NPI port prefix config encoding
++ *
++ * 0: No CPU extraction header (normal frames)
++ * 1: CPU extraction header without prefix
++ * 2: CPU extraction header with short prefix
++ * 3: CPU extraction header with long prefix
++ */
++enum lan9645x_tag_prefix {
++	LAN9645X_TAG_PREFIX_DISABLED = 0,
++	LAN9645X_TAG_PREFIX_NONE = 1,
++	LAN9645X_TAG_PREFIX_SHORT = 2,
++	LAN9645X_TAG_PREFIX_LONG = 3,
++};
++
++enum {
++	LAN9645X_SPEED_DISABLED = 0,
++	LAN9645X_SPEED_10 = 1,
++	LAN9645X_SPEED_100 = 2,
++	LAN9645X_SPEED_1000 = 3,
++	LAN9645X_SPEED_2500 = 4,
++};
++
++/* Rewriter VLAN port tagging encoding for REW:PORT[0-10]:TAG_CFG.TAG_CFG
++ *
++ * 0: Port tagging disabled.
++ * 1: Tag all frames, except when VID=PORT_VLAN_CFG.PORT_VID or VID=0.
++ * 2: Tag all frames, except when VID=0.
++ * 3: Tag all frames.
++ */
++enum lan9645x_vlan_port_tag {
++	LAN9645X_TAG_DISABLED = 0,
++	LAN9645X_TAG_NO_PVID_NO_UNAWARE = 1,
++	LAN9645X_TAG_NO_UNAWARE = 2,
++	LAN9645X_TAG_ALL = 3,
++};
++
++struct lan9645x {
++	struct device *dev;
++	struct dsa_switch *ds;
++	struct regmap *rmap[NUM_TARGETS];
++
++	int shared_queue_sz;
++
++	/* NPI chip_port */
++	int npi;
++
++	u8 num_phys_ports;
++	struct lan9645x_port **ports;
++
++	int num_port_dis;
++};
++
++struct lan9645x_port {
++	struct lan9645x *lan9645x;
++
++	u8 chip_port;
++
++	bool rx_internal_delay;
++	bool tx_internal_delay;
++};
++
++extern const struct phylink_mac_ops lan9645x_phylink_mac_ops;
++
++/* PFC_CFG.FC_LINK_SPEED encoding */
++static inline int lan9645x_speed_fc_enc(int speed)
++{
++	switch (speed) {
++	case LAN9645X_SPEED_10:
++		return 3;
++	case LAN9645X_SPEED_100:
++		return 2;
++	case LAN9645X_SPEED_1000:
++		return 1;
++	case LAN9645X_SPEED_2500:
++		return 0;
++	default:
++		WARN_ON_ONCE(1);
++		return 1;
++	}
++}
++
++/* Watermark encode. See QSYS:RES_CTRL[*]:RES_CFG.WM_HIGH for details.
++ * Returns lowest encoded number which will fit request/ is larger than request.
++ * Or the maximum representable value, if request is too large.
++ */
++static inline u32 lan9645x_wm_enc(u32 value)
++{
++	value = DIV_ROUND_UP(value, LAN9645X_BUFFER_CELL_SZ);
++
++	if (value >= GWM_MULTIPLIER_BIT) {
++		value = DIV_ROUND_UP(value, 16);
++		if (value >= GWM_MULTIPLIER_BIT)
++			value = (GWM_MULTIPLIER_BIT - 1);
++		value |= GWM_MULTIPLIER_BIT;
++	}
++
++	return value;
++}
++
++static inline struct lan9645x_port *lan9645x_to_port(struct lan9645x *lan9645x,
++						     int port)
++{
++	return lan9645x->ports[port];
++}
++
++static inline struct regmap *lan_tgt2rmap(struct lan9645x *lan9645x,
++					  enum lan9645x_target t, int tinst)
++{
++	return lan9645x->rmap[t + tinst];
++}
++
++static inline u32 __lan_rel_addr(int gbase, int ginst, int gcnt,
++				 int gwidth, int raddr, int rinst,
++				 int rcnt, int rwidth)
++{
++	WARN_ON(ginst >= gcnt);
++	WARN_ON(rinst >= rcnt);
++	return gbase + ginst * gwidth + raddr + rinst * rwidth;
++}
++
++/* Get register address relative to target instance */
++static inline u32 lan_rel_addr(enum lan9645x_target t, int tinst, int tcnt,
++			       int gbase, int ginst, int gcnt, int gwidth,
++			       int raddr, int rinst, int rcnt, int rwidth)
++{
++	WARN_ON(tinst >= tcnt);
++	return __lan_rel_addr(gbase, ginst, gcnt, gwidth, raddr, rinst,
++			      rcnt, rwidth);
++}
++
++static inline u32 lan_rd(struct lan9645x *lan9645x, enum lan9645x_target t,
++			 int tinst, int tcnt, int gbase, int ginst,
++			 int gcnt, int gwidth, int raddr, int rinst,
++			 int rcnt, int rwidth)
++{
++	u32 addr, val = 0;
++
++	addr = lan_rel_addr(t, tinst, tcnt, gbase, ginst, gcnt, gwidth,
++			    raddr, rinst, rcnt, rwidth);
++
++	WARN_ON_ONCE(regmap_read(lan_tgt2rmap(lan9645x, t, tinst), addr, &val));
++
++	return val;
++}
++
++static inline int lan_bulk_rd(void *val, size_t val_count,
++			      struct lan9645x *lan9645x,
++			      enum lan9645x_target t, int tinst, int tcnt,
++			      int gbase, int ginst, int gcnt, int gwidth,
++			      int raddr, int rinst, int rcnt, int rwidth)
++{
++	u32 addr;
++
++	addr = lan_rel_addr(t, tinst, tcnt, gbase, ginst, gcnt, gwidth,
++			    raddr, rinst, rcnt, rwidth);
++
++	return regmap_bulk_read(lan_tgt2rmap(lan9645x, t, tinst), addr, val,
++				val_count);
++}
++
++static inline struct regmap *lan_rmap(struct lan9645x *lan9645x,
++				      enum lan9645x_target t, int tinst,
++				      int tcnt, int gbase, int ginst,
++				      int gcnt, int gwidth, int raddr,
++				      int rinst, int rcnt, int rwidth)
++{
++	return lan_tgt2rmap(lan9645x, t, tinst);
++}
++
++static inline void lan_wr(u32 val, struct lan9645x *lan9645x,
++			  enum lan9645x_target t, int tinst, int tcnt,
++			  int gbase, int ginst, int gcnt, int gwidth,
++			  int raddr, int rinst, int rcnt, int rwidth)
++{
++	u32 addr;
++
++	addr = lan_rel_addr(t, tinst, tcnt, gbase, ginst, gcnt, gwidth,
++			    raddr, rinst, rcnt, rwidth);
++
++	WARN_ON_ONCE(regmap_write(lan_tgt2rmap(lan9645x, t, tinst), addr, val));
++}
++
++static inline void lan_rmw(u32 val, u32 mask, struct lan9645x *lan9645x,
++			   enum lan9645x_target t, int tinst, int tcnt,
++			   int gbase, int ginst, int gcnt, int gwidth,
++			   int raddr, int rinst, int rcnt, int rwidth)
++{
++	u32 addr;
++
++	addr = lan_rel_addr(t, tinst, tcnt, gbase, ginst, gcnt, gwidth,
++			    raddr, rinst, rcnt, rwidth);
++
++	WARN_ON_ONCE(regmap_update_bits(lan_tgt2rmap(lan9645x, t, tinst),
++					addr, mask, val));
++}
++
++/* lan9645x_npi.c */
++void lan9645x_npi_port_init(struct lan9645x *lan9645x,
++			    struct dsa_port *cpu_port);
++void lan9645x_npi_port_deinit(struct lan9645x *lan9645x, int port);
++
++/* lan9645x_port.c */
++int lan9645x_port_setup(struct dsa_switch *ds, int port);
++void lan9645x_port_set_tail_drop_wm(struct lan9645x *lan9645x);
++int lan9645x_port_set_maxlen(struct lan9645x *lan9645x, int port, size_t sdu);
++void lan9645x_port_cpu_init(struct lan9645x *lan9645x);
++
++/* lan9645x_phylink.c */
++void lan9645x_phylink_get_caps(struct lan9645x *lan9645x, int port,
++			       struct phylink_config *c);
++void lan9645x_phylink_port_down(struct lan9645x *lan9645x, int port);
++
++#endif /* __LAN9645X_MAIN_H__ */
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c
+new file mode 100644
+index 000000000000..7f39c20e5f34
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0+
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
++#include <net/addrconf.h>
++
++#include "lan9645x_main.h"
++
++void lan9645x_npi_port_init(struct lan9645x *lan9645x,
++			    struct dsa_port *cpu_port)
++{
++	int port = cpu_port->index;
++	struct lan9645x_port *p;
++
++	p = lan9645x_to_port(lan9645x, port);
++	lan9645x->npi = port;
++
++	dev_dbg(lan9645x->dev, "NPI port=%d\n", port);
++
++	/* Any CPU extraction queue frames, are sent to external CPU on given
++	 * port. Never send injected frames back to cpu.
++	 */
++	lan_wr(QSYS_EXT_CPU_CFG_EXT_CPUQ_MSK |
++	       QSYS_EXT_CPU_CFG_EXT_CPU_PORT_SET(p->chip_port) |
++	       QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA_SET(1) |
++	       QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA_SET(1),
++	       lan9645x, QSYS_EXT_CPU_CFG);
++
++	/* Configure IFH prefix mode for NPI port. We can not use an injection
++	 * prefix, because it requires all frames sent on the port to contain
++	 * the prefix. Frames without the prefix would get stuck in the queue
++	 * system rendering the port becomes unusable. Since we do not control
++	 * what is sent to the NPI port, no prefix is our only option.
++	 */
++	lan_rmw(SYS_PORT_MODE_INCL_XTR_HDR_SET(LAN9645X_TAG_PREFIX_LONG) |
++		SYS_PORT_MODE_INCL_INJ_HDR_SET(LAN9645X_TAG_PREFIX_NONE),
++		SYS_PORT_MODE_INCL_XTR_HDR |
++		SYS_PORT_MODE_INCL_INJ_HDR,
++		lan9645x,
++		SYS_PORT_MODE(p->chip_port));
++
++	/* Rewriting and extraction with IFH does not play nice together. A VLAN
++	 * tag pushed into the frame by REW will cause 4 bytes at the end of the
++	 * extraction header to be overwritten with the top 4 bytes of the DMAC.
++	 *
++	 * We can not use REW_PORT_CFG_NO_REWRITE=1 as that disabled RTAGD
++	 * setting in the IFH
++	 */
++	lan_rmw(REW_TAG_CFG_TAG_CFG_SET(LAN9645X_TAG_DISABLED),
++		REW_TAG_CFG_TAG_CFG, lan9645x, REW_TAG_CFG(port));
++
++	/* Clear rewriter port vid */
++	lan_wr(0, lan9645x, REW_PORT_VLAN_CFG(port));
++
++	/* Make sure frames with src_port=CPU_PORT are not reflected back via
++	 * the NPI port. This could happen if a frame is flooded for instance.
++	 * The *_CPU_KILL_ENA flags above only have an effect when a frame is
++	 * output due to a CPU forwarding decision such as trapping or cpu copy.
++	 */
++	lan_rmw(0, BIT(port), lan9645x, ANA_PGID(PGID_SRC + CPU_PORT));
++}
++
++void lan9645x_npi_port_deinit(struct lan9645x *lan9645x, int port)
++{
++	struct lan9645x_port *p;
++
++	if (port < 0)
++		return;
++
++	lan9645x->npi = -1;
++	p = lan9645x_to_port(lan9645x, port);
++
++	lan_wr(QSYS_EXT_CPU_CFG_EXT_CPU_PORT_SET(0x1f) |
++	       QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA_SET(1) |
++	       QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA_SET(1),
++	       lan9645x, QSYS_EXT_CPU_CFG);
++
++	lan_rmw(SYS_PORT_MODE_INCL_XTR_HDR_SET(LAN9645X_TAG_PREFIX_DISABLED) |
++		SYS_PORT_MODE_INCL_INJ_HDR_SET(LAN9645X_TAG_PREFIX_DISABLED),
++		SYS_PORT_MODE_INCL_XTR_HDR |
++		SYS_PORT_MODE_INCL_INJ_HDR,
++		lan9645x,
++		SYS_PORT_MODE(p->chip_port));
++}
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
+new file mode 100644
+index 000000000000..e57ff68d623d
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
+@@ -0,0 +1,409 @@
++// SPDX-License-Identifier: GPL-2.0+
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
++
++#include <linux/phy.h>
++#include <linux/phy/phy.h>
++
++#include "lan9645x_main.h"
++
++/* Port 4 or 7 is RGMII_0 and port 8 is RGMII_1 */
++#define RGMII_IDX(port) ((port) == 8 ? 1 : 0)
++
++void lan9645x_phylink_get_caps(struct lan9645x *lan9645x, int port,
++			       struct phylink_config *c)
++{
++	c->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
++			      MAC_100 | MAC_1000FD;
++
++	switch (port) {
++	case 0 ... 3:
++		__set_bit(PHY_INTERFACE_MODE_GMII, c->supported_interfaces);
++		break;
++	case 4:
++		__set_bit(PHY_INTERFACE_MODE_GMII, c->supported_interfaces);
++		phy_interface_set_rgmii(c->supported_interfaces);
++		break;
++	case 5 ... 6:
++		/* SerDes ports: QSGMII/SGMII/1000BASEX/2500BASEX modes
++		 * require PCS support which is not yet implemented.
++		 * With empty supported_interfaces, these will end up being
++		 * marked unused by the DSA core, if they are declared in the
++		 * DT.
++		 */
++		break;
++	case 7 ... 8:
++		/* QSGMII mode on ports 7-8 requires SerDes PCS support,
++		 * which is not yet implemented.
++		 */
++		phy_interface_set_rgmii(c->supported_interfaces);
++		break;
++	default:
++		break;
++	}
++}
++
++static void lan9645x_rgmii_set_speed(struct lan9645x *lan9645x, int port,
++				     int speed)
++{
++	u8 tx_clk;
++
++	tx_clk = speed == SPEED_1000 ? 1 :
++		 speed == SPEED_100  ? 2 :
++		 speed == SPEED_10   ? 3 : 0;
++
++	lan_rmw(HSIO_RGMII_CFG_RGMII_RX_RST_SET(0) |
++		HSIO_RGMII_CFG_RGMII_TX_RST_SET(0) |
++		HSIO_RGMII_CFG_TX_CLK_CFG_SET(tx_clk),
++		HSIO_RGMII_CFG_RGMII_RX_RST |
++		HSIO_RGMII_CFG_RGMII_TX_RST |
++		HSIO_RGMII_CFG_TX_CLK_CFG,
++		lan9645x, HSIO_RGMII_CFG(RGMII_IDX(port)));
++}
++
++static void lan9645x_rgmii_dll_config(struct lan9645x_port *p)
++{
++	u32 rx_idx, tx_idx;
++
++	/* DLL register layout:
++	 * (N*2):   RGMII_N_RX
++	 * (N*2)+1: RGMII_N_TX
++	 */
++	rx_idx = RGMII_IDX(p->chip_port) * 2;
++	tx_idx = RGMII_IDX(p->chip_port) * 2 + 1;
++
++	/* Enable DLL in RGMII clock paths, deassert DLL reset, and start the
++	 * delay tune FSM.
++	 */
++	lan_rmw(HSIO_DLL_CFG_DLL_CLK_ENA_SET(1) |
++		HSIO_DLL_CFG_DLL_RST_SET(0) |
++		HSIO_DLL_CFG_DLL_ENA_SET(p->rx_internal_delay) |
++		HSIO_DLL_CFG_DELAY_ENA_SET(p->rx_internal_delay),
++		HSIO_DLL_CFG_DLL_CLK_ENA |
++		HSIO_DLL_CFG_DLL_RST |
++		HSIO_DLL_CFG_DLL_ENA |
++		HSIO_DLL_CFG_DELAY_ENA,
++		p->lan9645x, HSIO_DLL_CFG(rx_idx));
++
++	lan_rmw(HSIO_DLL_CFG_DLL_CLK_ENA_SET(1) |
++		HSIO_DLL_CFG_DLL_RST_SET(0) |
++		HSIO_DLL_CFG_DLL_ENA_SET(p->tx_internal_delay) |
++		HSIO_DLL_CFG_DELAY_ENA_SET(p->tx_internal_delay),
++		HSIO_DLL_CFG_DLL_CLK_ENA |
++		HSIO_DLL_CFG_DLL_RST |
++		HSIO_DLL_CFG_DLL_ENA |
++		HSIO_DLL_CFG_DELAY_ENA,
++		p->lan9645x, HSIO_DLL_CFG(tx_idx));
++}
++
++static struct lan9645x_port *
++lan9645x_phylink_config_to_port(struct phylink_config *config)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++
++	return lan9645x_to_port(dp->ds->priv, dp->index);
++}
++
++static int lan9645x_phylink_mac_prepare(struct phylink_config *config,
++					unsigned int mode,
++					phy_interface_t iface)
++{
++	struct lan9645x_port *p = lan9645x_phylink_config_to_port(config);
++	struct lan9645x *lan9645x = p->lan9645x;
++	int port = p->chip_port;
++	u32 hw_cfg, gmii_ena;
++	bool is_rgmii;
++
++	if (port == 5 || port == 6 || port > 8)
++		return -EINVAL;
++
++	is_rgmii = phy_interface_mode_is_rgmii(iface);
++
++	/* RGMII_0 is a 2:1 mux shared between port 4 and port 7. Reject
++	 * collisions by looking at current hardware state: the driver
++	 * maintains the invariant that RGMII_0_CFG=1 iff port 4 owns
++	 * RGMII_0, and for port 7 when GMII_ENA bit 7 is set this implies port
++	 * 7 owns RGMII_0.
++	 */
++	if (is_rgmii) {
++		hw_cfg = lan_rd(lan9645x, HSIO_HW_CFG);
++		gmii_ena = HSIO_HW_CFG_GMII_ENA_GET(hw_cfg);
++
++		if (port == 4 && (gmii_ena & BIT(7)))
++			return -EBUSY;
++		if (port == 7 && (gmii_ena & BIT(4)) &&
++		    HSIO_HW_CFG_RGMII_0_CFG_GET(hw_cfg))
++			return -EBUSY;
++	}
++
++	lan_rmw(HSIO_HW_CFG_GMII_ENA_SET(BIT(port)),
++		HSIO_HW_CFG_GMII_ENA_SET(BIT(port)), lan9645x, HSIO_HW_CFG);
++
++	if (port == 4) {
++		lan_rmw(HSIO_HW_CFG_RGMII_0_CFG_SET(is_rgmii),
++			HSIO_HW_CFG_RGMII_0_CFG,
++			lan9645x, HSIO_HW_CFG);
++	} else if (port == 7 && is_rgmii) {
++		lan_rmw(HSIO_HW_CFG_RGMII_0_CFG_SET(0),
++			HSIO_HW_CFG_RGMII_0_CFG,
++			lan9645x, HSIO_HW_CFG);
++	}
++
++	return 0;
++}
++
++static void lan9645x_phylink_mac_config(struct phylink_config *config,
++					unsigned int mode,
++					const struct phylink_link_state *state)
++{
++	struct lan9645x_port *p = lan9645x_phylink_config_to_port(config);
++
++	if (phy_interface_mode_is_rgmii(state->interface))
++		lan9645x_rgmii_dll_config(p);
++}
++
++static bool lan9645x_port_is_cuphy(struct lan9645x *lan9645x, int port,
++				   phy_interface_t interface)
++{
++	return port >= 0 && port <= 4 && interface == PHY_INTERFACE_MODE_GMII;
++}
++
++void lan9645x_phylink_port_down(struct lan9645x *lan9645x, int port)
++{
++	struct lan9645x_port *p = lan9645x_to_port(lan9645x, port);
++	u32 val;
++
++	/* Disable MAC frame reception */
++	lan_rmw(DEV_MAC_ENA_CFG_RX_ENA_SET(0),
++		DEV_MAC_ENA_CFG_RX_ENA,
++		lan9645x, DEV_MAC_ENA_CFG(p->chip_port));
++
++	/* Disable traffic being sent to or from switch port */
++	lan_rmw(QSYS_SW_PORT_MODE_PORT_ENA_SET(0),
++		QSYS_SW_PORT_MODE_PORT_ENA,
++		lan9645x, QSYS_SW_PORT_MODE(p->chip_port));
++
++	/* Disable dequeuing from the egress queues  */
++	lan_rmw(QSYS_PORT_MODE_DEQUEUE_DIS_SET(1),
++		QSYS_PORT_MODE_DEQUEUE_DIS,
++		lan9645x, QSYS_PORT_MODE(p->chip_port));
++
++	/* Disable Flowcontrol */
++	lan_rmw(SYS_PAUSE_CFG_PAUSE_ENA_SET(0),
++		SYS_PAUSE_CFG_PAUSE_ENA,
++		lan9645x, SYS_PAUSE_CFG(p->chip_port));
++
++	/* Wait a worst case time 8ms (10K jumbo/10Mbit) */
++	usleep_range(8 * USEC_PER_MSEC, 9 * USEC_PER_MSEC);
++
++	/* Disable HDX backpressure. */
++	lan_rmw(SYS_FRONT_PORT_MODE_HDX_MODE_SET(0),
++		SYS_FRONT_PORT_MODE_HDX_MODE,
++		lan9645x, SYS_FRONT_PORT_MODE(p->chip_port));
++
++	/* Flush the queues associated with the port */
++	lan_rmw(QSYS_SW_PORT_MODE_AGING_MODE_SET(3),
++		QSYS_SW_PORT_MODE_AGING_MODE,
++		lan9645x, QSYS_SW_PORT_MODE(p->chip_port));
++
++	/* Enable dequeuing from the egress queues */
++	lan_rmw(QSYS_PORT_MODE_DEQUEUE_DIS_SET(0),
++		QSYS_PORT_MODE_DEQUEUE_DIS,
++		lan9645x, QSYS_PORT_MODE(p->chip_port));
++
++	/* Wait until flushing is complete */
++	if (lan9645x_rd_poll_slow(lan9645x, QSYS_SW_STATUS(p->chip_port),
++				  val, !QSYS_SW_STATUS_EQ_AVAIL_GET(val)))
++		dev_err(lan9645x->dev, "Flush timeout chip port %u\n", port);
++
++	/* Disable MAC tx */
++	lan_rmw(DEV_MAC_ENA_CFG_TX_ENA_SET(0),
++		DEV_MAC_ENA_CFG_TX_ENA,
++		lan9645x, DEV_MAC_ENA_CFG(p->chip_port));
++
++	/* Reset the Port and MAC clock domains */
++	lan_rmw(DEV_CLOCK_CFG_PORT_RST_SET(1),
++		DEV_CLOCK_CFG_PORT_RST,
++		lan9645x, DEV_CLOCK_CFG(p->chip_port));
++
++	/* Wait before resetting MAC clock domains. */
++	usleep_range(USEC_PER_MSEC, 2 * USEC_PER_MSEC);
++
++	lan_rmw(DEV_CLOCK_CFG_MAC_TX_RST_SET(1) |
++		DEV_CLOCK_CFG_MAC_RX_RST_SET(1) |
++		DEV_CLOCK_CFG_PORT_RST_SET(1),
++		DEV_CLOCK_CFG_MAC_TX_RST |
++		DEV_CLOCK_CFG_MAC_RX_RST |
++		DEV_CLOCK_CFG_PORT_RST,
++		lan9645x, DEV_CLOCK_CFG(p->chip_port));
++
++	/* Clear flushing */
++	lan_rmw(QSYS_SW_PORT_MODE_AGING_MODE_SET(1),
++		QSYS_SW_PORT_MODE_AGING_MODE,
++		lan9645x, QSYS_SW_PORT_MODE(p->chip_port));
++}
++
++static void lan9645x_phylink_mac_link_down(struct phylink_config *config,
++					   unsigned int link_an_mode,
++					   phy_interface_t interface)
++{
++	struct lan9645x_port *p = lan9645x_phylink_config_to_port(config);
++	struct lan9645x *lan9645x = p->lan9645x;
++
++	lan9645x_phylink_port_down(lan9645x, p->chip_port);
++}
++
++static void lan9645x_phylink_mac_link_up(struct phylink_config *config,
++					 struct phy_device *phydev,
++					 unsigned int link_an_mode,
++					 phy_interface_t interface, int speed,
++					 int duplex, bool tx_pause,
++					 bool rx_pause)
++{
++	struct lan9645x_port *p = lan9645x_phylink_config_to_port(config);
++	int rx_ifg1, rx_ifg2, tx_ifg, gtx_clk = 0;
++	struct lan9645x *lan9645x = p->lan9645x;
++	int gspeed = LAN9645X_SPEED_DISABLED;
++	int port = p->chip_port;
++	int mode = 0;
++	int fc_spd;
++
++	/* Configure RGMII TX clock for the negotiated speed */
++	if (phy_interface_mode_is_rgmii(interface))
++		lan9645x_rgmii_set_speed(lan9645x, port, speed);
++
++	if (duplex == DUPLEX_FULL) {
++		mode |= DEV_MAC_MODE_CFG_FDX_ENA_SET(1);
++		tx_ifg = 0x5;
++		rx_ifg2 = 0x2;
++
++	} else {
++		tx_ifg = 0x6;
++		rx_ifg2 = 0x2;
++	}
++
++	switch (speed) {
++	case SPEED_10:
++		rx_ifg1 = 0x2;
++		gspeed = LAN9645X_SPEED_10;
++		break;
++	case SPEED_100:
++		rx_ifg1 = 0x1;
++		gspeed = LAN9645X_SPEED_100;
++		break;
++	case SPEED_1000:
++		gspeed = LAN9645X_SPEED_1000;
++		mode |= DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
++		mode |= DEV_MAC_MODE_CFG_FDX_ENA_SET(1);
++		tx_ifg = 0x6;
++		rx_ifg1 = 0x1;
++		rx_ifg2 = 0x2;
++		gtx_clk = 1;
++		break;
++	case SPEED_2500:
++		gspeed = LAN9645X_SPEED_2500;
++		mode |= DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
++		mode |= DEV_MAC_MODE_CFG_FDX_ENA_SET(1);
++		tx_ifg = 0x6;
++		rx_ifg1 = 0x1;
++		rx_ifg2 = 0x2;
++		break;
++	default:
++		dev_err(lan9645x->dev, "Unsupported speed on port %d: %d\n",
++			p->chip_port, speed);
++		return;
++	}
++
++	fc_spd = lan9645x_speed_fc_enc(gspeed);
++
++	lan_rmw(mode,
++		DEV_MAC_MODE_CFG_FDX_ENA |
++		DEV_MAC_MODE_CFG_GIGA_MODE_ENA,
++		lan9645x, DEV_MAC_MODE_CFG(p->chip_port));
++
++	lan_rmw(DEV_MAC_IFG_CFG_TX_IFG_SET(tx_ifg) |
++		DEV_MAC_IFG_CFG_RX_IFG1_SET(rx_ifg1) |
++		DEV_MAC_IFG_CFG_RX_IFG2_SET(rx_ifg2),
++		DEV_MAC_IFG_CFG_TX_IFG |
++		DEV_MAC_IFG_CFG_RX_IFG1 |
++		DEV_MAC_IFG_CFG_RX_IFG2,
++		lan9645x, DEV_MAC_IFG_CFG(p->chip_port));
++
++	if (lan9645x_port_is_cuphy(lan9645x, port, interface)) {
++		lan_rmw(CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA_SET(gtx_clk),
++			CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA, lan9645x,
++			CHIP_TOP_CUPHY_PORT_CFG(p->chip_port));
++	}
++
++	lan_rmw(SYS_PAUSE_CFG_PAUSE_ENA_SET(1),
++		SYS_PAUSE_CFG_PAUSE_ENA,
++		lan9645x, SYS_PAUSE_CFG(p->chip_port));
++
++	/* Flow control */
++	lan_rmw(SYS_MAC_FC_CFG_FC_LINK_SPEED_SET(fc_spd) |
++		SYS_MAC_FC_CFG_FC_LATENCY_CFG_SET(0x7) |
++		SYS_MAC_FC_CFG_ZERO_PAUSE_ENA_SET(1) |
++		SYS_MAC_FC_CFG_PAUSE_VAL_CFG_SET(0xffff) |
++		SYS_MAC_FC_CFG_RX_FC_ENA_SET(rx_pause ? 1 : 0) |
++		SYS_MAC_FC_CFG_TX_FC_ENA_SET(tx_pause ? 1 : 0),
++		SYS_MAC_FC_CFG_FC_LINK_SPEED |
++		SYS_MAC_FC_CFG_FC_LATENCY_CFG |
++		SYS_MAC_FC_CFG_ZERO_PAUSE_ENA |
++		SYS_MAC_FC_CFG_PAUSE_VAL_CFG |
++		SYS_MAC_FC_CFG_RX_FC_ENA |
++		SYS_MAC_FC_CFG_TX_FC_ENA,
++		lan9645x, SYS_MAC_FC_CFG(p->chip_port));
++
++	/* Enable MAC module */
++	lan_wr(DEV_MAC_ENA_CFG_RX_ENA_SET(1) |
++	       DEV_MAC_ENA_CFG_TX_ENA_SET(1),
++	       lan9645x, DEV_MAC_ENA_CFG(p->chip_port));
++
++	/* port _must_ be taken out of reset before MAC. */
++	lan_rmw(DEV_CLOCK_CFG_PORT_RST_SET(0),
++		DEV_CLOCK_CFG_PORT_RST,
++		lan9645x, DEV_CLOCK_CFG(p->chip_port));
++
++	/* Take out the clock from reset. Note this write will set all these
++	 * fields to zero:
++	 *
++	 * DEV_CLOCK_CFG[*].MAC_TX_RST
++	 * DEV_CLOCK_CFG[*].MAC_RX_RST
++	 * DEV_CLOCK_CFG[*].PCS_TX_RST
++	 * DEV_CLOCK_CFG[*].PCS_RX_RST
++	 * DEV_CLOCK_CFG[*].PORT_RST
++	 * DEV_CLOCK_CFG[*].PHY_RST
++	 *
++	 * Note link_down will assert PORT_RST, MAC_RX_RST and MAC_TX_RST, so
++	 * we are effectively taking the mac tx/rx clocks out of reset.
++	 *
++	 * This linkspeed field has a slightly different encoding from others:
++	 *
++	 * - 0 is no-link
++	 * - 1 is both 2500/1000
++	 * - 2 is 100mbit
++	 * - 3 is 10mbit
++	 *
++	 */
++	lan_wr(DEV_CLOCK_CFG_LINK_SPEED_SET(fc_spd == 0 ? 1 : fc_spd),
++	       lan9645x,
++	       DEV_CLOCK_CFG(p->chip_port));
++
++	/* Core: Enable port for frame transfer */
++	lan_rmw(QSYS_SW_PORT_MODE_PORT_ENA_SET(1) |
++		QSYS_SW_PORT_MODE_SCH_NEXT_CFG_SET(1) |
++		QSYS_SW_PORT_MODE_INGRESS_DROP_MODE_SET(1) |
++		QSYS_SW_PORT_MODE_TX_PFC_ENA_SET(0),
++		QSYS_SW_PORT_MODE_PORT_ENA |
++		QSYS_SW_PORT_MODE_SCH_NEXT_CFG |
++		QSYS_SW_PORT_MODE_INGRESS_DROP_MODE |
++		QSYS_SW_PORT_MODE_TX_PFC_ENA,
++		lan9645x, QSYS_SW_PORT_MODE(p->chip_port));
++}
++
++const struct phylink_mac_ops lan9645x_phylink_mac_ops = {
++	.mac_prepare			= lan9645x_phylink_mac_prepare,
++	.mac_config			= lan9645x_phylink_mac_config,
++	.mac_link_down			= lan9645x_phylink_mac_link_down,
++	.mac_link_up			= lan9645x_phylink_mac_link_up,
++};
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
+new file mode 100644
+index 000000000000..815efc62ffbb
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
+@@ -0,0 +1,212 @@
++// SPDX-License-Identifier: GPL-2.0+
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
++
++#include <linux/of_net.h>
++
++#include "lan9645x_main.h"
++
++void lan9645x_port_cpu_init(struct lan9645x *lan9645x)
++{
++	/* Map the 8 CPU extraction queues to CPU port 9 (datasheet is wrong) */
++	lan_wr(0, lan9645x, QSYS_CPU_GROUP_MAP);
++
++	/* Set min-spacing of EOF to SOF on injected frames to 0, on cpu device
++	 * 1. This is required when injecting with IFH.
++	 * Default values emulates delay of std preamble/IFG setting on a front
++	 * port.
++	 */
++	lan_rmw(QS_INJ_CTRL_GAP_SIZE_SET(0),
++		QS_INJ_CTRL_GAP_SIZE,
++		lan9645x, QS_INJ_CTRL(1));
++
++	/* Injection: Mode: manual injection | Byte_swap */
++	lan_wr(QS_INJ_GRP_CFG_MODE_SET(1) |
++	       QS_INJ_GRP_CFG_BYTE_SWAP_SET(1),
++	       lan9645x, QS_INJ_GRP_CFG(1));
++
++	lan_rmw(QS_INJ_CTRL_GAP_SIZE_SET(0),
++		QS_INJ_CTRL_GAP_SIZE,
++		lan9645x, QS_INJ_CTRL(1));
++
++	lan_wr(SYS_PORT_MODE_INCL_INJ_HDR_SET(1),
++	       lan9645x, SYS_PORT_MODE(CPU_PORT + 1));
++
++	/* The CPU will only use its reserved buffer in the shared queue system
++	 * and none of the shared buffer space, therefore we disable resource
++	 * sharing in egress direction. We must not disable resource sharing in
++	 * the ingress direction, because some traffic test scenarios require
++	 * loads of buffer memory for frames initiated by the CPU.
++	 */
++	lan_rmw(QSYS_EGR_NO_SHARING_EGR_NO_SHARING_SET(BIT(CPU_PORT)),
++		QSYS_EGR_NO_SHARING_EGR_NO_SHARING_SET(BIT(CPU_PORT)),
++		lan9645x, QSYS_EGR_NO_SHARING);
++
++	/* The CPU should also discard frames forwarded to it if it has run
++	 * out of the reserved buffer space. Otherwise they will be held back
++	 * in the ingress queues with potential head-of-line blocking effects.
++	 */
++	lan_rmw(QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE_SET(BIT(CPU_PORT)),
++		QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE_SET(BIT(CPU_PORT)),
++		lan9645x, QSYS_EGR_DROP_MODE);
++
++	lan_wr(BIT(CPU_PORT), lan9645x, ANA_PGID(PGID_CPU));
++
++	lan_rmw(ANA_PORT_CFG_PORTID_VAL_SET(CPU_PORT) |
++		ANA_PORT_CFG_RECV_ENA_SET(1),
++		ANA_PORT_CFG_PORTID_VAL |
++		ANA_PORT_CFG_RECV_ENA, lan9645x,
++		ANA_PORT_CFG(CPU_PORT));
++
++	/* Enable switching to/from cpu port. Keep default aging-mode. */
++	lan_rmw(QSYS_SW_PORT_MODE_PORT_ENA_SET(1) |
++		QSYS_SW_PORT_MODE_SCH_NEXT_CFG_SET(1) |
++		QSYS_SW_PORT_MODE_INGRESS_DROP_MODE_SET(1),
++		QSYS_SW_PORT_MODE_PORT_ENA |
++		QSYS_SW_PORT_MODE_SCH_NEXT_CFG |
++		QSYS_SW_PORT_MODE_INGRESS_DROP_MODE,
++		lan9645x, QSYS_SW_PORT_MODE(CPU_PORT));
++
++	/* Transmit cpu frames as received without any tagging, timing or other
++	 * updates. This does not affect CPU-over-NPI, only manual extraction.
++	 * On the NPI port we need NO_REWRITE=0 for HSR/PRP.
++	 */
++	lan_wr(REW_PORT_CFG_NO_REWRITE_SET(1),
++	       lan9645x, REW_PORT_CFG(CPU_PORT));
++}
++
++void lan9645x_port_set_tail_drop_wm(struct lan9645x *lan9645x)
++{
++	int shared_per_port;
++	struct dsa_port *dp;
++
++	/* Configure tail dropping watermark */
++	shared_per_port =
++		lan9645x->shared_queue_sz / (lan9645x->num_phys_ports + 1);
++
++	/* The total memory size is divided by number of front ports plus CPU
++	 * port.
++	 */
++	dsa_switch_for_each_available_port(dp, lan9645x->ds)
++		lan_wr(lan9645x_wm_enc(shared_per_port), lan9645x,
++		       SYS_ATOP(dp->index));
++
++	/* Tail dropping active based only on per port ATOP wm */
++	lan_wr(lan9645x_wm_enc(lan9645x->shared_queue_sz), lan9645x,
++	       SYS_ATOP_TOT_CFG);
++}
++
++/* VLAN tag overhead is handled by DEV_MAC_TAGS_CFG */
++int lan9645x_port_set_maxlen(struct lan9645x *lan9645x, int port, size_t sdu)
++{
++	struct lan9645x_port *p = lan9645x_to_port(lan9645x, port);
++	int maxlen = sdu + ETH_HLEN + ETH_FCS_LEN;
++
++	if (port == lan9645x->npi) {
++		maxlen += LAN9645X_IFH_LEN;
++		maxlen += LAN9645X_LONG_PREFIX_LEN;
++	}
++
++	lan_wr(DEV_MAC_MAXLEN_CFG_MAX_LEN_SET(maxlen), lan9645x,
++	       DEV_MAC_MAXLEN_CFG(p->chip_port));
++
++	/* Set Pause WM hysteresis */
++	lan_rmw(SYS_PAUSE_CFG_PAUSE_STOP_SET(lan9645x_wm_enc(4 * maxlen)) |
++		SYS_PAUSE_CFG_PAUSE_START_SET(lan9645x_wm_enc(6 * maxlen)),
++		SYS_PAUSE_CFG_PAUSE_START |
++		SYS_PAUSE_CFG_PAUSE_STOP,
++		lan9645x,
++		SYS_PAUSE_CFG(p->chip_port));
++
++	return 0;
++}
++
++static void lan9645x_parse_mac_delay(struct lan9645x *lan9645x, int port,
++				     struct device_node *dn, const char *name,
++				     bool *out)
++{
++	u32 val;
++
++	if (of_property_read_u32(dn, name, &val))
++		return;
++
++	if (val != 0 && val != 2000) {
++		dev_warn(lan9645x->dev,
++			 "port %d: %s only supports a 2ns delay (on/off), got %u ps\n",
++			 port, name, val);
++		return;
++	}
++
++	*out = val == 2000;
++}
++
++int lan9645x_port_setup(struct dsa_switch *ds, int port)
++{
++	struct dsa_port *dp = dsa_to_port(ds, port);
++	struct lan9645x *lan9645x = ds->priv;
++	struct lan9645x_port *p;
++
++	p = lan9645x_to_port(lan9645x, port);
++
++	if (dp->dn) {
++		lan9645x_parse_mac_delay(lan9645x, port, dp->dn,
++					 "rx-internal-delay-ps",
++					 &p->rx_internal_delay);
++
++		lan9645x_parse_mac_delay(lan9645x, port, dp->dn,
++					 "tx-internal-delay-ps",
++					 &p->tx_internal_delay);
++	}
++
++	/* Disable learning on port */
++	lan_rmw(ANA_PORT_CFG_LEARN_ENA_SET(0),
++		ANA_PORT_CFG_LEARN_ENA,
++		lan9645x, ANA_PORT_CFG(p->chip_port));
++
++	lan9645x_port_set_maxlen(lan9645x, port, ETH_DATA_LEN);
++
++	/* Load HDX backoff seed (fixed per-port, one-shot strobe) */
++	lan_rmw(DEV_MAC_HDX_CFG_SEED_SET(p->chip_port) |
++		DEV_MAC_HDX_CFG_SEED_LOAD_SET(1),
++		DEV_MAC_HDX_CFG_SEED |
++		DEV_MAC_HDX_CFG_SEED_LOAD, lan9645x,
++		DEV_MAC_HDX_CFG(p->chip_port));
++
++	lan_rmw(DEV_MAC_HDX_CFG_SEED_LOAD_SET(0),
++		DEV_MAC_HDX_CFG_SEED_LOAD, lan9645x,
++		DEV_MAC_HDX_CFG(p->chip_port));
++
++	/* Set SMAC of Pause frame (00:00:00:00:00:00) */
++	lan_wr(0, lan9645x, DEV_FC_MAC_LOW_CFG(p->chip_port));
++	lan_wr(0, lan9645x, DEV_FC_MAC_HIGH_CFG(p->chip_port));
++
++	lan9645x_phylink_port_down(lan9645x, port);
++
++	/* Drop frames with multicast source address */
++	lan_rmw(ANA_DROP_CFG_DROP_MC_SMAC_ENA_SET(1),
++		ANA_DROP_CFG_DROP_MC_SMAC_ENA, lan9645x,
++		ANA_DROP_CFG(p->chip_port));
++
++	lan_rmw(DEV_MAC_TAGS_CFG_VLAN_AWR_ENA_SET(1) |
++		DEV_MAC_TAGS_CFG_PB_ENA_SET(1) |
++		DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA_SET(1) |
++		DEV_MAC_TAGS_CFG_TAG_ID_SET(ETH_P_8021AD),
++		DEV_MAC_TAGS_CFG_VLAN_AWR_ENA |
++		DEV_MAC_TAGS_CFG_PB_ENA |
++		DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA |
++		DEV_MAC_TAGS_CFG_TAG_ID,
++		lan9645x, DEV_MAC_TAGS_CFG(p->chip_port));
++
++	/* Enable receiving frames on the port, and activate auto-learning of
++	 * MAC addresses. LEARNAUTO is ignored when LEARN_ENA=0.
++	 */
++	lan_rmw(ANA_PORT_CFG_LEARNAUTO_SET(1) |
++		ANA_PORT_CFG_RECV_ENA_SET(1) |
++		ANA_PORT_CFG_PORTID_VAL_SET(p->chip_port),
++		ANA_PORT_CFG_LEARNAUTO |
++		ANA_PORT_CFG_RECV_ENA |
++		ANA_PORT_CFG_PORTID_VAL,
++		lan9645x, ANA_PORT_CFG(p->chip_port));
++
++	return 0;
++}
+
 -- 
-2.47.3
+2.52.0
 
 
