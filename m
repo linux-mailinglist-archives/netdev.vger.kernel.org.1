@@ -1,197 +1,180 @@
-Return-Path: <netdev+bounces-294670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id x4hWLqPhH2rtrgAAu9opvQ
-	(envelope-from <netdev+bounces-294670-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:11:15 +0200
+	id ezEKCg/fH2ocrgAAu9opvQ
+	(envelope-from <netdev+bounces-294671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:00:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 129126358D8
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:11:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B62E63572B
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:00:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=blackwall.org header.s=google header.b=DbqgEAUJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294670-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294670-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=HmtZXX4n;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294671-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294671-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D688030182B5
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:55:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 352A3309C9C7
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8693A1E7F;
-	Wed,  3 Jun 2026 07:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CC940628A;
+	Wed,  3 Jun 2026 07:57:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDCA4028C3
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F179405C4D;
+	Wed,  3 Jun 2026 07:57:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780473304; cv=none; b=KYmqzSH8B3r/cti26Fd9g4Nz6sy65/zR8paL42tKZuF/nP6hLBqaY7BbLOk8rf3HPWQIgakiThLHqnD5cP1fTnuiGsnW2fqdANLl0SzymjHIJ3I2o9g0nvcbpbM+ZCVAwjP2RacxFmqerwQmYO7yeNuWYjWl/l4U46/LrCQkKng=
+	t=1780473476; cv=none; b=T8IdIqNz/8zYTthQy4miMp/5pRfwoKx+ub3s4/DVUy8i575VWMig5LdbNTlb9PgCx1waSa/jOmYS+zerffRPgdDt8KplZY/AoWVCvDLes6dorK9LBmcgBBJ+L19g97sQXQM5zFteQl8cCFUeB8cKN8/k5zZtQs/RWkss6sF3plw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780473304; c=relaxed/simple;
-	bh=bf2/JwpQWD28xonEaanPrW5K427APXwU9FOB9VhG6XU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jgWRQb7rAJcFuq1QZqqK9DIpUWzpUtrwNTLVL3YDZ0O6OYhl2MqXrJmqZtyIQpbOyGwxBw4W9XTIvmVqGd5PkphaAy/Z7MVmCCkSWLL5MZaZncXsyGdSWdShUa9jLivw0DX104k23u7OXLFTfXtK/xQLQMEki/FrgoWkAavLpkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=DbqgEAUJ; arc=none smtp.client-ip=209.85.128.53
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-490b8ac62baso2080295e9.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 00:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1780473299; x=1781078099; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wT5gJlr8gJU4Zg/k/veBZUjxGWuT2RFVJgAw37fV/Es=;
-        b=DbqgEAUJOPWkmk2ACD4xC8i/MTc3gRHHC3exd3KuGJQqFVXtesk71sOzlGFAmeHC1G
-         IXrLGIwM+ZG69rVZh94hUMh1h2Oc1m1NfHWKXHiKZCSA4rGRGEo1+UFAT2lt47+2gcel
-         Y20advU9dV+kDdWSlRdvIGXSdsmqJqpA19GJtyuDl43pIe2JVZqzAzQxMbpsv5OTxJ6V
-         tdsmNhmg7RncL0GsDufTWk+W2CCmRSVbYWjF/ho9Hh8yhMv+EfNqjuKeCJEQ2LEOfOrn
-         F3HI+yr34cIvwHU7gCJuEKvXPcv0djsNCqj7zEQA2tyUtU85Sb6IMcOQdUjCkXXsqj0V
-         Zbzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780473299; x=1781078099;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wT5gJlr8gJU4Zg/k/veBZUjxGWuT2RFVJgAw37fV/Es=;
-        b=qYg/3CNj6NSASiiQij9F6KK6APdgeq1/qGoE/uNTWOd+OjeLaNQlcEESYNWH+D0Buu
-         fLBarC+jSx0svx8TusqRbIPcEkYEMnW78t6bjKx0iMr3FlfR1wUGo4yBNqzadac4InbN
-         7CKlR9q+KarEt9A26ydqOhumcvvbWcUHqI+G844cLkIO7ltECzL0NAatwwqnwcCgtFwK
-         idYRNklhGgdojhKuiQ9whgmJetsMnG04sSDSmC0p7zB8EWA03HFjDDy0x6vfM/GeYDrl
-         x8+iRxorN/SkarprUwkRxZxQ1Q3HZGwEwIOSVF+ht7GtBBYM8o6RzYXhJOSspakCA5rx
-         s1Qg==
-X-Gm-Message-State: AOJu0YyZOIKqgAsfbqpqDfeXyOS6xLUNi/tODEfFfKeETnuoHO7NuiLx
-	AaeQizYmyvmlsCzNExuvp2XCsV0XGuTzI3j3wj/gfsVFjMZV8hnuUBUPHZ89wVhxLTw=
-X-Gm-Gg: Acq92OENfxiAo11lbKapnaCXBi5awIe4OLEInMEtbaY+GWoCYqfZoDC/MjH9wyhpGeh
-	6lx6e/XsdxjTC33laREVbrCqk1NSlHEU3seBcOX0a0exxAbVx2tSX/nOMjQ0hy7x4RNFsVQhq0y
-	Tf2Mq6gDK7h1jIVv0Sj2jxKWGiDXt9r9ttELkHxSZIfI/ua95xsUcqD+IHtUToYoWTpWTcJjkJn
-	4IYubQhWNgEMougg3FvbIyx3hXoe4rf7ZJR6xyPvspCi4m8wbevVWRG6mR/kCXt/rK0lB2fsdXr
-	8H/vDnr9GL1YJJaXCJBokdOurLcNQ6AmfoA6kg1wWHA4i+C91dXkbOsIHDJ8KvDZfApFnfS6isG
-	1bSVkqW9ogxjuGndOwJYMAAuJKb96LjkmqsF3qGNaoTMxWfzJb4PuMI8VCVZ8wEvw36W+WpNEG9
-	r4RkqYBF1HBTwDCSVEgXL5q0blPd5JAVqw8lIt+LZzcS9TEZbZsxJ7EtRGpzAAnPMq
-X-Received: by 2002:a05:600c:458b:b0:490:af63:2cb1 with SMTP id 5b1f17b1804b1-490b6128dc3mr30990335e9.7.1780473299633;
-        Wed, 03 Jun 2026 00:54:59 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b0e20bacsm115325225e9.6.2026.06.03.00.54.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jun 2026 00:54:58 -0700 (PDT)
-Message-ID: <efcb9ef1-3996-4e49-9c71-7dc2a3edc5ab@blackwall.org>
-Date: Wed, 3 Jun 2026 10:54:56 +0300
+	s=arc-20240116; t=1780473476; c=relaxed/simple;
+	bh=+v78t5r+l4tSJyQHu8/3diPfqLNUodw+CjqVIQcnaYI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rbd57DqFmLp2yA28PAC0vxcFBS/eiRHSaFiy+fSw02Vqwz1rW1O+ChIe8AZ3nVR7CNihpSqgt3u5DMVTMJ9+tS9SgEuAJ9DBsVDX0xY6Y1Qwv/m2VaYq0lWD1s3Bsxpvzin/zSz7E86T05KZE17BF9fSCbRhi2OpUpAcGAF72iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmtZXX4n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A878CC2BCC7;
+	Wed,  3 Jun 2026 07:57:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780473475;
+	bh=+v78t5r+l4tSJyQHu8/3diPfqLNUodw+CjqVIQcnaYI=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=HmtZXX4nKUHGrM0wbAbEoRhunyuD5nFzcHDNef4poEIjKQ9rfvAyCUZjLeKoAfUOJ
+	 6Q62lm01TKyshWB2+HSCE73P6IuyMKuXD69NQQCN+vzRI/pd33JJgGwz4xq+b82Erj
+	 /sj5h21Lm8KQPxYCP7iXoEovZ8FTzlLQ5/uLjwBrC3+OkPb3sjKGvteAqx1bI6/aDZ
+	 eYYMbplax8sKWCV1MrYgykvZfpwFN0+R6ZhUnQQO8jKE04lRMDOdmkY7aHvzy7trwj
+	 8d526tySMTouHa8UtvW/qoQMcaMi3Mz6s53yc3zZcV2LgBayqWboCUvGk7N0E4s+xo
+	 tlRETiGVlNHxg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9045DCD6E64;
+	Wed,  3 Jun 2026 07:57:55 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Date: Wed, 03 Jun 2026 11:57:39 +0400
+Subject: [PATCH next-next] net: dsa: qca8k: Add support for force mode for
+ fixed link topology
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/11] net: bridge: don't recurse on the
- port's netdev ops lock
-Content-Language: en-US, bg
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, jakub@cloudflare.com,
- maxime.chevallier@bootlin.com, nb@tipi-net.de, lee@kernel.org,
- linux-leds@vger.kernel.org, pavel@kernel.org, jv@jvosburgh.net,
- michael.chan@broadcom.com, jhs@mojatatu.com, vinicius.gomes@intel.com,
- idosch@nvidia.com, hare@suse.de, jhasan@marvell.com, danieller@nvidia.com
-References: <20260603012840.2254293-1-kuba@kernel.org>
- <20260603012840.2254293-8-kuba@kernel.org>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260603012840.2254293-8-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MMQ6EIBAAv2K2vk0QlNP7irFAXLwtBAVjTIx/F
+ 20mmWLmhESRKcGvOCHSzomDz1J+CrB/4ydCHrODFFILLRSu1jRKfdGFaAnnMBK6wQ6mlq2uKg0
+ 5XCI5Pt5pB56ODR9Af1038ubuu28AAAA=
+X-Change-ID: 20260603-qca8337-force-mode-fbcba5296446
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780473474; l=1952;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=kxqS2bqjt6+ouza+vz/puCI2oc93WI/rb8uky+fmGoQ=;
+ b=5fbNiQpDmiLWqNtCEftWZ+N3nuB7FW5BbnHHC7D4Do5MPkWYC9NnnMxRf1e83dHAmQ61uv8/z
+ wg2uxmINcW0CtoyPAhqd9FBTaMhTNVrs9PDVccIbV1RoP76WdH2wz1k
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294670-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:nb@tipi-net.de,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:george.moussalem@outlook.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294671-lists,netdev=lfdr.de,george.moussalem.outlook.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DMARC_NA(0.00)[blackwall.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_REPLYTO(0.00)[outlook.com];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,outlook.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_REPLYTO(0.00)[george.moussalem@outlook.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,blackwall.org:mid,blackwall.org:dkim,blackwall.org:from_mime,blackwall.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,outlook.com:mid,outlook.com:email,outlook.com:replyto]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 129126358D8
+X-Rspamd-Queue-Id: 8B62E63572B
 
-On 03/06/2026 04:28, Jakub Kicinski wrote:
-> port_cost() calls __ethtool_get_link_ksettings() on the port device,
-> which will soon take the port's ops lock. br_port_carrier_check()
-> is reached via the NETDEV_CHANGE notifier from linkwatch, which
-> already holds the port's ops lock, so the call would deadlock.
-> 
-> Make port_cost() expect the port's ops lock held and switch to
-> netif_get_link_ksettings(). The only other caller is new_nbp(),
-> make sure it takes the lock explicitly.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   net/bridge/br_if.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
-> index d39571e13744..049d1d25bc26 100644
-> --- a/net/bridge/br_if.c
-> +++ b/net/bridge/br_if.c
-> @@ -19,6 +19,7 @@
->   #include <linux/if_ether.h>
->   #include <linux/slab.h>
->   #include <net/dsa.h>
-> +#include <net/netdev_lock.h>
->   #include <net/sock.h>
->   #include <linux/if_vlan.h>
->   #include <net/switchdev.h>
-> @@ -30,13 +31,13 @@
->    * Determine initial path cost based on speed.
->    * using recommendations from 802.1d standard
->    *
-> - * Since driver might sleep need to not be holding any locks.
-> + * Since driver might sleep, we need to not be holding any bridge spinlocks.
->    */
->   static int port_cost(struct net_device *dev)
->   {
->   	struct ethtool_link_ksettings ecmd;
->   
-> -	if (!__ethtool_get_link_ksettings(dev, &ecmd)) {
-> +	if (!netif_get_link_ksettings(dev, &ecmd)) {
->   		switch (ecmd.base.speed) {
->   		case SPEED_10000:
->   			return 2;
-> @@ -436,7 +437,9 @@ static struct net_bridge_port *new_nbp(struct net_bridge *br,
->   	p->br = br;
->   	netdev_hold(dev, &p->dev_tracker, GFP_KERNEL);
->   	p->dev = dev;
-> +	netdev_lock_ops(dev);
->   	p->path_cost = port_cost(dev);
-> +	netdev_unlock_ops(dev);
->   	p->priority = 0x8000 >> BR_PORT_BITS;
->   	p->port_no = index;
->   	p->flags = BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD;
+From: George Moussalem <george.moussalem@outlook.com>
 
-LGTM,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+A fixed link topology is commonly used to connect this switch (on port
+0 or 6) to a SoC's MAC over SGMII. When inband negotiation is not used,
+the switch needs to be configured to operate in force mode. As such,
+enable support for force mode.
+
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+ drivers/net/dsa/qca/qca8k-8xxx.c | 6 +++++-
+ drivers/net/dsa/qca/qca8k.h      | 1 +
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+index a36b8b07030e..3dbd18ab8638 100644
+--- a/drivers/net/dsa/qca/qca8k-8xxx.c
++++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+@@ -1611,10 +1611,14 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 	if (priv->ports_config.sgmii_tx_clk_falling_edge)
+ 		val |= QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE;
+ 
++	if (neg_mode == PHYLINK_PCS_NEG_OUTBAND)
++		val |= QCA8K_PORT_PAD_SGMII_FORCE_MODE;
++
+ 	if (val)
+ 		ret = qca8k_rmw(priv, reg,
+ 				QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
+-				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE,
++				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE |
++				QCA8K_PORT_PAD_SGMII_FORCE_MODE,
+ 				val);
+ 
+ 	return 0;
+diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
+index 1a00e2f62fef..956338893032 100644
+--- a/drivers/net/dsa/qca/qca8k.h
++++ b/drivers/net/dsa/qca/qca8k.h
+@@ -58,6 +58,7 @@
+ #define	  QCA8K_PORT_PAD_RGMII_TX_DELAY_EN		BIT(25)
+ #define   QCA8K_PORT_PAD_RGMII_RX_DELAY_EN		BIT(24)
+ #define   QCA8K_PORT_PAD_SGMII_EN			BIT(7)
++#define   QCA8K_PORT_PAD_SGMII_FORCE_MODE		BIT(3)
+ #define QCA8K_REG_PWS					0x010
+ #define   QCA8K_PWS_POWER_ON_SEL			BIT(31)
+ /* This reg is only valid for QCA832x and toggle the package
+
+---
+base-commit: b7bee4ca5688e30ca50fbc87b1b8f7eed7006c17
+change-id: 20260603-qca8337-force-mode-fbcba5296446
+
+Best regards,
+-- 
+George Moussalem <george.moussalem@outlook.com>
+
 
 
