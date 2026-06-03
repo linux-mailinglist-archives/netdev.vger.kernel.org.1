@@ -1,212 +1,138 @@
-Return-Path: <netdev+bounces-294749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294750-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tw3ZC2spIGoVyAAAu9opvQ
-	(envelope-from <netdev+bounces-294749-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 15:17:31 +0200
+	id uUReHK4sIGq5yAAAu9opvQ
+	(envelope-from <netdev+bounces-294750-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 15:31:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3DDC637F45
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 15:17:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA8163813E
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 15:31:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="TcEJtQ/c";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294749-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294749-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=cnSUHns3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294750-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294750-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F034031AC84E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 13:08:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7498F32C5FD2
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 13:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EAF48167B;
-	Wed,  3 Jun 2026 13:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A485929D26C;
+	Wed,  3 Jun 2026 13:15:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1939480DD2
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 13:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EACB26B2CE;
+	Wed,  3 Jun 2026 13:15:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780491999; cv=none; b=E+yqc3DOYOuq44n66J0U0sW4X/VnZhFsELFaeKiGvVQSz5iTaenX98Tn9RLyvgKGrW69tafeVpMaTgUoQB8m7VGTUyA7IsNn4N8FPswRll4Kg8xsJPOmpq5guNGd8LW2fRR2YHBpzBB7pusvzNqWt5akvuOKUDeBuJOCHyvMc8E=
+	t=1780492520; cv=none; b=c+SkGOOhpbpg573ah1nOwzWQ7CDaFGcC+F8peF83RwOLu8Wo7y+s6RWFkYw0GnLeziatSZ3mR1YIak4qiRUcoOf2ILmsjq8ZuooLXSebqiX7tyUITRGg7Q2kVFvbuJFux8sodWTv3X5JUfFNWIoJSjqxDs3ehzL8LgLZJS8iCVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780491999; c=relaxed/simple;
-	bh=ZApW2cI7YETmeg8qoxa0V/CbOF/XgrMKyvubFMRJs4U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ol5MjEQ5ciJjFekJwtff9u6q6t0lKCMi8i+ms5RrRnkTel+6dpBEoY8aZAJgfLOo4IZa9qdPQ2PEwyIHtMeDKOfTN+U6dJKpGPW0lwQjwMtzpgTpQ6MOk06DFegT0bBR+iYJM3S+AKGJremrWExnWF+uS25hfzvVwhBHITTY8aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TcEJtQ/c; arc=none smtp.client-ip=74.125.82.180
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-3074adb8fcaso424263eec.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 06:06:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780491997; x=1781096797; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4bwS8I9hjyPMoQIUtgoT/XA9wHOeUpofaMWQ6wzUEIo=;
-        b=TcEJtQ/cu5UMnqZIzWe5NVXZGpV7l1F5GyDaFBg6PjesJZKwSLYSZfZjnjWxbhjbKp
-         iio3aOdXZtnl2KJTKDzeD2YWsHvsu4s5GwQ0YNnGB/P76HZmtvjvR8Yuvjuvfsh+3O0f
-         eDs1UxX0Sao5h9SLil24c3LdhKPveFmAKmMar3WT2nd4pwMyNOY8JX85BohkaOPpjpGC
-         UAAZrt3MMDJjuYtN+ZLjyDUqKeUPFI0zpGNZlUHdyEJCaZXCtuBf/iT+/qzLOGVvawBs
-         IKpyLBV0XdqrS/qRbbZTW8D54K89o4r3jPq9SApNJwtcbHfh6KJ+ORkVYud+6JG4sRVP
-         ZCgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780491997; x=1781096797;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4bwS8I9hjyPMoQIUtgoT/XA9wHOeUpofaMWQ6wzUEIo=;
-        b=I1I2eWFZcPT3YusofMiHbfrWLzGJSxYv98ltrS409FMxFBY/+57oshD3HUMfr3P061
-         GvaKtB2a7ixE+XOdQ/6DOhYiZb5IDa5VHNx+5K3wq9hUqH/IxnRQSiBUNZLIkNVWhuvn
-         UcshtyrUWOYq9VT5YYFlwOPO8srgfsnHTh13H2rJY2jGvWFbLfXp37gpqn01qsoUO0cS
-         1DTK9SM/Jbu8jEakc67JvzW2y40R4MDrii3XnxZEp8sDhE6pm07YHlgz1pOqzKTwa0cq
-         6BU6hDdIHgwix4He6L/q7jFQq++p7i9jS2GKlNg+N6EHuewouvPVoJBka9WCBs2qtQh5
-         6x6w==
-X-Gm-Message-State: AOJu0Yzj6iBkDek5JLWacE7zAN8MwruvRi20NudHbq8wX6s75kNlaxdS
-	q17/NpanukE17I1roJWUEPXfo+UmZoU7SEZkYYGCMbVegsvNqsgFJeQm0Wo68i+P9a4=
-X-Gm-Gg: Acq92OF3STggtqa4/rhXdODgjkqW2JdrTZy4WIWl3sFDcGb85k7k3bU7ubN4M5HeK6K
-	q3aDbql5aNljRI+g2D3r4K6txM5VXT/f24OPzS0NiI8PAueTlqX1lTmn1yF6qYMEuuObutga4UX
-	rSeDPMB/V8y9NnJz9VtQs2YTFCtUPOUBnt9lFw+037TJ1LTtsgwsHu6ZjwtIzJgO3Oml5A6x86t
-	Do7AZN6yBcpMuo42RXaBYnQ10AAzSV+iO5iDJt9wn2dtQPqLYTVcNJny0OSP0gSh6AtB2o0wtg4
-	sf1OA20/WFSLGaruXstE1OgBZC2AWLzNrhASBvmTHe3BGhbgy0L2Qvwi6MQkGdTCQYHvz5B9tCB
-	mpRShJqe7q9RjvKsgTkuwfLJnHcTKwHMinfEHnVWdbWlricRbCZgw2YuAzx+R/zqTaddP57hChF
-	Z8dHbe3nMFBv/wePdxR3DQUqZ3
-X-Received: by 2002:a05:7300:5726:b0:304:5644:f97a with SMTP id 5a478bee46e88-3074fb7a698mr1767605eec.21.1780491996625;
-        Wed, 03 Jun 2026 06:06:36 -0700 (PDT)
-Received: from houminxi ([38.34.12.160])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074df75ff6sm2397111eec.26.2026.06.03.06.06.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 06:06:36 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	davem@davemloft.net,
-	echaudro@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	i.maximets@ovn.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH v3] selftests/net/openvswitch: guard command substitutions against empty output
-Date: Wed,  3 Jun 2026 21:06:19 +0800
-Message-ID: <20260603130619.1785322-1-houminxi@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1780492520; c=relaxed/simple;
+	bh=lCQJ9mw1FPDJXKsBwdxiyAriVn0m/V3Ql3yqrophdMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d3BpwE6aJdEaKZ62LaRQX//SwyugcWT3UpdiuJNzQxxFMXsR56606AdyR2mQ1xYUNxZ7rj9YE/TytDeqBIWYFMkZyeIo/p5en50mlJCOx4hydsH8M65e9OYkTlZOS7kwvhCR5ZZOjlIEbyAX+uwUTiupqaRxoag+n59X8Zy2hcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cnSUHns3; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IxX4ef1/ZRvhfLr6R6N2rF9/YUBOj2G4OZm6eMT1GK8=; b=cnSUHns3/yGsojxQQwefiHpNW/
+	kmOw5JuY7xUVfc9lyng5RnSQPvOlCJ9nSc+g7rPMTW9RKetFKxJyjOnDGShx16MCs5oQ8/w3PqLC3
+	nIgRkH/oJYBn0JefTgmd/4a7AGGhiSywZu49xRxZJ+8I8jvofoYT35Ggns8hi2so3pgw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wUlR1-005slJ-4Q; Wed, 03 Jun 2026 15:15:03 +0200
+Date: Wed, 3 Jun 2026 15:15:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javen <javen_xu@realsil.com.cn>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"nic_swsd@realtek.com" <nic_swsd@realtek.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v1 1/5] net: phy: realtek: add support for dummy
+ phy
+Message-ID: <bf3c29cb-334c-4d2c-b9d7-61bf04779fe2@lunn.ch>
+References: <20260603065916.334-1-javen_xu@realsil.com.cn>
+ <20260603065916.334-2-javen_xu@realsil.com.cn>
+ <7496c873-fee7-4584-ad70-4315d7b94f8f@bootlin.com>
+ <f614a60942e34bf39b1d49fb273221ab@realsil.com.cn>
+ <0bc2ae0e-316c-447e-9098-f18f4b491328@bootlin.com>
+ <7c35fa5bb5f24afdb42e2d45a4e559c3@realsil.com.cn>
+ <bac05b34-9c16-4c18-9e6e-a8ccee86f0d3@bootlin.com>
+ <c088522c19624f11beb179a71a11d9c1@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c088522c19624f11beb179a71a11d9c1@realsil.com.cn>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-294750-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,ovn.org,openvswitch.org,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-294749-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:davem@davemloft.net,m:echaudro@redhat.com,m:edumazet@google.com,m:horms@kernel.org,m:i.maximets@ovn.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:houminxi@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:maxime.chevallier@bootlin.com,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[bootlin.com,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B3DDC637F45
+X-Rspamd-Queue-Id: 9EA8163813E
 
-When ip-link output is unavailable, when the upcall daemon log has not
-been written yet, or when pahole does not know the OVS drop subsystem
-ID, the affected command substitutions silently produce empty strings.
-The caller then passes empty sha= or pid= arguments to ovs_add_flow,
-or matches against wrong drop reason codes, all without a diagnostic.
+> You are exactly right. The PHY doesn't actually exist; what we have
+> is an internal PCS.
 
-Add [ -z ] guards immediately after each assignment. For test_arp_ping,
-also align the MAC extraction to use awk '/link\/ether/' as in
-test_pop_vlan. The drop_reason guard returns ksft_skip because an
-absent subsystem ID is an environment issue, not a test failure.
+...
 
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
----
+> I actually tried to migrate it to
+> phylink before. However, the current driver codebase is deeply
+> coupled with tp->phydev in many places. Decoupling it may introduce
+> bugs for numerous existing devices. Therefore, I want to try to
+> expose the internal PCS as a dummy PHY device.
 
-Changes since v2:
-  - Fixed missing 'net/' in subject (selftests/net/openvswitch).
-  - Removed --base flag (prerequisite-patch-id flood in v2).
+Architecturally, you are going down a dead end. You really should be
+using phylink.
 
-Changes since v1:
-  - Rebased onto current net-next/main. No code changes.
+I don't see anything too scary with tp->phydev in the driver. Are
+there parts you think are going to be a problem with phylink?
 
- .../selftests/net/openvswitch/openvswitch.sh     | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index a415e9dec8cd..82f066a0ceed 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -360,6 +360,8 @@ test_psample() {
- 	# sFlow / IPFIX.
- 	nlpid=$(grep -E "listening on upcall packet handler" \
-             $ovs_dir/s0.out | cut -d ":" -f 2 | tr -d ' ')
-+	[ -z "$nlpid" ] && \
-+		{ info "failed to get upcall PID"; return 1; }
- 
- 	ovs_add_flow "test_psample" psample \
-             "in_port(2),eth(),eth_type(0x0800),ipv4()" \
-@@ -393,6 +395,10 @@ test_drop_reason() {
- 	ovs_drop_subsys=$(pahole -C skb_drop_reason_subsys |
- 			      awk '/OPENVSWITCH/ { print $3; }' |
- 			      tr -d ,)
-+	if [ -z "$ovs_drop_subsys" ]; then
-+		info "failed to get OVS drop subsys ID"
-+		return $ksft_skip
-+	fi
- 
- 	sbx_add "test_drop_reason" || return $?
- 
-@@ -491,13 +497,19 @@ test_arp_ping () {
- 	# Setup client namespace
- 	ip netns exec client ip addr add 172.31.110.10/24 dev c1
- 	ip netns exec client ip link set c1 up
--	HW_CLIENT=`ip netns exec client ip link show dev c1 | grep -E 'link/ether [0-9a-f:]+' | awk '{print $2;}'`
-+	HW_CLIENT=$(ip netns exec client ip link show dev c1 \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$HW_CLIENT" ] && \
-+		{ info "failed to get client hwaddr"; return 1; }
- 	info "Client hwaddr: $HW_CLIENT"
- 
- 	# Setup server namespace
- 	ip netns exec server ip addr add 172.31.110.20/24 dev s1
- 	ip netns exec server ip link set s1 up
--	HW_SERVER=`ip netns exec server ip link show dev s1 | grep -E 'link/ether [0-9a-f:]+' | awk '{print $2;}'`
-+	HW_SERVER=$(ip netns exec server ip link show dev s1 \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$HW_SERVER" ] && \
-+		{ info "failed to get server hwaddr"; return 1; }
- 	info "Server hwaddr: $HW_SERVER"
- 
- 	ovs_add_flow "test_arp_ping" arpping \
--- 
-2.54.0
-
+      Andrew
 
