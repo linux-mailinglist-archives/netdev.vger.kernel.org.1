@@ -1,83 +1,84 @@
-Return-Path: <netdev+bounces-294507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1kq/AaqGH2pSmwAAu9opvQ
-	(envelope-from <netdev+bounces-294507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:43:06 +0200
+	id 4S8sJdGGH2pemwAAu9opvQ
+	(envelope-from <netdev+bounces-294508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:43:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8D06337EE
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:43:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED69F6337FD
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:43:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=VsSKFUes;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294507-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294507-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="Yh2xw/Ap";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294508-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294508-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBA0030CAEED
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:37:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D9D930D65BE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7103237B416;
-	Wed,  3 Jun 2026 01:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EE337C928;
+	Wed,  3 Jun 2026 01:37:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D63E3793CD
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 01:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8732F37BE88
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 01:37:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780450674; cv=none; b=ZChZ0CQDIoRlSqiMEQ2YxigOpW82C6hgxDTCmVE8niDaKU++TmanOdOUTvli/xuvof9BkOqbgQ/J/MgPW9s89XHBphUjapOOkaW9baH0lWOZX8NF4PVA4LLnxx05xR4v/u0LZG1kQ6kWTZE/K7CnexSDIL9eicnxCuix9lUVCaU=
+	t=1780450676; cv=none; b=rCWYylrqt70faYvXPbkWppDZ/qhdTN/1LA6ZBobjRSl3FmkbQ8aeg4Wy0dbgzbkbeB4GO9gmG8qvr8BaLeWdvu2HgjSK2H1y/jYa1+pOx/Lb7U/KyJyim7fgIp6vZ8bGuT7fky16fkAlg5vdWhoymP4SnP/rWvdes3TyPQANHRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780450674; c=relaxed/simple;
-	bh=ES1WKSCz5Ml4lDjJOECrth35UgnTc42Rx9qt8CeRlDg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JlqyaH1w0TIAYs5LWN6EOFjRCyHqJsaTLQpDiqAYXt5NiIUz9Pot7RpOWXo3Xxi8oLn8Szz7cI+tRVLPtoxLl3EkYA3roOMMzDyn3cF8Lje9a63DFsnZpcp7JcRnnUx30gHjrLotyEFsV8o3nOjIlw9BObIAXJDe7k6yQpSEvkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VsSKFUes; arc=none smtp.client-ip=209.85.214.173
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2bf1cda2b17so984995ad.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 18:37:52 -0700 (PDT)
+	s=arc-20240116; t=1780450676; c=relaxed/simple;
+	bh=rkHcjsPkRR9nNSHxR46h2y9fTpo1dvARrrbdvhIHj/M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ujmbC7SGRZFFu45Wav8VGuE2zozlb6JnGdm64A+6w6RZ6D03OTIH069JKO1DnQJdiLpsT4ySgVabNPCP9NcP/CJFPodLx3rJViA0/iX7paJr06YKqrPuWOxE2bdXOZboUDU1aeXA1TZdhzjSVnPq+IrZxJKO5NKIH51rp1wDcjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yh2xw/Ap; arc=none smtp.client-ip=209.85.215.175
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c85893bce34so1439413a12.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 18:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780450672; x=1781055472; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=snamOO5LcthcZOncECWMujwY0sGVCI9tyFlslmu3fvU=;
-        b=VsSKFUes+Bb4sngu5DPpsyMS/5v+k0Gma8I1jRMVox+r6CgdwbYp51KQ+ATagAitXv
-         kdCb8PX6gLYeVUcqTqIb7V5sIf3FydxCmQ/vP44wT/B/97C9Oihkv8BDOY7ajf2kFmdx
-         2mNmb5qoGLCydQcI2TckJJpISQeMAGbOSotxDG7tnYmY1hWptY8fYKWP+Lg44c47tCyh
-         qYI3kLBwpbh2kruNgnAlTVMiwY782I3rvRf8VWZwlOOXNZWsClSQez/ZZ7JsWeBPh363
-         O7u7K793Gz3+OmNaey+zl7GUCGxkFV7uni6gVms06hNYqYgwNOdVC0c9qBi/EzGVyLcw
-         y9QA==
+        d=gmail.com; s=20251104; t=1780450674; x=1781055474; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p8Jk1ivLmwr3VP3ike29F6VRWUYvoG1CiSF1zOqSE6U=;
+        b=Yh2xw/ApLaK4resB94WFblQ/eikImAqAuEOp587sPYEjBTK4UnO2fyTABGxs9vVMVa
+         YlO5fNbOjoOzB8HVXiXp4i9oJy6lJGQC0TALrfM6YF7pdsM51eVafuBoJ99u5ftiDUSo
+         dMumZFMS/lxO1XQym3Fqp0C4JXTOWB2/4FUHaOLEnZTJBURSYp2UurXGdiHVwS7l9l2n
+         MEmwJNMR4wKEHDIZdv1h6+EYcDH+X9rcw85hfW/4M8h+j19JZDDWoKE5VvTVlfpvv6kE
+         NSIqD3ndYoGxbaYRDTXz9iiXTiRW/JruO9A3QE6Vo+48QhAVmIYEvLjxM2jd7f1SCRxA
+         MpDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780450672; x=1781055472;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=snamOO5LcthcZOncECWMujwY0sGVCI9tyFlslmu3fvU=;
-        b=Bjpke3rEeZWtIvduNjqYo3v8uQWafcO3/WmFNzdtdRCSojIR+Mmb5Jcj/5amVC1wou
-         mkcO9t7HCYTyw6M46yLIvsUJ/JIwb1lu9K9IKEwrrJ0MJwIDlsVZbA/Q2kZ0bqq4qnx0
-         KFSPn75jiBx5hGxJx4zXHsIM6II0S6irEr23UkiON6qqNMDoeqrks7lkLgQKdUod+HOn
-         FuA+A6zHEZUSuzhMlM/JWKw3SQcou6uLzRIIfvfUaJ4FB9v2z5mMZKlEkL/AuqoHL1jP
-         Me4G97HY9yziZ3HUAtbQ9Y95+EGBHpMEv+N0V6DDqtwGI7SRqj6+AvQwHbfJbQwPkOnS
-         o1mA==
-X-Gm-Message-State: AOJu0YwIlXot8xYwuVLaIqCOMV66yb+Xr53gOah8GSwAqo/7s5wsg132
-	iuv+HcI1l5joG0RjhwONt8NqPMpTXbmtvld3KBzvdiskwqlRlf1nfFcf
-X-Gm-Gg: Acq92OGNsUXi2fqoABAXrcdJxb2XrTPj3MvCBmoUsrXUB0D5B59ZYCXmkxf+dC/mNF9
-	U7pR+PMQVnlj26rzu3QlTkzCMZp0XI4QfpeR63d6jbw2BLsOrDazfHgzGTLvIoNFBEBrCJhiwZw
-	F6KVn0VN0If8U2NdYUo+e4HFfWB7h4suRfwN01sEPQkuhnzE83fLT2WLi5UBnd/kYFlEtQBkLCY
-	VDm1LgS51Rgh0ZK4dC/W+w1EuLn5FvgBmogtJ6UN6R3tUzZSQSss8enX72U17CYhYM583BqmGTG
-	C7+l48k7v3ck+rkohEo4Ay0CU/qRTFp6ZfotJ81MIIFi001KLyz9WD1rSfdcZZa1eFBjuIx50Z5
-	7EEtLSVId1E9tny9vgS3yFAbIWtJ8A+KfQT462CF2J9ETlVFyIGwCIRHEE1Ry31VWhHyHM1upwm
-	c5OfOPLJtvnS2B2nYFX0qUe/r0naEQMF7wQyKloosZ
-X-Received: by 2002:a17:903:37cf:b0:2bf:361e:3edc with SMTP id d9443c01a7336-2c1644d6b20mr9705345ad.2.1780450672261;
-        Tue, 02 Jun 2026 18:37:52 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c1663981basm5174305ad.67.2026.06.02.18.37.51
+        d=1e100.net; s=20251104; t=1780450674; x=1781055474;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=p8Jk1ivLmwr3VP3ike29F6VRWUYvoG1CiSF1zOqSE6U=;
+        b=oeGUHWvex3nXp8jFqIkmHu/yEDwv6JcaeFNw5hk5jNKhUIoO1GTrrX066EnchhMx9i
+         7c7PjWv9c1tLZQtvcGgH8iWwEsseq8xOMQEZw/Zdp9fJ7lrDUcn2MNOkq2bxXi+srxCy
+         zm8iRtQnADmQ0RUDX0LR1tiGR7idDn7gXEKwWs+Ex+Vimdqi1labwkCTtaLy+IR9MSHt
+         Xd2HFOzf9OvFCJtkHsnEIlirqvRaQ+P8ZERY2h75mXv9j1UhA0hDV18V2KxK+SDcCjVI
+         AgpIzVmKHrisOjQqvawTjxwDtZkPrlT00LOnzlJj1VgmpzqYcx/wVaXdUHPcgBOzKJA+
+         EEsA==
+X-Gm-Message-State: AOJu0YxGiTKQBAYlmM4uTDuC2ioDpteK8dvweRJiKesgqJlqUEVRbLJ2
+	cxrjRSJcF8V0h3n8MOcpzege584zfU3EGQhwWe2LfQZnV7k0CJ/rmavy
+X-Gm-Gg: Acq92OFDcIbnGyCGVPmz8L5u1fpK8tKWnWXffxxiNU05s4mw4YQi1GEDngj5AHgVBBq
+	0Va4IG8lIK9DRu5NvBJPZnHFGcubhwvI1gxJUlsRt0URfk1uluzhB+PDG5jOG5KFOccuiQ9yBBj
+	gj2tTVXj/IWb+B0cdvyiQ2xsQzAL5QlbsTXoGC2eaIDEO8ndh4nUefxmdhm2fguua5DX6OfhXaT
+	WWCPaQnLksECpEp7X6WNTTmnL1Y9hrpKkhtEnp8PTUHXoQDy4ylNZ8NXItjFjjRcURp7Pgxs6ab
+	Karp2pYP5Jn2eNqH60zhK2eRWhACx8e4Zg3KoLTbxOKG3iqmPjea31ekr7C4IDc508hXbMOaELk
+	KB/I+gmWiPhNPYi+IjIQsCPjlxHEdnOLxuQA5AId76wsXITFZDsWHCFh0Gbbw75nTUZktSty7tD
+	2x2Tlf+XKUksqWY9QlexKZN2j2D8t0qhUuCkVZQjH2
+X-Received: by 2002:a05:6a20:c79a:b0:38d:fad1:cf2a with SMTP id adf61e73a8af0-3b4973af276mr1426953637.13.1780450673809;
+        Tue, 02 Jun 2026 18:37:53 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:50::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85df043216sm525522a12.10.2026.06.02.18.37.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 18:37:51 -0700 (PDT)
+        Tue, 02 Jun 2026 18:37:53 -0700 (PDT)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Subject: [PATCH net-next v2 0/2] net: devmem: allow bind-rx from non-init
+Date: Tue, 02 Jun 2026 18:37:31 -0700
+Subject: [PATCH net-next v2 1/2] net: devmem: allow bind-rx from non-init
  user namespaces
-Date: Tue, 02 Jun 2026 18:37:30 -0700
-Message-Id: <20260602-nl-prov-v2-0-ad721142c641@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,10 +87,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAF2FH2oC/x3MQQqDQAwF0KuEvzYQQy06VyldWI01IFFmRATx7
- oW+A7wLxbJbQaIL2Q4vvgYSaUUY5j6+xj4iEVT0KY12HAtveT340dV92wyi8hFUhC3b5Od/eiF
- s57Bzx/u+f4ik9ItjAAAA
-X-Change-ID: 20260529-nl-prov-491a85c020b0
+Message-Id: <20260602-nl-prov-v2-1-ad721142c641@meta.com>
+References: <20260602-nl-prov-v2-0-ad721142c641@meta.com>
+In-Reply-To: <20260602-nl-prov-v2-0-ad721142c641@meta.com>
 To: Donald Hunter <donald.hunter@gmail.com>, 
  Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
@@ -107,13 +107,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294507-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294508-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch];
 	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[18];
@@ -136,49 +136,52 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8F8D06337EE
+X-Rspamd-Queue-Id: ED69F6337FD
 
-NETDEV_CMD_BIND_RX is GENL_ADMIN_PERM, which checks CAP_NET_ADMIN
-against init_user_ns. With netkit and netns support for devmem, it is
-now useful to let workloads holding CAP_NET_ADMIN only in their own
-user_ns issue bind-rx for a netns owned by that user_ns.
+From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-The first patch switches the flag to GENL_UNS_ADMIN_PERM so the check
-uses the target netns's owning user_ns. Init remains permitted.
+NETDEV_CMD_BIND_RX is currently GENL_ADMIN_PERM, which checks
+CAP_NET_ADMIN against init userns. With recent container/netkit/ns
+support for devmem, other userns/netns use cases come online and require
+bind-rx to allow CAP_NET_ADMIN in non-init user ns as well.
 
-The second patch just adds test cases. They are identical to
-nk_devmem.py tests, but using a non-init userns.
+Switch the flag to GENL_UNS_ADMIN_PERM to allow bind-rx for
+CAP_NET_ADMIN in the netns's owning userns as well.
 
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
-Changes in v2:
-- some pylint fixes
-- fixed import issue
-- Link to v1: https://lore.kernel.org/all/20260601-nl-prov-v1-0-9bc57d6ca3f3@meta.com/
+ Documentation/netlink/specs/netdev.yaml | 2 +-
+ net/core/netdev-genl-gen.c              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
----
-Bobby Eshleman (2):
-      net: devmem: allow bind-rx from non-init user namespaces
-      selftests: drv-net: add userns devmem RX test
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index a1f4c5a561e9..49862b666d7d 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -798,7 +798,7 @@ operations:
+       name: bind-rx
+       doc: Bind dmabuf to netdev
+       attribute-set: dmabuf
+-      flags: [admin-perm]
++      flags: [uns-admin-perm]
+       do:
+         request:
+           attributes:
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index c7e138bfe345..d18c89b5a6c7 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -220,7 +220,7 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.doit		= netdev_nl_bind_rx_doit,
+ 		.policy		= netdev_bind_rx_nl_policy,
+ 		.maxattr	= NETDEV_A_DMABUF_FD,
+-		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
++		.flags		= GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DO,
+ 	},
+ 	{
+ 		.cmd		= NETDEV_CMD_NAPI_SET,
 
- Documentation/netlink/specs/netdev.yaml            |  2 +-
- net/core/netdev-genl-gen.c                         |  2 +-
- tools/testing/selftests/drivers/net/hw/Makefile    |  1 +
- tools/testing/selftests/drivers/net/hw/config      |  1 +
- .../selftests/drivers/net/hw/lib/py/__init__.py    |  4 +-
- .../selftests/drivers/net/hw/userns_devmem.py      | 49 ++++++++++++++
- .../selftests/drivers/net/lib/py/__init__.py       |  4 +-
- tools/testing/selftests/drivers/net/lib/py/env.py  |  8 ++-
- tools/testing/selftests/net/lib/py/__init__.py     |  4 +-
- tools/testing/selftests/net/lib/py/netns.py        | 75 +++++++++++++++++++++-
- tools/testing/selftests/net/lib/py/utils.py        |  7 +-
- 11 files changed, 144 insertions(+), 13 deletions(-)
----
-base-commit: 0906c117f81c2ae6e6dbfa82719f79c75e1c9325
-change-id: 20260529-nl-prov-491a85c020b0
-
-Best regards,
 -- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+2.53.0-Meta
 
 
