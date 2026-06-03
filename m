@@ -1,177 +1,224 @@
-Return-Path: <netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id meGvG4naH2qurAAAu9opvQ
-	(envelope-from <netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:40:57 +0200
+	id pYhkNRnaH2qArAAAu9opvQ
+	(envelope-from <netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:39:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA5363550A
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:40:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319AA6354BF
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:39:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=OeNMOhBG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294639-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8A4623264479
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:31:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82BA63165219
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5AE40757B;
-	Wed,  3 Jun 2026 07:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE8F3FF899;
+	Wed,  3 Jun 2026 07:27:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0410B403EBA
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996F03F0AA9
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:27:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471733; cv=none; b=j+K+5PiOEwHpDu1KGwxek7ctkGwgzSFVS8YMsSdZ56xm6AV+p9QwOemoc8gb76nEE9dRPcNx2JBUNYCJ8zAoNYpknAZr3qEtzwLPCRP3NPpK1rgwKvbbdv6g2EHLbEiXjTwFN7JDa6vNjQ48cOM2vm01MeaJWUROOfCGyKxWpco=
+	t=1780471657; cv=none; b=OC5BvDLCo32Fj0qra6leRh6TolAZPOcFeamJjjGzSNU3uPwQel6DE037+1aYHFFW3CtL8OIsnTiDrXyo+C65libxMgC8eRQlvL2+gz3utPVz0kIaqOPioEOMzkrg7LL+ORF1617OYWUxzB7YUtZTyPbBKytqgX7N+Wor3YgFbV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471733; c=relaxed/simple;
-	bh=u6F/2C+fvBzquIXPlmU/3j5rjS4sBgawX1rb11MeljM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hEW2PvoR5Dco50twN5k2UmqjDYdOjrnTLqNt36Zv0QiPZ5sa7he5kWtQHggxFFnvkz30O37NPE6m0pcuRhQrSJ8Ib37y/j189m3UNSSKiuvwxJOWy420x0LUeBUe9ud91dI15GyK9X1mXyS14GiDW4SvFRW5f6lYsk01zEIMiA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OeNMOhBG; arc=none smtp.client-ip=95.215.58.178
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780471729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TbOdb5ayEdhtH6yD3DNTe0xKjBwdKK62mPaH1TFHgak=;
-	b=OeNMOhBGJqIjbiZIKthmLgw+5Il6LKUo0dcmPR1dzBbD8H+Js2nFq3Ay1dDPfbpf9til3s
-	tUnLRquTGzzLGphpHl8IzZlcuVPPCm6Gz9QJYauVovHPLRPdsbZ+neQD3wHgkzgroL5Cfe
-	iK0+sPgC+3g24EjqfI/auwnChrp1bJg=
-From: Fushuai Wang <fushuai.wang@linux.dev>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shayd@nvidia.com,
-	parav@nvidia.com,
-	moshe@nvidia.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wangfushuai@baidu.com
-Subject: [PATCH 2/2] net/mlx5: Only consider online CPUs in affinity subset check
-Date: Wed,  3 Jun 2026 15:26:57 +0800
-Message-Id: <20260603072657.10868-3-fushuai.wang@linux.dev>
-In-Reply-To: <20260603072657.10868-1-fushuai.wang@linux.dev>
-References: <20260603072657.10868-1-fushuai.wang@linux.dev>
+	s=arc-20240116; t=1780471657; c=relaxed/simple;
+	bh=iSImYBRI7UBlesDbd2QGdqtdS5zqWMc/RbpuZaikRF4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=f4WutX+YCfObO+qmyJve8uUEgtWX9xM0r/3wayd3diPO9ssuNRUzhszJ9fK+XrZSjNseG6agAwlGk+8t6P3tLIUSUKxWAbzD+K6uRF62ef+JVHcnQM1eXGh7VZCrtFUADjJFCDYdTjfKafjgEd2aEVwUO5BzO4FXVkeAyedC3x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-69de23f28d5so9272273eaf.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 00:27:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780471651; x=1781076451;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZtrFMzo+uNmFnPibicXyTEkj5A/kWJ433kEg8stsr6k=;
+        b=frESwfRAoed7A7qVJDezh4QaKUAkzdaDbo/yZEoOAR9GU9QLVtO/MaMrSZazIUBw99
+         4pqJ8YcVtev09q53PnC31LD48tVJZlqAJnNJqwCVUmuMoCCQIqAgxPCBGmXB4s5JzDZb
+         AuSQtisz4sgxzcCOrIpTW9d21/tyGcpS0EmZLi9jRqh4t+A+l8lvjWV4+60K/eyMxr5O
+         5oPPdQM4tU4F+xmZcLPnesI4eXrYI3OPhEepWpxLuKBxX25EJRFaAKcy/xeDa//iAHhB
+         6DnBoQu5HRa56O/+dyE6Su0C1t7Ljbhc2ONRjNdF5tGtvUbOgA0mbT5dnirrWTcPCOQh
+         AJQg==
+X-Forwarded-Encrypted: i=1; AFNElJ9LfneWWdq5bHtY2nG+sWBbwp10BCoFL4vpIuM9pthv5PrOxx1DM1wV6RSxFz1NLurqELDy864=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZYhJStkAaBKUhaJcJ+VfGRyQ0kENnbeFUoMxhWkCBBuzSl2uB
+	XvutYk9VmJtPhBnx284WM3J+WvWr7GPFNYaOzKB81zLxgFEdo9UgLcCaG7IOzck+AAR8Bvh11LN
+	I1Kc4gdoXx0KDMpjmXFKsxRg2XLyl6pggMA8j2I2n2S8WW+OI7kd5r3hc+FE=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6820:2c03:b0:69d:7bdb:ade2 with SMTP id
+ 006d021491bc7-69e47f76495mr867512eaf.32.1780471651515; Wed, 03 Jun 2026
+ 00:27:31 -0700 (PDT)
+Date: Wed, 03 Jun 2026 00:27:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a1fd763.278b5b03.2bcf39.0049.GAE@google.com>
+Subject: [syzbot] [wpan?] KMSAN: uninit-value in lowpan_xmit
+From: syzbot <syzbot+f13c19f75e1097abd116@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=91978e795dcd971b];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294643-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shayd@nvidia.com,m:parav@nvidia.com,m:moshe@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wangfushuai@baidu.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294639-lists,netdev=lfdr.de,f13c19f75e1097abd116];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-wpan@vger.kernel.org,m:miquel.raynal@bootlin.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:stefan@datenfreihafen.org,m:syzkaller-bugs@googlegroups.com,m:alexaring@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,bootlin.com,redhat.com,datenfreihafen.org,googlegroups.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[fushuai.wang@linux.dev,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fushuai.wang@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim]
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DEA5363550A
+X-Rspamd-Queue-Id: 319AA6354BF
 
-From: Fushuai Wang <wangfushuai@baidu.com>
+Hello,
 
-When an SF is created after a CPU has been taken offline, the IRQ pool may
-contain IRQs with affinity masks that include the offline CPU. Since only
-online CPUs should be considered for IRQ placement, cpumask_subset() check
-would fail because the iter_mask contains offline CPUs that are not present
-in req_mask, causing SF creation to fail.
+syzbot found the following issue on:
 
-Filter the affinity mask to only include online CPUs before checking if it's
-a subset of the requested mask, ensuring SF creation succeeds in this scenario.
+HEAD commit:    e8c2f9fdadee Merge tag 'for-7.1/hpfs-fixes' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10883b06580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=91978e795dcd971b
+dashboard link: https://syzkaller.appspot.com/bug?extid=f13c19f75e1097abd116
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Fixes: 061f5b23588a ("net/mlx5: SF, Use all available cpu for setting cpu affinity")
-Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6d28568f6ffa/disk-e8c2f9fd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/68a9eec5e7f1/vmlinux-e8c2f9fd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e6a7381a5e55/bzImage-e8c2f9fd.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f13c19f75e1097abd116@syzkaller.appspotmail.com
+
+ dev_queue_xmit include/linux/netdevice.h:3418 [inline]
+ tx+0xb6/0x440 drivers/block/aoe/aoenet.c:62
+ kthread+0x17d/0x370 drivers/block/aoe/aoecmd.c:1241
+ kthread+0x53a/0x5f0 kernel/kthread.c:436
+ ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+---[ end trace 0000000000000000 ]---
+=====================================================
+BUG: KMSAN: uninit-value in lowpan_header net/ieee802154/6lowpan/tx.c:240 [inline]
+BUG: KMSAN: uninit-value in lowpan_xmit+0xa6b/0x1d00 net/ieee802154/6lowpan/tx.c:282
+ lowpan_header net/ieee802154/6lowpan/tx.c:240 [inline]
+ lowpan_xmit+0xa6b/0x1d00 net/ieee802154/6lowpan/tx.c:282
+ __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5377 [inline]
+ xmit_one net/core/dev.c:3888 [inline]
+ dev_hard_start_xmit+0x22f/0xa80 net/core/dev.c:3904
+ __dev_queue_xmit+0x2990/0x5a00 net/core/dev.c:4870
+ dev_queue_xmit include/linux/netdevice.h:3418 [inline]
+ tx+0xb6/0x440 drivers/block/aoe/aoenet.c:62
+ kthread+0x17d/0x370 drivers/block/aoe/aoecmd.c:1241
+ kthread+0x53a/0x5f0 kernel/kthread.c:436
+ ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Uninit was stored to memory at:
+ lowpan_header net/ieee802154/6lowpan/tx.c:231 [inline]
+ lowpan_xmit+0x68f/0x1d00 net/ieee802154/6lowpan/tx.c:282
+ __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5377 [inline]
+ xmit_one net/core/dev.c:3888 [inline]
+ dev_hard_start_xmit+0x22f/0xa80 net/core/dev.c:3904
+ __dev_queue_xmit+0x2990/0x5a00 net/core/dev.c:4870
+ dev_queue_xmit include/linux/netdevice.h:3418 [inline]
+ tx+0xb6/0x440 drivers/block/aoe/aoenet.c:62
+ kthread+0x17d/0x370 drivers/block/aoe/aoecmd.c:1241
+ kthread+0x53a/0x5f0 kernel/kthread.c:436
+ ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4577 [inline]
+ slab_alloc_node mm/slub.c:4899 [inline]
+ kmem_cache_alloc_node_noprof+0x3cd/0x12c0 mm/slub.c:4951
+ kmalloc_reserve net/core/skbuff.c:613 [inline]
+ __alloc_skb+0x855/0x1190 net/core/skbuff.c:713
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ new_skb+0x4a/0x550 drivers/block/aoe/aoecmd.c:66
+ aoecmd_cfg_pkts drivers/block/aoe/aoecmd.c:430 [inline]
+ aoecmd_cfg+0x2c2/0xb70 drivers/block/aoe/aoecmd.c:1374
+ discover_timer+0x64/0x80 drivers/block/aoe/aoemain.c:25
+ call_timer_fn+0x4c/0x510 kernel/time/timer.c:1748
+ expire_timers kernel/time/timer.c:1799 [inline]
+ __run_timers kernel/time/timer.c:2374 [inline]
+ __run_timer_base+0x80a/0xdb0 kernel/time/timer.c:2386
+ run_timer_base kernel/time/timer.c:2395 [inline]
+ run_timer_softirq+0x3a/0x70 kernel/time/timer.c:2405
+ handle_softirqs+0x171/0x7b0 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0x9a/0x1e0 kernel/softirq.c:735
+ irq_exit_rcu+0x12/0x20 kernel/softirq.c:752
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
+ sysvec_apic_timer_interrupt+0x84/0x90 arch/x86/kernel/apic/apic.c:1061
+ asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:697
+
+CPU: 0 UID: 0 PID: 1310 Comm: aoe_tx0 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+=====================================================
+
+
 ---
- .../net/ethernet/mellanox/mlx5/core/irq_affinity.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-index 994fe83da4be..8c0df240b888 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-@@ -102,18 +102,26 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
- 	struct mlx5_irq *iter;
- 	int irq_refcount = 0;
- 	unsigned long index;
-+	cpumask_var_t tmp;
- 
- 	lockdep_assert_held(&pool->lock);
-+
-+	if (!alloc_cpumask_var(&tmp, GFP_ATOMIC))
-+		return NULL;
-+
- 	xa_for_each_range(&pool->irqs, index, iter, start, end) {
- 		struct cpumask *iter_mask = mlx5_irq_get_affinity_mask(iter);
- 		int iter_refcount = mlx5_irq_read_locked(iter);
- 
--		if (!cpumask_subset(iter_mask, req_mask))
-+		cpumask_and(tmp, iter_mask, cpu_online_mask);
-+		if (!cpumask_subset(tmp, req_mask))
- 			/* skip IRQs with a mask which is not subset of req_mask */
- 			continue;
--		if (iter_refcount < pool->min_threshold)
-+		if (iter_refcount < pool->min_threshold) {
- 			/* If we found an IRQ with less than min_thres, return it */
-+			free_cpumask_var(tmp);
- 			return iter;
-+		}
- 		if (!irq || iter_refcount < irq_refcount) {
- 			/* In case we won't find an IRQ with less than min_thres,
- 			 * keep a pointer to the least used IRQ
-@@ -122,6 +130,8 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
- 			irq = iter;
- 		}
- 	}
-+
-+	free_cpumask_var(tmp);
- 	return irq;
- }
- 
--- 
-2.36.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
