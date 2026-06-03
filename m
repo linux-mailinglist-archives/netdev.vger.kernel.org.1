@@ -1,138 +1,187 @@
-Return-Path: <netdev+bounces-294504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nO65HCGFH2ocmwAAu9opvQ
-	(envelope-from <netdev+bounces-294504-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:36:33 +0200
+	id 4miUCK6FH2oqmwAAu9opvQ
+	(envelope-from <netdev+bounces-294505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:38:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF118633784
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:36:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EA86337A0
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:38:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294504-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294504-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=126.com header.s=s110527 header.b="ppk/GZ3J";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294505-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294505-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=126.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27FE130610B0
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:30:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A17D30A7408
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46BA35E1BE;
-	Wed,  3 Jun 2026 01:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BE5360ED9;
+	Wed,  3 Jun 2026 01:34:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301D135DA4F;
-	Wed,  3 Jun 2026 01:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F50F3603FE;
+	Wed,  3 Jun 2026 01:34:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780450231; cv=none; b=NYX8i4UZjKys2RK0xU7wP+tKSjWL5D31KJE51sH1BN9vVjIbLlnDNeYCS8aIkvKpNbdRPbF+aPA925UjpoWqrddloKlg+/MjKZ5Se3b9nLcbkfEQnT+HZ7qOZGximQJfCj65aK7g480jtC9vZO7YQbESeYEg+WyJfvrJ3GRe+pQ=
+	t=1780450480; cv=none; b=nBxf5eCLROgz4pNvCwmXDZCn+biLIL1xdIi24v9alJPT9/iZDxxXdvbzOpCAZiZ2ZiOSCE3Egn1KQ9iAu5ysFxAtUBFH7/lvkwUOqwB8yOFiC8Y52d0NcJVAsgUtbQoe1/Yc2Xv9zCQukDVrzkUZCkW5G6CxKMXXB1JUdG/u+mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780450231; c=relaxed/simple;
-	bh=gcXgt81jVg+t71PXjrujpm/6IA3UwCOkGUgQ+gOoPeg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gflueHUzGhuTK1EzbPP1RAl/1k7D4NbZWBAixyQKQmL5LaHvWkEuX2nh+g1K2quPDcnrM53gse73I5UaPuIueGwFXi96zz4X7q0oRrGkT8SP5E6JAcGtikFnW1xLa1WbpLXsby1dPkkfMhFq/dUEypza05RnxCno60ilT6Zkvvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn; spf=pass smtp.mailfrom=mails.ucas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Received: from fric.. (unknown [36.110.52.2])
-	by APP-01 (Coremail) with SMTP id qwCowAAXvtafgx9qzq97AA--.10147S2;
-	Wed, 03 Jun 2026 09:30:07 +0800 (CST)
-From: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	ernestas.k@iconn-networks.com,
-	horms@kernel.org,
-	kees@kernel.org,
-	kuniyu@google.com,
-	leitao@debian.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	xujiakai24@mails.ucas.ac.cn
-Subject: Re: [PATCH v2] llc: Fix race between sock_orphan() and timer callback in llc_sk_free()
-Date: Wed,  3 Jun 2026 01:30:07 +0000
-Message-Id: <20260603013007.1171695-1-xujiakai24@mails.ucas.ac.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260602133002.3ed70fc3@kernel.org>
-References: <20260602133002.3ed70fc3@kernel.org>
+	s=arc-20240116; t=1780450480; c=relaxed/simple;
+	bh=esmJIIxm5KHtqbg938bfkDA8ppwaZ16VwS7nKCJivPY=;
+	h=Message-ID:Date:From:MIME-Version:To:CC:Subject:References:
+	 In-Reply-To:Content-Type; b=AzQDCkV5r7Xs8BuHjLowWzZGnLBpxsYeWfdmz56Espjqkrpl2astFqAuyG3L9/0SHowXc7c5TvlWfqe90LF95PZzH3CLyHo/01eNLY9EncXmQvaExd1VWkCbX5EYprXdtTilSgz+3v+iDUNM1fhdaZy7WsPeXtfhzU4Bpeap4lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=ppk/GZ3J; arc=none smtp.client-ip=220.197.31.7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:From:MIME-Version:To:Subject:
+	Content-Type; bh=BtEiAyLyIPFGiPQbhVD6Qlb1WOziCceBXDJcSwMDSjg=;
+	b=ppk/GZ3Jq6c2rl1QNQ4l2GXnjiNQ/lVoHgm2IqAwqEoMuSMT2CByFuQIDJnL6D
+	CKGI5PPcTiwamPlyUvTRW66BybZYIVTzKiSxSJP3ockfyTN+eAtiqcU3ACotxdSf
+	eh+YM6PU28GLVlMJgnW6OP3oLRZo3Jrx9B6OX9zyLv/P4=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDnD4hphB9qJCFYAw--.12847S2;
+	Wed, 03 Jun 2026 09:33:30 +0800 (CST)
+Message-ID: <6A1F846C.6000405@126.com>
+Date: Wed, 03 Jun 2026 09:33:32 +0800
+From: Hongling Zeng <zhongling0719@126.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+To: Anna Schumaker <anna@kernel.org>, 
+ Hongling Zeng <zenghongling@kylinos.cn>,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+ NeilBrown <neil@brown.name>,
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>,
+ Trond Myklebust <trondmy@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+CC: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+ stable@vger.kernel.org
+Subject: Re: [PATCH] sunrpc: fix uninitialized xprt_create_args structure
+References: <20260602083205.183807-1-zenghongling@kylinos.cn> <c3dc789b-c8c0-43e6-ae8d-615c932f4fa1@app.fastmail.com>
+In-Reply-To: <c3dc789b-c8c0-43e6-ae8d-615c932f4fa1@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAAXvtafgx9qzq97AA--.10147S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw18Jw1rGF1xCw4kJFyrJFb_yoWfXFb_ur
-	Wjga97Gry8Jan8Z3W2kr4FqFsxWw4jg34jv3yUJasrKryxtFZ7WFZF934S9FyrAay7W3y3
-	twn5A342q34SqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbh8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr
-	0_Cr1UM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
-	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8Jr
-	0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAq
-	YI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82
-	IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC2
-	0s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMI
-	IF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF
-	0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87
-	Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUrb18DUUUU
-X-CM-SenderInfo: 50xmxthndljko6pdxz3voxutnvoduhdfq/
+X-CM-TRANSID:_____wDnD4hphB9qJCFYAw--.12847S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Ary5KFyDGFyrJr1xuFy5CFg_yoW8Kw43pr
+	ZrGay5GFWDtws7Ww1rAw48C34Fyr4rGF45Gr4jyF98ArnxKas7tF12kFWj9F97CF4rGF1q
+	q3Wjvwn5X3yqyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jStC7UUUUU=
+X-CM-SenderInfo: x2kr0wpolqwiqxrzqiyswou0bp/xtbBoAqdbmofhGoDIAAA3h
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[126.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[126.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[ucas.ac.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:ernestas.k@iconn-networks.com,m:horms@kernel.org,m:kees@kernel.org,m:kuniyu@google.com,m:leitao@debian.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:xujiakai24@mails.ucas.ac.cn,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xujiakai24@mails.ucas.ac.cn,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-294504-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:anna@kernel.org,m:zenghongling@kylinos.cn,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:trondmy@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[zhongling0719@126.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-294505-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[126.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai24@mails.ucas.ac.cn,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhongling0719@126.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[126.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BF118633784
+X-Rspamd-Queue-Id: 79EA86337A0
 
-Thank you very much for your review and feedback. I really appreciate 
-you taking the time to look at this.
+   Hi Anna and Jeff,
 
-> Sashiko points out that there's more issues if the timer runs after
-> llc_ui_release(). Can you reliably reproduce this? Have you checked
-> that this change is sufficient? Sashiko says that llc->dev may
-> disappear even tho we don't clear that pointer in _release().
+   Thanks for the review!
 
-This crash was discovered by fuzzing. Unfortunately, the fuzzer did 
-not generate a reproducer program, so I am unable to reproduce it. 
-Our analysis has been based entirely on the crash report.
+   Regarding Anna's question about copying fields from the main xprt:
 
-I'm not an expert in this area, so the quality of my patches may be 
-low. I really appreciate your patience and the time you've taken to 
-review this. Would this V3 approach (moving both sock_orphan() and 
-netdev_put() into llc_sk_free() after the timer stop) be the correct 
-way to proceed?
+   Based on my analysis, these missing fields are not stored in
+   struct rpc_xprt:
+   - srcaddr: only passed during creation, not stored in xprt
+   - bc_xps: not present in rpc_xprt (only bc_xprt is stored)
+   - flags: not stored in xprt after creation
 
-Regards,
-Jiakai
+   Since these values are not available in the main xprt, we cannot
+   copy them. Zero-initializing is the correct approach with the
+   current design.
+
+   Updated to v2 with designated initializer as suggested by Jeff.
+
+   Thanks,
+   Hongling
+
+在 2026年06月02日 23:59, Anna Schumaker 写道:
+> Hi Hongling,
+>
+> Thanks for the patch!
+>
+> On Tue, Jun 2, 2026, at 4:32 AM, Hongling Zeng wrote:
+>> The xprt_create_args structure is allocated on the stack without
+>> initialization in rpc_sysfs_xprt_switch_add_xprt_store(). While some
+>> fields are manually populated, critical fields like srcaddr, bc_xps,
+>> and flags contain uninitialized stack garbage.
+>>
+>> This can lead to:
+>> 1. Kernel panic when xs_setup_xprt() dereferences garbage srcaddr
+>> 2. Information leak if srcaddr points to sensitive stack data
+>> 3. Unpredictable behavior if flags has random bits set
+> I took a look through the transport setup function to see what they
+> do when these fields are set to NULL, and it looks like thy do their
+> best to choose a default value which might be different than the
+> values set to the original transport that we are trying to clone.
+>
+> Can we instead set the missing fields in the xprt_create_args based
+> on how the main xprt is configured?
+>
+> Thanks,
+> Anna
+>
+>> The fix is to zero-initialize the structure to ensure all unused
+>> fields are NULL/0, preventing the transport setup code from acting
+>> on garbage data.
+>>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
+>> ---
+>>   net/sunrpc/sysfs.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
+>> index a90480f80154..0a99d0f1eb4c 100644
+>> --- a/net/sunrpc/sysfs.c
+>> +++ b/net/sunrpc/sysfs.c
+>> @@ -333,6 +333,7 @@ static ssize_t
+>> rpc_sysfs_xprt_switch_add_xprt_store(struct kobject *kobj,
+>>   	if (!xprt_switch)
+>>   		return 0;
+>>
+>> +	memset(&xprt_create_args, 0, sizeof(xprt_create_args));
+>>   	xprt = rpc_xprt_switch_get_main_xprt(xprt_switch);
+>>   	if (!xprt)
+>>   		goto out;
+>> -- 
+>> 2.25.1
 
 
