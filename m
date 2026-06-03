@@ -1,625 +1,2108 @@
-Return-Path: <netdev+bounces-294624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yxpZJnLcH2pDrQAAu9opvQ
-	(envelope-from <netdev+bounces-294624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:49:06 +0200
+	id o6P/K7PZH2parAAAu9opvQ
+	(envelope-from <netdev+bounces-294632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:37:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99EE56355FA
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:49:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD880635484
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:37:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=DmHfAfxS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294624-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294624-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=simonwunderlich.de;
+	dkim=pass header.d=microchip.com header.s=mchp header.b=UYuthz9X;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294632-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294632-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microchip.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 827633088077
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:26:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DDFA30265A5
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF071400E01;
-	Wed,  3 Jun 2026 07:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743A7402BBF;
+	Wed,  3 Jun 2026 07:26:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A565B3FE675
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CA340314F;
+	Wed,  3 Jun 2026 07:26:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471544; cv=none; b=tXAU0hkinGrUWj1QdnLdAqEPc8vWA5dWmXRWFzY9LriggVUADLcYP/koroDC73iw2d9wWHHBIblvlhcFfcecXYgB41VQLUW8443e/h8VKBLglNQPeuP8XhEooT2mbOwCkP2Xv7Sm51rZKZXiI9ciWsw+02pi4QPSa4VveJ/w8vI=
+	t=1780471583; cv=none; b=ub11nrQJJsqupFnAeTHxhIDgstqMA7vx6QE7bvochnbO5JWKXLzWYMiZbmAH2ArppJ8Q6iIHrM9ani4Ljs2z8HvTY1EsdJlZ0zT6GpTzTQqAyNLIRPCHoMZa5FRFBeIfxlSEqTHL7isqhMv3Ltp2mX8rWUspsnm1fL5cLK+MipU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471544; c=relaxed/simple;
-	bh=HYe614qMKq2sZiO1SMWKPJWYHLBEkjjTZAR4BXo0GCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bFOr/5gFeAdz2+n9D07Iiipt8oJJbSp9h0JzQv0pKYiXyo1qoAOwzTlHxZysH8QAjOKP4a7/6jdHI6A1nllqTKJvsTqQTpmybdz4Z4fSsfnhBgNepGsnqz5jsSoZ9beuHxsLkMWucvE6stzN8LRi+Wsrr1wPg0ycU6BaJOzBZkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=DmHfAfxS; arc=none smtp.client-ip=23.88.38.48
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1780471536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0h9j2XX2JpfUXM4ycXiooac/sZ7E+PW7+rvAlmRnvjo=;
-	b=DmHfAfxSMou98KaFoRoWal+gWKd0rSoKsAV/njn4L6nHDDG6iCzdZgpMER0vkJyqm19iO1
-	kIq8Xe+7O1sy2y56b9tD0iTxJ8w+i2foHfBYjl4Hsk4R3FNXXqw4JD8q50WR4gbT4YhTkc
-	r5kK+nof8DP7eEITCz0A+nlH5sCzIasIjO0G0ro+cqD8uug32tiAaSirXCif3o0iBe4Plm
-	HvchWXJbTzrUTKD/ByDDyFG0WZNUUB72sp8kUJg0XM+Dk9pP8f0aVZLqWcd9Naq9qTQIHs
-	IVl+JMj36xBTZflqNGAyq9fKnIpFtrb0JEKHJRlXnG3wNKKFw+FcMy8MNIFAHw==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net-next 10/15] batman-adv: tp_meter: use locking for all congestion control variables
-Date: Wed,  3 Jun 2026 09:25:21 +0200
-Message-ID: <20260603072527.174487-11-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260603072527.174487-1-sw@simonwunderlich.de>
-References: <20260603072527.174487-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1780471583; c=relaxed/simple;
+	bh=JW926GTJ5vNki/PDOGHMlRTRO4nqR7l84HodG8vWhnk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=Hwc/nVr62/HNBBA/ZLc5qJcgjgjINHQ2oQfRlK4n9+Z5lG2nSYARfOFH28MgKmYXU5VxCQAgpcJcGFFmNNBcLkF0K8WU93PgGAg0op7+z7gIQZs2NePVctgIqbRkJQtZ/sWp1qTOLiSVOP2XmyyZKy4xg31lnRL+SWwIKEPWd+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UYuthz9X; arc=none smtp.client-ip=68.232.154.123
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1780471579; x=1812007579;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=JW926GTJ5vNki/PDOGHMlRTRO4nqR7l84HodG8vWhnk=;
+  b=UYuthz9XyrsR+MstUjsX03GclDcmnetXvf5ZnSLxb2Bp2/Ce++K7M1sY
+   iTdZnxSHsW5qjP2IyZJNQx0E+TDU2kTaM7tq+YQkBNREPeXEX46qlCzV+
+   8t2/iqPON/3uH+B82CHeQcbQ9ydn+GHAJnYZmJXj7aHn0SxRfkC3vBADo
+   yHf/PQacQ6MI1H6KNw0pyeJKD2UCOQNa81yN+kZDByRh+QD6/gZmLpmBn
+   5gLjPMPOkB9JgazfAkRFJI2wr2FePE66EsDQBxvSDxCWdQrE1YRkt31wd
+   ovtHrUx7lUeyB1yWsDW8y9EkltMJygIVFEY4GnjPbs3c0R8f/AjF+6xg1
+   g==;
+X-CSE-ConnectionGUID: FbzfwNBeScWZ0WC+rJopvA==
+X-CSE-MsgGUID: MYM5wt9mR0adngUwEa2IGw==
+X-IronPort-AV: E=Sophos;i="6.24,184,1774335600"; 
+   d="scan'208";a="57703084"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Jun 2026 00:26:18 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Wed, 3 Jun 2026 00:26:18 -0700
+Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Wed, 3 Jun 2026 00:26:14 -0700
+From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+Date: Wed, 3 Jun 2026 09:25:22 +0200
+Subject: [PATCH net-next v7 3/9] net: dsa: lan9645x: add autogenerated
+ register macros
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-ID: <20260603-dsa_lan9645x_switch_driver_base-v7-3-b2f90e676707@microchip.com>
+References: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
+In-Reply-To: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
+ Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Russell King
+	<linux@armlinux.org.uk>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+X-Mailer: b4 0.15-dev
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294624-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-294632-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:woojung.huh@microchip.com,m:linux@armlinux.org.uk,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:jensemil.schulzostergaard@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,narfation.org:email,simonwunderlich.de:mid,simonwunderlich.de:dkim,simonwunderlich.de:from_mime,simonwunderlich.de:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:mid,microchip.com:dkim,microchip.com:from_mime,microchip.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 99EE56355FA
+X-Rspamd-Queue-Id: CD880635484
 
-From: Sven Eckelmann <sven@narfation.org>
+Add autogenerated register macros and update MAINTAINERS file. The
+register macros are generated using the same tool we use for lan966x,
+sparx5 and lan969x.
 
-Some variables used atomic_t for concurrent access while others relied on
-cwnd_lock, leading to an inconsistent locking model. This can be simplified
-by:
-
-* keeping all congestion control decisions inside the cc_lock
-* variables which can be accessed without a lock must use
-  READ_ONCE/WRITE_ONE
-
-This is only possible, by extracting the congestion control logic from
-batadv_tp_recv_ack() into a new helper batadv_tp_handle_ack(). Its
-decisions are returned as a batadv_tp_ack_reaction enum value and then
-applied by the caller. This separates the algorithm (deciding what to do)
-from the mechanism (actually doing it).
-
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 ---
- net/batman-adv/tp_meter.c | 272 +++++++++++++++++++++++---------------
- net/batman-adv/types.h    |   8 +-
- 2 files changed, 170 insertions(+), 110 deletions(-)
+Changes in v7:
+- Add ANA:COMMON:CPUQ_8021_CFG for bpdu cpu queue configuration.
 
-diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
-index c088d88804533..e9ba1c45a285d 100644
---- a/net/batman-adv/tp_meter.c
-+++ b/net/batman-adv/tp_meter.c
-@@ -143,14 +143,12 @@ static u32 batadv_tp_cwnd(u32 base, u32 increment, u32 min)
-  * increased by MSS * MSS / CWND for every unique received ACK
-  */
- static void batadv_tp_update_cwnd(struct batadv_tp_sender *tp_vars, u32 mss)
-+	__must_hold(&tp_vars->cwnd_lock)
- {
--	spin_lock_bh(&tp_vars->cwnd_lock);
--
- 	/* slow start... */
- 	if (tp_vars->cwnd <= tp_vars->ss_threshold) {
- 		tp_vars->dec_cwnd = 0;
- 		tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd, mss, mss);
--		spin_unlock_bh(&tp_vars->cwnd_lock);
- 		return;
- 	}
+Changes in v3:
+- No changes
+
+Changes in v2:
+- Add cpuq registers
+---
+ MAINTAINERS                                        |    1 +
+ drivers/net/dsa/microchip/lan9645x/lan9645x_regs.h | 1937 ++++++++++++++++++++
+ 2 files changed, 1938 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 40f8f23e39c2..5b2cbc01cbd1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17438,6 +17438,7 @@ M:	UNGLinuxDriver@microchip.com
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/net/dsa/microchip,lan96455s-switch.yaml
++F:	drivers/net/dsa/microchip/lan9645x/*
+ F:	include/linux/dsa/lan9645x.h
+ F:	net/dsa/tag_lan9645x.c
  
-@@ -160,15 +158,11 @@ static void batadv_tp_update_cwnd(struct batadv_tp_sender *tp_vars, u32 mss)
- 	/* increment CWND at least of 1 (section 3.1 of RFC5681) */
- 	tp_vars->dec_cwnd += max_t(u32, 1U << 3,
- 				   ((mss * mss) << 3) / tp_vars->cwnd);
--	if (tp_vars->dec_cwnd < (mss << 3)) {
--		spin_unlock_bh(&tp_vars->cwnd_lock);
-+	if (tp_vars->dec_cwnd < (mss << 3))
- 		return;
--	}
- 
- 	tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd, mss, mss);
- 	tp_vars->dec_cwnd = 0;
--
--	spin_unlock_bh(&tp_vars->cwnd_lock);
- }
- 
- /**
-@@ -178,6 +172,7 @@ static void batadv_tp_update_cwnd(struct batadv_tp_sender *tp_vars, u32 mss)
-  */
- static void batadv_tp_update_rto(struct batadv_tp_sender *tp_vars,
- 				 u32 new_rtt)
-+	__must_hold(&tp_vars->cwnd_lock)
- {
- 	long m = new_rtt;
- 
-@@ -197,14 +192,14 @@ static void batadv_tp_update_rto(struct batadv_tp_sender *tp_vars,
- 		tp_vars->rttvar += m; /* mdev ~= 3/4 rttvar + 1/4 new */
- 	} else {
- 		/* first measure getting in */
--		tp_vars->srtt = m << 3;	/* take the measured time to be srtt */
-+		tp_vars->srtt = m << 3; /* take the measured time to be srtt */
- 		tp_vars->rttvar = m << 1; /* new_rtt / 2 */
- 	}
- 
- 	/* rto = srtt + 4 * rttvar.
- 	 * rttvar is scaled by 4, therefore doesn't need to be multiplied
- 	 */
--	tp_vars->rto = (tp_vars->srtt >> 3) + tp_vars->rttvar;
-+	WRITE_ONCE(tp_vars->rto, (tp_vars->srtt >> 3) + tp_vars->rttvar);
- }
- 
- /**
-@@ -525,7 +520,8 @@ static void batadv_tp_reset_sender_timer(struct batadv_tp_sender *tp_vars)
- 		/* timer ref will be dropped in batadv_tp_sender_cleanup */
- 		return;
- 
--	mod_timer(&tp_vars->common.timer, jiffies + msecs_to_jiffies(tp_vars->rto));
-+	mod_timer(&tp_vars->common.timer,
-+		  jiffies + msecs_to_jiffies(READ_ONCE(tp_vars->rto)));
- }
- 
- /**
-@@ -544,8 +540,11 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
- 	if (batadv_tp_sender_stopped(tp_vars))
- 		return;
- 
-+	spin_lock_bh(&tp_vars->cwnd_lock);
-+
- 	/* if the user waited long enough...shutdown the test */
- 	if (unlikely(tp_vars->rto >= BATADV_TP_MAX_RTO)) {
-+		spin_unlock_bh(&tp_vars->cwnd_lock);
- 		batadv_tp_sender_shutdown(tp_vars,
- 					  BATADV_TP_REASON_DST_UNREACHABLE);
- 		return;
-@@ -554,9 +553,7 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
- 	/* RTO exponential backoff
- 	 * Details in Section 5.5 of RFC6298
- 	 */
--	tp_vars->rto <<= 1;
--
--	spin_lock_bh(&tp_vars->cwnd_lock);
-+	WRITE_ONCE(tp_vars->rto, tp_vars->rto * 2);
- 
- 	tp_vars->ss_threshold = tp_vars->cwnd >> 1;
- 	if (tp_vars->ss_threshold < BATADV_TP_PLEN * 2)
-@@ -565,14 +562,15 @@ static void batadv_tp_sender_timeout(struct timer_list *t)
- 	batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
- 		   "Meter: RTO fired during test towards %pM! cwnd=%u new ss_thr=%u, resetting last_sent to %u\n",
- 		   tp_vars->common.other_end, tp_vars->cwnd, tp_vars->ss_threshold,
--		   atomic_read(&tp_vars->last_acked));
-+		   tp_vars->last_acked);
- 
- 	tp_vars->cwnd = BATADV_TP_PLEN * 3;
- 
-+	WRITE_ONCE(tp_vars->last_sent, tp_vars->last_acked);
-+
- 	spin_unlock_bh(&tp_vars->cwnd_lock);
- 
- 	/* resend the non-ACKed packets.. */
--	tp_vars->last_sent = atomic_read(&tp_vars->last_acked);
- 	wake_up(&tp_vars->more_bytes);
- 
- 	batadv_tp_reset_sender_timer(tp_vars);
-@@ -670,6 +668,115 @@ static int batadv_tp_send_msg(struct batadv_tp_sender *tp_vars, const u8 *src,
- 	return BATADV_TP_REASON_CANT_SEND;
- }
- 
-+/**
-+ * enum batadv_tp_ack_reaction - expected reaction to ack packet
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_regs.h b/drivers/net/dsa/microchip/lan9645x/lan9645x_regs.h
+new file mode 100644
+index 000000000000..198c7aed87c1
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_regs.h
+@@ -0,0 +1,1937 @@
++/* SPDX-License-Identifier: GPL-2.0+
++ *
++ * Copyright (c) 2026 Microchip Technology Inc.
 + */
-+enum batadv_tp_ack_reaction {
-+	/** @BATADV_TP_ACK_REACTION_OLD_ACK: ignore old ack packet */
-+	BATADV_TP_ACK_REACTION_OLD_ACK,
 +
-+	/** @BATADV_TP_ACK_REACTION_IGNORE: ignore duplicated ack but reset timer */
-+	BATADV_TP_ACK_REACTION_IGNORE,
++/* This file is autogenerated by cml-utils 2026-06-01 15:09:18 +0200.
++ * Commit ID: 1d14b97555bf4fa63fec33701c1aed00d0315013
++ */
 +
-+	/** @BATADV_TP_ACK_REACTION_RESEND_WAKEUP: resend data and wakeup "more_bytes" */
-+	BATADV_TP_ACK_REACTION_RESEND_WAKEUP,
++#ifndef _LAN9645X_REGS_H_
++#define _LAN9645X_REGS_H_
 +
-+	/** @BATADV_TP_ACK_REACTION_WAKEUP: wakeup "more_bytes" */
-+	BATADV_TP_ACK_REACTION_WAKEUP,
++#include <linux/bitfield.h>
++#include <linux/types.h>
++#include <linux/bug.h>
++
++enum lan9645x_target {
++	TARGET_AFI = 0,
++	TARGET_ANA = 1,
++	TARGET_CHIP_TOP = 2,
++	TARGET_DEV = 5,
++	TARGET_GCB = 16,
++	TARGET_HSIO = 17,
++	TARGET_QS = 26,
++	TARGET_QSYS = 27,
++	TARGET_REW = 28,
++	TARGET_SYS = 29,
++	NUM_TARGETS = 38
 +};
 +
-+/**
-+ * batadv_tp_handle_ack() - Calculate reaction to ACK and update congestion control
-+ * @bat_priv: the bat priv with all the mesh interface information
-+ * @tp_vars: the private data of the current TP meter session
-+ * @recv_ack: received ACK seqno
-+ * @mss: maximum segment size for transmission
-+ *
-+ * Return: expected reaction to this ack
-+ */
-+static enum batadv_tp_ack_reaction
-+batadv_tp_handle_ack(struct batadv_priv *bat_priv,
-+		     struct batadv_tp_sender *tp_vars,
-+		     u32 recv_ack, size_t mss)
-+	__must_hold(&tp_vars->cwnd_lock)
-+{
-+	enum batadv_tp_ack_reaction reaction;
++#define __REG(...)    __VA_ARGS__
 +
-+	if (batadv_seq_before(recv_ack, tp_vars->last_acked))
-+		return BATADV_TP_ACK_REACTION_OLD_ACK;
++/*      AFI:PORT_TBL:PORT_FRM_OUT */
++#define AFI_PORT_FRM_OUT(g)       __REG(TARGET_AFI,\
++					0, 1, 6272, g, 11, 8, 0, 0, 1, 4)
 +
-+	/* check if this ACK is a duplicate */
-+	if (tp_vars->last_acked == recv_ack) {
-+		/* if this is the third duplicate ACK do Fast Retransmit */
-+		if (tp_vars->dup_acks > 3)
-+			return BATADV_TP_ACK_REACTION_IGNORE;
++#define AFI_PORT_FRM_OUT_FRM_OUT_CNT             GENMASK(26, 16)
++#define AFI_PORT_FRM_OUT_FRM_OUT_CNT_SET(x)\
++	FIELD_PREP(AFI_PORT_FRM_OUT_FRM_OUT_CNT, x)
++#define AFI_PORT_FRM_OUT_FRM_OUT_CNT_GET(x)\
++	FIELD_GET(AFI_PORT_FRM_OUT_FRM_OUT_CNT, x)
 +
-+		tp_vars->dup_acks++;
-+		if (tp_vars->dup_acks != 3)
-+			return BATADV_TP_ACK_REACTION_IGNORE;
++/*      AFI:PORT_TBL:PORT_CFG */
++#define AFI_PORT_CFG(g)           __REG(TARGET_AFI,\
++					0, 1, 6272, g, 11, 8, 4, 0, 1, 4)
 +
-+		if (!batadv_seq_before(tp_vars->recover, recv_ack))
-+			return BATADV_TP_ACK_REACTION_IGNORE;
++#define AFI_PORT_CFG_FRM_OUT_MAX                 GENMASK(9, 0)
++#define AFI_PORT_CFG_FRM_OUT_MAX_SET(x)\
++	FIELD_PREP(AFI_PORT_CFG_FRM_OUT_MAX, x)
++#define AFI_PORT_CFG_FRM_OUT_MAX_GET(x)\
++	FIELD_GET(AFI_PORT_CFG_FRM_OUT_MAX, x)
 +
-+		/* Fast Recovery */
-+		tp_vars->fast_recovery = true;
++#define AFI_PORT_CFG_FC_SKIP_TTI_INJ             BIT(16)
++#define AFI_PORT_CFG_FC_SKIP_TTI_INJ_SET(x)\
++	FIELD_PREP(AFI_PORT_CFG_FC_SKIP_TTI_INJ, x)
++#define AFI_PORT_CFG_FC_SKIP_TTI_INJ_GET(x)\
++	FIELD_GET(AFI_PORT_CFG_FC_SKIP_TTI_INJ, x)
 +
-+		/* Set recover to the last outstanding seqno when Fast Recovery
-+		 * is entered. RFC6582, Section 3.2, step 1
-+		 */
-+		tp_vars->recover = tp_vars->last_sent;
-+		tp_vars->ss_threshold = tp_vars->cwnd >> 1;
-+		batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
-+			   "Meter: Fast Recovery, (cur cwnd=%u) ss_thr=%u last_sent=%u recv_ack=%u\n",
-+			   tp_vars->cwnd, tp_vars->ss_threshold,
-+			   tp_vars->last_sent, recv_ack);
-+		tp_vars->cwnd = batadv_tp_cwnd(tp_vars->ss_threshold, 3 * mss,
-+					       mss);
-+		tp_vars->dec_cwnd = 0;
-+		WRITE_ONCE(tp_vars->last_sent, recv_ack);
++/*      ANA:ANA:ADVLEARN */
++#define ANA_ADVLEARN              __REG(TARGET_ANA,\
++					0, 1, 27136, 0, 1, 284, 0, 0, 1, 4)
 +
-+		return BATADV_TP_ACK_REACTION_RESEND_WAKEUP;
-+	}
++#define ANA_ADVLEARN_VLAN_CHK                    BIT(0)
++#define ANA_ADVLEARN_VLAN_CHK_SET(x)\
++	FIELD_PREP(ANA_ADVLEARN_VLAN_CHK, x)
++#define ANA_ADVLEARN_VLAN_CHK_GET(x)\
++	FIELD_GET(ANA_ADVLEARN_VLAN_CHK, x)
 +
-+	/* count the acked data */
-+	atomic64_add(recv_ack - tp_vars->last_acked, &tp_vars->tot_sent);
++/*      ANA:ANA:VLANMASK */
++#define ANA_VLANMASK              __REG(TARGET_ANA,\
++					0, 1, 27136, 0, 1, 284, 8, 0, 1, 4)
 +
-+	/* reset the duplicate ACKs counter */
-+	tp_vars->dup_acks = 0;
++#define ANA_VLANMASK_VLANMASK                    GENMASK(9, 0)
++#define ANA_VLANMASK_VLANMASK_SET(x)\
++	FIELD_PREP(ANA_VLANMASK_VLANMASK, x)
++#define ANA_VLANMASK_VLANMASK_GET(x)\
++	FIELD_GET(ANA_VLANMASK_VLANMASK, x)
 +
-+	if (tp_vars->fast_recovery) {
-+		/* partial ACK */
-+		if (batadv_seq_before(recv_ack, tp_vars->recover)) {
-+			/* this is another hole in the window. React
-+			 * immediately as specified by NewReno (see
-+			 * Section 3.2 of RFC6582 for details)
-+			 */
-+			reaction = BATADV_TP_ACK_REACTION_RESEND_WAKEUP;
-+			tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd,
-+						       mss, mss);
-+		} else {
-+			tp_vars->fast_recovery = false;
-+			/* set cwnd to the value of ss_threshold at the
-+			 * moment that Fast Recovery was entered.
-+			 * RFC6582, Section 3.2, step 3
-+			 */
-+			tp_vars->cwnd = batadv_tp_cwnd(tp_vars->ss_threshold,
-+						       0, mss);
-+			reaction = BATADV_TP_ACK_REACTION_WAKEUP;
-+		}
-+	} else {
-+		if (recv_ack - tp_vars->last_acked >= mss)
-+			batadv_tp_update_cwnd(tp_vars, mss);
++/*      ANA:ANA:ANAGEFIL */
++#define ANA_ANAGEFIL              __REG(TARGET_ANA,\
++					0, 1, 27136, 0, 1, 284, 12, 0, 1, 4)
 +
-+		reaction = BATADV_TP_ACK_REACTION_WAKEUP;
-+	}
++#define ANA_ANAGEFIL_AGE_LOCKED                  BIT(20)
++#define ANA_ANAGEFIL_AGE_LOCKED_SET(x)\
++	FIELD_PREP(ANA_ANAGEFIL_AGE_LOCKED, x)
++#define ANA_ANAGEFIL_AGE_LOCKED_GET(x)\
++	FIELD_GET(ANA_ANAGEFIL_AGE_LOCKED, x)
 +
-+	/* move the Transmit Window */
-+	WRITE_ONCE(tp_vars->last_acked, recv_ack);
++#define ANA_ANAGEFIL_PID_EN                      BIT(19)
++#define ANA_ANAGEFIL_PID_EN_SET(x)\
++	FIELD_PREP(ANA_ANAGEFIL_PID_EN, x)
++#define ANA_ANAGEFIL_PID_EN_GET(x)\
++	FIELD_GET(ANA_ANAGEFIL_PID_EN, x)
 +
-+	return reaction;
-+}
++#define ANA_ANAGEFIL_PID_VAL                     GENMASK(18, 14)
++#define ANA_ANAGEFIL_PID_VAL_SET(x)\
++	FIELD_PREP(ANA_ANAGEFIL_PID_VAL, x)
++#define ANA_ANAGEFIL_PID_VAL_GET(x)\
++	FIELD_GET(ANA_ANAGEFIL_PID_VAL, x)
 +
- /**
-  * batadv_tp_recv_ack() - ACK receiving function
-  * @bat_priv: the bat priv with all the mesh interface information
-@@ -683,16 +790,19 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- 	struct batadv_hard_iface *primary_if = NULL;
- 	struct batadv_orig_node *orig_node = NULL;
- 	const struct batadv_icmp_tp_packet *icmp;
-+	enum batadv_tp_ack_reaction reaction;
- 	struct batadv_tp_sender *tp_vars;
--	const unsigned char *dev_addr;
--	size_t packet_len, mss;
--	u32 rtt, recv_ack, cwnd;
-+	size_t packet_len;
-+	u32 recv_ack;
-+	size_t mss;
-+	u32 rtt;
- 
- 	packet_len = BATADV_TP_PLEN;
- 	mss = BATADV_TP_PLEN;
- 	packet_len += sizeof(struct batadv_unicast_packet);
- 
- 	icmp = (struct batadv_icmp_tp_packet *)skb->data;
-+	recv_ack = ntohl(icmp->seqno);
- 
- 	/* find the tp_vars */
- 	tp_vars = batadv_tp_list_find_sender_session(bat_priv, icmp->orig,
-@@ -704,8 +814,7 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- 		goto out;
- 
- 	/* old ACK? silently drop it.. */
--	if (batadv_seq_before(ntohl(icmp->seqno),
--			      (u32)atomic_read(&tp_vars->last_acked)))
-+	if (batadv_seq_before(recv_ack, READ_ONCE(tp_vars->last_acked)))
- 		goto out;
- 
- 	primary_if = batadv_primary_if_get_selected(bat_priv);
-@@ -716,93 +825,36 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- 	if (unlikely(!orig_node))
- 		goto out;
- 
-+	spin_lock_bh(&tp_vars->cwnd_lock);
- 	/* update RTO with the new sampled RTT, if any */
- 	rtt = jiffies_to_msecs(jiffies) - ntohl(icmp->timestamp);
- 	if (icmp->timestamp && rtt)
- 		batadv_tp_update_rto(tp_vars, rtt);
- 
--	/* ACK for new data... reset the timer */
--	batadv_tp_reset_sender_timer(tp_vars);
--
--	recv_ack = ntohl(icmp->seqno);
-+	reaction = batadv_tp_handle_ack(bat_priv, tp_vars, recv_ack, mss);
-+	spin_unlock_bh(&tp_vars->cwnd_lock);
- 
--	/* check if this ACK is a duplicate */
--	if (atomic_read(&tp_vars->last_acked) == recv_ack) {
--		atomic_inc(&tp_vars->dup_acks);
--		if (atomic_read(&tp_vars->dup_acks) != 3)
--			goto out;
-+	if (reaction == BATADV_TP_ACK_REACTION_OLD_ACK)
-+		goto out;
- 
--		if (!batadv_seq_before(tp_vars->recover, recv_ack))
--			goto out;
-+	/* ACK for new data... reset the timer */
-+	batadv_tp_reset_sender_timer(tp_vars);
- 
--		/* if this is the third duplicate ACK do Fast Retransmit */
-+	switch (reaction) {
-+	default:
-+	case BATADV_TP_ACK_REACTION_IGNORE:
-+		goto out;
-+	case BATADV_TP_ACK_REACTION_RESEND_WAKEUP:
- 		batadv_tp_send_msg(tp_vars, primary_if->net_dev->dev_addr,
- 				   orig_node, recv_ack, packet_len,
- 				   icmp->session, icmp->uid,
- 				   jiffies_to_msecs(jiffies));
--
--		spin_lock_bh(&tp_vars->cwnd_lock);
--
--		/* Fast Recovery */
--		tp_vars->fast_recovery = true;
--		/* Set recover to the last outstanding seqno when Fast Recovery
--		 * is entered. RFC6582, Section 3.2, step 1
--		 */
--		tp_vars->recover = tp_vars->last_sent;
--		tp_vars->ss_threshold = tp_vars->cwnd >> 1;
--		batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
--			   "Meter: Fast Recovery, (cur cwnd=%u) ss_thr=%u last_sent=%u recv_ack=%u\n",
--			   tp_vars->cwnd, tp_vars->ss_threshold,
--			   tp_vars->last_sent, recv_ack);
--		tp_vars->cwnd = batadv_tp_cwnd(tp_vars->ss_threshold, 3 * mss,
--					       mss);
--		tp_vars->dec_cwnd = 0;
--		tp_vars->last_sent = recv_ack;
--
--		spin_unlock_bh(&tp_vars->cwnd_lock);
--	} else {
--		/* count the acked data */
--		atomic64_add(recv_ack - atomic_read(&tp_vars->last_acked),
--			     &tp_vars->tot_sent);
--		/* reset the duplicate ACKs counter */
--		atomic_set(&tp_vars->dup_acks, 0);
--
--		if (tp_vars->fast_recovery) {
--			/* partial ACK */
--			if (batadv_seq_before(recv_ack, tp_vars->recover)) {
--				/* this is another hole in the window. React
--				 * immediately as specified by NewReno (see
--				 * Section 3.2 of RFC6582 for details)
--				 */
--				dev_addr = primary_if->net_dev->dev_addr;
--				batadv_tp_send_msg(tp_vars, dev_addr,
--						   orig_node, recv_ack,
--						   packet_len, icmp->session,
--						   icmp->uid,
--						   jiffies_to_msecs(jiffies));
--				tp_vars->cwnd = batadv_tp_cwnd(tp_vars->cwnd,
--							       mss, mss);
--			} else {
--				tp_vars->fast_recovery = false;
--				/* set cwnd to the value of ss_threshold at the
--				 * moment that Fast Recovery was entered.
--				 * RFC6582, Section 3.2, step 3
--				 */
--				cwnd = batadv_tp_cwnd(tp_vars->ss_threshold, 0,
--						      mss);
--				tp_vars->cwnd = cwnd;
--			}
--			goto move_twnd;
--		}
--
--		if (recv_ack - atomic_read(&tp_vars->last_acked) >= mss)
--			batadv_tp_update_cwnd(tp_vars, mss);
--move_twnd:
--		/* move the Transmit Window */
--		atomic_set(&tp_vars->last_acked, recv_ack);
-+		fallthrough;
-+	case BATADV_TP_ACK_REACTION_WAKEUP:
-+		wake_up(&tp_vars->more_bytes);
-+		break;
- 	}
- 
--	wake_up(&tp_vars->more_bytes);
- out:
- 	batadv_hardif_put(primary_if);
- 	batadv_orig_node_put(orig_node);
-@@ -819,16 +871,19 @@ static void batadv_tp_recv_ack(struct batadv_priv *bat_priv,
- static bool batadv_tp_avail(struct batadv_tp_sender *tp_vars,
- 			    size_t payload_len)
- {
--	u32 last_sent = READ_ONCE(tp_vars->last_sent);
- 	u32 win_left, win_limit;
- 
--	win_limit = atomic_read(&tp_vars->last_acked) + tp_vars->cwnd;
-+	spin_lock_bh(&tp_vars->cwnd_lock);
++#define ANA_ANAGEFIL_VID_EN                      BIT(13)
++#define ANA_ANAGEFIL_VID_EN_SET(x)\
++	FIELD_PREP(ANA_ANAGEFIL_VID_EN, x)
++#define ANA_ANAGEFIL_VID_EN_GET(x)\
++	FIELD_GET(ANA_ANAGEFIL_VID_EN, x)
 +
-+	win_limit = tp_vars->last_acked + tp_vars->cwnd;
- 
--	if (batadv_seq_before(last_sent, win_limit))
--		win_left = win_limit - last_sent;
-+	if (batadv_seq_before(tp_vars->last_sent, win_limit))
-+		win_left = win_limit - tp_vars->last_sent;
- 	else
- 		win_left = 0;
- 
-+	spin_unlock_bh(&tp_vars->cwnd_lock);
++#define ANA_ANAGEFIL_VID_VAL                     GENMASK(12, 0)
++#define ANA_ANAGEFIL_VID_VAL_SET(x)\
++	FIELD_PREP(ANA_ANAGEFIL_VID_VAL, x)
++#define ANA_ANAGEFIL_VID_VAL_GET(x)\
++	FIELD_GET(ANA_ANAGEFIL_VID_VAL, x)
 +
- 	return win_left >= payload_len;
- }
- 
-@@ -867,6 +922,7 @@ static int batadv_tp_send(void *arg)
- 	struct batadv_hard_iface *primary_if = NULL;
- 	struct batadv_orig_node *orig_node = NULL;
- 	size_t payload_len, packet_len;
-+	u32 last_sent;
- 	int err = 0;
- 
- 	orig_node = batadv_orig_hash_find(bat_priv, tp_vars->common.other_end);
-@@ -908,10 +964,10 @@ static int batadv_tp_send(void *arg)
- 		 * the size of the unicast header
- 		 */
- 		packet_len = payload_len + sizeof(struct batadv_unicast_packet);
-+		last_sent = READ_ONCE(tp_vars->last_sent);
- 
- 		err = batadv_tp_send_msg(tp_vars, primary_if->net_dev->dev_addr,
--					 orig_node, tp_vars->last_sent,
--					 packet_len,
-+					 orig_node, last_sent, packet_len,
- 					 tp_vars->common.session, tp_vars->icmp_uid,
- 					 jiffies_to_msecs(jiffies));
- 
-@@ -926,8 +982,12 @@ static int batadv_tp_send(void *arg)
- 		}
- 
- 		/* right-shift the TWND */
--		if (!err)
--			tp_vars->last_sent += payload_len;
-+		if (!err) {
-+			spin_lock_bh(&tp_vars->cwnd_lock);
-+			if (tp_vars->last_sent == last_sent)
-+				WRITE_ONCE(tp_vars->last_sent, last_sent + payload_len);
-+			spin_unlock_bh(&tp_vars->cwnd_lock);
-+		}
- 
- 		cond_resched();
- 	}
-@@ -1044,9 +1104,9 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
- 	memcpy(tp_vars->common.session, session_id, sizeof(session_id));
- 	tp_vars->icmp_uid = icmp_uid;
- 
--	tp_vars->last_sent = BATADV_TP_FIRST_SEQ;
--	atomic_set(&tp_vars->dup_acks, 0);
--	atomic_set(&tp_vars->last_acked, BATADV_TP_FIRST_SEQ);
-+	WRITE_ONCE(tp_vars->last_sent, BATADV_TP_FIRST_SEQ);
-+	WRITE_ONCE(tp_vars->dup_acks, 0);
-+	WRITE_ONCE(tp_vars->last_acked, BATADV_TP_FIRST_SEQ);
- 	tp_vars->fast_recovery = false;
- 	tp_vars->recover = BATADV_TP_FIRST_SEQ;
- 
-@@ -1065,7 +1125,7 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
- 	/* RTO initial value is 3 seconds.
- 	 * Details in Section 2.1 of RFC6298
- 	 */
--	tp_vars->rto = 1000;
-+	WRITE_ONCE(tp_vars->rto, 1000);
- 	tp_vars->srtt = 0;
- 	tp_vars->rttvar = 0;
- 
-diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index f7817a68a29ca..c782f04aea9c4 100644
---- a/net/batman-adv/types.h
-+++ b/net/batman-adv/types.h
-@@ -1387,7 +1387,7 @@ struct batadv_tp_sender {
- 	u32 last_sent;
- 
- 	/** @fast_recovery: true if in Fast Recovery mode */
--	unsigned char fast_recovery:1;
-+	bool fast_recovery:1;
- 
- 	/** @recover: last sent seqno when entering Fast Recovery */
- 	u32 recover;
-@@ -1410,7 +1410,7 @@ struct batadv_tp_sender {
- 	/** @cwnd: current size of the congestion window */
- 	u32 cwnd;
- 
--	/** @cwnd_lock: lock do protect @cwnd & @dec_cwnd */
-+	/** @cwnd_lock: lock do protect congestion control variables */
- 	spinlock_t cwnd_lock;
- 
- 	/**
-@@ -1420,13 +1420,13 @@ struct batadv_tp_sender {
- 	u32 ss_threshold;
- 
- 	/** @last_acked: last acked byte */
--	atomic_t last_acked;
-+	u32 last_acked;
- 
- 	/** @tot_sent: amount of data sent/ACKed so far */
- 	atomic64_t tot_sent;
- 
- 	/** @dup_acks: duplicate ACKs counter */
--	atomic_t dup_acks;
-+	u8 dup_acks;
- 
- 	/** @rto: sender timeout */
- 	u32 rto;
++/*      ANA:ANA:AUTOAGE */
++#define ANA_AUTOAGE               __REG(TARGET_ANA,\
++					0, 1, 27136, 0, 1, 284, 44, 0, 1, 4)
++
++#define ANA_AUTOAGE_AGE_FAST                     BIT(21)
++#define ANA_AUTOAGE_AGE_FAST_SET(x)\
++	FIELD_PREP(ANA_AUTOAGE_AGE_FAST, x)
++#define ANA_AUTOAGE_AGE_FAST_GET(x)\
++	FIELD_GET(ANA_AUTOAGE_AGE_FAST, x)
++
++#define ANA_AUTOAGE_AGE_PERIOD                   GENMASK(20, 1)
++#define ANA_AUTOAGE_AGE_PERIOD_SET(x)\
++	FIELD_PREP(ANA_AUTOAGE_AGE_PERIOD, x)
++#define ANA_AUTOAGE_AGE_PERIOD_GET(x)\
++	FIELD_GET(ANA_AUTOAGE_AGE_PERIOD, x)
++
++#define ANA_AUTOAGE_AUTOAGE_LOCKED               BIT(0)
++#define ANA_AUTOAGE_AUTOAGE_LOCKED_SET(x)\
++	FIELD_PREP(ANA_AUTOAGE_AUTOAGE_LOCKED, x)
++#define ANA_AUTOAGE_AUTOAGE_LOCKED_GET(x)\
++	FIELD_GET(ANA_AUTOAGE_AUTOAGE_LOCKED, x)
++
++/*      ANA:ANA:FLOODING */
++#define ANA_FLOODING(r)           __REG(TARGET_ANA,\
++					0, 1, 27136, 0, 1, 284, 68, r, 8, 4)
++
++#define ANA_FLOODING_FLD_UNICAST                 GENMASK(17, 12)
++#define ANA_FLOODING_FLD_UNICAST_SET(x)\
++	FIELD_PREP(ANA_FLOODING_FLD_UNICAST, x)
++#define ANA_FLOODING_FLD_UNICAST_GET(x)\
++	FIELD_GET(ANA_FLOODING_FLD_UNICAST, x)
++
++#define ANA_FLOODING_FLD_BROADCAST               GENMASK(11, 6)
++#define ANA_FLOODING_FLD_BROADCAST_SET(x)\
++	FIELD_PREP(ANA_FLOODING_FLD_BROADCAST, x)
++#define ANA_FLOODING_FLD_BROADCAST_GET(x)\
++	FIELD_GET(ANA_FLOODING_FLD_BROADCAST, x)
++
++#define ANA_FLOODING_FLD_MULTICAST               GENMASK(5, 0)
++#define ANA_FLOODING_FLD_MULTICAST_SET(x)\
++	FIELD_PREP(ANA_FLOODING_FLD_MULTICAST, x)
++#define ANA_FLOODING_FLD_MULTICAST_GET(x)\
++	FIELD_GET(ANA_FLOODING_FLD_MULTICAST, x)
++
++/*      ANA:ANA:FLOODING_IPMC */
++#define ANA_FLOODING_IPMC         __REG(TARGET_ANA,\
++					0, 1, 27136, 0, 1, 284, 100, 0, 1, 4)
++
++#define ANA_FLOODING_IPMC_FLD_MC4_CTRL           GENMASK(23, 18)
++#define ANA_FLOODING_IPMC_FLD_MC4_CTRL_SET(x)\
++	FIELD_PREP(ANA_FLOODING_IPMC_FLD_MC4_CTRL, x)
++#define ANA_FLOODING_IPMC_FLD_MC4_CTRL_GET(x)\
++	FIELD_GET(ANA_FLOODING_IPMC_FLD_MC4_CTRL, x)
++
++#define ANA_FLOODING_IPMC_FLD_MC4_DATA           GENMASK(17, 12)
++#define ANA_FLOODING_IPMC_FLD_MC4_DATA_SET(x)\
++	FIELD_PREP(ANA_FLOODING_IPMC_FLD_MC4_DATA, x)
++#define ANA_FLOODING_IPMC_FLD_MC4_DATA_GET(x)\
++	FIELD_GET(ANA_FLOODING_IPMC_FLD_MC4_DATA, x)
++
++#define ANA_FLOODING_IPMC_FLD_MC6_CTRL           GENMASK(11, 6)
++#define ANA_FLOODING_IPMC_FLD_MC6_CTRL_SET(x)\
++	FIELD_PREP(ANA_FLOODING_IPMC_FLD_MC6_CTRL, x)
++#define ANA_FLOODING_IPMC_FLD_MC6_CTRL_GET(x)\
++	FIELD_GET(ANA_FLOODING_IPMC_FLD_MC6_CTRL, x)
++
++#define ANA_FLOODING_IPMC_FLD_MC6_DATA           GENMASK(5, 0)
++#define ANA_FLOODING_IPMC_FLD_MC6_DATA_SET(x)\
++	FIELD_PREP(ANA_FLOODING_IPMC_FLD_MC6_DATA, x)
++#define ANA_FLOODING_IPMC_FLD_MC6_DATA_GET(x)\
++	FIELD_GET(ANA_FLOODING_IPMC_FLD_MC6_DATA, x)
++
++/*      ANA:PGID:PGID */
++#define ANA_PGID(g)               __REG(TARGET_ANA,\
++					0, 1, 27648, g, 90, 8, 0, 0, 1, 4)
++
++#define ANA_PGID_PGID                            GENMASK(9, 0)
++#define ANA_PGID_PGID_SET(x)\
++	FIELD_PREP(ANA_PGID_PGID, x)
++#define ANA_PGID_PGID_GET(x)\
++	FIELD_GET(ANA_PGID_PGID, x)
++
++/*      ANA:PGID:PGID_CFG */
++#define ANA_PGID_CFG(g)           __REG(TARGET_ANA,\
++					0, 1, 27648, g, 90, 8, 4, 0, 1, 4)
++
++#define ANA_PGID_CFG_SAN_ENA                     BIT(4)
++#define ANA_PGID_CFG_SAN_ENA_SET(x)\
++	FIELD_PREP(ANA_PGID_CFG_SAN_ENA, x)
++#define ANA_PGID_CFG_SAN_ENA_GET(x)\
++	FIELD_GET(ANA_PGID_CFG_SAN_ENA, x)
++
++#define ANA_PGID_CFG_CPUQ_DST_PGID               GENMASK(3, 1)
++#define ANA_PGID_CFG_CPUQ_DST_PGID_SET(x)\
++	FIELD_PREP(ANA_PGID_CFG_CPUQ_DST_PGID, x)
++#define ANA_PGID_CFG_CPUQ_DST_PGID_GET(x)\
++	FIELD_GET(ANA_PGID_CFG_CPUQ_DST_PGID, x)
++
++#define ANA_PGID_CFG_OBEY_VLAN                   BIT(0)
++#define ANA_PGID_CFG_OBEY_VLAN_SET(x)\
++	FIELD_PREP(ANA_PGID_CFG_OBEY_VLAN, x)
++#define ANA_PGID_CFG_OBEY_VLAN_GET(x)\
++	FIELD_GET(ANA_PGID_CFG_OBEY_VLAN, x)
++
++/*      ANA:ANA_TABLES:MACHDATA */
++#define ANA_MACHDATA              __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 44, 0, 1, 4)
++
++#define ANA_MACHDATA_VID                         GENMASK(28, 16)
++#define ANA_MACHDATA_VID_SET(x)\
++	FIELD_PREP(ANA_MACHDATA_VID, x)
++#define ANA_MACHDATA_VID_GET(x)\
++	FIELD_GET(ANA_MACHDATA_VID, x)
++
++#define ANA_MACHDATA_MACHDATA                    GENMASK(15, 0)
++#define ANA_MACHDATA_MACHDATA_SET(x)\
++	FIELD_PREP(ANA_MACHDATA_MACHDATA, x)
++#define ANA_MACHDATA_MACHDATA_GET(x)\
++	FIELD_GET(ANA_MACHDATA_MACHDATA, x)
++
++/*      ANA:ANA_TABLES:MACLDATA */
++#define ANA_MACLDATA              __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 48, 0, 1, 4)
++
++/*      ANA:ANA_TABLES:MACACCESS */
++#define ANA_MACACCESS             __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 52, 0, 1, 4)
++
++#define ANA_MACACCESS_CHANGE2SW                  BIT(17)
++#define ANA_MACACCESS_CHANGE2SW_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_CHANGE2SW, x)
++#define ANA_MACACCESS_CHANGE2SW_GET(x)\
++	FIELD_GET(ANA_MACACCESS_CHANGE2SW, x)
++
++#define ANA_MACACCESS_MAC_CPU_COPY               BIT(16)
++#define ANA_MACACCESS_MAC_CPU_COPY_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_MAC_CPU_COPY, x)
++#define ANA_MACACCESS_MAC_CPU_COPY_GET(x)\
++	FIELD_GET(ANA_MACACCESS_MAC_CPU_COPY, x)
++
++#define ANA_MACACCESS_SRC_KILL                   BIT(15)
++#define ANA_MACACCESS_SRC_KILL_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_SRC_KILL, x)
++#define ANA_MACACCESS_SRC_KILL_GET(x)\
++	FIELD_GET(ANA_MACACCESS_SRC_KILL, x)
++
++#define ANA_MACACCESS_IGNORE_VLAN                BIT(14)
++#define ANA_MACACCESS_IGNORE_VLAN_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_IGNORE_VLAN, x)
++#define ANA_MACACCESS_IGNORE_VLAN_GET(x)\
++	FIELD_GET(ANA_MACACCESS_IGNORE_VLAN, x)
++
++#define ANA_MACACCESS_AGED_FLAG                  BIT(13)
++#define ANA_MACACCESS_AGED_FLAG_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_AGED_FLAG, x)
++#define ANA_MACACCESS_AGED_FLAG_GET(x)\
++	FIELD_GET(ANA_MACACCESS_AGED_FLAG, x)
++
++#define ANA_MACACCESS_VALID                      BIT(12)
++#define ANA_MACACCESS_VALID_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_VALID, x)
++#define ANA_MACACCESS_VALID_GET(x)\
++	FIELD_GET(ANA_MACACCESS_VALID, x)
++
++#define ANA_MACACCESS_ENTRYTYPE                  GENMASK(11, 10)
++#define ANA_MACACCESS_ENTRYTYPE_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_ENTRYTYPE, x)
++#define ANA_MACACCESS_ENTRYTYPE_GET(x)\
++	FIELD_GET(ANA_MACACCESS_ENTRYTYPE, x)
++
++#define ANA_MACACCESS_DEST_IDX                   GENMASK(9, 4)
++#define ANA_MACACCESS_DEST_IDX_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_DEST_IDX, x)
++#define ANA_MACACCESS_DEST_IDX_GET(x)\
++	FIELD_GET(ANA_MACACCESS_DEST_IDX, x)
++
++#define ANA_MACACCESS_MAC_TABLE_CMD              GENMASK(3, 0)
++#define ANA_MACACCESS_MAC_TABLE_CMD_SET(x)\
++	FIELD_PREP(ANA_MACACCESS_MAC_TABLE_CMD, x)
++#define ANA_MACACCESS_MAC_TABLE_CMD_GET(x)\
++	FIELD_GET(ANA_MACACCESS_MAC_TABLE_CMD, x)
++
++/*      ANA:ANA_TABLES:MACTINDX */
++#define ANA_MACTINDX              __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 56, 0, 1, 4)
++
++#define ANA_MACTINDX_BUCKET                      GENMASK(12, 11)
++#define ANA_MACTINDX_BUCKET_SET(x)\
++	FIELD_PREP(ANA_MACTINDX_BUCKET, x)
++#define ANA_MACTINDX_BUCKET_GET(x)\
++	FIELD_GET(ANA_MACTINDX_BUCKET, x)
++
++#define ANA_MACTINDX_M_INDEX                     GENMASK(10, 0)
++#define ANA_MACTINDX_M_INDEX_SET(x)\
++	FIELD_PREP(ANA_MACTINDX_M_INDEX, x)
++#define ANA_MACTINDX_M_INDEX_GET(x)\
++	FIELD_GET(ANA_MACTINDX_M_INDEX, x)
++
++/*      ANA:ANA_TABLES:VLAN_PORT_MASK */
++#define ANA_VLAN_PORT_MASK        __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 60, 0, 1, 4)
++
++#define ANA_VLAN_PORT_MASK_VLAN_PORT_MASK        GENMASK(9, 0)
++#define ANA_VLAN_PORT_MASK_VLAN_PORT_MASK_SET(x)\
++	FIELD_PREP(ANA_VLAN_PORT_MASK_VLAN_PORT_MASK, x)
++#define ANA_VLAN_PORT_MASK_VLAN_PORT_MASK_GET(x)\
++	FIELD_GET(ANA_VLAN_PORT_MASK_VLAN_PORT_MASK, x)
++
++/*      ANA:ANA_TABLES:VLANACCESS */
++#define ANA_VLANACCESS            __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 64, 0, 1, 4)
++
++#define ANA_VLANACCESS_VLAN_TBL_CMD              GENMASK(1, 0)
++#define ANA_VLANACCESS_VLAN_TBL_CMD_SET(x)\
++	FIELD_PREP(ANA_VLANACCESS_VLAN_TBL_CMD, x)
++#define ANA_VLANACCESS_VLAN_TBL_CMD_GET(x)\
++	FIELD_GET(ANA_VLANACCESS_VLAN_TBL_CMD, x)
++
++/*      ANA:ANA_TABLES:VLANTIDX */
++#define ANA_VLANTIDX              __REG(TARGET_ANA,\
++					0, 1, 23680, 0, 1, 128, 68, 0, 1, 4)
++
++#define ANA_VLANTIDX_VLAN_PGID_CPU_DIS           BIT(18)
++#define ANA_VLANTIDX_VLAN_PGID_CPU_DIS_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_PGID_CPU_DIS, x)
++#define ANA_VLANTIDX_VLAN_PGID_CPU_DIS_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_PGID_CPU_DIS, x)
++
++#define ANA_VLANTIDX_VLAN_SEC_FWD_ENA            BIT(17)
++#define ANA_VLANTIDX_VLAN_SEC_FWD_ENA_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_SEC_FWD_ENA, x)
++#define ANA_VLANTIDX_VLAN_SEC_FWD_ENA_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_SEC_FWD_ENA, x)
++
++#define ANA_VLANTIDX_VLAN_FLOOD_DIS              BIT(16)
++#define ANA_VLANTIDX_VLAN_FLOOD_DIS_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_FLOOD_DIS, x)
++#define ANA_VLANTIDX_VLAN_FLOOD_DIS_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_FLOOD_DIS, x)
++
++#define ANA_VLANTIDX_VLAN_PRIV_VLAN              BIT(15)
++#define ANA_VLANTIDX_VLAN_PRIV_VLAN_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_PRIV_VLAN, x)
++#define ANA_VLANTIDX_VLAN_PRIV_VLAN_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_PRIV_VLAN, x)
++
++#define ANA_VLANTIDX_VLAN_LEARN_DISABLED         BIT(14)
++#define ANA_VLANTIDX_VLAN_LEARN_DISABLED_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_LEARN_DISABLED, x)
++#define ANA_VLANTIDX_VLAN_LEARN_DISABLED_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_LEARN_DISABLED, x)
++
++#define ANA_VLANTIDX_VLAN_MIRROR                 BIT(13)
++#define ANA_VLANTIDX_VLAN_MIRROR_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_MIRROR, x)
++#define ANA_VLANTIDX_VLAN_MIRROR_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_MIRROR, x)
++
++#define ANA_VLANTIDX_VLAN_SRC_CHK                BIT(12)
++#define ANA_VLANTIDX_VLAN_SRC_CHK_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_VLAN_SRC_CHK, x)
++#define ANA_VLANTIDX_VLAN_SRC_CHK_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_VLAN_SRC_CHK, x)
++
++#define ANA_VLANTIDX_V_INDEX                     GENMASK(11, 0)
++#define ANA_VLANTIDX_V_INDEX_SET(x)\
++	FIELD_PREP(ANA_VLANTIDX_V_INDEX, x)
++#define ANA_VLANTIDX_V_INDEX_GET(x)\
++	FIELD_GET(ANA_VLANTIDX_V_INDEX, x)
++
++/*      ANA:PORT:VLAN_CFG */
++#define ANA_VLAN_CFG(g)           __REG(TARGET_ANA,\
++					0, 1, 24576, g, 10, 256, 0, 0, 1, 4)
++
++#define ANA_VLAN_CFG_VLAN_PFC_ENA                BIT(21)
++#define ANA_VLAN_CFG_VLAN_PFC_ENA_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_PFC_ENA, x)
++#define ANA_VLAN_CFG_VLAN_PFC_ENA_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_PFC_ENA, x)
++
++#define ANA_VLAN_CFG_VLAN_AWARE_ENA              BIT(20)
++#define ANA_VLAN_CFG_VLAN_AWARE_ENA_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_AWARE_ENA, x)
++#define ANA_VLAN_CFG_VLAN_AWARE_ENA_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_AWARE_ENA, x)
++
++#define ANA_VLAN_CFG_VLAN_POP_CNT                GENMASK(19, 18)
++#define ANA_VLAN_CFG_VLAN_POP_CNT_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_POP_CNT, x)
++#define ANA_VLAN_CFG_VLAN_POP_CNT_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_POP_CNT, x)
++
++#define ANA_VLAN_CFG_VLAN_INNER_TAG_ENA          BIT(17)
++#define ANA_VLAN_CFG_VLAN_INNER_TAG_ENA_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_INNER_TAG_ENA, x)
++#define ANA_VLAN_CFG_VLAN_INNER_TAG_ENA_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_INNER_TAG_ENA, x)
++
++#define ANA_VLAN_CFG_VLAN_TAG_TYPE               BIT(16)
++#define ANA_VLAN_CFG_VLAN_TAG_TYPE_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_TAG_TYPE, x)
++#define ANA_VLAN_CFG_VLAN_TAG_TYPE_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_TAG_TYPE, x)
++
++#define ANA_VLAN_CFG_VLAN_PCP                    GENMASK(15, 13)
++#define ANA_VLAN_CFG_VLAN_PCP_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_PCP, x)
++#define ANA_VLAN_CFG_VLAN_PCP_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_PCP, x)
++
++#define ANA_VLAN_CFG_VLAN_DEI                    BIT(12)
++#define ANA_VLAN_CFG_VLAN_DEI_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_DEI, x)
++#define ANA_VLAN_CFG_VLAN_DEI_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_DEI, x)
++
++#define ANA_VLAN_CFG_VLAN_VID                    GENMASK(11, 0)
++#define ANA_VLAN_CFG_VLAN_VID_SET(x)\
++	FIELD_PREP(ANA_VLAN_CFG_VLAN_VID, x)
++#define ANA_VLAN_CFG_VLAN_VID_GET(x)\
++	FIELD_GET(ANA_VLAN_CFG_VLAN_VID, x)
++
++/*      ANA:PORT:DROP_CFG */
++#define ANA_DROP_CFG(g)           __REG(TARGET_ANA,\
++					0, 1, 24576, g, 10, 256, 4, 0, 1, 4)
++
++#define ANA_DROP_CFG_DROP_UNTAGGED_ENA           BIT(6)
++#define ANA_DROP_CFG_DROP_UNTAGGED_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_UNTAGGED_ENA, x)
++#define ANA_DROP_CFG_DROP_UNTAGGED_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_UNTAGGED_ENA, x)
++
++#define ANA_DROP_CFG_DROP_S_TAGGED_ENA           BIT(5)
++#define ANA_DROP_CFG_DROP_S_TAGGED_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_S_TAGGED_ENA, x)
++#define ANA_DROP_CFG_DROP_S_TAGGED_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_S_TAGGED_ENA, x)
++
++#define ANA_DROP_CFG_DROP_C_TAGGED_ENA           BIT(4)
++#define ANA_DROP_CFG_DROP_C_TAGGED_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_C_TAGGED_ENA, x)
++#define ANA_DROP_CFG_DROP_C_TAGGED_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_C_TAGGED_ENA, x)
++
++#define ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA      BIT(3)
++#define ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA, x)
++#define ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA, x)
++
++#define ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA      BIT(2)
++#define ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA, x)
++#define ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA, x)
++
++#define ANA_DROP_CFG_DROP_NULL_MAC_ENA           BIT(1)
++#define ANA_DROP_CFG_DROP_NULL_MAC_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_NULL_MAC_ENA, x)
++#define ANA_DROP_CFG_DROP_NULL_MAC_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_NULL_MAC_ENA, x)
++
++#define ANA_DROP_CFG_DROP_MC_SMAC_ENA            BIT(0)
++#define ANA_DROP_CFG_DROP_MC_SMAC_ENA_SET(x)\
++	FIELD_PREP(ANA_DROP_CFG_DROP_MC_SMAC_ENA, x)
++#define ANA_DROP_CFG_DROP_MC_SMAC_ENA_GET(x)\
++	FIELD_GET(ANA_DROP_CFG_DROP_MC_SMAC_ENA, x)
++
++/*      ANA:PORT:CPU_FWD_CFG */
++#define ANA_CPU_FWD_CFG(g)        __REG(TARGET_ANA,\
++					0, 1, 24576, g, 10, 256, 96, 0, 1, 4)
++
++#define ANA_CPU_FWD_CFG_NO_HSR_REDIR_ENA         BIT(9)
++#define ANA_CPU_FWD_CFG_NO_HSR_REDIR_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_NO_HSR_REDIR_ENA, x)
++#define ANA_CPU_FWD_CFG_NO_HSR_REDIR_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_NO_HSR_REDIR_ENA, x)
++
++#define ANA_CPU_FWD_CFG_SPV_COPY_ENA             BIT(8)
++#define ANA_CPU_FWD_CFG_SPV_COPY_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_SPV_COPY_ENA, x)
++#define ANA_CPU_FWD_CFG_SPV_COPY_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_SPV_COPY_ENA, x)
++
++#define ANA_CPU_FWD_CFG_VRAP_REDIR_ENA           BIT(7)
++#define ANA_CPU_FWD_CFG_VRAP_REDIR_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_VRAP_REDIR_ENA, x)
++#define ANA_CPU_FWD_CFG_VRAP_REDIR_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_VRAP_REDIR_ENA, x)
++
++#define ANA_CPU_FWD_CFG_MLD_REDIR_ENA            BIT(6)
++#define ANA_CPU_FWD_CFG_MLD_REDIR_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_MLD_REDIR_ENA, x)
++#define ANA_CPU_FWD_CFG_MLD_REDIR_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_MLD_REDIR_ENA, x)
++
++#define ANA_CPU_FWD_CFG_IGMP_REDIR_ENA           BIT(5)
++#define ANA_CPU_FWD_CFG_IGMP_REDIR_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_IGMP_REDIR_ENA, x)
++#define ANA_CPU_FWD_CFG_IGMP_REDIR_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_IGMP_REDIR_ENA, x)
++
++#define ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA       BIT(4)
++#define ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA, x)
++#define ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA, x)
++
++#define ANA_CPU_FWD_CFG_SRC_COPY_ENA             BIT(3)
++#define ANA_CPU_FWD_CFG_SRC_COPY_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_SRC_COPY_ENA, x)
++#define ANA_CPU_FWD_CFG_SRC_COPY_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_SRC_COPY_ENA, x)
++
++#define ANA_CPU_FWD_CFG_ALLBRIDGE_DROP_ENA       BIT(2)
++#define ANA_CPU_FWD_CFG_ALLBRIDGE_DROP_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_ALLBRIDGE_DROP_ENA, x)
++#define ANA_CPU_FWD_CFG_ALLBRIDGE_DROP_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_ALLBRIDGE_DROP_ENA, x)
++
++#define ANA_CPU_FWD_CFG_ALLBRIDGE_REDIR_ENA      BIT(1)
++#define ANA_CPU_FWD_CFG_ALLBRIDGE_REDIR_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_ALLBRIDGE_REDIR_ENA, x)
++#define ANA_CPU_FWD_CFG_ALLBRIDGE_REDIR_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_ALLBRIDGE_REDIR_ENA, x)
++
++#define ANA_CPU_FWD_CFG_OAM_ENA                  BIT(0)
++#define ANA_CPU_FWD_CFG_OAM_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_CFG_OAM_ENA, x)
++#define ANA_CPU_FWD_CFG_OAM_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_CFG_OAM_ENA, x)
++
++/*      ANA:PORT:CPU_FWD_BPDU_CFG */
++#define ANA_CPU_FWD_BPDU_CFG(g)   __REG(TARGET_ANA,\
++					0, 1, 24576, g, 10, 256, 100, 0, 1, 4)
++
++#define ANA_CPU_FWD_BPDU_CFG_BPDU_DROP_ENA       GENMASK(31, 16)
++#define ANA_CPU_FWD_BPDU_CFG_BPDU_DROP_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_BPDU_CFG_BPDU_DROP_ENA, x)
++#define ANA_CPU_FWD_BPDU_CFG_BPDU_DROP_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_BPDU_CFG_BPDU_DROP_ENA, x)
++
++#define ANA_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA      GENMASK(15, 0)
++#define ANA_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA_SET(x)\
++	FIELD_PREP(ANA_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA, x)
++#define ANA_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA_GET(x)\
++	FIELD_GET(ANA_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA, x)
++
++/*      ANA:PORT:PORT_CFG */
++#define ANA_PORT_CFG(g)           __REG(TARGET_ANA,\
++					0, 1, 24576, g, 10, 256, 112, 0, 1, 4)
++
++#define ANA_PORT_CFG_SRC_MIRROR_ENA              BIT(13)
++#define ANA_PORT_CFG_SRC_MIRROR_ENA_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_SRC_MIRROR_ENA, x)
++#define ANA_PORT_CFG_SRC_MIRROR_ENA_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_SRC_MIRROR_ENA, x)
++
++#define ANA_PORT_CFG_LIMIT_DROP                  BIT(12)
++#define ANA_PORT_CFG_LIMIT_DROP_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LIMIT_DROP, x)
++#define ANA_PORT_CFG_LIMIT_DROP_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LIMIT_DROP, x)
++
++#define ANA_PORT_CFG_LIMIT_CPU                   BIT(11)
++#define ANA_PORT_CFG_LIMIT_CPU_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LIMIT_CPU, x)
++#define ANA_PORT_CFG_LIMIT_CPU_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LIMIT_CPU, x)
++
++#define ANA_PORT_CFG_LOCKED_PORTMOVE_DROP        BIT(10)
++#define ANA_PORT_CFG_LOCKED_PORTMOVE_DROP_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LOCKED_PORTMOVE_DROP, x)
++#define ANA_PORT_CFG_LOCKED_PORTMOVE_DROP_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LOCKED_PORTMOVE_DROP, x)
++
++#define ANA_PORT_CFG_LOCKED_PORTMOVE_CPU         BIT(9)
++#define ANA_PORT_CFG_LOCKED_PORTMOVE_CPU_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LOCKED_PORTMOVE_CPU, x)
++#define ANA_PORT_CFG_LOCKED_PORTMOVE_CPU_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LOCKED_PORTMOVE_CPU, x)
++
++#define ANA_PORT_CFG_LEARNDROP                   BIT(8)
++#define ANA_PORT_CFG_LEARNDROP_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LEARNDROP, x)
++#define ANA_PORT_CFG_LEARNDROP_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LEARNDROP, x)
++
++#define ANA_PORT_CFG_LEARNCPU                    BIT(7)
++#define ANA_PORT_CFG_LEARNCPU_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LEARNCPU, x)
++#define ANA_PORT_CFG_LEARNCPU_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LEARNCPU, x)
++
++#define ANA_PORT_CFG_LEARNAUTO                   BIT(6)
++#define ANA_PORT_CFG_LEARNAUTO_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LEARNAUTO, x)
++#define ANA_PORT_CFG_LEARNAUTO_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LEARNAUTO, x)
++
++#define ANA_PORT_CFG_LEARN_ENA                   BIT(5)
++#define ANA_PORT_CFG_LEARN_ENA_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_LEARN_ENA, x)
++#define ANA_PORT_CFG_LEARN_ENA_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_LEARN_ENA, x)
++
++#define ANA_PORT_CFG_RECV_ENA                    BIT(4)
++#define ANA_PORT_CFG_RECV_ENA_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_RECV_ENA, x)
++#define ANA_PORT_CFG_RECV_ENA_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_RECV_ENA, x)
++
++#define ANA_PORT_CFG_PORTID_VAL                  GENMASK(3, 0)
++#define ANA_PORT_CFG_PORTID_VAL_SET(x)\
++	FIELD_PREP(ANA_PORT_CFG_PORTID_VAL, x)
++#define ANA_PORT_CFG_PORTID_VAL_GET(x)\
++	FIELD_GET(ANA_PORT_CFG_PORTID_VAL, x)
++
++/*      ANA:PFC:PFC_CFG */
++#define ANA_PFC_CFG(g)            __REG(TARGET_ANA,\
++					0, 1, 28672, g, 9, 64, 0, 0, 1, 4)
++
++#define ANA_PFC_CFG_RX_PFC_ENA                   GENMASK(9, 2)
++#define ANA_PFC_CFG_RX_PFC_ENA_SET(x)\
++	FIELD_PREP(ANA_PFC_CFG_RX_PFC_ENA, x)
++#define ANA_PFC_CFG_RX_PFC_ENA_GET(x)\
++	FIELD_GET(ANA_PFC_CFG_RX_PFC_ENA, x)
++
++#define ANA_PFC_CFG_FC_LINK_SPEED                GENMASK(1, 0)
++#define ANA_PFC_CFG_FC_LINK_SPEED_SET(x)\
++	FIELD_PREP(ANA_PFC_CFG_FC_LINK_SPEED, x)
++#define ANA_PFC_CFG_FC_LINK_SPEED_GET(x)\
++	FIELD_GET(ANA_PFC_CFG_FC_LINK_SPEED, x)
++
++/*      ANA:COMMON:AGGR_CFG */
++#define ANA_AGGR_CFG              __REG(TARGET_ANA,\
++					0, 1, 29248, 0, 1, 552, 0, 0, 1, 4)
++
++#define ANA_AGGR_CFG_AC_RND_ENA                  BIT(6)
++#define ANA_AGGR_CFG_AC_RND_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_RND_ENA, x)
++#define ANA_AGGR_CFG_AC_RND_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_RND_ENA, x)
++
++#define ANA_AGGR_CFG_AC_DMAC_ENA                 BIT(5)
++#define ANA_AGGR_CFG_AC_DMAC_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_DMAC_ENA, x)
++#define ANA_AGGR_CFG_AC_DMAC_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_DMAC_ENA, x)
++
++#define ANA_AGGR_CFG_AC_SMAC_ENA                 BIT(4)
++#define ANA_AGGR_CFG_AC_SMAC_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_SMAC_ENA, x)
++#define ANA_AGGR_CFG_AC_SMAC_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_SMAC_ENA, x)
++
++#define ANA_AGGR_CFG_AC_IP6_FLOW_LBL_ENA         BIT(3)
++#define ANA_AGGR_CFG_AC_IP6_FLOW_LBL_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_IP6_FLOW_LBL_ENA, x)
++#define ANA_AGGR_CFG_AC_IP6_FLOW_LBL_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_IP6_FLOW_LBL_ENA, x)
++
++#define ANA_AGGR_CFG_AC_IP6_TCPUDP_ENA           BIT(2)
++#define ANA_AGGR_CFG_AC_IP6_TCPUDP_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_IP6_TCPUDP_ENA, x)
++#define ANA_AGGR_CFG_AC_IP6_TCPUDP_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_IP6_TCPUDP_ENA, x)
++
++#define ANA_AGGR_CFG_AC_IP4_SIPDIP_ENA           BIT(1)
++#define ANA_AGGR_CFG_AC_IP4_SIPDIP_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_IP4_SIPDIP_ENA, x)
++#define ANA_AGGR_CFG_AC_IP4_SIPDIP_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_IP4_SIPDIP_ENA, x)
++
++#define ANA_AGGR_CFG_AC_IP4_TCPUDP_ENA           BIT(0)
++#define ANA_AGGR_CFG_AC_IP4_TCPUDP_ENA_SET(x)\
++	FIELD_PREP(ANA_AGGR_CFG_AC_IP4_TCPUDP_ENA, x)
++#define ANA_AGGR_CFG_AC_IP4_TCPUDP_ENA_GET(x)\
++	FIELD_GET(ANA_AGGR_CFG_AC_IP4_TCPUDP_ENA, x)
++
++/*      ANA:COMMON:CPUQ_CFG */
++#define ANA_CPUQ_CFG              __REG(TARGET_ANA,\
++					0, 1, 29248, 0, 1, 552, 4, 0, 1, 4)
++
++#define ANA_CPUQ_CFG_CPUQ_MLD                    GENMASK(29, 27)
++#define ANA_CPUQ_CFG_CPUQ_MLD_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_MLD, x)
++#define ANA_CPUQ_CFG_CPUQ_MLD_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_MLD, x)
++
++#define ANA_CPUQ_CFG_CPUQ_IGMP                   GENMASK(26, 24)
++#define ANA_CPUQ_CFG_CPUQ_IGMP_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_IGMP, x)
++#define ANA_CPUQ_CFG_CPUQ_IGMP_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_IGMP, x)
++
++#define ANA_CPUQ_CFG_CPUQ_IPMC_CTRL              GENMASK(23, 21)
++#define ANA_CPUQ_CFG_CPUQ_IPMC_CTRL_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_IPMC_CTRL, x)
++#define ANA_CPUQ_CFG_CPUQ_IPMC_CTRL_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_IPMC_CTRL, x)
++
++#define ANA_CPUQ_CFG_CPUQ_ALLBRIDGE              GENMASK(20, 18)
++#define ANA_CPUQ_CFG_CPUQ_ALLBRIDGE_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_ALLBRIDGE, x)
++#define ANA_CPUQ_CFG_CPUQ_ALLBRIDGE_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_ALLBRIDGE, x)
++
++#define ANA_CPUQ_CFG_CPUQ_LOCKED_PORTMOVE        GENMASK(17, 15)
++#define ANA_CPUQ_CFG_CPUQ_LOCKED_PORTMOVE_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_LOCKED_PORTMOVE, x)
++#define ANA_CPUQ_CFG_CPUQ_LOCKED_PORTMOVE_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_LOCKED_PORTMOVE, x)
++
++#define ANA_CPUQ_CFG_CPUQ_SRC_COPY               GENMASK(14, 12)
++#define ANA_CPUQ_CFG_CPUQ_SRC_COPY_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_SRC_COPY, x)
++#define ANA_CPUQ_CFG_CPUQ_SRC_COPY_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_SRC_COPY, x)
++
++#define ANA_CPUQ_CFG_CPUQ_MAC_COPY               GENMASK(11, 9)
++#define ANA_CPUQ_CFG_CPUQ_MAC_COPY_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_MAC_COPY, x)
++#define ANA_CPUQ_CFG_CPUQ_MAC_COPY_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_MAC_COPY, x)
++
++#define ANA_CPUQ_CFG_CPUQ_LRN                    GENMASK(8, 6)
++#define ANA_CPUQ_CFG_CPUQ_LRN_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_LRN, x)
++#define ANA_CPUQ_CFG_CPUQ_LRN_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_LRN, x)
++
++#define ANA_CPUQ_CFG_CPUQ_MIRROR                 GENMASK(5, 3)
++#define ANA_CPUQ_CFG_CPUQ_MIRROR_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_MIRROR, x)
++#define ANA_CPUQ_CFG_CPUQ_MIRROR_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_MIRROR, x)
++
++#define ANA_CPUQ_CFG_CPUQ_SFLOW                  GENMASK(2, 0)
++#define ANA_CPUQ_CFG_CPUQ_SFLOW_SET(x)\
++	FIELD_PREP(ANA_CPUQ_CFG_CPUQ_SFLOW, x)
++#define ANA_CPUQ_CFG_CPUQ_SFLOW_GET(x)\
++	FIELD_GET(ANA_CPUQ_CFG_CPUQ_SFLOW, x)
++
++/*      ANA:COMMON:CPUQ_8021_CFG */
++#define ANA_CPUQ_8021_CFG(r)      __REG(TARGET_ANA,\
++					0, 1, 29248, 0, 1, 552, 12, r, 16, 4)
++
++#define ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL          GENMASK(8, 6)
++#define ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL_SET(x)\
++	FIELD_PREP(ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL, x)
++#define ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL_GET(x)\
++	FIELD_GET(ANA_CPUQ_8021_CFG_CPUQ_BPDU_VAL, x)
++
++#define ANA_CPUQ_8021_CFG_CPUQ_GARP_VAL          GENMASK(5, 3)
++#define ANA_CPUQ_8021_CFG_CPUQ_GARP_VAL_SET(x)\
++	FIELD_PREP(ANA_CPUQ_8021_CFG_CPUQ_GARP_VAL, x)
++#define ANA_CPUQ_8021_CFG_CPUQ_GARP_VAL_GET(x)\
++	FIELD_GET(ANA_CPUQ_8021_CFG_CPUQ_GARP_VAL, x)
++
++#define ANA_CPUQ_8021_CFG_CPUQ_CCM_VAL           GENMASK(2, 0)
++#define ANA_CPUQ_8021_CFG_CPUQ_CCM_VAL_SET(x)\
++	FIELD_PREP(ANA_CPUQ_8021_CFG_CPUQ_CCM_VAL, x)
++#define ANA_CPUQ_8021_CFG_CPUQ_CCM_VAL_GET(x)\
++	FIELD_GET(ANA_CPUQ_8021_CFG_CPUQ_CCM_VAL, x)
++
++/*      CHIP_TOP:CUPHY_CFG:CUPHY_PORT_CFG */
++#define CHIP_TOP_CUPHY_PORT_CFG(r) __REG(TARGET_CHIP_TOP,\
++					0, 1, 12, 0, 1, 64, 20, r, 5, 4)
++
++#define CHIP_TOP_CUPHY_PORT_CFG_AUTO_SQUELCH_ENA BIT(7)
++#define CHIP_TOP_CUPHY_PORT_CFG_AUTO_SQUELCH_ENA_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_PORT_CFG_AUTO_SQUELCH_ENA, x)
++#define CHIP_TOP_CUPHY_PORT_CFG_AUTO_SQUELCH_ENA_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_PORT_CFG_AUTO_SQUELCH_ENA, x)
++
++#define CHIP_TOP_CUPHY_PORT_CFG_COMA_MODE        BIT(6)
++#define CHIP_TOP_CUPHY_PORT_CFG_COMA_MODE_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_PORT_CFG_COMA_MODE, x)
++#define CHIP_TOP_CUPHY_PORT_CFG_COMA_MODE_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_PORT_CFG_COMA_MODE, x)
++
++#define CHIP_TOP_CUPHY_PORT_CFG_MODE             GENMASK(5, 1)
++#define CHIP_TOP_CUPHY_PORT_CFG_MODE_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_PORT_CFG_MODE, x)
++#define CHIP_TOP_CUPHY_PORT_CFG_MODE_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_PORT_CFG_MODE, x)
++
++#define CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA      BIT(0)
++#define CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA, x)
++#define CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_PORT_CFG_GTX_CLK_ENA, x)
++
++/*      CHIP_TOP:CUPHY_CFG:CUPHY_LED_CFG */
++#define CHIP_TOP_CUPHY_LED_CFG(r) __REG(TARGET_CHIP_TOP,\
++					0, 1, 12, 0, 1, 64, 40, r, 5, 4)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_ECO_DIS       BIT(11)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_ECO_DIS_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_ECO_DIS, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_ECO_DIS_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_ECO_DIS, x)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_EEE_MODE      BIT(10)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_EEE_MODE_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_EEE_MODE, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_EEE_MODE_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_EEE_MODE, x)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_TEST_MODE     GENMASK(9, 8)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_TEST_MODE_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_TEST_MODE, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_TEST_MODE_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_TEST_MODE, x)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_TEST_VAL      GENMASK(7, 6)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_TEST_VAL_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_TEST_VAL, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_TEST_VAL_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_TEST_VAL, x)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_POLARITY      GENMASK(5, 4)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_POLARITY_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_POLARITY, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_POLARITY_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_POLARITY, x)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_DRIVE_MODE    GENMASK(3, 2)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_DRIVE_MODE_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_DRIVE_MODE, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_DRIVE_MODE_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_DRIVE_MODE, x)
++
++#define CHIP_TOP_CUPHY_LED_CFG_LED_BLINK_MODE    GENMASK(1, 0)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_BLINK_MODE_SET(x)\
++	FIELD_PREP(CHIP_TOP_CUPHY_LED_CFG_LED_BLINK_MODE, x)
++#define CHIP_TOP_CUPHY_LED_CFG_LED_BLINK_MODE_GET(x)\
++	FIELD_GET(CHIP_TOP_CUPHY_LED_CFG_LED_BLINK_MODE, x)
++
++/*      DEV:PORT_MODE:CLOCK_CFG */
++#define DEV_CLOCK_CFG(t)          __REG(TARGET_DEV,\
++					t, 9, 0, 0, 1, 20, 0, 0, 1, 4)
++
++#define DEV_CLOCK_CFG_MAC_TX_RST                 BIT(7)
++#define DEV_CLOCK_CFG_MAC_TX_RST_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_MAC_TX_RST, x)
++#define DEV_CLOCK_CFG_MAC_TX_RST_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_MAC_TX_RST, x)
++
++#define DEV_CLOCK_CFG_MAC_RX_RST                 BIT(6)
++#define DEV_CLOCK_CFG_MAC_RX_RST_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_MAC_RX_RST, x)
++#define DEV_CLOCK_CFG_MAC_RX_RST_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_MAC_RX_RST, x)
++
++#define DEV_CLOCK_CFG_PCS_TX_RST                 BIT(5)
++#define DEV_CLOCK_CFG_PCS_TX_RST_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_PCS_TX_RST, x)
++#define DEV_CLOCK_CFG_PCS_TX_RST_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_PCS_TX_RST, x)
++
++#define DEV_CLOCK_CFG_PCS_RX_RST                 BIT(4)
++#define DEV_CLOCK_CFG_PCS_RX_RST_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_PCS_RX_RST, x)
++#define DEV_CLOCK_CFG_PCS_RX_RST_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_PCS_RX_RST, x)
++
++#define DEV_CLOCK_CFG_PORT_RST                   BIT(3)
++#define DEV_CLOCK_CFG_PORT_RST_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_PORT_RST, x)
++#define DEV_CLOCK_CFG_PORT_RST_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_PORT_RST, x)
++
++#define DEV_CLOCK_CFG_PHY_RST                    BIT(2)
++#define DEV_CLOCK_CFG_PHY_RST_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_PHY_RST, x)
++#define DEV_CLOCK_CFG_PHY_RST_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_PHY_RST, x)
++
++#define DEV_CLOCK_CFG_LINK_SPEED                 GENMASK(1, 0)
++#define DEV_CLOCK_CFG_LINK_SPEED_SET(x)\
++	FIELD_PREP(DEV_CLOCK_CFG_LINK_SPEED, x)
++#define DEV_CLOCK_CFG_LINK_SPEED_GET(x)\
++	FIELD_GET(DEV_CLOCK_CFG_LINK_SPEED, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_ENA_CFG */
++#define DEV_MAC_ENA_CFG(t)        __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 0, 0, 1, 4)
++
++#define DEV_MAC_ENA_CFG_RX_ENA                   BIT(4)
++#define DEV_MAC_ENA_CFG_RX_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_ENA_CFG_RX_ENA, x)
++#define DEV_MAC_ENA_CFG_RX_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_ENA_CFG_RX_ENA, x)
++
++#define DEV_MAC_ENA_CFG_TX_ENA                   BIT(0)
++#define DEV_MAC_ENA_CFG_TX_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_ENA_CFG_TX_ENA, x)
++#define DEV_MAC_ENA_CFG_TX_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_ENA_CFG_TX_ENA, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_MODE_CFG */
++#define DEV_MAC_MODE_CFG(t)       __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 4, 0, 1, 4)
++
++#define DEV_MAC_MODE_CFG_FC_WORD_SYNC_ENA        BIT(8)
++#define DEV_MAC_MODE_CFG_FC_WORD_SYNC_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_MODE_CFG_FC_WORD_SYNC_ENA, x)
++#define DEV_MAC_MODE_CFG_FC_WORD_SYNC_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_MODE_CFG_FC_WORD_SYNC_ENA, x)
++
++#define DEV_MAC_MODE_CFG_GIGA_MODE_ENA           BIT(4)
++#define DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_MODE_CFG_GIGA_MODE_ENA, x)
++#define DEV_MAC_MODE_CFG_GIGA_MODE_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_MODE_CFG_GIGA_MODE_ENA, x)
++
++#define DEV_MAC_MODE_CFG_FDX_ENA                 BIT(0)
++#define DEV_MAC_MODE_CFG_FDX_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_MODE_CFG_FDX_ENA, x)
++#define DEV_MAC_MODE_CFG_FDX_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_MODE_CFG_FDX_ENA, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_MAXLEN_CFG */
++#define DEV_MAC_MAXLEN_CFG(t)     __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 8, 0, 1, 4)
++
++#define DEV_MAC_MAXLEN_CFG_MAX_LEN               GENMASK(15, 0)
++#define DEV_MAC_MAXLEN_CFG_MAX_LEN_SET(x)\
++	FIELD_PREP(DEV_MAC_MAXLEN_CFG_MAX_LEN, x)
++#define DEV_MAC_MAXLEN_CFG_MAX_LEN_GET(x)\
++	FIELD_GET(DEV_MAC_MAXLEN_CFG_MAX_LEN, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_TAGS_CFG */
++#define DEV_MAC_TAGS_CFG(t)       __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 12, 0, 1, 4)
++
++#define DEV_MAC_TAGS_CFG_TAG_ID                  GENMASK(31, 16)
++#define DEV_MAC_TAGS_CFG_TAG_ID_SET(x)\
++	FIELD_PREP(DEV_MAC_TAGS_CFG_TAG_ID, x)
++#define DEV_MAC_TAGS_CFG_TAG_ID_GET(x)\
++	FIELD_GET(DEV_MAC_TAGS_CFG_TAG_ID, x)
++
++#define DEV_MAC_TAGS_CFG_PB_ENA                  BIT(1)
++#define DEV_MAC_TAGS_CFG_PB_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_TAGS_CFG_PB_ENA, x)
++#define DEV_MAC_TAGS_CFG_PB_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_TAGS_CFG_PB_ENA, x)
++
++#define DEV_MAC_TAGS_CFG_VLAN_AWR_ENA            BIT(0)
++#define DEV_MAC_TAGS_CFG_VLAN_AWR_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_TAGS_CFG_VLAN_AWR_ENA, x)
++#define DEV_MAC_TAGS_CFG_VLAN_AWR_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_TAGS_CFG_VLAN_AWR_ENA, x)
++
++#define DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA        BIT(2)
++#define DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA, x)
++#define DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_TAGS_CFG_VLAN_LEN_AWR_ENA, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_IFG_CFG */
++#define DEV_MAC_IFG_CFG(t)        __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 20, 0, 1, 4)
++
++#define DEV_MAC_IFG_CFG_OLD_IPG_CHECK            BIT(17)
++#define DEV_MAC_IFG_CFG_OLD_IPG_CHECK_SET(x)\
++	FIELD_PREP(DEV_MAC_IFG_CFG_OLD_IPG_CHECK, x)
++#define DEV_MAC_IFG_CFG_OLD_IPG_CHECK_GET(x)\
++	FIELD_GET(DEV_MAC_IFG_CFG_OLD_IPG_CHECK, x)
++
++#define DEV_MAC_IFG_CFG_REDUCED_TX_IFG           BIT(16)
++#define DEV_MAC_IFG_CFG_REDUCED_TX_IFG_SET(x)\
++	FIELD_PREP(DEV_MAC_IFG_CFG_REDUCED_TX_IFG, x)
++#define DEV_MAC_IFG_CFG_REDUCED_TX_IFG_GET(x)\
++	FIELD_GET(DEV_MAC_IFG_CFG_REDUCED_TX_IFG, x)
++
++#define DEV_MAC_IFG_CFG_TX_IFG                   GENMASK(12, 8)
++#define DEV_MAC_IFG_CFG_TX_IFG_SET(x)\
++	FIELD_PREP(DEV_MAC_IFG_CFG_TX_IFG, x)
++#define DEV_MAC_IFG_CFG_TX_IFG_GET(x)\
++	FIELD_GET(DEV_MAC_IFG_CFG_TX_IFG, x)
++
++#define DEV_MAC_IFG_CFG_RX_IFG2                  GENMASK(7, 4)
++#define DEV_MAC_IFG_CFG_RX_IFG2_SET(x)\
++	FIELD_PREP(DEV_MAC_IFG_CFG_RX_IFG2, x)
++#define DEV_MAC_IFG_CFG_RX_IFG2_GET(x)\
++	FIELD_GET(DEV_MAC_IFG_CFG_RX_IFG2, x)
++
++#define DEV_MAC_IFG_CFG_RX_IFG1                  GENMASK(3, 0)
++#define DEV_MAC_IFG_CFG_RX_IFG1_SET(x)\
++	FIELD_PREP(DEV_MAC_IFG_CFG_RX_IFG1, x)
++#define DEV_MAC_IFG_CFG_RX_IFG1_GET(x)\
++	FIELD_GET(DEV_MAC_IFG_CFG_RX_IFG1, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_HDX_CFG */
++#define DEV_MAC_HDX_CFG(t)        __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 24, 0, 1, 4)
++
++#define DEV_MAC_HDX_CFG_BYPASS_COL_SYNC          BIT(26)
++#define DEV_MAC_HDX_CFG_BYPASS_COL_SYNC_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_BYPASS_COL_SYNC, x)
++#define DEV_MAC_HDX_CFG_BYPASS_COL_SYNC_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_BYPASS_COL_SYNC, x)
++
++#define DEV_MAC_HDX_CFG_OB_ENA                   BIT(25)
++#define DEV_MAC_HDX_CFG_OB_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_OB_ENA, x)
++#define DEV_MAC_HDX_CFG_OB_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_OB_ENA, x)
++
++#define DEV_MAC_HDX_CFG_WEXC_DIS                 BIT(24)
++#define DEV_MAC_HDX_CFG_WEXC_DIS_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_WEXC_DIS, x)
++#define DEV_MAC_HDX_CFG_WEXC_DIS_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_WEXC_DIS, x)
++
++#define DEV_MAC_HDX_CFG_SEED                     GENMASK(23, 16)
++#define DEV_MAC_HDX_CFG_SEED_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_SEED, x)
++#define DEV_MAC_HDX_CFG_SEED_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_SEED, x)
++
++#define DEV_MAC_HDX_CFG_SEED_LOAD                BIT(12)
++#define DEV_MAC_HDX_CFG_SEED_LOAD_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_SEED_LOAD, x)
++#define DEV_MAC_HDX_CFG_SEED_LOAD_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_SEED_LOAD, x)
++
++#define DEV_MAC_HDX_CFG_RETRY_EXC_COL_ENA        BIT(8)
++#define DEV_MAC_HDX_CFG_RETRY_EXC_COL_ENA_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_RETRY_EXC_COL_ENA, x)
++#define DEV_MAC_HDX_CFG_RETRY_EXC_COL_ENA_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_RETRY_EXC_COL_ENA, x)
++
++#define DEV_MAC_HDX_CFG_LATE_COL_POS             GENMASK(6, 0)
++#define DEV_MAC_HDX_CFG_LATE_COL_POS_SET(x)\
++	FIELD_PREP(DEV_MAC_HDX_CFG_LATE_COL_POS, x)
++#define DEV_MAC_HDX_CFG_LATE_COL_POS_GET(x)\
++	FIELD_GET(DEV_MAC_HDX_CFG_LATE_COL_POS, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_FC_MAC_LOW_CFG */
++#define DEV_FC_MAC_LOW_CFG(t)     __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 32, 0, 1, 4)
++
++#define DEV_FC_MAC_LOW_CFG_MAC_LOW               GENMASK(23, 0)
++#define DEV_FC_MAC_LOW_CFG_MAC_LOW_SET(x)\
++	FIELD_PREP(DEV_FC_MAC_LOW_CFG_MAC_LOW, x)
++#define DEV_FC_MAC_LOW_CFG_MAC_LOW_GET(x)\
++	FIELD_GET(DEV_FC_MAC_LOW_CFG_MAC_LOW, x)
++
++/*      DEV:MAC_CFG_STATUS:MAC_FC_MAC_HIGH_CFG */
++#define DEV_FC_MAC_HIGH_CFG(t)    __REG(TARGET_DEV,\
++					t, 9, 20, 0, 1, 44, 36, 0, 1, 4)
++
++#define DEV_FC_MAC_HIGH_CFG_MAC_HIGH             GENMASK(23, 0)
++#define DEV_FC_MAC_HIGH_CFG_MAC_HIGH_SET(x)\
++	FIELD_PREP(DEV_FC_MAC_HIGH_CFG_MAC_HIGH, x)
++#define DEV_FC_MAC_HIGH_CFG_MAC_HIGH_GET(x)\
++	FIELD_GET(DEV_FC_MAC_HIGH_CFG_MAC_HIGH, x)
++
++/*      DEV:PCS1G_CFG_STATUS:PCS1G_CFG */
++#define DEV_PCS1G_CFG(t)          __REG(TARGET_DEV,\
++					t, 9, 64, 0, 1, 68, 0, 0, 1, 4)
++
++#define DEV_PCS1G_CFG_LINK_STATUS_TYPE           BIT(4)
++#define DEV_PCS1G_CFG_LINK_STATUS_TYPE_SET(x)\
++	FIELD_PREP(DEV_PCS1G_CFG_LINK_STATUS_TYPE, x)
++#define DEV_PCS1G_CFG_LINK_STATUS_TYPE_GET(x)\
++	FIELD_GET(DEV_PCS1G_CFG_LINK_STATUS_TYPE, x)
++
++#define DEV_PCS1G_CFG_AN_LINK_CTRL_ENA           BIT(1)
++#define DEV_PCS1G_CFG_AN_LINK_CTRL_ENA_SET(x)\
++	FIELD_PREP(DEV_PCS1G_CFG_AN_LINK_CTRL_ENA, x)
++#define DEV_PCS1G_CFG_AN_LINK_CTRL_ENA_GET(x)\
++	FIELD_GET(DEV_PCS1G_CFG_AN_LINK_CTRL_ENA, x)
++
++#define DEV_PCS1G_CFG_PCS_ENA                    BIT(0)
++#define DEV_PCS1G_CFG_PCS_ENA_SET(x)\
++	FIELD_PREP(DEV_PCS1G_CFG_PCS_ENA, x)
++#define DEV_PCS1G_CFG_PCS_ENA_GET(x)\
++	FIELD_GET(DEV_PCS1G_CFG_PCS_ENA, x)
++
++/*      DEV:PCS1G_CFG_STATUS:PCS1G_SD_CFG */
++#define DEV_PCS1G_SD_CFG(t)       __REG(TARGET_DEV,\
++					t, 9, 64, 0, 1, 68, 8, 0, 1, 4)
++
++#define DEV_PCS1G_SD_CFG_SD_SEL                  BIT(8)
++#define DEV_PCS1G_SD_CFG_SD_SEL_SET(x)\
++	FIELD_PREP(DEV_PCS1G_SD_CFG_SD_SEL, x)
++#define DEV_PCS1G_SD_CFG_SD_SEL_GET(x)\
++	FIELD_GET(DEV_PCS1G_SD_CFG_SD_SEL, x)
++
++#define DEV_PCS1G_SD_CFG_SD_POL                  BIT(4)
++#define DEV_PCS1G_SD_CFG_SD_POL_SET(x)\
++	FIELD_PREP(DEV_PCS1G_SD_CFG_SD_POL, x)
++#define DEV_PCS1G_SD_CFG_SD_POL_GET(x)\
++	FIELD_GET(DEV_PCS1G_SD_CFG_SD_POL, x)
++
++#define DEV_PCS1G_SD_CFG_SD_ENA                  BIT(0)
++#define DEV_PCS1G_SD_CFG_SD_ENA_SET(x)\
++	FIELD_PREP(DEV_PCS1G_SD_CFG_SD_ENA, x)
++#define DEV_PCS1G_SD_CFG_SD_ENA_GET(x)\
++	FIELD_GET(DEV_PCS1G_SD_CFG_SD_ENA, x)
++
++/*      DEVCPU_GCB:CHIP_REGS:FEAT_DISABLE */
++#define GCB_FEAT_DISABLE          __REG(TARGET_GCB,\
++					0, 1, 0, 0, 1, 28, 20, 0, 1, 4)
++
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_CFG_DIS     BIT(0)
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_CFG_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_EEPROM_CFG_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_CFG_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_EEPROM_CFG_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_BOOT_DIS    BIT(1)
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_BOOT_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_EEPROM_BOOT_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_BOOT_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_EEPROM_BOOT_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_FW_PATCH_DIS BIT(2)
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_FW_PATCH_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_EEPROM_FW_PATCH_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_EEPROM_FW_PATCH_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_EEPROM_FW_PATCH_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_MMU_BACKDOOR_WR_DIS BIT(3)
++#define GCB_FEAT_DISABLE_FEAT_MMU_BACKDOOR_WR_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_MMU_BACKDOOR_WR_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_MMU_BACKDOOR_WR_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_MMU_BACKDOOR_WR_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_MGMT_IF_WR_DIS     BIT(4)
++#define GCB_FEAT_DISABLE_FEAT_MGMT_IF_WR_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_MGMT_IF_WR_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_MGMT_IF_WR_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_MGMT_IF_WR_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_DD_DIS             BIT(5)
++#define GCB_FEAT_DISABLE_FEAT_DD_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_DD_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_DD_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_DD_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_TSN_DIS            BIT(6)
++#define GCB_FEAT_DISABLE_FEAT_TSN_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_TSN_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_TSN_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_TSN_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_PTP_DIS            BIT(7)
++#define GCB_FEAT_DISABLE_FEAT_PTP_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_PTP_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_PTP_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_PTP_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_FRER_DIS           BIT(8)
++#define GCB_FEAT_DISABLE_FEAT_FRER_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_FRER_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_FRER_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_FRER_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS      GENMASK(14, 12)
++#define GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_NUM_CU_DIS         GENMASK(16, 15)
++#define GCB_FEAT_DISABLE_FEAT_NUM_CU_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_NUM_CU_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_NUM_CU_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_NUM_CU_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_RGMII_DIS          GENMASK(18, 17)
++#define GCB_FEAT_DISABLE_FEAT_RGMII_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_RGMII_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_RGMII_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_RGMII_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_SGMII_DIS          GENMASK(20, 19)
++#define GCB_FEAT_DISABLE_FEAT_SGMII_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_SGMII_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_SGMII_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_SGMII_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_QSGMII_DIS         BIT(21)
++#define GCB_FEAT_DISABLE_FEAT_QSGMII_DIS_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_QSGMII_DIS, x)
++#define GCB_FEAT_DISABLE_FEAT_QSGMII_DIS_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_QSGMII_DIS, x)
++
++#define GCB_FEAT_DISABLE_FEAT_NUM_CU_FIXED       BIT(22)
++#define GCB_FEAT_DISABLE_FEAT_NUM_CU_FIXED_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_NUM_CU_FIXED, x)
++#define GCB_FEAT_DISABLE_FEAT_NUM_CU_FIXED_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_NUM_CU_FIXED, x)
++
++#define GCB_FEAT_DISABLE_FEAT_WDT_ENABLED        BIT(25)
++#define GCB_FEAT_DISABLE_FEAT_WDT_ENABLED_SET(x)\
++	FIELD_PREP(GCB_FEAT_DISABLE_FEAT_WDT_ENABLED, x)
++#define GCB_FEAT_DISABLE_FEAT_WDT_ENABLED_GET(x)\
++	FIELD_GET(GCB_FEAT_DISABLE_FEAT_WDT_ENABLED, x)
++
++/*      HSIO:HW_CFGSTAT:HW_CFG */
++#define HSIO_HW_CFG               __REG(TARGET_HSIO,\
++					0, 1, 72, 0, 1, 44, 0, 0, 1, 4)
++
++#define HSIO_HW_CFG_RGMII_0_CFG                  BIT(10)
++#define HSIO_HW_CFG_RGMII_0_CFG_SET(x)\
++	FIELD_PREP(HSIO_HW_CFG_RGMII_0_CFG, x)
++#define HSIO_HW_CFG_RGMII_0_CFG_GET(x)\
++	FIELD_GET(HSIO_HW_CFG_RGMII_0_CFG, x)
++
++#define HSIO_HW_CFG_GMII_ENA                     GENMASK(9, 1)
++#define HSIO_HW_CFG_GMII_ENA_SET(x)\
++	FIELD_PREP(HSIO_HW_CFG_GMII_ENA, x)
++#define HSIO_HW_CFG_GMII_ENA_GET(x)\
++	FIELD_GET(HSIO_HW_CFG_GMII_ENA, x)
++
++#define HSIO_HW_CFG_QSGMII_ENA                   BIT(0)
++#define HSIO_HW_CFG_QSGMII_ENA_SET(x)\
++	FIELD_PREP(HSIO_HW_CFG_QSGMII_ENA, x)
++#define HSIO_HW_CFG_QSGMII_ENA_GET(x)\
++	FIELD_GET(HSIO_HW_CFG_QSGMII_ENA, x)
++
++/*      HSIO:HW_CFGSTAT:RGMII_CFG */
++#define HSIO_RGMII_CFG(r)         __REG(TARGET_HSIO,\
++					0, 1, 72, 0, 1, 44, 12, r, 2, 4)
++
++#define HSIO_RGMII_CFG_IB_RX_LINK_STATUS         BIT(15)
++#define HSIO_RGMII_CFG_IB_RX_LINK_STATUS_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_RX_LINK_STATUS, x)
++#define HSIO_RGMII_CFG_IB_RX_LINK_STATUS_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_RX_LINK_STATUS, x)
++
++#define HSIO_RGMII_CFG_IB_RX_DUPLEX              BIT(14)
++#define HSIO_RGMII_CFG_IB_RX_DUPLEX_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_RX_DUPLEX, x)
++#define HSIO_RGMII_CFG_IB_RX_DUPLEX_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_RX_DUPLEX, x)
++
++#define HSIO_RGMII_CFG_IB_RX_SPEED               GENMASK(13, 12)
++#define HSIO_RGMII_CFG_IB_RX_SPEED_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_RX_SPEED, x)
++#define HSIO_RGMII_CFG_IB_RX_SPEED_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_RX_SPEED, x)
++
++#define HSIO_RGMII_CFG_IB_TX_LINK_STATUS         BIT(11)
++#define HSIO_RGMII_CFG_IB_TX_LINK_STATUS_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_TX_LINK_STATUS, x)
++#define HSIO_RGMII_CFG_IB_TX_LINK_STATUS_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_TX_LINK_STATUS, x)
++
++#define HSIO_RGMII_CFG_IB_TX_FDX                 BIT(10)
++#define HSIO_RGMII_CFG_IB_TX_FDX_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_TX_FDX, x)
++#define HSIO_RGMII_CFG_IB_TX_FDX_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_TX_FDX, x)
++
++#define HSIO_RGMII_CFG_IB_TX_MII_SPD             BIT(9)
++#define HSIO_RGMII_CFG_IB_TX_MII_SPD_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_TX_MII_SPD, x)
++#define HSIO_RGMII_CFG_IB_TX_MII_SPD_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_TX_MII_SPD, x)
++
++#define HSIO_RGMII_CFG_IB_TX_SPD_1G              BIT(8)
++#define HSIO_RGMII_CFG_IB_TX_SPD_1G_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_TX_SPD_1G, x)
++#define HSIO_RGMII_CFG_IB_TX_SPD_1G_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_TX_SPD_1G, x)
++
++#define HSIO_RGMII_CFG_IB_TX_ENA                 BIT(7)
++#define HSIO_RGMII_CFG_IB_TX_ENA_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_TX_ENA, x)
++#define HSIO_RGMII_CFG_IB_TX_ENA_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_TX_ENA, x)
++
++#define HSIO_RGMII_CFG_IB_RX_ENA                 BIT(6)
++#define HSIO_RGMII_CFG_IB_RX_ENA_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_RX_ENA, x)
++#define HSIO_RGMII_CFG_IB_RX_ENA_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_RX_ENA, x)
++
++#define HSIO_RGMII_CFG_IB_ENA                    BIT(5)
++#define HSIO_RGMII_CFG_IB_ENA_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_IB_ENA, x)
++#define HSIO_RGMII_CFG_IB_ENA_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_IB_ENA, x)
++
++#define HSIO_RGMII_CFG_TX_CLK_CFG                GENMASK(4, 2)
++#define HSIO_RGMII_CFG_TX_CLK_CFG_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_TX_CLK_CFG, x)
++#define HSIO_RGMII_CFG_TX_CLK_CFG_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_TX_CLK_CFG, x)
++
++#define HSIO_RGMII_CFG_RGMII_TX_RST              BIT(1)
++#define HSIO_RGMII_CFG_RGMII_TX_RST_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_RGMII_TX_RST, x)
++#define HSIO_RGMII_CFG_RGMII_TX_RST_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_RGMII_TX_RST, x)
++
++#define HSIO_RGMII_CFG_RGMII_RX_RST              BIT(0)
++#define HSIO_RGMII_CFG_RGMII_RX_RST_SET(x)\
++	FIELD_PREP(HSIO_RGMII_CFG_RGMII_RX_RST, x)
++#define HSIO_RGMII_CFG_RGMII_RX_RST_GET(x)\
++	FIELD_GET(HSIO_RGMII_CFG_RGMII_RX_RST, x)
++
++/*      HSIO:HW_CFGSTAT:DLL_CFG */
++#define HSIO_DLL_CFG(r)           __REG(TARGET_HSIO,\
++					0, 1, 72, 0, 1, 44, 28, r, 4, 4)
++
++#define HSIO_DLL_CFG_DLL_CLK_ENA                 BIT(20)
++#define HSIO_DLL_CFG_DLL_CLK_ENA_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_DLL_CLK_ENA, x)
++#define HSIO_DLL_CFG_DLL_CLK_ENA_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_DLL_CLK_ENA, x)
++
++#define HSIO_DLL_CFG_BIST_PASS                   BIT(19)
++#define HSIO_DLL_CFG_BIST_PASS_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_BIST_PASS, x)
++#define HSIO_DLL_CFG_BIST_PASS_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_BIST_PASS, x)
++
++#define HSIO_DLL_CFG_BIST_END                    BIT(18)
++#define HSIO_DLL_CFG_BIST_END_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_BIST_END, x)
++#define HSIO_DLL_CFG_BIST_END_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_BIST_END, x)
++
++#define HSIO_DLL_CFG_BIST_START                  BIT(17)
++#define HSIO_DLL_CFG_BIST_START_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_BIST_START, x)
++#define HSIO_DLL_CFG_BIST_START_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_BIST_START, x)
++
++#define HSIO_DLL_CFG_TAP_SEL                     GENMASK(16, 10)
++#define HSIO_DLL_CFG_TAP_SEL_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_TAP_SEL, x)
++#define HSIO_DLL_CFG_TAP_SEL_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_TAP_SEL, x)
++
++#define HSIO_DLL_CFG_TAP_ADJ                     GENMASK(9, 3)
++#define HSIO_DLL_CFG_TAP_ADJ_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_TAP_ADJ, x)
++#define HSIO_DLL_CFG_TAP_ADJ_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_TAP_ADJ, x)
++
++#define HSIO_DLL_CFG_DELAY_ENA                   BIT(2)
++#define HSIO_DLL_CFG_DELAY_ENA_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_DELAY_ENA, x)
++#define HSIO_DLL_CFG_DELAY_ENA_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_DELAY_ENA, x)
++
++#define HSIO_DLL_CFG_DLL_ENA                     BIT(1)
++#define HSIO_DLL_CFG_DLL_ENA_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_DLL_ENA, x)
++#define HSIO_DLL_CFG_DLL_ENA_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_DLL_ENA, x)
++
++#define HSIO_DLL_CFG_DLL_RST                     BIT(0)
++#define HSIO_DLL_CFG_DLL_RST_SET(x)\
++	FIELD_PREP(HSIO_DLL_CFG_DLL_RST, x)
++#define HSIO_DLL_CFG_DLL_RST_GET(x)\
++	FIELD_GET(HSIO_DLL_CFG_DLL_RST, x)
++
++/*      DEVCPU_QS:XTR:XTR_FLUSH */
++#define QS_XTR_FLUSH              __REG(TARGET_QS,\
++					0, 1, 0, 0, 1, 36, 24, 0, 1, 4)
++
++#define QS_XTR_FLUSH_FLUSH                       GENMASK(1, 0)
++#define QS_XTR_FLUSH_FLUSH_SET(x)\
++	FIELD_PREP(QS_XTR_FLUSH_FLUSH, x)
++#define QS_XTR_FLUSH_FLUSH_GET(x)\
++	FIELD_GET(QS_XTR_FLUSH_FLUSH, x)
++
++/*      DEVCPU_QS:INJ:INJ_GRP_CFG */
++#define QS_INJ_GRP_CFG(r)         __REG(TARGET_QS,\
++					0, 1, 36, 0, 1, 40, 0, r, 2, 4)
++
++#define QS_INJ_GRP_CFG_MODE                      GENMASK(3, 2)
++#define QS_INJ_GRP_CFG_MODE_SET(x)\
++	FIELD_PREP(QS_INJ_GRP_CFG_MODE, x)
++#define QS_INJ_GRP_CFG_MODE_GET(x)\
++	FIELD_GET(QS_INJ_GRP_CFG_MODE, x)
++
++#define QS_INJ_GRP_CFG_BYTE_SWAP                 BIT(0)
++#define QS_INJ_GRP_CFG_BYTE_SWAP_SET(x)\
++	FIELD_PREP(QS_INJ_GRP_CFG_BYTE_SWAP, x)
++#define QS_INJ_GRP_CFG_BYTE_SWAP_GET(x)\
++	FIELD_GET(QS_INJ_GRP_CFG_BYTE_SWAP, x)
++
++/*      DEVCPU_QS:INJ:INJ_CTRL */
++#define QS_INJ_CTRL(r)            __REG(TARGET_QS,\
++					0, 1, 36, 0, 1, 40, 16, r, 2, 4)
++
++#define QS_INJ_CTRL_GAP_SIZE                     GENMASK(24, 21)
++#define QS_INJ_CTRL_GAP_SIZE_SET(x)\
++	FIELD_PREP(QS_INJ_CTRL_GAP_SIZE, x)
++#define QS_INJ_CTRL_GAP_SIZE_GET(x)\
++	FIELD_GET(QS_INJ_CTRL_GAP_SIZE, x)
++
++#define QS_INJ_CTRL_ABORT                        BIT(20)
++#define QS_INJ_CTRL_ABORT_SET(x)\
++	FIELD_PREP(QS_INJ_CTRL_ABORT, x)
++#define QS_INJ_CTRL_ABORT_GET(x)\
++	FIELD_GET(QS_INJ_CTRL_ABORT, x)
++
++#define QS_INJ_CTRL_EOF                          BIT(19)
++#define QS_INJ_CTRL_EOF_SET(x)\
++	FIELD_PREP(QS_INJ_CTRL_EOF, x)
++#define QS_INJ_CTRL_EOF_GET(x)\
++	FIELD_GET(QS_INJ_CTRL_EOF, x)
++
++#define QS_INJ_CTRL_SOF                          BIT(18)
++#define QS_INJ_CTRL_SOF_SET(x)\
++	FIELD_PREP(QS_INJ_CTRL_SOF, x)
++#define QS_INJ_CTRL_SOF_GET(x)\
++	FIELD_GET(QS_INJ_CTRL_SOF, x)
++
++#define QS_INJ_CTRL_VLD_BYTES                    GENMASK(17, 16)
++#define QS_INJ_CTRL_VLD_BYTES_SET(x)\
++	FIELD_PREP(QS_INJ_CTRL_VLD_BYTES, x)
++#define QS_INJ_CTRL_VLD_BYTES_GET(x)\
++	FIELD_GET(QS_INJ_CTRL_VLD_BYTES, x)
++
++/*      QSYS:SYSTEM:PORT_MODE */
++#define QSYS_PORT_MODE(r)         __REG(TARGET_QSYS,\
++					0, 1, 14336, 0, 1, 240, 0, r, 11, 4)
++
++#define QSYS_PORT_MODE_DEQUEUE_DIS               BIT(1)
++#define QSYS_PORT_MODE_DEQUEUE_DIS_SET(x)\
++	FIELD_PREP(QSYS_PORT_MODE_DEQUEUE_DIS, x)
++#define QSYS_PORT_MODE_DEQUEUE_DIS_GET(x)\
++	FIELD_GET(QSYS_PORT_MODE_DEQUEUE_DIS, x)
++
++#define QSYS_PORT_MODE_DEQUEUE_LATE              BIT(0)
++#define QSYS_PORT_MODE_DEQUEUE_LATE_SET(x)\
++	FIELD_PREP(QSYS_PORT_MODE_DEQUEUE_LATE, x)
++#define QSYS_PORT_MODE_DEQUEUE_LATE_GET(x)\
++	FIELD_GET(QSYS_PORT_MODE_DEQUEUE_LATE, x)
++
++/*      QSYS:SYSTEM:SWITCH_PORT_MODE */
++#define QSYS_SW_PORT_MODE(r)      __REG(TARGET_QSYS,\
++					0, 1, 14336, 0, 1, 240, 88, r, 10, 4)
++
++#define QSYS_SW_PORT_MODE_PORT_ENA               BIT(19)
++#define QSYS_SW_PORT_MODE_PORT_ENA_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_PORT_ENA, x)
++#define QSYS_SW_PORT_MODE_PORT_ENA_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_PORT_ENA, x)
++
++#define QSYS_SW_PORT_MODE_IDEQ_DIS               BIT(18)
++#define QSYS_SW_PORT_MODE_IDEQ_DIS_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_IDEQ_DIS, x)
++#define QSYS_SW_PORT_MODE_IDEQ_DIS_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_IDEQ_DIS, x)
++
++#define QSYS_SW_PORT_MODE_SCH_NEXT_CFG           GENMASK(17, 15)
++#define QSYS_SW_PORT_MODE_SCH_NEXT_CFG_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_SCH_NEXT_CFG, x)
++#define QSYS_SW_PORT_MODE_SCH_NEXT_CFG_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_SCH_NEXT_CFG, x)
++
++#define QSYS_SW_PORT_MODE_YEL_RSRVD              BIT(14)
++#define QSYS_SW_PORT_MODE_YEL_RSRVD_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_YEL_RSRVD, x)
++#define QSYS_SW_PORT_MODE_YEL_RSRVD_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_YEL_RSRVD, x)
++
++#define QSYS_SW_PORT_MODE_INGRESS_DROP_MODE      BIT(13)
++#define QSYS_SW_PORT_MODE_INGRESS_DROP_MODE_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_INGRESS_DROP_MODE, x)
++#define QSYS_SW_PORT_MODE_INGRESS_DROP_MODE_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_INGRESS_DROP_MODE, x)
++
++#define QSYS_SW_PORT_MODE_TX_PFC_ENA             GENMASK(12, 5)
++#define QSYS_SW_PORT_MODE_TX_PFC_ENA_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_TX_PFC_ENA, x)
++#define QSYS_SW_PORT_MODE_TX_PFC_ENA_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_TX_PFC_ENA, x)
++
++#define QSYS_SW_PORT_MODE_TX_PFC_MODE            BIT(4)
++#define QSYS_SW_PORT_MODE_TX_PFC_MODE_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_TX_PFC_MODE, x)
++#define QSYS_SW_PORT_MODE_TX_PFC_MODE_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_TX_PFC_MODE, x)
++
++#define QSYS_SW_PORT_MODE_FWD_TWOCYCLE_MODE      BIT(3)
++#define QSYS_SW_PORT_MODE_FWD_TWOCYCLE_MODE_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_FWD_TWOCYCLE_MODE, x)
++#define QSYS_SW_PORT_MODE_FWD_TWOCYCLE_MODE_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_FWD_TWOCYCLE_MODE, x)
++
++#define QSYS_SW_PORT_MODE_AGING_MODE             GENMASK(2, 1)
++#define QSYS_SW_PORT_MODE_AGING_MODE_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_AGING_MODE, x)
++#define QSYS_SW_PORT_MODE_AGING_MODE_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_AGING_MODE, x)
++
++#define QSYS_SW_PORT_MODE_HOL_PROTECTED          BIT(0)
++#define QSYS_SW_PORT_MODE_HOL_PROTECTED_SET(x)\
++	FIELD_PREP(QSYS_SW_PORT_MODE_HOL_PROTECTED, x)
++#define QSYS_SW_PORT_MODE_HOL_PROTECTED_GET(x)\
++	FIELD_GET(QSYS_SW_PORT_MODE_HOL_PROTECTED, x)
++
++/*      QSYS:SYSTEM:EGR_NO_SHARING */
++#define QSYS_EGR_NO_SHARING       __REG(TARGET_QSYS,\
++					0, 1, 14336, 0, 1, 240, 176, 0, 1, 4)
++
++#define QSYS_EGR_NO_SHARING_EGR_NO_SHARING       GENMASK(9, 0)
++#define QSYS_EGR_NO_SHARING_EGR_NO_SHARING_SET(x)\
++	FIELD_PREP(QSYS_EGR_NO_SHARING_EGR_NO_SHARING, x)
++#define QSYS_EGR_NO_SHARING_EGR_NO_SHARING_GET(x)\
++	FIELD_GET(QSYS_EGR_NO_SHARING_EGR_NO_SHARING, x)
++
++/*      QSYS:SYSTEM:SW_STATUS */
++#define QSYS_SW_STATUS(r)         __REG(TARGET_QSYS,\
++					0, 1, 14336, 0, 1, 240, 180, r, 10, 4)
++
++#define QSYS_SW_STATUS_EQ_AVAIL                  GENMASK(7, 0)
++#define QSYS_SW_STATUS_EQ_AVAIL_SET(x)\
++	FIELD_PREP(QSYS_SW_STATUS_EQ_AVAIL, x)
++#define QSYS_SW_STATUS_EQ_AVAIL_GET(x)\
++	FIELD_GET(QSYS_SW_STATUS_EQ_AVAIL, x)
++
++/*      QSYS:SYSTEM:EXT_CPU_CFG */
++#define QSYS_EXT_CPU_CFG          __REG(TARGET_QSYS,\
++					0, 1, 14336, 0, 1, 240, 220, 0, 1, 4)
++
++#define QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA        BIT(14)
++#define QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA_SET(x)\
++	FIELD_PREP(QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA, x)
++#define QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA_GET(x)\
++	FIELD_GET(QSYS_EXT_CPU_CFG_EXT_CPU_KILL_ENA, x)
++
++#define QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA        BIT(13)
++#define QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA_SET(x)\
++	FIELD_PREP(QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA, x)
++#define QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA_GET(x)\
++	FIELD_GET(QSYS_EXT_CPU_CFG_INT_CPU_KILL_ENA, x)
++
++#define QSYS_EXT_CPU_CFG_EXT_CPU_PORT            GENMASK(12, 8)
++#define QSYS_EXT_CPU_CFG_EXT_CPU_PORT_SET(x)\
++	FIELD_PREP(QSYS_EXT_CPU_CFG_EXT_CPU_PORT, x)
++#define QSYS_EXT_CPU_CFG_EXT_CPU_PORT_GET(x)\
++	FIELD_GET(QSYS_EXT_CPU_CFG_EXT_CPU_PORT, x)
++
++#define QSYS_EXT_CPU_CFG_EXT_CPUQ_MSK            GENMASK(7, 0)
++#define QSYS_EXT_CPU_CFG_EXT_CPUQ_MSK_SET(x)\
++	FIELD_PREP(QSYS_EXT_CPU_CFG_EXT_CPUQ_MSK, x)
++#define QSYS_EXT_CPU_CFG_EXT_CPUQ_MSK_GET(x)\
++	FIELD_GET(QSYS_EXT_CPU_CFG_EXT_CPUQ_MSK, x)
++
++/*      QSYS:SYSTEM:CPU_GROUP_MAP */
++#define QSYS_CPU_GROUP_MAP        __REG(TARGET_QSYS,\
++					0, 1, 14336, 0, 1, 240, 224, 0, 1, 4)
++
++#define QSYS_CPU_GROUP_MAP_CPU_GROUP_MAP         GENMASK(7, 0)
++#define QSYS_CPU_GROUP_MAP_CPU_GROUP_MAP_SET(x)\
++	FIELD_PREP(QSYS_CPU_GROUP_MAP_CPU_GROUP_MAP, x)
++#define QSYS_CPU_GROUP_MAP_CPU_GROUP_MAP_GET(x)\
++	FIELD_GET(QSYS_CPU_GROUP_MAP_CPU_GROUP_MAP, x)
++
++/*      QSYS:RES_CTRL:RES_CFG */
++#define QSYS_RES_CFG(g)           __REG(TARGET_QSYS,\
++					0, 1, 16384, g, 1024, 8, 0, 0, 1, 4)
++
++#define QSYS_RES_CFG_WM_HIGH                     GENMASK(8, 0)
++#define QSYS_RES_CFG_WM_HIGH_SET(x)\
++	FIELD_PREP(QSYS_RES_CFG_WM_HIGH, x)
++#define QSYS_RES_CFG_WM_HIGH_GET(x)\
++	FIELD_GET(QSYS_RES_CFG_WM_HIGH, x)
++
++/*      QSYS:DROP_CFG:EGR_DROP_MODE */
++#define QSYS_EGR_DROP_MODE        __REG(TARGET_QSYS,\
++					0, 1, 12736, 0, 1, 8, 0, 0, 1, 4)
++
++#define QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE      GENMASK(9, 0)
++#define QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE_SET(x)\
++	FIELD_PREP(QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE, x)
++#define QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE_GET(x)\
++	FIELD_GET(QSYS_EGR_DROP_MODE_EGRESS_DROP_MODE, x)
++
++/*      REW:PORT:PORT_VLAN_CFG */
++#define REW_PORT_VLAN_CFG(g)      __REG(TARGET_REW,\
++					0, 1, 4096, g, 11, 128, 0, 0, 1, 4)
++
++#define REW_PORT_VLAN_CFG_PORT_TPID              GENMASK(31, 16)
++#define REW_PORT_VLAN_CFG_PORT_TPID_SET(x)\
++	FIELD_PREP(REW_PORT_VLAN_CFG_PORT_TPID, x)
++#define REW_PORT_VLAN_CFG_PORT_TPID_GET(x)\
++	FIELD_GET(REW_PORT_VLAN_CFG_PORT_TPID, x)
++
++#define REW_PORT_VLAN_CFG_PORT_DEI               BIT(15)
++#define REW_PORT_VLAN_CFG_PORT_DEI_SET(x)\
++	FIELD_PREP(REW_PORT_VLAN_CFG_PORT_DEI, x)
++#define REW_PORT_VLAN_CFG_PORT_DEI_GET(x)\
++	FIELD_GET(REW_PORT_VLAN_CFG_PORT_DEI, x)
++
++#define REW_PORT_VLAN_CFG_PORT_PCP               GENMASK(14, 12)
++#define REW_PORT_VLAN_CFG_PORT_PCP_SET(x)\
++	FIELD_PREP(REW_PORT_VLAN_CFG_PORT_PCP, x)
++#define REW_PORT_VLAN_CFG_PORT_PCP_GET(x)\
++	FIELD_GET(REW_PORT_VLAN_CFG_PORT_PCP, x)
++
++#define REW_PORT_VLAN_CFG_PORT_VID               GENMASK(11, 0)
++#define REW_PORT_VLAN_CFG_PORT_VID_SET(x)\
++	FIELD_PREP(REW_PORT_VLAN_CFG_PORT_VID, x)
++#define REW_PORT_VLAN_CFG_PORT_VID_GET(x)\
++	FIELD_GET(REW_PORT_VLAN_CFG_PORT_VID, x)
++
++/*      REW:PORT:TAG_CFG */
++#define REW_TAG_CFG(g)            __REG(TARGET_REW,\
++					0, 1, 4096, g, 11, 128, 4, 0, 1, 4)
++
++#define REW_TAG_CFG_TAG_CFG                      GENMASK(8, 7)
++#define REW_TAG_CFG_TAG_CFG_SET(x)\
++	FIELD_PREP(REW_TAG_CFG_TAG_CFG, x)
++#define REW_TAG_CFG_TAG_CFG_GET(x)\
++	FIELD_GET(REW_TAG_CFG_TAG_CFG, x)
++
++#define REW_TAG_CFG_TAG_TPID_CFG                 GENMASK(6, 5)
++#define REW_TAG_CFG_TAG_TPID_CFG_SET(x)\
++	FIELD_PREP(REW_TAG_CFG_TAG_TPID_CFG, x)
++#define REW_TAG_CFG_TAG_TPID_CFG_GET(x)\
++	FIELD_GET(REW_TAG_CFG_TAG_TPID_CFG, x)
++
++#define REW_TAG_CFG_TAG_VID_CFG                  BIT(4)
++#define REW_TAG_CFG_TAG_VID_CFG_SET(x)\
++	FIELD_PREP(REW_TAG_CFG_TAG_VID_CFG, x)
++#define REW_TAG_CFG_TAG_VID_CFG_GET(x)\
++	FIELD_GET(REW_TAG_CFG_TAG_VID_CFG, x)
++
++#define REW_TAG_CFG_TAG_PCP_CFG                  GENMASK(3, 2)
++#define REW_TAG_CFG_TAG_PCP_CFG_SET(x)\
++	FIELD_PREP(REW_TAG_CFG_TAG_PCP_CFG, x)
++#define REW_TAG_CFG_TAG_PCP_CFG_GET(x)\
++	FIELD_GET(REW_TAG_CFG_TAG_PCP_CFG, x)
++
++#define REW_TAG_CFG_TAG_DEI_CFG                  GENMASK(1, 0)
++#define REW_TAG_CFG_TAG_DEI_CFG_SET(x)\
++	FIELD_PREP(REW_TAG_CFG_TAG_DEI_CFG, x)
++#define REW_TAG_CFG_TAG_DEI_CFG_GET(x)\
++	FIELD_GET(REW_TAG_CFG_TAG_DEI_CFG, x)
++
++/*      REW:PORT:PORT_CFG */
++#define REW_PORT_CFG(g)           __REG(TARGET_REW,\
++					0, 1, 4096, g, 11, 128, 8, 0, 1, 4)
++
++#define REW_PORT_CFG_ES0_EN                      BIT(4)
++#define REW_PORT_CFG_ES0_EN_SET(x)\
++	FIELD_PREP(REW_PORT_CFG_ES0_EN, x)
++#define REW_PORT_CFG_ES0_EN_GET(x)\
++	FIELD_GET(REW_PORT_CFG_ES0_EN, x)
++
++#define REW_PORT_CFG_FCS_UPDATE_NONCPU_CFG       GENMASK(3, 2)
++#define REW_PORT_CFG_FCS_UPDATE_NONCPU_CFG_SET(x)\
++	FIELD_PREP(REW_PORT_CFG_FCS_UPDATE_NONCPU_CFG, x)
++#define REW_PORT_CFG_FCS_UPDATE_NONCPU_CFG_GET(x)\
++	FIELD_GET(REW_PORT_CFG_FCS_UPDATE_NONCPU_CFG, x)
++
++#define REW_PORT_CFG_FCS_UPDATE_CPU_ENA          BIT(1)
++#define REW_PORT_CFG_FCS_UPDATE_CPU_ENA_SET(x)\
++	FIELD_PREP(REW_PORT_CFG_FCS_UPDATE_CPU_ENA, x)
++#define REW_PORT_CFG_FCS_UPDATE_CPU_ENA_GET(x)\
++	FIELD_GET(REW_PORT_CFG_FCS_UPDATE_CPU_ENA, x)
++
++#define REW_PORT_CFG_NO_REWRITE                  BIT(0)
++#define REW_PORT_CFG_NO_REWRITE_SET(x)\
++	FIELD_PREP(REW_PORT_CFG_NO_REWRITE, x)
++#define REW_PORT_CFG_NO_REWRITE_GET(x)\
++	FIELD_GET(REW_PORT_CFG_NO_REWRITE, x)
++
++/*      SYS:SYSTEM:RESET_CFG */
++#define SYS_RESET_CFG             __REG(TARGET_SYS,\
++					0, 1, 4160, 0, 1, 184, 0, 0, 1, 4)
++
++#define SYS_RESET_CFG_CORE_ENA                   BIT(0)
++#define SYS_RESET_CFG_CORE_ENA_SET(x)\
++	FIELD_PREP(SYS_RESET_CFG_CORE_ENA, x)
++#define SYS_RESET_CFG_CORE_ENA_GET(x)\
++	FIELD_GET(SYS_RESET_CFG_CORE_ENA, x)
++
++/*      SYS:SYSTEM:PORT_MODE */
++#define SYS_PORT_MODE(r)          __REG(TARGET_SYS,\
++					0, 1, 4160, 0, 1, 184, 48, r, 11, 4)
++
++#define SYS_PORT_MODE_PRP_LANID                  BIT(8)
++#define SYS_PORT_MODE_PRP_LANID_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_PRP_LANID, x)
++#define SYS_PORT_MODE_PRP_LANID_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_PRP_LANID, x)
++
++#define SYS_PORT_MODE_PRP_ENA                    BIT(7)
++#define SYS_PORT_MODE_PRP_ENA_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_PRP_ENA, x)
++#define SYS_PORT_MODE_PRP_ENA_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_PRP_ENA, x)
++
++#define SYS_PORT_MODE_INCL_INJ_HDR               GENMASK(6, 5)
++#define SYS_PORT_MODE_INCL_INJ_HDR_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_INCL_INJ_HDR, x)
++#define SYS_PORT_MODE_INCL_INJ_HDR_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_INCL_INJ_HDR, x)
++
++#define SYS_PORT_MODE_INCL_XTR_HDR               GENMASK(4, 3)
++#define SYS_PORT_MODE_INCL_XTR_HDR_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_INCL_XTR_HDR, x)
++#define SYS_PORT_MODE_INCL_XTR_HDR_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_INCL_XTR_HDR, x)
++
++#define SYS_PORT_MODE_INJ_HDR_ERR                BIT(2)
++#define SYS_PORT_MODE_INJ_HDR_ERR_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_INJ_HDR_ERR, x)
++#define SYS_PORT_MODE_INJ_HDR_ERR_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_INJ_HDR_ERR, x)
++
++#define SYS_PORT_MODE_PAD_DIS                    BIT(1)
++#define SYS_PORT_MODE_PAD_DIS_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_PAD_DIS, x)
++#define SYS_PORT_MODE_PAD_DIS_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_PAD_DIS, x)
++
++#define SYS_PORT_MODE_RTAG_CLEAR                 BIT(0)
++#define SYS_PORT_MODE_RTAG_CLEAR_SET(x)\
++	FIELD_PREP(SYS_PORT_MODE_RTAG_CLEAR, x)
++#define SYS_PORT_MODE_RTAG_CLEAR_GET(x)\
++	FIELD_GET(SYS_PORT_MODE_RTAG_CLEAR, x)
++
++/*      SYS:SYSTEM:FRONT_PORT_MODE */
++#define SYS_FRONT_PORT_MODE(r)    __REG(TARGET_SYS,\
++					0, 1, 4160, 0, 1, 184, 92, r, 9, 4)
++
++#define SYS_FRONT_PORT_MODE_HDX_MODE             BIT(1)
++#define SYS_FRONT_PORT_MODE_HDX_MODE_SET(x)\
++	FIELD_PREP(SYS_FRONT_PORT_MODE_HDX_MODE, x)
++#define SYS_FRONT_PORT_MODE_HDX_MODE_GET(x)\
++	FIELD_GET(SYS_FRONT_PORT_MODE_HDX_MODE, x)
++
++#define SYS_FRONT_PORT_MODE_ADD_FRAG_SIZE        GENMASK(9, 8)
++#define SYS_FRONT_PORT_MODE_ADD_FRAG_SIZE_SET(x)\
++	FIELD_PREP(SYS_FRONT_PORT_MODE_ADD_FRAG_SIZE, x)
++#define SYS_FRONT_PORT_MODE_ADD_FRAG_SIZE_GET(x)\
++	FIELD_GET(SYS_FRONT_PORT_MODE_ADD_FRAG_SIZE, x)
++
++#define SYS_FRONT_PORT_MODE_DONT_WAIT_FOR_TS     BIT(0)
++#define SYS_FRONT_PORT_MODE_DONT_WAIT_FOR_TS_SET(x)\
++	FIELD_PREP(SYS_FRONT_PORT_MODE_DONT_WAIT_FOR_TS, x)
++#define SYS_FRONT_PORT_MODE_DONT_WAIT_FOR_TS_GET(x)\
++	FIELD_GET(SYS_FRONT_PORT_MODE_DONT_WAIT_FOR_TS, x)
++
++/*      SYS:SYSTEM:FRM_AGING */
++#define SYS_FRM_AGING             __REG(TARGET_SYS,\
++					0, 1, 4160, 0, 1, 184, 128, 0, 1, 4)
++
++#define SYS_FRM_AGING_AGE_TX_ENA                 BIT(20)
++#define SYS_FRM_AGING_AGE_TX_ENA_SET(x)\
++	FIELD_PREP(SYS_FRM_AGING_AGE_TX_ENA, x)
++#define SYS_FRM_AGING_AGE_TX_ENA_GET(x)\
++	FIELD_GET(SYS_FRM_AGING_AGE_TX_ENA, x)
++
++#define SYS_FRM_AGING_MAX_AGE                    GENMASK(19, 0)
++#define SYS_FRM_AGING_MAX_AGE_SET(x)\
++	FIELD_PREP(SYS_FRM_AGING_MAX_AGE, x)
++#define SYS_FRM_AGING_MAX_AGE_GET(x)\
++	FIELD_GET(SYS_FRM_AGING_MAX_AGE, x)
++
++/*      SYS:SYSTEM:STAT_CFG */
++#define SYS_STAT_CFG              __REG(TARGET_SYS,\
++					0, 1, 4160, 0, 1, 184, 132, 0, 1, 4)
++
++#define SYS_STAT_CFG_STAT_CLEAR_SHOT             GENMASK(16, 10)
++#define SYS_STAT_CFG_STAT_CLEAR_SHOT_SET(x)\
++	FIELD_PREP(SYS_STAT_CFG_STAT_CLEAR_SHOT, x)
++#define SYS_STAT_CFG_STAT_CLEAR_SHOT_GET(x)\
++	FIELD_GET(SYS_STAT_CFG_STAT_CLEAR_SHOT, x)
++
++#define SYS_STAT_CFG_STAT_VIEW                   GENMASK(9, 0)
++#define SYS_STAT_CFG_STAT_VIEW_SET(x)\
++	FIELD_PREP(SYS_STAT_CFG_STAT_VIEW, x)
++#define SYS_STAT_CFG_STAT_VIEW_GET(x)\
++	FIELD_GET(SYS_STAT_CFG_STAT_VIEW, x)
++
++/*      SYS:SYSTEM:SW_STATUS */
++#define SYS_SW_STATUS(r)          __REG(TARGET_SYS,\
++					0, 1, 4160, 0, 1, 184, 136, r, 10, 4)
++
++#define SYS_SW_STATUS_PORT_RX_PAUSED             BIT(0)
++#define SYS_SW_STATUS_PORT_RX_PAUSED_SET(x)\
++	FIELD_PREP(SYS_SW_STATUS_PORT_RX_PAUSED, x)
++#define SYS_SW_STATUS_PORT_RX_PAUSED_GET(x)\
++	FIELD_GET(SYS_SW_STATUS_PORT_RX_PAUSED, x)
++
++/*      SYS:PAUSE_CFG:PAUSE_CFG */
++#define SYS_PAUSE_CFG(r)          __REG(TARGET_SYS,\
++					0, 1, 4344, 0, 1, 124, 0, r, 10, 4)
++
++#define SYS_PAUSE_CFG_PAUSE_START                GENMASK(18, 10)
++#define SYS_PAUSE_CFG_PAUSE_START_SET(x)\
++	FIELD_PREP(SYS_PAUSE_CFG_PAUSE_START, x)
++#define SYS_PAUSE_CFG_PAUSE_START_GET(x)\
++	FIELD_GET(SYS_PAUSE_CFG_PAUSE_START, x)
++
++#define SYS_PAUSE_CFG_PAUSE_STOP                 GENMASK(9, 1)
++#define SYS_PAUSE_CFG_PAUSE_STOP_SET(x)\
++	FIELD_PREP(SYS_PAUSE_CFG_PAUSE_STOP, x)
++#define SYS_PAUSE_CFG_PAUSE_STOP_GET(x)\
++	FIELD_GET(SYS_PAUSE_CFG_PAUSE_STOP, x)
++
++#define SYS_PAUSE_CFG_PAUSE_ENA                  BIT(0)
++#define SYS_PAUSE_CFG_PAUSE_ENA_SET(x)\
++	FIELD_PREP(SYS_PAUSE_CFG_PAUSE_ENA, x)
++#define SYS_PAUSE_CFG_PAUSE_ENA_GET(x)\
++	FIELD_GET(SYS_PAUSE_CFG_PAUSE_ENA, x)
++
++/*      SYS:PAUSE_CFG:ATOP */
++#define SYS_ATOP(r)               __REG(TARGET_SYS,\
++					0, 1, 4344, 0, 1, 124, 44, r, 10, 4)
++
++#define SYS_ATOP_ATOP                            GENMASK(8, 0)
++#define SYS_ATOP_ATOP_SET(x)\
++	FIELD_PREP(SYS_ATOP_ATOP, x)
++#define SYS_ATOP_ATOP_GET(x)\
++	FIELD_GET(SYS_ATOP_ATOP, x)
++
++/*      SYS:PAUSE_CFG:ATOP_TOT_CFG */
++#define SYS_ATOP_TOT_CFG          __REG(TARGET_SYS,\
++					0, 1, 4344, 0, 1, 124, 84, 0, 1, 4)
++
++#define SYS_ATOP_TOT_CFG_ATOP_TOT                GENMASK(8, 0)
++#define SYS_ATOP_TOT_CFG_ATOP_TOT_SET(x)\
++	FIELD_PREP(SYS_ATOP_TOT_CFG_ATOP_TOT, x)
++#define SYS_ATOP_TOT_CFG_ATOP_TOT_GET(x)\
++	FIELD_GET(SYS_ATOP_TOT_CFG_ATOP_TOT, x)
++
++/*      SYS:PAUSE_CFG:MAC_FC_CFG */
++#define SYS_MAC_FC_CFG(r)         __REG(TARGET_SYS,\
++					0, 1, 4344, 0, 1, 124, 88, r, 9, 4)
++
++#define SYS_MAC_FC_CFG_FC_LINK_SPEED             GENMASK(27, 26)
++#define SYS_MAC_FC_CFG_FC_LINK_SPEED_SET(x)\
++	FIELD_PREP(SYS_MAC_FC_CFG_FC_LINK_SPEED, x)
++#define SYS_MAC_FC_CFG_FC_LINK_SPEED_GET(x)\
++	FIELD_GET(SYS_MAC_FC_CFG_FC_LINK_SPEED, x)
++
++#define SYS_MAC_FC_CFG_FC_LATENCY_CFG            GENMASK(25, 20)
++#define SYS_MAC_FC_CFG_FC_LATENCY_CFG_SET(x)\
++	FIELD_PREP(SYS_MAC_FC_CFG_FC_LATENCY_CFG, x)
++#define SYS_MAC_FC_CFG_FC_LATENCY_CFG_GET(x)\
++	FIELD_GET(SYS_MAC_FC_CFG_FC_LATENCY_CFG, x)
++
++#define SYS_MAC_FC_CFG_ZERO_PAUSE_ENA            BIT(18)
++#define SYS_MAC_FC_CFG_ZERO_PAUSE_ENA_SET(x)\
++	FIELD_PREP(SYS_MAC_FC_CFG_ZERO_PAUSE_ENA, x)
++#define SYS_MAC_FC_CFG_ZERO_PAUSE_ENA_GET(x)\
++	FIELD_GET(SYS_MAC_FC_CFG_ZERO_PAUSE_ENA, x)
++
++#define SYS_MAC_FC_CFG_TX_FC_ENA                 BIT(17)
++#define SYS_MAC_FC_CFG_TX_FC_ENA_SET(x)\
++	FIELD_PREP(SYS_MAC_FC_CFG_TX_FC_ENA, x)
++#define SYS_MAC_FC_CFG_TX_FC_ENA_GET(x)\
++	FIELD_GET(SYS_MAC_FC_CFG_TX_FC_ENA, x)
++
++#define SYS_MAC_FC_CFG_RX_FC_ENA                 BIT(16)
++#define SYS_MAC_FC_CFG_RX_FC_ENA_SET(x)\
++	FIELD_PREP(SYS_MAC_FC_CFG_RX_FC_ENA, x)
++#define SYS_MAC_FC_CFG_RX_FC_ENA_GET(x)\
++	FIELD_GET(SYS_MAC_FC_CFG_RX_FC_ENA, x)
++
++#define SYS_MAC_FC_CFG_PAUSE_VAL_CFG             GENMASK(15, 0)
++#define SYS_MAC_FC_CFG_PAUSE_VAL_CFG_SET(x)\
++	FIELD_PREP(SYS_MAC_FC_CFG_PAUSE_VAL_CFG, x)
++#define SYS_MAC_FC_CFG_PAUSE_VAL_CFG_GET(x)\
++	FIELD_GET(SYS_MAC_FC_CFG_PAUSE_VAL_CFG, x)
++
++/*      SYS:STAT:CNT */
++#define SYS_CNT(g)                __REG(TARGET_SYS,\
++					0, 1, 0, g, 896, 4, 0, 0, 1, 4)
++
++/*      SYS:RAM_CTRL:RAM_INIT */
++#define SYS_RAM_INIT              __REG(TARGET_SYS,\
++					0, 1, 4492, 0, 1, 4, 0, 0, 1, 4)
++
++#define SYS_RAM_INIT_RAM_TEST_OPT                GENMASK(4, 2)
++#define SYS_RAM_INIT_RAM_TEST_OPT_SET(x)\
++	FIELD_PREP(SYS_RAM_INIT_RAM_TEST_OPT, x)
++#define SYS_RAM_INIT_RAM_TEST_OPT_GET(x)\
++	FIELD_GET(SYS_RAM_INIT_RAM_TEST_OPT, x)
++
++#define SYS_RAM_INIT_RAM_INIT                    BIT(1)
++#define SYS_RAM_INIT_RAM_INIT_SET(x)\
++	FIELD_PREP(SYS_RAM_INIT_RAM_INIT, x)
++#define SYS_RAM_INIT_RAM_INIT_GET(x)\
++	FIELD_GET(SYS_RAM_INIT_RAM_INIT, x)
++
++#define SYS_RAM_INIT_RAM_CFG_HOOK                BIT(0)
++#define SYS_RAM_INIT_RAM_CFG_HOOK_SET(x)\
++	FIELD_PREP(SYS_RAM_INIT_RAM_CFG_HOOK, x)
++#define SYS_RAM_INIT_RAM_CFG_HOOK_GET(x)\
++	FIELD_GET(SYS_RAM_INIT_RAM_CFG_HOOK, x)
++
++/*      SYS:PTPPORT:PTP_RXDLY_CFG */
++#define SYS_PTP_RXDLY_CFG(g)      __REG(TARGET_SYS,\
++					0, 1, 4512, g, 11, 28, 8, 0, 1, 4)
++
++#define SYS_PTP_RXDLY_CFG_PTP_RX_IO_DLY          GENMASK(23, 0)
++#define SYS_PTP_RXDLY_CFG_PTP_RX_IO_DLY_SET(x)\
++	FIELD_PREP(SYS_PTP_RXDLY_CFG_PTP_RX_IO_DLY, x)
++#define SYS_PTP_RXDLY_CFG_PTP_RX_IO_DLY_GET(x)\
++	FIELD_GET(SYS_PTP_RXDLY_CFG_PTP_RX_IO_DLY, x)
++
++/*      SYS:PTPPORT:PTP_TXDLY_CFG */
++#define SYS_PTP_TXDLY_CFG(g)      __REG(TARGET_SYS,\
++					0, 1, 4512, g, 11, 28, 12, 0, 1, 4)
++
++#define SYS_PTP_TXDLY_CFG_PTP_TX_IO_DLY          GENMASK(23, 0)
++#define SYS_PTP_TXDLY_CFG_PTP_TX_IO_DLY_SET(x)\
++	FIELD_PREP(SYS_PTP_TXDLY_CFG_PTP_TX_IO_DLY, x)
++#define SYS_PTP_TXDLY_CFG_PTP_TX_IO_DLY_GET(x)\
++	FIELD_GET(SYS_PTP_TXDLY_CFG_PTP_TX_IO_DLY, x)
++
++#endif /* _LAN9645X_REGS_H_ */
+
 -- 
-2.47.3
+2.52.0
 
 
