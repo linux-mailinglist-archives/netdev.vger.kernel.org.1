@@ -1,84 +1,77 @@
-Return-Path: <netdev+bounces-294491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294492-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WZHSORSBH2o+mgAAu9opvQ
-	(envelope-from <netdev+bounces-294491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:19:16 +0200
+	id KEmjOVODH2q/mgAAu9opvQ
+	(envelope-from <netdev+bounces-294492-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:28:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89FD6633623
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:19:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B6E96336BB
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:28:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294491-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294491-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=iT4qpd3u;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294492-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294492-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8B3C930C40E7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:14:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63311301F799
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1590923EAB3;
-	Wed,  3 Jun 2026 01:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F37C34752F;
+	Wed,  3 Jun 2026 01:28:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9731EF09B;
-	Wed,  3 Jun 2026 01:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E172E7377;
+	Wed,  3 Jun 2026 01:28:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780449268; cv=none; b=UEjcXEFWSEhnz5gGyjEMNsQ0IC9uhdsxFjQbEbjBAqcgM1ddb1R4cOwA4QrQwgcyYO2gwFZnzrP4TiMfSrJQJlkDXndRt+W4zmUz0zPy4WXZG/1HXsk9qygerQoY8Bq04JXlNEl2ACmHUrPc1hY8BHK6QylFJSJYArl67mPd3b8=
+	t=1780450129; cv=none; b=ad6TiwKYxWqHauyzH/AW+Su0rip/Yg6XhnncHSD5UWuVbBVrKXjYLBu7hguIygDGhCK87ClArPh5krQ/xrV6ZQaJeoCYvLcNIgWkHwak/dAul1fvV4xJG1UZaL/75uhYmvhBU8GVENC3X8IjbA0t9CQwP7Z1ElxJyJl6tWFzTcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780449268; c=relaxed/simple;
-	bh=Y+SbZnvOY4DMnp2Isj68xNWBDizdK7mDS0Mm8JfSqC0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OBZvm7t/mR7702VGBCxE5NOwXi/3J2QFUprcnufuTfhklF+q8ZtocjBj1UOWliA8rt9wkOKl+BA2BEODpkJ9ss9omw0E4kA4RPaBTDbvEoiavEPnbPkG2VEaJLjIxAgXeTphpo+9vMkrDMlPw/DqwElMnMK7l8IDKJbibATRe4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-X-UUID: 8d534b485ee911f1aa26b74ffac11d73-20260603
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_C_CI
-	GTI_FG_IT, GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:0d694747-0911-46f5-b171-59a97b40f4e9,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:10
-X-CID-INFO: VERSION:1.3.12,REQID:0d694747-0911-46f5-b171-59a97b40f4e9,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:10
-X-CID-META: VersionHash:e7bac3a,CLOUDID:a5e38d7ed08b0984efdfcaa3d78922c6,BulkI
-	D:2606030914220HKU4ZBV,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
-	|865|898|915,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,
-	Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BR
-	R:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 8d534b485ee911f1aa26b74ffac11d73-20260603
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1496129554; Wed, 03 Jun 2026 09:14:21 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Paul Moore <paul@paul-moore.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-Subject: [net v3] netlabel: validate unlabeled address and mask attribute lengths
-Date: Wed,  3 Jun 2026 09:13:53 +0800
-Message-Id: <20260603011353.101776-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1780450129; c=relaxed/simple;
+	bh=dEGFOYjO4S1JkPj3GKMQH/aL0Vk5M8CzYuezgWewo1U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b0cErFDreDFfQU2pyXcHgIbNitq/BUq/huoQHL5J+2e1MYcI9Xb9nCUsoMMcFU6AAXGkMf2TSvxA9sYV8qRFUATx6NRxXT/SdykvJWjm6TXDZZpJlc8JyD38NWZt4u/tyQ2yy/1qmFI3HakoO+1mWCLVROJtVWcrEooIalA8ckA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iT4qpd3u; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 766821F00893;
+	Wed,  3 Jun 2026 01:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780450128;
+	bh=hWkDGQ/3/sU3GIemiXrKZ3F/RMQcnTg11+gRqtyKsSE=;
+	h=From:To:Cc:Subject:Date;
+	b=iT4qpd3uUjw7fyicosVo1rE3HKc1VyVupRYMom6rp401HNzopqFNyawExs22tlboG
+	 x6Xt6rcs28bjYup/cUr97Gxxac0BLeJgh5yTxwMLXvL0NGLrIa2DKipQJ/UWJBzQO2
+	 92E/yVbUmBlZAAuegce26uD3uxk+94OSGgaCbDf5L6vhi0y8tP+XjVJz2N5PsTyNOJ
+	 Wsl0V8YnnngiVqhlnWt1pplkgFP4YHsmLtT6lFMqtuxwSdiBqfWuh03dc4jR08xbyO
+	 Jr/cDO0pEQNX8pUqcoWV2D0VxXfopCWLSDrNqucU20XHyOcPtiyBvsTAydZ3AJfHgn
+	 dyHVFe+a2P2+w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	jakub@cloudflare.com,
+	maxime.chevallier@bootlin.com,
+	nb@tipi-net.de,
+	lee@kernel.org,
+	linux-leds@vger.kernel.org,
+	pavel@kernel.org,
+	jv@jvosburgh.net,
+	michael.chan@broadcom.com,
+	jhs@mojatatu.com,
+	vinicius.gomes@intel.com,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	hare@suse.de,
+	jhasan@marvell.com,
+	danieller@nvidia.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/11] net: ethtool: make sure __ethtool_get_link_ksettings() is ops-locked
+Date: Tue,  2 Jun 2026 18:28:29 -0700
+Message-ID: <20260603012840.2254293-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,122 +80,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294491-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[kylinos.cn];
-	FORGED_RECIPIENTS(0.00)[m:paul@paul-moore.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:zhaochenguang@kylinos.cn,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-security-module@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-294492-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:nb@tipi-net.de,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,kylinos.cn:mid,kylinos.cn:from_mime,kylinos.cn:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 89FD6633623
+X-Rspamd-Queue-Id: 5B6E96336BB
 
-netlbl_unlabel_addrinfo_get() used the address attribute length to
-determine whether the attribute data could be read as an IPv4 or IPv6
-address, but did not independently validate the corresponding mask
-attribute length.  A crafted Generic Netlink request could therefore
-provide a valid IPv4/IPv6 address attribute with a shorter mask
-attribute, which would later be read as a full struct in_addr or
-struct in6_addr.
+This is prep for the series which will make most of the ethtool ops
+run without rtnl_lock. The AI bots surfaced a number of callers of
+__ethtool_get_link_ksettings() which need fixing, so I decided to
+send that as a smaller prep-series. Each driver changed separately
+for ease of review.
 
-NLA_BINARY policy lengths are maximum lengths by default, so use
-NLA_POLICY_EXACT_LEN() for the unlabeled IPv4/IPv6 address and mask
-attributes.  This rejects short attributes during policy validation and
-also exposes the exact length requirements through policy introspection.
+Full series unlocking ethtool ops AKA v1:: 
+https://lore.kernel.org/20260528231637.251822-1-kuba@kernel.org
 
-Fixes: 8cc44579d1bd ("NetLabel: Introduce static network labels for unlabeled connections")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
-v3:
- Use NLA_POLICY_EXACT_LEN() as suggested by Jakub
+Jakub Kicinski (11):
+  net: rename netdev_ops_assert_locked()
+  net: ethtool: cmis_cdb: hold instance lock for ops locked devices
+  net: document NETDEV_CHANGENAME as ops locked
+  net: ethtool: add netif_get_link_ksettings() for correct ops-locked
+    use
+  net: bonding: don't recurse on the slave's netdev ops lock
+  net: team: don't recurse on the port's netdev ops lock
+  net: bridge: don't recurse on the port's netdev ops lock
+  net: sched: don't recurse on the netdev ops lock in qdiscs
+  leds: trigger: netdev: don't recurse on the netdev ops lock
+  scsi: fcoe: don't recurse on the netdev's ops lock
+  net: ethtool: make sure __ethtool_get_link_ksettings() is ops-locked
 
-v2:
- https://lore.kernel.org/all/20260528015913.190970-1-zhaochenguang@kylinos.cn/
+ Documentation/networking/netdevices.rst   |  1 +
+ include/linux/ethtool.h                   |  2 ++
+ include/net/netdev_lock.h                 | 12 ++++++--
+ drivers/leds/trigger/ledtrig-netdev.c     | 37 +++++++++++++----------
+ drivers/net/bonding/bond_main.c           | 21 ++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |  2 +-
+ drivers/net/team/team_core.c              |  4 ++-
+ drivers/scsi/bnx2fc/bnx2fc_fcoe.c         |  3 ++
+ drivers/scsi/fcoe/fcoe.c                  |  6 ++--
+ drivers/scsi/fcoe/fcoe_transport.c        |  4 ++-
+ net/bridge/br_if.c                        |  7 +++--
+ net/core/dev.c                            | 26 ++++++++--------
+ net/core/dev_addr_lists.c                 |  2 +-
+ net/core/link_watch.c                     |  2 +-
+ net/core/lock_debug.c                     |  3 +-
+ net/core/netdev_queues.c                  |  2 +-
+ net/ethtool/cmis_cdb.c                    |  3 ++
+ net/ethtool/cmis_fw_update.c              |  8 ++---
+ net/ethtool/ioctl.c                       | 21 +++++++++++--
+ net/ethtool/linkinfo.c                    |  4 +--
+ net/ethtool/linkmodes.c                   |  4 +--
+ net/ethtool/module.c                      |  2 ++
+ net/ethtool/netlink.c                     |  4 +--
+ net/ipv6/addrconf.c                       |  2 +-
+ net/sched/sch_cbs.c                       |  2 +-
+ net/sched/sch_taprio.c                    |  2 +-
+ net/xdp/xsk_buff_pool.c                   |  2 +-
+ 27 files changed, 121 insertions(+), 67 deletions(-)
 
-v1:
- https://lore.kernel.org/all/20260522054521.1169755-1-zhaochenguang@kylinos.cn/
----
- net/netlabel/netlabel_unlabeled.c | 30 ++++++++++--------------------
- 1 file changed, 10 insertions(+), 20 deletions(-)
-
-diff --git a/net/netlabel/netlabel_unlabeled.c b/net/netlabel/netlabel_unlabeled.c
-index ca7a9e2a3de7..870e7699326a 100644
---- a/net/netlabel/netlabel_unlabeled.c
-+++ b/net/netlabel/netlabel_unlabeled.c
-@@ -114,14 +114,14 @@ static struct genl_family netlbl_unlabel_gnl_family;
- /* NetLabel Netlink attribute policy */
- static const struct nla_policy netlbl_unlabel_genl_policy[NLBL_UNLABEL_A_MAX + 1] = {
- 	[NLBL_UNLABEL_A_ACPTFLG] = { .type = NLA_U8 },
--	[NLBL_UNLABEL_A_IPV6ADDR] = { .type = NLA_BINARY,
--				      .len = sizeof(struct in6_addr) },
--	[NLBL_UNLABEL_A_IPV6MASK] = { .type = NLA_BINARY,
--				      .len = sizeof(struct in6_addr) },
--	[NLBL_UNLABEL_A_IPV4ADDR] = { .type = NLA_BINARY,
--				      .len = sizeof(struct in_addr) },
--	[NLBL_UNLABEL_A_IPV4MASK] = { .type = NLA_BINARY,
--				      .len = sizeof(struct in_addr) },
-+	[NLBL_UNLABEL_A_IPV6ADDR] =
-+		NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
-+	[NLBL_UNLABEL_A_IPV6MASK] =
-+		NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
-+	[NLBL_UNLABEL_A_IPV4ADDR] =
-+		NLA_POLICY_EXACT_LEN(sizeof(struct in_addr)),
-+	[NLBL_UNLABEL_A_IPV4MASK] =
-+		NLA_POLICY_EXACT_LEN(sizeof(struct in_addr)),
- 	[NLBL_UNLABEL_A_IFACE] = { .type = NLA_NUL_STRING,
- 				   .len = IFNAMSIZ - 1 },
- 	[NLBL_UNLABEL_A_SECCTX] = { .type = NLA_BINARY }
-@@ -757,24 +757,14 @@ static int netlbl_unlabel_addrinfo_get(struct genl_info *info,
- 				       void **mask,
- 				       u32 *len)
- {
--	u32 addr_len;
--
- 	if (info->attrs[NLBL_UNLABEL_A_IPV4ADDR] &&
- 	    info->attrs[NLBL_UNLABEL_A_IPV4MASK]) {
--		addr_len = nla_len(info->attrs[NLBL_UNLABEL_A_IPV4ADDR]);
--		if (addr_len != sizeof(struct in_addr) &&
--		    addr_len != nla_len(info->attrs[NLBL_UNLABEL_A_IPV4MASK]))
--			return -EINVAL;
--		*len = addr_len;
-+		*len = sizeof(struct in_addr);
- 		*addr = nla_data(info->attrs[NLBL_UNLABEL_A_IPV4ADDR]);
- 		*mask = nla_data(info->attrs[NLBL_UNLABEL_A_IPV4MASK]);
- 		return 0;
- 	} else if (info->attrs[NLBL_UNLABEL_A_IPV6ADDR]) {
--		addr_len = nla_len(info->attrs[NLBL_UNLABEL_A_IPV6ADDR]);
--		if (addr_len != sizeof(struct in6_addr) &&
--		    addr_len != nla_len(info->attrs[NLBL_UNLABEL_A_IPV6MASK]))
--			return -EINVAL;
--		*len = addr_len;
-+		*len = sizeof(struct in6_addr);
- 		*addr = nla_data(info->attrs[NLBL_UNLABEL_A_IPV6ADDR]);
- 		*mask = nla_data(info->attrs[NLBL_UNLABEL_A_IPV6MASK]);
- 		return 0;
 -- 
-2.25.1
+2.54.0
 
 
