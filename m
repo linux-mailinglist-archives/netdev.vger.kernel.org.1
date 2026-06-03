@@ -1,66 +1,80 @@
-Return-Path: <netdev+bounces-294807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kpU9FX1NIGq/0gAAu9opvQ
-	(envelope-from <netdev+bounces-294807-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:51:25 +0200
+	id etD4LUdOIGrx0gAAu9opvQ
+	(envelope-from <netdev+bounces-294808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:54:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E562C6396BB
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:51:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 081FC63974B
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:54:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="V3/Fc7aG";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294807-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294807-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=IlenalyA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294808-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294808-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1044832E702E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 15:14:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 263D833150FB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 15:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD063CBE7C;
-	Wed,  3 Jun 2026 15:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E133CCFCA;
+	Wed,  3 Jun 2026 15:14:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458BA3AB27D;
-	Wed,  3 Jun 2026 15:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE443AD52B;
+	Wed,  3 Jun 2026 15:14:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780499672; cv=none; b=fKbnjTwbub7H4vxZsY/Cni6Ui2jhrdE8X6+yZWoAkOQbMyaMvV7T9wW4XEN29Th3FfOE7O4LqAr0RvcThY7Km1GfurLnUd12psn8j70/AkX/EKc2YjTYCfOdeuTRRieMCoQQ24pFx4/h6ZfAVnE0lmLsJnEfZ5kTnXCqhYX1NFk=
+	t=1780499687; cv=none; b=cbLF+O3D4RHf1Hb1/CO8HYy96XI8hI5quwVnpfNlkonIn/vBsBZ2yhnJsi3tPW/m2SPvML8cK8VtK6G9WnPG3FrVQ1/7u0YeaxsRhnyYMKXcKVEhkJTfTFxSnFrtcLm49l3V9s+CqMSvGgt6Ki857TMEfMCv/rGzRPRIgtKICEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780499672; c=relaxed/simple;
-	bh=9dx/cPeeS3EZyWVUhZm9JNLLMe4HXCD0yvK9G8YhFxw=;
+	s=arc-20240116; t=1780499687; c=relaxed/simple;
+	bh=sfJFFRIt7ZtI5VSlY/vt/ttfsmf0TZHVo6bPhf4KChg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NoVp9RbUWm+dBO/DtZ19dELUc+IaGstcCBHxFcM03yuqYVdvPupg+ttQt0ZAqM3eXu3z08Y4pJ+lEF2E5SBNqPJSEWI9P6PHPV2IR4uLuh93nZIfmfknNxjoDPNi15g456u2n6AFpGbBk92bAVSEfPlFt6wLMBeDnqhldWzH/kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3/Fc7aG; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 337851F0089E;
-	Wed,  3 Jun 2026 15:14:30 +0000 (UTC)
+	 MIME-Version; b=WU3La+ykwNB1DOJHqXI2M64gOSeO8yTgL3VlWO3ZjRHbS2XEeOLUxtQYXxg0klwzVrSyJ4XsKkIsK9dOzXo6K/cib16T+jePKGyJzsdWQL3oZ/RVnDG+7oNuAteDVznUSklSwn2KFPFu8/3bddGl/pY5iSTxVa66MdYtp05nEVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IlenalyA; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D741F00898;
+	Wed,  3 Jun 2026 15:14:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780499671;
-	bh=BnZk5HC+TBlXGYAKvZD89rVJdXlgoZdSOfldLPIJKAs=;
+	s=k20260515; t=1780499686;
+	bh=q8gVi/KLN4RUu/hl2nIvT0jYawQsD47v53vKakKU8zE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=V3/Fc7aGm9iTl9uSs6ODzNOGMCPDzXlhJkq7xv0LXjQ61T2qttWEBu8IFFIAwemDr
-	 2jnM6ow2EiXNqNK18/K7Amk46TIzH8t93us8Ny7hH01THglO1fpKRM1In21AMB4Id1
-	 7jrTGtr1b1TPZcmDk4p3cRGeISJoSnGSUVUTLKjcIHr9mW+6hiOxtCgbJQTSChtzdV
-	 sMhhCf5Wr6A06Sn3C1kftXKJoK6t4025ice1WChfwgtqnr38nnR75DnJKI4RSI/rA2
-	 Px7QdZdeHo48Kq1xrRwQCsN5BkTLjmC9fzDh57LMrsR5g/i0FNUJLsi6/hcF7ymp87
-	 sYR0/e6OA0rQg==
+	b=IlenalyAI25X2pwHqJJ8/93TFOIjYZTFa05KP0tQul4B6AoYQ3L4kvq3L+PMWCJK8
+	 np0v8vEvaImhcIi/tfzMYPpeQlNAiSPTjUH79S/BY9XNdBParsdx8DvV+a/RtrVovz
+	 STm7FiJZCm+lXenwzyUVmPKXRJCzPiWDS3ug/dGt5u5h/NI5ZnjvN+aYOWIg3wgEjQ
+	 YGtP0vVDtMsK+aNsxD3d1m8IOv2GA//pgKte7JyuTy4mCo3TnmVP4EZ6rrjCP1W7gL
+	 mId5vdfmnudQsqDqSfvvmIUVZjEfhhvaPLvRzFAk01Da9xfwX2mN/CUNSQB9X6b3jR
+	 7hEywtPZwtTpw==
 From: Sasha Levin <sashal@kernel.org>
-To: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
+To: stable@vger.kernel.org,
+	Duoming Zhou <duoming@zju.edu.cn>
 Cc: Sasha Levin <sashal@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Arend van Spriel <arend.vanspriel@broadcom.com>,
+	Franky Lin <franky.lin@broadcom.com>,
+	Hante Meuleman <hante.meuleman@broadcom.com>,
+	Chi-hsien Lin <chi-hsien.lin@infineon.com>,
+	Wright Feng <wright.feng@infineon.com>,
+	Chung-hsien Hsu <chung-hsien.hsu@infineon.com>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?UTF-8?q?Jo=C3=ABl=20ESPONDE?= <joel.esponde@leroy-agon.com>
-Subject: Re: [PATCH 6.12.y] net: phy: micrel: fix LAN8814 QSGMII soft reset
-Date: Wed,  3 Jun 2026 11:13:56 -0400
-Message-ID: <20260603105137.lan8814-qsgmii@kernel.org>
+	Piotr Haber <phaber@broadcom.com>,
+	"John W . Linville" <linville@tuxdriver.com>,
+	Pieter-Paul Giesberts <pieterpg@broadcom.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	linux-wireless@vger.kernel.org,
+	brcm80211-dev-list.pdl@broadcom.com,
+	SHA-cyfmac-dev-list@infineon.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5.15.y] wifi: brcmfmac: fix use-after-free when rescheduling brcmf_btcoex_info work
+Date: Wed,  3 Jun 2026 11:14:10 -0400
+Message-ID: <20260603111500.item035@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <7b95f12f-aac6-47bb-ab9f-eab98b3911fd@leroy-agon.com>
-References: <7b95f12f-aac6-47bb-ab9f-eab98b3911fd@leroy-agon.com>
+In-Reply-To: <20260528055431.4124445-1-rob_garcia@163.com>
+References: <20260528055431.4124445-1-rob_garcia@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,43 +87,40 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294807-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:gregkh@linuxfoundation.org,m:stable@vger.kernel.org,m:sashal@kernel.org,m:netdev@vger.kernel.org,m:robert.marko@sartura.hr,m:kuba@kernel.org,m:horatiu.vultur@microchip.com,m:joel.esponde@leroy-agon.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294808-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,intel.com,broadcom.com,infineon.com,codeaurora.org,davemloft.net,tuxdriver.com,163.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:duoming@zju.edu.cn,m:sashal@kernel.org,m:johannes.berg@intel.com,m:arend.vanspriel@broadcom.com,m:franky.lin@broadcom.com,m:hante.meuleman@broadcom.com,m:chi-hsien.lin@infineon.com,m:wright.feng@infineon.com,m:chung-hsien.hsu@infineon.com,m:kvalo@codeaurora.org,m:davem@davemloft.net,m:kuba@kernel.org,m:phaber@broadcom.com,m:linville@tuxdriver.com,m:pieterpg@broadcom.com,m:rob_garcia@163.com,m:linux-wireless@vger.kernel.org,m:brcm80211-dev-list.pdl@broadcom.com,m:SHA-cyfmac-dev-list@infineon.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	SINGLE_SHORT_PART(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E562C6396BB
+X-Rspamd-Queue-Id: 081FC63974B
 
-> [PATCH 6.12.y] net: phy: micrel: fix LAN8814 QSGMII soft reset
-> [ Upstream commit e027c218c482c6a0ae1948129ccda3b0a2033368 ]
-
-Thanks. This doesn't apply to 6.12.y as submitted: the hunk depends on
-feature commit 19f1d6c7230b7d, which isn't present in 6.12.y.
+Queued for 5.15.y, thanks.
 
 -- 
 Thanks,
