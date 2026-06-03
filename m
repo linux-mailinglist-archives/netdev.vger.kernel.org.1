@@ -1,250 +1,316 @@
-Return-Path: <netdev+bounces-294527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294529-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CQIIAP2UH2q6nQAAu9opvQ
-	(envelope-from <netdev+bounces-294527-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:44:13 +0200
+	id r0PcLLCVH2rZnQAAu9opvQ
+	(envelope-from <netdev+bounces-294529-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:47:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5523B633B17
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:44:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 135B9633B48
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:47:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=cPkotrSr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294527-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294527-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294529-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294529-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4931307E9BD
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:42:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D626302712F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A353DC862;
-	Wed,  3 Jun 2026 02:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD46C384CCB;
+	Wed,  3 Jun 2026 02:46:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4BB3D6CDC
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 02:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5143EA66
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 02:46:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780454572; cv=none; b=Q+AX9svLHc+4kXcyzS/qwBbClPAJ59uUq2cJeRLBws90NpJrNK19ZqVuIBvAivh+kb/yEhTetBFiIUVQrHsxHr2m61obH/Pk6WsiojzczOQorboe1m46FeiyFHY9Vz9mnntK8N8Q42ccoTv62AOU/4uMagQb1ntMEH7yRNvsOFI=
+	t=1780454791; cv=none; b=KXlBeNBTfx73gNBWVjetVUlGgaMXEZfksFB5IqDrD9g2/kPvDZ8wyBwANROqi4kb62flXw14mUVwsS5IUbBqRRLBE5godEld8t5jJqBU2pS8L+dUr/qtfl3LUKn/Pjg2d/gnh5Jwuz3Pw5JkmcWTwpMygW7B+VjoXSUlfFOjvl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780454572; c=relaxed/simple;
-	bh=nk/5cRH+23kz3i5YCQ7JAJlTZAP5X4KP84ML8CoQwkk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JGH929AYK7gKNHNxvLzRGiyUGaA5hNRNmT/iEcEI03qCqo0gyT7KIP4oPAkhbPS2pb99da5flkFUUgLFbloMQ+uuXmVeUMhrFbTngADQ7wah8Crl8zT+KHeEhxOwHaizPntj/ulNOyHi1s1AX8sQn6FsO854mQ2tIjXvp02XWH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cPkotrSr; arc=none smtp.client-ip=209.85.216.50
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-36b9b15af73so5604964a91.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 19:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780454569; x=1781059369; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E9hGJ6zw7Uq6VFdPGEv6WZhGo5EeVEyFBc1oHCLMzjg=;
-        b=cPkotrSrblMJg0VkQemG1yM2SrRRSvFa+7n8iSeIxGrPCMgj62Uuj72kSg1OFZzBeq
-         IumtKeQv/zTHcpYKw++cSnMf0RpvfXNG+joFWQjxdTjYjloF077c7UtWPlqCFjZKQ4eA
-         FLR1otwhA0yheoKSFmmLsiXEFDJcecELOcSbFZ2HKMR16CyhEOadW5IsIChyATVRVLJB
-         DqnhDJvR74EbpSe7f/Nt3GMJNwRj5s6WHei/NSq1iGuBn+souh125mbFDFAxjmx9Ybk0
-         BnAnoXYXAgyGNVl9Ma07eMJKOm60J/+m1jsakIRMwsyOVuwR9ItuQnnAHqxFSWTinCpk
-         xjcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780454569; x=1781059369;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E9hGJ6zw7Uq6VFdPGEv6WZhGo5EeVEyFBc1oHCLMzjg=;
-        b=lxsLvL6QPdThUA0VNOIJNjvs8guiL46QovYh5n9gl3JoDhc7LbWASxwZMGfz/UBGqt
-         PsW3J15K0IyQkqDVd+IdE5mDfbDW5vTRb+OeIkQ1Ul3aufQ77XFlg8mVbGvw6VrzPRyr
-         M7yigFi2w4nBY+Mv0vBO5YMx+AExMRMrlnD9prewOszjpqL3c9u5tAZmOxhwIsfBG380
-         HNEzj/0Fq0E7tkkdC5xH3rnz+Tpt/yKDWUrhgLOhhiq0JNBVgkhE47Bc3y8pofmnJzA7
-         KD0LHstAXIp/8NE3W1pLhAf+hH64QaL/qG8r1b8HXJjKZ3Zmveb9Kw0Vj7SJ5/YAxjdg
-         h+mw==
-X-Gm-Message-State: AOJu0YzpCdYmzCJkybUXPL71dSR+KiMlNFbJqC7IdUmtz6OaarFd+b+o
-	KhZhm5IcXO0h4Lv+0r77a455OPB2KZnQR2C/kwZ8AF4w/H5VhPYhKiUJiNvgiGQK
-X-Gm-Gg: Acq92OEeldWXAIACVyfiq6q2qvWlWjKN1kpbTMmmDQElhr9LipS0NODgadWggpEhJHg
-	7RA08/rygL5RbUCCq5MyPUrvP3F69gXamgBWoSG8BJryu3Fkt0GrVz8+Lp/pc+fJd7FmkWxBZ6F
-	yp6mg+iiPtGOv/0LYnaW5XjpBSbMyRWoy6+wqz8ILkgzTZZjCpfZq8EJfiWPOACV+cZZnkUsW60
-	IJcSF98ymQIhzTx6m+Noj8rb/OuM3cKoOlJBpTT+oOTsuE6uzWDV5h/nsbmIphn1ClYhQJxAgdu
-	GgkHpESIsNyUFRxInhzCXpW7ab0k2gT+C+xmHVzLqu9eSjYOcqMH2U6xjss7BWZiotw+YHud8s/
-	WxDn1F205cQvU25/6C3bWtv92kE4YR6cLLhYCUjgtCGmvEXt5WSNACeDbzq+apdspP84IvdxGQs
-	ZHJ8+B+XDLZIjZezhvSlOgWluI6wThJk63a4A/Kb8BXcZ1931RjBgXUEIV+U2g
-X-Received: by 2002:a17:90b:560c:b0:36d:bc0d:f78c with SMTP id 98e67ed59e1d1-36e34292d97mr1367654a91.21.1780454569452;
-        Tue, 02 Jun 2026 19:42:49 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([2a09:bac5:661b:3046::4cf:38])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36e6e9be5f2sm164384a91.4.2026.06.02.19.42.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 19:42:49 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: dsa: felix: validate switch in .netdev_to_port() conversion
-Date: Wed,  3 Jun 2026 10:42:30 +0800
-Message-ID: <20260603024234.66603-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1780454791; c=relaxed/simple;
+	bh=EKkZ9NgeWytPsAiYzn2nCZ/RZY092F6evb083BOCwxM=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lJYNbxUCV5qwSrPpeUfoh1RlyVOQbh9grkIrcynXvipJCKkKdSk3PItlzEZaLmINRZA4mIIpXoT2IcEs0xoKZjV2MrbaREOahFt+QVAUmLV0YP2hZaKpquQyw4i9OxEhSZ8rWrHu1DVSMifBTtZQYEmSGRLKq+75bqJZsctIt5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
+X-QQ-mid:Yeas5t1780454715t664t06745
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.207.111])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 1858584479734954077
+To: "'Larysa Zaremba'" <larysa.zaremba@intel.com>
+Cc: <netdev@vger.kernel.org>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Simon Horman'" <horms@kernel.org>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Ingo Molnar'" <mingo@kernel.org>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Johannes Berg'" <johannes@sipsolutions.net>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
+	<netdev@vger.kernel.org>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Simon Horman'" <horms@kernel.org>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Ingo Molnar'" <mingo@kernel.org>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Johannes Berg'" <johannes@sipsolutions.net>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>
+References: <20260601072221.2952-1-jiawenwu@trustnetic.com> <20260601072221.2952-5-jiawenwu@trustnetic.com> <ah67geY9bPEbSKkX@soc-5CG4396X81.clients.intel.com>
+In-Reply-To: <ah67geY9bPEbSKkX@soc-5CG4396X81.clients.intel.com>
+Subject: RE: [PATCH net-next v4 4/5] net: wangxun: introduce soft quiesce callbacks for AER recovery
+Date: Wed, 3 Jun 2026 10:45:14 +0800
+Message-ID: <095901dcf303$016303f0$04290bd0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQEmZmPiFxLXVQw6wm5cjAUm9/PfJgGkmD0MAfjSC2G3fEh1EA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: N879q09ZcJuCCCE/2OM2Kd7sr2zLImBBhvcd/4twOBFOaD1zSodKJvkg
+	2eLnO6qjNIRoTOwCxmC1/l6cmf9WDKIOqZSJHMhUseAOWRbwbBTzkaPcS4xoiGvKo0PptCu
+	BqLLFgKyV1jj85gpbPVfV3C0aMyz4CJTl8Z4jmxkJrrc9cZydj4i+HKSb9k7APjomwJRzhV
+	rb5JvklotZDCURUO7WVbBAn3wvZ3nFiLOC0wRqjQ/nU7KL4VioTkpInhmRsRa3bKzwo1+VS
+	2w1+NMfvDydI6pfzBdAbNfHAL9BK3KlEUWDFBfuzz9fJHrxvisZBsPOCm/TPXHPTf2wNqrD
+	kHu2GUYrJmzrmykityz/b0AB688ryFlXJ1qQF3mA8T4oryGaDOa/yKU8w0ce2R/MM14PidK
+	GzW9utnutDHuc7aMxGguMBPgGjzm9KurRz3tqrwfE9rhhazlWi5FzwL3H/pORUFO7X6icCK
+	9ctD0VgIey3nT3Vwo0SRdEPc4jAeOQmwv6cEEbvxVHpp1fnciMvuhB/ev1eQVt8vb/Vq7KQ
+	FUeGFQMpJbwodgNSu1eBcoZng3VZ+2sICeujjZ0Sip8m135sR7IPIJDgux5ZmBTdFLoGxol
+	KDhFOUvAT0EKdC75Kfbd/pLi5JTb4yYRitpDLRyIN5NRRYunYjohqPJxWYtOQMdvF/mwzjl
+	uPGbisk2bX/S0+vw1ao1snOoLYwIVqnFYj9u84Zk6qulBpRGYDfTiMQII3PJI6sY+mjoGH/
+	w4xhLzX4UTOxo19jfeVCmZNwTtRUs2l3AgahThY3XEWsCPSZ42V9mOuvEXFo8QlzVIAkmXh
+	soLcxvuHLHVmracTmKYW8EluRelUAuxji9pRAnWyHnUW7lcSGL8qQ215cAIspr8CbaqyxCJ
+	SdBx2vCBAWmzEJLCAB3gca9sqgbn4r5AvoQ8e78MdDHUHsxb2zQgEWm+JRHT880yDjZU+AQ
+	2MunmrIQTPtU7BXJOWqpfGn9MJFUODbO9RlQuszwblSzHdeMclmNyomoqlbQn6KwtEhCZc/
+	i2xIObaKtk3D3w02mkcvddgt+mytq7g1UpXmUiLdFEA7WlYMzKjrtPC1OEDN1wJJkjXbeL8
+	g==
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,nxp.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294527-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:larysa.zaremba@intel.com,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:mingo@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:aleksandr.loktionov@intel.com,m:u.kleine-koenig@baylibre.com,m:johannes@sipsolutions.net,m:fabio.baltieri@gmail.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mmyangfl@gmail.com,m:vladimir.oltean@nxp.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	TAGGED_FROM(0.00)[bounces-294529-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trustnetic.com:mid,trustnetic.com:from_mime,trustnetic.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5523B633B17
+X-Rspamd-Queue-Id: 135B9633B48
 
-felix_netdev_to_port() uses dsa_port_from_netdev() without checking
-whether the resulting dsa_port actually belongs to the switch being
-operated on. The port index is then consumed by flower rule parsing,
-silently resolving to a wrong port on the local hardware.
+On Tue, Jun 2, 2026 7:16 PM, Larysa Zaremba wrote:
+> On Mon, Jun 01, 2026 at 03:22:20PM +0800, Jiawen Wu wrote:
+> > Introduce device-specific soft quiesce callbacks for ngbe and txgbe to
+> > provide a lightweight shutdown path during PCI error recovery. It avoids
+> > MMIO-dependent operations in PCI error status, for the later
+> > implementation of PCIe error callback function in libwx.
+> >
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > ---
+> >  drivers/net/ethernet/wangxun/libwx/wx_type.h  |  1 +
+> >  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 23 +++++++++++++++++++
+> >  .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 22 ++++++++++++++++++
+> >  3 files changed, 46 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> > index a8b4e84787f4..1b25a52188f7 100644
+> > --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> > @@ -1409,6 +1409,7 @@ struct wx {
+> >  	void (*configure_fdir)(struct wx *wx);
+> >  	int (*setup_tc)(struct net_device *netdev, u8 tc);
+> >  	void (*do_reset)(struct net_device *netdev, bool reinit);
+> > +	void (*soft_quiesce)(struct wx *wx);
+> >  	int (*ptp_setup_sdp)(struct wx *wx);
+> >  	void (*set_num_queues)(struct wx *wx);
+> >
+> > diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> > index 3dc8342dd3a7..2484d3177034 100644
+> > --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> > +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> > @@ -47,6 +47,28 @@ static const struct pci_device_id ngbe_pci_tbl[] = {
+> >  	{ }
+> >  };
+> >
+> > +static void ngbe_soft_quiesce(struct wx *wx)
+> > +{
+> > +	if (test_and_set_bit(WX_STATE_DOWN, wx->state))
+> > +		return;
+> 
+> Careful about reusing the same flags for different reinit processes.
 
-Add a dp->ds mismatch check and adjust struct ocelot_ops accordingly.
+I think WX_STATE_DOWN should be used here.
+The soft_quiesce calls back only in pcie error handler when netif is running.
+It is desired to implement all software quiesce on the device close path.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/dsa/ocelot/felix.c            | 6 ++++--
- drivers/net/dsa/ocelot/felix.h            | 2 +-
- drivers/net/ethernet/mscc/ocelot.h        | 2 +-
- drivers/net/ethernet/mscc/ocelot_flower.c | 4 ++--
- drivers/net/ethernet/mscc/ocelot_net.c    | 2 +-
- include/soc/mscc/ocelot.h                 | 2 +-
- 6 files changed, 10 insertions(+), 8 deletions(-)
+> 
+> > +
+> > +	wx_ptp_stop(wx);
+> > +	phylink_stop(wx->phylink);
+> > +	pci_clear_master(wx->pdev);
+> > +	wx_napi_disable_all(wx);
+> 
+> Sashiko says:
+> 
+>  "If NAPI is not disabled yet, the NAPI poll routine wx_clean_tx_irq() can run
+>   concurrently. If WX_STATE_PTP_TX_IN_PROGRESS is set, wx_clean_tx_irq() might
+>   call ptp_schedule_worker(), leading to a dereference of the ptp_clock
+>   object just as it's being freed."
+> 
+> I am not sure, if such race actually happens, but stopping napi before any kind
+> of deinit is not a terrible idea.
 
-diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-index 4272ea6e9ca8..84a95007825f 100644
---- a/drivers/net/dsa/ocelot/felix.c
-+++ b/drivers/net/dsa/ocelot/felix.c
-@@ -2446,12 +2446,14 @@ struct net_device *felix_port_to_netdev(struct ocelot *ocelot, int port)
- }
- EXPORT_SYMBOL_GPL(felix_port_to_netdev);
- 
--int felix_netdev_to_port(struct net_device *dev)
-+int felix_netdev_to_port(struct ocelot *ocelot, struct net_device *dev)
- {
-+	struct felix *felix = ocelot_to_felix(ocelot);
-+	struct dsa_switch *ds = felix->ds;
- 	struct dsa_port *dp;
- 
- 	dp = dsa_port_from_netdev(dev);
--	if (IS_ERR(dp))
-+	if (IS_ERR(dp) || dp->ds != ds)
- 		return -EINVAL;
- 
- 	return dp->index;
-diff --git a/drivers/net/dsa/ocelot/felix.h b/drivers/net/dsa/ocelot/felix.h
-index a657b190c5d7..19addcfd62be 100644
---- a/drivers/net/dsa/ocelot/felix.h
-+++ b/drivers/net/dsa/ocelot/felix.h
-@@ -104,6 +104,6 @@ int felix_register_switch(struct device *dev, resource_size_t switch_base,
- 			  enum dsa_tag_protocol init_tag_proto,
- 			  const struct felix_info *info);
- struct net_device *felix_port_to_netdev(struct ocelot *ocelot, int port);
--int felix_netdev_to_port(struct net_device *dev);
-+int felix_netdev_to_port(struct ocelot *ocelot, struct net_device *dev);
- 
- #endif
-diff --git a/drivers/net/ethernet/mscc/ocelot.h b/drivers/net/ethernet/mscc/ocelot.h
-index e50be508c166..42d2c456f712 100644
---- a/drivers/net/ethernet/mscc/ocelot.h
-+++ b/drivers/net/ethernet/mscc/ocelot.h
-@@ -92,7 +92,7 @@ int ocelot_mact_learn(struct ocelot *ocelot, int port,
- int ocelot_mact_forget(struct ocelot *ocelot,
- 		       const unsigned char mac[ETH_ALEN], unsigned int vid);
- struct net_device *ocelot_port_to_netdev(struct ocelot *ocelot, int port);
--int ocelot_netdev_to_port(struct net_device *dev);
-+int ocelot_netdev_to_port(struct ocelot *ocelot, struct net_device *dev);
- 
- int ocelot_probe_port(struct ocelot *ocelot, int port, struct regmap *target,
- 		      struct device_node *portnp);
-diff --git a/drivers/net/ethernet/mscc/ocelot_flower.c b/drivers/net/ethernet/mscc/ocelot_flower.c
-index 844292eb7422..0c3aa61c1413 100644
---- a/drivers/net/ethernet/mscc/ocelot_flower.c
-+++ b/drivers/net/ethernet/mscc/ocelot_flower.c
-@@ -234,7 +234,7 @@ ocelot_flower_parse_egress_port(struct ocelot *ocelot, struct flow_cls_offload *
- 				struct netlink_ext_ack *extack)
- {
- 	const char *act_string = mirror ? "mirror" : "redirect";
--	int egress_port = ocelot->ops->netdev_to_port(a->dev);
-+	int egress_port = ocelot->ops->netdev_to_port(ocelot, a->dev);
- 	enum flow_action_id offloadable_act_id;
- 
- 	offloadable_act_id = mirror ? FLOW_ACTION_MIRRED : FLOW_ACTION_REDIRECT;
-@@ -580,7 +580,7 @@ static int ocelot_flower_parse_indev(struct ocelot *ocelot, int port,
- 		return -ENOENT;
- 	}
- 
--	ingress_port = ocelot->ops->netdev_to_port(indev);
-+	ingress_port = ocelot->ops->netdev_to_port(ocelot, indev);
- 	if (ingress_port < 0) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Can only offload an ocelot ingress port");
-diff --git a/drivers/net/ethernet/mscc/ocelot_net.c b/drivers/net/ethernet/mscc/ocelot_net.c
-index 1b8269320464..d2e96d065dc4 100644
---- a/drivers/net/ethernet/mscc/ocelot_net.c
-+++ b/drivers/net/ethernet/mscc/ocelot_net.c
-@@ -984,7 +984,7 @@ static bool ocelot_netdevice_dev_check(const struct net_device *dev)
- 	return dev->netdev_ops == &ocelot_port_netdev_ops;
- }
- 
--int ocelot_netdev_to_port(struct net_device *dev)
-+int ocelot_netdev_to_port(struct ocelot *ocelot, struct net_device *dev)
- {
- 	struct ocelot_port_private *priv;
- 
-diff --git a/include/soc/mscc/ocelot.h b/include/soc/mscc/ocelot.h
-index 48d6deb3efd7..05a8191b148e 100644
---- a/include/soc/mscc/ocelot.h
-+++ b/include/soc/mscc/ocelot.h
-@@ -650,7 +650,7 @@ struct device_node;
- 
- struct ocelot_ops {
- 	struct net_device *(*port_to_netdev)(struct ocelot *ocelot, int port);
--	int (*netdev_to_port)(struct net_device *dev);
-+	int (*netdev_to_port)(struct ocelot *ocelot, struct net_device *dev);
- 	int (*reset)(struct ocelot *ocelot);
- 	u16 (*wm_enc)(u16 value);
- 	u16 (*wm_dec)(u16 value);
--- 
-2.53.0
+WX_STATE_PTP_TX_IN_PROGRESS is cleared in wx_ptp_stop().
+But I'll change wx_ptp_stop() to wx_ptp_quiesce() that drop all MMIO operations.
+
+> 
+> > +
+> > +	clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+> 
+> Same here, what if a caller needs a full reset?
+
+PCIe error handler has a higher priority and it will achieve a more complete
+reset. In fact, these two resets are not expected to be executed at the same
+time.
+
+> 
+> > +	timer_delete_sync(&wx->service_timer);
+> 
+> Sashiko says:
+> 
+>  "The timer is stopped, but the corresponding cancel_work_sync(&wx->service_task)
+>   is missing."
+> 
+> And it does seem to me that this is the case here. I see that you have explained
+> this in another thread, but you proposal does not address the case, when
+> ngbe_service_task() starts, interface is not down, and after that we have a PCI
+> error, and its handling interferes with service task. While this is unlikely,
+> synchronization should be more robust.
+
+I plan to check WX_STATE_DOWN and WX_STATE_RESETTING at the entry of every work
+item. Looks like a rough block, but is there a better way? :(
+
+> 
+> > +
+> > +	wx_clean_all_tx_rings(wx);
+> > +	wx_clean_all_rx_rings(wx);
+> > +
+> > +	wx_free_irq(wx);
+> > +	wx_free_isb_resources(wx);
+> > +	wx_free_resources(wx);
+> > +	phylink_disconnect_phy(wx->phylink);
+> > +}
+> > +
+> >  /**
+> >   *  ngbe_init_type_code - Initialize the shared code
+> >   *  @wx: pointer to hardware structure
+> > @@ -135,6 +157,7 @@ static int ngbe_sw_init(struct wx *wx)
+> >  	wx->mbx.size = WX_VXMAILBOX_SIZE;
+> >  	wx->setup_tc = ngbe_setup_tc;
+> >  	wx->do_reset = ngbe_do_reset;
+> > +	wx->soft_quiesce = ngbe_soft_quiesce;
+> >  	set_bit(0, &wx->fwd_bitmask);
+> >
+> >  	return 0;
+> > diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > index b37c9ed57cf7..816aba4a9099 100644
+> > --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > @@ -296,6 +296,27 @@ void txgbe_up(struct wx *wx)
+> >  	txgbe_up_complete(wx);
+> >  }
+> >
+> > +static void txgbe_soft_quiesce(struct wx *wx)
+> > +{
+> > +	if (test_and_set_bit(WX_STATE_DOWN, wx->state))
+> > +		return;
+> > +
+> > +	wx_ptp_stop(wx);
+> > +	phylink_stop(wx->phylink);
+> > +	pci_clear_master(wx->pdev);
+> > +	wx_napi_disable_all(wx);
+> > +
+> > +	clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+> > +	timer_delete_sync(&wx->service_timer);
+> > +
+> > +	wx_clean_all_tx_rings(wx);
+> > +	wx_clean_all_rx_rings(wx);
+> > +
+> > +	wx_free_irq(wx);
+> > +	txgbe_free_misc_irq(wx->priv);
+> > +	wx_free_resources(wx);
+> > +}
+> > +
+> >  /**
+> >   *  txgbe_init_type_code - Initialize the shared code
+> >   *  @wx: pointer to hardware structure
+> > @@ -412,6 +433,7 @@ static int txgbe_sw_init(struct wx *wx)
+> >
+> >  	wx->setup_tc = txgbe_setup_tc;
+> >  	wx->do_reset = txgbe_do_reset;
+> > +	wx->soft_quiesce = txgbe_soft_quiesce;
+> >  	set_bit(0, &wx->fwd_bitmask);
+> >
+> >  	switch (wx->mac.type) {
+> > --
+> > 2.51.0
+> >
+> 
 
 
