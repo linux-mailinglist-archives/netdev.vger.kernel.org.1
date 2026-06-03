@@ -1,320 +1,162 @@
-Return-Path: <netdev+bounces-294718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7sb7K50MIGpCvAAAu9opvQ
-	(envelope-from <netdev+bounces-294718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:14:37 +0200
+	id gOp4D9kMIGpXvAAAu9opvQ
+	(envelope-from <netdev+bounces-294719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:15:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C591636EA9
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:14:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA308636EDB
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 13:15:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b="Sy FYwlG";
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=ZMT4jcY4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294718-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294718-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=WF05GNAu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294719-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294719-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F3DFA308443A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 11:14:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BC0C0303B4E2
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 11:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB6344CF4A;
-	Wed,  3 Jun 2026 11:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E26735F5EC;
+	Wed,  3 Jun 2026 11:15:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02953D5677
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 11:14:02 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780485245; cv=pass; b=TuaiAKpKVBzWsoBcZAkAdzbGYPrILpXir6FpYZeZbvCgBYmHcTY2omGBHAc6AkW0BvHe4WEnVGvKMvYVOWStjIZA3HDYUCEPS0fgQreP8F+SDPB8nwmlHpeXXDxX/lrdSDn8xg0t32FHyuw2HzfUEJyaRWmfWwAupJvG66R7O90=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780485245; c=relaxed/simple;
-	bh=uBAyAR0iY1bN17nsLETbGFhwL/pntlsubwaqpvC8ork=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BzVOEHFuiRoYchLZ0dnyiR7IKRAsjaxDNRCd0PmPxAtnPTVKA6d7P1DMz/xhkxeUN6bBHQm1/ts60UXLaW727B+Q0VDmO6eApZsiexiOUYp088k2IIYd747IUIfnqmUp6psqv+Qa8H1czPOAFaWvQa6JdT6HIstSOXhQV5WPufg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SyFYwlGa; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ZMT4jcY4; arc=pass smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6536RJwe873737
-	for <netdev@vger.kernel.org>; Wed, 3 Jun 2026 11:14:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=
-	qcppdkim1; bh=19tJFy9lIf9VnTinb1+YfhqFSRdeYqD56zDrzVGVBoM=; b=Sy
-	FYwlGagsxvh7ElOxJmaihXiqez53lfLpIWWl8M297FhjleULl5awjFAoM5CCEWiB
-	JvXI+mZLsZQPYSnPNcg2ugnoQ/gJEUl8hFeBJujbGpipnoB6KK60ku7kENQ97OWA
-	5Y/dnbMSMl+swmylyF04SqbWrrIOMrvp+538/VQuHGmfDt4QM8n6aJnQps0CPeQQ
-	Zw5xpD95r/bTbUfArT1S42IVDtiPxePAIKB86A54NhuZ4lBvfoIlKToh7F1xnAco
-	R3BVyIm8rwKaAb/B6rU2fDdMyufOt99LQP2nwge0bnpH662XZoHu41TfCP8gn3UN
-	eZaHisN6F0jKdQZxaU/A==
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com [209.85.160.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ej6a9k5ne-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 11:14:02 +0000 (GMT)
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-43d33c10c62so1838456fac.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 04:14:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780485241; cv=none;
-        d=google.com; s=arc-20240605;
-        b=E9Iz+NhUI0/y9FS90pBmblCva/v4XgUqD0nvhh6z3scfTKsmdiJCZSZvJtwMHByHYj
-         NAX9XXImbeGWIf6NT6AzyL3p45EfYmmIn9jPNoY5XrGlx1zHa1ZNfZowKZ2WtkvGi1NF
-         PX/TUttfgWCJHThlAwjnJvkA8hVXNx9MQ/URRgBnx1tZ89bWtcuA18xYUaiAjnIjpt19
-         sAvCK6kiQBjPOuIEvErepNtoW3wX9bz8mmhNImEW/D0BiZ2TD23smHO6qeZB5XI3RjVL
-         cMsUp6Er/s51mw2Wr+qcESBSfaXHobSs/DsYVuH5AppeMZS+0pgfOHSNATt8/68rK7PE
-         ZIVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:dkim-signature;
-        bh=19tJFy9lIf9VnTinb1+YfhqFSRdeYqD56zDrzVGVBoM=;
-        fh=tIi+Hwf6feqXDGE3UEMUJKTt4ktU1o3HYnOE/+LLcsw=;
-        b=LgzaF6tdhQ4dpGPy0JFpCSAfAJZxrwolR4RM/PSgaBG42RfhNq85wDFPpvjfA/Qi2q
-         rShotCvbIlL9jnJyoCNQ0a7F7F1P9SAbeN0y+qfITmy/U73OL0xn3Xpq4BX+5kkWUZLt
-         xopxrALd7+++xuRlTH/ZSqdGleDH+IHuXrHz2pXXsZOgzhfXd5BCssZm8Q5Tc/gmWBLY
-         Ugav6RnW5uXHgqajejSh3RavJF5I6y6hOwlpnJWNEESrUykxmBZ8OE7S/Ccxm/mckDGp
-         MevUGxWbVKIp2VctiJybuQpkg4WzsH+2zG/GRCtSiExeXzTUnYW08KzwsC0YfdErd0ql
-         FMLg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F03F3655DB
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 11:15:11 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780485314; cv=none; b=u1CSAft1FcqVV/uzG6a5XhRX4h5TX0kv1v319JHj2WqwvHWCqfPpB7vBq0hs3YelQtn1QX/gp5e6DhX0e3gu/FInEISyY0SErPWCiSUC1EuzR3bSeg4xgaMx1OVfFviquXsw7VUHfXIOKpiTdJR26TCl4S/HBIUIDKad8dVQH1Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780485314; c=relaxed/simple;
+	bh=IYQ2aNeY+X4nQfJBL0t13iSGFwakR7F2aCt2177FAvo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=d5GdGo5yTpr25i+aXKCBOR/rMruT7wZev6p2h2QZ3zfoZZ7RAfzDc44aWvfc8FGfmhKGerxjLHouK3S1/GE+FKEBnMUeDwl5JT7wcZFhnqsWFEdbqTF3lixn7Wok1fqpxWQut4FC55xwkyLQ7fMrLx7WZGYFbkZg8icAKfIJZAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WF05GNAu; arc=none smtp.client-ip=209.85.208.49
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-68c76fb8009so6906434a12.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 04:15:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1780485241; x=1781090041; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=19tJFy9lIf9VnTinb1+YfhqFSRdeYqD56zDrzVGVBoM=;
-        b=ZMT4jcY4SxKVBIo7ObriG4J0i/pcBqJ9zDSy0Oj29nWI/wuoBpaqf7p/ExlvWTZZ0q
-         CNtcxrSXY0PZ37gEjFajforGGp+XKofPwLJ8stBiAuZXoneTWTeShQAYXSeIgTiQE2KO
-         cpvbXgVFLj2CzIs8k0l3Xu6NPSVc7myNGRY12JcvGx0RW5erfPmfwnXnfPkct/pzM8z3
-         8Li46cXMXJOnQMS16jyXLft6Ibxjl3E/4g9KUect5eQdsmBR/Qh04btQrGRMt9rb1W7w
-         kvWzcTpN4isXL0n6Oy6QwJnZ7XAyrUJQViRxiomth1eAmJen7vbUbaBUdfCgA9OEpFlu
-         6A/A==
+        d=cloudflare.com; s=google09082023; t=1780485310; x=1781090110; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hw0XW6MjQE4Q5GmtRBciMOYe8JFJUy2Q42SiJpNGiVM=;
+        b=WF05GNAuQR0KINPBBRORhhKTz6ecvHNw28vGLi+p1FbhvWYUn3EEcezPO97xWtnC8U
+         aKQQ+Bz3oIsDO1hVDV8nTFYKXC5FLWE8D0GdJcXv53M7DdQ067YI2qIKw+xa/Nr+Z+VM
+         e1QhNq7bE7hpUWqev2Z7qVVRJo4wlYMvpalRW0gcRGDBydbdWQPjXpNfYTZLbdMriUlv
+         UxzocdsFIzoWHIne+9XNpMthpjAVxpo6qfJQWu4rJbUq30RxETenina5QOM0Lxgmknp7
+         6G8rKSoNY4/XsaWwGjowJ7PzEIDrSyOLnMJxuAzwLaKYQLuN8HlXHpNjcUdLAFab2qs2
+         Ph8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780485241; x=1781090041;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=19tJFy9lIf9VnTinb1+YfhqFSRdeYqD56zDrzVGVBoM=;
-        b=VcS4IivuPXQKDkbD/33FNjRQ11VXkHKPeMsB8Q7GrIMVE3ZU2ZsPnotop+5NJPHiGW
-         e1m2KpHt8A+GQVgE64QLQrAEoExXrqS9XPUjtIvLHS/flMVjd9DCcsQ6n51Za8taNVZ0
-         WxTidAogJ0bFu/45dTqvmk37NdLgmV/RUpb8Gu3nUEmZPZCJmbu31mZPsR1/tGC5RrM/
-         MS4Gdq6QfovJ+LMTrbYndBZ2iUE3tyWNZk2jJcE0TH5loPMKC3Ea+E+/MDHyVhCps1jC
-         W/bYBSsJVOLRSM8MMGKKUK4/InEHph/Cb/dGuVxvvCOsrnQtRzKzVyViorbduB91Iuc2
-         XSZw==
-X-Forwarded-Encrypted: i=1; AFNElJ9bQlz9Ow0KOQnW9QAhmO1eultWxoB1kxdig1a9V9eI7GMbuooJnzF/rqshfL5LORCn9Z7l2Fc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9C81OEgqhJGPWBgEE5Q9fk+LGYVl26dsr6E3nVbFGcuZBACrA
-	3QeGy++PmNkWdk1T0mfTY+dWn6J7P09mbC86Ntqbx9A71/nIEcHZGXNKz5G/VxZcvP6kbIwqxMy
-	SNJkdaYS6Th0BdhXFIwtQWcniGBOX8w2EUngO3936fCKxaTjU5hdcDT8pIHnYLPjNMqQ24dpT8b
-	mAAtBPqWST6t3V78hAOeh24ioK/XcGCNA4EQ==
-X-Gm-Gg: Acq92OF2DGGd/Vg5GuONINe4goDKztEXQab9gq76GHxS0QcJGu63t+vV6gZLTJMWVIs
-	+/imuaWr/sfB0TEIp9ajINf1FMdCCAoBRcywLolgpf/CnLfb+nz6C8bCe+VOLnDIGR2JZanMjY0
-	FnCaqTZEXe7LIY1TF95HC3S7Gy36k/YtFznedgHjm9cotaVNyobo3NMSGV1CXW6EvPEON8V8vnA
-	+dTu/vrOq02YNq7NQ==
-X-Received: by 2002:a05:6870:171b:b0:439:d504:1465 with SMTP id 586e51a60fabf-440db44d16dmr1912783fac.5.1780485241394;
-        Wed, 03 Jun 2026 04:14:01 -0700 (PDT)
-X-Received: by 2002:a05:6870:171b:b0:439:d504:1465 with SMTP id
- 586e51a60fabf-440db44d16dmr1912767fac.5.1780485240990; Wed, 03 Jun 2026
- 04:14:00 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780485310; x=1781090110;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hw0XW6MjQE4Q5GmtRBciMOYe8JFJUy2Q42SiJpNGiVM=;
+        b=kJ60mb3OBIECiw44MRtTus4prDh2O6LSUjY3BVNYTRzILGmUg+RuqmsSHKGPKypxwh
+         7orbQVoTAiDcJdOw57Uj/J0o4G+EKO2u9fhfw2r7wGnkrGEacWYpLvQsURrwraDK2T6y
+         Tzc1vsNk7em64oSWlJ2B8J16D07e9tjKWgYgBq2Z9xXkyyv4FMohz+hK/95NFE7PSde8
+         vSnScoqENSEQ8htSIZUoEKJpTijPTYAm7IxJpi/KvQGR45tDFvdeXlD9IBtHNGWblGbO
+         WS6FQr2CR1PQURuqSc8dNDr0igWTFuefm88oSlp/FceU1T3LfpDleqswwyjf249XVIrS
+         6hWQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9SzDwCSViQ6apyIgIbhvl5demxc8QlW6ptUIfFSVWY5WitmhImd01OWytRwSg6owFw/nIfjJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj1SO7J5Eb+kvI6a8Iz8ODo+p5jjI32lnqJmzSBBDJkk/NtI7j
+	P1ZfmbFCRmxEPTd5+Aduaiv4tcX3hVYnEbYhQxRUSTptHdBKDPsoOBgCOj3SgAykUZQ=
+X-Gm-Gg: Acq92OH9A0Yv70qCvyli3fnzvcA4gkRclS3zXoFh/PwZW7KPVTAsQI0qFDg+WrwngI8
+	Ucgyea243FQDoXY2XYXmxRvLmz9j5y4YXa4A+DlZnM7i3JKDTljKHDzWa8wiWg6zBPSlVSUZBDP
+	vXK4wEEwsBOG0ZRPxnGHhP9MlD9Vt/7ssHFH7lIuzDFlJOhpfF2rGHFvAlfI3PFX7bgYGAYY8IF
+	6KafQm1ZRBZf+lpUAtPDEGgC1UsPpWbdxk//gEe5G3Txbn0/yelorSbDwaVAITFsWpaYj8NAkv2
+	UBjpBnqqg1ws60luM3DPwiHA9Af4lFnTU3nncN2ck0Zg3xtSawjiw0UMa7rxyVwVyils/mq20RH
+	oTARER+RGxVCp9LQkjoh1MRcVTSaLo7r0TxztOdIg78Ulws8xcsQsOjXJo1rNh0z6VV+j7KODFe
+	6wXS0Y1+dzPukzOte7H7m7H6KAUMxPDuS8bgwivPz55zEsZDOZC7uzzXOTwnJT3RHawswhD489Q
+	peEXLP87H8=
+X-Received: by 2002:a05:6402:50d0:b0:68b:5418:bee5 with SMTP id 4fb4d7f45d1cf-68e71aa2f01mr1359654a12.25.1780485309927;
+        Wed, 03 Jun 2026 04:15:09 -0700 (PDT)
+Received: from cloudflare.com (79.184.120.122.ipv4.supernova.orange.pl. [79.184.120.122])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68e65c542c7sm1018281a12.31.2026.06.03.04.15.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jun 2026 04:15:09 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  maxime.chevallier@bootlin.com,  nb@tipi-net.de,  lee@kernel.org,
+  linux-leds@vger.kernel.org,  pavel@kernel.org,  jv@jvosburgh.net,
+  michael.chan@broadcom.com,  jhs@mojatatu.com,  vinicius.gomes@intel.com,
+  idosch@nvidia.com,  razor@blackwall.org,  hare@suse.de,
+  jhasan@marvell.com,  danieller@nvidia.com
+Subject: Re: [PATCH net-next v2 01/11] net: rename netdev_ops_assert_locked()
+In-Reply-To: <20260603012840.2254293-2-kuba@kernel.org> (Jakub Kicinski's
+	message of "Tue, 2 Jun 2026 18:28:30 -0700")
+References: <20260603012840.2254293-1-kuba@kernel.org>
+	<20260603012840.2254293-2-kuba@kernel.org>
+Date: Wed, 03 Jun 2026 13:15:07 +0200
+Message-ID: <87zf1b50zo.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260528093437.2519248-1-hch@lst.de> <20260528093437.2519248-2-hch@lst.de>
- <5f7f90d8-cb32-4ffb-8f1c-0722aafbe869@kernel.org> <20260529135045.GA10647@lst.de>
- <5f3ba603-a6ad-4cf2-9a54-aebc10273c59@kernel.org> <58cc76e7-2348-443d-a989-2a06e61178af@kernel.org>
- <20260601113831.GA25535@lst.de> <d7b08296-7f6e-4d89-ab3b-04e43d04929e@kernel.org>
- <CACSVV00k-fxW6+waHNqvmYcnVNDkRexoWWprFzfayZfqdyMuuA@mail.gmail.com>
- <CACSVV00dNWgpNVU5rB=Hmg+3oWF18yTyfKNr_tWesjoP1jMxwg@mail.gmail.com> <5e6948b3-d235-4b61-aed7-e8b4d0f5b452@kernel.org>
-In-Reply-To: <5e6948b3-d235-4b61-aed7-e8b4d0f5b452@kernel.org>
-Reply-To: rob.clark@oss.qualcomm.com
-From: Rob Clark <rob.clark@oss.qualcomm.com>
-Date: Wed, 3 Jun 2026 04:13:49 -0700
-X-Gm-Features: AVHnY4L4Mu1tTTnLDgXjw8iz5Wj3eHB3OSZ6g8qAAhd22vyCAP_N07hQtlCZoOc
-Message-ID: <CACSVV02v0Fuc6=Rqyd89D-_tcSjEXuQmxz0+2-4aoRAEwJE4zg@mail.gmail.com>
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Harry Yoo <harry@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>, Hao Li <hao.li@linux.dev>,
-        Christoph Lameter <cl@gentwo.org>,
-        David Rientjes <rientjes@google.com>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, io-uring@vger.kernel.org,
-        kasan-dev@googlegroups.com, bpf@vger.kernel.org,
-        netdev@vger.kernel.org,
-        Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Boris Brezillon <boris.brezillon@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: uwdUaCMnSKn7Ek_CwmP6ox7hU8ERtGIn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAzMDEwNiBTYWx0ZWRfXzdCllfJCa2U2
- 0qSG+zA/uHmb/4GJDwnpTw6/GNJncKZtqU/r9BLDsrEjgARU9AOMpPtoNNpMPSa0qcglPNCmGG3
- 2n5mONMia1dI6RmGxzsMNAhf1FmgStFDa3mYujZ2aZvV/HtsJ+YJO9NaPrD7uymc7JfpRhu2dN2
- Cxgj9bkpLbSDi5IgMc5BNVl3iCmPtPNZZabRDm2HlN73tNnvGWB66D1ML4Nsu5riKu/puW5lNJx
- I8kVcKKvUwCZs6DPIPmncvDA8fcrFzvgcNhu9xY16rDRSSTk9XOWSv1sy5YytW0nmFr+puScHpL
- EB+Icm7d5AEO7j71Ew42lio8sfdkPJAKbIqrTs1+M9yu6ApLYD+UMSTB9wXlwdhHRphTGIHVuYV
- 8aQLfG+DguCLpmX///Ea0kxN3L5L2rBSTh1JnOjyyOwHBDmM5LMyox4nQqUiNW9nCqcDT6f5AGp
- FQfDSwfuNKix34ZuZ4Q==
-X-Authority-Analysis: v=2.4 cv=I/9Vgtgg c=1 sm=1 tr=0 ts=6a200c7a cx=c_pps
- a=nSjmGuzVYOmhOUYzIAhsAg==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=YMgV9FUhrdKAYTUUvYB2:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=8jdotb935GZv83SU0eMA:9 a=QEXdDO2ut3YA:10 a=1zu1i0D7hVQfj8NKfPKu:22
-X-Proofpoint-ORIG-GUID: uwdUaCMnSKn7Ek_CwmP6ox7hU8ERtGIn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-03_04,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 bulkscore=0 impostorscore=0 adultscore=0 suspectscore=0
- malwarescore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606030106
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294718-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294719-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:vbabka@kernel.org,m:hch@lst.de,m:harry@kernel.org,m:akpm@linux-foundation.org,m:broonie@kernel.org,m:hao.li@linux.dev,m:cl@gentwo.org,m:rientjes@google.com,m:roman.gushchin@linux.dev,m:hawk@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:io-uring@vger.kernel.org,m:kasan-dev@googlegroups.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:aleksander.lobakin@intel.com,m:boris.brezillon@collabora.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[rob.clark@oss.qualcomm.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:maxime.chevallier@bootlin.com,m:nb@tipi-net.de,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rob.clark@oss.qualcomm.com,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	HAS_REPLYTO(0.00)[rob.clark@oss.qualcomm.com];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:from_mime,oss.qualcomm.com:replyto,qualcomm.com:email,qualcomm.com:dkim,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,cloudflare.com:mid,cloudflare.com:dkim,cloudflare.com:from_mime,cloudflare.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C591636EA9
+X-Rspamd-Queue-Id: AA308636EDB
 
-On Wed, Jun 3, 2026 at 2:17=E2=80=AFAM Vlastimil Babka (SUSE) <vbabka@kerne=
-l.org> wrote:
+On Tue, Jun 02, 2026 at 06:28 PM -07, Jakub Kicinski wrote:
+> Jakub suggests renaming the existing assert to match
+> the netdev_lock_ops_compat() semantics.
 >
-> On 6/1/26 16:39, Rob Clark wrote:
-> > On Mon, Jun 1, 2026 at 6:32=E2=80=AFAM Rob Clark <rob.clark@oss.qualcom=
-m.com> wrote:
-> >>
-> >> On Mon, Jun 1, 2026 at 5:50=E2=80=AFAM Vlastimil Babka (SUSE) <vbabka@=
-kernel.org> wrote:
-> >> >
-> >> > On 6/1/26 13:38, Christoph Hellwig wrote:
-> >> > > On Mon, Jun 01, 2026 at 10:16:30AM +0200, Vlastimil Babka (SUSE) w=
-rote:
-> >> > >> > kmem_cache_alloc_bulk() returning 0 was considered a success in=
- that case.
-> >> > >> >
-> >> > >> > Either fixing kmem_cache_alloc_bulk() (and the comment) or fixi=
-ng the
-> >> > >> > user sounds fine to me.
-> >> > >>
-> >> > >> Would it be wrong if we just returned true for size of 0? Would s=
-omething
-> >> > >> else break?
-> >> > >
-> >> > > I don't think it is wrong per se, but it feels like the wrong kind=
- of
-> >> > > API.  I.e. I don't think the MSM caller actually wants this, as th=
-ey'd
-> >> > > also do a zero-sized kvmalloc.
-> >> >
-> >> > If p->count is 0 then indeed there's a zero-sized kvmalloc so p->pag=
-es =3D=3D
-> >> > ZERO_SIZE_PTR but then nothing breaks because nothing tries to deref=
-erence it?
-> >> >
-> >> > msm_iommu_pagetable_prealloc_cleanup() has a "if (p->count > 0)" bra=
-nch so
-> >> > it seems it's considered possible. But then the rest of the function=
-s also
-> >> > seems working fine, i.e. kmem_cache_free_bulk() of zero size does no=
-thing,
-> >> > kvfree() of ZERO_SIZE_PTR does nothing.
-> >> >
-> >> > It seems to me kmem_cache_alloc_bulk() returning true for size =3D=
-=3D 0 fits
-> >> > naturally in this world and is less likely to result in a gotcha?
-> >>
-> >> I think I was probably expecting kvmalloc(0) =3D> NULL ... but it
-> >> happened to work out before
-> >>
-> >> Adding an "if (!p->count) return 0;" at the top of
-> >> msm_iommu_pagetable_prealloc_allocate() seems like the thing to do..
-> >> if you want, I can send that patch (but traveling this week... so
-> >> let's see what I can do)
-> >
-> > Aaaaaand.. sending patch from hotel wifi doesn't seem to be a thing
-> > that works.. but I've tested the following w/ deqp-vk cts, and works
-> > as expected
+> We want netdev_assert_locked_ops() to mean - if the driver
+> is ops locked - check that it's holding the device lock.
 >
-> Thanks, I will amend the commit in slab tree with this as the easiest way=
- to
-> go foward.
-
-Thanks
-
-> Just a quick question though:
+> The existing helper check for either ops lock or rtnl_lock,
+> which is the locking behavior of netdev_lock_ops_compat().
 >
-> > ----------------
-> >
-> > diff --git a/drivers/gpu/drm/msm/msm_iommu.c b/drivers/gpu/drm/msm/msm_=
-iommu.c
-> > index 7d449e5202c5..ef744d154bbe 100644
-> > --- a/drivers/gpu/drm/msm/msm_iommu.c
-> > +++ b/drivers/gpu/drm/msm/msm_iommu.c
-> > @@ -332,13 +332,16 @@ msm_iommu_pagetable_prealloc_allocate(struct
-> > msm_mmu *mmu, struct msm_mmu_preall
-> >         struct kmem_cache *pt_cache =3D get_pt_cache(mmu);
-> >         int ret;
-> >
-> > +       if (!p->count)
-> > +               return 0;
+> The reason for naming divergence is likely that
+> netdev_ops_assert_locked() predated the _compat() helpers.
 >
-> We know p->pages is NULL in this case, right? Because it was allocated by
-> vm_bind_job_create() using kzalloc().
-> And the job can't be reused with a leftover value?
-> (msm_iommu_pagetable_prealloc_cleanup doesn't set p->pages to zero).
-> Or should we set p->pages to NULL here.
+> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - new patch
+> ---
 
-Correct, the job is not reused.  But I suppose setting p->pages to
-NULL would make things more obvious, so no objection to that.
-
-BR,
--R
-
-> > +
-> >         p->pages =3D kvmalloc_objs(*p->pages, p->count);
-> >         if (!p->pages)
-> >                 return -ENOMEM;
-> >
-> >         ret =3D kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, p->count, p=
-->pages);
-> >         if (ret !=3D p->count) {
-> > -               kfree(p->pages);
-> > +               kvfree(p->pages);
-> >                 p->pages =3D NULL;
-> >                 p->count =3D ret;
-> >                 return -ENOMEM;
->
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
