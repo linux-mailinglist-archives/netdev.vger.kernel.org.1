@@ -1,89 +1,99 @@
-Return-Path: <netdev+bounces-294837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rsY3KG9eIGoU2AAAu9opvQ
-	(envelope-from <netdev+bounces-294837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 19:03:43 +0200
+	id dZIII4BeIGoY2AAAu9opvQ
+	(envelope-from <netdev+bounces-294838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 19:04:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2301C63A03B
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 19:03:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC36B63A04B
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 19:03:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=C8t0gMMy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294837-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294837-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=lAoOHqiH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294838-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294838-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2DAEA32213FF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 16:27:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0ECB1322FC3D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 16:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000A93E959A;
-	Wed,  3 Jun 2026 16:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76453E9C08;
+	Wed,  3 Jun 2026 16:27:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFF43E9595
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 16:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFD23E5ED7
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 16:27:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780504051; cv=none; b=J/jdyHJNQfhgxm7EbYtQEq9OArWiz3Nh16wWTd4FQVQnYKxfMHVo7vqaCZc9bDQtgrqwPl3PH7UIVrH8CmBwSWHCtRaPWN/wmlpRl+v89RpQm3j68XZGwUHnzFTsJ+Nkt8VP71e2eRvbg6AbISJHPjvREkbYcgOGky8QMUm0OKA=
+	t=1780504075; cv=none; b=GQmP1hETDSzj2nEQobxf7Jv4ovPD2uWIy8sHREHQzE48oMW9j1Pez+IfnCX6MTLyWYU6Ca0W0Y0ysUrdn6tTLgkI34JgVtTsEi+9ahLq45Yo3mHNFDvf9M98S+B6GFAmmWHOqO/Eij2psH8qhN1+PDp5b5SNY7mbu4VVVrLpQoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780504051; c=relaxed/simple;
-	bh=KsALnQ7OjE26KILk6ZSGe6Ke9EgzKl/HnCEeCxpI3/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IHutQfHM3u3tuj7XFIt3sj9rJ1LWS81H8FMbyn0u5GTW/5oiAGMq4rfmtrnz2J9xZ+f+wqzLxoGoRb7PqUnvyYmmYZE8f7sPr++Avak3m/gHPTOu0c1ksfPcLavaFJE7/Smny2ZplpN2fIDOflS3/wsdP1rPQMe557PnZEHRdmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C8t0gMMy; arc=none smtp.client-ip=209.85.221.174
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-59aa414167eso2026351e0c.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 09:27:30 -0700 (PDT)
+	s=arc-20240116; t=1780504075; c=relaxed/simple;
+	bh=bZWAhI/SNWesR7lukDoX5NGLCgeYv7Rk10k9NwhATLA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=THxuDI/c6Xu5bD9wQxuKzFVoCufLjqn1RuychAi030e7EpAyvFsog7Y9d4iW5n4KXYljspRMQ5Zxqxop0JzTMzXnUfrzDj1iCX+YGpPd8ZnIo0bC9UAFEnC0GtvzPcdkH1f0wXQUVZfOjdErV+abyJTdcdqf8MUaUgHCljESB+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lAoOHqiH; arc=none smtp.client-ip=209.85.215.179
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c85b2139015so1409394a12.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 09:27:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780504050; x=1781108850; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780504074; x=1781108874; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+LdSRb4C5c5f23VF8YFsFSRCjScwvrWEISBSuouPkOs=;
-        b=C8t0gMMykGqM1sY0tLLsRMlHsYkL4xV5d299oDJJKM2ka2SpckhPX8Ug6u9ykn3Qjc
-         PzGqH3EVquDTG28kwFlhOJSPxdy30yo45HJtoX4E/m6oGMozpUIwSi2E0DV86ZXUlvri
-         FLBvbCuhw80EpNqRAR0ZLPsBwcrngD9jeVfTJjgjxGcEzUmYAEthSVvI5soxEqi0iR10
-         1owDkDCoEV+soYcoj8GG4hF9+Z+ZPeDAzGDb1I+y19BRJYd7hbnFIzf5QIa2iOw8MO3a
-         QwNDkmUg9NOaLSvltslEjT/tCBHtcg2Hp4d57eWAIOuEJ4ISWfAigNQU8/dhV9hmY5gN
-         kiOg==
+        bh=Pd5YhtxLNp2KnXGrb45Y+o+N5pgMe2J5d5AaYwVVkHo=;
+        b=lAoOHqiHkGUQKO158ZG8BXYY7dp+xUKGtR0Uqd7YQ3hzvXx8cbmitf8nBbmDHGUO3X
+         WyCHEdkkzlYQ9bm4hhSJ2jgxQyMFzh4egE6wSU4BeeTtf0++tTZHjpjceEYm5nVXzEPq
+         8s5mh9hCc5fC/aqtto6ILqCCRK5A0Hw06w6cT9A5GZvdxVMDtRr3onb1WslsiwKGrLWS
+         SFH58u91/hd5ZmBxXAkOfeSZb9kT2qSxrG3u2f7zL/IueAtb12AJCucNLp5LoaT+0Yr3
+         AcvSJQPYP0upHmUbLwGjP6loiveY6Emstqzo9CEgm+aHFTxckrMN2xzHZBSO+NaalPBl
+         pChA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780504050; x=1781108850;
+        d=1e100.net; s=20251104; t=1780504074; x=1781108874;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+LdSRb4C5c5f23VF8YFsFSRCjScwvrWEISBSuouPkOs=;
-        b=RRPuDX0IuWcmfEZSop8S45Mt6ZR1KxTR1EMXV5v4m4qVDqllJTLci8h4cO7fWa0jT/
-         ZY413Cygj6jALLo4ubnyweP21HmR6f78OU8IrDViwcxhEpNzXwVN4FPpTFNkmNAxmbiT
-         IkZFsQAO9rmQtugP5xBpDJ4Fm+63c4rHXvs+Oa9UXgPjWCPTfM4a8lfUMjBadDEDLFxi
-         CSmW8DlVq6vI1mBpOBSWyB3XOPjkMSGgRhsKTIWnbF2fhxeiNGn0LuqxoeTfYNCwlR3J
-         uWRVbJ271cdwifIeN0+jtYTXEPOkpZQRe8pVJJ2sYRp6vpWANWAKppxI7Rl+t0//SRZ4
-         d1pA==
-X-Forwarded-Encrypted: i=1; AFNElJ8cLn8aFEwfr7pbWbjiRsLOmqesByZZS1mwstTGMHGFdKngSv8I7WtS37uNA+3k63cxNxRXepg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7ctdBV899z+UWHT6Jl/65L+4I7PxJiBc8mmMe2bdC8U0qRLow
-	qwGv6UnOWEXzN0lRRj1FuqIB0+z9Q3r7zWEsoSoseO1z1hlfketVO5TH
-X-Gm-Gg: Acq92OGdsgxVHEDeon2Cl0fLSNcaALEkUjQjWb6vu82uj0cNPr4Axass7Z6IeasqFhJ
-	itFSiDpZ61Se15yjJM5aDtA3eiA1rSRFUltCP1SwEnKxaL1hbkcR2RuAd4UarTnyoqNyRpm1XKr
-	9vMm6a9NLbxzJmCyAvz00jGFjElgJr49F6g4rsw641bW5VG+hIgsgogXhQYrKmU4mHSu5RwGmbi
-	+2DUgLbGtGCxnMyOzxLELgpovC8ta1Y1ScL0qODhDuDuBJR2KRwLulBlFVL/qRdxa4/zquEZ03N
-	4/qC5+znVvdQFE2h3eg/oyCSCeqUaC5aYfEI8nNrqQpMdsCc32AGNGQEMFYEw1N9oKvUuV4mhno
-	0L4gNtjGWx2lvI0L27NGM3KYmtv9Kga6tsh8qQsSDEm2aYCFFaasPGeFxI39JiVGoe6e2MkEnKy
-	WNhRfQYJ7pxlc0ljFXMj1MX+vtvl278LyeqkEAwGge3hiwKbw0IXzOiszDlAf2qBB5FBC/1fJOv
-	FWzwrMu5E8cbfFtWJH11pWQLUKm
-X-Received: by 2002:a05:6122:1814:b0:5a1:fbbd:6bd0 with SMTP id 71dfb90a1353d-5a6e5612e27mr2148393e0c.5.1780504044819;
-        Wed, 03 Jun 2026 09:27:24 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5a6d777a638sm2752657e0c.8.2026.06.03.09.27.23
+        bh=Pd5YhtxLNp2KnXGrb45Y+o+N5pgMe2J5d5AaYwVVkHo=;
+        b=Ut+unEfr7sMA19CWtAeTW7gHvA4g8QX1MOkwgYT92T5vkr86pXVEHd4Kv6+5Eov7xN
+         JWcHKH11OtJsQX4sFnjR9zZgGNkpB0xhvi9M8z9/8IhJjPeVtaolJK9/cHWP9MSNFAfm
+         6rj0r74RZqnXhA9Xg3fdaJj24iNTQjIdca+fy18OxBiSz6sjxl2RkuaJGSdgMidYv74Z
+         m+JdOthPezEkLTCtKK6yMCuUgoKTdtW+QnfUZW+RRHoGWl3xf9co/FsQyLj4b2vSI+LW
+         znoeLEvlq9DRQ4oIVMYkP6ED9oqDTphIvT1E2ZyDcoGClKWgcI6sPpRBscgHxS6TiOgs
+         5i4g==
+X-Forwarded-Encrypted: i=1; AFNElJ8IPIpa3/n5bpvY2/kT+UhFKGr1DSWzOU3OG8fRtkVaQV5EsVQnXOF6ojTF+7u68Jh3SRNO77M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOdmqcJM7VcvWVhKtNGqjhBU9Qj9r0aHpBQ5rtiu95vU5S9Sh1
+	+XLy52gErwUd5+hVZHy6kiVTUiib0bHHeD/NWG0u9+f6yz2w2R/MxcRp
+X-Gm-Gg: Acq92OHDFMdHzkIymivXPPYuedTKaeP891fSsBYVlb2s4sDc42/L7DlVfpEf5z2BrqC
+	08vAtnZd8aWKi/QGFzC4bVO/KBhCG8NTQCCTJ7ih9Q0w0vNyzw0pcak22FxoVKEsHevw9L6bFjt
+	BUAguT25Loj/G8gZWDo9MEROeogVtuwaATZsiRJ9BzFgQ/JX6AlyN5iBDGEv8NtDUUY4r8Dkt83
+	Kc1iLMec/pS7ud00muCe0fyedscwo5qVaR9y1GOg0iyuFYEzw92PiGUlnoY4o+Om7KKsAmXdM2i
+	W8SvULYXrz11W/yS0+AGqaQ/SD4FMIjgaKCb5HeYnRjhZHB6Et6g29GdywQ4kxmr2JfZjOzTkbI
+	o2aPmVWZ1CbN9h+ga1ZDA5mSavLapT8qDj/s6NA5vipOODc6abFz72EFRG+/zogBNxYtlyB4cgy
+	eNQjO9Qu/Q3yH4zzCviWSa/+7N+RIeY3RLOT1fIWb2CSl6uE/K+NSfXScqYmnm4K2pccDsw0a5U
+	InbGYmbYRQ=
+X-Received: by 2002:a05:6300:67ca:b0:3b4:813d:dae with SMTP id adf61e73a8af0-3b4978049femr4892709637.16.1780504073819;
+        Wed, 03 Jun 2026 09:27:53 -0700 (PDT)
+Received: from cps-manycore-1.. ([147.46.174.222])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85df0a4e59sm2930976a12.16.2026.06.03.09.27.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 09:27:24 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-06-03
-Date: Wed,  3 Jun 2026 12:27:14 -0400
-Message-ID: <20260603162714.342496-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        Wed, 03 Jun 2026 09:27:53 -0700 (PDT)
+From: Sechang Lim <rhkrqnwk98@gmail.com>
+To: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
+	aleksander.lobakin@intel.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] udp: clear skb->dev before running a sockmap verdict
+Date: Wed,  3 Jun 2026 16:27:33 +0000
+Message-ID: <20260603162737.697215-1-rhkrqnwk98@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,104 +102,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294837-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,cloudflare.com,intel.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-294838-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_RECIPIENTS(0.00)[m:willemdebruijn.kernel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:aleksander.lobakin@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2301C63A03B
+X-Rspamd-Queue-Id: DC36B63A04B
 
-The following changes since commit cdf88b35e06f1b385f7f6228060ae541d44fbb72:
+On the UDP receive path skb->dev is repurposed as dev_scratch (the
+truesize/state cache set by udp_set_dev_scratch()), through the
+union { struct net_device *dev; unsigned long dev_scratch; } in sk_buff.
 
-  Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync() (2026-05-28 08:52:21 -0400)
+When a UDP socket is in a sockmap, sk_data_ready is
+sk_psock_verdict_data_ready(), which calls udp_read_skb() -> recv_actor()
+(sk_psock_verdict_recv) to run the attached SK_SKB verdict program in softirq.
+If that program calls a socket-lookup helper (bpf_sk_lookup_tcp/udp,
+bpf_skc_lookup_tcp), bpf_skc_lookup() does:
 
-are available in the Git repository at:
+	if (skb->dev)
+		caller_net = dev_net(skb->dev);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-06-03
+skb->dev still holds the dev_scratch value (a non-NULL integer), so dev_net()
+dereferences it as a struct net_device * and the kernel takes a general
+protection fault on a non-canonical address in softirq:
 
-for you to fetch changes up to 149324fc762c2a7acef9c26790566f81f475e51f:
+  Oops: general protection fault, probably for non-canonical address 0x1010000800004a0
+  CPU: 1 UID: 0 PID: 1406 Comm: syz.2.19 Not tainted 7.1.0-rc6 #1 PREEMPT(full)
+  RIP: 0010:bpf_skc_lookup net/core/filter.c:7033 [inline]
+  RIP: 0010:bpf_sk_lookup+0x45/0x160 net/core/filter.c:7047
+  Call Trace:
+   <IRQ>
+   bpf_prog_4675cb904b7071f8+0x12e/0x14e
+   bpf_prog_run_pin_on_cpu+0xc6/0x1f0
+   sk_psock_verdict_recv+0x1ba/0x350
+   udp_read_skb+0x31a/0x370
+   sk_psock_verdict_data_ready+0x2e3/0x600
+   __udp_enqueue_schedule_skb+0x4c8/0x650
+   udpv6_queue_rcv_one_skb+0x3ec/0x740
+   udp6_unicast_rcv_skb+0x11d/0x140
+   ip6_protocol_deliver_rcu+0x61e/0x950
+   ip6_input_finish+0xa9/0x150
+   NF_HOOK+0x286/0x2f0
+   ip6_input+0x117/0x220
+   NF_HOOK+0x286/0x2f0
+   __netif_receive_skb+0x85/0x200
+   process_backlog+0x374/0x9a0
+   __napi_poll+0x4f/0x1c0
+   net_rx_action+0x3b0/0x770
+   handle_softirqs+0x15a/0x460
+   do_softirq+0x57/0x80
+   </IRQ>
 
-  Bluetooth: MGMT: Fix backward compatibility with userspace (2026-06-03 11:24:12 -0400)
+The rmem charge that dev_scratch accounted for is released by skb_recv_udp() on
+dequeue, just above, so the scratch is dead by the time recv_actor() runs. Clear
+skb->dev so bpf_skc_lookup() falls back to sock_net(skb->sk), which
+skb_set_owner_sk_safe() set just above.
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+Fixes: 965b57b469a5 ("net: Introduce a new proto_ops ->read_skb()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+---
+v2:
+ - add blank lines around the added codes (Olek)
+ - use generic block comment style (Olek)
+ - Cc: stable
 
- - hci_core: fix memory leak in error path of hci_alloc_dev()
- - hci_sync: reject oversized Broadcast Announcement prepend
- - MGMT: Fix backward compatibility with userspace
- - MGMT: validate advertising TLV before type checks
- - L2CAP: reject BR/EDR signaling packets over MTUsig
- - RFCOMM: validate skb length in MCC handlers
- - RFCOMM: hold listener socket in rfcomm_connect_ind()
- - ISO: Fix not releasing hdev reference on iso_conn_big_sync
- - ISO: Fix a use-after-free of the hci_conn pointer
- - ISO: Fix data-race on iso_pi fields in hci_get_route calls
- - SCO: Fix data-race on sco_pi fields in sco_connect
- - BNEP: reject short frames before parsing
+ net/ipv4/udp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-----------------------------------------------------------------
-Bharath Reddy (1):
-      Bluetooth: fix memory leak in error path of hci_alloc_dev()
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 0ac2bf4f8759..70f6cbd4ef73 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2011,6 +2011,14 @@ int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+ 	}
+ 
+ 	WARN_ON_ONCE(!skb_set_owner_sk_safe(skb, sk));
++
++	/*
++	 * skb->dev still aliases the UDP rx dev_scratch (its charge was freed
++	 * on dequeue above); a sockmap verdict program may deref it via
++	 * bpf_sk_lookup_*(), so clear it -> bpf_skc_lookup() uses skb->sk
++	 */
++	skb->dev = NULL;
++
+ 	return recv_actor(sk, skb);
+ }
+ 
+-- 
+2.43.0
 
-Luiz Augusto von Dentz (3):
-      Bluetooth: ISO: Fix not releasing hdev reference on iso_conn_big_sync
-      Bluetooth: ISO: Fix a use-after-free of the hci_conn pointer
-      Bluetooth: MGMT: Fix backward compatibility with userspace
-
-Michael Bommarito (1):
-      Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
-
-SeungJu Cheon (3):
-      Bluetooth: RFCOMM: validate skb length in MCC handlers
-      Bluetooth: ISO: Fix data-race on iso_pi fields in hci_get_route calls
-      Bluetooth: SCO: Fix data-race on sco_pi fields in sco_connect
-
-Yuqi Xu (1):
-      Bluetooth: hci_sync: reject oversized Broadcast Announcement prepend
-
-Zhang Cen (3):
-      Bluetooth: RFCOMM: hold listener socket in rfcomm_connect_ind()
-      Bluetooth: MGMT: validate advertising TLV before type checks
-      Bluetooth: bnep: reject short frames before parsing
-
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/bnep/core.c     | 57 ++++++++++++++++++++++--------------
- net/bluetooth/hci_sync.c      |  5 ++++
- net/bluetooth/hci_sysfs.c     |  6 ++--
- net/bluetooth/iso.c           | 63 +++++++++++++++++++++++++++++-----------
- net/bluetooth/l2cap_core.c    | 46 +++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c          | 17 +++++------
- net/bluetooth/rfcomm/core.c   | 67 +++++++++++++++++++++++++++++++------------
- net/bluetooth/rfcomm/sock.c   | 26 ++++++++++++++---
- net/bluetooth/sco.c           | 20 +++++++++----
- 10 files changed, 233 insertions(+), 75 deletions(-)
 
