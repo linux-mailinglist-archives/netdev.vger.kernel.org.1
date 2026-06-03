@@ -1,55 +1,65 @@
-Return-Path: <netdev+bounces-294530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MmxtCGCWH2r7nQAAu9opvQ
-	(envelope-from <netdev+bounces-294530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:50:08 +0200
+	id 5ebeLp+WH2oGngAAu9opvQ
+	(envelope-from <netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:51:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F773633B60
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:50:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A31633B6D
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:51:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RVIMr5GU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294530-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294530-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=AiUW4t0H;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294531-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8B33A301EB71
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:50:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BF3C13030EA3
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2883D8117;
-	Wed,  3 Jun 2026 02:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB603DC4CC;
+	Wed,  3 Jun 2026 02:51:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13F5351C2F;
-	Wed,  3 Jun 2026 02:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FDA191F98
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 02:51:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780455005; cv=none; b=BPYjb3JQVJkNt2BcM7NFrDhUgQvoKOf/LKJmoWFjuEEAqImUJFUeVct+c3yDe6ny4elkfkmo9mvSGLGeUENTs4ls9Hu9o9MmgdRsv8D2v58J4pAYzIsTHyHbzwf3E0lrJTZjPZUVqiOJzYVWOPSZslImewGQ7XFyJFJwT65P/04=
+	t=1780455068; cv=none; b=Sy0h7JBGyCRceVpyzS+eMgxtQeatrX5D6vBtUSRa8jQovk8eigd9VjGzIboNzw/+5vyIdLyNgqTv3wvthrZKIzK9iSoSUmevraNqMkbNtPh8r4BCOQ9BRfACWoUKnsuY9slEscsZk+veWzc+k01Dk8H7bXJYfuLK6ZuZw35ez1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780455005; c=relaxed/simple;
-	bh=He1Q7jufBic6VclbSfjYVqkg21Zw9y6mwNjq0c43fAo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=e2f7H4za508J6QB+QqcyKQIQjMqg/2M7YUV5GKQdRz9kcUquLw+RYlOpEmx5/CgWevjvJweT+/pG5qOnVNLltikzzI37BiYL17Bp+Y5H2tawJRGZUX5CLCVgxrWo/ExmewlEFnGLTWucpB0Y7Lw2ipux92O/xn/9YG0LqqoZnf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RVIMr5GU; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7683E1F00893;
-	Wed,  3 Jun 2026 02:50:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780455004;
-	bh=dPwv3kbr9oAOiRy1rCKbnYSPg/dqZtjZkAL3xmhkGz4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=RVIMr5GUpoWHQNEizkkFxyO2jPXWwWjP2HOPGC/9SLVgVLGMKkJKxi9sBL+RhUyMX
-	 F+6xmS/g6YJAZUWBRsW24g8gbshy2XexRYamlg3DaA1s8rWvl2hgaA+ieqUegf4Z75
-	 3rLt8mavDaEBIxivugy9dKYZmp7AcT+JADxuW0AcnoTwRXDLdkSUGPNw2ALSOWZyi4
-	 ju5xm8IhzaA/CCo4BPlKR5CdAr7UzRtbzjU3p4ocv/opQVjyQ/VywP0wgWnproZB0V
-	 TSR76liBr9yWFUQ9MBbNwBmNqCZ9JfxY/kazUDLdHqNvg5Ta9x7zLHuEINiv7lyVVJ
-	 UPklQNbxMEAKg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5688B393003B;
-	Wed,  3 Jun 2026 02:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1780455068; c=relaxed/simple;
+	bh=eEq8iNXQCACbV78K62R7s3Cn5kOKlLHTcV5KQZJYgcA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FDWhgrCe8PYYJE4HrbsvRsbuXE7gAxCYAqvB3QkJbb0z7+zMtDqMSLTKi6Q8nyRdh1Wi7BFLcZFybmOsalqkH79oVRcS4mBbZHabIKu0Pq7lS9Xwa7UguGh3gXyYiq2+KhRamtiPa/lr+ckxgpsB5pfEaDEY2NMgB2rTN8vHpto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AiUW4t0H; arc=none smtp.client-ip=91.218.175.183
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780455054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MQLPpaSkYjgDNM6V9ukCVjB+PUc9tCwTjIjPYJtPcK4=;
+	b=AiUW4t0HEnL+VMo6ZR1/oy6Nfs0ndz2lo8yfecgsCm7O/jakEFvHqO6Dk68YV5q3g1U9Qa
+	8QIwnqtf5VKxa3GH7Fqj/4E99iillce4dd3aUnJU2OPmATaApv0iU4eWTWKyZMxnVu4j+8
+	FqcIGvJfHAntZKPRBUVLckMcpKkrx1Y=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Qingfang Deng <qingfang.deng@linux.dev>
+Subject: [PATCH nf-next] netfilter: flowtable: remove inline segmentation
+Date: Wed,  3 Jun 2026 10:50:46 +0800
+Message-ID: <20260603025047.32839-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,86 +67,176 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipv6: anycast: insert aca into global hash under
- idev->lock
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178045500615.1183919.5145496310272778664.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Jun 2026 02:50:06 +0000
-References: <20260529152219.235475-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260529152219.235475-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org,
- syzbot+819eb928d120d2bdad0e@syzkaller.appspotmail.com, kuniyu@google.com,
- dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-kernel@vger.kernel.org
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294530-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:syzbot+819eb928d120d2bdad0e@syzkaller.appspotmail.com,m:kuniyu@google.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-294531-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:qingfang.deng@linux.dev,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,819eb928d120d2bdad0e];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:dkim,linux.dev:from_mime,linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7F773633B60
+X-Rspamd-Queue-Id: 12A31633B6D
 
-Hello:
+Now that PPPoE driver has proper GSO support, this is no longer needed.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+---
+ include/net/netfilter/nf_flow_table.h |  1 -
+ net/netfilter/nf_flow_table_core.c    |  1 -
+ net/netfilter/nf_flow_table_ip.c      | 34 ---------------------------
+ net/netfilter/nf_flow_table_path.c    |  3 ---
+ 4 files changed, 39 deletions(-)
 
-On Fri, 29 May 2026 23:22:18 +0800 you wrote:
-> syzbot reported a splat [1]: a slab-use-after-free in
-> ipv6_chk_acast_addr(), which walks the global inet6_acaddr_lst[] hash
-> under RCU and dereferences a struct ifacaddr6 that has already been
-> freed while still linked in the hash, so a later reader walks into a
-> dangling node.
-> 
-> In __ipv6_dev_ac_inc() the aca is allocated with refcount 1, then
-> aca_get() bumps it to 2 to keep it alive across the unlocked region.
-> It is published to idev->ac_list under idev->lock, but
-> ipv6_add_acaddr_hash() runs after write_unlock_bh(). A concurrent
-> teardown (ipv6_ac_destroy_dev() from addrconf_ifdown(), under RTNL)
-> can slip into that window:
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] ipv6: anycast: insert aca into global hash under idev->lock
-    https://git.kernel.org/netdev/net/c/f723ccaff2fb
-
-You are awesome, thank you!
+diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
+index 7b23b245a5a8..61ee74e95d2b 100644
+--- a/include/net/netfilter/nf_flow_table.h
++++ b/include/net/netfilter/nf_flow_table.h
+@@ -151,7 +151,6 @@ struct flow_offload_tuple {
+ 	u16				dir:2,
+ 					xmit_type:3,
+ 					encap_num:2,
+-					needs_gso_segment:1,
+ 					tun_num:2,
+ 					in_vlan_ingress:2;
+ 	u16				mtu;
+diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
+index 785d8c244a77..2c4140e6f53c 100644
+--- a/net/netfilter/nf_flow_table_core.c
++++ b/net/netfilter/nf_flow_table_core.c
+@@ -122,7 +122,6 @@ static int flow_offload_fill_route(struct flow_offload *flow,
+ 
+ 	flow_tuple->tun = route->tuple[dir].in.tun;
+ 	flow_tuple->encap_num = route->tuple[dir].in.num_encaps;
+-	flow_tuple->needs_gso_segment = route->tuple[dir].out.needs_gso_segment;
+ 	flow_tuple->tun_num = route->tuple[dir].in.num_tuns;
+ 
+ 	switch (route->tuple[dir].xmit_type) {
+diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+index 9c05a50d6013..9ec44ea2bcd2 100644
+--- a/net/netfilter/nf_flow_table_ip.c
++++ b/net/netfilter/nf_flow_table_ip.c
+@@ -771,7 +771,6 @@ struct nf_flow_xmit {
+ 	const void		*source;
+ 	struct net_device	*outdev;
+ 	struct flow_offload_tuple *tuple;
+-	bool			needs_gso_segment;
+ };
+ 
+ static void __nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
+@@ -792,41 +791,10 @@ static void __nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
+ 	dev_queue_xmit(skb);
+ }
+ 
+-static unsigned int nf_flow_encap_gso_xmit(struct net *net, struct sk_buff *skb,
+-					   struct nf_flow_xmit *xmit)
+-{
+-	struct sk_buff *segs, *nskb;
+-
+-	segs = skb_gso_segment(skb, 0);
+-	if (IS_ERR(segs))
+-		return NF_DROP;
+-
+-	if (segs)
+-		consume_skb(skb);
+-	else
+-		segs = skb;
+-
+-	skb_list_walk_safe(segs, segs, nskb) {
+-		skb_mark_not_on_list(segs);
+-
+-		if (nf_flow_encap_push(segs, xmit->tuple, xmit->outdev) < 0) {
+-			kfree_skb(segs);
+-			kfree_skb_list(nskb);
+-			return NF_STOLEN;
+-		}
+-		__nf_flow_queue_xmit(net, segs, xmit);
+-	}
+-
+-	return NF_STOLEN;
+-}
+-
+ static unsigned int nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
+ 				       struct nf_flow_xmit *xmit)
+ {
+ 	if (xmit->tuple->encap_num) {
+-		if (skb_is_gso(skb) && xmit->needs_gso_segment)
+-			return nf_flow_encap_gso_xmit(net, skb, xmit);
+-
+ 		if (nf_flow_encap_push(skb, xmit->tuple, xmit->outdev) < 0)
+ 			return NF_DROP;
+ 	}
+@@ -910,7 +878,6 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
+ 		return NF_DROP;
+ 	}
+ 	xmit.tuple = other_tuple;
+-	xmit.needs_gso_segment = tuplehash->tuple.needs_gso_segment;
+ 
+ 	return nf_flow_queue_xmit(state->net, skb, &xmit);
+ }
+@@ -1231,7 +1198,6 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
+ 		return NF_DROP;
+ 	}
+ 	xmit.tuple = other_tuple;
+-	xmit.needs_gso_segment = tuplehash->tuple.needs_gso_segment;
+ 
+ 	return nf_flow_queue_xmit(state->net, skb, &xmit);
+ }
+diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
+index 9e88ea6a2eef..700a6ae34aa3 100644
+--- a/net/netfilter/nf_flow_table_path.c
++++ b/net/netfilter/nf_flow_table_path.c
+@@ -86,7 +86,6 @@ struct nft_forward_info {
+ 	u8 ingress_vlans;
+ 	u8 h_source[ETH_ALEN];
+ 	u8 h_dest[ETH_ALEN];
+-	bool needs_gso_segment;
+ 	enum flow_offload_xmit_type xmit_type;
+ };
+ 
+@@ -142,7 +141,6 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
+ 			if (path->type == DEV_PATH_PPPOE) {
+ 				memcpy(info->h_dest, path->encap.h_dest, ETH_ALEN);
+ 				info->xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
+-				info->needs_gso_segment = 1;
+ 			}
+ 			break;
+ 		case DEV_PATH_BRIDGE:
+@@ -283,7 +281,6 @@ static void nft_dev_forward_path(const struct nft_pktinfo *pkt,
+ 		memcpy(route->tuple[dir].out.h_dest, info.h_dest, ETH_ALEN);
+ 		route->tuple[dir].xmit_type = info.xmit_type;
+ 	}
+-	route->tuple[dir].out.needs_gso_segment = info.needs_gso_segment;
+ }
+ 
+ int nft_flow_route(const struct nft_pktinfo *pkt, const struct nf_conn *ct,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
