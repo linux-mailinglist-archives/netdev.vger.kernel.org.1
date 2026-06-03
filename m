@@ -1,761 +1,253 @@
-Return-Path: <netdev+bounces-294635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294628-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rqfaHRDdH2p6rQAAu9opvQ
-	(envelope-from <netdev+bounces-294635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:51:44 +0200
+	id 2D9BHWHfH2o6rgAAu9opvQ
+	(envelope-from <netdev+bounces-294628-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:01:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A29635651
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:51:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798BB635765
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:01:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=mchp header.b=B5cMXiHC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294635-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294635-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=microchip.com;
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=a9j9pyXT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294628-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294628-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=simonwunderlich.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA0ED31367C7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:28:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8CF7E312D336
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDE3407CCE;
-	Wed,  3 Jun 2026 07:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F20402453;
+	Wed,  3 Jun 2026 07:25:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B3B407578;
-	Wed,  3 Jun 2026 07:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBA6400DF2
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:25:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471592; cv=none; b=ADQtJxZZsBxVTGYN8ansYv9HCU2oEy2uNItq8CoQYDjYcpFzbKXy+ngXn8NptxoaI1saAZtkVYo52AaMncPwbSYhIGW3bKcltqEM1ctTtfhJHXs2r9pHW8RnwoAP90OY6w5y9AecM9vQ1GEnsAYoT8VStSfLm4OfmIpiY477EbA=
+	t=1780471546; cv=none; b=cw78DnJUrRYt8lYF+S662JoCJUkqvc+04FNOhw5kKIIlqhJfH67/FOAUXYEArJc2gk/YZQOrms+FvOGZ154Tp7ZrmFM5hhSrUKXrNJt89klJaNsJYOMfvxCioPkNhA288lgY/E5PrWqrkH411XQvhrznuVN30g5fTBpiygx3/+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471592; c=relaxed/simple;
-	bh=AzARm+DLlbloL+0lQYCog+sArY7kSdyCzNH4+XKGvBw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=cBLpnQTeFuVAkiouk5vr5FxU2WBfWoFRh/IkXwJ1CoqEnlCkTjAETLAKWbDxfcxkycC3RDFkn9jpTN4hAfG6HHKbWZb7gx45E1of2A+MF0gAFrzWQAoNZru3HMt9ALqXTGQet4akOk3Wtl2khR1B3mdyGqmiAD2zCIakvVHFwGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=B5cMXiHC; arc=none smtp.client-ip=68.232.154.123
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1780471589; x=1812007589;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=AzARm+DLlbloL+0lQYCog+sArY7kSdyCzNH4+XKGvBw=;
-  b=B5cMXiHCtIH8WkuN89ZCGNNsIJUYFMSB4Std6DWgxYyMzAde9rKSQQl2
-   N0ym7IDz0DrZaJcxmYtTtapzS58MpWTpZw811ChUZYztK73JCz0UsBmrE
-   6923icALm0s+XNvUsOc3+UK3A8EsZUVzH4322YHMrtFYicY1N51xfzXgu
-   dR/u3S/i9NTe/9l+wweKv2ntePsjZ8UhmWBghjNbkv1KOIM2wG73hqpQI
-   f3ocSxsc6FebzGwPR5kQXhAWYA6wbNf4TB2AOqPfqLK4OffJsDmx1LtZs
-   CPhHbT+/sxe8icY1h6UhTyHMcOQ6q87bupCaY/jrFWzosAOrCP0/HNvpa
-   Q==;
-X-CSE-ConnectionGUID: XRaO/wICShaMdtb4BIwCcw==
-X-CSE-MsgGUID: /+gOXxPSRrmE6bnrnjHUEw==
-X-IronPort-AV: E=Sophos;i="6.24,184,1774335600"; 
-   d="scan'208";a="57703132"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2026 00:26:29 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Wed, 3 Jun 2026 00:26:29 -0700
-Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Wed, 3 Jun 2026 00:26:25 -0700
-From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
-	<jensemil.schulzostergaard@microchip.com>
-Date: Wed, 3 Jun 2026 09:25:25 +0200
-Subject: [PATCH net-next v7 6/9] net: dsa: lan9645x: add vlan support
+	s=arc-20240116; t=1780471546; c=relaxed/simple;
+	bh=8K2iP9LSXQp27nsPUhKWxYl0Bitnf3LmxGh9VjbxmV4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EKeAt74HBtMpInKP1dYf/tU/RdDQmcC9zzrUgxCi0056VEql3r8NsFDePPALDzerJQSfy0+CyqvR55StN3PpfZ07isYzDyelhjjW7Xif8ibNl19TYEOH2GhVOoAbi2gKQ/vfuuvTiftM7NrPg/0Mx8qQg78jKDgI7nfYLN6r6/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=a9j9pyXT; arc=none smtp.client-ip=23.88.38.48
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
+	s=09092022; t=1780471539;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=he0/n/acgmP1vB/t/w0LP0oXotNGkr4FL/Cuc2RofVQ=;
+	b=a9j9pyXTUKQkbPU7aduarieiA3jnA9aDiRznBp9lT+pmmLPr5t2jc2FCsJyUIupP4aJUqr
+	9kz8k8pPfdKUQCh5hN4AUwTkuDF7ipsk8/P8AajBUgTCsVvERTxKXIsapkcQMm3jYgYUic
+	xl2n/LwOo4u3Yd81eU1TgZRW6YtHBWY+fsNg6VpAlTRziDHmqpSGaO/Sfr4E07CMwPBtS9
+	R//G1kL69lUArE11LSpK7mLuCTpFAV6r3jDTsque/Yv6+HO4P4GLppsWfyzOBuRFG2Ynep
+	HBRApSK7agZK8It4OIGhlP0YTP6r0qtZYd5G73jWTj1el6KBmHj/z/ue/dlIQg==
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Sven Eckelmann <sven@narfation.org>,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH net-next 15/15] batman-adv: tt: directly retrieve wifi flags of net_device
+Date: Wed,  3 Jun 2026 09:25:26 +0200
+Message-ID: <20260603072527.174487-16-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260603072527.174487-1-sw@simonwunderlich.de>
+References: <20260603072527.174487-1-sw@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <20260603-dsa_lan9645x_switch_driver_base-v7-6-b2f90e676707@microchip.com>
-References: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
-In-Reply-To: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
-To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
- Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Russell King
-	<linux@armlinux.org.uk>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
-	<jensemil.schulzostergaard@microchip.com>
-X-Mailer: b4 0.15-dev
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
+	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294635-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
-	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_RECIPIENTS(0.00)[m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:woojung.huh@microchip.com,m:linux@armlinux.org.uk,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:jensemil.schulzostergaard@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-294628-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[simonwunderlich.de:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,microchip.com:mid,microchip.com:dkim,microchip.com:from_mime,microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,simonwunderlich.de:mid,simonwunderlich.de:dkim,simonwunderlich.de:from_mime,simonwunderlich.de:email,narfation.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 06A29635651
+X-Rspamd-Queue-Id: 798BB635765
 
-Add VLAN support for VLAN-aware and VLAN-unaware bridges.
+From: Sven Eckelmann <sven@narfation.org>
 
-VID 4095 (HOST_PVID) is reserved and used internally as the port
-VLAN for standalone (non-bridged) ports so their FDB domain is
-isolated from bridged traffic.
+batadv_tt_local_add() tries to retrieve the wifi flags of an interface to
+mark the TT entry as wifi client for the AP isolation feature. In the past,
+it was necessary to look up the batadv_hard_iface because the wifi_flags
+were stored inside this struct. But with the batadv_wifi_net_devices
+rhashtable, it is preferred to directly retrieve the wifi_flags instead of
+the indirect route via batadv_hard_iface - which at the end only provides
+the net_device (which we used to find the batadv_hard_iface).
 
-VID 0 is used internally as the port VLAN for VLAN-unaware bridge ports
-(UNAWARE_PVID).
+This will also be essential when the global batadv_hardif_list is removed
+and each lookup via batadv_hardif_get_by_netdev() will require the RTNL
+lock.
 
-Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 ---
-Changes in v5:
-- switch -EBUSY to -EINVAL for vlan add/del in the reserved range.
-- remove reserved HSR vlan
-- update commit message
+ net/batman-adv/hard-interface.c    | 25 ++++++++++++++++++-------
+ net/batman-adv/hard-interface.h    |  1 +
+ net/batman-adv/translation-table.c | 14 ++++++++------
+ 3 files changed, 27 insertions(+), 13 deletions(-)
 
-Changes in v4:
-- fix clear HOST_PVID vlan membership when a port joins a bridge
-- explicit default value write to tag type register for untagged frames
-- use lan_rmw for ANA_DROP_CFG
-- add comment for error path in lan9645x_vlan_hw_wr
-- use dsa_switch_for_each_user_port to iterate ports
-
-Changes in v3:
-- use SET register macros in vlan_hw_wr
-- add vlan id bounds check to vlan_del
-- return vlan_hw_wr timeout err on init
-- move cpu vlan action after bounds check
-
-Changes in v2:
-- redesign based on selftests which rely on changing vlan_default_pvid.
-  Our HW limitations were too forward. Following Vladimirs changes to
-  ocelot VLAN implementation, we now dynamically change egress tag
-  configuration, allowing more states.
-- selftests are passing, except an expected failure w.r.t ctag/stag
-  conformance, which is a hw limitation.
----
- drivers/net/dsa/microchip/lan9645x/Makefile        |   1 +
- drivers/net/dsa/microchip/lan9645x/lan9645x_main.c |  50 +++
- drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |  29 ++
- drivers/net/dsa/microchip/lan9645x/lan9645x_port.c |   3 +
- drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c | 403 +++++++++++++++++++++
- 5 files changed, 486 insertions(+)
-
-diff --git a/drivers/net/dsa/microchip/lan9645x/Makefile b/drivers/net/dsa/microchip/lan9645x/Makefile
-index 7cc0ae0ada40..e049114b3563 100644
---- a/drivers/net/dsa/microchip/lan9645x/Makefile
-+++ b/drivers/net/dsa/microchip/lan9645x/Makefile
-@@ -6,3 +6,4 @@ mchp-lan9645x-objs := \
- 	lan9645x_npi.o \
- 	lan9645x_phylink.o \
- 	lan9645x_port.o \
-+	lan9645x_vlan.o \
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-index d1cac46cf3ea..440371d124be 100644
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-@@ -149,6 +149,9 @@ static int lan9645x_setup(struct dsa_switch *ds)
- 	}
- 
- 	mutex_init(&lan9645x->fwd_domain_lock);
-+	err = lan9645x_vlan_init(lan9645x);
-+	if (err)
-+		goto err_mutex;
- 
- 	/* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
- 	lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
-@@ -516,6 +519,7 @@ static int lan9645x_port_bridge_join(struct dsa_switch *ds, int port,
- 
- 	lan9645x->bridge_mask |= BIT(p->chip_port);
- 	__lan9645x_port_set_host_flood(lan9645x);
-+	lan9645x_vlan_clear_hostmode(p);
- 
- 	mutex_unlock(&lan9645x->fwd_domain_lock);
- 
-@@ -571,11 +575,52 @@ static void lan9645x_port_bridge_leave(struct dsa_switch *ds, int port,
- 		lan9645x->bridge = NULL;
- 
- 	__lan9645x_port_set_host_flood(lan9645x);
-+	lan9645x_vlan_set_hostmode(p);
- 	lan9645x_update_fwd_mask(lan9645x);
- 
- 	mutex_unlock(&lan9645x->fwd_domain_lock);
+diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
+index bb3c31b5f259d..43ebf86e7b368 100644
+--- a/net/batman-adv/hard-interface.c
++++ b/net/batman-adv/hard-interface.c
+@@ -366,22 +366,19 @@ static u32 batadv_wifi_flags_evaluate(struct net_device *net_device)
  }
  
-+static int lan9645x_port_vlan_filtering(struct dsa_switch *ds, int port,
-+					bool enabled,
-+					struct netlink_ext_ack *extack)
-+{
-+	struct lan9645x *lan9645x = ds->priv;
-+	struct lan9645x_port *p;
-+
-+	p = lan9645x_to_port(lan9645x, port);
-+	p->vlan_aware = enabled;
-+	lan9645x_vlan_port_apply(p);
-+
-+	return 0;
-+}
-+
-+static int lan9645x_port_vlan_add(struct dsa_switch *ds, int port,
-+				  const struct switchdev_obj_port_vlan *vlan,
-+				  struct netlink_ext_ack *extack)
-+{
-+	struct lan9645x *lan9645x = ds->priv;
-+	struct lan9645x_port *p;
-+	bool pvid, untagged;
-+
-+	p = lan9645x_to_port(lan9645x, port);
-+	pvid = !!(vlan->flags & BRIDGE_VLAN_INFO_PVID);
-+	untagged = !!(vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED);
-+
-+	return lan9645x_vlan_port_add_vlan(p, vlan->vid, pvid, untagged,
-+					   extack);
-+}
-+
-+static int lan9645x_port_vlan_del(struct dsa_switch *ds, int port,
-+				  const struct switchdev_obj_port_vlan *vlan)
-+{
-+	struct lan9645x *lan9645x = ds->priv;
-+	struct lan9645x_port *p;
-+
-+	p = lan9645x_to_port(lan9645x, port);
-+	return lan9645x_vlan_port_del_vlan(p, vlan->vid);
-+}
-+
- static const struct dsa_switch_ops lan9645x_switch_ops = {
- 	.get_tag_protocol		= lan9645x_get_tag_protocol,
+ /**
+- * batadv_hardif_get_wifi_flags() - retrieve wifi flags for hard_iface
+- * @hard_iface: the device to check
++ * batadv_netdev_get_wifi_flags() - retrieve wifi flags for net_device
++ * @net_dev: the device to check
+  *
+  * Return: batadv_hard_iface_wifi_flags flags of the device
+  */
+-u32 batadv_hardif_get_wifi_flags(struct batadv_hard_iface *hard_iface)
++u32 batadv_netdev_get_wifi_flags(struct net_device *net_dev)
+ {
+ 	struct batadv_wifi_net_device_state *device_state;
+ 	u32 wifi_flags = 0;
  
-@@ -598,6 +643,11 @@ static const struct dsa_switch_ops lan9645x_switch_ops = {
- 	.port_bridge_leave		= lan9645x_port_bridge_leave,
- 	.port_stp_state_set		= lan9645x_port_bridge_stp_state_set,
- 	.port_set_host_flood		= lan9645x_port_set_host_flood,
-+
-+	/* VLAN integration */
-+	.port_vlan_filtering		= lan9645x_port_vlan_filtering,
-+	.port_vlan_add			= lan9645x_port_vlan_add,
-+	.port_vlan_del			= lan9645x_port_vlan_del,
- };
- 
- static int lan9645x_request_target_regmaps(struct lan9645x *lan9645x)
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
-index 0a199a544038..baf23a372f35 100644
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
-@@ -7,6 +7,7 @@
- 
- #include <linux/dsa/lan9645x.h>
- #include <linux/if_bridge.h>
-+#include <linux/if_vlan.h>
- #include <linux/regmap.h>
- #include <net/dsa.h>
- 
-@@ -152,6 +153,17 @@ enum lan9645x_vlan_port_tag {
- 	LAN9645X_TAG_ALL = 3,
- };
- 
-+struct lan9645x_vlan {
-+	u32 portmask: 10, /* ports 0-8 + CPU_PORT */
-+	    untagged: 9, /* ports 0-8 */
-+	    src_chk: 1,
-+	    mir: 1,
-+	    lrn_dis: 1,
-+	    prv_vlan: 1,
-+	    fld_dis: 1,
-+	    s_fwd_ena: 1;
-+};
-+
- struct lan9645x {
- 	struct device *dev;
- 	struct dsa_switch *ds;
-@@ -176,6 +188,9 @@ struct lan9645x {
- 	u16 bridge_fwd_mask; /* Mask for forwarding bridged ports */
- 	struct mutex fwd_domain_lock; /* lock forwarding configuration */
- 
-+	/* VLAN entries */
-+	struct lan9645x_vlan vlans[VLAN_N_VID];
-+
- 	int num_port_dis;
- };
- 
-@@ -186,6 +201,9 @@ struct lan9645x_port {
- 	u8 stp_state;
- 	bool learn_ena;
- 
-+	bool vlan_aware;
-+	u16 pvid;
-+
- 	bool rx_internal_delay;
- 	bool tx_internal_delay;
- 
-@@ -352,4 +370,15 @@ void lan9645x_phylink_get_caps(struct lan9645x *lan9645x, int port,
- 			       struct phylink_config *c);
- void lan9645x_phylink_port_down(struct lan9645x *lan9645x, int port);
- 
-+/* VLAN lan9645x_vlan.c */
-+int lan9645x_vlan_init(struct lan9645x *lan9645x);
-+u16 lan9645x_vlan_unaware_pvid(bool is_bridged);
-+void lan9645x_vlan_port_apply(struct lan9645x_port *p);
-+int lan9645x_vlan_port_add_vlan(struct lan9645x_port *p, u16 vid, bool pvid,
-+				bool untagged,
-+				struct netlink_ext_ack *extack);
-+int lan9645x_vlan_port_del_vlan(struct lan9645x_port *p, u16 vid);
-+void lan9645x_vlan_set_hostmode(struct lan9645x_port *p);
-+void lan9645x_vlan_clear_hostmode(struct lan9645x_port *p);
-+
- #endif /* __LAN9645X_MAIN_H__ */
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-index 815efc62ffbb..87eb0f6dce4c 100644
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-@@ -208,5 +208,8 @@ int lan9645x_port_setup(struct dsa_switch *ds, int port)
- 		ANA_PORT_CFG_PORTID_VAL,
- 		lan9645x, ANA_PORT_CFG(p->chip_port));
- 
-+	if (p->chip_port != lan9645x->npi)
-+		lan9645x_vlan_set_hostmode(p);
-+
- 	return 0;
+-	if (!hard_iface)
+-		return 0;
+-
+ 	rcu_read_lock();
+ 	device_state = rhashtable_lookup_fast(&batadv_wifi_net_devices,
+-					      &hard_iface->net_dev,
++					      &net_dev,
+ 					      batadv_wifi_net_devices_params);
+ 	if (device_state)
+ 		wifi_flags = READ_ONCE(device_state->wifi_flags);
+@@ -390,6 +387,20 @@ u32 batadv_hardif_get_wifi_flags(struct batadv_hard_iface *hard_iface)
+ 	return wifi_flags;
  }
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c
-new file mode 100644
-index 000000000000..e024b359b313
---- /dev/null
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c
-@@ -0,0 +1,403 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/* Copyright (C) 2026 Microchip Technology Inc.
+ 
++/**
++ * batadv_hardif_get_wifi_flags() - retrieve wifi flags for hard_iface
++ * @hard_iface: the device to check
++ *
++ * Return: batadv_hard_iface_wifi_flags flags of the device
 + */
-+
-+#include "lan9645x_main.h"
-+
-+#define VLANACCESS_CMD_IDLE		0
-+#define VLANACCESS_CMD_READ		1
-+#define VLANACCESS_CMD_WRITE		2
-+#define VLANACCESS_CMD_INIT		3
-+
-+struct lan9645x_vlan_port_info {
-+	int untagged;
-+	int tagged;
-+	u16 untagged_vid;
-+};
-+
-+/* Calculate VLAN state of a port, across all VLANS. */
-+static void lan9645x_vlan_port_get_info(struct lan9645x *lan9645x, int port,
-+					struct lan9645x_vlan_port_info *info)
++u32 batadv_hardif_get_wifi_flags(struct batadv_hard_iface *hard_iface)
 +{
-+	u16 vid;
-+
-+	info->untagged = 0;
-+	info->tagged = 0;
-+	info->untagged_vid = 0;
-+
-+	for (vid = 1; vid <= VLAN_MAX; vid++) {
-+		struct lan9645x_vlan *v = &lan9645x->vlans[vid];
-+
-+		if (!(v->portmask & BIT(port)))
-+			continue;
-+
-+		if (v->untagged & BIT(port)) {
-+			info->untagged++;
-+			info->untagged_vid = vid;
-+		} else {
-+			info->tagged++;
-+		}
-+
-+		/* VLAN composition is invalid, so break early. */
-+		if (info->untagged > 1 && info->tagged)
-+			break;
-+	}
-+}
-+
-+static int lan9645x_vlan_wait_for_completion(struct lan9645x *lan9645x)
-+{
-+	u32 val;
-+
-+	return lan9645x_rd_poll_timeout(lan9645x, ANA_VLANACCESS, val,
-+					ANA_VLANACCESS_VLAN_TBL_CMD_GET(val) ==
-+					VLANACCESS_CMD_IDLE);
-+}
-+
-+static int lan9645x_vlan_hw_wr(struct lan9645x *lan9645x, u16 vid)
-+{
-+	struct lan9645x_vlan *v = &lan9645x->vlans[vid];
-+	bool cpu_dis = !(v->portmask & BIT(CPU_PORT));
-+	u32 val;
-+	int err;
-+
-+	val = ANA_VLANTIDX_VLAN_PGID_CPU_DIS_SET(cpu_dis) |
-+	      ANA_VLANTIDX_V_INDEX_SET(vid) |
-+	      ANA_VLANTIDX_VLAN_SEC_FWD_ENA_SET(v->s_fwd_ena) |
-+	      ANA_VLANTIDX_VLAN_FLOOD_DIS_SET(v->fld_dis) |
-+	      ANA_VLANTIDX_VLAN_PRIV_VLAN_SET(v->prv_vlan) |
-+	      ANA_VLANTIDX_VLAN_LEARN_DISABLED_SET(v->lrn_dis) |
-+	      ANA_VLANTIDX_VLAN_MIRROR_SET(v->mir) |
-+	      ANA_VLANTIDX_VLAN_SRC_CHK_SET(v->src_chk);
-+
-+	lan_wr(val, lan9645x, ANA_VLANTIDX);
-+	lan_wr(ANA_VLAN_PORT_MASK_VLAN_PORT_MASK_SET(v->portmask),
-+	       lan9645x, ANA_VLAN_PORT_MASK);
-+	lan_wr(ANA_VLANACCESS_VLAN_TBL_CMD_SET(VLANACCESS_CMD_WRITE),
-+	       lan9645x, ANA_VLANACCESS);
-+
-+	/* The VLAN access engine completes in a fixed ~1us vs the polling
-+	 * timeout of 100_000 us. A timeout here therefore likely means the
-+	 * register bus itself is dead, not that the VLAN op failed. There is no
-+	 * meaningful recovery at runtime, so this function logs via dev_err()
-+	 * and runtime callers discard the return value. Only
-+	 * lan9645x_vlan_init() treats this as fatal so that probe fails early
-+	 * on a broken bus.
-+	 */
-+	err = lan9645x_vlan_wait_for_completion(lan9645x);
-+	if (err)
-+		dev_err(lan9645x->dev, "Vlan set mask failed\n");
-+
-+	return err;
-+}
-+
-+u16 lan9645x_vlan_unaware_pvid(bool is_bridged)
-+{
-+	return is_bridged ? UNAWARE_PVID : HOST_PVID;
-+}
-+
-+static u16 lan9645x_vlan_port_get_pvid(struct lan9645x_port *port)
-+{
-+	bool is_bridged = lan9645x_port_is_bridged(port);
-+
-+	if (is_bridged && port->vlan_aware)
-+		return port->pvid;
-+	else
-+		return lan9645x_vlan_unaware_pvid(is_bridged);
-+}
-+
-+/* Dynamically choose the egress tagging mode based on the port vlan state:
-+ *
-+ * Standalone:
-+ * TAG_NO_PVID_NO_UNAWARE with PORT_VID=HOST_PVID. This avoids leaking the
-+ * internal HOST_PVID tag on ingress mirrored frames while leaving normal
-+ * egress frames untagged.
-+ *
-+ * Bridged, VLAN-aware:
-+ *  - N untagged, 0 tagged: TAG_DISABLED
-+ *  - 1 untagged, N tagged: TAG_NO_PVID_NO_UNAWARE
-+ *  - 0 untagged, N tagged: TAG_ALL
-+ *
-+ * Bridged, VLAN-unaware:
-+ *   TAG_DISABLED
-+ */
-+static void
-+lan9645x_vlan_port_apply_egress(struct lan9645x_port *p,
-+				struct lan9645x_vlan_port_info *info)
-+{
-+	struct lan9645x *lan9645x = p->lan9645x;
-+	enum lan9645x_vlan_port_tag tag_cfg;
-+	u16 port_vid = UNAWARE_PVID;
-+
-+	if (!lan9645x_port_is_bridged(p)) {
-+		tag_cfg = LAN9645X_TAG_NO_PVID_NO_UNAWARE;
-+		port_vid = HOST_PVID;
-+	} else if (p->vlan_aware) {
-+		struct lan9645x_vlan_port_info _info;
-+
-+		if (!info) {
-+			lan9645x_vlan_port_get_info(lan9645x, p->chip_port,
-+						    &_info);
-+			info = &_info;
-+		}
-+
-+		if (info->untagged == 1 && info->tagged) {
-+			tag_cfg = LAN9645X_TAG_NO_PVID_NO_UNAWARE;
-+			port_vid = info->untagged_vid;
-+		} else if (info->untagged) {
-+			tag_cfg = LAN9645X_TAG_DISABLED;
-+		} else {
-+			tag_cfg = LAN9645X_TAG_ALL;
-+		}
-+	} else {
-+		tag_cfg = LAN9645X_TAG_DISABLED;
-+	}
-+
-+	/* TAG_TPID_CFG encoding:
-+	 *
-+	 * 0: Use 0x8100.
-+	 * 1: Use 0x88A8.
-+	 * 2: Use custom value from PORT_VLAN_CFG.PORT_TPID.
-+	 * 3: Use PORT_VLAN_CFG.PORT_TPID, unless ingress tag was a C-tag
-+	 *    (EtherType = 0x8100)
-+	 *
-+	 * Use 3 and PORT_VLAN_CFG.PORT_TPID=0x88a8 to ensure stags are not
-+	 * rewritten to ctags on egress.
-+	 */
-+	lan_rmw(REW_TAG_CFG_TAG_TPID_CFG_SET(3) |
-+		REW_TAG_CFG_TAG_CFG_SET(tag_cfg),
-+		REW_TAG_CFG_TAG_TPID_CFG |
-+		REW_TAG_CFG_TAG_CFG,
-+		lan9645x, REW_TAG_CFG(p->chip_port));
-+
-+	lan_rmw(REW_PORT_VLAN_CFG_PORT_TPID_SET(ETH_P_8021AD) |
-+		REW_PORT_VLAN_CFG_PORT_VID_SET(port_vid),
-+		REW_PORT_VLAN_CFG_PORT_TPID |
-+		REW_PORT_VLAN_CFG_PORT_VID,
-+		lan9645x, REW_PORT_VLAN_CFG(p->chip_port));
-+}
-+
-+static void lan9645x_vlan_port_apply_ingress(struct lan9645x_port *p)
-+{
-+	struct lan9645x *lan9645x = p->lan9645x;
-+	u16 pvid;
-+	u32 val;
-+
-+	pvid = lan9645x_vlan_port_get_pvid(p);
-+
-+	/* Default vlan to classify for untagged frames (may be zero), and set
-+	 * their tag type to C-tag.
-+	 */
-+	val = ANA_VLAN_CFG_VLAN_VID_SET(pvid) |
-+	      ANA_VLAN_CFG_VLAN_TAG_TYPE_SET(0);
-+	if (p->vlan_aware)
-+		val |= ANA_VLAN_CFG_VLAN_AWARE_ENA_SET(1) |
-+		       ANA_VLAN_CFG_VLAN_POP_CNT_SET(1);
-+
-+	lan_rmw(val,
-+		ANA_VLAN_CFG_VLAN_VID |
-+		ANA_VLAN_CFG_VLAN_AWARE_ENA |
-+		ANA_VLAN_CFG_VLAN_POP_CNT |
-+		ANA_VLAN_CFG_VLAN_TAG_TYPE,
-+		lan9645x, ANA_VLAN_CFG(p->chip_port));
-+
-+	val = 0;
-+	if (p->vlan_aware && !pvid)
-+		/* If port is vlan-aware and tagged, drop untagged and priority
-+		 * tagged frames.
-+		 */
-+		val = ANA_DROP_CFG_DROP_UNTAGGED_ENA_SET(1) |
-+		      ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA_SET(1) |
-+		      ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA_SET(1);
-+
-+	lan_rmw(val,
-+		ANA_DROP_CFG_DROP_UNTAGGED_ENA |
-+		ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA |
-+		ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA,
-+		lan9645x, ANA_DROP_CFG(p->chip_port));
-+}
-+
-+void lan9645x_vlan_port_apply(struct lan9645x_port *p)
-+{
-+	lan9645x_vlan_port_apply_ingress(p);
-+	lan9645x_vlan_port_apply_egress(p, NULL);
-+}
-+
-+static struct lan9645x_vlan *lan9645x_vlan_port_modify(struct lan9645x_port *p,
-+						       u16 vid, bool pvid,
-+						       bool untagged)
-+{
-+	struct lan9645x_vlan *v = &p->lan9645x->vlans[vid];
-+
-+	if (untagged)
-+		v->untagged |= BIT(p->chip_port);
-+	else
-+		v->untagged &= ~BIT(p->chip_port);
-+
-+	if (pvid)
-+		p->pvid = vid;
-+	else if (p->pvid == vid)
-+		p->pvid = 0;
-+
-+	return v;
-+}
-+
-+static int lan9645x_vlan_cpu_add(struct lan9645x_port *p, u16 vid, bool pvid,
-+				 bool untagged)
-+{
-+	struct lan9645x_vlan *v;
-+
-+	v = lan9645x_vlan_port_modify(p, vid, pvid, untagged);
-+	v->portmask |= BIT(CPU_PORT) | BIT(p->chip_port);
-+	lan9645x_vlan_hw_wr(p->lan9645x, vid);
-+	lan9645x_vlan_port_apply_ingress(p);
-+
-+	return 0;
-+}
-+
-+int lan9645x_vlan_port_add_vlan(struct lan9645x_port *p, u16 vid, bool pvid,
-+				bool untagged, struct netlink_ext_ack *extack)
-+{
-+	struct lan9645x *lan9645x = p->lan9645x;
-+	struct lan9645x_vlan_port_info info;
-+	struct lan9645x_vlan old_vlan;
-+	struct lan9645x_vlan *v;
-+	u16 old_pvid;
-+
-+	/* Kernel VLAN core adds vid 0, which collides with our UNAWARE_PVID.
-+	 * We handle priority tagged frames by other means.
-+	 */
-+	if (!vid)
++	if (!hard_iface)
 +		return 0;
 +
-+	if (vid > VLAN_MAX) {
-+		NL_SET_ERR_MSG_MOD(extack, "VLAN 4095 reserved.");
-+		return -EINVAL;
++	return batadv_netdev_get_wifi_flags(hard_iface->net_dev);
++}
++
+ /**
+  * batadv_is_wifi_hardif() - check if the given hardif is a wifi interface
+  * @hard_iface: the device to check
+diff --git a/net/batman-adv/hard-interface.h b/net/batman-adv/hard-interface.h
+index 089e65c8a4817..822e7e378c4d1 100644
+--- a/net/batman-adv/hard-interface.h
++++ b/net/batman-adv/hard-interface.h
+@@ -70,6 +70,7 @@ extern struct notifier_block batadv_hard_if_notifier;
+ 
+ struct net_device *__batadv_get_real_netdev(struct net_device *net_device);
+ struct net_device *batadv_get_real_netdev(struct net_device *net_device);
++u32 batadv_netdev_get_wifi_flags(struct net_device *net_dev);
+ u32 batadv_hardif_get_wifi_flags(struct batadv_hard_iface *hard_iface);
+ bool batadv_is_wifi_hardif(struct batadv_hard_iface *hard_iface);
+ struct batadv_hard_iface*
+diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
+index 44bbaa3bb37d1..c346e43d47b9b 100644
+--- a/net/batman-adv/translation-table.c
++++ b/net/batman-adv/translation-table.c
+@@ -596,20 +596,23 @@ bool batadv_tt_local_add(struct net_device *mesh_iface, const u8 *addr,
+ 	struct net *net = dev_net(mesh_iface);
+ 	struct batadv_meshif_vlan *vlan;
+ 	struct net_device *in_dev = NULL;
+-	struct batadv_hard_iface *in_hardif = NULL;
+ 	struct hlist_head *head;
+ 	struct batadv_tt_orig_list_entry *orig_entry;
+ 	int hash_added, table_size, packet_size_max;
+ 	bool ret = false;
+ 	bool roamed_back = false;
++	bool iif_is_wifi = false;
+ 	u8 remote_flags;
+ 	u32 match_mark;
+ 
+ 	if (ifindex != BATADV_NULL_IFINDEX)
+ 		in_dev = dev_get_by_index(net, ifindex);
+ 
+-	if (in_dev)
+-		in_hardif = batadv_hardif_get_by_netdev(in_dev);
++	if (in_dev) {
++		u32 wifi_flags = batadv_netdev_get_wifi_flags(in_dev);
++
++		iif_is_wifi = batadv_is_wifi(wifi_flags);
 +	}
-+
-+	if (p->chip_port == lan9645x->npi)
-+		return lan9645x_vlan_cpu_add(p, vid, pvid, untagged);
-+
-+	old_vlan = lan9645x->vlans[vid];
-+	old_pvid = p->pvid;
-+
-+	v = lan9645x_vlan_port_modify(p, vid, pvid, untagged);
-+	v->portmask |= BIT(p->chip_port);
-+
-+	lan9645x_vlan_port_get_info(lan9645x, p->chip_port, &info);
-+
-+	if (info.untagged > 1 && info.tagged) {
-+		*v = old_vlan;
-+		p->pvid = old_pvid;
-+		NL_SET_ERR_MSG_MOD(extack, "Only support 1 untagged port VLAN");
-+		return -EBUSY;
-+	}
-+
-+	lan9645x_vlan_hw_wr(lan9645x, vid);
-+	lan9645x_vlan_port_apply_ingress(p);
-+	lan9645x_vlan_port_apply_egress(p, &info);
-+
-+	return 0;
-+}
-+
-+static int lan9645x_vlan_cpu_del(struct lan9645x_port *p, u16 vid)
-+{
-+	struct lan9645x_vlan *v;
-+
-+	v = lan9645x_vlan_port_modify(p, vid, false, false);
-+	v->portmask &= ~BIT(CPU_PORT) & ~BIT(p->chip_port);
-+	lan9645x_vlan_hw_wr(p->lan9645x, vid);
-+	lan9645x_vlan_port_apply_ingress(p);
-+
-+	return 0;
-+}
-+
-+int lan9645x_vlan_port_del_vlan(struct lan9645x_port *p, u16 vid)
-+{
-+	struct lan9645x *lan9645x = p->lan9645x;
-+	struct lan9645x_vlan *v;
-+
-+	if (!vid)
-+		return 0;
-+
-+	if (vid > VLAN_MAX)
-+		return -EINVAL;
-+
-+	if (p->chip_port == lan9645x->npi)
-+		return lan9645x_vlan_cpu_del(p, vid);
-+
-+	v = lan9645x_vlan_port_modify(p, vid, false, false);
-+	v->portmask &= ~BIT(p->chip_port);
-+	lan9645x_vlan_hw_wr(lan9645x, vid);
-+	lan9645x_vlan_port_apply(p);
-+
-+	return 0;
-+}
-+
-+void lan9645x_vlan_set_hostmode(struct lan9645x_port *p)
-+{
-+	p->vlan_aware = false;
-+	p->lan9645x->vlans[HOST_PVID].portmask |= BIT(p->chip_port);
-+	lan9645x_vlan_hw_wr(p->lan9645x, HOST_PVID);
-+	lan9645x_vlan_port_apply(p);
-+}
-+
-+void lan9645x_vlan_clear_hostmode(struct lan9645x_port *p)
-+{
-+	p->lan9645x->vlans[HOST_PVID].portmask &= ~BIT(p->chip_port);
-+	lan9645x_vlan_hw_wr(p->lan9645x, HOST_PVID);
-+	lan9645x_vlan_port_apply(p);
-+}
-+
-+int lan9645x_vlan_init(struct lan9645x *lan9645x)
-+{
-+	u32 all_phys_ports, all_ports;
-+	struct dsa_port *dp;
-+	u16 vid;
-+	int err;
-+
-+	all_phys_ports = GENMASK(lan9645x->num_phys_ports - 1, 0);
-+	all_ports = all_phys_ports | BIT(CPU_PORT);
-+
-+	/* Clear VLAN table, by default all ports are members of all VLANS */
-+	lan_wr(ANA_VLANACCESS_VLAN_TBL_CMD_SET(VLANACCESS_CMD_INIT),
-+	       lan9645x, ANA_VLANACCESS);
-+
-+	err = lan9645x_vlan_wait_for_completion(lan9645x);
-+	if (err) {
-+		dev_err(lan9645x->dev, "Vlan clear table failed\n");
-+		return err;
-+	}
-+
-+	for (vid = 1; vid < VLAN_N_VID; vid++) {
-+		err = lan9645x_vlan_hw_wr(lan9645x, vid);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* Set all the ports + cpu to be part of HOST_PVID and UNAWARE_PVID */
-+	lan9645x->vlans[HOST_PVID].portmask = all_ports;
-+	err = lan9645x_vlan_hw_wr(lan9645x, HOST_PVID);
-+	if (err)
-+		return err;
-+
-+	lan9645x->vlans[UNAWARE_PVID].portmask = all_ports;
-+	err = lan9645x_vlan_hw_wr(lan9645x, UNAWARE_PVID);
-+	if (err)
-+		return err;
-+
-+	/* Configure the CPU port to be vlan aware */
-+	lan_wr(ANA_VLAN_CFG_VLAN_VID_SET(UNAWARE_PVID) |
-+	       ANA_VLAN_CFG_VLAN_AWARE_ENA_SET(1) |
-+	       ANA_VLAN_CFG_VLAN_POP_CNT_SET(1),
-+	       lan9645x, ANA_VLAN_CFG(CPU_PORT));
-+
-+	/* Set vlan ingress filter mask to all ports */
-+	lan_wr(all_ports, lan9645x, ANA_VLANMASK);
-+
-+	dsa_switch_for_each_user_port(dp, lan9645x->ds) {
-+		lan_wr(0, lan9645x, REW_PORT_VLAN_CFG(dp->index));
-+		lan_wr(0, lan9645x, REW_TAG_CFG(dp->index));
-+	}
-+
-+	return 0;
-+}
-
+ 
+ 	tt_local = batadv_tt_local_hash_find(bat_priv, addr, vid);
+ 
+@@ -684,7 +687,7 @@ bool batadv_tt_local_add(struct net_device *mesh_iface, const u8 *addr,
+ 	 */
+ 	tt_local->common.flags = BATADV_TT_CLIENT_NEW;
+ 	tt_local->common.vid = vid;
+-	if (batadv_is_wifi_hardif(in_hardif))
++	if (iif_is_wifi)
+ 		tt_local->common.flags |= BATADV_TT_CLIENT_WIFI;
+ 	kref_init(&tt_local->common.refcount);
+ 	tt_local->last_seen = jiffies;
+@@ -743,7 +746,7 @@ bool batadv_tt_local_add(struct net_device *mesh_iface, const u8 *addr,
+ 	 */
+ 	remote_flags = tt_local->common.flags & BATADV_TT_REMOTE_MASK;
+ 
+-	if (batadv_is_wifi_hardif(in_hardif))
++	if (iif_is_wifi)
+ 		tt_local->common.flags |= BATADV_TT_CLIENT_WIFI;
+ 	else
+ 		tt_local->common.flags &= ~BATADV_TT_CLIENT_WIFI;
+@@ -767,7 +770,6 @@ bool batadv_tt_local_add(struct net_device *mesh_iface, const u8 *addr,
+ 
+ 	ret = true;
+ out:
+-	batadv_hardif_put(in_hardif);
+ 	dev_put(in_dev);
+ 	batadv_tt_local_entry_put(tt_local);
+ 	batadv_tt_global_entry_put(tt_global);
 -- 
-2.52.0
+2.47.3
 
 
