@@ -1,320 +1,393 @@
-Return-Path: <netdev+bounces-294584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uYONGizNH2o+qAAAu9opvQ
-	(envelope-from <netdev+bounces-294584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:43:56 +0200
+	id wruJGm3OH2qPqAAAu9opvQ
+	(envelope-from <netdev+bounces-294585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:49:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DEE6634BEC
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:43:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0427634D03
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:49:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=outlook.com header.s=selector1 header.b=nKulzzeb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294584-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294584-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=outlook.com;
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b="G/8tduTp";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294585-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294585-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8EABA304C7C7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:43:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 57BCB312AA02
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BBF37F012;
-	Wed,  3 Jun 2026 06:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DA237FF53;
+	Wed,  3 Jun 2026 06:43:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azolkn19010027.outbound.protection.outlook.com [52.103.23.27])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010016.outbound.protection.outlook.com [52.101.46.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68413803D2;
-	Wed,  3 Jun 2026 06:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102FF3659EB;
+	Wed,  3 Jun 2026 06:43:54 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780468994; cv=fail; b=bwS853Ff0Y6izYH+9VY5+vfS6HuzNUXpDxcDPWffiqKDMLcfaJzaBFHLNdnVsfNQiFHuembhuN+9WGfTuNcYJ6Q0C32ApdfdnVFODnGUtAN4ck4p+kRo/vry97ydNPzgs+F8SOP1vr/ifq5awsuajIKMdRc5FYoTvLLRW3z02jg=
+	t=1780469036; cv=fail; b=OGug69Wbty2C5TM7LwM420Lbbd9hACbY7y/thyL/cvGRnSRZGQ9CqPQwGCzSMxq4tUoiZN8BY9SPZnCTC593cBHoQhcNmPr4j4U+tMAsssMELxbBRX0q00AnM38p/qme/mTU5irfFgbsT1z9qnKn8MO/Z5zUItu8b5lFUc7yLh8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780468994; c=relaxed/simple;
-	bh=mRsCH8qz/OQ9Chz61CfaIHJWapu7QOaaZM9F86ZqQho=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bqNtVgtbnkZi2TobA06IvFo4ZXousp1UMxJRYpZl0LyJSt3eVuffpwMn25OVZ04clPrKVoc+JJzp0DCE/qtRbWZwo4Cle5hyYHH6jKr9C/9A4m5J9aEUMcfHdbCMWsAyQL5BrdqhEnDAyzAVAhEZNjs2O4FilRR0U242anfqUlg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=nKulzzeb; arc=fail smtp.client-ip=52.103.23.27
+	s=arc-20240116; t=1780469036; c=relaxed/simple;
+	bh=r4PBytMwdFHDNAxXfC/uIJr6X34SB1ldSEqWo1/PONs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HhPeqZY7kFPi71FkBbeGkBbMx21ox9nszx/K9EcAYJE6ErG7AFJI1NEYzwSHz1af1bs3YzwKZhQksftfokOZ/sa7W8CTiKOId/8iW/hwEwdYBgeivihq8pF7y3e9b9by9Z4jo0OafwVUjdZn11VXkAfXolO4pY4c2wE5LRR9iSI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G/8tduTp; arc=fail smtp.client-ip=52.101.46.16
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ym8kq1kHV0P03tPr40S3r8dO7sdEkNNzW2cjsLwXyuFmZTBVQOZcAxQI+rAe2o+xMJqJ2saMsulW4huqCrWJfccEI8O764HghXpBrNwsk2+M+CEh05iWnY98R+a4T3f1rB8xHhtOhG/k8eT9xilgVYCIfBR7vqnmg8XzWfjH2gs0wSqoRUT6GMxWSbXIrqac+2T0iorvYz/jCxioLXFB4Zf3t8gAgOrSXFI78dSeD1eyiJYJirJxL6gpP3ibxL5W3erDsphszcA2TDrLTNbDZeZRbt8J6TbDGLwtMtCF10jEgaEoBt7mcjp7qNjBpM1bSLxk/S8MKUjFtATyLhjU7Q==
+ b=vddkC0eJaB9d3iKNwHc5/cW2Z5ESLO3VON7DJ2qMJK/LleWJ840sXzwCgW4JZznP+u3NlW1vtcn3C+eJu796ExPFrwrAYY1892e0300hCbk3jkhtmXGIUxW7OzH6z/b5s2DsxxTwLIh06soK5fYwGi6rdifZqAkLmE/ZjzxadiTJ8PYt60jJVw4BNkwRaAHASWStSbkmW2ppITeggATz9fhvNZh1OXRgukxme3ggi7aSlEZ4NMRECIwsAjHqAZSV5Vpzozz0v9MCAEoTK3u23jntVQObWosOlJoirNFUA9mUq/wNypJ1wPAtyoaCHVPmm5V+CSKu5u0WbNfFArHnDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C3Q0SFFvSt7o4fKKodrZPkHhB9oeNfziNErf01jd1Qk=;
- b=FKYrvmGO+89Wes9MiFMFQhoc9e0z6YUpGR5RH8cIpo2SriYbo0Fh6NfEKrVawBBiFIC2paXQ262qS2bwn2xzhev9STR3Ox31fKVLD4YxYpmDzpimJMsXIAAhKxgKm04J0Xkw4wYpgzyxc3o1t++KAmCdrC7A7b+aYXUnIyylwlKvA5h4784UfggO/iQJTMsXCGA1WOEJbwr/pKWeIaVdQyA2nl0q3uPxG82QVKq+oQvzcdgAdD87ttFYqp5iKAoLXQDIjNXKALN1zLIdX0fkLyGg/A+uvyKgeDJBoC1IGO0quQBr7d6LVE7O3fO6Xzr/woiOyKN5qlS3NP81J85pbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
+ bh=VLBxdPTqByVmJidyf3DqxguKjfKl8Rvc3adPmNbiejg=;
+ b=U1yYat56YMk1czeEp2Pl5VfmfKOPuUP7F7tt1VaMvMKrrr/ppCAK9/ifOuH5C+TdI+PwZvJepZ7AAFxN0nuaCkQ+brRhWo1QVNiUR43XuVHEn+PyfQEjVWMrQUaG2LIESeKoNRPvsfgX2Lo4HL402/exAynH6aRrcrP81z+KsuijH1GyOMJ/M2lIHs//9IBpn/cHgWCs7S4Kwwg2v1S8I5spBbRbL3YCleN66e8Ccovi2zsY2TP+2NKhZMfOte37TuvmmWaoWCVUXY4/PpfGAj1Upwl8PcJ2yB3nKAPHoyAPAUK71yDMtNEGS4dHwx5EFK+xL/Y1FoFDCgg89+nzGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C3Q0SFFvSt7o4fKKodrZPkHhB9oeNfziNErf01jd1Qk=;
- b=nKulzzebuwjqibyzRwmfpHZzQLbpCp8lGeewsxCBhh+5+BWstGMyOG7XnNytss+1AYIx3jVodumcFb4JTb8Y4mUbwoQeXyRIYjG+uOjx1M1qEGFk9iDATl3m9Y5PmDkvNXw8pOpKp9psKQhIZpZ9aVQMu8ZY7leS5GBrvfbM8IwYqnvkMxuJZJfc1FuCZ7O1IuxPFLLA7yqOi3MNnz6HlNZhqfPkr19HVNY4xasdmGxWZm6o1imQAvR+abmjPSzGSV9ADx+nGRAnP+kWL20bblK6c3g0ena74a9+xfBDLy90veV63IvKx+xTPQZP4tX6iksK4O3lkevYAsIA1qYNsg==
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
- by PH0PR19MB5132.namprd19.prod.outlook.com (2603:10b6:510:90::17) with
+ bh=VLBxdPTqByVmJidyf3DqxguKjfKl8Rvc3adPmNbiejg=;
+ b=G/8tduTpOmCR01dkW47GaTwoNdvTXZABzlKa5dg6IfMTggANOyIgk3oIFEdHFGI4Vs+Y+r9RZSntgM1vfCECmlrsZNCHBINzqshf+Cf4f3V56ID7AROh1WvqzgkOO3LzgFdJTci6WW7EJ2/D8wwgvpy5i63A8XHvsLDVLpueO49ikCdfwV6Zb89fnm5sINWZL2LQioRYnjOEyrTz/lucYU2cRox41EfdA6kzgUh/4e3XIFVp+ValqOc/UrL2HnvWvmfl+shImyHNOJOX1P9UivXIvqr+z/zvCDjRCiN6yibNzSLOaRZ3HCTzq7iMAKGgc8/oPbdGZmaONUOrYPjKBg==
+Received: from SJ0PR03CA0047.namprd03.prod.outlook.com (2603:10b6:a03:33e::22)
+ by DS0PR12MB8318.namprd12.prod.outlook.com (2603:10b6:8:f6::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.17; Wed, 3 Jun 2026
- 06:43:09 +0000
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0092.006; Wed, 3 Jun 2026
- 06:43:09 +0000
-Message-ID:
- <SN7PR19MB6736D1AF2EA0ED8ADA4A72E79D132@SN7PR19MB6736.namprd19.prod.outlook.com>
-Date: Wed, 3 Jun 2026 10:42:53 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] dt-bindings: net: ethernet-phy: move clocks
- property to invidivual PHY bindings
-To: Conor Dooley <conor@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org
-References: <20260602-ipq5018-gephy-clocks-v2-0-65a1f1d881f3@outlook.com>
- <20260602-ipq5018-gephy-clocks-v2-1-65a1f1d881f3@outlook.com>
- <20260602-defense-diabetic-8a8e8e03a536@spud>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <20260602-defense-diabetic-8a8e8e03a536@spud>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0040.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:58::10) To SN7PR19MB6736.namprd19.prod.outlook.com
- (2603:10b6:806:263::12)
-X-Microsoft-Original-Message-ID:
- <39f57a9c-ba0c-4124-b3fe-3d7e1327e1dd@outlook.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Wed, 3 Jun 2026
+ 06:43:45 +0000
+Received: from SJ1PEPF000023CE.namprd02.prod.outlook.com
+ (2603:10b6:a03:33e:cafe::87) by SJ0PR03CA0047.outlook.office365.com
+ (2603:10b6:a03:33e::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.7 via Frontend Transport; Wed, 3
+ Jun 2026 06:43:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF000023CE.mail.protection.outlook.com (10.167.244.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.5 via Frontend Transport; Wed, 3 Jun 2026 06:43:44 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 2 Jun
+ 2026 23:43:30 -0700
+Received: from [10.221.198.204] (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 2 Jun
+ 2026 23:43:23 -0700
+Message-ID: <688e1bc4-09c5-451b-a5e3-65d7adf00089@nvidia.com>
+Date: Wed, 3 Jun 2026 09:43:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 12/13] net/mlx5e: TC, enable steering for SD
+ LAG
+To: Jakub Kicinski <kuba@kernel.org>, <tariqt@nvidia.com>
+CC: <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <saeedm@nvidia.com>, <leon@kernel.org>,
+	<mbloch@nvidia.com>, <noren@nvidia.com>, <ychemla@nvidia.com>,
+	<ohartoov@nvidia.com>, <edwards@nvidia.com>, <horms@kernel.org>,
+	<msanalla@nvidia.com>, <parav@nvidia.com>, <kees@kernel.org>,
+	<phaddad@nvidia.com>, <moshe@nvidia.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>, <gal@nvidia.com>,
+	<jacob.e.keller@intel.com>
+References: <20260531113954.395443-13-tariqt@nvidia.com>
+ <20260603022645.2298955-1-kuba@kernel.org>
+Content-Language: en-US
+From: Shay Drori <shayd@nvidia.com>
+In-Reply-To: <20260603022645.2298955-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|PH0PR19MB5132:EE_
-X-MS-Office365-Filtering-Correlation-Id: bea12255-4461-4c90-2767-08dec13b6003
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023CE:EE_|DS0PR12MB8318:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6caad087-5ee8-4f60-a452-08dec13b7548
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|37011999003|24021099003|55001999006|6090799003|51005399006|12121999013|5072599009|23021999003|8060799015|15080799012|19110799012|40105399003|3412199025|440099028|10035399007;
+	BCL:0;ARA:13230040|7416014|376014|36860700016|1800799024|82310400026|22082099003|18002099003|5023799004|11063799006|4143699003|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZXlGckd3UzRYOFpTUElZSXUrck1nY2pIVWRJcmlOeWlVaXpSQ0FMV01xM2o5?=
- =?utf-8?B?Q2N3TjA4ejdYc3FkNkRZOWhnOFNPNGF1NHJkYlU4RFZHcWxkcTUrRWhrL3BK?=
- =?utf-8?B?MHR0K3FzbE9sd2FZWnl3VzQ1YTFldGlOdmlDdVdMR1MzODZVd3ZhNzVzZTc2?=
- =?utf-8?B?WHB2U04zMnJaZVp2RFlRM0JLLzVmWUlVcitIeitiVXovR0NWTC9HMmtjdkpQ?=
- =?utf-8?B?Z2FkUytIWGlPaVdrN01PeEZWbk11Y1pHZHh6aXFOa3hOMWxETzh1bTQ5WThk?=
- =?utf-8?B?RGpzNjRxL3BXaGIrS0ZLc3RGVUJuMmdXd2toNjU0dzdwTXhNQzdhWnNJYkhP?=
- =?utf-8?B?dHFSU3RMNGF2TUlXcUhDWWVya1BiVFNWUkpLZ1kyOHFKcGxobmI3UUpmMkEy?=
- =?utf-8?B?MHdoYmdCL2J4dUNyUUdKYWhnOHV0RTlzVUdJNWR0YjFWelVzUEVYZUFNZzVS?=
- =?utf-8?B?dWxPN3FxeElvNktPd0FXQmlHUVRSSGRYTFN0SHd2VTVnbWFnWmluRXJ0ZVpC?=
- =?utf-8?B?bXh6SjhiWWpGYS9MbldXV012ckdTT3JHQ0l0Vmhud1cwaWF3WXorQTlOL3d1?=
- =?utf-8?B?L1pCWVgyYUJ1WUlFMUNRcTdwME41eHY3Vm1rVG45WmJMY1E4ZWFxeG1jZFVG?=
- =?utf-8?B?K21rNFlNMG9qRittaHlJdWlpVmlrZ3dWSVN5TWhVTERvQk1sQXdDK3NXdnpD?=
- =?utf-8?B?VU9sOE9rK3drbm5xVGlzblNTQy9VZS9tWDBhWTkzaHNiQXhrZjhhVkorVk5s?=
- =?utf-8?B?YW90WnR1UitkZVNLd0NXWGNxcFJ0ZTBZTTdjSFlBenpPNFNyd0hEblNrdnps?=
- =?utf-8?B?OTR0bUVUWTlDeWd4c0YxS05UcEVjZGYrUklRUGhTMmRSNFRFNndsMlMvVUxl?=
- =?utf-8?B?NDcyTDZvVWRyU29KRmlWSmdJYzhlUS9GaXR6UXZJSjBXWEExTjNrQjNtM0wx?=
- =?utf-8?B?bmdsdTcvN0MzNk1LZFJmamI2ZUZSOXZxcG0vZ0RsY1h2TmhHbEcxMEpmQXlZ?=
- =?utf-8?B?cUNnek9uQVpqTmZrdEpSdS8zMURDWjgzYXJhRVVkYkkrcU1VZ25OdDBKTW9G?=
- =?utf-8?B?WnE4dXEwcUVWd2VpcktHRG1pRlVheU9BUEFxS25sWm00VEFTY24vRlJvU240?=
- =?utf-8?B?STkwUjVkTElNMm5reVc3VnpMS1VCNDBEN1pvZXVxRjh2YlhNUjgzaVc1cnBh?=
- =?utf-8?B?bVEwL2djbUVHRHprR1ZlR2gvTXRUV3Y2WnEwSlZwVUg4S1NRREhkREpCNjBO?=
- =?utf-8?B?aHFRS21Va1l2ai94RWdMMnZjVHJWTFBjZDRId3pnbHNBSndpdyttRlovWjhE?=
- =?utf-8?B?R3VzM3gwSEQwSHA0UTBhR29XRDd5ZFlWd21oVUk2R1l4MTNTWkxiM2gyNkJU?=
- =?utf-8?Q?O6B/elwJRLBl6/xgC4OOuOkTuQpqCvs0=3D?=
+	RKIo5ooZxePQ1CVq1RLikm4yeTMreuY896Qj7yXp84PLJU/NpfSzTltl5or0KHfZr851nPvai/orqN+V5wIlGwXD5piGjw0d6c4Tcvfz99kbjdNLhgl5PLBBCRyLt+57p+0vpm3kSqqMIGo3Vj/1xTZdySfF3cuGkEUbNdy64iZbGNqxK+1XO4AWzFyo7XU7DtLw/v255N4fjwt3EMCbIJJWhiRNNGni9gAuMyKHy6se7CJikfjIimT3nPM1TpYCec/YNj6u1TU16if0siN62blFr5YnTns0LCoM2cfpnohj5C0kBYQ73v0L8JM9RjC41kbSc/tnsjvdCeEg1f0xKHpfiXmgxgZ7DO77Vk18nID9VW8kT9a1mNCrCQkBqK9oM7aKGGU6vfez6rACCYKhqACklVdbH8/2UPopUi1+Kjtn51rpl6K2GtzHB4YtaTmpBl8HsSjO6vvHvaz6e/aEEwsVmcXpW0N7ZDQ/1I+9mUh0MDgcJDEo+teUr6dvbeAViegYoB1wdwweZuz7NKVQPxGRpxFADJJxF3ipJgic1ucXb0qwONXbfE1JAj1GTQkhI+COW5L27MWgVP7If+XNdvMiYZEUKoGHMYGWJjpcL7EaAnmtspFsHkafjn2mHqw7jbxTTvPig7AoAf4iIKqE2NrXMSybcKia1liYCHSfXBRTQ/uYAAu5+04NU3WLLgL+zsvKWu0U51rxnZ2APn0lMKrKJUdPkj1soY8FZ9A5Jko=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700016)(1800799024)(82310400026)(22082099003)(18002099003)(5023799004)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WUFaRkVZTnpWSEkvZk9VV3VQNFhyVDhrWUxSZ1dUZzFYUjhjL281aVpSRTJQ?=
- =?utf-8?B?UW5xcmY4b29GZzIrellaL0Q4ZDE1b3VKUUw3d0xpbDhzWk1PRHRJZThjRldp?=
- =?utf-8?B?T09OY2pveXJjenBEK202WU5NcExabGltRGZjMTMyKzRUV0hMenhwd3JIYTlG?=
- =?utf-8?B?b1lBS25uYktnNUlGMTdGTDJzM3lsWTE5Y1lWMndEQ25QMThrWGFJWmoza1pR?=
- =?utf-8?B?SVhlV0FzdGxwN0I1YnBIbkVkaWMwTTN3anhtbHFkQmFNL2xwcnNhdlM4emdR?=
- =?utf-8?B?R2F3OE95UThrdzg0VUNnQytHWWRXS3l0aE1VSERQd3ZMNExHV2d2NlNPU2RD?=
- =?utf-8?B?eGFzREQxcUFJWUR4bW5KU0V6dnhod28vcVZPTzRTTXhEWnFqTjJoQkZwK2tW?=
- =?utf-8?B?eXlDMWltMzRMUlF6em4yZ0tpM3hZdUsvWmM4MUJ2SFExdE1NNWVLdk5iMkdB?=
- =?utf-8?B?eTRDT3VMUk9JcEh6eDNMbE1yeGdWWlZ3TVZCVloxWnNZMjkrVWFJdG8vQUNM?=
- =?utf-8?B?alprM1BSQzNKQlJ0aktQeStXdDVKRG9vdFZvREFKMytkUHBISGlvM3c4NHJG?=
- =?utf-8?B?VlRQZTNldVU5eWREVDhzTFMwVldHTzdwMXBJSmV6Nloyd0F6TDVQT2JxL3hT?=
- =?utf-8?B?Q243ckUzK3RHMGtqaE1FaXVpWEVjV0ptamZGd3JGNVVjRzBrc2ovK2FQYUJY?=
- =?utf-8?B?QTNkSjMxVlovdGt1c0xMVzFsVEFPdDdvQVVRMVFnbzBZWm9wd2twWUVvUUVs?=
- =?utf-8?B?NXR6S014SUdpZENhU3hKMEJFZXlRUVE4bEhiTlltQlNuRnBOWXJIRGtoRnpD?=
- =?utf-8?B?ZFpsbVNXUG1mcjlXNnVVSlZnN3ArajZpYlZBOE9LNTZIaWMrbDRoOXFabFdH?=
- =?utf-8?B?KzEvbldpenp3bFhyK1h3OFYzWmdsVzNITEZ1TXdmT094eXRON3lVNUFyWE4x?=
- =?utf-8?B?aTNaU1lpR01tVTdTOURjcU55ZVpCbDdQT000ajF4ejdEMmJwemxWYVJIbG8x?=
- =?utf-8?B?YXRMUE9SQXIzR3hkWk1tOXU2N1JDYlB3K21FSWQ5Y0ZUK04vY2lzQTNEYjNP?=
- =?utf-8?B?c09tUWRuVU9Ed1R2WVB5L2xjbnppUmd3ZXU2YlhGQnBrb09TTE0zRkFvMWxw?=
- =?utf-8?B?cnJaQ0tCbHRoNWlyTVdtS2ovbzNFaTE3NE9zUlNtcVczcHdtUHU0dHllUmgw?=
- =?utf-8?B?OFN2OE01clg2ZTUxdUtVaEdEWFVzRkx4Qkd2b0xKSkgzQ1BaNzdCVlF2V2Z3?=
- =?utf-8?B?UXZLUXdQMWFUVG15cnB2Wi9lbTRCN3FrcDJUWTc3eHdjcmgvUFd2ZUVvdk5C?=
- =?utf-8?B?dFYwbk1FbHFPWjdEZzdDYzJaL0cycjFmZTlxL1NRdzY1NzIrd2xyQWZuQXZN?=
- =?utf-8?B?OUo1SmZKTjJoQjhLbVFLRFduUG1CSTBCRHB4R0VRTUpkRVkzb1U4N1U3Y0ls?=
- =?utf-8?B?Qk8zcllwd2NvTW1zOU8yTUxzc08zS0F5VnY4ZGhZN1NlVjJFWmhPZGt4TXF2?=
- =?utf-8?B?RGNvQ3A0MnFPUUVBWEhjUzlwN3ZhQXNZQTk5cWRMUkxhbmFxb1ZIUVdCdTlJ?=
- =?utf-8?B?WXJSUGRrTG9VTjd4TnVBVjJia3dtNTFoZnV5N0pMTTdrRzQyb09MMmtkRVd1?=
- =?utf-8?B?RUMyY1ZQSzRwUHZDeGY2MUdMcVEwWjNMdWhPcjYwZ25GVUVwa0RMMWdEVHlI?=
- =?utf-8?B?VG1HdkJQNWVGZml3QmtsQnpaY0U3YVBUeEJyRVFKMnRBYUpwTlNhSVdLUjNr?=
- =?utf-8?B?ZElnMjFMcm9iT1R2Z2VFbSt0RUhlMlU0WUJVVlE2RlRCWThiUGZTK0JrdXhr?=
- =?utf-8?B?ZGJWRVBSeGREM09oa29NcUYxMVE2S2hkZXlqVnFLdTBUME14OWkxRnZpTHM4?=
- =?utf-8?B?d01taTZDdkgyNjFjVW55djdYZWZkZkd1Ynh2RHJGZ3gwclE9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bea12255-4461-4c90-2767-08dec13b6003
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2026 06:43:09.6540
+	XaFMSNXAo4jjkOuJMypHRZ+2AYOCNjKIV7CEk9XtJtLpn5Ih3j4WUfcxJb8fJgE5dtkpMRBI2NfJVUqQdPjzpFzjiwQdG8qp1FOWc89/X8zYAJOwx/Eiu9Ec0KJqSaCXJHiBUXX32XnAw784Z0EUObAbQ6GulzWiavWAJolBz65Jg3QV80hz86RMY5XJjtl1LHuQkjo4+QyiEM3VWv3TqEgqJsJHsIgcrxCFnW5bYkmHIhhIgjJvJAWjGLrIwl19c2uAbYb8XuASLzW2SV5/5e4Gqme9PAi+FouLc5Zs3zd2hp9kfCSk90XxMV6zXgzLQssVf5lp2/BNw3v1ecbDLWHZyiw595bHcEc/191cbaF5ce/kitzkYEWhw7xYZmEWIRyxy6jjKIFCSYw4N3Ufb720EIIha+BkcisuHEkvHu49nmhCZ1P/WU0UQ9/5D6KQ
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2026 06:43:44.7234
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR19MB5132
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6caad087-5ee8-4f60-a452-08dec13b7548
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000023CE.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8318
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
-	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:konrad.dybcio@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:krzk@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[outlook.com];
-	FORGED_MUA_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294584-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,oss.qualcomm.com];
-	DKIM_TRACE(0.00)[outlook.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-294585-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:tariqt@nvidia.com,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:leon@kernel.org,m:mbloch@nvidia.com,m:noren@nvidia.com,m:ychemla@nvidia.com,m:ohartoov@nvidia.com,m:edwards@nvidia.com,m:horms@kernel.org,m:msanalla@nvidia.com,m:parav@nvidia.com,m:kees@kernel.org,m:phaddad@nvidia.com,m:moshe@nvidia.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:gal@nvidia.com,m:jacob.e.keller@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:from_mime,nvidia.com:mid,Nvidia.com:dkim];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,outlook.com:dkim,outlook.com:from_mime,outlook.com:email,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4DEE6634BEC
+X-Rspamd-Queue-Id: E0427634D03
 
-On 6/2/26 20:34, Conor Dooley wrote:
-> On Tue, Jun 02, 2026 at 10:50:37AM +0400, George Moussalem via B4 Relay wrote:
->> From: George Moussalem <george.moussalem@outlook.com>
->>
->> Move the clock property and restriction from the ethernet-phy.yaml file
->> to the individual PHY binding files. This allows each PHY to manage its
->> own clock requirements.
->>
->> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->> ---
->> Commit 350b7a258f20 introduced the clocks property with a restriction to
->> maximum 1 to the main ethernet-phy.yaml binding for Realtek to add an
->> optional external clock source. This is restrictive to all PHY bindings,
->> as some PHYs may require more than 1 clock such as the IPQ5018 PHY which
->> requires 2 clocks (for RX and TX).
->>
->> There are three other PHY drivers that require clock management:
->> - Micrel: requires 1 optional clock and the micrel.yaml file already
->> accomodates for the clock property.
->> - SMSC: requires an optional clock and the legacy bindings file
->> (smsc-lan87xx.txt) already accomodates for the clock property.
->> - BCM7xxx: requires an optional clock. I could not find a bindings file
->> for this PHY family.
+
+
+On 03/06/2026 5:26, Jakub Kicinski wrote:
+> External email: Use caution opening links or attachments
 > 
-> Have you done a large-scale dtbs_check run with this patch applied and
-> checked that it does not ban having a clock for phys with no dedicated
-> bindings?
-
-I've ran: make V=s CHECK_DTBS=y DT_SCHEMA_FILES=/net/ ARCH=arm64
-
-There were a whole lot of errors, mostly related to missing required
-regulator/power-supply properties, but none related to clocks.
-
-Also ran: make dt_binding_check DT_SCHEMA_FILES=/net/
-
-This ran successfully apart from the one error I highlighted in my reply
-to Rob on v1:
-
-  DTC [C] Documentation/devicetree/bindings/net/renesas,ether.example.dtb
-/home/george/src/linux-next/out/Documentation/devicetree/bindings/net/renesas,ether.example.dtb:
-ethernet-phy@1 (ethernet-phy-id0022.1537): compatible:
-['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
-	from schema $id: http://devicetree.org/schemas/net/micrel.yaml
-
-In addition, I ran `grep -r '#include <linux/clk.h>' drivers/net/phy` to
-identify all phy drivers that manage clocks which I've reported above.
-There's one more: xlnx_gmii2rgmii.c which acquires and enables 1 clock
-which is also accounted for in its schema.
-
-None of the phy-core files manage clocks.
-
-> I feel like weakening the limit of a single clock is probably more
-> accurate than outright banning clocks for ethernet phys without a
-> dedicated binding?
-
-If you think increasing the restriction is a better solution, I can
-submit an updated version. Kindly let me know.
-
 > 
-> Cheers,
-> Conor.
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net/mlx5e: TC, enable steering for SD LAG
 > 
->> ---
->>  Documentation/devicetree/bindings/net/ethernet-phy.yaml    | 6 ------
->>  Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml | 6 ++++++
->>  2 files changed, 6 insertions(+), 6 deletions(-)
+> Extends TC flow steering to support the SD LAG mode by adding
+> mlx5_lag_is_sd()/mlx5_sd_is_primary() helpers, redirecting uplink
+> priv/proto_dev queries to the primary eswitch in SD setups, and adding
+> peer-flow handling for secondary devices.
+> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+>> index 2a16368a948e..910492eb51f2 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> 
+> [ ... ]
+> 
+>> @@ -4196,9 +4197,26 @@ static bool is_lag_dev(struct mlx5e_priv *priv,
+>>                 same_hw_reps(priv, peer_netdev));
+>>   }
 >>
->> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
->> index 21a1a63506f0..709ea976ef79 100644
->> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
->> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
->> @@ -105,12 +105,6 @@ properties:
->>        1BR-10 names. The PHY must be configured to operate in BroadR-Reach mode
->>        by software.
->>  
->> -  clocks:
->> -    maxItems: 1
->> -    description:
->> -      External clock connected to the PHY. If not specified it is assumed
->> -      that the PHY uses a fixed crystal or an internal oscillator.
->> -
->>    enet-phy-lane-swap:
->>      $ref: /schemas/types.yaml#/definitions/flag
->>      description:
->> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> index 45033c31a2d5..8a26f6941dc4 100644
->> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> @@ -38,6 +38,12 @@ properties:
->>        - ethernet-phy-id001c.cad0
->>        - ethernet-phy-id001c.cb00
->>  
->> +  clocks:
->> +    maxItems: 1
->> +    description:
->> +      External clock connected to the PHY. If not specified it is assumed
->> +      that the PHY uses a fixed crystal or an internal oscillator.
+>> +static bool is_sd_eligible(struct mlx5e_priv *priv,
+>> +                        struct net_device *peer_netdev)
+>> +{
+>> +     struct mlx5e_priv *peer_priv;
 >> +
->>    leds: true
->>  
->>    realtek,aldps-enable:
->>
->> -- 
->> 2.53.0
->>
->>
+>> +     peer_priv = netdev_priv(peer_netdev);
+>> +     return same_hw_reps(priv, peer_netdev) &&
+>> +             mlx5_lag_is_sd(priv->mdev) &&
+>> +             (mlx5_sd_get_primary(priv->mdev) ==
+>> +              mlx5_sd_get_primary(peer_priv->mdev));
+>> +}
+> 
+> [Medium]
+> With the redefinition of mlx5_sd_get_primary() to return NULL when
+> sd->devcom is not ready, can both calls here legitimately return NULL
+> during a teardown race and make the equality test succeed?
 
-Best regards,
-George
+no, mlx5_lag_is_sd() is the gateway. e.g.: if mlx5_lag_is_sd() returns
+true, mlx5_sd_get_primary() returns a valid primary, never NULL. The
+two-NULLs-and-equal scenario isn't reachable.
+
+> 
+> In that situation is_sd_eligible() would report two unrelated devices
+> as belonging to the same SD primary.
+> 
+> Would something like this be more robust:
+> 
+>      struct mlx5_core_dev *primary = mlx5_sd_get_primary(priv->mdev);
+> 
+>      return same_hw_reps(priv, peer_netdev) &&
+>             mlx5_lag_is_sd(priv->mdev) &&
+>             primary &&
+>             primary == mlx5_sd_get_primary(peer_priv->mdev);
+> 
+>> +
+>>   static bool is_multiport_eligible(struct mlx5e_priv *priv, struct net_device *out_dev)
+>>   {
+>> -     return same_hw_reps(priv, out_dev) && mlx5_lag_is_mpesw(priv->mdev);
+>> +     struct mlx5_core_dev *primary = mlx5_sd_get_primary(priv->mdev);
+>> +
+>> +     if (!primary)
+>> +             return false;
+>> +
+>> +     return same_hw_reps(priv, out_dev) && mlx5_lag_is_mpesw(primary);
+>>   }
+> 
+> [ ... ]
+> 
+>> @@ -4351,7 +4372,7 @@ static struct rhashtable *get_tc_ht(struct mlx5e_priv *priv,
+>>                return &tc->ht;
+>>   }
+>>
+>> -static bool is_peer_flow_needed(struct mlx5e_tc_flow *flow)
+>> +static bool is_peer_flow_needed(struct mlx5e_tc_flow *flow, bool *is_sd)
+>>   {
+>>        struct mlx5_esw_flow_attr *esw_attr = flow->attr->esw_attr;
+>>        struct mlx5_flow_attr *attr = flow->attr;
+>> @@ -4372,6 +4393,13 @@ static bool is_peer_flow_needed(struct mlx5e_tc_flow *flow)
+>>        if (mlx5_lag_is_mpesw(esw_attr->in_mdev))
+>>                return true;
+>>
+>> +     if (mlx5_lag_is_sd(esw_attr->in_mdev) &&
+>> +         !mlx5_sd_is_primary(esw_attr->in_mdev)) {
+>> +             if (!mlx5_lag_is_mpesw(mlx5_sd_get_primary(esw_attr->in_mdev)))
+>> +                     *is_sd = true;
+>> +             return true;
+>> +     }
+>> +
+>>        return false;
+>>   }
+> 
+> [High]
+> Can mlx5_sd_get_primary(esw_attr->in_mdev) return NULL here?
+
+no, same as above.
+
+> 
+> [Medium]
+> On the topic of unsynchronized SD-state reads in this branch, the
+> writer (mlx5_sd_cleanup) updates sd->primary and devcom->ready under
+> the devcom rwsem, but the readers introduced by this patch take none
+> of those locks:
+> 
+>    - mlx5_sd_is_primary() reads sd->primary with no lock and no
+>      READ_ONCE.
+>    - mlx5_sd_get_primary() pairs READ_ONCE(ready) with a plain read of
+>      sd->primary and sd->primary_dev.
+>    - mlx5_lag_is_sd() reads pf->group_id under lag_lock, which does
+>      not order against the devcom rwsem at all.
+> 
+> Since sd->primary also selects which arm of the union in struct
+> mlx5_sd is valid (secondaries[] vs primary_dev), can a torn or stale
+> read of sd->primary make these helpers read the wrong union member?
+
+These helpers are intentionally lockless; it's the caller's
+responsibility to call them in a context where the returned state is
+guaranteed to remain valid. In this patch, the TC/rep callers only run
+while SD is valid.
+
+> 
+>> @@ -4628,19 +4657,26 @@ mlx5e_add_fdb_flow(struct mlx5e_priv *priv,
+>>                   struct mlx5e_tc_flow **__flow)
+>>   {
+>>        struct mlx5_devcom_comp_dev *devcom = priv->mdev->priv.eswitch->devcom, *pos;
+>> +     struct netlink_ext_ack *extack = f->common.extack;
+>>        struct mlx5e_rep_priv *rpriv = priv->ppriv;
+>>        struct mlx5_eswitch_rep *in_rep = rpriv->rep;
+>>        struct mlx5_core_dev *in_mdev = priv->mdev;
+>>        struct mlx5_eswitch *peer_esw;
+>>        struct mlx5e_tc_flow *flow;
+>> +     bool is_sd = false;
+>>        int err;
+>>
+>> +     if (mlx5_lag_is_sd(in_mdev) && !mlx5_lag_is_active(in_mdev)) {
+>> +             NL_SET_ERR_MSG_MOD(extack, "SD shared FDB not yet active");
+>> +             return -EOPNOTSUPP;
+>> +     }
+>> +
+>>        flow = __mlx5e_add_fdb_flow(priv, f, flow_flags, filter_dev, in_rep,
+>>                                    in_mdev);
+>>        if (IS_ERR(flow))
+>>                return PTR_ERR(flow);
+>>
+>> -     if (!is_peer_flow_needed(flow)) {
+>> +     if (!is_peer_flow_needed(flow, &is_sd)) {
+>>                *__flow = flow;
+>>                return 0;
+>>        }
+>> @@ -4651,6 +4687,15 @@ mlx5e_add_fdb_flow(struct mlx5e_priv *priv,
+>>        }
+>>
+>>        mlx5_devcom_for_each_peer_entry(devcom, peer_esw, pos) {
+>> +             if (is_sd) {
+>> +                     /* SD shared FDB: only the matching SD primary. */
+>> +                     if (mlx5_sd_get_primary(in_mdev) !=
+>> +                         mlx5_sd_get_primary(peer_esw->dev))
+>> +                             continue;
+>> +             } else {
+>> +                     if (!mlx5_sd_is_primary(peer_esw->dev))
+>> +                             continue;
+>> +             }
+>>                err = mlx5e_tc_add_fdb_peer_flow(f, flow, flow_flags, peer_esw);
+>>                if (err)
+>>                        goto peer_clean;
+> 
+> [Medium]
+> Same NULL == NULL question applies here. The devcom being iterated is
+> priv->mdev->priv.eswitch->devcom, i.e. the eswitch devcom, so peer_esw
+> entries are not necessarily SD peers and may belong to different SD
+> groups (or to none).
+
+The is_sd branch is only entered when is_peer_flow_needed() returns
+is_sd=true, which requires the caller's mdev to be SD. As mentioned
+above, mlx5_sd_get_primary() is gated by mlx5_lag_is_sd(), so
+mlx5_sd_get_primary(in_mdev) can't be NULL here. Different SD groups
+have different primaries, so the is_sd branch explicitly filters to
+the matching group.
+
+> 
+> If mlx5_sd_get_primary() can transiently return NULL on either side
+> during an SD teardown race, both sides may evaluate to NULL and the
+> != test will not skip the unrelated peer:
+> 
+>      if (mlx5_sd_get_primary(in_mdev) !=
+>          mlx5_sd_get_primary(peer_esw->dev))
+>          continue;
+> 
+> Would explicitly requiring a non-NULL primary on at least one side, or
+> caching mlx5_sd_get_primary(in_mdev) once and rejecting NULL up front,
+> be more correct?
+> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> index ec606851feb8..25286ecd724e 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> @@ -49,13 +49,16 @@ static int mlx5_sd_get_host_buses(struct mlx5_core_dev *dev)
+>>        return sd->host_buses;
+>>   }
+>>
+>> -static struct mlx5_core_dev *mlx5_sd_get_primary(struct mlx5_core_dev *dev)
+>> +struct mlx5_core_dev *mlx5_sd_get_primary(struct mlx5_core_dev *dev)
+>>   {
+>>        struct mlx5_sd *sd = mlx5_get_sd(dev);
+>>
+>>        if (!sd)
+>>                return dev;
+>>
+>> +     if (!mlx5_devcom_comp_is_ready(sd->devcom))
+>> +             return NULL;
+>> +
+>>        return sd->primary ? dev : sd->primary_dev;
+>>   }
+> 
+> [ ... ]
 
 
