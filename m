@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-294641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FY65KobbH2oJrQAAu9opvQ
-	(envelope-from <netdev+bounces-294641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:45:10 +0200
+	id meGvG4naH2qurAAAu9opvQ
+	(envelope-from <netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:40:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15AB0635592
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:45:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA5363550A
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:40:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b="btgvpoP/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294641-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294641-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=OeNMOhBG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294643-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6E09930C54BA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:31:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A4623264479
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61848405869;
-	Wed,  3 Jun 2026 07:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5AE40757B;
+	Wed,  3 Jun 2026 07:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9430A403EA7
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0410B403EBA
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:28:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471726; cv=none; b=FmOYI+p+2c0sbsePMfA0h9+/r22diUydjQgo7FU+XS627I3q63U0aZb1v7+WV67GHKwyDu/nsqhA+/5qA/kdrxpaxNuwwtYbbof02g8XK1TLpI/7MQW7/wBrI7cJQ1e7ToJ0jDj45P99rmf9czB4QVxO38gf/hTxbPsQtK+IfUg=
+	t=1780471733; cv=none; b=j+K+5PiOEwHpDu1KGwxek7ctkGwgzSFVS8YMsSdZ56xm6AV+p9QwOemoc8gb76nEE9dRPcNx2JBUNYCJ8zAoNYpknAZr3qEtzwLPCRP3NPpK1rgwKvbbdv6g2EHLbEiXjTwFN7JDa6vNjQ48cOM2vm01MeaJWUROOfCGyKxWpco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471726; c=relaxed/simple;
-	bh=vZOfIEcxw+Fy1HBH6hwkpuijf88E6fq/alp03avT+5s=;
+	s=arc-20240116; t=1780471733; c=relaxed/simple;
+	bh=u6F/2C+fvBzquIXPlmU/3j5rjS4sBgawX1rb11MeljM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WQb7Ea2SOkJtepn3wJBuLnOvujxcWz47wJCmOs5NKbaqje3Eo030IqaqUMJi5K6wg2MhISh1VQTtUwRwMuDJTgc3+d3y1s41oIIspVEwzxAo6ezAOPS49HFUVExqQFpHoWMXJfaqbgmrb7zQNZL+aSlK83eR3b+qCbK/IlgsCXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=btgvpoP/; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=hEW2PvoR5Dco50twN5k2UmqjDYdOjrnTLqNt36Zv0QiPZ5sa7he5kWtQHggxFFnvkz30O37NPE6m0pcuRhQrSJ8Ib37y/j189m3UNSSKiuvwxJOWy420x0LUeBUe9ud91dI15GyK9X1mXyS14GiDW4SvFRW5f6lYsk01zEIMiA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OeNMOhBG; arc=none smtp.client-ip=95.215.58.178
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780471722;
+	t=1780471729;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cGWYtXhrZv46AL1Ad6j8BtWNTA7mBnidxEXk+Mph1lY=;
-	b=btgvpoP/52SIHLi2S3tYnry3XCFl3lxirO/81WgmLgvurS2xp8AUyrwtJIBWMGLmHisNo2
-	HDns5Y8pmvKE5fthZXUkLfUhUZJAeE6zOSoWQRs06JJZWMVvOGfQC/92+yL2YLLfygQjcl
-	8SJmaQ4DeIE0+b55OmxkDtxR5XsqBgk=
+	bh=TbOdb5ayEdhtH6yD3DNTe0xKjBwdKK62mPaH1TFHgak=;
+	b=OeNMOhBGJqIjbiZIKthmLgw+5Il6LKUo0dcmPR1dzBbD8H+Js2nFq3Ay1dDPfbpf9til3s
+	tUnLRquTGzzLGphpHl8IzZlcuVPPCm6Gz9QJYauVovHPLRPdsbZ+neQD3wHgkzgroL5Cfe
+	iK0+sPgC+3g24EjqfI/auwnChrp1bJg=
 From: Fushuai Wang <fushuai.wang@linux.dev>
 To: saeedm@nvidia.com,
 	leon@kernel.org,
@@ -62,9 +62,9 @@ Cc: netdev@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	wangfushuai@baidu.com
-Subject: [PATCH 1/2] net/mlx5: Simplify cpumask operations in comp_irq_request_sf()
-Date: Wed,  3 Jun 2026 15:26:56 +0800
-Message-Id: <20260603072657.10868-2-fushuai.wang@linux.dev>
+Subject: [PATCH 2/2] net/mlx5: Only consider online CPUs in affinity subset check
+Date: Wed,  3 Jun 2026 15:26:57 +0800
+Message-Id: <20260603072657.10868-3-fushuai.wang@linux.dev>
 In-Reply-To: <20260603072657.10868-1-fushuai.wang@linux.dev>
 References: <20260603072657.10868-1-fushuai.wang@linux.dev>
 Precedence: bulk
@@ -83,11 +83,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294641-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294643-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shayd@nvidia.com,m:parav@nvidia.com,m:moshe@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wangfushuai@baidu.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -106,37 +106,71 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 15AB0635592
+X-Rspamd-Queue-Id: DEA5363550A
 
 From: Fushuai Wang <wangfushuai@baidu.com>
 
-Combine cpumask_copy() and cpumask_andnot() into a single
-cpumask_andnot() since the function can take cpu_online_mask
-directly as the source.
+When an SF is created after a CPU has been taken offline, the IRQ pool may
+contain IRQs with affinity masks that include the offline CPU. Since only
+online CPUs should be considered for IRQ placement, cpumask_subset() check
+would fail because the iter_mask contains offline CPUs that are not present
+in req_mask, causing SF creation to fail.
 
+Filter the affinity mask to only include online CPUs before checking if it's
+a subset of the requested mask, ensuring SF creation succeeds in this scenario.
+
+Fixes: 061f5b23588a ("net/mlx5: SF, Use all available cpu for setting cpu affinity")
 Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/eq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/irq_affinity.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index 22a637111aa2..d11ec263d53c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -886,8 +886,7 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
- 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+index 994fe83da4be..8c0df240b888 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+@@ -102,18 +102,26 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
+ 	struct mlx5_irq *iter;
+ 	int irq_refcount = 0;
+ 	unsigned long index;
++	cpumask_var_t tmp;
  
- 	af_desc->is_managed = false;
--	cpumask_copy(&af_desc->mask, cpu_online_mask);
--	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
-+	cpumask_andnot(&af_desc->mask, cpu_online_mask, &table->used_cpus);
- 	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
- 	if (IS_ERR(irq)) {
- 		kvfree(af_desc);
+ 	lockdep_assert_held(&pool->lock);
++
++	if (!alloc_cpumask_var(&tmp, GFP_ATOMIC))
++		return NULL;
++
+ 	xa_for_each_range(&pool->irqs, index, iter, start, end) {
+ 		struct cpumask *iter_mask = mlx5_irq_get_affinity_mask(iter);
+ 		int iter_refcount = mlx5_irq_read_locked(iter);
+ 
+-		if (!cpumask_subset(iter_mask, req_mask))
++		cpumask_and(tmp, iter_mask, cpu_online_mask);
++		if (!cpumask_subset(tmp, req_mask))
+ 			/* skip IRQs with a mask which is not subset of req_mask */
+ 			continue;
+-		if (iter_refcount < pool->min_threshold)
++		if (iter_refcount < pool->min_threshold) {
+ 			/* If we found an IRQ with less than min_thres, return it */
++			free_cpumask_var(tmp);
+ 			return iter;
++		}
+ 		if (!irq || iter_refcount < irq_refcount) {
+ 			/* In case we won't find an IRQ with less than min_thres,
+ 			 * keep a pointer to the least used IRQ
+@@ -122,6 +130,8 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
+ 			irq = iter;
+ 		}
+ 	}
++
++	free_cpumask_var(tmp);
+ 	return irq;
+ }
+ 
 -- 
 2.36.1
 
