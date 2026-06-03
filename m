@@ -1,53 +1,84 @@
-Return-Path: <netdev+bounces-294666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294667-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kqsrGSXhH2rArgAAu9opvQ
-	(envelope-from <netdev+bounces-294666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:09:09 +0200
+	id GN5DKC/kH2qZrwAAu9opvQ
+	(envelope-from <netdev+bounces-294667-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:22:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976A8635892
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:09:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C88635A73
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:22:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="L2Up9Zp/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294666-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294666-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=blackwall.org header.s=google header.b=HhPvNOcV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294667-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294667-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E3BF3018AC4
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:51:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5A671309CE03
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEA53FF8AA;
-	Wed,  3 Jun 2026 07:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40EF402442;
+	Wed,  3 Jun 2026 07:50:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938A53D47DC;
-	Wed,  3 Jun 2026 07:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5736F402BA0
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:50:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780473023; cv=none; b=s4wqQP++zvwP1pVV6iKvg5n4yUB3cGCnSwgxnQO79P+m539YghvQSdznI/XKqQI5JuOMd10BaXzZF1rxNLbJpB54beKnLWXfOwDGxDw5YLfymHsSM5UDj83KM5Hq8RCg1dzqH7eoBZHqUgxnCTuWABgmDiZbAvFYOuPxOAEat6E=
+	t=1780473044; cv=none; b=Ld28EfEnFSKxNI8LmLj9jDQFoo33KBv9WuFg1MMe9mbgZv3xkc4IDK3VGgOsBLtxI4OvO1gmi1O8gUSH2abJh33h0FxUIeTJ9C4s5zSHu77THQaUQtXwZHzHwdN96K/mSDyGsrTV8EfqxM5Tf4rsCRWGmT+cGS1LGP0LrUjU8XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780473023; c=relaxed/simple;
-	bh=4SlNVuIUt4a+Le1/sIdYKbYIKA3fRJN6rU1+wZYsBfw=;
+	s=arc-20240116; t=1780473044; c=relaxed/simple;
+	bh=DfKZU2lEpY/XWuD80Z8o6lGViXs83jlHA85EQaV6BcU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WNKl2HqwTYNB2Q1DEZeHKsAqkpC0RDM71rGeuGZVl/R92HGWRFW6fC5YWdlmuF9X/YBbwfFZKxzwKXWLc25uwYpklmWw5BOTv6Hs2HjhvxsElzDHAizbX1moBjLZ4b6zMYcgclbEn+eOKXuiY3Uv4ZK0dOuHcTg3qiDk1qdVIwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2Up9Zp/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB7D1F00893;
-	Wed,  3 Jun 2026 07:50:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780473022;
-	bh=88hbOu2kVMzvRDy1eOcozFAmg35YAXSjbmJFuM/mDK4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=L2Up9Zp/7tLPcWy426HJxpyxK5jrLwIKsJh/I7EJrRqcMVmPW2D3+n64+taNy6XZD
-	 ZwdSTJ3RON53sNMh72dYcdBngzi+//cBXjPCP2TR0P2pLDzeSCUSNIp2+t/UrFFG+f
-	 l5kJXpa9fMPly8p1SjmScFTJJ15uQW2Zu81INbFDgDLPz5mtcYEx1uNknRioWz8unX
-	 U0un4cVpgXwBSRBNNymxkAycgiZmzK55Txhoa8kYnHkznYtABdxBsIRTGYEIQQqIYB
-	 F0JhkZF7PR8dLeyUevRBWaTjlMrnD/sVqHpvTV1ougk40oJuqlpF6GsQKvj5/BOxGQ
-	 cyjSy6gZLovcA==
-Message-ID: <df22c9ff-6705-426e-85b1-b5018590d723@kernel.org>
-Date: Wed, 3 Jun 2026 09:50:15 +0200
+	 In-Reply-To:Content-Type; b=tPm17I8I80I+okERhcBaKDHESfa6f86/+GXz04I8iYGPUaRY6yEHeXU5DvdNwXH6IdLtbuBNoP5byBfA2Z1BNtzuBE4tKg+gCjmCFQ58L1TSvVDiPlUBAyd4URpipNKxnI2HhtNooi+RmZe7KYKKqBrXAu+3Sa6//rdizRLwBts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=HhPvNOcV; arc=none smtp.client-ip=209.85.221.52
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-45efb698ef2so2145706f8f.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 00:50:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1780473042; x=1781077842; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6FFnDjQi9nJ9DDSXP3upNDWWSUY1uZfMzeFgACqAkmQ=;
+        b=HhPvNOcVRafBqp7ZUjRztSr7BCsq2zsy79K+f3OHCnIkdiKNgOIdXkrdA0j6eJKVHY
+         9cxu3j1PpyXR42qI3hvbmGooyzOAihc93pImqcatzP/PAwYPZ4oL3i5zPXvJcNEsKikf
+         lJRtZiBekApR04CdwaZKsbP0DqYl/KrSLsAU90vSRsl0OAS93ZZ+D/2BgLCaTaLfliFl
+         5A0m+a0iZcXecXthaaKPzsFAHmC4CpmjzwMetl0qBjdorPeb3qYPtEbS60QckqOLKgyQ
+         1Sa5e3zl5yLcLPTMyfOXxs/MdySg/A0J5UPZPbsmeN6KStnQwB7A6tIM8zSwvtLvxawv
+         KS3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780473042; x=1781077842;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6FFnDjQi9nJ9DDSXP3upNDWWSUY1uZfMzeFgACqAkmQ=;
+        b=FWAuOjz8cnmhVQB3F2sCWNK4iANuW9T7Z3w23H/ggNtYD/5pBDMlQaA5PkmwOb3m+j
+         XLj6M8dBCh0Z8f5eYhh3huEns/FCh97MNqS33SNDVtaO/dxEAZK0xkf+m21hYSPmBX5i
+         Qr9W89E9RjqJtRLGlGpndL3bRCx4QtctrV6bUI4uFquxlaBUbEjutafwG7khIq2pPWMK
+         cqPHRe2k7c3RTPJTTMARBcMzTALYuIqn2Mq9C5WhyTER/wSPAdhrBopEp3NHnhXF5HeU
+         JvbNhLeweWBUIyN9ta/N5qiyVi70Q8bJ7xlYuUTwj10GKiE+AOz8CTQG5gZNBLZI0lpb
+         wh9A==
+X-Forwarded-Encrypted: i=1; AFNElJ/tbt2eBLuxoRwmO49Ummyq9+KSn3MUZesWnWj3kSoifNT4oJI0tIPm/GLI4ph2nn2uE/zTIv4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYFMKFNp7M8/z8hQOScRWjez8xi7F5QbCKGNUJ3WPC+KTQ/5b6
+	GfrFfidynfSCub0N17T2qSmp5uQHKt+xgLHtxzYNXwGi41nx6uAbEQLvdpZsp5lMz1M=
+X-Gm-Gg: Acq92OHoWecQYcgqnIF7lM8DJkdzYgjUFlUIIHdm0hdGbVMr8YsZlFktghRhPmIeezn
+	bD9btGdhhw3AKsS4Oerf2RRZdClrZHpMbISKn6h0oGjW9XVRKPHlwxDu3VWgMPfqOCIi1fuybn5
+	gpzvEjZRBCc7XlTJ4jfmk6BJRt7sVGz4erQ9VXo6ng2Ry1NtlEXHY/XzYvppBQUs0DBXOELRrWx
+	1m7N4Px7cB7PQtjjLv9UbUQa56Bi+hxtJ1o0nn2LNktV08adlCVSiSjbsQPOyqm0uxcp+vvd13D
+	YU18HiU78ysUaHUKHP5metmwEQwtSlLpOGg+zTQjUu0CARB9VEKm5rF+sWhTdQvRjArSz8Easb7
+	LQffKvA/xfhSvisCStpnvSW1FKEGil2tMon7+hC7T+AVSWcAKp2SvjwGtbe5EPKCwOHT9TT30PR
+	krAWnml+8q5F+RcZvu5FZ8lHb+FdlkofUoKMCxI8bB4qQQQOapULygWZoq6iEZ95AK
+X-Received: by 2002:a05:600c:5394:b0:490:b0e0:3de2 with SMTP id 5b1f17b1804b1-490b60f9e98mr36120885e9.33.1780473041726;
+        Wed, 03 Jun 2026 00:50:41 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490b0e76feasm120928085e9.9.2026.06.03.00.50.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jun 2026 00:50:40 -0700 (PDT)
+Message-ID: <e20a2bbb-8bbe-4998-8c46-4171f35c2ab0@blackwall.org>
+Date: Wed, 3 Jun 2026 10:50:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,172 +86,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for
- preadv2/pwritev2
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Steven Rostedt <rostedt@goodmis.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Christian Brauner <brauner@kernel.org>, Askar Safin <safinaskar@gmail.com>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-api@vger.kernel.org,
- netdev@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
- David Howells <dhowells@redhat.com>, Pedro Falcato <pfalcato@suse.de>,
- Miklos Szeredi <miklos@szeredi.hu>, patches@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, Jan Kara <jack@suse.cz>
-References: <20260531010107.1953702-1-safinaskar@gmail.com>
- <20260601-enthusiasmus-canceln-anlehnen-0e62317a9784@brauner>
- <CAHk-=wifX_rrDjRGnDnOqE-usptAukuXKrmuPuVDP5bOCBWzGQ@mail.gmail.com>
- <20260601173325.GH2636677@ZenIV> <20260601160455.2c187574@gandalf.local.home>
- <20260601172825.a51a588ec1c32617a0e12d78@linux-foundation.org>
- <821ed41e-5b2f-4d17-aeb2-71b0361f8e7f@kernel.org>
- <20260602184440.GB2503276@google.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20260602184440.GB2503276@google.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v2 net-next 09/11] bridge: provide lockless access to
+ p->port_id
+Content-Language: en-US, bg
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20260603062043.3911278-1-edumazet@google.com>
+ <20260603062043.3911278-10-edumazet@google.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260603062043.3911278-10-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294666-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294667-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ebiggers@kernel.org,m:akpm@linux-foundation.org,m:rostedt@goodmis.org,m:viro@zeniv.linux.org.uk,m:torvalds@linux-foundation.org,m:brauner@kernel.org,m:safinaskar@gmail.com,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-api@vger.kernel.org,m:netdev@vger.kernel.org,m:willy@infradead.org,m:axboe@kernel.dk,m:hch@infradead.org,m:dhowells@redhat.com,m:pfalcato@suse.de,m:miklos@szeredi.hu,m:patches@lists.linux.dev,m:linux-fsdevel@vger.kernel.org,m:jack@suse.cz,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[david@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux-foundation.org,goodmis.org,zeniv.linux.org.uk,kernel.org,gmail.com,vger.kernel.org,kvack.org,infradead.org,kernel.dk,redhat.com,suse.de,szeredi.hu,lists.linux.dev,suse.cz];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[blackwall.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,vger.kernel.org:from_smtp,blackwall.org:mid,blackwall.org:dkim,blackwall.org:from_mime,blackwall.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 976A8635892
+X-Rspamd-Queue-Id: 71C88635A73
 
-On 6/2/26 20:44, Eric Biggers wrote:
-> On Tue, Jun 02, 2026 at 10:25:06AM +0200, David Hildenbrand (Arm) wrote:
->> On 6/2/26 02:28, Andrew Morton wrote:
->>>
->>>
->>> Well yes, The patchset seems sensible from a quality POV.  But to make
->>> a decision we should first have a decent understanding of its downside
->>> impact.
->>
->> I guess most (all?) of us ... dislike ... vmsplice(), so trying to remove it
->> entirely is certainly very appealing ...
->>
->>>
->>> I haven't seen a description of that impact in the discussion thus far.
->>> And that description is owed, please.
->>>
->>> I assume a small number of specialized applications are using
->>> vmsplice() to great effect?  What are those applications?  What is the
->>> impact of this change?
->>
->>
->> I did some digging, and the kernel crypto API documents using splice/vmsplice
->> for zero-copy[1] and libkcapi [2].
->>
->> I did not find performance numbers, how much vmsplice/splice actually gives us.
->> Playing with the kcapi-speed tool [3] (specifying --vmsplice vs. --sendmsg)
->> doesn't really reveal a big difference at least on my notebook. Not sure if the
->> parameters I specify are reasonable.
->>
->> I don't know whether downgrading vmsplice to preadv2/pwritev2 would perform
->> significantly worse than sendmsg ... and I don't know what the default would
->> usually be (default to vmsplice or sendmsg). I might try finding some time to
->> play with it more, but I doubt it, so if anybody else has time ... :)
+On 03/06/2026 09:20, Eric Dumazet wrote:
+> sysfs show_port_id() and BRCTL_GET_PORT_INFO need this.
 > 
-> AF_ALG is a mistake and isn't commonly used.  Using a userspace crypto
-> library is faster and is what almost everyone does anyway, as it avoids
-> the syscall overhead.  There are many other issues with AF_ALG as well.
+> This will be needed for upcoming RTNL avoidance in "ip link"
+> dumps (cf br_port_fill_attrs()).
 > 
-> 7.2 will mark AF_ALG as deprecated, mostly remove AF_ALG's zero-copy
-> support, and remove AF_ALG's async I/O support:
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   net/bridge/br_ioctl.c    | 2 +-
+>   net/bridge/br_netlink.c  | 2 +-
+>   net/bridge/br_stp_if.c   | 4 ++--
+>   net/bridge/br_sysfs_if.c | 2 +-
+>   4 files changed, 5 insertions(+), 5 deletions(-)
 > 
->     https://lore.kernel.org/linux-crypto/20260430011544.31823-1-ebiggers@kernel.org/
->     https://lore.kernel.org/linux-crypto/20260504225328.25356-1-ebiggers@kernel.org/
->     https://lore.kernel.org/linux-crypto/20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com/
-> 
-> In practice, the programs that are keeping Linux distros from disabling
-> AF_ALG in their kconfig outright are just iwd, cryptsetup, and bluez.
-> They use AF_ALG just because it was mistakenly thought to be easier than
-> using a userspace crypto library.  They don't need maximum performance,
-> nor do they use vmsplice, splice, or sendfile.
-> 
-> There is other highly niche code out there that does implement the
-> AF_ALG + vmsplice + splice thing, e.g. libkcapi.  But it's just not
-> enough of a reason to keep zero-copy support, especially considering
-> that AF_ALG has always been the wrong solution in the first place.  The
-> fallback to copying the data is fine for this deprecated API.
 
-Cool, thanks for sharing that Eric!
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
--- 
-Cheers,
-
-David
 
