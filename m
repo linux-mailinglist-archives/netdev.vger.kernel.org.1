@@ -1,218 +1,191 @@
-Return-Path: <netdev+bounces-294674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d0qKLKbfH2pIrgAAu9opvQ
-	(envelope-from <netdev+bounces-294674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:02:46 +0200
+	id u4kzDLLfH2pRrgAAu9opvQ
+	(envelope-from <netdev+bounces-294675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:02:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ACF5635790
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:02:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4296A63579B
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:02:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=pH+tbqaI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294674-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294674-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=gibson.dropbear.id.au header.s=202602 header.b=LnPVNuzo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294675-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294675-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E018300AED7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 08:01:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D2ECE300C0CE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 08:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD62840800A;
-	Wed,  3 Jun 2026 08:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B523955EA;
+	Wed,  3 Jun 2026 08:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C18403EA2;
-	Wed,  3 Jun 2026 08:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F44402453
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 08:02:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780473682; cv=none; b=JHVd44EfZuAxTqCiyK0zUqipst49gAcOAVq/mOrFSCYm4lPQjgjgNlpAep8pBHTMf0R4xiHdHO+JP+j7Lb4hXkcn8uLVemxWw4QxkNn6J0nXtyTh/c8f4fYrsogaEbdKWbJY/IfHDH3KwP7nTmtVFHn3AAtEd+QWszg/5z7A+Io=
+	t=1780473731; cv=none; b=Q58UrFAALbXcGA681Z52h3xqK4VbMRSiW8NVlXFExwlsUsO2E+6WezylEqXksMHa3WodN2XOBtxFIec3TXXNHnSRn61kK2y9MHFj9E26Wl7G4Z7jHpq11AeIxmpddrLHTKLUZ25EiBd6JY0RIDan5lyLSPZpkAn0E+uWQLje+gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780473682; c=relaxed/simple;
-	bh=Cz5MJb6xvniBMFvl4ZHdADZPJrwkgz2f2V9m7W0UaKQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TVtE0CL+BulrW3mQ4X7I1G4idTGyMh/9HWHEopZN83IcVECY9vp9CeQ7symcyi/lyGs1hkcPCMBOnFIbd5td0mVJ47+cWqt69SP1O57hvr9oLJ0eUJXuiEsgxIKFqft9XHJPamVKLmvv3Oa2umrflEaTCh3qSwQZiciwYbGCBsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=pH+tbqaI; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65380hQB23670145, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1780473644;
-	bh=Cz5MJb6xvniBMFvl4ZHdADZPJrwkgz2f2V9m7W0UaKQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=pH+tbqaIAS9YsyzkNc4PUjDibbFU6kJegqaBbzK8ZOva/vQFdHQ+oGB8q2uEgjYoP
-	 xcOatNrCJlXLRLqVRB/w6uc0OA6ABDx9HIKDMIh/nDYC+eeNHRuRdRYW43l9Ycj1Si
-	 kdbcrq+H6evcJ9iL9G4HacjW26Iz5N0tuoLAt7VE9rM32pVsi0i0WsAF7e7vPMrxW+
-	 yp9Bnd/kV03lYQEnNcHNHEYB+szIpZwz9hIKJ8Mcc3lC+Czrz11GjzPeRDMC+mwPCF
-	 o59Dgjm1woCh/zQ/6RkDyLydBKJK2OI+p1WGq4Di8XsIf+00F83yJjAtg5ttQWEL/9
-	 XQnaOt39DJteA==
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 65380hQB23670145
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 3 Jun 2026 16:00:44 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 3 Jun 2026 16:00:43 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Wed,
- 3 Jun 2026 16:00:43 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v1 1/5] net: phy: realtek: add support for dummy
- phy
-Thread-Topic: [PATCH net-next v1 1/5] net: phy: realtek: add support for dummy
- phy
-Thread-Index: AQHc8yZ/Mp8SA5nBjkWeW0kSVYYOAbYr622AgACJVcA=
-Date: Wed, 3 Jun 2026 08:00:43 +0000
-Message-ID: <f614a60942e34bf39b1d49fb273221ab@realsil.com.cn>
-References: <20260603065916.334-1-javen_xu@realsil.com.cn>
- <20260603065916.334-2-javen_xu@realsil.com.cn>
- <7496c873-fee7-4584-ad70-4315d7b94f8f@bootlin.com>
-In-Reply-To: <7496c873-fee7-4584-ad70-4315d7b94f8f@bootlin.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1780473731; c=relaxed/simple;
+	bh=FhEX2C5U1e2rLZE3qf3v81ODJ4nqrFQu116VRK2H89s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sOv57UyKlYuw/IKye+c/F7MgZu4dhOi9LgRfx2uZRPlb9ETsTViOMXXSCsajr8t2QccKt3BZyzCNP+iCMOqnO1SSmdtbvo96U6Qc2GHtaeBqwk5Tjq9z3K9Hha60GCQeD7/yKxz1S7PLZL82pUcCZ7iucPVH0bZmPwGatOTbvVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=LnPVNuzo; arc=none smtp.client-ip=150.107.74.76
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=gibson.dropbear.id.au; s=202602; t=1780473727;
+	bh=CS2AOn/tJ0mhXVuSowRo5F86TzuTj5U20PzZdWlsqc4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LnPVNuzo3iGFLrZWRaHrS4RFAlNoXR3F9EgxxKcZnGS8Bp9+mTPwKRmW5vNxXmaiH
+	 vddTm3+IlpL7FZQaPNxCnEmAsDZiOMzpkmVrx9o4Uc9cBvVX74qE8MEXNWw8us0+1F
+	 Xw/XKoiPbZj41WfrAYMBl5Mdg0fYNVvw8znO+sD4LjhKASxWBTQy2g8/u93a8n/8JM
+	 iAJ+v3WBhAVly6/E1GrmugM1utf/jhcacZrMjgIHEXpJdaJdEUTOYBG6bjimhjHwzw
+	 fbi3Z1M0Khsq3r0AkveT6nWqL64Owvz3ziZX9oDZIYfhOwD70vq1y68jx1jOJJiQ3X
+	 sR6acvVyuFGew==
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+	id 4gVgCM39K2z4wxG; Wed, 03 Jun 2026 18:02:07 +1000 (AEST)
+Date: Wed, 3 Jun 2026 18:02:02 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: =?iso-8859-1?B?zfFpZ28=?= Huguet <ihuguet@redhat.com>,
+	Stefano Brivio <sbrivio@redhat.com>,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	netdev@vger.kernel.org, yuhuang@redhat.com, justin.iurman@gmail.com,
+	horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, idosch@nvidia.com,
+	dsahern@kernel.org, Chris Adams <linux@cmadams.net>,
+	Beniamino Galvani <bgalvani@redhat.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Andrew Lunn <andrew@lunn.ch>, regressions@lists.linux.dev
+Subject: Re: [PATCH net v2] Revert "ipv6: preserve insertion order for
+ same-scope addresses"
+Message-ID: <ah_fejZd-lPr6AqM@zatzit>
+References: <20260529112357.5079-1-fmancera@suse.de>
+ <20260529134045.56330243@elisabeth>
+ <5079261a-79e5-421b-bf6a-a511acaaeca4@kernel.org>
+ <20260601153525.546746a8@elisabeth>
+ <CACT4oueDv=KRZmJw=1N58EN7eoFz5AqbBBMP8FE4=+rQ99oFEg@mail.gmail.com>
+ <8e9cbf0a-caff-4575-afb7-fe852df8a51a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2hgDZo9YJcACAqqN"
+Content-Disposition: inline
+In-Reply-To: <8e9cbf0a-caff-4575-afb7-fe852df8a51a@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [-1.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[gibson.dropbear.id.au:s=202602];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294674-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:ihuguet@redhat.com,m:sbrivio@redhat.com,m:fmancera@suse.de,m:netdev@vger.kernel.org,m:yuhuang@redhat.com,m:justin.iurman@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:linux@cmadams.net,m:bgalvani@redhat.com,m:regressions@leemhuis.info,m:andrew@lunn.ch,m:regressions@lists.linux.dev,m:justiniurman@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[bootlin.com,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[david@gibson.dropbear.id.au,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DMARC_NA(0.00)[dropbear.id.au];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294675-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gibson.dropbear.id.au:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[david@gibson.dropbear.id.au,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,suse.de,vger.kernel.org,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,leemhuis.info,lunn.ch,lists.linux.dev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3ACF5635790
+X-Rspamd-Queue-Id: 4296A63579B
 
-Pk9uIDYvMy8yNiAwODo1OSwgamF2ZW4gd3JvdGU6DQo+PiBGcm9tOiBKYXZlbiBYdSA8amF2ZW5f
-eHVAcmVhbHNpbC5jb20uY24+DQo+Pg0KPj4gQWRkIHN1cHBvcnQgZm9yIHJ0bDgxMTZhZiBkdW1t
-eSBwaHkgZHJpdmVyLCBtYXRjaCBwaHkgaWQgYW5kIHJlYWQgbGluaw0KPj4gc3BlZWQgZnJvbSBN
-SUlfQk1DUi4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBKYXZlbiBYdSA8amF2ZW5feHVAcmVhbHNp
-bC5jb20uY24+DQo+DQo+Q2FuIHlvdSBlbGFib3JhdGUgbW9yZSBvbiB3aHkgdGhpcyBpcyBuZWVk
-ZWQgPw0KPg0KPlRoZSBjb3ZlciBzYXlzIDoNCj4iDQo+SW4gdGhpcyBtb2RlLCB0aGUgZHJpdmVy
-DQo+bmVlZHMgYSBkdW1teSBQSFkgSUQgc28gdGhhdCBwaHlsaWIgY2FuIGF0dGFjaCB0byBhIGR1
-bW15IFJlYWx0ZWsgUEhZDQo+ZHJpdmVyLCB3aGlsZSBzZWxlY3RlZCBzdGFuZGFyZCBQSFkgcmVn
-aXN0ZXJzIGFyZSBoYW5kbGVkIHRocm91Z2ggdGhlIFNlckRlcw0KPnJlZ2lzdGVyLg0KPiINCj4N
-Cj5XaHkgY2FuJ3QgeW91IHVzZSB0aGUgU2VyRGVzIHJlZ2lzdGVycyBmb3IgeW91ciBQSFkgZHJp
-dmVyID8gVGhlIHBocmFzZSBhYm92ZQ0KPnN1Z2dlc3RzIHRoYXQgdGhlICJTZXJEZXMgcmVnaXN0
-ZXJzIiBoYXZlIHRoZSB0eXBpY2FsIEMyMi80NSBsYXlvdXQuIFRoZXJlIGFyZQ0KPlBIWXMgYW5k
-IFBDU3Mgb3V0IHRoZXJlIHRoYXQgYXJlbid0IGFjY2Vzc2VkIHRocm91Z2ggcmVndWxhciBNRElP
-IHdpdGgNCj5yZWdtYXAgYmVpbmcgdXNlZCB0byB0cmFuc2xhdGUgdGhlIG1kaW8gYWNjZXNzZXMg
-ZG9uZSBieSBwaHlsaWIgaW50byB0aGUNCj5hY3R1YWwgcmVnaXN0ZXIgYWNjZXNzIG1ldGhvZCB1
-c2VkLg0KPg0KPk1heGltZQ0KPg0KDQpUaGFua3MgZm9yIHlvdXIgcmV2aWV3Lg0KTWF5YmUgSSBz
-aG91bGRuJ3QgY2FsbCBpdCBhICJkdW1teSIgUEhZLiBJdCBpcyBhY3R1YWxseSBhIHJlYWwsIGRl
-ZGljYXRlZCBQSFkgZHJpdmVyIGZvciB0aGUgUlRMODExNmFmIG9wZXJhdGluZyBpbiBGaWJlci9T
-ZXJEZXMgbW9kZS4gVGhlIHJlYXNvbiB3ZSBjYW5ub3QgdXNlIHRoZSBzdGFuZGFyZCBnZW5lcmlj
-IFBIWSBkcml2ZXIgaXMgdGhhdCBoYXJkd2FyZSBkb2VzIG5vdCBjb3JyZWN0bHkgcG9wdWxhdGUg
-dGhlIHN0YW5kYXJkIEdpZ2FiaXQgU3RhdHVzIFJlZ2lzdGVyIChNSUlfU1RBVDEwMDAsIFJlZyAw
-eDBhKS4gDQpIZXJlIGlzIGEgc25pcHBldCBvZiBvdXIgTURJTyByZWFkIHRyYWNlIGR1cmluZyBs
-aW5rIHVwOg0KcjgxNjkgMDAwMDo4NTowMC4xOiBNRElPIHJlYWQ6IHRwLT5vY3BfYmFzZT0weGE0
-MDAsIHJlZz0weDBhLCB2YWx1ZT0weDAwMDANCnI4MTY5IDAwMDA6ODU6MDAuMTogTURJTyByZWFk
-OiB0cC0+b2NwX2Jhc2U9MHhhNDAwLCByZWc9MHgwNSwgdmFsdWU9MHg0MWEwDQpSZWcgMHgwYSBy
-ZXR1cm5zIDB4MDAwMCwgdGhlIHBoeWxpYiBnZW5lcmljIHN0YXR1cyBwYXJzZXIgZmFpbHMgdG8g
-cmVzb2x2ZSB0aGUgMTAwME1icHMgbGluaywgY2F1c2luZyB0aGUgZHJpdmVyIHRvIGluY29ycmVj
-dGx5IGZhbGwgYmFjayB0byBhIGZvcmNlZCAxME1icHMsIGV2ZW4gdGhvdWdoIHRoZSBwaHlzaWNh
-bCBsaW5rIGlzIGFjdHVhbGx5IFVQIGF0IDEwMDBNYnBzLiBUaGVyZWZvcmUsIHdlIG5lZWQgdG8g
-cmVnaXN0ZXIgYSBjdXN0b20gUEhZIGRyaXZlciB0byBwcm92aWRlIGEgc3BlY2lmaWMgLnJlYWRf
-c3RhdHVzIGNhbGxiYWNrIHRoYXQgcGFyc2VzIE1JSV9CTUNSIGluc3RlYWQgb2YgcmVseWluZyBv
-biBNSUlfU1RBVDEwMDAuDQoNCkJScywNCkphdmVuDQoNCj4+IC0tLQ0KPj4gIGRyaXZlcnMvbmV0
-L3BoeS9yZWFsdGVrL3JlYWx0ZWtfbWFpbi5jIHwgNTQgKysrKysrKysrKysrKysrKysrKysrKysr
-KysNCj4+ICBpbmNsdWRlL25ldC9waHkvcmVhbHRla19waHkuaCAgICAgICAgICB8ICAxICsNCj4+
-ICAyIGZpbGVzIGNoYW5nZWQsIDU1IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy9uZXQvcGh5L3JlYWx0ZWsvcmVhbHRla19tYWluLmMNCj4+IGIvZHJpdmVycy9uZXQv
-cGh5L3JlYWx0ZWsvcmVhbHRla19tYWluLmMNCj4+IGluZGV4IDI3MjY4ODExZjU2NC4uOWI5Mjgy
-OGM0OWQ5IDEwMDY0NA0KPj4gLS0tIGEvZHJpdmVycy9uZXQvcGh5L3JlYWx0ZWsvcmVhbHRla19t
-YWluLmMNCj4+ICsrKyBiL2RyaXZlcnMvbmV0L3BoeS9yZWFsdGVrL3JlYWx0ZWtfbWFpbi5jDQo+
-PiBAQCAtMjY1OSw2ICsyNjU5LDQ3IEBAIHN0YXRpYyBpbnQgcnRsZ2VuX3NmcF9nZXRfZmVhdHVy
-ZXMoc3RydWN0DQo+cGh5X2RldmljZSAqcGh5ZGV2KQ0KPj4gICAgICAgcmV0dXJuIDA7DQo+PiAg
-fQ0KPj4NCj4+ICtzdGF0aWMgaW50IHJ0bDgxMTZhZl9zZnBfZ2V0X2ZlYXR1cmVzKHN0cnVjdCBw
-aHlfZGV2aWNlICpwaHlkZXYpIHsNCj4+ICsgICAgIGxpbmttb2RlX3NldF9iaXQoRVRIVE9PTF9M
-SU5LX01PREVfMTAwMGJhc2VUX0Z1bGxfQklULA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICBw
-aHlkZXYtPnN1cHBvcnRlZCk7DQo+PiArDQo+PiArICAgICBwaHlkZXYtPnNwZWVkID0gU1BFRURf
-MTAwMDsNCj4+ICsgICAgIHBoeWRldi0+ZHVwbGV4ID0gRFVQTEVYX0ZVTEw7DQo+PiArDQo+PiAr
-ICAgICBwaHlkZXYtPnBvcnQgPSBQT1JUX0ZJQlJFOw0KPj4gKw0KPj4gKyAgICAgcmV0dXJuIDA7
-DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRpYyBpbnQgcnRsODExNmFmX3NmcF9yZWFkX3N0YXR1cyhz
-dHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2KSB7DQo+PiArICAgICBpbnQgdmFsLCBlcnI7DQo+PiAr
-DQo+PiArICAgICBlcnIgPSBnZW5waHlfdXBkYXRlX2xpbmsocGh5ZGV2KTsNCj4+ICsgICAgIGlm
-IChlcnIpDQo+PiArICAgICAgICAgICAgIHJldHVybiBlcnI7DQo+PiArDQo+PiArICAgICBpZiAo
-IXBoeWRldi0+bGluaykNCj4+ICsgICAgICAgICAgICAgcmV0dXJuIDA7DQo+PiArDQo+PiArICAg
-ICB2YWwgPSBwaHlfcmVhZChwaHlkZXYsIE1JSV9CTUNSKTsNCj4+ICsgICAgIGlmICh2YWwgPCAw
-KQ0KPj4gKyAgICAgICAgICAgICByZXR1cm4gdmFsOw0KPj4gKw0KPj4gKyAgICAgaWYgKHZhbCAm
-IEJNQ1JfU1BFRUQxMDAwKQ0KPj4gKyAgICAgICAgICAgICBwaHlkZXYtPnNwZWVkID0gU1BFRURf
-MTAwMDsNCj4+ICsgICAgIGVsc2UgaWYgKHZhbCAmIEJNQ1JfU1BFRUQxMDApDQo+PiArICAgICAg
-ICAgICAgIHBoeWRldi0+c3BlZWQgPSBTUEVFRF8xMDA7DQo+PiArDQo+PiArICAgICBpZiAodmFs
-ICYgQk1DUl9GVUxMRFBMWCkNCj4+ICsgICAgICAgICAgICAgcGh5ZGV2LT5kdXBsZXggPSBEVVBM
-RVhfRlVMTDsNCj4+ICsgICAgIGVsc2UNCj4+ICsgICAgICAgICAgICAgcGh5ZGV2LT5kdXBsZXgg
-PSBEVVBMRVhfSEFMRjsNCj4+ICsNCj4+ICsgICAgIHJldHVybiAwOw0KPj4gK30NCj4+ICsNCj4+
-ICBzdGF0aWMgaW50IHJ0bGdlbl9zZnBfcmVhZF9zdGF0dXMoc3RydWN0IHBoeV9kZXZpY2UgKnBo
-eWRldikgIHsNCj4+ICAgICAgIGludCB2YWwsIGVycjsNCj4+IEBAIC0yOTQ3LDYgKzI5ODgsMTkg
-QEAgc3RhdGljIHN0cnVjdCBwaHlfZHJpdmVyIHJlYWx0ZWtfZHJ2c1tdID0gew0KPj4gICAgICAg
-ICAgICAgICAud3JpdGVfcGFnZSAgICAgPSBydGw4MjF4X3dyaXRlX3BhZ2UsDQo+PiAgICAgICAg
-ICAgICAgIC5yZWFkX21tZCAgICAgICA9IHJ0bDgyMnhfcmVhZF9tbWQsDQo+PiAgICAgICAgICAg
-ICAgIC53cml0ZV9tbWQgICAgICA9IHJ0bDgyMnhfd3JpdGVfbW1kLA0KPj4gKyAgICAgfSwgew0K
-Pj4gKyAgICAgICAgICAgICBQSFlfSURfTUFUQ0hfRVhBQ1QoUEhZX0lEX1JUTDgxMTZBRl9EVU1N
-WSksDQo+PiArICAgICAgICAgICAgIC5uYW1lICAgICAgICAgICA9ICJSVEw4MTE2YWYgUEhZIE1v
-ZGUiLA0KPj4gKyAgICAgICAgICAgICAuZmxhZ3MgICAgICAgICAgPSBQSFlfSVNfSU5URVJOQUws
-DQo+PiArICAgICAgICAgICAgIC5nZXRfZmVhdHVyZXMgICA9IHJ0bDgxMTZhZl9zZnBfZ2V0X2Zl
-YXR1cmVzLA0KPj4gKyAgICAgICAgICAgICAuY29uZmlnX2FuZWcgICAgPSBydGxnZW5fc2ZwX2Nv
-bmZpZ19hbmVnLA0KPj4gKyAgICAgICAgICAgICAucmVhZF9zdGF0dXMgICAgPSBydGw4MTE2YWZf
-c2ZwX3JlYWRfc3RhdHVzLA0KPj4gKyAgICAgICAgICAgICAuc3VzcGVuZCAgICAgICAgPSBnZW5w
-aHlfc3VzcGVuZCwNCj4+ICsgICAgICAgICAgICAgLnJlc3VtZSAgICAgICAgID0gcnRsZ2VuX3Jl
-c3VtZSwNCj4+ICsgICAgICAgICAgICAgLnJlYWRfcGFnZSAgICAgID0gcnRsODIxeF9yZWFkX3Bh
-Z2UsDQo+PiArICAgICAgICAgICAgIC53cml0ZV9wYWdlICAgICA9IHJ0bDgyMXhfd3JpdGVfcGFn
-ZSwNCj4+ICsgICAgICAgICAgICAgLnJlYWRfbW1kICAgICAgID0gcnRsODIyeF9yZWFkX21tZCwN
-Cj4+ICsgICAgICAgICAgICAgLndyaXRlX21tZCAgICAgID0gcnRsODIyeF93cml0ZV9tbWQsDQo+
-PiAgICAgICB9LCB7DQo+PiAgICAgICAgICAgICAgIFBIWV9JRF9NQVRDSF9FWEFDVCgweDAwMWNj
-YWQwKSwNCj4+ICAgICAgICAgICAgICAgLm5hbWUgICAgICAgICAgID0gIlJUTDgyMjQgMi41R2Jw
-cyBQSFkiLA0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L3BoeS9yZWFsdGVrX3BoeS5oDQo+
-PiBiL2luY2x1ZGUvbmV0L3BoeS9yZWFsdGVrX3BoeS5oIGluZGV4IGQ2ODNiYzFiMDY1OS4uY2Jm
-OTFhZjBlYWQ2DQo+PiAxMDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUvbmV0L3BoeS9yZWFsdGVrX3Bo
-eS5oDQo+PiArKysgYi9pbmNsdWRlL25ldC9waHkvcmVhbHRla19waHkuaA0KPj4gQEAgLTMsNSAr
-Myw2IEBADQo+PiAgI2RlZmluZSBfUkVBTFRFS19QSFlfSA0KPj4NCj4+ICAjZGVmaW5lICAgICAg
-UEhZX0lEX1JUTF9EVU1NWV9TRlAgICAgMHgwMDFjY2JmZg0KPj4gKyNkZWZpbmUgUEhZX0lEX1JU
-TDgxMTZBRl9EVU1NWSAgMHgwMDFjY2JmZQ0KPj4NCj4+ICAjZW5kaWYgLyogX1JFQUxURUtfUEhZ
-X0ggKi8NCg0K
+
+--2hgDZo9YJcACAqqN
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 03, 2026 at 03:46:14PM +1000, Matthieu Baerts wrote:
+>=20
+>=20
+> On 02/06/2026 00:01, =C3=8D=C3=B1igo Huguet wrote:
+> > On Mon, Jun 1, 2026 at 3:35=E2=80=AFPM Stefano Brivio <sbrivio@redhat.c=
+om> wrote:
+> >> I was thinking that if we implement a label like NLM_F_INSERT_LAST
+> >> (David's proposal for the name), we could patch iproute2 to set it on
+> >> 'ip address restore' at least, other than using it in pasta(1).
+>=20
+> (...)
+>=20
+> > What if we reapply the patch and add a NLM_F_INSERT_FIRST /
+> > NLM_F_PREPEND option instead? This will break UAPI, which is bad, but
+> > probably not too bad per the conversations in this and the other
+> > thread.=20
+>=20
+> I guess it is safer not to break UAPI and not reapplying the patch,
+> especially when there is no clear way to know which order is taken by
+> the kernel.
+
+I think =C3=8D=C3=B1igo wasn't suggesting reapplying the patch as is, but a
+modified version that only makes the behavioural change when userspace
+sets a new attribute/flag/whatever.
+
+> What about clearly stating that the default order is "random", except
+> when an additional flag is set to sort them chronologically or the
+> opposite?
+
+We could, but since userspace relying on the existing behaviour is
+already out there, I'm not sure what it buys us.  The insertion order
+also isn't random - it's sorted by scope at least.  Theoretically
+there could be other (existing) sorting criteria for other address
+types (I haven't looked beyong IPv4 and IPv6).  The problem arises
+because IPv4 and IPv6 have different behaviours when inserting
+something where the order isn't defined - IPv4 inserts after existing
+entries of the same scope, IPv6 puts it before existing entries of the
+same scope - it's literally a < versus a <=3D.
+
+--=20
+David Gibson (he or they)	| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
+				| around.
+http://www.ozlabs.org/~dgibson
+
+--2hgDZo9YJcACAqqN
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmof320ACgkQzQJF27ox
+2GdT4Q/+Pdyv4ttbRv9/hxDynh1JFBvIDwN77zvrMD9D9VZNFWTzFrSWI3fzkw1J
++narmMh4NtYObu26YzltRw2hq4pKMEkUYw14Tgx0okBBMX/kHzymNrSADC3GGJKG
+MvHcTP03r/7pD+cnPF7d8DToYQDC3WfCsMKSg79OXmDOy9fdy3/8K21JtYv+m820
+bPiQv77nbXBElhBnGENR6Oy4k7uyM7ga0TQFTxWWbzYeJSaVnHju33Fit+qdulnI
+vZVX2Aj+g7MPdzHzF+wvA6+xp/vLKALA0Sut1uLzWiQAF5NRHKEoc9xO5QCl6N8l
+r6XICQZN3/KwL5it+WLXgJkwVsahBjIwLE91hxWAtRI38gpSIPyDmmTqHRL9beTq
+XfRb/fuuFVLT2TNs55G+iG0S7pstcoqzBhMIPUbh3K8kFVpRYx5B2Vhv/1DGNR0t
+3emeU5M9kRXkH/VQpFshfeO7rNYQtlqtE+dssUQhpX3saNUczO4vfTnJlM9sYyT6
+BoGzVGPlAImatDuJWwUGh1WiO4ceD1UfVQ/wJm0+dhadWabI5SWj/D5Cy2k/+rJv
+EUOmUl+7a6j9fIrPkn7M+PFNnQKIi2r/fyvRqDmII4a3JMAGuGf8upziK3Xmf0a2
+tjj7MgiG1AXcxBgogthYG9KXicHMhhiLtX+O2U0CnqCkWUXeUdk=
+=0PGq
+-----END PGP SIGNATURE-----
+
+--2hgDZo9YJcACAqqN--
 
