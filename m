@@ -1,229 +1,177 @@
-Return-Path: <netdev+bounces-294696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294697-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dZZUIXn4H2q3tQAAu9opvQ
-	(envelope-from <netdev+bounces-294696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:48:41 +0200
+	id dkE2KhD7H2pAtgAAu9opvQ
+	(envelope-from <netdev+bounces-294697-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:59:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 200156364BB
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:48:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C8626365F8
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 11:59:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=m0prZVM6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294696-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294696-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=szeredi.hu header.s=google header.b=HkDLARZC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294697-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294697-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=szeredi.hu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8DBF6300750B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 09:48:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA13630E03AB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 09:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED67D428841;
-	Wed,  3 Jun 2026 09:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1970141C30E;
+	Wed,  3 Jun 2026 09:57:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4092A339708;
-	Wed,  3 Jun 2026 09:48:35 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780480117; cv=none; b=ijLv/IqV00IJ3pOxLbpvkXjhbUmjvHp0IemwxPVXmbXMrcyQBuUsX5swiSSBADUUJc1I3CHtbl+3Y847ayhNuWdkx9zTJrjBQb2dz4iJ/3CXcUAAsaBp/Dq06H72SalEyVuS83ZZT7/KSickn60CfL4W7t9Lz2PBd2MFPDHUBzE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780480117; c=relaxed/simple;
-	bh=hDnLDvhqbVCU2VOwBDHfh7+5jqwgjR/RNFzjS3fwavM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xi4fQwW+F91v9CRzU9CSNENKR9PRkFn+r+MkMc5v3PNBMWhpZu4Pexxdv9W9LIn3kgoD5GcF+xYT12lsipRt7+S8Eh8NuajSl4fDS/9zsiY9zUvqvtVEIqcGTQWEJRkdKjyK4wwB0joBpOrwKNRu2VHjugFWCATwf+lDResNACM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=m0prZVM6; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id BB11A1A378D;
-	Wed,  3 Jun 2026 09:48:33 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 856715FFA8;
-	Wed,  3 Jun 2026 09:48:33 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 691CE10888CC5;
-	Wed,  3 Jun 2026 11:48:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780480112; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=lsa284HlyvD7YcDPlDuDUhOG7yi8maBQiEgj343AeqA=;
-	b=m0prZVM6kdyfWz2eQLzUPyjLAzhR+2OFD/pJEx8SLeVIojbAKA/nvTwxnUkmsx0gnFe6XE
-	Mmns3gtmmSm0Y7AS0b20ZnzN6NRcH9OSF0j0BrfNIC56z3cN0doJkk6klJntbpdJHuJtqX
-	Ie51OjubB4NGaKNbUVDQMQzcaPaxxkbxjxTSiVn0Y8tvmSiaBgn2OIofYYs9NjvLt22+1P
-	Na8Lzqn3OYkJF6sKzznG/3VnMm49oTSknwDz2bX+d4cqF+60A2S1EMlt7W/wytO7l+ma09
-	/8oweZqQVr5RqlWk+qxOh6i/TPBYbO9Ezssi3AnCcjjSSVl8x/1qhsZDC/KiZw==
-Message-ID: <bac05b34-9c16-4c18-9e6e-a8ccee86f0d3@bootlin.com>
-Date: Wed, 3 Jun 2026 11:48:27 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3E144103A
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 09:57:24 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780480646; cv=pass; b=ICkdBtN2dp5oDXndWfqgt4ng3Njpr2A/K7kotnUlwUYSt9OnpurSFa4ETwAecX7/VqDJzoVHZK+7nSaUxPC7CN+jB6OUStnPf6+mhdsP6qE6O3TeYC6XnTtYFijy2dD0zU06aMZieZT+WwMe22gr9mk84e+4+V6MVksrGphXgWU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780480646; c=relaxed/simple;
+	bh=ZCqrAxzAA1VkvSHMPbJW9yIvYLlRWu40qg6zjxtnKxA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A2aoGHBYX+ZT3U+MNA+y9fgXCQEPYB+OZLUpHwlFynueRRJPfEeVLLsRAtZXBExmrCnell9F1RDLm2yvycmzkWqhhCaeWUlC241EqBr/sYFtwjaXy7VqVJz5qDP5jooG3dZ7qr0ehrxXNYHhSZXy0UGYV1gkt+hp92H8qxSmc68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=HkDLARZC; arc=pass smtp.client-ip=209.85.222.171
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-9154ca1aa1dso71503885a.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 02:57:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780480643; cv=none;
+        d=google.com; s=arc-20240605;
+        b=janvsPMQWDt3TcKikPcnwCXjmbq8xRjVRheNRTTv7nhRZd5YaGa+b/LvSZG48IWJsP
+         wYaGlQ3WIHvKbvehYeZ4I5LKpyQykkvBvRrNX4JmcNgBaRXzrgO8SbfJHWpDdyxApngu
+         ZChNVlb+dGBAFJgB4q4yp+xO1rTFfrNMfZV4lqjVOzZ0Om8/1w8VzOZvBRw6+vq4ccbo
+         7FclIjoQxVs6hOKpEtnpN5yx6hqqtosVJsVGMIrWcEieMD8hd4HPXPowdfxfVCSmXxXy
+         wnfbI9g2OYVxmxeE3oC8BFejDowSFWGisOuZlii/B+j5pzcX8NJGOxSXkceC52SjNNRE
+         dZ3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=ZCqrAxzAA1VkvSHMPbJW9yIvYLlRWu40qg6zjxtnKxA=;
+        fh=tqBvuKyAUDoP3HrWhoNBaQuDdRb2mbrDqJKX3QIzLwc=;
+        b=ZLyRq3rNNDkOZldgGVcSttdPA9+f6LFm2mWVxXqS3UNu4eYJW2E6SPCnxUyGL/cU+F
+         ud4ZV74U9W5ELlWjp3zVBDFMYasHDGdSSEDQqGUrQWR+jbplDQBT5urVHequyJBs5QoN
+         wWBzyzNq/hXYNhw5/AHX+b/0ehIrrGL07qMpEj8jIYdD9GH2wx420gmHVGtslTO3gBop
+         bzWKcRP7uWCE/9FyVpt9fNIdcca1cECR2kThi7Xya4ilUbC1aKxzRRP1DO9vIoqdKHyb
+         ITzReioo5nhXTzZNyc8obIwRuZXLlnBFvOryHbunWGS4jKjOa99TPhaa6guQvkhW5MeU
+         pjUQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1780480643; x=1781085443; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZCqrAxzAA1VkvSHMPbJW9yIvYLlRWu40qg6zjxtnKxA=;
+        b=HkDLARZC/XPgnAkeNQ5n3MAM79d1kM1OOAeIKHRtNGpfkDXUv245i2yp+mD6JQPeUA
+         64NZTw9EGfWhoENMoiIPb3oOJkXL+vE4E73fmxTFzb0nVraMC0mwLrTACZFwydQIAExR
+         aNhk9bnGc++zz0NIEM1FWBwrjxTfiTh4xXjBY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780480643; x=1781085443;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZCqrAxzAA1VkvSHMPbJW9yIvYLlRWu40qg6zjxtnKxA=;
+        b=Zg+5bxY0qIJjjlivqNu0QCPrReXiMoSmczBSwQSeFlsW78RD+euDH09P+o8NR37QTk
+         5PGWaHYjkpwUCPnvhB49O47A0FsQwYoVIl3g54Wxcf8Wqq0RpEPCuEDSLBLaYcD5UyFj
+         M1fbil/cPDovb4CVkHQkU77s+rGariQwtN1VmqHdEoH4/doB6MFCyD6Xx7MgG84tOfUk
+         mNnQAqesWgM5+ZeswgfbDd1NcQaOl1bZbmcxqSYqIRZars3aojApcpYqrOT9o3HXCFFk
+         0zN//NDCk7MoMtbgZ7lo05Bq27MIEDOtM1Ziv3III52HfM7ZSILHwnEHnuLSC7gJpkgw
+         ilXA==
+X-Forwarded-Encrypted: i=1; AFNElJ+YDYI9thJaN2NzVbsrzegGELreY9dqMaBetl+uqeTykeiMJsVxaNLFVOlyjZTJGY9DhqaBkIU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaoWQwwZf3h8BBnFFUL/tFnjCFfJnePEyV38/x1tZoKUHM7Agw
+	/y6p2qu1kCiCxiyYTquY3GZ3QLH8VjS6/Fk3hbQBISFRDkS1w+I49LyjaQQzXOweKzyAx62G2+1
+	l+sT6lq9JAsBwbPgF5knNQmESxvfYGN7S+T26mKZ1Lg==
+X-Gm-Gg: Acq92OHyGN6hOm/Fwrrf9RoIriLXA2+z69FwYdjVnZpAzsrEg6EHu15ic30W4xiHvG7
+	KOUX9MQhqj68nFdzegTaNfMvXKHQCluLItAfBHnTfTRlYHcchdG7zdDN0DDSZWUUoXK91aFqb1e
+	k+xc/l3fOh8JSuT5FqO0ZpkDh/9TD52qX59A+MaPSTNpIRe48YYRQ8ay4LJCRCfe3900aZe9yzM
+	TiYvPPRPhijxGmC9notmgihteuEGwruh/ZgRTDcTuXzZYCuTkmH96LleM6TwMXdD18YrSNhOItz
+	LzeSD3Qf+ln0xRurSwIVYbAIcdnP79uNOIv09p6qRC0d0C/n98cK/8sdxg==
+X-Received: by 2002:a05:620a:31a8:b0:915:422c:a0 with SMTP id
+ af79cd13be357-9158b6e2074mr292177985a.22.1780480643420; Wed, 03 Jun 2026
+ 02:57:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 1/5] net: phy: realtek: add support for dummy
- phy
-To: Javen <javen_xu@realsil.com.cn>,
- "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
- "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20260603065916.334-1-javen_xu@realsil.com.cn>
- <20260603065916.334-2-javen_xu@realsil.com.cn>
- <7496c873-fee7-4584-ad70-4315d7b94f8f@bootlin.com>
- <f614a60942e34bf39b1d49fb273221ab@realsil.com.cn>
- <0bc2ae0e-316c-447e-9098-f18f4b491328@bootlin.com>
- <7c35fa5bb5f24afdb42e2d45a4e559c3@realsil.com.cn>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <7c35fa5bb5f24afdb42e2d45a4e559c3@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20260531010107.1953702-1-safinaskar@gmail.com>
+ <20260601-enthusiasmus-canceln-anlehnen-0e62317a9784@brauner>
+ <CAHk-=wifX_rrDjRGnDnOqE-usptAukuXKrmuPuVDP5bOCBWzGQ@mail.gmail.com> <20260601173325.GH2636677@ZenIV>
+In-Reply-To: <20260601173325.GH2636677@ZenIV>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Wed, 3 Jun 2026 11:57:11 +0200
+X-Gm-Features: AVHnY4IqQCqMS4qklUMIqRUT1Fpv-SuCQDkhxYBkM9m1uTwHwBhUln17rZFWNU4
+Message-ID: <CAJfpegtH-E79D-3UL=pPv-QqJk6C4ODXLLZSAjzQJwSSeqqS-A@mail.gmail.com>
+Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Christian Brauner <brauner@kernel.org>, 
+	Askar Safin <safinaskar@gmail.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-api@vger.kernel.org, netdev@vger.kernel.org, 
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@infradead.org>, David Howells <dhowells@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
+	Pedro Falcato <pfalcato@suse.de>, patches@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	Jan Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, 
+	Joanne Koong <joannelkoong@gmail.com>, fuse-devel <fuse-devel@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[szeredi.hu,quarantine];
+	R_DKIM_ALLOW(-0.20)[szeredi.hu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:viro@zeniv.linux.org.uk,m:torvalds@linux-foundation.org,m:brauner@kernel.org,m:safinaskar@gmail.com,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-api@vger.kernel.org,m:netdev@vger.kernel.org,m:willy@infradead.org,m:axboe@kernel.dk,m:hch@infradead.org,m:dhowells@redhat.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:pfalcato@suse.de,m:patches@lists.linux.dev,m:linux-fsdevel@vger.kernel.org,m:jack@suse.cz,m:rostedt@goodmis.org,m:joannelkoong@gmail.com,m:fuse-devel@lists.linux.dev,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294697-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294696-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[miklos@szeredi.hu,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,kernel.org,gmail.com,vger.kernel.org,kvack.org,infradead.org,kernel.dk,redhat.com,suse.de,lists.linux.dev,suse.cz,goodmis.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[miklos@szeredi.hu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[szeredi.hu:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:mid,bootlin.com:dkim,bootlin.com:from_mime,bootlin.com:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[szeredi.hu:from_mime,szeredi.hu:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,linux.org.uk:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 200156364BB
+X-Rspamd-Queue-Id: 1C8626365F8
 
-Hi,
+On Mon, 1 Jun 2026 at 19:33, Al Viro <viro@zeniv.linux.org.uk> wrote:
+>
+> On Mon, Jun 01, 2026 at 10:17:23AM -0700, Linus Torvalds wrote:
+>
+> > TLDR: maybe we could ghet rid of "f_op->splice_read". *That* would be
+> > a big simplification.
+>
+> FUSE might be interesting - fuse_dev_splice_read() and its ilk.
+> Communications between the kernel and fuse server at least used to
+> seriously want that, so that would be one place to look for unhappy
+> userland...
+>
+> splice-related logics in fs/fuse/dev.c is interesting; another place
+> like this is kernel/trace/, but I'm less familiar with that one.
 
-On 6/3/26 11:13, Javen wrote:
->> Hi,
->>
->> On 6/3/26 10:00, Javen wrote:
->>>> On 6/3/26 08:59, javen wrote:
->>>>> From: Javen Xu <javen_xu@realsil.com.cn>
->>>>>
->>>>> Add support for rtl8116af dummy phy driver, match phy id and read
->>>>> link speed from MII_BMCR.
->>>>>
->>>>> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
->>>>
->>>> Can you elaborate more on why this is needed ?
->>>>
->>>> The cover says :
->>>> "
->>>> In this mode, the driver
->>>> needs a dummy PHY ID so that phylib can attach to a dummy Realtek PHY
->>>> driver, while selected standard PHY registers are handled through the
->>>> SerDes register.
->>>> "
->>>>
->>>> Why can't you use the SerDes registers for your PHY driver ? The
->>>> phrase above suggests that the "SerDes registers" have the typical
->>>> C22/45 layout. There are PHYs and PCSs out there that aren't accessed
->>>> through regular MDIO with regmap being used to translate the mdio
->>>> accesses done by phylib into the actual register access method used.
->>>>
->>>> Maxime
->>>>
->>>
->>> Thanks for your review.
->>> Maybe I shouldn't call it a "dummy" PHY. It is actually a real, dedicated PHY
->> driver for the RTL8116af operating in Fiber/SerDes mode. The reason we
->> cannot use the standard generic PHY driver is that hardware does not
->> correctly populate the standard Gigabit Status Register (MII_STAT1000, Reg
->> 0x0a).
->>> Here is a snippet of our MDIO read trace during link up:
->>> r8169 0000:85:00.1: MDIO read: tp->ocp_base=0xa400, reg=0x0a,
->>> value=0x0000
->>> r8169 0000:85:00.1: MDIO read: tp->ocp_base=0xa400, reg=0x05,
->>> value=0x41a0 Reg 0x0a returns 0x0000, the phylib generic status parser fails
->> to resolve the 1000Mbps link, causing the driver to incorrectly fall back to a
->> forced 10Mbps, even though the physical link is actually UP at 1000Mbps.
->> Therefore, we need to register a custom PHY driver to provide a
->> specific .read_status callback that parses MII_BMCR instead of relying on
->> MII_STAT1000.
->>
->> This behaviour of not getting proper information through the standard
->> register happens on multiple different PHYs, so having a dedicated driver is
->> the way to go indeed.
->>
->> What does this PHY do exactly, does it connect to an SFP cage as the name
->> seems to imply ? If so, what kind of mode can it support ?
->> 1000BaseX/100BaseX, maybe SGMII as well ?
->>
->> What I don't quite understand then is why you have the need to return a
->> custom PHY ID that matches that "dummy" driver, in the next patch.
->>
->> If this is a regular PHY with C22 registers, what's the original content of
->> PHYSID1/2 ? M
->>
->> Can you explain what the hardware looks like exactly ? What are the different
->> components involved, etc ?
->>
->> Maxime
-> 
-> It supports 1000BaseX mode.
+[Cc: Joanne, fuse-devel]
 
-Ok, but the driver for the "dummy" phy seems to be able to report SPEED_100, which
-you can't achieve with 1000BaseX. Either this is a stray check in the PHY driver,
-or there's more to it than 1000BaseX :)
+I'd favor simplification, but care is needed to not regress performance.
 
-Also, if this is 1000BaseX maybe you need to use the C37 helpers to read the link
-status :
+Joanne might be in a better position to say something about relative
+performance of various transport modes in fuse.
 
-https://elixir.bootlin.com/linux/v7.1-rc5/source/drivers/net/phy/phy_device.c#L2607
-
-> The datapath in Fiber mode is strictly and simply: MAC -> PCS -> SerDes. MAC accesses the PCS registers via MAC OCP channel. Although it is accessed via MAC OCP, the register definitions at those addresses are exactly the same as the IEEE 802.3 Clause 22 PHY standard registers.
-> Reading Reg 0x02 and 0x03 via this MAC OCP interface simply returns 0x00000000.
-> [ 1671.299837] r8169 0000:85:00.1: 8116af read: reg=0x02, value=0x0000
-> [ 1671.299906] r8169 0000:85:00.1: 8116af read: reg=0x03, value=0x0000
-> So we need a dummy phy id to attach phy driver.
-
-So this PHY actually doesn't exist ? what you have is a PCS that you access
-over MDIO, right ?
-
-It seems it all boils down to how the realtek MAC driver deals with PHYs and
-PCSs and SFP, that is without using phylink or the SFP infrastructure at all :(
-
-Can you check for the C37 thing and the SPEED_100 reporting ?
-
-Maxime
-
-
-
-> 
-> BRs,
-> Javen
-> 
-
+Thanks,
+Miklos
 
