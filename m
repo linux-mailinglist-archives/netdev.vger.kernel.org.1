@@ -1,281 +1,199 @@
-Return-Path: <netdev+bounces-294562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5FVyAXPDH2pspgAAu9opvQ
-	(envelope-from <netdev+bounces-294562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:02:27 +0200
+	id 0HJxLPLDH2qLpgAAu9opvQ
+	(envelope-from <netdev+bounces-294563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:04:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B3216347BF
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:02:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC435634806
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:04:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="enSpK/Fq";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294562-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294562-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none ("invalid DKIM record") header.d=aerlync.com header.s=google header.b=hkfApIKl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294563-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294563-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed)" header.from=aerlync.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2DA84305261A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:01:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 071A73045289
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A3E3F9F52;
-	Wed,  3 Jun 2026 06:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B213F5BD8;
+	Wed,  3 Jun 2026 06:01:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7563FADE0;
-	Wed,  3 Jun 2026 06:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DC93F54C3
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 06:01:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780466479; cv=none; b=QbJk26exeOKqISI0t2lMTn0MAy2wpBO3Bp5dmUNfwRV2gjltovtvw6SxpAaclsl+B26yTlHH/XXkBuiIdK9jMXzKvZ5xRKsQS0rGfsFBTzxn6Q7Y4EL3kPRLnbLsPNHVlgdLVcte27gaNXCbI2w3y7E1SjIyWNDqb3wPo8xcxLo=
+	t=1780466490; cv=none; b=uf+FTsZtL3GWW8mX9wqFIYmaa2LaYs31nKDaHy6tLETOs49wBtcNdZFPUHPoB8DyPZ8bLm3UVvzOvJW0IVn5bsQQsdn7I2xUZmeNuPg4Nj0y+sLH+hn5+giU2rWLYeiL5PoddDqEixF5rhoDDlfLqpymL+fgsN72uHYE3L3YKao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780466479; c=relaxed/simple;
-	bh=/0KgoMZ7Y/Y66N6PUC1bOPKa43xzWpVKcVg749kMwdY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GbIce4O8MIbob9AUKCjFRQAW9LL1zpNmx0XJddY9RPfYNJZeq++eyDA9TbhZ4grFFx80locR08yPAHLjtyy4bRcmBjjXir6GAA9Me3I+l/0d8SjeLOuvXBtaI50AXG9qFOSxNLKF3SC46ghiwsbBIj5KDuy+1Y8NZQK9Q0xfjlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enSpK/Fq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C88421F0089B;
-	Wed,  3 Jun 2026 06:01:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780466476;
-	bh=kwIhmiUhjwa16fmPX2KCAn+2U6erjZhTvA6Oh/JF3Ek=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=enSpK/FqKXcv6CnTcskuOQrBmQWdqGUhBqQnFU6/NwkpB4Pud96BO4KgfO/LlFgrd
-	 NvJH9+sMnfoFKaS0GzI5iijhQ0IoSqEHt2pOl4t21LGRL4mgPJyNQiPsGsBhEhHYSr
-	 YsU50pJgrKlEAUxtGDzgK1kjI+KFKQoUHl6fKXfAjzoyXEbDvUkHAicP1QJW9SFTUv
-	 FNMYkxrRdr8lAaFQbOkPLU3EOrHy/KsGKIKImUdSbGQQzn4XZxWI0dj8geVZcxNxLh
-	 Gj1S+4mLYDlBk+g4rFVkc1c+1eTwhUAPjxogPZh4F7imYZFqKm8ka9vAzD3Qtq+Moe
-	 0FQ5IAaUveY+Q==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 03 Jun 2026 08:00:20 +0200
-Subject: [PATCH net-next v9 6/6] net: airoha: Support multiple LAN/WAN
- interfaces for hw MAC address configuration
+	s=arc-20240116; t=1780466490; c=relaxed/simple;
+	bh=qUVoLwTe4Qv1zxG3l26DEvnd4jLo43w1wQQ2la3Dh/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PzerVM77Tk9HUjd4RsjvWuWLuQE1tdKx+F+ltrdFz0mkngPZuyeWeLBeGaYcYIHRx0f0STBIDRD31AB/4V+oDeAhAhcEF9Rny4HOYNLP0suiu/bDN+WeR9sVDXUJiLD6J/W0qyHUvCyM5BFtCNmJnsxA2YbKzFEqFlZZAHxPUZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aerlync.com; spf=pass smtp.mailfrom=aerlync.com; dkim=fail (0-bit key) header.d=aerlync.com header.i=@aerlync.com header.b=hkfApIKl reason="key not found in DNS"; arc=none smtp.client-ip=209.85.214.170
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2bf55c39e16so1144575ad.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 23:01:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=aerlync.com; s=google; t=1780466488; x=1781071288; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A5nZhGGV5ovxkIytxrfvh/xga75F2Y72Ucu1MFnwu/E=;
+        b=hkfApIKlEpfSIv8ljXZXK2XULRU67Q91cxOEZJqxZ8C16Q5Z6d0q+eNtZIt8uOQEu8
+         qDhlo13rpBT4f8i+iE2EEkbkKNAsukllHGgxfGDEer6FieoSIdxlln2I/4LVqjdu6LeM
+         FYPl3JFl8YnWq7FRf3QjHV7hAvmh5rJuG+MLp9wHXnSCkqJdB0qoMZ9J1SPpI2HTJTPp
+         TMWOb+96+ymeJlLaLluvsLwD6t2t+pz06GNjfY1nnrE/3CgQBYL2o4c2ON7wePF8NFQM
+         KkRCCRvvGrch0H4v0fuiRboHYRjGd4lw1D0/1tndSJgDOg8lF0yp7ws+Z/0pLFNoB0jb
+         fopw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780466488; x=1781071288;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=A5nZhGGV5ovxkIytxrfvh/xga75F2Y72Ucu1MFnwu/E=;
+        b=iVMosXxcp+8L80PQl78Yx+vUC22qmGLV9rdFCgBCiRm4FSvlg32TWrZA7VP+sr0z3A
+         3Dqd2nVGt7qZ2jQdSztSm/b0Rkr86WFyhse8qDRKEfQWdclLGAj2oBGLoQGB1X2DH6UQ
+         HrcYBxXr0VsrVg0u+eje2uC/iOIAS/PNvuM/dvD44dLs+Feces7uqb+HYDoOkLa9tkAW
+         cwPn8yiOrPcFOHPKvCGgglGoq376O1UEf8QcT8aplzqT+zGRln2n8pMd8eQaGX0thsn/
+         /1LaogYijrQN+tE3Hm2b6v8p6BMttomELlWrH7I5z6Li5o4HFSMvK6c+UgZJ2pGFVAaE
+         eb5Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/mbf3E7isgydqJ6xTqq79KjrjR4A7M+ifw3RmjUZxB1rwZxAijsyHefnTJeOAB3+XgJ8SUXlY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgH2FrTsc1CL9MZi1fsbFcjhhZSSzj9i77aRMSngN3NkfMAhkJ
+	mb7rCF8AEg91D7wW9yZNuoXsOuMGPNpoSaZpnM5gna31DEvUKf30JzZ//1HKL5RsExQ=
+X-Gm-Gg: Acq92OGW7Uv3mByJTJ9XOPglulGxWoW193ulP+uRYaLOzTxgcRoUEZBluAU3llrRxEG
+	3YkJX/LIHKvBrSfMq/zihsoKYZxEPapsY4e3dgXkZriQu1FqxrFLSc1fqEjh73gzgoSf/PWBdLM
+	zqE6bByWvPNVd4d8JehEaW2CkZwz4WEkjXlwHNhTxgqz2YKyNPgI12KMkgNCjCREYeLGsjejrQk
+	Fh2nqHVfr+tk/sdHI7u9KZaxPwkHiCMEYfZ8Y4/vil8nUtMvymzBfgKUgZhULmyIOpx1P2fNOLh
+	a3sqSWlRCapyHH+Ow7g4VKrUw3juSbWC7QXP8iIipIlzjZFBumm4eU8DTjK3mM8Zjs6/5yMdepI
+	8hTzwxD+LIxX3yZQ28SHEKq5cg7ksiOJoANEazx65yB6wUQ0ToKDjPgI06GjD/fLxWAEVc9zy2u
+	mu01WM+X4Hd6wabO0XhwKxzI+kaP6BnjPHRbQQMz6HPb/PrEox5IO3HQ2Q5Mr/8YSFztBHd0c=
+X-Received: by 2002:a17:903:37ce:b0:2c0:d29b:34ff with SMTP id d9443c01a7336-2c1646eaeacmr16015745ad.10.1780466488253;
+        Tue, 02 Jun 2026 23:01:28 -0700 (PDT)
+Received: from manjaro ([2406:7400:ff03:ca30:c17:db43:8a08:9d82])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16649bde7sm12097795ad.72.2026.06.02.23.01.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 23:01:27 -0700 (PDT)
+From: Sayooj K Karun <sayooj@aerlync.com>
+To: pablo@netfilter.org
+Cc: aleksander.lobakin@intel.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org,
+	idosch@nvidia.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sayooj@aerlync.com,
+	netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH] net/ipv6: icmp: fix is_ineligible() to block errors for Redirect packets
+Date: Wed,  3 Jun 2026 11:31:12 +0530
+Message-ID: <20260603060112.10524-1-sayooj@aerlync.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <ah1VoxXLbRAZIEC3@chamomile>
+References: <ah1VoxXLbRAZIEC3@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260603-airoha-eth-multi-serdes-v9-6-5d476bc2f426@kernel.org>
-References: <20260603-airoha-eth-multi-serdes-v9-0-5d476bc2f426@kernel.org>
-In-Reply-To: <20260603-airoha-eth-multi-serdes-v9-0-5d476bc2f426@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, 
- Benjamin Larsson <benjamin.larsson@genexis.eu>, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- Madhur Agrawal <madhur.agrawal@airoha.com>
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[aerlync.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294562-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:lorenzo@kernel.org,m:ansuelsmth@gmail.com,m:benjamin.larsson@genexis.eu,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:madhur.agrawal@airoha.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:aleksander.lobakin@intel.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,m:idosch@nvidia.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:sayooj@aerlync.com,m:netfilter-devel@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294563-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[sayooj@aerlync.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	R_DKIM_PERMFAIL(0.00)[aerlync.com:s=google];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[aerlync.com:~];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sayooj@aerlync.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[airoha.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,aerlync.com:from_mime,aerlync.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9B3216347BF
+X-Rspamd-Queue-Id: BC435634806
 
-The EN7581 and AN7583 SoCs provide registers to configure hardware LAN/WAN
-MAC addresses. These registers are used during FE hw acceleration to
-determine whether received traffic is destined to this host (L3 traffic)
-or should be switched to another device (L2 traffic).
-The SoC hardware design assumes all interfaces configured as LAN (or WAN)
-share the MAC address MSBs, which are programmed into the
-REG_FE_{LAN,WAN}_MAC_H register. The LSBs of 'local' mac addresses can be
-expressed as a range via the REG_FE_MAC_LMIN and REG_FE_MAC_LMAX
-registers. In order to properly accelerate the traffic, FE module requires
-the user to configure the REG_FE_{LAN,WAN}_MAC_H register respecting this
-limitation. Please note a misconfiguration in REG_FE_{LAN,WAN}_MAC_H
-will still allow the user to log into the device for debugging.
-Previously, only a single interface was considered when programming these
-registers. Extend the logic to derive the correct minimum and maximum
-values for REG_FE_MAC_LMIN/REG_FE_MAC_LMAX when two or more interfaces are
-configured as LAN or WAN. Since this functionality was not available
-before this series, no regression is introduced.
+You are right that netfilter can be configured to make devices behave in
+non-RFC-compliant ways, so I will drop the "netfilter policy must obey
+the RFC" framing from my earlier reply.
 
-Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 77 ++++++++++++++++++++++++++++----
- drivers/net/ethernet/airoha/airoha_eth.h |  2 +-
- drivers/net/ethernet/airoha/airoha_ppe.c |  4 +-
- 3 files changed, 71 insertions(+), 12 deletions(-)
+The point I should have made is that is_ineligible() is not a netfilter
+function. It is the generic gate that icmpv6_send() uses to decide
+whether the kernel, as an ICMPv6 originator, may emit an error for a
+given trigger packet, and it is shared by all icmpv6_send() callers. It
+already enforces RFC 4443 section 2.4(e.1) at exactly this spot, via
+!(*tp & ICMPV6_INFOMSG_MASK), that is "do not originate an error in
+response to an ICMPv6 error". My patch adds (e.2) (Redirect) right next
+to it, the second rule from the same MUST NOT list. So this is not
+about overriding netfilter policy; it is completing the e.1/e.2 pair at
+the single point where the kernel decides ICMPv6 error eligibility.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 64ee526da241..8f2608293bb7 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -71,20 +71,76 @@ static void airoha_qdma_irq_disable(struct airoha_irq_bank *irq_bank,
- 	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
- }
- 
--static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
-+static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
- {
-+	u8 ref_addr[ETH_ALEN] __aligned(2);
- 	struct airoha_eth *eth = dev->eth;
--	u32 val, reg;
-+	u32 reg, val, lmin, lmax;
-+	int i;
-+
-+	eth_zero_addr(ref_addr);
-+	lmin = (addr[3] << 16) | (addr[4] << 8) | addr[5];
-+	lmax = lmin;
-+
-+	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
-+		struct airoha_gdm_port *port = eth->ports[i];
-+		int j;
-+
-+		if (!port)
-+			continue;
-+
-+		for (j = 0; j < ARRAY_SIZE(port->devs); j++) {
-+			struct airoha_gdm_dev *iter_dev;
-+			struct net_device *netdev;
-+
-+			iter_dev = port->devs[j];
-+			if (!iter_dev || iter_dev == dev)
-+				continue;
-+
-+			if (airoha_is_lan_gdm_dev(iter_dev) !=
-+			    airoha_is_lan_gdm_dev(dev))
-+				continue;
-+
-+			netdev = netdev_from_priv(iter_dev);
-+			if (netdev->reg_state != NETREG_REGISTERED)
-+				continue;
-+
-+			ether_addr_copy(ref_addr, netdev->dev_addr);
-+			val = (netdev->dev_addr[3] << 16) |
-+			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
-+			if (val < lmin)
-+				lmin = val;
-+			if (val > lmax)
-+				lmax = val;
-+		}
-+	}
-+
-+	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
-+		/* According to the HW design, hw mac address MSBs must be
-+		 * the same for each net_device with the same LAN/WAN
-+		 * configuration.
-+		 */
-+		struct net_device *netdev = netdev_from_priv(dev);
-+
-+		dev_warn(eth->dev,
-+			 "%s: wrong mac addr, MSBs must be %02x:%02x:%02x\n",
-+			 netdev->name, ref_addr[0], ref_addr[1],
-+			 ref_addr[2]);
-+		dev_warn(eth->dev, "FE hw forwarding won't work properly\n");
-+
-+		return -EINVAL;
-+	}
- 
- 	reg = airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H : REG_FE_WAN_MAC_H;
- 	val = (addr[0] << 16) | (addr[1] << 8) | addr[2];
- 	airoha_fe_wr(eth, reg, val);
- 
--	val = (addr[3] << 16) | (addr[4] << 8) | addr[5];
--	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
--	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
-+	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), lmin);
-+	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), lmax);
- 
--	airoha_ppe_init_upd_mem(dev);
-+	airoha_ppe_init_upd_mem(dev, addr);
-+
-+	return 0;
- }
- 
- static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
-@@ -1826,13 +1882,18 @@ static int airoha_dev_stop(struct net_device *netdev)
- static int airoha_dev_set_macaddr(struct net_device *netdev, void *p)
- {
- 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-+	struct sockaddr *addr = p;
- 	int err;
- 
--	err = eth_mac_addr(netdev, p);
-+	err = eth_prepare_mac_addr_change(netdev, p);
- 	if (err)
- 		return err;
- 
--	airoha_set_macaddr(dev, netdev->dev_addr);
-+	err = airoha_set_macaddr(dev, addr->sa_data);
-+	if (err)
-+		return err;
-+
-+	eth_commit_mac_addr_change(netdev, p);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 3e8262f583a7..8f42973f9cf5 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -683,7 +683,7 @@ void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
- int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data);
- int airoha_ppe_init(struct airoha_eth *eth);
- void airoha_ppe_deinit(struct airoha_eth *eth);
--void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev);
-+void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev, const u8 *addr);
- u32 airoha_ppe_get_total_num_entries(struct airoha_ppe *ppe);
- struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
- 						  u32 hash);
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index f54622904733..91bcc55a6ac6 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -1487,12 +1487,10 @@ void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
- 	airoha_ppe_foe_insert_entry(ppe, skb, hash, rx_wlan);
- }
- 
--void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev)
-+void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev, const u8 *addr)
- {
--	struct net_device *netdev = netdev_from_priv(dev);
- 	struct airoha_gdm_port *port = dev->port;
- 	struct airoha_eth *eth = dev->eth;
--	const u8 *addr = netdev->dev_addr;
- 	u32 val;
- 
- 	val = (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
+On how it fixes the REJECT case: the two IPv6 reject paths differ in who
+actually frames the ICMPv6 error. The bridge/netdev path,
+nf_reject_skb_v6_unreach(), builds the packet by hand: it allocates the
+skb, writes the IPv6 and ICMPv6 headers, copies in the original packet
+and computes the checksum. Because it does all that itself, it has to
+carry its own guard, nf_skb_is_icmp6_unreach(), the IPv6 analogue of the
+nf_skb_is_icmp_unreach() you mention.
 
--- 
-2.54.0
+The L3 path, ip6t_REJECT / nft_reject -> nf_send_unreach6(), never frames
+a packet of its own. It just calls icmpv6_send() and lets the core
+ICMPv6 stack build and send the error. is_ineligible() is the gate that
+core builder consults first, before it allocates or assembles anything,
+so that is exactly where the e.1 suppression already lives for this path.
+There is no netfilter-local guard here, and there does not need to be.
 
+So the scenario in my commit message is the L3 path:
+
+	ip6t_REJECT / nft_reject
+	  > nf_send_unreach6()
+	    > icmpv6_send() / icmp6_send()
+	      > is_ineligible()  // now returns true for NDISC_REDIRECT
+	        > goto out, no packet is ever built or transmitted
+
+The patch fixes the REJECT case because the L3 reject hands packet
+construction to icmp6_send(), and is_ineligible() runs at the top of
+that builder, before any error skb exists. It is the same spot that
+already drops e.1 today, so adding e.2 there completes the pair rather
+than introducing a new override.
+
+I also agree there is a gap to close on the netfilter side. The
+bridge/netdev path never reaches is_ineligible(), and its
+nf_skb_is_icmp6_unreach() guard currently checks only
+ICMPV6_DEST_UNREACH, not Redirect, so it is not covered by this patch. I
+will send a follow-up to netfilter-devel for nf-next extending that
+guard to also skip Redirect, so both paths behave consistently.
+
+Does that split sound right? this fix to is_ineligible() for the L3
+path, plus a separate nf-next patch for the bridge/netdev reject guard?
+
+Thanks,
+Sayooj
 
