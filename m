@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-294798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id K7V7KRJGIGpxzwAAu9opvQ
-	(envelope-from <netdev+bounces-294798-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:19:46 +0200
+	id 18wNAxZGIGp0zwAAu9opvQ
+	(envelope-from <netdev+bounces-294799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:19:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B49E639175
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B90E563917D
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:19:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=6wind.com header.s=google header.b=OqIWR1a7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294798-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294798-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=6wind.com header.s=google header.b=aSeLhMib;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294799-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294799-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=6wind.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 58D9830D8A9D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 15:03:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5484830E244D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 15:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7691E39A4DF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C9C3A3E96;
 	Wed,  3 Jun 2026 15:03:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f98.google.com (mail-ed1-f98.google.com [209.85.208.98])
+Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E7A3955D4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016BD384CF7
 	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 15:03:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780499016; cv=none; b=iM9YobY4zgYLGljTmSY1U0zLIu107+Kb7nTt2Cqw0G01PomqpAeuqB51fduk9nFIMi+wYilBCRRFKEvtDy7LQUc74eVJl8zSSCxDdPkxtwVQAm+fWx16mIi30aGLNZ5zuzGKkU8AybM9VQrJPvsz57shoA/lMcp59kuqBmH14FU=
+	t=1780499016; cv=none; b=cs3ET1zYt9HtujryPoE/5NKfoU4VUGPxL4qG6T9eLsHTcF8BrWF7O9p+V7I3IpEvIZaSShl6Np5NI7lwLDi/dsOehrjUki+pUxI+lwZysDW1LcddTaTb68lESkPetIWObkbFiljwYj0lnOBGBGzymZoSdElKFSt5GJk7s8uzhc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780499016; c=relaxed/simple;
-	bh=Gy9qg58vggdxk44h8XgCLq+MO3qBQ2hPoOlO3qleE/k=;
+	bh=FHmhFntMj/tK4ZN+OV7rbeyvzvuBRGRmI9u2G5h/KhA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d5F13lhwkHIAlufR7xIDEg6uq6Qrfyl24Gz6wBAD14EX/38b9iVz1z4scjFuDVO4zNHZmKmFp8PiN3+7dfH6SYQPc/QYQ0z84sn5rkNfXqLOBJvXsaLP+im6pzfIEX1MYPjch54wreh4rIZFm+C4dxkmoSjrPjSX8l6yCScV5xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=OqIWR1a7; arc=none smtp.client-ip=209.85.208.98
-Received: by mail-ed1-f98.google.com with SMTP id 4fb4d7f45d1cf-68c3421b009so1331110a12.1
+	 MIME-Version; b=NrLSt41ScdnzzuOtPt2h3esTPY+XBZTxZtuy4I41lnsbeEz5Ip8VbIwyDF3oGucEcOXSucP0AmkXoVPu+cTboHsg/h9/Go+C91u20k/VD5VZGspxyIiGrWf253eJa23eJaANkEfr9RfozlX1X7897bj7cL7fgUxNlY0dqsHyaWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=aSeLhMib; arc=none smtp.client-ip=209.85.218.99
+Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-becfa735b9aso531255766b.1
         for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 08:03:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1780499013; x=1781103813; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4gv5+1r1armjndx3NqTxWVROfN58tPv0t9fyfNxmNLA=;
-        b=OqIWR1a7jS0Gn+ddX8JnC2JknI+ss4sC+4AZm/wVhzSNbz4tNM1JUxcKyYNi8tvoR5
-         6+p+VLjUAVGQ9kT5XVfA+2frpzgI5EC8Ox1OY3L+0wLL0PhfOe1ab02HlsY0buSeNAaG
-         6NGOV8YPMt5cV+fTKGfsG6imSemgUANZhBTt6MUfxmM9Bj2DatVvfwNo8fuR+IqxE391
-         sDaS4MRhM8Z72OiRKfaZOE5hECIsh91BJuL+vjWiGc+arnxvtaovrGs4uKmHRRRBjr33
-         9Ujla6r5tkyyKhqd7UOEnGESSm5hUl0p9wVvXWlDEEzRObovGTPFITD6IV6De00gO5iT
-         dB+g==
+        bh=02JMPGZKVWx1vQdBy740XViOLIkd3niDYziQ8fLNiB8=;
+        b=aSeLhMibR+9zGnkvuMkYMBTykjuSPV4OvjyCP+DkL2DqONITq7bHws2lUoVO0TVr6M
+         YeNOWtayOSwlaOlD/rYntDLtdH4utf7r1iTL6Z5dMa1tlUbTZ87saxpLTKJnm4XKeK1e
+         rQTSnmhBKb0mpUiZmieUpSlOXSgy8YnS2pLPTmw4a23DHtknXNEtp+DsqCitDlu4OMOl
+         8mDdsIThc0sj7Kc/7m5k7xLjLhPFMloOU+MFP/+l1WfwrzHS4uxx27hWMYE7V8LnEzm0
+         CTUokz4t6m3mc/2GQy4FlZMNTIWwnDvOG66Q31ZuZrGZP450capen+OItM46K+nORxmL
+         Vqpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1780499013; x=1781103813;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4gv5+1r1armjndx3NqTxWVROfN58tPv0t9fyfNxmNLA=;
-        b=QuKoVjnWjlffmxg6Wrt+aLLxt8FWv9849lU4ajsP2PxZYF0NvJAx22Y0XbtPPXgHLu
-         dQDfLSHE4eMT4yohGpZ62ILXIarRT9mhmZ0zT8PC2VlzEhXVrllUTw/2L4hEbVYZ+9Or
-         DVmvf8H8KBKe/XoFCAbk1yYoKkmALdgJQhk0/YHoeElJdk6XY3Ev4S61LqsirAJCj7nS
-         gfJtp206kH72Ir0nFGcwiQc0+JBORCtCFLXbnIxSpIaxJm5qGgR6TLTekER4WHmNbB0c
-         btP0L3tzejvUGX6K7eN5rQ60Iod8FTATNGv4u7rQ65Uww4VirAp2EMUEiLnRO/9reVNm
-         GH9g==
-X-Gm-Message-State: AOJu0YxEwfnBKyoJ6jpzDvBGKXD8nVn5tEsU92PkTGaOv1TaL9VY/bQp
-	RmfBdkTS9bcs5nRXbPy7/n9eJuJV5o6uFhLUGb9ou2Q8GNmTEodf1W0g0TYTVN3Ji4zrxXotDBr
-	r9S2e4/hVAk9ViQgn8F+3IN0bQrlPfbGAcw+L
-X-Gm-Gg: Acq92OG6KmSIGQtENo3+A80oztuOCOrlGCzTYTCD/u0QLvQ+D6O1gIRKqiw8zkJCCQ4
-	xPeZcip8q8dFxz7aHxKfX270Fcm0wnXAEU/X/3GUtOVCQwOVdAHaZiwX6H9Yi1gQ4b/A22a/WkW
-	jgXqVpadMOiZxNxhXFSbXXw55qJnVPkon3FbGqXYAsug9CSE0lTMk1mx6AhqS1ViB7S4FiymBBX
-	3C/JrmQSoI5T4jQ1b8aaYB68RkOV1zLNvOXsx9118boJG+zL1rrKEbznumnYx9KHYwsTNeZeuMM
-	vYE5vcN0Qoox1/QefZwpnxdAhUU75zyXzyn522364C9vKJ3lpl2WsJnzBZQ9YuOS0+Fwd/tzlHn
-	s6WPX0anLpA4tequp7B2I6khtZjJtBAUp1o/IhaIKHwzbeKxETpOZFAavR2oEn3U=
-X-Received: by 2002:a17:906:6a13:b0:bc1:d3d2:9348 with SMTP id a640c23a62f3a-bf09ea6587emr184765866b.20.1780499013189;
+        bh=02JMPGZKVWx1vQdBy740XViOLIkd3niDYziQ8fLNiB8=;
+        b=E2z6PTqjTxC9zdZsMJB0g1UfyCvpUAxUVbUojjBOH560n7WgOGdDpY4uG96tc37t5h
+         EzctgWbMTFymlQhvY9WwYpey3grvxKIEwxAWRwALRJQ9oPRgwFFCZYPowW0y3y9r7NyH
+         m3N+tGt7xHUMGm4qtT3i8BLIoDKs+gsmq9TSXzca2rDuB1pWFiSiaAzsH8f15iCv3sf9
+         hPBnIbxOgLahWgLA9T4UocNfnIdyDD6pDOckt9HxGjuTFBvHHB3hGy13FUI0HZJRITQb
+         wmL1ENY8ByVtpl8ir0lFL4frxF/FM2kPans4zPyNLkSpQ2UQr+PXLXsLKtQ7qTqeKJNk
+         7Pxg==
+X-Gm-Message-State: AOJu0YyfQ4CvC/XJgBjmLTlTFpZr6i/uUEbbrH2/pS3ltjspzryeb5nH
+	kZGQkRiKtAQQb9nDXYOSU59Ad0I7i433GOvYqTSZgBWZNTZy0UajEt76jpsAgRg+RYASnNSzeHA
+	ZqxtSLFq3z6sSgoe8F1ffxMfcOTJf638oqmhf
+X-Gm-Gg: Acq92OGqidvPYKrKG6/n4bjI6wageVPXLk+iZngxuZnpCLwVLBvluMGj+HFNdJqvVID
+	oXqne4gdwdOlwIb8JPkvjEuCpyVTeRXDIVvPpi3xTVtyqkoSIJZjS2+tlDJj6Os3vdIrX5R+4+R
+	kGVGrVZ/TtjBlqgePnE9qpnKrpaT+tYpAZ2oRhCUBDwrB+f+aUX0EvM/dTKiV0DwDfOK/oEpFM1
+	ydeoMlKRd6w7GZEZEGnbXUpljeTIFpvrrAe5sMZWkB9BBqmy5h3pu6/SdyRIP8uBcQFTGTjMl09
+	3r5rnStwxZNnMDJwr+ExNB47to/H/drPQ/DHVbNegdLc/nPK5g+igoqpbLmjrOrVprmvA3Uww0u
+	sccbjOSP99A7gvZ3bYOLsc2KA//eqXpmU6KTAuvWC1Kg/7Tp7psmuOiCi/eTVGQ4=
+X-Received: by 2002:a17:907:3f07:b0:bd3:32ce:8902 with SMTP id a640c23a62f3a-bf0af2039b9mr236308966b.39.1780499013367;
         Wed, 03 Jun 2026 08:03:33 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-bf0516757c5sm19475766b.7.2026.06.03.08.03.33;
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-bf051580cabsm19732966b.2.2026.06.03.08.03.33;
         Wed, 03 Jun 2026 08:03:33 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 0390B14713;
+	by smtpservice.6wind.com (Postfix) with ESMTP id 0698714714;
 	Wed,  3 Jun 2026 17:03:33 +0200 (CEST)
 From: Louis Scalbert <louis.scalbert@6wind.com>
 To: netdev@vger.kernel.org
@@ -92,9 +92,9 @@ Cc: andrew+netdev@lunn.ch,
 	jonas.gorski@gmail.com,
 	horms@kernel.org,
 	Louis Scalbert <louis.scalbert@6wind.com>
-Subject: [PATCH net v8 4/6] bonding: 3ad: fix carrier when no usable slaves
-Date: Wed,  3 Jun 2026 17:03:29 +0200
-Message-Id: <20260603150331.1919611-5-louis.scalbert@6wind.com>
+Subject: [PATCH net v8 5/6] bonding: 3ad: fix mux port state on oper down
+Date: Wed,  3 Jun 2026 17:03:30 +0200
+Message-Id: <20260603150331.1919611-6-louis.scalbert@6wind.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20260603150331.1919611-1-louis.scalbert@6wind.com>
 References: <20260603150331.1919611-1-louis.scalbert@6wind.com>
@@ -117,7 +117,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294798-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294799-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FREEMAIL_CC(0.00)[lunn.ch,jvosburgh.net,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com,6wind.com];
 	MIME_TRACE(0.00)[0:+];
@@ -140,107 +140,58 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:mid,6wind.com:dkim,6wind.com:from_mime,6wind.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3B49E639175
+X-Rspamd-Queue-Id: B90E563917D
 
-Apply the "lacp_strict" configuration from the previous commit.
+When the bonding interface has carrier down due to the absence of
+usable slaves and a slave transitions from down to up, the bonding
+interface briefly goes carrier up, then down again, and finally up
+once LACP negotiates collecting and distributing on the port.
 
-"lacp_strict" mode "on" asserts that the bonding master carrier is up
-only when at least 'min_links' slaves are in the Collecting_Distributing
-state.
+When lacp_strict mode is on, the interface should not transition to
+carrier up until LACP negotiation is complete.
+
+This happens because the actor and partner port states remain in
+Collecting_Distributing when the port goes down. When the port
+comes back up, it temporarily remains in this state until LACP
+renegotiation occurs.
+
+Previously this was mostly cosmetic, but since the bonding carrier
+state may depend on the LACP negotiation state, it causes the
+interface to flap.
+
+According to IEEE 802.3ad-2000 and IEEE 802.1ax-2014, Collecting and
+Distributing should be reset when a port goes down:
+- In the Receive state machine, port_enabled == FALSE causes a
+  transition to the PORT_DISABLED state, which is expected to clear
+  Partner_Oper_Port_State.Synchronization.
+- In the Mux state machine, Partner_Oper_Port_State.Synchronization ==
+  FALSE causes a transition to the ATTACHED state, which disables
+  Collecting and Distributing.
+
+However, Partner_Oper_Port_State.Synchronization is not cleared in the
+PORT_DISABLED state.
+
+Clear Partner_Oper_Port_State.Synchronization in the Receive
+PORT_DISABLED state.
 
 Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
 Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
 ---
- drivers/net/bonding/bond_3ad.c     | 26 +++++++++++++++++++++++---
- drivers/net/bonding/bond_options.c |  1 +
- 2 files changed, 24 insertions(+), 3 deletions(-)
+ drivers/net/bonding/bond_3ad.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index f0aa7d2f2171..98abb2fdd7a6 100644
+index 98abb2fdd7a6..ab7ce9eecbf5 100644
 --- a/drivers/net/bonding/bond_3ad.c
 +++ b/drivers/net/bonding/bond_3ad.c
-@@ -745,6 +745,21 @@ static void __set_agg_ports_ready(struct aggregator *aggregator, int val)
- 	}
- }
- 
-+static int __agg_usable_ports(struct aggregator *agg)
-+{
-+	struct port *port;
-+	int valid = 0;
-+
-+	for (port = agg->lag_ports; port;
-+	     port = port->next_port_in_aggregator) {
-+		if (port->actor_oper_port_state & LACP_STATE_COLLECTING &&
-+		    port->actor_oper_port_state & LACP_STATE_DISTRIBUTING)
-+			valid++;
-+	}
-+
-+	return valid;
-+}
-+
- static int __agg_active_ports(struct aggregator *agg)
- {
- 	struct port *port;
-@@ -1179,10 +1194,10 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 		switch (port->sm_mux_state) {
- 		case AD_MUX_DETACHED:
- 			port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
--			ad_disable_collecting_distributing(port,
--							   update_slave_arr);
- 			port->actor_oper_port_state &= ~LACP_STATE_COLLECTING;
- 			port->actor_oper_port_state &= ~LACP_STATE_DISTRIBUTING;
-+			ad_disable_collecting_distributing(port,
-+							   update_slave_arr);
- 			port->ntt = true;
+@@ -1337,6 +1337,7 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
+ 			fallthrough;
+ 		case AD_RX_PORT_DISABLED:
+ 			port->sm_vars &= ~AD_PORT_MATCHED;
++			port->partner_oper.port_state &= ~LACP_STATE_SYNCHRONIZATION;
  			break;
- 		case AD_MUX_WAITING:
-@@ -2105,6 +2120,7 @@ static void ad_disable_distributing(struct port *port, bool *update_slave_arr)
- 			  port->actor_port_number,
- 			  aggregator->aggregator_identifier);
- 		__disable_distributing_port(port);
-+		bond_3ad_set_carrier(port->slave->bond);
- 		/* Slave array needs an update */
- 		*update_slave_arr = true;
- 	}
-@@ -2128,6 +2144,7 @@ static void ad_enable_collecting_distributing(struct port *port,
- 			  port->actor_port_number,
- 			  aggregator->aggregator_identifier);
- 		__enable_port(port);
-+		bond_3ad_set_carrier(port->slave->bond);
- 		/* Slave array needs update */
- 		*update_slave_arr = true;
- 		/* Should notify peers if possible */
-@@ -2151,6 +2168,7 @@ static void ad_disable_collecting_distributing(struct port *port,
- 			  port->actor_port_number,
- 			  aggregator->aggregator_identifier);
- 		__disable_port(port);
-+		bond_3ad_set_carrier(port->slave->bond);
- 		/* Slave array needs an update */
- 		*update_slave_arr = true;
- 	}
-@@ -2830,7 +2848,9 @@ int bond_3ad_set_carrier(struct bonding *bond)
- 	active = __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggregator));
- 	if (active) {
- 		/* are enough slaves available to consider link up? */
--		if (__agg_active_ports(active) < bond->params.min_links) {
-+		if ((bond->params.lacp_strict ? __agg_usable_ports(active)
-+					: __agg_active_ports(active)) <
-+		    bond->params.min_links) {
- 			if (netif_carrier_ok(bond->dev)) {
- 				netif_carrier_off(bond->dev);
- 				goto out;
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index d358b831df77..94b7b0851f16 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -1706,6 +1706,7 @@ static int bond_option_lacp_strict_set(struct bonding *bond,
- 	netdev_dbg(bond->dev, "Setting LACP fallback to %s (%llu)\n",
- 		   newval->string, newval->value);
- 	bond->params.lacp_strict = newval->value;
-+	bond_3ad_set_carrier(bond);
- 
- 	return 0;
- }
+ 		case AD_RX_LACP_DISABLED:
+ 			port->sm_vars &= ~AD_PORT_SELECTED;
 -- 
 2.39.2
 
