@@ -1,376 +1,199 @@
-Return-Path: <netdev+bounces-294707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294710-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZEYpKFQCIGrLtwAAu9opvQ
-	(envelope-from <netdev+bounces-294707-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 12:30:44 +0200
+	id ifX0ICIEIGpsuAAAu9opvQ
+	(envelope-from <netdev+bounces-294710-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 12:38:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411256369BB
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 12:30:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB133636A87
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 12:38:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=MWob5gAQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294707-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294707-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=leemhuis.info header.s=key2 header.b=XEa9GDO0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294710-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294710-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 04C1E307DCE6
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 10:27:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D0A3A301FABF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 10:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA1E43D4EE;
-	Wed,  3 Jun 2026 10:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FF6383985;
+	Wed,  3 Jun 2026 10:38:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010043.outbound.protection.outlook.com [52.101.85.43])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7283D564A;
-	Wed,  3 Jun 2026 10:27:47 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780482469; cv=fail; b=nvS8wH0G02/+Sq2ksdS9kmrpogDbRZi7I5SZcJZWTXoTS+TmfSX4yo+v5QCV9+mHgvbZiLSjxAHC5uDgDO6g/5QJvY2HBs+aFkeKKwwRmyvjnyK2Sa3f4r5Ltoe1mymWtT1hbPdf9lEEcP1T3QFCZT2kuN0YmZyNnpjNLOWkVV4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780482469; c=relaxed/simple;
-	bh=W/9/xY+l4VAQcHa5GsTTLq0906D99vB5j70yy7o7DIw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MymHyvqWSypZx82UpyxMBDZNJR2MkCbXb8o42EGYiu7eny89QxFsbJfLQD+VQcH1//Wk4MiVDzQtB8+b1donpEOA6Hiyc1IGQvA4FgOYAurhXsax3eS6fxuqUmb1MXBYUMBmHaYQuFQYV5WQ92ZYbYa+xUrBdSp4u5lzgbGN57s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MWob5gAQ; arc=fail smtp.client-ip=52.101.85.43
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Te7T5CtEId2loI2nuQi4WtyJCJsWSVc0/vmSUzLABvePAEN8zwyku8KmPw8islqqPZc+f8mgTuI/MsIbQo6Xvfw1/sf6B1lwENAYwK5Ahii2lGckwhfHGUD20O5nxEiOM/fe4GtAR2390EO2qvD7jxVh/20KNuZissOAOeucnn+NNIoCFNk35/NYXY6U4e8BUwTjpZdQ29MbUOJub1kxJdrPGxZIBFTbVupMj0fU8e4Gslk1vxw0HqKsVVdRSyAdagsC0sgqn9h5RtVfF7Hu8NitOCGb6lSa1XSA8Kg4j53CILb9UTS55LlJ8VpCAjb6yQtlpw0vK/gfwPN3uMBkIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4xtnRC7N3IgjAiKuwuFW8jFzNniD0lhN2+ojm8D4XJI=;
- b=SAlHNxMQH2S/7lW8LhA9gLXEtpLoHBYrUaqkYTE2LVLQBq75JTpmgwE9P954R94Rx5CGRTTM+GmgsErWr4lWjkpvoM86MqygrW4WoWZ37/iBGnmnSDG90aY3DdO0hTlfzEIv9DThyjPPyihTULuSSrFlkdITAtpDoY69D6evQzU4/KhsInAp16EJdq0yMEiMdYHi/8e2U36TA1VSP1IH+LNyQ0Yqk7qF8KAyK/lEl6ARI9hJLYKd7U7cRw5jgIJFgCzTfIxV1znuRSQEOwRoRaYzhg7WDkbxwOVqfaMiHVUKAyVZajX+kPJH670sxQN+JZs0wEIXowxN9SdoinwjFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4xtnRC7N3IgjAiKuwuFW8jFzNniD0lhN2+ojm8D4XJI=;
- b=MWob5gAQY5+15TP9TzOBtnyxJcq5F7pL3I7jGaDB3iLOq705pN+4iKhaClF49tYHG3T0LNNRKBfY4Z9fZ54kmS02CQI7CB/725jBjXQ9vFiFU6FwJIcozJ5svbRtBr5MCUtwTfTjIll7uWjgjO9zo06TsbPX/ofiSwOActuXwySp296iI6AhuGUzhBYkZdR6xJT9pdzmC3vHKSqtvv9O172Nwk4cf+XqhMPn6Ekyy/MEWqrntVUNai7YVqtdrO5cuhJGfhJIZXNQB7UETVX6a55cpFpR7oov55zrVdO26tnJ0D1i4Hd+5mhoJPRY/MTun3FJnF5nOd6NeW8uh2kmow==
-Received: from SJ0PR03CA0029.namprd03.prod.outlook.com (2603:10b6:a03:33a::34)
- by SJ2PR12MB7866.namprd12.prod.outlook.com (2603:10b6:a03:4cc::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Wed, 3 Jun 2026
- 10:27:42 +0000
-Received: from MWH0EPF000A672F.namprd04.prod.outlook.com
- (2603:10b6:a03:33a:cafe::5) by SJ0PR03CA0029.outlook.office365.com
- (2603:10b6:a03:33a::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.7 via Frontend Transport; Wed, 3
- Jun 2026 10:27:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000A672F.mail.protection.outlook.com (10.167.249.21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.92.5 via Frontend Transport; Wed, 3 Jun 2026 10:27:41 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 3 Jun
- 2026 03:27:26 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 3 Jun
- 2026 03:27:25 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Wed, 3 Jun
- 2026 03:27:18 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, "Jonathan
- Corbet" <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, "Saeed
- Mahameed" <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
- Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Vlad Dumitrescu
-	<vdumitrescu@nvidia.com>, Daniel Zahka <daniel.zahka@gmail.com>, "Aleksandr
- Loktionov" <aleksandr.loktionov@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Arthur Kiyanovski <akiyano@amazon.com>, "Petr
- Machata" <petrm@nvidia.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
-	"Nikolay Aleksandrov" <razor@blackwall.org>, David Ahern
-	<dsahern@kernel.org>, <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>, Gal Pressman
-	<gal@nvidia.com>, Amery Hung <ameryhung@gmail.com>, Nikolay Aleksandrov
-	<nikolay@nvidia.com>
-Subject: [PATCH net-next V3 2/2] net/mlx5: implement max_sfs parameter
-Date: Wed, 3 Jun 2026 13:26:46 +0300
-Message-ID: <20260603102646.404797-3-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260603102646.404797-1-tariqt@nvidia.com>
-References: <20260603102646.404797-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4490737F742
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 10:38:21 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780483103; cv=none; b=Egk0IXk0Iday0NJpttjVWS/wHLGnP8o1CKzpGwZ4R/Zsoyb77ioswn0HUoqbuXrcmTLR+jEgOTFlZ1a9iEFV03Gk+uhoWclV2nZJ1gMFJkKQCe5eO12O3ZUeQC/4U600CtbXCmH/rTZlWvnV3sOeNkStyYSnAQJoyCt9kHC/tyw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780483103; c=relaxed/simple;
+	bh=Gzj0QkdwEtprZHRxKJVS3Guel7KlNxme7gyx1LSz1to=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fWDCit0eMJS7sE0ieNoqIHSJ9U5ErKkYHvfWLblIkmk4806foyfL+qL4Vt5/3wppXShJoE24H7L3OdRVz40RUWyaCFPnD06YBnJG2gkESZdnLcIXCUmvWuDy4K+vuZ7ZK9d3EXhrEA6YgNYcvcfTUSfL+C1QpPjCbUxzpTH9nFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=XEa9GDO0; arc=none smtp.client-ip=188.68.63.98
+Received: from mors-relay-2501.netcup.net (localhost [127.0.0.1])
+	by mors-relay-2501.netcup.net (Postfix) with ESMTPS id 4gVkQy1z4Rz63J2;
+	Wed,  3 Jun 2026 12:27:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1780482442;
+	bh=Gzj0QkdwEtprZHRxKJVS3Guel7KlNxme7gyx1LSz1to=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XEa9GDO0xF0VTcLKHyqz1JOaBYeXkQ07VLBtIcEoBNzCb7KkNJPyes7ZthBk1yrqR
+	 +b9IsFWBEaarLdoYWA5FlJTBC/yVJz868jLmzqnG5XR5O0GsCSAdW5ZHCI/PEumRNi
+	 UiNyY4da1HapPJjzk8mL8x2Gup0xGUuPCtceHEIwtLSV/iWNTQvb0d8w6z/8zAPer/
+	 hmkVSol7ggOK/nrvsBDCbTMXJgXa9i/jfIR5S4I4k4lyLlxMlvyi5ws084NpjNezS/
+	 l6rmkNy46ZuWx6OsTUC9ciTo7VefhgZoiE5Ot6SlU2MmJ0BA15YubG1qJ1gfKKOCz8
+	 wuncI9Ijgtp2g==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-2501.netcup.net (Postfix) with ESMTPS id 4gVkQy1FD6z4whb;
+	Wed,  3 Jun 2026 12:27:22 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.901
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gVkQx21qPz8tcJ;
+	Wed,  3 Jun 2026 12:27:21 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 6EEE85F96B;
+	Wed,  3 Jun 2026 12:27:20 +0200 (CEST)
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <59207b24-4fc1-45ec-b34d-359e1d247c54@leemhuis.info>
+Date: Wed, 3 Jun 2026 12:27:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A672F:EE_|SJ2PR12MB7866:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc1e5e8b-bdd2-4206-5067-08dec15abe6e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|36860700016|82310400026|376014|6133799003|18002099003|3023799007|11063799006|22082099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	9uiDewN8CyoB4FaxGQu7yHkRzuUW1aIznvp9JJf8vHYPENQKlQHkWJRVqNlPjDdj8KTOq1OeqP4V2CTz3KuNilJIanu0DPverTP1F6hfgkGjU/o9brnz1bBxl1z8/sMHg7LjvkTi0IEdKKP1S9gpN27+EYSOaphaMqM4agKA9TVSrG9w5Ms6j167aR0nDYsX2EmfePY9kjoxHcZrfGHPOH7IJSh3AdUKbSw4nmfOHwyL6KU6J9SVdDUGoqSYXJ8MjQpZ6A2Mr8Mi+Gyf4Iasm1AESrSO1PIMH6eREC8UwNvl5JyUmpdhebG1OOg1P7nJg1jV272yOaaJYuInBgQjIIUZs7WmQ8oODKFJPBipM6As6n+Cp35p/mQdNWlVMGhXe1y9YHrNOCYXp1YkyASDxCHXAKDXqbcYmCoCPw6Ivws6Q8tIDCdNQJZZGbWG3mNI4IfY9Zo5doSZRBbHwM9sWrkApU5Fz6kVhvogsJFHw3nlllx/5rRFFjKhOdHnsCiQ0NQakFpMJqS3E/AubiZKzqE1wVMIPW7OCafj+fTYI26EIAPJYswApNYUinO2et8I8B/IWtCLH1IofbtmlnGWlVd7iTJWKzD+Fes+BJn9m7K4FGAJ50B0dILpxzhIIgzpkC4RQ0pevBt9IIu2A/ognc3tcS0hvrEBU8bzV7KEwWX9S0WXQ6Z0xNx3uiByEkT+wt5X8xt0zGhEZJ7FUYOwmRks9wgsWYBSe04w8LCL9tI=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700016)(82310400026)(376014)(6133799003)(18002099003)(3023799007)(11063799006)(22082099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	VD1DdI1S2iCQDEmTJjcC/ghJLAWjclBvYrbvkpetW+JKPMoHC/dv+KaRgfZqmblAyKlmF1PBf4PVZFZEyJONle84ekSXybSXmfloZvO9/UsBvIYGvLnAAEQT0Yfn3T3+y0uI+xwCUR7OONe4N+BSCUlAmwU7v58k6xOiTttDT/HFtGn8r62EvI/moj6DpMlKfIaBpggUwvKTkbrTzwDYvLXISyoTzJHEUfIhTadyks26LTrr+pN+HO7IbPO2Xqi37T4GUFezyd6n04IhAvMBCv0QuVhuX3Kg0QHi1MXYUYUsoeqz+yG20LhXS0ZtXE46N01zDD906ay9HA1ZlAy63Pob2q7gzkZiaLr+8cJdvcKLqeynCPl7xLZNfj6YZ5Yf5ZJcp6rL1NzuX8qmDRVioOT7q+kpBTd1ry/nK3jjX91J8Q8PU4xxO7YRnrAjg9fi
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2026 10:27:41.7855
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc1e5e8b-bdd2-4206-5067-08dec15abe6e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A672F.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7866
+User-Agent: Mozilla Thunderbird
+Subject: Re: CL37 autonegotiation not working on amd-xgbe
+To: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Jakub Kicinski <kuba@kernel.org>, PrashanthKumar.K.R@amd.com,
+ Madhu.Banavara@amd.com
+Cc: Patrick Oppenlander <patrick.oppenlander@gmail.com>,
+ netdev@vger.kernel.org,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: 
+ <CAEg67GmFS0Q4oSZkz8zWdOzckSth9_vBPiOy6a7-d697C2w2Xg@mail.gmail.com>
+ <20260427162839.350135c8@kernel.org>
+ <fa98f520-7539-42c0-a8f4-1858553946fe@amd.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+X-Enigmail-Draft-Status: N11222
+Autocrypt: addr=linux@leemhuis.info; keydata=
+ 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 MEK4
+In-Reply-To: <fa98f520-7539-42c0-a8f4-1858553946fe@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <178048244075.3176975.4222387635817759165@mxe9fb.netcup.net>
+X-NC-CID: PA3D8pYHFeY2MIVhENuKQGGPYslo2rPwJVrRO6DpG1DxwmHMn34=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:jiri@resnulli.us,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:vdumitrescu@nvidia.com,m:daniel.zahka@gmail.com,m:aleksandr.loktionov@intel.com,m:przemyslaw.kitszel@intel.com,m:akiyano@amazon.com,m:petrm@nvidia.com,m:rkannoth@marvell.com,m:razor@blackwall.org,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:gal@nvidia.com,m:ameryhung@gmail.com,m:nikolay@nvidia.com,m:andrew@lunn.ch,m:danielzahka@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-294707-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294710-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:Shyam-sundar.S-k@amd.com,m:kuba@kernel.org,m:PrashanthKumar.K.R@amd.com,m:Madhu.Banavara@amd.com,m:patrick.oppenlander@gmail.com,m:netdev@vger.kernel.org,m:regressions@lists.linux.dev,m:patrickoppenlander@gmail.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	DMARC_NA(0.00)[leemhuis.info];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lists.linux.dev];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[resnulli.us,kernel.org,lwn.net,linuxfoundation.org,nvidia.com,gmail.com,intel.com,amazon.com,marvell.com,blackwall.org,vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[leemhuis.info:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:from_mime,nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 411256369BB
+X-Rspamd-Queue-Id: EB133636A87
 
-From: Nikolay Aleksandrov <nikolay@nvidia.com>
+On 5/6/26 05:55, Shyam Sundar S K wrote:
+> On 4/28/2026 04:58, Jakub Kicinski wrote:
+>> On Thu, 23 Apr 2026 10:18:49 +1000 Patrick Oppenlander wrote:
+>>> A recent change [1]
 
-Implement max_sfs generic parameter to allow users to control the total
-light-weight NIC subfunctions that can be created using devlink instead
-of external vendor tools. A value of 0 will effectively disable creation
-of new subfunction devices. A warning is sent to user-space via extack
-(returning extack without error code is interpreted as a warning by
-user-space tools). The maximum value is capped at U16_MAX.
+FWIW, that was 42fd432fe6d320 ("amd-xgbe: align CL37 AN sequence as per
+databook") [v6.16-rc5]
 
-Signed-off-by: Nikolay Aleksandrov <nikolay@nvidia.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- Documentation/networking/devlink/mlx5.rst     |   7 +-
- .../mellanox/mlx5/core/lib/nv_param.c         | 118 +++++++++++++++++-
- 2 files changed, 121 insertions(+), 4 deletions(-)
+>>> stopped CL37 autonegotiation from working on amd-xgbe hardware.
+>>
+>> Hi Raju! Are you looking into this report?
+> 
+> Dropping Raju as he is no longer with AMD.
+> 
+> Thanks for the bug report. Prashanth will maintain this driver going
+> forward.
+> 
+> Prashanth, can you address this bug? Also, please update the
+> MAINTAINERS list by dropping Raju's name.
+Any progress? It looks like nothing happened to fix this regression
+since above mail, but I'm looking at things from the outside and there
+it's easy to miss something, so please tell me if that's the case.
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index 4bba4d780a4a..f5e2dccafa5a 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -45,8 +45,13 @@ Parameters
-      - The range is between 1 and a device-specific max.
-      - Applies to each physical function (PF) independently, if the device
-        supports it. Otherwise, it applies symmetrically to all PFs.
-+   * - ``max_sfs``
-+     - permanent
-+     - The range is between 0 and a device-specific max.
-+     - Applies to each physical function (PF) independently.
- 
--Note: permanent parameters such as ``enable_sriov`` and ``total_vfs`` require FW reset to take effect
-+Note: permanent parameters such as ``enable_sriov``, ``total_vfs`` and ``max_sfs``
-+      require FW reset to take effect
- 
- .. code-block:: bash
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-index 4a7275e8b62e..899167a5cd92 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-@@ -68,7 +68,9 @@ struct mlx5_ifc_mnvda_reg_bits {
- 
- struct mlx5_ifc_nv_global_pci_conf_bits {
- 	u8         sriov_valid[0x1];
--	u8         reserved_at_1[0x10];
-+	u8         reserved_at_1[0xa];
-+	u8         per_pf_num_sf[0x1];
-+	u8         reserved_at_c[0x5];
- 	u8         per_pf_total_vf[0x1];
- 	u8         reserved_at_12[0xe];
- 
-@@ -93,9 +95,11 @@ struct mlx5_ifc_nv_global_pci_cap_bits {
- };
- 
- struct mlx5_ifc_nv_pf_pci_conf_bits {
--	u8         reserved_at_0[0x9];
-+	u8         log_sf_bar_size[0x8];
-+	u8         pf_total_sf_en[0x1];
- 	u8         pf_total_vf_en[0x1];
--	u8         reserved_at_a[0x16];
-+	u8         reserved_at_a[0x6];
-+	u8         total_sf[0x10];
- 
- 	u8         reserved_at_20[0x20];
- 
-@@ -158,6 +162,8 @@ struct mlx5_ifc_nv_sw_accelerate_conf_bits {
- #define MLX5_GET_CFG_HDR_LEN(_mnvda_ptr) \
- 	MLX5_GET(mnvda_reg, _mnvda_ptr, configuration_item_header.length)
- 
-+#define MLX5_DEFAULT_LOG_SF_BAR_SIZE 12
-+
- static int mlx5_nv_param_read(struct mlx5_core_dev *dev, void *mnvda,
- 			      size_t len)
- {
-@@ -755,6 +761,108 @@ static int mlx5_devlink_total_vfs_validate(struct devlink *devlink, u32 id,
- 	return 0;
- }
- 
-+static int mlx5_devlink_max_sfs_get(struct devlink *devlink, u32 id,
-+				    struct devlink_param_gset_ctx *ctx,
-+				    struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err;
-+
-+	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to read global PCI configuration");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	if (!MLX5_GET(nv_global_pci_conf, data, per_pf_num_sf)) {
-+		ctx->val.vu32 = 0;
-+		return 0;
-+	}
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read PF configuration");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	if (MLX5_GET(nv_pf_pci_conf, data, pf_total_sf_en))
-+		ctx->val.vu32 = MLX5_GET(nv_pf_pci_conf, data, total_sf);
-+	else
-+		ctx->val.vu32 = 0;
-+
-+	return 0;
-+}
-+
-+static int mlx5_devlink_max_sfs_validate(struct devlink *devlink, u32 id,
-+					 union devlink_param_value val,
-+					 struct netlink_ext_ack *extack)
-+{
-+	if (val.vu32 > U16_MAX) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Max SFs allowed value is %u", U16_MAX);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int mlx5_devlink_max_sfs_set(struct devlink *devlink, u32 id,
-+				    struct devlink_param_gset_ctx *ctx,
-+				    struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err;
-+
-+	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to read global PCI configuration");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	MLX5_SET(nv_global_pci_conf, data, per_pf_num_sf, !!ctx->val.vu32);
-+
-+	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to change per_pf_num_sf global PCI configuration");
-+		return err;
-+	}
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read PF configuration");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	MLX5_SET(nv_pf_pci_conf, data, log_sf_bar_size,
-+		 ctx->val.vu32 ? MLX5_DEFAULT_LOG_SF_BAR_SIZE : 0);
-+	MLX5_SET(nv_pf_pci_conf, data, pf_total_sf_en, !!ctx->val.vu32);
-+	MLX5_SET(nv_pf_pci_conf, data, total_sf, ctx->val.vu32);
-+
-+	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to change PF PCI configuration");
-+		return err;
-+	}
-+	NL_SET_ERR_MSG(extack,
-+		       "Modifying max_sfs requires a FW reset and PCI bus rescan");
-+
-+	return 0;
-+}
-+
- static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
- 			      mlx5_devlink_enable_sriov_get,
-@@ -763,6 +871,10 @@ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 			      mlx5_devlink_total_vfs_get,
- 			      mlx5_devlink_total_vfs_set,
- 			      mlx5_devlink_total_vfs_validate),
-+	DEVLINK_PARAM_GENERIC(MAX_SFS, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			      mlx5_devlink_max_sfs_get,
-+			      mlx5_devlink_max_sfs_set,
-+			      mlx5_devlink_max_sfs_validate),
- 	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
- 			     "cqe_compress_type", DEVLINK_PARAM_TYPE_STRING,
- 			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
--- 
-2.44.0
-
+Ciao, Thorsten
 
