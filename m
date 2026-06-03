@@ -1,395 +1,155 @@
-Return-Path: <netdev+bounces-294968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tYuEKY28IGo+7QAAu9opvQ
-	(envelope-from <netdev+bounces-294968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 01:45:17 +0200
+	id LmuTFk6+IGq07QAAu9opvQ
+	(envelope-from <netdev+bounces-294969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 01:52:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0724463BE48
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 01:45:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7244063BEE7
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 01:52:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=EvQWoTHF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294968-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294968-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Op1+6vms;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294969-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294969-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 686B8301BF4A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 23:43:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B35C1300BD56
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 23:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FE84657CF;
-	Wed,  3 Jun 2026 23:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFCE4DBD9D;
+	Wed,  3 Jun 2026 23:52:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26453D47AC
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2CC3B585D;
+	Wed,  3 Jun 2026 23:52:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780530234; cv=none; b=flSQJoWtULw3Xblpa/l3Zv8WlU8mGu++NdlnApSpfD/mPD1p32jApQAwC/EHr+2wBMh1v7y8Ghq8/Kw0P9OSVbJp5Dqg1OJvD/QLru+FsGxQXWNzCJejOp7LycdiNAh7QphVICegjMRHRd5CftJ6jGGqr004PXIMN94GTG+Oy04=
+	t=1780530761; cv=none; b=GtMc1xgcWZfwJ4HMcmYvhbcGJaaLA7edI/Zrh8oHp/GqF5TqNHQpyt2TLOvdepP6alHq0jG0QAFB07dbbdbv08mA/TyWKPRfxzR4ltFmFVkZ5uDf8X2g4eG5sul3YShtiyFMF365nNlT4x/1QFbgwbULdU2PmbGT3aFQJA+yhOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780530234; c=relaxed/simple;
-	bh=4FRgeUKxAtViRu/Vti7zSZ6k+8I0GC+nOnaMnBCJk1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WfrBexJUWG5ArHbDEHYgfBuTe01l+ZYGKZ0ao1271lMT7q4dC/aqDCViMWjHHS6KUBXZkq7W2afr2NKC9r/C4flN6FZJ85/82aFdIMKo6JRdtJI8wxuL9jqlTfeFf0RSxcTsaUts0ep2PgwM13i6LphItgRXngKRnvqkVVage8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EvQWoTHF; arc=none smtp.client-ip=209.85.208.173
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-396775c26e0so452741fa.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:43:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780530230; x=1781135030; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YOMKVjpdQuMQW/mDvL7MkB3wiks8i0bLiAPsA9AAen8=;
-        b=EvQWoTHFCc/jtd5KSsrN5T5O6J3sx9rGPWVR8SERtKsaqH+r+h4ldlrFdfEKYT5qw6
-         Qj6aiHSsaflp5DsZd6hihTBrjAKjcgLQc+g81QYqvedaWAck1smnIOCPqQVuH4BWNpem
-         Fx2HwvbGwHqaqH7dlaQmp1ZSUbjUBGmVtN+sYx9Dk3KmP+kZTqcjfHcBZnRgL1ZFzqDq
-         CNilK6VSnCjwF+Fih9H9AZZRAtAxNjstU+MolkkElixEXQhfwFuJeEiGNjMDFQ3/bsHa
-         7nIaIi09yjeoQMlFJupx69Gt5PBp7NK4ifrbxqsuYAHJlAK3b38RZqBu4diLIl+MqIC2
-         75wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780530230; x=1781135030;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YOMKVjpdQuMQW/mDvL7MkB3wiks8i0bLiAPsA9AAen8=;
-        b=FMOp+2ciLXWmR2uxPDqQhvSSDUwLF6Dr+JRUVi02wZeN9ow4yiyjOLhgBDYAsfzeGR
-         rJ1EjiX3k3q8jMKUQ5SGNrQ1jnruM+JX2jlX3qbaGSEuUnWJWYM2LBv3bg8UlNe4QRTA
-         HeoM/P5IahaeYiOyXkK9/Za+pyFbeLA2eMVujfyNXr2cMJa97PowIyV6fA2gbazB93Nz
-         xmMAaHLMNlVwJnHQLxXC6Ox39WKVzuIRVIp0rvY5d2Rw5s8wlMu9+nEc1Gj0QOyiPDJ8
-         8JGZxucN++mFVl7c3lM1RbveLrI01cRL7yR2LnxcEfv9NPFp3dILyAbql0/1TNAcwa0m
-         ZTqA==
-X-Forwarded-Encrypted: i=1; AFNElJ81lbzjrTc2Qoth8PYu0Zm0SQrBJbLVy7A7dWTB6YSMyzmXsrgYhxb41beogVW2rl4IaVEgOGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHHQoaIM0oMVJrvDJtZaBUJmDAQ+b5yoDfJEobJm3yGmXx28wz
-	lHxbe+NL+/yYC2O//K1TFXeooXZsYZHm3Iv+Cld+75JGkd5Kk6nJgK7y
-X-Gm-Gg: Acq92OGf9frKoH8gm2uY5h/prn+wvTBbupfy116/BH4CHvFjly38hUX02+7AbntSjQe
-	GU/0V+M7b6gaqrXLdDergpwkmbr4T4iWSLpjwIv/pCu179T/bJatGF/TTAKCtwFyHzSOFcwQOhY
-	PYwI+poKQP+WBdnnn36XfEQ1drPsXDCJTuA3Fud7yFMO7c9Duys7rlk58TZWJK65fX8wMVxoHS7
-	gX2wPYDVoNq26bn0B/w3elAd5XMKGQ5cCJvHFhI7muMIR/8eAuocC5yhAE1ztExZRog4E4+PnGK
-	WlVGC7PFIht809kdpFvjgxaN/LmIyb15qsknK1On12rJlsnO3kXiM8VrdPypO561JjktyfNbGpH
-	uGrC/ormHjzldPdDDcfEoeY1y1S+mcs3iyDatqcdCfJpfpzxj5+BPDytDy/veNuOOMhw1XvjvP6
-	3SS+D97ExalhZ0myehCRdGbyWeXJw8HrA282Vkz0WV6k69SktcI3YEZJ8eMEb/BFcq7viduFJZr
-	17cJjA=
-X-Received: by 2002:a05:651c:547:b0:393:c6b5:993b with SMTP id 38308e7fff4ca-396af5172a2mr16825171fa.24.1780530229785;
-        Wed, 03 Jun 2026 16:43:49 -0700 (PDT)
-Received: from c0624c666cc5.devsec.astralinux.ru ([93.188.205.42])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-396ac2d5034sm12286331fa.29.2026.06.03.16.43.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 16:43:47 -0700 (PDT)
-From: Vladislav Nikolaev <vlad102nikolaev@gmail.com>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Vladislav Nikolaev <vlad102nikolaev@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	David Rheinsberg <david@readahead.eu>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	lvc-project@linuxtesting.org,
-	syzbot+2faa4825e556199361f9@syzkaller.appspotmail.com,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH 5.10] Bluetooth: hci_core: Fix use-after-free in vhci_flush()
-Date: Thu,  4 Jun 2026 02:43:39 +0300
-Message-ID: <20260603234343.445-1-vlad102nikolaev@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1780530761; c=relaxed/simple;
+	bh=J161UQqMh9wxSA8A4moimcmgr0gOVC0pTzMbys2arTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qIrpq/LU1ki+cRy+ENPVa3MK4l8d/HhUFktVRpjwWwas5z8G73s2qqMIEPoJcZd3dxsBixcv649O62UwIo3FkEywi2b4TeCImDAz16R7e+6ligx/2XqAaW2sUIvMQ5PyZG4D6upZDX5dbEs3wascP7H9U0+ETD+cLNFd91Wm26w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Op1+6vms; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 490F11F00893;
+	Wed,  3 Jun 2026 23:52:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780530760;
+	bh=pIhFG4QGZBE88pUeGj789/G2k4umSI59x5bGIxRq2bA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Op1+6vmsjKCJ+0c/7Z9rYZ3iFiNgW33YKcZcf/tJ9fNgbMsYRys1jgDgIVe7f7Y/q
+	 ZFGXV851h7UhUQKQCw67jhOMq9qivVrkqshkW2KvwrgEusgWx0CNS/l52bTg2i6P1H
+	 appkCNbUJrhhmqCtIkCgk7PfYD86AApDHvNneHd+5ccsJEZ3/gbWHh9tIFyF/DNPYN
+	 w6CyFVhqFiiTtoddyILgXhxuXSnFnn230eTPCtW4HsM/L1k0Io3ZDUi/mbyTxIVBc+
+	 yhEnylu1lP3eoT4f+A3KM//g+r3H6BguA42kv9YeRDzwXtRDfSFI9cQNv15W06ZJna
+	 Dm2e48XEgKVTw==
+Date: Wed, 3 Jun 2026 16:52:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Gui-Dong Han <hanguidong02@gmail.com>, netdev@vger.kernel.org,
+ linux-net-drivers@amd.com, linux-kernel@vger.kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, baijiaju1990@gmail.com
+Subject: Re: [PATCH] sfc: Use acquire/release for irq_soft_enabled
+Message-ID: <20260603165238.43259251@kernel.org>
+In-Reply-To: <74e6932f-a755-4931-8d4d-0025826a5502@gmail.com>
+References: <20260528092838.2099352-1-hanguidong02@gmail.com>
+	<20260603112035.0866d7d4@kernel.org>
+	<74e6932f-a755-4931-8d4d-0025826a5502@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294968-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[vlad102nikolaev@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,holtmann.org,davemloft.net,kernel.org,googlemail.com,vger.kernel.org,readahead.eu,intel.com,linuxtesting.org,syzkaller.appspotmail.com,google.com,molgen.mpg.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:vlad102nikolaev@gmail.com,m:marcel@holtmann.org,m:johan.hedberg@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:dh.herrmann@googlemail.com,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:luiz.dentz@gmail.com,m:david@readahead.eu,m:johan.hedberg@intel.com,m:lvc-project@linuxtesting.org,m:syzbot+2faa4825e556199361f9@syzkaller.appspotmail.com,m:kuniyu@google.com,m:pmenzel@molgen.mpg.de,m:luiz.von.dentz@intel.com,m:johanhedberg@gmail.com,m:dhherrmann@gmail.com,m:luizdentz@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294969-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ecree.xilinx@gmail.com,m:hanguidong02@gmail.com,m:netdev@vger.kernel.org,m:linux-net-drivers@amd.com,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:baijiaju1990@gmail.com,m:ecreexilinx@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,amd.com,lunn.ch,davemloft.net,google.com,redhat.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vlad102nikolaev@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,2faa4825e556199361f9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,vger.kernel.org:from_smtp,appspotmail.com:email,syzkaller.appspot.com:url]
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0724463BE48
+X-Rspamd-Queue-Id: 7244063BEE7
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+On Wed, 3 Jun 2026 21:28:02 +0100 Edward Cree wrote:
+> On 03/06/2026 19:20, Jakub Kicinski wrote:
+> > On Thu, 28 May 2026 17:28:38 +0800 Gui-Dong Han wrote: =20
+> >> Use release stores when updating the gate and acquire loads in interru=
+pt
+> >> handlers before touching channels. Keep the existing smp_wmb() after g=
+ate
+> >> updates, preserving the current ordering with event queue start and st=
+op. =20
+> >=20
+> > Why are you keeping the smp_wmb() tho? You don't have to repeat what
+> > the patch does. The goal of the commit message is to explain the why.
+> >=20
+> > Ed, WDYT? =20
+>=20
+> I think... that my head hurts from trying to understand this.
+> What I particularly don't understand is why it wouldn't suffice to just
+>  put smp_rmb() after every read of irq_soft_enabled, pairing with the
+>  existing smp_wmb().
 
-commit 1d6123102e9fbedc8d25bf4731da6d513173e49e upstream.
+Exactly..
 
-syzbot reported use-after-free in vhci_flush() without repro. [0]
+> And, conversely, why any of this works at all =E2=80=94 what stops an int=
+errupt
+>  handler passing the gate, because the write to irq_soft_enabled has
+>  propagated to its CPU, but the writes to channel pointers haven't?
+>  Na=C3=AFvely I'd expect the smp_wmb() in efx_soft_enable_interrupts() to
+>  come _before_ the write to irq_soft_enabled.
+> (The smp_wmb() in efx_soft_disable_interrupts(), I'm not sure exactly
+>  what that pairs with, since the ordering that matters there is between
+>  the irq_soft_enabled=3Dfalse write and the synchronize_irq().)
+>=20
+> Anyway, this code predates my involvement with sfc and I've never had
+>  to touch it, so frankly I don't know any more here than anyone else,
+>  and if a memory-models expert reviews it and says 'this is needed and
+>  correct', that would mean more than a review tag from me.
+> That's not a cop-out "I won't review this", rather I'm saying that if
+>  Gui-Dong can't convince me because I'm too dumb, but can convince you,
+>  then you don't need to wait for me to show up and add my tag.
 
-From the splat, a thread close()d a vhci file descriptor while
-its device was being used by iotcl() on another thread.
+I haven't dug into the code too much but FWIW having a store_release
+barrier which flips something _both_ to true and false strikes me as
+highly suspicious. So the patch needs a much better commit description
+at the very least.
 
-Once the last fd refcnt is released, vhci_release() calls
-hci_unregister_dev(), hci_free_dev(), and kfree() for struct
-vhci_data, which is set to hci_dev->dev->driver_data.
-
-The problem is that there is no synchronisation after unlinking
-hdev from hci_dev_list in hci_unregister_dev().  There might be
-another thread still accessing the hdev which was fetched before
-the unlink operation.
-
-We can use SRCU for such synchronisation.
-
-Let's run hci_dev_reset() under SRCU and wait for its completion
-in hci_unregister_dev().
-
-Another option would be to restore hci_dev->destruct(), which was
-removed in commit 587ae086f6e4 ("Bluetooth: Remove unused
-hci-destruct cb").  However, this would not be a good solution, as
-we should not run hci_unregister_dev() while there are in-flight
-ioctl() requests, which could lead to another data-race KCSAN splat.
-
-Note that other drivers seem to have the same problem, for exmaple,
-virtbt_remove().
-
-[0]:
-BUG: KASAN: slab-use-after-free in skb_queue_empty_lockless include/linux/skbuff.h:1891 [inline]
-BUG: KASAN: slab-use-after-free in skb_queue_purge_reason+0x99/0x360 net/core/skbuff.c:3937
-Read of size 8 at addr ffff88807cb8d858 by task syz.1.219/6718
-
-CPU: 1 UID: 0 PID: 6718 Comm: syz.1.219 Not tainted 6.16.0-rc1-syzkaller-00196-g08207f42d3ff #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0xd2/0x2b0 mm/kasan/report.c:521
- kasan_report+0x118/0x150 mm/kasan/report.c:634
- skb_queue_empty_lockless include/linux/skbuff.h:1891 [inline]
- skb_queue_purge_reason+0x99/0x360 net/core/skbuff.c:3937
- skb_queue_purge include/linux/skbuff.h:3368 [inline]
- vhci_flush+0x44/0x50 drivers/bluetooth/hci_vhci.c:69
- hci_dev_do_reset net/bluetooth/hci_core.c:552 [inline]
- hci_dev_reset+0x420/0x5c0 net/bluetooth/hci_core.c:592
- sock_do_ioctl+0xd9/0x300 net/socket.c:1190
- sock_ioctl+0x576/0x790 net/socket.c:1311
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcf5b98e929
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fcf5c7b9038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fcf5bbb6160 RCX: 00007fcf5b98e929
-RDX: 0000000000000000 RSI: 00000000400448cb RDI: 0000000000000009
-RBP: 00007fcf5ba10b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fcf5bbb6160 R15: 00007ffd6353d528
- </TASK>
-
-Allocated by task 6535:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __kmalloc_cache_noprof+0x230/0x3d0 mm/slub.c:4359
- kmalloc_noprof include/linux/slab.h:905 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- vhci_open+0x57/0x360 drivers/bluetooth/hci_vhci.c:635
- misc_open+0x2bc/0x330 drivers/char/misc.c:161
- chrdev_open+0x4c9/0x5e0 fs/char_dev.c:414
- do_dentry_open+0xdf0/0x1970 fs/open.c:964
- vfs_open+0x3b/0x340 fs/open.c:1094
- do_open fs/namei.c:3887 [inline]
- path_openat+0x2ee5/0x3830 fs/namei.c:4046
- do_filp_open+0x1fa/0x410 fs/namei.c:4073
- do_sys_openat2+0x121/0x1c0 fs/open.c:1437
- do_sys_open fs/open.c:1452 [inline]
- __do_sys_openat fs/open.c:1468 [inline]
- __se_sys_openat fs/open.c:1463 [inline]
- __x64_sys_openat+0x138/0x170 fs/open.c:1463
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6535:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x62/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2381 [inline]
- slab_free mm/slub.c:4643 [inline]
- kfree+0x18e/0x440 mm/slub.c:4842
- vhci_release+0xbc/0xd0 drivers/bluetooth/hci_vhci.c:671
- __fput+0x44c/0xa70 fs/file_table.c:465
- task_work_run+0x1d1/0x260 kernel/task_work.c:227
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0x6ad/0x22e0 kernel/exit.c:955
- do_group_exit+0x21c/0x2d0 kernel/exit.c:1104
- __do_sys_exit_group kernel/exit.c:1115 [inline]
- __se_sys_exit_group kernel/exit.c:1113 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1113
- x64_sys_call+0x21ba/0x21c0 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88807cb8d800
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 88 bytes inside of
- freed 1024-byte region [ffff88807cb8d800, ffff88807cb8dc00)
-
-Fixes: bf18c7118cf8 ("Bluetooth: vhci: Free driver_data on file release")
-Reported-by: syzbot+2faa4825e556199361f9@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=f62d64848fc4c7c30cd6
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Vladislav Nikolaev <vlad102nikolaev@gmail.com>
----
-Backport fix for CVE-2025-38250
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 34 ++++++++++++++++++++++++++++----
- 2 files changed, 32 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fe62943a35dd..bc4e2856f235 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -28,6 +28,7 @@
- #include <linux/idr.h>
- #include <linux/leds.h>
- #include <linux/rculist.h>
-+#include <linux/srcu.h>
- 
- #include <net/bluetooth/hci.h>
- #include <net/bluetooth/hci_sock.h>
-@@ -285,6 +286,7 @@ struct amp_assoc {
- 
- struct hci_dev {
- 	struct list_head list;
-+	struct srcu_struct srcu;
- 	struct mutex	lock;
- 
- 	const char	*name;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9787a4c55113..a718e38f3da3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1040,7 +1040,7 @@ static int hci_linkpol_req(struct hci_request *req, unsigned long opt)
- 
- /* Get HCI device by index.
-  * Device is held on return. */
--struct hci_dev *hci_dev_get(int index)
-+static struct hci_dev *__hci_dev_get(int index, int *srcu_index)
- {
- 	struct hci_dev *hdev = NULL, *d;
- 
-@@ -1053,6 +1053,8 @@ struct hci_dev *hci_dev_get(int index)
- 	list_for_each_entry(d, &hci_dev_list, list) {
- 		if (d->id == index) {
- 			hdev = hci_dev_hold(d);
-+			if (srcu_index)
-+				*srcu_index = srcu_read_lock(&d->srcu);
- 			break;
- 		}
- 	}
-@@ -1060,6 +1062,22 @@ struct hci_dev *hci_dev_get(int index)
- 	return hdev;
- }
- 
-+struct hci_dev *hci_dev_get(int index)
-+{
-+	return __hci_dev_get(index, NULL);
-+}
-+
-+static struct hci_dev *hci_dev_get_srcu(int index, int *srcu_index)
-+{
-+	return __hci_dev_get(index, srcu_index);
-+}
-+
-+static void hci_dev_put_srcu(struct hci_dev *hdev, int srcu_index)
-+{
-+	srcu_read_unlock(&hdev->srcu, srcu_index);
-+	hci_dev_put(hdev);
-+}
-+
- /* ---- Inquiry support ---- */
- 
- bool hci_discovery_active(struct hci_dev *hdev)
-@@ -1906,9 +1924,9 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
- int hci_dev_reset(__u16 dev)
- {
- 	struct hci_dev *hdev;
--	int err;
-+	int err, srcu_index;
- 
--	hdev = hci_dev_get(dev);
-+	hdev = hci_dev_get_srcu(dev, &srcu_index);
- 	if (!hdev)
- 		return -ENODEV;
- 
-@@ -1930,7 +1948,7 @@ int hci_dev_reset(__u16 dev)
- 	err = hci_dev_do_reset(hdev);
- 
- done:
--	hci_dev_put(hdev);
-+	hci_dev_put_srcu(hdev, srcu_index);
- 	return err;
- }
- 
-@@ -3596,6 +3614,11 @@ struct hci_dev *hci_alloc_dev(void)
- 	if (!hdev)
- 		return NULL;
- 
-+	if (init_srcu_struct(&hdev->srcu)) {
-+		kfree(hdev);
-+		return NULL;
-+	}
-+
- 	hdev->pkt_type  = (HCI_DM1 | HCI_DH1 | HCI_HV1);
- 	hdev->esco_type = (ESCO_HV1);
- 	hdev->link_mode = (HCI_LM_ACCEPT);
-@@ -3839,6 +3862,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	list_del(&hdev->list);
- 	write_unlock(&hci_dev_list_lock);
- 
-+	synchronize_srcu(&hdev->srcu);
-+	cleanup_srcu_struct(&hdev->srcu);
-+
- 	cancel_work_sync(&hdev->rx_work);
- 	cancel_work_sync(&hdev->cmd_work);
- 	cancel_work_sync(&hdev->tx_work);
--- 
-2.47.3
+Thanks for the prompt reply!
 
