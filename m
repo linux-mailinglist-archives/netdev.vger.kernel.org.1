@@ -1,175 +1,284 @@
-Return-Path: <netdev+bounces-294790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294791-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rFNxO81AIGo5zQAAu9opvQ
-	(envelope-from <netdev+bounces-294790-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 16:57:18 +0200
+	id IuohJjBGIGp9zwAAu9opvQ
+	(envelope-from <netdev+bounces-294791-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:20:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5602F638DB4
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 16:57:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC01B639186
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 17:20:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294790-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294790-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=hotmail.com (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b="agz/z7uW";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294791-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294791-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68287316ADB2
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 14:40:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F0753031AFB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 14:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8634B39A80E;
-	Wed,  3 Jun 2026 14:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6125B3A3E96;
+	Wed,  3 Jun 2026 14:44:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47475396D2E
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 14:37:19 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780497440; cv=none; b=JwbWUfFGdIDkw9OilDW0vUtMbba1KtJTrQ0pm8b5YK15WmEvp/WLZcVdWqxnhD2nH0vE5C+La8YP5ldlh8RXQ+JJg+pVMEGz/nZGd/GcfOg75ytaqVtUyXtoHPKL/V7K6KJK93xAgCrxiqdwF9MFv5Gp/3pehad7ztbi9KcTl/s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780497440; c=relaxed/simple;
-	bh=7sotkPWu1wfNu67XWnbqYZkTGv9k1u0xzUPyOcRSLKo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QPAh5Iw4yq6XDnm466rm9c+TkitF0tWvrh5aB2zAbVYfTJro5k/4X+In9Bm59CNEiPKXPQZj2yhyJQn/x/aY+ONWK0Dict0DTz4/19Rp4Tg/CnV48gTV69sg3SLBzUjbAWzyphiTvJLQhrDhUMQ0pTlHUb/nfdQnLnUamkrh9lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.47
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8cceb2ecc03so37796166d6.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 07:37:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780497438; x=1781102238;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7sotkPWu1wfNu67XWnbqYZkTGv9k1u0xzUPyOcRSLKo=;
-        b=nYbCmT9UjoKhZOBgJQc/q8hFbOyV9HG5UzjjoZHlJ1vSC5FlvrqBfqacL9h2ZjnO1X
-         PMleOfnV/tJrV82y1d7zxe3Y0VXGCC64/gDZH4HvepFIa20FI5QzITJLnKj6xVSLHF4f
-         Uyz7bK5ZxLkqMNmbu1TpF0lfGD0QQZmKhrFwe899TE06iucLQynb9u2+3a+M0FvEaNKy
-         nlAnu0ksk8g9mv2T9OwxFin38r+p852YMgUDmf+52NOefB7+6jNUfN8M6s9doMccOsKV
-         XKEvC2P+gzjnwt7xfnhzIGk0aJwMapdFvTrmDH5xd66kpYtbobPJ4TMuqcMBr8xJOaK6
-         RQNg==
-X-Forwarded-Encrypted: i=1; AFNElJ+vtunHEWPTR+zRUk/727ASfxvU1cXOXeOn533usn0BNIFTi1c6zJNKb15Jb3kY/9sy+/C40xU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcyAO6RwF0EXoqR9ccpBVjIqi3hwXo5an+askCSzb9fn+sWSl5
-	9zKw/5noxDWcL3aeIoiKyNUWHXvNmxmRVlWuXlut2Zyr2HT8K7Z9gyRc
-X-Gm-Gg: Acq92OF8SpMW61NW7FVZOpqlPTBLF2sYhWl5RwYqnewJ7BcImOJ1uW7q68Ua0mD+iWX
-	sgZ0FfEDvcuETRVSzXFA1XfOqNsWCBzQ0raNF5mGkzZrRzwqjqUKdvIiah09eg+8qWPNdS00NS7
-	83Kr/G83bmqszxpkk6kbgSnQoAqNqjqzS/uXdj7EEVMoPMEB5Y9ivAlFjdHiwz9FxiWIp9InYuY
-	JUD0QhkHB/hxfH4Cys3AFJg0Q19Axdmv/cTOqT/rnWYzGjByoJp/KaC/gtEAx40ReboExF5lgFj
-	GfZO9DVanwcN6GXFY2pX5+zIGtL5U4mmFi8clYjzgQm+W/ZRj1cdgvRUVVdvDJFxr+C9mZftbzj
-	s4XHDXvBSMqbLf1IelAv3e4MZNi44imbv1T88QyJXxOjgk9xE+vV6wOxNhfuCzP0HFOzn/xKB5Q
-	nFYmz8FvrDPA5Zyowb/VFVCfhNFjbcvecGXRkEK+orjGgustaGIO3q7o56GnaSL2PNefQVJ1lAU
-	h59vs9hfEijt7wB6O21Fk03f97YHA+3N3IkCCPaWTU=
-X-Received: by 2002:a05:6214:459b:b0:8ca:25d3:bf41 with SMTP id 6a1803df08f44-8cecdc52a1dmr52727396d6.8.1780497438259;
-        Wed, 03 Jun 2026 07:37:18 -0700 (PDT)
-Received: from lxc-docker-tertiary.local (pool-108-45-26-115.washdc.fios.verizon.net. [108.45.26.115])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ceccd9fda2sm21883976d6.2.2026.06.03.07.37.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 07:37:17 -0700 (PDT)
-From: Greg Patrick <gregspatrick@hotmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1] net: phy: sfp: detect presence via I2C when no MOD_DEF0 GPIO
-Date: Wed,  3 Jun 2026 14:37:17 +0000
-Message-ID: <20260603143717.2985309-1-gregspatrick@hotmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <dd3c9c23-a9de-4505-8e49-97d4bf18f465@lunn.ch>
-References: <20260602235528.2795028-1-gregspatrick@hotmail.com> <dd3c9c23-a9de-4505-8e49-97d4bf18f465@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627AB2B9A4;
+	Wed,  3 Jun 2026 14:43:58 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780497840; cv=fail; b=FvIo0Haanxagqk01vFPr70yFaqqs2lHTn9o4az1/E/dYXFb7/12GGoaga3kVpIEqZr1ZYNI+6Bti21tnLmNBTWQe9WCjxSCaAiMzpwGyHBl2z50FHrOfctl5O5VJqH3lcM3zfxR3xa2PtmyyK0wuD9/vFvpdnOb+vNBK1cFr2z8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780497840; c=relaxed/simple;
+	bh=jRZNu1SK+RHOXGPria0eAx+eBezPyOhH27/sMHC1V6I=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dxWOcpiEwLGLS/ma79tN7iHSghWBjvlTcXkhVlu0pVS6gdABHiQnf4T2HxLv+Z4mfZBh9a1beMFMExCXTxzdEL5ZXFm69qo82RHHEgHJgtyyJFVNh/8J0VZwObj9FaMozHikhalSvRR6OTFMTwAk1DzELA96VwGVzg6aNdJGTOo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=agz/z7uW; arc=fail smtp.client-ip=192.198.163.17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780497838; x=1812033838;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=jRZNu1SK+RHOXGPria0eAx+eBezPyOhH27/sMHC1V6I=;
+  b=agz/z7uWMrXHWPAzRJgG/S6BVRuG36Y2/LXVgS3vIHQkj07PqruAghcP
+   Rxah+6CeD7wPgPcTfF7lx0/jqJl91FNkncxwaPREfP/RandfaNksN1A2a
+   eiAn2VmeNBCyO2Ai9C+qJB0l0hrHKvsz/hd1/R1s5zix8cvTQZ8uce/9u
+   MaO81QMDjJStoFCyVeu8yNUBUsYPcrJLWpLmpzam3nY8GnDn8ScwNSAsS
+   oBX2vW32NRCg9umDWrUq14L/cLqNbUt3uWCF8VbvDQkKG2adk2DW7KW5P
+   yYS+q9HQ9Xi7LcUVnsFtyuhYjJDgXt08B0eI+OX/vMy3mUGvgJIkHR3Kp
+   w==;
+X-CSE-ConnectionGUID: JyjUoeLaS92bGooSmnsXWw==
+X-CSE-MsgGUID: E+dLpe4ZSJaxPnTXipyNyQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11806"; a="81167614"
+X-IronPort-AV: E=Sophos;i="6.24,185,1774335600"; 
+   d="scan'208";a="81167614"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2026 07:43:57 -0700
+X-CSE-ConnectionGUID: ReL6oHx1SS2hERJq0SOqUQ==
+X-CSE-MsgGUID: d2AGhDaxTZ6EjfXBr8K70Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,185,1774335600"; 
+   d="scan'208";a="243420091"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2026 07:43:52 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 3 Jun 2026 07:43:52 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 3 Jun 2026 07:43:52 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.27) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 3 Jun 2026 07:43:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BgbPzD+9uNkiEYLBe/HgWjulhDy5LLAH84jIzVVuaVqOgHFeRJ23EH8VjICKGusnyU2zolx67EhEMOV0y+Q546EJpizjFtWJF7qa5utHqGj5d3/hay8FvhUuR3nW0OL/SR+5PlcLcesnvlspes5ctdoTdSkFXtWnsV3iE0I35wvXc0/knL/3oQowN+QOVlJ7HdcsBTYQZVLCp27HL5zv4YDG5ZsSWorNzeyEzcdoVGpxb2061xbAR5XD3CW9mBPJnUiHG4/dSuKja3wYOWptsMqs5zxeFWdqRMHhy8r5MU/MsP2vAfoVi5KTwxj8WM/0iM7wFJqfPvdNQ32jH0RcmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZRS3Jd6MuV/TtYzWbF0aqm0UsdE9v+kfwuMH6q6dCnY=;
+ b=PWzVyY1/zME98IGx31kLNTNMwOVUsPRAnwMxmB7ytgDrd56AVxkckVhhyqPx/JocP4n5iXpjvHtKJY66TsktFUHOBPGxp3bsWPRRnaVNivSKciTEC77Hfy/G/dOvUik12LL+Lb4X1WdBNWwwpC+QpcxADuvfabTERwNuvaaGAiO6QyGny7n1piWtcAuDeWAAVcDRY9pLdIZV9riissWEv60lschbJ01g8FNMpbaOuCBmLn5vhhT1T8sRtG6ZsSlXfQlAFYYl9zuU7rPA4w3WHOJpsUIaPto0fOMFKdcLyZtQ4OnlnJJ16A++jTcns4HpdZ9eCmqbYvs6Fx79Lqn1Pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SA2PR11MB4940.namprd11.prod.outlook.com (2603:10b6:806:fa::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.71.16; Wed, 3 Jun 2026
+ 14:43:48 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0071.014; Wed, 3 Jun 2026
+ 14:43:48 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Guangshuo Li <lgs201920130244@gmail.com>, Siddharth Vadapalli
+	<s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Kevin Hao <haokexin@gmail.com>, Alexander Sverdlin
+	<alexander.sverdlin@gmail.com>, Daniel Zahka <daniel.zahka@gmail.com>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Murali Karicheri
+	<m-karicheri2@ti.com>, Grygorii Strashko <grygorii.strashko@ti.com>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] net: cpsw_new: unregister devlink on port registration
+ failure
+Thread-Topic: [PATCH] net: cpsw_new: unregister devlink on port registration
+ failure
+Thread-Index: AQHc82JqANod20DBBEKGiAOlsIvnrrYs5+4w
+Date: Wed, 3 Jun 2026 14:43:48 +0000
+Message-ID: <IA3PR11MB898623B5BB7ECF02CADF7B4EE5132@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260603140742.1398659-1-lgs201920130244@gmail.com>
+In-Reply-To: <20260603140742.1398659-1-lgs201920130244@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SA2PR11MB4940:EE_
+x-ms-office365-filtering-correlation-id: 4e5d6d0e-ec38-4703-20b9-08dec17e85d4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|921020|3023799007|22082099003|18002099003|11063799006|56012099006;
+x-microsoft-antispam-message-info: gAReACC37AvJxhc12+leOFDcDMqRsX2MKEtv7QahjwOakZmK5TcGx2+O+P7eo0UQ+MZpb6l+C0H5tP30xc6mgtmzZopzXyxDyABCoQyUb3dCK/VUGpwselc4E4V6iHXPUf1T/PQDoeI938/sMiSkLJWgUHM98QIInsHqp4PaMERegfLfie52VTtjMTUmbCc3vU9UhysLf0OOWwUUc+OliRYhrxbYgT4bWnduylbp+3Wj4poXZpLsqolri489YPG3Kft9Ri4FFZ3ZDnke+JEk59v6u/gks1dOgdt7fpF+9MkihlNQy0oBUXGRI+h0AOPYan65bXR3GHe9J1+3/y/XjoOa+OG8/+zJHWDp/s9LZRqENC486KLDZWYUdZhqX6+WmEe4wcdhhDSWNVkIxdQdqzmeX7EBAXRYuKp+ciGHc7KT1dbg/p74nrqkl1gIp7SRDIYfu8pwqoAr9XTp5b2Cf4rvfCEXgDdQNCDLqDxCqA2Lhbf/sccipKlApyXBhvLUeMrhL0splipyuX4c0rhYehKXFG07xRrEQ5HKUyCmQ4VUZY0BImwkmuOVKVmtmkD7hqFpMv2jupJkXWpCQ/ROemxPIoWvFmPlXtg5QZHamNL9581b7ccmwdEvwDqt2N4XskHUrrykAPRgeyWP1DqUC387RVjB36TBAqwwh7mr6MNcYLAmbw8FUVrRIac0Noy4WAd6cpqAmOm4VFQqsYFnqnbminq1Ao3yJyevAEb63y5KjAwVVOM5stQOzgKpVYhdwN9jsPlmKd6VAGHzFmb4QA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(921020)(3023799007)(22082099003)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qUDu/ofcGybKvYM8weALtp65d2Gdx0cnFwRx5GBzdnG82sgQDIS9oBSmrqJg?=
+ =?us-ascii?Q?73v4mBRHVtMK2RqdQTACf4BJ5nl32GHGqi3YWSAo3VU7I+Ur4Pv+a7PyYRCl?=
+ =?us-ascii?Q?QZXfdLalA5fdhF4a/B78Syh0JUo77gyxo1N+PQnl1RHh9GQCzsr/zL1SRK7q?=
+ =?us-ascii?Q?yngQSdkbfsW7e0Lf2u8puCjDqq0mIFywdcuAmrv5FXJINBYLH9oLWTDyCH26?=
+ =?us-ascii?Q?lL0aTPdSYsnst/DHXTAmGbsvhHNE3cKzWVhn+HoBPC743DeiusbttSpatABG?=
+ =?us-ascii?Q?n1m7MdQF+h0d9QnjME4A1HkHn9E97T8y7WQPGdY4ayVfO6PrObZMldqXprgq?=
+ =?us-ascii?Q?/wk0gNTNaROomLIEGsw75xoQIvu8zbV19mXVN5uY1eQJzo/Xeu5YRin/kuwe?=
+ =?us-ascii?Q?ZncxSuSL3By6bzycVYrrSIcUN1Kcl6q5Nxmwm9nHzZVDYsCjsstLjVxufVJ1?=
+ =?us-ascii?Q?xiaFiWSMxUNsJOgUHXziLCQWlMKiYKwoPG+jk+G/Ei95zi4Ycs+qr8YNbWeD?=
+ =?us-ascii?Q?j2juNHvzohVPEG6D/+Gq+S8Ox4wK1yMhQrIXm/vQQUnRMlXjgLGLNFHz6QpX?=
+ =?us-ascii?Q?Xhk4jMRZFLijOrZvNVaL6A2fEOgZS0Ia8ua0mpldre2HtpS/HPyw2yEHORMC?=
+ =?us-ascii?Q?YPjgU+hGIWMtvOFLQbTfQ7+W1Umi0+CHljREDLFIpuZbd2k6iT7tkgjchem5?=
+ =?us-ascii?Q?y3HdKol0Eka3QqaVGYb5SwJxS5MdKJKgPnOTJknSZNNboMIsUblG7gCzrFqY?=
+ =?us-ascii?Q?58752e5Ntx2a7zaN5kNO2rCjZV1xucv1Xqgz7zQKbmSoIP8zHgcwd4vmGXvg?=
+ =?us-ascii?Q?VQaJzglKTPzrsgADo9nCxqpXSTFe38mASb6YOPKMXnrQeExDjIFXQrvdB7cB?=
+ =?us-ascii?Q?PWUYzCRl0eVDAvu+zc+xKTiU1/uAZhPPu3G88PIWdfVqSM6FbXaaA/2kFVF0?=
+ =?us-ascii?Q?ByHSGdBvcTAC4US7FjbXrUd9V2e16g1ilA/iEbBz3B3pT0HHu+uxfztCyNGk?=
+ =?us-ascii?Q?c/5TUqLtbQatLs7WgIRlX/R/qHelvjvpobUtFT5P6vKbYh1Kb9pWPWZtl7l/?=
+ =?us-ascii?Q?px1vUQShZqk5SkY7fSK/RG2zzCkaSxoJa4CiX2v/FDb3A97xNmUaOa+d/T3Y?=
+ =?us-ascii?Q?SABf3Fs1JF/9p167bmYDkThOle0OuznFwEHAaTzMl7aX0ULWF5nzriDMacu7?=
+ =?us-ascii?Q?/StjMk4Eb0onsG1KaO3AAjiOu4JwTV5qIYqsh7wYQhYXfFKTQ8nf6xvfE4EC?=
+ =?us-ascii?Q?ccYIX1nHySh0gOGu42FTkj314RDhhQMnaH0QAnf+9TpfgT/sTUYBTczfeMIQ?=
+ =?us-ascii?Q?NZXVA96Cw2RK1II33eCvzz/ScTqQsVszZWHkUE9DW2+k7rIxShKSL/yn+NOv?=
+ =?us-ascii?Q?NG1W8N2WhD18ESZITAleCFwvT6AOiMt4woeCjGF6B08Fv7vqRk+NYxSgS/pq?=
+ =?us-ascii?Q?bdRzLMVs9d6kZPBcrWcz5zUVe9j4SqFrNl+xlAZlenkDIPqBDq72N3Im4FJY?=
+ =?us-ascii?Q?aHfaPTav7KBZUOcv45z7769XW2hVIuDnLm4Cb1QfjwAwApNqN1LVOiiwdilE?=
+ =?us-ascii?Q?GwLbHykPX8roMjqbjmoMHyE4Tvbhge1bMlAXcWMr7RHcsTaS+TlVtwpaKfg6?=
+ =?us-ascii?Q?X68U6SZdNUiKlXtfGwtmK9cRF3sqsMJjGgTpnAX4/1VAxzy/0/eAjhGK5cT0?=
+ =?us-ascii?Q?D0NvTSvAS2uXAZUUTWho2fRWV9p7xsPEODd1/wzb1UGTToQ4eIdctb7ClCjD?=
+ =?us-ascii?Q?EuDb604DZGtIaLOTjCQnTktw1gNUmig=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: nPsXn8LZ8S+F81oqb9m7H6DjAeI28+88KnwNKXOtAHOZ2crALKyX+tcQfl6jV8o6I8TB/xbSUq4T6SL+xsmAQG9L50rLxr/Cm6v5K7xjPiJGXFcjIInGLnGNxr7MYOEW4KwP3NLEf8nN5hUgJRnzT8MRHpNPznrlaPo+Evo7DAzEkxQOIC68aU4plncQ+286/7+UT5wHdTMlOhsXcoskhgDu4R0vYhBclFPJxH+Yhgq2ZneIq9fQRrtBwGUYzLSCAur04sR3pQKuYqagGH5FLRtwn/hC2Ppi0sqJnZnXjDX7wB/eSdcYkVKpghk2eCOt+/+w4tSzQYKVMFOkSH/2hg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e5d6d0e-ec38-4703-20b9-08dec17e85d4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2026 14:43:48.8353
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HysePxi7cs1pe83FQNPXXNln0RFaB/ah7qNMZcznL4ob7V1aBmvR04NCqfr8NkqgpJ3BZiuL9DIp0vrcxuiho6ohqkndNSeVWCsBNDan3C4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4940
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[hotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-294790-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER(0.00)[gregspatrick@hotmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-294791-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:lgs201920130244@gmail.com,m:s-vadapalli@ti.com,m:rogerq@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haokexin@gmail.com,m:alexander.sverdlin@gmail.com,m:daniel.zahka@gmail.com,m:ilias.apalodimas@linaro.org,m:m-karicheri2@ti.com,m:grygorii.strashko@ti.com,m:linux-omap@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:alexandersverdlin@gmail.com,m:danielzahka@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,vger.kernel.org];
+	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregspatrick@hotmail.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[hotmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5602F638DB4
+X-Rspamd-Queue-Id: EC01B639186
 
-Thanks for the review, Andrew -- folding your three replies together.
 
-> > ... wires none of the cage sideband signals to a software-visible GPIO.
-> Are they wired to a software invisible GPIO? Or nowhere at all?
 
-Nowhere usable that I can find. TX_DISABLE is driven via a PCA9534 I/O
-expander, but no presence/MOD_ABS line reaches a readable input: the
-RTL9303 gpio0 lines the sister TL-ST1008F uses for MOD_DEF0 read stuck-low
-here, the single PCA9534 is fully consumed by TX_DISABLE, and there is no
-RTL8231. I haven't traced the PCB or decompiled the vendor firmware, so I
-can't prove it goes literally nowhere versus somewhere I can't reach -- but
-there is no software-readable presence source. I'll reword the commit
-message to say that precisely.
+> -----Original Message-----
+> From: Guangshuo Li <lgs201920130244@gmail.com>
+> Sent: Wednesday, June 3, 2026 4:08 PM
+> To: Siddharth Vadapalli <s-vadapalli@ti.com>; Roger Quadros
+> <rogerq@kernel.org>; Andrew Lunn <andrew+netdev@lunn.ch>; David S.
+> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
+> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+> Kevin Hao <haokexin@gmail.com>; Alexander Sverdlin
+> <alexander.sverdlin@gmail.com>; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>; Daniel Zahka
+> <daniel.zahka@gmail.com>; Guangshuo Li <lgs201920130244@gmail.com>;
+> Ilias Apalodimas <ilias.apalodimas@linaro.org>; Murali Karicheri <m-
+> karicheri2@ti.com>; Grygorii Strashko <grygorii.strashko@ti.com>;
+> linux-omap@vger.kernel.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: [PATCH] net: cpsw_new: unregister devlink on port
+> registration failure
+>=20
+> cpsw_probe() registers devlink before registering the CPSW ports.
+>=20
+> If cpsw_register_ports() fails, the error path only unregisters the
+> notifiers and then releases the lower level resources. It does not
+> undo the successful cpsw_register_devlink() call, leaving the devlink
+> instance and its parameters registered after probe has failed.
+>=20
+> Add a devlink cleanup label for the path where devlink registration
+> has already succeeded, and use it when port registration fails.
+>=20
+> Fixes: ed3525eda4c4 ("net: ethernet: ti: introduce cpsw switchdev
+> based driver part 1 - dual-emac")
+> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+> ---
+>  drivers/net/ethernet/ti/cpsw_new.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/ti/cpsw_new.c
+> b/drivers/net/ethernet/ti/cpsw_new.c
+> index 7f42f58a4b03..95b3b58db6e0 100644
+> --- a/drivers/net/ethernet/ti/cpsw_new.c
+> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> @@ -2050,7 +2050,7 @@ static int cpsw_probe(struct platform_device
+> *pdev)
+>=20
+>  	ret =3D cpsw_register_ports(cpsw);
+>  	if (ret)
+> -		goto clean_unregister_notifiers;
+> +		goto clean_unregister_devlink;
+>=20
+>  	dev_notice(dev, "initialized (regs %pa, pool size %d)
+> hw_ver:%08X %d.%d (%d)\n",
+>  		   &ss_res->start, descs_pool_size,
+> @@ -2062,6 +2062,8 @@ static int cpsw_probe(struct platform_device
+> *pdev)
+>=20
+>  	return 0;
+>=20
+> +clean_unregister_devlink:
+> +	cpsw_unregister_devlink(cpsw);
+>  clean_unregister_notifiers:
+>  	cpsw_unregister_notifiers(cpsw);
+>  clean_cpts:
+> --
+> 2.43.0
 
-> You might want to differentiate between an SFF and an SFP, using the
-> compatible. An SFF has no need for an MOD_DEF0 GPIO. I did not look,
-> maybe the code already does?
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-It doesn't currently, and you're right that my patch wrongly changes the
-sff,sff case too: sff_data has no SFP_F_PRESENT in .gpios, so a soldered
-sff,sff never has a MOD_DEF0 GPIO and always hits this branch. v2 keeps the
-always-present path for sff,sff and uses the I2C probe only for an sff,sfp
-cage with no MOD_DEF0 GPIO, gated on (sff->gpios & SFP_F_PRESENT).
-
-> Did you try a 0 byte read? That is what tools like i2cdetect use.
-
-I can't on this board: the cage I2C master is the RTL9303's SMBus
-controller, which advertises only I2C_FUNC_SMBUS_BYTE_DATA -- no
-I2C_FUNC_I2C and, notably, no SMBus Quick Command (the zero-length probe
-i2cdetect uses). sfp_i2c_configure() therefore selects sfp_smbus_byte_read()
-with i2c_max_block_size = 1, and the presence probe reuses that same path.
-A 1-byte read is the lightest primitive this controller supports, and it is
-also the only form that works through sfp->read on both raw-I2C and
-SMBus-only adapters -- a zero-length transfer is not expressible there. (I
-checked on the hardware: i2ctransfer reports "Adapter does not have I2C
-transfers capability", and i2cdetect -F shows Quick Command unsupported but
-Receive/Read Byte supported, which is what presence detection rides on.)
-
-> > -static unsigned int sff_gpio_get_state(struct sfp *sfp)
-> Humm. Why?
-
-That deletion was wrong, for the sff,sff reason above -- I'll keep
-sff_gpio_get_state() in v2.
-
-I'll send the v2 with these changes after the 24h window. Thanks again.
-
-Greg
 
