@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-294486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294488-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3P/xBl9yH2oRmAAAu9opvQ
-	(envelope-from <netdev+bounces-294486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 02:16:31 +0200
+	id XTv6DYxzH2pamAAAu9opvQ
+	(envelope-from <netdev+bounces-294488-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 02:21:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A830363323A
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 02:16:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE4B6332D5
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 02:21:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=pw4zxjhT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294486-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-294486-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=aJpcr8La;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294488-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294488-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 267E13033216
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 00:16:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8694730EA746
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 00:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23AB23D281;
-	Wed,  3 Jun 2026 00:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD0020B80B;
+	Wed,  3 Jun 2026 00:16:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881DA223DE9;
-	Wed,  3 Jun 2026 00:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A651DDC3F;
+	Wed,  3 Jun 2026 00:16:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780445760; cv=none; b=l7nP79C4py7f8PKIrHIgJuqd1L8jzWXLsAxTwkNKHDDLUx3aa8EwpWF0zKkrtqYctf/cIHQMCj9Z9TjsbKaMNIFYZWzd87KRD1QD4BOIYryw2mYQbmJ/y1pynZCwkAATaS0Vipd0Q5pTGFxRKx6vTV+qbSUfPOSJ6sFY5gMhCOg=
+	t=1780445800; cv=none; b=slhGO/lntWEha7Qa+aB5pkc1Pwh/tu4vYNwLTzDfqxjcZMjD7zdnidhi25jBmPimvv+5Y9G5H5I77X+zJi8r9bJgb0ku01MAlY7NCZpPZnWpLwwNrpcxb11qJr0XIl0aJVUzQJ+6pp1GHQRXe7dgN6XzSKCahL5ktJHNK09+xro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780445760; c=relaxed/simple;
-	bh=9flrw53HNgG8jcIR9SckLbImG0fNZXaaC4jde+qluCY=;
+	s=arc-20240116; t=1780445800; c=relaxed/simple;
+	bh=VnWcVr1Lne7dR7bsrfFF+fMQKU1U1TSkca865MsfDfs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MnqG5CaT0vtgCXftSwwFuPFyjAeIG+ICQDcR9i6c22IH6KberZuhv5ruj+uaGKbwba0w/oslFlVbHOwgW1yF3y45/EJUxOd5hsviE7KEo4We9hcsx+KyZel2w2DmM+QdFYg+jGsuCdk2gPRpga7pXGW9FGkRhMrDMc2SQi4ySfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pw4zxjhT; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=P97VCm6LBUnkXo6JnrUMvYZT60M0iAxsgmc7zzNuNMB3wnaIU6QTCCGwS9Tq9JEXsxxNOAbyCzocaurVZBtwiG0FxE24jcQwI8G/vX7S1D0V0/QJu5Y3ERuzH9nwQ6D9Y2fB0gevVKjw3hxIj5dm6W/dcnKUR5jYMrZ7WZ3RzAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aJpcr8La; arc=none smtp.client-ip=156.67.10.101
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WyLvf9bqb1QFIVpJ/5XsqBvvssIE6x5Mu3bV8kLzoug=; b=pw4zxjhTJ8SZ2lNyPM0MZneYWx
-	3VtctziaWRv91SEyhJlRnF1MaOL5k9INUjIzxj6Gp1M35aODEjpb6XhsF+WtN4dHT7keObBbMLGBh
-	9aaMuCVqq0ENsZerthmjxNJynfzrWnIX4+EZmh8+s1NhBibvXA79fhpzB2/bLcZ8sMxQ=;
+	bh=ZmV4UCd8znAK5gyIFcgOlICFE9S4/sbctQqsx7mz+8w=; b=aJpcr8La3BX13x5sb39NR3WPfM
+	Wgf+u0NzavrCFXn6qAEZBm/pBckeGvyaKIBkIDkE18u0XlE0WmwaWyx6dsXW9CYTN6yDDWzhRkXfA
+	y0iS0+BMTacbyf4obPSeJSEIg/TJXoZxEs2a7UnZM6PlOEM0q7bG7dK7JvvORYivyA28=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wUZH0-005mKN-BC; Wed, 03 Jun 2026 02:15:54 +0200
-Date: Wed, 3 Jun 2026 02:15:54 +0200
+	id 1wUZHf-005mLO-NQ; Wed, 03 Jun 2026 02:16:35 +0200
+Date: Wed, 3 Jun 2026 02:16:35 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Greg Patrick <gregspatrick@hotmail.com>
 Cc: Russell King <linux@armlinux.org.uk>,
@@ -56,7 +56,7 @@ Cc: Russell King <linux@armlinux.org.uk>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Subject: Re: [PATCH net-next v1] net: phy: sfp: detect presence via I2C when
  no MOD_DEF0 GPIO
-Message-ID: <193b3aba-fc64-45bc-81bb-ea248efa9c3c@lunn.ch>
+Message-ID: <930e4026-fc9f-4f49-b6e8-4ab9d597a361@lunn.ch>
 References: <20260602235528.2795028-1-gregspatrick@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,12 +71,12 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294486-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294488-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:gregspatrick@hotmail.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[hotmail.com];
@@ -99,16 +99,17 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A830363323A
+X-Rspamd-Queue-Id: BEE4B6332D5
 
-> +/* Probe whether a module is physically present by attempting a single-byte
-> + * I2C read of the EEPROM identifier (an empty cage NAKs). Used as the presence
-> + * source on boards that do not wire MOD_DEF0 to a GPIO.
+> -static unsigned int sff_gpio_get_state(struct sfp *sfp)
+> -{
+> -	return sfp_gpio_get_state(sfp) | SFP_F_PRESENT;
+> -}
 
-Did you try a 0 byte read? That is what tools like i2cdetect use.
+Humm. Why?
 
-	Andrew
+      Andrew
 
