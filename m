@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-294973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cLb4FwXBIGpB7gAAu9opvQ
-	(envelope-from <netdev+bounces-294973-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:04:21 +0200
+	id fbeTIArAIGoA7gAAu9opvQ
+	(envelope-from <netdev+bounces-294975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:00:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD4963BF7B
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:04:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C6CF63BF2F
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:00:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JSww1zuo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294973-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294973-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=j2XlGRv0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294975-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294975-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A017A30A1C1B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 23:59:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4C1903019D83
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 23:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E264DD6D3;
-	Wed,  3 Jun 2026 23:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869D34DD6E5;
+	Wed,  3 Jun 2026 23:59:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125834DD6E1
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296334DD6CE
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:59:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780531195; cv=none; b=WtgZFUDm9UY5ISYEtv9pW1/jGR9Yr30r4U+RQBK++Pf0cGWpXMFjiZqhvpmQlg8UOQZZwaNUSFG4iQhlL6lk6tY+lYcYbSPwuHZnQibmkAsEiqK/ZMAImDBiPnFiHa9N/BA7DklgTPUqhm96IZLmjmjn5mJhePYk492Hf+YnSKc=
+	t=1780531196; cv=none; b=cQhBvXMKMZAxpcLyqqvST92YNTacxyAjJRgvaZOh7a7mBMfNtd3Ce4ofRgK6wCGjPzsDRIEha49tBT3quGa/HRgGIqRZYcCbhqPZE7ANrC6qjvJEpYiGg1S2TWh92/UqG4T6TZgeBAF+ueiZqv6TiqoLoWaZmUVnoC2FiXYUkkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780531195; c=relaxed/simple;
-	bh=o4bCrAPqY2OwVJndIypN54qGLFUZi/XgPCOACyik5aE=;
+	s=arc-20240116; t=1780531196; c=relaxed/simple;
+	bh=Q6yivGGVJOW60EZcnf6PAP7uUyP30l6Z4AZyymAy4VU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LKc4ak2xLhBFb7dE6saWzrQtzk0uLdoj8kOd5UhkhO4Is6bUllLPJdRteLjod0mwU6qjDlh4TEG9BhIyCHrca5YT0tJ/ZoGvnQNOVyxxmQBb6CZ5Y35F38di67iU0wx9L/ojYoLewWW1tSgbyYkQIVzy+Fr5mrIzQTOwFqS1OcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSww1zuo; arc=none smtp.client-ip=209.85.128.171
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7df68e68103so180867b3.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:59:53 -0700 (PDT)
+	 MIME-Version; b=c8dcgxdMCBfFpn1vZh6YLw8QVbuPsDEvi5fWHdNuhahxn059p5AzXcRsiE+gwfJTicopf9sEI7wH/kdD48EaBtqseBLKhTfns6OvKUsVawe3+ucAZmJ+BZFAdNMN2AEa3DtFmLhUX6lCFHPa5OY4o1qG1ejQ7s31SB0+SDradak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j2XlGRv0; arc=none smtp.client-ip=74.125.224.54
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-66050f7af22so25753d50.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:59:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780531193; x=1781135993; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780531194; x=1781135994; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C2wB9AL1QlGCOzz5Bq43cZT2ped99U/TYYqDX0RD9rY=;
-        b=JSww1zuo77b9u4Tp2vJRue66XUZ7cUNjOrD65S0T6E59/bXbz1MpB5o726zrAQhr7N
-         N0tAt7emioM2SmwYBbjr/ConVDR3sd9469XaW8WfKDTima0UDavBj5rp6LBcGmnj5Ehl
-         +vQiTJwGG63rV/0/A3esSE/d/N2w5GRqhwdz9QAh4eUpBxOkUZBSVXA+w5cb7kzNAg+T
-         SnwPBLRh8J14txBjuqtQrwa8rjguKOJCU62K/M51AGsrb2daON+UU7i/IALrmAVT+NWR
-         UzEkhbgpBh4U1Ie2cGGssp9RbBKWQ+FiWAhzmgImNQ3YmCaNbYD61ueysikEB1ZqBbCS
-         ajvA==
+        bh=lPcUswk5Zk6wNLB0Hr4KXSt6/tk8QkDBjbN8eLXHrp8=;
+        b=j2XlGRv0LwKhsPyAjLrRv48VdYb/Zo0ObtWh7AR9pTFxDahCmiS5+E0NvZBgkoLVBu
+         SJsYq4tVnsE3kjrcZ1OCSLTq/h4xCc1D57YjTcMvWmUt5hzqbCJ6GLxlHDcwQxJcSSB+
+         UPyRZuEdUOSafmabLcGEd9XEIcBNvMPQwicCgXyOUxOQmOn8BLQB/t7N6Vg0xN9+ifdS
+         oSm7GimJdxIP0aQExP2IDJcHzYYmldD2ay16zGMC91tTTtIlmvlL1zJHANLRdS9rj28w
+         81l5E4bnY21pMK28Sw6lBtmYxDnFAk+Sel0W2w1oGLyU4VO2whND1RFX3/TFHkAhIWCo
+         iqNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780531193; x=1781135993;
+        d=1e100.net; s=20251104; t=1780531194; x=1781135994;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=C2wB9AL1QlGCOzz5Bq43cZT2ped99U/TYYqDX0RD9rY=;
-        b=JyesNO7EqLLK0MyJpzbF6z6oXKZti9Z1jOkuAEofXkP9lJoBIQTKSJAJTotyrOS1jM
-         +3iojlUYEoe+KmLMexYOMjIQ2FM+N1InNrI5+jzcodW5+ZP06a3v/e7yu7ZwRC7Go3PW
-         3b9YhvQhazmSQJ3LFyqeJyc0GW9yJp19oX5DCQVTtsiCIMmYybKI02AAsRP/Wyn7IGsk
-         iZ2bDqirUdq0QFfovUjNUqu/xzg4/shx/0Xnk7q9gYOWj1KIdIhsWz1PS7WG38B7dJq2
-         616uB8FBZmKDq2eHRtK/Rf9CNfDjr9WAFZGTo4x5s0ibi6tjrl+IhVCk+Pf2mmuC1Lxv
-         xPjA==
-X-Gm-Message-State: AOJu0YwzdhiuF00GKw74mjBHzgF4T6Js9fX7Vu9N7ny4wQ23O/K8ZZXT
-	ip8pybI5+zyejxEqkm4t7/kcSfD4Ma1P2Si6aKvxNki1uDtgX3Nq9hCkOBMA1w==
-X-Gm-Gg: Acq92OEfPT96YfPkrsGcAxG9MzPAmqrb1PW8tbpKy9zr1mz/Ya/cKReJYUPftjnJWVj
-	IwzUuQauydVBwmnroheFoqIlffqxc0KyvvitrFTvcMNdut7z6viBVRxjlYUI1Fb33WMGqWQuGRl
-	QoeOlyT+6YEwbD7+25Q2yB0d3RLmSSfrcGmJMx07yMNnnaGeijP3wug9Pn5KLoIBoiKM1JhdB+U
-	kHHFbJK5KeyPXc1WUVQc9kTmZuhtKW5VGfY0WWQhGkMaySUT0zOjnfCEOELAm95pvbFwql9hXS1
-	UvqHyxUz0qU8iVZQl7EJ3vMKeSt1vRSoAe8gMVPWkvt1tFkaOmUwcqeY2dC4S/NVg/OCT1H90av
-	JGudbFCWPSvy8E4+mvr1GgxPNaqo2R8ayq+C3XJb1o+70Ib4ZEouZ5rsZG1t7oXV5a3XZtrHL1F
-	xwTvwlKhqOWGZnWh+PIN99iCdAZfsKQH9dazFnCPaJ5fvl5g==
-X-Received: by 2002:a05:690c:dc9:b0:7df:a880:8c98 with SMTP id 00721157ae682-7ebd2b6ee96mr3151737b3.0.1780531193196;
-        Wed, 03 Jun 2026 16:59:53 -0700 (PDT)
-Received: from localhost ([2a03:2880:21ff:48::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea20ea8d0dsm25424517b3.6.2026.06.03.16.59.52
+        bh=lPcUswk5Zk6wNLB0Hr4KXSt6/tk8QkDBjbN8eLXHrp8=;
+        b=lSoGfF58ZpHrpXVRrRbDAhwP6ZpNkUJvD7CFUnk5TTwXsgeYuuOMFHVz7D48NrVMYt
+         wNp/TJWGeKxp90sZjYufk0RZ4oFgrWDeiaLl8zom9NOOKjXqEeoIlgCwgE7NdVwlC6It
+         vq590CFJnACGLruZf6rT/crdb65qVZlVKgMjQAeY1T0ltVY7bvXf/VtYEk1wIx1Owd6Z
+         ODSmk/r0V/rf+Sn+4xjLf1OZWiYPoPWks6yHvgqPR5YEKu8h7QSiO29WE1/+3WEZVkT3
+         Ung4TQOoR0UW5zRdiV3C7JREfTV0nUue5WHvNcO7DCghgxsUleGjGlBqbUByrQpFribU
+         LAeQ==
+X-Gm-Message-State: AOJu0YxJnCO7LhPKFCAaAxu43CiLCorvAjN3wQwi7713KU07W4BFZlSa
+	6x6qqikaZFjodi0T/B44cXIBAxx3TDsFM/yxij3kFpQFPQOBe2l0vfhx6H9Vew==
+X-Gm-Gg: Acq92OETqEQdwlVoM+MD1g6kna3L39+EhCyIO2jbahPQRvKr2eqib/9+QUEE4EGyNXX
+	YqITElZ3DtXtqiGFaf51pQ9r0qD6k+sn1wEEHCE/i14JQUvBx/G22b9yc8CwIWfny5pyj004J0p
+	0Rnknfpv0WtlwDrno+E8JcwgMFmzkIEhx/bmXA/XB63xonSVyVxcetQP/N5HqNvNGhnnDqvbVSG
+	dcnjSBkIqp7j+b/UhtMgsl6lpYEjdktyOt/4fCMZ8DMZhoZWai2BNCfREeA/fMTYrjXG7PWND8D
+	RY+eApH+VxRr0VAnp8PbhMfA71sm9tfxzxOU4dzDzcyudSddMl2A9jKIdOQcxqHoSZ42d0yiBKl
+	At+/nAZKO6Fp+aTbPnqxgY9xvLkh/QZLQasNPl871m1rnADvOZzOtjEBM50pn5EjaaLKBZQ3TEv
+	PeORse/5mnufvp5+n0owXWbvIrgmdPPmTCMBs=
+X-Received: by 2002:a05:690c:6612:b0:7b4:ce18:1079 with SMTP id 00721157ae682-7ebd3266aacmr3410887b3.0.1780531194156;
+        Wed, 03 Jun 2026 16:59:54 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff:70::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea20ea816dsm25623067b3.7.2026.06.03.16.59.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 16:59:52 -0700 (PDT)
+        Wed, 03 Jun 2026 16:59:53 -0700 (PDT)
 From: Wei Wang <weibunny.kernel@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -87,9 +87,9 @@ To: netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>
 Cc: Wei Wang <weibunny@fb.com>
-Subject: [PATCH v15 net-next 04/10] selftests/net: psp: refactor test builders to use ksft_variants
-Date: Wed,  3 Jun 2026 16:59:33 -0700
-Message-ID: <20260603235947.2986110-5-weibunny.kernel@gmail.com>
+Subject: [PATCH v15 net-next 05/10] selftests/net: add _find_bpf_obj() to search hw/ for BPF objects
+Date: Wed,  3 Jun 2026 16:59:34 -0700
+Message-ID: <20260603235947.2986110-6-weibunny.kernel@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260603235947.2986110-1-weibunny.kernel@gmail.com>
 References: <20260603235947.2986110-1-weibunny.kernel@gmail.com>
@@ -107,14 +107,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294973-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294975-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,redhat.com];
@@ -132,100 +132,69 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,fb.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lib.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fb.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BBD4963BF7B
+X-Rspamd-Queue-Id: 7C6CF63BF2F
 
 From: Wei Wang <weibunny@fb.com>
 
-Replace the manual psp_ip_ver_test_builder() and ipver_test_builder()
-functions with @ksft_variants decorators for data_basic_send and
-data_mss_adjust. This is a pure refactor with no behavior change.
+Add _find_bpf_obj() helper to NetDrvContEnv that searches the test
+directory first, then falls back to the hw/ subdirectory. This allows
+tests outside drivers/net/hw/ (e.g. psp.py in drivers/net/) to find
+BPF objects built in the hw/ directory.
+
+Update _attach_bpf() and _attach_primary_rx_redirect_bpf() to use
+_find_bpf_obj() for BPF object discovery.
 
 Signed-off-by: Wei Wang <weibunny@fb.com>
 ---
- tools/testing/selftests/drivers/net/psp.py | 46 ++++++++++------------
- 1 file changed, 21 insertions(+), 25 deletions(-)
+ .../selftests/drivers/net/lib/py/env.py       | 21 +++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-index 864d9fce1094..6d5114be4c88 100755
---- a/tools/testing/selftests/drivers/net/psp.py
-+++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -14,6 +14,7 @@ from lib.py import defer
- from lib.py import ksft_run, ksft_exit, ksft_pr
- from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises
- from lib.py import ksft_not_none
-+from lib.py import ksft_variants, KsftNamedVariant
- from lib.py import KsftSkipEx
- from lib.py import NetDrvEpEnv, PSPFamily, NlError
- from lib.py import bkg, rand_port, wait_port_listen
-@@ -571,24 +572,29 @@ def removal_device_bi(cfg):
-         _close_conn(cfg, s)
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index ef317aef3a0a..42c0cb777fb6 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -510,10 +510,19 @@ class NetDrvContEnv(NetDrvEpEnv):
+                 return map_id
+         raise Exception(f"Failed to find .bss map for prog {prog_id}")
  
- 
--def psp_ip_ver_test_builder(name, test_func, psp_ver, ipver):
--    """Build test cases for each combo of PSP version and IP version"""
--    def test_case(cfg):
--        cfg.require_ipver(ipver)
--        test_func(cfg, psp_ver, ipver)
-+def _get_psp_ver_ip_variants():
-+    for ver in range(4):
-+        for ipv in ("4", "6"):
-+            yield KsftNamedVariant(f"v{ver}_ip{ipv}", ver, ipv)
- 
--    test_case.__name__ = f"{name}_v{psp_ver}_ip{ipver}"
--    return test_case
- 
-+def _get_ip_variants():
-+    for ipv in ("4", "6"):
-+        yield KsftNamedVariant(f"ip{ipv}", ipv)
- 
--def ipver_test_builder(name, test_func, ipver):
--    """Build test cases for each IP version"""
--    def test_case(cfg):
--        cfg.require_ipver(ipver)
--        test_func(cfg, ipver)
- 
--    test_case.__name__ = f"{name}_ip{ipver}"
--    return test_case
-+@ksft_variants(_get_psp_ver_ip_variants())
-+def data_basic_send(cfg, version, ipver):
-+    """Test basic PSP data send."""
-+    cfg.require_ipver(ipver)
-+    _data_basic_send(cfg, version, ipver)
++    def _find_bpf_obj(self, name):
++        bpf_obj = self.test_dir / name
++        if bpf_obj.exists():
++            return bpf_obj
++        bpf_obj = self.test_dir / "hw" / name
++        if bpf_obj.exists():
++            return bpf_obj
++        return None
 +
-+
-+@ksft_variants(_get_ip_variants())
-+def data_mss_adjust(cfg, ipver):
-+    """Test MSS adjustment with PSP."""
-+    cfg.require_ipver(ipver)
-+    _data_mss_adjust(cfg, ipver)
+     def _attach_bpf(self):
+-        bpf_obj = self.test_dir / "nk_forward.bpf.o"
+-        if not bpf_obj.exists():
+-            raise KsftSkipEx("BPF prog not found")
++        bpf_obj = self._find_bpf_obj("nk_forward.bpf.o")
++        if not bpf_obj:
++            raise KsftSkipEx("BPF prog nk_forward.bpf.o not found")
  
+         if self._tc_ensure_clsact():
+             self._tc_clsact_added = True
+@@ -533,9 +542,9 @@ class NetDrvContEnv(NetDrvEpEnv):
  
- def main() -> None:
-@@ -611,17 +617,7 @@ def main() -> None:
-                                                           cfg.comm_port),
-                                                          timeout=1)
+     def _attach_primary_rx_redirect_bpf(self):
+         """Attach BPF redirect program on the primary netkit ingress."""
+-        bpf_obj = self.test_dir / "nk_primary_rx_redirect.bpf.o"
+-        if not bpf_obj.exists():
+-            raise KsftSkipEx("Primary RX redirect BPF prog not found")
++        bpf_obj = self._find_bpf_obj("nk_primary_rx_redirect.bpf.o")
++        if not bpf_obj:
++            raise KsftSkipEx("nk_primary_rx_redirect.bpf.o not found")
  
--                cases = [
--                    psp_ip_ver_test_builder(
--                        "data_basic_send", _data_basic_send, version, ipver
--                    )
--                    for version in range(0, 4)
--                    for ipver in ("4", "6")
--                ]
--                cases += [
--                    ipver_test_builder("data_mss_adjust", _data_mss_adjust, ipver)
--                    for ipver in ("4", "6")
--                ]
-+                cases = [data_basic_send, data_mss_adjust]
- 
-                 ksft_run(cases=cases, globs=globals(),
-                          case_pfx={"dev_", "data_", "assoc_", "removal_"},
+         if self._tc_ensure_clsact(self._nk_host_ifname):
+             self._primary_rx_redirect_clsact_added = True
 -- 
 2.52.0
 
