@@ -1,214 +1,218 @@
-Return-Path: <netdev+bounces-294874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294875-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H+O1BpdvIGq+3QAAu9opvQ
-	(envelope-from <netdev+bounces-294874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 20:16:55 +0200
+	id efSzHmluIGpr3QAAu9opvQ
+	(envelope-from <netdev+bounces-294875-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 20:11:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 605F763A76C
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 20:16:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC35A63A6CA
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 20:11:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amacapital-net.20251104.gappssmtp.com header.s=20251104 header.b=Ycii7cT0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294874-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294874-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Yoq+uvUH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294875-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294875-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 922073008202
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 18:10:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E89AE3004C23
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 18:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566653911D2;
-	Wed,  3 Jun 2026 18:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D48384CD6;
+	Wed,  3 Jun 2026 18:11:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAB638C2D0
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 18:10:22 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780510225; cv=pass; b=a2ysNz5lBOeJ8lowDy7utsHQsKUdDnyVokJiIb2trMDvi7ChXkLBCrQ39lOlYT4AfHrxiFoMKFybol1Ww4V5IvdMhS/66vr2CXHS/h6KElu7xqN52dDHD9HHqg0BXa0TREPBrpwR/bbtYqw+dHdQzYAWfOXmRrrCn2jnLWRvXQw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780510225; c=relaxed/simple;
-	bh=QI5X4GxUbtQqHSEMGf2m2zt26rBr9KAW94estlSgOxQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MmBEbdEGE/LyUF15/wbsEtENVKTV78MKdFmKWE5/4CCscvNoitqpL+GXIxn3XYIFc2PIQqMJyUQgZRXTMO5Ru+HVcwbIRk5Fr/DDiwOD2S0b6p6MkIzAHl+q5zDZKEhlHa71HwGH/WRi78caMc7n10Js79FHQkJIPwNwbMozaFQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20251104.gappssmtp.com header.i=@amacapital-net.20251104.gappssmtp.com header.b=Ycii7cT0; arc=pass smtp.client-ip=209.85.167.44
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5aa7a7ad475so1658067e87.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 11:10:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780510220; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Wjbppqq9kxptAknRbBfB6lPFP8k2bcb1/Pq7JEL0FZn4U/5vbgR1rRAhvE+Ven7Qqq
-         U2GiusWoGiWOEJH2iVVu+ZbvcMWU6Fzbb0XvjdKkGgqFUTD4DE0k1Bapn94g1/UjoAe+
-         TED+iCmTyekJRGCTMtsyd44hca62hFrymF22H1NuQHaW/mFQyRT5ovw1xPZObQCu+zNF
-         Ig3gDaeHERPEQe6Z925l6WNRt1L0cigG9gZcfbdTEZ61SCTy6JtoJ5F6n7G3FmcLV+SR
-         28HTxPP7BDsvmcRvOD8nIQZgY/0oZsaDxNPMau4u/oYIf7ExA5PhvOr8FNuGOQek8rM0
-         /0UQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QI5X4GxUbtQqHSEMGf2m2zt26rBr9KAW94estlSgOxQ=;
-        fh=lsNGX+O9BTVbXcU+aDJ2cOI3o5/+UFlHVNlEtVKKQt8=;
-        b=jjJ/ar8X9V+c7Hdq67VlWGUPpVUXhebHZHRVFJsebFZCjXeuGQrBwriPa2VmWkund8
-         6yP5quyCKjkwBNVYrKPAa3zBiN1jJ5o8DX+/Bzmy/dRuWjXb0m8JGa07Ncc+sa4Axg3Y
-         ApnwsMfJGZ2yMA+lw9RlKuc2XlWI5S2R84Q9/hMND96AlLXnk+l5vU6f8r6+Yo03F+l7
-         SyYjKIhn8toHtN+3QegYPq7oId7zM8r1VMQfjmylwe8HFtRKBi052UYxf5IEL85x2oSl
-         C/zrmrMtaNsjpUIQrq6tCh7SQIv5yps228/z+F68I/BwbGp5a6Dq312eilMYqkc5120R
-         TS0A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F903AC0FA
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 18:11:47 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780510309; cv=none; b=rj9a5oS2ITKgOfQ6fYZIy9ky7LhcOS/MCkMEblRuqLvm/Qe3ljFn6bn3hWxG6gb6rJnqHbbxSN0a8AQ2K2KfTzt7AEIC3Np7WPsgKd/PFkY1mO/9corOeDQoQFCbfaoJFaaeYfuRLl/T3t1ewXJp/xPMZn2xLhsjdqH1vSVj8eA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780510309; c=relaxed/simple;
+	bh=vBuq5RH5ejw3/tAcr3Nrfx9Wu35JeiLcr7k1mySn2OA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FeNS3RK0hwK2fZnFbPP43bWtj5sobvLAKYd+kqeBeqRJu8+swjwgVJhkoj2xVcVCVRKWhBfFDbxVUTBgBWcK67gBXtBOJDf8d58436FVKuhX5FKA+x6MFW3sJla420df+iqdm+hsUKnLeRIWRN1NHHEj9tuqq1W2e4v18lAxTTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yoq+uvUH; arc=none smtp.client-ip=209.85.222.179
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-91588056619so120331685a.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 11:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20251104.gappssmtp.com; s=20251104; t=1780510220; x=1781115020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QI5X4GxUbtQqHSEMGf2m2zt26rBr9KAW94estlSgOxQ=;
-        b=Ycii7cT0JXbZoT1HegxGgvqaSMKThW4bkvG6TukTUJa8mzOrUCAQZbykUj6hte7pHj
-         V5Tpr7d5OOSZ1Xvg/Tb/VCzN3xB1zWnN0XRM5eav+EI12K7sidrRvdKt/muCEahtB5pt
-         +FG5pFvtxbd7AdNGJby6pbXRb8ot3BuqBAhZPKLoBILX87RO8EtOO74dehQUXMLayloW
-         brJyPG8l0TFxADH6C4EkozCNfKLInRFAAgVV5TesPbAhUryU0++NrA59NPahO4rDy200
-         StpKVms/jc6L2u/Rozww7BNqylkR1Uz25oTiAEd2X6TD38LTPETCHMt927slju0MYu0l
-         i7nQ==
+        d=gmail.com; s=20251104; t=1780510306; x=1781115106; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SaZwF8ov1p7ahT/5/Q/DFOl65g+3shlkuIdix4Mu7Lc=;
+        b=Yoq+uvUHIOQldUMwOINb4unrJIN7Q/oukVsB05x75uL37ADMpMGrBcVhA8mt9W3+45
+         JABrDIM4v4BCYDxgyPOT0mYl1Jw4N97Jyh/B3P/sr2fu8QyN7QsaczNtHTEbQHfR+rgg
+         uQo9Da+7bZEf1cjtP7i4bWOY9iecfNE/EGsfixP7Zwlx5Sc0Dp5WwvdiHoK98VysTAka
+         0Jv736HqOFYdIn5Cm+tjMjEZOlndx7N180UUNbGCKeP20xQtLUE5AFH8BaVxvimNS+iI
+         y6jUGu5jrnA98m0qSZgiVJR8mTvCpedPMSSV0vkSA4Xeao6KrE7qZkWfJ9Ix6QxlgAci
+         /3UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780510220; x=1781115020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QI5X4GxUbtQqHSEMGf2m2zt26rBr9KAW94estlSgOxQ=;
-        b=Hqv0/zN6pzVyw5K6Ds2o9Sp6JCBJUtxwLOR6IqD07Xv8bfQBvPDgfwqW5hDFXUFhm7
-         zBWBxO8ML87RsG/wgBPJ0wDbU5iPpHSkFxGZ3gW+esew8Z3M33QCIf2l2HKC3B1wNfsf
-         FyUGAFC8WuLSfHTsyg3QQ432Rb1KdzrMU8JrzZtHfvlxNrDNuCl6ORYgYS1twltY1J6o
-         B5rwhKTfWOLd7de74tX18U/uLGrmHuEVXNR/dI9ifMzWFWdBgCbeHu4A+RXvGR7bkAFJ
-         Aym1dMpveXqupyjqmGwszbd7uLSYT/kFYDhbMGiSNza+9rToe8b9MW7vQgbCquds+gJI
-         q6/A==
-X-Forwarded-Encrypted: i=1; AFNElJ8R58DtyqHypxJQaWmugFxoEYrVeTU5u35e+ll1H3u0HtPxFzMEF0Txb1tSU057v7M/qsPRi24=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVCfl1JwxHacHIo0MNcajbAvcxxr+n/1vqOt+n2Y4/rB7VKVqF
-	DRCKpF12OygFd7w5zzmDClZRB9/vLT5K/R8a93R07ozU8o4Gga+c6oTl13W5I7MlEi98AJS92nS
-	905sRc/9c0RWvmfpySitP1HevUFjbJwep+qFVYjXd
-X-Gm-Gg: Acq92OEh7OGygoprWrx9kctxV2tCY+w4t7wnetZ7driaKvu38LIb6sNXwiQJjCARvXl
-	PoW4ulrE/LxVvKB2m2NMCjrqx6gi7tgu4tVSv6R6zT+r5IjYulZ7exJYL6iAy+4+71s1CoC9B/y
-	QAgEWNfLTiPAdDsW/B+62MlUY5AncNYwPEre9JeVF7PywWIiItr8mUcWmuoyvUCsRxe60kFHDXe
-	4fFgq/7v+FJBgvx0k49twZXJPZbJvN2zVCidDat3N0VnH4HlR1K7C0C0d1ztdfwOkaz4WrZUFA4
-	e/Na58EAYAXlw6wAEQw=
-X-Received: by 2002:a05:6512:1316:b0:5aa:6917:da62 with SMTP id
- 2adb3069b0e04-5aa7c0feb48mr1695669e87.22.1780510220289; Wed, 03 Jun 2026
- 11:10:20 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780510306; x=1781115106;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SaZwF8ov1p7ahT/5/Q/DFOl65g+3shlkuIdix4Mu7Lc=;
+        b=MwMBWxe3E1g8LDGkB8yeGobc3VwNkm/N+ML1JEda6zDV0g2xOGFwIdJN0N5Pqi8BPy
+         sys023FflpEej3LYhXydCbwXn8/5lpwKO/xsS0u54V45njx3Yzevd1O6ZFOabQ0I+aVp
+         d5SC6GuPfmuQk1pkzVAT/6jKlIWbmLnRX2z8M93XxZDMclQA15WYfj+0MbpBSzFyJEw0
+         Wqtz08AuaAJuxmCKKfUuhJ0Q2hbdF/0F1TCfWTq7OHwY7L/XmekZkHBJlZXoUWoHvrxg
+         dzM/Mc7JCmeNc+dcpmIooZLXdk0kEN5rvwywxaM7iV8WNTWed1hhPDBAQSAA7YGjL6pP
+         z2zQ==
+X-Gm-Message-State: AOJu0YxEmiubJWSnKXHYkRBUXUhXKIwKEbo38KanMnhmjWhRfg97/8BC
+	R5PfCtX7kWpkucZLHH/fyc/mkWYkFRN7HnH8mUFHiV7MDXoxvRsCzqO6ENP79Q==
+X-Gm-Gg: Acq92OFud7DPo0GxY0fV5LnJwJQwIW7OZNFpGvzl5ACETtvfeOr8qpJXzb6mOlRcvCg
+	hG3Xq8s2WBfyvuOukDw9UzX0kl4KW5iMy4VRrkuskA3dS5acryxj0qOelflbtLxJQAlYNf/NrsW
+	DJ6DXLhE6JML7Y/1t3GEzdtXJNCylPndMIHPV3XFhWx0vBuFtsk6oNzR/d/uyd7FLcwE7UkfQ7u
+	fvLFC1wqFR/1gLB3FSirXZ+kIxS3q669xlQJV7KkslytI55bRgQ92gfoBKNzNv3KUv9ICgtQk5s
+	Usu/u4+ARKwhY49pFuyQvA/BWbU/vZsHQXqCIVWP6ePPxbwk4aPxLhUiCt7JL3t8oGfYrRGUE2V
+	lOLd9Lkh4ZhiEbTZDKz1Ivx6f9gQlpwjo2cLjfwr4Fh8SXHiRnEhOSN6PF3BhbkYDsyfb89LNNP
+	LSpvNlEqG/15fNNaIWZon9RP0WX6Hf/PMn3XevjhU4NLH9mccrfMZnMnpQpRDSf9OPG26yrUG1R
+	7fDkdW/adKYLQC5hKQnXWnzTsF5zBACF+TRBJiLkJtQ+DD4pQ+QQnvTYFuBbtEuyORUSqFLkXeY
+X-Received: by 2002:a05:620a:2412:20b0:915:8f08:5f9f with SMTP id af79cd13be357-9158f08645amr440199785a.48.1780510305897;
+        Wed, 03 Jun 2026 11:11:45 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a00afbcsm319202285a.9.2026.06.03.11.11.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jun 2026 11:11:45 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Zhengchuan Liang <zcliangcn@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
+	Yuqi Xu <xuyq21@lenovo.com>,
+	Ren Wei <n05ec@lzu.edu.cn>
+Subject: [PATCH net] sctp: purge outqueue on stale COOKIE-ECHO handling
+Date: Wed,  3 Jun 2026 14:11:44 -0400
+Message-ID: <94318159b9052907a6cbb7256aee8b5f8dfbfccb.1780510304.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
- <20260602225426.122258-1-safinaskar@gmail.com> <CAHk-=wgKy4dP0oQCNKyMQQf3-uVpaigmDyH6_T0Via76gWST9g@mail.gmail.com>
- <CALCETrWx8-Q5-rK1KnAPCxCbXaWCd=Yfs_Pr8qVMa8k8L6of1w@mail.gmail.com> <CAHk-=wizkDXRut5xLXRF-CVUVYMaZ5AOexxeghOAoXPb4yAvQg@mail.gmail.com>
-In-Reply-To: <CAHk-=wizkDXRut5xLXRF-CVUVYMaZ5AOexxeghOAoXPb4yAvQg@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Wed, 3 Jun 2026 11:10:07 -0700
-X-Gm-Features: AVHnY4I8xlGMoYvHWadfAyp7JPxqtCaCokQuJfO8Z8xN2WDEFYt6TSKYy0-h7os
-Message-ID: <CALCETrXzxubt4eWue3+wv7Fq9C2m7uu6bWPstqFh6Mo57bPwQQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Askar Safin <safinaskar@gmail.com>, akpm@linux-foundation.org, axboe@kernel.dk, 
-	brauner@kernel.org, david@kernel.org, dhowells@redhat.com, hch@infradead.org, 
-	jack@suse.cz, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, miklos@szeredi.hu, 
-	netdev@vger.kernel.org, patches@lists.linux.dev, pfalcato@suse.de, 
-	viro@zeniv.linux.org.uk, willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amacapital-net.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:safinaskar@gmail.com,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[amacapital.net];
-	FORGED_SENDER(0.00)[luto@amacapital.net,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-294875-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:xuyq21@lenovo.com,m:n05ec@lzu.edu.cn,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,lzu.edu.cn,lenovo.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-294874-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amacapital-net.20251104.gappssmtp.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luto@amacapital.net,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-foundation.org:email,mail.gmail.com:mid,amacapital.net:from_mime,amacapital.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amacapital-net.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 605F763A76C
+X-Rspamd-Queue-Id: DC35A63A6CA
 
-> On Jun 2, 2026, at 9:20=E2=80=AFPM, Linus Torvalds <torvalds@linux-founda=
-tion.org> wrote:
->
-> =EF=BB=BFOn Tue, 2 Jun 2026 at 20:51, Andy Lutomirski <luto@amacapital.ne=
-t> wrote:
->>
->> Am I understanding correctly that this will completely break zerocopy
->> sendfile?
->
-> Very much, yes.
->
-> And it's worth making it very very clear that ABSOLUTELY NONE of the
-> recent big security bugs were in splice.
->
-> They were all in the networking and crypto code that just didn't deal
-> with shared data correctly.
->
-> So in that sense, it's a bit sad to discuss castrating splice.
->
-> But it's probably still the right thing to at least try.
->
-> I've seen very impressive benchmark numbers over the years, but
-> they've often smelled more like benchmarketing than actual real work.
->
-> There's also a real possibility that a lot of the sendfile / splice
-> advantage has little to do with zero-copy, and more to do with the
-> cost of mapping and maintaining buffers in user space.
->
-> If you are sending file data using plain reads and writes, it's not
-> just the "copy from user space to socket data structures".
->
-> There's also the cost of populating user space in the first place:
-> page faults for mmap made *that* historical copy avoidance basically a
-> fairy tale.
->
-> And not using mmap means that you have the cost of double caching in
-> the kernel _and_ user space etc.
->
-> So sendfile() as a concept (whether you use combinations of splice()
-> system calls or the sendfile system call itsefl) isn't necessarily
-> only about the zero-copy, it's really also about avoiding the user
-> space memory management.
+sctp_stream_update() is only invoked when the association is moved into
+COOKIE_WAIT during association setup/reconfiguration. In this path, the
+outbound stream scheduler state (stream->out_curr) is expected to be
+clean, since no user data should have been transmitted yet unless the
+state machine has already partially progressed.
 
-So maybe we should make sure that, if we go down the route of
-disabling all the splice magic, that we leave an API, maybe the
-existing sendfile or maybe something else, that does an optimized copy
-from one fd to another and that is at least capable of sending from a
-file to the network with at most one CPU-side copy.
+However, a corner case exists in sctp_sf_do_5_2_6_stale(): when a
+Stale Cookie ERROR is received, the association is rolled back from
+COOKIE_ECHOED to COOKIE_WAIT. In this scenario, user data may already
+have been queued and even bundled with the COOKIE-ECHO chunk.
 
-Even if we=E2=80=99re just doing that, I continue to find it strange that w=
-e
-require that a pipe be involved. What=E2=80=99s so special about pipes that=
- we
-allow splicing from file to pipe and then pipe to socket (this
-requiring that the pipe retain a reference to the file=E2=80=99s page cache
-structures to avoid *two* copies), but we can=E2=80=99t splice straight fro=
-m
-file to socket. Heck, even sendfile is implemented under the hood as a
-pair of splices!
+During the rollback, sctp_stream_update() frees the old stream table
+and installs a new one, but it does not invalidate stream->out_curr.
+As a result, out_curr may still point to a freed sctp_stream_out
+entry from the previous stream state.
+
+Later, SCTP scheduler dequeue paths (FCFS, RR, PRIO, etc.) rely on
+stream->out_curr->ext, which can lead to use-after-free once the old
+stream state has been released via sctp_stream_free().
+
+This results in crashes such as (reported by Yuqi):
+
+  BUG: KASAN: slab-use-after-free in sctp_sched_fcfs_dequeue+0x13a/0x140
+  Read of size 8 at addr ff1100004d4d3208 by task mini_poc/9312
+  CPU: 1 UID: 1001 PID: 9312 Comm: mini_poc Not tainted
+     7.1.0-rc1-00305-gbd3a4795d574 #5 PREEMPT(full)
+   sctp_sched_fcfs_dequeue+0x13a/0x140
+   sctp_outq_flush+0x1603/0x33e0
+   sctp_do_sm+0x31c9/0x5d30
+   sctp_assoc_bh_rcv+0x392/0x6f0
+   sctp_inq_push+0x1db/0x270
+   sctp_rcv+0x138d/0x3c10
+
+Fix this by fully purging the association outqueue when handling the
+Stale Cookie case. This ensures all pending transmit and retransmit
+state is dropped, and any scheduler cached pointers are invalidated,
+making it safe to rebuild stream state during COOKIE_WAIT restart.
+
+Updating only stream->out_curr would be insufficient, since queued
+and retransmittable data would still reference the old stream state and
+trigger later use-after-free in dequeue paths.
+
+Fixes: 5bbbbe32a431 ("sctp: introduce stream scheduler foundations")
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Reported-by: Yuqi Xu <xuyq21@lenovo.com>
+Reported-by: Ren Wei <n05ec@lzu.edu.cn>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/sctp/sm_statefuns.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+index 8e89a870780c..9b23c11cbb9e 100644
+--- a/net/sctp/sm_statefuns.c
++++ b/net/sctp/sm_statefuns.c
+@@ -2598,11 +2598,7 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
+ 	 */
+ 	sctp_add_cmd_sf(commands, SCTP_CMD_DEL_NON_PRIMARY, SCTP_NULL());
+ 
+-	/* If we've sent any data bundled with COOKIE-ECHO we will need to
+-	 * resend
+-	 */
+-	sctp_add_cmd_sf(commands, SCTP_CMD_T1_RETRAN,
+-			SCTP_TRANSPORT(asoc->peer.primary_path));
++	sctp_add_cmd_sf(commands, SCTP_CMD_PURGE_OUTQUEUE, SCTP_NULL());
+ 
+ 	/* Cast away the const modifier, as we want to just
+ 	 * rerun it through as a sideffect.
+-- 
+2.47.1
+
 
