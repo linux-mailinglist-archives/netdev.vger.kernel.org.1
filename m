@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-294976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9ZKnFEzBIGpR7gAAu9opvQ
-	(envelope-from <netdev+bounces-294976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:05:32 +0200
+	id 6gPXD1vBIGpW7gAAu9opvQ
+	(envelope-from <netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:05:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A168963BF8D
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:05:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BFA563BF93
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 02:05:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="Bs0bPe/D";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294976-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294976-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=OEvlEsa6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294977-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D694930BA833
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 23:59:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90AA730BF300
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 00:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA204DD6CD;
-	Wed,  3 Jun 2026 23:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD024DD6E0;
+	Thu,  4 Jun 2026 00:00:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2324DD6CE
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A303A168C
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 23:59:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780531199; cv=none; b=HIG8PPG4mcKDwc3RUaXXfdfVJ4AaGeR/zoNpUvqGqwG+QtMwIyxlDU/Vby93ISGYw36y745gX/kCxRyVjxKBpKXybMPtXh6OLvrPteCFAlXLBZwQoZT5eKqR6DfR3odqnsB2tqNmBSjkg4Onq687ay4GOREgISlhwaBETAgmdyg=
+	t=1780531200; cv=none; b=mLp0y8q4PgWpips9OPlnWr2CfRKfnwvI4quFN2JiVZEmFMQyI8mI3QhUoJR3n2sPQkvLaXgJvc4lr6ULgIgDKzWfgDq1wqpNDUUkWL/c8KkRuUzhm+abgRf97laSFt1r6ukTmMX3eTqmEHRm5G4ksUwU/DqKNRiNv4/3ZtT9oXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780531199; c=relaxed/simple;
-	bh=PeELbLb1xCP0BGf+hiuMxRD8R523PQOFQeRljqXbYDI=;
+	s=arc-20240116; t=1780531200; c=relaxed/simple;
+	bh=n8jvIh8rSy5l4r1sikRBZ0KKujywm2brYKxHwyQnGmM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KniPzD27AofYsP0ibGjc7+BIeX9T8GCW2W5u5NDYeN+SKd0nvoC7hJzYeKYi48pBUOgtVl3aoSSfm6QtJnTKrghQe6WmTIryjn9lrbFaNokGjtCgVAqrbztX19xAFX+qAJgE9lguW2ucV9wzigAdUI849hkNK1ndc8IChQvZ6eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bs0bPe/D; arc=none smtp.client-ip=209.85.128.177
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7e2cf9bf458so53967b3.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:59:57 -0700 (PDT)
+	 MIME-Version; b=I+UFA6zDzOaOxHsZQJmJFHB8B6qv44M5MVcjcjL3F07DBgfpH7QZcfGNudtdGXK9UEFxGxcdx6BYRVPk9N1s+bh6+wbBfglRE4BDZe5f4qUlqkoSIihMuwK+ZpP2sG4ufwS5KuOYKWwSlNGuLdILDKme7Tub/Cisa6DslyFsbPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OEvlEsa6; arc=none smtp.client-ip=74.125.224.50
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-6603d54b317so25221d50.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 16:59:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780531197; x=1781135997; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780531198; x=1781135998; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nG/d9SJNc8hUXGJwOA61mWz7X78sXE+MB08JZN5IGlc=;
-        b=Bs0bPe/DI98o9eDcQKdQ0OFli0atfeFQGh6vDaXhEhdaFZW4UjgHeY6AM8EvI5GCGv
-         M/VkY0GGSOowRRdcSkEgOcQBebvhsRyYLd8OXnbcoeRGet2xcqF9OIluI4Aq64jxsG/5
-         wXi10X5airR1X2LUkWiIDa1OgCCCDNyPkJZ87Uhv/KDtTy1l3t9QePKP0JgDSQRKl1uN
-         o+eOoFkG3H4iTsJHwIKXxlVtuJ3yf1RE/tK2+axnLfv9p+Ryy2Jh+LHNskTAygS4WFbn
-         KBdYLDAP2V4mUHGxqLbojgjMXN+Q6ouElL2CLRIBLz91BLn9A1W966GGQhpZh+Qvin06
-         0e0A==
+        bh=K41qv9ZHZPYFOsHREWMOzv3cTvIXZflhgrFt4tffsU8=;
+        b=OEvlEsa61vOFIWQmSMlNvSGMqrKyfEKEHAKWXY+F2o2Nb94thWAmKu95wjZV3ka4qk
+         jF33qdFEYc38oCJmgl8deGEhG7k8CcsaQG3a5ABHAkmMp8O3eUpA0knNPB5/3kBdWXgL
+         9mOOKD4Kbs96Op4pM/1wqXE3TI8LlacwxePXHipeVjb4KPR+Y6ttw1Csqxfi1hWdwdkD
+         I07fXzMF7oeBNq3xPTlVR0vckvbcxJYm287wr4lWSp2In1hUtAJSFZA2Ox08o23Lqiyl
+         u5gnIo2gsVTMA2/rwn5ppyzB5t+qVM4jNGiQBeGUBOFN5ugwi8AjilW7rwV3Kvi6GacP
+         EesQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780531197; x=1781135997;
+        d=1e100.net; s=20251104; t=1780531198; x=1781135998;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=nG/d9SJNc8hUXGJwOA61mWz7X78sXE+MB08JZN5IGlc=;
-        b=pt+NHAvyr1d/dWqycPxwXgbS7uln8nMDTLctLCwtcGv1JX8rvze/L7JX/yQDZoW1pG
-         YFCbeEWo8DzXb0nUa3md+elf5rsGm89IrSqtXlIq9Sp87m3Ctel80ewOHZfcWtqcfPGF
-         OGXtXluPGpeBYaJaEg/Ac9jR7z5FV6Ads1QP2RU3PWg78bawB7QtMMGTYDYKTgl5b0Fc
-         sML7twvjIOmVeRol6wUQdPabTRHcaVp3+42h/IO/tm/XF4ND9nFPlQff5yWLXRqFyxZD
-         GgCF/lvvoNUDA2IgV8ELqZeQx7duu60JRS/R+W51xBS9WtXkPHW1FK1DM7tAN4LP80/F
-         Nv+Q==
-X-Gm-Message-State: AOJu0YzeHLsdWC2jH6Zim7TdsoXu0SuheLVNFtkrueIOvkNALgloAemR
-	7HjDD1nYsjvifSdMV0DY/glz/KCAHj5Ie6I1lVl10es5a79DKshPoKPR9qTfFg==
-X-Gm-Gg: Acq92OG4ocdjBBl46kJURk18Q761ZAbFLewcJFwyWNdTo9jUaxgHbkDwb3hYDaVCpkv
-	kpDTMh9LJgRBCcO/WOGYcb1HENdlJXWntE3SSKtLZ1I8vPXa6JUq2NnZodm8yYudKSolF3r5k4+
-	q+t7QW0Sf/MLUam8i1P6MeT93xvSQseboaQH1IoC/ZPp5/fQw5Y+Fdxno+JCvsZEOvpwEIsqQW0
-	VmGAQcta7NEpcDHqM/HP30fvv5FbBzn4zQU4GI2NneHGf8gzvQKepqmeqhWVVttyRbUPN5k74uo
-	dOYtPU/qK8sHvcTLwNZ0m7mKioGuFyYXJv5wXzf3tQUA+p9dTNzRnOrTVpS92PfgwmzMjCfNlak
-	l2xMyNOeZPHrwBk7ul/rNXTKmWZloStBkmxktMq9Ba1dGyt9rBzz8ZunE1YMR8xBuCvD7qOh0fL
-	VmZ+LE3ei4drk9e4jZOXyMQ2gwvH3fs/RR2j4ciEccWl51
-X-Received: by 2002:a05:690c:81:b0:7ba:ee87:87e0 with SMTP id 00721157ae682-7ea2fac76b4mr36081007b3.3.1780531196971;
-        Wed, 03 Jun 2026 16:59:56 -0700 (PDT)
-Received: from localhost ([2a03:2880:21ff:6::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea23b91689sm24966767b3.40.2026.06.03.16.59.56
+        bh=K41qv9ZHZPYFOsHREWMOzv3cTvIXZflhgrFt4tffsU8=;
+        b=T290UK87l6LNxt/hfmKObJnkly3t1kd8BjsqbIfnjZ+PnPadXmdgq97DkfTUV+sEEq
+         fL9swhYt0hYb/QurrutEyBSEjKpg6G0pkhQyGAbJ4IGT+/8kyCVlx6OXaDflmc64pPQa
+         qnGwit61BPM8G7kmFbrsaMimNiKvS8IDOvJN5Lcd75J1WKBxcxDC2iP89e4EXp5RQQNm
+         fU6vB33kJ/m5edrO75WkGkSO0wee8BWwnTXYbc6wT3yU63F5pmll/cvAZHNWJnTEsaJM
+         epfQtH1YiwrvwnKbU5GuABD8/CHnQsIIzxHJou/KazU2THV7jOPQU3AnMSY6hDAojLYh
+         8ZFA==
+X-Gm-Message-State: AOJu0YwUByAC71G5RUSOOHCTWwyU8oBf09osCPCqaBHZ0/zdmVcawshF
+	8E1q/sRov8tz+y9fLIRQCl6z4X9Xizli2vpdF4L90r070Lf2L18QpwKDi6O4Ow==
+X-Gm-Gg: Acq92OHIGWHdlvprR7tstYLBHBW1lh1piV4Q74Ea9xQtG17YqTKPD8tK8+QORI4TkmV
+	iFhrzOGM67sP8bDqRH7v6tovGC8kJ4rSpg5ogDWLkgkSDlqVXKKfX8zxjMSOU37WaHpUHcmP294
+	GwduZB5sdvbvA5/Ss2NLVrlkH64yZ8/hoguG6KhPHrj7smrfptlLTL6meYYHG6MzA1bhlPsq7AA
+	+VUWrMaebRYOYCC5rDCv6Cvlv9nWmqbScHctKFHKVa2OsajK7JZ/aswNQ5KNg2wp/ohsZyWpvu9
+	ySpTOGahAk9Jy2/bp++S4jsI4s+cuPwyV2kOUbJATYcZZETbik5PlrCjZdjPZdhE1Aj9ri82Iv0
+	er+QPpIt7dE4XZHCcmLbUybs/BEsXJarfYM18xq4BsP8i7X0SVJECtsNMOAbfpqA1LW+qt+69sK
+	zfa/y5NgwT+ZdVQKHwFNejTwS33zXMm9ZlGw==
+X-Received: by 2002:a05:690c:3481:b0:7db:b065:fe71 with SMTP id 00721157ae682-7ebda6ad51cmr2577127b3.7.1780531197859;
+        Wed, 03 Jun 2026 16:59:57 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff:1::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-660d62046efsm2851847d50.11.2026.06.03.16.59.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 16:59:56 -0700 (PDT)
+        Wed, 03 Jun 2026 16:59:57 -0700 (PDT)
 From: Wei Wang <weibunny.kernel@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -87,9 +87,9 @@ To: netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>
 Cc: Wei Wang <weibunny@fb.com>
-Subject: [PATCH v15 net-next 07/10] selftests/net: psp: support PSP in NetDrvContEnv infrastructure
-Date: Wed,  3 Jun 2026 16:59:36 -0700
-Message-ID: <20260603235947.2986110-8-weibunny.kernel@gmail.com>
+Subject: [PATCH v15 net-next 08/10] selftests/net: psp: add dev-assoc data path test
+Date: Wed,  3 Jun 2026 16:59:37 -0700
+Message-ID: <20260603235947.2986110-9-weibunny.kernel@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260603235947.2986110-1-weibunny.kernel@gmail.com>
 References: <20260603235947.2986110-1-weibunny.kernel@gmail.com>
@@ -107,14 +107,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-294976-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294977-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,redhat.com];
@@ -132,239 +132,126 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.py:url,vger.kernel.org:from_smtp,fb.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netns.name:url,cfg.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.py:url,vger.kernel.org:from_smtp,fb.com:email,netns.name:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A168963BF8D
+X-Rspamd-Queue-Id: 9BFA563BF93
 
 From: Wei Wang <weibunny@fb.com>
 
-Add infrastructure to support PSP tests across network namespaces
-using NetDrvContEnv with netkit pairs. This enables testing PSP device
-association, where a non-PSP-capable device (e.g. netkit) in a guest
-namespace is associated with a real PSP device in the host namespace,
-allowing the guest to perform PSP encryption/decryption through the
-host's PSP hardware.
+Add _assoc_check_list() test that associates nk_guest with the PSP
+device and verifies the assoc-list is correctly populated.
 
-The topology is:
-  Host NS:  psp_dev_local <---> nk_host
-                |                  |
-                |                  | (netkit pair)
-                |                  |
-  Remote NS: psp_dev_peer      Guest NS: nk_guest
-             (responder)             (PSP tests)
-
-env.py:
-- nk_guest_ifindex is queried after moving the device into the guest
-  namespace, so tests can use it directly for dev-assoc
-
-psp.py:
-- PSP device lookup supports container environments where the PSP
-  device is on the physical interface, not the test interface
-- Association helpers handle dev-assoc/dev-disassoc with defer-based
-  cleanup to prevent state leaks on test assertion failures
-- main() tries NetDrvContEnv with primary_rx_redirect and falls back
-  to NetDrvEpEnv, so existing tests continue to work without the
-  container environment
+Add _data_basic_send_netkit_psp_assoc() which tests PSP data send
+through a netkit interface associated with a PSP device. The test
+associates nk_guest with the PSP device, then sends PSP-encrypted
+traffic from the guest namespace.
 
 Signed-off-by: Wei Wang <weibunny@fb.com>
 ---
- tools/testing/selftests/drivers/net/config    |   1 +
- .../selftests/drivers/net/lib/py/env.py       |   7 +-
- tools/testing/selftests/drivers/net/psp.py    | 102 +++++++++++++++++-
- 3 files changed, 104 insertions(+), 6 deletions(-)
+ tools/testing/selftests/drivers/net/psp.py | 72 ++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
-diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
-index 617de8aaf551..91d4fd410914 100644
---- a/tools/testing/selftests/drivers/net/config
-+++ b/tools/testing/selftests/drivers/net/config
-@@ -8,6 +8,7 @@ CONFIG_NETCONSOLE=m
- CONFIG_NETCONSOLE_DYNAMIC=y
- CONFIG_NETCONSOLE_EXTENDED_LOG=y
- CONFIG_NETDEVSIM=m
-+CONFIG_NETKIT=y
- CONFIG_NET_SCH_ETF=m
- CONFIG_NET_SCH_FQ=m
- CONFIG_PPP=y
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index 1d8964538abb..89a39c8b2cb1 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -337,7 +337,8 @@ class NetDrvContEnv(NetDrvEpEnv):
-               +---------------+
-     """
- 
--    def __init__(self, src_path, rxqueues=1, primary_rx_redirect=False, **kwargs):
-+    def __init__(self, src_path, rxqueues=1,
-+                 primary_rx_redirect=False, **kwargs):
-         self.netns = None
-         self.nk_host_ifname = None
-         self.nk_guest_ifname = None
-@@ -351,7 +352,6 @@ class NetDrvContEnv(NetDrvEpEnv):
-         self._remote_route_added = False
-         self._old_fwd = None
-         self._old_accept_ra = None
--
-         super().__init__(src_path, **kwargs)
- 
-         self.require_ipver("6")
-@@ -468,6 +468,9 @@ class NetDrvContEnv(NetDrvEpEnv):
-         self._init_ns_attached = True
-         ip("netns set init 0", ns=self.netns)
-         ip(f"link set dev {self.nk_guest_ifname} netns {self.netns.name}")
-+        nk_guest_dev = ip(f"link show dev {self.nk_guest_ifname}",
-+                          json=True, ns=self.netns)[0]
-+        self.nk_guest_ifindex = nk_guest_dev['ifindex']
-         ip(f"link set dev {self.nk_host_ifname} up")
-         ip(f"-6 addr add fe80::1/64 dev {self.nk_host_ifname} nodad")
-         ip(f"-6 route add {self.nk_guest_ipv6}/128 via fe80::2 dev {self.nk_host_ifname}")
 diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-index 6d5114be4c88..015af92c8d7b 100755
+index 015af92c8d7b..f07d0becfede 100755
 --- a/tools/testing/selftests/drivers/net/psp.py
 +++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -5,6 +5,7 @@
- 
- import errno
- import fcntl
-+import os
- import socket
- import struct
- import termios
-@@ -16,8 +17,10 @@ from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises
- from lib.py import ksft_not_none
- from lib.py import ksft_variants, KsftNamedVariant
+@@ -19,6 +19,7 @@ from lib.py import ksft_variants, KsftNamedVariant
  from lib.py import KsftSkipEx
--from lib.py import NetDrvEpEnv, PSPFamily, NlError
-+from lib.py import NetDrvEpEnv, NetDrvContEnv
-+from lib.py import NlError, PSPFamily
+ from lib.py import NetDrvEpEnv, NetDrvContEnv
+ from lib.py import NlError, PSPFamily
++from lib.py import NetNSEnter
  from lib.py import bkg, rand_port, wait_port_listen
-+from lib.py import ip
+ from lib.py import ip
  
- 
- def _get_outq(s):
-@@ -118,11 +121,13 @@ def _get_stat(cfg, key):
- # Test case boiler plate
- #
- 
--def _init_psp_dev(cfg):
-+def _init_psp_dev(cfg, use_psp_ifindex=False):
-     if not hasattr(cfg, 'psp_dev_id'):
-         # Figure out which local device we are testing against
-+        # For NetDrvContEnv: use psp_ifindex instead of ifindex
-+        target_ifindex = cfg.psp_ifindex if use_psp_ifindex else cfg.ifindex
-         for dev in cfg.pspnl.dev_get({}, dump=True):
--            if dev['ifindex'] == cfg.ifindex:
-+            if dev['ifindex'] == target_ifindex:
-                 cfg.psp_info = dev
-                 cfg.psp_dev_id = cfg.psp_info['id']
-                 break
-@@ -597,13 +602,102 @@ def data_mss_adjust(cfg, ipver):
+@@ -602,6 +603,71 @@ def data_mss_adjust(cfg, ipver):
      _data_mss_adjust(cfg, ipver)
  
  
-+def _try_disassoc(cfg, psp_dev_id, ifindex, nsid=None):
-+    """Best-effort disassociate, ignoring errors if already removed."""
-+    try:
-+        params = {'id': psp_dev_id, 'ifindex': ifindex}
-+        if nsid is not None:
-+            params['nsid'] = nsid
-+        cfg.pspnl.dev_disassoc(params)
-+    except NlError:
-+        pass
++def _check_assoc_list(cfg, psp_dev_id, ifindex, nsid=None):
++    """Verify assoc-list contains device with given ifindex, no duplicates."""
++    dev_info = cfg.pspnl.dev_get({'id': psp_dev_id})
++
++    ksft_true('assoc-list' in dev_info,
++              "No assoc-list in dev_get() response after association")
++    found = False
++    for assoc in dev_info['assoc-list']:
++        if assoc['ifindex'] != ifindex:
++            continue
++        if nsid is not None and assoc['nsid'] != nsid:
++            continue
++        ksft_eq(found, False, "Duplicate assoc entry found")
++        found = True
++    ksft_eq(found, True,
++            "Associated device not found in dev_get() response")
 +
 +
-+def _assoc_nk_guest(cfg):
-+    """Associate nk_guest with PSP device and register cleanup via defer()."""
-+    _init_psp_dev(cfg, True)
-+
-+    cfg.pspnl.dev_assoc({'id': cfg.psp_dev_id,
-+                         'ifindex': cfg.nk_guest_ifindex,
-+                         'nsid': cfg.psp_dev_peer_nsid})
-+    defer(_disassoc_nk_guest, cfg,
-+          cfg.psp_dev_id, cfg.nk_guest_ifindex)
-+
-+
-+def _disassoc_nk_guest(cfg, psp_dev_id, nk_guest_ifindex):
-+    """Disassociate nk_guest and reset cfg PSP state."""
-+    pspnl = PSPFamily()
-+    pspnl.dev_disassoc({'id': psp_dev_id, 'ifindex': nk_guest_ifindex,
-+                        'nsid': cfg.psp_dev_peer_nsid})
-+    cfg.pspnl = pspnl
-+    del cfg.psp_dev_id
-+    del cfg.psp_info
-+
-+
-+def _get_nsid(ns_name):
-+    """Get the nsid for a namespace."""
-+    for entry in ip("netns list-id", json=True):
-+        if entry.get("name") == str(ns_name):
-+            return entry["nsid"]
-+    raise KsftSkipEx(f"nsid not found for namespace {ns_name}")
-+
-+
-+def _setup_psp_attributes(cfg):
-+    # pylint: disable=protected-access
++def _data_basic_send_netkit_psp_assoc(cfg, version, ipver):
 +    """
-+    Set up PSP-specific attributes on the environment.
-+
-+    This sets attributes needed for PSP tests based on whether we're using
-+    netdevsim or a real NIC.
++    Test basic data send with netkit interface associated with PSP dev.
 +    """
-+    if cfg._ns is not None:
-+        # netdevsim case: PSP device is the local dev (in host namespace)
-+        cfg.psp_dev = cfg._ns.nsims[0].dev
-+        cfg.psp_ifname = cfg.psp_dev['ifname']
-+        cfg.psp_ifindex = cfg.psp_dev['ifindex']
++    _assoc_nk_guest(cfg)
 +
-+        # PSP peer device is the remote dev (in _netns, where psp_responder runs)
-+        cfg.psp_dev_peer = cfg._ns_peer.nsims[0].dev
-+        cfg.psp_dev_peer_ifname = cfg.psp_dev_peer['ifname']
-+        cfg.psp_dev_peer_ifindex = cfg.psp_dev_peer['ifindex']
-+    else:
-+        # Real NIC case: PSP device is the local interface
-+        cfg.psp_dev = cfg.dev
-+        cfg.psp_ifname = cfg.ifname
-+        cfg.psp_ifindex = cfg.ifindex
++    # Enter guest namespace (netns) to run PSP test
++    with NetNSEnter(cfg.netns.name):
++        cfg.pspnl = PSPFamily()
 +
-+        # PSP peer device is the remote interface
-+        cfg.psp_dev_peer = cfg.remote_dev
-+        cfg.psp_dev_peer_ifname = cfg.remote_ifname
-+        cfg.psp_dev_peer_ifindex = cfg.remote_ifindex
++        sock = _make_psp_conn(cfg, version, ipver)
 +
-+    # Get nsid for the guest namespace (netns) where nk_guest is
-+    cfg.psp_dev_peer_nsid = _get_nsid(cfg.netns.name)
++        rx_assoc = cfg.pspnl.rx_assoc({"version": version,
++                                       "dev-id": cfg.psp_dev_id,
++                                       "sock-fd": sock.fileno()})
++        rx_key = rx_assoc['rx-key']
++        tx_key = _spi_xchg(sock, rx_key)
 +
++        cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
++                            "version": version,
++                            "tx-key": tx_key,
++                            "sock-fd": sock.fileno()})
++
++        data_len = _send_careful(cfg, sock, 100)
++        _check_data_rx(cfg, data_len)
++        _close_psp_conn(cfg, sock)
 +
 +
- def main() -> None:
-     """ Ksft boiler plate main """
++def _assoc_check_list(cfg):
++    """Test that assoc-list is correctly populated after dev-assoc."""
++    _assoc_nk_guest(cfg)
++    _check_assoc_list(cfg, cfg.psp_dev_id, cfg.nk_guest_ifindex,
++                      cfg.psp_dev_peer_nsid)
++
++
++def _get_psp_ver_ip6_variants():
++    for ver in range(4):
++        yield KsftNamedVariant(f"v{ver}_ip6", ver, "6")
++
++
++@ksft_variants(_get_psp_ver_ip6_variants())
++def data_basic_send_netkit_psp_assoc(cfg, version, ipver):
++    """Test PSP data send via netkit with dev-assoc."""
++    cfg.require_ipver(ipver)
++    _data_basic_send_netkit_psp_assoc(cfg, version, ipver)
++
++
+ def _try_disassoc(cfg, psp_dev_id, ifindex, nsid=None):
+     """Best-effort disassociate, ignoring errors if already removed."""
+     try:
+@@ -713,6 +779,12 @@ def main() -> None:
  
--    with NetDrvEpEnv(__file__) as cfg:
-+    # Make sure LOCAL_PREFIX_V6 is set
-+    if "LOCAL_PREFIX_V6" not in os.environ:
-+        os.environ["LOCAL_PREFIX_V6"] = "2001:db8:2::"
-+
-+    try:
-+        env = NetDrvContEnv(__file__, primary_rx_redirect=True)
-+        has_cont = True
-+    except KsftSkipEx:
-+        env = NetDrvEpEnv(__file__)
-+        has_cont = False
-+
-+    with env as cfg:
-         cfg.pspnl = PSPFamily()
+                 cases = [data_basic_send, data_mss_adjust]
  
-+        if has_cont:
-+            _setup_psp_attributes(cfg)
++                if has_cont:
++                    cases += [
++                        _assoc_check_list,
++                        data_basic_send_netkit_psp_assoc,
++                    ]
 +
-         # Set up responder and communication sock
-+        # psp_responder runs in _netns (remote namespace with psp_dev_peer)
-         responder = cfg.remote.deploy("psp_responder")
- 
-         cfg.comm_port = rand_port()
+                 ksft_run(cases=cases, globs=globals(),
+                          case_pfx={"dev_", "data_", "assoc_", "removal_"},
+                          args=(cfg, ))
 -- 
 2.52.0
 
