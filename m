@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-294498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294499-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HafgH3mDH2rKmgAAu9opvQ
-	(envelope-from <netdev+bounces-294498-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:29:29 +0200
+	id cSeUIXGDH2rImgAAu9opvQ
+	(envelope-from <netdev+bounces-294499-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:29:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF58C6336E3
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:29:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C936336DA
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 03:29:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PE1A+olj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294498-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294498-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=igCfpVZi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294499-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294499-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 066AE301F83F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:29:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B74730396B5
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 01:29:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E14734D394;
-	Wed,  3 Jun 2026 01:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574F534B192;
+	Wed,  3 Jun 2026 01:28:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E618C349B19;
-	Wed,  3 Jun 2026 01:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C238347FC8;
+	Wed,  3 Jun 2026 01:28:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780450136; cv=none; b=Uy5WxPB3dtpVJfnSJzt/XKn8lorMveAkxRd351ZcbEWfhhbs3EWkX8gkxDwEix0A2m30iLFOi8W1a26qErFba1qffbl6umfC/0OMr/e2otiIDBEbQUmm3EyTW4CavIC2O8hhXMRLXEiw+KQwlYt0eLOotEHWjs8VYOEFB2idvCc=
+	t=1780450138; cv=none; b=dmgmaWgvJnOOtj9WXH9jcEwd5HD6zMndJPt0z5YywT6xSE+C7GuzPY7gXSJ2lbatSFhA97sHKHenWAzfW3X7YU2iC3BOd1h4KDzJmHduYA5GAVOYQYUcZKsqOvBfyhQsKOuEbkvBXjzJzB0KZFnYYRnlAr0bs+lQwxbd+9fUzo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780450136; c=relaxed/simple;
-	bh=Bd/zzYgE//ACpCp6ESTTqB75nzpAce2Tolgu79aG7TU=;
+	s=arc-20240116; t=1780450138; c=relaxed/simple;
+	bh=K9G47XIv5OzRXEX8XSq0tT+qRCKcfs5NjjXNDOvLDlo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uy5A99Hku4CzxYbe4QFulr0xgvKoMeMFLLR/RWfxOIo7SxxN3N7T82FI/shA313pJcP6ioo/aXr8b68MaDL6YDAD/B1YHe9f/MwGXoPEDRkZ11FQJMGtRpPZOIK+l6NImFWh1r5+yGigCyoZyqGwKvixyfUmjhZCaYniK/8AahM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PE1A+olj; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF97B1F00898;
-	Wed,  3 Jun 2026 01:28:54 +0000 (UTC)
+	 MIME-Version; b=HrGVNzFDS0QhXRgjHyCnzNdi9iW99jqQa6cHoKWlaH+KfUq/tt7mf4DgAzClAxyvC8/JEc0EQ2mvwc31eDKfdUx0h7Zftd5PXVNSCyRAYTSGC0MWLbej+Fd/wd9B0arO2LzxIUDxP5HDegE+SM1Gdi5y/h4SWvvHOAk9hsLjxbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=igCfpVZi; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0491B1F00899;
+	Wed,  3 Jun 2026 01:28:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780450135;
-	bh=q7MChu/y++LSvWxFejV8VTdOuAow4Mznfau6/I7QmBk=;
+	s=k20260515; t=1780450136;
+	bh=iIa161hU9SdUgF9rCFokyCi43tfBwnkoST4TjB6grTs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PE1A+olj4rVT4OJ8tCJ7tdvBLP4EZS18WqWj6+0rNa8rUyxkaQsyIpzhijtA0Wmkm
-	 VY+RTfLXk0GddedWDi7V2jRnD21r6uF/MjIxI6ShIiYsCgl3w9okIGT4HTq6+4aVfm
-	 AT6gQKbPTCzogqPilZeR//ugg3J9lGf1tFfbz5ovkVGCCFpU9PQZ6wnSghc0ghRlxL
-	 zFVGxOmVSRY5lAAVMlNFsFkbHo2t2RqHFxqAUIVGOOfWoh0OW1AWv9FKtV+iV0tDST
-	 ei5fC1WhPq1bCDLTqjKlfxURuHBFapc/dBztX2XcHpD9ui66DaoVNM1mAAf0lurK36
-	 QyFd70vr0S0VQ==
+	b=igCfpVZiyH79QWCaIxR7y0g3I0SEw4bOU23mlrzd6Y72ey6EKey4KJayHncVvtKNJ
+	 pUK7r+O00sFQe/qqYre8aKEh20TNRGNT+VJL9SD2WFMHgR3Qs6EF4daCCbH1NJnjzL
+	 FMN3J96IvGB5iKj6E+r5cv1LclrQWu2ackIiJ4PfDiUvvfGBF/rWcbOwdRZoFh41jN
+	 w5Rf//XfpmqDLwSKpwj6wazXckVoZtHzRFukyEux/1qYfOlcBhOpZn0qZFivVTJWFf
+	 hgZlK+L4Pl2B43F8Fo2RVYVrkJ0Ei70h0GmxyjZ2MAb7jwIQQU88USfysw3xhTy87n
+	 MwcUdc89X16Aw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: netdev@vger.kernel.org,
 	jhasan@marvell.com,
 	danieller@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 06/11] net: team: don't recurse on the port's netdev ops lock
-Date: Tue,  2 Jun 2026 18:28:35 -0700
-Message-ID: <20260603012840.2254293-7-kuba@kernel.org>
+Subject: [PATCH net-next v2 07/11] net: bridge: don't recurse on the port's netdev ops lock
+Date: Tue,  2 Jun 2026 18:28:36 -0700
+Message-ID: <20260603012840.2254293-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260603012840.2254293-1-kuba@kernel.org>
 References: <20260603012840.2254293-1-kuba@kernel.org>
@@ -90,13 +90,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-294498-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294499-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:nb@tipi-net.de,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -112,55 +112,64 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BF58C6336E3
+X-Rspamd-Queue-Id: 21C936336DA
 
-__team_port_change_send() calls __ethtool_get_link_ksettings() on
-the port, which will soon take the port's ops lock. The notifier
-caller already holds it while the slave-add/del callers do not,
-so the function would either deadlock or run unprotected depending
-on the path.
+port_cost() calls __ethtool_get_link_ksettings() on the port device,
+which will soon take the port's ops lock. br_port_carrier_check()
+is reached via the NETDEV_CHANGE notifier from linkwatch, which
+already holds the port's ops lock, so the call would deadlock.
 
-Make __team_port_change_send() expect the port's ops lock held and
-switch to netif_get_link_ksettings(). team_device_event()'s NETDEV_UP /
-NETDEV_CHANGE already arrive with the port's ops lock held.
-team_port_add() now take it explicitly.
-
-Note that NETDEV_DOWN and team_port_del() will pass false as @linkup
-so they will not execute netif_get_link_ksettings(). This is fortunate
-as NETDEV_DOWN has somewhat mixed locking right now.
+Make port_cost() expect the port's ops lock held and switch to
+netif_get_link_ksettings(). The only other caller is new_nbp(),
+make sure it takes the lock explicitly.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/team/team_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bridge/br_if.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index f51388d50307..feaa75fbf8fc 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1375,7 +1375,9 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 	list_add_tail_rcu(&port->list, &team->port_list);
- 	team_port_enable(team, port);
- 	netdev_compute_master_upper_features(dev, true);
-+	netdev_lock_ops(port_dev);
- 	__team_port_change_port_added(port, !!netif_oper_up(port_dev));
-+	netdev_unlock_ops(port_dev);
- 	__team_options_change_check(team);
+diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
+index d39571e13744..049d1d25bc26 100644
+--- a/net/bridge/br_if.c
++++ b/net/bridge/br_if.c
+@@ -19,6 +19,7 @@
+ #include <linux/if_ether.h>
+ #include <linux/slab.h>
+ #include <net/dsa.h>
++#include <net/netdev_lock.h>
+ #include <net/sock.h>
+ #include <linux/if_vlan.h>
+ #include <net/switchdev.h>
+@@ -30,13 +31,13 @@
+  * Determine initial path cost based on speed.
+  * using recommendations from 802.1d standard
+  *
+- * Since driver might sleep need to not be holding any locks.
++ * Since driver might sleep, we need to not be holding any bridge spinlocks.
+  */
+ static int port_cost(struct net_device *dev)
+ {
+ 	struct ethtool_link_ksettings ecmd;
  
- 	netdev_info(dev, "Port device %s added\n", portname);
-@@ -3090,7 +3092,7 @@ static void __team_port_change_send(struct team_port *port, bool linkup)
- 	if (linkup) {
- 		struct ethtool_link_ksettings ecmd;
- 
--		err = __ethtool_get_link_ksettings(port->dev, &ecmd);
-+		err = netif_get_link_ksettings(port->dev, &ecmd);
- 		if (!err) {
- 			port->state.speed = ecmd.base.speed;
- 			port->state.duplex = ecmd.base.duplex;
+-	if (!__ethtool_get_link_ksettings(dev, &ecmd)) {
++	if (!netif_get_link_ksettings(dev, &ecmd)) {
+ 		switch (ecmd.base.speed) {
+ 		case SPEED_10000:
+ 			return 2;
+@@ -436,7 +437,9 @@ static struct net_bridge_port *new_nbp(struct net_bridge *br,
+ 	p->br = br;
+ 	netdev_hold(dev, &p->dev_tracker, GFP_KERNEL);
+ 	p->dev = dev;
++	netdev_lock_ops(dev);
+ 	p->path_cost = port_cost(dev);
++	netdev_unlock_ops(dev);
+ 	p->priority = 0x8000 >> BR_PORT_BITS;
+ 	p->port_no = index;
+ 	p->flags = BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD;
 -- 
 2.54.0
 
