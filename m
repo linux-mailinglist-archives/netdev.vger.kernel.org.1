@@ -1,161 +1,160 @@
-Return-Path: <netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ip5JBXXXH2p3qwAAu9opvQ
-	(envelope-from <netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:27:49 +0200
+	id 8e+BLuvZH2pzrAAAu9opvQ
+	(envelope-from <netdev+bounces-294611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:38:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BABF0635333
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:27:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2FE16354A5
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:38:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=leemhuis.info header.s=key2 header.b=PZo8u9ES;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294610-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b=Zoa7geZH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294611-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294611-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50FF9311F4B8
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:18:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6D63F3082421
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219E839C00F;
-	Wed,  3 Jun 2026 07:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCCB39E9BD;
+	Wed,  3 Jun 2026 07:18:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [194.59.206.189])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D0839A4D6
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 07:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDAA39DBFC;
+	Wed,  3 Jun 2026 07:18:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471104; cv=none; b=IiykWsvRLChcHgmAJO4y2mlO6iKgMo0YvNVCeIeq6bWP4DHKDg9ypgRylKZV/n3PJkWuj/DodpifKOPEtNwzH9dl1QPTiqYpNdz3wEySpFJi9i4HSPMILTYKbn0iW3dDy7HkPyI9wfCilUSxVMQMgSFgOIRlWecBWA3SsC13tOY=
+	t=1780471108; cv=none; b=dAONig5s+vUGCgoWp+wfT+hXrD5M4x9TXjzQlK8ehgrm6Y88LkKt1G6Jlvv66u8O4683BhQwNtOtdJCOIfGOuvkfEksO6kOcLXUBY4R2ExQ4CKW6GjOZ5Q2FlBUaDZKtSoett1CiloqE8eoFXd1oE3Hi7Hh0dtU5i+O2jgg8Q+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471104; c=relaxed/simple;
-	bh=6AZli0waDkqPPv4RYfw4UTCBZr6umj22h0dhXR1Jr4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M4P4LYaFwPgMKFmUBCD9FCeCy7OuNfPYklExcWFewMEDGWBYXormECXzBdAZDK4kPT7S06qz0IrqvQnEKK8fI3BiZNrZ1DRUqI6OdGs1rpiFhAuRld1RdIvr//6H5kzmoNccwUkw7TxF7NvVP6EyWvhSkblmMyHZYMVNPuTaUkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=PZo8u9ES; arc=none smtp.client-ip=194.59.206.189
-Received: from relay02-mors.netcup.net (localhost [127.0.0.1])
-	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4gVfDK1zM1z44TC;
-	Wed,  3 Jun 2026 09:17:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1780471073;
-	bh=6AZli0waDkqPPv4RYfw4UTCBZr6umj22h0dhXR1Jr4Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PZo8u9ES/eDEnOLUv4zPK5PT0RYgcx0DzP3CNid17so5QbcNr4mNP3zXV7GzevQph
-	 jVeen7yRdabS2ngfW2VxsarG4/o4Uqu+NFfdRrUz685pLJLrlDhsZHajvG1pT9ONwL
-	 F14AMkiodK4oLDhlXLdPdowPukLu3HYDYzTvFUEvTfMyrERizr8mBWVR5igbwVKzMi
-	 tiQeFAqy82C7jKLXGFEiMG8aR2mvOAVJNuCm4xCPSpBeC3CzG+FHBjCqtYU5qG01yG
-	 fWCEwji0RQk7SGUGK+46P7BXUzjROEIkYn+O3G+FTw4sqpFvLQyNtSwiaFhJCSC40g
-	 1+Zwi6fLifhbg==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4gVfDK1FmZz7x8R;
-	Wed,  3 Jun 2026 09:17:53 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gVfDF24yqz8sb8;
-	Wed,  3 Jun 2026 09:17:49 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id E18645F96B;
-	Wed,  3 Jun 2026 09:17:47 +0200 (CEST)
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <eba11df5-3ae6-4bc4-bbe7-be358a0d4717@leemhuis.info>
-Date: Wed, 3 Jun 2026 09:17:46 +0200
+	s=arc-20240116; t=1780471108; c=relaxed/simple;
+	bh=eopH5zYjoqqXWPlP9/1em1VNH5BgMfP/OFiOmHs9DCU=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=iu2icVZe8Oo96LLJ/0oVt8gcZ6A8+Nkr6chX8lqwfEEIbYDMG6f0wexGwb2BJCYEd6Y9YvFlNQ3UDZ/JmPuB3AzFJ5Yl/3eXgDBslZyd8Lve8dDRX5EU5wiwVsDO7ILJADgPT6GcO1BiJIz0F+hyJUnPlkVr85JlrX3x/RWgT3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Zoa7geZH; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 24507A03C2;
+	Wed,  3 Jun 2026 09:18:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1780471104; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=unD7fVDej0gDVMjXgolcmQ3vJZ292FaMOu0mhGLUp/w=;
+	b=Zoa7geZHCSxG7jx+fMSeAIApF6d+/cbc2PcgzMxaBKdgd9n0XmKdTtrCXFIXFnge/HyA7e
+	Jpwc/WzlLbwFLBQhHNru1Fw7lQ0CzrDL+QYrWUXzz7CAsfhvPEtkN+naOVv8aaZ9bvhiY8
+	ctoCuSydyXnFZxAtkaB4uEcXnEgfnrNeaaf/GEGSjuqMHhO3HAzmqyhm5DnpMPpQ09ktej
+	ZyGVur03EYSZUs4TJ/2wsm7mGVTkmw2HL0Uf2S1xUbfQz8Vbn6RJqWoJDGlqWmHpRp2FVN
+	2L1OgmXxjSd5cv/eUDuIPiwE/OrY78XlsOy6vy1sdKP7r02Bfs5QF6y5Cauczw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] Revert "ipv6: preserve insertion order for
- same-scope addresses"
-To: =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
- Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org,
- yuhuang@redhat.com, justin.iurman@gmail.com, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org,
- Chris Adams <linux@cmadams.net>, David Gibson <david@gibson.dropbear.id.au>,
- Beniamino Galvani <bgalvani@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- regressions@lists.linux.dev
-References: <20260529112357.5079-1-fmancera@suse.de>
- <20260529134045.56330243@elisabeth>
- <5079261a-79e5-421b-bf6a-a511acaaeca4@kernel.org>
- <20260601153525.546746a8@elisabeth>
- <CACT4oueDv=KRZmJw=1N58EN7eoFz5AqbBBMP8FE4=+rQ99oFEg@mail.gmail.com>
- <8e9cbf0a-caff-4575-afb7-fe852df8a51a@kernel.org>
- <CACT4oueJ3GsVvnWcZHgYVL-fCjpt5nOw+2=0BTmiz-9xKY4B0w@mail.gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: 
- <CACT4oueJ3GsVvnWcZHgYVL-fCjpt5nOw+2=0BTmiz-9xKY4B0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: 
- <178047106860.2884229.11167975002197488257@mxe9fb.netcup.net>
-X-NC-CID: oXfrpjjwOSKR5sEbKrJBTtL/u+qg0NyG0cVHx0QSERX9DU+6VGE=
+Date: Wed, 03 Jun 2026 09:18:23 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jakub@cloudflare.com, maxime.chevallier@bootlin.com, lee@kernel.org,
+ linux-leds@vger.kernel.org, pavel@kernel.org, jv@jvosburgh.net,
+ michael.chan@broadcom.com, jhs@mojatatu.com, vinicius.gomes@intel.com,
+ idosch@nvidia.com, razor@blackwall.org, hare@suse.de, jhasan@marvell.com,
+ danieller@nvidia.com
+Subject: Re: [PATCH net-next v2 11/11] net: ethtool: make sure
+ __ethtool_get_link_ksettings() is ops-locked
+In-Reply-To: <20260603012840.2254293-12-kuba@kernel.org>
+References: <20260603012840.2254293-1-kuba@kernel.org>
+ <20260603012840.2254293-12-kuba@kernel.org>
+Message-ID: <6cedf5898b770e430cb60fa7ae011802@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294610-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:ihuguet@redhat.com,m:matttbe@kernel.org,m:sbrivio@redhat.com,m:fmancera@suse.de,m:netdev@vger.kernel.org,m:yuhuang@redhat.com,m:justin.iurman@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:linux@cmadams.net,m:david@gibson.dropbear.id.au,m:bgalvani@redhat.com,m:andrew@lunn.ch,m:regressions@lists.linux.dev,m:justiniurman@gmail.com,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FORGED_SENDER(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	DMARC_NA(0.00)[leemhuis.info];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-294611-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,suse.de,vger.kernel.org,gmail.com,kernel.org,google.com,davemloft.net,nvidia.com,cmadams.net,gibson.dropbear.id.au,lunn.ch,lists.linux.dev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:from_mime,tipi-net.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BABF0635333
+X-Rspamd-Queue-Id: B2FE16354A5
 
-On 6/3/26 08:53, Íñigo Huguet wrote:
-> Stating that the order is "random" implies that someone will change
-> the default insertion order in the future, as the documentation says
-> that it's not UAPI. So they'll cause the UAPI breakage that we are
-> trying to avoid now. Moreover, if we consider the default order
-> "random" and state that userspace programs must not rely on it, why
-> can't we change it now?
+Hi Jakub
 
-Because the UAPI is only indirectly important, as it's "something that
-used to work doesn't anymore" is what matters; you in fact can break the
-UAPI all you want, as long as everything continues to work. Or to quote
-Linus from:
+On 3.6.2026 03:28, Jakub Kicinski wrote:
+> All drivers which may call *_get_link_ksettings() on ops-locked
+> devices from paths already holding the ops lock are ready now.
+> Make __ethtool_get_link_ksettings() take the ops lock, and assert
+> that it's held in netif_get_link_ksettings().
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/ethtool/ioctl.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+> index 49da873b673d..a4b0cbae4063 100644
+> --- a/net/ethtool/ioctl.c
+> +++ b/net/ethtool/ioctl.c
+> @@ -439,7 +439,7 @@ struct ethtool_link_usettings {
+>  int netif_get_link_ksettings(struct net_device *dev,
+>  			     struct ethtool_link_ksettings *link_ksettings)
+>  {
+> -	/* once callers fixed - assert ops locked */
+> +	netdev_assert_locked_ops_compat(dev);
+> 
+>  	if (!dev->ethtool_ops->get_link_ksettings)
+>  		return -EOPNOTSUPP;
+> @@ -456,10 +456,14 @@ EXPORT_SYMBOL(netif_get_link_ksettings);
+>  int __ethtool_get_link_ksettings(struct net_device *dev,
+>  				 struct ethtool_link_ksettings *link_ksettings)
+>  {
+> +	int ret;
+> +
+>  	ASSERT_RTNL();
+> 
+> -	/* once callers fixed - take the ops lock around this call */
+> -	return netif_get_link_ksettings(dev, link_ksettings);
+> +	netdev_lock_ops(dev);
+> +	ret = netif_get_link_ksettings(dev, link_ksettings);
+> +	netdev_unlock_ops(dev);
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL(__ethtool_get_link_ksettings);
 
-https://www.kernel.org/doc/html/latest/process/handling-regressions.html#on-what-qualifies-as-userspace-interface-abi-api-documented-interfaces-etc
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-"I just wanted to point out that the argument about whether it's an ABI
-change or not is irrelevant. If it turns out that some program - not a
-test script, but something with relevance to conscious user expectations
-~ depended on the old broken behavior, then it needs to be done some
-other way.""
-
-Yes, he talks about ABIs here, but it's the same for APIs.
-
-Ciao, Thorsten
+Thanks
+Nicolai
 
