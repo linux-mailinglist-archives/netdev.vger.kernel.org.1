@@ -1,64 +1,75 @@
-Return-Path: <netdev+bounces-294567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294581-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jVH2GS/HH2o/pwAAu9opvQ
-	(envelope-from <netdev+bounces-294567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:18:23 +0200
+	id FycYDsfKH2rjpwAAu9opvQ
+	(envelope-from <netdev+bounces-294581-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:33:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4330763499D
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:18:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AA65634AEF
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:33:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=bpzC9ZIO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294567-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294567-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=realtek.com header.s=dkim header.b=vt2Jw+Nm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294581-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294581-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realtek.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 631D23022245
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:18:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3BC5303676C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E873F8892;
-	Wed,  3 Jun 2026 06:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092DB3F99F2;
+	Wed,  3 Jun 2026 06:28:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E1A38BF89
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 06:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36FA3F99F6;
+	Wed,  3 Jun 2026 06:28:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780467492; cv=none; b=OzmWF4sFK43vVfSyhSePlQOFH2rmKCkp7/q/lvg8oU8lUD4Q6CNgqYgBEx5xSQ83ngfxfgOMVTbRLdBQEoXttLz0VatR86GZMnP6KTPlNmbve6hjdEczRr68FpmHeGb0f2OZ6Ft/YdJJH68NFxTePT7MEsFZgQ5Nbg0TJpvqRqs=
+	t=1780468125; cv=none; b=QXVKQ+TU5ws8QNl/H3nd2gooKlbikg8j3nPt2ATnW6zFdpGZm22N3mdNRcKzLiyzghU0vhZnFebATFz2dT7QlRwLEb3yc4En8xtbf/GjWqMPygQDvw7shPleWbPSJ3Y+EdFfG4+b/OScW+b7Dxs7DVhe0EmYOlHgbpsPP2Y+Hco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780467492; c=relaxed/simple;
-	bh=igLi0aFoIR8oOPtljlYZro0h7CIA1d9Odeoh220PwZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TwBILOjLZ7Mvk1E0M9/hWjEle8ej7S37sMiw6S9FK8q2sTGpVc8FZKRl4FOKBryQBRz44IjDJ8gDLAKGP8Z6XmNWaAPMpTtzUgSfAdLc+yFnOQy6i9NFLTmLbr36hU9nRZi/0a5AqXYDf6bKHvhOVnVzXPbtB999FQM9U77lbbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bpzC9ZIO; arc=none smtp.client-ip=95.215.58.181
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780467477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d4V0CNKpI15eY3bq0nYf9RGoV7ytpy50VKiOWNIpJgQ=;
-	b=bpzC9ZIOM3QPg7VNwMnc84WZLdWNo3xVDuFgBhS5IkRTbD7lg9wbbMT3O6QX7G9xW6F3pF
-	eiwJEPvdewTqfZaiskbrMtpNfH9tve5TGKpxvYwqO7NOfq7xBAQATSDVB6qtSdOmrb0O4E
-	50eNlLQ25KVQto/DnZoISegdndDtxR4=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Matthieu Baerts <matttbe@kernel.org>
-Subject: [PATCH net-next] selftests: net: do not detect PPPoX loopback
-Date: Wed,  3 Jun 2026 14:17:44 +0800
-Message-ID: <20260603061746.23452-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1780468125; c=relaxed/simple;
+	bh=WAi8U+3sfBWwUpadzsvWjdyiQFBV9pSSkxACkoPzTxs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B/1SNagc2WT41tCxnjnZWc+ovJTIXlmF2pviOdmpUPv99KzlEldjjDHmJAHbCzFjq4AMsdqOECGE0QPuZge3LNgdiz4o4aYUQdMSKVpHbI9D/l+GNIG7Bs9S9+Zo0OAQ7hiOWIFh1kPupSvfQBZX69VSF8BIM/OhLPh9X1CUP1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=vt2Jw+Nm; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6536IIJ103626622, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1780467498; bh=TWwBiF+NAdoTfoslkDu2INd/Tmlxm1z80iFJEROktwk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=vt2Jw+NmqA5BLN8q1OfkiPv9cZZhXr3uvwEpnlxnBWiUTNJXwb9wZ8rbOrTkjNhek
+	 6OQXcAACnP23ZhQsiWq6zurYr7DpMZ8/PQmAmwpCg/z8QHc17brZBmWxuu3mpq8Zrq
+	 7822d9G9U6hwmPHuqc1IS6g1MlWsvbDRsECZwIJa5UluLU5/hMuX3hIF1sPwxtlUR4
+	 +n+cP1rFnyLlOS+vBOrcvxQkDWkGKPiQQQ8y6Ogsgd8Eli5l4JRK/0pZZdlwk+BZJ3
+	 +qCL65jFZ6oJnQYLs0C3Hj/8eUqp9NLjFR4x+7yVDX2dxk9mv+c1hxf61N2kmSC7Z7
+	 Hq1mJGFrWOw3Q==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6536IIJ103626622
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 3 Jun 2026 14:18:18 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 3 Jun 2026 14:18:18 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 3 Jun 2026 14:18:18 +0800
+Received: from RTDOMAIN (172.21.42.225) by RTKEXHMBS05.realtek.com.tw
+ (10.21.1.55) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Wed, 3 Jun 2026 14:18:18 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>, <horms@kernel.org>,
+	<aleksander.lobakin@intel.com>, <pkshih@realtek.com>,
+	<larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
+Subject: [PATCH net v2] rtase: Avoid sleeping in get_stats64()
+Date: Wed, 3 Jun 2026 14:18:16 +0800
+Message-ID: <20260603061816.31356-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,65 +77,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294567-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:qingfang.deng@linux.dev,m:linux-ppp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:matttbe@kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-294581-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:justinlai0215@realtek.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[realtek.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realtek.com:mid,realtek.com:dkim,realtek.com:from_mime,realtek.com:email];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:from_mime,linux.dev:email]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4330763499D
+X-Rspamd-Queue-Id: 8AA65634AEF
 
-By default, pppd attempts to detect loopbacks on the underlying
-interface using a pseudo-randomly generated magic number and checks if
-the same value is received. The seed for the PRNG is a hash of hostname
-XOR current time XOR pid, which is likely to collide on NIPA, causing
-false positives. Disable magic number generation.
+The .ndo_get_stats64 callback must not sleep because it can be
+called when reading /proc/net/dev.
 
-Reported-by: Matthieu Baerts <matttbe@kernel.org>
-Fixes: 7af2a94f4dcf ("selftests: net: add tests for PPPoL2TP")
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+rtase_get_stats64() calls rtase_dump_tally_counter(), which polls
+the tally counter dump bit with read_poll_timeout(). This may
+sleep while waiting for the hardware counter dump to complete.
+
+Use read_poll_timeout_atomic() instead to avoid sleeping in the
+get_stats64() path.
+
+Fixes: 079600489960 ("rtase: Implement net_device_ops")
+Cc: stable@vger.kernel.org
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
- tools/testing/selftests/net/ppp/pppoe-server-options | 1 +
- 1 file changed, 1 insertion(+)
+v1 -> v2:
+- Target net tree.
+- Add Fixes tag.
+- Add Cc: stable@vger.kernel.org.
+---
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/ppp/pppoe-server-options b/tools/testing/selftests/net/ppp/pppoe-server-options
-index 66c8c9d319e9..cd586be7061b 100644
---- a/tools/testing/selftests/net/ppp/pppoe-server-options
-+++ b/tools/testing/selftests/net/ppp/pppoe-server-options
-@@ -1,2 +1,3 @@
- noauth
- noipdefault
-+nomagic
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 6ccbefb5acf2..55105d34bc79 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -1565,8 +1565,9 @@ static void rtase_dump_tally_counter(const struct rtase_private *tp)
+ 	rtase_w32(tp, RTASE_DTCCR0, cmd);
+ 	rtase_w32(tp, RTASE_DTCCR0, cmd | RTASE_COUNTER_DUMP);
+ 
+-	err = read_poll_timeout(rtase_r32, val, !(val & RTASE_COUNTER_DUMP),
+-				10, 250, false, tp, RTASE_DTCCR0);
++	err = read_poll_timeout_atomic(rtase_r32, val,
++				       !(val & RTASE_COUNTER_DUMP),
++				       10, 250, false, tp, RTASE_DTCCR0);
+ 
+ 	if (err == -ETIMEDOUT)
+ 		netdev_err(tp->dev, "error occurred in dump tally counter\n");
 -- 
-2.43.0
+2.40.1
 
 
