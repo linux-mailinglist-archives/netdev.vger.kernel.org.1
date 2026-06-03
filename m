@@ -1,175 +1,194 @@
-Return-Path: <netdev+bounces-294608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tru+HRbXH2pTqwAAu9opvQ
-	(envelope-from <netdev+bounces-294608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:26:14 +0200
+	id j/zVArvWH2ouqwAAu9opvQ
+	(envelope-from <netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:24:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E113F6352F3
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:26:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0A266352C1
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 09:24:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=kd8n+8rs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294608-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294608-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294609-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0A4D030DFDCB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:17:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A7B3030698AE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 07:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568F239B95D;
-	Wed,  3 Jun 2026 07:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D5E39BFED;
+	Wed,  3 Jun 2026 07:18:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40C7399031;
-	Wed,  3 Jun 2026 07:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2002D73B8;
+	Wed,  3 Jun 2026 07:17:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780471012; cv=none; b=b4XDH3XxKu47gYnjqIVu+7bhJIbbkCRu9PRLNkYMMW7CrXRzmV90iU3PLkkZRLFdE8dBVODPHvj1npv7jIngy25YS6uSw/uZotq5twfxf+gRFpPax4MEEunwrOqqzG9Cl/tKG3s6h7TnmgM5xdIzfKbQB8DFtwows2hKx7wfdCA=
+	t=1780471081; cv=none; b=lA1tXNzPcIPl5uwHTfN817jDxgfAoZq4XfCV3I+iF352UgJCXC7N2UV34xaPVf8j9dZibuQmx4iWRCIEZbVDfe47PyX+wQnmg9FTuLJqy/Pnj7TWajWP24tVl92U8emnpz619Poxn0eOJs9wFLQ0ZUimj14V8T8XhEx0gn3+iLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780471012; c=relaxed/simple;
-	bh=vyz0Xa1//X2cgKiA8x50y0o6xktJFDyDe1/KFcEJfHM=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=VGT7Na5o/UOh4xOAi5MaA0CoNzjqqiGdU4zQZpORbXUORMuy3QZAall8qVlLfTWlLS64eKgpajjn7zOGyYu7CrcR2tpEigvwvyl5w3oniDZo7K1EwgB4tUV7pb6u5Ji+7wfvIx3nqo7XmAj5M6n1Cxy6G4Di2qQZnPETluyl0Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=kd8n+8rs; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 41481A03C2;
-	Wed,  3 Jun 2026 09:16:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1780471004; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Vg2AJcCFLJnI5vjShorKN1fo6tPDywI2MFm003N7eXg=;
-	b=kd8n+8rsaOLBhSjImTzV783fbvAdIg74RlEsJ0zpTD3S8PbK+0LiFSgREPyaNtf84kDL3q
-	U0nufqHfCsDLjve40u7PUAyjB1sWOLBJ2/HflKjaeHAc7FCiugpbHjoyEwa0vCKjFL7GZb
-	Pr7370v6gAJJF2WZf/eHjd/+5esDiByMyr95VDei2E5GE6b8gldv+wl0fw5/Pf5HNlQp5x
-	+S5WDjqdGP9HrVslMn0ImpqAL2IqQ/HhBzwT26Fv/6Eq/Jn6nF1AZsEGE5RLKqgWiHnxKe
-	1NmalZ3RjJtdumVkip05o0GH8Ant/Czm2rT704AIlrLFOeBliea5zubwqxnqJQ==
+	s=arc-20240116; t=1780471081; c=relaxed/simple;
+	bh=eGMA2kfukIoeyI725SFDEiyovjQe2K1z/IFmf/wWKd8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vfs2/XI88Xjy0IFQpGwL1Cihyat6ZIqx1DxpIdlwJRIqllNz7JQH9EI3+UWV49CfXckZR0sPCJ1u/XUV9iBY4v2Zp7G3I/5fIRsBGbUczKiugZnI0QJCNoM/mkobsoaD0S5O0+4SQRlk0zl4vfqNiJMmc+ewWknZB9BqyGlZzy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Received: from localhost.localdomain (unknown [36.112.3.223])
+	by APP-01 (Coremail) with SMTP id qwCowAC3XNUK1R9q8eqAAA--.1949S2;
+	Wed, 03 Jun 2026 15:17:30 +0800 (CST)
+From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+To: skalluru@marvell.com,
+	manishc@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ariele@broadcom.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] bnx2x: clean up VF PCI resources on probe failure
+Date: Wed,  3 Jun 2026 15:17:29 +0800
+Message-Id: <20260603071729.799370-1-lihaoxiang@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 03 Jun 2026 09:16:39 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jakub@cloudflare.com, maxime.chevallier@bootlin.com, lee@kernel.org,
- linux-leds@vger.kernel.org, pavel@kernel.org, jv@jvosburgh.net,
- michael.chan@broadcom.com, jhs@mojatatu.com, vinicius.gomes@intel.com,
- idosch@nvidia.com, razor@blackwall.org, hare@suse.de, jhasan@marvell.com,
- danieller@nvidia.com
-Subject: Re: [PATCH net-next v2 07/11] net: bridge: don't recurse on the
- port's netdev ops lock
-In-Reply-To: <20260603012840.2254293-8-kuba@kernel.org>
-References: <20260603012840.2254293-1-kuba@kernel.org>
- <20260603012840.2254293-8-kuba@kernel.org>
-Message-ID: <b9a0430bb83cc76096488ce4bf239368@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAC3XNUK1R9q8eqAAA--.1949S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGF13Wry7KF4xAw48tF4xWFg_yoW5Gw1fpa
+	9rXFy5Xr18GrsxAa1UXFWUAFnxA398t34UKayUJ3yavryYyF98JF47Ka47ZrW8GrZ5CF4S
+	qw4jvwn8W3WYvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiCRAHE2ofveVYpAAAsc
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-294608-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294609-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:skalluru@marvell.com,m:manishc@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ariele@broadcom.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lihaoxiang@isrc.iscas.ac.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:from_mime,tipi-net.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iscas.ac.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E113F6352F3
+X-Rspamd-Queue-Id: E0A266352C1
 
-Hi Jakub
+bnx2x_init_one() allocates VF PCI resources by calling
+bnx2x_vf_pci_alloc(), but later error paths fall through
+the common cleanup path without calling bnx2x_vf_pci_dealloc().
 
-On 3.6.2026 03:28, Jakub Kicinski wrote:
-> port_cost() calls __ethtool_get_link_ksettings() on the port device,
-> which will soon take the port's ops lock. br_port_carrier_check()
-> is reached via the NETDEV_CHANGE notifier from linkwatch, which
-> already holds the port's ops lock, so the call would deadlock.
-> 
-> Make port_cost() expect the port's ops lock held and switch to
-> netif_get_link_ksettings(). The only other caller is new_nbp(),
-> make sure it takes the lock explicitly.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  net/bridge/br_if.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
-> index d39571e13744..049d1d25bc26 100644
-> --- a/net/bridge/br_if.c
-> +++ b/net/bridge/br_if.c
-> @@ -19,6 +19,7 @@
->  #include <linux/if_ether.h>
->  #include <linux/slab.h>
->  #include <net/dsa.h>
-> +#include <net/netdev_lock.h>
->  #include <net/sock.h>
->  #include <linux/if_vlan.h>
->  #include <net/switchdev.h>
-> @@ -30,13 +31,13 @@
->   * Determine initial path cost based on speed.
->   * using recommendations from 802.1d standard
->   *
-> - * Since driver might sleep need to not be holding any locks.
-> + * Since driver might sleep, we need to not be holding any bridge 
-> spinlocks.
->   */
->  static int port_cost(struct net_device *dev)
->  {
->  	struct ethtool_link_ksettings ecmd;
-> 
-> -	if (!__ethtool_get_link_ksettings(dev, &ecmd)) {
-> +	if (!netif_get_link_ksettings(dev, &ecmd)) {
->  		switch (ecmd.base.speed) {
->  		case SPEED_10000:
->  			return 2;
-> @@ -436,7 +437,9 @@ static struct net_bridge_port *new_nbp(struct 
-> net_bridge *br,
->  	p->br = br;
->  	netdev_hold(dev, &p->dev_tracker, GFP_KERNEL);
->  	p->dev = dev;
-> +	netdev_lock_ops(dev);
->  	p->path_cost = port_cost(dev);
-> +	netdev_unlock_ops(dev);
->  	p->priority = 0x8000 >> BR_PORT_BITS;
->  	p->port_no = index;
->  	p->flags = BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD;
+This can leak the VF PCI resources allocated for the VF
+when probe fails after bnx2x_vf_pci_alloc() succeeds.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Add a VF-specific error label to call bnx2x_vf_pci_dealloc()
+before falling through to the existing common cleanup path.
 
-Thanks
-Nicolai
+Fixes: 6411280ac94d ("bnx2x: Segregate SR-IOV code")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+---
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+index da0f8c353e6a..acb0379d94b9 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+@@ -13932,13 +13932,13 @@ static int bnx2x_init_one(struct pci_dev *pdev,
+ 		dev_err(&bp->pdev->dev,
+ 			"Cannot map doorbell space, aborting\n");
+ 		rc = -ENOMEM;
+-		goto init_one_freemem;
++		goto init_one_vf_pci_dealloc;
+ 	}
+ 
+ 	if (IS_VF(bp)) {
+ 		rc = bnx2x_vfpf_acquire(bp, tx_count, rx_count);
+ 		if (rc)
+-			goto init_one_freemem;
++			goto init_one_vf_pci_dealloc;
+ 
+ #ifdef CONFIG_BNX2X_SRIOV
+ 		/* VF with OLD Hypervisor or old PF do not support filtering */
+@@ -13952,7 +13952,7 @@ static int bnx2x_init_one(struct pci_dev *pdev,
+ 	/* Enable SRIOV if capability found in configuration space */
+ 	rc = bnx2x_iov_init_one(bp, int_mode, BNX2X_MAX_NUM_OF_VFS);
+ 	if (rc)
+-		goto init_one_freemem;
++		goto init_one_vf_pci_dealloc;
+ 
+ 	/* calc qm_cid_count */
+ 	bp->qm_cid_count = bnx2x_set_qm_cid_count(bp);
+@@ -13971,7 +13971,7 @@ static int bnx2x_init_one(struct pci_dev *pdev,
+ 	rc = bnx2x_set_int_mode(bp);
+ 	if (rc) {
+ 		dev_err(&pdev->dev, "Cannot set interrupts\n");
+-		goto init_one_freemem;
++		goto init_one_vf_pci_dealloc;
+ 	}
+ 	BNX2X_DEV_INFO("set interrupts successfully\n");
+ 
+@@ -13979,7 +13979,7 @@ static int bnx2x_init_one(struct pci_dev *pdev,
+ 	rc = register_netdev(dev);
+ 	if (rc) {
+ 		dev_err(&pdev->dev, "Cannot register net device\n");
+-		goto init_one_freemem;
++		goto init_one_vf_pci_dealloc;
+ 	}
+ 	BNX2X_DEV_INFO("device name after netdev register %s\n", dev->name);
+ 
+@@ -14001,6 +14001,10 @@ static int bnx2x_init_one(struct pci_dev *pdev,
+ 
+ 	return 0;
+ 
++init_one_vf_pci_dealloc:
++	if (IS_VF(bp))
++		bnx2x_vf_pci_dealloc(bp);
++
+ init_one_freemem:
+ 	bnx2x_free_mem_bp(bp);
+ 
+-- 
+2.25.1
+
 
