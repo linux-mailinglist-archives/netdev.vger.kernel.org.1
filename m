@@ -1,217 +1,183 @@
-Return-Path: <netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H6mEKMuHIGoG4wAAu9opvQ
-	(envelope-from <netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 22:00:11 +0200
+	id WVFUEq2JIGpS4wAAu9opvQ
+	(envelope-from <netdev+bounces-294902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 22:08:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9FA63B075
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 22:00:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA2E63B0BB
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 22:08:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux-foundation.org header.s=google header.b=E5WQL0eE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294901-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=infradead.org header.s=bombadil.20210309 header.b=QiaPGPh3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294902-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294902-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93922301E6C2
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 20:00:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C9A03012E82
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 20:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258803A6412;
-	Wed,  3 Jun 2026 20:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86ABB3FB7C7;
+	Wed,  3 Jun 2026 20:07:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9583A5E99
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 20:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7C930276A;
+	Wed,  3 Jun 2026 20:07:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780516803; cv=none; b=gYfHQrPdJ/2Xt7bikul/qzU5cneAAPudGpid5qF4vwOUBtsDXmN+qZhfhkcKjLQ/dhWip5aKh/gT1C8SbOK/ga97dgsEfsgNpm1GU2emt4mvUuExJ6/WIFck/H4aiVu7urXxKNJ3PsBCK99BOhmXu4p8EJ9juFnl7F1klxc4AHs=
+	t=1780517226; cv=none; b=IQBhfvJVmNvxkZmtrjfuAFTzYSeRzAMsmI8M4RwVYceRMZK7/l1fBoG9/bh+6f20vUHcae4xLkSi9cOhZT+yrqavihzXv5cRvEPmwRs6o/pycN9gGOFYvx82ZJ8MrZC02PlHlWwvKeiZfc6CPejVfNMyBIPVhI9rsrliyzZnbbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780516803; c=relaxed/simple;
-	bh=cJCdMggMBtlaRufFOzf56NF2SmvXVse1UnTO+KmUUY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JYjrhXyW6Bc+t8cUhVW2Ug8pwu9mfNIAFpH2vtnlXSE1i/EtV+p4SBBZqEYFjaDJDZKLqMd6E35KGZvLrxKMchvdOMVOU9p9th0IW1RkFgZv5cPAF7cxibqMkvxKTfyY1b9wlBKqpMeunUL5sTOB0yKHSvl4GK1FZNQ7Ra5PGrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=E5WQL0eE; arc=none smtp.client-ip=209.85.216.44
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36b95eb4bb4so3397501a91.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 13:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1780516800; x=1781121600; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rLwU6+VwyCgHprpb82bpoZ1vCU00viaTeQ4mjhQKQr0=;
-        b=E5WQL0eE5SCkORdDgmaH/6yh0Q+bkb2AAXJDvh0D9Qt3t3+ma6m0+1u9F2rEHJVllH
-         udnnnxaDFUrroLqW14J517iMyS1wSC4j3ZPETGbQkkkkzIh6FzQyDfxqMojqgmNnFHeA
-         r4172xi+9r/CMdbECOO1j4unC9zKjDm9l3DzE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780516800; x=1781121600;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rLwU6+VwyCgHprpb82bpoZ1vCU00viaTeQ4mjhQKQr0=;
-        b=sja+hkm900N4Ric8Mdrh8CQzwkvmPoBfIrcXnBiVrccQZNV7CngF6fYSZ9vTAsrnCE
-         eTF4n1vWAEv5mAn3sOMt7zqhTxezUkVpTo+jpyqB4s/wIzh4PrTOFfjdVuDg7WnA2fMm
-         eRDLNkREB7PO8k6fY3Ji3gsvzvsEtxjugy6ZbmW0joDdd9iy5nca8gnhBf6pTVgfeCyO
-         f9JpKC6MlMVH2/knwIctY83gSKYrYtt6KApRfK+Oasv0+JWNr2bcHbFoRSIs86IOmCu9
-         kixIrP28B/J15UNTDBCrkV5kYu6s97gXFamyjanGCf/pYXbhvp1GnG2yMPiI0Ioyd4On
-         tLTA==
-X-Forwarded-Encrypted: i=1; AFNElJ8wTROTkxMC9vGMkvuWSqTW/2WhJAHLr38Di3posD++CFgrzJvpfeGcxEiiYCfIVs2yHjOszjA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjrYC67G5eClk5rv/k596eUr7UPXOGojD35XKKpXysWTJ4UZiD
-	s68FsmM1Ox4ty59O039K6OIJNvzaUc8EBQNzsh6S7dHD9UA9Cv8PeRinCDcmzhEcr6BDaJLwjZc
-	ij3lal7GtwQ==
-X-Gm-Gg: Acq92OFogCYBrOcR99/QuBARNOkcXHDIrIcJZ8giJevRr6oYUvZHuMrS1sX1xCosoYA
-	ZV2RlIi0fm7g3sLMjVYR4Qs4ajhmRmBQn5xApPOakt10h6euf9E/1zoPnl1rQO4qK5UQANQGpbG
-	aw+FFuNHDdlwkiskWdXcO8sdpOiFRrwGHB6c/V8z6+7G06JUwW9By6CNJ8OTcmRJYIL1fTYx1dA
-	Psq38nekplDyICkowKEGJQ8SAoWIwdBo++BnOudXaJukcNc2EEOu41/cr0rkHldW6atPcEbue43
-	op5jkDQG1d8NJvaOtvQTwwuYiPoT/WDnj0E0gS8Cm98JhZQ+MwxPGUyLRLqulnpiI+yBM2qYBpl
-	W7aDc6qjidmwUbGrhu+lJapr/7wD7xmsbWoHj4zqxNAR2/54RZnej0I+1yL6KFxNf24/fqcwuW/
-	LxpD/nwzTxDFGV27W6gnT6dbmHlnLLBTlYIlICoaOGT+aZ42cEaKoKNCHlGtiPLhT3y003DDPSM
-	G7qBv9D57s=
-X-Received: by 2002:a17:902:ecc8:b0:2c0:cea4:3df4 with SMTP id d9443c01a7336-2c1644cb12bmr48064515ad.40.1780516800175;
-        Wed, 03 Jun 2026 13:00:00 -0700 (PDT)
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com. [209.85.216.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c1664950aesm31788165ad.69.2026.06.03.12.59.58
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jun 2026 12:59:58 -0700 (PDT)
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36babe2c4bdso3878720a91.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 12:59:58 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9KDN+YzfrAcYSOqgaAbEd03FmY5Zg2p9Wp98POC4PuNg463gvpC1EsepV/29aLc5DYx0WmaXA=@vger.kernel.org
-X-Received: by 2002:a17:90b:2f86:b0:36b:77b9:5c8c with SMTP id
- 98e67ed59e1d1-36e3237e125mr4484034a91.17.1780516797989; Wed, 03 Jun 2026
- 12:59:57 -0700 (PDT)
+	s=arc-20240116; t=1780517226; c=relaxed/simple;
+	bh=BA9H6R3Q8M9olF9mGy953/1qfBeeiH1fA14XcTcB7n0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nMGWSuXC/2MnNKAXmU/kwBDMSB0HoxQyYhXYRMIOrxIgya2QPRHnkYrDXP94HGN/lZxey37to1pIRAckBHXZsFCQgvjyPP2qoSgURv969hton2FnTcJS5kZBpWARnY7wstDtsLO2m+0YGYXo6qhEIsJS9KbD57DWJjFRNz1cbss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QiaPGPh3; arc=none smtp.client-ip=198.137.202.133
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=1+dWje48khfViclGaERQCi/Gh0wxudHWH/QCF3kZqJw=; b=QiaPGPh3pMGAkZngFffySC7HGP
+	2qLjppS0arPQUFZx+kkx8ahTJa/4Fowj2hWCpElZOIL5uCsUp0pjN+P7GwWuR0KB47yC9tu7568iW
+	EppUWFzcIA4pdBx4BvyM6mLQZGX6nP13YQrGRq7ar3a+fObk+kDX22iYQPlyl7WzFoKjiuOQi0TUL
+	yJf4zsC6L8XHmkFEGt50bcRZ6KjAWobEGLcCgH7JyxC10TUv7OhWl1QGT6sngdHqZbc9yFGDROvOl
+	31B510tKcJ7BWSf/iiGttgsy4bhxfpGDeVHQSfMAekHpFQdna69xAL3rNFpJ/6NuDt84jKVlCMDYC
+	+cg0O5Sw==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wUrr2-0000000Fn3z-41XE;
+	Wed, 03 Jun 2026 20:06:21 +0000
+Message-ID: <d276e842-dd8f-40b7-806b-71572503005e@infradead.org>
+Date: Wed, 3 Jun 2026 13:06:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
- <20260602225426.122258-1-safinaskar@gmail.com> <CAHk-=wgKy4dP0oQCNKyMQQf3-uVpaigmDyH6_T0Via76gWST9g@mail.gmail.com>
- <CALCETrWx8-Q5-rK1KnAPCxCbXaWCd=Yfs_Pr8qVMa8k8L6of1w@mail.gmail.com>
- <CAHk-=wizkDXRut5xLXRF-CVUVYMaZ5AOexxeghOAoXPb4yAvQg@mail.gmail.com>
- <CALCETrXzxubt4eWue3+wv7Fq9C2m7uu6bWPstqFh6Mo57bPwQQ@mail.gmail.com> <CAHk-=wiEwSjfbjfO74xu=UmkkdHXkJg5QNQ8pP-3iYmunmeV9g@mail.gmail.com>
-In-Reply-To: <CAHk-=wiEwSjfbjfO74xu=UmkkdHXkJg5QNQ8pP-3iYmunmeV9g@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 3 Jun 2026 12:59:36 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whkGbMoP-Dym8pAd3hV21=BZST+6sK++1X038+9Q-TgeA@mail.gmail.com>
-X-Gm-Features: AVHnY4Jw9pwWVUIawcRWYEJbSOr_4eFJHRjDI61fxjs_qgnMfY70yBDODQXhxd4
-Message-ID: <CAHk-=whkGbMoP-Dym8pAd3hV21=BZST+6sK++1X038+9Q-TgeA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: Askar Safin <safinaskar@gmail.com>, akpm@linux-foundation.org, axboe@kernel.dk, 
-	brauner@kernel.org, david@kernel.org, dhowells@redhat.com, hch@infradead.org, 
-	jack@suse.cz, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, miklos@szeredi.hu, 
-	netdev@vger.kernel.org, patches@lists.linux.dev, pfalcato@suse.de, 
-	viro@zeniv.linux.org.uk, willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 7/7] devlink: Add eswitch mode boot defaults
+To: Mark Bloch <mbloch@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+ Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+ Thomas Gleixner <tglx@kernel.org>, Petr Mladek <pmladek@suse.com>,
+ Tejun Heo <tj@kernel.org>, Vlastimil Babka <vbabka@kernel.org>,
+ Feng Tang <feng.tang@linux.alibaba.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
+ Marco Elver <elver@google.com>, Eric Biggers <ebiggers@kernel.org>,
+ Li RongQing <lirongqing@baidu.com>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Ethan Nelson-Moore <enelsonmoore@gmail.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+References: <20260603193259.3412464-1-mbloch@nvidia.com>
+ <20260603193259.3412464-8-mbloch@nvidia.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260603193259.3412464-8-mbloch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-294901-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:luto@amacapital.net,m:safinaskar@gmail.com,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-foundation.org];
+	TAGGED_FROM(0.00)[bounces-294902-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[gmail.com,linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
+	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:jiri@resnulli.us,m:horms@kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:bbhushan2@marvell.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:bp@alien8.de,m:akpm@linux-foundation.org,m:peterz@infradead.org,m:tglx@kernel.org,m:pmladek@suse.com,m:tj@kernel.org,m:vbabka@kernel.org,m:feng.tang@linux.alibaba.com,m:dave.hansen@linux.intel.com,m:brauner@kernel.org,m:dapeng1.mi@linux.intel.com,m:kees@kernel.org,m:elver@google.com,m:ebiggers@kernel.org,m:lirongqing@baidu.com,m:paulmck@kernel.org,m:enelsonmoore@gmail.com,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lwn.net,linuxfoundation.org,resnulli.us,kernel.org,marvell.com,nvidia.com,alien8.de,linux-foundation.org,infradead.org,suse.com,linux.alibaba.com,linux.intel.com,google.com,baidu.com,gmail.com,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,linux-foundation.org:dkim,linux-foundation.org:from_mime,linux-foundation.org:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:mid,infradead.org:from_mime,infradead.org:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DB9FA63B075
+X-Rspamd-Queue-Id: BDA2E63B0BB
 
-On Wed, 3 Jun 2026 at 11:28, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> But even then you need to have a *handle* to the buffers for the
-> general case, and that's what the pipe fd ends up then still
-> effectively being.
+Hi.
 
-Again: for sendfile, you don't need the handle, because you can just
-"read the file data again".
+On 6/3/26 12:32 PM, Mark Bloch wrote:
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 063c11ca33e5..7af9f2898d92 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -1264,6 +1264,31 @@ Kernel parameters
+>  	dell_smm_hwmon.fan_max=
+>  			[HW] Maximum configurable fan speed.
+>  
+> +	devlink_eswitch_mode=
+> +			[NET]
+> +			Format:
+> +			[<selector>]:<mode>
 
-But the the handle is needed for any buffering that can't do that -
-iow pretty much *any* other case than a file-backed source.
+It appears (please correct me if I am mistaken) that the '[' and ']'
+above don't mean "optional" but instead they are required characters...
 
-So the original use-cases included things like copying media data from
-a TV capture card to a GPU for outputting in a window.
+> +
+> +			<selector>:
+> +			* | <handle>[,<handle>...]
 
-There it's actually the intermediate buffer that is the important
-thing, and it needs to have a lifetime that is independent of the
-system call itself, because the system call may be interrupted by
-signals etc, and you can't just "read the data again" when you
-restart.
+while here they mean "optional".
 
-So the whole idea with splice() is that you have an input, an output,
-and a stateful buffer between the two that has a lifetime.
+That is confusing (inconsistent). Also, if the square brackets are
+always required around the <selector>, what purpose do they serve?
 
-Having just a iov_iter isn't enough - even with the current much more
-capable iov_iter we have now (compared to when splice came to be: two
-decades ago when the modern iov_iter didn't even exist). You have to
-have that notion of a buffer with a lifetime.
+> +
+> +			<handle>:
+> +			<bus-name>/<dev-name>
+> +
+> +			Configure default devlink eswitch mode for matching
+> +			devlink instances during device initialization.
+> +
+> +			<mode>:
+> +			legacy | switchdev | switchdev_inactive
+> +
+> +			Examples:
+> +			devlink_eswitch_mode=[*]:switchdev
+> +			devlink_eswitch_mode=[pci/0000:08:00.0]:switchdev
+> +			devlink_eswitch_mode=[pci/0000:08:00.0,pci/0000:09:00.1]:legacy
+> +
+> +			See Documentation/networking/devlink/devlink-defaults.rst
+> +			for the full syntax.
+> +
+>  	dfltcc=		[HW,S390]
+>  			Format: { on | off | def_only | inf_only | always }
+>  			on:       s390 zlib hardware support for compression on
 
-(iov_iter came a couple of years later, but it then took many many
-years for it to become the powerful thing it is today where you can
-put almost arbitrary data into it - it started as purely a user space
-iovec iterator, all the bvec/kvec etc stuff that you need for IO
-buffering came a decade later)
 
-So there's historical reasons for the use of pipes, but there really
-is a very fundamental reason for it too: wanting to *generic* data
-transfer between two points, not sendfile.
+-- 
+~Randy
 
-It's worth noticing that in the generic case, zero-copy isn't really
-even an issue.
-
-When you think operations like "splice TV capture input to a pipe",
-you typically need to allocate the pages that you then DMA into
-*anyway*, and you'd just put those pages into the pipe. And the facty
-that you can then just take the data directly from those pages when
-you splice from the pipe to whatever GPU engine that does the decoding
-is kind of secondary.
-
-So again: the big deal with splice() and the pipe isn't really about
-zero-copy. It's the in-kernel buffers where the drivers control the
-allocation and you don't have some "user space allocates memory, then
-kernel looks that allocation up and uses it" model.
-
-Having less copies is kind of incidental. It *might* happen just
-because it's natural when some streaming device just gives it data
-away and doesn't care after the fact.
-
-The problem with splicing from a file has been exactly the fact that
-it's *not* streaming data, and the filesystem zero-copy case gave
-direct access to the long-term cache.
-
-Which is undoubtedly good for performance. But it fundamentally
-*requires* that the sink is trustworthy. Which has been problematic.
-
-That's why sendfile() is bad. Not because splice itself is a bad
-concept, but because you have to have that absolute trust across
-components.
-
-          Linus
 
