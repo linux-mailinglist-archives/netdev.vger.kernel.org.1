@@ -1,317 +1,295 @@
-Return-Path: <netdev+bounces-294683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id F9F5K/vqH2qHsQAAu9opvQ
-	(envelope-from <netdev+bounces-294683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:51:07 +0200
+	id kTMpOUznH2p8sAAAu9opvQ
+	(envelope-from <netdev+bounces-294684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:35:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A940635DEA
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:51:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43D61635BF3
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 10:35:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=Z4NfPU9P;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294683-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294683-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=tu-berlin.de header.s=dkim-tub26 header.b=bGLabq9j;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294684-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294684-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=tu-berlin.de;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 071853083EFD
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 08:24:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F993315A767
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 08:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2708A41B365;
-	Wed,  3 Jun 2026 08:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19564219F8;
+	Wed,  3 Jun 2026 08:28:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECAC38399B
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 08:24:51 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780475093; cv=pass; b=NS5DyNapsOHFxles7b+leyFxcggxKHEVRXBhyx1sO+IdtoO2C+/SiNHACp8nmQEaJ0ZFCxNDQ1/YvHxBZfc5VzbEpnzmwT+rwtGMNSHWEBmDUS/rOFBxgvnxZ6YIMfyQcwbTF5Sp7aysGHcTHQ9R7Bt0eQGTsQkxwzkWClDhjRA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780475093; c=relaxed/simple;
-	bh=WmS2dRcTi3iMV+pvAjFVj9qUbxO+ZRHW3bXCpYLdG5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Paef3IBRmGC6mYteMDZXYyXki+tx3uqWy3APctrdaxFC5ylSRSdc3mIahF7FgtHipAfq+zdgygLphQ9VhYsST/31cbPXWxJlpcTI9x0BjYWiqvnIMn/tDM44kMtVRlRcto09AYCwyFoNnWPNfDjNCr0/x04S1+0ozud1yoBxGgw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=Z4NfPU9P; arc=pass smtp.client-ip=209.85.210.174
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8423b08b293so1505742b3a.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 01:24:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780475091; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CuAIn+5I1xHmX9lLSBErFuO0pIZi1sn73u2EGkTmbCVWuG8Znn6YTteOkGzgMkGATR
-         +TTA9bRUOFWdmTtG3w3MpyMFHNzFeWqNyv7l9wIuHHuf+FMUaWgigyepAJJ+LNMLwjxx
-         MGeY0UDkp9tW/42uBinf60DurO9yVWArO3euRvkdJvGcsZYW63u1TnLw1JWGPW9w4R2X
-         dSWfy/cerixDU6QgPH3Og/GrFShxoTueKPdfEVXtG0oWQ0/WBdeYSFzvn8HohNkPibiM
-         HJFZBy8gi7JG6SzHG2IN6I5tFVZu1SsnDEW7Y3tPi9Jfhu79IfXDBTeguhdjV2E2VS2t
-         QSiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=u/DAvsSXfJEi3I1lBSq3kuZRsfa7fKGNmssgOv2Y58o=;
-        fh=6/7L4Ce17rxOlSVcLbfenBz4vYjI/U3Ipf7o/fOH7tc=;
-        b=f5reWEOjwYiXs+4X8yq0VcgqPPLELs6eiqkXpL8t6gNa/GTUA7yA6KoRL3NY3wcH9Z
-         8ggSTCfO+BNIqb6dwaHxiFxHXtnlci9TKMhdtVZVKU4Pe1ZSBUhus05j4qJbzmvjK8LX
-         AKPPqaZLNu8rseSSdlBITufj4cWHzRnPgYuqF5eJ9nvS7cX1jwDO97nwI82c/sX9qEpu
-         LFxwJ/xqryHnn9RrmcQD5K7sVvWeVe3ClFM7pIu4pwLvNOnpcwz/1Un6/FJ6m64ofd+W
-         2Sg387fGrYfkzqd0XITen7vOf1a2m9YyKr7VVJ9Kvi9aIkuxV5JSf9948FuiMxSMGw1V
-         ZZ0A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1780475091; x=1781079891; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u/DAvsSXfJEi3I1lBSq3kuZRsfa7fKGNmssgOv2Y58o=;
-        b=Z4NfPU9P2vkwu/LNtRB6lQTR833p/T3E1I2J1hWDdA/GQv5AGFD5EO+mP5GFIFxKKg
-         m461QJVhtIGreKNr1k0u2P0S/HUQGeIxuX6LEfwsvY/mLHGvt0uIJGiMBgcuFyjKhd6X
-         UyqolOfeoD82IDYmopHwb3pGazPghT+Xuqww4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780475091; x=1781079891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=u/DAvsSXfJEi3I1lBSq3kuZRsfa7fKGNmssgOv2Y58o=;
-        b=ppdlNbXCzSj+XnPElwA/iJc5duEVJ41v0/yst1plNe3MDHKb0r/6rRN8eJffoSQwnz
-         O6U2nL7p4u8S+f4H3KDJHvBNOAw091yisuYAlSOQyOs3GoUAGpMAHQJOumvZc4/0nx1m
-         RwE6V+rGJE0np0/QHNSuwliHR1HNUe3n5woE55i2YtEuqK9W6NwfDcVT4T3WNUWtqG4T
-         jBPj1W7eeXhaDFzxy6Q1H0DeL2d9Soi0Q95ykLED3QeQ9hICt8j2PuExeA+ruTFWC1Iv
-         gmSOfJGFNfStAfK19Y4ro34MQZtKnFFfZdPGV6uU06o2tOFU4DnwEEOCRbOPHJ1Bo93t
-         MxZQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8s5K3jR+hhgRj+hezPiadZiY776TXb8nBClnV3k0rTMHZonPJCvOe3nQwUbH94A3tNMLRKDBg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvcLgMOXi2NUxZPs6AF+CnPVIOcEZdXupQXqmYgJ94tBp5ThOc
-	9Dt/9Mz8thMMl7DCYDcO4t0mxVAAGYBrkeRpNIBp0H93pN1GVBeQL4DoLSCyzEKdxJUrOxB0XM7
-	PZvrtD0FRjgNYilGVBBNvHE1IEOYOQ/2nyQnsuo2D
-X-Gm-Gg: Acq92OECzG2kgK1hStJOay8JIja2JMtvl3dIEn8clJpV9aQIO25mYWDBimQNtqkIbP5
-	bpHpcZmOmJZ/AL4uCR5G6CVbljrv06oowMhHXxxSKSMrfCaC37S0I3UQa7h+iu4rig1gLoH9yyE
-	McNKUWJJZXh13+7EEXD2e0BWfh2KqBB+ailgEmsISGyL0hNzQADgNh64+rYANFK/x3gQ4rVrZhM
-	V6/jCQl7yOuUXtdS1iBgw3SBoSHeQCNJkwW2xaVRYYgzkhYR4TQ1j/CGO/hAgRPA0PHtEEng6LP
-	/509lM0TgJPzMJcUKa8=
-X-Received: by 2002:a05:6a00:c84:b0:82a:7893:e14b with SMTP id
- d2e1a72fcca58-84284f373d2mr2313922b3a.38.1780475090554; Wed, 03 Jun 2026
- 01:24:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1D3421F0E;
+	Wed,  3 Jun 2026 08:28:16 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780475301; cv=none; b=jUNGJ25+d5sne6hu/DFpE/qwhAwS/z4coYdaQftcFtWLuqyHB6gVnwl7pAyl6gMap3UzZ2r6p5Ha9geGubZg3qio1kP8vka3kt32TGkxZv88vaTCySWriv7fM167wVU9yBVf4LkilV7eSGolTp+PGDGRRF+OEiUoI74VBxfEEFc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780475301; c=relaxed/simple;
+	bh=NbiC0nkA2E7pSau2zZGMlE9xqPeX2IqbAUQsvrU6Bdo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ak6bfi3M3TimZwdir2OunEu2XgQe7VxfiGnPl0/Q0jv9+YmFuWYTAP/Cm5ha16GZO/AZGOUNrfpb2sdJwjRdA5UndouS8a4phygdJlrB5O5pDu7h9rEzNLijs4kg/sqnC+VfplQ5lm8/p12cz94QX3KSkUXIhTQYIxczCcOO3rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=bGLabq9j; arc=none smtp.client-ip=130.149.7.70
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
+  d=tu-berlin.de; s=dkim-tub26; t=1780475297;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kllgp+5e73EpTFd+zeCHCvSfGkA31GpIR6WCqaIcFYU=;
+  b=bGLabq9jo/OVRTyO3uXNG8dJaIty5xez12hWtKgkPyrRPph5qfubEPr3
+   RSrYa8NoEGM/mbDL5OxXLuSdKfQC/GRZz6pLONX6MDoGVywe7yTNQVzuQ
+   Ps0FVMdvY05L+pphcN4jsov1YxBRbxCiK3nFFSAPk/4aRAtj0scXK3hBK
+   twOKPWQxTrMhNtw4hV9GVehY5eqSmXbqSTyvoC25BCyhqUZHBoK8/ByO3
+   S88Tsk6UftZsiFEMDsXGM23r+yBQdgrMwSzlfZco/TGEwDVj2TYXPZHnH
+   FSlhGLKJe3xTJZcXt4aoGjTg7Aoc22cDtDrYdWjZl1YMbdfCrdB3kJPKS
+   Q==;
+X-CSE-ConnectionGUID: 7lZ8/bCBQd6v7vxaYyTgZw==
+X-CSE-MsgGUID: /O3ohytHQYy/kO1DtP16cw==
+X-IronPort-AV: E=Sophos;i="6.24,184,1774306800"; 
+   d="scan'208";a="48183097"
+Received: from bulkmail.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.143])
+  by mailrelay.tu-berlin.de with ESMTP; 03 Jun 2026 10:28:09 +0200
+Message-ID: <866cd367-5d53-46c3-b2f8-b0989a1d462d@tu-berlin.de>
+Date: Wed, 3 Jun 2026 10:28:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAN2cbVe79oj0O9==m4+4x3v+O+qzRagA=2=wkrp9i9=CqYvyZA@mail.gmail.com>
-In-Reply-To: <CAN2cbVe79oj0O9==m4+4x3v+O+qzRagA=2=wkrp9i9=CqYvyZA@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 3 Jun 2026 04:24:39 -0400
-X-Gm-Features: AVHnY4J6KNSRXKe7B3hHvGoZR8gyihsZrwMDHFF6g4EqgO8yA5vqJ86v3JPsTlQ
-Message-ID: <CAM0EoM=Fs7bA9JdxUWkD=Yi8_cKBAsAhx5Rg=VAYOWpn-mR4GA@mail.gmail.com>
-Subject: Re: [BUG] net/sched: HFSC + fq_codel stall on 6.6.116
- (qdisc_tree_reduce_backlog / qlen_notify)
-To: Anirudh Gupta <anirudhrudr@gmail.com>
-Cc: "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Anirudh Gupta <Anirudh.gupta@sophos.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
+ coalescing via ethtool tx-usecs
+To: Simon Schippers <simon.schippers@tu-dortmund.de>, <hawk@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+References: <20260527135418.1166665-1-hawk@kernel.org>
+ <20260527135418.1166665-6-hawk@kernel.org>
+ <2affe9f4-56a7-4482-931f-9d98cfdf09fd@tu-berlin.de>
+ <db5b7f7e-135c-40f0-a740-057bc6623e6c@tu-dortmund.de>
+ <865f31e5-4e90-4dc0-890f-b5796948b590@tu-berlin.de>
+ <55b23925-9676-4005-8c13-ea7001190abb@tu-dortmund.de>
+ <e3d28da7-0fe3-4970-865c-9f51346e01fd@tu-berlin.de>
+ <53dc682c-f3df-485a-91f6-74212554cd10@tu-dortmund.de>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
+Autocrypt: addr=j.koeppeler@tu-berlin.de; keydata=
+ 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
+In-Reply-To: <53dc682c-f3df-485a-91f6-74212554cd10@tu-dortmund.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anirudhrudr@gmail.com,m:xiyou.wangcong@gmail.com,m:netdev@vger.kernel.org,m:Anirudh.gupta@sophos.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[mojatatu.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294684-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:hawk@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,sophos.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[tu-berlin.de:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-294683-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
+	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,mojatatu.com:from_mime,mojatatu.com:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6A940635DEA
+X-Rspamd-Queue-Id: 43D61635BF3
 
-Hi Anirudh,
+On 6/2/26 17:37, Simon Schippers wrote:
+> On 6/2/26 09:24, Jonas Köppeler wrote:
+>> On 6/1/26 6:16 PM, Simon Schippers wrote:
+>>
+>>> On 6/1/26 16:03, Jonas Köppeler wrote:
+>>>> On 6/1/26 2:00 PM, Simon Schippers wrote:
+>>>>> On 5/28/26 09:46, Jonas Köppeler wrote:
+>>>>>> On 5/27/26 3:54 PM, hawk@kernel.org wrote:
+>>>>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>>>
+>>>>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
+>>>>>>> excessive NAPI scheduling overhead and qdisc requeues.
+>>>>>>>
+>>>>>>> Accumulate BQL completions and flush them when a configurable time
+>>>>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
+>>>>>>> queuing delay to the configured interval. Coalescing state persists
+>>>>>>> across NAPI polls in struct veth_rq so completions can accumulate
+>>>>>>> beyond a single budget=64 cycle.
+>>>>>>>
+>>>>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
+>>>>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
+>>>>>>> completion.
+>>>>>>>
+>>>>>>>       ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
+>>>>>>>       ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
+>>>>>>>
+>>>>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>> Tested-by: Jonas Köppeler<j.koeppeler@tu-berlin.de>
+>>>>>>
+>>>>> Thanks for your testing!
+>>>>>
+>>>>> However, I have issues reproducing.
+>>>>> I run bare metal (without virtme) with v6 + your pktgen patch
+>>>>> and I am on the branch pktgen-and-benchmark, commit
+>>>>> "results: add veth-bql measurements":
+>>>>>
+>>>>> 1. ping fails with 100% packet loss ~20% of the times with --pktgen.
+>>>>>       When this happens the avg ping of this run is mistakenly set
+>>>>>       to 0.0 ms, which distorts the results.
+>>>>>       I fixed it locally by rerunning when this happens.
+>>>>>
+>>>>> 2. pktgen runs with > 3 Mpps even with --nrules 10000, see log below.
+>>>>>       I see that this is because of qdisc drops.
+>>>>>       I also tried pfifo and sfq but with the same result.
+>>>>>       I spent quite some time on it but I do not know a fix.
+>>>>>
+>>>>> Do you have an idea?
+>>>>> Thanks!
+>>>> Hi,
+>>>> yes there are some changes missing in the test script.
+>>>> I have pushed it now, sorry. This should fix 1.
+>>> I pulled it and ran...
+>>>
+>>> sudo ./veth_bql_sweep.sh --runs 1 --pktgen --duration 20 --qdisc fq_codel --no-bpftrace
+>>>
+>>> ... but still 8/32=1/4 of the pings are zero, I do not see
+>>> a pattern.
+>>>
+>>>
+>>> I grabbed the logs from /tmp and this is what a failing
+>>> ping looks like:
+>>>
+>>> PING 10.99.0.2 (10.99.0.2) 56(84) bytes of data.
+>>>
+>>> --- 10.99.0.2 ping statistics ---
+>>> 97 packets transmitted, 0 received, 100% packet loss, time 19967ms
+>>>
+>>>
+>>> Feels like a race or something..
+>>> Can you reproduce with the exact command?
+>>> I think you need --runs 1, else it just averages over multiple
+>>> runs.
+>> Sorry, no I could not reproduce this. I used the exact same
+>> command as you did, and I am using net-next/main + v6 patches.
+>> I have 0% ping loss across all tests. Does the ping loss
+>> happen regardless of the qdisc?
+>>
+> Yes, it happens for each qdisc I tested.
+> As a fix I changed the script to rerun if this happens.
 
-On Tue, Jun 2, 2026 at 3:12=E2=80=AFPM Anirudh Gupta <anirudhrudr@gmail.com=
-> wrote:
->
-> Hi,
->
-> Linux 6.6.116 can permanently stall traffic under this qdisc tree on ifb0=
-:
->          HTB =E2=86=92 prio =E2=86=92 HFSC (class 1:a, RT 320Kbit) =E2=86=
-=92 fq_codel
->
-> Symptom:
->   tc -s shows hfsc/fq_codel backlog stucks while Sent byte/packet
-> counters do not increase for 30+ seconds. No kernel oops.
->
-> Steps to reproduce:
-> 1) Use attached script =E2=80=98apply_tc_tree.sh=E2=80=99 to create the r=
-equired tc qdisc tree.
-> 2) Send bulk short lived tcp connections, on the interface whose
-> traffic is mirred to ifb0 interface for rate limiting.
-> 3) Observe that the sent bytes in class statistics get stuck, while
-> the backlog counter keeps on increasing -
->
->
-> ---captured output---
-> kabir@KABIR-CL-2:~$ date
-> Tue Jun  2 06:29:11 AM UTC 2026
-> kabir@KABIR-CL-2:~$ cat /proc/version
-> Linux version 6.6.116-0606116-generic (kernel@balboa)
-> (x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, GNU ld
-> (GNU Binutils for Ubuntu) 2.42) #202511021338 SMP PREEMPT_DYNAMIC Sun
-> Nov  2 14:08:04 UTC 2025
-> kabir@KABIR-CL-2:~$
-> kabir@KABIR-CL-2:~$ uname -a
-> Linux KABIR-CL-2 6.6.116-0606116-generic #202511021338 SMP
-> PREEMPT_DYNAMIC Sun Nov  2 14:08:04 UTC 2025 x86_64 x86_64 x86_64
-> GNU/Linux
-> kabir@KABIR-CL-2:~$ tc -s qdisc show dev ifb0 | tee /tmp/stall-before.txt
-> qdisc htb fffe: root refcnt 2 r2q 10 default 0x1 direct_packets_stat 0
-> direct_qlen 32
->  Sent 80337622 bytes 937086 pkt (dropped 4541, overlimits 4505 requeues 0=
-)
->  backlog 27760b 171p requeues 0
-> qdisc fq_codel a: parent 1:a limit 10240p flows 1024 quantum 1514
-> target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64
->  Sent 80338354 bytes 937034 pkt (dropped 4541, overlimits 0 requeues 0)
->  backlog 27760b 171p requeues 0
->   maxpacket 7570 drop_overlimit 0 new_flow_count 3438 ecn_mark 0
-> memory_used 639744
->   new_flows_len 7 old_flows_len 1
-> qdisc prio fffd: parent fffe:1 bands 8 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 =
-0 0 0
->  Sent 80337622 bytes 937086 pkt (dropped 4541, overlimits 0 requeues 0)
->  backlog 27760b 171p requeues 0
-> qdisc hfsc 1: parent fffd:1 default fffc
->  Sent 80337622 bytes 937086 pkt (dropped 4541, overlimits 1879582 requeue=
-s 0)
->  backlog 27760b 171p requeues 0
-> qdisc fq_codel 9: parent 1:9 limit 10240p flows 1024 quantum 1514
-> target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64
->  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
->  backlog 0b 0p requeues 0
->   maxpacket 0 drop_overlimit 0 new_flow_count 0 ecn_mark 0
->   new_flows_len 0 old_flows_len 0
-> qdisc fq_codel fffc: parent 1:fffc limit 10240p flows 1024 quantum
-> 1514 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64
->  Sent 2296 bytes 54 pkt (dropped 0, overlimits 0 requeues 0)
->  backlog 0b 0p requeues 0
->   maxpacket 70 drop_overlimit 0 new_flow_count 2 ecn_mark 0
->   new_flows_len 0 old_flows_len 2
-> kabir@KABIR-CL-2:~$
-> kabir@KABIR-CL-2:~$ tc -s class show dev ifb0 | grep -A6 "hfsc 1:a" |
-> tee /tmp/stall-class-before.txt
-> class hfsc 1:a parent 1:1 leaf a: rt m1 0bit d 0us m2 320Kbit ls m1
-> 0bit d 0us m2 1Kbit ul m1 0bit d 0us m2 480Kbit
->  Sent 80335326 bytes 937032 pkt (dropped 0, overlimits 0 requeues 0)
->  backlog 27760b 171p requeues 0
->  period 7484 work 80335326 bytes rtwork 53590324 bytes level 0
-> class hfsc 1:fffc parent 1:1 leaf fffc: rt m1 0bit d 0us m2 8Kbit ls
-> m1 0bit d 0us m2 1Kbit ul m1 0bit d 0us m2 800Mbit
->  Sent 2296 bytes 54 pkt (dropped 0, overlimits 0 requeues 0)
-> kabir@KABIR-CL-2:~$
-> kabir@KABIR-CL-2:~$ sleep 30
-> kabir@KABIR-CL-2:~$
-> kabir@KABIR-CL-2:~$ date
-> Tue Jun  2 06:30:39 AM UTC 2026
-> kabir@KABIR-CL-2:~$ tc -s qdisc show dev ifb0 | tee /tmp/stall-after.txt
-> qdisc htb fffe: root refcnt 2 r2q 10 default 0x1 direct_packets_stat 0
-> direct_qlen 32
->  Sent 80337748 bytes 937089 pkt (dropped 4541, overlimits 4505 requeues 0=
-)
->  backlog 28204b 177p requeues 0
-> qdisc fq_codel a: parent 1:a limit 10240p flows 1024 quantum 1514
-> target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64
->  Sent 80338354 bytes 937034 pkt (dropped 4541, overlimits 0 requeues 0)
->  backlog 28204b 177p requeues 0
->   maxpacket 7570 drop_overlimit 0 new_flow_count 3438 ecn_mark 0
-> memory_used 669696
->   new_flows_len 7 old_flows_len 1
-> qdisc prio fffd: parent fffe:1 bands 8 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 =
-0 0 0
->  Sent 80337748 bytes 937089 pkt (dropped 4541, overlimits 0 requeues 0)
->  backlog 28204b 177p requeues 0
-> qdisc hfsc 1: parent fffd:1 default fffc
->  Sent 80337748 bytes 937089 pkt (dropped 4541, overlimits 1879731 requeue=
-s 0)
->  backlog 28204b 177p requeues 0
-> qdisc fq_codel 9: parent 1:9 limit 10240p flows 1024 quantum 1514
-> target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64
->  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
->  backlog 0b 0p requeues 0
->   maxpacket 0 drop_overlimit 0 new_flow_count 0 ecn_mark 0
->   new_flows_len 0 old_flows_len 0
-> qdisc fq_codel fffc: parent 1:fffc limit 10240p flows 1024 quantum
-> 1514 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64
->  Sent 2422 bytes 57 pkt (dropped 0, overlimits 0 requeues 0)
->  backlog 0b 0p requeues 0
->   maxpacket 70 drop_overlimit 0 new_flow_count 2 ecn_mark 0
->   new_flows_len 0 old_flows_len 2
-> kabir@KABIR-CL-2:~$
-> kabir@KABIR-CL-2:~$ tc -s class show dev ifb0 | grep -A6 "hfsc 1:a" |
-> tee /tmp/stall-class-after.txt
-> class hfsc 1:a parent 1:1 leaf a: rt m1 0bit d 0us m2 320Kbit ls m1
-> 0bit d 0us m2 1Kbit ul m1 0bit d 0us m2 480Kbit
->  Sent 80335326 bytes 937032 pkt (dropped 0, overlimits 0 requeues 0)
->  backlog 28204b 177p requeues 0
->  period 7484 work 80335326 bytes rtwork 53590324 bytes level 0
-> class hfsc 1:fffc parent 1:1 leaf fffc: rt m1 0bit d 0us m2 8Kbit ls
-> m1 0bit d 0us m2 1Kbit ul m1 0bit d 0us m2 800Mbit
->  Sent 2422 bytes 57 pkt (dropped 0, overlimits 0 requeues 0)
-> kabir@KABIR-CL-2:~$
-> ---captured output end ---
->
-> Notice that, only backlog increased for class hfsc 1:a from 'backlog
-> 27760b' to 'backlog 28204b', however, sent bytes remained stuck at
-> 'Sent 80335326 bytes 937032 pkt'
-> Existing connections get stalled, and new connections never get establish=
-ed.
->
-> This was working fine till v6.6.49, and I started to notice it once I
-> moved to v6.6.116.
-> Suspected commits introduced in 6.6.49..6.6.116:
->     2f9761a94bae codel: remove sch->q.qlen check before
-> qdisc_tree_reduce_backlog()
->     f680a4643c6f net/sched: Always pass notifications when child class
-> becomes empty
->
-> Analysis: fq_codel calls qdisc_tree_reduce_backlog() when child qlen=3D=
-=3D0
->   after codel drops; hfsc_qlen_notify() removes class from eltree while H=
-FSC
->   still has queued packets; subsequent enqueues do not re-activate the cl=
-ass.
->
-> Workaround: reverting commit 2f9761a94bae
-> (https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/=
-?id=3D2f9761a94bae)
-> alone fixes the stall on the same repro steps.
->
+I was able to reproduce it and I think it is because you are lacking
+support of the qdiscs, and thus you will fallback to pfifo, this
+explains why it occasionally will drop all packets.
 
-Thanks for the excellent report.
-Reverting is not a good option at this point - will look at it and see
-how to address this.
+>
+> With that I ran the benchmark and also created a script to have
+> the result as an ASCII table.
+> I think it would make sense to include something like this in
+> the commit message.
+>
+> Throughput (pps)
+> ==================================================
+> nrules |   0us | 100us | 1000us | 10000us || stock
+> -------+-------+-------+--------+---------++------
+>       0 | 1.65M | 1.75M |  1.74M |   1.74M || 1.73M
+>     100 |  684K |  755K |   730K |    728K ||  744K
+>    1000 |  119K |  126K |   126K |    125K ||  126K
+>   10000 |   13K |   12K |    13K |     13K ||   13K
+>
+>
+> Ping RTT ms (avg)
+> ==================================================
+> nrules |   0us | 100us | 1000us | 10000us || stock
+> -------+-------+-------+--------+---------++------
+>       0 | 0.016 | 0.138 |  0.137 |   0.135 || 0.133
+>     100 | 0.029 | 0.185 |  0.310 |   0.315 || 0.310
+>    1000 | 0.137 | 0.321 |   1.66 |    1.81 ||  1.78
+>   10000 |  1.22 |  1.87 |   3.02 |    16.0 ||  17.2
 
-cheers,
-jamal
+Yes, good idea. I think we should report p99 + max_ping and not the avg.
+
+>
+>>>> Regarding 2.: do not look at the pktgen output, in the
+>>>> new version you will see something like "goodput",
+>>>> which is the number you should look for.
+>>>> Pktgen will report at what speed it enqueued packets in
+>>>> the qdisc.
+>>> Exactly. Now it works. Had a single outlier but apart from that
+>>> everything is fine.
+>>>
+>>> Thanks,
+>>> Simon
+>>>
+>>>> Let me know if it worked.
+>>>> Best,
+>>>> Jonas
+>>>>
 
