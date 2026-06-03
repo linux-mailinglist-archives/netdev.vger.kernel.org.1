@@ -1,216 +1,215 @@
-Return-Path: <netdev+bounces-294579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294582-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id T9X8Af7IH2qepwAAu9opvQ
-	(envelope-from <netdev+bounces-294579-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:26:06 +0200
+	id H56SOfnMH2o1qAAAu9opvQ
+	(envelope-from <netdev+bounces-294582-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:43:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53ABC634A37
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:26:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FC2634BD0
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:43:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=DMtGJOVW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294579-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294579-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=S9MeyWfr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294582-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294582-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96ED13110822
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:21:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C08A53007F73
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020863F9A1E;
-	Wed,  3 Jun 2026 06:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D1C314A73;
+	Wed,  3 Jun 2026 06:38:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E96331A7B
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 06:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8ED0286AC;
+	Wed,  3 Jun 2026 06:38:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780467663; cv=none; b=F6KWC3JuNs8BMw44ewXEc6txhE7e3s4W6466j4RUwcCUNqJIcSlVNmt+3Fvnd/onTdLUO3YxXcSdA+AOJvxXwWDsCRuHC4Eyag0AxCsZOnmsM+rH4qveSSlWPRIpXLZCt/2DSv2d2x4mQ7KyjdcRsfwH/l94FLVkoEyKMUn2DVU=
+	t=1780468682; cv=none; b=h8fUp2qa6Idk3eUZzI0AbC5NF2oa9t3MTWexka4RhVbrO9sf0oEEjsFeYWiLelJJJZ42i+2Xubs6g6ZKt9oc74CmZLaF5s/UNTJ+2PR669Hyr9fYEA01XZY7KrtNGvGwVJaFWAA7t7OxzsG+ZWzL6EBtqeI9VUXgQY9ThOUkRkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780467663; c=relaxed/simple;
-	bh=37dYseTBJ3qtvhHw84eO5OhCMorR8W7PuHtZbxgUvCU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZpSsB/80wSFM7nV+76TZAWR0W1L3GMuFadnYHCax/6wSSr+KZ4V3dSe+mlZv8V4J/02kKyu2hevjybkLNm9skR4rNRj2v7633m4Z3f27hoVkRWniS5p4Vvy8DkU9wW54nqqBWKFGtuzdo6q9KINjgmmFHaQS227HPxHFNaMxjoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DMtGJOVW; arc=none smtp.client-ip=209.85.160.201
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-5176cc5bf2aso21008391cf.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 23:21:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780467662; x=1781072462; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W61nrj3kd0RTpYPrBH9HWVse8n+RRFsy6wqLuJq3N8g=;
-        b=DMtGJOVW+58gXjZpv8DDu7sDDLQzMV0y3ZYqCaBBLE4RlHMjSZ5ErND4LbaAtHVJAq
-         mpXdnAOAAPEocmWKCgF0CVTjk5U64gLR2CoYEAiwwK44RXbNjqzEO8jpJ2zCufqvB3QD
-         lJvHR2XT08uCANNxGSliqooOxd0G8LITdwYkrJiON9pVPCEqYSA4EmB5vEvaWyPo5lt/
-         k7cixQzIeVvv4XFKxefTUYP6kxyd7a0QxMg8AYcd6BmLu5iOaT3k8dCkabrCCxH2JpjP
-         9SkqkQx9zrGtgJtgALQnREyoa2TdXo7jh2GOY+7CWwliwcTXli/QIjZBIc9cHplhVpa1
-         86SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780467662; x=1781072462;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W61nrj3kd0RTpYPrBH9HWVse8n+RRFsy6wqLuJq3N8g=;
-        b=scwFcbkQ8bix7y1Tiix8TgNWyoWVQMKMbJ2VTOG4ngnERO6XEFzT1yUJZtRdcjl7am
-         5coCuBRerQCsYElPbeQlEuBSeAYpfRfSAqvAOajCjbO8808c/9e9lu5S7UiNX26nOlME
-         2Fxmoo4h7eEWneUZ1e9Ar0NQSbi2hoqTqeSzgfFk1ET2DDLe+E0FVnKV3jAx+9TMXFnU
-         6lp8TnJ/7x7JC/uj0aDrhPJ+ED36CxT3grhHakZLWv3KWTanC6HgMdmWHwE6nsNGvX2g
-         Gjqvq5Mr/UgMQApdNWK1/CEOGbyd5V5K37RJc/2jfvRLLDqzGmrt1TBlaLZl/viN9c19
-         jnHg==
-X-Forwarded-Encrypted: i=1; AFNElJ/1rqyJgcMiKbVDreDdqfkDHTNj58/tIQ48cCHtaVX5vVRve0+mtZd34szKmraAcN/CIB2QoxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyThrKfNAtYjqralsssj/cvi+51GsF8CUzsDOf877POP87qCd/R
-	lvElACQMc/u8rLYc23WwvI+/iC7cU1yzJjHoXL7y1cjOq62PKFWwD3cTnRKrCfYW/TZ93Skzlyh
-	OGq98efQpWxZ1yw==
-X-Received: from qtns11.prod.google.com ([2002:ac8:528b:0:b0:517:710d:afde])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1391:b0:517:7063:49d4 with SMTP id d75a77b69052e-5177873be2bmr31841751cf.47.1780467661572;
- Tue, 02 Jun 2026 23:21:01 -0700 (PDT)
-Date: Wed,  3 Jun 2026 06:20:43 +0000
-In-Reply-To: <20260603062043.3911278-1-edumazet@google.com>
+	s=arc-20240116; t=1780468682; c=relaxed/simple;
+	bh=TcS8ozdvqYwuaxXS6ik7ii1gXzcBaJYB1U1kLQmazOo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tyeqbiss17eWOnlAYJVBtSZwqGH1dIXdHKD+bP0bwUVOwln0rmemYWh5IFs7AIeQ56JQz2Z/fDNMLMf0gklGRk0+KmOeSaTDz774exCJo1pTzLrzwesL8+UEZUWIJkfCNZDLgNOIMPnxoJGHFTL055znO7kZ1uKqxtsO6ItZq3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=S9MeyWfr; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6532CFtq1194256;
+	Tue, 2 Jun 2026 23:37:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=FGokJjgUyTvBTzBtrU9E3YF9B
+	uoWdrBav7kix/H9XlE=; b=S9MeyWfr3eEYeTJclaWg0C9xTOXJKebPi1U37qNXK
+	Mf03J7tcYVUz7m2H6Snb9HOT0A3Fz3eobtX/zopX/n+EpjBifooMDtEQ8UcO21Mn
+	XEKoX2XUS1x5prPQ4MApHIxRF6BESBTjf7Z+CxvYOiDHQ+Vi/BAwF55Fr4wJXj3H
+	pNblud8sC69tWT94Nfz0XsAR1RlDNwQXcesM9eow1mA2jk4hvkS1c4rp4nKTANlH
+	lCsS3v17JQOv5pdWVdnRWDRzzZAG/N/U6LU8QhzvUouXFy/ZgCU6VNUqmDAT0CRD
+	Bv3ljRkLDjx+r5Fe0j3/VOkLs/yIyLcNjIB947mv1GY6A==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ega3bc5tb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Jun 2026 23:37:40 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 2 Jun 2026 23:37:39 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 2 Jun 2026 23:37:39 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 35BF03F708D;
+	Tue,  2 Jun 2026 23:37:35 -0700 (PDT)
+Date: Wed, 3 Jun 2026 12:07:35 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH v18 net-next 5/8] octeontx2: cn20k: Coordinate default
+ rules with NIX LF lifecycle
+Message-ID: <ah_Lrz0aP4jAd9eR@rkannoth-OptiPlex-7090>
+References: <20260602060359.1894952-1-rkannoth@marvell.com>
+ <20260602060359.1894952-6-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260603062043.3911278-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
-Message-ID: <20260603062043.3911278-12-edumazet@google.com>
-Subject: [PATCH v2 net-next 11/11] bridge: read p->flags once in br_port_fill_attrs()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260602060359.1894952-6-rkannoth@marvell.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAzMDA2MSBTYWx0ZWRfX5YRr7pXVwnbZ
+ hcP+Px6RnJGQQ4FwA2DnGaqYndiUxy8sLX8W8sppv14Ydz1Ea0IGlul4m3+MzHRArmhw9mlfFvY
+ itLzZXbTsMAJNOVgiR3ZvNWyKV8a0JBfwc/90bnQ1X7oGO4PzklJBqtgNPm50scA3VyNcqxpTic
+ FkrLwLc38eMBzZOYxLLIOjfxrn7+diZpy3I1ze4BojuKywNPByLqzDfZfWlUc71Tfqe5n7k0yp5
+ x84l5LIe9Mmmf+0exQaQK84QnjU5lc+BA8D/6s5ua4G0NFDdiZTmT3SfRk3J/uCt0WTEecI1ZSz
+ CUXGiMsGCqDmxi1G5dGKlod6Az+u2ectx2ZMIeJ49usxJsRYT58ZrOCuV6R/FLZqZ4mRyc051GO
+ 0W/Rr/lo32TXnlknny6AlA0mwVFUbjJFpD8G8eOfDx3Q2v0eLgj7uYbRFe+qaQi0x/q/bZGCvCB
+ OREZD9qPVcrUFANHmXA==
+X-Authority-Analysis: v=2.4 cv=cLjQdFeN c=1 sm=1 tr=0 ts=6a1fcbb4 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=c92rfblmAAAA:8
+ a=M5GUcnROAAAA:8 a=_4monf2TZ0uLVZycb8gA:9 a=CjuIK1q_8ugA:10
+ a=GvGzcOZaWPEFPQC_NcjD:22 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: 5ABij7lqwmwIIBK5FfzOjZUjdlmOydo0
+X-Proofpoint-GUID: 5ABij7lqwmwIIBK5FfzOjZUjdlmOydo0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-03_02,2026-05-28_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294579-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-294582-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rkannoth-OptiPlex-7090:mid,marvell.com:dkim,marvell.com:from_mime,marvell.com:email,vger.kernel.org:from_smtp];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,blackwall.org,vger.kernel.org,gmail.com,google.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 53ABC634A37
+X-Rspamd-Queue-Id: 42FC2634BD0
 
-We might run br_port_fill_attrs() locklessly in the future.
+On 2026-06-02 at 11:33:56, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Add NIX_LF_DONT_FREE_DFT_IDXS so the PF can send NIX LF free during hw
+> reinit or teardown without the AF freeing CN20K default NPC rule indexes
+> while the driver still owns that state (otx2_init_hw_resources and
+> otx2_free_hw_resources).
+>
+> On CN20K, allocate default NPC rules from NIX LF alloc before
+> nix_interface_init, roll back with npc_cn20k_dft_rules_free on failure,
+> and free from NIX LF free when the new flag is not set. Tighten
+> rvu_mbox_handler_nix_lf_alloc error handling: use a single rc, propagate
+> qmem_alloc and other errors, and set -ENOMEM only when kcalloc fails
+> (remove the blanket -ENOMEM at the free_mem path).
+>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
- net/bridge/br_netlink.c | 41 +++++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
+https://sashiko.dev/#/patchset/20260602060359.1894952-1-rkannoth%40marvell.com says
 
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index ead66dbe1bb7679af18d5f0c2fdea6be2574727d..7cb24de9c77d3d15892723f77288c27a15a6a0ad 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -234,7 +234,8 @@ static inline size_t br_nlmsg_size(struct net_device *dev, u32 filter_mask)
- static int br_port_fill_attrs(struct sk_buff *skb,
- 			      const struct net_bridge_port *p)
- {
--	u8 mode = !!(p->flags & BR_HAIRPIN_MODE);
-+	unsigned long flags = READ_ONCE(p->flags);
-+	u8 mode = !!(flags & BR_HAIRPIN_MODE);
- 	struct net_bridge_port *backup_p;
- 	u64 timerval;
- 
-@@ -242,23 +243,23 @@ static int br_port_fill_attrs(struct sk_buff *skb,
- 	    nla_put_u16(skb, IFLA_BRPORT_PRIORITY, READ_ONCE(p->priority)) ||
- 	    nla_put_u32(skb, IFLA_BRPORT_COST, READ_ONCE(p->path_cost)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_MODE, mode) ||
--	    nla_put_u8(skb, IFLA_BRPORT_GUARD, !!(p->flags & BR_BPDU_GUARD)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_GUARD, !!(flags & BR_BPDU_GUARD)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_PROTECT,
--		       !!(p->flags & BR_ROOT_BLOCK)) ||
-+		       !!(flags & BR_ROOT_BLOCK)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_FAST_LEAVE,
--		       !!(p->flags & BR_MULTICAST_FAST_LEAVE)) ||
-+		       !!(flags & BR_MULTICAST_FAST_LEAVE)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_MCAST_TO_UCAST,
--		       !!(p->flags & BR_MULTICAST_TO_UNICAST)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_LEARNING, !!(p->flags & BR_LEARNING)) ||
-+		       !!(flags & BR_MULTICAST_TO_UNICAST)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_LEARNING, !!(flags & BR_LEARNING)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_UNICAST_FLOOD,
--		       !!(p->flags & BR_FLOOD)) ||
-+		       !!(flags & BR_FLOOD)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_MCAST_FLOOD,
--		       !!(p->flags & BR_MCAST_FLOOD)) ||
-+		       !!(flags & BR_MCAST_FLOOD)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_BCAST_FLOOD,
--		       !!(p->flags & BR_BCAST_FLOOD)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_PROXYARP, !!(p->flags & BR_PROXYARP)) ||
-+		       !!(flags & BR_BCAST_FLOOD)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_PROXYARP, !!(flags & BR_PROXYARP)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_PROXYARP_WIFI,
--		       !!(p->flags & BR_PROXYARP_WIFI)) ||
-+		       !!(flags & BR_PROXYARP_WIFI)) ||
- 	    nla_put(skb, IFLA_BRPORT_ROOT_ID, sizeof(struct ifla_bridge_id),
- 		    &p->designated_root) ||
- 	    nla_put(skb, IFLA_BRPORT_BRIDGE_ID, sizeof(struct ifla_bridge_id),
-@@ -272,22 +273,22 @@ static int br_port_fill_attrs(struct sk_buff *skb,
- 	    nla_put_u8(skb, IFLA_BRPORT_TOPOLOGY_CHANGE_ACK,
- 		       p->topology_change_ack) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_CONFIG_PENDING, READ_ONCE(p->config_pending)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_VLAN_TUNNEL, !!(p->flags &
-+	    nla_put_u8(skb, IFLA_BRPORT_VLAN_TUNNEL, !!(flags &
- 							BR_VLAN_TUNNEL)) ||
- 	    nla_put_u16(skb, IFLA_BRPORT_GROUP_FWD_MASK, p->group_fwd_mask) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_NEIGH_SUPPRESS,
--		       !!(p->flags & BR_NEIGH_SUPPRESS)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_MRP_RING_OPEN, !!(p->flags &
-+		       !!(flags & BR_NEIGH_SUPPRESS)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_MRP_RING_OPEN, !!(flags &
- 							  BR_MRP_LOST_CONT)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_MRP_IN_OPEN,
--		       !!(p->flags & BR_MRP_LOST_IN_CONT)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_ISOLATED, !!(p->flags & BR_ISOLATED)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_LOCKED, !!(p->flags & BR_PORT_LOCKED)) ||
--	    nla_put_u8(skb, IFLA_BRPORT_MAB, !!(p->flags & BR_PORT_MAB)) ||
-+		       !!(flags & BR_MRP_LOST_IN_CONT)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_ISOLATED, !!(flags & BR_ISOLATED)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_LOCKED, !!(flags & BR_PORT_LOCKED)) ||
-+	    nla_put_u8(skb, IFLA_BRPORT_MAB, !!(flags & BR_PORT_MAB)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_NEIGH_VLAN_SUPPRESS,
--		       !!(p->flags & BR_NEIGH_VLAN_SUPPRESS)) ||
-+		       !!(flags & BR_NEIGH_VLAN_SUPPRESS)) ||
- 	    nla_put_u8(skb, IFLA_BRPORT_NEIGH_FORWARD_GRAT,
--		       !!(p->flags & BR_NEIGH_FORWARD_GRAT)))
-+		       !!(flags & BR_NEIGH_FORWARD_GRAT)))
- 		return -EMSGSIZE;
- 
- 	timerval = br_timer_value(&p->message_age_timer);
--- 
-2.54.0.1013.g208068f2d8-goog
+>>  	/* Alloc NIX RQ HW context memory and config the base */
+>>  	hwctx_size = 1UL << ((ctx_cfg >> 4) & 0xF);
+>> -	err = qmem_alloc(rvu->dev, &pfvf->rq_ctx, req->rq_cnt, hwctx_size);
+>> -	if (err)
+>> +	rc = qmem_alloc(rvu->dev, &pfvf->rq_ctx, req->rq_cnt, hwctx_size);
+>> +	if (rc)
+>>  		goto free_mem;
+>>
+>>  	pfvf->rq_bmap = kcalloc(req->rq_cnt, sizeof(long), GFP_KERNEL);
+>> -	if (!pfvf->rq_bmap)
+>> +	if (!pfvf->rq_bmap) {
+>> +		rc = -ENOMEM;
+>>  		goto free_mem;
+>> +	}
+>This is a pre-existing issue, but can repeated mailbox messages cause a memory
+>leak here?
+>If an untrusted VF continuously sends MBOX_MSG_NIX_LF_ALLOC messages without
+>sending a corresponding NIX_LF_FREE, it appears qmem_alloc() and kcalloc()
+>will overwrite the pointers in the pfvf structure (like pfvf->rq_ctx and
+>pfvf->rq_bmap) without freeing the previously allocated memory.
+>Could this be used by a guest to cause host DMA or heap memory exhaustion?
+Prexisting issue, not addressing as part of this. May be a hardening series post this series,
+or patch to introduce some limit  can be planned.
 
+>> +	rc = nix_interface_init(rvu, pcifunc, intf, nixlf, rsp,
+>> +				!!(req->flags & NIX_LF_LBK_BLK_SEL));
+>> +	if (rc)
+>> +		goto free_dft;
+>>
+>>  	/* Disable NPC entries as NIXLF's contexts are not initialized yet */
+>>  	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
+>> @@ -1699,9 +1712,12 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
+>>
+>>  	goto exit;
+>>
+>> +free_dft:
+>> +	if (is_cn20k(rvu->pdev))
+>> +		npc_cn20k_dft_rules_free(rvu, pcifunc);
+>Does this rollback path accidentally destroy pre-existing default rules?
+>If the PF preserved the rules using NIX_LF_DONT_FREE_DFT_IDXS during teardown,
+>npc_cn20k_dft_rules_alloc() returns 0 without allocating anything when they
+>are already installed:
+>npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
+>{
+>    ...
+>    ret = npc_cn20k_dft_rules_idx_get(rvu, pcifunc, &b, &m, &p, &u);
+>    if (!ret) {
+>        dev_dbg(rvu->dev, "default rules are already installed...");
+>        return 0;
+>    }
+>    ...
+>}
+>If nix_interface_init() subsequently fails, the error handler jumps to free_dft
+>and unconditionally frees the rules.
+Even if it is freed, next successful nix lf alloc, will setup these default rules.
+
+We can modify npc_cn20k_dft_rules_alloc() to add one more paremeter (bool &) to indicate whether newly/already
+allocated status. Based on the flag, invoke npc_cn20k_dft_rules_free(). Will take it up as
+hardening series after the series is merged.
 
