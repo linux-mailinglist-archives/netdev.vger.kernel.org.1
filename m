@@ -1,225 +1,138 @@
-Return-Path: <netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294533-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nfyWCe6WH2oRngAAu9opvQ
-	(envelope-from <netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:52:30 +0200
+	id POEbMFCYH2pVngAAu9opvQ
+	(envelope-from <netdev+bounces-294533-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:58:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 224D0633B89
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:52:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA258633BD0
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 04:58:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294532-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=dsaVZKFS;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294533-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-294533-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 473853003BF9
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:52:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 072873022275
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 02:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A45E3D8115;
-	Wed,  3 Jun 2026 02:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C5B3DCDA1;
+	Wed,  3 Jun 2026 02:58:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE25F191F98
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 02:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4E33DC4CC;
+	Wed,  3 Jun 2026 02:58:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780455144; cv=none; b=Y7kFJCo/VCEFu9bTYmcqyX5FPabrusjBnugLVFH56Dxb6bs4t8F50BQK9pF7kVh6N/OpCsXqce8RQRL2LFOd4wCbob0Nn17IaswuFCWw3KgaTPa26mzHRKoh664hg4k+oqDfZ+6rnVJPxJPcxuzdQf80x8WrXd0zuwHuMbw6YdY=
+	t=1780455484; cv=none; b=dXc3QfKZfw0Irwvwp1zCjtrFknwi8GP/aIxfybZSl1GleTr0tha83ffo2XCuxAFq8F//LmMEPrMJeff71ratidhNcT9Zxkr/XznArd5NJ26zRgEJZbC4yaU6J2MgwuF5ZZaDj5ZAVpZJawmHoXgMuyLRj8x8y7zO9/V3K6k6sYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780455144; c=relaxed/simple;
-	bh=Q6eR0SAT/uKHN/6h7YuGqZBEURlSyy2gNsq2bj3TXiY=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kh5s9wC7t9BNOoMkUBFdidrGG3yFC92JBrskoM7oj6AWyDSJf/I+7nvKPh7GYdYutYKCFtOn5kIHBGm4jGanodHZCl8y4LWHAkrzm0FSyWasOZJZeqK/8/7/IXUwm1vCDCzyENGzOaqWBvlJgEn7KxhjPxftnCV3TA2IVXvzjyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
-X-QQ-mid:Yeas8t1780455089t594t31214
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.207.111])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 486067191020761161
-To: "'Larysa Zaremba'" <larysa.zaremba@intel.com>
-Cc: <netdev@vger.kernel.org>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Richard Cochran'" <richardcochran@gmail.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Kees Cook'" <kees@kernel.org>,
-	"'Ingo Molnar'" <mingo@kernel.org>,
-	"'Joe Damato'" <joe@dama.to>,
-	"'Breno Leitao'" <leitao@debian.org>,
-	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
-	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
-	"'Johannes Berg'" <johannes@sipsolutions.net>,
-	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
-	<netdev@vger.kernel.org>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Richard Cochran'" <richardcochran@gmail.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Kees Cook'" <kees@kernel.org>,
-	"'Ingo Molnar'" <mingo@kernel.org>,
-	"'Joe Damato'" <joe@dama.to>,
-	"'Breno Leitao'" <leitao@debian.org>,
-	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
-	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
-	"'Johannes Berg'" <johannes@sipsolutions.net>,
-	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>
-References: <20260601072221.2952-1-jiawenwu@trustnetic.com> <20260601072221.2952-6-jiawenwu@trustnetic.com> <ah6-x9CJHwxh_3Qt@soc-5CG4396X81.clients.intel.com>
-In-Reply-To: <ah6-x9CJHwxh_3Qt@soc-5CG4396X81.clients.intel.com>
-Subject: RE: [PATCH net-next v4 5/5] net: wangxun: implement pci_error_handlers ops
-Date: Wed, 3 Jun 2026 10:51:28 +0800
-Message-ID: <095a01dcf303$e03d08a0$a0b719e0$@trustnetic.com>
+	s=arc-20240116; t=1780455484; c=relaxed/simple;
+	bh=32S/JeI3COWaV3zz0O0QavmW5XvRTB9WfOfkTWq86JE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nV7YzavWiTbU1qTnsvnm6KtxHMZoq83p5gKDX/+h3mWOSkXYwIplRAahVC03zu0TAHPvjeaxCnZpO+HcKCHcy5BUNkTwZ62xrpAr+xqB0Y5ML87KEYvVspp5WLmcR8g5QvVJzGBZg2p5uagxe++o5d7Fo0Fi2Qj3tlUj1K82y/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dsaVZKFS; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=fZSCPtkOATWB8zuR8SXfWy/LtG2NjTWEQXDI83pfLtE=; b=dsaVZKFSfz+B++OvfPtGKjktHN
+	zMEoef0T50dYZz4Bu0x9XMoAk7Os27/A3YfwK5DhtbonXq7gerjn3PFJf7dXnIFb07I1r2qLsjNx/
+	Tvhrg5LVTKgdHacRHE3oHN4PPjKrO1l46pZhYtGr+6dZjEcRdo3AdQ3tJwmrxSw7RElQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wUbnf-005oSp-98; Wed, 03 Jun 2026 04:57:47 +0200
+Date: Wed, 3 Jun 2026 04:57:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javen <javen_xu@realsil.com.cn>
+Cc: "nb@tipi-net.de" <nb@tipi-net.de>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	=?utf-8?B?6aG+5pmT5Yab?= <freddy_gu@realsil.com.cn>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v1 1/2] net: phy: realtek: add support for
+ RTL8261
+Message-ID: <26c9ecf2-d284-4b4b-b41d-d0a84a31427a@lunn.ch>
+References: <10b6718e8fe84e1895f82ea05c446925@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQEmZmPiFxLXVQw6wm5cjAUm9/PfJgEIHjjLAbXhlRG3g0pdsA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MKut7GF+UZm9gj21eL6U7wzx7XMwbtj1SL/jq616fwfP5IKufGn3D5l3
-	pse0sxhBzsDeHA+Rg8HJHa7VOKg7K7lVhfq9ipnMwnetTIb5F/G/wypWuPtpuTUv+LW1yFz
-	s62FfErEB4iDbAMWpTWrFFSYBASdJJ3MFJf5kLyL8xvURAGzjaJ5hhLF9grTJk2Z/4GOHci
-	ZlNnEmhQSgTz1G/Ih0DBRUxPH2rRYH6USI/BmpygmjZhCtC+eZUtYF3k/k+QCKm3qqH14Pa
-	Nv5DZmPhpu71MpBPW/XLjH3kC5HakPCPbc6KY29LBqBiDNxINaPLLvrybZI0XilV/4g1onT
-	EyX3y/ZsIbUbHlEJOvBJTFIW0ewAVSpKRBpXWZo4nsUMfPzzfAqp7bGKqOqo4jzGBThWvm4
-	/6mEBLLMC4bABU7o5ug0M7JnxkvYcb/IFScfhAsJXuMHWlEPm0a/Rn3xO9NC7NoAbEVx8zM
-	Pk3WDpAKET20weOu4YQiU8qmtefBPAq7Mim5cYljqXq9QkvznYhrzn7EPGhA+ST87IQ/hYx
-	/jaC7Mp29duKkpvtYcT7jMK001WloKOsZqF+/H/UG52e4R7tHFIyyA4judGbcLphxoGet7w
-	fHIgPSh4AT1wRtCSAaQCMUFbzMB19h0qu1W2ZizYlzeqURaN4w3kjOPywENbdrcLmdM3wgq
-	RF2s4xcmXFYHbVAG+DxIqV3RhJ99aKSo9ycTvXEIbthoPpZNCSHtLjgpGkDkZHqWJNLhB66
-	CNWte4XCPtkGI6RReQLV7COeBzO4a8XbOQGlnsTIwJ/htE5RO5a8W2bk35Cb9ZbZGHzeCPA
-	UC8CmY75sz+mrR3hkTjXwWIgrYuBRxPSMddChFbWCdsNe8OcLpMq84PtLMoYs3SSoga5E9W
-	8nctKyl+t/V/Nk7Df1tXDmiyTDyLHs0yH9xczTuSoyXA146Mm6ySlZzh3uTni2NZTedv5Er
-	Kl17aQmR3hOq/LC+e3FkAsYHs0PoWQnQOmjNTW/Vru71AmCBn8Ja359e+YmzGFAuHOxsgbR
-	DAbn9BRp5zyBRPkb08imnEcN+om/jH+24kw7Is1SYExf1fVTDGQkTWxB9xzMDGFTrjqyrYv
-	MlbcpR0MEqS03znEUvjjueFHlZboMNtDXLuKlxvIEZFpHWJX4NC6/Tv4blE1QC0sA==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <10b6718e8fe84e1895f82ea05c446925@realsil.com.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	FROM_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:larysa.zaremba@intel.com,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:mingo@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:aleksandr.loktionov@intel.com,m:u.kleine-koenig@baylibre.com,m:johannes@sipsolutions.net,m:fabio.baltieri@gmail.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[41];
-	TAGGED_FROM(0.00)[bounces-294532-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294533-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:nb@tipi-net.de,m:daniel@makrotopia.org,m:davem@davemloft.net,m:edumazet@google.com,m:freddy_gu@realsil.com.cn,m:hkallweit1@gmail.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[tipi-net.de,makrotopia.org,davemloft.net,google.com,realsil.com.cn,gmail.com,kernel.org,vger.kernel.org,armlinux.org.uk,redhat.com,nxp.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,sipsolutions.net];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,trustnetic.com:mid,trustnetic.com:from_mime,trustnetic.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 224D0633B89
+X-Rspamd-Queue-Id: BA258633BD0
 
-On Tue, Jun 2, 2026 7:30 PM, Larysa Zaremba wrote:
-> On Mon, Jun 01, 2026 at 03:22:21PM +0800, Jiawen Wu wrote:
-> > Support AER driver to handle the PCIe errors.
-> >
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> > ---
-> >  drivers/net/ethernet/wangxun/libwx/wx_err.c   | 111 ++++++++++++++++++
-> >  drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
-> >  drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
-> >  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   9 +-
-> >  .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   8 +-
-> >  5 files changed, 127 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> > index e249cea874be..ae5d14071f3d 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> > @@ -4,11 +4,122 @@
-> >
-> >  #include <linux/netdevice.h>
-> >  #include <linux/pci.h>
-> > +#include <linux/aer.h>
-> >
-> >  #include "wx_type.h"
-> >  #include "wx_lib.h"
-> >  #include "wx_err.h"
-> >
-> > +/**
-> > + * wx_io_error_detected - called when PCI error is detected
-> > + * @pdev: Pointer to PCI device
-> > + * @state: The current pci connection state
-> > + *
-> > + * Return: pci_ers_result_t.
-> > + *
-> > + * This function is called after a PCI bus error affecting
-> > + * this device has been detected.
-> > + */
-> > +static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-> > +					     pci_channel_state_t state)
-> > +{
-> > +	struct wx *wx = pci_get_drvdata(pdev);
-> > +	struct net_device *netdev;
-> > +
-> > +	if (!wx)
-> > +		return PCI_ERS_RESULT_DISCONNECT;
-> > +
-> > +	netdev = wx->netdev;
-> > +	if (!netif_device_present(netdev))
-> > +		return PCI_ERS_RESULT_DISCONNECT;
-> > +
-> > +	if (state == pci_channel_io_perm_failure)
-> > +		return PCI_ERS_RESULT_DISCONNECT;
-> > +
-> > +	rtnl_lock();
-> > +	netif_device_detach(netdev);
+On Wed, Jun 03, 2026 at 02:32:37AM +0000, Javen wrote:
+> Hi, Nicolai
 > 
-> Sashiko says:
+> >> +/* Concatenated 4-bit speed code values (SPD_H << 2 | SPD_L) */
+> >> +#define RTL8261X_SPEED_CODE_500M	0x3	/* H=0, L=3 */
+> >> +#define RTL8261X_SPEED_CODE_1000M	0x7	/* H=1, L=3 */
+> >> +#define RTL8261X_SPEED_CODE_2500M	0x8	/* H=2, L=0 */
+> >> +#define RTL8261X_SPEED_CODE_5000M	0x9	/* H=2, L=1 */
+> >> +#define RTL8261X_SPEED_500		500
+> >
+> > 500 MBit/s isnt a standard rate which also isnt represented in ethtool.
+> > Is this just for documentation or intended to be used? If yes, how?
 > 
->  "Calling netif_device_detach() stops new packets from entering the TX queue but
->   doesn't wait for currently executing ndo_start_xmit operations to complete,
->   which netif_tx_disable() would do."
-> 
-> Device detaching does not grab __netif_tx_lock(), so it does seem like
-> netif_device_detach() leaves some race possibilities.
+> Giga-lite (500M) is a Realtek-proprietary speed: when two Realtek
+> PHYs supporting Giga-lite are connected and the higher speed is
+> disabled or unstable, auto-negotiation may fall back to 500M. Since
+> ethtool has no SPEED_500 definition, the driver reports
+> SPEED_UNKNOWN for this case.  So we add this.
 
-netif_tx_disable() is missed in soft_quiesce(). I'll add it.
- 
+Is it negotiated? What bit does it use in which code word page to
+accomplish this? Is there a register which can be used to control the
+advertisement? Can you see the link partner advertisement for this
+bit?
 
+	Andrew
 
