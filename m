@@ -1,194 +1,211 @@
-Return-Path: <netdev+bounces-294541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P1IUBsGkH2qWoQAAu9opvQ
-	(envelope-from <netdev+bounces-294541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 05:51:29 +0200
+	id meASOTOlH2qkoQAAu9opvQ
+	(envelope-from <netdev+bounces-294542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 05:53:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671EF6340AF
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 05:51:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2096340C4
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 05:53:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amacapital-net.20251104.gappssmtp.com header.s=20251104 header.b=pACszlmx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294541-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294541-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=guY0CLUf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294542-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-294542-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 28DB430214C1
-	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 03:51:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4DCFC3078E49
+	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 03:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDCE3ED3DC;
-	Wed,  3 Jun 2026 03:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6765D3F0AB6;
+	Wed,  3 Jun 2026 03:53:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011001.outbound.protection.outlook.com [52.101.52.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725B23E4C75
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 03:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05BC3E4C75
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 03:53:17 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780458679; cv=pass; b=tFB92aWg8lmqICfnamP7MQZ14iwKhGrdPzPjtl07/m/NrF42Yvrr5sevweokv2Lul4kOCk74jz8yA9InJbWjPj/9DOU/pXUT6yq4jSYjFhaahmKSFVJPXhDF8N6UbsYnQZLNhe1ib3WToR8tt0TdW/X+GFi1NTbIsqEeVSINCC4=
+	t=1780458799; cv=fail; b=mH9yfVDOoLhnCtE7kNr8eYnpde67QfxpP35Wqhz3um2p9DBMGZHEDYOa/jKnzUlnlH7QmBnhtBfM4OpQvZjTtHGyuRe2UUsV8nm3WKr1NI8eFTZV+Y/lHEHq9zPPGxPn3kysas97fr/kF/td1xJuRZlqjn4kQMo5RmleRtvW9H4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780458679; c=relaxed/simple;
-	bh=anjN+nTOXqNBWHTS9fQMFqGEaXiDXaRnabq18gPz6kk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sZTXaK2azs4j1SM+c5wOQY1zXW19Kkoa8Q+y5isx/Yjuc2yqiAYn7sBNi3JyYS3B9ekmpdWs/Vrky/qRzVRh9uO7xojpAXsSVL1vbuDxmLBxsRWN5EzwpqO8TygDhdTizVQr3MfAj9RZVB0pRQyCtVi+7tQEve2S7jtg0vVpRqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20251104.gappssmtp.com header.i=@amacapital-net.20251104.gappssmtp.com header.b=pACszlmx; arc=pass smtp.client-ip=209.85.167.46
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5aa6cdebc33so2579437e87.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 20:51:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780458677; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AkfyAcJ2LER4Zg+tcGWYKi8Im7Yp6G4IzqxJcyJlWSNEkb5zxd8aI0aMflNBN4ejq+
-         zTlSgIZOvrhxyPgyoXwoONxLOUK/tfmOd1LVsd0+hcSv2pNSWbhiGkuzulRXOYrOb/xv
-         t8IfTvZ3tTVrOLEx8Jjeuv+uGAF1UURvTlsWIjN7VEDrI62+Z49hKrD3pZNE5SzVVVx+
-         NwB26MO3zNxO+zDq/je46chrsaMJzpQPeTWtJvyHk6xpEe88jmXnvNNEIKAtzMUvII4m
-         Ys8q1hjr/p5PgWGS9X/6tc5qyPHY46f4qRmjuPtU27Lu95AKP/oUgys41dxwqbJwp1P/
-         IMcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=hLctvnpeHHKwaBCwCGUFctRGdwexf3XsJleZhrQYpkE=;
-        fh=h+9os9kEUdWaWqVnyvzfkRe5SClKYiyHv/984MNapU0=;
-        b=fEYurG1h8A62bLXimx+WsVGeFEFKWR8YGb7EwQ6M+UMJv6A3t3gI66bQinMHU+qFP1
-         fKlRaD6LT7n1ueEuBzb3JAzJzFGQ1qomdrpcNlXOmliP5z/QpdhItjxapMm85ZplZqHg
-         NH8Ovn8mHxwUpk8Aj484UGWAoyhxvjL2kWp0/8ykJscbrdfWL7QJ+NyYr65GTMLQxJVk
-         fgTCaCrfge8Rz7ZeKzyzwPt4M0rOsjXOAlDInnTK3JIin3aJuIaIyJtA3XDzaIE6H+QV
-         2sMm67eFL1NabYu3WqTlsMpyV8Z05T2rd6639OB+qGPkuxoOLAWp5hmIy9f9i4wZ5rtK
-         uBLg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20251104.gappssmtp.com; s=20251104; t=1780458677; x=1781063477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hLctvnpeHHKwaBCwCGUFctRGdwexf3XsJleZhrQYpkE=;
-        b=pACszlmx3Ln9947bgLM/fx/VQ32WWmcPDl9URflypHU47mh09zCUoDdMN0TpbQjwR9
-         L4NKNbN7iJdFMkZ549+BK69za4lWIlIR3xkSdAT6lkQPV8xhZBiZlxXrUY96pwWuJaxt
-         P4x/pOcbxq556iCMRflqurGV2i89lN/szwObKm/fmWCeSr/BRC6KFwjmPjQnL6ZZ9JNS
-         EIIxI4iPFVjGJsfoYJ/CFvh2a/nsPjzBg9jzRp8MP2Ht/HC38+DL88wJ4lIup0I+zzsF
-         fmJMB+9s5U7yo9b1xnvi8lyffz4vX7cPHzYB3U02huylW/P16aPOngD1G2DduXNGEGC+
-         tORA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780458677; x=1781063477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hLctvnpeHHKwaBCwCGUFctRGdwexf3XsJleZhrQYpkE=;
-        b=r7kqyVR7fDpnUjGRqRfEKk6LKNXNkJ3SKByqJ+8+qRQMGoq1c8kKtnB/OQFDqkbZQE
-         agMSZnyOCnlRZFTMo6h2+nD7wktsAj9dpeE09QALuVfFwlAZnzyKa1zQOEPMCmiJeUHv
-         H1lOnjwSObl5xbfJCxdgT0Msm/MhJfjy3tATwT3+jdb4PkdiSHiNCMTuP9glsQRqDeX9
-         zlNlV27Ipkow3SQDhZAVZdum40C72wEEq/8WXJHnnnYQmF+WU/UwYnUiuweNVjwSg1qD
-         jyc++ZIrh66TvMHqYWteGpwcNmB6H5WeMgEbYsXofnIKzPQYslHsqAVh3TB71Lqq10+4
-         L1NA==
-X-Forwarded-Encrypted: i=1; AFNElJ9CdnE5RRN8AzdjzlEv80h6f+nszNwuSOrhHed1agQWMqxbFn+vTuFutYs9oAE6hPBAq9LqNIc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8EySXeVzqPbClWibGnIc7YbBvi8Coq3wCttCfDqQ+RvJkc9jd
-	T3Ut8tq4+MZ5lpo4HPytQ+CDckX+FLEaijzFYj2t3k0CIOiTo4oaxYO86ss2pxOvnyhexz3vITC
-	pSn9bfmz6pEhoQmv6PDdGxhBlnN7rpsYFSmvY0GRB
-X-Gm-Gg: Acq92OGCs6U9W1T5/p8+c0X48Zn4VVz6zuni70lWJtU8qCCuhgBjOz0yE1SColaL/5u
-	VOthWA7MnhKhGgizrjdSMop9DWjit3aYrX/Z5MqGvRvajcys+tjJXCHnMQa0MjCBJi9vGIL6COm
-	d21loPRZwF0y9/Bm8gz/PNyjp+uINs0XylwLuB0krHitn1HhCjakMDCry6xs1eLC1m+plyTLZOX
-	OcXqtbGw9GKE6o53HiURKHwF751ZFDdR+E5Qjdoataf9I8XfCBAR8HcKWopaOfabokEWth3dIyX
-	UdCbK7VpbXnS270=
-X-Received: by 2002:a05:6512:1587:b0:5aa:6d0f:1dc7 with SMTP id
- 2adb3069b0e04-5aa7c0bf470mr459675e87.19.1780458676548; Tue, 02 Jun 2026
- 20:51:16 -0700 (PDT)
+	s=arc-20240116; t=1780458799; c=relaxed/simple;
+	bh=/oxaFGkh1jBG8BCPhw9pxZUsYhsftLaFuR3csz0F+Z8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cMMelky62SbcH4OXaAUNKvkVxM6+tQMoEtxiZ4yqXir5P00GUavP8PaxHVdkJzKbUZ6F1UCj8/+zOruh6vtGYXc1dBToI4tnGYHucQa2GZbn4tv6ax5FqoE25y3bA9WOuVetATRfrj7n5IbROCnmxnvhkSvzeuLVWYgmWThbCFM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=guY0CLUf; arc=fail smtp.client-ip=52.101.52.1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PLEBFGnRXu1qV9GkO+M3CKtHG/wvNV1uCqwLmkrAEdMUDhk/V4wMsYfQWe/YeCn8ZAxGyWJBcJQ4E+XsuqvajT57qYcCNSEbXpVQg+wS7iXJYGOIR8bLHEf8FMzSiYWVEposSnShsxEYuOPISOjn/RYx0EOnv7N1YK0GcxkuBjD8TK8LbUyo6hdrMz2hsz38yfOZn4bT1Fd2YA/Bms4UCfvNdYCx9cxlUQ73hqzpai87KxUKTmMzDf5jOoqkYzScqvlsIEjMaJXukv8DvW2WeulMh2X03tlrJVaOK99aaGGO5fCSov3Clm1ef2yo35Dh03wJkKNndaKKvNg+YGv/sA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lPphc42rFLvtr/hX+8TOI2iziEhxNtgEViTVkM839/I=;
+ b=nc4Jtsbn2J2jj6+t3Uin7Ym/Yu0BRT1XodnVcfeocn/IRV1hwdKA7mPVE/+2ohKltQ9bsPlUc4uzKHnsSOsPJwXAO2ixbF48WBPVELvtfHXJMxoknJHhB0TcT0Gea+ceYK8ncQwNPQzuGwXiRowBpob4pR3VmiU8OC2FQk8RfmCt9wE39oJMdeLgJV1/iv+rHrO2q2hs+HCUN9TVKnW6KcHYfPjpMddhug0M/zKpDs4t299G+7/nzUSykYQs2CO/d/3VaKkDScPaZk0vPoK33WJo2faI7zVMg5UPntTq2n5juO8pHrwwR7KvEs3IJIq1WviNducj1cXbTMaNzoQNMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lPphc42rFLvtr/hX+8TOI2iziEhxNtgEViTVkM839/I=;
+ b=guY0CLUfV4xcChxVzITJNAjKB++cMB2P5SmuPELNq6TmzDY6Aj2Dii+jWPZObhQFvjRckIZxo3q9dpj35vdpXcGXYjVcl5j+7NtZL7JP7EdbBiDNPsgkr9WRFWQEg7JQNPr5sajs+TfFPmtoSs/5CFSAia5ZcLz2rQLy+wWJSvg=
+Received: from IA1P220CA0024.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:464::12)
+ by DS7PR12MB5910.namprd12.prod.outlook.com (2603:10b6:8:7b::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.71.15; Wed, 3 Jun 2026 03:53:13 +0000
+Received: from MN1PEPF0000F0E5.namprd04.prod.outlook.com
+ (2603:10b6:208:464:cafe::12) by IA1P220CA0024.outlook.office365.com
+ (2603:10b6:208:464::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.7 via Frontend Transport; Wed, 3
+ Jun 2026 03:53:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ MN1PEPF0000F0E5.mail.protection.outlook.com (10.167.242.43) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.5 via Frontend Transport; Wed, 3 Jun 2026 03:53:13 +0000
+Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Tue, 2 Jun
+ 2026 22:53:12 -0500
+From: "Nikhil P. Rao" <nikhil.rao@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <brett.creeley@amd.com>, <eric.joyner@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>, "Nikhil P.
+ Rao" <nikhil.rao@amd.com>
+Subject: [PATCH net] pds_core: disable bus mastering in pdsc_stop() to quiesce DMA
+Date: Wed, 3 Jun 2026 03:52:45 +0000
+Message-ID: <20260603035245.32972-1-nikhil.rao@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
- <20260602225426.122258-1-safinaskar@gmail.com> <CAHk-=wgKy4dP0oQCNKyMQQf3-uVpaigmDyH6_T0Via76gWST9g@mail.gmail.com>
-In-Reply-To: <CAHk-=wgKy4dP0oQCNKyMQQf3-uVpaigmDyH6_T0Via76gWST9g@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Tue, 2 Jun 2026 20:51:03 -0700
-X-Gm-Features: AVHnY4I4B2wg7ilf1zQmemgKARTlVUvTJ9JxDnVBlHgiDg-UsafiWLR7jiVDKio
-Message-ID: <CALCETrWx8-Q5-rK1KnAPCxCbXaWCd=Yfs_Pr8qVMa8k8L6of1w@mail.gmail.com>
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Askar Safin <safinaskar@gmail.com>, akpm@linux-foundation.org, axboe@kernel.dk, 
-	brauner@kernel.org, david@kernel.org, dhowells@redhat.com, hch@infradead.org, 
-	jack@suse.cz, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, miklos@szeredi.hu, 
-	netdev@vger.kernel.org, patches@lists.linux.dev, pfalcato@suse.de, 
-	viro@zeniv.linux.org.uk, willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E5:EE_|DS7PR12MB5910:EE_
+X-MS-Office365-Filtering-Correlation-Id: 683b3702-d9b8-4649-5b95-08dec123a2b0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700016|82310400026|3023799007|11063799006|56012099006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	fEXHqmFZkiZ/Awsfn6gTYJAOp1pAQTxw2bpr2041ICUEKp0nQk3jmL6PWOgXElg0dKO25ROh5pS3eOde4pnmiZxTYD4P7BChIUngN4+R6NHmXDdgUhj01qvgq2jCrW3uR/W/Jb8qs3tblUOI0Jci5UW+iX3nOWGwAGtRenqgwrpsYv8gOA85y4lTYMiSCTW2QT6U4zAlPK55EN9YGf6k7c9wPIhyu1Y7cgr4MgxSv4vPFCX/czzNQdPBcOy3wQbOe0StHx1T0BacSu1IREfMLBS0MQ3SWhQVFqZaLpiKiQmr18xWs7wSze+CbevwBruZ64jjT18IwRCohmv1CPqZN/qTOB/tVRNgX2YFPUKSDMao0Bdk/EMp1GlkFPzpKL+hNmyajQp2jECLHj5j/u3Vll9zLuU8W9RLwYLEKS8flPXJ4C0cv6ms4wVgx8WZCKczNkkEjJp/XBpPJmFLnYaLzZyfCgsyNL1qCooWE8UUoIwX9h86bwv7kpzSo065AUwagGCJebnZyHhwBB5FmshNcTH5lYGcl3AVkT8cGR9TDl6yoZSDRhxu8qEOiNujrz5El3gOwxma+N2UMX+xdPppd3rW8ph2oEEbnXlC6d/mCiMYS/LktCGUbULgO2+EGVIROWuVmiQVGwsvLq5nog4gCDDEEx69czdn7Ap4dTfZjTa6HtoOgDiGnuJ1CFgSzh13TqJY63v8d3Eiic9S9Zq0KBwmWAZ6K16qS/Q7r6lByg0=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700016)(82310400026)(3023799007)(11063799006)(56012099006)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	OC6RfzdP48PdVZRto7Ssrcw2UE6X81SYIX8oTEyfYKFQG31PhCK9R21l+EASZaccRfdJIRpIKAdMh4TREUKDpLTF7Qo1zSEDxWCl39L+tIts0n86mAVvTohJ0EmBFzm6Ype4XI8LHT79rXi/Nl4yaQskiK4DZXsy0Hh6SDx7OOZx1+xXO811GD61BmgtnTYM63rWCH/uhiCIQ1bqFa28VK2nVcXU981HQydGHzj0NTP6SEoMtYSurqH+QKvm1Do4p0Y4F38+NH1P100l842Zm+m4K8sAo0UmhYPNy/b/Gydec1JtMXlcrlebLW32XEd51xiqkR2vRGSmeN6IztIwFUqtvBnmvJAvDUBN0Ut4+uVG/WjcW4uDUrRD8VX/5pWPMuf8ufFnh7Ht8HRREb3V0Mop3WnH1Mi6OjPjUuThJNS65lhGm2cRb/j7FX6oaH4a
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2026 03:53:13.0304
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 683b3702-d9b8-4649-5b95-08dec123a2b0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E5.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5910
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amacapital-net.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:safinaskar@gmail.com,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[amacapital.net];
-	FORGED_SENDER(0.00)[luto@amacapital.net,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-294541-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amacapital-net.20251104.gappssmtp.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luto@amacapital.net,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-294542-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:nikhil.rao@amd.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,amacapital.net:from_mime]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 671EF6340AF
+X-Rspamd-Queue-Id: 5D2096340C4
 
-On Tue, Jun 2, 2026 at 5:12=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Tue, 2 Jun 2026 at 15:54, Askar Safin <safinaskar@gmail.com> wrote:
-> >
-> > Pedro is talking here not about this vmsplice patch, but about
-> > my future hypothetical patch, which will remove splice-pagecache-to-pip=
-e.
->
-> That absolutely would be my suggested next step.
->
-> Something like the attached - get rid of filemap_splice_read()
-> entirely, and just replace it with copy_splice_read().
+pdsc_stop() masks interrupts but does not disable bus mastering,
+leaving the device able to perform DMA after the function returns.
+This can lead to use-after-free if DMA buffers are freed while the
+device is still accessing them.
 
-Am I understanding correctly that this will completely break zerocopy
-sendfile?  sendfile is, internally, splice-to-a-secret-per-task-pipe
-and then splice to the socket.  How much to people care?  These days,
-a lot of high-bandwidth network senders are sending encrypted data,
-which is not zerocopy frompagecache.  But there are surely some users
-that care, for example the person who went to the effort to implement
-IORING_OP_SPLICE:
+Add pci_clear_master() to pdsc_stop() to disable bus mastering after
+masking interrupts, ensuring all DMA is quiesced before teardown
+proceeds.
 
-commit 7d67af2c013402537385dae343a2d0f6a4cb3bfd
-Author: Pavel Begunkov <asml.silence@gmail.com>
-Date:   Mon Feb 24 11:32:45 2020 +0300
+Add the corresponding pci_set_master() to pdsc_start() to re-enable
+bus mastering when the device is brought back up, such as during
+recovery.
 
-    io_uring: add splice(2) support
+Fixes: 01ba61b55b20 ("pds_core: Add adminq processing and commands")
+Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
+---
+ drivers/net/ethernet/amd/pds_core/core.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-Now maybe someone cares about a different path?  Splice from socket to
-pipe to file?  Splice from socket to pipe to other socket?  Does
-anyone do any of this?  One can, of course, recv() directly to an
-mmapped file, but then you pay for page faults, so that probably a bad
-idea in most cases.  At least all of these cases don't have spliced
-buffers that refer to a potentially read-only file.
+diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
+index 705cab7b0727..27369b3297b2 100644
+--- a/drivers/net/ethernet/amd/pds_core/core.c
++++ b/drivers/net/ethernet/amd/pds_core/core.c
+@@ -494,6 +494,7 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
+ 
+ int pdsc_start(struct pdsc *pdsc)
+ {
++	pci_set_master(pdsc->pdev);
+ 	pds_core_intr_mask(&pdsc->intr_ctrl[pdsc->adminqcq.intx],
+ 			   PDS_CORE_INTR_MASK_CLEAR);
+ 
+@@ -504,14 +505,15 @@ void pdsc_stop(struct pdsc *pdsc)
+ {
+ 	int i;
+ 
+-	if (!pdsc->intr_info)
+-		return;
+-
+ 	/* Mask interrupts that are in use */
+-	for (i = 0; i < pdsc->nintrs; i++)
+-		if (pdsc->intr_info[i].vector)
+-			pds_core_intr_mask(&pdsc->intr_ctrl[i],
+-					   PDS_CORE_INTR_MASK_SET);
++	if (pdsc->intr_info) {
++		for (i = 0; i < pdsc->nintrs; i++)
++			if (pdsc->intr_info[i].vector)
++				pds_core_intr_mask(&pdsc->intr_ctrl[i],
++						   PDS_CORE_INTR_MASK_SET);
++	}
++
++	pci_clear_master(pdsc->pdev);
+ }
+ 
+ static void pdsc_adminq_wait_and_dec_once_unused(struct pdsc *pdsc)
+-- 
+2.43.0
 
-
-But I'm a little concerned that zerocopy sends from files to network
-are actually important.
-
---Andy
 
