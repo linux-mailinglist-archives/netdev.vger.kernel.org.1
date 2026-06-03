@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-294571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-294572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f7U+CGPIH2p5pwAAu9opvQ
-	(envelope-from <netdev+bounces-294571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:23:31 +0200
+	id HTBCH2rIH2p9pwAAu9opvQ
+	(envelope-from <netdev+bounces-294572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:23:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736C36349F2
-	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:23:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BF26349FA
+	for <lists+netdev@lfdr.de>; Wed, 03 Jun 2026 08:23:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="aD/Cw4Bs";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294571-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-294571-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=FE1KJht6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-294572-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-294572-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A76E30C4198
+	by sea.lore.kernel.org (Postfix) with ESMTP id C34E630C69A6
 	for <lists+netdev@lfdr.de>; Wed,  3 Jun 2026 06:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7D43812E5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC713F8EAF;
 	Wed,  3 Jun 2026 06:20:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9940D3F8891
-	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 06:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAD73F9F5D
+	for <netdev@vger.kernel.org>; Wed,  3 Jun 2026 06:20:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780467655; cv=none; b=RRITM7qg7li5pBZWoL6A+DA5ALp1Fe7EHIVnQ2USXmoS2LJGnq28pA1z79rL1+hpU5bRLo1eaPNN7vTOoRcBEKtb+uzxuAQXccxJK7TgPmLHgtWLNjTL9ZlKp0rsCEoZOOCrVKwx7t6Eo8ulHrgA8SzF3Tv218GmEzht2oCiMIQ=
+	t=1780467655; cv=none; b=LcnVQVRpcnMrBSEqMj++ZU/W5Ehp5y1XBUOo6qKpCOM3uDpokrXNk0zYJl415JMQVpwe9kuxcqCypI0iLXFiSUoK8qPcMh9RiMd/qG5YHt071BjDG6dPJlGm9RPRrUcZmaCQD98XTEfu2SUIIvskLvlg/NxssY19oZ8JiiktsOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780467655; c=relaxed/simple;
-	bh=RADVh8HcVjmyHbmZM3nuptZ7x3MlyEdWAI2ZwGzLeUk=;
+	bh=6p9uB0jT3+oo3IcMLhyKSd78G3PKysoyjWNmwNrtf6Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TuSec4aCXZ08zWtTFmEtGhSpApvoxFh1RiH0+rMnxKZWy/+asgqWYyaCWEyw9taNxW3RctQYbA9YLF3+gc/DwALQ2tAGzneftUqZ2CDfj4Ta6xnjKlR58EmD6LVXzn7EMNvZXBejb5ADOF+4tP2mYNxe5AkHw9+2A+79f2EBYtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aD/Cw4Bs; arc=none smtp.client-ip=209.85.219.73
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8cceb0317b3so80681746d6.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 23:20:49 -0700 (PDT)
+	 To:Cc:Content-Type; b=PuSiIq3nJTnw6tV/olNXf618bKDnlXFvGpBvR7tRvugExSHRsGWSjhiXim0dNJqBWHhDwmWoE6FV3gIzW1Q8WgaFvoDkXrQRQSpj3iHOqDGnXnEfH0i37Sxbef4qWyqqXkLaX3YTIJfZRoKsnUGiIpLBhvvundCSaOkga29J7BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FE1KJht6; arc=none smtp.client-ip=209.85.160.202
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-517480bde1cso77436491cf.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jun 2026 23:20:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780467649; x=1781072449; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780467650; x=1781072450; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x4+cQwYOPyCpNW2zSi/QmQ32R3UUJytr3cfOXw5A+Qg=;
-        b=aD/Cw4BsVAF98ZJtWrQghxmBehuBZIiajyCY5S1zVWkXbt3rer38Stqh6H+b3ad0th
-         I1mHqE3nK83iwOsYeEHwIhWjSNPqrieHAPHWvDtnmLM4gwiojBiPdqHg8//RlPrSWjNy
-         nOAy42CW8/vgm0/x31DUsQpJ+Y8e9aQjmotDtxdLFvlo7s9aqzYnKAO0GgJYSczzhuD2
-         nr6wzcPb98eNxD82b5oZ1UrBNPDip/jMxKuTQd1lRknKIXdAox2sn+0K9wDxMe5tfD+j
-         a042OQoEldunfZP9JgRNSmPZ22C2knGW6FygI10Vlk3fBP8RwYg4xvNTQRXxGFGmuesA
-         XLmg==
+        bh=9LwIWOy39nsoBC8GXKhoK+xHs6COGI+YIOQAggUnROY=;
+        b=FE1KJht6T0X236z8hPGeZqyvSYkKGzned2xa1gbHIzEU//LizwSVNpsMoWWakx7OK0
+         SL0AQwLuVh14I8OW4fHAqA0huUcqP5ufK9Xr9mIdiOFaPGcKFDCpYV73xui3IQReOH58
+         4pyXkT/5PelRRWJK4jRvw5a17ih99z9DMKBEp/AojHCqwiw7fXwBnEBN84Y4q9Bq8dQZ
+         aJrASi1aXewHEVwKrPcK4eMtdb5cUxG8IHdirUOvf5x6JrTupsfvjs0KouPHDh9iyUlJ
+         Kr8e69UduxpJix2xZm+RV1542DM3VVQqWZJWoKM4uNoi9NqPN2GV4Z/nQod1ah0M5Rr2
+         hRxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780467649; x=1781072449;
+        d=1e100.net; s=20251104; t=1780467650; x=1781072450;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x4+cQwYOPyCpNW2zSi/QmQ32R3UUJytr3cfOXw5A+Qg=;
-        b=A00mJqbOU7RXwHEZZefwZPCh5JbLVZRBT7nc80MlKEMGMsA19dQ6TNStVTKu9nDjIl
-         n0YAN3XLmrVu1XlAjxQCgoWbPjqBz3DHagB/UMwH4PrkR1YkRKbZHhOl2xI1MbKSJFzj
-         zsUFG1BuznWMldoFbEMiXiEpZjsZu7KUhoEE5e6Q+fNxpNydiug6NS+o7E9NNoQbEUac
-         2ksYdQEBsflD8LPtYHIdJLA3MNX4yeG2u4i0LWNBIPaGP4PPVBd4y/Uzfss8GrvMTNim
-         BQlfd2Vq7nbweKXu/FeG8WIfCQS1ZkMWRsVnpveaEu+tMSekn03v29ZlrHO1X1drL8ZT
-         PyBw==
-X-Forwarded-Encrypted: i=1; AFNElJ8zhAx0Ajy/T4DzPFsTKQ+rCU4XW5xFvJocpEqXHbSCGINUjQgJzRKh295X6Z6gWDtOx7jFUH0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyH7wav+4hkwkFuJ1FE2Y7cFk/STF63G466lB6TFNRaIHzr6QTU
-	3HHNJTQijIhGlzIVyd6bw4D4V0AXHHPRG4BDX/IC2U6XQB9upLqV/V6qzNIobTo6Dn8YqfCFcXZ
-	++Je6ptlia1fU6w==
-X-Received: from qvvu16.prod.google.com ([2002:a05:6214:11b0:b0:8ce:aa21:b13f])
+        bh=9LwIWOy39nsoBC8GXKhoK+xHs6COGI+YIOQAggUnROY=;
+        b=fK1YGVR3R2C2FK0rzdyTvAmNIsPpw0UJKDnVcklI2kuRekci6rx7PgE7u8WAt1+HUD
+         x84WtaK4QgbTM6YWlPiBiPSavlMMGAsbWOkj3Vl9m9kncwhfKzH3YqsfHN6rd4ODg7Rx
+         /X2kQPSGh9F5cN8anQNmvOhbByangRBVSSutGIdf9NbTSbDK+fGXX2yP3VOqFyUKNy/l
+         HscK0Gw2irmWBJhM+WOd0aKtgek4lnZOzQGAWv/bXfWuD663SE7xQPIXlK2SO33QyCgo
+         Yhd66qkXA4UGYQYbOYNRwXMN8isxlUhfPfTiIsmfDxEYceWjz+OxXBdjGS9PDVG4ohrG
+         5vog==
+X-Forwarded-Encrypted: i=1; AFNElJ+WIgJQo385ZNDZkdXkAev/APSnv9FpdPuMR4RQywnCjIrGEfe11XhwJ1YHDBoBF8lqOvJZYSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMBk9KrTD+yD5FxQ+AFzKdMBtZvfehoXlyiYNi+uXBrfHnt+Ru
+	xYfub195ilqIHL6KIebujf8HbeR8pOTgYk9VajJy44lLhuu2V7bPW2xpKqY6CMhEJzynOSiov2l
+	U0pEVx1TXoDUW5g==
+X-Received: from qtob21.prod.google.com ([2002:ac8:44d5:0:b0:517:5ec0:e4d7])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5be5:0:b0:8ce:9e58:838f with SMTP id 6a1803df08f44-8cece0296ffmr25185896d6.33.1780467648478;
- Tue, 02 Jun 2026 23:20:48 -0700 (PDT)
-Date: Wed,  3 Jun 2026 06:20:34 +0000
+ 2002:a05:622a:151:b0:516:ef49:f6f5 with SMTP id d75a77b69052e-5177873f64emr33149371cf.39.1780467649948;
+ Tue, 02 Jun 2026 23:20:49 -0700 (PDT)
+Date: Wed,  3 Jun 2026 06:20:35 +0000
 In-Reply-To: <20260603062043.3911278-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260603062043.3911278-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
-Message-ID: <20260603062043.3911278-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 02/11] bridge: add bridge_flags_bit enum
+Message-ID: <20260603062043.3911278-4-edumazet@google.com>
+Subject: [PATCH v2 net-next 03/11] bridge: use BR_PROMISC_BIT
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -93,12 +93,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-294571-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-294572-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -116,114 +116,57 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 736C36349F2
+X-Rspamd-Queue-Id: 14BF26349FA
 
-We want to use atomic operations for lockless p->flags changes
-and reads.
-
-Add definitions for bits in addition of masks so that we can use
-test_bit(), clear_bit() and set_bit() in subsequent patches.
+Use BR_PROMISC_BIT and set_bit(), clear_bit() and test_bit() lockless
+functions.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
- include/linux/if_bridge.h | 78 ++++++++++++++++++++++++++-------------
- 1 file changed, 53 insertions(+), 25 deletions(-)
+ net/bridge/br_if.c      | 4 ++--
+ net/bridge/br_private.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/if_bridge.h b/include/linux/if_bridge.h
-index ec9ffea1e46ede3762f108f6e7085ebb1bf1d2e1..75673b8bffcb8ad6396e6a05b8af8150208fb6fe 100644
---- a/include/linux/if_bridge.h
-+++ b/include/linux/if_bridge.h
-@@ -36,32 +36,60 @@ struct br_ip_list {
- 	struct br_ip addr;
- };
+diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
+index d39571e13744431f5e4c67f34ee7de34eb8bb6b0..3169fab686a534cf2a6458ff228eee2b6fc7e7e4 100644
+--- a/net/bridge/br_if.c
++++ b/net/bridge/br_if.c
+@@ -110,7 +110,7 @@ static void br_port_set_promisc(struct net_bridge_port *p)
+ 		return;
  
--#define BR_HAIRPIN_MODE		BIT(0)
--#define BR_BPDU_GUARD		BIT(1)
--#define BR_ROOT_BLOCK		BIT(2)
--#define BR_MULTICAST_FAST_LEAVE	BIT(3)
--#define BR_ADMIN_COST		BIT(4)
--#define BR_LEARNING		BIT(5)
--#define BR_FLOOD		BIT(6)
-+enum bridge_flags_bit {
-+	BR_HAIRPIN_MODE_BIT,
-+	BR_BPDU_GUARD_BIT,
-+	BR_ROOT_BLOCK_BIT,
-+	BR_MULTICAST_FAST_LEAVE_BIT,
-+	BR_ADMIN_COST_BIT,
-+	BR_LEARNING_BIT,
-+	BR_FLOOD_BIT,
-+	BR_PROMISC_BIT,
-+	BR_PROXYARP_BIT,
-+	BR_LEARNING_SYNC_BIT,
-+	BR_PROXYARP_WIFI_BIT,
-+	BR_MCAST_FLOOD_BIT,
-+	BR_MULTICAST_TO_UNICAST_BIT,
-+	BR_VLAN_TUNNEL_BIT,
-+	BR_BCAST_FLOOD_BIT,
-+	BR_NEIGH_SUPPRESS_BIT,
-+	BR_ISOLATED_BIT,
-+	BR_MRP_AWARE_BIT,
-+	BR_MRP_LOST_CONT_BIT,
-+	BR_MRP_LOST_IN_CONT_BIT,
-+	BR_TX_FWD_OFFLOAD_BIT,
-+	BR_PORT_LOCKED_BIT,
-+	BR_PORT_MAB_BIT,
-+	BR_NEIGH_VLAN_SUPPRESS_BIT,
-+	BR_NEIGH_FORWARD_GRAT_BIT,
-+};
-+
-+#define BR_HAIRPIN_MODE		BIT(BR_HAIRPIN_MODE_BIT)
-+#define BR_BPDU_GUARD		BIT(BR_BPDU_GUARD_BIT)
-+#define BR_ROOT_BLOCK		BIT(BR_ROOT_BLOCK_BIT)
-+#define BR_MULTICAST_FAST_LEAVE	BIT(BR_MULTICAST_FAST_LEAVE_BIT)
-+#define BR_ADMIN_COST		BIT(BR_ADMIN_COST_BIT)
-+#define BR_LEARNING		BIT(BR_LEARNING_BIT)
-+#define BR_FLOOD		BIT(BR_FLOOD_BIT)
- #define BR_AUTO_MASK		(BR_FLOOD | BR_LEARNING)
--#define BR_PROMISC		BIT(7)
--#define BR_PROXYARP		BIT(8)
--#define BR_LEARNING_SYNC	BIT(9)
--#define BR_PROXYARP_WIFI	BIT(10)
--#define BR_MCAST_FLOOD		BIT(11)
--#define BR_MULTICAST_TO_UNICAST	BIT(12)
--#define BR_VLAN_TUNNEL		BIT(13)
--#define BR_BCAST_FLOOD		BIT(14)
--#define BR_NEIGH_SUPPRESS	BIT(15)
--#define BR_ISOLATED		BIT(16)
--#define BR_MRP_AWARE		BIT(17)
--#define BR_MRP_LOST_CONT	BIT(18)
--#define BR_MRP_LOST_IN_CONT	BIT(19)
--#define BR_TX_FWD_OFFLOAD	BIT(20)
--#define BR_PORT_LOCKED		BIT(21)
--#define BR_PORT_MAB		BIT(22)
--#define BR_NEIGH_VLAN_SUPPRESS	BIT(23)
--#define BR_NEIGH_FORWARD_GRAT	BIT(24)
-+#define BR_PROMISC		BIT(BR_PROMISC_BIT)
-+#define BR_PROXYARP		BIT(BR_PROXYARP_BIT)
-+#define BR_LEARNING_SYNC	BIT(BR_LEARNING_SYNC_BIT)
-+#define BR_PROXYARP_WIFI	BIT(BR_PROXYARP_WIFI_BIT)
-+#define BR_MCAST_FLOOD		BIT(BR_MCAST_FLOOD_BIT)
-+#define BR_MULTICAST_TO_UNICAST	BIT(BR_MULTICAST_TO_UNICAST_BIT)
-+#define BR_VLAN_TUNNEL		BIT(BR_VLAN_TUNNEL_BIT)
-+#define BR_BCAST_FLOOD		BIT(BR_BCAST_FLOOD_BIT)
-+#define BR_NEIGH_SUPPRESS	BIT(BR_NEIGH_SUPPRESS_BIT)
-+#define BR_ISOLATED		BIT(BR_ISOLATED_BIT)
-+#define BR_MRP_AWARE		BIT(BR_MRP_AWARE_BIT)
-+#define BR_MRP_LOST_CONT	BIT(BR_MRP_LOST_CONT_BIT)
-+#define BR_MRP_LOST_IN_CONT	BIT(BR_MRP_LOST_IN_CONT_BIT)
-+#define BR_TX_FWD_OFFLOAD	BIT(BR_TX_FWD_OFFLOAD_BIT)
-+#define BR_PORT_LOCKED		BIT(BR_PORT_LOCKED_BIT)
-+#define BR_PORT_MAB		BIT(BR_PORT_MAB_BIT)
-+#define BR_NEIGH_VLAN_SUPPRESS	BIT(BR_NEIGH_VLAN_SUPPRESS_BIT)
-+#define BR_NEIGH_FORWARD_GRAT	BIT(BR_NEIGH_FORWARD_GRAT_BIT)
+ 	br_fdb_unsync_static(p->br, p);
+-	p->flags |= BR_PROMISC;
++	set_bit(BR_PROMISC_BIT, &p->flags);
+ }
  
- #define BR_DEFAULT_AGEING_TIME	(300 * HZ)
+ static void br_port_clear_promisc(struct net_bridge_port *p)
+@@ -133,7 +133,7 @@ static void br_port_clear_promisc(struct net_bridge_port *p)
+ 		return;
  
+ 	dev_set_promiscuity(p->dev, -1);
+-	p->flags &= ~BR_PROMISC;
++	clear_bit(BR_PROMISC_BIT, &p->flags);
+ }
+ 
+ /* When a port is added or removed or when certain port flags
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index 02671e648dac7ab6fd59b80e044f62b00a8e4a8a..d55ea9516e3e369bb9e0045fca5b8d034ef5a45f 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -452,7 +452,7 @@ struct net_bridge_port {
+ #define kobj_to_brport(obj)	container_of(obj, struct net_bridge_port, kobj)
+ 
+ #define br_auto_port(p) ((p)->flags & BR_AUTO_MASK)
+-#define br_promisc_port(p) ((p)->flags & BR_PROMISC)
++#define br_promisc_port(p) test_bit(BR_PROMISC_BIT, &(p)->flags)
+ 
+ static inline struct net_bridge_port *br_port_get_rcu(const struct net_device *dev)
+ {
 -- 
 2.54.0.1013.g208068f2d8-goog
 
