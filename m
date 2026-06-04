@@ -1,148 +1,186 @@
-Return-Path: <netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eWQ+OSYCImoyRgEAu9opvQ
-	(envelope-from <netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:54:30 +0200
+	id Io/+LEgCImo3RgEAu9opvQ
+	(envelope-from <netdev+bounces-295469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:55:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA82643DFA
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:54:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25AA1643E07
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:55:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mWqVhDtl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=iBzDf7G6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295469-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295469-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB1D33030355
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:54:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 059993013885
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5BF30594F;
-	Thu,  4 Jun 2026 22:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF8B30C629;
+	Thu,  4 Jun 2026 22:55:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013007.outbound.protection.outlook.com [40.93.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A7F285C84;
-	Thu,  4 Jun 2026 22:54:24 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780613666; cv=none; b=Y1JN00X3KliNXZb+z40EvEphj3gJZbeUbTf9iBP0uKiCPkzad19Mw6zikK+1gpzBD41TERTf/XuggCUdIJ0ycKLZV6hMAKRysaXdXysSeKSq2NiIaH5Y+1X89ebnJF70oyvwyuN7AdAK5tsknEm8EokFsnuSqozV+ikpX6qVDL4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780613666; c=relaxed/simple;
-	bh=oXjJ7XjYMvV4qrB0SMbNbwChK2HbZT6xNUdwAiiSbzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M4LwB0OSa7pedqKhog6Uy8NVL0iqG+iGKqHhMaqY94JQVG0pkjG3/qAokeOU7n8dkZ2zTPSrpVQq2eCftuZMABybznur2pDcBeAiFHlqu53o5u/FM60ldz7/y2t1tcoDmEnOzV73TCNogTeVfiadb78bD5YeTwf1ptYK339dMbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWqVhDtl; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E76051F00893;
-	Thu,  4 Jun 2026 22:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780613664;
-	bh=3lMPwTETgOHXdjVrbiyEjoY0H3xuhL5jFk2nN61vumk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=mWqVhDtl9S6NhuYYXnbfYOKqCQPIW+Ht1cApg/HEDqr1C792kFVYvQx9S0hUdEyRx
-	 4DlsmC/nV1JjporWCyz4mimRtjEgUv4woONpG1J5QuYaJXXFMPqxZJNl9XXn9M8oTR
-	 YmdudMQhInteUeITIoxa6pfFhK7D/vzKPaY1hyWVM4KW3i9aH7NoUkps3rGZ1OjXUo
-	 YoiRNk0LxO4kYy63w183d3gvSayScBFJiWD9i2UsI+pzas/CUgy2hX1LE32dXqZjDL
-	 tjZi7sInI33fhlM3jeukZY3un7hHLzOefigz4G8URTjoGQrtgFhfBDVKrEQNDFVaA0
-	 AGIsuZuYEVK7Q==
-Date: Thu, 4 Jun 2026 15:54:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Oros, Petr" <poros@redhat.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
- <Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
- "jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
- <arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
- <vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
- <donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
-Subject: Re: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and
- full TX reference clock control for E825
-Message-ID: <20260604155422.167314ff@kernel.org>
-In-Reply-To: <IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
-	<20260603183036.7c4762d2@kernel.org>
-	<IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2B6285C84
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 22:54:59 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780613700; cv=fail; b=HFpUiXW4ronKPrr+Gkz+joq2H3yvm185nozSAzmc7MIS385+o1ufc+eQliR1A9mvSoq8zOQJFZt8c5DMzmv0UbBX7GU/x5U2av0/FOZsW+G/kf/hqLS6SQz2rzG338IQFCgGg1BlMlkNPOzj9Nad2oTY0+h4amd6DEce9qrSslk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780613700; c=relaxed/simple;
+	bh=NmrrqCzVnvnIPMmyyPf2YSbti0a6F18y3zbypeUglmk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K5ggC8BXE9ZQrQ4bXOPZhPhsY8bSyJNf0F5VLR1JttdluQLfi43l2Hqa8e7JZn8QuvF29DxZyEb/kxXfB8F0YHoqMzFAY1pZ+0hCwla8nduKKrudkw7Xq0wuyhGni+ZWPx6wEOepbVz2mEHVzsmaGdJ7Vfw54rHcDHdImER22eU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iBzDf7G6; arc=fail smtp.client-ip=40.93.201.7
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Osk2cjt9b2HnE/3529pJR2e3To+uFRm2pk2IJb++ybHRIvhvTkmL1UPaU2iy0bDk0uZu0yXkoaMtF6HJfLiwRw5eGaEtzGJZCgPHkeXOF7xLfJLVWcst8CLtRG+ZVWaPm8cXjvoiNNCxgrHJLUk1+lFy7iy0d+idt33bFJeqLvedquDLSEnWKbQCnQ0idqMTUC3fDb6SzkvaPQ0AgJTTgPOzmksfX7dYtFIcu6nkPHKtb0fNBmDHKo6Nifo2t6yG2NQK7iBuOx0QVocg36YbVEVy8LGyHpjP3tp7zSZudv7rentpDpKd5dPlQagkE3OHBBbg7cc+3PVF09UD8zAi8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6Ds/t8E1KRNju+1ieDQiM2M9Z+ucR7QMIGU7xNN4Us4=;
+ b=s9fER5srRvp9ffX+ZMgRIDQ5TZKSMFtkcgUDPWk9+LfsOTaXJcxdO3Dgb34bE5giITG2pM3dFWsKYZ42scOfRrmvBOhTrFqEmlWrbu0P3dP9S/VMSw6qY8xNundZw4a7mA103JYQ0lr9hYLnNmd5466LTZGzlFp65QqAlreEDOv7wGuWo8E8cnEi+Dju4a1xZvGjApf1k4+o9VSfT9plQ6hzRtvyO3RrvPh1Sm9c8NqNv8RR66azZLutck8ATx3WoOljysSwriKr60Z9E5Pl2V0++UfGb+t7ahHiRh1ER/4Kh/g/8hahULbmzvLQvYc+heEdv6rzxmszwIUZ9ilraw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6Ds/t8E1KRNju+1ieDQiM2M9Z+ucR7QMIGU7xNN4Us4=;
+ b=iBzDf7G685OrhWwOmUv/UYvF8f7Bp5P1pxUW2so0Wj+nUDj9BJTdYOy1L7+IVXv7bJ9JLDPg5CK1bJyQX4b8jDlcRygRNq997ppo3F4tCxf/DSn5YR3f8K9Td9Z85JFPXYPEURCLw2pJnkR3LMIFKIbmrWZrPSMb7HVkAkFcSns=
+Received: from PH8PR05CA0010.namprd05.prod.outlook.com (2603:10b6:510:2cc::15)
+ by CY8PR12MB7243.namprd12.prod.outlook.com (2603:10b6:930:58::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Thu, 4 Jun 2026
+ 22:54:55 +0000
+Received: from SN1PEPF000397B2.namprd05.prod.outlook.com
+ (2603:10b6:510:2cc:cafe::7) by PH8PR05CA0010.outlook.office365.com
+ (2603:10b6:510:2cc::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.8 via Frontend Transport; Thu, 4
+ Jun 2026 22:54:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SN1PEPF000397B2.mail.protection.outlook.com (10.167.248.56) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.5 via Frontend Transport; Thu, 4 Jun 2026 22:54:54 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 4 Jun
+ 2026 17:54:53 -0500
+From: Eric Joyner <eric.joyner@amd.com>
+To: <netdev@vger.kernel.org>
+CC: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jacob Keller
+	<jacob.e.keller@intel.com>, Eric Joyner <eric.joyner@amd.com>
+Subject: [PATCH net] ethtool: Set histogram ranges to NULL before querying FEC data
+Date: Thu, 4 Jun 2026 15:54:40 -0700
+Message-ID: <20260604225440.11083-1-eric.joyner@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397B2:EE_|CY8PR12MB7243:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01b8115e-3461-4ba2-9036-08dec28c4b63
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700016|6133799003|11063799006|56012099006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	wEkjQIbEvVg5sZFU0lOZ8uXfxEDmpVcBikPBJQlDXjsZLtXDDfuAs6RA7CV2dzNXkguGBrUVrP+IQFJhKvV6eAOuv5lebbLky20iLPH/sxg5ayX7mI4SAuXYf07ILQLi0eOaadk9cfqTdg6UTspaUtv/AaV/ROARJXIZ3LGWIgvm8bwqDsiH1BLiNKGcaKdJ+KQ7UCtcHZrWA4fLAA6Xhhf9//VfxE8CKsicKkiDuThbg1hjwdzQQDhc5qtScssMmDo5kyCwL6SqeUiAyaozyrSA+JhtIDvf2+IYCU/IzV83UZP6kfTrqjbtnZdDFzRUcqVi5Qo0Cs7uVBeOC2aCL8PpHTHzPCPb+Asp2E7Ak3YXHddZr3GGGUMqhJf9dcdQ/dzNnPhrkRUALgdUKJJcBwtRk7mCqw9hZ7wZzp7CrHeMDXBO+jtyQqmpaK5bzrshgv6L9uoEF2FnC0nlR4RyN/BXMIvG7PEvhM3rVqFoHZToOLKBKfm/C/GCbPnmjz9ybIniv56xHYE2KEwJ1a86Sf2+Zr5e69VL1riwlItkqzC8FrZdS028C3bjZqWiZxw1WS1lPZ1Ufekg0EII8ty5WLQEKM6Jv6yLwR6PUmaO+DyN16lC9JmmHpu6qE9Cna55gGaPju/SQ8mDCjgquOIzgXErlqVjozqHjeRcDrqvlJoiPMCaSdqHX2Say3XPCCyKm8OCSB7OUOrteU06v0Ho1BMaaeUvIk3AIGkqu9Sp59I=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700016)(6133799003)(11063799006)(56012099006)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	aKw6jSylZ2kx1YCXA9bG+hg5jo+GZmCk/5Hxl0L22bdzC4ZImkDj/DpjwxuPPFrqt2H1JWmpf4xhwm+018AR6xujEEK10wzfYCX9OhG5CBSNreGb9FJWpp4bpehsNY6gpG3ZFaEYFbsu4FOwNBPhm88idj2xD8svB8Dfsx86sesCLJclDqc3s1B1tCxe+S6FdDk2TKuyI5fQH9W6u2RGsEkFkqHWnzvfROWowZy2WuJUK1mH1DItvP9WcK3+EzL54B5oAkc5yj/8tyQ04RaYapFNQ0+lNH+OmFEcTx+HqXP9KKxtcxFV2xsuP7cNB+lGIT0mfLJv28Q4+VuElfAHL30eST89892Vhue1n0sJrMmwf0sSQXaHzktGhBWCrLXWKh+G9HmPdMtUwWEBK+OvR6/xFUUE/vK0Ji6YzjNXsNY6OgClqAoxm65wjVldNX7I
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2026 22:54:54.8614
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01b8115e-3461-4ba2-9036-08dec28c4b63
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000397B2.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7243
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295468-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295469-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jacob.e.keller@intel.com,m:eric.joyner@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,amd.com:mid,amd.com:dkim,amd.com:from_mime,amd.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BA82643DFA
+X-Rspamd-Queue-Id: 25AA1643E07
 
-On Thu, 4 Jun 2026 20:05:54 +0000 Nitka, Grzegorz wrote:
-> > On Fri, 29 May 2026 16:26:20 +0200 Grzegorz Nitka wrote:  
-> > > NOTE: This series is intentionally submitted on net-next (not
-> > > intel-wired-lan) as early feedback of DPLL subsystem changes is
-> > > welcomed. In the past possible approaches were discussed in [1].  
-> > 
-> > I dug into 3 of the issues reported by Claude here and I think all
-> > are really preexisting. But I don't see why we wouldn't fix those
-> > first, and have a clean AI scan. Please send the fixes ASAP if you
-> > have them, if they are trivial they may make it for tomorrow's PR.  
-> 
-> Thanks for your feedback.
-> I'm not sure if I can identify exact 3 issues you mentioned above.
-> I see couple pre-existing issues reported in
-> https://sashiko.dev/#/patchset/20260529142628.1678955-1-grzegorz.nitka%40intel.com
->   - 3 issues reported in [PATCH v12 net-next 3/8] dpll: extend pin notifier with notification source ID
->   - 2 issues reported in [PATCH v12 net-next 5/8] ice: introduce TXC DPLL device and TX ref clock pin framework for E825
->     The first one is false positive in my opinion.
-> 
-> Did you mean those from patch 3/8?
-> It should be rather simple ones. Shall I submit it as a part of this series?
-> Or a new patch/patchset? (against next or net?)
+If this field isn't set to NULL, then drivers that set the non-histogram
+FEC statistics and don't support/modify the histogram fields will
+trigger a WARN_ON() in fec_put_hist(). Drivers shouldn't be forced to
+set this field to NULL if they don't have a need to touch FEC histogram
+reporting, so set this field before the driver gets the data structure.
 
-Ugh, I think I missed that the caller looks at the ICE_FLAG_DPLL flag.
-So most of the deinit bugs are not actually bugs.
+Fixes: cc2f08129925 ("ethtool: add FEC bins histogram report")
+Signed-off-by: Eric Joyner <eric.joyner@amd.com>
+---
+ net/ethtool/fec.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-You can add the fixes to this series.
+diff --git a/net/ethtool/fec.c b/net/ethtool/fec.c
+index e2d539271060..640d7f264919 100644
+--- a/net/ethtool/fec.c
++++ b/net/ethtool/fec.c
+@@ -116,6 +116,7 @@ static int fec_prepare_data(const struct ethnl_req_info *req_base,
+ 		ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
+ 		ethtool_stats_init((u64 *)data->fec_stat_hist.values,
+ 				   sizeof(data->fec_stat_hist.values) / 8);
++		data->fec_stat_hist.ranges = NULL;
+ 		dev->ethtool_ops->get_fec_stats(dev, &stats,
+ 						&data->fec_stat_hist);
+ 
+
+base-commit: b6197b386677ae5268d4702e23849d9ad53051ad
+-- 
+2.17.1
+
 
