@@ -1,227 +1,272 @@
-Return-Path: <netdev+bounces-295066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OvLfBN4kIWqo/gAAu9opvQ
-	(envelope-from <netdev+bounces-295066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:10:22 +0200
+	id cPSaKLMoIWp3/wAAu9opvQ
+	(envelope-from <netdev+bounces-295067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:26:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82FD63D87F
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:10:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D7263D9C2
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:26:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mTlK76AL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295066-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295066-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=k+Y9YeKZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295067-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295067-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2758E3028155
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 07:10:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 57E11300C828
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 07:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEBD3DB332;
-	Thu,  4 Jun 2026 07:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9131C3D6CAB;
+	Thu,  4 Jun 2026 07:21:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EDC3C3BE6;
-	Thu,  4 Jun 2026 07:10:18 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780557019; cv=none; b=Pts9MkGon0MgQn+7BOFcZhPureUILyufJjXR35AL0Pnq6QSAt2gIoeqL23ogw4PdKN026BDmvU7Zhbum9mzveNtaEVKWLYafCaxI4sVehRIXrl+3P308DQLVh+DlCqwGg9LPjA1EBLdpnmt/+PpLym8CW14GXRn9T86ezTtDNdM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780557019; c=relaxed/simple;
-	bh=Ws4H9Q+8t06VACzdZSGsOKt9b28u1KPCCkBtrR11z9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RhqPJVKO0Zi3Cfmdq5/SeJJaIvJcR/EaUFXuuovvWu1SSPDMTXgMB+rwiwfCyfGhvLcQjRj8hfiMrbTx9xLUMfH4S6SSA2A8+1lENfiz/bDHzVi+hd6COgjIGV+y7GRt3NnVRZ/KZpWgu1TO06BLsM8EzHmt2ErItKgw2QV2DhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTlK76AL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 724E31F00893;
-	Thu,  4 Jun 2026 07:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780557018;
-	bh=AhMxEQwcegOFcYLIZ9y5iV53bw04kwuyEtOBVhEDYMA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=mTlK76ALzPHk/Pz+6x8nTHyAjcgK/SS+Mku9+Qi7I3SNA0dfcHu6BhFEs+C19pRU6
-	 E5+OGsyWwtumgMG/WJ2Le0aae5LQxGXgowtVmcepxAXxMfqCWAilCKaYGk/5+kRVkP
-	 4cO9j+hmH6qM30B4Ytx/qU6yvKs9erS3UMZLX0LxVk1/5u7oTpy2ME5T1T/npLCOGU
-	 s4u+Pk89mJTbVKzFZ55WRg+drPIILWBGGd5p/DVxhd0Z2F7ICIpxvMp25Jq0zQa4Gy
-	 HAb3eZDLpekHG+5x0DW3wia0LnDWOcTfGSaDl10ol+7lmMFjJhA3KS0hZK1C8ogR+c
-	 F4m/GYKhfbnJQ==
-Message-ID: <f027078c-6a55-463b-8938-95ede02dca3b@kernel.org>
-Date: Thu, 4 Jun 2026 16:10:08 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB27175A86
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 07:21:00 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780557662; cv=pass; b=LYap7XJqol+41OPl6mswLeOPM7/f2XnVaKQ3mJjG7+U+Tm4CzdK/5naafkNlS/tkX6IXKVV03CV81zeSrOEd/6H/yaxL/UbypYG6PQvfnh7Y+eLVTAgBoGqUxbvP7837A+BNFEXEzmOSRi7l9RNdsGuGZOCjNTTpAxkEGrMaw94=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780557662; c=relaxed/simple;
+	bh=X9xjukybo6S7vXXk+qL+5aNke3f2xVT5L4Cl/0Wyf2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WuhJQpsBVBkPRdCSqouCRem761Beraewb7D8GMeC4BMGhF+d/5Y5ld23dIQpH5A7bvufT60xjR32xlJkD+KP+VhoviP4K7HSoUWevkQ4ZHZFUCep68IL9Ewy19/rOqhGG7WlSmeBdPaAgpoUcwbKsfqKxC82ns2w83aZgsscCYg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k+Y9YeKZ; arc=pass smtp.client-ip=209.85.160.170
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-5174a3d9598so3660471cf.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 00:21:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780557660; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QRKenuPc3ePMijURJenkkxO/VN7e2KsPMh+M3GlInsFYDJX/6t2ajGa99/N9fbHxNg
+         mxFshR69uVh2qkUjkAv69ih5lf7ZDXANDspugU6mhxSRmwKNl1cEg6Zuen4THhAqVhA6
+         QU6e6EcUVvy+E2ZAjdKP8Nah6f1sJ1ODQJwJchEDESa5b5hgDfMkS3yhyIB88h6O4K9S
+         xHvI038F5VkRe8wL75UWqdGLQbsHz/+R/hs4Dm7E2iS/ywNX1dvgbsUr/iYxtc77IhOG
+         kWQMIa2GpJjLi8U5hhMfqQRKUxIzvcGNn4SRCECYDvWqPoTgY5rSV4NwbwaB1x48qzuj
+         ikbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VRJUjNFYXqgMCP6VqtwWRNf39zONDcKlcYz+DrknF84=;
+        fh=dvnGgD2it5si6ubeRTq8cWbTqZOBMPW5IUdXL4EHTe4=;
+        b=UJ7FspKt8a/OId277gvsq77Na9qNH9Aq6dbBAtDMCBzC5jVLDdBAitxOepxfwgkQto
+         ge5E3/3SSbPiCAIlew0iAUPc3UsJbFPdK3uWdoAsv64LxTxTPhMLkB0I/cJoT33WufRW
+         /AXCgdd8bgXYxrcZo2hHSdUWyLB9BkxIc2+6wmgNAYYusyy32VHv8lh/LpwwJmPOIYih
+         RRr8yxUf9FXWi6Rl2ApUu330nZfUvxBEkEA68V6+jx8uR07xJOl6yJVDwN3JMkB7atY9
+         80xB0mgfNWlF4udaFOzlymzGQ97jURW4UBMU5FlD0TyW1An3ymRLwjRAA1uW338jfjYR
+         E7+A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780557660; x=1781162460; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VRJUjNFYXqgMCP6VqtwWRNf39zONDcKlcYz+DrknF84=;
+        b=k+Y9YeKZrZHeZr5p8KrOFEwrZNeOUYgGeEGjVO1RtOm8To3B81zor3JX+RH+zjFDn3
+         RdY28+bLWIwriPh31B4vJsPxVl/DLtD1GwR2OPvK5Y6RQgi3gZGgcFn3NdS5yZuaXEKT
+         c7m5OZ7DnG/ZvB+iHO1NsrM/CNB1xax4g2c/xGq9nv9SaWovq22VKe3o8fj5Xdrboy+u
+         xGtP7nyeVTSejeWajp5M+AZJbeE8Gd6JIRTc5BFn/6BBbPon8zGrl8fpN61xACSqsWpN
+         H00b+Khgj0jaOp4TaLAb+vBIJknjhtPsORs3Al9DklqbO84bFeLiYeXNlJxQ+yuGGAO3
+         N8BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780557660; x=1781162460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VRJUjNFYXqgMCP6VqtwWRNf39zONDcKlcYz+DrknF84=;
+        b=AvJ4NAFC8/tb/VinnoJWBxYnJaoEcNwNQ2M5cbXovqAXcXH9m1TCxYYjVhv8Tq9YnP
+         k+p9M8sB3VqFb9Wax+x3SHYBNGqSM7SFApp8NXU2DnKDCt/8JmAumNFYg4nYQJarPgkN
+         otxS3lqeRVSaG4uL79pZyDBvcHN2hzY822x/aT0UKWD/+4uO3GqRjS16RwOGXsuJBXfs
+         QdnxqXhEN53L9upShpxeaTEdN+Tff6HSMAd+UZ0Dj9UC8OpNcss8NU3ozviQmelLQX7H
+         cuvDAT8Sre1d/luGk5fdD2FrRSQo/1/7rziSNPxT8I9awH4TcsFUJnTzlcPd/8y2uU55
+         6eLw==
+X-Forwarded-Encrypted: i=1; AFNElJ/YS2ndbbUcuSirxsfmeoL/nH5uE+08D0+ckiue5NEenkCrnGCX/Kw5GXZ34s1WnGVZ4/Ugc/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzroxsbZUY77XkR9S8kxWpiW99cQ4XiUCMJXCjAusvSiYQLk/nu
+	kklNCSeV08GoAmkB8Bzi43vOcKId14w2LJkJ82aZ25xyeteN7hrG2DSirVlBE1rXBs3JYGllKcw
+	qd2KlQqhif6kyp9068ym+v0MTT3EjsNBZlGXN
+X-Gm-Gg: Acq92OFLi5vJJj5YL/wvUMNgjFeAdP/lBKTZtEbLAFeLCPFGDQaoVqtNBfkt+zVbclf
+	LqRtPIau+mmmXsv+IKahtOoau6FM1nh1mHabCouWJ1l0gloNdIh5Awd1ZImfC/CiFw5J7jNLh0t
+	MRuBTUXa9e8Y08Tp7GPRg/ZrX4qwLBxZCG4GvdRQYcL4EgEWPAdz10/DaHv0MLhQwNXXElOiWUL
+	4BmpYECmryUhVWXLgpVTbG6AlexxfcCyzG8SJOOrFRkcyjGqJXr/Hm4xzv5Oo5ps1laKTrdKHDS
+	0HASiILhAtqcit5ziBI=
+X-Received: by 2002:a05:622a:7c95:b0:517:29c1:2b58 with SMTP id
+ d75a77b69052e-51778706242mr69490691cf.48.1780557660032; Thu, 04 Jun 2026
+ 00:21:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, rob.clark@oss.qualcomm.com
-Cc: Christoph Hellwig <hch@lst.de>, Andrew Morton
- <akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>,
- Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
- David Rientjes <rientjes@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Jesper Dangaard Brouer <hawk@kernel.org>, linux-arm-msm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, io-uring@vger.kernel.org,
- kasan-dev@googlegroups.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Boris Brezillon <boris.brezillon@collabora.com>
-References: <20260528093437.2519248-1-hch@lst.de>
- <20260528093437.2519248-2-hch@lst.de>
- <5f7f90d8-cb32-4ffb-8f1c-0722aafbe869@kernel.org>
- <20260529135045.GA10647@lst.de>
- <5f3ba603-a6ad-4cf2-9a54-aebc10273c59@kernel.org>
- <58cc76e7-2348-443d-a989-2a06e61178af@kernel.org>
- <20260601113831.GA25535@lst.de>
- <d7b08296-7f6e-4d89-ab3b-04e43d04929e@kernel.org>
- <CACSVV00k-fxW6+waHNqvmYcnVNDkRexoWWprFzfayZfqdyMuuA@mail.gmail.com>
- <CACSVV00dNWgpNVU5rB=Hmg+3oWF18yTyfKNr_tWesjoP1jMxwg@mail.gmail.com>
- <5e6948b3-d235-4b61-aed7-e8b4d0f5b452@kernel.org>
- <CACSVV02v0Fuc6=Rqyd89D-_tcSjEXuQmxz0+2-4aoRAEwJE4zg@mail.gmail.com>
- <b6f6323e-6f5b-4928-b474-bd2743eac3f2@kernel.org>
-Content-Language: en-US
-From: Harry Yoo <harry@kernel.org>
-In-Reply-To: <b6f6323e-6f5b-4928-b474-bd2743eac3f2@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------wiFRKWLl9yvmDjGQCVE2s47E"
+References: <20260526063650.952-1-xuewen.yan@unisoc.com>
+In-Reply-To: <20260526063650.952-1-xuewen.yan@unisoc.com>
+From: Xuewen Yan <xuewen.yan94@gmail.com>
+Date: Thu, 4 Jun 2026 15:20:48 +0800
+X-Gm-Features: AVHnY4JMDbEjgp_41z4QQ3jxPPk1W4FxPy4hld5AnX75Yz1GbP34j3RzSyqNPn8
+Message-ID: <CAB8ipk9-A2KPFu6B4PVfJ-X+W1QvH0dwrkPZS_3xzdLOOPOBUA@mail.gmail.com>
+Subject: Re: [RFC PATCH] net/core: use wake_up_interruptible_poll() in sock_def_readable()
+To: Xuewen Yan <xuewen.yan@unisoc.com>
+Cc: edumazet@google.com, kuniyu@google.com, pabeni@redhat.com, 
+	willemb@google.com, davem@davemloft.net, kuba@kernel.org, horms@kernel.org, 
+	peterz@infradead.org, mingo@redhat.com, vincent.guittot@linaro.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ke.wang@unisoc.com, 
+	guohua.yan@unisoc.com, Wade.Shu@unisoc.com, di.shen@unisoc.com, 
+	Jiayuan Chen <jiayuan.chen@linux.dev>, John Stultz <jstultz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295066-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:vbabka@kernel.org,m:rob.clark@oss.qualcomm.com,m:hch@lst.de,m:akpm@linux-foundation.org,m:broonie@kernel.org,m:hao.li@linux.dev,m:cl@gentwo.org,m:rientjes@google.com,m:roman.gushchin@linux.dev,m:hawk@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:io-uring@vger.kernel.org,m:kasan-dev@googlegroups.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:aleksander.lobakin@intel.com,m:boris.brezillon@collabora.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[harry@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:~];
+	FORGED_RECIPIENTS(0.00)[m:xuewen.yan@unisoc.com,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:peterz@infradead.org,m:mingo@redhat.com,m:vincent.guittot@linaro.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ke.wang@unisoc.com,m:guohua.yan@unisoc.com,m:Wade.Shu@unisoc.com,m:di.shen@unisoc.com,m:jiayuan.chen@linux.dev,m:jstultz@google.com,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295067-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[xuewenyan94@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[harry@kernel.org,netdev@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuewenyan94@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A82FD63D87F
+X-Rspamd-Queue-Id: 16D7263D9C2
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------wiFRKWLl9yvmDjGQCVE2s47E
-Content-Type: multipart/mixed; boundary="------------wMYGC0PsvxX072tLl8xZovbN";
- protected-headers="v1"
-From: Harry Yoo <harry@kernel.org>
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, rob.clark@oss.qualcomm.com
-Cc: Christoph Hellwig <hch@lst.de>, Andrew Morton
- <akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>,
- Hao Li <hao.li@linux.dev>, Christoph Lameter <cl@gentwo.org>,
- David Rientjes <rientjes@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Jesper Dangaard Brouer <hawk@kernel.org>, linux-arm-msm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, io-uring@vger.kernel.org,
- kasan-dev@googlegroups.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Boris Brezillon <boris.brezillon@collabora.com>
-Message-ID: <f027078c-6a55-463b-8938-95ede02dca3b@kernel.org>
-Subject: Re: [PATCH] mm/slab: improve kmem_cache_alloc_bulk
-References: <20260528093437.2519248-1-hch@lst.de>
- <20260528093437.2519248-2-hch@lst.de>
- <5f7f90d8-cb32-4ffb-8f1c-0722aafbe869@kernel.org>
- <20260529135045.GA10647@lst.de>
- <5f3ba603-a6ad-4cf2-9a54-aebc10273c59@kernel.org>
- <58cc76e7-2348-443d-a989-2a06e61178af@kernel.org>
- <20260601113831.GA25535@lst.de>
- <d7b08296-7f6e-4d89-ab3b-04e43d04929e@kernel.org>
- <CACSVV00k-fxW6+waHNqvmYcnVNDkRexoWWprFzfayZfqdyMuuA@mail.gmail.com>
- <CACSVV00dNWgpNVU5rB=Hmg+3oWF18yTyfKNr_tWesjoP1jMxwg@mail.gmail.com>
- <5e6948b3-d235-4b61-aed7-e8b4d0f5b452@kernel.org>
- <CACSVV02v0Fuc6=Rqyd89D-_tcSjEXuQmxz0+2-4aoRAEwJE4zg@mail.gmail.com>
- <b6f6323e-6f5b-4928-b474-bd2743eac3f2@kernel.org>
-In-Reply-To: <b6f6323e-6f5b-4928-b474-bd2743eac3f2@kernel.org>
+Hello everyone,
+Any comments about this?
 
---------------wMYGC0PsvxX072tLl8xZovbN
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Or we only ignore sync for thread:
+---
+diff --git a/net/core/sock.c b/net/core/sock.c
+index b37b664b6eb9..a46334266e86 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3610,9 +3610,14 @@ void sock_def_readable(struct sock *sk)
 
+        rcu_read_lock();
+        wq =3D rcu_dereference(sk->sk_wq);
+-       if (skwq_has_sleeper(wq))
+-               wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN | EPOLLP=
+RI |
++       if (skwq_has_sleeper(wq)) {
++               if (in_interrupt())
++                       wake_up_interruptible_sync_poll(&wq->wait,
+EPOLLIN | EPOLLPRI |
++                                               EPOLLRDNORM | EPOLLRDBAND);
++               else
++                       wake_up_interruptible_poll(&wq->wait, EPOLLIN
+| EPOLLPRI |
+                                                EPOLLRDNORM | EPOLLRDBAND);
++       }
+        sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
+        rcu_read_unlock();
+ }
+@@ -3628,9 +3633,14 @@ static void sock_def_write_space(struct sock *sk)
+         */
+        if (sock_writeable(sk)) {
+                wq =3D rcu_dereference(sk->sk_wq);
+-               if (skwq_has_sleeper(wq))
+-                       wake_up_interruptible_sync_poll(&wq->wait, EPOLLOUT=
+ |
++               if (skwq_has_sleeper(wq)) {
++                       if (in_interrupt())
++
+wake_up_interruptible_sync_poll(&wq->wait, EPOLLOUT |
++                                               EPOLLWRNORM | EPOLLWRBAND);
++                       else
++                               wake_up_interruptible_poll(&wq->wait, EPOLL=
+OUT |
+                                                EPOLLWRNORM | EPOLLWRBAND);
++               }
 
+                /* Should agree with poll, otherwise some programs break */
+                sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
 
-On 6/4/26 1:22 AM, Vlastimil Babka (SUSE) wrote:
-> On 6/3/26 13:13, Rob Clark wrote:
->> On Wed, Jun 3, 2026 at 2:17=E2=80=AFAM Vlastimil Babka (SUSE) <vbabka@=
-kernel.org> wrote:
->>>
->>> We know p->pages is NULL in this case, right? Because it was allocate=
-d by
->>> vm_bind_job_create() using kzalloc().
->>> And the job can't be reused with a leftover value?
->>> (msm_iommu_pagetable_prealloc_cleanup doesn't set p->pages to zero).
->>> Or should we set p->pages to NULL here.
->>
->> Correct, the job is not reused.  But I suppose setting p->pages to
->> NULL would make things more obvious, so no objection to that.
->=20
-> OK, did that, just in case. Thanks.
-
-The kvfree() -> kfree() part should probably be a separate patch
-with Fixes: 830d68f2cb8a ("drm/msm: Fix pgtable prealloc error
-path") and Cc: stable?
-
-=2E..as the commit landed v6.18.
-
->> BR,
->> -R
->>
->>>> +
->>>>         p->pages =3D kvmalloc_objs(*p->pages, p->count);
->>>>         if (!p->pages)
->>>>                 return -ENOMEM;
->>>>
->>>>         ret =3D kmem_cache_alloc_bulk(pt_cache, GFP_KERNEL, p->count=
-, p->pages);
->>>>         if (ret !=3D p->count) {
->>>> -               kfree(p->pages);
->>>> +               kvfree(p->pages);
->>>>                 p->pages =3D NULL;
->>>>                 p->count =3D ret;
->>>>                 return -ENOMEM;
-
---=20
-Cheers,
-Harry / Hyeonggon
-
---------------wMYGC0PsvxX072tLl8xZovbN--
-
---------------wiFRKWLl9yvmDjGQCVE2s47E
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEARYKAB0WIQQQ1ub6gR5ogjaKRmOGXBN6rc5S1gUCaiEk0AAKCRCGXBN6rc5S
-1v0/AQCTdSzVR1AlZpSbYogIVVB+443eCQzT7065V9OSIICLswD/e6Yg56WZBHlu
-kh1s01feILBrZKf2TcrQ69haUSsKKgk=
-=BoaG
------END PGP SIGNATURE-----
-
---------------wiFRKWLl9yvmDjGQCVE2s47E--
+On Tue, May 26, 2026 at 2:37=E2=80=AFPM Xuewen Yan <xuewen.yan@unisoc.com> =
+wrote:
+>
+> sock_def_readable() currently uses wake_up_interruptible_sync_poll() to
+> wake up tasks waiting for readable data on a socket. The _sync variant
+> sets the WF_SYNC flag, which tells the scheduler that the waker will
+> schedule away soon, so the wakee should stay on the same CPU to avoid
+> needless cache bouncing.
+>
+> However, we found that the following stack:
+>  -vfs_write
+>  -sock_write_iter
+>  -unix_stream_sendmsg
+>  -sock_def_readable
+>  -__wake_up_sync_key
+>
+> In this process-context scenario, the waker does NOT go to sleep
+> after the wakeup. With WF_SYNC, the scheduler is misled into placing
+> the wakee on the waker's CPU (via wake_affine_idle()'s sync path when
+> nr_running =3D=3D 1), causing both the sender and receiver to contend for
+> the same CPU. This may hurt throughput for IPC workloads on multi-core
+> systems where the sender and receiver could otherwise run in parallel
+> on different CPUs.
+>
+> Switch to wake_up_interruptible_poll() which does not set WF_SYNC.
+> This allows the scheduler to freely migrate the wakee to an idle CPU,
+> enabling true parallelism between the sending and receiving processes.
+>
+> Co-developed-by: Guohua Yan <guohua.yan@unisoc.com>
+> Signed-off-by: Guohua Yan <guohua.yan@unisoc.com>
+> Signed-off-by: Xuewen Yan <xuewen.yan@unisoc.com>
+> ---
+> Note:
+> The possible cost is that for softirq callers (TCP/UDP receive path), the=
+ wakee
+> may be migrated away from the current CPU where the received data is
+> cache-hot. However, this is mitigated by:
+>   - The scheduler's existing wake_affine logic which already considers
+>     cache affinity regardless of WF_SYNC.
+>
+> We are not very familiar with the networking code here,
+> so we would greatly appreciate any suggestions or advice from the communi=
+ty.
+>
+> Thanks=EF=BC=81
+> ---
+>  net/core/sock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index b37b664b6eb9..42ab9373194f 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3611,7 +3611,7 @@ void sock_def_readable(struct sock *sk)
+>         rcu_read_lock();
+>         wq =3D rcu_dereference(sk->sk_wq);
+>         if (skwq_has_sleeper(wq))
+> -               wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN | EPOL=
+LPRI |
+> +               wake_up_interruptible_poll(&wq->wait, EPOLLIN | EPOLLPRI =
+|
+>                                                 EPOLLRDNORM | EPOLLRDBAND=
+);
+>         sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
+>         rcu_read_unlock();
+> --
+> 2.25.1
+>
 
