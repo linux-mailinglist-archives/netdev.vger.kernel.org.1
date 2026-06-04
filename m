@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-295458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mpJGIjMBImr5RQEAu9opvQ
-	(envelope-from <netdev+bounces-295458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:50:27 +0200
+	id RgSrK1oBImr+RQEAu9opvQ
+	(envelope-from <netdev+bounces-295459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:51:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B61643DDC
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:50:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 072EA643DE3
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:51:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=Nqnuyzoj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295458-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295458-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=tGbEBQ0k;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295459-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295459-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 496EB304EA29
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:47:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B19D33061E8B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF6A18CC13;
-	Thu,  4 Jun 2026 22:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B48B33C53D;
+	Thu,  4 Jun 2026 22:47:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15E029E117
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 22:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28DE30594F
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 22:47:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780613248; cv=none; b=dPcpdr+Cxf1Yf+SPVqzgxCIlcM+7RE+lV65UkDiRdAG4FIqGdEo+Uu3DeBvFgj4Ok7eqTv77kXO7vmjdmmaGmBS19cAUpbpx4238LIcSngZRX8Qjwok8Gq/ot/xrXAJGSSNxDWxnkRtEa0AjsNrhXRdWPkuw78Gbaps15OlFeDE=
+	t=1780613250; cv=none; b=MrKEJ6GNixQkUpj4h8nkzS6dgmSur6UzLYA6IlBjLRXKkFIGeBvgCdOy/wFtsRFHqVR6pf/ZNbJAQ3DI64J3devwCDsZgJMkCYw39SLAbuiezxF95KY0pY69Diq9+LK3kBr0o8+5gv/K5hqvjupt7gFFXq81LGDsndXRWPQJ8JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780613248; c=relaxed/simple;
-	bh=6pLcVcN7xh4CDhA4JS0zGRY9mdAa8AFNN6bUow8/VVM=;
+	s=arc-20240116; t=1780613250; c=relaxed/simple;
+	bh=4tOP5Xbaiyw3chab8ooB4r/AHChl49yMklWTyoU5GKI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RwHB2RyFHwpTZnjrlMdp10Zbm1s6LU6rtKpnFC40ev+UvIv3S3tnw3M5qqxPqKo7/CjlJcDHA8cTHcQ1KfvoXtbm/JYLoHTcpkLxxfhXrHgaQL3UIYB8zo8C+9lXeJtQV7Ns0Ce2nqx2ExV2cewVLlbZt+dSzQoh4RzfTt5Tbrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nqnuyzoj; arc=none smtp.client-ip=209.85.216.74
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-36d6389bbf4so1135001a91.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 15:47:25 -0700 (PDT)
+	 To:Cc:Content-Type; b=PdNL4PrxPokPlrtUFQS0rAXaTaFxNstJ0FcITYZgsxDR+6TXuVo9s5Mc/xVtECGRFvMDTCyGLYObL/8hb993wq//9Qvy3cfooP8CU+mBoW3etlTvgT0nM1ifCj35WTTcEsnkLKpkM4WRk21nHA0MjtwDBdbgkCI2+a28mj/bGXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tGbEBQ0k; arc=none smtp.client-ip=209.85.216.73
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-36bb6c41341so1448061a91.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 15:47:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780613245; x=1781218045; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780613247; x=1781218047; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XvZEheOknSj4SDQgEshO0akCDgpLmkqRad0rN6bw3Es=;
-        b=Nqnuyzoj1hcbeyaj6Yn2LCZm78M7s+Xu5/6qwmjjVyLRKjGrh62G8RyzU9yjRRWPNV
-         63QPFNAe4vdB16ykWsSKzZbF6xnR4g5T+1pD9NEPvhVbG6HZqMY8CYkr2r3ByxOPYe4m
-         VZj1qoND+WXfqIZyAENDdo+Gq+xWciFUJbldnGTyTdQd9tjHPjrInjNU0gMPkDI6abht
-         8Km8KCmgEz+TdzshEHEM+cqtHbn5VMz+cAIByP8lweNJbv0dKk2Ja+RJ07NApnqmDvfz
-         QYKJvp6f5vp1wpuqaonosYM+UMX3KMzoCS2sXlKVkToXRADdT9J0NsxXsJA8D3hyV2+z
-         6q4A==
+        bh=XCVcy7HuGc8hs/BVluuXbjsahhIghgrCReA3zwv70RE=;
+        b=tGbEBQ0kK2YZOX3eSHi3DVNVtvsGRq26w1KlHGQdJrOeBXAPZpQp2c/P/HwM5b/gw8
+         TfekAVBHlVFenxpHlB4RAXgdRPTy3xex1bUlIWd5ZaL6z3Fno7Q/EpScQMnYMO+hq/V0
+         ic5W3d33hg0/bKX5bLP4j3i1/o4rTQmfFd+EPlxXvv1pGZI4QlklDRHob5MeCXxZkADi
+         l1EFfVN1YzH6TXsuN13e8CG3llYoqDEyF6/VBYZ/1r9GOeCOGSE8tEV4u8/JU84WlEjs
+         N9hfsiRCVNj97ihunCO6qIvWuKBNRLC2dA/z1+yWrVIV+eFiwnmqWMw6D8YJwmNINyyD
+         zfag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780613245; x=1781218045;
+        d=1e100.net; s=20251104; t=1780613247; x=1781218047;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XvZEheOknSj4SDQgEshO0akCDgpLmkqRad0rN6bw3Es=;
-        b=oS3VeAbDgQJWANlhfT3YitMZi8OLMqz+JsHB6zCCF8NNhGBS0fEXsaGEcjAqQnj7yI
-         /q9WeqvJUzYkDU6KoI1/5ZV313gLrN0UZVtRDsmlvupecaZuTs+Id/ODSUy8RaaUBaNK
-         kDysDSxcsTijXUDgZxqtXfsVyiPY+sSSlfH29pAgDxsCozFFlaI+/4kpoUnBG/twFkrP
-         ZjfvxQESXve7iYjN2usmcN+JI16hbB64HyNwHJt/0gJmFFUgjx612Y4MNlmyU476uc6+
-         GBOkmutMPSALMNzp93UNj5EG6U0QFehNXLQL6KhWZgHG8zx2et+/R40xHcvFJUzHSFiZ
-         7hPw==
-X-Forwarded-Encrypted: i=1; AFNElJ/LMviLLS7N5a/AhIj4Fcr5/G+4668qbnZb9BiiLB7mPJwEiqUO0jkRjwQG6SByfYSdNTC5oZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwH2Ns+Be+yaLXW86CkJLQKzk0SMCd4wZCnQnl4E07X02f46q0
-	5l3GNdPtQwLqpXMZPXk320britdh49xu5pw/H5JL9+G6p6mc3gMTAEbCnFMgpuIGLQmbCi472AD
-	JkF591Q==
-X-Received: from pfqr1.prod.google.com ([2002:aa7:9ec1:0:b0:842:4878:6a38])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e390:b0:3b4:8e36:5fb6
- with SMTP id adf61e73a8af0-3b4ccd1e5cdmr1160844637.2.1780613244923; Thu, 04
- Jun 2026 15:47:24 -0700 (PDT)
-Date: Thu,  4 Jun 2026 22:46:25 +0000
+        bh=XCVcy7HuGc8hs/BVluuXbjsahhIghgrCReA3zwv70RE=;
+        b=gR//XpcC2dklOKi6QE0aAe4qLQN/WWZPRMXArk8IJ24Q768VU6q76EebJBAwwuuXGc
+         k5h6grdLbQxHMywkoeQPAl9KkC7j7ZU9fg9b3QYL3wBqjLgTDMY5mIPb8TeJF7R6JnFz
+         JT0+mt/slHIUW0UtT3ytW929yUvw2qbfMn6YeSyPOUiBRuKhvifPjh0IqqAG8HM5fNRm
+         nYwT8LPj0azED/gduPLYxB4ouPeBqc2E8d7Wtd70+mCxF46WRshR7lfziInMjvT5ST9w
+         MI7RneIQJqRWWpB8vplMy4WirGyXGVFvyFbm7cLqBwYUj5E+1IhfsCJmU/cbcZUSkD5T
+         dJEQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8bvz5ZRf3fCtQd9zvlcryfMENir4uJsezroyt0mCGl+sTTJNPdERZx2XmDJrfPixS5UlJ6oCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6JKnhIuKgB6Mg8zEaIQURG6HwtHPM8eXueQx5u74CaBY9Kira
+	uJS35GWBOrOgz7UdvogL+2UT2Q+97RC2X0FggTZwl+3w/czYLi/ezjYFqPfUvqKP2k+1LBJv+gT
+	BAKqLQw==
+X-Received: from pjyl21.prod.google.com ([2002:a17:90a:ec15:b0:36b:a0ab:bf1f])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3512:b0:36d:b424:4f17
+ with SMTP id 98e67ed59e1d1-370ee82fa3cmr798100a91.1.1780613246516; Thu, 04
+ Jun 2026 15:47:26 -0700 (PDT)
+Date: Thu,  4 Jun 2026 22:46:26 +0000
 In-Reply-To: <20260604224712.3209821-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260604224712.3209821-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
-Message-ID: <20260604224712.3209821-8-kuniyu@google.com>
-Subject: [PATCH v3 net-next 07/15] net: Remove rtnl_held of struct fib_dump_filter.
+Message-ID: <20260604224712.3209821-9-kuniyu@google.com>
+Subject: [PATCH v3 net-next 08/15] ip6mr: Free mr_table after RCU grace period.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Ido Schimmel <idosch@nvidia.com>, 
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295458-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295459-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -119,154 +119,295 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D7B61643DDC
+X-Rspamd-Queue-Id: 072EA643DE3
 
-Commit 22e36ea9f5d7 ("inet: allow ip_valid_fib_dump_req() to
-be called with RTNL or RCU") introduced the rtnl_held field in
-struct fib_dump_filter to switch __dev_get_by_index() and
-dev_get_by_index_rcu() depending on the caller's context.
+Since default_device_exit_batch() is called after ->exit_rtnl(),
+idev->mc_ifc_work could finally call mroute6_is_socket() under RCU
+while ->exit_rtnl() is running. [0]
 
-This field served as an interim measure while we were incrementally
-converting all callers of ip_valid_fib_dump_req() to RCU.
+With CONFIG_IPV6_MROUTE_MULTIPLE_TABLES=n, ip6mr_fib_lookup() does
+not check if net->ipv6.mrt6 is NULL.  If ip6mr_net_exit_batch()
+set net->ipv6.mrt6 to NULL and freed it, the mrt->mroute_sk access
+could result in null-ptr-deref or use-after-free.
 
-Now that all users (IPv4, IPv6, ipmr, ip6mr, and MPLS) have
-been converted to RCU, the field is no longer necessary.
+Let's prepare for that situation by applying RCU rule to ip6mr
+table similarly.
 
-Let's remove it.
+!check_net(net) is added in ip6mr_cache_unresolved() and
+mroute_clean_tables() to synchronise the two by mfc_unres_lock
+so that ip6mr_cache_unresolved() will not queue skb after
+mroute_clean_tables() purged &mrt->mfc_unres_queue.
 
+rcu_read_lock() in reg_vif_xmit() is moved up to cover
+ip6mr_fib_lookup() as with ipmr.
+
+Link: https://lore.kernel.org/netdev/20260407184202.34cfe2d6@kernel.org/ #[0]
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/net/ip_fib.h    |  1 -
- net/ipv4/fib_frontend.c | 19 ++++++-------------
- net/ipv4/ipmr.c         |  4 +---
- net/ipv6/ip6_fib.c      |  1 -
- net/ipv6/ip6mr.c        |  4 +---
- net/mpls/af_mpls.c      |  6 ++----
- 6 files changed, 10 insertions(+), 25 deletions(-)
+ net/ipv6/ip6mr.c | 121 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 69 insertions(+), 52 deletions(-)
 
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index 318593743b6e..1142ffad7444 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -269,7 +269,6 @@ struct fib_dump_filter {
- 	bool			filter_set;
- 	bool			dump_routes;
- 	bool			dump_exceptions;
--	bool			rtnl_held;
- 	unsigned char		protocol;
- 	unsigned char		rt_type;
- 	unsigned int		flags;
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index 1dab44e13d3b..ceeb87b13b93 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -946,9 +946,6 @@ int ip_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
- 	struct rtmsg *rtm;
- 	int err, i;
- 
--	if (filter->rtnl_held)
--		ASSERT_RTNL();
--
- 	rtm = nlmsg_payload(nlh, sizeof(*rtm));
- 	if (!rtm) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for FIB dump request");
-@@ -992,10 +989,8 @@ int ip_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
- 			break;
- 		case RTA_OIF:
- 			ifindex = nla_get_u32(tb[i]);
--			if (filter->rtnl_held)
--				filter->dev = __dev_get_by_index(net, ifindex);
--			else
--				filter->dev = dev_get_by_index_rcu(net, ifindex);
-+
-+			filter->dev = dev_get_by_index_rcu(net, ifindex);
- 			if (!filter->dev)
- 				return -ENODEV;
- 			break;
-@@ -1017,18 +1012,16 @@ EXPORT_SYMBOL_GPL(ip_valid_fib_dump_req);
- 
- static int inet_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- {
-+	const struct nlmsghdr *nlh = cb->nlh;
-+	struct net *net = sock_net(skb->sk);
- 	struct fib_dump_filter filter = {
- 		.dump_routes = true,
- 		.dump_exceptions = true,
--		.rtnl_held = false,
- 	};
--	const struct nlmsghdr *nlh = cb->nlh;
--	struct net *net = sock_net(skb->sk);
--	unsigned int h, s_h;
--	unsigned int e = 0, s_e;
--	struct fib_table *tb;
-+	unsigned int e = 0, s_e, h, s_h;
- 	struct hlist_head *head;
- 	int dumped = 0, err = 0;
-+	struct fib_table *tb;
- 
- 	rcu_read_lock();
- 	if (cb->strict_check) {
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 2628cd3a93a6..78dbeecf71bb 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -2777,9 +2777,7 @@ static int ipmr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 
- static int ipmr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb)
- {
--	struct fib_dump_filter filter = {
--		.rtnl_held = false,
--	};
-+	struct fib_dump_filter filter = {};
- 	int err;
- 
- 	rcu_read_lock();
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index b897b3c5023b..fc95738ded76 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -633,7 +633,6 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct rt6_rtnl_dump_arg arg = {
- 		.filter.dump_exceptions = true,
- 		.filter.dump_routes = true,
--		.filter.rtnl_held = false,
- 	};
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
 diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 380e5eb9416d..8c8ad1753c75 100644
+index 8c8ad1753c75..ddbe06397d9c 100644
 --- a/net/ipv6/ip6mr.c
 +++ b/net/ipv6/ip6mr.c
-@@ -2745,9 +2745,7 @@ static int ip6mr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- static int ip6mr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb)
+@@ -136,16 +136,6 @@ static struct mr_table *__ip6mr_get_table(struct net *net, u32 id)
+ 	return NULL;
+ }
+ 
+-static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
+-{
+-	struct mr_table *mrt;
+-
+-	rcu_read_lock();
+-	mrt = __ip6mr_get_table(net, id);
+-	rcu_read_unlock();
+-	return mrt;
+-}
+-
+ static int ip6mr_fib_lookup(struct net *net, struct flowi6 *flp6,
+ 			    struct mr_table **mrt)
  {
- 	const struct nlmsghdr *nlh = cb->nlh;
--	struct fib_dump_filter filter = {
--		.rtnl_held = false,
--	};
-+	struct fib_dump_filter filter = {};
+@@ -274,7 +264,7 @@ static void __net_exit ip6mr_rules_exit(struct net *net)
+ 
+ 	ASSERT_RTNL();
+ 	list_for_each_entry_safe(mrt, next, &net->ipv6.mr6_tables, list) {
+-		list_del(&mrt->list);
++		list_del_rcu(&mrt->list);
+ 		ip6mr_free_table(mrt);
+ 	}
+ 	fib_rules_unregister(net->ipv6.mr6_rules_ops);
+@@ -298,28 +288,30 @@ bool ip6mr_rule_default(const struct fib_rule *rule)
+ }
+ EXPORT_SYMBOL(ip6mr_rule_default);
+ #else
+-#define ip6mr_for_each_table(mrt, net) \
+-	for (mrt = net->ipv6.mrt6; mrt; mrt = NULL)
+-
+ static struct mr_table *ip6mr_mr_table_iter(struct net *net,
+ 					    struct mr_table *mrt)
+ {
+ 	if (!mrt)
+-		return net->ipv6.mrt6;
++		return rcu_dereference(net->ipv6.mrt6);
+ 	return NULL;
+ }
+ 
+-static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
++static struct mr_table *__ip6mr_get_table(struct net *net, u32 id)
+ {
+-	return net->ipv6.mrt6;
++	return rcu_dereference_check(net->ipv6.mrt6,
++				     lockdep_rtnl_is_held() ||
++				     !rcu_access_pointer(net->ipv6.mrt6));
+ }
+ 
+-#define __ip6mr_get_table ip6mr_get_table
++#define ip6mr_for_each_table(mrt, net)				\
++	for (mrt = __ip6mr_get_table(net, 0); mrt; mrt = NULL)
+ 
+ static int ip6mr_fib_lookup(struct net *net, struct flowi6 *flp6,
+ 			    struct mr_table **mrt)
+ {
+-	*mrt = net->ipv6.mrt6;
++	*mrt = rcu_dereference(net->ipv6.mrt6);
++	if (!*mrt)
++		return -EAGAIN;
+ 	return 0;
+ }
+ 
+@@ -330,15 +322,19 @@ static int __net_init ip6mr_rules_init(struct net *net)
+ 	mrt = ip6mr_new_table(net, RT6_TABLE_DFLT);
+ 	if (IS_ERR(mrt))
+ 		return PTR_ERR(mrt);
+-	net->ipv6.mrt6 = mrt;
++
++	rcu_assign_pointer(net->ipv6.mrt6, mrt);
+ 	return 0;
+ }
+ 
+ static void __net_exit ip6mr_rules_exit(struct net *net)
+ {
++	struct mr_table *mrt = rcu_dereference_protected(net->ipv6.mrt6, 1);
++
+ 	ASSERT_RTNL();
+-	ip6mr_free_table(net->ipv6.mrt6);
+-	net->ipv6.mrt6 = NULL;
++
++	RCU_INIT_POINTER(net->ipv6.mrt6, NULL);
++	ip6mr_free_table(mrt);
+ }
+ 
+ static int ip6mr_rules_dump(struct net *net, struct notifier_block *nb,
+@@ -353,6 +349,17 @@ static unsigned int ip6mr_rules_seq_read(const struct net *net)
+ }
+ #endif
+ 
++static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
++{
++	struct mr_table *mrt;
++
++	rcu_read_lock();
++	mrt = __ip6mr_get_table(net, id);
++	rcu_read_unlock();
++
++	return mrt;
++}
++
+ static int ip6mr_hash_cmp(struct rhashtable_compare_arg *arg,
+ 			  const void *ptr)
+ {
+@@ -411,8 +418,8 @@ static void ip6mr_free_table(struct mr_table *mrt)
+ 	timer_shutdown_sync(&mrt->ipmr_expire_timer);
+ 	mroute_clean_tables(mrt, MRT6_FLUSH_MIFS | MRT6_FLUSH_MIFS_STATIC |
+ 				 MRT6_FLUSH_MFC | MRT6_FLUSH_MFC_STATIC);
+-	rhltable_destroy(&mrt->mfc_hash);
+-	kfree(mrt);
++
++	mr_table_free(mrt);
+ }
+ 
+ #ifdef CONFIG_PROC_FS
+@@ -623,18 +630,22 @@ static netdev_tx_t reg_vif_xmit(struct sk_buff *skb,
+ 	if (!pskb_inet_may_pull(skb))
+ 		goto tx_err;
+ 
++	rcu_read_lock();
++
+ 	if (ip6mr_fib_lookup(net, &fl6, &mrt) < 0)
+-		goto tx_err;
++		goto tx_lookup_err;
+ 
+ 	DEV_STATS_ADD(dev, tx_bytes, skb->len);
+ 	DEV_STATS_INC(dev, tx_packets);
+-	rcu_read_lock();
++
+ 	ip6mr_cache_report(mrt, skb, READ_ONCE(mrt->mroute_reg_vif_num),
+ 			   MRT6MSG_WHOLEPKT);
+ 	rcu_read_unlock();
+ 	kfree_skb(skb);
+ 	return NETDEV_TX_OK;
+ 
++tx_lookup_err:
++	rcu_read_unlock();
+ tx_err:
+ 	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+@@ -1157,11 +1168,18 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
+ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
+ 				  struct sk_buff *skb, struct net_device *dev)
+ {
+-	struct mfc6_cache *c;
++	struct net *net = read_pnet(&mrt->net);
++	struct mfc6_cache *c = NULL;
+ 	bool found = false;
  	int err;
  
- 	rcu_read_lock();
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index 26340a7306b5..ca504d9626cf 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -2221,12 +2221,10 @@ static bool mpls_rt_uses_dev(struct mpls_route *rt,
+ 	spin_lock_bh(&mfc_unres_lock);
++
++	if (!check_net(net)) {
++		err = -EINVAL;
++		goto err;
++	}
++
+ 	list_for_each_entry(c, &mrt->mfc_unres_queue, _c.list) {
+ 		if (ipv6_addr_equal(&c->mf6c_mcastgrp, &ipv6_hdr(skb)->daddr) &&
+ 		    ipv6_addr_equal(&c->mf6c_origin, &ipv6_hdr(skb)->saddr)) {
+@@ -1177,10 +1195,8 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
  
- static int mpls_dump_routes(struct sk_buff *skb, struct netlink_callback *cb)
+ 		c = ip6mr_cache_alloc_unres();
+ 		if (!c) {
+-			spin_unlock_bh(&mfc_unres_lock);
+-
+-			kfree_skb(skb);
+-			return -ENOBUFS;
++			err = -ENOBUFS;
++			goto err;
+ 		}
+ 
+ 		/* Fill in the new cache entry */
+@@ -1192,16 +1208,8 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
+ 		 *	Reflect first query at pim6sd
+ 		 */
+ 		err = ip6mr_cache_report(mrt, skb, mifi, MRT6MSG_NOCACHE);
+-		if (err < 0) {
+-			/* If the report failed throw the cache entry
+-			   out - Brad Parker
+-			 */
+-			spin_unlock_bh(&mfc_unres_lock);
+-
+-			ip6mr_cache_free(c);
+-			kfree_skb(skb);
+-			return err;
+-		}
++		if (err < 0)
++			goto err;
+ 
+ 		atomic_inc(&mrt->cache_resolve_queue_len);
+ 		list_add(&c->_c.list, &mrt->mfc_unres_queue);
+@@ -1212,18 +1220,26 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
+ 
+ 	/* See if we can append the packet */
+ 	if (c->_c.mfc_un.unres.unresolved.qlen > 3) {
+-		kfree_skb(skb);
++		c = NULL;
+ 		err = -ENOBUFS;
+-	} else {
+-		if (dev) {
+-			skb->dev = dev;
+-			skb->skb_iif = dev->ifindex;
+-		}
+-		skb_queue_tail(&c->_c.mfc_un.unres.unresolved, skb);
+-		err = 0;
++		goto err;
++	}
++
++	if (dev) {
++		skb->dev = dev;
++		skb->skb_iif = dev->ifindex;
+ 	}
+ 
++	skb_queue_tail(&c->_c.mfc_un.unres.unresolved, skb);
++
++	spin_unlock_bh(&mfc_unres_lock);
++	return 0;
++
++err:
+ 	spin_unlock_bh(&mfc_unres_lock);
++	if (c)
++		ip6mr_cache_free(c);
++	kfree_skb(skb);
+ 	return err;
+ }
+ 
+@@ -1534,6 +1550,7 @@ static int ip6mr_mfc_add(struct net *net, struct mr_table *mrt,
+ 
+ static void mroute_clean_tables(struct mr_table *mrt, int flags)
  {
-+	struct mpls_route __rcu **platform_label;
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
--	struct mpls_route __rcu **platform_label;
--	struct fib_dump_filter filter = {
--		.rtnl_held = false,
--	};
-+	struct fib_dump_filter filter = {};
- 	unsigned int flags = NLM_F_MULTI;
- 	size_t platform_labels;
- 	unsigned int index;
++	struct net *net = read_pnet(&mrt->net);
+ 	struct mr_mfc *c, *tmp;
+ 	LIST_HEAD(list);
+ 	int i;
+@@ -1558,8 +1575,7 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags)
+ 				continue;
+ 			rhltable_remove(&mrt->mfc_hash, &c->mnode, ip6mr_rht_params);
+ 			list_del_rcu(&c->list);
+-			call_ip6mr_mfc_entry_notifiers(read_pnet(&mrt->net),
+-						       FIB_EVENT_ENTRY_DEL,
++			call_ip6mr_mfc_entry_notifiers(net, FIB_EVENT_ENTRY_DEL,
+ 						       (struct mfc6_cache *)c, mrt->id);
+ 			mr6_netlink_event(mrt, (struct mfc6_cache *)c, RTM_DELROUTE);
+ 			mr_cache_put(c);
+@@ -1567,7 +1583,8 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags)
+ 	}
+ 
+ 	if (flags & MRT6_FLUSH_MFC) {
+-		if (atomic_read(&mrt->cache_resolve_queue_len) != 0) {
++		if (atomic_read(&mrt->cache_resolve_queue_len) != 0 ||
++		    !check_net(net)) {
+ 			spin_lock_bh(&mfc_unres_lock);
+ 			list_for_each_entry_safe(c, tmp, &mrt->mfc_unres_queue, list) {
+ 				list_del(&c->list);
 -- 
 2.54.0.1032.g2f8565e1d1-goog
 
