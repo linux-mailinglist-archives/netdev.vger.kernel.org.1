@@ -1,96 +1,98 @@
-Return-Path: <netdev+bounces-295336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295337-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id moC8EQSrIWrBKwEAu9opvQ
-	(envelope-from <netdev+bounces-295336-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:42:44 +0200
+	id 6cCRAhGuIWqYLAEAu9opvQ
+	(envelope-from <netdev+bounces-295337-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:55:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA31641F77
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:42:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CCBE6421BA
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:55:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=GbMA3v86;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295336-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295336-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=trailofbits.com header.s=google header.b=NUzI+k8P;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295337-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295337-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4513B332EAF1
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 16:30:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 15E0B3024448
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 16:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87C43B7741;
-	Thu,  4 Jun 2026 16:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CC83B4E95;
+	Thu,  4 Jun 2026 16:31:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1EE3B4E95
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 16:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD383B47F7
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 16:31:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780590635; cv=none; b=rjSRmapuBrBeuYo7TiSxIEdgQFzb3BMERIvva3XMZ7YeM/91L8DkcWd9C6ql6CPy6ZEMbi6e0IQr4lnU5hSFck/CJ2DXmqm02r/327iEY2mS1HLuf1jvauMq+7Z3RClqq4noDK/JK58nNAqGE6wRdYxkAqL5bh7F2fyz2hquCAc=
+	t=1780590674; cv=none; b=Aw6dcr5g2XyrOg4U3uWtC8lNwe1M6sf2nGXhYlOjsrX1BOg3vtJnu7KFMxSsBfND8mxX8FboUtVPoQ6xqmdB2L0KHeT8rwXKfwUwKs825mLC2JK48yYUfCO7K0d5OH9nH2vvbP6ezoNCMuO+B1XXTPbgbRh5oKvrHC7tNrLCBT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780590635; c=relaxed/simple;
-	bh=TWQD7Nx2vPdkyw41EjqI2NzyTI0ByqqmHYzzWo5TKSg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PJSnA1g6SclxJWh0nh0ZjXOphWAzdy4wRe1rnuaVoQM4ehT8qCFt2/5cbTrgHasZV5xv3KybXMpbUVfCw5Z4i0t3lFhxX0YDDyH9lrTHVi84eycuWvN8KKiX2M1gaZkTSFxAJj9aT8zqivBsYahKbUbSbrxhMl2FlZLEJd0QcAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GbMA3v86; arc=none smtp.client-ip=74.125.82.54
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-1370417c01cso1296540c88.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 09:30:31 -0700 (PDT)
+	s=arc-20240116; t=1780590674; c=relaxed/simple;
+	bh=E+CY1M4wlSS+01/WXaewcF4d2P9oQida5I0nhuFHPIc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b8LnDw16IHCPTgi9tjK+Gu4sc6GxJ0fVFpCPnUsg4+5e6Uti6lmERnMauMP/Bx87il6Ug/FW8LjxCGpAafbetfL2TSNYGdNr7fU9dLSmbOI2o2BSGLtXct1/LeAP+CMHwmpvzx73QAZF6twWZ/LoCPqRaC1s1JjV79bNhz3jrBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=NUzI+k8P; arc=none smtp.client-ip=209.85.221.51
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-45ee5cdbd28so1385601f8f.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 09:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780590631; x=1781195431; darn=vger.kernel.org;
+        d=trailofbits.com; s=google; t=1780590671; x=1781195471; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MNxWKwtOMlmaCtYDf9JG2uLTPybVcNdh3AmCvSMq9aE=;
-        b=GbMA3v8629/Vw/zhLcTgNBQwilapXeXobAMfKogSOiP3rpWTn0UuJ7aSV3zXPaVbWn
-         KLQOM+s/cMQvkVfvO9qfywLFtc6WdkyWnxeWXPI6K4+eJ8CYzW8yykih2Ldofp9Y2xlN
-         bzGa8FoZkJbXEgj/7UlI4lptTYZoxbM8paAvEAuI9j2bcl++7fnnaKw3MqbdUQwcJjaG
-         kszIixA2XWjjc0yjsp/qb+jhthbull701ynkqYR5r8EEE7BAKzCR2Zvk32pWX6Ww8cdC
-         T99mekXxIf69XJ1PE5RokhpeQ+Pgm0hObJfdxxCN3VZOswRJyIpwhFPU0CqwZun/YRDW
-         3BJg==
+        bh=k/GEJPOLrP92/aFR0MWS+Y1Uq69OUcBYv6uQ0YsT5bY=;
+        b=NUzI+k8P5Zwls7EyjHD88tj8+O4YO48ZQEx5xTH0Tmn3QBVsdHKQRA2Ez5lIfLdT97
+         Pzr54+7ZCX488AtaSiRejZxhBBG40mQIxBBdyy2HTv/Fv8PfDzgalyp+3w7OaDHfYe5o
+         GF+mGY93AnRE9vW7I1adhHWYpizQg8cU6drJcYPYVgHTEUzERL09LSwk6pt3dXuLCCkZ
+         izIPxeiU4ITy5xiQ0psVyvcGlHYsIqsODpWDKEWkfXLQ6gKjt7QzrmxXuPTSvioHfE3V
+         alEuv5K2tvs7bUzMxrNajs9IxYzNFVgJGMKRBj0sWVECEIji8CysJRbvAxuN2ATczH69
+         Zsfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780590631; x=1781195431;
+        d=1e100.net; s=20251104; t=1780590671; x=1781195471;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MNxWKwtOMlmaCtYDf9JG2uLTPybVcNdh3AmCvSMq9aE=;
-        b=SJpNN+V2XxcHfP97puB/97p8h0n9SGTUqkBc9QrLaTWgJ9lUnCbddFjym280SQQvMH
-         KAVUPDZXYDx/SuqcEV289TBtAahY97B2Vm+M95q9eUmZTyOoYmoBY3fMovsBUmUfJB18
-         w66hAdIyN4nQmNSzDhXDFPXPz+3Poe0kvQFbxYfyxseIUySoS+V0c6uaBRSIhpLzJgQM
-         mAlIT61aLc+rsDOw+zXCv0rUXyg+iaEqoDFuAIZ0DyOzhe7t8GOLIJg8D6ZIj2BdBlWD
-         DJG+Fn0AmtbUZXsz+jmj3skstaOFJTgVP/u6LUb3b+UhHlo3TXZT4FZiVDA/yOOB953a
-         oNiQ==
-X-Gm-Message-State: AOJu0YzCdg6CQ/eP/j90kyvuyhT8p/NR7XbhYSMTXeRHg1AzfgGIWU/X
-	pgNwbzlx5ntFcfGW7vgVOIHMelr3hT5szwIt+q9KvD1r2Cuf7Z7y1rTp7+RiONNxHpY=
-X-Gm-Gg: Acq92OHmpBYyEoV09cQYK3x2XjGSjdSUvWAPhS0IiWDWiVBMNZkHKdM4vJEnUXLbQxO
-	aQ6+qOBkG5HZhPvNSXjOMSH4UQZY4umFpLjt+rFtzUKJItjEDmHDccTUO7di+ZOr2R4NSFrQuU6
-	tSRcz1wUm+JxzIxmuBPgV/jsBpyjuL+H8LdS4tHVX3wH6C0t4Hc8aW1FplMQZ/7AAqTlvb1SsZL
-	EkiaYupkPiLvLbbZP3ZCEK4o3WMbv6zwm7vIaUfOpEhH+DidQ5BZdpsNzktKyZChTAJQM5tjnoJ
-	jl3dVjdZson81HEKa2vyC0VbyBazeeOj+GNPGT4Bi2Af2HumzKgxX1DY0kQVmg2IzrcC6G08s3d
-	42SOeZxWT96qcHuI4ujWpepAs42b5hPSd6WqttUZTFwP1vmaPtvaK/cKFZ3br5EEWzFnowZs/2w
-	rUegsOOg2r4JjjlT00FVO845DrLhY=
-X-Received: by 2002:a05:7022:2390:b0:134:df4a:2821 with SMTP id a92af1059eb24-137f6c16da7mr3392850c88.40.1780590630843;
-        Thu, 04 Jun 2026 09:30:30 -0700 (PDT)
-Received: from houminxi ([64.118.153.39])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137f549bbefsm4239005c88.4.2026.06.04.09.30.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2026 09:30:30 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	davem@davemloft.net,
-	echaudro@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	i.maximets@ovn.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net v4] selftests/net/openvswitch: guard command substitutions against empty output
-Date: Fri,  5 Jun 2026 00:30:16 +0800
-Message-ID: <20260604163016.3929371-1-houminxi@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        bh=k/GEJPOLrP92/aFR0MWS+Y1Uq69OUcBYv6uQ0YsT5bY=;
+        b=CRQ7h7jtaINeU2BSVrK4RMOOW0uoREDQSXqz5WXhXfR92fH7wUszGdWzVcmmQZBl8r
+         zLTn3HpExSI0oL2CtoFBBdWBHEnfR1kb/XkuA+009t+flew1lPliG9ZYuTiavuiGFjUA
+         ErV0HkSw0NyjMuVkJMR7A/TQm/PMlAtpiTVXqM8Csxu/Mq3pNkpFoyrOMhwHPeMaYUDp
+         hkrAz1WY3KGtVtTyuvho+coFdjzkJfD90h2uPCQK1oZKfMpRDkz0QXJAT1WRVtck/P2l
+         sjA0VNHBY1sdpTwFBcdcxnYunua2g6Ypbhf54X4G17nnhoxKgk66S5kdH82Ilmpo2GH9
+         87+A==
+X-Forwarded-Encrypted: i=1; AFNElJ9iCiE9wjCba9nwxKUrKZ0+tb46UObjlcX6eJEUYbQjkVr62NjVvRtgwpkaMuUJ6V7FqX0Y0w8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGxmzUhKGlop2c1PlK7nyWUkH9l4ZSPS74ZLm+8V9G0HicZmeK
+	FozUv3a4s3KYLu6brF0/WfYWQFufK3hM5K8VkFysgRyJ4Q/9/QgcDbTIUtTcFE0RXjI=
+X-Gm-Gg: Acq92OHWa9C69OPwgE21wm3ZtO22NKjxiAMFWJLw5ZUdQXWpQuSQov/vg9tA8QinNnf
+	ICn3djFjp3FO1fN1wSAyhbotdi1yPz5l3Q17uiZPYJeK4EnMqxVtW4qm9lBt9zSaIHJ/fVE3njM
+	WG+RAhog8X6SXSYfzcNB+AzZuOLy52vWH6DtnD/bq5SytCo0Te/m1JHJlGCG/fR4syz+7fyH9GP
+	dkdLuLGmLyPe79/a+rPoSShGG9NEI9or+4mOZ5A8dL9D/QbwViOi+tx/Co+gi6y/1/c/CI4zQpz
+	8CshnhPea8RbdhTT3Z6W4uD79WxSfdzqgclB4pka17qr5sFXQjC0o1dlaUQZwDIFdTvBIaZA9r/
+	hJkajHBHhPbHKutIhPtQZpf8Xbv0+PJjMGyn3JXOFzBYIzZFn7NJ/dp8AwRk+w1RwF9NEI8tHQz
+	fm6uDUS4Vlo2nUis9cCQx8h3MPtEFtmNcvJH6e2Nrq4W5LQbRcT5ogeSMAfg1/TZHC3Io2mrwhW
+	uZfcQ==
+X-Received: by 2002:a05:600c:3155:b0:490:b4a8:e031 with SMTP id 5b1f17b1804b1-490bc4c4b62mr64777715e9.4.1780590670952;
+        Thu, 04 Jun 2026 09:31:10 -0700 (PDT)
+Received: from localhost ([46.101.197.76])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46028a6dcbdsm8063435f8f.7.2026.06.04.09.31.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jun 2026 09:31:10 -0700 (PDT)
+From: Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>
+To: Jon Maloy <jmaloy@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>,
+	Simon Horman <horms@kernel.org>,
+	Richard Alpe <richard.alpe@ericsson.com>,
+	Erik Hugne <erik.hugne@ericsson.com>,
+	Ying Xue <ying.xue@windriver.com>,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] tipc: require admin privileges for TIPCv2 mutators
+Date: Thu,  4 Jun 2026 16:31:01 +0000
+Message-ID: <20260604163102.2658553-1-dominik.czarnota@trailofbits.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,113 +105,151 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,ovn.org,openvswitch.org,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-295336-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:davem@davemloft.net,m:echaudro@redhat.com,m:edumazet@google.com,m:horms@kernel.org,m:i.maximets@ovn.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:houminxi@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-295337-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[dominik.czarnota@trailofbits.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:dominik.czarnota@trailofbits.com,m:horms@kernel.org,m:richard.alpe@ericsson.com,m:erik.hugne@ericsson.com,m:ying.xue@windriver.com,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dominik.czarnota@trailofbits.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,trailofbits.com:mid,trailofbits.com:dkim,trailofbits.com:from_mime,trailofbits.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ECA31641F77
+X-Rspamd-Queue-Id: 8CCBE6421BA
 
-When ip-link output is unavailable, when the upcall daemon log has not
-been written yet, or when pahole does not know the OVS drop subsystem
-ID, the affected command substitutions silently produce empty strings.
-The caller then passes empty sha= or pid= arguments to ovs_add_flow,
-or matches against wrong drop reason codes, all without a diagnostic.
+TIPCv2 registers its generic-netlink mutating commands without
+permission flags. Generic netlink only checks CAP_NET_ADMIN when an
+operation carries GENL_ADMIN_PERM or GENL_UNS_ADMIN_PERM, so callers
+without CAP_NET_ADMIN can invoke these setters.
 
-Add [ -z ] guards immediately after each assignment. For test_arp_ping,
-also align the MAC extraction to use awk '/link\/ether/' as in
-test_pop_vlan. The drop_reason guard returns ksft_skip because an
-absent subsystem ID is an environment issue, not a test failure.
+This allows an unprivileged caller to change TIPC control-plane state,
+including bearer, link, network, monitor, peer and crypto-key state.
+TIPC_NL_MEDIA_SET is broader because it updates the shared media
+defaults returned by tipc_media_find(), including UDP MTU, priority,
+tolerance and window values, which can affect later bearer setup.
 
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
+Require CAP_NET_ADMIN for all TIPCv2 mutators. Use
+GENL_UNS_ADMIN_PERM for network-namespace scoped state, matching the
+legacy compat path and normal netns administration semantics. Use
+GENL_ADMIN_PERM for TIPC_NL_MEDIA_SET because it mutates global media
+defaults rather than state owned only by the target net namespace.
+
+Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
+Assisted-by: Codex:gpt-5.5-cyber-preview
+Signed-off-by: Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>
 ---
+ net/tipc/netlink.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Changes since v3:
-  - Corrected subject prefix to [PATCH net] (hardening fix, not new feature).
-
-Changes since v2:
-  - Fixed missing 'net/' in subject path (selftests/net/openvswitch).
-  - Removed --base flag (prerequisite-patch-id flood in v2).
-
-Changes since v1:
-  - Rebased onto current net-next/main. No code changes.
-
- .../selftests/net/openvswitch/openvswitch.sh     | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index a415e9dec8cd..82f066a0ceed 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -360,6 +360,8 @@ test_psample() {
- 	# sFlow / IPFIX.
- 	nlpid=$(grep -E "listening on upcall packet handler" \
-             $ovs_dir/s0.out | cut -d ":" -f 2 | tr -d ' ')
-+	[ -z "$nlpid" ] && \
-+		{ info "failed to get upcall PID"; return 1; }
- 
- 	ovs_add_flow "test_psample" psample \
-             "in_port(2),eth(),eth_type(0x0800),ipv4()" \
-@@ -393,6 +395,10 @@ test_drop_reason() {
- 	ovs_drop_subsys=$(pahole -C skb_drop_reason_subsys |
- 			      awk '/OPENVSWITCH/ { print $3; }' |
- 			      tr -d ,)
-+	if [ -z "$ovs_drop_subsys" ]; then
-+		info "failed to get OVS drop subsys ID"
-+		return $ksft_skip
-+	fi
- 
- 	sbx_add "test_drop_reason" || return $?
- 
-@@ -491,13 +497,19 @@ test_arp_ping () {
- 	# Setup client namespace
- 	ip netns exec client ip addr add 172.31.110.10/24 dev c1
- 	ip netns exec client ip link set c1 up
--	HW_CLIENT=`ip netns exec client ip link show dev c1 | grep -E 'link/ether [0-9a-f:]+' | awk '{print $2;}'`
-+	HW_CLIENT=$(ip netns exec client ip link show dev c1 \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$HW_CLIENT" ] && \
-+		{ info "failed to get client hwaddr"; return 1; }
- 	info "Client hwaddr: $HW_CLIENT"
- 
- 	# Setup server namespace
- 	ip netns exec server ip addr add 172.31.110.20/24 dev s1
- 	ip netns exec server ip link set s1 up
--	HW_SERVER=`ip netns exec server ip link show dev s1 | grep -E 'link/ether [0-9a-f:]+' | awk '{print $2;}'`
-+	HW_SERVER=$(ip netns exec server ip link show dev s1 \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$HW_SERVER" ] && \
-+		{ info "failed to get server hwaddr"; return 1; }
- 	info "Server hwaddr: $HW_SERVER"
- 
- 	ovs_add_flow "test_arp_ping" arpping \
--- 
-2.54.0
-
+diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
+index 1a9a5bdaccf4..5bbe134284ac 100644
+--- a/net/tipc/netlink.c
++++ b/net/tipc/netlink.c
+@@ -152,11 +152,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_DISABLE,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_disable,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_ENABLE,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_enable,
+ 	},
+ 	{
+@@ -168,11 +170,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_ADD,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_add,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_set,
+ 	},
+ 	{
+@@ -197,11 +201,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_LINK_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_set_link,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_LINK_RESET_STATS,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit   = tipc_nl_node_reset_link_stats,
+ 	},
+ 	{
+@@ -213,6 +219,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_MEDIA_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_ADMIN_PERM,
+ 		.doit	= tipc_nl_media_set,
+ 	},
+ 	{
+@@ -228,6 +235,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_NET_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_net_set,
+ 	},
+ 	{
+@@ -238,6 +246,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_MON_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_set_monitor,
+ 	},
+ 	{
+@@ -255,6 +264,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_PEER_REMOVE,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_peer_rm,
+ 	},
+ #ifdef CONFIG_TIPC_MEDIA_UDP
+@@ -269,11 +279,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_KEY_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_set_key,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_KEY_FLUSH,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_flush_key,
+ 	},
+ #endif
 
