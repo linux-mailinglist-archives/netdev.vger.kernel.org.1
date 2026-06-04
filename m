@@ -1,153 +1,268 @@
-Return-Path: <netdev+bounces-295127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id C5suCqg/IWqtBwEAu9opvQ
-	(envelope-from <netdev+bounces-295127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:04:40 +0200
+	id 3vkoOr5BIWpKCAEAu9opvQ
+	(envelope-from <netdev+bounces-295128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:13:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207B763E4FD
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:04:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C5763E674
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:13:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=mkjbyrCG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295127-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295127-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lodid3iO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295128-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295128-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 208BF3093D9D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 09:02:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 040C63072AB0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 09:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DA33F6C27;
-	Thu,  4 Jun 2026 09:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC1F3F5BCE;
+	Thu,  4 Jun 2026 09:03:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792D83FC5BA
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 09:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EB53988F8;
+	Thu,  4 Jun 2026 09:03:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780563715; cv=none; b=uaJTUI2oS8WIRRQQQj3XzMVmmAh9PhYOVDzZkbMGublp2vEUAeK6bDBeV3J26i7lwlPiCl31DY/qMm4c1r5Q4pZ8khEaC3slgGNpvtG7McKjrdd7BzRSpu/h82xnO22w8jGNt9lysz9X8uxaprgVX123GEuPUCuxMt1OMt6JePQ=
+	t=1780563790; cv=none; b=A6mmKSLsycyg+xM294u2XM07LcloeoPVa8aoGP7ETVG8V09bmhC+YVdGCCmBMPSBkKMAc5hacZdctrvWIbCGj9ehXmmh/m8H6d81Fi0Zv/aFSdVE4t4TMa1see7q6jcJvRrpc49PmYjItj1EiYNSNkQIMGByLs1FycLF5aTYe2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780563715; c=relaxed/simple;
-	bh=gwCofHGH6vZXW/4XECc2TxwWRgvTc5wmCwaHLRqs2kw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=FMV/5LYLoDtOA4RcvaSnqVwBURB5JQ+SbAljEuz5iYON3VAfvtguAHgbSNCxrJycA44Rt0x4n8kahUhAugcgCjL2hVMzc7sthrjcv1iiu+/g8jJDLqNEFTXETa3I9QJ4bFHa/s1fi/z7mUVKFcyRWOFsJG0lkZz+lNVgz2kNCcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=mkjbyrCG; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65491cCeA241584, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1780563699;
-	bh=gwCofHGH6vZXW/4XECc2TxwWRgvTc5wmCwaHLRqs2kw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=mkjbyrCGX/PxBk9Z0Ayt2iDsqNA5tey9mF2RQ1Dj2+s7Fxie4/A1wxjGdwS3rb6DT
-	 tUzby9y3Ux7bqXvFxOtx++asOx8n5Szj4kRrduGqlZ3/pRWDrAkfXjKMxxMQvrF3Pg
-	 wp+GHcru0ILLT9oHPYFZcXJC2rZLThqo3FnoBg1Plx8py/4OxYXHqShQsSzd6Mqw5P
-	 C8Futs0WH64CbdzfvQlKP+lJrqPuROid5td5uyz9r1QYEvkrSHYccaPvljE2kz8pUJ
-	 5SogGPSXlTewbPqnHoRyCZ1mrvjhutuGXyUytK+9PGryd5KzPSSgFGfY2vIImR3zQy
-	 usYWdDdl029AQ==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 65491cCeA241584
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 4 Jun 2026 17:01:39 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 4 Jun 2026 17:01:38 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Thu,
- 4 Jun 2026 17:01:38 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "lasse@lgb.dk"
-	<lasse@lgb.dk>
-Subject: RE: [Bug 221606] r8169: PCIe AER errors and recovery failure after
- recent driver changes
-Thread-Topic: [Bug 221606] r8169: PCIe AER errors and recovery failure after
- recent driver changes
-Thread-Index: AQHc85gwkGNesnqGQkCQ9QthIRv61LYuEfCw
-Date: Thu, 4 Jun 2026 09:01:38 +0000
-Message-ID: <9b206f58d93b48d194980374cf0da7b1@realsil.com.cn>
-References: <bug-221606-201211@https.bugzilla.kernel.org/>
- <bug-221606-201211-LMiiKJhHhg@https.bugzilla.kernel.org/>
- <b1bda1da-8231-4f05-94a7-7511041ae489@gmail.com>
-In-Reply-To: <b1bda1da-8231-4f05-94a7-7511041ae489@gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1780563790; c=relaxed/simple;
+	bh=pdCZW0Nv4rGJC7vYq2kzSF9tdbL4yemU2nDjlN7ZEYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o+aOcfifbOseAvhCS2T8CAheuw0arsxnNdT9k3lIDLjMJkxjoWGQvZOEHalgZdgVsjwhjj/XmCC1sLNnRhOI3OWEJOfX6p3j85MekFv8lt5fbNw1weNMJjeTWZmixVE0Wk2zwfi+lxmk7OiaUSk8wp70691Zr/ydIXA55FuCr5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lodid3iO; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E52C1F00893;
+	Thu,  4 Jun 2026 09:03:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780563788;
+	bh=Vv2KZQzlj+kvn26HfHTSCpLW9E9m5jlROFD0yErTScA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lodid3iOO9V6zyNLwhPJXt6u+NPWJn7LxFFIqnUhbWvp64+ODYM1NorzXtCHdnpeI
+	 WBiqdns6vBPwz5oVaj3R9YKbSzH05euPVcXcmOBLwf15tS9vPzAjA9toqmmpYrfUs4
+	 8pUSfVerfxTjxxopB3awN8nUgOPueU5TQ3y31ziBHbd9ZcRsznjhtmwpBlWuCfDimE
+	 Ywj3qfYCTZh2wGT+Yj+dSnSQhr4AamZjIhiwce14kiRDII0qmF9A8PeDiD3xu6Qmn3
+	 ANam/MG/qLIou1nglCcq2OllZncE3sR8ZpxetOaj1QEJ+84o6OwFO5ToPi/sWbU8j9
+	 z4bnZIHX6YM5g==
+Date: Thu, 4 Jun 2026 11:03:06 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v9 6/6] net: airoha: Support multiple LAN/WAN
+ interfaces for hw MAC address configuration
+Message-ID: <aiE_SnocP64Eg54B@lore-desk>
+References: <20260603-airoha-eth-multi-serdes-v9-6-5d476bc2f426@kernel.org>
+ <20260604060126.0DF2B1F00899@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gqo63t7tWet7a99i"
+Content-Disposition: inline
+In-Reply-To: <20260604060126.0DF2B1F00899@smtp.kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:lasse@lgb.dk,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295127-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295128-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_RECIPIENTS(0.00)[m:sashiko-reviews@lists.linux.dev,m:devicetree@vger.kernel.org,m:robh@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lgb.dk:email]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lore-desk:mid,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 207B763E4FD
+X-Rspamd-Queue-Id: A2C5763E674
 
-Pk9uIDAzLjA2LjIwMjYgMDk6NDQsIGJ1Z3ppbGxhLWRhZW1vbkBrZXJuZWwub3JnIHdyb3RlOg0K
-Pj4gaHR0cHM6Ly9idWd6aWxsYS5rZXJuZWwub3JnL3Nob3dfYnVnLmNnaT9pZD0yMjE2MDYNCj4+
-DQo+PiAtLS0gQ29tbWVudCAjMiBmcm9tIGxhc3NlQGxnYi5kayAtLS0NCj4+IENvbW1pdCA5YWI5
-NGEzMmFmNzA0ZmE5Yzg3MzA5NDI4M2FlODc0NGEwN2JhZjI1IChyODE2OTogZW5hYmxlIExUUg0K
-Pj4gc3VwcG9ydCkgc2VlbXMgdG8gYmUgdGhlIGlzc3VlLiBSdW5uaW5nIHRoZSBjb21taXQgYmVm
-b3JlIHRoaXMgZG9lc24ndA0KPj4gZ2l2ZSBtZSBhbnkgQUVSIGVycm9ycyBhbmQgZXZlcnl0aGlu
-ZyBzZWVtcyB0byBiZWhhdmUgbm9ybWFsbHkuDQo+Pg0KPkJpc2VjdGluZyB0aGUgcmVwb3J0ZWQg
-aXNzdWUgcG9pbnRzIHRvIG9uZSBvZiB5b3VyIGNvbW1pdHMuDQo+Q291bGQgeW91IHBsZWFzZSBj
-aGVjayB3aXRoIHRoZSB1c2VyPw0KDQpIaSwgSGVpbmVyLCBMYXNzZQ0KDQpUaGFua3MgZm9yIHJl
-cG9ydGluZyB0aGlzIGlzc3VlLg0KDQpDdXJyZW50bHksIHdlIGhhdmVuJ3QgcmVjZWl2ZWQgYW55
-IHNpbWlsYXIgcmVwb3J0cyBmcm9tIG91ciBjdXN0b21lcnMsIGFuZCBJIGFtIHVuYWJsZSB0byBy
-ZXByb2R1Y2UgdGhpcyBBRVIgZXJyb3Igb24gbXkgbG9jYWwgdGVzdCBwbGF0Zm9ybXMuDQoNCkNv
-dWxkIHlvdSBwbGVhc2UgcHJvdmlkZSBzb21lIG1vcmUgZGV0YWlsZWQgaW5mb3JtYXRpb24/IFRo
-ZSBmdWxsIGRtZXNnIGxvZyB3aWxsIGhlbHAgbWUgY2hlY2sgdGhlIGV4YWN0IEFFUiBlcnJvciBt
-ZXNzYWdlcyBhbmQgdGhlIGJvb3QgY29udGV4dC4gQWxzbyB0aGUgb3V0cHV0IG9mIHN1ZG8gbHNw
-Y2kgLXZ2di4gSSBuZWVkIHRoaXMgdG8gY2hlY2sgdGhlIGV4YWN0IHBsYXRmb3JtIGluZm9ybWF0
-aW9uLCBQQ0llIHRvcG9sb2d5LCBhbmQgdGhlIExUUi9BU1BNIGNhcGFiaWxpdGllcyBvZiBib3Ro
-IHlvdXIgUm9vdCBQb3J0IGFuZCB0aGUgUmVhbHRlayBOSUMuDQoNCldoaWxlIHJldmlld2luZyB0
-aGUgaW5pdGlhbGl6YXRpb24gZmxvdywgSSBub3RpY2VkIGEgcG90ZW50aWFsIGxvZ2ljIGNvbnRy
-YWRpY3Rpb24uIElmIHJ0bF9hc3BtX2lzX3NhZmUodHApIHJldHVybnMgZmFsc2UsIHRoZSBkcml2
-ZXIgZGlzYWJsZXMgTDEgYXQgdGhlIFBDSWUgY29yZSBsZXZlbCwgYnV0IHRwLT5hc3BtX21hbmFn
-ZWFibGUgbWlnaHQgc3RpbGwgYmUgc2V0IHRvIHRydWUuIFRoaXMgY291bGQgY2F1c2UgdGhlIGRy
-aXZlciB0byBpbmNvcnJlY3RseSBlbmFibGUgQVNQTS9MVFIgaW4gdGhlIE1BQyByZWdpc3RlcnMg
-bGF0ZXIsIGNyZWF0aW5nIGEgaGFyZHdhcmUgc3RhdGUgbWlzbWF0Y2ggKFBDSWUgTDEgZGlzYWJs
-ZWQsIGJ1dCBNQUMgTFRSIGVuYWJsZWQpIHdoaWNoIHVzdWFsbHkgbGVhZHMgdG8gQUVSLg0KDQpD
-b3VsZCB5b3UgcGxlYXNlIHRlc3QgaWYgdGhlIGZvbGxvd2luZyBwYXRjaCBmaXhlcyB0aGUgQUVS
-IGVycm9yIG9uIHlvdXIgc2lkZT8NCg0KLQlpZiAoZW5hYmxlICYmIHRwLT5hc3BtX21hbmFnZWFi
-bGUpIHsNCisJaWYgKGVuYWJsZSAmJiB0cC0+YXNwbV9tYW5hZ2VhYmxlICYmIHJ0bF9hc3BtX2lz
-X3NhZmUodHApKSB7DQoNClRoYW5rcywNCkJScywNCkphdmVuDQo=
+
+--gqo63t7tWet7a99i
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to consider:
+> - [High] The MAC address MSB validation introduces a configuration deadlo=
+ck, permanently preventing MAC address MSB updates when multiple interfaces=
+ are registered.
+> - [High] Unconditional overwrite of `ref_addr` in the interface evaluatio=
+n loop breaks MSB validation and corrupts hardware L2 bounds.
+> --
+>=20
+> commit ca5c4a90447cc1f9bdc3a2831da1cfe304652070
+> Author: Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
+> net: airoha: Support multiple LAN/WAN interfaces for hw MAC address confi=
+guration
+>=20
+> The EN7581 and AN7583 SoCs provide registers to configure hardware LAN/WAN
+> MAC addresses. This commit extends the logic to derive the correct minimum
+> and maximum values for MAC LSB bounds when multiple interfaces are config=
+ured.
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 64ee526da2414..8f2608293bb72 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -71,20 +71,76 @@ static void airoha_qdma_irq_disable(struct airoha_i=
+rq_bank *irq_bank,
+> [ ... ]
+> > -static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *a=
+ddr)
+> > +static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *ad=
+dr)
+> >  {
+> > +	u8 ref_addr[ETH_ALEN] __aligned(2);
+> >  	struct airoha_eth *eth =3D dev->eth;
+> > -	u32 val, reg;
+> > +	u32 reg, val, lmin, lmax;
+> > +	int i;
+> > +
+> > +	eth_zero_addr(ref_addr);
+> > +	lmin =3D (addr[3] << 16) | (addr[4] << 8) | addr[5];
+> > +	lmax =3D lmin;
+> > +
+> > +	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
+> > +		struct airoha_gdm_port *port =3D eth->ports[i];
+> > +		int j;
+> > +
+> > +		if (!port)
+> > +			continue;
+> > +
+> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
+> > +			struct airoha_gdm_dev *iter_dev;
+> > +			struct net_device *netdev;
+> [ ... ]
+> > +			if (netdev->reg_state !=3D NETREG_REGISTERED)
+> > +				continue;
+> > +
+> > +			ether_addr_copy(ref_addr, netdev->dev_addr);
+> > +			val =3D (netdev->dev_addr[3] << 16) |
+> > +			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
+> > +			if (val < lmin)
+> > +				lmin =3D val;
+> > +			if (val > lmax)
+> > +				lmax =3D val;
+> > +		}
+> > +	}
+>=20
+> [Severity: High]
+> Does this loop unconditionally overwrite ref_addr with the last evaluated
+> interface? If there are multiple interfaces with mismatched MSBs (e.g., f=
+rom
+> random boot MACs), it seems ref_addr will only retain the MSB of the final
+> interface.
+>=20
+> Could this cause the validation check below to incorrectly pass if the new
+> MAC matches the last interface's MSB but not the earlier ones, while
+> erroneously accumulating LSBs from mismatched interfaces into lmin and
+> lmax?
+
+As pointed out before the hw design requires all the interfaces configured =
+as
+LAN (or WAN) to share the mac address MSBs since we have a single register =
+to
+configure it (we can't configure a range like for lmin or lamx). A
+misconfiguration will just affect hw acceleration and the user will be able=
+ to
+log and fix the configuration (according to the reported log) if the provid=
+ed=20
+mac addresses do not follow this hw limitation.
+The choice of the reference interface is arbitrary and if multiple interfac=
+es
+have 'wrong' mac address based on the hw requirements, the user should log =
+and
+fix them one by one.
+Please note this limitation is only valid if multiple net_devices are
+configured as LAN (or WAN). Since in the current codebase we do not support
+multiple interfaces configured as LAN or WAN, we are not introducing any
+regression.
+
+>=20
+> > +
+> > +	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
+>=20
+> [Severity: High]
+> Can this validation check create a configuration deadlock?
+>=20
+> Since the driver requires all LAN or WAN interfaces to share the same
+> MAC address 3-byte MSB, and userspace APIs configure interfaces sequentia=
+lly
+> via ndo_set_mac_address, changing the first interface's MSB will always f=
+ail
+> this check against the remaining interfaces.
+>=20
+> How can a user successfully configure a unified custom MAC MSB across all
+> devices if the interfaces are assigned random MAC addresses at boot with
+> different MSBs?
+
+As pointed out above, the user is supposed to configure the mac addresses b=
+ased
+on the hw design.
+
+Regards,
+Lorenzo
+
+>=20
+> > +		/* According to the HW design, hw mac address MSBs must be
+> > +		 * the same for each net_device with the same LAN/WAN
+> > +		 * configuration.
+> > +		 */
+> > +		struct net_device *netdev =3D netdev_from_priv(dev);
+> > +
+> > +		dev_warn(eth->dev,
+> > +			 "%s: wrong mac addr, MSBs must be %02x:%02x:%02x\n",
+> > +			 netdev->name, ref_addr[0], ref_addr[1],
+> > +			 ref_addr[2]);
+> > +		dev_warn(eth->dev, "FE hw forwarding won't work properly\n");
+> > +
+> > +		return -EINVAL;
+> > +	}
+>=20
+> --=20
+> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260603-airoha-eth-=
+multi-serdes-v9-0-5d476bc2f426@kernel.org?part=3D6
+
+--gqo63t7tWet7a99i
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaiE/SgAKCRA6cBh0uS2t
+rAkUAQCKzEQxpcQmY4+jDSdmVPbZ1TRvV8Q82nNN8ukqfNdk5gD8DOCZiqQTs4nN
++J5nLWG7/NLao7/hIc5Z/u9fKEFw/Q4=
+=eshO
+-----END PGP SIGNATURE-----
+
+--gqo63t7tWet7a99i--
 
