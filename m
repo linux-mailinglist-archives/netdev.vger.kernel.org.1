@@ -1,220 +1,220 @@
-Return-Path: <netdev+bounces-295040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rMBWJTnvIGrL9gAAu9opvQ
-	(envelope-from <netdev+bounces-295040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:21:29 +0200
+	id XL0bOAD3IGrc9wAAu9opvQ
+	(envelope-from <netdev+bounces-295041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:54:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 094E663CAFE
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:21:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B58163CBE4
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:54:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=ESl0gcHf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295040-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295040-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=infradead.org header.s=bombadil.20210309 header.b=EFzE3fkC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295041-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295041-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2B97630391C7
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 03:21:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F300302AD39
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 03:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57FD33AFCE0;
-	Thu,  4 Jun 2026 03:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066A935C19F;
+	Thu,  4 Jun 2026 03:53:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37573AFAE1;
-	Thu,  4 Jun 2026 03:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA1B36AF6;
+	Thu,  4 Jun 2026 03:53:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780543279; cv=none; b=mbg3a2QuR5N9NA87XQwXorWByqan0OqEa8hNQX2zuGxxFgnkAcaGhX8poK/MloHyYAZnuhT1v+RktNXDhanszLNb4bdW0d4t7AtxWkUIzLPM8SYK7puoQdJfmQNdb9nD4HCwtjeUTUTcdxoR9F5Q7vvLeznONgGMpYFiiw6JkQ0=
+	t=1780545215; cv=none; b=EBGr1VdxSIkpYdULwb6po/bKGLL7JvPMYLexL3OoYWSlMqk/8cxZJXcBbQkZZSEcMOy6jv9j/l8p+2WqLrNwh4QTL/losNtr3MhmX0pCgLlWVZhAZnlWL9gjAzZ4VegeRvnzGBfvVhS0+xj2sUkAVLB7n5PczpCc/CwFvk7vWuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780543279; c=relaxed/simple;
-	bh=1oDiJB74RxXKNtE6veGROB69s5IkmtYfeS6XlJ+7O5w=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kbN2OAtENJK6xeGZazW3pbvfG9Qfm4t4/t452FBVTck2qpagaaibQcVBBFwBGjqffNQEOwNA0dBaM4PrUdenOaiOtTudD2x1rWrSEmus1naIsb69ZhdJq9XrVfvyq3C22xemr3f4bWTmB2heEBcIwbLeQJ7rcvhZ0coIH8PxxmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ESl0gcHf; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 653J7Sgj2884705;
-	Wed, 3 Jun 2026 20:21:07 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=NNyy1jq/HXaiMvrK9Ng7rk+va
-	I3HU3arH8QIARQY2Fg=; b=ESl0gcHfS2JTSdUB1OuP0ZdRCxex1pQApHZztzRJz
-	HI6GjqyK7FNXI2Gr2YdnNG8DTdnTKg4THtygOR0wmUxYAJJrP2ASIp/8ZEPNR3zg
-	PEfOt0rh08Y/RKrcEwBOcQh8u4zYyj/t/PsEdQAz4wfR8zVZT6N9xMR9ZAHkTBLa
-	Bwk5JdNK3TxI033wWfZuQ2ByIh9Qn14k4+3Fu2r/TUjQhh5neSxbpaUhZMXL7KR9
-	5ZYSZy0rdpCy6G7YLRn5EWiL1/O9ZT8Zr9PKshtXee1Edb7gxTHFoDs9sVdCZaMa
-	kQ9n0B64zPYLBlqn/VoG8iHFyxhyoeqoUVzJ0HRw7mCKg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ej8vfcynk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jun 2026 20:21:07 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 3 Jun 2026 20:21:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 3 Jun 2026 20:21:06 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id B00B93F7066;
-	Wed,  3 Jun 2026 20:21:03 -0700 (PDT)
-Date: Thu, 4 Jun 2026 08:51:02 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v18 net-next 8/8] octeontx2-af: npc: cn20k: Allocate
- npc_priv and dstats dynamically.
-Message-ID: <aiDvHu_f0nPpXC81@rkannoth-OptiPlex-7090>
-References: <20260602060359.1894952-1-rkannoth@marvell.com>
- <20260602060359.1894952-9-rkannoth@marvell.com>
+	s=arc-20240116; t=1780545215; c=relaxed/simple;
+	bh=IbZDDiI4sTfVViCQqvDWqR5n0xj8Bma7tEQ4mXxqk+U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HXOkC95jUPfIDaIx6F3nSUsyGXcmZg+CR3Lng1k98XYmCM81/dtpYHFusr43V6cZV5FgkOWUfgCv6mj0TjR0yiA2sqz0qDhdpoIa9CPkRznPNVphbjzgvBXn1otg7r42/tmYJ2I1QNv2F9rSyiEDD/WPviKfNZq4l2bOP2+CivA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EFzE3fkC; arc=none smtp.client-ip=198.137.202.133
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=Iec0mp4Rj6DxjXTpBzeIIYyiPjr/Gr+gA3QOICt7QLY=; b=EFzE3fkCvWzZTurHZYxYoyFRXZ
+	jIWGeP+cEbt+zs2lr46uyaGr4yvCNptPMvuS0YdvFNFWrsxkezfvt7SiCxm9o9EcpSPwLMx67HpCd
+	cTQuAnS9GYuHsFi5+TAYmiGeHXQp7cZ63xj5aeWSXGav1Pr26HcxP2a42asdqjHcZO6wOmCyeXpyn
+	SjV0rpN62g3ZM19xsK8bHeC61GNmdQMbe9WoRhrfF+Uf4eYLr4CREqlzxYYDydP5x276pyf0r45DG
+	S3m6e+nJWyjFIEU8Qia9yaT+lVHCw20KcveBSNw3VmYrCD5J/29cm9D6cyUCYvFHkzzvuoe7ZNVjI
+	b4K2TiFQ==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wUz8g-0000000G7yt-3Wso;
+	Thu, 04 Jun 2026 03:53:02 +0000
+Message-ID: <909ada9a-a398-4e3f-8ed0-596a1e4bdbfd@infradead.org>
+Date: Wed, 3 Jun 2026 20:53:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260602060359.1894952-9-rkannoth@marvell.com>
-X-Proofpoint-ORIG-GUID: 0RO2QFmIJRf_GY1WwiChFZtBIzKg2FrQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA0MDAyOSBTYWx0ZWRfX7idvCb//hzcg
- IGXdgvWS0zHx8FF01Qcfpzaq9N14Ib1isO3nMu9768PE+ZD4EB7qQjp87nlDU01qPPaZbUY7tSx
- Ftfy12G4OJsQiJado0d+qGZdPXcd/p1z8LdvEqwyz8MDU6kNNcpC8hHXEu6Z2i5rzi7nXoJ2d0q
- H4EvGDmCdLTHs2LAgqOrcIzT4k1y7S4xBjSkqhqX6MbMr1xknI62W32sj6H4VJalfR2Rik6yJiE
- Ts0Gp78Nk8hH8VH+vPzps/zKmZtl5meM8eiVM505uFKrkoybeemOuL3ECfvoNT3h0mvO0eZX6Ql
- wyzNT8+piH9xavRDYx8tKTm9dPa4Awlelu+zOZSBKIwMtJ71teMXgXjvc31RX8CSHQjokuL14LP
- bB4qHNpj6pGcumI+u1xXD9NiY6bVBroDG7+xfh7mseOG+nB08gAcYaaxX06LHFjgRioYOw6btJi
- v5UQ8GSkL0Us8Buk6TA==
-X-Authority-Analysis: v=2.4 cv=EtviaycA c=1 sm=1 tr=0 ts=6a20ef23 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=wLtUEu86mD6Azn7RXrwA:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: 0RO2QFmIJRf_GY1WwiChFZtBIzKg2FrQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-04_01,2026-05-28_03,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 7/7] devlink: Add eswitch mode boot defaults
+To: Mark Bloch <mbloch@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+ Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+ Thomas Gleixner <tglx@kernel.org>, Petr Mladek <pmladek@suse.com>,
+ Tejun Heo <tj@kernel.org>, Vlastimil Babka <vbabka@kernel.org>,
+ Feng Tang <feng.tang@linux.alibaba.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
+ Marco Elver <elver@google.com>, Eric Biggers <ebiggers@kernel.org>,
+ Li RongQing <lirongqing@baidu.com>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Ethan Nelson-Moore <enelsonmoore@gmail.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+References: <20260603193259.3412464-1-mbloch@nvidia.com>
+ <20260603193259.3412464-8-mbloch@nvidia.com>
+ <d276e842-dd8f-40b7-806b-71572503005e@infradead.org>
+ <e4aada53-fb80-41a8-9a8e-d19414f6466b@nvidia.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <e4aada53-fb80-41a8-9a8e-d19414f6466b@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-295040-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,rkannoth-OptiPlex-7090:mid,linux.dev:url,marvell.com:dkim,marvell.com:from_mime,marvell.com:email];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295041-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:jiri@resnulli.us,m:horms@kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:bbhushan2@marvell.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:bp@alien8.de,m:akpm@linux-foundation.org,m:peterz@infradead.org,m:tglx@kernel.org,m:pmladek@suse.com,m:tj@kernel.org,m:vbabka@kernel.org,m:feng.tang@linux.alibaba.com,m:dave.hansen@linux.intel.com,m:brauner@kernel.org,m:dapeng1.mi@linux.intel.com,m:kees@kernel.org,m:elver@google.com,m:ebiggers@kernel.org,m:lirongqing@baidu.com,m:paulmck@kernel.org,m:enelsonmoore@gmail.com,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lwn.net,linuxfoundation.org,resnulli.us,kernel.org,marvell.com,nvidia.com,alien8.de,linux-foundation.org,infradead.org,suse.com,linux.alibaba.com,linux.intel.com,google.com,baidu.com,gmail.com,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:mid,infradead.org:from_mime,infradead.org:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 094E663CAFE
+X-Rspamd-Queue-Id: 3B58163CBE4
 
-On 2026-06-02 at 11:33:59, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Replace the file-scope static npc_priv with a kcalloc'd struct filled
-> from hardware bank/subbank geometry at init (num_banks is no longer a
-> const compile-time constant; drop init_done and use a non-NULL
-> npc_priv pointer for liveness). Thread npc_priv_get() / pointer access
-> through the CN20K NPC code paths, extend teardown to kfree the root
-> struct on failure and in npc_cn20k_deinit, and adjust MCAM section
-> setup to use the discovered subbank count.
->
-> Allocate MCAM debugfs dstats via devm_kzalloc instead of a static matrix,
-> and use the allocated backing store consistently when computing deltas
-> (including the counter rollover compare).
->
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260602060359.1894952-1-rkannoth%40marvell.com says
 
->> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
->[ ... ]
->> @@ -397,6 +398,10 @@ int npc_cn20k_debugfs_init(struct rvu *rvu)
->>  	debugfs_create_file("vidx2idx", 0444, rvu->rvu_dbg.npc,
->>  			    npc_priv, &npc_vidx2idx_map_fops);
+On 6/3/26 6:16 PM, Mark Bloch wrote:
+> 
+> 
+> On 03/06/2026 23:06, Randy Dunlap wrote:
+>> Hi.
 >>
->> +	dstats = devm_kzalloc(rvu->dev, sizeof(*dstats), GFP_KERNEL);
->> +	if (!dstats)
->> +		return -ENOMEM;
->> +
->>  	debugfs_create_file("dstats", 0444, rvu->rvu_dbg.npc, rvu,
->>  			    &npc_mcam_dstats_fops);
->Should the dstats allocation move to the top of npc_cn20k_debugfs_init()?
->By the time the kzalloc fails, three debugfs files (mcam_layout,
->mcam_default, vidx2idx) have already been created, and on -ENOMEM the
->function returns without unwinding them. The sole caller in
->rvu_dbg_npc_init() is:
->    if (is_cn20k(rvu->pdev))
->        npc_cn20k_debugfs_init(rvu);
->rvu_dbg_npc_init() is static void and discards the return value, so under
->memory pressure during probe the device completes probe with a partially
->populated debugfs hierarchy and no error is logged. Pre-patch the function
->unconditionally returned 0, so this is a new failure mode introduced by
->this change.
-I dont see any problem with this.
+>> On 6/3/26 12:32 PM, Mark Bloch wrote:
+>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+>>> index 063c11ca33e5..7af9f2898d92 100644
+>>> --- a/Documentation/admin-guide/kernel-parameters.txt
+>>> +++ b/Documentation/admin-guide/kernel-parameters.txt
+>>> @@ -1264,6 +1264,31 @@ Kernel parameters
+>>>  	dell_smm_hwmon.fan_max=
+>>>  			[HW] Maximum configurable fan speed.
+>>>  
+>>> +	devlink_eswitch_mode=
+>>> +			[NET]
+>>> +			Format:
+>>> +			[<selector>]:<mode>
+>>
+>> It appears (please correct me if I am mistaken) that the '[' and ']'
+>> above don't mean "optional" but instead they are required characters...
+>>
+>>> +
+>>> +			<selector>:
+>>> +			* | <handle>[,<handle>...]
+>>
+>> while here they mean "optional".
+>>
+>> That is confusing (inconsistent). Also, if the square brackets are
+>> always required around the <selector>, what purpose do they serve?
+> 
+> Yes, you are right, this is confusing. The outer square brackets are part of
+> the syntax and are required, while the brackets in "[,<handle>...]" mean that
+> additional handles are optional.
+> 
+> I couldn't find a better way to describe this. What I want to say is that the
+> selector is always wrapped in square brackets. Inside the brackets it can either
+> be "*" to match all devices, or a comma separated list of handles. If "*" is
+> not used, then at least one handle has to be provided.
+> 
+> Maybe it would be clearer to spell it out explicitly, something like:
+> 
+> Format:
+>   [<selector>]:<mode>
+> 
+> The '[' and ']' characters are literal and required.
+> 
+> <selector>:
+>   * | <handle>[,<handle>...]
+> 
+> If '*' is not used, <selector> must contain at least one <handle>.
+> 
+> Does that sound like a reasonable way to document it?
 
->> -	xa_destroy(&npc_priv.xa_sb_used);
->[ ... ]
->> +	if (!npc_priv)
->> +		return;
->[ ... ]
->> +	kfree(npc_priv->sb);
->>  	kfree(subbank_srch_order);
->> -	bitmap_clear(npc_priv.en_map, 0, MAX_NUM_BANKS * MAX_NUM_SUB_BANKS *
->> +	bitmap_clear(npc_priv->en_map, 0, MAX_NUM_BANKS * MAX_NUM_SUB_BANKS *
->>  		     MAX_SUBBANK_DEPTH);
->> +	npc_defrag_list_clear();
->> +	kfree(npc_priv);
->> +	npc_priv = NULL;
->>  }
->Should npc_cn20k_deinit() also NULL out subbank_srch_order after
->kfree()ing it, to match the cleanup symmetry of the fail3 path in
->npc_priv_init()?
-I dont see a need as there is only one AF device per system
+Yes, that helps a little bit. Better than nothing.
 
->> -	const int num_banks;
->> +	int num_banks;
->>  	int num_subbanks;
->>  	int subbank_depth;
->>  	DECLARE_BITMAP(en_map, MAX_NUM_BANKS *
->> @@ -214,7 +214,6 @@ struct npc_priv_t {
->>  	struct list_head defrag_lh;
->>  	struct mutex lock; /* protect defrag nodes */
->>  	int pf_cnt;
->> -	bool init_done;
->>  };
->The init_done field is removed from struct npc_priv_t, but the
->kernel-doc block above the struct still carries the corresponding
->description:
->    * @init_done:		Indicates MCAM initialization is done.
->Should this @init_done line in the kernel-doc be removed alongside the
->field? scripts/kernel-doc and make htmldocs will warn with "Excess
->struct member init_done description in npc_priv_t".
-ACK. Should i post v19 to address this ?
+But why are they required at all?
+
+>>> +
+>>> +			<handle>:
+>>> +			<bus-name>/<dev-name>
+>>> +
+>>> +			Configure default devlink eswitch mode for matching
+>>> +			devlink instances during device initialization.
+>>> +
+>>> +			<mode>:
+>>> +			legacy | switchdev | switchdev_inactive
+>>> +
+>>> +			Examples:
+>>> +			devlink_eswitch_mode=[*]:switchdev
+>>> +			devlink_eswitch_mode=[pci/0000:08:00.0]:switchdev
+>>> +			devlink_eswitch_mode=[pci/0000:08:00.0,pci/0000:09:00.1]:legacy
+>>> +
+>>> +			See Documentation/networking/devlink/devlink-defaults.rst
+>>> +			for the full syntax.
+>>> +
+>>>  	dfltcc=		[HW,S390]
+>>>  			Format: { on | off | def_only | inf_only | always }
+>>>  			on:       s390 zlib hardware support for compression on
+>>
+>>
+> 
+
+-- 
+~Randy
+
 
