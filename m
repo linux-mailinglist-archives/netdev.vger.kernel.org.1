@@ -1,152 +1,155 @@
-Return-Path: <netdev+bounces-295080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295082-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mFX+KNozIWoHAwEAu9opvQ
-	(envelope-from <netdev+bounces-295080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:14:18 +0200
+	id 8lKEFJIyIWo2AgEAu9opvQ
+	(envelope-from <netdev+bounces-295082-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:08:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED15E63DE89
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:14:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD4763DDD1
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:08:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.microsoft.com header.s=default header.b=WCdFTXs+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295080-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295080-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=vbft8c13;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295082-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295082-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30D6B3071C59
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:02:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DC27E3067B4F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260C8393DE8;
-	Thu,  4 Jun 2026 08:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A428D37E303;
+	Thu,  4 Jun 2026 08:02:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0F537105A;
-	Thu,  4 Jun 2026 08:01:57 +0000 (UTC)
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B713D3859CB
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 08:02:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780560120; cv=none; b=kEOx6fp4p0c8vdBU1DK8uM7ORN9pq/Uy0dqhSua+/EYhbEDegVJ76IZpc/EVXkSKcHPR/gvHzUs+zQj9DkIPGTMFYeWOhifN0ZufVTbwbDP/RC/f4FYQCuzu8ywoV4jSaONaM9MDxj4W8YDPZzjnrx9b5YBtiSB2xXx33EEWf3E=
+	t=1780560139; cv=none; b=IQEmI6YFsuTz89/IseVk9DYpR2DnfEE34FWcVVaafWmJ0Qsfz1o2oakhYAaA46AXUbBC9rBmwoYRutJg223JIAeGKIOzwQn6P0bjTgENuTSfbZJzTljod/UZk52VJg1cCYImHlm9M7BKtm0iF1/BawgtAp7NZ/XlXVFH1yTyb9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780560120; c=relaxed/simple;
-	bh=3dP7tSKE777SpeJjpcqFKvadQN1HE9zy/yv1fQvLeRA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t4kZm/p9KokhQKCGzfNS196xt2x6D8Pa+UxuEVd6mTz04Rp70oebffnNEnC9cZ9k2RDE6Ez4bwx3vWmECGl6BIn7EbWBaDZaIfmtf6jNAiqUvS29hmzX7TiXy+epaME4g3UFuLtTysRu70dQrl6FN61ie7n1eZ03euezP82Avt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WCdFTXs+; arc=none smtp.client-ip=13.77.154.182
-Received: by linux.microsoft.com (Postfix, from userid 1231)
-	id 405EF20B716D; Thu,  4 Jun 2026 01:01:43 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 405EF20B716D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1780560103;
-	bh=XPoYNCGvDJaTicqaJgBWKLcSrkwnst8h0cS85WM1Ij0=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=WCdFTXs+lyRejL+5qYa1V89vD2RW8wbzfBoWMXa9BY1QBTiKbCukS+ZmwUto+9bAy
-	 PXalcoeGi7lmTksMy5khgdXF0QLj1iEoLA9TresXJydw6DDMJUdHkuLZ5OZOv2Un2j
-	 RjXAN+K269VUicXaQc4iHsGJMH5R97V/M8dHTp7o=
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	kees@kernel.org,
-	shacharr@microsoft.com,
-	stephen@networkplumber.org,
-	gargaditya@microsoft.com,
-	gargaditya@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] net: mana: guard TX wq object destroy with INVALID_MANA_HANDLE check
-Date: Thu,  4 Jun 2026 01:01:26 -0700
-Message-ID: <20260604080137.1995269-3-gargaditya@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260604080137.1995269-1-gargaditya@linux.microsoft.com>
-References: <20260604080137.1995269-1-gargaditya@linux.microsoft.com>
+	s=arc-20240116; t=1780560139; c=relaxed/simple;
+	bh=6DPDWi1Fdv2KhLiabVa6e+jQ5ofL59QW9KnnH61wnVQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UUiBqBvsVzXi+fw6pyvUUZ8+6Ex8B7vBy+nuahiS+ibzwUwQQvqgXbPvZlq8l3aA9mrSrwyZh3l+mOVUa92sGs0st0xQqMPhR0KDtauxeHfsjkwyCEXnM+Jtvttv8vz47+EqCO91v9V4b7RoYelVE6OeeAWgHGKWBp/HOV8iNAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vbft8c13; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 4F8E24E4059C;
+	Thu,  4 Jun 2026 08:02:16 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 20E335FEF7;
+	Thu,  4 Jun 2026 08:02:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 37204106A17D7;
+	Thu,  4 Jun 2026 10:02:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780560129; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=xzaY2tAeL0L5YgTXcoH5IsPMnKeR68XcgGGXMSuV3dA=;
+	b=vbft8c13XxpGiNTq+kj/BYvMTABGQqMT7eNS3flN+N47rhIOXIvi/Cv++Y1aclKZ23Qpj1
+	JMntgP54DZ9hwVjBA0oYXhtRKU1hHrbdlPP2NpQ0FH0wpPflTdkqziZwVhhisufHfJUQ05
+	2886I3iw1CIE1uCY1hWkb0Bbvfzsz4pV/99+S5gOW8L21mDGp/gUsYiuSbI3BBhfJhW3Mc
+	5cz3nhK1bCazMawqn/oO5cxY2BxUb+fOkB/6UnSBGi+u0TCOztv31CnESG7s3DgBmK9MSI
+	t+7sBfHHY+lpwC4gbqahWdS+LtPVOJEkO6qomDnzDW0lhPXlD9zmJWnN+Vzlzg==
+Message-ID: <5d0a38d0-44ab-4689-a243-8c9aed057d93@bootlin.com>
+Date: Thu, 4 Jun 2026 10:02:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/3] net: phy: remove phy ports upon probe failure
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com
+References: <20260601084029.815461-1-maxime.chevallier@bootlin.com>
+ <20260601084029.815461-3-maxime.chevallier@bootlin.com>
+ <2823b00cb2aa211d8f4f392a37537351@tipi-net.de>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <2823b00cb2aa211d8f4f392a37537351@tipi-net.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295080-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shradhagupta@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:ernis@linux.microsoft.com,m:kees@kernel.org,m:shacharr@microsoft.com,m:stephen@networkplumber.org,m:gargaditya@microsoft.com,m:gargaditya@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[gargaditya@linux.microsoft.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gargaditya@linux.microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com];
+	TAGGED_FROM(0.00)[bounces-295082-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:mid,linux.microsoft.com:from_mime,linux.microsoft.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim,bootlin.com:from_mime,bootlin.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ED15E63DE89
+X-Rspamd-Queue-Id: 3FD4763DDD1
 
-mana_create_txq() has several error paths (after mana_alloc_queues() or
-mana_create_wq_obj() failure) where tx_qp[i]->tx_object stays as the
-INVALID_MANA_HANDLE sentinel set at allocation. mana_destroy_txq() then
-unconditionally calls mana_destroy_wq_obj() with (u64)-1, which firmware
-rejects and logs an error.
+Hi Nicolai,
 
-Mirror the RX-side pattern in mana_destroy_rxq() and skip the destroy
-when the handle is still INVALID_MANA_HANDLE.
+On 6/1/26 11:31, Nicolai Buchwitz wrote:
+> On 1.6.2026 10:40, Maxime Chevallier wrote:
+>> When phy_probe fails, let's clean the phy_ports that were successfully
+>> added already.
+>>
+>> Suggested-by: Nicolai Buchwitz <nb@tipi-net.de>
+>> Fixes: 589e934d2735 ("net: phy: Introduce PHY ports representation")
+>> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+>> ---
+>>  drivers/net/phy/phy_device.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+>> index 6ccbfacf7d1d..a171cbe2a74a 100644
+>> --- a/drivers/net/phy/phy_device.c
+>> +++ b/drivers/net/phy/phy_device.c
+>> @@ -3778,6 +3778,8 @@ static int phy_probe(struct device *dev)
+>>      return 0;
+>>
+>>  out:
+>> +    phy_cleanup_ports(phydev);
+>> +
+>>      sfp_bus_del_upstream(phydev->sfp_bus);
+>>      phydev->sfp_bus = NULL;
+> 
+> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
-Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
-Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I'll be moving phy_cleanup_ports(phydev); after the sfp cleanup,
+can I keep your review tag ?
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index db14357d3732..4a2cd800111e 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2351,7 +2351,8 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 			netif_napi_del_locked(napi);
- 			apc->tx_qp[i]->txq.napi_initialized = false;
- 		}
--		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i]->tx_object);
-+		if (apc->tx_qp[i]->tx_object != INVALID_MANA_HANDLE)
-+			mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i]->tx_object);
- 
- 		mana_deinit_cq(apc, &apc->tx_qp[i]->tx_cq);
- 
--- 
-2.43.0
+Maxime
+
+> 
+> Thanks
+> Nicolai
 
 
