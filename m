@@ -1,209 +1,268 @@
-Return-Path: <netdev+bounces-295292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295293-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7H+fAReWIWqkJQEAu9opvQ
-	(envelope-from <netdev+bounces-295292-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 17:13:27 +0200
+	id Q4dtKrWTIWrtJAEAu9opvQ
+	(envelope-from <netdev+bounces-295293-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 17:03:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52FDA64148D
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 17:13:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04698641307
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 17:03:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=bQ+D3ouh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295292-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295292-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=onsemi.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="qTC/jynT";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295293-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295293-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB21930097CD
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 14:51:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 12F873079F7D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 14:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575A92F9D98;
-	Thu,  4 Jun 2026 14:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6C72DECDF;
+	Thu,  4 Jun 2026 14:53:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C722624E4C6
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 14:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A95824E4C6
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 14:53:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780584692; cv=none; b=HtEzd6qUGK1xUQQVZT0Y5Pn446u2jO+PjmiDK8kkANJImjIH8XYRvLe8M673kDJtNfsYaBt0Zmv0iwQPOOYXpwy0dmfsG9/nzMMy/2ujKAxmbuhfW7IR2YPVJNsc+ss9SicIviD+8x/TJAyTUqO+3IpainoKefHbjwEgvmlbAG4=
+	t=1780584793; cv=none; b=JKrlErHHBD5yHo0/w3PZjeBf3ew/7pZ4NBDHkFGYAuaULS2865hnwv4bmi/wughIJfNL2P3GUiYSlKtvt7+HUqahVfa50COnvTGZ7NvekJ2e2gIQrA9DuqXxwTFHsYOfPu5s1251wQaJhAy7J6m9B+vrLWa3hvGhHz6ZlYFdCa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780584692; c=relaxed/simple;
-	bh=XQDvGuBCKWLLr6nccJZYBVXdSy0v/+LJTT+/47lKA18=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=Rf9TpWetYSRGzJH0+u74B+p/AStWyCAbSpTYowrQD42SSz5aPwOn8IDngR1aomra7Ne7fRQ2jwcBSq9RjIwrcgWj7wItd7SjIAeE/eqSOflg05qhM2qoEgPlgAN2mO6/wJrhVuXj0OixoXa5bICToWOwOaJq40g/WbfjrNt2D64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=bQ+D3ouh; arc=none smtp.client-ip=170.10.153.120
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1780584684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XQDvGuBCKWLLr6nccJZYBVXdSy0v/+LJTT+/47lKA18=;
-	b=bQ+D3ouhm8fhPGrN4+wy+X+w+rNOKyWuRDMRGL+R6sOYV7eCzbg6dxCscwP/eLatP2iiuT
-	QJ2V/3uNChTADByZVWBfUJjgWWEpQb7lkTofWOuxT4kOE9rdVFRh+u6sdw5sTGl5YBjksv
-	3EC56JlFScfWyNa3gomOyz0MjBC1CENtIMIs/YGP9ofOWhrktNfi2igBG+ZowYbhH5Ijsr
-	7aQugZAxUJUtvByyFbSfD0j2oAsZuYmO9CmqToUEvNIXhoeZ/Ww8wW9i2UIxyKVxAcNL2e
-	yADiTrNFGn0F39cLGe+Jv8MQgZ20MrT2m3e9aXCVYkL292VLXSRzTrzfVpCN4Q==
-Received: from DM5PR21CU001.outbound.protection.outlook.com
- (mail-centralusazon11011024.outbound.protection.outlook.com [52.101.62.24])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id usb-mta-28-3QnhUujYPsSPpH5Q8kyTOQ-1; Thu,
- 04 Jun 2026 07:51:20 -0700
-X-MC-Unique: 3QnhUujYPsSPpH5Q8kyTOQ-1
-X-Mimecast-MFC-AGG-ID: 3QnhUujYPsSPpH5Q8kyTOQ_1780584676
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
- by BY5PR02MB6689.namprd02.prod.outlook.com (2603:10b6:a03:20f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Thu, 4 Jun 2026
- 14:51:09 +0000
-Received: from CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
- ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.21.0092.007; Thu, 4 Jun 2026
- 14:51:09 +0000
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: Paolo Abeni <pabeni@redhat.com>, Parthiban Veerasooran
-	<parthiban.veerasooran@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-CC: Piergiorgio Beruto <Pier.Beruto@onsemi.com>, Andrew Lunn <andrew@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Conor Dooley
-	<conor.dooley@microchip.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>
-Subject: RE: [PATCH net v3 0/2] Resubmitting with cover-letter and threaded
- patch series.
-Thread-Topic: [PATCH net v3 0/2] Resubmitting with cover-letter and threaded
- patch series.
-Thread-Index: AQHc8eDJSLy74ngCnk2lTBbpvAesgLYuZacAgAAZeCA=
-Date: Thu, 4 Jun 2026 14:51:09 +0000
-Message-ID: <CY8PR02MB92490D1BEFDB7DB856F9843783102@CY8PR02MB9249.namprd02.prod.outlook.com>
-References: <20260601-level-trigger-v3-0-da73e7010532@onsemi.com>
- <42052da1-2d33-4023-b383-482006fcb628@redhat.com>
-In-Reply-To: <42052da1-2d33-4023-b383-482006fcb628@redhat.com>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|BY5PR02MB6689:EE_
-x-ms-office365-filtering-correlation-id: be6f5704-0ab7-4f0d-3705-08dec248b6cf
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014|56012099006|4143699003|11063799006|22082099003|38070700021|18002099003
-x-microsoft-antispam-message-info: wohVayzYtjTtAM4U50tNs8wC1Nl335EmiZAzdqD3ZeDmwgzh5gTxkAPD/0q1/xyzWIva3F6CVv3qgbzflrB66+svGe0JYFnv9as/Flsyc0cQjb7bOaulB/hZJruH2gqJASkQ1O8g684EYqIXWSzY/iXi5Ky/M0gxUSb8NUQZq7GQVlrbzHtdB0Jx7JzNkw8ur9qRGy8shRdWxZdr+N8fY+o1jlzlOYWUFXZ+o1xCpDFlThMW7JGx996QldRnSWkJmP4wc49V5RmDkFUrWFaiK/C+MU/A5FxNzciv5G21NhEOOrVbhPHj0WR45Wd34RhipkI/L/v+H1Y4hh6A/0fb6m/3oO7g5ZJQxhh2j+WagcIqModWNIzh4pUeW1DV936l6TJ0bet/DQXW0O1OqHzjO+/lWguLGKu0HeHxO+eFpqlJwOJ5crjh+XwLBRaDhxSqoAKW4lEty2T34MhGdPR1sK92FUy+MwDjr3dOdpzGg4k4i+n6PRcwLkfs/VxLRnGO9Lm5oN6Tc+ILESm6ispiZMTN8v+meKdWmi/erIlznlXofTWwlQRyDH3Sx3SMMEBiMgpcJOqbnPbbb7XwzFSGlE9/m0rx5BjYwofg3iG5UY/uLVwKRB2xWL8PiUboleRJZxe/m5fceZzL5bN6dI9thXFJAPHzOPNqYu7aSbYCk+l4x3qdTVHV7nwrvWHiTpFhaOQA24yjUQMxDFhYtEiHw4cLAoJpsJT2DiwtZ1F4tXtUQ/QEfyqaMz2TBdFmAkeZ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014)(56012099006)(4143699003)(11063799006)(22082099003)(38070700021)(18002099003);DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RlhMWVMvbkMyTFl5VHpJSUYwRkFLOVI5QXduV0Z3eE54L0hIQ3dOMlMyMXo1?=
- =?utf-8?B?cmUwYWYvTHFHSGlINWhXRWMySk5OMnhXSlQ0cHdNU3BJUU5sMUFCTmdrRFJo?=
- =?utf-8?B?ZGRQTFh1cU5nUWZTc1NyN3NQRFFhSDdoejF1Szk4cm1HUE9LaEp1Tnd0VUZW?=
- =?utf-8?B?NHJzdWJqN1kwUWNzT3VLTE5yaHRGN2g3bGFMRDBrQzBXaGJIM1M4bGVIUkxU?=
- =?utf-8?B?YlJCak1EY2daa1NjVDN4NHd5V0tSS09RNlJHSjJDMWxUZEtWa0ZmTVFoeSs1?=
- =?utf-8?B?Rk1KTWhKNzZPS0loRmh4Qm9JZm83VXNsM3BqTnl6QnNkSEJyTHpyc0NoQ1ND?=
- =?utf-8?B?ZWNvMVd3YVByVVd1c2lhb3dLcExQTno4TXhIekwrK2cvMCtZT0I2QklUVjZ6?=
- =?utf-8?B?ZFY3MU9uVThqMlg3MnlVQ05lUzNEViswUGlCOWpySzh5UGtTWWJqR1BsMXJ1?=
- =?utf-8?B?NnNacTVGUFVmU3c4M3JBcEVncHhNVTMrSzlGcWd3RFI3Mmw3UjlzeVFhRkdU?=
- =?utf-8?B?b0JhamZBVWVmdEE3M3RMd1F6dWh1dnQ2TS91TkRXOUlSKzhkSGVrQ1kya08x?=
- =?utf-8?B?R2NrVUl6bXUvR3lOWkxjZVFZQzJJMXNnTVNGS1ZNZzE4WWRZTWh5TTQ4WVhR?=
- =?utf-8?B?N1FKNVFnakRtczl3UGpWeC9ueEZHT05wbE1jcFFCZDMyTmlFS3dzczQ5VkJu?=
- =?utf-8?B?YnFyaWVDK21qVC8zMXYxUE4xUVREWGRWcHkzaCtNS3pkaFRiNWJ3OThNOGpP?=
- =?utf-8?B?UnZQYzZtdEh3NVVPdlYwSW05WE14Ly9LaU5DdE5yZExJUlJnTW9jMU9JaDIz?=
- =?utf-8?B?SVFpQUNYWEpnaWFsSFc1bkZGSjg1Q2s5WWNZK1BFWm5pbTZqZTY5MzFxTmJP?=
- =?utf-8?B?OHd3dDVtNFJCQTRiYTJHZTkwbHpDUnE2Nlk2VzJNTlNoYk4zZENiMnlDdnBx?=
- =?utf-8?B?VzVFb3ozY2JDR1RPYVlBdWNqZ3kzeDY0VllxbWlTVlNOakxSbzR4UkFnaHNZ?=
- =?utf-8?B?RzZaeEp6UWVRTUVtY2cvMmh6Ukh6c1NTM2FONFRUaDlXWVhhZEhaVVNnQWlK?=
- =?utf-8?B?NWdOWGlrR1lxUFFuelFVTUlVS1djTXNtMFZhNk82TnFEMm9iaEIxcndQWnFD?=
- =?utf-8?B?L3BSVXI2N3MybWFKazREclJ5NkI4cDZNb1piL0ZxdWpOcHBpbERBYmRUdGV6?=
- =?utf-8?B?N3J6bWs2RTNNNmhVaXpaM3h1MmZhQm1MYnA0VkM2Q1JROThnang3QnRGRS9M?=
- =?utf-8?B?NEhIWWRVNnAzeGZweGl3bnE0ck9LRS9kK2o2YVBTbnRhZnY0b1NJV1AvVFAz?=
- =?utf-8?B?L2xJRmhlM1VaTWVoVW5pT05JdFloM1RJTEwydVQ3L2dLRG05YittRVduRW9J?=
- =?utf-8?B?NEs0WjdreUd2WmcrQzBlbUpRNG5GSUZBS3JoWWVLU3cwRzd1cDJ5ZHpSM0RB?=
- =?utf-8?B?SFREOC9GNUxOaGhac0R5dTNTOE5sdkFub2xZTS9SaVBIZVJwZ2VKemJiaUJn?=
- =?utf-8?B?ckprOHdOT3hURWJOMFYzdXdpWXBRbmJzTU10V2F2TWJHbXIyNmlSYXdNKzcr?=
- =?utf-8?B?cnAvVHRVa2pPT2FXVklJcTFrZXJia0h1MThheXJLY0pFbmQrcXBVMWhIOFFo?=
- =?utf-8?B?TElGN3QzSVdwVlZsOURGVzNqZ0NBMjltUHYybWRVNm9NSVkweC9RYXJ0ZEpB?=
- =?utf-8?B?WU4vb2VJQ25HUzRkZ1lsN0tqaHVVR2ZSaytQODJ6S1lKYXpzbHFnZDM1Rk5J?=
- =?utf-8?B?dG9sSWRtbU5JWm94NWZSVHNTUHlDTnljYlAvWHNzSWF1T1ptL2pzRXFGZWZ0?=
- =?utf-8?B?WU1paWY4UEs5UGdpazlSQUdyQnBvTWExditzZXA4RWVOWGcvWEFNMjd4cDgz?=
- =?utf-8?B?UmpWM1B6WjdQcXBpS3dPSU5sQ2laWkc2anhlY01taDF1UTNlbi95NTEwVWhj?=
- =?utf-8?B?VVpKUjgxOXhxQ1I4cFpENXBSMFJpMGIxbjZ6YjBlWmZiQ3Nldnl4d2hmRUFH?=
- =?utf-8?B?WVJHbW4yaVlsd3BTTm9sWW9hdUFSRDFyaVZhUG9KUXJ3bzJKdUxuOW5EZGUz?=
- =?utf-8?B?bEZINGh5T1R3b2RBc1lhNlYranVrY0V1R0hGWExnaUo2UVhRVmJvUnlhZFox?=
- =?utf-8?B?enNmb1M3bEVwdkxPZ2VENzhJNkI5VzNIbEFHUGZacEZGTG94clpWNEZHeE4r?=
- =?utf-8?B?dU5tQU5WRkhNcklqQVVQUGVJbVlLbjZLS3N0M3pwOVQvQ1JGNHpVZk1PMHRU?=
- =?utf-8?B?ZGRZdXhBZ3B4ekpwcDZRc3VOMDFkZVp6U1l5QnhFYldPamxBc3FMRWlzTitB?=
- =?utf-8?B?YVdxTE1UbVl0SXB4MEJTMFVRdFRXSjdFTTZjQitaZXpTVW53QUNtSXNhVUZX?=
- =?utf-8?Q?iIOXT72/8EGUMumY=3D?=
+	s=arc-20240116; t=1780584793; c=relaxed/simple;
+	bh=8cH4mAiquyBWMo7JCLMDAIcgKxWh3mA2G+eVR5xhxcw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CX/f1JwHbWmJCh53MHzBFLqdbsdDPjwSeTgcsE0puC/87lvdyw86fufM/Aditrd3W6HDEBLkoRMaediRSw91cNJnddbJ6PNty7DKHFfH9N7rnYp1E4yuo2Wvx1M/8K78a2i2EO0m9QjiBvF5GveBCQNhrIfop4oA1jQwLQy3A2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qTC/jynT; arc=none smtp.client-ip=209.85.128.48
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-490ace40f4bso9918435e9.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 07:53:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780584790; x=1781189590; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GjRGuOqbwCyHAFXf1dsFmUnnUDQzMFMpBmyvdHjNefI=;
+        b=qTC/jynTxhm3I5qQzwfZQKtBilHchZNwXRtUmI82AJYBHnanRmxaE2sdXL43vRE057
+         VTdKCkrtJ7gLFcnsqTUT7XyKQrE1tiaz9aYfAcQL8bU0Nis4rIcHls9Rx6ck3+yje9/w
+         X9BadcrLdVt4jAjxbi2KChhtwWN9p4V6K7HgTnMHa2Amp79Ai/a7sQmSkEO9isd/PKlx
+         7Awg/NolOpvSqQGZdM2LsZsSPZ5iT4tQoSVpHS4bm5BbstbgeBI41+OkVbqkOXCvNaNp
+         TfHJ59ntCMwQE8CvYzwmvNf246mDi7exNjnVljV56ZALIPK6Ex3XE6qx8BRL9aYz4fot
+         40rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780584790; x=1781189590;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GjRGuOqbwCyHAFXf1dsFmUnnUDQzMFMpBmyvdHjNefI=;
+        b=ROyJntS2od+E7Y0Qf4CiQchWcqV6GCkEQdBT8p65+eS27KNABw0L/urTl+Y1VmsJvr
+         8vibRdzQ0l2KVDpG72WqZSgM38V0JJbXie7LYIVf4EtpSWOOyyza8zb29j6VAciIn1pD
+         jJhPynitiysQyQ2bw1dwSk/P2zZZsMALHQ22GA3GnKWKOw6SU/6JB6WLVks+ymhmuTBZ
+         V5qkq1jMHVPobZdD6cBHqjB5HKoR0rJdvHH9AqH5UjS5HDoiKwXIyApZwnm2GPaue4RG
+         m9RI8G0ntS1mopsadGHzogQhUM+Z9S87w/0/ckv1hROMqUAedSVb7QQ7VXim7Ov5GDej
+         FscA==
+X-Forwarded-Encrypted: i=1; AFNElJ/CnMmIB9pMPboatn3UbN4y/q8d3c/ku5DPstmt61EldaKHp0FsWSh/BjkuEGVFRgSAdmOnkuw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXlNQZRwcHIRYF8nkhC9cOWABOWkCQA9IJSepV7nnVMZo5daO1
+	jIA126uf8C1LJsJS2NWEX1sWRPWDGjSxSUcZggenWyRshMzRUyUaX6tt
+X-Gm-Gg: Acq92OGlpM3TfkwPxOcGE/61zexf+fl9XjxEhV8REcaJ1Hjvv0w/zUuwn8ul0i7QoHH
+	I3MkUIXSvWp/ao1Bfr5ETIgf34dpNP+x7rK8ZEgKkJBRAwt2dHIvOacPzfN/FVV8eNvdSoAraK3
+	8FAZPokELD/x+SyKyyPd74/T+JCXvoCU4sscqAEqEQM/lQsz4nVvNfP6PROKfPDjkmrrXSt++Mt
+	4TctO4C/VSkopspinLwhicdDRK7Wo0a5ZLP71oBG+pAaZfMPrUpYuqiRbP2Cugp+fMd4t81C4Kl
+	YFImY0GKucXs2Cem3KVQtKXuJznBJ2amdDhifHxav/bvY35cEKzOtRByvtqTTUBRTtJDo4zKQqX
+	oGGwPLPMMVmxr6h976sk620QHnPJhiT0+E9rsXr6vyzula+3AdusoexkbXDk22kT1oiFTIC3CxB
+	fD7jiu5H9pmwuNXVGzuwXW3TmJvzzmxGPgw4svzJH2bdVXfNWtvINqn/aqi546hhbeEQ0H0M7T4
+	9+dLNhVjA==
+X-Received: by 2002:a05:600c:a0c:b0:490:bd66:e526 with SMTP id 5b1f17b1804b1-490bd66e5femr59985365e9.32.1780584790359;
+        Thu, 04 Jun 2026 07:53:10 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f0a43e9sm17030103f8f.0.2026.06.04.07.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2026 07:53:10 -0700 (PDT)
+Date: Thu, 4 Jun 2026 15:53:08 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "kuba@kernel.org" <kuba@kernel.org>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
+ <horms@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu
+ <larry.chiu@realtek.com>
+Subject: Re: [PATCH] rtase: Workaround for IP fragmented UDP packet hardware
+ bug
+Message-ID: <20260604155308.770b2deb@pumpkin>
+In-Reply-To: <1489704deb9844b08848758af95a448e@realtek.com>
+References: <20260601062341.63981-1-justinlai0215@realtek.com>
+	<5c095b26-9720-45b0-a8d5-a8495291e45b@lunn.ch>
+	<447c46ad1f654222a8daa423149f0b89@realtek.com>
+	<20260604124606.7143581b@pumpkin>
+	<1489704deb9844b08848758af95a448e@realtek.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: T0pHZIlYC7QPxuqKGjAYo8ZjF5pqdwagVogppVt8FCv1f3HhX2ProLLB7D1lDn9nm5VJs5fMuVhcrXsJN02gUNe84lVQlrevYRX3nt3c97x/K/4GA8BZltvu60IkW+si9qGxYvx/B668fic7+V8F8Y/eqoYjqAhvgIJQFfhtQb/Ag0pns+aJJX4RpAfxxnMhpEXdaNhd3UMZJW0STzpBe5sfoNSNsauCoJLtMO9b9PCnyvHtXFMBdJTAL3/PzXFaK5Cl6Nxb2kVXrMVXApP7ImmS43tB7GljzzKtWv0qItDNMsg4pVhGjgM1YlxZOWhXB/nZ/AdtCeC5heUYzKVoRA==
-X-OriginatorOrg: onsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be6f5704-0ab7-4f0d-3705-08dec248b6cf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2026 14:51:09.3243
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PBpqKMLKo/SoM1UlD+jacWIxEYajLnm4DeX+TFPcZW+WWUG2YqVV0pJhfaLa2sYPx1rPRCL70U0QK2dHGkeEhw29Oll17syy5X7nYVPukRI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6689
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 7FCd1o56JITgdO1SvQz80KYmQ6ww0xdDJn2LVjnnF1M_1780584676
-X-Mimecast-Originator: onsemi.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
-	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-295293-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295292-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:justinlai0215@realtek.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pkshih@realtek.com,m:larry.chiu@realtek.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Pier.Beruto@onsemi.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:conor.dooley@microchip.com,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,CY8PR02MB9249.namprd02.prod.outlook.com:mid,vger.kernel.org:from_smtp,onsemi.com:dkim,onsemi.com:from_mime,onsemi.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,pumpkin:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 52FDA64148D
+X-Rspamd-Queue-Id: 04698641307
 
-PiA+DQo+ID4gTWFpbnRhaW5lciBmb3IgdGhpcyBkcml2ZXIgaXMgYWxyZWFkeSBpbmZvcm1lZCBh
-bmQgYXdhcmUgb2YgdGhlc2UNCj4gPiBjaGFuZ2VzLiBUZXN0aW5nIGZvciB0aGVzZSBjaGFuZ2Vz
-IHdhcyBkb25lIGluIG9uc2VtaSdzIHNldHVwIGFuZA0KPiA+IGZvdW5kIHRvIGJlIHdvcmtpbmcu
-DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTZWx2YW1hbmkgUmFqYWdvcGFsIDxTZWx2YW1hbmku
-UmFqYWdvcGFsQG9uc2VtaS5jb20+DQo+IA0KPiBOb3RlIGZvciBmdXR1cmUgc3VibWlzc2lvbnM6
-IHRoZSBjb3ZlciBsZXR0ZXIgc3ViaiBtdXN0IHJlZmVyIHRvIHRoZQ0KPiBzZXJpZXMgY29udGVu
-dCwgYW5kIG5vdCB0byBjaGFuZ2VzIGZyb20gdGhlIHByZXZpb3VzIHJldmlzaW9uLg0KDQpVbmRl
-cnN0b29kLiBUaGFua3MuDQoNCj4gDQo+IC9QDQoNCg==
+On Thu, 4 Jun 2026 13:43:27 +0000
+Justin Lai <justinlai0215@realtek.com> wrote:
+
+> David Laight <david.laight.linux@gmail.com> wrote:
+> > 
+> > On Thu, 4 Jun 2026 08:33:51 +0000
+> > Justin Lai <justinlai0215@realtek.com> wrote:
+> >   
+> > > Andrew Lunn <andrew@lunn.ch> wrote:  
+> > > >
+> > > > On Mon, Jun 01, 2026 at 02:23:41PM +0800, Justin Lai wrote:  
+> > > > > The hardware parser incorrectly interprets 319/320 in a short IP
+> > > > > fragmented UDP packet payload as standard PTP destination ports
+> > > > > and treats the fragment as a PTP packet for further parsing.  
+> > 
+> > Is that a packet that has been segmented by IP, or one where the skb is
+> > fragmented enough that the data in the header is too short?
+> > I thought that IPv4 required an mtu of 128 bytes (ish) and IPv6 somewhat
+> > larger - so I don't see how that is a problem.
+> > 
+> > If the skb is fragmented then you need to move data into the header not pad
+> > the frame.
+> > 
+> > If the hardware really is broken then I suspect you need to disable the feature
+> > and suffer the consequences.
+> >   
+> > > > >
+> > > > > If the transport data is smaller than RTASE_MIN_PAD_LEN, the
+> > > > > remaining data is insufficient for further parsing and causes hardware TX  
+> > hang.  
+> > > >
+> > > > Where does RTASE_SHORT_PKT_THRESH come into this?
+> > > >
+> > > > RTASE_MIN_PAD_LEN is 47, so matches all packets which need padding
+> > > > up to
+> > > > 60 bytes, plus FCS. There are not many such packets, so why both
+> > > > this all the complexity and just pad all small packets? Do you have
+> > > > any performance numbers which show the complexity is worth it?
+> > > >  
+> > > > > Pad these packets so the transport data reaches RTASE_MIN_PAD_LEN
+> > > > > before transmitting to avoid triggering the hardware issue.
+> > > > >
+> > > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>  
+> > > >
+> > > > Is this a Fix? Please add a Fixes: tag. And base it on net.
+> > > >
+> > > > https://www.kernel.org/doc/html/latest/process/maintainer-netdev.htm
+> > > > l
+> > > >
+> > > >     Andrew
+> > > >
+> > > > ---
+> > > > pw-bot: cr  
+> > >
+> > > Hi Andrew,
+> > >
+> > > RTASE_MIN_PAD_LEN is not the Ethernet minimum-frame padding  
+> > threshold.  
+> > > It is the minimum transport-data length required by the hardware
+> > > parser after the packet is incorrectly detected as a PTP packet.
+> > >
+> > > Therefore, this workaround needs to pad the packets which can trigger
+> > > the hardware issue, rather than just padding packets to the Ethernet
+> > > minimum frame size.  
+> > 
+> > Is that a longer length?
+> > Excessive frame padding (beyond 60+FCS) can be treated as a protocol error.
+> > 
+> > -- David
+> >   
+> > >
+> > > I agree that RTASE_SHORT_PKT_THRESH is not necessary here. I will
+> > > remove it in the next revision.
+> > >
+> > > Yes, this is a fix. I will add a Fixes tag and repost it against the
+> > > net tree.
+> > >
+> > > Thanks,
+> > > Justin
+> > >  
+> 
+> Hi David,
+>  
+> This is an IP fragmented packet, not a fragmented skb.
+
+Ok, your tests are broken for fragmented skb.
+skb_tail_pointer() is the end of the initial fragment, not the
+end of the actual data.
+So you could be adding padding to a full length packet making
+it overlong.
+Somewhere you need to be looking at skb->len.
+Probably with a fast-path check to ignore long packets.
+
+>  
+> The issue occurs on a non-initial IP fragment whose payload
+> contains values matching the PTP event/general destination
+> ports (319/320). The hardware parser incorrectly identifies the
+> fragment as a PTP packet and attempts further parsing.
+
+Wait a minute, what stops someone using either of those port numbers
+for something else?
+There are no hard restrictions on the use of UDP port numbers.
+So what does the hardware do with UDP packets to port 319/320 that
+are being used for something else entirely?
+
+> The workaround does not modify the IP or UDP length fields. The
+> original protocol headers still describe the actual packet size.
+>  
+> Therefore, the protocol-defined payload size remains unchanged.
+>  
+> We have tested this workaround and have not observed issues
+> caused by the additional padding.
+
+Have you checked all the systems that might receive such packets?
+
+-- David
+
+>  
+> Thanks,
+> Justin
 
 
