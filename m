@@ -1,127 +1,165 @@
-Return-Path: <netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295440-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NSyMM7v5IWrQRAEAu9opvQ
-	(envelope-from <netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:18:35 +0200
+	id 0GguLfb4IWqkRAEAu9opvQ
+	(envelope-from <netdev+bounces-295440-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:15:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A5B643C44
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:18:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C448643C25
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:15:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=2dBSWT2E;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=iEXUFXgs;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295440-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295440-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5B9B3051C92
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:13:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E9C843019540
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAC63242AB;
-	Thu,  4 Jun 2026 22:13:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2237831280D;
+	Thu,  4 Jun 2026 22:15:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCDA2EEE90;
-	Thu,  4 Jun 2026 22:13:37 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780611219; cv=none; b=SpGHmQ+D5OiDKL8GRROX00vqDtxfFqqSpwTMKerAQ14sq4AtHZILDQbRYoL+Ij9byULVd1L3fwQYA/OidsFZ/ddilp+lRRAupVTDFUof5Z5KRKaxuCVgIPu4j0hcEUDGL/7nqKo1lACWAPHKU5XAM9lu1zXMMpEXBsWuIbfn5VY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780611219; c=relaxed/simple;
-	bh=VBPzNNhKg/gxgevw9Vu7BeyTNnOknUjKtkIaoQ0qFUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QjEnaa2bx/KME0I7/2EumJKNuwMR9OwVf72XGolOLdQDTAbB3Sh9kdpojKL1bJgpZbaKU5brlMgki6r4GiLk2PINf3Z5VngOFK35fCJ7wOx8wRzxEk5gCB8VklCZBFqu8XZ07tub/geXNwBuigyUQjR0YtCSl3fg/t7BvUX4eHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2dBSWT2E; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=c1PTdC9lXCxKPecUug8orxQ1I8i9oybZdggOXybuF2c=; b=2dBSWT2Erl8bH1W14lQ4z/tzlW
-	xOsL5jj92/VqRaLSDi27QR3X/CiVUJs0LMHmaUlPrBnAxFHufLXL4FXN/5EF7GWXMIC+VoncsL9OV
-	168ZwQ3MvVwqyyH7i+yy7yXVIEeawy7qpg+6qatpq4UG5T5jHx8Ss5GDTV2WarsO2CTM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wVGJU-0066yJ-Ej; Fri, 05 Jun 2026 00:13:20 +0200
-Date: Fri, 5 Jun 2026 00:13:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: ciprian.regus@analog.com
-Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 05/13] net: ethernet: oa_tc6: Export standard
- defined registers
-Message-ID: <171a1424-eb9b-440a-ba3c-2f6296727a44@lunn.ch>
-References: <20260604-adin1140-driver-v3-0-5debdb3173c4@analog.com>
- <20260604-adin1140-driver-v3-5-5debdb3173c4@analog.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B49830677E
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 22:15:11 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780611317; cv=pass; b=CO9evOnbH5BygZ1mc3sEbWjexk9VUtcKt1tXMDP2u7hW3vwWEvvpXvM+J48OQKcDpyyMokJDA/DJ+1++ERO4e2BxCG2e8DChlQCQ3svc5FCGPKnDfXNXA77zeKNdW+qQVe/MgxN9FAy5JjV4D9JETo5/ryQp9UU3ha/M0oxOTQE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780611317; c=relaxed/simple;
+	bh=N+S6n/Znutpvljp2LyGehOTzm7sQwOqrmvx6wxqCpZQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oNoEvVU0JUfq6JUs2U8ojvSmGkOUThjSkcHPwEm3OxY2q9bgACH1Xi+a2Lc4u/0p92G7KnJwKGjGNmnqxWSnr1WfeRHnZobambioM6sPgh1rjJeDHeTxhZQyzMIwDxkyroGXLqgUfyWPLwUXycN9DfeDWaRfFmv3Wsfc6g6nGzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iEXUFXgs; arc=pass smtp.client-ip=209.85.128.67
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-490b7866869so14526905e9.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 15:15:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780611310; cv=none;
+        d=google.com; s=arc-20240605;
+        b=h9aE5y3wy22W9TWtdijnWjDSo2Yq2twQh+WqbKrP+220GoaVq/dU+Zp0uWhGOC9uFB
+         aOgBbFMakfOGH/AOk9s7Awz8KBD5/BA/O0ik471xDjhBvxUGdyBL7koonCa9ywyGL1Yr
+         6s6kOBsiFO+Ptt6PzRPKMzyrirVZSXs9T+DbNOOiRee2ezxZangYSM7mDx1Pa2Y+3972
+         40bPEQTw+WoxsjAQ0HfTjcRNmCz5hsdT6AekA9TBPmcYCfVnPVdqGH2sfryEs1JnrwQ+
+         XMml2bf5GNXCNq9My5Sj5y55it89BgKHXttjW8aIrYtqcGrfzqRV69ogReP8FfGYiWz1
+         4o/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=N+S6n/Znutpvljp2LyGehOTzm7sQwOqrmvx6wxqCpZQ=;
+        fh=CUQ9qQykhEMabQeRWsmlNX6p1yx61xQ0ny8bJJnh6O4=;
+        b=DssSpkyRN28VoLvPu4OXzVezqjfk3yduGk3LbgLCnvmFxtpmLRQFLD+68q6iuQr1c7
+         QjfRaKx7KUu9iVFwYFQCnzSLd87ixzSiIZSILbfPjfFRNl4m26Nf17NF/hc3Ekm6RAkZ
+         11mSc+NCiT7WQHISH2zY142/VBs7L5bn5KFacR1BKsshBwXzNGL8l6mj0RRb0FcTai5k
+         bHY9n1LkolsiOQPtPuc6xEUsUgjWHGrb4GQfkNTrm3mksrhLRAbecPzN8wEC0pUwWya7
+         V7KyBHrjESlP9oKmM4XqvoXEFC6ZYDhG2Sm2gErD04/xmhfPlCqJ2ivUSBezSSJyZzB0
+         0UfA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780611310; x=1781216110; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=N+S6n/Znutpvljp2LyGehOTzm7sQwOqrmvx6wxqCpZQ=;
+        b=iEXUFXgsNaotlG0sgZ+JlvIz2B3IEpkbi/YW95qSNxebMXaDvuDYK1FoctdNnitX3E
+         XGdnsqbtB4LbTLxsLSsWmKbvHMfxVLgVpONZJbuBXQv7W65yD0guZL3TfLImNeuKO6b5
+         SiyzRdmgjiAqJ8KCQwMeD3pDCyxQPbr1xBjuHpI7jB2pJxCTCzcq5rx+vfaeEqkIlWr7
+         U85Go+1mMusqson7jV7KnAUZWiWoflZ0kD/5TyKyPV9X8G4bqi9udpII6dEIHULzUT10
+         2B5foUb0eD7R/bFMQO/mqe4ZmqVo96L7uABjHvG3wiaKkX0g+T+1ky6auP+Tn9R572ZF
+         +sSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780611310; x=1781216110;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N+S6n/Znutpvljp2LyGehOTzm7sQwOqrmvx6wxqCpZQ=;
+        b=orxlB8wePpiqIzoTNZ+V7EbPFQ4djnMd5tZdoBYwpKz0rtUVTni7KxdqxZvCPeB3wa
+         1Jmh09FF7SZKA64n6AxmyshJ/taOKRtHyg5pX7m3RQViHqJkNuRNY2+ll1eBJO7pooY7
+         UA3JFqnIOW07Y+PFXdtOVRBV0tVONqXpb74ZcE1bKE/CQ7zjTK8uOEOV9WCW6PyL+b9j
+         1VG1QClwmaEw+CAofyRqr9pNGjwYeiVGhl+LM3azRDi3sRrApDFOtSG2PKhdAlu3EQCi
+         M3CoyppKs+cPTVYuFuLHgTvs59PcqE03yJSTqq/Z7Wlb5eKXpLBPdhOdMlt1E+OoeQEG
+         I5ow==
+X-Forwarded-Encrypted: i=1; AFNElJ8RyDAdnL9E0zcuFVyh51Ipbsw7KpXJbh3JQxQKW3g0qeZeiuEcgH+IEJ9Nobjh9fT9kVAk1rg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6tK50oiw3A02z0a8fDtarJiKq8J7orRYTyWLFaFEJWx+WKQ/b
+	YSEKwaxTZKN/rixr9w4z6Z9RRNGQfevmE2qGRHKtEtagzg07yT914IqiEFJoGqBxSw/iD7xp/oK
+	B2aq9/+crCSbppnFrq+abGlbaHFyennI=
+X-Gm-Gg: Acq92OErZous8BiBicZK24gyIbDMXaP9lJ3TYFgMFT1v611C+CBK0OmkSQPjHh5hhra
+	gifjs8OuwmFuGHYSLp7h8iSz0maNQ3fRqAPrGe5HgzCzmiz+28i66cqsL7TuUjo/BH1Lq6lupWt
+	H2H8xuTIHS5++8Zw5lcZTFzKqY9nZX2KcD+qzu+MzPjOTABLjcWppG5foGHcUPNLpYGRhxlNWRv
+	pVTXJbpE8+9XJSFrogC/7jkO1JJknXUJoUAr7MicB7gqxgx4+1tXa1+bNkg//LpaiQUVxa8WCDX
+	w8w8GATbaGqsrTgtw1XEYG5RZamLK9w71LxjWqlXNFDJH/bhLAHGeN0vw0YqV9q1wblFY9SZyB3
+	qt0ye9G6in4XDzD/KOKfmKvwgM7jIqKIlYE2VO9DuIG2n55FhI+OW4wTbFIS35/o+DH8RbA==
+X-Received: by 2002:a05:600c:4fc9:b0:490:b8c0:d474 with SMTP id
+ 5b1f17b1804b1-490c25eee06mr6021975e9.14.1780611310133; Thu, 04 Jun 2026
+ 15:15:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260604-adin1140-driver-v3-5-5debdb3173c4@analog.com>
+References: <20260604220904.1032145-1-ameryhung@gmail.com>
+In-Reply-To: <20260604220904.1032145-1-ameryhung@gmail.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Fri, 5 Jun 2026 00:14:00 +0200
+X-Gm-Features: AVVi8CfnBYLIp-tlymFRZk0s_Hv9SPnYJxD2LptM1OA6yj_xom8IhP939m0OY98
+Message-ID: <CAP01T75pWAgXi4CRR4Ca75grBFwXBKHERdH94KVxW8hDQ3uqog@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v1 0/3] Object relationship refactor followup
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, 
+	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295438-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-295440-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[memxor@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:martin.lau@kernel.org,m:mykyta.yatsenko5@gmail.com,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,m:mykytayatsenko5@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[memxor@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 22A5B643C44
+X-Rspamd-Queue-Id: 7C448643C25
 
-On Thu, Jun 04, 2026 at 07:32:50PM +0300, Ciprian Regus via B4 Relay wrote:
-> From: Ciprian Regus <ciprian.regus@analog.com>
-> 
-> Move defines for standard Open Alliance TC6 register addresses and
-> subfields in the oa_tc6's header and add entries for the PHYID and
-> CONFIG2. As such, other ethernet drivers that rely on oa_tc6 can use
-> them directly.
-> 
-> Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
+On Fri, 5 Jun 2026 at 00:09, Amery Hung <ameryhung@gmail.com> wrote:
+>
+> Hi,
+>
+> The main patchset refactoring object relationship tracking in the
+> verifier has landed and this is a followup that addresses the remaining
+> feedback in v6 [0].
+>
+> [0] https://lore.kernel.org/bpf/20260529014936.2811085-1-ameryhung@gmail.com/
+>
+>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+bpf-next makes sense, but Fixes: tag looks missing?
 
