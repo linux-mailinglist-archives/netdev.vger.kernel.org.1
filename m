@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-295332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XzhxDLuoIWoXKwEAu9opvQ
-	(envelope-from <netdev+bounces-295332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:32:59 +0200
+	id 9cw+EWWqIWqFKwEAu9opvQ
+	(envelope-from <netdev+bounces-295333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:40:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D862641DC1
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:32:58 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30347641EE0
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:40:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=gO1LsM8s;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295332-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295332-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ccEOlVZ6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295333-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295333-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2541531B2EA6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 16:22:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B1FCD30FAF57
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 16:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68BE0449EA9;
-	Thu,  4 Jun 2026 16:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7B847DFA2;
+	Thu,  4 Jun 2026 16:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3649D2C11FA;
-	Thu,  4 Jun 2026 16:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53F9480946
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 16:20:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780590022; cv=none; b=RL9MuG//jAFPqyRY0rPl/y+mJaQZXqbZULoUWr1XLEdDyKtKPbRXe/TuhsvFa5vvQ4RcTgEvn2clGTK9QY7Wa98gn0oqpz6nZ16q/QAlHksW6CqKfQ6TfxV1Gvi3NMUPNq8NQWTFUYHmGx0J/IRFKhtB1H7cDYcHZsQAlhUhIig=
+	t=1780590023; cv=none; b=PVEVZNSCArZpB67NVKY97xaVTcqqt/VEkDQRNo6r1lgTNqoL6HNYudZQ6dMqLCKf00woKQnT/VZ1P9f1cLd0PFtaZ3pJDZu499+A1kJtvUWAwcsrlmTMXhg3a/1Fus8bHrRVorWL8ljL/YT4sr5mxMruxep11W1DdeXerNiDAys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780590022; c=relaxed/simple;
-	bh=iq+ni599eOdwgPQ91V8xvsCHsD7V86D88tIQfeEhKHU=;
+	s=arc-20240116; t=1780590023; c=relaxed/simple;
+	bh=NhOYS5M9wbprkqVwoAauvCLAFAciNkwuDezF8z9wcXE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ief9p15NGqMNJv4m3jGUqeQxW5NpbN2F/Ci8PowMeQO94sXz7BOSvLi+sGvguUE+6SGm2vD9gaeoOM2MeK0qq6z4yAlYjS42u3koDSYcpsY2FJCDLCL5FMEu2t/PNfVC7EYrhpbqvA/9ajQvBUpUgNdZEEMAxnx+5X6UbGuiXN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gO1LsM8s; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5F211F00898;
-	Thu,  4 Jun 2026 16:20:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780590018;
-	bh=0iZUxqEK+ViJWTJOCRa9D/05WrOB3xf1jaBtFVoEDm0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=gO1LsM8sLvOVAlJaKlGcrH3b4IKF/X+pP7OuGZcFL7VZnUEm2uzMElKtqmFsenLEA
-	 TU+idbCBU6smNSIde/Hu2cp6lWIo5tXRRxEhmqYw1w8GZVXyaVjGEd6ZrgASvcAZxA
-	 4vXDx7sHQICpwFEScaQD0V3VxPzcvGpiFRQ5To8K0XkntzOCIqscEZIJlzrc3EeZcD
-	 KXjZM0gzUeQ7DO4sviLTuuYk6DlfDbqr4BBccCdw0cjt4xZWfIA3ijWkgshbBci44M
-	 m4LhmumSJm8PsF5dfcH8Con6+Qe2YIEvzSM846vgPIUutH5E9yY2kryuVXLdhqP6Vo
-	 7NXsuZgQr9NWg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B6C39309B7;
+	 In-Reply-To:To:Cc; b=jNI13alFRIYac755E0xLfuJDpIrhHAbUSvw71rmHsEJUQydMxHoX2jGyI294aqXwxUwjO1yVq2kfmxPiHuXmQC+4g96XFLPHw145T7Js5XKb0TtQFkz3NVNiGFtXIuJgRVJ4T8C9ntOBakLQ5pbIWdp9PiCX9JRRpa8kz6pElo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccEOlVZ6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFEE1F00893;
 	Thu,  4 Jun 2026 16:20:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780590020;
+	bh=ZsmWTSXFoK1uQJIVgzeXjGea6fgt/mfuQncsTENa+1I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ccEOlVZ6BbXudgVtIEo6Ivp8d7DAuQJ9zikzB/NPU2K/fAH8c3zi8ZquuiAznRnw/
+	 nZMLRfdhIrF+WHlRfBhzR0q8P2qGlES69+RlnBdbsqqcWbqVdRacyvaOKCt1FA3uGm
+	 ZTQrQaIBg5Ik3pdZ03/ZK7sqT9V8/0diOiBdMd6V5aakyD2HvJ7HP9W5FSJFha0ra6
+	 zb0zpzq4+a2MYbnPLH9GeHSlR1+nGqPWMkP/CHXXVwPrMNZLMiq63AtqB68n/fEGTs
+	 D2QcYAK4z4CuVOQmukvMCSxRVBVh/VFSP+GwshFPMvi6VsypigifkCCHIiHhgOL13D
+	 USExLGGbX4YRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568E039309B7;
+	Thu,  4 Jun 2026 16:20:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,82 +57,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] sctp: purge outqueue on stale COOKIE-ECHO handling
+Subject: Re: [PATCH net] bonding: annotate data-races arcound churn variables
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178059001964.2502005.1832706734432444090.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jun 2026 16:20:19 +0000
-References: 
- <94318159b9052907a6cbb7256aee8b5f8dfbfccb.1780510304.git.lucien.xin@gmail.com>
-In-Reply-To: 
- <94318159b9052907a6cbb7256aee8b5f8dfbfccb.1780510304.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- marcelo.leitner@gmail.com, yuantan098@gmail.com, yifanwucs@gmail.com,
- tomapufckgml@gmail.com, zcliangcn@gmail.com, bird@lzu.edu.cn,
- xuyq21@lenovo.com, n05ec@lzu.edu.cn
+ <178059002089.2502005.2403817673330222849.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jun 2026 16:20:20 +0000
+References: <20260603123514.388226-1-edumazet@google.com>
+In-Reply-To: <20260603123514.388226-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, liuhangbin@gmail.com,
+ jv@jvosburgh.net, andrew+netdev@lunn.ch
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,jvosburgh.net,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-295333-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295332-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:xuyq21@lenovo.com,m:n05ec@lzu.edu.cn,m:lucienxin@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,lzu.edu.cn,lenovo.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:liuhangbin@gmail.com,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8D862641DC1
+X-Rspamd-Queue-Id: 30347641EE0
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  3 Jun 2026 14:11:44 -0400 you wrote:
-> sctp_stream_update() is only invoked when the association is moved into
-> COOKIE_WAIT during association setup/reconfiguration. In this path, the
-> outbound stream scheduler state (stream->out_curr) is expected to be
-> clean, since no user data should have been transmitted yet unless the
-> state machine has already partially progressed.
+On Wed,  3 Jun 2026 12:35:14 +0000 you wrote:
+> These fields are updated asynchronously by the bonding state machine
+> in ad_churn_machine() while holding bond->mode_lock.
 > 
-> However, a corner case exists in sctp_sf_do_5_2_6_stale(): when a
-> Stale Cookie ERROR is received, the association is rolled back from
-> COOKIE_ECHOED to COOKIE_WAIT. In this scenario, user data may already
-> have been queued and even bundled with the COOKIE-ECHO chunk.
+> bond_info_show_slave() and bond_fill_slave_info() read them without
+> bond->mode_lock being held, we need to add READ_ONCE() and
+> WRITE_ONCE() annotations.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] sctp: purge outqueue on stale COOKIE-ECHO handling
-    https://git.kernel.org/netdev/net/c/e374b22e9b07
+  - [net] bonding: annotate data-races arcound churn variables
+    https://git.kernel.org/netdev/net/c/b47ff80f280e
 
 You are awesome, thank you!
 -- 
