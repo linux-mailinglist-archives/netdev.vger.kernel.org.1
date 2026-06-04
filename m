@@ -1,242 +1,317 @@
-Return-Path: <netdev+bounces-295371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wm5VGNq5IWqsMgEAu9opvQ
-	(envelope-from <netdev+bounces-295371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:46:02 +0200
+	id cn/TIGO7IWoRMwEAu9opvQ
+	(envelope-from <netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:52:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023DC642613
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:46:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB8586426DD
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:52:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=LiJfUkKU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295371-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295371-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=broadcom.com header.s=google header.b="ch/ooTR6";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4C3C33014242
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:46:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B520302BB9C
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D632F7EF4;
-	Thu,  4 Jun 2026 17:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD4B2F7EF4;
+	Thu,  4 Jun 2026 17:48:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yx1-f98.google.com (mail-yx1-f98.google.com [74.125.224.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6FC2C1788
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 17:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914474CA26A
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 17:48:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780595159; cv=none; b=s0141EiXOF/u1sy9Sy+Nz7P/3zY32kO3l9+RvC4DXsZ1bu/+mPXrZ2WXTiuk6kCSL17LyIwFxfXMy3HnZ3ENrCh8ELIPX3C0UK7YNSfP3MjHnzxCKA0T34TjNkUJ674X1X+ak5KUU+Ms8MJlI5qyX4UchPJNVbkkg2eJJWSR5aQ=
+	t=1780595282; cv=none; b=C4XjMCigJ2Wmhit80a2qu2x0aQjki/OCdTkIUhpqUAjPkwHIrDMzTpIqcaTJR0C8vPMIpK4N7UYJXkXSza9NflSGkm3L8yAD/7pwO1Jbw2MlyquvJaPi11rCBHEkR47dTng4SPDjWzzmuLqSWRX49fxGhKDAj4HxTMINVj8XqhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780595159; c=relaxed/simple;
-	bh=wOJaN8GAxx6NH9MYsunfI2Xi3Kx2+d7D/S41XA8A0fg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OI+22mUqGF7XZYULjNTF1HBBCI8R//HnEjZi/9busBCGm/G0gGHndcGmGFHX0gCBOeCCMl+eRJfKD2Snabeyao0FvnSmlVaMOWij21rnZSdKCw+GsRWDDE2ACWjiW85c2EKi9+VN4o11GzNh5kPbDmi2KagkDwi/XBPI8s3RCdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LiJfUkKU; arc=none smtp.client-ip=209.85.128.201
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7dd5d43583fso20387037b3.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:45:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780595157; x=1781199957; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pd1goQ0s/WMqKfzdr3UizRBsE1LqwR+ptuqSVy/nbuI=;
-        b=LiJfUkKUmu6o/r8np52BreFesjWRQIFJ3XrXJoGQDZf+kPjtNk53B9Z+0zRag4G4B6
-         grFTXSCjufcjRwSgivKa9U8WKaNttUc5EWcCCFkGRePpeW6nvQ/mJC1mVYuANP2dWg+F
-         lA53V8RPhbo5CrMvdPwnO+FZRTHZV9EDCDxnkFfH3oPgalFgLxghfyYInPo1+r8c+0iC
-         +DfzAqvCSpYCpptPcOJGoFXmG5DUFj0iXE/7KyhdcGsQXxd3JeDuA+m2mWrGVWXkg/S9
-         w/+ejDi/QhfwchQJEDXgl1JXrnW9qagVH4LwGF/IL4gqiTyJWzQ0yyKYgyf5PEaYKvV7
-         PrPw==
+	s=arc-20240116; t=1780595282; c=relaxed/simple;
+	bh=XGPdSKc2PItXppM/3AwiVc+LrpEqW3VrnCwgH3g1OBU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rVSzJJkgJ3JLadYQLpPDLa2ioBfgGuZ1cf7Uu+sqeGko19yib7JyHPhWiao2xo+BTjOgGt76GqSyLU5fNylcojFyYCId/cAFlH4I+zlMnm/CfLbdjleXdZJJzS5KWgn540miT4WZS5BIMRa+ON/OQ15BHTc3l/qiHiztdbBYZuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ch/ooTR6; arc=none smtp.client-ip=74.125.224.98
+Received: by mail-yx1-f98.google.com with SMTP id 956f58d0204a3-6604176b575so1247476d50.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:48:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780595157; x=1781199957;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pd1goQ0s/WMqKfzdr3UizRBsE1LqwR+ptuqSVy/nbuI=;
-        b=Fi3bfdLTsfJc5XgMWpU1Wy6kRAB2K4fA004lC+VRW8UcQ6zMnvJXdO/7Q8hunPyN37
-         dG372zV5YyVajLuwOUCn4cqlt9oghW8A5KYIRFAdLDp4vZNYHXHlstsnwqHWJ9JEd4ix
-         7y/iz1C5yF1rxkeMthk5mdxy8hNHbeVgf8mf2K097Bz3slFXzHTeE4dqQn9xF6jpP6/u
-         3EH1Ac2+4jfuZURv2VIw3flbSyuCcsh9gOa8OL2kHwpbMREuNcbLWAfq3Rz4Nab8HaFz
-         ZRxilVxMT8mU2iRNkKTzvo67ub3G9gxKb4chH96yqoJmngao4ZsyLdcAjvXCBrLYYck/
-         ++tw==
-X-Forwarded-Encrypted: i=1; AFNElJ/276tGAkLUp0si0djmenGi8IzPai4A+P6a6A0xuKRtTelMyTsgZU8BWaAi4Sw9e4TISLPCxtY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/6Gf54H8LiBTHR9DZOzwnZsbVNEZqn0IhxJEqvqyjOsQ/FTxP
-	y1DdY+9hMbiswfzakmlvoV1WvpXaqCdPIKVbrsOADAeUlxB2RCML3JrNUmgRHboRnMDoVTE9aNJ
-	RYh0SDgKN2N4r/A==
-X-Received: from ywbgj4.prod.google.com ([2002:a05:690c:4284:b0:7ba:de28:5507])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:45c7:b0:7dc:aa85:5c67 with SMTP id 00721157ae682-7ea49584a3cmr82999407b3.11.1780595156715;
- Thu, 04 Jun 2026 10:45:56 -0700 (PDT)
-Date: Thu,  4 Jun 2026 17:45:55 +0000
+        d=1e100.net; s=20251104; t=1780595280; x=1781200080;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jyjhIooHOuoef8qoETeUqFFAm+Ooci5we0LcStQoqpM=;
+        b=bLzKRjLp28unY86/bBN0uFUlDn4pj40rp2lhtQh5cDhANzIAXoNu+bWP0WeJGo1TPW
+         Na6bPd0R5SUFaZ/k/S2ZfdWsy3KP3CtxOjyrZkvipojmW0gcTCwesy32xMN5GrmHhVz7
+         8dnJ6kGTBVsEpm7pi2x+GjnbnOSR2tCOh+FR+Wbl3JVQ80hpHdV1LzXTClKE5RF431Qe
+         SfTP9vwVCtxFQSL6RzHdmNJON+i6yc19eFmJTDElgdO6sZyCT/9l+CoWoLMNe7Jyenoc
+         sa6FxToXL3iqvVIi66tJRZQgJaGoLrsiKWmKdqNgvdnBn3y7dffPW3FtbPAHsYXJ/mv1
+         oIrQ==
+X-Gm-Message-State: AOJu0YxG6RsUp7qFcC42eVa+CflhiBYEQ9XxcJCjdq+9NbdFBeF3NiM3
+	lBDFSUpkrfHySYPrCBmkb/eje0FG9jjkU1doMvwjikLWLw/GcJRTr/0hvtHklumHrsDF5Cco2K2
+	4dNHBBq972KXTynU65iSDn0yZ2oDhp4JqPtI0bp67UOkpmoNzIvdeABZyctEa+xfxxI2e6+4KDd
+	EcF6DijYtZypIuqRx7DPF66YZXJq/SUSeJFi4abuQDD1oq/qXXA5Vy80NAVjmtVKC+nFEDV07i7
+	VK6MdrAdzY=
+X-Gm-Gg: Acq92OEQ5wYaVrCJb73azRAmf0AYoj3+C+4tHqLkkeGNQxGMTfIKiqRZnRb8uTV0Y9n
+	2OVDnaKiG3XIEmJ6uw0MIQ8fA95mKRyFPWz0glOFeSpi/vS8lkQ9X/vCBBW/3nnrwV0edxUXSMG
+	TpKGDL4fLUoYC8oOB18b5n/e0W4qKZIXJQy1unKUB7bo1T4UXPRFUvuWeBaMuGX8PlI1aLhiMHm
+	Bz/7GXovNC/v9QeIIa+FeeTg8xLahMuNT9aY3hPslyx49XfR+TIAgErn9s+6IcPvxvof/HFgHB7
+	6H7dvbe34MFZkssaAqU343klsBGnQUBpSPpbt87mOt2cbgNYB/fLat3gK28QSPwj/LvUFg9ilBc
+	7Tr1SqitpwugdvFIdaYO/VWcB5eM5v/v3nO8Z70zr0X67hscmT1BDMR7Q/JSvpzwreg4+7HcbUd
+	gR1uo4X3leEDeT/qf0C50+AdAeiKv8tQaDmeQ+rFpQjfW4KN1VCHK3A/f4O5bLIpuR/ntEtA==
+X-Received: by 2002:a05:690e:4091:b0:660:880f:d46d with SMTP id 956f58d0204a3-660dc5ddd37mr8398440d50.63.1780595279537;
+        Thu, 04 Jun 2026 10:47:59 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
+        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-660d62338b9sm565535d50.21.2026.06.04.10.47.59
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jun 2026 10:47:59 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-68b23bd1766so1064693a12.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1780595278; x=1781200078; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jyjhIooHOuoef8qoETeUqFFAm+Ooci5we0LcStQoqpM=;
+        b=ch/ooTR6mHuqQPWR0O6GECVbtDGcau9pwftpQEYY9iPQ5rU7wF9xudb5ElfcrILpL6
+         hQzJDwwHnIfzmfTFQBeNWV/tFj7pyHmIjA6OChT2DEUbsN7p5oFUjcRl03VMkrzUZ2AS
+         zVmtcBPSSt/T9BZws4oMBS8f1XqG5ra2cSknE=
+X-Received: by 2002:a17:906:8a5c:b0:bda:d9e1:4e1d with SMTP id a640c23a62f3a-bf0aa815ce3mr380155766b.34.1780595277874;
+        Thu, 04 Jun 2026 10:47:57 -0700 (PDT)
+X-Received: by 2002:a17:906:8a5c:b0:bda:d9e1:4e1d with SMTP id
+ a640c23a62f3a-bf0aa815ce3mr380153866b.34.1780595277465; Thu, 04 Jun 2026
+ 10:47:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
-Message-ID: <20260604174555.2801532-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: remove obsolete EXPORT_SYMBOL() and EXPORT_SYMBOL_GPL()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+References: <20260603223535.2504695-1-sdf@fomichev.me> <20260603223535.2504695-4-sdf@fomichev.me>
+In-Reply-To: <20260603223535.2504695-4-sdf@fomichev.me>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 4 Jun 2026 10:47:44 -0700
+X-Gm-Features: AVVi8CdT7bGeWW9PIAfoR-eSxky_8SdO-B2Ads_ys5YQWwaPn5IhtAS1EP4NHRY
+Message-ID: <CACKFLi=xWQ88cdFxA96qEScre0jog9B1m4AikPcrc2TN3Xz2gg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] bnxt: convert to core rx_mode retry mechanism
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, Pavan Chebbi <pavan.chebbi@broadcom.com>
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000000c79d9065371257d"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295371-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295372-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pavan.chebbi@broadcom.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid,broadcom.com:dkim,broadcom.com:from_mime,broadcom.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 023DC642613
+X-Rspamd-Queue-Id: CB8586426DD
 
-These symbols don't need to be exported, they are only used from vmlinux:
+--0000000000000c79d9065371257d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-- inet6addr_notifier_call_chain
-- inet6addr_validator_notifier_call_chain
-- in6addr_linklocal_allnodes
-- in6addr_linklocal_allrouters
-- in6addr_interfacelocal_allnodes
-- in6addr_interfacelocal_allrouters
-- in6addr_sitelocal_allrouters
-- inet6_cleanup_sock
-- ip6_sk_dst_lookup_flow
-- ipv6_proxy_select_ident
-- ip6_sk_update_pmtu
-- ip6_sk_redirect
+On Wed, Jun 3, 2026 at 3:35=E2=80=AFPM Stanislav Fomichev <sdf.kernel@gmail=
+.com> wrote:
+>
+> Remove the driver-specific BNXT_STATE_L2_FILTER_RETRY + timer + sp_task
+> retry mechanism and rely on the core stack's ndo_set_rx_mode_async retry
+> instead.
+>
+> bnxt_cfg_rx_mode() now returns errors instead of swallowing them. The
+> PF-unavailable case (-ENODEV from HWRM on a VF) is normalized to
+> -EAGAIN at the boundary so callers can match on a single "retry me"
+> errno without re-implementing the VF/-ENODEV check. Other errors
+> propagate unchanged.
+>
+> This removes:
+> - BNXT_STATE_L2_FILTER_RETRY state bit
+> - BNXT_RX_MASK_SP_EVENT sp_event bit
+> - Retry trigger from bnxt_timer()
+> - BNXT_RX_MASK_SP_EVENT handling from bnxt_sp_task()
+>
+> bnxt_init_chip() still calls bnxt_cfg_rx_mode() directly during open.
+> On a fresh open dev->uc is empty and the call effectively cannot fail
+> on the unicast path. But on FW reset reopen (bnxt_fw_reset_task ->
+> bnxt_open) a VF may have a populated dev->uc and the PF may be
+> transiently unavailable; since that path doesn't go through
+> __dev_open(), the follow-up rx_mode call that would otherwise drive
+> the core retry doesn't fire. On -EAGAIN, swallow the error and call
+> netif_rx_mode_schedule_retry() explicitly. The unicast filter loop
+> truncates vnic->uc_filter_count on failure, so the retry's delta check
+> sees pending work and reinstalls.
+>
+> Cc: Michael Chan <michael.chan@broadcom.com>
+> Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv6/addrconf_core.c | 6 ------
- net/ipv6/af_inet6.c      | 1 -
- net/ipv6/ip6_output.c    | 1 -
- net/ipv6/output_core.c   | 1 -
- net/ipv6/route.c         | 2 --
- 5 files changed, 11 deletions(-)
+> @@ -13758,11 +13762,8 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp, str=
+uct netdev_hw_addr_list *uc,
+>                 rc =3D bnxt_hwrm_set_vnic_filter(bp, 0, i, vnic->uc_list =
++ off);
+>                 if (rc) {
+>                         if (BNXT_VF(bp) && rc =3D=3D -ENODEV) {
+> -                               if (!test_and_set_bit(BNXT_STATE_L2_FILTE=
+R_RETRY, &bp->state))
+> -                                       netdev_warn(bp->dev, "Cannot conf=
+igure L2 filters while PF is unavailable, will retry\n");
+> -                               else
+> -                                       netdev_dbg(bp->dev, "PF still una=
+vailable while configuring L2 filters.\n");
+> -                               rc =3D 0;
+> +                               netdev_warn(bp->dev, "Cannot configure L2=
+ filters while PF is unavailable, will retry\n");
+> +                               rc =3D -EAGAIN;
 
-diff --git a/net/ipv6/addrconf_core.c b/net/ipv6/addrconf_core.c
-index fa27a90ab3cdd4daacbc88e2fba2f3b2419d503a..29095c90aa16b19fcb7a7fff1d5b99c2150563aa 100644
---- a/net/ipv6/addrconf_core.c
-+++ b/net/ipv6/addrconf_core.c
-@@ -107,7 +107,6 @@ int inet6addr_notifier_call_chain(unsigned long val, void *v)
- {
- 	return atomic_notifier_call_chain(&inet6addr_chain, val, v);
- }
--EXPORT_SYMBOL(inet6addr_notifier_call_chain);
- 
- int register_inet6addr_validator_notifier(struct notifier_block *nb)
- {
-@@ -126,7 +125,6 @@ int inet6addr_validator_notifier_call_chain(unsigned long val, void *v)
- {
- 	return blocking_notifier_call_chain(&inet6addr_validator_chain, val, v);
- }
--EXPORT_SYMBOL(inet6addr_validator_notifier_call_chain);
- 
- /* IPv6 Wildcard Address and Loopback Address defined by RFC2553 */
- const struct in6_addr in6addr_loopback __aligned(BITS_PER_LONG/8)
-@@ -140,16 +138,12 @@ const struct in6_addr in6addr_linklocal_allnodes __aligned(BITS_PER_LONG/8)
- EXPORT_SYMBOL(in6addr_linklocal_allnodes);
- const struct in6_addr in6addr_linklocal_allrouters __aligned(BITS_PER_LONG/8)
- 	= IN6ADDR_LINKLOCAL_ALLROUTERS_INIT;
--EXPORT_SYMBOL(in6addr_linklocal_allrouters);
- const struct in6_addr in6addr_interfacelocal_allnodes __aligned(BITS_PER_LONG/8)
- 	= IN6ADDR_INTERFACELOCAL_ALLNODES_INIT;
--EXPORT_SYMBOL(in6addr_interfacelocal_allnodes);
- const struct in6_addr in6addr_interfacelocal_allrouters __aligned(BITS_PER_LONG/8)
- 	= IN6ADDR_INTERFACELOCAL_ALLROUTERS_INIT;
--EXPORT_SYMBOL(in6addr_interfacelocal_allrouters);
- const struct in6_addr in6addr_sitelocal_allrouters __aligned(BITS_PER_LONG/8)
- 	= IN6ADDR_SITELOCAL_ALLROUTERS_INIT;
--EXPORT_SYMBOL(in6addr_sitelocal_allrouters);
- 
- static void snmp6_free_dev(struct inet6_dev *idev)
- {
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 0a88b376141d70217d96976b7230fd4a34519d43..b6a794f6c042ab8de2ba4f0fa56ad9ebe7f9d243 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -498,7 +498,6 @@ void inet6_cleanup_sock(struct sock *sk)
- 		txopt_put(opt);
- 	}
- }
--EXPORT_SYMBOL_GPL(inet6_cleanup_sock);
- 
- /*
-  *	This does both peername and sockname.
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index c14adcdd43960ddd8856a7ab2f9775589a4f79c0..9f1e0e4f74641550ddc08136e93a0cd283fa4c92 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1332,7 +1332,6 @@ struct dst_entry *ip6_sk_dst_lookup_flow(struct sock *sk, struct flowi6 *fl6,
- 
- 	return dst;
- }
--EXPORT_SYMBOL_GPL(ip6_sk_dst_lookup_flow);
- 
- static inline struct ipv6_opt_hdr *ip6_opt_dup(struct ipv6_opt_hdr *src,
- 					       gfp_t gfp)
-diff --git a/net/ipv6/output_core.c b/net/ipv6/output_core.c
-index 64b1eeb79b572b8b412c60f832c4a7984ac8276f..418f21d24fb80fec094be8097fbab3e85b31b9a1 100644
---- a/net/ipv6/output_core.c
-+++ b/net/ipv6/output_core.c
-@@ -42,7 +42,6 @@ __be32 ipv6_proxy_select_ident(struct net *net, struct sk_buff *skb)
- 	id = __ipv6_select_ident(net, &addrs[1], &addrs[0]);
- 	return htonl(id);
- }
--EXPORT_SYMBOL_GPL(ipv6_proxy_select_ident);
- 
- __be32 ipv6_select_ident(struct net *net,
- 			 const struct in6_addr *daddr,
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 636f0120d7e38d6d7f07b43ee6673c56e77471aa..8259c7527aa4cd1ff5709ea24cf4ab7b729c52b6 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3044,7 +3044,6 @@ void ip6_sk_update_pmtu(struct sk_buff *skb, struct sock *sk, __be32 mtu)
- 		ip6_datagram_dst_update(sk, false);
- 	bh_unlock_sock(sk);
- }
--EXPORT_SYMBOL_GPL(ip6_sk_update_pmtu);
- 
- void ip6_sk_dst_store_flow(struct sock *sk, struct dst_entry *dst,
- 			   const struct flowi6 *fl6)
-@@ -3255,7 +3254,6 @@ void ip6_sk_redirect(struct sk_buff *skb, struct sock *sk)
- 	ip6_redirect(skb, sock_net(sk), sk->sk_bound_dev_if,
- 		     READ_ONCE(sk->sk_mark), sk_uid(sk));
- }
--EXPORT_SYMBOL_GPL(ip6_sk_redirect);
- 
- static unsigned int ip6_default_advmss(const struct dst_entry *dst)
- {
--- 
-2.54.0.1032.g2f8565e1d1-goog
+Note that bnxt_hwrm_set_vnic_filter() can also directly return -EAGAIN
+if the FW is busy and retrying is correct.  It will drop to the else
+statement below.  Adding an else if statement will provide a more
+proper warning:
 
+else if (rc =3D=3D -EAGAIN)
+        netdev_warn(bp->dev, "FW busy while setting vnic filter, will retry=
+\n");
+
+>                         } else {
+>                                 netdev_err(bp->dev, "HWRM vnic filter fai=
+lure rc: %x\n", rc);
+>                         }
+
+--0000000000000c79d9065371257d
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
+qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
+5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
+rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
+qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
+2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
+K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
+H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
+Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
+WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
+q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
+2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
+bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
+R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCB1rFg3
+tI3GQBY5cZQUefOlMOBgKYzPhR8tVvajCnCwYTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA2MDQxNzQ3NThaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA7pDjYPujhH2WNnbhEFkxpxDn6OT0tBMWll+4kheyG
+0xcatDI3tom4sCcOhNJMFG6LWFVd46qV3cK1DjzHGyu+hBjqxjHG6PEHBXkTEX0PRqvG0Upk0TaC
+WCKapA52piEie2LO/gtcIvdwHvdEOCbyI/DRH0NBALzgKa/G9JurdHs3lH7gkqzAKPaLFY6F2z0Y
+uheUMQe+o6VvahqcONIuFDjCUG/3Ywa0rV07SjeiDJLlVyB3F6RtV274tiTHTPsC97vRSXznkVU2
+Hj9VNYbaykKXz8AznlflIqBZJWWfpnoKgNQKEguMCM6UsKgOlDMkiq+Y638iLKsjY71bS0xF
+--0000000000000c79d9065371257d--
 
