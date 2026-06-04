@@ -1,138 +1,168 @@
-Return-Path: <netdev+bounces-295187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YE0iJktfIWoHFQEAu9opvQ
-	(envelope-from <netdev+bounces-295187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:19:39 +0200
+	id j8WVDcdiIWooFgEAu9opvQ
+	(envelope-from <netdev+bounces-295188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:34:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C4063F5C9
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:19:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A270F63F75F
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:34:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eQBCLgSj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295187-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295187-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=OrbJdfZm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295188-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295188-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6BE873003716
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 11:10:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22F1B3127AB6
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 11:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A96402433;
-	Thu,  4 Jun 2026 11:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DD041B361;
+	Thu,  4 Jun 2026 11:27:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856B02EA73D;
-	Thu,  4 Jun 2026 11:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4FD40963B
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 11:27:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780571406; cv=none; b=XCGQ8QoQQJYSuKOmh0K9fWI0zmjCb98WXDHhnfSpPbAJq4szVlknwcyQVO1rNAjZodGPArE9XOvJgZWectOT1oEe989liY7XeMZ7XE8HnnHSWzbVW2y4iFgRsbIDEWOJ6eNBYhrIgJIEnfe8SbwlEp9/e9GtCTBznDxGTbe01Rs=
+	t=1780572461; cv=none; b=eRLkgQ29zIaIgVCFLjlptAVzgz6G2SGq3z0psiDuxf9veastxf1RENVnOeM9g9h0ju62bM6okoWpx2CdRw2Janxf4WOIZ/3898OPOyGMSurUoiQ4AL0vDQ+W8cbCObSCUniwNSn48r2BdpWF/Uq/bHr7tPOLDCTtcLs6YAaWTng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780571406; c=relaxed/simple;
-	bh=ObNrt96l5SRoRQF0aBAf0g+HJXVqxVb64hZbnLkHy6I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tmn6X48O42Z/297cyQSTzoTRIIwPASidsm3UeBMIKOMdtfxsKKuR9wIHbNc+bH4jdYBnEItHPU0cLZJdThc9s7zZbczjNOu1b1aDAQLHKQmPXCMazz+xe41oYD6MWGyfZzqT6VHUn8kH6vYujaiwVPE2v6ocEbCMs4N9Dnq4fCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQBCLgSj; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 210B81F00893;
-	Thu,  4 Jun 2026 11:10:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780571405;
-	bh=sBDHwF0A5ftXuY2RVhAcPuncgVJtUJv7SC8kcwkgTzI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=eQBCLgSj9TmlR/EMYl1Y8uW9e1GPmXso5kxKgDwwPlRNPD6A7UXnWlkXHcJy0PGQX
-	 0viQBq/NWMVxxH+45ABxAcsq6cvVNTrRi2q6Txa3bWIH15SIYeg+pOfrcGSG+CyxbL
-	 cILKAYCG7UAt+B/8UKAF15KTXJHYGVGtyA2yzkn8+OOWGT8ifh3EeyJDqsXtzsN35G
-	 iMQ78WYngg1BHOa3lNS+pXz6+csokpp/ASJcFhE6TRM+v5JvohcQoZJ7Y+mW6h7zL+
-	 F/l5mUyL/Qhxlws5ac7oyAcECmAyWWBo2SCTKr20jpTX6aBru27l8pIk8owzid0xz2
-	 cyM+MI063oaCQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568E83930923;
-	Thu,  4 Jun 2026 11:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1780572461; c=relaxed/simple;
+	bh=/lFZRcmNSW3lZw1v83n87Avac7pc4Kp3gbkQWxUi+nk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZT4dInXlKby8IiPdJNCfKjfJjN815xBA0Oo2DF3aDefa4apjzrQc+izMQsPwSwNCo+JjbJVq7XnfDXO+8oVCo80WM2cZrBDKew07wbrpsdZ0gUcO6zqaYRXi1N3vKhGRNdY6WF01NpsFmcO879XvSE4qQHLWYucLBZi0IbZ7Lu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OrbJdfZm; arc=none smtp.client-ip=95.215.58.180
+Message-ID: <66925275-1d07-4a74-996a-ec14456999f2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780572447;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWCOT+3WwXwE95YAG0b/l/NlokI59TxeEDWAYxdMIiY=;
+	b=OrbJdfZmGjeb/aBbf2B+uMBQ9Cwhu0PBU3IHjUqwharUxSR8JVP+SEJokaw7ERBD4/OZDX
+	tBfqEaDjwN20je32VOQvTOVuLQMneqm+Ui8P0yn/HL+VO5NndUpuh3XjfILUec4qWddWmO
+	2a+3nrvXmpvrlneEv2wuY+omfBFPuLg=
+Date: Thu, 4 Jun 2026 19:27:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [RFC net] tls: TLS_SW sendfile() stalls at large MSS
+To: "WindowsForum.com" <admin@windowsforum.com>
+Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, David Howells <dhowells@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+References: <20260603171922.4A1512AA9D4@windowsforum.com>
+ <345af51b-9135-4ca0-816b-781a61fdbcbe@linux.dev>
+ <CAP_6uV+1zQqLtwH30SyuQmyHc03uv9ea+ZUr42TGSCozU4KcdA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <CAP_6uV+1zQqLtwH30SyuQmyHc03uv9ea+ZUr42TGSCozU4KcdA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] vsock/vmci: fix sk_ack_backlog leak on failed handshake
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178057140614.2374942.1031115322455733862.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jun 2026 11:10:06 +0000
-References: <20260526104356.469928-1-rafdog35@gmail.com>
-In-Reply-To: <20260526104356.469928-1-rafdog35@gmail.com>
-To: Raf Dickson <rafdog35@gmail.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, sgarzare@redhat.com, stefanha@redhat.com,
- bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, stable@vger.kernel.org
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295187-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-295188-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,queasysnail.net,redhat.com,google.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:rafdog35@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:sgarzare@redhat.com,m:stefanha@redhat.com,m:bryan-bt.tan@broadcom.com,m:vishnu.dasa@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:admin@windowsforum.com,m:netdev@vger.kernel.org,m:borisp@nvidia.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:dhowells@redhat.com,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 86C4063F5C9
+X-Rspamd-Queue-Id: A270F63F75F
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On 6/4/26 2:53 PM, WindowsForum.com wrote:
+> Thanks for testing. The non-reproduction is maybe now the key data 
+> point. My reproducer omitted a precondition my hosts happened to meet: 
+> a low net.ipv4.tcp_notsent_lowat. To reproduce, add before running:
+>
+> sysctl -w net.ipv4.tcp_notsent_lowat=16384
 
-On Tue, 26 May 2026 10:43:56 +0000 you wrote:
-> When vmci_transport_recv_connecting_server() returns an error,
-> vmci_transport_recv_listen() calls vsock_remove_pending() but never
-> calls sk_acceptq_removed(). This leaves sk_ack_backlog incremented
-> permanently.
-> 
-> Repeated handshake failures (malformed packets, queue pair alloc
-> failure, event subscribe failure) cause sk_ack_backlog to climb
-> toward sk_max_ack_backlog. Once it reaches the limit the listener
-> permanently refuses all new connections with -ECONNREFUSED, a
-> silent denial of service requiring a process restart to recover.
-> 
-> [...]
 
-Here is the summary with links:
-  - vsock/vmci: fix sk_ack_backlog leak on failed handshake
-    https://git.kernel.org/netdev/net/c/c05fa14db43e
+I see.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>
+> Root cause
+> ----------
+> The stalling hosts have tcp_notsent_lowat=16384 (local web tuning); 
+> the stock default is effectively disabled. A TLS 1.3 record is 16406 
+> bytes (TLS_MAX_PAYLOAD_SIZE 16384 + 22), just above that watermark -- 
+> so once tls_sw queues a single completed record, notsent (16406) 
+> exceeds the lowat, tcp_stream_memory_free() returns false, and tls_sw 
+> parks in sk_stream_wait_memory() holding exactly one corked record 
+> (the notsent:16406 + persist state from the original dump). With the 
+> default lowat, tls_sw keeps queuing, the MSG_MORE cork flushes at each 
+> sendfile() boundary, packets_out stays non-zero, and the persist timer 
+> never arms -- which is why stock kernels don't show it.
+>
+> Three conditions must coincide:
+>   (a) MSG_MORE forwarded on a completed record -> the sub-MSS record 
+> is corked [the bug];
+>   (b) tcp_notsent_lowat < one TLS record (16406) -> tls_sw blocks 
+> after that one record instead of streaming past it [the trigger I'd 
+> omitted];
+>   (c) large MSS -> the record is sub-MSS, so the cork engages [the 
+> amplifier].
+>
+> Confirmed by flipping only that knob: on a stalling host, restoring 
+> the default lowat -> 2.89 GiB/s; on a healthy host, setting 
+> lowat=16384 -> stalls (~0.0001 GiB/s). Everything that merely 
+> correlated (kernel build, congestion control/qdisc, wmem/rmem, 
+> tcp_mem, tcp_limit_output_bytes, CPU count, AES-GCM impl) was 
+> flip-tested and ruled out.
+>
+> This doesn't change the proposed fix: clearing MSG_MORE for a full 
+> record sends it immediately, so the deadlock can't form regardless of 
+> tcp_notsent_lowat.
+
+
+IMO, force-clearing the MSG_MORE flag for each record is not a good idea,
+
+since we want multiple "APPLICATION DATA" frames in one TCP payload.
+
+>
+> If you had not submitted your reply I don't think I would have kept 
+> testing it - hope this information is useful to the group.
+>
+>
+Maybe we can skip the sk_stream_memory_free check if MSG_MORE is 
+present. The lower tcp_sendmsg_locked will check it again.
+
 
 
 
