@@ -1,317 +1,252 @@
-Return-Path: <netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cn/TIGO7IWoRMwEAu9opvQ
-	(envelope-from <netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:52:35 +0200
+	id 8osqOoa6IWrNMgEAu9opvQ
+	(envelope-from <netdev+bounces-295375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:48:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB8586426DD
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:52:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8D2642642
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:48:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b="ch/ooTR6";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295372-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hhQDRTeB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295375-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295375-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B520302BB9C
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:48:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 21731301AA5E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD4B2F7EF4;
-	Thu,  4 Jun 2026 17:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC7E4CA276;
+	Thu,  4 Jun 2026 17:48:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f98.google.com (mail-yx1-f98.google.com [74.125.224.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914474CA26A
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 17:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE91A35B650;
+	Thu,  4 Jun 2026 17:48:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780595282; cv=none; b=C4XjMCigJ2Wmhit80a2qu2x0aQjki/OCdTkIUhpqUAjPkwHIrDMzTpIqcaTJR0C8vPMIpK4N7UYJXkXSza9NflSGkm3L8yAD/7pwO1Jbw2MlyquvJaPi11rCBHEkR47dTng4SPDjWzzmuLqSWRX49fxGhKDAj4HxTMINVj8XqhI=
+	t=1780595322; cv=none; b=GHWa5ee9lEOtet9pDvvhl7EbPZQGsYzmRvKTPFUJnk72rBFe3ejZ8efZis9TJexn+gqHBW/ZMFByMIrg3Kzk+2nsxBu0UCplohKmNwE5j7o28QGmk1cp11aaeAaQ1wDJ6BnxTjcHbD0QYul62RT83Hzpsnih4j3bJUNBSjpJNU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780595282; c=relaxed/simple;
-	bh=XGPdSKc2PItXppM/3AwiVc+LrpEqW3VrnCwgH3g1OBU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rVSzJJkgJ3JLadYQLpPDLa2ioBfgGuZ1cf7Uu+sqeGko19yib7JyHPhWiao2xo+BTjOgGt76GqSyLU5fNylcojFyYCId/cAFlH4I+zlMnm/CfLbdjleXdZJJzS5KWgn540miT4WZS5BIMRa+ON/OQ15BHTc3l/qiHiztdbBYZuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ch/ooTR6; arc=none smtp.client-ip=74.125.224.98
-Received: by mail-yx1-f98.google.com with SMTP id 956f58d0204a3-6604176b575so1247476d50.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:48:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780595280; x=1781200080;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jyjhIooHOuoef8qoETeUqFFAm+Ooci5we0LcStQoqpM=;
-        b=bLzKRjLp28unY86/bBN0uFUlDn4pj40rp2lhtQh5cDhANzIAXoNu+bWP0WeJGo1TPW
-         Na6bPd0R5SUFaZ/k/S2ZfdWsy3KP3CtxOjyrZkvipojmW0gcTCwesy32xMN5GrmHhVz7
-         8dnJ6kGTBVsEpm7pi2x+GjnbnOSR2tCOh+FR+Wbl3JVQ80hpHdV1LzXTClKE5RF431Qe
-         SfTP9vwVCtxFQSL6RzHdmNJON+i6yc19eFmJTDElgdO6sZyCT/9l+CoWoLMNe7Jyenoc
-         sa6FxToXL3iqvVIi66tJRZQgJaGoLrsiKWmKdqNgvdnBn3y7dffPW3FtbPAHsYXJ/mv1
-         oIrQ==
-X-Gm-Message-State: AOJu0YxG6RsUp7qFcC42eVa+CflhiBYEQ9XxcJCjdq+9NbdFBeF3NiM3
-	lBDFSUpkrfHySYPrCBmkb/eje0FG9jjkU1doMvwjikLWLw/GcJRTr/0hvtHklumHrsDF5Cco2K2
-	4dNHBBq972KXTynU65iSDn0yZ2oDhp4JqPtI0bp67UOkpmoNzIvdeABZyctEa+xfxxI2e6+4KDd
-	EcF6DijYtZypIuqRx7DPF66YZXJq/SUSeJFi4abuQDD1oq/qXXA5Vy80NAVjmtVKC+nFEDV07i7
-	VK6MdrAdzY=
-X-Gm-Gg: Acq92OEQ5wYaVrCJb73azRAmf0AYoj3+C+4tHqLkkeGNQxGMTfIKiqRZnRb8uTV0Y9n
-	2OVDnaKiG3XIEmJ6uw0MIQ8fA95mKRyFPWz0glOFeSpi/vS8lkQ9X/vCBBW/3nnrwV0edxUXSMG
-	TpKGDL4fLUoYC8oOB18b5n/e0W4qKZIXJQy1unKUB7bo1T4UXPRFUvuWeBaMuGX8PlI1aLhiMHm
-	Bz/7GXovNC/v9QeIIa+FeeTg8xLahMuNT9aY3hPslyx49XfR+TIAgErn9s+6IcPvxvof/HFgHB7
-	6H7dvbe34MFZkssaAqU343klsBGnQUBpSPpbt87mOt2cbgNYB/fLat3gK28QSPwj/LvUFg9ilBc
-	7Tr1SqitpwugdvFIdaYO/VWcB5eM5v/v3nO8Z70zr0X67hscmT1BDMR7Q/JSvpzwreg4+7HcbUd
-	gR1uo4X3leEDeT/qf0C50+AdAeiKv8tQaDmeQ+rFpQjfW4KN1VCHK3A/f4O5bLIpuR/ntEtA==
-X-Received: by 2002:a05:690e:4091:b0:660:880f:d46d with SMTP id 956f58d0204a3-660dc5ddd37mr8398440d50.63.1780595279537;
-        Thu, 04 Jun 2026 10:47:59 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-660d62338b9sm565535d50.21.2026.06.04.10.47.59
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Jun 2026 10:47:59 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-68b23bd1766so1064693a12.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1780595278; x=1781200078; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jyjhIooHOuoef8qoETeUqFFAm+Ooci5we0LcStQoqpM=;
-        b=ch/ooTR6mHuqQPWR0O6GECVbtDGcau9pwftpQEYY9iPQ5rU7wF9xudb5ElfcrILpL6
-         hQzJDwwHnIfzmfTFQBeNWV/tFj7pyHmIjA6OChT2DEUbsN7p5oFUjcRl03VMkrzUZ2AS
-         zVmtcBPSSt/T9BZws4oMBS8f1XqG5ra2cSknE=
-X-Received: by 2002:a17:906:8a5c:b0:bda:d9e1:4e1d with SMTP id a640c23a62f3a-bf0aa815ce3mr380155766b.34.1780595277874;
-        Thu, 04 Jun 2026 10:47:57 -0700 (PDT)
-X-Received: by 2002:a17:906:8a5c:b0:bda:d9e1:4e1d with SMTP id
- a640c23a62f3a-bf0aa815ce3mr380153866b.34.1780595277465; Thu, 04 Jun 2026
- 10:47:57 -0700 (PDT)
+	s=arc-20240116; t=1780595322; c=relaxed/simple;
+	bh=VXT/p5gwqEh8hm9n/NOS3Cv+n3pR3UsotOyh/mQ3u8w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JGw0DR2lHvlNI3wITCpZ71gV2WsqDQnvf8Nsed+mQooL4eVHvwXw0rbE6RWyOPc2be9aMRM/tQ0p2hkf2jjLRGhc89De7LkxtwN30WdPhoYWsK/hpYEEbzWOiiQv05nBoZ8JDVJ5cYhklZrnVqvgpuVRZu3jcSNIBPtvGeVd7Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhQDRTeB; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 175621F00893;
+	Thu,  4 Jun 2026 17:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780595320;
+	bh=jqNqmB8Vze/oRK0XQ4iGEwQ2KUXxneapSE3/zn6cz9I=;
+	h=From:Subject:Date:To:Cc;
+	b=hhQDRTeBe4UCe3PptOXYxF/pzIt4Cx9Uz7PBfFobUN6gWYVQjRERRo4sVYXyj68e5
+	 Cig89hwiIS3zivMXdanZONF5DEDHOdR1mB9fm5nTqJ1G0aM7FHZP/18FwBuc5qyFhR
+	 Um9MAYJ1TwvWvdJEwZl97ZiXH4r1oyJ6SdkLtNIrNA7yGL+O7zFOUsxdpQHkYFxiSd
+	 bSKW5X1xuTqyav3yUQkKLMcaWlIxxqetbe60JVzDk7JdkBHMEQ+iA6CB/quFWV7oCh
+	 MKPl73H239uGsoFFZt6DHqB5dRB9pQIrhSr7dgJX/z6aq0n3zEsdUjpiwMZRsD23wK
+	 PXOJEA8E3z8QQ==
+From: Chuck Lever <cel@kernel.org>
+Subject: [PATCH net-next v12 0/6] tls: receive-path fixes and clean-ups
+Date: Thu, 04 Jun 2026 13:48:23 -0400
+Message-Id: <20260604-tls-read-sock-v12-0-b114efa6e3e2@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260603223535.2504695-1-sdf@fomichev.me> <20260603223535.2504695-4-sdf@fomichev.me>
-In-Reply-To: <20260603223535.2504695-4-sdf@fomichev.me>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 4 Jun 2026 10:47:44 -0700
-X-Gm-Features: AVVi8CdT7bGeWW9PIAfoR-eSxky_8SdO-B2Ads_ys5YQWwaPn5IhtAS1EP4NHRY
-Message-ID: <CACKFLi=xWQ88cdFxA96qEScre0jog9B1m4AikPcrc2TN3Xz2gg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] bnxt: convert to core rx_mode retry mechanism
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, Pavan Chebbi <pavan.chebbi@broadcom.com>
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000c79d9065371257d"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XQzU4DIRDA8VdpOIvOUD49+R7GAwuD3djuGthsa
+ pq+u3QT03XRI5Dff8hcWKHcU2HPuwvLNPelH4d6QPGwY+Hgh3fifawXTIDQsEfDp2PhmXzkZQw
+ f3AMIEVxMQitWzWem1J+X4CsbaOIDnSf2Vl86X4h32Q/hcOv9vD2dfD/c5KEv05i/lp/McvH/z
+ JwlB+47BKspaID0MmYfjvQYxtMyalYrLuSWq8qVBNtRImWMbLhec73luvIUrTWdI5NAN9ysud1
+ yUzkqbaxEFVPAhts7ly23lVuVnA6mLl2Ghrs1d1vuKt/Xf6P3xuIfq0O4e4W49Qg1IIxLQQGqB
+ NQGcBVot1eTNSBlIoxB+i7+Clyv129T6GIbkwIAAA==
+X-Change-ID: 20260317-tls-read-sock-a0022c9df265
+To: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
+Cc: Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
+ Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@kernel.org>, 
+ Hannes Reinecke <hare@suse.de>, Alistair Francis <alistair.francis@wdc.com>
+X-Mailer: b4 0.16-dev-da966
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5123;
+ i=chuck.lever@oracle.com; h=from:subject:message-id;
+ bh=VXT/p5gwqEh8hm9n/NOS3Cv+n3pR3UsotOyh/mQ3u8w=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqIbptFnLPsQ1v5jGNCOezIfq3Atz1ZOaF7mm29
+ Wak+IUbM6OJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCaiG6bQAKCRAzarMzb2Z/
+ l/5xD/4xusTaz6LW0QnI1sMO8TWXGVI3BarG0Qk5VzshZxq27/zbyE8my3iscBrptCkWLUA6Fr7
+ qDyKBufkwfxXipsBXTbjdU9FbTj+IJ9KfuXRSCjG/Hu/DQgwwp42tuHRFMCWrhxWsfbsZDF7uG9
+ xcqQ9JBvVua5NHf6zPVGK1v+sdqZfjAA8Mt59XUrnHGf05oFjQfs6ycA79EPhbh9dPFypaDkeYi
+ lNdyH1o6es0rZ/HfFd/zak8hjXfklPvEI/NxYEDlqrVYUA2LdTWfXAcKJW6mOV8fQwYbCV1LGIO
+ a78Uc6P5Ngi2b1VWGW77C1qzPAyN8bRaAvFUtcAKfaSsGlsX5jHHhN8qzHcxS3Aqk5aIW9c9aoZ
+ a5CyogOrpYwI22K05pWypWxOJ5KIkkKahnoZDEMkRg5r9iVF4N5/Wek4FduQG2wT5OIeZHSbTKs
+ hFiqoJZaoSoTLRN3Ek7KnzAVoU8hyfFdYPMsBIv8vIUcJwkklpMMXrgTejJYrt6q5bvzb2x6PJa
+ nlimbkDlaIIlXN9U1I3enuyV0A+XeIvDlAbmBVr+Ma0r9W8YUGVwpdNvZYmcr+IOKo2sG4CYY/w
+ T+Z71nCO5h4Pzk1E/rhwfSYkzLSh+1Tmcc+AQEpV4InNAaP2sCpwVyeCFhFLxgZbdAdQ0+oAG5p
+ goFcAsrKBAHlorg==
+X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
+ fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295372-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pavan.chebbi@broadcom.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:edumazet@google.com,m:horms@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:chuck.lever@oracle.com,m:sagi@grimberg.me,m:hare@kernel.org,m:hare@suse.de,m:alistair.francis@wdc.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295375-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid,broadcom.com:dkim,broadcom.com:from_mime,broadcom.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CB8586426DD
+X-Rspamd-Queue-Id: 8A8D2642642
 
---0000000000000c79d9065371257d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I'd like to encourage in-kernel kTLS consumers (NFSD, NVMe/TCP) to
+coalesce on the use of read_sock. While auditing read_sock for that
+purpose, Hannes and Sabrina flagged a few rough edges in the receive
+paths.
 
-On Wed, Jun 3, 2026 at 3:35=E2=80=AFPM Stanislav Fomichev <sdf.kernel@gmail=
-.com> wrote:
->
-> Remove the driver-specific BNXT_STATE_L2_FILTER_RETRY + timer + sp_task
-> retry mechanism and rely on the core stack's ndo_set_rx_mode_async retry
-> instead.
->
-> bnxt_cfg_rx_mode() now returns errors instead of swallowing them. The
-> PF-unavailable case (-ENODEV from HWRM on a VF) is normalized to
-> -EAGAIN at the boundary so callers can match on a single "retry me"
-> errno without re-implementing the VF/-ENODEV check. Other errors
-> propagate unchanged.
->
-> This removes:
-> - BNXT_STATE_L2_FILTER_RETRY state bit
-> - BNXT_RX_MASK_SP_EVENT sp_event bit
-> - Retry trigger from bnxt_timer()
-> - BNXT_RX_MASK_SP_EVENT handling from bnxt_sp_task()
->
-> bnxt_init_chip() still calls bnxt_cfg_rx_mode() directly during open.
-> On a fresh open dev->uc is empty and the call effectively cannot fail
-> on the unicast path. But on FW reset reopen (bnxt_fw_reset_task ->
-> bnxt_open) a VF may have a populated dev->uc and the PF may be
-> transiently unavailable; since that path doesn't go through
-> __dev_open(), the follow-up rx_mode call that would otherwise drive
-> the core retry doesn't fire. On -EAGAIN, swallow the error and call
-> netif_rx_mode_schedule_retry() explicitly. The unicast filter loop
-> truncates vnic->uc_filter_count on failure, so the retry's delta check
-> sees pending work and reinstalls.
->
-> Cc: Michael Chan <michael.chan@broadcom.com>
-> Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+This series is a set of clean-ups, not a performance series. Async
+batch decryption and its submit/deliver scaffolding were dropped
+during previous review: async_capable is always false for TLS 1.3,
+the version NFSD and NVMe/TCP both require, so async-related
+improvements were unreachable for the in-kernel consumers this
+work targets.
 
-> @@ -13758,11 +13762,8 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp, str=
-uct netdev_hw_addr_list *uc,
->                 rc =3D bnxt_hwrm_set_vnic_filter(bp, 0, i, vnic->uc_list =
-+ off);
->                 if (rc) {
->                         if (BNXT_VF(bp) && rc =3D=3D -ENODEV) {
-> -                               if (!test_and_set_bit(BNXT_STATE_L2_FILTE=
-R_RETRY, &bp->state))
-> -                                       netdev_warn(bp->dev, "Cannot conf=
-igure L2 filters while PF is unavailable, will retry\n");
-> -                               else
-> -                                       netdev_dbg(bp->dev, "PF still una=
-vailable while configuring L2 filters.\n");
-> -                               rc =3D 0;
-> +                               netdev_warn(bp->dev, "Cannot configure L2=
- filters while PF is unavailable, will retry\n");
-> +                               rc =3D -EAGAIN;
+A subsequent series will introduce infrastructure to support
+KeyUpdate for in-kernel kTLS consumers, which need to handle TLS
+Alert messages that trigger a tlshd upcall.
 
-Note that bnxt_hwrm_set_vnic_filter() can also directly return -EAGAIN
-if the FW is busy and retrying is correct.  It will drop to the else
-statement below.  Adding an else if statement will provide a more
-proper warning:
+---
+Changes since v11:
+- 1/7 has been merged into net/main
+- Rebased on net-next main (Thu Jun 4 09:33:24 2026 -0700)
+- Patch 6: Apply the has_copied handling from f508262ae9f2 to the
+  post-flush sk_err recheck, so an abort observed with no bytes
+  copied is consumed via sock_error() and reported exactly once
+- Picked up Reviewed-by tags from Hannes and Sabrina
 
-else if (rc =3D=3D -EAGAIN)
-        netdev_warn(bp->dev, "FW busy while setting vnic filter, will retry=
-\n");
+Changes since v10:
+- Move fixes to front of series
+- Simplify loop termination in tls_sw_read_sock() (Sabrina)
 
->                         } else {
->                                 netdev_err(bp->dev, "HWRM vnic filter fai=
-lure rc: %x\n", rc);
->                         }
+Changes since v9:
+- Recast cover letter: this is a clean-up series, not a
+  performance series (Jakub, Sabrina)
+- Rephrase subject to describe the refactor (Jakub)
+- Split 2/5 into two patches separating the do/while
+  loop-structure cleanup from the partial-consume fix (Sabrina)
+- Continue the loop after a partial consume to match
+  __tcp_read_sock() semantics, instead of exiting (Jakub)
+- Drop kdoc on the internal function and rename
+  tls_strp_msg_release() to tls_strp_msg_consume() (Jakub)
+- Drop kdoc on tls_strp_check_rcv() and un-wrap the "Defer
+  notification" comment (Jakub)
+- Rename tls_strp_check_rcv() parameter wake to announce, and
+  tls_rx_msg_ready() to tls_rx_msg_maybe_announce() (Jakub)
+- Drop tls_rx_handoff(); fold the per-record path back into
+  tls_rx_rec_done() and fire the deferred announce from
+  tls_rx_reader_release() (Jakub)
+- New patch: Preserve sk_err across recvmsg() when data has
+  been copied, so a connection abort during sk_flush_backlog()
+  surfaces on the next read instead of vanishing when the
+  caller returns the bytes already accumulated
 
---0000000000000c79d9065371257d
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Changes since v8:
+- Address review comments from sashiko
+  - Patch 2: Requeue partially consumed skb to prevent leak
+  - Patch 5: Re-check sk_err so RST during flush surfaces as
+    -ECONNRESET instead of EOF
+- Address review comments from gpt-5.5
+  - Patch 4: Restore msg_ready early-return in tls_strp_check_rcv()
+    so the queued strp_work doesn't double-wake the consumer
+  - Patch 4: Add tls_strparser msg_announced bit so the recvmsg
+    exit-point handoff doesn't re-fire saved_data_ready() for a
+    record BH or the worker already announced (rx_list-only drain
+    path)
 
-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
-DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
-qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
-5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
-rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
-qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
-2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
-K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
-H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
-Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
-WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
-q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
-2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
-bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
-R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCB1rFg3
-tI3GQBY5cZQUefOlMOBgKYzPhR8tVvajCnCwYTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA2MDQxNzQ3NThaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA7pDjYPujhH2WNnbhEFkxpxDn6OT0tBMWll+4kheyG
-0xcatDI3tom4sCcOhNJMFG6LWFVd46qV3cK1DjzHGyu+hBjqxjHG6PEHBXkTEX0PRqvG0Upk0TaC
-WCKapA52piEie2LO/gtcIvdwHvdEOCbyI/DRH0NBALzgKa/G9JurdHs3lH7gkqzAKPaLFY6F2z0Y
-uheUMQe+o6VvahqcONIuFDjCUG/3Ywa0rV07SjeiDJLlVyB3F6RtV274tiTHTPsC97vRSXznkVU2
-Hj9VNYbaykKXz8AznlflIqBZJWWfpnoKgNQKEguMCM6UsKgOlDMkiq+Y638iLKsjY71bS0xF
---0000000000000c79d9065371257d--
+Changes since v7:
+- Rebased on net-next (v7.1-rc1)
+
+Changes since v6:
+- Rebased on net-next, v5's 1/6 was merged upstream
+
+Changes since v5:
+- Patch 6: Set released = true when sk_flush_backlog() returns
+  true, so tls_strp_msg_load() knows the socket lock was
+  released (Sabrina)
+- Patch 6: Drop Fixes tag; submit bug fix separately via net
+  if warranted (Sabrina)
+- Patch 6: Note redundant flush on cold path in commit message
+  (Sabrina)
+
+Changes since v4:
+- Drop batch async decryption and submit/deliver restructure:
+  async_capable is always false for TLS 1.3, so the new code
+  was unreachable for NFS and NVMe/TCP
+- Purge async_hold directly in tls_decrypt_async_wait() and drop
+  the tls_decrypt_async_drain() wrapper
+- Merge tls_strp_check_rcv_quiet() into tls_strp_check_rcv() with
+  a bool wake parameter; fix lost wakeup on the recvmsg exit path
+
+Changes since v3:
+- Clarify why tls_decrypt_async_drain() is separate from _wait()
+- Fold tls_err_abort() into tls_rx_one_record(), drop tls_rx_decrypt_record()
+- Move backlog flush into tls_rx_rec_wait() so all RX paths benefit
+
+Changes since v2:
+- Fix short read self tests
+
+Changes since v1:
+- Add C11 reference
+- Extend data_ready reduction to recvmsg and splice
+- Restructure read_sock and recvmsg using shared helpers
+
+---
+Chuck Lever (6):
+      tls: Avoid evaluating freed skb in tls_sw_read_sock() loop
+      tls: Re-present partially-consumed records in tls_sw_read_sock()
+      tls: Move decrypt-failure abort into tls_rx_one_record()
+      tls: Factor tls_strp_msg_consume() from tls_strp_msg_done()
+      tls: Suppress spurious saved_data_ready on all receive paths
+      tls: Flush backlog before waiting for a new record
+
+ include/net/tls.h  |  5 ++++
+ net/tls/tls.h      |  6 ++---
+ net/tls/tls_main.c |  2 +-
+ net/tls/tls_strp.c | 26 ++++++++++++++-------
+ net/tls/tls_sw.c   | 67 ++++++++++++++++++++++++++++++++++++++----------------
+ 5 files changed, 75 insertions(+), 31 deletions(-)
+---
+base-commit: 93790c374b9d77f3db15786d7d432872d92751cf
+change-id: 20260317-tls-read-sock-a0022c9df265
+
+Best regards,
+--  
+Chuck Lever <chuck.lever@oracle.com>
+
 
