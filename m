@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-295443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nwiJOkn8IWpERQEAu9opvQ
-	(envelope-from <netdev+bounces-295443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:29:29 +0200
+	id T6PnN879IWqERQEAu9opvQ
+	(envelope-from <netdev+bounces-295444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:35:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF76643CC3
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3946A643D13
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:35:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=qTEoC8WW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295443-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295443-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b="K+ WTlvB";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295444-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295444-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4AE3305E2A6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:23:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C46BA300A8E8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4AC366DB9;
-	Thu,  4 Jun 2026 22:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B4933E351;
+	Thu,  4 Jun 2026 22:31:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16CD30D3EF;
-	Thu,  4 Jun 2026 22:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE103BBFB6;
+	Thu,  4 Jun 2026 22:31:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780611798; cv=none; b=WmJsYNZkm/IKD9ASnRRGWTrzGZ4qFpQKI4Ixhp8M2uEA0yb34arvv2ORwVGKQwp+nNL91mxqxgNHTBqIJUffUEA+PevLmTsILFgYYhBX9GwPLDBWcmooauz2rRy4as9XKPZhmy534Qc80x01l8rnq1WWTuib1GElZ4+Cj7vJBT4=
+	t=1780612297; cv=none; b=SIgikro7J48nxpkGeXi7jWXT04Rz4S6tPOsGX2bVWNVsq/fcAnCYxjFqV+f0m6cTZuVgdTTuKR3F2rOjRmfxqsqnrKVw4Q2wDXDTfNHp9nFaBMzWwuv82aaMunr1Wk1fJaPOEekjpmVqe8zpZrv5xBz9Iig8mCh78aFgzNi2fpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780611798; c=relaxed/simple;
-	bh=Cj3a5wtbJ7+9lriBGBUrGy+4XLBy51/W0EZUlVmGtGY=;
+	s=arc-20240116; t=1780612297; c=relaxed/simple;
+	bh=5HAtlgw5/Y7O7w6wpFMhAKspPS+xoUwCTIb4OZ8B1nE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FXTdwZZL3ANOdTBd585nWKU2S2yUqfvQEd9PfvzflNDYZnXF0/bSKRuWn+lJlE/mecTVAMSG5YCurre/l6FFrmvlLeMTm1D4BPcDu6ZeWesR8ILRWj9vdcvLQAuJDsjURxkt+cHPqEHbtK+9WT+kgBysLg29IZxaXYdJ1TMqXgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qTEoC8WW; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=nzU/QyeTbiH8i//rCBsBvFLDpoRDfqrqcU2rquvur+toWUKlOdpdzheNKs5cC4ViThK7jfWmYEAXyZRN6CxDnKHcEFE718SWxvq8Tj8vTT4Ow5krtsJLlZl7pDUN5NQ1VLUzDrBiYf8rTc6ycyVKgyD06d/+LZAdhvC3jg9muHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=K+WTlvB+; arc=none smtp.client-ip=156.67.10.101
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=70hpHvvUCowNhdJWsu6EfsO0ZrtpVhg0eQt9nqZdnls=; b=qTEoC8WWwHUsxdgORz64AsaXpH
-	sMpqf2ilVRBFEPq8GM56vJxIV+dg5sJEKP7eg3yrJ7QG5I+MB3FuHsAyF4tyxR62+lvtJ0ZUypdzb
-	e8eqKjHP2eod+5q83rQZbI6r2jCf+3Nv2xEC1sikJzcEJamm/FdDAj3LETbu/pC4R3cg=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=+jIBNjlrd+8cBpesyOegY0Ulnp5mjGSHeu8lpw+r880=; b=K+
+	WTlvB+tcexno4iGj1x0gIpyyUT39sI5jy5yJGiWkNkCHi8Prm7Eh4lMUZkclmARYN7NswZ7tzISc+
+	hfEZR+GNqbevMRmUKnZRRTalgPToIEtMx6hSibeg9/TFiDZbfmMwwgKJOL/j0lFUdnxjOSyMUq4hd
+	gzH6n7SvcmaTgeA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wVGSv-00674u-0d; Fri, 05 Jun 2026 00:23:05 +0200
-Date: Fri, 5 Jun 2026 00:23:05 +0200
+	id 1wVGay-00678b-Mk; Fri, 05 Jun 2026 00:31:24 +0200
+Date: Fri, 5 Jun 2026 00:31:24 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: ciprian.regus@analog.com
 Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
@@ -61,20 +62,21 @@ Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
 	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 08/13] net: ethernet: oa_tc6: Use the
- read_mms/write_mms functions for C45
-Message-ID: <22e977f2-c957-41ec-beed-0670a6704e15@lunn.ch>
+Subject: Re: [PATCH net-next v3 09/13] net: ethernet: oa_tc6: Add new
+ register address defines
+Message-ID: <a113080e-44ae-4867-8414-14a1b1a3c7a9@lunn.ch>
 References: <20260604-adin1140-driver-v3-0-5debdb3173c4@analog.com>
- <20260604-adin1140-driver-v3-8-5debdb3173c4@analog.com>
+ <20260604-adin1140-driver-v3-9-5debdb3173c4@analog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260604-adin1140-driver-v3-8-5debdb3173c4@analog.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260604-adin1140-driver-v3-9-5debdb3173c4@analog.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -86,12 +88,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295443-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295444-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -108,23 +110,29 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,lunn.ch:from_mime,lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,analog.com:email,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5FF76643CC3
+X-Rspamd-Queue-Id: 3946A643D13
 
-On Thu, Jun 04, 2026 at 07:32:53PM +0300, Ciprian Regus via B4 Relay wrote:
-> From: Ciprian Regus <ciprian.regus@analog.com>
-> 
-> Accessing PHY MMD devices requires control transactions to registers in
-> a memory map other than 0. Replace the current formatting of the
-> register addresses with the oa_tc6_{read,write}_register_mms()
-> functions. While we're here, introduce the mms variable to store the
-> memory map returned by oa_tc6_get_phy_c45_mms() instead of ret, in order
-> to improve the code readability.
-> 
-> Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
+> +/* Vendor specific memory map. */
+> +#define OA_TC6_VEND_MMS1			1
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+I'm not sure that is the best name. Table 6 calls it MAC. 10-15 are
+listed as vendor specific. Ideally we want to avoid confusion between
+MAC registers and other vendor registers. So maybe OA_TC6_MAC_MMS1?
+That would fit the pattern:
+
+/* PHY – Clause 45 registers memory map selector (MMS) as per table 6 in the
+ * OPEN Alliance specification.
+ */
+#define OA_TC6_PHY_C45_PCS_MMS2                 2       /* MMD 3 */
+#define OA_TC6_PHY_C45_PMA_PMD_MMS3             3       /* MMD 1 */
+#define OA_TC6_PHY_C45_VS_PLCA_MMS4             4       /* MMD 31 */
+#define OA_TC6_PHY_C45_AUTO_NEG_MMS5            5       /* MMD 7 */
+#define OA_TC6_PHY_C45_POWER_UNIT_MMS6          6       /* MMD 13 */
+
+I personally would generalise the comment here, and add it to this
+list, so keeping everything together.
 
     Andrew
 
