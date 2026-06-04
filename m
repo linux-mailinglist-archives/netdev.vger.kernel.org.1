@@ -1,170 +1,174 @@
-Return-Path: <netdev+bounces-295228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f9gYJqVyIWpYGgEAu9opvQ
-	(envelope-from <netdev+bounces-295228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:42:13 +0200
+	id ga4RNDBzIWqGGgEAu9opvQ
+	(envelope-from <netdev+bounces-295229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:44:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44EC163FFA5
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:42:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E823B640016
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:44:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=e1ErmNFN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295228-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295228-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b=KoNM8iV4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295229-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295229-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E463031571FC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 12:34:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 541A03102A95
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 12:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA698472774;
-	Thu,  4 Jun 2026 12:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E6147798B;
+	Thu,  4 Jun 2026 12:37:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931AF451044
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 12:34:20 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780576461; cv=none; b=WGxLvnRC2DvTOkKtC/5r0p6pIP552919/8ylm7zko9X5BXoKRPDDEF6osYrcnwUXSh5iAyeFi3bm4bbZxv+WWHZzzXL9a4FPqQJZ8By13ht7JzrisYG0dOt7EdY38VzJkJwdA2JaguIMN1OX3VVbKTWwc9uf7Kq8E20tNArR9DA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780576461; c=relaxed/simple;
-	bh=tRdKfjnRUz0aPl6PAEFjMNJL5WVJkUOwzH0txEdO+/Q=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UedlQ0aJ9HDgX3w0PwKEcZgAh2VZ6MwKAk3z2Oja2L38AHEfUIcjlqkmkSKDtc+VeZ0BYhsawVJVDP8WiTZ0GpgnOEtgR0l1JA7lCuZ0VGxIykCfQzthE+9Ze3ghF9gThlKFvqaF4rJFLb+4YbUCbmQnDU+AA8NQguinD/D3V8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1ErmNFN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C211F00A1C
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 12:34:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780576459;
-	bh=kQ6M6FDKXPf9y7Y2G+ZlFRRaP5oLHz23vLbG+bNrvo8=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=e1ErmNFNc3B2GEwYqb/P6xaZrlvHojwGUKOx+yleFIv+SrequIqnOzpFPLS1QoJOu
-	 M6UveWB9G9jMFR2xQgcuoOfCqwtUFLxtREEtbjlRtcR8Oiz300JksvjDpoAiEHZWl5
-	 DK4tJNSy64M+EydtbLB3r3qwSx6AoeXlzSDvlHLB9/hX0rPhEzKIn8xc9Bfw8dWGhh
-	 8YQLs+n/OsaOYQD5t+KUjWzIRs9cKpu34ToF65wYvg8QcIy+50z8yHU8exS3cwA7GT
-	 lIqRVAp3Dz2GuvmZ2qOOkeo5ggbyFzMytBjaNxsOZHoXJpBb89z7x9cipR7tV9C/DW
-	 ReyLRDqG/Vt9Q==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-3965f215817so5719251fa.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 05:34:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8au/pL2+3KEkXvvuZc3ymgilCJTuMB9KCLIe/0G0fKEKawqeDQ22aYc08YHJvRnz1mPBaOxbM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMOPlhtpOqzO3ksJj9M+Bi04J2Q7yCYWate3ZKBCTOlb6hqdVm
-	ZXQxNrhxFb8g7rNtPlU4hEoVpBtEu4C5IQTqdOdQnw8qmVNcrpWXhxN539iemmdXbLJPX/zmF9z
-	KndqZ38sAcrLDxG+aVIoKOgvBbn/3dFERuLN+DC1RHg==
-X-Received: by 2002:a2e:bcc1:0:b0:396:8eb1:a4a4 with SMTP id
- 38308e7fff4ca-396af436443mr25706941fa.14.1780576458112; Thu, 04 Jun 2026
- 05:34:18 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 4 Jun 2026 08:34:16 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 4 Jun 2026 08:34:16 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <ah9P6Xt9SyKgc2oJ@ashevche-desk.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B92477E36
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 12:37:40 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780576664; cv=pass; b=SHDOmsQKiUR9K9MESk3Zyba697Kc3A7aCNjw564JNHD9t98CFqAMY0ElxVyYzMkz7uyPpoyr03GB60TUpJqWfbSg1iTV+l+2HI7C3Jevct1WGVD1KnrtUcUkbLP37mmRziGm1zqslvD2CnWwmhKmat24e61S494Ki9Q2sBjED7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780576664; c=relaxed/simple;
+	bh=eecKwSkFz6kBSxAziuAzDOf/uuk+1dBSku4wR63srpY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aqMxHLHCi5GpkoFZygBVWmWINBln/OZSEOzsK/1ZIdaKfshRH64rj7xuUsozBVYWeviUv1YWMI3uvqPZ8QR6vZVjtzPe0EfOVtmH+YmIllY5CtMxd6X9Sf1sQfQMr9sOxV4rCV+jG8JLe1OX/fxL26jhvIsigh3ahTkukaSd940=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=KoNM8iV4; arc=pass smtp.client-ip=209.85.215.174
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c8585cd8400so247749a12.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 05:37:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780576660; cv=none;
+        d=google.com; s=arc-20240605;
+        b=O5DyTX2dzqxurCWZ++OeWKhhB7JLBTf6Be3wbz2lyoPSDJqYGheSh9IXto1s7rOviS
+         tKQVq86fmQmJKIt7B6uSjnsOwmP1EonDZcRJJy7TTTSheZv0NbocJz2nc/yXYgjQ9LL/
+         htbs3HVOESkphSBijy47zs6KarEjn9lhns3uwBgxU04zccTfwVraTkBZVhhZW+fqmeYv
+         bY7eaGIJWB40FUUTA9RdiJgoI5XasJVdkSssLn2puA6WELEQTVM9WOgbpvP03PfZxgyy
+         GYJ9aSwaDsOr6VFc8n+pfRjsLskUYk1/ZL2JSpoovt9/Z8k8K7uSn2PyGZF8+1BycZLb
+         kn+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=T6iEHZVQzF9ogQCO7/aeBuEDiXsPvwfwZqExDSXWtEI=;
+        fh=5vItltAusB8n2n3l8+BN4+wkiyA2y6xZLyuDBEvprWs=;
+        b=iQyPvwZ20couPMKFt/W6wO7PsT6CCrjz/Jd1NkFX0XWjkK3SWHzGzaDJ06GBNZFypn
+         dCwQN6eZOPb3nghXRdqZAlsUvQ6a7kqZibTi0Aw5JnvcIDUd4u5Z+HJprE6WjY5sRVb2
+         /HCw8VoY0cc/5KSfcW+IOkcD8djJAQ7V6B9vkqiecIFzQLR54gkqoyWnT3Cr0p1FM8En
+         YV4dyeKnck7/2aB77Kv/yhdOnourwc/yXF8Zsb6Yw5emwgLCy0F9u1xlRE0BJdK3jzD5
+         1wYZKAHX/cbCIL8PosNppWP+HBJzNqqEl7btoQ042DHtpHTgnSHST5+NB1GUcOh6Flbp
+         dHLg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1780576660; x=1781181460; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=T6iEHZVQzF9ogQCO7/aeBuEDiXsPvwfwZqExDSXWtEI=;
+        b=KoNM8iV4d2d0o8s0VPrVGkAId1k4Zbr1CKy4gYZvxQUmhk0wiP8paVWmSyK+XOyRuN
+         buEqnSNfoUirCQY9TOjyRxAqmgYQRja288OhJzgtyhbO0VMwUb4PO+dOlMnB7vTP8xJ9
+         y9dFeFTSuahO0G/pqUT5N/vmgLeaCPi61sPAc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780576660; x=1781181460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T6iEHZVQzF9ogQCO7/aeBuEDiXsPvwfwZqExDSXWtEI=;
+        b=frIeU/Kg9/liE8rTTrXhsSCciMdX6jIwsDXZeolzKUeVEZfpzJu75aL1x8p4eT3qcz
+         SsE1ZPrNVLIEgQXLJdlMPUMqiw7rDRjVra/wT02N0S8Ukyu2bBuVYNnEmjRAoAIHZVYf
+         A1JXQ4qufctNHgNRFLdeElzIfSKJ1SzAgYNBbS3D66Ad2QshKf5lbZ/6mjoVAwVn+87U
+         uyBrE1J1wdqCcz0qfaTPP2nG23/6vaDyEIlSngGfwldx9hyvjVkjZCQIwtQUnJsKqycJ
+         mu3OfYBPD2yrEIxfW8fYXB895n5txokdnsbhRwxUcBA+Kkm/U4SmedFDbDZoLeztn907
+         ca7w==
+X-Forwarded-Encrypted: i=1; AFNElJ8P3YQzS2UKu504rWV6M3GEQudLke10JvkCG0S5LYdHYLAizSMZwNeK8Cr1t+H84jRazfHmzuE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhQs6v5sGIuutaay+r9t2e6B2BLSpQV6XGjXAOaub54v5f4ueF
+	pBv6exxUmBMbIb/sBNgGBb7/5wEKlc3d5R9rqCIDqNB/knksDsr3y4xVLL4FsOoZ+Yy6zHRUHrj
+	JEZGhD6dT2/+r8Idp6470ug6A6e5oMgu/PPA1Lt0r
+X-Gm-Gg: Acq92OGfpeCwu+wxs1rjqKv/hj4sgh7C1+rvabFW8T1V3K1s1IXXCPLlaw6k0qIj1us
+	qOoElf0FSVbQ+9kokUksgSwiJ6o5st8eMttaGQHTLVKCRoScB8oHBpjYNtJbqABtX4xZxdhdV68
+	7wbiukM8Ed+YXymKrmjhC9kZH+zVlguEF8zyeM1zhvjmaf1Nkjv13YnjAftGj0kV28phUtphNdp
+	2dbUtkiO4U8Go3KdonLFJOLoHJj42T4onXeE5dgaH3mpAcr3ybZT1NJRDVwe6BuVoosUOMjgqyw
+	5T8syJmJssKnRk5tmtA=
+X-Received: by 2002:a05:6a21:9146:b0:39f:a8fb:3354 with SMTP id
+ adf61e73a8af0-3b4977e59c8mr8046550637.17.1780576660316; Thu, 04 Jun 2026
+ 05:37:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-20-88c324a1b8d2@oss.qualcomm.com> <ah9P6Xt9SyKgc2oJ@ashevche-desk.local>
-Date: Thu, 4 Jun 2026 08:34:16 -0400
-X-Gmail-Original-Message-ID: <CAMRc=MdhjZhGL9tEx9WEjn2f95d=ObNM0AtBNpcevm6aHgpj+Q@mail.gmail.com>
-X-Gm-Features: AVHnY4IaL6Srer7kIaxoyyrYpvf7EUQjky2qCo2_J16coVWA1ajpEEsVM7UfQA8
-Message-ID: <CAMRc=MdhjZhGL9tEx9WEjn2f95d=ObNM0AtBNpcevm6aHgpj+Q@mail.gmail.com>
-Subject: Re: [PATCH 20/23] usb: chipidea: use platform_device_set_of_node_from_dev()
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Lee Jones <lee@kernel.org>, Mark Brown <broonie@opensource.wolfsonmicro.com>, 
-	Thierry Reding <thierry.reding@avionic-design.de>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Srinivas Kandagatla <srini@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Vinod Koul <vkoul@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@kernel.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
-	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Doug Berger <opendmb@gmail.com>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>, 
-	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
-	Matthew Brost <matthew.brost@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>, 
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Maximilian Luz <luzmaximilian@gmail.com>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org, imx@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
-	linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 4 Jun 2026 08:37:29 -0400
+X-Gm-Features: AVHnY4LlzJb5RlJLg6o1J35Nb-MJatDdIgZiKhnggUIpS5hc_9Qn5rm87J2bKe8
+Message-ID: <CAM0EoMmC7oT99G7Qz8Kw9oB79agGpsHmJtzzhrc3MS5Nb101gQ@mail.gmail.com>
+Subject: 0x1A: Keynote Speaker, Greg Kroah-Hartman
+To: people <people@netdevconf.info>
+Cc: Christie Geldart <christie@ambedia.com>, Kimberley Jeffries <kimberleyjeffries@gmail.com>, 
+	Stefano Salsano <stefano.salsano@uniroma2.it>, Lael Santos <lael.nasan@gmail.com>, 
+	PJ Waskiewicz <pjwaskiewicz@gmail.com>, program-committee@netdevconf.info, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, LWN <lwn@lwn.net>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com];
-	TAGGED_FROM(0.00)[bounces-295228-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295229-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid,vger.kernel.org:from_smtp];
-	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:people@netdevconf.info,m:christie@ambedia.com,m:kimberleyjeffries@gmail.com,m:stefano.salsano@uniroma2.it,m:lael.nasan@gmail.com,m:pjwaskiewicz@gmail.com,m:program-committee@netdevconf.info,m:netdev@vger.kernel.org,m:lwn@lwn.net,m:laelnasan@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andriy.shevchenko@linux.intel.com,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel
- @pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[ambedia.com,gmail.com,uniroma2.it,netdevconf.info,vger.kernel.org,lwn.net];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[66];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 44EC163FFA5
+X-Rspamd-Queue-Id: E823B640016
 
-On Tue, 2 Jun 2026 23:49:29 +0200, Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> said:
-> On Thu, May 21, 2026 at 10:36:43AM +0200, Bartosz Golaszewski wrote:
->> Ahead of reworking the reference counting logic for platform devices,
->> encapsulate the assignment of the OF node from another device for
->> dynamically allocated platform devices with the provided helper.
->
-> ...
->
->>  	pdev->dev.parent = dev;
->> -	device_set_of_node_from_dev(&pdev->dev, dev);
->> +	platform_device_set_of_node_from_dev(pdev, dev);
->
-> Why do they even do that? Do they have a USB connected pin control?
->
+We are honored to announce our Netdev 0x1A keynote speaker, Greg K-H.
 
-I don't know. I can't test it so I don't want to break it. If they don't need
-it, the person who can test it, can remove it later.
+If you are a Linux developer and dont know who Greg is, you are very
+likely living under some big rock somewhere. Maybe this would remind
+you ;->
+https://netdevconf.info/0x1A/sessions/keynote/Greg-Kroah-Hartman.jpeg
 
-Bart
+Greg  is a Fellow at the Linux Foundation. He is currently responsible
+for the stable Linux kernel releases, is a member of the Linux
+security team and CNA, and is a maintainer of the USB, TTY, and driver
+core subsystems in the kernel as well as other portions of the
+codebase that he wishes he could forget about, but LLM-generated
+reports keep that from happening!
+
+Greg's keynote is titled "LLMs and the kernel security process"
+
+Right now the networking subsystem is taking the brunt of the abuse of
+recent LLM advances with a flood of =E2=80=9Csecurity=E2=80=9D bug reports.=
+ Greg will
+go into a bit of the history of what has been happening, how the
+kernel security team has tried to make it better, and perhaps a few
+things that we can do in the future to reduce the load you all are
+currently having. Also any feedback on what the kernel security team
+can do better to help aleviate the load is always welcome.
+Come and listen and interact with Greg.
+
+
+cheers,
+jamal
 
