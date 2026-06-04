@@ -1,201 +1,174 @@
-Return-Path: <netdev+bounces-295195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8WrdI35jIWpeFgEAu9opvQ
-	(envelope-from <netdev+bounces-295195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:37:34 +0200
+	id z9mwANRjIWp2FgEAu9opvQ
+	(envelope-from <netdev+bounces-295197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:39:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0A763F7C1
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:37:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6978763F7E1
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 13:38:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ezmqC2iN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295195-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295195-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=KZD8gqOM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295197-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295197-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B217303D377
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 11:30:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6238303110D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 11:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD25641B372;
-	Thu,  4 Jun 2026 11:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9D83B19B4;
+	Thu,  4 Jun 2026 11:35:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577AE413D87
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 11:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A1407597
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 11:35:54 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780572655; cv=pass; b=Ou8FTPC4BjKEqs5na9NM9KzQfaIKcSG/xYuYQaoleDUpVql80n90mj+AGLTFiE6PAm1J6F6kfqF6St3FFJWU6Sd41j0aMx/dwBGRUjx3M2btO8swGvIIKht497mqwP2zTcd8IEtSIF0oJrT+eEEMaRrmtS+VeW5oyjrxUAp/yYk=
+	t=1780572955; cv=pass; b=Q+ELRaTtDJBB+S82sWPmIVYYU2KpTBAxos7AIzjkXZ251BkwaQ41Z9jAeWgEew6KQVnkWV2J/ZQnckeRWzFyKKWa0CZAXsIm0s5AbYEJ6BD+OMZ0nR5VAgL9qafdNtTNoop+cdfbbu6oXmHmv3YcXGBW4cNlNLCixMqgMj3gAfE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780572655; c=relaxed/simple;
-	bh=IgaVd4/D/neWcGaYdf4+CIF4yFVYz7Eh1SsiQPIdiNg=;
+	s=arc-20240116; t=1780572955; c=relaxed/simple;
+	bh=SgU2+O1qVnP93tbbWQNDkNxh2GJU8NRcrJqhzXyf8l0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RjsZnnNZCckL6gSnRB4ZlazA86XkvwK7uswprR2UJDTTkeaRxcuCDn3g2/J/GPX4mkqVmvc9tb0GVZlwoZoy23FDwqIITS1oiqhVDRXw2+Fz+QsShivdMDKkCWnizPiRGGRJDc21xdh49/tWK0bg7wKB3jnKBKnyDJRSVsFVDwA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ezmqC2iN; arc=pass smtp.client-ip=209.85.221.179
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-59c1bacf871so174547e0c.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 04:30:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780572653; cv=none;
+	 To:Cc:Content-Type; b=qyP3zIlkNfPYZ5M0w9FPA/A/52mquuieZBexESH4gH3iLdzvD1xNcium5yiXGV2MKI20z7Nsl0IcV7eKe9F2xBj6TIVrN/CeeUYaA8kpBSJ4oRpFhH8oR/s9eBdfU9uyKV5dOfRwkX2eRnPnnMBMG2iD/VprjD0TYZAs+rq9x4A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KZD8gqOM; arc=pass smtp.client-ip=209.85.160.175
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5175d339e8bso521221cf.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 04:35:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780572954; cv=none;
         d=google.com; s=arc-20240605;
-        b=TyRVZsHQNqdXxVd9qiINRq1uZ9W0RqnKcRT2s3mOuQCw6hQ4tn9b5ImATdJa6kSIEZ
-         3Uo0qtjDEOAOiB7fqucHFgFySDLgsUMDsGDaVC/g/7uhA0SlQGpkFQUrnv/DCugoE86J
-         fcyWkIn5+RLMbX1Dq49XDh/qndN7Hwr540mLxRMUo8YN6KjfpbQflbJo6D7gW8n9TQ64
-         t8BicM+ptdHrJ8hE63nhodFGMY0MBqw+q6JJl8yt7K2tKaG4cMFs8lzwyZ2lZGguC6Zq
-         GQ5I0cJUbmcgQDPnulxJ9uR5RYSjBaIXQy/ucS18WHNxgj3iqEKp2PaW9HHIJnb3PWfC
-         3m9g==
+        b=EoOkTPe7GCViMY4EbA74dO+7zcGfwangWbQCZd5pGbxWxsFDt62pLR3yGmWWzLgnUd
+         Hor6wFvXPU9YsvAyF2du8MhNyTDIlajkx0RcIyBvSP6vvZYfvClLOYQ+N/FDJ6TQni+R
+         +YAMb5WdteZ/fFlefNgAQ3td1U+Ihbkpaqvb7qvmhfj5Xk0kYDtEu+OICpDacdrJruNM
+         sspxBu0pwBIZGPBl80d1i46d+jNP4RR0hDYZGKptEvFrTPv8lh9vJJ09awKfLXpWybDc
+         5vid/sbM7rLrCmD7UOqer0lxTV3A1B5peRPVbeTckQ1muG7lb6DtVxHPrYZqRLIt2i7X
+         qWnQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=fpp7hpo+duJ5Snlj5PG+EfICta9eCWIZjou+VYQUVQ4=;
-        fh=mhyzYzRgTx2JnqG4TJFwTltdE4ePG9W+WNCeDJVrADY=;
-        b=iG2KFV1LY8OY4Ilv6YTm6UkTLEbq92LfY+zfULUuOmJcIM7lyEGVirsAQuNV2Er2NX
-         3oK36X7CWndFHvFZlqlK0QuGFHJQEVKyA6G9Pp3uRs6xWF29sR2l7gj/ON6XGZjP2rwy
-         ynRHFxW56Cg+f0ZWZRKC9BoGJ/sivuBiESpQC9l7K7C4uECbbAcmeku2+p5pb/Zomt79
-         hPREtFTDuOKGJiiwODXetx63hMmHBrk4ts7mId+s7WwNDjNkWYsUZl2L6xW1kFmpCQ5P
-         qU2ye1qoTYS5l/ciGUo2Cg8XM/ITxJzPBBlmre7pJu9Pj6jD1vsV+J7IlAazUyPqV9vm
-         J7ag==;
+        bh=yg4x99fBtz+f6aO+UsqxYVWgAGOJf5YpBuFNQpiKhok=;
+        fh=1AqvwXpwljB1e6nnNrr77wUgDtAr6bssWemo3TCf4+I=;
+        b=UXUHvTwLMpo2OrOBAU4LRwe6HSQvkEM0pkVt3D2dKYPa47FJ/AnTFEWwt2k9Nw/gXG
+         vIRSAs2qtrasVqeY68oKc0bCVB4U0i2r7fxKh/pE6t1WbVn8cWrJQF1ZnrsYRuYQOfvq
+         529d0hfZZ1D+zMjk3WFu/Yt//rMdvJfogRiI/oF8Yi0XZ20h6uYNQIX3rUXXWXsuirtl
+         YYp2cE1qGBC22gvfmAgo5kj7jPFklTJThN/V02MFhXbpS2UZrpKSKHfUAK5flSIp1liV
+         IUn4ZKfliXVr0Cc0awWutXuOi2NVQTQvXbrvHQUGYo/LIlFb+Dz/KZDbdpEwuXPqql5+
+         X2Lw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780572653; x=1781177453; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780572954; x=1781177754; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fpp7hpo+duJ5Snlj5PG+EfICta9eCWIZjou+VYQUVQ4=;
-        b=ezmqC2iNUUfJwgeZG5pY77k+XsOPGlvqQzmHybpNLf7TgfVbhGzWR/k7Etygx2EpSE
-         Z6JruUu6i+sXQ1MdiNIQhWdtKUBevMu8VDIVGDED/svPKd88sD3WWuf3fk9isG8+grfP
-         z7luiITciUECenfvw++v6qu+35n08EKbcfbTDepHUszlgloxnAYu4lxHmiJNISX9VVfi
-         ccRz1vwWyVrp1N09BchOhOSHIdePyMAbf61zuPrbhf4qJkOn3BCKIrle7JrKLAL1hMzD
-         A6UnlLA3ubDJiXX/X+bf+KGPz0FksE0UYBQZ2TTOcZ8zXrdCZo2ulqws8wYwRrqbdVcv
-         evpg==
+        bh=yg4x99fBtz+f6aO+UsqxYVWgAGOJf5YpBuFNQpiKhok=;
+        b=KZD8gqOM3Vb/3ankMKar0nH6CkccCSAnyZHHmgb+w8nDtVwuHoo7F3ii0Y9DZGaeiV
+         2Rg/gXdGMWQo9XdvA8TWKPnpB84ZGBcjA5kQf5z7nhaxUnuItHVXO71InU9i2/Sa4UgL
+         F/AxMJVyIgQZtEUKc4lfLGlXK78tpQG8GJApyX088i2+E8np2I5YkpkzdNCPu2jGKG5z
+         q2lU+sEl09Rl8jaem28bLKqhF8wNWW8mZc6xQbn0XpFfryOcxul6ux7gxjPZfpvgQivC
+         gg+5OhTMtLoWjNkBcfYnnBhtvghL5iOgOAeUzyONY/oupZYDRUYfW+aPv2C1SyyY9AsF
+         v6RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780572653; x=1781177453;
+        d=1e100.net; s=20251104; t=1780572954; x=1781177754;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fpp7hpo+duJ5Snlj5PG+EfICta9eCWIZjou+VYQUVQ4=;
-        b=MKa9f1uf1y/+5oyVN1U9gLwwoxB42LUhdY/F6Ovq8GsF2+o6tFFqzXENbZy/PfNCQT
-         OlHuGXLVO1g+DFZl1jMUK/WH1UNfuUzdyo7VHgitO1Ml6WjIQVI2IDRyD5GQpiKmUzD/
-         pz9NIsyrknZmzmYud31QtlmL2gPp9im8EQD8YZ2+r/67lT/vzPHiMqkmTji9GHbwFJYu
-         EYG4K3ja7cuYArJYSk4zb49wDuuBGA4/LE94kz+0bfsRUjqLbEeK+Z6ZZaGeQoX2zfV4
-         qIFejBCR/bRQlhfju5+OoGtpS7v0XMqcGzxrdo2ivRG1y6m/ZRa+7onhP6dqZ7v26w60
-         zKrg==
-X-Forwarded-Encrypted: i=1; AFNElJ+oyu3dMdpmHiT+Lo2842GSXEk3+KJ9RPOD9eloHFIErNSvgDEC0Je3t53yVDImtYWV+q8mQuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydlHueVciYZzX67H3/LvICvUB4XTjnz4hBXBX/2jTXOoUfTbZM
-	CmGr0XObEezh7Nn2ntAf2/1Mih6YqDR5FLXwlItqp9Pi3x3/KgGIL2qgI5lB+qCmRUPmIUdSlmR
-	DNyQK+kUQNN+ZeD+5g6pPyfZCiusueoI=
-X-Gm-Gg: Acq92OFU5eSJNN2bMi1KlDnJy4Az2LxOqn0zOF6+sboYcRfXy7i5NIq5VYmAibByXaZ
-	eEQgpzOgXYbOzGz6zxmPgUVFs2QVcwGbKzBn/xs4h5SvCLKiZ9sDFtkDPKiVsufHG8jO6i0rkM6
-	uWqbNH9RHUFzbNhWdpaO08zVuiOJe9ux97l8FI0AZp1MHIkrIggoD67YQ1sp7sl1iP331lO9Rje
-	pwLjG40jtU2SeSeLMtufHW+4oDMaR+NkxcqcniK6CorvaQMZ3vqBpE4/K7/4ErT+tGsIt1EZu/k
-	BcrV7xrhO2R+vS0M
-X-Received: by 2002:a05:6122:6e0f:b0:5a0:c38e:61a6 with SMTP id
- 71dfb90a1353d-5a6e64b8500mr3995715e0c.8.1780572653233; Thu, 04 Jun 2026
- 04:30:53 -0700 (PDT)
+        bh=yg4x99fBtz+f6aO+UsqxYVWgAGOJf5YpBuFNQpiKhok=;
+        b=bi12az/MSFI6RkczmbGA+j3TEHOsOdKvDbVb0BG0T8XOsklXQT1Q7c2fggXQFMudUF
+         Esb6ZN3uf4mE0dmhEm3La0eOETeOVjGD6bJNipZTLOr8woENMDbtY65HbpvAkNTOHD05
+         U93yg2IJdgfo5DoRFgc7zUp99nafGHh+LfRsCghOirgYxLYqA5aBKADfqH71K3ejI/W2
+         uQ/phrKebbhb8X+m2A7eyiN+OpH1qPXHdzmP+nF4onMVISo7v2WCDaXuOeP1oR52HflZ
+         GMIiSfUdHLq7kbyguK9r24RNXvqukq+jW3Bdsd8eJlG+Spu4xH3MHKu49EE4fPs3nQON
+         NTUQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9C/2L0BMFQsX3ZsxyvKc93w5mxmSXBJxwIeYzQh2mq3Fbb14pAg/zNxZgc2UBGiUgsk7kJ7+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCzjm3dt2Mgpa9A5vusz46ZRnNqcd2F9E6muG1yOkS3zhRWSBX
+	YKBWL9mqvhNtBwrDuMfaG8se0Gs++vITcCyU+iN9zuh6LOULbH18w2Sq+RIuIQpGMkBp/ApOVgS
+	EWbQyi6ymggkHyiCEcDq3/rRZlB+N9T1F2kH79Jlh
+X-Gm-Gg: Acq92OFMnRbo8zfWdBMVcLjWsht/wYcBDA70QxBZKlcyROkiG/saWFTyONqWOQ/X/mP
+	IGUsyTu2/E9qX9hvA4VzUD2ps9S4O6lFUz3Blx577yN6BthqVUgykzuAezlQghoDHXOXyOdFmLs
+	/Lm4sNL1iDFZ8JzIhcxmBlbp+T4VKTOFHCFBf35SqwOVsL91UC3p757WlEYtRiOJBGv0JU5Dhyf
+	H/1vrDcWScUwo/bKaa9YupPSW3GFu9WeCvgtn/wjnwehPIDqLzPaoMgMP8Hn5KavZ8J5NSoD0DG
+	0uFAr9dvGYh9HbHS+7ukd+61SitNhnKHk5FH47NaNycgMZzAgA==
+X-Received: by 2002:ac8:4651:0:b0:516:4f62:85ed with SMTP id
+ d75a77b69052e-51787a79f2dmr9114181cf.18.1780572953224; Thu, 04 Jun 2026
+ 04:35:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260602164635.62517-1-mail@tk154.de> <e80deefc-8467-4ec2-b61e-6cb064802473@intel.com>
-In-Reply-To: <e80deefc-8467-4ec2-b61e-6cb064802473@intel.com>
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Date: Thu, 4 Jun 2026 13:30:42 +0200
-X-Gm-Features: AVVi8CcDjNH2_4RpELI_VLhIrfYWmPteT4vvqOayjCSlCrLru3IZfh7g7MR56sg
-Message-ID: <CAHzn2R2uvJiJM8UNw2+QEU7yqnqdJqcsDo1gBq8FKRBGs9DsDg@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/4] net: mvpp2: fix XDP RX buffer handling
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Til Kaiser <mail@tk154.de>, Russell King <linux@armlinux.org.uk>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+References: <20260531030705.3754389-1-yuyanghuang@google.com>
+ <20260531030705.3754389-3-yuyanghuang@google.com> <20260604102001.GC771160@shredder>
+In-Reply-To: <20260604102001.GC771160@shredder>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Thu, 4 Jun 2026 20:35:16 +0900
+X-Gm-Features: AVHnY4Lb_a_R7bflhmfrKCJj7HqnSgAjEhk1Gu-NoCgjI_cfw2jrUR7vXLGTjks
+Message-ID: <CADXeF1F2E55krqjxHXv3PrhvJ_E1oUnUWg9oZ4pL-M13Ke+fyQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ipv4: igmp: annotate data-races around timer-related fields
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Matteo Croce <mcroce@redhat.com>, 
-	Sven Auhagen <sven.auhagen@voleatech.de>, Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:aleksander.lobakin@intel.com,m:mail@tk154.de,m:linux@armlinux.org.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:mcroce@redhat.com,m:sven.auhagen@voleatech.de,m:lorenzo@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295195-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295197-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[marcinswojtas@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcinswojtas@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[tk154.de,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,voleatech.de,vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1D0A763F7C1
+X-Rspamd-Queue-Id: 6978763F7E1
 
-Hi Tim,
-
-
-=C5=9Br., 3 cze 2026 o 15:55 Alexander Lobakin
-<aleksander.lobakin@intel.com> napisa=C5=82(a):
+On Thu, Jun 4, 2026 at 7:20=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wro=
+te:
 >
-> From: Til Kaiser <mail@tk154.de>
-> Date: Tue,  2 Jun 2026 18:46:31 +0200
+> > Fixes: 1d7138de878d ("igmp: RCU conversion of in_dev->mc_list")
 >
-> > This is v2 of the earlier XDP_PASS fix. The XDP_PASS change is retained=
-,
-> > and the series now also fixes related RX/XDP buffer handling issues fou=
-nd
-> > during review.
-> >
-> > ---
-> > v1: https://lore.kernel.org/all/20260524122334.1730451-1-mail@tk154.de/
-> >
-> > Changes in v2:
-> > - Fixed RX DMA sync range to account for RX headroom.
-> > - Limited XDP frame size to the actual RX buffer size.
-> > - Fixed refill error paths so retired buffers are not returned to BM.
-> >
-> > Til Kaiser (4):
-> >   net: mvpp2: sync RX data at the hardware packet offset
-> >   net: mvpp2: limit XDP frame size to the RX buffer
-> >   net: mvpp2: do not return retired RX buffers to BM
-> >   net: mvpp2: build skb from XDP-adjusted data on XDP_PASS
-> >
-> >  .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 38 ++++++++++++-------
-> >  1 file changed, 25 insertions(+), 13 deletions(-)
->
-> Series:
->
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->
+> Pending Paolo's approval, please drop the Fixes tag given the patch is
+> targeted at net-next.
 
-Tha changes look good, thank you.
+Thanks, will fix it in patch v2.
 
-Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+>
+> [...]
+>
+> > @@ -2964,6 +2964,7 @@ static int igmp_mc_seq_show(struct seq_file *seq,=
+ void *v)
+> >               struct igmp_mc_iter_state *state =3D igmp_mc_seq_private(=
+seq);
+> >               char   *querier;
+> >               long delta;
+> > +             int tm_running;
+>
+> Nit: Please move this above 'delta' for reverse xmas tree ordering
 
-Best regards,
-Marcin
+Thanks, will fix it in patch v2.
 
