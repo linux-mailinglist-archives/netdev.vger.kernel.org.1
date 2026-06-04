@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-295073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6scfKyotIWqGAAEAu9opvQ
-	(envelope-from <netdev+bounces-295073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:45:46 +0200
+	id 5TVFGi0tIWqHAAEAu9opvQ
+	(envelope-from <netdev+bounces-295074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:45:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 068B863DB7E
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0753C63DB83
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:45:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=ucYemEry;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295073-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295073-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b="Z+vN+/sZ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295074-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295074-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B6F43043FFA
+	by sea.lore.kernel.org (Postfix) with ESMTP id CFBCF3044A68
 	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 07:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2843988F9;
-	Thu,  4 Jun 2026 07:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02EF1399897;
+	Thu,  4 Jun 2026 07:42:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB89E394788;
-	Thu,  4 Jun 2026 07:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7493947AB;
+	Thu,  4 Jun 2026 07:42:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780558972; cv=none; b=XKPLn9B4vvhSOOtcJP6K5n2wONomXkcC09eEmR7XssURh5KMfhs5Uywj+joPMBWXTH9RLro63/eoCIlpb/ac3bnoTkXVexo4CRL5MAI9L9n39jvFXYiWbhhLCytu6HQBvux8M6N1Rj8XdM2Rl2SdqM4YQKwSqcK/uK9zc5FLj60=
+	t=1780558972; cv=none; b=b4Euwc0302w4JJNuaDEft1yZDyo9JMdk8u5YX3W1kpwsT8qyYqE5luaqHqaNQWdHgHfoUTQ17xTjXBDXfVyVq6TgqS8oO8AzBJmJVfgcLThPvWt/5A+xnSWUcHJmnWnrdu39MfdqUJJT2WqsPCrUKs2tEb7AVhWG+0yxxKX6JDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780558972; c=relaxed/simple;
-	bh=TnMIemFlNZga1NcA05eZMeODmw+F/dtvCz3ialD0qh8=;
+	bh=+OSl/9Tg8QZDlHSmSofCJZOkgxqpsg/6y0R7twGKNMk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EhmgvjdNbe3VjXI46Lv/GHSID6zxyYUbeJA9L8FN+logQz8jinGJ7Aahed70befq0tl3ab1J9Yo9Rxp+D0UaazcbxSPEzqdyC1FBr4oAIwOS9mQEXoA7p2UnUbHaAgonDDTzTw++9+/kYvJ73x5P969qDfMm1L7t4BT1/VgKyNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=ucYemEry; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6547gCosD206040, This message is accepted by code: ctloc85258
+	 MIME-Version:Content-Type; b=rDdptyJL7GCuMmKddoiEKC+Wulj/ayXhMeLyRAD/no6r4bBPnNk9OUaUXOzOmEQLY3H88FfawJZULSwt9ryS1veCOTfyTNGWmfdxhHn81mChVfFsiMU+qvaCJR3qxTVDFIPdIrEhMryQ7ybnQVvp/8nn/27kUw9dPquhC55pg0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=Z+vN+/sZ; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6547gCotD206040, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
 	s=dkim; t=1780558932;
-	bh=EwdlIooH6T36HcqnKhFk40dIknqRzenkj9VLa93ZvVc=;
+	bh=8EcVsiTJKG7rqcLq7ehM2aQoe+JZYKMbrtZECLfzNMI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=ucYemErynuH/IPO/nn7dJGSWFAw1G8ADxFzbmzB7JxazO5c9VCkJ4FAKeNw/nJW34
-	 KMmmIhjXRwuvzNOh/HGagDPqjnq/SkigAoogllCpLBX8SoCubIdouEJeGsD5ZbNdo2
-	 oGW60aWlN+VtgfGrSV0ys0MLLNJRzI1RXjztTr5ep7ez2stx8wk8x7pM/BR+AW37SS
-	 krgegkyIbwzqEuxeW0wUl4XtE0FLY8bidUrP10rgBmzu9D8QIDQVt+WO/JbJfMu7rT
-	 f9mwX/1MwbZXFnWqkklR9aIWsajjGF1Vz4C6WxQ5uOZR7gyIRp08DRH3NcfZFL8v25
-	 La2KNGoAfAxEw==
+	b=Z+vN+/sZCCH+KehYLeZZmgNgH2+72gcZH23XPYkIlSsdrluAZoCK6+0KUZItnOExK
+	 9X+z6T5FuF+o4ChrgOclTsajiRdiktRNWH4VbeHlFJj3+a0PfuNqzZ+wDjlcblB4ZY
+	 sSq2ZmSNO+jI9SwaoejBth0pLLRZ2SWbCKzz2QVX8WgxOs7B3h5mawQO5PtFK0/d/s
+	 kCedUMbOU+9ebQ57s/LqNO52LVrk9ieuT5vQgXKiPJRFZlJJn3ySqNtmhUPUh2rYqP
+	 sXl9ktRkPVReVjgyWUvdffcMFyM65oQcZnARz5zcW3f0JKN5orvmQhAV2+QMtgbOcK
+	 5ZRnqN+BgS/qw==
 Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6547gCosD206040
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6547gCotD206040
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
 	Thu, 4 Jun 2026 15:42:12 +0800
 Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
@@ -64,9 +64,9 @@ To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v2 1/4] net: phy: c45: add genphy_c45_soft_reset()
-Date: Thu, 4 Jun 2026 15:42:06 +0800
-Message-ID: <20260604074209.93-2-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v2 2/4] net: phy: c45: add genphy_c45_config_master_slave()
+Date: Thu, 4 Jun 2026 15:42:07 +0800
+Message-ID: <20260604074209.93-3-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260604074209.93-1-javen_xu@realsil.com.cn>
 References: <20260604074209.93-1-javen_xu@realsil.com.cn>
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295073-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295074-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -112,68 +112,91 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 068B863DB7E
+X-Rspamd-Queue-Id: 0753C63DB83
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-Add a generic Clause 45 software reset helper. The helper sets the reset
-bit in the PMA/PMD control register and waits until the bit is cleared by
-hardware.
+Add a generic helper to configure forced master/slave mode for Clause 45
+PHYs using the 10GBASE-T AN control register.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
 Changes in v2:
  - no changes, new file
 ---
- drivers/net/phy/phy-c45.c | 22 ++++++++++++++++++++++
+ drivers/net/phy/phy-c45.c | 32 ++++++++++++++++++++++++++++++++
  include/linux/phy.h       |  1 +
- 2 files changed, 23 insertions(+)
+ include/uapi/linux/mdio.h |  2 ++
+ 3 files changed, 35 insertions(+)
 
 diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 126951741428..216a2cb9e3f0 100644
+index 216a2cb9e3f0..bbab5586c348 100644
 --- a/drivers/net/phy/phy-c45.c
 +++ b/drivers/net/phy/phy-c45.c
-@@ -330,6 +330,28 @@ int genphy_c45_an_disable_aneg(struct phy_device *phydev)
+@@ -352,6 +352,38 @@ int genphy_c45_soft_reset(struct phy_device *phydev)
  }
- EXPORT_SYMBOL_GPL(genphy_c45_an_disable_aneg);
+ EXPORT_SYMBOL_GPL(genphy_c45_soft_reset);
  
 +/**
-+ * genphy_c45_soft_reset - software reset the PHY via Clause 45 PMA/PMD control register
++ * genphy_c45_config_master_slave - Configure Master/Slave setting for C45 PHYs
 + * @phydev: target phy_device struct
 + *
-+ * Return: 0 on success, negative errno on failure.
++ * Description: Configures the Master/Slave manual setting in the
++ * 10GBASE-T control register (MMD 7, Register 0x0020) according to
++ * IEEE 802.3 standards.
 + */
-+int genphy_c45_soft_reset(struct phy_device *phydev)
++int genphy_c45_config_master_slave(struct phy_device *phydev)
 +{
-+	int ret, val;
++	u16 val = 0;
 +
-+	ret = phy_set_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1,
-+			       MDIO_CTRL1_RESET);
-+	if (ret < 0)
-+		return ret;
++	switch (phydev->master_slave_set) {
++	case MASTER_SLAVE_CFG_MASTER_FORCE:
++		val = MDIO_AN_10GBT_CTRL_MS_ENABLE | MDIO_AN_10GBT_CTRL_MS_VALUE;
++		break;
++	case MASTER_SLAVE_CFG_SLAVE_FORCE:
++		val = MDIO_AN_10GBT_CTRL_MS_ENABLE;
++		break;
++	case MASTER_SLAVE_CFG_UNKNOWN:
++	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
++	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
++	default:
++		break;
++	}
 +
-+	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PMAPMD,
-+					 MDIO_CTRL1, val,
-+					 !(val & MDIO_CTRL1_RESET),
-+					 5000, 100000, true);
++	return phy_modify_mmd_changed(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
++				      MDIO_AN_10GBT_CTRL_MS_ENABLE |
++				      MDIO_AN_10GBT_CTRL_MS_VALUE, val);
 +}
-+EXPORT_SYMBOL_GPL(genphy_c45_soft_reset);
++EXPORT_SYMBOL_GPL(genphy_c45_config_master_slave);
 +
  /**
   * genphy_c45_restart_aneg - Enable and restart auto-negotiation
   * @phydev: target phy_device struct
 diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 199a7aaa341b..25a66320df56 100644
+index 25a66320df56..d9c8c86e2d81 100644
 --- a/include/linux/phy.h
 +++ b/include/linux/phy.h
-@@ -2309,6 +2309,7 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed);
- /* Clause 45 PHY */
+@@ -2310,6 +2310,7 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed);
  int genphy_c45_restart_aneg(struct phy_device *phydev);
  int genphy_c45_check_and_restart_aneg(struct phy_device *phydev, bool restart);
-+int genphy_c45_soft_reset(struct phy_device *phydev);
+ int genphy_c45_soft_reset(struct phy_device *phydev);
++int genphy_c45_config_master_slave(struct phy_device *phydev);
  int genphy_c45_aneg_done(struct phy_device *phydev);
  int genphy_c45_read_link(struct phy_device *phydev);
  int genphy_c45_read_lpa(struct phy_device *phydev);
+diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
+index b2541c948fc1..2f36005b3133 100644
+--- a/include/uapi/linux/mdio.h
++++ b/include/uapi/linux/mdio.h
+@@ -332,6 +332,8 @@
+ #define MDIO_AN_10GBT_CTRL_ADV2_5G	0x0080	/* Advertise 2.5GBASE-T */
+ #define MDIO_AN_10GBT_CTRL_ADV5G	0x0100	/* Advertise 5GBASE-T */
+ #define MDIO_AN_10GBT_CTRL_ADV10G	0x1000	/* Advertise 10GBASE-T */
++#define MDIO_AN_10GBT_CTRL_MS_ENABLE	0x8000	/* Master/slave manual config enable */
++#define MDIO_AN_10GBT_CTRL_MS_VALUE	0x4000	/* Master/slave config value (1=Master) */
+ 
+ /* AN 10GBASE-T status register. */
+ #define MDIO_AN_10GBT_STAT_LP2_5G	0x0020  /* LP is 2.5GBT capable */
 -- 
 2.43.0
 
