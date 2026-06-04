@@ -1,315 +1,217 @@
-Return-Path: <netdev+bounces-295250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8kxADOmDIWpHHwEAu9opvQ
-	(envelope-from <netdev+bounces-295250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:55:53 +0200
+	id CcwwCzmAIWooHgEAu9opvQ
+	(envelope-from <netdev+bounces-295251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:40:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE4FE64094D
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:55:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CFEF64069F
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:40:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=GSGCo7IO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295250-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295250-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=ti.com header.s=selector1 header.b=liS2kETx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295251-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295251-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=ti.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9438A30EFB4A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 13:39:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BF3B830607E0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 13:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2547B47DD60;
-	Thu,  4 Jun 2026 13:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C343B47DF9A;
+	Thu,  4 Jun 2026 13:39:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010045.outbound.protection.outlook.com [52.101.85.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9920B42DFE1
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 13:39:48 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780580390; cv=none; b=kBM60MLMCruPPofJkqNxhdNjZcleYPG6s6Lut/YXpTPUVGdcn2UftuJtxdM3cY3CqZI7VyXU3jTkZHfKR5ITIvNnd53XxZ7I9d+3yjbA3/tvKVfz/f6eXHAO72PUgVq7+EDiK+bfsxzp4tqgY07KReivOn9fOC87RjD8D84x8B4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780580390; c=relaxed/simple;
-	bh=PuiSfB+WWfQz7daTjBKFBNcRktJZ7+As3yZ6A7uLbLE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tSKPDhuFKHLVeWfStwPN2NnXNfAudFwG39Hx+krLjuFM0r5/me98bd9KIxMuLo67LxdlcY7XhzGS+Yrc8ITRSHFzJLxCd0EVNgQgfsLq6yQJ3XWvbn2P3hZ7rZUmB7SXG+1LFbnZi/yC5xcnNqWzG+f50LSod/3Dhj2Ok98OvVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GSGCo7IO; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780580387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p4xCPaErfSPl/FhuiLk2OH2ArqCMXjkbm8he/8C5wbw=;
-	b=GSGCo7IObybd+Bv991WlbdczLdhLXTTxONBbg8HcFxFaxk64H7Z8/h25Crgd3a48hQr4Ad
-	CoDL2tEIgNbPjgm4l6YXn76CguBzaa1WmyTbR7Vbn2ot34kXGmh3QBtl/zpYypq/K7YQ8f
-	2mtkPJkvLGGUQPJc5VGw+0uvVI0D7nE=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-112-rDmLFS-eMs6UCiV-dGrKrg-1; Thu,
- 04 Jun 2026 09:39:44 -0400
-X-MC-Unique: rDmLFS-eMs6UCiV-dGrKrg-1
-X-Mimecast-MFC-AGG-ID: rDmLFS-eMs6UCiV-dGrKrg_1780580382
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 427CB195608C;
-	Thu,  4 Jun 2026 13:39:41 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.49.23])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3E98530001A1;
-	Thu,  4 Jun 2026 13:39:36 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: m.lobanov@rosa.ru
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	mail@david-bauer.net,
-	jchapman@katalix.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH net-next v9] l2tp: fix double dst_release() on sk_dst_cache race
-Date: Thu,  4 Jun 2026 15:39:31 +0200
-Message-ID: <20260604133931.211224-1-pabeni@redhat.com>
-In-Reply-To: <20260601213302.18761-1-m.lobanov@rosa.ru>
-References: <20260601213302.18761-1-m.lobanov@rosa.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357FE47DF86;
+	Thu,  4 Jun 2026 13:39:50 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780580392; cv=fail; b=Q2RYjwW7lx8AZz/YNEZ+aAEAt9344wC4gup7A3dRUlq06B2bjwHzfSTK8/IaVoYbPrx59QmxeF++Id5lPERd7JGiSTP3sXkTSRc6ki+YbXXZd0n/SypYKK9oGDzJGFkbdJ/GNt4bCY6KAaj8kvKq29zcw6gd4EyfxMklvzIFNow=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780580392; c=relaxed/simple;
+	bh=iS9yO9rxjMD/7WId2FV+MKAPCazXK849m4CYTSMUGD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hgIwwZPJiYEeYsuweIhY91mAUccU34M/mxnal8pm/MbeUlWTgA/ucg1Pu6QNinWpIQhpCAXClEMExyS+3LGz4AuH/tAcrxWwyHIAWc05IuiZVfNxRb10bQXoGLgIlaLFypZE9BFrbgDeHMwJBSa01EQrZdnnnyLjFZTIwNEG7gs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=liS2kETx; arc=fail smtp.client-ip=52.101.85.45
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Oc8WpnnjuohM9neMbS1CPeGkbDR3gN5uAmkMb0O/WfgeKYkXl6axwpDAVDoox2mbPze1QGo0j7YoHh51LSdFddJn9kTz315tUqKxSypKS24YK/uf4vsWUkp58xM2qPgtRKaWUsdu/rXLO0iF3HAeK5A4Wf4QXvmqRWBStr3zhIiHKFtxMDMSGwY1IDlvihsYbm1puWk7b2HOGJhu4sGnlfKWLmZFkcxvSARvD6LFZbQTXTv960HOzyM01/T/u4LPXdkYAQq+NcbxMYNoiZT4bxpS8G6ptmUqWAkjbsMYmCbLSU0RiHAn+tonvqq3m0M3FWS8uhpbIVEOZepilwwgZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZkLny3c8lG0NHpQ9QLnewkOtgOyTX6LzNdoiDnbRtQU=;
+ b=GXzPKU2F8IDt+KO+HKhiBKnqGXUAK2YfuuvT1/HyAjvcLXazpnyv+jRMKC5Tcl2juGENHqgIbMZpBmv+w9hklNyrZ1BuywkpdC090QYruoellAff7eoXiGRl/jsHPz1ThZ7dGJOQIUKGmsL4e+NbHZGotiQu95/ADnD7ZHBoFkwQNa3DaTXSBZEmr+X0kJM0pwxWkofOl3KMvareAJ4YjTxI/y9Jbpy5BTi2TOEhj40rFbcsVqc0Z7tVgvV+JMe2o94BkFC1Rq9Hc5TbMR6j4Iuo4DXKCl4AJa0oEHYlI09vSAcjSDzE6joC8vzJLR1HRSdvahjlZ9QxYRvHljgNGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZkLny3c8lG0NHpQ9QLnewkOtgOyTX6LzNdoiDnbRtQU=;
+ b=liS2kETxNQ6xMyhfpxnjImt7GTp+8qcNehEdhUOhZ2NkDlyc5nNGW0W4fcCNiVn/rySDh8hHFSm9tRpYhlQnxxWgz7RaFKk7IMQcMPG0H4Fjws8xA+5RQv8xlpmB9eBdAsAQfPpWdCr/+0D1294O46MR9vY3xTDJAqvPqrBUaG4=
+Received: from SJ0PR03CA0047.namprd03.prod.outlook.com (2603:10b6:a03:33e::22)
+ by PH7PR10MB5745.namprd10.prod.outlook.com (2603:10b6:510:125::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Thu, 4 Jun 2026
+ 13:39:49 +0000
+Received: from BY1PEPF0001AE18.namprd04.prod.outlook.com
+ (2603:10b6:a03:33e:cafe::23) by SJ0PR03CA0047.outlook.office365.com
+ (2603:10b6:a03:33e::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.8 via Frontend Transport; Thu, 4
+ Jun 2026 13:39:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ BY1PEPF0001AE18.mail.protection.outlook.com (10.167.242.100) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.5 via Frontend Transport; Thu, 4 Jun 2026 13:39:49 +0000
+Received: from DLEE201.ent.ti.com (157.170.170.76) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Thu, 4 Jun
+ 2026 08:39:48 -0500
+Received: from DLEE211.ent.ti.com (157.170.170.113) by DLEE201.ent.ti.com
+ (157.170.170.76) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Thu, 4 Jun
+ 2026 08:39:48 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE211.ent.ti.com
+ (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
+ Transport; Thu, 4 Jun 2026 08:39:48 -0500
+Received: from [172.24.231.93] (ti.dhcp.ti.com [172.24.231.93])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 654DdgMH4007609;
+	Thu, 4 Jun 2026 08:39:42 -0500
+Message-ID: <86d2c8b6-4240-4ac7-aca1-915d330cddf4@ti.com>
+Date: Thu, 4 Jun 2026 19:09:41 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 0/2] Add Frame Preemption MAC Merge support
+ for ICSSG
+To: Simon Horman <horms@kernel.org>
+CC: <liuhangbin@gmail.com>, <haokexin@gmail.com>, <vadim.fedorenko@linux.dev>,
+	<devnexen@gmail.com>, <jacob.e.keller@intel.com>, <arnd@arndb.de>,
+	<afd@ti.com>, <basharath@couthit.com>, <parvathi@couthit.com>,
+	<vladimir.oltean@nxp.com>, <rogerq@kernel.org>, <danishanwar@ti.com>,
+	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <srk@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>
+References: <20260525182700.3135858-1-m-malladi@ti.com>
+ <20260527115755.GK2256768@horms.kernel.org>
+Content-Language: en-US
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <20260527115755.GK2256768@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE18:EE_|PH7PR10MB5745:EE_
+X-MS-Office365-Filtering-Correlation-Id: bb1ad85a-450e-4b68-7ccf-08dec23ebfc6
+X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700016|1800799024|82310400026|3023799007|18002099003|22082099003|5023799004|4143699003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	xIcDT3b2sHdyS8tvsZgaxpY896FgT8xOfu6pizj1ElIKzyvVOch4tYAGE/vC2UhscKj8kvp1lK7uW2N0IwPtbLVxwFlpjqoQIuYRtzke+ZivKxC4iEaz6+JoMSePJpZp9a8Y+25oRipZo+Zq7EKdpMcXTMgC8z1nilIcGa6+GtOU0SRVb1x5HLGI8zgTPgGjORMhniWpixkh8m17tqd4U/9LVFDp8Erxkij/W27CFaHAo0LPNLLg/jGkaGGQl4qhJSyr7s9ehNbI2pKYSqzRh0thIAGDW1LgMKDOZJfndypCwipoh4cvLH+lnRKOJ/6F2hfUamAj6aEqMYK73tQIxAJvhinDA6isWwEnBICc67JbKi03Dx4v27qBjtUNGcwSwQrBLGtGSWzpAFvVYN8fwPO2RD4FEJ8lKJN6Tc+aLXEYilZ0XDcgCcQ+oTgwNlknA0rFKWMMT2Hglp/ZRuEKSXxNEMLXk5SE9VfIycVJoOY6FlC0Y71N3QFOhg2Ibswp+LzHwZOGn7F0KxL0gGf6R9bYGYgI5B19xT61ydvHe4Dc7IiuAuZeYEpdXiUA+sw/p+WwFYGbMbPF6MJ/Kaa0JFlODhBVW1mgyhy72OHSV29RYyW9THbUxQFjBGeuC4YIrQFzfnda5vBG83KbepJi4m7wBmhDXk8IBXoGvMGJ4Zo9JuA8EwNowV02AYI058sf
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700016)(1800799024)(82310400026)(3023799007)(18002099003)(22082099003)(5023799004)(4143699003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	bxGV3sBmy5Gq9DEC9sbTaHWM0xEnWsbzXQubDaSxYD1HcGpIMsxUqgkXQ5SGjoVLrUd2/O4ombHcWZ4bABGUlK5D6am+y74yr21kZimHXUrSorJ5faworBo3PSllvqRb4S2gWi0QwD+/n5ZVv/CVdrY1Bb6HUVsv/8lFVQ7OFifTRQmqsSMcBu9awM8Pp6W/QZO+vrze/aWsCcX2bn7JVIFYJgCGvKUFV87SRc4q+OMqBQKZ4X3KPCOYGbjQ8okqcP+cA+FCxaJHLSHnFNxuOlWQM2DTtY50+GNVZ3MKXyvOFgslG6GXxhaP1Hl4TCCS0hPlIXSVxVH2f4FUQerYLBB7jYFuVRjp+Hr58LEsHVcT1dtuBEdNanAgoOVrjbP2JEuQWy3fyV8n1sT0/CBAuP6aYRVuFCRpXV8QvADSXTALHWQdmC7wVAPiMmdZjFhV
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2026 13:39:49.2727
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb1ad85a-450e-4b68-7ccf-08dec23ebfc6
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BY1PEPF0001AE18.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5745
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295251-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295250-lists,netdev=lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:m.lobanov@rosa.ru,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:mail@david-bauer.net,m:jchapman@katalix.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sashiko.dev:url,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	FORGED_SENDER(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:liuhangbin@gmail.com,m:haokexin@gmail.com,m:vadim.fedorenko@linux.dev,m:devnexen@gmail.com,m:jacob.e.keller@intel.com,m:arnd@arndb.de,m:afd@ti.com,m:basharath@couthit.com,m:parvathi@couthit.com,m:vladimir.oltean@nxp.com,m:rogerq@kernel.org,m:danishanwar@ti.com,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:srk@ti.com,m:vigneshr@ti.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,intel.com,arndb.de,ti.com,couthit.com,nxp.com,kernel.org,redhat.com,google.com,davemloft.net,lunn.ch,lists.infradead.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[ti.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BE4FE64094D
+X-Rspamd-Queue-Id: 9CFEF64069F
 
-From: AI Reviewer <ai@example.com>
+Hi Simon,
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-l2tp: fix double dst_release() on sk_dst_cache race
+On 5/27/26 17:27, Simon Horman wrote:
+> On Mon, May 25, 2026 at 11:56:58PM +0530, Meghana Malladi wrote:
+>> This patch series adds QoS support to the ICSSG PRUETH driver.
+>> The first patch implements mqprio qdisc handling and TC offload hooks
+>> so userspace can request TC mappings and queue counts.
+>>
+>> It also integrates a driver-side mechanism to program the firmware
+>> with the IET/FPE preemption mask and to kick the firmware verify state
+>> machine when frame preemption is enabled. The second patch adds ethtool
+>> perations for the MAC Merge (Frame Preemption) sublayer, exposing .get_mm,
+>> .set_mm and .get_mm_stats so admins can view and change MAC Merge
+>> parameters and retrieve preemption statistics.
+>>
+>> v5: https://lore.kernel.org/all/20260430111723.497113-1-m-malladi@ti.com/
+>>
+>> MD Danish Anwar (2):
+>>    net: ti: icssg-prueth: Add Frame Preemption MAC Merge support
+>>    net: ti: icssg-prueth: Add ethtool ops for Frame Preemption MAC Merge
+> 
+> Hi Meghana and MD,
+> 
+> There is another round of AI-generated reviews for this patch-set available at
+> https://netdev-ai.bots.linux.dev/ and https://sashiko.dev/
+> 
+> I would appreciate it if you could look over them and address any
+> issues that are either introduced by this patch-set, or directly
+> impact it.
+> 
 
-This commit reworks the L2TP transmit path to stop using
-inet6_csk_xmit() for IPv6 and to pre-route IPv4 packets via a new
-helper, with the goal of avoiding a double dst_release() race between
-sk_dst_check() and __sk_dst_check() on sk->sk_dst_cache observed under
-pppol2tp traffic. New helpers l2tp_xmit_ipv6() and l2tp_xmit_ipv4()
-replace the former inet6_csk_xmit() / ip_queue_xmit() calls in
-l2tp_xmit_queue().
+Yeah I am working on it, though some of them seem to be false positives, 
+some actually made sense. Hopefully I will fix all of them without 
+introducing anything new in my next version.
 
-A few questions on the new helpers below.
-
-> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-> index f940914959b1..54e837fec201 100644
-> --- a/net/l2tp/l2tp_core.c
-> +++ b/net/l2tp/l2tp_core.c
-> @@ -1205,19 +1205,114 @@ static int l2tp_build_l2tpv3_header(struct l2tp_session *session, void *buf)
->  	return bufp - optr;
->  }
->  
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +static int l2tp_xmit_ipv6(struct sock *sk, struct sk_buff *skb)
-> +{
-> +	struct ipv6_pinfo *np = inet6_sk(sk);
-> +	struct inet_sock *inet = inet_sk(sk);
-> +	struct in6_addr *final_p, final;
-> +	struct ipv6_txoptions *opt;
-> +	struct dst_entry *dst;
-> +	struct flowi6 fl6;
-> +	int err;
-
-[ ... ]
-
-> +	dst = ip6_sk_dst_lookup_flow(sk, &fl6, final_p, true);
-> +	if (IS_ERR(dst)) {
-> +		rcu_read_unlock();
-> +		kfree_skb(skb);
-> +		return NET_XMIT_DROP;
-> +	}
-
-[Medium]
-Should this error path return a negative errno rather than
-NET_XMIT_DROP?
-
-l2tp_xmit_queue() converts the result of this function with:
-
-	return err >= 0 ? NET_XMIT_SUCCESS : NET_XMIT_DROP;
-
-NET_XMIT_DROP is 0x01 (a positive value), so the wrapper takes the
-err >= 0 branch and returns NET_XMIT_SUCCESS even though the skb has
-already been freed via kfree_skb(). l2tp_xmit_skb() then bumps
-session/tunnel tx_packets and tx_bytes (rather than tx_errors) for a
-packet that never went out.
-
-The IPv4 sibling l2tp_xmit_ipv4() returns -EHOSTUNREACH on the
-analogous failure, and the inet6_csk_xmit() being replaced returned
-PTR_ERR(dst) (negative) here. Returning PTR_ERR(dst) or -EHOSTUNREACH
-would let the wrapper map this to NET_XMIT_DROP and have
-l2tp_xmit_skb() count it as an error.
-
-> +
-> +	skb_dst_set(skb, dst);
-> +	fl6.daddr = sk->sk_v6_daddr;
-> +
-> +	err = ip6_xmit(sk, skb, &fl6, READ_ONCE(sk->sk_mark),
-> +		       opt, np->tclass,
-> +		       READ_ONCE(sk->sk_priority));
-> +	rcu_read_unlock();
-> +	return err;
-> +}
-> +#endif
-> +
-> +static int l2tp_xmit_ipv4(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
-> +{
-> +	struct inet_sock *inet = inet_sk(sk);
-> +	struct net *net = sock_net(sk);
-> +	struct ip_options_rcu *inet_opt;
-> +	struct flowi4 *fl4;
-> +	struct rtable *rt;
-> +	__u8 tos;
-> +	int err;
-> +
-> +	rcu_read_lock();
-> +	inet_opt = rcu_dereference(inet->inet_opt);
-> +	fl4 = &fl->u.ip4;
-> +	tos = READ_ONCE(inet->tos);
-> +
-> +	rt = dst_rtable(sk_dst_check(sk, 0));
-
-[High]
-Does the cache-hit path leak a reference on the cached dst?
-
-sk_dst_check() ultimately calls sk_dst_get(), which does
-rcuref_get(&dst->__rcuref) and returns a dst with a caller-owned +1
-reference.
-
-> +	if (!rt) {
-> +		__be32 daddr = inet->inet_daddr;
-> +
-> +		if (inet_opt && inet_opt->opt.srr)
-> +			daddr = inet_opt->opt.faddr;
-> +
-> +		rt = ip_route_output_ports(net, fl4, sk,
-> +					   daddr, inet->inet_saddr,
-> +					   inet->inet_dport,
-> +					   inet->inet_sport,
-> +					   sk->sk_protocol,
-> +					   tos & INET_DSCP_MASK,
-> +					   READ_ONCE(sk->sk_bound_dev_if));
-> +		if (IS_ERR(rt)) {
-> +			rcu_read_unlock();
-> +			IP_INC_STATS(net, IPSTATS_MIB_OUTNOROUTES);
-> +			kfree_skb_reason(skb, SKB_DROP_REASON_IP_OUTNOROUTES);
-> +			return -EHOSTUNREACH;
-> +		}
-> +
-> +		sk_setup_caps(sk, &rt->dst);
-> +	}
-> +
-> +	skb_dst_set_noref(skb, &rt->dst);
-> +	rcu_read_unlock();
-> +
-> +	err = ip_queue_xmit(sk, skb, fl);
-> +	return err;
-> +}
-
-[High]
-Continuing on the cache-hit path: skb_dst_set_noref() stores the
-pointer with SKB_DST_NOREF and explicitly does not consume a
-reference, and ip_queue_xmit()/__ip_queue_xmit() only drop noref-
-flagged dsts via skb_dst_drop()/refdst_drop without releasing a
-reference. The +1 reference returned by sk_dst_check() is never put.
-
-For comparison, net/ipv4/udp.c:udp_sendmsg() uses the same idiom and
-explicitly calls ip_rt_put(rt) at its out: label to release this
-reference. The previous behaviour relied on __ip_queue_xmit() using
-__sk_dst_check() (the no-ref variant), which avoids this issue. Should
-this helper also call ip_rt_put(rt) (or equivalent) on its way out?
-
-Note that sk_dst_reset() drops only the cache's own ref, so the
-leaked refs persist past socket close and the cached dst is never
-freed, which appears to make this an unbounded leak under user-driven
-sendmsg loops.
-
-[Critical]
-On the cache-miss path, can the rtable be freed before
-__ip_queue_xmit() dereferences it?
-
-ip_route_output_ports() returns rt with a +1 reference. sk_setup_caps()
-calls sk_dst_set(), which xchg's sk_dst_cache and dst_releases the old
-entry but does not take a new reference on the new rt; the caller's +1
-ref is consumed by being installed into the cache slot.
-
-After sk_setup_caps(), rt's only liveness anchor is sk->sk_dst_cache.
-The function then does:
-
-	skb_dst_set_noref(skb, &rt->dst);
-	rcu_read_unlock();
-
-	err = ip_queue_xmit(sk, skb, fl);
-
-__ip_queue_xmit() takes its own rcu_read_lock(), starting a new
-critical section. In the gap between rcu_read_unlock() here and the
-new rcu_read_lock() inside __ip_queue_xmit(), an RCU grace period can
-complete on this CPU.
-
-A concurrent sk_dst_reset() (from a route update, sockopt, or another
-lockless caller observing the dst as obsolete, similar to the
-udpv6_sendmsg pattern described in the commit message) can xchg
-sk_dst_cache to NULL and dst_release(rt), dropping the refcount 1->0
-and queueing the rtable for free via call_rcu_hurry / dst_destroy_rcu.
-If the grace period elapses in the rcu_read_unlock window, the rtable
-is freed before __ip_queue_xmit() dereferences skb_rtable(skb)
-(rt_uses_gateway, rt->dst, ...) at the packet_routed label.
-
-skb_dst_set_noref() requires an unbroken RCU read-side critical
-section spanning the entire skb consumption, which is the invariant
-__ip_queue_xmit() itself maintains (its rcu_read_lock() spans
-skb_dst_set_noref through ip_local_out). Should this helper either
-hold rcu_read_lock() across the ip_queue_xmit() call, or take a real
-reference (skb_dst_set() with dst_hold(), or skip the noref path) so
-that rt cannot be freed during the handoff?
--- 
-This is an AI-generated review.
+> I would not suggest expanding this patchset to address any other
+> pre-existing issues, but rather address them separately as appropriate.
 
 
