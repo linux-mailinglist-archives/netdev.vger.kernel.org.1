@@ -1,2033 +1,234 @@
-Return-Path: <netdev+bounces-295385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295386-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zQEXI3HGIWpSNQEAu9opvQ
-	(envelope-from <netdev+bounces-295385-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 20:39:45 +0200
+	id 3HxeO2jGIWpLNQEAu9opvQ
+	(envelope-from <netdev+bounces-295386-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 20:39:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC6C6429E1
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 20:39:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC7E36429D3
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 20:39:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295385-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295385-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=sony.com (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=qRV7r2vy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295386-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295386-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 666083059876
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 18:38:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2096E3012E59
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 18:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386402D8382;
-	Thu,  4 Jun 2026 18:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113A03093B8;
+	Thu,  4 Jun 2026 18:39:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010051.outbound.protection.outlook.com [40.93.198.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7AE3BADB6
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 18:38:21 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780598309; cv=none; b=PsNAWNMsAYx3KH08geqaJADUhregnxA/EHpB3eiMLYBTHQWrcajbbbyTVZQ6WsZF1qZTMqUWlXdys+Mpd3/AgCh4IRFrRD/qSqe7bo1008PElCkZsp+C8O4+h1IXY85HX2x8i0pUIwxcA5YBHUKitxCSPz6hGa1eGOn2Ur75/BU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780598309; c=relaxed/simple;
-	bh=1HG6kzHahQXFVIYKaqVrDPEzpIjS4BjraipHNe1c8Ug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KCkE3GK+M+Fwx+VU0oTS7AysriKlsFkJtzUlx76znY//dl7gdC3vNFTPacG1bph9Amss24NoA9RLtkfCmOjo1B1ZbzJjc70yxhhMQHx5EgB5o0e/WifUpq2ElRGcm5cAk446DMc8cuXMAkZlcPaE2XKG/g5IHgbiw4vUjQVwVa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sony.com; spf=fail smtp.mailfrom=sony.com; arc=none smtp.client-ip=44.202.169.39
-Received: from eig-obgw-6002b.ext.cloudfilter.net ([10.0.30.203])
-	by cmsmtp with ESMTPS
-	id UT1nwm8qkVGUKVCxKwwLnk; Thu, 04 Jun 2026 18:38:14 +0000
-Received: from host2044.hostmonster.com ([67.20.76.238])
-	by cmsmtp with ESMTPS
-	id VCxKw4VhFfpvWVCxKw5juE; Thu, 04 Jun 2026 18:38:14 +0000
-X-Authority-Analysis: v=2.4 cv=Y6j4sgeN c=1 sm=1 tr=0 ts=6a21c616
- a=O1AQXT3IpLm5MaED65xONQ==:117 a=QeWor2tdjpy9U23wdFvjzw==:17
- a=FelO9ux0wxsA:10 a=z6gsHLkEAAAA:8 a=ALmvj29gwPS_8lg63cMA:9
- a=seGktVK47h5ljF7J:21 a=RVmHIydaz68A:10 a=iekntanDnrheIxGr1pkv:22
-Received: from [66.118.44.127] (port=42740 helo=timdesk.home.local)
-	by host2044.hostmonster.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.2)
-	(envelope-from <tim.bird@sony.com>)
-	id 1wVCxJ-00000001WL1-1y38;
-	Thu, 04 Jun 2026 12:38:13 -0600
-From: Tim Bird <tim.bird@sony.com>
-To: jmaloy@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: tim.bird@sony.com,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-spdx@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] tipc: Add SPDX id lines to source files
-Date: Thu,  4 Jun 2026 12:38:05 -0600
-Message-ID: <20260604183805.747630-1-tim.bird@sony.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A9A3502A6
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 18:39:30 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780598372; cv=fail; b=TyEuMiMAljYX09iZczzPRqd9/dcF9xS3O6F02fKD6sCDkLCYZtXqWCR8Wh/Hvan/QBeJGCdKHKijGWttfSvLwOp55tq+PAeX3ICUyZ70cdSpUt3MalI/51CQe+FuY8DlU2bMT0f+Gw3/pkrCMavNsYj8ZxvwPRorIAVBKNYvbRg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780598372; c=relaxed/simple;
+	bh=8auyhZTyn+I8528vPJFGWVVwZhh7gW5aEwd/mJY1DdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UvDdst1DO9r+F0tfX4Uwm9lcoTNrkL+6U66dAgkz18CtNXIEPfz9ttFMRg0JjELBbPmNoKRD2RZg1NGIlFyRAMkMopBca3GeAy/2FYIrZcUamDA4t8iouhv4LwURySYQcBiq6f2M8UoPyVLSAbAQpuNgesWqtPs4YGix1KfqASM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qRV7r2vy; arc=fail smtp.client-ip=40.93.198.51
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CHvhuzCh9RQ5sLmHebqnYZedvs/P2FUXqsiPSGiNXgvFUTLBsFhnnT2t009B6SqljSGr9xgrE4fUJEc8fYDmhteVTYecnry9ouQiWndEUKxgJlGxI/ugzGKJpJX3to2xXBHyRhZBk9ACU3tQipa+Q3vjMtWjuTi2dI13vWDsqgxaJzlxcKkPQb7DLz7gl96ypsVFuwEFCwVskx8O6NWLX2Fmn+vZvUfjvZj2QSvyI/vEJr/u9tr/0OISwhWw+YsW/QbyDrKEhDFW5wGUx0mldwSMuNbVqeTtQxiUfqI36+MCH0h4oyMdzKQb234m+vETBvJecpPegfVuLkDeteNxlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8NxyZ6oXnr077W40FTua6OroSvt4PMjwANvEssyZ/48=;
+ b=vox/wtMQ7QwqL5ucLESTiYlxc9Wsb3vlV+Cy9A9RwXuSLOgI/2Xig8Bpiflp3Z0vL2cgO2f47vSxlz+83hrdbbAVTvmTbwDcF6N9jCvC9TkhSy2PEgSz2zHveagPuetlyHEJ5tRZA6eUrlsMcVvTjFAM2wOrIjM82CHzUwPdXxHrQYAYSVrNYClSIkb3Xgb1Eu3qxPLx5mzkMx1ncNGfLnVC8aE6pnuZMH2ao6o1fUIshg/rjB40ESnqKsnrDe66ZKys/5VcxJ5qg4N9T5Pftioc3Rf4AIdiYNBJgr7iZQZI2wAYVAazF1F/zBC7ExcmulMQBh1gy4569Qo7ZoqTLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8NxyZ6oXnr077W40FTua6OroSvt4PMjwANvEssyZ/48=;
+ b=qRV7r2vycGtyFmyGfPHEgY7bPWD6PSI4PpAYB0kSTGQXf6YVJj0tUakgH44RTJr0Z92lxQiCfBNaH3gHxV+1VxuUEXGw7T7eMHADVa3+Lt7PSGqjC2Rp6rxMYFyXJRRtCPyLpU+ePusd/5YAjRiuFv6W47AkaprCgvl+Ifr4ByY7I/nkY1y7WyR1VOHC4DLsNKytm624qyh4Gioe5kmoEidfrlXWagrwTIPxgFZz/Vjj20jimaS43p/yGZ6pTyg8T7Vae2EQ1XSH31URLCIql6DVjFGENQgugi+Y0AINB0KDtBAKoQaIk9p3KcNFiS2adYCuJ+Zvp3Sncro5Rh5Nnw==
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SA5PPF3C36BFCB5.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8c7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Thu, 4 Jun 2026
+ 18:39:21 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0092.007; Thu, 4 Jun 2026
+ 18:39:21 +0000
+Date: Thu, 4 Jun 2026 21:39:09 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Stefano Brivio <sbrivio@redhat.com>,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	netdev@vger.kernel.org, yuhuang@redhat.com, justin.iurman@gmail.com,
+	horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	Chris Adams <linux@cmadams.net>,
+	Beniamino Galvani <bgalvani@redhat.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	Andrew Lunn <andrew@lunn.ch>, ihuguet@redhat.com,
+	regressions@lists.linux.dev
+Subject: Re: IPv6 address insertion order (was Re: [PATCH net v2] Revert
+ "ipv6: preserve insertion order for same-scope addresses")
+Message-ID: <20260604183909.GA877115@shredder>
+References: <20260529112357.5079-1-fmancera@suse.de>
+ <20260529134045.56330243@elisabeth>
+ <ah57wxGjL7JBORR1@zatzit>
+ <20260602132118.GA508395@shredder>
+ <ah-SvHdPRrYXX6lx@zatzit>
+ <20260603074717.GA569921@shredder>
+ <20260603174538.5454bb93@elisabeth>
+ <aiDUMHKi2Sn1_dYD@zatzit>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aiDUMHKi2Sn1_dYD@zatzit>
+X-ClientProxiedBy: FR2P281CA0092.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::16) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - host2044.hostmonster.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - sony.com
-X-BWhitelist: no
-X-Source-IP: 66.118.44.127
-X-Source-L: No
-X-Exim-ID: 1wVCxJ-00000001WL1-1y38
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (timdesk.home.local) [66.118.44.127]:42740
-X-Source-Auth: tim@bird.org
-X-Email-Count: 4
-X-Org: HG=bhshared_hm;ORG=bluehost;
-X-Source-Cap: YmlyZG9yZztiaXJkb3JnO2hvc3QyMDQ0Lmhvc3Rtb25zdGVyLmNvbQ==
-X-Local-Domain: no
-X-CMAE-Envelope: MS4xfKRLyx7x3DaRTC7WPj+nIsbuOFMb0Aswv0OkzcIJHmc5OFvA82UAu2b4k1XnV0BBcNzYsHd1UqGNzKYgylRBwYPZoYRo0HbGPolxb6QETtNNpinM0Nvs
- 17aC4DdaShHIPTCFhqP2X+UE6ycWHN43vp9Wm2+PcBBoTQUp7LoRYkSIVKopBz3NtVlmHzPpQLrrjK2+3xJjSJuioJ9eQS7JD0M=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SA5PPF3C36BFCB5:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90d877ce-cd1a-4000-f6b3-08dec268978e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|6133799003|22082099003|56012099006|5023799004|11063799006|4143699003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	lTzdPeIsxCV9HKJVU3lsynhq0RkZPliDetdxGDHEOiOMoOT0kmMZJTdxp/FHsPjDav8yBkcLIOBIpHGCyom4rJlYk4XcP2Z/CG06MFvbQjyz9tLCrVMR9EKIZ4wpGldhFTuMjWjQidGXzdTSJiLaadQsgxm/IYBjFnwl84bdUb1P6KtVk/UV23UsxzGo+X2kjA5LEBV6wMkSYdKHob1uD9F1xEfa/IBx6HpRzCuhZvr2UJO3uen/ezCHEqUUudj3hf3GNsrfj6bAdOZPoVstPEQ6qGGOAIoAhJDl0LE1/mA4AcwTHFMypO303EISjgZ5NNzzDQ8cuJeKsSArkV2KUkHrAVK+hw4FpEYwAYw7wYzbvmnp/kv8BJUxD810/tEhQo2MlC3EIezbvyjVvSymF1h8nP0lKOEs4/nITnfTDKqK3Vjnta5tD5DR5h6/9SHzu6K5+6byZnkyJSWynlvYJMCg9DggMq8ovBxR8M4oX1kvjiuzAJj+CQ0hbjd05fDk45MLkPCsexUwk6qNWILyuKT4SBFD3leOFYDTgJtNKqNVH7PBzgNeeCajUaZ8ton6+2gIB65vlAVyW9gyerVTXExLGMNWOtvVHn0Uiuh4+zwLakQDaDsPdA6pgPFAAtgWl1X4bldy0AWd+BhNZYX5EuBw3CDqi5N0KzZ6gtzgCG3vFxeTgOra5Sd4xhnpFXBx
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(6133799003)(22082099003)(56012099006)(5023799004)(11063799006)(4143699003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pDYSa31tyrR+hSeb+vK8h1uJz/TxlgWyPklE3Pr9EFDdCYpWs5wNT+VBgDtH?=
+ =?us-ascii?Q?LBasmPEJSjVqbPA4iLkhSN8JxE6U7Ewg6XWbD50/Jb8WXQdBpQ/85PS01vRJ?=
+ =?us-ascii?Q?zwp5TwW6qDhmQh1yGn1GyekrzrkkbW8/g/xMduMnZ/l493UVuZhG1oZq/OK5?=
+ =?us-ascii?Q?9hfIExphHX71R5Allq07kkMZt0N+DoW7mN4F+Pf/9jmDJZE+7cjFXFFUmsHO?=
+ =?us-ascii?Q?NNMuFzRVzrNqVdag/z3k7Bq7ARxe9fvuBM6XKItIME3xnizXU2Udxq1j9PAm?=
+ =?us-ascii?Q?nul9DM0IiRdhMf8018U3bbzhg9Hu7wbwixA5MwF175ANRM+dnLi7WJqFECDv?=
+ =?us-ascii?Q?rlM4QhHVXpEGz2AeJCEv15ZHcD2oNcMVupDzxSMSI7+sauABtS5CWcXyKh0B?=
+ =?us-ascii?Q?CZQKcmCBAWvwAMO8QLiqY/u7QpaD5QrqhOJUgQ6kg72TOTcAf2Wx55lFnxSn?=
+ =?us-ascii?Q?cSasXtk1HCLMPbuVPnlOUjyLMzwlAAxdlQ9xIamzJ7U9Hl0Zt76v8H88Irai?=
+ =?us-ascii?Q?gDBKR3MLMDGpk3bc8Y8odaBenb2gu4yW1Cztjow0E3AN6ba0uJ2TqiBCK3FP?=
+ =?us-ascii?Q?+WaB8Qq0EMCf6tVIadq+//IrFLdkD1YzqtFf0XOoT0v1GTrUNjNC+XVWQTUS?=
+ =?us-ascii?Q?EolFOBeE1OjEYdOMcRIsgD0Ap2NP6Qx/mGEiRdXQhvlRBkryrwMmPrLMEWcG?=
+ =?us-ascii?Q?+Y3VfmBeE4zYt2qJlgCnuYDw1+vjxJJnx49QmZ1QWq0b7KDFo2RulcTOFX9D?=
+ =?us-ascii?Q?opVa7hzdn9O+fHGtTgFNAEglmnAz6+0u86zs+GJIIbNYcygpo0bybPOHKc0b?=
+ =?us-ascii?Q?8BHAaKb+ByOyz6mx0XuGCXJjyw1pqXWqkkl8g3mGHKHCimLkUQgTXtvb5luD?=
+ =?us-ascii?Q?sBtKMBFwOwjhWZlUAGBaDRbWFzQCbjrTrmLDqhgaLJSLcOT2yg9wX9zsz88P?=
+ =?us-ascii?Q?au1k5+18886uyx8/1XOxeq68HYgWtXbMvuXUNRa36oOxaicn5xjDf1wXgQK9?=
+ =?us-ascii?Q?l3SNSOaHXWQ1jqktgLuLVa6Hc5Dn/rOjvn+S0VjyQU9R+WkX6I5ocAIiYnK0?=
+ =?us-ascii?Q?5exq9yK8v4jHPo8Y25oZ25OQobYR+7e8K8VYXPGnx5b9O9GmNxyknen6koaW?=
+ =?us-ascii?Q?oc9Y1n6bGaMC37Gx5hSdVJpL0OIT4EMJ2uLxQCTK7ImTQL9OeYnRbFjTBVSr?=
+ =?us-ascii?Q?rWRuheomR6Yt6vvIi4Wyrw/bmkJbVtcN6P7Bvazhw7MJ5Ds3b01MuTfIRmYG?=
+ =?us-ascii?Q?rxdvYu1RKDfLkXv5hwKasSxKzvhNxgqEIF0GW90FyvPo+rc0wNU9jhVniQCO?=
+ =?us-ascii?Q?HYOPV8lT4xUb3wqepibl3JbhTuhYmtHay8c5zoDs3o9qbFOZWmL/2jbHeXrg?=
+ =?us-ascii?Q?/tx69JFRO+n968fGrbcI1vzZ1EkkduJSoKC5+TPNK5jTLR5Sff3GvXJEy2T4?=
+ =?us-ascii?Q?Kxdb6phs0v7glstWNmTXLDdrVmu3meKznwO5lYkysX4PYhF5oVZvDha5Z99E?=
+ =?us-ascii?Q?Q919/PdljxwY+eyJyuYv1C/n3TbOZR8MxybL5Kbj/QXNdL0mBJBDbJgFf886?=
+ =?us-ascii?Q?BU7Deee8U8sWDk7WCOmC+CHIzxLyatoTXs6VadwWIPVNYoQJyoU0Sy4xF2MH?=
+ =?us-ascii?Q?9iEvpg8x+nRgh4hIowK1OqaB5cN/dYvzEkWAs5G9IlZGgAhKpOtmAoZnpOOF?=
+ =?us-ascii?Q?ffNIovWxg1R2/uFMxnyOwEQ/9yfAGKO2Ryez0SEtiA5FU5jXQWUHkgWM/GyG?=
+ =?us-ascii?Q?7nlRuXFvug=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90d877ce-cd1a-4000-f6b3-08dec268978e
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2026 18:39:20.9574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BAj2ttu8/z4SODsNLu9+c1XP4+f1hpjjJnmjmKKExTQcStrNZroF1N1Ln3vWgkw6yj4zLGY+a1dzHQKcgXSxhQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF3C36BFCB5
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[sony.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	HAS_X_ANTIABUSE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295386-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_X_SOURCE(0.00)[];
-	FORGED_SENDER(0.00)[tim.bird@sony.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tim.bird@sony.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-spdx@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295385-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tim.bird@sony.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:david@gibson.dropbear.id.au,m:sbrivio@redhat.com,m:fmancera@suse.de,m:netdev@vger.kernel.org,m:yuhuang@redhat.com,m:justin.iurman@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:linux@cmadams.net,m:bgalvani@redhat.com,m:regressions@leemhuis.info,m:andrew@lunn.ch,m:ihuguet@redhat.com,m:regressions@lists.linux.dev,m:justiniurman@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,suse.de,vger.kernel.org,gmail.com,kernel.org,google.com,davemloft.net,cmadams.net,leemhuis.info,lunn.ch,lists.linux.dev];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sony.com:mid,sony.com:from_mime,sony.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim,vger.kernel.org:from_smtp,nvidia.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BDC6C6429E1
+X-Rspamd-Queue-Id: EC7E36429D3
 
-Most of the tipc source files are missing SPDX-License-Identifier
-lines.  Add appropriate IDs to these files, and remove the
-previous license lines from the headers.  In this case,
-every file received the 'GPL-2.0 OR BSD-3-Clause' ID expression.
+On Thu, Jun 04, 2026 at 11:26:08AM +1000, David Gibson wrote:
+> So, I second Stefano's arguments for the most part, as well as
+> re-iterating that being broken by this change would require the
+> intersection of two unlikely conditions (misusing NLM_F_APPEND *and*
+> expecting the "wrong" order).
+> 
+> That said, Ido, if you're still not convinced I can do this as an
+> attribute.  It's more hassle, but I can make it work.
 
-Signed-off-by: Tim Bird <tim.bird@sony.com>
----
- net/tipc/addr.c           | 29 +----------------------------
- net/tipc/addr.h           | 29 +----------------------------
- net/tipc/bcast.c          | 29 +----------------------------
- net/tipc/bcast.h          | 29 +----------------------------
- net/tipc/bearer.c         | 29 +----------------------------
- net/tipc/bearer.h         | 29 +----------------------------
- net/tipc/core.c           | 29 +----------------------------
- net/tipc/core.h           | 29 +----------------------------
- net/tipc/diag.c           | 29 +----------------------------
- net/tipc/discover.c       | 29 +----------------------------
- net/tipc/discover.h       | 29 +----------------------------
- net/tipc/eth_media.c      | 29 +----------------------------
- net/tipc/group.c          | 29 +----------------------------
- net/tipc/group.h          | 29 +----------------------------
- net/tipc/ib_media.c       | 29 +----------------------------
- net/tipc/link.c           | 29 +----------------------------
- net/tipc/link.h           | 29 +----------------------------
- net/tipc/monitor.c        | 29 +----------------------------
- net/tipc/monitor.h        | 29 +----------------------------
- net/tipc/msg.c            | 29 +----------------------------
- net/tipc/msg.h            | 29 +----------------------------
- net/tipc/name_distr.c     | 29 +----------------------------
- net/tipc/name_distr.h     | 29 +----------------------------
- net/tipc/name_table.c     | 29 +----------------------------
- net/tipc/name_table.h     | 29 +----------------------------
- net/tipc/net.c            | 29 +----------------------------
- net/tipc/net.h            | 29 +----------------------------
- net/tipc/netlink.c        | 29 +----------------------------
- net/tipc/netlink.h        | 29 +----------------------------
- net/tipc/netlink_compat.c | 29 +----------------------------
- net/tipc/node.c           | 29 +----------------------------
- net/tipc/node.h           | 29 +----------------------------
- net/tipc/socket.c         | 29 +----------------------------
- net/tipc/socket.h         | 29 +----------------------------
- net/tipc/subscr.c         | 29 +----------------------------
- net/tipc/subscr.h         | 29 +----------------------------
- net/tipc/sysctl.c         | 29 +----------------------------
- net/tipc/topsrv.c         | 29 +----------------------------
- net/tipc/topsrv.h         | 29 +----------------------------
- net/tipc/trace.c          | 29 +----------------------------
- net/tipc/trace.h          | 29 +----------------------------
- net/tipc/udp_media.c      | 29 +----------------------------
- net/tipc/udp_media.h      | 29 +----------------------------
- 43 files changed, 43 insertions(+), 1204 deletions(-)
+I appreciate the survey that Stefano and you conducted, but there is
+still a non-zero chance of causing regressions by suddenly giving
+NLM_F_APPEND a meaning in RTM_NEWADDR. We already tried the
+"change-and-see-what-happens" methodology once with this feature and it
+backfired, so it's going to be quite painful if we miss again.
 
-diff --git a/net/tipc/addr.c b/net/tipc/addr.c
-index 6f5c54cbf8d9..ee73b58bcc69 100644
---- a/net/tipc/addr.c
-+++ b/net/tipc/addr.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/addr.c: TIPC address utility routines
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2004-2005, 2010-2011, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "addr.h"
-diff --git a/net/tipc/addr.h b/net/tipc/addr.h
-index a113cf7e1f89..0eccd4719092 100644
---- a/net/tipc/addr.h
-+++ b/net/tipc/addr.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/addr.h: Include file for TIPC address utility routines
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2004-2005, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_ADDR_H
-diff --git a/net/tipc/bcast.c b/net/tipc/bcast.c
-index 76a1585d3f6b..27dbb5fcdb3a 100644
---- a/net/tipc/bcast.c
-+++ b/net/tipc/bcast.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/bcast.c: TIPC broadcast code
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2004, Intel Corporation.
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <linux/tipc_config.h>
-diff --git a/net/tipc/bcast.h b/net/tipc/bcast.h
-index 2d9352dc7b0e..8a453b3796af 100644
---- a/net/tipc/bcast.h
-+++ b/net/tipc/bcast.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/bcast.h: Include file for TIPC broadcast code
-  *
-  * Copyright (c) 2003-2006, 2014-2015, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_BCAST_H
-diff --git a/net/tipc/bearer.c b/net/tipc/bearer.c
-index a3bd1ef17558..ba362ea61ccf 100644
---- a/net/tipc/bearer.c
-+++ b/net/tipc/bearer.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/bearer.c: TIPC bearer code
-  *
-  * Copyright (c) 1996-2006, 2013-2016, Ericsson AB
-  * Copyright (c) 2004-2006, 2010-2013, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <net/sock.h>
-diff --git a/net/tipc/bearer.h b/net/tipc/bearer.h
-index 41eac1ee0c09..ce913ac16924 100644
---- a/net/tipc/bearer.h
-+++ b/net/tipc/bearer.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/bearer.h: Include file for TIPC bearer code
-  *
-  * Copyright (c) 1996-2006, 2013-2016, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_BEARER_H
-diff --git a/net/tipc/core.c b/net/tipc/core.c
-index 434e70eabe08..0fa53f05fd10 100644
---- a/net/tipc/core.c
-+++ b/net/tipc/core.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/core.c: TIPC module code
-  *
-  * Copyright (c) 2003-2006, 2013, Ericsson AB
-  * Copyright (c) 2005-2006, 2010-2013, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/core.h b/net/tipc/core.h
-index 9ce5f9ff6cc0..ff96b66c8bb7 100644
---- a/net/tipc/core.h
-+++ b/net/tipc/core.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/core.h: Include file for TIPC global declarations
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2005-2007, 2010-2013, Wind River Systems
-  * Copyright (c) 2020, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_CORE_H
-diff --git a/net/tipc/diag.c b/net/tipc/diag.c
-index 54dde8c4e4d4..e6a1cb0a52da 100644
---- a/net/tipc/diag.c
-+++ b/net/tipc/diag.c
-@@ -1,36 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/diag.c: TIPC socket diag
-  *
-  * Copyright (c) 2018, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "ASIS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/discover.c b/net/tipc/discover.c
-index 3e54d2df5683..bb4d7c066521 100644
---- a/net/tipc/discover.c
-+++ b/net/tipc/discover.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/discover.c
-  *
-  * Copyright (c) 2003-2006, 2014-2018, Ericsson AB
-  * Copyright (c) 2005-2006, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/discover.h b/net/tipc/discover.h
-index 521d96c41dfd..87945cd1ed62 100644
---- a/net/tipc/discover.h
-+++ b/net/tipc/discover.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/discover.h
-  *
-  * Copyright (c) 2003-2006, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_DISCOVER_H
-diff --git a/net/tipc/eth_media.c b/net/tipc/eth_media.c
-index cb0d185e06af..3eb8c5218f73 100644
---- a/net/tipc/eth_media.c
-+++ b/net/tipc/eth_media.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/eth_media.c: Ethernet bearer support for TIPC
-  *
-  * Copyright (c) 2001-2007, 2013-2014, Ericsson AB
-  * Copyright (c) 2005-2008, 2011-2013, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/group.c b/net/tipc/group.c
-index 14e6732624e2..5b2990b1533e 100644
---- a/net/tipc/group.c
-+++ b/net/tipc/group.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/group.c: TIPC group messaging code
-  *
-  * Copyright (c) 2017, Ericsson AB
-  * Copyright (c) 2020, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/group.h b/net/tipc/group.h
-index ea4c3be64c78..2eefe626d550 100644
---- a/net/tipc/group.h
-+++ b/net/tipc/group.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/group.h: Include file for TIPC group unicast/multicast functions
-  *
-  * Copyright (c) 2017, Ericsson AB
-  * Copyright (c) 2020, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_GROUP_H
-diff --git a/net/tipc/ib_media.c b/net/tipc/ib_media.c
-index b9ad0434c3cd..504d36777a23 100644
---- a/net/tipc/ib_media.c
-+++ b/net/tipc/ib_media.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/ib_media.c: Infiniband bearer support for TIPC
-  *
-@@ -8,34 +9,6 @@
-  * Copyright (c) 2001-2007, Ericsson AB
-  * Copyright (c) 2005-2008, 2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <linux/if_infiniband.h>
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index 49dfc098d89b..ff966b9892ee 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/link.c: TIPC link code
-  *
-  * Copyright (c) 1996-2007, 2012-2016, Ericsson AB
-  * Copyright (c) 2004-2007, 2010-2013, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/link.h b/net/tipc/link.h
-index d80f5649b395..102ff0184fa8 100644
---- a/net/tipc/link.h
-+++ b/net/tipc/link.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/link.h: Include file for TIPC link code
-  *
-  * Copyright (c) 1995-2006, 2013-2014, Ericsson AB
-  * Copyright (c) 2004-2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_LINK_H
-diff --git a/net/tipc/monitor.c b/net/tipc/monitor.c
-index a94b9b36a700..fe1906e103d3 100644
---- a/net/tipc/monitor.c
-+++ b/net/tipc/monitor.c
-@@ -1,36 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/monitor.c
-  *
-  * Copyright (c) 2016, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <net/genetlink.h>
-diff --git a/net/tipc/monitor.h b/net/tipc/monitor.h
-index ed63d2e650b0..3b849c683371 100644
---- a/net/tipc/monitor.h
-+++ b/net/tipc/monitor.h
-@@ -1,36 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/monitor.h
-  *
-  * Copyright (c) 2015, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_MONITOR_H
-diff --git a/net/tipc/msg.c b/net/tipc/msg.c
-index b0bba0feef56..22f0274c4505 100644
---- a/net/tipc/msg.c
-+++ b/net/tipc/msg.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/msg.c: TIPC message header routines
-  *
-  * Copyright (c) 2000-2006, 2014-2015, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <net/sock.h>
-diff --git a/net/tipc/msg.h b/net/tipc/msg.h
-index c5eec16213d7..3416bf07869e 100644
---- a/net/tipc/msg.h
-+++ b/net/tipc/msg.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/msg.h: Include file for TIPC message header routines
-  *
-  * Copyright (c) 2000-2007, 2014-2017 Ericsson AB
-  * Copyright (c) 2005-2008, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_MSG_H
-diff --git a/net/tipc/name_distr.c b/net/tipc/name_distr.c
-index 190b49c5cbc3..e9af08463caf 100644
---- a/net/tipc/name_distr.c
-+++ b/net/tipc/name_distr.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/name_distr.c: TIPC name distribution code
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/name_distr.h b/net/tipc/name_distr.h
-index c677f6f082df..cd08ec9943f9 100644
---- a/net/tipc/name_distr.h
-+++ b/net/tipc/name_distr.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/name_distr.h: Include file for TIPC name distribution code
-  *
-  * Copyright (c) 2000-2006, Ericsson AB
-  * Copyright (c) 2005, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_NAME_DISTR_H
-diff --git a/net/tipc/name_table.c b/net/tipc/name_table.c
-index 253c72d1366e..b0f95a13a812 100644
---- a/net/tipc/name_table.c
-+++ b/net/tipc/name_table.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/name_table.c: TIPC name table code
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2004-2008, 2010-2014, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <net/sock.h>
-diff --git a/net/tipc/name_table.h b/net/tipc/name_table.h
-index 7ff6eeebaae6..fff7e79dd936 100644
---- a/net/tipc/name_table.h
-+++ b/net/tipc/name_table.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/name_table.h: Include file for TIPC name table code
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2004-2005, 2010-2011, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_NAME_TABLE_H
-diff --git a/net/tipc/net.c b/net/tipc/net.c
-index 7e65d0b0c4a8..1883f1a76d6b 100644
---- a/net/tipc/net.c
-+++ b/net/tipc/net.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/net.c: TIPC network routing code
-  *
-  * Copyright (c) 1995-2006, 2014, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/net.h b/net/tipc/net.h
-index 1cb1e43cf34a..1c56ae964c46 100644
---- a/net/tipc/net.h
-+++ b/net/tipc/net.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/net.h: Include file for TIPC network routing code
-  *
-  * Copyright (c) 1995-2006, 2014, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_NET_H
-diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
-index 1a9a5bdaccf4..8dc5b1daee5b 100644
---- a/net/tipc/netlink.c
-+++ b/net/tipc/netlink.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/netlink.c: TIPC configuration handling
-  *
-  * Copyright (c) 2005-2006, 2014, Ericsson AB
-  * Copyright (c) 2005-2007, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/netlink.h b/net/tipc/netlink.h
-index 7cf777723e3e..56b395b216a6 100644
---- a/net/tipc/netlink.h
-+++ b/net/tipc/netlink.h
-@@ -1,36 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/netlink.h: Include file for TIPC netlink code
-  *
-  * Copyright (c) 2014, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_NETLINK_H
-diff --git a/net/tipc/netlink_compat.c b/net/tipc/netlink_compat.c
-index 2a786c56c8c5..c110b9844a91 100644
---- a/net/tipc/netlink_compat.c
-+++ b/net/tipc/netlink_compat.c
-@@ -1,34 +1,7 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * Copyright (c) 2014, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/node.c b/net/tipc/node.c
-index 97aa970a0d83..724fec939a85 100644
---- a/net/tipc/node.c
-+++ b/net/tipc/node.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/node.c: TIPC node management routines
-  *
-  * Copyright (c) 2000-2006, 2012-2016, Ericsson AB
-  * Copyright (c) 2005-2006, 2010-2014, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/node.h b/net/tipc/node.h
-index 154a5bbb0d29..28da1d7025e5 100644
---- a/net/tipc/node.h
-+++ b/net/tipc/node.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/node.h: Include file for TIPC node management routines
-  *
-  * Copyright (c) 2000-2006, 2014-2016, Ericsson AB
-  * Copyright (c) 2005, 2010-2014, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_NODE_H
-diff --git a/net/tipc/socket.c b/net/tipc/socket.c
-index 9329919fb07f..ec79eb6e35b3 100644
---- a/net/tipc/socket.c
-+++ b/net/tipc/socket.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/socket.c: TIPC socket API
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2004-2008, 2010-2013, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <linux/rhashtable.h>
-diff --git a/net/tipc/socket.h b/net/tipc/socket.h
-index 02cdf166807d..4d3a31590395 100644
---- a/net/tipc/socket.h
-+++ b/net/tipc/socket.h
-@@ -1,35 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /* net/tipc/socket.h: Include file for TIPC socket code
-  *
-  * Copyright (c) 2014-2016, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_SOCK_H
-diff --git a/net/tipc/subscr.c b/net/tipc/subscr.c
-index 352d304c3acd..6d6c34871485 100644
---- a/net/tipc/subscr.c
-+++ b/net/tipc/subscr.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/subscr.c: TIPC network topology service
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2005-2007, 2010-2013, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/subscr.h b/net/tipc/subscr.h
-index 60b877531b66..0262e6589b69 100644
---- a/net/tipc/subscr.h
-+++ b/net/tipc/subscr.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/subscr.h: Include file for TIPC network topology service
-  *
-@@ -5,34 +6,6 @@
-  * Copyright (c) 2005-2007, 2012-2013, Wind River Systems
-  * Copyright (c) 2020-2021, Red Hat Inc
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_SUBSCR_H
-diff --git a/net/tipc/sysctl.c b/net/tipc/sysctl.c
-index 30d2e06e3d8c..1ce7c6dea30b 100644
---- a/net/tipc/sysctl.c
-+++ b/net/tipc/sysctl.c
-@@ -1,36 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/sysctl.c: sysctl interface to TIPC subsystem
-  *
-  * Copyright (c) 2013, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "core.h"
-diff --git a/net/tipc/topsrv.c b/net/tipc/topsrv.c
-index af530c9ed840..9346578327d2 100644
---- a/net/tipc/topsrv.c
-+++ b/net/tipc/topsrv.c
-@@ -1,37 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/server.c: TIPC server infrastructure
-  *
-  * Copyright (c) 2012-2013, Wind River Systems
-  * Copyright (c) 2017-2018, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include "subscr.h"
-diff --git a/net/tipc/topsrv.h b/net/tipc/topsrv.h
-index c7ea71293748..b98c37c98738 100644
---- a/net/tipc/topsrv.h
-+++ b/net/tipc/topsrv.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/server.h: Include file for TIPC server code
-  *
-  * Copyright (c) 2012-2013, Wind River Systems
-  * Copyright (c) 2017, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifndef _TIPC_SERVER_H
-diff --git a/net/tipc/trace.c b/net/tipc/trace.c
-index 7d2931521e0e..e052e59dfb44 100644
---- a/net/tipc/trace.c
-+++ b/net/tipc/trace.c
-@@ -1,36 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * net/tipc/trace.c: TIPC tracepoints code
-  *
-  * Copyright (c) 2018, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "ASIS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #define CREATE_TRACE_POINTS
-diff --git a/net/tipc/trace.h b/net/tipc/trace.h
-index 865142ed0ab4..47656cb64c67 100644
---- a/net/tipc/trace.h
-+++ b/net/tipc/trace.h
-@@ -1,36 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/trace.h: TIPC tracepoints
-  *
-  * Copyright (c) 2018, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "ASIS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #undef TRACE_SYSTEM
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index 2c66b356025a..b2aeb63ad48f 100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -1,35 +1,8 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /* net/tipc/udp_media.c: IP bearer support for TIPC
-  *
-  * Copyright (c) 2015, Ericsson AB
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #include <linux/socket.h>
-diff --git a/net/tipc/udp_media.h b/net/tipc/udp_media.h
-index e7455cc73e16..8b92aef7246a 100644
---- a/net/tipc/udp_media.h
-+++ b/net/tipc/udp_media.h
-@@ -1,37 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * net/tipc/udp_media.h: Include file for UDP bearer media
-  *
-  * Copyright (c) 1996-2006, 2013-2016, Ericsson AB
-  * Copyright (c) 2005, 2010-2011, Wind River Systems
-  * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. Neither the names of the copyright holders nor the names of its
-- *    contributors may be used to endorse or promote products derived from
-- *    this software without specific prior written permission.
-- *
-- * Alternatively, this software may be distributed under the terms of the
-- * GNU General Public License ("GPL") version 2 as published by the Free
-- * Software Foundation.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-- * POSSIBILITY OF SUCH DAMAGE.
-  */
- 
- #ifdef CONFIG_TIPC_MEDIA_UDP
--- 
-2.43.0
+As I see it, we have three options:
 
+1. Use NLM_F_APPEND. Relatively easy change in both the kernel and user
+space, but at the risk of reintroducing regressions.
+
+2. Add a new attribute (e.g., IFA_INSERT_MODE with DEFAULT/APPEND
+options). Less risky than #1, at the cost of a bit more code in both the
+kernel and user space.
+
+3. Do nothing. As I understand it, any production software (as opposed
+to a test script) that cares about the in-scope order will have to
+maintain a fallback anyway (e.g., iterating over IPv6 addresses in
+reverse). Therefore, the changes in #1 and #2 are not strictly
+necessary, yet they are uAPI that the kernel will have to maintain
+forever.
+
+Given the above, my preference would be #3 -> #2 -> #1. The first two
+options expose the same capability to user space, so #1 doesn't buy us
+anything over #2, except a bit less code, but we risk introducing a
+regression.
+
+Between #2 and #3, production software can't drop the fallback even if
+we implement #2, yet #2 requires us to maintain uAPI forever. I think we
+should accept that the divergence between IPv4 and IPv6 is not ideal,
+but at least it's predictable and dependable (Fernando is working on a
+ksft and documentation).
+
+That being said, you can send an RFC for #1 and see what others think
+since at this point it's unclear who is still following the thread.
+
+Thanks
 
