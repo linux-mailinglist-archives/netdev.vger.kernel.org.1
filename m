@@ -1,305 +1,272 @@
-Return-Path: <netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7FiSKzvbIWrvPgEAu9opvQ
-	(envelope-from <netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 22:08:27 +0200
+	id ezNGIZXbIWr4PgEAu9opvQ
+	(envelope-from <netdev+bounces-295414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 22:09:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01AE864318D
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 22:08:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE0F643199
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 22:09:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=PijeqS4W;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=AnUowIBi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295414-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295414-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12DBC300D6A6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 20:05:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A98A73011BDF
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 20:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571B03C457F;
-	Thu,  4 Jun 2026 20:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC04F3D9024;
+	Thu,  4 Jun 2026 20:06:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F3A3BD22E;
-	Thu,  4 Jun 2026 20:05:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780603536; cv=none; b=mgHzBphQrardW08el+t/PRGpBQmmgBOwxCIqtYP42mY+qDSJn3L8prVPsKBY+XZFwZvvdndIJ7Z4YU5af8z2TEd0FDL4weshiTe0ImYGXQXQhD0i767qYfnpr1EbVvEgUMikWzW43fFoNp++RTNLdXFCnZZnKEHAYmvmWMK9uZs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780603536; c=relaxed/simple;
-	bh=GlLYHmEGMNg6oqH8rc6t2+bsB9VTXb2eEXcfBEe0O0s=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=P49Dd85mNF9Ce0h8bgC64dbDLKj84y0wOGNBvCzlWOcU5jSNIiCAXyb4kM6mlubLSzNrQH6dO3jFwL0LiBvZndQ3E272U1bs529+iZS4CJp7j+G7nF+970dHyDO2yxOZd8J7MJDUJOMilK3zifmf1ZS/z7J9o9tzwbONY7xWrsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=PijeqS4W; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B4BB1A01B4;
-	Thu,  4 Jun 2026 22:05:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1780603531; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=UW4gxJiL3cJlXD2vzkSBOSktwGvUlNbwdLTHRiCG9wk=;
-	b=PijeqS4WdXffaPaT7dXcQTCGhy3ODG4wTA2/6toMy9JWx81h/J/TU24B0fKoKsh2pfJ46p
-	w8s3FNeu15fwV4jZg5ApezPUv0qo++GqQcXSCxRCCsh8Q8I5w4IGY/vpT8p644fsf+JT+c
-	Wfjy4M6QYi/lGnihV7ILZ29FEbieZqArLlitSgTDWP9bNQtcu8Vtv4xMzybca54fm4E4yW
-	+4WVV2SXsNnBHCAIbG6eacqJXHIunVKXkpTJnbESYn9hglnFOi0kZvqHmEVpTLdAOWSpq2
-	jtoyVTveoarhwOZvPtoyuHgKlBJfo2lpxZtXI8yIC2ke1wFYXJbQTwflWbj7JQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BFF3D8915;
+	Thu,  4 Jun 2026 20:06:00 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780603566; cv=fail; b=swt2tteYge5TUNPOSyHhc1WkQvqZ7HI2fSvXOepoTkDMa9HPEvDupj7ScIqaK3Y8brYQ4bwF42uCS/fwSQp66EespJH9gADcxHlgQXk8K/wTyAdUvESdjQi7t9IDyYPvV3xR8y2VqQKWOTVhShzIHHAm+aL9Up4DEcCla/6Se8o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780603566; c=relaxed/simple;
+	bh=R49bCwwbYTTjqJYcjjbakBcfc1x/ljrFthOz+fxNJTU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KCC5eeCvRsxP0O5QxNl3264OMePwOq+9AM8wltMbzNiLk8zK2D9ShcutvaNI5KpUss1k5RGE6l/l8IufmRBRu2McgkrEoMlP/ONkAR6UG0tUCTJ5jS7uGMKV/KwKpnH6gLULzSmU84kfflPUafhKfMuEbvvbfHmyrHvQMqRAY5c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AnUowIBi; arc=fail smtp.client-ip=198.175.65.15
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780603561; x=1812139561;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=R49bCwwbYTTjqJYcjjbakBcfc1x/ljrFthOz+fxNJTU=;
+  b=AnUowIBivUs8QDERfpt8UXZihEFoYOkJKM3w92ycRWUB7QJVv5enjx/V
+   qAhWEungUhT6L93bpL1hYCe5RVJuFz3jpfvKi82VJP4m22Fj567zP8bZE
+   E7hnVd+br/pKEw8NKbjsHsbh5BRPUr53pHxtuTOhG424nmAfUTz5VxImJ
+   p8z8hgf9mATZon/N2tIC6WXJyH7CYjaNnsZk+rkl5UxEYWyJb9Qi5H8Is
+   X4VJ0VLFxzwb5W9IeBd8SFxST8aRK0g3PA467KAio9WyIWa2Pv3C9ljxm
+   aA+DrvcXSanY6+eAOj8+WXy0/1q/dn/ylNDY3YoJ5Tt9hMS+s7Q0CNKYG
+   g==;
+X-CSE-ConnectionGUID: TnKlfrW6SViM6a0Vd+zCwQ==
+X-CSE-MsgGUID: k5obUDdVR/GF9p5bA18WjQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11807"; a="85063204"
+X-IronPort-AV: E=Sophos;i="6.24,187,1774335600"; 
+   d="scan'208";a="85063204"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2026 13:06:01 -0700
+X-CSE-ConnectionGUID: V+1L50/zRN2ijiSsGyZ8fw==
+X-CSE-MsgGUID: ICu+kyHfThqIuVQEzP8gXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,187,1774335600"; 
+   d="scan'208";a="249567469"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2026 13:05:59 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 4 Jun 2026 13:05:58 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 4 Jun 2026 13:05:58 -0700
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.32) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 4 Jun 2026 13:05:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gC7CEWiz5KjMQgR86kRMK/Ho4zFRdZ7UJE1Ba2LbTBqfIkLRz9Sc8ObkeAYy0aEO6XrfgiVU2dqEV28NguIJ3cuEcylTxRA1dh9GRsPQN+xTHazptqsJG4zZY1ljQD5LstB5WdJDstxKkyWLom4pN0/zQTpbAC0hAl67eDLL607uB72aZ57+DSNV2GCBbSB2uAAWG8+OfcrXo5enIsQqZRnSm85wO4NEWNknMZKfEzZi5XF1qUtXL0eoT9W/QX1vfApkvffMD6UccBviN/377uyCC35czXxpbQyKAElyC0rdmr1++PoI+CTABWNtc2hYO37lDltxgQzjYyllEJY9QQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2Vipo0cvSJULuw+IIG1ODvEXu0b9O/mMv9UbsgmG0S8=;
+ b=v/8RZO6CjWlfAVuHtklInakZrODp6F0NkbCmll20mfavIcjLKf+5kwVYf18QVUZx6TEuyvIcwxUBeppkMkXUsxxOYjqBCHSh7G9efNwNzymp1R7ms4iSs3X33kW0EZ4XN7gm9eQ6ejc2nWlqwETQn2LwrGyLVg2KBQc009AfihvkXla59B01I+DNXhp0ucw5829w+0q+APe4Efz9G5eO/ztRdXpyjKOnA1kTaCYOXr+2/Q3k0f1L07PQGFUUjL99tNnQOlEPT2GTqcdhV+Zo7in0Zh99vrmyPaaeZrgsqmISOLnOtRr2vSGCI/XQ/dOi9KFBylTO7DiRsZrt5STxAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
+ by SA1PR11MB6848.namprd11.prod.outlook.com (2603:10b6:806:29c::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Thu, 4 Jun 2026
+ 20:05:55 +0000
+Received: from IA1PR11MB6219.namprd11.prod.outlook.com
+ ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
+ ([fe80::a2b9:8e8:c48b:ea31%5]) with mapi id 15.21.0092.006; Thu, 4 Jun 2026
+ 20:05:54 +0000
+From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Oros,
+ Petr" <poros@redhat.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
+	<Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
+Subject: RE: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and full
+ TX reference clock control for E825
+Thread-Topic: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and
+ full TX reference clock control for E825
+Thread-Index: AQHc73fbuuwofGiUWEqM+0MeGgr+dbYtpIwAgAEzHgA=
+Date: Thu, 4 Jun 2026 20:05:54 +0000
+Message-ID: <IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
+References: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
+ <20260603183036.7c4762d2@kernel.org>
+In-Reply-To: <20260603183036.7c4762d2@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|SA1PR11MB6848:EE_
+x-ms-office365-filtering-correlation-id: 329ff594-ec8a-4703-6392-08dec274af73
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|38070700021|18002099003|22082099003|56012099006|11063799006|4143699003|5023799004;
+x-microsoft-antispam-message-info: LrtCNVMvoWuorRZumVADAlRk0w9XYqOcASV5xMOMBMK2m9uqkhsF/RSpJPhPZybMpphJ45lMzknfYz/of+pRn9Ktu/bDJ8ls3EOkEsHnG5KkF1fVbbYHjFMcZpG+SAv1C4+9bEeGPqJralq36KslSI+Cxon2stx49lfyYP2gPP0ROH3EKvtb9OqH018jKEwDm23vK1PireA4x8WpxFHhhx9+h5RbwiK1xaJORlDu+raoGNvJGeReA3+gDXBQmLrewyMxDydYw/IvMep96MtcO7M3V79EcjynL6DgVv5zFNcg83DEt4WZx1Pl2qHF1d0ATLtJTz/HHDp9YE6TUMGL/KZfAJVv+wtNJcGMXSvEr7o0/ZOn8kBRrRCRxKqgDDP8OIiEfzPZc/8ysoe2W0TZKwiW2HSjCmgNblbzaYJxCDKmOdW9ea1pmM3Ndb+luhwbhNDyI9+GX2Wkq8RGT7TByS1XCIC+QytD6oXQLfSuJHM+++yuvEqBdNW5og5WziOfUnXqjSMYxKMyv9viWH1CJMrzNqXW0zKpt6y3uRgwDlBRKOwl7/NTCtXiJrDIZMg/8cwIN2tW6R3wkG3Q2NvVaxaA5UL5CWT8CdQ1J7tFfoRjnEb1zctUSiNdDPS+cKz4zDu6QfcB5oWT9dSgFdlj+Ez/lSi/H1yBRCeTxpxqTT0gRh4u0VWyIKuDnW3hHIFB
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(38070700021)(18002099003)(22082099003)(56012099006)(11063799006)(4143699003)(5023799004);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?KcLwINz4KOnaP0Tvz6ArOzxbWKCGoNtdK7KyEYNEoUnd0svP33oE66fahYFg?=
+ =?us-ascii?Q?m9Q+WhplCTgH1Rn+4coxbCChX5GM7Xc66XBrl012ixPkCuzkE5/IVlPlcn/l?=
+ =?us-ascii?Q?+rmgwF7c7GdE6mqk4C4NX+bJgm+YU7meCV9TmFJCNzW/sWxzXdMx+R2a1L06?=
+ =?us-ascii?Q?qzrZODq8VDRGjp+73JpfHbqrhJ8YDTEfKZSaQ6X7msKeC819bPLbLxB1bI8k?=
+ =?us-ascii?Q?es3sZsYGp4xeLTw7jEoscocgmUmirE1xlDgMsLf/7fN0bDfWm8AHcYPkMPvV?=
+ =?us-ascii?Q?dVskYoucyg8H8pVzs33XqAUELGBpsFGH3UVDGu4EmFvwPA9EqOk1w+rYGHeT?=
+ =?us-ascii?Q?WdI1cUa6g7yEVZRpUaD949odLG0l70KWff0ubZd207eUHjFZnFwCQwMBPRcJ?=
+ =?us-ascii?Q?J1A2xyR+iGMkLOKkbeSefJqyynVfLxskyhJrkE80t/aZFM9HOQ4EwlZEWI5n?=
+ =?us-ascii?Q?YLdP44zIIbbO5znuqijRGS3U6W/UkYLuisCAxGmboZ+o1ujmSPy29a4NmU9P?=
+ =?us-ascii?Q?OFpN6GDSIK5t68xsBHtTek/b75jtomEITUq+igSj0vjv0vmANnhgW5GICyyF?=
+ =?us-ascii?Q?JK3YujdvatmmVCVMWE9mxlMsiBQxgSlITgInSKRhWRVMP5txgLKJx12xC3TT?=
+ =?us-ascii?Q?/gnEJ0hZiPU772alv+djm0OSG2ma9nBhsh0cuPn9mzj00TxEvIHZ5eflhdS/?=
+ =?us-ascii?Q?HAwuxAfcqObyGOHFZ7q0Wdytj9jfPvx1YqMQbPHmw1Fjn2oYVL6rnG7Mjjwq?=
+ =?us-ascii?Q?hwg20dC+J86Nj72zmDranGeF3/2rQrtISmQ/I8eqY0kopXmXE/BYHIe3/Nqe?=
+ =?us-ascii?Q?YTa097+qML/PzAcJsRTPYdKAwNAaV5vOWknFbCBkodUBGvA4rsx/JU47xCzZ?=
+ =?us-ascii?Q?J947nwwKX180MiRZNNkVhzrhmTMqSVKaJinPGd9NbpeqPfRmrrexyLiuK6GH?=
+ =?us-ascii?Q?+ZqkZKSwKdibpd6TRMXdMPrDtKKUi22638wL2VUk6cjT2M1jsqKc+tbY6pCn?=
+ =?us-ascii?Q?6z+PteBFSCGikO3RyHloE6qzQqEy8DAHI1eEEtITKaUjaumMm7fWiTwR89DC?=
+ =?us-ascii?Q?HmtkdY6gBuX5D3OsL4tvEC2MFGB/v5PbIPklwnXGKM74uKc63dXbEa9K/zmh?=
+ =?us-ascii?Q?cDSjgyFbREWgCIQAmHtdOBYgCYR4uZJQogHl07O20Y2DcTHZFzj0AUvRWoyw?=
+ =?us-ascii?Q?3V5HrRFYCFrh+e8WSSlo4yq+mw1x/9Ao+rdJIACs+nHIw4PMxmcZ6/fVkCds?=
+ =?us-ascii?Q?qFEa7dOBX1T92W9Rd2AVYXkKVIuVHpB0S1nmdXnrrib9koPUH6N8L4jnkT/5?=
+ =?us-ascii?Q?wrrWdAysD1oYhraslql5R2T7Qzvd6g1LBt/ZZVmRfe+A0q1N9PZRr9EOEMm3?=
+ =?us-ascii?Q?5XDlDyhYw+gaBVjTr1irdPOvFIfSmEFkRR6/iymdbAAfQGEpck9PyS3CZmGi?=
+ =?us-ascii?Q?LPbTCwBqRsgYaMJj5tTiUKhZzQaqQwMhcgVekJE1v8O98UIAKfAwigVQgMxx?=
+ =?us-ascii?Q?Qwyy3vZEUAaADPHqa10J3l/reyD6xj+k//Dp4+q/kyGRyOSlAegMqC9eR58v?=
+ =?us-ascii?Q?Hyfy5MnDD1IQrfkL/1Fwr+ejFcr9KFVNkd1spqVBVHOiUKXKsuSsRqt444iM?=
+ =?us-ascii?Q?m47ZLu5scBomaI1SJZSw6VKWhM4QugBdEldYw6IZfyPNzYtvvksZeI+ZnBys?=
+ =?us-ascii?Q?Cm68xE8AdYqfSWe74wuGzMJuIRaOrfF6Fi7cWut8j0kjl+ZyCzzKeORAE7Cs?=
+ =?us-ascii?Q?or2PC506yQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 04 Jun 2026 22:05:29 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, justin.chen@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, opendmb@gmail.com, florian.fainelli@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, vikas.gupta@broadcom.com,
- rajashekar.hudumula@broadcom.com, bhargava.marreddy@broadcom.com,
- fmancera@suse.de, markus@blochl.de, arnd@arndb.de,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: bcmgenet: convert RX path to page_pool
-In-Reply-To: <20260604173205.3989025-3-horms@kernel.org>
-References: <20260602094248.4130712-1-nb@tipi-net.de>
- <20260604173205.3989025-3-horms@kernel.org>
-Message-ID: <e6694208872ec000c8db73dedd5931a2@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-Exchange-RoutingPolicyChecked: Ayu/wYPlx6qUFMBvtj+X2MeeWZO3gQzqZLm53+475KbFDKqIhbsJWVtszY2P1B37XaZheXURKPgOfK7wQDkIHcBxEOxMlZJr7rYMzwP/a2iTzlIh6KfLcdNOZZTHzl7Cnf2so/EzB06vSjQ34DsQptBUrObqn7ddcmgEar2qhEIZtxpwzW/iRRDrBPEf7xaEm92p9xKKl7fOB4whhnQnM0tGfxjn9yhTAnm7VVDZPTVDP4Mr/dU9T+OItmXLCE+ssmTJqDqqq+f6sXNO3zSh5gdRpIV6FzZueIfsQTu3O/+cY8ihv28kKYZ86STryAHJI5ffJfTQ+brxM8zC9TU38w==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 329ff594-ec8a-4703-6392-08dec274af73
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2026 20:05:54.8410
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: enESsyxxLXBwd03Lplzy/A26PO+/6vjgIKP6npTEC+OHwWwXtGg1Xg3Ixk/y56TpntrNM0w6lOCbf7kwqOtiArF+Ad21r2w1BmLICOGDFAY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6848
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-295414-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:justin.chen@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:vikas.gupta@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:bhargava.marreddy@broadcom.com,m:fmancera@suse.de,m:markus@blochl.de,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-295413-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,suse.de,blochl.de,arndb.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,vger.kernel.org:from_smtp,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:from_mime,tipi-net.de:email]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01AE864318D
+X-Rspamd-Queue-Id: CEE0F643199
 
-Hi Simon
 
-On 4.6.2026 19:32, Simon Horman wrote:
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
-> ---
-> Now I have the exact diff. Let me produce the report.
-> 
-> commit ff8ce4b2334ded9490897cdd2cff5a25a4a0a438
-> Author: Nicolai Buchwitz <nb@tipi-net.de>
-> 
-> net: bcmgenet: convert RX path to page_pool
-> 
-> This patch converts the bcmgenet RX path from per-packet
-> __netdev_alloc_skb() + dma_map_single() to page_pool, builds SKBs from
-> pool pages via napi_build_skb() with skb_mark_for_recycle(), and 
-> removes
-> the now-unused priv->rx_buf_len field and rx_dma_failed soft MIB
-> counter.
-> 
->> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c 
->> b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Thursday, June 4, 2026 3:31 AM
+> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
+> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; intel-wired-
+> lan@lists.osuosl.org; Oros, Petr <poros@redhat.com>;
+> richardcochran@gmail.com; andrew+netdev@lunn.ch; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Prathosh.Satish@microchip.com; Vecera,
+> Ivan <ivecera@redhat.com>; jiri@resnulli.us; Kubalewski, Arkadiusz
+> <arkadiusz.kubalewski@intel.com>; vadim.fedorenko@linux.dev;
+> donald.hunter@gmail.com; horms@kernel.org; pabeni@redhat.com;
+> davem@davemloft.net; edumazet@google.com
+> Subject: Re: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and=
+ full
+> TX reference clock control for E825
+>=20
+> On Fri, 29 May 2026 16:26:20 +0200 Grzegorz Nitka wrote:
+> > NOTE: This series is intentionally submitted on net-next (not
+> > intel-wired-lan) as early feedback of DPLL subsystem changes is
+> > welcomed. In the past possible approaches were discussed in [1].
+>=20
+> I dug into 3 of the issues reported by Claude here and I think all
+> are really preexisting. But I don't see why we wouldn't fix those
+> first, and have a clean AI scan. Please send the fixes ASAP if you
+> have them, if they are trivial they may make it for tomorrow's PR.
 
-> [...]
+Thanks for your feedback.
+I'm not sure if I can identify exact 3 issues you mentioned above.
+I see couple pre-existing issues reported in
+https://sashiko.dev/#/patchset/20260529142628.1678955-1-grzegorz.nitka%40in=
+tel.com
+  - 3 issues reported in [PATCH v12 net-next 3/8] dpll: extend pin notifier=
+ with notification source ID
+  - 2 issues reported in [PATCH v12 net-next 5/8] ice: introduce TXC DPLL d=
+evice and TX ref clock pin framework for E825
+    The first one is false positive in my opinion.
 
->> @@ -1153,7 +1159,6 @@ static const struct bcmgenet_stats 
->> bcmgenet_gstrings_stats[] = {
->>  			UMAC_RBUF_ERR_CNT_V1),
->>  	STAT_GENET_MISC("mdf_err_cnt", mib.mdf_err_cnt, UMAC_MDF_ERR_CNT),
->>  	STAT_GENET_SOFT_MIB("alloc_rx_buff_failed", 
->> mib.alloc_rx_buff_failed),
->> -	STAT_GENET_SOFT_MIB("rx_dma_failed", mib.rx_dma_failed),
->>  	STAT_GENET_SOFT_MIB("tx_dma_failed", mib.tx_dma_failed),
-> 
-> [Medium]
-> The string "rx_dma_failed" exposed via ethtool -S is user-visible: 
-> monitoring
-> agents (collectd, telegraf, Prometheus exporters, ad-hoc scripts) may 
-> key off
-> that name, and the strings list is ordered, so removing one shifts the 
-> index
-> of every counter that follows for tools that index by offset rather 
-> than name.
-> 
-> Should the changelog mention this user-visible change explicitly, or 
-> could
-> the entry be retained reporting 0 to preserve the existing string set?
+Did you mean those from patch 3/8?
+It should be rather simple ones. Shall I submit it as a part of this series=
+?
+Or a new patch/patchset? (against next or net?)
 
-Nothing in the driver can increment rx_dma_failed after this patch. What 
-would be
-the point in keeping it static 0? AFAIU removing dead soft-MIB counters 
-in the same
-patch is not so special for page_pool conversions (e.g. ionic)?
+Regards
 
-I will mention it in the commit message of v2 though.
+Grzegorz
 
-> 
-> Worth noting that the sibling driver 
-> drivers/net/ethernet/broadcom/bcmsysport.c
-> still exposes rx_dma_failed, so the two drivers in the same Broadcom 
-> directory
-> will diverge after this patch.
-
-bcmsysport still does per-packet dma_map_single() and not PP. The two 
-drivers
-diverge because they do different things now, not because removing the 
-counter
-here is wrong?
-
-> [...]
-
-> [High]
-> Has a one-page-per-RX-descriptor scheme been considered against the
-> platforms bcmgenet actually runs on?
-> 
-> The pool is created with order=0 and max_len=RX_BUF_LENGTH (2048):
-> 
-> 	struct page_pool_params pp_params = {
-> 		.order = 0,
-> 		...
-> 		.max_len = RX_BUF_LENGTH,
-> 	};
-> 
-> bcmgenet_rx_refill() always sets cb->rx_page_offset = 0, and
-> bcmgenet_desc_rx() then does:
-> 
-> 	skb = napi_build_skb(hard_start, PAGE_SIZE - rx_off);
-> 
-> so each ~1.5KB frame ends up with skb->truesize == PAGE_SIZE.
-> 
-> bcmgenet runs on BCM2711/2712 (Raspberry Pi 4/5) and Brahma-B53 STB 
-> SoCs,
-> which are commonly built with 16K or 64K page sizes. With ring->size of
-
-Pi5 uses BCM2712, but doesn't expose the genet and instead uses cadence 
-macb
-on it's RP1. AFAIK only pi5 uses 16k pages and Pi4 and other STB 
-platforms
-use 4k pages? With 4k we would end up at 1 MB per ring, which seems fine 
-for
-a GBit MAC?
-
-> 256 and one full page per descriptor, that is e.g. 256 * 64K = 16MB of
-> DMA-mapped memory per ring on a 64K-page kernel, for ~512KB of frame
-> data. Every ~1.5KB packet also bills PAGE_SIZE bytes against sk_rcvbuf
-> and per-socket memory accounting, which can drive TCP receivers into
-> memory pressure on a Gigabit MAC.
-> 
-> The newly added struct enet_cb::rx_page_offset is set but never to a
-> non-zero value:
-> 
-> 	cb->rx_page = page;
-> 	cb->rx_page_offset = 0;
-> 
-> Was a fragmented allocation (page_pool_dev_alloc_frag(), or a higher
-> .order) the original intent here? If so, would it make sense to either
-> implement that in this patch, or drop the unused rx_page_offset field
-> until it is needed?
-
-Frag allocation is a reasonable follow-up but I'd keep this patch
-focused on the page_pool conversion. rx_page_offset is an artifact from
-the original XDP series. It is meant for the later XDP_PACKET_HEADROOM, 
-but
-I can drop it in v2 for now.
-
-> 
->> @@ -2340,25 +2321,31 @@ static unsigned int bcmgenet_desc_rx(struct 
->> bcmgenet_rx_ring *ring,
-> 
-> [ ... ]
-> 
->> -		if (unlikely(len > RX_BUF_LENGTH)) {
->> -			netif_err(priv, rx_status, dev, "oversized packet\n");
->> +		/* Reject obviously bogus lengths to keep the SKB build path
->> +		 * safe against runt frames.
->> +		 */
->> +		min_len = GENET_RSB_PAD + ETH_ZLEN +
->> +			  (priv->crc_fwd_en ? ETH_FCS_LEN : 0);
->> +		if (unlikely(len > RX_BUF_LENGTH || len < min_len)) {
->> +			netif_err(priv, rx_status, dev,
->> +				  "invalid packet length %d\n", len);
->>  			BCMGENET_STATS64_INC(stats, length_errors);
->> -			dev_kfree_skb_any(skb);
->> +			page_pool_put_full_page(ring->page_pool, rx_page,
->> +						true);
->>  			goto next;
->>  		}
-> 
-> [Low, Low]
-> This combined check changes the per-counter attribution for short 
-> frames.
-> Previously, only len > RX_BUF_LENGTH short-circuited into 
-> length_errors;
-> runts that also had DMA_RX_CRC_ERROR / DMA_RX_OV / DMA_RX_NO / 
-> DMA_RX_LG /
-> DMA_RX_RXER set would fall through to the dma_flag-driven block and be
-> counted as crc_errors / over_errors / frame_errors / errors as 
-> appropriate.
-> 
-> After this patch any sub-min_len frame is bucketed only as 
-> length_errors,
-> even if dma_flag indicates a CRC or RXER condition. Is the loss of 
-> finer
-> attribution intentional, and could the changelog mention it?
-> 
-> A related question on the lower bound itself: min_len is computed as
-> GENET_RSB_PAD + ETH_ZLEN (+ ETH_FCS_LEN if crc_fwd_en), so any 
-> HW-reported
-> frame below ETH_ZLEN on the wire is dropped. Frames below the minimum
-> that the MAC nevertheless delivers (for example with promiscuous mode 
-> or
-> runt-pass enabled, or some PHY-side debug captures) used to reach the
-> stack with DMA_RX_LG / DMA_RX_NO flagging.
-> 
-> The commit message describes this as "a runt cannot underflow the SKB
-> build path". The actual underflow precondition for the skb_reserve() /
-> __skb_put() sequence is len < GENET_RSB_PAD (= 66):
-> 
-> 		skb_reserve(skb, GENET_RSB_PAD);
-> 		__skb_put(skb, len - GENET_RSB_PAD);
-> 
-> Would a tighter check of len < GENET_RSB_PAD satisfy the stated safety
-> goal without filtering legitimate sub-ETH_ZLEN frames the HW chose to
-> deliver?
-
-Resonable. Will use len < GENET_RSB_PAD in v2.
-
-Thanks,
-Nicolai
+> --
+> pw-bot: cr
 
