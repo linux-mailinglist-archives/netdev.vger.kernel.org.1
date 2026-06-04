@@ -1,69 +1,55 @@
-Return-Path: <netdev+bounces-295029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /l0sFeriIGqI8wAAu9opvQ
-	(envelope-from <netdev+bounces-295029-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:28:58 +0200
+	id Yl4gFWLjIGqa8wAAu9opvQ
+	(envelope-from <netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:30:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE17663C827
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:28:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F1C63C84D
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:30:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ctVzrtCU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295029-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295029-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="mYT/Gk6l";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 784B430015BE
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 02:27:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 88DBF3012211
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 02:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABED323EAB4;
-	Thu,  4 Jun 2026 02:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5DB3932CE;
+	Thu,  4 Jun 2026 02:30:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B84A379C5F;
-	Thu,  4 Jun 2026 02:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DAD3876BF
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 02:30:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780540071; cv=none; b=fIoHxs04tNUnTBTZk4/quEpwpODE8zlP3+udaRmDvjaLsEc4kQHuWL8Z63qQpoy6KX6VwkSB1JeOnR+vygok+0+HNxiyEH8VIy/NT+LgMAWHumK8qJkmC0JrE6TaGszZs7S/0n89u/K2EY5Iujyg255FZClRP4fkC7bh0W/xVW8=
+	t=1780540210; cv=none; b=fRsT3+NjfvaaepS/IFQMgrQDZdg+wRjRt9+C1M/hQMgq6BlRk/j6Ve4ibkXp8bz9F+uatoF7qymBqjN5kW0RQbYzAFysWzYLafpPFcADpMec0QhX504hjgOJWjyTmZllZcerJqQdRyaE7+AbyVwiJwkie1n94KWpSk3myjquZl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780540071; c=relaxed/simple;
-	bh=//ycdR9j666aB+3laQyvxqliimkNigFli/rTv0dJYlo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lW6vKiW7d5/djptAqUDF0LDTMOrDWrJih/on9Z+3wN3yjQfJyf2BvAueBWTFNYp5PLivlvaydI7Qx1eXNmioq6Edz6cEHaSxvkIA7AvvzM+9fdtsFGjLTt5Ildtbb+h2aBrOia5GuWnGcD0hNlm7Kf5Pdr7xPoAq+PeyMXGzohk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ctVzrtCU; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 508D71F00893;
-	Thu,  4 Jun 2026 02:27:47 +0000 (UTC)
+	s=arc-20240116; t=1780540210; c=relaxed/simple;
+	bh=TKa1HUW7M4p98jKYnxCp9xHQ9LQnAYhR8oIx4ug8Bp0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=u3teYiE12gb94l2LlBo6G9z0joL96y6NN40u4xa0Z0Tosca0JuofW5g6Dv/Tpey2gmgW+m7zk5ilvgf7hlxq7EqcCi7z157AP949rKDsBBLEbpm4jsA+CfiWQJkI+MLNef0G289FxU0F2uj9ONlwPCBVKiFFaWgmW7sJEu5IskY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYT/Gk6l; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F8241F00893;
+	Thu,  4 Jun 2026 02:30:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780540067;
-	bh=OsaDkSdZoV/McZV7BLdMAnT/Q/15j5KgU6rySIlZccY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ctVzrtCUrS8/cvpyBFFEXlhRoSWY/002kp9vsyPD1O4FyqNzGbkYgxjAGp06HBJN8
-	 tWxJ3PO8WN4CvJ6sGXz4ubWSeAEY1zqIwEpvDczvpNqqPeyqCZWHCaQrndiwuyovbc
-	 K+ehveaek/iveDKzsZknnjgE5xe8liRs+FmOLSzk4KRORO8iiu/AhMg1wWRKXMXZDx
-	 NG2uI6kcWanG6u1D9crQ9zE5F3WWszVbxjmi8C41pzaFa5uCl2cfbjmj6vaKZQcMaY
-	 +E40ZiGnQS+iRsZBstLmEOKmwbJkE/MoG71HdPEkkwcF5py+ODQ+Wb2pkkwO6fpJ58
-	 rLLCOK5IFZZQw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: maxime.chevallier@bootlin.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	hkallweit1@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com
-Subject: Re: [PATCH net v2 3/3] net: phy: don't try to setup PHY-driven SFP cages when using genphy
-Date: Wed,  3 Jun 2026 19:27:30 -0700
-Message-ID: <20260604022729.2925198-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260601084029.815461-4-maxime.chevallier@bootlin.com>
-References: <20260601084029.815461-4-maxime.chevallier@bootlin.com>
+	s=k20260515; t=1780540207;
+	bh=pYfJh+51yj2R4Kc20BEo/16TMlYX/OGjxFXaijOHj2g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=mYT/Gk6lgBe5ptQyD8lFkyNRyBmkUESqSu/6n2CRrDLBo77wah3HAlrHvI1FkTp4w
+	 pOP6FtIHww39OAkIkXAmx9e99BOT8/eqbCVM6YcNgXf0kVseuxCFNge5MjPmDIwp1h
+	 tpcuaj/IX1ohCVlszxLmr6U6Rk7uxt75lAfJ+h3Pxja+UxQwG3IHFsZzdRpFTUuN+J
+	 Wdorom7dBgeCytDsxAHMV78iEUxukQ7ZeVKV0hP4XFV+43jyFl8dcht1I4AVv0DlVK
+	 +g3zLkIsCEOxpndhxapyywVr0GBN6OV2psac2jsNQhXXZ5QvLh8dPBLdAhAaf4WHR/
+	 U3ZzvNdBJVgXw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A5739308E6;
+	Thu,  4 Jun 2026 02:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,78 +57,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] Fix use-after-free in metadata dst teardown in
+ airoha_eth and mtk_eth_soc drivers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178054020839.2211213.18332239171948439867.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jun 2026 02:30:08 +0000
+References: 
+ <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
+In-Reply-To: 
+ <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, nbd@nbd.name, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, fw@strlen.de,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com];
-	TAGGED_FROM(0.00)[bounces-295029-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295030-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,strlen.de,lists.infradead.org,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nbd@nbd.name,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:fw@strlen.de,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EE17663C827
+X-Rspamd-Queue-Id: F3F1C63C84D
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: phy: don't try to setup PHY-driven SFP cages when using genphy
+Hello:
 
-This change skips phy_sfp_probe() when the genphy driver is bound,
-avoiding an RTNL deadlock in sfp_bus_add_upstream() since genphy
-binding runs under RTNL while non-genphy driver binding does not.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index a171cbe2a74a..8eace58e9f12 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -3512,9 +3512,14 @@ static int phy_setup_ports(struct phy_device *phydev)
->  	if (ret)
->  		return ret;
->  
-> -	ret = phy_sfp_probe(phydev);
-> -	if (ret)
-> -		goto out;
-> +	/* We don't support SFP with genphy drivers. Also, genphy driver binding
-> +	 * occurs with RTNL help, wich will deadlock the sfp_bus_add_upstream().
-                          ^^^^
+On Tue, 02 Jun 2026 11:21:03 +0200 you wrote:
+> airoha_metadata_dst_free() and mtk_free_dev() call metadata_dst_free()
+> which frees the metadata_dst with kfree() immediately, bypassing the RCU
+> grace period.
+> Replace metadata_dst_free() with dst_release() which properly goes
+> through the refcount path and runs call_rcu_hurry() if refcount goes to
+> zero.
+> 
+> [...]
 
-[Low]
-There is a typo in the new comment, "wich" should be "which".
+Here is the summary with links:
+  - [net,1/2] net: airoha: Fix use-after-free in metadata dst teardown
+    https://git.kernel.org/netdev/net/c/b38cae85d1c4
+  - [net,2/2] net: ethernet: mtk_eth_soc: Fix use-after-free in metadata dst teardown
+    https://git.kernel.org/netdev/net/c/80df409e1a48
 
-> +	 */
-> +	if (!phydev->is_genphy_driven) {
-> +		ret = phy_sfp_probe(phydev);
-> +		if (ret)
-> +			goto out;
-> +	}
->  
->  	if (phydev->n_ports < phydev->max_n_ports) {
->  		ret = phy_default_setup_single_port(phydev);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
