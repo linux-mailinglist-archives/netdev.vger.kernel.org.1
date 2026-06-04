@@ -1,119 +1,127 @@
-Return-Path: <netdev+bounces-295437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7/CDMY/5IWrIRAEAu9opvQ
-	(envelope-from <netdev+bounces-295437-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:17:51 +0200
+	id NSyMM7v5IWrQRAEAu9opvQ
+	(envelope-from <netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:18:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA7B643C3B
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A5B643C44
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:18:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eTZHiFHk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295437-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295437-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=2dBSWT2E;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295438-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 137653048DCA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:11:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5B9B3051C92
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B4F30D41A;
-	Thu,  4 Jun 2026 22:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAC63242AB;
+	Thu,  4 Jun 2026 22:13:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B351B31D366;
-	Thu,  4 Jun 2026 22:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCDA2EEE90;
+	Thu,  4 Jun 2026 22:13:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780611111; cv=none; b=kgNHa2J9icZE53WD+OHt2kealAoiUptv9mXgFfF2ccWo5i5t7C9kmMN8IwvWNZHOwh3T76UPXJIS2eaDTx8hQaKqVyBvN+/vykKfMyRDyI9+JKEUBYUs/RKciZAJENJJD6LozPu+gAoZJooFXv96nYGI0gsjqxfB+9qb+E9KGOs=
+	t=1780611219; cv=none; b=SpGHmQ+D5OiDKL8GRROX00vqDtxfFqqSpwTMKerAQ14sq4AtHZILDQbRYoL+Ij9byULVd1L3fwQYA/OidsFZ/ddilp+lRRAupVTDFUof5Z5KRKaxuCVgIPu4j0hcEUDGL/7nqKo1lACWAPHKU5XAM9lu1zXMMpEXBsWuIbfn5VY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780611111; c=relaxed/simple;
-	bh=tqnlzggUeP+DeqCuU6PMcOwk1UKbT+3RhEFmlE+FSPk=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=r2nXLsuBmrJhjKNReL3vSDjMZy4izwqYLwN6iBbdpBFb3J4jAKWa6lSU2c3cdiFIbp+yd5Ko/RcI+6UhHzhB6YTiRzNbtPod/EglpFyLMfGv6jaJrey8qVH+qfT9//1rFgs3q2GQ2QbXRlPLhX4XXNlw/Dr8tq52DIdXmP7md9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTZHiFHk; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BDD1F00893;
-	Thu,  4 Jun 2026 22:11:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780611110;
-	bh=S0LrZZRScugOJWF+OWiPG6bj2BfIJIAsTtEDJXX7ryg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=eTZHiFHkyTXgoDUSOtNEVGa0o/bz/G5FGL0Xjhe6TzeL6voWeDya2V2Xk+MUTDp4E
-	 2lVn2XxaxROancEWPNDVYfvbubRx8IcbMNXDKXJw60sNlTcOxqy1WMvUAK6kDo9aHz
-	 sib5qKnTaK4bgVZXwQatSSxvdwXarftFUwcKCVO/COD48zkXtUH9UtLt0l5hxl6a8e
-	 NJyYYfUS064Ff5Tc7p5LvDlciVrDH45zp2Vey5khR2pQBEB+iV+6Wf+Gk9/99nkDCh
-	 1lhbPwCfMVEbzOogMgh/ok2vIID91pyP/SAu+O8kn6+OGuioMYOwYiS2mrQ1RT60cb
-	 cq78HlIwCi+JQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93C133930A31;
-	Thu,  4 Jun 2026 22:11:52 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v7.1-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260604173137.3434910-1-kuba@kernel.org>
-References: <20260604173137.3434910-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260604173137.3434910-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.1-rc7
-X-PR-Tracked-Commit-Id: b6197b386677ae5268d4702e23849d9ad53051ad
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ddd664bbff63e09e7a7f9acae9c43605d4cf185f
-Message-Id: <178061111129.3043969.9400012738673082977.pr-tracker-bot@kernel.org>
-Date: Thu, 04 Jun 2026 22:11:51 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1780611219; c=relaxed/simple;
+	bh=VBPzNNhKg/gxgevw9Vu7BeyTNnOknUjKtkIaoQ0qFUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QjEnaa2bx/KME0I7/2EumJKNuwMR9OwVf72XGolOLdQDTAbB3Sh9kdpojKL1bJgpZbaKU5brlMgki6r4GiLk2PINf3Z5VngOFK35fCJ7wOx8wRzxEk5gCB8VklCZBFqu8XZ07tub/geXNwBuigyUQjR0YtCSl3fg/t7BvUX4eHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2dBSWT2E; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=c1PTdC9lXCxKPecUug8orxQ1I8i9oybZdggOXybuF2c=; b=2dBSWT2Erl8bH1W14lQ4z/tzlW
+	xOsL5jj92/VqRaLSDi27QR3X/CiVUJs0LMHmaUlPrBnAxFHufLXL4FXN/5EF7GWXMIC+VoncsL9OV
+	168ZwQ3MvVwqyyH7i+yy7yXVIEeawy7qpg+6qatpq4UG5T5jHx8Ss5GDTV2WarsO2CTM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wVGJU-0066yJ-Ej; Fri, 05 Jun 2026 00:13:20 +0200
+Date: Fri, 5 Jun 2026 00:13:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: ciprian.regus@analog.com
+Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 05/13] net: ethernet: oa_tc6: Export standard
+ defined registers
+Message-ID: <171a1424-eb9b-440a-ba3c-2f6296727a44@lunn.ch>
+References: <20260604-adin1140-driver-v3-0-5debdb3173c4@analog.com>
+ <20260604-adin1140-driver-v3-5-5debdb3173c4@analog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260604-adin1140-driver-v3-5-5debdb3173c4@analog.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295437-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295438-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:torvalds@linux-foundation.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1EA7B643C3B
+X-Rspamd-Queue-Id: 22A5B643C44
 
-The pull request you sent on Thu,  4 Jun 2026 10:31:37 -0700:
+On Thu, Jun 04, 2026 at 07:32:50PM +0300, Ciprian Regus via B4 Relay wrote:
+> From: Ciprian Regus <ciprian.regus@analog.com>
+> 
+> Move defines for standard Open Alliance TC6 register addresses and
+> subfields in the oa_tc6's header and add entries for the PHYID and
+> CONFIG2. As such, other ethernet drivers that rely on oa_tc6 can use
+> them directly.
+> 
+> Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.1-rc7
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ddd664bbff63e09e7a7f9acae9c43605d4cf185f
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+    Andrew
 
