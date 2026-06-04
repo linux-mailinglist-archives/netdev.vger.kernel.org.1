@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-295141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295142-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ye3qMxxGIWptCQEAu9opvQ
-	(envelope-from <netdev+bounces-295141-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:32:12 +0200
+	id awEDNXFJIWpJCgEAu9opvQ
+	(envelope-from <netdev+bounces-295142-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:46:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E72463E8EF
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:32:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCAE463EA5B
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 11:46:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=07lJXG45;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295141-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295141-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=jFOlI3bO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295142-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295142-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AEE5F308FA35
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 09:28:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D8F0F30A2BFE
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 09:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58EF401487;
-	Thu,  4 Jun 2026 09:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F639401A1D;
+	Thu,  4 Jun 2026 09:28:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCBB3F44CB;
-	Thu,  4 Jun 2026 09:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94A7400E01
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 09:28:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780565313; cv=none; b=t5Zyo4G+T9/HFORaadhVCFzATYeSxNONzND7On7/NlMpFQIR/jtVi0+zKHk9dHx1Bi3m7QdgPQjrWl1jVn6Lm6kxLgsg91emKdrJz/gya2kmWwZ/jQXdJdc/Rg8e1LisyvG7YqHr4SK+lk4KGZa+O7gymhRA9gqsXfUrMh5uklI=
+	t=1780565314; cv=none; b=poWRx3D6OkqaLFWYgfmWbbR6KAmYSKHyjWhI/b97LpRl/KQaA5HdIeLQRxba4Hfkh7sTyOBhTIKlMUpz0qmVoW8tYCG5KQ5Jh6VtaRg5SIOXGnwfx2AJYZw5Av3sQKKnX2KZY1s3T6lvj/bwXmBL7QP/eCXGwZZvjajN/gZ9G9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780565313; c=relaxed/simple;
-	bh=WW6JgxeMBErUtGgr/0vA+ffViSgDw6LQlXiiXxfyoDA=;
+	s=arc-20240116; t=1780565314; c=relaxed/simple;
+	bh=jskCFflmxToUINjJmLffODvvm6DVOanoQ5eEaEd+aVI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DnHgtG0VjLWQq6VmuoM4+5uFN1wU8qfRjRGdIkYAmrJNYEkE2GH1h2dWLRg87Fb5J/EWjv6BcG3NiPPcoB0astOvBIRSPD/rdTAGvoik344bJq+3kDvYoUllayLatsfVqjbbKPFwZhOnSMbVPbZBIfjOhY6L8zwRoLPsLNgCwoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=07lJXG45; arc=none smtp.client-ip=185.246.85.4
+	 MIME-Version; b=MZToobUf7jcn1K3W7ReCYOLBPPei2FXtfD8yWldgSvGQBMr/GcDJcCUEHWxnIFvny7uGuBDnK8Uz3r+woZXHIOc1B5BEi//dlPWYPu8tcm4XBy9X9k5KgAVrCXWW/x+7qujwPSEF3nRVd11O/iCUNN9Mg0mWVFyfRjqazJz6k1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jFOlI3bO; arc=none smtp.client-ip=185.246.85.4
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id AADE84E405EF;
-	Thu,  4 Jun 2026 09:28:30 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B96CB4E406AC;
+	Thu,  4 Jun 2026 09:28:31 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7F4585FEF7;
-	Thu,  4 Jun 2026 09:28:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7C669106A1867;
-	Thu,  4 Jun 2026 11:28:28 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 8CFEA5FEF7;
+	Thu,  4 Jun 2026 09:28:31 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DDC09106A17C0;
+	Thu,  4 Jun 2026 11:28:29 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780565309; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1780565310; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=mw+r8i3yM/UEbAoWm4ZLrQzfHj7n/cBFxgGHZ6EACQE=;
-	b=07lJXG45jRow/WvmQqwGSKNvhExW6fcIGvK9pydACJZwyJ8Roy2ngE51vHckBzxiwPtuIj
-	BjdLvvRjGhw6tQnQ8R/XVUIoiswY3PoSbPbMV5Epdsfefl7WdisHr23E4Izp/wzFPYRfaf
-	STm2m20MIWrFRdnqh3ajl3aSXxfX5l+nkz/+zymLTbQSiWEkg1bykH6f7uyETj+rKLil1x
-	r4bPk9lh/EwMDZR9LvvNqWXXQJqLNOc8pOok5i4lOV4mswJTiLeR0IsqEepe8buoesYLPA
-	g1tj9kylPUEwIwVWQharOS8+ipIQI6ptCJDmSifmYIOdb9/Vy+xjXW+ZzIxIfw==
+	bh=YsRgl1lRAk6jP9fJqYly+oGLmo/o8RaokN6f/Q0aPJY=;
+	b=jFOlI3bOuPoe+KcopbAWXAHlKCLBJmjGsmlFd1z/oFxMWlwk/ulCgkDc9k5b6QAUSesoOR
+	Cl5zLQnY8kip0261+ZGGzyW2VZHX0Zx5vpAdslTPk2yhVvYkS+/PMgDyozG30i48uJiU3t
+	FtmcoExh+YdIOuO8XwWTXW+8/Dp9afLQJptpNybULvSTX4SxtCc2/hlWtzrfrwNABYnBnt
+	5h86l7ww7MR2kCTCvSYDdzKvyZFJnISTImhq1P69uMLASQFLKBs223cxb+8CJDltF2odlg
+	tp4RgfZn7/1Yfy8+wFB17pEIF1Xre10shK0TpXtjclEM9vyN7QnUsUI0hyYmCQ==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	thomas.petazzoni@bootlin.com
-Subject: [PATCH net v3 3/4] net: phy: Clean the phy_ports after unregistering the downstream SFP bus
-Date: Thu,  4 Jun 2026 11:28:17 +0200
-Message-ID: <20260604092819.723505-4-maxime.chevallier@bootlin.com>
+Subject: [PATCH net v3 4/4] net: phy: don't try to setup PHY-driven SFP cages when using genphy
+Date: Thu,  4 Jun 2026 11:28:18 +0200
+Message-ID: <20260604092819.723505-5-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260604092819.723505-1-maxime.chevallier@bootlin.com>
 References: <20260604092819.723505-1-maxime.chevallier@bootlin.com>
@@ -85,7 +85,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295141-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295142-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com,tipi-net.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -109,43 +109,58 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[bootlin.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:mid,bootlin.com:dkim,bootlin.com:from_mime,bootlin.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tipi-net.de:email,bootlin.com:mid,bootlin.com:dkim,bootlin.com:from_mime,bootlin.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5E72463E8EF
+X-Rspamd-Queue-Id: CCAE463EA5B
 
-As reported by sashiko when looking a other patches, we need to ensure
-that the downstream SFP bus gets unregistered prior to destroying the
-phy_ports attached to a phy_device, as the SFP code may reference these
-ports. Let's make sure we follow that ordering in phy_remove().
+We don't have support for PHY-driver SFP cages with the genphy code.
 
-Fixes: 589e934d2735 ("net: phy: Introduce PHY ports representation")
+On top of that, it was found by sashiko that running
+sfp_bus_add_upstream() for genphy deadlocks, as for genphy the PHY
+probing runs under RTNL, which isn't the case for non-genphy drivers.
+
+This problem was reproduced, and does lead to a deadlock on RTNL.
+
+Before the blamed commit, the phy_sfp_probe() call was made by
+individual PHY drivers, so there was no way to get to the SFP probing
+path when using genphy.
+
+Let's therefore only run phy_sfp_probe when not using genphy.
+
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Fixes: bad869b5e41a ("net: phy: Only rely on phy_port for PHY-driven SFP")
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy_device.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/phy/phy_device.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 4ba880446896..b48722589f40 100644
+index b48722589f40..1511385b9b36 100644
 --- a/drivers/net/phy/phy_device.c
 +++ b/drivers/net/phy/phy_device.c
-@@ -3806,11 +3806,11 @@ static int phy_remove(struct device *dev)
+@@ -3512,9 +3512,15 @@ static int phy_setup_ports(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
  
- 	phydev->state = PHY_DOWN;
+-	ret = phy_sfp_probe(phydev);
+-	if (ret)
+-		goto out;
++	/* We don't support SFP with genphy drivers. Also, genphy driver
++	 * binding occurs with RTNL help, which will deadlock the call to
++	 * sfp_bus_add_upstream().
++	 */
++	if (!phydev->is_genphy_driven) {
++		ret = phy_sfp_probe(phydev);
++		if (ret)
++			goto out;
++	}
  
--	phy_cleanup_ports(phydev);
--
- 	sfp_bus_del_upstream(phydev->sfp_bus);
- 	phydev->sfp_bus = NULL;
- 
-+	phy_cleanup_ports(phydev);
-+
- 	if (phydev->drv && phydev->drv->remove)
- 		phydev->drv->remove(phydev);
- 
+ 	if (phydev->n_ports < phydev->max_n_ports) {
+ 		ret = phy_default_setup_single_port(phydev);
 -- 
 2.54.0
 
