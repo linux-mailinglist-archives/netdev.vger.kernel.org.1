@@ -1,135 +1,122 @@
-Return-Path: <netdev+bounces-295003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Iq/eL8TUIGoo8QAAu9opvQ
-	(envelope-from <netdev+bounces-295003-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 03:28:36 +0200
+	id uuJ+OkHVIGo48QAAu9opvQ
+	(envelope-from <netdev+bounces-295005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 03:30:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69BDA63C320
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 03:28:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B59663C343
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 03:30:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gondor.apana.org.au header.s=h01 header.b=OIoBgn4i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295003-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295003-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=apana.org.au;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mDXMH5T+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295005-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295005-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 062AD3017067
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 01:28:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0CAC53020002
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 01:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B38E263C8C;
-	Thu,  4 Jun 2026 01:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2BA1A23A4;
+	Thu,  4 Jun 2026 01:30:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E844919539F
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 01:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E581F1F4CB3;
+	Thu,  4 Jun 2026 01:30:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780536513; cv=none; b=ZyX4HCE9jR8AedmE2SVOJiKxlAaAH0QYlsE4LlxE+TBqo9uNM5fbhnhpcCEW9DT9r+eD6A1h91zBnIX4GSJRHXYMhzsDVj7xkUL7AFoqeXikNUf7eM3wcqCC6GfwasrLE7s0GJzH/aZjt3j6/VtH9Uu9ZqP9Rp1pYcT2F45Ekeg=
+	t=1780536638; cv=none; b=Vhrn1Ff3aaFX+KpfBk6eFzW3TI7TNqkf6Th67rYkLuEwmQxf1ExPLLJpu1MbM05lZTr+igtwgEugRe3eoAfbKD8uWueO5jelE78sQ67hM0Zv+Em7SWAiPPxuoK9TJjnDd0N8mT+D+tKPE84F5VpelVh2Cef/17NVZ89CVKTc9fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780536513; c=relaxed/simple;
-	bh=jZcHl9ofsXjAPjliIiKHG7gjViAMTJb4hUNs1xuT2w4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=du63CJpQFg3O+iAKsb0kN/l4NMaqwLMDbirVM6hlT7Tc8id7rRKy0sJBdcHAlwvfZ5fpgs4D8Dh22RJzKggxDeKxR8aKyWrNUIM1muobJiP/kEHc10kAh6lWuH/4bM5MqXxWzOZ5VjL6SdnUK/I622vu6dTr/i0hvNvUUonyomM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=OIoBgn4i; arc=none smtp.client-ip=180.181.231.80
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=V6Y+oz6COzZsGaT88ofmuWoB69bqSB9qg64abED/XMQ=; 
-	b=OIoBgn4ir7IweuSu27rA4JMP9DLxA1Fz/193QGwnknE6QDwLyljj5m1YttE9q9YafZSMbrkvgJO
-	nkdrVyAoB6kHLzb/s40ecY690BQ/jN76HXxeePuckftWafgy8IJX/5vbAwimLHnL9gGJDGSEG9vPm
-	DMN9KXVSliIM5I8uE5TDS6YHPRBxtUodpHIZcrUT22t98WjqfJUt+bwIeR6BR+35lmosXYFwIFlHU
-	vxH/lzBd1PsJg2oJX7TLaNFvZEbhx/arIb7qOjpcLoYG6yOEsuMm/r8FflCQtf048ZItFd0HezqAR
-	2k+5BqQM/Yh2HSKIOTe8QxpJNEKzMqlpdNiw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wUwsS-002D2S-2L;
-	Thu, 04 Jun 2026 09:28:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 04 Jun 2026 09:28:08 +0800
-Date: Thu, 4 Jun 2026 09:28:08 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, idosch@nvidia.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, steffen.klassert@secunet.com,
-	andrew+netdev@lunn.ch, kuniyu@google.com, jlayton@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] net: protect egress device access in the output
- path with rcu_read_lock
-Message-ID: <aiDUqIC7N1GXtICR@gondor.apana.org.au>
-References: <ahveCu-zzFlpeVut@v4bel>
- <20260602154523.GA537996@shredder>
- <ad40bbe0-f79c-4fd9-9670-5dab01a8e57f@kernel.org>
- <aiAk2Q-yNs6It6g4@v4bel>
+	s=arc-20240116; t=1780536638; c=relaxed/simple;
+	bh=E5O4CQvdXPwkXJMo2ITuL0Zm58nCisd9Kw5BEusOG1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pqjRKMiRhoWejGPjRCi/7/W+saDFpL+0B/se/dycrVqAWckJwR1Pf80KtSOa483xDz6kmj4cBGEAsJzdCkEvHaUt1RwQYqEUjcNCV3ODVSLbm2btSkd9I4h4ot7nrvdqMHeoaoQxlyn5ujBbSXGbDmj1FjjrOWlu1fhioRW8y38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDXMH5T+; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F40C41F00893;
+	Thu,  4 Jun 2026 01:30:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780536637;
+	bh=QGiIv2EogEHFCZ6gLG2NuS35JHQ8K9sawD/XXjwoGF0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=mDXMH5T+YgYjpWjeRD9wgaNvXS+A9PsVLasvd3/bHaBsfDJpmwoIC6+SxyE6T4jc9
+	 FKSTZuH8YzcVuGuxLHf6SGTHraEQTvY/vwfbGSe66Yin1QwmFaHdQKY4I5dLiuqvZR
+	 O3z9MmlO8QnjkahcqgmBvTsXzeGqtanyd6BsUevMZxZu0g1cn0WcIURVUIVsZsaWBC
+	 DWS3c6ng2vdLM+3FR+N7TfhrCNncFBy4bVxr3eNpLVRqgIHjGPZd9HRvgUYWI67wR4
+	 L4N1B27UGhpI93qDtmqoRd9kR6R59ZT4Mk/WtIwjXroHHYS85fqkthPi1lVxHFVxze
+	 kIy/MCgZlQXdg==
+Date: Wed, 3 Jun 2026 18:30:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, poros@redhat.com,
+ richardcochran@gmail.com, andrew+netdev@lunn.ch,
+ przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+ Prathosh.Satish@microchip.com, ivecera@redhat.com, jiri@resnulli.us,
+ arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
+ donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, edumazet@google.com
+Subject: Re: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and
+ full TX reference clock control for E825
+Message-ID: <20260603183036.7c4762d2@kernel.org>
+In-Reply-To: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
+References: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aiAk2Q-yNs6It6g4@v4bel>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-295003-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:imv4bel@gmail.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:andrew+netdev@lunn.ch,m:kuniyu@google.com,m:jlayton@kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295005-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,gondor.apana.org.au:mid,gondor.apana.org.au:from_mime,gondor.apana.org.au:dkim]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 69BDA63C320
+X-Rspamd-Queue-Id: 3B59663C343
 
-On Wed, Jun 03, 2026 at 09:58:01PM +0900, Hyunwoo Kim wrote:
->
-> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-> index cc35c2fcbbe0..c5ac360da38d 100644
-> --- a/net/xfrm/xfrm_output.c
-> +++ b/net/xfrm/xfrm_output.c
-> @@ -594,6 +594,7 @@ int xfrm_output_resume(struct sock *sk, struct sk_buff *skb, int err)
->  {
->  	struct net *net = xs_net(skb_dst(skb)->xfrm);
-> 
-> +	rcu_read_lock();
+On Fri, 29 May 2026 16:26:20 +0200 Grzegorz Nitka wrote:
+> NOTE: This series is intentionally submitted on net-next (not
+> intel-wired-lan) as early feedback of DPLL subsystem changes is
+> welcomed. In the past possible approaches were discussed in [1].
 
-xfrm_output_resume is supposed to run with BH off so there is
-no need to acquire the RCU lock.
-
-Please also check the other code paths that you chagned to ensure
-that they don't already run with BH off.
-
-Cheers,
+I dug into 3 of the issues reported by Claude here and I think all
+are really preexisting. But I don't see why we wouldn't fix those
+first, and have a clean AI scan. Please send the fixes ASAP if you
+have them, if they are trivial they may make it for tomorrow's PR.
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+pw-bot: cr
 
