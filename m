@@ -1,313 +1,288 @@
-Return-Path: <netdev+bounces-295366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ElU+D4K5IWqIMgEAu9opvQ
-	(envelope-from <netdev+bounces-295366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:44:34 +0200
+	id /hCLJnu3IWpcMQEAu9opvQ
+	(envelope-from <netdev+bounces-295367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:35:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CA516425F1
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:44:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1504364254A
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:35:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KAMvaTYv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295366-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295366-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=google.com header.s=20251104 header.b="vP5r8Iu/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295367-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295367-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A1DEF3085AEC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:33:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CE03430138A2
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56524C9560;
-	Thu,  4 Jun 2026 17:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9791C3A4F36;
+	Thu,  4 Jun 2026 17:34:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f73.google.com (mail-vs1-f73.google.com [209.85.217.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149B84C954A;
-	Thu,  4 Jun 2026 17:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E77C40F8D6
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 17:34:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780594396; cv=none; b=mxyakoIglgNy7l9ujQ8Xj0IRz/dFuhRsejjGaL1eFXy+28uWLxog9G0sqP9oK0fUgG0OUU9pwWOR2AhplcMzyQmXTJk2pf75jKbuaeX5f8j38eKD6h8RKN3qk83+L2UqDQibOyH+q1mGdZ7GfS9DaD46uunhzgk4KyceDOlRvf0=
+	t=1780594457; cv=none; b=hGFpNWEchzKdRxRsZUsEJLJ0aDiR7rRwU+SsxOsiopoVVZurMfozU0sN4GXynWf34BipAw/ShLxu0HIora43MHbkIPtLfXAkjL6FGt3nv+BrUjKT9x/mpBfv+oNxIaS19fNm0hPf8IQAqfpwGTfLF3hb+ruV5L+PKTUrf4y1GmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780594396; c=relaxed/simple;
-	bh=K7kw/I3eF2aRMgsjq6hJCOCmmCvvffqpzX0AsR7dY2E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OOO30mkRDHVVxV06wgVZS78G/VtS7HeO90hoKdWnbt8M5HvqcXdcEaoy7ohclkV1ljsp/6RvULYe8GORy1XyjdU9dPQdXWCsDoH6aFfGywSoOWOocwejJ8vOlXZAM2EmpMXJ32/QLP1nDk6D/Ahy6g3UD0qJygQ5WoBYxIoARCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KAMvaTYv; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 134521F00893;
-	Thu,  4 Jun 2026 17:33:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780594393;
-	bh=KE+uMkWXsI4pHqJPpGFmy8f2FxY+qMoC/T/rfy5gO7Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=KAMvaTYvDvB4hnp/67u6AT0NyXI8HNFOOSF7atosC10cAnrq6Ek44404qw48A/SbE
-	 UZ1ruN3mLI1zxR9JzULFaAir6JN6DU/gwjv2fIKewb8ZloyVDrbahkjF89Kw1YkS4u
-	 CjzudcGsriEIhruwFzo64urOtOFSBOq7fpR/clqI63xDZ9qp6GXmeaXRH73yhCdjAp
-	 V5jUU3qk9Fg5a6vdSQrO9VhJyTKqN8+X7aS1pscBiMWqWK1/2bbxIYV4PCxFKoBwZa
-	 j8A2VOVOcD8Ue7wG2RTcicXZq5sJnoIWW0M8dtaA4/f+1NrdZppaS0bgEIi8o1yw6B
-	 Ab6Qjrrsuw7cA==
-From: Simon Horman <horms@kernel.org>
-To: nb@tipi-net.de
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	justin.chen@broadcom.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	opendmb@gmail.com,
-	florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	vikas.gupta@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	fmancera@suse.de,
-	markus@blochl.de,
-	arnd@arndb.de,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: bcmgenet: convert RX path to page_pool
-Date: Thu,  4 Jun 2026 18:32:06 +0100
-Message-ID: <20260604173205.3989025-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260602094248.4130712-1-nb@tipi-net.de>
-References: <20260602094248.4130712-1-nb@tipi-net.de>
+	s=arc-20240116; t=1780594457; c=relaxed/simple;
+	bh=6tC+1wkf1VdbGfTG0QkQBUqZWeEfK9bZ6jgPuZLqQW4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Saw75KK3tXtfEGqmdfleSqBDe+++YxxnBs4zSJ5ajlbq0klnWmA+hZKY0EhyDFFRDWHgai/pySID5f5XcyzQL5GINB/mAZP/XnfG92AsYDKdMxFWojp3x5ZiYwBNWaR15N6SqzyFjmhdrpgphIun1B/gmO/EdwSGn1vhzfBdZK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vP5r8Iu/; arc=none smtp.client-ip=209.85.217.73
+Received: by mail-vs1-f73.google.com with SMTP id ada2fe7eead31-6751c50552dso565063137.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:34:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780594455; x=1781199255; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OyYscCiHWrEf9Tqb4of5uAilULIbQexBcezGvW3rcyk=;
+        b=vP5r8Iu/KLRqK5Vwx/AZq8JwbUURUcCj7J9c4spc9XANWPnWlVVG/nqHlcx6gxl6AT
+         uYgWVtyK1BdAdnsCRH0jm/7CAaRMHFEV6I8GH7ZN3jSVlfDF3q2fPdV8VWv1xdX1UiqW
+         XL87PSzPNNXwLpNi+q+LZAzkiSF1PXD1/zyu5MbaCSZ+yj3dvS+ZI51WqPwG25LhtQv6
+         w5TrBQMQJUz8Kqrpf18wmduoXvrRJoCjsFHvJIq6Y8UExCR9gUJLAOiHqWAzZJHyi+d5
+         qt3Bf9TQXtPFEwDkqufvdS2TyFJfV21dwvNLy8vN+Y2x0yyVo5s0RtZC7nUFC4PAeDSy
+         Z9GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780594455; x=1781199255;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OyYscCiHWrEf9Tqb4of5uAilULIbQexBcezGvW3rcyk=;
+        b=n40DzDpSRnJuanQRALJXNQ3TQFAKYYgBeBN9wSzxm0lD1jvXzZFG4NCVHzdjjYCN6G
+         gzO+ecZbMem6VytHb498oYxv4dLlurr6E0gyPKqyxsQ1WRn4+I3Un2FsDvOtQVYfuQ7z
+         ZFtHNCMsrDj+EQ6xqUFMzjpVNke6kglM/gPIw6Ui74bhHQv9Yxre6PaF0bw/lhKNRE8S
+         jEaCDB7l05b4XHObmtEHU9vSmGqln+aD50cVNsY3RS32d6/sxKIuNjoQLuqUcnvS28WH
+         YoMrOuS5JrmEbUCLXkwmF7EV4dwOaEAbFXkYYk6StEFEWs+epdPy6wAcqRu1om/5t2aI
+         Q8SA==
+X-Forwarded-Encrypted: i=1; AFNElJ/y4cVUAMFCl1Gqg4Ranchhs6LsamPMSC09yYxzxEW/iOmM8akeM4CeaaHUO+KY7UftLNOTbII=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyw+bqYLJarr6Xy05O01tqNC7dz38lB93T/7xvpfknX/MRHNfPX
+	unF8+Cs1cZxAG4ELU0izGmo4Q3Hp/6cp4I/tR5h4dAFEMgsO4HGVf4tNpDbvZDZPAjMcNWlAVEm
+	4uCE3R74cg4AMTg==
+X-Received: from qvblx5.prod.google.com ([2002:a05:6214:5f05:b0:8bb:bac0:7879])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:3594:b0:607:4fde:1921 with SMTP id ada2fe7eead31-6ec490c3d34mr4611692137.24.1780594454762;
+ Thu, 04 Jun 2026 10:34:14 -0700 (PDT)
+Date: Thu,  4 Jun 2026 17:34:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
+Message-ID: <20260604173413.2782008-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv4: remove obsolete EXPORT_SYMBOL() and EXPORT_SYMBOL_GPL()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295366-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:horms@kernel.org,m:netdev@vger.kernel.org,m:justin.chen@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:vikas.gupta@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:bhargava.marreddy@broadcom.com,m:fmancera@suse.de,m:markus@blochl.de,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,suse.de,blochl.de,arndb.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295367-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:email,vger.kernel.org:from_smtp,linux.dev:url]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3CA516425F1
+X-Rspamd-Queue-Id: 1504364254A
 
-From: 'Simon Horman' <horms@kernel.org>
+These symbols no longer need to be exported, they are only used from
+vmlinux:
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+- inet_send_prepare
+- inet_splice_eof
+- inet_sk_rebuild_header
+- inet_current_timestamp
+- snmp_fold_field
+- snmp_get_cpu_field64
+- snmp_fold_field64
+- fib_nh_common_release
+- fib_nh_common_init
+- fib_nexthop_info
+- fib_add_nexthop
+- ip_build_and_send_pkt
+- ipv4_sk_update_pmtu
+- ipv4_sk_redirect
+- rt_dst_clone
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-Now I have the exact diff. Let me produce the report.
+ net/ipv4/af_inet.c       | 7 -------
+ net/ipv4/fib_semantics.c | 4 ----
+ net/ipv4/ip_output.c     | 1 -
+ net/ipv4/route.c         | 3 ---
+ 4 files changed, 15 deletions(-)
 
-commit ff8ce4b2334ded9490897cdd2cff5a25a4a0a438
-Author: Nicolai Buchwitz <nb@tipi-net.de>
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index cbac072633bb57fd68131904fa3eff24265696d9..32d006c1a8eedad9ede42445f6a93d47bca7fc52 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -852,7 +852,6 @@ int inet_send_prepare(struct sock *sk)
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(inet_send_prepare);
+ 
+ int inet_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ {
+@@ -881,7 +880,6 @@ void inet_splice_eof(struct socket *sock)
+ 	if (prot->splice_eof)
+ 		prot->splice_eof(sock);
+ }
+-EXPORT_SYMBOL_GPL(inet_splice_eof);
+ 
+ int inet_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		 int flags)
+@@ -1349,7 +1347,6 @@ int inet_sk_rebuild_header(struct sock *sk)
+ 
+ 	return err;
+ }
+-EXPORT_SYMBOL(inet_sk_rebuild_header);
+ 
+ void inet_sk_set_state(struct sock *sk, int state)
+ {
+@@ -1579,7 +1576,6 @@ __be32 inet_current_timestamp(void)
+ 	/* Convert to network byte order. */
+ 	return htonl(msecs);
+ }
+-EXPORT_SYMBOL(inet_current_timestamp);
+ 
+ int inet_recv_error(struct sock *sk, struct msghdr *msg, int len)
+ {
+@@ -1665,7 +1661,6 @@ unsigned long snmp_fold_field(void __percpu *mib, int offt)
+ 		res += snmp_get_cpu_field(mib, i, offt);
+ 	return res;
+ }
+-EXPORT_SYMBOL_GPL(snmp_fold_field);
+ 
+ #if BITS_PER_LONG==32
+ 
+@@ -1686,7 +1681,6 @@ u64 snmp_get_cpu_field64(void __percpu *mib, int cpu, int offt,
+ 
+ 	return v;
+ }
+-EXPORT_SYMBOL_GPL(snmp_get_cpu_field64);
+ 
+ u64 snmp_fold_field64(void __percpu *mib, int offt, size_t syncp_offset)
+ {
+@@ -1698,7 +1692,6 @@ u64 snmp_fold_field64(void __percpu *mib, int offt, size_t syncp_offset)
+ 	}
+ 	return res;
+ }
+-EXPORT_SYMBOL_GPL(snmp_fold_field64);
+ #endif
+ 
+ #ifdef CONFIG_IP_MULTICAST
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 3e8fadc28798786d76cb476c88ae1d4bd5d5f427..4f3c0740dde913fcc7c747b8ffae68d3ca4a9f69 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -207,7 +207,6 @@ void fib_nh_common_release(struct fib_nh_common *nhc)
+ 	rt_fibinfo_free(&nhc->nhc_rth_input);
+ 	free_nh_exceptions(nhc);
+ }
+-EXPORT_SYMBOL_GPL(fib_nh_common_release);
+ 
+ void fib_nh_release(struct net *net, struct fib_nh *fib_nh)
+ {
+@@ -639,7 +638,6 @@ int fib_nh_common_init(struct net *net, struct fib_nh_common *nhc,
+ 	nhc->nhc_pcpu_rth_output = NULL;
+ 	return err;
+ }
+-EXPORT_SYMBOL_GPL(fib_nh_common_init);
+ 
+ int fib_nh_init(struct net *net, struct fib_nh *nh,
+ 		struct fib_config *cfg, int nh_weight,
+@@ -1642,7 +1640,6 @@ int fib_nexthop_info(struct sk_buff *skb, const struct fib_nh_common *nhc,
+ nla_put_failure:
+ 	return -EMSGSIZE;
+ }
+-EXPORT_SYMBOL_GPL(fib_nexthop_info);
+ 
+ #if IS_ENABLED(CONFIG_IP_ROUTE_MULTIPATH) || IS_ENABLED(CONFIG_IPV6)
+ int fib_add_nexthop(struct sk_buff *skb, const struct fib_nh_common *nhc,
+@@ -1675,7 +1672,6 @@ int fib_add_nexthop(struct sk_buff *skb, const struct fib_nh_common *nhc,
+ nla_put_failure:
+ 	return -EMSGSIZE;
+ }
+-EXPORT_SYMBOL_GPL(fib_add_nexthop);
+ #endif
+ 
+ #ifdef CONFIG_IP_ROUTE_MULTIPATH
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 5bcd73cbdb41c0d402c025cc449a9f84fd2833e0..3b4e9b8af044f19d76802abf519228ca6496e600 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -195,7 +195,6 @@ int ip_build_and_send_pkt(struct sk_buff *skb, const struct sock *sk,
+ 	/* Send it out. */
+ 	return ip_local_out(net, skb->sk, skb);
+ }
+-EXPORT_SYMBOL_GPL(ip_build_and_send_pkt);
+ 
+ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 3d62d45d84bda986db8b3592c0c7f5c81da3fb7e..3f3de5164d6e5854cae3ebe6fcecbac10fb63418 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1171,7 +1171,6 @@ void ipv4_sk_update_pmtu(struct sk_buff *skb, struct sock *sk, u32 mtu)
+ 	bh_unlock_sock(sk);
+ 	dst_release(odst);
+ }
+-EXPORT_SYMBOL_GPL(ipv4_sk_update_pmtu);
+ 
+ void ipv4_redirect(struct sk_buff *skb, struct net *net,
+ 		   int oif, u8 protocol)
+@@ -1203,7 +1202,6 @@ void ipv4_sk_redirect(struct sk_buff *skb, struct sock *sk)
+ 		ip_rt_put(rt);
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(ipv4_sk_redirect);
+ 
+ INDIRECT_CALLABLE_SCOPE struct dst_entry *ipv4_dst_check(struct dst_entry *dst,
+ 							 u32 cookie)
+@@ -1701,7 +1699,6 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
+ 	}
+ 	return new_rt;
+ }
+-EXPORT_SYMBOL(rt_dst_clone);
+ 
+ /* called in rcu_read_lock() section */
+ enum skb_drop_reason
+-- 
+2.54.0.1032.g2f8565e1d1-goog
 
-net: bcmgenet: convert RX path to page_pool
-
-This patch converts the bcmgenet RX path from per-packet
-__netdev_alloc_skb() + dma_map_single() to page_pool, builds SKBs from
-pool pages via napi_build_skb() with skb_mark_for_recycle(), and removes
-the now-unused priv->rx_buf_len field and rx_dma_failed soft MIB
-counter.
-
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index 7c11cf916762..80dbfba9fa88 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-
-[ ... ]
-
-> @@ -1153,7 +1159,6 @@ static const struct bcmgenet_stats bcmgenet_gstrings_stats[] = {
->  			UMAC_RBUF_ERR_CNT_V1),
->  	STAT_GENET_MISC("mdf_err_cnt", mib.mdf_err_cnt, UMAC_MDF_ERR_CNT),
->  	STAT_GENET_SOFT_MIB("alloc_rx_buff_failed", mib.alloc_rx_buff_failed),
-> -	STAT_GENET_SOFT_MIB("rx_dma_failed", mib.rx_dma_failed),
->  	STAT_GENET_SOFT_MIB("tx_dma_failed", mib.tx_dma_failed),
-
-[Medium]
-The string "rx_dma_failed" exposed via ethtool -S is user-visible: monitoring
-agents (collectd, telegraf, Prometheus exporters, ad-hoc scripts) may key off
-that name, and the strings list is ordered, so removing one shifts the index
-of every counter that follows for tools that index by offset rather than name.
-
-Should the changelog mention this user-visible change explicitly, or could
-the entry be retained reporting 0 to preserve the existing string set?
-
-Worth noting that the sibling driver drivers/net/ethernet/broadcom/bcmsysport.c
-still exposes rx_dma_failed, so the two drivers in the same Broadcom directory
-will diverge after this patch.
-
-> @@ -2249,46 +2246,30 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
->  	goto out;
->  }
->  
-> -static struct sk_buff *bcmgenet_rx_refill(struct bcmgenet_priv *priv,
-> -					  struct enet_cb *cb)
-> +static int bcmgenet_rx_refill(struct bcmgenet_rx_ring *ring,
-> +			      struct enet_cb *cb)
->  {
-> -	struct device *kdev = &priv->pdev->dev;
-> -	struct sk_buff *skb;
-> -	struct sk_buff *rx_skb;
-> +	struct bcmgenet_priv *priv = ring->priv;
->  	dma_addr_t mapping;
-> +	struct page *page;
->  
-> -	/* Allocate a new Rx skb */
-> -	skb = __netdev_alloc_skb(priv->dev, priv->rx_buf_len + SKB_ALIGNMENT,
-> -				 GFP_ATOMIC | __GFP_NOWARN);
-> -	if (!skb) {
-> +	page = page_pool_alloc_pages(ring->page_pool,
-> +				     GFP_ATOMIC);
-> +	if (!page) {
->  		priv->mib.alloc_rx_buff_failed++;
->  		netif_err(priv, rx_err, priv->dev,
-> -			  "%s: Rx skb allocation failed\n", __func__);
-> -		return NULL;
-> -	}
-> -
-> -	/* DMA-map the new Rx skb */
-> -	mapping = dma_map_single(kdev, skb->data, priv->rx_buf_len,
-> -				 DMA_FROM_DEVICE);
-> -	if (dma_mapping_error(kdev, mapping)) {
-> -		priv->mib.rx_dma_failed++;
-> -		dev_kfree_skb_any(skb);
-> -		netif_err(priv, rx_err, priv->dev,
-> -			  "%s: Rx skb DMA mapping failed\n", __func__);
-> -		return NULL;
-> +			  "%s: Rx page allocation failed\n", __func__);
-> +		return -ENOMEM;
->  	}
->  
-> -	/* Grab the current Rx skb from the ring and DMA-unmap it */
-> -	rx_skb = bcmgenet_free_rx_cb(kdev, cb);
-> +	/* page_pool handles DMA mapping via PP_FLAG_DMA_MAP */
-> +	mapping = page_pool_get_dma_addr(page);
->  
-> -	/* Put the new Rx skb on the ring */
-> -	cb->skb = skb;
-> -	dma_unmap_addr_set(cb, dma_addr, mapping);
-> -	dma_unmap_len_set(cb, dma_len, priv->rx_buf_len);
-> +	cb->rx_page = page;
-> +	cb->rx_page_offset = 0;
->  	dmadesc_set_addr(priv, cb->bd_addr, mapping);
->  
-> -	/* Return the current Rx skb to caller */
-> -	return rx_skb;
-> +	return 0;
->  }
-
-[High]
-Has a one-page-per-RX-descriptor scheme been considered against the
-platforms bcmgenet actually runs on?
-
-The pool is created with order=0 and max_len=RX_BUF_LENGTH (2048):
-
-	struct page_pool_params pp_params = {
-		.order = 0,
-		...
-		.max_len = RX_BUF_LENGTH,
-	};
-
-bcmgenet_rx_refill() always sets cb->rx_page_offset = 0, and
-bcmgenet_desc_rx() then does:
-
-	skb = napi_build_skb(hard_start, PAGE_SIZE - rx_off);
-
-so each ~1.5KB frame ends up with skb->truesize == PAGE_SIZE.
-
-bcmgenet runs on BCM2711/2712 (Raspberry Pi 4/5) and Brahma-B53 STB SoCs,
-which are commonly built with 16K or 64K page sizes. With ring->size of
-256 and one full page per descriptor, that is e.g. 256 * 64K = 16MB of
-DMA-mapped memory per ring on a 64K-page kernel, for ~512KB of frame
-data. Every ~1.5KB packet also bills PAGE_SIZE bytes against sk_rcvbuf
-and per-socket memory accounting, which can drive TCP receivers into
-memory pressure on a Gigabit MAC.
-
-The newly added struct enet_cb::rx_page_offset is set but never to a
-non-zero value:
-
-	cb->rx_page = page;
-	cb->rx_page_offset = 0;
-
-Was a fragmented allocation (page_pool_dev_alloc_frag(), or a higher
-.order) the original intent here? If so, would it make sense to either
-implement that in this patch, or drop the unused rx_page_offset field
-until it is needed?
-
-> @@ -2340,25 +2321,31 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
-
-[ ... ]
-
-> -		if (unlikely(len > RX_BUF_LENGTH)) {
-> -			netif_err(priv, rx_status, dev, "oversized packet\n");
-> +		/* Reject obviously bogus lengths to keep the SKB build path
-> +		 * safe against runt frames.
-> +		 */
-> +		min_len = GENET_RSB_PAD + ETH_ZLEN +
-> +			  (priv->crc_fwd_en ? ETH_FCS_LEN : 0);
-> +		if (unlikely(len > RX_BUF_LENGTH || len < min_len)) {
-> +			netif_err(priv, rx_status, dev,
-> +				  "invalid packet length %d\n", len);
->  			BCMGENET_STATS64_INC(stats, length_errors);
-> -			dev_kfree_skb_any(skb);
-> +			page_pool_put_full_page(ring->page_pool, rx_page,
-> +						true);
->  			goto next;
->  		}
-
-[Low, Low]
-This combined check changes the per-counter attribution for short frames.
-Previously, only len > RX_BUF_LENGTH short-circuited into length_errors;
-runts that also had DMA_RX_CRC_ERROR / DMA_RX_OV / DMA_RX_NO / DMA_RX_LG /
-DMA_RX_RXER set would fall through to the dma_flag-driven block and be
-counted as crc_errors / over_errors / frame_errors / errors as appropriate.
-
-After this patch any sub-min_len frame is bucketed only as length_errors,
-even if dma_flag indicates a CRC or RXER condition. Is the loss of finer
-attribution intentional, and could the changelog mention it?
-
-A related question on the lower bound itself: min_len is computed as
-GENET_RSB_PAD + ETH_ZLEN (+ ETH_FCS_LEN if crc_fwd_en), so any HW-reported
-frame below ETH_ZLEN on the wire is dropped. Frames below the minimum
-that the MAC nevertheless delivers (for example with promiscuous mode or
-runt-pass enabled, or some PHY-side debug captures) used to reach the
-stack with DMA_RX_LG / DMA_RX_NO flagging.
-
-The commit message describes this as "a runt cannot underflow the SKB
-build path". The actual underflow precondition for the skb_reserve() /
-__skb_put() sequence is len < GENET_RSB_PAD (= 66):
-
-		skb_reserve(skb, GENET_RSB_PAD);
-		__skb_put(skb, len - GENET_RSB_PAD);
-
-Would a tighter check of len < GENET_RSB_PAD satisfy the stated safety
-goal without filtering legitimate sub-ETH_ZLEN frames the HW chose to
-deliver?
 
