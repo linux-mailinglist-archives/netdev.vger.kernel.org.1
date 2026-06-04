@@ -1,244 +1,242 @@
-Return-Path: <netdev+bounces-295021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295022-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WB35OVjgIGoX8wAAu9opvQ
-	(envelope-from <netdev+bounces-295021-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:18:00 +0200
+	id YWcoFgzhIGo/8wAAu9opvQ
+	(envelope-from <netdev+bounces-295022-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:21:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8751E63C729
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:18:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D3563C76E
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:20:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=QOuFTE0C;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295021-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295021-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="i/ZeAU5Z";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295022-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295022-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DB9C7300749F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 02:17:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F498301FAAE
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 02:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2B3305691;
-	Thu,  4 Jun 2026 02:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539EC33DEC8;
+	Thu,  4 Jun 2026 02:20:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3EC2F7F04
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 02:17:52 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780539476; cv=pass; b=Xt9JPaD2Yu5ofF4CYpbUPAKowiq1D7NJC5ZHELrPLoX4CDJMyKj8/L+3KKlDvEM18nmNowA3TvPqfHChGNjTclu3pUlEDbGVxzRKBuF0KQNx+sVMgvxkEFdgyhxKajGVLxuDsl7Wx5+z39B5qGTmZWUPCx+I3yaCE+1CufIoXzE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780539476; c=relaxed/simple;
-	bh=EwcX1tsFLxFLL5FwrFLfJffAgEqRvnJSRnequxoHdNQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qhauTIs+l13vqHlGNafpuRHFIxIR0YRnvff79OpLSS1RX4irovlYuUV4grRXckplrWNgF/lZ9DerWPNPcAOfJ65PYom3Q0PGm3jxywtGIo7mOICgmQ2H1o9AKgGuRdoLXXK2az4rikwjQHJfP1uh2BT7qDUaAqPWM0NE2RSyJ/k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QOuFTE0C; arc=pass smtp.client-ip=209.85.210.53
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7e6128bd9b3so86589a34.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 19:17:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780539472; cv=none;
-        d=google.com; s=arc-20240605;
-        b=G7/0MZdjsrIQU2qGaXPgL29XJOV+jsQjklJaPcB+weDOYEwn9DiGOOz8iEdYXaBLy7
-         iZRRIlbeG16KjnliASBNSCiEf0fJy2FS9rtSx6kSLNvILQI1Ap9LwHlWOZvT/kAsHJPx
-         6nHRb4jjl7i55a93Tg/Jv7UgaNWy0LlH/kb2M+f3AW9A7MHOd4gEIkVE0TPeMqvwah8s
-         SbqGajiLSLTtM0zmiC/1Qg5Hbc9oJYmaT86lUeCnDuGmoaHpR6MwmelZgEkBH4GeZ4fR
-         LtGd8vBGF2GdvZVkMoo+t/aT9aIV3djE57ct7pHpt/nQIK882S4bcto1C2dmVrbzjsmw
-         sqgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QErorqY9RMKPgA72Ld2f8HeSHtavYVIkAzt6SVGTWa0=;
-        fh=yo/o8z4J3DxVeiSosoLN/ImBAQ3aHimlb4g0RXWwsI8=;
-        b=SxBVqq9zw2Ay+U1RAMpXbL1LgdW6pi34av6MjYNCoEYJik7/AEmDi3yenRY/Qws5zP
-         Cpr6qC40gdlHCMMG6mTVtiWaCammxy1AcCY8WprCyIxyXxUwzZpPCZERsvbl0eUOjUmg
-         SxZorKcCgdQpDGWycEmV6i7hhidulyayAd/bmVrmhUvT4QBjW2FUV1VKGkgj+GBVe7YC
-         CnZoGS9EQVeZRLMMRTBh1JDeAAbYztKHZgSTYoxLoKPJHFiJExwcrRBgV7TuU5+MUhSY
-         4oihg3JEyOdfxXAHzrtToqKEHe7TT0a/beipbqrRD/LlgWxSdhfvRpu0DORfCr619Vt+
-         NQRA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780539472; x=1781144272; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QErorqY9RMKPgA72Ld2f8HeSHtavYVIkAzt6SVGTWa0=;
-        b=QOuFTE0CwWWZUIuhPAU3ZFlqQPTLxVeFeQRncC8Y19gnsIAQgWQdOyk/kLTZ+E4LmP
-         VB3+A/JtsRMTpXr1xhMHL3j3i4IOatuuMxD5uNc/I37cbRM9SL6lgPx7I8oLneg+LMu4
-         +gT3St1qCmdji6dwPhJzkBvpHPDC9w8rig+9Oorr3DuPYIrsabzOrwvWtcJV87BITCHb
-         1Hd4lgL5UGL6Nna9uTIo3fh2TNOcgeiZ1xo+mJgaNM4a+AzlJpJT8XehNwP/fKt136eo
-         qfvUGosf6neMwowt2MaWOUEERRA/Tb1/2F2d1LZm2zXa+SY94OEphmMkKtAa3vgpvuq4
-         rNYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780539472; x=1781144272;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QErorqY9RMKPgA72Ld2f8HeSHtavYVIkAzt6SVGTWa0=;
-        b=fYRVd7Yb0UAk2rv5BEHirbCwHESlGQpNGqYTac7ruZ4Q9CA9QzRg8JJMFy+EQ4GOKV
-         jRvKRALMoLDMuhEIOuEqi59B+WLC4LRsUEcp0/Mftvbx8DhIfw3S2pyM0ALItA+jsWVs
-         7aMC6RsdSsi0UtOhZ3ZpHAfx+VrJ/9Y8UCOtSN9Dy4ypSp1KEuXsBih/mw30U4/UAvc3
-         wrizqLnV5DkDsLDZuN2ZMSBkCgRpaJ+5WFsUkqtj8sOZuEB7+Aq5ii/vYtZbN+sLqc+B
-         Q9KHB+NNFltZH4PyZnlWdu+BKfpLospnIRmQYRRXaockqwT//oBTt1S8v+iGJqy8Nv6O
-         mi2A==
-X-Gm-Message-State: AOJu0Yyc9QxrF4G9rlZC0GzCcyCT6CZm/DomByg52fWNA3S3NZ17uoDR
-	1BjKAXYTqGMdb5aQEx2gBnqJsMn23eN9HHm8IuEyYo/ImnU6gBJaCoMylJbP3Nhw9VaLchVLypc
-	x9S01bfrlGfqu0C1YF9pCDL5r35e3Odc=
-X-Gm-Gg: Acq92OEqRSX5TIZLSABHJG/ZaLX0uz1+QcPRYee3m08W2varBwiFJEnxXwRLiPBS/R7
-	K5XvYGYARvsp2cDnHfWZ3GsaHaugBq9ZResHT6MCkrbbLDltltNada4FJLN71nZdK+o1VyKFYyS
-	55rBR62apzSBFAj8xNTb/l9lGhqLiaklkkbaxPtp8LYSDQq+BIDTOV6D2l0f6pehR3KB+QIxrZC
-	29WTcM0K6iWZOhifUsAJuye5UjR6JDyBXXLUxqnFfivJm8CijOVnBRCytCJs20JQOoXh4bF1EGK
-	RtQV86fr43rghymddW/vXym05SGG/RyRyemJr4Ob3zRNHaM0vdSNlBmcEXuTJGVBhYnJLoi1B9V
-	7sVDFVv0tevdg4a6m0rCJRxd6lHU6dg0=
-X-Received: by 2002:a05:6830:3919:b0:7dc:cd0b:58bc with SMTP id
- 46e09a7af769-7e6e94ef38emr3659117a34.7.1780539471819; Wed, 03 Jun 2026
- 19:17:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B718339705;
+	Thu,  4 Jun 2026 02:19:59 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780539603; cv=none; b=IwRz1XJ8mJxeoCAuVkWVkZ9G5CwKsQzl2NzGQiwE3vW2RM4PaZxesGGXSBfaKz+Rebiprr/2b4CZCQ7PyBy2J5thyOUyk6HSAoXU9Hf6WhSasGqe2x+Ei+mqUw/0Q48/TMMhwM7921rSlTVMB1cW4eO9yIdhGh+05/w/27nuVa0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780539603; c=relaxed/simple;
+	bh=vmckD8Tdpulu28xOxc11IGXXKvCwk+kNu2AeVVrwEN8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tdJLld8amiUNNHatff8VCLPPGoNICGcp+nPWirExvYiEZCvBaWnOGD7sI/7sScQSDBacLsRHWXJvLc8i0DNfLSJw9c0lY8XNxczKwneGpREGmvi/Ib7HdOUQjGKgfEloNyUJmt2i17CU9qSEAmqoThlJh37+ovfffOoQHrAtAN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=i/ZeAU5Z; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 653JH91w024408;
+	Wed, 3 Jun 2026 19:19:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=oYUoxRxoQd/DVfOnvf6Stj0mP
+	ZD4TfhthTFHXzi01MI=; b=i/ZeAU5Zciy8rY/iLuxLvPp23MMqMTZbZbxItiNlM
+	xBUpu1I6l1jAJAlMlW02ZLcK5r8F4af+3SRkfF11D2XIKyzFmBPbWafHAGLIrCm2
+	3csY8ftq4a+Rfq8V+Vwgji/wXSbyYDYX5hs5YSDrT0Vo2XmRH1tXycs03qRtnnLk
+	o2dp+ArqdTe80rUJex1sdnsyIovR6FzHrTiKdTJBORjl1cx2kQRWZJmhys6XIo1/
+	ztGYV6aQZP/itLTZRPnqjHB+wJJdGRWL4qR77DBbMwJ1Qx/ehVNKxrxNEDObpd+M
+	Ic2hdtfINeIkSVzSjTordCEDnHxFymZxPxp5QNlGyJ//Q==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ej8v9cqpg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Jun 2026 19:19:48 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 3 Jun 2026 19:19:47 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 3 Jun 2026 19:19:47 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id ACF7E3F70A2;
+	Wed,  3 Jun 2026 19:19:44 -0700 (PDT)
+Date: Thu, 4 Jun 2026 07:49:43 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH v18 net-next 1/8] octeontx2-af: npc: cn20k: debugfs
+ enhancements
+Message-ID: <aiDgvzA2pe8FXJOL@rkannoth-OptiPlex-7090>
+References: <20260602060359.1894952-1-rkannoth@marvell.com>
+ <20260602060359.1894952-2-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260528092838.2099352-1-hanguidong02@gmail.com>
- <20260603112035.0866d7d4@kernel.org> <74e6932f-a755-4931-8d4d-0025826a5502@gmail.com>
- <20260603165238.43259251@kernel.org>
-In-Reply-To: <20260603165238.43259251@kernel.org>
-From: Gui-Dong Han <hanguidong02@gmail.com>
-Date: Thu, 4 Jun 2026 10:17:42 +0800
-X-Gm-Features: AVHnY4LGebkZzXltOaznFBXkEV1y-2gdxNlRrehEewr3Ev4nuMZ8kJ7WOrq0x5Y
-Message-ID: <CALbr=La4JEwfqVg_ouFExpDBQGk-B+63CMaNUp4CiimkKLfqYQ@mail.gmail.com>
-Subject: Re: [PATCH] sfc: Use acquire/release for irq_soft_enabled
-To: Jakub Kicinski <kuba@kernel.org>, Edward Cree <ecree.xilinx@gmail.com>, 
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, 
-	linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, baijiaju1990@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260602060359.1894952-2-rkannoth@marvell.com>
+X-Proofpoint-ORIG-GUID: QahqpciJMAcJoUc0IulIHavSxiQ70SZk
+X-Authority-Analysis: v=2.4 cv=JNQLdcKb c=1 sm=1 tr=0 ts=6a20e0c4 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=9R54UkLUAAAA:8
+ a=M5GUcnROAAAA:8 a=xYWY-QBHG2NFp7g9jwEA:9 a=CjuIK1q_8ugA:10
+ a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA0MDAyMCBTYWx0ZWRfXw6QIdNjokXJe
+ NxBv9fTxaLoYCdb4mzSNYH7p686phFTwSmsn6jPQ0H/LzOEYYA145uqIxTPVBHCcjPN6tB3mg17
+ k+SelJa2qllULGaDhpYkRG2fOgkvAkC88XgkXppZ4SPDKKGqyAOMHApfOsMthqHzjbGbm7C7X96
+ hGYKQyZOn1tkvP/sgAg/2j4jl9uT+1RoDI2WsLD5TjbMlSnTKtlmZkk1+JHiTJxZBrDsll2au3e
+ BcB4Zf/J4RgkLFLiKVzpLr5/6t2iWo8Q48X1w6q6CEF7PKla+KkpvxAdoH4RhEKItaA8zBGPWZo
+ 97FXxkE36aLrEZJhavWyqJTGV+s7jGl+LNEpxTjC6dG93F3HqH9SoS936+f9rtjmZgWLTCXmFVB
+ 9hOy4x/RDFPtCV5/EcBRVO+3SDSRYpuZnOlYJ2smBLVtxD51rovwBcdSXV/GC0zG4E66ka5KoLA
+ gt8w1mULO2TLuanOtnw==
+X-Proofpoint-GUID: QahqpciJMAcJoUc0IulIHavSxiQ70SZk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-04_01,2026-05-28_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295021-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:ecree.xilinx@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-net-drivers@amd.com,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:baijiaju1990@gmail.com,m:ecreexilinx@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-295022-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:from_mime,marvell.com:email,rkannoth-OptiPlex-7090:mid];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[hanguidong02@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,amd.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hanguidong02@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8751E63C729
+X-Rspamd-Queue-Id: C5D3563C76E
 
-On Thu, Jun 4, 2026 at 7:52=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On 2026-06-02 at 11:33:52, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Improve MCAM visibility and field debugging for CN20K NPC.
 >
-> On Wed, 3 Jun 2026 21:28:02 +0100 Edward Cree wrote:
-> > On 03/06/2026 19:20, Jakub Kicinski wrote:
-> > > On Thu, 28 May 2026 17:28:38 +0800 Gui-Dong Han wrote:
-> > >> Use release stores when updating the gate and acquire loads in inter=
-rupt
-> > >> handlers before touching channels. Keep the existing smp_wmb() after=
- gate
-> > >> updates, preserving the current ordering with event queue start and =
-stop.
-> > >
-> > > Why are you keeping the smp_wmb() tho? You don't have to repeat what
-> > > the patch does. The goal of the commit message is to explain the why.
-> > >
-> > > Ed, WDYT?
-> >
-> > I think... that my head hurts from trying to understand this.
-> > What I particularly don't understand is why it wouldn't suffice to just
-> >  put smp_rmb() after every read of irq_soft_enabled, pairing with the
-> >  existing smp_wmb().
+> - Extend "mcam_layout" to show enabled (+) or disabled state per entry
+>   so status can be verified without parsing the full "mcam_entry" dump.
+> - Add "dstats" debugfs entry: for enabled MCAM indices, print hit deltas
+>   since the prior read by comparing hardware counters to a per-entry
+>   software baseline and advancing that baseline after each read (hardware
+>   counters are not cleared).
+> - Add "mismatch" debugfs entry: lists MCAM entries that are enabled
+>   but not explicitly allocated, helping diagnose allocation/field issues.
 >
-> Exactly..
->
-> > And, conversely, why any of this works at all =E2=80=94 what stops an i=
-nterrupt
-> >  handler passing the gate, because the write to irq_soft_enabled has
-> >  propagated to its CPU, but the writes to channel pointers haven't?
-> >  Na=C3=AFvely I'd expect the smp_wmb() in efx_soft_enable_interrupts() =
-to
-> >  come _before_ the write to irq_soft_enabled.
-> > (The smp_wmb() in efx_soft_disable_interrupts(), I'm not sure exactly
-> >  what that pairs with, since the ordering that matters there is between
-> >  the irq_soft_enabled=3Dfalse write and the synchronize_irq().)
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-The issue I was trying to fix is the transition to true.  The interrupt
-handler uses irq_soft_enabled as a gate before it touches channel state,
-for example efx->channel[context->index].  So when the handler observes
-irq_soft_enabled =3D=3D true, it must also observe the channel state that w=
-as
-set up before the gate was opened.
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260602060359.1894952-1-rkannoth%40marvell.com says
 
-The existing barriers do not provide that ordering.  There is no read
-barrier after the READ_ONCE() in the interrupt handlers.  Also, the
-existing smp_wmb() in efx_soft_enable_interrupts() is after the
-irq_soft_enabled=3Dtrue store, so it cannot publish earlier channel state
-before that store becomes visible.
+>> +static DEFINE_MUTEX(stats_lock);
+>> +
+>> +/* MAX_NUM_BANKS, MAX_SUBBANK_DEPTH and MAX_NUM_SUB_BANKS represent
+>> + * hard limit on all silicon variants, preventing any possibility of
+>> + * out-of-bounds access.
+>> + */
+>> +static u64 dstats[MAX_NUM_BANKS][MAX_SUBBANK_DEPTH * MAX_NUM_SUB_BANKS] = {};
+>The dstats array is a file-scope static and is never reset on driver
+>teardown. npc_cn20k_deinit() now clears npc_priv.en_map but leaves
+>dstats alone:
+>  void npc_cn20k_deinit(struct rvu *rvu)
+>  {
+>      ...
+>      bitmap_clear(npc_priv.en_map, 0, MAX_NUM_BANKS * MAX_NUM_SUB_BANKS *
+>                   MAX_SUBBANK_DEPTH);
+>  }
+>On a probe -> remove -> probe sequence (or after an NPC reset) within
+>the same module load, do the stale baselines from the previous device
+>incarnation remain in dstats[][]?
+>The wrap-around guard only self-corrects when the new hardware counter
+>is smaller than the stored baseline:
+>  if (stats < dstats[bank][idx])
+>      dstats[bank][idx] = 0;
+>If the post-reinit counter is greater than the stale value, would the
+>first read of dstats report stats - stale_baseline rather than the true
+>post-init delta? The commit message states baselines are advanced
+>"after each read", which seems to imply per-incarnation correctness.
+>Note: this appears to be addressed later in the same series by the
+>patch "octeontx2-af: npc: cn20k: Allocate npc_priv and dstats
+>dynamically" (4767c16e8909), which moves dstats to a devm_kzalloc()
+>allocation that is freshly zeroed at each probe.
+There is only one AF device per system. So this case wont happen.
 
-A writer-side smp_wmb() before irq_soft_enabled=3Dtrue plus a reader-side
-smp_rmb() after reading true would provide the needed ordering.  I used
-smp_store_release() and smp_load_acquire() instead because they express
-that flag-based synchronization directly and are usually cheaper.
-
-I kept the existing smp_wmb() because it seems to provide a different
-ordering, between opening/closing the software IRQ gate and the later
-event queue start/stop operations.  That barrier is not documented, so I
-did not want to remove it in the same patch.
-
-> >
-> > Anyway, this code predates my involvement with sfc and I've never had
-> >  to touch it, so frankly I don't know any more here than anyone else,
-> >  and if a memory-models expert reviews it and says 'this is needed and
-> >  correct', that would mean more than a review tag from me.
-> > That's not a cop-out "I won't review this", rather I'm saying that if
-> >  Gui-Dong can't convince me because I'm too dumb, but can convince you,
-> >  then you don't need to wait for me to show up and add my tag.
->
-> I haven't dug into the code too much but FWIW having a store_release
-> barrier which flips something _both_ to true and false strikes me as
-> highly suspicious. So the patch needs a much better commit description
-> at the very least.
-
-Agreed, the false transition does not need release ordering.  Handlers
-that observe false do not touch channel state.  I changed that side in v1
-only for helper consistency.
-
-If this direction sounds OK, I can send a v2 that keeps WRITE_ONCE() for
-the false transition, uses release only for the true transition, and
-improves the commit message.
-
-Thanks Jakub, Edward, and Simon for the careful review.  If there is anythi=
-ng
-else you would like changed in v2, such as splitting the patch, please
-let me know.
-
-Thanks.
+>> +	mutex_lock(&stats_lock);
+>> +	seq_puts(s, "idx\tpfunc\tstats\n");
+>> +	for (int bank = npc_priv->num_banks - 1; bank >= 0; bank--) {
+>> +		for (int idx = npc_priv->bank_depth - 1; idx >= 0; idx--) {
+>> +			mcam_idx = bank * npc_priv->bank_depth + idx;
+>> +
+>> +			if (npc_mcam_idx_2_key_type(rvu, mcam_idx, &key_type))
+>> +				continue;
+>> +
+>> +			if (key_type == NPC_MCAM_KEY_X4 && bank != 0)
+>> +				continue;
+>> +
+>> +			if (!test_bit(mcam_idx, npc_priv->en_map))
+>> +				continue;
+>> +
+>> +			stats = rvu_read64(rvu, blkaddr,
+>> +					   NPC_AF_CN20K_MCAMEX_BANKX_STAT_EXT(idx, bank));
+>Can idx exceed the second dimension of dstats[][] here? The inner loop
+>runs idx from npc_priv->bank_depth - 1 down to 0, but dstats is sized
+>MAX_SUBBANK_DEPTH * MAX_NUM_SUB_BANKS (8192).
+>In npc_priv_init() the new validation only constrains the quotient:
+>  subbank_depth = bank_depth / num_subbanks;
+>  if (subbank_depth > MAX_SUBBANK_DEPTH) {
+>      ...
+>      return -EINVAL;
+>  }
+>Because of integer truncation, bank_depth values in the range
+>(MAX_NUM_SUB_BANKS * MAX_SUBBANK_DEPTH, MAX_NUM_SUB_BANKS *
+>MAX_SUBBANK_DEPTH + num_subbanks - 1] (for example 8193..8223 with
+>num_subbanks=32) pass this check while exceeding 8192.
+>mcam->banksize is sourced from a 16-bit hardware-reported field, so the
+>value is structurally allowed even if current silicon programs a
+>power-of-2 banksize. With such a banksize, would the new
+>set_bit(index, npc_priv.en_map) in npc_cn20k_enable_mcam_entry() (which
+>only validates index < mcam->total_entries) and the dstats[bank][idx]
+>indexing here write past the bitmap and array?
+>The new comment in cn20k/npc.h states:
+>  /* MAX_NUM_BANKS, MAX_SUBBANK_DEPTH and MAX_NUM_SUB_BANKS represent
+>   * hard limit on all silicon variants, preventing any possibility of
+>   * out-of-bounds access on matrix defined using these values.
+>   */
+>Would an explicit check such as bank_depth > MAX_NUM_SUB_BANKS *
+>MAX_SUBBANK_DEPTH (or mcam->total_entries against the bitmap size) make
+>the comment match the code?
+>> +			if (!stats)
+>> +				continue;
+>> +			if (stats == dstats[bank][idx])
+>> +				continue;
+>> +
+>> +			if (stats < dstats[bank][idx])
+>> +				dstats[bank][idx] = 0;
+>> +
+npc_priv_init() during probe() do check against limits MAX_SUBBANK_DEPTH, MAX_NUM_SUB_BANKS.
+So the condition wont happen.
 
