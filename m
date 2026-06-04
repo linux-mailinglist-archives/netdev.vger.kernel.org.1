@@ -1,120 +1,158 @@
-Return-Path: <netdev+bounces-295221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295222-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tRgcEpFvIWqBGQEAu9opvQ
-	(envelope-from <netdev+bounces-295221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:29:05 +0200
+	id Xx1HGjFwIWq9GQEAu9opvQ
+	(envelope-from <netdev+bounces-295222-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:31:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3539963FDAE
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:29:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 613C563FE2F
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:31:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=balqjJvs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295221-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295221-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=eX1TVbd9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295222-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295222-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93E85305BCC4
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 12:15:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9195C30296D6
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 12:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D4343E4BF;
-	Thu,  4 Jun 2026 12:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CABD4418FC;
+	Thu,  4 Jun 2026 12:20:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32C4423156;
-	Thu,  4 Jun 2026 12:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2938A43DA4C
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 12:19:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780575344; cv=none; b=HGJVkFoVD1qvMxGsga5dTvf21OBuAwx/9r3+xgjAnptXW4fPNi0OBqYC1zdn9vb0MMbzt9lfxSjwvOp8jFLbvsGZmYQK4DBg1YpR90oLYY/Rc8lHmW3rwp71r7KOJv6invugN/rkyo2mnCCmvaDLq/58DQ9X+i8AE0A0c7hpWvg=
+	t=1780575601; cv=none; b=fG0ZIeUiwKmG5168KsJsglLmJCKMhG7ahmYvYkpXx3EcWt4j/SIYzJME1djjtZELTMrDB9DipuYn6IhNUoGE3LH5hiACbEy2kyeSiEwf9zkcTa4rknmGEbr60O79sQ2TECfKA9FFpcfYQ8TtZ1LUUf1kq1DxTK+PbXLLz+yg2lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780575344; c=relaxed/simple;
-	bh=uuWtqL2WolXYJNjqqDgxF84YSoqvRlyovyp6OYFfqbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dCrFqYdlMeSj+9ab74J1W0tpmUL7U6uguytjP2kFO9RjCf5gbdXxJjfqPB2JRIn/3XZiyY2j42RFu/9akLRV09rDW7rkCZZdaE3d6gE9dQRUEpEbaIYfPJ/2EuKL1Pl0v0+5WagAwmPI2IUVVjMEjrnpgQxcUPonqhKM+lWE/Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=balqjJvs; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rrTCBVw9fJyz5w/AnDGqMEZsVlg7Qh/n11cbzaFeMz4=; b=balqjJvs7WubRmKvrFq4m9hDKm
-	hqK5AsFBvzyOP0kR3KEu/3C//N+u3/9s9Ym7wPEHVtDxaXie552IKIi8YPotEBZQadPiuya65E3Kv
-	HeSMXiHdc4fs/9I2K71X+oHWvmHjfL9zc1b3p1oVgnX5NrgnFagRyR+aLtiIZIgy76E8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wV6yy-0062VK-VZ; Thu, 04 Jun 2026 14:15:32 +0200
-Date: Thu, 4 Jun 2026 14:15:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: lawson.fidelio@gmail.com, woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com, olteanv@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	marex@denx.de, maxime.chevallier@bootlin.com, horms@kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk,
-	Tristram.Ha@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nb@tipi-net.de,
-	fidelio.lawson@exotec.com, marex@nabladev.com
-Subject: Re: [PATCH net-next v9 3/3] net: phy: micrel: expose KSZ87xx
- low-loss cable tunables
-Message-ID: <bbb42bb7-7ea2-4a7d-a66b-dea02129a667@lunn.ch>
-References: <20260601-ksz87xx_errata_low_loss_connections-v9-3-fdbbb15592cb@exotec.com>
- <20260604114133.170770-1-pabeni@redhat.com>
+	s=arc-20240116; t=1780575601; c=relaxed/simple;
+	bh=SI0wUmmssdNyLig00onMvpbP/Rf7xOYdVtG8qWFPk8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uZslyR6swXZilN61Ot0zUzSBK0keVP3NXReRgGi3v5+tNXV0DgoozwGQwiE/SCEUkZvaUAua7NDHyRR0IvGpwjKEPYQaQhAX1GQJN79PsmPBiFPIAF+UVUJ8/O38U6sNCFDgBYgfBHn9vDHcXxL1T8Ek9pzpq8g/4IWBHjJp2oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eX1TVbd9; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780575598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rQk73RjGmv1YYZSKsEIY/tBeBU1Z6whR3boOZNNywYE=;
+	b=eX1TVbd9gGSMoiyEKb3Cw0mc2Yy7GlQ1tTArRwmxpZ9dBkza855f77m9C0qXGX4559RoGk
+	MYV+2O66IZ9zTOMPw8DaA2Fx2qEzuAwT/YDKcrUMPBieFmhTifvSAr7Bo7mX/6Z4wOlVGV
+	qXy/4ICB//ELru8Y6ICheb8w/kqskpY=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-V6AZ3xNrNeeUPKgNMdDDkw-1; Thu,
+ 04 Jun 2026 08:19:55 -0400
+X-MC-Unique: V6AZ3xNrNeeUPKgNMdDDkw-1
+X-Mimecast-MFC-AGG-ID: V6AZ3xNrNeeUPKgNMdDDkw_1780575593
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59AAF1956052;
+	Thu,  4 Jun 2026 12:19:53 +0000 (UTC)
+Received: from antares.redhat.com (unknown [10.44.32.149])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A1D411955BC1;
+	Thu,  4 Jun 2026 12:19:48 +0000 (UTC)
+From: Adrian Moreno <amorenoz@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Adrian Moreno <amorenoz@redhat.com>,
+	Aaron Conole <aconole@redhat.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Pravin B Shelar <pshelar@nicira.com>,
+	Jarno Rajahalme <jrajahalme@nicira.com>,
+	dev@openvswitch.org (open list:OPENVSWITCH),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] net: openvswitch: fix possible kfree_skb of ERR_PTR
+Date: Thu,  4 Jun 2026 14:19:46 +0200
+Message-ID: <20260604121946.942164-1-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260604114133.170770-1-pabeni@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295222-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295221-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:lawson.fidelio@gmail.com,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:marex@denx.de,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:Tristram.Ha@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nb@tipi-net.de,m:fidelio.lawson@exotec.com,m:marex@nabladev.com,m:lawsonfidelio@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:amorenoz@redhat.com,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:pshelar@nicira.com,m:jrajahalme@nicira.com,m:dev@openvswitch.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[amorenoz@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,microchip.com,davemloft.net,google.com,kernel.org,denx.de,bootlin.com,armlinux.org.uk,vger.kernel.org,tipi-net.de,exotec.com,nabladev.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[amorenoz@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3539963FDAE
+X-Rspamd-Queue-Id: 613C563FE2F
 
-> Since the capability check looks at get_tunable but unconditionally calls
-> set_tunable, could this lead to a NULL pointer dereference if a PHY driver
-> were to implement only read-only tunables by providing just get_tunable?
+After the patch in the "Fixes" tag, the allocation of the "reply" skb
+can happen either before or after locking the ovs_mutex.
 
-It is in the name, tunable. A write only tunable might make sense, but
-a read only does not. So an Opps is the right thing to do, it makes it
-clear there is a bug, and you get a nice stack trace to help you find
-it.
+However, error cleanups still follow the classical reversed order,
+assuming "reply" is allocated before locking: it is freed after unlocking.
 
-      Andrew
+If "reply" allocation happens after locking the mutex and it fails,
+"reply" is left with an ERR_PTR, and execution jumps to the correspondent
+cleanup stage which will try to free an invalid pointer.
+
+Fix this by setting the pointer to NULL after having saved its error
+value.
+
+Fixes: 893f139b9a6c ("openvswitch: Minimize ovs_flow_cmd_new|set critical sections.")
+
+Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+---
+ net/openvswitch/datapath.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+index bbbde50fc649..f0164817d9b7 100644
+--- a/net/openvswitch/datapath.c
++++ b/net/openvswitch/datapath.c
+@@ -1316,6 +1316,7 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
+ 
+ 		if (IS_ERR(reply)) {
+ 			error = PTR_ERR(reply);
++			reply = NULL;
+ 			goto err_unlock_ovs;
+ 		}
+ 	}
+-- 
+2.54.0
+
 
