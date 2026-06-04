@@ -1,138 +1,286 @@
-Return-Path: <netdev+bounces-295240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 00O+Ic56IWqdHAEAu9opvQ
-	(envelope-from <netdev+bounces-295240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:17:02 +0200
+	id zooIJK16IWqWHAEAu9opvQ
+	(envelope-from <netdev+bounces-295241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:16:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5D56403C1
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:17:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1D956403A9
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:16:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=J+Qq9g4e;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295240-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295240-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=IRyyyXbO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295241-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295241-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3A3D03002B7F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 13:06:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 56FB3300917D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 13:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52C747D922;
-	Thu,  4 Jun 2026 13:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0CA47885F;
+	Thu,  4 Jun 2026 13:13:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74F93BE17E;
-	Thu,  4 Jun 2026 13:06:27 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780578388; cv=none; b=p0MnZqjnrH3kDmM6x7W362Cm7/lXNNPfe2p/FRxpJODGITsZ9o4iZQvW44l3uXdwVYUTtqyaGo2d5q59gJTBmkljdUksJ8JVvRhbh/TeXHRSuMgUaZZYJQXpIWGAqa5AVwJ9NyrAue4VgYA+672Tn2f50xu3k98/ULLrIiG8bSo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780578388; c=relaxed/simple;
-	bh=t/bnHVvLxSnLu7GFAfeDE6W9zRykt9dyoZD7Bp1dM8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f+U9EILtBgxB65TE9ziYP9e6QGFumE0sUWnXHjmWfVAS5cwSbz4xC7gCwJ0IRL06VkmrzO9AHlJtLaE3CPPBpNOn+VcQt5YtT7SaeC3Sr4QHnqyTqb5Q84c2dobB1ZZPeHOqu0DV/UgLNv+Te7JJTNySmf7VSh9xbMKDtZ4jp9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J+Qq9g4e; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F8A11F00893;
-	Thu,  4 Jun 2026 13:06:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780578387;
-	bh=Yk7G4nQ76kEw4V8LfGixmYzRqb+tUcXQEXr+9JxJya8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=J+Qq9g4ecq6sFBscMlTP5Yd+894YldsFLUszk5+a4sBaXHEHvTdLhRnn9UekuoDLN
-	 /gY8+t2iBNybiMJoZAw1p5RGzGvV8Q3ZMQqiiX0+BP9YJqRaCGi8UANpo5FSZCvLXo
-	 AI0VKx5InvAx3ljDvwT2DXzrB0QDhe8vJfrCLh9c8+wB8kv7RufsKFcMn/eKmmJTBE
-	 UNb9FYDFzjojwOhrCT5DmnN9MA5y9gmDIYvQEEVs7Cxo5jeuntl4eAbR3xQrO55Pyr
-	 mjSsYj14vx05f9cFVuwGQW3Yy7oCXv8rGa5n7qc6sA2tWdJgFiLHKIIiS5BhnnNfHr
-	 Gus2LDtsORCvw==
-Date: Thu, 4 Jun 2026 14:06:22 +0100
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 0/3] netconsole: Fix reported problems
-Message-ID: <20260604130622.GB3920875@horms.kernel.org>
-References: <20260602-netcons_fix_before_move-v2-0-eca3f8a8b1a3@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F403477993
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 13:13:42 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780578823; cv=pass; b=st3IY9UmCrEPZTCt42BexKiQleLDQKGT1sZHXgkr/4g98wMMv1gZiwuMciMz632lpJ5kgaHGrLEeWDfxqpK9WH6RFmTWTxTyp1O88WICHgxvVbhldkkZaQBOvAsbLGNM5W8v++amim8n3aOPBJ10BADcLpVrm+IqeURLCGuCmKM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780578823; c=relaxed/simple;
+	bh=rfHhjL3ZZMp60w7b1i+Cr2MGuwtgIguCPu+p9RC8SQs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uTAEo/gHzKtAVdyM5uoXtkcrQPq67sgg7Ue9jHmTjBwu97UdXuMoyM8yK6AzlZXeHnvFFJ2uZPdG+EOj+DshC21x6EYIEOOSPRqBvxI64ej32bzrS5M8lgiLrEpcaUNfigZXlPJUsGVUoyzQGV2tW/H8W03KpOFdklY0SccxmvA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IRyyyXbO; arc=pass smtp.client-ip=209.85.160.171
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-517863a2edfso5285011cf.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 06:13:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780578821; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dv9OqVZCsmAkgBvGgrS1X6I0xWF3yELNzssQM4/sqhgLXCQUxO+6yRYUqhCMcIRgQY
+         faOl5Elbls80VKidhlIijxrHY/O4c/mfYnODIJEqz5f/PkgwOFQhFtsNq+KxVy6Kr19l
+         Q6VzM44vuSlDOGwFg/2Jrr9ErrOl4sJYwyfkk7gX0FgPW8jq6Jy6AQLnFO+OWgWKMvO2
+         LX06YbWVgXsSRIjjjqe0WgeWlYx1UxutQdIoF7ijGd8aUhOUinyJqTjpd6mWo3clA9b3
+         ip9IEVXrLwVmUxKjGAcoepZQuu7ix8x2qWUwWOHVI4vfbUpJRxd8Ctu5Sq0yKg9SZU8Z
+         962A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dLMuLfUGqkTkGr6t08UWpsLJjsHkoXfFjO9Vo2MOjIs=;
+        fh=K/NG9dPRVSyMTaD+yBK9psxmjdzscoEmXfYRWUuNuyU=;
+        b=KxqOQ/VQ7Y6aN+O5kEPzycM+UlWoYFVmrx/bK6eHj5pkIg6roSXlEil6qJEchrF+Rp
+         ZAYsy1s0aXkxVD/Y7rU4Z5W3rCBVERj4wXBw8/q0Cuxra+Ajbo66RS0I9KafeSb2bFOd
+         M0PIguUTwnx3FLeoKrJj0hUtQ0DKnuVrQpmCaeA+7jMzwSiWVXUqFcG8q5ipDfI3v8Rk
+         fo6ouXgGswAmJO6WT5azYMdxBK0oVrW6LHkQVK/RLlOO/o86oImzBM9uoH5s8Chzn0h8
+         28k/hRr4Xg6PzIpJhlUXS766C5U7iJC10PtnBxyw+XWtbHEj3Bz1Il6SHG1K5vTrt+TJ
+         GCYg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780578821; x=1781183621; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dLMuLfUGqkTkGr6t08UWpsLJjsHkoXfFjO9Vo2MOjIs=;
+        b=IRyyyXbOXJxB4a+WTrto/KeN20FUhCEmrPLpF5QKmw4OUMfPiapip151Fso5MV1kgn
+         kIPwZ17SOmTI5DQXwLuE3GRU+Vb9xHeffUAzTNmbkNSZB5WHRiz1jJpgbPXlWtARRNf8
+         isdgrDA+4T+0mj4HvCNpEqyFuOS77PP9QgN741hYZIkx/UU8/5iXGkBmPMU1QzFPzlLO
+         UtYOGZM9/Wfoco1k/MqtxKJKvrq2cKaViQyxljYmqL1GC7htpSECL+9ZK4dwCe6wZhh9
+         QLiLwvMD0CzrVeKc1yyh+wQybADPjL2heI3uzTc1X20lsPyXg31jERNPdikra790sjCO
+         6UoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780578821; x=1781183621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dLMuLfUGqkTkGr6t08UWpsLJjsHkoXfFjO9Vo2MOjIs=;
+        b=IK6N2NgpX9weHM5aB/frc97LAJ74Tryk24DuSbHV6YOjGV0iJGVkxqw/Ejte3tYPNU
+         3+Q4Wm6lCpHXc8kUKM8CbetYa7JtzPQjyNWAeUdYBTp+cXXiyYy6b/QPbIvzt2EQw+ea
+         97MSuVK9W5+Qn/lvXZdzZ26jyFl+xAyxOQpGN0Gs556SxoDlqiqOPB2pTkgMBmAULdSD
+         WZSui/N6reb91WLtz1QAvM6zsUy9X6vBYv+OM809WsX6xbOzuLkJtQgZI35SnYneqBdU
+         6DQSeegXJCmSxVl4pY2oa0gb1/94EzrJ7Sg4qbbRhMb+VZ7YnN8aVLRxefgxiyuHIw8l
+         WLtQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/tiz2j7m8o7W22zMk5qAEv/0ax4L0EjHGCdey1HZo2ltllFQxZ44Uik0PpnVdZpDKjvgAffNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl4x7qnLwEV+oRcxcRvPOMG2qZn7hj82enYP+sUzv3FvhOc9xj
+	IMPdNS1xk9rUxyuEsEC1Qi9mjbpEgmKpuLVKl4WZjCjjN94fN20ros4NWnRViEO7sdZwK/I+2bg
+	IMYBt7CcLJRshylBglQHnxYN88PC5JcsjtMM0fgbc
+X-Gm-Gg: Acq92OHjTbCtaYMx+VC+8d9um2iR2HkeDa54XwevwpubAxTDyGOXKLpEqrc/fiWNa8q
+	I7Xny5hnahDKElf14GZ4OlieDBvlk+X+Q8lfW2MAAbMzFXs/I9VDyCWs3n7FGgydvESzJloZjZm
+	fiHbr96CdnvKyliRHQBequl5Us9FNDkcjtghkzttkiNRGyuf1qzddQxHoymxq3nDJdjvpIUf22a
+	6e44fs2KwsDPBk97SC8hDfBo0VUWPFCf9LlDK8kZSq0zjtv3WJxVaeSYmctDwQcVa6eFnYsHpWQ
+	7b2yboshW9DIQBIa2+788ec1FClE5Yhrj6QiQi013ldlbq+k0fXEKks80FxnJonIU1qbWXP17OC
+	Dt186BA52L0+NhwYMv5oJxm/jnzkJHg==
+X-Received: by 2002:a05:622a:1dc3:b0:517:84f3:6908 with SMTP id
+ d75a77b69052e-51784f3727dmr67811931cf.32.1780578820456; Thu, 04 Jun 2026
+ 06:13:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260602-netcons_fix_before_move-v2-0-eca3f8a8b1a3@debian.org>
+References: <20260603171922.4A1512AA9D4@windowsforum.com> <345af51b-9135-4ca0-816b-781a61fdbcbe@linux.dev>
+ <CAP_6uV+1zQqLtwH30SyuQmyHc03uv9ea+ZUr42TGSCozU4KcdA@mail.gmail.com>
+In-Reply-To: <CAP_6uV+1zQqLtwH30SyuQmyHc03uv9ea+ZUr42TGSCozU4KcdA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 4 Jun 2026 06:13:29 -0700
+X-Gm-Features: AVHnY4LeIBb5kQLkkIRSYRzKcvvmNsrN7jJIUE8W9uhZX7zdFQHlQPHzAaaJWto
+Message-ID: <CANn89iKWNXT_zeBHKZbQXAXbAs_+7iSMZVNXM=MOgHjygu+VfQ@mail.gmail.com>
+Subject: Re: [RFC net] tls: TLS_SW sendfile() stalls at large MSS
+To: "WindowsForum.com" <admin@windowsforum.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org, 
+	Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>, 
+	David Howells <dhowells@redhat.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295241-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295240-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:kernel-team@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[linux.dev,vger.kernel.org,nvidia.com,gmail.com,kernel.org,queasysnail.net,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:admin@windowsforum.com,m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:borisp@nvidia.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:dhowells@redhat.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,horms.kernel.org:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,windowsforum.com:url,windowsforum.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7D5D56403C1
+X-Rspamd-Queue-Id: E1D956403A9
 
-On Tue, Jun 02, 2026 at 07:26:56AM -0700, Breno Leitao wrote:
-> These are some of the issues that LLM reported to netconsole, and they
-> are being addressed here before big refactors.
-> 
-> I was doing some big refactors, and got some "pre-existent-issues"
-> during LLM review of the refactor, that make them hard to guarantee that
-> refactor is not introducing any bug, so, let's clean these pre-existent
-> bugs first, and then submit the refactor.
-> 
-> The issues fixed in this patchset were reported during the review of
-> https://lore.kernel.org/all/20260524-netconsole_move_more-v1-0-909d1ab398b4@debian.org/
-> 
-> Not all of them got fixed, but, those that were easy to reason about.
-> 
-> Why net-next and not 'net' tree.
-> 
-> Most of the functions that are being fixed here moved from netpoll to
-> netconsole, thus, fixing this on net will cause merge conflicts from
-> 'net' to 'net-next', thus I decided to fix it on 'net-next', given we
-> are on 7.1-rc6 already. Sorry if that is not the right approach.
-> 
-> Changed from v1:
->   * Change it from 'net' to 'net-next'.
+On Wed, Jun 3, 2026 at 11:53=E2=80=AFPM WindowsForum.com <admin@windowsforu=
+m.com> wrote:
+>
+> Thanks for testing. The non-reproduction is maybe now the key data point.=
+ My reproducer omitted a precondition my hosts happened to meet: a low net.=
+ipv4.tcp_notsent_lowat. To reproduce, add before running:
+>
+> sysctl -w net.ipv4.tcp_notsent_lowat=3D16384
+>
+> Root cause
+> ----------
+> The stalling hosts have tcp_notsent_lowat=3D16384 (local web tuning); the=
+ stock default is effectively disabled. A TLS 1.3 record is 16406 bytes (TL=
+S_MAX_PAYLOAD_SIZE 16384 + 22), just above that watermark -- so once tls_sw=
+ queues a single completed record, notsent (16406) exceeds the lowat, tcp_s=
+tream_memory_free() returns false, and tls_sw parks in sk_stream_wait_memor=
+y() holding exactly one corked record (the notsent:16406 + persist state fr=
+om the original dump). With the default lowat, tls_sw keeps queuing, the MS=
+G_MORE cork flushes at each sendfile() boundary, packets_out stays non-zero=
+, and the persist timer never arms -- which is why stock kernels don't show=
+ it.
+>
+> Three conditions must coincide:
+>   (a) MSG_MORE forwarded on a completed record -> the sub-MSS record is c=
+orked [the bug];
+>   (b) tcp_notsent_lowat < one TLS record (16406) -> tls_sw blocks after t=
+hat one record instead of streaming past it [the trigger I'd omitted];
+>   (c) large MSS -> the record is sub-MSS, so the cork engages [the amplif=
+ier].
+>
+> Confirmed by flipping only that knob: on a stalling host, restoring the d=
+efault lowat -> 2.89 GiB/s; on a healthy host, setting lowat=3D16384 -> sta=
+lls (~0.0001 GiB/s). Everything that merely correlated (kernel build, conge=
+stion control/qdisc, wmem/rmem, tcp_mem, tcp_limit_output_bytes, CPU count,=
+ AES-GCM impl) was flip-tested and ruled out.
+>
+> This doesn't change the proposed fix: clearing MSG_MORE for a full record=
+ sends it immediately, so the deadlock can't form regardless of tcp_notsent=
+_lowat.
+>
+> If you had not submitted your reply I don't think I would have kept testi=
+ng it - hope this information is useful to the group.
 
-Hi Breno,
 
-There is AI-generated review of this patch-set available on both
-https://sashiko.dev and https://netdev-ai.bots.linux.dev/sashiko/
+I see no reason using such a small net.ipv4.tcp_notsent_lowat
 
-I would appreciate it if you could look over that with a view
-to addressing any issues that directly effect this patch-set.
+Recommended/practical value for this sysctl is 2MB to reach line rate
+on modern NICS.
+
+tcp sendmsg() has an skb granularity; an skb packs around 64KB of
+payload (this might be bigger if BIG TCP is enabled),
+so 16KB is clearely asking for troubles.
+
+>
+>
+> On Wed, Jun 3, 2026 at 11:12=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.=
+dev> wrote:
+> >
+> >
+> > On 6/4/26 1:19 AM, Mike Fara wrote:
+> > > Hi,
+> > >
+> > > Software-kTLS (TLS_SW) TX over sendfile()/splice() drops to the TCP
+> > > persist-timer cadence (tens of KB/s, with individual sendfile() calls=
+ blocking
+> > > for tens of seconds) when the path MSS is large -- e.g. loopback (MSS=
+ 65483) or
+> > > jumbo frames. At a typical 1448-byte MSS it does not occur. Plain TCP
+> > > sendfile() on the same path is unaffected, and kTLS write() (no splic=
+e) is
+> > > unaffected, so it is specific to TLS_SW + the splice/sendfile path.
+> > >
+> > > It triggers only on large-MSS paths with software kTLS (no NIC TLS of=
+fload), so
+> > > it is a niche path -- but it is a clean, reproducible multi-order-of-=
+magnitude
+> > > cliff, so it seems worth a look. Reproduces on current mainline. CCin=
+g David
+> > > Howells as the author of the 2023 sendpage->MSG_SPLICE_PAGES splice_t=
+o_socket()
+> > > rework referenced below, and Eric/Paolo as this is as much a TCP-cork=
+ing
+> > > interaction as a TLS one.
+> > >
+> > > Environment
+> > > -----------
+> > > - net/tls TLS_SW (no NIC offload; ethtool tls-hw-tx-offload: off [fix=
+ed]).
+> > > - AES-GCM; gcm(aes) resolves to generic-gcm-vaes-avx512.
+> > >
+> > > Reproducer (no OpenSSL/handshake; TLS_TX programmed with a fixed key,=
+ the
+> > > receiver discards ciphertext, like tools/testing/selftests/net/tls.c)=
+:
+> > >
+> > >      cc -O2 -Wall -o ktls_sendfile_stall ktls_sendfile_stall.c
+> > >      ./ktls_sendfile_stall          # default loopback MSS (65483)
+> > >      ./ktls_sendfile_stall 1448     # clamp sender MSS via TCP_MAXSEG
+> > >
+> > > Observed (loopback, single box):
+> > >
+> > >      MSS=3Ddefault    sent=3D     4.0 MiB in  52.08s  =3D>  0.0001 Gi=
+B/s   (stalled)
+> > >      MSS=3D1448       sent=3D  2048.0 MiB in   1.65s  =3D>  1.2106 Gi=
+B/s
+> > >
+> > > i.e. ~four orders of magnitude; at the default MSS a single sendfile(=
+) blocks
+> > > for tens of seconds. For contrast, on the same loopback path:
+> > >
+> > >      plain TCP sendfile() (no TLS ULP):           7.87  GiB/s
+> > >      kTLS write() (TLS_SW, no splice, 2 GiB):      1.99  GiB/s
+> >
+> >
+> > I tested your ktls_sendfile_stall.c under stable 6.6 and upstream, but
+> > both of them works correctly.
+> >
+> > ~/code/tmp$ ./ktls_sendfile_stall 1448 MSS=3D1448 sent=3D 2048.0 MiB in
+> > 2.32s =3D> 0.8603 GiB/s ~/code/tmp$ ./ktls_sendfile_stall 1448 MSS=3D14=
+48
+> > sent=3D 2048.0 MiB in 2.37s =3D> 0.8439 GiB/s ~/code/tmp$
+> > ./ktls_sendfile_stall MSS=3Ddefault sent=3D 2048.0 MiB in 1.64s =3D> 1.=
+2204
+> > GiB/s :~/code/tmp$ ./ktls_sendfile_stall MSS=3Ddefault sent=3D 2048.0 M=
+iB in
+> > 1.70s =3D> 1.1737 GiB/s ~/code/tmp$ ./ktls_sendfile_stall 1448 MSS=3D14=
+48
+> > sent=3D 2048.0 MiB in 2.33s =3D> 0.8570 GiB/s
+> >
+> > ~/code/tmp$ ethtool -k lo | grep "tls-hw-tx-offload" tls-hw-tx-offload:
+> > off [fixed]
+> >
 
