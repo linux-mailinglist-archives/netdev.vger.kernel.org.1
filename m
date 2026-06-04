@@ -1,811 +1,235 @@
-Return-Path: <netdev+bounces-295100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id b2QiNk45IWp+BQEAu9opvQ
-	(envelope-from <netdev+bounces-295100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:37:34 +0200
+	id vRlGFuI3IWoWBQEAu9opvQ
+	(envelope-from <netdev+bounces-295101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:31:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C23F63E0C1
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:37:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF4F63E026
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:31:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=ZPziAXRL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295100-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295100-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=altera.com header.s=selector2 header.b=J6i5bsIA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295101-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295101-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=altera.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF4C13016C81
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:30:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D2E31307D922
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEFC3A1E96;
-	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31B4399377;
+	Thu,  4 Jun 2026 08:30:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013043.outbound.protection.outlook.com [40.93.196.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C889B39183E;
-	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780561821; cv=none; b=OE7WWpGkM0xhBHgPEJyXbUvdNu8Qu2StPMpJvEK+GUixqv+kqzMNH4tn2xeRxuIYFShSlUN7Fw+Kw6ghouxsLOLoKD+XrX0QuolyGoEN6fUFMVOJwomwcC5gIUW4hWK+p+7PjqUpRM0goGapDyj6xewlENLtJzcpeW9pOJJAYrk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780561821; c=relaxed/simple;
-	bh=SJRc5rS3whuCXAOcF6o5FNxKnenPumjMHCTmq0haUOI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QQbHXWg9IFYZ/mQ2R+CUE0HN4EhUakcAoJ0S0agfCePhJV9pr+ixMaUqaG14Ni0J5W4X7TuDw5dGd0sFc3by+jCRfKdf+qXo6QO93dFQMgPz0aYwSvEWXGvxz3jltXuzD0+yTO4g++mGnLaBTv5QaxpBXywfTJIuZqz4iL/kuCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZPziAXRL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C8BAC2BCC9;
-	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780561821;
-	bh=SJRc5rS3whuCXAOcF6o5FNxKnenPumjMHCTmq0haUOI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ZPziAXRLanlMHArBfh1soX16QAK/KsVRqRALH29sGfMUmFdU/oqrZLGe/sl+pYy7s
-	 3cJsU9bgz/7oaueAGrE7qWGL2WPn6vocrYcKKyRCoIjTEQ7Wu4sRwCtK7Pcr1y8pzj
-	 MynfxpxKOiRVSbsN0JnT2M7EnCIY3jmqi82WYlZyQ9YTFfrV7T54SFJ0rD8kxR2yFM
-	 sJ/VrPuX2SeGJZFC6rTAZ2KwJeGF7ExLsnqnnebjyHxMTWmLWFGpfkuCzX+fPxvucD
-	 tLonCwgD+WYoR0P/xpb33MtCVU+Dya+zvwe17gEozCMJMTEwFgAwspbI6NKlzYL8Ka
-	 TjwXICzdS50jQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66227CD6E6B;
-	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
-From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
-Date: Thu, 04 Jun 2026 10:30:15 +0200
-Subject: [PATCH net-next 2/2] net: dsa: mv88e6xxx: add support for dcb pcp
- app
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3197E19A2A3;
+	Thu,  4 Jun 2026 08:30:41 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780561844; cv=fail; b=OBlYxEW9K8//Omlxb33zMHXDaRMbQc4I5YjEpnfSqz+FUcLpFbid7Vfv6ZoP7Mpl413uKEasIEqMNdZq++oYMtF3cpJNQ1mh77o9TMIBERy8LrlMUBijxSGI1e+lgmCotsGMMMjXgnba4yMGzvVJNcUV3zYtQQgXnCjEwJHVocU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780561844; c=relaxed/simple;
+	bh=JrVliSlbeKptO9eKXjEV84rVZHJHw+RmXy/fQR5J7mY=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=WCF7469DiQR52v66tq26py8BPqA3FBdbb50Kk6LKYtx8CQnsDoa+AEr0AzHHd2yzypmgJasywXJADhJLf7ft+ApFE53pM0w0HPjtAhwCTXHQhgGDdR5EqO1Y00rowWhghWtxh6J+zFqUdZEBFc9/EoB4NqZMOBa+lvl+17HH1d4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=J6i5bsIA; arc=fail smtp.client-ip=40.93.196.43
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MGKR7G0FFqsMFR2N8jXH34sK9JFQj7CbfsJ6KtVczcOS3ivDsL9C3cPnrn6MEKqliZ27KqY9Hzsny7L4THtve7pg3xccBPDCSxSnGuVQMZXtqu6XCyeXuC7kxl7k2LilwFskwcgGAUrpcWudjrQaLPLTKN1LpYPGPGr0FAfX13ZNuMOwuzRKMc76XZbKYlJx2cryL5hM67cQsDjTU5VmSb/x4AhyvhYYy4KnJUm1IVUMbJ6zE/UmHY2oShP9zFlL3xX1s+lwNS7Vs3cWU/VmHVM5f7plPMNHDBOwjoYltfVb9poqEwxj27rBAY7coz2jOlWRt6eFRo0oPzKC8m03EA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xWeXD5b3Mu0UToFxdMygz4f9aecflESnL2RYK3Wz5FE=;
+ b=ldUUPRUFHnJ+/KsrboovXcn42AFeHsV1KjgqLTvNXwOq2eeJXDRTA0GHeueJaUrEi1VBYdjBO4LZzin7c02NX/FJ1br1VohCwUdq+Brlxsfs5nGHihxmgAmTINUTTUSRp9PHUbCQulxJ8H5fqvoYXZ7DJrcnJXPqtfT/W0SOMbdiHDMW1hJjF7hFBIpVCObvRitVNtsDYwRgBXQXiskcnfZbscIiNmv5+FAr+jsmYRE+6xFl72j3K7W6gCh/KYVkHUTHJW9vAbi40bhvP0U+B6aMT3S+/0rD0bAbQYKq9urPtXoWSerJbvD2R4exl16AobFFkZkDT8X8eSlBE4XlIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xWeXD5b3Mu0UToFxdMygz4f9aecflESnL2RYK3Wz5FE=;
+ b=J6i5bsIAf5+Kwc9TWQNBxc1gPso3FtH27OTH8fAH5yLTjgQvvvFY6WPCTnE1kjva8AThFS/glKrrhRSAeidufDgBDUZua6aggbrG+ia7zjdx2kOhzY2z0PJS/42a4oeo4PO8VYJP3OVQBbXlnmpYb9jd/e2T8PEfYMsMcvxoQ1Q4NcACPvbsKGvVq2M/p9xHNEz1jjvjZ92s4CmbBu3vQX+fsZeXcLQ4MnO6YumcN8LLT8dwnJ5s3Pv+KAwgL0mEX05zn4+ojK/tqzW6+y7Se3RqK0ivdx4/g4BljYuDs0iz45mlpJm3tcX/lPrm4STo8xbljZiN+Pcs7LmRDqoXNg==
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
+ by PH0PR03MB5941.namprd03.prod.outlook.com (2603:10b6:510:34::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Thu, 4 Jun 2026
+ 08:30:39 +0000
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.21.0092.006; Thu, 4 Jun 2026
+ 08:30:39 +0000
+From: muhammad.nazim.amirul.nazle.asmade@altera.com
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: stmmac: xgmac: report L3/L4 filter match count in ethtool stats
+Date: Thu,  4 Jun 2026 01:30:37 -0700
+Message-ID: <20260604083037.24407-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0368.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::13) To SJ0PR03MB6964.namprd03.prod.outlook.com
+ (2603:10b6:a03:432::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260604-net-next-mv88e6xxx-pcp-prio-v1-2-f9d10fe6cdc8@luminex.be>
-References: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
-In-Reply-To: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luke Howard <lukeh@padl.com>, Cedric Jehasse <cedric.jehasse@gmail.com>, 
- Cedric Jehasse <cedric.jehasse@luminex.be>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780561819; l=23190;
- i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
- bh=vbq/xR+1aOCJGVhsg0S57sI1gN3M56tEOWeAmq/+PXE=;
- b=WEZ6Ra5o/OBIiNAFfp2GHUVRQ2Ep4OTq2KnvwVW39N5ssn/h+O//g1EnV9OM00OKX1bCLipX7
- sY66cle5IE2ABXkgt0iaN/iinD+qDPPIcrwLVv6uPJnbvTe8bg217WU
-X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
- pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
-X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
- with auth_id=638
-X-Original-From: Cedric Jehasse <cedric.jehasse@luminex.be>
-Reply-To: cedric.jehasse@luminex.be
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|PH0PR03MB5941:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1514ebb8-162c-4163-20b1-08dec2138efa
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|18002099003|11063799006|56012099006|55112099003;
+X-Microsoft-Antispam-Message-Info:
+	GxObSr+v9xf23qOZWRRJ9yYcpjHgF0oB+VTSFpPV8thIkLHX8ZlOzZPw25kBqMEd75MTSzTZw5AxU7+wpCBxtBX0UlSVTwR/S57rL5X5qZlt1I6p6TwrVLBCWiDUNpy7JoXQaAdX5+RC6M1t1CUpkdGOddoLe+WpNsgVPw7p/b1kH92yynhvGdRvQUR32ehSJAS7V6WX8xRUy430obdB4AflAFhFKeXCVuwWuygkERpKY3aDgDu2XmiCCXEenPEKTdLwasGkzUSA4gVHWS5shvEA8vS50Q05YrVIltwF7h+hGhwK/8Lzhb4z8svtkKoffJsIaO/bg01h7iMVQfV6mVE2zQELw6tYDrTFt7WzQlaCcndqPIiHzL7bcV4JnKJZe8Fd3is0bcF2f3MqeiDdm/xp2V70S+kPFBX8ZSwvyBlQI6OMJyWuGtBYeCdrWJ7VLeV6nos2/HXnVbE2satwldBnrsnvdrUyT0L1ayLkRB4i8qIV8aX5ETks+pJWRUPDQGS/ohyX/WFw3YcGVmc0txK+DNuvHG7sLwEgtEApLfe5iKhMuNqiMTjYVMYr9yhTEkoEO5JR34FoRajfULBDQmrYSs1dFtPGyozX+LHG4BQLM9bF1/IBzUmuPd7sjoY4ih7p/UZKriZrz+hoZOHSYXdNYI9NoXm2W8bklGt/087b/a3YSV3Lv1SEsHlgeJ90
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(18002099003)(11063799006)(56012099006)(55112099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?uhrCcq2ZVsvLqyTJr4poH/8tl57SIlz7Boy3pz4uN1CPtd+fXf1ZpQhhzS/x?=
+ =?us-ascii?Q?g6fSMzk/HMwk9d9x679nhHAOW0wVyhVS+chcRU7nK6TyysBgpcG2bEUjMBiC?=
+ =?us-ascii?Q?yLQbWgMjT/jQi65z3XoDuTaFFJTWggRCOTxoXgd4hbqnGUZatIwGPazypkOj?=
+ =?us-ascii?Q?1U5yGV/GVm/nj7UW7MVtvDp6oKEQduuUTnID8t2D1cEeuv2S/MAJ8liGfDrr?=
+ =?us-ascii?Q?itOupZtVUuivqIwnqeoEbXHNfvgztSX97K11EJ3OcvONrEistZ0AFjiS1Xfl?=
+ =?us-ascii?Q?WX23Y5sZ75HclJBJ3hLF0pF2jcRiIM4cW24HNEurmMujUD0GtnqC8KzJFVXy?=
+ =?us-ascii?Q?oRHdBaoqeU4heYUN9zKMzy1qoLGlA7BSNG5iHrGS3kKlQ914y6TEwObbhGFc?=
+ =?us-ascii?Q?1VhCsOuOyKf7ls2z12x9/ib7VGMz3FsiBdawISJmv+PpEaaxjDhJRI4qkqg5?=
+ =?us-ascii?Q?RQzuBqbuuHBhx+YdjToAK/XHKdzaTjoS6cc01te9aSTAcD5/keT4+J+r6tyY?=
+ =?us-ascii?Q?mkvQIMiSu8sGhhQ6FY++SqyyLHWgJsJHJURDJHK+A1ehPS3Idwm+aVyJrIC2?=
+ =?us-ascii?Q?9bPITWe2/OQa1W7d3UEaW3DL2HNVnUPXWxsUekDbYB4YirUme/m1dMJgZSU+?=
+ =?us-ascii?Q?J31oJ6HYUxgdz/zzzcmFr+5xXzht+A4NEPZD+ZGQJUx79A5KmT3SmLcO/RvT?=
+ =?us-ascii?Q?UR+lEac3lD/rit7RFpM1ixNroU8X0MeXYsCR4irCXPAp0dQXeZ+liJno/feJ?=
+ =?us-ascii?Q?5xjq82DPKIa/qIhHvySw/vrZ2mUgaSv29r9WfL9dExaoUeS84r2VQSTGHkSy?=
+ =?us-ascii?Q?8zbtgnkDYcuRaRmNVuza9zRn0tTJ+ykAPC2t+7kS+U0AmwK6/RErIceAsrEX?=
+ =?us-ascii?Q?qW1zkjkHBti4W0sJdMGjCoLc37zTnoW3885VynmXtqUCUrYkdPqtEzI8170g?=
+ =?us-ascii?Q?0YaC+kECYuqHFpucfasqhUXJJFE0frXeKwC4bT9Ab7ZnEbPOfrFo4x5u85f9?=
+ =?us-ascii?Q?5+EZIg6Y3WPKVhX3clQVFOFiMfzxYtJ2LtNjxQcmMeVij5fNrb3sAN6IlOaZ?=
+ =?us-ascii?Q?1TDfI6sUDSzNXsJVkXtY2pUTVuwAgZC8hBKAkaru4uRew7vIUIZpqyLZ5M2M?=
+ =?us-ascii?Q?sp573eOT+z/TwXoBc4MtsdHT5g8ATMmdgqJqZbmvy7quKd2+WnvGFpjDQH4o?=
+ =?us-ascii?Q?Rbo1eD/CIqHacJreNVMk8WXDiEd2KH0BKzXHUxukAVi6pP2rbnSDxrnMxJxi?=
+ =?us-ascii?Q?sy0csUIl26zN/1+z4DMTPXD/2F64DfpyN/UNJrnSsbuuHvU0NGchr0TtjLxp?=
+ =?us-ascii?Q?/YaTGb5kL95hRJnFcApiHzmiqF/CHXRVEraSPaZjHHt8yq3hkSff0BIIpqci?=
+ =?us-ascii?Q?ULJ9F/mf3xMdaXaXv4fNT0/z9KIb8ZVbWGqZ1m1mtPnvWVFd0WMK1ashyIS0?=
+ =?us-ascii?Q?o3CQSll6l0sW93ZzdgSdQMVpg3ZGw7PNX8COD4SBCPUnWGU2Go84CnklgI/A?=
+ =?us-ascii?Q?Pcs59fbVbx319LreqSRkpGvpc8ReIanyuF025saVYonMCI5+eJoGEKBzFHuN?=
+ =?us-ascii?Q?P68qL2vPVua4j+2QTg0/wAJ81K8e4aQA6n4guoNytNQ5Po0o32TDo8P55SHb?=
+ =?us-ascii?Q?GK6O/jjMiViXw79kTEPvEET5HWs/VLOOxqnOrk/K+Ppa8POtU4/RGLsGcP+X?=
+ =?us-ascii?Q?rvTxX2rEwB7w7FWoHmQ8OeIyGCUAqtTZyYXlwKVaC0oshC5635s3pohISAhz?=
+ =?us-ascii?Q?Jj9XQYcJxm7xiVLpeMyiHHy3fhOdnBxgmLaHHVrYDbtWHx7UaYeKTX3ti+Sz?=
+X-MS-Exchange-AntiSpam-MessageData-1: 7zBphShBrn4F6Q==
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1514ebb8-162c-4163-20b1-08dec2138efa
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2026 08:30:39.4030
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6dcP/MYEnK2H22Cr1JfQLHRPbX4zn66/0TX1BXxADJ6wuVrIY0+0GSEIZckKm4KknoFs6fJ3YvQPTHOxfcTqx6RkZevKBA/2xeU26I4BsfYwbidKZ+n4rqUOJ2mO5y/dLlnQPDm8jILwngvFKqM1vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB5941
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
+	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295100-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lukeh@padl.com,m:cedric.jehasse@gmail.com,m:cedric.jehasse@luminex.be,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,padl.com,gmail.com,luminex.be];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	HAS_REPLYTO(0.00)[cedric.jehasse@luminex.be];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295101-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,luminex.be:mid,luminex.be:email,luminex.be:replyto]
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[altera.com:+];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NO_DN(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,altera.com:mid,altera.com:dkim,altera.com:from_mime,altera.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2C23F63E0C1
+X-Rspamd-Queue-Id: EAF4F63E026
 
-From: Cedric Jehasse <cedric.jehasse@luminex.be>
+From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 
-Implement the DSA pcp_prio hooks to support the dcb pcp app.
-In the Marvell switches this is done by configuring the IEEE PRI Mapping
-table. There are different hardware implementations of this table
-depending on the switch:
-* a global table
-* the 6390 has one table per port
-* the 6393 has one table for DEI=0, and another table for DEI=1 per port
+Read the L3FM and L4FM bits from the RX descriptor status word (RDES2)
+and increment the corresponding ethtool statistics counters. This allows
+users to observe L3/L4 filter hit rates via ethtool -S.
 
-Example command:
-dcb app replace dev p1 pcp-prio 7nd:3
-
-Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 ---
- drivers/net/dsa/mv88e6xxx/Makefile |   1 +
- drivers/net/dsa/mv88e6xxx/chip.c   |  36 ++++++
- drivers/net/dsa/mv88e6xxx/chip.h   |  17 +++
- drivers/net/dsa/mv88e6xxx/dcb.c    | 229 +++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/dcb.h    |  21 ++++
- drivers/net/dsa/mv88e6xxx/port.c   |  28 ++++-
- drivers/net/dsa/mv88e6xxx/port.h   |   8 ++
- 7 files changed, 338 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h       | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/Makefile b/drivers/net/dsa/mv88e6xxx/Makefile
-index b0b08c6f159c..6eb9be4d934a 100644
---- a/drivers/net/dsa/mv88e6xxx/Makefile
-+++ b/drivers/net/dsa/mv88e6xxx/Makefile
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_NET_DSA_MV88E6XXX) += mv88e6xxx.o
- mv88e6xxx-objs := chip.o
-+mv88e6xxx-objs += dcb.o
- mv88e6xxx-objs += devlink.o
- mv88e6xxx-objs += global1.o
- mv88e6xxx-objs += global1_atu.o
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 5bbf5e69de9a..e12b84e42a93 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -35,6 +35,7 @@
- #include <net/pkt_sched.h>
- 
- #include "chip.h"
-+#include "dcb.h"
- #include "devlink.h"
- #include "global1.h"
- #include "global2.h"
-@@ -4258,6 +4259,7 @@ static const struct mv88e6xxx_ops mv88e6085_ops = {
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
- 	.phylink_get_caps = mv88e6185_phylink_get_caps,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6095_ops = {
-@@ -4290,6 +4292,7 @@ static const struct mv88e6xxx_ops mv88e6095_ops = {
- 	.phylink_get_caps = mv88e6095_phylink_get_caps,
- 	.pcs_ops = &mv88e6185_pcs_ops,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6097_ops = {
-@@ -4337,6 +4340,7 @@ static const struct mv88e6xxx_ops mv88e6097_ops = {
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6123_ops = {
-@@ -4378,6 +4382,7 @@ static const struct mv88e6xxx_ops mv88e6123_ops = {
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
- 	.phylink_get_caps = mv88e6185_phylink_get_caps,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6131_ops = {
-@@ -4418,6 +4423,7 @@ static const struct mv88e6xxx_ops mv88e6131_ops = {
- 	.vtu_getnext = mv88e6185_g1_vtu_getnext,
- 	.vtu_loadpurge = mv88e6185_g1_vtu_loadpurge,
- 	.phylink_get_caps = mv88e6185_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6141_ops = {
-@@ -4481,6 +4487,7 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.phylink_get_caps = mv88e6341_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6161_ops = {
-@@ -4529,6 +4536,7 @@ static const struct mv88e6xxx_ops mv88e6161_ops = {
- 	.ptp_ops = &mv88e6165_ptp_ops,
- 	.phylink_get_caps = mv88e6185_phylink_get_caps,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6165_ops = {
-@@ -4566,6 +4574,7 @@ static const struct mv88e6xxx_ops mv88e6165_ops = {
- 	.avb_ops = &mv88e6165_avb_ops,
- 	.ptp_ops = &mv88e6165_ptp_ops,
- 	.phylink_get_caps = mv88e6185_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6171_ops = {
-@@ -4612,6 +4621,7 @@ static const struct mv88e6xxx_ops mv88e6171_ops = {
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
- 	.phylink_get_caps = mv88e6351_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6172_ops = {
-@@ -4669,6 +4679,7 @@ static const struct mv88e6xxx_ops mv88e6172_ops = {
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6175_ops = {
-@@ -4715,6 +4726,7 @@ static const struct mv88e6xxx_ops mv88e6175_ops = {
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
- 	.phylink_get_caps = mv88e6351_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6176_ops = {
-@@ -4773,6 +4785,7 @@ static const struct mv88e6xxx_ops mv88e6176_ops = {
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6185_ops = {
-@@ -4811,6 +4824,7 @@ static const struct mv88e6xxx_ops mv88e6185_ops = {
- 	.phylink_get_caps = mv88e6185_phylink_get_caps,
- 	.pcs_ops = &mv88e6185_pcs_ops,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6190_ops = {
-@@ -4830,6 +4844,7 @@ static const struct mv88e6xxx_ops mv88e6190_ops = {
- 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
- 	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
- 	.port_tag_remap = mv88e6390_port_tag_remap,
-+	.dcb_ops = &mv88e6390_dcb_ops,
- 	.port_set_policy = mv88e6352_port_set_policy,
- 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
- 	.port_set_ucast_flood = mv88e6352_port_set_ucast_flood,
-@@ -4931,6 +4946,7 @@ static const struct mv88e6xxx_ops mv88e6190x_ops = {
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6390x_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.dcb_ops = &mv88e6390_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6191_ops = {
-@@ -4990,6 +5006,7 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.dcb_ops = &mv88e6390_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6240_ops = {
-@@ -5051,6 +5068,7 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6250_ops = {
-@@ -5096,6 +5114,7 @@ static const struct mv88e6xxx_ops mv88e6250_ops = {
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6250_phylink_get_caps,
- 	.set_max_frame_size = mv88e6185_g1_set_max_frame_size,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6290_ops = {
-@@ -5158,6 +5177,7 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
- 	.tcam_ops = &mv88e6390_tcam_ops,
-+	.dcb_ops = &mv88e6390_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6320_ops = {
-@@ -5211,6 +5231,7 @@ static const struct mv88e6xxx_ops mv88e6320_ops = {
- 	.avb_ops = &mv88e6352_avb_ops,
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e632x_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6321_ops = {
-@@ -5263,6 +5284,7 @@ static const struct mv88e6xxx_ops mv88e6321_ops = {
- 	.avb_ops = &mv88e6352_avb_ops,
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e632x_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6341_ops = {
-@@ -5329,6 +5351,7 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.phylink_get_caps = mv88e6341_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6350_ops = {
-@@ -5375,6 +5398,7 @@ static const struct mv88e6xxx_ops mv88e6350_ops = {
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
- 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
- 	.phylink_get_caps = mv88e6351_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6351_ops = {
-@@ -5423,6 +5447,7 @@ static const struct mv88e6xxx_ops mv88e6351_ops = {
- 	.avb_ops = &mv88e6352_avb_ops,
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6351_phylink_get_caps,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6352_ops = {
-@@ -5487,6 +5512,7 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
- 	.serdes_get_regs = mv88e6352_serdes_get_regs,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.dcb_ops = &mv88e6352_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6390_ops = {
-@@ -5553,6 +5579,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
- 	.tcam_ops = &mv88e6390_tcam_ops,
-+	.dcb_ops = &mv88e6390_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6390x_ops = {
-@@ -5618,6 +5645,7 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
- 	.ptp_ops = &mv88e6390_ptp_ops,
- 	.phylink_get_caps = mv88e6390x_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.dcb_ops = &mv88e6390_dcb_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6393x_ops = {
-@@ -5684,6 +5712,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
- 	.phylink_get_caps = mv88e6393x_phylink_get_caps,
- 	.pcs_ops = &mv88e6393x_pcs_ops,
- 	.tcam_ops = &mv88e6393_tcam_ops,
-+	.dcb_ops = &mv88e6393x_dcb_ops,
- };
- 
- static const struct mv88e6xxx_qav_info mv88e6352_qav_info = {
-@@ -7385,6 +7414,9 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 	.port_hwtstamp_get	= mv88e6xxx_port_hwtstamp_get,
- 	.port_txtstamp		= mv88e6xxx_port_txtstamp,
- 	.port_rxtstamp		= mv88e6xxx_port_rxtstamp,
-+	.port_get_pcp_prio	= mv88e6xxx_port_get_pcp_prio,
-+	.port_add_pcp_prio	= mv88e6xxx_port_add_pcp_prio,
-+	.port_del_pcp_prio	= mv88e6xxx_port_del_pcp_prio,
- 	.port_setup_tc		= mv88e6xxx_port_setup_tc,
- 	.cls_flower_add		= mv88e6xxx_cls_flower_add,
- 	.cls_flower_del         = mv88e6xxx_cls_flower_del,
-@@ -7402,6 +7434,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 
- static int mv88e6xxx_register_switch(struct mv88e6xxx_chip *chip)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 51943705a2b0..95fdf3133208 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -429,6 +429,8 @@
+ #define XGMAC_TDES3_VLTV		BIT(16)
+ #define XGMAC_TDES3_VT			GENMASK(15, 0)
+ #define XGMAC_TDES3_FL			GENMASK(14, 0)
++#define XGMAC_RDES2_L4FM		BIT(28)
++#define XGMAC_RDES2_L3FM		BIT(27)
+ #define XGMAC_RDES2_HL			GENMASK(9, 0)
+ #define XGMAC_RDES3_OWN			BIT(31)
+ #define XGMAC_RDES3_CTXT		BIT(30)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+index b5f200a87484..6719ac6e395b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+@@ -27,6 +27,7 @@ static int dwxgmac2_get_rx_status(struct stmmac_extra_stats *x,
+ 				  struct dma_desc *p)
  {
-+	const struct mv88e6xxx_dcb_ops *dcb_ops = chip->info->ops->dcb_ops;
- 	struct device *dev = chip->dev;
- 	struct dsa_switch *ds;
+ 	u32 rdes3 = le32_to_cpu(p->des3);
++	u32 rdes2 = le32_to_cpu(p->des2);
  
-@@ -7418,6 +7451,9 @@ static int mv88e6xxx_register_switch(struct mv88e6xxx_chip *chip)
- 	ds->ageing_time_min = chip->info->age_time_coeff;
- 	ds->ageing_time_max = chip->info->age_time_coeff * U8_MAX;
+ 	if (unlikely(rdes3 & XGMAC_RDES3_OWN))
+ 		return dma_own;
+@@ -37,6 +38,11 @@ static int dwxgmac2_get_rx_status(struct stmmac_extra_stats *x,
+ 	if (unlikely((rdes3 & XGMAC_RDES3_ES) && (rdes3 & XGMAC_RDES3_LD)))
+ 		return discard_frame;
  
-+	ds->pcp_prio_mapping_is_global = dcb_ops &&
-+					 dcb_ops->global_get_pcp_prio;
++	if (rdes2 & XGMAC_RDES2_L3FM)
++		x->l3_filter_match++;
++	if (rdes2 & XGMAC_RDES2_L4FM)
++		x->l4_filter_match++;
 +
- 	/* Some chips support up to 32, but that requires enabling the
- 	 * 5-bit port mode, which we do not support. 640k^W16 ought to
- 	 * be enough for anyone.
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index e563cfe8ab2a..1aa77b643924 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -211,6 +211,7 @@ struct mv88e6xxx_stu_entry {
- };
- 
- struct mv88e6xxx_bus_ops;
-+struct mv88e6xxx_dcb_ops;
- struct mv88e6xxx_irq_ops;
- struct mv88e6xxx_gpio_ops;
- struct mv88e6xxx_avb_ops;
-@@ -728,6 +729,9 @@ struct mv88e6xxx_ops {
- 
- 	/* Ternary Content Addressable Memory operations */
- 	const struct mv88e6xxx_tcam_ops *tcam_ops;
-+
-+	/* Data Center Bridging operations */
-+	const struct mv88e6xxx_dcb_ops *dcb_ops;
- };
- 
- struct mv88e6xxx_irq_ops {
-@@ -779,6 +783,19 @@ struct mv88e6xxx_avb_ops {
- 			      u16 data);
- };
- 
-+struct mv88e6xxx_dcb_ops {
-+	/* Get/set the chip's global PCP to queue priority mapping */
-+	int (*global_get_pcp_prio)(struct mv88e6xxx_chip *chip, u8 pcp);
-+	int (*global_set_pcp_prio)(struct mv88e6xxx_chip *chip, u8 pcp,
-+				   u8 prio);
-+
-+	/* Get/set a port's PCP to queue priority mapping */
-+	int (*port_get_pcp_prio)(struct mv88e6xxx_chip *chip, int port,
-+				 u8 pcp);
-+	int (*port_set_pcp_prio)(struct mv88e6xxx_chip *chip, int port,
-+				 u8 pcp, u8 prio);
-+};
-+
- struct mv88e6xxx_ptp_ops {
- 	u64 (*clock_read)(struct cyclecounter *cc);
- 	int (*ptp_enable)(struct ptp_clock_info *ptp,
-diff --git a/drivers/net/dsa/mv88e6xxx/dcb.c b/drivers/net/dsa/mv88e6xxx/dcb.c
-new file mode 100644
-index 000000000000..0a3099cdf388
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/dcb.c
-@@ -0,0 +1,229 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+// Copyright (c) 2026 Luminex Network Intelligence
-+
-+#include "chip.h"
-+#include "dcb.h"
-+#include "global1.h"
-+#include "port.h"
-+
-+static int mv88e6352_get_pcp_prio(struct mv88e6xxx_chip *chip, u8 pcp)
-+{
-+	u16 val;
-+	int err;
-+
-+	/* These devices have no mapping table for frames with DEI bit set */
-+	if (pcp >= 8)
-+		return -EOPNOTSUPP;
-+
-+	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_IEEE_PRI, &val);
-+	if (err)
-+		return err;
-+
-+	return (val >> (pcp * 2)) & 3;
-+}
-+
-+static int mv88e6352_set_pcp_prio(struct mv88e6xxx_chip *chip, u8 pcp, u8 prio)
-+{
-+	u16 val;
-+	int err;
-+
-+	/* These devices have no mapping table for frames with DEI bit set */
-+	if (pcp >= 8)
-+		return -EOPNOTSUPP;
-+
-+	if (prio >= 4)
-+		return -EINVAL;
-+
-+	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_IEEE_PRI, &val);
-+	if (err)
-+		return err;
-+
-+	val &= ~(3 << (pcp * 2));
-+	val |= prio << (pcp * 2);
-+
-+	return mv88e6xxx_g1_write(chip, MV88E6XXX_G1_IEEE_PRI, val);
-+}
-+
-+static int mv88e639x_port_ieeepmt_pcp_entry(u8 pcp, bool has_dei,
-+					    u16 *table, u8 *ptr)
-+{
-+	if (pcp >= 16)
-+		return -EINVAL;
-+
-+	/* not all devices have a table for mapping with DEI bit set */
-+	if (pcp >= 8 && !has_dei)
-+		return -EOPNOTSUPP;
-+
-+	*table = pcp >= 8 ?
-+		MV88E6393X_PORT_IEEE_PRIO_MAP_TABLE_INGRESS_PCP_DEI :
-+		MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_INGRESS_PCP;
-+	*ptr = pcp & 7;
-+
-+	return 0;
-+}
-+
-+static int mv88e639x_port_get_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+				       u8 pcp, bool has_dei)
-+{
-+	u16 val, table;
-+	u8 ptr;
-+	int err;
-+
-+	err = mv88e639x_port_ieeepmt_pcp_entry(pcp, has_dei, &table, &ptr);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_port_ieeepmt_read(chip, port, table, ptr, &val);
-+	if (err)
-+		return err;
-+
-+	if (val & MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_DIS)
-+		return -EOPNOTSUPP;
-+
-+	return (val & MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_MASK)
-+		>> MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_SHIFT;
-+}
-+
-+static int mv88e639x_port_set_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+				       u8 pcp, u8 prio, bool has_dei)
-+{
-+	u16 val, table;
-+	u8 ptr;
-+	int err;
-+
-+	if (prio >= 8)
-+		return -EINVAL;
-+
-+	err = mv88e639x_port_ieeepmt_pcp_entry(pcp, has_dei, &table, &ptr);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_port_ieeepmt_read(chip, port, table, ptr, &val);
-+	if (err)
-+		return err;
-+
-+	val &= ~MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_DIS;
-+	val &= ~MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_MASK;
-+	val |= (prio << MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_SHIFT) &
-+		MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_MASK;
-+
-+	return mv88e6xxx_port_ieeepmt_write(chip, port, table, ptr, val);
-+}
-+
-+static int mv88e6390_port_get_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+				       u8 pcp)
-+{
-+	return mv88e639x_port_get_pcp_prio(chip, port, pcp, false);
-+}
-+
-+static int mv88e6390_port_set_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+				       u8 pcp, u8 prio)
-+{
-+	return mv88e639x_port_set_pcp_prio(chip, port, pcp, prio, false);
-+}
-+
-+static int mv88e6393x_port_get_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+					u8 pcp)
-+{
-+	return mv88e639x_port_get_pcp_prio(chip, port, pcp, true);
-+}
-+
-+static int mv88e6393x_port_set_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+					u8 pcp, u8 prio)
-+{
-+	return mv88e639x_port_set_pcp_prio(chip, port, pcp, prio, true);
-+}
-+
-+const struct mv88e6xxx_dcb_ops mv88e6352_dcb_ops = {
-+	.global_get_pcp_prio = mv88e6352_get_pcp_prio,
-+	.global_set_pcp_prio = mv88e6352_set_pcp_prio,
-+};
-+
-+const struct mv88e6xxx_dcb_ops mv88e6390_dcb_ops = {
-+	.port_get_pcp_prio = mv88e6390_port_get_pcp_prio,
-+	.port_set_pcp_prio = mv88e6390_port_set_pcp_prio,
-+};
-+
-+const struct mv88e6xxx_dcb_ops mv88e6393x_dcb_ops = {
-+	.port_get_pcp_prio = mv88e6393x_port_get_pcp_prio,
-+	.port_set_pcp_prio = mv88e6393x_port_set_pcp_prio,
-+};
-+
-+static int mv88e6xxx_dcb_get_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+				      u8 pcp)
-+{
-+	const struct mv88e6xxx_dcb_ops *dcb_ops = chip->info->ops->dcb_ops;
-+
-+	if (!dcb_ops)
-+		return -EOPNOTSUPP;
-+
-+	if (dcb_ops->port_get_pcp_prio)
-+		return dcb_ops->port_get_pcp_prio(chip, port, pcp);
-+
-+	if (dcb_ops->global_get_pcp_prio)
-+		return dcb_ops->global_get_pcp_prio(chip, pcp);
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+static int mv88e6xxx_dcb_set_pcp_prio(struct mv88e6xxx_chip *chip, int port,
-+				      u8 pcp, u8 prio)
-+{
-+	const struct mv88e6xxx_dcb_ops *dcb_ops = chip->info->ops->dcb_ops;
-+
-+	if (!dcb_ops)
-+		return -EOPNOTSUPP;
-+
-+	if (dcb_ops->port_set_pcp_prio)
-+		return dcb_ops->port_set_pcp_prio(chip, port, pcp, prio);
-+
-+	if (dcb_ops->global_set_pcp_prio)
-+		return dcb_ops->global_set_pcp_prio(chip, pcp, prio);
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+int mv88e6xxx_port_get_pcp_prio(struct dsa_switch *ds, int port, u8 pcp)
-+{
-+	struct mv88e6xxx_chip *chip = ds->priv;
-+	int err;
-+
-+	mv88e6xxx_reg_lock(chip);
-+	err = mv88e6xxx_dcb_get_pcp_prio(chip, port, pcp);
-+	mv88e6xxx_reg_unlock(chip);
-+
-+	return err;
-+}
-+
-+int mv88e6xxx_port_add_pcp_prio(struct dsa_switch *ds, int port, u8 pcp,
-+				u8 prio)
-+{
-+	struct mv88e6xxx_chip *chip = ds->priv;
-+	int err;
-+
-+	if (prio >= 8)
-+		return -EINVAL;
-+
-+	mv88e6xxx_reg_lock(chip);
-+	err = mv88e6xxx_dcb_set_pcp_prio(chip, port, pcp, prio);
-+	mv88e6xxx_reg_unlock(chip);
-+
-+	return err;
-+}
-+
-+int mv88e6xxx_port_del_pcp_prio(struct dsa_switch *ds, int port, u8 pcp,
-+				u8 prio)
-+{
-+	struct mv88e6xxx_chip *chip = ds->priv;
-+	int err = 0;
-+
-+	mv88e6xxx_reg_lock(chip);
-+	if (mv88e6xxx_dcb_get_pcp_prio(chip, port, pcp) != prio)
-+		goto unlock;
-+
-+	err = mv88e6xxx_dcb_set_pcp_prio(chip, port, pcp, 0);
-+
-+unlock:
-+	mv88e6xxx_reg_unlock(chip);
-+	return err;
-+}
-diff --git a/drivers/net/dsa/mv88e6xxx/dcb.h b/drivers/net/dsa/mv88e6xxx/dcb.h
-new file mode 100644
-index 000000000000..7a2124ec23ba
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/dcb.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * Marvell 88E6xxx Switch DCB support
-+ */
-+
-+#ifndef _MV88E6XXX_DCB_H_
-+#define _MV88E6XXX_DCB_H_
-+
-+#include "chip.h"
-+
-+extern const struct mv88e6xxx_dcb_ops mv88e6352_dcb_ops;
-+extern const struct mv88e6xxx_dcb_ops mv88e6390_dcb_ops;
-+extern const struct mv88e6xxx_dcb_ops mv88e6393x_dcb_ops;
-+
-+int mv88e6xxx_port_get_pcp_prio(struct dsa_switch *ds, int port, u8 pcp);
-+int mv88e6xxx_port_add_pcp_prio(struct dsa_switch *ds, int port, u8 pcp,
-+				u8 prio);
-+int mv88e6xxx_port_del_pcp_prio(struct dsa_switch *ds, int port, u8 pcp,
-+				u8 prio);
-+
-+#endif /* _MV88E6XXX_DCB_H_ */
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index 23d1435db0d8..a8e2f8910b0a 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -1641,8 +1641,8 @@ int mv88e6095_port_tag_remap(struct mv88e6xxx_chip *chip, int port)
- 				    0x7654);
+ 	return good_frame;
  }
  
--static int mv88e6xxx_port_ieeepmt_write(struct mv88e6xxx_chip *chip,
--					int port, u16 table, u8 ptr, u16 data)
-+int mv88e6xxx_port_ieeepmt_write(struct mv88e6xxx_chip *chip,
-+				 int port, u16 table, u8 ptr, u16 data)
- {
- 	u16 reg;
- 
-@@ -1654,6 +1654,30 @@ static int mv88e6xxx_port_ieeepmt_write(struct mv88e6xxx_chip *chip,
- 				    MV88E6390_PORT_IEEE_PRIO_MAP_TABLE, reg);
- }
- 
-+int mv88e6xxx_port_ieeepmt_read(struct mv88e6xxx_chip *chip, int port,
-+				u16 table, u8 ptr, u16 *data)
-+{
-+	u16 reg;
-+	int err;
-+
-+	reg = table |
-+		(ptr << __bf_shf(MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_PTR_MASK));
-+
-+	err = mv88e6xxx_port_write(chip, port,
-+				   MV88E6390_PORT_IEEE_PRIO_MAP_TABLE, reg);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_port_read(chip, port,
-+				  MV88E6390_PORT_IEEE_PRIO_MAP_TABLE, &reg);
-+	if (err)
-+		return err;
-+
-+	*data = reg & MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_DATA_MASK;
-+
-+	return 0;
-+}
-+
- int mv88e6390_port_tag_remap(struct mv88e6xxx_chip *chip, int port)
- {
- 	int err, i;
-diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
-index cf8655a13729..8bf0f3cbc4f0 100644
---- a/drivers/net/dsa/mv88e6xxx/port.h
-+++ b/drivers/net/dsa/mv88e6xxx/port.h
-@@ -457,11 +457,15 @@
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_EGRESS_GREEN_PCP	0x1000
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_EGRESS_YELLOW_PCP	0x2000
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_EGRESS_AVB_PCP	0x3000
-+#define MV88E6393X_PORT_IEEE_PRIO_MAP_TABLE_INGRESS_PCP_DEI	0x4000
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_EGRESS_GREEN_DSCP	0x5000
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_EGRESS_YELLOW_DSCP	0x6000
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_EGRESS_AVB_DSCP	0x7000
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_PTR_MASK		0x0e00
- #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_DATA_MASK		0x01ff
-+#define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_DIS		0x0080
-+#define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_MASK		0x0070
-+#define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_QPRI_SHIFT		4
- 
- /* Offset 0x18: Port IEEE Priority Remapping Registers (0-3) */
- #define MV88E6095_PORT_IEEE_PRIO_REMAP_0123	0x18
-@@ -543,6 +547,10 @@ int mv88e6xxx_port_set_8021q_mode(struct mv88e6xxx_chip *chip, int port,
- 				  u16 mode);
- int mv88e6095_port_tag_remap(struct mv88e6xxx_chip *chip, int port);
- int mv88e6390_port_tag_remap(struct mv88e6xxx_chip *chip, int port);
-+int mv88e6xxx_port_ieeepmt_write(struct mv88e6xxx_chip *chip,
-+				 int port, u16 table, u8 ptr, u16 data);
-+int mv88e6xxx_port_ieeepmt_read(struct mv88e6xxx_chip *chip, int port,
-+				u16 table, u8 ptr, u16 *data);
- int mv88e6xxx_port_set_egress_mode(struct mv88e6xxx_chip *chip, int port,
- 				   enum mv88e6xxx_egress_mode mode);
- int mv88e6085_port_set_frame_mode(struct mv88e6xxx_chip *chip, int port,
-
 -- 
-2.43.0
-
+2.43.7
 
 
