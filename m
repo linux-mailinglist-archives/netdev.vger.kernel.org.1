@@ -1,216 +1,159 @@
-Return-Path: <netdev+bounces-295421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Vg0tO+3sIWp5QgEAu9opvQ
-	(envelope-from <netdev+bounces-295421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:23:57 +0200
+	id +PK+Lm7uIWqrQgEAu9opvQ
+	(envelope-from <netdev+bounces-295422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:30:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6518C643962
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30E046439C4
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:30:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=UJNpkEQt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295421-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295421-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KVvFxAn2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295422-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295422-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E920D301E7FE
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 21:23:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE4F6301AB8E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 21:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FB11F78E6;
-	Thu,  4 Jun 2026 21:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4870F3C6A5F;
+	Thu,  4 Jun 2026 21:30:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785F93FADF6
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 21:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBE83E9F61;
+	Thu,  4 Jun 2026 21:30:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780608202; cv=none; b=s6gesV348RSjg5un0ipjgA5x+Z87HF0tHbOQQjeqCy/EsyfEFlJc+c0+XN0ro5J8Z7r4FMyg+N/f0Yk1zXix1uvosBZisyczJ8YaMBlYLlgSb9EHZZDFnk4S1j6akxRuIO4mlCQ25g5eb/Zw07thfwEgVVR/aiXis7XrxGJ3GjU=
+	t=1780608620; cv=none; b=hnCf5fbLBHiAsm9r44ArFjF6sVO+ZM+KqcJcpbp89+Is04mJ9TDIVgK2K4loMxcfG0rTrC1m3CO4L+jkxStZVXg1wsmK1kEKTrCvgGNrl9XasWemRlmu5LMY6aCBo3M34Ty+Z686blnIjim3KR16HR0BXELeA84kPaHgMOvKtxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780608202; c=relaxed/simple;
-	bh=0xer4wn2tCTzWbs5uLYTskx4FaXA/2EiMQZeA7em6p4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=opKjT36qVEUVopHPScXCtJezztjed+PVRqz64RTcwT9mZbtSTkZl/AN/ETtuQ8OJano7hT4iuFL6bK/gZxF6MWS9kZrL1RGMgb4AVveBeZ3+ElZhNkG39zqX98rud5Qd3BSM6k4tu5kdVStc1jm/0pN0cHSsJIachxuRQQtjw14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJNpkEQt; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B1AE1F00893;
-	Thu,  4 Jun 2026 21:23:20 +0000 (UTC)
+	s=arc-20240116; t=1780608620; c=relaxed/simple;
+	bh=ou5f4RNsO/qt4RFvA8bM/Q80qO7tC8SqRKNrn7v8KJQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=O/6wDsbRr4qQ5dQ+Tf72xY3EZxiajOlgE2o2eRrM2WwwHwgYAih3x/Jen61DT4yav/5P9uzt9njmcsmQVQCK/9u669DTBdw2bF6tvWPeKrpv5groEmUBkan1YIvAbTBbKVdOkUl7wYdmwvwAnQDlS2FjyKNoSgDH1FJTwFS/W1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVvFxAn2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5D1F1F00893;
+	Thu,  4 Jun 2026 21:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780608200;
-	bh=sTEc98M4XZy4WMkROG0qptNsTU3Fmgz7V9VTlpGoaVk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=UJNpkEQt0CjkCEugmUYRNBhibW8aOtscYwd1wNIXNfvnqPgDBnxZiY1nhmlqv7+ny
-	 9mbOZCovyunje6G1Z6EhgfiE+hADo5LdmjDPBYtBqZNZR7IYQ7SG5JeBDyIrOksuln
-	 KS8Inh2I2jYGs+sE1IKgZqGLLnBca+6vlZnRACzPDmofakkIHTRD6hWN6cio3Jy8Mq
-	 qZxdLtODHaz/gheWt60QtP04MNza/uKK4d9+wqPt3TpMcIrZPheJj1MqZ7azgqTTsm
-	 2w6ortBrQUgasNRO1mQtECATG3HqNSdo9d0FDnAY38MpMKIIQzamgNGoHFDx8P4jrY
-	 7k5oLWJK437Hw==
-Date: Thu, 4 Jun 2026 23:23:16 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Florian Westphal <fw@strlen.de>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: airoha: Fix use-after-free in metadata dst
- teardown
-Message-ID: <aiHsxFrleJfpLeuA@lore-rh-laptop>
-References: <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
- <20260602-airoha-mtk-metadata-uaf-fix-v1-1-3aaa99d83351@kernel.org>
- <21810a20-abe6-4490-969c-cfd62c4c082a@intel.com>
+	s=k20260515; t=1780608618;
+	bh=9lWxlO6ntsyiC++b0Cvnh+whTMYhM2EFtDyY/PQSpn4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=KVvFxAn2zLpyRY90s29gWWmC7a02XJOYPYW+OzXGsH8xwGI7zvWrSj7kZNLSu+wDc
+	 zkqkDTbhv+WUVKP2iEgUNljK90NmxFKEjZVUUQ+iPDyNgJ+hg0Rswsz7/cnfJjIVLP
+	 NrzOLLFr3/IGOgnyHbPEay7u+7rwI7yaes3gJ/MpEGbkcPWunEJyMuJd6pKkumsp+E
+	 yzProC7XEZSob7tjGWkQGylvGNkJ7OLlTjXb1ndc4o7t8q4f+l5qD5JqgMZLlq7cpy
+	 dAWE0cFiNBC6OO8ukRjzcQVU0l0SmNB0bjcZsYkxQfYeoA/iRHejtP7NNWJNUM2n6e
+	 NEYEuBXXNjG0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09453930A28;
+	Thu,  4 Jun 2026 21:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aWp9RvEMdmSaWjBX"
-Content-Disposition: inline
-In-Reply-To: <21810a20-abe6-4490-969c-cfd62c4c082a@intel.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/11] net: ethtool: make sure
+ __ethtool_get_link_ksettings() is ops-locked
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178060861965.3031243.13905126660213599412.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jun 2026 21:30:19 +0000
+References: <20260603012840.2254293-1-kuba@kernel.org>
+In-Reply-To: <20260603012840.2254293-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jakub@cloudflare.com, maxime.chevallier@bootlin.com, nb@tipi-net.de,
+ lee@kernel.org, linux-leds@vger.kernel.org, pavel@kernel.org,
+ jv@jvosburgh.net, michael.chan@broadcom.com, jhs@mojatatu.com,
+ vinicius.gomes@intel.com, idosch@nvidia.com, razor@blackwall.org,
+ hare@suse.de, jhasan@marvell.com, danieller@nvidia.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295421-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295422-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jacob.e.keller@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nbd@nbd.name,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:fw@strlen.de,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jakub@cloudflare.com,m:maxime.chevallier@bootlin.com,m:nb@tipi-net.de,m:lee@kernel.org,m:linux-leds@vger.kernel.org,m:pavel@kernel.org,m:jv@jvosburgh.net,m:michael.chan@broadcom.com,m:jhs@mojatatu.com,m:vinicius.gomes@intel.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:hare@suse.de,m:jhasan@marvell.com,m:danieller@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,strlen.de,lists.infradead.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6518C643962
+X-Rspamd-Queue-Id: 30E046439C4
+
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  2 Jun 2026 18:28:29 -0700 you wrote:
+> This is prep for the series which will make most of the ethtool ops
+> run without rtnl_lock. The AI bots surfaced a number of callers of
+> __ethtool_get_link_ksettings() which need fixing, so I decided to
+> send that as a smaller prep-series. Each driver changed separately
+> for ease of review.
+> 
+> Full series unlocking ethtool ops AKA v1::
+> https://lore.kernel.org/20260528231637.251822-1-kuba@kernel.org
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,01/11] net: rename netdev_ops_assert_locked()
+    https://git.kernel.org/netdev/net-next/c/251bc9db88fb
+  - [net-next,v2,02/11] net: ethtool: cmis_cdb: hold instance lock for ops locked devices
+    https://git.kernel.org/netdev/net-next/c/1d3964e29e53
+  - [net-next,v2,03/11] net: document NETDEV_CHANGENAME as ops locked
+    https://git.kernel.org/netdev/net-next/c/b8dfa196cb97
+  - [net-next,v2,04/11] net: ethtool: add netif_get_link_ksettings() for correct ops-locked use
+    https://git.kernel.org/netdev/net-next/c/f32fe1d79a18
+  - [net-next,v2,05/11] net: bonding: don't recurse on the slave's netdev ops lock
+    https://git.kernel.org/netdev/net-next/c/107b097790e9
+  - [net-next,v2,06/11] net: team: don't recurse on the port's netdev ops lock
+    https://git.kernel.org/netdev/net-next/c/a6882c158326
+  - [net-next,v2,07/11] net: bridge: don't recurse on the port's netdev ops lock
+    https://git.kernel.org/netdev/net-next/c/20398c41d001
+  - [net-next,v2,08/11] net: sched: don't recurse on the netdev ops lock in qdiscs
+    https://git.kernel.org/netdev/net-next/c/e50f6245be53
+  - [net-next,v2,09/11] leds: trigger: netdev: don't recurse on the netdev ops lock
+    https://git.kernel.org/netdev/net-next/c/ea8ea212d415
+  - [net-next,v2,10/11] scsi: fcoe: don't recurse on the netdev's ops lock
+    https://git.kernel.org/netdev/net-next/c/af1737dab07c
+  - [net-next,v2,11/11] net: ethtool: make sure __ethtool_get_link_ksettings() is ops-locked
+    https://git.kernel.org/netdev/net-next/c/9f275c2e9020
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---aWp9RvEMdmSaWjBX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> On 6/2/2026 2:21 AM, Lorenzo Bianconi wrote:
-> > airoha_metadata_dst_free() runs metadata_dst_free() which frees the
-> > metadata_dst with kfree() immediately, bypassing the RCU grace period.
-> > In the RX path, skb_dst_set_noref() sets a non-refcounted pointer from
-> > the skb to the metadata_dst. This function requires RCU read-side
-> > protection and the dst must remain valid until all RCU readers complete.
-> > Since metadata_dst_free() calls kfree() directly, an use-after-free can
-> > occur if any skb still holds a noref pointer to the dst when the driver
-> > tears it down.
-> > Replace metadata_dst_free() with dst_release() which properly goes
-> > through the refcount path: when the refcount drops to zero, it schedules
-> > the actual free via call_rcu_hurry(), ensuring all RCU readers have
-> > completed before the memory is freed.
-> >=20
-> > Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index cecd66251dba..eab6a98d62b9 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -2936,7 +2936,7 @@ static void airoha_metadata_dst_free(struct airoh=
-a_gdm_port *port)
-> >  		if (!port->dsa_meta[i])
-> >  			continue;
-> > =20
-> > -		metadata_dst_free(port->dsa_meta[i]);
-> > +		dst_release(&port->dsa_meta[i]->dst);
-> >  	}
-> >  }
-> > =20
-> >=20
->=20
-> the port->dsa_meta is allocated using metadata_dst_alloc().. how is it
-> safe to use dst_release here? Seems like we should be calling dst_alloc
-> instead of metadata_dst_alloc in order to use dst_release??
-
-We need to allocate the metadata_dst using metadata_dst_alloc() since
-md_dst->u.port_info.port_id is consumed in dsa_switch_rcv() to get the
-switch conduit port.
-I guess it is fine to free metadata_dst running dst_release() since dst_ini=
-t()
-sets DST_METADATA flag and so dst_destroy() runs metadata_dst_free() after =
-the
-RCU grace period.
-
->=20
-> metadata_dst_alloc does call __metadata_dst_init which calls dst_init..
->=20
-> I guess the start of the metadata_dst structure is also the same address
-> as the internal dst_entry struct...
->=20
-> But dst_destroy does a whole lot more than metadata_dst_release so I
-> don't feel confident in this actually being a drop-in replacement... It
-> calls netdev_put, it calls the dst->ops->destroy, it releases child
-> refs.. Or for metadata dst entries is that all basically a no-op??
-
-__metadata_dst_init() calls dst_init() with dev =3D NULL so netdev_put() is=
- a
-no-op. Same for dst->ops is dst_blackhole_ops and and dst_blackhole_ops has=
- no
-destroy callback.
-
->=20
-> I feel like I'm missing something here.. The driver also calls
-> metadata_dst_free in the remove path and that wasn't changed by this
-> patch either.
-
-can you please explain what you mean here? we do not run metadata_dst_free()
-anymore.
-
-Regards,
-Lorenzo
-
->=20
-> Generally it seems like we should be using the same API to allocate as
-> to release the object... This is confusing. What am I missing?
-
---aWp9RvEMdmSaWjBX
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaiHswQAKCRA6cBh0uS2t
-rHipAP4llkXraaMXUK3wGAgySlJJUwlEcRj8tHK/o/3m+eELXwEA2l1QByKUIy8/
-sBrHvIWNbv90x/tGgmBZkNoYSKAXpAo=
-=ev4h
------END PGP SIGNATURE-----
-
---aWp9RvEMdmSaWjBX--
 
