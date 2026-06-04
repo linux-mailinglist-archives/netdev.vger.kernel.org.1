@@ -1,196 +1,217 @@
-Return-Path: <netdev+bounces-295285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uXuOBFeOIWpYIwEAu9opvQ
-	(envelope-from <netdev+bounces-295285-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:40:23 +0200
+	id 1bivEISNIWoiIwEAu9opvQ
+	(envelope-from <netdev+bounces-295284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:36:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A2CC640F76
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:40:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF052640EEF
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:36:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=SQD+fnzX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295285-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295285-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=oiPPIXt8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295284-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295284-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 73FA530C76AF
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 14:23:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D948F311E97F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 14:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6916D48BD52;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43464480971;
 	Thu,  4 Jun 2026 14:19:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C40248B380
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C43480977
 	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 14:19:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780582772; cv=none; b=kdCiWUg8uD57KL36SLyfu/W+h2uIo73eGPH7YnznUWuny3hK2K7gdnqNyzO1GoLoc3d53hd/l0oYBAc7sx9PX3lOi5TbPteL5g7N/4U5C/KnTv1QVu15vAP04N0dtYnl8xM51MEqP01nJ2hl/d9Jxw90vXu9e7Uw30E0mXAZDt8=
+	t=1780582772; cv=none; b=hPyZkd711992cwDE6EolXcMpWN7/O1czACbIKschhDD2RI2njeZt7PwWTOkhRPs+nBxPnMmzLM2PxaF8jDVyD7pQ3oSXmXy5UMGCMG02jLmtLIRwUsXkh0JT3H2uSijlBR7LXJuVyEyPEiPKOPY4MaWkdgJ2+T3+U6YLmYPwHIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780582772; c=relaxed/simple;
-	bh=bZBJK1bEyOHMOP+p6S1oJ0XzlGGuTJSxJohxL9ZrAFc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VfaqsDim+SUcpSel1arpNKxVDdDayGTiuiSF33ka32Fzv0gpZJQKHlJ4LejAFIX5YSN+GPg08vu/Tn9hWxLH4CuBnu6jzDK8hR3aDMh1qT+KOyJSB9bcI3v1R8nRyIWJjrA1BWdVL7UyoTqJlwU9Hyt5gtic9HmIlrPEOfOQNts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQD+fnzX; arc=none smtp.client-ip=209.85.221.49
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-46013161068so406659f8f.2
+	bh=PY0GgQpHC9Aq0VJm9Y+dvOS4dC/BpXJjS+JJGwvRgdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gZxcRX4q4yG1ax4ssQP+qM8IJ1yx/k7BS/ReFtjgH0QvOsb5JBUX8GAmric5njeSBzkyo8XtGTg0Ls+9PAqBpxagcuWbmhG8w4s8o8OObNNl3WgC1ujXnKM1AwFpNbWHd0a8PE8susHo97W70wZmLtI6umzNUoX0qKw0/44hYIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oiPPIXt8; arc=none smtp.client-ip=209.85.128.42
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490b4a8e28bso6954375e9.1
         for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 07:19:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1780582769; x=1781187569; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CMJns1srValYD3xrGqq9bBco3mB6WrjFlMQ0l4f/4n0=;
-        b=SQD+fnzX6+74vx0kZss/aosFKYlhirDw7MR2vEBmHXHriwkfjsjT23bjGTtYCx/+QT
-         JDO1xH6QwUZXZgfXjpyi6VvyBTAzJVUOVCZEp8S4aeI4Hbiz02NrVOY3egr+VVyLjG+k
-         5U/mGzvaHdCFguDJwzSVz15xehjZmwZl8hEqTh/2MJA28wdYbACg5Ux5pR4XhdYLZshP
-         FxKsJPMmtOQbXgQruYkUjrEGqH3gQF7Fwyr6cvBNJ9m93IiBgTOLkUNdqfDya+fEPlRq
-         rp2lmT/rseQnDGUai2p7twA0e5pC272vJR7YRpUAFBwlbrDtSvVsOqAltPWArPuOEOr6
-         968Q==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4NRZUa7I3XPfqUu/QiRSG37yGjwWwJiviNkPIf3sJNM=;
+        b=oiPPIXt86B70xSggytLMjrAInt/7O1wxZybk2aEfecVyEaaU3GkPwWdOj7Ked077lH
+         PAQGWE5q99eLeP7Seepab66sbnz+rPPgN5Cb6d0m2d00zGoGyr9pBCVB3PDeViIRvj6+
+         C1lij7IvwQEpx/auF53Dy3yPe9qJpqFs4dJ0Ma1oDEWN1pTDpogyPqOfw8o/FbsShw+n
+         2EBJBzU/kXwetnQF0Le2b7o1hRjN8Dy9i30EtQ3TSRty/i1Oy0H0as9e9ZxXssFyxcyG
+         w+ZlJ7boyPuwjNIAc92U0pLO5juDK00rhw2n6PAEFQ49KSLWsApiyRQhUBRJ2RjqU0sh
+         1MSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1780582769; x=1781187569;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CMJns1srValYD3xrGqq9bBco3mB6WrjFlMQ0l4f/4n0=;
-        b=Z6Ghv1fYD/F+9Jxa1Y4ptjJzcF4Z+uSnbCnJOuUDIFygm7OtGuNSQZw/HlGZtcoS0l
-         Uy6eudHomd6PUm5ejdurJ6F8FnAJDwFQsku7goHDr1amxj6GAtfXhTEIhL7x1Wa+I0xh
-         V+wzBQ424y6XbRk1Tgycxzl/VfE9ngXtfVnw+GK/IHr8VVRVEoaQIKAZ9Tu4DzgQsoFf
-         2/prjY4tkG6l0+X3u2Prx62t56iKHc61qCMSdT1uFtk9x/vCvyyb+5y7H1BmlSDwCJn+
-         fw7m7tOAMMoVJxn/SvvTPdMqXAOg/S9SWnuJQXEzANzUtL+4lGoIsUNJWvNy0yyR14Bl
-         2Mfg==
-X-Gm-Message-State: AOJu0YxEPGJM++rocWCtGz9ZCP5Z/yGHNdNCiXKsimK2wdkMPJvTR5iQ
-	tJhPvNwqM6WV8uT0asgox9Qtb1HVCkovfP03G2O6du2bt1Pfrakh9b8m5Rljrvk73w0=
-X-Gm-Gg: Acq92OGATmXNFv0daWq+zaCy7ZLqucQeNu99ZD5H5OAk1yFU7wQGRrbvJBWWqqLiBHe
-	risXFQJ6JAuhayq0SUkB2kDKJQFeQi2Tiz8dX1yxZaS8soOx4rloc0MWREzUmXIjP+L0MulWYgz
-	h3sxqjJoBInC061uQ/GubRcp+PkMm49K9yngTQPLt7m93xnT+9oWEQGL6e6MEo/HcQ4A0foI6vg
-	YY8qtmMjNTrd0GAWmVHZEx2Ecm8eTEjLSqxO18eKgZk2kD3TFKGNDSF2CeikTenticxKdiNX/Ex
-	RcOKFf05TCLcyRIebrmaE7jkd6HRdfVuJLBFka1tEsUAJh7gULinIZnWwbu1yFyd1dMh8keXnFj
-	aUI/andB1jawfX+DSTL9Q2UYpI+GIQu0RlBVWfGop9Qv7yRP8cisYg/ki8AyTx1gyo3H5qaFrk0
-	ceTjrgUBxvE0kMd0qhdZbRa1KwaaeJqs3poHIaSdtYcO4srtUChtPwG4oNr6k7XJmnEHWprgnZt
-	ao3X7RXqxoQ7LFKAesUYw==
-X-Received: by 2002:a5d:64e4:0:b0:45f:f142:d56c with SMTP id ffacd0b85a97d-460217c1330mr13296092f8f.16.1780582769247;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4NRZUa7I3XPfqUu/QiRSG37yGjwWwJiviNkPIf3sJNM=;
+        b=JXJbxXxwoWbjSn0k6f82qBCRD62o81wYEE3VPiem8RjIZcHtSdtmlL2SpCyQVr7v0F
+         Aragv75IE27paiCrF6AnjmYi5RaNPiEALthpimxwirse4a9lPRI1n4aEcvGtuzpySY+x
+         YPEnji9EezN4Kj9gOhm0tOQWNQ8KDntYcbmOUC/M0rx9XQuz4Uoml6X0uqBWNLErDgkA
+         kzlfh2T/Wd8VgtQvmVtU3aFwaUiOqrJVynVvsNTRHYuqCgzZ3k31AyvneS+X3jm1Jc7p
+         PGkbYBk1m8mG1j2Gway0Hz27Br4eKSCeOYHbhZ2gH246fssIP/ZlfgxG49JoaPcCyzdg
+         NbVg==
+X-Forwarded-Encrypted: i=1; AFNElJ+3ucNP2i/P4c782HBMALN3hIv+evPKQ+ReF6yLtHql2DAZmVEgsCgr4q0wD0Xab0x/Lc4cg+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJjYazIbeoc1j7a3MJp+HJvuyBETUpS/f8k6YqmJa1SrUQodeD
+	irP7JV1bfJlLKbsFhlGpV1C380V9byiySCFjGApK+9RsnN14CsZHGbA7
+X-Gm-Gg: Acq92OF8lE42oCNQDid8+1018CVmCIS5g7OBkZ9NP3Cxu9prSHZh9j1dTHMh644uu7X
+	JnU1wMNlHKH6EcJkA+B31Da/U+pDckCNLTMJCzQEpkieGUB2WF32AusoGCZJZ4fg2ZJCVhD58JP
+	K3IADkpmqvoQF6CZv5qlfbyEDCTehKP3Z1u3HnK/fjKkAsMBWsHFryzrsrs+bptxx6AYBqk5suy
+	R14PGAWfov+T9CyNWT4sSGplZZda5E93W+nIca+We5qbLihb5aUYlQbD3ahAJZd/4QCaHzZj+J9
+	r/+0wvfhZIBJmJOUhfSHveO+Zo4ac4TzqYO6YnAU9rwK1KGmSIFJsnJURWAuIobkbnoufebP+19
+	Mt/nXFgcwoYL60dx6x8UvinplqJU5kgBF70nsARysrq7weKHAu/zxGWzty46VNDHet9wsdW5tPk
+	V6zdb2Y37e/qojldy16RfJBG+1mCFjeEKVPRK9JTDFKEvucd70IA/FXOpyne7vbjQKhs4KNpc=
+X-Received: by 2002:a05:600c:698c:b0:48e:6db3:ff33 with SMTP id 5b1f17b1804b1-490b5d41d43mr146363555e9.14.1780582769139;
         Thu, 04 Jun 2026 07:19:29 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2dc412sm17274297f8f.4.2026.06.04.07.19.28
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4602cda3651sm3788978f8f.32.2026.06.04.07.19.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Jun 2026 07:19:28 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Carlier <devnexen@gmail.com>,
-	Claude <noreply@anthropic.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Ingo Molnar <mingo@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: garp: reload skb header pointers after pskb_may_pull()
-Date: Thu,  4 Jun 2026 15:19:22 +0100
-Message-ID: <20260604141925.237746-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+Date: Thu, 4 Jun 2026 15:19:25 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Christian Brauner
+ <brauner@kernel.org>, Tim Bird <tim.bird@sony.com>, Amir Goldstein
+ <amir73il@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net/dns_resolver: use kasprintf +
+ kmemdup_nul to simplify dns_query
+Message-ID: <20260604151925.081e9f47@pumpkin>
+In-Reply-To: <20260602071343.962830-2-thorsten.blum@linux.dev>
+References: <20260602071343.962830-2-thorsten.blum@linux.dev>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,anthropic.com,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-295285-lists,netdev=lfdr.de];
-	URIBL_MULTI_FAIL(0.00)[vger.kernel.org:server fail,anthropic.com:server fail,sin.lore.kernel.org:server fail];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:devnexen@gmail.com,m:noreply@anthropic.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:tglx@kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:mingo@kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295284-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:thorsten.blum@linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:brauner@kernel.org,m:tim.bird@sony.com,m:amir73il@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,sony.com,gmail.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,anthropic.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0A2CC640F76
+X-Rspamd-Queue-Id: AF052640EEF
 
-garp_pdu_parse_attr() keeps a pointer into the skb linear area across
-pskb_may_pull(skb, ga->len), and garp_pdu_parse_msg() dereferences gm
-on every loop iteration even though the nested parse may pull again.
-pskb_may_pull() can reallocate the skb head, which would leave those
-pointers stale.
+On Tue,  2 Jun 2026 09:13:41 +0200
+Thorsten Blum <thorsten.blum@linux.dev> wrote:
 
-This is not reachable today: GARP PDUs arrive via the 802.2 LLC SAP
-path, where llc_fixup_skb() already pulls and trims the whole payload
-into the linear area, so the inner pulls never reallocate. Reload ga
-after the pull and snapshot gm->attrtype into a local anyway, to harden
-the parser and match the skb_header_pointer() discipline used by mrp.c.
+> Use kasprintf() for descriptions with a query type and kmemdup_nul()
+> otherwise to simplify dns_query().
 
-No functional change.
+It'll be a lot slower - if that matters.
 
-Assisted-by: Claude <noreply@anthropic.com>
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- net/802/garp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+-- David
 
-diff --git a/net/802/garp.c b/net/802/garp.c
-index c7a39f298ad6..56b934ec1aae 100644
---- a/net/802/garp.c
-+++ b/net/802/garp.c
-@@ -452,6 +452,7 @@ static int garp_pdu_parse_attr(struct garp_applicant *app, struct sk_buff *skb,
- 
- 	if (!pskb_may_pull(skb, ga->len))
- 		return -1;
-+	ga = (struct garp_attr_hdr *)skb->data;
- 	skb_pull(skb, ga->len);
- 	dlen = ga->len - sizeof(*ga);
- 
-@@ -492,6 +493,7 @@ static int garp_pdu_parse_attr(struct garp_applicant *app, struct sk_buff *skb,
- static int garp_pdu_parse_msg(struct garp_applicant *app, struct sk_buff *skb)
- {
- 	const struct garp_msg_hdr *gm;
-+	u8 attrtype;
- 
- 	if (!pskb_may_pull(skb, sizeof(*gm)))
- 		return -1;
-@@ -499,9 +501,10 @@ static int garp_pdu_parse_msg(struct garp_applicant *app, struct sk_buff *skb)
- 	if (gm->attrtype == 0)
- 		return -1;
- 	skb_pull(skb, sizeof(*gm));
-+	attrtype = gm->attrtype;
- 
- 	while (skb->len > 0) {
--		if (garp_pdu_parse_attr(app, skb, gm->attrtype) < 0)
-+		if (garp_pdu_parse_attr(app, skb, attrtype) < 0)
- 			return -1;
- 		if (garp_pdu_parse_end_mark(skb) < 0)
- 			break;
--- 
-2.53.0
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> Changes in v2:
+> - Reverse xmas tree (Jakub)
+> - v1: https://lore.kernel.org/lkml/20260528222030.1655010-2-thorsten.blum@linux.dev/
+> ---
+>  net/dns_resolver/dns_query.c | 33 ++++++++-------------------------
+>  1 file changed, 8 insertions(+), 25 deletions(-)
+> 
+> diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+> index c250d82cad96..14bee83cbe22 100644
+> --- a/net/dns_resolver/dns_query.c
+> +++ b/net/dns_resolver/dns_query.c
+> @@ -64,44 +64,27 @@ int dns_query(struct net *net,
+>  	      const char *options, char **_result, time64_t *_expiry,
+>  	      bool invalidate)
+>  {
+> -	struct key *rkey;
+>  	struct user_key_payload *upayload;
+> -	size_t typelen, desclen;
+> -	char *desc, *cp;
+> +	struct key *rkey;
+>  	int ret, len;
+> +	char *desc;
+>  
+>  	kenter("%s,%*.*s,%zu,%s",
+>  	       type, (int)namelen, (int)namelen, name, namelen, options);
+>  
+>  	if (!name || namelen < 3 || namelen > 255)
+>  		return -EINVAL;
+> +	if (type && *type == '\0')
+> +		return -EINVAL;
+>  
+>  	/* construct the query key description as "[<type>:]<name>" */
+> -	typelen = 0;
+> -	desclen = 0;
+> -	if (type) {
+> -		typelen = strlen(type);
+> -		if (typelen < 1)
+> -			return -EINVAL;
+> -		desclen += typelen + 1;
+> -	}
+> -
+> -	desclen += namelen + 1;
+> -
+> -	desc = kmalloc(desclen, GFP_KERNEL);
+> +	if (type)
+> +		desc = kasprintf(GFP_KERNEL, "%s:%.*s", type, (int)namelen, name);
+> +	else
+> +		desc = kmemdup_nul(name, namelen, GFP_KERNEL);
+>  	if (!desc)
+>  		return -ENOMEM;
+>  
+> -	cp = desc;
+> -	if (type) {
+> -		memcpy(cp, type, typelen);
+> -		cp += typelen;
+> -		*cp++ = ':';
+> -	}
+> -	memcpy(cp, name, namelen);
+> -	cp += namelen;
+> -	*cp = '\0';
+> -
+>  	if (!options)
+>  		options = "";
+>  	kdebug("call request_key(,%s,%s)", desc, options);
+> 
 
 
