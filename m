@@ -1,198 +1,195 @@
-Return-Path: <netdev+bounces-295379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xDhfCLm6IWrhMgEAu9opvQ
-	(envelope-from <netdev+bounces-295379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:49:45 +0200
+	id 3hMDIra8IWpMMwEAu9opvQ
+	(envelope-from <netdev+bounces-295380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:58:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E366642668
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:49:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2818964275C
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 19:58:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="UmYe/REf";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295379-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295379-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=gs17Tqkp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295380-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295380-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5ADD03028345
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:48:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 982223014259
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 17:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940E84D2ED2;
-	Thu,  4 Jun 2026 17:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B264E4CA26B;
+	Thu,  4 Jun 2026 17:58:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753534CA28E;
-	Thu,  4 Jun 2026 17:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA4A4C6F02
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 17:58:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780595324; cv=none; b=utnSxKV8kqjZ8+azIMV7TDVKVkpNq5c6zdEY/BDNn+TMVWG5zPQrFD9lI8i6s07tVxfCllKMxTGKPCLm8Z0lwPq6n+V1Hk/648SCUj2v2ngkxgdSfhYbP9YgPl3dOefRW3InlzF7oIKvM6hE9dWRWaZH0xHpa5x2W6trsOru0PY=
+	t=1780595890; cv=none; b=uqNwEtrg2quRz2ksGJkvcEO1pzUiAzDh/sOV40k0c3uE02WmQl0XKc/IYK0iChpCKmc4l1Ry9MB9PvqSy0A7+OExEcWs8KsAdygslfoZSusUzpw33SBfBvGSbNEjxyv/6tQ9+bwxTBo0pPTQiMXrtUn73LGaoKveB/6QqfYnGnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780595324; c=relaxed/simple;
-	bh=W6IoCm8k2YaoSXfyNu0dP+g0UIHQ2jLkMzviiCEez0k=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=j5PkCfgdESokHobaVxg8UpyEMWPB5dQ+cxiwqZifJ8MuRNn840yB1GeqwA4heOoKapOlgyeMtrNE3XTJniVk0x1o1A+GcpR2k6B5X7F8t+JuJ3nuWUxmr514CnN5m5uEBmUQt/dL/bCUmIWNejZQVw4DYNkeZtqUG46GR4mamtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UmYe/REf; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7DF1F00893;
-	Thu,  4 Jun 2026 17:48:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780595323;
-	bh=G5lTzb6PZ26RdyvIpz6234N+JQ+TFr7aT8ilR9r4Fl0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=UmYe/REf01mob26PjgH2lKm68ATT38aE6vz/KSUWspeZ0vPkcY3JF7Rmtcgh6vqT/
-	 xxyT773pf7scCgvlxiSz/4O0oqXTSAA1bBgXxfc89czszOPUVoqKB5Nm4HyJEANaYD
-	 iCM7bDOIRVMjGCW9pCiNdfTbba2i3vOkbXWnrO4a0wZV0R++wmmnj69FLt3Ynu7gg4
-	 l0a6nYgmwr2MLXY4jJOpqXZ2tlXXMT/WdDuvFzW6IqTWL42m+IPTwHvQ3sJeBT/d4K
-	 yp8pCpOlWoKoUSMqZFIhkOrDyEmmIJuVUHzOeeOBEvBX6PfSFVZosmnCDSqxi0HAYc
-	 WZBC+cln1Dv/w==
-From: Chuck Lever <cel@kernel.org>
-Date: Thu, 04 Jun 2026 13:48:29 -0400
-Subject: [PATCH net-next v12 6/6] tls: Flush backlog before waiting for a
- new record
+	s=arc-20240116; t=1780595890; c=relaxed/simple;
+	bh=QgKf+3clhhMLNlggfZvWCRY5iz5ATGH7muhRFNw4wbA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MdCeFANT27sQiPk80+PSDULdyEHjFxRbJ1ZMbhhThG1DKOIonOIMuq6qOw415esbmG7kw+gSKaWRuVYQ3fZD052Lds4uhGNVmfDjNAIpCflQ4OLm6utDRdGDaG/dJJFVOAKZ9DLPpAGOpr7oDOKXIjxq3vuBYVizwmVgQ12Wh+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gs17Tqkp; arc=none smtp.client-ip=209.85.222.182
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-9156ceb55ffso89262385a.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 10:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780595888; x=1781200688; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2qQO5dPJpJPnmsYjavZ2xiv11ddii1u7KjXOe802ZBo=;
+        b=gs17Tqkpe7H4tRM33lhFgoJhiitdUIk24IfI+FDCTBJTy19KIFT/6H++WiYWJbfCHr
+         xIr5hmCSyWBh+d7P1r3EKgTfbqBcr3HzL6HLGMVPAW8N0XIzW+zpo8N2ZpHsyrZLQBQz
+         w5+Qfr44orLZf4CODGigGAvRVhnOfwL6p8Csr+upT+ZvrZMvIbgZ/5fpHosYFPyNGz2u
+         Od8pXuwb4jVxH7lmxPAew/ofAMiAWsnGTNGT+iNDecq3n7mAV8OoMxYdUWwO+eEK84SX
+         XQGaJX9Nh/BaVUB0sGMJ8N2229XXkWWks5PZLqOuTaw6J5sJJ4F06lEcVuvKNItrnUWY
+         7U8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780595888; x=1781200688;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2qQO5dPJpJPnmsYjavZ2xiv11ddii1u7KjXOe802ZBo=;
+        b=GojigLPrab5ezeTYEdz3fhUVhCXdrk+4OK0LhEdFH9iIgRVPosEayUpxnj8SRIfIIt
+         ZAjgiDlA5iU7P2qeanTIOW7IlmTPXN1qS7NiaH1UPcyL5ukZK10I+tBexHXwd9MhPEvj
+         qEDtCdgxUZkdGLes1iVS7V2c8d5B+/M8bZfiGXWbXu4nqc2mrXiKm+fTSOvfg6h4hwC9
+         pbZaukj4qS39EtEs6iWvsuC1a99sGJRHj5PqTY3d0D/tAaXbXvpZgiMEsv6XI19rkqZ3
+         I4dYAHYgob291hcar9161ifkErq3D8D2HkbcgVXKEYrLLBTRnztGGoZSBxjEU5EksVMi
+         MdUA==
+X-Forwarded-Encrypted: i=1; AFNElJ9MiJGCC+ZXbYOnoIZLgXzo9+/0+PbtYFOiTGT4EPakCkegDmiUh7S7gLWrLZtOufc8ahnKKB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNV5bkkeph0yFM+SNu/10NZB5v3ssXHo8FNiMokoAqLTIhetms
+	JvhfqynTbA+v+FYSdd1QXff0RmgrBe8sACA/Ly5i4oCu0z4VP603cJ3G
+X-Gm-Gg: Acq92OExyR/w+H89h7TYwsFroECC6ySt0ftyIEmMLI0/0S18XdurEoEkoqE4bzonwWU
+	oTT0ZIgELs6O7SrmJ75LtPNcuEVIMrf0QTnRfFpq2pgLEE588Up3vaN00dMtDD0KbOnteRu3r4H
+	I6jfkRsQwZVv+/ba2fPDD4SD7LbZQKuP6at2cxyo0cGkZW9shG85/MBaMAsH0vkJnyHwr8ldwOi
+	j3CykCcIn6DFy9JNnZvfvLwFsfUQaNEoGb6mPv5mvCyLDLUsCpbzEdnauYvVglrf+7CJ1Gh5qI9
+	5houQRjEDGPuat8SE3UHC/j73Hnz0CDil9/Yvp4khh5CdXloM9g0FczmbndNAo6Qn4FD2i+PD1R
+	Y4LNpe6xPqv1cKjTWwqkwwHVl0R6xeXNsY3OBhRy0O+eA3wHOhg4IcTxzlSKLQSJmOxQovEq9nR
+	8HBY/Aaazl3BGuN8KqDL5Gc1kH6SWHtBKaqeHtDhlBdyW72FIqUyKkU4tEjPZI31HD9+oVKUn6e
+	RU6pxIXdBoY8TmBsj3SWrfvlxdKsOg=
+X-Received: by 2002:a05:620a:480a:b0:8c9:f8e5:9f12 with SMTP id af79cd13be357-915a9e0a7c5mr25895485a.57.1780595887710;
+        Thu, 04 Jun 2026 10:58:07 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a381abfsm650227285a.27.2026.06.04.10.58.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2026 10:58:07 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Vlad Yasevich <vladislav.yasevich@hp.com>,
+	linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] sctp: fix uninit-value in __sctp_rcv_asconf_lookup()
+Date: Thu,  4 Jun 2026 13:58:03 -0400
+Message-ID: <20260604175803.2142975-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260604-tls-read-sock-v12-6-b114efa6e3e2@oracle.com>
-References: <20260604-tls-read-sock-v12-0-b114efa6e3e2@oracle.com>
-In-Reply-To: <20260604-tls-read-sock-v12-0-b114efa6e3e2@oracle.com>
-To: John Fastabend <john.fastabend@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
-Cc: Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
- Hannes Reinecke <hare@suse.de>
-X-Mailer: b4 0.16-dev-da966
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2795;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=/6ObuvjYz1Emi6QHBj5HPN2W7LFHmm8C+UVAlpiAMoc=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqIbp3Y/Ykq8EMp9nytTLZW/pTPLaWr1hZ8foEX
- LLL3qyApPOJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCaiG6dwAKCRAzarMzb2Z/
- l7rlD/48H8HGOpauwPdIZ8fkXzCOkP3h2sSPvZgvVM7H1lF4A9oxY49oSHZYmdD+BRTmgNLHDYq
- +he737mH8tg4RQ8bYqrfAI1MKIZl6CZ033yfophWbpTaxhKkpfWDJjUjamCC+PQ4A1J0UPuBxmh
- 2RbS6BsRE0lMUpm5FDI7OX0ZUSZ9xDkte+hOoycOB7lGKB+3nJ2y2TvYbtOyv+f9uZKXXfKkKGZ
- ++TqsRPSlZlzzYKgs0983l5SltMcixv8br3M2WdALSUULbW7wb4VBFwzeNesR1M8qzwMx6KJfpZ
- KabmFBmni1CeMZRuNLJXvowTEg//rQbwVIk7vXzY0Mt6YGNHCHaiVECATCE3u9OLz+HSUxJl/Dt
- mJp+9ucynaWNIMbyw1FGuK9Rvml4LPrH/aKAD9XIdGsI0BAK69Ad+mlafajrqoZsy27MnPW7ttX
- oGqG6hST+Cfu6UuqXHq6NlYFvSDr4KDUDtFQAxZX6g4wqcbp2taUBDrPelppdet8RLtL3s1yNqu
- EsdaERucpv0sOh/xDiCLHqSowVtTEbK2d4uR27VTYiLeiBvmiL9KMN+43bp3odStqCFbuKfBI62
- 1v6tAlu3MMy/DYW5ooOB7n2U6SigqdHkxywwTWWh7hajhIZ2hBfqf7C1xra5ABpUGEZm/hPPDe8
- mYjgoDvVAxa+keg==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295380-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295379-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
-	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:edumazet@google.com,m:horms@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:chuck.lever@oracle.com,m:hare@suse.de,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:vladislav.yasevich@hp.com,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,queasysnail.net:email,oracle.com:mid,oracle.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8E366642668
+X-Rspamd-Queue-Id: 2818964275C
 
-From: Chuck Lever <chuck.lever@oracle.com>
+__sctp_rcv_asconf_lookup() in net/sctp/input.c only checks that the ASCONF
+chunk can hold the ADDIP header and a parameter header, then calls
+af->from_addr_param(), which reads the full address (16 bytes for IPv6)
+trusting the parameter's declared length.
 
-While lock_sock is held, incoming TCP segments land on
-sk->sk_backlog rather than sk->sk_receive_queue.
-tls_rx_rec_wait() inspects only sk_receive_queue, so backlog
-data remains invisible. For non-blocking callers (read_sock,
-and recvmsg or splice_read with MSG_DONTWAIT) this causes a
-spurious -EAGAIN. For blocking callers it forces an
-unnecessary sleep/wakeup cycle.
+An unauthenticated peer can send a truncated trailing ASCONF chunk that
+declares an IPv6 address parameter but stops after the 4-byte parameter
+header; reached from the no-association lookup path, from_addr_param() then
+reads uninitialized bytes past the parameter.
 
-Flush the backlog inside tls_rx_rec_wait() before checking
-sk_receive_queue so the strparser can parse newly-arrived
-segments immediately. On the next loop iteration
-tls_read_flush_backlog() may redundantly flush, but this
-path is cold and the cost is negligible.
+Impact: an unauthenticated SCTP peer makes the receive path read up to 16
+bytes of uninitialized memory past a truncated ASCONF address parameter.
 
-Backlog processing can run tcp_reset(), which calls
-tcp_done_with_error() to set sk->sk_err = ECONNRESET and then
-tcp_done() to set sk->sk_shutdown = SHUTDOWN_MASK. The pre-existing
-top-of-loop sk_err check already ran before the flush, so the
-freshly-set error would be masked by the next-line sk_shutdown test
-returning 0 (EOF). Re-check sk_err immediately before the sk_shutdown
-test so a connection abort surfaces as -ECONNRESET rather than a clean
-EOF.
+The sibling __sctp_rcv_init_lookup() bounds parameters with
+sctp_walk_params(); this path open-codes the fetch and omits the bound.
+Verify the whole address parameter lies within the chunk before
+from_addr_param() reads it, the same class of fix as commit 51e5ad549c43
+("net: sctp: fix KMSAN uninit-value in sctp_inq_pop").
 
-Commit f508262ae9f2 ("tls: Preserve sk_err across recvmsg() when
-data has been copied") gave the top-of-loop sk_err check a
-has_copied split. The recheck applies the same handling: when the
-caller has already copied bytes, sk_err is reported but preserved
-so the error surfaces on the next call; otherwise sock_error()
-consumes it so the error is reported exactly once.
-
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Link: https://lore.kernel.org/netdev/ahgHgQ84RCc8uYrG@krikkit/
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Fixes: df2185771439 ("[SCTP]: Update association lookup to look at ASCONF chunks as well")
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
- net/tls/tls_sw.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/sctp/input.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index df4cdf11f784..5a4300c943a1 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1400,6 +1400,8 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
- 		if (ret < 0)
- 			return ret;
+diff --git a/net/sctp/input.c b/net/sctp/input.c
+--- a/net/sctp/input.c
++++ b/net/sctp/input.c
+@@ -1196,6 +1196,7 @@ static struct sctp_association *__sctp_rcv_asconf_lookup(
+ 	struct sctp_addip_chunk *asconf = (struct sctp_addip_chunk *)ch;
+ 	struct sctp_af *af;
+ 	union sctp_addr_param *param;
+ 	union sctp_addr paddr;
++	__u16 plen;
  
-+		if (sk_flush_backlog(sk))
-+			released = true;
- 		if (!skb_queue_empty(&sk->sk_receive_queue)) {
- 			/* Defer notification to the exit point; this thread
- 			 * will consume the record directly.
-@@ -1409,6 +1411,16 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
- 				break;
- 		}
+ 	if (ntohs(ch->length) < sizeof(*asconf) + sizeof(struct sctp_paramhdr))
+ 		return NULL;
+@@ -1204,6 +1205,16 @@ static struct sctp_association *__sctp_rcv_asconf_lookup(
+ 	/* Skip over the ADDIP header and find the Address parameter */
+ 	param = (union sctp_addr_param *)(asconf + 1);
  
-+		/* sk_flush_backlog() can run tcp_reset(), which sets
-+		 * sk_err and then sk_shutdown via tcp_done(). Recheck
-+		 * sk_err here so a connection abort surfaces as the
-+		 * actual error rather than a clean EOF.
-+		 */
-+		if (sk->sk_err) {
-+			if (has_copied)
-+				return -READ_ONCE(sk->sk_err);
-+			return sock_error(sk);
-+		}
- 		if (sk->sk_shutdown & RCV_SHUTDOWN)
- 			return 0;
- 
-
--- 
-2.54.0
-
++	/* The whole address parameter must lie within the chunk before
++	 * af->from_addr_param() reads the variable-length address; otherwise a
++	 * truncated trailing ASCONF chunk lets it read uninitialized bytes past
++	 * the parameter.  Mirror the bound sctp_walk_params() applies on the
++	 * INIT path.
++	 */
++	plen = ntohs(param->p.length);
++	if (plen < sizeof(struct sctp_paramhdr) ||
++	    (u8 *)param + plen > (u8 *)ch + ntohs(ch->length))
++		return NULL;
++
+ 	af = sctp_get_af_specific(param_type2af(param->p.type));
+ 	if (unlikely(!af))
+ 		return NULL;
 
