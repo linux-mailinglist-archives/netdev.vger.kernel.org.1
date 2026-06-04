@@ -1,170 +1,142 @@
-Return-Path: <netdev+bounces-295064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EbPdDQ8kIWpw/gAAu9opvQ
-	(envelope-from <netdev+bounces-295064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:06:55 +0200
+	id VvE3NockIWqT/gAAu9opvQ
+	(envelope-from <netdev+bounces-295065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:08:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E739B63D83B
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:06:53 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DD863D858
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 09:08:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=uniontech.com header.s=onoh2408 header.b=NNOsg0iJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295064-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295064-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=uniontech.com;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b=EiZwVPya;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295065-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295065-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 49C7C300441A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 07:04:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E0E663028AC4
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 07:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E633C140D;
-	Thu,  4 Jun 2026 07:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F90D3DE432;
+	Thu,  4 Jun 2026 07:08:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1693B8D5C;
-	Thu,  4 Jun 2026 07:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41AD3DE42F;
+	Thu,  4 Jun 2026 07:08:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780556673; cv=none; b=AM+V37L4cdcEmaUQkgp4xtI8QWGaLmr1GFCS/KFmTN5Ly8fzdC+J1NgpTBsmE0RE6A24pZMy75oYgfaJINoyhiqPRsYY2sAjAsNRYDgm1WJwPnLSm28bMxiM8nMmHlk7fbjLYWRgJYSEYwzhLjJ3srzZz5dwjZAgNbUhe+tlfdc=
+	t=1780556932; cv=none; b=GwJEkQGqYKYgjVxpUL/CG5FqEA5KM8xL3oP8TaLD38Oi7/+gTBd3+MFjeAMQH9/HW+jJCqgIbKA8a7tIK/oQGjJ/5ttMTcCrSG1xJ74Q5PAKaqG8Pi7KF7qfte6H3nvGuuax9sPkiEbhVTslP0rioRNtnVfHagWNhqfG6MGlxP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780556673; c=relaxed/simple;
-	bh=yywu8ZxTRtIH1pOnd1WALrDXQCMv0OTT03m35HlcjAI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P8rz1ZLSloKyKo41QzfR7O2mlWMU03v8pVU2dshb1D4sQZUupJ8HriC/WfLLch6MrZpynws4GevA2/2l0L7DBKZbLjNi1XfRnXzGihXRT1Qtq8grEGKU9AVitvsxesEIdgvtIs5vvr7iCOZSqEy4Aj9umR3d3W+6vC+5LlnGYck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=NNOsg0iJ; arc=none smtp.client-ip=18.194.254.142
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1780556658;
-	bh=P57iD2S9EPfRAP36gj0JdTbFwtXxilaoUSFYn5CFF2o=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=NNOsg0iJWo8zMQ06kcpPsnFGMsZw2Z+b2uN1+w9qHDateWfQY9qQqxeJ5rpkybcpX
-	 qe2f+H0mTDTzyJGknNlcX/ZFKU9rs5CL8lsdW9ai0T7kN29CfImD5qZe+MiFYOB5eL
-	 n6RSewXLjdhkIYFMFmG3RJUeEMd6XdrUbqlg14+8=
-X-QQ-mid: zesmtpsz4t1780556654tb32bb824
-X-QQ-Originating-IP: PPa2v+lkVt/vNsQ6iSmnuR6BrhfKhuX7ejWkLBDo3GQ=
-Received: from localhost.localdomain ( [124.126.19.250])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 04 Jun 2026 15:03:56 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6328800719262846295
-EX-QQ-RecipientCnt: 13
-From: ZhaoJinming <zhaojinming@uniontech.com>
-To: lorenzo@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	ZhaoJinming <zhaojinming@uniontech.com>
-Subject: [PATCH net] net: airoha: Add NULL check for of_reserved_mem_lookup() in airoha_qdma_init_hfwd_queues()
-Date: Thu,  4 Jun 2026 15:03:52 +0800
-Message-Id: <20260604070352.2603077-1-zhaojinming@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1780556932; c=relaxed/simple;
+	bh=KxyJGkwPDoOBqy5XW77REpfneG4cVhH63Z/648+fpPc=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=VX5UnCIv1WACx8bUEA+iCu3iWwN4r6GUq9GHA1xPUwd+enmrx+ZDIZDIL/h2FeBWlXeZZlzA0So6ZytdLT6y+jm0URwyeO0xMfgTWeuEpT+dIOw1GvXAqyM29blBVaPF0ipRFC9K4E/7iDJnFoiSnbZ7/7w0CAnxKUXXaBZK0vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=EiZwVPya; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 919B2A12E1;
+	Thu,  4 Jun 2026 09:08:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1780556924; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=VBkqgVxnrPw423JfYWcKCfXKl/tFbBF8vWm0ExUBrv0=;
+	b=EiZwVPyaADsIVsBgsc593DKqKW6IGwIXOJwDa6xSzKHI7Pdw0kOUMlzQTWGhzf3ztr1Ldb
+	GiSserTRH/KC7Njs7cUPdkR9KSf5gWe+YhTR2agbVU89klfosN5+E4MM9E4Sc/C07L5r09
+	eO/oJ2O2r7WABpxrqGrWyJoJsKyn5w2R0DS4TrcpQ0XQ4NyY7/n606eqv1a4cM7a6NebBc
+	7u17mVQ5ZrTDAL8KHZMLZ3szM35JsSFakHZZlD8VxWbpdCqlVJhhmCUehAbQFU6ru5JmAr
+	o9yqMJUYVMdnF8cQ/QpmECQxlg/JZo7X+HTAjqfSaqoz4WklgIk1FaF0qDeASw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: N0mS+7D7RQfjnescUnQL6LLlhipBV6toT1YvXzbhTDKTucpfLuyjWHph
-	CsZjaMgAT5Y7V1nIKAdtyBntQtyLlPdORxe3RYI8d71cNfSXjZxgBi0CyJ0KyB7aNNjIm6G
-	JdRRgKuT3Ts6/Vbz0/tXHtTEmGtaGaui9Nb1yHz5ThdHf/jC47iEb5I9NQmKM8zAm0q3X6p
-	6Jvn04qF+/7VFjlV6CmkexoJRw6K7li/Hes5BycD69RkLAfssbJ3czGvA204XwJRksU/Fip
-	ok4h4F+tH9cWD4Gm9CJ55lzxMZt9dgxdHxZX9lLJ4gl5+utaYIeyD009mfozXz4+AHOSkoF
-	pTY4cOw7PuZsRt1GVGWGX9szwVVL+9lGS/0aoioxCXgl0bQ/iDDW0YpXfUCl3P3ct8hUguI
-	HDHwWKMTkkZB2piOJ/aEXldaEOdISHTLCP92t9NFs1ilVZJacq+XhzjqYB30aGwXOp3y/yr
-	FNjIpKzUpWZhjyK5WD05C2sLnigdX+BOrixr8QTHkUvq/QAJGnxnW05lYVydffwhj/NgO5j
-	9FnEZzamTSxhMZzm9FitFlMPnpGGiajXubw1lUjxrrdviu6jW07KpPR3P9nehbSE85Ex1Zl
-	ar/Hgw8k+fEIZqZXPInIBjhLLomNNBLjGt0xdQ2z8xs7cWLyYH15P2eQsW8VspKjbNimepT
-	B4wZ/MlN/dwknA8tpcMpCqhP9brKbCvjuj0Ey/f4efv0fxN9mG3jT0I4n7Y+aFXVaZ7GWpu
-	Pr48Lram0lz0RvgVc7LP7PAbNjGAY0m9IJBHd3ywS4Rzmftk/c0pVm0C6cVpuSFRHM/dwyn
-	/5MjYwp2fI8TBgryB+/QfCY3ue3IAWxBvKSaYKIyfCyJcbkmrYW6ouIuTaIXYz3QBPBqMXj
-	700IsAYrN1yk+K2sDIMYDQhE38NB4gJ+G5hipL2OoHbpdWhebWrcMl4TK5H3eY/zECXQKEE
-	DWDi6r26+TQTiKWPAENMQvo8E//6elCWSEJEnShkD4PIpG+8jHRy3FK9xfV4B8Wk8ZFwOnw
-	ZwfjAQF292JNyaZPCS
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-X-QQ-RECHKSPAM: 0
+Date: Thu, 04 Jun 2026 09:08:42 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Parthiban.Veerasooran@microchip.com
+Cc: Selvamani.Rajagopal@onsemi.com, conor@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ Pier.Beruto@onsemi.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Conor.Dooley@microchip.com,
+ devicetree@vger.kernel.org
+Subject: Re: [PATCH net v3 2/2] dt-bindings: net: updated interrupt type to be
+ active low, level triggered
+In-Reply-To: <a5abb9b8-6ebf-4f95-a684-fc889b98acea@microchip.com>
+References: <20260601-level-trigger-v3-0-da73e7010532@onsemi.com>
+ <20260601-level-trigger-v3-2-da73e7010532@onsemi.com>
+ <20260602-rebel-snide-5036c97e410d@spud>
+ <CY8PR02MB92493D2E5491AAE5416C05A283122@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <a5abb9b8-6ebf-4f95-a684-fc889b98acea@microchip.com>
+Message-ID: <16a277ff339663c52d57d290ca3ebe50@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-295064-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:zhaojinming@uniontech.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[uniontech.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295065-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:Parthiban.Veerasooran@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:conor@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Pier.Beruto@onsemi.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:Conor.Dooley@microchip.com,m:devicetree@vger.kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,uniontech.com:mid,uniontech.com:dkim,uniontech.com:from_mime,uniontech.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,microchip.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E739B63D83B
+X-Rspamd-Queue-Id: 72DD863D858
 
-of_reserved_mem_lookup() may return NULL if the reserved memory region
-referenced by the "memory-region" phandle is not found in the reserved
-memory table (e.g. due to a misconfigured DTS or a removed
-memory-region node).  The current code dereferences the returned
-pointer without checking for NULL, leading to a kernel NULL pointer
-dereference at the following lines:
+Hi Parthiban
 
-    dma_addr = rmem->base;                          // line 1156
-    num_desc = div_u64(rmem->size, buf_size);       // line 1160
+On 4.6.2026 08:29, Parthiban.Veerasooran@microchip.com wrote:
 
-Add a NULL check after of_reserved_mem_lookup() and return -ENODEV if
-the lookup fails, which is consistent with the existing error handling
-for of_parse_phandle() failure in the same code block.
+> [...]
 
-Fixes: 3a1ce9e3d01b ("net: airoha: Add the capability to allocate hwfd buffers via reserved-memory")
-Cc: stable@vger.kernel.org
-Signed-off-by: ZhaoJinming<zhaojinming@uniontech.com>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 3 +++
- 1 file changed, 3 insertions(+)
+> One possible alternative could be to use a threaded IRQ handler with
+> IRQF_ONESHOT, where the IRQ line is disabled until the handler
+> completes, and sleeping is allowed. In that case, we could perform the
+> SPI transfer in the threaded handler to send the data header and
+> deassert the interrupt, while deferring the remaining work to a 
+> separate
+> kthread (the current SPI thread). However, I have not yet tried this
+> implementation, so I cannot comment on its behavior or effectiveness
+> without implementing and testing it.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index cecd66251dba..2444d3275a81 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1153,6 +1153,9 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 
- 		rmem = of_reserved_mem_lookup(np);
- 		of_node_put(np);
-+		if (!rmem)
-+			return -ENODEV;
-+
- 		dma_addr = rmem->base;
- 		/* Compute the number of hw descriptors according to the
- 		 * reserved memory size and the payload buffer size
--- 
-2.25.1
+AFAIK both ks8851 and adin1110 request the IRQ as IRQF_TRIGGER_LOW | 
+IRQF_ONESHOT
+with a NULL primary handler and do everything in the threaded handler. 
+SO
+looking at these two drivers might be worth the inspiration.
+
+
+> [...]
+
+REgards
+Nicolai
 
