@@ -1,196 +1,209 @@
-Return-Path: <netdev+bounces-295102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HgFOHd45IWqeBQEAu9opvQ
-	(envelope-from <netdev+bounces-295102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:39:58 +0200
+	id I9kqGCk6IWq4BQEAu9opvQ
+	(envelope-from <netdev+bounces-295103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:41:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DFD163E0D8
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:39:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DCDB63E10E
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:41:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=UD+liWiU;
-	dkim=pass header.d=redhat.com header.s=google header.b=ebhXAAJO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295102-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295102-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hkUnuWr2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295103-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295103-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B2F72304FC80
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:31:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6FA02300D764
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1A43A641C;
-	Thu,  4 Jun 2026 08:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62813D3329;
+	Thu,  4 Jun 2026 08:33:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DE03803D2
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 08:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CD23C199E;
+	Thu,  4 Jun 2026 08:33:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780561858; cv=none; b=Br/IuMa8gy1jK7Mr1NqBxrtjaPS3fsPjos3BVXJExfKOccfUr29NDF2YcoHg5qpGstHVcvMD2VGDN19Gek5Nbu9/s5zaaBmAKdYQOfWzHlbOxIlspmben2ofxppgk2TAyY55mZLy2R6kUznxQFRGhH3QIQcUOKN8B4yCxEk4oyw=
+	t=1780562007; cv=none; b=W3ZymFLtZmAy4T2QkhcFNWFj6jdq9WZ2oMpCe94yL1OjUeggKAlnzx627puMIauEy8+Wc4cA28jm1TMsBidrCVxec/j6IdlsMJeWPgJ3Q72xfGaQTZEZLppJGRNlTLg2G4gfv91ClVZzLYLFFJHbv10rszh3tiygnD1/w68cnz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780561858; c=relaxed/simple;
-	bh=Z8OVP16ejdIREmaWRl+L2yDU+RGvvMKUI+ywOyOT+Dc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lTf9QmneUmUTyAa5uremGp1pkWZCmjnoMtls8//BxrUUxyoCjSEUZJldnLXVvxBBX9kY72n7ERdQJxLO7UZCKTRGJFvFlqSKfboirDbhQ+xdAhLQcLdaekAx4IXMZ+GJstbBvr1EbZZJn6sk20ouNTOYZ5opnMekNvfFSr8mSZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UD+liWiU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ebhXAAJO; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780561854;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zfG24Fn7ZF6pSbC0Um/66jIGY3WmDN4xCLgytW1z1jY=;
-	b=UD+liWiUdumWgI82Sin9aF50Ki4tBRxzVKrhCF3+A6WPX1Fe7YXyd3d5mKHUUebneTT24m
-	hBKu25QjSOWXqj8G9gHqkUofX4f1PQFU+wQh5udUqsK9QWXG8iqvmUDBBd0csv+N76953K
-	8edV/Kkr+ypLUuEXtBMFFGGagM2mL58=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-259-CKu41FVmMRGrGcQhU5ecdg-1; Thu, 04 Jun 2026 04:30:52 -0400
-X-MC-Unique: CKu41FVmMRGrGcQhU5ecdg-1
-X-Mimecast-MFC-AGG-ID: CKu41FVmMRGrGcQhU5ecdg_1780561851
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-bec23d0e9dcso37697166b.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 01:30:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780561851; x=1781166651; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zfG24Fn7ZF6pSbC0Um/66jIGY3WmDN4xCLgytW1z1jY=;
-        b=ebhXAAJOxPuYUCm2E+Z4/MnGMbPsbrcllRKVD3X8qYICrtHb2fn87aGtR3Q0SWeES5
-         xzAFHDQ/hMUrIXb0/Jl5ZezTSgwLssVIsqJ0wB5XJTzU60djQ07AdrhfR4aLCj7mVvlb
-         8KKjSo53B2lG1CwNhw9V2qaDpGl4EhBLZh4zVxeydMQQV6rW2k0EdMplmQ9xJeJwI4WL
-         HuPHgv0ty0/oUW8KNilhfj0KA/3y5j3wmem9Mp5lNaXCPXL4JUoC3/FJL+zfGU6ocwYF
-         piSigVdiGf07hJf9s+BYSEc6TbfK4KO3bONkPCKhM9uE4csMKsuE2Qeiun54wnrvBdqV
-         4Hdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780561851; x=1781166651;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zfG24Fn7ZF6pSbC0Um/66jIGY3WmDN4xCLgytW1z1jY=;
-        b=mAGi3dqdmvNtj37c8aDQ2cZ1Q0Rdsqfxvs8gPxnU6Mxybku8RhbuuDNJ3EhwKIj8Px
-         haRU5WeQMUjx7PRdKYTny8FLVSVVmvTEA3Yw9UZtj49lR5sPqcuJaibHSJ0m3Qc+YpLN
-         SbfuCIHuy+LINCnPT0bqP/CU5k5dKS/EbQ8nE0qXQ7mW/QkgLz3KOyOwaFsz+lHdch3U
-         7SMDyBpRd1bi46/PKLyUj/xpJGcp1aNPthe7Suqp3SDhPPYIKyrxEEngHPnHCymToXkP
-         h0/81IZXSwvYt/xMCduLJGGFdb55Z2KjInCv7uPgTTObr0PNX64NY/zg22jif4XtsTll
-         oPxA==
-X-Forwarded-Encrypted: i=1; AFNElJ96K0mUt5OF9f1TF0te90Vug0QX75bvDYUgI3jqn0dIa327a64435PTqYWBb4tgCAXyAVLNty4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOE079rBahOay7+KAibnEJodoW2lrjQ1RWHAzUKRBih2QjKvOa
-	fhqZxDaz0cDTVzx4Yc1nAL22uzKvBi6dWg3FgtriQ/zP3/RpXRzLUCoahtC3lWDDLr3BldrFW7q
-	KnO0E+O370iLYX2kC91fD16IkONTovWSpsb68XBVe1lt2N3Wv5X14YpZsbyP6jFpcxA==
-X-Gm-Gg: Acq92OFnKCcmrk4jDKMa3ojQGaH+/BiHP5izbtGJpJ0pFLDRVRoKgpXxVN81lw6amxD
-	lKJIhhcwzM5JMST6eWKbwWGPrXmGIirX5cmj/VW1FtcFW9GQ0bhrJdbvwERlzDwbVxaLr0TbpTm
-	QQNftRJ9LHAAGDtqhkgTBO9ZhS/eFRewUE/3v8uQkxLtKjxZIQJ3KeL4XHAiPm5wB5UvtMsptpL
-	Djz8oWOzHGhQLBKTtpXWiOALfkku0WClWCB8W/ElFHfjSdn5AJBMrOHn3ctrraoo3VsRxhrvtNc
-	fFCFqZ+GYfqJQN16TPAZkCximrcwuRzcIWSemLPt5I3x4vifOJPBRqsGrx2iRgy8bidUNpv7Wdn
-	x6xRIEx5ui11xo0H3K+zVUiXs+wi+2n5r/QUymHoPLpHlfKdKRpsVJMu2iHbPtAVVOls=
-X-Received: by 2002:a17:907:2668:b0:bed:6e53:bb16 with SMTP id a640c23a62f3a-bf0af3019camr239312666b.43.1780561850910;
-        Thu, 04 Jun 2026 01:30:50 -0700 (PDT)
-X-Received: by 2002:a17:907:2668:b0:bed:6e53:bb16 with SMTP id a640c23a62f3a-bf0af3019camr239311266b.43.1780561850384;
-        Thu, 04 Jun 2026 01:30:50 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.155.59])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf0517721c2sm261120066b.3.2026.06.04.01.30.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2026 01:30:49 -0700 (PDT)
-Message-ID: <3f73e314-756e-494e-a1aa-0bc39c14f41b@redhat.com>
-Date: Thu, 4 Jun 2026 10:30:48 +0200
+	s=arc-20240116; t=1780562007; c=relaxed/simple;
+	bh=fN7QWmBX6UiZ9Jfh+lKcCqexBDWY1iBe5MdOt+/SSyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TpeAL+rSaB19o2woXYhghALQY2CKLDLDEXljmZEcZYfAeuHOiIaowCR2C4H5he6vLp6+2USQNM4852rKwr0kQRkLavMOmGCoR29PAo6acqr4Iqu241D8qdDi/8POyN50E830bFlBUtUuZOA0JLg9Q/btB3QjZqWaIetLM06xclM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hkUnuWr2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C57F81F00893;
+	Thu,  4 Jun 2026 08:33:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780562006;
+	bh=x9K5u8SP5ZGeSxr1oo9OtnVaDCP+qHoYO4mPjYD+CG8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=hkUnuWr2s6CgeVuGMi9AEipArgipRW2JONlQleVvc+seerS2gQJBeAH+kHKPj6uvK
+	 vJSaP7HQcI5eukq+A69Ncl1Pf1vKI7GzYQcun63DKK4NS9xN8vPQsArTZ8SIyHsfUR
+	 d/p3d2mFnM0feIu3A0HFh0edUZGoAnFHqgscRnFRFbjILxIrgqD3trNM9nBWUCufiQ
+	 PCVSjQikq4DzeZLVaXcjCoA2GnC6hOXBt6cBlyu9vhU02Y04PKWYzcYEOaBTQvrS6K
+	 4Ozs3FJeQ+oBbjUyVDmCvhbFAVt4uBgfhibY8btXIpTdCseXk85BT2+MYcEzoJtzjW
+	 0TGvXjRkzLZJQ==
+Date: Thu, 4 Jun 2026 10:33:23 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: conor+dt@kernel.org, robh@kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v9 3/6] net: airoha: Support multiple
+ net_devices for a single FE GDM port
+Message-ID: <aiE4U_HOgBpuRZOm@lore-desk>
+References: <20260603-airoha-eth-multi-serdes-v9-3-5d476bc2f426@kernel.org>
+ <20260604060125.5B5A11F00898@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 4/5] net: sched: add timeout count to NETDEV
- WATCHDOG message
-To: hawk@kernel.org, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-5-hawk@kernel.org>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260527135418.1166665-5-hawk@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="W5hlnucVWG49UUuI"
+Content-Disposition: inline
+In-Reply-To: <20260604060125.5B5A11F00898@smtp.kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295102-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:hawk@kernel.org,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:j.koeppeler@tu-berlin.de,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295103-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sashiko-reviews@lists.linux.dev,m:conor+dt@kernel.org,m:robh@kernel.org,m:devicetree@vger.kernel.org,m:netdev@vger.kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url,lore-desk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6DFD163E0D8
+X-Rspamd-Queue-Id: 5DCDB63E10E
 
-On 5/27/26 3:54 PM, hawk@kernel.org wrote:
-> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-> index 237ee1cd0136..2aebab985c00 100644
-> --- a/net/sched/sch_generic.c
-> +++ b/net/sched/sch_generic.c
-> @@ -533,13 +533,12 @@ static void dev_watchdog(struct timer_list *t)
->  		    netif_running(dev) &&
->  		    netif_carrier_ok(dev)) {
->  			unsigned int timedout_ms = 0;
-> +			struct netdev_queue *txq;
->  			unsigned int i;
->  			unsigned long trans_start;
->  			unsigned long oldest_start = jiffies;
->  
->  			for (i = 0; i < dev->num_tx_queues; i++) {
-> -				struct netdev_queue *txq;
-> -
->  				txq = netdev_get_tx_queue(dev, i);
->  				if (!netif_xmit_stopped(txq))
->  					continue;
-> @@ -561,9 +560,10 @@ static void dev_watchdog(struct timer_list *t)
->  
->  			if (unlikely(timedout_ms)) {
->  				trace_net_dev_xmit_timeout(dev, i);
-> -				netdev_crit(dev, "NETDEV WATCHDOG: CPU: %d: transmit queue %u timed out %u ms\n",
-> +				netdev_crit(dev, "NETDEV WATCHDOG: CPU: %d: transmit queue %u timed out %u ms (n:%ld)\n",
->  					    raw_smp_processor_id(),
-> -					    i, timedout_ms);
-> +					    i, timedout_ms,
-> +					    atomic_long_read(&txq->trans_timeout));
 
-It looks like txq could be uninitialized here if num_tx_queues is 0. I'm
-unsure if some weird/buggy device driver could actually hit that case,
-but grep '->num_tx_queues = 0;' has more than 0 hits in the current tree
-and I would err on the safe side.
+--W5hlnucVWG49UUuI
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-/P
+[...]
+>=20
+> Are there similar issues with the ingress configuration?  Earlier in
+> airoha_dev_open(), REG_GDM_INGRESS_CFG(port->id) is modified based on whe=
+ther
+> the specific netdev uses DSA:
+>=20
+> 	if (netdev_uses_dsa(netdev))
+> 		airoha_fe_set(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
+> 			      GDM_STAG_EN_MASK);
+> 	else
+> 		airoha_fe_clear(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
+> 				GDM_STAG_EN_MASK);
 
+This is not a real issue since just GDM1 can be used as cpu port of the dsa
+switch (MT7630) and we do not support multiple net_devices for GDM1.
+
+>=20
+> Also, do airoha_dev_stop() and airoha_dev_change_mtu() have similar
+> regressions?  They appear to blindly overwrite shared registers like
+> REG_GDM_FWD_CFG (setting it to FE_PSE_PORT_DROP) and REG_GDM_LEN_CFG(port=
+->id).
+>=20
+> I noticed the stop() and MTU issues might be fixed in a subsequent patch,=
+ but
+> should this intermediate patch be self-contained to avoid breaking
+> bisectability?
+
+These issues are addressed in subsequent patches on the same series.
+
+>=20
+> [ ... ]
+> > @@ -3080,15 +3100,51 @@ static int airoha_alloc_gdm_port(struct airoha_=
+eth *eth,
+> >  	u64_stats_init(&port->stats.syncp);
+> >  	spin_lock_init(&port->stats.lock);
+> >  	port->id =3D id;
+> > -	/* XXX: Read nbq from DTS */
+> > -	port->nbq =3D id =3D=3D AIROHA_GDM3_IDX && airoha_is_7581(eth) ? 4 : =
+0;
+> >  	eth->ports[p] =3D port;
+> > =20
+> >  	err =3D airoha_metadata_dst_alloc(port);
+> >  	if (err)
+> >  		return err;
+> > =20
+> > -	return airoha_alloc_gdm_device(eth, port, np);
+> > +	/* Default nbq value to ensure backward compatibility */
+> > +	nbq =3D id =3D=3D AIROHA_GDM3_IDX && airoha_is_7581(eth) ? 4 : 0;
+> > +
+> > +	for_each_child_of_node(np, node) {
+> > +		/* Multiple external serdes connected to the FE GDM port via an
+> > +		 * external arbiter.
+> > +		 */
+> > +		const __be32 *nbq_ptr;
+>=20
+> [Severity: Medium]
+> Will these multiplexed devices report duplicated, incorrect hardware stat=
+istics?
+
+hw statistics will be addressed with a dedicated patch not part of the seri=
+es.
+
+Regards,
+Lorenzo
+
+>=20
+> When userspace queries statistics for any single multiplexed device,
+> airoha_dev_get_stats64() fetches from port->stats, which is updated by
+> airoha_update_hw_stats() reading the clear-on-read MAC hardware counters =
+for
+> the entire physical GDM port.
+>=20
+> Since the port->stats structure is shared across all net_devices attached=
+ to
+> the port, each device will report the total traffic volume of all devices
+> sharing the port rather than its own traffic.
+>=20
+> Should the driver rely on per-queue software counters to provide accurate
+> per-device statistics when hardware MACs are multiplexed?
+>=20
+> --=20
+> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260603-airoha-eth-=
+multi-serdes-v9-0-5d476bc2f426@kernel.org?part=3D3
+
+--W5hlnucVWG49UUuI
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaiE4UwAKCRA6cBh0uS2t
+rNsZAP0fGngKikTPqftV8uTqDHz1LwoBivQnPwVjtaDVyBF8owD/T8DBwL4Vs5wO
+ZAdrFgmC3b0Z1skjdTitrNS/9rQQUQw=
+=b3/r
+-----END PGP SIGNATURE-----
+
+--W5hlnucVWG49UUuI--
 
