@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-295099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295098-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id sSFCCEU5IWp4BQEAu9opvQ
-	(envelope-from <netdev+bounces-295099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:37:25 +0200
+	id sEhGNzw5IWp0BQEAu9opvQ
+	(envelope-from <netdev+bounces-295098-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:37:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3C663E0B6
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:37:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA9E63E0A7
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 10:37:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=lRD4rZXD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295099-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295099-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=A5NPQlqq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295098-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295098-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C0DF330142B9
+	by sea.lore.kernel.org (Postfix) with ESMTP id A84BD3012E84
 	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 08:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E095A39D3F1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E076639B482;
 	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD14C34D3B0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1D0352C28;
 	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780561821; cv=none; b=B3xxmwasc6MtLAFdf5eW5MjnImCQoXBomQW/dIVqVkuWmo5saN8w8LoQJMrM/RFeKvDD43GH50NhPufSUTDDiFOXqMmfaZsrqMgA62aSTWxEAS7Yt99Ou2YcJucgq2k4NNXNKI7RrUtGVTdGwmhPQQ1QlVcLkyBIC6CExOigWLU=
+	t=1780561821; cv=none; b=toCZ89kd6SpE+WmT95m5XFRyH9LaNDo42JXc3mHcMIPm6xpJbsnTmSRvnnwxK+0M/L8C2vh0asoJ6RzM3+dkTE0LZtzNbW6zgxtZVgtrsPKr64vgHL4QFwKEFKTjA/EKb75REa3gEDJMHxrJsL9OBdzEedrc9cXJR0QZ/TCY7OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780561821; c=relaxed/simple;
-	bh=bGDZ2KmYMu8TPrWbvyodp+cEnNoB47xZ8xSbg/l4UNA=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fa2LzBQX9FeiVmFt3TwTwifT30N2ATXD4DkEGzx6uuy0mTs1HdbmWpga8qS0DresKnwOKRVNAbEb5V98PCDikYe6bhgLKaLsCyyBqNUtPfAUWHjLyseJmYLDQD4rvQXK0o3Hp8eKXWTo73nq3Nj4/QluUC1eUyR8upoLETH0lDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lRD4rZXD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 612B5C2BCB9;
+	bh=EqUsJb5dmF8hJKkcZTRQyLGmvdg26mTAQ0mITdbTufg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=PsfIyFKtMnQuN0pWrlhI3rRiM7o+MV0q5k3fzP33/ncPp4l7usJdzXR5jv6+Aj/dthxax7i+5r2tf1jRWkfa8JU6oI3dojWZB6cWoNOVL7sA/HFnMsognp5YDDBGT2lv4q4GVa2DWrcv6w+Eto4Gh9JOkOAPSu1zf4nsvs56X3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5NPQlqq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69E91C2BCC6;
 	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1780561821;
-	bh=bGDZ2KmYMu8TPrWbvyodp+cEnNoB47xZ8xSbg/l4UNA=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=lRD4rZXDVde4KhqpCT0RBcKEjzGT8mVIGNpr2JDx/LgjTr4v9nMw85VikBLmD4NNq
-	 XJ9MjKJA+lsxq1rVdYHO/sI9ao7Cl9bfllVlIkBzGQTut77nONzaKbUBbOIGVDD5xb
-	 rw/jnDfC+gk2xmT2F+rusK3TvmxhRxqiwrL+IclLWo87h0i2JXnABQkJ6Cqvtt5PCl
-	 tylYMk8jg/oyT5Sfpru5MTWF9M0yG0M2hR9sGWWrwPMynW///kqce0i7CfhnS1YP+k
-	 9/pkBTgIkWBQhxuHXA52an5KELOwKPhLJxcLNrmZGXPfRR/1+T8wF+Vz0yIx4XBzPx
-	 Y/aGDrFlXUg6w==
+	bh=EqUsJb5dmF8hJKkcZTRQyLGmvdg26mTAQ0mITdbTufg=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=A5NPQlqqmtUoH8md30A7A3t4PqZPHYIliMi+XLiWx2E4Bhf7nttWDZxf477AY6Fyd
+	 3IoJjK44SyhMeovFyRIioxvo1Ip264aHndt9mzDhP7xglI7p/p93PchHUaEFxmD7ph
+	 dZx1p3mnYgvNzJVo88Pz0kzp5jGnyHibR2fL2p1sfr79tq7cH228nZ8B+zIox3/V+l
+	 h3Os/wKbvplEIBj9O/l0kNdJjZxEehnaLbSg/csdmJ2iDPMtKMey/ND/YrP9989MTY
+	 7auY64yK00CmYXWOQbUTaWqj9r+XFnQQB+Rw2o3C2j2fyd2M1UgbCV17woyR3rZNk8
+	 3nABI9ZQ4gVmw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A9FCD6E57;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55411CD6E4A;
 	Thu,  4 Jun 2026 08:30:21 +0000 (UTC)
 From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
-Subject: [PATCH net-next 0/2] net: dsa: mv88e6xxx: add support for dcb pcp
- app
-Date: Thu, 04 Jun 2026 10:30:13 +0200
-Message-Id: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
+Date: Thu, 04 Jun 2026 10:30:14 +0200
+Subject: [PATCH net-next 1/2] net: dsa: add support for dcb pcp app
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +60,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJY3IWoC/23NOw7DIBAE0KtYWwdpwQaDrxK5MLBOKPwJOBZSl
- LuHfKsUW4xGO+8GiWKgBF11g0h7SGGZS+CHCtx5mE/Egi8ZBAqFCms201Yub2zatSaVc2arW9k
- aw8JkK4UbhtYIZaEsrJHGkF/rR/g+Qv9uIl2uhds+9U/rqpfV1PjPcjYxwQXnyhRJ6W6XT8kOi
- ZhbpilsXYXGNMJ78s4ahaOhVo9e85ZcXY8SuefYoJMW+vv9AYgTS/sBAQAA
-X-Change-ID: 20260603-net-next-mv88e6xxx-pcp-prio-5752caa7926b
+Message-Id: <20260604-net-next-mv88e6xxx-pcp-prio-v1-1-f9d10fe6cdc8@luminex.be>
+References: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
+In-Reply-To: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -74,11 +71,11 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Luke Howard <lukeh@padl.com>, Cedric Jehasse <cedric.jehasse@gmail.com>, 
  Cedric Jehasse <cedric.jehasse@luminex.be>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780561819; l=2032;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780561819; l=7081;
  i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
- bh=bGDZ2KmYMu8TPrWbvyodp+cEnNoB47xZ8xSbg/l4UNA=;
- b=Pkc1VjKFsVN4zwDEY/02NcavPpe08EC0GqN9rrjLAWxSbSY8Br3Kf/GmPvMdEcmv4fTDTrkIE
- Bit53QYOoWfBUNvr3AjMZBVJVqZYfQwGg7sTHSiUNTNAXqupyRfdq67
+ bh=vAbt2oUZwh/Xl1VBsXEixbjizxp0CkUnxtZsJliOylM=;
+ b=fRYhAMUUjGItSLgK1KBvFXTrF64mRPvaT/fHSgkT2XMW6s1snlpMsIo7J1q7Ion/DSLUt+pBH
+ k2FIxzWGT9iASVhBQiI+cGU5+BGe5UlCvFmDY1GE0VdFzizo2cyskR+
 X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
  pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
 X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
@@ -95,7 +92,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295099-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
+	TAGGED_FROM(0.00)[bounces-295098-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lukeh@padl.com,m:cedric.jehasse@gmail.com,m:cedric.jehasse@luminex.be,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
@@ -122,56 +119,244 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6D3C663E0B6
+X-Rspamd-Queue-Id: 2FA9E63E0A7
 
-This patch series adds support for dcb pcp app to the mv88e6xxx
-driver. The pcp app is there to configure pcp based queue
-classification.
+From: Cedric Jehasse <cedric.jehasse@luminex.be>
 
-In the Marvell switches this is done by configuring the IEEE PRI Mapping
-table. There are different hardware implementations of this table
-depending on the switch:
-* a global table
-* the 6390 has one table per port
-* the 6393 has one table for DEI=0, and another table for DEI=1 per port
-
-For this the DSA framework needs to be extended. The implementation for
-pcp-prio in the DSA framework is very similar to existing dcsp-prio
-implementation.
-
-There's another patch series [1] on the mailing list that uses the same
-IEEE PRI Mapping table to implement MPQRIO. To me the dcb pcp app feels
-like the natural way to configure the pcp to QPri mappings in the
-switch.
-
-[1] https://lore.kernel.org/netdev/20260602-mv88e6xxx-8021qat-mqprio-v2-0-72be14522e7c@padl.com/
+Set/get of dscp-prio map is already supported by dsa.
+This adds support for set/get of pcp-prio map in a similar way.
 
 Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
 ---
-Cedric Jehasse (2):
-      net: dsa: add support for dcb pcp app
-      net: dsa: mv88e6xxx: add support for dcb pcp app
+ include/net/dsa.h |  10 +++++
+ net/dsa/user.c    | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 129 insertions(+), 7 deletions(-)
 
- drivers/net/dsa/mv88e6xxx/Makefile |   1 +
- drivers/net/dsa/mv88e6xxx/chip.c   |  36 ++++++
- drivers/net/dsa/mv88e6xxx/chip.h   |  17 +++
- drivers/net/dsa/mv88e6xxx/dcb.c    | 229 +++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/dcb.h    |  21 ++++
- drivers/net/dsa/mv88e6xxx/port.c   |  28 ++++-
- drivers/net/dsa/mv88e6xxx/port.h   |   8 ++
- include/net/dsa.h                  |  10 ++
- net/dsa/user.c                     | 126 ++++++++++++++++++--
- 9 files changed, 467 insertions(+), 9 deletions(-)
----
-base-commit: 09942ddedcb960f9e78fd817ec33f501d1040c5b
-change-id: 20260603-net-next-mv88e6xxx-pcp-prio-5752caa7926b
-prerequisite-change-id: 20260430-net-next-mv88e6xxx-cbs-2121169caa68:v5
-prerequisite-patch-id: 8ad59c43368d4639e0cabcc59a7f6e487560d3f7
-prerequisite-patch-id: 88ee88bf34ac3631056bc92c6c6251c29cf7223c
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 8b6d34e8a6f0..05428c555ccd 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -447,6 +447,11 @@ struct dsa_switch {
+ 	 */
+ 	u32			dscp_prio_mapping_is_global:1;
+ 
++	/* Drivers that have global PCP mapping settings must set this to
++	 * true to automatically apply the settings to all ports.
++	 */
++	u32			pcp_prio_mapping_is_global:1;
++
+ 	/* Listener for switch fabric events */
+ 	struct notifier_block	nb;
+ 
+@@ -970,6 +975,11 @@ struct dsa_switch_ops {
+ 				      u8 prio);
+ 	int	(*port_del_dscp_prio)(struct dsa_switch *ds, int port, u8 dscp,
+ 				      u8 prio);
++	int	(*port_get_pcp_prio)(struct dsa_switch *ds, int port, u8 pcp);
++	int	(*port_add_pcp_prio)(struct dsa_switch *ds, int port, u8 pcp,
++				     u8 prio);
++	int	(*port_del_pcp_prio)(struct dsa_switch *ds, int port, u8 pcp,
++				     u8 prio);
+ 	int	(*port_set_apptrust)(struct dsa_switch *ds, int port,
+ 				     const u8 *sel, int nsel);
+ 	int	(*port_get_apptrust)(struct dsa_switch *ds, int port, u8 *sel,
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index c4bd6fe90b45..aa6d030968b9 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -2238,11 +2238,11 @@ dsa_user_dcbnl_set_default_prio(struct net_device *dev, struct dcb_app *app)
+ 	return 0;
+ }
+ 
+-/* Update the DSCP prio entries on all user ports of the switch in case
+- * the switch supports global DSCP prio instead of per port DSCP prios.
++/* Update the APP entries on all user ports of the switch in case
++ * the switch supports global prio settings instead of per port prios.
+  */
+-static int dsa_user_dcbnl_ieee_global_dscp_setdel(struct net_device *dev,
+-						  struct dcb_app *app, bool del)
++static int dsa_user_dcbnl_ieee_global_setdel(struct net_device *dev,
++					     struct dcb_app *app, bool del)
+ {
+ 	int (*setdel)(struct net_device *dev, struct dcb_app *app);
+ 	struct dsa_port *dp = dsa_user_to_port(dev);
+@@ -2284,7 +2284,7 @@ static int dsa_user_dcbnl_ieee_global_dscp_setdel(struct net_device *dev,
+ 
+ 		restore_err = setdel(user, app);
+ 		if (restore_err)
+-			netdev_err(user, "Failed to restore DSCP prio entry configuration\n");
++			netdev_err(user, "Failed to restore APP entry configuration\n");
+ 	}
+ 
+ 	return err;
+@@ -2324,7 +2324,7 @@ dsa_user_dcbnl_add_dscp_prio(struct net_device *dev, struct dcb_app *app)
+ 	if (!ds->dscp_prio_mapping_is_global)
+ 		return 0;
+ 
+-	err = dsa_user_dcbnl_ieee_global_dscp_setdel(dev, app, false);
++	err = dsa_user_dcbnl_ieee_global_setdel(dev, app, false);
+ 	if (err) {
+ 		if (ds->ops->port_del_dscp_prio)
+ 			ds->ops->port_del_dscp_prio(ds, port, dscp, new_prio);
+@@ -2335,6 +2335,54 @@ dsa_user_dcbnl_add_dscp_prio(struct net_device *dev, struct dcb_app *app)
+ 	return 0;
+ }
+ 
++static int __maybe_unused
++dsa_user_dcbnl_add_pcp_prio(struct net_device *dev, struct dcb_app *app)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	struct dsa_switch *ds = dp->ds;
++	unsigned long mask, new_prio;
++	int err, port = dp->index;
++	u8 pcp = app->protocol;
++
++	if (!ds->ops->port_add_pcp_prio)
++		return -EOPNOTSUPP;
++
++	if (app->priority >= IEEE_8021QAZ_MAX_TCS)
++		return -EINVAL;
++
++	if (pcp >= 16) {
++		netdev_err(dev, "PCP APP entry with protocol value %u is invalid\n",
++			   pcp);
++		return -EINVAL;
++	}
++
++	err = dcb_ieee_setapp(dev, app);
++	if (err)
++		return err;
++
++	mask = dcb_ieee_getapp_mask(dev, app);
++	new_prio = __fls(mask);
++
++	err = ds->ops->port_add_pcp_prio(ds, port, pcp, new_prio);
++	if (err) {
++		dcb_ieee_delapp(dev, app);
++		return err;
++	}
++
++	if (!ds->pcp_prio_mapping_is_global)
++		return 0;
++
++	err = dsa_user_dcbnl_ieee_global_setdel(dev, app, false);
++	if (err) {
++		if (ds->ops->port_del_pcp_prio)
++			ds->ops->port_del_pcp_prio(ds, port, pcp, new_prio);
++		dcb_ieee_delapp(dev, app);
++		return err;
++	}
++
++	return 0;
++}
++
+ static int __maybe_unused dsa_user_dcbnl_ieee_setapp(struct net_device *dev,
+ 						     struct dcb_app *app)
+ {
+@@ -2349,6 +2397,8 @@ static int __maybe_unused dsa_user_dcbnl_ieee_setapp(struct net_device *dev,
+ 		break;
+ 	case IEEE_8021QAZ_APP_SEL_DSCP:
+ 		return dsa_user_dcbnl_add_dscp_prio(dev, app);
++	case DCB_APP_SEL_PCP:
++		return dsa_user_dcbnl_add_pcp_prio(dev, app);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -2405,7 +2455,7 @@ dsa_user_dcbnl_del_dscp_prio(struct net_device *dev, struct dcb_app *app)
+ 	if (!ds->dscp_prio_mapping_is_global)
+ 		return 0;
+ 
+-	err = dsa_user_dcbnl_ieee_global_dscp_setdel(dev, app, true);
++	err = dsa_user_dcbnl_ieee_global_setdel(dev, app, true);
+ 	if (err) {
+ 		if (ds->ops->port_add_dscp_prio)
+ 			ds->ops->port_add_dscp_prio(ds, port, dscp,
+@@ -2417,6 +2467,42 @@ dsa_user_dcbnl_del_dscp_prio(struct net_device *dev, struct dcb_app *app)
+ 	return 0;
+ }
+ 
++static int __maybe_unused
++dsa_user_dcbnl_del_pcp_prio(struct net_device *dev, struct dcb_app *app)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	struct dsa_switch *ds = dp->ds;
++	int err, port = dp->index;
++	u8 pcp = app->protocol;
++
++	if (!ds->ops->port_del_pcp_prio)
++		return -EOPNOTSUPP;
++
++	err = dcb_ieee_delapp(dev, app);
++	if (err)
++		return err;
++
++	err = ds->ops->port_del_pcp_prio(ds, port, pcp, app->priority);
++	if (err) {
++		dcb_ieee_setapp(dev, app);
++		return err;
++	}
++
++	if (!ds->pcp_prio_mapping_is_global)
++		return 0;
++
++	err = dsa_user_dcbnl_ieee_global_setdel(dev, app, true);
++	if (err) {
++		if (ds->ops->port_add_pcp_prio)
++			ds->ops->port_add_pcp_prio(ds, port, pcp,
++						   app->priority);
++		dcb_ieee_setapp(dev, app);
++		return err;
++	}
++
++	return 0;
++}
++
+ static int __maybe_unused dsa_user_dcbnl_ieee_delapp(struct net_device *dev,
+ 						     struct dcb_app *app)
+ {
+@@ -2431,6 +2517,8 @@ static int __maybe_unused dsa_user_dcbnl_ieee_delapp(struct net_device *dev,
+ 		break;
+ 	case IEEE_8021QAZ_APP_SEL_DSCP:
+ 		return dsa_user_dcbnl_del_dscp_prio(dev, app);
++	case DCB_APP_SEL_PCP:
++		return dsa_user_dcbnl_del_pcp_prio(dev, app);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -2486,6 +2574,30 @@ static int dsa_user_dcbnl_init(struct net_device *dev)
+ 		}
+ 	}
+ 
++	if (ds->ops->port_get_pcp_prio) {
++		int protocol;
++
++		for (protocol = 0; protocol < 16; protocol++) {
++			struct dcb_app app = {
++				.selector = DCB_APP_SEL_PCP,
++				.protocol = protocol,
++			};
++			int prio;
++
++			prio = ds->ops->port_get_pcp_prio(ds, port, protocol);
++			if (prio == -EOPNOTSUPP)
++				continue;
++			if (prio < 0)
++				return prio;
++
++			app.priority = prio;
++
++			err = dcb_ieee_setapp(dev, &app);
++			if (err)
++				return err;
++		}
++	}
++
+ 	return 0;
+ }
+ 
 
-Best regards,
 -- 
-Cedric Jehasse <cedric.jehasse@luminex.be>
+2.43.0
 
 
 
