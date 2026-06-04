@@ -1,164 +1,148 @@
-Return-Path: <netdev+bounces-295467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2kcJA6UBImoHRgEAu9opvQ
-	(envelope-from <netdev+bounces-295467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:52:21 +0200
+	id eWQ+OSYCImoyRgEAu9opvQ
+	(envelope-from <netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:54:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6C2D643DEC
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:52:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA82643DFA
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 00:54:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=padl.com header.s=default header.b=kTYAXuMs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295467-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295467-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=padl.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mWqVhDtl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295468-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 016663015AA1
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:52:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AB1D33030355
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 22:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57FE30D3EA;
-	Thu,  4 Jun 2026 22:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5BF30594F;
+	Thu,  4 Jun 2026 22:54:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us.padl.com (us.padl.com [216.154.215.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CC72EA171;
-	Thu,  4 Jun 2026 22:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A7F285C84;
+	Thu,  4 Jun 2026 22:54:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780613534; cv=none; b=V40JZE6Fn7rpJNsV/alckPtfPWozYvJqfLqknPisEQedfJoWwWEJoRwvSI2PXP5fAUFIuTGkPbmGjoJAiLECQ4pf5BNEZWHG0wd69SMhqK+z9KKFi7fCqbXcrqm7j7o7gUrXtr6f766uTk7NTrQpSpOrrCxl8a4cK3IU1yBJ9dw=
+	t=1780613666; cv=none; b=Y1JN00X3KliNXZb+z40EvEphj3gJZbeUbTf9iBP0uKiCPkzad19Mw6zikK+1gpzBD41TERTf/XuggCUdIJ0ycKLZV6hMAKRysaXdXysSeKSq2NiIaH5Y+1X89ebnJF70oyvwyuN7AdAK5tsknEm8EokFsnuSqozV+ikpX6qVDL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780613534; c=relaxed/simple;
-	bh=OEm1hdLn46Ff+W5Kx9p8C2M4P47h2b5Qaf5LFifR0nc=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=ba5wgFlhgItI+r5U/PNxIwAZWM+nIObe+ZmlMZ6UdglvKc5ijUQ/TLcb11b8Uqdqj1NXVfHnHGCBj4uFAelEJUd3SEqk5TJt76mKXVUzvIm8xOR2LGh7DxXdFvBYZ0z09BqyigVthfBfVDYhfON8VOhy2BkjKpNcCzK9Js7DnPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=kTYAXuMs; arc=none smtp.client-ip=216.154.215.154
-Received: from smtpclient.apple (border.lukktone.com [139.130.100.52])
-	by us.padl.com (Postfix) with ESMTPSA id D2DF960C6D;
-	Thu,  4 Jun 2026 18:52:08 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1780613531; bh=HMJb5ahSNURO+v12SkoNhUjqk5ykiyADfmMXFoQmvOk=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=kTYAXuMsJ6t6QzFi2meSE+6bqSyaFb/75Y+b88APEz4vv44dLQwNzsNYh3DcvBhRu
-	 OTcv35sQ2DAplU9HFIv91FrJGRa1Yomw5bXN3Am8cQON3MHIxlu543rHXl54dEGTy5
-	 zICOuA6uKmoqC9Mo2s2lA65MGHj106d7g9Tmmn79vpefGh8kuqgvbjcHmaxAb1ouBP
-	 pE2SvfdAKnEzbxsHRAmhILnIl9aHnM2n/PKkVtWNCQamS0t4oIPT0rrXrlptT1HoYJ
-	 QfS57Fo9uWz/ZBvt8R10Aqnaf6ntUh7oJClU66er/J9MX+eQ3HzagtiClq0V6nWKM8
-	 uGElNrxIlm+SQ==
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1780613666; c=relaxed/simple;
+	bh=oXjJ7XjYMvV4qrB0SMbNbwChK2HbZT6xNUdwAiiSbzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M4LwB0OSa7pedqKhog6Uy8NVL0iqG+iGKqHhMaqY94JQVG0pkjG3/qAokeOU7n8dkZ2zTPSrpVQq2eCftuZMABybznur2pDcBeAiFHlqu53o5u/FM60ldz7/y2t1tcoDmEnOzV73TCNogTeVfiadb78bD5YeTwf1ptYK339dMbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWqVhDtl; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E76051F00893;
+	Thu,  4 Jun 2026 22:54:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780613664;
+	bh=3lMPwTETgOHXdjVrbiyEjoY0H3xuhL5jFk2nN61vumk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=mWqVhDtl9S6NhuYYXnbfYOKqCQPIW+Ht1cApg/HEDqr1C792kFVYvQx9S0hUdEyRx
+	 4DlsmC/nV1JjporWCyz4mimRtjEgUv4woONpG1J5QuYaJXXFMPqxZJNl9XXn9M8oTR
+	 YmdudMQhInteUeITIoxa6pfFhK7D/vzKPaY1hyWVM4KW3i9aH7NoUkps3rGZ1OjXUo
+	 YoiRNk0LxO4kYy63w183d3gvSayScBFJiWD9i2UsI+pzas/CUgy2hX1LE32dXqZjDL
+	 tjZi7sInI33fhlM3jeukZY3un7hHLzOefigz4G8URTjoGQrtgFhfBDVKrEQNDFVaA0
+	 AGIsuZuYEVK7Q==
+Date: Thu, 4 Jun 2026 15:54:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Oros, Petr" <poros@redhat.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "Kitszel, Przemyslaw"
+ <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+ <anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
+ <Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
+ "jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
+ <arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
+ <vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
+ <donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
+Subject: Re: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and
+ full TX reference clock control for E825
+Message-ID: <20260604155422.167314ff@kernel.org>
+In-Reply-To: <IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
+References: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
+	<20260603183036.7c4762d2@kernel.org>
+	<IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH net-next 0/2] net: dsa: mv88e6xxx: add support for dcb pcp
- app
-From: Luke Howard <lukeh@padl.com>
-In-Reply-To: <v4fqikeec52ginmogfvsfe5gobul2nqspe2ebzpzpja52lxacb@wq2elxqwrucf>
-Date: Fri, 5 Jun 2026 08:51:56 +1000
-Cc: cedric.jehasse@luminex.be,
- Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Russell King <linux@armlinux.org.uk>,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E43832AD-0F8A-465F-95E3-2AF5E72FB7B9@padl.com>
-References: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
- <02BDD59A-30A9-46F9-8413-28A867B50CD5@padl.com>
- <v4fqikeec52ginmogfvsfe5gobul2nqspe2ebzpzpja52lxacb@wq2elxqwrucf>
-To: Cedric Jehasse <cedric.jehasse@gmail.com>
-X-Mailer: Apple Mail (2.3826.700.81)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-295467-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295468-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:cedric.jehasse@luminex.be,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cedric.jehasse@gmail.com,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[padl.com:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	APPLE_MAILER_COMMON(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[padl.com:mid,padl.com:from_mime,padl.com:dkim,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C6C2D643DEC
+X-Rspamd-Queue-Id: 5BA82643DFA
 
-Hi Cedric,
+On Thu, 4 Jun 2026 20:05:54 +0000 Nitka, Grzegorz wrote:
+> > On Fri, 29 May 2026 16:26:20 +0200 Grzegorz Nitka wrote:  
+> > > NOTE: This series is intentionally submitted on net-next (not
+> > > intel-wired-lan) as early feedback of DPLL subsystem changes is
+> > > welcomed. In the past possible approaches were discussed in [1].  
+> > 
+> > I dug into 3 of the issues reported by Claude here and I think all
+> > are really preexisting. But I don't see why we wouldn't fix those
+> > first, and have a clean AI scan. Please send the fixes ASAP if you
+> > have them, if they are trivial they may make it for tomorrow's PR.  
+> 
+> Thanks for your feedback.
+> I'm not sure if I can identify exact 3 issues you mentioned above.
+> I see couple pre-existing issues reported in
+> https://sashiko.dev/#/patchset/20260529142628.1678955-1-grzegorz.nitka%40intel.com
+>   - 3 issues reported in [PATCH v12 net-next 3/8] dpll: extend pin notifier with notification source ID
+>   - 2 issues reported in [PATCH v12 net-next 5/8] ice: introduce TXC DPLL device and TX ref clock pin framework for E825
+>     The first one is false positive in my opinion.
+> 
+> Did you mean those from patch 3/8?
+> It should be rather simple ones. Shall I submit it as a part of this series?
+> Or a new patch/patchset? (against next or net?)
 
-> On 4 Jun 2026, at 10:01=E2=80=AFpm, Cedric Jehasse =
-<cedric.jehasse@gmail.com> wrote:
->=20
-> On Thu, Jun 04, 2026 at 08:37:17PM +1000, Luke Howard wrote:
->> I still need to find a similarly natural way to expose the switch=E2=80=
-=99s AVB capabilities / 802.1Qat admission control. Perhaps there is =
-none and it will need to remain a local patch.
->=20
-> There's a devlink port param command. I've been wondering if this =
-could be used
-> to set a port's AvbMode. However:
-> * at the moment there are no drivers supporting this.
->  eg. devlink_nl_port_param_set_doit and other return this isn't =
-supported
-> * i don't know if AvbMode is a valid use for devlink port param, and =
-if it
->  would get accepted
+Ugh, I think I missed that the caller looks at the ICE_FLAG_DPLL flag.
+So most of the deinit bugs are not actually bugs.
 
-mv88e6xxx already exposes the ATU_hash driver-specific devlink =
-parameter, so there is a precedent which augurs well.
-
-A per-port AVB mode devlink could configure:
-
-- AVB mode to enhanced
-- iso ptrs to number of enabled ports * N (currently we use N=3D64)
-- enabling interpreting AVB_NRL entries as AVB with G1_ATU_CTL_MAC_AVB
-
-The leaves two issues:
-
-- if at least one port has AVB mode set, we could install permanent MDB =
-entries as AVB_NRL. But here we have the old problem, that AVB mode is =
-on the ingress port, whereas MDB entries are on the egress port.
-- also the AVB FPri and QPri values would need to be configured, either =
-via another devlink parameter or MQPRIO
-
-This approach would integrate well with your CBS and DCB patches. Having =
-said that, AVB mode could likely be reimplemented with TCAM, and =
-(assuming an SRP daemon that knew how to install those flower entries) =
-that might be a more portable and idiomatic solution. I am not sure how =
-it would perform compared to the native AVB admission control in the =
-switch.
-
-Luke=
+You can add the fixes to this series.
 
