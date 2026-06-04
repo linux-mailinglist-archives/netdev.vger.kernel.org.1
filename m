@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-295276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f0jkJ3OKIWrtIQEAu9opvQ
-	(envelope-from <netdev+bounces-295276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:23:47 +0200
+	id FJkTCgaOIWo9IwEAu9opvQ
+	(envelope-from <netdev+bounces-295277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:39:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1282D640D21
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:23:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A12C0640F26
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 16:39:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=S1TWU5HR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295276-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295276-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=ka3rSjtq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295277-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295277-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C7FDC312F8A7
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 14:15:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA2B83163AD3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 14:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6F3480DD9;
-	Thu,  4 Jun 2026 14:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9574B48C3FE;
+	Thu,  4 Jun 2026 14:14:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09385480DEE
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 14:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E98480970
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 14:13:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780582443; cv=none; b=HB6nZhEidIabq+USRmZUOHViXEt/z0BnqpV7+TFtnRyoL82Qx/qgMBrw2H1OkfoYlqR+8wPHCajcKl/nUCqAmVDuhoWaAtfYxZ780rrZINgR5oWbrQaby0+gEC1kci73Rnw5VkRIyEkpZlZePh/16pKY4UTMbEf8UNNOZvpw0Bs=
+	t=1780582445; cv=none; b=j8wWiUuWZliU1jnX5Z/YEivt3siQQNBMMOKVNpKj1ZB7mJPbFYq9PNZxHp3+RQxR00YMo9bnDNvV4sdQXcNkfwyvtknHBtf27Kv/4Gk6+i4pceF/SSW5L7xjF+1Gjmcvm8F4dxAmAJzaAmo16oAHqsB5ttuPoa1jC+Ufn4JZLvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780582443; c=relaxed/simple;
-	bh=DpkPVJTZBA+soZ3X7TBP0/+44ucHPSO8yoIbrrsUq5s=;
+	s=arc-20240116; t=1780582445; c=relaxed/simple;
+	bh=/Wb4szO7KFT1y+eAsfpfCvhKedpKy9HOFnh5gENLCOE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GRK+Czip4ambsC0xWHhpObQNG2sYhTtdwD2Fp/BauUTn4NDDf71+0zrzlgkb6yWwPNHHmZ5ly4yEk5MEKUAHKPVO9TBO7Cg4EU8rBCwjf+LGnqQX3av9r2JUH9yTmXzXbBThxizothrV9jv3cBaXrJGORfgpKOkD4p/PeDHKv6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S1TWU5HR; arc=none smtp.client-ip=209.85.219.74
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8ccf396f53bso20637476d6.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 07:13:57 -0700 (PDT)
+	 To:Cc:Content-Type; b=c+RJtPKJYEG7zuF4G6i0ibekfn1JXd8KjOMBG4CNhc8bNTw6o1kpnWg0T02dbu3zHincYM6b5QOwuxQZDre52fz2/yC6hkQcgIkEhP/tBgRY58wkjBpdSH/8t1Pt3IhxETmtLpPXq9CmwBowqarQfNxxqi11Lo9/04iV2j386NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ka3rSjtq; arc=none smtp.client-ip=209.85.219.74
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8ce9de04835so25621506d6.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 07:13:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780582436; x=1781187236; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780582438; x=1781187238; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HL5O3s+5Savlu/dGCFjJgchYirt3mpzmIhQQ5NINLNo=;
-        b=S1TWU5HRGAAUV8Z8dlUA7X7KnKAZQBigrJWDqV3ex7p/mLW+5sM6v8JQNhrm64az+K
-         89gWPlsMLbO4unFaHR/lbPFfh7QBW1YCjTpTDQr1YFTlxdr1JsDwJ2XNqcIOGrILI7kJ
-         77ptRUKBYjMUDvrtPLmlP3G+I6UQfmt2xL9Bf6rRhied7tEFdKBhAEXMbqMlC1Yl61ZM
-         0VJaRoc3QvuuujNKTeoa3M1SczduNWHAsxt2fcO0SwY/mL+NvNQHQNXmGCB4JtJkqX/Z
-         7c651YFE4eRfY6DRuf3DaUnAP9Sj3jrH9HhfIDdm3CMmRKsrEuD5kwPe6dPRTrppVhAo
-         rngg==
+        bh=Dc/mj9LIZxr4ZUxDfAjSCQwydR9Uuqwp5cjPUbNL/4Q=;
+        b=ka3rSjtqdJ+Pm7Thzj+B9pecK2oTyQVCgpqU96KQZafs7x3j1O8A4emdlLelZW2XmR
+         ipAKtDXqJJbbuP+N1QE/IfMv4pBrNRNjVya/wMGBO73kxdcFoCZuLxJhA6XZ2uAAS0/M
+         sF+VDyAVUYsVOTtdFwNi6HWhzZhZw5GOy+O7kBtXsIOQL8OechBSlXWOo8RMsxNBCVt7
+         mJ4MXsvCoJA8CLFiK5XLxTXWj8XTm18Ob5uVCG1Uu/TbCvAyyZkC6HtT7tdyMyYOrq0t
+         fwLrfn3tgqB2FUYiEERPQA2zi4QwE5r0p6SrO8N2Eveo8i/GmOFdJSsk7jI2trjF+A5t
+         uYgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780582436; x=1781187236;
+        d=1e100.net; s=20251104; t=1780582438; x=1781187238;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HL5O3s+5Savlu/dGCFjJgchYirt3mpzmIhQQ5NINLNo=;
-        b=Z6d/fH4EXeBgDGAXQ0pGeNLA2OVqDQ9zaLZgwooCKOQ1uLqs3YhqOzL4Vbec6FLZko
-         1ynMnKk8beI8M29Y0+9WBLkFjc+aGQgyGzm3NNk5gqgg6cf65LWkaD3Jm3hqO5A/eBUW
-         DTMLh2KJTqqI6ezxVaCzBfKXD8qr9sm9fSepz2u5oTHf/Co9jQY+x8JxgIZEtFzr3tro
-         sabJdssuxxl/nL2PCGECA1tKkyb2gduzyRvrms3JKTTh8ymZNsyz9ImBJ25mq1mfEOp9
-         dzUDji8fyPgQ9MEh6a/x3i2oxJWrRbgEJ6BaicQ0TVMWNeyQQftgE5BaZV9z9hTOWbSw
-         k3aA==
-X-Forwarded-Encrypted: i=1; AFNElJ+pPPsv8wUhRZXTmyOKKIZqMXpRtSmWIWqMFvwHa0McnYo5YGlYpXiOXRDmzsr4ZL08libDvU0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmuunEgzQvhYYLugfK3ZeBn1A8nJjCTJ2HpV4DxuucWZpGyi6Z
-	J8XmN4XOUcwoPeWI8qVQZDbrYqzzFw72f64RfKA17W8oIUD9CkzHNzQGh/9C8A+uFdK/9LFwMDu
-	TAaUrGWY5etv0ZQ==
-X-Received: from qvwo4.prod.google.com ([2002:a05:6214:1804:b0:8cc:c4e8:bb4c])
+        bh=Dc/mj9LIZxr4ZUxDfAjSCQwydR9Uuqwp5cjPUbNL/4Q=;
+        b=QkXKyVE+CfBwx1jqwvuj5153e+5vlohWXHYl5yqa+PIiCiWnzbeRCU1Mp1ycUDjgDp
+         EDE272Sc7fRWHcCATyTdRs6hqkXeiQLyndwFnLckxLJdNBKEOe7WMbkzEPYwsbWrr54A
+         WeJ5WjvGk3IFYgdtAMJRnsWaRZMQ7k1lwFPaazoFhuSQCWowYNJSOQ0aAvAJhvOMxyTu
+         HP1r+GSiY8eJdI7s3bTAc/jFUYxaxMba29t+cTVhE7o6hyDZUcPz1hbOO1TnX8z+FluI
+         2wAmghIZkLUV8TrxfSVgrR+FOIS1E616Ce8jtKTRqa9MSBJ8+rpm9vln+3IJRjVD7bgk
+         q70Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9CD5UtR+EfM8gJj14LYCZKmL9CxltFNnjnMQZuoxOGkPawDtS8S0APontuPjvBLyoWq+fL3qg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGkbhBoo/qUi+ckSCQNMPn8OS5xFZRpBlhWeF+mb6+Ec1zvOet
+	3Uj/sfL4qe8zuON3VJoDye1uTlrwpZLLbori6mpfwADf7KN9xDNT5mi7h0TVPmpKy4SH51zdufM
+	BiQ3HxR8oiZ6wqA==
+X-Received: from qkba14.prod.google.com ([2002:a05:620a:a38e:b0:915:71c1:ce29])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:514c:0:b0:8cc:e654:3100 with SMTP id 6a1803df08f44-8ced7deeccamr38074706d6.16.1780582435845;
- Thu, 04 Jun 2026 07:13:55 -0700 (PDT)
-Date: Thu,  4 Jun 2026 14:13:39 +0000
+ 2002:a05:620a:a0c5:20b0:911:dfb6:d89b with SMTP id af79cd13be357-9158a7b6ec7mr946044885a.39.1780582437393;
+ Thu, 04 Jun 2026 07:13:57 -0700 (PDT)
+Date: Thu,  4 Jun 2026 14:13:40 +0000
 In-Reply-To: <20260604141343.2124500-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260604141343.2124500-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
-Message-ID: <20260604141343.2124500-8-edumazet@google.com>
-Subject: [PATCH v3 net-next 07/11] bridge: provide lockless access to p->designated_port
+Message-ID: <20260604141343.2124500-9-edumazet@google.com>
+Subject: [PATCH v3 net-next 08/11] bridge: provide lockless access to p->priority
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -93,12 +93,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295276-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295277-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -116,103 +116,64 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,nvidia.com:email,blackwall.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,blackwall.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1282D640D21
+X-Rspamd-Queue-Id: A12C0640F26
 
-Add READ_ONCE()/WRITE_ONCE() annotations around p->designated_port
+sysfs show_priority() needs this.
 
-This is needed at least for sysfs show_designated_port(), BRCTL_GET_PORT_INFO
-and upcoming RTNL avoidance in "ip link" dumps (cf br_port_fill_attrs()).
+Also br_port_fill_attrs() might in the future run without RTNL.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- net/bridge/br_ioctl.c    | 2 +-
- net/bridge/br_netlink.c  | 3 ++-
- net/bridge/br_stp.c      | 4 ++--
+ net/bridge/br_netlink.c  | 2 +-
  net/bridge/br_stp_if.c   | 2 +-
  net/bridge/br_sysfs_if.c | 2 +-
- 5 files changed, 7 insertions(+), 6 deletions(-)
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bridge/br_ioctl.c b/net/bridge/br_ioctl.c
-index a507c7b369ac49803019cdca7836c7fb9ef4459e..2be802991f70ab3ce48ade5da6d1488e072dbec6 100644
---- a/net/bridge/br_ioctl.c
-+++ b/net/bridge/br_ioctl.c
-@@ -258,7 +258,7 @@ int br_dev_siocdevprivate(struct net_device *dev, struct ifreq *rq,
- 		memcpy(&p.designated_root, &pt->designated_root, 8);
- 		memcpy(&p.designated_bridge, &pt->designated_bridge, 8);
- 		p.port_id = pt->port_id;
--		p.designated_port = pt->designated_port;
-+		p.designated_port = READ_ONCE(pt->designated_port);
- 		p.path_cost = READ_ONCE(pt->path_cost);
- 		p.designated_cost = READ_ONCE(pt->designated_cost);
- 		p.state = pt->state;
 diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 296f62ebdd4a6f3d404b5902fe661995bd1ca0f5..a722db89aef6bbb6ecc77c7e0f173dc79418797f 100644
+index a722db89aef6bbb6ecc77c7e0f173dc79418797f..fc25c6b6cc9713080873976f443da1fbd764aafe 100644
 --- a/net/bridge/br_netlink.c
 +++ b/net/bridge/br_netlink.c
-@@ -263,7 +263,8 @@ static int br_port_fill_attrs(struct sk_buff *skb,
- 		    &p->designated_root) ||
- 	    nla_put(skb, IFLA_BRPORT_BRIDGE_ID, sizeof(struct ifla_bridge_id),
- 		    &p->designated_bridge) ||
--	    nla_put_u16(skb, IFLA_BRPORT_DESIGNATED_PORT, p->designated_port) ||
-+	    nla_put_u16(skb, IFLA_BRPORT_DESIGNATED_PORT,
-+			READ_ONCE(p->designated_port)) ||
- 	    nla_put_u16(skb, IFLA_BRPORT_DESIGNATED_COST,
- 			READ_ONCE(p->designated_cost)) ||
- 	    nla_put_u16(skb, IFLA_BRPORT_ID, p->port_id) ||
-diff --git a/net/bridge/br_stp.c b/net/bridge/br_stp.c
-index ced8d23f05d1ee262d1760c768e5c88868f13178..cbc48197c3db5e225ead7425b2cee46acc9768f3 100644
---- a/net/bridge/br_stp.c
-+++ b/net/bridge/br_stp.c
-@@ -261,7 +261,7 @@ static void br_record_config_information(struct net_bridge_port *p,
- 	p->designated_root = bpdu->root;
- 	WRITE_ONCE(p->designated_cost, bpdu->root_path_cost);
- 	p->designated_bridge = bpdu->bridge_id;
--	p->designated_port = bpdu->port_id;
-+	WRITE_ONCE(p->designated_port, bpdu->port_id);
- 	p->designated_age = jiffies - bpdu->message_age;
+@@ -239,7 +239,7 @@ static int br_port_fill_attrs(struct sk_buff *skb,
+ 	u64 timerval;
  
- 	mod_timer(&p->message_age_timer, jiffies
-@@ -434,7 +434,7 @@ void br_become_designated_port(struct net_bridge_port *p)
- 	p->designated_root = br->designated_root;
- 	WRITE_ONCE(p->designated_cost, br->root_path_cost);
- 	p->designated_bridge = br->bridge_id;
--	p->designated_port = p->port_id;
-+	WRITE_ONCE(p->designated_port, p->port_id);
- }
- 
- 
+ 	if (nla_put_u8(skb, IFLA_BRPORT_STATE, p->state) ||
+-	    nla_put_u16(skb, IFLA_BRPORT_PRIORITY, p->priority) ||
++	    nla_put_u16(skb, IFLA_BRPORT_PRIORITY, READ_ONCE(p->priority)) ||
+ 	    nla_put_u32(skb, IFLA_BRPORT_COST, READ_ONCE(p->path_cost)) ||
+ 	    nla_put_u8(skb, IFLA_BRPORT_MODE, mode) ||
+ 	    nla_put_u8(skb, IFLA_BRPORT_GUARD, !!(p->flags & BR_BPDU_GUARD)) ||
 diff --git a/net/bridge/br_stp_if.c b/net/bridge/br_stp_if.c
-index e5d43492d2dcf0615ee984bc190d7ce2264aaab0..7b0d1a334785047905a00694fd65e3212b160e5d 100644
+index 7b0d1a334785047905a00694fd65e3212b160e5d..3524bb7e87f0586774a883720be9fa8eb60f0370 100644
 --- a/net/bridge/br_stp_if.c
 +++ b/net/bridge/br_stp_if.c
-@@ -320,7 +320,7 @@ int br_stp_set_port_priority(struct net_bridge_port *p, unsigned long newprio)
- 
- 	new_port_id = br_make_port_id(newprio, p->port_no);
- 	if (br_is_designated_port(p))
--		p->designated_port = new_port_id;
-+		WRITE_ONCE(p->designated_port, new_port_id);
+@@ -323,7 +323,7 @@ int br_stp_set_port_priority(struct net_bridge_port *p, unsigned long newprio)
+ 		WRITE_ONCE(p->designated_port, new_port_id);
  
  	p->port_id = new_port_id;
- 	p->priority = newprio;
+-	p->priority = newprio;
++	WRITE_ONCE(p->priority, newprio);
+ 	if (!memcmp(&p->br->bridge_id, &p->designated_bridge, 8) &&
+ 	    p->port_id < p->designated_port) {
+ 		br_become_designated_port(p);
 diff --git a/net/bridge/br_sysfs_if.c b/net/bridge/br_sysfs_if.c
-index 36b832902d33a492e91d53a4248778b3ee2322ca..1023f97b1c9a22a1f79c3c734aef9bd41832ea39 100644
+index 1023f97b1c9a22a1f79c3c734aef9bd41832ea39..3f666d4fef42324a4751779153ecc48bdb44b85a 100644
 --- a/net/bridge/br_sysfs_if.c
 +++ b/net/bridge/br_sysfs_if.c
-@@ -129,7 +129,7 @@ static BRPORT_ATTR(designated_bridge, 0444, show_designated_bridge, NULL);
+@@ -100,7 +100,7 @@ static BRPORT_ATTR(path_cost, 0644, show_path_cost, store_path_cost);
  
- static ssize_t show_designated_port(struct net_bridge_port *p, char *buf)
+ static ssize_t show_priority(struct net_bridge_port *p, char *buf)
  {
--	return sysfs_emit(buf, "%d\n", p->designated_port);
-+	return sysfs_emit(buf, "%d\n", READ_ONCE(p->designated_port));
+-	return sysfs_emit(buf, "%d\n", p->priority);
++	return sysfs_emit(buf, "%d\n", READ_ONCE(p->priority));
  }
- static BRPORT_ATTR(designated_port, 0444, show_designated_port, NULL);
  
+ static int store_priority(struct net_bridge_port *p, unsigned long v)
 -- 
 2.54.0.1032.g2f8565e1d1-goog
 
