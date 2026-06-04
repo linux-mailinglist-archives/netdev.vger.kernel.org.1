@@ -1,69 +1,111 @@
-Return-Path: <netdev+bounces-295355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id B++4EFetIWpXLAEAu9opvQ
-	(envelope-from <netdev+bounces-295355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:52:39 +0200
+	id yreODkKsIWoWLAEAu9opvQ
+	(envelope-from <netdev+bounces-295354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:48:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F2B76420FF
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:52:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDC4642064
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 18:48:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dm0Wf9c5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295355-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295355-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=broadcom.com header.s=google header.b=NXFlboor;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295354-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295354-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED93F301B903
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 16:39:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2F23C315D9E3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 16:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C9F3B6378;
-	Thu,  4 Jun 2026 16:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AABC3932E9;
+	Thu,  4 Jun 2026 16:37:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f97.google.com (mail-yx1-f97.google.com [74.125.224.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7612F2F531B;
-	Thu,  4 Jun 2026 16:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15F934DB46
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 16:37:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780591146; cv=none; b=FhPSwxVVnCFZ7Sf7dZOP1ciPUDuknF4t/IqkR9mlpLCm//KzSBFLhOxvCtN1krrtaqgep4z/jRaMktKOTCsEwfOl6KezwtvLFtmo537VQnUan1jByOrUBxQMOKNOZZ5EMCgjceEq90m7y2k9IW4bCSCQ1cubWPaPzxkvs5jmp4Q=
+	t=1780591069; cv=none; b=ptL3OnpLnzOO6y5S/ZaNyX0dmgUfFO8Znt6cSwY5W3bF4B3OQVDywVtM/fb72TzhqbqBsdk3O2jUileiTwE5Hsas14zRQZSqgcAWwklciLmKRwyXSL2+gVZlnhHZQWDEVWxYHTrPTmnkbFgCxU2yasAP3n9ampIwQOkvo0IDV/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780591146; c=relaxed/simple;
-	bh=7y1X+mc0RP4JERnetQIXLYlQgO98q5svq1wduccnOns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lr4Nur5OrW16h07jCI/Mo75Il4J/3PnLvqF+UpeAsZfFvlSPjrfrzhp/A5WyHZ4dKpkq5eOziZyKTTQOxjRtN5D7EJ8GNubNh+hirNlvNKupzrt38Gt2W495PB/Iasl0QliZF4cYoUlHmXDMEvo9nL5GazvJ/LDnJBWfjUW5tII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dm0Wf9c5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD9B71F00893;
-	Thu,  4 Jun 2026 16:39:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780591145;
-	bh=C97OinIMHdoGNYwilRL1cyfSqURl26hCe8MlGB8UpuE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=dm0Wf9c5FAae4OWnJETtorw91Jbgd1QsxZvME4aM3YDOUcrQtZhMboaCdLlHmz3OR
-	 cmEaQYetJ1uQHU7ddQkTxJHGRjx83VtThq4Eafg6WDShb8clHN0zKHJj2OMEXrDS/h
-	 K/+dHUmuckP8102D/4z8p5TYR3V9VmzG0fPBTBWBEf2sDaLHlruDtJPqvYqHEOE+Gu
-	 /LJNKdgKlk05c6PzJLqtvfsGHb9qJ6kFDg3bt+hhTMmWcNNAaYE742GpSrtMaf1t3r
-	 cFqRBPfwh8I26LIYThlTWgpPzuLoak+eXDlvVu1+/mNBS8qSoVb0GPwuZcCSwTe9p5
-	 /riCyQXM+zvew==
-From: Simon Horman <horms@kernel.org>
-To: mmyangfl@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	vladimir.oltean@nxp.com,
-	UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	davem@davemloft.net,
+	s=arc-20240116; t=1780591069; c=relaxed/simple;
+	bh=0Y0Sjy44RdkBzYSdAeUlWQZAogOV193vCQin/KVtbQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A3kSiR+klcxuQnYv3KK3DDkeZXmfug/m3yoSUILLPxGBG9dJrGMnbl0dg1z2mGiYD98Ftom6ePzomQ3IgSJth73gKLEHl+AJ/PQ5U9nYS7AspILaRxNGCDZsGO/LtXyckacsp+8/hAr3elQs/ol9+BY/S8XCxotwprwBESMvtbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NXFlboor; arc=none smtp.client-ip=74.125.224.97
+Received: by mail-yx1-f97.google.com with SMTP id 956f58d0204a3-6605c3453f2so1134368d50.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 09:37:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780591067; x=1781195867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dA1YjKYHZBhklMysioMr6OFl2p5kCNCILPwzpCesPi8=;
+        b=ojcEAoDScWN5yMBX5rwsSQhflxFWPeOXiJvikX8oLs0Z9rifCxF6zF4GmPWD+zSX5q
+         xKqjXI2JS9muAzmLsa4CgKt3fu0Pf6jJX7+aAADvsboGY1t1okuAxHO+30Ztzh15ao7D
+         vrmltqJNMzwX9jDTl4zsOqdQoPVVevL2IvISF5w4UFYgW/hUGtqQDnlp1O6Dxz3G57Hx
+         +1PWjTSuRC0Fqpo6krIwqgxiZnHJegslegzkhLhfc3HEQqABT5oC/amXjOxDsRKFrNEF
+         wt4zptzepUKDK0QcwI9L7W9RfIaJ0uo4ht/dkbZ8GRFsdqiJsNzqaaSX6xfqe3Et8fJA
+         2uTQ==
+X-Gm-Message-State: AOJu0YypcWR9L5hWGoj5EMccDf42oAKfor/LDv7xp7yIgTI0OCq4jxgh
+	otudjQ6F6l58boqzNgqwxEB9H+DTIY1z74iEZCQ8dVEj7OlBnTkwj2Vwhd8/b8SkXqlfhzCXsiI
+	KsUQif6E50Zq1i2oczUdcFwshKNFThbwLxP7L+Wr8gVxBTaqSnbMyBpajnx5IxgBlFZ4KDmkDed
+	+G4TrBXw41fY6K/0T2Thi4b/M5JrizbpH1gXNfQlL8iO/I35rWSQZ2IypJfxp+dSH6GsnzztXpq
+	4hbsnz5fZGS
+X-Gm-Gg: Acq92OGW500meNBzmM+X8qNCWgOadtBOidYewAybPb5Hc2ZZx+GMV+sZN/2vkZK+IIB
+	oiVZaWpFEvhUbWX+afdhBFDLUTrRBoK15HNX07gB+yKcuic3kvRJLpKg/C9xHxs0LOesgpfRmSh
+	Clmmfw89FcMtPl7z3ejJeSRe56io+wQjoL2WcFBeicoVv6cRWhN/njVClRKOOj5aFwBorpVwU+i
+	e5VhAbWCfSdR8r4Ws145ZreGTBMlTcIQj4pM5z2itziWjRk6+cY6C85KPkZJKLva+xn+fntEK7P
+	xwq3juqcjLDPuBx+/HhPlCf3QVS6mCty6qLnqfCnL/y2rBGwCZfzh27o7zKG4uMj26g8N69MZkI
+	8NpxI91GZSd0opW6ij8oLAxFNrOCf3zhx+ISGCxUb8B+Rz/aU/mWH/aLEKEyLu0CFdFofcGz2f/
+	vYmw0CBgVjdue8Km55ku/O7DVWUJficnbwqNlC5f8n/dHQZK+YZzLrVyar8cRI5zOLZ/jo
+X-Received: by 2002:a53:d006:0:b0:660:8253:b84d with SMTP id 956f58d0204a3-660dc2a6eb4mr7774081d50.31.1780591066611;
+        Thu, 04 Jun 2026 09:37:46 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
+        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-660d61ea17fsm521040d50.15.2026.06.04.09.37.46
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jun 2026 09:37:46 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2c0c36f4b76so9940545ad.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 09:37:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1780591065; x=1781195865; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dA1YjKYHZBhklMysioMr6OFl2p5kCNCILPwzpCesPi8=;
+        b=NXFlboorQJmHlG/5Nvo5AXFclF3OghgXlKHr42GmNVQi++XBUtz6aSpGLfpNDKoIla
+         6WkVCajspctAJmrdClDazsoBI0CHIdczoosaBcFFkjemaBmCnk70bpmIbE+VvDGOzONj
+         uPhmQaOx+VdmVNALAqMkXV5HJ1LSyFaT4KbW0=
+X-Received: by 2002:a17:902:c602:b0:2c0:a555:80d6 with SMTP id d9443c01a7336-2c163a14eb7mr56838815ad.2.1780591065303;
+        Thu, 04 Jun 2026 09:37:45 -0700 (PDT)
+X-Received: by 2002:a17:902:c602:b0:2c0:a555:80d6 with SMTP id d9443c01a7336-2c163a14eb7mr56838585ad.2.1780591064803;
+        Thu, 04 Jun 2026 09:37:44 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16629c08bsm64746735ad.61.2026.06.04.09.37.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2026 09:37:44 -0700 (PDT)
+From: Vikas Gupta <vikas.gupta@broadcom.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: felix: validate switch in .netdev_to_port() conversion
-Date: Thu,  4 Jun 2026 17:36:30 +0100
-Message-ID: <20260604163629.3976927-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260603024234.66603-1-mmyangfl@gmail.com>
-References: <20260603024234.66603-1-mmyangfl@gmail.com>
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	vsrama-krishna.nemani@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	rajashekar.hudumula@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	dharmender.garg@broadcom.com,
+	rahul-rg.gupta@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: [PATCH net] bnge: fix context mem iteration
+Date: Thu,  4 Jun 2026 22:07:09 +0530
+Message-ID: <20260604163709.497649-1-vikas.gupta@broadcom.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,113 +113,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-295355-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:mmyangfl@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:vladimir.oltean@nxp.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-295354-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vsrama-krishna.nemani@broadcom.com,m:bhargava.marreddy@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:ajit.khaparde@broadcom.com,m:dharmender.garg@broadcom.com,m:rahul-rg.gupta@broadcom.com,m:vikas.gupta@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8F2B76420FF
+X-Rspamd-Queue-Id: BFDC4642064
 
-From: 'Simon Horman' <horms@kernel.org>
+The firmware advertises context memory (backing store) types
+through a linked list, with BNGE_CTX_INV serving as the
+end-of-list sentinel.
+However, the driver incorrectly assumes that the list is strictly
+ordered and prematurely terminates traversal when it encounters
+an unrecognized type (>=BNGE_CTX_V2_MAX). As a result, any valid
+context types that appear later in the chain are silently skipped,
+leading to incomplete memory configuration and eventual driver load
+failure.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Fix this by traversing the entire list until the BNGE_CTX_INV sentinel
+is reached, while safely ignoring only those context types that fall
+outside the supported range.
+
+Fixes: 29c5b358f385 ("bng_en: Add backing store support")
+Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+Reviewed-by: Dharmender Garg <dharmender.garg@broadcom.com>
 ---
-net: dsa: felix: validate switch in .netdev_to_port() conversion
+ drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-This commit changes the .netdev_to_port() callback to take a struct
-ocelot pointer and adds a dp->ds mismatch check in felix_netdev_to_port()
-so that a netdev belonging to a different switch is rejected before the
-port index is consumed by flower rule parsing.
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+index eb11800f5573..1c9cfec1b633 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+@@ -277,7 +277,7 @@ int bnge_hwrm_func_backing_store_qcaps(struct bnge_dev *bd)
+ 	struct hwrm_func_backing_store_qcaps_v2_output *resp;
+ 	struct hwrm_func_backing_store_qcaps_v2_input *req;
+ 	struct bnge_ctx_mem_info *ctx;
+-	u16 type;
++	u16 type, next_type;
+ 	int rc;
+ 
+ 	if (bd->ctx)
+@@ -294,8 +294,8 @@ int bnge_hwrm_func_backing_store_qcaps(struct bnge_dev *bd)
+ 
+ 	resp = bnge_hwrm_req_hold(bd, req);
+ 
+-	for (type = 0; type < BNGE_CTX_V2_MAX; ) {
+-		struct bnge_ctx_mem_type *ctxm = &ctx->ctx_arr[type];
++	for (type = 0; type < BNGE_CTX_INV; type = next_type) {
++		struct bnge_ctx_mem_type *ctxm;
+ 		u8 init_val, init_off, i;
+ 		__le32 *p;
+ 		u32 flags;
+@@ -304,8 +304,14 @@ int bnge_hwrm_func_backing_store_qcaps(struct bnge_dev *bd)
+ 		rc = bnge_hwrm_req_send(bd, req);
+ 		if (rc)
+ 			goto ctx_done;
++
++		next_type = le16_to_cpu(resp->next_valid_type);
++		if (type >= BNGE_CTX_V2_MAX)
++			continue;
++
++		ctxm = &ctx->ctx_arr[type];
+ 		flags = le32_to_cpu(resp->flags);
+-		type = le16_to_cpu(resp->next_valid_type);
++
+ 		if (!(flags &
+ 		      FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_TYPE_VALID))
+ 			continue;
+-- 
+2.47.1
 
-> diff --git a/drivers/net/ethernet/mscc/ocelot_net.c b/drivers/net/ethernet/mscc/ocelot_net.c
-> index 1b8269320464..d2e96d065dc4 100644
-> --- a/drivers/net/ethernet/mscc/ocelot_net.c
-> +++ b/drivers/net/ethernet/mscc/ocelot_net.c
-> @@ -984,7 +984,7 @@ static bool ocelot_netdevice_dev_check(const struct net_device *dev)
->  	return dev->netdev_ops == &ocelot_port_netdev_ops;
->  }
->  
-> -int ocelot_netdev_to_port(struct net_device *dev)
-> +int ocelot_netdev_to_port(struct ocelot *ocelot, struct net_device *dev)
->  {
->  	struct ocelot_port_private *priv;
-
-[Medium]
-The new ocelot parameter is added here to match the updated
-ocelot_ops::netdev_to_port signature, but is it actually used in the
-body of ocelot_netdev_to_port()?
-
-The function still does only:
-
-    if (!dev || !ocelot_netdevice_dev_check(dev))
-            return -EINVAL;
-
-    priv = netdev_priv(dev);
-
-    return priv->port.index;
-
-ocelot_netdevice_dev_check() compares dev->netdev_ops against the
-file-scope ocelot_port_netdev_ops vtable, which is shared across all
-ocelot instances, so a netdev belonging to a sibling ocelot switch
-passes this check and priv->port.index is returned as a port number
-on the local hardware.
-
-Isn't this the same silent wrong-port resolution the commit message
-describes for the felix path?
-
-The corresponding switch-ownership check the commit adds for felix:
-
-    if (IS_ERR(dp) || dp->ds != ds)
-            return -EINVAL;
-
-has no analogue in the ocelot variant. struct ocelot_port carries a
-back-pointer to its owning struct ocelot (used elsewhere in this
-file), so a symmetric check such as:
-
-    if (priv->port.ocelot != ocelot)
-            return -EINVAL;
-
-after the netdev_ops check would mirror the felix change and consume
-the otherwise unused ocelot argument. Without it, the parameter is
-dead and the validation promised by the commit message is only
-half-applied.
-
-The two call sites in ocelot_flower.c, ocelot_flower_parse_egress_port()
-consuming a->dev and ocelot_flower_parse_indev() resolving a netdev
-from a user-supplied ifindex via __dev_get_by_index(), both feed
-externally-controlled netdevs into ocelot->ops->netdev_to_port(ocelot, dev),
-so the standalone ocelot path used by ocelot_vsc7514 still accepts a
-foreign switch's netdev when more than one ocelot instance is present.
 
