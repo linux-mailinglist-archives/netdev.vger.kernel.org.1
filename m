@@ -1,342 +1,315 @@
-Return-Path: <netdev+bounces-295044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295046-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oogrDooBIWpz+QAAu9opvQ
-	(envelope-from <netdev+bounces-295044-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 06:39:38 +0200
+	id zQNAJxAJIWox+gAAu9opvQ
+	(envelope-from <netdev+bounces-295046-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 07:11:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAAAD63CD7B
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 06:39:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6CB63CEB8
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 07:11:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.microsoft.com header.s=default header.b=UglmN5g9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295044-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295044-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="Wfj5/olb";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295046-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295046-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1ABD6303AC2E
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 04:39:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4E443301FE7A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 05:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56553B9D9D;
-	Thu,  4 Jun 2026 04:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4243BED70;
+	Thu,  4 Jun 2026 05:09:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6096C245019;
-	Thu,  4 Jun 2026 04:39:33 +0000 (UTC)
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128C93BD62C
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 05:09:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780547974; cv=none; b=V6Zt9wkxSVg/EgM3vsEOD+sxSUDhqdPwom/Lv/RXqY6Nxa5QPjXi7SFtEN3Lc75QS/j3TKVtLefkHHAh8G8wqLnP2oirihoZivSXPusjwpLDrtY6aWLe2YWJ/Hct4gjeE5VwBkaU3nzUB4hV6J/JJUqxtVyQPLSf6fcgf9pdtlU=
+	t=1780549758; cv=none; b=l7ngO4odjJqQL1H5XD+U/b2UTeTxKm1AHHLOCKOdBGwqnktNFqotdiFB3H3BIUFC6X5bvsGyGa6RfGvcmvF63pqSaxqZn/oCXoihWf/icXXxHHt57tuHz8P9kQeo3EfnIppuJuzJt6B8Bq9KDM9bK5egzrUHeXAo04c/d6sUWRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780547974; c=relaxed/simple;
-	bh=3TD/EbWlUgw5Oxp6TsO4T2zyEASvjXycXPbXPXSTw2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IwtHwCpxYqGivxpwQBXr4z6pluAU3lExNNhfsgcDc2lQWPZQz3N2r5FUWr16eNyPGLplX30Q2j9KhNFAh1zZWjGB30hSSMiR6HtG9AtfiYEIiVQem236mp6wAe/6lcBBAzt3Bi7bAaAVMkBiBmuh5VlEy2XhBDo6Rdkkt5Eeusg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=UglmN5g9; arc=none smtp.client-ip=13.77.154.182
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 9C1FA20B7168; Wed,  3 Jun 2026 21:39:18 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9C1FA20B7168
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1780547958;
-	bh=rS4jtbTUUzAmQ4oxR78vqTVOwiU0QMyHLpZQiXKQYyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UglmN5g9gwJz1zQfFDWNUaTZpokmsFN+TAoL05Tx43anuQpgeSZfiEti18jBIFDXn
-	 /hHds2ZlNKGBBDr9zUZ2QiZdj59Tt1Kq8dcXQvMU2iP5vwmdY+6Lng6FTojP293BPe
-	 coiGkZ/ewOoS+qsNGUi9wUHaAxA+KigeHbAalsUo=
-Date: Wed, 3 Jun 2026 21:39:18 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Long Li <longli@microsoft.com>, Yury Norov <yury.norov@gmail.com>,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Saurabh Singh Sengar <ssengar@microsoft.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net: mana: Optimize irq affinity for low vcpu
- configs
-Message-ID: <aiEBdsP7NTBd0+ah@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260601102749.1768304-1-shradhagupta@linux.microsoft.com>
- <10988db9-8a8d-4ad0-917e-317dd4b20253@intel.com>
+	s=arc-20240116; t=1780549758; c=relaxed/simple;
+	bh=Av1frBjcGBjlzFynU2Hy7rkXSpmEfO68DCNBSYURblM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FzDx8MU3fBWP3yly/ql/k0srFHGxKL58QR+/i9HihOUJNzss/1WGaQNgKWQzXIaQl/tyYH/l8tX5sy6veG+ysdqiRvzCD+680Cn6ueNOYhKGwcHb6kTQkeJweIvFin/KEqKLcONi31+KQFTmKLHoOc/Ia7gSsKT1BoCTlKhJoCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wfj5/olb; arc=none smtp.client-ip=209.85.216.47
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-36f4773d7abso49615a91.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 22:09:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780549755; x=1781154555; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H+vy0QPkbgBGQCp+nbHU8oM3LzLFEBCDA4xt5ygdBfo=;
+        b=Wfj5/olb/9nGiV8QqwNuMpzRQsqb18H9713Cs0ytRcaX6COoKQox8ltM0esz5CKpq4
+         NF25W7Ro5GRSmIa9C6KVDg8W0FZZ+tOKHvf0Zkz5xsglkahxjTJAWqy4zh29M5b3Wtif
+         7StVzLcsrk9eg9/p/oduv0LrOtwVsR5vtiHQpDEoTahE06rjAbTocQQaK1a23kkvo35D
+         Mw3viVXOmuZ7zuIqGKeBMKHAzgKuWoDcfkWyRAFxqmEM9lH33TJbgcBl1iBBa4fgP8vR
+         z57bYXJMxNceX8iMrvqV97EWdlhwRumfKDSa1KoXOEnbE/9rN62yV5I489uZd28iYkRR
+         jbcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780549755; x=1781154555;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H+vy0QPkbgBGQCp+nbHU8oM3LzLFEBCDA4xt5ygdBfo=;
+        b=GH/a3GgB3rAqe1DebMImkI3HFd1XQcQD13C0Vkl3oJBYOcpMJIHIuWPIQkO1DRfstU
+         u4LJQdR0vCmNj7WxTntpl4+3STJs6vzll0dGWGGrJy9Cp9yBqCZVJ5qe/1fqqCvr95yD
+         ooeeaWfiaZ/NF6WRvH5/7tDuJk43ea5Cbdoa5JNug+OACFhI8jgMT8NKXNpgbTSvTnMB
+         eioe8QbhIXA6GuXUqGFZdZSQSTes62+j6FQrRGXjPqNDvMjRNh0KDylNYnFiSxRYfdNv
+         dnwSzPKk8mf9EuNpBH779/SjneaiDUQPjhV4Z741j00CJqHtr8O/wsSsmEPgT+tFgJm1
+         RE+A==
+X-Forwarded-Encrypted: i=1; AFNElJ/9hlGa+2FVbDDVSUKNNmJtVVtt3RohlYcwbjnmQiNyZ0Rs37cexUnmJ4/Ang+5SG1NXjb0kks=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywh2NvRiFzGcur1ulzH71CMyoQq4T9XR3NQF1Y30yFUxqAZc716
+	lFyTSOIkW0RGAMWP0PVJkdYr6qE4iBMQbcYRpjZfDXVXsavEfWK3qb7f
+X-Gm-Gg: Acq92OGxcIpUBl6aUVKDmGQy7ETeXfkKwu1g+UYDfXcG8DyCceZW9O1sWNoET2WBo2w
+	yv0RzATQBAAbgP+EXBZ3GvTMPg1LXCKXPn2v5xpwMnEOuKAYSh/LwlRDu7qKufui4Jd72UNYh5/
+	j8/xSAKpMSe/1hINWNoGG32ytMOQ0vVRFVQ1l125OuXIYVVB/f2Ul7XpJsoxH24OX09yVwGFgnX
+	jcUQZm8iz3HV0NdXaK2e4j6CRq2Kxsg25r8ZxHSkOcyupCOAwxzSykQUWL84Za/ZHjT4c3AkcHc
+	RhVk0r5evQ6u4v4PZG1w3WbKyRUAj8NzMQ49w3n6wyticQwEZ0YHnTYLyYCbufD5LKppeZne9SW
+	vu1bRAN6Epi8dtRY+xtznVIPj6Let8bq2s4REplGUqHaXxv3D/azccjMmvFJs6aVyWBMgQ8v1lM
+	UCV9FxEYISPzojCyo8859hMw53RCznm51s1pnLvO5vg6Rv
+X-Received: by 2002:a17:90b:4b85:b0:366:2b56:3ec2 with SMTP id 98e67ed59e1d1-36fbd7cbd0emr692507a91.1.1780549755227;
+        Wed, 03 Jun 2026 22:09:15 -0700 (PDT)
+Received: from [192.168.1.7] ([159.192.166.161])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-36f68bf99dcsm1595578a91.0.2026.06.03.22.09.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jun 2026 22:09:14 -0700 (PDT)
+Message-ID: <f5fe7d26-4467-4015-be65-f01d7acda213@gmail.com>
+Date: Thu, 4 Jun 2026 12:09:09 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10988db9-8a8d-4ad0-917e-317dd4b20253@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] bus: mhi: pci_generic: add Rolling Wireless RW135R-GL
+ and RW151 support
+To: zwq2226404116@163.com, mhi@lists.linux.dev,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org
+Cc: mani@kernel.org, loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
+ Wanquan Zhong <wanquan.zhong@fibocom.com>
+References: <20260603070608.309114-1-zwq2226404116@163.com>
+Content-Language: en-US
+From: Lars Melin <larsm17@gmail.com>
+In-Reply-To: <20260603070608.309114-1-zwq2226404116@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:jacob.e.keller@intel.com,m:decui@microsoft.com,m:wei.liu@kernel.org,m:haiyangz@microsoft.com,m:kys@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:shirazsaleem@microsoft.com,m:mhklinux@outlook.com,m:longli@microsoft.com,m:yury.norov@gmail.com,m:linux-hyperv@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:paulros@microsoft.com,m:shradhagupta@microsoft.com,m:ssengar@microsoft.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,m:yurynorov@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295044-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295046-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[shradhagupta@linux.microsoft.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:zwq2226404116@163.com,m:mhi@lists.linux.dev,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:mani@kernel.org,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:kuba@kernel.org,m:wanquan.zhong@fibocom.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[163.com,lists.linux.dev,vger.kernel.org];
+	FORGED_SENDER(0.00)[larsm17@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,gmail.com,lunn.ch,davemloft.net,fibocom.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shradhagupta@linux.microsoft.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.microsoft.com:from_mime,linux.microsoft.com:dkim]
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[larsm17@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BAAAD63CD7B
+X-Rspamd-Queue-Id: AA6CB63CEB8
 
-On Wed, Jun 03, 2026 at 02:49:24PM -0700, Jacob Keller wrote:
-> On 6/1/2026 3:27 AM, Shradha Gupta wrote:
-> > In mana driver, the number of IRQs allocated is capped by the
-> > min(num_cpu + 1, queue count). In cases, where the IRQ count is greater
-> > than the vcpu count, we want to utilize all the vCPUs, irrespective of
-> > their NUMA/core bindings.
-> > 
-> > This is important, especially in the envs where number of vCPUs are so
-> > few that the softIRQ handling overhead on two IRQs on the same vCPU is
-> > much more than their overheads if they were spread across sibling vCPUs.
-> > 
-> > This behaviour is more evident with dynamic IRQ allocation. Since MANA
-> > IRQs are assigned at a later stage compared to static allocation, other
-> > device IRQs may already be affinitized to the vCPUs. As a result, IRQ
-> > weights become imbalanced, causing multiple MANA IRQs to land on the
-> > same vCPU, while some vCPUs have none.
-> > 
-> > In such cases when many parallel TCP connections are tested, the
-> > throughput drops significantly.
-> > 
-> > Test envs:
-> > =======================================================
-> > Case 1: without this patch
-> > =======================================================
-> > 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-> > 
-> > 	TYPE		effective vCPU aff
-> > =======================================================
-> > IRQ0:	HWC		0
-> > IRQ1:	mana_q1		0
-> > IRQ2:	mana_q2		2
-> > IRQ3:	mana_q3		0
-> > IRQ4:	mana_q4		3
-> > 
-> > %soft on each vCPU(mpstat -P ALL 1) on receiver
-> > vCPU		0	1	2	3
-> > =======================================================
-> > pass 1:		38.85	0.03	24.89	24.65
-> > pass 2:		39.15	0.03	24.57	25.28
-> > pass 3:		40.36	0.03	23.20	23.17
-> > 
-> > =======================================================
-> > Case 2: with this patch
-> > =======================================================
-> > 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-> > 
-> >         TYPE            effective vCPU aff
-> > =======================================================
-> > IRQ0:   HWC             0
-> > IRQ1:   mana_q1         0
-> > IRQ2:   mana_q2         1
-> > IRQ3:   mana_q3         2
-> > IRQ4:   mana_q4         3
-> > 
-> > %soft on each vCPU(mpstat -P ALL 1) on receiver
-> > vCPU            0       1       2       3
-> > =======================================================
-> > pass 1:         15.42	15.85	14.99	14.51
-> > pass 2:         15.53	15.94	15.81	15.93
-> > pass 3:         16.41	16.35	16.40	16.36
-> > 
-> > =======================================================
-> > Throughput Impact(in Gbps, same env)
-> > =======================================================
-> > TCP conn	with patch	w/o patch
-> > 20480		15.65		7.73
-> > 10240		15.63		8.93
-> > 8192		15.64		9.69
-> > 6144		15.64		13.16
-> > 4096		15.69		15.75
-> > 2048		15.69		15.83
-> > 1024		15.71		15.28
-> > 
-> > Fixes: 755391121038 ("net: mana: Allocate MSI-X vectors dynamically")
-> > Cc: stable@vger.kernel.org
-> > Co-developed-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> > Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > ---
-> > Changes in v3
-> >  * Optimize the comments in mana_gd_setup_dyn_irqs()
-> >  * add more details in the dev_dbg for extra IRQs 
-> > ---
-> > Changes in v2
-> >  * Removed the unused skip_first_cpu variable
-> >  * fixed exit condition in irq_setup_linear() with len == 0
-> >  * changed return type of irq_setup_linear() as it will always be 0
-> >  * removed the unnecessary rcu_read_lock() in irq_setup_linear()
-> >  * added appropriate comments to indicate expected behaviour when
-> >    IRQs are more than or equal to num_online_cpus()
-> > ---
-> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 60 ++++++++++++++++---
-> >  1 file changed, 53 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index 712a0881d720..00a28b3ca0a6 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -197,6 +197,8 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
-> >  	} else {
-> >  		/* If dynamic allocation is enabled we have already allocated
-> >  		 * hwc msi
-> > +		 * Also, we make sure in this case the following is always true
-> > +		 * (num_msix_usable - 1 HWC) <= num_online_cpus()
-> >  		 */
-> >  		gc->num_msix_usable = min(resp.max_msix, num_online_cpus() + 1);
-> >  	}
-> > @@ -1717,11 +1719,24 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node,
-> >  	return 0;
-> >  }
-> >  
-> > +/* should be called with cpus_read_lock() held */
-> > +static void irq_setup_linear(unsigned int *irqs, unsigned int len)
-> > +{
-> > +	int cpu;
-> > +
-> > +	for_each_online_cpu(cpu) {
-> > +		if (len == 0)
-> > +			break;
-> > +
-> > +		irq_set_affinity_and_hint(*irqs++, cpumask_of(cpu));
-> > +		len--;
-> > +	}
-> > +}
+On 2026-06-03 14:06, zwq2226404116@163.com wrote:
+> From: Wanquan Zhong <wanquan.zhong@fibocom.com>
 > 
-> I would find all of this a bit easier to follow if irq_setup_linear()
-> and irq_setup() had a mana prefix so it was more obvious these are
-> specific to the driver. Of course irq_setup is pre-existing, and its not
-> my driver so do as you will :)
+> bus: mhi: pci_generic: add Rolling Wireless RW135R-GL and RW151 support
 > 
-> > +
-> >  static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
-> >  {
-> >  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> >  	struct gdma_irq_context *gic;
-> > -	bool skip_first_cpu = false;
-> >  	int *irqs, irq, err, i;
-> >  
-> >  	irqs = kmalloc_objs(int, nvec);
-> > @@ -1729,6 +1744,8 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
-> >  		return -ENOMEM;
-> >  
-> >  	/*
-> > +	 * In this function, num_msix_usable = HWC IRQ + Queue IRQ.
-> > +	 * nvec is only Queue IRQ (HWC already setup).
-> >  	 * While processing the next pci irq vector, we start with index 1,
-> >  	 * as IRQ vector at index 0 is already processed for HWC.
-> >  	 * However, the population of irqs array starts with index 0, to be
-> > @@ -1767,13 +1784,42 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
-> >  	 * first CPU sibling group since they are already affinitized to HWC IRQ
-> >  	 */
-> >  	cpus_read_lock();
-> > -	if (gc->num_msix_usable <= num_online_cpus())
-> > -		skip_first_cpu = true;
-> > +	if (gc->num_msix_usable <= num_online_cpus()) {
-> > +		err = irq_setup(irqs, nvec, gc->numa_node, true);
-> > +		if (err) {
-> > +			cpus_read_unlock();
-> > +			goto free_irq;
-> > +		}
-> > +	} else {
-> > +		/*
-> > +		 * When num_msix_usable are more than num_online_cpus, our
-> > +		 * queue IRQs should be equal to num of online vCPUs.
-> > +		 * We try to make sure queue IRQs spread across all vCPUs.
-> > +		 * In such a case NUMA or CPU core affinity does not matter.
-> > +		 * Note: in this case the total mana IRQ should always be
-> > +		 * num_online_cpus + 1. The first HWC IRQ is already handled
-> > +		 * in HWC setup calls
-> > +		 * However, if CPUs went offline since num_msix_usable was
-> > +		 * computed, queue IRQs will be more than num_online_cpus().
-> > +		 * In such cases remaining extra IRQs will retain their default
-> > +		 * affinity.
-> > +		 */
-> > +		int first_unassigned = num_online_cpus();
-> > +		if (nvec > first_unassigned) {
-> > +			char buf[32];
-> > +
-> > +			if (first_unassigned == nvec - 1)
-> > +				snprintf(buf, sizeof(buf), "%d",
-> > +					 first_unassigned);
-> > +			else
-> > +				snprintf(buf, sizeof(buf), "%d-%d",
-> > +					 first_unassigned, nvec - 1);
-> > +
-> > +			dev_dbg(&pdev->dev,
-> > +				"MANA IRQ indices #%s will retain the default CPU affinity\n", buf);
-> > +		}
-> >  
-> > -	err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
-> > -	if (err) {
-> > -		cpus_read_unlock();
-> > -		goto free_irq;
-> > +		irq_setup_linear(irqs, nvec);
+> Add MHI PCIe device configuration for Rolling Wireless modules:
 > 
-> irq_setup() doesn't have a driver prefix, but is actually a static
-> function in gdma_main.c, so its implementation is specific to this
-> driver despite its name.
+> - RW135R-GL (Qualcomm sdx35): MBIM, DIAG, DUN, NMEA, FIREHOSE, ADB, IP_HW0
+> - RW151 (Qualcomm sdx75): same channel layout with adjusted ring sizes
 > 
-> So if I understand this change correctly, if the number of usable MSI-X
-> vectors is smaller than the number of CPUs, you contineu to use the
-> current irq_setup logic.. otherwise you switch to the simpler "linear"
-> logic.
+> Register PCI_DEVICE_SUB entries for vendor 0x2099, device 0x1300/1301 on
+> QCOM 0x011a (sdx35) and 0x0309 (sdx75) respectively.
 > 
-> I guess this means the logic and heuristic used in irq_setup() breaks
-> down when the number of vectors is large and number of vCPU is small?
+> Enable the ADB MHI channel in mhi_wwan_ctrl so userspace can access the
+> WWAN_PORT_ADB port via the wwan subsystem.
 > 
-> Makes sense.
+> Tested-on: Rolling RW135R-GL / RW151 hardware (MHI probe, MBIM, DIAG, ADB)
 > 
+> Signed-off-by: Wanquan Zhong <wanquan.zhong@fibocom.com>
+> ---
+>   drivers/bus/mhi/host/pci_generic.c | 100 +++++++++++++++++++++++++++++
+>   drivers/net/wwan/mhi_wwan_ctrl.c   |   1 +
+>   2 files changed, 101 insertions(+)
+> 
+> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
+> index 0884a384b77f..ad166de2d0f3 100644
+> --- a/drivers/bus/mhi/host/pci_generic.c
+> +++ b/drivers/bus/mhi/host/pci_generic.c
+> @@ -902,6 +902,94 @@ static const struct mhi_pci_dev_info mhi_netprisma_fcun69_info = {
+>   	.sideband_wake = true,
+>   };
+>   
+> +static const struct mhi_channel_config mhi_rolling_rw135r_channels[] = {
+> +	MHI_CHANNEL_CONFIG_UL(4, "DIAG", 64, 1),
+> +	MHI_CHANNEL_CONFIG_DL(5, "DIAG", 64, 1),
+> +	MHI_CHANNEL_CONFIG_UL(12, "MBIM", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL(14, "NMEA", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(15, "NMEA", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL(32, "DUN", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(33, "DUN", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL_FP(34, "FIREHOSE", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL_FP(35, "FIREHOSE", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL(36, "ADB", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(37, "ADB", 32, 0),
+> +	MHI_CHANNEL_CONFIG_HW_UL(100, "IP_HW0", 128, 2),
+> +	MHI_CHANNEL_CONFIG_HW_DL(101, "IP_HW0", 128, 3),
+> +};
+> +
+> +static struct mhi_event_config mhi_rolling_rw135r_events[] = {
+> +	MHI_EVENT_CONFIG_CTRL(0, 128),
+> +	MHI_EVENT_CONFIG_DATA(1, 128),
+> +	MHI_EVENT_CONFIG_HW_DATA(2, 1024, 100),
+> +	MHI_EVENT_CONFIG_HW_DATA(3, 2048, 101),
+> +};
+> +
+> +static const struct mhi_controller_config modem_rolling_rw135r_config = {
+> +	.max_channels = 128,
+> +	.timeout_ms = 8000,
+> +	.num_channels = ARRAY_SIZE(mhi_rolling_rw135r_channels),
+> +	.ch_cfg = mhi_rolling_rw135r_channels,
+> +	.num_events = ARRAY_SIZE(mhi_rolling_rw135r_events),
+> +	.event_cfg = mhi_rolling_rw135r_events,
+> +};
+> +
+> +static const struct mhi_pci_dev_info mhi_rolling_rw135r_info = {
+> +	.edl = "qcom/sdx35m/prog_firehose_ddr.elf",
+> +	.name = "rolling-rw135r",
+> +	.config = &modem_rolling_rw135r_config,
+> +	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
+> +	.dma_data_width = 32,
+> +	.sideband_wake = false,
+> +	.mru_default = 32768,
+> +	.edl_trigger = true,
+> +};
+> +
+> +static const struct mhi_channel_config mhi_rolling_rw151_channels[] = {
+> +	MHI_CHANNEL_CONFIG_UL(4, "DIAG", 16, 1),
+> +	MHI_CHANNEL_CONFIG_DL(5, "DIAG", 16, 1),
+> +	MHI_CHANNEL_CONFIG_UL(12, "MBIM", 4, 0),
+> +	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 4, 0),
+> +	MHI_CHANNEL_CONFIG_UL(14, "NMEA", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(15, "NMEA", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL(32, "DUN", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(33, "DUN", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL_FP(34, "FIREHOSE", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL_FP(35, "FIREHOSE", 32, 0),
+> +	MHI_CHANNEL_CONFIG_UL(36, "ADB", 32, 0),
+> +	MHI_CHANNEL_CONFIG_DL(37, "ADB", 32, 0),
+> +	MHI_CHANNEL_CONFIG_HW_UL(100, "IP_HW0", 128, 2),
+> +	MHI_CHANNEL_CONFIG_HW_DL(101, "IP_HW0", 128, 3),
+> +};
+> +
+> +static struct mhi_event_config mhi_rolling_rw151_events[] = {
+> +	MHI_EVENT_CONFIG_CTRL(0, 128),
+> +	MHI_EVENT_CONFIG_DATA(1, 128),
+> +	MHI_EVENT_CONFIG_HW_DATA(2, 1024, 100),
+> +	MHI_EVENT_CONFIG_HW_DATA(3, 2048, 101),
+> +};
+> +
+> +static const struct mhi_controller_config modem_rolling_rw151_config = {
+> +	.max_channels = 128,
+> +	.timeout_ms = 50000,
+> +	.num_channels = ARRAY_SIZE(mhi_rolling_rw151_channels),
+> +	.ch_cfg = mhi_rolling_rw151_channels,
+> +	.num_events = ARRAY_SIZE(mhi_rolling_rw151_events),
+> +	.event_cfg = mhi_rolling_rw151_events,
+> +};
+> +
+> +static const struct mhi_pci_dev_info mhi_rolling_rw151_info = {
+> +	.edl = "qcom/sdx75m/prog_firehose_lite.elf",
+> +	.name = "rolling-rw151",
+> +	.config = &modem_rolling_rw151_config,
+> +	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
+> +	.dma_data_width = 32,
+> +	.sideband_wake = false,
+> +	.mru_default = 32768,
+> +	.edl_trigger = true,
+> +};
+> +
+>   /* Keep the list sorted based on the PID. New VID should be added as the last entry */
+>   static const struct pci_device_id mhi_pci_id_table[] = {
+>   	{PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x0116),
+> @@ -909,6 +997,12 @@ static const struct pci_device_id mhi_pci_id_table[] = {
+>   	/* Telit FN920C04 (sdx35) */
+>   	{PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x011a, 0x1c5d, 0x2020),
+>   		.driver_data = (kernel_ulong_t) &mhi_telit_fn920c04_info },
+> +	/* Rolling RW135R-GL (sdx35) */
+> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x011a, 0x2099, 0x1300),
+> +		.driver_data = (kernel_ulong_t) &mhi_rolling_rw135r_info },
+> +	/* Rolling RW135R-GL (sdx35) */
+> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x011a, 0x2099, 0x1301),
+> +		.driver_data = (kernel_ulong_t) &mhi_rolling_rw135r_info },
+>   	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x0304),
+>   		.driver_data = (kernel_ulong_t) &mhi_qcom_sdx24_info },
+>   	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x0306, PCI_VENDOR_ID_QCOM, 0x010c),
+> @@ -941,6 +1035,12 @@ static const struct pci_device_id mhi_pci_id_table[] = {
+>   	/* Telit FE990B40 (sdx72) */
+>   	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x0309, 0x1c5d, 0x2025),
+>   		.driver_data = (kernel_ulong_t) &mhi_telit_fe990b40_info },
+> +	/* Rolling RW151 (sdx75) */
+> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x0309, 0x2099, 0x1300),
+> +		.driver_data = (kernel_ulong_t) &mhi_rolling_rw151_info },
+> +	/* Rolling RW151 (sdx75) */
+> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x0309, 0x2099, 0x1301),
+> +		.driver_data = (kernel_ulong_t) &mhi_rolling_rw151_info },
+>   	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x0309),
+>   		.driver_data = (kernel_ulong_t) &mhi_qcom_sdx75_info },
+>   	/* QDU100, x100-DU */
+> diff --git a/drivers/net/wwan/mhi_wwan_ctrl.c b/drivers/net/wwan/mhi_wwan_ctrl.c
+> index fa73861db6ad..c0bba94d5c3f 100644
+> --- a/drivers/net/wwan/mhi_wwan_ctrl.c
+> +++ b/drivers/net/wwan/mhi_wwan_ctrl.c
+> @@ -264,6 +264,7 @@ static const struct mhi_device_id mhi_wwan_ctrl_match_table[] = {
+>   	{ .chan = "DIAG", .driver_data = WWAN_PORT_QCDM },
+>   	{ .chan = "FIREHOSE", .driver_data = WWAN_PORT_FIREHOSE },
+>   	{ .chan = "NMEA", .driver_data = WWAN_PORT_NMEA },
+> +	{ .chan = "ADB", .driver_data = WWAN_PORT_ADB },
+>   	{},
+>   };
+>   MODULE_DEVICE_TABLE(mhi, mhi_wwan_ctrl_match_table);
+> 
+> --
+> 2.43.0
+> 
+> 
+Hi,
+does both the sdx35 and the sdx75 device really have the same Rolling 
+PCI Vid:Pid (2099:1300 and 2099:1301)?
 
-Hi Jacob,
+thanks
+Lars
 
-Yes, that's the right understanding. 
-Regarding the function names, let me take that up in a seperate patch to
-add prefixes to all such functions.
 
-Thanks.
-
-> >  	}
-> >  
-> >  	cpus_read_unlock();
-> > 
-> > base-commit: 8415598365503ced2e3d019491b0a2756c85c494
 
