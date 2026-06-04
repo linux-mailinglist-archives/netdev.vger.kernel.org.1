@@ -1,142 +1,220 @@
-Return-Path: <netdev+bounces-295050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5YrLG8UQIWpE+wAAu9opvQ
-	(envelope-from <netdev+bounces-295050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 07:44:37 +0200
+	id FcdRGQITIWqf+wAAu9opvQ
+	(envelope-from <netdev+bounces-295051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 07:54:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDF963D0FA
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 07:44:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DFA63D18D
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 07:54:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295050-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295050-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=padl.com (policy=reject);
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bdNNhv66;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295051-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295051-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 527FC301AD26
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 05:39:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3675230097FC
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 05:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867633BFE4F;
-	Thu,  4 Jun 2026 05:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C719A3D3489;
+	Thu,  4 Jun 2026 05:50:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us.padl.com (us.padl.com [216.154.215.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9393C09EA;
-	Thu,  4 Jun 2026 05:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47083D411B
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 05:49:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780551597; cv=none; b=D/U7XP6Ofqgpi8nkGxOUCue+x0mFqCvBC84IRKDpgcO9482yUttoWkEpT1Yx+StHKPRK9hjSfVOJJUga9v8zJqInuvPbP4rCRMQKK1miqsjXc8+Lbx+NDgDB/jZJXLL/U4fNW1PRngmaCL14lTgzpl6ZasiZdxbY/4NJBgX3roA=
+	t=1780552203; cv=none; b=pRWhm3trKGFIbs0ZC62dOu4QcasvWurVksxDeFbp9bAy8RTGHxYEz945jCjfro33q1h+aoE4H+MvSJEXQkHO9iVbqyKux0d8Auo4Kxn5Rim6cBDZN/074DVboiaUvkLpZT4auyadsRkG+By9Du9Tg1ItkbSq8AdZMeWh3MmvPsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780551597; c=relaxed/simple;
-	bh=/71IDNAYlaYhMk27O2rluNJgQT68JB+md99aDpuFqFw=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=YvBx2pRKDhaZUcQkpD7M6vfUPlEgH5ypeGB48MtAKcrf+HkRM144rT3b1o06SZ9c0qEdqX15RtubXnPAUOyyAhsJdBIcSw8xHDff84AgtuUlRfY/vO3daylk7Lt5RqP48tij3963D4s5Ox6OGrpzieEBZthu+4PPxZjQ0YfHwn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; arc=none smtp.client-ip=216.154.215.154
-Received: from smtpclient.apple (border.lukktone.com [139.130.100.52])
-	by us.padl.com (Postfix) with ESMTPSA id 7471B60058;
-	Thu,  4 Jun 2026 01:39:38 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 7471B60058
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1780552203; c=relaxed/simple;
+	bh=zpCv17Sg5kWkxuzMxb1CNjR4cVcHw9YcPd9dSnigmAA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WGpQdAslwCSCKHc8F09zeU0hNzRLKU+Q5l+RIFnKbfg5qikGqATXa1qh4z/5Z25Ynz7eAUtnjB4AQiXWtDmgYbUUiwSpkpOv88zvtBcDUuYO0RQBLJaB2a1w3+0kZCeklpAFK/ae9OEG9LXzLX65ML//jjyFeh5MqRN7vU9vV3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdNNhv66; arc=none smtp.client-ip=209.85.210.169
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-84237c55ef9so135715b3a.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jun 2026 22:49:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780552195; x=1781156995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c6O/WIRCX+AkXpjS4dBwmz/ZiRhzvinSASQRSoiHl/o=;
+        b=bdNNhv660kGRaonALZmmrRjd3LWqkfTf9/1GC8ICyOmlygFO2Tmxvz5/XGHdms8BIZ
+         fE3AYYs1evukfkAbH3IoHwPb3Bf73o3yd1EU9LiWUE+Hfu+1kTZBJ9F9nYMkS+BYL4U1
+         nxnhsaguKWjKZgZ/2eqZQrcMcBhpufNIY0rXxDsp2hknz0DJMBiQ2a+v4bc37vVnP/eG
+         OfC9FxxzkEpQlVYB3dVKDgdtIAwQmQI+UoCvQgJplLYoPuIBNRBcg218b7MScAKDomxG
+         ejlZ4lvht7H4YIVgSThQyNN5HoPlyL7ymFdspZWDRTVp9cUur6sEVi5srIrG8aur2WbR
+         LyPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780552195; x=1781156995;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c6O/WIRCX+AkXpjS4dBwmz/ZiRhzvinSASQRSoiHl/o=;
+        b=KGd64AgenJ3KJ0r2USDnO5m3wRO7qBit7x4fyeU6SiDGZX5l2KD+LGLl/uaNyby4gE
+         DqW4aCykQvn2RmOxAi91B9LokPDbS5hHvVG8uulBigt5ybFMNT/6UbOZ/WjX7AmKbKMB
+         xl4byS1nJJ8wD/sD1hT6DZYEUWy1d4VNKshP4IxBbsXwBLfPVHEhXrejM9Pa0AExoNOR
+         aZA4tnNG9uUeDhQMw3UAI6Tt0ml/5nIX4NfITiyrZ0ddTMrVcfEw+ALrgqLcBPmpjxEG
+         QVLmKGZi4O5juBmbtPIjzvFfQfIo+1FIjkQ02VNSXWTi1gyTIr6gqbZjC31AfrI0aVG/
+         atxA==
+X-Gm-Message-State: AOJu0YwvPxZWbJ6ABVRT3kBzutCwWH9nC1idVgf0e1T3oKg9tSN+Z7nI
+	v27M1HNJaktHvaA55zq357V4qtHBJy9caSQ7tOfkySS9l4VqP7IMXOfb1s9l0g==
+X-Gm-Gg: Acq92OFz2ek4SAOGKT0vyG4+kRWopWsn951OzOrf4xCsAMgeALy5QZ8oaVRMkrHsOw4
+	f79GHaGHrheb8wBdALWcDTJc+zrNkGeW5k3dwxep4lTe8LPxsEgWjS8Bm5o1tPvSAEr6aU28oGs
+	M89rkLiwlnjwusWosMBm4tuFSLJT7p6rZMDnVKptrpu+af6QDYxdejSfhXH1VfZx6QoYXfae16Q
+	5IlnW9p8ihpEff6ZZU5ryV6bBziHaBnDBn+PoOvyaiZqTS0tP2iThK4lNsnj2xXpwC/Ri7CDQQb
+	O4XuceDetIZQ0pb6acpa5nWC9Rn7+9j6iSGMliYLCb/J/2P0IoOQKQvRHnFJzazRiApX/2YDK1p
+	qsCnNmKZTJ7ORWEWGNoVL/P9qv5zS/LAvdiZhw9Iw+1Oow3TexL1qTQ+1E4s8fylt1nrPFBLNGs
+	dZnhh/G0J5Ym+IXbHO4+vVjXNxFuh06NTD/RAZaHGFa/RTRlzS/8KhADijKtwiQ3vQx3QGoA==
+X-Received: by 2002:a05:6a00:9094:b0:842:54c1:8e15 with SMTP id d2e1a72fcca58-84284ecf490mr6679870b3a.29.1780552194807;
+        Wed, 03 Jun 2026 22:49:54 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828821ddsm4880943b3a.35.2026.06.03.22.49.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jun 2026 22:49:54 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	fmancera@suse.de,
+	jvaclav@redhat.com,
+	andrew@lunn.ch,
+	luka.gejak@linux.dev
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ap420073@gmail.com,
+	Maoyi Xie <maoyixie.tju@gmail.com>
+Subject: [PATCH net-next v3] hsr: broadcast netlink notifications in the device's net namespace
+Date: Thu,  4 Jun 2026 13:49:49 +0800
+Message-Id: <20260604054949.2999304-1-maoyixie.tju@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH net-next v2 3/6] net: bridge: add 802.1Qat stream
- reservation admission control
-From: Luke Howard <lukeh@padl.com>
-In-Reply-To: <537410c3-ff4e-43fd-834e-775cd1bbe89e@blackwall.org>
-Date: Thu, 4 Jun 2026 15:39:25 +1000
-Cc: Jiri Pirko <jiri@resnulli.us>,
- Ivan Vecera <ivecera@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Ido Schimmel <idosch@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- David Ahern <dsahern@kernel.org>,
- Shuah Khan <shuah@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- bridge@lists.linux.dev,
- linux-kselftest@vger.kernel.org,
- Max Hunter <max@huntershome.org>,
- Kieran Tyrrell <kieran@sienda.com>,
- Cedric Jehasse <cedric.jehasse@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E1253C6D-F6F0-407A-AABF-FCAB57100A1C@padl.com>
-References: <20260602-mv88e6xxx-8021qat-mqprio-v2-0-72be14522e7c@padl.com>
- <20260602-mv88e6xxx-8021qat-mqprio-v2-3-72be14522e7c@padl.com>
- <537410c3-ff4e-43fd-834e-775cd1bbe89e@blackwall.org>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-X-Mailer: Apple Mail (2.3826.700.81)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[padl.com : SPF not aligned (relaxed), No valid DKIM,reject];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:ivecera@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:shuah@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bridge@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:max@huntershome.org,m:kieran@sienda.com,m:cedric.jehasse@gmail.com,m:razor@blackwall.org,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295050-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-295051-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:fmancera@suse.de,m:jvaclav@redhat.com,m:andrew@lunn.ch,m:luka.gejak@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ap420073@gmail.com,m:maoyixie.tju@gmail.com,m:maoyixietju@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[resnulli.us,redhat.com,davemloft.net,google.com,kernel.org,nvidia.com,lunn.ch,gmail.com,vger.kernel.org,lists.linux.dev,huntershome.org,sienda.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	APPLE_MAILER_COMMON(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[padl.com:from_mime,padl.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blackwall.org:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DEDF963D0FA
+X-Rspamd-Queue-Id: D1DFA63D18D
 
-On 3 Jun 2026, at 5:35=E2=80=AFpm, Nikolay Aleksandrov =
-<razor@blackwall.org> wrote:
-> So looking at how this is implemented, why not put most of it in TC?
-> It is testing for skb class, for tc qdisc, I don't see a reason for it
-> to be in the bridge at all. You can filter the mcast groups and =
-simulate
-> the "reserved" flag, it has to be set manually anyway. Adding new
-> tests in the bridge software fast-path just for this is a waste.
+The HSR generic netlink family sets .netnsok = true. HSR devices can
+live in network namespaces other than init_net.
 
-This makes sense. Maybe it=E2=80=99s better to use flower+TCAM to =
-implement this, and have our SRP daemon manage flower entries in =
-addition to MDB entries. The mv88e6xxx driver=E2=80=99s TCAM support is =
-recent (hi Cedric!) and does not yet appear to support the 6352 or =
-matching on PCP/DA, but one presumes this is possible to add.
+Two async notifiers broadcast events with genlmsg_multicast(). They
+are hsr_nl_ringerror() and hsr_nl_nodedown(). That helper delivers
+only on the default genl socket in init_net. So the events always land
+in init_net. The network namespace of the device does not matter.
 
-Alternatively, responding to your comments, the bridge could mark frames =
-with a =E2=80=9Cstream reserved=E2=80=9D DA with a new tc_skb_ext bit, =
-which would be surfaced to flower similarly to l2_miss. The rest of the =
-policy would live in the flower rule. MDB_FLAGS_STREAM_RESERVED would =
-remain but IFLA_BRPORT_FILTER_STREAM_RESERVED could go (we would =
-dynamically enable the equivalent in mv88e6xxx by refcounting =
-MDB_FLAGS_STREAM_RESERVED entries).
+This has two effects. A listener in the device's own namespace never
+sees its own ring error and node down events. A privileged listener in
+init_net receives events from HSR devices in other namespaces. The
+payload carries the peer node MAC (HSR_A_NODE_ADDR) and the slave port
+ifindex (HSR_A_IFINDEX).
 
-Luke=
+Switch both callers to genlmsg_multicast_netns(). Other families with
+.netnsok = true already do this. Examples are gtp, ovpn, team,
+batman-adv, netdev-genl, ethtool and handshake.
+
+hsr_nl_ringerror() already has the slave port. It uses
+dev_net(port->dev). hsr_nl_nodedown() takes the namespace from the
+master port via hsr_port_get_hsr().
+
+Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+---
+v3: Drop the master NULL check that v2 added in hsr_nl_nodedown(). As
+    Fernando pointed out, master cannot be NULL on this path. hsr_dellink()
+    calls timer_delete_sync() on the background jobs before removing the
+    master, so the notifier never runs without one. The check only produced
+    a false positive static analysis report. Use master directly, which
+    matches the existing fail path that already dereferences master->dev.
+v2: Drop the Fixes and stable tags and target net-next. As discussed,
+    this is more of a behavior change than a fix, and the .netnsok
+    commit has been in since 5.6 with no report. The multicast stays
+    inside the rcu_read_lock, which avoids taking a netns ref on this
+    path. Fernando's Reviewed-by carried over.
+
+Inquiry (2026-05-18):
+https://lore.kernel.org/netdev/CAHPEe=GO=2qqWZPwBB4rrXc3mkD0dznp2K78nCsKwF=c-QwxEw@mail.gmail.com/
+v1 [PATCH net] (2026-05-27):
+https://lore.kernel.org/netdev/20260527075924.2707856-1-maoyixie.tju@gmail.com/
+v2 [PATCH net-next] (2026-06-01):
+https://lore.kernel.org/netdev/20260601022014.1175348-1-maoyixie.tju@gmail.com/
+
+ net/hsr/hsr_netlink.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/net/hsr/hsr_netlink.c b/net/hsr/hsr_netlink.c
+index f0ca23da3ab9..8099f2069a74 100644
+--- a/net/hsr/hsr_netlink.c
++++ b/net/hsr/hsr_netlink.c
+@@ -252,7 +252,8 @@ void hsr_nl_ringerror(struct hsr_priv *hsr, unsigned char addr[ETH_ALEN],
+ 		goto nla_put_failure;
+ 
+ 	genlmsg_end(skb, msg_head);
+-	genlmsg_multicast(&hsr_genl_family, skb, 0, 0, GFP_ATOMIC);
++	genlmsg_multicast_netns(&hsr_genl_family, dev_net(port->dev),
++				skb, 0, 0, GFP_ATOMIC);
+ 
+ 	return;
+ 
+@@ -288,8 +289,12 @@ void hsr_nl_nodedown(struct hsr_priv *hsr, unsigned char addr[ETH_ALEN])
+ 	if (res < 0)
+ 		goto nla_put_failure;
+ 
++	rcu_read_lock();
++	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
+ 	genlmsg_end(skb, msg_head);
+-	genlmsg_multicast(&hsr_genl_family, skb, 0, 0, GFP_ATOMIC);
++	genlmsg_multicast_netns(&hsr_genl_family, dev_net(master->dev),
++				skb, 0, 0, GFP_ATOMIC);
++	rcu_read_unlock();
+ 
+ 	return;
+ 
+
+base-commit: 8415598365503ced2e3d019491b0a2756c85c494
+-- 
+2.34.1
+
 
