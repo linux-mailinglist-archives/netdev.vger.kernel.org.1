@@ -1,201 +1,305 @@
-Return-Path: <netdev+bounces-295412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MIkEK+PWIWrYPQEAu9opvQ
-	(envelope-from <netdev+bounces-295412-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 21:49:55 +0200
+	id 7FiSKzvbIWrvPgEAu9opvQ
+	(envelope-from <netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 22:08:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EFB643042
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 21:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01AE864318D
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 22:08:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Rujq+fk4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295412-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295412-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b=PijeqS4W;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295413-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFBC93086FC5
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 19:42:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12DBC300D6A6
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 20:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4023C0605;
-	Thu,  4 Jun 2026 19:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571B03C457F;
+	Thu,  4 Jun 2026 20:05:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9B23C1981
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 19:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F3A3BD22E;
+	Thu,  4 Jun 2026 20:05:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780602163; cv=none; b=HpmA7kNW5GEWOTBhD4CXaks/vMgDL445zZEEElM1pi/bzEqR5N/LnOdkdJrbN5FXd1ZQdXWNcTjQG4NxfW/0osZ15qcPhKMMF/WcBsqkKisqkX/TpZRftktFVcDVdfvMrflkRwg4k634Kgr5C8fzYxlUZYfTknkFCiTkymH5dUY=
+	t=1780603536; cv=none; b=mgHzBphQrardW08el+t/PRGpBQmmgBOwxCIqtYP42mY+qDSJn3L8prVPsKBY+XZFwZvvdndIJ7Z4YU5af8z2TEd0FDL4weshiTe0ImYGXQXQhD0i767qYfnpr1EbVvEgUMikWzW43fFoNp++RTNLdXFCnZZnKEHAYmvmWMK9uZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780602163; c=relaxed/simple;
-	bh=KtMgABGlcpTepOluQ1ou8fSMVZFHM4vfpwhadYiKBcI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pDAzZ9xc9BVDlqkHoiRb2Mzo8x5fqnMEg0Alrv8OIueLZtoaWAvNoweGP/moSHhlguidUamNRm7UamVxRC6OGz2yhy8xTqMtwDkCS6173KFfflCohzwMyzkbCl4EwCFaPadBMcy31M+cp3MkAgSQC0h4QeFox+xBb9qKPW5Q2KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rujq+fk4; arc=none smtp.client-ip=74.125.224.52
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-66043ecf6b3so1369482d50.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 12:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780602161; x=1781206961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=czVnTl00M38M+CvcTn3IvYeN9aQCX6IoD9Yd91fGVis=;
-        b=Rujq+fk4PStZVAPxIIw5KzdygAnQLWCHwkxaQZSL47bCxJ8X0AIEoPlIj96r+5UBv+
-         WDqR31joAXqv/d0N2eu78XAfF+R1DRsIJ1UQSFV5LD/LLVy0RFnw7hB+DIvZBD6Ap1BJ
-         DQpuDNvXIGPiBzcJE7hHdzF0DMhy5+Qdg/jk+Yo/hYS5Hn9e9nqJaGFQkCWfwPk3VZEb
-         jpN38KqwPWpFluBWBaPwLuoATNzZJcQXlNLOHgXoDiTCJyma1geOPLRC7Ds+a/vbvKRK
-         kbjlWIA8sppPMp8ahiTGpbJCJj6DTdrlEE0/bwG14qLchrRXVOojGnauJ0TfSezMHSJQ
-         qOPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780602161; x=1781206961;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=czVnTl00M38M+CvcTn3IvYeN9aQCX6IoD9Yd91fGVis=;
-        b=BuDyubInpIVIyzxW6Y5z9RxxQvuPkz+V2g36h+MlmZRL6GO+1KOhAAObi0ZNV+byh7
-         Sl0MLP6aYPrhPhJ378mqHa98r0OroSoE7sAEUWqk2wKtIWx8pLoPoEc7YkntEDgs0xA0
-         9zAEmJOLzXP+UJUoQmWA3lF58X0/KUGIhHqke/92ShDOpEy/KOtGzBiByFMqc8u2rvTY
-         Vk0dMTp51rizKxXEKHaE1mNUON94IThO3SIy8sYYlENuc7LS8T9CU5lebBoBaWHu7fnQ
-         OVS04zJ7cbYrdrjobC9R1TmQgoMQMzjhxpKqCFJASZx4VkxMgT6+1nBJQOeySOJii3xt
-         xJWA==
-X-Gm-Message-State: AOJu0YwkkQyzYLHibEhk613eX2iY84B1dStj7z9pp7Gey/sEy6wnodPi
-	we8NUIQU6Pv0r66RU18luWBdBq+R5WQfJkfzyB7FGujS90HELG/duN2YDPPs6Q==
-X-Gm-Gg: Acq92OEc4yZxnkK2OXA/ui4uiVoC4h67GMtP7uVKpT/8pyLPb1odpW9dNPV6uUy1Cwj
-	qmSLaj9xOJId9izKjIN5tgFS3m+Kd9gvbd3X1wLieWuiOiF96zzcBWgTw2sMy28O94WclmhYnrb
-	gCFx7acwTgFqe7v5OVdcW4f0difQs/loejdEXzDfpPFeLHfeXgbkbmWRzbjnb4Ae+0yg6UgNm85
-	8jfXW2lfWtiHyjPXBsFcfSIyAPOVmYlB7qFGv75TEM7Ufk96ReJP/YYkupOuyMQqac6TII/IzQj
-	DnXXkIRJnpw/eWkRzHHHo9tPbbRIBHTc8NZnUHdMGRVQDEb89g0DM7mXcvOXXXxJeJK7K3BH9wa
-	3xkfkhwGLSE2evupJyZQX7820I7UWjqtbHIOREXl1+OwDrCilPFD1uRKk80Xe0IiIGkWQs1SFFL
-	y8TI5FsziK9CMTPEjB07PIXnZzLJoR5GJS9J1Z9by3sWbgnOizwKiJkuBWW6/lY0vggq7jtCWbF
-	irf27KBdwYLyrF0yNzavHYKmYQwgQkKpggOmp8Q
-X-Received: by 2002:a05:690e:169e:b0:660:54e4:5db5 with SMTP id 956f58d0204a3-66106fb3615mr238751d50.56.1780602161000;
-        Thu, 04 Jun 2026 12:42:41 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-660d5f883e2sm4360772d50.6.2026.06.04.12.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2026 12:42:40 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 3/3] selftests: drv-net: extend so_txtime with FQ with other clocks
-Date: Thu,  4 Jun 2026 15:41:05 -0400
-Message-ID: <20260604194221.3319080-4-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
-In-Reply-To: <20260604194221.3319080-1-willemdebruijn.kernel@gmail.com>
-References: <20260604194221.3319080-1-willemdebruijn.kernel@gmail.com>
+	s=arc-20240116; t=1780603536; c=relaxed/simple;
+	bh=GlLYHmEGMNg6oqH8rc6t2+bsB9VTXb2eEXcfBEe0O0s=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=P49Dd85mNF9Ce0h8bgC64dbDLKj84y0wOGNBvCzlWOcU5jSNIiCAXyb4kM6mlubLSzNrQH6dO3jFwL0LiBvZndQ3E272U1bs529+iZS4CJp7j+G7nF+970dHyDO2yxOZd8J7MJDUJOMilK3zifmf1ZS/z7J9o9tzwbONY7xWrsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=PijeqS4W; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B4BB1A01B4;
+	Thu,  4 Jun 2026 22:05:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1780603531; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=UW4gxJiL3cJlXD2vzkSBOSktwGvUlNbwdLTHRiCG9wk=;
+	b=PijeqS4WdXffaPaT7dXcQTCGhy3ODG4wTA2/6toMy9JWx81h/J/TU24B0fKoKsh2pfJ46p
+	w8s3FNeu15fwV4jZg5ApezPUv0qo++GqQcXSCxRCCsh8Q8I5w4IGY/vpT8p644fsf+JT+c
+	Wfjy4M6QYi/lGnihV7ILZ29FEbieZqArLlitSgTDWP9bNQtcu8Vtv4xMzybca54fm4E4yW
+	+4WVV2SXsNnBHCAIbG6eacqJXHIunVKXkpTJnbESYn9hglnFOi0kZvqHmEVpTLdAOWSpq2
+	jtoyVTveoarhwOZvPtoyuHgKlBJfo2lpxZtXI8yIC2ke1wFYXJbQTwflWbj7JQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Thu, 04 Jun 2026 22:05:29 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, justin.chen@broadcom.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, opendmb@gmail.com, florian.fainelli@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, vikas.gupta@broadcom.com,
+ rajashekar.hudumula@broadcom.com, bhargava.marreddy@broadcom.com,
+ fmancera@suse.de, markus@blochl.de, arnd@arndb.de,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: bcmgenet: convert RX path to page_pool
+In-Reply-To: <20260604173205.3989025-3-horms@kernel.org>
+References: <20260602094248.4130712-1-nb@tipi-net.de>
+ <20260604173205.3989025-3-horms@kernel.org>
+Message-ID: <e6694208872ec000c8db73dedd5931a2@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295412-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:willemb@google.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:justin.chen@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:vikas.gupta@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:bhargava.marreddy@broadcom.com,m:fmancera@suse.de,m:markus@blochl.de,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-295413-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,suse.de,blochl.de,arndb.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,vger.kernel.org:from_smtp,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:from_mime,tipi-net.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 12EFB643042
+X-Rspamd-Queue-Id: 01AE864318D
 
-From: Willem de Bruijn <willemb@google.com>
+Hi Simon
 
-Add a variant of the existing FQ tests, but pass CLOCK_TAI rather than
-the native CLOCK_MONOTONIC clock id.
+On 4.6.2026 19:32, Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
+> 
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ---
+> Now I have the exact diff. Let me produce the report.
+> 
+> commit ff8ce4b2334ded9490897cdd2cff5a25a4a0a438
+> Author: Nicolai Buchwitz <nb@tipi-net.de>
+> 
+> net: bcmgenet: convert RX path to page_pool
+> 
+> This patch converts the bcmgenet RX path from per-packet
+> __netdev_alloc_skb() + dma_map_single() to page_pool, builds SKBs from
+> pool pages via napi_build_skb() with skb_mark_for_recycle(), and 
+> removes
+> the now-unused priv->rx_buf_len field and rx_dma_failed soft MIB
+> counter.
+> 
+>> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c 
+>> b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 
-FQ used to imply monotonic. This is no longer the case, and the
-inverse need not hold either. Rename $PREFIX_mono to $PREFIX_fq.
+> [...]
 
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- .../testing/selftests/drivers/net/so_txtime.py | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+>> @@ -1153,7 +1159,6 @@ static const struct bcmgenet_stats 
+>> bcmgenet_gstrings_stats[] = {
+>>  			UMAC_RBUF_ERR_CNT_V1),
+>>  	STAT_GENET_MISC("mdf_err_cnt", mib.mdf_err_cnt, UMAC_MDF_ERR_CNT),
+>>  	STAT_GENET_SOFT_MIB("alloc_rx_buff_failed", 
+>> mib.alloc_rx_buff_failed),
+>> -	STAT_GENET_SOFT_MIB("rx_dma_failed", mib.rx_dma_failed),
+>>  	STAT_GENET_SOFT_MIB("tx_dma_failed", mib.tx_dma_failed),
+> 
+> [Medium]
+> The string "rx_dma_failed" exposed via ethtool -S is user-visible: 
+> monitoring
+> agents (collectd, telegraf, Prometheus exporters, ad-hoc scripts) may 
+> key off
+> that name, and the strings list is ordered, so removing one shifts the 
+> index
+> of every counter that follows for tools that index by offset rather 
+> than name.
+> 
+> Should the changelog mention this user-visible change explicitly, or 
+> could
+> the entry be retained reporting 0 to preserve the existing string set?
 
-diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
-index 5d4388bfc6dd..b7be4cabbec2 100755
---- a/tools/testing/selftests/drivers/net/so_txtime.py
-+++ b/tools/testing/selftests/drivers/net/so_txtime.py
-@@ -46,7 +46,7 @@ def _qdisc_setup(ifname, qdisc, optargs=""):
-     tc(f"qdisc replace dev {ifname} root {qdisc} {optargs}")
- 
- 
--def _test_variants_mono():
-+def _test_variants_fq():
-     for ipver in ["4", "6"]:
-         for testcase in [
-             ["no_delay", "a,-1", "a,-1"],
-@@ -59,13 +59,20 @@ def _test_variants_mono():
-             yield KsftNamedVariant(name, ipver, testcase[1], testcase[2])
- 
- 
--@ksft_variants(_test_variants_mono())
--def test_so_txtime_mono(cfg, ipver, args_tx, args_rx):
-+@ksft_variants(_test_variants_fq())
-+def test_so_txtime_fq_mono(cfg, ipver, args_tx, args_rx):
-     """Run all variants of monotonic (fq) tests."""
-     _qdisc_setup(cfg.ifname, "fq")
-     test_so_txtime(cfg, "mono", ipver, args_tx, args_rx, True)
- 
- 
-+@ksft_variants(_test_variants_fq())
-+def test_so_txtime_fq_tai(cfg, ipver, args_tx, args_rx):
-+    """Run all variants of fq tests, but pass CLOCK_TAI to test conversion."""
-+    _qdisc_setup(cfg.ifname, "fq")
-+    test_so_txtime(cfg, "tai", ipver, args_tx, args_rx, True)
-+
-+
- def _test_variants_etf():
-     for ipver in ["4", "6"]:
-         for testcase in [
-@@ -95,7 +102,10 @@ def test_so_txtime_etf(cfg, ipver, args_tx, args_rx, expect_fail):
- def main() -> None:
-     """Boilerplate ksft main."""
-     with NetDrvEpEnv(__file__) as cfg:
--        ksft_run([test_so_txtime_mono, test_so_txtime_etf], args=(cfg,))
-+        ksft_run(
-+            [test_so_txtime_fq_mono, test_so_txtime_fq_tai, test_so_txtime_etf],
-+            args=(cfg,),
-+        )
-     ksft_exit()
- 
- 
--- 
-2.54.0.1032.g2f8565e1d1-goog
+Nothing in the driver can increment rx_dma_failed after this patch. What 
+would be
+the point in keeping it static 0? AFAIU removing dead soft-MIB counters 
+in the same
+patch is not so special for page_pool conversions (e.g. ionic)?
 
+I will mention it in the commit message of v2 though.
+
+> 
+> Worth noting that the sibling driver 
+> drivers/net/ethernet/broadcom/bcmsysport.c
+> still exposes rx_dma_failed, so the two drivers in the same Broadcom 
+> directory
+> will diverge after this patch.
+
+bcmsysport still does per-packet dma_map_single() and not PP. The two 
+drivers
+diverge because they do different things now, not because removing the 
+counter
+here is wrong?
+
+> [...]
+
+> [High]
+> Has a one-page-per-RX-descriptor scheme been considered against the
+> platforms bcmgenet actually runs on?
+> 
+> The pool is created with order=0 and max_len=RX_BUF_LENGTH (2048):
+> 
+> 	struct page_pool_params pp_params = {
+> 		.order = 0,
+> 		...
+> 		.max_len = RX_BUF_LENGTH,
+> 	};
+> 
+> bcmgenet_rx_refill() always sets cb->rx_page_offset = 0, and
+> bcmgenet_desc_rx() then does:
+> 
+> 	skb = napi_build_skb(hard_start, PAGE_SIZE - rx_off);
+> 
+> so each ~1.5KB frame ends up with skb->truesize == PAGE_SIZE.
+> 
+> bcmgenet runs on BCM2711/2712 (Raspberry Pi 4/5) and Brahma-B53 STB 
+> SoCs,
+> which are commonly built with 16K or 64K page sizes. With ring->size of
+
+Pi5 uses BCM2712, but doesn't expose the genet and instead uses cadence 
+macb
+on it's RP1. AFAIK only pi5 uses 16k pages and Pi4 and other STB 
+platforms
+use 4k pages? With 4k we would end up at 1 MB per ring, which seems fine 
+for
+a GBit MAC?
+
+> 256 and one full page per descriptor, that is e.g. 256 * 64K = 16MB of
+> DMA-mapped memory per ring on a 64K-page kernel, for ~512KB of frame
+> data. Every ~1.5KB packet also bills PAGE_SIZE bytes against sk_rcvbuf
+> and per-socket memory accounting, which can drive TCP receivers into
+> memory pressure on a Gigabit MAC.
+> 
+> The newly added struct enet_cb::rx_page_offset is set but never to a
+> non-zero value:
+> 
+> 	cb->rx_page = page;
+> 	cb->rx_page_offset = 0;
+> 
+> Was a fragmented allocation (page_pool_dev_alloc_frag(), or a higher
+> .order) the original intent here? If so, would it make sense to either
+> implement that in this patch, or drop the unused rx_page_offset field
+> until it is needed?
+
+Frag allocation is a reasonable follow-up but I'd keep this patch
+focused on the page_pool conversion. rx_page_offset is an artifact from
+the original XDP series. It is meant for the later XDP_PACKET_HEADROOM, 
+but
+I can drop it in v2 for now.
+
+> 
+>> @@ -2340,25 +2321,31 @@ static unsigned int bcmgenet_desc_rx(struct 
+>> bcmgenet_rx_ring *ring,
+> 
+> [ ... ]
+> 
+>> -		if (unlikely(len > RX_BUF_LENGTH)) {
+>> -			netif_err(priv, rx_status, dev, "oversized packet\n");
+>> +		/* Reject obviously bogus lengths to keep the SKB build path
+>> +		 * safe against runt frames.
+>> +		 */
+>> +		min_len = GENET_RSB_PAD + ETH_ZLEN +
+>> +			  (priv->crc_fwd_en ? ETH_FCS_LEN : 0);
+>> +		if (unlikely(len > RX_BUF_LENGTH || len < min_len)) {
+>> +			netif_err(priv, rx_status, dev,
+>> +				  "invalid packet length %d\n", len);
+>>  			BCMGENET_STATS64_INC(stats, length_errors);
+>> -			dev_kfree_skb_any(skb);
+>> +			page_pool_put_full_page(ring->page_pool, rx_page,
+>> +						true);
+>>  			goto next;
+>>  		}
+> 
+> [Low, Low]
+> This combined check changes the per-counter attribution for short 
+> frames.
+> Previously, only len > RX_BUF_LENGTH short-circuited into 
+> length_errors;
+> runts that also had DMA_RX_CRC_ERROR / DMA_RX_OV / DMA_RX_NO / 
+> DMA_RX_LG /
+> DMA_RX_RXER set would fall through to the dma_flag-driven block and be
+> counted as crc_errors / over_errors / frame_errors / errors as 
+> appropriate.
+> 
+> After this patch any sub-min_len frame is bucketed only as 
+> length_errors,
+> even if dma_flag indicates a CRC or RXER condition. Is the loss of 
+> finer
+> attribution intentional, and could the changelog mention it?
+> 
+> A related question on the lower bound itself: min_len is computed as
+> GENET_RSB_PAD + ETH_ZLEN (+ ETH_FCS_LEN if crc_fwd_en), so any 
+> HW-reported
+> frame below ETH_ZLEN on the wire is dropped. Frames below the minimum
+> that the MAC nevertheless delivers (for example with promiscuous mode 
+> or
+> runt-pass enabled, or some PHY-side debug captures) used to reach the
+> stack with DMA_RX_LG / DMA_RX_NO flagging.
+> 
+> The commit message describes this as "a runt cannot underflow the SKB
+> build path". The actual underflow precondition for the skb_reserve() /
+> __skb_put() sequence is len < GENET_RSB_PAD (= 66):
+> 
+> 		skb_reserve(skb, GENET_RSB_PAD);
+> 		__skb_put(skb, len - GENET_RSB_PAD);
+> 
+> Would a tighter check of len < GENET_RSB_PAD satisfy the stated safety
+> goal without filtering legitimate sub-ETH_ZLEN frames the HW chose to
+> deliver?
+
+Resonable. Will use len < GENET_RSB_PAD in v2.
+
+Thanks,
+Nicolai
 
