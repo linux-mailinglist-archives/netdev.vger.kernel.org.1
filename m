@@ -1,171 +1,154 @@
-Return-Path: <netdev+bounces-295166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295167-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id q2dQJglTIWrjDQEAu9opvQ
-	(envelope-from <netdev+bounces-295166-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:27:21 +0200
+	id /3uUM1tTIWomDgEAu9opvQ
+	(envelope-from <netdev+bounces-295167-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:28:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF87163F016
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:27:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C87A63F046
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:28:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=DNCS45tC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295166-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295166-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=q5mpUZ8e;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295167-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295167-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8E8D3019BA9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 10:21:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FD0C3091F0F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 10:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6807B3563EB;
-	Thu,  4 Jun 2026 10:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCCF3815CE;
+	Thu,  4 Jun 2026 10:22:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11F4342C98
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 10:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAFF373C0E
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 10:22:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780568481; cv=none; b=LV9OkrGYOCpEZho0T5N0T3mrmXMezu3ZcZZl/BLQQ2yCPQc16f8+JKrLDsgOFEda9krzzSZ/Y4Nv4CMEkHRHYo/MA0pk2r0atXOZZ89l8RFxjnpmNzADDl6XVvITpAoHbtV1NkL0nIfQEp6B9cyRWae7SVgSzCLOdngssSagB2A=
+	t=1780568572; cv=none; b=ECrD7iedLzivHofSErgeL5KWAE5m1k6sP7fi830T0xVYXIQcCZDHtPwd73OcolTmdMo7n0Q5OJuj8WqSRm+9hEhdnKaGEcObIYeIKcNG3HtXRDfDL0/lpCdOWDhlOMX8BnfB0ssXDWhbaXsgmJREceHJgR6awxTCA2PjrYg7ul4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780568481; c=relaxed/simple;
-	bh=j22bdv9oPvFnjlSd+/YWy+aZ8pdIVUE4JTKplAf6Lg8=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=LGif24VztHGRibZnYecfoxZRNtP1q9HRnC92i1q3bVl7smwkYD/SZ0rLVA+Wa4GZ8oJoiF1HQ+5SKiIEG997XO5rQFwgpD3zqhlLGsdPyDYcCWG7qUiHC99ealO6OBkAM6JDV2bca16XWzdAM+VS6ikvE6DiAEJEmIy27hwJr2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=DNCS45tC; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BD42AA4C55;
-	Thu,  4 Jun 2026 12:21:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1780568477; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=eXdVtjcOydMZf6JHfGJ2qYRXGk9C4bzSq34+tbFiQOo=;
-	b=DNCS45tC1g/hdn2LEdDuSLmFoTECMMqjQCXssdm2wbAYK/RkLBJRNNxJ+fGSF8ux57NRXV
-	0U4M7wX5yemBoeXemxMvOUzF9cyDe4CwYJ9qh8O+ffCPFwJjZflbUj6Ml0N7pNlf8rUT2f
-	NCegmc1lEb1YE4beocYUQltMREhsvEdwf8TRMxhwdXRROZDETyVv0msec5XNtlN0GOnVc8
-	oJ438HfGi1eF5mFW+q+LINFnj9hPj4z4u5kYn6Y7Ye6NPJ9mg2DDyVq5GkJ1W6eonNCBHo
-	50MdU5AMW7bYzNFXatyHZR2dzXv0HSH0kBdPGRoL165cu+irZJd3+1Ruh+YEKw==
+	s=arc-20240116; t=1780568572; c=relaxed/simple;
+	bh=cACz35Uc2+a6MPuu6gpXvq4GoXJj99xU4zRRb8Ib+CI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Ls2Ca1U5yGBkNLg6H7mprMY32NMuWVM1clPLjnTY5/N8ImlRxRTCEVVvGnmYeah8UEzG4qVb5nrrSAnOnNqrThQQW8rW2W+SLBaaVhjC4Jg+CJ7x+9S+etlAYjEFuT0Um+xS3JuE/wGrCWhNb3WE2clLHdLpXwXKMFmQg9ue39Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=q5mpUZ8e; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 5D3B14E405AC;
+	Thu,  4 Jun 2026 10:22:48 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1AE445FEF7;
+	Thu,  4 Jun 2026 10:22:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A1C13106A18E4;
+	Thu,  4 Jun 2026 12:22:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780568567; h=from:subject:date:message-id:to:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=kcL0ulMNPC0gnHlGvkBUUzYgmWFlYbvTgn3AllNsYeI=;
+	b=q5mpUZ8evVG0PqKkVaAUYt+QerlJ4hm4cJk+tj9GzqGXqkuBakctwV+wt1DlQI51n3Ocqv
+	CO6d0W92xJVGWpxLOhFOfQzdr0fsXQSppCtzmIK7cLdnFLCbXw+a+8ePl1ptwPEd67UTOq
+	T0tCBaHUievmhAB5AZ0NOI8fgj+L7jd5SeiXzkdG3df5xz16X5/KLBZvTkslhngYHkZG0N
+	T1Jxy2hpzLK1Vc/qOh3pHoHCJhQwlBMHEd20F7D6lLSj5aR24FjHxkdfN8UfIsfztt71qz
+	pm43YJdEFMzX2GdVUrYEC6DpxpHnqEKxd6sq1zCm/6kZ/XPfbaCHhN505S+eUA==
+Message-ID: <993cc534-63a6-4cc9-a54b-efc78acdb38b@bootlin.com>
+Date: Thu, 4 Jun 2026 12:22:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 04 Jun 2026 12:21:16 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com
-Subject: Re: [PATCH net-next] tools: ynl: try to avoid the very slow YAML
- loader
-In-Reply-To: <3ca7d6b6-1aeb-4e7b-9263-64f4b427d1ef@intel.com>
-References: <20260603210810.2636193-1-kuba@kernel.org>
- <508a922f-c8e4-4b31-8670-43d44d45f467@intel.com>
- <20260603163518.7bde747a@kernel.org>
- <3ca7d6b6-1aeb-4e7b-9263-64f4b427d1ef@intel.com>
-Message-ID: <191ecbc0a4f9b51b9ead8ba559d6a170@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/3] net: phy: as21xxx: force C45 OPs for AUTONEG
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260601105342.28865-1-ansuelsmth@gmail.com>
+ <20260601105342.28865-3-ansuelsmth@gmail.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260601105342.28865-3-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295166-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295167-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[tipi-net.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jacob.e.keller@intel.com,m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:donald.hunter@gmail.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EF87163F016
+X-Rspamd-Queue-Id: 2C87A63F046
 
-On 4.6.2026 02:17, Jacob Keller wrote:
-> On 6/3/2026 4:35 PM, Jakub Kicinski wrote:
->> On Wed, 3 Jun 2026 15:08:46 -0700 Jacob Keller wrote:
->>> Hmm. I was a bit confused at first by the switch from safe_load to
->>> load.. but we're passing Loader as _yaml_loader which will either be
->>> CSafeLoader *or* the default SafeLoader, so we'll get the appropriate
->>> loader equivalent to what safe_load would have done, so there's no
->>> change. Ok
->> 
->> Maybe I should have mentioned this in the commit msg. I was also super
->> confused by these APIs but IDK how much is this me not knowing Python
->> and how much it's special. AFAIU basically:
->> 
-> 
-> This is a pyyaml issue not a generic python one I think.
-> 
->> somewhere in pyyaml...
->> 
->> 	def safe_load(file):
->> 		return load(file, Loader=SafeLoader)
->> 
->> so safe_load() is just a "shorthand" for using SafeLoader, which 
->> unlike
->> load()s default loader doesn't allow constructing real/binary Python
->> objects ?
-> 
-> load() by default uses the generic Loader that supports the full spec
-> and because of that is "unsafe":
-> 
-> https://github.com/yaml/pyyaml/wiki/PyYAML-yaml.load(input)-Deprecation
-> 
-> Basically, loading the full YAML spec on untrusted input is unsafe 
-> since
-> it allows arbitrary execution.
->> 
->> Why it doesn't default to the C one is beyond my understanding.
-> 
-> Right. I'm not super familiar here as to how it ends up not defaulting
-> to CSafeLoader, but probably its because its not always available.
 
-That's correct. CSafeLoader is only available if libyaml-dev was present 
-when
-pyyaml was built. Auto-enabling the libyaml bindings was requested a few 
-years
-ago, but it stalled due to internals [1]. It would also require 
-reworking
-safe_load() and others, which are atm hardcoded. Hence the usual 
-try/except
-import pattern.
 
-Anyway, the changes match the usual patterns.
+On 6/1/26 12:53, Christian Marangi wrote:
+> With further testing with 2.5G NIC, it was discovered that the PHY
+> require the C45 OPs to configure and restart ANEG or speed higher than
+> 1G doesn't function correctly.
+> 
+> To force C45 OPs with generic PHY function, clear the C22 bit from
+> devices_in_package bitmask.
+> 
+> Fixes: 830877d89edc ("net: phy: Add support for Aeonsemi AS21xxx PHYs")
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-[1] https://github.com/yaml/pyyaml/issues/437
+Maxime
 
-Regards
-Nicolai
+> ---
+>  drivers/net/phy/as21xxx.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/net/phy/as21xxx.c b/drivers/net/phy/as21xxx.c
+> index 97ca37c6929f..a6686b4908c6 100644
+> --- a/drivers/net/phy/as21xxx.c
+> +++ b/drivers/net/phy/as21xxx.c
+> @@ -616,6 +616,13 @@ static int as21xxx_probe(struct phy_device *phydev)
+>  	if (ret)
+>  		return ret;
+>  
+> +	/* Even if PHY declare support for Clause 22 register,
+> +	 * Clause 45 register should be used for ANEG configuration
+> +	 * and restart. Clear the C22 bit for devices_in_package to
+> +	 * force C45 generic OPs in generic PHY ANGE OPs.
+> +	 */
+> +	phydev->c45_ids.devices_in_package &= ~BIT(0);
+> +
+>  	ret = aeon_ipc_sync_parity(phydev, priv);
+>  	if (ret)
+>  		return ret;
 
 
