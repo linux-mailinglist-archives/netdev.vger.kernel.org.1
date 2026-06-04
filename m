@@ -1,193 +1,215 @@
-Return-Path: <netdev+bounces-295181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8uM2IzpYIWrHEQEAu9opvQ
-	(envelope-from <netdev+bounces-295181-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:49:30 +0200
+	id rGv+L/ZYIWqQEgEAu9opvQ
+	(envelope-from <netdev+bounces-295182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:52:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10AD63F314
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 139BA63F36B
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 12:52:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=IWXxxFUM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295181-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295181-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=VMiqhIP7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295182-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295182-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2D7330247FB
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 10:48:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C7845301F4B0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 10:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290FA2D8DC2;
-	Thu,  4 Jun 2026 10:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F3D405C42;
+	Thu,  4 Jun 2026 10:50:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011063.outbound.protection.outlook.com [52.101.52.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A8025228D;
-	Thu,  4 Jun 2026 10:48:46 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780570127; cv=none; b=OFmQlB1H2N4GylFB9Ieq/gaALKrhgOSWNdOmJvhThiM6bKA6rxUQGGA+cRbp34no2nOSUDYZAxvOhcWyPSBW7WpTysgNK+ef+c2JlSZkRUwN8RI5uEdkrcMtBE5pzmhxvkIfluErmYQgc06IKO7uZpMp/rQA+1dom+y36aMmeok=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780570127; c=relaxed/simple;
-	bh=NhjpSV8kbwwztydJJsEocMCjGECxphNrWHWb/NbWx9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ch6iOKKVy2+6lf3IUP16rPe5H0syzmcXPpL+/h+F0Fqu28poOtxCxApgI2LRchL4NYJBTB9piDiVsXgUMD9azAgBiD5qP+Y9K7KfdqWsZFYKDqnnwXC23uaSzOrRjYtDQ2ZFq0n0LZlQ+L6cSxxNPYGpdNva9H/i2IUM/9f/Do0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWXxxFUM; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E97C1F00893;
-	Thu,  4 Jun 2026 10:48:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780570125;
-	bh=utFnp8XY1auOWu4UYvkAONYE8LSpdtHRf3hdQz1NicY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IWXxxFUMOZQVqLMQJ4XMGLOBO/v2xfF5PzFfTzhPms9ZxrMaDQMTw0TUUiyv8dz3C
-	 4Q2Tp0xZT5GypW7hsULy8VUsL85QLUPYn1d6L6DYJt48YE5Ueam1AHAJal2LLwj6nY
-	 UkOw1zQeqkUHGAaWqm3fZdlDP68NumeiiGMWcaxbHEOXeuMl3VxWT59GvSoLHiKhH4
-	 WXHi0oVj2X8KFMYSDEsx1iw7VJ/zhn0LjSuHeMdMbWj+azjEENYtwpLGLgPcEJT/ly
-	 CbOovmDU4qPuakhPDhrxuvfLJyFrgerbUKwHGZz6MD/0E1vuo9c/idNXHoLJG6pM3o
-	 6QBvKf6lYUomA==
-From: Simon Horman <horms@kernel.org>
-To: lucien.xin@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-sctp@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	marcelo.leitner@gmail.com,
-	bgeffon@google.com
-Subject: Re: [PATCH net] sctp: validate cached peer INIT chunk length in COOKIE_ECHO processing
-Date: Thu,  4 Jun 2026 11:47:14 +0100
-Message-ID: <20260604104712.3904260-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <eb60825fa22d6f9e663c7d4dbb69f397b5d34d42.1780362366.git.lucien.xin@gmail.com>
-References: <eb60825fa22d6f9e663c7d4dbb69f397b5d34d42.1780362366.git.lucien.xin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AB93DD509
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 10:50:44 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780570245; cv=fail; b=pmUZ5E3gL6KxhZwX73kG19m2mrFRULkBF3v4BYa1nRo+FmMut9RGygBgN3z8GJgH/aAhZLM6GFg63HjjKKn620uc0+qdMtCUSk16JvBCfSrO+zNM0OT2YS/xKTjtUap3CKu9l/MYbG4F9nhnxPRxMITzmAEGfDK5W9UCnHVQdHM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780570245; c=relaxed/simple;
+	bh=T2Z1Zfb33Ot+m6Gh2/18dDKI3XYoNTBQC0cCbNQ9imM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=G351PLUsi1XvQfX+/6bOmYqvu782TT+RzBZuMXpIenpgDUS7nuJJme9QAO/At0xVe5YTj7/JYb/EnzTAILcOmEcV7CGFOQHNiTBeFIAUrouUGc62hRoGhbFicOb54Ty5E/FfpXzPcMwNm+9ydkNriEdgF7z4nOFQjTYZp4Lh/kg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VMiqhIP7; arc=fail smtp.client-ip=52.101.52.63
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BUeCEyGdXQNY72heSUrmjbj/VnCsZlsyR1ofw8+XImFZi5R3iY8V2U5cHp0BNVudYRHumS0jhIBufBmhZfDtHYx97h7FtfmXmNfmgs2vZjZiy9mSvHRXr2ym/hhqZZOHaC3jcnrpo5rbN11vP6Zbdzhhkl23dNFWNUyfelBFflzLpVbjLf6pEIyembpUTqwmRcWc4RnTyvX+/zs7hg2LndUjYQfVpGX/KDxJ2/62i3aN1kynFZ3G9/PgAbaNZmFwwIwfkTB2GSJQIsaVVQ66PKfG5pZaB6QioJ5Ne6ylLSe9KQwScwkMu+8NRO6LfX+OMMjfUL4lgbR1U0wC7s6jig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SX5ZyvPQUBMLcmUM/foEpyBgpabOzsf/5r+PeBytiuE=;
+ b=NaGB+aH/CtDaaS9tjada1UjiGsc4GaNWzGObi2YSFmp41lAZeJMZWHCYDXjqV9m8TQtF+qMHfBMIkiPosQoHez0umCD7IkqUixNFSsaYeilSPCvS6v1PDxV744+Wy2lm+AFCpsFg+2TRm0zJOWcUY4I0eiuJ0tq0suXS/N90dl5rLhmhK9gHQ3kCmHoSWFn+q1AWdyoPeexr8/SKEpaUoxdEL7NAQ+3DdHaBRoZdIouKecg9ADVurR7Zlt9Nc1omzLe4Qj9jQK0G/Axs0jnLkQ5x+LqqH6IK03D90lknOqVrwiqeV0qttSLLdEd8JQsND9hMAVeyAyl4Ya0S6grxvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SX5ZyvPQUBMLcmUM/foEpyBgpabOzsf/5r+PeBytiuE=;
+ b=VMiqhIP7Hqf3iDpAr1W1G2+KNhW03BoGEZw5MQINH9/iU02g6m3kMn5OqXl5nmPGUt+NzSjDDen6nqb7LysK1uH6brLmVgN0+D6XPYjN2Be52R6EZ7+rW0fMhCSbgHAoYHycMzpYdZYdIiyZVibqH6EoQipkn6yKROdTsM//S0/fTDvtF8yqtm7sAdkjQfqdW23WWbHjf5bIkKS8MY6a8YIOJVfbkq3gBLpPgd/fkPBD7zpjD7yAxN2MIzATVAqj6IWfTv+XtnCbX519UBk0Wf5oeJ/dGqwks19pn3r+iYOVER6p/Pb4Yc0CBZhbfhESs53rPHOrHAgmEjS+fB7ZKA==
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by IA1PR12MB6041.namprd12.prod.outlook.com (2603:10b6:208:3d7::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Thu, 4 Jun 2026
+ 10:50:40 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0092.007; Thu, 4 Jun 2026
+ 10:50:40 +0000
+Date: Thu, 4 Jun 2026 13:50:30 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next 06/11] bridge: provide lockless access to
+ p->designated_cost
+Message-ID: <20260604105030.GA775294@shredder>
+References: <20260603062043.3911278-1-edumazet@google.com>
+ <20260603062043.3911278-7-edumazet@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260603062043.3911278-7-edumazet@google.com>
+X-ClientProxiedBy: FR2P281CA0136.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9e::18) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|IA1PR12MB6041:EE_
+X-MS-Office365-Filtering-Correlation-Id: 497a55c2-a004-41dc-822c-08dec2271e86
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|22082099003|56012099006|4143699003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	Zh4R8Keh1wbgGgAXdjG7W1ttyGX8C8GoBhzYUIUFCjgNxN52QRe8YgRiwWsUTbbraDMma4PhdSo7oTU+54+rmj6gYTO38iKlc6VDmUKFgZOdlZEdQDiUBe8Fqpj1eMq3iZd9LPQ7cvAfLim5wq0Oasmq4bh6zi1c/7digxue3dBAL4Owg+VEhz/dO3AyNe5+rV8SPlr1Vi1oqL6pRsXUi1vgHysayy7N8AIoSiUwni+59MGFppjPx4EbHQza7PdGQ81hRlx602EwKNDuZIRANaVgtxNOeik1Agx8CpYd8hitl3H/R9tEfCKVx4WgqRUQ+cfGGkxozVYYmMtB709S9Gw/HBKRuCdvy3zBkmpa6c/eHss2FIYjrVmsYq0VB4H0LgJe5fogU3xHPWYLdbcgNiD0j6UE6gF0sRl3sNohiOPFUCTjLSOxvD1iKVts0De3y1/8TQU0SAqCwdJOslv4fUNAMVGj3cqdt3rHE5qmnfUcCYg1f5BUf6ztAMTzo/44GUD6EaetyeicV6gz1kyNP8xCRxpKPk5q0wGOwg/rDdIxMl8SgWbusqZ94TAJnQl6g73bppfAEP3XVw+RYucgQRblvBQcBiTrMp5A3puJ+FtloP6ChSd1QpAoxSV9qyaf4SMF7XPnpacVbL/3ZLOS240aHn1C3i90B/ZA+RG1r5VWqJA3VGbOrXxl27iLQjpN
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(22082099003)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qF4uil+y61AsXPpr9u93tFnBR6rxKDDpetLK3K9VFllLYjgI2iYCUwf+HkZO?=
+ =?us-ascii?Q?g2DHjrfPf6EEuRtxUMUT2MlPGMcIzpoS2x5SGp4arrJjuJ1NmIxiGMTfpLX0?=
+ =?us-ascii?Q?tIiorwuz6sfLmSvCnyKCo1kfGiNL3PJU049NdXS789sKMRl8xsIUNBuIfeQj?=
+ =?us-ascii?Q?V80uFUxgzcbKsU0i7X6avDXsKa/D3+CYq48MC9VwXWWxjfrQBndAFkOsecPm?=
+ =?us-ascii?Q?usSCwCOJ4dQzD5wkqk4YeDwflgrgJxr7jG3Rh1jqkhmsfTRoCwq2CIyT8IlS?=
+ =?us-ascii?Q?Dp4CquYtfOJ3333RpSkekFUDA4aCqg3sMNOwHMAItxKZV9Tx6eq5YOVoJJix?=
+ =?us-ascii?Q?WSmEZb5VhhqhvJ5JxUbFZS5o7w1U0oac60nLivqewOLbqBEXjipQ2FGwu3o4?=
+ =?us-ascii?Q?/oW4m40TOaP/0fCKL3/eXivKZCh6xbifxo4xmb5Jr5CyGKvANJGg+qKWoOau?=
+ =?us-ascii?Q?V0jqUQcJneAuBUUmV+ZuYzZxOGQAYClTk90IU2jvtOoJ8+y7exyYqjSUc+Nd?=
+ =?us-ascii?Q?g1PHi1u2a9fvAxTksB++kvl0CBshUPEn1zY+Neh3W1j8sbDyO5K7MpOo/gyL?=
+ =?us-ascii?Q?e/GLJ9TJ7qdCk4I3iCWwXK4LJ8PeizQ6bNCeZsHGoXvG1dIMcXmUioXIxh13?=
+ =?us-ascii?Q?PDWwQe/L1VQ5hwhEn4kkTCbixHx2WqaJNC2F6xmopjY0+WI9vGl8VDrVvNTf?=
+ =?us-ascii?Q?u/nGeW0heMGKYrkPkZzCwk0N1QGiwxU72vFh6B/9H9DUFcq+4kRF/6qcMlJC?=
+ =?us-ascii?Q?oeMyqBB27CEykIY2pfytEvg8/ZbPPrR763SD8SReyJaN72EIqwfbYt4CyRoF?=
+ =?us-ascii?Q?YlshTLY49g0Fjr1or6YuNB+YQ373XaHNAVTT9jXZutpoiDJNSapLhXJvYfVl?=
+ =?us-ascii?Q?iWi92RfsXB1qQgZTU9gk5FJgD+Y8/rKNNv+WxpZyjojNs2Le+xkHbg51KaCl?=
+ =?us-ascii?Q?72IXOuBFyWdLugtNqdYacT1FOuthVEoYxOkDNTo77z4G4I367ao9Z6bOfCX6?=
+ =?us-ascii?Q?MWZnR1SF46wisjykcvSrMJGA0637A3mJrQGOt3adGX1dP1bPXP+qSfTqRQDI?=
+ =?us-ascii?Q?jkQULLUBKUv4KqgZkQva+DpnENZNK1Zh/4LI4QK1HAvlZefyAigeAKDKAgby?=
+ =?us-ascii?Q?jDYGXB8UsDw4gT+qxiJAJdKGjd5ew213Qa2vFsT89pJB7vbHkQNpl1dSpZrz?=
+ =?us-ascii?Q?rU1KkwAubjqfj8jpoxOHs7kLTj7l0JpqRd+hPVe/UBQ70upetoikJVlHT/77?=
+ =?us-ascii?Q?YTOcdYp6xvxyT/vVXFtf1gZ4T0tinI1opvdAl6LdrYLy1k26yKRJrPyWVq/U?=
+ =?us-ascii?Q?STXom4htPODn7ZxTkRSDA/m+7QnkuqjPNK7AQ7Y9dBRTEnIz1WW1s5yDMnQU?=
+ =?us-ascii?Q?l2/LZxMo/h9JZJ+b0DPHHsRursMbIrSs0hoK94+yb/IfkkxHis7orHSA4oAy?=
+ =?us-ascii?Q?SW9CL7/LImyXxiZ9lHVILw/N4rlEopDRZkOics/OvwVeZIc8h+/vw+oQa+zD?=
+ =?us-ascii?Q?vPQTG7ZsxL4hrH0uAVOJ/jYyIMWy04uVH6nveo209WM5U4A1ROqnTl14UepI?=
+ =?us-ascii?Q?o72LL+gdevQ7uFANCKSCxAf/NdQmf/TcEg6RHP1JYvWDv4RG+YzR9mqRjkhD?=
+ =?us-ascii?Q?UUElRjUmqT3QHy6AKo/NnnI7xhgxt1KPuPCVAJtNYBozE5OzhFfqGaIw+BqS?=
+ =?us-ascii?Q?rDuBQ/Q0KtZtvKoSKF1NfXnP4l6brbbS6qSkLCNS8Q/R/TDT5RhE5jwnlYN1?=
+ =?us-ascii?Q?BpJBcDWOpg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 497a55c2-a004-41dc-822c-08dec2271e86
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2026 10:50:40.6723
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R5LaZq8ciPTIGvl6hyvMcuIOxW8LJVyfSnzKzy69mis4Ve7iRtGGk9yRI9Z+RIOz+GRNQq9gWuUlw0d4s3eEBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6041
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295181-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:marcelo.leitner@gmail.com,m:bgeffon@google.com,m:lucienxin@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-295182-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,blackwall.org,vger.kernel.org,gmail.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F10AD63F314
+X-Rspamd-Queue-Id: 139BA63F36B
 
-From: 'Simon Horman' <horms@kernel.org>
-
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-sctp: validate cached peer INIT chunk length in COOKIE_ECHO processing
-
-This commit adds a bounds check to ensure the cached peer INIT chunk
-length does not exceed the available data in the COOKIE_ECHO buffer
-during unpacking.
-
-Simon says:
-
-Hi Xin,
-
-Although the issues flagged below are flagged as pre-existing I am
-wondering if they directly impact the effectiveness of this patch.
-Could you take a look?
-
-> diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
-> index de86ac088289e..85264862fb6b6 100644
-> --- a/net/sctp/sm_make_chunk.c
-> +++ b/net/sctp/sm_make_chunk.c
-
-[ ... ]
-
-> @@ -1759,6 +1760,10 @@ struct sctp_association *sctp_unpack_cookie(
->  	cookie = chunk->subh.cookie_hdr;
->  	bear_cookie = &cookie->c;
+On Wed, Jun 03, 2026 at 06:20:38AM +0000, Eric Dumazet wrote:
+> @@ -302,9 +304,10 @@ static int br_should_become_designated_port(const struct net_bridge_port *p)
+>  	if (memcmp(&p->designated_root, &br->designated_root, 8))
+>  		return 1;
 >  
-> +	ch = (struct sctp_chunkhdr *)(bear_cookie + 1);
-> +	if (ntohs(ch->length) > len - fixed_size)
-> +		goto malformed;
-> +
+> -	if (br->root_path_cost < p->designated_cost)
+> +	t = br->root_path_cost - READ_ONCE(p->designated_cost);
+> +	if (t < 0)
+>  		return 1;
+> -	else if (br->root_path_cost > p->designated_cost)
+> +	else if (t > 0)
+>  		return 0;
 
-[Severity: High]
-This isn't a bug introduced by this patch, but does this check also
-need to ensure the length is at least the size of the INIT header?
+Eric, I think you meant:
 
-If ch->length is small, for example 4 bytes for just the chunk header,
-this check passes. However, sctp_process_init() appears to unconditionally
-read the init_hdr fields:
+p_designated_cost = READ_ONCE(p->designated_cost);
 
-net/sctp/sm_make_chunk.c:sctp_process_init() {
-    ...
-    asoc->peer.i.init_tag = ntohl(peer_init->init_hdr.init_tag);
-    asoc->peer.i.a_rwnd = ntohl(peer_init->init_hdr.a_rwnd);
-    ...
-}
+if (br->root_path_cost < p_designated_cost)
+	return 1;
+else if (br->root_path_cost > p_designated_cost)
+	return 0;
 
-Could an attacker send a COOKIE_ECHO chunk with an embedded INIT chunk
-truncated to 4 bytes and trigger an out-of-bounds read past the SKB payload?
+?
 
-[Severity: High]
-This is a pre-existing issue, but is cookie->raw_addr_list_len properly
-validated against the remaining payload length before use?
+>  
+>  	t = memcmp(&br->bridge_id, &p->designated_bridge, 8);
+> @@ -344,9 +347,10 @@ static int br_supersedes_port_info(const struct net_bridge_port *p,
+>  	else if (t > 0)
+>  		return 0;
+>  
+> -	if (bpdu->root_path_cost < p->designated_cost)
+> +	t = bpdu->root_path_cost < READ_ONCE(p->designated_cost);
+> +	if (t < 0)
+>  		return 1;
+> -	else if (bpdu->root_path_cost > p->designated_cost)
+> +	else if (t > 0)
+>  		return 0;
 
-If SCTP cookie authentication is disabled, an unvalidated
-raw_addr_list_len could lead to out-of-bounds reads when
-sctp_assoc_set_bind_addr_from_cookie() calls sctp_raw_to_bind_addrs()
-to parse the bind addresses:
-
-net/sctp/bind_addr.c:sctp_raw_to_bind_addrs() {
-    ...
-    while (addrs_len >= sizeof(struct sctp_paramhdr)) {
-        param = (struct sctp_paramhdr *)raw_addr_list;
-        len = ntohs(param->length);
-        addrs_len -= len;
-        raw_addr_list += len;
-    }
-    ...
-}
-
-If the unvalidated addrs_len is artificially large, or if a supplied
-param->length is larger than addrs_len causing an integer underflow on
-addrs_len -= len, could this bypass the loop condition, read into unmapped
-pages, and cause a panic?
-
->  	/* Verify the cookie's MAC, if cookie authentication is enabled. */
->  	if (sctp_sk(ep->base.sk)->cookie_auth_enable) {
->  		u8 mac[SHA256_DIGEST_SIZE];
+Similarly here?
 
