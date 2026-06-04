@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-295235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2cz+Kfx3IWoLHAEAu9opvQ
-	(envelope-from <netdev+bounces-295235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:05:00 +0200
+	id Uz16EGd2IWqJGwEAu9opvQ
+	(envelope-from <netdev+bounces-295236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:58:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32DC6402B4
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:04:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF84B6401C6
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 14:58:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=ksLpH5NC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295235-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295235-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b="R8/MNnUd";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295236-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295236-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB7B23025D24
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 12:57:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0563E301AFCA
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 12:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D4447D947;
-	Thu,  4 Jun 2026 12:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACEC47B429;
+	Thu,  4 Jun 2026 12:58:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94935290DBB
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 12:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86F7421F10
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 12:58:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780577874; cv=none; b=ULMa63YV6c+JyUChhgK/fsgudgsmLnRuTVQq85lDY3emEzLb4dRJsWQFS6ZYOJmyvYiFXMm81Di/2oZ0Mjtkf1mr798wh6y5Bwc999ebSjnRhBYgpDW0/Jm/ZIYPieAOccpl9xBB/rZWkUzqAw/JIv1OtkMVf23hu3pfDaYrIRU=
+	t=1780577885; cv=none; b=Poq3Vj8MCxjrourgJRcF0diCX9sp+9PqjIiVmavdmk81FfuQkYv5JxHfAYTz7gcETp0FDHBycVe/ble+9eRlCBfoo6H8TPw3FZmklI0YnD2aly8PN/AyxqrmpQgUXqJ2gi8aiIS9ObH+HzIbYz589XJ7KFBoaSuM7wniQ1bXppM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780577874; c=relaxed/simple;
-	bh=zCcG0zycEcF5opS5BvS+8tk5FTqTS7tRZZEpnxTN1NA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YfRVuWfnBh7AysS6G7+etKh4X8J+cw/FY+Oyt2HAaOwsyAhPwdBC8EeK11AFQSwa/Rj04MT7fLBj/TGsCNvyyj2uirqMD+gbB6xC1c6adTcVQtdQ0e0LO4XXEmMn/xGvrm25pQEbssSlmpQK6Sg+mXEtFSXOtK2PqfkCDdbMfT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ksLpH5NC; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1780577885; c=relaxed/simple;
+	bh=79Mdp1AOyEnseQ6YciyHtVOQDkgA3tpWYMzYOqm3TB0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Y5ieilwwXNyuGhg/19dRyBxfHf+2VRf445J3gduQGew90vPtGglI+YPB/eu9xiR2hgXr8PVfLZ4ybclW+kiDT/f/ZD5x4u+xI8HWhjNSp8+qSjS2xb2TN5rc/agGb/zHLAfTzl8+bgpJq/hcU283fKYpDme495OrPm27MJcQT6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R8/MNnUd; arc=none smtp.client-ip=91.218.175.185
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780577870;
+	t=1780577882;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lxRMjpY6moeDrrxQnEZS/RUp5ZNpLvWccvW6bQxni0o=;
-	b=ksLpH5NCEd2T2f8kbHPojy9FHxBQ9VDML4cjofnyEePgSaxiNx2w36t91jNGIkJcVevJb5
-	LzndYgTuomGqblFC5H3NKsJMnIN8OumwDOejclp0X5oHXrmOLL/USlF6Bgpmh+2vDHK9Jn
-	ZvNfI6KGF3doAwDuY2ZbCWq4yLTfTTw=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nlSixzpVPe58sKtClq15cLtWL0cPTKiwPec4PU8Bn4o=;
+	b=R8/MNnUdp7U9NmYIomXbeTYl81HJaA8cfrOUNgwObKtfaTD2c5B8Y2OjGRiVP1lccHLQbp
+	Wbt+F87UWjO8nbZ2a8bqQUaExGBCBuqnV94hIzrFGoaFWcNWnM7T7YTlwPPZCDLEFjWCg9
+	CPb4TqLDTsutvPatFBRBWeQdJw9J+sw=
 From: Fushuai Wang <fushuai.wang@linux.dev>
 To: saeedm@nvidia.com,
 	leon@kernel.org,
@@ -60,9 +62,11 @@ Cc: netdev@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	wangfushuai@baidu.com
-Subject: [PATCH v2 0/2] net/mlx5: Only consider online CPUs in affinity subset check
-Date: Thu,  4 Jun 2026 20:57:03 +0800
-Message-Id: <20260604125705.21241-1-fushuai.wang@linux.dev>
+Subject: [PATCH v2 1/2] net/mlx5: Simplify cpumask operations in comp_irq_request_sf()
+Date: Thu,  4 Jun 2026 20:57:04 +0800
+Message-Id: <20260604125705.21241-2-fushuai.wang@linux.dev>
+In-Reply-To: <20260604125705.21241-1-fushuai.wang@linux.dev>
+References: <20260604125705.21241-1-fushuai.wang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,11 +83,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295235-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295236-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shayd@nvidia.com,m:parav@nvidia.com,m:moshe@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wangfushuai@baidu.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -102,39 +106,38 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F32DC6402B4
+X-Rspamd-Queue-Id: BF84B6401C6
 
 From: Fushuai Wang <wangfushuai@baidu.com>
 
-Hi all,
+Combine cpumask_copy() and cpumask_andnot() into a single
+cpumask_andnot() since the function can take cpu_online_mask
+directly as the source.
 
-When an SF is created after a CPU has been taken offline, the IRQ affinity
-check fails because existing IRQs in the pool may have affinity masks that
-include the now-offline CPU. This causes SF creation to fail even though
-suitable online CPUs are available.
+Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+Reviewed-by: Shay Drory <shayd@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-This series fixes this issue and includes a small cleanup:
-
-Patch 1 folds cpumask_copy() into cpumask_andnot() for better code clarity
-in comp_irq_request_sf().
-
-Patch 2 filters affinity masks to only consider effective CPUs before the
-subset check, ensuring SF creation succeeds when CPUs have been taken offline.
-
---WANG
-
-Fushuai Wang (2):
-  net/mlx5: Simplify cpumask operations in comp_irq_request_sf()
-  net/mlx5: Use effective affinity mask for IRQ selection
-
- drivers/net/ethernet/mellanox/mlx5/core/eq.c           | 3 +--
- drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c | 5 ++++-
- 2 files changed, 5 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index 22a637111aa2..d11ec263d53c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -886,8 +886,7 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
+ 		return -ENOMEM;
+ 
+ 	af_desc->is_managed = false;
+-	cpumask_copy(&af_desc->mask, cpu_online_mask);
+-	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
++	cpumask_andnot(&af_desc->mask, cpu_online_mask, &table->used_cpus);
+ 	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
+ 	if (IS_ERR(irq)) {
+ 		kvfree(af_desc);
 -- 
 2.36.1
 
