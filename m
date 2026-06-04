@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Yl4gFWLjIGqa8wAAu9opvQ
-	(envelope-from <netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:30:58 +0200
+	id mVXABAvkIGq68wAAu9opvQ
+	(envelope-from <netdev+bounces-295031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:33:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F1C63C84D
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:30:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1A563C87D
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 04:33:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="mYT/Gk6l";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295030-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=IcNmzFKn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295031-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295031-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 88DBF3012211
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 02:30:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 32DA7307B9F3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 02:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5DB3932CE;
-	Thu,  4 Jun 2026 02:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2985031327A;
+	Thu,  4 Jun 2026 02:30:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DAD3876BF
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 02:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6683C2BE03C;
+	Thu,  4 Jun 2026 02:30:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780540210; cv=none; b=fRsT3+NjfvaaepS/IFQMgrQDZdg+wRjRt9+C1M/hQMgq6BlRk/j6Ve4ibkXp8bz9F+uatoF7qymBqjN5kW0RQbYzAFysWzYLafpPFcADpMec0QhX504hjgOJWjyTmZllZcerJqQdRyaE7+AbyVwiJwkie1n94KWpSk3myjquZl4=
+	t=1780540217; cv=none; b=lXwW84jyE33gF/Y4nowETzP/e599LYGnp5h8J18QbIMd5Uuf4BzBu4wgr3FiBlunif1i5p3/vsonW78/S7kVWVp2i8Sqh25zcRtX0ssY7oMklIRLi22oeV0u4Iq8v72TraMESXHj8hxmDfx27q43irQK4BPWIWGVsXod2YFvzAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780540210; c=relaxed/simple;
-	bh=TKa1HUW7M4p98jKYnxCp9xHQ9LQnAYhR8oIx4ug8Bp0=;
+	s=arc-20240116; t=1780540217; c=relaxed/simple;
+	bh=sdCzHy7C40HMOj4/b7kN8+YkH4JkzzQucO2MAVnyLK4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u3teYiE12gb94l2LlBo6G9z0joL96y6NN40u4xa0Z0Tosca0JuofW5g6Dv/Tpey2gmgW+m7zk5ilvgf7hlxq7EqcCi7z157AP949rKDsBBLEbpm4jsA+CfiWQJkI+MLNef0G289FxU0F2uj9ONlwPCBVKiFFaWgmW7sJEu5IskY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYT/Gk6l; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F8241F00893;
-	Thu,  4 Jun 2026 02:30:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hBks4cqzr/ZgTo32dZFVSw8j45z121Ntn/N+4TbyY7ohI1KaFI4kdydphEQOpSGI3zoL+LkjolCzv85nx/bSJmgvpBBRqfLPWyvkbSJAOpNhijGlM8iaGHP/K5gjuF4AN6V45YzjYm/BdFnUD/ZA2BGkwX9g/YytF19jELr6LcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IcNmzFKn; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 340B11F00893;
+	Thu,  4 Jun 2026 02:30:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780540207;
-	bh=pYfJh+51yj2R4Kc20BEo/16TMlYX/OGjxFXaijOHj2g=;
+	s=k20260515; t=1780540215;
+	bh=9wU2AxMPhoOp7B/T3SMAKEa5O1kX2NJAEi/Oh9Z6D5o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=mYT/Gk6lgBe5ptQyD8lFkyNRyBmkUESqSu/6n2CRrDLBo77wah3HAlrHvI1FkTp4w
-	 pOP6FtIHww39OAkIkXAmx9e99BOT8/eqbCVM6YcNgXf0kVseuxCFNge5MjPmDIwp1h
-	 tpcuaj/IX1ohCVlszxLmr6U6Rk7uxt75lAfJ+h3Pxja+UxQwG3IHFsZzdRpFTUuN+J
-	 Wdorom7dBgeCytDsxAHMV78iEUxukQ7ZeVKV0hP4XFV+43jyFl8dcht1I4AVv0DlVK
-	 +g3zLkIsCEOxpndhxapyywVr0GBN6OV2psac2jsNQhXXZ5QvLh8dPBLdAhAaf4WHR/
-	 U3ZzvNdBJVgXw==
+	b=IcNmzFKnDaBPQVTFAu+lROvtOHA/BFQHeCMnym0wKTIhA0y9xlqjuS122INkcBR01
+	 7C1oAaA8LPvz5dVCGnC9UglQju8ikMDo9fI+r+Gvz+b+BSnL2zU4JectbpxEx3AR6Z
+	 rJIAXCnAM/mEW8o9gIy5JidNC50UN+g0anc7W1R/wg2GK3nD4IwKppTVFxlYl1OvlN
+	 2pEFwmS9/dX+XG8wNrJjUKVAh2orSTbTOSDs/Y6RpiGKnq9OorkD7ePT2UWFchNLzZ
+	 u1Aei8v3Uq9NXtBnUayxwuzoIAh8UuKvnlNH2aZc84EcC0DwXMOCfd15jtxh1mFZqx
+	 2Q5x2x5ylBzuQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A5739308E6;
-	Thu,  4 Jun 2026 02:30:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9393939308E6;
+	Thu,  4 Jun 2026 02:30:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,80 +57,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] Fix use-after-free in metadata dst teardown in
- airoha_eth and mtk_eth_soc drivers
+Subject: Re: [PATCH net-next v3] net/sun: Fix multiple typos in comments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178054020839.2211213.18332239171948439867.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jun 2026 02:30:08 +0000
-References: 
- <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
-In-Reply-To: 
- <20260602-airoha-mtk-metadata-uaf-fix-v1-0-3aaa99d83351@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, nbd@nbd.name, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, fw@strlen.de,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
+ <178054021614.2211213.3521363278754692746.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jun 2026 02:30:16 +0000
+References: <20260601163727.554364-1-j.raczynski@samsung.com>
+In-Reply-To: <20260601163727.554364-1-j.raczynski@samsung.com>
+To: Jakub Raczynski <j.raczynski@samsung.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, kuba@kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295030-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,strlen.de,lists.infradead.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295031-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nbd@nbd.name,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:fw@strlen.de,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:j.raczynski@samsung.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:kernel-janitors@vger.kernel.org,m:kuba@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,samsung.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F3F1C63C84D
+X-Rspamd-Queue-Id: 6B1A563C87D
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 02 Jun 2026 11:21:03 +0200 you wrote:
-> airoha_metadata_dst_free() and mtk_free_dev() call metadata_dst_free()
-> which frees the metadata_dst with kfree() immediately, bypassing the RCU
-> grace period.
-> Replace metadata_dst_free() with dst_release() which properly goes
-> through the refcount path and runs call_rcu_hurry() if refcount goes to
-> zero.
+On Mon,  1 Jun 2026 18:37:27 +0200 you wrote:
+> There are some typos in comments and while they are harmless and not visible,
+> there is no reason not to fix them. Fix the ones that are not register related,
+> which might have intentional naming convention.
+> 
+> Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
+> ---
+> Changes in v3:
+> - Just fix typos, no funny business, no changing spaces
+> - Restore commit message to original
+> Changes in v2:
+> - Fix typo within typo fix ('empirical' word)
+> - Change autoneg related sentence to make sense
+> - Fix double spaces in lines where typos are fixed.
+>   Add annotation to commit message why only these
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] net: airoha: Fix use-after-free in metadata dst teardown
-    https://git.kernel.org/netdev/net/c/b38cae85d1c4
-  - [net,2/2] net: ethernet: mtk_eth_soc: Fix use-after-free in metadata dst teardown
-    https://git.kernel.org/netdev/net/c/80df409e1a48
+  - [net-next,v3] net/sun: Fix multiple typos in comments
+    https://git.kernel.org/netdev/net-next/c/8bcffff57d57
 
 You are awesome, thank you!
 -- 
