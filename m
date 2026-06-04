@@ -1,240 +1,201 @@
-Return-Path: <netdev+bounces-295244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vTQtF8d9IWqHHQEAu9opvQ
-	(envelope-from <netdev+bounces-295244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:29:43 +0200
+	id J48xLFWBIWplHgEAu9opvQ
+	(envelope-from <netdev+bounces-295245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:44:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B7A640586
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:29:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4865764073A
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 15:44:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XxzqfsTJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295244-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295244-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=AFNt+FSk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295245-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295245-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B75C6304FB42
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 13:21:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A574131AA8D1
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 13:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221DE3A5E92;
-	Thu,  4 Jun 2026 13:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27AF47ECF4;
+	Thu,  4 Jun 2026 13:26:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CC71917FB;
-	Thu,  4 Jun 2026 13:21:56 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780579318; cv=none; b=CfMgF9s6HiWVFFZ+dv1kZEJ/2tIPrbah5JnXITY9DbslJOMcPp1lyPoX39re92TJ7KcytmwtmMY+noNz5GiLv/FU+xpbcloTZDXzMU1xp2DUn6SWMTdO6G71f74IOgLiGiCQldIkgpm55sp9nNqEc3kf38Qr5+gZ8YtaCDtJmwQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780579318; c=relaxed/simple;
-	bh=pXUNbEWCMR85osdK/op/ojECmWrGtQTXkPsbVoZ2ZUk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LN3UD9rjBQ4qLRPHMXw258ScKSZqvzeJvx0ttSIoDJ1zNnds7HtUzktVitBdTmpfRCIO1WFdzLF7McrvHFoA8am7v6BMEHj4swfJ05Vt2FA9f33oE2YD6Q0CQbyt9laz35inYaFGytImJf9BaszwOec0l2Ny1tXzEQ99SnPJJkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxzqfsTJ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 245FD1F00893;
-	Thu,  4 Jun 2026 13:21:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780579316;
-	bh=ve97dki2PV3LjRGiFHzMYMHrM8bU+3Hy/Ds/lCO8I2c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XxzqfsTJlSthH0Q8C+QmnFn+QeSZWliUvafSEEcMxGLGoGjNig6UC96HYtANo6kIh
-	 xFhGqKajU916+21pSWploQGt5yk3S16jrpkjt5oXDvWDh4IYWngMRMmAS30QoUXD6/
-	 j2shD5UP1fkMr1rgEutm3FvI+RhWX1hLKHjuCc/L4haRbfbdAda4Wda9iu6fEUe5Rf
-	 w/0TeFVXNwkrwavsgcu8Xl2kh51TO/UJgSRWvbtJ9Icn7XL0cWU5GxejTNgBJQFbRD
-	 JWXmp01PdBjwXDzfQTA+bgH5v4bVbSErhwMSePrB0QyK1yyAq6kljbk43B2dBYva4A
-	 yxzRxzFuvNP0A==
-From: Simon Horman <horms@kernel.org>
-To: aroulin@nvidia.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	roopa@nvidia.com,
-	petrm@nvidia.com,
-	idosch@nvidia.com,
-	chirag@nvidia.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 3/3] selftests: net: add vxlan vnifilter notification test
-Date: Thu,  4 Jun 2026 14:19:25 +0100
-Message-ID: <20260604131922.3928241-4-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260602185138.253265-4-aroulin@nvidia.com>
-References: <20260602185138.253265-4-aroulin@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944DB47ECF9
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 13:26:58 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780579619; cv=pass; b=c1nsRdfTco8tmaxzUzVuYb1lH0ukqzrtXq38RSDPHO4cYqU35VThGzl8eLNmctP3TaFik8pKEWg7+m88rl7fHfdLfMR1iUAJl+wyK/XEd2zO18vzeghu6UitsSja6A4u0v6/54R86F7zHvcUQvUyvBZVLZoar6gM9pgI0AXwUf8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780579619; c=relaxed/simple;
+	bh=Y/exHIc9brVjKunGoHXR95ATn0QtNMmHP85zIf3yQGM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BeNPeDB9rcTq4v6uzLBdnt8vhY28d39oqpX9CFM9e9DY2y3ad5mY+hg9kRerX946mJwyIft/HvUeHPsfn/E6OXhVsybX4J6HnYuqInt47wgAQSiPFvixXI4vtfNdyn0/Dwe4mByr9PMFsO2ZLYv+/1aVgnn8bJkq5SzddhStgO0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AFNt+FSk; arc=pass smtp.client-ip=209.85.222.169
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-9158fbaa4bbso94813785a.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 06:26:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780579617; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NUrlBTH632oPj/NKue3v7qDz/V2m7t7iFVA/m8a17GjQpNX868uwUFYKM9qevxd/P5
+         l9tTejdaQ6vpT3jK3igHu6XxK05EgpO9ZFN2iBvdCMBu3rs0zBIuD+oREjy1oI7n8DMF
+         YPWuQs6nNVMtEYlnDt8NXl5WWzhpLjk2DWW494sNhudAuc21XECWgWA9Oj+B5dwjJ8Cq
+         cOg1DErwzSNPzAJHfJS22+D0vUiAeACsU+lkzTZwT1fzf4W8QBvI822h/6geaLqVvwXI
+         U/hEueyzvu+MtbeOjEJdj4Gxe9GE+IxP+0QYBvVN3aZlI35PE+etV5GgBz55ZaFhlE8Z
+         tyDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KY3HsjCQui9i18mE5QmqfIjfXKZSET3GoS4sPvYKb/M=;
+        fh=kJGKBeDQrK0LSYFvX0wIBUTYEI1t3w3FcK0Bkx1ol64=;
+        b=gIvl05mM3C3LLqI69di6rK4gRBLdsGB+mYJ1gT6rp0Dnj9Ujqhglb8Ka+lMXVPcpiZ
+         tldHn24q0IkuXObbBN/LOtZX9ceopSZeTCkRbRnPbA9PoUSHTE1+zyIv9JlaLMU2M2YN
+         pwo8+dxRlAqzvPdDiuwsjItrmJwUXtmqsQT0Jg/nIGsq0yuDugcTJKkAwuQXEB96BLN9
+         9TrVPdowbmYaIKGPVMnw7jGz3Xp4Nq37RrJ8deMQhTxKTmLuSuHvD/Y771Y35JflSAO8
+         CjqDXrNG1MEwGy6A+cMhxEmT6kXT+0DHxdPRx1AEjJ1HhTxVTelm32ZkOiXqX5nzFmfD
+         32Fw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780579617; x=1781184417; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KY3HsjCQui9i18mE5QmqfIjfXKZSET3GoS4sPvYKb/M=;
+        b=AFNt+FSk3RpbkN1JGw8qtwiVspRQiWJqRZnRmLaydkqUOfuQb0M2UukeKFIzEKFxWT
+         LJy0IXpS7kzvYR6PuAD9anV367O64GXgRmK6t2MdEbmLiLZMslK6wzwiUOlQFG+FytRx
+         glfNkoC6zl/6jneq/nIzSohxUGBq+pcqoXul8s/oajvXcN9dP9FkMsfIt+3eBQNrh9vM
+         OpJSvYM1LOvwYFt/xapDFgUsnzazEevHdU8bvthj6TemNOxerFF3BWIooAZJOmoYcAtR
+         CUQLooKbMCepQkdug+oEkY2Kt1SUYIe9D0eNu/7L894nxExcPQx1gj5FpVMPXN/7WnXU
+         cRKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780579617; x=1781184417;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KY3HsjCQui9i18mE5QmqfIjfXKZSET3GoS4sPvYKb/M=;
+        b=i6CFHuFxo0WbKyuo8LFmAugu7bbXopSh7SqeQbeBenvQ1r2rFH6dV04vtjaUYlUQMw
+         ffrRffHagMhR9eWoHQWCTvLjMeFLj/6BijZBGItGFo2q9pCpwtHfGMxbvXVFpZbmE2k4
+         +TfALqyOrSCAdo7FvpR++C0EEwt3iMSGZhK4+Ttsf89bZXmdkYwY6pzSuobG5f3qnvp/
+         a5e9r4jds+1ZsBqwBvU5vjgUGliT3/1DEZia4OLVlWOZG6FXzQrQAoa4w6iVcJj11F4p
+         AXbOwaOdJXMhXtFktAZrd9aVYK/ek8tfibcXuTdOmmVzNeneoxHgG6QUvuzRlS6r/S8d
+         Pinw==
+X-Forwarded-Encrypted: i=1; AFNElJ/RyZKmoOiZubeWkZz73eAxG0c3AShxd/Rp8azIzzFDiiGmijWUsyLZRiaXeB8+lzkR/Il4p+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkucXHWDfPg/ehShMW78syWE6fgJP1X2+VnT1JXqU7bKFm++QR
+	ElmgH7kAvleujnws6ynggqMMHUkYvbgSKV+C6zgjaz7I3nvdPeYVGtDLVfkp60wrFf0qw4G1J7M
+	jVCP+KKK1Qlj3rqyPv2IYip3cScIIJ4obUU+w7Y6/
+X-Gm-Gg: Acq92OGUw0QmFdm60b6fKrLKIGMEmIU1zBdEd3gG3hwCp5+MExzwTIo0VbLj/yb2G3h
+	Yw09zj6bvvAsMrA2oBtHq5bQcYHP1RsOw1hYxgW8z05opXhIaJ9OhN6jpVdFCqNb6cMgD6+0pH1
+	oJhhKI6enB9s8W+0pgqHbxTp/77CPzQx0mqx2KhNi3RWaAgxpk8I57LUYY8VRqijtaQxhKEj389
+	CtiIOThO4R7cxRXak97J5FqrihxZxNEqurZq/17ukIgFVlH/MlRaxEGViz9Xrx663ZabI0PLnSG
+	UJiIZ2HqnHrjUytts7wjarrtcAix0LY7vTFsrvGzPdEXTbl/dcmiXs3MyCKJYv7NFRclZ+AWWsV
+	W3JOOFSzYUWHPO2PtDmAN+qOGN28jvQ==
+X-Received: by 2002:a05:622a:2b0a:b0:517:72e0:612 with SMTP id
+ d75a77b69052e-5177874af42mr110703141cf.42.1780579616768; Thu, 04 Jun 2026
+ 06:26:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260603062043.3911278-1-edumazet@google.com> <20260603062043.3911278-7-edumazet@google.com>
+ <20260604105030.GA775294@shredder>
+In-Reply-To: <20260604105030.GA775294@shredder>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 4 Jun 2026 06:26:45 -0700
+X-Gm-Features: AVHnY4KOIq5euv12ttKrv6Vtt7j6hZ67FlRTPV1uzCbWBM0DtU1djnN-iGtuwh0
+Message-ID: <CANn89iJ-v_Nrc+wP53WnWxcPjo2zM4TkWc8ufGm9iO1pZ+8uuw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 06/11] bridge: provide lockless access to p->designated_cost
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:aroulin@nvidia.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:roopa@nvidia.com,m:petrm@nvidia.com,m:idosch@nvidia.com,m:chirag@nvidia.com,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295244-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,blackwall.org,vger.kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url,fdb_notify.sh:url]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8B7A640586
+X-Rspamd-Queue-Id: 4865764073A
 
-From: 'Simon Horman' <horms@kernel.org>
+On Thu, Jun 4, 2026 at 3:50=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wro=
+te:
+>
+> On Wed, Jun 03, 2026 at 06:20:38AM +0000, Eric Dumazet wrote:
+> > @@ -302,9 +304,10 @@ static int br_should_become_designated_port(const =
+struct net_bridge_port *p)
+> >       if (memcmp(&p->designated_root, &br->designated_root, 8))
+> >               return 1;
+> >
+> > -     if (br->root_path_cost < p->designated_cost)
+> > +     t =3D br->root_path_cost - READ_ONCE(p->designated_cost);
+> > +     if (t < 0)
+> >               return 1;
+> > -     else if (br->root_path_cost > p->designated_cost)
+> > +     else if (t > 0)
+> >               return 0;
+>
+> Eric, I think you meant:
+>
+> p_designated_cost =3D READ_ONCE(p->designated_cost);
+>
+> if (br->root_path_cost < p_designated_cost)
+>         return 1;
+> else if (br->root_path_cost > p_designated_cost)
+>         return 0;
+>
+> ?
+>
+> >
+> >       t =3D memcmp(&br->bridge_id, &p->designated_bridge, 8);
+> > @@ -344,9 +347,10 @@ static int br_supersedes_port_info(const struct ne=
+t_bridge_port *p,
+> >       else if (t > 0)
+> >               return 0;
+> >
+> > -     if (bpdu->root_path_cost < p->designated_cost)
+> > +     t =3D bpdu->root_path_cost < READ_ONCE(p->designated_cost);
+> > +     if (t < 0)
+> >               return 1;
+> > -     else if (bpdu->root_path_cost > p->designated_cost)
+> > +     else if (t > 0)
+> >               return 0;
+>
+> Similarly here?
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+Oh well, time for a V3 I guess.
 
-Simon says:
-
-There is also an AI-generated review of this patch on sashiko.dev.
-And AI-generated reviews of other patches of this series.
-But I believe what is forwarded here covers what should
-be considered in the context of this patch-set.
-
----
-selftests: net: add vxlan vnifilter notification test
-
-This patch adds a selftest that exercises VXLAN vnifilter netlink
-notifications by running bridge monitor vni in the background while
-adding, updating, deleting and re-adding VNIs, then counting the
-matching lines in the captured output.
-
-> diff --git a/tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh b/tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh
-> new file mode 100755
-> index 000000000000..9d51a9e02ae0
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/test_vxlan_vnifilter_notify.sh
-> @@ -0,0 +1,184 @@
-
-[ ... ]
-
-> +# Run bridge monitor in the background, execute a command, then count
-> +# the notification lines.
-> +# Usage: vni_notify_check <command> [args...]
-> +# Sets: NOTIFY_COUNT with the number of notifications observed.
-> +vni_notify_check()
-> +{
-> +	local tmpf cmd_ret monitor_pid
-> +
-> +	tmpf=$(mktemp)
-> +	defer rm "$tmpf"
-> +
-> +	defer_scope_push
-> +		ip netns exec "$NS1" bridge monitor vni > "$tmpf" 2>/dev/null &
-> +		monitor_pid=$!
-> +		defer kill_process "$monitor_pid"
-> +
-> +		sleep 0.5
-> +		if [ ! -e "/proc/$monitor_pid" ]; then
-> +			RET=$ksft_skip
-> +			log_test "iproute2 'bridge monitor vni' not supported"
-> +			return "$RET"
-> +		fi
-
-[Medium]
-Could the skip path here turn a legitimate skip into a failure?
-
-When bridge monitor vni is not supported, the helper sets RET=$ksft_skip,
-calls log_test from inside the helper, and then returns ksft_skip (4).
-Every caller follows the helper with:
-
-    vni_notify_check \
-        bridge -n "$NS1" vni add vni 1000 dev "$VXLAN_DEV"
-    check_err $? "Failed to add VNI"
-
-Since ksft_skip is non-zero, check_err treats the return as a failure
-and calls ret_set_ksft_status with ksft_fail. Per the merge weights in
-ksft_status_merge (pass < xfail < skip < fail), that demotes RET from
-skip to fail.
-
-NOTIFY_COUNT is also never assigned because the function returned
-before the grep, so the next:
-
-    [ "$NOTIFY_COUNT" -eq 1 ]
-    check_err $? "Expected 1 notification for VNI add, got $NOTIFY_COUNT"
-
-also records a failure, and the caller's log_test then prints FAIL for
-the real test name in addition to the SKIP printed by the helper. The
-script ends up reporting both a SKIP and a FAIL line for the same case
-and exits with a failure status.
-
-Two related observations on this same path:
-
-The bare return is issued between defer_scope_push and defer_scope_pop,
-so defer_scope_pop is skipped on the skip path. Does that leave
-__DEFER__SCOPE_ID off by one and the registered defer kill_process
-"$monitor_pid" only unwound through the EXIT trap rather than the
-normal scope unwind?
-
-Would it be cleaner to signal skip back to the caller without going
-through check_err (for example, set RET plus a flag and have the caller
-short-circuit), and either move log_test to the caller or restructure
-the skip path so it does not straddle defer_scope_push/defer_scope_pop?
-fdb_notify.sh uses a similar pattern without mixing log_test and an
-early return inside the scope.
-
-> +
-> +		"$@"
-> +		cmd_ret=$?
-> +		sleep 0.2
-> +	defer_scope_pop
-> +
-> +	NOTIFY_COUNT=$(grep -c "$VXLAN_DEV" "$tmpf")
-> +	NOTIFY_COUNT=${NOTIFY_COUNT:-0}
-> +	return "$cmd_ret"
-> +}
-
-[Low]
-Does this counting strategy actually distinguish RTM_NEWTUNNEL from
-RTM_DELTUNNEL?
-
-The commit message states:
-
-    verifies that RTM_NEWTUNNEL and RTM_DELTUNNEL are sent correctly
-    when VNIs are added, deleted, or updated
-
-but NOTIFY_COUNT comes from:
-
-    NOTIFY_COUNT=$(grep -c "$VXLAN_DEV" "$tmpf")
-
-which matches both add and delete events emitted by bridge monitor vni.
-A regression that emitted RTM_NEWTUNNEL on delete (or vice versa) would
-still produce NOTIFY_COUNT=1 and pass every positive test. Would
-differentiating the two (for instance, by separately counting lines
-that begin with "Deleted " versus those that do not) make the test
-match what the commit message describes?
+Thanks.
 
