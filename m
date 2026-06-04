@@ -1,222 +1,207 @@
-Return-Path: <netdev+bounces-295425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 91cIC+jvIWrZQgEAu9opvQ
-	(envelope-from <netdev+bounces-295425-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:36:40 +0200
+	id iZt2BAHwIWrcQgEAu9opvQ
+	(envelope-from <netdev+bounces-295426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:37:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 447AC643A32
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:36:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF3A643A37
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 23:37:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=KmJL9Mxh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295425-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295425-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=amd.com header.s=selector1 header.b="KGjk/Q/+";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295426-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295426-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C82293019F31
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 21:32:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C504530166AB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 21:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F7E39BFE0;
-	Thu,  4 Jun 2026 21:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2476A4D98EB;
+	Thu,  4 Jun 2026 21:36:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011043.outbound.protection.outlook.com [40.93.194.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A653DA5AE
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 21:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22F14D90BD
+	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 21:36:57 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780608778; cv=pass; b=Pkk/c3D+3wliuiELFT2o1uQqhVXHlQcPBPLMs36sWBieJxSwEB4cg8jc8HYt8bR/k+qbEOeI7fB3qZM9nO77968OO3N5JEklKZYbB+/2zbxwd/lMNqbfR7AhDFLunAtYR7TenCF4ip8lqspmTWzkf3oGL4tNQ3vD9cf30iNnsPI=
+	t=1780609019; cv=fail; b=lTpYIYetAi7jkj8iUbjAVfDDeoDPvEYUZ5r31SAHU8mFWoW/GBQrUGN0T8LwK+xk/1S1Laf7YphU6ZbEluSNT7zSppcNHOVtVvtIcczisE7gHcI1qSgPohmHZhCi2U4GUHsut02novUTDMQH16HIIr8NTdOTJW1QvXHNbQba5n0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780608778; c=relaxed/simple;
-	bh=Av0sHvdn29fm2C6t1HIlpl6qnYttHJO4691xFfVaAJE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mvz4iACcdXq7SrxZZAtaoU35kgE5kHVik/0ClGzuk9/wxqjCaX7DKAL0GldClqGitegI2gFqwpzc55SzFILkpvpVnw9beb8kb56jbxYCLUReIGLssbBywW/sOm89ouqRsYXYayLAjNFPRr6+jQCfg120qyn5EDzMyfmWsDlckus=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=KmJL9Mxh; arc=pass smtp.client-ip=209.85.128.173
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7ea6923cc94so13457747b3.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 14:32:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780608776; cv=none;
-        d=google.com; s=arc-20240605;
-        b=f1VsevW+mhtC1p/o28XoX81J6pvbiexj7tw55ipifXqces3xuSw9aZYhbHDlHl8n/v
-         rLDaNUUtfGXxCfeqQNge+9DLjMPfnJSG7TjC3bUwbSd0kXWteYDPd/Ha9SzGhs/YwoPu
-         qf5ll8hqhUj+g+FdPLD37L388zE2zdLQ2P1fLtQUW9jwbzcQfkJMaBhe7ScjGeo/4CL8
-         nQMAr/WSjXOm+9c0fJY9/WrI1/56n6KHS5mLSWRqfMwSSmji8IAA698VKRC0LTZLaOMV
-         5by8hs5PdLVoappQzt7KLab0oU7UqQX2R9nM5hRNI21CrrKRuqg0cCwwx+x0vKBKVDPF
-         JzRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Av0sHvdn29fm2C6t1HIlpl6qnYttHJO4691xFfVaAJE=;
-        fh=Tqr9mIwdU/SpPmGtMwJ/QNMjsIP335WBhivSwC0f2pI=;
-        b=PVU8C07X7cz0tCwEI50fQ1l9XSqODx/ORT/oJr0Xl47t4EQAZOqrt+feLBIih1k7VB
-         jcnczjDiLiDgcLbH26atyUJJFpmKS4kQ4Exw+DspuRlrD+OaueuVVMEQ0N1V4MtRlupj
-         +yvMgbLo4PBNu6sKd8YUry0G3Lo7jItfZAdy0YpIjBPKBuCesbctgMgk3ZBNrUzVYNYq
-         iD6IEpUMDLOn8KhD3HS5daIt2wcOnNjLEfTQaQox4R4/l/l14opHfTL4zTrpM33ev8vi
-         TQb8nSdXNVDf9kmr9K6yIBowAIY4ZWhidsFZ/+WzQytGCf8X6jG2pCrvPmCNYJ5v75DS
-         +aBQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1780608776; x=1781213576; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Av0sHvdn29fm2C6t1HIlpl6qnYttHJO4691xFfVaAJE=;
-        b=KmJL9MxhMXLjQk1CJeo6BfgTqpJ/CpAEeDpPEWK7mbOLaL9u+PutC7oRwNHULxHPUz
-         aW8Q4JAn1lzaxYg6agx08sBCT9+zFhMVvpHHy4xu4e7SGO2uBuTO8Cv+QGCrIzqg7rvK
-         a61aTUJ+bw8zzhHtZON6sPc1KNEYo+BoQ434I=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780608776; x=1781213576;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Av0sHvdn29fm2C6t1HIlpl6qnYttHJO4691xFfVaAJE=;
-        b=ZBXBd7gXMBK7QUNtR/eGZ4+jDmCmMeJ6p7RO8MLfYrRewdnzeLprO8txo63E8vD+bL
-         e7oRkpDbQJLaefiJNYh68EwZk2mQTxefhzCO2dqjKaub5PCL3lBJZ1ozNHjcQa0HPn5o
-         7Jnwsq7P69lnKtN407hC7niovuHEPw0+KoFG+n/C2p+ZzwJ+FQYn+btwdR0ewPZRMecf
-         gs+ryMBl1jBGzO6X3+4g5/pFQ0JPUvcf5ReN1QZnKEV+pVC9RTW3nENIngxo1XaX7Uxu
-         vuU/sXq5S27wyG9TURScXQtEY2OtIyM7xsHhWZBFN8Ce72Hn+aW2S0Tx6HfaTZOh22ON
-         8opg==
-X-Forwarded-Encrypted: i=1; AFNElJ+CdUTXAZryqtzDeijaLSxdN4DlJEA5ol9jEn2YtpqNUUxf0ZhH8sjs/m3oLQND1SHu38/Fm8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+VZsiRZDzjtFQEjGMJnzM6Mv9czd1nnYCYIJoKp/UlGkB/WdD
-	ueHFAu7pSsG062SpViaB+zxEi5G6geT5AvY7ZnpbTLwHY6SOUMhKiDZziJ1YHFVQaivsmr3/0kh
-	YDMDBMPiPFE6UxFyfvaUATaYM+MJPcaotwj9srNM3
-X-Gm-Gg: Acq92OG7+PkX6wPjr9WD3u+bQWXXdeDWwGQBBco+DrtkJ6d9vduuj5W0OY24LbVsbvp
-	U5fXLWOR6eUIarIDI764MRrBej2/swrmddoJdjB72onpc9dlUaAU/ymGCsYqSc0GZg0U91vMGlf
-	zCMQbDo8c92Az4mdPaP6Jmn5k/juCcw0p+nvlQtdm2Tn6ZvqCtcLKdYOgleHoMx5fMw0dpS2cn2
-	HJPfdAnojzTVGwVh/gAwjGmlhE55HROYkiAlza0CXyNPKSdadcUhGGHQfA1HY00lVWQPAo1n7MV
-	OC18xPUiP0Rcp81IpkCPEbLxIqg3b3tQQhLFJmTqhxVlQyRE
-X-Received: by 2002:a05:690c:710a:b0:7bd:5579:185a with SMTP id
- 00721157ae682-7ed0c80a062mr7303137b3.25.1780608775885; Thu, 04 Jun 2026
- 14:32:55 -0700 (PDT)
+	s=arc-20240116; t=1780609019; c=relaxed/simple;
+	bh=qYymAYf0bVNspYykAHNhQAfsH0maFfMuV2dONYz6sSk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RTZe23AFUZbVNF9lbOu2JSKNboPjdmiZp8WFpO6ysyeT5ItJH8nL4BOZ1wF+IsqWglCiXKSb1KPKmrMDaxUBTeDKBpRDij+LXwaY9kLDuo5ulsB516eMdUgjcEjl/wsYZNPE263Ke57SL2AltN/L7hm0U7PS8sMEshmkE1VnFeU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KGjk/Q/+; arc=fail smtp.client-ip=40.93.194.43
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=huon4o9uBO+YFiWFgip6251tr9WtzCwGCv1aNj18G/tiU2rk0Z7DXp6n6/U1vg7KJyop2LwZm9wqFFDqOzGQjH/p+0vv1EKZasfv/tyW6PGHNLamwol7NMLEGT8Xz26WHiBuxspr2BMlTm3VUg/OwzGkcu1gJ9u7qa/VT0lt8DguV0fHckWACI0zjdPRVbiqd1ubBo6TypwubVlIffaocwM/kU7B3EIxsARV9OnPchzzTvCHhk8E0PWJfJbuzxPYlh58LRC/MMIY5acpUSn9oOMx36OibARw8E5ToSqzP5l6YBkn12pywY/iIZ6lh7vRulEwpADw4EeZ4tHfu5k67Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fln/hkbQUZB70hkvG9hTUyamdBaT9ae3Ep3exNcwFa8=;
+ b=SnvTHAyIzYmW91cbYVcjJoa1h8CJYThwrAakW1HeNHggJzuhfeLu4rAWW3zun3uPbH7DFsLJ3l1OorFLSTbEcnOaNjsTFNAUxV7nj8cprImNE7BNLbjM77L+74PrCEfUkXHbpLO8vuU+bq0DhFe0BksCyDhufEl8n2d5ED16RKBjjw8EJP7sBcUWGhmtJSJGqwU0XLiL4cBP/b8PydnLkouyC8rv6hSeCKMapO2KtIjhgTLyr6rfmkoa9LtClXlwdAIi3XccF1ZyslHvJpWy7/xgBISOJK9qnWiKU2NEY9VKcP0CZRj9aLfbl+I+ydC2rVrEh+u8uuonkEQJ7VG5qQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fln/hkbQUZB70hkvG9hTUyamdBaT9ae3Ep3exNcwFa8=;
+ b=KGjk/Q/+ujcSCBe43Zrg5Wvq6pNQJhg3aCdGT4NqDvB0dgpBuMMpaPxoJLs/Np8gaxNsYFPnhYi6hVFU2bCQGfxUpAQS6S8kiX1ZeIqn24tI8xl/d2jZC/oX+zUkC6DBoVnAqYftBVKtt02KFMIiVZI5U7QZf2kMGdmV1NUaBNE=
+Received: from CH2PR14CA0048.namprd14.prod.outlook.com (2603:10b6:610:56::28)
+ by DS0PR12MB7828.namprd12.prod.outlook.com (2603:10b6:8:14b::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Thu, 4 Jun 2026
+ 21:36:53 +0000
+Received: from CH2PEPF00000141.namprd02.prod.outlook.com
+ (2603:10b6:610:56:cafe::7f) by CH2PR14CA0048.outlook.office365.com
+ (2603:10b6:610:56::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.8 via Frontend Transport; Thu, 4
+ Jun 2026 21:36:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CH2PEPF00000141.mail.protection.outlook.com (10.167.244.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.5 via Frontend Transport; Thu, 4 Jun 2026 21:36:52 +0000
+Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 4 Jun
+ 2026 16:36:52 -0500
+From: "Nikhil P. Rao" <nikhil.rao@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <aleksander.lobakin@intel.com>, "Nikhil P. Rao"
+	<nikhil.rao@amd.com>
+Subject: [PATCH net v2] pds_core: quiesce DMA before freeing resources
+Date: Thu, 4 Jun 2026 21:36:37 +0000
+Message-ID: <20260604213637.3844317-1-nikhil.rao@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAN2cbVe79oj0O9==m4+4x3v+O+qzRagA=2=wkrp9i9=CqYvyZA@mail.gmail.com>
- <8978c158-b005-4b53-99d7-b475d9c4c665@mojatatu.com> <CAN2cbVenex+3wB0o+rvxcFrQOTjAL3W_WQ1sh7QZ_AKewgRVVQ@mail.gmail.com>
-In-Reply-To: <CAN2cbVenex+3wB0o+rvxcFrQOTjAL3W_WQ1sh7QZ_AKewgRVVQ@mail.gmail.com>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Thu, 4 Jun 2026 18:32:44 -0300
-X-Gm-Features: AVHnY4Ih_py6v3ez32zzorvXVRPfROXrRyYheYlMzTGb1PlFd9AxpZelS7iQcis
-Message-ID: <CA+NMeC-cpoV8X44wTXm=a+Xkpx0Ka0uydG1fUNqM_0vFEh2GTA@mail.gmail.com>
-Subject: Re: [BUG] net/sched: HFSC + fq_codel stall on 6.6.116
- (qdisc_tree_reduce_backlog / qlen_notify)
-To: Anirudh Gupta <anirudhrudr@gmail.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>
-Cc: "jhs@mojatatu.com" <jhs@mojatatu.com>, Anirudh Gupta <Anirudh.gupta@sophos.com>
-Content-Type: multipart/mixed; boundary="00000000000092560006537449b3"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000141:EE_|DS0PR12MB7828:EE_
+X-MS-Office365-Filtering-Correlation-Id: fb4b742b-18fc-4d0a-e316-08dec28164b2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700016|13003099007|3023799007|56012099006|18002099003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	tYtsIqWKfoFMy4vTfuOnRQdbKXHvoPNSbM4QQGDgiWTMo6NcdaBlww41PZ4mYQq9+Hy+wxtsEqjby3SONgAfCvxpvhdcbfNcuaEXv93+bHCJCedS5pY5KGZiEzm76YRO8IwXmzM8EuFkZa/b0pXJ+34OpGfmxPJaB3UFJtApvdZKyMCJ/fa5prBu9Kp8k0lQdajbOWyUHAsrYCHfaBVz/w793gSUThf5N9K58EK9XLtdodLYhuZW3NeJljDeAJZssAS//1IBAgefzV1/uZTMfWBjzAsZUrr5d2pqaN3CMZPL5L34rHSSz5rONUkRSVIo1EI3r58S3TowidWtXeZosp7ceJPDyUilAwoR4pqu4JDIqp9/fUFuuMGrkZQi+nsZ+z7aYe9DCVAEvzJsMxtXd1n/8dFv8QPsTzocpF+EaJcMHukE2YE8p4ezOQcyazw8DMCAwCHlEYVRD2qLoLJsYRd/uHZyFxuttrMd0XSA2xpepW4QP4OEd6RJ8qkf0JJxNiOT0y5oItoHIEkIsmjRvZ5lx7RCHmOxLpyw3kpGdUmI24QkBUj0IuRd/amra2RZB6UgmQW7PBf051S63fSmWY231uD/7TtSERMOzXeuFNy2dXfqNZyTdm1MUdsT9BlalPqohPLVGgoj7IF4Re6u7EtOTOsmTZt7M9bH3jkVFgI8Ute++W6uE56hrkRRQrPK
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700016)(13003099007)(3023799007)(56012099006)(18002099003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	EYSc4tW8j088b5Uu36wh8qRZbyCLhojETxuhFRpzBVmGEuYvB4aZsQG4OLMhy3/BnaiTLtIW0HgEC0gkA/iR27ADQ29xGrSgsyE0OVYdweCZlc9oTcAOkZY8tpK+tONsDCw1gzY2r1SzkxoBouWcxSm8kjAO68D77de62Txhi80S0GCq61Z+AknQBpiY/5207Y6K/3+Zx06uxwgKY0ErwBZ7CwIhYIW6oP1qGGET8bsDRquWJQcPZ/EXjoFstjqC/kQ+6l8BzdKqmqHUc4VPiHxHdVyxv0+n1kyfxGXDQ1oYam0CyJTreF0E/Jq6X2Uz/N00tRtb9VjoeYCxatBwouiKtIYADoZpto1zMddW3YjUScEBj5yX8QtaSVnUoeqNdxGTw5pwGJDmBulNI9FtoS0hjb4bIduQqjN0DQ+rL69kzu7VNB/F6DazBFt/Lf2O
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2026 21:36:52.8815
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb4b742b-18fc-4d0a-e316-08dec28164b2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000141.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7828
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.94 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anirudhrudr@gmail.com,m:netdev@vger.kernel.org,m:xiyou.wangcong@gmail.com,m:jhs@mojatatu.com,m:Anirudh.gupta@sophos.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
+	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-295425-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	HAS_ATTACHMENT(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295426-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:aleksander.lobakin@intel.com,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 447AC643A32
+X-Rspamd-Queue-Id: DAF3A643A37
 
---00000000000092560006537449b3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+pdsc_teardown() frees DMA buffers but does not disable bus mastering,
+leaving the device able to perform DMA after the buffers are freed.
+This can lead to use-after-free if the device writes to freed memory.
 
-On Thu, Jun 4, 2026 at 11:23=E2=80=AFAM Anirudh Gupta <anirudhrudr@gmail.co=
-m> wrote:
->
-> The provided patch did not fix the bug.
->
-> Observing the same issue, where sent bytes get stuck and backlog
-> continues to increase, while traffic gets stuck.
+Add pci_clear_master() to pdsc_teardown() to disable bus mastering
+before freeing resources, ensuring all DMA is quiesced.
 
-I can't reproduce this locally with the previous patch, but investigating t=
-he
-code I think I understand what might be happening. Can you try the new
-attached patch instead? If it still doesn't work, can you provide me with
-more details on how you are reproducing (environment, traffic
-generator and etc)?
+Add pci_set_master() to pdsc_setup() to re-enable bus mastering,
+which is needed for the firmware recovery path since pdsc_teardown()
+now disables it.
 
-cheers,
-Victor
+Fixes: 01ba61b55b20 ("pds_core: Add adminq processing and commands")
+Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
+---
+v2:
+- Move pci_clear_master() from pdsc_stop() to pdsc_teardown() to cover
+  error paths (Sashiko)
+- Add pci_set_master() to pdsc_setup() instead of pdsc_start() for
+  recovery path (Sashiko)
+- Drop Reviewed-by since patch changed substantially
+v1: https://lore.kernel.org/netdev/20260603035245.32972-1-nikhil.rao@amd.com/
+Sashiko review: https://sashiko.dev/#/patchset/20260603035245.32972-1-nikhil.rao%40amd.com
 
---00000000000092560006537449b3
-Content-Type: text/x-patch; charset="US-ASCII"; name="hfsc_anirudh_fix_v2.patch"
-Content-Disposition: attachment; filename="hfsc_anirudh_fix_v2.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mpzzrbo80>
-X-Attachment-Id: f_mpzzrbo80
+ drivers/net/ethernet/amd/pds_core/core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-ZGlmZiAtLWdpdCBhL25ldC9zY2hlZC9zY2hfZnFfY29kZWwuYyBiL25ldC9zY2hlZC9zY2hfZnFf
-Y29kZWwuYwppbmRleCAyNGRiNTQ2ODRlOGEuLjlhZWJmMjVkZGM3OSAxMDA2NDQKLS0tIGEvbmV0
-L3NjaGVkL3NjaF9mcV9jb2RlbC5jCisrKyBiL25ldC9zY2hlZC9zY2hfZnFfY29kZWwuYwpAQCAt
-MjgwLDcgKzI4MCw3IEBAIHN0YXRpYyB2b2lkIGRyb3BfZnVuYyhzdHJ1Y3Qgc2tfYnVmZiAqc2ti
-LCB2b2lkICpjdHgpCiAJcWRpc2NfcXN0YXRzX2Ryb3Aoc2NoKTsKIH0KIAotc3RhdGljIHN0cnVj
-dCBza19idWZmICpmcV9jb2RlbF9kZXF1ZXVlKHN0cnVjdCBRZGlzYyAqc2NoKQorc3RhdGljIHN0
-cnVjdCBza19idWZmICpfX2ZxX2NvZGVsX2RlcXVldWUoc3RydWN0IFFkaXNjICpzY2gpCiB7CiAJ
-c3RydWN0IGZxX2NvZGVsX3NjaGVkX2RhdGEgKnEgPSBxZGlzY19wcml2KHNjaCk7CiAJc3RydWN0
-IHNrX2J1ZmYgKnNrYjsKQEAgLTMxNywxMiArMzE3LDQ5IEBAIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVm
-ZiAqZnFfY29kZWxfZGVxdWV1ZShzdHJ1Y3QgUWRpc2MgKnNjaCkKIAlxZGlzY19ic3RhdHNfdXBk
-YXRlKHNjaCwgc2tiKTsKIAlXUklURV9PTkNFKGZsb3ctPmRlZmljaXQsIGZsb3ctPmRlZmljaXQg
-LSBxZGlzY19wa3RfbGVuKHNrYikpOwogCisJcmV0dXJuIHNrYjsKK30KKworc3RhdGljIHZvaWQg
-ZnFfY29kZWxfZGVxdWV1ZV9kcm9wKHN0cnVjdCBRZGlzYyAqc2NoKQoreworCXN0cnVjdCBmcV9j
-b2RlbF9zY2hlZF9kYXRhICpxID0gcWRpc2NfcHJpdihzY2gpOworCiAJaWYgKHEtPmNzdGF0cy5k
-cm9wX2NvdW50KSB7CiAJCXFkaXNjX3RyZWVfcmVkdWNlX2JhY2tsb2coc2NoLCBxLT5jc3RhdHMu
-ZHJvcF9jb3VudCwKIAkJCQkJICBxLT5jc3RhdHMuZHJvcF9sZW4pOwogCQlxLT5jc3RhdHMuZHJv
-cF9jb3VudCA9IDA7CiAJCXEtPmNzdGF0cy5kcm9wX2xlbiA9IDA7CiAJfQorfQorCitzdGF0aWMg
-c3RydWN0IHNrX2J1ZmYgKmZxX2NvZGVsX2RlcXVldWUoc3RydWN0IFFkaXNjICpzY2gpCit7CisJ
-c3RydWN0IHNrX2J1ZmYgKnNrYjsKKworCXNrYiA9ICBfX2ZxX2NvZGVsX2RlcXVldWUoc2NoKTsK
-KworCWZxX2NvZGVsX2RlcXVldWVfZHJvcChzY2gpOworCisJcmV0dXJuIHNrYjsKK30KKworc3Rh
-dGljIHN0cnVjdCBza19idWZmICpmcV9jb2RlbF9wZWVrKHN0cnVjdCBRZGlzYyAqc2NoKQorewor
-CXN0cnVjdCBza19idWZmICpza2IgPSBza2JfcGVlaygmc2NoLT5nc29fc2tiKTsKKworCWlmICgh
-c2tiKSB7CisJCXNrYiA9IF9fZnFfY29kZWxfZGVxdWV1ZShzY2gpOworCisJCWlmIChza2IpIHsK
-KwkJCV9fc2tiX3F1ZXVlX2hlYWQoJnNjaC0+Z3NvX3NrYiwgc2tiKTsKKwkJCS8qIGl0J3Mgc3Rp
-bGwgcGFydCBvZiB0aGUgcXVldWUgKi8KKwkJCXFkaXNjX3FzdGF0c19iYWNrbG9nX2luYyhzY2gs
-IHNrYik7CisJCQlzY2gtPnEucWxlbisrOworCQl9CisKKwkJZnFfY29kZWxfZGVxdWV1ZV9kcm9w
-KHNjaCk7CisJfQorCiAJcmV0dXJuIHNrYjsKIH0KIApAQCAtNzI1LDcgKzc2Miw3IEBAIHN0YXRp
-YyBzdHJ1Y3QgUWRpc2Nfb3BzIGZxX2NvZGVsX3FkaXNjX29wcyBfX3JlYWRfbW9zdGx5ID0gewog
-CS5wcml2X3NpemUJPQlzaXplb2Yoc3RydWN0IGZxX2NvZGVsX3NjaGVkX2RhdGEpLAogCS5lbnF1
-ZXVlCT0JZnFfY29kZWxfZW5xdWV1ZSwKIAkuZGVxdWV1ZQk9CWZxX2NvZGVsX2RlcXVldWUsCi0J
-LnBlZWsJCT0JcWRpc2NfcGVla19kZXF1ZXVlZCwKKwkucGVlawkJPQlmcV9jb2RlbF9wZWVrLAog
-CS5pbml0CQk9CWZxX2NvZGVsX2luaXQsCiAJLnJlc2V0CQk9CWZxX2NvZGVsX3Jlc2V0LAogCS5k
-ZXN0cm95CT0JZnFfY29kZWxfZGVzdHJveSwKZGlmZiAtLWdpdCBhL25ldC9zY2hlZC9zY2hfaGZz
-Yy5jIGIvbmV0L3NjaGVkL3NjaF9oZnNjLmMKaW5kZXggODNiMmNhMmUzN2ZjLi5jNDgyOTRjYWEw
-YWUgMTAwNjQ0Ci0tLSBhL25ldC9zY2hlZC9zY2hfaGZzYy5jCisrKyBiL25ldC9zY2hlZC9zY2hf
-aGZzYy5jCkBAIC03NTMsNyArNzUzLDggQEAgdXBkYXRlX3ZmKHN0cnVjdCBoZnNjX2NsYXNzICpj
-bCwgdW5zaWduZWQgaW50IGxlbiwgdTY0IGN1cl90aW1lKQogCXU2NCBmOyAvKiAsIG15Zl9ib3Vu
-ZCwgZGVsdGE7ICovCiAJaW50IGdvX3Bhc3NpdmUgPSAwOwogCi0JaWYgKGNsLT5xZGlzYy0+cS5x
-bGVuID09IDAgJiYgY2wtPmNsX2ZsYWdzICYgSEZTQ19GU0MpCisJaWYgKGNsLT5xZGlzYy0+cS5x
-bGVuID09IDAgJiYgY2wtPmNsX2ZsYWdzICYgSEZTQ19GU0MgJiYKKwkgICAgY2wtPmNsX25hY3Rp
-dmUpCiAJCWdvX3Bhc3NpdmUgPSAxOwogCiAJZm9yICg7IGNsLT5jbF9wYXJlbnQgIT0gTlVMTDsg
-Y2wgPSBjbC0+Y2xfcGFyZW50KSB7Cg==
---00000000000092560006537449b3--
+diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
+index 705cab7b0727..38a2446571af 100644
+--- a/drivers/net/ethernet/amd/pds_core/core.c
++++ b/drivers/net/ethernet/amd/pds_core/core.c
+@@ -446,6 +446,8 @@ int pdsc_setup(struct pdsc *pdsc, bool init)
+ {
+ 	int err;
+ 
++	pci_set_master(pdsc->pdev);
++
+ 	err = pdsc_dev_init(pdsc);
+ 	if (err)
+ 		return err;
+@@ -480,6 +482,8 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
+ 	if (pdsc->adminqcq.work.func)
+ 		cancel_work_sync(&pdsc->adminqcq.work);
+ 
++	pci_clear_master(pdsc->pdev);
++
+ 	pdsc_core_uninit(pdsc);
+ 
+ 	if (removing) {
+-- 
+2.43.0
+
 
