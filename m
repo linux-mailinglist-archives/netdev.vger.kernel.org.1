@@ -1,163 +1,220 @@
-Return-Path: <netdev+bounces-295038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295039-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id flOgMartIGp89gAAu9opvQ
-	(envelope-from <netdev+bounces-295038-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:14:50 +0200
+	id e/nPCjbuIGqc9gAAu9opvQ
+	(envelope-from <netdev+bounces-295039-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:17:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 541FB63CAAD
-	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:14:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A7E63CACA
+	for <lists+netdev@lfdr.de>; Thu, 04 Jun 2026 05:17:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=qlMRhIgS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295038-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295038-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=J8vEXLOx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295039-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295039-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21FB93004C7B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 03:12:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0B5A23004916
+	for <lists+netdev@lfdr.de>; Thu,  4 Jun 2026 03:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D6037F001;
-	Thu,  4 Jun 2026 03:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822073812DA;
+	Thu,  4 Jun 2026 03:17:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049C433F5A7
-	for <netdev@vger.kernel.org>; Thu,  4 Jun 2026 03:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168DC2BE035;
+	Thu,  4 Jun 2026 03:17:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780542767; cv=none; b=iXdjcA5DhgMgkv6WxXevxtN1Csrzq1cg9xl+S1wsKq/Z8FPOHWD0ebzafxvsPA4QJyrcl3Eiz2Fun/hMHGskFjFay1kiS4acPn+JwEL8KBsoc+J5PWmwm/VdOetojU8zFw1kakxjvV7LKcYIznXhIA3h1JywmL/dZ4eEJ7qLeTk=
+	t=1780543026; cv=none; b=D2kLdCUDl6j3+9aeJ0PQEGp2DKdT+FZKzxSYl4bTPFFAR0QRexHr0uTXv0+CBKNyXiV8jkBkpo1RbVoN9aY/17rOm13QC++uL6tFKm6Zj5xKLSVoLuG2Xvj2Srq8ebnA8QVlT6eAqdqWbamBiWaCbc1fBPwuO4hOgSV0h2NSDxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780542767; c=relaxed/simple;
-	bh=DlfDwq7/6VDpQjufWIM7cSm5vVt4VNrY3a/zA5y/Q4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t6xix/RMc+q/ZIRw3InCDIq2TIcOmlQleS02g3ytJKTlA9KzbunHha/0OT+ZOrz4IZ5OypG6Wcds/f/0eNcWUP37BHtnR6zN9t501d5BG4g5y4HxA294Z58b+X7RKvrMzJOk6/GhwkCkL61yXz3lFtb5BuJm4bTgnUPlY9ABS2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qlMRhIgS; arc=none smtp.client-ip=91.218.175.184
-Message-ID: <345af51b-9135-4ca0-816b-781a61fdbcbe@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780542764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lOGYlrozBf4t97jXZhgsusCZMhce7jGlmSymXrVd1EQ=;
-	b=qlMRhIgSgDKeoqs23aIpwFYqgW9UMP/hlz2XjY94XzO0rrQkIfKJe73oYdIWaKhi2sjITz
-	xIpn+rG5EE+/+xDmJRBxbesR9HuzSBgNaiCnFRv7aj780Fvgb6pcEx5gbF8+1pcHG8Up9U
-	+L9stlYIFkEJ4LMbxhyaQVv4LcXq+s0=
-Date: Thu, 4 Jun 2026 11:12:32 +0800
+	s=arc-20240116; t=1780543026; c=relaxed/simple;
+	bh=5iqKnkdI/qNFDn6owp8XGyCBJ9688eFsWIEN84Sndic=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DmOeTTLJIhQYjRN6E9AeVc8CDjQTcX5xcdoZIkHsEhh17aBqEXdKJl5PjCcvYsNIEtW7t/c+RUIWn43ednNXSRQXSK4ASeTBbqUtiSrF/g6Soi3URubzNEUfGVR7D7+mctCqswyNSHnG6EwKzK02rfgRZmhL+weklOIPedQ7lCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=J8vEXLOx; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 653JYTP1023943;
+	Wed, 3 Jun 2026 20:16:53 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=wxUX0tRfJYvGPB6UXCUXCVprq
+	h1hrkJgdOtzY/GSsGE=; b=J8vEXLOxr9Rt0ldF91IdGsZBHnmSU+yeqD1ctXU6W
+	+nFI5HevMCFWJEFjCMuLAUouoTwMqN9ZXMfZnkWolcAFoSKeUhS9/UJjfsb2v6ey
+	zkNLUUa0qLd1aX1XrTkOBKlj7MoeMhhGJG474XIEjWgtH+H1YAg2bcDFIhw2hEW5
+	Zepuh0No0CxN6SxAxMT5Z3lvaz/Hx8YTqwoLQYRZNCtD1fG9jpF1mafYyrChwNXJ
+	aKbG+J8HzYTgPe5LPgfHgKGO6wTspH/TN9P0v44v9lknNM3B830J0hVZTLbOEMEm
+	/urb8XWur7S095FZ9UeqmZfzLLcQoxhwehh/hP/hkUwRQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ej8v9cvd3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Jun 2026 20:16:53 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 3 Jun 2026 20:16:52 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 3 Jun 2026 20:16:52 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id A13A63F704E;
+	Wed,  3 Jun 2026 20:16:49 -0700 (PDT)
+Date: Thu, 4 Jun 2026 08:46:48 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH v18 net-next 7/8] octeontx2: cn20k: Respect NPC MCAM
+ X2/X4 profile in flows and DFT alloc
+Message-ID: <aiDuIHx6TbalXCfX@rkannoth-OptiPlex-7090>
+References: <20260602060359.1894952-1-rkannoth@marvell.com>
+ <20260602060359.1894952-8-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC net] tls: TLS_SW sendfile() stalls at large MSS
-To: Mike Fara <admin@windowsforum.com>, netdev@vger.kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>, David Howells <dhowells@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Mike Fara <mjfara@gmail.com>, linux-kernel@vger.kernel.org
-References: <20260603171922.4A1512AA9D4@windowsforum.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260603171922.4A1512AA9D4@windowsforum.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260602060359.1894952-8-rkannoth@marvell.com>
+X-Proofpoint-ORIG-GUID: GD63m1JFfFnPsIxtEq0L59fO8E1U4pYA
+X-Authority-Analysis: v=2.4 cv=JNQLdcKb c=1 sm=1 tr=0 ts=6a20ee25 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=9R54UkLUAAAA:8
+ a=M5GUcnROAAAA:8 a=48gxjua0xmgbg7Xn39kA:9 a=CjuIK1q_8ugA:10
+ a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA0MDAyOCBTYWx0ZWRfX0nQiSwSNg7NM
+ VipfH5Co6HImarjq/4WIArVNQP6CI+kAgjFUG/34JDl1Y0OLls0koElho3pOgK/hz2z8GWkXjUn
+ PFxNt+weUzlgqgk1CifRJkIBDw789HddDlsc9ztJcDHP3j/DUqDjW7tqv/hNSVpHDoQHAkoZlaO
+ JvgGrwZwVjF5MxNAHEjsICgDoRr+LhqOtmriJhSfXOX2dtEfkbXdKVBPU89YITxkNKwi9JrXfcO
+ pDmBvu5rxVgVxGBd4i61/lYPR0j4m2k+CT8oJFg9BKw2geKE7XsgqONUjHwBHrFxjBkVhRlvMio
+ lXKNfJDKrgs/Jv5qIP/fhSZw5j0l2uDqRk2qprbZxELLesZRAT9qk/1i4acr7jlekghfPoNx54A
+ ca4RZcEboUiXMOhySTXfmTnnx+BE6uPLRxCbWI8Iz0DP6Ax2h5OaXuvoyq+KDWLcHHZDa5WFawL
+ AhJGoEIwc6HOmYMI7zQ==
+X-Proofpoint-GUID: GD63m1JFfFnPsIxtEq0L59fO8E1U4pYA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-04_01,2026-05-28_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295038-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:admin@windowsforum.com,m:netdev@vger.kernel.org,m:borisp@nvidia.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:dhowells@redhat.com,m:edumazet@google.com,m:pabeni@redhat.com,m:mjfara@gmail.com,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,redhat.com,google.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-295039-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:from_mime,marvell.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,rkannoth-OptiPlex-7090:mid];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:from_mime,linux.dev:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 541FB63CAAD
+X-Rspamd-Queue-Id: B8A7E63CACA
 
+On 2026-06-02 at 11:33:58, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Default CN20K NPC rule allocation now keys off the active MCAM keyword
+> width: use X4 with a bank-masked reference index when the silicon uses
+> X4 keys, and X2 with the raw index otherwise (replacing the previous
+> always-X2 / eidx + 1 behaviour).
+>
+> In the AF flow-install path, flows that need more than 256 key bits
+> query the NPC profile; if the platform is fixed to X2 entries, fail
+> with -EOPNOTSUPP instead of requesting X4. Otherwise select X4 for the
+> MCAM alloc.
+>
+> On the PF, cache and pass the profile kw_type from npc_get_pfl_info
+> through otx2_mcam_pfl_info_get(), and use it when allocating MCAM
+> entries for RSS/defaults and when installing ethtool flows on CN20K,
+> including masking the reference index for X4 slot layout.
+>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-On 6/4/26 1:19 AM, Mike Fara wrote:
-> Hi,
->
-> Software-kTLS (TLS_SW) TX over sendfile()/splice() drops to the TCP
-> persist-timer cadence (tens of KB/s, with individual sendfile() calls blocking
-> for tens of seconds) when the path MSS is large -- e.g. loopback (MSS 65483) or
-> jumbo frames. At a typical 1448-byte MSS it does not occur. Plain TCP
-> sendfile() on the same path is unaffected, and kTLS write() (no splice) is
-> unaffected, so it is specific to TLS_SW + the splice/sendfile path.
->
-> It triggers only on large-MSS paths with software kTLS (no NIC TLS offload), so
-> it is a niche path -- but it is a clean, reproducible multi-order-of-magnitude
-> cliff, so it seems worth a look. Reproduces on current mainline. CCing David
-> Howells as the author of the 2023 sendpage->MSG_SPLICE_PAGES splice_to_socket()
-> rework referenced below, and Eric/Paolo as this is as much a TCP-corking
-> interaction as a TLS one.
->
-> Environment
-> -----------
-> - net/tls TLS_SW (no NIC offload; ethtool tls-hw-tx-offload: off [fixed]).
-> - AES-GCM; gcm(aes) resolves to generic-gcm-vaes-avx512.
->
-> Reproducer (no OpenSSL/handshake; TLS_TX programmed with a fixed key, the
-> receiver discards ciphertext, like tools/testing/selftests/net/tls.c):
->
->      cc -O2 -Wall -o ktls_sendfile_stall ktls_sendfile_stall.c
->      ./ktls_sendfile_stall          # default loopback MSS (65483)
->      ./ktls_sendfile_stall 1448     # clamp sender MSS via TCP_MAXSEG
->
-> Observed (loopback, single box):
->
->      MSS=default    sent=     4.0 MiB in  52.08s  =>  0.0001 GiB/s   (stalled)
->      MSS=1448       sent=  2048.0 MiB in   1.65s  =>  1.2106 GiB/s
->
-> i.e. ~four orders of magnitude; at the default MSS a single sendfile() blocks
-> for tens of seconds. For contrast, on the same loopback path:
->
->      plain TCP sendfile() (no TLS ULP):           7.87  GiB/s
->      kTLS write() (TLS_SW, no splice, 2 GiB):      1.99  GiB/s
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260602060359.1894952-1-rkannoth%40marvell.com says:
 
+>> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+>> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+>> @@ -4533,11 +4539,18 @@ int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
+>>  	 * as NPC_DFT_RULE_PRIO - 1 (higher hw priority)
+>>  	 */
+>>  	req.contig = false;
+>> -	req.kw_type = NPC_MCAM_KEY_X2;
+>>  	req.count = cnt;
+>>  	req.hdr.pcifunc = pcifunc;
+>>  	req.ref_prio = NPC_MCAM_LOWER_PRIO;
+>> -	req.ref_entry = eidx + 1;
+>> +
+>> +	if (npc_priv.kw == NPC_MCAM_KEY_X4) {
+>> +		req.kw_type = NPC_MCAM_KEY_X4;
+>> +		req.ref_entry = eidx & (npc_priv.bank_depth - 1);
+>> +	} else {
+>> +		req.kw_type = NPC_MCAM_KEY_X2;
+>> +		req.ref_entry = eidx;
+>> +	}
+>> +
+>The first allocation block in npc_cn20k_dft_rules_alloc() previously used
+>req.ref_entry = eidx, so adding only the X4 path to it is purely additive.
+>This second (LOWER_PRIO fallback) block is different: it used to use
+>req.ref_entry = eidx + 1, and the new X2 branch silently drops the +1 and
+>uses eidx instead.
+>Was the previous eidx + 1 (that is, 2 * npc_priv.bank_depth) in the
+>fallback path intentional?
+This is intentional to fix a bug  as eidx + 1 may cross the boundary of the resource.
 
-I tested your ktls_sendfile_stall.c under stable 6.6 and upstream, but 
-both of them works correctly.
-
-~/code/tmp$ ./ktls_sendfile_stall 1448 MSS=1448 sent= 2048.0 MiB in 
-2.32s => 0.8603 GiB/s ~/code/tmp$ ./ktls_sendfile_stall 1448 MSS=1448 
-sent= 2048.0 MiB in 2.37s => 0.8439 GiB/s ~/code/tmp$ 
-./ktls_sendfile_stall MSS=default sent= 2048.0 MiB in 1.64s => 1.2204 
-GiB/s :~/code/tmp$ ./ktls_sendfile_stall MSS=default sent= 2048.0 MiB in 
-1.70s => 1.1737 GiB/s ~/code/tmp$ ./ktls_sendfile_stall 1448 MSS=1448 
-sent= 2048.0 MiB in 2.33s => 0.8570 GiB/s
-
-~/code/tmp$ ethtool -k lo | grep "tls-hw-tx-offload" tls-hw-tx-offload: 
-off [fixed]
-
-
+>> -	if (kw_bits > 256)
+>> +	if (kw_bits > 256) {
+>> +		rvu_mbox_handler_npc_get_pfl_info(rvu, &req, &rsp);
+>> +		if (rsp.kw_type == NPC_MCAM_KEY_X2) {
+>> +			dev_err(rvu->dev,
+>> +				"Only X2 entries are supported in X2 profile\n");
+>> +			return -EOPNOTSUPP;
+>> +		}
+>> +
+>>  		*kw_type = NPC_MCAM_KEY_X4;
+>> +	}
+>A couple of concerns here.
+>The struct msg_req req; is left uninitialized on the stack and then passed
+>to rvu_mbox_handler_npc_get_pfl_info(). The handler does not currently
+>read req, but it is a registered mbox dispatch entry whose contract has
+>its hdr filled in by the mbox layer, so should req be zero-initialized at
+>the declaration to match that contract, similar to the on-the-same-line
+>struct npc_get_pfl_info_rsp rsp = { 0 } above it?
+>The int return of rvu_mbox_handler_npc_get_pfl_info() is also discarded,
+>and rsp.kw_type is then tested unconditionally. Since rsp starts at zero
+>and NPC_MCAM_KEY_X1 is 0, a hypothetical handler failure would skip the
+>X2-profile guard and select NPC_MCAM_KEY_X4. The handler's only failure
+>return today is the !is_cn20k() check, which the function has already
+>short-circuited above, so there is no live failure path; would it still
+>make sense to capture the return and bail out, matching the rc-checking
+>pattern used for rvu_mbox_handler_npc_get_num_kws() just a few lines
+>earlier?
+rvu_mbox_handler_npc_get_pfl_info() behaves purely as a local accessor function in this execution path.
+It retrieves a statically cached profile configuration without processing any mailboxes.
+However, to maintain strict consistency with the mailbox contract and prevent
+any future static analysis tools from flagging uninitialized stack usage, we will add a error handler
+as per of hardening series once this patch series is merged.
 
