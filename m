@@ -1,372 +1,262 @@
-Return-Path: <netdev+bounces-295766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ykEfKfOgImrNbAEAu9opvQ
-	(envelope-from <netdev+bounces-295766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 12:12:03 +0200
+	id TvHjDQSkImp5bQEAu9opvQ
+	(envelope-from <netdev+bounces-295767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 12:25:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD8E647336
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 12:12:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 611BD6474C6
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 12:25:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=rosa.ru header.s=mail header.b=aHQaTMjJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295766-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295766-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=rosa.ru;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=outlook.com header.s=selector1 header.b=kC492UT7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295767-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295767-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=outlook.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9AF5D301D018
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 10:11:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 44E62305D5CD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 10:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253F33F44E4;
-	Fri,  5 Jun 2026 10:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49A33F44D9;
+	Fri,  5 Jun 2026 10:12:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [178.154.239.83])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azolkn19010035.outbound.protection.outlook.com [52.103.10.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928283F1AA1;
-	Fri,  5 Jun 2026 10:11:25 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780654292; cv=none; b=ZQKJIc8KpPw4GPprNui44BPHIne8Yi6lVsTy1dQ6M00Bthf8rqE822aCUOUsU0IlcrD/hMHhHtuMwGodvbF/QhDZiofJaOxdk9/cNExYoFF+P3ie5MPONe0/Woo5szCL9U3Ad2PaEzDxx+ngpyqiPow7Nu8sSo6Hu0rxJDSiyV0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780654292; c=relaxed/simple;
-	bh=kYTFxZTNhTxOeblLkPCzG75HnjLsmHVo1Hax14QTLVA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f4AwMy026clfXTKKTjsyoByozC7lWahK+ynTTYRunAsYFn8FupsvKcEh8Sx5u59Oso96aclB0R0PzFymvnx1h2cxGEht4IhCXg4L1azMmeYUOpbKbh8YRbkZk8m/XWpWpdIk72HE/PMeIlyzK2Rb8yGECovmD1BA1+mze1mwQvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=aHQaTMjJ; arc=none smtp.client-ip=178.154.239.83
-Received: from mail-nwsmtp-smtp-production-main-77.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-77.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:bd0b:0:640:38a2:0])
-	by forward100a.mail.yandex.net (Yandex) with ESMTPS id 26104C0703;
-	Fri, 05 Jun 2026 13:11:18 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-77.iva.yp-c.yandex.net (smtp) with ESMTPSA id DBfH9QHdMa60-bOhYyqVP;
-	Fri, 05 Jun 2026 13:11:16 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
-	t=1780654277; bh=VDmXEm+9yqLjSK0iZYj1FLfuR5L7ZeC46zEHgd4ElMA=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=aHQaTMjJmMjnAbOHJJuuTG0F9N2rZk0eXr1Yp5w5py4ceFnY6MnEe8TZCZ7M8oFIq
-	 6ljlLkKIBPjHW0RYfZyllCVgeEeEg8VfLMQDKG6OXZLU0Q/inXx9aO3PtzwsuMbi4z
-	 pnvTp8J21FxOnYvZxfgAhAiz1CQj//QPbCzeJu3c=
-From: Mikhail Lobanov <m.lobanov@rosa.ru>
-To: davem@davemloft.net
-Cc: m.lobanov@rosa.ru,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	mail@david-bauer.net,
-	jchapman@katalix.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net-next v10] l2tp: fix double dst_release() on sk_dst_cache race
-Date: Fri,  5 Jun 2026 13:11:12 +0300
-Message-Id: <20260605101112.12241-1-m.lobanov@rosa.ru>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C8A3D9695;
+	Fri,  5 Jun 2026 10:12:17 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780654338; cv=fail; b=jo+lESTh9X/2zvvKN3/Pt1415L4oIwbzs8jw1PVOlfud5qBPs1yPARFlAyMNo7waa9rn94/DeaDmQgnvDzT1x3LLcWEY+78oRO/SRJ57/4LArVhUSc9mgTAtZmsLgkoSbkL0n7StrVyVA9gTDGigoj1wSbOBulmyhkD2Xjz3zxE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780654338; c=relaxed/simple;
+	bh=gzQ8R3HIKm7zQKaKy853uHJ0UWqzpGcltqgy3QG/FdY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=sQxoa7UOLEeAS6wa73UG9EW3+W9rris8yQ4dKmaw7G0NL781bhD2eHbzH0BqiqB2cI8Up5k3LV0OSFFNJSouiPflxvsoIwf5f+fsDWWDXL2NuuHbE4YQt0f3XP/nawLfRoFqKN0rg/jGk8uoFhG0y3tkHZg6c0Al6ZfI52BIwKo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=kC492UT7; arc=fail smtp.client-ip=52.103.10.35
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VLt+I1j8dmRF5O3VSZPHaQCJDDDIbm1JDH6dTMI84u2NSfpeoXcv5ZIR/4fHAQ23lW5EdIln+ttjPNtH7dQH1IFllQeTV9htQahey9nOAindPbU4gu2y6TNQIVF8W6jCOMHQOb4RMg1M2/Rj17/I6q4tE86jahnYz9/eHDLwJTeaEDyKLeZltUilNTB7cPFz0epOQzDS9KjxsfJkqQgrjIrJe5nwyTdw7aHQdBU1H4ZFuRaIxjapeWR5cF5CB6fXVGgTzK+ED6nv4E/tq2KfREmMWILcjkGSiVQM3MfageaSGFfI4UscwS0e8nk7y/ZoN6enkPbFbgJP60cT0XUhsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EoX3o0RhLR+O8iCH+eyxRyKZeWD7IfHY9Zx844G//Fs=;
+ b=S9930iaygLHpk3nWdrbjZxoh2SgMgq+PNuQAxvy3n5s4mEI5c96WRS0WAiXM3Pj+eWTryNaEmJBQiW1vRAl9q/gwHiySOujR7wO+OHUXqYJLnDGU/4JoIiWdx+dn+vV7Jc46+8ob8lT9cjTbTgFajEuVKpOLn69nK7AxN3TmYOP7JmNfThzfRLj2hXw2b9TdhBKy9HAsxTLlxMGa1A/2VgirChDbJj7WRIkZJeU3BCz2VTPqU6ZEDDlZSYfaTb+rJdmxOUpSWbuDZ8V1vHYZYs6c451iExcz95FymvQtYY6W/e6yyqnk2azRqH/hC5HrefukAwrNzk7WfEOuS+Z94Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EoX3o0RhLR+O8iCH+eyxRyKZeWD7IfHY9Zx844G//Fs=;
+ b=kC492UT70TvZS0bXjfsszoTgHIh5+shH43mczOPPZLNwH1usxI/6TRgl1z+N+JgP/PpUN0MzDFZCThdCf4OKrV/2U6PYn/nV2rga6u+EAow4SlIp5y8IjPXCPHEGTLbungUlh9z6gq5ILbAL/gV6/8KUptE7PcI+N8JWw+GBCcjAR0DngiTJ/XFX6aMb61lAZpYbpGl9U78zPkveDfnNGStrZkW78EqOnFARkRoohfw/Ky1/Z2sFfBwmb9NYjsKk0LCSnZcKtD5QofVUNlrhXx99qBOFh6jK4GXD1ST1OSi39VOOjL6ezW4MDylpXBFR4PZYz5n7dR/Ao/KZRgSGfA==
+Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
+ by SN7PR19MB6566.namprd19.prod.outlook.com (2603:10b6:806:26e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Fri, 5 Jun 2026
+ 10:12:15 +0000
+Received: from SN7PR19MB6736.namprd19.prod.outlook.com
+ ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
+ ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
+ 10:12:15 +0000
+Message-ID:
+ <SN7PR19MB6736654AFA46A76AA351D2609D112@SN7PR19MB6736.namprd19.prod.outlook.com>
+Date: Fri, 5 Jun 2026 14:12:04 +0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] dt-bindings: net: ethernet-phy: move clocks
+ property to invidivual PHY bindings
+To: Rob Herring <robh@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org
+References: <20260602-ipq5018-gephy-clocks-v2-0-65a1f1d881f3@outlook.com>
+ <20260602-ipq5018-gephy-clocks-v2-1-65a1f1d881f3@outlook.com>
+ <20260604213948.GA1223636-robh@kernel.org>
+Content-Language: en-US
+From: George Moussalem <george.moussalem@outlook.com>
+In-Reply-To: <20260604213948.GA1223636-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DX0P273CA0036.AREP273.PROD.OUTLOOK.COM
+ (2603:1086:300:58::14) To SN7PR19MB6736.namprd19.prod.outlook.com
+ (2603:10b6:806:263::12)
+X-Microsoft-Original-Message-ID:
+ <d0e39fc2-7b7b-4ae6-a33c-908f181f8c13@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|SN7PR19MB6566:EE_
+X-MS-Office365-Filtering-Correlation-Id: a0a53a6e-b5de-4ed2-df20-08dec2eaea3f
+X-MS-Exchange-SLBlob-MailProps:
+	Z68gl6A5j2981iOqa3TIFE7v3cGH1r/4iyR0FNVF1LsrxI+Jk4tOuByvlPjLR0kQjAdm0bOm9hTsGSYkRF6ANCN5bwnLy6SuhafPKIs5ad4Ju2VtXHe7E4yX1BMr8K7yPA9r4qRJMRPmgxXTCQ7Kg1pGkLJVhhLFGkxBHkIQSXG5jk5wDnMTuc4PryozoCcIfV1wtZFB/A6RwtrEv3VHJqYc0nzhMbDhWaSM8YrqMLdJ5vICNKL/iIoKHYPfCfMKnqG8eeIo2uTmg5l6UfdEGpLykP6ZfNMU0eFIc0jVwd2bnF1/Tm7tARCIJmxIDUZWuMj5HMn+wpNTNfenfYHaIE7LRKXoufE1vr8lKP++zaVc44/hON2GCDH7bnH39ovkhqHtr783AFt3V+kRImfnLL9ViRrutHUTAvk+eol2RmgR32kXAa9zZsL8yodOksrh5ERvMxbX39EIQOXItdD4BbtDrdnzi7QLUWjE8euRCZtRsFhMFm1oQqzqpQwLK563O9YSrj8QLZvwdCmyWer1d6kGzKFPf5tqfxs0kHY0Fomyi5KJpvkd3TESBV5a8F+zowOS3XXF7ipZZMpD2BlfTy038BgTpaARsVZprIDQg68V+tnpcdATLLqzqw7oRA3O0EebWlVn9qTzPTQRaK/GylVeLU2WnSzqlFyfFAxlR4aessTJNqc+hbzTtm8UbhJbyE+ka4aTAJPiC36ozwfbGis/9mdnO3rsGmFDiJ3WhvPVxq0/GsP4j62hyjHGKLCAO6ZlzIZrf4Jy4Lkxhuif+jU49VZPIb4egxCrXUDeCylgPiGzKExD+aBNz49u61DA
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|24021099003|55001999006|51005399006|37011999003|19110799012|8060799015|5072599009|23021999003|6090799003|15080799012|1602099012|40105399003|4302099013|440099028|3412199025|10035399007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SGRuSit4d0Vqb2dRMmJrS05XRUFTMEhTMFU5S3gyMmk1Wi9odHJic1FJU2V2?=
+ =?utf-8?B?bHFDUXBad0hCYldUc3ovOXcyaHVOK3AyQlVGNXVud0tlNmh3REZobXZHT3lT?=
+ =?utf-8?B?ZXBSSytHdDBJeFprNDJWR3NTQ1hsWWVyQythL1NoMGJmU0tLMVZFVXYyaXo1?=
+ =?utf-8?B?cnBjTWcrd0l4MG5Sd0Z5S1l2SE5sdm9nV2MxcUhXNmZaQ0pMQ29HZFdndzNN?=
+ =?utf-8?B?d053NkVqVVJKblN3Ujc1cUxqZTB6Q2tndDE5OU1EZ0lKWGVPTVJsTW9HREo4?=
+ =?utf-8?B?YWFNeXhrSjF6TXN6L0N5S0doeDllTllLN09CaWgrT256NTRQNytuMEVZL251?=
+ =?utf-8?B?bUtPQnBHdGxKa3V6NTQ1ajJGWkxiZ0xERGwzNHBTTGhXRDRqYklkcHVBOU84?=
+ =?utf-8?B?ZDByWmFRS0JjRXJIYkl3WW5xS0xwQU1zSXhLTjh1T1V6OU82OE5Wd1ppdnBG?=
+ =?utf-8?B?ZlRGZnM0UGpFd2RscGpZbjd1K3pEMHA3WFhheHBLNTRKWWdKUzMyYVJMemVC?=
+ =?utf-8?B?c09TTWM1anN5ZE4vajZxVkVuc1R4UC9jTy8yRHB1OTkzUGJiTDBDNmtRMXFX?=
+ =?utf-8?B?eCtyNTRNZ0c5dEdCWkdDYVRLbzhSRTlQdkd0dGhRbjNHZ1M5WWVrVGg4Ymth?=
+ =?utf-8?B?VUltd3Q0eEZ2SGs2OGtwR1BtYWNIVDNsOFVZbGFycUdrTEJZaExkUXduMTVC?=
+ =?utf-8?B?d3orbk9zUGd1RzMvS0hhZ3BCUlB1dm93d3pYYjEyWE50KzZTV00yR21pOUdE?=
+ =?utf-8?B?SVJVWUlnaUhZMGFwOThzV2JBZUIyS1lzaVVrcXFrMHR0QnQxWC9PTnhQbnYx?=
+ =?utf-8?B?SXFiOFR2aEhWMnhUOUliS1hIbU9sMnIrRFpTRlJwSVhER0JnVnZmMVE4dVcv?=
+ =?utf-8?B?dHVHZmJSQzhuYUZNeGlNb005U2FPSitoZzdMeXhNcndmbTgwK3JVQm1HODlW?=
+ =?utf-8?B?VEhQYnFadG9FZ1JvckpxcTc1OCtkdFd0UVlkTGtSVC9QMWlQazh2SXR3VWFq?=
+ =?utf-8?B?Zk9zTFVCMGU3eHZLUU1CcGJ1ejhhNDIwMitQNEFtU1kyajM3UmQ0ampSUCtD?=
+ =?utf-8?B?TDhLZVhYcjY5d1o2WjBESVRpQW9VbEw1N2tTNFgxcmgxNHhMUm9ZbTQ3NGdE?=
+ =?utf-8?B?cWdHbTdMVmhucVlKRFJNRHVvczZCOUhRMzZyU2NvUllZdG4zNGgrN05tYzNO?=
+ =?utf-8?B?TnROakM2S0pWYVVwWnlIZnNxOFg5b2tVbVptWFN4NEs2WUMwUkcvMnNvQ2Zk?=
+ =?utf-8?B?bHcvalMwdDVaMVA3NGloN0NUMU80OWhObVdqam1ROSttQnl4cS9EU1NPVzU5?=
+ =?utf-8?B?N2Fpb2UrNHkvZ0c1a2pWZmF5VThLRmpJaTVzWlFpcDkwOXdYUzR3ajZ6cklk?=
+ =?utf-8?B?ZHFxMmZQMy9scEVaWTVoNE9NSndBMjg2ZHk1ZFFOQm9jMjVGSmVGcmMyR3Fn?=
+ =?utf-8?B?TlVTeDdwZ2R2dzdwazRJTXJDanc5cnFwWERnSkRUckJZdVB4d0djRVhIK3dJ?=
+ =?utf-8?Q?6gX3xSaR5cU6h6zumBqSWj6XxpB?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eEcxdjVLZTlBM0FjcU5Xa3p4a0NVWk9SVDNsRnRJY3ovNVM2MTBLM1g1MDZy?=
+ =?utf-8?B?MnBTUTBJRWVsbnMyYlJRME1DTEpQcDh0RWdQcmNSdzBRbjZ0UlRVd0ZvNUhk?=
+ =?utf-8?B?SXpEMlFqWEtadk14UmlUUUVJZE0wT3RtRmgyQ204SU9URXRRR0FibmxsVWVk?=
+ =?utf-8?B?eHRpUnlnVktLWXdjUHpwb3pqcUlZS3BQWHc3TjhLN2dXVFZ2UEVmUGp0SkNq?=
+ =?utf-8?B?dEJFck8xWEhIclJ2Z2Z3THNtSkt2SXlhOEhxdm9pSUpDMkxlNllSUEF0UUxs?=
+ =?utf-8?B?SzlhVzVFdU51K3hRczF3UkJpSGR1TVgxZHZXdG9NdFljazZaa21EZDJsdlhl?=
+ =?utf-8?B?cWV1a1kxRXpZREVRUHZhdlFsdnVyOWk0bXJkUGtzU002T1JkQjdBUGd6OHEy?=
+ =?utf-8?B?dkR0Nis2M01JdmFlL2M5NjB2UG1PTnlMK2FXeDdyUjExWjJIdXkzSFJ5N2Uy?=
+ =?utf-8?B?bU1BNUQwdEdnTnk2RjZlaFRTNDhRcEVmcC81eXZudUxyaGkrQnlQcU9OeUh6?=
+ =?utf-8?B?UWFuS2FoTGc5QXl5NTlJNE1yRWhpelNGRjVXbTc5RGtKRFhiVDUwc2FDdE5E?=
+ =?utf-8?B?dHVNVnUrR2Q4MmI1NlluVXF6bENteHRwbzYweU9YMUczenNBQXhOZWowS3o3?=
+ =?utf-8?B?aXFXU3RjMGtmZiszVjVRT2hNRzdJOFNQdUtGYi9MWVFVaTBFZnpSaVg5SkVi?=
+ =?utf-8?B?eVo4NU1BN0lZeTdpZUhweWhZUFU0L0s0MVQ2S2NrNW5STTFxYzZMQjZ1eDg2?=
+ =?utf-8?B?cmZGMFdqSlVVdnJZNEh1NW56TmU2NU1IbldKR0FrL1c5UXJlUEZtWUdxaHdo?=
+ =?utf-8?B?aUwrQzBHSXlha2MzT3VoWmkveTl0UVQxK3hjMG1jM2JOOUNaR3VpSjY3emVj?=
+ =?utf-8?B?VWpqZXNxNzNPVE5xTmpaYXRDdjJxWjJ5L3pXbWZiVnFIN3NERnpuVjVWUU1k?=
+ =?utf-8?B?Z0V4OTVBS25HbGdWVmdnblRTTS93cE5YZlVpbXJtYkUrazhMYVI3NEZpa3NC?=
+ =?utf-8?B?OEV0ZCt3NytheXlDRHFtOWg5U05CeTRoMWlRamgrZExLQ0NJNEdhVGtYSkpE?=
+ =?utf-8?B?UE9MeWYveE5lajkyTzlLU0E4a3l0NmpSUDIxb0NMQ3lxQS9XWFdBTENGQnF5?=
+ =?utf-8?B?aHl1QzdtZ25EM2V5aTNaQmhlUXN3eDhMTHVNMnVIWmZNZnB3NXk3WlROa3hO?=
+ =?utf-8?B?TDRubkZGdWRNUUlMUEljUGp3OTNCWWR4N1VCUExmMjFyM01xRFVQK2poNTBU?=
+ =?utf-8?B?M3VqSVY2MjE5bnRaMUovSUZvVTZld25seFRWUjhJakRyQXJEU3dRM1o2T3pU?=
+ =?utf-8?B?QlQ3cURnczlrMWFwenlRZjBvbGR6RnZ3MVVram4rdDVGcllseWJycXJBYVRk?=
+ =?utf-8?B?QWM1UE1pdnVTdURBenJjT2NiMVVwenhWblhZdURUbkxKNkQveWQvTU45VlJn?=
+ =?utf-8?B?VDlPMGVpcVpCcVptNWNQcGkvNW9JczV3SmNIZWxQK0J2S245bjVDNHRYQ05w?=
+ =?utf-8?B?Mk5CSVRzZjFCUXRKdUMrWWJGNXp6c0FhNEVNMjQ2YkhjVytqdmxNMlBwZUZq?=
+ =?utf-8?B?YVNPUmNHbUJ2d2FyT3V1eGh6VFdhaVRaaEJ1d0tLTzlMQnpreTcxa1VaQnl5?=
+ =?utf-8?B?NGdtaEw1RHIvdCt6Zmc3dTh3cEU2ekRKMVNrUUcybVVOMGtKT2MxN2t1ZFda?=
+ =?utf-8?B?UFZNMlJmcEc3b1hwNVdxaTB2RlJSc09OYlJvSjk3cytTTVpadVlyZTdDaTZq?=
+ =?utf-8?B?SkxtaDFDY01tNWIybzRkMWNOK2doM3k0WHJhZ2dGWTFFT1NKMVJFQ1h3enMy?=
+ =?utf-8?B?QXU2RDJFMXpQVG03emFIOStlMDBwRDNNamZ5OTh0SjRuckJJNmlRdTBGazJN?=
+ =?utf-8?B?cnhydHF1bndEYkJyNGN1eUpLdmZURWVuaG53RjAwd291bkE9PQ==?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a0a53a6e-b5de-4ed2-df20-08dec2eaea3f
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 10:12:14.9020
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR19MB6566
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[rosa.ru,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[rosa.ru:s=mail];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
+	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[rosa.ru:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:konrad.dybcio@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:m.lobanov@rosa.ru,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:mail@david-bauer.net,m:jchapman@katalix.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[m.lobanov@rosa.ru,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-295766-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m.lobanov@rosa.ru,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[outlook.com];
+	FORGED_MUA_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-295767-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,oss.qualcomm.com];
+	DKIM_TRACE(0.00)[outlook.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,rosa.ru:mid,rosa.ru:dkim,rosa.ru:from_mime,rosa.ru:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,SN7PR19MB6736.namprd19.prod.outlook.com:mid,outlook.com:dkim,outlook.com:from_mime,outlook.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3FD8E647336
+X-Rspamd-Queue-Id: 611BD6474C6
 
-A reproducible rcuref - imbalanced put() warning is observed under
-IPv6 L2TP (pppol2tp) traffic with blackhole routes, indicating an
-imbalance in dst reference counting for routes cached in
-sk->sk_dst_cache and pointing to a subtle lifetime/synchronization
-issue between the helpers that validate and drop cached dst entries.
+On 6/5/26 01:39, Rob Herring wrote:
+> On Tue, Jun 02, 2026 at 10:50:37AM +0400, George Moussalem wrote:
+>> Move the clock property and restriction from the ethernet-phy.yaml file
+>> to the individual PHY binding files. This allows each PHY to manage its
+>> own clock requirements.
+>>
+>> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+>> ---
+>> Commit 350b7a258f20 introduced the clocks property with a restriction to
+>> maximum 1 to the main ethernet-phy.yaml binding for Realtek to add an
+>> optional external clock source. This is restrictive to all PHY bindings,
+>> as some PHYs may require more than 1 clock such as the IPQ5018 PHY which
+>> requires 2 clocks (for RX and TX).
+>>
+>> There are three other PHY drivers that require clock management:
+>> - Micrel: requires 1 optional clock and the micrel.yaml file already
+>> accomodates for the clock property.
+> 
+> It does? Where?
 
-rcuref - imbalanced put()
-WARNING: CPU: 0 PID: 899 at lib/rcuref.c:266 rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
-Call Trace:
- <TASK>
- dst_release+0x291/0x310 net/core/dst.c:167
- __sk_dst_check+0x2d4/0x350 net/core/sock.c:604
- __inet6_csk_dst_check net/ipv6/inet6_connection_sock.c:76 [inline]
- inet6_csk_route_socket+0x6ed/0x10c0 net/ipv6/inet6_connection_sock.c:104
- inet6_csk_xmit+0x12f/0x740 net/ipv6/inet6_connection_sock.c:121
- l2tp_xmit_queue net/l2tp/l2tp_core.c:1214 [inline]
- l2tp_xmit_core net/l2tp/l2tp_core.c:1309 [inline]
- l2tp_xmit_skb+0x1404/0x1910 net/l2tp/l2tp_core.c:1325
- pppol2tp_sendmsg+0x3ca/0x550 net/l2tp/l2tp_ppp.c:302
- __sys_sendmmsg+0x188/0x450 net/socket.c:2749
- __x64_sys_sendmmsg+0x98/0x100 net/socket.c:2775
- do_syscall_64+0x64/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
- </TASK>
+apologies, I see it's clock-names only:
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Documentation/devicetree/bindings/net/micrel.yaml#n103
 
-The race occurs between the lockless UDPv6 transmit path
-(udpv6_sendmsg() -> sk_dst_check()) and the locked L2TP/pppol2tp
-transmit path (pppol2tp_sendmsg() -> l2tp_xmit_skb() ->
-... -> inet6_csk_xmit() -> __sk_dst_check()), when both handle
-the same obsolete dst from sk->sk_dst_cache: the UDPv6 side takes
-an extra reference and atomically steals and releases the cached
-dst, while the L2TP side, using a stale cached pointer, still
-calls dst_release() on it, and together these updates produce
-an extra final dst_release() on that dst, triggering
-rcuref - imbalanced put().
+> 
+>> - SMSC: requires an optional clock and the legacy bindings file
+>> (smsc-lan87xx.txt) already accomodates for the clock property.
+>> - BCM7xxx: requires an optional clock. I could not find a bindings file
+>> for this PHY family.
+> 
+> Because it only uses what is defined in ethernet-phy.yaml. The only way 
+> to enforce 1 clock in this case is split ethernet-phy.yaml into common 
+> properties (removing the 'select') and a 'generic' phy schema that 
+> selects nodes with name 'ethernet-phy' and also have no 'compatible' 
+> property. Not sure if that's really worth doing. We generally try to 
+> require compatible for any new phys, but that's only if they try to add 
+> something to ethernet-phy.yaml so we see it.
+> 
+> The simple solution is you need to keep 'clocks' and make it 1-2 
+> clocks. It's been how many years until we needed 2 clocks? So probably 
+> some time before needing more if ever.
 
-The Race Condition:
+I'll update in next version, thanks.
 
-Initial:
-  sk->sk_dst_cache = dst
-  ref(dst) = 1
+> 
+> Rob
 
-Thread 1: sk_dst_check()                Thread 2: __sk_dst_check()
-========================               ===========================
-sk_dst_get(sk):
-  rcu_read_lock()
-  dst = rcu_dereference(sk->sk_dst_cache)
-  rcuref_get(dst) succeeds
-  rcu_read_unlock()
-  // ref = 2
-
-                                            dst = __sk_dst_check()
-                                    // reads same dst from sk->sk_dst_cache
-                                    // ref still = 2 (no explicit get)
-
-[both see dst obsolete & check() == NULL]
-
-sk_dst_reset(sk):
-  old = xchg(&sk->sk_dst_cache, NULL)
-    // old = dst
-  dst_release(old)
-    // drop cached ref
-    // ref: 2 -> 1
-
-                                  RCU_INIT_POINTER(sk->sk_dst_cache, NULL)
-                                  // cache already NULL after xchg
-                                            dst_release(dst)
-                                              // ref: 1 -> 0
-
-  dst_release(dst)
-  // tries to drop its own ref after final put
-  // rcuref_put_slowpath() -> "rcuref - imbalanced put()"
-
-Make L2TP's IPv6 transmit path stop using inet6_csk_xmit()
-(and thus __sk_dst_check()) and instead open-code the same
-routing and transmit sequence using ip6_sk_dst_lookup_flow()
-and ip6_xmit(). The new code builds a flowi6 from the socket
-fields in the same way as inet6_csk_route_socket(), then calls
-ip6_sk_dst_lookup_flow(), which internally relies on the lockless
-sk_dst_check()/sk_dst_reset() pattern shared with UDPv6, and
-attaches the resulting dst to the skb before invoking ip6_xmit().
-This makes both the UDPv6 and L2TP IPv6 paths use the same
-dst-cache handling logic for a given socket and removes the
-possibility that sk_dst_check() and __sk_dst_check() concurrently
-drop the same cached dst and trigger the rcuref - imbalanced put()
-warning under concurrent traffic.
-
-Use a helper to pre-route IPv4 L2TP packets via sk_dst_check()
-and ip_route_output_ports(), attach the resulting dst to the
-skb, and then hand the skb to ip_queue_xmit(). With skb->dst
-already set, __ip_queue_xmit() skips its __sk_dst_check()-based
-dst cache handling, so IPv4 L2TP uses the same lockless
-sk_dst_check() helper as UDPv4 for a given socket. This avoids
-mixed sk_dst_check()/__sk_dst_check() users of sk->sk_dst_cache
-and closes the same class of double dst_release() race on IPv4.
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: b0270e91014d ("ipv4: add a sock pointer to ip_queue_xmit()")
-Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
----
-Changes in v10:
- - l2tp_xmit_ipv4(): hold a real dst reference for the skb
-   (skb_dst_set() instead of skb_dst_set_noref(), taking dst_hold()
-   before donating the route to the socket dst cache) so the cached
-   dst cannot be freed during the ip_queue_xmit() handoff, and the
-   sk_dst_check() reference taken on the cache-hit path is not leaked.
-   This matches what udp_sendmsg() does. Reported by the netdev AI
-   reviewer on v9.
- - l2tp_xmit_ipv6(): return PTR_ERR(dst) instead of NET_XMIT_DROP on
-   route lookup failure, so the l2tp_xmit_queue() wrapper maps it to
-   NET_XMIT_DROP and l2tp_xmit_skb() accounts it as a tx error rather
-   than a tx success.
- - Fix the variable declaration order (reverse christmas tree) in
-   l2tp_xmit_ipv4() and l2tp_xmit_queue(). Per Paolo Abeni's review.
-
-v9: https://lore.kernel.org/netdev/3564485c-0969-40bf-8f18-c9eb36c4065e@redhat.com/T/#t
-
-Changes in v9:
- - Rebase on net-next; no functional change to the fix.
- - The kmemleak reported by CI on v8 is the AEAD transform of an IPsec
-   ESP SA, allocated by the XFRM control plane (xfrm_add_sa ->
-   __xfrm_init_state -> esp_init_state -> esp_init_aead, comm "ip") and
-   freed by the xfrm_state destructor esp_destroy() -> crypto_free_aead().
-   This change only rewrites the L2TP data-plane transmit path and never
-   allocates, frees, or changes the refcounting of that object, so it is
-   not the source of the leak. Not reproducible here (KASAN +
-   DEBUG_KMEMLEAK; adding/removing rfc4106(gcm(aes)) ESP SAs in a loop ->
-   0 unreferenced objects) nor by Li Xiasong. Detailed analysis in reply
-   to the v8 thread.
-
-v8: https://lore.kernel.org/netdev/20251215145537.5085-1-m.lobanov@rosa.ru/
-
- net/l2tp/l2tp_core.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 3 deletions(-)
-
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 157fc23ce4e1..44a4add220ea 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1204,19 +1204,119 @@ static int l2tp_build_l2tpv3_header(struct l2tp_session *session, void *buf)
- 	return bufp - optr;
- }
- 
-+#if IS_ENABLED(CONFIG_IPV6)
-+static int l2tp_xmit_ipv6(struct sock *sk, struct sk_buff *skb)
-+{
-+	struct ipv6_pinfo *np = inet6_sk(sk);
-+	struct inet_sock *inet = inet_sk(sk);
-+	struct in6_addr *final_p, final;
-+	struct ipv6_txoptions *opt;
-+	struct dst_entry *dst;
-+	struct flowi6 fl6;
-+	int err;
-+
-+	memset(&fl6, 0, sizeof(fl6));
-+	fl6.flowi6_proto = sk->sk_protocol;
-+	fl6.daddr        = sk->sk_v6_daddr;
-+	fl6.saddr        = np->saddr;
-+	fl6.flowlabel    = np->flow_label;
-+	IP6_ECN_flow_xmit(sk, fl6.flowlabel);
-+
-+	fl6.flowi6_oif   = READ_ONCE(sk->sk_bound_dev_if);
-+	fl6.flowi6_mark  = READ_ONCE(sk->sk_mark);
-+	fl6.fl6_sport    = inet->inet_sport;
-+	fl6.fl6_dport    = inet->inet_dport;
-+	fl6.flowi6_uid   = sk_uid(sk);
-+
-+	security_sk_classify_flow(sk, flowi6_to_flowi_common(&fl6));
-+
-+	rcu_read_lock();
-+	opt = rcu_dereference(np->opt);
-+	final_p = fl6_update_dst(&fl6, opt, &final);
-+
-+	dst = ip6_sk_dst_lookup_flow(sk, &fl6, final_p, true);
-+	if (IS_ERR(dst)) {
-+		rcu_read_unlock();
-+		kfree_skb(skb);
-+		return PTR_ERR(dst);
-+	}
-+
-+	skb_dst_set(skb, dst);
-+	fl6.daddr = sk->sk_v6_daddr;
-+
-+	err = ip6_xmit(sk, skb, &fl6, READ_ONCE(sk->sk_mark),
-+		       opt, np->tclass,
-+		       READ_ONCE(sk->sk_priority));
-+	rcu_read_unlock();
-+	return err;
-+}
-+#endif
-+
-+static int l2tp_xmit_ipv4(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
-+{
-+	struct inet_sock *inet = inet_sk(sk);
-+	struct ip_options_rcu *inet_opt;
-+	struct net *net = sock_net(sk);
-+	struct flowi4 *fl4;
-+	struct rtable *rt;
-+	__u8 tos;
-+	int err;
-+
-+	rcu_read_lock();
-+	inet_opt = rcu_dereference(inet->inet_opt);
-+	fl4 = &fl->u.ip4;
-+	tos = READ_ONCE(inet->tos);
-+
-+	rt = dst_rtable(sk_dst_check(sk, 0));
-+	if (!rt) {
-+		__be32 daddr = inet->inet_daddr;
-+
-+		if (inet_opt && inet_opt->opt.srr)
-+			daddr = inet_opt->opt.faddr;
-+
-+		rt = ip_route_output_ports(net, fl4, sk,
-+					   daddr, inet->inet_saddr,
-+					   inet->inet_dport,
-+					   inet->inet_sport,
-+					   sk->sk_protocol,
-+					   tos & INET_DSCP_MASK,
-+					   READ_ONCE(sk->sk_bound_dev_if));
-+		if (IS_ERR(rt)) {
-+			rcu_read_unlock();
-+			IP_INC_STATS(net, IPSTATS_MIB_OUTNOROUTES);
-+			kfree_skb_reason(skb, SKB_DROP_REASON_IP_OUTNOROUTES);
-+			return -EHOSTUNREACH;
-+		}
-+
-+		/* Take a reference for the skb before donating the route
-+		 * reference to the socket dst cache, so the dst stays valid
-+		 * across the ip_queue_xmit() handoff (mirrors udp_sendmsg()).
-+		 */
-+		dst_hold(&rt->dst);
-+		sk_setup_caps(sk, &rt->dst);
-+	}
-+
-+	skb_dst_set(skb, &rt->dst);
-+	rcu_read_unlock();
-+
-+	err = ip_queue_xmit(sk, skb, fl);
-+	return err;
-+}
-+
- /* Queue the packet to IP for output: tunnel socket lock must be held */
- static int l2tp_xmit_queue(struct l2tp_tunnel *tunnel, struct sk_buff *skb, struct flowi *fl)
- {
-+	struct sock *sk = tunnel->sock;
- 	int err;
- 
- 	skb->ignore_df = 1;
- 	skb_dst_drop(skb);
- #if IS_ENABLED(CONFIG_IPV6)
--	if (l2tp_sk_is_v6(tunnel->sock))
--		err = inet6_csk_xmit(tunnel->sock, skb, NULL);
-+	if (l2tp_sk_is_v6(sk))
-+		err = l2tp_xmit_ipv6(sk, skb);
- 	else
- #endif
--		err = ip_queue_xmit(tunnel->sock, skb, fl);
-+		err = l2tp_xmit_ipv4(sk, skb, fl);
- 
- 	return err >= 0 ? NET_XMIT_SUCCESS : NET_XMIT_DROP;
- }
--- 
-2.43.0
+thanks,
+George
 
