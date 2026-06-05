@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-295943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NHIcGlwYI2o3iQEAu9opvQ
-	(envelope-from <netdev+bounces-295943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:41:32 +0200
+	id T+EDCG0YI2pDiQEAu9opvQ
+	(envelope-from <netdev+bounces-295945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:41:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07BD064AB15
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:41:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74BB64AB1E
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:41:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LE2po7YG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295943-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295943-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=BlboEMWO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295945-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295945-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 566143080D49
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 18:37:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D6CB530850E9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 18:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A423FC5A8;
-	Fri,  5 Jun 2026 18:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC203FD137;
+	Fri,  5 Jun 2026 18:35:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700013F9F23
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 18:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3179E3EC2FD
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 18:35:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780684556; cv=none; b=uR/f2lhf1QWTMO1KHIzCpwsnixEL9OqTJ2lxff9m87Jyw30Y95w3ZkBEwTYfFblpyhB4JxnG+Jj8UP3g8/RVC2ZaSl3x0I+9EgcNHbXbDkR/kctKp/NCDvKPYBhVQxI6xHmaquJ1lvg4XfCIJ5Y3hRAAtXq1KwuDI+MNXxX/HbY=
+	t=1780684557; cv=none; b=Qjd5aHA7qYESnB1j6GR2s7jKxMCT5v/9BTJrVFo0g3xylAUC+MG45wZXSqsIwQ/L82QR1hbn30Wa2UB6aDOZsFKvv1q1jX6VnW8GJYL2MEaG743rZYXHOR0ck9Te9p6EhJZP2mmq8BXWulm9TKSFNcIR293TR2vNnHK19guOLX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780684556; c=relaxed/simple;
-	bh=bdDero+XyXIqJKT2CcYDDlJxAtQ+MlH1wwcGYYvKqyY=;
+	s=arc-20240116; t=1780684557; c=relaxed/simple;
+	bh=VVADNSV1X9wTkRBoKH71hQL9qSar8jZgE+dZ8EZnP3A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Iw6/qvTKhYfrADyqffPNFFxrnczHX8zW5OoX3FhQZStvOMeM4cPPIYCi0y8iB3vgWKDtz8OTUeBhpR+LUyacJM2IFvZadQLN2lFBegKK/AuyVozoanGSEtnB++yAeKuugkBP3Laxz5gdo3j6jodWB6Shs6auGPWNNSkTYvm1wk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LE2po7YG; arc=none smtp.client-ip=209.85.214.182
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2c0c1e0b0faso16488785ad.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 11:35:55 -0700 (PDT)
+	 MIME-Version; b=ei/fYC0r05E2AZdLwuEDT+iDuyl/uCxHgA2cjQSoCX98c6vlZi5fa5j+G8UXdFzQ5DAFdvwlQcuSLcFKP49pDXEwgUoWJpu0g3kxVANqeQrCMBNKxAOEiGU1UkIJzn0am4T3RsKdyu8a2CCqrnqKqHgxW/vN9UVmHAJm3+9e0k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BlboEMWO; arc=none smtp.client-ip=209.85.216.41
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36d630c0e35so2287682a91.3
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 11:35:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1780684555; x=1781289355; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jCQYih7Qu6X9/MRoiGqCVzcGjRebs+PoxLmTpVbEJQw=;
-        b=LE2po7YGuv7kVfch2jy1Fg9WIwTZRQZuQ4udv7xX0jTjMtSaPY7L8DAfv9Ifs6lKW4
-         EYRNhWW3yR/qOWYnVeDzmaeEmxD9Y+XHWUHOaTf2znZs20nBflEXNaDR5UHvhN2Rz7B6
-         0K3AAFtCafO7rAUkUbqy2cGWv8dJC3u1wKxN+FhFAowB294me3+CWJXzg/6OV3U5a0Cl
-         XLk+82JNW7+WK/vhuxSNsWWbuxFnC74awk9ju660xhvHqOHiSCqZAE2WPCXuD40tJuXs
-         DacHKJa/tXlrhPLaEx8uUoZzGQdNHzOgTHh9UjPgcKCs2ClQ22bv/wNBWklSYSE8H7A+
-         0zkg==
+        bh=uLIAaKlmgt4AiSXDWFcEgvbqEgZu5tWx4v+R7w02MlU=;
+        b=BlboEMWOWKmYDDGiMzxNk0pjbSJCeaXVg3A9oFzpsXNlcWLqRKc8yAcrLV1y6+VJxc
+         lEc2KNS5+vrMvWfLq5yve6doTy1lQL3gD/3F3XSUooQ+Xopc5N0iAOQjCVmmRZN0VZ8p
+         jyRM9PlPQa54a5F0Qp0ELsizlOLy5H9WXiDO+1MJuLgEMt4/QbWjVEz5b+OipUwiWYgS
+         LEx+PT/as8EA3iYBEqEnqzu5zgpEAxbl5mt+LSyYay2Iw5uTpK5YzJ+GtPzJSfCYxFOY
+         shdMvLEeQyffZZZ4Bg7BA5uMUnOKj/UcxvLPfHfpxLd9h6YrWaH3TTToIBP+XK8DYhUQ
+         e1qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1780684555; x=1781289355;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jCQYih7Qu6X9/MRoiGqCVzcGjRebs+PoxLmTpVbEJQw=;
-        b=LzlhCRqEOdzvTVcM5Yn4HwAHW0GCqh1PALXF2Pm2eKMLXoo89WwqUmjIWe549yRjuW
-         1xcjpHv245kLp+mxdh46zFAi3+w3fI9geb3p3WZeJ0Lh393K/2qvAyo4h+pfWyD+I+hs
-         ou/6QmaEIhULRbdg4zse7U3UF8jb5oatPF3b27HbNMSnTpIt67qvTfxrW6e0YzTP87y/
-         0P6i1QrARETuErQiYnmSnUJ8IRUoEAswEzgTcTxzHIkiToukH7gWVNYCP/g6VlTQXc9C
-         7PTw7XeueEVdsF/JJWHPLMWmyBFDk+vp/rRdnm7Qaa6JpXB56MOlTp8UB4ZyDjaF1TYQ
-         TXlg==
-X-Gm-Message-State: AOJu0YwQ6MC67Fv0LcTYdR/S0rcPzlh1vyQIGYLuEuAvQPBOYSGP2M46
-	gtP+BNLwntEEYEubO26lfbsEgqg+KiLbqEpWMxpj4tjL/aHYsHwnP2Jv
-X-Gm-Gg: Acq92OEYfgBvc3YSKw2YwCAFRlzP9/fbguH7k3eRS9Ke7TfT71ukELn6fKPK0/04eeq
-	lrcPUH9oxIIs+Y/XOlkf7pJJExCR301aqMm5e4gZTSr57WAOXA6C2DpmPNPwHzZxV6JFxE+++B8
-	fkK50zpiHtW6/CzU2YAzinVeZqLfzZprMOO8krMFWzCGYLGdVzoNkpDyEsYSE9hvzWDlcw1plG8
-	sDBLHHcwH9zQ8TPtCYSCGTWFn0KT0QevVNu1nHEeBgclMjngosRl50EESvcSVeZvg16a/70PzIU
-	lGUlflKHJrggjqUQDsgiJ8rZuPnAz7kVsG4poKT9q77lCkhuZQLFIMSZfqtDnDNJ0+Lp9GxpO9b
-	sYk2PbogLrHlwCxanXZS6xyoMNLCGPTh40MCP9r0ShyPKhoV1ChqMeO+Po73PQsd2E3kxopnOJZ
-	MuLJXDH2nTv45/NcbhvS3GPTHd
-X-Received: by 2002:a17:902:ecc3:b0:2b7:aa20:3c61 with SMTP id d9443c01a7336-2c1e8339808mr52702625ad.33.1780684554636;
-        Fri, 05 Jun 2026 11:35:54 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:50::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d37esm142698675ad.9.2026.06.05.11.35.54
+        bh=uLIAaKlmgt4AiSXDWFcEgvbqEgZu5tWx4v+R7w02MlU=;
+        b=bjBSlvXX8D3HL1/bLsQ/pJToQZjEIKLq0qgWsZ0AnmQ6ileDOhPdiMjLOV8Q/bScDK
+         WW/hieGI02P3h85VXtB5MNT/u9rjuOnDjBLLMKW0w/jewYNIuDe03y6h7+mDkzAyGxnY
+         2r+7aq7onEbIbKvnPVJiRDBOLLXP8o5D9D1L+1UwTqkO1Kl0Isl5yUqCx3TRGFEbdqHW
+         0gJJQwZpOpdWuFEgEnIdoP5WQqacSHyx+XlcwNO03Av+7p9BMon2BBNt0DergN8FJVGy
+         vt6IGmTHQKpi8Rkn2tEgXK7hR1HOXIaxUnhYhLX8jefjtxQx5VJnG/PTIb7YvLlaEJa4
+         8TuA==
+X-Gm-Message-State: AOJu0YxOx1x1mM2rzzk5tOwaOukBo3bj5nvpoYmou348+Cse2YniN05B
+	tqz5lLiqYbJoypcAV7oa4511It7BgGfiUM/UaEyDL8A/8CGi4FSiqwwc
+X-Gm-Gg: Acq92OGI6a3F2Nbp8eSeqtmo7Rsnm6HozlF/bw1/4zwg4KbFiM+q1OsY9lMJlt6nghN
+	lVFqsSakUji39Dd7zilanQfcW11UJxD13nkSeJCXzl0MVRIrNDSAOpUZ0sfyugoaIarx6u5oFAZ
+	dnK/vpaBnykV/4SLysicNXoQsjeGXv0U/zHxU0Kvqww4vKFVN0mCvyLPl3N2P6/M2I6gY3Sdts1
+	iuHjnrrN9Zn+c1A5Sf6RspzBIjsosqJAX5YYncDaYG9qMQVR7mxQ4BzglrKceIIqbI3z0X3vgV0
+	OEIGGCyISo0iHo9VR+Le3spYUu7DPuHPV9vRyLS7yqkX/j05kJvWfzCRyipXj1Fg6fRtBb4G/aX
+	CJYgABLj7w9dQvSTIKbWRVLdTbbj9C3AXNP3QIfgAUc+tDxILJB4GnWSo3fsxSKrLTJ+0dhehHS
+	ORGEMVw3y23Q8CxUgA3o6WAnM=
+X-Received: by 2002:a17:90b:57c4:b0:36b:75:6387 with SMTP id 98e67ed59e1d1-370eea202f0mr5225778a91.8.1780684555542;
+        Fri, 05 Jun 2026 11:35:55 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:2::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36f6c668f9bsm7340861a91.7.2026.06.05.11.35.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2026 11:35:54 -0700 (PDT)
+        Fri, 05 Jun 2026 11:35:55 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -87,9 +87,9 @@ Cc: netdev@vger.kernel.org,
 	mykyta.yatsenko5@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v2 2/5] bpf: Check acquire_reference() error for "__ref" struct_ops arguments
-Date: Fri,  5 Jun 2026 11:35:48 -0700
-Message-ID: <20260605183551.969144-3-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v2 3/5] bpf: Compare parent_id in refsafe() for REF_TYPE_PTR
+Date: Fri,  5 Jun 2026 11:35:49 -0700
+Message-ID: <20260605183551.969144-4-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260605183551.969144-1-ameryhung@gmail.com>
 References: <20260605183551.969144-1-ameryhung@gmail.com>
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -117,12 +117,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-295943-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295945-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:mykyta.yatsenko5@gmail.com,m:ameryhung@gmail.com,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,m:mykytayatsenko5@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -138,44 +138,33 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 07BD064AB15
+X-Rspamd-Queue-Id: C74BB64AB1E
 
-When acquiring references for struct_ops program arguments tagged with
-"__ref", the return value of acquire_reference() was stored directly
-into u32 ctx_arg_info[i].ref_id without checking for failure.
-acquire_reference() returns -ENOMEM when acquire_reference_state() fails
-to allocate, so the error was silently stored as a ref_id instead of
-aborting verification. Fix it by checking the return.
+refsafe() compared each reference's id and type but not its parent_id,
+so two states whose PTR references differ only in the parent object they
+were derived from could be wrongly treated as equivalent and pruned. Fix
+it by checking parent_id too.
 
-Fixes: a687df2008f6 ("bpf: Support getting referenced kptr from struct_ops argument")
+Fixes: 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- kernel/bpf/verifier.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ kernel/bpf/states.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 6446db9628ae..2a18b8aba14d 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -18362,9 +18362,15 @@ static int do_check_common(struct bpf_verifier_env *env, int subprog)
- 
- 	/* Acquire references for struct_ops program arguments tagged with "__ref" */
- 	if (!subprog && env->prog->type == BPF_PROG_TYPE_STRUCT_OPS) {
--		for (i = 0; i < aux->ctx_arg_info_size; i++)
--			aux->ctx_arg_info[i].ref_id = aux->ctx_arg_info[i].refcounted ?
--						      acquire_reference(env, 0, 0) : 0;
-+		for (i = 0; i < aux->ctx_arg_info_size; i++) {
-+			int id;
-+
-+			id = aux->ctx_arg_info[i].refcounted ? acquire_reference(env, 0, 0) : 0;
-+			if (id < 0)
-+				return id;
-+
-+			aux->ctx_arg_info[i].ref_id = id;
-+		}
- 	}
- 
- 	ret = do_check(env);
+diff --git a/kernel/bpf/states.c b/kernel/bpf/states.c
+index 5945956a7573..06d9ae24f006 100644
+--- a/kernel/bpf/states.c
++++ b/kernel/bpf/states.c
+@@ -890,6 +890,9 @@ static bool refsafe(struct bpf_verifier_state *old, struct bpf_verifier_state *c
+ 			return false;
+ 		switch (old->refs[i].type) {
+ 		case REF_TYPE_PTR:
++			if (!check_ids(old->refs[i].parent_id, cur->refs[i].parent_id, idmap))
++				return false;
++			break;
+ 		case REF_TYPE_IRQ:
+ 			break;
+ 		case REF_TYPE_LOCK:
 -- 
 2.53.0-Meta
 
