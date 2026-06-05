@@ -1,441 +1,186 @@
-Return-Path: <netdev+bounces-295710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1159OLiAImpYZAEAu9opvQ
-	(envelope-from <netdev+bounces-295710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:54:32 +0200
+	id Lg8TKYuCImqoZQEAu9opvQ
+	(envelope-from <netdev+bounces-295713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:02:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D166462CF
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:54:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F30FC6463B6
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:02:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=uzJIAf4f;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295710-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295710-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=IVEFAsoI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295713-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295713-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 739A0304B45B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:45:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D203C306619F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8787F47D937;
-	Fri,  5 Jun 2026 07:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF106405C38;
+	Fri,  5 Jun 2026 07:48:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435CF4508F2;
-	Fri,  5 Jun 2026 07:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519913B7767;
+	Fri,  5 Jun 2026 07:48:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780645492; cv=none; b=e35K/iwie2zTIzkvy1ZUydaw+KqKKy2ENSjJnz6bXSGpIGhDHl1sDAX/LpseN0Iw5lRdUzv2o50Z8nGUuKvD3Fz5jEgbZ7nf/jlNsXVZK/pgvexedOb1BN1i0myjJPDXab4E+9luy2wVBoT16vLehYdjJy1sRMbdNcJj04RnXpc=
+	t=1780645692; cv=none; b=Bi79qj0SZTeguXecf3StRofwneRYVECUpWkHT0BFhYOmgSZelyDXPyzYNBwlPjwYXNlhNxOQ5b7LEPd2Ptcj/n2kDUyQ037+eOF+RQ91WFUQpnahHUZSwOTC5jlKHsw1t4pTwh333sMIZVY5hc6k4sE0VyD0IJM1u6ZWoviW97o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780645492; c=relaxed/simple;
-	bh=oyLiZLasXuM9gXS0pBIgtACsuR+t/mlOUbVvDq6mjG0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sjBAKTP+PquP82dAgy1CUVn7+qHWz+XWtMBzKyJG5lyX0h3twV5WQQzAoJJ9JiWM44dG/8n6D6fFYmmCXqLozHtnd8n9/WAHXe7QKwjxtE2fvmYJIuNGEieeHEKJpTH3wfoSa3g/aLsvTmVx9oiRFIPwP7P0hGqdtlPpN9T1pT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=uzJIAf4f; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6557hVeV51221753, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1780645411;
-	bh=q0qZeaJfiqJgbKqEBoYwxtIO8Wv0rXORaL4/rqSredM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=uzJIAf4fP7Q5MdZm2z4Jhw1pCX3BoetEhaF06ADNH15DwVnXL8f6D+cav6kfYM3mv
-	 XulIy6PDtnXrY6eNkt1XckhXW+5rVazmZw4QG6O9qDBJ4OjiklHWu35m9P+EAJUhXq
-	 YkqKwzB58k5wd6EurJD3XU8sCf4i1jWsNjbOTj4sdniWWHps/y6+2ymSQ2RFNwBrFL
-	 Xp9urtwOOVvVGW3levvQ3oenV2R7mWzl9mBMPw6WlOMOXafAB4Q3RTbou+Dgv0te0U
-	 non316DtQf8Wb7NCewn/8T7PBs0zVCmT/yt3sUMGW01IHStrfEDSOBWguuzVIaCt2J
-	 tB+WQf5DjLV1A==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6557hVeV51221753
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 5 Jun 2026 15:43:31 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+	s=arc-20240116; t=1780645692; c=relaxed/simple;
+	bh=bLVa+it7Fcgvro+pv1jm7ZG4kvYOadKHZDdsUxgN6uI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gfvW4F1Y7+lJlEYLM6haSFhgjAGaAUMCEv496VbpXSZODFHvdv3uc1vROu1mruZ28vYQnoMTqrKaFh0c+N3Kq6kHJ8EuemaUBwCgD2y3eGE+jEP6vWLRmub2zI56UWZ3UUyyQH5rgYzksODK+kNM/KM4oSJBF7d6sJcMkO44TtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IVEFAsoI; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 654NS1Zr1933112;
+	Fri, 5 Jun 2026 00:48:03 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=wQSEh8Sz1qZGPBUxTZT2mHSrL
+	TncE9qcUGzA4n5NyLI=; b=IVEFAsoIcqRDfUWD3S78EPMED5kRhP52I9ZiqjZAn
+	y4wLVBBb3ngmdYVD7YS6sqslsSUwOx0nxE1gabtZy4v0hLiXxVAHEkvTp2++APPl
+	k7GGvISQ7k7z/NNFO+HYrOZRZ8du5Z3bWfFMfnjQYCQKB3Z/012VaU18ZTkQdN/I
+	qo96Xgv+ZkCzDfLep7h6aYbupWMK811X/vXMBnHyxI0gcxBDbnfFZSsWzYQRZZcN
+	LNKSgZMVSTAB5H0vwVi7OquOPr5ABUwuAXGXTnxxjywrgii0BzeYKazCFJ4/PL+q
+	HiU2nxGO6rGRwHkKqo/ypIUAhN/6JAg7EnJK4CDF+GwRA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ekk2916a1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Jun 2026 00:48:02 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 5 Jun 2026 15:43:31 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Fri, 5 Jun 2026 15:43:31 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <freddy_gu@realsil.com.cn>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v3 4/4] net: phy: realtek: load firmware for RTL8261C_CG
-Date: Fri, 5 Jun 2026 15:43:28 +0800
-Message-ID: <20260605074328.1800-5-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260605074328.1800-1-javen_xu@realsil.com.cn>
-References: <20260605074328.1800-1-javen_xu@realsil.com.cn>
+ 15.2.1544.25; Fri, 5 Jun 2026 00:48:01 -0700
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 5 Jun 2026 00:48:00 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 5 Jun 2026 00:48:00 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 53AAE3F7079;
+	Fri,  5 Jun 2026 00:47:56 -0700 (PDT)
+Date: Fri, 5 Jun 2026 13:17:55 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH v19 net-next 1/9] octeontx2-af: Enforce single RVU AF
+ probe
+Message-ID: <aiJ_K-Z7bV1Syyde@rkannoth-OptiPlex-7090>
+References: <20260605035030.3195141-1-rkannoth@marvell.com>
+ <20260605035030.3195141-2-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260605035030.3195141-2-rkannoth@marvell.com>
+X-Authority-Analysis: v=2.4 cv=MOlQXsZl c=1 sm=1 tr=0 ts=6a227f32 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8
+ a=PhMr_M3VcTPrr3iKzVkA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+ a=Oh551-UHZqmTy8JkqTUo:22
+X-Proofpoint-ORIG-GUID: VdwKVJYtSzj-W70ExOloTnELllTISmKo
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDA3NCBTYWx0ZWRfX/xtX4H9hn3Pi
+ k597YJd/e5A4XeBPlbTcndVrVZkAwGfWD50gLT0H11WLSk/n3kilp6bNHDFGyTlmmgeyu0ztUhB
+ NkCQNn97wmR4u8K4uATxJqSBCjL5sh6dqyKpl8XxSZYu/pDI8gZosw4L/2RJHTufibDJphgIKSK
+ hYOhrR0zoXbKXSjPASDNn8e6Wd9oWCetQ4CmnrBok1crCdTc02B41nEI68Ja+eDggNbNJBj5Dot
+ Ap3CEFBFLoZ2RyjJLgozJeUbl29UR4m/ItqUejig9CxQALCI0iu3vS9aumE0V6sBPefI/+oDmgA
+ zlsSdihZ7TMG9JKu58YOJTYuGKqn1qItHT9RFvKNyI9VcAmkXKrBhto4Em5w55HgdjSU1+mlPx8
+ /5DJBz0ycn2ibtz8RJ/owGkPVcFO/WobxvDhfIVA2WWOQqzUL7ILXuXZciNNvr3HasTDr2p7Qoc
+ 2qo8lGufxAyA6D/xmRg==
+X-Proofpoint-GUID: VdwKVJYtSzj-W70ExOloTnELllTISmKo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-05_01,2026-05-28_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295710-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-295713-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rkannoth-OptiPlex-7090:mid,vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:from_mime,marvell.com:email];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B0D166462CF
+X-Rspamd-Queue-Id: F30FC6463B6
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+On 2026-06-05 at 09:20:21, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> There is only one admin-function PCI device per system.
+> Reject any additional AF probe with -EBUSY so the driver model matches
+> hardware and automated reviewers can rely on a single bound instance.
+>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-This patch adds support for loading firmware. Download some parameters
-for RTL8261C_CG.
+Apologies. Mavell SMTP server had many issues which resulted delaying,requeing, resending
+emails. Sorry for the noise. Please abandon this set as another patch (same patch) is
+active.
+pw-bot: changes-requested
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
-Changes in v2:
- - remove __pack, struct rtl8261x_fw_header and rtl8261x_fw_entry will not pad
- - reverse xmas tree for some definition
- - add explanation on rtl_phy_write_mmd_bits()
-
-Changes in v3:
- - add struct rtl8261x_priv
----
- drivers/net/phy/realtek/realtek_main.c | 240 +++++++++++++++++++++++++
- 1 file changed, 240 insertions(+)
-
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index f7b07f38f0c1..f433c1dd3529 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -8,7 +8,9 @@
-  * Copyright (c) 2004 Freescale Semiconductor, Inc.
-  */
- #include <linux/bitops.h>
-+#include <linux/crc32.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/firmware.h>
- #include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/pm_wakeirq.h>
-@@ -281,6 +283,42 @@
- 					 RTL8261X_INT_ALDPS_CHG | \
- 					 RTL8261X_INT_JABBER)
- 
-+#define FW_MAIN_MAGIC			0x52544C38
-+#define FW_SUB_MAGIC_8261C		0x32363143
-+#define RTL8261X_POLL_TIMEOUT_MS	100
-+
-+#define RTL8261C_CE_FW_NAME	"rtl_nic/rtl8261c.bin"
-+MODULE_FIRMWARE(RTL8261C_CE_FW_NAME);
-+
-+enum rtl8261x_fw_op {
-+	OP_WRITE = 0x00,	/* Write */
-+	OP_POLL  = 0x02,	/* Polling */
-+};
-+
-+struct rtl8261x_fw_header {
-+	__le32 main_magic;	/* Main magic number 0x52544C38 ("RTL8") */
-+	__le32 sub_magic;	/* Sub magic number */
-+	__le16 version_major;	/* Major version */
-+	__le16 version_minor;	/* Minor version */
-+	__le16 num_entries;	/* Number of entries */
-+	__le16 reserved;	/* Reserved */
-+	__le32 crc32;		/* CRC32 checksum */
-+};
-+
-+struct rtl8261x_fw_entry {
-+	__u8  type;		/* Operation type (OP_*) */
-+	__u8  dev;		/* MMD device */
-+	__le16 addr;		/* Register address */
-+	__u8  msb;		/* MSB bit position */
-+	__u8  lsb;		/* LSB bit position */
-+	__le16 value;		/* Value to write/compare */
-+	__le16 timeout_ms;	/* Poll timeout in milliseconds */
-+	__u8  poll_set;		/* Poll for set (1) or clear (0) */
-+	__u8  reserved;		/* Reserved */
-+};
-+
-+#define FW_HEADER_SIZE		sizeof(struct rtl8261x_fw_header)
-+#define FW_ENTRY_SIZE		sizeof(struct rtl8261x_fw_entry)
- 
- /* RTL8211E and RTL8211F support up to three LEDs */
- #define RTL8211x_LED_COUNT			3
-@@ -300,6 +338,11 @@ struct rtl821x_priv {
- 	u16 iner;
- };
- 
-+struct rtl8261x_priv {
-+	const char *fw_name;
-+	bool fw_loaded;
-+};
-+
- static int rtl821x_read_page(struct phy_device *phydev)
- {
- 	return __phy_read(phydev, RTL821x_PAGE_SELECT);
-@@ -343,8 +386,15 @@ static int rtl821x_modify_ext_page(struct phy_device *phydev, u16 ext_page,
- static int rtl8261x_probe(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-+	struct rtl8261x_priv *priv;
- 	int sub_phy_id, ret;
- 
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
- 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_ADDR_REG,
- 			    RTL_8261X_SUB_PHY_ID_ADDR);
- 	if (ret < 0)
-@@ -358,6 +408,7 @@ static int rtl8261x_probe(struct phy_device *phydev)
- 
- 	switch (sub_phy_id) {
- 	case RTL8261C_CE_MODEL:
-+		priv->fw_name = RTL8261C_CE_FW_NAME;
- 		phydev_info(phydev, "RTL8261C detected (sub_id 0x%02x)\n", sub_phy_id);
- 		break;
- 
-@@ -388,6 +439,178 @@ static int rtl8261x_get_features(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8261x_verify_firmware(struct phy_device *phydev, const struct firmware *fw)
-+{
-+	const struct rtl8261x_fw_header *hdr;
-+	u32 main_magic, sub_magic;
-+	u32 calc_crc, file_crc;
-+	size_t data_len;
-+	u16 num_entries;
-+
-+	if (fw->size < FW_HEADER_SIZE) {
-+		phydev_err(phydev, "Firmware too small: %zu bytes\n", fw->size);
-+		return -EINVAL;
-+	}
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	main_magic = le32_to_cpu(hdr->main_magic);
-+	if (main_magic != FW_MAIN_MAGIC) {
-+		phydev_err(phydev, "Invalid firmware magic: 0x%08x\n", main_magic);
-+		return -EINVAL;
-+	}
-+
-+	sub_magic = le32_to_cpu(hdr->sub_magic);
-+	if (sub_magic != FW_SUB_MAGIC_8261C) {
-+		phydev_err(phydev, "Invalid sub magic: 0x%08x\n", sub_magic);
-+		return -EINVAL;
-+	}
-+
-+	num_entries = le16_to_cpu(hdr->num_entries);
-+	data_len = num_entries * FW_ENTRY_SIZE;
-+
-+	if (fw->size != sizeof(*hdr) + data_len) {
-+		phydev_err(phydev, "Firmware size mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	calc_crc = crc32(~0, fw->data + FW_HEADER_SIZE, data_len) ^ ~0;
-+	file_crc = le32_to_cpu(hdr->crc32);
-+
-+	if (calc_crc != file_crc) {
-+		phydev_err(phydev, "CRC32 mismatch: calculated=0x%08x file=0x%08x\n",
-+			   calc_crc, file_crc);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * rtl_phy_write_mmd_bits - Write a bitfield in an MMD register
-+ * @phydev: PHY device structure
-+ * @devnum: MMD device number
-+ * @reg:    MMD register address
-+ * @msb:    Most significant bit of the field (inclusive)
-+ * @lsb:    Least significant bit of the field (inclusive)
-+ * @val:    Value to write into the field (right-aligned)
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+static int rtl_phy_write_mmd_bits(struct phy_device *phydev, int devnum,
-+				  u16 reg, u8 msb, u8 lsb, u16 val)
-+{
-+	u32 reg_val;
-+	int ret;
-+
-+	if (msb > 15 || lsb > msb)
-+		return -EINVAL;
-+
-+	ret = phy_read_mmd(phydev, devnum, reg);
-+	if (ret < 0)
-+		return ret;
-+	reg_val = ret;
-+
-+	reg_val &= ~GENMASK(msb, lsb);
-+	reg_val |= (val << lsb) & GENMASK(msb, lsb);
-+
-+	return phy_write_mmd(phydev, devnum, reg, reg_val);
-+}
-+
-+static int rtl8261x_fw_execute_entry(struct phy_device *phydev,
-+				     const struct rtl8261x_fw_entry *entry)
-+{
-+	u16 addr, value, timeout_ms;
-+	u8 dev, msb, lsb, poll_set;
-+	u32 bits, expect_val;
-+	int ret = 0;
-+	int val;
-+
-+	dev = entry->dev;
-+	addr = le16_to_cpu(entry->addr);
-+	msb = entry->msb;
-+	lsb = entry->lsb;
-+	value = le16_to_cpu(entry->value);
-+	timeout_ms = le16_to_cpu(entry->timeout_ms);
-+	poll_set = entry->poll_set;
-+
-+	if (timeout_ms == 0)
-+		timeout_ms = RTL8261X_POLL_TIMEOUT_MS;
-+
-+	switch (entry->type) {
-+	case OP_WRITE:
-+		ret = rtl_phy_write_mmd_bits(phydev, dev, addr, msb, lsb, value);
-+		if (ret) {
-+			phydev_err(phydev, "WRITE failed: dev=%d addr=0x%04x\n", dev, addr);
-+			return ret;
-+		}
-+		break;
-+
-+	case OP_POLL: {
-+		bits = GENMASK(msb, lsb);
-+		expect_val = (value << lsb) & bits;
-+
-+		if (poll_set)
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) == expect_val,
-+							1000, timeout_ms * 1000, false);
-+		else
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) != expect_val,
-+							1000, timeout_ms * 1000, false);
-+		if (ret)
-+			phydev_err(phydev, "POLL timeout: dev=%d addr=0x%04x\n",
-+				   dev, addr);
-+		break;
-+	}
-+	default:
-+		phydev_err(phydev, "Unknown firmware operation: %d\n", entry->type);
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static int rtl8261x_fw_load(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	const struct rtl8261x_fw_entry *entry;
-+	const struct rtl8261x_fw_header *hdr;
-+	const struct firmware *fw;
-+	int ret, i;
-+
-+	if (!priv->fw_name)
-+		return 0;
-+
-+	ret = request_firmware(&fw, priv->fw_name, &phydev->mdio.dev);
-+	if (ret) {
-+		phydev_err(phydev, "Failed to load firmware %s: %d\n", priv->fw_name, ret);
-+		return ret;
-+	}
-+
-+	ret = rtl8261x_verify_firmware(phydev, fw);
-+	if (ret)
-+		goto release_fw;
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	entry = (const struct rtl8261x_fw_entry *)(fw->data + FW_HEADER_SIZE);
-+	for (i = 0; i < le16_to_cpu(hdr->num_entries); i++, entry++) {
-+		ret = rtl8261x_fw_execute_entry(phydev, entry);
-+		if (ret) {
-+			phydev_err(phydev, "Entry %d failed: %d\n", i, ret);
-+			goto release_fw;
-+		}
-+	}
-+
-+	priv->fw_loaded = true;
-+
-+release_fw:
-+	release_firmware(fw);
-+	return ret;
-+}
-+
- static int rtl8261x_config_intr(struct phy_device *phydev)
- {
- 	int ret;
-@@ -464,6 +687,22 @@ static int rtl8261x_config_aneg(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8261x_config_init(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	int ret = 0;
-+
-+	if (priv->fw_name && !priv->fw_loaded) {
-+		ret = rtl8261x_fw_load(phydev);
-+		if (ret) {
-+			phydev_err(phydev, "Firmware loading failed: %d\n", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return ret;
-+}
-+
- static int rtl821x_probe(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-@@ -3159,6 +3398,7 @@ static struct phy_driver realtek_drvs[] = {
- 		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
- 		.name			= "Realtek RTL8261C 10Gbps PHY",
- 		.probe			= rtl8261x_probe,
-+		.config_init		= rtl8261x_config_init,
- 		.get_features		= rtl8261x_get_features,
- 		.config_aneg		= rtl8261x_config_aneg,
- 		.read_status		= genphy_c45_read_status,
--- 
-2.43.0
-
+> ---
+>  drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> index 3cf131508ecf..1f0c962e10f4 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> @@ -3542,12 +3542,19 @@ static void rvu_update_module_params(struct rvu *rvu)
+>  		kpu_profile ? kpu_profile : default_pfl_name, KPU_NAME_LEN);
+>  }
+>
+> +static atomic_t device_bound = ATOMIC_INIT(0);
+> +
+>  static int rvu_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+>  	struct device *dev = &pdev->dev;
+>  	struct rvu *rvu;
+>  	int    err;
+>
+> +	if (atomic_cmpxchg(&device_bound, 0, 1) != 0) {
+> +		dev_warn(dev, "Only one af device is supported.\n");
+> +		return -EBUSY;
+> +	}
+> +
+>  	rvu = devm_kzalloc(dev, sizeof(*rvu), GFP_KERNEL);
+>  	if (!rvu)
+>  		return -ENOMEM;
+> --
+> 2.43.0
+>
 
