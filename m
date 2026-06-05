@@ -1,281 +1,227 @@
-Return-Path: <netdev+bounces-295911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gPlXGF0JI2qcgwEAu9opvQ
-	(envelope-from <netdev+bounces-295911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:37:33 +0200
+	id T9JzG0YKI2rTgwEAu9opvQ
+	(envelope-from <netdev+bounces-295912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:41:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10BE64A3AA
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:37:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC09664A43D
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:41:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=sony.com header.s=p1 header.b="JuKbP/tG";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295911-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295911-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=sony.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WubdgHpX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295912-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295912-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0458D3056B19
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 17:32:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B8CB303DADE
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 17:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D357A1A3154;
-	Fri,  5 Jun 2026 17:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5600E38C2C3;
+	Fri,  5 Jun 2026 17:34:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-001d1705.pphosted.com (mx08-001d1705.pphosted.com [185.183.30.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9A9416D04;
-	Fri,  5 Jun 2026 17:32:31 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780680754; cv=fail; b=Enh3II1K3rtTJx1KmlQDJzXtWmCZxXjfygt4V4KB7B9UQz8jCdo6LGBRue/9OmeHPVUlXa51GFgQ6PQx3fer1JOabMx34DH0byv328PuWTWcQNnkNMBtc1tBwcVdpMy1LSlvCSeFSsPzDtDO4j0ls9I7sSwjCatbOTog+2zeKFQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780680754; c=relaxed/simple;
-	bh=HEFrNPzbj1NOutaBuLHmu8wmBmtEs0VCkg3uR60d350=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=f/Ylv3T86VEAJZLIup8DRnWlcg4KePPHTkukAddiygZofVTkC/uba5mlKKTIxuLuh0sMJXtk/4SfAcEG3wp3KPYEqzxDXiZsuNhYhv99IJPtGqmMfzyHvIYMyUC3QjM2gfpXAK1HQKSDT/H+dttv9E1FLQ0kaPdVDG5XMqEI9TA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com; spf=pass smtp.mailfrom=sony.com; dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b=JuKbP/tG; arc=fail smtp.client-ip=185.183.30.70
-Received: from pps.filterd (m0209322.ppops.net [127.0.0.1])
-	by mx08-001d1705.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 655GpPSU987047;
-	Fri, 5 Jun 2026 17:31:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sony.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=p1; bh=HEFrNPz
-	bj1NOutaBuLHmu8wmBmtEs0VCkg3uR60d350=; b=JuKbP/tGdOWGDWk1Iv4xVxi
-	Gw1iztKWtY35q7i/+bcC8zs/1jQFAip1HKfklSnGNm1AM3WTT7VOY6ZEE24fy1j5
-	mU9DsjQMVjMX9pI2Mvos1IiuIkE65myX5vD9AasfbRtEFxTc9QcLHwFISWNicdAX
-	k1yvNgCK344TNqjZgkj/jDlS4cgWhInBNJfWCCMfM9puU+Y2s6QipeUbUTkGSloM
-	Rks3lU3DbqRfHLYhjyNSf+VSCAAJIJwwWwrLvO+5HQ4NnuOzeaWDg9l2MMVOW2kq
-	Qv+9qqNsAfKNQpkRAcuHUGsWBakq5u8udC7Ov+RinTTwFNw4sheYacRYHvLrGxQ=
-	=
-Received: from bl2pr02cu003.outbound.protection.outlook.com (mail-eastusazon11011022.outbound.protection.outlook.com [52.101.52.22])
-	by mx08-001d1705.pphosted.com (PPS) with ESMTPS id 4efpp5qbuf-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Fri, 05 Jun 2026 17:31:57 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Yh9CKH/RZFda5mxSB6v/FUvVILzQAvsmInCLhNbqcEoWxJ69SHFgZmmul3YsTYvUGYDFsuJnhTK3d98rxXJfWziWhI/r9UWlThBiBdwr6Z0nI/YlxC+XTzeJkxAgObmD5w18PDmU5xcIVzMeEk3OglSJyK9tKIrlO46qvtOuNi760A1C3fK2CWrwFokGtD63Qes3YGQR1EmBOx5fieud/TSRh1jdwxVfF28M236xsnKN1bua+NeNV4pR0i4lahwoGVTUv3k+4BPMNX83y6NDmYlgTc/+IlYFhfcQsahX4Bs/pAmndoSEBsthbQ/bvMt8VbV1O/2N16KChiNSpx+KQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HEFrNPzbj1NOutaBuLHmu8wmBmtEs0VCkg3uR60d350=;
- b=ZuQMh3DFn+EpTKv9HZ9OiOTJ1soB7m3TKmrJxn5jffNZSI/97Eoj1A7WpsAWb3JBVj9pLDyibKsJq1J+seJbV6Prhx7kux+bMQ4+My4QdBLyh0m8j1/01gqM4JixpEAOgZDoEe+Q9LEJdJqVnaycQamdWTC2STUxYqWOwPycKc7Jvh5FVZDZvLB8bttKzz2yFI7dmgrIQrZamskXX5Kmva+OE1HJmw2jfACTUjhB0SAGZlgtHDX9nkFoFu7MQjh4nuoERn67kbWsYfpPaOpgnSC1vhiEHplWI/97A7H9OHbWqSQ3jR0tTxZz2xRXYzYopisSOkR3GGpoXRRHkoyDiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=sony.com; dmarc=pass action=none header.from=sony.com;
- dkim=pass header.d=sony.com; arc=none
-Received: from MW5PR13MB5632.namprd13.prod.outlook.com (2603:10b6:303:197::16)
- by DS1PR13MB6917.namprd13.prod.outlook.com (2603:10b6:8:1dd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.2; Fri, 5 Jun 2026
- 17:31:53 +0000
-Received: from MW5PR13MB5632.namprd13.prod.outlook.com
- ([fe80::29e9:b355:cabf:66f1]) by MW5PR13MB5632.namprd13.prod.outlook.com
- ([fe80::29e9:b355:cabf:66f1%3]) with mapi id 15.21.0113.002; Fri, 5 Jun 2026
- 17:31:51 +0000
-From: "Bird, Tim" <Tim.Bird@sony.com>
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>,
-        "linux-spdx@vger.kernel.org"
-	<linux-spdx@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "jmaloy@redhat.com" <jmaloy@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org"
-	<horms@kernel.org>
-Subject: RE: [PATCH] tipc: Add SPDX id lines to source files
-Thread-Topic: [PATCH] tipc: Add SPDX id lines to source files
-Thread-Index: AQHc9FFUlV10YYXnxEudftH68E0XT7YvLzyAgADuuuCAAAwngIAADanQ
-Date: Fri, 5 Jun 2026 17:31:50 +0000
-Message-ID:
- <MW5PR13MB56322296263725D452A71BA6FD112@MW5PR13MB5632.namprd13.prod.outlook.com>
-References: <20260604183805.747630-1-tim.bird@sony.com>
- <GV1P189MB1988FB0E53EA8D3FCC2533BDC6112@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
- <MW5PR13MB56323F0BA8638F14186DB228FD112@MW5PR13MB5632.namprd13.prod.outlook.com>
- <GV1P189MB1988CF69395CB583074480F8C6112@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-In-Reply-To:
- <GV1P189MB1988CF69395CB583074480F8C6112@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW5PR13MB5632:EE_|DS1PR13MB6917:EE_
-x-ms-office365-filtering-correlation-id: fe1ebad0-ef4e-4550-26ee-08dec3285420
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|10070799003|366016|4143699003|56012099006|11063799006|18002099003|22082099003|38070700021;
-x-microsoft-antispam-message-info:
- Zf1XOW92q14pQ6H1SFyb3palF2SGucnuFHPagNdqEFyFdCYGU5kNmz6ZYc2AN3CQy6xkDXjEPQdWlbUf5JNyeVNRYx/+Ic7FC3Xkm0zPgaZi7bIUSm1JqZbt1CRo419FEaYhS2t39K/Z0pi1GH/N/lxJySyDnkhy+pIPS5nHkXF8r5YxaapdUXctmBvrU4iguUXmfpQvTGOVVvigzsB/dt5nfV40G5NLGsIAjhJuEm8yRBe6raQTWO8IzAa1snplOxqB0Cwx/xPow07Ah+V/8DOoGXAG+rXacCHiKz+OP93/ZTu622atAnDIRN4W1txRGg28MXQ9WPHLLEqiYiATwspmVIK3RZNUQgAvcwlGGICmysILxmd/t4wl8Htzlr3u1lEqiUHpzAKhAtUvcqH4t6scMNo5ZqP4lJq48rq42u0rDpTuknlLwsXSYokcQPCpopGIvY7q4jzz+Fp18gADnAYQ0jrrx+lPIFf7A2y4CT1kvUYJd0WDNnPtQBKWaV7tmd4BMQoaSmXmkF2KdLb0rVpz6OrV0Pq0eN9zHMfOnv+EXQOMePwDkAQiPEsYaQf/bvG3O0IEaFmirSR0dURInZZEt0iA9PoKIdOR7UXL41QgIiu4u1dwclWxU0IFGqexgrbKwkKsQuxQ35b2AdZvxDlPcJWHf+BsQFuG0ZjpSAgJSNXTWo93onz2HiAdcIpj82J2VWnZx92x+Lk52vOiU4aYB31eRWhjsaJYLfMtzjYZuMuOcvqSI1lNhbF/2tzP
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR13MB5632.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(10070799003)(366016)(4143699003)(56012099006)(11063799006)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SGRtUGk0RWlLYU1mdTB5RVZCWUZGNitMMWNFYlRGQjVITVVId2hlbXZlbVdo?=
- =?utf-8?B?T3JpNHRZMW5YVVl3T0JQT3k1RTZXaFVNbFJIYTJiWGZXYnVBZ1hvWmszTTU2?=
- =?utf-8?B?bEd0Nkt3TndQNHltOXdSU2lxaGg5clIzR0ljWS9PSEtCTGVTRVBJN0t6OXhr?=
- =?utf-8?B?VHlnNnB2VVVvOHdjQ0FkTEJlOHBQSXR0Y25kSXFIcnpYN2FLLzYyRE1XRndP?=
- =?utf-8?B?bzJVOW5IOVJEVGtRaEk3NjdJL2llZ2NqUUs1R25FVHpkbTVvSVZCYUhUVFhW?=
- =?utf-8?B?aU1mOFhRVjUwOXZXek1MNHJPbEtHQmQ5NWRmTTUrbmd3VmNwWmRsTjlwZGZJ?=
- =?utf-8?B?Vmt2S0NOVU84K1FVVGNQS0RZcDcwNmpGSWpDQWpIRGZHWmErMFFONlN4TWFm?=
- =?utf-8?B?MXVseHorM0VodStaMmtCMWhBcWcra25wTGJQc2htdmRLVnVKWjlnYUNjYlBn?=
- =?utf-8?B?c1p4Q0lmVzlyZlpwTGFPcGpaU2Y2a2llQ2tQSjBGT3NmeENxdmZIYzQyMnBB?=
- =?utf-8?B?OTc2VDBNUmdrWEZaRVlQTzVxMDF6ZU1OaWdIY3h1RHVBWEtXMFVPMEZoanVw?=
- =?utf-8?B?amFkU0hFbzB6VW1tMkVOdlc4NXhjV1YvaWhxYkwyU3lmbzhoWXNFcU1VdVpK?=
- =?utf-8?B?UzVnSElwNVppekJsdGttS3M0dmZrclJZWkFWMklQVmlsMkZVVHkrTlV0ZEdZ?=
- =?utf-8?B?cFgwQTNzTGhvdFgvbzN2aVpvRjRHNU9Yei9IbHNwdGt4WHRGZVRlZ1NDeEFD?=
- =?utf-8?B?YTVzejNRNDhvaCt2TzhEeUNScmtFSnpMaGxrUXl4VDVvUDg3eUN1bER4MURp?=
- =?utf-8?B?QTc0TlpGZmIyZU5TLzVGZ2dLL0FwUWxuSFFZcFFoUUZYc0krTExlUzk2bjFv?=
- =?utf-8?B?TnpjMHJWZ3M1NDcyekt5TFVkR2FhamVvc21tc1QrbkFDcU01Skd2QlV2dzlp?=
- =?utf-8?B?TVBZR0h1b2k3V0pTU25GSHE1R1RCalpRcW9lajVsZnorUzVKamdEYURNZWlk?=
- =?utf-8?B?VHZXQWlULzZFaCtWQTdtRHNreTRoWEN5VDFMK0k1QWJ1U3h6enc4VDdmMm1o?=
- =?utf-8?B?eFlWY3ZFVERDaGVTbk14ajR2YkR3VVZuem9SZUh4MEg0YzhSRlJkTE9yZkt6?=
- =?utf-8?B?bmRWZmdXNXl4M1VlMllhdy9ZMXU3Y2pEaVp4YldYcWFUQmZsc2VHc0IrVmhT?=
- =?utf-8?B?TlJpRGhmTStVWjgzUmJGczFnVFMyR21zREh2bWtxZERhSy9MeENaV0M5d3lS?=
- =?utf-8?B?aUVSVE93SUgvRTJ2dW90RFkrY2RYT1Ryckk1aGNJTGlGWlNtRGZiektaWVN1?=
- =?utf-8?B?SmMxMkRYdzNsc2ZhYjZueXRVVUM0Sk1ZbTVyZHFUbnlQSjVsb1B1OS9nK21F?=
- =?utf-8?B?a0FGVDRhVXo2T1h2MG5Ra2xRMmhmRlZ3NEFIck1UNkxmOXVJL2RmVlJpVFR0?=
- =?utf-8?B?ZU9TVTk5ZzMycjQ1NFZ3Ry9icUJzMmErT2piWEFqak01R2p1ZEpKclpiYzlx?=
- =?utf-8?B?Zm9HckR6c2hmNkRJajBuSEFxejFhT3BUa0dVZWh4bGZtSkFQNXBJb2dzWU5t?=
- =?utf-8?B?SnRjS2lUOE5RMS8ra1g2OGg3R05Mdk00dE1laEYwd1JOcVVlSWdlRmdqZStM?=
- =?utf-8?B?cTRCWWhRanRyYmFXRXpGVlpTZXBWY1lLdXVqdHdnbHRnZVM4MzhRdmUrMlo1?=
- =?utf-8?B?OE5kK3dpN0l4T0w2clJuTHdiMmROaVZzSWlnVTFvc2pjMVcwbTkvSk1Qaito?=
- =?utf-8?B?cER2b1hGMUVlcGZKZk1CemJTU2Q0bEkwei9FNlJHdlV2WnNCaFlaL05HTVZo?=
- =?utf-8?B?SGNFSE94eCthcVNsa21STDFpb1VNN3ZLaWtGY2Njd2xsL2ZCUm5hckRoVm03?=
- =?utf-8?B?Tk5MM2RHanNWQ0hMQUVRd1U0UTducXdCdXJXMUhoc3pqRWN5Wm82cXZLOGE5?=
- =?utf-8?B?eVZ1QjczUjN2eUJvRHoyOTJPcTVsRG5vcHQxdHMwOUxWVm5EcWRvOS9Hd1pI?=
- =?utf-8?B?Ry9xNHNac0F5b1h6aXVKMmM4SDh5YXRKT2lmckhTTWNacEdBL05DejdkcmVI?=
- =?utf-8?B?T1BkOHNidXIyWlRxNTdScUl1SEZtZWVMM1JwcGVmOHcyNVVsK3o0OTBQTFZq?=
- =?utf-8?B?NzFFNUllSnNXNFNtekIrN3p2L1J1NDltVlNzd054U3lUNzVLT0VzdGsxdjhv?=
- =?utf-8?B?bnoxTEIrUjFyYWpJakR6YkRvMWlzbDZ0NFAvb0pOTHVwcS9nUi93bllURXN5?=
- =?utf-8?B?NVJZUmppUUdBcldXOG5NNlpNQXdQNVBGWmJ4Nk1QdXNOVnRiZ1VsQ3NrcGFl?=
- =?utf-8?B?aWw3TlhEdUZ4SEh1eGtFdWlLOFE5TzJERjFIZHJHeThKb0RURzhlTmc4VWdj?=
- =?utf-8?Q?b/cdCGXENXFcdh+OFpxGnqKZwdbJmEe57J4qq?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4992ECEB9;
+	Fri,  5 Jun 2026 17:34:49 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780680892; cv=none; b=Pr5RMxwtILABC5QluVTkW3JcRY1sj2ztMADE4604f3KCLXjO4tSxGV6yaMmNXuFJkzGaIkHZnv1V8DcwNHP212bfd5i6z4AVIhWn6n8lwpKhC1LA1P23nh5+IZuO0R294U6m806rWC19KorVx1Dq6Waxr6oDxuMDSQdfEuIGsPc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780680892; c=relaxed/simple;
+	bh=AOY7jew2s0vv83qulKa7jUQDx/LLrW5jw2CNNhrGoIE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rbGrNSeUumsn4kMlOx241xwNaoogh/eqwYG3YX85ZXAO4N3T/ogc9Zii16t5GlFvXWz1WVkxWjUBghRd++/Vj8yUkMVDoDzNcxWG6QCKTOJxt1bY/bUMkZi/SoMN7PdOdOP0ppc4UbYanI1Dk7bhI36/kAy4mixx15XGGb7O4U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WubdgHpX; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 056A71F00893;
+	Fri,  5 Jun 2026 17:34:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780680889;
+	bh=dFe/Z+3EtDNNukIoQsxiCqihyu44aA+wIuaTVhBapcA=;
+	h=From:Subject:Date:To:Cc;
+	b=WubdgHpXl/wPnCcnUfQOSk+VwOuZHDE7rROnKC/7mWMKpWORDH56JQ/aww/R+tj2w
+	 QUqrN8XqmiTlc8PhnFYtAC8BJKzdxus4OUDBg+1gE4LdtShF+HEG3TvtDDjeJfD+Pq
+	 UcH+Beagz7bV4XlCbGZcKFt8vw/4zi0NG0KbzmGrtg++HjwXcuQRbH+FhuV+mBDDag
+	 Xpl/8Ibg7a96jedeSMiE/dvF6ClTqbEp/JLHp2yhZkEnrSKPNLR42VZ65QTtNDwbJ9
+	 u2vSIEeT6IIbGoazPk2TTOs7Rxe8eDDL4xHauB10D70lnfOkewZrAQUPaPoAEYnwjW
+	 A5Pvs4UDwg57A==
+From: Chuck Lever <cel@kernel.org>
+Subject: [PATCH 0/9] Deliver TLS session tags to upper-layer consumers
+ (NFSD)
+Date: Fri, 05 Jun 2026 13:34:34 -0400
+Message-Id: <20260605-tls-session-tags-v1-0-47bd1d94d552@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	DS10dSGtHKH4wHoNf7bH758Pui7e7nfn8HYZsEVgkDBU0IWEjkNnxCWE/DO/VtPnnuq7ECNYJB3fyaEWhU9/sr26KZY4idsAYZTBPNsKeQHE+a6Fd5f986/Mk6qlKuD8sJovsZX2qv59ncW9yZ0eR/3c1HElljXadpxoBNKCVxDX7pgAfn2Monjg9iaOKyRvD7AK1kHCqXgSg0R2B3GTscMig2lF7LZyTYg02JFyQ1kVyoGAu1NZeBAiNzoorW9XSHeFD1AETpT4Di9W1qTsL/XvA24sgmdBVz1cRiCuemlFkpdfhpg9YDdIt1nx4QP1aONx46VfSUtafyBjZblOSA==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	A2gxDyoIIWSmarsdteX3dTgVJ8xAGNHiBNaSOK85EGpOESLEyUAvDKjlb0Oj1gWNfy9JVBALfDyYsNFdhza3FSOzASYC+TGfYiGFPI/NyaqwYm1DA/VhKv2YTp2JVg8XwlBjRc7Tpy3H/0ckL7lwnYgSmilS7XMEcijkGZHj0wNN11RtXXFojHTzizdeBNC0pIoa0YrxHJhzysy1vxtWuYJ4ehQoB1u0UAmHoICyhCjxIa+7TSnT/96IZ6fL90boinU7RTNjQXVLd/H143CtMOSfSW5z/YZAMZvDp6oYNMuMVQfYPJUFWmCHTyZP8wkmSlyqdH9dJjq1GrJQL5OswFCJjoh33iz2G6aasVykzqhnu/LsLHFiNg31COXZRyRAbHX6YCidqmRPvc5U8ZXeJmKa/f7bGt4Cnsjkj/4EwuFM4ETyUM89Pbn+O0JGDqoZVtE81gEY1/vm54OXVukqUoWbfT4gfGRMC7owZEdzsDnd4Uyuhp9edcqbfILGZG7dqhrFQmPllYuEjpXIoHJhxCGG4nISUJPC/Akgoo5GZXBqQrfZTumKw7U+ilkiHWrQ7d6uKuFDKQSUVvRtjEqOUMkc6QpY5VAkdL9tYJ+wUNPk4N7NwtWZVOwbx/j4x6bl
-X-OriginatorOrg: sony.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR13MB5632.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe1ebad0-ef4e-4550-26ee-08dec3285420
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2026 17:31:50.9877
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 66c65d8a-9158-4521-a2d8-664963db48e4
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: f9eraWZ80xtYg//8q4eflr47M64TweeDhSTiOZZDRypTLxVWBCMqepYx1vN3W1FRUdA5FPLj+DTetcX3xe3Paw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS1PR13MB6917
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDE3MiBTYWx0ZWRfX6Gk5igQZTVD2
- 8UC0dmzuRCkSnVBcX1c2v21h4SRfEEeXgxALjYpgal2fo4eXirfjg9v23VYpA+PiyAeA06+2ppL
- Gkqu5gjPY6k5PeoQJwJyKeFScb3x+PozF9TAhgheISpzJcND2Axes87lqkV6WGMPHlTIBBeMuNy
- VsWOFezYrYoEeTwgCc8PWwPNIq+GbqNHj7qzHFYGWSGGw/Hz+YxxGoawGqAL1gvDZxNpN/2TJhV
- 9ZkUJfevnE7IO/g5QfQpVaLwJHSKYvxL5vlkj0xGAVdO288w07jCXydoz1CWKfQV1sMuFg4BVWw
- TEiYwjkj78L+6r1ojZrnD/WxmZSWJ4joovAPU9Jr/D8b7iHr6vWn0/l0+Od+G+aTr13e983qPgJ
- nXyZIBNm9/VYBtBKeppl2JFaVrA4gfSEaKfokdghhQ1OvGht4IXpWUGO3p2XIpkQndNdMdPXyY2
- tjDY1ArQdaQ0IGxXYsg==
-X-Proofpoint-ORIG-GUID: 30t-Hn7g8ea_W0egioBj19QeIIcPzZKj
-X-Proofpoint-GUID: 30t-Hn7g8ea_W0egioBj19QeIIcPzZKj
-X-Authority-Analysis: v=2.4 cv=Nt/htcdJ c=1 sm=1 tr=0 ts=6a23080d cx=c_pps
- a=3RjCkzAZQHL7PUncwJf+GQ==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=FelO9ux0wxsA:10 a=xR56lInIT_wA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=KAb5x4SsHD3PzxGk7EmX:22 a=cIyGuqrkuvkXWOl_fzuj:22 a=93Ubh6UdAAAA:8
- a=02hD3WDiEKGFPMP6GBYA:9 a=QEXdDO2ut3YA:10 a=q-6THwuxr82FYj4XiUVi:22
-X-Sony-Outbound-GUID: 30t-Hn7g8ea_W0egioBj19QeIIcPzZKj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-05_03,2026-06-05_02,2025-10-01_01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMywrCMBBFf6XM2sE0pqL+irjIY5KOlCiZKELpv
+ 5vo8lzOPSsIFSaBy7BCoTcLP3KDcTeAn21OhBwag1b6qKZRY10EhaR7WG0SPAeljJ5Oh2gMtNu
+ zUOTPL3m9/Vle7k6+9k43nBVCV2z2c588LfscJWAlqZwTbNsXoMZd95cAAAA=
+X-Change-ID: 20260512-tls-session-tags-9d0042583f44
+To: Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Sabrina Dubroca <sd@queasysnail.net>, Keith Busch <kbusch@kernel.org>, 
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
+ Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>
+Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, 
+ Chuck Lever <chuck.lever@oracle.com>
+X-Mailer: b4 0.16-dev-da966
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4609;
+ i=chuck.lever@oracle.com; h=from:subject:message-id;
+ bh=AOY7jew2s0vv83qulKa7jUQDx/LLrW5jw2CNNhrGoIE=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqIwivHy/0foophi6P8xjfFkcgLXLw4wr9vH8ii
+ IScrp0uNZ6JAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCaiMIrwAKCRAzarMzb2Z/
+ l4RaD/42OQWIPmEYtGo7JJufQ6n/cYRM3z1qCs67r5J4TXL0G+XCz6H5RPAEIMYaK/Gm+uOu/wa
+ DrnW7oWUCSdIJts8574Yi+eeRDAtQMCJJaFcuarPEjRe1UvYZIPQQuc0UrVJelLAdYhwo805Pn+
+ fmtcLn0wWprXuE7pISGV5bl7HGIBMfinskspDkfLusTBrWuPwBTjz7Sr0QAO3y82ags5q2iYj1i
+ NOOGlGN32nPfOlS6pMagMHCIXhQ+XzNoHkV2CeXsrDJOMzsdJR2TY2ef7OVjiW2AI/8Fm5kmxag
+ q77YIdm+/lWqvD0AKsu2luwkdLYddr4wq/i/nTx4fQH3JmsGrY8Meoah6VWooIdeRENwXjuKc7l
+ xwc7VryGekDxOt3/JiTPa2XlTxeNiEejv3RCwB3y7sRBAM3lv5abRHxnMDx1ejbsGu8UGKqCTXJ
+ +dXU/CIOF900EOs/5NOUBgmPwiw86ZqyUPgYL/RfJfeOYTResAo4Es8u5IIKPV6E+qP0O+41QNf
+ vdPNw2jan9c8QpnvKP6GIMk6WBTSsCZWKDMz0yWZ9wouzUGidgT6dbID0ki8f5b9bjzmjGjLTrO
+ cr8gHOl4w+9p1kf1etnmKWelnr28ovwhYnaQybTb1Wmy7Zj+wIlaXPqVun45p1DIYjrmPpAwvdi
+ qu5QgtQw5m25PjA==
+X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
+ fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.94 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[sony.com,none];
-	R_DKIM_ALLOW(-0.20)[sony.com:s=p1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295911-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-spdx@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[Tim.Bird@sony.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sony.com:from_mime,sony.com:dkim,opensource.org:url,est.tech:email,vger.kernel.org:from_smtp,MW5PR13MB5632.namprd13.prod.outlook.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:akpm@linux-foundation.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:sagi@grimberg.me,m:kch@nvidia.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-nfs@vger.kernel.org,m:chuck.lever@oracle.com,m:donaldhunter@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,linux-foundation.org,queasysnail.net,kernel.dk,lst.de,grimberg.me,nvidia.com,brown.name,oracle.com,talpey.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295912-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Tim.Bird@sony.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[sony.com:+];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:mid,oracle.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F10BE64A3AA
+X-Rspamd-Queue-Id: BC09664A43D
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVHVuZyBRdWFuZyBOZ3V5
-ZW4gPHR1bmcucXVhbmcubmd1eWVuQGVzdC50ZWNoPg0KPiA+IENhbiB5b3UgcGxlYXNlIGV4cGxh
-aW4gd2h5IHlvdSBiZWxpZXZlIHRoZSBvcmlnaW5hbCBsaWNlbnNlIG9mIFRJUEMgaXMgR1BMLTIu
-MCBhbmQgbm90IGR1YWwtbGljZW5zZWQ/DQo+ID4gRG8geW91IGhhdmUgZXZpZGVuY2Ugb3V0c2lk
-ZSBvZiB0aGUga2VybmVsIHJlcG9zaXRvcnkgYW5kIGNvbW1pdCBoaXN0b3J5IHRoYXQgeW91IGFy
-ZSByZWZlcnJpbmcgdG8/DQo+IA0KPiBJIHJlZmVycmVkIHRvIGh0dHBzOi8vb3BlbnNvdXJjZS5v
-cmcvbGljZW5zZS9ic2QtMy1jbGF1c2U6DQo+IFRoZSBmaXJzdCBsaW5lICJDb3B5cmlnaHQgPFlF
-QVI+IDxDT1BZUklHSFQgSE9MREVSPiIgZG9lcyBub3Qgc2VlbSBsb29rIGxpa2Ugd2hhdCBkZXNj
-cmliZSBpbiBjdXJyZW50IGZpbGVzOg0KPiAiKiBDb3B5cmlnaHQgKGMpIDIwMDQtMjAwNSwgMjAx
-MC0yMDExLCBXaW5kIFJpdmVyIFN5c3RlbXMNCj4gICAqIENvcHlyaWdodCAoYykgMjAyMC0yMDIx
-LCBSZWQgSGF0IEluYw0KPiAgKiBBbGwgcmlnaHRzIHJlc2VydmVkLg0KPiAiDQoNClRoZSBDb3B5
-cmlnaHQgbGluZSBpcyBhbGxvd2VkIHRvIGJlIGRpZmZlcmVudC4gIFdoYXQgeW91IHNlZSBvbiB0
-aGF0IHdlYiBzaXRlIGlzIGEgdGVtcGxhdGUsDQp3aXRoIHBsYWNlaG9sZGVycyBmb3IgdGhlIHll
-YXIgYW5kIGNvcHlyaWdodCBob2xkZXIuDQoNClRha2UgYSBsb29rIGF0OiBMSUNFTlNFUy9wcmVm
-ZXJyZWQvQlNELTMtQ2xhdXNlIGluIHRoZSBrZXJuZWwgc291cmNlIHRyZWUuDQpJdCBoYXMgYSBz
-aW1pbGFyIHRlbXBsYXRlLCB3aGVyZSB0aGUgeWVhciBhbmQgb3duZXIgb24gdGhlIENvcHlyaWdo
-dCBsaW5lIGFyZSBhbGxvd2VkDQp0byBiZSBkaWZmZXJlbnQgZnJvbSBvbmUgZmlsZSB0byBhbm90
-aGVyLg0KDQo+IEZ1cnRoZXIgbW9yZSwgR1BMIGlzIG1lbnRpb25lZCBpbiB0aGUgcGFyYWdyYXBo
-IG1ha2VzIG1lIHRoaW5rIHRoYXQgaXQgaXMgZm9yIEdQTC0yLjAgbGljZW5zZSBvbmx5Lg0KPiBJ
-IG1pZ2h0IGJlIHdyb25nIG9yIG1pc3Mgc29tZSBoaXN0b3J5IG9mIGN1cnJlbnQgaGVhZGVycy4N
-Cg0KVGhlIHVzZSBvZiB0aGUgd29yZCAiQWx0ZXJuYXRpdmVseSIgaW4gdGhlIHBhcmFncmFwaCBt
-ZW50aW9uaW5nIEdQTCB2ZXJzaW9uIDIgZXN0YWJsaXNoZXMgdGhlDQpkdWFsIGxpY2Vuc2luZyBz
-dGF0dXMuDQogLS0gVGltDQoNCj4gDQo+ID4gVGhlIGN1cnJlbnQgdGV4dCBpbiB0aGUgaGVhZGVy
-cyBvZiBhbGwgdGhlc2UgZmlsZXMgY29udGFpbnMgdGhlIGZ1bGwsIGV4YWN0IHRleHQgb2YgdGhl
-IEJTRC0zLUNsYXVzZQ0KPiA+IGxpY2Vuc2UsIGFsb25nIHdpdGggYSBzdGF0ZW1lbnQgdGhhdCAi
-QWx0ZXJuYXRpdmVseSwgdGhpcyBzb2Z0d2FyZSBtYXkgYmUgZGlzdHJpYnV0ZWQgdW5kZXIgdGhl
-IHRlcm1zIG9mIHRoZQ0KPiA+IEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlICgiR1BMIikgdmVy
-c2lvbiAyIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLiIgIFRo
-aXMgaGFzDQo+ID4gYmVlbiB0aGUgY2FzZSBzaW5jZSAyMDA2LCB3aGVuIHRoaXMgY29kZSB3YXMg
-aW50cm9kdWNlZCBpbnRvIHRoZSBrZXJuZWwgc291cmNlIHRyZWUqLg0KPiANCj4gPiBUaGlzIGlz
-IHRoZSBvbmUgb2YgdGhlIG1vc3QgdW5hbWJpZ3VvdXMgY2FzZXMgb2YgZHVhbCBsaWNlbnNpbmcg
-SSBoYXZlIGVuY291bnRlcmVkIHdoaWxlIHdvcmtpbmcgb24NCj4gPiB0aGVzZSBTUERYIElEIExp
-bmVzLg0KPiAgPiAtLSBUaW0NCj4gDQo+ID4gKiBEZXRhaWxzOg0KPiA+IFBlciBMaW5kb24sIHdv
-cmtpbmcgZm9yIEVyaWNzc29uLCBpbnRyb2R1Y2VkIG1vc3Qgb2YgdGhlc2UgZmlsZXMgb24gSmFu
-IDIsIDIwMDYsIHdpdGggYSBCU0QtMy1DbGF1c2UNCj4gPiBsaWNlbnNlLiAgTW9zdCBvZiB0aGUg
-ZmlsZXMgd2VyZSBpbnRyb2R1Y2VkIHdpdGggY29tbWl0IGI5N2JmM2ZkOGY2YQ0KPiA+IE9uIEph
-biAxMSwgMjAwNiwgYSBsaXR0bGUgb3ZlciBhIHdlZWsgbGF0ZXIsIFBlciBjbGFyaWZpZWQgdGhh
-dCB0aGUgbGljZW5zZSB3YXMgaW50ZW5kZWQgdG8gYmUgZHVhbCBsaWNlbnNlZCwNCj4gPiBhbmQg
-YWRkZWQgdGhlICJBbHRlcm5hdGl2ZWx5Li4uIiBjbGF1c2UuICBUaGlzIHdhcyBpbiBjb21taXQg
-OWVhMWZkM2MxYTE1Lg0K
+NFSD and similar upper-layer services want access-control decisions
+based on TLS peer-certificate characteristics, but in-kernel x.509
+parsing would duplicate work mature userspace libraries already do.
+This series gives tlshd a way to evaluate certificates against
+admin-defined policy and report matching policies back to the kernel
+as opaque string tags. The handshake layer plumbs the tags through to
+the upper-layer consumer's completion callback; intersection against
+per-resource tag sets stays the consumer's problem.
+
+Four architectural choices shape the series, only one of which is
+visible in any single patch.
+
+The tagging vocabulary is opaque to the kernel. tlshd decides what
+each tag means; the handshake layer and its consumers only test
+membership. This keeps x.509 out of the kernel and lets policy evolve
+at userspace speed. Any future attribute the kernel wants to gate on
+must be expressed as a tag rather than as a new netlink field per
+attribute.
+
+DONE gains a privilege check (patch 1) as a prerequisite, not as
+cleanup. Without it, an unprivileged process guessing a sockfd could
+submit a forged DONE and effectively grant or deny tag membership
+for a real handshake. Once tags carry authorization weight, that
+pre-existing gap becomes load-bearing. The fix predates tags in
+principle and carries a Fixes: tag, but it sits at the head of this
+series so the rest of the work has a trustworthy foundation.
+
+HANDSHAKE_MAX_SESSIONTAGS is advertised on every ACCEPT reply as
+HANDSHAKE_A_ACCEPT_MAX_TAGS (patch 6), so tlshd can size its
+DONE-side tag list against the kernel's runtime limit rather than
+guessing from header constants. If a daemon overruns anyway, the
+DONE handler truncates and logs one pr_warn_once rather than
+returning -E2BIG: tearing down a handshake the operator almost
+certainly wants to keep is a worse outcome than dropping a few
+tags. The truncation path is defense-in-depth for a buggy or
+stale agent, not the primary signal.
+
+The tagset helper (patch 3) is split out as a generic library so
+NFSD export tagging (patches 8 and 9) can use it without further
+churn in net/handshake/.
+
+---
+Chuck Lever (9):
+      handshake: Require admin permission for DONE command
+      handshake: Add tags to "done" downcall
+      lib: Add a "tagset" data structure
+      handshake: Pick up session tags passed during the DONE downcall
+      handshake: Add a kunit test for the completion gate
+      handshake: advertise the session-tag cap to user space
+      SUNRPC: Copy the TLS session tags when they are available
+      NFSD: Implement export tagging
+      NFSD: Add allow_tags to the netlink export interface
+
+ Documentation/core-api/index.rst           |   1 +
+ Documentation/core-api/tagset.rst          | 225 +++++++++++++++++++++++++++++
+ Documentation/netlink/specs/handshake.yaml |  16 ++
+ Documentation/netlink/specs/nfsd.yaml      |  10 ++
+ Documentation/networking/tls-handshake.rst |  63 +++++++-
+ drivers/nvme/host/tcp.c                    |   3 +-
+ drivers/nvme/target/tcp.c                  |   3 +-
+ fs/nfsd/export.c                           | 141 +++++++++++++++++-
+ fs/nfsd/export.h                           |  11 ++
+ fs/nfsd/netlink.c                          |   4 +-
+ fs/nfsd/netlink.h                          |   3 +-
+ fs/nfsd/trace.h                            |  19 +++
+ include/linux/sunrpc/svc_xprt.h            |   2 +
+ include/linux/tagset.h                     | 187 ++++++++++++++++++++++++
+ include/net/handshake.h                    |  30 +++-
+ include/uapi/linux/handshake.h             |   4 +
+ include/uapi/linux/nfsd_netlink.h          |   1 +
+ lib/Makefile                               |   1 +
+ lib/tagset.c                               | 174 ++++++++++++++++++++++
+ net/handshake/genl.c                       |   7 +-
+ net/handshake/handshake-test.c             |  72 +++++++++
+ net/handshake/handshake.h                  |   6 +
+ net/handshake/netlink.c                    | 109 +++++++++++++-
+ net/handshake/request.c                    |  68 ++++++++-
+ net/handshake/tlshd.c                      |  10 +-
+ net/sunrpc/svc_xprt.c                      |  11 +-
+ net/sunrpc/svcauth_unix.c                  |  12 ++
+ net/sunrpc/svcsock.c                       |  38 ++++-
+ net/sunrpc/xprtsock.c                      |   5 +-
+ 29 files changed, 1205 insertions(+), 31 deletions(-)
+---
+base-commit: 4d4d6605de5f91a40335729b6a7cc15e83b280f3
+change-id: 20260512-tls-session-tags-9d0042583f44
+
+Best regards,
+--  
+Chuck Lever <chuck.lever@oracle.com>
+
 
