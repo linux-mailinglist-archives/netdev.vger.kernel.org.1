@@ -1,179 +1,134 @@
-Return-Path: <netdev+bounces-295847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295853-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MhBzL9bmImrrewEAu9opvQ
-	(envelope-from <netdev+bounces-295847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:10:14 +0200
+	id vfEDBYPpImqcfAEAu9opvQ
+	(envelope-from <netdev+bounces-295853-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:21:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E358649243
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:10:14 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CB06493EA
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:21:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=dz21K3Jb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295847-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295847-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=QgAgqxeU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295853-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295853-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linuxfoundation.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4934230E29DB
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 14:55:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 057573022180
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 15:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC84D3DE45F;
-	Fri,  5 Jun 2026 14:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E00400E15;
+	Fri,  5 Jun 2026 15:08:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249C03E16BB
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 14:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049EA3E5564;
+	Fri,  5 Jun 2026 15:08:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780671315; cv=none; b=guL1AXKAOhOa0pgAQFs180mlUURy8nzTIjYSV0EhUDm+x7lQFbx80yrU0KYQm60JrO7iWm2aXZx3R3J+uJPFRcyN8pe2ecMZkOvUL9Rrh22L5slWBDoWwkQiVwCPjYsx3MwbQ3+dgzkFISTeAVFQ7xwqLR81bBPeu2BjrjaDZEc=
+	t=1780672130; cv=none; b=MTTxJCYwpBeaKYCmmJe5AMOrCwTVTiznIYHWgrkPtmRTJLaytyz8B7qv9NjuoECsEGwdTGMt28zMYRKZOfTSuKpH6fMWG8pbgT/m9Knv2A6xWSn0qAouDWAJYECO1qjsXtJ77Z8oe6I+CTRaafUDWIlbQZCj3T3cGl8ioTLNAo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780671315; c=relaxed/simple;
-	bh=1RIjhyMLtv99EBtOuAcd36dJda8OIlnmtL2e3xghDv0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XKKZJI7ySbUyhU0dobj6YpbnXDFcDXeZ2ZNaBw/QfrPPsOby4wgH3WOqum3vjZ0oj6Fh9DGF8NNUvA1AfIf7ereNH3rdfsxYUqZEqii+z7ViydjFPunNEuPFMlFXCw+TZ8zFthUf34TOYRmwjDOyHzwMmbJ+gu0+VTeUkCZG91Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dz21K3Jb; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 7C5524E408EA;
-	Fri,  5 Jun 2026 14:55:11 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3760F5FED1;
-	Fri,  5 Jun 2026 14:55:11 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B2859106A21AF;
-	Fri,  5 Jun 2026 16:55:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780671310; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=qWXGRwd3dgogIG+Bvu9DUV5PG31p4cZwWp/87lf38RU=;
-	b=dz21K3JbykBYP0dGe9k0xmZ+3l5tU+Hx3gj08dAtSVDppefMhtMqpZl4jnL40WxdmZnGt2
-	HSn6st3ifIi3VTp8hME8IHDk96OCk+kOeZuQliZaubKA+bU3DNmUKsHuL6+pGPB1US4Ihz
-	bsFgKA3S/MBiBB0GjCwPvNT8sW/m3vJrj7Fjh0goXdzmDlsORzno5UJUIJrso+lookTdCn
-	jXOIaNFIXugn/xtmJUuqXUAvcBxpByCAXQML7AJJ1LpRuYywMZ7uRTYVmgKEAZANgnS48D
-	ti0wFnjaL6MJpvGcO0EAgS+HoImTNqfz9MouwZGZNgMaMvWSKqJM6vSdlp8T6A==
-Message-ID: <15d6ff60-cb36-4d61-a4ce-62b72c4429f5@bootlin.com>
-Date: Fri, 5 Jun 2026 16:55:02 +0200
+	s=arc-20240116; t=1780672130; c=relaxed/simple;
+	bh=UJHREpDeIob2u3UyEwalJQx5zfb1tBSJ5dQ/an4MA1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bBFgmd2LDiqJB67f2wyNEJEXnfNuGLb0R3ISMKWPfsHurqBwcO9yUQlj+ftz+Ibft8lLLbNE3fcBTQx2D1NUPzvu+/IztESwHQzcxrVz/QgPj3VoF9FnKynQXYFUOm9KbZ7I8ITC+jFwAHBsfZte40GFru6i8tbL34FXOkGxZLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=QgAgqxeU; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5597B1F00893;
+	Fri,  5 Jun 2026 15:08:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1780672129;
+	bh=KwnobDycUoeaG1IWloTQkcMfkvmcZSblONxcFsLEbZI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QgAgqxeUL6dLtlMll8pVENTIkHWVKMQXpzFQrw82adMgfO2+VOfMw6rviQVuOm85/
+	 p+uYNu5ceOAtKIIpWrlUgzNRXNdfQqOVcDTIvwVdLAKjKHHHLAeccVXZ26ZbRCo7bI
+	 JevuEq4sTFrqQIgQZmQqg95QV1T8WI/IBm9hVZLo=
+Date: Fri, 5 Jun 2026 16:57:35 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Nguyen Minh Tien <zizuzacker@gmail.com>
+Cc: stable@vger.kernel.org, Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
+Subject: Re: [PATCH 6.6.y] net: usb: lan78xx: program MAC_CR for LAN7801
+ fixed-PHY link
+Message-ID: <2026060535-subpanel-proven-595a@gregkh>
+References: <20260605121535.51414-1-zizuzacker@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: xgmac: report L3/L4 filter match count in
- ethtool stats
-To: muhammad.nazim.amirul.nazle.asmade@altera.com, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260604083037.24407-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260604083037.24407-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260605121535.51414-1-zizuzacker@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295847-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:zizuzacker@gmail.com,m:stable@vger.kernel.org,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295853-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:mid,bootlin.com:dkim,bootlin.com:from_mime,bootlin.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,altera.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linuxfoundation.org:from_mime,linuxfoundation.org:dkim,gregkh:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0E358649243
+X-Rspamd-Queue-Id: 20CB06493EA
 
-Hi,
-
-You're missing the 'net-next' in the Patch subject :(
-
-Besides that,
-
-On 6/4/26 10:30, muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
-> From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+On Fri, Jun 05, 2026 at 07:15:35PM +0700, Nguyen Minh Tien wrote:
+> While bringing up a LAN7801 wired over RGMII to an MDIO-less switch, I
+> hit a link that the fixed PHY reported as "up" but that could not pass a
+> single packet: every frame came out corrupted at the switch and no ARP
+> reply ever made it back.
 > 
-> Read the L3FM and L4FM bits from the RX descriptor status word (RDES2)
-> and increment the corresponding ethtool statistics counters. This allows
-> users to observe L3/L4 filter hit rates via ethtool -S.
+> It turned out the MAC_CR speed/duplex bits are never set on this path.
+> lan7801_phy_init() registers a fixed PHY at SPEED_1000/DUPLEX_FULL, but
+> nothing programs the MAC to match: there is no PHY state machine for a
+> fixed link, and lan78xx_reset() only sets the auto speed/duplex bits for
+> the 7800.  So the 7801 comes up at 10M/half, clocks RGMII TXC at 2.5 MHz
+> instead of 125 MHz, and mangles everything it transmits.
 > 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-> Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h       | 2 ++
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c | 6 ++++++
->  2 files changed, 8 insertions(+)
+> Fix it by programming MAC_CR to 1G/full in the fixed-PHY branch, to match
+> fphy_status.  Only that branch is touched, so boards with a real external
+> PHY (and the 7800/7850) are unaffected.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 51943705a2b0..95fdf3133208 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -429,6 +429,8 @@
->  #define XGMAC_TDES3_VLTV		BIT(16)
->  #define XGMAC_TDES3_VT			GENMASK(15, 0)
->  #define XGMAC_TDES3_FL			GENMASK(14, 0)
-> +#define XGMAC_RDES2_L4FM		BIT(28)
-> +#define XGMAC_RDES2_L3FM		BIT(27)
->  #define XGMAC_RDES2_HL			GENMASK(9, 0)
->  #define XGMAC_RDES3_OWN			BIT(31)
->  #define XGMAC_RDES3_CTXT		BIT(30)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-> index b5f200a87484..6719ac6e395b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-> @@ -27,6 +27,7 @@ static int dwxgmac2_get_rx_status(struct stmmac_extra_stats *x,
->  				  struct dma_desc *p)
->  {
->  	u32 rdes3 = le32_to_cpu(p->des3);
-> +	u32 rdes2 = le32_to_cpu(p->des2);
->  
->  	if (unlikely(rdes3 & XGMAC_RDES3_OWN))
->  		return dma_own;
-> @@ -37,6 +38,11 @@ static int dwxgmac2_get_rx_status(struct stmmac_extra_stats *x,
->  	if (unlikely((rdes3 & XGMAC_RDES3_ES) && (rdes3 & XGMAC_RDES3_LD)))
->  		return discard_frame;
->  
-> +	if (rdes2 & XGMAC_RDES2_L3FM)
-> +		x->l3_filter_match++;
-> +	if (rdes2 & XGMAC_RDES2_L4FM)
-> +		x->l4_filter_match++;
-> +
->  	return good_frame;
->  }
->  
+> Mainline fixes this differently via the phylink conversion in v6.16,
+> commit e110bc825897 ("net: usb: lan78xx: Convert to PHYLINK for improved
+> PHY and MAC management"), which is far too large to backport, so this is
+> a small fix for stable only.
 
+Why is that too large?  If we take this, we then diverge and any future
+fixes will not apply here :(
+
+Please backport exactly what is in the mainline tree, otherwise odds
+are, this one-off fix will be found incorrect (we always get it
+wrong...)
+
+thanks,
+
+greg k-h
 
