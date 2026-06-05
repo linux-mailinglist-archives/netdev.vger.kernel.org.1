@@ -1,76 +1,68 @@
-Return-Path: <netdev+bounces-295592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +gBuHWk2ImqiTwEAu9opvQ
-	(envelope-from <netdev+bounces-295592-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:37:29 +0200
+	id Q0+8Dr42ImqpTwEAu9opvQ
+	(envelope-from <netdev+bounces-295594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:38:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 470D5644B50
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:37:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A391D644B5E
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:38:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HcrEvOi8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295592-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295592-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=c3QN+yvT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295594-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295594-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 06A453002B58
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:37:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 51647301F484
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604C237AA65;
-	Fri,  5 Jun 2026 02:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6956F3E8341;
+	Fri,  5 Jun 2026 02:38:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1BA3E2ABF
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 02:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD7D391507;
+	Fri,  5 Jun 2026 02:38:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780627041; cv=none; b=WZW3MG9H9RWbNyO1LJEmGrfufhz3Go16JSbG4i80UdICni04/r5UTk+py5rbtHIr6bpTq0W553UVShP7ROFfi4jPDPj/ugwmH5ZacyVebmmVyv8K7bEgwZ/pRWW5k+kYDaIBFs3oKfPeu7g0wwLToCNBAcZRF+pUmbbyknN4NXs=
+	t=1780627120; cv=none; b=aZF9wMrnfLRQoxV2BH4r/JeO5sPtQYy2KV0KwXixFeptd+hdCooilEux3qQ9xSE/Lb5d7zeLstv6lOrXeHVBaTfFrINXbIz4NCpFzKXk0IXeKOdhybFVW6ZOrQQlBuo1SnOUUW2lcgR60H6VJoqYFW7PynnEErI5fh9EonwEE2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780627041; c=relaxed/simple;
-	bh=IbY5PVTOrL8eCaLa3jm1ws2zoEcSQsbPbwxz+zUyn1o=;
+	s=arc-20240116; t=1780627120; c=relaxed/simple;
+	bh=m9BSIbIw4s7WJIctrYVCa4WXUj1lnuXHCZm8JrFTj+U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cuVlZ00xlt/eHtI6wo7cvZDlYQXnqTXohhClruI7LNN0on/h9pCTZWVF/SgkThy+DhCik6cZwi55Sx/xp4wCZFLO8FD3XCtnWjGg2RACJ83RU7Qq1XOd9ofhngyRXlQy28RR9BOMwnHaSrhUbV9MVoreLNuJZUFgzGhyqGzYoC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HcrEvOi8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF9D1F00893;
-	Fri,  5 Jun 2026 02:37:14 +0000 (UTC)
+	 MIME-Version; b=jAePND5cY0bty4rK7+syW7SO18oPDMQHnPvjYdyFZMuhaKL5ronklqXjDRRgHuiYZEfbx/Cj2AD8nY7XyokZAfcLkoBHMARLHmKJuMkUw1N2/yzxzMOb6v8Y8flhVXSv7nMfVWxGycNf7p5RkX99kREqIUnkClRlbzaSzaqacN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3QN+yvT; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A81A01F00893;
+	Fri,  5 Jun 2026 02:38:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780627035;
-	bh=9lPe3V1kbXwQcy11sW9IOTZnFlvLl5J21zXgtrx0sp0=;
+	s=k20260515; t=1780627111;
+	bh=Hg+fGRs9zH/4yImd4sjINVXE++n8vPxI/VvGaadI6/s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=HcrEvOi8fn1Uv0faiTif0FKT/GeSxSATG2b/i9Os2vBRMbDcknYXhXZgL3dCeKG+W
-	 CRbrhDTrD1RcwKQUv1kv7zFmpF17ADd21xXhwIeewwf3zNsNzAJGfBxwBb02J2/Iqs
-	 VwQr8GADFXdKb7O5PJUIK4X/yNp9lQpvm1YmEB/IRGtYrNKuHMwQX6ax1YC6NKtksM
-	 JA38qJpx9j5+sDTSAN3bsA1rfvXt/WLa87k99iXnvCLltt5X2pUWNQvQlLqaApzfmw
-	 AgVzPVh34V8XFxh/8mAjPDztbiexYyfg/Rb9UBzX7iCG3sPAn62DS99Hl6YcwLtXbx
-	 oNs+0BTfDk05g==
+	b=c3QN+yvTFPkDEHAS0/9lqCPy7IUnhIEe4hPsqi+1q2zCXsed7fVPl0GfaSgZS5/KS
+	 xXS5VVMKTWy5M4E+SgiZimhDhwZ8m5Ow/IaQYjPRnaAB84yx/P6IRLaIOHsYUfSg7N
+	 iH+7x+8n/FeUg1KYUmNnOLySzgwVv1Fz/dI6+dVEiCStxI9QU7kBAJi/oByk+/RE/P
+	 gTTC3c0ZtfyJ9CsE7zlXteLwvxliDs+Qw7+BhQbB6XA3rFyYia6geKcwPx9b02Qavk
+	 DTBcTQyYhnTCVaSw1GLmoiSdU2NMdia1P/cusTvMI5Cz13ZxOwreBac9gNr+jREwQy
+	 y6D4wrzEO2XpA==
 From: Jakub Kicinski <kuba@kernel.org>
-To: alice.kernel@fastmail.im
+To: sukhdeeps@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	lucien.xin@gmail.com,
-	willemdebruijn.kernel@gmail.com,
-	willemb@google.com,
-	dsahern@kernel.org,
-	razor@blackwall.org,
-	shuah@kernel.org,
-	stfomichev@gmail.com,
-	andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org,
 	horms@kernel.org,
-	fw@strlen.de,
-	netdev@vger.kernel.org,
-	alice@isovalent.com
-Subject: Re: [PATCH net-next v6 05/11] udp: Support gro_ipv4_max_size > 65536
-Date: Thu,  4 Jun 2026 19:37:11 -0700
-Message-ID: <20260605023712.3627277-1-kuba@kernel.org>
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next v4 5/12] net: atlantic: add AQC113 filter data structures and firmware query
+Date: Thu,  4 Jun 2026 19:38:28 -0700
+Message-ID: <20260605023828.3629062-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260602093931.516281-6-alice.kernel@fastmail.im>
-References: <20260602093931.516281-6-alice.kernel@fastmail.im>
+In-Reply-To: <20260602135452.516-6-sukhdeeps@marvell.com>
+References: <20260602135452.516-6-sukhdeeps@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,111 +75,300 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295592-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:alice.kernel@fastmail.im,m:kuba@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:alice@isovalent.com,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[fastmail.im];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-295594-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:sukhdeeps@marvell.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:vadim.fedorenko@linux.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,google.com,redhat.com,gmail.com,blackwall.org,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 470D5644B50
+X-Rspamd-Queue-Id: A391D644B5E
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-udp: Support gro_ipv4_max_size > 65536
+net: atlantic: add AQC113 filter data structures and firmware query
 
-This commit allows GRO to aggregate UDP packets larger than 65535 bytes
-by writing 0 to the UDP header length field (via udp_set_len()) and
-restoring the real length from skb->len in udp_rcv().
+This patch adds L3/L4/L3L4 and ethertype tag filter data structures to
+hw_atl2_priv, defines RPF L3/L4 command bits and several filter count
+constants, and queries filter capabilities from firmware shared memory
+during aq_a2_fw_init().  It also adds an unrelated MAC register dump
+helper hw_atl2_utils_hw_get_regs().
 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 3e92575f1d55..856c23b9d6dd 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -2605,6 +2605,9 @@ int udp_rcv(struct sk_buff *skb)
->  	if (ulen > skb->len)
->  		goto short_packet;
->  
-> +	if (!ulen)
-> +		ulen = skb->len;
-> +
->  	if (ulen < sizeof(*uh))
->  		goto short_packet;
->  
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 96987b1c05cd..f7da760f046f 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -919,7 +919,7 @@ int udp_gro_complete(struct sk_buff *skb, int nhoff,
->  	struct sock *sk;
->  	int err;
->  
-> -	udp_set_len_short(uh, newlen);
-> +	udp_set_len(uh, newlen);
+A few questions inline.
 
-[High]
-After this change, udp_gro_complete() may write uh->len = 0 when the
-aggregated packet is >= GRO_LEGACY_MAX_SIZE (65536).  How does this
-interact with conntrack on the receive path?
-
-Looking at udp_validate_len() in net/netfilter/nf_conntrack_proto_udp.c
-at this commit:
-
-    static bool udp_validate_len(...)
-    {
-        unsigned int udplen = udp_get_len_short(hdr);
-        ...
-        if (udplen > skblen || udplen < sizeof(*hdr))
-            return false;
-        ...
-    }
-
-For a super-packet where uh->len has been zeroed, udp_get_len_short()
-returns 0, which is less than sizeof(*hdr), so udp_validate_len() returns
-false.  udp_error() then logs "truncated/malformed packet" and
-nf_conntrack_udp_packet() returns -NF_ACCEPT, leaving the flow untracked.
-
-The deployment this patch enables (gro_ipv4_max_size > 65536 with VXLAN
-or Geneve TCP-in-UDP and conntrack) is the very example given in the
-commit message.  Should this patch also update udp_validate_len() (or
-otherwise account for the zeroed length) so that conntrack does not drop
-out of the state machine for super-packets, breaking NAT and stateful
-firewalling?
-
-The follow-up patch in this series, "udp: Support BIG TCP GSO packets
-where they can occur" (b73c2d663201), updates udp_validate_len() to
-accept udplen == 0 when skblen >= GRO_LEGACY_MAX_SIZE, but until that
-patch is applied this commit on its own appears to regress conntrack for
-the configurations it is intended to support.
-
->  	sk = INDIRECT_CALL_INET(lookup, udp6_lib_lookup_skb,
->  				udp4_lib_lookup_skb, skb, uh->source, uh->dest);
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> index 5a89bb8722f9..fc086d84fb91 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
 
 [ ... ]
+
+> @@ -94,6 +106,12 @@ enum HW_ATL2_RPF_ART_INDEX {
+>  #define HW_ATL2_ACTION_DISABLE HW_ATL2_ACTION(0, 0, 0, 0)
+>  #define HW_ATL2_ACTION_ASSIGN_QUEUE(QUEUE) HW_ATL2_ACTION(1, 0, (QUEUE), 1)
+>  #define HW_ATL2_ACTION_ASSIGN_TC(TC) HW_ATL2_ACTION(1, 1, (TC), 1)
+> +#define HW_ATL2_RPF_L3L4_FILTERS 8
+> +#define HW_ATL2_RPF_L3V4_FILTERS 8
+> +#define HW_ATL2_RPF_L4_FILTERS 8
+> +#define HW_ATL2_RPF_VLAN_FILTERS 16
+> +#define HW_ATL2_RPF_ETYPE_FILTERS 16
+> +#define HW_ATL2_RPF_ETYPE_TAGS 7
+
+[Low]
+HW_ATL2_RPF_L3V4_FILTERS and HW_ATL2_RPF_L4_FILTERS look unused.
+
+Every array in hw_atl2_priv (l3_v4_filters[], l3_v6_filters[],
+l4_filters[], l3l4_filters[]) is sized with HW_ATL2_RPF_L3L4_FILTERS, and
+the bounds clamps in hw_atl2_utils_get_filter_caps() also compare against
+HW_ATL2_RPF_L3L4_FILTERS.  HW_ATL2_RPF_L3V4_FILTERS and
+HW_ATL2_RPF_L4_FILTERS appear nowhere else in tree, and there is no
+symmetric HW_ATL2_RPF_L3V6_FILTERS even though the commit message
+enumerates IPv4 and IPv6 as distinct categories.
+
+Should the unused names be dropped, or should the arrays and clamps be
+switched to use them so that, for example, lowering
+HW_ATL2_RPF_L4_FILTERS in the future actually has effect?
+
+[ ... ]
+
+> +struct hw_atl2_l3_filter {
+> +	u8 proto;
+> +	u8 usage;
+> +	u32 cmd;
+> +	u32 srcip[4];
+> +	u32 dstip[4];
+> +};
+> +
+> +struct hw_atl2_l4_filter {
+> +	u8 usage;
+> +	u32 cmd;
+> +	u16 sport;
+> +	u16 dport;
+> +};
+
+[Low]
+The commit message says these structures provide "reference-counted
+sharing support", but the only field that looks like a refcount is a
+plain u8 usage with no atomic_t, refcount_t, or paired inc/dec helpers
+in this commit.  Could the wording in the commit message be tightened
+to match what is actually added (a serialized usage counter, not a
+refcount)?
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
+> index 0fe6257d9c08..ef549e172dd9 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
+> @@ -128,3 +128,37 @@ int hw_atl2_utils_soft_reset(struct aq_hw_s *self)
+>  err_exit:
+>  	return err;
+>  }
+> +
+> +static const u32 hw_atl2_utils_hw_mac_regs[] = {
+
+[Low]
+The subject and body describe filter data structures and firmware
+capability discovery, but the diff also adds a 72-entry MAC register
+table and the new register-dump helper hw_atl2_utils_hw_get_regs().  The
+register dump utility is unrelated to filter discovery and is not
+mentioned in the subject.
+
+Would it be better to split this into a separate patch (or fold it into
+the follow-up commit that wires hw_atl2_utils_hw_get_regs() into
+hw_atl2_ops) so that this patch is one logical change?
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
+> index 7370e3f76b62..3011c7cd5259 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
+
+[ ... ]
+
+> +int hw_atl2_utils_get_filter_caps(struct aq_hw_s *self)
+> +{
+> +	struct hw_atl2_priv *priv = self->priv;
+> +	struct filter_caps_s filter_caps;
+> +	u32 tag_top;
+> +	int err;
+> +	u32 min_val;
+> +
+> +	err = hw_atl2_shared_buffer_read_safe(self, filter_caps, &filter_caps);
+> +	if (err)
+> +		return err;
+> +
+> +	priv->art_base_index = filter_caps.rslv_tbl_base_index * 8;
+> +	priv->art_count = filter_caps.rslv_tbl_count * 8;
+> +	if (priv->art_count == 0)
+> +		priv->art_count = 128;
+
+[Low]
+What does the literal 128 represent here?  It has no #define, no comment,
+and no log message.  If firmware legitimately reports a 0 count (feature
+unavailable, FW bug, restricted SKU), this silently substitutes 128 ART
+entries and the driver could later program slots beyond what the part
+actually has.
+
+Could this be promoted to a named macro alongside HW_ATL2_RPF_ART_INDEX
+with a short rationale, and possibly a netdev_warn() noting that the
+firmware did not advertise an ART count?
+
+[Low]
+priv->art_base_index now has two writers reading the same firmware
+field.  This function sets:
+
+	priv->art_base_index = filter_caps.rslv_tbl_base_index * 8;
+
+while the pre-existing helper
+
+	int hw_atl2_utils_get_action_resolve_table_caps(struct aq_hw_s *self,
+							u8 *base_index, u8 *count);
+
+is still called from hw_atl2.c, which then assigns
+priv->art_base_index = base_index * 8 from its out-parameter.
+
+Is one of these now redundant?  Should callers move to consume the
+cached priv->art_base_index, or is there a reason to keep both
+sources of truth?
+
+> +	priv->l2_filters_base_index = filter_caps.l2_filters_base_index;
+> +	priv->l2_filter_count = filter_caps.l2_filter_count;
+> +	priv->etype_filter_base_index = filter_caps.ethertype_filter_base_index;
+> +	priv->etype_filter_count = filter_caps.ethertype_filter_count;
+> +	priv->etype_filter_tag_top =
+> +		(priv->etype_filter_count >= HW_ATL2_RPF_ETYPE_TAGS) ?
+> +		 (HW_ATL2_RPF_ETYPE_TAGS) : (HW_ATL2_RPF_ETYPE_TAGS >> 1);
+
+[Low]
+The L3 and L4 paths below clamp base_index against HW_ATL2_RPF_L3L4_FILTERS
+and use min_t() on the count, but the etype, l2 and vlan_filter_base_index
+fields are copied verbatim from filter_caps_s u8 values (range 0..255).
+
+Is that asymmetry intentional?  It would be easier for future consumers
+to reason about if every firmware-supplied capability field were
+range-checked against its compile-time array bound (etype_policy[] is
+sized HW_ATL2_RPF_ETYPE_FILTERS, etc.) at the FW boundary, in this one
+place.
+
+> +	priv->vlan_filter_base_index = filter_caps.vlan_filter_base_index;
+> +	/* 0 - no tag, 1 - reserved for vlan-filter-offload filters */
+> +	tag_top =
+> +		  (filter_caps.vlan_filter_count == HW_ATL2_RPF_VLAN_FILTERS) ?
+> +		  (HW_ATL2_RPF_VLAN_FILTERS - 2) :
+> +		  (HW_ATL2_RPF_VLAN_FILTERS / 2 - 2);
+> +
+> +	if (filter_caps.vlan_filter_count > 2)
+> +		priv->vlan_filter_count = min_t(u32,
+> +						filter_caps.vlan_filter_count - 2,
+> +						tag_top);
+> +	else
+> +		priv->vlan_filter_count = 0;
+
+[Low]
+When firmware reports filter_caps.vlan_filter_count of 1 or 2, the
+"> 2" gate forces priv->vlan_filter_count to 0 silently, with no
+netdev_dbg()/netdev_warn().  The comment only documents the 2-entry
+reservation when the count is large.
+
+Is the silent disable on a small but nonzero count intentional, and
+worth a short log line so users can tell why VLAN filtering came up
+disabled?
+
+> +	priv->l3_v4_filter_base_index = filter_caps.l3_ip4_filter_base_index;
+> +	if (priv->l3_v4_filter_base_index >= HW_ATL2_RPF_L3L4_FILTERS) {
+> +		priv->l3_v4_filter_base_index = 0;
+> +		priv->l3_v4_filter_count = 0;
+> +	} else {
+> +		min_val = HW_ATL2_RPF_L3L4_FILTERS - 1 - priv->l3_v4_filter_base_index;
+> +		priv->l3_v4_filter_count = min_t(u32,
+> +						 filter_caps.l3_ip4_filter_count,
+> +						 min_val);
+> +	}
+
+[Medium]
+Is the "- 1" in this clamp intentional?
+
+The arrays are sized HW_ATL2_RPF_L3L4_FILTERS (= 8), and consumers in
+the follow-up patch "net: atlantic: implement AQC113 L2/L3/L4 RX filter
+ops" iterate over priv->l3_v4_filters[] / l3_v6_filters[] / l4_filters[]
+as a half-open range:
+
+	for (i = base; i < base + count; i++)
+
+With base_index = 0 and firmware reporting count = 8 (the natural
+maximum for a 4-bit field):
+
+	min_val = 8 - 1 - 0 = 7
+	priv->l3_v4_filter_count = min_t(u32, 8, 7) = 7
+
+so slot 7 is permanently unreachable.  With base_index = 7 (still
+in-range, since the validity check is ">= HW_ATL2_RPF_L3L4_FILTERS"):
+
+	min_val = 8 - 1 - 7 = 0
+	priv->l3_v4_filter_count = 0
+
+so the entire pool reports zero filters even though slot 7 exists.
+
+For the half-open consumer convention, the formula that exactly fills
+the array is:
+
+	min_val = HW_ATL2_RPF_L3L4_FILTERS - priv->l3_v4_filter_base_index;
+
+The same pattern is duplicated in the l3_v6 and l4 blocks below, and
+unlike the VLAN logic in this same function (which has the "- 2"
+comment explaining its reservation), the "- 1" here is undocumented.
+
+> +
+> +	priv->l3_v6_filter_base_index = filter_caps.l3_ip6_filter_base_index;
+> +	if (priv->l3_v6_filter_base_index >= HW_ATL2_RPF_L3L4_FILTERS) {
+> +		priv->l3_v6_filter_base_index = 0;
+> +		priv->l3_v6_filter_count = 0;
+> +	} else {
+> +		min_val = HW_ATL2_RPF_L3L4_FILTERS - 1 - priv->l3_v6_filter_base_index;
+> +		priv->l3_v6_filter_count = min_t(u32,
+> +						 filter_caps.l3_ip6_filter_count,
+> +						 min_val);
+> +	}
+> +
+> +	priv->l4_filter_base_index = filter_caps.l4_filter_base_index;
+> +	if (priv->l4_filter_base_index >= HW_ATL2_RPF_L3L4_FILTERS) {
+> +		priv->l4_filter_base_index = 0;
+> +		priv->l4_filter_count = 0;
+> +	} else {
+> +		min_val = HW_ATL2_RPF_L3L4_FILTERS - 1 - priv->l4_filter_base_index;
+> +		priv->l4_filter_count = min_t(u32,
+> +					      filter_caps.l4_filter_count,
+> +					      min_val);
+> +	}
+> +
+> +	return 0;
+> +}
+
+Same "- 1" question as above for the l3_v6 and l4 blocks.
 
