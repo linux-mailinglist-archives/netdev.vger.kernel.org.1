@@ -1,193 +1,218 @@
-Return-Path: <netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lKYPL3UkI2qAjQEAu9opvQ
-	(envelope-from <netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:33:09 +0200
+	id TTZhFNciI2owjQEAu9opvQ
+	(envelope-from <netdev+bounces-295953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:26:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B509864AF79
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:33:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D6164AED5
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:26:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cs.unc.edu header.s=google header.b=eCcGzrJ4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=cs.unc.edu;
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=CoDGtcee;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295953-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295953-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=onsemi.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8D868300BD7F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:20:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E73983009F0D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:23:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691444071F9;
-	Fri,  5 Jun 2026 19:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB314071E8;
+	Fri,  5 Jun 2026 19:23:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF783BED1F
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 19:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B7E4071C9
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 19:23:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780687191; cv=none; b=qXtGpAw36hHwPf8htDSy/xhBDd1lNQxshKtSS+ZKFpQzFbed9G0PJZvaLeAS5IJ9/FtTiULxM71ytjRrNaxwEFtRp/CMiv/iqIQC1mNf4puTYfD8lXFlqss+F/7rYimfFO0INX18JC2dx2zCdKGfywyvjE1UNFhMHtO4KTvSbkg=
+	t=1780687399; cv=none; b=LTRLvXlLdfb9uQupwZKnoYBAogx0AWnX2QwljlcLFGKjJCBpm/WI8B3WLfuIby0lC3jc29WW9AlvhegJILJ4AasdpaihU/PXJzyQ5jXaZ0VPl+BDSE3A/DqT4VAYEh0/TWICl2FUWoSoDYxwYhPtF4Hu4knppPZ4IgsexBmJ/G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780687191; c=relaxed/simple;
-	bh=lQyeoEHvPDcTd8UBfI28l1PrKOeUuXwWGO6rNePL3aM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HZGsZIyUdMMTyhiQsbuutEm2h7bszMptEPogRz/EelUPQaawEigBa6fqdgNQI3VcY/ZEqJ6Qp9dYISXWQ4EyvE4Oor2SCWHx0gt7JY80PKW76FlCAccfrhXVSnPgfx4gdfHLpQCdKmJZ/kwVRxtuhqitdI60Y8CfC6I6nl4dhoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cs.unc.edu; spf=pass smtp.mailfrom=cs.unc.edu; dkim=pass (2048-bit key) header.d=cs.unc.edu header.i=@cs.unc.edu header.b=eCcGzrJ4; arc=none smtp.client-ip=209.85.216.49
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-36bc065c298so271561a91.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 12:19:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cs.unc.edu; s=google; t=1780687184; x=1781291984; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0vJH8NNd0RF41K/4FCBtez2ytaf4nIFe3x4aSA4G5w=;
-        b=eCcGzrJ4DDhZBO/s4Ntwd+hvBl/td6H2K4Kz8xGIIvcHauLoogijSjsyweD7TG1jZK
-         A2RmBx2Xkz8DtAhduy5k2tPwehKJki2ZV1RfRiYlEEVWG3lYihK/rxbHmjRoCWYr0UPD
-         Syj9Qv0wW2Sy9yKSfEQ3F0NQMg3esKIhBp2GmmgTgInWW/9dBiG9155fivTKff9bn9y5
-         AtYVksSDXPWAowQNxjP0Yd1Un6Onp4O10g1C6liujsxCho+Hf7VJVpgmJxr0KzFmHEfN
-         TPcKdaOZ68pVbgbeQpH/LIkUSr2UFKuUQEa/EvwIXE+bCB5fVkE3Jpe1Y5IuMCU26pXC
-         0O2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780687184; x=1781291984;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B0vJH8NNd0RF41K/4FCBtez2ytaf4nIFe3x4aSA4G5w=;
-        b=rYOTDJskO3I5nZ/C2oASD9yihETzWPYBuQ8JVUg87cx76arOgDMe8J+XJusUodznbl
-         ZQRYcbAPsv7qYXGv7YL1zvgbwiKyaaD2ztHwH/wkEVa1+B/Ui79zyhR7zNCmLG/94x/7
-         RPNfU5rLmlcgtL+b0FqSQjkoWMfvfk1mLbwisz5EjvyRE7RKksn8XVb030Em6ycPfgeT
-         b0L0tdqK/BmmDr7i7ymZw5CyReJTTfHMfoyQSkpx9kLCFIRipcksIyznAyh4dzAHFPhW
-         fa0VBgEDDsHPACR07oRvvmfwO7rRWjyV7rMaJ+chKXeKi8J1DlKZCEtHftkUbqZ+XThg
-         R/yw==
-X-Forwarded-Encrypted: i=1; AFNElJ9ObIv+Xpk7reSWUv4gLcjPaSPLZFnn1GEwc0FxoEoyUuHYm2ACS6ndoPG3ghdUBRCGRxHhyVI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXy9y4xVlIIsCqsrTc3s5EeHcsOIE7R2sEcr6Y3wzgOpVUq915
-	JgjrJMWDiQKg700o8Ee2QTft+kCw560UUOz7zdDhGOuETT/X2sCkpFKdt936lM8Qwg==
-X-Gm-Gg: Acq92OFGcsnwYCC89KVjZYn/2G4qczUFs7xcNps3hAzcPL5wBwxJonwFH9YzxNDtW9J
-	WwqpIHp2yxoL82+XNkcdok4qRmwttlo3bEFSQfZWqFY4Tgd6DfOIDluM2tlT9odiL3ve3kbfB0X
-	ihWmYLNzvJ58aCLNIHJHVN1LJ7zunnN7si6dE09s4pYjPO2gjrtWHU3VB5qoXNyoJBf2hkyZUSa
-	A1YU123ZFTOQTNrWj2fI7m5BztrSOJiEGQ6Pec+eMmCK8rGbhWADH7/IVJSVDVkjk4351dJaMpD
-	IXsIVOk67fFGxzUKHmH0/aZvYQMHRHfE6lZhjkAWBdUZP2bfBWCHXWTNpev6GbXVjvtfzmq88jK
-	KSzsupznAdm0xSVLUiDorj83PW+W2SbVyGiMOxv6/nzbcbfV7PTxNiVhy5e6Ce0YOFHJOvE2GRx
-	NiqyviPWqgRk1XoemeG72AHsRF6fwgkf564piag3PiLUUqD807w1Of5NfJxhrgmA==
-X-Received: by 2002:a17:90b:3dcf:b0:36b:3ecd:88d7 with SMTP id 98e67ed59e1d1-370ef0f50ffmr2677491a91.2.1780687183832;
-        Fri, 05 Jun 2026 12:19:43 -0700 (PDT)
-Received: from localhost.localdomain ([106.51.195.148])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842820e8e6asm9757737b3a.0.2026.06.05.12.19.39
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 05 Jun 2026 12:19:43 -0700 (PDT)
-From: Divya Mankani <divyakm@cs.unc.edu>
-X-Google-Original-From: Divya Mankani <divyakm@unc.edu>
-To: kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com,
-	Divya Mankani <divyakm@unc.edu>
-Subject: [PATCH] vsock/virtio: fix memory leak in virtio_transport_recv_listen
-Date: Sat,  6 Jun 2026 00:49:22 +0530
-Message-ID: <20260605191922.12720-1-divyakm@unc.edu>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1780687399; c=relaxed/simple;
+	bh=0tSUzHTzrKY+5caF2k1r3Xa1YexII1eK6VGJt+3BoZ0=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=esIPy3VdsrRtQ22FvJWmBGXFm/B2itID9khrVASYzjZvX3Z+rYDuGeNtBvF1PVRBwCZTy7GAFxNBkD+kUP6Ex+0x6IP2EoNCFAHOsX+YMvlJNBMf9NJ7g1TmALvsR7lx8uE+6yYPOh7nm6V5gwzvykPQx4fUwaXay5Clm+afhkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=CoDGtcee; arc=none smtp.client-ip=170.10.153.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1780687397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0tSUzHTzrKY+5caF2k1r3Xa1YexII1eK6VGJt+3BoZ0=;
+	b=CoDGtceeEkARGhQdxNwA+ghh1Vx18jM3vIcBYgIfkijJsIoQOCjgGKkAA0nLZ3E00rBxMW
+	eZiHEx2XMiVvgUGLtywqUIffEQFQ0sxLosR9zftqx/+jv6DCDjpXHyvYb/YzcyJw5HmVZ3
+	UyC8tUXyPl/2Jf8Si+cppwM8aKbwyhkA/+Ls57SLPzkaReKrd+EV9eXvUi/WWDHcNuwH88
+	3kh0lLlkeCdQ0QKtAdU4a+jk0gPEH01UjKNe4lLjyhCF3wJTI9SE0UWE2BeQ3Am98uUNFB
+	P+ODj17z0PKPT1zKFy9Yz8M/5YKohiZBxaSmZfWwUJ4wNSIsdkb7DkZ18cGbuw==
+Received: from CO1PR03CU002.outbound.protection.outlook.com
+ (mail-westus2azon11010063.outbound.protection.outlook.com [52.101.46.63])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id usb-mta-16-bi9J8ABsPIq7g9t91elN4A-1; Fri,
+ 05 Jun 2026 12:23:13 -0700
+X-MC-Unique: bi9J8ABsPIq7g9t91elN4A-1
+X-Mimecast-MFC-AGG-ID: bi9J8ABsPIq7g9t91elN4A_1780687389
+Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
+ by DM6PR02MB6747.namprd02.prod.outlook.com (2603:10b6:5:220::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Fri, 5 Jun 2026
+ 19:23:07 +0000
+Received: from CY8PR02MB9249.namprd02.prod.outlook.com
+ ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
+ ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
+ 19:23:07 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: "Jerry.Ray@microchip.com" <Jerry.Ray@microchip.com>, Piergiorgio Beruto
+	<Pier.Beruto@onsemi.com>, "Parthiban.Veerasooran@microchip.com"
+	<Parthiban.Veerasooran@microchip.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next v3 08/14] net: ethernet: oa_tc6: Remove FCS size
+ in RX frame
+Thread-Topic: [PATCH net-next v3 08/14] net: ethernet: oa_tc6: Remove FCS size
+ in RX frame
+Thread-Index: AdzvmRIV9Yc6XZqaQq2ja4j42ca11AFgD4jQAAHDuaA=
+Date: Fri, 5 Jun 2026 19:23:06 +0000
+Message-ID: <CY8PR02MB924905780DDC814D61D281FD83112@CY8PR02MB9249.namprd02.prod.outlook.com>
+References: <CY8PR02MB9249644F900471DB8417134683162@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <CH3PR11MB7723AA90B2FEDDCE9F70041CEF112@CH3PR11MB7723.namprd11.prod.outlook.com>
+In-Reply-To: <CH3PR11MB7723AA90B2FEDDCE9F70041CEF112@CH3PR11MB7723.namprd11.prod.outlook.com>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|DM6PR02MB6747:EE_
+x-ms-office365-filtering-correlation-id: 0a8e51c2-b982-4515-414a-08dec337df4e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|22082099003|18002099003|921020|56012099006|4143699003|11063799006|38070700021
+x-microsoft-antispam-message-info: COm+Qg9wTVASJpctHULEhSdLKRlSpwSRW9zAx/C68LBN3D1I6DH9mwuNCREVHsOPdewQXv7q4D2yhT+zxnEo5qyob5ps68pXyOhLD+TS9IvwlZZj9mVuCAT2yXhFdoLXPuxoldF/sfJNTJKmhb6a45E/O/xKVppP6Kmcnc72aG6fLZr9YWu+QGkWv1ydbKdYiUcIk48OlYswymO+8U6XMNB7JYA7NqBXEAYlWHk1u3rpBe992Ad04vJvSWgRuq0LB3pSuiivExnjCQfM/JLqxj/yu7gzdNWF0f5nK3nobKTwWfAiATGQCGZGbVrwmLHyYioH1sWtTByruQ3M4LwYcvk0rQElQ+1xZspqEYzIFw0urEEapHEVLVRBGWNZ1AEkEW11oA80ZEwgRXaQw8807T7p5UvUf/bYCnq93WM7TdUdm1YS/9L2BtEmeS+YTqYKqBZxLhbAZbNVLgTFuQ72MfLGY78gL+3lYKGZtJ3mX1ILfuOjDlkHWBEDzKITjcOcRdXutqtgG5M7W5dlleq66QQrIkwCiaw9pZWM4rUA/TY25iY3TRL8UUW+uWmdror55KcDMaOkvqiLUjvd3bJ3tBR+2GqRV+ja1uW/oVv5WGqnPe8Gqi8kj6AG5FN3EAI4zJ6bdR78WMs5xzSDpw66T36v2iGTXTZC1Mes/u7OEwbcfaGtPVA6r9lQyvuUDTdkFzRSkjiq6pOtH4sLw7xjrv+O++ZVXb2m7J/awNdWhMs/GR1NdwgiKNXGrDf8SCCsJhiVh8uAve6+ki7/OLqzlA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(22082099003)(18002099003)(921020)(56012099006)(4143699003)(11063799006)(38070700021);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NUpFVndPelZHcGpuY2hiVk8yY2Eya0xhcWdmc054ak5PSjh2bmlwYnB0T1N5?=
+ =?utf-8?B?M2tvOEdPV2I3YnZzWjNOYXZ6OXhOQ01TS1dvNWNIenpsOXBQYjcwbzAzaDBK?=
+ =?utf-8?B?dGxhUU1yaVJldlgzNTNtOTFYc0pSZVVkVEpDcGo4MWpZMjNuV0FHcGNlVUc5?=
+ =?utf-8?B?dTc2STlleXlMVUh5b2g2L2VnYjdOTFpLeTNmUHJrZFlrdzRQS0hxaWNpS004?=
+ =?utf-8?B?YS9pTWVIY24vS2dic2NFUERaSlNRcjFNY1VmODFSb2cvQVgzQzBFa1M1ZGJs?=
+ =?utf-8?B?eUpwd0h4TTgxOHBXV3dHamlyNXJCTHE5Vkl6S1dESGtiam9iMjNpVTJRK2ZP?=
+ =?utf-8?B?TTltaTVOV25XdCtzM215cElXMGp5TXFBdXVDV0IySmFlMlhTWGFPYkFsU3lG?=
+ =?utf-8?B?dWxRRnVBNFB2c3VIdUJRRllvNng5SHMvZDYwdnVKRkljMnZhbmZZSnJGWmty?=
+ =?utf-8?B?ajh2enMwejFqek82djdSZEFINTBmM20yUE81bk4ydmgzR05vTGM2MW1xSGN2?=
+ =?utf-8?B?MmwwY091S0hTY3JLQzhSS3U0L1hzL0R6N3BNYmZRVE9pSFM4SUhjUkd4TU1B?=
+ =?utf-8?B?VmN3UG55S2pPUXN3MTYzWFBNUGJMR0JGcUREVytzbFBSV0k4ZEVZU0lLWjN5?=
+ =?utf-8?B?Y3BHQVFtWFF3UW9USjVYanZLYk01OVRLaFE2K05hcDN3b2tnU3pFNTN6UDFl?=
+ =?utf-8?B?TkYrYUk5L2NhcEU4MTc2L3JkSE5rbTVLeG44bWh2WTZUMHJ3U09pdEU2aS90?=
+ =?utf-8?B?OVNwbWNadFZOYnhCK25HUk1ub3Z3Mk9NOEhvb0pkV2s0TGp6MG5yb2d5MW1S?=
+ =?utf-8?B?aC95bkdWaXRjblAzOFB2dkI1NFFvN0pXQk96ZXdRMUJ2c0c1RmZ0NjNXTVRO?=
+ =?utf-8?B?OFdoZ3Mvanlva0p4Y1RNdURrMUd4dVNOYkU1S2RjaVpQenFBOVRxcFVrdExx?=
+ =?utf-8?B?NVM4MEVobG5kZ2E5WXA4OFplS1ZFd0pkcWdLejZEeXFlOFhVeE13SlFlazg3?=
+ =?utf-8?B?NkNLTEIxdEcrRnU0UVFPdENtR1NaNVJZbHhGSkdPSjlZNzRkZW9hUU1RNU5k?=
+ =?utf-8?B?akVWTFlVL2NMRG1BSC9kVW00VWlWMS80UjNxMmZHQ2EyL2U0VlVkQVJ0aFhE?=
+ =?utf-8?B?YXlzN3BlYUwxcjM0TWpxc3lCT3hXUXEvUUdiYkN0L3IxVzd6QVUxelcvWHZi?=
+ =?utf-8?B?ZVVtRnVBWHJoU1VhWGxVdzNjblp5MTlkeFNyOElJYWthYzcxdC9MZnVZcnFy?=
+ =?utf-8?B?QVlCOFVpTnlPS2hvNjJYUVMxLy9sYWVOYzVZK0NTMjRvdkFzbmFleU9SN3BG?=
+ =?utf-8?B?eVFZWU8yMGpaWFJyNEdicmRzM0NVaFJmY3cxN2lEQnJIRi8vbE5Ob1I4Slln?=
+ =?utf-8?B?K281Q2Nnb20vYTV2TEQrTitidHNwdVZZOFhXYUJhTUZKNTI5VWQ1QUY0MXgw?=
+ =?utf-8?B?cFBpN1pTWkViZVlQRlBMbFEvTU1VdUNYU1FNNUhCVHhMaDYweG5ObWhQcXNU?=
+ =?utf-8?B?VFY0b0ZzdXo1TFhhNU9TNDFBc1NCWi9DWDkrcVI5S3BOa21RaS9td1l5NE55?=
+ =?utf-8?B?TWRuTVowbTJCb0ZUUmN3K3h1bXBsWEpVbzg0V21kN1R5Ykh3TzVOQ0V1dWVh?=
+ =?utf-8?B?QzR1YVZESDJQQ3ppZUg5cWNnU2NzQzV2eFlwclpCSDZEZlZzVlpsVy9keGFj?=
+ =?utf-8?B?Kzl4SHJGMnJHRmJ1WjhuMDdSRW9RNmF0ZGQwT2tiSmo3QXFJNGRFaVBSNVpJ?=
+ =?utf-8?B?TmYwczh5eng1b25zblZnVDRpRWxYNUk2UHRQSnBWQXYxc2owSGRVRVZ0V3BO?=
+ =?utf-8?B?dXpZeDVNUG5NR0xJUnlPOGxieTBMRmFhSUExY1JrYlc4eERaMTdNSWNSMVNQ?=
+ =?utf-8?B?R25TU3Z2eUU1M1htTUwyWVEram0wbmVUcWtIOHJmUWdKL1o1bTEzYnlGa2Rw?=
+ =?utf-8?B?aXdOTkNmYjhmTERqdnhBMU1KSG1UUHV0cFVxajdVREVpOEdBNE80aGdjQW40?=
+ =?utf-8?B?eVB1UlFFVzZ2ZkJIOFRLcDNvMW1keEV6dTMwbzl6VUZYYU14emV6M1Fmb1Rs?=
+ =?utf-8?B?Z1orbHkyemxleEZHSWFiQzlobk5GZmFDVWx2STYxelNheGlLSWk0aFJia3M0?=
+ =?utf-8?B?ZkJwUHQ4YXVGRzE0b2F5ZThPQXBpeTdxMWh6NHFIV1VaTWVQd3VUM3NXSS9S?=
+ =?utf-8?B?MHVobDllMnhzdnVKQm1oZzBvRUZ6WFE0U3lVUFBad3BXemVBOENab2QyTzg4?=
+ =?utf-8?B?YVpwRHlJQjZrcklaclp4WFk3dWt4aHAzeVNhQk9WbHIvQWdQOXBwd2JnaWJC?=
+ =?utf-8?B?Nzl5R1lSQTVPNzVxNXZKb3RCUHByalFsSlErUlBzOWQreDM5RURzKzZrVTNP?=
+ =?utf-8?Q?1GJo8DNcaMp6AmmE=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: anqeQSpAItnJZYTn9miE1oQwwxaCwFUp2eAfaewXyxFk6mdC85Y0UVz8flqjfG38XnRCb5NIyi0UXCQlH4gcAdWBhwvEt8bUUzwKRq3QCdx8FeS80zUt4IJO81lzsTpIIDECapUIedDaoyOpWxiFhock+bItVVIhtRhDSwqh1Lpp4jTxDe/gAp2kkhAaN4Wk10URVgp7K+5h+TnT4/Qz41uMBqyzPSJvJ96zpI31fdQEQWkLiame8ccKN+6N0VT+C+i30snJE2bKus4uuFEGd5xdKhZgNSlYNiD9t8PFVF3y4TMR/2NWTBh7t8C5yxyMcWuFfR8trzbkp77pSLGPPw==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a8e51c2-b982-4515-414a-08dec337df4e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2026 19:23:06.9734
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ikPMKvqyEaGal65nYT7CPWv9CMwMjqcJ2p/vkz/c4Sn9wVnddexepVX/s7IlNQeNEuw/13EbMxzkUkEqKMA3aLpOmlgUanCKaiAbbbFYsaY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6747
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: zfuOpav-Yy_EBmEcRv9Qj6BSO4qRk4QNCXX2nsk1mnA_1780687389
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cs.unc.edu,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[cs.unc.edu:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295952-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_SENDER(0.00)[divyakm@cs.unc.edu,netdev@vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[divyakm@cs.unc.edu,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:virtualization@lists.linux.dev,m:kvm@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com,m:divyakm@unc.edu,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[cs.unc.edu:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,1b2c9c4a0f8708082678];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[unc.edu:mid,unc.edu:email,syzkaller.appspot.com:url,vger.kernel.org:from_smtp,cs.unc.edu:from_mime,cs.unc.edu:dkim,appspotmail.com:email]
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295953-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:Jerry.Ray@microchip.com,m:Pier.Beruto@onsemi.com,m:Parthiban.Veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,CY8PR02MB9249.namprd02.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B509864AF79
+X-Rspamd-Queue-Id: B6D6164AED5
 
-Syzbot reported a memory leak inside virtio_transport_recv_listen
-caused by a race condition when the parent listener socket shuts down
-while an incoming packet is being enqueued.
-
-Fix this by locking the parent socket and verifying its shutdown
-state under the lock before executing vsock_enqueue_accept().
-
-Fixes: a478546a782a ("vsock/virtio: add support for listen sockets")
-Reported-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
-Signed-off-by: Divya Mankani <divyakm@unc.edu>
----
- net/vmw_vsock/virtio_transport_common.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 3b294164b..8006a13bb 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1571,15 +1571,20 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
- 	vsock_addr_init(&vchild->remote_addr, le64_to_cpu(hdr->src_cid),
- 			le32_to_cpu(hdr->src_port));
- 
--	ret = vsock_assign_transport(vchild, vsk);
--	/* Transport assigned (looking at remote_addr) must be the same
--	 * where we received the request.
-+	/* Lock the parent listener socket to synchronize with a potential
-+	 * simultaneous shutdown thread running __vsock_release().
- 	 */
--	if (ret || vchild->transport != &t->transport) {
-+	lock_sock(sk);
-+
-+	/* Check if the listener socket was shut down while we were
-+	 * creating and configuring the child socket.
-+	 */
-+	if (sk->sk_shutdown == SHUTDOWN_MASK) {
-+		release_sock(sk);
- 		release_sock(child);
- 		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
- 		sock_put(child);
--		return ret;
-+		return -ESHUTDOWN;
- 	}
- 
- 	sk_acceptq_added(sk);
-@@ -1590,6 +1595,8 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
- 	vsock_enqueue_accept(sk, child);
- 	virtio_transport_send_response(vchild, skb);
- 
-+	/* Safely release both locked objects */
-+	release_sock(sk);
- 	release_sock(child);
- 
- 	sk->sk_data_ready(sk);
--- 
-2.50.1 (Apple Git-155)
+PiANCj4gSGkgUmFqYWdvcGFsLA0KPiANCj4gVGhhbmtzIC0gY29uZmlybWVkOiB3aXRoIHBhdGNo
+IDA4IGFwcGxpZWQsIGxhbjg2NXgganVzdCBuZWVkcyB0aGUgRkNTDQo+IGhhbmRsaW5nLCBhbmQg
+czI1MDAgZ2V0cyBpdCB2aWEgaHdfZmVhdHVyZXMgfD0gTkVUSUZfRl9SWEZDUy4NCj4gDQo+IFR3
+byB0aGluZ3MgdGhvdWdoOg0KPiAoMSkgSSBoYWQgZHJvcHBlZCBwYXRjaCAwOCBpbiBteSB0cmVl
+LCBoZW5jZSB0aGUgc2VwYXJhdGUgc3RyaXAgcGF0Y2guDQo+ICgyKSBQYXRjaCAwOCB1c2VzIE5F
+VElGX0ZfUlhGQ1MgaW52ZXJ0ZWQgZnJvbSBpdHMga2VybmVsIG1lYW5pbmcNCj4gKCJhcHBlbmQg
+RkNTIik6IGl0IHN0cmlwcyB3aGVuIHRoZSBiaXQgaXMgaW4gaHdfZmVhdHVyZXMgYW5kIGNoZWNr
+cw0KPiBod19mZWF0dXJlcyByYXRoZXIgdGhhbiBkZXYtPmZlYXR1cmVzLCBzbyBldGh0b29sIC1L
+IHJ4LWZjcyBvbiBuZXZlcg0KPiBhY3R1YWxseSBkZWxpdmVycyB0aGUgRkNTLCBhbmQgYSBjb25z
+dW1lciBtdXN0IGFkdmVydGlzZSBhIGRlYnVnIGZlYXR1cmUNCj4gdG8gZ2V0IGRlZmF1bHQgYmVo
+YXZpb3IuIFRoZSBtYWlubGluZSBpZGlvbSAocjgxNjksIHJ0YXNlLCA4MTM5dG9vLCBtbHg0KQ0K
+PiBpcyBpZiAoIShkZXYtPmZlYXR1cmVzICYgTkVUSUZfRl9SWEZDUykpIHN0cmlwOw0KPiB3aXRo
+IGh3X2ZlYXR1cmVzIHw9IE5FVElGX0ZfUlhGQ1MgdG8gYWxsb3cgdG9nZ2xpbmcuIFNpbmNlIGV2
+ZXJ5IE9BIFRDNg0KPiBkZXZpY2UgZGVsaXZlcnMgdGhlIEZDUywgSSdkIHN1Z2dlc3QgdGhlIGZy
+YW1ld29yayBzdHJpcCB1bmNvbmRpdGlvbmFsbHkNCj4gYnkgZGVmYXVsdCB1c2luZyB0aGF0IGlk
+aW9tIChwYXRjaCBhdHRhY2hlZCksIHJhdGhlciB0aGFuIGdhdGluZyBvbiBhDQo+IHBlci12ZW5k
+b3Igb3B0LWluLg0KPiANCj4gUGxlYXNlIGNvbnNpZGVyLg0KDQoNClllcy4gT2YgY291cnNlLiBJ
+IHdpbGwgbWFrZSB0aG9zZSBjaGFuZ2VzIGJlZm9yZSBzdWJtaXR0aW5nIHY0LiBXZSB3YW50IHRo
+ZSBmbGFnDQp0byBiZSB1c2VkIGNvbnNpc3RlbnRseS4gDQoNCg0KDQo=
 
 
