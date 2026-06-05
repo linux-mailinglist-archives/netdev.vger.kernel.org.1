@@ -1,341 +1,191 @@
-Return-Path: <netdev+bounces-295803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f0CFCOu7ImqecwEAu9opvQ
-	(envelope-from <netdev+bounces-295803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:07:07 +0200
+	id +CkgEqm9ImoBdAEAu9opvQ
+	(envelope-from <netdev+bounces-295804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:14:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B535647F1F
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:07:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC497647FE6
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:14:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=bpIHS21K;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295803-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295803-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=NiHLFiC0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295804-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295804-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=debian.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0E4053023E2B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:07:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 089DC300CFD9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE664D90A1;
-	Fri,  5 Jun 2026 12:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA944DA55A;
+	Fri,  5 Jun 2026 12:13:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913D53B4EB7
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 12:07:00 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780661222; cv=fail; b=AggiNEfUsV6JAaPElObnGC2C5AXM+UgUvTh4RyykKkEzqEbQWafamWHmlNA9vI/IoAFeSNGFLUCQLyCWKg59Mn35wuFXFb8pGEOs8jSUgj2c1PJ/21WElTiIAXld0Q3Doc5PbUbjIhlMwZVut47kgXwjAjXKxcZHU4ysfPIaX6E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780661222; c=relaxed/simple;
-	bh=CA5E+RKvb4HSzZYNtySZIEk8ZC9tguPZ70qoK6WrCa0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=H8umbw21Z9zS8xa5cOD34ZeDEeDDDQ0DNSNCUDECP6DPvH1PUM5ofBmo9RSOwZq2UGySeemqJrnnessBzBSGI4E6ADvOA1yfbzZWx9SojjhadCN219UZc81xdOef6Jqu7jrwyKlsQze7L0kOjH00opL4nzn/GnYmn5fj2owFdEc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bpIHS21K; arc=fail smtp.client-ip=198.175.65.17
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780661220; x=1812197220;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CA5E+RKvb4HSzZYNtySZIEk8ZC9tguPZ70qoK6WrCa0=;
-  b=bpIHS21KHpBJ7Gvh2av400pdOneaBXalSlyIChvamEeSh3+ZASERdjCR
-   yf2caTWHSzLUwur9WL11Hqtj2DBfEZk8E66QlzitztjxxOpuFK5vQtaSl
-   q69Vov/M06x3d8XxDpGJz8Oyufc9HJC72380d7hZvcJ4MrDmCXwUOKzPB
-   xqtSufBu+3Ew3sZypwlsLbsBgFc8nra7Dhvl53tVSJuTFb0QIYso6qFio
-   Pk5tEaq9HFl7ApxJYDVeiAznIzLOyb/lVsJlnCrUYjNl5zL8Na1v7VmbP
-   jku/vZxZpF+5AfKyTN2Chbf5qCUDIGD+TA1GndxtYZceqpirODvEdtZVR
-   g==;
-X-CSE-ConnectionGUID: wV5GHp5XQf2rAKmRAlGGKQ==
-X-CSE-MsgGUID: GdRW2GkYTVa/KfRvG49fcw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11807"; a="81493963"
-X-IronPort-AV: E=Sophos;i="6.24,188,1774335600"; 
-   d="scan'208";a="81493963"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2026 05:07:00 -0700
-X-CSE-ConnectionGUID: 5tf4XtC0TN2mYVgazfUCYw==
-X-CSE-MsgGUID: bzXtUq3kT9SDkL8Mnk+9dQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,188,1774335600"; 
-   d="scan'208";a="242352133"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2026 05:07:00 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 5 Jun 2026 05:06:59 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 5 Jun 2026 05:06:59 -0700
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.32) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 5 Jun 2026 05:06:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rf3jQthsHwSSwe9ImVtFUb+Ruuw0vZRtNEcu5nyJp8iiAiJI65SyCjH4Hk2B4XPjXA9/zRCLMfWeZb+PqlijiOahwneVTpYlLqs5iPp0+3TSFRdkkY/cpkVxG+MdcJdiciRlOzqq8HRtZ2Jim7s7EoBx+FgjmTzDFJFVnEWsoUQ5zeJRnN+Gr98dr/T9++wsgNIhp9wyQ9+iAqnwlr21uql06N+suEN74IHIpll/AFTFFTiQLtKhp0ZR6VHA29czhapwbHKNURQClQhoWiaUski04oyVLdYChLUnKJ14Q3pAu/zLVeH3hNnBVuiegpI1hbFl0yQ6oTn2CFr5aypCiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3T+xilYqgM618FmWXVSfrp1o9CWDJ3b+9ci8Wp0qyBA=;
- b=WVffqhRXK0xPIyx02HFLaoaXtWi4tbJHCpTtVUL7nMzD+qEekUbBSKEZFFAU9pMTkByaZVw6ggslCCjijKmjs0g08LyLB8HP5hq/8mProyu5G2kx2PI8YMQVWzqg1bTUhXuEB6GiNWp3MUVxXUWChNogRraG4s51a48ylA6YqicMQLHgHyQVoZaEWOiIKzk8VXrwqQQp4ZKd2aeXfNZQiojvQ2f5EIynLi0K/+vQPD/0XQsgRTiH6pn/jRiW06elTbzjQ8+rZAeiaxy8R6V9dLBjG0jyTqKL7h7632QhSdt9Uszop3EOZAm7T8uVh8E95so2uiMuD72EBdBZAMqYeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB4904.namprd11.prod.outlook.com (2603:10b6:510:40::10)
- by LVUPR11MB9858.namprd11.prod.outlook.com (2603:10b6:408:38b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Fri, 5 Jun 2026
- 12:06:39 +0000
-Received: from PH0PR11MB4904.namprd11.prod.outlook.com
- ([fe80::ff04:50e9:d186:6305]) by PH0PR11MB4904.namprd11.prod.outlook.com
- ([fe80::ff04:50e9:d186:6305%7]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
- 12:06:39 +0000
-From: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
-To: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>
-Subject: RE: [PATCH iwl-net v2] ice: fall back to SBQ when LL PHY timer
- interface times out
-Thread-Topic: [PATCH iwl-net v2] ice: fall back to SBQ when LL PHY timer
- interface times out
-Thread-Index: AQHc806r/vmlH/1pSE6hWaCka69ZYLYv4Lvg
-Date: Fri, 5 Jun 2026 12:06:39 +0000
-Message-ID: <PH0PR11MB4904E79B141C012D58A2016994112@PH0PR11MB4904.namprd11.prod.outlook.com>
-References: <20260603114904.1297713-1-przemyslaw.korba@intel.com>
-In-Reply-To: <20260603114904.1297713-1-przemyslaw.korba@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB4904:EE_|LVUPR11MB9858:EE_
-x-ms-office365-filtering-correlation-id: bfda0af0-bf40-4816-4f1a-08dec2fae662
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|3023799007|38070700021|11063799006|56012099006|18002099003|22082099003;
-x-microsoft-antispam-message-info: cyQZhr0cIdjN9Vwhy1KCwwac28ON1uHZh6Cj50OQS1RbR2d19sOS7pkywNpNcu5MuH4skaNrU9v6HG4KTmQxnkuCGyiNEX9YI4nN6Ns83izhNh5VmEjAB6aMHXznF2GL0eLjGQuAi37PKyCqcIPTwCOmlfQJbo8uPlh0fzewvyaDHbxawGrfT6IPImiMwRWXoVX6Xbw17osBNey5wHZsG/xm7OPrE90pGa3cdRcD4LM0K5Os2nQYjb8CarT5/prm0NaUqgEb21wPn8+0IwuRHYlb/r7Ky8etqOZpct1Sw+7PSCTWEerzjS6tyCF9EGTpnFfZxBXJ+DPkZ7Hd2uiVVXfeqWGUZHTjL7WVF8Dy6pS2i8ih0RYzufDF7dRo0XAMEVNx/dF8+aON4qsV/j6JYFWAlcxS/nZOeY7oaOyt9KK/6GQBxuSLircNVpLZfIN/+PAoDDvDJUvQCVy389cc0Ha9m73OzUV+G2R2lhx5Z3tvnD/u0kwKKzRxbvq02SMaMv4lAF+hG9Pn437ZUkVWKx5MH3AQu1p4Ka+RxgSSGit7kIXruSBwGlUjx20sN6GMOCbtytOkJrZ1Jt2VoKtyV8M0GDlwycfHoTiz7kjPZeBkREg1+10fMmHC/SJ8E2hlkMBTR0AGGxD+n5VlhkSLT8XcncSMTH6huzaA2g6FSu/82FH2aEev5G+h7yq7lU36d8zUM8akbM/SNPE52yQHIUq6eTFYsLpkHCE4rUb2Z2eTiJSIXCjyjgucI+7HVhwL
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4904.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(3023799007)(38070700021)(11063799006)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+0YAzuagExxKYksvxaNJEYYtCLo6HlL2q8vsbZHCTDv+l7k/BnvGWBGS1NG1?=
- =?us-ascii?Q?LLG0sPpXXMh2VjqoyCrEcfDT8Bv8QczEInCDVaASbaqAiG9LMjiabTTAOHmL?=
- =?us-ascii?Q?bNPhDESnh2i7KzS4JxjSWa7Rsr7xd6UEKof+5CnGw5xPKSRFh6WP25XsenJN?=
- =?us-ascii?Q?Ls6xm1aiF2gG60XISpSr8sWDX7Fc41Ln70QQd70hwA0cBg0JiovWBIdzs2Z1?=
- =?us-ascii?Q?2zbpqeIxp/UUtkY0la+w7qP16OXVre9AMs3FbXl0C+xcS2gkKAxT66ICWE/N?=
- =?us-ascii?Q?lJS8bd+naqVPrr93k3q86zNF0/sbHzFMXrTo3NSwVNSa/RDxZiw9UaNhXvEX?=
- =?us-ascii?Q?oy3hXrrUrRw8kKKwtPGcincNZfb75auGaSt30Fuz4a4PFFjopkDLD60sv+RB?=
- =?us-ascii?Q?iRasNhDUpq2vlVVJrmt9sQMmKkaLgNqyVBGaOC2vCZAEyAoloMfRHapZBSoV?=
- =?us-ascii?Q?LjZu7L9fRqDsVsxpYwtMcESdGtfNzfptaX+ADJu44kduMJO7WIw20lvS2mDQ?=
- =?us-ascii?Q?BYLrYlo3c2B8umAyim3Byi1Qm8u//D6EvObEDG1a+dSxk4l9hoVM4eevxI9i?=
- =?us-ascii?Q?qhgcF6v8GKk4ITSmqg9iCFkPHC/ygCpnHBlCqwAHhE8sVChqhGWyjP5nz1YY?=
- =?us-ascii?Q?9XRg2sG1aS6iatmyGC2xalg2cL86aerqQZYvZMYqsc0u8MaLnhvydwpq8pX0?=
- =?us-ascii?Q?cV5RHy4U8ueyBALzkN/0WzxoUwb7IhPemYvKQxlyGFxxiuJxz4GvWImaO4aA?=
- =?us-ascii?Q?6WhrIzAY/vNF26B0oVBHS9JcQu2OdCJhTNQwT6osyz2xZUmii8s/e8Jg7eSz?=
- =?us-ascii?Q?UzRzz5LsWQ5OtrAsVf2KXJbj9HTM/8dCVFk4/CSmQ26J6levIvsbzRnBZWfm?=
- =?us-ascii?Q?toQx1NmIF8Gqais20KLF3sEVgTA+MfKPiO7tJw5gjHG3C5P0QMyKGIvuYot9?=
- =?us-ascii?Q?CDFcRApU9U7UeL5cX1KzzEHIMSlVGXPgNxinZ/FAddQCI5E4YVRFOGrW2t4V?=
- =?us-ascii?Q?XZN/Uss2i2HFh7qEfqfO4kHzqHuUiRdE+lkzh0kgXryUTjznN0kuq8DKJFfK?=
- =?us-ascii?Q?lyRhmCGBRNKX/KNF5ABJfUyhp/J0XK0hEsDHU5yTQIidUwjUfV72v/y4vLyW?=
- =?us-ascii?Q?1RF9rm8+NsXDF58l9xB+P9kceGqHbt3vt/VYElvsb4dRj84EMV8W1Fass7U3?=
- =?us-ascii?Q?VnmHtGgsB8JsD4gL7G5siBjUvt0MMrDeBQmddjLe0QqZ50xrqgSIdwUsqkVW?=
- =?us-ascii?Q?QsAuANwBhfbQj5sfqdEkTdQF67QrkEU7lB1b3R0VYe96nMsadM/ZqBpBnkT8?=
- =?us-ascii?Q?4/OpnyukoiCr9cGViAIl/TAgLF9yAwWMVU/9KClZXxahQez+cQtE2d8r2P/U?=
- =?us-ascii?Q?DcIw3mFb92Ga7FiQHXVyPfL5rjmQFHIRpV4+jigJvejmQ4w1cP5v71Nby3Fn?=
- =?us-ascii?Q?331+IGOJSjLfyhu1Ai9kkY7/7FWogII10w8lmqLZhj4H+uDQNvh10385NDfJ?=
- =?us-ascii?Q?SMJBgP7eCbHEpQjzifAQlrlBKMbHFsyPFyoguB2Q1HwBBmnCacnU8OCZC8RI?=
- =?us-ascii?Q?KV3qxdZ80MO9wo/BOd0pNaGImFsgF8bKIMhbgGfbyTmNgXQa4xFuFNUf6uep?=
- =?us-ascii?Q?btMfGoVULn4EAlD5RJp0Jf/LON3Ig2tOUOinkI7uXmCOZivI4AnYqixsy1XV?=
- =?us-ascii?Q?fWOsP6kx/KACNHapTLF3IOFf0JxBjYhjs+3QKUfOLdsUHYI0Ph5jppxYJ4Tq?=
- =?us-ascii?Q?ivKvNpxamQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFF54D8D99;
+	Fri,  5 Jun 2026 12:13:43 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780661624; cv=none; b=PVBBBKDQovktw9M0v1sNY8BolW7T0VGtjVoJn+9WCWx+tUss6pkwR3n0TqUXNoJR33s4RSgLXQHMoXEamMuXyiuPaj74LDvQfjVvbgABRuyO8HyWqlEWxZ/MdGlXyRB6bG+RbQffMdeNAcBdgVXuisFKzlPD4fffxromNkaLx0I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780661624; c=relaxed/simple;
+	bh=wlGIJYU/dDzvU9MAE0TjTNh5imcqVaypnxxCgiS9lvU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JqN15x78oMR+2kvFq47aVTACD0cTtvLYjj6QQLEnLpuc2/Khi9KmyHajR07Byovr9df0zd8hIcuh35YnpBSFBDaV4Buk87PL1U15d6Y0UFQNPynMuJG730fbBKoyYGOdPFw5R2HRfN8XjGdPiCv5nsM7iH4qkKScZqCTIQbN1qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=NiHLFiC0; arc=none smtp.client-ip=82.195.75.108
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=MByAqnkLEXLPVdCrzdTSFRkXWavhWm2hvRfXpDldUXA=; b=NiHLFiC0YnU2X2Q9D8HU8xS+k2
+	8DoJu4eyvuFQhwJPTNmYwGM9CjJcfexW8xEVjmwlHI5eA/SzVAo1LhZatqGlihPa+WQLHdB6PGyWw
+	CLF0nCa/48/1G3FYP5W7DOnKw7tLU4NYAqQPGULld0Cmcdl8WIGUNXrSAs8mh5P/QOl8LY2mhtJs0
+	ta9St5z8IOaa1l5+j5DqjFmARhytWcLOsXE86YCezyTEIYLtLcBxgxLmUF9MXjoQOIqADBKa2CQA1
+	qCjvlsVDgK8470irHDOHvQHLJ1WDDmamHLWUKuWHvJUNR6GsZhjW4iTGk4kZdqQR58h7aeyyeqjPD
+	izM33evg==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wVTQc-005HW2-1Y;
+	Fri, 05 Jun 2026 12:13:34 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/2] net/smc: convert getsockopt to
+ getsockopt_iter
+Date: Fri, 05 Jun 2026 05:13:24 -0700
+Message-Id: <20260605-getsockopt_smc-v1-0-65da62fa44c4@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: g0lpZtqCIaIKX3vPiP55fe7CPh9ZFsf5aWVt7Ij98fGx809G+PWV7ZzySM3vv1xVRRAXGouR8xvIFVuWJ+185eHN/NPFaeBn8Tzy4AFaeJ4rwtuCUUEAcxKpFK9WCKChG3xrQiLFjvZ0Ow5VMPQ+YzTxtaR3+BdGP5uRrKIdbMJuLB5kvp6vwKgwI0VZiaipXXPaLnc99rqE3pS7XX0siqzHvtNSfiQrNszMPQflmsvpi8rf4nayOTd/KsBCPzFlzdwh0R1VjR2vIdF6eWoh9EiGbcfQT/xjJ7Q8BiyDbjNXpnUmuOg9KoxAFbOOL4LerLS5EJTIFtzFjHBpqLosww==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4904.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfda0af0-bf40-4816-4f1a-08dec2fae662
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2026 12:06:39.5425
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: o3pCDqCzi1kG7Iu2Q10yAWdpgAYmIEA0BkSP44r4yDPtoGgPrYltwtDiADXB22ggCcmIKXqqKaY0zHQODnrOs7L6vFOucrlDZVpXKH/9tTo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LVUPR11MB9858
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGS9ImoC/x3M4QqCMBQG0Fe5fL8dzCGz9ioRYfPLRrTJ7ghBf
+ PfA8wBnh7ImKoLsqPwlTSUjSN8J4nvKC02aEQTOOm+9HczCpiV+ytoe+o2GbprH/jpcPJ/oBGv
+ lK21neENmM5lbw/04/vmWExRqAAAA
+X-Change-ID: 20260604-getsockopt_smc-e2ad719486eb
+To: "D. Wythe" <alibuda@linux.alibaba.com>, 
+ Dust Li <dust.li@linux.alibaba.com>, 
+ Sidraya Jayagond <sidraya@linux.ibm.com>, 
+ Wenjia Zhang <wenjia@linux.ibm.com>, 
+ Mahanta Jambigi <mjambigi@linux.ibm.com>, 
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2665; i=leitao@debian.org;
+ h=from:subject:message-id; bh=wlGIJYU/dDzvU9MAE0TjTNh5imcqVaypnxxCgiS9lvU=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqIr1pIS/x43wPjjvzmWbNsm0G32tzbhQbfSiEm
+ PL7boVHQOOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaiK9aQAKCRA1o5Of/Hh3
+ bf4KD/90AFrq2jSuXAh/UBfgxKhd7Y2dGik959DyxgVa2mVHbHLRFXqw/eoVDuxa1EV2ftr/ClW
+ fRuMTe9bEETot5BDjsznnuuSxkbBCklvz4m5RLxeO/etQyBw+RZxm7WXU8GMFiPzXXre6WCUzS0
+ sRWLah6Xqp9W4/2SZ/Lm26JQg+/Kc8XZiwZ7Qc6tDWSATy9l1Tnurpb2/5eTr2yVmq0DMMKr9Fv
+ 5nQk8gp2hvJ/p66qv6jP1YQkqlf1OX3l1rdpbXTVnxGPi0JFcWmTvxr0Ezz4FvTTfwh9EjNPMBi
+ Z7aJ2BzSS1+XssFo9JkZEl8kxiDnhicsjJqWzs9XIaqccVcJFKzX6NKhzB97lW9Siuv77hsa/l3
+ CKwbDSEDYJVVSKCak5Bj+xxPAy93WI3my5r7nO0wFT2gGH2x051zcslspcBsoXN3bgqu16R4C7N
+ RF/WSGHab/MCjHkhRnw5Tw/yaUL1OG0bC9jIvaiTUTs10fQll1o6tzQ391kd7bGY7Sck41CU3qw
+ 57grUjoNhi40Fxvn+YrL8mvj3FZQPL/2XuMezLlY8BZH8VDwg6SyG14Cze2Ni2HaYK9Ll+yPtUy
+ D8DSSAr3Rskh5GK+G1KvAwXejNmlQxm+zcF62YLfOcCmswhx34I8yxnDlJhRZoCHmmSVdECa4Bx
+ gARgSCi81/xSsFg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksander.lobakin@intel.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295804-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295803-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:leitao@debian.org,m:kernel-team@meta.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3B535647F1F
+X-Rspamd-Queue-Id: AC497647FE6
 
+SMC is the last protocol to be converted to getsockopt_iter(). As soon
+as this series lands, and all the other outstanding conversion patches
+land, getsockopt_iter() will be renamed back to getsockopt() and the
+first part of the conversion will be complete.
 
-> -----Original Message-----
-> From: Korba, Przemyslaw <przemyslaw.korba@intel.com>
-> Sent: Wednesday, June 3, 2026 1:48 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Nguyen, Anthony L <anthony.l.nguyen@intel.com=
->; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
-> Lobakin, Aleksander <aleksander.lobakin@intel.com>; Korba, Przemyslaw <pr=
-zemyslaw.korba@intel.com>
-> Subject: [PATCH iwl-net v2] ice: fall back to SBQ when LL PHY timer inter=
-face times out
->=20
-> The low-latency (LL) PHY timer interface relies on a tight, atomic poll
-> of the PF_SB_ATQBAL register with a 2ms timeout. After an NVM update /
-> EMPR, FW may need significantly longer than 2ms to start responding to
-> ATQBAL commands. The first PHY adjust or incval write issued by
-> ice_ptp_rebuild_owner() fails with -ETIMEDOUT.
->=20
-> Fix this by falling back to the existing SBQ-based PHY register write
-> path when LL times out. This makes sure PTP is initialized when FW takes
-> longer than expected to come back online.
->=20
-> Steps to reproduce:
-> ./nvmupdate64e -if devlink -f
-> Update E810 card with nvmupdate64e, and observe dmesg errors:
->   Failed to write PHC increment value, status -110
->   PTP reset failed, error: -110 (-ETIMEDOUT)
->=20
-> Fixes: ef9a64c07294 ("ice: implement low latency PHY timer updates")
-> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-> ---
-> v2:
-> * add TIMEDOUT check in ice_prep_phy_adj_e810
-> v1:
-> https://lore.kernel.org/intel-wired-lan/20260511095830.1095984-1-przemysl=
-aw.korba@intel.com/
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 40 +++++++++++----------
->  1 file changed, 22 insertions(+), 18 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/et=
-hernet/intel/ice/ice_ptp_hw.c
-> index 2c18e16fe053..9cd323bd9739 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> @@ -4771,15 +4771,12 @@ static int ice_ptp_prep_phy_adj_ll_e810(struct ic=
-e_hw *hw, s32 adj)
->  				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
->  				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
->  				       REG_LL_PROXY_H);
-> -	if (err) {
-> -		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment usi=
-ng low latency interface\n");
-> -		spin_unlock_irq(&params->atqbal_wq.lock);
-> -		return err;
-> -	}
-> -
->  	spin_unlock_irq(&params->atqbal_wq.lock);
->=20
-> -	return 0;
-> +	if (err)
-> +		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment usi=
-ng low latency interface\n");
-> +
-> +	return err;
->  }
->=20
->  /**
-> @@ -4800,8 +4797,13 @@ static int ice_ptp_prep_phy_adj_e810(struct ice_hw=
- *hw, s32 adj)
->  	u8 tmr_idx;
->  	int err;
->=20
-> -	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
-> -		return ice_ptp_prep_phy_adj_ll_e810(hw, adj);
-> +	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update) {
-> +		err =3D ice_ptp_prep_phy_adj_ll_e810(hw, adj);
-> +		if (!err)
-> +			return 0;
-> +		ice_debug(hw, ICE_DBG_PTP, "LL adj failed (%d), falling back to SBQ\n"=
-,
-> +			  err);
-> +	}
->=20
->  	tmr_idx =3D hw->func_caps.ts_func_info.tmr_index_owned;
->=20
-> @@ -4864,15 +4866,12 @@ static int ice_ptp_prep_phy_incval_ll_e810(struct=
- ice_hw *hw, u64 incval)
->  				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
->  				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
->  				       REG_LL_PROXY_H);
-> -	if (err) {
-> -		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment usin=
-g low latency interface\n");
-> -		spin_unlock_irq(&params->atqbal_wq.lock);
-> -		return err;
-> -	}
-> -
->  	spin_unlock_irq(&params->atqbal_wq.lock);
->=20
-> -	return 0;
-> +	if (err)
-> +		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment usin=
-g low latency interface\n");
-> +
-> +	return err;
->  }
->=20
->  /**
-> @@ -4890,8 +4889,13 @@ static int ice_ptp_prep_phy_incval_e810(struct ice=
-_hw *hw, u64 incval)
->  	u8 tmr_idx;
->  	int err;
->=20
-> -	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
-> -		return ice_ptp_prep_phy_incval_ll_e810(hw, incval);
-> +	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update) {
-> +		err =3D ice_ptp_prep_phy_incval_ll_e810(hw, incval);
-> +		if (!err)
-> +			return 0;
-> +		ice_debug(hw, ICE_DBG_PTP, "LL incval failed (%d), falling back to SBQ=
-\n",
-> +			  err);
-> +	}
->=20
->  	tmr_idx =3D hw->func_caps.ts_func_info.tmr_index_owned;
->  	low =3D lower_32_bits(incval);
->=20
-> base-commit: 80b47e88f7ead00b0795e9f2833f1d0cafe11d90
-> --
-> 2.43.0
+This series converts SMC's getsockopt() to the new getsockopt_iter()
+callback, which hands protocols a sockopt_t that abstracts the optval
+buffer as an iov_iter and the option length as a plain int instead of
+raw (char __user *optval, int __user *optlen) pointers. This is part of
+the broader effort to move getsockopt() off __user pointers so that
+kernel-backed callers (e.g. io_uring) can issue socket options.
 
-Sorry, made a mistake ad did not update the code in this version properly! =
-Sent v3
+SMC is a proxy socket: only the SOL_SMC level is handled locally, while
+every other level is forwarded to the underlying CLC (TCP) socket. That
+sub-socket's getsockopt() still operates on __user buffers, so the
+pass-through cannot simply forward the sockopt_t. Instead it reconstructs
+optval from a user-backed iter_out, forwards the preserved user optlen
+pointer (kept in sockopt_t by the base patch), and mirrors the length
+reported by the clcsock back into opt->optlen.
+
+Because of that, the SOL_SMC level is fully converted and works with any
+iov_iter type, but the CLC pass-through is intentionally limited to
+user-backed iters (ubuf) and returns -EOPNOTSUPP otherwise. This is a
+deliberate, temporary restriction: SMC will continue to operate on ubuf
+only until the underlying protocols (TCP/IP) grow their own
+getsockopt_iter() callbacks. Once that generic callback path is enabled,
+the pass-through can forward the sockopt_t directly and drop the ubuf
+restriction, supporting all iov_iter types.
+
+The series contains:
+
+  1) smc: convert getsockopt to getsockopt_iter / sockopt_t.
+
+  2) selftests: net: I've vibe coded a kselftest exercising both the
+     SOL_SMC path and the CLC pass-through, including the
+     oversized-buffer writeback.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Breno Leitao (2):
+      smc: convert to getsockopt_iter
+      selftests: net: add SMC getsockopt_iter conversion test
+
+ net/smc/af_smc.c                             |  41 +++++--
+ net/smc/smc.h                                |   2 +-
+ net/smc/smc_inet.c                           |   4 +-
+ tools/testing/selftests/net/Makefile         |   1 +
+ tools/testing/selftests/net/getsockopt_smc.c | 175 +++++++++++++++++++++++++++
+ 5 files changed, 208 insertions(+), 15 deletions(-)
+---
+base-commit: 0a8b288e2248cb62a62f748bc095c2136acf22b2
+change-id: 20260604-getsockopt_smc-e2ad719486eb
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
