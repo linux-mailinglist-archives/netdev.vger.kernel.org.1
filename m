@@ -1,156 +1,257 @@
-Return-Path: <netdev+bounces-295659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eGWjOvN1ImoHXwEAu9opvQ
-	(envelope-from <netdev+bounces-295659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:08:35 +0200
+	id vAaxBE9cImrDVQEAu9opvQ
+	(envelope-from <netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:19:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E549645C8A
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:08:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62176645269
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:19:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=iUr9Wbos;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295659-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295659-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=outlook.com header.s=selector1 header.b=ZXWWYUPy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=outlook.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B06FF30ABE86
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:01:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 69115300F149
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 05:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F8E3FFAA4;
-	Fri,  5 Jun 2026 07:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004AD3A9DB9;
+	Fri,  5 Jun 2026 05:19:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazolkn19012048.outbound.protection.outlook.com [52.103.2.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA82405C35;
-	Fri,  5 Jun 2026 07:01:43 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780642905; cv=none; b=c+l3Kmjnwp6PaY8cED1lMndlarhGMyu/FosJlDx4VX3cKEBexbMVSQbpWKKQ/pOzxb7YYGy+fnSnZtz9NSt4gj8Frlhadt4lNMeDnjoaOeFEKuYB+1J5YwRZCld4myascAlpmvfnIKvZKqA5rldlHz64WcJSDcwOtt61/9h8F4Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780642905; c=relaxed/simple;
-	bh=O/+ZkA1rqT1OtfxrbKnXmuheVKw68QR1ymZno0iGDAY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CL4K9jCM/T+swpEISh0W68TOQZpIVdrQS/0Nr2uqsn5wvTWeKQqcxzyCCHEf3O8C4y47fQXfmkEQUEOhwS1i0SYHrOVZjcLPy1/vwN2PUjIzCV2Wr+QvUB1Z58vVzTW3r9MDFriffV1uLw7yexIG4Uw0urxnQ2k/aWhvWs1TnAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iUr9Wbos; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6554PZC8823235;
-	Fri, 5 Jun 2026 00:01:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=O/+ZkA1rqT1OtfxrbKnXmuheV
-	Kw68QR1ymZno0iGDAY=; b=iUr9WbosMJHyTX5/B31U5fTVcMK1y4Q1jfp20Imle
-	dpmOrkk+sYSKHMOmEU1eizmQpccnZtVQsID8pjAaGIS7uIOz3grGVxyhezfFZwaP
-	rzZ/392pfjkNPwCWL0+/tOxwea1bl0xzL7jzp1RgVhmYVhIp+g/aSoXKpphhQ6ls
-	+IabfZvmztlY3fP6Oy5VibPJCqrRHumHb4H+cpeNuRN/EDJwjFoNYPNuTvn6hQnu
-	pyU8aPqDLZZTFyUGejrFPVOkX7HF6hoMFWnGMOkXkOmjYm4rNoc/lPFdCsTeB2QP
-	Fz7Pmm1xgWPsWdY+p1sCAQvjB9bI2LTz0Q9RSnNn1seaw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ejgsp8aq8-17
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jun 2026 00:01:35 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 5 Jun 2026 00:01:19 -0700
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 4 Jun 2026 22:01:37 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 4 Jun 2026 22:01:37 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id A3D203F707A;
-	Thu,  4 Jun 2026 22:01:33 -0700 (PDT)
-Date: Fri, 5 Jun 2026 10:31:32 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v19 net-next 0/9] octeontx2-af: npc: Enhancements.
-Message-ID: <aiJYLODHW9WkZ8k5@rkannoth-OptiPlex-7090>
-References: <20260605035030.3195141-1-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F586175D53;
+	Fri,  5 Jun 2026 05:19:05 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780636746; cv=fail; b=hO/3EdxxGbbSVMbh8uWqbcN4RyzsTUdKj2MGw1fm2P9dylqey7uP3FLiMKKHcT7UXwfPXyEvwyMihQq6A32cs0o9aEDrH5aHrONnL4R0IDBQC2yVHyX1m4KN21uZij1hnx2JLFWx++O1WVsgWtmpQHzWsqITN+pB6TI/2Kj+5Fc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780636746; c=relaxed/simple;
+	bh=PsM2huVqYJTCi8fhX6R9y0f0pNF7FnEdPvQ0H2EZdIs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Wi34o3eaV5ZFuBCzG3LYh8l8mEDbhOuQj1S8DZlpgoFHPhDvRUylt/ToJr8jksBXKTitYyrYp+HDIN+QTsGKa5Hx7OX5HtqO+GOIqOqNbnV0e6KM+pM3UVao4f7s1oX9NfXEuQL5kk0OWtYPNMzNLB+6nCJEOyrceGuq/RtzUgY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=ZXWWYUPy; arc=fail smtp.client-ip=52.103.2.48
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WGlOCRvZSvBljSlAT+KuTKMlgVVkLzzbK5c1d7xhW53FelNEtR7EW9/n970PAkOGCPSOnoD0zEcXlfxj2Pt9ai1iEAK9tMqJ4w7pQfR5kQIBfAd8QUE+eA7HuBkFqd5GROhackhnPtT3IeBE31PQCHTir0vTE469wurn4rM1c+Gfx4ML+7vkDbYhxxTzr4PG2bDqrKEl9r6UQqVMhigwz2FAF4yFBeQOGi5v7ufJPO0Qz2uSR4YCgzULyXW5Z7ZPBppmH/FYXQkZj9HuI6cjepVJZBDMXvA2h0HtblEsz7Bu4io4v8Mz/uQx73jHAvNsJs+YZS4g7+GAdXKJDtLmBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YZdxHJpwNdd5ANg2ZlCpReLYMZWYgiU8X71JX8kab1I=;
+ b=vzqtfOmDGMs1JknEffl6gdDM5bVMFX+/fY4Lwdbyae3pleOqpZiPwUc2qvtnPc9pEwcdUOQhN1ddGMhaKp9G2vV2uSJGUFDgdcBd2SAOt/0xQUzA3UNv/KuppvHuzHjsCacoawzNFvghc+Psyej4Z2KyKoXW8xu+BCR2CIII2REcXW0WRGT6VDW31PqCiHwoRDFsuu1k6glP3sHUeo4Ql7O980tizS9gXiWUzB2Bq0p0/ttsL6sOe75XuzwvxW0wsAHkP+hRr/ySRptQDjMxHPVRwrHOedXPSJxa/4QAx6pGPLTVpanxjbmINnqRauYmnYD+h8/pYcYtaA0Dpbzu8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YZdxHJpwNdd5ANg2ZlCpReLYMZWYgiU8X71JX8kab1I=;
+ b=ZXWWYUPyVpbLQqDFKy0Nq8oQHR31VLb9jGNcGXfMIsfvDv0fpiLO6eVMB7Q3YJOGscvrm0p/JsDEl8u7jZrtj+PBhbrmfEpQGV2BRg8iQjet4P3dgFr8yBHODjc7EX9jAa0Mq/6OoRNg3btSjiKx8T8RIZyNdT+9HyPFZAeS3AR6XfSE9tpOMZEbIyhOlWcXzhRDovf4q68czIBfHG05uRBuA7K6aWfl8Z14JF3CyjiMQQyqQaVfmR+rnEl4aJePesBGpGniDQFjxUNPuxGohU9lTAObnl0sXVkGSW4T0nGM1aw9Br8/6+9EHXhLpthaP0apz1LPBb2G2O/U7W5bzQ==
+Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
+ by DS6PR19MB997434.namprd19.prod.outlook.com (2603:10b6:8:463::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Fri, 5 Jun 2026
+ 05:19:04 +0000
+Received: from SN7PR19MB6736.namprd19.prod.outlook.com
+ ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
+ ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
+ 05:19:03 +0000
+Message-ID:
+ <SN7PR19MB6736BF850FAF84B013000E5F9D112@SN7PR19MB6736.namprd19.prod.outlook.com>
+Date: Fri, 5 Jun 2026 09:18:56 +0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH next-next] net: dsa: qca8k: Add support for force mode for
+ fixed link topology
+To: Jakub Kicinski <kuba@kernel.org>,
+ devnull+george.moussalem.outlook.com@kernel.org
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com>
+ <20260605012421.3517532-1-kuba@kernel.org>
+Content-Language: en-US
+From: George Moussalem <george.moussalem@outlook.com>
+In-Reply-To: <20260605012421.3517532-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DX0P273CA0001.AREP273.PROD.OUTLOOK.COM
+ (2603:1086:300:26::6) To SN7PR19MB6736.namprd19.prod.outlook.com
+ (2603:10b6:806:263::12)
+X-Microsoft-Original-Message-ID:
+ <0fc24d8e-902e-44eb-870a-f6616370e4b4@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260605035030.3195141-1-rkannoth@marvell.com>
-X-Proofpoint-ORIG-GUID: qs9y6n98legmmoeNbfiI5mNaNdjV2lZQ
-X-Proofpoint-GUID: qs9y6n98legmmoeNbfiI5mNaNdjV2lZQ
-X-Authority-Analysis: v=2.4 cv=FJkrAeos c=1 sm=1 tr=0 ts=6a22744f cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
- a=55J0GqIfsF46N-Hq72kA:9 a=CjuIK1q_8ugA:10 a=ZXulRonScM0A:10
- a=OBjm3rFKGHvpk9ecZwUJ:22 a=Oh551-UHZqmTy8JkqTUo:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDA2NCBTYWx0ZWRfX5c7Zs1NCR3cm
- d0zBGRF3QAYZbPeZnt+xYXCWjxKJZVpt6XvM7MMCMYj0PikB7ifWxOdKoDb5AoI66hOc0akeNC/
- aPtCBjje+UAsNJPC307yKNAiUc7B8FN3XRnJQuAuFtd0RBYST9AW3JPXCo3TUGcv0GVINsnicbP
- DV7OxOA3xEyUtyHAbnpOOXmqwuI+SpfaV+dQn/HK9F36T67AYT1tZHEOVBPvQzcSQJMiZw+LYjc
- FCAZjfSuAolK5U5U9+2Op/CeTGefOHTbZRwk4zv/6u0xRevbGFl7F5iYvwYj7S2AC+c8JPJu6dS
- 2eN8bfy+kVgUtKdnBUuZGl3w2iYC3hFpcQCspqQp02zomhqh6uHzkQT26kTciOoQOkpsLwx+pkt
- e4ae3keH+UIdRZ0el4wUkZbQbijD0uNHdiYFTBWt0zZ1ofjAIM4MnIZOLrEbjxalZ3zM5GoHdtL
- HWU6vjXKKkqjmKo7GPg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-05_01,2026-05-28_03,2025-10-01_01
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|DS6PR19MB997434:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66e68753-54f0-4272-0996-08dec2c1f4d8
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|15080799012|19110799012|8060799015|6090799003|12121999013|24021099003|55001999006|5072599009|41001999006|23021999003|51005399006|37011999003|3412199025|440099028|40105399003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VG9uNHkrMWI3N2tKcnU2T2UvUUtwT3hOL0puY0pkR2FMbkJjNlhHNld5VlFY?=
+ =?utf-8?B?NE1YdkhOUXd2RERJR3ZjeGtDbWM4cVVOVVFwZUJiV0ZzcTNRdSs3Z2tNUmdh?=
+ =?utf-8?B?N1RmQVBTdmZkWFVYNnZvNVlSaTBiUjNaQ3ZjYzlWTEwzSVN2NURFVkNoSWlj?=
+ =?utf-8?B?NXp0amtHSytjZHFQY3EzZDdjc2YyV2UyVlhzd2tNTk56UlJOQ1ZTL2s0eHF5?=
+ =?utf-8?B?Y1J5K0NHakxabk96QS9VMjduclBOQ0xXMVhadkdkd0h0dkZzWHEwbFVlSVB2?=
+ =?utf-8?B?RFMzelU5dElKZWVLWU5XbElKSUk5Z0toQVg3R0NZanBzSlhWSVc2cFlSc1Vz?=
+ =?utf-8?B?ZDl0VkF1aERoa2dBUmtBSW5KejZpS29IS3BPV0NYYnM2WjhtWkxqaFo5Tyt4?=
+ =?utf-8?B?TFg3TThPYWNFZzIyV05xQjUweHFrWlE5OHpSWlJXQlFCVzcvcXdmME9NSWU1?=
+ =?utf-8?B?ZHNmUDU1UXlPa05vRTFsSVdDRG01L0hVVVJVeXduUkJGWHFXTjBkYTY3b2Ex?=
+ =?utf-8?B?V1pBM3RXTUVIV0ZTYUp5bWo2QkdxbDFoQW1hOXdNRXRSY0tsaFNHZ0NxQTVU?=
+ =?utf-8?B?cVAxWDBDeVZ6bVpLTWlzOFJpbHA0aHdncWlhMXMvUzdOaVl3T09UMWhKdHJp?=
+ =?utf-8?B?R0tNamJLd3BGWFRrOU41TXRaYzlpRTY3czdWQk5FMXFJc1N0dy82anRUMjJI?=
+ =?utf-8?B?ajhuSTFib0lSeGN4cnE0L0x1VncvaDhhRDlSc2cwUGhmU0s4US8zQjJiNjJC?=
+ =?utf-8?B?SlRGVEVUazZwSURDMjlwR1RDWmFFbktLR2dmZ3FscmRDbnRkM1kzaXFRRTJ3?=
+ =?utf-8?B?SmpCanE4dms0N0NCOXdvRFlqdFRvdW9YQ01CTWJaSGZpVXRHaXhCRkNuSXlt?=
+ =?utf-8?B?YlVWM3RCeGlPRC9uTkI1cUpTcUJBK09QTGoxVWdOWlc0eGtqa3o3ODRxTW94?=
+ =?utf-8?B?a2t1S3BqaStJNGxaVjBBY3lOWSszVWVtRnF2TjFCVjhLMDlWQXZyWEU2dUkz?=
+ =?utf-8?B?aFlzVFo0bW9ZK2pUeEk2MjFOWjFKOEpYVkVmSmVmSXVJcUQrZFc3S0ZCODda?=
+ =?utf-8?B?cGVOeWZvZlRHaU45Z2pZREdXWkxxZXRmTGM0bXlLSGhnbjRUS2ZyRFVPUnEy?=
+ =?utf-8?B?Rkw2aC85bXdteDc3NmNFRUNSL1RyRS9JQXNFaUt4SE5GeW5uYVlkVnNLZ1Bs?=
+ =?utf-8?B?ajhpVVlnMGViNGVxTW9WWE5ubndUblFHb2xmNno0Y2syb2VoTDZFS1h6M2tr?=
+ =?utf-8?B?RmxOK1YvVVFXTDVtQ0R6TEhNRnFlTkExY0NuZ3JaQlE2K1UxV2V2d25uZWpB?=
+ =?utf-8?B?Y2dOSGVuSzJtZ1dvVFV5ZUdFNFNXcndENHRoY0JmK1lhTXppSXMzYmZzUUl0?=
+ =?utf-8?B?ckRwQjlpZ0FLejNvRlRvNC9zRVBXb2plSEduVFFLVjczc0xPUnM0REJra1Nk?=
+ =?utf-8?B?VlRaU1BZbGEyS3lnOVpVdjBGUTZTcVJvdzJ1dnZBPT0=?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZzRDWXV4T1pGN0J0SzFLMWtrNE9uZExBMEJVKzloV1FxMmtQUk5LcGV2MFJV?=
+ =?utf-8?B?MWJYUmducHk2MzA1UTJKUVZvNExoN1RHdG9leTdxZkN5MGxIc1pJaEFKeU9n?=
+ =?utf-8?B?V1Jkc2RtZWVGOEZNOTl3WENJMnhmb0IrSlpBSERhTzZzLzZ0Ukt5Mmg3YVVI?=
+ =?utf-8?B?ejVMMEdHcUJIQU04Um80NkJDYWFYa241MWV5SSszODl4YllYdDNsUU1OY0ta?=
+ =?utf-8?B?bDdQb3hOSkVVYWtJTmdsU0IxOTdGRkl5KzUxU2hwNFNZNFVLREZ1VTc5bXhV?=
+ =?utf-8?B?N3BnSFdRWkpOcnNoSkR2Z3VlWWdhd1psZ2kybllIYXhrWTRsSkpsQnJzUGs2?=
+ =?utf-8?B?QWdaeEVXNWVwT3hMYkZKbExPTTlVTGZrMVI2QkJkSWcwSUdVaXdzRWE2WGZB?=
+ =?utf-8?B?SE5DOVJaK2lJODdKaXVWUHFoUDh6d1RDVm03YzU3OUdmTG9Va1RHNUo0RUhm?=
+ =?utf-8?B?bzRxTkVEdEtIRGtHY2J3ZENVOEttaldWR21KRnVXUG9zNmRRTmFQMEpkSnBm?=
+ =?utf-8?B?ZUgwOGM0eDNnS24wNmJtREZ2cVdEYkg1UG51ZXM3R0dKZlFrS2V3T1VEL0tJ?=
+ =?utf-8?B?c1A5ZEE2N2M3cVUzY1E1eUhDcklvUlZnOWVManBnMGJnVklKaFREZGkrQmpv?=
+ =?utf-8?B?d3Q4UjRTMjMra3NEQXoxdjZYZ0FCdWtYRFgzNkdKYXF4WFNMcEhSRE51bjI5?=
+ =?utf-8?B?M0VXWkpvT3htUGtZVGV5MExhQ0R6aVNxTXMxNHBFSmJmckJaMHpyZ1Rid0JN?=
+ =?utf-8?B?YlBueW5SV2czbkdsT1pwVHc3eGRIMXFTY2Y1elJEblVtbzYzM09OQXgyN2RM?=
+ =?utf-8?B?MjNiWEMwdm5YaE95UmE1UXN2RThhRktuUFB3b1FCOWdnZCtielM1MWlpSlgz?=
+ =?utf-8?B?Ri9oTlJNWlRSclJZek96Q2liSUc5Y2V0WDFCSXVLb3Vva3NUK3JsbnFTbFpZ?=
+ =?utf-8?B?dWNsWVBRTWRVRTJ1M0w0SzQrVVlaZ1F1ZzN1ZWtITEorNXJpeU1pVXZhTDBo?=
+ =?utf-8?B?TzR6azhvMEhSM3lzdHlsdWJhTFh6d0tLSFNsWlR6Y2xGQ2lTM2dxMmpua3or?=
+ =?utf-8?B?a3NiNHpRaGZDR2VwQ0pLRDIxT1dSVjBZTWNyK0hwNGFlL0xHdFdmOEVDbDVZ?=
+ =?utf-8?B?UUM4THVBOXJVOERBNXJqMDF4OElkeDlmcG52eitsRFJHZllIK0h4bFVXNkNt?=
+ =?utf-8?B?UENmT0RaK1B3eXNRa2VZRUc2d1FVeUVGQTkvbVBFbllVcmpaakF6dHdRb2hX?=
+ =?utf-8?B?cGJlVUpvMlgwaDdlM3N5ZlVPSEJtb1hnSnppaGFucEQ2MGwvNnRiZXFnK1A2?=
+ =?utf-8?B?cVUwUTlRTWJlS2NoSWtZUUVKdHdyU0FBamt3bWg0MWhjU25SRUJKSlZialBi?=
+ =?utf-8?B?K0ZZaElybkMvREpGMXhNWldUTUNhcUtUWHpzQXZSbWJ2aHJiVFZuUkFhNHV2?=
+ =?utf-8?B?L3M5ZTRMNGNycEp0MkxYbUlIMHNkU1ViYVUzMkVkR3hFbHpuTVJpdEdPOHRl?=
+ =?utf-8?B?bE9nbUpMUGdYVVA0U0xBNk5QTllkS2RvUzZ6SlJ6TWladncvaXprMDZkbG9V?=
+ =?utf-8?B?Ymc5blhlOTJibmZhanB0eU1BNXdPRUR1d3N6YzFlUHpnOVF6NlZlNGlQZjdi?=
+ =?utf-8?B?aS8vRGFMWFZ0TXVQT2V4dWZlK21KdlpGaktEU0pyT1VqTGRGYWU0M3NjR0Jx?=
+ =?utf-8?B?ZHc5Z3pnOU9Sc0dGYkdxTUUrNDZwQnRiV1haRkNiV2FzNUlncDUzeEhuUmFp?=
+ =?utf-8?B?dDcxVkdSM3lrVWJ2S0l1VCt5ZTVjQ0Mra1hyUHl6eUl0dGQ4K3l5VTllQ2ZV?=
+ =?utf-8?B?MzFDdUxSb04wNUxhWEcxZW1lRi9PcElRUThIYXNOL3NMdTBISW1hR0RPamU0?=
+ =?utf-8?B?NXIwMTVGN2Y2U0RvTXVpYi9UNTZtc3VXRCtDMUlLb3RSYnc9PQ==?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66e68753-54f0-4272-0996-08dec2c1f4d8
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 05:19:03.5929
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS6PR19MB997434
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
+	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-295659-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim,marvell.com:from_mime,marvell.com:email,rkannoth-OptiPlex-7090:mid];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295631-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:devnull+george.moussalem.outlook.com@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devnull@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_MUA_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[outlook.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,george.moussalem.outlook.com];
+	FREEMAIL_FROM(0.00)[outlook.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E549645C8A
+X-Rspamd-Queue-Id: 62176645269
 
-On 2026-06-05 at 09:20:20, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
-> debuggability, allocation policy, default-rule lifetime, optional KPU
-> profiles from firmware files, X2/X4 MCAM keyword handling in flows and
-> defaults, and dynamic CN20K NPC private state), adds a devlink mechanism
-> for multi-value parameters, and moves devlink_nl_param_fill() temporaries
-> to the heap so stack usage stays reasonable once union devlink_param_value
-> grows (patch 3).
+On 6/5/26 05:24, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+...
+> 
+> Earlier in qca8k_pcs_config(), reg is overridden for these models:
+> 
+> 	if (priv->switch_id == QCA8K_ID_QCA8327 ||
+> 	    priv->switch_id == QCA8K_ID_QCA8337)
+> 		reg = QCA8K_REG_PORT0_PAD_CTRL;
+> 
+> Since the SGMII force mode configuration uses this same reg variable,
+> won't this cause the FORCE_MODE bit for port 6 to be incorrectly written
+> to port 0's PAD control register on these specific switches?
 
-pw-bot: changes-requested
+I've taken another look at the vendor SDK and this property is always
+set on PORT0_PAD_CTRL regardless of whether it's physically wired on
+port 0 or 6. I did see it is only set on the QCA8337 version, so I'll
+check for that in v2.
 
-Disregarding this patch submission. I experienced an internal SMTP
-error mid-way through running git send-email, which caused only a few patches to go through.
+> 
+>>  	if (val)
+>>  		ret = qca8k_rmw(priv, reg,
+>>  				QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
+>> -				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE,
+>> +				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE |
+>> +				QCA8K_PORT_PAD_SGMII_FORCE_MODE,
+>>  				val);
+> 
+> [Severity: High]
+> Is FORCE_MODE properly cleared if it was previously set by a bootloader,
+> but we don't use outband negotiation and no clock falling edge properties
+> are configured?
+> 
+> If neg_mode != PHYLINK_PCS_NEG_OUTBAND and the clock phase bits are not set,
+> val will be 0. This causes the if (val) check to fail, skipping the
+> qca8k_rmw() call entirely, leaving FORCE_MODE unchanged in hardware.
+> 
+> However, if clock phases are configured in the device tree, val will be
+> non-zero, and qca8k_rmw() will clear FORCE_MODE. Does this create a
+> scenario where clearing this mode unpredictably depends on unrelated clock
+> configurations?
 
-I apologize for the noise and will resend the complete series shortly.
+No, the default value, as for all documented bits on PORT0_PAD_CTRL, is
+0 (disabled) after a reset. So it will be disabled by default and only
+enabled if a fixed link is defined in the port node in the DT.
+
+> 
+>>  
+>>  	return 0;
+
+Best regards,
+George
+
 
