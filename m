@@ -1,451 +1,436 @@
-Return-Path: <netdev+bounces-295588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wjAwEm0yImoLTwEAu9opvQ
-	(envelope-from <netdev+bounces-295588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:20:29 +0200
+	id Sh36COMzImo8TwEAu9opvQ
+	(envelope-from <netdev+bounces-295590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:26:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2A2644A95
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:20:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F458644AE8
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:26:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=B4HK5iQd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295588-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295588-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=h9yNQwJb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295590-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295590-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D3AB33037787
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:20:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D353C3086DD8
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7384C3E8341;
-	Fri,  5 Jun 2026 02:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629B33E51C0;
+	Fri,  5 Jun 2026 02:20:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F813E1CED;
-	Fri,  5 Jun 2026 02:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA4637BE84;
+	Fri,  5 Jun 2026 02:20:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780625947; cv=none; b=nqghgRmYt9JCyEKPjxiKbR3qn66LfcwmHgOBiRn9P0iKIDxdp4jiBM3dzTdspMfi5GSBHDMfnd5D9WRCpslJKkRTMOUq0EjKCsW7AR84xUSyHQpT8EkpYUfiidmOIM39uwmIB2rn18bn11149XMUSK/33UGqlKS/r8D9IC0eC9g=
+	t=1780626033; cv=none; b=l+cXbN6z8Ha7fgezCojBfDjHQp4bktTJVMgCCZ/88zmelqzopZ1h8QfDbqwYJHdGRpreX4W6fSyUEBjuzcruhF2ewSvVQ/uYhLAYYxglo7CyjmNETwPmBWXOXV2Wpj0nlO1V66lmojAmXu5dLEnO3DAA1DTXm7GnyYYXoToZGag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780625947; c=relaxed/simple;
-	bh=Rj2sMioJcubYaC2WBlvOyDNK/bwJIArjMGrFkW3dO9g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KAOpnr+BUnXhhabujF6THR4UpeEkHkvqPZWEu/LtEeu+JKUuW+ctKRSpY4eshloRCDuQ9hqiqs4+46TLn8JvWAFyVrO1qFT9YcX7D9Xuf8I0o2safUTpZiXCkKglBw1BvpH/ut0HEM+pUwPpuujHilZB1VRwHJuvniLFuvDIpU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4HK5iQd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 474E01F0089B;
-	Fri,  5 Jun 2026 02:19:00 +0000 (UTC)
+	s=arc-20240116; t=1780626033; c=relaxed/simple;
+	bh=UbxpImoknXuqvKYf/eg9CyXPgm2uzf3+ClJ5y85I54E=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RDGL1tM0lY4GO3oqbJbw+EluKgjKc3A8Qf3b4eqse2CuJksdLwJ5GaeYHK8rGnBfmwcTrni2xfZQDtyPu0ubZ3Dq076AkuDXh/vFzhl3ZQ77d3HmFR5mD74P+0+8/Cx0bV1xWehFaE7CSookdFE4n7XccAWUNfNy26IjrRz7ZnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h9yNQwJb; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AE3E1F00893;
+	Fri,  5 Jun 2026 02:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780625941;
-	bh=yymIECeoFszmyi5ws8XXDw1iy0jT9Ce1kmUxM5cQlGQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=B4HK5iQdXrKSH5NmNoKCWSHY9jbPFqwVJQzyOtscg9SzkjbFqq0woLkUsDPRlspa9
-	 c+ck1ysCyuvQSlIyDaNdQ599A33PjXv4UPzjRvz5rOLC2FwUjVY+uR9vAkrD6FlvKY
-	 WgOHKdZ3C27DwfjSowphYetuodYBW+mXsMJNzmDFtS7g8uj9dX6anfrh8NSq1HrBWh
-	 64ai8EHYLZk+Wdg25HajJRZYXaAtQYpVnhv0V7rfcOjslNwyWqmhcD5qSpsEUp1mxV
-	 pocwgcZOs5DaNLXs+GC7qOEtmWp6JHP8IrbMyneZBSM/CiLfPkr2rBcg5PfIywYq3X
-	 iKF98Y3Nc4uyA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: lukasz.majewski@mailbox.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	lgirdwood@gmail.com,
-	nathan@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	krzk+dt@kernel.org,
-	imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	robh@kernel.org
-Subject: Re: [net-next v24 6/7] net: mtip: Extend the L2 switch driver with management operations
-Date: Thu,  4 Jun 2026 19:18:59 -0700
-Message-ID: <20260605021859.3594656-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260601112437.2216043-7-lukasz.majewski@mailbox.org>
-References: <20260601112437.2216043-7-lukasz.majewski@mailbox.org>
+	s=k20260515; t=1780626026;
+	bh=iMqrRtz2eb5lnLw+J4vSqJrQs0P4R30G8v4BLNSRKzk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=h9yNQwJbn2GEmFBvPrtApzxAXUBUYpaNKd/nBhT+OZuS0C07JDKr5x7BtuilJt7rN
+	 PBHY18PsnFfP6WWzoYtp+8GWf3zo87uXktuFeUM0DhJhkLAP5RzTQls4Hvrdauusc8
+	 P28Srdr2GZnEq6cJG3RvENUKKid6lhfIM+nl9DL2MQaJIBMH/Y4Jixzvl30ZDndwUZ
+	 pwBc/Q3WlP1RDbzNo1txh0MaZilED5LqpTZNZXSigAL6aWPdn2H84TNHkLUIjcWZro
+	 VClqvzj17YQHBs0cOQxCh7YMzWqansZrFpE5PzZ0LnwqZT2bD4zJe5anG/xjxNyrvF
+	 YRIFQPscBBa0g==
+Message-ID: <4b81c104a8b0f67bb844b894cbd0c58a8191ac5d.camel@kernel.org>
+Subject: Re: [PATCH net-next 1/2] rds: convert to getsockopt_iter
+From: Allison Henderson <achender@kernel.org>
+To: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-kselftest@vger.kernel.org, kernel-team@meta.com
+Date: Thu, 04 Jun 2026 19:20:24 -0700
+In-Reply-To: <20260603-getsock_more-v1-1-43b8d40c8849@debian.org>
+References: <20260603-getsock_more-v1-0-43b8d40c8849@debian.org>
+	 <20260603-getsock_more-v1-1-43b8d40c8849@debian.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-295588-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:lukasz.majewski@mailbox.org,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:lgirdwood@gmail.com,m:nathan@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk+dt@kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:robh@kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-295590-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AD2A2644A95
+X-Rspamd-Queue-Id: 6F458644AE8
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: mtip: Extend the L2 switch driver with management operations
+On Wed, 2026-06-03 at 09:11 -0700, Breno Leitao wrote:
+> Convert RDS socket's getsockopt implementation to use the new
+> getsockopt_iter callback with sockopt_t.
+>=20
+> Key changes:
+> - Replace (char __user *optval, int __user *optlen) with sockopt_t *opt
+> - Use opt->optlen for buffer length (input) and returned size (output)
+> - Use copy_to_iter() instead of put_user()/copy_to_user()
+>=20
+> The RDS_INFO_* snapshot path in rds_info_getsockopt() used to pin the
+> userspace buffer with pin_user_pages_fast() on the raw optval address;
+> the info producers then memcpy into those pages under a spinlock via
+> kmap_atomic() and so must not fault. Obtain the same page array and
+> starting offset from opt->iter_out with iov_iter_extract_pages(), which
+> pins for write because iter_out is ITER_DEST.
+>=20
+> The page array is preallocated here (sized with iov_iter_npages()) and
+> passed in, so iov_iter_extract_pages() fills it in place rather than
+> allocating one for us; RDS therefore keeps ownership of the array on
+> every return path and frees it itself. The rds_info_iterator /
+> rds_info_copy machinery and all producer callbacks are unchanged.
+>=20
+> Kernel buffers (ITER_KVEC) are not page-backed in a way the info
+> producers can use, so the RDS_INFO path returns -EOPNOTSUPP for them;
+> this matches the previous behaviour, where a kernel-buffer getsockopt
+> hit the WARN_ONCE() path in do_sock_getsockopt() and returned
+> -EOPNOTSUPP. The simple RDS_RECVERR and SO_RDS_TRANSPORT options keep
+> working for kernel buffers via copy_to_iter().
+>=20
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-This patch adds switch management helpers (port enable, blocking,
-learning, broadcast, multicast, VLAN input/output, VLAN verification,
-forced forwarding, port separation) and wires them into the switch
-configuration and TX paths.
+Hi Breno,
 
-> diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> index 212207861e13..76e503e128dd 100644
-> --- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> @@ -505,8 +505,35 @@ static void mtip_config_switch(struct switch_enet_private *fep)
->  
->  	writel(0, fep->hwp + ESW_BKLR);
->  
-> +	/* Do NOT disable learning */
-> +	mtip_port_learning_config(fep, 0, 0, 0);
-> +	mtip_port_learning_config(fep, 1, 0, 0);
-> +	mtip_port_learning_config(fep, 2, 0, 0);
-> +
-> +	/* Disable blocking */
-> +	mtip_port_blocking_config(fep, 0, 0);
-> +	mtip_port_blocking_config(fep, 1, 0);
-> +	mtip_port_blocking_config(fep, 2, 0);
-> +
->  	writel(MCF_ESW_IMR_TXF | MCF_ESW_IMR_RXF,
->  	       fep->hwp + ESW_IMR);
-> +
-> +	mtip_port_enable_config(fep, 0, 1, 1);
-> +	mtip_port_enable_config(fep, 1, 1, 1);
-> +	mtip_port_enable_config(fep, 2, 1, 1);
-> +
-> +	mtip_port_broadcast_config(fep, 0, 1);
-> +	mtip_port_broadcast_config(fep, 1, 1);
-> +	mtip_port_broadcast_config(fep, 2, 1);
-> +
-> +	/* Disable multicast receive on port 0 (MGNT) */
-> +	mtip_port_multicast_config(fep, 0, 0);
-> +	mtip_port_multicast_config(fep, 1, 1);
-> +	mtip_port_multicast_config(fep, 2, 1);
+Thanks for working on this.  The conversions look mostly correct to me, jus=
+t a few nits I noticed below:
 
-[Low]
-mtip_port_learning_config(), mtip_port_blocking_config(),
-mtip_port_enable_config(), mtip_port_broadcast_config() and
-mtip_port_multicast_config() all return int, but every return value here
-is discarded and mtip_config_switch() itself stays void.
-
-The arguments are compile-time constants today so validation cannot
-fail, but if any of these helpers later acquire a real failure mode (for
-example, hardware probing or capability gating) the switch would be
-silently left in a partially configured state.  Should the return
-values be checked, or should these helpers be void?
-
-> +
-> +	/* Setup VLANs to provide port separation */
-> +	if (!fep->br_offload)
-> +		mtip_switch_en_port_separation(fep);
+> ---
+>  net/rds/af_rds.c | 36 ++++++++++++++++-------------
+>  net/rds/info.c   | 70 +++++++++++++++++++++++++++++++-------------------=
+------
+>  net/rds/info.h   |  3 +--
+>  3 files changed, 60 insertions(+), 49 deletions(-)
+>=20
+> diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+> index 6f4f9cf352bd..d5defe9172e3 100644
+> --- a/net/rds/af_rds.c
+> +++ b/net/rds/af_rds.c
+> @@ -37,6 +37,7 @@
+>  #include <linux/in.h>
+>  #include <linux/ipv6.h>
+>  #include <linux/poll.h>
+> +#include <linux/uio.h>
+>  #include <net/sock.h>
+> =20
+>  #include "rds.h"
+> @@ -485,35 +486,36 @@ static int rds_setsockopt(struct socket *sock, int =
+level, int optname,
 >  }
->  
->  static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
-> @@ -592,6 +619,10 @@ static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
->  
->  	skb_tx_timestamp(skb);
->  
-> +	/* For port separation - force sending via specified port */
-> +	if (!fep->br_offload && port != 0)
-> +		mtip_forced_forward(fep, port, 1);
-> +
+> =20
+>  static int rds_getsockopt(struct socket *sock, int level, int optname,
+> -			  char __user *optval, int __user *optlen)
+> +			  sockopt_t *opt)
+>  {
+>  	struct rds_sock *rs =3D rds_sk_to_rs(sock->sk);
+>  	int ret =3D -ENOPROTOOPT, len;
+>  	int trans;
+> +	int val;
+> =20
+>  	if (level !=3D SOL_RDS)
+>  		goto out;
+> =20
+> -	if (get_user(len, optlen)) {
+> -		ret =3D -EFAULT;
+> -		goto out;
+> -	}
+> +	len =3D opt->optlen;
+> =20
+>  	switch (optname) {
+>  	case RDS_INFO_FIRST ... RDS_INFO_LAST:
+> -		ret =3D rds_info_getsockopt(sock, optname, optval,
+> -					  optlen);
+> +		ret =3D rds_info_getsockopt(sock, optname, opt);
+>  		break;
+> =20
+>  	case RDS_RECVERR:
+> -		if (len < sizeof(int))
+> +		if (len < sizeof(int)) {
+>  			ret =3D -EINVAL;
+> -		else
+> -		if (put_user(rs->rs_recverr, (int __user *) optval) ||
+> -		    put_user(sizeof(int), optlen))
+> +			break;
+> +		}
+> +		val =3D rs->rs_recverr;
+> +		if (copy_to_iter(&val, sizeof(int), &opt->iter_out) !=3D
+> +		    sizeof(int)) {
+>  			ret =3D -EFAULT;
+> -		else
+> +		} else {
+> +			opt->optlen =3D sizeof(int);
+>  			ret =3D 0;
+> +		}
+>  		break;
+>  	case SO_RDS_TRANSPORT:
+>  		if (len < sizeof(int)) {
+> @@ -522,11 +524,13 @@ static int rds_getsockopt(struct socket *sock, int =
+level, int optname,
+>  		}
+>  		trans =3D (rs->rs_transport ? rs->rs_transport->t_type :
+>  			 RDS_TRANS_NONE); /* unbound */
+> -		if (put_user(trans, (int __user *)optval) ||
+> -		    put_user(sizeof(int), optlen))
+> +		if (copy_to_iter(&trans, sizeof(int), &opt->iter_out) !=3D
+> +		    sizeof(int)) {
+>  			ret =3D -EFAULT;
+> -		else
+> +		} else {
+> +			opt->optlen =3D sizeof(int);
+>  			ret =3D 0;
+> +		}
+>  		break;
+>  	default:
+>  		break;
+> @@ -653,7 +657,7 @@ static const struct proto_ops rds_proto_ops =3D {
+>  	.listen =3D	sock_no_listen,
+>  	.shutdown =3D	sock_no_shutdown,
+>  	.setsockopt =3D	rds_setsockopt,
+> -	.getsockopt =3D	rds_getsockopt,
+> +	.getsockopt_iter =3D	rds_getsockopt,
+>  	.sendmsg =3D	rds_sendmsg,
+>  	.recvmsg =3D	rds_recvmsg,
+>  	.mmap =3D		sock_no_mmap,
+> diff --git a/net/rds/info.c b/net/rds/info.c
+> index f1b29994934a..171838782595 100644
+> --- a/net/rds/info.c
+> +++ b/net/rds/info.c
+> @@ -35,6 +35,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/proc_fs.h>
+>  #include <linux/export.h>
+> +#include <linux/uio.h>
+> =20
+>  #include "rds.h"
+> =20
+> @@ -144,60 +145,68 @@ void rds_info_copy(struct rds_info_iterator *iter, =
+void *data,
+>  EXPORT_SYMBOL_GPL(rds_info_copy);
+> =20
+>  /*
+> - * @optval points to the userspace buffer that the information snapshot
+> - * will be copied into.
+> - *
+> - * @optlen on input is the size of the buffer in userspace.  @optlen
+> - * on output is the size of the requested snapshot in bytes.
+> + * @opt->iter_out describes the buffer that the information snapshot wil=
+l be
+> + * copied into, and @opt->optlen is the size of that buffer on input.  O=
+n
+> + * output @opt->optlen is set to the size of the requested snapshot in b=
+ytes.
+>   *
+>   * This function returns -errno if there is a failure, particularly -ENO=
+SPC
+> - * if the given userspace buffer was not large enough to fit the snapsho=
+t.
+> - * On success it returns the positive number of bytes of each array elem=
+ent
+> - * in the snapshot.
+> + * if the given buffer was not large enough to fit the snapshot.  On suc=
+cess
+> + * it returns the positive number of bytes of each array element in the
+> + * snapshot.
+>   */
+> -int rds_info_getsockopt(struct socket *sock, int optname, char __user *o=
+ptval,
+> -			int __user *optlen)
+> +int rds_info_getsockopt(struct socket *sock, int optname, sockopt_t *opt=
+)
+>  {
+>  	struct rds_info_iterator iter;
+>  	struct rds_info_lengths lens;
+>  	unsigned long nr_pages =3D 0;
+> -	unsigned long start;
+>  	rds_info_func func;
+>  	struct page **pages =3D NULL;
+> +	size_t offset0 =3D 0;
+> +	int npages =3D 0;
+>  	int ret;
+>  	int len;
+>  	int total;
+> =20
+> -	if (get_user(len, optlen)) {
+> -		ret =3D -EFAULT;
+> -		goto out;
+> -	}
+> +	len =3D opt->optlen;
+> =20
+>  	/* check for all kinds of wrapping and the like */
+> -	start =3D (unsigned long)optval;
+> -	if (len < 0 || len > INT_MAX - PAGE_SIZE + 1 || start + len < start) {
+> +	if (len < 0 || len > INT_MAX - PAGE_SIZE + 1) {
+>  		ret =3D -EINVAL;
+>  		goto out;
+>  	}
+> =20
+> +	/* The info producers write into the pages with kmap_atomic() while
+> +	 * holding a spinlock, so they need a genuine page-backed user buffer.
+> +	 */
+I think !user_backed_iter() is more accurate for what you're meaning to do =
+here?  Technically we only ever get kvecs or
+ubufs since rds_info_getsockopt is only called by do_sock_getsockopt.  Thos=
+e appear to be the only two types it passes,
+so it works out.  But it means we're counting on that assumption from the c=
+aller and ideally we should filter anything
+that's not user backed.  So, I'd replace the iov_iter_is_kvec check with:
 
-[High]
-This is the per-packet TX path, and mtip_forced_forward() is called for
-every non-management transmit.  A few questions about that call:
+	if (!user_backed_iter(&opt->iter_out)) {
 
-The helper passes the netdev port index (1 or 2) in as the FD value, but
-its body encodes that argument as a bitmap into MCF_ESW_P0FFEN_FD_MASK:
-
-	reg |= FIELD_PREP(MCF_ESW_P0FFEN_FD_MASK, port & GENMASK(1, 0));
-
-For port == 1 the FD field is 0b01, for port == 2 it is 0b10.  If FD is
-a destination-port bitmap, does this mean port == 1 forwards to MGNT
-port 0 and port == 2 forwards to the first user port?  Is the caller
-passing the right value?
-
-The function builds the register value from a fresh u32 reg = 0 and
-unconditionally writes ESW_P0FFEN, so the else branch that masks off
-MCF_ESW_P0FFEN_FEN never runs in practice (reg already has FEN clear).
-Once this path runs once with enable == 1, who clears the FEN bit?
-
-mtip_switch_dis_port_separation() resets PID/VRES/VIMEN/VIMSEL/VLANV/
-VOMSEL but not ESW_P0FFEN.  Is forced-forward state expected to remain
-asserted across reconfiguration?
-
->  	dev->stats.tx_bytes += skb->len;
->  	/* If this was the last BD in the ring,
->  	 * start at the beginning again.
-
-> diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
-> new file mode 100644
-> index 000000000000..4c07861a6a3e
-> --- /dev/null
-> +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
-
-[ ... ]
-
-> +int mtip_vlan_input_process(struct switch_enet_private *fep,
-> +			    int port, int mode, unsigned short port_vlanid,
-> +			    int vlan_verify_en, int vlan_domain_num,
-> +			    int vlan_domain_port)
-> +{
-> +	if (mode < 0 || mode > 3) {
-> +		dev_err(&fep->pdev->dev,
-> +			"%s: VLAN input processing mode (%d) not supported\n",
-> +			__func__, mode);
-> +		return -EINVAL;
+> +	if (iov_iter_is_kvec(&opt->iter_out)) {
+> +		ret =3D -EOPNOTSUPP;
+> +		goto out;
 > +	}
 > +
-> +	if (port < 0 || port > 2) {
-> +		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported!\n",
-> +			__func__, port);
-> +		return -EINVAL;
-> +	}
+>  	/* a 0 len call is just trying to probe its length */
+>  	if (len =3D=3D 0)
+>  		goto call_func;
+> =20
+> -	nr_pages =3D (PAGE_ALIGN(start + len) - (start & PAGE_MASK))
+> -			>> PAGE_SHIFT;
+> -
+> -	pages =3D kmalloc_objs(struct page *, nr_pages);
+> +	/*
+> +	 * Preallocate the page array and pass it in so that
+> +	 * iov_iter_extract_pages() fills it in place rather than allocating
+> +	 * one for us.  Handing it a non-NULL array keeps ownership of the
+> +	 * array with us on every return path, instead of depending on the
+> +	 * iterator code to allocate and hand it back.
+> +	 */
+> +	npages =3D iov_iter_npages(&opt->iter_out, INT_MAX);
+> +	pages =3D kvmalloc_array(npages, sizeof(*pages), GFP_KERNEL);
+>  	if (!pages) {
+>  		ret =3D -ENOMEM;
+>  		goto out;
+>  	}
+> -	ret =3D pin_user_pages_fast(start, nr_pages, FOLL_WRITE, pages);
+> -	if (ret !=3D nr_pages) {
+> -		if (ret > 0)
+> -			nr_pages =3D ret;
+> -		else
+> -			nr_pages =3D 0;
 > +
-> +	if (vlan_verify_en == 1 &&
-> +	    (vlan_domain_num < 0 || vlan_domain_num > 32)) {
-> +		dev_err(&fep->pdev->dev, "%s: Domain out of range\n", __func__);
-> +		return -EINVAL;
-> +	}
+> +	ret =3D iov_iter_extract_pages(&opt->iter_out, &pages, len, npages,
+> +				     0, &offset0);
+> +	if (ret < 0)
+> +		goto out;
+> +	nr_pages =3D DIV_ROUND_UP(offset0 + ret, PAGE_SIZE);
+> +	if (ret !=3D len) {
+>  		ret =3D -EAGAIN; /* XXX ? */
+>  		goto out;
+>  	}
+> @@ -213,7 +222,7 @@ int rds_info_getsockopt(struct socket *sock, int optn=
+ame, char __user *optval,
+> =20
+>  	iter.pages =3D pages;
+>  	iter.addr =3D NULL;
+> -	iter.offset =3D start & (PAGE_SIZE - 1);
+> +	iter.offset =3D offset0;
+> =20
+>  	func(sock, len, &iter, &lens);
+>  	BUG_ON(lens.each =3D=3D 0);
+> @@ -230,13 +239,12 @@ int rds_info_getsockopt(struct socket *sock, int op=
+tname, char __user *optval,
+>  		ret =3D lens.each;
+>  	}
+> =20
+> -	if (put_user(len, optlen))
+> -		ret =3D -EFAULT;
+> +	opt->optlen =3D len;
+> =20
+>  out:
+The unpin here works, but it took me a little bit to trace out where the co=
+rresponding pin went since it is removed
+earlier in the patch. =C2=A0Pages are pinned on extract, but only for user =
+pages. This works out since the only caller here
+passes kvec or ubuf, and we error out on kvec iters.  Pages are assumed pin=
+ned if they're not null, but without the
+!user_backed_iter check, it leans on this behavior from the caller.  Ideall=
+y I think=C2=A0iov_iter_extract_pages is supposed
+to be paired with iov_iter_extract_will_pin.  A quick comment would help cl=
+arify too.  So the closing gate would look
+something like this:
 
-[Medium]
-Is the upper bound here off by one?  ESW_VRES_BASE is 0x280 and
-ESW_VRES(x) = 0x280 + 4*x, so vlan_domain_num == 32 produces offset
-0x300, which is the ESW_DISCN register.  A call with
-vlan_domain_num == 32 would write a VRES bitmap value into the
-discard-stats register.  Should the test be > 31 (or >= 32)?
+	/* unpin pages from ubuf iters */
+	if (pages && iov_iter_extract_will_pin(&opt->iter_out))
 
-[Low]
-The vlan_domain_port parameter is part of the function signature and
-the public header but never referenced in the body, and all in-tree
-callers pass 0.  Is it intended to control which VRES port bit is set
-(currently hardcoded from port), or should the parameter be removed
-until it has a use?
+>  	if (pages)
+>  		unpin_user_pages(pages, nr_pages);
 
-> +
-> +	writel(FIELD_PREP(MCF_ESW_PID_VLANID_MASK, port_vlanid),
-> +	       fep->hwp + ESW_PID(port));
-> +	if (port == 0) {
-> +		if (vlan_verify_en == 1)
-> +			writel(FIELD_PREP(MCF_ESW_VRES_VLANID_MASK,
-> +					  port_vlanid) | MCF_ESW_VRES_P0,
-> +			       fep->hwp + ESW_VRES(vlan_domain_num));
-> +
-> +		writel(readl(fep->hwp + ESW_VIMEN) | MCF_ESW_VIMEN_EN0,
-> +		       fep->hwp + ESW_VIMEN);
-> +		writel(readl(fep->hwp + ESW_VIMSEL) |
-> +		       FIELD_PREP(MCF_ESW_VIMSEL_IM0_MASK, mode),
-> +		       fep->hwp + ESW_VIMSEL);
+Having both checks is somewhat redundant, but it doesnt hurt anything eithe=
+r.  And I think it helps make it a little
+more uniform and readable.  Other than that I think this patch is looking p=
+retty good to me.
 
-[Medium]
-VIMSEL IMx and VOMSEL OMx are 2-bit fields, but the update here is
-read | FIELD_PREP(MASK, mode) without first clearing the field.  Once a
-non-zero mode has been programmed for a port, can a subsequent
-reprogramming actually replace it?
+Thank you!
+Allison
 
-For example, programming port 0 first with mode 1 (binary 01) and then
-with mode 2 (binary 10) would yield 01 | 10 = 11 in IM0.
-
-mtip_config_switch() runs from the switch-restart path
-(mtip_open(), mtip_timeout_work(), mtip_adjust_link()) and does not
-zero VIMSEL/VOMSEL beforehand, so a restart with a different mode would
-hit this.  Should the helpers do reg &= ~MASK; reg |= FIELD_PREP(...)
-as the sibling helpers (e.g. mtip_port_enable_config) do?
-
-> +	} else if (port == 1) {
-
-[ ... ]
-
-> +int mtip_vlan_output_process(struct switch_enet_private *fep, int port,
-> +			     int mode)
-> +{
-> +	if (port < 0 || port > 2) {
-> +		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported!\n",
-> +			__func__, port);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (port == 0) {
-> +		writel(readl(fep->hwp + ESW_VOMSEL) |
-> +		       FIELD_PREP(MCF_ESW_VOMSEL_OM0_MASK, mode),
-> +		       fep->hwp + ESW_VOMSEL);
-
-[Medium]
-The same accumulating-OR pattern is used here, and there is no
-validation of mode (the input variant has it).  Should mode be range
-checked, and should the OMx field be cleared before being rewritten?
-
-> +	} else if (port == 1) {
-
-[ ... ]
-
-> +int mtip_set_vlan_verification(struct switch_enet_private *fep, int port,
-> +			       int vlan_domain_verify_en,
-> +			       int vlan_discard_unknown_en)
-> +{
-> +	if (port < 0 || port > 2) {
-> +		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported!\n",
-> +			__func__, port);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (vlan_domain_verify_en == 1) {
-
-[Low]
-Both vlan_domain_verify_en and vlan_discard_unknown_en are tested for
-exactly 1 and exactly 0; any other value silently performs no register
-update yet the function still returns 0.
-
-Would it be cleaner to declare these parameters bool (as several other
-helpers in this file do) or to validate them and return -EINVAL on out
-of range input?
-
-> +		if (port == 0)
-> +			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_VV0,
-> +			       fep->hwp + ESW_VLANV);
-
-[ ... ]
-
-> +int mtip_port_multicast_config(struct switch_enet_private *fep,
-> +			       int port, bool enable)
-> +{
-> +	u32 reg = 0;
-> +
-> +	if (port < 0 || port > 2) {
-> +		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-> +			__func__, port);
-> +		return -EINVAL;
-> +	}
-> +
-> +	reg = readl(fep->hwp + ESW_DMCR);
-
-[Medium]
-A general question that applies to every helper added in this file:
-each one performs a read-modify-write on a shared MMIO register
-(ESW_BKLR, ESW_PER, ESW_DBCR, ESW_DMCR, ESW_VLANV, ESW_VIMEN,
-ESW_VIMSEL, ESW_VOMSEL, ESW_VRES, ESW_IMR) without taking any lock and
-without a documented locking precondition, and the helpers are exported
-via mtipl2sw.h.
-
-fep->hw_lock already exists for HW configuration but the helpers
-neither take it nor call lockdep_assert_held() on it.
-mtip_config_switch() itself issues three independent RMWs on the same
-register for each helper (one per port).
-
-Today the only caller is mtip_config_switch() during switch restart, so
-the race is dormant.  If a future caller (sysfs/netlink/bridge offload
-hook) appears, every shared-register update becomes a race.  Should
-these helpers take fep->hw_lock internally, or assert it via
-lockdep_assert_held()?
-
-[ ... ]
-
-> +int mtip_forced_forward(struct switch_enet_private *fep, int port, bool enable)
-> +{
-> +	u32 reg = 0;
-> +
-> +	if (port & ~GENMASK(1, 0)) {
-> +		dev_err(&fep->pdev->dev,
-> +			"%s: Forced forward for port(s): 0x%x not supported!\n",
-> +			__func__, port);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Enable Forced forwarding for port(s) */
-> +	reg |= FIELD_PREP(MCF_ESW_P0FFEN_FD_MASK, port & GENMASK(1, 0));
-> +
-> +	if (enable)
-> +		reg |= MCF_ESW_P0FFEN_FEN;
-> +	else
-> +		reg &= ~MCF_ESW_P0FFEN_FEN;
-> +
-> +	writel(reg, fep->hwp + ESW_P0FFEN);
-> +	return 0;
-> +}
-
-[High]
-Two more notes here in addition to the call-site question above:
-
-The validation accepts port values 0..3 via port & ~GENMASK(1, 0) while
-every sibling helper in this file rejects port > 2.  Which convention
-is intended for the API?
-
-The function unconditionally overwrites ESW_P0FFEN starting from
-u32 reg = 0, instead of doing the readl/modify/writel that every other
-helper here does.  Is that intentional, and if so what about other bits
-that may live in this register?
-
-> +
-> +int mtip_port_learning_config(struct switch_enet_private *fep, int port,
-> +			      bool disable, bool irq_adj)
-> +{
-> +	u32 reg = 0;
-> +
-> +	if (port < 0 || port > 2) {
-> +		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-> +			__func__, port);
-> +		return -EINVAL;
-> +	}
-> +
-> +	reg = readl(fep->hwp + ESW_BKLR);
-> +	if (disable) {
-> +		if (irq_adj)
-> +			writel(readl(fep->hwp + ESW_IMR) & ~MCF_ESW_IMR_LRN,
-> +			       fep->hwp + ESW_IMR);
-
-[Medium]
-Can this RMW on ESW_IMR race with mtip_interrupt()?  The hardirq
-handler does its own RMW on the same register with no lock:
-
-	int_imask = readl(fep->hwp + ESW_IMR);
-	int_imask &= ~MCF_ESW_IMR_RXF;
-	writel(int_imask, fep->hwp + ESW_IMR);
-
-If the hardirq fires between this helper's readl() and writel(), the
-interrupt handler's RXF mask clear can be lost on writeback,
-re-enabling RXF while NAPI is supposed to be servicing it.
-
-Today mtip_config_switch() calls this helper with irq_adj = 0 so the
-ESW_IMR side is dormant, but the function is exported for the explicit
-purpose of toggling the LRN mask, so the documented use of the API
-trips the race.  Should this take fep->hw_lock with spin_lock_irqsave()
-(and have mtip_interrupt() take the same lock around its RMW)?
-
-> +
-[ ... ]
+> -	kfree(pages);
+> +	kvfree(pages);
+> =20
+>  	return ret;
+>  }
+> diff --git a/net/rds/info.h b/net/rds/info.h
+> index a069b51c4679..1aab62ab6d00 100644
+> --- a/net/rds/info.h
+> +++ b/net/rds/info.h
+> @@ -21,8 +21,7 @@ typedef void (*rds_info_func)(struct socket *sock, unsi=
+gned int len,
+> =20
+>  void rds_info_register_func(int optname, rds_info_func func);
+>  void rds_info_deregister_func(int optname, rds_info_func func);
+> -int rds_info_getsockopt(struct socket *sock, int optname, char __user *o=
+ptval,
+> -			int __user *optlen);
+> +int rds_info_getsockopt(struct socket *sock, int optname, sockopt_t *opt=
+);
+>  void rds_info_copy(struct rds_info_iterator *iter, void *data,
+>  		   unsigned long bytes);
+>  void rds_info_iter_unmap(struct rds_info_iterator *iter);
+>=20
 
