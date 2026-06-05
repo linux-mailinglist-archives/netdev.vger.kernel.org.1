@@ -1,67 +1,78 @@
-Return-Path: <netdev+bounces-295994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295995-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QDKbDVRYI2pFqQEAu9opvQ
-	(envelope-from <netdev+bounces-295994-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 01:14:28 +0200
+	id F4QYLR9bI2o0qwEAu9opvQ
+	(envelope-from <netdev+bounces-295995-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 01:26:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B3E64BC16
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 01:14:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4E864BCD1
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 01:26:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JrD2CULs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295994-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295994-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=E7403+Oo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295995-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295995-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 947C6304544F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 23:13:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC8793016693
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 23:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE5440B36B;
-	Fri,  5 Jun 2026 23:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356433B71BF;
+	Fri,  5 Jun 2026 23:26:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9832F3D4103;
-	Fri,  5 Jun 2026 23:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1FB30D401;
+	Fri,  5 Jun 2026 23:26:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780701198; cv=none; b=HVeAefl/PB5HWzLUi6HVVKeYVkwrGpBwHMfjzc0KNZJ6IArCxyd8jsyDvoCzST09Rqq+btWt/CD8ldY1qF/EhYON3aLLRLNQy1W2Z3CjuCRC8w/VsaswNiziTSkpYqtmBxmStgf4oHIXYINfvHlSZkOCkee7Botgvb/O4ZcrOrc=
+	t=1780701978; cv=none; b=sIa9UXDVC9/QR2Wsg7FUmIGUKcISTXG1HfqwaIYgGtd3CnFrAVkJg8cSBw5GMs+QMx2DGpSMeNjpeYguh506ipB3V/8k36w4XAlEKH/83Glzfn+7llNR1nGnvDjhrPNvBJbS+SOXBFPoMFFKmqJ5SbT7lPNDj5ToWHFwhs0z964=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780701198; c=relaxed/simple;
-	bh=HVohKQd1pTvqn6Qh+3Y9RzCE0kuc0HwT8xPN8j79ya4=;
+	s=arc-20240116; t=1780701978; c=relaxed/simple;
+	bh=KnZFrCUbyhR+riefVqmFHD4g1Bj567ZClbQUDv/JWMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iAMjzfPnH4XiUhGWQ8vgtMUNFCHjSQyak07Q6qeCQsypLXKMvHjT3NPp3+gOulV9EKHer36jNuzi26srbNvZ0xU0YvvQM9p1LCWw4d6LBprOLEkIqgFhH/a6c0pZuy+4i88P4xX/1CGbcLM+3NJkq3OyFeuN+l5FmOUHGYm3Mwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrD2CULs; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BED981F00893;
-	Fri,  5 Jun 2026 23:13:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jVy+gsvurY6mmgSZrwbcCOFV2Htrnkfq3tChlVRIj5veTVjJAN8dkz7ww8y01ALIFHg1T+xFV0eUypedLU0xjHOSqZ0Mzqu28ZMJFEq97UhzhakwVeb9N7t95gji1MGH0a5FhEIDzT4xTLWkni0urr8bShlkZ9yQSdabpTFVPAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E7403+Oo; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29FBD1F00893;
+	Fri,  5 Jun 2026 23:26:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780701197;
-	bh=MWVBiiFpEQ0/EmGFoo8huzeAXw0aY1xHLVjCxXfg3fA=;
+	s=k20260515; t=1780701976;
+	bh=IG96N48IaU0YB7Fwkuesk+PO+SJtj7KaqjiAzFCI5Ao=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=JrD2CULsR3Z5ODT7I7ePEHkBwtjOr436CUokEgXc2bRs3eRrlCFoVhkrkd/C6cnUs
-	 V0UZgHYXeIQdMV/LWuWsl+xIuFrNgKrlFoTQ0FwpDQHOWrtUp4HdNxc4wPvFtGu4cY
-	 KIct6ETV1OAS5EfQzBqRDl9nYAmH0LyfILs1BoIScWsp2nrhnauZsdphWmbGlGlFh1
-	 TZvKaMhVO6ER//uDAjIVC0K4AHT/cLXYiJ0xOVaWTNYnoTJb+3RJqpSdm9rHVs2HuF
-	 0Gos4gRHhv+3ZhQro5Lc0RJYy0eA4wpkAqNXaLumfvF5xkuzElhFQ7RltFnmRI59eN
-	 IfnPcdGTv6HPQ==
-Date: Fri, 5 Jun 2026 16:13:15 -0700
+	b=E7403+OodPvRrNF8Mu0tD+WtYtsyw6n74A4QVl6z/iRe4WKlz9LJkPJfmpHf8WcEk
+	 1RoDOPsMm31w8ml9+DhR3SJuo4i5omE65p5UL1zp/fKi3IRzx7dAgtqZ5rB2T8JHCX
+	 Dz9pAASe2FCFJq9BUaXNeKC2l5HTg31yR9IBmDe20nYxJ4F0p0oVMy8Xo4U2YnDTVd
+	 aPuAr9BrPNqhLX/3NoBy45reAkNQtPNpTS8l5iFhQ1GBAUwCeD17ddf7dnSCNsbjhD
+	 d1AN7RDTojfSWFZDgAjDYl2DNqgpHj0oojBw5JQooiRDROVnTS9avrCEA2JPartTrY
+	 rZpFXnToUrJMg==
+Date: Fri, 5 Jun 2026 16:26:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- kotaranov@microsoft.com, horms@kernel.org, dipayanroy@linux.microsoft.com,
- kees@kernel.org, linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mana: Cache MANA_QUERY_LINK_CONFIG result
- to avoid repeated HWC queries
-Message-ID: <20260605161315.26784677@kernel.org>
-In-Reply-To: <aiJeuU3DLKL7JcPN@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260528180757.1536640-1-ernis@linux.microsoft.com>
-	<20260602132127.25fc27ee@kernel.org>
-	<aiJeuU3DLKL7JcPN@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Oros, Petr" <poros@redhat.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "Kitszel, Przemyslaw"
+ <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+ <anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
+ <Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
+ "jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
+ <arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
+ <vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
+ <donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
+Subject: Re: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and
+ full TX reference clock control for E825
+Message-ID: <20260605162615.0987ff2a@kernel.org>
+In-Reply-To: <IA1PR11MB6219C1EF3BF8160226E5826992112@IA1PR11MB6219.namprd11.prod.outlook.com>
+References: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
+	<20260603183036.7c4762d2@kernel.org>
+	<IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
+	<20260604155422.167314ff@kernel.org>
+	<IA1PR11MB6219C1EF3BF8160226E5826992112@IA1PR11MB6219.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,50 +86,61 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295995-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295994-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:ernis@linux.microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 99B3E64BC16
+X-Rspamd-Queue-Id: AE4E864BCD1
 
-On Thu, 4 Jun 2026 22:29:29 -0700 Erni Sri Satya Vennela wrote:
-> I tried two netdev_lock-based variants. 
+On Fri, 5 Jun 2026 16:10:19 +0000 Nitka, Grzegorz wrote:
+> Hi Kuba. Just submitted v13.
 > 
-> mana_query_link_cfg() has four callers:
+> It includes the following fixes for pre-existing issues:
+>   - dpll core fixes. Each AI review concern (3) is addressed in separate
+>     commit. If you think it's better to squash them, let me know (however
+>     it addresses issues from two different 'old' commits).
+>     Also, the hint form AI  to use different dpll xa_array (parent not pin) to
+>     address one of the issues, it simply does not work (WARNING flood observed,
+>     more details in patch 3/11)
+>   - ice driver fix for potential hung on flush_workqueue in error path for FW node pins
 > 
-> 1 ethtool ioctl/netlink			- has RTNL	- has netdev->lock
-> 2 sysfs speed_show/duplex_show		- has RTNL	- no netdev->lock
-> 3 netvsc_get_link_ksettings VF forward	- has RTNL	- no netdev->lock
-> 4 mana_shaper_set			- no RTNL	- has netdev->lock
-> 
-> No existing lock covers all four.
+> As you noted, two other pre-existing issues are covered by ICE_FLAG_DPLL.
+> I left the code as it is for those concerns.
+> There is one more pre-existing one, related to ice_ptp_link_change. As the fix seems to be
+> rather simple one, I believe I need more time for more comprehensive testing.
+> So my preference is to go with standard fix-path on 'net'.
 
-How fresh is your tree? The just-minted commit 9f275c2e9020 should
-address the gap, I believe?
+SG, thanks!
+
+BTW either you or Arkadiusz should chime in on the NCO thread, please:
+https://lore.kernel.org/all/20260531194423.383366-2-ivecera@redhat.com/
+Shouldn't take much time to express an opinion, I hope.
 
