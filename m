@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295709-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LvczDcGDImpHZgEAu9opvQ
-	(envelope-from <netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:07:29 +0200
+	id ooq/M7aAImpWZAEAu9opvQ
+	(envelope-from <netdev+bounces-295709-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:54:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA6C64642C
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:07:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F69D6462C7
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:54:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=WSSGsK92;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=bbsfis8i;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295709-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295709-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49F4A3174720
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:46:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F137130F3842
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB5348A2BF;
-	Fri,  5 Jun 2026 07:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E8247CC8D;
+	Fri,  5 Jun 2026 07:44:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844DE481FCA;
-	Fri,  5 Jun 2026 07:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436A34611C7;
+	Fri,  5 Jun 2026 07:44:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780645497; cv=none; b=TKlyMXI/R9CqmJj1hybdK0h0+5oZ1bDwVa4RjdH6gqysfmDfs2uLyodODJuxnsNZuOK7DALKQzr7cwx8vx88/emDDpAf7UNT0R1rW+B9CpzW3qqDjWfs2JhdWGFUNhyZYDYXehHWLXp1XPEOTgieXvqaULjCubkovjRKCOrDsgU=
+	t=1780645492; cv=none; b=alxPczsxzYtCeedmTTMHxtjlA0RNOA+z8TLw2DXKnygW6m5hJbxlIv00LfKYsYO244z0UPGlzIKXvvG4bheM80PorsyG3qVor6B3UTLu/FVUMj1V2SDNUtMzKnmtRTm0y3LvDvHIU6YcMypIsyV2W5EYBk+ncheckhTFjBRbBwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780645497; c=relaxed/simple;
-	bh=T4B7H85vrvd5LrFha4O8snmkpPt3uAYMiFPtIBi1GXM=;
+	s=arc-20240116; t=1780645492; c=relaxed/simple;
+	bh=w05mEsXyfNgZIGJQeRXMcA76h/pV9AUQDIx87EaLqIg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WzGuRFM6/Y5btDk2Xjug38AmxFnzudQ7qwu1ZGxwT2Q9bq/cEuv/NOryKmPaCR47EozPES5CV5JQPufTBS/UF/sTFRgnOU1snnilKVH5QuoZS7BB4+5oTAiBq2fmdzJ5CEnp04yPvT5pUkuIfqKGTw5lPmaERMWqIdfxvS96uv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=WSSGsK92; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6557hUeW51221753, This message is accepted by code: ctloc85258
+	 MIME-Version:Content-Type; b=n2PPvrP69W9YqB+85cvr8SoIIZORBLgy1zORD7isci+phVvUuQwyZyhTWOT6t28Us/Jy0qctXvXDNtg+76cCGAvsSQXF2/EY3jjP/QeEcfRAdEFFYT1uHDpkzCEIoNJfvtes3ZN4xMDvmocRy6TmBEdcvBw4DmHhth91B/Cavo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=bbsfis8i; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6557hVeU51221753, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
 	s=dkim; t=1780645411;
-	bh=nWzts/H4wwuI5TljBKGOGaj/2CwHAdU2rSYQgB7LJbk=;
+	bh=FljCfBWZt6zmGyfGbiRa8WrQSdumbJidxYols3nxfW4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=WSSGsK92N/CcWIPxdkM/o04OoQGctJ+JaYSZQaenAVR9BZiretChwtzPSugQoJiiL
-	 sSS1MEIiJ5o3iMuJl/0MwAffodmVxiRGgqrzxPGgFT7llcC9DGtsgdBgemah6v7zJB
-	 lAnwT/g/oViD6AM35TAAM5LiLHnbEIO+1h5i45NY9/j6UqY7Mq0TlYj6Ocddx8NSUR
-	 cOr5FxQVoEM+cU11N14ftvW5UcoGOYEW08BE5LYnR1leT3I0qBwVR7Brqtr387Yj5X
-	 Yc21sd5iRP2cRdsnrBKB8t1GqJ8JvaZzkAybPAa9BoeB3XIrIDJ3jDRD8QyFUGtblO
-	 yUt6sfx6ihdyw==
+	b=bbsfis8ikkOEgKOcS1cG3Z5MOuqVGtwW2FxPzehU9sAsqarDPY/HSeZsP0Xq7q+J3
+	 hnHcOWyIk1k7pzorND6wdMIdKZND5AiaNUEXQanQEwL8bi+t1K81QJHbjbVLK5PkiV
+	 klbcqvCng2XiLs8PmdPNnZO093kBpMLb9Pz01deU+4aX176ulTe5oEg3ZWn5vXKqmM
+	 dSHJiCcnB4N4hcKcQYRAWIKIYr0U6ybKIu++UMQFCAAV6fBTruHTx1T/0h6kkqaXb3
+	 PNtD7+fCbbmm5St1W7Op4dP9+8G46skhQ0mwSB6WIfSI0GxpZuAGrTpBPSyKmnbzt5
+	 51fXO0OhOAzMw==
 Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6557hUeW51221753
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6557hVeU51221753
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
 	Fri, 5 Jun 2026 15:43:31 +0800
 Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
@@ -64,9 +64,9 @@ To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v3 2/4] net: phy: c45: add genphy_c45_an_setup_master_slave()
-Date: Fri, 5 Jun 2026 15:43:26 +0800
-Message-ID: <20260605074328.1800-3-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v3 3/4] net: phy: realtek: add support for RTL8261C_CG
+Date: Fri, 5 Jun 2026 15:43:27 +0800
+Message-ID: <20260605074328.1800-4-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260605074328.1800-1-javen_xu@realsil.com.cn>
 References: <20260605074328.1800-1-javen_xu@realsil.com.cn>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295712-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295709-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -108,113 +108,229 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7BA6C64642C
+X-Rspamd-Queue-Id: 1F69D6462C7
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-Add a generic helper to configure forced master/slave mode for Clause 45
-PHYs using the 10GBASE-T AN control register.
+This patch adds support for Realtek phy chip RTL8261C_CG. Its PHY ID is
+0x001cc898.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
 Changes in v2:
- - no changes, new file
+ - remove RTL8261D, only support RTL8261C_CG
+ - remove speed 500, rarely used
+ - add helper function, genphy_c45_soft_reset() and genphy_c45_config_master_slave()
 
 Changes in v3:
- - re-order function according to the order in phy-c45.c
- - add kernel-doc about return value
- - add MASTER_SLAVE_CFG_MASTER_PREFERRED,
-   MASTER_SLAVE_CFG_SLAVE_PREFERRED, MASTER_SLAVE_CFG_UNKNOWN,
-   MASTER_SLAVE_CFG_UNSUPPORTED, MASTER_SLAVE_CFG_SLAVE_PREFERRED cfg
+ - remove macro RTL8261X_GBCR_REG
+ - remove priv struct and priv->sub_phy_id
 ---
- drivers/net/phy/phy-c45.c | 42 +++++++++++++++++++++++++++++++++++++++
- include/linux/phy.h       |  1 +
- include/uapi/linux/mdio.h |  3 +++
- 3 files changed, 46 insertions(+)
+ drivers/net/phy/realtek/realtek_main.c | 166 +++++++++++++++++++++++++
+ 1 file changed, 166 insertions(+)
 
-diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index d8a83179ec40..28cb173ff7aa 100644
---- a/drivers/net/phy/phy-c45.c
-+++ b/drivers/net/phy/phy-c45.c
-@@ -406,6 +406,48 @@ int genphy_c45_soft_reset(struct phy_device *phydev)
- }
- EXPORT_SYMBOL_GPL(genphy_c45_soft_reset);
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 27268811f564..f7b07f38f0c1 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -141,6 +141,10 @@
+ #define RTL8211F_PHYSICAL_ADDR_WORD1		17
+ #define RTL8211F_PHYSICAL_ADDR_WORD2		18
  
-+/**
-+ * genphy_c45_an_setup_master_slave - Configure Master/Slave setting for C45 PHYs
-+ * @phydev: target phy_device struct
-+ *
-+ * Description: Configure the forced or preferred Master/Slave role
-+ * 10GBASE-T control register (MMD 7, Register 0x0020) according to
-+ * IEEE 802.3 standards.
-+ *
-+ * Returns negative errno code on failure, 0 if Master/Slave didn't change,
-+ * or 1 if Master/Slave modes changed.
-+ */
-+int genphy_c45_an_setup_master_slave(struct phy_device *phydev)
-+{
-+	u16 ctl = 0;
++#define RTL8261X_EXT_ADDR_REG			0xa436
++#define RTL8261X_EXT_DATA_REG			0xa438
++#define RTL_8261X_SUB_PHY_ID_ADDR		0x801d
 +
-+	switch (phydev->master_slave_set) {
-+	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
-+		ctl = MDIO_AN_10GBT_CTRL_MS_PORT_TYPE;
+ #define RTL822X_VND1_SERDES_OPTION			0x697a
+ #define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
+ #define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
+@@ -251,6 +255,32 @@
+ #define RTL_8221B_VM_CG				0x001cc84a
+ #define RTL_8251B				0x001cc862
+ #define RTL_8261C				0x001cc890
++#define RTL_8261C_CG				0x001cc898
++
++#define RTL8261C_CE_MODEL		0x00
++#define RTL8261X_IMR			0xa4d2
++#define RTL8261X_ISR			0xa4d4
++#define RTL8261X_INT_AUTONEG_ERROR	BIT(0)
++#define RTL8261X_INT_PAGE_RECV		BIT(2)
++#define RTL8261X_INT_AUTONEG_DONE	BIT(3)
++#define RTL8261X_INT_LINK_CHG		BIT(4)
++#define RTL8261X_INT_PHY_REG_ACCESS	BIT(5)
++#define RTL8261X_INT_PME		BIT(7)
++#define RTL8261X_INT_ALDPS_CHG		BIT(9)
++#define RTL8261X_INT_JABBER		BIT(10)
++
++#define RTL8261X_INT_MASK_DEFAULT	(RTL8261X_INT_AUTONEG_DONE | \
++					 RTL8261X_INT_LINK_CHG)
++
++#define RTL8261X_INT_MASK_ALL		(RTL8261X_INT_AUTONEG_ERROR | \
++					 RTL8261X_INT_PAGE_RECV | \
++					 RTL8261X_INT_AUTONEG_DONE | \
++					 RTL8261X_INT_LINK_CHG | \
++					 RTL8261X_INT_PHY_REG_ACCESS | \
++					 RTL8261X_INT_PME | \
++					 RTL8261X_INT_ALDPS_CHG | \
++					 RTL8261X_INT_JABBER)
++
+ 
+ /* RTL8211E and RTL8211F support up to three LEDs */
+ #define RTL8211x_LED_COUNT			3
+@@ -310,6 +340,130 @@ static int rtl821x_modify_ext_page(struct phy_device *phydev, u16 ext_page,
+ 	return phy_restore_page(phydev, oldpage, ret);
+ }
+ 
++static int rtl8261x_probe(struct phy_device *phydev)
++{
++	struct device *dev = &phydev->mdio.dev;
++	int sub_phy_id, ret;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_ADDR_REG,
++			    RTL_8261X_SUB_PHY_ID_ADDR);
++	if (ret < 0)
++		return ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_DATA_REG);
++	if (ret < 0)
++		return ret;
++
++	sub_phy_id = (ret >> 8) & 0xff;
++
++	switch (sub_phy_id) {
++	case RTL8261C_CE_MODEL:
++		phydev_info(phydev, "RTL8261C detected (sub_id 0x%02x)\n", sub_phy_id);
 +		break;
-+	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
-+		break;
-+	case MASTER_SLAVE_CFG_MASTER_FORCE:
-+		ctl = MDIO_AN_10GBT_CTRL_MS_ENABLE | MDIO_AN_10GBT_CTRL_MS_VALUE;
-+		break;
-+	case MASTER_SLAVE_CFG_SLAVE_FORCE:
-+		ctl = MDIO_AN_10GBT_CTRL_MS_ENABLE;
-+		break;
-+	case MASTER_SLAVE_CFG_UNKNOWN:
-+	case MASTER_SLAVE_CFG_UNSUPPORTED:
-+		return 0;
++
 +	default:
-+		phydev_warn(phydev, "Unsupported Master/Slave mode\n");
-+		return -EOPNOTSUPP;
++		phydev_err(phydev, "Unknown sub_id 0x%02x\n", sub_phy_id);
++		return -ENODEV;
 +	}
 +
-+	return phy_modify_mmd_changed(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
-+				      MDIO_AN_10GBT_CTRL_MS_ENABLE |
-+				      MDIO_AN_10GBT_CTRL_MS_VALUE |
-+				      MDIO_AN_10GBT_CTRL_MS_PORT_TYPE, ctl);
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(genphy_c45_an_setup_master_slave);
 +
- /**
-  * genphy_c45_aneg_done - return auto-negotiation complete status
-  * @phydev: target phy_device struct
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 25a66320df56..a46f4d9a6155 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2310,6 +2310,7 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed);
- int genphy_c45_restart_aneg(struct phy_device *phydev);
- int genphy_c45_check_and_restart_aneg(struct phy_device *phydev, bool restart);
- int genphy_c45_soft_reset(struct phy_device *phydev);
-+int genphy_c45_an_setup_master_slave(struct phy_device *phydev);
- int genphy_c45_aneg_done(struct phy_device *phydev);
- int genphy_c45_read_link(struct phy_device *phydev);
- int genphy_c45_read_lpa(struct phy_device *phydev);
-diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
-index b2541c948fc1..ffca03fd82c9 100644
---- a/include/uapi/linux/mdio.h
-+++ b/include/uapi/linux/mdio.h
-@@ -332,6 +332,9 @@
- #define MDIO_AN_10GBT_CTRL_ADV2_5G	0x0080	/* Advertise 2.5GBASE-T */
- #define MDIO_AN_10GBT_CTRL_ADV5G	0x0100	/* Advertise 5GBASE-T */
- #define MDIO_AN_10GBT_CTRL_ADV10G	0x1000	/* Advertise 10GBASE-T */
-+#define MDIO_AN_10GBT_CTRL_MS_ENABLE	0x8000	/* Master/slave manual config enable */
-+#define MDIO_AN_10GBT_CTRL_MS_VALUE	0x4000	/* Master/slave config value (1=Master) */
-+#define MDIO_AN_10GBT_CTRL_MS_PORT_TYPE	0x2000	/* Master Preferred Type */
++static int rtl8261x_get_features(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = genphy_c45_pma_read_abilities(phydev);
++	if (ret)
++		return ret;
++	/*
++	 * Supplement Multi-Gig speeds that may not be automatically detected
++	 * RTL8261X supports 2.5G/5G in addition to standard 10G
++	 */
++	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++			 phydev->supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++			 phydev->supported);
++
++	return 0;
++}
++
++static int rtl8261x_config_intr(struct phy_device *phydev)
++{
++	int ret;
++
++	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
++		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_ISR);
++		if (ret < 0)
++			return ret;
++
++		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_IMR,
++				    RTL8261X_INT_MASK_DEFAULT);
++		if (ret < 0)
++			return ret;
++	} else {
++		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_IMR, 0);
++		if (ret < 0)
++			return ret;
++	}
++
++	return 0;
++}
++
++static irqreturn_t rtl8261x_handle_interrupt(struct phy_device *phydev)
++{
++	int irq_status;
++
++	irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_ISR);
++	if (irq_status < 0) {
++		phy_error(phydev);
++		return IRQ_NONE;
++	}
++
++	if (!(irq_status & RTL8261X_INT_MASK_ALL))
++		return IRQ_NONE;
++
++	if (irq_status & (RTL8261X_INT_LINK_CHG | RTL8261X_INT_AUTONEG_DONE |
++	    RTL8261X_INT_AUTONEG_ERROR | RTL8261X_INT_JABBER))
++		phy_trigger_machine(phydev);
++
++	return IRQ_HANDLED;
++}
++
++static int rtl8261x_config_aneg(struct phy_device *phydev)
++{
++	bool changed = false;
++	u16 adv_1g = 0;
++	int ret;
++
++	if (phydev->autoneg == AUTONEG_DISABLE)
++		return genphy_c45_pma_setup_forced(phydev);
++
++	ret = genphy_c45_an_setup_master_slave(phydev);
++	if (ret < 0)
++		return ret;
++	if (ret > 0)
++		changed = true;
++
++	ret = genphy_c45_config_aneg(phydev);
++	if (ret < 0)
++		return ret;
++
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
++			      phydev->advertising))
++		adv_1g = ADVERTISE_1000FULL;
++
++	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND2,
++				     RTL822X_VND2_C22_REG(MII_CTRL1000),
++				     ADVERTISE_1000FULL, adv_1g);
++	if (ret < 0)
++		return ret;
++	if (ret > 0 || changed)
++		return genphy_c45_restart_aneg(phydev);
++
++	return 0;
++}
++
+ static int rtl821x_probe(struct phy_device *phydev)
+ {
+ 	struct device *dev = &phydev->mdio.dev;
+@@ -3001,6 +3155,18 @@ static struct phy_driver realtek_drvs[] = {
+ 		.resume		= genphy_resume,
+ 		.read_mmd	= genphy_read_mmd_unsupported,
+ 		.write_mmd	= genphy_write_mmd_unsupported,
++	}, {
++		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
++		.name			= "Realtek RTL8261C 10Gbps PHY",
++		.probe			= rtl8261x_probe,
++		.get_features		= rtl8261x_get_features,
++		.config_aneg		= rtl8261x_config_aneg,
++		.read_status		= genphy_c45_read_status,
++		.config_intr		= rtl8261x_config_intr,
++		.handle_interrupt	= rtl8261x_handle_interrupt,
++		.soft_reset		= genphy_c45_soft_reset,
++		.suspend		= genphy_c45_pma_suspend,
++		.resume			= genphy_c45_pma_resume,
+ 	},
+ };
  
- /* AN 10GBASE-T status register. */
- #define MDIO_AN_10GBT_STAT_LP2_5G	0x0020  /* LP is 2.5GBT capable */
 -- 
 2.43.0
 
