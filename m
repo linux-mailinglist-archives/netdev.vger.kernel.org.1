@@ -1,77 +1,63 @@
-Return-Path: <netdev+bounces-295500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DrNGB7oYImrMSQEAu9opvQ
-	(envelope-from <netdev+bounces-295500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:30:50 +0200
+	id 7qEQIxAfImrHSgEAu9opvQ
+	(envelope-from <netdev+bounces-295501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:57:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352EE6441E2
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:30:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E67676442C3
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:57:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=d7QJCkH8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295500-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295500-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295501-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295501-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=microsoft.com (policy=reject);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8077E301F82C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 00:30:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A92F2302AC1D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 00:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBED242D84;
-	Fri,  5 Jun 2026 00:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B076824466C;
+	Fri,  5 Jun 2026 00:57:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A78526E173
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 00:29:47 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4010A1C695;
+	Fri,  5 Jun 2026 00:57:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780619388; cv=none; b=O0XPYltp2lidVdCI4/leoYYlM6IAz1hgezg5apvmpnhcXivbeXD/ZovtipgzDuls0jJnEPvIpyk/3S+UqbC9SxaLgM6ewmlUrqQNDIacSl3cfAQBHMjERmVXFCWuucDgqilUBBCDD3prB0BU8IXhVhoo0Z2yiMiD5jwRZMh3mCo=
+	t=1780621058; cv=none; b=UAI1FRcr1ZmZq736FojMgGpvW3CaedOC3ZYzhsuvuAWJ/FKgYvCSwQ11Z4GR5IP6wWN1VUFXsTjkVvP/szuRpOq860EQ7KiWiXO6PZCKPP0K+11ebPq49h+u+L6Zj/+k3mfynt4JC4ZwSeTGl3clRDvw77Epg1qtRSm9QgFB0aU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780619388; c=relaxed/simple;
-	bh=Cf/N1zvK1k2FuBPK7Fvx3R7iJEvHK3g/9gb41dDNYx4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f8RtZlgChOG6Fodai95RtltWAavr9oaa4pPd2QBy1dnTdeo7S9UrZGgCIah7V9QkTDmIkuFtMHNASm2/jhz5SyYFQYQtrOv7h+fN6aiBxk7y5kJ1bGO5cAmIYe9IIQmNQK0GySJ/svvAXJAb/2cOKP9R/dKuHoe112r+35rIlCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7QJCkH8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D5D91F00898;
-	Fri,  5 Jun 2026 00:29:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780619387;
-	bh=XEqiLDpRGahY0GJ6J32/FBRA+G8TZe2KzBFHo1LnWQM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=d7QJCkH8rQAm7MDVrs+IXDS7lq4WLkH1jNoLjgJIu6makXHbFvFdDwC1PdFxyPAfE
-	 VfcAQ84N8R/UNDC0HTccoAieg/AGtctyBpznlXO6Qi8uZERZgQTgEFEOZaruN85p1r
-	 fsS2tbpRIrv5LMiAuYjPaaXnnqyIbfmNYRoFBdRXoffqvLAWL9ekRKbJupQY+TewDf
-	 6ldNb8AY/1123AhxM+nqcaVunh2pmvRiruNIvyz5CHbtQMRJ9kVlL4zbIIR8/MzeAn
-	 73QafUuOgNRlRE9Bf4Rn8McufVxrmowRH/Nddy2DYtTvqnaig7InXe6BK0OX8Q2pYS
-	 SrXMfy+QY6U6w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	michael.chan@broadcom.com,
-	hkallweit1@gmail.com,
-	maxime.chevallier@bootlin.com,
-	joshwash@google.com,
-	tariqt@nvidia.com,
-	alexanderduyck@fb.com,
-	willemb@google.com,
-	jacob.e.keller@intel.com,
-	kory.maincent@bootlin.com,
-	sdf.kernel@gmail.com,
-	jakub@cloudflare.com,
-	nb@tipi-net.de,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 12/12] docs: net: ethtool: document ops-locked drivers and op_needs_rtnl
-Date: Thu,  4 Jun 2026 17:29:12 -0700
-Message-ID: <20260605002912.3456868-13-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260605002912.3456868-1-kuba@kernel.org>
-References: <20260605002912.3456868-1-kuba@kernel.org>
+	s=arc-20240116; t=1780621058; c=relaxed/simple;
+	bh=jszyRrYiL96XU6G1BbKnPnxd9Zpxbplb2qCmzqkVUOA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QgRxvtzaubqfI+CDycgYCgwiBCCJGlQ41dBDAwCup4J/5LEZx8Wu8epFFI8cMDYbtTzZ5n54nAWro8LvJml2/7WNwMuA2cEoWlxixVcTvueCHcsBST7oEIzBY9SVITJhniwA4KcEe0ItB5gQsu13tYDpz2ZmbMLP5PTY/zgpWyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 1677A20B7169; Thu,  4 Jun 2026 17:57:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1677A20B7169
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	shradhagupta@linux.microsoft.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v12 0/6] net: mana: Per-vPort EQ and MSI-X management
+Date: Thu,  4 Jun 2026 17:57:09 -0700
+Message-ID: <20260605005717.2059954-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,128 +66,232 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295500-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:joshwash@google.com,m:tariqt@nvidia.com,m:alexanderduyck@fb.com,m:willemb@google.com,m:jacob.e.keller@intel.com,m:kory.maincent@bootlin.com,m:sdf.kernel@gmail.com,m:jakub@cloudflare.com,m:nb@tipi-net.de,m:kuba@kernel.org,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:longli@microsoft.com,m:kotaranov@microsoft.com,m:kuba@kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:jgg@ziepe.ca,m:leon@kernel.org,m:haiyangz@microsoft.com,m:kys@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:shradhagupta@linux.microsoft.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-hyperv@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,gmail.com,bootlin.com,nvidia.com,fb.com,intel.com,cloudflare.com,tipi-net.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-295501-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 352EE6441E2
+X-Rspamd-Queue-Id: E67676442C3
 
-Catch up various bits of documentation after the locking changes.
+This series moves EQ ownership from the shared mana_context to per-vPort
+mana_port_context, enabling each vPort to have dedicated MSI-X vectors
+when the hardware provides enough vectors. When vectors are limited, the
+driver falls back to sharing MSI-X among vPorts.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- Documentation/networking/netdev-features.rst |  7 +++++++
- Documentation/networking/netdevices.rst      | 17 ++++++++++-------
- include/linux/ethtool.h                      | 10 ++++++++--
- 3 files changed, 25 insertions(+), 9 deletions(-)
+The series introduces a GDMA IRQ Context (GIC) abstraction with reference
+counting to manage interrupt context lifecycle. This allows both Ethernet
+and RDMA EQs to dynamically acquire dedicated or shared MSI-X vectors at
+vPort creation time rather than pre-allocating all vectors at probe time.
 
-diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
-index 6293d47e5b09..f9e1f3921f53 100644
---- a/Documentation/networking/netdev-features.rst
-+++ b/Documentation/networking/netdev-features.rst
-@@ -76,6 +76,13 @@ netdev instance lock, that lock must be held as well. This should not be
- done from ndo_*_features callbacks. netdev->features should not be modified
- by driver except by means of ndo_fix_features callback.
- 
-+For "ops locked" drivers (see Documentation/networking/netdevices.rst),
-+ethtool callbacks that may end up invoking netdev_update_features() must
-+opt back into rtnl_lock by setting the matching ETHTOOL_OP_NEEDS_RTNL_*
-+bit in ``ethtool_ops::op_needs_rtnl``. The ethtool core then keeps
-+rtnl_lock held across those SET callbacks so the contract above still
-+holds.
-+
- ndo_features_check is called for each skb before that skb is passed to
- ndo_start_xmit. Driver may perform any non-trivial checks (e.g. exact
- header geometry / length) and withdraw features like HW_CSUM or TSO,
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 8fc96975b3bd..fde601acd1d2 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -351,10 +351,6 @@ virtual and the physical device. To prevent deadlocks, the virtual device's
- lock must always be acquired before the physical device's (see
- ``netdev_nl_queue_create_doit``).
- 
--In the future, there will be an option for individual
--drivers to opt out of using ``rtnl_lock`` and instead perform their control
--operations directly under the netdev instance lock.
--
- Device drivers are encouraged to rely on the instance lock where possible.
- 
- For the (mostly software) drivers that need to interact with the core stack,
-@@ -375,9 +371,16 @@ the instance lock.
- struct ethtool_ops
- ------------------
- 
--Similarly to ``ndos`` the instance lock is only held for select drivers.
--For "ops locked" drivers all ethtool ops without exceptions should
--be called under the instance lock.
-+For non-"ops locked" drivers ethtool_ops are executed under ``rtnl_lock``.
-+
-+For "ops locked" drivers, ``ethtool_ops``, unlike ``ndos``, run under
-+the instance lock **only**. Drivers may request that ``rtnl_lock``
-+is held around specific operations (both SET and GET) by setting
-+appropriate bits in ``ethtool_ops::op_needs_rtnl`` (if the necessary
-+``ETHTOOL_OP_NEEDS_RTNL_*`` bit doesn't exist, just add it).
-+Commonly used core helpers which force drivers to selectively opt-in to
-+``rtnl_lock`` protection include ``netdev_update_features()``,
-+``netif_set_real_num_tx_queues()``, and phylink helpers.
- 
- struct netdev_stat_ops
- ----------------------
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index da29017c757f..1b834e2a522e 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -1177,8 +1177,14 @@ struct kernel_ethtool_ts_info {
-  * @get_mm_stats: Query the 802.3 MAC Merge layer statistics.
-  *
-  * All operations are optional (i.e. the function pointer may be set
-- * to %NULL) and callers must take this into account.  Callers must
-- * hold the RTNL lock or netdev instance lock (see @op_needs_rtnl).
-+ * to %NULL) and callers must take this into account.
-+ *
-+ * For traditional drivers callers hold ``rtnl_lock`` across the call.
-+ * For "ops locked" drivers (see Documentation/networking/netdevices.rst)
-+ * callers instead hold the netdev instance lock (``netdev_lock_ops``);
-+ * ``rtnl_lock`` is additionally held only for callbacks for which
-+ * the driver opts in via the matching ``ETHTOOL_OP_NEEDS_RTNL_*`` bit
-+ * in @op_needs_rtnl.
-  *
-  * See the structures used by these operations for further documentation.
-  * Note that for all operations using a structure ending with a zero-
+This series is intended to go through the net-next tree.
+
+The following changes since commit 93790c374b9d77f3db15786d7d432872d92751cf:
+
+  net/mlx5: convert miss_list allocation to kvmalloc_array() (2026-06-04 09:33:24 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/longlimsft/linux.git tags/mana-eq-msi-v12
+
+for you to fetch changes up to 18505b11dcf052442cdeba5e208a85219776206a:
+
+  RDMA/mana_ib: Allocate interrupt contexts on EQs (2026-06-05 00:26:56 +0000)
+
+Changes in v12:
+- Restrict each vport to a single RSS QP. The hardware only supports
+  one steering config per vport, and destroy disables RX globally.
+  Previously a second RSS QP would silently overwrite the first.
+  Track via pd->has_rss_qp under vport_mutex (patch 1)
+- Validate comp_vector against per-vPort EQ count with modulo mapping.
+  Document the rationale: when RDMA-advertised num_comp_vectors exceeds
+  the port's num_queues, the vector is remapped to an available EQ
+  rather than failing QP creation (patch 1)
+- Extend channel_changing serialization to the async per-port queue
+  reset handler, preventing RDMA from claiming the vport during
+  the reset detach/attach window (patch 1)
+- Fix HW vport registration leak: roll back
+  mana_pf_register_hw_vport() when mana_cfg_vport() fails in
+  mana_create_vport() (patch 1)
+- Cap num_ports to MAX_PORTS_IN_MANA_DEV before the per-vPort MSI-X
+  budget calculation so it matches the port count that is later
+  instantiated by mana_probe() (patch 2)
+- Use a local msi variable in mana_gd_setup_irqs() and
+  mana_gd_setup_dyn_irqs() to decouple the loop counter from
+  the callee-updated mana_gd_get_gic() parameter (patch 4)
+- Add WARN_ON(!xa_empty()) assertion in mana_gd_remove_irqs()
+  before pci_free_irq_vectors() to catch leaked GIC references
+  (patch 4)
+- Log gc->max_num_queues_vport (per-vPort value) instead of
+  gc->max_num_queues (global) in the MSI sharing mode message,
+  use %u format specifiers (patch 2)
+- Clarify comment about MANA_DEF_NUM_QUEUES clamping vs hardware
+  max precedence (patch 2)
+- Rebase onto net-next/main (2026-06-04)
+
+Changes in v11:
+- Address AI reviewer feedback from Paolo on patch 1: add cross-port
+  PD-sharing check in mana_ib_create_qp_rss() to match the guard
+  already present in mana_ib_cfg_vport(), preventing NULL deref on
+  mpc->eqs when an RSS QP is created on a different port than the
+  PD's bound port (patch 1)
+- Document that pd->vport_port is only valid when vport_use_count > 0
+  in the struct mana_ib_pd comment, as suggested by the AI reviewer
+  (patch 1)
+- Propagate actual error code from mana_ib_cfg_vport() instead of
+  hardcoding -ENODEV in the raw QP creation path (patch 1)
+- Switch mana_gd_get_gic() from returning NULL to IS_ERR/PTR_ERR on
+  failure so callers can propagate the actual error code (-ENOSPC,
+  -ENOMEM, etc.) instead of always returning -ENOMEM (patch 3)
+- Update all mana_gd_get_gic() callers (patches 2, 4, 5, 6) to use
+  IS_ERR()/PTR_ERR() error checking
+- Set *msi_requested after pci_msix_alloc_irq_at() returns the actual
+  assigned index, so the caller gets the correct MSI vector when
+  dynamic allocation remaps it (patch 3)
+- Add comments documenting the GIC refcount ownership contract in
+  mana_gd_register_irq() and mana_gd_deregister_irq() (patch 5)
+- Move the zero-port detection error message from mana_probe() to
+  mana_gd_query_max_resources() where the actual check occurs (patch 2)
+- Clamp apc->max_queues to gc->max_num_queues_vport in
+  mana_init_port() so that on resume, if max_num_queues_vport has
+  decreased, num_queues is reduced before EQ allocation (patch 2)
+
+Changes in v10:
+- Add channel_changing flag to block RDMA from grabbing the vport
+  during mana_set_channels() detach/attach window. The flag is checked
+  in mana_cfg_vport() only when called from the RDMA path via a new
+  check_channel_changing parameter (patch 1)
+- Bind each PD to a single physical port via pd->vport_port to prevent
+  cross-port PD sharing which would cause EQ scope mismatch. Returns
+  -EINVAL if a second port tries to use an already-bound PD (patch 1)
+- Guard gc->msi_sharing reset with pci_msix_can_alloc_dyn() to avoid
+  overwriting the non-dyn platform constraint set by
+  mana_gd_setup_hwc_irqs() (patch 2)
+
+Changes in v9:
+- RSS QPs now take a vport reference via pd->vport_use_count to ensure
+  EQs outlive all QP consumers. EQs are only destroyed when the last
+  QP (raw or RSS) on the PD releases its reference (patch 1)
+- Serialize mana_set_channels() against RDMA vport configuration via
+  apc->vport_mutex when the port is down. When the port is up, Ethernet
+  owns the vport exclusively so no locking is needed (patch 1)
+- Change WARN_ON(apc->eqs) to bail out with -EEXIST to prevent
+  leaking prior EQ array if invariant is violated (patch 1)
+- Only commit pd->tx_shortform_allowed and pd->tx_vp_offset after
+  mana_create_eq() succeeds (patch 1)
+- Reset gc->msi_sharing at the top of mana_gd_query_max_resources()
+  so it is recomputed from current hardware state on resume (patch 2)
+- Fix reverse Christmas tree variable declaration ordering (patches
+  1, 3, 5)
+
+Changes in v8:
+- Fix comment to reference per-vPort queue count instead of
+  gc->max_num_queues (patch 2)
+- Remove duplicate irq_update_affinity_hint() calls from error paths
+  and mana_gd_remove_irqs(); the clearing is now centralized in
+  mana_gd_put_gic() (patch 4)
+- Note the IRQ name change (mana_q -> mana_msi) in the commit
+  message (patch 4)
+- Remove dead conditional write to spec.eq.msix_index (patch 5)
+- Document GIC ownership contract and msix_index invariant change
+  in commit message (patch 5)
+- Populate eq.irq on RDMA EQs for consistency with the Ethernet
+  path (patch 6)
+- Document BIT(6) relocation and capability flag semantics in
+  commit message (patch 6)
+- Fix checkpatch --strict alignment and line length warnings
+
+Changes in v7:
+- Use rounddown_pow_of_two() instead of roundup_pow_of_two() when
+  computing per-vPort queue count to avoid unnecessarily forcing shared
+  MSI-X mode (patch 2)
+- Call mana_gd_setup_remaining_irqs() unconditionally to ensure
+  irq_contexts are populated in both dedicated and shared MSI-X modes,
+  fixing bisectability between patches 2 and 5 (patch 2)
+- Guard ibdev_dbg() in mana_ib_cfg_vport() with error check so the
+  vport handle is not logged on the failure path (patch 1)
+- Use cached gic->irq instead of pci_irq_vector() lookup in
+  mana_gd_put_gic() for consistency with the allocation path (patch 3)
+- Fix unsigned int* to int* pointer type mismatch when calling
+  mana_gd_get_gic() by using a local int variable for the MSI index
+  (patches 5, 6)
+
+Changes in v6:
+- Rebased on net-next/main (v7.1-rc1)
+
+Changes in v5:
+- Rebased on net-next/main
+
+Changes in v4:
+- Rebased on net-next/main 7.0-rc4
+- Patch 2: Use MANA_DEF_NUM_QUEUES instead of hardcoded 16 for
+  max_num_queues clamping
+- Patch 3: Track dyn_msix in GIC context instead of re-checking
+  pci_msix_can_alloc_dyn() on each call; improved remove_irqs iteration
+  to skip unallocated entries
+
+Changes in v3:
+- Rebased on net-next/main
+- Patch 1: Added NULL check for mpc->eqs in mana_ib_create_qp_rss() to
+  prevent NULL pointer dereference when RSS QP is created before a raw QP
+  has configured the vport and allocated EQs
+
+Changes in v2:
+- Rebased on net-next/main (adapted to kzalloc_objs/kzalloc_obj macros,
+  new GDMA_DRV_CAP_FLAG definitions)
+- Patch 2: Fixed misleading comment for max_num_queues vs
+  max_num_queues_vport in gdma.h
+- Patch 3: Fixed spelling typo in gdma_main.c ("difference" -> "different")
+
+Long Li (6):
+  net: mana: Create separate EQs for each vPort
+  net: mana: Query device capabilities and configure MSI-X sharing for
+    EQs
+  net: mana: Introduce GIC context with refcounting for interrupt
+    management
+  net: mana: Use GIC functions to allocate global EQs
+  net: mana: Allocate interrupt context for each EQ when creating vPort
+  RDMA/mana_ib: Allocate interrupt contexts on EQs
+
+ drivers/infiniband/hw/mana/main.c             |  83 +++-
+ drivers/infiniband/hw/mana/mana_ib.h          |  14 +
+ drivers/infiniband/hw/mana/qp.c               |  68 +++-
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 359 +++++++++++++-----
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 198 ++++++----
+ .../ethernet/microsoft/mana/mana_ethtool.c    |  23 +-
+ include/net/mana/gdma.h                       |  33 +-
+ include/net/mana/mana.h                       |  15 +-
+ 8 files changed, 604 insertions(+), 189 deletions(-)
+
+
+base-commit: 93790c374b9d77f3db15786d7d432872d92751cf
 -- 
-2.54.0
+2.43.0
 
 
