@@ -1,510 +1,184 @@
-Return-Path: <netdev+bounces-295885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mx4rO2z0ImrZfgEAu9opvQ
-	(envelope-from <netdev+bounces-295885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:08:12 +0200
+	id E0SECG7zImqUfgEAu9opvQ
+	(envelope-from <netdev+bounces-295886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:03:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E80A76499BA
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:08:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 731D2649907
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:03:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=G2LIbeMo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295885-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295885-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=linux-foundation.org header.s=google header.b=NDV8lzCh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295886-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295886-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5FC5130151BC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 15:50:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A56C1307FC3E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 15:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7528337B41C;
-	Fri,  5 Jun 2026 15:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40403E0236;
+	Fri,  5 Jun 2026 15:54:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A650937B023
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 15:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1573E5A05
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 15:54:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780674640; cv=none; b=eC/OXWHLHrEdqEo6ztpOoDO6eVQDz9a/PnIB8jA9peMaY5Fq3fzqFmN4osh7TtbnbwhIOQIrQ41r+1gxwEl7y59Us4WISIfnlPa5hOmIGVDgMqoX0yo4bJfTmMTCfJum9Sp9+iNTNaC9iIl3CRx7CGDBJJ1ssA92COxukkik218=
+	t=1780674872; cv=none; b=hwKG3W7VmQ6HXbVVAAq9JYKy4fshfGKuAABtr2P2wcc3Z7vLfVe39p6zTj0rYgYzynUt4PeYOtFDrBsmoIrQwf4ib0K1wPhYTGVdCkBpFgj5tfu7qcJ13L1m/3K2brbj/8aDdAUudW2ROGV8ZFqQA+6kLcjqfrt+04yF2yu8fk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780674640; c=relaxed/simple;
-	bh=K2iR71Lz8pyajEU/oWkyuGMme6cKtNn6NZu0FGdrXqE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uXKZlcBTu5dzgw3QDZc775+mPtazZnUh3kIwDHMuX7aPqrbQrVT0F39tdPrvPGSlOMkkWAmn6p98c0/85BNUQncWabdokZoFUDK9gMOZnHWMM+cZA5NEpL7u54kQyFY/q2DTE1r3PRc5lohz97ATu8B/mawZ2xT8S7LEY1qoQRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G2LIbeMo; arc=none smtp.client-ip=209.85.219.74
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8ccd3213beaso42907306d6.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 08:50:38 -0700 (PDT)
+	s=arc-20240116; t=1780674872; c=relaxed/simple;
+	bh=Fj3s5frbyB6TsqrxQjPY0GZVgFWhmiPiWsC9BqFUZ+A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VK4upyzKEkkv1gR5Gsq4xZwgIKuOCdS4cNO/lpfL2fJcpcNjhUYWRSdQhms/ADQcZQXAjrMDX7SkPfrskFMcsX58HVrDE14Ddrf+6xn8qU1YHkEUPN0q4KZb0kXO+XUrrA1GVbmPsy2pPCJf9rVb8JmLb98zEIdEcOf1RK/XqYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=NDV8lzCh; arc=none smtp.client-ip=209.85.218.45
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-bef47b1ac01so333379666b.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 08:54:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780674637; x=1781279437; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=opaO9Qy6PeHB1XuGQ1+OrP44QuAg4byUbrfbSy2Rp+s=;
-        b=G2LIbeMoFGU18/2W/gDFNUqfLII9ivaY8K4LeCV8cZ+LsTtfutZbE2pzJQ4PRiezuy
-         j5grDw4buulazCSoHUSmn962MNowp6RCuewRbxPfyApRJIHXKjXgwQpGQnpTA4oO3CJ2
-         jJ6ajSNqL/FAEGRa2IeMYf+jRL99w0X4Zu8ZoMVVAy7r81L1coZa/8ZzU/SFjLL48+MT
-         dlO8/G/tlFvh9nQPakrvnof9+1S5/HKObkFO1KXcxTUvJRF2gEiRt4Nqj//uVqLNAJbd
-         nkXCwEZL6lOhYPr6urJkshrQQJC7RYa0r6w4znCis/oz3XQ7mXnXy+nipJrhgrvjC6D7
-         /PWw==
+        d=linux-foundation.org; s=google; t=1780674866; x=1781279666; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1hPSWEkREGIx4yoYWkytVFmLCkNUDGfpLW+35vC71FY=;
+        b=NDV8lzChw4oKMyXkX9t5IqYYUJVCOTbJRWXrdeoBqfCJ9UZQyjtjuJtu9fzIq2hekM
+         ljZQVDEd7BscYS+U2Wmt5ID50BZgMNpKiouciRCfcgMIaAnQ3+XVDDTzpIBlUXWpFBHc
+         ECPsyTNrrD1IGyNRZsshdS1n9hzOF+PQcH4Xg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780674637; x=1781279437;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=opaO9Qy6PeHB1XuGQ1+OrP44QuAg4byUbrfbSy2Rp+s=;
-        b=OmgI1Ihkkpt6VoKlntHQpm9YIHSK8U1UcJOtxcR7yMiHYRh4zyU1X1d5+xXmC/KPJy
-         FwX1WJG8eyhFE8/qcxG+S3H907GsNflNo9SXbBn+Zu4Wt8ySb35mkmuQ1dKkbUsm6Lho
-         3q9oCM103dYIaBVsEQx7PaRuMsBacKHeOFGWbQg/RueJBK/HvPrcRf8H08tHKkKG27fz
-         qbNm2H/6T1rKleVTaySJL+fhzVP5+KzBXTKSa7+eGcHm6Svkz2/fi9U4LmBb9ArNvTsr
-         8IaL7q7AjZA31TD6fi1RY5+YHBogAPX4hNNj8HvvrogXhDfbiXlPwxJDopWsKKW0L4YI
-         /0wA==
-X-Forwarded-Encrypted: i=1; AFNElJ9q/SULUTj3Mlpyowk1jpNlw9Fedvi1606uf0DeByjOZclDliaGbAaDMXowtoi5R3zRzgSY/Is=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6PZ5iImQYfYrgSmQJcLvgU9jbb6xDLfwSaAMpPooSt1Igdnrh
-	fb4+tD+Yf7Aj5aw76/pld30TKV0Iky7Ur/9wnEguxOrOvvU3ZRaaObt9LLRiC79Ffzz4BGnW0GS
-	UDOggAGVzYUGsGw==
-X-Received: from qvbne16.prod.google.com ([2002:a05:6214:4250:b0:8cc:eb71:e396])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a0c:e98f:0:b0:8ca:2413:607a with SMTP id 6a1803df08f44-8cee5fe51ecmr50364946d6.5.1780674637343;
- Fri, 05 Jun 2026 08:50:37 -0700 (PDT)
-Date: Fri,  5 Jun 2026 15:50:34 +0000
+        d=1e100.net; s=20251104; t=1780674866; x=1781279666;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1hPSWEkREGIx4yoYWkytVFmLCkNUDGfpLW+35vC71FY=;
+        b=qRUKVPKOOeG7rvxCj5bg/Ogg3awBFzo4PjC6bYQgAd5omZ7x5RAHmBIvnxKuKIsPpl
+         wcCfYWcblMWWSZe6cGhR+E5yVhfMZKWb17xVZRZU/G3T4wibsMjqLkUQvVo7TNrqRIbP
+         aA1RO93zhXicnpToyqwxmlLh1uFxc16of2UDcEeoxgyiKXYQEcusXgOg0KTCLrO4C7MA
+         Wa1Qpsfym006HjDwNUH3PFwkgyBGYJTNsrqlLxJQy6tkwt9VYZvwwBA581QXUfUi/xGT
+         hCCwTSg+oFu092bLaPj6Vni1Z+lVX6KS0LxQaiPVGi17vgr2EOnt+gn3tC32f1ek4AV9
+         zctQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+U5iKcRv6B7O/SHhiauCyiA59Wecx7z6VZOuYzfj6b+YjG/miAHUN+Js31Ut2je+uwHl13+cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg278uLQ3pUGcMUqWOmUCzup/CMErOrfNY2LQcuVEZRyAIGZRa
+	Bx1+1QlkrTRoVOTMU998QDQsQD7Q6dMrjfEsXVJOP0yK4+1QyUnaLQ0S/Uqn6Keh4odeNw75ept
+	PZUuM2mlTKA==
+X-Gm-Gg: Acq92OEvTns1XY+CTobCh5WnY+1FuJE42L3v0w1qawHkY1LHMBihS2St1qn8YueLgW9
+	bHBmEBkzk+7UOfdWSkBUA1yenfCcpEEDWXsDPXcOMlAMLf7tFbC1NsEs2c9hUg1GtP880zlASo8
+	nVfq/ktUcK46Eiakc0iPXBNS5Vtsa/XxJ8dfkz04aH95vHcv/XEAZ7tN5Vjzlov7MRGWaOBVIqo
+	HkDnh6pAJq59Ro+qdDCvAM7wLwqAVro+KTVr+3igDypWqN1Zr0gxEyi5QwEoArywBnW9oUUJG4k
+	b6SeYHbomGM6jc8gKYl+/tOL5hOg1wmYVESvnkuKJNg70a6KWWhSBZAOfnewTVXcFCj8ND+bSjs
+	amax3AaAzoSrB1rAHkmUpyRnBVM4Hu6u2+S6Ywj3DTlW/78/Mhv7DJJliLurkopNr8xrMb9khYq
+	SEQ3vWhgyvgtqXQ+oG61JSYkaiACjN300/qdsvGVwH6YuIM9sPvOaoJAUiE9/2G1Hn9sjRelnFE
+	6ZPaHmXFQU=
+X-Received: by 2002:a17:906:9c96:b0:bec:de7b:163c with SMTP id a640c23a62f3a-bf3729333c5mr210144966b.35.1780674865794;
+        Fri, 05 Jun 2026 08:54:25 -0700 (PDT)
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com. [209.85.208.52])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf051770994sm485110966b.13.2026.06.05.08.54.25
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2026 08:54:25 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6877c719cb0so2841899a12.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 08:54:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/x8kLJc5KT0MhO6iNX59uxVIOkRbhdd1kmyG/prPUhIBzXOz/Y35OEA2HmLJvpcAACaD2ICrQ=@vger.kernel.org
+X-Received: by 2002:a17:907:741:b0:bef:d760:93ea with SMTP id
+ a640c23a62f3a-bf37234c965mr227182666b.30.1780674864895; Fri, 05 Jun 2026
+ 08:54:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
-Message-ID: <20260605155034.3844105-1-edumazet@google.com>
-Subject: [PATCH net-next] bonding: no longer rely on RTNL in bond_fill_info()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>
+MIME-Version: 1.0
+References: <f919874c-065e-48be-ac5b-300c4ab86d4e@samba.org>
+ <20260603211736.755139-1-safinaskar@gmail.com> <20260604100609.6b37f500@pumpkin>
+ <CAHk-=wjvb56qo27-axALOKCY-CjLsj9_294zeBovPVJaYm14dA@mail.gmail.com>
+ <20260604183829.63c35fd9@pumpkin> <CAHk-=wip3mwLOHOYJ9TtjDxOaq9YUXmuCg2AycyASGgeY6qqUw@mail.gmail.com>
+ <20260604223216.73468830@pumpkin> <CAHk-=wh1Avi8FGbWkt9k0Z-KXWB0spo5mQyowO8PB2sJ3unbkw@mail.gmail.com>
+ <87se71jps4.fsf@oldenburg.str.redhat.com>
+In-Reply-To: <87se71jps4.fsf@oldenburg.str.redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 5 Jun 2026 08:54:07 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjkZSAhxykvG6tQM5DnBoS30_XCKkYpCsQwEGcxJb=i3Q@mail.gmail.com>
+X-Gm-Features: AVVi8CdvqDsmiM-EYrTUflKR5aYKg4JuQO6h_hoIzVtXJtUhEM3tfPOlti75Shw
+Message-ID: <CAHk-=wjkZSAhxykvG6tQM5DnBoS30_XCKkYpCsQwEGcxJb=i3Q@mail.gmail.com>
+Subject: Re: [PATCH 2/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+To: Florian Weimer <fweimer@redhat.com>
+Cc: David Laight <david.laight.linux@gmail.com>, Askar Safin <safinaskar@gmail.com>, metze@samba.org, 
+	akpm@linux-foundation.org, axboe@kernel.dk, brauner@kernel.org, 
+	david@kernel.org, dhowells@redhat.com, hch@infradead.org, jack@suse.cz, 
+	linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, miklos@szeredi.hu, 
+	netdev@vger.kernel.org, patches@lists.linux.dev, pfalcato@suse.de, 
+	viro@zeniv.linux.org.uk, willy@infradead.org
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295885-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295886-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:fweimer@redhat.com,m:david.laight.linux@gmail.com,m:safinaskar@gmail.com,m:metze@samba.org,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DMARC_NA(0.00)[linux-foundation.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,jvosburgh.net,lunn.ch];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,samba.org,linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:email,jvosburgh.net:email]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E80A76499BA
+X-Rspamd-Queue-Id: 731D2649907
 
-Add READ_ONCE()/WRITE_ONCE() annotations on port->is_enabled.
-While this field is written under bond->mode_lock protection,
-is is read without this lock being held.
+On Fri, 5 Jun 2026 at 02:33, Florian Weimer <fweimer@redhat.com> wrote:
+>
+> * Linus Torvalds:
+>
+> > x86 really doesn't *care*. If the caller zero-extends or leaves high
+> > bits set randomly, according to the x86 ABI that's perfectly fine: the
+> > callee will only care about the low 32 bits. So the high bits are
+> > simply not relevant for the ABI.
+>
+> Please note that Clang does not implement the x86-64 ABI and requires
+> zero extension.  We see increasing problems from that, now that we have
+> more C code calling Rust code.
 
-Change bond_fill_info() to acquire RCU and use READ_ONCE()
-to read bond->params fields that can be updated concurrently
-from sysfs/procfs/rtnetlink.
+Uhhuh. But that is only specific to 'bool', right?
 
-Add const qualifiers to bond_uses_primary(), __agg_active_ports(),
-bond_option_active_slave_get_rcu(), bond_3ad_get_active_agg_info(),
-__bond_3ad_get_active_agg_info() helpers.
+If it were to have the same issue that powerpc(*) had - that 'unsigned
+int' has to be passed to functions with well-defined high bits - that
+would be bad.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
----
- drivers/net/bonding/bond_3ad.c     | 18 +++---
- drivers/net/bonding/bond_netlink.c | 90 ++++++++++++++++--------------
- drivers/net/bonding/bond_options.c |  4 +-
- include/net/bond_3ad.h             |  4 +-
- include/net/bonding.h              |  8 +--
- 5 files changed, 65 insertions(+), 59 deletions(-)
+And I'm pretty sure that clang doesn't do that.
 
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index 985ef66dc3331e89458c9951a222d140c2275fb9..090b13b1e83ae31c9dbca6ed92a7a62dfa17ed80 100644
---- a/drivers/net/bonding/bond_3ad.c
-+++ b/drivers/net/bonding/bond_3ad.c
-@@ -745,14 +745,14 @@ static void __set_agg_ports_ready(struct aggregator *aggregator, int val)
- 	}
- }
- 
--static int __agg_active_ports(struct aggregator *agg)
-+static int __agg_active_ports(const struct aggregator *agg)
- {
--	struct port *port;
-+	const struct port *port;
- 	int active = 0;
- 
- 	for (port = agg->lag_ports; port;
- 	     port = port->next_port_in_aggregator) {
--		if (port->is_enabled)
-+		if (READ_ONCE(port->is_enabled))
- 			active++;
- 	}
- 
-@@ -2782,11 +2782,11 @@ void bond_3ad_handle_link_change(struct slave *slave, char link)
- 	 * some of he adaptors(ce1000.lan) report.
- 	 */
- 	if (link == BOND_LINK_UP) {
--		port->is_enabled = true;
-+		WRITE_ONCE(port->is_enabled, true);
- 		ad_update_actor_keys(port, false);
- 	} else {
- 		/* link has failed */
--		port->is_enabled = false;
-+		WRITE_ONCE(port->is_enabled, false);
- 		ad_update_actor_keys(port, true);
- 	}
- 	agg = __get_first_agg(port);
-@@ -2857,13 +2857,13 @@ int bond_3ad_set_carrier(struct bonding *bond)
-  * Returns:   0 on success
-  *          < 0 on error
-  */
--int __bond_3ad_get_active_agg_info(struct bonding *bond,
-+int __bond_3ad_get_active_agg_info(const struct bonding *bond,
- 				   struct ad_info *ad_info)
- {
--	struct aggregator *aggregator = NULL, *tmp;
-+	const struct aggregator *aggregator = NULL, *tmp;
-+	const struct port *port;
- 	struct list_head *iter;
- 	struct slave *slave;
--	struct port *port;
- 
- 	bond_for_each_slave_rcu(bond, slave, iter) {
- 		port = &(SLAVE_AD_INFO(slave)->port);
-@@ -2886,7 +2886,7 @@ int __bond_3ad_get_active_agg_info(struct bonding *bond,
- 	return 0;
- }
- 
--int bond_3ad_get_active_agg_info(struct bonding *bond, struct ad_info *ad_info)
-+int bond_3ad_get_active_agg_info(const struct bonding *bond, struct ad_info *ad_info)
- {
- 	int ret;
- 
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index 90365d3f7ebff7f762b4cb10303a3dd3fdd49cc6..2d5558434c64ee5e1ef5144eae9287614cc16ac7 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -674,47 +674,45 @@ static size_t bond_get_size(const struct net_device *bond_dev)
- 		0;
- }
- 
--static int bond_option_active_slave_get_ifindex(struct bonding *bond)
-+static int bond_option_active_slave_get_ifindex_rcu(const struct bonding *bond)
- {
- 	const struct net_device *slave;
--	int ifindex;
- 
--	rcu_read_lock();
- 	slave = bond_option_active_slave_get_rcu(bond);
--	ifindex = slave ? slave->ifindex : 0;
--	rcu_read_unlock();
--	return ifindex;
-+	return slave ? slave->ifindex : 0;
- }
- 
- static int bond_fill_info(struct sk_buff *skb,
- 			  const struct net_device *bond_dev)
- {
--	struct bonding *bond = netdev_priv(bond_dev);
--	unsigned int packets_per_slave;
--	int ifindex, i, targets_added;
-+	const struct bonding *bond = netdev_priv(bond_dev);
-+	int ifindex, i, targets_added, miimon, mode;
-+	const struct slave *primary;
- 	struct nlattr *targets;
--	struct slave *primary;
- 
--	if (nla_put_u8(skb, IFLA_BOND_MODE, BOND_MODE(bond)))
-+	rcu_read_lock();
-+	mode = READ_ONCE(bond->params.mode);
-+	if (nla_put_u8(skb, IFLA_BOND_MODE, mode))
- 		goto nla_put_failure;
- 
--	ifindex = bond_option_active_slave_get_ifindex(bond);
-+	ifindex = bond_option_active_slave_get_ifindex_rcu(bond);
- 	if (ifindex && nla_put_u32(skb, IFLA_BOND_ACTIVE_SLAVE, ifindex))
- 		goto nla_put_failure;
- 
--	if (nla_put_u32(skb, IFLA_BOND_MIIMON, bond->params.miimon))
-+	miimon = READ_ONCE(bond->params.miimon);
-+	if (nla_put_u32(skb, IFLA_BOND_MIIMON, miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_UPDELAY,
--			bond->params.updelay * bond->params.miimon))
-+			READ_ONCE(bond->params.updelay) * miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_DOWNDELAY,
--			bond->params.downdelay * bond->params.miimon))
-+			READ_ONCE(bond->params.downdelay) * miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_PEER_NOTIF_DELAY,
--			bond->params.peer_notif_delay * bond->params.miimon))
-+			READ_ONCE(bond->params.peer_notif_delay) * miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, 1))
-@@ -729,8 +727,10 @@ static int bond_fill_info(struct sk_buff *skb,
- 
- 	targets_added = 0;
- 	for (i = 0; i < BOND_MAX_ARP_TARGETS; i++) {
--		if (bond->params.arp_targets[i]) {
--			if (nla_put_be32(skb, i, bond->params.arp_targets[i]))
-+		__be32 t = READ_ONCE(bond->params.arp_targets[i]);
-+
-+		if (t) {
-+			if (nla_put_be32(skb, i, t))
- 				goto nla_put_failure;
- 			targets_added = 1;
- 		}
-@@ -741,11 +741,12 @@ static int bond_fill_info(struct sk_buff *skb,
- 	else
- 		nla_nest_cancel(skb, targets);
- 
--	if (nla_put_u32(skb, IFLA_BOND_ARP_VALIDATE, bond->params.arp_validate))
-+	if (nla_put_u32(skb, IFLA_BOND_ARP_VALIDATE,
-+			READ_ONCE(bond->params.arp_validate)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_ARP_ALL_TARGETS,
--			bond->params.arp_all_targets))
-+			READ_ONCE(bond->params.arp_all_targets)))
- 		goto nla_put_failure;
- 
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -755,6 +756,9 @@ static int bond_fill_info(struct sk_buff *skb,
- 
- 	targets_added = 0;
- 	for (i = 0; i < BOND_MAX_NS_TARGETS; i++) {
-+		/* Note: IPv6 addresses can not be read in an atomic READ_ONCE() yet.
-+		 * We accept this minor race for the moment.
-+		 */
- 		if (!ipv6_addr_any(&bond->params.ns_targets[i])) {
- 			if (nla_put_in6_addr(skb, i, &bond->params.ns_targets[i]))
- 				goto nla_put_failure;
-@@ -768,93 +772,93 @@ static int bond_fill_info(struct sk_buff *skb,
- 		nla_nest_cancel(skb, targets);
- #endif
- 
--	primary = rtnl_dereference(bond->primary_slave);
-+	primary = rcu_dereference(bond->primary_slave);
- 	if (primary &&
- 	    nla_put_u32(skb, IFLA_BOND_PRIMARY, primary->dev->ifindex))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_PRIMARY_RESELECT,
--		       bond->params.primary_reselect))
-+		       READ_ONCE(bond->params.primary_reselect)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_FAIL_OVER_MAC,
--		       bond->params.fail_over_mac))
-+		       READ_ONCE(bond->params.fail_over_mac)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_XMIT_HASH_POLICY,
--		       bond->params.xmit_policy))
-+		       READ_ONCE(bond->params.xmit_policy)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_RESEND_IGMP,
--			bond->params.resend_igmp))
-+			READ_ONCE(bond->params.resend_igmp)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_NUM_PEER_NOTIF,
--		       bond->params.num_peer_notif))
-+		       READ_ONCE(bond->params.num_peer_notif)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_ALL_SLAVES_ACTIVE,
--		       bond->params.all_slaves_active))
-+		       READ_ONCE(bond->params.all_slaves_active)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_MIN_LINKS,
--			bond->params.min_links))
-+			READ_ONCE(bond->params.min_links)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_LP_INTERVAL,
--			bond->params.lp_interval))
-+			READ_ONCE(bond->params.lp_interval)))
- 		goto nla_put_failure;
- 
--	packets_per_slave = bond->params.packets_per_slave;
- 	if (nla_put_u32(skb, IFLA_BOND_PACKETS_PER_SLAVE,
--			packets_per_slave))
-+			READ_ONCE(bond->params.packets_per_slave)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_AD_LACP_ACTIVE,
--		       bond->params.lacp_active))
-+		       READ_ONCE(bond->params.lacp_active)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_AD_LACP_RATE,
--		       bond->params.lacp_fast))
-+		       READ_ONCE(bond->params.lacp_fast)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_AD_SELECT,
--		       bond->params.ad_select))
-+		       READ_ONCE(bond->params.ad_select)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_TLB_DYNAMIC_LB,
--		       bond->params.tlb_dynamic_lb))
-+		       READ_ONCE(bond->params.tlb_dynamic_lb)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_MISSED_MAX,
--		       bond->params.missed_max))
-+		       READ_ONCE(bond->params.missed_max)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_COUPLED_CONTROL,
--		       bond->params.coupled_control))
-+		       READ_ONCE(bond->params.coupled_control)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_BROADCAST_NEIGH,
--		       bond->params.broadcast_neighbor))
-+		       READ_ONCE(bond->params.broadcast_neighbor)))
- 		goto nla_put_failure;
- 
--	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
-+	if (mode == BOND_MODE_8023AD) {
- 		struct ad_info info;
- 
- 		if (capable(CAP_NET_ADMIN)) {
- 			if (nla_put_u16(skb, IFLA_BOND_AD_ACTOR_SYS_PRIO,
--					bond->params.ad_actor_sys_prio))
-+					READ_ONCE(bond->params.ad_actor_sys_prio)))
- 				goto nla_put_failure;
- 
- 			if (nla_put_u16(skb, IFLA_BOND_AD_USER_PORT_KEY,
--					bond->params.ad_user_port_key))
-+					READ_ONCE(bond->params.ad_user_port_key)))
- 				goto nla_put_failure;
- 
-+			/* Small race here, this is a minor trade off. */
- 			if (nla_put(skb, IFLA_BOND_AD_ACTOR_SYSTEM,
- 				    ETH_ALEN, &bond->params.ad_actor_system))
- 				goto nla_put_failure;
- 		}
--		if (!bond_3ad_get_active_agg_info(bond, &info)) {
-+		if (!__bond_3ad_get_active_agg_info(bond, &info)) {
- 			struct nlattr *nest;
- 
- 			nest = nla_nest_start_noflag(skb, IFLA_BOND_AD_INFO);
-@@ -882,9 +886,11 @@ static int bond_fill_info(struct sk_buff *skb,
- 		}
- 	}
- 
-+	rcu_read_unlock();
- 	return 0;
- 
- nla_put_failure:
-+	rcu_read_unlock();
- 	return -EMSGSIZE;
- }
- 
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index 5095ac3dad2cd924ff548343c7c1afe3e57e3065..501cfb72369dfc7f70a59862631642dd834e268e 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -925,7 +925,7 @@ static int bond_option_mode_set(struct bonding *bond,
- 	 * enabled in 8023ad mode. Therefore, only clear broadcast_neighbor
- 	 * to 0.
- 	 */
--	bond->params.broadcast_neighbor = 0;
-+	WRITE_ONCE(bond->params.broadcast_neighbor, 0);
- 
- 	if (bond->dev->reg_state == NETREG_REGISTERED) {
- 		bool update = false;
-@@ -1900,7 +1900,7 @@ static int bond_option_broadcast_neigh_set(struct bonding *bond,
- 	if (bond->params.broadcast_neighbor == newval->value)
- 		return 0;
- 
--	bond->params.broadcast_neighbor = newval->value;
-+	WRITE_ONCE(bond->params.broadcast_neighbor, newval->value);
- 	if (bond->dev->flags & IFF_UP) {
- 		if (bond->params.broadcast_neighbor)
- 			static_branch_inc(&bond_bcast_neigh_enabled);
-diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-index 05572c19e14b7ae97d497cc9c5d97d4314eab295..ef667dff297294dc78d98701aae10c31ef09df3f 100644
---- a/include/net/bond_3ad.h
-+++ b/include/net/bond_3ad.h
-@@ -302,8 +302,8 @@ void bond_3ad_state_machine_handler(struct work_struct *);
- void bond_3ad_initiate_agg_selection(struct bonding *bond, int timeout);
- void bond_3ad_adapter_speed_duplex_changed(struct slave *slave);
- void bond_3ad_handle_link_change(struct slave *slave, char link);
--int  bond_3ad_get_active_agg_info(struct bonding *bond, struct ad_info *ad_info);
--int  __bond_3ad_get_active_agg_info(struct bonding *bond,
-+int  bond_3ad_get_active_agg_info(const struct bonding *bond, struct ad_info *ad_info);
-+int  __bond_3ad_get_active_agg_info(const struct bonding *bond,
- 				    struct ad_info *ad_info);
- int bond_3ad_lacpdu_recv(const struct sk_buff *skb, struct bonding *bond,
- 			 struct slave *slave);
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index edd1942dcd736d3601e799dfbc9aeb8da0835902..f464ff163357637661500a6172902e5bb7401031 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -344,14 +344,14 @@ static inline bool bond_mode_uses_primary(int mode)
- 	       mode == BOND_MODE_ALB;
- }
- 
--static inline bool bond_uses_primary(struct bonding *bond)
-+static inline bool bond_uses_primary(const struct bonding *bond)
- {
- 	return bond_mode_uses_primary(BOND_MODE(bond));
- }
- 
--static inline struct net_device *bond_option_active_slave_get_rcu(struct bonding *bond)
-+static inline struct net_device *bond_option_active_slave_get_rcu(const struct bonding *bond)
- {
--	struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
-+	const struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
- 
- 	return bond_uses_primary(bond) && slave ? slave->dev : NULL;
- }
-@@ -702,7 +702,7 @@ void bond_setup(struct net_device *bond_dev);
- unsigned int bond_get_num_tx_queues(void);
- int bond_netlink_init(void);
- void bond_netlink_fini(void);
--struct net_device *bond_option_active_slave_get_rcu(struct bonding *bond);
-+struct net_device *bond_option_active_slave_get_rcu(const struct bonding *bond);
- const char *bond_slave_link_status(s8 link);
- struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
- 					      struct net_device *end_dev,
--- 
-2.54.0.1032.g2f8565e1d1-goog
+Anyway, for the kernel, this shouldn't be an issue simply because we
+typically avoid 'bool' in arguments or structures that are exposed to
+outside.
 
+(I say 'typically' because I'm sure it happens in some broken UAPI
+thing anyway).
+
+                  Linus
+
+(*) I may mis-remember. Maybe it was s390, not powerpc. The s390
+compat layer independently had a similar issue wrt pointers, where bit
+31 had to be cleared. s390 dropped the 31-bit code entirely fairly
+recently, but it caused some "interesting" code in the already
+disgusting syscall argument handling wrapper macros.
 
