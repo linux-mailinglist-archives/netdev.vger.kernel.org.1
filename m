@@ -1,211 +1,172 @@
-Return-Path: <netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HqvPJl+GImrKZgEAu9opvQ
-	(envelope-from <netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:18:39 +0200
+	id OCQNBLGGImraZgEAu9opvQ
+	(envelope-from <netdev+bounces-295718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:20:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158AA646551
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:18:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F7A7646569
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:20:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=Hbrnqrg9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=suse.com header.s=google header.b=CNEe9PUp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295718-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295718-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3C181308C8CA
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 08:11:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11F1A301E5BC
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 08:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C684849552F;
-	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC5549553A;
+	Fri,  5 Jun 2026 08:12:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30B6495510;
-	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780647091; cv=none; b=izElTZnAl4VU4jMwjDaYCFw9xgx5Jdm3nvzLj6yKtIxqBkHhndvHgZTl1ps4ZXGZY7WuzqrPlnZzKvjqbmLl9zMojNhz9bfdRUSxAHckbIK7FvDAqJkdGnW7vUVhM2Y2vqBfHF8y99Y7jlplG33EUJvsGus3U3Nwb3XrMMA+TEk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780647091; c=relaxed/simple;
-	bh=wVsP7qwG8BJu2wprX0HV2M1fTkH7tQV3G1mR8NtSBaw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YkSoB8rVHO59IG66zmiHuYuyYWLzbyGnZ4+Pyj30JYpjAyBu7MB3zgNmma5FE0yJ7yiQycoKrPcRux8qX7HpzavyQwPsDNmhSJ3eRqrE70gLAOVn8Aia4AnJW0rE5tcNyS6PhhYfflZLwAMqrMF9wuhVOgl8HQ/nT/H2Xry/x8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hbrnqrg9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CA61C2BCC6;
-	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780647091;
-	bh=wVsP7qwG8BJu2wprX0HV2M1fTkH7tQV3G1mR8NtSBaw=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=Hbrnqrg9RhUWrD93DON6WYHKiUY/P9JoQoOKcBb0/KJWXzbzKUzy1aiEPRDNCz74l
-	 unOk46jE02c/euDZYR1gDWxh9Uxacss0xlUunTTj86g+Uk7iSNaM04wzH4DGgAqWuP
-	 QOK6c9mcDNCgEQ6otxAJVE8JDdQ6Rci/uyPf3YSW6lk2Xc5jca5/hSBn1Ed49K5Ycp
-	 e3VdODdZns9EJlfW2FyX1pLCLijdAZOhdw0+BdfL7Jl8v1NW3lPx68kX0BRG1rAFRs
-	 fIOgpgls+EJeJW0zsiaY65LScSz0F1I6vkcMUyGlEv/qY6jPK7TwZ9GbG+DUyC7SF3
-	 jl5FVBD61KZUQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 305B6CD6E5D;
-	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
-From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Fri, 05 Jun 2026 12:11:29 +0400
-Subject: [PATCH next-next v2] net: dsa: qca8k: Add support for force mode
- for fixed link topology
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2957E3FE641
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 08:12:57 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780647178; cv=pass; b=W8QrdjaAG/LMqhIjHuKMBJlRblXWXQTlD3sgMPOE6xx2tqG2IdYB3tCK4RSH6d3IyZDF0ddPw7GjvVogm4zGt7IouMN05D7hMdOH+rSC4FiHd+SIufn/o/QcyVjHzcC+InZjZR4t7Z6GUT7iiBfNJE+/IXD2wWsO8C6AVWgkYAg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780647178; c=relaxed/simple;
+	bh=u8Q1WXjqlC5qiRxn7sucCO95sEC38cQ31d6p2EtwTxk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E/QmU5UnIYtRz+BHKtRLfciWpCO8k2omvMYsdoNA/cyxSMeeavPEuPfHj2vO9WAFfW07gByENQiHjgMmPJzTBflGGzT0Gf3qTpZwBEBw3gheQLlOTFRV3GOSGjXMvu7FI+yNP76AihYWopJ4ro/XCibyKjExgtwomCeVr9l0HLk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CNEe9PUp; arc=pass smtp.client-ip=209.85.167.42
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5aa2c25c632so1699109e87.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 01:12:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780647175; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EBHlRfVuHQoq/6jvTDScvwF2vSv87u/Q3wDQb8X54xNz0x7xlLtz9RnsJ39LfefCQw
+         lwuYCYAsELUgHgD40pQQl+ZOB+kXMlHu/Z0rThec2aP3c33JhryqXqz3NcE/FEEkxAab
+         SYpx/sED7WrEU/VIovWHCAub0kcsaO+BuhS+yvHZfFLiXNXkPWuTxy6OW/qku/UO57WG
+         sQTlVFO5NRT/LTN+L7s6pRnh5+RFdAfrziU58VWljftp6eQqvW/PCQS2d9LcI8pgL1Dg
+         lyFYb1oqJGqcHOThCz7wbHudpj4LRYbK4xdYrtT1Vx5HyU2pcA6M5C6aVGFshwgnw40F
+         PpkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UNQ7O5z6I1BYhENIlkkD1dwN4YbzeYUuGuJtBadnfug=;
+        fh=BT3Ebbie907+LLtyxaYHmvXKjOQJkhBamjiUk177siw=;
+        b=NNV0RfKoPCxwGQbM3ckbL9DkaAl52h313+nPD/Tkh2sUzzhB/NOXUayPtYHhTKnZ4r
+         +z6dneOWxJD+ENl8J9aqCtPXgIH1hVurO4rGIF+b4BcYSGL53hr89HYHCLcta9LBrGih
+         fVQRwnIGdVRNjIIMhIBy+p9xlUOh6HqL6AGOmfLNr7EhCbLYnn6nwkS1uJgSsPv9XTAb
+         POTODyb4ASmha2afDg0hJyh9QOmYUyN6q0Lvc73o5WsaQpXLBS2PMjXwX/MdP7A9OfWK
+         wJzH5Vn4vK0ks4gGey1Bj3URlEk2tkzQcSqJu2kEOXBwkGwbdhBNghGa1uMq4Dzcx5rE
+         +A0w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1780647175; x=1781251975; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UNQ7O5z6I1BYhENIlkkD1dwN4YbzeYUuGuJtBadnfug=;
+        b=CNEe9PUpaoijwqkTIYHI94153VfVRW8M3uhHS6H1dJkNBlDd7+ha4P7nkNjD6icidz
+         VGWq+BtdPAwtJxmxWIsJtsogm9MPVtD3m+pZgUkunYEUszSJOQ1HBTNB7BsTEOCG1pno
+         CYd0z9BIBMWMp6ma8Ec8Xx7ru4m7bFcvtT3kDJdStgoQx4UzkA4A3ZMqSB9UwIGbM/nX
+         GeM8p/P5y/Pi4Uz4TGNaMEyuOK6JxtUEUojuPh6tNHvFttcf7xwAT9aZFdx/h5RWUF5+
+         MGfwfxdXxNEnky5E/hL2oameukx7OtMpy/U1U511qJPuQ6dGqxMjvEOM1HY7aHC9CiKU
+         nsAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780647175; x=1781251975;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UNQ7O5z6I1BYhENIlkkD1dwN4YbzeYUuGuJtBadnfug=;
+        b=Swa00MUmz4lyEHDFzs5j7Bd53Ns5Tq8qo06xLA1qmDSyAI99LNSdOe787pqDZ9kwqx
+         ExGlYwAglS9beuEa/Gec3PbEfdgjsyyxnDl8hEm+9IxMEajN61sRS3UcBYD6noDQ5eGz
+         zQAGbIw2D6ge1aRhUHmNL/PXCQkRjgHz9L+jnv3iaBHqCQ8KHrl7eNMjLtFJ5L2Uc3J3
+         uhchPKtoY1ED6peglYQNmBNrZSHuAD0R98WRAeaZJB5dqfzwG2P2q7cldgcpQo4BBr/S
+         mUkWS6Voi2PcoNa3pL08kh3MpUyqYctX7XTRUU0T1p+V8AcsSOOy2oBcUHArR7cWprf/
+         IBIg==
+X-Forwarded-Encrypted: i=1; AFNElJ9nfBj1cf4Gawol8e0o3lpsrJiGPlocwQgdgyPSQpWnTOMVkjK2siIQVoT6Tb4x6gvmmRhi/bs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkK/hc8uBq9bTdeRdLtE1cgFKGjzp/Yy4PLJtp8WTQ4zKAA6bM
+	HwX8kjiph90MSEyj0wdZKc2lXrX4dXSlklzBHsANxP8ULHSSrC+kLJhqEfIe2aMS/E/TgqTALr0
+	5DKaNUVKtqLJRA+X+7GiN3+y9XSlt5PX7CLIDMjPf1g==
+X-Gm-Gg: Acq92OGXharxIgp7CTYKCBC10LgBiHDx2TLEnGaQqg0C5U50pDqo8IyLXdUyILyv4pj
+	gF30N4c7XRSB+HWxTD8XtlUB1xmR+donalMkfl/fQzTx+20VnHIV+qNZRerQznCzHwK641gXbkH
+	qQSNxzQigCvwA27lHHxU9vIooEFt+aMvaLITCkXafCEVeoCOyb+LEXJ99w9H9lCahr8SepQR8N4
+	WyE4+XTBxcoL6eZbASxLYH5gggMztRz8OOab0/25YBwisUwWXwQi5G+BQYPSFbDaAiwA8hgFXCG
+	KGE/3K36gixf5n28PB/ybyXbq4bx6v3XNvEWIqmoCNMoUFDznHA=
+X-Received: by 2002:ac2:5098:0:b0:5aa:2a75:e14b with SMTP id
+ 2adb3069b0e04-5aa87bc23e7mr500538e87.18.1780647175361; Fri, 05 Jun 2026
+ 01:12:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260605-qca8337-force-mode-v2-1-d9a6b6545bfa@outlook.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32NTQ6CMBCFr0Jm7ZjSYlFX3sOwKGUqjdLRFgmGc
- HcrB3Dzki/vb4FE0VOCc7FApMknzyGD3BVgexNuhL7LDFJILbRQ+LLmqFSNjqMlHLgjdK1tzUG
- edFVpyMVnJOfnbfQKgeYRfwJNtnqfRo6f7W4qt8C/5anEEq1xta6Fc6ZVF36PD+b73vIAzbquX
- 0/JJvLBAAAA
-X-Change-ID: 20260603-qca8337-force-mode-fbcba5296446
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- George Moussalem <george.moussalem@outlook.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780647089; l=3187;
- i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=/1K49g/Q0+wrB8ffa0QJHaW9eANv5Yae+dqQkwbdI4U=;
- b=Xn7RwqPiLUqBSMkfjxaoyatDwqn+EhlJZVxXog3mgyAtwLsVAImKiBsVWVvKVPlXJ//K6hwlv
- IPyVfdFw1CBAI5t89drX8j9nLQevPmF9+g75OyKnuqOsk4jD9ZFIckZ
-X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
- pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
-X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
- with auth_id=364
-X-Original-From: George Moussalem <george.moussalem@outlook.com>
-Reply-To: george.moussalem@outlook.com
+References: <20260507130117.252825-1-marco.crivellari@suse.com>
+In-Reply-To: <20260507130117.252825-1-marco.crivellari@suse.com>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Fri, 5 Jun 2026 10:12:43 +0200
+X-Gm-Features: AVHnY4IBbk-mtCcmYv-f3PQjt98lbgBbhfgbnsFIyJNcIJ7haAnpnTNZKfnc6Yo
+Message-ID: <CAAofZF5_MRtySWTMs-J3T676FwjJiLDpYLRWmsFaSXePo3nZPg@mail.gmail.com>
+Subject: Re: [PATCH v2] xprtrdma: Move long delayed work on system_dfl_long_wq
+To: linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	netdev@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Michal Hocko <mhocko@suse.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:mhocko@suse.com,m:trondmy@kernel.org,m:anna@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295718-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:george.moussalem@outlook.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295717-lists,netdev=lfdr.de,george.moussalem.outlook.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[outlook.com];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,outlook.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[george.moussalem@outlook.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,vger.kernel.org:from_smtp,outlook.com:mid,outlook.com:email,outlook.com:replyto]
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,suse.com:dkim,suse.com:from_mime,suse.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 158AA646551
+X-Rspamd-Queue-Id: 7F7A7646569
 
-From: George Moussalem <george.moussalem@outlook.com>
+Hi,
 
-A fixed link topology is commonly used to connect this switch (on port
-0 or 6) to a SoC's MAC over SGMII. When inband negotiation is not used,
-the switch needs to be configured to operate in force mode. As such,
-enable support for force mode.
+On Thu, May 7, 2026 at 3:01=E2=80=AFPM Marco Crivellari
+<marco.crivellari@suse.com> wrote:
+> [...]
+>  net/sunrpc/xprtrdma/transport.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
----
-Changes in v2:
-- Added check for QCA8337 switch ID and build up the register mask
-  accordingly before writing the force mode bit to avoid overwriting the
-  bit on switches other than QCA8337 for which there's no documentation
-  on whether force mode is supported or not.
-- Added comment to state that regardless of port used (0 or 6), the
-  force mode bit is written to the PORT0 PAD register as per vendor SDK.
-- Link to v1: https://lore.kernel.org/r/20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com
----
- drivers/net/dsa/qca/qca8k-8xxx.c | 22 ++++++++++++++++------
- drivers/net/dsa/qca/qca8k.h      |  1 +
- 2 files changed, 17 insertions(+), 6 deletions(-)
+Gentle ping.
 
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index a36b8b07030e..4c928983b862 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -1538,7 +1538,7 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- {
- 	struct qca8k_priv *priv = pcs_to_qca8k_pcs(pcs)->priv;
- 	int cpu_port_index, ret, port;
--	u32 reg, val;
-+	u32 mask, reg, val;
- 
- 	port = pcs_to_qca8k_pcs(pcs)->port;
- 	switch (port) {
-@@ -1611,11 +1611,21 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	if (priv->ports_config.sgmii_tx_clk_falling_edge)
- 		val |= QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE;
- 
--	if (val)
--		ret = qca8k_rmw(priv, reg,
--				QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
--				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE,
--				val);
-+	mask = (val) ? (QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
-+			QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE) : 0;
-+
-+	/*
-+	 * (Un)set force mode on QCA8337 only, don't include it in the mask for
-+	 * others. It is written to the PORT0 PAD register for both port 0 and 6.
-+	 */
-+	if (priv->switch_id == QCA8K_ID_QCA8337) {
-+		if (neg_mode == PHYLINK_PCS_NEG_OUTBAND)
-+			val |= QCA8K_PORT_PAD_SGMII_FORCE_MODE;
-+		mask |= QCA8K_PORT_PAD_SGMII_FORCE_MODE;
-+	}
-+
-+	if (mask)
-+		ret = qca8k_rmw(priv, reg, mask, val);
- 
- 	return 0;
- }
-diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
-index 1a00e2f62fef..956338893032 100644
---- a/drivers/net/dsa/qca/qca8k.h
-+++ b/drivers/net/dsa/qca/qca8k.h
-@@ -58,6 +58,7 @@
- #define	  QCA8K_PORT_PAD_RGMII_TX_DELAY_EN		BIT(25)
- #define   QCA8K_PORT_PAD_RGMII_RX_DELAY_EN		BIT(24)
- #define   QCA8K_PORT_PAD_SGMII_EN			BIT(7)
-+#define   QCA8K_PORT_PAD_SGMII_FORCE_MODE		BIT(3)
- #define QCA8K_REG_PWS					0x010
- #define   QCA8K_PWS_POWER_ON_SEL			BIT(31)
- /* This reg is only valid for QCA832x and toggle the package
+Thanks!
 
----
-base-commit: b7bee4ca5688e30ca50fbc87b1b8f7eed7006c17
-change-id: 20260603-qca8337-force-mode-fbcba5296446
+--=20
 
-Best regards,
--- 
-George Moussalem <george.moussalem@outlook.com>
+Marco Crivellari
 
-
+SUSE Labs
 
