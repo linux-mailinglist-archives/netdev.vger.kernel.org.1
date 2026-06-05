@@ -1,167 +1,201 @@
-Return-Path: <netdev+bounces-295737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295738-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id M6ArDSWaImodawEAu9opvQ
-	(envelope-from <netdev+bounces-295737-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 11:43:01 +0200
+	id Iz9aHguYImqjagEAu9opvQ
+	(envelope-from <netdev+bounces-295738-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 11:34:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86161646F77
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 11:43:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15BA5646E2D
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 11:34:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=VNmveZCM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295737-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295737-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=K7FJSRgI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295738-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295738-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC59330BF8B6
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 09:20:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 67AB23009169
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 09:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F114183AB;
-	Fri,  5 Jun 2026 09:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA85C4183BD;
+	Fri,  5 Jun 2026 09:22:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34134183B5
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 09:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9322B4183B2;
+	Fri,  5 Jun 2026 09:21:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780651206; cv=none; b=VOEGBfYj1fDaLpW14NOpD2vBz0YoO2y+7+AWymgPZ96O12obrj7pC89GOu/z+qPwrzVJv7AdyNra9A0r/8uaDsrgvQ8xhx6SKqmpxaKvLbh9UaZIA6MM5PFN3NGUVZZAlJTBBKENH858n354jkh87VTuqEdyQtBhdZShNw4eDDA=
+	t=1780651320; cv=none; b=PBsmtZuPmQDU9PAZKz29f9/AvSGTsk2JLas4zHdvdd+tqtuCCjTU6ej8+05sO1XpWf4auK1zj0LTP0E7JPGtwoV4zrzOQR6e8jzqIS11zi8u77ZPLNmTqZ3evD8z+MZW3RLNVa94N6FyV/oyVwUtw0l0UIU+2DyurPk6D0972A4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780651206; c=relaxed/simple;
-	bh=qjDKjhPpttI+UQx2avyK3+GZI3Dxeu06L24De+4zMsI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n+CsIkzr+7emvLv5v4OVsB+/MdOa5zAUH54POHSBPUcvyoL5qCNGPH0/QRCGtd//q+hvAapWPU6GbW2NEqdWsoVoQyO1tVJwj1ELNxj2yjknFMqINxtCAKR0Uti5/30sRMbG3ylGmS7dkcDO42kRZfi1i1//RxfjOkQ97z9GRlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VNmveZCM; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 87C8D1A0910;
-	Fri,  5 Jun 2026 09:20:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5A77B5FED1;
-	Fri,  5 Jun 2026 09:20:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9F582106A202B;
-	Fri,  5 Jun 2026 11:19:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780651202; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=I67YpnlUqPTyg2ONDmwiTIl0/OLYwSFgLshuT8Sr4PU=;
-	b=VNmveZCMuIq+I3UZGaCG+up+nENGJ3cuI6FVdZMQDJJIGR8kl/r5zOiO86P4/DgRrnnrEM
-	D8pBa7CSBHKXk1oPReFa7ZkvzEUM1vmxuIxGqQcdx05WEC7h5ZLAJiLiVD3xOrPD54sXnP
-	VBG1yl1npKofoLeapWqp33tfioucmej++yy36gofN19POlmckjImK5EX4AOlaGjPt4NiQu
-	VqIlJn64A0FCLkyaQAtNCOaYNEAtkGD+j3p0bApCGqAw6H48/tfnbArsNeDQgA7g/GDcfT
-	oxqhMiT/D7UxybhPXNPplrE7MRYMgOz0OTSZHSFY7Q4Q9IHXbIBWPVh+sVOYIQ==
-Message-ID: <476ef2e0-b090-4a06-af3c-d2b97641cdc5@bootlin.com>
-Date: Fri, 5 Jun 2026 11:19:52 +0200
+	s=arc-20240116; t=1780651320; c=relaxed/simple;
+	bh=IQyGWGwxWlD4QOFS/o2hb+N2aTIisuaPW48hlU9kOXY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fjHH5TiTQ0Nn7ruK9oCydDpOAJ9mEy0Xd4MwFBDmKWggnEecwUNMzzjQRxJY9kOG00TSKZ0InCt4OKK+Tx6FJD7dYd2kzKZKvygzKpUas8Q56DhNuPyyCc2sBfoKrKEj9jkymS/udjvLPSHx7JEReI9xhdmPP049bv+YkZU+3Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K7FJSRgI; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1461F00893;
+	Fri,  5 Jun 2026 09:21:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780651319;
+	bh=E37SG+AdDpLtO2UiYqyM2celFi2dDo+IX/sJvSqiS0g=;
+	h=From:Subject:Date:To:Cc;
+	b=K7FJSRgIkbKOSXyuCF/I/SBcnK3b6lTE1GnPO5bzr40ncTSgucRQ7qRDvzaAFXSeL
+	 ap70Tln730AvqJku4kzoEl0zA6AW3FZE28rcc1TtmZOBdfVn/UL8LdSEFuePkdonM2
+	 oTGO+EByVt0o010+2WOb/9r13i74pGf4pHlIwbEB11GEKrv8RTlDHrUxo8SY/eIiXd
+	 Nr2U6xO4uJ4vDWfKgjiUZMyPc6ZFMGVnkKiw0lV+nC92oBwZS5yAz2QMrUS14/SkwP
+	 ib6XEyrSsD9m58ZFdBjtwSrqrGGvAJFexyafvDGMrVD2qzOFDwj88nfEnSX65YMrT2
+	 ++SX5u20HQkHg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next v2 00/15] mptcp: pm: drop TCP TS with ADD_ADDRv6 +
+ port
+Date: Fri, 05 Jun 2026 19:21:44 +1000
+Message-Id: <20260605-net-next-mptcp-add-addr6-port-ts-v2-0-758e7ca73f4d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/3] net: phy: clean the sfp upstream if phy
- probing fails
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux@armlinux.org.uk, hkallweit1@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com
-References: <20260601084029.815461-2-maxime.chevallier@bootlin.com>
- <20260605012403.3513979-1-kuba@kernel.org>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260605012403.3513979-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42OzQ6CMBCEX4Xs2TWlwUo8+R6GA7ZbqD+02VaCI
+ by7BePdwxwmszPfzhCJHUU4FTMwjS46P2QjdwXovh06QmeyBymkEkqUOFDKmhI+Q9IBW2NWscL
+ gOWGKWAlTm2NlapIC8kxgsm7aEBf4taH5JvF1vZFOK2G97V1Mnt/bN2O5Nf4HjyUKrKyWB2PJK
+ knnO/FAj73nDpplWT5l+Psm7QAAAA==
+X-Change-ID: 20260601-net-next-mptcp-add-addr6-port-ts-40d8d74d8e20
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ Shuah Khan <shuah@kernel.org>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3494; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=IQyGWGwxWlD4QOFS/o2hb+N2aTIisuaPW48hlU9kOXY=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBqIpUx2f0IX99W1PY9D+gbsqujaUgkjKZerLa7T
+ TG2DpvWXXeJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCaiKVMQAKCRD2t4JPQmmg
+ c9ipD/9fWgJIhFNDkqqNTpH439b3QTG/1h72fPvW/5LO+X8Ua2yKBrm2VNF556zbcZS5UVVzAeS
+ MrlX6N9WTtUReXPyZxs93F3c+WCUPk5LcBtdK5REzUeGrQ0AU8q0jIs7AErAYKh+SXonkdPEQbT
+ vpsgrVyvwGTpDl/W9Hn3+fD9WWjpHI3fBO4Kxc/dKb1nRBYA2709iJi/OVwj3oBzK183OomqLq3
+ 0yXzKW0xgpcAqJdCyvNfj+zG3Kwiv+6T8qI66nBkj2DyKFPlkzQR2OtsdkteQvb3/6uaFpgctrW
+ Vxg5Bf0qT+xxHCkUUADKsrkYONaphFtHX24lRx5pe4zLDUwqXedfk3M7/6vElFsEQW6FbTbJKj0
+ iszHQk40eyr73S/8VCsP2ZNtn0/XVKJJbr7+hQ18Ftmoy5rB3gjUXQ2IliKXtTJ2wbnyteDhttJ
+ nGiQrAtadrUg96URJ1Rjk+9GTnv+wEZBew28g/Pj3i1Eif8QxsvvqWrw0/DQ8/beq0EhSd0gOpk
+ n5zFR5sADYUX3M7S6fdkWn3I7kNnrWYMOwjjBzBurZuYMvVPepDSbs2hNiuOoK4xOagukcrh0H1
+ zTK8ytHHB47v7lXc1aYa1tp0uPEoiR618ApegH0IzHkr7TuePDGFTcjj7qAFlwtJvbCMq+1VJ1s
+ kKBVPX5CEVfAK7g==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com];
-	TAGGED_FROM(0.00)[bounces-295737-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:matttbe@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-doc@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:shuah@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-295738-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:mid,bootlin.com:from_mime,bootlin.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,msgid.link:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 86161646F77
+X-Rspamd-Queue-Id: 15BA5646E2D
 
+Up to this series, it was possible to add a "signal" MPTCP endpoint with
+an IPv6 address and a port, or to directly request to send an ADD_ADDR
+with a v6 address and a port, but the expected ADD_ADDR wasn't sent when
+TCP timestamps was used for the connection.
 
+In fact, such signalling option cannot be sent when TCP timestamps is
+used due to a lack of option space: the limit is at 40 bytes, and, with
+padding, TCP timestamps is taking 12 bytes, while an ADD_ADDR IPv6 +
+port is taking 30 bytes. The selected solution here is to simply drop
+the TCP timestamps option when such ADD_ADDR of 30 bytes needs to be
+sent.
 
-On 6/5/26 03:24, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: phy: clean the sfp upstream if phy probing fails
-> 
-> This commit adds a call to sfp_bus_del_upstream() in the probe failure path
-> to ensure the sfp-bus is not left with a dangling upstream field that could
-> be used during subsequent SFP events.
-> 
->> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
->> --- a/drivers/net/phy/phy_device.c
->> +++ b/drivers/net/phy/phy_device.c
-> 
-> [ ... ]
-> 
->> @@ -3775,6 +3778,9 @@ static int phy_probe(struct device *dev)
->>  	return 0;
->>  
->>  out:
->> +	sfp_bus_del_upstream(phydev->sfp_bus);
->> +	phydev->sfp_bus = NULL;
->> +
-> 
-> [Severity: High]
-> This is a pre-existing issue, but if a subsequent initialization step fails
-> and we jump to the out label, should we be calling the specific PHY driver's
-> remove callback?
-> 
-> If phydev->drv->probe() succeeds early in phy_probe(), but something like
-> phy_setup_ports() or of_phy_leds() fails later, the execution jumps to this
-> error path. Without calling phydev->drv->remove(phydev), any resources
-> allocated by the driver are leaked.
-> 
-> Also, drivers like dp83640 register the phydev with external subsystems,
-> such as adding it to shared lists like clock->phylist during their probe.
-> Leaving dangling pointers to this unbound phydev in those subsystems could
-> lead to use-after-free crashes later.
+- Patches 1-3: small cleanups to avoid computing ADD/RM_ADDR twice.
 
-Good point too. I've sent a V3 already, so if V3 is accepted I'll send a
-standalone patch for that, or include that in V4 should it be needed :)
+- Patches 4-7: the new feature, controlled by a new sysctl knob.
 
-Maxime
+- Patch 8: extra checks in the MPTCP Join selftests.
 
-> 
->>  	if (!phydev->is_on_sfp_module)
->>  		phy_led_triggers_unregister(phydev);
->>
+- Patches 9-15: A bunch of refactoring: renamed confusing helpers and
+  variables, and prevent future misused functions.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- Rebased: some diff caused by commit a02a765bd5c2 ("mptcp: change
+  mptcp_established_options() to return opt_size") and commit
+  bd34fa025726 ("mptcp: add-addr: always drop other suboptions")
+- Patch 4: Use READ_ONCE() to read sysctl data. (Eric)
+- Patches 5-6: Avoid passing local variables' addresses to
+  mptcp_established_options not to force the compiler to use a stack
+  canary in this hot function, even for non-MPTCP flows. (Eric)
+- Replaced previous patches 9-11 modifying selftests by a bunch of
+  pm related refactoring: patches 9-15.
+- Link to v1: https://patch.msgid.link/20260601-net-next-mptcp-add-addr6-port-ts-v1-0-4fc25dfef62e@kernel.org
+
+---
+Matthieu Baerts (NGI0) (15):
+      mptcp: options: suboptions sizes can be negative
+      mptcp: pm: avoid computing rm_addr size twice
+      mptcp: pm: avoid computing add_addr size twice
+      mptcp: introduce add_addr_v6_port_drop_ts sysctl knob
+      tcp: allow mptcp to drop TS for some packets
+      mptcp: pm: drop TCP TS with ADD_ADDRv6 + port
+      selftests: mptcp: validate ADD_ADDRv6 + TS + port
+      selftests: mptcp: always check sent/dropped ADD_ADDRs
+      mptcp: pm: use for_each_subflow helper
+      mptcp: pm: rename add_entry structure to add_addr
+      mptcp: pm: uniform announced addresses helpers
+      mptcp: pm: remove add_ prefix from timer
+      mptcp: pm: make mptcp_pm_add_addr_send_ack static
+      mptcp: pm: avoid using del_timer directly
+      mptcp: options: rst: drop unused skb parameter
+
+ Documentation/networking/mptcp-sysctl.rst       |  13 ++
+ include/net/mptcp.h                             |  13 +-
+ net/ipv4/tcp_output.c                           |  10 +-
+ net/mptcp/ctrl.c                                |  18 ++-
+ net/mptcp/options.c                             |  68 +++------
+ net/mptcp/pm.c                                  | 191 ++++++++++++++----------
+ net/mptcp/pm_kernel.c                           |  22 +--
+ net/mptcp/pm_userspace.c                        |   6 +-
+ net/mptcp/protocol.h                            |  48 ++----
+ net/mptcp/subflow.c                             |   4 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh |  83 +++++-----
+ 11 files changed, 248 insertions(+), 228 deletions(-)
+---
+base-commit: bfa3d89cc15c09f7d1581c834a5ed725189ec19f
+change-id: 20260601-net-next-mptcp-add-addr6-port-ts-40d8d74d8e20
+
+Best regards,
+--  
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
