@@ -1,222 +1,202 @@
-Return-Path: <netdev+bounces-295646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295647-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SiCKHs9sImokXAEAu9opvQ
-	(envelope-from <netdev+bounces-295646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:29:35 +0200
+	id hJoEHMttImpeXAEAu9opvQ
+	(envelope-from <netdev+bounces-295647-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:33:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB8C64581A
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:29:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D853964588E
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:33:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=ONzkaZ4w;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295646-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295646-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=realtek.com header.s=dkim header.b=FwGKQj7q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295647-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295647-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realtek.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 35EE63020A83
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 06:25:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D9A163027113
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 06:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CD6403EBE;
-	Fri,  5 Jun 2026 06:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B586405C37;
+	Fri,  5 Jun 2026 06:27:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011061.outbound.protection.outlook.com [52.101.52.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6153D18BC3B;
-	Fri,  5 Jun 2026 06:25:49 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780640750; cv=fail; b=Heo6ESqh+aDz564mjiWSvjJyJW/rEg5tcJozr3Ac9Y6dyCdEoBCskiekksyJppt5jpSxJGrSVgzOUSPJ2C4DFmg+4Ao/CaLAw1sM5901tKVzk7fjDuhN+bvbKOVe7AiDezwttSYmS4ZtimTHl9PvkTuVQE2Z/HXt6rwDl0lcucY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780640750; c=relaxed/simple;
-	bh=ogGEysa2fUtxJplnYerIRD6NLRnamJLsg9DjSA6IwoE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=V1waBDKgHDAjcookKhQ+U9FSRAbiPOYEuHwgzT6cmtjvACBwJgFGVtpmb6m0kxR7kOpczMAkFYWQVsINo2a4FGyEVBvQz4jJZypZoEtj4GNfvV5aIgLjuF2rHD03G3yq44ydrMGsBuJyzI9RGlQb08XhFy3mmGw13dneRSs3DnI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ONzkaZ4w; arc=fail smtp.client-ip=52.101.52.61
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uKKWXW1EQ2Ns6BsB0pmfZ7pt4kC3DEfT29466NQiA48auq5dcvea16ezL5Y4BzN38knrPJ9hzxqhWJmVdkCTXgPUlibjKWcoLO2HH4uiDOsCCnt0WC4kt85dbGrhVQCqde3R/YwzGPYv5qBhK88wrtkOCQwX/99a6Oe04bgXPSPMuac3LN8uvrHm+xZhcsxVLQazf84AVWF9Vis2gXpG1iMhwYJQWt6LB5t5ISPR3qDO20P8KXybR0QEz3LxLSppV5HVPtFAtzKyIEd2BAEKIlwVqrYRJ8N9ZsV/RJ20Yb8PKW+iyS/jcwYekAN+MoqEH6LNDfUBBBr7XY0TvsI3sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FOoG81cKD0tBLYE/Mdnyi9yqD+np+6gLOeZDkWeUIu8=;
- b=fhkIxBSEu1S01lAu5Tb2M4RbNZFb+RtDRDgtCejVtdUloiAtAcM5jCceTtwaWU/e76wB9JNLh8UJjJnwzIhhfqU526zuMhLFtBA9Bqh+D7CEVx7En+ZVYAllsmbv21HnSY675eJYHGPst52YS7eMQhKPuGrDZruA9jiPXoEiDd0Ppgldz/pz1pqZgbxZjI9MosOEKX6l1GjwWpu7w61RpzBFqvYoC1k7rSJLoYIaaey1ohUjXPre66jYIz+TzaYeLKMHMSwQ9gwwNuHPrma8k+DRhTmXbL8Ge4PDWBoBhMvTJzoolBZjuN8IKC0U71RWySInv8Zt4VcXFMBOhPx1+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FOoG81cKD0tBLYE/Mdnyi9yqD+np+6gLOeZDkWeUIu8=;
- b=ONzkaZ4wEsgpE30xP71NTK3LSVB+Idp6owF7RYWI/C7n/3akw0GMhqi5PNmXvGgzXivTJ9i0bcx2QmTFI/RRbA0KaWQW5w7aypDUDwIJ71hG94gPk7jjgUHWfEHRMEINxGus2gABuCl1d4vidoVLPLbShuv2QUtsusprM4xyIR6kIMXcTMkfG/wNdOWFitFzJ8RPZ9Jzz9GCpJuVyJAyV01xtPUJbldWi9yGPFWndOEJqB2+tIfAN6j3MUIg/sdTkY9BevG2HN4Rh46O4ZtUB4u0o9spNkro2eIGRyblHpCXa5OyatjHkl7y9a7Z8V7qCBAePLPxp6MEemwhJ9O/Ug==
-Received: from CH0PR03CA0333.namprd03.prod.outlook.com (2603:10b6:610:11a::7)
- by CH2PR12MB4086.namprd12.prod.outlook.com (2603:10b6:610:7c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Fri, 5 Jun 2026
- 06:25:42 +0000
-Received: from CH3PEPF0000000F.namprd04.prod.outlook.com
- (2603:10b6:610:11a:cafe::29) by CH0PR03CA0333.outlook.office365.com
- (2603:10b6:610:11a::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.8 via Frontend Transport; Fri, 5
- Jun 2026 06:25:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH3PEPF0000000F.mail.protection.outlook.com (10.167.244.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.92.5 via Frontend Transport; Fri, 5 Jun 2026 06:25:41 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 4 Jun
- 2026 23:25:27 -0700
-Received: from [10.221.193.185] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 4 Jun
- 2026 23:25:22 -0700
-Message-ID: <aa1e6365-3c75-4f0d-915f-9a2fbaa2c158@nvidia.com>
-Date: Fri, 5 Jun 2026 09:25:14 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD813134CF;
+	Fri,  5 Jun 2026 06:27:00 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780640822; cv=none; b=rVX0EuNNLXhlpBC2rAi7A9KjPMTN3bc1mYT0uNmcHir12nxzgtHUTLbmSa5ezQpCta5p9JL+Yn0FdeOYQJiVxVNxV216m29zRqIZNx/83l2C1acN8ORzoFiLJ0DX7Cf6GsNa+IaRf94FfOoLiL82yR7ZehAtm7HVCx9WZjSzY0s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780640822; c=relaxed/simple;
+	bh=dKIv6DTBccWXjxvvX592ngIa3cd0Qeyc4LUSi4OhCq0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jFllZdjnmjtwlwfFql6UjCprbJN65N27Yir/kTwjsSk7bGiIBpn834wxh3//pM+Pdf6yNuD//UsXF2Q0RP476SW3nnNRKrfCUzLcOdKaR+lO1+t0Gwf16lO+FKEruwvu0aXhoKFOALQ6tjkQiY8cBnfNEDc/Q/mToGmPNCiz9kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=FwGKQj7q; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6556QkiI61190600, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1780640806; bh=rwYspt8d8zSBtuVwmCcOzpCCaan6aqBoJsQzOGWcItY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=FwGKQj7qi+jRCCIAdRY/ezjMf8mU6WaUpZ+xoyFkQgLQKB5Zvds4aTF/DnEud/ivd
+	 IN3FFUTi/WYBXtqJ+Vbt8CHKT/J7/ySpr58qiuDgqoTsOkeDLxlDL+OAL98aEme29X
+	 27u9UkS6/X956BdSbYCKLA+6XhZ5Mna7bD5gfSMGRGogxw8SGAOIHZU3vW4EdhIlTn
+	 5/E85k2XMmc5t9MyT/tGFs5PFHej4Slfob8CrbOtRo1YMlFwQZKtKgbzsAumQxnZcc
+	 6mx7hT2vmZEolrlQuM+GBCmhqYRDMef4wxrL2ayb9VciL32tGIcLa7QANlbIvLJKpT
+	 CUKY1uYlYpu+g==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6556QkiI61190600
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 5 Jun 2026 14:26:46 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 5 Jun 2026 14:26:46 +0800
+Received: from RTKEXHMBS06.realtek.com.tw ([::1]) by
+ RTKEXHMBS06.realtek.com.tw ([fe80::e6fd:5a3f:8946:92c4%10]) with mapi id
+ 15.02.2562.017; Fri, 5 Jun 2026 14:26:46 +0800
+From: Chih Kai Hsu <hsu.chih.kai@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	nic_swsd <nic_swsd@realtek.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>
+Subject: RE: [PATCH net] r8152: handle the return value of usb_reset_device()
+Thread-Topic: [PATCH net] r8152: handle the return value of usb_reset_device()
+Thread-Index: AQHc9APC9XApZAQtH0mFd55w2OdfKbYt1DKAgAFpdUD//5TagIAAqFpA
+Date: Fri, 5 Jun 2026 06:26:46 +0000
+Message-ID: <19bdb89de51c46408b7e7d7cdeba8e4d@realtek.com>
+References: <20260604092247.27158-450-nic_swsd@realtek.com>
+ <c1ddf8f3-71f7-434c-ad10-64096b65fe51@lunn.ch>
+ <ce2651bf86fc401b9e1e7cc29b5a6c22@realtek.com>
+ <3e108daa-7913-4890-8331-9761a4654b1f@lunn.ch>
+In-Reply-To: <3e108daa-7913-4890-8331-9761a4654b1f@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] net/mlx5: Use effective affinity mask for IRQ
- selection
-To: Fushuai Wang <fushuai.wang@linux.dev>, <saeedm@nvidia.com>,
-	<leon@kernel.org>, <tariqt@nvidia.com>, <mbloch@nvidia.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <parav@nvidia.com>,
-	<moshe@nvidia.com>
-CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <wangfushuai@baidu.com>
-References: <20260604125705.21241-1-fushuai.wang@linux.dev>
- <20260604125705.21241-3-fushuai.wang@linux.dev>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <20260604125705.21241-3-fushuai.wang@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF0000000F:EE_|CH2PR12MB4086:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f193625-0ca4-47c4-03e7-08dec2cb4456
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|36860700016|376014|82310400026|1800799024|921020|56012099006|22082099003|4143699003|18002099003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	KjL/tmcbU133hD+qZQDLGq673OCt1qBORByH0JD11tZEvSQJ85XRJY+p8VpyLVWGhvX8LqFK2Qa/NoXs8CjPqIdAlPKmgFo0wf1Iy83txAXMfMcynrGqAkXa5XNNijl2HxS0WfhhwWrTwM4f/qapV91qe305F1pZ2uKD1m494BxEsXd9Rez/ZKt8qEPOCcpqIj5RtJjstHiJHfCZFnrPC4QRoYDqQBe+acZyLO3eO98bO6r0Wsue4gHcTt/A5liQgoi2hudWha6v+hXc3ypmoQwTvmL6Lrv2aI7ljSLILxHB8XfXDmeYHuGmYG3DO5l43UaSSf7UeQacd9QJXH1Bp7X6/e04XhM+9LYgyfFofoZrBbA9SEkwN3dJG8T1jfwKTvvH7YCCN00NcAboB+9/fN89ymn8FDRikxcnrYBcI65xRqGmPcmpyjh2Grgz2t85o+LsUUcfAph7/AI/wRl2aQy1AK7eQRJbuqbxFdZ7QJDUdL/9jEfq45Hr5hqFx0ulbSpXC6nCjzcP/4g4VGN0ivFDcJRqe8eAsfU7EW3gKW6EcGwAa/wFjZQzK/1VYH3pb1QGyPZWZ6wRfeGJSXgCGrpV7T3wU6G8lyxvM0keOdzN6rEx0WF/VWrd+g8bsFvXFysQ79xm2a78T0ZUArKYoT2BEBZeHC2Im3jEnvcUIYxLMJwz5/ZB932h2wgP1aINLRvZIqzFvHhjM1F/w9Ic/pkJQXkOQycjiXU3sD6WmIWvyuQuA6CelYXZS07uv4cxnDpUSD5voWXf/+9pXZm/zA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(36860700016)(376014)(82310400026)(1800799024)(921020)(56012099006)(22082099003)(4143699003)(18002099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	ubZ9qxf8jqE8R6jqk1neknMULx+icEpQ4PQYMfoAGasZEZATutYZ4170snt6LXnFbgwrO6xTz3sOiLNHSyZfVkIXaHciw/ilhOS3Js3dJTY3Ge4TN9y9Vaacah9M4jjg5OOAjvgoTAEbnmwiEOcsSBLbP81+a0mLC0PKKx9loNGOnCokDvX8ytRmUASYNqQL8zK+RAXR7YL/OJ8O7H2tfutyFDiDVCQr3tINT6s3sN0v7w68izHreZRt2yy/e7Hyr+vFJ825fo7wBcd3FitV4IQhYLSdw2UtznrWIc3dMFZZUT49dpTSBJmxpnLl/AY/B1SSxb3yfIPv5dwV6+d8CXzZmQI8e/1kXeOFCiAn6fXhgbnv4hW9S+9aQ/LFurgXndvlqcmqUGPwEYFFWA2eLM8QshJebYve3Pm6rs+UDunzw9dgUWKs4Gbie/B9mClV
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 06:25:41.2433
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f193625-0ca4-47c4-03e7-08dec2cb4456
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF0000000F.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4086
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-295646-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295647-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:fushuai.wang@linux.dev,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:parav@nvidia.com,m:moshe@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wangfushuai@baidu.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,nvidia.com:mid,nvidia.com:from_mime,nvidia.com:email,Nvidia.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:nic_swsd@realtek.com,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realtek.com:mid,realtek.com:from_mime,realtek.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DAB8C64581A
+X-Rspamd-Queue-Id: D853964588E
 
+On 05/06/26 12:04 pm, Andrew Lunn wrote:
 
+> On Fri, Jun 05, 2026 at 02:42:34AM +0000, Chih Kai Hsu wrote:
+> > On 04/06/26 8:54 pm, Andrew Lunn wrote:
+> >
+> > > On Thu, Jun 04, 2026 at 05:22:47PM +0800, Chih Kai Hsu wrote:
+> > > > If usb_reset_device() returns a negative error code, stop the
+> > > > process of probing.
+> > > >
+> > > > Fixes: 10c3271712f5 ("r8152: disable the ECM mode")
+> > >
+> > > https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.h
+> > > tml
+> > >
+> > > Does this bother people?
+> > Yes, it does.
+> > If the driver does not return early when receiving an error code from
+> > usb_reset_device(), the subsequent execution will trigger a kernel call=
+ trace.
+>=20
+> Please include a link to such a bug report, kernel call trace etc, to to =
+show it
+> bothers somebody. Do you have the hardware and can trigger this?
 
-On 04/06/2026 15:57, Fushuai Wang wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> From: Fushuai Wang <wangfushuai@baidu.com>
-> 
-> When an SF is created after a CPU has been taken offline, the IRQ pool may
-> contain IRQs with affinity masks that include the offline CPU. Since only
-> online CPUs should be considered for IRQ placement, cpumask_subset() check
-> would fail because the iter_mask contains offline CPUs that are not present
-> in req_mask, causing SF creation to fail.
+If the driver ignores the error from usb_reset_device(), I get the followin=
+g call trace.
 
-can you please add the example/repro from the prev discussion?
-Sorry I wasn't clear I want it the commit message...
+[ 2405.758846] Call Trace:
+[ 2405.758853]  <TASK>
+[ 2405.758872]  usb_probe_interface+0x15b/0x350
+[ 2405.758895]  really_probe+0xdb/0x340
+[ 2405.758910]  ? pm_runtime_barrier+0x55/0x90
+[ 2405.758926]  __driver_probe_device+0x78/0x140
+[ 2405.758940]  driver_probe_device+0x1f/0xa0
+[ 2405.75895s3]  ? __pfx___driver_attach+0x10/0x10
+[ 2405.758965]  __driver_attach+0xcb/0x1e0
+[ 2405.758979]  bus_for_each_dev+0x82/0xd0
+[ 2405.758992]  bus_add_driver+0x12f/0x210
+[ 2405.759035]  ? __pfx_rtl8152_driver_init+0x10/0x10 [r8152]
+[ 2405.759069]  driver_register+0x75/0xe0
+[ 2405.759079]  usb_register_driver+0x99/0x150
+[ 2405.759092]  ? usb_register_device_driver.cold+0x3a/0x40
+[ 2405.759107]  do_one_initcall+0x58/0x300
+[ 2405.759124]  do_init_module+0x84/0x280
+[ 2405.759138]  init_module_from_file+0x8a/0xe0
+[ 2405.759160]  idempotent_init_module+0x114/0x310
+[ 2405.759178]  __x64_sys_finit_module+0x6d/0xd0
+[ 2405.759190]  ? syscall_trace_enter+0x173/0x1f0
+[ 2405.759205]  do_syscall_64+0x7e/0x250
+[ 2405.759216]  ? syscall_exit_work+0xb0/0x1b0
+[ 2405.759228]  ? do_syscall_64+0xb6/0x250
+[ 2405.759239]  ? count_memcg_events+0x15d/0x230
+[ 2405.759251]  ? handle_mm_fault+0x248/0x360
+[ 2405.759264]  ? do_user_addr_fault+0x21a/0x690
+[ 2405.759278]  ? irqentry_exit_to_user_mode+0x2c/0x1c0
+[ 2405.759290]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 2405.759300] RIP: 0033:0x7f7fa09010cd
+[ 2405.759335] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 =
+89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48=
+> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 03 4d 0f 00 f7 d8 64 89 01 48
+[ 2405.759344] RSP: 002b:00007fff7deaa418 EFLAGS: 00000246 ORIG_RAX: 000000=
+0000000139
+[ 2405.759356] RAX: ffffffffffffffda RBX: 0000555bbeb58750 RCX: 00007f7fa09=
+010cd
+[ 2405.759362] RDX: 0000000000000000 RSI: 0000555bb09c65ee RDI: 00000000000=
+00003
+[ 2405.759368] RBP: 00007fff7deaa4d0 R08: 0000000000000000 R09: 00007fff7de=
+aa460
+[ 2405.759375] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000=
+00000
+[ 2405.759380] R13: 0000555bbeb583c0 R14: 0000555bb09c65ee R15: 00000000000=
+00000
+[ 2405.759395]  </TASK>
+[ 2405.759400] ---[ end trace 0000000000000000 ]---
 
-> 
-> Use irq_get_effective_affinity_mask() instead, which returns the IRQ's
-> actual effective affinity that already excludes offline CPUs.
-> 
-> Fixes: 061f5b23588a ("net/mlx5: SF, Use all available cpu for setting cpu affinity")
-> Suggested-by: Shay Drory <shayd@nvidia.com>
-> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> index 994fe83da4be..c5d784cbc8e4 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> @@ -105,9 +105,12 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
-> 
->          lockdep_assert_held(&pool->lock);
->          xa_for_each_range(&pool->irqs, index, iter, start, end) {
-> -               struct cpumask *iter_mask = mlx5_irq_get_affinity_mask(iter);
-> +               const struct cpumask *iter_mask;
->                  int iter_refcount = mlx5_irq_read_locked(iter);
+>=20
+>         Andrew
 
-can you please keep revers xmas tree here as well?
-
-> 
-> +               iter_mask = irq_get_effective_affinity_mask(mlx5_irq_get_irq(iter));
-> +               if (!iter_mask)
-> +                       continue;
->                  if (!cpumask_subset(iter_mask, req_mask))
->                          /* skip IRQs with a mask which is not subset of req_mask */
->                          continue;
-> --
-> 2.36.1
-> 
-
+Best Regards,
+Chih-Kai
 
