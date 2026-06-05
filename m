@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-295641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oY39DutqImqtWwEAu9opvQ
-	(envelope-from <netdev+bounces-295641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:21:31 +0200
+	id 0TVoOoxoImoDWwEAu9opvQ
+	(envelope-from <netdev+bounces-295642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:11:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85DED64576C
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:21:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF6E6456AA
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:11:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295641-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295641-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295642-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295642-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=starfivetech.com (policy=quarantine);
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D210330777FD
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 06:02:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BEE8F300F5ED
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 06:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF923FE376;
-	Fri,  5 Jun 2026 06:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9193F39F5;
+	Fri,  5 Jun 2026 06:02:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2139.outbound.protection.partner.outlook.cn [139.219.17.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC19F3F5BD7;
-	Fri,  5 Jun 2026 06:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242F33B3C06;
+	Fri,  5 Jun 2026 06:02:37 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780639356; cv=fail; b=e9symZnmf1n5gvTTbWtb2e5WrLUbb+HOWISZSopx0id3AZScut/pmo61wBjXKicA4UlnrVLqBW7cW4uOBfTQ6Jp1xqXvL2QO3deJTWLPiozCT6A3Kd1SWbXE2Bi6RTgoBW+il/otZrX3lnmkcjBeQGcSZkLd/31A4yMiRVW2Kec=
+	t=1780639366; cv=fail; b=d2+nvk9pV/047a5+JE8+O7MdEXwnnOi3BfDTSZVJ7yygwqSNDX9j5uf9D2rzglKTFCHhYguYD2kou3F27p6rnWVccKHIkR9x4IzUYUy7nWrsH0gx1vUuz3PSFfe7fm3/cQ77NO8+z2xsW5WPQvZeK+CU0grms0ylwXEBj2c7xzM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780639356; c=relaxed/simple;
-	bh=egTCt+Hji5TE7QB0a+z5XL6YtHWn14ZAok5YCYZ2+ko=;
+	s=arc-20240116; t=1780639366; c=relaxed/simple;
+	bh=3329eNo3s13nuMkpqq1IhdY0a77mjYnJF2bKFRT1lF8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fLYOfK4hOE1kKaPWPMrEniDDBCxCoGR9Vfm5OzJMyrhFI0NataEZzoqc3wDpna1IxnJUP464a1Pvt0kLp68gf1E9V8qKFBR2/1c3w/KOQAMum0R3ouLUv9t2UFiOFNqdL3rWEcBHomi2CG2j2D8zKDFENrOYjsUKmQGwbqUf5Qc=
+	 Content-Type:MIME-Version; b=c2dtvtu9ksvwUrTnWNrXc+fc2bD+KnotAL0KBVZks3nlMYvoaUHOs4yp9xFMFPYsEC5u+/rSLv16OXKU/tk3VvsBlEfJS/76RKJFVN5EJF1k+OfNIyFYdD0IoT0sntjSbk8/zZpgtHQ4Pfdnklr5o1wxXzc+3Rkjw3IoOPYUeXM=
 ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.139
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nzHNHHKSccXeFAbtWNjqWzPu1Nkr76OrbIKFIDnw8lpR/tJPlT1BOI0FW2ll3y5sSN+g33au3NlEfe4Si3yZqNNSPhK+n5RWYkgKFGaNSmSm36VEkJbO4iwfT/RWURHsXm/VmW5uxCyuR5+x14dfjmdhBfybU7OfEqdXH4ufF9sUvYY0oR9vndg5eO0uLij7aF9qCtixEkbyVzeMRbl7Zaow4/TPuTOz52yp/50gij9Q/35+XH7mmOfQl8xj6ZHEWVvNgHz99ZxlUg8ZGkjdgRJPDtDhv5YVWhmWVzG1htjZ0lVCn3pfGMXsHB2gpH1cr3UT3kZTnNt1wQX3Czz6nw==
+ b=LWonjfexkdY64YRAo65aadM6ryQQIVSKRXtAah+5vdrNxQgZj5akIeL+L3Y6PGvvBenEnPAPaIm3//HcqFcmHsEI/pIdxKZAvLXzMYFwNf4C3cDsYFVxp1FC0heSCqoiuoZdTBWlro1Ztx3ZVQc1GqpFx4LN6sieW+73jC0ekZMVlp4rqPQ7VGdbVk1qCOAru3lTDXzoPpopjldAkwG2c5RQawXSFJ3Tpx0/EL25Yf9kRmqZcoOzvr5BnN3CoY19DNP3mrvOkfFM5QFRWbvGaziRfS6B3kNuwTE1QPX/U2rw1SHRHXrxMREQ7/GPjgPLbMFZumgFEM5e+ZEOfCVMBw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j3gCHIxZVmRkiMyEXpJVAXIH/USVV0D6GXEP0IIwon0=;
- b=k9NobCQdUxyC9XMIQKYBNCNa+drBQG569tBElup7tCovaoMlnmbSwiFtHpUMApMDXcPSe3ZvwWl3NzemKM0SDL8CrabHfBs/yKMEmAPrBPsGqmqtzadVc8ikUvBZCyeboZZUiBxfBH1rcu+TQZI2uPVMXA4Xnm4q5JMHprdklq8Rs7biv/zT6Q/sAWouWATz13/FQepsOGw5iinGy5VSymT4SDIR/POIg4YbaQyWcBvESycfujHQPWa3ojVyN+w+Eb3v90e4RaQUNKfSUlpoZkIsDYvO1YJg+PXkTnxXrkeomzXOT4R9VPX2mmpzDEKQ7nGyLuA+bzHTSdfqPfi78A==
+ bh=KALmmW1o9tr5miSgZtpu1ZIrhPWpRU6gsN1Vz5XyRck=;
+ b=JDIHzvyKLbShcBrwA7zcq/iomU9OW8OVurqgq8+NYIMXqZFc0hkJBBs7uvUpnJHUVjlexT7C8MFuDBu7ZyCpcUX96xNZ8JL4+v4Nb2ujCf6w0clLyYDF9gjT8Qsf5DHA0PMgWzZrM83pz4hDq9g2mEQaLlhIOeFpPHH6Mcdki1+wOdDBX8BtfcQJ6l3681/ZIACGGklJDeX4frf6rD5LpJu5Wb7xybWfmoDhbCQlXgd34+jEdfq1C5a49BXfC2GqduerrOCUN+MLzJEA0bfqlM5sYCQjaJmvJlnajHd9hLwHPiiBROGgeASaCZPV2P7ktsjEZr6LJe34hfwWldbwEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -65,9 +65,9 @@ To: Frank <Frank.Sae@motor-comm.com>,
 	netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Minda Chen <minda.chen@starfivetech.com>
-Subject: [net-next v6 1/3] net: phy: motorcomm: move mdio lock out from yt8531_set_ds()
-Date: Fri,  5 Jun 2026 14:02:10 +0800
-Message-Id: <20260605060212.41895-2-minda.chen@starfivetech.com>
+Subject: [net-next v6 2/3] net: motorcomm: phy: set drive strength in YT8531s RGMII
+Date: Fri,  5 Jun 2026 14:02:11 +0800
+Message-Id: <20260605060212.41895-3-minda.chen@starfivetech.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260605060212.41895-1-minda.chen@starfivetech.com>
 References: <20260605060212.41895-1-minda.chen@starfivetech.com>
@@ -83,56 +83,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0542:EE_
-X-MS-Office365-Filtering-Correlation-Id: c137138e-28dc-4ed5-ebc8-08dec2c8010b
+X-MS-Office365-Filtering-Correlation-Id: ec27fad9-e5a7-40f8-6e36-08dec2c80177
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|376014|366016|7416014|52116014|38350700014|56012099006|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	3TroL5D2g4FANqyBVIu+Msaud4h6cniIc/yR2pIDSmGQlOmhx7Mb27RPkbk0wLRkTSEuB4nTxsohWdhEGmyV6+dN+CT/WbxpY4Phwq19efta0HeZwHKU3XfQjyhTWEnCH5AaO1z8ieA5fc+xuM7nXYQKCd5AZNjj5jYBe/sWu9NYlGEG0nFUbbmC9KVzs+zZpMhQYX/bxpodXPZ0GnuESsmZq/YXIGK3HUvbGsQi/9fLxGvu5wtajHtjYdX1u8rWD5PDjXo8YEdplqOLE+X6TRqZBGhGAp5spaXk02Qmr8OE7bh44YPQgnC8sEMlgcczpG9GrwVnR1LXSyJ3hdO5PqDetT9c8hahpio1MUw2VVDlKhm0Ch08QdiSDuAcWyQ5wnjumqjpWVh18GWoSrBkv7HHvN7/3+u3V1bf4EyuCgpvYRh7tUFbRzit32uGTuLZMAxIYjvkGSsiWiRUM//7UmjQJi/mBM/x43/gjK4GELNuThZD+6IG5dCowtRNVfCJVSh+TsLXZIeQ3UxcUYN+H5OJWvf0DTu6T8o/A0FRLwVZZ/FCtelxK2Hmg+wczJ+l
+	vUJOl/D8GDEBWLFi8Da6zREaHNfjITiJ+RIYEPxOw9PtztNnhsKcTCkE45WxRy5uj8EcTpSNaIoGG9kDfi+IDTmX3XLNJfQzKdDOS9k4tra/iOO+Vv78MC630krjhjR7RS+wVpfyUObUUfXuGjr1gjRGi5zbGFuF+fam4TrxRtax2je1UYGuwR0MdylIZooDqlJ5da/Dl4ad9ZeywYwa6bfMtCedddR5d0yR0bBC5GX6rYX1S9AlOzAtUIQ6epFYOVEWjl8wNEieQsteG38T0SfxGNl7SxIJFdrJTF6IUokjAi7BXJvYv4E6poXqdGiBX4RHz7wqSWRH/OYZybdkOKnQsmgKRg7X95Dpqls7k7oaCkm1fFp/7+lHt3cmyFB8uMf8S8/cLOulqZM22g85Lf3PBNARSlAUGaSSDsqnuYg6kWtrbcHWOUUf2X5l4sTqHuYzoo26J6muMKbBV1QU+ioxjZJE4hcDpyKeRzwwxK/QE0K22N5Ficaz9WYasT4Q9Vuyz/SH11K493Qtu0Yaj5S72+ZCM6UHjWP4Rq5+6i0SPesuKtziX8hTIAYHJ3/q
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(52116014)(38350700014)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0mij9794wp9HHDqp1hLXpOAXu+BJQOk2HVDVAw4WgkFm/jb7RK+ZF6NCFspP?=
- =?us-ascii?Q?HqmndiWpCoqQgZlK6iaISojprfwfTfY5xAql1yRBwUcSt4Ct6hVGhfeV2nt0?=
- =?us-ascii?Q?Bo/7fIO5FNjcJRWM2GdkzPFbqDUoIIqHZ6pTCwxtSgSU/qrkfjmPtGdPJKhy?=
- =?us-ascii?Q?0wivM47Zs/0lubGGD5AFo4kkoUjHOh0cDxkbZRXqA1xEfEFq4tXv5IQYXk1X?=
- =?us-ascii?Q?2f2P0vTYZIB9ekBdGNwzTtzz0sb/EYKaqGJ5cTCYMNaysb7mr8ujv9VpZsWB?=
- =?us-ascii?Q?nQLdzdjhvxsqY7cRHWKYCXbrOJeLbSIvnFB82yRz0/Sb16CY3nC4LO40RjiF?=
- =?us-ascii?Q?M6C9VzGwso/HP8rILSQP7wFSrB5YDpxAltgd/J62MufALbY06vm9C1quUxy8?=
- =?us-ascii?Q?qD/Pl8FBZtVP50shvWlPmuxNKvQHTbZoi2wSOpWBNj5MLedPJ2PA1lVyHEuL?=
- =?us-ascii?Q?bV+Oa6mw5mh1q00tzh3xTXfFVHPgM4aQ58PaXFsi+6etUXN5SASTA95JUirl?=
- =?us-ascii?Q?ls/Z2cjzn6yCE4IMnJYDjBOlYyD5u1+Sdz+dVi/EpGDbiR6EDEZHw43aXe68?=
- =?us-ascii?Q?qvmglnS/B1iHZWv6NyniLEN74dgowcVAPH78CNpwR7lIpg06+4DQfHuLYr/n?=
- =?us-ascii?Q?U+onzaf9Qx/zQZXdSI2ujjtGkyeQCvmSPrmWNwspL7OY4wFFwaH2lz45DWrA?=
- =?us-ascii?Q?nzfwuId9/vMKIraLeNuIp8A5VN0uyRIabx8dZEk6PNsWQ/zR7gD2CUCthAIZ?=
- =?us-ascii?Q?8iQTqLHbGP0DxdH2lAfV820sun90/xqAfHsXsdT/hNHJr75n8p5tcG+u7/y2?=
- =?us-ascii?Q?DCGN9CI7nlA2Jo8KRK07R7Fjn4ZsvjSeNl05soSBPydoeSia9OCZGaIpywbR?=
- =?us-ascii?Q?CywUOCVKxBy6C4bLLUgheIUwI0vSo41l655oUsWmYRtKLyZCIcoZRh3GGzE4?=
- =?us-ascii?Q?RC75qqYKcYQuZFB4It/Km3q/Lz56Sc7v7G4zrziD725/KPfwAgrXnfr+vhLV?=
- =?us-ascii?Q?r4zlUNeof07tvxe2tQvqEVodqPjG5ggldZTG3L1EZJlxzzzTsfrldE9M1P71?=
- =?us-ascii?Q?8XPmDeszuumTsMurkUZjALr47rxG2rBpzsLtIRF0/7RRBuEh2xblIvNotnNg?=
- =?us-ascii?Q?dtHIDGyZ4ZxQmaHFaXGBW/DcVnBs1wKXhESjAO/SHVs63kgTUmQJN0T2pb29?=
- =?us-ascii?Q?YBhbm+ooClEpZAKdFi8fkThTH8r5qcIqiKu9G94aIG3BMLzGx8GtpHTjMgH+?=
- =?us-ascii?Q?e5tHzjaboV/xiZ3XJTLetx6yIH6cQldiC3+K6YGRnms8aXGZDSmLDIOTCyq9?=
- =?us-ascii?Q?jrYPsAIS68F1u3PIcSOz+a8Zj1BGCLqH/Oszn8AyzGwrYVK+BiOS7Err7Y0h?=
- =?us-ascii?Q?8SVd/YNz7i/WgIS49gncNky/f4dMJ2R+SeDQG424jEZJVH86JBe6YtZSSxlj?=
- =?us-ascii?Q?txGYQ4COVa2LjvDdZbyxXAIkDSdifR5J4iyebHL0/wmnb2mgs497hXwKDvGm?=
- =?us-ascii?Q?NPFxXt6R1/+jszTKA/8ajhYvMvZKMROhZ9sNPDmLJY5b+TkkmifG/M8zefvw?=
- =?us-ascii?Q?l9gWE48oiocuYDL1RpCYDHbjTNWbLHduB4ngtolZSbbIZVJYOGGb4pH5wFmN?=
- =?us-ascii?Q?JDuIVAxr9Be2ZFhYy9mg5EWNuBnKIj0PTKbx5rlFxs0ID9LdQprtKajz48j8?=
- =?us-ascii?Q?dy08fRrBK3g+wY5w6V0R5rFlltkm3YHjzdUsGakb7SjPMBAV82ZNYFEvCLPs?=
- =?us-ascii?Q?DJeySwvYP3/IWMopGrUImDt2xtdVvAM=3D?=
+	=?us-ascii?Q?uYLWaQEPnP4cgBHnL3fDIIgorYhkSxLDQzpBQ4bY525TVIQH6pxukNkXuU79?=
+ =?us-ascii?Q?MkpJDY2KmxDf+r5lb9vnHZC9ITWV/ykGOUnI3eInOZsnn+l/tWTNa1bDefCX?=
+ =?us-ascii?Q?SAC0vya+OTdVoaFS/Uu23zWly/LHN9ZhSajlA1KCjJCY8kxqI7hpymJHfq3F?=
+ =?us-ascii?Q?7K5gfZTruFnS7BBWYfyxFs7HmVM/a+v/2SNwYbp/zbTi2AFNgJB5wZPbGn/i?=
+ =?us-ascii?Q?37gcZLOI8AdUinHNsT/Aywp1GznTEIBqNQOAQOUGkuSamE3bXm13GE3OtKbM?=
+ =?us-ascii?Q?EpO7K8Uo7puAAryKeJY+keMDmlfu5ZjkMNeQiVm06nG16okSD2f3g/+KCrV2?=
+ =?us-ascii?Q?PrOOZiJ8XjIsr3GyJBWYUWVkz10yym6Bok4HwaRwfXJ2B2bGR4yba0oVRu9y?=
+ =?us-ascii?Q?ITK1X5RRkrwOwW0M4v15jLAMEI2Zy2pim3TPsPLOfO8LmhiYjqykgA1BVMEh?=
+ =?us-ascii?Q?eMY9xlx6LTgBvXA5ay4OGuY8iOXlNxiFPZm9hIYE26XDy2Nqn/ko/82J3vI0?=
+ =?us-ascii?Q?ykb80VzUXV70WnZ1luKd6IiQVFoX/G4hMha0dlHX4T7sRnoxVmVoqTkuEu9E?=
+ =?us-ascii?Q?rcvwcQNg/sVWSOr1efIzPllY07dW+sOD+h/NmWyzY3LAcvp8R6wBQCUVjcZS?=
+ =?us-ascii?Q?jj5GpUQ89VK/bpc0Fwv9rbuc7sdjWv0dcFOAURzSkrd9thFuKZ9i7BVgjCXG?=
+ =?us-ascii?Q?0qGf7xC+ibFrUL/nlrFyaA8wRtU5A4RDtcC1RzjxRN2uWFaN4ncWp3Yuosgj?=
+ =?us-ascii?Q?DD38eR/k3jiFZLij0dqf6T3K/Stykoh5skd3GAjRPx/IdCKjTU+xVVH46145?=
+ =?us-ascii?Q?kHjeDbdv+TJZ/kmLGitk1fWu06sT4cbz4shRGYyoVF9tTVnQp9TDd65DSLnO?=
+ =?us-ascii?Q?TUIqByWOpt7HUQOrrRxVVVcT5T9zriq/BOkLqk/n1FELKOynmj08pLuYCU4R?=
+ =?us-ascii?Q?gaFcieRbAReEGemNeb1A3eK42NOvAsaF081MNLifbviWE5vubYlqPv/FzsCH?=
+ =?us-ascii?Q?D9pbO1HiUibyG2ZCgnCmQmlTsHAQUJHKJ+IRMlJQbQsPlxARpWXrua9K/RGx?=
+ =?us-ascii?Q?pjDPpy1ZLngSDYNXGcmm+rXIEPGm2mzXB26Qa2h9M2c9elP59XyV6weEYACg?=
+ =?us-ascii?Q?GynRXiQHmtHKVVuM4oCH0X8sERnlcgF/Zhm4t+iIAA50QjQ/2JukHFQ1BtqO?=
+ =?us-ascii?Q?rFgMepZmx6XMjt/s3jgh6emwF2n+zrCGtCKRFnhOj7jdC0tQ96sU4E5Y03Gb?=
+ =?us-ascii?Q?7GEfP1I6rssDQIEt4KZgGCuasuGle2a389TXLExlrkCC+SqFgzBH+jwO7+1n?=
+ =?us-ascii?Q?4Gl+Rjfm25uR/SuTw/cZM0JJcC/4ECXoGZI33g/hyAQScna0wt7IjnQj+71m?=
+ =?us-ascii?Q?JxtFQkVbh32V8dbEsJRkIvx6hymib1gISepxSjeQ4QrLIKmBgJb+sCgNrORt?=
+ =?us-ascii?Q?zBNbfBSvgU8zkuA1XdE1zlGYpDa+8hu5W3ibolTvKLaXTdue95iRAJVsKUeV?=
+ =?us-ascii?Q?svksusxlwSAypZ+vnDiAdL/r1qxa+bJuF5eyolKUrNe4bd+U45Iqd5VSoWCy?=
+ =?us-ascii?Q?lONyI6Ch2Cg3DjUzVIHu24eANRC9zFy5kLN2HUZZ96WB4mrWNzGRQZdcwA0Q?=
+ =?us-ascii?Q?FV7C50MN57uE+KXSn6om2fUjc8bNO+KYXZuvLqM8pToOCJvoXP5o+FUNQeLz?=
+ =?us-ascii?Q?B6/iwKEv/bfFcNn+dplZzQbcYSpKiYfEc7aJFryOrmP7HOYXlSMP0hAJFoVD?=
+ =?us-ascii?Q?1WtdlCrFlpw85ZPAduKH/lzVPLmlA1w=3D?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c137138e-28dc-4ed5-ebc8-08dec2c8010b
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec27fad9-e5a7-40f8-6e36-08dec2c80177
 X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 06:02:20.1300
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 06:02:20.7894
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zjvd4JsXGQo62oiEm3j2G0A5iTsdcrthAOGF6Mc2xsoEYdsNj+79NuDt8Vj1d7EEH7EtdRBaz0gXm2dhoLYZ+K70K0BTYpwvboGQ94oVU8I=
+X-MS-Exchange-CrossTenant-UserPrincipalName: no2y8Z2QeVBKZC/Sg5a7bga495Nrt5ISEr1YVtQnFzrCGos1hzLZqkwGtua50XqOuYHFxf1SNbOtiQlP3E9nk/ioVQFeYTKXi7DlkifQz9s=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0542
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [5.04 / 15.00];
@@ -141,13 +141,13 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-295641-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295642-lists,netdev=lfdr.de];
 	GREYLIST(0.00)[pass,body];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
@@ -163,87 +163,41 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,starfivetech.com:mid,starfivetech.com:from_mime,starfivetech.com:email,lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,starfivetech.com:mid,starfivetech.com:from_mime,starfivetech.com:email,vger.kernel.org:from_smtp,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 85DED64576C
+X-Rspamd-Queue-Id: CEF6E6456AA
 
-yt8531_set_ds() default set register with mdio lock and only called
-with YT8531 PHY. But new type YT8531s support RGMII and has the same
-pin strength setting with YT8531, YT8531s need to call yt8531_set_ds()
-setting pin drive strength. But YT8531s config init function
-yt8521_config_init() already get the mdio lock with phy_select_page().
-If calling yt8521_config_init() with mdio lock will cause dead lock.
-
-Need to get the lock before calling yt8531_set_ds() and move mdio
-lock out from it for YT8531s.
+Set RXD and RX CLK pin drive strength while in YT8531s connect
+with RGMII. Need to check 8531s PHY ID because 8521 and 8531s
+pin drive strength is different, 8521 can not call
+yt8531_set_ds().
 
 Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/phy/motorcomm.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+ drivers/net/phy/motorcomm.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-index 708491bc198a..688679457ef9 100644
+index 688679457ef9..dcba50007451 100644
 --- a/drivers/net/phy/motorcomm.c
 +++ b/drivers/net/phy/motorcomm.c
-@@ -974,7 +974,8 @@ static u32 yt8531_get_ldo_vol(struct phy_device *phydev)
- {
- 	u32 val;
- 
--	val = ytphy_read_ext_with_lock(phydev, YT8521_CHIP_CONFIG_REG);
-+	val = ytphy_read_ext(phydev, YT8521_CHIP_CONFIG_REG);
-+
- 	val = FIELD_GET(YT8531_RGMII_LDO_VOL_MASK, val);
- 
- 	return val <= YT8531_LDO_VOL_1V8 ? val : YT8531_LDO_VOL_1V8;
-@@ -1010,10 +1011,11 @@ static int yt8531_set_ds(struct phy_device *phydev)
- 		ds = YT8531_RGMII_RX_DS_DEFAULT;
+@@ -1697,6 +1697,11 @@ static int yt8521_config_init(struct phy_device *phydev)
+ 		if (ret < 0)
+ 			goto err_restore_page;
  	}
- 
--	ret = ytphy_modify_ext_with_lock(phydev,
--					 YTPHY_PAD_DRIVE_STRENGTH_REG,
--					 YT8531_RGMII_RXC_DS_MASK,
--					 FIELD_PREP(YT8531_RGMII_RXC_DS_MASK, ds));
-+	ret = ytphy_modify_ext(phydev,
-+			       YTPHY_PAD_DRIVE_STRENGTH_REG,
-+			       YT8531_RGMII_RXC_DS_MASK,
-+			       FIELD_PREP(YT8531_RGMII_RXC_DS_MASK, ds));
 +
- 	if (ret < 0)
- 		return ret;
- 
-@@ -1033,10 +1035,11 @@ static int yt8531_set_ds(struct phy_device *phydev)
- 	ds_field_low = FIELD_GET(GENMASK(1, 0), ds);
- 	ds_field_low = FIELD_PREP(YT8531_RGMII_RXD_DS_LOW_MASK, ds_field_low);
- 
--	ret = ytphy_modify_ext_with_lock(phydev,
--					 YTPHY_PAD_DRIVE_STRENGTH_REG,
--					 YT8531_RGMII_RXD_DS_LOW_MASK | YT8531_RGMII_RXD_DS_HI_MASK,
--					 ds_field_low | ds_field_hi);
-+	ret = ytphy_modify_ext(phydev,
-+			       YTPHY_PAD_DRIVE_STRENGTH_REG,
-+			       YT8531_RGMII_RXD_DS_LOW_MASK | YT8531_RGMII_RXD_DS_HI_MASK,
-+			       ds_field_low | ds_field_hi);
++	if (phy_interface_is_rgmii(phydev) &&
++	    phydev_id_compare(phydev, PHY_ID_YT8531S))
++		ret = yt8531_set_ds(phydev);
 +
- 	if (ret < 0)
- 		return ret;
- 
-@@ -1825,7 +1828,9 @@ static int yt8531_config_init(struct phy_device *phydev)
- 			return ret;
- 	}
- 
-+	phy_lock_mdio_bus(phydev);
- 	ret = yt8531_set_ds(phydev);
-+	phy_unlock_mdio_bus(phydev);
- 	if (ret < 0)
- 		return ret;
- 
+ err_restore_page:
+ 	return phy_restore_page(phydev, old_page, ret);
+ }
 -- 
 2.17.1
 
