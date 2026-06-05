@@ -1,211 +1,321 @@
-Return-Path: <netdev+bounces-295702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zHBLNdV7ImoXYQEAu9opvQ
-	(envelope-from <netdev+bounces-295702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:33:41 +0200
+	id acOUEEJ8ImpJYQEAu9opvQ
+	(envelope-from <netdev+bounces-295703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:35:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8137864605A
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:33:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93156460A9
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:35:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b="SGZhrs/N";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295702-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295702-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=jxHbk0TH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295703-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295703-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8AD793056161
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:32:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F3B943047076
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEF647B41D;
-	Fri,  5 Jun 2026 07:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE51F47B42E;
+	Fri,  5 Jun 2026 07:33:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011065.outbound.protection.outlook.com [52.101.65.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E6442315C;
-	Fri,  5 Jun 2026 07:32:06 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780644728; cv=none; b=ApTmAAsJQZeMZUYYYAxrcVUu3afBmB+xB9Leq8lQKggoFeeR5fkdT4+in+20UlE6jnoDj7zG/leucrwQ4S9yeHNp2xgOKuFyA8TULlBGCUNlKxhcDJpJzIwSOw85rLyF2NhVeSl2Cznyn++uRA2QfDPveEZ3eXYBMCimhzDyLhE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780644728; c=relaxed/simple;
-	bh=c30wbulhkBn1BOKZ95h66WcDcHsR2Lig8B6kzzR9otg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HlRM+IeYSCMvfG/BZgboPZuuSMDydBImO5nRRmQvrqvLapimmToLjtTXt7FhUz/pjkhrs636K+FXwREBcKHvjt/FRmn4fYKMMdw12zAE1PgjgqEyh/6OFQsfpOA1Z54N+Vfv8cGcq3TzlrW4gtNtS4BSoPJHN5XXULKg3LJH95Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SGZhrs/N; arc=none smtp.client-ip=192.198.163.16
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780644727; x=1812180727;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c30wbulhkBn1BOKZ95h66WcDcHsR2Lig8B6kzzR9otg=;
-  b=SGZhrs/NfcpcCcqV3uRHFGGg+wyRaQlgJsWM3upHHww90ue67+lQDMBd
-   ZsmRSSOc33GM4VM9AsyTuBhhnV7MAH7xc2dqXbElIG8TGOdRNQTaFds3r
-   n+6NamFDPmklFUc3GIiDadql2qpWu4ARQrWn1130ZLqyZHtZG+i/R4Xef
-   1avlRLuGqciRhbLkSCHepAJEPKle+epn4jqQlzep4z1niyBIoi+UNi68s
-   FGLgThZnY/fmZyDtFDvW4/Il453EtwvdQTQ3YLizReE4S120cS0sKLXQH
-   EHI0KTusI7l2arMH0SA25vxbYJUAno6dDkYRfQjR27rUumN5sbB0Vczyb
-   g==;
-X-CSE-ConnectionGUID: EIBuMG3eSeyjAKKtOweGZg==
-X-CSE-MsgGUID: /0xCisKmTq2pYVBW821L0Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11807"; a="69012007"
-X-IronPort-AV: E=Sophos;i="6.24,188,1774335600"; 
-   d="scan'208";a="69012007"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2026 00:32:05 -0700
-X-CSE-ConnectionGUID: dgmCPLzkTKmMjNLLI2/dBg==
-X-CSE-MsgGUID: q1Bd7HPvQi+WKekTT+SBKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,188,1774335600"; 
-   d="scan'208";a="249704712"
-Received: from ettammin-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.245.178])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2026 00:31:50 -0700
-Date: Fri, 5 Jun 2026 10:31:48 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: "Peter Chen (CIX)" <peter.chen@kernel.org>
-Cc: Bartosz Golaszewski <brgl@kernel.org>, Lee Jones <lee@kernel.org>,
-	Mark Brown <broonie@opensource.wolfsonmicro.com>,
-	Thierry Reding <thierry.reding@avionic-design.de>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH 20/23] usb: chipidea: use
- platform_device_set_of_node_from_dev()
-Message-ID: <aiJ7ZB-J-TyJEwBb@ashevche-desk.local>
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-20-88c324a1b8d2@oss.qualcomm.com>
- <ah9P6Xt9SyKgc2oJ@ashevche-desk.local>
- <CAMRc=MdhjZhGL9tEx9WEjn2f95d=ObNM0AtBNpcevm6aHgpj+Q@mail.gmail.com>
- <aiJz6Ys4gE998ULp@nchen-desktop>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF21447A0C2;
+	Fri,  5 Jun 2026 07:33:40 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780644822; cv=fail; b=QnFP3vFacmH5/JVY/eM01sk0nJqbVhgUjTF//lF+ALeBlNkbPVYF3gcObBorL8lG/sqPeSPP+YsjrE5gdKIcgyfXwuaDFBgOFCWjixXu/uHbePlOGWTONfIraKqsKAKDGjgtgfaj4NNIE0rf96+Tft0iUvlMmsDJQuun3GN0W6M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780644822; c=relaxed/simple;
+	bh=+3Qmf1X0e9tWSBaB1mRqYspacKbzl/cemLcVH6lh6Z4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ns0gktTZFxG4GwTU7OPx34jijFUnDL5QI6rUbStZalWzlG0L90g87wwYlgF34oqF3qgpRw5idZRIRnoYynJcNlVYb9b6K4XeotlQVez8e7DUTyg4jwXbJVAIBtQenJlppPK4t8vvyYPDyd+x5xXVPZx/kf/LM1zZZhHOF777lhs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=jxHbk0TH; arc=fail smtp.client-ip=52.101.65.65
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xCpFX9kgx7PKN1PnGfDnR7ij2blfwfGlncxnzSI/5gEJbIjwnGmxMNHJdGr3eHs/RA2j+hxynpgw3k6wj6RQQoAVhS7kedyJNt5fDMT+wtsVuVfxpAXyz/VzBhWWocJUDBv3gLNPGpfc9VWb5UsdGoAWe4TD7/y+Kkt6UibXibg2s+Zfb6VQ32CG5kiQaiZdaTL547TcPbV89JOdJ+BTD4YVR7UpeCS+X2Hg9T0+NuPa0P7HLykd3Zg0kPmwt2T+FSgUUJzsVRU6OsHT2SfgczZ75cD0vR1sw1fjkAMJxmDDw7Itid/UhRD++rduYKsS9xyuIvwVbLF1krMfyFSwNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9UIR0qr+MCyhcqyh176VxKwOQofQDmIznqTeaRbOA/o=;
+ b=ZNunoYgE/rXDHyVRQnBdrw2/zvqwUFOCHuRcqLSQT96lis+N7SFm5A7FKg9arFZSwqPnKZ8Rjc+ue+fkJ11MphjlToZed0wSlbw5P8gKVu8NFpvX0B31Lw9/ZXmduSVprCCKgw/Ser3bubpmI+2eeBksubcojGByGwcLoNe2hgJ3OANF7tCJFXJYZsoUtU7x2NR1KhLCLmoIBMgjfqigh2Cqn0iaSyw66d6Gb4CNgMJhnYZhjxyP7M9k2Bb9iCd4F7jfSgIhYR6dOGS2Ma3n5LzZXc4UvGfAX6csl+Buy73vPYUBot2uSRk0AnjrE2ZhYkLXaiWo5cAUFs/hZIRYxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9UIR0qr+MCyhcqyh176VxKwOQofQDmIznqTeaRbOA/o=;
+ b=jxHbk0TH6y1Et80pZeweQsPyC6DcFt9gg6+iWeber5zcbbxUnd0r3VjzxS0SDxGE+UEVsttUQBJIXrTxm0b12QfWUYMiOwM7eVvYfSXNTu8MmhS9oiYzp+XXfkWKI0/700Oc/AAcXmFwT2G/8pmB/2w45HEFreaMbTNncgoxHxPDa/AiiGwwDpSXUqViLNweJtM70iFo9bs42BXTzJhY9s4f0IBytox7Po3QNtF9QgD3z+YrZMg5rr7DECU8Ygq7hETQXdzQ3eOxfBxcMnatpHNZLGX14UqCr2miC3nAkg8Z6Yrfr/iCFIGosBjG4MVD1lagAw1kovLqHwhTAymPIQ==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ GV2P189MB2912.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:26e::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.8; Fri, 5 Jun 2026 07:33:36 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
+ 07:33:36 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>
+CC: Simon Horman <horms@kernel.org>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Jon Maloy <jmaloy@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH net] tipc: require admin privileges for TIPCv2 mutators
+Thread-Topic: [PATCH net] tipc: require admin privileges for TIPCv2 mutators
+Thread-Index: AQHc9EL8BMh0sI0f4kKmrWLCm578SLYvkK0A
+Date: Fri, 5 Jun 2026 07:33:35 +0000
+Message-ID:
+ <GV1P189MB198889FC61EF33D109D8B100C6112@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260604163102.2658553-1-dominik.czarnota@trailofbits.com>
+In-Reply-To: <20260604163102.2658553-1-dominik.czarnota@trailofbits.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|GV2P189MB2912:EE_
+x-ms-office365-filtering-correlation-id: d7a48354-edc5-4066-fcd6-08dec2d4c0ee
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|7416014|376014|3023799007|11063799006|56012099006|5023799004|6133799003|38070700021|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ /iDWidjmlzdHhcszvBcfs0w7kEGehEN6zrMRhCLqr9xmF/q/3pyinpW/7nsUKX3lYWkuTlJTeOQ/B2gz7+kVaZN8Lcf+t/7k1uPcmI8QFvkNfoVk3tdQbZvgXkrh7MVRmHPwDNnRJojMvuyyW+FtkXQeEZXaFA/xcmvpTRF4f+ALhRlmQ8J6iwSo/6GWtjX3hRKuc0e1KOPHD0mLzMZpV6DY2/d+iLkbcotOKy0pSb8ZASF12bkAgltX6EknM2HUFdfYIhhtzro7GdGnHhCyWzkCkfh/3nHL/7SSZkrIXCle3uOUEh98RzF3+oqmKfNq1R4Ip4ECkcaDcDVPh0kpNASRrSPtzHzrc/2NxIY87pTqXhqE5tB622NYgt5xiUGOHGQUPFzFCHObSEHvDWAHD/pk/91qLe1trXOa5vvb45IgycD+wH7Re9LHiZKlJqEoqcvhUKeeVs5iFCNljqPf6wBlCk9V6JP6JTvbLUZT+zN4fGymDKGDg6NaYYG89bCjy7IKqaaH9jEUok11ZncF81d56K9aGOqEn3/S2xhDbKSQF14UcapNfj9wfTbp8RKSoEzCJhFdZPoHkkaJrPcrHznJ22OuMbLPCdcrz9A96stw2C1kDOUvzzIrDDskQsRWFVlCXlLjA2JD1brYTX024f5Rp4V0/wXauwOfLLNlxoOb3IS9KXHHNXk56AzZ/LvD+Pj+ZMsCcL28hnEX1P+9a2Sjmbwx1qghP2rTX13wM8yu5Z/4YjsjxqS8ICYEAsYX
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(3023799007)(11063799006)(56012099006)(5023799004)(6133799003)(38070700021)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?3AtEuVUfBNk3mW4QOObCKraB0q7CQT153sfT36Jk/HRWQ7gWgLTBXTTHQnVt?=
+ =?us-ascii?Q?4fOIEkwkDFMCz4XIfWSY2JbbHKaEz9UlAQSp2S6qcxy+Y9LzVlx1L3jBmv4l?=
+ =?us-ascii?Q?PG51Fk0+Qnn+OBjozOxdTbAWEn1F1Mlujjl+7ljPTJBKu+A/4BVqCw8bkCGH?=
+ =?us-ascii?Q?ti5MxSusG38GLedTNYCRkbYiGvkOKVW4KBD3mUpVmTEQ32w8z41JlM1ymW9u?=
+ =?us-ascii?Q?Kl8MH6X2X0sLmZwYNbxCM2xJBI8bwuiQxtnG/IlOxJLyni/Fj/VhqOJoH8gu?=
+ =?us-ascii?Q?/uiyGybvOgNGdyfVsvEDXbAirAfP1m9sNqvCVHb7pxsuq6pcD1tH8QipvUVB?=
+ =?us-ascii?Q?Z8+6bvavcsYf1+f6jC3DFxx9zr5qukr3/+cu/+iKPG9IEc+bKEUS7IICgSUP?=
+ =?us-ascii?Q?6C38PsJkqcVJ6FgxN6gVak341TlWrNxmv44DaiLAU/eBj3oKWjLGBUhtjV8P?=
+ =?us-ascii?Q?xv81qsG7+MD8gQ8rJUAf1piPG8LAFcZn5IxtBLFUSlVIkP0/71SDpU77ZCdJ?=
+ =?us-ascii?Q?VV0sWzh02pRhfW5TUUSERR5xVXpkgO8RsYq9+tTqaRg+QBfE4N5xmden6URC?=
+ =?us-ascii?Q?wSvfeNTFRqwDsmecT4PbHuJIhlM4Zr7akrEMwoYtAOatFqHpLpZibkRqwO91?=
+ =?us-ascii?Q?REpjC/uBmAImrxhXc7h1VH6fKV2C/6V9ZBooFWLUjv9t311rA4JyDYhgeb5i?=
+ =?us-ascii?Q?8J3+o3lNRTPRtbtHsYi8u8of2kOtUkYPCN7nceV8y4RxVbEKE8UfsyXitavj?=
+ =?us-ascii?Q?jMUmVDRv7poEPty2AY1S708zaLj6gFr0nCVJk3bE21aWDWKroP9v7QQic4uy?=
+ =?us-ascii?Q?3nz0dRcBCagAQXBTvRoNpiS1TkdEWXuXgqo4m08tYwNTeWw6GjYLsarGzcB+?=
+ =?us-ascii?Q?zw0CBXr2bM1RjjP06U0czx6SDhGjkzzZWQayZb1kSluBDRwhIYVqRGnC05md?=
+ =?us-ascii?Q?H2JNfz++K5SbAkOApc3/7GYq1If/59exWhYJdV12FCwh4aeofGFiKW5IIWmZ?=
+ =?us-ascii?Q?BI3VfO5rYcHDlLkiay73i0dz+an6QosTr337hnOzcYH899XImWpdYo2m2zvB?=
+ =?us-ascii?Q?C6GLzaYjWSYX0azzkTrKvVcdUdNxWCjLLdCj01LJ67aQ66gT34SGxTBibOX9?=
+ =?us-ascii?Q?9esul1+UBYY23gzPzG90kbGhGREn0cWsOMR2twA3R3FUc/JKlza3iSH2biXg?=
+ =?us-ascii?Q?yBA6H2oTufZDht+QAKJ6zSEbBJrjPp+7lNXHRf2icO5kZ3GRmgK0SV6cINcV?=
+ =?us-ascii?Q?oYvxMhKPJJo6e7tlckpbfGDKBTVH7kOTa/aywruDy3QBdOMlJQDeN9AANLl0?=
+ =?us-ascii?Q?IdR5SgpyqbPjNp1V8ofBPGYE8RUtT/OlVXPE9S9BqQVVLgrAo5MIiE1jvikV?=
+ =?us-ascii?Q?rfdCzZDXh3JoExlFsgu/n5MfJAYlZCB32E1oTmVMteLKwyeK774er1b8b41B?=
+ =?us-ascii?Q?d3GxiTzdfWZeeMGOo/gNMlNLN2vKKT0lACjcEAw7mYO2wK+IORji+OI4AUBg?=
+ =?us-ascii?Q?HVygTlZ9FPkDf2pRLShts8HS0lnvELZzLG1y5tk8llE6yXgEQPuSjEt5BNmh?=
+ =?us-ascii?Q?CA9S7nW9ozeO7W44Jw3VFQlKhy8OC84oS9yd/SoU01zE0Fxv/PWMx6IqvV7S?=
+ =?us-ascii?Q?T4CNjQjYcMQoXhTK8cxOkg/iNq0NgNedK1PrcgOp3Yzgh+oQdsIgkSEl2sjO?=
+ =?us-ascii?Q?8BCeJ9NbmpXFm59LFUnnSwbAK5NdGrUgrCqzzKqL59D4qbzS7KvnVCqJFH4V?=
+ =?us-ascii?Q?BMWBBFdUzg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aiJz6Ys4gE998ULp@nchen-desktop>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7a48354-edc5-4066-fcd6-08dec2d4c0ee
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2026 07:33:35.8643
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YMYta4DuLOVLGndOWdlNV3c0SiVl4zkyiRsTyPP//CpFzqfYeYOoSOVXXgiA0UmHkp1FhqNJ9QY9aXY3LHGkPDEsXl6p2mjM8XonWET7el4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2P189MB2912
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:dominik.czarnota@trailofbits.com,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295703-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295702-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:peter.chen@kernel.org,m:brgl@kernel.org,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:
- luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	DMARC_NA(0.00)[est.tech];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[est.tech:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCPT_COUNT_GT_50(0.00)[65];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:from_mime,ashevche-desk.local:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8137864605A
+X-Rspamd-Queue-Id: A93156460A9
 
-On Fri, Jun 05, 2026 at 02:59:53PM +0800, Peter Chen (CIX) wrote:
-> On 26-06-04 08:34:16, Bartosz Golaszewski wrote:
-> > On Tue, 2 Jun 2026 23:49:29 +0200, Andy Shevchenko
-> > <andriy.shevchenko@linux.intel.com> said:
-> > > On Thu, May 21, 2026 at 10:36:43AM +0200, Bartosz Golaszewski wrote:
+>Subject: [PATCH net] tipc: require admin privileges for TIPCv2 mutators
+>
+>TIPCv2 registers its generic-netlink mutating commands without permission
+>flags. Generic netlink only checks CAP_NET_ADMIN when an operation carries
+>GENL_ADMIN_PERM or GENL_UNS_ADMIN_PERM, so callers without
+>CAP_NET_ADMIN can invoke these setters.
+>
+>This allows an unprivileged caller to change TIPC control-plane state, inc=
+luding
+>bearer, link, network, monitor, peer and crypto-key state.
+>TIPC_NL_MEDIA_SET is broader because it updates the shared media defaults
+>returned by tipc_media_find(), including UDP MTU, priority, tolerance and
+>window values, which can affect later bearer setup.
+>
+>Require CAP_NET_ADMIN for all TIPCv2 mutators. Use
+>GENL_UNS_ADMIN_PERM for network-namespace scoped state, matching the
+>legacy compat path and normal netns administration semantics. Use
+>GENL_ADMIN_PERM for TIPC_NL_MEDIA_SET because it mutates global media
+>defaults rather than state owned only by the target net namespace.
 
-...
+A similar patch has been submitted using the same AI:
+https://patchwork.kernel.org/project/netdevbpf/patch/20260602133555.769727-=
+2-michael.bommarito@gmail.com/
 
-> > >>  	pdev->dev.parent = dev;
-> > >> -	device_set_of_node_from_dev(&pdev->dev, dev);
-> > >> +	platform_device_set_of_node_from_dev(pdev, dev);
-> > >
-> > > Why do they even do that? Do they have a USB connected pin control?
-> > 
-> > I don't know. I can't test it so I don't want to break it. If they don't need
-> > it, the person who can test it, can remove it later.
-> 
-> It was introduced by below commits:
-> 
-> commit 0f153a1b8193ce768be4df0400aeb2c8f2a3b3da
-> Author: Rob Herring <robh@kernel.org>
-> Date:   Wed Dec 15 16:56:46 2021 -0600
-> 
->     usb: chipidea: Set the DT node on the child device
-> 
->     The ChipIdea glue drivers just copy the glue resources to the "ci_hdrc"
->     child device. Instead, set the child device's DT node pointer to the
->     parent device's node so that platform_get_irq() can find the IRQ
->     resources in the DT. This removes the need for statically populating the
->     IRQ resources from the DT which has been deprecated for some time.
+Your patch suggests using GENL_ADMIN_PERM while above patch does not.
+Did AI suggest using GENL_ADMIN_PERM or you suggested it yourself ?
 
-This doesn't explain why the node marked as reused. device_set_node() fits
-the above description. Rob?
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+>
+>Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
+>Assisted-by: Codex:gpt-5.5-cyber-preview
+>Signed-off-by: Dominik 'Disconnect3d' Czarnota
+><dominik.czarnota@trailofbits.com>
+>---
+> net/tipc/netlink.c | 12 ++++++++++++
+> 1 file changed, 12 insertions(+)
+>
+>diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c index
+>1a9a5bdaccf4..5bbe134284ac 100644
+>--- a/net/tipc/netlink.c
+>+++ b/net/tipc/netlink.c
+>@@ -152,11 +152,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
+{
+> 	{
+> 		.cmd	=3D TIPC_NL_BEARER_DISABLE,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_bearer_disable,
+> 	},
+> 	{
+> 		.cmd	=3D TIPC_NL_BEARER_ENABLE,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_bearer_enable,
+> 	},
+> 	{
+>@@ -168,11 +170,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
+{
+> 	{
+> 		.cmd	=3D TIPC_NL_BEARER_ADD,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_bearer_add,
+> 	},
+> 	{
+> 		.cmd	=3D TIPC_NL_BEARER_SET,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_bearer_set,
+> 	},
+> 	{
+>@@ -197,11 +201,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
+{
+> 	{
+> 		.cmd	=3D TIPC_NL_LINK_SET,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_node_set_link,
+> 	},
+> 	{
+> 		.cmd	=3D TIPC_NL_LINK_RESET_STATS,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit   =3D tipc_nl_node_reset_link_stats,
+> 	},
+> 	{
+>@@ -213,6 +219,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D {
+> 	{
+> 		.cmd	=3D TIPC_NL_MEDIA_SET,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_media_set,
+> 	},
+> 	{
+>@@ -228,6 +235,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D {
+> 	{
+> 		.cmd	=3D TIPC_NL_NET_SET,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_net_set,
+> 	},
+> 	{
+>@@ -238,6 +246,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D {
+> 	{
+> 		.cmd	=3D TIPC_NL_MON_SET,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_node_set_monitor,
+> 	},
+> 	{
+>@@ -255,6 +264,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D {
+> 	{
+> 		.cmd	=3D TIPC_NL_PEER_REMOVE,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_peer_rm,
+> 	},
+> #ifdef CONFIG_TIPC_MEDIA_UDP
+>@@ -269,11 +279,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
+{
+> 	{
+> 		.cmd	=3D TIPC_NL_KEY_SET,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_node_set_key,
+> 	},
+> 	{
+> 		.cmd	=3D TIPC_NL_KEY_FLUSH,
+> 		.validate =3D GENL_DONT_VALIDATE_STRICT |
+>GENL_DONT_VALIDATE_DUMP,
+>+		.flags	=3D GENL_UNS_ADMIN_PERM,
+> 		.doit	=3D tipc_nl_node_flush_key,
+> 	},
+> #endif
 
 
