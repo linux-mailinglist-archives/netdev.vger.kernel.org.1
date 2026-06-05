@@ -1,189 +1,191 @@
-Return-Path: <netdev+bounces-295723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295724-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Lug7FYWKImqhZwEAu9opvQ
-	(envelope-from <netdev+bounces-295723-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:36:21 +0200
+	id 2CYzB46KImqnZwEAu9opvQ
+	(envelope-from <netdev+bounces-295724-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:36:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB63B646705
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:36:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB09646715
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:36:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Sr2t+Rg+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295723-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295723-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=suse.com header.s=google header.b=LjT9b6dW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295724-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295724-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 28D5430465D4
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 08:23:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4AE2A30CE3BA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 08:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD0E3CAA5F;
-	Fri,  5 Jun 2026 08:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18B53CAE6B;
+	Fri,  5 Jun 2026 08:24:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069653C9888
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 08:23:22 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780647804; cv=none; b=e6AfHAIimnqwmtJna8AwOe8Hbd7M6uZDLsyKRTpkBWSBGOUdD35OA73bd+HgY/yPIc8K/z8HWd5GuiqGa39OHQMRKXgFwsJrieGLw9oLlEomrzm4IgwuzhBuWg5zrv1NtNMVPp1b982eHsNyO38OM20rkVAfnT1B6RYzd2t6cyU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780647804; c=relaxed/simple;
-	bh=eAlKvP2gsEfRQmVOZv1allmZysrFKO1fn5IMvtPZQiI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z6HrV1l8KEsHa/higSKq1/YxJiBpNBQVXa4CWhMhBu2hXBj8SPAz5KyGlfCM3RZMIpzuUzTaNQo2HZ1J35GvzbNw16KrDZnVq1x5ZXgsOLmeTN8aCEwo1cLruoM0wfJomSaHbk+Dc8MA8nznWP+yaB2Q1V5Kg4qEA6u4HyrFFQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sr2t+Rg+; arc=none smtp.client-ip=209.85.221.50
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-45f3cf907ceso762895f8f.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 01:23:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A770830F803
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 08:24:31 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780647873; cv=pass; b=Lg4VjJTVG+x5cWQMdPYLek977nlPRW5F//OJQiqZDKMFiKOYfGoGMsgrEPOYbqWjwGe7WZ3PkGLw6NVi6COUEMPiEmKUVU285zqzCJXVQ6ONL0Yky66fOU6nXwQwLzovlsNGXd/UcDF5AEKfLkf2UjM2BotuudLUhdlgOOoOsD0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780647873; c=relaxed/simple;
+	bh=//piZpS4JqLzDTuCDQ4SM8AQklgNjfVxCndwQALTVT8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KwrPVMvKnXNdzRC8yF6zY503xiHYAJdbNHF+xWH03eqTnZprmWvoQAwVCDEzOIVOPVgAQwdRJrUhIAMOwKPzadO1LjOOub4TTLNoyr/2hx5WWLW2VwyWKrlkFg2T8gg7jCdGiOLQ5P9G/XNtwOkL6+oDNax94EyGQzn/35lGvB0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LjT9b6dW; arc=pass smtp.client-ip=209.85.167.48
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5aa612bf6efso1682967e87.3
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 01:24:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780647870; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TjYpmfz33BUr/WPO7zQuaVlwRI5oSrmPOeFJwoUPnRXqwJkB9k2971kJOBzt2YLtiI
+         YslJU2SNsHs1zYDcr3CbPgwXgNabXrKC9k4do470U7IxLcQHM48qV42Y9Xzgt+pk5BPY
+         psGEtdDTGoFiSi3F0rFp1Dv5YLHgm/MhXX05WYrWF7b8rsjB5f+LKnhw9qBf69mXJ7Xy
+         Ai5LwtHkJ7sYI2EMHmmGLzq/xZK+vA720TmN0mA8Sr3H6bF1K0iQv+3gm6dLeswv6rgX
+         OEBnPm0cE7BJR38sLKxz2Wd2Z9hWavfQODvwsROEpfnIWitAVlwpvqDlChbt/H+amDoM
+         HP1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+RZhurI/q7oJqN3iUeEhWQQThIPk8thOCCIV1vfD+a8=;
+        fh=F4qiCW50zgRIn4OJ7DdxJcEnaGXRJmeZNlvR5BAVl9I=;
+        b=hGWwIkmBwoCQmF44qUD7W92ppgTNkyuBcl+yFUl6zkfKv/EPBzod2SPvNmoLwckfLl
+         2EOUJ8n/X5wuu8g+PGfvWSt/NG1kppOYXRkv6jgJ0LoQ4EVhxeA5F0uTj5ZuHLMhoriA
+         1Xy9B+JNXW5Q+B2PtcwmyExXCh84Oa+lPVUzR8kqk9vjahZ2ddmqiPVOiTRYSMjTIjCC
+         FXlxVBtVPknKCh3Mqw1+1YVjpLPd+TcQ0ol3x8L6HJ8tXgesez7DeIfhf2AvqBlMD4tF
+         r0fKDFbQFe66KEFFbyertD6/iz4Q8RtGP/gC/UZkV//tEN6JkA3RvdNsF95yaVIzlMj2
+         aY+g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780647801; x=1781252601; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=suse.com; s=google; t=1780647870; x=1781252670; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/ncylH/iADc8ME04RgleGvGv2QOfG/3EuEqLEAZ+XWA=;
-        b=Sr2t+Rg+htecQ7mMDjt3jafvQkDhGt20df/P3Cs/4kP9/frGVSzMbw4gnwBzd7/Glb
-         LQbaGgyEOKmp0NA0I7tpfquCUZnW5dx7ofSQTISET7S9/TSCx/edEE44cAlsU8t/C1A7
-         QxxeGoSuXd/6QdVNsPk5sz9NtojZ2YzWl4Py5FhloNRfW4Y56av/HK5gGGjDf9vUPM0E
-         jvDA2EXN6mQYtlbAwAa9ZI8nojXgk5RPdnMQl2lQdGDHELa2SpxkDw48WGMtqqgTyYlY
-         aahI9vhG463Zn0IB/786cAmx0P9o+uy1XxsGb0uTPK7rSpGsf1H74Q1M1BWfiZDNXwaL
-         SiKQ==
+        bh=+RZhurI/q7oJqN3iUeEhWQQThIPk8thOCCIV1vfD+a8=;
+        b=LjT9b6dWMZcIdjz4oeqKvXL0ItMDCzgUaG4MlGlVlDnidXGf2giPipapvKKmNiFoTR
+         IQFPpZe8sKs3nq3KAXbsbHSOoM60N0hbx0Q2XZ8le4F/ACwsRwNFmtIsvoH0ehF6bnxd
+         YWW8z19sfRWye2MIj8ApauS2VZtQ/nmpNvthcRyXaxKKPRLOfHDYQ7pETFxbOlKBpUgk
+         gApWOeBxfds79t+ATzylPFPVTmzZiI6EPrKiHp07Y/f6nWog6pHJbCM2bEkuz3I/0MJN
+         nHKJUkBFj6vAtVMqE5BFhcfuVYnf36fDrnCFwP6eV0JoY+2GNpAaRuTL5sfdsXY/75CA
+         pgAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780647801; x=1781252601;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1780647870; x=1781252670;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/ncylH/iADc8ME04RgleGvGv2QOfG/3EuEqLEAZ+XWA=;
-        b=mKdqluqgeoixxOeMSP7fMa/aSSJ18GIUKuoRulScLvzAlcY7tWRR6M8I+b60FEkz6+
-         GTnUW7eX0jT5EG36rS6zj5htbM+m41hNZ049LPpqx9pWGFHf2HfLQP90Eugk88gZKsKB
-         5Ftn250U3wTxnPcqakpuO6iqQEtYzm9YtedPmmH/FbTcBDI0lye9NRnt9lpbHXUQ3ULY
-         akVFHelslTneNcFLRRYXi/GrBuhUALMz496vgSlJlk61OK3NAtvdgDVjR9kUcA2zaa+k
-         eIQIgUuWlfRqmZFEbkbp9pqnSEg5mgJmPIf9v8VTtdvjkksiMrxYaorw66WF4f7EM9Um
-         SSyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9h6Yfcd1yHRakRt4hYrTlS5utpUreij1qIkkjK+MUexdYOhheQniYoZLNLL1JNhuFzAJILRZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBCPbh97CuvnL1692UgLGcP3wrHVCMPQqIwgby61HR7kBk2O8D
-	trer8c7eU6MInBTq3jHemLFx1wifOGcEBjAEyjcvj9IIuIaipD4txa36
-X-Gm-Gg: Acq92OG/IR9QarOjlmEz9XMWxKi8eBD0teSP8u4+Tz1X1F2wOQaVp+ScR9oepydTsgH
-	ZJm0d/2/Sf6vweeWZFF6990VgYmKrMSRnB6MTCG4e4VJ6/t4FFoUSCmvXIY4L+3+PN1Q1KS5em+
-	P8CzhePQ0+6+R05v5jhKFPrUTmGg3PjJf0+9uVw3Dz7X3bPZVDusXXHf54asZzxCYsA7IyikYz5
-	n42Z7ZDLUEicXEpRTh/l+1kKCrNylPl5TKLIozZl5j6eJoDIXqQL1iDKzL4QMOENI1CyyoeBdc+
-	7bj1x2rN2XEU6Apc8u7a0dTT6UiDhQ6JqqA4e54kuDYuQ3SueAfmAil7HQllHDdVvvjZ/MEBmq3
-	P5Ifq/Aul1T2ygTvCnpsykmp9rE+AEOdzx8ncG6yXPu2TzrUAxxcx8lRAF/DvjNRSnlMN9pg9d7
-	oQyfon5ipT32bhXsKZS8O/7LReZxHDTXX+YNywmYjnaIlxxGQkE8I6ITHmSm24S+Cs700JMecmw
-	3zh89YatQ==
-X-Received: by 2002:a05:600c:4fc6:b0:490:51e9:deba with SMTP id 5b1f17b1804b1-490c2615a5cmr34498005e9.27.1780647801274;
-        Fri, 05 Jun 2026 01:23:21 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2f67c6sm23925419f8f.16.2026.06.05.01.23.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2026 01:23:20 -0700 (PDT)
-Date: Fri, 5 Jun 2026 09:23:19 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Askar Safin
- <safinaskar@gmail.com>, metze@samba.org, akpm@linux-foundation.org,
- axboe@kernel.dk, brauner@kernel.org, david@kernel.org, dhowells@redhat.com,
- hch@infradead.org, jack@suse.cz, linux-api@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, miklos@szeredi.hu, netdev@vger.kernel.org,
- patches@lists.linux.dev, pfalcato@suse.de, viro@zeniv.linux.org.uk,
- willy@infradead.org
-Subject: Re: [PATCH 2/3] vmsplice: make vmsplice a trivial wrapper for
- preadv2/pwritev2
-Message-ID: <20260605092319.5a1bba74@pumpkin>
-In-Reply-To: <20260605015724.GA520134@ax162>
-References: <f919874c-065e-48be-ac5b-300c4ab86d4e@samba.org>
-	<20260603211736.755139-1-safinaskar@gmail.com>
-	<20260604100609.6b37f500@pumpkin>
-	<CAHk-=wjvb56qo27-axALOKCY-CjLsj9_294zeBovPVJaYm14dA@mail.gmail.com>
-	<20260604183829.63c35fd9@pumpkin>
-	<CAHk-=wip3mwLOHOYJ9TtjDxOaq9YUXmuCg2AycyASGgeY6qqUw@mail.gmail.com>
-	<20260604223216.73468830@pumpkin>
-	<20260605015724.GA520134@ax162>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        bh=+RZhurI/q7oJqN3iUeEhWQQThIPk8thOCCIV1vfD+a8=;
+        b=OvwHIoDcCdawUTHZCwLMhqK8i5C2rYgVUOD1hCmfNDi+QjHPsDYJYkoGwozSsPSvat
+         lXCMc1xab78G0rp+nlnjZ4kXjIyaHMHLbgFu9yB+Rww1GdE/9Q92grfvgYI7hubRS02g
+         uyPBTNh5Owy4uVxHvGYu5j/0RCzh8pF9LKiNM5gzpk2Pko8RR1jZFacVAefshn1zzLTq
+         1XpF4ywjCX0xeYVl/ExcPZ6ie2c0vIaubUe/7ITiKhZdfOOG4DPXk/t7HFU1BTDByXB7
+         rXcphxQ8HEagaLERL/ob5byRwFer6VxK79FZgWu894yj1hwVfanT4B92oW5+peEGwAJ/
+         bWLg==
+X-Forwarded-Encrypted: i=1; AFNElJ+Xt1SPfqjS1ovnh1hUEfZIBzgk+c9W2Cnkx1zRIdZnOiNnfyvvicEfBvWEmpJGiuck3ptkDBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywsv7zfIWjYO0EzNTB4UYbLh60VG80hB0hvO3yuRTQawYGFeDh2
+	5rMe1B61HvnBneehAuVTUeHtA/fBxgZ12PU7gJBAEgmLKw5t2fBEL87VUmK2R2lW9LrHPtNJulr
+	ffJd6roqNdDEyZYpLl5fzt5xZSnUHrC+L7bighlBRdg==
+X-Gm-Gg: Acq92OH/eqtOgqPxi/7xrsbAlwVnCX/kLqjZdgerZZ6eBAz38hl6WCW0rgXV6QJghuG
+	j3Vwk0sblr4F8pu5yspy/IQbWwFQdKV1TTCWsmu+/5fznDnQ7K3pvqEDfiNV68puKb2C1J+pTYW
+	BRmch+JLeHQVTrFbI33gj31gp5aTraGuiE+gtL3mJnUHhgBc29HGhwLW10Wve+Zu5/yB/kXvOOF
+	vst3/R7VMm7chmZ7ry8aQRL2eE/dQ2yaeXw2czCh0B3DNy3/tEVn0d+NMC++WmiNBVZKM+UiN7W
+	CXCdDz74ZLgBOKdTNO2z31Lv6aXlu5kaBtxaZCgw+0bGydpSDx4=
+X-Received: by 2002:a05:6512:3b10:b0:5a4:d44:99f0 with SMTP id
+ 2adb3069b0e04-5aa87b4019cmr757909e87.6.1780647870036; Fri, 05 Jun 2026
+ 01:24:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260507134815.295588-1-marco.crivellari@suse.com>
+ <CAAofZF6CcyxoOsYr94KARUFtfi+=H1nF3mBQAtFWxEujdVgXUw@mail.gmail.com>
+ <4d9067d9-2a4a-45e2-aa43-c456648989da@blackwall.org> <8186bef1-aa58-47c5-9816-1b707ec949da@blackwall.org>
+In-Reply-To: <8186bef1-aa58-47c5-9816-1b707ec949da@blackwall.org>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Fri, 5 Jun 2026 10:24:18 +0200
+X-Gm-Features: AVVi8CcX_QIeknkz-xXX_HwyABpbbtsK9sCbzxQSWw8Cjcwh7JYr-iUtJ1QO5Nc
+Message-ID: <CAAofZF6uW+tE0p2FK+8S=x1OUObhYqK56g3T0u+4oJF-r0Sqvw@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] net: bridge: Move long delayed work on system_dfl_long_wq
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	bridge@lists.linux.dev, Tejun Heo <tj@kernel.org>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Hocko <mhocko@suse.com>, 
+	Simon Horman <horms@verge.net.au>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295723-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:razor@blackwall.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:bridge@lists.linux.dev,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:mhocko@suse.com,m:horms@verge.net.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:idosch@nvidia.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295724-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:nathan@kernel.org,m:torvalds@linux-foundation.org,m:safinaskar@gmail.com,m:metze@samba.org,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[linux-foundation.org,gmail.com,samba.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,davemloft.net,google.com,redhat.com,nvidia.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pumpkin:mid,godbolt.org:url]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,blackwall.org:email,suse.com:dkim,suse.com:from_mime,suse.com:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BB63B646705
+X-Rspamd-Queue-Id: 6DB09646715
 
-On Thu, 4 Jun 2026 18:57:24 -0700
-Nathan Chancellor <nathan@kernel.org> wrote:
+On Fri, Jun 5, 2026 at 10:21=E2=80=AFAM Nikolay Aleksandrov <razor@blackwal=
+l.org> wrote:
+>
+> On 05/06/2026 11:20, Nikolay Aleksandrov wrote:
+> > On 05/06/2026 11:16, Marco Crivellari wrote:
+> >> Hi,
+> >>
+> >> On Thu, May 7, 2026 at 3:48=E2=80=AFPM Marco Crivellari
+> >> <marco.crivellari@suse.com> wrote:
+> >>> [...]
+> >>>   net/bridge/br_fdb.c    | 2 +-
+> >>>   net/bridge/br_stp.c    | 2 +-
+> >>>   net/bridge/br_stp_if.c | 2 +-
+> >>>   3 files changed, 3 insertions(+), 3 deletions(-)
+> >>
+> >> Gentle ping.
+> >>
+> >> Thanks!
+> >>
+> >
+> > Ping about what? The patch is marked as RFC so it is not
+> > going to be considered. It already got a reviewed-by one
+>
+> err, considered to be applied
 
-> On Thu, Jun 04, 2026 at 10:32:16PM +0100, David Laight wrote:
-> > Talking of broken compilers, had you noticed that:
-> > struct foo {
-> >     int a;
-> >     char c[32];
-> > };
-> > 
-> > int b(struct foo *f)
-> > {
-> >     return __builtin_object_size(f->c, 1);
-> > }
-> > returns -1 (size unknown/indefinite).
-> > You can't use __builtin_object_size() to stop code running off the end
-> > of anything referenced by address - even when the size is constant.  
-> 
-> That is the entire point of using '-fstrict-flex-arrays=3' in the
-> kernel:
-> 
->   df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3")
->   https://godbolt.org/z/bvfrh7W58
-> 
-> Without it, all trailing arrays in structures are treated as flexible
-> arrays, even those with fixed sizes.
-> 
+I haven't resent it without the RFC prefix because many other
+maintainers applied the RFC version.
 
-strict-flex-arrays got added in gcc 13.1 and clang 15.0; it isn't supported
-by the gcc 12.2 on the debian 12 system I'm building kernels on.
-__buitin_object_size() itself is in gcc 4.1.2 and clang 3.0.
+BTW thanks, I hadn't noticed it was already applied!
 
-Neither are flex arrays mentioned in the gcc docs for __builtin_object_size().
+--=20
 
-Someone might have used (eg) 'char x[4]' as a flex array to include the
-padding, but no one would have used anything that extended the structure.
-And the chance of those hitting __builtin_object_size() is even smaller.
+Marco Crivellari
 
--- David
-
+SUSE Labs
 
