@@ -1,149 +1,225 @@
-Return-Path: <netdev+bounces-295802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k0rANpu9Imr/cwEAu9opvQ
-	(envelope-from <netdev+bounces-295802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:14:19 +0200
+	id 3CsJM1S8Imq+cwEAu9opvQ
+	(envelope-from <netdev+bounces-295801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:08:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419A9647FE2
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:14:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE93647F5D
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:08:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=padl.com header.s=default header.b=y9Bu3EFF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295802-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295802-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=padl.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b="K/Uz1CEW";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295801-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295801-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6A8B3055815
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:06:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BB386301A310
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20C64DA550;
-	Fri,  5 Jun 2026 12:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B413F7ABE;
+	Fri,  5 Jun 2026 12:05:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us.padl.com (us.padl.com [216.154.215.154])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367994A3410;
-	Fri,  5 Jun 2026 12:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5772253A1
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 12:05:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780661166; cv=none; b=fPhsl3IOxYvAWq55swUV96Z8wxhyBPdAh8aszVWbPaS7pJcG4k/rrNXSPsHs0unGBm+KNJ59g+qbsac3e0JoaAa6URG19WquOUzewJS5p/caz8iVFpIiSvSQ32oidqC1joqiE892WcLBQRM79Zqj5UbfUHSje1Y5JdtjWbMC3qc=
+	t=1780661114; cv=none; b=ZpO3RM7xQI30IdAKVOfAv6ovkUAJJqjlbKQSHvr4pAilKyMLuJJF8li+NiLkYc3eMQK7uC5Y8nJFhcrP995kXWeJ/KUiER7C211Z4yI0S3VF482FNhZweW2PoHlE/pbFEiqLTAo8Rs0zmhclQxiw1U502jfGHmxtJbwSkrpOdNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780661166; c=relaxed/simple;
-	bh=Vxh3wg9HhEr1qAX4WFzBiSO8Vz9T8RHOzpTn4p1z3tg=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=YLfdWN3196xMaPEqGgutMSYjB0BsTwCE+g9UFvpGQzFrNtxJlqTJwd0KgULqaH0rq/iqm9aiXGyGCGmCnxCv81xzVn/uXlp1IaieX/9laTy8qdDDZbpeRyG+28fSmk07jgZO7kUvdCF3YrS8j4KTla29rtWQYzbCBG0wLbg5x48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=y9Bu3EFF; arc=none smtp.client-ip=216.154.215.154
-Received: from smtpclient.apple (119-18-22-158.771216.mel.static.aussiebb.net [119.18.22.158])
-	by us.padl.com (Postfix) with ESMTPSA id 5A7B760C11;
-	Fri,  5 Jun 2026 08:05:52 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1780661155; bh=Vxh3wg9HhEr1qAX4WFzBiSO8Vz9T8RHOzpTn4p1z3tg=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=y9Bu3EFFo/XPLXE6WcTk9fDcnEGy/hmWKfOwBDzLbTIuIF78Ms1Co57a9r0yrpZE9
-	 C8tA84J+e/6YSe12URoFkXpJDrdCKgNJOC0LbF8eB64d+1J/OdAs7+UQcTzLIfsbAH
-	 Y2QZHGKdTkFqehfxNwcDdLHCOvoqYVKov8c9JWvWHEO9MF79FFlhpK01BimML8BDxR
-	 4aptKO3jP+CSX8iSL0KfIlYiv9yURIAZRsNT9kXHbDlcAW0UWUZ9bhwAsj1q/VFBwf
-	 jHONYOv1o6vYGLvwgwncQYgZT3u3/rM5J+5B1l4AvZZXCWKeaAEIqb5tbevBKXkt6h
-	 CbTq54tBhlnvw==
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1780661114; c=relaxed/simple;
+	bh=PspPcxZj4eK+HGP+IlvV4ikRRIBQqslU9MXOR2NDmWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OW5yWvlSJNwj+jDQgnnWMj4eobmp8qLCZ+oiEFPVPgzyUwoZGGQ3Rt4D/Zckbgwe90UcCzkIz42CCqicSYQuUk+RQdtT+EPId3lpsyXAyN0G1Jzr2teMLMYmplt6zIKvXF5nG2ZEYNtxwEIyP93rE2VNGboS5RwKtQQYAznIAbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K/Uz1CEW; arc=none smtp.client-ip=192.198.163.9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780661113; x=1812197113;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PspPcxZj4eK+HGP+IlvV4ikRRIBQqslU9MXOR2NDmWk=;
+  b=K/Uz1CEWn3ZcCfZqwErFgpCoKm64zDTnRBLN8hHfa9o4UlWlhHO9Avy6
+   kHi7CvhNqQUufQTfS6WaKbsrIDUhR8eZkJvl0xGOf04EV4HGqQftg6gu/
+   aTGXyM7bIk2EZfUWFLsbEVEiyr7gYylueJ02s2AXTOI1YQb8CrXDjrIhD
+   bMymwPJ1f9W9KnFFFzbDutF4WQhfE8Ne5omgBR+qYugOGa0d9KU07qzG2
+   Gbxgv8uWlVEWoQU1E3jmmfvdqxcCKxBtqZeXAg4RPv1p0zSOsujC70LI1
+   9yETYwpCf3SrbkQ3Lgr7e7Qoy6Iyn+Bv20wQN269A9lLLaEO8T6OlybBG
+   w==;
+X-CSE-ConnectionGUID: 29mcunvRTdyS2Xb8ZJ5saA==
+X-CSE-MsgGUID: ww8LgEqlSn2AR6yETFVrbw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11807"; a="92178247"
+X-IronPort-AV: E=Sophos;i="6.24,188,1774335600"; 
+   d="scan'208";a="92178247"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2026 05:05:12 -0700
+X-CSE-ConnectionGUID: HJyVO94lTFOQoQX/Ra6/bw==
+X-CSE-MsgGUID: XL0Nxp4UQBKcuTttpnfLMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,188,1774335600"; 
+   d="scan'208";a="268759073"
+Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
+  by fmviesa001.fm.intel.com with ESMTP; 05 Jun 2026 05:05:11 -0700
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	konstantin.ilichev@intel.com,
+	aleksander.lobakin@intel.com,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>
+Subject: [PATCH iwl-net v3] ice: fall back to SBQ when LL PHY timer interface times out
+Date: Fri,  5 Jun 2026 14:06:26 +0200
+Message-ID: <20260605120734.1462847-1-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Re: [PATCH net-next 0/2] net: dsa: mv88e6xxx: add support for dcb pcp
- app
-From: Luke Howard <lukeh@padl.com>
-In-Reply-To: <B9290FD7-FB84-4FF7-BA30-529484B8A01F@padl.com>
-Date: Fri, 5 Jun 2026 22:05:35 +1000
-Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
- cedric.jehasse@luminex.be,
- Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Russell King <linux@armlinux.org.uk>,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Max Hunter <max@huntershome.org>,
- Kieran Tyrrell <kieran@sienda.com>,
- Nikolay Aleksandrov <razor@blackwall.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DC4059EC-F03D-4F7C-8F76-3D8C30E94A14@padl.com>
-References: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
- <02BDD59A-30A9-46F9-8413-28A867B50CD5@padl.com>
- <v4fqikeec52ginmogfvsfe5gobul2nqspe2ebzpzpja52lxacb@wq2elxqwrucf>
- <E43832AD-0F8A-465F-95E3-2AF5E72FB7B9@padl.com>
- <4d6e6d83-af79-4a06-9736-d6d81e705a61@lunn.ch>
- <B9290FD7-FB84-4FF7-BA30-529484B8A01F@padl.com>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295802-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[gmail.com,luminex.be,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,huntershome.org,sienda.com,blackwall.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:cedric.jehasse@gmail.com,m:cedric.jehasse@luminex.be,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:max@huntershome.org,m:kieran@sienda.com,m:razor@blackwall.org,m:andrew@lunn.ch,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:konstantin.ilichev@intel.com,m:aleksander.lobakin@intel.com,m:przemyslaw.korba@intel.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295801-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[padl.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 419A9647FE2
+X-Rspamd-Queue-Id: 6DE93647F5D
 
+The low-latency (LL) PHY timer interface relies on a tight, atomic poll
+of the PF_SB_ATQBAL register with a 2ms timeout. After an NVM update /
+EMPR, FW may need significantly longer than 2ms to start responding to
+ATQBAL commands. The first PHY adjust or incval write issued by
+ice_ptp_rebuild_owner() fails with -ETIMEDOUT.
 
-> On 5 Jun 2026, at 11:13=E2=80=AFam, Luke Howard <lukeh@padl.com> =
-wrote:
->=20
->> Ideally, the user should not need to know if some functionality has
->> been accelerated by offloading it to hardware. They just configure it
->> using the standard Linux model of the feature.
->=20
-> Absolutely, and that was the model I used when building a SRP daemon, =
-which I first tested with the software bridge and some i210s.
+Fix this by falling back to the existing SBQ-based PHY register write
+path when LL times out. This makes sure PTP is initialized when FW takes
+longer than expected to come back online.
 
-Which does beg the question why I hadn=E2=80=99t considered the =
-admission control issue when originally implementing against the =
-software bridge. That=E2=80=99s my bad, and perhaps had I discovered =
-tc-flower earlier I would have a different mental model of how to map =
-this to mv88e6xxx.
+Steps to reproduce:
+./nvmupdate64e -if devlink -f
+Update E810 card with nvmupdate64e, and observe dmesg errors:
+  Failed to write PHC increment value, status -110
+  PTP reset failed, error: -110 (-ETIMEDOUT)
 
-Also whilst the admission control is necessary to correctly implement =
-802.1Qat and pass the Avnu test suites, it might not matter for many =
-networks.
+Fixes: ef9a64c07294 ("ice: implement low latency PHY timer updates")
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+---
+v3:
+* actually add TIMEDOUT check in ice_prep_phy_adj_e810 (did do it)
+v2:
+* add TIMEDOUT check in ice_prep_phy_adj_e810 (did not do it)
+https://lore.kernel.org/intel-wired-lan/20260603114904.1297713-1-przemyslaw.korba@intel.com/
+v1:
+https://lore.kernel.org/intel-wired-lan/20260511095830.1095984-1-przemyslaw.korba@intel.com/
+---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 38 +++++++++++----------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
 
-I will think about how to implement these semantics with tc-flower/TCAM, =
-likely after I take a look at submitting your DSA in-band/Marvell RMU =
-patches.
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index d47d5baf3281..e77c7f2b5575 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -4789,15 +4789,12 @@ static int ice_ptp_prep_phy_adj_ll_e810(struct ice_hw *hw, s32 adj)
+ 				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
+ 				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
+ 				       REG_LL_PROXY_H);
+-	if (err) {
+-		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment using low latency interface\n");
+-		spin_unlock_irq(&params->atqbal_wq.lock);
+-		return err;
+-	}
+-
+ 	spin_unlock_irq(&params->atqbal_wq.lock);
+ 
+-	return 0;
++	if (err)
++		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment using low latency interface\n");
++
++	return err;
+ }
+ 
+ /**
+@@ -4818,8 +4815,12 @@ static int ice_ptp_prep_phy_adj_e810(struct ice_hw *hw, s32 adj)
+ 	u8 tmr_idx;
+ 	int err;
+ 
+-	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
+-		return ice_ptp_prep_phy_adj_ll_e810(hw, adj);
++	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update) {
++		err = ice_ptp_prep_phy_adj_ll_e810(hw, adj);
++		if (err != -ETIMEDOUT)
++			return err;
++		ice_debug(hw, ICE_DBG_PTP, "LL adj timed out, falling back to SBQ\n");
++	}
+ 
+ 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
+ 
+@@ -4882,15 +4883,12 @@ static int ice_ptp_prep_phy_incval_ll_e810(struct ice_hw *hw, u64 incval)
+ 				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
+ 				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
+ 				       REG_LL_PROXY_H);
+-	if (err) {
+-		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment using low latency interface\n");
+-		spin_unlock_irq(&params->atqbal_wq.lock);
+-		return err;
+-	}
+-
+ 	spin_unlock_irq(&params->atqbal_wq.lock);
+ 
+-	return 0;
++	if (err)
++		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment using low latency interface\n");
++
++	return err;
+ }
+ 
+ /**
+@@ -4908,8 +4906,12 @@ static int ice_ptp_prep_phy_incval_e810(struct ice_hw *hw, u64 incval)
+ 	u8 tmr_idx;
+ 	int err;
+ 
+-	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
+-		return ice_ptp_prep_phy_incval_ll_e810(hw, incval);
++	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update) {
++		err = ice_ptp_prep_phy_incval_ll_e810(hw, incval);
++		if (err != -ETIMEDOUT)
++			return err;
++		ice_debug(hw, ICE_DBG_PTP, "LL incval timed out, falling back to SBQ\n");
++	}
+ 
+ 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
+ 	low = lower_32_bits(incval);
 
-Luke=
+base-commit: 2d72c95ac8e2d1abccf671d95b94532a8b2abb24
+-- 
+2.43.0
+
 
