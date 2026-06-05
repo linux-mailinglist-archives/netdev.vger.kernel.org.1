@@ -1,168 +1,136 @@
-Return-Path: <netdev+bounces-295887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id V/ZLIbr0ImrmfgEAu9opvQ
-	(envelope-from <netdev+bounces-295887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:09:30 +0200
+	id ThrgKbj0ImrkfgEAu9opvQ
+	(envelope-from <netdev+bounces-295888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:09:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC2E56499E5
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:09:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE6D56499E1
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:09:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux-foundation.org header.s=google header.b=HM3tvW6B;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295887-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295887-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VRmTccUp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295888-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295888-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C5E08305760C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 15:59:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3A2330BF32D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 16:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF96E3CF66F;
-	Fri,  5 Jun 2026 15:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41303EB7FE;
+	Fri,  5 Jun 2026 16:00:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6C435A397
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 15:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51643D5C06;
+	Fri,  5 Jun 2026 15:59:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780675140; cv=none; b=PPuI/qWQwfTWQPO29fJkxEVALpC52BIbPJiw++jAQEpBClMzLnhK8WiKLdd8yhXJJVXQL/vYubVItA1KgZwWyG9mrbcPRLXaeGFisvPuezFTinCKzA/lpbU8QDHqPmoIAsAvjQeh1betrxKlu/IiwkO9lalSY4mLSg2qj9kuYVE=
+	t=1780675200; cv=none; b=qPaw8KAHOUa8hvurvAMuKogxXkdNo52Dwl5Q9NdmKToaojGnzMOeVRr/HBJCuhDlOqsIjgcpDBOAP5gLXGFOhmcZSiC6Pw38yqAg47OdFOnJ5TPrUxYinIu/a54CvwoVagrBIIN4n7TKLcELaDbdcr1ToSEueNpHv7jJgcUdjME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780675140; c=relaxed/simple;
-	bh=cHDeiU+5q6zHW354GymA6FXFmgmlOGfgwP7cdr1ffak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e8FUkGeFg6WNk7Dg5pjoqoUdY1FdJhOKjOIokI+5/sfGTMHIwvAfKbFnTNkctu4pCS5vrWrmAiSUMS8Jp0sGT8ACc583Zht6Z39nHFaQMMWZAXXWnKDnErzgkUcD3wp1M6l4JFRouDYrDzAGvgI0mjKVJRz2JBOSWGeLEk/L7JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=HM3tvW6B; arc=none smtp.client-ip=209.85.218.41
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-bf1141c26ecso287012666b.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 08:58:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1780675138; x=1781279938; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OUZ5QahFiUWTYdBZUTA5YwtlfS/dH2OxVTaDuMHjYEI=;
-        b=HM3tvW6B/2VpTg0s8h95hg2vEKlZK5JsisKPXVnZiVv7+VXsyD2Dy36cAkhsJU7XRN
-         LhpnGRJHIuVnLue6e57+Q4FygpbDfEc7bUWuJKNxSU9DtZ2+QK/VRCRikZGJ+TRAko3L
-         y9+yvj0vzE4hpOwf7y4IVFNonA4Qofx5G1wEM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780675138; x=1781279938;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OUZ5QahFiUWTYdBZUTA5YwtlfS/dH2OxVTaDuMHjYEI=;
-        b=B/n8pCLETrDhzMSbaOwN2wq5ozioCpfiRa0wdagyLcRS6XfMStJavbsNV/vjTqYh4K
-         j9mH4CabUyKCKcE+5nw6HyDik3et+N7EfjOVZOXN+RIAIyfCXQmUVlSQwCHal5DJDxs+
-         cmbqL5+BnE9kjB+YGy6sioF34n+XVIkwZ4biCZNAtoR7LYjcJpqMwZkOWC1ISxmgJLJW
-         VN+puvEtO7TEVTpwJZ1lH4VgNNXvtWCDp5hl/W9pCKFWfnEZNDMG0S03YaYKu2hraeLe
-         yqoK1ALwavtQomEl2P/uNtscDroqvAfLVbxDpXMZcOxa1iNlCDAirK52Cqa2rUGoDS8p
-         Aplg==
-X-Forwarded-Encrypted: i=1; AFNElJ963m7d+uh39LhoMQNWL9p902Eycfv++/acN7XMrJNgG7ZVjNBe7QJ0u4AciZHippve8Nqv5/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP0HNKrZe9FolFf4sxoZRzhfHFyGkc+ehM/B8JRN0rxSqxg9jS
-	b21uTYCFh04vZbjuDVTDumEvyQlYchTeZ+FQ5b+Cd5EX3zlC+o7t5T6fx4LHqCdNeDjy0T8nU/4
-	wfCR+w8Zh7w==
-X-Gm-Gg: Acq92OEbcK2SL9NHvREAHHH0pyhIzbwaP7P/beigCHiYomNW5e2AQ3asr2nIueljrQz
-	O06RzjXMCN3b7hsSgDrqHGzdKn0W6JKxdLEUnpu98XsxFxpswgCD+QSBYvzmZtPv8Z0DHMa6C3m
-	Vdhgmig8R1Lz6a3mAKC8hNKBdIKnDm9NR+FLlu/gN2nTBFI0YJoZVcMlJyUEDayt4m+/2imZiRm
-	j0KUiXSacOWjexOxVksplz2tEl43PKGtg6n0z2PXOqV7f/wTli6XqQLLQeJF2gHcsgxyBjgwcUp
-	/Fqpk+Hi/LgchTq8JA7uu8Xh+W1zlWbhKHon1ICNhezGwGkQhdA9+P0Km5+qUuIecUajvgSGMsg
-	D0KFvCOXsRspAlro1zh7hZpMYXlIevk/v9C8/u6Vj2Gh4x2Qfz0hRCiGe5dkP3JmE3w8XZTPjXA
-	CZDiMYcx2A7pjgYdtyuvvgXC/8xCTsyQffSZRFXKzj91Z6+GwPaA14mvK/rqB7qgSQDgAM6imh2
-	Vb8Zx8wkkc=
-X-Received: by 2002:a17:907:7b8c:b0:beb:c3a7:9cd with SMTP id a640c23a62f3a-bf36fba1c96mr226606766b.8.1780675137572;
-        Fri, 05 Jun 2026 08:58:57 -0700 (PDT)
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com. [209.85.208.52])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf0553040a7sm479405566b.50.2026.06.05.08.58.55
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2026 08:58:56 -0700 (PDT)
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-68852b58d87so3879882a12.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 08:58:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8RG945Vc1PLUVnfchhCW9He0SBKBvto4Cjz7jYpznGGgZ1maeGFHYfFannP9DDbvfAYBSUHHw=@vger.kernel.org
-X-Received: by 2002:a17:907:a03:b0:be2:dd37:facd with SMTP id
- a640c23a62f3a-bf370e6211cmr221318066b.20.1780675135190; Fri, 05 Jun 2026
- 08:58:55 -0700 (PDT)
+	s=arc-20240116; t=1780675200; c=relaxed/simple;
+	bh=yCAGbq/6JlyTZp4QI10TckEayK0yDn1kPsMjsDABZF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M/xP3qwl3yrnMJEVjdmOX1v4ANHsA539y82rXu3qia59vQSqL7WQ2Uta9KZ6r7/HYXJx0Div6kgkaDnK7nCsfJQtUgGnC0z9WWa/Yo3m3Hat90LNeG80P/fj+FyI1eet2xB7tRsE4SHgV0W3ml3PJBswbKX4AyiFUHmTviEGkXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRmTccUp; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB3551F00893;
+	Fri,  5 Jun 2026 15:59:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780675197;
+	bh=ObS4SJI1Hi4ANlAVGEHF39GV4a6SL8/PZg5/oxRIZLA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VRmTccUpapuDZg1/Vo2DsF06NMWmciMkNXi/GgmSGq3xx93DqVQHxLpPk4g/WCV2U
+	 EspohMbt6QuyOFDYwEftJjiC9mwsZYm1zh5s3g/Pc0pFxvQflbAmZYMIfLguDRvKZC
+	 KdVcyQGeu6j+/RCkux/B2CP/JSz/gX06GALj81XaV4nmYmdQipIGfMFSPlPS2e5WQ0
+	 jGfhtTpvcey86tuJk/JvHD4lta2OBBcHqx41l52ANQtq+cMXyqSwl8vTarHNdfJnc7
+	 /N4o+bCi3Menj58/hh6WGqLKKa6Vyd9sI7jNHJtDqvCvram8JzqRLePprdObZ7zYEB
+	 BZ3vvnXgLpOAA==
+Date: Fri, 5 Jun 2026 10:59:56 -0500
+From: Rob Herring <robh@kernel.org>
+To: George Moussalem <george.moussalem@outlook.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: ethernet-phy: increase max
+ clock count to two
+Message-ID: <20260605155956.GA3788055-robh@kernel.org>
+References: <20260605-ipq5018-gephy-clocks-v3-0-f232d9ca0966@outlook.com>
+ <20260605-ipq5018-gephy-clocks-v3-1-f232d9ca0966@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHk-=wiAqf0PdZ4AKj_4riUnnEb=g_ZNPkLnXrByA9BBHYiFRg@mail.gmail.com>
- <20260602225426.122258-1-safinaskar@gmail.com> <CAHk-=wgKy4dP0oQCNKyMQQf3-uVpaigmDyH6_T0Via76gWST9g@mail.gmail.com>
- <CALCETrWx8-Q5-rK1KnAPCxCbXaWCd=Yfs_Pr8qVMa8k8L6of1w@mail.gmail.com>
- <CAHk-=wizkDXRut5xLXRF-CVUVYMaZ5AOexxeghOAoXPb4yAvQg@mail.gmail.com>
- <CALCETrXzxubt4eWue3+wv7Fq9C2m7uu6bWPstqFh6Mo57bPwQQ@mail.gmail.com>
- <CAHk-=wiEwSjfbjfO74xu=UmkkdHXkJg5QNQ8pP-3iYmunmeV9g@mail.gmail.com>
- <CALCETrW3XcNLuB1Y6PSkxQDSK2o+=EB2AAd25SjWQqcJemwnbw@mail.gmail.com>
- <CAHk-=wgn3QTLj+F+XccE10dXY-UGWN8+fNLEvhsLw+tik9rOmg@mail.gmail.com>
- <CALCETrXpqPMS487Bm8f8mHe8hv9DzCqoaW4UdoHetzYBUAhYLw@mail.gmail.com>
- <CAHk-=wh5bFj1a7eaGp9sixDg3UXu7xUGfU=YJo+ckpGxGAyhXQ@mail.gmail.com> <f1c7fbbf-5be1-48b0-8927-2d9b75a35816@samba.org>
-In-Reply-To: <f1c7fbbf-5be1-48b0-8927-2d9b75a35816@samba.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 5 Jun 2026 08:58:38 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whL0oLvmh3FO9SapDhgrXMT_d6qkP2V3OBjysOWXod2Og@mail.gmail.com>
-X-Gm-Features: AVVi8Cf0FjZlqJePEzD8bhzCDc_NK8sni3u4Z9RMJefCrCHFLhBrwtWwfg4F_Wo
-Message-ID: <CAHk-=whL0oLvmh3FO9SapDhgrXMT_d6qkP2V3OBjysOWXod2Og@mail.gmail.com>
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Andy Lutomirski <luto@amacapital.net>, Askar Safin <safinaskar@gmail.com>, akpm@linux-foundation.org, 
-	axboe@kernel.dk, brauner@kernel.org, david@kernel.org, dhowells@redhat.com, 
-	hch@infradead.org, jack@suse.cz, linux-api@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, miklos@szeredi.hu, netdev@vger.kernel.org, 
-	patches@lists.linux.dev, pfalcato@suse.de, viro@zeniv.linux.org.uk, 
-	willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260605-ipq5018-gephy-clocks-v3-1-f232d9ca0966@outlook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295887-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:metze@samba.org,m:luto@amacapital.net,m:safinaskar@gmail.com,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295888-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:konrad.dybcio@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-foundation.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[amacapital.net,gmail.com,linux-foundation.org,kernel.dk,kernel.org,redhat.com,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
+	FREEMAIL_TO(0.00)[outlook.com];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,oss.qualcomm.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-foundation.org:from_mime,linux-foundation.org:dkim,samba.org:email,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EC2E56499E5
+X-Rspamd-Queue-Id: EE6D56499E1
 
-On Fri, 5 Jun 2026 at 08:15, Stefan Metzmacher <metze@samba.org> wrote:
->
-> It means the most common workload, e.g. a file only opened for
-> file serving (or simple opens in general) would still be able to
-> be optimized.
+On Fri, Jun 05, 2026 at 04:41:26PM +0400, George Moussalem wrote:
+> The clocks property has a restriction to maximum one.
+> Yet, some PHYs may require more than 1 clock such as the IPQ5018 PHY
+> which requires two clocks for RX and TX. As such, increase maxItems to
+> two.
+> 
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
+> Commit 350b7a258f20 introduced the clocks property with a restriction to
+> maximum 1 to the main ethernet-phy.yaml binding for Realtek to add an
+> optional external clock source. This is restrictive to all PHY bindings,
+> as some PHYs may require more than 1 clock such as the IPQ5018 PHY which
+> requires 2 clocks (for RX and TX).
+> ---
+>  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 
-Nope. If your web server opens files with write access, I'd be
-extremely surprised.
-
-And if you don't have write access, and you're sending out data from
-files you opened just for reading - the onle sane case - you hit all
-the existing problems with "I can certainly look up pages, but I damn
-well shouldn't pass those pages to the networking code without copying
-them".
-
-               Linus
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
