@@ -1,220 +1,423 @@
-Return-Path: <netdev+bounces-295759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295760-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /vHxC6qcImrBawEAu9opvQ
-	(envelope-from <netdev+bounces-295759-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 11:53:46 +0200
+	id ukhaJLKeImpKbAEAu9opvQ
+	(envelope-from <netdev+bounces-295760-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 12:02:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9540964711D
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 11:53:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E82D564724E
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 12:02:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=GFruvWfo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295759-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295759-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kio0Un4P;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295760-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295760-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 19BA43025C21
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 09:50:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D54E3007CAA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 09:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D523DA7C8;
-	Fri,  5 Jun 2026 09:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EF33E3164;
+	Fri,  5 Jun 2026 09:56:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979C63B71BD
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 09:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE093D0C12;
+	Fri,  5 Jun 2026 09:56:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780653007; cv=none; b=QAH8LtpBQEuu85G5atf4YUhL92iY7WrXsyIFro54eUUfjSQ+uWqCBARlcI4YsvCYOvn5Vpj5DZFVnLFJt61DGdvoslZbAUcb9Kp54KYAF8RMHIq3+saDpI1uUc7rrNHNUf0mPIQrSv229GKSwD3s2YNQYIYPpH9AYeX3ockPvdc=
+	t=1780653378; cv=none; b=Yak7NLD/Uhc/impq5cKcj6cZewRjFlCOA1T0UeWTvyzCO1+cJEtH8HHVjFgCFlSsmjWa59Ntl9HoGXeNG32uHOboO8B8RD3fpcWOYFjcmqEhqRIsmUopUdDwotYcbtgwTmUq2IE/Y0cfscOQi4LtssrBsB6VQGC2YoCA+C2peZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780653007; c=relaxed/simple;
-	bh=G4+yJM6zWYuFGgB8T+z7rO6dkHqePIEw7sogic09p8o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MY6qSxaqqJkxWVWCqQD1BRWWkhGjfbuhagiMp/18kNvEnl7coZ8/oNYO3LyGMRuOlR3FpczaDHyNDbuWdi1R1TBIpjx/+CwnpYtb21rZC+OJ1OH8rvUVyZaJPEB0n6k8geSLe7rSnJ7GfzQsuUspI2DMXsziy0jFPUyCd5hbHys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFruvWfo; arc=none smtp.client-ip=209.85.214.176
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2bf18c30bb2so11758105ad.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 02:50:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780653004; x=1781257804; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dCw22FSssd23IT7H44f6S6FFYK8geV9IkF2RFmfa8jU=;
-        b=GFruvWfo+dp7EsRy4+nRSnuq74EZN6Ha1zJSmsbBP35U1Yf2FuytBzFrg8cfB8l2TP
-         p3V8c6PGIhgJSEzOdaAse8eVxHHWZKu0v7dmZqf44hejGbU+eHwfobF0UczXS5WvgWC3
-         DuASqOxZ2THzC24qKdQfccjyiMTON4v+94KIWECcDYsqQ+SrzP/kvIks+9hxfJ5WFuvy
-         DbhT6DeXz1ttovBhGQb2osb92VD/AtVj+WYNqQdUl6HzJUVsgwFJS2qDf1PKZZT3esBT
-         TNrNUZBwXefw5gLYh7XgLHgPRkePH6fQUoj4QK9iY2cW4jD4rhCIMntDR16whrWw1TP7
-         XBTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780653004; x=1781257804;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dCw22FSssd23IT7H44f6S6FFYK8geV9IkF2RFmfa8jU=;
-        b=hdTpXBIiS0XXvX4uMaJfud32ZzXiBZ+UgRLt4jbgYsD2vGGzV4SEouy53y7A5uBeOn
-         ArvUSHU4PAPKdK46X2bOvsl8L2TJZsfgWuaWaqi/HlmKKB4n+SVC8x75s3itsanQf1wq
-         /xIpDbTbNqoYe70+LNU9R+jjGQCXp4CdDs831oOl4Mu8zginzO5cEaN52ozIgL55Y/lA
-         ui6p09IkBrNCkYFKc1ePjFBUxefYrxCb2V+5sbLChHsCghq1tI51V5+jKtcoNmP1TiAl
-         tiPfXm52X4g66u2yimnNs/N/+bRtTipuG0BGrmQ1evPf1Kw5s0nzeTe47HPHCvZtRiNu
-         JsJQ==
-X-Forwarded-Encrypted: i=1; AFNElJ98NbK2SpLcI+aKhPX7Od4m6ZeGhT9tsXNt8lykoOY9Q1REFiuQdh1iWD+QVrwI23w8/j/bUA4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNNTuIX537CZLhlR0Zul0hvvCOdZictkClcyD7BqLcScuIs1s4
-	6l2HhJRZWOo9KlcTFf6zr4SyhiQzRfI1RV1w17pRYb0ha1igAG2L3OvJfZq1qU9G
-X-Gm-Gg: Acq92OFkQlYFQ637sC1KUkWZZj4BMosLnmUWu86p2X0zofkuAss+eqEK9tpR6NEoQV8
-	QiC2tCx2768Dt+gtgX/YXdm6KtiHxqhdFbdoD1rhu8i6YfiGDYaUfQFcGBelS9UHYKwu4I5lMux
-	MumlzsAm48f5m6IRDFzbp9Y3oyjz/zv//t1qKtHYjmWh9SxxTaKRmwBGBSM4MJuY7D1DmZmVBg8
-	6tCDRllCA+EKsIF3eWfKL9fLX+bYd05AG9d2NCZfRfdqCabvZxo3Q+Yqdv/Dt3UYoV4tv4syg62
-	mqT5koxAol9AdJZATmNHYIaTYPFsbWpgEbcqqWjrMmyhGfWnFKq6qbT8zLRkHZomo3ixqb0RxbC
-	qmV8hLe1FthuU4GbkImzT/AwEbL3b9C/kbwW8UQ3HBnEv9jbgsiuIuly66Pf1aQx39jcn/djsNh
-	t4SxXzgutOvw1WQCQMcWv+iU7hb2RPDU6YqHUZql1LGYGqTsUYnVfRJAmHnGBoDzBRlKAoTORf
-X-Received: by 2002:a17:903:18c:b0:2c0:e5ee:f56c with SMTP id d9443c01a7336-2c1e881fefemr29151715ad.20.1780653003681;
-        Fri, 05 Jun 2026 02:50:03 -0700 (PDT)
-Received: from cps-manycore-1.. ([147.46.174.222])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c166391d53sm115871285ad.65.2026.06.05.02.49.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2026 02:50:03 -0700 (PDT)
-From: Sechang Lim <rhkrqnwk98@gmail.com>
-To: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>,
-	Simon Horman <horms@kernel.org>,
-	Lawrence Brakmo <brakmo@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net] tcp: clear sock_ops cb flags before force-closing a child socket
-Date: Fri,  5 Jun 2026 09:49:46 +0000
-Message-ID: <20260605094954.1374489-1-rhkrqnwk98@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1780653378; c=relaxed/simple;
+	bh=ebx2eOoRfodw4FjM3aTndhII1xk2ScvNBV1BYPRHfu4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gueB96PPBgTh/5yd86/d+pjImbeRbsTtTcIcv685Uaa7CAj8P9BuC4fSh8nhr9f0WF7cqs+VCdwTPjnMn0SCmy6BRZ0GBFQ07c0KYGnQ1bFhPaUVHBi6edlEK1rVIH1ype+JYdYRBBiekGxO+ci/G8OZXbnYpYcl7wNI0yk9YtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kio0Un4P; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A495D1F00893;
+	Fri,  5 Jun 2026 09:56:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780653376;
+	bh=BUfEQxhjOu8G3jt69U+LgJt/XEj0OlJFMZlUeTVC9fI=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=kio0Un4PfaU/SXyNE8jwmEmw254Z8DLHgGB0XiNVo+KSGfRRKIG6yrLk4QTEIjc7D
+	 3aUg49zXdCNDuqvg5r4EQaUyeNfAxQydmiucDjckbdqc3lezBQHRGoWxVVqFuCcAiH
+	 X2MlKZc35uFNNIQ5CLt6sLgaTVLp7R/TlUd9x9v/LpHL2pwjJsEdm7U3z6Cmor5RaI
+	 wH+L3gMxvJw77fCVvEago6IETawENhnSEwVKj31GV8wxIM7QsFf2h747ciCID8/7VF
+	 ruwDCsCemy54CjAQ9fPjnyJ6PGDcmsyrNYKXJVZ9+UZflK29qx89dzc0sHYtCzcxKN
+	 vxkyknCTE+qhg==
+Message-ID: <134c50a1ca2d2f2bc06336072c89ff011a9842cb.camel@kernel.org>
+Subject: Re: [PATCH net-next 2/2] selftests: net: rds: add getsockopt()
+ conversion test
+From: Allison Henderson <achender@kernel.org>
+To: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-kselftest@vger.kernel.org, kernel-team@meta.com
+Date: Fri, 05 Jun 2026 02:56:09 -0700
+In-Reply-To: <20260603-getsock_more-v1-2-43b8d40c8849@debian.org>
+References: <20260603-getsock_more-v1-0-43b8d40c8849@debian.org>
+	 <20260603-getsock_more-v1-2-43b8d40c8849@debian.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-295759-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:ncardwell@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:horms@kernel.org,m:brakmo@fb.com,m:ast@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-295760-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[include.sh:url,vger.kernel.org:from_smtp,run.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9540964711D
+X-Rspamd-Queue-Id: E82D564724E
 
-A child socket inherits the listener's bpf_sock_ops_cb_flags via
-sk_clone_lock(). If its setup fails in tcp_v4_syn_recv_sock() /
-tcp_v6_syn_recv_sock(), the child is freed through put_and_exit, where
-inet_csk_prepare_forced_close() drops the socket lock and tcp_done() runs
-without it.
+On Wed, 2026-06-03 at 09:11 -0700, Breno Leitao wrote:
+> Add a kselftest that exercises the RDS getsockopt() paths converted to
+> the getsockopt_iter() / sockopt_t callback:
+>=20
+> - RDS_RECVERR and SO_RDS_TRANSPORT, which return their int value through
+>   copy_to_iter() and report the written length in opt->optlen.
+>=20
+> - RDS_INFO_*, which obtains the userspace buffer pages with
+>   iov_iter_extract_pages() (including a non-zero starting page offset)
+>   and lets the info producers copy the snapshot in under a spinlock.
+>=20
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-If BPF_SOCK_OPS_STATE_CB_FLAG was inherited, tcp_done() -> tcp_set_state()
-calls tcp_call_bpf(), which expects the lock and trips sock_owned_by_me():
+Hi Breno,
 
-  WARNING: include/net/sock.h:1799 at tcp_set_state+0x433/0x550
-  RIP: 0010:tcp_set_state+0x433/0x550 include/net/sock.h:1799
-  Call Trace:
-   <IRQ>
-   tcp_done+0xba/0x250 net/ipv4/tcp.c:5095
-   tcp_v4_syn_recv_sock+0x850/0xa50 net/ipv4/tcp_ipv4.c:1787
-   tcp_check_req+0xf30/0x1360 net/ipv4/tcp_minisocks.c:926
-   tcp_v4_rcv+0x1047/0x1b50 net/ipv4/tcp_ipv4.c:2164
-   </IRQ>
+Thanks for working on this.  Your test covers a lot of socket behavior that=
+ the
+existing packet test doesn't get into, so I definitely think it's worth add=
+ing.
+I ran it locally under vng and it passes for me.  I did notice one nit belo=
+w, but
+otherwise I think it looks really good.
 
-The child is freed before it is ever established, so it should run no
-sock_ops callback. Clear its cb flags before the forced close.
 
-Fixes: d44874910a26 ("bpf: Add BPF_SOCK_OPS_STATE_CB")
-Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
----
- include/net/tcp.h   | 7 +++++++
- net/ipv4/tcp_ipv4.c | 1 +
- net/ipv6/tcp_ipv6.c | 1 +
- 3 files changed, 9 insertions(+)
+> ---
+>  tools/testing/selftests/net/rds/.gitignore   |   1 +
+>  tools/testing/selftests/net/rds/Makefile     |   4 +
+>  tools/testing/selftests/net/rds/getsockopt.c | 201 +++++++++++++++++++++=
+++++++
+>  3 files changed, 206 insertions(+)
+>=20
+> diff --git a/tools/testing/selftests/net/rds/.gitignore b/tools/testing/s=
+elftests/net/rds/.gitignore
+> index 1c6f04e2aa11..7ca4b1440f51 100644
+> --- a/tools/testing/selftests/net/rds/.gitignore
+> +++ b/tools/testing/selftests/net/rds/.gitignore
+> @@ -1 +1,2 @@
+>  include.sh
+> +getsockopt
+> diff --git a/tools/testing/selftests/net/rds/Makefile b/tools/testing/sel=
+ftests/net/rds/Makefile
+> index fe363be8e358..0700d8298eec 100644
+> --- a/tools/testing/selftests/net/rds/Makefile
+> +++ b/tools/testing/selftests/net/rds/Makefile
+> @@ -5,6 +5,8 @@ all:
+> =20
+>  TEST_PROGS :=3D run.sh
+> =20
+> +TEST_GEN_PROGS :=3D getsockopt
+> +
+>  TEST_FILES :=3D \
+>  	include.sh \
+>  	settings \
+> @@ -16,4 +18,6 @@ EXTRA_CLEAN :=3D \
+>  	/tmp/rds_logs \
+>  # end of EXTRA_CLEAN
+> =20
+> +CFLAGS +=3D $(KHDR_INCLUDES)
+> +
+>  include ../../lib.mk
+> diff --git a/tools/testing/selftests/net/rds/getsockopt.c b/tools/testing=
+/selftests/net/rds/getsockopt.c
+> new file mode 100644
+> index 000000000000..a82ffe4871c2
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/rds/getsockopt.c
+> @@ -0,0 +1,201 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Exercise the RDS getsockopt() paths that were converted to the
+> + * getsockopt_iter() / sockopt_t callback.
+> + *
+> + * Three distinct paths are covered:
+> + *
+> + *   - RDS_RECVERR and SO_RDS_TRANSPORT, which now return their int valu=
+e
+> + *     through copy_to_iter() and report the written length in opt->optl=
+en.
+> + *
+> + *   - RDS_INFO_*, which pins the userspace buffer with
+> + *     iov_iter_extract_pages() (including a non-zero starting page offs=
+et)
+> + *     and lets the info producers memcpy the snapshot in under a spinlo=
+ck.
+> + *
+> + * The kvec (in-kernel buffer) -> -EOPNOTSUPP path of rds_info_getsockop=
+t()
+> + * is not reachable from a userspace getsockopt() and so is not tested h=
+ere.
+> + */
+> +#include <errno.h>
+> +#include <stdint.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include <sys/mman.h>
+> +#include <sys/socket.h>
+> +#include <linux/rds.h>
+> +
+> +#include "../../kselftest_harness.h"
+> +
+> +#ifndef AF_RDS
+> +#define AF_RDS 21
+> +#endif
+> +
+> +FIXTURE(rds) {
+> +	int fd;
+> +};
+> +
+> +FIXTURE_SETUP(rds)
+> +{
+> +	self->fd =3D socket(AF_RDS, SOCK_SEQPACKET, 0);
+> +	if (self->fd < 0)
+> +		SKIP(return, "AF_RDS unavailable (errno %d) - load the rds module",
+> +		     errno);
+> +}
+> +
+> +FIXTURE_TEARDOWN(rds)
+> +{
+> +	if (self->fd >=3D 0)
+> +		close(self->fd);
+> +}
+> +
+> +/* RDS_RECVERR defaults to 0 and is reported back as a 4-byte int. */
+> +TEST_F(rds, recverr_default)
+> +{
+> +	socklen_t len =3D sizeof(int);
+> +	int val =3D 0xdeadbeef;
+> +
+> +	ASSERT_EQ(0, getsockopt(self->fd, SOL_RDS, RDS_RECVERR, &val, &len));
+> +	EXPECT_EQ(sizeof(int), len);
+> +	EXPECT_EQ(0, val);
+> +}
+> +
+> +/* A value set via setsockopt() must be readable back unchanged. */
+> +TEST_F(rds, recverr_set_get)
+> +{
+> +	socklen_t len =3D sizeof(int);
+> +	int val =3D 1;
+> +
+> +	ASSERT_EQ(0, setsockopt(self->fd, SOL_RDS, RDS_RECVERR, &val, len));
+> +
+> +	val =3D 0;
+> +	ASSERT_EQ(0, getsockopt(self->fd, SOL_RDS, RDS_RECVERR, &val, &len));
+> +	EXPECT_EQ(sizeof(int), len);
+> +	EXPECT_EQ(1, val);
+> +}
+> +
+> +/* A buffer smaller than an int is rejected with EINVAL, not silently. *=
+/
+> +TEST_F(rds, recverr_short_buffer)
+> +{
+> +	socklen_t len =3D sizeof(int) - 1;
+> +	char buf[sizeof(int)];
+> +
+> +	EXPECT_EQ(-1, getsockopt(self->fd, SOL_RDS, RDS_RECVERR, buf, &len));
+> +	EXPECT_EQ(EINVAL, errno);
+> +}
+> +
+> +/* An unbound socket reports RDS_TRANS_NONE for SO_RDS_TRANSPORT. */
+> +TEST_F(rds, transport_unbound)
+> +{
+> +	socklen_t len =3D sizeof(int);
+> +	int val =3D 0;
+> +
+> +	ASSERT_EQ(0, getsockopt(self->fd, SOL_RDS, SO_RDS_TRANSPORT, &val,
+> +				&len));
+> +	EXPECT_EQ(sizeof(int), len);
+> +	EXPECT_EQ(RDS_TRANS_NONE, (unsigned int)val);
+> +}
+> +
+> +TEST_F(rds, transport_short_buffer)
+> +{
+> +	socklen_t len =3D sizeof(int) - 1;
+> +	char buf[sizeof(int)];
+> +
+> +	EXPECT_EQ(-1, getsockopt(self->fd, SOL_RDS, SO_RDS_TRANSPORT, buf,
+> +				 &len));
+> +	EXPECT_EQ(EINVAL, errno);
+> +}
+> +
+> +/*
+> + * RDS_INFO_COUNTERS with a zero-length buffer is the "probe" call: it m=
+ust
+> + * fail with ENOSPC and report the required snapshot size in optlen.
+> + */
+> +TEST_F(rds, info_counters_probe)
+> +{
+> +	socklen_t len =3D 0;
+> +
+> +	EXPECT_EQ(-1, getsockopt(self->fd, SOL_RDS, RDS_INFO_COUNTERS, NULL,
+> +				 &len));
+> +	EXPECT_EQ(ENOSPC, errno);
+> +	EXPECT_GT(len, 0);
+> +	/* The snapshot is an array of fixed-size counter records. */
+> +	EXPECT_EQ(0, len % (socklen_t)sizeof(struct rds_info_counter));
+> +}
+> +
+> +/*
+> + * A real snapshot into an unaligned userspace buffer exercises the
+> + * iov_iter_extract_pages() path, including the non-zero offset0 handlin=
+g
+> + * that the patch reworked. Place the buffer at a non-page-aligned addre=
+ss
+> + * spanning into the next page to make sure multi-page pinning works too=
+.
+> + */
+> +TEST_F(rds, info_counters_snapshot)
+> +{
+> +	struct rds_info_counter *ctr;
+> +	socklen_t need =3D 0, len;
+> +	long pagesz =3D sysconf(_SC_PAGESIZE);
+> +	unsigned int i, n;
+> +	char *region, *buf;
+> +	int ret;
+> +
+> +	/* Probe for the required size. */
+> +	getsockopt(self->fd, SOL_RDS, RDS_INFO_COUNTERS, NULL, &need);
+> +	ASSERT_GT(need, 0);
+> +
+> +	region =3D mmap(NULL, 2 * pagesz, PROT_READ | PROT_WRITE,
+> +		      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 98848db62894..97eac5fa341c 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2942,6 +2942,11 @@ static inline int tcp_call_bpf_3arg(struct sock *sk, int op, u32 arg1, u32 arg2,
- 	return tcp_call_bpf(sk, op, 3, args);
- }
- 
-+static inline void tcp_clear_sock_ops_cb_flags(struct sock *sk)
-+{
-+	tcp_sk(sk)->bpf_sock_ops_cb_flags = 0;
-+}
-+
- #else
- static inline int tcp_call_bpf(struct sock *sk, int op, u32 nargs, u32 *args)
- {
-@@ -2959,6 +2964,8 @@ static inline int tcp_call_bpf_3arg(struct sock *sk, int op, u32 arg1, u32 arg2,
- 	return -EPERM;
- }
- 
-+static inline void tcp_clear_sock_ops_cb_flags(struct sock *sk) {}
-+
- #endif
- 
- static inline u32 tcp_timeout_init(struct sock *sk)
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index fdc81150ff6c..7748668dba82 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1783,6 +1783,7 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
- 	return NULL;
- put_and_exit:
- 	newinet->inet_opt = NULL;
-+	tcp_clear_sock_ops_cb_flags(newsk);
- 	inet_csk_prepare_forced_close(newsk);
- 	tcp_done(newsk);
- 	goto exit;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 36d75fb50a70..493477b786db 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1531,6 +1531,7 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
- 	tcp_listendrop(sk);
- 	return NULL;
- put_and_exit:
-+	tcp_clear_sock_ops_cb_flags(newsk);
- 	inet_csk_prepare_forced_close(newsk);
- 	tcp_done(newsk);
- 	goto exit;
--- 
-2.43.0
+The 2-page mapping (and the ASSERT_LE guarding it) ties the test to the sna=
+pshot
+fitting in two pages.  This works right now, but ideally the region here sh=
+ould
+account for the number of counters that come back from RDS_INFO_COUNTERS so=
+ that
+if the total number of counters were to grow later, we don't overrun a regi=
+on
+that's set to a fixed number of pages.  So in this case, we'd want the need=
+ + offset,
+and then page align that so we can mmap it:
+
+	offset	=3D pagesz - 64;=20
+	map_len	=3D ((offset + need + pagesz - 1) / pagesz) * pagesz;  /* round (o=
+ff+need) up to whole pages */
+	region  =3D mmap(NULL, map_len, ...);                =20
+
+
+> +	ASSERT_NE(MAP_FAILED, region);
+> +
+> +	/* Unaligned start that runs past the first page boundary. */
+> +	buf =3D region + pagesz - 64;
+Then this simplifies to:
+	buf =3D region + offset;
+
+> +	ASSERT_LE(need, (socklen_t)(pagesz + 64));
+And then the ASSERT here can be removed
+
+> +
+> +	/*
+> +	 * On success the RDS_INFO path returns the positive per-element size
+> +	 * (lens.each) rather than 0, and writes the full snapshot length back
+> +	 * into optlen.
+> +	 */
+> +	len =3D need;
+> +	ret =3D getsockopt(self->fd, SOL_RDS, RDS_INFO_COUNTERS, buf, &len);
+> +	ASSERT_GE(ret, 0) {
+> +		TH_LOG("getsockopt snapshot failed: errno %d", errno);
+> +	}
+> +	EXPECT_EQ(sizeof(struct rds_info_counter), ret);
+> +	EXPECT_EQ(need, len);
+> +
+> +	/* The counter names must be NUL-terminated, non-empty strings. */
+> +	ctr =3D (struct rds_info_counter *)buf;
+> +	n =3D len / sizeof(*ctr);
+> +	ASSERT_GT(n, 0);
+> +	for (i =3D 0; i < n; i++) {
+> +		size_t namelen =3D strnlen((char *)ctr[i].name,
+> +					 sizeof(ctr[i].name));
+> +
+> +		EXPECT_GT(namelen, 0);
+> +		EXPECT_LT(namelen, sizeof(ctr[i].name));
+> +	}
+> +
+> +	munmap(region, 2 * pagesz);
+
+Finally this turns into:
+        munmap(region, map_len);
+
+That's the only thing that really stood out.  I think the rest of it looks =
+really good.  Thanks for putting this
+together!
+
+Allison
+> +}
+> +
+> +/*
+> + * A non-zero but too-small buffer must report ENOSPC and the full requi=
+red
+> + * length, without corrupting memory past the buffer.
+> + */
+> +TEST_F(rds, info_counters_short_buffer)
+> +{
+> +	socklen_t need =3D 0, len;
+> +	char small[sizeof(struct rds_info_counter)];
+> +
+> +	getsockopt(self->fd, SOL_RDS, RDS_INFO_COUNTERS, NULL, &need);
+> +	ASSERT_GT(need, 0);
+> +
+> +	/* Ask with a buffer guaranteed smaller than the full snapshot. */
+> +	if (need <=3D (socklen_t)sizeof(small))
+> +		SKIP(return, "snapshot fits in one record; nothing to test");
+> +
+> +	len =3D 1; /* < sizeof(struct rds_info_counter) */
+> +	EXPECT_EQ(-1, getsockopt(self->fd, SOL_RDS, RDS_INFO_COUNTERS, small,
+> +				 &len));
+> +	EXPECT_EQ(ENOSPC, errno);
+> +	EXPECT_EQ(need, len);
+> +}
+> +
+> +TEST_HARNESS_MAIN
+>=20
 
 
