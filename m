@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-295879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EraVDkvyImpQfgEAu9opvQ
-	(envelope-from <netdev+bounces-295879-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:59:07 +0200
+	id kFgoF0rxImorfgEAu9opvQ
+	(envelope-from <netdev+bounces-295880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:54:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3430F649899
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:59:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3B3649838
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 17:54:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tk154.de header.s=DKIM001 header.b=B52EyhIE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295879-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295879-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=tk154.de header.s=DKIM001 header.b=D60BYEjk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295880-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295880-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 875EB306C538
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 15:45:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 23EF630E7A12
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 15:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DD53128CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277173128CC;
 	Fri,  5 Jun 2026 15:45:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp10.goneo.de (smtp10.goneo.de [85.220.189.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A3730EF9B;
-	Fri,  5 Jun 2026 15:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44105271A9A;
+	Fri,  5 Jun 2026 15:45:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780674323; cv=none; b=o4DVyU6o1TYjR1+Ak0JYzBTlBcfVNPS46EgtRNXXDnlnVXXOSVpQR6fxPmPwAMRJ87WfaAWouNxJr8QYA1DJrzWNakdTzvXut2VzIN5meTF22k6PTDbykysXGejx3iZ8VuR6kAM6n5bPo3VvNk6OkPp/PQd8xl6uJDXuMzth8UM=
+	t=1780674323; cv=none; b=saGgkB5cUyHWP2qnsf6InCyQZXu9lQvar1UqruCH4fxNsmopugBtg6tV/1enLVyvAjak+L9pDtIrFFwk8sJoGqZP4bityKsObSueZmIlkE00YNNyRfXD7Y6Z+C8NC1SWF2ckRPYDbo9r67KdanI0yQT1wTb+/z+owdGX4oaYjXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780674323; c=relaxed/simple;
-	bh=evstT5AQzuQfOFZzt57PgLgV9THIu2v86e82J+pbOFY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R9Id9iIcxPYoCF3O7lJgre20yMnrO/RErNtWN0iRnVXQlsQQpdA4Ecd44Bq3uAivC4NK6Dt+piQ9dA8etUjwcxXd59cZJC5iB6hDVkXyDpFMayDCWl52hCfmkPMoSVtQm86/YplShDRyn1P1Ccw5+CCVxgVP+W42mv5aKP6HiZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=B52EyhIE; arc=none smtp.client-ip=85.220.189.106
+	bh=X3uWoFTL43TKtRaGf/jtjolAY6UPFdTmz02blP+KP3k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GojeYA/r/2+EyeEdPaVfUhE0IGcLmPeXqB2E4t8lBlMp4R7w02AyWLMt5sKsoyLU4vziNH294IM2DWT5xYveiy5owfXucxoobdJrvwRiY4dpDh7dvHsfgJwG2U6zalY7AqPLEGUdIXzACTLivKGXeLC1N/03jiJWahrSyh0yAQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=D60BYEjk; arc=none smtp.client-ip=85.220.189.106
 Received: from hub1.goneo.de (hub1.goneo.de [85.220.129.52])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519)
 	(No client certificate requested)
-	by smtp10.goneo.de (Postfix) with ESMTPS id 4EF53240069;
-	Fri, 05 Jun 2026 17:45:17 +0200 (CEST)
+	by smtp10.goneo.de (Postfix) with ESMTPS id B8D6524028A;
+	Fri, 05 Jun 2026 17:45:19 +0200 (CEST)
 Received: from hub1.goneo.de (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	by hub1.goneo.de (Postfix) with ESMTPS id 6473E24016A;
-	Fri,  5 Jun 2026 17:45:15 +0200 (CEST)
+	by hub1.goneo.de (Postfix) with ESMTPS id 207F424016A;
+	Fri,  5 Jun 2026 17:45:18 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=DKIM001;
-	t=1780674315;
+	t=1780674318;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VB2msiqAX8ETz7EG91isMk+QZv7d+BEDx4/Tb94VLdU=;
-	b=B52EyhIESoOzi3SntjGZ5LN73Mz5LD9ytKA9nMX+G8UYcGD5rQ8VRFebiYlTSAx7/0gVnY
-	wlrExgkEbYZLqAIy2at8Ba0CjIlN7z8fkc04S+SgLtYQpPEEblcbDgGMOyQ4yD3XmBNszM
-	REbmgmOKaaLX4Cy0GgJV7qP8SrNM6xa28KpAgQvyitukww1YLfkJeAdIX0dlYcc9PY3CNP
-	4ewQ5s7P0a4nMm9Ba7dXYYy+iuSSbyRJX9uIT0f2jvthWQNTIfJxWOxtWFy+tHOarhmzT+
-	xwRdYupGji/24fpBT5kolDcSt1vLtM2TBjS7aGqbBAg1214zl4lvlymMkwUhHw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZoTVEgLNauvougTiOOzgJ66IRmD3vjDkLm4JeWlu9kI=;
+	b=D60BYEjk3nlxKyYQznfyNV18znoglvdY4E4vOnDfGSjiRiY1rnymQyP8RoHR6NHMNnjdgr
+	4rziNYiLctFGUb/h6QdUtHbwTuMDRBF7jYFLnn3mWvdsN9Ok4GT8trdluOBZqSrVVHBE8m
+	+tAIVswRIiTChWPLhc87MTqPAAa0ZV4ol/PDw/9cGbq4wOgDTofpoLQx8aT6Vn2FlAD6+G
+	eE767qG70nsEyVe3Vy5jfLSqqXshuz9vZavcZYnDDWsVj9rk3MxK8Vz4eVFg7FVqYBaziY
+	2YQOTp/ejfPV5TQZ8VPGWs1eAJuGSCPhITyWGdUGFJLqD7K9DHdz9jM2x/3a8Q==
 Received: from Til-Notebook.meshlab (unknown [195.37.88.189])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by hub1.goneo.de (Postfix) with ESMTPSA id 5F3FA240282;
-	Fri,  5 Jun 2026 17:45:12 +0200 (CEST)
+	by hub1.goneo.de (Postfix) with ESMTPSA id 600232400A5;
+	Fri,  5 Jun 2026 17:45:15 +0200 (CEST)
 From: Til Kaiser <mail@tk154.de>
 To: netdev@vger.kernel.org,
 	bpf@vger.kernel.org
@@ -81,10 +83,12 @@ Cc: marcin.s.wojtas@gmail.com,
 	sven.auhagen@voleatech.de,
 	lorenzo@kernel.org,
 	Til Kaiser <mail@tk154.de>
-Subject: [PATCH net v4 0/4] net: mvpp2: fix XDP RX buffer handling
-Date: Fri,  5 Jun 2026 17:44:53 +0200
-Message-ID: <20260605154457.163304-1-mail@tk154.de>
+Subject: [PATCH net v4 1/4] net: mvpp2: sync RX data at the hardware packet offset
+Date: Fri,  5 Jun 2026 17:44:54 +0200
+Message-ID: <20260605154457.163304-2-mail@tk154.de>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260605154457.163304-1-mail@tk154.de>
+References: <20260605154457.163304-1-mail@tk154.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,8 +96,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-UID: dad915
-X-Rspamd-UID: 97db6a
+X-Rspamd-UID: 83efb2
+X-Rspamd-UID: ebefe1
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -101,14 +105,14 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[tk154.de:s=DKIM001];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-295879-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295880-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[mail@tk154.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:marcin.s.wojtas@gmail.com,m:linux@armlinux.org.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:mcroce@redhat.com,m:sven.auhagen@voleatech.de,m:lorenzo@kernel.org,m:mail@tk154.de,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -124,46 +128,50 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DKIM_TRACE(0.00)[tk154.de:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tk154.de:mid,tk154.de:from_mime,tk154.de:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3430F649899
+X-Rspamd-Queue-Id: 8C3B3649838
 
-This is v4 of the earlier XDP_PASS fix. The XDP_PASS change is
-retained, and the series also fixes related RX/XDP buffer handling
-issues found during review.
+mvpp2 programs the RX queue packet offset, so hardware writes received
+data at dma_addr + MVPP2_SKB_HEADROOM. The current CPU sync starts at
+dma_addr and only covers rx_bytes + MVPP2_MH_SIZE bytes, which syncs the
+unused headroom and misses the same number of bytes at the packet tail.
 
-Tested with tools/testing/selftests/drivers/net/xdp.py on mvpp2
-hardware.
+On non-coherent DMA systems this can leave the CPU reading stale cache
+contents for the end of the received frame.
 
+Use dma_sync_single_range_for_cpu() with MVPP2_SKB_HEADROOM as the range
+offset so the sync covers the Marvell header and packet data actually
+written by hardware.
+
+Fixes: e1921168bbd4 ("mvpp2: sync only the received frame")
+Signed-off-by: Til Kaiser <mail@tk154.de>
 ---
-v1: https://lore.kernel.org/all/20260524122334.1730451-1-mail@tk154.de/
-v2: https://lore.kernel.org/all/20260602164635.62517-1-mail@tk154.de/
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Changes in v4:
-- Reposted as a new independent thread, no code changes.
-
-Changes in v3:
-- Reworked RX refill failure handling to preserve BM pool depth by
-  refilling before the current buffer is consumed by XDP or an skb.
-
-Changes in v2:
-- Fixed RX DMA sync range to account for RX headroom.
-- Limited XDP frame size to the actual RX buffer size.
-- Fixed refill error paths so retired buffers are not returned to BM.
-
-Til Kaiser (4):
-  net: mvpp2: sync RX data at the hardware packet offset
-  net: mvpp2: limit XDP frame size to the RX buffer
-  net: mvpp2: refill RX buffers before XDP or skb use
-  net: mvpp2: build skb from XDP-adjusted data on XDP_PASS
-
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 61 +++++++++++--------
- 1 file changed, 36 insertions(+), 25 deletions(-)
-
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index f442b874bb59..92a701f4fe3f 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -3946,9 +3946,10 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
+ 			dma_dir = DMA_FROM_DEVICE;
+ 		}
+ 
+-		dma_sync_single_for_cpu(dev->dev.parent, dma_addr,
+-					rx_bytes + MVPP2_MH_SIZE,
+-					dma_dir);
++		dma_sync_single_range_for_cpu(dev->dev.parent, dma_addr,
++					      MVPP2_SKB_HEADROOM,
++					      rx_bytes + MVPP2_MH_SIZE,
++					      dma_dir);
+ 
+ 		/* Buffer header not supported */
+ 		if (rx_status & MVPP2_RXD_BUF_HDR)
 -- 
 2.54.0
 
