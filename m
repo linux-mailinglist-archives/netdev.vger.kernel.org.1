@@ -1,141 +1,165 @@
-Return-Path: <netdev+bounces-295901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wBgFD4UBI2prgQEAu9opvQ
-	(envelope-from <netdev+bounces-295901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:04:05 +0200
+	id C/c7HroBI2pxgQEAu9opvQ
+	(envelope-from <netdev+bounces-295902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:04:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8FC649FF8
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:04:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E1764A00A
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:04:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=OurfKy3t;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295901-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295901-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Z2yMU8NR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295902-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295902-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 92105300BC62
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 16:47:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B99A5301681A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 16:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C1B3B42E6;
-	Fri,  5 Jun 2026 16:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5473838886D;
+	Fri,  5 Jun 2026 16:48:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42933B42EA
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 16:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A439B416D11;
+	Fri,  5 Jun 2026 16:48:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780678031; cv=none; b=pFRZKDFN5Kq7AGCJFiIIFWxyjk+ct8BIfR976259G8RhvgXxkgyWH4Un6APY2ue93KqCpoV/j1c5Z6M3NZ6bjQMCu4x1CCM0BXC2chfuJlVj1PdgJ+LUp2LFTR33cOBau19BA1L/WqjbxWWuhWMI4afdw/aVs+z0Qbjy4G/XEh0=
+	t=1780678091; cv=none; b=boh6y7HXtq9fsFn3d54yO5Khn6Zdt18KjCheO3K6SpdijOxqVWv3zgdme2HSS+OpcMRAB+5jrMj0umJNv4FQQt+ts4dhtTIkE0BIHBDrkEnuG1eKKxsxgIUar9gBGBeN71ivH6JxFmmW9YHcxBtphvhMYOrYS9CPiSvTYCDGh3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780678031; c=relaxed/simple;
-	bh=9ZQWCAriGC7//nhBAgyH4AqXGlpZlnaLsGPBr2HX8TQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cAC37o0LimLzpZ8yiAiHFewEy/jS0yXZymfhTwSwcDU4OQNaC4y61v2lZZid0cZKxA7V7RLxzbezOUnvlvTbekAxtQLMIugVdJ+d+ulocz94EvvsiQgtE7igVgz4y8HC69HCSfJhKuhf/zMCPYWRlynvShHF35gOdCjILZ+hPPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OurfKy3t; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7Yx0xoCSUnZFBwl5Y19RbiT9uE8MOdCxSvI7T6rLc28=; b=OurfKy3t7FAUTdEDf4uzqgBp3A
-	RdSKDWsXmmQXLvvqI6hmX3eGQ5ffJ2yobieIBk1P9dxrYyh9jiVZsnNaYNarhH67X7dzQx9+iwVmH
-	teL1dL9uGND/lPgjoiLvqCvmUrFPnMLl6TNahuqzOSyQ1k6S3UHANow2b1mAU9RSgSMI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wVXhG-006GRh-IR; Fri, 05 Jun 2026 18:47:02 +0200
-Date: Fri, 5 Jun 2026 18:47:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net v2 3/3] net: txgbe: initialize PHY interface to 0
-Message-ID: <06157cab-2201-4707-804c-c915e3c4a901@lunn.ch>
-References: <20260605030850.17796-1-jiawenwu@trustnetic.com>
- <20260605030850.17796-4-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1780678091; c=relaxed/simple;
+	bh=L12zN332I92MvNM9UxWwKc8LP852nIsJRf/OVsmGYnc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KMQVHJ7gl/iOjhE2wky2ptk3/L6vVd4sNnnI0ZJCh6BjRvdIgs1WhYNKy7H8rI2GUZ/3gXGKoSjPEmvT7o9KqIUufEEetQOKb+0yyoSEyfK1WhzF+wUpkYVYjWPmAz+KJDtQnpofRZX2hoy8Sb6r4x4yqVP2Kzi6KridhoWScxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2yMU8NR; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D2E21F00893;
+	Fri,  5 Jun 2026 16:48:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780678089;
+	bh=v5tPOCoS4u/BnwalvSfGaAsQN8smT4gdZFQcmM0aeME=;
+	h=From:Date:Subject:To:Cc;
+	b=Z2yMU8NRmyTxSJ6I88bKgKbu1ejvG/lCN8Ve5zckAKMZpsXsnnFjnRU6Fgw3509gy
+	 cb3E3Qy1/UVCeDd6tVHQNf47NMU/HbliT6HZItaWVwR/03yPfdL5cCDLCkPdpuPyxa
+	 cizF5YgkdDS+gcCupBVTX4m27V9A3STiorz+fMKVYoh0wjfhnbtwd21ZQkAxc3fRnX
+	 zZDh/rP72qMsawAAovkMFFAtJguag58l0NerQ17WsVt9nlWROqdbMXhsGeE0ZzgSNH
+	 uY8DsiYC2IIWEpgN0Mo+K2SFBwmFMMtjg1qGAB3e32a11KCQVTdyvOvvvI44AAX9BG
+	 phWH98dkYY2FQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Fri, 05 Jun 2026 18:47:48 +0200
+Subject: [PATCH nf] netfilter: flowtable: Validate iph->ihl in
+ nf_flow_ip4_tunnel_proto()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260605030850.17796-4-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260605-nf_flow_ip4_tunnel_proto-update-v1-1-9de42230f080@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NQQqDMBBA0avIrA1E26boVUSC0Zl2QCYhiVUQ7
+ 97g8m3+PyFhZEzQVydE/HFiLwVNXcH8neSDipdiaHVrtNEvJWRp9bvl8LR5E8HVhuizV1tYpoz
+ KPRp6OyJDroNSCRGJj/swgBCM1/UHkXgHcnUAAAA=
+X-Change-ID: 20260605-nf_flow_ip4_tunnel_proto-update-b31f7bff6fb9
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295901-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:lorenzo@kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jiawenwu@trustnetic.com,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-295902-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3F8FC649FF8
+X-Rspamd-Queue-Id: 73E1764A00A
 
-On Fri, Jun 05, 2026 at 11:08:50AM +0800, Jiawen Wu wrote:
-> DECLARE_PHY_INTERFACE_MASK() does not guarantee zeroed contents. Change
-> the stack variable "interfaces" to be zeroed before setting supported
-> interfaces.
-> 
-> Fixes: 57d39faed4c9 ("net: txgbe: improve functions of AML 40G devices")
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-> index bdac654a2364..d73295d26b85 100644
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-> @@ -270,8 +270,8 @@ static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
->  
->  static int txgbe_qsfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
->  {
-> +	unsigned long interfaces[PHY_INTERFACE_MODE_MAX] = {};
->  	__ETHTOOL_DECLARE_LINK_MODE_MASK(modes) = { 0, };
-> -	DECLARE_PHY_INTERFACE_MASK(interfaces);
+Add sanity check for iph->ihl field in nf_flow_ip4_tunnel_proto routine.
+Moreover, similar to nf_flow_ip6_tunnel_proto(), rely on
+skb_header_pointer() to validate skb header layout.
 
-This is not what i was meaning. Please add something like
+Fixes: ab427db178858 ("netfilter: flowtable: Add IPIP rx sw acceleration")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ net/netfilter/nf_flow_table_ip.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-DECLARE_PHY_INTERFACE_MASK_ZEROED(name)
-
-where the = {0} is inside the macro. If this is next to the
-DECLARE_PHY_INTERFACE_MASK() macro, it is less likely other developers
-will make the same error as you have in your code.
-
-    Andrew
+diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+index 9c05a50d6013..9684c19da37a 100644
+--- a/net/netfilter/nf_flow_table_ip.c
++++ b/net/netfilter/nf_flow_table_ip.c
+@@ -319,15 +319,17 @@ static unsigned int nf_flow_xmit_xfrm(struct sk_buff *skb,
+ static bool nf_flow_ip4_tunnel_proto(struct nf_flowtable_ctx *ctx,
+ 				     struct sk_buff *skb)
+ {
+-	struct iphdr *iph;
++	struct iphdr *iph, _iph;
+ 	u16 size;
+ 
+-	if (!pskb_may_pull(skb, sizeof(*iph) + ctx->offset))
++	iph = skb_header_pointer(skb, ctx->offset, sizeof(*iph), &_iph);
++	if (!iph)
+ 		return false;
+ 
+-	iph = (struct iphdr *)(skb_network_header(skb) + ctx->offset);
+-	size = iph->ihl << 2;
++	if (iph->ihl < 5)
++		return false;
+ 
++	size = iph->ihl << 2;
+ 	if (ip_is_fragment(iph) || unlikely(ip_has_options(size)))
+ 		return false;
+ 
+@@ -335,9 +337,9 @@ static bool nf_flow_ip4_tunnel_proto(struct nf_flowtable_ctx *ctx,
+ 		return false;
+ 
+ 	if (iph->protocol == IPPROTO_IPIP) {
+-		ctx->tun.proto = IPPROTO_IPIP;
++		ctx->tun.proto = iph->protocol;
+ 		ctx->tun.hdr_size = size;
+-		ctx->offset += size;
++		ctx->offset += ctx->tun.hdr_size;
+ 	}
+ 
+ 	return true;
 
 ---
-pw-bot: cr
+base-commit: 4aacf509e537a711fa71bca9f234e5eb6968850e
+change-id: 20260605-nf_flow_ip4_tunnel_proto-update-b31f7bff6fb9
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
