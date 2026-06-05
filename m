@@ -1,188 +1,213 @@
-Return-Path: <netdev+bounces-295487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295488-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id V4wNMYwUImolSQEAu9opvQ
-	(envelope-from <netdev+bounces-295487-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:13:00 +0200
+	id wkO5MXQYImq8SQEAu9opvQ
+	(envelope-from <netdev+bounces-295488-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:29:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3646F644179
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:13:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 323416441C1
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 02:29:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=sr4R6pAx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295487-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295487-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="DW4A8I/X";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295488-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295488-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3375B3007668
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 00:12:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 208D430377A6
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 00:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA12422339;
-	Fri,  5 Jun 2026 00:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EDF1990C7;
+	Fri,  5 Jun 2026 00:29:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012026.outbound.protection.outlook.com [40.107.209.26])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863263BBFC4
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 00:12:55 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780618376; cv=fail; b=U8+XQZVj1Yitrt+x5aqB9FRTbdLl2DTG+BehPlT9f80+d28t5L2n6214s2YlXS2eIRX2cNk7tdDbsj3xOVcIwNX6sdb7TS5U/NWUbXBwONLDrivRjcRO3vuyWA0KTU3B3mT0QQ8FRYZX6rtiYLCPpz7hQevC3+FdI/JhjsYDAlw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780618376; c=relaxed/simple;
-	bh=cCedtJ0qn8UtABG8DDCGsNyiYeMZGOoMDktQBDaigXs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cfv0kHxi3O5AJsSQQjd2hpF/ouVKWonX7blVkgEvGr21KFnWFZNJvL4NQeydb59i1yKqJFBVcyiX76oBDWnjDgJDEVHYulubyDE1BbnWY5K9mTEsaOWn+cewDoHhbJP+SMaIsoKLjkhuMe6iqnpHgsyGsmkBWSJQdVZO4vB2aPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sr4R6pAx; arc=fail smtp.client-ip=40.107.209.26
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JvcupkpyboXOzeCfA2IIkwDqUPAPtOnklpqZMtJtfyMAHGunsPqpgQcrvs1Kadvqy6Kj1pCE/Y2UgsYdEVdQR0kI/JX0sIy3HLohyx4zd+UoOpP5tkcJvg9M4RjXu7CrCI/ZU4fM1+eEjZ2HJbdPIi/lRZcGURHHKzj65sDiqqrLzNaBNOeC8CHdrf9HN8eyNlyETdybLiAvbLUrZNZWTWeX0ogjNfEMvXKovKerNKf2QliRDl6HanCjNF/bWlIVDjy5Y/PAsjB4TawzcT9wETIGxqmUeipI/9M58bPFv8IBJTqLztgk9Tj4op055ome9bGVqG2wmakjvNvkDr7SWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Ni026xIqlSKzWPfBlwj0CLXDx1hjwwbvPXTEyO+++U=;
- b=c1TYtRvULcvXi/lxlaLeAeUvPwVW9tnpsW5xHbtHfz3ZiWrRyNzhdoj9Su3Rc9FknL3f4qoAmCpUunrMVcdRa8PnfdZgGe9r4xwm8ZT0im8vF0aao1A/Vs0j8t8o/HU8rrCaLopmlRgWnHtHxCVch2X31gDicfTaK54ft0/PnKvd4apZBTj1hQooQa0qYgIt8kzZnj0Tso1rx1f1gmNysyrTXjGeFSylOgpILlyPnGpRWH9Sb5+dRpLB1mVHrLoScxlLE4Gy7qaTMdht5/bU7K6aJwJLdFEGntOMdKz4FG4Yf6yFT4kNfx4zgUHI28zRf5hsYk0ZSzfJT0M6O3nd+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Ni026xIqlSKzWPfBlwj0CLXDx1hjwwbvPXTEyO+++U=;
- b=sr4R6pAxY0nuSL6N8qc2zOWK7t1kw47LlV03zdE9HnKwBd735er6xSEcs3nr5T6RcHXlEBmX6wvDADb5cQ8ETB1gt+iiygcOZjW7gwZTgjCwrOqybOVAV3cSrhp+QbulRIi0rIEk8CAwYDewJcyWHmtPEmXFcEOFSdkDqC/25wE=
-Received: from BYAPR21CA0027.namprd21.prod.outlook.com (2603:10b6:a03:114::37)
- by SA1PR12MB9492.namprd12.prod.outlook.com (2603:10b6:806:459::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Fri, 5 Jun 2026
- 00:12:51 +0000
-Received: from BY1PEPF0001AE1D.namprd04.prod.outlook.com
- (2603:10b6:a03:114:cafe::2) by BYAPR21CA0027.outlook.office365.com
- (2603:10b6:a03:114::37) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.8 via Frontend Transport; Fri, 5
- Jun 2026 00:12:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BY1PEPF0001AE1D.mail.protection.outlook.com (10.167.242.106) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.92.5 via Frontend Transport; Fri, 5 Jun 2026 00:12:50 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 4 Jun
- 2026 19:12:49 -0500
-From: Eric Joyner <eric.joyner@amd.com>
-To: <netdev@vger.kernel.org>
-CC: Brett Creeley <brett.creeley@amd.com>, Jakub Kicinski <kuba@kernel.org>,
-	Michal Kubecek <mkubecek@suse.cz>, Eric Joyner <eric.joyner@amd.com>, "Jacob
- Keller" <jacob.e.keller@intel.com>, Nikhil Rao <nikhil.rao@amd.com>
-Subject: [PATCH ethtool] netlink: fec: Add missing newlines in FEC statistics output
-Date: Thu, 4 Jun 2026 17:12:37 -0700
-Message-ID: <20260605001237.11708-1-eric.joyner@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F021BCA6F
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 00:29:35 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780619377; cv=none; b=hv3mv+6pykrieWTWlJu+hwp7qlJshxOqlv7ISDqUbgRe9XnAYDuw9/0wzYdvOD0jzPaOMUV9ZcJDwWHDFCvKzff7H8yW3RYPh6tMp5phVROqO2xW1gcacIyrH2EirH3pSfv8M1I/eUAluELXYdtyMJJqum/oyfCM3bpiey9Ov/8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780619377; c=relaxed/simple;
+	bh=XDrIFfYejMWIXqRNlWgrd9Xs/2HYZ+u+Gc4pqx5Epn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NmkqGAADjN/vrZ1VOt2SdbKtG0cC1Wmic1X/GtmGPdTzUqR9+O1+yTs0d34K06R+UcZ+iM+hdsSSwgMIZ2MSXSSxdHshBzq5x9JVYvHJtDPKPyC14EIXg2LLSjZL9NcpOT0h+/PJYn8q9XfNzlddxjJHRVrxQGFrvGVMC7rkJqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DW4A8I/X; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B68ED1F00893;
+	Fri,  5 Jun 2026 00:29:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780619375;
+	bh=nnvVXOVQb6kAEUOzYlpn/ITzwYxCQs0dOmZ9v6+04pw=;
+	h=From:To:Cc:Subject:Date;
+	b=DW4A8I/Xct97EaBUdYICjjDrBVgds6Ee+3g/LqTgD9Ha5/Dwg8yb1ORh8m9YU5Ml5
+	 6SiLRUQ8ywcEdj/IEwI/A2yVSh6P/jB0z0VA5R+wMal65DSaA1W1Cqj6aZ9qJ/bNQ7
+	 fbbBlcmawfdyyWL/AF1Jx7LvL4EHZbOhpylWksOrbzB7GWfQuuU5TpImrQTMCXzbgH
+	 yvDQGBa4IR0aLhLbjHQ+/z355T1j3gnOHdFe4rnI8JQ5uKMxIlkMPhZhFvKRDhsjIv
+	 B3fHj7yXfdG7+lgmd0YyoKmEWdDlmeRP/p+D6XSGBiUUc2fqO1f0x+WlK60CcjUvbg
+	 VzyJYNhC9lbUg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	michael.chan@broadcom.com,
+	hkallweit1@gmail.com,
+	maxime.chevallier@bootlin.com,
+	joshwash@google.com,
+	tariqt@nvidia.com,
+	alexanderduyck@fb.com,
+	willemb@google.com,
+	jacob.e.keller@intel.com,
+	kory.maincent@bootlin.com,
+	sdf.kernel@gmail.com,
+	jakub@cloudflare.com,
+	nb@tipi-net.de,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/12] net: ethtool: let ops locked drivers run without rtnl_lock
+Date: Thu,  4 Jun 2026 17:29:00 -0700
+Message-ID: <20260605002912.3456868-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE1D:EE_|SA1PR12MB9492:EE_
-X-MS-Office365-Filtering-Correlation-Id: 92e8196f-9644-4e72-ae47-08dec2972e7c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700016|18002099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	fnPpH47GhdGF3Z2CFPeBaLSX4mZA0rZtx81upSaFF1FOB5CaoU9v+m0zIask1b3fmKWuyhy1nIGhbVG34kgin4Sujm+8+G6oNMSHQ3kZ/oloOr2dsVSQz1jAvLeqfUYjCOjqM6QXCzouYX4Lp8494Qcyx/ZVZqsPU94R+u3mqVuEwqfVFuKvXkHKxYOdE8Nh3fuIxn2j65pZjgIP5YOKSJdFzb5iradQAHTnVgZqkMvygWCzGjR0CntsazizO/UNLbj3Dmcm6Ob1Q3XkWg5roD2Umx+bzOlMcsAPdvCMo2vj2u3AuebAvZ828vdulsB4GsyGVXWQiOCh8SbunOu+v3IHA88S9TTKK74lKltRvOOPH+BbCq/U3xYHn4jw8mhj8uUMxaPwu4EaBYrhiiZjDGr5rjheDnisDfqx97R5zNd63cobD0sThHnVBTBt7ijNS8G66wHYSQdbYWBENbxF2JJsRilhSVkY+a0WMeAMkjepXSK88I0fTZFb3jyoVpAhqDYiNl6ggmH3+TYq+/2G06yKLKtaMXKBXCNco//k5sG5XChiCVpP0mHg6OHnIPge3ZRKsTG+tYZU2R1GvRRNDfQIsWSCd6J2IIcTwwtG+Q7jwjVuIK1jdraV+qslG28yk84maRIAdwUSfxEnB5S9F7jvpS5imPXE5t+Ntcn/eEONpGubtdfGBqXNbFQGPQojeOaUH7IvW6OAqhR/X1IIuWTnqzmyuZEpQJbQ1H0BLrY=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700016)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	nLyYfiKyvpwAS7APayAqfvKGCw9cHA6WFdnNPE3Saf17bYGlKS/cZteX2a9osAI/So7pMw08MqyZLn/TI+thmEAKHQCN1o12YQpuTSJWGdIKsWDf8Qz+P8YDFsO0Sxdmqtfy2lXvv1EcJcFbxtP/Da4EqCHTm/JCEAX9lSy1lhRDBYu8Ym5sZCQ2sp7SW34Lfyoqy9fKi1V8xUBB30ynd91sxZf+YddyhOcoMffQEjqucC/BOhgebKwq7Pc31LHHBl3Iu2PAELcEWvfSUn+XEcysmYR+jaijmiPreFSwBk2iyOddHEgjzVBvEROuLrKEqrkCNnLBNpYLvuBgMy99GfnEDcAAcJat4oHDkN44KuyNhs3uNSlwl2KxVif6fgVvg0fZf3aPXZKc3iFcmSyFRYVuyhPwKhJlVdNc8eJrKaE62KYwjSgK5D8u+eZjK+Or
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 00:12:50.7849
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92e8196f-9644-4e72-ae47-08dec2972e7c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BY1PEPF0001AE1D.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9492
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295487-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295488-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:kuba@kernel.org,m:mkubecek@suse.cz,m:eric.joyner@amd.com,m:jacob.e.keller@intel.com,m:nikhil.rao@amd.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:joshwash@google.com,m:tariqt@nvidia.com,m:alexanderduyck@fb.com,m:willemb@google.com,m:jacob.e.keller@intel.com,m:kory.maincent@bootlin.com,m:sdf.kernel@gmail.com,m:jakub@cloudflare.com,m:nb@tipi-net.de,m:kuba@kernel.org,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,gmail.com,bootlin.com,nvidia.com,fb.com,intel.com,cloudflare.com,tipi-net.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3646F644179
+X-Rspamd-Queue-Id: 323416441C1
 
-The non-histogram stats don't have newlines printed after them if they
-don't have per-lane counts, and so they (and the first histogram bin, if
-applicable) were displayed on the same line with the rest of the stats
-being displayed with one stat per line, which looked inconsistent and
-doesn't match the display in previous versions of ethtool.
+With the ethtool_get_link_ksettings() situation hopefully ironed out
+the previous series (commit 6a5d837f0ce2) let's return to the main
+part of the series.
 
-Fix this by printing a final newline in the case where there are no
-per-lane counts so that each stat gets printed with a newline at the
-end.
+We have been slowly moving towards removing the rtnl_lock dependency
+in driver ops since the concept of "ops-locked" drivers have been
+introduced last year. Since last year will take the netdev instance
+lock before invoking any ndo or ethtool op of "ops-locked" drivers.
 
-Fixes: 3426a920183f ("netlink: fec: add errors histogram statistics")
-Signed-off-by: Eric Joyner <eric.joyner@amd.com>
----
- netlink/fec.c | 2 ++
- 1 file changed, 2 insertions(+)
+We dipped our toes into rtnl_lock-less ops with the queue binding API.
+Queue stats, NAPI, and other netdev-netlink objects are also queried
+without holding rtnl_lock already. It's time to take the next logical
+step and lift the requirement from ethtool ops.
 
-diff --git a/netlink/fec.c b/netlink/fec.c
-index 36ad3f504a83..c014749ac950 100644
---- a/netlink/fec.c
-+++ b/netlink/fec.c
-@@ -166,6 +166,8 @@ static int fec_show_stats(const struct nlattr *nest)
- 		if (lanes) {
- 			close_json_array("");
- 			printf(" ]\n");
-+		} else {
-+			printf("\n");
- 		}
- 
- 		close_json_object();
+The direct motivation for this patchset is that ethtool ops often
+involve communicating with device FW, and may take a long time
+to complete. Aggressive polling of device state on machines
+with 10+ NICs have been shown to significantly increase rtnl_lock
+pressure.
 
-base-commit: 75fd12445ffd6d697d53b7d296e345d524a9bedd
+There's a handful of areas which still need rtnl_lock (see below).
+I decided to convert everything to rtnl_lock-less by default, and
+add a set of flags which let the drivers request rtnl_lock to still
+be taken. I don't love this, but I'm worried that opt-in would be
+even more confusing.
+
+Known issues / exclusions:
+ - qdiscs - qdisc configuration currently assumes rtnl_lock, this
+   is mostly impacting set_channels callback. qdisc config is probably
+   the easiest one of the exclusions to tackle, it's fairly self-contained.
+ - features - even tho feature changes are (correctly) plumbed to
+   the driver thru ndos they are part of ethtool uAPI. ethtool itself
+   calls netdev_features_change() if it has spotted device feature change
+   before vs after to the callback. Some drivers also call
+   netdev_features_change() directly in response to various changes,
+   e.g. setting priv flags.
+   Since features have to propagate to upper and lower devices anything
+   that touches features is quite hard to move from under rtnl_lock.
+ - phylink - phylink and SFP depend on rtnl_lock today, I suspect
+   that this is purely for historic reasons. I started poking at
+   it and don't really see a need for a global lock. But accessing
+   the netdev instance lock from the SFP entry points will require
+   some attention from the phylink folks.
+ - phydev - similar to phylink, looks quite doable. But no ops-locked
+   driver currently has a phydev (fbnic only uses phylink) so phydev
+   related paths retain a ASSERT_RTNL() for now.
+
+Tested on mlx5, bnxt and fbnic.
+
+Jakub Kicinski (12):
+  net: ethtool: serialize broadcast notification sequence allocation
+  net: ethtool: relax ethnl_req_get_phydev() locking assertion
+  net: ethtool: make dev->hwprov ops-protected
+  net: ethtool: optionally skip rtnl_lock on Netlink path for GET ops
+  net: ethtool: optionally skip rtnl_lock on Netlink path for SET ops
+  net: ethtool: optionally skip rtnl_lock in cable test handlers
+  net: ethtool: optionally skip rtnl_lock in ethnl_tsinfo_dumpit()
+  net: ethtool: optionally skip rtnl_lock in ethnl_act_module_fw_flash()
+  net: ethtool: optionally skip rtnl_lock in RSS context handlers
+  net: ethtool: ioctl: concentrate the locking
+  net: ethtool: optionally skip rtnl_lock on IOCTL path
+  docs: net: ethtool: document ops-locked drivers and op_needs_rtnl
+
+ Documentation/networking/netdev-features.rst  |   7 +
+ Documentation/networking/netdevices.rst       |  17 ++-
+ include/linux/ethtool.h                       |  36 ++++-
+ include/linux/netdevice.h                     |   3 +
+ include/linux/phy_link_topology.h             |   5 +
+ include/net/netdev_lock.h                     |  11 ++
+ net/ethtool/common.h                          |  76 +++++++++++
+ net/ethtool/netlink.h                         |   8 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   4 +
+ drivers/net/ethernet/google/gve/gve_ethtool.c |   6 +-
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |   3 +
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |   2 +
+ .../mellanox/mlx5/core/ipoib/ethtool.c        |   2 +
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   5 +
+ .../ethernet/microsoft/mana/mana_ethtool.c    |   2 +
+ drivers/net/netdevsim/ethtool.c               |   1 +
+ drivers/net/phy/phy_device.c                  |   3 +
+ drivers/net/phy/phy_link_topology.c           |  10 ++
+ net/core/dev_ioctl.c                          |   4 +-
+ net/ethtool/cabletest.c                       |  12 +-
+ net/ethtool/ioctl.c                           | 123 ++++++++++++++----
+ net/ethtool/mm.c                              |   5 +-
+ net/ethtool/module.c                          |   6 +-
+ net/ethtool/netlink.c                         |  62 ++++++---
+ net/ethtool/phy.c                             |   1 -
+ net/ethtool/rss.c                             |  21 +--
+ net/ethtool/tsconfig.c                        |  10 +-
+ net/ethtool/tsinfo.c                          |  32 +++--
+ 28 files changed, 363 insertions(+), 114 deletions(-)
+
 -- 
-2.17.1
+2.54.0
 
 
