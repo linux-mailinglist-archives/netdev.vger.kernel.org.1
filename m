@@ -1,178 +1,143 @@
-Return-Path: <netdev+bounces-295987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uyoFEFtNI2rvoQEAu9opvQ
-	(envelope-from <netdev+bounces-295987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 00:27:39 +0200
+	id MNHDJf5NI2pQogEAu9opvQ
+	(envelope-from <netdev+bounces-295988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 00:30:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEC1564BA32
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 00:27:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0243864BA45
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 00:30:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=hpe.com header.s=pps0720 header.b="Zf/X iCz";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295987-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295987-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=hpe.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Wh6I3zhT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295988-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295988-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAF58301BC33
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 22:25:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DAAA5301B4C4
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 22:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3953B71BA;
-	Fri,  5 Jun 2026 22:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1153D3309;
+	Fri,  5 Jun 2026 22:30:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AA13C3C02;
-	Fri,  5 Jun 2026 22:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE614347503;
+	Fri,  5 Jun 2026 22:30:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780698354; cv=none; b=jbkXsJQN5FTSzfYKBIR/RJpPoCZ8W6BGp6cCEkiQ77FSPwhJ8s+maBfBUwiQp5Ij6SwZbDEGgPFoqF2NZvgzP7Sy9aJb0+64vrC+mafiFvr6fbPL1mui+ZnyGh8h/SQtXAbSWOz4kTFGFs8SR1XyfSftuGJTN9LDzNyS95TkcKU=
+	t=1780698619; cv=none; b=K323eTVu1vyhgKbgIvvn1FfJX8cs24V+hLqf6vLhwtIOb/WgmU3xB6iwe2Hme06FWj+eTrcR0QCPqSnJpyaDsnTx209sJZJpho9lgv73jYs40xmaecZosFnFf7+Q8DJJB1xMTZMWRbSFNvg0fhkj3KGYMPu0xZEL5muFVPWbm1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780698354; c=relaxed/simple;
-	bh=hR9xslRbdiigPAZ5ZfCCV7KUc5lDvC+AACgfaWEYnWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=T1y968t4zGM63nVr9uIwHMjNq1XTL3HV8BGK+BObaBT3x7T0uP1w9mqwBbfCpLUTELVIgWcv8q2mw3oifBkKFz0Sh3ONXlpD/p4yCjX6OQP8FqXUfYhUEMXR0JWzSIiFDl8g2w1Eiagal/F3og8hitqObzcOU0/ItIZ3b0Vn1Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=Zf/XiCzX; arc=none smtp.client-ip=148.163.143.35
-Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 655HZJq6408510;
-	Fri, 5 Jun 2026 22:25:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-type:date:from:message-id:mime-version:subject:to; s=
-	pps0720; bh=/ntOmGPECocOXVF+Qff9yChtuO6F1D0acS3zzuw89O8=; b=Zf/X
-	iCzXJ0WIPVE96k76D4ShODhYfJbuuryGsYD8vZaNupNnIU65IRUFTtJ5hdZcWMx5
-	W7R+/1+MEL+8G7TKup6aAJOrEHOti4cdpljLsIjWFqZGptu5xfbeqONAca07ennx
-	840do9sv/ixmyepZP7cpH5J2aRzyWd0UByCA9nXChOBdJE5PlUMo3W9pr31tu4T6
-	FKAlwNsI1il5swZg3si4ZzPvErUv7xkU5GJxgsxb0H+HBcZlfjTE+s51dRUtPFQB
-	i7/M5SWPM7doaZ8VnZ96QWQbjf44rCWwj+dxCGJL/juGfg2WDwuD7XmICFQjbIof
-	X/MOnvLu8BQiXgxyjQ==
-Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4em305jtdt-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 05 Jun 2026 22:25:28 +0000 (GMT)
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 86C90132DA;
-	Fri,  5 Jun 2026 22:25:27 +0000 (UTC)
-Received: from HPE-5CG20646DK.localdomain (unknown [16.231.227.36])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTPS id 484B9801613;
-	Fri,  5 Jun 2026 22:25:26 +0000 (UTC)
-Date: Fri, 5 Jun 2026 17:25:24 -0500
-From: Kyle Meyer <kyle.meyer@hpe.com>
-To: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] bnxt_en: Fix NULL pointer dereference
-Message-ID: <aiNM1CY2-StPilxW@hpe.com>
+	s=arc-20240116; t=1780698619; c=relaxed/simple;
+	bh=U19LfsRgdKwSeFFxNxoOrtmBuXFDufpZJwURLyY5NTo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=N1d3tbz2y3ynWsGzfbm7YG/Ci2WrBO2g/BCoph2eytxfC5Xzs60SMkgKUUECYGN0qQXI3QfB+2qBnDrWUSi5YcMbnryaNLXjgHSH9XqFHHvfuOHme2GovXYItyAPPi846pWbhB5KDupYnJ9gw+XJjnnSE6DXVm7xRo1JXCxsYoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wh6I3zhT; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 646671F00893;
+	Fri,  5 Jun 2026 22:30:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780698618;
+	bh=hlmbBlTrqmrDYDpcjR/k4okFjgvx2UOIyy3ZPtCIGN0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=Wh6I3zhTa9v7VW8fXhj1NdVZJBx8npe087gwZoXvPa3vLURhF8HfoRzsK3l6kfVUO
+	 8KW1oR9Lw/5T0K1PZH4+9DAdzZdFJEMkcsljyqjWNwALFKlMmEAZ5qyZEbuyx0dsRK
+	 vKaCkvuLDhi6N6J4nqa7QY7jdm3MLR0wkk6FwUqL02HMYrudiBZzY7K+Bh9YLRmRLw
+	 Amg0cu5RUvXgk5RTuQevV8rloV72bECeu+yPZpogltxIzUskscrAOpM57JRVukC/U/
+	 dRg8b4lg2Zjcunh/40o08rakXMSEcRco/T0lB3waE/cJcvHLyjPBHHm7jKlaPUaEDq
+	 aymzKAz40nMjg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D098F3930C04;
+	Fri,  5 Jun 2026 22:30:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-GUID: Yaytd8mKrkxs13hOSQTO17blgzicMqOy
-X-Proofpoint-ORIG-GUID: Yaytd8mKrkxs13hOSQTO17blgzicMqOy
-X-Authority-Analysis: v=2.4 cv=Qp9uG1yd c=1 sm=1 tr=0 ts=6a234cd8 cx=c_pps
- a=UObrlqRbTUrrdMEdGJ+KZA==:117 a=UObrlqRbTUrrdMEdGJ+KZA==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=gQcMVamqm3wCPoSYhaRC:22 a=g3u0LPWLDYfGfufhFw6-:22 a=VwQbUJbxAAAA:8
- a=MvuuwTCpAAAA:8 a=ubeRpN5ZeyW9BGWM014A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDIyMSBTYWx0ZWRfXwm0AnEAt6oyV
- MdyzOPllGK2QHdEBei5TOsOxVQHQUysoI6ixzIFP15mSOUuw26D707CL1Gx3KsybVLD5DP3OT+J
- 3C8hXYYEgf5rsyFnM79PNnHc4JZgR/tRCRkyVUJ18omxNZ59+I1kD7THrFE5gz23l5MIeXSGBLB
- 1PjR3QMfN9H3+0Ni9DpyMmr9IROYF6mkhMC4BACii7XoUS6boRivbzazSjXNqMNhPJpTpQqdEAh
- JpxDNdM+4QaIZ5g28yXBBVpItksYUH83erbObjyUARZhGk6n9/JmHskhafyzCJdnO/xPqlJ5px9
- RVEUUMXuwoNmFvqbtZr9c3TAWasTbnqaxHnKraQW1GA0Fvo9TWg8lL8BlzILNJ72oq4nA7XRmj+
- 8Go6V+xprQAWSrGJMPyBdrbkjuCEv6n0YNd4jj/330BHZr8aR3es3SwsVr1yQIC7ilZ7p520Lb9
- tj+Td8nGdv+cJ8fYahA==
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-05_04,2026-06-05_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 priorityscore=1501 phishscore=0 spamscore=0 impostorscore=0
- suspectscore=0 malwarescore=0 clxscore=1011 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606050221
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v4 0/2] bpf: Update transport_header when
+ encapsulating
+ UDP tunnel in lwt
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178069861864.3943503.1557962772185018635.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jun 2026 22:30:18 +0000
+References: <20260602150931.49629-1-leon.hwang@linux.dev>
+In-Reply-To: <20260602150931.49629-1-leon.hwang@linux.dev>
+To: Leon Hwang <leon.hwang@linux.dev>
+Cc: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ martin.lau@linux.dev, memxor@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, jolsa@kernel.org, shuah@kernel.org,
+ gnault@redhat.com, idosch@nvidia.com, fmancera@suse.de, posk@google.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-patches-bot@fb.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[hpe.com,reject];
-	R_DKIM_ALLOW(-0.20)[hpe.com:s=pps0720];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hpe.com:mid,hpe.com:dkim,hpe.com:from_mime,hpe.com:email];
-	DKIM_TRACE(0.00)[hpe.com:+];
-	TAGGED_FROM(0.00)[bounces-295987-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,nvidia.com,suse.de,fb.com];
+	TAGGED_FROM(0.00)[bounces-295988-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kyle.meyer@hpe.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FORGED_RECIPIENTS(0.00)[m:leon.hwang@linux.dev,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:martin.lau@linux.dev,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:gnault@redhat.com,m:idosch@nvidia.com,m:fmancera@suse.de,m:posk@google.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:kernel-patches-bot@fb.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kyle.meyer@hpe.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CEC1564BA32
+X-Rspamd-Queue-Id: 0243864BA45
 
-PCIe errors detected by a Root Port or Downstream Port cause error
-recovery services to run on all subordinate devices regardless of
-administrative state.
+Hello:
 
-The .error_detected() callback, bnxt_io_error_detected(), disables
-and synchronizes IRQs via bnxt_disable_int_sync(), which calls
-bnxt_cp_num_to_irq_num() to map completion rings to IRQs using
-bp->bnapi.
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-Since bp->bnapi is allocated on NIC open and freed on NIC close, PCIe
-error recovery on a closed NIC can dereference a NULL pointer.
+On Tue,  2 Jun 2026 23:09:29 +0800 you wrote:
+> Currently, bpf_lwt_push_ip_encap() does not update skb->transport_header.
+> When a driver, e.g. ice, reuses the stale skb->transport_header to
+> offload checksum computation to NIC hardware, VxLAN packets encapsulated
+> by bpf_lwt_push_encap() helper may be dropped due to incorrect checksum.
+> 
+> Update skb->transport_header in bpf_lwt_push_ip_encap() whenever the
+> encapsulated packet uses UDP, so checksum offload works correctly.
+> 
+> [...]
 
-Check if bp->bnapi is NULL before disabling and synchronizing IRQs.
+Here is the summary with links:
+  - [bpf,v4,1/2] bpf: Update transport_header when encapsulating UDP tunnel in lwt
+    https://git.kernel.org/bpf/bpf-next/c/82d7d0adbc67
+  - [bpf,v4,2/2] selftests/bpf: Add tests to verify the fix of encapsulating VxLAN in lwt
+    https://git.kernel.org/bpf/bpf-next/c/5477d55f351f
 
-Fixes: e5811b8c09df ("bnxt_en: Add IRQ remapping logic.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Kyle Meyer <kyle.meyer@hpe.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 008c34cff7b4..ec38a0a40875 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5748,7 +5748,7 @@ static void bnxt_disable_int_sync(struct bnxt *bp)
- {
- 	int i;
- 
--	if (!bp->irq_tbl)
-+	if (!bp->irq_tbl || !bp->bnapi)
- 		return;
- 
- 	atomic_inc(&bp->intr_sem);
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
