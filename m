@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-295595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295596-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fpdONQw3Imq0TwEAu9opvQ
-	(envelope-from <netdev+bounces-295595-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:40:12 +0200
+	id FjDNHD43Imq6TwEAu9opvQ
+	(envelope-from <netdev+bounces-295596-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:41:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E01E644B75
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:40:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E69C0644B80
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:41:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eNAAwSOY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295595-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295595-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=NUyGIfj8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295596-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295596-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DDB25302BBCE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:39:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2109230515B1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5103C345A;
-	Fri,  5 Jun 2026 02:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF9F3E7BD7;
+	Fri,  5 Jun 2026 02:38:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF82E3BB677;
-	Fri,  5 Jun 2026 02:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E363E3D95;
+	Fri,  5 Jun 2026 02:38:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780627127; cv=none; b=DyPb98y+6kv60UfQifKYcbjyx1TrTaNqu4zAxrVImrNYXizY9ZfP+XMoQYANAEa+kh6KeJdw2ERGdyegrNUg+WYY5XJACUxndSO71hdTA/P9oOcRXCQrAX8Chr9Iitj9Xtk1+OaxRQwOvp12H09PUelfrX5MOp0LsNFGkxrw3tA=
+	t=1780627131; cv=none; b=NMHty+SYSucB4/Oyghg0926A4XCnrmVnRz1FglpZHyqeO3YbH0FRXDsnVNFpY3CO83dJWCPOKiKsrArwua4KkVo31p/KObicEYxV9LvQ1GbGVvK42r+JB6BxB9Q24h6wJK9x+JCKDKaJtELEAozJBLdPSBNeHvljieEfHYdQVZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780627127; c=relaxed/simple;
-	bh=LtCEhE69OZJMIcZijTbLlsQmWABBDJJa4xvGMBjZVwE=;
+	s=arc-20240116; t=1780627131; c=relaxed/simple;
+	bh=sn7zpUxy22Hja8bbh+CIF3eXqCMVoy7QnuUYrtejGso=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ehs9zpDDQVoNA5Anv3nlO1UURiiPt59qH0npwxe3rTEyfPivHETaIMfEVaCSJ383dyU/6TeaKSVbuTc142UHhVqiN64TCKmOAOvbMNLokBovdxTpm5ByShFNopFzVnV4sV62b8SlgCCWRBKxU2XsTvIxp3f64NtpKQ4PTBwVi8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNAAwSOY; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2B911F00899;
-	Fri,  5 Jun 2026 02:38:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kS0KFXotyX4mluWx5AW9NZIV5JTPEO8lpEJVbh5lh7v3d08LjLoQEjR/DtIhuGNjYyN/O7zTZ1B57cjvyXp25lnP/Z3IVlpIxihjExOjva6NfabGFHGN8bSYLLtqWSECaMeh/mEJyH5NHPPAtc680kX3J6qmrKIioqTt3qHEPfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUyGIfj8; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 669781F0089B;
+	Fri,  5 Jun 2026 02:38:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780627117;
-	bh=6QbMMTu+jWsY7A9wTECEYRZhP1wOEcjM9sT+lCNHMvQ=;
+	s=k20260515; t=1780627118;
+	bh=MWBOzxBMxgHl6TjAVpvpMpXtUg1vYflz1NEGmnBzG8c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eNAAwSOYmLUFwVpM0NAJF+gh8Gb4hpQd407JIu/5Pps4+lcubloiSNrqcnBQpugBv
-	 jAxSN2OM1kUO4K1ME1IvMw6edMYFBJIKQ3rCXaiL0AzdGl6pg9T1xcCK6fgBx9cdBP
-	 Na+pzk+ngKsHB027nd6jEBVu74ZRCRMqa2qPFvQ7n7CipQvjslJCULYZ7IKq1p/kIk
-	 QsIA7g7B+96iz7/CTKAHRZrkEQqQppca7RPvF2Fz4uThi/Lf/xgK/WRC1OnFpCvItz
-	 A2RtdC4olCLS7yNTUFsEQJ1J77Cf7mFf8W3mpDOTr1+dcH5CYmi3wXrAZRhciSkl6o
-	 IQDtCtrqZ/gUw==
+	b=NUyGIfj8rP/vZRyeUebx96l9mT024duyBXQJlQTpfchg0jKb8/GDhnhfVLzKd3Du+
+	 /KSRcV6F7zq3VZBsiCHWxkuS17b9w99y4TLplz5te066ZfPzt+7Ug/t9dw4IhRjvIu
+	 /7Ay34HvTJpdr/wpzssSvcMc+r0jnNnTTVK4b7cmHEFM88e/jlHyb8uyEc2v+HoGvG
+	 rCubuwW/VultKfn5E/ZJu7A4K7YnNaEyXL+NqMBWWNAKPNamYLYdaWukAfMtHzRCLx
+	 kWbnV0x7nOeQ14haHcT21PrQon8gCQbOWlFNZ58s/0jfwlL8EDSL8HEwWUfHaJcZjl
+	 QhVV3ixAmhihQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: sukhdeeps@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -57,12 +57,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	horms@kernel.org,
 	vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next v4 7/12] net: atlantic: implement AQC113 L2/L3/L4 RX filter ops
-Date: Thu,  4 Jun 2026 19:38:33 -0700
-Message-ID: <20260605023833.3629131-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v4 10/12] net: atlantic: add AQC113 PTP hardware ops in hw_atl2
+Date: Thu,  4 Jun 2026 19:38:37 -0700
+Message-ID: <20260605023837.3629173-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260602135452.516-8-sukhdeeps@marvell.com>
-References: <20260602135452.516-8-sukhdeeps@marvell.com>
+In-Reply-To: <20260602135452.516-11-sukhdeeps@marvell.com>
+References: <20260602135452.516-11-sukhdeeps@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,12 +77,12 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295595-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295596-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:sukhdeeps@marvell.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:vadim.fedorenko@linux.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -101,388 +101,294 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E01E644B75
+X-Rspamd-Queue-Id: E69C0644B80
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: atlantic: implement AQC113 L2/L3/L4 RX filter ops
+net: atlantic: add AQC113 PTP hardware ops in hw_atl2
 
-This patch adds tag-based L2/L3/L4 RX filter management for AQC113,
-including reference-counted L3 and L4 filter slots, an ART-based L3L4
-configuration helper, and L2 ethertype set/clear, and wires the new
-ops into hw_atl2_ops.
+This patch wires the AQC113 (Antigua) PTP hardware ops into hw_atl2:
+TSG clock setup/adjust, PTP ring init, TX timestamp readback from
+descriptor writeback, RX timestamp extraction from packet trailer, and
+GPIO pulse / PPS output. It also reduces HW_ATL2_RXBUF_MAX from 192 to
+172.
 
 [Low]
-The commit message describes hw_atl2_filter_tag_get/put as:
+On the commit message itself, a couple of descriptions look like they
+do not quite match the code that landed in this patch:
 
-    Add tag-based filter policy with reference-counted sharing
-    (hw_atl2_filter_tag_get/put), allowing multiple filter rules to share
-    the same L3 or L4 hardware filter when their match criteria are
-    identical.
+   - hw_atl2.h/hw_atl2_utils.h/hw_atl2_internal.h: export PTP function
+     prototypes, per-instance aq_ptp_offset arrays, RX timestamp size
 
-In the patch, hw_atl2_filter_tag_get/put operate only on
-priv->etype_policy[] and are called only from hw_atl2_hw_fl2_set/clear.
-The L3 and L4 sharing is implemented separately via the usage field on
-hw_atl2_l3_filter / hw_atl2_l4_filter and hw_atl2_rxf_l3_get/put /
-hw_atl2_rxf_l4_get/put.
+Every new hw_atl2 PTP function is static in hw_atl2.c and is reached
+only through hw_atl2_ops, so are any prototypes actually being exported
+from the headers?  The new HW_ATL2_PTP_OFFSET_* additions in hw_atl2.h
+are also individual scalar #defines, not arrays — should the wording be
+adjusted?
 
-Could the description be reworded so it does not conflate the etype tag
-policy with the L3/L4 filter refcounts?
+   - hw_atl2.c: implement hw_atl2_enable_ptp() to program TSG clocks,
+     PTP TC receive path and filter ART entries, and re-enable PTP
+     state after hardware reset.
+
+The hw_atl2_enable_ptp() body only resets/enables the TSG clocks,
+optionally calls hw_atl2_adj_clock_freq(), and toggles
+hw_atl2_tpb_tps_highest_priority_tc_enable_set().  Is the "PTP TC
+receive path and filter ART entries" claim describing this patch, or
+work that lives in another patch in the series?
 
 > diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
-> index 27a62fffbc29..a07a3dbddefe 100644
+> index 6d9ec4072d43..e94627c36163 100644
 > --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
 > +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
-> @@ -87,6 +87,38 @@ const struct aq_hw_caps_s hw_atl2_caps_aqc116c = {
->  			  AQ_NIC_RATE_10M,
->  };
->  
-> +/* Find tag with the same action or new free tag
-> + *  top - top inclusive tag value
-> + *  action - action for ActionResolverTable
-> + */
-> +static int hw_atl2_filter_tag_get(struct hw_atl2_tag_policy *tags,
-> +				  int top, u16 action)
-> +{
-> +	int i;
-> +
-> +	for (i = 1; i <= top; i++)
-> +		if (tags[i].usage > 0 && tags[i].action == action) {
-> +			tags[i].usage++;
-> +			return i;
-> +		}
-> +
-> +	for (i = 1; i <= top; i++)
-> +		if (tags[i].usage == 0) {
-> +			tags[i].usage = 1;
-> +			tags[i].action = action;
-> +			return i;
-> +		}
-> +
-> +	return -1;
-
-[Low]
-Sibling helpers introduced in this patch (hw_atl2_new_fl3l4_find_l3 /
-_find_l4) return -ENOSPC on the no-free-slot path, but this helper
-returns the bare value -1.
-
-The current caller hw_atl2_hw_fl2_set() translates it into -ENOSPC
-manually, but if a future caller propagates the value unchanged it
-becomes -EPERM. Would returning -ENOSPC here directly be more
-consistent?
-
-> +}
 
 [ ... ]
 
-> @@ -823,6 +855,489 @@ static struct aq_stats_s *hw_atl2_utils_get_hw_stats(struct aq_hw_s *self)
+> @@ -127,6 +137,7 @@ static u32 hw_atl2_sem_act_rslvr_get(struct aq_hw_s *self)
+>  static int hw_atl2_hw_reset(struct aq_hw_s *self)
+>  {
+>  	struct hw_atl2_priv *priv = self->priv;
+> +	s8 clk_sel;
+>  	int err;
+>  	int i;
+>  
+> @@ -144,6 +155,13 @@ static int hw_atl2_hw_reset(struct aq_hw_s *self)
+>  		priv->l3l4_filters[i].l4_index = -1;
+>  	}
+>  
+> +	clk_sel = READ_ONCE(self->clk_select);
+> +	if (clk_sel != -1)
+> +		hw_atl2_enable_ptp(self,
+> +				   clk_sel,
+> +				   aq_utils_obj_test(&self->flags, AQ_HW_PTP_AVAILABLE) ?
+> +				   1 : 0);
+> +
+
+[Medium]
+Where is self->clk_select initialised to -1?
+
+struct aq_hw_s is allocated through kzalloc_obj() in aq_pci_func.c, so
+clk_select starts as 0, and 0 is also a valid clock index
+(ATL_TSG_CLOCK_SEL_0).  On the very first aq_nic_init()->hw_reset()
+the test:
+
+	if (clk_sel != -1)
+		hw_atl2_enable_ptp(self, clk_sel, ...);
+
+evaluates true with clk_sel == 0, and AQ_HW_PTP_AVAILABLE is not set
+yet at this point in the series (aq_ptp_init() in this tree only sets
+it for the a1 PTP path), so hw_atl2_enable_ptp(self, 0, 0) gets
+unconditionally called for every hw_atl2 chip including aqc115c and
+aqc116c.
+
+That call then does:
+
+	hw_atl2_tsg_clock_reset(self, 0);
+	hw_atl2_tsg_clock_en(self, 1, 0);
+	hw_atl2_tsg_clock_en(self, 0, 0);
+	hw_atl2_tpb_tps_highest_priority_tc_enable_set(self, 0);
+
+on parts that may have no PTP setup at all.  Should the -1 sentinel
+initialisation that lives in a later patch in the series be folded
+into this commit so each commit is self-contained for bisection?
+
+>  	self->aq_fw_ops->set_state(self, MPI_RESET);
+>  
+>  	err = aq_hw_err_from_flags(self);
+> @@ -725,14 +743,32 @@ static int hw_atl2_hw_ring_rx_init(struct aq_hw_s *self,
+>  				   struct aq_ring_s *aq_ring,
+>  				   struct aq_ring_param_s *aq_ring_param)
+>  {
+> -	return hw_atl_b0_hw_ring_rx_init(self, aq_ring, aq_ring_param);
+> +	int res = hw_atl_b0_hw_ring_rx_init(self, aq_ring, aq_ring_param);
+> +
+> +	if (!res && aq_ptp_ring(aq_ring->aq_nic, aq_ring)) {
+> +		int rx_err = hw_atl2_hw_rx_ptp_ring_init(self, aq_ring);
+> +
+> +		if (!res)
+> +			res = rx_err;
+> +	}
+> +
+> +	return res;
+>  }
+>  
+>  static int hw_atl2_hw_ring_tx_init(struct aq_hw_s *self,
+>  				   struct aq_ring_s *aq_ring,
+>  				   struct aq_ring_param_s *aq_ring_param)
+>  {
+> -	return hw_atl_b0_hw_ring_tx_init(self, aq_ring, aq_ring_param);
+> +	int res = hw_atl_b0_hw_ring_tx_init(self, aq_ring, aq_ring_param);
+> +
+> +	if (!res && aq_ptp_ring(aq_ring->aq_nic, aq_ring)) {
+> +		int tx_err = hw_atl2_hw_tx_ptp_ring_init(self, aq_ring);
+> +
+> +		if (!res)
+> +			res = tx_err;
+> +	}
+> +
+> +	return res;
+>  }
+
+[Low]
+The inner if (!res) check is provably always true here — the outer
+if (!res && aq_ptp_ring(...)) already established res == 0 for the
+whole block:
+
+	if (!res && aq_ptp_ring(aq_ring->aq_nic, aq_ring)) {
+		int rx_err = hw_atl2_hw_rx_ptp_ring_init(self, aq_ring);
+
+		if (!res)         /* always true */
+			res = rx_err;
+	}
+
+Was the intent to also call the PTP ring init when the b0 init had
+already failed (and only then preserve the first error), or is the
+inner test simply redundant and meant to be a plain res = rx_err?
+
+[ ... ]
+
+> @@ -892,6 +928,151 @@ static struct aq_stats_s *hw_atl2_utils_get_hw_stats(struct aq_hw_s *self)
 >  	return &self->curr_stats;
 >  }
 >  
-> +static bool hw_atl2_rxf_l3_is_equal(struct hw_atl2_l3_filter *f1,
-> +				    struct hw_atl2_l3_filter *f2)
+> +static void hw_atl2_enable_ptp(struct aq_hw_s *self,
+> +			       unsigned int param, int enable)
 > +{
-> +	if (f1->cmd != f2->cmd)
-> +		return false;
+> +	WRITE_ONCE(self->clk_select, (s8)param);
 > +
-> +	if (f1->cmd & HW_ATL2_RPF_L3_CMD_SA_EN)
-> +		if (f1->srcip[0] != f2->srcip[0])
-> +			return false;
+> +	/* enable tsg counter */
+> +	hw_atl2_tsg_clock_reset(self, self->clk_select);
+> +	hw_atl2_tsg_clock_en(self, !self->clk_select, enable);
+> +	hw_atl2_tsg_clock_en(self, self->clk_select, enable);
 > +
-> +	if (f1->cmd & HW_ATL2_RPF_L3_CMD_DA_EN)
-> +		if (f1->dstip[0] != f2->dstip[0])
-> +			return false;
+> +	if (enable)
+> +		hw_atl2_adj_clock_freq(self, 0);
 > +
-> +	if (f1->cmd & (HW_ATL2_RPF_L3_CMD_PROTO_EN |
-> +		       HW_ATL2_RPF_L3_V6_CMD_PROTO_EN))
-> +		if (f1->proto != f2->proto)
-> +			return false;
-
-[Low]
-Where is l3.proto ever populated? In hw_atl2_new_fl3l4_configure() the
-local l3 is memset to 0 and the protocol value is encoded into the upper
-bits of l3.cmd via:
-
-    l3.cmd |= IPPROTO_TCP << (data->is_ipv6 ? 0x18 : 8);
-
-hw_atl2_rxf_l3_get() then copies _l3->proto (=0) into the tracked slot,
-so this proto comparison appears to be 0 == 0 in all cases. The actual
-protocol comparison happens implicitly via the f1->cmd != f2->cmd check
-above.
-
-Should l3.proto be removed, or populated consistently from the cmd
-encoding, so future code that begins setting one but not the other does
-not silently produce false negatives in the sharing check?
-
-> +
-> +	if (f1->cmd & HW_ATL2_RPF_L3_V6_CMD_SA_EN)
-> +		if (memcmp(f1->srcip, f2->srcip, 16))
-> +			return false;
-> +
-> +	if (f1->cmd & HW_ATL2_RPF_L3_V6_CMD_DA_EN)
-> +		if (memcmp(f1->dstip, f2->dstip, 16))
-> +			return false;
-> +
-> +	return true;
+> +	hw_atl2_tpb_tps_highest_priority_tc_enable_set(self, enable);
 > +}
 
-[ ... ]
+[Low]
+Is mixing one WRITE_ONCE store with three plain reads of the same
+field intentional?
 
-> +static void hw_atl2_rxf_l3_get(struct aq_hw_s *self,
-> +			       struct hw_atl2_l3_filter *l3, int idx,
-> +			       const struct hw_atl2_l3_filter *_l3)
+The other accessors in this file (hw_atl2_hw_reset(), aq_get_ptp_ts(),
+hw_atl2_adj_sys_clock(), hw_atl2_adj_clock_freq(),
+hw_atl2_hw_get_clk_sel()) consistently use READ_ONCE(self->clk_select),
+suggesting the field is treated as concurrent state.  Here the three
+plain reads after WRITE_ONCE() defeat that protocol and KCSAN will
+flag the inconsistent annotations.
+
+Would using the local param value (which is what was just stored) be
+clearer, e.g.:
+
+	s8 sel = (s8)param;
+
+	WRITE_ONCE(self->clk_select, sel);
+	hw_atl2_tsg_clock_reset(self, sel);
+	hw_atl2_tsg_clock_en(self, !sel, enable);
+	hw_atl2_tsg_clock_en(self, sel, enable);
+
+> +
+> +static void aq_get_ptp_ts(struct aq_hw_s *self, u64 *stamp)
 > +{
-> +	int i;
+> +	s8 clk_sel = READ_ONCE(self->clk_select);
 > +
-> +	l3->usage++;
-> +	if (l3->usage == 1) {
-> +		l3->cmd = _l3->cmd;
-> +		for (i = 0; i < 4; i++) {
-> +			l3->srcip[i] = _l3->srcip[i];
-> +			l3->dstip[i] = _l3->dstip[i];
-> +		}
-> +		l3->proto = _l3->proto;
-> +
-> +		if (l3->cmd & HW_ATL2_RPF_L3_CMD_EN) {
-> +			hw_atl2_rpf_l3_v4_cmd_set(self, l3->cmd, idx);
-> +			hw_atl2_rpf_l3_v4_tag_set(self, idx + 1, idx);
-> +			hw_atl2_rpf_l3_v4_dest_addr_set(self,
-> +							idx,
-> +							l3->dstip[0]);
-> +			hw_atl2_rpf_l3_v4_src_addr_set(self,
-> +						       idx,
-> +						       l3->srcip[0]);
-> +		} else {
-> +			hw_atl2_rpf_l3_v6_cmd_set(self, l3->cmd, idx);
-> +			hw_atl2_rpf_l3_v6_tag_set(self, idx + 1, idx);
-> +			hw_atl2_rpf_l3_v6_dest_addr_set(self,
-> +							idx,
-> +							l3->dstip);
-> +			hw_atl2_rpf_l3_v6_src_addr_set(self,
-> +						       idx,
-> +						       l3->srcip);
-> +		}
-> +	}
+> +	if (clk_sel < 0)
+> +		return;
+> +	if (stamp)
+> +		*stamp = hw_atl2_tsg_clock_read(self, clk_sel);
 > +}
 
 [Medium]
-Is the ordering of the MMIO writes here intentional?
+Can this leave *stamp uninitialised on the early return?
 
-The cmd word containing the EN/SA_EN/DA_EN/PROTO_EN bits is committed
-first via hw_atl2_rpf_l3_v4_cmd_set() (the v4 mask is 0xFFFF and
-includes the EN bit), and only afterwards are the destination and
-source address registers programmed.
+The existing callers in aq_ptp.c declare an uninitialised stack
+variable and pass its address straight in, expecting the callee to
+populate it:
 
-Between the cmd write and the address writes, the filter is enabled
-while its DA/SA registers still hold whatever value they had before
-(stale, zero, or a previously programmed filter's addresses).
+aq_ptp_gettime():
+	u64 ns;
 
-The IPv6 path is worse because hw_atl2_rpf_l3_v6_dest_addr_set() and
-_src_addr_set() each issue four separate register writes (one per
-dword), so the filter is enabled with a partially-programmed address
-for several MMIO cycles.
+	aq_ptp_get_sync_time_from_pkt(aq_nic, NULL, &ns);
+	...
+	hw_get_ptp_ts() variants are called the same way
 
-The same pattern is in hw_atl2_rxf_l4_get() below. Would it be safer to
-program the addresses (or ports) and tag first and write the cmd word
-with EN last?
+aq_ptp_settime():
+	u64 now;
 
+	aq_nic->aq_hw_ops->hw_get_ptp_ts(aq_nic->aq_hw, &now);
+
+aq_ptp_pps_pin_configure():
+	u64 start;
+
+	aq_nic->aq_hw_ops->hw_get_ptp_ts(aq_nic->aq_hw, &start);
+
+When clk_sel < 0 the new aq_get_ptp_ts() returns without touching
+*stamp, so the caller then forwards stack garbage as a timestamp
+(into ns_to_timespec64() in the gettime path, into hw_adj_sys_clock()
+in settime).  Should the early return set *stamp = 0 first, or should
+the prototype be changed to return an error?
+
+> +
 [ ... ]
-
-> +static void hw_atl2_rxf_l4_get(struct aq_hw_s *self,
-> +			       struct hw_atl2_l4_filter *l4, int idx,
-> +			       const struct hw_atl2_l4_filter *_l4)
+> +static int hw_atl2_hw_rx_ptp_ring_init(struct aq_hw_s *self,
+> +				       struct aq_ring_s *aq_ring)
 > +{
-> +	l4->usage++;
-> +	if (l4->usage == 1) {
-> +		l4->cmd = _l4->cmd;
-> +		l4->sport = _l4->sport;
-> +		l4->dport = _l4->dport;
-> +
-> +		hw_atl2_rpf_l4_cmd_set(self, l4->cmd, idx);
-> +		hw_atl2_rpf_l4_tag_set(self, idx + 1, idx);
-> +		hw_atl_rpf_l4_spd_set(self, l4->sport, idx);
-> +		hw_atl_rpf_l4_dpd_set(self, l4->dport, idx);
-> +	}
-> +}
-> +
-> +static int hw_atl2_new_fl3l4_configure(struct aq_hw_s *self,
-> +				       struct aq_rx_filter_l3l4 *data)
-> +{
-
-[ ... ]
-
-> +	/* convert legacy filter to new */
-> +	if (data->cmd & HW_ATL_RX_ENABLE_CMP_PROT_L4) {
-> +		l3.cmd |= data->is_ipv6 ? HW_ATL2_RPF_L3_V6_CMD_PROTO_EN :
-> +					  HW_ATL2_RPF_L3_CMD_PROTO_EN;
-> +		l3.cmd |= data->is_ipv6 ? HW_ATL2_RPF_L3_V6_CMD_EN :
-> +					  HW_ATL2_RPF_L3_CMD_EN;
-> +		switch (data->cmd & 0x7) {
-> +		case HW_ATL_RX_TCP:
-> +			l3.cmd |= IPPROTO_TCP << (data->is_ipv6 ? 0x18 : 8);
-> +			break;
-> +		case HW_ATL_RX_UDP:
-> +			l3.cmd |= IPPROTO_UDP << (data->is_ipv6 ? 0x18 : 8);
-> +			break;
-> +		case HW_ATL_RX_SCTP:
-> +			l3.cmd |= IPPROTO_SCTP << (data->is_ipv6 ? 0x18 : 8);
-> +			break;
-> +		case HW_ATL_RX_ICMP:
-> +			l3.cmd |= IPPROTO_ICMP << (data->is_ipv6 ? 0x18 : 8);
-> +			break;
-
-[Low]
-For the IPv6 branch of HW_ATL_RX_ICMP, should the next-header value be
-IPPROTO_ICMPV6 (58) rather than IPPROTO_ICMP (1)? Real ICMPv6 traffic
-uses next-header 58, so this branch will not match ICMPv6 packets.
-
-The aq_set_data_fl3l4() helper in aq_filters.c does not currently set
-HW_ATL_RX_ICMP for any flow type, so the case is not reachable from the
-in-tree ethtool ntuple path today, but it is written explicitly here.
-
-[Low]
-The shift values 0x18 and 8 are repeated four times here, while the
-matching enable bits are named constants (HW_ATL2_RPF_L3_CMD_PROTO_EN
-and HW_ATL2_RPF_L3_V6_CMD_PROTO_EN). Would a pair of named shift
-macros (for example HW_ATL2_RPF_L3_CMD_PROTO_SHIFT /
-HW_ATL2_RPF_L3_V6_CMD_PROTO_SHIFT) make the relationship between the
-enable bit and the protocol byte position clearer and harder to
-mis-edit?
-
-> +		}
-> +	}
-
-[ ... ]
-
-> +	/* find L3 and L4 filters */
-> +	if (l3.cmd & (HW_ATL2_RPF_L3_CMD_EN | HW_ATL2_RPF_L3_V6_CMD_EN)) {
-> +		l3_idx = hw_atl2_new_fl3l4_find_l3(self, &l3);
-> +		if (l3_idx < 0)
-> +			return l3_idx;
-> +
-> +		if (l3.cmd & HW_ATL2_RPF_L3_V6_CMD_EN)
-> +			l3_filters = priv->l3_v6_filters;
-> +		else
-> +			l3_filters = priv->l3_v4_filters;
-> +
-> +		if (priv->l3l4_filters[data->location].l3_index != l3_idx ||
-> +		    old_ipv6 != !!(l3.cmd & HW_ATL2_RPF_L3_V6_CMD_EN))
-> +			hw_atl2_rxf_l3_get(self, &l3_filters[l3_idx],
-> +					   l3_idx, &l3);
-> +	}
-> +
-> +	if (old_l3_index != -1) {
-> +		if (old_ipv6)
-> +			l3_filters = priv->l3_v6_filters;
-> +		else
-> +			l3_filters = priv->l3_v4_filters;
-> +
-> +		if (!(hw_atl2_rxf_l3_is_equal(&l3,
-> +					      &l3_filters[old_l3_index]))) {
-> +			hw_atl2_rxf_l3_put(self,
-> +					   &l3_filters[old_l3_index],
-> +					   old_l3_index);
-> +		}
-> +	}
-> +	if (l3.cmd & HW_ATL2_RPF_L3_V6_CMD_EN)
-> +		priv->l3l4_filters[data->location].ipv6 = 1;
-> +	else
-> +		priv->l3l4_filters[data->location].ipv6 = 0;
-> +	priv->l3l4_filters[data->location].l3_index = l3_idx;
-> +
-> +	if (l4.cmd & HW_ATL2_RPF_L4_CMD_EN) {
-> +		l4_idx = hw_atl2_new_fl3l4_find_l4(self, &l4);
-> +		if (l4_idx < 0)
-> +			return -EINVAL;
-
-[High, Low]
-By the time this L4 search runs, hw_atl2_new_fl3l4_configure() has
-already mutated state for the new request:
-
-  - hw_atl2_rxf_l3_get() programmed the new L3 hardware filter and
-    bumped its refcount,
-  - the old L3 filter has typically been released via
-    hw_atl2_rxf_l3_put() (clearing its HW slot if it was the last
-    user, since match criteria differ), and
-  - priv->l3l4_filters[location].l3_index and .ipv6 have been
-    overwritten to point at the new L3 slot.
-
-When this branch returns, hw_atl2_hw_fl3l4_set() simply propagates
-the error and skips the ART write, so the device is left with the new
-L3 filter enabled (refcount 1) but no ART entry referencing its tag,
-the old ART entry still pointing at the now-cleared old L3 tag, and
-the user's previously-installed working rule effectively destroyed.
-
-Userspace receives an error and will not call the disable path, so
-the new L3 slot stays leaked. With only HW_ATL2_RPF_L3L4_FILTERS
-slots per family, repeated failures rapidly exhaust the pool.
-
-Could this path roll back the L3-side state (and refcounts) before
-returning?
-
-As a separate question, the L3 path uses:
-
-    if (l3_idx < 0)
-        return l3_idx;
-
-while the L4 path overwrites the more specific value with -EINVAL:
-
-    if (l4_idx < 0)
-        return -EINVAL;
-
-Should the L4 path also propagate l4_idx so userspace can distinguish
--ENOSPC from -EINVAL?
-
-> +
-> +		if (priv->l3l4_filters[data->location].l4_index != l4_idx)
-> +			hw_atl2_rxf_l4_get(self, &priv->l4_filters[l4_idx],
-> +					   l4_idx, &l4);
-> +	}
-
-[ ... ]
-
-> +static int hw_atl2_hw_fl2_set(struct aq_hw_s *self,
-> +			      struct aq_rx_filter_l2 *data)
-> +{
-
-[ ... ]
-
-> +	tag = hw_atl2_filter_tag_get(priv->etype_policy,
-> +				     priv->etype_filter_tag_top,
-> +				     action);
-> +
-> +	if (tag < 0)
-> +		return -ENOSPC;
-> +
-> +	req_tag |= tag << HW_ATL2_RPF_TAG_ET_OFFSET;
-> +	hw_atl2_rpf_etht_flr_tag_set(self, tag, location);
-> +	index = priv->art_base_index + HW_ATL2_RPF_ET_PCP_USER_INDEX +
-> +		data->location;
-> +	hw_atl2_act_rslvr_table_set(self, index, req_tag, mask, action);
-> +
-> +	hw_atl_rpf_etht_flr_en_set(self, 1U, location);
-> +
+> +	hw_atl2_rpf_rx_desc_timestamp_req_set(self,
+> +					      self->clk_select == ATL_TSG_CLOCK_SEL_1 ? 2 : 1,
+> +					      aq_ring->idx);
 > +	return aq_hw_err_from_flags(self);
 > +}
 
+[Low]
+This reads self->clk_select with a plain access while every other
+reader of the same field in this file uses READ_ONCE().  Should this
+also be:
+
+	s8 clk_sel = READ_ONCE(self->clk_select);
+
+	hw_atl2_rpf_rx_desc_timestamp_req_set(self,
+					      clk_sel == ATL_TSG_CLOCK_SEL_1 ? 2 : 1,
+					      aq_ring->idx);
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> index 31d7cae6641a..8da3262c167d 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> @@ -29,7 +29,8 @@
+>  #define HW_ATL2_TXBUF_MAX              128U
+>  #define HW_ATL2_PTP_TXBUF_SIZE           8U
+>  
+> -#define HW_ATL2_RXBUF_MAX              192U
+> +/* AQC113 on-chip RX packet buffer available for data TCs */
+> +#define HW_ATL2_RXBUF_MAX              172U
+>  #define HW_ATL2_PTP_RXBUF_SIZE          16U
+>  #define HW_ATL2_RSS_REDIRECTION_MAX 64U
+
 [Medium]
-Once hw_atl2_filter_tag_get() succeeds, the etype_policy slot's usage
-count has been incremented. After that point this function still has
-two ways to return an error without releasing that tag:
+The comment scopes this change to AQC113, but HW_ATL2_RXBUF_MAX is
+used unconditionally in hw_atl2_hw_qos_set():
 
-  - hw_atl2_act_rslvr_table_set() may return an error (semaphore poll
-    timeout) — its return value is ignored here, but
-  - aq_hw_err_from_flags(self) at the end can return -ENXIO or -EIO if
-    AQ_HW_FLAG_ERR_UNPLUG / AQ_HW_FLAG_ERR_HW have been set during the
-    register writes above.
+	u32 rx_buff_size = HW_ATL2_RXBUF_MAX;
 
-Because HW_ATL2_RPF_ETYPE_TAGS is small (7), repeated transient HW
-errors would gradually permanently exhaust the etype tag pool until
-no L2 filter can be installed. Should a failure path here call
-hw_atl2_filter_tag_put() before returning?
+for hw_atl2_caps_aqc113, hw_atl2_caps_aqc115c and
+hw_atl2_caps_aqc116c, with no per-chip selection.  Does the same
+on-chip 172 KB limit apply to aqc115c and aqc116c, or does this
+silently shrink the RX buffer pool for chips outside the stated
+scope of the patch?
+
+The non-PTP path on AQC113 is also affected: hw_atl2_hw_qos_set()
+already subtracts HW_ATL2_PTP_RXBUF_SIZE (16) when cfg->is_ptp is
+set, so the PTP TC reservation is independent of this base value.
+Would it make sense to split the RXBUF_MAX change into its own
+commit with a Fixes: tag (if 192 was wrong) or a justification (if
+this is a tradeoff for a new TC layout)?
+
+[ ... ]
 
