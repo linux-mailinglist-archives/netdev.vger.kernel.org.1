@@ -1,173 +1,196 @@
-Return-Path: <netdev+bounces-295792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cr4pLESxImrmcAEAu9opvQ
-	(envelope-from <netdev+bounces-295792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 13:21:40 +0200
+	id t0NrMgS0ImqCcQEAu9opvQ
+	(envelope-from <netdev+bounces-295793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 13:33:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25518647AE2
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 13:21:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28EAA647BF7
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 13:33:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=JPMLQlJC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295792-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295792-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=secunet.com header.s=202301 header.b=A8Xp+JZB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295793-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295793-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=secunet.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3324A30285E4
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 11:21:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F15BE3014BFC
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 11:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173173F888A;
-	Fri,  5 Jun 2026 11:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C944A4D2EFA;
+	Fri,  5 Jun 2026 11:26:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBED73DB623
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 11:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5EE3BBFAF;
+	Fri,  5 Jun 2026 11:26:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780658498; cv=none; b=JkDMwuBtDa1lXzzL9eJYizILKWnyA3K7iF4b4POWT8cG517+3fo471rb9ojsIpXsMyAE4LDNlHqi82XrjqoZaft7Wwgma1NNN6gm5fvRquB7DEU3c33Beh89WsZgPE+O/2CHWyfZ3pdCisdZZPM4zM/BF7hvz2BlRiKyaeQoOq4=
+	t=1780658788; cv=none; b=Vy3Qf6LcDoO7+Cmq6XpgzYkaSqJe+8RH73TCvxPu2kNMkj4m1jCk2UbBEo9+aggMrsB0N5xOsOVaqizRPF/ZpoE3xi+ny3LR+EivH/p47KYkZjzorGr++YfBoOhrx5DwvDRh1gjFRUIR6SSwqs5jnfkj7VT2EAmHW3VYmQJbD6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780658498; c=relaxed/simple;
-	bh=b4Dvvl39/qvd09t/KzndcD8LY8sR+L9mXyPpXGNZHks=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=clbrtSaaCuNM1Ha2p01abrgi3GqkOv9IWZeZleXkw62wAPe83K0ay/ZvuRVkAKqJF7JGMwiPxvl6CYJ2zTgIoewioA9AF6giLWKPrasxWSM0Zb96suOzkDEUyM3LN9aIybXdYX/k7bzmTj7lMNNCLCKnRVDLzsa69bDobBpkhkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JPMLQlJC; arc=none smtp.client-ip=209.85.160.202
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-5176d949c58so48191951cf.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 04:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780658496; x=1781263296; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bTJSJfZlrZnr72qQBV1nT54IsiqSXO4gYoEedTnTMa4=;
-        b=JPMLQlJCXC1Eee5rE3hSZX+ARwdERYFlKJLWhLl6A7iyX0/o2BLPe0rl/r2rtcesC7
-         GM24DTVGrn1UDWuYng21rfoew6zWtIhPUqelZPrioHQj/Lw+wAVknlxtzR5oReAduSZ0
-         krBYVRdj6hjmGNsP3s/MatKYlY5S11HN4bKdxEAKIVj5kaGoBr3nzi53ZA4N+Dz1dkEO
-         yceQyxyUY7gSzl7daYCYLBqR0SuXPrB0rcnHs3rY2+idy62pi8eGV2YI8N4AIRyvSs0N
-         QwBVc8Tzbg+rYuLwnUNulvKO0+HEe8axDyFvtgyqWRSXAvsiF74k6RoFRgvQIElCOUim
-         b1VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780658496; x=1781263296;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bTJSJfZlrZnr72qQBV1nT54IsiqSXO4gYoEedTnTMa4=;
-        b=sQp2ha1pStFoiQay8amOzRM9Karp0ykX5VSH2EaTaPil6iBZ+AQfXM+MyP4ajlR4Q3
-         RYTueU0ucOjApRMN4OmgV9tYyeG8XeIEBpxGeB7nihR74GIR0hFI2TDtbCyvk/yprkar
-         RuHhoVusOkJmRZ73yy7HlueqVRnsxVyowcoel9h8/DStpUHkGlHUGd4/UEIvoCx/mBnU
-         CijSi+OTZf9is/DiyizdLreCJzBlXVcSjwP8BZiStLTPKhygJUaqfwMMep5Ix8wslH7d
-         q3vebrLVsZ4m8t7NnYeTTDIZzR1KvXQDeyTUbCh7GVacLJ32eAb354OOQaZiDgXBubLm
-         ETmA==
-X-Forwarded-Encrypted: i=1; AFNElJ81zpiNrKUEaeVF2xdeYn5qeinvGYPeHjT+xOxC92m7MrfaevYSEC/y4TXHhsIC6kI2gGRPYII=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0/BSrMNHMcnU3a7UjnOlpBbgYLKQtF8eTcSqky8U1h9fJQJz9
-	bn0Rbxfj9AXk2HguQiyyHG+rWIDjOK0w7cDFuuCU4mfTggEPvmJmCOEsO3uA7rF5MsuOwPOmNTD
-	Dvr7eQmnrjwNXLA==
-X-Received: from qtww3-n2.prod.google.com ([2002:a05:622a:6843:20b0:517:6663:a9fe])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:650:b0:50b:4a84:aa94 with SMTP id d75a77b69052e-517959d5610mr47652751cf.7.1780658495128;
- Fri, 05 Jun 2026 04:21:35 -0700 (PDT)
-Date: Fri,  5 Jun 2026 11:21:34 +0000
+	s=arc-20240116; t=1780658788; c=relaxed/simple;
+	bh=UQNjvhsS0kyP9yZjiftX5re9UssabP7shCO1bYn/BEo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e480eB6HoqXEvcUAs9QxCmu5FI1tUJGbEdwFwScFCXpfPXkIEI+Tr2jgk0838nPBlH0Yd+1hsCfuWRx3f8nRekbMV9TfllRtpJo8jrRaYBj8WxajKF+gN9EB8XtAonY1MyxmGPBi6+IthhD6uAMyNWQZsGETAr7CbhJ1X7u/Swc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=A8Xp+JZB; arc=none smtp.client-ip=62.96.220.36
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 145412080B;
+	Fri,  5 Jun 2026 13:26:25 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JVgEhEhNj6FO; Fri,  5 Jun 2026 13:26:24 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 60418205CD;
+	Fri,  5 Jun 2026 13:26:24 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 60418205CD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1780658784;
+	bh=Ars2tic3lzf/ipie+1QBlNBvTaWoFizgll5R0E9sbeg=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=A8Xp+JZBabijuLMWups3YB4RQd/J+bmBIAP0u6Ufp/yOdMbXxo/BaoE8J269GFNWt
+	 Suzz2pexXdDq0G2NAuxRiTh7wwpdXCI3w4gEzQTg9dTWBbB9pn0DLm0aNTXR/AhPwE
+	 WM5r7NHJOFBBobPo6aWcRFiOTiTPM3X2I+IE7WEdVDC7LcGb7XJ/ceULiwBGUfvRmN
+	 Z1h/jpuc550HGpzHXEoCkyeOFHyUwD10IY+7FqiOopTUENkdkV+r095egRAy8/Y258
+	 CMcMg5Q0z3q4KbKRWUzv3m+zMQdwHXOOXrYBSWYZGICk8u/9Iwqu2Q9McuWjDoTRJJ
+	 4v/aqOmr373KA==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 5 Jun
+ 2026 13:26:23 +0200
+Received: (nullmailer pid 389996 invoked by uid 1000);
+	Fri, 05 Jun 2026 11:26:23 -0000
+Date: Fri, 5 Jun 2026 13:26:23 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Alessandro Schino <7991aleschino@gmail.com>
+CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH ipsec v2] esp: fix page frag reference leak on
+ skb_to_sgvec failure
+Message-ID: <aiKyX8XlbFoTuZ4U@secunet.com>
+References: <20260603114507.1443-1-7991aleschino@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
-Message-ID: <20260605112134.3642413-1-edumazet@google.com>
-Subject: [PATCH net] tcp: restrict SO_ATTACH_FILTER to priv users
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Tamir Shahar <tamirthesis@gmail.com>, 
-	Amit Klein <aksecurity@gmail.com>, Willem de Bruijn <willemb@google.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260603114507.1443-1-7991aleschino@gmail.com>
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:tamirthesis@gmail.com,m:aksecurity@gmail.com,m:willemb@google.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:ericdumazet@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-295792-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:7991aleschino@gmail.com,m:netdev@vger.kernel.org,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295793-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:mid,secunet.com:from_mime,secunet.com:dkim,vger.kernel.org:from_smtp];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 25518647AE2
+X-Rspamd-Queue-Id: 28EAA647BF7
 
-This patch restricts the use of SO_ATTACH_FILTER (cBPF) on TCP sockets
-to users with CAP_NET_ADMIN capability.
+On Wed, Jun 03, 2026 at 01:45:07PM +0200, Alessandro Schino wrote:
+> In esp_output_tail(), when esp->inplace is false, the old skb page frags
+> are replaced with a new page from the xfrm page_frag cache. The source
+> scatterlist (sg) is built from the old frags before the replacement, and
+> esp_ssg_unref() is responsible for releasing the old page references
+> after the crypto operation completes.
+> 
+> However, if the second skb_to_sgvec() call (which builds the destination
+> scatterlist from the new page) fails, the code jumps to error_free which
+> only calls kfree(tmp). The old page frag references captured in the
+> source scatterlist are never released:
+> 
+>   1. sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+>   2. nr_frags is set to 1 and frag[0] is replaced with the new page
+>   3. Second skb_to_sgvec() fails -> goto error_free
+> 
+> Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+> unconditionally unrefs the source scatterlist frags. Since req->src is
+> not yet initialized by aead_request_set_crypt() at the point of the
+> error, the source scatterlist is obtained directly via esp_req_sg().
+> Existing callers pass false to preserve the original behavior.
+> 
+> The same issue exists in both esp4 and esp6 as the code is identical.
+> 
+> Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+> Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
+> ---
+> v2: split the long line in esp_ssg_unref() to keep it under 100 columns
+> 
+>  net/ipv4/esp4.c | 7 +++++--
+>  net/ipv6/esp6.c | 7 +++++--
+>  2 files changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+> index 2429c7845984..dfc81ee969ae 100644
+> --- a/net/ipv4/esp4.c
+> +++ b/net/ipv4/esp4.c
+> @@ -113,10 +113,13 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb,
+>  	/* Unref skb_frag_pages in the src scatterlist if necessary.
+>  	 * Skip the first sg which comes from skb->data.
+>  	 */
+> -	if (already_unref || req->src != req->dst)
+> -		for (sg = sg_next(already_unref ? esp_req_sg(aead, req) : req->src); sg; sg = sg_next(sg))
+> +	if (already_unref || req->src != req->dst) {
+> +		struct scatterlist *src = already_unref ? esp_req_sg(aead, req) : req->src;
 
-This blocks potential side-channel attack where an unprivileged application
-attaches a filter to leak TCP sequence/acknowledgment numbers.
+This looks like a diff beween two versions of your patch.
+We don't have already_unref in the code, so it does not
+apply.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reported-by: Tamir Shahar <tamirthesis@gmail.com>
-Reported-by: Amit Klein <aksecurity@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Andrii Nakryiko <andrii@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Eduard Zingerman <eddyz87@gmail.com>
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: Song Liu <song@kernel.org>
-Cc: Yonghong Song <yonghong.song@linux.dev>
-Cc: Jiri Olsa <jolsa@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>
----
- net/core/sock.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> +
+> +		for (sg = sg_next(src); sg; sg = sg_next(sg))
+>  			skb_page_unref(page_to_netmem(sg_page(sg)),
+>  				       skb->pp_recycle);
+> +	}
+>  }
+>  
+>  #ifdef CONFIG_INET_ESPINTCP
+> diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+> index 50af6ab9b8fc..296b57926abb 100644
+> --- a/net/ipv6/esp6.c
+> +++ b/net/ipv6/esp6.c
+> @@ -130,10 +130,13 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb,
+>  	/* Unref skb_frag_pages in the src scatterlist if necessary.
+>  	 * Skip the first sg which comes from skb->data.
+>  	 */
+> -	if (already_unref || req->src != req->dst)
+> -		for (sg = sg_next(already_unref ? esp_req_sg(aead, req) : req->src); sg; sg = sg_next(sg))
+> +	if (already_unref || req->src != req->dst) {
+> +		struct scatterlist *src = already_unref ? esp_req_sg(aead, req) : req->src;
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index d097025c116a863b29346c12470a9c81ec38ac56..cab041b57d286536cd4299c98f0d7d3bf7499501 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1465,6 +1465,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 	case SO_ATTACH_FILTER: {
- 		struct sock_fprog fprog;
- 
-+		if (sk_is_tcp(sk) &&
-+		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-+			ret = -EPERM;
-+			break;
-+		}
- 		ret = copy_bpf_fprog_from_user(&fprog, optval, optlen);
- 		if (!ret)
- 			ret = sk_attach_filter(&fprog, sk);
--- 
-2.54.0.1032.g2f8565e1d1-goog
-
+Same here.
 
