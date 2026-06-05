@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-295950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ldl4DdceI2o9jAEAu9opvQ
-	(envelope-from <netdev+bounces-295950-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:09:11 +0200
+	id 5iztG+oeI2pFjAEAu9opvQ
+	(envelope-from <netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:09:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F0BE64AD8D
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1BD664AD94
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:09:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Gx15zSB0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295950-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295950-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mvJjF9SQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D9413024A3F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:08:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4861B3035F00
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C74E402B9E;
-	Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC36040BCBE;
+	Fri,  5 Jun 2026 19:08:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6173F075A;
-	Fri,  5 Jun 2026 19:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E300F409603;
+	Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780686535; cv=none; b=KggaTwqrcT4QURjzWCgR5GfFQeDF5icS354ZaLxayQMtNhhRRuGloiftGZF98JlBDYPGKq8XOcN7RXKU9j9E5DvSSbtujcYy3RNvtQRz2vUUUVsZKq1fpxi2uaSEvJkG2rP8KmvWXusUPFHJLbGAzotn+TAa99wW27M/zFV9Hd8=
+	t=1780686536; cv=none; b=eOxLwNSU1jGjhTSF/NmDEtwX8cw4U1SoeLJN+sCIUlFHzOvPh5E98jOejtYl4+YWWO09dYBQf9aOfaMIJsbGLznSCXd/ZGnOE073iQsuATap2Ux0Q842a9gOL7b40BqmcM3pqBRRIBjyVqfCBufHE1oo8reDMVRoCeL0pBo4EBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780686535; c=relaxed/simple;
-	bh=3DL/LpvyUq4LonJwd/lyFJqbPQGAHBZMHDkJ7spP++o=;
+	s=arc-20240116; t=1780686536; c=relaxed/simple;
+	bh=KR5xveAOSH4lE4C7FApc/5PGwobBZ2hRVpf8cnvjB8Y=;
 	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=JRlWBPq8mI4v5Xq5OuWBwR/LeVJGBszNmzDfHmgnf9Ix7MJoKR8+z51l/kFbxFeFuoKMz9LLuyEyI4FKxgXTBKHNv7MwvEyAhs09bkfdj7//LiNqLEAH6WKe7lhzfYAuLL5dJIGLN0YBSKy8v66MqwK6t/z/kfMWBPOUHDi7Yws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gx15zSB0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D821F00893;
-	Fri,  5 Jun 2026 19:08:53 +0000 (UTC)
+	 Subject:From:To:Cc:Date; b=lR2icXJewlgwBxEfpHP80vZMhDVdYEuRKWulLvb0dqlYxn/qvOLZfCMnnk76vugPHDFIMjaQuZ1if9ynlus3YIpItBfywKJMBYtDm72f7EnysoAU6/zBCfbBw1xf/xRtH/nFlcbwRxcnz097GoWBEYhkloa9S52SkWhkJvz47Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvJjF9SQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66CAC1F00893;
+	Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780686534;
-	bh=q6qqrSbjMEYTyY2+C+bT1l6eDfMipQNqFU3HH5CfK+s=;
+	s=k20260515; t=1780686535;
+	bh=qo2m33NQeRmaDvm/ox0qcA8IfPMMLz/eL4e61lU1CKU=;
 	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=Gx15zSB07Kcd7e0URuPQrwrz2SGDJYPZNx9I0+bNLOC7Z4eAcYMNlU8+rvLG6GLys
-	 aoHitcJMgMx+uVU27yDkv+Kha+HsaoSR1fWvW5xcZ+Lt4pxgBdRaR5ms2+RTNlkJpn
-	 MPAl9cr0UNcTv90gO9ylX0pl5nAVnhUw4IH76JFwFEEycCumtV6YyjbF5AOdUawYW5
-	 yqoHPBo2Iikxpx6mWgP+fpI2sWdEAIH7DUbpxj73K0dIOS7xj6SoeiQOSKbGbMtKOb
-	 okdI4khZybTRyv+JAr5RCBtWVoo495PW2W6y6p989ndBy7z30dsO7gxD9J4xXQVaQI
-	 Jeb1lK591AHaw==
-Content-Type: multipart/mixed; boundary="===============7693173522675949626=="
+	b=mvJjF9SQ29lyrlk3oI7xS4lcRrisWR2R4LFM/xP3jWHn5WQgh4nGN2EUvMViJR1TS
+	 TbHqyO4herEAb38mppJT+0DfJ/rDBJPw275LIkdnYaAXlreDoxcMqJutSNCYoOIRPT
+	 jbIIJ4ISFuyFv0BwzkNU1G0OuXYPR/buVz6pY1EsWKy/pRLOaqKlTEG1SXMT6noznM
+	 QeSmJjApEDWjvabAyS/wCRQrP+9UyB6cCCx7NG8w2fQTZnWR6mxZZ+49V/EOYoe/Od
+	 uQtmDEcPvRVzzOxpsFYDZqXUWaFgx9+E3Mm10ai+h+A8Lx1WWQ7vBbv16jUZhD9bLx
+	 CaoOCgbApPc6w==
+Content-Type: multipart/mixed; boundary="===============8919606443623192315=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <7e270031a11c9c839dde64ca32cdedda701639a999fc824c9dd135433e8d12b6@mail.kernel.org>
-In-Reply-To: <20260605183551.969144-6-ameryhung@gmail.com>
-References: <20260605183551.969144-6-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v2 5/5] selftests/bpf: Use bpf_dynptr_slice() to read file dynptr in leak test
+Message-Id: <3a3a97529e6a13b4220026c0d97d3c2341a503e3f815e0c67f1cc6a8ba13cab7@mail.kernel.org>
+In-Reply-To: <20260605183551.969144-5-ameryhung@gmail.com>
+References: <20260605183551.969144-5-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v2 4/5] bpf: Remove WARN_ON_ONCE in check_ids()
 From: bot+bpf-ci@kernel.org
 To: ameryhung@gmail.com,bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,martin.lau@kernel.org,mykyta.yatsenko5@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri,  5 Jun 2026 19:08:53 +0000 (UTC)
+Date: Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -74,7 +74,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295950-lists,netdev=lfdr.de,bpf-ci];
+	TAGGED_FROM(0.00)[bounces-295951-lists,netdev=lfdr.de,bpf-ci];
 	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:mykyta.yatsenko5@gmail.com,m:kernel-team@meta.com,m:ast@kernel.org,m:yonghong.song@linux.dev,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:alexeistarovoitov@gmail.com,m:mykytayatsenko5@gmail.com,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+,1:+];
@@ -92,63 +92,53 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.kernel.org:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F0BE64AD8D
+X-Rspamd-Queue-Id: D1BD664AD94
 
---===============7693173522675949626==
+--===============8919606443623192315==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-> diff --git a/tools/testing/selftests/bpf/progs/file_reader_fail.c b/tools/testing/selftests/bpf/progs/file_reader_fail.c
-> index d5fae5e4cf9a..3bb9e2612f8f 100644
-> --- a/tools/testing/selftests/bpf/progs/file_reader_fail.c
-> +++ b/tools/testing/selftests/bpf/progs/file_reader_fail.c
-> @@ -87,7 +87,8 @@ int use_file_dynptr_slice_after_put_file(void *ctx)
->  	struct task_struct *task = bpf_get_current_task_btf();
->  	struct file *file = bpf_get_task_exe_file(task);
->  	struct bpf_dynptr dynptr;
-> -	char *data;
-> +	char buf[1];
-> +	const char *data;
+> bpf: Remove WARN_ON_ONCE in check_ids()
 >
->  	if (!file)
->  		return 0;
-> @@ -95,15 +96,14 @@ int use_file_dynptr_slice_after_put_file(void *ctx)
->  	if (bpf_dynptr_from_file(file, 0, &dynptr))
->  		goto out;
+> check_ids() warned when it ran out of idmap slots, assuming this was
+> impossible because the slots are bounded by the number of registers and
+> stack slots. That assumption no longer holds: referenced dynptrs acquire
+> an intermediate reference that lives in refs[] but is not backed by any
+> register or stack slot [0], so a program can accumulate more reference
+> ids than the idmap can hold and exhaust it.
 >
-> -	data = bpf_dynptr_data(&dynptr, 0, 1);
-> +	data = bpf_dynptr_slice(&dynptr, 0, buf, sizeof(buf));
+> Exhaustion is fine for verification correctness. check_ids() already
+> returns false, which makes the states compare as not equivalent and
+> prevents unsound pruning. The only effect of the WARN_ON_ONCE() is log
+> noise, or a panic under panic_on_warn. Drop the warning and keep
+> returning false.
+>
+> [0] 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
 
-A note from the earlier review on v1: an automated review bot suggested
-initializing the stack buffer here, e.g.
+This removes a WARN_ON_ONCE() that can panic under panic_on_warn, and
+the commit body explains the idmap exhaustion only became reachable once
+referenced dynptrs began acquiring an intermediate reference in refs[]
+that is not backed by a register or stack slot.
 
-	char buf[1] = {0};
+Should this carry a Fixes: tag pointing at the commit that introduced
+that behavior, which the body already cites as [0]?
 
-worrying that the uninitialized 'buf' passed to bpf_dynptr_slice() could
-make the verifier reject the program early with an invalid stack read,
-which would bypass the intended reference-leak check.
-
-This looks like a false positive, since the buf argument to
-bpf_dynptr_slice() is a destination the helper writes into, so
-uninitialized stack memory should be valid there, and the v1 patch
-already carried an Acked-by from Eduard Zingerman.
-
-Was this comment considered, and is the test still failing for the
-intended reference-leak reason rather than an early verifier rejection?
-
+  Fixes: 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
 
 ---
 AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
 See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
 CI run summary: https://github.com/kernel-patches/bpf/actions/runs/27034008594
---===============7693173522675949626==--
+--===============8919606443623192315==--
 
