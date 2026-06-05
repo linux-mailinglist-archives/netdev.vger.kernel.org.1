@@ -1,143 +1,160 @@
-Return-Path: <netdev+bounces-295895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 20V/JpX5ImrofwEAu9opvQ
-	(envelope-from <netdev+bounces-295895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:30:13 +0200
+	id L7M3Mar6ImojgAEAu9opvQ
+	(envelope-from <netdev+bounces-295896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:34:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E4C9649C73
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:30:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C7F9649D0C
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 18:34:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=APouJqga;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295895-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295895-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=LJ5AwyI0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295896-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295896-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 482BF309D388
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 16:25:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A759B30591B7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 16:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B95408636;
-	Fri,  5 Jun 2026 16:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC0030D416;
+	Fri,  5 Jun 2026 16:26:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3E63E7BAA
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 16:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBA54A0C;
+	Fri,  5 Jun 2026 16:26:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780676518; cv=none; b=PQAUGHQ9Wsz9Ha58I9EpOL5eXbl/I9pofcgtjJZlDtvy+59ljgcWAwDV4N+2AqPjrD5mxMovftRgpyeZJmRyEZHPptXlEzuSDz61kDcKHT19ePSmWCQHbKu8x8BdJqrtefwaCsIM0YkFBE1Oo/uLCaO2qvGs2tIbar57/C6eccA=
+	t=1780676818; cv=none; b=SylhYY4ahRluxw+hvBYjeZyRkxUzBM+Kn6duJIl8YuY2Nxn4rymNXVjUEkn+F22AuGqxI20hZ2FDv4dcjgg5vsac20dqStU2BMkaBuIxq5SkR72SkF3LBoykSWewOpkF5R+E4Jvh5zUKVEHqkla0L61bVEtDq9qolrwzF+AGJCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780676518; c=relaxed/simple;
-	bh=ZKZ84/luGj+BWGDyOu9nLN0I3YRngpbvVR4I/PcJFPk=;
+	s=arc-20240116; t=1780676818; c=relaxed/simple;
+	bh=k8jxxf8sPq7/nIqWVslJ63cGDL/ilghT2Ni5xc6z2d4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tHc99QGNMpLGCSnnx19oGYidxvnVF6DKVy7s5yZ0OKXEq+omw06enNndGDOxrr35046PVfO2lvpsEX8fV0GNpX73dJBMNNq0hzt0OsG8jDn9f0zTEb5+mN3wktv2O9B13nCLQo/Xnx/FIouM5BVcRLy+zqbuEzJtFll2w+nmZTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=APouJqga; arc=none smtp.client-ip=209.85.214.195
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2c0c2c7e0c5so14788265ad.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 09:21:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780676517; x=1781281317; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGpdGSSCTZrMcrdmmPXr+aQ94+C8S19ytpnAhcpODSs=;
-        b=APouJqgabpEpqMm9h581az8kNoilJERAYDVBaQO88TnjIjURGIvAQCE3M6Q8B7Z+9N
-         KXyZ624fW+DtLvALcVTj2lYXIsOmH4n/fnzN9pqg2Ku7SPBt0YGk+eYYm61knfhr3u48
-         SRGoIStVwCURBNHCZpMqfLMB21yW2AU/sXjaanDyLeTOstOthWNDsmeYaco499k/Lwsr
-         R3vATKoXrmghaRXWkK4vqVhWouC928Z3+ie/yiJXIe0cus7PFMnHlIf9zZJcqsBiJI4O
-         cJfDvHgFyV81wnDuOTQCIdfQYfgUv0l0Rsxwnag9ugMSYm16rojCstl5VkOsIBqM5PIC
-         /qjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780676517; x=1781281317;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RGpdGSSCTZrMcrdmmPXr+aQ94+C8S19ytpnAhcpODSs=;
-        b=REfvhlq4MYjyNJb/jAUV6ROuAR876JVbBWEQkaqN+ExgCuL51TepqIVNYreEqKyITc
-         LcY7vSgT2ONXTOIauiiAkYZ47tQphmjQz8mkie7UQYxoKFH+w5gwG9g1mYT24B7lDQ5y
-         RIJZ8mSzhhFclIjYfCchAquzAlCKH2IibS2srPQo8d87RufxBg3Wmmkk8UZP2KLRNm4j
-         EE8f8Sai6v22BPLwDT771WCdnw/BDsrywlR8RcpWimSg0J+eTb2A9EKTt1faMLpgvZDE
-         hbLfA2cyauq7tv0u3chnygPci3yD4rkztx9OfMiS5Y/ERwE5xYA/XfS6VtDBGbg39unl
-         owzw==
-X-Gm-Message-State: AOJu0YwNlPoy9SxgYclUT4fg4cboo3x0AcpdFQ0saDnjEomsRcmGh71e
-	bkIgR4s9KXyxoTZBG+PYQu36L8rl8XXVi5wVpVpA2q9N6OZniq12HiyK
-X-Gm-Gg: Acq92OERWk3YrRblHz4G96fX1mOM7x62BoeJ/mwcjABMd4p8AeFJib+EaXBC9lw5ZEr
-	N+MMuFyDGH65ABiasa8dYvYPwTqFSg9XWfXSq0/vz57C85zB3XgGRjGQllCbuSKxgp4h2iUdVEf
-	B2t1LsvbAYmaL76J+7inJ4lBEaULqQ3KlQu/0h0oc8/quALNEGjGMXIW5XamhFCv2GHy8i8KWo9
-	ArtpxQ4TBjdTP/Z8aqEn+uiis6sVIz2gsqs9XZ6A3PZ414uEZJZKwa/cJvWdf6jkEjp4aT+phWW
-	hVIDOh63hC7JikOpepQwy/2nEcWuPCvsrqUjXT9xepCvBYcyxIJHml5OZjGokThZ5saIp2E7WSA
-	2q6PXYzuqCbStDuNO/ZnUkMfcQF/6E7upfvvmXUxbffAgJF4Mlig8bfDoJj0Mpup7ard9F9DGMl
-	PnzGhCiZLg+2SFhhWbVC3YM/WHVzY=
-X-Received: by 2002:a17:902:ea06:b0:2c0:abd3:32f1 with SMTP id d9443c01a7336-2c1e8220b2bmr47569415ad.24.1780676516833;
-        Fri, 05 Jun 2026 09:21:56 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:47::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f9ed6csm96975505ad.31.2026.06.05.09.21.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2026 09:21:56 -0700 (PDT)
-Date: Fri, 5 Jun 2026 09:21:44 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 2/3] net: add retry mechanism to
- ndo_set_rx_mode_async
-Message-ID: <aiL3jjFRxyqKuo_b@devvm7509.cco0.facebook.com>
-References: <20260603223535.2504695-1-sdf@fomichev.me>
- <20260603223535.2504695-3-sdf@fomichev.me>
- <20260604190142.0ef0d119@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AIGED8L1Q+/9LR42D3KeujvRJSe9cl2iRi16HVTJqeLF/EOJH6XjTcEDstjDNi+ey3/mwqODhuAhKE60Fn2Ul/yv12q/tgiEv5eaiNSvT9tAf1+fiVYIIhaVj4INKGFTH/d6Jz670SC6i3sppI/O4LvxHMFGlnexIAADqhA+4N8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJ5AwyI0; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B91C1F00893;
+	Fri,  5 Jun 2026 16:26:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780676816;
+	bh=r2snqK5TmvBjLf7irf+fuZCEZasZ3Pbn/RhGzf37Nzs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=LJ5AwyI0OawYi+sL2VqoHYRDXQly81j/iq9Hu1QCyRV/oI2u+eo9HKRwCt/seMVYO
+	 ZdU6gjCh3epPP4w83HFdgfua/mqbm21w206mpV8ljUXevWL42dnlA3Suzgo//DxI7I
+	 exdSX9Ht4UckbFS3Yt/N7DLCSHKGx8idhu0gxBx29CuZCzwcXoJtqqrXjkIjBaxGOT
+	 lrH8m8UVsyKbN2OWhs8A/Oneh86jVogUhkO87JjphEqpnAKGqdgeufNOTMLNklpySA
+	 FlVFA3Q1CzPGOayBya4B24imwrQXZfdtdyUQ8YqUsnsgzWIlcrRTQJK56ddknaN3vo
+	 xobc9BNb2BBHg==
+Date: Fri, 5 Jun 2026 17:26:49 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-api@vger.kernel.org, netdev@vger.kernel.org,
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	David Howells <dhowells@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Pedro Falcato <pfalcato@suse.de>, Aishwharya.TCV@arm.com,
+	ltp@lists.linux.it, Miklos Szeredi <miklos@szeredi.hu>,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 2/3] vmsplice: make vmsplice a trivial wrapper for
+ preadv2/pwritev2
+Message-ID: <1eac3b42-5dde-41c4-930a-d74cda9e6d68@sirena.org.uk>
+References: <20260531010107.1953702-1-safinaskar@gmail.com>
+ <20260531010107.1953702-3-safinaskar@gmail.com>
+ <d9806b34-fc73-4878-997a-95c5e8ae4b29@sirena.org.uk>
+ <CAHk-=wjBZAzPdZgEeHAtSiwJpomt8ZZgKbixuiHfRm09a4=PtA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="g/nnWGulOH+szEAc"
 Content-Disposition: inline
-In-Reply-To: <20260604190142.0ef0d119@kernel.org>
+In-Reply-To: <CAHk-=wjBZAzPdZgEeHAtSiwJpomt8ZZgKbixuiHfRm09a4=PtA@mail.gmail.com>
+X-Cookie: Error in operator: add beer
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-295896-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:safinaskar@gmail.com,m:linux-fsdevel@vger.kernel.org,m:brauner@kernel.org,m:viro@zeniv.linux.org.uk,m:jack@suse.cz,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-api@vger.kernel.org,m:netdev@vger.kernel.org,m:willy@infradead.org,m:axboe@kernel.dk,m:hch@infradead.org,m:dhowells@redhat.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:pfalcato@suse.de,m:Aishwharya.TCV@arm.com,m:ltp@lists.linux.it,m:miklos@szeredi.hu,m:patches@lists.linux.dev,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,zeniv.linux.org.uk,suse.cz,kvack.org,infradead.org,kernel.dk,redhat.com,linux-foundation.org,suse.de,arm.com,lists.linux.it,szeredi.hu,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295895-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,devvm7509.cco0.facebook.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0E4C9649C73
+X-Rspamd-Queue-Id: 3C7F9649D0C
 
-On 06/04, Jakub Kicinski wrote:
-> On Wed,  3 Jun 2026 15:35:34 -0700 Stanislav Fomichev wrote:
-> > +	netdev_ops_assert_locked(dev);
-> 
-> One thing, I guess, since I applied the rename I think this should
-> become netdev_assert_locked_ops_compat(). Not that it matters in
-> practice.
 
-Will do, ty for the review!
+--g/nnWGulOH+szEAc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Fri, Jun 05, 2026 at 09:02:52AM -0700, Linus Torvalds wrote:
+> On Fri, 5 Jun 2026 at 04:02, Mark Brown <broonie@kernel.org> wrote:
+
+> > | L4472tst_test.c:2050: TINFO: Tested kernel: 7.1.0-rc6-next-20260604 #1 SMP @1780589917 armv7l
+> > | L4473tst_kconfig.c:71: TINFO: Couldn't locate kernel config!
+> > | L4474tst_test.c:1875: TINFO: Overall timeout per run is 0h 00m 30s
+
+> I htink this is the same thing that Christian already noted (he said
+> "reported by David", but I don't know which David ;), where the
+> vmsplice() writev() emulation was done as a blocking write, even
+> though vmsplice only blocked at the beginning (ie waiting only for
+> _initial_ space to write, not then blocking afterwards).
+
+Ah, yes it is - exactly the same issue that's mentioned in[1], I missed
+it in the middle of the quite large thread and didn't directly find
+David's report.  Sorry for the duplication there.
+
+[1] https://lore.kernel.org/r/20260603-raumfahrt-unmerklich-ertrugen-c4ecae70d5f9@brauner
+
+--g/nnWGulOH+szEAc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoi+MgACgkQJNaLcl1U
+h9Ctwwf/XkRjB062vspvG1uidxqEpWAVutxYq5EvOG1EiujrqzC1HAdtvESiAulS
+WTWxzQt+TKgaYHJ2HVDYpinhZEgTbOLChWHzER0hzObbMogvQsYUXwhn6NKNF7pa
+wLasVL07aZdXilsSJdBcjzGOAkdbfpQMcPiO70YqrrCj/Dzcg3b7VDZwgWNmMJWB
+ZCH7O8PaAk0UU17qB1pF7XsoK79IDMcyzwrj9XX7VqZRc2hQ3E1MU6B8vwY9QBOI
+D+VetiwfTYgkb/yweZokwkAIH/o64w7mfBvi8SXnxBcKEfqvxELjjeIaD9DynXf0
+GM/haoPUaOz77nGe3hZgodaEqpnoBQ==
+=H14S
+-----END PGP SIGNATURE-----
+
+--g/nnWGulOH+szEAc--
 
