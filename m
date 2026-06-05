@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-295675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4ugyElx5ImozYAEAu9opvQ
-	(envelope-from <netdev+bounces-295675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:23:08 +0200
+	id bW64H255Imo3YAEAu9opvQ
+	(envelope-from <netdev+bounces-295677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:23:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2262645EB2
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:23:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7D7645EC6
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:23:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=AVdrMZoK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295675-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295675-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=w1GDLF2t;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295677-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295677-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=simonwunderlich.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3EDD030422CF
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:20:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF9263047CBE
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124C447887A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8640478E5F;
 	Fri,  5 Jun 2026 07:20:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAAF426EC1
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 07:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34ED341C31B
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 07:20:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780644020; cv=none; b=C6d1OfWMSMyDMhmkZay3W7ADpuFralsVFiu+y8eG9MnYX2z1XXu896ZTKxtYajM+r6YlM1s/6nDeRMkJAJ+k3BK8HogfP9XO/DVpi1BkkuHYsckB84GCQuQnkVtIqeYi/oxCTEhfU1yaJjr2eJMeOZtZSmUOG/eh78GQ/NXxcc4=
+	t=1780644020; cv=none; b=SKDKxOx9x6hjjZAn64CDp9ZPxOWsHBsLyrg/yngP5N4cr+tU1DDf73WhDJQqe9/SgBzxq90yueksCOSL+4WExcXkklTwDqcOAZYRR01sD1MktQAgw6jwXR+e72l9A5/ddUmSjZ0GKIPehr8zSL7MFxMNPdO2oD0KWhtMTFgXCcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780644020; c=relaxed/simple;
-	bh=Y5kgoPwwDx/Pmpy/Io8HZVWFjNi1ERfFtAXTnPDlGGE=;
+	bh=Obsha1/QLQjEyGmsc+3yvBUqvXx+6H5BtGwJmefMfP8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XN2CcVMuQP413gqqbWhX8x8idoJDBztwjQvhus+ZG8PnCAWI8Eaw4GB2IGWKZPJkw/5lBheLLt2FSl02SaRZUxUTHsbLKcZVGKzFnNtN916xOs7SoG+AEypbK9vjn8125N5MZStH1VkYnVGwQ3T0/1f1IytV19ihUP7OizR3vXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=AVdrMZoK; arc=none smtp.client-ip=23.88.38.48
+	 MIME-Version; b=iwqpb2LGgbLGiHywIK2P/sG+afIUDvJPygeFM7WD3AB77bIl58lUJs4jkx1Lo1WnszHe3Q5ovBsYidyM7CAt1/CsZoDuQ1Xt6Xb8KGlZWuePC9fJH/3RbDrIU60AeDPEGxKRfGmD8p1BRSUioJ0nlxCrnmIFx6VPusKolXBBIcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=w1GDLF2t; arc=none smtp.client-ip=23.88.38.48
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1780644015;
+	s=09092022; t=1780644016;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RsEJ65hYXPcCWEyEzR+SRyfNmgEFmJ3/S+o4eeaUnSA=;
-	b=AVdrMZoK84TZnMtoxSL8nFPkwZS8Cka89dVvERMvAhfdwSRzEJvLB9a3ZJ9RmVszn9/lRi
-	p6be7JHwAoebauFj7M8qpttbPrVjcZU5TjmrA8Wuqor0toEtuUsLw7XwwcxKsom0xWbrh/
-	VaCaBgC3m+EdtZ2eKKnjb29T1k6PTndAhtbkkWhiWA03TLmbpgBtoOcq12eTl8eO6Urqzc
-	NiylzQlkqcSbBsyy/sWwWhg0cn8+mKfUCgCupTVJmG61MYZ2PdvSfsNZsqJ04ZkN+m1j5K
-	/uhGfRQLMuEtl5nOgmMWsMbKoyEjou5DuflzIuL+f8aVIpxoNl7JcK+qXCS03g==
+	bh=8JwYgpPGj+vXgN7oOZfclO+SwAYin1aQSzciPTokuxk=;
+	b=w1GDLF2t3VGcrkDgrUcMHn2iQelb6ktbar4gRzbMv1qeJ3xZ87vMuWkwnEyNdgVmpqpHD0
+	6IgHjKUg7eSYtyEO0Wc9mnbFAj+L413hsR2k5UyO145iJMc7O4DQzCWJrungqSNcp2Rxir
+	eJKACQRtPpNFZsqxMHEZHt1Oxa6PKQgvPe5DtKoJKWby8/AINHyqmRlhh21HFbDaJk9+oz
+	zkYbjyszIQYiosW+8JUY4ALUC42B5jtJ6j8nKn5Lpjy8chE33phzHxrHfh8mclGdfbb1CR
+	2aDcevlC9rKC0+CgpW5mk8NMGmbwEyPLrwWidXHC7nJL6CtxatPzvsTntEcrAA==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -56,9 +56,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	b.a.t.m.a.n@lists.open-mesh.org,
 	Sven Eckelmann <sven@narfation.org>,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net-next 06/11] batman-adv: correct batadv_wifi_* kernel-doc
-Date: Fri,  5 Jun 2026 09:20:00 +0200
-Message-ID: <20260605072005.490368-7-sw@simonwunderlich.de>
+Subject: [PATCH net-next 07/11] batman-adv: tp_meter: update stale kernel-doc after refactoring
+Date: Fri,  5 Jun 2026 09:20:01 +0200
+Message-ID: <20260605072005.490368-8-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260605072005.490368-1-sw@simonwunderlich.de>
 References: <20260605072005.490368-1-sw@simonwunderlich.de>
@@ -76,19 +76,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
 	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-295675-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295677-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -102,67 +102,147 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,simonwunderlich.de:mid,simonwunderlich.de:dkim,simonwunderlich.de:from_mime,simonwunderlich.de:email,narfation.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D2262645EB2
+X-Rspamd-Queue-Id: 1A7D7645EC6
 
 From: Sven Eckelmann <sven@narfation.org>
 
-The original kernel documentation for the batadv_wifi_* functions contained
-copy+paste errors. Correct them to make it easier understandable.
+The tp_meter codebase was recently refactored:
+
+* throughput meter sender and receiver variables were split into
+  two different structures
+* the congestion control variables were extracted in a separate structure
+
+But the kernel-doc was not updated everywhere to reflect these changes.
 
 Signed-off-by: Sven Eckelmann <sven@narfation.org>
 Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 ---
- net/batman-adv/hard-interface.c | 6 +++---
- net/batman-adv/hard-interface.h | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ net/batman-adv/tp_meter.c | 16 ++++++++--------
+ net/batman-adv/types.h    | 14 ++++++++------
+ 2 files changed, 16 insertions(+), 14 deletions(-)
 
-diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index e2c85bd8dbb53..60cee2c2f2f41 100644
---- a/net/batman-adv/hard-interface.c
-+++ b/net/batman-adv/hard-interface.c
-@@ -971,9 +971,9 @@ static int batadv_hard_if_event_meshif(unsigned long event,
- /**
-  * batadv_wifi_net_device_insert() - save information about wifi net_device
-  * @net_dev: net_device to add to batadv_wifi_net_devices
-- * @wifi_flags: net_device which generated an event
-+ * @wifi_flags: extracted batadv_hard_iface_wifi_flags of a net_device
+diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
+index a404d70e053e2..7e98cbfbbb70d 100644
+--- a/net/batman-adv/tp_meter.c
++++ b/net/batman-adv/tp_meter.c
+@@ -289,7 +289,7 @@ batadv_tp_list_find_sender(struct batadv_priv *bat_priv, const u8 *dst)
+  * @bat_priv: the bat priv with all the mesh interface information
+  * @dst: the other endpoint MAC address to look for
   *
-- * Return: 0 on result, negative value on error
-+ * Return: 0 on success, negative value on error
+- * Return: if matching session with @dst was found
++ * Return: true if a matching session with @dst was found, false otherwise
   */
- static int
- batadv_wifi_net_device_insert(struct net_device *net_dev, u32 wifi_flags)
-@@ -1006,7 +1006,7 @@ batadv_wifi_net_device_insert(struct net_device *net_dev, u32 wifi_flags)
+ static bool batadv_tp_list_active(struct batadv_priv *bat_priv, const u8 *dst)
+ 	__must_hold(&bat_priv->tp_list_lock)
+@@ -355,7 +355,7 @@ batadv_tp_list_find_sender_session(struct batadv_priv *bat_priv, const u8 *dst,
+ /**
+  * batadv_tp_vars_common_release() - release batadv_tp_vars_common from lists
+  *  and queue for free after rcu grace period
+- * @ref: kref pointer of the batadv_tp_vars
++ * @ref: kref pointer of the batadv_tp_vars_common
+  */
+ static void batadv_tp_vars_common_release(struct kref *ref)
+ {
+@@ -391,7 +391,7 @@ static void batadv_tp_sender_put(struct batadv_tp_sender *tp_vars)
+ }
  
  /**
-  * batadv_wifi_net_device_remove() - remove information about wifi net_device
-- * @device_state: wifi net_device state to remove from batadv_wifi_net_device_state
-+ * @device_state: wifi net_device state to remove from batadv_wifi_net_devices
-  */
- static void
- batadv_wifi_net_device_remove(struct batadv_wifi_net_device_state *device_state)
-diff --git a/net/batman-adv/hard-interface.h b/net/batman-adv/hard-interface.h
-index 822e7e378c4d1..af31696c39780 100644
---- a/net/batman-adv/hard-interface.h
-+++ b/net/batman-adv/hard-interface.h
-@@ -126,7 +126,7 @@ batadv_primary_if_get_selected(struct batadv_priv *bat_priv)
- /**
-  * batadv_is_cfg80211() - check if the given hardif is a cfg80211
-  *  wifi interface
-- * @wifi_flags: extracted batadv_hard_iface_wifi_flagss of an net_device
-+ * @wifi_flags: extracted batadv_hard_iface_wifi_flags of a net_device
+- * batadv_tp_list_detach() - remove tp receiver session from mesh session list once
++ * batadv_tp_list_detach() - remove tp session from mesh session list once
+  * @tp_vars: the private data of the current TP meter session
   *
-  * Return: true if the net device is a cfg80211 wireless device, false
-  *  otherwise.
-@@ -143,7 +143,7 @@ static inline bool batadv_is_cfg80211(u32 wifi_flags)
+  * Return: whether tp_vars was detached from list and reference must be freed
+@@ -509,7 +509,7 @@ static void batadv_tp_sender_finish(struct work_struct *work)
+  * batadv_tp_reset_sender_timer() - reschedule the sender timer
+  * @tp_vars: the private TP meter data for this session
+  *
+- * Reschedule the timer using tp_vars->rto as delay
++ * Reschedule the timer using tp_vars->cc.rto as delay
+  */
+ static void batadv_tp_reset_sender_timer(struct batadv_tp_sender *tp_vars)
+ {
+@@ -621,9 +621,9 @@ static void batadv_tp_fill_prerandom(struct batadv_tp_sender *tp_vars,
+  *
+  * Create and send a single TP Meter message.
+  *
+- * Return: 0 on success, BATADV_TP_REASON_DST_UNREACHABLE if the destination is
+- * not reachable, BATADV_TP_REASON_MEMORY_ERROR if the packet couldn't be
+- * allocated
++ * Return: 0 on success, BATADV_TP_REASON_MEMORY_ERROR if the packet couldn't
++ * be allocated, BATADV_TP_REASON_CANT_SEND if the packet could not be
++ * transmitted
+  */
+ static int batadv_tp_send_msg(struct batadv_tp_sender *tp_vars, const u8 *src,
+ 			      struct batadv_orig_node *orig_node,
+@@ -913,7 +913,7 @@ static int batadv_tp_wait_available(struct batadv_tp_sender *tp_vars, size_t ple
+  * batadv_tp_send() - main sending thread of a tp meter session
+  * @arg: address of the related tp_vars
+  *
+- * Return: nothing, this function never returns
++ * Return: 0
+  */
+ static int batadv_tp_send(void *arg)
+ {
+diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
+index 5eb0371def83a..a7fa0d9e09288 100644
+--- a/net/batman-adv/types.h
++++ b/net/batman-adv/types.h
+@@ -1331,7 +1331,7 @@ struct batadv_tp_unacked {
+ 	/** @len: length of the packet */
+ 	u16 len;
  
- /**
-  * batadv_is_wifi() - check if flags belong to wifi interface
-- * @wifi_flags: extracted batadv_hard_iface_wifi_flagss of an net_device
-+ * @wifi_flags: extracted batadv_hard_iface_wifi_flags of a net_device
-  *
-  * Return: true if the net device is a 802.11 wireless device, false otherwise.
+-	/** @list: list node for &batadv_tp_vars.unacked_list */
++	/** @list: list node for &batadv_tp_vars_common.unacked_list */
+ 	struct list_head list;
+ };
+ 
+@@ -1367,7 +1367,9 @@ struct batadv_tp_vars_common {
+ 	struct rcu_head rcu;
+ };
+ 
+-/** struct batadv_tp_sender_cc - congestion control variables */
++/**
++ * struct batadv_tp_sender_cc - congestion control variables
++ */
+ struct batadv_tp_sender_cc {
+ 	/** @fast_recovery: true if in Fast Recovery mode */
+ 	bool fast_recovery:1;
+@@ -1410,7 +1412,7 @@ struct batadv_tp_sender_cc {
+  * struct batadv_tp_sender - sender tp meter private variables per session
   */
+ struct batadv_tp_sender {
+-	/** @common: common batadv_tp_vars (best be first member) */
++	/** @common: common batadv_tp_vars_common (must be first member) */
+ 	struct batadv_tp_vars_common common;
+ 
+ 	/** @start_time: start time in jiffies */
+@@ -1437,7 +1439,7 @@ struct batadv_tp_sender {
+ 	/** @cc: congestion control variables */
+ 	struct batadv_tp_sender_cc cc;
+ 
+-	/** @cc_lock: lock do protect @cc */
++	/** @cc_lock: lock to protect @cc */
+ 	spinlock_t cc_lock;
+ 
+ 	/** @tot_sent: amount of data sent/ACKed so far */
+@@ -1460,7 +1462,7 @@ struct batadv_tp_sender {
+  * struct batadv_tp_receiver - receiver tp meter private variables per session
+  */
+ struct batadv_tp_receiver {
+-	/** @common: common batadv_tp_vars (best be first member) */
++	/** @common: common batadv_tp_vars_common (must be first member) */
+ 	struct batadv_tp_vars_common common;
+ 
+ 	/** @receiving: receiving binary semaphore: 1 if receiving, 0 is not */
+@@ -1662,7 +1664,7 @@ struct batadv_priv {
+ 	/** @forw_bcast_list_lock: lock protecting forw_bcast_list */
+ 	spinlock_t forw_bcast_list_lock;
+ 
+-	/** @tp_list_lock: spinlock protecting @tp_list */
++	/** @tp_list_lock: spinlock protecting @tp_sender_list + @tp_receiver_list */
+ 	spinlock_t tp_list_lock;
+ 
+ 	/** @tp_num: number of currently active tp sessions */
 -- 
 2.47.3
 
