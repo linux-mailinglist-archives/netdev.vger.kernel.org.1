@@ -1,162 +1,293 @@
-Return-Path: <netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +mbfICZhImq6VgEAu9opvQ
-	(envelope-from <netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:39:50 +0200
+	id b0/EHxpfImpFVgEAu9opvQ
+	(envelope-from <netdev+bounces-295632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:31:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52A064531E
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:39:49 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBE16452C8
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:31:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.microsoft.com header.s=default header.b=kCFlTesH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=MqihekrR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295632-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295632-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AACA300C925
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 05:39:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6A3853033F5C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 05:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36343BB10D;
-	Fri,  5 Jun 2026 05:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97AC2F6565;
+	Fri,  5 Jun 2026 05:31:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2142AD2C;
-	Fri,  5 Jun 2026 05:39:42 +0000 (UTC)
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7851C5F27
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 05:31:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780637983; cv=none; b=IEaYmcdiFovK/4ECa5/mccw/7RybzFRFWN0DyU0PrXyn6mzjS0Gi5SQaSFLz6g66BZzoIfxbp1ilDFIuuLJZ0cGIqAGvoCrmZ6hRoDXfjx4V+kLjXR9F6WAA54d6UIGP/0aqwsJYjJfzCadJmxsjoQxLcLkIqd/mwkBuNZhIG/c=
+	t=1780637462; cv=none; b=RvoQt7iEaCrx3/bkerXDuiPHHEnwXtKa/uuucAkAK+YLgkhDcM+GDeXknQl/3ZEjjs8soOdp1eR8cW31yWr3uV8yPuG9qGS2iMur1tFszqF0kGEHYi7ymk7kYnQbyTA4NZZIENgh/G0AALlStGymEiAKFNh3lXjk9r6vMapRC4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780637983; c=relaxed/simple;
-	bh=OtzFLoaL6YRibt5cWxU3Bh1ybqbe+mB6LqicVDYoSVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rr4pkLA6xuIPAYSFkcPHYDS6YDHUrOoQKWQfrxlK1kZRyudiCpNj1DKtR4id5QKQrCU64QMTg3dEE/hEwXDY388dfYRmKoLgG03MpduwYpYTqMnoI4B8ss+CYrKKaLG6H9iRct6d4OBSZ/KTwzinjo4B72wkyYiXCeRzWUhVzwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=kCFlTesH; arc=none smtp.client-ip=13.77.154.182
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id BB02520B7169; Thu,  4 Jun 2026 22:29:29 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BB02520B7169
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1780637369;
-	bh=qIO/sBp81IBMRVL//sPxD46ntAHHAdA/+qb5LsOMY8c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kCFlTesHtfd61rL4g6Pk2Gf9tPjaIQvHUm8+WvC9ONeLMpNzq74ueTfVx+or9v5vv
-	 i1BXiC6LmO5lem0eSeF2ac6gFBq4SoHHuxkTr/k7U+vLYWHs9daeBo9qR+YwUCTxqE
-	 ITX8nLq26F57iawXJOMbSFnOTQtZUFCFpRzqXi3k=
-Date: Thu, 4 Jun 2026 22:29:29 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	kotaranov@microsoft.com, horms@kernel.org,
-	dipayanroy@linux.microsoft.com, kees@kernel.org,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mana: Cache MANA_QUERY_LINK_CONFIG result
- to avoid repeated HWC queries
-Message-ID: <aiJeuU3DLKL7JcPN@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260528180757.1536640-1-ernis@linux.microsoft.com>
- <20260602132127.25fc27ee@kernel.org>
+	s=arc-20240116; t=1780637462; c=relaxed/simple;
+	bh=6KkI5MZZbDclc8igv7Jmkuhhc3G1Kn/GhoYh9WlzOFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Xw3GAJybbG3ErrW9Lgnhy+59Fc64tGzpRC5A7PK9eXlR6xJ2Q64avBL/ncPZIeUwSuF2+tdxGganwgwpLMP5oFEERNFvwIDA7lmwbShsZ5dP7Hb9Rp6wmjeuMp2xXK0+UqX6xDEX0EUwx0DLSomys8olGWqrkbo/ufyQmgckeog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqihekrR; arc=none smtp.client-ip=209.85.128.49
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490ace40f4bso17556675e9.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 22:31:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780637460; x=1781242260; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vuvdhqAuePBbJyQdMyyPcU8SDSteetKe1IJhuqarnPk=;
+        b=MqihekrRfuOfW+tty/TXvzHHBIvHlnPBGCae6Wz7T075FAfKXKQpZ+UOWZ7Z+Y54lF
+         RTe84Y+vlbk/HpOxclOUmMMvyfjgCA/l8LSgnGLLT6TrzUteFrplsOwCfGDnI7UybaNm
+         vSZSJrbwGJidcgzfW9yxmk+NKBc+awwEkGJbVq5eeriT0Y5BmEo4xXsZAZBmqlClj9JW
+         3JuPhFUEfpIIMAPhlT51FrTrLu8pbBH0M20M/W76CbLUxPe9bNXIDUU8iLg3FW5PDl1o
+         aj3K1Dsz/SUUiemvwH/4yIyuMOikb4Ta9GCs8w62TnpAXGgArRl0yRoLybD+NIciVL8C
+         N0Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780637460; x=1781242260;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vuvdhqAuePBbJyQdMyyPcU8SDSteetKe1IJhuqarnPk=;
+        b=gq+qXEXw798F4x0WXSYVTeH4zOHg/9Z6CtHYvJqtEiabClfEy1L0utrL2/d6jmgo/D
+         C3FxnnbvOrFAWhGGPZRkRE7u3ZBBYTLb/FnkyboI6ZbFXSNeyBwqNiJV/9p+OIwe5GXs
+         fICw5UzZbjKmGi6iQzFTqBCl6J2iGubQYYFa/w6kRuIVw/g7XeWJcNqNtHr4rmUZWIYZ
+         csdfj0vcieBOzr39JRTgW+o+E69Dn9pFgq6AXNK9AScy4S8VrbuznQsqtoY638d+sbgu
+         u8IMtb16Svo7QbEGBKdE06g1Z00dFOhbHodaM73uNUd1ayeAzXRu96SvVm/evtmL5oPV
+         onCw==
+X-Gm-Message-State: AOJu0YwCjZj3zO2Qgg4cinwQPmvW3NeqlVSTbuq3d4J/ESkIB5LCysvP
+	aFtd9Bwc/QgGpyPSgsni9aS2GqK20rWyNnxKCuHHHoyq6QIkcwo6ZWnmh1IwjS6y
+X-Gm-Gg: Acq92OF5iQZYy+E8osE5QZfj8t/ETTqE1qAdVrteGgwq4HFBYZe0EUs/g1/Xp6iGNNT
+	5HcereGEO9PFoTmGQRinG5pRCSq21ODLG3e38F0ZDn3sMpQWOCTmB7epWrsnaUbudeg9hLX2tei
+	aI9joI59bpDdhW4yQdgAnX+kMTCwy5EZVvtu0t+jHvYi6QskfLzb0Jnb/Z28FGXQJwtkmVWUmjt
+	nTiKT4fW4wrSOi2UBxmQZB1UQOgZ9WHiu/57Lc1WiVj7qIJgQBpdFbRiqJNblIz4aybAicjAYFT
+	NFjL9lzGnVGtAX6Aa/ajic8qKRHSD5h2DzKhuDuRd9ysg/OFxA0DDU8sBLE+hujU86N7y11xXRz
+	px5sxzB9/hTW28pc9DdePL9VXAftF010KU3PC8x0rOJEz6Cc/GMGUFkBeQKwk3+ylEGNjO4h4Gd
+	4zixnzfE4tI0FJ2jHsPWJcmUl6D192e6sM2PcQc11eR7q8dQ5pPmr4FS02COQI4InbcQsdP7O7C
+	3H+BjoZJ2hwObdUuJhZHFqsTJUi
+X-Received: by 2002:a05:600c:4e09:b0:488:9bf8:7f17 with SMTP id 5b1f17b1804b1-490c25acd18mr28114225e9.14.1780637459481;
+        Thu, 04 Jun 2026 22:30:59 -0700 (PDT)
+Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc413541sm128414495e9.14.2026.06.04.22.30.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2026 22:30:59 -0700 (PDT)
+From: Petr Wozniak <petr.wozniak@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-phy@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	maxime.chevallier@bootlin.com,
+	bjorn@mork.no,
+	olek2@wp.pl,
+	Petr Wozniak <petr.wozniak@gmail.com>
+Subject: [PATCH v2 net-next] net: phy: mdio-i2c: defer RollBall bridge probe to PHY discovery
+Date: Fri,  5 Jun 2026 07:30:56 +0200
+Message-ID: <20260605053056.1977-1-petr.wozniak@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260604181207.17468-1-petr.wozniak@gmail.com>
+References: <20260604181207.17468-1-petr.wozniak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260602132127.25fc27ee@kernel.org>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295634-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295632-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-phy@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:maxime.chevallier@bootlin.com,m:bjorn@mork.no,m:olek2@wp.pl,m:petr.wozniak@gmail.com,m:petrwozniak@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,lists.infradead.org,vger.kernel.org,bootlin.com,mork.no,wp.pl];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:from_mime,linux.microsoft.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,wp.pl:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D52A064531E
+X-Rspamd-Queue-Id: 0FBE16452C8
 
-On Tue, Jun 02, 2026 at 01:21:27PM -0700, Jakub Kicinski wrote:
-> On Thu, 28 May 2026 11:07:51 -0700 Erni Sri Satya Vennela wrote:
-> > mana_query_link_cfg() sends an HWC command to firmware on every call,
-> > but the link speed and QoS values it returns only change when the
-> > driver explicitly calls mana_set_bw_clamp(). This function is called
-> > not only by userspace via ethtool get_link_ksettings, but also
-> > periodically by hv_netvsc through netvsc_get_link_ksettings and by
-> > the sysfs speed_show attribute via dev_attr_show, resulting in
-> > unnecessary HWC traffic every few minutes.
-> 
-> mana is ops-locked, right? Because you support net shapers
-> 
-> Could you instead take the netdev_lock() in the work?
-> It's already held around the user space originated calls.
+commit 8fe125892f40 ("net: phy: sfp: probe for RollBall I2C-to-MDIO
+bridge in mdio-i2c") introduced a regression: the RollBall I2C-to-MDIO
+bridge is not yet ready to respond to CMD_READ/CMD_DONE cycles when
+sfp_sm_add_mdio_bus() runs in SFP_S_INIT.  The 200 ms probe times out,
+i2c_mii_probe_rollball() returns -ENODEV, and sfp_sm_add_mdio_bus()
+sets mdio_protocol = MDIO_I2C_NONE.  By the time sfp_sm_probe_for_phy()
+runs (up to ~17 s later on affected hardware), the bridge is fully
+initialized — but PHY probing is skipped because the protocol has
+already been changed to NONE.
 
-Hi Jakub,
+This affects both modules inserted before boot and hotplugged modules on
+hardware where bridge initialization exceeds the 200 ms probe window
+(confirmed: FLYPRO SFP-10GT-CS-30M with Aquantia AQR113C, hotplugged).
 
-I tried two netdev_lock-based variants. 
+Move the probe from i2c_mii_init_rollball() — called at bus-creation
+time — to sfp_sm_probe_for_phy() in sfp.c, where it runs after the SFP
+state machine's module initialization delays.  Export the probe function
+as mdio_i2c_probe_rollball() so sfp.c can call it.
 
-mana_query_link_cfg() has four callers:
+For RTL8261BE-based modules: the probe correctly returns -ENODEV at PHY
+discovery time, causing sfp_sm_probe_for_phy() to destroy the MDIO bus
+and set MDIO_I2C_NONE — eliminating the 5+ minute PHY probe retry loop.
 
-1 ethtool ioctl/netlink			- has RTNL	- has netdev->lock
-2 sysfs speed_show/duplex_show		- has RTNL	- no netdev->lock
-3 netvsc_get_link_ksettings VF forward	- has RTNL	- no netdev->lock
-4 mana_shaper_set			- no RTNL	- has netdev->lock
+For genuine RollBall modules (e.g. FLYPRO SFP-10GT-CS-30M with Aquantia
+AQR113C): the probe now runs after initialization is complete and
+correctly returns 0 — PHY detection proceeds normally.
 
-No existing lock covers all four.
+Reported-by: Aleksander Bajkowski <olek2@wp.pl>
+Fixes: 8fe125892f40 ("net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c")
+Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
+---
+Changes in v2:
+ - Generalize scope: regression affects both boot-inserted and hotplugged
+   modules on hardware where bridge init exceeds 200 ms; Aleksander
+   Bajkowski confirmed FLYPRO SFP-10GT-CS-30M / AQR113C broken even
+   when hotplugged
+ - Correct state machine description: probe runs in SFP_S_INIT (which
+   follows SFP_S_WAIT), not "before initialization delays" (Jan Hoffmann)
+ - No code changes from v1
 
-A. netdev_assert_locked() in the mana_query_link_cfg() :
-Lockdep WARN on every sysfs cat /sys/class/net/eth*/speed and every
-periodic netvsc_get_link_ksettings() poll since callers 2 and 3 hold
-RTNL only.
-A slow firmware reply on callers 2/3 can land after mana_shaper_set
-(caller 4) has changed the rate and invalidated the cache,
-publishing a stale apc->speed / apc->max_speed as "cached valid". 
-Because the value is cached, the staleness then persists until the next
-shaper change
+ drivers/net/mdio/mdio-i2c.c   | 18 ++++--------------
+ drivers/net/phy/sfp.c         | 18 ++++++++++++------
+ include/linux/mdio/mdio-i2c.h |  1 +
+ 3 files changed, 17 insertions(+), 20 deletions(-)
 
-B. ASSERT_RTNL() + netdev_lock_ops() inside mana_query_link_cfg():
-Self-deadlocks on #1 (__dev_ethtool already holds it) and #4
-(mana_shaper_set already holds it and calls mana_query_link_cfg() before
-the clamp).
-ASSERT_RTNL() also WARNs from #4 — shaper genl ops don't take RTNL.
+diff --git a/drivers/net/mdio/mdio-i2c.c b/drivers/net/mdio/mdio-i2c.c
+--- a/drivers/net/mdio/mdio-i2c.c
++++ b/drivers/net/mdio/mdio-i2c.c
+@@ -352,7 +352,7 @@
+ 	return 0;
+ }
 
-Eg. Deadlock scenario:
-__dev_ethtool()
-  netdev_lock_ops(dev)              ← held
-    ops->get_link_ksettings()
-      mana_get_link_ksettings()
-        mana_query_link_cfg()
-          netdev_lock_ops(ndev)     ← DEADLOCK
+-static int i2c_mii_probe_rollball(struct i2c_adapter *i2c)
++int mdio_i2c_probe_rollball(struct i2c_adapter *i2c)
+ {
+ 	u8 data_buf[] = { ROLLBALL_DATA_ADDR, 0x01, 0x00, 0x00 };
+ 	u8 cmd_buf[]  = { ROLLBALL_CMD_ADDR, ROLLBALL_CMD_READ };
+@@ -397,9 +397,11 @@
 
-Can we consider private link_cfg_mutex which is orthogonal to RTNL and
-netdev->lock and covers all four callers?
+ 	return -ENODEV;
+ }
++EXPORT_SYMBOL_GPL(mdio_i2c_probe_rollball);
 
-Thanks,
-Vennela
+ static int i2c_mii_init_rollball(struct i2c_adapter *i2c)
+ {
++	/* Send the RollBall unlock password; bridge presence is verified
++	 * later, in sfp_sm_probe_for_phy(), after module initialization. */
+ 	struct i2c_msg msg;
+ 	u8 pw[5];
+ 	int ret;
+@@ -419,7 +421,7 @@
+ 	if (ret != 1)
+ 		return -EIO;
+
+-	return i2c_mii_probe_rollball(i2c);
++	return 0;
+ }
+
+ struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
+@@ -444,12 +446,8 @@
+ 	case MDIO_I2C_ROLLBALL:
+ 		ret = i2c_mii_init_rollball(i2c);
+ 		if (ret < 0) {
+-			if (ret != -ENODEV)
+-				dev_err(parent,
+-					"Cannot initialize RollBall MDIO I2C protocol: %d\n",
+-					ret);
+-			/* -ENODEV propagates to caller: no bridge present,
+-			 * PHY probing should be skipped for this module. */
++			dev_err(parent,
++				"Cannot initialize RollBall MDIO I2C protocol: %d\n",
++				ret);
+ 			mdiobus_free(mii);
+ 			return ERR_PTR(ret);
+ 		}
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -2028,17 +2028,8 @@ static int sfp_sm_add_mdio_bus(struct sfp *sfp)
+ 	dev_info(sfp->dev, "probing phy device through the [%s] protocol\n",
+ 		 mdio_i2c_proto_type(sfp->mdio_protocol));
+
+-	int ret;
+-
+ 	if (sfp->mdio_protocol == MDIO_I2C_NONE)
+ 		return 0;
+
+-	ret = sfp_i2c_mdiobus_create(sfp);
+-	if (ret == -ENODEV) {
+-		/* Probe confirmed no bridge present; skip PHY discovery. */
+-		sfp->mdio_protocol = MDIO_I2C_NONE;
+-		return 0;
+-	}
+-	return ret;
++	return sfp_i2c_mdiobus_create(sfp);
+ }
+
+ /* Probe a SFP for a PHY device if the module supports copper - the PHY
+@@ -2058,8 +2049,23 @@ static int sfp_sm_probe_for_phy(struct sfp *sfp)
+
+ 	case MDIO_I2C_ROLLBALL:
+-		err = sfp_sm_probe_phy(sfp, SFP_PHY_ADDR_ROLLBALL, true);
++		/* Probe here, after module initialization delays, so that
++		 * genuine RollBall bridges have had time to start up.
++		 * Modules without a bridge (e.g. RTL8261BE) return -ENODEV. */
++		err = mdio_i2c_probe_rollball(sfp->i2c);
++		if (err == -ENODEV) {
++			sfp_i2c_mdiobus_destroy(sfp);
++			sfp->mdio_protocol = MDIO_I2C_NONE;
++			break;
++		}
++		if (!err)
++			err = sfp_sm_probe_phy(sfp, SFP_PHY_ADDR_ROLLBALL, true);
+ 		break;
+ 	}
+diff --git a/include/linux/mdio/mdio-i2c.h b/include/linux/mdio/mdio-i2c.h
+--- a/include/linux/mdio/mdio-i2c.h
++++ b/include/linux/mdio/mdio-i2c.h
+@@ -33,5 +33,6 @@
+
+ struct mii_bus *mdio_i2c_alloc(struct device *parent, struct i2c_adapter *i2c,
+ 			       enum mdio_i2c_proto protocol);
++int mdio_i2c_probe_rollball(struct i2c_adapter *i2c);
+
+ #endif
+--
+2.51.0
 
