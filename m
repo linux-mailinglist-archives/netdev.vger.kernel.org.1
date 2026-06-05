@@ -1,761 +1,300 @@
-Return-Path: <netdev+bounces-295612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ObecEk1GImpnUgEAu9opvQ
-	(envelope-from <netdev+bounces-295612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:45:17 +0200
+	id 4pXGOqVHImqJUgEAu9opvQ
+	(envelope-from <netdev+bounces-295613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:51:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CB2644EF2
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:45:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76DAB644F25
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:51:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=qa8bfypT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295612-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295612-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=YB0hkUnJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295613-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295613-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 01EA73018407
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 03:45:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E80B9301E54C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 03:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4995931ED93;
-	Fri,  5 Jun 2026 03:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4F93F20EE;
+	Fri,  5 Jun 2026 03:50:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1990E3F54C8
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 03:45:11 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780631114; cv=pass; b=miRO1sbDoXnC378q46gUwGIPGLxyEMop8aQ9aNCORjHAWbD1n1CSNAojHLXSuMD+UxuBQjSq2pDMuJt1Fs6Mjdv/cz9zuI6886OqXmsGSXaO9expL/FgHbWDg62IfSnIq6o4fH5wZ99Y/giq89WLOacd9CEh3OAho/wSO8eU/gE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780631114; c=relaxed/simple;
-	bh=mGqFACtGrSVINwFpO8ywF5lUfVtL0d5zetuzyjG/2Gw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ofAtHnW+jNaNEtz59hXczhYoU6ToejBWlW86d7jV8Mtn6ddZwZC2/+BmxmSGOPn8LgofemB/9c5XGXZ0mRamsThd7we9ZgsGCdiiS5IuREtLopSi0KQN36nDz+mu0m1E3OVxPAfpLIboIKlb+LWOlefdPApHGSynwUQru7oN0uA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qa8bfypT; arc=pass smtp.client-ip=209.85.214.177
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2bf22c18ad3so73245ad.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jun 2026 20:45:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780631111; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LY9nf+VkO7VwHkv+pWhQHUpyn64o5Srf+fvPYosWI/mFEKSCVgah8VfQBtkGqp90QG
-         xPyKNuM14dynbLdEUH6h3G8S7kI5CX4MISUVLarq55DzhHqH2Os9EYbdIGQ8SFUlt8OR
-         Z+YpXvNGJW9cxxDZtkkMcxE5LbiIMhOf0fs94X8jFxvWzTczZWKUpqEgSzILQdK/HN39
-         a8Ag7p/M/VqWoirSgH6SZOofBKbmHobRiacyzy4HBjK/Okuizmngz2TTuXmcARveUpI5
-         TyFNfj04lAA8nIaPW0JsYMf4HG8eUJ711x4s9YvqRGKAOYjbY4ag8BdejR+u1rJdh83R
-         JCBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eEbenGZPReLJ9DhbGUrqCibVr6fOdJSY9PicD1Cn1dc=;
-        fh=Ef9lcZO4ZwrztREP42xReRHLmD9Hg2GQuFQd3HW9yBk=;
-        b=JU95ahavbkqjLgWbIATFtDtDqnXa8t8NCCoXhYxs0ffNjT9qHcjyc7eTfQzbcisO4n
-         rWQbEuQrPjjJ12aQ4NjdeYVoeKtWLxQ8dPOUfW5UPlgCGiV7CXHAvDLOYGt8MISukwrf
-         iVAsRZQHpLvHqjus9fN4q4+mk1boc4uNTFocsitWFaTOw0VzYLcbVu9CQk6/ZYVcdq8h
-         eWBcWows3UApd1SO4ZTE08f/fRfBwKjtcunlNwKqEwN8D5VZTkO4oXrG5hIZ7ZBKwxnr
-         ECXhCuzahIGcDVFq3JaXmNSsMmRYK8d/Arm/KdXjzJP42ZPupVQm0L/jM87HY+UhhiCr
-         HZiQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780631111; x=1781235911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eEbenGZPReLJ9DhbGUrqCibVr6fOdJSY9PicD1Cn1dc=;
-        b=qa8bfypTvgSr+vdwXK3WVY45UJgBgHzVXDtE88+cvsy+9tAXIe3nH/gxXANt1CkKKJ
-         NXOInGEj+2xMPhmG1eroeulOdi1SACHelfjUop5Wci9q/Q+P6AgO9wRbZuPG9HdZ090i
-         Q0TYwKbGmfbwkk4bxjMegt7uUeuy45UO3ULC7xYfuESX+it/de8AyIacJdSAnMzFfKuE
-         d8g2W0BiVWmq7K2FCRBPqA0vyha4Mw76tZuvbIBW6uMBGxMoLup4mC9FKNMELZ4m0NoD
-         Z4BV63+Nu8A3RyyphbU4bs8nBLfeOCvqcBx4mLBvzJbs34aOl9IL7ExXxHRqXdbMgl/M
-         /TmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780631111; x=1781235911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eEbenGZPReLJ9DhbGUrqCibVr6fOdJSY9PicD1Cn1dc=;
-        b=Bz8s2hVOj8XveWrapdQz+S67yjpTMKKK4d5XooGkkxQn9nTYc9UYMkB6eDPOLkSFgI
-         J0GnkLeE+H3eSnIqtdqQwXARCnkJw6j/owtJI0hDUus8/nZmtnyLSf/tE1oE2h8UCtGu
-         E5xJF+O5mkKjhjLlBvDtOuqvtCUD1ikMGu9hCi0rSx94uCDLd0BAMvj5vMXXJaH0rY33
-         gQH1UVRhGxNBHUiq5ACgx8Yad8Cm4gStDceLaAJDfgtZhCoxDxDUjxCeX1bEoKg7OFlu
-         OO5x17mPImYl7l6qCnnv7Fjs4pHX6oirZTwJIH6wmxVZ7ass2Y435CTBERTEnOacfq36
-         VZGA==
-X-Gm-Message-State: AOJu0YyNeLS6Y4Z+rO+NzXBsMoPKjLAczy+rup+OC3oPX+Rzv9CNjfYu
-	DoQw7yehl0kEMeLCPP+wdMkqnSPKODQLXJIfZrP3SKs3hBHlStCRP8qHDPRHcOGfSsXoLYRWfcJ
-	1RNPBuRA0Pu7R3jZOjW/0zd3ndym/ApjoWcT9t2D1+hSZS5i6lZL/EbIwlpKKqg==
-X-Gm-Gg: Acq92OGdRcLU5nfDSiXtlEGtmbGk2w9q1+r52zvN/L59Ovuaem2dsriP/9FKMTGe1eI
-	m+u+X92AQO+eqpqVgcgtwqm4yt/4pc5IaQv9zE7KAf9Ou91y7m8jNxBfGoK+vcrNhV/XzFSBxPF
-	576VfO+XE0zJj0Wr89xRaA2EaONyJzyqUKHPz+VBB/33KiSaUqkgAneCqzRKDxxo10i7+ZX0YN5
-	Cswba2+q7rI5U10ShDa75l4GQnueUdXYI4xLeZnduVizNtPjLHAfK/SqnSRbtpAXwI2LmTZbkyu
-	OL5xBKvg5HdYRSgZl3TiPNkrwi77xb8+N9FiJI5H8R40Qr/do60/NY/AeWSo1cwvIuiKU++sNcW
-	hOnMN97mmyr/a6vma+nw=
-X-Received: by 2002:a17:902:c948:b0:2bd:508b:f3ab with SMTP id
- d9443c01a7336-2c1eb5075ddmr661945ad.15.1780631110621; Thu, 04 Jun 2026
- 20:45:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C102637756F;
+	Fri,  5 Jun 2026 03:50:57 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780631459; cv=none; b=AGixtVjHCmuPnY9RFdiP7DA9CEXxrZm0eErMU1hrrRCjTBjaXosuubYzdvUIrgksROnWqFUwkTGMHXuSk4IWN4slMx1Cnmer00iUrWv16qCLYVfPrx/t+anXY47dyfsnw5B9BZi+Oho6R+dlll/YjmAbHsDgdAZGAvFPevXeuX8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780631459; c=relaxed/simple;
+	bh=/gYjDDnZRR1Vd0bQ9tglUxNvtcLGHf1+DH9L0c64xvc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eClKs33pa/zc//S4ce+f4wVolpXgq3WwKNsOVVGAXp7uF52lXdonWYkTuBcyL2wdCn/85NpBAdWsxuMIrVlSxmpfR606zAtY6PWmAG/MMeuF+FMGj6N0CCQX1xhxLONFyHLpmF+gFIqsMroujVUmHm5vzGHCWYpHSyhpYCDpb6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YB0hkUnJ; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 654NJb8P3656238;
+	Thu, 4 Jun 2026 20:50:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=WGhBn0re31fLd4RFFPlltu3
+	Z9cx7X0PPG+2ZxQ+uAHs=; b=YB0hkUnJKYwuEEBapw0pK+JfAf9mUAzP//rkB0n
+	lkFguB2dRS3jO1sGSSX+RzS8pBUTR6lujPexmTT/0JWgBb7fV8qxiGkw2hTz0U9a
+	xrz6gwDIqdMNtemvRO+0Pcv+YRNed0WLPY8PUnA7GjhTNuJn7b8nAIbqK9lM3Cvd
+	CEkMzB64acwpwy+G5NlPHExjImh7N+c71vuJsckk5yyDY+awfgVkOGzhcIZQIQHx
+	FmUm74dKiY90zRWP/0k5C8IMA2G+R+1mhpnWuS4YvA6JVEbfosa6irUC4tns+NKH
+	iRlfEUbPFRJD8kNN6QAI+WT/HJT5Rsi7czry1zK2VmombEg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ejgsp7v3g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Jun 2026 20:50:46 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 4 Jun 2026 20:50:45 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 4 Jun 2026 20:50:45 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 0CAA63F707A;
+	Thu,  4 Jun 2026 20:50:41 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH v19 net-next 0/9] octeontx2-af: npc: Enhancements.
+Date: Fri, 5 Jun 2026 09:20:20 +0530
+Message-ID: <20260605035030.3195141-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260602235900.3050782-1-hramamurthy@google.com> <20260602235900.3050782-6-hramamurthy@google.com>
-In-Reply-To: <20260602235900.3050782-6-hramamurthy@google.com>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Thu, 4 Jun 2026 20:44:58 -0700
-X-Gm-Features: AVHnY4J8S28WHbP5CLUzYI5Qe8QMIovQG4XNwGosNLc-2fJQzqpl6dUv5fQ5A_Y
-Message-ID: <CAEAWyHcH8zfquuRh-U0_2U8CEUz_kpNFLqyA-N1mN=u4VLNFRg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 05/15] gve: add struct gve_device_info to hold
- device properties
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	sdf@fomichev.me, willemb@google.com, jordanrhee@google.com, 
-	jfraker@google.com, nktgrg@google.com, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 2DZXtSRqLuRJACzXgxSI1XvmIMxBuleJ
+X-Proofpoint-GUID: 2DZXtSRqLuRJACzXgxSI1XvmIMxBuleJ
+X-Authority-Analysis: v=2.4 cv=FJkrAeos c=1 sm=1 tr=0 ts=6a224796 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=QXcCYyLzdtTjyudCfB6f:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=1rdZWFfAsYpIarNArpIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDAzMyBTYWx0ZWRfX+O/bQqnDsPFt
+ fnNOvI25sx+YxWONVKSs1lY5QiBF2604zVP6KipzKkkkvBFkjwu5GfQVYgkV4glzzrCEwvCWC5n
+ F+gWU5fuzGW2PIEUHr5r+zeam/dU8VmsjttqISxNVSz+IOrx/Eobf3sxG2+PmqfuWbFdHEk6SqB
+ oGI1OHhbHtOV/83ao+HTCdlanRSeVYZGVD38IZ/Bo7RgwDf6GEfjEv0x+55ZgEhgFW3HPn9+fuw
+ mbFoHKOL8C0OGx6MyPz8i4smyG2aFMNJgKHE/lf46oqcK1KkB9HseiOV2GGW5AMCvto8a7vX6Ku
+ ZnHj4+TN0T4IRUKDWOKLJW1DovQLFEbnJjhy195V7tYSLpLGEE3BMREvqinz6SpDF1m9V8zFNwk
+ Q6yCzCAb7GbTvPKDHeVf5+8TEF8Jm5gUTMrd1mUi2ZqnfpZECAIUJmVXCLTwdnWl/WvRg8kqp8M
+ 1Q9hRrKIX18acoZ0ESA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-04_07,2026-05-28_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295613-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295612-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:joshwash@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:willemb@google.com,m:jordanrhee@google.com,m:jfraker@google.com,m:nktgrg@google.com,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:mid,marvell.com:dkim,marvell.com:from_mime,marvell.com:email];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A5CB2644EF2
+X-Rspamd-Queue-Id: 76DAB644F25
 
-On Tue, Jun 2, 2026 at 4:59=E2=80=AFPM Harshitha Ramamurthy
-<hramamurthy@google.com> wrote:
->
-> In the current AdminQ mode, device properties are written into
-> struct gve_device_descriptor that is allocated in shared memory
-> between the driver and device. In the upcoming MailboxQ mode,
-> these properties will be returned in the response of a mailbox
-> message. Hence, add struct gve_device_info as the structure that
-> holds all the properties that are negotiated with the device in
-> either mode.
->
-> Change the AdminQ mode method gve_adminq_describe_device()
-> and the functions it calls to fill up device information
-> into this newly introduced struct gve_device_info. Move a
-> few helper functions and code that set device properties
-> in the priv structure into gve_init_priv(). So now
-> gve_init_priv() calls/does the following:
->
-> - gve_set_mtu()
-> - gve_set_mac()
-> - gve_set_queue_properties()
-> - gve_set_buf_sizes()
-> - set flow steering and RSS properties
-> - set other priv properties
->
-> When MailboxQ support is added, device information will be filled
-> into the same structure and the same gve_init_priv() path would be
-> used to set device properties to ensure common code reusage.
->
-> These changes are refactors only, no functional change.
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Reviewed-by: Jordan Rhee <jordanrhee@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> ---
->  drivers/net/ethernet/google/gve/gve.h        |  29 +++++
->  drivers/net/ethernet/google/gve/gve_adminq.c | 113 +++++++++++--------
->  drivers/net/ethernet/google/gve/gve_adminq.h |   6 -
->  drivers/net/ethernet/google/gve/gve_main.c   | 101 ++++++++++++-----
->  4 files changed, 169 insertions(+), 80 deletions(-)
->
-> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet=
-/google/gve/gve.h
-> index 645175a5dfae..086a315f42c1 100644
-> --- a/drivers/net/ethernet/google/gve/gve.h
-> +++ b/drivers/net/ethernet/google/gve/gve.h
-> @@ -796,6 +796,34 @@ struct gve_ptp {
->         struct gve_priv *priv;
->  };
->
-> +struct gve_device_info {
-> +       enum gve_queue_format queue_format;
-> +       u16 default_tx_queues;
-> +       u16 default_rx_queues;
-> +       u16 max_tx_queues;
-> +       u16 max_rx_queues;
-> +       u16 default_tx_ring_size;
-> +       u16 default_rx_ring_size;
-> +       u16 max_tx_ring_size;
-> +       u16 max_rx_ring_size;
-> +       u16 min_tx_ring_size;
-> +       u16 min_rx_ring_size;
-> +       u16 max_mtu;
-> +       u8 mac[ETH_ALEN];
-> +       u16 max_rx_buffer_size;
-> +       u16 header_buf_size;
-> +       u32 max_flow_rules;
-> +       u16 rss_key_size;
-> +       u16 rss_lut_size;
-> +       u16 tx_pages_per_qpl;
-> +       u16 num_event_counters;
-> +       u64 max_registered_pages;
-> +       bool default_min_ring_size;
-> +       bool nic_timestamp_supported;
-> +       bool modify_ring_size_enabled;
-> +       bool cache_rss_config;
-> +};
-> +
->  struct gve_priv {
->         struct net_device *dev;
->         struct gve_tx_ring *tx; /* array of tx_cfg.num_queues */
-> @@ -928,6 +956,7 @@ struct gve_priv {
->         struct gve_nic_ts_report *nic_ts_report;
->         dma_addr_t nic_ts_report_bus;
->         u64 last_sync_nic_counter; /* Clock counter from last NIC TS repo=
-rt */
-> +       struct gve_device_info device_info;
->  };
->
->  enum gve_service_task_flags_bit {
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/e=
-thernet/google/gve/gve_adminq.c
-> index 77203184efbd..06db2ccd0b89 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -70,7 +70,7 @@ void gve_parse_device_option(struct gve_priv *priv,
->
->                 dev_info(&priv->pdev->dev,
->                          "Gqi raw addressing device option enabled.\n");
-> -               priv->queue_format =3D GVE_GQI_RDA_FORMAT;
-> +               priv->device_info.queue_format =3D GVE_GQI_RDA_FORMAT;
->                 break;
->         case GVE_DEV_OPT_ID_GQI_RDA:
->                 if (option_length < sizeof(**dev_op_gqi_rda) ||
-> @@ -190,7 +190,7 @@ void gve_parse_device_option(struct gve_priv *priv,
->
->                 /* device has not provided min ring size */
->                 if (option_length =3D=3D GVE_DEVICE_OPTION_NO_MIN_RING_SI=
-ZE)
-> -                       priv->default_min_ring_size =3D true;
-> +                       priv->device_info.default_min_ring_size =3D true;
->                 break;
->         case GVE_DEV_OPT_ID_FLOW_STEERING:
->                 if (option_length < sizeof(**dev_op_flow_steering) ||
-> @@ -922,10 +922,13 @@ int gve_adminq_destroy_rx_queues(struct gve_priv *p=
-riv, u32 num_queues)
->
->  static void gve_set_default_rss_sizes(struct gve_priv *priv)
->  {
-> -       if (!gve_is_gqi(priv)) {
-> -               priv->rss_key_size =3D GVE_RSS_KEY_SIZE;
-> -               priv->rss_lut_size =3D GVE_RSS_INDIR_SIZE;
-> -               priv->cache_rss_config =3D true;
-> +       struct gve_device_info *device_info =3D &priv->device_info;
-> +
-> +       if (device_info->queue_format =3D=3D GVE_DQO_RDA_FORMAT ||
-> +           device_info->queue_format =3D=3D GVE_DQO_QPL_FORMAT) {
-> +               device_info->rss_key_size =3D GVE_RSS_KEY_SIZE;
-> +               device_info->rss_lut_size =3D GVE_RSS_INDIR_SIZE;
-> +               device_info->cache_rss_config =3D true;
->         }
->  }
->
-> @@ -946,77 +949,105 @@ static void gve_enable_supported_features(struct g=
-ve_priv *priv,
->                                           const struct gve_device_option_=
-modify_ring
->                                           *dev_op_modify_ring)
->  {
-> +       struct gve_device_info *info =3D &priv->device_info;
-> +
->         /* Before control reaches this point, the page-size-capped max MT=
-U from
->          * the gve_device_descriptor field has already been stored in
-> -        * priv->dev->max_mtu. We overwrite it with the true max MTU belo=
-w.
-> +        * device_info->max_mtu. We overwrite it with the true max MTU be=
-low.
->          */
->         if (dev_op_jumbo_frames &&
->             (supported_features_mask & GVE_SUP_JUMBO_FRAMES_MASK)) {
->                 dev_info(&priv->pdev->dev,
->                          "JUMBO FRAMES device option enabled.\n");
-> -               priv->dev->max_mtu =3D be16_to_cpu(dev_op_jumbo_frames->m=
-ax_mtu);
-> +               info->max_mtu =3D be16_to_cpu(dev_op_jumbo_frames->max_mt=
-u);
->         }
->
->         if (dev_op_buffer_sizes &&
->             (supported_features_mask & GVE_SUP_BUFFER_SIZES_MASK)) {
-> -               priv->max_rx_buffer_size =3D
-> +               info->max_rx_buffer_size =3D
->                         be16_to_cpu(dev_op_buffer_sizes->packet_buffer_si=
-ze);
-> -               priv->header_buf_size =3D
-> +               info->header_buf_size =3D
->                         be16_to_cpu(dev_op_buffer_sizes->header_buffer_si=
-ze);
->                 dev_info(&priv->pdev->dev,
->                          "BUFFER SIZES device option enabled with max_rx_=
-buffer_size of %u, header_buf_size of %u.\n",
-> -                        priv->max_rx_buffer_size, priv->header_buf_size)=
-;
-> -               if (gve_is_dqo(priv) &&
-> -                   priv->max_rx_buffer_size > GVE_DEFAULT_RX_BUFFER_SIZE=
-)
-> -                       priv->rx_cfg.packet_buffer_size =3D
-> -                               priv->max_rx_buffer_size;
-> +                        info->max_rx_buffer_size, info->header_buf_size)=
-;
->         }
->
->         /* Read and store ring size ranges given by device */
->         if (dev_op_modify_ring &&
->             (supported_features_mask & GVE_SUP_MODIFY_RING_MASK)) {
-> -               priv->modify_ring_size_enabled =3D true;
-> -               priv->max_rx_desc_cnt =3D
-> +               info->modify_ring_size_enabled =3D true;
-> +               info->max_rx_ring_size =3D
->                         be16_to_cpu(dev_op_modify_ring->max_rx_ring_size)=
-;
-> -               priv->max_tx_desc_cnt =3D
-> +               info->max_tx_ring_size =3D
->                         be16_to_cpu(dev_op_modify_ring->max_tx_ring_size)=
-;
->                 if (priv->default_min_ring_size) {
+This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
+debuggability, allocation policy, default-rule lifetime, optional KPU
+profiles from firmware files, X2/X4 MCAM keyword handling in flows and
+defaults, and dynamic CN20K NPC private state), adds a devlink mechanism
+for multi-value parameters, and moves devlink_nl_param_fill() temporaries
+to the heap so stack usage stays reasonable once union devlink_param_value
+grows (patch 3).
 
-Sashiko's report:
+Patch 1 enforces a single RVU admin-function PCI device per system: there
+is only one AF; rvu_probe() rejects any additional bind with -EBUSY, logs a
+warning, and matches the hardware model so automated reviewers and tooling
+can rely on exactly one bound AF instance.
 
-"Does this code still read the correct boolean?
-Since gve_parse_device_option() was updated to set
-priv->device_info.default_min_ring_size, but this check still looks
-at the un-refactored priv->default_min_ring_size (which remains false),
-won't we unconditionally enter the else block?"
+Patch 2 improves CN20K MCAM visibility in debugfs: mcam_layout marks
+enabled entries, dstats reports per-entry hit deltas (baseline updated in
+software after each read; hardware counters are not cleared), and mismatch
+lists enabled entries without a PF mapping.
 
-Correct, this needs to now check for info->default_min_ring_size. Will
-fix in v3.
+Patch 3 allocates the per-configuration-mode union devlink_param_value
+buffers and struct devlink_param_gset_ctx used by devlink_nl_param_fill()
+with kcalloc()/kzalloc_obj() and funnels failures through a single cleanup
+path so the netlink reply path stays safe as the union grows.
 
->                         /* If device hasn't provided minimums, use defaul=
-t minimums */
-> -                       priv->min_tx_desc_cnt =3D GVE_DEFAULT_MIN_TX_RING=
-_SIZE;
-> -                       priv->min_rx_desc_cnt =3D GVE_DEFAULT_MIN_RX_RING=
-_SIZE;
-> +                       info->min_tx_ring_size =3D GVE_DEFAULT_MIN_TX_RIN=
-G_SIZE;
-> +                       info->min_rx_ring_size =3D GVE_DEFAULT_MIN_RX_RIN=
-G_SIZE;
->                 } else {
-> -                       priv->min_rx_desc_cnt =3D be16_to_cpu(dev_op_modi=
-fy_ring->min_rx_ring_size);
-> -                       priv->min_tx_desc_cnt =3D be16_to_cpu(dev_op_modi=
-fy_ring->min_tx_ring_size);
-> +                       info->min_rx_ring_size =3D
-> +                               be16_to_cpu(dev_op_modify_ring->min_rx_ri=
-ng_size);
-> +                       info->min_tx_ring_size =3D
-> +                               be16_to_cpu(dev_op_modify_ring->min_tx_ri=
-ng_size);
->                 }
->         }
->
->         if (dev_op_flow_steering &&
->             (supported_features_mask & GVE_SUP_FLOW_STEERING_MASK)) {
->                 if (dev_op_flow_steering->max_flow_rules) {
-> -                       priv->max_flow_rules =3D
-> +                       info->max_flow_rules =3D
->                                 be32_to_cpu(dev_op_flow_steering->max_flo=
-w_rules);
-> -                       priv->dev->hw_features |=3D NETIF_F_NTUPLE;
->                         dev_info(&priv->pdev->dev,
->                                  "FLOW STEERING device option enabled wit=
-h max rule limit of %u.\n",
-> -                                priv->max_flow_rules);
-> +                                info->max_flow_rules);
->                 }
->         }
->
->         if (dev_op_rss_config &&
->             (supported_features_mask & GVE_SUP_RSS_CONFIG_MASK)) {
-> -               priv->rss_key_size =3D
-> +               info->rss_key_size =3D
->                         be16_to_cpu(dev_op_rss_config->hash_key_size);
-> -               priv->rss_lut_size =3D
-> +               info->rss_lut_size =3D
->                         be16_to_cpu(dev_op_rss_config->hash_lut_size);
-> -               priv->cache_rss_config =3D false;
-> +               info->cache_rss_config =3D false;
->                 dev_dbg(&priv->pdev->dev,
->                         "RSS device option enabled with key size of %u, l=
-ut size of %u.\n",
-> -                       priv->rss_key_size, priv->rss_lut_size);
-> +                       info->rss_key_size, info->rss_lut_size);
->         }
->
->         if (dev_op_nic_timestamp &&
->             (supported_features_mask & GVE_SUP_NIC_TIMESTAMP_MASK))
-> -               priv->nic_timestamp_supported =3D true;
-> +               info->nic_timestamp_supported =3D true;
-> +}
-> +
-> +static void gve_fill_device_info(struct gve_priv *priv,
-> +                                struct gve_device_descriptor *descriptor=
-)
-> +{
-> +       struct gve_device_info *device_info =3D &priv->device_info;
-> +       u16 default_num_queues;
-> +
-> +       device_info->tx_pages_per_qpl =3D
-> +                               be16_to_cpu(descriptor->tx_pages_per_qpl)=
-;
-> +       device_info->max_registered_pages =3D
-> +                               be64_to_cpu(descriptor->max_registered_pa=
-ges);
-> +       device_info->num_event_counters =3D be16_to_cpu(descriptor->count=
-ers);
-> +       ether_addr_copy(device_info->mac, descriptor->mac);
-> +       device_info->max_mtu =3D  be16_to_cpu(descriptor->mtu);
-> +
-> +       default_num_queues =3D be16_to_cpu(descriptor->default_num_queues=
-);
-> +       device_info->default_tx_queues =3D default_num_queues;
-> +       device_info->default_rx_queues =3D default_num_queues;
-> +       device_info->default_tx_ring_size =3D
-> +                               be16_to_cpu(descriptor->tx_queue_entries)=
-;
-> +       device_info->default_rx_ring_size =3D
-> +                               be16_to_cpu(descriptor->rx_queue_entries)=
-;
-> +
-> +       /* set default ranges */
-> +       device_info->max_tx_ring_size =3D device_info->default_tx_ring_si=
-ze;
-> +       device_info->max_rx_ring_size =3D device_info->default_rx_ring_si=
-ze;
-> +       device_info->min_tx_ring_size =3D device_info->default_tx_ring_si=
-ze;
-> +       device_info->min_rx_ring_size =3D device_info->default_rx_ring_si=
-ze;
->  }
->
->  int gve_adminq_describe_device(struct gve_priv *priv)
-> @@ -1027,6 +1058,7 @@ int gve_adminq_describe_device(struct gve_priv *pri=
-v)
->         struct gve_device_option_jumbo_frames *dev_op_jumbo_frames =3D NU=
-LL;
->         struct gve_device_option_modify_ring *dev_op_modify_ring =3D NULL=
-;
->         struct gve_device_option_rss_config *dev_op_rss_config =3D NULL;
-> +       struct gve_device_info *device_info =3D &priv->device_info;
->         struct gve_device_option_gqi_rda *dev_op_gqi_rda =3D NULL;
->         struct gve_device_option_gqi_qpl *dev_op_gqi_qpl =3D NULL;
->         struct gve_device_option_dqo_rda *dev_op_dqo_rda =3D NULL;
-> @@ -1070,26 +1102,26 @@ int gve_adminq_describe_device(struct gve_priv *p=
-riv)
->          * DqoRda, DqoQpl, GqiRda, GqiQpl. Use GqiQpl as default.
->          */
->         if (dev_op_dqo_rda) {
-> -               priv->queue_format =3D GVE_DQO_RDA_FORMAT;
-> +               device_info->queue_format =3D GVE_DQO_RDA_FORMAT;
->                 dev_info(&priv->pdev->dev,
->                          "Driver is running with DQO RDA queue format.\n"=
-);
->                 supported_features_mask =3D
->                         be32_to_cpu(dev_op_dqo_rda->supported_features_ma=
-sk);
->         } else if (dev_op_dqo_qpl) {
-> -               priv->queue_format =3D GVE_DQO_QPL_FORMAT;
-> +               device_info->queue_format =3D GVE_DQO_QPL_FORMAT;
->                 supported_features_mask =3D
->                         be32_to_cpu(dev_op_dqo_qpl->supported_features_ma=
-sk);
->         }  else if (dev_op_gqi_rda) {
-> -               priv->queue_format =3D GVE_GQI_RDA_FORMAT;
-> +               device_info->queue_format =3D GVE_GQI_RDA_FORMAT;
->                 dev_info(&priv->pdev->dev,
->                          "Driver is running with GQI RDA queue format.\n"=
-);
->                 supported_features_mask =3D
->                         be32_to_cpu(dev_op_gqi_rda->supported_features_ma=
-sk);
-> -       } else if (priv->queue_format =3D=3D GVE_GQI_RDA_FORMAT) {
-> +       } else if (device_info->queue_format =3D=3D GVE_GQI_RDA_FORMAT) {
->                 dev_info(&priv->pdev->dev,
->                          "Driver is running with GQI RDA queue format.\n"=
-);
->         } else {
-> -               priv->queue_format =3D GVE_GQI_QPL_FORMAT;
-> +               device_info->queue_format =3D GVE_GQI_QPL_FORMAT;
->                 if (dev_op_gqi_qpl)
->                         supported_features_mask =3D
->                                 be32_to_cpu(dev_op_gqi_qpl->supported_fea=
-tures_mask);
-> @@ -1097,18 +1129,9 @@ int gve_adminq_describe_device(struct gve_priv *pr=
-iv)
->                          "Driver is running with GQI QPL queue format.\n"=
-);
->         }
->
-> +       gve_fill_device_info(priv, descriptor);
->         gve_set_default_rss_sizes(priv);
->
-> -       err =3D gve_set_mtu(priv, descriptor);
-> -       if (err)
-> -               goto free_device_descriptor;
-> -
-> -       priv->num_event_counters =3D be16_to_cpu(descriptor->counters);
-> -
-> -       gve_set_mac(priv, descriptor);
-> -
-> -       gve_set_queue_properties(priv, descriptor);
-> -
->         gve_enable_supported_features(priv, supported_features_mask,
->                                       dev_op_jumbo_frames, dev_op_dqo_qpl=
-,
->                                       dev_op_buffer_sizes, dev_op_flow_st=
-eering,
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/e=
-thernet/google/gve/gve_adminq.h
-> index ed5cb052a52d..831759d30f44 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.h
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-> @@ -655,11 +655,5 @@ int gve_adminq_report_nic_ts(struct gve_priv *priv,
->  struct gve_ptype_lut;
->  int gve_adminq_get_ptype_map_dqo(struct gve_priv *priv,
->                                  struct gve_ptype_lut *ptype_lut);
-> -void gve_set_queue_properties(struct gve_priv *priv,
-> -                             struct gve_device_descriptor *descriptor);
-> -int gve_set_mtu(struct gve_priv *priv,
-> -               struct gve_device_descriptor *descriptor);
-> -void gve_set_mac(struct gve_priv *priv,
-> -                struct gve_device_descriptor *descriptor);
->
->  #endif /* _GVE_ADMINQ_H */
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
-ernet/google/gve/gve_main.c
-> index 338dc0b3249a..1aeee916471f 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -2380,6 +2380,8 @@ static int gve_set_num_ntfy_blks(struct gve_priv *p=
-riv)
->
->  static void gve_set_num_queues(struct gve_priv *priv)
->  {
-> +       struct gve_device_info *device_info =3D &priv->device_info;
-> +
->         priv->tx_cfg.max_queues =3D
->                 min_t(int, priv->tx_cfg.max_queues, priv->num_ntfy_blks /=
- 2);
->         priv->rx_cfg.max_queues =3D
-> @@ -2387,12 +2389,14 @@ static void gve_set_num_queues(struct gve_priv *p=
-riv)
->
->         priv->tx_cfg.num_queues =3D priv->tx_cfg.max_queues;
->         priv->rx_cfg.num_queues =3D priv->rx_cfg.max_queues;
-> -       if (priv->default_num_queues > 0) {
-> -               priv->tx_cfg.num_queues =3D min_t(int, priv->default_num_=
-queues,
-> +       if (device_info->default_tx_queues > 0)
-> +               priv->tx_cfg.num_queues =3D min_t(int,
-> +                                               device_info->default_tx_q=
-ueues,
->                                                 priv->tx_cfg.num_queues);
-> -               priv->rx_cfg.num_queues =3D min_t(int, priv->default_num_=
-queues,
-> +       if (device_info->default_rx_queues > 0)
-> +               priv->rx_cfg.num_queues =3D min_t(int,
-> +                                               device_info->default_rx_q=
-ueues,
->                                                 priv->rx_cfg.num_queues);
-> -       }
->
->         dev_info(&priv->pdev->dev, "TX queues %d, RX queues %d\n",
->                  priv->tx_cfg.num_queues, priv->rx_cfg.num_queues);
-> @@ -2400,54 +2404,69 @@ static void gve_set_num_queues(struct gve_priv *p=
-riv)
->                  priv->tx_cfg.max_queues, priv->rx_cfg.max_queues);
->  }
->
-> -static void gve_set_default_desc_cnt(struct gve_priv *priv,
-> -                                    const struct gve_device_descriptor *=
-descriptor)
-> +static void gve_set_desc_cnt(struct gve_priv *priv)
->  {
-> -       priv->tx_desc_cnt =3D be16_to_cpu(descriptor->tx_queue_entries);
-> -       priv->rx_desc_cnt =3D be16_to_cpu(descriptor->rx_queue_entries);
-> +       struct gve_device_info *device_info =3D &priv->device_info;
->
-> -       /* set default ranges */
-> -       priv->max_tx_desc_cnt =3D priv->tx_desc_cnt;
-> -       priv->max_rx_desc_cnt =3D priv->rx_desc_cnt;
-> -       priv->min_tx_desc_cnt =3D priv->tx_desc_cnt;
-> -       priv->min_rx_desc_cnt =3D priv->rx_desc_cnt;
-> +       priv->tx_desc_cnt =3D device_info->default_tx_ring_size;
-> +       priv->rx_desc_cnt =3D device_info->default_rx_ring_size;
-> +       priv->max_tx_desc_cnt =3D device_info->max_tx_ring_size;
-> +       priv->max_rx_desc_cnt =3D device_info->max_rx_ring_size;
-> +       priv->min_tx_desc_cnt =3D device_info->min_tx_ring_size;
-> +       priv->min_rx_desc_cnt =3D device_info->min_rx_ring_size;
->  }
->
-> -void gve_set_queue_properties(struct gve_priv *priv,
-> -                             struct gve_device_descriptor *descriptor)
-> +static void gve_set_queue_properties(struct gve_priv *priv)
->  {
-> -       /* set default descriptor counts */
-> -       gve_set_default_desc_cnt(priv, descriptor);
-> +       struct gve_device_info *device_info =3D &priv->device_info;
->
-> -       priv->max_registered_pages =3D be64_to_cpu(descriptor->max_regist=
-ered_pages);
-> -       priv->tx_pages_per_qpl =3D be16_to_cpu(descriptor->tx_pages_per_q=
-pl);
-> -       priv->default_num_queues =3D be16_to_cpu(descriptor->default_num_=
-queues);
-> +       gve_set_desc_cnt(priv);
-> +       priv->max_registered_pages =3D device_info->max_registered_pages;
-> +       priv->tx_pages_per_qpl =3D device_info->tx_pages_per_qpl;
->  }
->
-> -int gve_set_mtu(struct gve_priv *priv,
-> -               struct gve_device_descriptor *descriptor)
-> +static int gve_set_mtu(struct gve_priv *priv)
->  {
-> +       struct gve_device_info *device_info =3D &priv->device_info;
->         u16 mtu;
->
-> -       mtu =3D be16_to_cpu(descriptor->mtu);
-> +       mtu =3D device_info->max_mtu;
->         if (mtu < ETH_MIN_MTU) {
->                 dev_err(&priv->pdev->dev, "MTU %d below minimum MTU\n", m=
-tu);
->                 return -EINVAL;
->         }
->         priv->dev->max_mtu =3D mtu;
-> +       priv->dev->mtu =3D priv->dev->max_mtu;
->
->         return 0;
->  }
->
-> -void gve_set_mac(struct gve_priv *priv,
-> -                struct gve_device_descriptor *descriptor)
-> +static void gve_set_mac(struct gve_priv *priv)
->  {
-> -       eth_hw_addr_set(priv->dev, descriptor->mac);
-> -       dev_info(&priv->pdev->dev, "MAC addr: %pM\n", descriptor->mac);
-> +       struct gve_device_info *device_info =3D &priv->device_info;
-> +
-> +       eth_hw_addr_set(priv->dev, device_info->mac);
-> +       dev_info(&priv->pdev->dev, "MAC addr: %pM\n", device_info->mac);
-> +}
-> +
-> +static void gve_set_buf_sizes(struct gve_priv *priv)
-> +{
-> +       struct gve_device_info *device_info =3D &priv->device_info;
-> +
-> +       if (device_info->max_rx_buffer_size > priv->max_rx_buffer_size)
-> +               priv->max_rx_buffer_size =3D device_info->max_rx_buffer_s=
-ize;
-> +
-> +       if (gve_is_dqo(priv) &&
-> +           priv->max_rx_buffer_size > GVE_DEFAULT_RX_BUFFER_SIZE)
-> +               priv->rx_cfg.packet_buffer_size =3D priv->max_rx_buffer_s=
-ize;
-> +
-> +       if (device_info->header_buf_size)
-> +               priv->header_buf_size =3D device_info->header_buf_size;
->  }
->
->  static int gve_init_priv(struct gve_priv *priv, bool skip_describe_devic=
-e)
->  {
-> +       struct gve_device_info *device_info =3D &priv->device_info;
->         int err;
->
->         /* Set up the adminq */
-> @@ -2463,11 +2482,13 @@ static int gve_init_priv(struct gve_priv *priv, b=
-ool skip_describe_device)
->         if (skip_describe_device)
->                 goto setup_device;
->
-> -       priv->queue_format =3D GVE_QUEUE_FORMAT_UNSPECIFIED;
-> +       device_info->queue_format =3D GVE_QUEUE_FORMAT_UNSPECIFIED;
->         err =3D gve_adminq_get_device_properties(priv);
->         if (err)
->                 goto err;
->
-> +       priv->queue_format =3D priv->device_info.queue_format;
-> +
->         err =3D gve_set_num_ntfy_blks(priv);
->         if (err) {
->                 dev_err(&priv->pdev->dev,
-> @@ -2491,12 +2512,34 @@ static int gve_init_priv(struct gve_priv *priv, b=
-ool skip_describe_device)
->                 netif_set_tso_max_size(priv->dev, GVE_DQO_TX_MAX);
->         }
->
-> -       priv->dev->mtu =3D priv->dev->max_mtu;
-> +       if (gve_set_mtu(priv)) {
-> +               err =3D -EINVAL;
-> +               goto err;
-> +       }
-> +
-> +       priv->num_event_counters =3D device_info->num_event_counters;
-> +
-> +       gve_set_mac(priv);
-> +
-> +       gve_set_queue_properties(priv);
-> +       priv->modify_ring_size_enabled =3D device_info->modify_ring_size_=
-enabled;
-> +
-> +       gve_set_buf_sizes(priv);
-> +
-> +       priv->max_flow_rules =3D device_info->max_flow_rules;
-> +       if (priv->max_flow_rules)
-> +               priv->dev->hw_features |=3D NETIF_F_NTUPLE;
-> +
-> +       priv->rss_key_size =3D device_info->rss_key_size;
-> +       priv->rss_lut_size =3D device_info->rss_lut_size;
-> +       priv->cache_rss_config =3D device_info->cache_rss_config;
-> +
->         priv->numa_node =3D dev_to_node(&priv->pdev->dev);
->         priv->tx_cfg.num_xdp_queues =3D 0;
->         priv->rx_copybreak =3D GVE_DEFAULT_RX_COPYBREAK;
->         priv->ts_config.tx_type =3D HWTSTAMP_TX_OFF;
->         priv->ts_config.rx_filter =3D HWTSTAMP_FILTER_NONE;
-> +       priv->nic_timestamp_supported =3D device_info->nic_timestamp_supp=
-orted;
->
->  setup_device:
->         priv->xsk_pools =3D bitmap_zalloc(priv->rx_cfg.max_queues, GFP_KE=
-RNEL);
-> --
-> 2.54.0.1013.g208068f2d8-goog
->
+Patch 4 (Saeed) introduces DEVLINK_PARAM_TYPE_U64_ARRAY and nested
+DEVLINK_ATTR_PARAM_VALUE_DATA attributes so drivers and user space can
+exchange bounded u64 arrays; YAML, uapi, and netlink validation are
+updated.
+
+Patch 5 adds a runtime devlink parameter srch_order to reorder CN20K
+subbank search during MCAM allocation (the param uses the u64 array type
+from patch 4).
+
+Patch 6 ties default MCAM entries to NIX LF alloc/free on CN20K, adds
+NIX_LF_DONT_FREE_DFT_IDXS for PF teardown paths that must not drop default
+NPC indexes while the driver still owns state, and tightens nix_lf_alloc
+error propagation.
+
+Patch 7 allows loading a custom KPU profile from /lib/firmware/kpu via
+module parameter kpu_profile, with cam2 / ptype_mask wiring and helpers
+that share firmware-sourced vs filesystem-sourced profile layouts.
+
+Patch 8 makes default-rule allocation, AF flow install, and PF-side RSS,
+defaults, and ethtool flows respect the active CN20K MCAM keyword width
+(X2 vs X4), including X4 reference-index masking and -EOPNOTSUPP when a
+flow needs X4 keys on an X2-only profile.
+
+Patch 9 replaces file-scope npc_priv and static dstats with allocation
+sized from discovered bank/subbank geometry, threads npc_priv_get()
+through CN20K NPC paths, and allocates dstats via devm_kzalloc for the
+debugfs helper.
+
+This guard is ordered first so later patches assume a single bound AF.
+Heap-backed devlink_nl_param_fill() sits immediately before the U64 array param work so
+incremental builds stay stack-safe as the union grows; the CN20K patches
+keep srch_order ahead of NIX LF coordination, optional KPU profile load
+from firmware files, X2/X4 handling, and the npc_priv refactor that touches
+the same files heavily.
+
+Ratheesh Kannoth (8):
+  octeontx2-af: Enforce single RVU AF probe
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  devlink: heap-allocate param fill buffers in devlink_nl_param_fill
+  octeontx2-af: npc: cn20k: add subbank search order control
+  octeontx2: cn20k: Coordinate default rules with NIX LF lifecycle
+  octeontx2-af: npc: Support for custom KPU profile from filesystem
+  octeontx2: cn20k: Respect NPC MCAM X2/X4 profile in flows and DFT
+    alloc
+  octeontx2-af: npc: cn20k: Allocate npc_priv and dstats dynamically.
+
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
+
+ Documentation/netlink/specs/devlink.yaml      |   4 +
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 163 ++++-
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 633 ++++++++++++------
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  18 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  17 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |   7 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  12 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  92 ++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  77 ++-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 486 +++++++++++---
+ .../ethernet/marvell/octeontx2/af/rvu_npc.h   |  17 +
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  12 +-
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ .../marvell/octeontx2/nic/otx2_flows.c        |  48 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
+ include/net/devlink.h                         |   8 +
+ include/uapi/linux/devlink.h                  |   1 +
+ net/devlink/netlink_gen.c                     |   2 +
+ net/devlink/param.c                           |  95 ++-
+ 20 files changed, 1295 insertions(+), 405 deletions(-)
+
+--
+
+v18 -> v19: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/20260602060359.1894952-1-rkannoth@marvell.com/
+	Added 1 more patch.
+
+v17 -> v18: Addressed sashiko comments.
+	https://lore.kernel.org/netdev/20260601025844.865865-1-rkannoth@marvell.com/
+
+v16 -> v17: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/20260521095303.2395584-1-rkannoth@marvell.com/
+
+v15 -> v16: Addressed Sashiko comments
+	https://lore.kernel.org/netdev/20260520020939.1457231-1-rkannoth@marvell.com/
+
+v14 -> v15: Addressed Paolo comments
+	https://lore.kernel.org/netdev/20260514062537.3813802-1-rkannoth@marvell.com/
+
+v13 -> v14: Addressed sashiko comments.
+	I had to revert Jiri comment in v11 as sashiko was complaining about
+	leaking kernel memory to userspace.
+	https://lore.kernel.org/netdev/20260511033923.1301976-1-rkannoth@marvell.com/
+
+v12 -> v13: Addressed David Laight comments
+	https://lore.kernel.org/netdev/20260508034912.4082520-1-rkannoth@marvell.com/
+
+v11 -> v12: Addressed Paolo,Jiri comments.
+	https://lore.kernel.org/netdev/20260409025055.1664053-1-rkannoth@marvell.com/
+	Added one patch which was rejected by simon in net
+	(as it was kind of enhancement rather than a bug)
+	Added one more patch- which allocates two variables from heap.
+
+v10 -> v11: Addressed Paolo comments.
+	https://lore.kernel.org/netdev/20260403025533.6250-1-rkannoth@marvell.com/
+
+v9 -> v10: Addressed Paolo comments
+	https://lore.kernel.org/netdev/
+	20260330053105.2722453-1-rkannoth@marvell.com/
+
+v8 -> v9: Addressed Simon comments
+	https://lore.kernel.org/netdev/
+	20260325072159.1126964-1-rkannoth@marvell.com/
+
+v7 -> v8: Addressed Simon comments
+	https://lore.kernel.org/netdev/
+	20260323035110.3908741-1-rkannoth@marvell.com/T/#t
+
+v6 -> v7: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260320165432.98832-1-horms@kernel.org/
+
+v5 -> v6: Addressed Jakub,Jiri comments
+	https://lore.kernel.org/netdev/
+	20260317045623.250187-1-rkannoth@marvell.com/
+
+v4 -> v5: Addressed Jakub comments
+	https://lore.kernel.org/netdev/
+	20260312022754.2029595-6-rkannoth@marvell.com/
+
+v3 -> v4: Addressed Simon comments
+	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
+
+v2 -> v3: Addressed Simon comments.
+	https://lore.kernel.org/netdev/
+	20260304043032.3661647-1-rkannoth@marvell.com/
+
+v1 -> v2: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/
+	20260302085803.2449828-1-rkannoth@marvell.com/#t
+
+2.43.0
 
