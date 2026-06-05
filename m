@@ -1,64 +1,70 @@
-Return-Path: <netdev+bounces-295649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295656-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id w3VlKMpvImrrXAEAu9opvQ
-	(envelope-from <netdev+bounces-295649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:42:18 +0200
+	id 2ijDM1N1ImrPXgEAu9opvQ
+	(envelope-from <netdev+bounces-295656-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:05:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8E864599B
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 08:42:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF794645C24
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:05:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=PzCRRmZo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295649-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295649-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=XoI911Z9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295656-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-295656-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C5A163056A12
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 06:33:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AA4C03007B03
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 06:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8634D40802E;
-	Fri,  5 Jun 2026 06:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8436F42EEC8;
+	Fri,  5 Jun 2026 06:59:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F25F406270;
-	Fri,  5 Jun 2026 06:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B88740B6C6;
+	Fri,  5 Jun 2026 06:59:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780641190; cv=none; b=KCRfnWwWO5F5E2huT7vourS/yVImDNfCrWOeYbZKzIaxtFNIlQPtwUG7ug9AHvdmpIe/MzoiTqO5NVUwh4oNGYgOZM7VTUnVVfh4uerbmrblXCQJjwi6GHeeJyB5vzk17zjJpYp0VQdjI8umY/2TS3NLWOpIuvV3Km/e3bMJq34=
+	t=1780642790; cv=none; b=XCryLaS/UY3YraPOJm0fUHlffoi6/fFrBerK8znZ9zz0RIj65LstIqMufTe3itP30yn+Qhs+sCFcdwg9GzIKtSuqQ8b2vkxtAxe1Gczpm0PcBuJfaollntRAmeN5tA742JV2BaLSG7suNE5oTf3g3g5skRUTaB+AmUY+Q/xe9JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780641190; c=relaxed/simple;
-	bh=/gYjDDnZRR1Vd0bQ9tglUxNvtcLGHf1+DH9L0c64xvc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j6vbrtnjlgB1OuFn16Pi+5FZbeLUA3hSj5nkLpzhdJC6+QfgvkU3G5aBYM1G7Vwd7cUGF+LK+F2nxM32rz+STIcJtn791gjX/2Zqxb6/fGQuVLxBuuuUCFHwFZj9xtWzE37AGUP6ZCUdtkt0pMFgr+cRsUt8HLc0dyYFE4MqPlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=PzCRRmZo; arc=none smtp.client-ip=67.231.148.174
+	s=arc-20240116; t=1780642790; c=relaxed/simple;
+	bh=ekTe7hbZIQd0YB91tpENtmYdl4mtyIgE3ISkU1IeIFc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PU0jIzXEfZAdoYYloYKxPm8RdWn8VUWKXBiGWefvueJhdpsXbWy5SV8FGr5Vb9lHAy2AEMeVCz4Fo+ISSFFjKvTF5BmDeBuB0DQ62tY7/mufyJofoq9UyaS/u4wvgly8Lu6IghN6UhvUOQVKIjjITNzxluV2KWO070bRYL7w72I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=XoI911Z9; arc=none smtp.client-ip=67.231.148.174
 Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6553RNAC302225;
-	Thu, 4 Jun 2026 23:32:58 -0700
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 655373hh302316;
+	Thu, 4 Jun 2026 23:59:38 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=WGhBn0re31fLd4RFFPlltu3
-	Z9cx7X0PPG+2ZxQ+uAHs=; b=PzCRRmZoAjgEANPZ28R0s5z/Yc5GIzI3Hc6zQja
-	CrSsbD4ING+eNn+zsE/RS1fLFMpTIkJA731cRs3MmHfnfze4dRqvuRhwpF4rfi9m
-	j9RclDE9WQ2sFGdSDkYCc5us/n6K1mUTuPMnG+rvkPjjfrYTxknYY1S7Ntcgiw1G
-	yG6kDPAmb1n5IZJmzbrde6DClGcbDlrFDVReH8SPmTF/1XybxTp7Y+pmUBH00BJL
-	n8vBru7kXm35Mzv8z9E2936HUzF0TGpg5DJX7njKc8H6cQriF0D8laAcTnFW+8ef
-	3vTj6Mepx8IR1D1CBgNi37Odig+PYwxGshos4tYFspCZlNA==
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=h
+	tuEsZkKi1uXw2QsAcERI5P9a0jvBAlIqlvADZAAJ84=; b=XoI911Z9+Eeps93sB
+	XvQjrR+MKaTpnN1kk5BYUeSqvtMHeN0P+0ga7NbDQiaN4CT+42QCL9QmmnpIzYMd
+	39E/aC4klW3kPRcCUicYrxupf5iEfSO+04YNoD3rI/t12Kko8Akrt5S0gaHY5wpd
+	FNXQ3Bir60BYZSBnpU2DykBRrnIdJTMhOzgODP++yQrx+WiHE3yi3bpL+RclGQRG
+	4Q51j2sjgCiJ79hRXi+rTrKM3ElN/ejBr4BTUBQCqbafb1ZeYragzrpRyeNy6mWC
+	i0fe1uiKC9gIidwSNh+q2GJNmeqLzUnWMCb7sRlQDPey25rF+ZP3ex3E7OMiD/VT
+	XFGzA==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ekcj0agmf-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ekcj0ajjn-12
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Jun 2026 23:32:57 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+	Thu, 04 Jun 2026 23:59:38 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 4 Jun 2026 23:32:56 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 4 Jun 2026 23:32:56 -0700
+ 15.2.1544.25; Thu, 4 Jun 2026 23:59:34 -0700
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 4 Jun 2026 23:33:02 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 4 Jun 2026 23:33:02 -0700
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id D09803F7074;
-	Thu,  4 Jun 2026 23:32:52 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 86F4B3F7074;
+	Thu,  4 Jun 2026 23:32:57 -0700 (PDT)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
 CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
@@ -66,10 +72,12 @@ CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
         "Ratheesh
  Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH v19 net-next 0/9] octeontx2-af: npc: Enhancements.
-Date: Fri, 5 Jun 2026 12:02:36 +0530
-Message-ID: <20260605063245.3553861-1-rkannoth@marvell.com>
+Subject: [PATCH v19 net-next 1/9] octeontx2-af: Enforce single RVU AF probe
+Date: Fri, 5 Jun 2026 12:02:37 +0530
+Message-ID: <20260605063245.3553861-2-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260605063245.3553861-1-rkannoth@marvell.com>
+References: <20260605063245.3553861-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,21 +86,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=G78s1dk5 c=1 sm=1 tr=0 ts=6a226d99 cx=c_pps
+X-Authority-Analysis: v=2.4 cv=G78s1dk5 c=1 sm=1 tr=0 ts=6a2273da cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
- a=1rdZWFfAsYpIarNArpIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDA2MCBTYWx0ZWRfXxe1GoDJ8NY+9
- M0mrIZxyE7jOsFootYWt9BgkUQxt/qTdKuYThQsblNtPOyv+RwTWguhUXMkL/DLJcqaAmcRO57W
- NtMLuBUva6sH5DJRJd2E3DkZ5pPQqqgN7Gf+Ysl8ZIP0IL1UlvidC9cKgcc6IarBNb1WuEkuQjF
- vO1GyMGOv/oqFk6PJ2kE0+nnGR2DKZ0oRWxTnmAwAFMitcQXspnWM2eSdLkDn9q59Ed9G1APW8j
- hyO8nzbzpU3i8bV6ymI6yBE2pFL0diIEM48WFLEkB2hfS2On+6ga+hbLh+kNXu41sn3DVD2Fvk+
- CFUGAtkMWBGbGjQVDBqWq3fI0+HvMVpOEHY8bSSI8vrzPUCQgUN8/iPfZv1ER7MXw5nkBbFdzBc
- kgfzbzLRv1jVfVx08MujSDCUSR2VuSwK5rYACDr49gNytfPZLvjdnh6jpp4N4JWsrq/EIN3+FM/
- 6gG4VrhjNZPKAwA8s4w==
-X-Proofpoint-GUID: IWANrHP53C_1gR14nvy2ntSceRuNhsCd
-X-Proofpoint-ORIG-GUID: IWANrHP53C_1gR14nvy2ntSceRuNhsCd
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=T1-iXrwByj4Y60gxB9YA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDA2NCBTYWx0ZWRfX3d7P7VKmkqm5
+ R5QnhJoVF7KKREpssG6UIMbE5/IGVYuMD6+eXfhS9mlZkLOdg7AGRZJq8bI7dTuW7WqH8V+gER1
+ hfWwJ6ZjHQr5TYF15c9N0LoFsqGbOq9tO/l5dp1RFGiqbY0z99cm+eqSs2G9peNtNhLDCJ5FPlY
+ SUKDnnRUHAJDsD7ZgBMjwtX9Mi3rQ51SPCNNXZXwXHPk/VkTkrEiGZAkW/0gj0ITxGISbQnpZSr
+ 3Vfr401TJlBPT8NREQylJgr9Bn7eb13sCAKLKvP8WNbAKHGuytUlzCQMnExCD47DhkU1hNl/uUj
+ 9cTdDHyaUexfdTbXX/DvsMNmPVM0yWgXZYdG6/9x9k5O8DRBIL/WgLz3lNfKhKMH92mOU3ee5Z6
+ v447iWIWFA+E1STqribOdy+0tkZkLu8G0xi4yxtXK7YKRNhsoZxxjQoD0exe6gVcct0TUiUG5DX
+ 4CvlDdbdCayc0g8nsyw==
+X-Proofpoint-GUID: 1HZ8lQNiyzAYDbhlEWtpCpoCiQLNE-wf
+X-Proofpoint-ORIG-GUID: 1HZ8lQNiyzAYDbhlEWtpCpoCiQLNE-wf
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-05_01,2026-05-28_03,2025-10-01_01
@@ -104,11 +112,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295649-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295656-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
 	MIME_TRACE(0.00)[0:+];
@@ -124,177 +132,49 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,marvell.com:mid,marvell.com:dkim,marvell.com:from_mime,marvell.com:email,vger.kernel.org:from_smtp];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,marvell.com:mid,marvell.com:dkim,marvell.com:from_mime,marvell.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F8E864599B
+X-Rspamd-Queue-Id: BF794645C24
 
-This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
-debuggability, allocation policy, default-rule lifetime, optional KPU
-profiles from firmware files, X2/X4 MCAM keyword handling in flows and
-defaults, and dynamic CN20K NPC private state), adds a devlink mechanism
-for multi-value parameters, and moves devlink_nl_param_fill() temporaries
-to the heap so stack usage stays reasonable once union devlink_param_value
-grows (patch 3).
+There is only one admin-function PCI device per system.
+Reject any additional AF probe with -EBUSY so the driver model matches
+hardware and automated reviewers can rely on a single bound instance.
 
-Patch 1 enforces a single RVU admin-function PCI device per system: there
-is only one AF; rvu_probe() rejects any additional bind with -EBUSY, logs a
-warning, and matches the hardware model so automated reviewers and tooling
-can rely on exactly one bound AF instance.
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Patch 2 improves CN20K MCAM visibility in debugfs: mcam_layout marks
-enabled entries, dstats reports per-entry hit deltas (baseline updated in
-software after each read; hardware counters are not cleared), and mismatch
-lists enabled entries without a PF mapping.
-
-Patch 3 allocates the per-configuration-mode union devlink_param_value
-buffers and struct devlink_param_gset_ctx used by devlink_nl_param_fill()
-with kcalloc()/kzalloc_obj() and funnels failures through a single cleanup
-path so the netlink reply path stays safe as the union grows.
-
-Patch 4 (Saeed) introduces DEVLINK_PARAM_TYPE_U64_ARRAY and nested
-DEVLINK_ATTR_PARAM_VALUE_DATA attributes so drivers and user space can
-exchange bounded u64 arrays; YAML, uapi, and netlink validation are
-updated.
-
-Patch 5 adds a runtime devlink parameter srch_order to reorder CN20K
-subbank search during MCAM allocation (the param uses the u64 array type
-from patch 4).
-
-Patch 6 ties default MCAM entries to NIX LF alloc/free on CN20K, adds
-NIX_LF_DONT_FREE_DFT_IDXS for PF teardown paths that must not drop default
-NPC indexes while the driver still owns state, and tightens nix_lf_alloc
-error propagation.
-
-Patch 7 allows loading a custom KPU profile from /lib/firmware/kpu via
-module parameter kpu_profile, with cam2 / ptype_mask wiring and helpers
-that share firmware-sourced vs filesystem-sourced profile layouts.
-
-Patch 8 makes default-rule allocation, AF flow install, and PF-side RSS,
-defaults, and ethtool flows respect the active CN20K MCAM keyword width
-(X2 vs X4), including X4 reference-index masking and -EOPNOTSUPP when a
-flow needs X4 keys on an X2-only profile.
-
-Patch 9 replaces file-scope npc_priv and static dstats with allocation
-sized from discovered bank/subbank geometry, threads npc_priv_get()
-through CN20K NPC paths, and allocates dstats via devm_kzalloc for the
-debugfs helper.
-
-This guard is ordered first so later patches assume a single bound AF.
-Heap-backed devlink_nl_param_fill() sits immediately before the U64 array param work so
-incremental builds stay stack-safe as the union grows; the CN20K patches
-keep srch_order ahead of NIX LF coordination, optional KPU profile load
-from firmware files, X2/X4 handling, and the npc_priv refactor that touches
-the same files heavily.
-
-Ratheesh Kannoth (8):
-  octeontx2-af: Enforce single RVU AF probe
-  octeontx2-af: npc: cn20k: debugfs enhancements
-  devlink: heap-allocate param fill buffers in devlink_nl_param_fill
-  octeontx2-af: npc: cn20k: add subbank search order control
-  octeontx2: cn20k: Coordinate default rules with NIX LF lifecycle
-  octeontx2-af: npc: Support for custom KPU profile from filesystem
-  octeontx2: cn20k: Respect NPC MCAM X2/X4 profile in flows and DFT
-    alloc
-  octeontx2-af: npc: cn20k: Allocate npc_priv and dstats dynamically.
-
-Saeed Mahameed (1):
-  devlink: Implement devlink param multi attribute nested data values
-
- Documentation/netlink/specs/devlink.yaml      |   4 +
- .../marvell/octeontx2/af/cn20k/debugfs.c      | 163 ++++-
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 633 ++++++++++++------
- .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  18 +-
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
- .../net/ethernet/marvell/octeontx2/af/npc.h   |  17 +
- .../net/ethernet/marvell/octeontx2/af/rvu.c   |   7 +
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |  12 +-
- .../marvell/octeontx2/af/rvu_devlink.c        |  92 ++-
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  77 ++-
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 486 +++++++++++---
- .../ethernet/marvell/octeontx2/af/rvu_npc.h   |  17 +
- .../marvell/octeontx2/af/rvu_npc_fs.c         |  12 +-
- .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
- .../marvell/octeontx2/nic/otx2_flows.c        |  48 +-
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
- include/net/devlink.h                         |   8 +
- include/uapi/linux/devlink.h                  |   1 +
- net/devlink/netlink_gen.c                     |   2 +
- net/devlink/param.c                           |  95 ++-
- 20 files changed, 1295 insertions(+), 405 deletions(-)
-
---
-
-v18 -> v19: Addressed Jakub comments.
-	https://lore.kernel.org/netdev/20260602060359.1894952-1-rkannoth@marvell.com/
-	Added 1 more patch.
-
-v17 -> v18: Addressed sashiko comments.
-	https://lore.kernel.org/netdev/20260601025844.865865-1-rkannoth@marvell.com/
-
-v16 -> v17: Addressed Jakub comments.
-	https://lore.kernel.org/netdev/20260521095303.2395584-1-rkannoth@marvell.com/
-
-v15 -> v16: Addressed Sashiko comments
-	https://lore.kernel.org/netdev/20260520020939.1457231-1-rkannoth@marvell.com/
-
-v14 -> v15: Addressed Paolo comments
-	https://lore.kernel.org/netdev/20260514062537.3813802-1-rkannoth@marvell.com/
-
-v13 -> v14: Addressed sashiko comments.
-	I had to revert Jiri comment in v11 as sashiko was complaining about
-	leaking kernel memory to userspace.
-	https://lore.kernel.org/netdev/20260511033923.1301976-1-rkannoth@marvell.com/
-
-v12 -> v13: Addressed David Laight comments
-	https://lore.kernel.org/netdev/20260508034912.4082520-1-rkannoth@marvell.com/
-
-v11 -> v12: Addressed Paolo,Jiri comments.
-	https://lore.kernel.org/netdev/20260409025055.1664053-1-rkannoth@marvell.com/
-	Added one patch which was rejected by simon in net
-	(as it was kind of enhancement rather than a bug)
-	Added one more patch- which allocates two variables from heap.
-
-v10 -> v11: Addressed Paolo comments.
-	https://lore.kernel.org/netdev/20260403025533.6250-1-rkannoth@marvell.com/
-
-v9 -> v10: Addressed Paolo comments
-	https://lore.kernel.org/netdev/
-	20260330053105.2722453-1-rkannoth@marvell.com/
-
-v8 -> v9: Addressed Simon comments
-	https://lore.kernel.org/netdev/
-	20260325072159.1126964-1-rkannoth@marvell.com/
-
-v7 -> v8: Addressed Simon comments
-	https://lore.kernel.org/netdev/
-	20260323035110.3908741-1-rkannoth@marvell.com/T/#t
-
-v6 -> v7: Addressed Simon comments
-	https://lore.kernel.org/netdev/20260320165432.98832-1-horms@kernel.org/
-
-v5 -> v6: Addressed Jakub,Jiri comments
-	https://lore.kernel.org/netdev/
-	20260317045623.250187-1-rkannoth@marvell.com/
-
-v4 -> v5: Addressed Jakub comments
-	https://lore.kernel.org/netdev/
-	20260312022754.2029595-6-rkannoth@marvell.com/
-
-v3 -> v4: Addressed Simon comments
-	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
-
-v2 -> v3: Addressed Simon comments.
-	https://lore.kernel.org/netdev/
-	20260304043032.3661647-1-rkannoth@marvell.com/
-
-v1 -> v2: Addressed Jakub comments.
-	https://lore.kernel.org/netdev/
-	20260302085803.2449828-1-rkannoth@marvell.com/#t
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index 3cf131508ecf..1f0c962e10f4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -3542,12 +3542,19 @@ static void rvu_update_module_params(struct rvu *rvu)
+ 		kpu_profile ? kpu_profile : default_pfl_name, KPU_NAME_LEN);
+ }
+ 
++static atomic_t device_bound = ATOMIC_INIT(0);
++
+ static int rvu_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct rvu *rvu;
+ 	int    err;
+ 
++	if (atomic_cmpxchg(&device_bound, 0, 1) != 0) {
++		dev_warn(dev, "Only one af device is supported.\n");
++		return -EBUSY;
++	}
++
+ 	rvu = devm_kzalloc(dev, sizeof(*rvu), GFP_KERNEL);
+ 	if (!rvu)
+ 		return -ENOMEM;
+-- 
 2.43.0
+
 
