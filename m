@@ -1,359 +1,350 @@
-Return-Path: <netdev+bounces-295921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lXegJzcKI2rNgwEAu9opvQ
-	(envelope-from <netdev+bounces-295921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:41:11 +0200
+	id qlVGEAIMI2phhAEAu9opvQ
+	(envelope-from <netdev+bounces-295922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:48:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A8264A42C
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:41:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22AE64A4F1
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 19:48:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Y81iZ0nn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295921-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295921-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=FSDYGN8b;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295922-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295922-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4A875308492F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 17:35:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 672FE302BDFC
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 17:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFD83AB294;
-	Fri,  5 Jun 2026 17:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E4E397343;
+	Fri,  5 Jun 2026 17:42:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011057.outbound.protection.outlook.com [52.101.57.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B6539A06B;
-	Fri,  5 Jun 2026 17:34:57 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780680901; cv=none; b=tqKRpY46+ixV9C51wFSMZEJ1KcCRPcezEKvN/3UFAPO0TjMVvsn31z/203PdTZgjFpF1kDhUj1bhVS9kP46tcANyFaMKWTqWH13Fmb+JDrm+BYAnJhOmBtjKuIoAgnkGwrHCjp6HWo2/qeOB403UJz2uX16OJIUF8WsvFkjpk9s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780680901; c=relaxed/simple;
-	bh=Ows39zTI9n7wAPEQiw6Xs3MR4cdzRkAjhnHBxY84dn8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ctw1DegS/xKuJl1Rb6d0hMhmkJhRyN+/kvcyeQQviylMpE126buqfvz5Mh2UP911obvRSby1XR1pkO3aKoNUlLsmcTVmufxPx2Y1OfZZtZJUpXrzE2KzatLoPtp1evwTGBZMB02DykkU+znX3v9qPpqumUfw875A0WqcCeikBtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y81iZ0nn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AA331F0089D;
-	Fri,  5 Jun 2026 17:34:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780680897;
-	bh=GdAp+BOi7Bw5Wcr+RoPktPL/Tov2J8OBkbGvYCENpiM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=Y81iZ0nn9VUhH8TWtV8RhxanmGmZ10cPFgUdxRsQ3UuGNxCyP9s9UMniTjZGEs4D/
-	 RLM5GxecIR281agf9qynX6k/B4J4eOw/dwAJSEoDzDTHxsIeIBQHrnf3vurcI+O33r
-	 bEMQ5j62lq7wGAnSE745j79jYTwS+RRcqh4XnJn0S64uclZhcn0tq/uHA6/5Puiso3
-	 mP1hLiaSfLzxMqqQVII4yQAae88Gcxq3P6cZLnTWkIWdDYnJsHMgUw+XIcBoN1YqRe
-	 f9A/IX+iBkEBcFfsZxyc+d8jw0MWXrmDjW4Q4il+VS4qoq9XPR1aNAnv902X7v9BK7
-	 nIT8pVoY82Maw==
-From: Chuck Lever <cel@kernel.org>
-Date: Fri, 05 Jun 2026 13:34:43 -0400
-Subject: [PATCH 9/9] NFSD: Add allow_tags to the netlink export interface
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0631D28643C;
+	Fri,  5 Jun 2026 17:42:13 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780681349; cv=fail; b=Eo0SvrIdaU2kHu2fFiZ3I7aHJ1C388TPWtj5A0bjyLTwt0sguqFRfvmBTyK9ZVKjFPZQ//OXJCx4mMZO71OMcrmzGNdZhctpAYlWHTlJ8RRiRFTsN8+XxrdKEuYe4iP3jj9M3qY6jKxEJflOWeZdB4VgkutFIV9swpGL4SfQrUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780681349; c=relaxed/simple;
+	bh=IrF0ItQ3RIjwHgeq5Yp1ZdxMvZvn/9qYkgEeW5i/Au8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jzV/vInMD/c8ybqaL4na2bRPXSdIXUt312tMVIIa+RKFPLnfa9KdacNNqknObodSGgeHbQzWM6UonhVGHUw39ZHgV+q/jQAMd2paVPnueHgvuN9kBdpDx1weYEJGJT3e0hZ6XX8eKOfaV0DVJMhaj/3Qd7k7/2CuiFlHP7UUX4w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FSDYGN8b; arc=fail smtp.client-ip=52.101.57.57
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c7VZlFlbUJQbqb7KjX1q/8CRdhFfyMjcvBD3d/9loQAUlPeaHgSxm6CZHWNOLD9zse333finGMJc7A2WyVumSUaIgP0WtMXHHQ1huywYiLkJGtpBTj+nzHXbsW0twdDOjrYqXIQ8FG4USfVVFW9N63zlUNWJJw4oDZK8eWIpS+Jr5stpmyhBUqzYo8L80RRjEXN5dnOWY2Vy52mesPN8oyowwZyMbIovSWR/SqxG7W3+/D6EKdWaoD/D+GNnVTgdfrwu0Oj93VM56tEKIAhPpL7Sk/454N6mp3KPZUeJbHfCLnNqREYOH3xPPqKpBmnuFHZbKFHScJeQSnwwnwNPFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1na3breKKWu2a6om/2PxHDnJtLblWuS6PCAdA7fP82s=;
+ b=UU8Zny3/ccmBo8Vh999pbKQp3xb12x5IKxbTWIjqndteUjv7MYi+aHALHtIihtHsvma9FEKdKsA1cCEoDa3S+X1nuXdXpvtE3WQ6+xlO32JTm3AYLVA3mF30QiQJBdTvbyBUN3X2633f0yjkVz4q1Ge6+sWTBnTUvJde/r3Ai1zs/U7CKrLj0ueR6HWIJIRWa/Q3lccWRBSk0HSZW1aFIgAMZkiGfC0FZU2p3aGKRYpjwECGSK5Fwd+xnSLaHOJZe1y1E2n9cgSRjr46oQx1mGCZasN1dy9ST2QMDiXIV7BTfoYWJHnYzO03F2WG9Cb2SiYcCKcYEc2VDVL7YrYaKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1na3breKKWu2a6om/2PxHDnJtLblWuS6PCAdA7fP82s=;
+ b=FSDYGN8b8rRX+iO4qC8cM1J+ro0z9SAFGkXar4zoa3EUH16LDaV9QcWlevMnAH0zLEaiUMmcG3H5WzQejBKicOBq7Q1R3VeGEVOO+vfjHr8qo02hRd/UZy4puCxRwBD0PLt9pX2IlgJ4emLtBUsg3CPX0+8lZv0FRwNWdBCPL/LoISfrutC2/bbTEbzNCe7a7bGVkLMF+Ad99//pRb5FYALzQBd8IPet9Pi7fDs7gcZaFNzvleuIdtYZUtAymyWO8U8qzqZg/JNVNFDrs6Lf/AkYqnMcu4s/rZulzSHcD1htf8cIK/t3KohaDj1cqN/oQNVhAUBVIfbMSQLZfwLJCQ==
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by CY8PR12MB7435.namprd12.prod.outlook.com (2603:10b6:930:51::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.9; Fri, 5 Jun 2026
+ 17:42:05 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
+ 17:42:05 +0000
+Message-ID: <3e8b0954-5f63-424e-97ef-ba841cc8f2bb@nvidia.com>
+Date: Fri, 5 Jun 2026 20:41:53 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 7/7] devlink: Add eswitch mode boot defaults
+To: Randy Dunlap <rdunlap@infradead.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+ Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+ Thomas Gleixner <tglx@kernel.org>, Petr Mladek <pmladek@suse.com>,
+ Tejun Heo <tj@kernel.org>, Vlastimil Babka <vbabka@kernel.org>,
+ Feng Tang <feng.tang@linux.alibaba.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
+ Marco Elver <elver@google.com>, Eric Biggers <ebiggers@kernel.org>,
+ Li RongQing <lirongqing@baidu.com>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Ethan Nelson-Moore <enelsonmoore@gmail.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+References: <20260603193259.3412464-1-mbloch@nvidia.com>
+ <20260603193259.3412464-8-mbloch@nvidia.com>
+ <d276e842-dd8f-40b7-806b-71572503005e@infradead.org>
+ <e4aada53-fb80-41a8-9a8e-d19414f6466b@nvidia.com>
+ <909ada9a-a398-4e3f-8ed0-596a1e4bdbfd@infradead.org>
+ <91d12ffd-6bd9-4951-8351-655262d44874@nvidia.com>
+ <fa19f1d2-832b-4b9c-824d-29ae48e4bc2a@infradead.org>
+Content-Language: en-US
+From: Mark Bloch <mbloch@nvidia.com>
+In-Reply-To: <fa19f1d2-832b-4b9c-824d-29ae48e4bc2a@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0174.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b7::20) To CH3PR12MB7548.namprd12.prod.outlook.com
+ (2603:10b6:610:144::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260605-tls-session-tags-v1-9-47bd1d94d552@oracle.com>
-References: <20260605-tls-session-tags-v1-0-47bd1d94d552@oracle.com>
-In-Reply-To: <20260605-tls-session-tags-v1-0-47bd1d94d552@oracle.com>
-To: Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Sabrina Dubroca <sd@queasysnail.net>, Keith Busch <kbusch@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
- Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
- Anna Schumaker <anna@kernel.org>
-Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, 
- Chuck Lever <chuck.lever@oracle.com>
-X-Mailer: b4 0.16-dev-da966
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8031;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=tLFpkkm/QOrTFF11jxLqkjXfpcq+yXBPGCWn24fWr1g=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBqIwi440EJq0B9b65Z9WgUj8Gibd8eTyplP+COc
- TmFQCjXnGWJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCaiMIuAAKCRAzarMzb2Z/
- lzpND/9vWqMhbLSNjgXvdrKtIk0jAC8XIQGGqwaWCvSV3UhtfFdefN6f4yqojRytq4SedfLgcPy
- neZ/tA+gSdmlHdWx4V6a7JQP5kBY+lbAwXAL226Z4xzgAPP1Wr7o+RsbLc6wGfhIpVWeaXbOkXc
- Z/pIp5fxoGZA0Jfn3DXsVOY2hSJb+Gf45VMjBhCu1DtyoKrT9DRHALGQ9LULXIhn3BPtLHM1qyF
- BYRfce9GcaTaGdDr9bWgvINgQmeXZ5hH24pInpsZR6P8tsBD1DmS18NwxdMzEfpBJQSI9xbI7G3
- CydN55SuleclaD6nIYd5p1WNFYcAj9aM70PLSavwMIlo8TG086xF3S8QLF8/5GLisW+aLUNBykM
- iNkwYnpuiBnIYlfE4LdUYWfsVqzkCIyOSy9nd1JtG+QStmgXKmGuZvdatkBifaYoacI3DndDSHE
- YwQ1OheOdD+/kzZihRt/MY9x8tqbZx02+I2YdWjencI2m0N2+K+9WziYpSTLtPGA61K7u2zCWxm
- VXT5cMNAZG4EyXOQpw6sMSollVttnhPgwxiUMfqC96KL/8sNoPjEgYYtQrAcKPzJoSEkgamaN3U
- igLEIMxrgDPAWYbqczuUFJdb9+O/UlVaQj2qTuAAKAi1dj2dDM8oxWi1559ZknbF8NUSKpS4BoF
- xQ46UDlF71lhhEA==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|CY8PR12MB7435:EE_
+X-MS-Office365-Filtering-Correlation-Id: a4a1f4e7-3f97-4e0a-61c9-08dec329c258
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|6133799003|11063799006|56012099006|4143699003|5023799004|3023799007|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	R500DLeM69yF0MCgy/d8xdAk11nhfWhyZU4qvWiZO6dqejtsPStNLLg3zfObg3RDF5WAp3NfRl/EUlir5nlw37Jmg+PG1oIFOXDKvT6zqajIzWM+5lxFTW/ncS8OmaY0X93zYi5hs8WpWskJ6U2c9b5FUxn6hYK5YgMCFtiRqzXsZZ9FFWpsGUzu27slwR0Cs/zbQ9BllwCxVHZJtPm6hmZBd0CR/7q6tcZFOL0KR+tLFFeRFV5SyWPzRTyu7bsYiKyoHQtiNCltz2oxnGH0ouSI7FvlIOv6VyCM6sXvyleVLhKUJwnnp+4rDDYJ0DI94M/C2DiQza1fFiNAypFQVinagy3zHnvOrdVanAVaXRsL2EfTrS+sm5Szt+jMduF6jDvMfjb8gGPzYeMgMODD4K2AYqeJSTHuIWP+SDTdh4KnW6Zb2chMuTRVMsPs8qZGEcfuIGzRtKUCO21ZV2awh+Vz6hhYZ1faTOYo2uwuqKTRzxSa6tmOOmz7e9PVLq0KpqzeWY+tNZusONwXooPWouxMOqE5HBiMXNC2qMskLj/XptYCMjIViLRrND5kXW97bjfgm2SXTLIyIeYH2OxMQdOa+6qhmqNzuieQMf7FnjJ1PQd8vTImMD9Z4ApxnP8QUV/8rtm7Eg29NIxuID0CIvKzwZzacTnUi7Lmx+nxwHq2fsHE+J/krDEj/5ep3OAH
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(6133799003)(11063799006)(56012099006)(4143699003)(5023799004)(3023799007)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MjNLenNVS1gvYU8veDhBUlNBQ1M0QzhUMk9nb01YcE9WZXIxaDVJSUY5enVE?=
+ =?utf-8?B?QlFhL0U1SkFiOVJaakJvbEw0MUFCSmVxQ1E4dXV2UEZ6UWR5cVNyRzFVUjVr?=
+ =?utf-8?B?VlZWalVXSk9mRko3L0x3dzlRZDFqQTFUbklEV2xVREFUcG5QdVExdGtrZ1Y0?=
+ =?utf-8?B?VTZQc2QxMDdkekN0d0xhZ2VnY3ZXbElwZzBHSW40MVFlZkhWU2lZNUdnS1JP?=
+ =?utf-8?B?RkhDRXVmcklPWndmM0lITXlmRUJkMEZEbzdTd0V6SnFqMHpuWGNUQi8xUUVj?=
+ =?utf-8?B?cjZ0OFNHU04xWGphOXNYRjFPK3BHbDZkYUl6blZiSGVhR2dwY1pBZ1FHZEVQ?=
+ =?utf-8?B?Yy9xeFg1TXcvd0xDTFFhcElKeTJobzFyWkJNQ0pkaGhRV1N0cGZlaiszaTN5?=
+ =?utf-8?B?NC9oYkhzWkVxcXU0MnZMZTh1dDBMVkYyTUIzd3JMZVJrZnlNY0RoaVRzMzRy?=
+ =?utf-8?B?REhSVEE5TTN2OHhwdnhRSjZMakpwdUt5OWI4Rnp4cXBWbHRmWXdOUjFYbjhG?=
+ =?utf-8?B?MDZIbVBScVpTRnhaNlZzTVNsSi9XdHpkOFE3ZlE1WHhIRFRRNVdhTkUrSDRC?=
+ =?utf-8?B?OHlWNTRlcFJmMGNJZndZQzF6M3N6RlhSS3FjbUl2QUpCdlBtcUFKaTJiWE9S?=
+ =?utf-8?B?d0Qxck5GWTAyc2tlS3J5T0hFSTd6MW9DNzZGK2tSOVdBNExIbEw0Z3pzRnVC?=
+ =?utf-8?B?aGtpZjhsMjRIR1NNUkVmeWh3OURCU0VjQkt4WnNqYUNJN0ZXbjJDcURMams3?=
+ =?utf-8?B?RlYxSnpZNkppODZuYnYvN3ZoS3hOZE1NamU3cEdHSGd6VnR5ODBiMm83eWtV?=
+ =?utf-8?B?dTFWMDltY0FkL2U0cGRGNVFYRXEzYmNVUDVucWdSekpiZ0JLd1ZDYkpUN2FV?=
+ =?utf-8?B?bnpUdDNlRThvbk9ickdQQVdIbmdQUWRhYjJQNGduT1VwcXdOSnlibjlsT2VV?=
+ =?utf-8?B?QmZWQWQ4M1VNcFBYcnNUbXJ1UmlSalpsZWZEYlZHaFMvQldGYjhTUWFkZjZN?=
+ =?utf-8?B?NDZ6cmdFU3ZBaDhiblFwL0xOY0R3Tmd4VkFsN1ZZY1FCbUlVRVU5RFJTMXdm?=
+ =?utf-8?B?VllEWG10MytRUTEySndXMW50aGZJQTlJWkxTMEpRRUduVkFZSWgvZm5oWHVX?=
+ =?utf-8?B?L3JsYm1PRjd0ekRjT1A4YlNId0RXT2xWNTM4L0U2d0tRbTE5Yk5xZHdQb0x5?=
+ =?utf-8?B?SWJwNWd5ZHo2OWw3ek9kcy9seUVjYnBYTEN2TDQza2RQVW9YYnFkemZVbTlV?=
+ =?utf-8?B?ZDd5czVVbFM2dzAxdk5Gd0p3UEY2SEdBME5Qb3NTNmgwZUtjRml3K1lJVm5C?=
+ =?utf-8?B?b2F3cXUweU0ySmR5ditzcU9qZS9Dc2lGV1E0RDFpek01bEVMUXhTSTJmWWxr?=
+ =?utf-8?B?UmtnS2VMYW41bWVBWHJFNVBtbG5UTVJnZ3BNbzg1Y0MzdVExS0NqU3pBQmpK?=
+ =?utf-8?B?bEc0cjFGRnlhcTkwSnNXYWVWZUhiNHRrc1g4a1NlUDhpU1hMQ3BrNkErUEpo?=
+ =?utf-8?B?VW9sWXV3cmh0NFBsUTA1RGJJeVRhbGYyMEViUFdqZzRrek9HUGo0U1I5cFVa?=
+ =?utf-8?B?S1BDK08wa3MvMGFTdllJZmtiY3ZOWU5yaEY1R3lzNTJqN3EzbVRsTmtRdzBV?=
+ =?utf-8?B?eUhkNndTNks0M2w1OEt2WXM5c2Q2RHVycEhidmp6OEdsQzlKOXN1N2xINXV5?=
+ =?utf-8?B?UnYwakNLT2h4Y2pTNFVZT0hua0lxUkh6MEIyWXZMTXh6VmlJa3VHenoyRE00?=
+ =?utf-8?B?M2VyNjE2SklYZmhId2FDWlZ5Z1VJSnFnR0gvbFMySGJlcytXb3pjdTc3UGF0?=
+ =?utf-8?B?UkZxUHpCRlVmY01lekU5S2VVSUFJSHVFSXVBQlNGa2IzSEtjVCthUW9qTkhN?=
+ =?utf-8?B?eWEzRUowR2MzdFljd1IyVC80WVNjMThFQ0J2T1RvYVlnT1RWYldkS0RQcXVK?=
+ =?utf-8?B?QXUxeDkrSkNpR04xVDUyUXd3aXRPWnZ3UXJrVGlaNTR6T0hNUmREWUNoaGMw?=
+ =?utf-8?B?dm5ESzQ5alVqdXhVVVF1M3ZqWnlMMEhsTERKL2pnZmF1OEtNREdWZG11c0li?=
+ =?utf-8?B?bVRDSXFOWTZBcEpMWndGWkc3amMrd3pMMnRxbVJyUUVyMktBZGtjc3RVeTdX?=
+ =?utf-8?B?Y3lUbHRwMWlzcHZjS0VscXA1QW16WjVQajdPZ2tISU8xVFhwYmxFeit3MnJp?=
+ =?utf-8?B?d3VqeWk2anR4WEpjM0ZwSmF5aFZ4ekFsMHBpTng3R2VoS3FnSnoxRnRVU3dw?=
+ =?utf-8?B?bnNYdnRyRXZWU09YRmE1TWQ1RjVUZXV0d1ZGcHdEek1DS3pneklmdDRwMFdi?=
+ =?utf-8?B?alNBSTJXOGpCYjU0N3JNdDVOSkdXMmE3Z3hQTkFEcjc0ZmFVcjZBdz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a4a1f4e7-3f97-4e0a-61c9-08dec329c258
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 17:42:05.6618
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OM88OmHAZ6VK5FzYKnY8rzBEGDbI9NJK+sCxa/00+VS0dqBXI/bmhFMLcBLxHOpZ/rTs1eRI2tPRkU6/YNATTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7435
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295922-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:akpm@linux-foundation.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:sagi@grimberg.me,m:kch@nvidia.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-nfs@vger.kernel.org,m:chuck.lever@oracle.com,m:donaldhunter@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,linux-foundation.org,queasysnail.net,kernel.dk,lst.de,grimberg.me,nvidia.com,brown.name,oracle.com,talpey.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	FORGED_RECIPIENTS(0.00)[m:rdunlap@infradead.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:jiri@resnulli.us,m:horms@kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:bbhushan2@marvell.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:bp@alien8.de,m:akpm@linux-foundation.org,m:peterz@infradead.org,m:tglx@kernel.org,m:pmladek@suse.com,m:tj@kernel.org,m:vbabka@kernel.org,m:feng.tang@linux.alibaba.com,m:dave.hansen@linux.intel.com,m:brauner@kernel.org,m:dapeng1.mi@linux.intel.com,m:kees@kernel.org,m:elver@google.com,m:ebiggers@kernel.org,m:lirongqing@baidu.com,m:paulmck@kernel.org,m:enelsonmoore@gmail.com,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295921-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[lwn.net,linuxfoundation.org,resnulli.us,kernel.org,marvell.com,nvidia.com,alien8.de,linux-foundation.org,infradead.org,suse.com,linux.alibaba.com,linux.intel.com,google.com,baidu.com,gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,oracle.com:mid,oracle.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:from_mime,nvidia.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 43A8264A42C
+X-Rspamd-Queue-Id: B22AE64A4F1
 
-From: Chuck Lever <chuck.lever@oracle.com>
 
-The legacy exportfs cache path accepts an allow_tags clause that
-restricts an export to mTLS sessions carrying at least one matching
-session tag. The netlink-based svc_export interface had no such
-attribute, so administrators configuring exports via netlink could
-not request tag enforcement: nfsd_nl_parse_one_export() always
-left ex_allow_tags empty, and check_xprtsec_policy() then granted
-any authenticated peer.
 
-Extend the svc-export attribute set with allow-tags and parse it
-in nfsd_nl_parse_one_export(). Apply the same xprtsec=mtls
-consistency check as svc_export_parse() so the netlink path
-refuses contradictory security policy rather than silently exposing
-a tagged export to plaintext or anonymous-TLS peers.
+On 05/06/2026 7:02, Randy Dunlap wrote:
+> 
+> 
+> On 6/4/26 2:49 AM, Mark Bloch wrote:
+>>
+>>
+>> On 04/06/2026 6:53, Randy Dunlap wrote:
+>>>
+>>>
+>>> On 6/3/26 6:16 PM, Mark Bloch wrote:
+>>>>
+>>>>
+>>>> On 03/06/2026 23:06, Randy Dunlap wrote:
+>>>>> Hi.
+>>>>>
+>>>>> On 6/3/26 12:32 PM, Mark Bloch wrote:
+>>>>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+>>>>>> index 063c11ca33e5..7af9f2898d92 100644
+>>>>>> --- a/Documentation/admin-guide/kernel-parameters.txt
+>>>>>> +++ b/Documentation/admin-guide/kernel-parameters.txt
+>>>>>> @@ -1264,6 +1264,31 @@ Kernel parameters
+>>>>>>  	dell_smm_hwmon.fan_max=
+>>>>>>  			[HW] Maximum configurable fan speed.
+>>>>>>  
+>>>>>> +	devlink_eswitch_mode=
+>>>>>> +			[NET]
+>>>>>> +			Format:
+>>>>>> +			[<selector>]:<mode>
+>>>>>
+>>>>> It appears (please correct me if I am mistaken) that the '[' and ']'
+>>>>> above don't mean "optional" but instead they are required characters...
+>>>>>
+>>>>>> +
+>>>>>> +			<selector>:
+>>>>>> +			* | <handle>[,<handle>...]
+>>>>>
+>>>>> while here they mean "optional".
+>>>>>
+>>>>> That is confusing (inconsistent). Also, if the square brackets are
+>>>>> always required around the <selector>, what purpose do they serve?
+>>>>
+>>>> Yes, you are right, this is confusing. The outer square brackets are part of
+>>>> the syntax and are required, while the brackets in "[,<handle>...]" mean that
+>>>> additional handles are optional.
+>>>>
+>>>> I couldn't find a better way to describe this. What I want to say is that the
+>>>> selector is always wrapped in square brackets. Inside the brackets it can either
+>>>> be "*" to match all devices, or a comma separated list of handles. If "*" is
+>>>> not used, then at least one handle has to be provided.
+>>>>
+>>>> Maybe it would be clearer to spell it out explicitly, something like:
+>>>>
+>>>> Format:
+>>>>   [<selector>]:<mode>
+>>>>
+>>>> The '[' and ']' characters are literal and required.
+>>>>
+>>>> <selector>:
+>>>>   * | <handle>[,<handle>...]
+>>>>
+>>>> If '*' is not used, <selector> must contain at least one <handle>.
+>>>>
+>>>> Does that sound like a reasonable way to document it?
+>>>
+>>> Yes, that helps a little bit. Better than nothing.
+>>>
+>>> But why are they required at all?
+>>
+>> Jiri suggested using the square brackets, and I liked that they made the
+>> selector look like a grouped argument. But if that is too confusing, I can
+>> also drop them and use a simpler separator, for example:
+>>
+>> 	devlink_eswitch_mode=
+>> 			[NET]
+>> 			Format:
+>> 			<selector>=<mode>
+>>
+>> 			<selector>:
+>> 			* | <handle>[,<handle>...]
+>>
+>> 			<handle>:
+>> 			<bus-name>/<dev-name>
+>>
+>> 			Configure default devlink eswitch mode for matching
+>> 			devlink instances during device initialization.
+>>
+>> 			<mode>:
+>> 			legacy | switchdev | switchdev_inactive
+>>
+>> 			Examples:
+>> 			devlink_eswitch_mode=*=switchdev
+>> 			devlink_eswitch_mode=pci/0000:08:00.0=switchdev
+>> 			devlink_eswitch_mode=pci/0000:08:00.0,pci/0000:09:00.1=switchdev_inactive
+>>
+>> Does this look better to you?
+> 
+> Yes, that looks much better to me.
+> But you should do whatever you think is right.
 
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- Documentation/netlink/specs/nfsd.yaml | 10 ++++++
- fs/nfsd/export.c                      | 68 +++++++++++++++++++++++++++++++++--
- fs/nfsd/netlink.c                     |  4 ++-
- fs/nfsd/netlink.h                     |  3 +-
- include/uapi/linux/nfsd_netlink.h     |  1 +
- 5 files changed, 82 insertions(+), 4 deletions(-)
+Good syntax should not be confusing. If it was not clear to you, then
+it will probably not be clear to others either, so I am fine with
+changing it.
 
-diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netlink/specs/nfsd.yaml
-index 8f36fadd68f7..5cbdc1dab7e3 100644
---- a/Documentation/netlink/specs/nfsd.yaml
-+++ b/Documentation/netlink/specs/nfsd.yaml
-@@ -7,6 +7,10 @@ uapi-header: linux/nfsd_netlink.h
- doc: NFSD configuration over generic netlink.
- 
- definitions:
-+  -
-+    name: handshake-session-tag-max-len
-+    type: const
-+    header: uapi/linux/handshake.h
-   -
-     type: flags
-     name: cache-type
-@@ -253,6 +257,12 @@ attribute-sets:
-       -
-         name: fsid
-         type: s32
-+      -
-+        name: allow-tags
-+        type: string
-+        checks:
-+          max-len: handshake-session-tag-max-len
-+        multi-attr: true
-   -
-     name: svc-export-reqs
-     attributes:
-diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
-index a2aaa3cd6c52..25802de2de40 100644
---- a/fs/nfsd/export.c
-+++ b/fs/nfsd/export.c
-@@ -831,6 +831,7 @@ static struct svc_export *svc_export_update(struct svc_export *new,
- static struct svc_export *svc_export_lookup(struct svc_export *);
- static int check_export(const struct path *path, int *flags,
- 			unsigned char *uuid);
-+static int check_allow_tags(const struct svc_export *exp);
- 
- /**
-  * nfsd_nl_parse_one_export - parse one svc_export entry from a netlink message
-@@ -845,14 +846,14 @@ static int check_export(const struct path *path, int *flags,
- static int nfsd_nl_parse_one_export(struct cache_detail *cd,
- 				    struct nlattr *attr)
- {
--	struct nlattr *tb[NFSD_A_SVC_EXPORT_FSID + 1];
-+	struct nlattr *tb[NFSD_A_SVC_EXPORT_ALLOW_TAGS + 1];
- 	struct auth_domain *dom = NULL;
- 	struct svc_export exp = {}, *expp;
- 	struct nlattr *secinfo_attr;
- 	struct timespec64 boot;
- 	int err, rem;
- 
--	err = nla_parse_nested(tb, NFSD_A_SVC_EXPORT_FSID, attr,
-+	err = nla_parse_nested(tb, NFSD_A_SVC_EXPORT_ALLOW_TAGS, attr,
- 			       nfsd_svc_export_nl_policy, NULL);
- 	if (err)
- 		return err;
-@@ -993,6 +994,68 @@ static int nfsd_nl_parse_one_export(struct cache_detail *cd,
- 			}
- 		}
- 
-+		/* allow-tags (multi-attr string) */
-+		if (tb[NFSD_A_SVC_EXPORT_ALLOW_TAGS]) {
-+			struct nlattr *tag_attr;
-+			unsigned int count = 0;
-+
-+			/*
-+			 * The NLA_STRING policy does not guarantee a
-+			 * terminating NUL, so each tag is copied with
-+			 * the length-aware nla_strdup(). Embedded NUL
-+			 * bytes are rejected here because the policy
-+			 * cannot express that check; a tag containing
-+			 * one could never match a handshake-supplied
-+			 * tag, which net/handshake rejects the same
-+			 * way.
-+			 */
-+			nla_for_each_nested_type(tag_attr,
-+						 NFSD_A_SVC_EXPORT_ALLOW_TAGS,
-+						 attr, rem) {
-+				const char *src = nla_data(tag_attr);
-+				size_t srclen = nla_len(tag_attr);
-+
-+				if (srclen > 0 && src[srclen - 1] == '\0')
-+					srclen--;
-+				if (srclen == 0 ||
-+				    memchr(src, '\0', srclen)) {
-+					err = -EINVAL;
-+					goto out_uuid;
-+				}
-+				count++;
-+			}
-+			if (count > NFSD_MAX_ALLOW_TAGS) {
-+				err = -EINVAL;
-+				goto out_uuid;
-+			}
-+			if (!tagset_alloc(&exp.ex_allow_tags, count,
-+					  GFP_KERNEL)) {
-+				err = -ENOMEM;
-+				goto out_uuid;
-+			}
-+			nla_for_each_nested_type(tag_attr,
-+						 NFSD_A_SVC_EXPORT_ALLOW_TAGS,
-+						 attr, rem) {
-+				char *tag;
-+
-+				tag = nla_strdup(tag_attr, GFP_KERNEL);
-+				if (!tag) {
-+					err = -ENOMEM;
-+					goto out_uuid;
-+				}
-+				if (!tagset_add(&exp.ex_allow_tags, tag)) {
-+					kfree(tag);
-+					err = -ENOMEM;
-+					goto out_uuid;
-+				}
-+			}
-+			tagset_finalize(&exp.ex_allow_tags);
-+		}
-+
-+		err = check_allow_tags(&exp);
-+		if (err)
-+			goto out_uuid;
-+
- 		err = check_export(&exp.ex_path, &exp.ex_flags,
- 				   exp.ex_uuid);
- 		if (err)
-@@ -1026,6 +1089,7 @@ static int nfsd_nl_parse_one_export(struct cache_detail *cd,
- 	}
- 
- out_uuid:
-+	tagset_destroy(&exp.ex_allow_tags);
- 	kfree(exp.ex_uuid);
- out_fslocs:
- 	nfsd4_fslocs_free(&exp.ex_fslocs);
-diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
-index fbee3676d253..4db094b1021f 100644
---- a/fs/nfsd/netlink.c
-+++ b/fs/nfsd/netlink.c
-@@ -10,6 +10,7 @@
- #include "netlink.h"
- 
- #include <uapi/linux/nfsd_netlink.h>
-+#include <uapi/linux/handshake.h>
- 
- /* Common nested types */
- const struct nla_policy nfsd_auth_flavor_nl_policy[NFSD_A_AUTH_FLAVOR_FLAGS + 1] = {
-@@ -41,7 +42,7 @@ const struct nla_policy nfsd_sock_nl_policy[NFSD_A_SOCK_TRANSPORT_NAME + 1] = {
- 	[NFSD_A_SOCK_TRANSPORT_NAME] = { .type = NLA_NUL_STRING, },
- };
- 
--const struct nla_policy nfsd_svc_export_nl_policy[NFSD_A_SVC_EXPORT_FSID + 1] = {
-+const struct nla_policy nfsd_svc_export_nl_policy[NFSD_A_SVC_EXPORT_ALLOW_TAGS + 1] = {
- 	[NFSD_A_SVC_EXPORT_SEQNO] = { .type = NLA_U64, },
- 	[NFSD_A_SVC_EXPORT_CLIENT] = { .type = NLA_NUL_STRING, },
- 	[NFSD_A_SVC_EXPORT_PATH] = { .type = NLA_NUL_STRING, },
-@@ -55,6 +56,7 @@ const struct nla_policy nfsd_svc_export_nl_policy[NFSD_A_SVC_EXPORT_FSID + 1] =
- 	[NFSD_A_SVC_EXPORT_XPRTSEC] = NLA_POLICY_MASK(NLA_U32, 0x7),
- 	[NFSD_A_SVC_EXPORT_FLAGS] = NLA_POLICY_MASK(NLA_U32, 0x3ffff),
- 	[NFSD_A_SVC_EXPORT_FSID] = { .type = NLA_S32, },
-+	[NFSD_A_SVC_EXPORT_ALLOW_TAGS] = { .type = NLA_STRING, .len = HANDSHAKE_SESSION_TAG_MAX_LEN, },
- };
- 
- const struct nla_policy nfsd_version_nl_policy[NFSD_A_VERSION_ENABLED + 1] = {
-diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
-index af41aa0d4a65..133e99a0a3fc 100644
---- a/fs/nfsd/netlink.h
-+++ b/fs/nfsd/netlink.h
-@@ -11,6 +11,7 @@
- #include <net/genetlink.h>
- 
- #include <uapi/linux/nfsd_netlink.h>
-+#include <uapi/linux/handshake.h>
- 
- /* Common nested types */
- extern const struct nla_policy nfsd_auth_flavor_nl_policy[NFSD_A_AUTH_FLAVOR_FLAGS + 1];
-@@ -18,7 +19,7 @@ extern const struct nla_policy nfsd_expkey_nl_policy[NFSD_A_EXPKEY_PATH + 1];
- extern const struct nla_policy nfsd_fslocation_nl_policy[NFSD_A_FSLOCATION_PATH + 1];
- extern const struct nla_policy nfsd_fslocations_nl_policy[NFSD_A_FSLOCATIONS_LOCATION + 1];
- extern const struct nla_policy nfsd_sock_nl_policy[NFSD_A_SOCK_TRANSPORT_NAME + 1];
--extern const struct nla_policy nfsd_svc_export_nl_policy[NFSD_A_SVC_EXPORT_FSID + 1];
-+extern const struct nla_policy nfsd_svc_export_nl_policy[NFSD_A_SVC_EXPORT_ALLOW_TAGS + 1];
- extern const struct nla_policy nfsd_version_nl_policy[NFSD_A_VERSION_ENABLED + 1];
- 
- int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
-diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_netlink.h
-index f5b75d5caba9..23a42c26ede0 100644
---- a/include/uapi/linux/nfsd_netlink.h
-+++ b/include/uapi/linux/nfsd_netlink.h
-@@ -165,6 +165,7 @@ enum {
- 	NFSD_A_SVC_EXPORT_XPRTSEC,
- 	NFSD_A_SVC_EXPORT_FLAGS,
- 	NFSD_A_SVC_EXPORT_FSID,
-+	NFSD_A_SVC_EXPORT_ALLOW_TAGS,
- 
- 	__NFSD_A_SVC_EXPORT_MAX,
- 	NFSD_A_SVC_EXPORT_MAX = (__NFSD_A_SVC_EXPORT_MAX - 1)
+I will post v3 with this change.
 
--- 
-2.54.0
+Thanks for the input!
+
+Mark
+
+> 
+>>>>>> +
+>>>>>> +			<handle>:
+>>>>>> +			<bus-name>/<dev-name>
+>>>>>> +
+>>>>>> +			Configure default devlink eswitch mode for matching
+>>>>>> +			devlink instances during device initialization.
+>>>>>> +
+>>>>>> +			<mode>:
+>>>>>> +			legacy | switchdev | switchdev_inactive
+>>>>>> +
+>>>>>> +			Examples:
+>>>>>> +			devlink_eswitch_mode=[*]:switchdev
+>>>>>> +			devlink_eswitch_mode=[pci/0000:08:00.0]:switchdev
+>>>>>> +			devlink_eswitch_mode=[pci/0000:08:00.0,pci/0000:09:00.1]:legacy
+>>>>>> +
+>>>>>> +			See Documentation/networking/devlink/devlink-defaults.rst
+>>>>>> +			for the full syntax.
+>>>>>> +
+>>>>>>  	dfltcc=		[HW,S390]
+>>>>>>  			Format: { on | off | def_only | inf_only | always }
+>>>>>>  			on:       s390 zlib hardware support for compression on
+>>>>>
+>>>>>
+>>>>
+>>>
+>>
+> 
 
 
