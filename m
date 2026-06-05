@@ -1,162 +1,211 @@
-Return-Path: <netdev+bounces-295721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id sC9ELa2HImr/ZgEAu9opvQ
-	(envelope-from <netdev+bounces-295721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:24:13 +0200
+	id HqvPJl+GImrKZgEAu9opvQ
+	(envelope-from <netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:18:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5098B6465CB
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:24:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158AA646551
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:18:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295721-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295721-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=kabelmail.de (policy=reject);
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=Hbrnqrg9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295717-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B93E23027C63
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 08:21:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3C181308C8CA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 08:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C163C988B;
-	Fri,  5 Jun 2026 08:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C684849552F;
+	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay-b03.edpnet.be (relay-b03.edpnet.be [212.71.1.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9153C65FE
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 08:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30B6495510;
+	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780647670; cv=none; b=jXtj9e9fTeo3lfavvKr+a0W6g+GUDHMUqb2GaKwhpBSG8WtJtHn1EDzZnxoJY1LKprZUTzQpxYbHfGcV5ULN4Dt7lt9ObAZIAYkTEm3prGpASMOwyfIFvnUUk5rlHu0UUjRLz3a+6G8peOpwAiRHX/WTSFqMvY/WsC2iP6frlRc=
+	t=1780647091; cv=none; b=izElTZnAl4VU4jMwjDaYCFw9xgx5Jdm3nvzLj6yKtIxqBkHhndvHgZTl1ps4ZXGZY7WuzqrPlnZzKvjqbmLl9zMojNhz9bfdRUSxAHckbIK7FvDAqJkdGnW7vUVhM2Y2vqBfHF8y99Y7jlplG33EUJvsGus3U3Nwb3XrMMA+TEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780647670; c=relaxed/simple;
-	bh=gvOODPje+TEjM+2jIBwQ7IWN5bH+nt1eH6bEsvlWuDE=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=mMR5a9U3ymiDZ+W4SsNzu19UQKds+aWNMEpAZG8zGe/vf/KXQNgZ8S6boMBY5C2p6fy79s97Ww3b2odMHxbLMW18fGGRsVF7EQC6CqG3ECJZPy0JA4V8Xgp9C99s1XPqB4YtBbjBcnxQRFhCJjTsRRFnTyf4CAEjTYAM/YZluMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de; spf=fail smtp.mailfrom=kabelmail.de; arc=none smtp.client-ip=212.71.1.220
-Received: from [192.168.177.83] (212.71.13.3.adsl.dyn.edpnet.net [212.71.13.3]) by relay-b03.edpnet.be with ESMTP id BFDwOVlck5m4BoaQ for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 10:09:50 +0200 (CEST)
-X-Barracuda-Envelope-From: janpieter.sollie@kabelmail.de
-X-Barracuda-Effective-Source-IP: 212.71.13.3.adsl.dyn.edpnet.net[212.71.13.3]
-X-Barracuda-Apparent-Source-IP: 212.71.13.3
-Message-ID: <ec5bd768-3f54-4c30-b5a2-1e0b43f789e3@kabelmail.de>
-Date: Fri, 5 Jun 2026 10:09:46 +0200
+	s=arc-20240116; t=1780647091; c=relaxed/simple;
+	bh=wVsP7qwG8BJu2wprX0HV2M1fTkH7tQV3G1mR8NtSBaw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YkSoB8rVHO59IG66zmiHuYuyYWLzbyGnZ4+Pyj30JYpjAyBu7MB3zgNmma5FE0yJ7yiQycoKrPcRux8qX7HpzavyQwPsDNmhSJ3eRqrE70gLAOVn8Aia4AnJW0rE5tcNyS6PhhYfflZLwAMqrMF9wuhVOgl8HQ/nT/H2Xry/x8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hbrnqrg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CA61C2BCC6;
+	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780647091;
+	bh=wVsP7qwG8BJu2wprX0HV2M1fTkH7tQV3G1mR8NtSBaw=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=Hbrnqrg9RhUWrD93DON6WYHKiUY/P9JoQoOKcBb0/KJWXzbzKUzy1aiEPRDNCz74l
+	 unOk46jE02c/euDZYR1gDWxh9Uxacss0xlUunTTj86g+Uk7iSNaM04wzH4DGgAqWuP
+	 QOK6c9mcDNCgEQ6otxAJVE8JDdQ6Rci/uyPf3YSW6lk2Xc5jca5/hSBn1Ed49K5Ycp
+	 e3VdODdZns9EJlfW2FyX1pLCLijdAZOhdw0+BdfL7Jl8v1NW3lPx68kX0BRG1rAFRs
+	 fIOgpgls+EJeJW0zsiaY65LScSz0F1I6vkcMUyGlEv/qY6jPK7TwZ9GbG+DUyC7SF3
+	 jl5FVBD61KZUQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305B6CD6E5D;
+	Fri,  5 Jun 2026 08:11:31 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Date: Fri, 05 Jun 2026 12:11:29 +0400
+Subject: [PATCH next-next v2] net: dsa: qca8k: Add support for force mode
+ for fixed link topology
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: nl, en-US
-To: netdev@vger.kernel.org
-From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-Subject: SFP/MDIO/I2C: help requested unlocking a SFP+ MCU to expose PHY
-Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
- 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
-X-ASG-Orig-Subj: SFP/MDIO/I2C: help requested unlocking a SFP+ MCU to expose PHY
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Barracuda-Connect: 212.71.13.3.adsl.dyn.edpnet.net[212.71.13.3]
-X-Barracuda-Start-Time: 1780646990
-X-Barracuda-URL: https://212.71.1.220:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at edpnet.be
-X-Barracuda-Scan-Msg-Size: 1230
-X-Barracuda-BRTS-Status: 1
-X-ASG-Debug-ID: 1780646990-24639c1f231c9220001-BZBGGp
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=10.0 QUARANTINE_LEVEL=10.0 KILL_LEVEL=7.0 test= 
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.125474
-	Rule breakdown below
-	  pts rule name              description
-	 ---- ---------------------- --------------------------------------------------
-	
+Message-Id: <20260605-qca8337-force-mode-v2-1-d9a6b6545bfa@outlook.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32NTQ6CMBCFr0Jm7ZjSYlFX3sOwKGUqjdLRFgmGc
+ HcrB3Dzki/vb4FE0VOCc7FApMknzyGD3BVgexNuhL7LDFJILbRQ+LLmqFSNjqMlHLgjdK1tzUG
+ edFVpyMVnJOfnbfQKgeYRfwJNtnqfRo6f7W4qt8C/5anEEq1xta6Fc6ZVF36PD+b73vIAzbquX
+ 0/JJvLBAAAA
+X-Change-ID: 20260603-qca8337-force-mode-fbcba5296446
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780647089; l=3187;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=/1K49g/Q0+wrB8ffa0QJHaW9eANv5Yae+dqQkwbdI4U=;
+ b=Xn7RwqPiLUqBSMkfjxaoyatDwqn+EhlJZVxXog3mgyAtwLsVAImKiBsVWVvKVPlXJ//K6hwlv
+ IPyVfdFw1CBAI5t89drX8j9nLQevPmF9+g75OyKnuqOsk4jD9ZFIckZ
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[kabelmail.de : SPF not aligned (relaxed), No valid DKIM,reject];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295721-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[janpieter.sollie@kabelmail.de,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:george.moussalem@outlook.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295717-lists,netdev=lfdr.de,george.moussalem.outlook.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_REPLYTO(0.00)[outlook.com];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,outlook.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_REPLYTO(0.00)[george.moussalem@outlook.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[janpieter.sollie@kabelmail.de,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_ONE(0.00)[1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kabelmail.de:from_mime,kabelmail.de:mid,vger.kernel.org:from_smtp]
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,vger.kernel.org:from_smtp,outlook.com:mid,outlook.com:email,outlook.com:replyto]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5098B6465CB
+X-Rspamd-Queue-Id: 158AA646551
 
-Hi,
+From: George Moussalem <george.moussalem@outlook.com>
 
-This message is a follow-up on a previous request,
-I reverse-engineered a lot of stuff,
-and the question has become fundamentally different.
+A fixed link topology is commonly used to connect this switch (on port
+0 or 6) to a SoC's MAC over SGMII. When inband negotiation is not used,
+the switch needs to be configured to operate in force mode. As such,
+enable support for force mode.
 
-I am trying to access the bcm84891 phy on a 10Gtek ASF-10G-T80 sfp+ transceiver.
-According to 10Gtek, these modules contain a bcm84891 phy.
-The MDIO commands seem te be sent to a MCU, not the phy itself.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+Changes in v2:
+- Added check for QCA8337 switch ID and build up the register mask
+  accordingly before writing the force mode bit to avoid overwriting the
+  bit on switches other than QCA8337 for which there's no documentation
+  on whether force mode is supported or not.
+- Added comment to state that regardless of port used (0 or 6), the
+  force mode bit is written to the PORT0 PAD register as per vendor SDK.
+- Link to v1: https://lore.kernel.org/r/20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com
+---
+ drivers/net/dsa/qca/qca8k-8xxx.c | 22 ++++++++++++++++------
+ drivers/net/dsa/qca/qca8k.h      |  1 +
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-Does anybody know how to make a MCU transparent?
-Did he / she found a hack by writing a i2c register or something alike?
+diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+index a36b8b07030e..4c928983b862 100644
+--- a/drivers/net/dsa/qca/qca8k-8xxx.c
++++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+@@ -1538,7 +1538,7 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+ {
+ 	struct qca8k_priv *priv = pcs_to_qca8k_pcs(pcs)->priv;
+ 	int cpu_port_index, ret, port;
+-	u32 reg, val;
++	u32 mask, reg, val;
+ 
+ 	port = pcs_to_qca8k_pcs(pcs)->port;
+ 	switch (port) {
+@@ -1611,11 +1611,21 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 	if (priv->ports_config.sgmii_tx_clk_falling_edge)
+ 		val |= QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE;
+ 
+-	if (val)
+-		ret = qca8k_rmw(priv, reg,
+-				QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
+-				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE,
+-				val);
++	mask = (val) ? (QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
++			QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE) : 0;
++
++	/*
++	 * (Un)set force mode on QCA8337 only, don't include it in the mask for
++	 * others. It is written to the PORT0 PAD register for both port 0 and 6.
++	 */
++	if (priv->switch_id == QCA8K_ID_QCA8337) {
++		if (neg_mode == PHYLINK_PCS_NEG_OUTBAND)
++			val |= QCA8K_PORT_PAD_SGMII_FORCE_MODE;
++		mask |= QCA8K_PORT_PAD_SGMII_FORCE_MODE;
++	}
++
++	if (mask)
++		ret = qca8k_rmw(priv, reg, mask, val);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
+index 1a00e2f62fef..956338893032 100644
+--- a/drivers/net/dsa/qca/qca8k.h
++++ b/drivers/net/dsa/qca/qca8k.h
+@@ -58,6 +58,7 @@
+ #define	  QCA8K_PORT_PAD_RGMII_TX_DELAY_EN		BIT(25)
+ #define   QCA8K_PORT_PAD_RGMII_RX_DELAY_EN		BIT(24)
+ #define   QCA8K_PORT_PAD_SGMII_EN			BIT(7)
++#define   QCA8K_PORT_PAD_SGMII_FORCE_MODE		BIT(3)
+ #define QCA8K_REG_PWS					0x010
+ #define   QCA8K_PWS_POWER_ON_SEL			BIT(31)
+ /* This reg is only valid for QCA832x and toggle the package
 
-I have a rollball password, but initializing MDIO with rollball does not work.
-with MDIO_I2C_NONE, the link comes up (and is stable), so the firmware / MCU does a lot on its own.
-with MDIO_I2C_C45 (the only method bcm84891 supports) says "no phy detected"
-with C22, it shows a buggy ID which isn't even close to the 84891 IDs in the 7.1 patch.
+---
+base-commit: b7bee4ca5688e30ca50fbc87b1b8f7eed7006c17
+change-id: 20260603-qca8337-force-mode-fbcba5296446
 
-All methods (C22/C45/Rollball (with/without password) can be used to read registers with i2csfp,
-but none are actually consistent (and rollball returning 0xffff at best).
+Best regards,
+-- 
+George Moussalem <george.moussalem@outlook.com>
 
-Also, writing to those registers, and reading them again, shows no changed value.
-
-Did anybody ever try + succeed making a MCU transparent?
-Could he / she teach me how it was done?
-
-Thanks,
-
-Janpieter Sollie
 
 
