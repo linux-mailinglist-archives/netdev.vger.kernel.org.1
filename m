@@ -1,96 +1,93 @@
-Return-Path: <netdev+bounces-295961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295962-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KVPlJVgnI2oOjgEAu9opvQ
-	(envelope-from <netdev+bounces-295961-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:45:28 +0200
+	id rb3WFhcpI2pWjgEAu9opvQ
+	(envelope-from <netdev+bounces-295962-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:52:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51F164B08F
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:45:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD11C64B0D9
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:52:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=I19Bho0F;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295961-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295961-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=trailofbits.com header.s=google header.b=M12yxGjd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295962-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295962-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 629673008A6C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:40:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B1653301AD0F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9071543E4A6;
-	Fri,  5 Jun 2026 19:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145BD43E4BA;
+	Fri,  5 Jun 2026 19:46:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B1C4418CA
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 19:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065171A683A
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 19:46:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780688452; cv=none; b=Wn55626oQsfwxXdQmNcPzkgrcgjnmyi8F4HYPiBELZsZn8iX5CL0Ud25bId3HChd0wykQ/Ja32Qn6YYPSLNsRbCiSc5WEI77mIfyqiqCjZ9k6ZKPfbMRRi8YKx0KAXqfLAOZ0QUUawPA7204GtNjVXOLEFbZ2pcr1NUhwpaD6cc=
+	t=1780688809; cv=none; b=TYw0vVV9C5rrs9VUO/HvdtjV4TRxUG/avk2iveUTgC5PnAA/FtSeKPIOnp5sy17gcq4qKPnx5ZNo7tr8oR4A3bOfNRfCWbEPp3G2aMpwdvBsUalg6XPe/G/q952d4bDjdKB4vhYDUWYNU8z1xMc5MJwpFTxHdbHYeduFkAkZuYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780688452; c=relaxed/simple;
-	bh=y/rU4gh0E0L2u/dhKcW9ljUwXNcpqmT4X+WX+7weVWE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QT/IdhBm0gQPSjH+4UUoT+3Wd48aylwI+qtCNlrfM3WxfpH7fk2eF5VdA2QG/dfPVfegYp4S0krRHh6GOj5BzWaOli7cA+vsu3+8XpRUN+Cc4RJO4sxYXIlWZkofbOzi8u20HGthzRXDbk3C+NW/X/2/2J0QO1rALgzx7Znmpx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=I19Bho0F; arc=none smtp.client-ip=209.85.219.49
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8ce65629acaso26219136d6.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 12:40:49 -0700 (PDT)
+	s=arc-20240116; t=1780688809; c=relaxed/simple;
+	bh=I4BJujHHZUZqw6n+betSBc0+olYlvmBlXUXmbzBrl7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oGseR1C5kf1O18kkt6Uv6GuZN3w+750MqgYNn1LbIhQ6jNDuCCGBPfBQqrndBW/DTPbS3Ows8+p7H4UT5GGhgxL5g/ixnNwpUBDFUz+L+wdqvQJxcHvjgjxohBVHB5DHiyq7+PBehqbWYjvdn/tvZdl1qjC5d7ouWSpQ7SHR7Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=M12yxGjd; arc=none smtp.client-ip=209.85.222.180
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-91587626a3eso284694885a.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 12:46:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780688449; x=1781293249; darn=vger.kernel.org;
+        d=trailofbits.com; s=google; t=1780688806; x=1781293606; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cAFqrVA+AqYfDZqdtHewX5SP2boCxXzf2uI82b8kdGA=;
-        b=I19Bho0FtK+r40fAbPnyu4R0jAO4GrbzY5HhGpN3f2/+PaUdhlaZ7CPsiO6Ts4TVa5
-         v6UPhnWuGK+A9fGQ0M3oPIv5CbTuMUyFgqXCupP4wdgv79WqYJNP/KuEcd36oORqwz+/
-         6PNIwM2P0TVV726vx7nGoWGZSxanBws7mdV52Lf3ACCbP94rsN5RyX98wuQKNsIxd7JI
-         1nEaKAxY8qKA5w1l8+zk7BSyOA01eoKyGnxWFv2m1EDFbkWETrkE157giFxIfe4Crz73
-         VYQmbJmdpZ4OrLUuf0oEsF28Yf5RtuOSGLPgSIUCx/NFUmjTETAycnwqdlBg2VvIDGDS
-         oS0A==
+        bh=QkwkhyiQDGQIbGWw1Mr8x2MZmKdl2kRdID6GKjvxF4g=;
+        b=M12yxGjdAAiqiImH6CCOvssnZPHBETqmfKAkhCG22fwVZpVLtO1+UhZH6zXzpvy8Mb
+         fm8ltSIss++FusPrYZ+XRyjjbMHzswlGRTsjF5VN7f9oEKnszuD3P1dPW/Tt8jsoasll
+         vz81iWDFUyIJMmqCRDUhZ10qtYN3WJAXhCCA+mHpQ8Ln/d2Pd4cZFm40l1gLkCpeDIXM
+         NCe6LgQhvaXR/qK66zSjzX08PWIo/Ldp2J3vDhgeb8czpga8EqkKM6INA/n359RpOIvJ
+         eIFnRL+n6/pChM+u0mPI89c8dWo2fFcbHVmq58auQBS5mIuVxMt4jcIuiqBNWdllTYtB
+         35jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780688449; x=1781293249;
+        d=1e100.net; s=20251104; t=1780688806; x=1781293606;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cAFqrVA+AqYfDZqdtHewX5SP2boCxXzf2uI82b8kdGA=;
-        b=AwGz49buA1XLe9Ki/BswkcqG2a6ZrCQc43WRo4nbGvU4CRR/VyqH7DDu9wjNKW95sz
-         OyPJh79Kt5mk5cqNYJVXdscYttqOr/DdShCwqVGs3LFuCAyC1mlmJwB3+5RM00waJrrE
-         lfjZf4ZJW55ibaAdNpfjeMrYKKHVGxnV77IFRft5E9pCnKvHUc+lx+8YYx+ewteFkQpH
-         RdFVQbD6d6TCZmTn3tOPes7yyNM8IQ5OBx03JwzYBXRQilYdvsrPU3xekXJ6fD0oy6kk
-         FeqpSpySlhXm01XJofx9sfl2Tzts1wC5E12G+ywM85UTrbljC7IQTrMUlbxTHjj4e9n3
-         JkcQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/fXbKf9Sl0aZAJ0+ZdDh65V3XbwythDuR5Gxr0wRFbXlSDlmW6ko0ux0JuNPoDxxunj6TLJFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTG4jt7xDZ1G5tNEO+ULUua1g1UxMNantH9GbmrCsn3EFunnCM
-	AnUqWkuK19K6nhLTm7VEnNTNFgjShkUiUbto/zzHxd+LGYICu4vQaDFe529ktooSfMw=
-X-Gm-Gg: Acq92OHELCZhyinA1805gbBM48P0LTMjvjM47ZbBWNvXIPxBv79i/PCpbwfzNl3k7mt
-	Q+wRN4Re7nv+LSDB8nXj8lZhlD3/c8+8koj8EZKe2LBlxemLLm8oL4F7/U4AU5B4IeuDERxFxQN
-	RaW5cmcAet5zYZjUHa77itIjROd19GOHnxMdZWWbW/27BQl4NH2QQHAWCFc/JjEkLMzH7Ln3reg
-	ad8xkZncOCbxMPyp7VulFZUAbMtiMNeT+jzvztg7NC3AXFh+qRqzpq54s1hU6UP9x2KLpcabU5+
-	nqPvXI7IE+lxFSquslQSCGa2f/XElDQvruoYvUrK2BmgGhJupEwuTBuvAcrUFxer/Lkv5goSOre
-	UYs0C/decqwQbUShInC4jZ7UZNOCGUvAwh/WYfE+6oNOQV5mUc6GaufvYLBqwxVo5VPBiaS8aH8
-	cPaZ0lqWkCqv6DmZhSQVr/pjHheVNMzu7qIa9OIA==
-X-Received: by 2002:a05:620a:690d:b0:915:8865:dc01 with SMTP id af79cd13be357-915a9da7f30mr906550385a.46.1780688448992;
-        Fri, 05 Jun 2026 12:40:48 -0700 (PDT)
+        bh=QkwkhyiQDGQIbGWw1Mr8x2MZmKdl2kRdID6GKjvxF4g=;
+        b=KEBOC6e+mCWhYcHjiqjyDwynr4/N5+iHLh1+c0tNMbv3wZSSfe8WNzrY6ZF+rxymJf
+         xl+QcmpaRlSAmoDgHuLxW0xrXEpYRGisXbCvQG2N7e+eDrsRlrVPLJlcRbVmuJ5LfmO9
+         eWLD1sNK/9xD4l3smNv4j4XSh07BFlEaqziGeY6Qv3iUwct1EsS0KbQLnBmryBGbhSnu
+         kkLkv0vX0KnQQGo7RM0qJOEFtOpRx9ZNIKXaA32Df5QObqM8UP76VldAQdyneSdDVdgj
+         IU9TVAE7odYsmn4vn0pJ7m/CE0wHr1ZDmlWR0EcIeNRwyXnYc1Iyuy3O4FSWShGJS0th
+         zmOA==
+X-Forwarded-Encrypted: i=1; AFNElJ/6sqqS9lyd8t3aijFQsWmmfb/TIFrIqgz+xhzQPs2Jfd1UUgjjsl4U4/IRnXxoTUZATymXrNo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9Be3AlXoY6cffepZtMZh94TPXoCZggq6pqUbfyQ2L3AdL70uK
+	jpVRFUGlX9nAAB/i9JgA/ouMHBAprjXwO5hc5XWkeuh8IFxodUDHsG5tZK+0a5Fef6s=
+X-Gm-Gg: Acq92OHRC7UUvmYBk2zHrfEVSeBny7bA4IzCT/2RfZ7Uu8yWcdFn+RAdbTZE6x1XFkD
+	+Tv60bmmqXtJI/9kdMgH+lY9n75VwLbA+Eg4WqPcxpywm1LG4+9fifAHsju1n5RlxYO9x6w/7Ko
+	OS1m3NO3FETYXNGyuemXUEmPKo6PC+q6U2MLun9bysZbdBKhkzE+/mK/AfU7MtEONOa6SruCfdv
+	1eKhzK+ICSzIz/og6/sXuer616I/oobBZSDXcWUtmzN3cDU2hpq1/pMSfGrkVOgtC7r7iyJKVgn
+	/2yvl/A8Ozzk4U/ZQx0sUEmYwYWuoJjK//8O2fjsT+CMRkMUzrcyvDi00VQM4ilun9Wy1BZKGx9
+	UjIYW7ci9rw1B0uDe8EvERuMrhWTESm4Id3V8El3+q/EGGW+Fnh8lgr6YO/wE1mYo3Eb1pQmYly
+	S+fffaC2MTGLDUpjAcd7lBToabrDXVeOH/gG2/GgqCSZ+0XD/W
+X-Received: by 2002:a05:620a:25c6:b0:912:671b:d098 with SMTP id af79cd13be357-915a9dee09dmr926759785a.51.1780688805905;
+        Fri, 05 Jun 2026 12:46:45 -0700 (PDT)
 Received: from localhost ([161.35.96.86])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a00afafsm974370785a.2.2026.06.05.12.40.47
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a37bcd6sm996117285a.25.2026.06.05.12.46.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2026 12:40:48 -0700 (PDT)
+        Fri, 05 Jun 2026 12:46:45 -0700 (PDT)
 From: Samuel Moelius <sam.moelius@trailofbits.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org (open list:VIRTIO NET DRIVER),
-	virtualization@lists.linux.dev (open list:VIRTIO NET DRIVER),
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org (open list:TC subsystem),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] virtio_net: normalize non-positive napi_weight values
-Date: Fri,  5 Jun 2026 19:40:44 +0000
-Message-ID: <20260605194045.2625610-1-sam.moelius@trailofbits.com>
+Subject: [PATCH] net/sched: act_pedit: require matching IPv4 L4 protocol
+Date: Fri,  5 Jun 2026 19:46:39 +0000
+Message-ID: <20260605194640.2645386-1-sam.moelius@trailofbits.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -100,90 +97,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
 	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295962-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295961-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:sam.moelius@trailofbits.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E51F164B08F
+X-Rspamd-Queue-Id: AD11C64B0D9
 
-The virtio_net.napi_weight module parameter is signed and is copied
-directly into the RX NAPI weight after netif_napi_add_config().
+The extended IPv4 L4 header mode in act_pedit can select TCP or UDP
+header fields without confirming that the IPv4 protocol field matches
+the selected transport header.
 
-A value of -1 lets virtnet_poll() run with a negative budget.  The RX
-loop processes no packets, the unsigned received-vs-budget comparison
-completes NAPI, and the NAPI core reports:
+That lets a rule written for TCP or UDP modify unrelated payload bytes
+in a packet carrying a different protocol.
 
-NAPI poll function virtnet_poll returned 0, exceeding its budget of -1
-
-The device then repeatedly drops receive progress under stock QEMU
-virtio-net traffic.
-
-Normalize non-positive values to the default NAPI weight before
-assigning the RX and TX NAPI weights.  TX NAPI can still be disabled
-through the separate napi_tx parameter, which intentionally sets the TX
-weight to zero.
+Verify the IPv4 protocol before applying TCP or UDP extended header
+edits.
 
 Assisted-by: Codex:gpt-5.5-cyber-preview
 Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
 ---
- drivers/net/virtio_net.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/sched/act_pedit.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index f4adcfee7a80..667026607cfa 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -6481,6 +6481,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- static int virtnet_alloc_queues(struct virtnet_info *vi)
- {
- 	int i;
-+	int weight = napi_weight > 0 ? napi_weight : NAPI_POLL_WEIGHT;
+diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+index bc20f08a2789..9a4590451f7e 100644
+--- a/net/sched/act_pedit.c
++++ b/net/sched/act_pedit.c
+@@ -341,6 +341,8 @@ static int pedit_l4_skb_offset(struct sk_buff *skb, int *hoffset, const int head
  
- 	if (vi->has_cvq) {
- 		vi->ctrl = kzalloc_obj(*vi->ctrl);
-@@ -6500,10 +6501,10 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
- 		vi->rq[i].pages = NULL;
- 		netif_napi_add_config(vi->dev, &vi->rq[i].napi, virtnet_poll,
- 				      i);
--		vi->rq[i].napi.weight = napi_weight;
-+		vi->rq[i].napi.weight = weight;
- 		netif_napi_add_tx_weight(vi->dev, &vi->sq[i].napi,
- 					 virtnet_poll_tx,
--					 napi_tx ? napi_weight : 0);
-+					 napi_tx ? weight : 0);
- 
- 		sg_init_table(vi->rq[i].sg, ARRAY_SIZE(vi->rq[i].sg));
- 		ewma_pkt_len_init(&vi->rq[i].mrg_avg_pkt_len);
+ 		if (!iph)
+ 			goto out;
++		if (iph->ihl < 5 || iph->protocol != header_type)
++			goto out;
+ 		*hoffset = noff + iph->ihl * 4;
+ 		ret = 0;
+ 		break;
 -- 
 2.43.0
 
