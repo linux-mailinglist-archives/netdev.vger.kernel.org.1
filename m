@@ -1,154 +1,135 @@
-Return-Path: <netdev+bounces-295938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295939-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id C7PRLK4UI2pihwEAu9opvQ
-	(envelope-from <netdev+bounces-295938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:25:50 +0200
+	id EL3eKUgUI2o8hwEAu9opvQ
+	(envelope-from <netdev+bounces-295939-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:24:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D0364A975
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:25:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11CD564A928
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 20:24:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=kKvXX5Tw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295938-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295938-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b=ozlRqFxB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295939-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295939-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8CF03038F78
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 18:15:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA08C30434E8
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 18:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534193A9DA9;
-	Fri,  5 Jun 2026 18:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8FE23B2FE4;
+	Fri,  5 Jun 2026 18:16:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DEE3A3821;
-	Fri,  5 Jun 2026 18:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6932253340
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 18:16:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780683297; cv=none; b=GKbfeMpjOlyoZrqg/kywW42i//k2/idlpOQsJAFWJbjVUeYWRw6wwgKcm7VUHL/yXsnqi0/ng3NRV/EvXKzVicfv8aYORf7MJduyiZyYXpU/Y4jnBZCREPMvJvt5W6bPKJLnSu6F3l5whiJrwVxG1rzOCp7t9B4Ay0GoP27GO8k=
+	t=1780683376; cv=none; b=YvkopCjWIk9KDzutZR683v+arfvy37M5C9Wkk4u+zeCyKLTc9KLP+U1p/7nIfhSnVlCqYEFahDILl7TrNvQwF+q1qeNTrlAp3/Qs/DDlQXDQvuNVvCL21CnonMvf6DFL62aPXG6luHRz1Vjc4GlanLGpVl1FZrcRtT/rOm+nCmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780683297; c=relaxed/simple;
-	bh=Ge2nsXbXVB11wGz26n/HR93zpsXWkFswt9H/b+SLtgA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C7JmOc7bZSzPLbTY/w/2CkYSCLyPpumvnJOxnr4xpBhB9xfomEJO0lj5ldK6u+0KWsXwktw2FlOQVR++kh+DntDzriendpWvy/LDY+4+KlygHoMoJF0vghbpjyzIZ9UWmNXlu9/S7EvBKZS0PHt828hWQX8f0qS7XdRyGR+tGx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kKvXX5Tw; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CWSJhxCvKNv8WF2H5sZ3YZCpqe7EisvdRxWuvZCt+Lg=; b=kKvXX5Tw3k1zYXky5H61GA2eAn
-	YQCNCAOfKkOUytJ/ySMIjmGQwwTn903T3ajubR8xq7X2ymdVcWy5etV9+6ZpEv+kQYn2SsTy4QiUX
-	2hr4X3WWaFNDEQkSscWHthsGXvO+PfTiaXqUzXBmUkiw/Z45LVwc3z3cRtPm9l6SHmlg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wVZ43-006H9d-S1; Fri, 05 Jun 2026 20:14:39 +0200
-Date: Fri, 5 Jun 2026 20:14:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: George Moussalem <george.moussalem@outlook.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] net: phy: at803x: add RX and TX clock management
- for IPQ5018 PHY
-Message-ID: <afdced5b-73b9-4214-a94a-c13fadd39dce@lunn.ch>
-References: <20260605-ipq5018-gephy-clocks-v3-0-f232d9ca0966@outlook.com>
- <20260605-ipq5018-gephy-clocks-v3-4-f232d9ca0966@outlook.com>
- <36cd63f4-749e-4b09-b8a6-cbf6924dea88@lunn.ch>
- <SN7PR19MB673634FEEF98FB8BCBBB15979D112@SN7PR19MB6736.namprd19.prod.outlook.com>
- <471a21f2-7ab0-410c-861d-5722a94b127d@lunn.ch>
- <SN7PR19MB67363B4F852FB37071637A299D112@SN7PR19MB6736.namprd19.prod.outlook.com>
+	s=arc-20240116; t=1780683376; c=relaxed/simple;
+	bh=Dvr3HuucUQy9MSoVPbMBM9jW04Hs2nygJoBIBZTKxyM=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=klT3FzJ2ltvb4VD+KWkOwFu1nqZawNpKiIjO3uU4GbQmE9VB1g8rgwrh8iW8FP6LYGjCzA5DsL/e9AUPStmDYJGXWXdlUSaf0p7WRIaB3E3XGCwS6n/OFGH6zQF2CuBCCOY2lqSToG4brPTWeBssJ/+pLuUcVl+khTJppGnB3i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=ozlRqFxB; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8584BA4C3B;
+	Fri,  5 Jun 2026 20:16:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1780683368; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=wrNglY5ViloEmNs9RRyqZPGCG3oTEJgSEbE0UVjOUck=;
+	b=ozlRqFxBLDD+L0BZetFQ+Wo/u6kZCLjHHVtvN+ryTuzcsfQ4EaZW5rJF4s2T3iZSfpjgsP
+	gZfU/ZDWlSW9rpZN7mKqNk226UuwUtDc0T1s4fCSFumYnYGWKdbC00nKBWQWiCoYccMKoC
+	1Ha3nTkJiNWDZHqoemi+ydk65b9E85vIkeFm3/37ZVeQ4goT6LKxDLgHRO6rVrnuAFMMMr
+	II6drYy5BSnA1Xdph6piul+0G18JDvai0nBmQ2o7nAQCu4Ui/Mlx7Fl2+uMviukBsW0gWW
+	scXXLGBhQna2C6JPjvqO4/2h6dtfQsnePcuyudz9DsYP5seBVmNYAHM6uHnAAA==
+Date: Fri, 05 Jun 2026 20:16:03 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+ Janpieter Sollie <janpieter.sollie@kabelmail.de>
+CC: netdev@vger.kernel.org
+Subject: Re: SFP/MDIO/I2C: help requested unlocking a SFP+ MCU to expose PHY
+User-Agent: Thunderbird for Android
+In-Reply-To: <903daf32-aecd-4160-8f69-4fc329fdad3f@lunn.ch>
+References: <ec5bd768-3f54-4c30-b5a2-1e0b43f789e3@kabelmail.de> <903daf32-aecd-4160-8f69-4fc329fdad3f@lunn.ch>
+Message-ID: <49CA4531-3BDC-4054-8830-BA80775C2B68@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN7PR19MB67363B4F852FB37071637A299D112@SN7PR19MB6736.namprd19.prod.outlook.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.65 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:konrad.dybcio@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-295938-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[outlook.com];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TO_DN_SOME(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:janpieter.sollie@kabelmail.de,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295939-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,oss.qualcomm.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tipi-net.de:mid,tipi-net.de:from_mime,tipi-net.de:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 44D0364A975
+X-Rspamd-Queue-Id: 11CD564A928
 
-> >> This PHY is integrated into the IPQ5018 SoC, connected to the first GMAC
-> >> (GMAC0) and probed upon boot. However, this PHY is not used on all
-> >> boards because an external PHY or switch can be wired to the SoC's
-> >> second GMAC instead (through a PCS). So from a power management
-> >> perspective, it would be better if we can disable the clocks if there's
-> >> no link detected.
-> > 
-> > Humm, is link the correct criteria? If the PHY is not used,
-> > .config_aneg should not be called. Why not have the probe method get
-> > the optional clocks, but leave them off. When .config_aneg is called
-> > for the first time, enable the clocks?
-> 
-> Will check if config_aneg is called and test accordingly.
-> 
-> ip link set eth0 up/down and cable (un)plug do trigger
-> link_change_notify, and based on the link state the RX/TX clocks are
-> turned off/on properly.
 
-You are talking about something else here. You say the device is not
-used. If it is not used, .config_aneg should not be called.
 
-This is a second use case, the device is used, and you want to limit
-the power it consumes, when there is no link. Do you have any numbers?
-How much power is actually saved?
+On June 5, 2026 6:51:56 PM GMT+02:00, Andrew Lunn <andrew@lunn=2Ech> wrote=
+:
+>On Fri, Jun 05, 2026 at 10:09:46AM +0200, Janpieter Sollie wrote:
+>> Hi,
+>>=20
+>> This message is a follow-up on a previous request,
+>> I reverse-engineered a lot of stuff,
+>> and the question has become fundamentally different=2E
+>>=20
+>> I am trying to access the bcm84891 phy on a 10Gtek ASF-10G-T80 sfp+ tra=
+nsceiver=2E
+>> According to 10Gtek, these modules contain a bcm84891 phy=2E
+>> The MDIO commands seem te be sent to a MCU, not the phy itself=2E
+>
+>Do you know what MCU is in the SFP? Is there a data sheet for it? Can
+>you read out the EEPROM holding its code over the I2C bus? You can
+>then disassemble/decompile the code and see what it is actually doing=2E
 
-> Could you explain why to use _optional variants of devm_clk_get as these
-> clocks are required? There are currently no users upstream.
+https://doc=2E10gtek=2Ecom/file/file/20240806/d6fa28f954989f74cde42c75353b=
+5fe6=2Epdf
 
-This last bit is important. We don't want to cause regressions on
-existing systems by adding in requirements which were not there in the
-past. But if you say there are currently no users, that is fine.
+I2c address should be A0h
 
-	Andrew
+Nicolai
+
+>
+>	Andrew
+>
 
