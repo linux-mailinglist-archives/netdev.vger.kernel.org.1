@@ -1,173 +1,187 @@
-Return-Path: <netdev+bounces-295545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BZhiIYElImpuTAEAu9opvQ
-	(envelope-from <netdev+bounces-295545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 03:25:21 +0200
+	id hM5gL7opImpoTQEAu9opvQ
+	(envelope-from <netdev+bounces-295547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 03:43:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE47644630
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 03:25:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2EA46447C1
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 03:43:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=aZNGRjx1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295545-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295545-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295547-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295547-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DAB023032398
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 01:24:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0BB1E30D434C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 01:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F91385509;
-	Fri,  5 Jun 2026 01:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1248F37B023;
+	Fri,  5 Jun 2026 01:28:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C78361650;
-	Fri,  5 Jun 2026 01:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20F436215A;
+	Fri,  5 Jun 2026 01:28:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780622669; cv=none; b=enM42X7LDMeogmH4meVKxAve/JIUTFO+7GxBBzSYhh2Mbc9dEYTrfSKw8cL6aae/5YIRpnF0Os2qvYUHSgASPcz6f4+xM8MBjjjhUierKmKYb4GKKuzYkGxFGXX41tLhqNvniH2HPzi4h4XmQA6T8I6fydkobhl4LA94lR8tu6I=
+	t=1780622929; cv=none; b=ohG+GLIJ+cBiF2qli/94Gtq/b4Gxy/zXdS8QsNRr1/TPGdlAzrygbz7phfjYqOkYX8PpyyKy/QRt6RocA/C7av8pEc/WLcgeL9zXZGhHETJWJfb9Hq/oVvc2GUyyhWfLpH+WA2fZzI9HXfUhA5tpTbnmpNZqiiEJbbAfHfN5WaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780622669; c=relaxed/simple;
-	bh=0F5y4FcvZ4sW3vclqK88EapePq6+JuWGywmKUd1PKE4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WPBnlbOn8mC9fDoKlCYKchYtQR+yTGIuBgkXMqpEWVg6wiExnYiVbPC4qWyK1I8Ihx1fgdz/FrKUtnzvuKZo4io9ETiiLceEyEYxAYinB+wgnFtuliL+Ijnw9ZQu9pOua+FTxjOrMiEqNEtdeJPJUXzCgB8R3oE+w7fTLaQpNEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZNGRjx1; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4DB41F0089B;
-	Fri,  5 Jun 2026 01:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780622663;
-	bh=fewRWzJCNDCCA8/KFWnc5g54zB+46ySS+Do+r/WrM6c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=aZNGRjx1KgWzLCrVCPXsmakHcN8mAS8sdjpRpsacMcK7WB5KroIY8rF3ienwya3wL
-	 Sr7BlH/b76XOW+OKekjkTQpUmuUZmXrRmB6trh3jaU3HMDIZKnXt6JE9JJ307vhVua
-	 4XShbdHmCZHNGFlLOR6ONT8bhb6rYorYJmKM3lSlZ1VWWvNOgCrui8MAx+jagwTrtu
-	 gsqkkp1iUqWiuduXK8NWO/edAL+zu7y7m6LS+6E2EkRh+knZUDZpmR15uzRjMmJFeo
-	 7lS7wVgo0AKpGs7l+o21P4VRR25EGhTJmDQGrC32ebfw3s87aVfddikfsUneEiNFfi
-	 w3NhvX6V9XbiA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: devnull+george.moussalem.outlook.com@kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	george.moussalem@outlook.com
-Subject: Re: [PATCH next-next] net: dsa: qca8k: Add support for force mode for fixed link topology
-Date: Thu,  4 Jun 2026 18:24:20 -0700
-Message-ID: <20260605012421.3517532-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com>
-References: <20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com>
+	s=arc-20240116; t=1780622929; c=relaxed/simple;
+	bh=YIFK7ThZKvxcD6wuXBCW/xr5YF5zs8VrzZiNkhe3zvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IzD2flKaLfuJXrXit4HPSNNUwPFdi+OtbyVE5C8IhaLJxa2J9ye5ZaN6cA95ozt8jXc2g7J50MLBiuykWO3NHeatOBp1T/tysBAZgrbwUCEgmeVDtewuf9yQLE9zduLjQHYM/eOgHyMjeEfV32K+D7NSXtRCARGEroZ77ZQAeCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
+X-QQ-mid: esmtpsz20t1780622911t751b3deb
+X-QQ-Originating-IP: bIJVzi1eACFz8E/TmWoHi956L0iTmPj8njNpk0+moEM=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 05 Jun 2026 09:28:29 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17100364510394675939
+EX-QQ-RecipientCnt: 13
+Date: Fri, 5 Jun 2026 09:28:29 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org,
+	u.kleine-koenig@baylibre.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, yaojun@mucse.com
+Subject: Re: [PATCH net-next v6 4/4] net: rnpgbe: Add link status handling
+ support
+Message-ID: <8373BDD7E788A344+20260605012829.GA793611@nic-Precision-5820-Tower>
+References: <20260604112750.769215-1-dong100@mucse.com>
+ <20260604112750.769215-5-dong100@mucse.com>
+ <7d31ec15-07cc-479d-adce-c7d504eff284@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <7d31ec15-07cc-479d-adce-c7d504eff284@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
+X-QQ-XMAILINFO: NiFdmnmiW14nvJX06TwupE9+3y99TSj2NrtjP85uGHU8e+en1htTlCl/
+	RahnuuG0zfufpFAub5nEXiCYMBp3+P/MbNDqI3lqHNIo+U7/FqLWCwiPrjVM0Zxz7Z+ndbw
+	Zf5eG+vWaXk7rCArT9OG6SLG4//xbay2Kub6uY925qCfRhRpb52uLuLzFsUYDu1CD5RS6vO
+	RUnmDaNVGAdUG+PeSE6mSiOu/3vWIaSNKnyj0bKS69bAEy2utyh8rdmq1xU9RHseVud0VBj
+	JuHXThYomA/fBg/cFDSrj4gTo8ZFH6I8Tms4oEP8bpNidBrM7NXekHasMZ5sG8mQaEm4qfH
+	9CwveS4bgV2u/HvUjp/1RZA2pdPrU9eK4ITABxPjMsO0OVHtjL9OPudqcN1NTwJ6FwIWuUG
+	w1/1Ibj9JXfLmrmbw1YmNJrEEghzkZ2wQ1alUEo6zvZATnttKLLFy1VK79KOq3rid3Z2SbA
+	S1A14mT1JLAaEYcSRmNkoszfuMveEW/ptVXlG86W18ZXoQXxuJVoPrAPGkaQXhDyoONeMCY
+	G6L/Yrt3kbDHgQjGgKd1+yKG7RFePxSMv4fDz7cnUPPdLCfPCeZN8pNMW+eiwHZwCOt6JL6
+	EhNIO3/5C6TfIlNBkOJsd51459iuol+fw0yZrATz80OsULl0DkqhjQkGRAsbuH9bmyKUfjp
+	nv7bPk+H1vVKcVpkc8b3xsSoX8+kcb9ceNnfGPgwCj8qJzhMPXfCJA0iS33NQ5sT+Spl/Mi
+	g+MpwD94cqmyYcfGqrQ+T5x5ed6UTxKdcwHksEz1lMC7W16KlwMUoAIQOn1rp1O8bKZvn3/
+	vOPMYoP0XBOxh9/cJFlRIG28gALZPnt/GWk6dyNjrvwohSh24e2ZB9ZEH1iyVcuU2q4YP9/
+	0jlwjV8qp16lmj2oN0X/WymNHfIaqVEsyORaSmr9SiQpwx+2opDvoJef7DkJQPKfFby/qAY
+	Yud5gFS+ejtix15PCdwQ96deXPHUgXsiJpmU8y/0WCt1lQhrSo/0ARLzzjTiNl4NvzzCUvu
+	+n3wG8XtEI5rAG0Vb+6jj0yWXoi0o=
+X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:danishanwar@ti.com,m:vadim.fedorenko@linux.dev,m:horms@kernel.org,m:u.kleine-koenig@baylibre.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:yaojun@mucse.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DMARC_NA(0.00)[mucse.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org,outlook.com];
-	TAGGED_FROM(0.00)[bounces-295545-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:devnull+george.moussalem.outlook.com@kernel.org,m:kuba@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:george.moussalem@outlook.com,m:devnull@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev,george.moussalem.outlook.com];
+	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-295547-lists,netdev=lfdr.de];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mucse.com:from_mime,nic-Precision-5820-Tower:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EEE47644630
+X-Rspamd-Queue-Id: F2EA46447C1
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: dsa: qca8k: Add support for force mode for fixed link topology
-    
-A fixed link topology is commonly used to connect this switch (on port
-0 or 6) to a SoC's MAC over SGMII. When inband negotiation is not used,
-the switch needs to be configured to operate in force mode. As such,
-enable support for force mode.
-
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index a36b8b07030e3..3dbd18ab86380 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-[ ... ]
-> @@ -1611,10 +1611,14 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
->  	if (priv->ports_config.sgmii_tx_clk_falling_edge)
->  		val |= QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE;
->  
-> +	if (neg_mode == PHYLINK_PCS_NEG_OUTBAND)
-> +		val |= QCA8K_PORT_PAD_SGMII_FORCE_MODE;
-> +
-
-[Severity: High]
-Could there be an issue with configuring port 6 on QCA8327 and QCA8337
-hardware?
-
-Earlier in qca8k_pcs_config(), reg is overridden for these models:
-
-	if (priv->switch_id == QCA8K_ID_QCA8327 ||
-	    priv->switch_id == QCA8K_ID_QCA8337)
-		reg = QCA8K_REG_PORT0_PAD_CTRL;
-
-Since the SGMII force mode configuration uses this same reg variable,
-won't this cause the FORCE_MODE bit for port 6 to be incorrectly written
-to port 0's PAD control register on these specific switches?
-
->  	if (val)
->  		ret = qca8k_rmw(priv, reg,
->  				QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
-> -				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE,
-> +				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE |
-> +				QCA8K_PORT_PAD_SGMII_FORCE_MODE,
->  				val);
-
-[Severity: High]
-Is FORCE_MODE properly cleared if it was previously set by a bootloader,
-but we don't use outband negotiation and no clock falling edge properties
-are configured?
-
-If neg_mode != PHYLINK_PCS_NEG_OUTBAND and the clock phase bits are not set,
-val will be 0. This causes the if (val) check to fail, skipping the
-qca8k_rmw() call entirely, leaving FORCE_MODE unchanged in hardware.
-
-However, if clock phases are configured in the device tree, val will be
-non-zero, and qca8k_rmw() will clear FORCE_MODE. Does this create a
-scenario where clearing this mode unpredictably depends on unrelated clock
-configurations?
-
->  
->  	return 0;
--- 
-pw-bot: cr
+On Fri, Jun 05, 2026 at 01:32:59AM +0200, Andrew Lunn wrote:
+> > +static int rnpgbe_process_link_event(struct mucse *mucse)
+> > +{
+> > +	struct net_device *netdev = mucse->netdev;
+> > +	struct mucse_hw *hw = &mucse->hw;
+> > +	unsigned long flags;
+> > +	bool link;
+> > +	int speed;
+> > +	u8 duplex;
+> > +
+> > +	/* lockless fast-path ,serv_task retry handles race */
+> > +	if (!(mucse->flags & M_FLAG_NEED_LINK_UPDATE))
+> > +		return hw->link;
+> > +
+> > +	spin_lock_irqsave(&mucse->link_lock, flags);
+> > +
+> > +	link = hw->link;
+> > +	speed = hw->speed;
+> > +	duplex = hw->duplex;
+> > +
+> > +	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
+> > +	spin_unlock_irqrestore(&mucse->link_lock, flags);
+> > +
+> > +	if (link) {
+> > +		netdev_info(netdev, "NIC Link is Up %d Mbps, %s Duplex\n",
+> > +			    speed,
+> > +			    duplex ? "Full" : "Half");
+> > +	}
+> 
+> I actually think down is more useful to report than up? Up is
+> generally the normal state, you don't care about that too
+> much. However if the link does down, you probably want to know so you
+> can figure out why.
+> 
+I agree down is the more actionable signal. However most in-tree drivers
+(igb, e1000e, nfp, etc.) report both directions, and the link-up message
+carries speed/duplex information that is useful at boot or after renegotiation.
+I'd prefer to keep both but move the up print to the right place.
+> > + * rnpgbe_link_is_down - Update netif_carrier status and
+> > + * print link down message
+> > + * @mucse: pointer to the private structure
+> > + **/
+> > +static void rnpgbe_link_is_down(struct mucse *mucse)
+> > +{
+> > +	struct net_device *netdev = mucse->netdev;
+> > +	struct mucse_hw *hw = &mucse->hw;
+> > +
+> > +	/* Only continue if link was up previously */
+> > +	if (!netif_carrier_ok(netdev))
+> > +		return;
+> > +	netdev_info(netdev, "NIC Link is Down\n");
+> > +	rnpgbe_set_link(hw, false);
+> > +	netif_carrier_off(netdev);
+> 
+> Why asymmetric behaviour.  Report up in one place down somewhere else?
+You're right — the up message in rnpgbe_process_link_event() is misplaced.
+I should move it to rnpgbe_link_is_up which is symmetrically with the down path.
+> 
+> 	Andrew
+> 
+Thanks for you feedback.
 
