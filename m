@@ -1,192 +1,172 @@
-Return-Path: <netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hRYLO8K/ImqHdAEAu9opvQ
-	(envelope-from <netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:23:31 +0200
+	id H495N3K/ImpzdAEAu9opvQ
+	(envelope-from <netdev+bounces-295813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:22:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67548648145
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:23:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EAF864810F
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:22:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=bXK6rN+R;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VOFT+2Ov;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295813-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-295813-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDFC8308ED5E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:15:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 14E88300D754
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8967C30D3FB;
-	Fri,  5 Jun 2026 12:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38392FE575;
+	Fri,  5 Jun 2026 12:16:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFD02EEE86
-	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 12:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3F33B1B3;
+	Fri,  5 Jun 2026 12:16:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780661742; cv=none; b=fMi11IxXs51+Mkx8QKGPIUc0ZmxYlKMh2XBDAFP8LW+Sp9ad3u71v8ZQTwmUA7XYkJzHTtXgNqp7aylKq3JQUyI/ItYTAXU+ACKmGqeDNFCCVkUc2nTvqw0QLvIcetHXv9dtxMginyOrdf4M5hRxGX38qcNhe2EZtZZlf3eqyZ4=
+	t=1780661781; cv=none; b=oaOhERVROKpLO615hMFqSjGXcrHTlJ4uTTWWpVk+VuK2N7gdFRHev6j72MABOPBeyAApwakSZPDj3xQNIcK12nxQpPwB2Oq0H5eeVlKYU61Yo3ALiDcE81tGdmt3wFCNc5zWGdGNTB65yJOfyrl3I+sgKtlTFMjZWnTxHCzW9tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780661742; c=relaxed/simple;
-	bh=fXx6yGbTzyV9r4+8RIi/cY1NomiwKfkeqLs2lx+MlLs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HU3DqMTmbXlGM7h0XMfEUBKTQyvsO41N9wTWc3t5GoMNtplwas4zl7KCAh5mHIoPXyaMVzeXSAGRcQSNR7Oy1My34uxYNBUVs8h2RyiOULQSqnEmn45D0XjV+15gJBkOvjfRm/AJLvOtQx3H1MN2u/JC8fT6mW+AuAuMq1KB510=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXK6rN+R; arc=none smtp.client-ip=209.85.210.181
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-842358aaf36so772678b3a.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 05:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780661740; x=1781266540; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8BtuG0pULy2ESLzHtqYqpkGxYxsqgbLcJ3DpU7JXoV0=;
-        b=bXK6rN+Rs93Wf3M7m2aZnpktP/eYSnZ+x14FkP20cby09Hw98X2uS79PFC7zua+wDl
-         V6iADps1Zh6joUs504JZlEADmSWtOWqWvg78kkDSNYwnTh/52VnMAzbDn0GlkRCuXHBB
-         DANnHbAvvH1xPzebasbiadrz5wA/d72o7pKBLtQGgMy5B8fWd8VAIUNS6IzyE9sOa+/t
-         QvL/dVE4qOLsGsP4mZVLcSuqIIVY7+FXsJ0SuslfwrMWiOMqfbWRykvuVLk8jzRtRl5o
-         Gn9IAMjGIzZGLmEzKaDxnmFr3dTu4+8P/jpPbZjTTXtutVrZctrJIka8xnhgbP0QhMen
-         KJTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780661740; x=1781266540;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8BtuG0pULy2ESLzHtqYqpkGxYxsqgbLcJ3DpU7JXoV0=;
-        b=qzV6z6d9CKZJ35w82dvlHJjdk4dcUj9GyrxoWCSZnIDolOnLYZuUr4Q/EJ9kr/715j
-         OBptvRCzVOoI07KPpOOV//5MRQEWylYv/pASYI8sPm4vbeqhRt9T8uWuqvhTZ6qag6CM
-         uLWpGuVLwSz0K1jPtM5FlfqktJ7JSYRdrbTZP3yfKcunbtL3hl2SjDsudA34aAcEExXh
-         wzEbvo77TMtwr/E4sys9dEL0JMpfGHQ5oJ2Kz/GprXEmmIFFzgWSNFNM5WpmW3V2DtUt
-         qkJwE5k4Aj+wrDys/fxgUPN+dOiyfEe+qFehGpiigjE39K/yvzUkIMFx7tGCyBRlV/2P
-         UiXA==
-X-Forwarded-Encrypted: i=1; AFNElJ/c/miCWy50CNHIiXIuzmdkWLEMDnR2pjNUrTMMHz0QknBj/Cvx/zwJZuxr5jj9XLcx3ph7yYw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQnFeoLt5P8s+WLl0oXFEvVv3ArXTQU+cTmA98H/0Voj2qmoM7
-	hzu06ejXMjxclrTwKFIhUmxhCpPYMHTd38TiQhYZSYOdbRdNtdYx9ZDV
-X-Gm-Gg: Acq92OFOkSi7eVSPkSsaN7tRga+KOtfJJRoa3Ydby2oawLSeBkvPQoQ21PDdpQ01RlX
-	XueY1omema5DQs+xsuiyhJCXq2+oc5NPhFPU/SWFgt3xvMBVHosia34mdv4uWYQI28RT5MD+QwJ
-	nP2RtC6ZU0tN++ekTdMenMnxcQYM60jyrdIoUU3HL0achKfaxwWPBxC6cFwJigTx7IT6igaQiKj
-	H3R16eCsChyf1bLRhROWToD7FPhPR2Ps02+kXE0G0Xi1HLXULtBi3CajJ//zu5TeTPcCtUFbXpf
-	rEM0mSEMU6ZzGkeSwfeCV3MsehmEd9F0OAm272HbU4BPPdekmDL+n9ZGwhaSz4XJqHJYr1t3lUt
-	CQJrbBDn5iObJJE84lIt5R0XkI7duosQREshIrYX9nUh2ghKJ+Ip5sbi7QXSjf4R/KSyn853/V6
-	SkeOUMUECcPn5eaZDQcSYrYcx3zJ/AwyDt9g==
-X-Received: by 2002:a05:6a00:1d91:b0:842:2ddb:e305 with SMTP id d2e1a72fcca58-842b0fc0c71mr3240988b3a.43.1780661739544;
-        Fri, 05 Jun 2026 05:15:39 -0700 (PDT)
-Received: from ltu.. ([171.245.6.72])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84282374300sm11241583b3a.20.2026.06.05.05.15.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2026 05:15:39 -0700 (PDT)
-From: Nguyen Minh Tien <zizuzacker@gmail.com>
-To: stable@vger.kernel.org
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org
-Subject: [PATCH 6.6.y] net: usb: lan78xx: program MAC_CR for LAN7801 fixed-PHY link
-Date: Fri,  5 Jun 2026 19:15:35 +0700
-Message-Id: <20260605121535.51414-1-zizuzacker@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1780661781; c=relaxed/simple;
+	bh=Gv/jv50W6HYzvFdtLIOw9FUx1JL4zlTD930XAxEzdgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SW1SFcqkM0C0sh8U71VW3R88hA+DYWJ95erutUF3oyj8fG/qGc9gaP9YQI79TPLPtInsBiwo5ueCZ5I1ErO1urzcPFiNIF2AqitZ2BOcf9x2M02mxgUswobRCNOMFCCxVIIFT8Jmbix4RqcvAC+5YaepfT7n3x3APNSmV0Wnc2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOFT+2Ov; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70CFA1F00893;
+	Fri,  5 Jun 2026 12:16:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780661780;
+	bh=N6eF1GWUd29h7zy7BTjjZPmBC+K5GJ6gDgFk0aS492o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VOFT+2OvlBtpNuDhZERoNGbVhpyXK6pZJaP6rLVUG6qpUcQs6j+Omao1sssQRncQY
+	 1m9NFiMYSj7IQbmefSmJytF0dsrP5YNKZatB6uNwDtchw3h+govcw9EbPZmh3kcHF6
+	 0oPamZY3TdW+5YHiyKa9spHJ423FECL3kGkLDkWSGouMiQgdlI0n6DLVv4mRJtjmth
+	 lo5m/tghSaeN6MiAweXSHu5BOAT0zLd9n+spOEroR9P+r/gYh4RPjWwNlfvbQ/+cga
+	 JCtQ7c+84t3He6vUTed8SdwPpe+dWk28+7O7g4XOlwkdOG88pDfVyTVdJtZr12BUg+
+	 Ff43G7q8d2huw==
+Received: from johan by xi.lan with local (Exim 4.99.3)
+	(envelope-from <johan@kernel.org>)
+	id 1wVTTF-00000000DVf-0HM4;
+	Fri, 05 Jun 2026 14:16:17 +0200
+Date: Fri, 5 Jun 2026 14:16:17 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+	Lee Jones <lee@kernel.org>,
+	Mark Brown <broonie@opensource.wolfsonmicro.com>,
+	Thierry Reding <thierry.reding@avionic-design.de>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Peter Chen <peter.chen@kernel.org>,
+	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Maximilian Luz <luzmaximilian@gmail.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
+	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
+	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 08/23] driver core: platform: provide
+ platform_device_set_of_node_from_dev()
+Message-ID: <aiK-EXwp_xhcbty9@hovoldconsulting.com>
+References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
+ <20260521-pdev-fwnode-ref-v1-8-88c324a1b8d2@oss.qualcomm.com>
+ <ah9O15bMlAYgSlHx@ashevche-desk.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ah9O15bMlAYgSlHx@ashevche-desk.local>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295812-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-295813-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[zizuzacker@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zizuzacker@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER(0.00)[johan@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:andriy.shevchenko@linux.intel.com,m:bartosz.golaszewski@oss.qualcomm.com,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@c
+ rapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johan@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[66];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 67548648145
+X-Rspamd-Queue-Id: 7EAF864810F
 
-While bringing up a LAN7801 wired over RGMII to an MDIO-less switch, I
-hit a link that the fixed PHY reported as "up" but that could not pass a
-single packet: every frame came out corrupted at the switch and no ARP
-reply ever made it back.
+On Wed, Jun 03, 2026 at 12:44:55AM +0300, Andy Shevchenko wrote:
+> On Thu, May 21, 2026 at 10:36:31AM +0200, Bartosz Golaszewski wrote:
+> > Provide a platform-specific variant of device_set_of_node_from_dev(). In
+> > addition to bumping the reference count of the OF node being assigned,
+> > it also assigns the fwnode of the platform device.
+> 
+> Can we rather investigate the way how to make that of node reuse thingy
+> (which is used solely by pin control) differently and then drop this confusing
+> device_set_of_node_from_dev() call altogether?
 
-It turned out the MAC_CR speed/duplex bits are never set on this path.
-lan7801_phy_init() registers a fixed PHY at SPEED_1000/DUPLEX_FULL, but
-nothing programs the MAC to match: there is no PHY state machine for a
-fixed link, and lan78xx_reset() only sets the auto speed/duplex bits for
-the 7800.  So the 7801 comes up at 10M/half, clocks RGMII TXC at 2.5 MHz
-instead of 125 MHz, and mangles everything it transmits.
+No, that call is needed. See commit 4e75e1d7dac9 ("driver core: add
+helper to reuse a device-tree node") for details.
 
-Fix it by programming MAC_CR to 1G/full in the fixed-PHY branch, to match
-fphy_status.  Only that branch is touched, so boards with a real external
-PHY (and the 7800/7850) are unaffected.
-
-Mainline fixes this differently via the phylink conversion in v6.16,
-commit e110bc825897 ("net: usb: lan78xx: Convert to PHYLINK for improved
-PHY and MAC management"), which is far too large to backport, so this is
-a small fix for stable only.
-
-Please apply to 6.1.y, 6.6.y and 6.12.y, the pre-phylink branches that
-still carry this bug.  Built and tested on 6.6.y; the touched code is
-identical on 6.1.y and 6.12.y.
-
-Fixes: 89b36fb5e532 ("lan78xx: Lan7801 Support for Fixed PHY")
-Cc: stable@vger.kernel.org
-Signed-off-by: Nguyen Minh Tien <zizuzacker@gmail.com>
----
- drivers/net/usb/lan78xx.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index f5bcf150fd9e..6b94f6026472 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -2325,6 +2325,22 @@ static struct phy_device *lan7801_phy_init(struct lan78xx_net *dev)
- 		buf |= HW_CFG_CLK125_EN_;
- 		buf |= HW_CFG_REFCLK25_EN_;
- 		ret = lan78xx_write_reg(dev, HW_CFG, buf);
-+
-+		/* Nothing programs MAC_CR for the fixed link: reset() only
-+		 * sets speed/duplex for the 7800, so the 7801 is left at
-+		 * 10M/half and mangles every frame it sends.  Force it to
-+		 * match the 1G/full fphy_status above.
-+		 */
-+		ret = lan78xx_read_reg(dev, MAC_CR, &buf);
-+		if (ret < 0)
-+			return NULL;
-+		buf &= ~(MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_ |
-+			 MAC_CR_ADP_ | MAC_CR_GMII_EN_ |
-+			 MAC_CR_SPEED_MASK_);
-+		buf |= MAC_CR_SPEED_1000_ | MAC_CR_FULL_DUPLEX_;
-+		ret = lan78xx_write_reg(dev, MAC_CR, buf);
-+		if (ret < 0)
-+			return NULL;
- 	} else {
- 		if (!phydev->drv) {
- 			netdev_err(dev->net, "no PHY driver found\n");
--- 
-2.34.1
-
+Johan
 
