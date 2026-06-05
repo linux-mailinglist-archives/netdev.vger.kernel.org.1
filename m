@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-295708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vXOBN7eAImpXZAEAu9opvQ
-	(envelope-from <netdev+bounces-295708-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:54:31 +0200
+	id LvczDcGDImpHZgEAu9opvQ
+	(envelope-from <netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:07:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B526462CC
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 09:54:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA6C64642C
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 10:07:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b="fWLDRy2/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295708-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295708-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=WSSGsK92;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295712-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7682330F36DD
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:45:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 49F4A3174720
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 07:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A7147B439;
-	Fri,  5 Jun 2026 07:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB5348A2BF;
+	Fri,  5 Jun 2026 07:44:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4378047AF6C;
-	Fri,  5 Jun 2026 07:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844DE481FCA;
+	Fri,  5 Jun 2026 07:44:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780645492; cv=none; b=ofH8IanBPJbG3AILM3azav2NVo+BJXcDyyVggo2orHh+MIH81q/wThb0o3B0lZLJGBtrKUmgB6sN6hGDdCaneP4AYKEOX4oYuT3qvSeCLdDUxhzz1LEBMVqpN3jhsp9U4Cdocmk2CdGLgBLgsbhwZPr6k5Ck4jZQFlNO77EWX4U=
+	t=1780645497; cv=none; b=TKlyMXI/R9CqmJj1hybdK0h0+5oZ1bDwVa4RjdH6gqysfmDfs2uLyodODJuxnsNZuOK7DALKQzr7cwx8vx88/emDDpAf7UNT0R1rW+B9CpzW3qqDjWfs2JhdWGFUNhyZYDYXehHWLXp1XPEOTgieXvqaULjCubkovjRKCOrDsgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780645492; c=relaxed/simple;
-	bh=HAZBs5BOqikvqTV0pkWO+hF/E1kHkdu3KinoNRr3J/c=;
+	s=arc-20240116; t=1780645497; c=relaxed/simple;
+	bh=T4B7H85vrvd5LrFha4O8snmkpPt3uAYMiFPtIBi1GXM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A8R4nJdKhRvgMxFao0+A6pXtlSkBpM97czM7zoFj1KWVObIK56JJXz0oyYoPcrMiBH5+AU1PJ6d6fXZrmebIqhP9vEQurJdNlzEstmOauKVMPoFA0fi0aPU2MXF1czXUQ7e9P2i0ttK6eS0+bRLE+LRqvc4WcXIUS3pFK55XkVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=fWLDRy2/; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6557hUeV51221753, This message is accepted by code: ctloc85258
+	 MIME-Version:Content-Type; b=WzGuRFM6/Y5btDk2Xjug38AmxFnzudQ7qwu1ZGxwT2Q9bq/cEuv/NOryKmPaCR47EozPES5CV5JQPufTBS/UF/sTFRgnOU1snnilKVH5QuoZS7BB4+5oTAiBq2fmdzJ5CEnp04yPvT5pUkuIfqKGTw5lPmaERMWqIdfxvS96uv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=WSSGsK92; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6557hUeW51221753, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1780645410;
-	bh=cAL7P3Xyg9/GaQs/Xyb7AvlE3Tyao+AY7aIvuGNaF18=;
+	s=dkim; t=1780645411;
+	bh=nWzts/H4wwuI5TljBKGOGaj/2CwHAdU2rSYQgB7LJbk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=fWLDRy2/udjw6yzWHU2OT6qivzH6oWWfxHdMbzbH3CLrneqzkCdxtKuSU1fQ2tRc/
-	 tRV+YmS+MxH2aWy41WoEZOm2FdfYQ65VcYQo5Xw360KBflaIMTbZC0CC4QDcvyKO1O
-	 BUgcKPNhLST/zy1Ps9PFtuDQfUDQItEIOWqCPG4sFyiQQjjXgxsyKgg7yZ6ndUpBgp
-	 x8b1E/FOyg/tZFaVOqFpFsHyAEbpnuTzMDklMVSu0SMy5PVAHePSW979YOoBlWuXCh
-	 kDMbJsEHYguyqMllmdg2m5ce76zNk5N33JN8YxxSxPDazgy2rxO4idnFMQlHTsHtzt
-	 Xh/C/6hMly6Qw==
+	b=WSSGsK92N/CcWIPxdkM/o04OoQGctJ+JaYSZQaenAVR9BZiretChwtzPSugQoJiiL
+	 sSS1MEIiJ5o3iMuJl/0MwAffodmVxiRGgqrzxPGgFT7llcC9DGtsgdBgemah6v7zJB
+	 lAnwT/g/oViD6AM35TAAM5LiLHnbEIO+1h5i45NY9/j6UqY7Mq0TlYj6Ocddx8NSUR
+	 cOr5FxQVoEM+cU11N14ftvW5UcoGOYEW08BE5LYnR1leT3I0qBwVR7Brqtr387Yj5X
+	 Yc21sd5iRP2cRdsnrBKB8t1GqJ8JvaZzkAybPAa9BoeB3XIrIDJ3jDRD8QyFUGtblO
+	 yUt6sfx6ihdyw==
 Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6557hUeV51221753
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6557hUeW51221753
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 5 Jun 2026 15:43:30 +0800
+	Fri, 5 Jun 2026 15:43:31 +0800
 Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
  RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -64,9 +64,9 @@ To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v3 1/4] net: phy: c45: add genphy_c45_soft_reset()
-Date: Fri, 5 Jun 2026 15:43:25 +0800
-Message-ID: <20260605074328.1800-2-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v3 2/4] net: phy: c45: add genphy_c45_an_setup_master_slave()
+Date: Fri, 5 Jun 2026 15:43:26 +0800
+Message-ID: <20260605074328.1800-3-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260605074328.1800-1-javen_xu@realsil.com.cn>
 References: <20260605074328.1800-1-javen_xu@realsil.com.cn>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295708-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295712-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -108,17 +108,16 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C4B526462CC
+X-Rspamd-Queue-Id: 7BA6C64642C
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-Add a generic Clause 45 software reset helper. The helper sets the reset
-bit in the PMA/PMD control register and waits until the bit is cleared by
-hardware.
+Add a generic helper to configure forced master/slave mode for Clause 45
+PHYs using the 10GBASE-T AN control register.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
@@ -127,56 +126,95 @@ Changes in v2:
 
 Changes in v3:
  - re-order function according to the order in phy-c45.c
+ - add kernel-doc about return value
+ - add MASTER_SLAVE_CFG_MASTER_PREFERRED,
+   MASTER_SLAVE_CFG_SLAVE_PREFERRED, MASTER_SLAVE_CFG_UNKNOWN,
+   MASTER_SLAVE_CFG_UNSUPPORTED, MASTER_SLAVE_CFG_SLAVE_PREFERRED cfg
 ---
- drivers/net/phy/phy-c45.c | 22 ++++++++++++++++++++++
+ drivers/net/phy/phy-c45.c | 42 +++++++++++++++++++++++++++++++++++++++
  include/linux/phy.h       |  1 +
- 2 files changed, 23 insertions(+)
+ include/uapi/linux/mdio.h |  3 +++
+ 3 files changed, 46 insertions(+)
 
 diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 126951741428..d8a83179ec40 100644
+index d8a83179ec40..28cb173ff7aa 100644
 --- a/drivers/net/phy/phy-c45.c
 +++ b/drivers/net/phy/phy-c45.c
-@@ -384,6 +384,28 @@ int genphy_c45_check_and_restart_aneg(struct phy_device *phydev, bool restart)
+@@ -406,6 +406,48 @@ int genphy_c45_soft_reset(struct phy_device *phydev)
  }
- EXPORT_SYMBOL_GPL(genphy_c45_check_and_restart_aneg);
+ EXPORT_SYMBOL_GPL(genphy_c45_soft_reset);
  
 +/**
-+ * genphy_c45_soft_reset - software reset the PHY via Clause 45 PMA/PMD control register
++ * genphy_c45_an_setup_master_slave - Configure Master/Slave setting for C45 PHYs
 + * @phydev: target phy_device struct
 + *
-+ * Return: 0 on success, negative errno on failure.
++ * Description: Configure the forced or preferred Master/Slave role
++ * 10GBASE-T control register (MMD 7, Register 0x0020) according to
++ * IEEE 802.3 standards.
++ *
++ * Returns negative errno code on failure, 0 if Master/Slave didn't change,
++ * or 1 if Master/Slave modes changed.
 + */
-+int genphy_c45_soft_reset(struct phy_device *phydev)
++int genphy_c45_an_setup_master_slave(struct phy_device *phydev)
 +{
-+	int ret, val;
++	u16 ctl = 0;
 +
-+	ret = phy_set_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1,
-+			       MDIO_CTRL1_RESET);
-+	if (ret < 0)
-+		return ret;
++	switch (phydev->master_slave_set) {
++	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
++		ctl = MDIO_AN_10GBT_CTRL_MS_PORT_TYPE;
++		break;
++	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
++		break;
++	case MASTER_SLAVE_CFG_MASTER_FORCE:
++		ctl = MDIO_AN_10GBT_CTRL_MS_ENABLE | MDIO_AN_10GBT_CTRL_MS_VALUE;
++		break;
++	case MASTER_SLAVE_CFG_SLAVE_FORCE:
++		ctl = MDIO_AN_10GBT_CTRL_MS_ENABLE;
++		break;
++	case MASTER_SLAVE_CFG_UNKNOWN:
++	case MASTER_SLAVE_CFG_UNSUPPORTED:
++		return 0;
++	default:
++		phydev_warn(phydev, "Unsupported Master/Slave mode\n");
++		return -EOPNOTSUPP;
++	}
 +
-+	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PMAPMD,
-+					 MDIO_CTRL1, val,
-+					 !(val & MDIO_CTRL1_RESET),
-+					 5000, 100000, true);
++	return phy_modify_mmd_changed(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
++				      MDIO_AN_10GBT_CTRL_MS_ENABLE |
++				      MDIO_AN_10GBT_CTRL_MS_VALUE |
++				      MDIO_AN_10GBT_CTRL_MS_PORT_TYPE, ctl);
 +}
-+EXPORT_SYMBOL_GPL(genphy_c45_soft_reset);
++EXPORT_SYMBOL_GPL(genphy_c45_an_setup_master_slave);
 +
  /**
   * genphy_c45_aneg_done - return auto-negotiation complete status
   * @phydev: target phy_device struct
 diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 199a7aaa341b..25a66320df56 100644
+index 25a66320df56..a46f4d9a6155 100644
 --- a/include/linux/phy.h
 +++ b/include/linux/phy.h
-@@ -2309,6 +2309,7 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed);
- /* Clause 45 PHY */
+@@ -2310,6 +2310,7 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed);
  int genphy_c45_restart_aneg(struct phy_device *phydev);
  int genphy_c45_check_and_restart_aneg(struct phy_device *phydev, bool restart);
-+int genphy_c45_soft_reset(struct phy_device *phydev);
+ int genphy_c45_soft_reset(struct phy_device *phydev);
++int genphy_c45_an_setup_master_slave(struct phy_device *phydev);
  int genphy_c45_aneg_done(struct phy_device *phydev);
  int genphy_c45_read_link(struct phy_device *phydev);
  int genphy_c45_read_lpa(struct phy_device *phydev);
+diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
+index b2541c948fc1..ffca03fd82c9 100644
+--- a/include/uapi/linux/mdio.h
++++ b/include/uapi/linux/mdio.h
+@@ -332,6 +332,9 @@
+ #define MDIO_AN_10GBT_CTRL_ADV2_5G	0x0080	/* Advertise 2.5GBASE-T */
+ #define MDIO_AN_10GBT_CTRL_ADV5G	0x0100	/* Advertise 5GBASE-T */
+ #define MDIO_AN_10GBT_CTRL_ADV10G	0x1000	/* Advertise 10GBASE-T */
++#define MDIO_AN_10GBT_CTRL_MS_ENABLE	0x8000	/* Master/slave manual config enable */
++#define MDIO_AN_10GBT_CTRL_MS_VALUE	0x4000	/* Master/slave config value (1=Master) */
++#define MDIO_AN_10GBT_CTRL_MS_PORT_TYPE	0x2000	/* Master Preferred Type */
+ 
+ /* AN 10GBASE-T status register. */
+ #define MDIO_AN_10GBT_STAT_LP2_5G	0x0020  /* LP is 2.5GBT capable */
 -- 
 2.43.0
 
