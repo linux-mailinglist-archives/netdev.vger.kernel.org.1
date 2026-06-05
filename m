@@ -1,164 +1,143 @@
-Return-Path: <netdev+bounces-295608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wuxzAJhBImptUQEAu9opvQ
-	(envelope-from <netdev+bounces-295608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:25:12 +0200
+	id Utx2MNxCImqeUQEAu9opvQ
+	(envelope-from <netdev+bounces-295609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:30:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4160F644DA8
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:25:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B2AF644DDC
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 05:30:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=mQync9q4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295608-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295608-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=MF1Vxc1w;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295609-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295609-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E9C5302F3BE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 03:21:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5917302E307
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 03:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD2A207A32;
-	Fri,  5 Jun 2026 03:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D2B5CDF1;
+	Fri,  5 Jun 2026 03:29:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322B330BB8A;
-	Fri,  5 Jun 2026 03:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397D03E0251;
+	Fri,  5 Jun 2026 03:29:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780629674; cv=none; b=mEZdDyZ2M3Mga1KO8buoRT/c3FDSHdK9Xc8PquWH/qpB8xKXZAmd2b91RhEA8lPaWek57wIYoPlGvgahsWQZn1832Qt66L3ALPoZlyDJHvUakfxSflw4Vl61ju2l4vi5jQUQD4QN9sDAdnBbk1YdogDL8TBXFyBTa1gp9tEQae8=
+	t=1780630179; cv=none; b=iqxzds3Kwb+68olp0y8SMFFyXp6xz9rpbjt06aepiLxS7uIBH1yG8CcJfbJWMTFwYQrHawqWVauaffDjeEfn+5iY1DTi/sA2XxT+g7gDxnHGnGrOejP9U2Pe2HtxNG7Cx95q6EAvY8uxBanaKdjJ+Z3GWjdHGZEfl8LfUgR3/mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780629674; c=relaxed/simple;
-	bh=hXVgQNlynljjtrPJ+dfgtb/MzNa9jC6vOZPzn9oR8SE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BD7uLKGZzBwtE5WdM0n8nqDAFQ2wTLxS5M3hdJabvKpZJqOSK9en5py4x5PU3scWt1q6Gf5YxL/bfDBIfyWesM0wpNnqMymmspQOvHBUZvHvuJre554EaQOrpMkwjuOaEsFqMRBDHyVgOy3E2hqJ1pfUbd7ahuINWtarOwoOgjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=mQync9q4; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6553Ju8121096197, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1780629597;
-	bh=hXVgQNlynljjtrPJ+dfgtb/MzNa9jC6vOZPzn9oR8SE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=mQync9q4o1blY6pa8OpijIG4SzszRJSb5RQ9T5HTHjY/w0UcO5Gz7L00wrpK5gI/5
-	 jm+72V8lxCufpZEj2xjj+LCFTXzuJLbl2Hoav7v8+RaqUG7gLgJzLcuQTStcs/CU5n
-	 LtyOLPD94McYzp1CkyVZKjVPddMSuGFiwC+Zm/3lLINIdxJZKD8cJkAOoV9Nh56gB3
-	 HKIOzaN+WWutZ8IgaG8s4yr3KalQRxKyl5xHPaLs8+vmLnIeQlH7QvzPyw0CgLarqF
-	 AG092lIoSbBeuJun423Q+7IF8Uh1SJo2Zz6icpqgIk4pxuuRHSLhPQtfxQMhR5t9Ol
-	 +RVtUFyGVa82w==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6553Ju8121096197
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 5 Jun 2026 11:19:57 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 5 Jun 2026 11:19:56 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Fri,
- 5 Jun 2026 11:19:56 +0800
-From: Javen <javen_xu@realsil.com.cn>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, =?gb2312?B?ucvP/r78?=
-	<freddy_gu@realsil.com.cn>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "daniel@makrotopia.org"
-	<daniel@makrotopia.org>, "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>
-Subject: RE: [PATCH net-next v2 2/4] net: phy: c45: add
- genphy_c45_config_master_slave()
-Thread-Topic: [PATCH net-next v2 2/4] net: phy: c45: add
- genphy_c45_config_master_slave()
-Thread-Index: AQHc8/WnKcsUE7Sb+kW6lZTT1vLRgrYtkA+AgAG8GVA=
-Date: Fri, 5 Jun 2026 03:19:56 +0000
-Message-ID: <91b78641a1da403f865eb81c03c3ce10@realsil.com.cn>
-References: <20260604074209.93-1-javen_xu@realsil.com.cn>
- <20260604074209.93-3-javen_xu@realsil.com.cn>
- <521e53fe8f22eb938ea7b9073516378f@tipi-net.de>
-In-Reply-To: <521e53fe8f22eb938ea7b9073516378f@tipi-net.de>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1780630179; c=relaxed/simple;
+	bh=09OMGCXdgPxRIUIcs5HYAVa/yTG0nxi353C0a2eeW38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LunQNebmqJ1qdApCLjsoCV3YIVaA3cVf7CYYR+OXaE7AXKEldTFY3ffDqjj2M4IqJo61aicy2Aqg1vdL7E0vJJM2oC6ZQyopFbuW29b6zg1yjCFUEoBjcRR8vONn4oVBBw5s4uLri9GBDmme/M4bgzsz8lFQuZx4407VIRG8Bco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MF1Vxc1w; arc=none smtp.client-ip=115.124.30.132
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1780630167; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=v2zJHdDZm7IzZSlv+vooUHOvAPF8NoHwQA9KCee3Wkw=;
+	b=MF1Vxc1w9OtvuLtROnpm5HMt11KH6r9p+wJOTpleDXpfvgMOgtBCXVwUmFjl5cORDYHuT4OSCi4XNBBLUFufqMbhqElL9u8OCfLpbLOHW+77RNpuFqivVL5a/S1RunZik2tz3wcQ7zFbl48GhcPO4plLpRBtKHeBHh5h4RTKKwA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X4BnY77_1780630165;
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X4BnY77_1780630165 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 05 Jun 2026 11:29:26 +0800
+Date: Fri, 5 Jun 2026 11:29:25 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: Re: [PATCH net-next 0/2] net/smc: transition to RDMA core CQ pooling
+Message-ID: <20260605032925.GA60671@j66a10360.sqa.eu95>
+References: <20260528084819.6059-1-alibuda@linux.alibaba.com>
+ <20260602140359.3b97d180@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260602140359.3b97d180@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:alibuda@linux.alibaba.com,m:davem@davemloft.net,m:dust.li@linux.alibaba.com,m:edumazet@google.com,m:pabeni@redhat.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:horms@kernel.org,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:oliver.yang@linux.alibaba.com,m:pasic@linux.ibm.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295608-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,vger.kernel.org,makrotopia.org,nxp.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295609-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realsil.com.cn:mid,realsil.com.cn:dkim,realsil.com.cn:from_mime,realsil.com.cn:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4160F644DA8
+X-Rspamd-Queue-Id: 1B2AF644DDC
 
-PkhpIEphdmVuDQo+DQo+T24gNC42LjIwMjYgMDk6NDIsIGphdmVuIHdyb3RlOg0KPj4gRnJvbTog
-SmF2ZW4gWHUgPGphdmVuX3h1QHJlYWxzaWwuY29tLmNuPg0KPj4NCj4+IEFkZCBhIGdlbmVyaWMg
-aGVscGVyIHRvIGNvbmZpZ3VyZSBmb3JjZWQgbWFzdGVyL3NsYXZlIG1vZGUgZm9yIENsYXVzZQ0K
-Pj4gNDUNCj4+IFBIWXMgdXNpbmcgdGhlIDEwR0JBU0UtVCBBTiBjb250cm9sIHJlZ2lzdGVyLg0K
-Pj4NCj4+IFNpZ25lZC1vZmYtYnk6IEphdmVuIFh1IDxqYXZlbl94dUByZWFsc2lsLmNvbS5jbj4N
-Cj4NCj4+IFsuLi5dDQo+DQo+PiArLyoqDQo+PiArICogZ2VucGh5X2M0NV9jb25maWdfbWFzdGVy
-X3NsYXZlIC0gQ29uZmlndXJlIE1hc3Rlci9TbGF2ZSBzZXR0aW5nDQo+PiArZm9yDQo+PiBDNDUg
-UEhZcw0KPj4gKyAqIEBwaHlkZXY6IHRhcmdldCBwaHlfZGV2aWNlIHN0cnVjdA0KPj4gKyAqDQo+
-PiArICogRGVzY3JpcHRpb246IENvbmZpZ3VyZXMgdGhlIE1hc3Rlci9TbGF2ZSBtYW51YWwgc2V0
-dGluZyBpbiB0aGUNCj4+ICsgKiAxMEdCQVNFLVQgY29udHJvbCByZWdpc3RlciAoTU1EIDcsIFJl
-Z2lzdGVyIDB4MDAyMCkgYWNjb3JkaW5nIHRvDQo+PiArICogSUVFRSA4MDIuMyBzdGFuZGFyZHMu
-DQo+PiArICovDQo+DQo+UGxlYXNlIGRvY3VtZW50IHRoZSByZXR1cm4gdmFsdWUgKDAgPSB1bmNo
-YW5nZWQsIDEgPSBjaGFuZ2VkLCA8MCBlcnJubyksIGxpa2UNCj5pdCBpcyBkb25lIGZvciBnZW5w
-aHlfYzQ1X2FuX2NvbmZpZ19hbmVnKCkuDQo+DQo+PiAraW50IGdlbnBoeV9jNDVfY29uZmlnX21h
-c3Rlcl9zbGF2ZShzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2KSB7DQo+PiArICAgICB1MTYgdmFs
-ID0gMDsNCj4+ICsNCj4+ICsgICAgIHN3aXRjaCAocGh5ZGV2LT5tYXN0ZXJfc2xhdmVfc2V0KSB7
-DQo+PiArICAgICBjYXNlIE1BU1RFUl9TTEFWRV9DRkdfTUFTVEVSX0ZPUkNFOg0KPj4gKyAgICAg
-ICAgICAgICB2YWwgPSBNRElPX0FOXzEwR0JUX0NUUkxfTVNfRU5BQkxFIHwNCj5NRElPX0FOXzEw
-R0JUX0NUUkxfTVNfVkFMVUU7DQo+PiArICAgICAgICAgICAgIGJyZWFrOw0KPj4gKyAgICAgY2Fz
-ZSBNQVNURVJfU0xBVkVfQ0ZHX1NMQVZFX0ZPUkNFOg0KPj4gKyAgICAgICAgICAgICB2YWwgPSBN
-RElPX0FOXzEwR0JUX0NUUkxfTVNfRU5BQkxFOw0KPj4gKyAgICAgICAgICAgICBicmVhazsNCj4+
-ICsgICAgIGNhc2UgTUFTVEVSX1NMQVZFX0NGR19VTktOT1dOOg0KPj4gKyAgICAgY2FzZSBNQVNU
-RVJfU0xBVkVfQ0ZHX01BU1RFUl9QUkVGRVJSRUQ6DQo+PiArICAgICBjYXNlIE1BU1RFUl9TTEFW
-RV9DRkdfU0xBVkVfUFJFRkVSUkVEOg0KPj4gKyAgICAgZGVmYXVsdDoNCj4+ICsgICAgICAgICAg
-ICAgYnJlYWs7DQo+PiArICAgICB9DQo+DQo+UGVyIElFRUUgODAyLjMgKDQ1LjIuNy4xMC4zKSwg
-Ny4zMi4xMyAocG9ydCB0eXBlKSBpcyBhIGNvcHkgb2YgOS4xMCAvDQo+Q1RMMTAwMF9QUkVGRVJf
-TUFTVEVSLCBsaWtlIGl0IGlzIGRvbmUgaW4gYzIyJ3MNCj5nZW5waHlfc2V0dXBfbWFzdGVyX3Ns
-YXZlKCkuDQo+DQo+U28gc2V0IGl0IGZvciBNQVNURVJfUFJFRkVSUkVELCBjbGVhciBpdCBmb3Ig
-U0xBVkVfUFJFRkVSUkVEIGFuZCBsZWF2ZQ0KPlVOS05PV04vVU5TVVBQT1JURUQgdW50b3VjaGVk
-IChyZXR1cm4gMCkuIFVzZSAtRU9QTk9UU1VQUCBvbmx5IGZvcg0KPmRlZmF1bHQuDQoNClRoYW5r
-cyBmb3IgeW91ciByZXZpZXcuDQpJIGhhdmUgYXBwbGllZCBhbGwgdGhlIHN1Z2dlc3Rpb25zIHRv
-IHBhdGNoIHYzLg0KDQpUaGFua3MsDQpCUnMsDQpKYXZlbg0KDQo+DQo+PiBbLi4uXQ0KPg0KPlRo
-YW5rcywNCj5OaWNvbGFpDQo=
+On Tue, Jun 02, 2026 at 02:03:59PM -0700, Jakub Kicinski wrote:
+> On Thu, 28 May 2026 16:48:17 +0800 D. Wythe wrote:
+> > This series transitions SMC-R completion handling to RDMA core CQ pooling
+> > via the ib_cqe API. The new completion model improves scalability by
+> > allowing per-link completion processing across multiple cores and enables
+> > DIM-based interrupt moderation.
+> > 
+> > As a side effect, the increased concurrency can amplify contention for TX
+> > slots on the shared wait queue. Patch 2 addresses this by switching TX slot
+> > allocation from non-exclusive wait_event() to prepare_to_wait_exclusive(),
+> > which avoids thundering-herd wakeups under contention.
+> > 
+> > Patch 1 replaces the global per-device CQ and manual tasklet polling model
+> > with RDMA core CQ pooling.
+> > Patch 2 reduces TX slot contention by using exclusive wait queue entries
+> > during allocation.
+> 
+> Sashiko reports a couple of issues on patch 1:
+> https://sashiko.dev/#/patchset/20260528084819.6059-2-alibuda@linux.alibaba.com
+> Are these legit?
+> 
+> Either way - would be good to get some reviews here from (ohter) SMC
+> maintainers.
+
+Thanks for the heads up. 
+
+We’ve seen the Sashiko reports and are currently evaluating whether
+they’re legit. So far it looks valid, though some of the issues may be
+uncovering pre-existing problems. If needed, we may send extra patches
+to fix them before applying this patch. The SMC maintainers are already
+aware, and I expect more maintainers to join the review soon.
+
+D. Wythe
 
