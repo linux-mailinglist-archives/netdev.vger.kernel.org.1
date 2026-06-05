@@ -1,141 +1,226 @@
-Return-Path: <netdev+bounces-295975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pGxvALo2I2r2kgEAu9opvQ
-	(envelope-from <netdev+bounces-295975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 22:51:06 +0200
+	id 3OviNxM5I2oglAEAu9opvQ
+	(envelope-from <netdev+bounces-295976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 23:01:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424F064B37D
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 22:51:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468A664B44E
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 23:01:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VkhEd5pR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295975-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-295975-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=infinite-source.de header.s=strato-dkim-0002 header.b=QN+LVqd9;
+	dkim=pass header.d=infinite-source.de header.s=strato-dkim-0003 header.b=8WCLaVWz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295976-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295976-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=infinite-source.de;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A974B3028F0F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 20:50:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A03A630293D1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 20:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1D03C3781;
-	Fri,  5 Jun 2026 20:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6A93C4149;
+	Fri,  5 Jun 2026 20:58:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CFC3C5827;
-	Fri,  5 Jun 2026 20:50:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780692633; cv=none; b=sQn152H5W/anYZ8Y43msbXgpbMFwJ3jYuAySGtvlbgn+qmUi/7ueoFNFVyd3wqfkXwDLza21vDvfeRKnXO6/BsEOG69C02bfexqMxtJPDXrIbM8YLBe9PEbTUM4MofCb5VLOahRJ4PyssN1tMtXVC+4sqjYEaI5m+X68Q6Sgd/o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780692633; c=relaxed/simple;
-	bh=xbrHq+DGHaD+A8qzioPF9ByfcICvn4tsN4P5u5DLV1U=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=oWbAgYU9kJuzlQC3XY3vZNgPvebX6gEAI/REU6DRD1IcTOWtwjiF1XEGy+sNKcVRZoBNdiKZxHvD7lFBpRdNOBN5rE/H9lOwXFxqNRp0j36Cfw5s5fvqs/6SD2/M2u9Rik+k40Yl9iB5NsBB7GQBbl5lrOWzvVC+h6I3Vz/T6MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkhEd5pR; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B28341F00893;
-	Fri,  5 Jun 2026 20:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780692632;
-	bh=XvEjhU9dpizasLQXA4sOqgWY9q0v/NYUa0Pf10IzTJw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=VkhEd5pROhEYGqNYEItmc/Drm3sQWJqfmOwwVgQDlh5FD2fT2Nv4mhLWtRNHW20HS
-	 mYsWyGthqWVHM1Z9OG3ijORkLg/R25OIpq6BG4zFxe2ULa2qadIX0vMUGWtswCk2wL
-	 6Idb2vxfFclHoRHAZ6s8+ZGE5C29uZd7xRXC2VAdHHtkYokGr4fBoAUHPAla+MLRgc
-	 Tu61j88jHkLVFq4wBk1CeC+6i/D3lviu+MW8upOQBHrSYqkKDtxKw1ZDiqOMsnoIqF
-	 x8PajMzRwfbvmJ5xIyuXe5SAb29BdVJFWa5x3NLT3VR+kHknSjVYSsCTRulqZPT+8f
-	 zguL/8Plpo8Ng==
-Content-Type: multipart/mixed; boundary="===============1305281309859444005=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506563A7F4B;
+	Fri,  5 Jun 2026 20:58:01 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780693084; cv=pass; b=F7xU38yboehSljPEAye5rWjJ+P/jXns0Ioasu5a6e70CjE+PFnkKeC49K84rnXElBFtL+E8diznB5zaCqp1trsbuEdjF4PJJnu4pXbWIzdgEmJUBHy2blgjpTK2Zb8btIp3dK+qQ6ENuJFLJZRv/+guSbWZcl3uPNRP5ePoqe6Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780693084; c=relaxed/simple;
+	bh=uRYDliO21fd15TPq957TbM5u9FjxvLcB64qva0Hutsg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RP37II5Vr3i9M8AxlwSFoep37FBkX/S+eXsvIbREmnN9K5mKqX3Wz96kMXinxZU4IYwSSuoxIDl/Z3yTDeR2R8UndZYarOs8hR1nhlTLd+oTylyoqv+rgilkiJzvuFpGOnAVxdFBpsVbdm9lXKvsBC4lpQgG28KXNLzfMvppx1M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infinite-source.de; spf=none smtp.mailfrom=infinite-source.de; dkim=pass (2048-bit key) header.d=infinite-source.de header.i=@infinite-source.de header.b=QN+LVqd9; dkim=permerror (0-bit key) header.d=infinite-source.de header.i=@infinite-source.de header.b=8WCLaVWz; arc=pass smtp.client-ip=81.169.146.171
+ARC-Seal: i=1; a=rsa-sha256; t=1780692890; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=hh6lIgoTvUllGPKdx4NqM37Z3SF8LMp0ir6sZ5owEEk2q+iyku+p9P7kRvyaP5a5Je
+    M3UWuwAPZA5fbGvy3uj6818OQdtroD2lLFkf3fuRCuFqcd2Xl64nwVAih7smIDfpUn0Q
+    c7Eo7Vv1iGEygwBki/yfC8ZguabC+MPAxuGMTTKNFOWZtSl+bGQfabCP5TcUTI19kB85
+    qNcTuzZgGOb2SJGKRylMVvx1qcHvH1y5+KftAdRHktrEnanFXMb943h2YwSTZn65ERa8
+    GoUBTLXZfEFhl2OCSaUbPdwNnZ9JQFMETWQ7Xx4Il6DCg5V2HwY055f0aUjfSvtVcbM0
+    ZaaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1780692890;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=e5U4ig/uUW/ykznudNtIoLlpAxdXFMDfbHPHK9h+DFI=;
+    b=mW0kw25xNVqlyNoCKiNir7K4Wa6ubcpkH6PCelWgzXQPwunjJMVGM7/LcjVF8YXHy1
+    yqPNxtmPyzg/t4B5lhMhMY+8kmO4A5kem9FUerITV6bn7GumCb4X92HDNo7jBvcyXDe/
+    xi/rzkfvTRpyvV4BJi0xZV4HCsPohirJagixrEroGMqyNHAtdbxcBNNBLttSStQj0CMO
+    iNrispwkk5pcEBWGvpfUMNuFXq711PgaG7p+azV290Qqs0flcOpW1ye+CZ8VFjKRi7j4
+    zKA+ww//vjcofx3SV/4HQaVzT4tkvXmp8xOk1TyouzVXoC5EFRdPY/4ZhdcSm9baL8CF
+    GvLg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1780692890;
+    s=strato-dkim-0002; d=infinite-source.de;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=e5U4ig/uUW/ykznudNtIoLlpAxdXFMDfbHPHK9h+DFI=;
+    b=QN+LVqd9GFndtvOCtdXeHdLoDQKUV99KE/r4wqHwhZj240RcZNueQdKolOkD1VpIVB
+    Oc8Z0kOpEBJsH80PWib/FOzXyxjgiXNfxRQ9OzBkT5vJ7ee9kYSppu9cZYvrqRiY1WBv
+    s/mGiD7HO9kD+dIFxfOw6XfM6fmVJT/OAHEtLdD91brHmwK5nWO4lPEc6+uqMGlB1882
+    K3FKQvYlosYKDWdudFCB/16Z44IaD9PQXTA/knGRn6InGle36MKg3cc7wAU7muk9sh2v
+    C35CyTzMG/N7ezxeVM0oD2TXAqdAdr3z8vnfk+Fdgg9Wr9xPxx4C3pUsDpcAu9z0jlPj
+    Z8dg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1780692890;
+    s=strato-dkim-0003; d=infinite-source.de;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=e5U4ig/uUW/ykznudNtIoLlpAxdXFMDfbHPHK9h+DFI=;
+    b=8WCLaVWzkyF+FJqcLNijVyFBuhYUe+qoh+tOXBMn1wQUQAg06PmA5C7puyuyh3N7GY
+    r95LcM6D6YmdR1gmxADQ==
+X-RZG-AUTH: ":LW0Wek7mfO1Vkr5kPgWDvaJNkQpNEn8ylntakOISso1hE0McXX1lsX682SOpskKNgu1vdp7pXN2ayNAkRm8xGwNyBO1pryZlEoFdH8nUdt2z/2Kw21ZBog=="
+Received: from [IPV6:2003:de:f737:c700:4ed4:78b0:5f62:98a7]
+    by smtp.strato.de (RZmta 55.0.1 AUTH)
+    with ESMTPSA id 2b9b8e255Ksn2SU
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Fri, 5 Jun 2026 22:54:49 +0200 (CEST)
+Message-ID: <0c9f58f1-52f6-481c-829f-6f5a70ffff7f@infinite-source.de>
+Date: Fri, 5 Jun 2026 22:54:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <5e8611cf339651054f1237f21f7e869431725e6eb4f17ff16331a4af3f7ed921@mail.kernel.org>
-In-Reply-To: <20260605202056.1780352-5-ameryhung@gmail.com>
-References: <20260605202056.1780352-5-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v3 4/5] bpf: Remove WARN_ON_ONCE in check_ids()
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,martin.lau@kernel.org,mykyta.yatsenko5@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri,  5 Jun 2026 20:50:31 +0000 (UTC)
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
-	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295975-lists,netdev=lfdr.de,bpf-ci];
-	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:mykyta.yatsenko5@gmail.com,m:kernel-team@meta.com,m:ast@kernel.org,m:yonghong.song@linux.dev,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:alexeistarovoitov@gmail.com,m:mykytayatsenko5@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid,vger.kernel.org:from_smtp]
-X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 424F064B37D
-
---===============1305281309859444005==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for
+ preadv2/pwritev2
+To: Linus Torvalds <torvalds@linux-foundation.org>, Willy Tarreau <w@1wt.eu>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Al Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Askar Safin <safinaskar@gmail.com>,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-api@vger.kernel.org,
+ netdev@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+ David Howells <dhowells@redhat.com>, David Hildenbrand <david@kernel.org>,
+ Pedro Falcato <pfalcato@suse.de>, Miklos Szeredi <miklos@szeredi.hu>,
+ patches@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ Jan Kara <jack@suse.cz>
+References: <20260531010107.1953702-1-safinaskar@gmail.com>
+ <20260601-enthusiasmus-canceln-anlehnen-0e62317a9784@brauner>
+ <CAHk-=wifX_rrDjRGnDnOqE-usptAukuXKrmuPuVDP5bOCBWzGQ@mail.gmail.com>
+ <20260601173325.GH2636677@ZenIV> <20260601160455.2c187574@gandalf.local.home>
+ <20260601172825.a51a588ec1c32617a0e12d78@linux-foundation.org>
+ <aiEb8CTM-ovMIq7-@1wt.eu>
+ <CAHk-=wiQB-j53cTs9kM4UeXoXPaFj78aJe3D6Yp1Fohg7i4tWA@mail.gmail.com>
+ <aiGfgRch99l_5z11@1wt.eu>
+ <CAHk-=wg0e8pP5haNW4qJP1=QwwUEctwjK5k07sv8bskitoMDgg@mail.gmail.com>
+Content-Language: en-US
+From: The 8472 <kernel@infinite-source.de>
+In-Reply-To: <CAHk-=wg0e8pP5haNW4qJP1=QwwUEctwjK5k07sv8bskitoMDgg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[infinite-source.de,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infinite-source.de:s=strato-dkim-0002,infinite-source.de:s=strato-dkim-0003];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-295976-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:w@1wt.eu,m:akpm@linux-foundation.org,m:rostedt@goodmis.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:safinaskar@gmail.com,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-api@vger.kernel.org,m:netdev@vger.kernel.org,m:willy@infradead.org,m:axboe@kernel.dk,m:hch@infradead.org,m:dhowells@redhat.com,m:david@kernel.org,m:pfalcato@suse.de,m:miklos@szeredi.hu,m:patches@lists.linux.dev,m:linux-fsdevel@vger.kernel.org,m:jack@suse.cz,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kernel@infinite-source.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux-foundation.org,goodmis.org,zeniv.linux.org.uk,kernel.org,gmail.com,vger.kernel.org,kvack.org,infradead.org,kernel.dk,redhat.com,suse.de,szeredi.hu,lists.linux.dev,suse.cz];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kernel@infinite-source.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infinite-source.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,1wt.eu:email,vger.kernel.org:from_smtp]
+X-Rspamd-Server: lfdr
+X-Rspamd-Queue-Id: 468A664B44E
 
-> bpf: Remove WARN_ON_ONCE in check_ids()
->
-> check_ids() warned when it ran out of idmap slots, assuming this was
-> impossible because the slots are bounded by the number of registers and
-> stack slots. That assumption no longer holds: referenced dynptrs acquire
-> an intermediate reference that lives in refs[] but is not backed by any
-> register or stack slot [0], so a program can accumulate more reference
-> ids than the idmap can hold and exhaust it.
-> Exhaustion is fine for verification correctness. check_ids() already
-> returns false, which makes the states compare as not equivalent and
-> prevents unsound pruning. The only effect of the WARN_ON_ONCE() is log
-> noise, or a panic under panic_on_warn. Drop the warning and keep
-> returning false.
-> [0] 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+On 04/06/2026 17:58, Linus Torvalds wrote:
+> On Thu, 4 Jun 2026 at 08:53, Willy Tarreau <w@1wt.eu> wrote:
+>>
+>>> It looks like you're actually doing exactly the thing that I thought
+>>> was crazy and wouldn't even work reliably: you change the
+>>> common_response[] contents dynamically *after* the vmsplice, and
+>>> depend on the fact that changing it in user space changes the buffer
+>>> in the pipe too.
+>>
+>> No no, it's definitely not doing that (or it's a bug, but it's not
+>> supposed to happen). I'm perfectly aware that one must definitely not
+>> do that, and it's a guarantee the user of vmsplice() must provide.
+> 
+> Whew, good.
+> 
+> In that case, can you just try the vmsplice patch series (Christian
+> already found a bug, but I don't think it will necessarily matter in
+> practice - famous last words) and that test patch of mine, and see if
+> it all (a) works for you and (b) if you have any numbers for
+> performance that would be *great*.
+> 
+> There aren't many obvious splice users out there, and even if they
+> were to exist they are typically specialized enough that you have to
+> have a real use case to then tell if the patches make a difference in
+> real life or not.
 
-This looks like a bug fix for a warning that can panic under
-panic_on_warn, but it does not carry a Fixes: tag. The body attributes
-the newly reachable exhaustion to commit 308c7a0ae885, which introduced
-referenced dynptrs that acquire an intermediate reference in refs[] not
-backed by any register or stack slot.
+In the Rust standard library we use splice as one of several strategies
+in our generic io::copy[0] routine. It selects the strategy[1] based on
+source and sink types.
 
-Should this include:
+It tries
 
-  Fixes: 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
+- copy_file_range
+- sendfile
+- splice
+- fallback to userspace read-write loop
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+sendfile or splice are skipped when we can't uphold the "callers must ensure
+transferred portions in_fd remain unmodified" condition on the manpage,
+which unfortunately includes some particularly desirable combinations of
+sinks and sources (such as mutable files -> socket).
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/27038754519
---===============1305281309859444005==--
+We primarily want this for reflink copies and to avoid the syscall
+overhead of a read-write loop with a small stack buffer.
+
+Any additional zerocopy benefit, when it doesn't lead to unstable data, is
+welcome but not critical. E.g. it'd be nice if sendfile could do the following:
+For a 1MB source and a socket with a 64kB sendbuffer it could zerocopy first ~900kB
+safely and then memcpy the last 64kB to ensure it can't be modified after the
+syscall returns. But a "just memcpy in kernel space instead of zerocopy" flag for
+sendfile would be ok too.
+
+We're currently not making use of vmsplice. In theory we'd like to use it for
+copying from `&'static [u8]` sources since the type upholds the requirements of
+vmsplice, but type specialization currently is not powerful enough to
+select based on this lifetime and it's unclear if it'll ever be.
+
+
+[0] https://doc.rust-lang.org/nightly/std/io/fn.copy.html
+[1] https://github.com/rust-lang/rust/blob/ac6f3a3e778a586854bdbf8f15202e11e2348d9f/library/std/src/sys/io/kernel_copy/linux.rs#L210-L259
+
+> 
+> So you testing that thing would seem to be a great first test of
+> whether any of this is realistic..
+> 
+>                 Linus
+> 
+
 
