@@ -1,95 +1,88 @@
-Return-Path: <netdev+bounces-295810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZyRGNpe+Imo4dAEAu9opvQ
-	(envelope-from <netdev+bounces-295810-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:18:31 +0200
+	id hRYLO8K/ImqHdAEAu9opvQ
+	(envelope-from <netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:23:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C174464807D
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:18:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67548648145
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 14:23:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tk154.de header.s=DKIM001 header.b=Yi39hrZk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295810-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295810-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bXK6rN+R;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295812-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C1BAA302AECC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:15:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDFC8308ED5E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 12:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 959A84DBD60;
-	Fri,  5 Jun 2026 12:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8967C30D3FB;
+	Fri,  5 Jun 2026 12:15:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp10.goneo.de (smtp10.goneo.de [85.220.189.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42FA4A3410;
-	Fri,  5 Jun 2026 12:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFD02EEE86
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 12:15:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780661695; cv=none; b=sE1TN1D5hWbb+QGv9Ukl1Ls6amQCP6T/7SFdUFdfcuPLgh10oHMnElRyAXACfSvw2rOJjZ6Lq9K9stM3VGlje9B9Un1jYkljA3jwCfSYiGkPQQhMIVShXwEVIcj7I/kTVt+/7udjQDF293WRIxNnDlkNV4RHXQRpUQs7SG3jorw=
+	t=1780661742; cv=none; b=fMi11IxXs51+Mkx8QKGPIUc0ZmxYlKMh2XBDAFP8LW+Sp9ad3u71v8ZQTwmUA7XYkJzHTtXgNqp7aylKq3JQUyI/ItYTAXU+ACKmGqeDNFCCVkUc2nTvqw0QLvIcetHXv9dtxMginyOrdf4M5hRxGX38qcNhe2EZtZZlf3eqyZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780661695; c=relaxed/simple;
-	bh=WKJ5UODfxYR+CfqWr+7OySQFtpSHPGfBPqs504KLb1k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OOZPh6OwQTfcyLqw6CMsBYn0E/28OhIXv2qvpckG9JjmnWx+w18GXhRWxxSio/6fuS7ujvzQ1vvxGKKzhAgrxkdRzZyFowWdf/Aie6zOd/nMlYfav4Ctu85Ouy6CbIpHOYmhYW9QLrdBPdOoNdg9X2Pdt/GhAekwuocEF+M7yuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=Yi39hrZk; arc=none smtp.client-ip=85.220.189.106
-Received: from hub2.goneo.de (hub2.goneo.de [IPv6:2001:1640:5::8:53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519)
-	(No client certificate requested)
-	by smtp10.goneo.de (Postfix) with ESMTPS id 45AC824062F;
-	Fri, 05 Jun 2026 14:14:52 +0200 (CEST)
-Received: from hub2.goneo.de (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by hub2.goneo.de (Postfix) with ESMTPS id 9DE8D24037A;
-	Fri,  5 Jun 2026 14:14:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=DKIM001;
-	t=1780661690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tWkvo5U1ZaxF235Fa0aIZyeQWAjHdlwHnsDbK7czZ1w=;
-	b=Yi39hrZkf3YgbflLNba561Ry5BYC+vdb8h5G1YUcPQOV2g2p8cc43NOEGgQDg7uPnI+Xh1
-	+6Rw6jmFDZJU0BZywzT2mzso2gMcdrhk4fleI/mIHMkDetBWev9ffTdQ2O6jF+8kuiIX9d
-	aoh7gcgLLH5OIzsJgcu1Nwdn/PyqGkJduXLq8xyefw8VpIzqZWqONtniRwbFn4YSB6w+Zs
-	ccRAn6dXMaWzxjj4+oj44714eCF1CZFwax+HrtbW8BiLphVrttHU+2aKE9WqATcOiy0Omn
-	1RqFDRKoRyVb3OySHiXljAUtTewmRGllm0VdJZyMF9mWgBeT09R36DDOtBV3aA==
-Received: from Til-Notebook.meshlab (unknown [195.37.88.189])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by hub2.goneo.de (Postfix) with ESMTPSA id 96D2D24034E;
-	Fri,  5 Jun 2026 14:14:48 +0200 (CEST)
-From: Til Kaiser <mail@tk154.de>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: marcin.s.wojtas@gmail.com,
-	linux@armlinux.org.uk,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	mcroce@redhat.com,
-	sven.auhagen@voleatech.de,
-	lorenzo@kernel.org,
-	Til Kaiser <mail@tk154.de>
-Subject: [PATCH net v3 4/4] net: mvpp2: build skb from XDP-adjusted data on XDP_PASS
-Date: Fri,  5 Jun 2026 14:13:32 +0200
-Message-ID: <20260605121332.147397-5-mail@tk154.de>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260605121332.147397-1-mail@tk154.de>
-References: <20260602164635.62517-1-mail@tk154.de>
- <20260605121332.147397-1-mail@tk154.de>
+	s=arc-20240116; t=1780661742; c=relaxed/simple;
+	bh=fXx6yGbTzyV9r4+8RIi/cY1NomiwKfkeqLs2lx+MlLs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HU3DqMTmbXlGM7h0XMfEUBKTQyvsO41N9wTWc3t5GoMNtplwas4zl7KCAh5mHIoPXyaMVzeXSAGRcQSNR7Oy1My34uxYNBUVs8h2RyiOULQSqnEmn45D0XjV+15gJBkOvjfRm/AJLvOtQx3H1MN2u/JC8fT6mW+AuAuMq1KB510=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXK6rN+R; arc=none smtp.client-ip=209.85.210.181
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-842358aaf36so772678b3a.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 05:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780661740; x=1781266540; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8BtuG0pULy2ESLzHtqYqpkGxYxsqgbLcJ3DpU7JXoV0=;
+        b=bXK6rN+Rs93Wf3M7m2aZnpktP/eYSnZ+x14FkP20cby09Hw98X2uS79PFC7zua+wDl
+         V6iADps1Zh6joUs504JZlEADmSWtOWqWvg78kkDSNYwnTh/52VnMAzbDn0GlkRCuXHBB
+         DANnHbAvvH1xPzebasbiadrz5wA/d72o7pKBLtQGgMy5B8fWd8VAIUNS6IzyE9sOa+/t
+         QvL/dVE4qOLsGsP4mZVLcSuqIIVY7+FXsJ0SuslfwrMWiOMqfbWRykvuVLk8jzRtRl5o
+         Gn9IAMjGIzZGLmEzKaDxnmFr3dTu4+8P/jpPbZjTTXtutVrZctrJIka8xnhgbP0QhMen
+         KJTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780661740; x=1781266540;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8BtuG0pULy2ESLzHtqYqpkGxYxsqgbLcJ3DpU7JXoV0=;
+        b=qzV6z6d9CKZJ35w82dvlHJjdk4dcUj9GyrxoWCSZnIDolOnLYZuUr4Q/EJ9kr/715j
+         OBptvRCzVOoI07KPpOOV//5MRQEWylYv/pASYI8sPm4vbeqhRt9T8uWuqvhTZ6qag6CM
+         uLWpGuVLwSz0K1jPtM5FlfqktJ7JSYRdrbTZP3yfKcunbtL3hl2SjDsudA34aAcEExXh
+         wzEbvo77TMtwr/E4sys9dEL0JMpfGHQ5oJ2Kz/GprXEmmIFFzgWSNFNM5WpmW3V2DtUt
+         qkJwE5k4Aj+wrDys/fxgUPN+dOiyfEe+qFehGpiigjE39K/yvzUkIMFx7tGCyBRlV/2P
+         UiXA==
+X-Forwarded-Encrypted: i=1; AFNElJ/c/miCWy50CNHIiXIuzmdkWLEMDnR2pjNUrTMMHz0QknBj/Cvx/zwJZuxr5jj9XLcx3ph7yYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQnFeoLt5P8s+WLl0oXFEvVv3ArXTQU+cTmA98H/0Voj2qmoM7
+	hzu06ejXMjxclrTwKFIhUmxhCpPYMHTd38TiQhYZSYOdbRdNtdYx9ZDV
+X-Gm-Gg: Acq92OFOkSi7eVSPkSsaN7tRga+KOtfJJRoa3Ydby2oawLSeBkvPQoQ21PDdpQ01RlX
+	XueY1omema5DQs+xsuiyhJCXq2+oc5NPhFPU/SWFgt3xvMBVHosia34mdv4uWYQI28RT5MD+QwJ
+	nP2RtC6ZU0tN++ekTdMenMnxcQYM60jyrdIoUU3HL0achKfaxwWPBxC6cFwJigTx7IT6igaQiKj
+	H3R16eCsChyf1bLRhROWToD7FPhPR2Ps02+kXE0G0Xi1HLXULtBi3CajJ//zu5TeTPcCtUFbXpf
+	rEM0mSEMU6ZzGkeSwfeCV3MsehmEd9F0OAm272HbU4BPPdekmDL+n9ZGwhaSz4XJqHJYr1t3lUt
+	CQJrbBDn5iObJJE84lIt5R0XkI7duosQREshIrYX9nUh2ghKJ+Ip5sbi7QXSjf4R/KSyn853/V6
+	SkeOUMUECcPn5eaZDQcSYrYcx3zJ/AwyDt9g==
+X-Received: by 2002:a05:6a00:1d91:b0:842:2ddb:e305 with SMTP id d2e1a72fcca58-842b0fc0c71mr3240988b3a.43.1780661739544;
+        Fri, 05 Jun 2026 05:15:39 -0700 (PDT)
+Received: from ltu.. ([171.245.6.72])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84282374300sm11241583b3a.20.2026.06.05.05.15.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jun 2026 05:15:39 -0700 (PDT)
+From: Nguyen Minh Tien <zizuzacker@gmail.com>
+To: stable@vger.kernel.org
+Cc: Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org
+Subject: [PATCH 6.6.y] net: usb: lan78xx: program MAC_CR for LAN7801 fixed-PHY link
+Date: Fri,  5 Jun 2026 19:15:35 +0700
+Message-Id: <20260605121535.51414-1-zizuzacker@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,106 +90,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-UID: d0f7ab
-X-Rspamd-UID: 974217
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[tk154.de:s=DKIM001];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-295810-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tk154.de];
-	FORGED_SENDER(0.00)[mail@tk154.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:marcin.s.wojtas@gmail.com,m:linux@armlinux.org.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:mcroce@redhat.com,m:sven.auhagen@voleatech.de,m:lorenzo@kernel.org,m:mail@tk154.de,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,voleatech.de,tk154.de];
+	TAGGED_FROM(0.00)[bounces-295812-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[zizuzacker@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@tk154.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tk154.de:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zizuzacker@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C174464807D
+X-Rspamd-Queue-Id: 67548648145
 
-When an XDP program uses bpf_xdp_adjust_head() or bpf_xdp_adjust_tail()
-and then returns XDP_PASS, mvpp2 still builds the skb from fixed offsets
-derived from the original RX descriptor. Packet geometry changes made by
-the XDP program are therefore discarded before the skb reaches the stack.
+While bringing up a LAN7801 wired over RGMII to an MDIO-less switch, I
+hit a link that the fixed PHY reported as "up" but that could not pass a
+single packet: every frame came out corrupted at the switch and no ARP
+reply ever made it back.
 
-Update rx_offset and rx_bytes from xdp.data and xdp.data_end for
-XDP_PASS. This makes skb_reserve() and skb_put() reflect the packet seen
-by XDP, and makes RX byte accounting for XDP_PASS follow the length of the
-skb passed to the network stack.
+It turned out the MAC_CR speed/duplex bits are never set on this path.
+lan7801_phy_init() registers a fixed PHY at SPEED_1000/DUPLEX_FULL, but
+nothing programs the MAC to match: there is no PHY state machine for a
+fixed link, and lan78xx_reset() only sets the auto speed/duplex bits for
+the 7800.  So the 7801 comes up at 10M/half, clocks RGMII TXC at 2.5 MHz
+instead of 125 MHz, and mangles everything it transmits.
 
-Non-PASS verdicts continue to account the descriptor length because no skb
-is passed up in those cases.
+Fix it by programming MAC_CR to 1G/full in the fixed-PHY branch, to match
+fphy_status.  Only that branch is touched, so boards with a real external
+PHY (and the 7800/7850) are unaffected.
 
-Fixes: 07dd0a7aae7f ("mvpp2: add basic XDP support")
-Signed-off-by: Til Kaiser <mail@tk154.de>
+Mainline fixes this differently via the phylink conversion in v6.16,
+commit e110bc825897 ("net: usb: lan78xx: Convert to PHYLINK for improved
+PHY and MAC management"), which is far too large to backport, so this is
+a small fix for stable only.
+
+Please apply to 6.1.y, 6.6.y and 6.12.y, the pre-phylink branches that
+still carry this bug.  Built and tested on 6.6.y; the touched code is
+identical on 6.1.y and 6.12.y.
+
+Fixes: 89b36fb5e532 ("lan78xx: Lan7801 Support for Fixed PHY")
+Cc: stable@vger.kernel.org
+Signed-off-by: Nguyen Minh Tien <zizuzacker@gmail.com>
 ---
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ drivers/net/usb/lan78xx.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 481daafdc1cb..dd30674148aa 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -3920,7 +3920,7 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
- 		unsigned int frag_size;
- 		dma_addr_t dma_addr;
- 		phys_addr_t phys_addr;
--		int pool, rx_bytes, err, ret;
-+		int pool, rx_bytes, rx_offset, err, ret;
- 		struct page *page;
- 		void *data;
- 
-@@ -3933,6 +3933,7 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
- 		rx_status = mvpp2_rxdesc_status_get(port, rx_desc);
- 		rx_bytes = mvpp2_rxdesc_size_get(port, rx_desc);
- 		rx_bytes -= MVPP2_MH_SIZE;
-+		rx_offset = MVPP2_MH_SIZE + MVPP2_SKB_HEADROOM;
- 		dma_addr = mvpp2_rxdesc_dma_addr_get(port, rx_desc);
- 
- 		pool = (rx_status & MVPP2_RXD_BM_POOL_ID_MASK) >>
-@@ -3999,6 +4000,10 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
- 				continue;
- 			}
- 
-+			/* Update offset and length to reflect any XDP adjustments. */
-+			rx_offset = xdp.data     - data;
-+			rx_bytes  = xdp.data_end - xdp.data;
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index f5bcf150fd9e..6b94f6026472 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -2325,6 +2325,22 @@ static struct phy_device *lan7801_phy_init(struct lan78xx_net *dev)
+ 		buf |= HW_CFG_CLK125_EN_;
+ 		buf |= HW_CFG_REFCLK25_EN_;
+ 		ret = lan78xx_write_reg(dev, HW_CFG, buf);
 +
- 			metasize = xdp.data - xdp.data_meta;
- 		}
- 
-@@ -4041,7 +4046,7 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
- 		ps.rx_packets++;
- 		ps.rx_bytes += rx_bytes;
- 
--		skb_reserve(skb, MVPP2_MH_SIZE + MVPP2_SKB_HEADROOM);
-+		skb_reserve(skb, rx_offset);
- 		skb_put(skb, rx_bytes);
- 		if (metasize)
- 			skb_metadata_set(skb, metasize);
++		/* Nothing programs MAC_CR for the fixed link: reset() only
++		 * sets speed/duplex for the 7800, so the 7801 is left at
++		 * 10M/half and mangles every frame it sends.  Force it to
++		 * match the 1G/full fphy_status above.
++		 */
++		ret = lan78xx_read_reg(dev, MAC_CR, &buf);
++		if (ret < 0)
++			return NULL;
++		buf &= ~(MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_ |
++			 MAC_CR_ADP_ | MAC_CR_GMII_EN_ |
++			 MAC_CR_SPEED_MASK_);
++		buf |= MAC_CR_SPEED_1000_ | MAC_CR_FULL_DUPLEX_;
++		ret = lan78xx_write_reg(dev, MAC_CR, buf);
++		if (ret < 0)
++			return NULL;
+ 	} else {
+ 		if (!phydev->drv) {
+ 			netdev_err(dev->net, "no PHY driver found\n");
 -- 
-2.54.0
+2.34.1
 
 
