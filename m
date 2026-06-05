@@ -1,144 +1,193 @@
-Return-Path: <netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5iztG+oeI2pFjAEAu9opvQ
-	(envelope-from <netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:09:30 +0200
+	id lKYPL3UkI2qAjQEAu9opvQ
+	(envelope-from <netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:33:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1BD664AD94
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:09:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B509864AF79
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 21:33:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mvJjF9SQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295951-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=cs.unc.edu header.s=google header.b=eCcGzrJ4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295952-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=cs.unc.edu;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4861B3035F00
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:09:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8D868300BD7F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 19:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC36040BCBE;
-	Fri,  5 Jun 2026 19:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691444071F9;
+	Fri,  5 Jun 2026 19:19:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E300F409603;
-	Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF783BED1F
+	for <netdev@vger.kernel.org>; Fri,  5 Jun 2026 19:19:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780686536; cv=none; b=eOxLwNSU1jGjhTSF/NmDEtwX8cw4U1SoeLJN+sCIUlFHzOvPh5E98jOejtYl4+YWWO09dYBQf9aOfaMIJsbGLznSCXd/ZGnOE073iQsuATap2Ux0Q842a9gOL7b40BqmcM3pqBRRIBjyVqfCBufHE1oo8reDMVRoCeL0pBo4EBk=
+	t=1780687191; cv=none; b=qXtGpAw36hHwPf8htDSy/xhBDd1lNQxshKtSS+ZKFpQzFbed9G0PJZvaLeAS5IJ9/FtTiULxM71ytjRrNaxwEFtRp/CMiv/iqIQC1mNf4puTYfD8lXFlqss+F/7rYimfFO0INX18JC2dx2zCdKGfywyvjE1UNFhMHtO4KTvSbkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780686536; c=relaxed/simple;
-	bh=KR5xveAOSH4lE4C7FApc/5PGwobBZ2hRVpf8cnvjB8Y=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=lR2icXJewlgwBxEfpHP80vZMhDVdYEuRKWulLvb0dqlYxn/qvOLZfCMnnk76vugPHDFIMjaQuZ1if9ynlus3YIpItBfywKJMBYtDm72f7EnysoAU6/zBCfbBw1xf/xRtH/nFlcbwRxcnz097GoWBEYhkloa9S52SkWhkJvz47Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvJjF9SQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66CAC1F00893;
-	Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780686535;
-	bh=qo2m33NQeRmaDvm/ox0qcA8IfPMMLz/eL4e61lU1CKU=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=mvJjF9SQ29lyrlk3oI7xS4lcRrisWR2R4LFM/xP3jWHn5WQgh4nGN2EUvMViJR1TS
-	 TbHqyO4herEAb38mppJT+0DfJ/rDBJPw275LIkdnYaAXlreDoxcMqJutSNCYoOIRPT
-	 jbIIJ4ISFuyFv0BwzkNU1G0OuXYPR/buVz6pY1EsWKy/pRLOaqKlTEG1SXMT6noznM
-	 QeSmJjApEDWjvabAyS/wCRQrP+9UyB6cCCx7NG8w2fQTZnWR6mxZZ+49V/EOYoe/Od
-	 uQtmDEcPvRVzzOxpsFYDZqXUWaFgx9+E3Mm10ai+h+A8Lx1WWQ7vBbv16jUZhD9bLx
-	 CaoOCgbApPc6w==
-Content-Type: multipart/mixed; boundary="===============8919606443623192315=="
+	s=arc-20240116; t=1780687191; c=relaxed/simple;
+	bh=lQyeoEHvPDcTd8UBfI28l1PrKOeUuXwWGO6rNePL3aM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HZGsZIyUdMMTyhiQsbuutEm2h7bszMptEPogRz/EelUPQaawEigBa6fqdgNQI3VcY/ZEqJ6Qp9dYISXWQ4EyvE4Oor2SCWHx0gt7JY80PKW76FlCAccfrhXVSnPgfx4gdfHLpQCdKmJZ/kwVRxtuhqitdI60Y8CfC6I6nl4dhoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cs.unc.edu; spf=pass smtp.mailfrom=cs.unc.edu; dkim=pass (2048-bit key) header.d=cs.unc.edu header.i=@cs.unc.edu header.b=eCcGzrJ4; arc=none smtp.client-ip=209.85.216.49
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-36bc065c298so271561a91.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 12:19:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cs.unc.edu; s=google; t=1780687184; x=1781291984; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B0vJH8NNd0RF41K/4FCBtez2ytaf4nIFe3x4aSA4G5w=;
+        b=eCcGzrJ4DDhZBO/s4Ntwd+hvBl/td6H2K4Kz8xGIIvcHauLoogijSjsyweD7TG1jZK
+         A2RmBx2Xkz8DtAhduy5k2tPwehKJki2ZV1RfRiYlEEVWG3lYihK/rxbHmjRoCWYr0UPD
+         Syj9Qv0wW2Sy9yKSfEQ3F0NQMg3esKIhBp2GmmgTgInWW/9dBiG9155fivTKff9bn9y5
+         AtYVksSDXPWAowQNxjP0Yd1Un6Onp4O10g1C6liujsxCho+Hf7VJVpgmJxr0KzFmHEfN
+         TPcKdaOZ68pVbgbeQpH/LIkUSr2UFKuUQEa/EvwIXE+bCB5fVkE3Jpe1Y5IuMCU26pXC
+         0O2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780687184; x=1781291984;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B0vJH8NNd0RF41K/4FCBtez2ytaf4nIFe3x4aSA4G5w=;
+        b=rYOTDJskO3I5nZ/C2oASD9yihETzWPYBuQ8JVUg87cx76arOgDMe8J+XJusUodznbl
+         ZQRYcbAPsv7qYXGv7YL1zvgbwiKyaaD2ztHwH/wkEVa1+B/Ui79zyhR7zNCmLG/94x/7
+         RPNfU5rLmlcgtL+b0FqSQjkoWMfvfk1mLbwisz5EjvyRE7RKksn8XVb030Em6ycPfgeT
+         b0L0tdqK/BmmDr7i7ymZw5CyReJTTfHMfoyQSkpx9kLCFIRipcksIyznAyh4dzAHFPhW
+         fa0VBgEDDsHPACR07oRvvmfwO7rRWjyV7rMaJ+chKXeKi8J1DlKZCEtHftkUbqZ+XThg
+         R/yw==
+X-Forwarded-Encrypted: i=1; AFNElJ9ObIv+Xpk7reSWUv4gLcjPaSPLZFnn1GEwc0FxoEoyUuHYm2ACS6ndoPG3ghdUBRCGRxHhyVI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXy9y4xVlIIsCqsrTc3s5EeHcsOIE7R2sEcr6Y3wzgOpVUq915
+	JgjrJMWDiQKg700o8Ee2QTft+kCw560UUOz7zdDhGOuETT/X2sCkpFKdt936lM8Qwg==
+X-Gm-Gg: Acq92OFGcsnwYCC89KVjZYn/2G4qczUFs7xcNps3hAzcPL5wBwxJonwFH9YzxNDtW9J
+	WwqpIHp2yxoL82+XNkcdok4qRmwttlo3bEFSQfZWqFY4Tgd6DfOIDluM2tlT9odiL3ve3kbfB0X
+	ihWmYLNzvJ58aCLNIHJHVN1LJ7zunnN7si6dE09s4pYjPO2gjrtWHU3VB5qoXNyoJBf2hkyZUSa
+	A1YU123ZFTOQTNrWj2fI7m5BztrSOJiEGQ6Pec+eMmCK8rGbhWADH7/IVJSVDVkjk4351dJaMpD
+	IXsIVOk67fFGxzUKHmH0/aZvYQMHRHfE6lZhjkAWBdUZP2bfBWCHXWTNpev6GbXVjvtfzmq88jK
+	KSzsupznAdm0xSVLUiDorj83PW+W2SbVyGiMOxv6/nzbcbfV7PTxNiVhy5e6Ce0YOFHJOvE2GRx
+	NiqyviPWqgRk1XoemeG72AHsRF6fwgkf564piag3PiLUUqD807w1Of5NfJxhrgmA==
+X-Received: by 2002:a17:90b:3dcf:b0:36b:3ecd:88d7 with SMTP id 98e67ed59e1d1-370ef0f50ffmr2677491a91.2.1780687183832;
+        Fri, 05 Jun 2026 12:19:43 -0700 (PDT)
+Received: from localhost.localdomain ([106.51.195.148])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842820e8e6asm9757737b3a.0.2026.06.05.12.19.39
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 05 Jun 2026 12:19:43 -0700 (PDT)
+From: Divya Mankani <divyakm@cs.unc.edu>
+X-Google-Original-From: Divya Mankani <divyakm@unc.edu>
+To: kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com,
+	Divya Mankani <divyakm@unc.edu>
+Subject: [PATCH] vsock/virtio: fix memory leak in virtio_transport_recv_listen
+Date: Sat,  6 Jun 2026 00:49:22 +0530
+Message-ID: <20260605191922.12720-1-divyakm@unc.edu>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <3a3a97529e6a13b4220026c0d97d3c2341a503e3f815e0c67f1cc6a8ba13cab7@mail.kernel.org>
-In-Reply-To: <20260605183551.969144-5-ameryhung@gmail.com>
-References: <20260605183551.969144-5-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v2 4/5] bpf: Remove WARN_ON_ONCE in check_ids()
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,martin.lau@kernel.org,mykyta.yatsenko5@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri,  5 Jun 2026 19:08:55 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[cs.unc.edu,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[cs.unc.edu:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295951-lists,netdev=lfdr.de,bpf-ci];
-	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:mykyta.yatsenko5@gmail.com,m:kernel-team@meta.com,m:ast@kernel.org,m:yonghong.song@linux.dev,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:alexeistarovoitov@gmail.com,m:mykytayatsenko5@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-295952-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER(0.00)[divyakm@cs.unc.edu,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[divyakm@cs.unc.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:virtualization@lists.linux.dev,m:kvm@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com,m:divyakm@unc.edu,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[cs.unc.edu:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.kernel.org:mid,vger.kernel.org:from_smtp]
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,1b2c9c4a0f8708082678];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[unc.edu:mid,unc.edu:email,syzkaller.appspot.com:url,vger.kernel.org:from_smtp,cs.unc.edu:from_mime,cs.unc.edu:dkim,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D1BD664AD94
+X-Rspamd-Queue-Id: B509864AF79
 
---===============8919606443623192315==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Syzbot reported a memory leak inside virtio_transport_recv_listen
+caused by a race condition when the parent listener socket shuts down
+while an incoming packet is being enqueued.
 
-> bpf: Remove WARN_ON_ONCE in check_ids()
->
-> check_ids() warned when it ran out of idmap slots, assuming this was
-> impossible because the slots are bounded by the number of registers and
-> stack slots. That assumption no longer holds: referenced dynptrs acquire
-> an intermediate reference that lives in refs[] but is not backed by any
-> register or stack slot [0], so a program can accumulate more reference
-> ids than the idmap can hold and exhaust it.
->
-> Exhaustion is fine for verification correctness. check_ids() already
-> returns false, which makes the states compare as not equivalent and
-> prevents unsound pruning. The only effect of the WARN_ON_ONCE() is log
-> noise, or a panic under panic_on_warn. Drop the warning and keep
-> returning false.
->
-> [0] 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+Fix this by locking the parent socket and verifying its shutdown
+state under the lock before executing vsock_enqueue_accept().
 
-This removes a WARN_ON_ONCE() that can panic under panic_on_warn, and
-the commit body explains the idmap exhaustion only became reachable once
-referenced dynptrs began acquiring an intermediate reference in refs[]
-that is not backed by a register or stack slot.
-
-Should this carry a Fixes: tag pointing at the commit that introduced
-that behavior, which the body already cites as [0]?
-
-  Fixes: 308c7a0ae885 ("bpf: Refactor object relationship tracking and fix dynptr UAF bug")
-
+Fixes: a478546a782a ("vsock/virtio: add support for listen sockets")
+Reported-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+Signed-off-by: Divya Mankani <divyakm@unc.edu>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ net/vmw_vsock/virtio_transport_common.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/27034008594
---===============8919606443623192315==--
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 3b294164b..8006a13bb 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1571,15 +1571,20 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+ 	vsock_addr_init(&vchild->remote_addr, le64_to_cpu(hdr->src_cid),
+ 			le32_to_cpu(hdr->src_port));
+ 
+-	ret = vsock_assign_transport(vchild, vsk);
+-	/* Transport assigned (looking at remote_addr) must be the same
+-	 * where we received the request.
++	/* Lock the parent listener socket to synchronize with a potential
++	 * simultaneous shutdown thread running __vsock_release().
+ 	 */
+-	if (ret || vchild->transport != &t->transport) {
++	lock_sock(sk);
++
++	/* Check if the listener socket was shut down while we were
++	 * creating and configuring the child socket.
++	 */
++	if (sk->sk_shutdown == SHUTDOWN_MASK) {
++		release_sock(sk);
+ 		release_sock(child);
+ 		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
+ 		sock_put(child);
+-		return ret;
++		return -ESHUTDOWN;
+ 	}
+ 
+ 	sk_acceptq_added(sk);
+@@ -1590,6 +1595,8 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+ 	vsock_enqueue_accept(sk, child);
+ 	virtio_transport_send_response(vchild, skb);
+ 
++	/* Safely release both locked objects */
++	release_sock(sk);
+ 	release_sock(child);
+ 
+ 	sk->sk_data_ready(sk);
+-- 
+2.50.1 (Apple Git-155)
+
 
