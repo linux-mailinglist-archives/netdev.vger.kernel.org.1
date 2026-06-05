@@ -1,257 +1,162 @@
-Return-Path: <netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vAaxBE9cImrDVQEAu9opvQ
-	(envelope-from <netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:19:11 +0200
+	id +mbfICZhImq6VgEAu9opvQ
+	(envelope-from <netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:39:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62176645269
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:19:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52A064531E
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 07:39:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=outlook.com header.s=selector1 header.b=ZXWWYUPy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-295631-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=outlook.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=linux.microsoft.com header.s=default header.b=kCFlTesH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295634-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 69115300F149
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 05:19:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AACA300C925
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 05:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004AD3A9DB9;
-	Fri,  5 Jun 2026 05:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36343BB10D;
+	Fri,  5 Jun 2026 05:39:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazolkn19012048.outbound.protection.outlook.com [52.103.2.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F586175D53;
-	Fri,  5 Jun 2026 05:19:05 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780636746; cv=fail; b=hO/3EdxxGbbSVMbh8uWqbcN4RyzsTUdKj2MGw1fm2P9dylqey7uP3FLiMKKHcT7UXwfPXyEvwyMihQq6A32cs0o9aEDrH5aHrONnL4R0IDBQC2yVHyX1m4KN21uZij1hnx2JLFWx++O1WVsgWtmpQHzWsqITN+pB6TI/2Kj+5Fc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780636746; c=relaxed/simple;
-	bh=PsM2huVqYJTCi8fhX6R9y0f0pNF7FnEdPvQ0H2EZdIs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Wi34o3eaV5ZFuBCzG3LYh8l8mEDbhOuQj1S8DZlpgoFHPhDvRUylt/ToJr8jksBXKTitYyrYp+HDIN+QTsGKa5Hx7OX5HtqO+GOIqOqNbnV0e6KM+pM3UVao4f7s1oX9NfXEuQL5kk0OWtYPNMzNLB+6nCJEOyrceGuq/RtzUgY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=ZXWWYUPy; arc=fail smtp.client-ip=52.103.2.48
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WGlOCRvZSvBljSlAT+KuTKMlgVVkLzzbK5c1d7xhW53FelNEtR7EW9/n970PAkOGCPSOnoD0zEcXlfxj2Pt9ai1iEAK9tMqJ4w7pQfR5kQIBfAd8QUE+eA7HuBkFqd5GROhackhnPtT3IeBE31PQCHTir0vTE469wurn4rM1c+Gfx4ML+7vkDbYhxxTzr4PG2bDqrKEl9r6UQqVMhigwz2FAF4yFBeQOGi5v7ufJPO0Qz2uSR4YCgzULyXW5Z7ZPBppmH/FYXQkZj9HuI6cjepVJZBDMXvA2h0HtblEsz7Bu4io4v8Mz/uQx73jHAvNsJs+YZS4g7+GAdXKJDtLmBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YZdxHJpwNdd5ANg2ZlCpReLYMZWYgiU8X71JX8kab1I=;
- b=vzqtfOmDGMs1JknEffl6gdDM5bVMFX+/fY4Lwdbyae3pleOqpZiPwUc2qvtnPc9pEwcdUOQhN1ddGMhaKp9G2vV2uSJGUFDgdcBd2SAOt/0xQUzA3UNv/KuppvHuzHjsCacoawzNFvghc+Psyej4Z2KyKoXW8xu+BCR2CIII2REcXW0WRGT6VDW31PqCiHwoRDFsuu1k6glP3sHUeo4Ql7O980tizS9gXiWUzB2Bq0p0/ttsL6sOe75XuzwvxW0wsAHkP+hRr/ySRptQDjMxHPVRwrHOedXPSJxa/4QAx6pGPLTVpanxjbmINnqRauYmnYD+h8/pYcYtaA0Dpbzu8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YZdxHJpwNdd5ANg2ZlCpReLYMZWYgiU8X71JX8kab1I=;
- b=ZXWWYUPyVpbLQqDFKy0Nq8oQHR31VLb9jGNcGXfMIsfvDv0fpiLO6eVMB7Q3YJOGscvrm0p/JsDEl8u7jZrtj+PBhbrmfEpQGV2BRg8iQjet4P3dgFr8yBHODjc7EX9jAa0Mq/6OoRNg3btSjiKx8T8RIZyNdT+9HyPFZAeS3AR6XfSE9tpOMZEbIyhOlWcXzhRDovf4q68czIBfHG05uRBuA7K6aWfl8Z14JF3CyjiMQQyqQaVfmR+rnEl4aJePesBGpGniDQFjxUNPuxGohU9lTAObnl0sXVkGSW4T0nGM1aw9Br8/6+9EHXhLpthaP0apz1LPBb2G2O/U7W5bzQ==
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
- by DS6PR19MB997434.namprd19.prod.outlook.com (2603:10b6:8:463::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Fri, 5 Jun 2026
- 05:19:04 +0000
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0092.007; Fri, 5 Jun 2026
- 05:19:03 +0000
-Message-ID:
- <SN7PR19MB6736BF850FAF84B013000E5F9D112@SN7PR19MB6736.namprd19.prod.outlook.com>
-Date: Fri, 5 Jun 2026 09:18:56 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH next-next] net: dsa: qca8k: Add support for force mode for
- fixed link topology
-To: Jakub Kicinski <kuba@kernel.org>,
- devnull+george.moussalem.outlook.com@kernel.org
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260603-qca8337-force-mode-v1-1-caf7670ffab3@outlook.com>
- <20260605012421.3517532-1-kuba@kernel.org>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <20260605012421.3517532-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0001.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:26::6) To SN7PR19MB6736.namprd19.prod.outlook.com
- (2603:10b6:806:263::12)
-X-Microsoft-Original-Message-ID:
- <0fc24d8e-902e-44eb-870a-f6616370e4b4@outlook.com>
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2142AD2C;
+	Fri,  5 Jun 2026 05:39:42 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780637983; cv=none; b=IEaYmcdiFovK/4ECa5/mccw/7RybzFRFWN0DyU0PrXyn6mzjS0Gi5SQaSFLz6g66BZzoIfxbp1ilDFIuuLJZ0cGIqAGvoCrmZ6hRoDXfjx4V+kLjXR9F6WAA54d6UIGP/0aqwsJYjJfzCadJmxsjoQxLcLkIqd/mwkBuNZhIG/c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780637983; c=relaxed/simple;
+	bh=OtzFLoaL6YRibt5cWxU3Bh1ybqbe+mB6LqicVDYoSVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rr4pkLA6xuIPAYSFkcPHYDS6YDHUrOoQKWQfrxlK1kZRyudiCpNj1DKtR4id5QKQrCU64QMTg3dEE/hEwXDY388dfYRmKoLgG03MpduwYpYTqMnoI4B8ss+CYrKKaLG6H9iRct6d4OBSZ/KTwzinjo4B72wkyYiXCeRzWUhVzwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=kCFlTesH; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id BB02520B7169; Thu,  4 Jun 2026 22:29:29 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BB02520B7169
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1780637369;
+	bh=qIO/sBp81IBMRVL//sPxD46ntAHHAdA/+qb5LsOMY8c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kCFlTesHtfd61rL4g6Pk2Gf9tPjaIQvHUm8+WvC9ONeLMpNzq74ueTfVx+or9v5vv
+	 i1BXiC6LmO5lem0eSeF2ac6gFBq4SoHHuxkTr/k7U+vLYWHs9daeBo9qR+YwUCTxqE
+	 ITX8nLq26F57iawXJOMbSFnOTQtZUFCFpRzqXi3k=
+Date: Thu, 4 Jun 2026 22:29:29 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	dipayanroy@linux.microsoft.com, kees@kernel.org,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mana: Cache MANA_QUERY_LINK_CONFIG result
+ to avoid repeated HWC queries
+Message-ID: <aiJeuU3DLKL7JcPN@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260528180757.1536640-1-ernis@linux.microsoft.com>
+ <20260602132127.25fc27ee@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|DS6PR19MB997434:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66e68753-54f0-4272-0996-08dec2c1f4d8
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|15080799012|19110799012|8060799015|6090799003|12121999013|24021099003|55001999006|5072599009|41001999006|23021999003|51005399006|37011999003|3412199025|440099028|40105399003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VG9uNHkrMWI3N2tKcnU2T2UvUUtwT3hOL0puY0pkR2FMbkJjNlhHNld5VlFY?=
- =?utf-8?B?NE1YdkhOUXd2RERJR3ZjeGtDbWM4cVVOVVFwZUJiV0ZzcTNRdSs3Z2tNUmdh?=
- =?utf-8?B?N1RmQVBTdmZkWFVYNnZvNVlSaTBiUjNaQ3ZjYzlWTEwzSVN2NURFVkNoSWlj?=
- =?utf-8?B?NXp0amtHSytjZHFQY3EzZDdjc2YyV2UyVlhzd2tNTk56UlJOQ1ZTL2s0eHF5?=
- =?utf-8?B?Y1J5K0NHakxabk96QS9VMjduclBOQ0xXMVhadkdkd0h0dkZzWHEwbFVlSVB2?=
- =?utf-8?B?RFMzelU5dElKZWVLWU5XbElKSUk5Z0toQVg3R0NZanBzSlhWSVc2cFlSc1Vz?=
- =?utf-8?B?ZDl0VkF1aERoa2dBUmtBSW5KejZpS29IS3BPV0NYYnM2WjhtWkxqaFo5Tyt4?=
- =?utf-8?B?TFg3TThPYWNFZzIyV05xQjUweHFrWlE5OHpSWlJXQlFCVzcvcXdmME9NSWU1?=
- =?utf-8?B?ZHNmUDU1UXlPa05vRTFsSVdDRG01L0hVVVJVeXduUkJGWHFXTjBkYTY3b2Ex?=
- =?utf-8?B?V1pBM3RXTUVIV0ZTYUp5bWo2QkdxbDFoQW1hOXdNRXRSY0tsaFNHZ0NxQTVU?=
- =?utf-8?B?cVAxWDBDeVZ6bVpLTWlzOFJpbHA0aHdncWlhMXMvUzdOaVl3T09UMWhKdHJp?=
- =?utf-8?B?R0tNamJLd3BGWFRrOU41TXRaYzlpRTY3czdWQk5FMXFJc1N0dy82anRUMjJI?=
- =?utf-8?B?ajhuSTFib0lSeGN4cnE0L0x1VncvaDhhRDlSc2cwUGhmU0s4US8zQjJiNjJC?=
- =?utf-8?B?SlRGVEVUazZwSURDMjlwR1RDWmFFbktLR2dmZ3FscmRDbnRkM1kzaXFRRTJ3?=
- =?utf-8?B?SmpCanE4dms0N0NCOXdvRFlqdFRvdW9YQ01CTWJaSGZpVXRHaXhCRkNuSXlt?=
- =?utf-8?B?YlVWM3RCeGlPRC9uTkI1cUpTcUJBK09QTGoxVWdOWlc0eGtqa3o3ODRxTW94?=
- =?utf-8?B?a2t1S3BqaStJNGxaVjBBY3lOWSszVWVtRnF2TjFCVjhLMDlWQXZyWEU2dUkz?=
- =?utf-8?B?aFlzVFo0bW9ZK2pUeEk2MjFOWjFKOEpYVkVmSmVmSXVJcUQrZFc3S0ZCODda?=
- =?utf-8?B?cGVOeWZvZlRHaU45Z2pZREdXWkxxZXRmTGM0bXlLSGhnbjRUS2ZyRFVPUnEy?=
- =?utf-8?B?Rkw2aC85bXdteDc3NmNFRUNSL1RyRS9JQXNFaUt4SE5GeW5uYVlkVnNLZ1Bs?=
- =?utf-8?B?ajhpVVlnMGViNGVxTW9WWE5ubndUblFHb2xmNno0Y2syb2VoTDZFS1h6M2tr?=
- =?utf-8?B?RmxOK1YvVVFXTDVtQ0R6TEhNRnFlTkExY0NuZ3JaQlE2K1UxV2V2d25uZWpB?=
- =?utf-8?B?Y2dOSGVuSzJtZ1dvVFV5ZUdFNFNXcndENHRoY0JmK1lhTXppSXMzYmZzUUl0?=
- =?utf-8?B?ckRwQjlpZ0FLejNvRlRvNC9zRVBXb2plSEduVFFLVjczc0xPUnM0REJra1Nk?=
- =?utf-8?B?VlRaU1BZbGEyS3lnOVpVdjBGUTZTcVJvdzJ1dnZBPT0=?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZzRDWXV4T1pGN0J0SzFLMWtrNE9uZExBMEJVKzloV1FxMmtQUk5LcGV2MFJV?=
- =?utf-8?B?MWJYUmducHk2MzA1UTJKUVZvNExoN1RHdG9leTdxZkN5MGxIc1pJaEFKeU9n?=
- =?utf-8?B?V1Jkc2RtZWVGOEZNOTl3WENJMnhmb0IrSlpBSERhTzZzLzZ0Ukt5Mmg3YVVI?=
- =?utf-8?B?ejVMMEdHcUJIQU04Um80NkJDYWFYa241MWV5SSszODl4YllYdDNsUU1OY0ta?=
- =?utf-8?B?bDdQb3hOSkVVYWtJTmdsU0IxOTdGRkl5KzUxU2hwNFNZNFVLREZ1VTc5bXhV?=
- =?utf-8?B?N3BnSFdRWkpOcnNoSkR2Z3VlWWdhd1psZ2kybllIYXhrWTRsSkpsQnJzUGs2?=
- =?utf-8?B?QWdaeEVXNWVwT3hMYkZKbExPTTlVTGZrMVI2QkJkSWcwSUdVaXdzRWE2WGZB?=
- =?utf-8?B?SE5DOVJaK2lJODdKaXVWUHFoUDh6d1RDVm03YzU3OUdmTG9Va1RHNUo0RUhm?=
- =?utf-8?B?bzRxTkVEdEtIRGtHY2J3ZENVOEttaldWR21KRnVXUG9zNmRRTmFQMEpkSnBm?=
- =?utf-8?B?ZUgwOGM0eDNnS24wNmJtREZ2cVdEYkg1UG51ZXM3R0dKZlFrS2V3T1VEL0tJ?=
- =?utf-8?B?c1A5ZEE2N2M3cVUzY1E1eUhDcklvUlZnOWVManBnMGJnVklKaFREZGkrQmpv?=
- =?utf-8?B?d3Q4UjRTMjMra3NEQXoxdjZYZ0FCdWtYRFgzNkdKYXF4WFNMcEhSRE51bjI5?=
- =?utf-8?B?M0VXWkpvT3htUGtZVGV5MExhQ0R6aVNxTXMxNHBFSmJmckJaMHpyZ1Rid0JN?=
- =?utf-8?B?YlBueW5SV2czbkdsT1pwVHc3eGRIMXFTY2Y1elJEblVtbzYzM09OQXgyN2RM?=
- =?utf-8?B?MjNiWEMwdm5YaE95UmE1UXN2RThhRktuUFB3b1FCOWdnZCtielM1MWlpSlgz?=
- =?utf-8?B?Ri9oTlJNWlRSclJZek96Q2liSUc5Y2V0WDFCSXVLb3Vva3NUK3JsbnFTbFpZ?=
- =?utf-8?B?dWNsWVBRTWRVRTJ1M0w0SzQrVVlaZ1F1ZzN1ZWtITEorNXJpeU1pVXZhTDBo?=
- =?utf-8?B?TzR6azhvMEhSM3lzdHlsdWJhTFh6d0tLSFNsWlR6Y2xGQ2lTM2dxMmpua3or?=
- =?utf-8?B?a3NiNHpRaGZDR2VwQ0pLRDIxT1dSVjBZTWNyK0hwNGFlL0xHdFdmOEVDbDVZ?=
- =?utf-8?B?UUM4THVBOXJVOERBNXJqMDF4OElkeDlmcG52eitsRFJHZllIK0h4bFVXNkNt?=
- =?utf-8?B?UENmT0RaK1B3eXNRa2VZRUc2d1FVeUVGQTkvbVBFbllVcmpaakF6dHdRb2hX?=
- =?utf-8?B?cGJlVUpvMlgwaDdlM3N5ZlVPSEJtb1hnSnppaGFucEQ2MGwvNnRiZXFnK1A2?=
- =?utf-8?B?cVUwUTlRTWJlS2NoSWtZUUVKdHdyU0FBamt3bWg0MWhjU25SRUJKSlZialBi?=
- =?utf-8?B?K0ZZaElybkMvREpGMXhNWldUTUNhcUtUWHpzQXZSbWJ2aHJiVFZuUkFhNHV2?=
- =?utf-8?B?L3M5ZTRMNGNycEp0MkxYbUlIMHNkU1ViYVUzMkVkR3hFbHpuTVJpdEdPOHRl?=
- =?utf-8?B?bE9nbUpMUGdYVVA0U0xBNk5QTllkS2RvUzZ6SlJ6TWladncvaXprMDZkbG9V?=
- =?utf-8?B?Ymc5blhlOTJibmZhanB0eU1BNXdPRUR1d3N6YzFlUHpnOVF6NlZlNGlQZjdi?=
- =?utf-8?B?aS8vRGFMWFZ0TXVQT2V4dWZlK21KdlpGaktEU0pyT1VqTGRGYWU0M3NjR0Jx?=
- =?utf-8?B?ZHc5Z3pnOU9Sc0dGYkdxTUUrNDZwQnRiV1haRkNiV2FzNUlncDUzeEhuUmFp?=
- =?utf-8?B?dDcxVkdSM3lrVWJ2S0l1VCt5ZTVjQ0Mra1hyUHl6eUl0dGQ4K3l5VTllQ2ZV?=
- =?utf-8?B?MzFDdUxSb04wNUxhWEcxZW1lRi9PcElRUThIYXNOL3NMdTBISW1hR0RPamU0?=
- =?utf-8?B?NXIwMTVGN2Y2U0RvTXVpYi9UNTZtc3VXRCtDMUlLb3RSYnc9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66e68753-54f0-4272-0996-08dec2c1f4d8
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2026 05:19:03.5929
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS6PR19MB997434
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260602132127.25fc27ee@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
-	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295634-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-295631-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:devnull+george.moussalem.outlook.com@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devnull@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_MUA_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[outlook.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,george.moussalem.outlook.com];
-	FREEMAIL_FROM(0.00)[outlook.com]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:from_mime,linux.microsoft.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 62176645269
+X-Rspamd-Queue-Id: D52A064531E
 
-On 6/5/26 05:24, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-...
+On Tue, Jun 02, 2026 at 01:21:27PM -0700, Jakub Kicinski wrote:
+> On Thu, 28 May 2026 11:07:51 -0700 Erni Sri Satya Vennela wrote:
+> > mana_query_link_cfg() sends an HWC command to firmware on every call,
+> > but the link speed and QoS values it returns only change when the
+> > driver explicitly calls mana_set_bw_clamp(). This function is called
+> > not only by userspace via ethtool get_link_ksettings, but also
+> > periodically by hv_netvsc through netvsc_get_link_ksettings and by
+> > the sysfs speed_show attribute via dev_attr_show, resulting in
+> > unnecessary HWC traffic every few minutes.
 > 
-> Earlier in qca8k_pcs_config(), reg is overridden for these models:
+> mana is ops-locked, right? Because you support net shapers
 > 
-> 	if (priv->switch_id == QCA8K_ID_QCA8327 ||
-> 	    priv->switch_id == QCA8K_ID_QCA8337)
-> 		reg = QCA8K_REG_PORT0_PAD_CTRL;
-> 
-> Since the SGMII force mode configuration uses this same reg variable,
-> won't this cause the FORCE_MODE bit for port 6 to be incorrectly written
-> to port 0's PAD control register on these specific switches?
+> Could you instead take the netdev_lock() in the work?
+> It's already held around the user space originated calls.
 
-I've taken another look at the vendor SDK and this property is always
-set on PORT0_PAD_CTRL regardless of whether it's physically wired on
-port 0 or 6. I did see it is only set on the QCA8337 version, so I'll
-check for that in v2.
+Hi Jakub,
 
-> 
->>  	if (val)
->>  		ret = qca8k_rmw(priv, reg,
->>  				QCA8K_PORT0_PAD_SGMII_RXCLK_FALLING_EDGE |
->> -				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE,
->> +				QCA8K_PORT0_PAD_SGMII_TXCLK_FALLING_EDGE |
->> +				QCA8K_PORT_PAD_SGMII_FORCE_MODE,
->>  				val);
-> 
-> [Severity: High]
-> Is FORCE_MODE properly cleared if it was previously set by a bootloader,
-> but we don't use outband negotiation and no clock falling edge properties
-> are configured?
-> 
-> If neg_mode != PHYLINK_PCS_NEG_OUTBAND and the clock phase bits are not set,
-> val will be 0. This causes the if (val) check to fail, skipping the
-> qca8k_rmw() call entirely, leaving FORCE_MODE unchanged in hardware.
-> 
-> However, if clock phases are configured in the device tree, val will be
-> non-zero, and qca8k_rmw() will clear FORCE_MODE. Does this create a
-> scenario where clearing this mode unpredictably depends on unrelated clock
-> configurations?
+I tried two netdev_lock-based variants. 
 
-No, the default value, as for all documented bits on PORT0_PAD_CTRL, is
-0 (disabled) after a reset. So it will be disabled by default and only
-enabled if a fixed link is defined in the port node in the DT.
+mana_query_link_cfg() has four callers:
 
-> 
->>  
->>  	return 0;
+1 ethtool ioctl/netlink			- has RTNL	- has netdev->lock
+2 sysfs speed_show/duplex_show		- has RTNL	- no netdev->lock
+3 netvsc_get_link_ksettings VF forward	- has RTNL	- no netdev->lock
+4 mana_shaper_set			- no RTNL	- has netdev->lock
 
-Best regards,
-George
+No existing lock covers all four.
 
+A. netdev_assert_locked() in the mana_query_link_cfg() :
+Lockdep WARN on every sysfs cat /sys/class/net/eth*/speed and every
+periodic netvsc_get_link_ksettings() poll since callers 2 and 3 hold
+RTNL only.
+A slow firmware reply on callers 2/3 can land after mana_shaper_set
+(caller 4) has changed the rate and invalidated the cache,
+publishing a stale apc->speed / apc->max_speed as "cached valid". 
+Because the value is cached, the staleness then persists until the next
+shaper change
+
+B. ASSERT_RTNL() + netdev_lock_ops() inside mana_query_link_cfg():
+Self-deadlocks on #1 (__dev_ethtool already holds it) and #4
+(mana_shaper_set already holds it and calls mana_query_link_cfg() before
+the clamp).
+ASSERT_RTNL() also WARNs from #4 — shaper genl ops don't take RTNL.
+
+Eg. Deadlock scenario:
+__dev_ethtool()
+  netdev_lock_ops(dev)              ← held
+    ops->get_link_ksettings()
+      mana_get_link_ksettings()
+        mana_query_link_cfg()
+          netdev_lock_ops(ndev)     ← DEADLOCK
+
+Can we consider private link_cfg_mutex which is orthogonal to RTNL and
+netdev->lock and covers all four callers?
+
+Thanks,
+Vennela
 
