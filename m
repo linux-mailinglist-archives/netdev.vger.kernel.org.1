@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-295585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-295586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RsSNAScyImrwTgEAu9opvQ
-	(envelope-from <netdev+bounces-295585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:19:19 +0200
+	id nZG+Hq4yImoSTwEAu9opvQ
+	(envelope-from <netdev+bounces-295586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:21:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70806644A58
-	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:19:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6EA2644AA2
+	for <lists+netdev@lfdr.de>; Fri, 05 Jun 2026 04:21:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=O++CaLF8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295585-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295585-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SnaSb2a1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-295586-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-295586-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A7BF130073F5
-	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:19:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92DE2302F240
+	for <lists+netdev@lfdr.de>; Fri,  5 Jun 2026 02:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F4F3E314A;
-	Fri,  5 Jun 2026 02:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B013B7B98;
+	Fri,  5 Jun 2026 02:19:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4764F3537E0;
-	Fri,  5 Jun 2026 02:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6463CA48C;
+	Fri,  5 Jun 2026 02:18:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780625943; cv=none; b=QHq9o8HvMN4NVdc4MBag5tQALDrONcsV3uDAPRaXUhEiIBVtMOOvUoef3cPu1ABdiq2q99ddsEvBsLFn8tkas1sItBla2/dD3gj6aCIk+rjW6htpSyMZh2M9Y3wm8or1pAP6dCGrbgwFgNDoTb6GGEnzyNpjkkeCDguHoJ1W6+I=
+	t=1780625943; cv=none; b=hZIbkx46q9ji/izqgjJGPK+GCJp6vxgRgibqcoucEBdk0A8cBEMdBqYRJ8Gz9B3leTOUQi8+uh4yIcdpAjw5cHrQWGSatYoN/ATsXs3CVp37oQHEYJxvjvJaUv5RDhUV9vinUWiiCO1yA4KFQEL/iahFzhRYFz7Yu7RP2HFTCGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780625943; c=relaxed/simple;
-	bh=pPJlGcT4H26CdpxxHFB6T5I8HU/ThewofmKN3unxuvA=;
+	bh=L0j99wFpCUAUr0Qd1c9SCo0ktKiz0H9ld7dt4nJL69k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eKTOxiD8yloq4CrtDNQvg6ShwYo/diyPPhN3A0tmyQUdIY/DD0r+nAgtOeAkqJptp2iM0x76YaSwE/wMXEJKIz88+OTnq9iRvN9ZxIvqcWBEOQ3PA+mg9/tVEYiYxf9v+sU47VYUCJOeLKnw2KXunDciUehbVB2jghjkVhXMkEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O++CaLF8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FA281F00898;
-	Fri,  5 Jun 2026 02:18:55 +0000 (UTC)
+	 MIME-Version; b=X9X2vejCbG8MmDhfhMBtBew+Mrofx0V+xM3p4TraUhrEtgSzehW+wDkytG7QoF9/MdDSObktCWUpJEZqNc6ZcVImVQKUNWThD3lAVkWdVBQhseX7H9rK6DTKtW2KBgWACo4SQ+Z20F8i+g45B8WkS5+QEb+Wdqu75WHnlKDKBjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnaSb2a1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20B41F00899;
+	Fri,  5 Jun 2026 02:18:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780625935;
-	bh=Z/YFoK1DlLyiD3rD9Jae9zwSGdB8zFmwUT4o+JkNbQI=;
+	s=k20260515; t=1780625937;
+	bh=mIZRJWfB9uIoT21u274B0cnlZ9ADp5gVESO1zB5LtY0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=O++CaLF8v8wrssJuowzuKTiK6q8AhGFjieZh0Sx7fWLDdO9jbhs33tdFsXwH2fOP/
-	 Qgt0hQUOSpCO0XDgBEFu8XgcCweOoOl6khQoBWJF0iIwf3pgXC8GojWK91wnrWKr1g
-	 v7I2X9G4lGqCaUNHocPPgP9ViDeDF7iYqhNymnHMcR58lopXWw0GyHsSJzsHP0ejx8
-	 ajkkk4nyNlt43GFBbKXfO3ystJy80PDX+WvT4mOLLEO/EwDFI3waTsF6i2i49KXCUR
-	 yV5XsPl4vZeZi/T5jY5H+413t6Z1mSLIXOh4cYtb3KQm/EqwCiKcxtM0riH5EPvWgr
-	 5IfFIJ6DE4pHQ==
+	b=SnaSb2a1NiGHKTNUDDVS/xqHJAY6OKx82UAQ6E8istkspZEghE6Lr1pXt40a3G1+N
+	 coX3EKFfTlYu2Q7zgoJpqob88M/Zl8yJx5JOuzSE0m/i/LQCFDxHrv0gofIciiyj0e
+	 0kdOOXHnFVZ9c1863hF8sUwzlnwJ0F8khi4oI0rgmL1pXgSnYQrIYknCK80+FAyuli
+	 EfLcMlBLYeDOn0gJbycNJ5YoEF7BAVNooKBjioXeE8BaXviHhZGeWx4VkB4gl6aL+E
+	 JPSXYKwWGiVcUxtdAY5agkHqu8A+xBMf1E0DZdFVB8ck0NoU3h/WZvpo2CEK+N8A5x
+	 Gw8uX74FTenkg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: lukasz.majewski@mailbox.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -62,12 +62,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	imx@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	robh@kernel.org
-Subject: Re: [net-next v24 3/7] net: mtip: Add buffers management functions to the L2 switch driver
-Date: Thu,  4 Jun 2026 19:18:53 -0700
-Message-ID: <20260605021853.3594553-1-kuba@kernel.org>
+Subject: Re: [net-next v24 4/7] net: mtip: Add net_device_ops functions to the L2 switch driver
+Date: Thu,  4 Jun 2026 19:18:55 -0700
+Message-ID: <20260605021855.3594587-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260601112437.2216043-4-lukasz.majewski@mailbox.org>
-References: <20260601112437.2216043-4-lukasz.majewski@mailbox.org>
+In-Reply-To: <20260601112437.2216043-5-lukasz.majewski@mailbox.org>
+References: <20260601112437.2216043-5-lukasz.majewski@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,13 +83,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-295585-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-295586-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:lukasz.majewski@mailbox.org,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:lgirdwood@gmail.com,m:nathan@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk+dt@kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:robh@kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -107,111 +107,244 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 70806644A58
+X-Rspamd-Queue-Id: C6EA2644AA2
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: mtip: Add buffers management functions to the L2 switch driver
+net: mtip: Add net_device_ops functions to the L2 switch driver
 
-This patch fills in mtip_alloc_buffers() and mtip_free_buffers() for the
-MTIP L2 switch driver, replacing the previously empty stubs with real
-page_pool setup/teardown and tx_bounce buffer allocation/free.
+This patch adds the ndo_start_xmit, ndo_set_rx_mode, ndo_tx_timeout,
+ndo_set_mac_address, and ndo_get_port_parent_id callbacks to the MTIP
+L2 switch driver, along with helpers and a tx_timeout work item.
 
 > diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> index 1d1005a42306..5b5229ee411d 100644
+> index 5b5229ee411d..7dfeda230e3f 100644
 > --- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
 > +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> @@ -892,11 +892,101 @@ static void mtip_get_drvinfo(struct net_device *dev,
+
+[ ... ]
+
+> @@ -617,6 +740,76 @@ static void mtip_switch_restart(struct net_device *dev, int duplex0,
+>  	mtip_config_switch(fep);
+>  }
 >  
->  static void mtip_free_buffers(struct net_device *dev)
->  {
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +static void mtip_print_hw_state(struct net_device *dev)
+> +{
+
+[ ... ]
+
+> +static void mtip_timeout_work(struct work_struct *work)
+> +{
+> +	struct mtip_ndev_priv *priv =
+> +		container_of(work, struct mtip_ndev_priv, tx_timeout_work);
 > +	struct switch_enet_private *fep = priv->fep;
-> +	int i;
+> +	struct net_device *dev = priv->dev;
 > +
-> +	for (i = 0; i < RX_RING_SIZE; i++) {
-> +		if (!fep->page[i])
-> +			continue;
-> +
-> +		page_pool_put_full_page(fep->page_pool,
-> +					fep->page[i], false);
-> +		fep->page[i] = NULL;
+> +	rtnl_lock();
+> +	if (netif_device_present(dev) || netif_running(dev)) {
+> +		napi_disable(&fep->napi);
+> +		netif_tx_lock_bh(dev);
+> +		mtip_switch_restart(dev, fep->full_duplex[0],
+> +				    fep->full_duplex[1]);
+> +		netif_tx_wake_all_queues(dev);
+> +		netif_tx_unlock_bh(dev);
+> +		napi_enable(&fep->napi);
 > +	}
-> +
-> +	page_pool_destroy(fep->page_pool);
-> +	fep->page_pool = NULL;
-> +
-> +	for (i = 0; i < TX_RING_SIZE; i++) {
-> +		kfree(fep->tx_bounce[i]);
-> +		fep->tx_bounce[i] = NULL;
-> +	}
+> +	rtnl_unlock();
 > +}
 
 [High]
-Now that mtip_free_buffers() is no longer an empty stub, can the
-mtip_open() error path tear down buffers that another active port is
-still using?
+Should the guard here be a logical AND rather than OR?
 
-Looking at mtip_open():
+	if (netif_device_present(dev) || netif_running(dev)) {
 
-	if (fep->usage_count == 0) {
-		...
-		ret = mtip_alloc_buffers(dev);
-		if (ret)
-			goto mtip_alloc_buffers_err;
-	}
-	...
-	ret = mtip_mii_probe(dev);
-	if (ret)
-		goto mtip_mii_probe_err;
-	...
- mtip_mii_probe_err:
-	mtip_free_buffers(dev);
- mtip_alloc_buffers_err:
-	if (fep->usage_count == 0) {
+netif_device_present() returns true unless netif_device_detach() has been
+called, and this driver never calls netif_device_detach().  So the OR
+collapses to "always true" once the device has been registered, and the
+work proceeds even after mtip_close().
+
+mtip_close() does this on the last close:
+
+	if (fep->usage_count == 1) {
+		napi_disable(&fep->napi);
 		netif_napi_del(&fep->napi);
+		mtip_free_buffers(dev);
 		clk_disable(fep->clk_ipg);
 	}
-	return ret;
 
-mtip_alloc_buffers() only runs when fep->usage_count == 0, so the
-page_pool, fep->page[] and fep->tx_bounce[] are shared across switch
-ports and only allocated on first open. mtip_close() reflects this and
-only calls mtip_free_buffers() when fep->usage_count == 1.
+After that, can mtip_timeout_work() running due to a previously scheduled
+watchdog still call napi_disable(&fep->napi) / napi_enable(&fep->napi) on
+a netif_napi_del()'d napi, and call mtip_switch_restart() which writes
+hardware registers after clk_ipg has been disabled?
 
-When a second port is opened (fep->usage_count > 0) and mtip_mii_probe()
-fails, the mtip_mii_probe_err label still calls mtip_free_buffers()
-unconditionally, which destroys the page_pool and frees the tx_bounce
-buffers that the first, still-active port is using.
+Would gating the work on fep->usage_count (and/or cancel_work_sync() in
+mtip_close()) be more correct than the present netif_device_present() ||
+netif_running() check?
 
-Should the mtip_mii_probe_err teardown also be guarded by
-fep->usage_count == 0 (or the labels reordered) so buffers are only
-freed for the last user, similar to mtip_close()?
-
-After this change the previously harmless call becomes a real teardown,
-so the surviving port's NAPI path (mtip_switch_rx() and the later
-mtip_update_cbd() refill) would dereference a freed fep->page_pool and
-NULL fep->page[] / fep->tx_bounce[] entries whenever the second port's
-PHY probe fails while the first port is up.
-
->  
-> +static int mtip_create_page_pool(struct switch_enet_private *fep, int size)
-> +{
 [ ... ]
-> +}
->  
->  static int mtip_alloc_buffers(struct net_device *dev)
->  {
-[ ... ]
+
+> @@ -1095,6 +1288,98 @@ static int mtip_close(struct net_device *dev)
 >  	return 0;
-> +
-> + err:
-> +	mtip_free_buffers(dev);
-> +	return -ENOMEM;
 >  }
->
+>  
+> +#define FEC_HASH_BITS	6		/* #bits in hash */
+
+[ ... ]
+
+> +static int mtip_set_mac_address(struct net_device *dev, void *p)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	void __iomem *enet_addr = fep->enet_addr;
+> +	struct sockaddr *addr = p;
+> +	int ret;
+> +
+> +	if (!is_valid_ether_addr(addr->sa_data))
+> +		return -EADDRNOTAVAIL;
+> +
+> +	ret = mtip_update_atable_static((unsigned char *)addr->sa_data,
+> +					7, 7, fep);
+> +	if (ret)
+> +		return ret;
+
+[Medium]
+Is the previously-programmed MAC ever removed from the switch's static
+address table?  mtip_update_atable_static() either updates a matching
+entry in place or fills the first empty slot in an 8-entry block:
+
+	for (entry = block_index; entry < index_end; entry++) {
+		mtip_read_atable(fep, entry, &read_lo, &read_hi);
+		if (read_lo == write_lo &&
+		    ((read_hi & 0x0000FFFF) ==
+		     (write_hi & 0x0000FFFF))) {
+			mtip_write_atable(fep, entry, write_lo, write_hi);
+			...
+			return 0;
+		} else if (!(read_hi & (1 << 16))) {
+			mtip_write_atable(fep, entry, write_lo, write_hi);
+			...
+			return 0;
+		}
+	}
+	...
+	return -ENOSPC;
+
+After 8 distinct MAC changes whose CRC8 maps to the same block, will
+further mtip_set_mac_address() calls return -ENOSPC, and will the stale
+MACs continue to be honored as static entries with port mask 7 and
+priority 7?
+
+> +
+> +	eth_hw_addr_set(dev, addr->sa_data);
+> +
+> +	if (priv->portnum == 2)
+> +		enet_addr += MCF_ESW_ENET_PORT_OFFSET;
+> +
+> +	writel(dev->dev_addr[3] | (dev->dev_addr[2] << 8) |
+> +	       (dev->dev_addr[1] << 16) | (dev->dev_addr[0] << 24),
+> +	       enet_addr + MCF_FEC_PALR);
+> +	writel((dev->dev_addr[5] << 16) | (dev->dev_addr[4] << 24),
+> +	       enet_addr + MCF_FEC_PAUR);
+> +
+> +	return 0;
+> +}
+
+[Medium]
+Should fep->mac[priv->portnum - 1] be updated here as well?  The driver
+caches the MAC in fep->mac[] and mtip_get_port_parent_id() reads
+fep->mac[0] as the parent identifier.  After a userspace MAC change
+fep->mac[] stays at its boot/DT value, so ndo_get_port_parent_id keeps
+returning the old value while dev->dev_addr and the hardware registers
+have moved on.
+
+[Medium]
+Does this sequence need to disable the controller before reprogramming
+PALR/PAUR?  mtip_configure_enet_mii() programs ECR to MAGIC_ENA only
+(no ETHER_EN), then writes PALR/PAUR, then enables ETHER_EN at the end:
+
+	writel(MCF_FEC_ECR_MAGIC_ENA, enet_addr + MCF_FEC_ECR);
+	...
+	writel(... , enet_addr + MCF_FEC_PALR);
+	writel(... , enet_addr + MCF_FEC_PAUR);
+	...
+	writel(readl(enet_addr + MCF_FEC_ECR) | MCF_FEC_ECR_ETHER_EN,
+	       enet_addr + MCF_FEC_ECR);
+
+mtip_set_mac_address() writes PALR and PAUR while ETHER_EN can be set
+and traffic is being matched, and it does not take fep->hw_lock either,
+so it can race with mtip_configure_enet_mii() / mtip_switch_restart()
+that touch the same register block.  Is that intended?
+
+> +
+> +static int mtip_get_port_parent_id(struct net_device *ndev,
+> +				   struct netdev_phys_item_id *ppid)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(ndev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +
+> +	ppid->id_len = sizeof(fep->mac[0]);
+> +	memcpy(&ppid->id, &fep->mac[0], ppid->id_len);
+> +
+> +	return 0;
+> +}
+
+[Medium]
+Is fep->mac[0] a suitable choice for the switch parent id?  fep->mac[]
+is populated only from DT via of_get_mac_address() in mtip_parse_of();
+when DT does not supply a mac-address for port 1, fep->mac[0] stays
+zeroed (it is kzalloc'd in probe), since mtip_setup_mac()'s bootloader
+and random-MAC fallbacks update dev->dev_addr only and never write back
+into fep->mac[].
+
+If two MTIP switches both lack a DT MAC for port 1, both will report
+ppid = 00:00:00:00:00:00, which switchdev/bridge code will treat as the
+same switch (offload_fwd_mark, bridge offload decisions).
+
+Would a switch-wide identifier (a register-derived id, the platform
+of_node phandle, etc.) be more appropriate than a port MAC?
+
+[ ... ]
+
+> @@ -1158,10 +1448,14 @@ static int mtip_switch_dma_init(struct switch_enet_private *fep)
+>  
+>  static void mtip_ndev_cleanup(struct switch_enet_private *fep)
+>  {
+> +	struct mtip_ndev_priv *priv;
+>  	int i;
+>  
+>  	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
+>  		if (fep->ndev[i]) {
+> +			priv = netdev_priv(fep->ndev[i]);
+> +			cancel_work_sync(&priv->tx_timeout_work);
+> +
+>  			unregister_netdev(fep->ndev[i]);
+>  			free_netdev(fep->ndev[i]);
+>  			fep->ndev[i] = NULL;
+
+[High]
+Is the order here safe against the netdev TX watchdog?  The watchdog
+timer is only stopped inside unregister_netdev() (via dev_deactivate),
+so between cancel_work_sync() returning and unregister_netdev() actually
+disarming the watchdog the timer can still fire mtip_timeout(), which
+calls schedule_work(&priv->tx_timeout_work) and re-queues the work that
+was just drained.
+
+After unregister_netdev() and free_netdev() complete, priv (which embeds
+tx_timeout_work) is freed, and when the worker thread later picks up
+the queued work it will dereference a freed priv/fep.
+
+Would the sequence
+
+	unregister_netdev(fep->ndev[i]);
+	cancel_work_sync(&priv->tx_timeout_work);
+	free_netdev(fep->ndev[i]);
+
+be safer, since unregister_netdev() quiesces all sources of new work
+before cancel_work_sync() drains what remains?  The same concern applies
+to the rollback path in mtip_ndev_init() for ports whose watchdog is
+already active.
 
