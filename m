@@ -1,58 +1,54 @@
-Return-Path: <netdev+bounces-296056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296057-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FLr4JCm0I2orxQEAu9opvQ
-	(envelope-from <netdev+bounces-296056-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:46:17 +0200
+	id O9fTDOe1I2phxQEAu9opvQ
+	(envelope-from <netdev+bounces-296057-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:53:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF5764CA16
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:46:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E8164CA77
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:53:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=p53DixIh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296056-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296056-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Yc4pfBcr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296057-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296057-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50039307A7F4
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 05:43:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3EB0930086CE
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 05:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8AF32AABC;
-	Sat,  6 Jun 2026 05:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769DE2F531F;
+	Sat,  6 Jun 2026 05:50:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3D830F95F;
-	Sat,  6 Jun 2026 05:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FE81A9F88
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 05:50:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780724570; cv=none; b=ucWJsuaeMCuEdCXDBJyTvxGpdOTEwGeWpTn8Resyv+Eilq+TYx85XaA5GvvW19POydV2aLS972S3Lt0g/D2FG3EmrzqJR/TsLvPuL89wjt5c/mdmOQcKC79cwoK2zXxm0+OuZAhq3O5CrBVOmzgj3/9CRBTmqGaUitfTgt9iqlw=
+	t=1780725039; cv=none; b=Yx7G7ZOePFAmMyR9ktjcNkPXY0IzdHWazmkXJp0VIPuB5gorhQJWveW8fRG8OBZncpUKhFRhp2peBO4M7CucZdl6BrRNpaY16zjgO/UryzNjIUWH5CRH637QiPCzhsOOEicBODCZhNSTUgAF5gShTE2ZVMEucvyii2sOo+9h5/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780724570; c=relaxed/simple;
-	bh=LwObKbMYH5trZ9xLMT05dZHy//hBzE5Yhld+T95HsCU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MMTttzEvS/bVz+o/PNAuMA2xgloBPSPIJWKquEGOItVodhuVD4qVjiNXf89uFLxHOwWEm3S6TzDMhn9QG5VmjQbOODM1u9jlbsGHOnLYN+At9X69BOscUUyw7FZG26BAyI3ispnMRkVIuQE48FN7adWLHC807euV4rcqH49CPzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p53DixIh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3AF4BC2BCFC;
-	Sat,  6 Jun 2026 05:42:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780724570;
-	bh=LwObKbMYH5trZ9xLMT05dZHy//hBzE5Yhld+T95HsCU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=p53DixIhEszCg6onyjTt0EzJ/lU/vnhSiUhDxpyYl0oAXq6qJa9APftdf56Aesh4n
-	 GgyovOcrU34yMeQBfL5jIbpo3WPFuYMhsNDUls4CeJpRKATJ1EyLCIQoxUczszkH3t
-	 1gQ3Eyq2E92w1qj6UH27zoHnOF+/IyNSiZ3/PYRRPYhB+LQ6hJ0aaZYV+bHqse4c8C
-	 tjGYUa6IqNQgL/U6qIVnmBDejJDLbNgIyZudtbi8CcZBjP33p1X5uiWtdIzpco3X7g
-	 ekLMJ/Zl/LBnmT8S/3XT2XpAZlX+Du9CiSi7BURJXQm4IwpH/dcB+G3YgD7jT7BcMH
-	 jihxbiJrwSHnQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 342A7CD8C93;
-	Sat,  6 Jun 2026 05:42:50 +0000 (UTC)
-From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Fri, 05 Jun 2026 22:42:47 -0700
-Subject: [PATCH net-next v4 16/16] Documentation: networking: Add timestamp
- related APIs to OA TC6 framework
+	s=arc-20240116; t=1780725039; c=relaxed/simple;
+	bh=z7SkIp9z+bRtbbNXb03wvDdYtpeVVyvfRF8vBgvn8nY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CrLwvU8BphpGXX+SJRDUj1qv05jUK9OLOfXXZEjaytCDoSTkwiDrOTiH0MUU2/j1w6sjbFh35rSTjMmk5q9WFzZH5/qiwU8nCXMCwZ0ZKWDD2TUXB3WcYj/QkB7z6YYoSc+YxEJO1iJZlpmcsb94IiiCJp5XIqiQ1zyd+JzhMhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yc4pfBcr; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C1A21F00893;
+	Sat,  6 Jun 2026 05:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780725038;
+	bh=Qd5esQLYkEp9qLYF3uDQurNkA79QQQMRr7j4ojvsKBA=;
+	h=From:Date:Subject:To:Cc;
+	b=Yc4pfBcr8gFeMuG0vq66p8dzpYN9BM+hwza4eVwJDCz1PwmKRHWTM7lvahzg5v7KT
+	 RDBqACQW8/eUYCkoKaOfkXIXwiU4LVYkvPRYVVlWQib+JSPY5UoxTzsd/xh2KYQbhk
+	 A4wOwSJ6i3mKIuGu0URERl3ePZcJbmtUhvWxcQ0epTP4G0QOH+ow62bu9mchPZrRAD
+	 xdijExBBMS3kfET120DVOjbOaeQeZxFLDqaOZP3I5oXEUWo8nQf02a4w6eJhdjBlTl
+	 JTXTQOesP1SdzBIfffPC18UsjJuwbozUl9uym1Ma+pryWMuVBMjiyuKcxNIRN+On/v
+	 abdb6qcbI1FDg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Sat, 06 Jun 2026 07:49:59 +0200
+Subject: [PATCH net-next] net: airoha: Use int instead of atomic_t for qdma
+ users counter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,180 +57,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260605-s2500-mac-phy-support-v4-16-de0fbc13c6d8@onsemi.com>
-References: <20260605-s2500-mac-phy-support-v4-0-de0fbc13c6d8@onsemi.com>
-In-Reply-To: <20260605-s2500-mac-phy-support-v4-0-de0fbc13c6d8@onsemi.com>
-To: Andrew Lunn <andrew@lunn.ch>, 
- Piergiorgio Beruto <pier.beruto@onsemi.com>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
+Message-Id: <20260606-airoha_qdma_users-no-atomic-v1-1-86e2d6a1bfaf@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqDMBAAvyJ77kIMtoJfkSJrXHUPbjRJiyD+v
+ UuZ0xxmLsichDN01QWJv5Ilqkn9qCCspAujTObgnX85A0lSXGk4po2Gj8UZNSKVuElA1z5dCH5
+ s/FyDHfbEs5z/ew/KBZXPAu/7/gGNKAtYdwAAAA==
+X-Change-ID: 20260606-airoha_qdma_users-no-atomic-0750cc2b42f1
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Selva Rajagopal <selvamani.rajagopal@onsemi.com>, 
- Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-doc@vger.kernel.org, 
- Jerry Ray <jerry.ray@microchip.com>, 
- Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780724562; l=4814;
- i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=qMIzLX0eC5ihmFdaKnhKOPCk6N1TEOL8NPk1LNjEmH4=;
- b=K/RVcj2az8TbAlcs1pGNk3cydG43TjXs/KRPyZsvcKVB3OaD4G9k8JQhjkhDTT5aAmn8cLobV
- zxHaDTIL7c0D3+u/dd3GjUT4UkNsmV0Hi2iBU3pP3IYSv9MncQfKNMF
-X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
- pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
-X-Endpoint-Received: by B4 Relay for
- Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
-X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Reply-To: Selvamani.Rajagopal@onsemi.com
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296056-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:pier.beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:selvamani.rajagopal@onsemi.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296057-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[onsemi.com:mid,onsemi.com:email,onsemi.com:replyto,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4CF5764CA16
+X-Rspamd-Queue-Id: 74E8164CA77
 
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+QDMA users counter is always accessed holding RTNL lock so we do not
+require atomic_t for it.
 
-Added new APIs to support hardware timestamp feature as defined in
-OPEN Alliance 10BASE-T1x MAC-PHY serial interface specification.
-
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- Documentation/networking/oa-tc6-framework.rst | 76 +++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ drivers/net/ethernet/airoha/airoha_eth.c | 4 ++--
+ drivers/net/ethernet/airoha/airoha_eth.h | 3 +--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/networking/oa-tc6-framework.rst b/Documentation/networking/oa-tc6-framework.rst
-index fe2aabde923a..694d9485b1c5 100644
---- a/Documentation/networking/oa-tc6-framework.rst
-+++ b/Documentation/networking/oa-tc6-framework.rst
-@@ -153,6 +153,10 @@ OPEN Alliance TC6 Framework
- - Forwards the received Ethernet frame from 10Base-T1x MAC-PHY to n/w
-   subsystem.
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 5a8e84fa9918..a5fe08864fa3 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1809,7 +1809,7 @@ static int airoha_dev_open(struct net_device *netdev)
+ 	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
+ 			GLOBAL_CFG_TX_DMA_EN_MASK |
+ 			GLOBAL_CFG_RX_DMA_EN_MASK);
+-	atomic_inc(&qdma->users);
++	qdma->users++;
  
-+- If supported by the hardware and enabled, updates hardware timestamp
-+  in skb, when indicated by one of the three timestamp capture registers
-+  through TSC fields of the header.
-+
- Data Transaction
- ~~~~~~~~~~~~~~~~
+ 	if (!airoha_is_lan_gdm_dev(dev) &&
+ 	    airoha_ppe_is_enabled(qdma->eth, 1))
+@@ -1863,7 +1863,7 @@ static int airoha_dev_stop(struct net_device *netdev)
+ 					    REG_GDM_FWD_CFG(port->id),
+ 					    FE_PSE_PORT_DROP);
  
-@@ -495,3 +499,75 @@ the MAC-PHY.
- Zero align receive frame feature can be enabled to align all receive ethernet
- frames data to start at the beginning of any receive data chunk payload with a
- start word offset (SWO) of zero.
-+
-+.. c:function:: int oa_tc6_ptp_register(struct oa_tc6 *tc6, \
-+                                        struct ptp_clock_info *info);
-+
-+Registers the PTP hardware clock related functions with the kernel.
-+This API simply registers. Initialization of the fields in the
-+ptp_clock_info structure are left to the vendor as programming hardware
-+timer is expected to be vendor dependent. The fields max_adj, owner,
-+and all the functions for the clock operations, like adjfine, gettimex64,
-+settime64, adjtime are expected to be initialized in the structure before
-+calling the registering the hardware clock.
-+
-+.. c:function:: void oa_tc6_ptp_unregister(struct oa_tc6 *tc6);
-+
-+Unregisters the PTP hardware clock related callbacks.
-+
-+.. c:function:: int oa_tc6_ioctl(struct oa_tc6 *tc6, struct ifreq *rq, \
-+                                 int cmd);
-+
-+ioctl interface to handle hardware timestamp and PHY related commands.
-+
-+.. c:function:: int oa_tc6_get_ts_info(struct oa_tc6 *tc6, \
-+                                       struct kernel_ethtool_ts_info *info);
-+
-+Provides timestamp related settings that are supported to ethtool.
-+
-+.. c:function:: void oa_tc6_hwtstamp_get(struct oa_tc6 *tc6, \
-+                                         struct kernel_hwtstamp_config *cfg);
-+
-+Returns hardware timestamp configuration. Part of net_device_ops callbacks.
-+
-+.. c:function:: void oa_tc6_get_ts_stats(struct oa_tc6 *tc6, \
-+                                         struct ethtool_ts_stats *ts_stats);
-+
-+Provides hardware timestamp related traffic statistics for ethtool.
-+
-+.. c:function:: int oa_tc6_hwtstamp_set(struct oa_tc6 *tc6, \
-+                                         struct kernel_hwtstamp_config *cfg);
-+
-+Helper to set hardware timestamp configuration. Part of net_device_ops
-+callbacks.
-+
-+.. c:function:: void oa_tc6_set_vend1_mms(struct oa_tc6 *tc6, int mms);
-+
-+Helper to map MDIO_MMD_VEND1 command to vendor specific Memory Map Select
-+(MMS) value. This function offers flexibility for vendors that may have
-+used any MMS value between 10 and 15 as allowed by the specification.
-+MDIO_MMD_VEND2 is already mapped to MMS4 in the OA TC6 frame work code.
-+
-+.. c:function:: int oa_tc6_write_registers_mms(struct oa_tc6 *tc6, \
-+                                               u16 address, u16 mms, \
-+                                               u32 value[], u8 length);
-+Writing multiple consecutive registers starting from @address for the
-+given @mms memory map selector in the MAC-PHY. Maximum of 128 consecutive
-+registers can be written starting at @address.
-+
-+.. c:function:: int oa_tc6_write_register_mms(struct oa_tc6 *tc6, \
-+                                              u16 address, u16 mms, \
-+                                              u32 value);
-+Write a single register addressed by @address and @mms in the MAC-PHY.
-+
-+.. c:function:: int oa_tc6_read_registers_mms(struct oa_tc6 *tc6, \
-+                                              u16 address, u16 mms, \
-+                                              u32 value[], u8 length);
-+Reading multiple consecutive registers starting from @address for the
-+given @mms memory map selector value, in the MAC-PHY. Maximum of 128
-+consecutive registers can be read starting at @address.
-+
-+.. c:function:: int oa_tc6_read_register_mms(struct oa_tc6 *tc6, \
-+                                             u16 address, u16 mms, \
-+                                             u32 *value);
-+Read a single register addressed by @address and @mms in the MAC-PHY.
+-	if (atomic_dec_and_test(&qdma->users)) {
++	if (!--qdma->users) {
+ 		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
+ 				  GLOBAL_CFG_TX_DMA_EN_MASK |
+ 				  GLOBAL_CFG_RX_DMA_EN_MASK);
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 8f42973f9cf5..e89c2dff411f 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -525,8 +525,7 @@ struct airoha_irq_bank {
+ struct airoha_qdma {
+ 	struct airoha_eth *eth;
+ 	void __iomem *regs;
+-
+-	atomic_t users;
++	int users;
+ 
+ 	struct airoha_irq_bank irq_banks[AIROHA_MAX_NUM_IRQ_BANKS];
+ 
 
+---
+base-commit: 903db046d5579bef0ea699eae4b279dd6455fc9f
+change-id: 20260606-airoha_qdma_users-no-atomic-0750cc2b42f1
+
+Best regards,
 -- 
-2.43.0
-
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
