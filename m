@@ -1,218 +1,214 @@
-Return-Path: <netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TsUFH0eqI2qowgEAu9opvQ
-	(envelope-from <netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:04:07 +0200
+	id JSl4B22zI2r7xAEAu9opvQ
+	(envelope-from <netdev+bounces-296042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:43:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E6664C79B
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:04:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B1B64C98B
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:43:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=pardini.net header.s=google header.b=GZrsoX1z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=Jh1Eu6S5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296042-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296042-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B4CD301C3F0
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 05:04:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53959302BDE6
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 05:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B8E2F8E8E;
-	Sat,  6 Jun 2026 05:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC43308F3B;
+	Sat,  6 Jun 2026 05:42:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247DB524F
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 05:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE1B284B3B;
+	Sat,  6 Jun 2026 05:42:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780722244; cv=none; b=cF2YRKM2jt46B2oi9piMmOQunTDbf9z+wPDphFIFGOPop5j2jaCZwoalR8JoA4jPg5UDFqUXKoUvRwdcWWV2KHkgF+BxvRCXlrPIXK3DhGQQ48OcIttslalYAZNwWmlPdw9O5RICi0US15ATFv0ZvK8iYDJYp6yAyNSprgSUCsI=
+	t=1780724569; cv=none; b=QogECi80gwhInHyC60kf1/0sktOtl0my2/LyI/oLbWXd7AFjCyAcwCIfjMsz1gkz2Ua3xuXXyHRdv5FyCXr2GM3on3Tg2Wq2ZvmGzvwvD/FTam8ef2uTYursDqugfclUwhs1HkCasaGlUxmg2uYWZacQApbDVMhVDcPuqgKJJeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780722244; c=relaxed/simple;
-	bh=263QfBY5Zp+gfX2SSDrodQXz/EAIY/aQ/Pr5s0xl9+Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sIAZV9Bs9FtHzHDhRQHrqT8CgkURyHl4kBLEDZ6keV5ciqdRMbMai5DFTknUQKLaAIfvrEVnA378Jncuo9NyysU1eMFzyqBZ8TIpACTz3r3ncrbUlz3zbY+5YzDGUpiXrN3cl8bjM/XIfm7M9BiLdvBDWsXinTK0CjM50Rg4Q1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pardini.net; spf=pass smtp.mailfrom=pardini.net; dkim=pass (2048-bit key) header.d=pardini.net header.i=@pardini.net header.b=GZrsoX1z; arc=none smtp.client-ip=209.85.208.46
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-68cc6c7df99so3778435a12.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 22:04:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pardini.net; s=google; t=1780722242; x=1781327042; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ad3Risuri9Oy23ttuXXObF+tJAD6dYgEl+kDhesPP88=;
-        b=GZrsoX1ziTdDLcdmOAsCHNY+OeE3e5tdgZDTirvyA8VQdLnrB0uiVrpcwwBCPpiH8E
-         56TTq067Mz7cq3cPfUcoDPjmyBuTkVKUvdjb4cFjhwjC3TblyCh0ymondJHKqduCiCCT
-         YjAdydm+f96c14j8w1y3vGy6sh6tcr/EEZFdfmFqZwWHTG08z5kdLubGIHS1PDl89oEC
-         GbWxqWWc6JxOcLtA7R4rBvZneI1qRMLBKqITxDluKzE17ugE0txz1Cf1j5Nocdm1/EN2
-         7L0hVwxnfJOIquakxQ5Tyn0x+84uMVWVt641klWNDZKC58IJMzOxDPn6rE+Wvl9R+sc9
-         BIOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780722242; x=1781327042;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ad3Risuri9Oy23ttuXXObF+tJAD6dYgEl+kDhesPP88=;
-        b=dEYyD+QnSvtrILA1kv8VrA/jWzJULTKToCm0BnjHQIzzkdTVBVGNezG916GiQbIN9H
-         L474qj3zskpmRYD+QMo3TB9EOacCM12pldmDICOw1iIptIHFcbBzc6yImqqKggXEhPdK
-         U9IxEu7Yzy+LOPveLrQelQgg+pqOikwsfdj10qFUns/KWxht/sCB8+Bil8wleoIwff5c
-         +n44RHrN8h1EKeIPiP1bDWD8BIFc0e+a5znQJC+WU2wX1b2Cemdyopm/3Ba2zwaMAVN7
-         EAVkAdcj965bqh4/U8K3Ijuli3MrB1qQkN7A9TG4T2iENb6rYOlePPDZkuu2kdcfreTm
-         9BZg==
-X-Forwarded-Encrypted: i=1; AFNElJ/a45ANrcg2+YW6lCaAD5dKLKl6tpNkbXZ4AzVXjKrqiPR3xSi9yuDb8ubBwJsz+YCb4DY5LDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2dZRR0VGGEEFZ+tkySOaKDGUey7ofDYkI268FIZtxFVTIw7sx
-	rOHEgC/xTbm3A59NjNOBTn/4YN31tedE2ne+DSLSQhAeAag+mT0IzYE53LMu7yGymQ==
-X-Gm-Gg: Acq92OHXm59VgUNvyU8fjTCqi451eHCd2FZwWy4HGemCWjjGTfaBwzisMO5eSOyVJjA
-	W62A0GfUB5Ci5KVgNm7HaDsmlX4MWSKnCUz6UYLkMmqEYH29UrmE+uOgNWaO1O6NRfkmHTZoc0v
-	xIJTI8SFVdtC/NItBFONsp6grJVWTvn7geHSTBcFgRzPDvi/sE1QXrZWwxU2SYIi44YK6ke5ksa
-	+38IYQbYGhIpU3mLKbMKW/GYur3uv7zjAKlcnD9Brq1UERs0YBQPJCLQWJf94cEfKcDSSA4cu7d
-	max+jpOk4bVTO6u3JLLT1K3cqp18mz1pr8gu7YvhO63tl00RznPthrM5hSSySbP+4j7v/Owo4mI
-	zcKXwnqkhn0z+aVwkfMTnk050CcAh/8JP7H2A0qXfYDSZJFAsoXXXiMkTPbQ7wzRkS/0cPVdHOr
-	Qm3OxQ3H8KBEUKeIATCDshoclKv218eKYmYErqjt3ijy6uYoEyRrxJUrD3s5LlO73+dYhr8VYxX
-	y2o6SwXYXdPVam/svFtix+lv6iLiKTP7QLmxrJyNEh6g0mt6TMSrvrUEjr3jHoOtDRcj5kxxNlk
-X-Received: by 2002:a05:6402:268f:b0:68e:4c0:f599 with SMTP id 4fb4d7f45d1cf-68fa4c16b80mr3088882a12.5.1780722241268;
-        Fri, 05 Jun 2026 22:04:01 -0700 (PDT)
-Received: from ?IPV6:2a02:a466:4d7a:0:c439:8cdb:ad2:c0fb? (2a02-a466-4d7a-0-c439-8cdb-ad2-c0fb.fixed6.kpn.net. [2a02:a466:4d7a:0:c439:8cdb:ad2:c0fb])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6915a637180sm421874a12.26.2026.06.05.22.03.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2026 22:04:00 -0700 (PDT)
-Message-ID: <26da1dfa-3408-4654-9046-36ed6d57059c@pardini.net>
-Date: Sat, 6 Jun 2026 07:03:59 +0200
+	s=arc-20240116; t=1780724569; c=relaxed/simple;
+	bh=dAOA6SjpWMVvSYsnDvoLrQBjwg5fA4k8JH4p1r9yoy4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=h8aw8WRrPpU3CUV0N+objTuyw6LQ/GYMBwk/0yzVjaER2iaOXA4Bl3s+LhwBm0MxPyXIBAh4r/UT9OwyPf6vBotMafaRmgZZwblUFCT+Uf34i+1DefxIONSw0teBhthucA+Jrg69MmY74cqjiyPFJoUlLVxihsEigmI0aL4R2Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jh1Eu6S5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1CF19C2BCB0;
+	Sat,  6 Jun 2026 05:42:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780724569;
+	bh=dAOA6SjpWMVvSYsnDvoLrQBjwg5fA4k8JH4p1r9yoy4=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=Jh1Eu6S5d0SZlSh+Q4zYhH4/gU3VPe+2CvEmGCg+qM50WU8jfNQZQyGYjkMgoYo/N
+	 1kMq5AYD3KdDbHMpkXFNPrGWJxPBIDIjkq+l9eiL+5BKdqtoTwJpczbBCMtSY2xlMr
+	 0KOoXQS7yo2LCSCrLIygHJMvkLx6qNLAMXIXGIGJV8iKOFFkWPJSf8WQ6PSX0c4duY
+	 tBLU+AaEDf74N9Zr0XDCbgaFG8JTI5uwJzo70e1cYWMn0pqfWwNbTN4gweVZ4C9F3Q
+	 SYabbP4rYKKL+nFncbobBIyqE3mvEzBWfNapKoHELSURqWAWf3Ujsv2BSro9lCmO+D
+	 bmSNOXfuplmfA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F179CCD8C8D;
+	Sat,  6 Jun 2026 05:42:48 +0000 (UTC)
+From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
+Subject: [PATCH net-next v4 00/16] Support for onsemi's S2500 10Base-T1S
+ MAC-PHY
+Date: Fri, 05 Jun 2026 22:42:31 -0700
+Message-Id: <20260605-s2500-mac-phy-support-v4-0-de0fbc13c6d8@onsemi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] dt-bindings: net: add Realtek r8169 family PCIe
- Ethernet
-To: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>
-Cc: Sebastian Reichel <sebastian.reichel@collabora.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org
-References: <20260605-rk3588-dts-rtl-eth-describe-dt-alias-v3-0-8a8857b39daf@pardini.net>
- <20260605-rk3588-dts-rtl-eth-describe-dt-alias-v3-1-8a8857b39daf@pardini.net>
- <b7cc8eba-ff6e-417d-8e74-b3bb24e08a26@gmail.com>
-Content-Language: en-US
-From: Ricardo Pardini <ricardo@pardini.net>
-In-Reply-To: <b7cc8eba-ff6e-417d-8e74-b3bb24e08a26@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEizI2oC/yWMQQrCMBAAv1L27MKa1Ip+RXpI48auYBqyaamU/
+ t2ox2GY2UA5Cytcmw0yL6IyxQrtoQE/uvhglHtlMGQ66uiIak5E+HIe0/hGnVOacsE2WMcXQ2E
+ 4W6htyhxk/X1vELlg5LVA/zc6D0/25buFff8AyBajKoMAAAA=
+To: Andrew Lunn <andrew@lunn.ch>, 
+ Piergiorgio Beruto <pier.beruto@onsemi.com>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
+ Selva Rajagopal <selvamani.rajagopal@onsemi.com>, 
+ Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Jerry Ray <jerry.ray@microchip.com>, 
+ Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780724562; l=4265;
+ i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
+ bh=dAOA6SjpWMVvSYsnDvoLrQBjwg5fA4k8JH4p1r9yoy4=;
+ b=qx2oYI5fXg+6Xkpr6RmdC6IHzvzkJPrcyap4R79wuSo6V2yTXvPJ7/Ft/+2ho1SzwEcSVoylQ
+ 4NggIhtkOj1AxKzm+y5nlfHKs3s3PmqGrYVbuJoEKBzhZ4U/B0IcuO4
+X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
+ pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
+X-Endpoint-Received: by B4 Relay for
+ Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
+X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Reply-To: Selvamani.Rajagopal@onsemi.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[pardini.net:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-296042-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:pier.beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:selvamani.rajagopal@onsemi.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:sebastian.reichel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,sntech.de];
-	DMARC_NA(0.00)[pardini.net];
-	FORGED_SENDER(0.00)[ricardo@pardini.net,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-296039-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ricardo@pardini.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[pardini.net:+];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,pardini.net:mid,pardini.net:dkim,pardini.net:from_mime,pardini.net:email]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 70E6664C79B
+X-Rspamd-Queue-Id: B0B1B64C98B
 
-On 05/06/2026 17:48, Heiner Kallweit wrote:
-> On 05.06.2026 13:49, Ricardo Pardini via B4 Relay wrote:
->> From: Ricardo Pardini <ricardo@pardini.net>
->>
->> Add a binding for fixed/soldered Realtek PCIe Ethernet controllers
->> driven by the r8169 driver (RTL8125/8126/8127/8168 and variants).
->>
->> The "pciVVVV,DDDD" compatibles are the Open Firmware PCI Bus Binding
->> spelling, auto-derived from PCI-SIG vendor/device IDs, but they still
->> need a binding when used in a board DT - analogous to "usbVVVV,PPPP"
->> compatibles documented in their own bindings (e.g. microchip,lan95xx)
->> so board DTs attaching properties (fixed MAC, nvmem cell, ...) to
->> these PCI function nodes can be validated.
->>
-> 
-> The of node seems to be created by of_pci_make_dev_node(). But this
-> function is called for bridges only in pci_bus_add_device().
-> So where is the node created in your case? Did you test node creation?
-> 
+This patch series brings support for onsemi's S2500 that is IEEE 802.3cg
+compliant Ethernet transceiver with an integrated Media Access
+Controller (MAC-PHY)
 
-Hi Heiner,
+Previous versions were submitted unthreaded, without coverletter
+and changelog.
 
-Seems to me of_pci_make_dev_node() is not at play here - that's the 
-DT-synthesis path. For nodes already present in DT, the of_node is bound 
-earlier, during pci_setup_device() -> pci_set_of_node() -> 
-of_pci_find_child_device() via the 5-cell reg.
+Changes in v4:
+ - Added return value comment for genphy_read/write_phy_mmd functions
+ - Added genphy_loopback_fixed_speed helper function to be used in
+   set_loopback callbacks
+ - Updated networking documentation for OA TC6 framework to elaborate
+   on what is expected in the ptp_clock_info structure for registration.
+ - added spi-max-frequency in YAML file based on alert from sashiko-bot
+ - Removed model/version from the onsemi driver's private structure as
+   they were useful as "information-only" data.
+ - Replaced the non-standard selftest with Linux's standard selftest
+   and made it as a separate patch
+ - Changed bit manipulation, shift operations to use macros so that
+   it is clean and readable.
+ - added new read_register and write_register apis with _mms postfix
+   so that MMS (memory map selector) can be given as a parameter.
+ - Fixed the wrong condition check with NETIF_F_RXFCS to subtract
+   FCS size from the length of the frame.
 
-Ref testing: yes; with this series on a NanoPC-T6 I get, for example:
-/sys/bus/pci/devices/0004:41:00.0/of_node -> 
-/sys/firmware/devicetree/base/pcie@fe190000/pcie@0,0/ethernet@0,0 and 
-u-boot correctly adds local-mac-address property there which is 
-correctly picked up kernel-side:
+Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+---
+Selvamani Rajagopal (16):
+      net: phy: Helper to read and write through C45 without lock
+      net: phy: Helper to modify PHY loopback mode only.
+      net: ethernet: oa_tc6: Move oa_tc6.c to its own directory
+      net: phy: microchip_t1s: Use generic APIs for C45 read and write
+      net: ethernet: oa_tc6: Move constant definitions to header file
+      net: ethernet: oa_tc6: Support for hardware timestamp
+      net: ethernet: oa_tc6: Support for vendor specific MMS
+      net: ethernet: oa_tc6: Remove FCS size in RX frame
+      net: ethernet: oa_tc6: read, write interface with MMS option
+      net: phy: ncn26000: Support for onsemi's S2500 internal phy
+      net: phy: ncn26000: Enable enhanced noise immunity
+      net: phy: ncn26000: Support for loopback support
+      onsemi: s2500: Add driver support for TS2500 MAC-PHY
+      onsemi: s2500: Added selftest support to onsemi's S2500 driver
+      dt-bindings: net: add onsemi's S2500
+      Documentation: networking: Add timestamp related APIs to OA TC6 framework
 
-=> setenv eth1addr 8e:b4:90:66:66:66
-=> boot
+ .../devicetree/bindings/net/onnn,s2500.yaml        |  67 +++
+ Documentation/networking/oa-tc6-framework.rst      |  76 +++
+ MAINTAINERS                                        |  13 +-
+ drivers/net/ethernet/Kconfig                       |  12 +-
+ drivers/net/ethernet/Makefile                      |   2 +-
+ drivers/net/ethernet/microchip/lan865x/lan865x.c   |  61 +-
+ drivers/net/ethernet/oa_tc6/Kconfig                |  16 +
+ drivers/net/ethernet/oa_tc6/Makefile               |   7 +
+ drivers/net/ethernet/{ => oa_tc6}/oa_tc6.c         | 476 ++++++++++------
+ drivers/net/ethernet/oa_tc6/oa_tc6_ptp.c           |  67 +++
+ drivers/net/ethernet/oa_tc6/oa_tc6_std_def.h       | 190 +++++++
+ drivers/net/ethernet/oa_tc6/oa_tc6_tstamp.c        | 202 +++++++
+ drivers/net/ethernet/onsemi/Kconfig                |  21 +
+ drivers/net/ethernet/onsemi/Makefile               |   7 +
+ drivers/net/ethernet/onsemi/s2500/Kconfig          |  22 +
+ drivers/net/ethernet/onsemi/s2500/Makefile         |   7 +
+ drivers/net/ethernet/onsemi/s2500/s2500_ethtool.c  | 354 ++++++++++++
+ drivers/net/ethernet/onsemi/s2500/s2500_hw_def.h   | 225 ++++++++
+ drivers/net/ethernet/onsemi/s2500/s2500_main.c     | 632 +++++++++++++++++++++
+ drivers/net/ethernet/onsemi/s2500/s2500_ptp.c      | 233 ++++++++
+ drivers/net/phy/dp83867.c                          |  11 +-
+ drivers/net/phy/microchip_t1s.c                    |  32 +-
+ drivers/net/phy/ncn26000.c                         |  63 +-
+ drivers/net/phy/phy_device.c                       |  75 +++
+ include/linux/oa_tc6.h                             |  36 ++
+ include/linux/phy.h                                |   6 +
+ 26 files changed, 2662 insertions(+), 251 deletions(-)
+---
+base-commit: 903db046d5579bef0ea699eae4b279dd6455fc9f
+change-id: 20260601-s2500-mac-phy-support-4f3ae920fb73
 
-...
+Best regards,
+-- 
+Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
-# readlink -f /sys/bus/pci/devices/0004:41:00.0/of_node
-/sys/firmware/devicetree/base/pcie@fe190000/pcie@0,0/ethernet@0,0
-
-# xxd /sys/bus/pci/devices/0004:41:00.0/of_node/local-mac-address
-00000000: 8eb4 9066 6666                           ...fff
-
-# ip link show dev end1 | grep ether
-     link/ether 8e:b4:90:66:66:66 brd ff:ff:ff:ff:ff:ff
-
-
->> +properties:
->> +  compatible:
->> +    enum:
->> +      - pci10ec,8125  # RTL8125 2.5GbE
->> +      - pci10ec,8126  # RTL8126 5GbE
->> +      - pci10ec,8127  # RTL8127
->> +      - pci10ec,8161  # RTL8168 variant
->> +      - pci10ec,8162  # RTL8168 variant
->> +      - pci10ec,8168  # RTL8168/8111 GbE
-> 
-> This list reflects just some of the PCI id's handled by r8169.
-> Any specific reason for this exact selection?
-I went for "chips likely to be soldered down on an SBC", but that was 
-indeed speculative.
-
-I guess I should trim to pci10ec,8125, which is all this series 
-describes? (further IDs can be added by the patches that introduce 
-boards using them)
-
---
-Regards,
-Ricardo
 
 
