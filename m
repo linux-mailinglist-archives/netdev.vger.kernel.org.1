@@ -1,243 +1,218 @@
-Return-Path: <netdev+bounces-296038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NaTXEViqI2qywgEAu9opvQ
-	(envelope-from <netdev+bounces-296038-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:04:24 +0200
+	id TsUFH0eqI2qowgEAu9opvQ
+	(envelope-from <netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:04:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81C364C7A6
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:04:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E6664C79B
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 07:04:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=Qd8WLQct;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296038-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296038-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=pardini.net header.s=google header.b=GZrsoX1z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296039-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8EA7E306CB03
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 05:01:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B4CD301C3F0
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 05:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136E03033F5;
-	Sat,  6 Jun 2026 05:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B8E2F8E8E;
+	Sat,  6 Jun 2026 05:04:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011023.outbound.protection.outlook.com [40.93.194.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA9E2F7F13;
-	Sat,  6 Jun 2026 05:00:45 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780722046; cv=fail; b=sZU19r19M2tFRpHEn8yepM7Cgq9BdvFI7/nbcx6m5sVVneRSLZvtGF/dTwFg5Vlf4Eh9NPu/BgNEDU3GKj83NcwVEAfByhJRuYrY/nxQQx4Z0WM6s9Edgi45UVTLSAoLwdHu6zrLgOCrri4Txdbs0E2vINRKWi0zBUQJMYcJiM4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780722046; c=relaxed/simple;
-	bh=El9A0qcJwLeoqwW52mEsiCTr+/Qaix/HuHSDpRiiJz4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=se3LhMtLzeu7vm+NnLYE9MfKrzsIUYAbfvcJ0SLMhHPlslpZXkepMOLcl/JXuzK29ftM5TJudXGDVym+pGmZx6GkPQcUnG9GYxnFKKePYm9i5fxM7pYY+3R1YAGBJ1/Yhk6HDa4/iwM/rDee014P+KydSK4awfQBrBcnEpRcYWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Qd8WLQct; arc=fail smtp.client-ip=40.93.194.23
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A6+sbY7T74saq4OwNAw6tBhUxdZX+CpyowIQvDvpeBdBCkg0gB/FDDOEr9/2h0gLoZlknNP1gmv0i5HRlj1+BWCovWQkrvOQ8hqsIf592ETdIpULn7/mTR8HGPgYFWXnsPl3HCmgBop6cT1QWm7ie48mCnroT1VIrD3jpyxlJD0WuQW0Djf0Z70HqnKSeypvw5bhi+aeZMsNmIkA/VoZFsC+7USXNbP07lNH+C/PiVqhRCW3FAZqZe6LTM2++qtYyap1JLgg20Dja1ykQaFDh7Ug80s8rrrGNxh8gBXVtR2VEY9AB3qltQ6yddwxRj0VrTy+/MzcLEskqy2CgIa15g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C9bNPysfq2ItYP9eja/EvhjPe6OVYOicbBwY6PCGQJ0=;
- b=D/vIlydsOogsIwSKsZqPbVJdSQeg22fWCMS49FXnSTFiNQr0aL0LOqZoWfVXN9X50+44DizbtOU0lqEbo9VrGA2vPBtheNiYgEmtQ9fGnSFk08ZmYgw7E7XWHCd8Qm8e4K32e4+5PaVvZ7OkD2gMifH69cNOmoL843lgFvZgBjqsNCGK/jLOaXC6H9pkwBlDWUrVrUK3T/hqBTvDL1fW7W+xzgwIZOqGXZL2iysos7opScNEa8oAN9r7tlJAksc39Efcuz7dj6FxmCBGGw/4nxcqtCJGyZxSDi0MSHeKIx7/ijn/u6bnwE9PDamZSImnVptg2mkCgDQv4fOBJ/S9iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C9bNPysfq2ItYP9eja/EvhjPe6OVYOicbBwY6PCGQJ0=;
- b=Qd8WLQctGDQfn1UL3H6dHpMs1YhTHkwy3LvkjhnoXvJMT1fKIC6GUNuyoCX//vPGuWbrlG09zMMpdChaBEK1dBgabKjvqghKax8jftcpxsvc/5dQj/etZHIuSzcAKrQejtXO0o7itG0FO9BNwdAbFV7otRXwp3djfecUtFQxrJ4=
-Received: from BL1PR13CA0277.namprd13.prod.outlook.com (2603:10b6:208:2bc::12)
- by LV8PR12MB9335.namprd12.prod.outlook.com (2603:10b6:408:1fc::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.10; Sat, 6 Jun 2026
- 05:00:39 +0000
-Received: from BL02EPF00021F6C.namprd02.prod.outlook.com
- (2603:10b6:208:2bc:cafe::4) by BL1PR13CA0277.outlook.office365.com
- (2603:10b6:208:2bc::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.8 via Frontend Transport; Sat, 6
- Jun 2026 05:00:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- BL02EPF00021F6C.mail.protection.outlook.com (10.167.249.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.92.5 via Frontend Transport; Sat, 6 Jun 2026 05:00:39 +0000
-Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Sat, 6 Jun
- 2026 00:00:35 -0500
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb10.amd.com
- (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Sat, 6 Jun
- 2026 00:00:34 -0500
-Received: from xhdipdslab46.xilinx.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.41 via Frontend
- Transport; Sat, 6 Jun 2026 00:00:31 -0500
-From: Abhijit Gangurde <abhijit.gangurde@amd.com>
-To: <jgg@ziepe.ca>, <leon@kernel.org>, <brett.creeley@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Abhijit Gangurde <abhijit.gangurde@amd.com>
-Subject: [for-next v3 5/5] RDMA/mlx5: move mlx5 clock info to common struct ib_uverbs_clock_info
-Date: Sat, 6 Jun 2026 10:30:03 +0530
-Message-ID: <20260606050003.3648306-6-abhijit.gangurde@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260606050003.3648306-1-abhijit.gangurde@amd.com>
-References: <20260606050003.3648306-1-abhijit.gangurde@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247DB524F
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 05:04:03 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780722244; cv=none; b=cF2YRKM2jt46B2oi9piMmOQunTDbf9z+wPDphFIFGOPop5j2jaCZwoalR8JoA4jPg5UDFqUXKoUvRwdcWWV2KHkgF+BxvRCXlrPIXK3DhGQQ48OcIttslalYAZNwWmlPdw9O5RICi0US15ATFv0ZvK8iYDJYp6yAyNSprgSUCsI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780722244; c=relaxed/simple;
+	bh=263QfBY5Zp+gfX2SSDrodQXz/EAIY/aQ/Pr5s0xl9+Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sIAZV9Bs9FtHzHDhRQHrqT8CgkURyHl4kBLEDZ6keV5ciqdRMbMai5DFTknUQKLaAIfvrEVnA378Jncuo9NyysU1eMFzyqBZ8TIpACTz3r3ncrbUlz3zbY+5YzDGUpiXrN3cl8bjM/XIfm7M9BiLdvBDWsXinTK0CjM50Rg4Q1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pardini.net; spf=pass smtp.mailfrom=pardini.net; dkim=pass (2048-bit key) header.d=pardini.net header.i=@pardini.net header.b=GZrsoX1z; arc=none smtp.client-ip=209.85.208.46
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-68cc6c7df99so3778435a12.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jun 2026 22:04:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pardini.net; s=google; t=1780722242; x=1781327042; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ad3Risuri9Oy23ttuXXObF+tJAD6dYgEl+kDhesPP88=;
+        b=GZrsoX1ziTdDLcdmOAsCHNY+OeE3e5tdgZDTirvyA8VQdLnrB0uiVrpcwwBCPpiH8E
+         56TTq067Mz7cq3cPfUcoDPjmyBuTkVKUvdjb4cFjhwjC3TblyCh0ymondJHKqduCiCCT
+         YjAdydm+f96c14j8w1y3vGy6sh6tcr/EEZFdfmFqZwWHTG08z5kdLubGIHS1PDl89oEC
+         GbWxqWWc6JxOcLtA7R4rBvZneI1qRMLBKqITxDluKzE17ugE0txz1Cf1j5Nocdm1/EN2
+         7L0hVwxnfJOIquakxQ5Tyn0x+84uMVWVt641klWNDZKC58IJMzOxDPn6rE+Wvl9R+sc9
+         BIOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780722242; x=1781327042;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ad3Risuri9Oy23ttuXXObF+tJAD6dYgEl+kDhesPP88=;
+        b=dEYyD+QnSvtrILA1kv8VrA/jWzJULTKToCm0BnjHQIzzkdTVBVGNezG916GiQbIN9H
+         L474qj3zskpmRYD+QMo3TB9EOacCM12pldmDICOw1iIptIHFcbBzc6yImqqKggXEhPdK
+         U9IxEu7Yzy+LOPveLrQelQgg+pqOikwsfdj10qFUns/KWxht/sCB8+Bil8wleoIwff5c
+         +n44RHrN8h1EKeIPiP1bDWD8BIFc0e+a5znQJC+WU2wX1b2Cemdyopm/3Ba2zwaMAVN7
+         EAVkAdcj965bqh4/U8K3Ijuli3MrB1qQkN7A9TG4T2iENb6rYOlePPDZkuu2kdcfreTm
+         9BZg==
+X-Forwarded-Encrypted: i=1; AFNElJ/a45ANrcg2+YW6lCaAD5dKLKl6tpNkbXZ4AzVXjKrqiPR3xSi9yuDb8ubBwJsz+YCb4DY5LDk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2dZRR0VGGEEFZ+tkySOaKDGUey7ofDYkI268FIZtxFVTIw7sx
+	rOHEgC/xTbm3A59NjNOBTn/4YN31tedE2ne+DSLSQhAeAag+mT0IzYE53LMu7yGymQ==
+X-Gm-Gg: Acq92OHXm59VgUNvyU8fjTCqi451eHCd2FZwWy4HGemCWjjGTfaBwzisMO5eSOyVJjA
+	W62A0GfUB5Ci5KVgNm7HaDsmlX4MWSKnCUz6UYLkMmqEYH29UrmE+uOgNWaO1O6NRfkmHTZoc0v
+	xIJTI8SFVdtC/NItBFONsp6grJVWTvn7geHSTBcFgRzPDvi/sE1QXrZWwxU2SYIi44YK6ke5ksa
+	+38IYQbYGhIpU3mLKbMKW/GYur3uv7zjAKlcnD9Brq1UERs0YBQPJCLQWJf94cEfKcDSSA4cu7d
+	max+jpOk4bVTO6u3JLLT1K3cqp18mz1pr8gu7YvhO63tl00RznPthrM5hSSySbP+4j7v/Owo4mI
+	zcKXwnqkhn0z+aVwkfMTnk050CcAh/8JP7H2A0qXfYDSZJFAsoXXXiMkTPbQ7wzRkS/0cPVdHOr
+	Qm3OxQ3H8KBEUKeIATCDshoclKv218eKYmYErqjt3ijy6uYoEyRrxJUrD3s5LlO73+dYhr8VYxX
+	y2o6SwXYXdPVam/svFtix+lv6iLiKTP7QLmxrJyNEh6g0mt6TMSrvrUEjr3jHoOtDRcj5kxxNlk
+X-Received: by 2002:a05:6402:268f:b0:68e:4c0:f599 with SMTP id 4fb4d7f45d1cf-68fa4c16b80mr3088882a12.5.1780722241268;
+        Fri, 05 Jun 2026 22:04:01 -0700 (PDT)
+Received: from ?IPV6:2a02:a466:4d7a:0:c439:8cdb:ad2:c0fb? (2a02-a466-4d7a-0-c439-8cdb-ad2-c0fb.fixed6.kpn.net. [2a02:a466:4d7a:0:c439:8cdb:ad2:c0fb])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6915a637180sm421874a12.26.2026.06.05.22.03.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2026 22:04:00 -0700 (PDT)
+Message-ID: <26da1dfa-3408-4654-9046-36ed6d57059c@pardini.net>
+Date: Sat, 6 Jun 2026 07:03:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F6C:EE_|LV8PR12MB9335:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f47bf95-9edc-48d2-fc9c-08dec3888db0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|36860700016|6133799003|18002099003|22082099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	vCwTJDlslYP3sNf0dRFZmsYPANJRtbJXKoIFM4U6+kNkOMt8KXjUqcpmTjlevBf+qjLdDR7ZV4aku3D8H6Au3tp1x5jsmB+y1ezLW2juavvjjzbcyS/s87r3kBRcfKTx8SgTR6vDLoBnV1ecpe1okFYveTICTa/Q2ku7qiIuSv96f84CXfpLW9vds04VR3UAbI/1gDC0RdGp2tqA7cblqRCOPwXpf49OR6GDLJwmvIhho4f06AhXbvZt4jyv9FAkH4dFR78lRPo6SOrZD2UCx/b71d2HG/VvS2H4lWT7nMYg50xrOUfRPS7+FWApQ7Y8GHFL3twxbvvHtOwIYVk7um0+VHE0oTxXXqPtZaSW9PX3rkVmuCEUg7MmsjNzCc3SEF0A1/rjXn24xyw9kiW+riv019hxdBcI3exBFnGbiD02oEQFZJw+IqhweGAxlzwaHC56UJ3yheJasSA2WFkEZo7UYcaqHFRm+9US8SQquDQc2s1hxkiFCU+8ARneA5Iluj1LIfzGfg6sBhQOrwpAAXBWuPVWP+zBl0Aj/meDS+7NQfPYz2b3g25Q9r9IL+f40eRKMGXRUYX3agF346lZA4k1E6l+upOYvVfftgF57CI9re70ZORpU/T1QMHzRFVn7pGvGxLcsI8L2HTKvoVZWKbMlux3u7ibsKl5R0AfoYkLvomkPM48dQ8W9AabEW0A84DHmX4Rd7h/snFSGnh412abuLrBLQHPx6zlLX6vgn0=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(36860700016)(6133799003)(18002099003)(22082099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	fRkzJzh48p5to+QoBJAUGwJYjBo4zTpDoq4Kg0tkhtcYT+vskaqmLKeMmGyOcUYNFjrUbMJ8vp7OnN61hIdAqWr+o+X5QbTG3x+BCXC5vP8CY56PEIhCAQu+/iBhEh7UlIQHsrlRM0iSIKVsz3qGYH1nzM5rXsOzeC8Wb1qBvnf9gSY6dndN9Ag0768SZmnhHQ8zLAMvaVB8xF+sL+UACH3hfBESH7FgVauCgdYHjwKYpr6sOpffnXRJRM1lXQPr+N2oPyKO1DBBJoilEaqEFJex1Qk7i/qqJ6nKKudgBUXGtMgy+RIzmtikJnnWg6U6UJxa11CRbKwexUCqOiepVYeneSNi1dhMb/5eqN9eaaPYvGV7ZwHtyDVZ5ryrY+eteWZPE7kMoKUChzCjmtNKzTH8pJZXdzdiE5QJ6RPtVhUYmy83eHkXwxACXMtMIVhc
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2026 05:00:39.2979
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f47bf95-9edc-48d2-fc9c-08dec3888db0
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F6C.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9335
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] dt-bindings: net: add Realtek r8169 family PCIe
+ Ethernet
+To: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>
+Cc: Sebastian Reichel <sebastian.reichel@collabora.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org
+References: <20260605-rk3588-dts-rtl-eth-describe-dt-alias-v3-0-8a8857b39daf@pardini.net>
+ <20260605-rk3588-dts-rtl-eth-describe-dt-alias-v3-1-8a8857b39daf@pardini.net>
+ <b7cc8eba-ff6e-417d-8e74-b3bb24e08a26@gmail.com>
+Content-Language: en-US
+From: Ricardo Pardini <ricardo@pardini.net>
+In-Reply-To: <b7cc8eba-ff6e-417d-8e74-b3bb24e08a26@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[pardini.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[abhijit.gangurde@amd.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-296038-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jgg@ziepe.ca,m:leon@kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:allen.hubbe@amd.com,m:nikhil.agarwal@amd.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:abhijit.gangurde@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[amd.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[abhijit.gangurde@amd.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:sebastian.reichel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,sntech.de];
+	DMARC_NA(0.00)[pardini.net];
+	FORGED_SENDER(0.00)[ricardo@pardini.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296039-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim,amd.com:from_mime,amd.com:email,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ricardo@pardini.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[pardini.net:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,pardini.net:mid,pardini.net:dkim,pardini.net:from_mime,pardini.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D81C364C7A6
+X-Rspamd-Queue-Id: 70E6664C79B
 
-Use struct ib_uverbs_clock_info from ib_user_verbs.h for clock info.
+On 05/06/2026 17:48, Heiner Kallweit wrote:
+> On 05.06.2026 13:49, Ricardo Pardini via B4 Relay wrote:
+>> From: Ricardo Pardini <ricardo@pardini.net>
+>>
+>> Add a binding for fixed/soldered Realtek PCIe Ethernet controllers
+>> driven by the r8169 driver (RTL8125/8126/8127/8168 and variants).
+>>
+>> The "pciVVVV,DDDD" compatibles are the Open Firmware PCI Bus Binding
+>> spelling, auto-derived from PCI-SIG vendor/device IDs, but they still
+>> need a binding when used in a board DT - analogous to "usbVVVV,PPPP"
+>> compatibles documented in their own bindings (e.g. microchip,lan95xx)
+>> so board DTs attaching properties (fixed MAC, nvmem cell, ...) to
+>> these PCI function nodes can be validated.
+>>
+> 
+> The of node seems to be created by of_pci_make_dev_node(). But this
+> function is called for bridges only in pci_bus_add_device().
+> So where is the node created in your case? Did you test node creation?
+> 
 
-The original struct mlx5_ib_clock_info remains in mlx5-abi.h for
-userspace ABI compatibility.
+Hi Heiner,
 
-Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c | 8 ++++----
- include/linux/mlx5/driver.h                         | 2 +-
- include/uapi/rdma/mlx5-abi.h                        | 3 +++
- 3 files changed, 8 insertions(+), 5 deletions(-)
+Seems to me of_pci_make_dev_node() is not at play here - that's the 
+DT-synthesis path. For nodes already present in DT, the of_node is bound 
+earlier, during pci_setup_device() -> pci_set_of_node() -> 
+of_pci_find_child_device() via the 5-cell reg.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-index d0ba83d77cd1..fce6687a2773 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-@@ -412,7 +412,7 @@ static u64 read_internal_timer(struct cyclecounter *cc)
- 
- static void mlx5_update_clock_info_page(struct mlx5_core_dev *mdev)
- {
--	struct mlx5_ib_clock_info *clock_info = mdev->clock_info;
-+	struct ib_uverbs_clock_info *clock_info = mdev->clock_info;
- 	struct mlx5_clock *clock = mdev->clock;
- 	struct mlx5_timer *timer;
- 	u32 sign;
-@@ -1228,7 +1228,7 @@ static void mlx5_timecounter_init(struct mlx5_core_dev *mdev)
- 
- static void mlx5_init_overflow_period(struct mlx5_core_dev *mdev)
- {
--	struct mlx5_ib_clock_info *clock_info = mdev->clock_info;
-+	struct ib_uverbs_clock_info *clock_info = mdev->clock_info;
- 	struct mlx5_clock *clock = mdev->clock;
- 	struct mlx5_timer *timer = &clock->timer;
- 	u64 overflow_cycles;
-@@ -1263,10 +1263,10 @@ static void mlx5_init_overflow_period(struct mlx5_core_dev *mdev)
- static void mlx5_init_clock_info(struct mlx5_core_dev *mdev)
- {
- 	struct mlx5_clock *clock = mdev->clock;
--	struct mlx5_ib_clock_info *info;
-+	struct ib_uverbs_clock_info *info;
- 	struct mlx5_timer *timer;
- 
--	mdev->clock_info = (struct mlx5_ib_clock_info *)get_zeroed_page(GFP_KERNEL);
-+	mdev->clock_info = (struct ib_uverbs_clock_info *)get_zeroed_page(GFP_KERNEL);
- 	if (!mdev->clock_info) {
- 		mlx5_core_warn(mdev, "Failed to allocate IB clock info page\n");
- 		return;
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 5405ca1038f9..3b310331d582 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -774,7 +774,7 @@ struct mlx5_core_dev {
- #endif
- 	struct mlx5_clock       *clock;
- 	struct mlx5_clock_dev_state *clock_state;
--	struct mlx5_ib_clock_info  *clock_info;
-+	struct ib_uverbs_clock_info *clock_info;
- 	struct mlx5_fw_tracer   *tracer;
- 	struct mlx5_rsc_dump    *rsc_dump;
- 	u32                      vsc_addr;
-diff --git a/include/uapi/rdma/mlx5-abi.h b/include/uapi/rdma/mlx5-abi.h
-index 8a6ad6c6841c..1a190883d5ea 100644
---- a/include/uapi/rdma/mlx5-abi.h
-+++ b/include/uapi/rdma/mlx5-abi.h
-@@ -472,6 +472,9 @@ struct mlx5_ib_modify_wq {
- 	__u32	reserved;
- };
- 
-+/*
-+ * deprecated, see struct ib_uverbs_clock_info from ib_user_verbs.h
-+ */
- struct mlx5_ib_clock_info {
- 	__u32 sign;
- 	__u32 resv;
--- 
-2.43.0
+Ref testing: yes; with this series on a NanoPC-T6 I get, for example:
+/sys/bus/pci/devices/0004:41:00.0/of_node -> 
+/sys/firmware/devicetree/base/pcie@fe190000/pcie@0,0/ethernet@0,0 and 
+u-boot correctly adds local-mac-address property there which is 
+correctly picked up kernel-side:
+
+=> setenv eth1addr 8e:b4:90:66:66:66
+=> boot
+
+...
+
+# readlink -f /sys/bus/pci/devices/0004:41:00.0/of_node
+/sys/firmware/devicetree/base/pcie@fe190000/pcie@0,0/ethernet@0,0
+
+# xxd /sys/bus/pci/devices/0004:41:00.0/of_node/local-mac-address
+00000000: 8eb4 9066 6666                           ...fff
+
+# ip link show dev end1 | grep ether
+     link/ether 8e:b4:90:66:66:66 brd ff:ff:ff:ff:ff:ff
+
+
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - pci10ec,8125  # RTL8125 2.5GbE
+>> +      - pci10ec,8126  # RTL8126 5GbE
+>> +      - pci10ec,8127  # RTL8127
+>> +      - pci10ec,8161  # RTL8168 variant
+>> +      - pci10ec,8162  # RTL8168 variant
+>> +      - pci10ec,8168  # RTL8168/8111 GbE
+> 
+> This list reflects just some of the PCI id's handled by r8169.
+> Any specific reason for this exact selection?
+I went for "chips likely to be soldered down on an SBC", but that was 
+indeed speculative.
+
+I guess I should trim to pci10ec,8125, which is all this series 
+describes? (further IDs can be added by the patches that introduce 
+boards using them)
+
+--
+Regards,
+Ricardo
 
 
