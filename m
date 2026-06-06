@@ -1,132 +1,136 @@
-Return-Path: <netdev+bounces-296012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296013-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OslrKaR3I2reuAEAu9opvQ
-	(envelope-from <netdev+bounces-296012-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 03:28:04 +0200
+	id CN5dFiJ4I2r4uAEAu9opvQ
+	(envelope-from <netdev+bounces-296013-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 03:30:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E983864C1A8
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 03:28:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE1864C1B4
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 03:30:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WozLIiq0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296012-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296012-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=cr5+HxSN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296013-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296013-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66EA23024977
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 01:27:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 27ED63026F38
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 01:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7C6233134;
-	Sat,  6 Jun 2026 01:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7267625228D;
+	Sat,  6 Jun 2026 01:30:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DB54071C4;
-	Sat,  6 Jun 2026 01:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64722248886;
+	Sat,  6 Jun 2026 01:30:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780709271; cv=none; b=u+4H/5thOqZO1jY6SWs/oF2a5KZN9rLdYu+slRGS8cLW8n0vHU610UDfSkgvZINf9aBl80mJ8q+cKqhhsDwWse0SSZRwG2SOkHerbUSSzzmbKqSXsjUtNs3ZAZ6Y/xCZp52Y/ZTdT2dXdCNLQfMSm2Fp6btinw7uMgksqVyx8Ao=
+	t=1780709407; cv=none; b=QzvCDQGfzrzUAH6KgRM6cJ0Nh3aCtmqZqQAQxEW6HAQxzmIDowJTmZMsrMejZSs/aAQ3HzTR8BV4ImmQekTR1YnVzOe5ZBpMlBsWCYTeGXNxyTzyhnI5rPOvmo3BbdoS+WuxrXbDypYrkDga747NekddJDNmqXwVcyeXdpzL6PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780709271; c=relaxed/simple;
-	bh=1OJtF7vY9H8KdCtv0DLdAod04oMqb1yTg4e1NStshKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SdcsOCBsp6p6dQd2shY4Ngr9mpwuF6aVvG3wi5Fa7op8xdN/c2DvmT4nKSpYPqDFOBx34yzj67+9dZ3XpOif+JvX782MhPQhbJ63y14agipr3S6PCOUw6KMkVOFxBH9Dl5owK6pQj6hPfXrP/WaozIuH2AdyYB5WgdeBIdfoIdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WozLIiq0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FEA51F00893;
-	Sat,  6 Jun 2026 01:27:49 +0000 (UTC)
+	s=arc-20240116; t=1780709407; c=relaxed/simple;
+	bh=V9zdUch1RCqumX9vL7VDj7yyGBh4Yz8WOttv6lfxVFI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uveTNEfuLUkNd4aux1h4GI7SOp8VWTbtPwEJGmVrbBMwjhrYI3eWmkI3Y2VeB4ayqzTNq/znDBSM7dk59KlwKmByT20yQhidB48yoVARmCStALlXGEzCSjLsx3jPHRaa4Rt7GzIRAUkw/up16wF0SpuIS7Is9tYW87iBIIwITl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cr5+HxSN; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECFC91F00893;
+	Sat,  6 Jun 2026 01:30:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780709270;
-	bh=jXywdkzqZJYiigfuu3nQzbSjqzHWAoQ1g0NVJCMwSZI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=WozLIiq0kZcEHuHGfIXwaSSSF/vTYHL7CJz0GCOvQ+Rt34qwjo7qySAzCtrd3C95w
-	 x08DDn2plKEEseJkl6qSGjy54FbHqYk8wAHdAR0OPPy5RVjfy8zIuElXznL6+owGr3
-	 nL/wo+xqscL0m1VM8HNOM7GQm+kEHH+M7NAvyUNTrIttxUVm0SjfQ/uRjprQHnhkGz
-	 FJeyPzY4YkqyPfNbwAnM79tgVf3n0prC1AwwHCorwO/hlzNG8l8ugO802FWs9bynNb
-	 C8lJwxyqLKNi2iwALi4MVcDVtQD1igaNBlf46ofsSNFGFf0o9FCqT+VWKObVf2j9VS
-	 PgJtDaH5Gph+g==
-Date: Fri, 5 Jun 2026 18:27:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aditya Garg <gargaditya@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, shradhagupta@linux.microsoft.com,
- dipayanroy@linux.microsoft.com, ernis@linux.microsoft.com, kees@kernel.org,
- shacharr@microsoft.com, stephen@networkplumber.org,
- gargaditya@microsoft.com, ssengar@linux.microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] net: mana: fix error-path issues in queue setup
-Message-ID: <20260605182748.5f106575@kernel.org>
-In-Reply-To: <20260604080137.1995269-1-gargaditya@linux.microsoft.com>
-References: <20260604080137.1995269-1-gargaditya@linux.microsoft.com>
+	s=k20260515; t=1780709406;
+	bh=ASXWK8gh0lMnAbiPph0XBp/VyyYVnUTZVyfHxjwp+Dk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=cr5+HxSNHdkS8C6KkY4HwanjvCasaX+Les4bRwAKQd31rBdAVtn7epdZmKcevyDlM
+	 b8+wcRmUlZO+LYG5Uq0kHwTDRmvEHSAhOWfhgH/0HAN0wdmogGYJf1RWBZqOJH2exx
+	 2/ZqKBZJG1Hxmh0FR8UZbUTnyZ207I/vgAL3TLhpLuV23KjZxODpaY/OiZAHa00i11
+	 xMPy5aMOlDu6luKT9oHXhW7y2UuLf75StZGSvHWg/h0IwaZbauJGsEM/1QdF35R5rj
+	 +q5+AEsvCWETARD/dJYbDMWGF3Huz/B4Z/QXLq4Vk9grHvFsYnGcDKa2tt2KTReiic
+	 Qy/f9B4i24vWw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569293930A9C;
+	Sat,  6 Jun 2026 01:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: airoha: Add NULL check for
+ of_reserved_mem_lookup()
+ in airoha_qdma_init_hfwd_queues()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178070940590.3983833.5638172237505353100.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Jun 2026 01:30:05 +0000
+References: <20260604070352.2603077-1-zhaojinming@uniontech.com>
+In-Reply-To: <20260604070352.2603077-1-zhaojinming@uniontech.com>
+To: ZhaoJinming <zhaojinming@uniontech.com>
+Cc: lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296012-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:gargaditya@linux.microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:shradhagupta@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:ernis@linux.microsoft.com,m:kees@kernel.org,m:shacharr@microsoft.com,m:stephen@networkplumber.org,m:gargaditya@microsoft.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296013-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:zhaojinming@uniontech.com,m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E983864C1A8
+X-Rspamd-Queue-Id: CFE1864C1B4
 
-On Thu,  4 Jun 2026 01:01:24 -0700 Aditya Garg wrote:
-> Two error-path fixes in MANA queue setup, both surfaced during Sashiko
-> AI review of a recently upstreamed patch series.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  4 Jun 2026 15:03:52 +0800 you wrote:
+> of_reserved_mem_lookup() may return NULL if the reserved memory region
+> referenced by the "memory-region" phandle is not found in the reserved
+> memory table (e.g. due to a misconfigured DTS or a removed
+> memory-region node).  The current code dereferences the returned
+> pointer without checking for NULL, leading to a kernel NULL pointer
+> dereference at the following lines:
 > 
-> Patch 1 initializes queue->id to INVALID_QUEUE_ID in
-> mana_gd_create_mana_wq_cq() so that a CQ creation failure before the
-> firmware id is assigned does not NULL gc->cq_table[0] and silently
-> break whichever real CQ owns that slot. This mirrors the existing
-> pattern in mana_gd_create_eq().
-> 
-> Patch 2 guards mana_destroy_txq()'s call to mana_destroy_wq_obj() with
-> an INVALID_MANA_HANDLE check, mirroring mana_destroy_rxq(). Without
-> it, TX setup failures lead to a firmware-rejected destroy of (u64)-1
-> and a spurious error in dmesg.
+> [...]
 
-Looks like these patches were generated against net-next, please rebase:
+Here is the summary with links:
+  - [net] net: airoha: Add NULL check for of_reserved_mem_lookup() in airoha_qdma_init_hfwd_queues()
+    https://git.kernel.org/netdev/net/c/f9f25118faa4
 
-Applying: net: mana: initialize gdma queue id to INVALID_QUEUE_ID
-Applying: net: mana: guard TX wq object destroy with INVALID_MANA_HANDLE check
-error: patch failed: drivers/net/ethernet/microsoft/mana/mana_en.c:2351
-error: drivers/net/ethernet/microsoft/mana/mana_en.c: patch does not apply
-Patch failed at 0002 net: mana: guard TX wq object destroy with INVALID_MANA_HANDLE check
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
