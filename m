@@ -1,74 +1,70 @@
-Return-Path: <netdev+bounces-296112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hYJ7KSoiJGoc3gEAu9opvQ
-	(envelope-from <netdev+bounces-296112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 15:35:38 +0200
+	id /syABGYiJGom3gEAu9opvQ
+	(envelope-from <netdev+bounces-296113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 15:36:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2928964DA75
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 15:35:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6171F64DA8D
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 15:36:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Cb8qMDq7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296112-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296112-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linux.microsoft.com header.s=default header.b=C2IFoxsj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296113-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296113-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.microsoft.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2A783046D7F
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 13:31:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C073C3014960
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 13:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E453B14CB;
-	Sat,  6 Jun 2026 13:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57DEC3B3892;
+	Sat,  6 Jun 2026 13:33:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260A03B2FF1;
-	Sat,  6 Jun 2026 13:31:33 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055553AFD19;
+	Sat,  6 Jun 2026 13:33:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780752697; cv=none; b=HLlRPqG0X+k55xldb+5duwT+3SFumegp/7nkrgOHlSpXNZS28x1Ou7HBrR/Fka0/YgEnCPFF7O/n9ZaGFcRO5ziPv3ws7YHyiSRzKPqEw+VJCqzaOAOx8Zc9WOyrPpcCWkxDqFYtQlH3b8aUYVMUgFHZkaVKLx6CQ45aukY9k+0=
+	t=1780752803; cv=none; b=L4xi+v2sN0uExZ2SGlQWr0va8fy49+8V6j4Z0jmDSmNV1bJZX08oNc6HUwn8COzWAe2oamenzKQb/naHJ2+2jg5xqjZn40FGtcBKocwRDAEw5dBPIsnb2Lp7qHhYzhprUUKDE9qlV0MttZkpJX5Gjig722TJiwelzofJjX1DdXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780752697; c=relaxed/simple;
-	bh=iqdBp1SBe9s5B8xK7xryHGkN3EFOsiyJRhWFfYHWwXY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WTOhKgGg7Jida1r7J8gdhsMZS0ht8zt/ZTlrtrhVYScppLOSbcKpqA+fq7c9yUjXHx/W/uKD1AQAg1pqzaNSb6kjxdYFg2XRg8vAq4iWAy5dYt53TRnoU/PleAgIC4aq2KBH89TnvQ7opsPFi9/iQ/dCk8LXeyZnzMUmUrRXc1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cb8qMDq7; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 340B91F00899;
-	Sat,  6 Jun 2026 13:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780752693;
-	bh=JzucgvGDuY3nnjHaY/HehPAaXtFO2Zl/ImV4s57IpW4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Cb8qMDq7EkDP5+UtGVouj9wv6ricBE4nwU36/63nVZRa0HgEFXFFVDj+IaweH324M
-	 pFX4vH4lUMX3lMX/jKz2TZuFzH86UcU+lv87pPeVEz2TPK29kZpd2WfFoJf6OF56L7
-	 nTqumVUNJz4MzcuNoW318jRzY4yJAs+rKSz6XjxbX8Jv7bp6mP901pQhvhSWdQ/3MR
-	 fIMRXF+80DaPl8LPPT7WQufjolOoUjCC4NUj0RgixqjaQN9yqBDMSQ5F0D8IBiIjGN
-	 Yzu1li6pAkydqCTyNaWbzSylOjwlipmljMVEhynLDMObIv2A+SyvJa31MMQyRc8wls
-	 iiJbB8lstVOAA==
-From: Sasha Levin <sashal@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
+	s=arc-20240116; t=1780752803; c=relaxed/simple;
+	bh=DYHMfQyR2sTnIYoQ4BwT3L1UOEBgVV1FnGPDeBIplG8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=cTjGZmbM06Hsc6RWo99s7aq3/ynRKny4fn9dEtdjPWvAU/Ske1YJ+Ezc/JX/SDBhXeXe+zF9ih0X85TXXgBuu+3AkxQzAaUQvD78BVLxJqixnvN0vF+6hWv8aTVrUV2aHHUjjIELq7f6jrTnD6F4PuiQrs4jtBchTJeJwaWzM2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=C2IFoxsj; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 0F3F520B716A; Sat,  6 Jun 2026 06:33:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0F3F520B716A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1780752786;
+	bh=RJDiIch2cS/p2BsBvB6NuI4AyVbSC79DD0GQWUtLgBo=;
+	h=From:To:Subject:Date:From;
+	b=C2IFoxsjLhXvm5maLlS+rXeqNA37LjgJ/raoIhs1RBrZEtLm61NNVSAku/Xfan30/
+	 GVeax45NzOLWC+7xcFluh80kt/a83y5nDaR/qor9ggucsmSAY5vTBHLnxyIfmjNwSB
+	 R3zs5mGMPRL/JTo+S4G24BMKDEKnZTY3/fnBgh+c=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	kees@kernel.org,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Simon Liebold <lieboldsimonpaul@gmail.com>
-Cc: Sasha Levin <sashal@kernel.org>,
-	Qi Tang <tpluszz77@gmail.com>,
-	Florian Westphal <fw@strlen.de>,
-	Simon Liebold <simonlie@amazon.de>
-Subject: Re: [PATCH 6.12.y] xfrm: hold dev ref until after transport_finish NF_HOOK
-Date: Sat,  6 Jun 2026 09:31:19 -0400
-Message-ID: <20260606-stable-reply-0009@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260605141254.1177152-1-simonlie@amazon.de>
-References: <20260605141254.1177152-1-simonlie@amazon.de>
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next v2] net: mana: Cache MANA_QUERY_LINK_CONFIG result to avoid repeated HWC queries
+Date: Sat,  6 Jun 2026 06:32:55 -0700
+Message-ID: <20260606133301.2180073-1-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,47 +73,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-296112-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:sashal@kernel.org,m:tpluszz77@gmail.com,m:fw@strlen.de,m:simonlie@amazon.de,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296113-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,strlen.de,amazon.de];
-	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	SINGLE_SHORT_PART(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.microsoft.com:mid,linux.microsoft.com:from_mime,linux.microsoft.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2928964DA75
+X-Rspamd-Queue-Id: 6171F64DA8D
 
-Queued for 6.12, thanks.
+mana_query_link_cfg() sends an HWC command to firmware on every call,
+but the link speed and QoS values it returns only change when the
+driver explicitly calls mana_set_bw_clamp(). This function is called
+not only by userspace via ethtool get_link_ksettings, but also
+periodically by hv_netvsc through netvsc_get_link_ksettings and by
+the sysfs speed_show attribute via dev_attr_show, resulting in
+unnecessary HWC traffic every few minutes.
 
+Add a link_cfg_error field to mana_port_context to cache the query
+result. The field uses three states: 1 (not yet queried, initial
+value set during mana_probe_port), 0 (success, speed/max_speed are
+valid), or a negative errno for permanent errors like -EOPNOTSUPP
+when the hardware does not support the command. Transient errors and
+qos_unconfigured responses are not cached so that subsequent calls
+will retry.
+
+MANA is ops-locked because it implements net_shaper_ops, so the core
+already takes netdev_lock() around all ethtool_ops and net_shaper_ops
+entry points. Reuse that lock to serialize mana_query_link_cfg() and
+mana_set_bw_clamp(). This prevents a concurrent mana_set_bw_clamp()
+from racing with an in-flight query and publishing stale pre-clamp
+speed/max_speed.
+
+Invalidate the cache inside mana_set_bw_clamp() on success, so all
+current and future callers that change the link configuration
+automatically trigger a fresh query on the next mana_query_link_cfg()
+call. Also reset link_cfg_error during resume in mana_probe() under
+netdev_lock(), so that any query already in flight cannot later
+store 0 and silently overwrite the post-resume invalidation.
+
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+---
+Changes in v2:
+* Use netdev_lock() instead of introducing new per-port mutex.
+* Update commit message.
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 23 +++++++++++++++----
+ include/net/mana/mana.h                       |  4 ++++
+ 2 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index db14357d3732..af2517a27aad 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1456,6 +1456,12 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+ 	struct mana_query_link_config_req req = {};
+ 	int err;
+ 
++	netdev_assert_locked(ndev);
++
++	err = apc->link_cfg_error;
++	if (err <= 0)
++		return err;
++
+ 	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_LINK_CONFIG,
+ 			     sizeof(req), sizeof(resp));
+ 
+@@ -1468,6 +1474,7 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+ 	if (err) {
+ 		if (err == -EOPNOTSUPP) {
+ 			netdev_info_once(ndev, "MANA_QUERY_LINK_CONFIG not supported\n");
++			apc->link_cfg_error = err;
+ 			return err;
+ 		}
+ 		netdev_err(ndev, "Failed to query link config: %d\n", err);
+@@ -1485,12 +1492,12 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+ 		return err;
+ 	}
+ 
+-	if (resp.qos_unconfigured) {
+-		err = -EINVAL;
+-		return err;
+-	}
++	if (resp.qos_unconfigured)
++		return -EINVAL;
++
+ 	apc->speed = resp.link_speed_mbps;
+ 	apc->max_speed = resp.qos_speed_mbps;
++	apc->link_cfg_error = 0;
+ 	return 0;
+ }
+ 
+@@ -1502,6 +1509,8 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+ 	struct net_device *ndev = apc->ndev;
+ 	int err;
+ 
++	netdev_assert_locked(ndev);
++
+ 	mana_gd_init_req_hdr(&req.hdr, MANA_SET_BW_CLAMP,
+ 			     sizeof(req), sizeof(resp));
+ 	req.vport = apc->port_handle;
+@@ -1535,6 +1544,8 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+ 	if (resp.qos_unconfigured)
+ 		netdev_info(ndev, "QoS is unconfigured\n");
+ 
++	/* Invalidate the cache; next query will re-fetch from firmware. */
++	apc->link_cfg_error = 1;
+ 	return 0;
+ }
+ 
+@@ -3448,6 +3459,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	apc->port_handle = INVALID_MANA_HANDLE;
+ 	apc->pf_filter_handle = INVALID_MANA_HANDLE;
+ 	apc->port_idx = port_idx;
++	apc->link_cfg_error = 1;
+ 	apc->cqe_coalescing_enable = 0;
+ 
+ 	mutex_init(&apc->vport_mutex);
+@@ -3768,6 +3780,9 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 			rtnl_lock();
+ 			apc = netdev_priv(ac->ports[i]);
+ 			enable_work(&apc->queue_reset_work);
++			netdev_lock(ac->ports[i]);
++			apc->link_cfg_error = 1;
++			netdev_unlock(ac->ports[i]);
+ 			err = mana_attach(ac->ports[i]);
+ 			rtnl_unlock();
+ 			/* Log the port for which the attach failed, stop
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index d9c27310fd04..2a45ff7211ef 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -555,6 +555,10 @@ struct mana_port_context {
+ 	u32 speed;
+ 	/* Maximum speed supported by the SKU (mbps) */
+ 	u32 max_speed;
++	/* 1 = not queried, 0 = cached success, negative = permanent error.
++	 * Protected by the netdev instance lock.
++	 */
++	int link_cfg_error;
+ 
+ 	bool port_is_up;
+ 	bool port_st_save; /* Saved port state */
 -- 
-Thanks,
-Sasha
+2.34.1
+
 
