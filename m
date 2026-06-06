@@ -1,243 +1,218 @@
-Return-Path: <netdev+bounces-296074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ULtVFU3KI2oXygEAu9opvQ
-	(envelope-from <netdev+bounces-296074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 09:20:45 +0200
+	id yN7KIyDQI2pBzQEAu9opvQ
+	(envelope-from <netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 09:45:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF60464CD19
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 09:20:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA61464CDD8
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 09:45:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=RAD1qRWe;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296074-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296074-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=J89U8wFJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EC6ED301083F
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 07:20:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0213301FA52
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 07:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5C426A08A;
-	Sat,  6 Jun 2026 07:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2689E30AACB;
+	Sat,  6 Jun 2026 07:45:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB7722F388;
-	Sat,  6 Jun 2026 07:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D752A2FD696
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 07:45:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780730438; cv=none; b=EFAOD5Hk2U2CGVqwoMa7x3qhWU1Vc4qcKt+UcDFD3wUyoJI8QCzWGXJLoMJlMGPonB1/anmQFJq1DGhe+HIvEZBo5WUWPQYVdNhVxrtwlF6IDeSb5d9VZsEuigVNRbPPfRCJomyPogWyu3pVRodcxuOrfizfmVoqWS6KjSVCK0A=
+	t=1780731934; cv=none; b=A2ghEz1e/agVjMYZYKcjCuzaiGNR8P9kIdM1YhnMktGyQGrorl1obNOgKtFfZ6lsKUKrgmlcFM7wdEVQe1RDh1nYBsCTbWbWnUlEzMY92LtOyZ0wfkOIPYRo/MtdluLSXhNUB8wExZRAgFHAkoUoMEvlPa9pkIL3ndDS1W0xtcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780730438; c=relaxed/simple;
-	bh=oLrCTrusbE1Dnnw5x61HR6wXcNqfs6DUM2PSApOo1rg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mUdXB4vFbEe3AvQipd0MK9PAiaDoqx+aZ+zqkslkokVgzBUpoyq+vPcu2E4aY35oNcnSlROJyWv0/kwephqGxAEyyL/uK6LkWVfaPf2TKvuy0jE6ecxqbY01KpxVzvmPvGu8V55ppz/dEhSTAysEgwKZHsHb/BwKXY1Vlcz2/lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RAD1qRWe; arc=none smtp.client-ip=198.175.65.12
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780730436; x=1812266436;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oLrCTrusbE1Dnnw5x61HR6wXcNqfs6DUM2PSApOo1rg=;
-  b=RAD1qRWecXCMvpvwVDOq59r7m/iqnejGXzdjKE0jAichHNpgK376QoTM
-   oBxWEhS+No/Cea3WOo0DojLKZq45hy50TKYCx4g6r8tuX3ujSJXCQXzxv
-   ugmWFxJAmDlKtS67dO7wEqWB3D8w846OVxuoIjwwo5foc3wNlMfUiNvuM
-   jvqcg+jI+BB29KDoc+PdqQRggBDVqQC1dSmTKNR5VaLneUnRoTsdAuSRh
-   kFcsBhcuuimb9A6U++D9QmEwD88i9hF9jHmIcc6frfKFxOM0bVUPswtCS
-   3AmdlO0u618hQER/rEZKBUPv78uYsgrO/L4xdIDnnFs6nZPtNDJvPl0cL
-   w==;
-X-CSE-ConnectionGUID: oojvUS7xQZ6zAJlTc+uUHw==
-X-CSE-MsgGUID: kZjLmR7tQW69Rd1UZdzKgA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11808"; a="93040148"
-X-IronPort-AV: E=Sophos;i="6.24,190,1774335600"; 
-   d="scan'208";a="93040148"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2026 00:20:35 -0700
-X-CSE-ConnectionGUID: XF/uVrspQyKHeQ4MdppY7g==
-X-CSE-MsgGUID: 2wq0+D3ZSgORxZGDxgERwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,190,1774335600"; 
-   d="scan'208";a="275258416"
-Received: from igk-lkp-server01.igk.intel.com (HELO 892db79562d4) ([10.211.93.152])
-  by orviesa002.jf.intel.com with ESMTP; 06 Jun 2026 00:20:33 -0700
-Received: from kbuild by 892db79562d4 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wVlKY-000000002nd-3jPK;
-	Sat, 06 Jun 2026 07:20:30 +0000
-Date: Sat, 6 Jun 2026 09:19:51 +0200
-From: kernel test robot <lkp@intel.com>
-To: Divya Mankani <divyakm@cs.unc.edu>, kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, horms@kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com,
-	Divya Mankani <divyakm@unc.edu>
-Subject: Re: [PATCH] vsock/virtio: fix memory leak in
- virtio_transport_recv_listen
-Message-ID: <202606060907.y54Wngh6-lkp@intel.com>
-References: <20260605191922.12720-1-divyakm@unc.edu>
+	s=arc-20240116; t=1780731934; c=relaxed/simple;
+	bh=v9RFj9MLdQbf0mLs20/N3qsqWDLSHOEx8cvUCHKQTcg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dWgadVykbVtTBQKkcEnDK4YdpSwq142W5E979gq+YW3XCDFm5tK/KvC8rUINSFouxK56V0tISEhBuFZplG319VcfUYPJKBZqvoByD9yIhJiAibFxVuDdIBrWEyK5fhRjNte1WvJ+XVJHfImfqJ07IjF7sf0VLg9jJ/eQZhDuo78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J89U8wFJ; arc=none smtp.client-ip=209.85.210.181
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-8423f1e2f8eso2134809b3a.1
+        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 00:45:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780731932; x=1781336732; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=soOeU2aKGw0sdOWk6ao9iMdkrGHwTA85Ix/Vj7V69uU=;
+        b=J89U8wFJwcO8RuLdKPnTH98kxRcTTEICOCldLhpAvX/wKWlfhYcHAhEbxxlLIcIYBH
+         ETi5mqDiA0Udop/A12zd4rZ0Er3Sq6eNrdOjXPb5AJ6M65N4dg3+JVEvwYmqluf8Z/FO
+         YkiBLWaBQThY4fm6vm9Q1ly/rGxpTNf1i84xHPvtVCUk46idUwzTiXyJ0kQY2yPN5fmC
+         x2mhUWHVF/LRAPv7M0E3p6V4xBBpubdlZOtlE3rp8y8q1QLhaUThTKz4qSE3cDCTnL0C
+         bGBayIImKC4ugrQGL6ByvloQU8aRuMWwW7iWcH2EQY6T0jH3zrHoOJeB7nhid2eeCrGh
+         pqlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780731932; x=1781336732;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=soOeU2aKGw0sdOWk6ao9iMdkrGHwTA85Ix/Vj7V69uU=;
+        b=hPYtMPy7ZQ3CD/xoTCblrVtky64cAQjD1EWSx6jWcAAlC2A4mYe+MQtFNRXR4pDFeN
+         07eMVyVJ/Ip1zfpBCXtX1xao4r+p7MF6OLG6WLhjxWG+j/1QtuQa5vN45Su8rek7bRD/
+         znainDhscp1QtRLIAx3HJPLC7GFT/D4upvlPWYNs8bjtVsuzeDQGsm5p6FvYM7lv5EUN
+         yntXNfDnBqEkpEuzKsycQYYUQo+2kpW9MVEsZ8eijXdBYWsBIRXKlHp1aoMrGO91VYpK
+         UY6bY0U1vUqRyV7NYcqUqZxCJl9nE7aaUD6LCXL2wpl8mlHapi4LDbQwtn0MjD5vBxOB
+         hp+Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9WmrK4Q/InmsC3hzoPMF8b8gPeNrWu5OyA/GpOEaE1AuwKBtYXdGAJ8aAFJa12ky68zkak6KA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznwKQ76KKcPABgmiaRctWst8iNwXCAGY+zo2veYD3Qc1k0Z4Up
+	etW7NIVwRcwOX+MSvQXaK/xhaKHGF/gCiOq6tWLptFfqpqqReRrwkRgE
+X-Gm-Gg: Acq92OH7rVxZvurmZK5Nvge8v+54Or/Mk70LCGeBVzbCmHQjXiVPW0qMU5ry4LbKQqi
+	v77Ge4vpV8Wb57CpSQXZxjImZcP/L86o02mqibvdUJONxpgv8Pmz62zyb3+t/SFE/4idNI0ALOt
+	Ihe8IHzNx6hA2OCtobVdPdIn40Zuy9ufqBzNPKHoXH7iBi7cEROAsIOgjr57nRQ4T8sMlqsg3GW
+	e+i6Bdi2WmFscJLqgDmmcUzDCAZeAdCQdUozsqVWiM/lV8kbqHcI6i3vALS4gcrqAOlfo0y4EEy
+	VzGQN6bfDM/erCE/kGjoRDzWjww1gy2qrKWMEXxWe3jwkxSHX6TWVjS1G/zxzX+TcRRj9N2crB2
+	ga2xvoSi+n9Lja0vMr39G2Ahq3d5mPnAs9RhDqefNDXI8vttBXsOn6R2aydHzTO9FaBTHRze9rc
+	lE3RG3xUZjOVctWac6bmoqFKVBJzkWZT+JrS4Nc6sgNVAzZahgIQ==
+X-Received: by 2002:a05:6a00:94d8:b0:832:e65:ddcd with SMTP id d2e1a72fcca58-842b0f4278cmr7095141b3a.45.1780731932077;
+        Sat, 06 Jun 2026 00:45:32 -0700 (PDT)
+Received: from Inspiron-14-5420.. ([2402:e280:21c6:671:13af:61e2:7096:38fb])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828821d0sm11350990b3a.28.2026.06.06.00.45.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jun 2026 00:45:31 -0700 (PDT)
+From: "Hemendra M. Naik" <hemendranaik@gmail.com>
+To: stephen@networkplumber.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	hemendranaik@gmail.com,
+	horms@kernel.org,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	tahiliani@nitk.edu.in,
+	vishy0777@gmail.com
+Subject: Re: [PATCH net-next 1/2] net/sched: sch_fq_pie: add per-flow statistics via class ops
+Date: Sat,  6 Jun 2026 13:14:32 +0530
+Message-Id: <20260606074432.22005-1-hemendranaik@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260531154149.592bb35f@phoenix.local>
+References: <20260531154149.592bb35f@phoenix.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260605191922.12720-1-divyakm@unc.edu>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296074-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:divyakm@cs.unc.edu,m:kuba@kernel.org,m:pabeni@redhat.com,m:oe-kbuild-all@lists.linux.dev,m:horms@kernel.org,m:virtualization@lists.linux.dev,m:kvm@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com,m:divyakm@unc.edu,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:davem@davemloft.net,m:edumazet@google.com,m:hemendranaik@gmail.com,m:horms@kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:tahiliani@nitk.edu.in,m:vishy0777@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,gmail.com,kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,redhat.com,nitk.edu.in];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296075-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,1b2c9c4a0f8708082678];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:from_mime,intel.com:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,01.org:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DF60464CD19
+X-Rspamd-Queue-Id: DA61464CDD8
 
-Hi Divya,
+On Sun, 31 May 2026 15:41:49 -0700, Stephen Hemminger wrote:
 
-kernel test robot noticed the following build warnings:
+> Sorry, you can't change the kernel/userspace ABI like this.
+> How will old iproute2 handle new kernel and vice/versa.
+>
+> The better safer way to do this is to either extend the
+> existing structure and have iproute2 know how how to handle
+> short (missing) class data; or use another netlink
+> type for class data.
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on linus/master v6.16-rc1 next-20260605]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Hello Stephen,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Divya-Mankani/vsock-virtio-fix-memory-leak-in-virtio_transport_recv_listen/20260606-032557
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-patch link:    https://lore.kernel.org/r/20260605191922.12720-1-divyakm%40unc.edu
-patch subject: [PATCH] vsock/virtio: fix memory leak in virtio_transport_recv_listen
-config: s390-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20260606/202606060907.y54Wngh6-lkp@intel.com/config)
-compiler: s390x-linux-gnu-gcc (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260606/202606060907.y54Wngh6-lkp@intel.com/reproduce)
+Apologies for breaking the ABI.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202606060907.y54Wngh6-lkp@intel.com/
+We've been working on two fixes along the lines of what you suggested.
 
-All warnings (new ones prefixed by >>):
+Approach #1
 
-   net/vmw_vsock/virtio_transport_common.c: In function 'virtio_transport_recv_listen':
->> net/vmw_vsock/virtio_transport_common.c:1538:13: warning: unused variable 'ret' [-Wunused-variable]
-    1538 |         int ret;
-         |             ^~~
->> net/vmw_vsock/virtio_transport_common.c:1535:28: warning: unused variable 'vsk' [-Wunused-variable]
-    1535 |         struct vsock_sock *vsk = vsock_sk(sk);
-         |                            ^~~
+Append type and the union after the original 9 fields rather than
+inserting them at the front:
 
+struct tc_fq_pie_xstats {
+__u32 packets_in;       /* offset  0, untouched */
+...
+__u32 memory_usage;     /* offset 32, untouched */
+__u32 type;             /* offset 36, new */
 
-vim +/ret +1538 net/vmw_vsock/virtio_transport_common.c
+```
+      union {
+              struct tc_fq_pie_cl_stats  class_stats;
+              struct tc_fq_pie_xqd_stats xqdisc_stats;
+      };
+```
 
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1528  
-06a8fc78367d07 Asias He           2016-07-28  1529  /* Handle server socket */
-06a8fc78367d07 Asias He           2016-07-28  1530  static int
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1531  virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1532  			     struct virtio_transport *t)
-06a8fc78367d07 Asias He           2016-07-28  1533  {
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1534  	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-06a8fc78367d07 Asias He           2016-07-28 @1535  	struct vsock_sock *vsk = vsock_sk(sk);
-06a8fc78367d07 Asias He           2016-07-28  1536  	struct vsock_sock *vchild;
-06a8fc78367d07 Asias He           2016-07-28  1537  	struct sock *child;
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14 @1538  	int ret;
-06a8fc78367d07 Asias He           2016-07-28  1539  
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1540  	if (le16_to_cpu(hdr->op) != VIRTIO_VSOCK_OP_REQUEST) {
-a69686327e4291 Bobby Eshleman     2026-01-21  1541  		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
-06a8fc78367d07 Asias He           2016-07-28  1542  		return -EINVAL;
-06a8fc78367d07 Asias He           2016-07-28  1543  	}
-06a8fc78367d07 Asias He           2016-07-28  1544  
-06a8fc78367d07 Asias He           2016-07-28  1545  	if (sk_acceptq_is_full(sk)) {
-a69686327e4291 Bobby Eshleman     2026-01-21  1546  		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
-06a8fc78367d07 Asias He           2016-07-28  1547  		return -ENOMEM;
-06a8fc78367d07 Asias He           2016-07-28  1548  	}
-06a8fc78367d07 Asias He           2016-07-28  1549  
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1550  	/* __vsock_release() might have already flushed accept_queue.
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1551  	 * Subsequent enqueues would lead to a memory leak.
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1552  	 */
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1553  	if (sk->sk_shutdown == SHUTDOWN_MASK) {
-a69686327e4291 Bobby Eshleman     2026-01-21  1554  		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1555  		return -ESHUTDOWN;
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1556  	}
-d7b0ff5a866724 Michal Luczaj      2024-11-07  1557  
-b9ca2f5ff7784d Stefano Garzarella 2019-11-14  1558  	child = vsock_create_connected(sk);
-06a8fc78367d07 Asias He           2016-07-28  1559  	if (!child) {
-a69686327e4291 Bobby Eshleman     2026-01-21  1560  		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
-06a8fc78367d07 Asias He           2016-07-28  1561  		return -ENOMEM;
-06a8fc78367d07 Asias He           2016-07-28  1562  	}
-06a8fc78367d07 Asias He           2016-07-28  1563  
-06a8fc78367d07 Asias He           2016-07-28  1564  	lock_sock_nested(child, SINGLE_DEPTH_NESTING);
-06a8fc78367d07 Asias He           2016-07-28  1565  
-3b4477d2dcf270 Stefan Hajnoczi    2017-10-05  1566  	child->sk_state = TCP_ESTABLISHED;
-06a8fc78367d07 Asias He           2016-07-28  1567  
-06a8fc78367d07 Asias He           2016-07-28  1568  	vchild = vsock_sk(child);
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1569  	vsock_addr_init(&vchild->local_addr, le64_to_cpu(hdr->dst_cid),
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1570  			le32_to_cpu(hdr->dst_port));
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1571  	vsock_addr_init(&vchild->remote_addr, le64_to_cpu(hdr->src_cid),
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1572  			le32_to_cpu(hdr->src_port));
-06a8fc78367d07 Asias He           2016-07-28  1573  
-b09fac3ae8b655 Divya Mankani      2026-06-06  1574  	/* Lock the parent listener socket to synchronize with a potential
-b09fac3ae8b655 Divya Mankani      2026-06-06  1575  	 * simultaneous shutdown thread running __vsock_release().
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1576  	 */
-b09fac3ae8b655 Divya Mankani      2026-06-06  1577  	lock_sock(sk);
-b09fac3ae8b655 Divya Mankani      2026-06-06  1578  
-b09fac3ae8b655 Divya Mankani      2026-06-06  1579  	/* Check if the listener socket was shut down while we were
-b09fac3ae8b655 Divya Mankani      2026-06-06  1580  	 * creating and configuring the child socket.
-b09fac3ae8b655 Divya Mankani      2026-06-06  1581  	 */
-b09fac3ae8b655 Divya Mankani      2026-06-06  1582  	if (sk->sk_shutdown == SHUTDOWN_MASK) {
-b09fac3ae8b655 Divya Mankani      2026-06-06  1583  		release_sock(sk);
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1584  		release_sock(child);
-a69686327e4291 Bobby Eshleman     2026-01-21  1585  		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1586  		sock_put(child);
-b09fac3ae8b655 Divya Mankani      2026-06-06  1587  		return -ESHUTDOWN;
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1588  	}
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1589  
-52bcb57a4e8a08 Dudu Lu            2026-04-13  1590  	sk_acceptq_added(sk);
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1591  	if (virtio_transport_space_update(child, skb))
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1592  		child->sk_write_space(child);
-c0cfa2d8a788fc Stefano Garzarella 2019-11-14  1593  
-06a8fc78367d07 Asias He           2016-07-28  1594  	vsock_insert_connected(vchild);
-06a8fc78367d07 Asias He           2016-07-28  1595  	vsock_enqueue_accept(sk, child);
-71dc9ec9ac7d3e Bobby Eshleman     2023-01-13  1596  	virtio_transport_send_response(vchild, skb);
-06a8fc78367d07 Asias He           2016-07-28  1597  
-b09fac3ae8b655 Divya Mankani      2026-06-06  1598  	/* Safely release both locked objects */
-b09fac3ae8b655 Divya Mankani      2026-06-06  1599  	release_sock(sk);
-06a8fc78367d07 Asias He           2016-07-28  1600  	release_sock(child);
-06a8fc78367d07 Asias He           2016-07-28  1601  
-06a8fc78367d07 Asias He           2016-07-28  1602  	sk->sk_data_ready(sk);
-06a8fc78367d07 Asias He           2016-07-28  1603  	return 0;
-06a8fc78367d07 Asias He           2016-07-28  1604  }
-06a8fc78367d07 Asias He           2016-07-28  1605  
+};
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+tc_fq_pie_xqd_stats is currently empty. It acts as a placeholder for
+future qdisc stats if needed.
+
+With this layout, older iproute2 versions receiving the new 64-byte
+blob still see RTA_PAYLOAD(64) >= sizeof(36) and read the original
+fields correctly since offsets 0-35 remain unchanged.
+
+Conversely, newer iproute2 versions receiving the old 36-byte blob
+take the memcpy path into a zeroed local struct, type defaults to 0
+(QDISC), and execution falls back to the qdisc stats path.
+
+Approach #2
+
+Leave struct tc_fq_pie_xstats unchanged and export class stats
+separately as an NLA blob via gnet_stats_copy_app():
+
+enum {
+TCA_FQ_PIE_XSTATS_UNSPEC,
+TCA_FQ_PIE_XSTATS_TYPE,
+TCA_FQ_PIE_XSTATS_CL_PROB,
+TCA_FQ_PIE_XSTATS_CL_DELAY,
+TCA_FQ_PIE_XSTATS_CL_AVG_DQ_RATE,
+...
+};
+
+Adding any new stat, class or qdisc, is just a new enum entry and one
+nla_put() call. Old iproute2 sees an unknown TYPE and skips it
+gracefully via the default case. No struct versioning, no size math.
+
+Let us know which approach you'd prefer, or if there's another
+approach you think would work better, and we'll send a revised patch
+accordingly.
+
+Thanks,
+Hemendra
+
 
