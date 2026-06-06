@@ -1,258 +1,604 @@
-Return-Path: <netdev+bounces-296096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kxvzBfP3I2rx0gEAu9opvQ
-	(envelope-from <netdev+bounces-296096-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 12:35:31 +0200
+	id gKYbEPv/I2o81QEAu9opvQ
+	(envelope-from <netdev+bounces-296097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 13:09:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F4664D19F
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 12:35:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC1C64D266
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 13:09:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=outlook.com header.s=selector1 header.b="oB/uDkBQ";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296096-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296096-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=outlook.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=yeah.net header.s=s110527 header.b=AdKnHzaq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296097-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296097-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=yeah.net;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7A7E9301B93E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 10:35:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83E093019F26
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 11:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C97384228;
-	Sat,  6 Jun 2026 10:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D54430C63A;
+	Sat,  6 Jun 2026 11:09:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazolkn19012068.outbound.protection.outlook.com [52.103.14.68])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2863C382F1E;
-	Sat,  6 Jun 2026 10:35:24 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780742126; cv=fail; b=shXOZMOXC2xO7X8jVLlEd2hz94e5epJz07DOlStZIw8bOBdru0g9vRE+vX6QKUwMb3UbmJo1z5bc+tkXXgzPp8yuVZ5Y/LSDverChlWNy7m8SnuF7BM6/L6WCphqHYIKIfqCM0m0P64s+/WFBkDctVrwP0nmFWvhXCVm5tidSNM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780742126; c=relaxed/simple;
-	bh=z3EMxlVyW33syzMzVFpyHHpnE6lUA7Bez3PwfNrEvSM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=azKymWZq3zR8A/i2ntGcs0CsUiROfLrP2yQbJ0iT5gOwB73QQ+0dufCCuSMqxuWbg7xdZtPud8CDEb85vG5QTS6UDrcDEBzhC0kOdVdyxK+NovBvA6prN+7julUxV9VWwA3lSLUl69LZ3gNQ0A6YB/aAfpRJBEXJsDww5ajtdOs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=oB/uDkBQ; arc=fail smtp.client-ip=52.103.14.68
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eRUIYTk0MbGI84W1Ls/ysEAsuXq6ILOkNzImsacpSRuHWTYY8PrR9pcRl4rTV65o4mmAw/fbPoRx2Pi9iP8TazDnO9PkXnNliShjQ6K8CbVVW/MJRX80ddIwUxdLIPQCitdo/e/clZkTkGi79iNiklHVQyTyMi0I+CxyQKPWI2VdTDMtCJWBb2kk7Q7HwrnEG9mED1sB5jaFX0D0jP8HW+9PGyZJBuwJjUHH6hAp9Fn0OdH8tZA+/Uh5AYfTJrcwJ3Tx5ihKEZGNuX9OwoviB/DWIicrCI4qgs84p3BqB9nI+bQljvzC8Ls1Qw6cqS/SCQyIdZ4g7vVaVcuQN5gvEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9kGL0Q+WxXtzzdixAU2U0TU8i+mfTvtgqewXRXNFDPI=;
- b=saCujehGeeceiolXyJjbGrj189tvxG24MYQblCXOldi4j+jBmGZwQUO4bZMRg16b32NjBu75UWJnmKWI4jizKywyV8Xz9xlRUbEfKtf3ETwLJlflwxg5jrsweHzKZuGZxt2GwxoaneabDfxvn3GL4AjQ8goJFAhl3/0blKCG/nMKkho+O/BRjs6yNUM3mHTzsq29hkSk+lmJzz1o9pnJFabMhQjo+1L6BqpylDG7jQ7aJ8xJYtQxL6GufkAG3mnbXX3love4Bc3a3zbRMFNl1KAKVPxphmj92pv0rm1BQGvlff8GkBSoyynNw/lokNdIVR2c2WOfsyNCkobqkA6yjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9kGL0Q+WxXtzzdixAU2U0TU8i+mfTvtgqewXRXNFDPI=;
- b=oB/uDkBQzdNsIeSOZF1Dzi62pEQxyNaxqnGC7W0RcxxUw8k6EAzlZ4flOm2kh699mjYDIrAvXegOf2INtOfRB+Yw0AG91oDqnXLoec8b4gv5vcT7IrKUxjG4G3Gp8zlR/2+LYWqFonF/tyX/XG5lMl17xP65nIzZGk2duRIMHhnkRd1sONNbvvTci2vCcYI1knkWsIcKpi+O0j75bkFWhBIIKHyt0K21bFUJS1iw4cLHGxFCz1bwyUQRt0JhA8CjpMZrTzQnCbVrxOshIvEco+7XPRIJiqgdN8D18SxzdVU4aMs4U/5vng953dXzdD96gFCgxc+vtTLUXZG6Mv/EKw==
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
- by DM4PR19MB5978.namprd19.prod.outlook.com (2603:10b6:8:6a::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.8; Sat, 6 Jun 2026
- 10:35:22 +0000
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0092.007; Sat, 6 Jun 2026
- 10:35:22 +0000
-Message-ID:
- <SN7PR19MB6736B93ECA27FAB6A990B5539D1E2@SN7PR19MB6736.namprd19.prod.outlook.com>
-Date: Sat, 6 Jun 2026 14:35:13 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/4] net: phy: at803x: add RX and TX clock management
- for IPQ5018 PHY
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org
-References: <20260605-ipq5018-gephy-clocks-v3-0-f232d9ca0966@outlook.com>
- <20260605-ipq5018-gephy-clocks-v3-4-f232d9ca0966@outlook.com>
- <36cd63f4-749e-4b09-b8a6-cbf6924dea88@lunn.ch>
- <SN7PR19MB673634FEEF98FB8BCBBB15979D112@SN7PR19MB6736.namprd19.prod.outlook.com>
- <471a21f2-7ab0-410c-861d-5722a94b127d@lunn.ch>
- <SN7PR19MB67363B4F852FB37071637A299D112@SN7PR19MB6736.namprd19.prod.outlook.com>
- <afdced5b-73b9-4214-a94a-c13fadd39dce@lunn.ch>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <afdced5b-73b9-4214-a94a-c13fadd39dce@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0008.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:26::12) To SN7PR19MB6736.namprd19.prod.outlook.com
- (2603:10b6:806:263::12)
-X-Microsoft-Original-Message-ID:
- <a80aedb2-bdd8-4e61-8ca4-f8a660f43e07@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFF61D9A5F
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 11:09:38 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780744183; cv=none; b=nFPl8Y+GkBEqBAMQQMPQsOvNZzb+EgYSn7wpNfAsLpInO8vBurZLBmPCq8hKjzjwvHsrxfO7AmUbkWf8j2qn2AhdpHkB/8FGvfg7pRBJtRkqusRQ40wGXN6a+PyMnRj/yrXMFxeJMIr1ek5fpYnBtpDu86DqXPr8/G2IsCDgDRw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780744183; c=relaxed/simple;
+	bh=dh9igelg836az/IVn8wESN9bBustg5UCL5KUIn2e+ZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cBOFtliiXqaKtYT8/tS7ktKHSicVAudCVabfebYJitSJpt/4e8NMfwuOKrQzfkfNY3yt+eNrvVRGjJyyaX05p2s/WcKHpcxLXM1p6svLyOGV7f/g4E+jkE4D+xvOxxJpgmUxp7JdvcEdn3MFA8Q4hVOtOio9BfCpP+910dsKpRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=AdKnHzaq; arc=none smtp.client-ip=220.197.32.17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=r4RHCTLof2VW08KiazDOQce2cjLcGT4EQ+sFu6atOdk=;
+	b=AdKnHzaqYS8ZOzfrVnoXFAaWW7ZfaNt1KW6R4XaURRXvuGbpuoVzVtSxIPmsQI
+	H4vWwkTel/nk0q9zGDwFZLEzXQTilIqWnxeu2UkR24O8cagGi2UrdoSkfWJkeSly
+	y+3igd6hVlMfR+37EGdj5Hhfw5Zuxnn6pXPAGj/A6v4yE=
+Received: from [100.70.220.18] (unknown [])
+	by gzsmtp2 (Coremail) with UTF8SMTPA id Ms8vCgA3d8fY_iNqcrTDAQ--.17312S2;
+	Sat, 06 Jun 2026 19:04:57 +0800 (CST)
+Message-ID: <99caeafd-edf5-44a4-8742-4eada5d0f5d1@yeah.net>
+Date: Sat, 6 Jun 2026 19:04:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|DM4PR19MB5978:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5480384f-3406-4a4f-627e-08dec3b74ffe
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|24021099003|37011999003|51005399006|5072599009|19110799012|23021999003|15080799012|8060799015|12121999013|6090799003|40105399003|3412199025|440099028;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?c3JrSVUzTmxWU2s0TVMweXp1ZllWb1pXeWVFRzZyS0d5UlRHa2dUb1VWWUor?=
- =?utf-8?B?aWEyaVFRdjNyV3F0R3lRWWYxcjRCT3JYZk4rd21GenBycGRmdmlSNVNZNFJi?=
- =?utf-8?B?QXBybDBPc2tGeks2dUFvaCtVdmdVbmIrNHdSS3M2WjQ0eU1ka0VqQWUvV1dw?=
- =?utf-8?B?cnlnM2JZZkkrVFNmWG5leEhIa2orOEVqRzI0eUpPZG9BbUprMmljaW9NM3R5?=
- =?utf-8?B?ZWNlU3gzcmYxOWo1SnUyRzd6NUFFRVFlMWpVMEo1TXNvZ2RDR05ITzZwVGo0?=
- =?utf-8?B?WEpXaXB5bVNWeVVUZWN0UTh1WExzVXFYNTBVcWRhK3didlN4dXZSbDVJK3hJ?=
- =?utf-8?B?eEZ4T0xacjFOZUlqVUtkSU1VdGZLTUU4MVo3cWcwZmRBdldLYllGMVhMR0l3?=
- =?utf-8?B?ZVoycTlPcGNKUzVXeVlLSzc4TlFMNW00TlZnVEd0RlIwZG1ENG9hQTlxa3Iw?=
- =?utf-8?B?bEFGQThRNTVNK2JZUHFXWEpPY0x5RDZ0QTdvbStHQnlZOWI3TGxjekw5UUJK?=
- =?utf-8?B?SUpDWU4wK0hWRWNwQmtaT1U0aXArcTRySFc0TGtBQXEwdEUwWnNqVU5uVkc3?=
- =?utf-8?B?TElCd3FtMDNKd0cranNZRjNtMlpRSWJuclBFRGszYUVpRzBZNkJyaW4ycDgz?=
- =?utf-8?B?RU9Fc3lqUGE3YTNlWXJaclQreVpQRUZ3aDFMbTM0cWcvNVZ3ODd3UjhoOFht?=
- =?utf-8?B?SW1ZbGExM3NvVm1JZERZVzBOQXdnRW4xQ2VZeUpiTURUdFJnTkNSOEd1ZWFB?=
- =?utf-8?B?a2hRNklRcitjNzRkU0lldEZFeDFORzQ0QUxVdGtRYXNIWDVIMkZ5cmhUb3Ez?=
- =?utf-8?B?M0JYQUdpZUs1eU5LYSt6N3F3VTVOMktsNytyajJCdW16NkRSNzlldGErc1JU?=
- =?utf-8?B?QlpNWDQ3MVVTZFp2TUdjN2h2cStteUdYbkRoMm5VZVo2dFNWVWt2WlBDZ1Uy?=
- =?utf-8?B?WnpHck1aamZpem9nVC9MRFlIL0lNRUwyeit0R1JwRmhKaVRIZGNIMHBLQlFW?=
- =?utf-8?B?d3JJVzdTWnVxMHhlSUg3aHhDbWxiMHBqNDNqaXlDcjN4OE94OU12S3N5ZDN3?=
- =?utf-8?B?enc5T29GY09xaWk0UkFFKzBlVWhrejNuMXB5L250bmI2RTlBOG04WmtPWVpF?=
- =?utf-8?B?WHg2eHRacWRKTEt5ekdTMWZDMkRuTmNteHp6Y1FWYWFVVzA3bktsWDk1T0hh?=
- =?utf-8?B?VDNXMFBNUmZJSVF1anZvL0RmWHZHOXRoUHU0MGVPTGQ0YTlBakp1ckIyaGND?=
- =?utf-8?B?ZkwybXY0S0xrY3RmTytlL3RsWjdxY01XQ3hHL1pkVUtvZlJUd1lDcDVIMVdU?=
- =?utf-8?B?K29jTzRHYjdtV1Z1eldnZUQzdVlGOW5oV0Z4RG93Q1BoVVhrNUhKK2VIaXZL?=
- =?utf-8?B?dGxqc2UrSVB0UlE9PQ==?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bU56ZHcxNEQ1d3lQaTlQcW11dVZwcklBZEtaaGozVjZhcmhPV0RaVytmbm03?=
- =?utf-8?B?MG8vZlNlWW1naEVNNGcrVmhvZTErOFJOcDg5dUFNQTZySklwWW9VT2VuNVJE?=
- =?utf-8?B?ZXNpRGJRV3VzWWg4UGYycThwMWdBYUZQODVhMjVNaS85RTNMOHlUd1JKeVo0?=
- =?utf-8?B?cnk0U3VQdmwxWFpJZmZ6QllyaXhVck83YmhHMEtPd2g5eTBhU2Jra2JhdDRD?=
- =?utf-8?B?KzQyT2pyK0dDOVFhVnFZeXo4NzJzdjg0S2ZCRXR1UGhMNnZucmlnQnhaYjV0?=
- =?utf-8?B?UjM4NUV0Tjc3Z2haY29sUE5pQUdaa0lQSWxnRXN5VEdUSDFYcnNJeS9RZ2pL?=
- =?utf-8?B?VkFjNzRHb2I3eC9qRmw3TDRmWCtUT01KcGVLckVJQjE4dTdXbWkrdVF0cURQ?=
- =?utf-8?B?NmdYbWxrTUVwRjNBblRDWnU3bmJOb1B0NFEwMEIxazZZeXkxVmI2YlhYYVF1?=
- =?utf-8?B?K2diTzZlL1dHdkY5ZU9yRVFnRTkwSVZ5aGoyU0RvYVc4N3BSM3hwUjhGTEFH?=
- =?utf-8?B?WGowREN4RTNNVFlHWHMweGVKUkFNaStNb3REckE4akhRU0ZEZDljYWlMQ0pS?=
- =?utf-8?B?VGNlSHF6cW5NTXlPYnRkcWNJdzhxRkRteHpuMHJWTE1VY3JacEZOaXRnanNs?=
- =?utf-8?B?eWdwejJ0azkvT3oyeEd1L1AzQW85Y1BYOVFIVk9KWFdhU2l3cFVpSktmOTNF?=
- =?utf-8?B?OWZ4V3FENUNlRHk4WC9Ka0ViM3VSbjdsRmRXTVg2VEdXK2tLKzJqRCtvUzhD?=
- =?utf-8?B?VzdxcDdWaVdiK29YQlgxRUExU3dYL2ZMZ2VkRTlGWUo0dHBhRjdvRVNyN0hP?=
- =?utf-8?B?bTE3V2FzcDJiSTdVUzduN2tIQ2FmV3pWbXROUXg2bXViUWdPRzl3Sk5OamUv?=
- =?utf-8?B?Qk14U0NuNnlBdnQ4c005Nmg4dW5aY3RJMEo1c2VtU0V1VlpHdGRMVGc1c29m?=
- =?utf-8?B?RFRZV2Z6WHRnODdkMjAra3VpcEQxQ1JTWG10K2FaVVA4TDNlMEFRZ0RrRStn?=
- =?utf-8?B?b0tSc1VObkVvbUx5dmUwMC9nS0hvSUFMdVlQdlE1M0lMQW1KYmNNbnpaSnV0?=
- =?utf-8?B?UXF6VHExQ2tOUCtoSG9HWGhXZGY0YnNOemp2THd5MmxDb3Vzb25KL3ljSGZw?=
- =?utf-8?B?MVltdFd4ZkIvMzZ1dUUrYUgzdWpBU3dRb1dxMGQ2K1BJMFNxUGYwdEM2VmNn?=
- =?utf-8?B?R2RyYXBaRW0yekQ2b0R1VlVOdVpqZXhZMnlnSFNZbUsyZUtpMkZZVktvcVVO?=
- =?utf-8?B?M04xMW40TC9hU2taQ01PNG9ya3g3T21FU000T1hzUExmUCtuQUR6bjhRbzh6?=
- =?utf-8?B?TUdGM3dmdU1yRHJ0SUJZV3NDYjNBYTNjSEhtRlBqUlYyYTBZRDViQytXTEFF?=
- =?utf-8?B?bDNTS0RjR3BkVyt5VjdveGRpdTd5bG5TcVVrMjZWcytXeTB5TzdxMlBKVTg0?=
- =?utf-8?B?ZEJqbEh2VTlYTldJaFZjcVBkaS9WQ1pHYkhvNVBMS0ZaRlB2SGhHNDJJMHBN?=
- =?utf-8?B?ZEN0V1FzUkp6dUdObUd5SFFhWFNBaTIwaTF5NGx1dFNTaDRlU0VNbUN2UzdI?=
- =?utf-8?B?dytnaHdjVWxyMWI2czBWaXBhNTQyakZaYldZdFpZbTdZSnlpVVFQN3VwUmFY?=
- =?utf-8?B?WkV6UUEycFdWWWM2aUFzMXhKV21HQ0tjV3dBQ09mOGlJdDZ0NXRJa1YzV2Nr?=
- =?utf-8?B?dzFTdUJzaGNRdSttSEl4TzhWbFE2SEpvQWNDdVN3VVhjSkY5KzV1dERTSjZ0?=
- =?utf-8?B?dzVPeFdIVWRNSXd0QUhsY3M3TFRnS0tOVTlkaTB6RkUzS01BNm5EeXg1Wjg3?=
- =?utf-8?B?NTlFMjArbjdtM2p0ZFNVaWp3Q2FhSjZPT2xRWmRJSUhXNU9ORkFIZEp5QWlP?=
- =?utf-8?B?QXEwdG1GRWFqd3NGd2NlQkpEYXlMQkQzRFByODlxdUNyRkE9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5480384f-3406-4a4f-627e-08dec3b74ffe
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2026 10:35:22.6628
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR19MB5978
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: secure_seq: add back ports to TS offset
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willy Tarreau <w@1wt.eu>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Zhouyan Deng <dengzhouyan_nwpu@163.com>, Florian Westphal <fw@strlen.de>
+References: <20260302205527.1982836-1-edumazet@google.com>
+From: xietangxin <xietangxin@yeah.net>
+In-Reply-To: <20260302205527.1982836-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:Ms8vCgA3d8fY_iNqcrTDAQ--.17312S2
+X-Coremail-Antispam: 1Uf129KBjvAXoWfJw4rAFyUKrWkJw1DWFyDZFb_yoW8Ar13Ko
+	Wxt3WFyr1rtr13Jay2kr1fJa90vws5KF4Yqr4kKrsxuanFv345Ar4fKa1rAa12qw4rtFs5
+	uFy8J3y0vw4IvFWfn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4RJUUUUUUUU
+X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiORpZjWoj-toG+gAA3m
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
-	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	URL_NUMERIC_IP(1.50)[10.0.0.1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:konrad.dybcio@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[outlook.com];
-	FORGED_MUA_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296097-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_FROM(0.00)[yeah.net];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:w@1wt.eu,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:dengzhouyan_nwpu@163.com,m:fw@strlen.de,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296096-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,oss.qualcomm.com];
-	DKIM_TRACE(0.00)[outlook.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[yeah.net:+];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,1wt.eu,vger.kernel.org,gmail.com,163.com,strlen.de];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:from_mime,outlook.com:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,yeah.net:mid,yeah.net:from_mime,yeah.net:dkim,strlen.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 81F4664D19F
+X-Rspamd-Queue-Id: ECC1C64D266
 
-On 6/5/26 22:14, Andrew Lunn wrote:
->>>> This PHY is integrated into the IPQ5018 SoC, connected to the first GMAC
->>>> (GMAC0) and probed upon boot. However, this PHY is not used on all
->>>> boards because an external PHY or switch can be wired to the SoC's
->>>> second GMAC instead (through a PCS). So from a power management
->>>> perspective, it would be better if we can disable the clocks if there's
->>>> no link detected.
->>>
->>> Humm, is link the correct criteria? If the PHY is not used,
->>> .config_aneg should not be called. Why not have the probe method get
->>> the optional clocks, but leave them off. When .config_aneg is called
->>> for the first time, enable the clocks?
->>
->> Will check if config_aneg is called and test accordingly.
->>
->> ip link set eth0 up/down and cable (un)plug do trigger
->> link_change_notify, and based on the link state the RX/TX clocks are
->> turned off/on properly.
-> 
-> You are talking about something else here. You say the device is not
-> used. If it is not used, .config_aneg should not be called.
-> 
-> This is a second use case, the device is used, and you want to limit
-> the power it consumes, when there is no link. Do you have any numbers?
-> How much power is actually saved?
 
-I've given it some more thought, I think it's best we just use
-devm_clk_get_enabled on both clocks during probe. For devices that don't
-use the PHY, we can disable it in the device tree and we don't have to
-store the clocks in the priv. It makes it much simpler. Would you agree
-with that approach?
 
+On 3/3/2026 4:55 AM, Eric Dumazet wrote:
+> This reverts 28ee1b746f49 ("secure_seq: downgrade to per-host timestamp offsets")
 > 
->> Could you explain why to use _optional variants of devm_clk_get as these
->> clocks are required? There are currently no users upstream.
+> tcp_tw_recycle went away in 2017.
 > 
-> This last bit is important. We don't want to cause regressions on
-> existing systems by adding in requirements which were not there in the
-> past. But if you say there are currently no users, that is fine.
+> Zhouyan Deng reported off-path TCP source port leakage via
+> SYN cookie side-channel that can be fixed in multiple ways.
 > 
-> 	Andrew
+> One of them is to bring back TCP ports in TS offset randomization.
+> 
+> As a bonus, we perform a single siphash() computation
+> to provide both an ISN and a TS offset.
+> 
+> Fixes: 28ee1b746f49 ("secure_seq: downgrade to per-host timestamp offsets")
+> Reported-by: Zhouyan Deng <dengzhouyan_nwpu@163.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Florian Westphal <fw@strlen.de>
+> ---
+>  include/net/secure_seq.h | 45 ++++++++++++++++++----
+>  include/net/tcp.h        |  6 ++-
+>  net/core/secure_seq.c    | 80 +++++++++++++++-------------------------
+>  net/ipv4/syncookies.c    | 11 ++++--
+>  net/ipv4/tcp_input.c     |  8 +++-
+>  net/ipv4/tcp_ipv4.c      | 37 +++++++++----------
+>  net/ipv6/syncookies.c    | 11 ++++--
+>  net/ipv6/tcp_ipv6.c      | 37 +++++++++----------
+>  8 files changed, 127 insertions(+), 108 deletions(-)
+> 
+> diff --git a/include/net/secure_seq.h b/include/net/secure_seq.h
+> index cddebafb9f779ebd5d9c02e8ff26c13b5697c7d1..6f996229167b3c3f7861b2d5693ef81b5eed0d74 100644
+> --- a/include/net/secure_seq.h
+> +++ b/include/net/secure_seq.h
+> @@ -5,16 +5,47 @@
+>  #include <linux/types.h>
+>  
+>  struct net;
+> +extern struct net init_net;
+> +
+> +union tcp_seq_and_ts_off {
+> +	struct {
+> +		u32 seq;
+> +		u32 ts_off;
+> +	};
+> +	u64 hash64;
+> +};
+>  
+>  u64 secure_ipv4_port_ephemeral(__be32 saddr, __be32 daddr, __be16 dport);
+>  u64 secure_ipv6_port_ephemeral(const __be32 *saddr, const __be32 *daddr,
+>  			       __be16 dport);
+> -u32 secure_tcp_seq(__be32 saddr, __be32 daddr,
+> -		   __be16 sport, __be16 dport);
+> -u32 secure_tcp_ts_off(const struct net *net, __be32 saddr, __be32 daddr);
+> -u32 secure_tcpv6_seq(const __be32 *saddr, const __be32 *daddr,
+> -		     __be16 sport, __be16 dport);
+> -u32 secure_tcpv6_ts_off(const struct net *net,
+> -			const __be32 *saddr, const __be32 *daddr);
+> +union tcp_seq_and_ts_off
+> +secure_tcp_seq_and_ts_off(const struct net *net, __be32 saddr, __be32 daddr,
+> +			  __be16 sport, __be16 dport);
+> +
+> +static inline u32 secure_tcp_seq(__be32 saddr, __be32 daddr,
+> +				 __be16 sport, __be16 dport)
+> +{
+> +	union tcp_seq_and_ts_off ts;
+> +
+> +	ts = secure_tcp_seq_and_ts_off(&init_net, saddr, daddr,
+> +				       sport, dport);
+> +
+> +	return ts.seq;
+> +}
+> +
+> +union tcp_seq_and_ts_off
+> +secure_tcpv6_seq_and_ts_off(const struct net *net, const __be32 *saddr,
+> +			    const __be32 *daddr,
+> +			    __be16 sport, __be16 dport);
+> +
+> +static inline u32 secure_tcpv6_seq(const __be32 *saddr, const __be32 *daddr,
+> +				   __be16 sport, __be16 dport)
+> +{
+> +	union tcp_seq_and_ts_off ts;
+> +
+> +	ts = secure_tcpv6_seq_and_ts_off(&init_net, saddr, daddr,
+> +					 sport, dport);
+>  
+> +	return ts.seq;
+> +}
+>  #endif /* _NET_SECURE_SEQ */
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index eb8bf63fdafc3243469f293fd06aef0ce086c5a4..978eea2d5df04f378dceb251025bee3101120f69 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -43,6 +43,7 @@
+>  #include <net/dst.h>
+>  #include <net/mptcp.h>
+>  #include <net/xfrm.h>
+> +#include <net/secure_seq.h>
+>  
+>  #include <linux/seq_file.h>
+>  #include <linux/memcontrol.h>
+> @@ -2464,8 +2465,9 @@ struct tcp_request_sock_ops {
+>  				       struct flowi *fl,
+>  				       struct request_sock *req,
+>  				       u32 tw_isn);
+> -	u32 (*init_seq)(const struct sk_buff *skb);
+> -	u32 (*init_ts_off)(const struct net *net, const struct sk_buff *skb);
+> +	union tcp_seq_and_ts_off (*init_seq_and_ts_off)(
+> +					const struct net *net,
+> +					const struct sk_buff *skb);
+>  	int (*send_synack)(const struct sock *sk, struct dst_entry *dst,
+>  			   struct flowi *fl, struct request_sock *req,
+>  			   struct tcp_fastopen_cookie *foc,
+> diff --git a/net/core/secure_seq.c b/net/core/secure_seq.c
+> index 9a39656804513dcef0888d280d8289913ef27eea..6a6f2cda5aaef82074718439920c75a75592e967 100644
+> --- a/net/core/secure_seq.c
+> +++ b/net/core/secure_seq.c
+> @@ -20,7 +20,6 @@
+>  #include <net/tcp.h>
+>  
+>  static siphash_aligned_key_t net_secret;
+> -static siphash_aligned_key_t ts_secret;
+>  
+>  #define EPHEMERAL_PORT_SHUFFLE_PERIOD (10 * HZ)
+>  
+> @@ -28,11 +27,6 @@ static __always_inline void net_secret_init(void)
+>  {
+>  	net_get_random_once(&net_secret, sizeof(net_secret));
+>  }
+> -
+> -static __always_inline void ts_secret_init(void)
+> -{
+> -	net_get_random_once(&ts_secret, sizeof(ts_secret));
+> -}
+>  #endif
+>  
+>  #ifdef CONFIG_INET
+> @@ -53,28 +47,9 @@ static u32 seq_scale(u32 seq)
+>  #endif
+>  
+>  #if IS_ENABLED(CONFIG_IPV6)
+> -u32 secure_tcpv6_ts_off(const struct net *net,
+> -			const __be32 *saddr, const __be32 *daddr)
+> -{
+> -	const struct {
+> -		struct in6_addr saddr;
+> -		struct in6_addr daddr;
+> -	} __aligned(SIPHASH_ALIGNMENT) combined = {
+> -		.saddr = *(struct in6_addr *)saddr,
+> -		.daddr = *(struct in6_addr *)daddr,
+> -	};
+> -
+> -	if (READ_ONCE(net->ipv4.sysctl_tcp_timestamps) != 1)
+> -		return 0;
+> -
+> -	ts_secret_init();
+> -	return siphash(&combined, offsetofend(typeof(combined), daddr),
+> -		       &ts_secret);
+> -}
+> -EXPORT_IPV6_MOD(secure_tcpv6_ts_off);
+> -
+> -u32 secure_tcpv6_seq(const __be32 *saddr, const __be32 *daddr,
+> -		     __be16 sport, __be16 dport)
+> +union tcp_seq_and_ts_off
+> +secure_tcpv6_seq_and_ts_off(const struct net *net, const __be32 *saddr,
+> +			    const __be32 *daddr, __be16 sport, __be16 dport)
+>  {
+>  	const struct {
+>  		struct in6_addr saddr;
+> @@ -87,14 +62,20 @@ u32 secure_tcpv6_seq(const __be32 *saddr, const __be32 *daddr,
+>  		.sport = sport,
+>  		.dport = dport
+>  	};
+> -	u32 hash;
+> +	union tcp_seq_and_ts_off st;
+>  
+>  	net_secret_init();
+> -	hash = siphash(&combined, offsetofend(typeof(combined), dport),
+> -		       &net_secret);
+> -	return seq_scale(hash);
+> +
+> +	st.hash64 = siphash(&combined, offsetofend(typeof(combined), dport),
+> +			    &net_secret);
+> +
+> +	if (READ_ONCE(net->ipv4.sysctl_tcp_timestamps) != 1)
+> +		st.ts_off = 0;
+> +
+> +	st.seq = seq_scale(st.seq);
+> +	return st;
+>  }
+> -EXPORT_SYMBOL(secure_tcpv6_seq);
+> +EXPORT_SYMBOL(secure_tcpv6_seq_and_ts_off);
+>  
+>  u64 secure_ipv6_port_ephemeral(const __be32 *saddr, const __be32 *daddr,
+>  			       __be16 dport)
+> @@ -118,33 +99,30 @@ EXPORT_SYMBOL(secure_ipv6_port_ephemeral);
+>  #endif
+>  
+>  #ifdef CONFIG_INET
+> -u32 secure_tcp_ts_off(const struct net *net, __be32 saddr, __be32 daddr)
+> -{
+> -	if (READ_ONCE(net->ipv4.sysctl_tcp_timestamps) != 1)
+> -		return 0;
+> -
+> -	ts_secret_init();
+> -	return siphash_2u32((__force u32)saddr, (__force u32)daddr,
+> -			    &ts_secret);
+> -}
+> -
+>  /* secure_tcp_seq_and_tsoff(a, b, 0, d) == secure_ipv4_port_ephemeral(a, b, d),
+>   * but fortunately, `sport' cannot be 0 in any circumstances. If this changes,
+>   * it would be easy enough to have the former function use siphash_4u32, passing
+>   * the arguments as separate u32.
+>   */
+> -u32 secure_tcp_seq(__be32 saddr, __be32 daddr,
+> -		   __be16 sport, __be16 dport)
+> +union tcp_seq_and_ts_off
+> +secure_tcp_seq_and_ts_off(const struct net *net, __be32 saddr, __be32 daddr,
+> +			  __be16 sport, __be16 dport)
+>  {
+> -	u32 hash;
+> +	u32 ports = (__force u32)sport << 16 | (__force u32)dport;
+> +	union tcp_seq_and_ts_off st;
+>  
+>  	net_secret_init();
+> -	hash = siphash_3u32((__force u32)saddr, (__force u32)daddr,
+> -			    (__force u32)sport << 16 | (__force u32)dport,
+> -			    &net_secret);
+> -	return seq_scale(hash);
+> +
+> +	st.hash64 = siphash_3u32((__force u32)saddr, (__force u32)daddr,
+> +				 ports, &net_secret);
+> +
+> +	if (READ_ONCE(net->ipv4.sysctl_tcp_timestamps) != 1)
+> +		st.ts_off = 0;
+> +
+> +	st.seq = seq_scale(st.seq);
+> +	return st;
+>  }
+> -EXPORT_SYMBOL_GPL(secure_tcp_seq);
+> +EXPORT_SYMBOL_GPL(secure_tcp_seq_and_ts_off);
+>  
+>  u64 secure_ipv4_port_ephemeral(__be32 saddr, __be32 daddr, __be16 dport)
+>  {
+> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> index 061751aabc8e16c5d536a19f7b920d1bca2b0f4f..fc3affd9c8014b1d4e9f161421a7753717cdcd73 100644
+> --- a/net/ipv4/syncookies.c
+> +++ b/net/ipv4/syncookies.c
+> @@ -378,9 +378,14 @@ static struct request_sock *cookie_tcp_check(struct net *net, struct sock *sk,
+>  	tcp_parse_options(net, skb, &tcp_opt, 0, NULL);
+>  
+>  	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+> -		tsoff = secure_tcp_ts_off(net,
+> -					  ip_hdr(skb)->daddr,
+> -					  ip_hdr(skb)->saddr);
+> +		union tcp_seq_and_ts_off st;
+> +
+> +		st = secure_tcp_seq_and_ts_off(net,
+> +					       ip_hdr(skb)->daddr,
+> +					       ip_hdr(skb)->saddr,
+> +					       tcp_hdr(skb)->dest,
+> +					       tcp_hdr(skb)->source);
+> +		tsoff = st.ts_off;
+>  		tcp_opt.rcv_tsecr -= tsoff;
+>  	}
+>  
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 7b03f2460751f366dd6cf15505e49ae26cd6466e..cba89733d1216bc2663758b4bda21984835e6055 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -7646,6 +7646,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+>  	const struct tcp_sock *tp = tcp_sk(sk);
+>  	struct net *net = sock_net(sk);
+>  	struct sock *fastopen_sk = NULL;
+> +	union tcp_seq_and_ts_off st;
+>  	struct request_sock *req;
+>  	bool want_cookie = false;
+>  	struct dst_entry *dst;
+> @@ -7715,9 +7716,12 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+>  	if (!dst)
+>  		goto drop_and_free;
+>  
+> +	if (tmp_opt.tstamp_ok || (!want_cookie && !isn))
+> +		st = af_ops->init_seq_and_ts_off(net, skb);
+> +
+>  	if (tmp_opt.tstamp_ok) {
+>  		tcp_rsk(req)->req_usec_ts = dst_tcp_usec_ts(dst);
+> -		tcp_rsk(req)->ts_off = af_ops->init_ts_off(net, skb);
+> +		tcp_rsk(req)->ts_off = st.ts_off;
+>  	}
+>  	if (!want_cookie && !isn) {
+>  		int max_syn_backlog = READ_ONCE(net->ipv4.sysctl_max_syn_backlog);
+> @@ -7739,7 +7743,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+>  			goto drop_and_release;
+>  		}
+>  
+> -		isn = af_ops->init_seq(skb);
+> +		isn = st.seq;
+>  	}
+>  
+>  	tcp_ecn_create_request(req, skb, sk, dst);
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index d53d39be291a5750af3ab2a160b35f0f8a28ff9d..56c0db955177edd3fdd04d26d6cd07b5e379e7bc 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -104,17 +104,14 @@ static DEFINE_PER_CPU(struct sock_bh_locked, ipv4_tcp_sk) = {
+>  
+>  static DEFINE_MUTEX(tcp_exit_batch_mutex);
+>  
+> -static u32 tcp_v4_init_seq(const struct sk_buff *skb)
+> +static union tcp_seq_and_ts_off
+> +tcp_v4_init_seq_and_ts_off(const struct net *net, const struct sk_buff *skb)
+>  {
+> -	return secure_tcp_seq(ip_hdr(skb)->daddr,
+> -			      ip_hdr(skb)->saddr,
+> -			      tcp_hdr(skb)->dest,
+> -			      tcp_hdr(skb)->source);
+> -}
+> -
+> -static u32 tcp_v4_init_ts_off(const struct net *net, const struct sk_buff *skb)
+> -{
+> -	return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->saddr);
+> +	return secure_tcp_seq_and_ts_off(net,
+> +					 ip_hdr(skb)->daddr,
+> +					 ip_hdr(skb)->saddr,
+> +					 tcp_hdr(skb)->dest,
+> +					 tcp_hdr(skb)->source);
+>  }
+>  
+>  int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+> @@ -326,15 +323,16 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr_unsized *uaddr, int addr_len
+>  	rt = NULL;
+>  
+>  	if (likely(!tp->repair)) {
+> +		union tcp_seq_and_ts_off st;
+> +
+> +		st = secure_tcp_seq_and_ts_off(net,
+> +					       inet->inet_saddr,
+> +					       inet->inet_daddr,
+> +					       inet->inet_sport,
+> +					       usin->sin_port);
+>  		if (!tp->write_seq)
+> -			WRITE_ONCE(tp->write_seq,
+> -				   secure_tcp_seq(inet->inet_saddr,
+> -						  inet->inet_daddr,
+> -						  inet->inet_sport,
+> -						  usin->sin_port));
+> -		WRITE_ONCE(tp->tsoffset,
+> -			   secure_tcp_ts_off(net, inet->inet_saddr,
+> -					     inet->inet_daddr));
+> +			WRITE_ONCE(tp->write_seq, st.seq);
+> +		WRITE_ONCE(tp->tsoffset, st.ts_off);
+>  	}
+>  
+>  	atomic_set(&inet->inet_id, get_random_u16());
+> @@ -1676,8 +1674,7 @@ const struct tcp_request_sock_ops tcp_request_sock_ipv4_ops = {
+>  	.cookie_init_seq =	cookie_v4_init_sequence,
+>  #endif
+>  	.route_req	=	tcp_v4_route_req,
+> -	.init_seq	=	tcp_v4_init_seq,
+> -	.init_ts_off	=	tcp_v4_init_ts_off,
+> +	.init_seq_and_ts_off	=	tcp_v4_init_seq_and_ts_off,
+>  	.send_synack	=	tcp_v4_send_synack,
+>  };
+>  
+> diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+> index 7e007f013ec827c99bcab4ceb85eb35e9242b439..4f6f0d751d6c533231ca0397319935dc90ba4dba 100644
+> --- a/net/ipv6/syncookies.c
+> +++ b/net/ipv6/syncookies.c
+> @@ -151,9 +151,14 @@ static struct request_sock *cookie_tcp_check(struct net *net, struct sock *sk,
+>  	tcp_parse_options(net, skb, &tcp_opt, 0, NULL);
+>  
+>  	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+> -		tsoff = secure_tcpv6_ts_off(net,
+> -					    ipv6_hdr(skb)->daddr.s6_addr32,
+> -					    ipv6_hdr(skb)->saddr.s6_addr32);
+> +		union tcp_seq_and_ts_off st;
+> +
+> +		st = secure_tcpv6_seq_and_ts_off(net,
+> +						 ipv6_hdr(skb)->daddr.s6_addr32,
+> +						 ipv6_hdr(skb)->saddr.s6_addr32,
+> +						 tcp_hdr(skb)->dest,
+> +						 tcp_hdr(skb)->source);
+> +		tsoff = st.ts_off;
+>  		tcp_opt.rcv_tsecr -= tsoff;
+>  	}
+>  
+> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> index e46a0efae01235ae7430ed268b92cb47309b8d28..5d95f9ab86973777c29399348adcc4b07e98d2b4 100644
+> --- a/net/ipv6/tcp_ipv6.c
+> +++ b/net/ipv6/tcp_ipv6.c
+> @@ -104,18 +104,14 @@ static void inet6_sk_rx_dst_set(struct sock *sk, const struct sk_buff *skb)
+>  	}
+>  }
+>  
+> -static u32 tcp_v6_init_seq(const struct sk_buff *skb)
+> +static union tcp_seq_and_ts_off
+> +tcp_v6_init_seq_and_ts_off(const struct net *net, const struct sk_buff *skb)
+>  {
+> -	return secure_tcpv6_seq(ipv6_hdr(skb)->daddr.s6_addr32,
+> -				ipv6_hdr(skb)->saddr.s6_addr32,
+> -				tcp_hdr(skb)->dest,
+> -				tcp_hdr(skb)->source);
+> -}
+> -
+> -static u32 tcp_v6_init_ts_off(const struct net *net, const struct sk_buff *skb)
+> -{
+> -	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->daddr.s6_addr32,
+> -				   ipv6_hdr(skb)->saddr.s6_addr32);
+> +	return secure_tcpv6_seq_and_ts_off(net,
+> +					   ipv6_hdr(skb)->daddr.s6_addr32,
+> +					   ipv6_hdr(skb)->saddr.s6_addr32,
+> +					   tcp_hdr(skb)->dest,
+> +					   tcp_hdr(skb)->source);
+>  }
+>  
+>  static int tcp_v6_pre_connect(struct sock *sk, struct sockaddr_unsized *uaddr,
+> @@ -319,14 +315,16 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr_unsized *uaddr,
+>  	sk_set_txhash(sk);
+>  
+>  	if (likely(!tp->repair)) {
+> +		union tcp_seq_and_ts_off st;
+> +
+> +		st = secure_tcpv6_seq_and_ts_off(net,
+> +						 np->saddr.s6_addr32,
+> +						 sk->sk_v6_daddr.s6_addr32,
+> +						 inet->inet_sport,
+> +						 inet->inet_dport);
+>  		if (!tp->write_seq)
+> -			WRITE_ONCE(tp->write_seq,
+> -				   secure_tcpv6_seq(np->saddr.s6_addr32,
+> -						    sk->sk_v6_daddr.s6_addr32,
+> -						    inet->inet_sport,
+> -						    inet->inet_dport));
+> -		tp->tsoffset = secure_tcpv6_ts_off(net, np->saddr.s6_addr32,
+> -						   sk->sk_v6_daddr.s6_addr32);
+> +			WRITE_ONCE(tp->write_seq, st.seq);
+> +		tp->tsoffset = st.ts_off;
+>  	}
+>  
+>  	if (tcp_fastopen_defer_connect(sk, &err))
+> @@ -816,8 +814,7 @@ const struct tcp_request_sock_ops tcp_request_sock_ipv6_ops = {
+>  	.cookie_init_seq =	cookie_v6_init_sequence,
+>  #endif
+>  	.route_req	=	tcp_v6_route_req,
+> -	.init_seq	=	tcp_v6_init_seq,
+> -	.init_ts_off	=	tcp_v6_init_ts_off,
+> +	.init_seq_and_ts_off	= tcp_v6_init_seq_and_ts_off,
+>  	.send_synack	=	tcp_v6_send_synack,
+>  };
+>  
+Hi Eric and netdev,
 
+I noticed a significant TCP performance regression (QPS drop) when using
+iptables MASQUERADE with the `--random-fully` option, and I have bisected
+it down to commit 165573e41f2f66ef98940cf65f838b2cb575d9d1
+(tcp: secure_seq: add back ports to TS offset).
+
+Here is the benchmark environment and test results.
+Environment:
+- Client & Server: 2 VMs
+- Server: Nginx listening on port 80 (HTTP), and ip 10.0.0.1
+- Benchmark tool: wrk (short-lived connections with "Connection: close")
+
+Test Commands
+1. With random-fully:
+   # iptables -t nat -A POSTROUTING -d 10.0.0.1 -p tcp --dport 80 -j MASQUERADE --random-fully
+   # wrk -t8 -c200 -H "Connection: close" -d10s --latency http://10.0.0.1:80
+2. Without random-fully:
+   # iptables -t nat -A POSTROUTING -d 10.0.0.1 -p tcp --dport 80 -j MASQUERADE
+   # wrk -t8 -c200 -H "Connection: close" -d10s --latency http://10.0.0.1:80
+
+Test Results (QPS):
+1. Parent Commit (7f083faf59d14c04e01ec05a7507f036c965acf8):
+   - with random-fully:    18145.74, 15006.39, 15716.67
+   - without random-fully: 18556.36, 16339.22, 21506.02
+
+2. Bad Commit (165573e41f2f66ef98940cf65f838b2cb575d9d1):
+   - with random-fully:    11074.76, 10383.20, 10164.81  <-- (~35% drop)
+   - without random-fully: 17310.75, 20279.85, 18399.48
+
+Is this performance degradation an expected side-effect of the security fix,
+or is there any sysctl param we should tune when `--random-fully` is
+required for high-concurrency short connections?
+
+Looking forward to your insights.
+
+
+-- 
 Best regards,
-George
+Tangxin Xie
+
 
