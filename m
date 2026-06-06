@@ -1,181 +1,164 @@
-Return-Path: <netdev+bounces-296156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id p60ICJWFJGqv7wEAu9opvQ
-	(envelope-from <netdev+bounces-296156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 22:39:49 +0200
+	id Yg5tLAOIJGok8QEAu9opvQ
+	(envelope-from <netdev+bounces-296157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 22:50:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEAE864E509
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 22:39:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1110364E563
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 22:50:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JiETHX0M;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296156-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296156-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b="BfkIR/JI";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296157-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296157-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5AE71307BC00
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 20:34:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 083A23016CAE
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 20:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36ED2DC798;
-	Sat,  6 Jun 2026 20:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9351C24E4C6;
+	Sat,  6 Jun 2026 20:48:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA9530EF94
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 20:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629CA2B9BA
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 20:48:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780778048; cv=none; b=DNYbwdfq9ZsE3WnP63plc52qu4e7XOuJ5KSYFbDld+1MpbYohOSPDaltrasDNhH8XrGtluuKTX/b+iAEQR38TPpSsPkmjYpR1Z53VbyNdmY93kWuwom9JtI8Og8RX7jjTtRq4zc7JCcLOpWeuvW44BFcXJ55K7Gkb/MV9xOVJ84=
+	t=1780778931; cv=none; b=GPcxva5yqO7o79rLWBhUWu0HDDj4zqQlKQf4ORCJ7TcmWMIWHT880d/cUaiJgTWzNg/eHgFs/NPL0DvDHq1skVqxT5R9bfp3K31Sx8yIDV+m3w16c4+xjPJejruvQasns5WzDWNKr+hHwHiYX9NXV+kycZ2CDbohPRRu4UAnL7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780778048; c=relaxed/simple;
-	bh=KZfgjYV0I+8RaYIW8rTryt4IF3AwZYO8MCxZBeKc3kw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YcS7p5HNs1K+hWp17pKNPvmo5pZKaJduvfjTZnccmJZ9oKj55ipa2xTyM2c8yQOB+3w8J349hXvzN70pGbxKnTpqhCrdxRODS16RgcDalWWO6q2Pm45rpDOD/8RPltbd/dQy645NE/BtubAfx10s4QshdsGvAaJdmz3qMctANMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JiETHX0M; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4906869f0cbso36219605e9.1
-        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 13:34:07 -0700 (PDT)
+	s=arc-20240116; t=1780778931; c=relaxed/simple;
+	bh=oQ0GMYpzLA0ExoHEEVjvS7y2GApzRxeda1nTkzMkPe4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sKNXBrQ9dZwv8cVyIP2jTpAeyM1fkKBxfMphKdPzfQ/o5B20LFBL+CadaaPZXoJpp688elIS6buL8EIs28U3RR+sxxnETtLU7UPZM5GXac2UtTJKtD8UmBJvFUw9iZh9duIuNU4G2E6mTcmo+sSyWd4jnL315aeYzuD3XNk1nc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BfkIR/JI; arc=none smtp.client-ip=209.85.214.201
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2bf30576aa3so20650545ad.3
+        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 13:48:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780778045; x=1781382845; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WixW9hwBnhDlhC+Gdp2bGWzDhW7ze8+rpM+LOh8QrUk=;
-        b=JiETHX0MZYQNfcCihTX03Pxe1E+9dNo94N/WgNwcxDgNdupqoSDIWtvZ0ZNh1j0uCQ
-         xHMFTbh9PpXkeLYG2NNaPKEEvcUPYXDhPxzeoE9/52d33yQAbxr8eG1OIvG36ZGQYfdq
-         nCkwNQAzKH4X7zWxzlyACYMgUbQt36eLbxJY18QL4ZkbYQRTcCz07xVK0BrJw8wf4KYq
-         JD1QB/q23sIVxnIgxDEVpFkUZGoWBiV704+vpMp4wHgb9BaOmoeZ7npc9Yd8q3gCb5Mj
-         CUS/d+eD8pqM7Bli/2DMLjf+I64vdCetcr+6TElImf6ouU77T95QmKmCdUe2ToWNfHZd
-         lJxQ==
+        d=google.com; s=20251104; t=1780778930; x=1781383730; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ICwtIk1WTVsl9deJp7rsqib5Y+9mGMqCg0Kkl+P2DeA=;
+        b=BfkIR/JIi/TWkxXHDomYpedwl8ouzWk9y62JQ4ZnXIuwULZv6gPZEa67Pcg5coPQEP
+         ugZU0mRqSkmzktCegS5mNWaIc4csi7RzeiBJbCIiahWblkhcjYcwn+LWVlf7N9uplf5S
+         wgTReLY73vqrqp1cxIv83UsPWCiLVpa1c/qkrjZFvwX/ZrhaU+0zj2rXup+4k9n8gvcz
+         UuVoJlXF2gQDdt3Ry6DVJI4zFLpmhICzKkpvWnY58DRf5uIDTXEBbw6JJf6/37Fs4RQG
+         VtYl8N8QpcmQ2PPHl50BDKsMFSl7EhOUD40aTIESyvOubKn8hXpXGPbXSO9OTqM/HgbX
+         U0eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780778045; x=1781382845;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WixW9hwBnhDlhC+Gdp2bGWzDhW7ze8+rpM+LOh8QrUk=;
-        b=MXAzOa/Ce1dgiVyY1jMuAv9Uj5s7TJVcj+lKbWZxANgPvxO+ciG+r42L7BjSYmgC3D
-         micFSdPp1MSwLhD5+YTnxFr8J415VEiSAolWBdaCedBu3TNO5AEZeCYdzNgls5bj3iNM
-         TRqVoC5nP/JLkFEERSWm9VBLBZz6g2B8t9hFbVGsi56Xjifn78j7w3ORUxXxttj0XDcX
-         Uc19y/5r22Qw4rhJ7HaTIhM3CeiG7yOtfd+MkE6651tqJ+4zAEVGjUUVT1Qsnq6g1tpU
-         44aVX75q2IpvQLy0vPR2C+Lw43yJCmbq3TMig3bNhJ4L1cRAxt+j4m1p+1i9Fy/NWLlb
-         30kw==
-X-Gm-Message-State: AOJu0Yxca+UezrW8uhrUHzMpvAg50YmxyJlwSo+/2XgGmlGPvBvunrVT
-	F3WbhlrYX2EQL1dgmyIYdykI3vCVHRECy0TrTN15Mt3QKzIYkVDIyy/GTHUiG3gz
-X-Gm-Gg: Acq92OF/4K/bvYCsGRgRkDMsgKej6uEiObZ02ifvEbJkVbQ+jMxPfPAbSE7flw3oDPV
-	Hx2T/69YjwpO8cuUpBkYp1ZWJdoqcz6pDEW+edoQy5STZ2x/odTTMx9jFkClkodQSrQcmZVnbk3
-	KQVh3VZNCbRqptvYLT1WW6+d0ZF3QL2dC5/SN5jiEDTHv1gxeX3NCO33VmqfPSxg4KMOglXAfnp
-	vc35fY0S9/KAT90ZlVuLzEQfJo5Hd2v7nPKOGZxi5NlHRz5uYdSU1UHuZj1MHUOlaahuafZX/uo
-	Nr9/d9cn1yFg1WMXpe4rujKq+ym+n6M3EIR1RaNhM7kFRiuPe1qZJ0bFy68T8s7tOzk5m1RpmUS
-	pRnXu2OQl3U6TwJUjo7vzjJYK3MVvhLBls5ShxIkxaYxdSm2X1yFMZ1KTxfJZWozJABGbS7SL03
-	rz6P4mWVyYDw3+/HPJBUsW4hPSQ7luXZDoODRHKTH5yDkqlABehkaaRhbUULQUnjRaiMbcWquKx
-	YMObNSC2z6IOo7V8w1zI9XxWCq1pjiRELxYZqEhm9GAfkAiqV4+iEdLSPqevXPHCsPN9hQ=
-X-Received: by 2002:a05:600c:4fc9:b0:490:b8c0:d474 with SMTP id 5b1f17b1804b1-490c25eee06mr146206745e9.14.1780778045349;
-        Sat, 06 Jun 2026 13:34:05 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f4a:1a00:ac2e:7640:d3:7bd5? (p200300ea8f4a1a00ac2e764000d37bd5.dip0.t-ipconnect.de. [2003:ea:8f4a:1a00:ac2e:7640:d3:7bd5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3cc0f8sm255109875e9.8.2026.06.06.13.34.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Jun 2026 13:34:04 -0700 (PDT)
-Message-ID: <18427976-e075-4a36-bd67-22e4fa5792ab@gmail.com>
-Date: Sat, 6 Jun 2026 22:34:03 +0200
+        d=1e100.net; s=20251104; t=1780778930; x=1781383730;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ICwtIk1WTVsl9deJp7rsqib5Y+9mGMqCg0Kkl+P2DeA=;
+        b=kDEl+pLVUydXxTmJLAKO+n8rlSlxzn6/6Cju3MKivemqokuZg8f82qjgc/tCdo0GMK
+         rOeP6GfDhzLFrFlSvlslkABx+Z6AmEIluFUq1J82TbnGhEFaBTRf1DYwdBhxwH/sk7W1
+         ntR3iTSQow9TzIo68jqAkS5pHjSq4EC5q+its2iZnIyWmEV770+cwv8xcurKpudKX8tC
+         HXu/vusBkmObZ2cT3kQwTje21pDWjgcLPkd1YMXlfy1Rjegj1IGAnHV115QH8c6ZcOqc
+         M/Qdzmry0Ctsyvp9wRj5BZAi/SsoSoCOivv3R5lOmCVWzyWlqp8vWXxQQz9hEVNsw3uB
+         GEHg==
+X-Forwarded-Encrypted: i=1; AFNElJ8TAHz5mIYhIhJl6DXZ/7yeCp950i8yVqabrs3/eppkpIw4iWd2arVfSRV4RJqt3MkN9Mo4rHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6wymiZiMSobPEm5D+UbzJ4fjGxWUOZ+UzBcLYZSOJCjCFqnIK
+	BML5uMwU8pp+vE1GlAdU4IqfH/49D8CpoA+QtjWNV/o/l7gRXg7PekkY6xonaKNvDOnKVJmTzGG
+	5Cb19uw==
+X-Received: from plbmt6.prod.google.com ([2002:a17:903:b06:b0:2bf:1803:8eec])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b84:b0:2bf:23c3:34ba
+ with SMTP id d9443c01a7336-2c1e833c207mr101294465ad.28.1780778929490; Sat, 06
+ Jun 2026 13:48:49 -0700 (PDT)
+Date: Sat,  6 Jun 2026 20:48:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug 221606] r8169: PCIe AER errors and recovery failure after
- recent driver changes
-To: Javen <javen_xu@realsil.com.cn>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "lasse@lgb.dk" <lasse@lgb.dk>
-References: <bug-221606-201211@https.bugzilla.kernel.org/>
- <bug-221606-201211-LMiiKJhHhg@https.bugzilla.kernel.org/>
- <b1bda1da-8231-4f05-94a7-7511041ae489@gmail.com>
- <9b206f58d93b48d194980374cf0da7b1@realsil.com.cn>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <9b206f58d93b48d194980374cf0da7b1@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
+Message-ID: <20260606204848.1987046-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next] geneve: Move udp_conf.local_ip6 under CONFIG_IPV6
+ in geneve_create_sock().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-296156-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:netdev@vger.kernel.org,m:lasse@lgb.dk,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296157-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:lkp@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,intel.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AEAE864E509
+X-Rspamd-Queue-Id: 1110364E563
 
-On 04.06.2026 11:01, Javen wrote:
->> On 03.06.2026 09:44, bugzilla-daemon@kernel.org wrote:
->>> https://bugzilla.kernel.org/show_bug.cgi?id=221606
->>>
->>> --- Comment #2 from lasse@lgb.dk ---
->>> Commit 9ab94a32af704fa9c873094283ae8744a07baf25 (r8169: enable LTR
->>> support) seems to be the issue. Running the commit before this doesn't
->>> give me any AER errors and everything seems to behave normally.
->>>
->> Bisecting the reported issue points to one of your commits.
->> Could you please check with the user?
-> 
-> Hi, Heiner, Lasse
-> 
-> Thanks for reporting this issue.
-> 
-> Currently, we haven't received any similar reports from our customers, and I am unable to reproduce this AER error on my local test platforms.
-> 
-> Could you please provide some more detailed information? The full dmesg log will help me check the exact AER error messages and the boot context. Also the output of sudo lspci -vvv. I need this to check the exact platform information, PCIe topology, and the LTR/ASPM capabilities of both your Root Port and the Realtek NIC.
-> 
-> While reviewing the initialization flow, I noticed a potential logic contradiction. If rtl_aspm_is_safe(tp) returns false, the driver disables L1 at the PCIe core level, but tp->aspm_manageable might still be set to true. This could cause the driver to incorrectly enable ASPM/LTR in the MAC registers later, creating a hardware state mismatch (PCIe L1 disabled, but MAC LTR enabled) which usually leads to AER.
+Unlike struct ip_tunnel_key, struct udp_port_cfg does not always
+define IPv6 address fields.
 
-rtl_aspm_is_safe() just changes the default and doesn't disable L1 at driver load.
-Note that even if L1 gets disabled at driver load, the user can still re-enable L1
-using standard PCI sysfs attributes (w/o r8169 driver being notified).
-Therefore driver must not make any assumption on state of L1.
+  >> drivers/net/geneve.c:778:12: error: no member named 'local_ip6' in 'struct udp_port_cfg'
+       778 |                 udp_conf.local_ip6 = info->key.u.ipv6.src;
+           |                 ~~~~~~~~ ^
 
-The hardware state mismatch you mention should be prevented by the hardware itself.
-PCI standard registers in the chip know whether L1 is enabled, and chip should
-prevent any unsafe PCIe bus activity (independent of ASPM/LTR setting).
+Let's add CONFIG_IPV6 guard in geneve_create_sock().
 
-> 
-> Could you please test if the following patch fixes the AER error on your side?
-> 
-> -	if (enable && tp->aspm_manageable) {
-> +	if (enable && tp->aspm_manageable && rtl_aspm_is_safe(tp)) {
-> 
-> Thanks,
-> BRs,
-> Javen
+Fixes: afabbb56a726 ("geneve: Introduce IFLA_GENEVE_LOCAL and IFLA_GENEVE_LOCAL6.")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202606070019.yx2LhZPU-lkp@intel.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ drivers/net/geneve.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index a60e16bbb2c9..23b42466a7c9 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -771,12 +771,15 @@ static struct sock *geneve_create_sock(struct net *net,
+ 
+ 	memset(&udp_conf, 0, sizeof(udp_conf));
+ 
++#if IS_ENABLED(CONFIG_IPV6)
+ 	if (ipv6) {
+ 		udp_conf.family = AF_INET6;
+ 		udp_conf.ipv6_v6only = 1;
+ 		udp_conf.use_udp6_rx_checksums = geneve->cfg.use_udp6_rx_checksums;
+ 		udp_conf.local_ip6 = info->key.u.ipv6.src;
+-	} else {
++	} else
++#endif
++	{
+ 		udp_conf.family = AF_INET;
+ 		udp_conf.local_ip.s_addr = info->key.u.ipv4.src;
+ 	}
+-- 
+2.54.0.1032.g2f8565e1d1-goog
 
 
