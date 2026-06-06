@@ -1,218 +1,178 @@
-Return-Path: <netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296076-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yN7KIyDQI2pBzQEAu9opvQ
-	(envelope-from <netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 09:45:36 +0200
+	id 8tKJLjPUI2rvzQEAu9opvQ
+	(envelope-from <netdev+bounces-296076-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:02:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA61464CDD8
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 09:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DDE764CE22
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:02:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=J89U8wFJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296075-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=padl.com header.s=default header.b="F75/otmZ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296076-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296076-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=padl.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A0213301FA52
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 07:45:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23E0530238F0
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 08:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2689E30AACB;
-	Sat,  6 Jun 2026 07:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C77330BF67;
+	Sat,  6 Jun 2026 08:02:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us.padl.com (us.padl.com [216.154.215.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D752A2FD696
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 07:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93A826ED5D;
+	Sat,  6 Jun 2026 08:02:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780731934; cv=none; b=A2ghEz1e/agVjMYZYKcjCuzaiGNR8P9kIdM1YhnMktGyQGrorl1obNOgKtFfZ6lsKUKrgmlcFM7wdEVQe1RDh1nYBsCTbWbWnUlEzMY92LtOyZ0wfkOIPYRo/MtdluLSXhNUB8wExZRAgFHAkoUoMEvlPa9pkIL3ndDS1W0xtcE=
+	t=1780732964; cv=none; b=YtWC80nF6HXHuEDBo12H55LDE7W7zIHApScIATt/wxchAHYK6YV5gEkjeS7CMls31fInuEt7EClx45tpEyF6C/aDHzTEO3kj95VSS5gDh9bDEgnLf+y3uBJDuf74GN3yQr+K2e+pmfFKz2WEeffMT5TvdD5syf6kL9yYt5S1m6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780731934; c=relaxed/simple;
-	bh=v9RFj9MLdQbf0mLs20/N3qsqWDLSHOEx8cvUCHKQTcg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dWgadVykbVtTBQKkcEnDK4YdpSwq142W5E979gq+YW3XCDFm5tK/KvC8rUINSFouxK56V0tISEhBuFZplG319VcfUYPJKBZqvoByD9yIhJiAibFxVuDdIBrWEyK5fhRjNte1WvJ+XVJHfImfqJ07IjF7sf0VLg9jJ/eQZhDuo78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J89U8wFJ; arc=none smtp.client-ip=209.85.210.181
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-8423f1e2f8eso2134809b3a.1
-        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 00:45:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780731932; x=1781336732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=soOeU2aKGw0sdOWk6ao9iMdkrGHwTA85Ix/Vj7V69uU=;
-        b=J89U8wFJwcO8RuLdKPnTH98kxRcTTEICOCldLhpAvX/wKWlfhYcHAhEbxxlLIcIYBH
-         ETi5mqDiA0Udop/A12zd4rZ0Er3Sq6eNrdOjXPb5AJ6M65N4dg3+JVEvwYmqluf8Z/FO
-         YkiBLWaBQThY4fm6vm9Q1ly/rGxpTNf1i84xHPvtVCUk46idUwzTiXyJ0kQY2yPN5fmC
-         x2mhUWHVF/LRAPv7M0E3p6V4xBBpubdlZOtlE3rp8y8q1QLhaUThTKz4qSE3cDCTnL0C
-         bGBayIImKC4ugrQGL6ByvloQU8aRuMWwW7iWcH2EQY6T0jH3zrHoOJeB7nhid2eeCrGh
-         pqlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780731932; x=1781336732;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=soOeU2aKGw0sdOWk6ao9iMdkrGHwTA85Ix/Vj7V69uU=;
-        b=hPYtMPy7ZQ3CD/xoTCblrVtky64cAQjD1EWSx6jWcAAlC2A4mYe+MQtFNRXR4pDFeN
-         07eMVyVJ/Ip1zfpBCXtX1xao4r+p7MF6OLG6WLhjxWG+j/1QtuQa5vN45Su8rek7bRD/
-         znainDhscp1QtRLIAx3HJPLC7GFT/D4upvlPWYNs8bjtVsuzeDQGsm5p6FvYM7lv5EUN
-         yntXNfDnBqEkpEuzKsycQYYUQo+2kpW9MVEsZ8eijXdBYWsBIRXKlHp1aoMrGO91VYpK
-         UY6bY0U1vUqRyV7NYcqUqZxCJl9nE7aaUD6LCXL2wpl8mlHapi4LDbQwtn0MjD5vBxOB
-         hp+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9WmrK4Q/InmsC3hzoPMF8b8gPeNrWu5OyA/GpOEaE1AuwKBtYXdGAJ8aAFJa12ky68zkak6KA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznwKQ76KKcPABgmiaRctWst8iNwXCAGY+zo2veYD3Qc1k0Z4Up
-	etW7NIVwRcwOX+MSvQXaK/xhaKHGF/gCiOq6tWLptFfqpqqReRrwkRgE
-X-Gm-Gg: Acq92OH7rVxZvurmZK5Nvge8v+54Or/Mk70LCGeBVzbCmHQjXiVPW0qMU5ry4LbKQqi
-	v77Ge4vpV8Wb57CpSQXZxjImZcP/L86o02mqibvdUJONxpgv8Pmz62zyb3+t/SFE/4idNI0ALOt
-	Ihe8IHzNx6hA2OCtobVdPdIn40Zuy9ufqBzNPKHoXH7iBi7cEROAsIOgjr57nRQ4T8sMlqsg3GW
-	e+i6Bdi2WmFscJLqgDmmcUzDCAZeAdCQdUozsqVWiM/lV8kbqHcI6i3vALS4gcrqAOlfo0y4EEy
-	VzGQN6bfDM/erCE/kGjoRDzWjww1gy2qrKWMEXxWe3jwkxSHX6TWVjS1G/zxzX+TcRRj9N2crB2
-	ga2xvoSi+n9Lja0vMr39G2Ahq3d5mPnAs9RhDqefNDXI8vttBXsOn6R2aydHzTO9FaBTHRze9rc
-	lE3RG3xUZjOVctWac6bmoqFKVBJzkWZT+JrS4Nc6sgNVAzZahgIQ==
-X-Received: by 2002:a05:6a00:94d8:b0:832:e65:ddcd with SMTP id d2e1a72fcca58-842b0f4278cmr7095141b3a.45.1780731932077;
-        Sat, 06 Jun 2026 00:45:32 -0700 (PDT)
-Received: from Inspiron-14-5420.. ([2402:e280:21c6:671:13af:61e2:7096:38fb])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828821d0sm11350990b3a.28.2026.06.06.00.45.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jun 2026 00:45:31 -0700 (PDT)
-From: "Hemendra M. Naik" <hemendranaik@gmail.com>
-To: stephen@networkplumber.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	hemendranaik@gmail.com,
-	horms@kernel.org,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	tahiliani@nitk.edu.in,
-	vishy0777@gmail.com
-Subject: Re: [PATCH net-next 1/2] net/sched: sch_fq_pie: add per-flow statistics via class ops
-Date: Sat,  6 Jun 2026 13:14:32 +0530
-Message-Id: <20260606074432.22005-1-hemendranaik@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260531154149.592bb35f@phoenix.local>
-References: <20260531154149.592bb35f@phoenix.local>
+	s=arc-20240116; t=1780732964; c=relaxed/simple;
+	bh=95/Bc8g7qS6AmG65Mi9qNIx2fcFhFDs2MrupCjJhEWw=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=jtDXWKi+ZPENTpo22rjeeouEBZKnPk9jynYnQ8vEzYsJWL1y7NPnpHBGs7Gh5yeCG2DeD0W0RmAe+viLBNdCeatT9sq9iMj3S+xyEXujt3YaIO3ma1euhXipDjjrG0ChNXfrULk7MsPm8VH59iABEVFOiv8CCcHSPCBvD1MHsjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=F75/otmZ; arc=none smtp.client-ip=216.154.215.154
+Received: from smtpclient.apple (border.lukktone.com [139.130.100.52])
+	by us.padl.com (Postfix) with ESMTPSA id 3EA6D62226;
+	Sat,  6 Jun 2026 04:02:37 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1780732961; bh=C6knqyYtwWysw/J/UjxZx6ooyQA0Q9w3FH7GFrPkXpU=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=F75/otmZ69bK9Ai62vs7YMDminLgns083w1PKEkqL6BgWthAVQoOxSO7uUnhNsAbh
+	 SK0e0Dsp427FJjWJnPDYuvLH1J9RHDzHGCJ95Nb5jqpOJQIfBaLxnRZSdP68P1xUHY
+	 O1vzG1MJd9gdMjrxk2fveu+H/PF2VJdf+zNsipZsb20J31tESJa6+vyZuU84mNju0s
+	 KjjrYO/dCuD79XFdbrzGHDSZuDTeZ/hCGMDeuR/iHjXtjjssQupuN2+nt/U0LTa61z
+	 GO2tGIOuH+d7WpK+UxOhJf45nOR7IcNIwX6fOH1vpOCFtLV9DHfYUG9dscKvBjqGZS
+	 jrqtVjul/VCEA==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH net-next v2 3/6] net: bridge: add 802.1Qat stream
+ reservation admission control
+From: Luke Howard <lukeh@padl.com>
+In-Reply-To: <d0e650fb-4011-4d64-9780-a0ddd0ca1cf3@lunn.ch>
+Date: Sat, 6 Jun 2026 18:02:24 +1000
+Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Ivan Vecera <ivecera@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Ido Schimmel <idosch@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ David Ahern <dsahern@kernel.org>,
+ Shuah Khan <shuah@kernel.org>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ bridge@lists.linux.dev,
+ linux-kselftest@vger.kernel.org,
+ Max Hunter <max@huntershome.org>,
+ Kieran Tyrrell <kieran@sienda.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CCF20D32-6C9F-49DC-9838-592EFB5E88D2@padl.com>
+References: <20260602-mv88e6xxx-8021qat-mqprio-v2-0-72be14522e7c@padl.com>
+ <20260602-mv88e6xxx-8021qat-mqprio-v2-3-72be14522e7c@padl.com>
+ <537410c3-ff4e-43fd-834e-775cd1bbe89e@blackwall.org>
+ <E1253C6D-F6F0-407A-AABF-FCAB57100A1C@padl.com>
+ <n2pi7h5nvxg3xvshtcxqeizpukp6hphqa7kodbe7b3ioc3kcq5@n34fgocvaicm>
+ <d0e650fb-4011-4d64-9780-a0ddd0ca1cf3@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3826.700.81)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
+	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:davem@davemloft.net,m:edumazet@google.com,m:hemendranaik@gmail.com,m:horms@kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:tahiliani@nitk.edu.in,m:vishy0777@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,gmail.com,kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,redhat.com,nitk.edu.in];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296075-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296076-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:cedric.jehasse@gmail.com,m:razor@blackwall.org,m:jiri@resnulli.us,m:ivecera@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:shuah@kernel.org,m:olteanv@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bridge@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:max@huntershome.org,m:kieran@sienda.com,m:andrew@lunn.ch,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[gmail.com,blackwall.org,resnulli.us,redhat.com,davemloft.net,google.com,kernel.org,nvidia.com,lunn.ch,vger.kernel.org,lists.linux.dev,huntershome.org,sienda.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[padl.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	APPLE_MAILER_COMMON(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,padl.com:mid,padl.com:from_mime,padl.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DA61464CDD8
+X-Rspamd-Queue-Id: 2DDE764CE22
 
-On Sun, 31 May 2026 15:41:49 -0700, Stephen Hemminger wrote:
 
-> Sorry, you can't change the kernel/userspace ABI like this.
-> How will old iproute2 handle new kernel and vice/versa.
->
-> The better safer way to do this is to either extend the
-> existing structure and have iproute2 know how how to handle
-> short (missing) class data; or use another netlink
-> type for class data.
+> So it sounds like you first need to work on the software
+> implementation and expand the simplified version with the features you
+> need. You can then add support to accelerate this by offloading it to
+> the hardware.
 
-Hello Stephen,
+Agreed.
 
-Apologies for breaking the ABI.
+The definition of Dynamic Reservation Entries in 802.1Q (clause 8.8.7) =
+might support the addition of a new MDB (or even FDB) entry state to the =
+kernel:
 
-We've been working on two fixes along the lines of what you suggested.
+- add MDB_DYNAMIC_RESERVATION (a state, not a flag);
+- the software bridge only _classifies_ packets against  =
+MDB_DYNAMIC_RESERVATION entries, and only when MDB is authoritative. =
+Classification sets dynamic_reservation_hit on tc_skb_ext;
+- dynamic_reservation_hit is visible to the flow dissector so can be =
+used for policy enforcement.
 
-Approach #1
+Advantages:
 
-Append type and the union after the original 9 fields rather than
-inserting them at the front:
+- the new MDB state maps well to 802.1Q;
+- minimal changes to bridge;
+- actual policy (reclassify, drop, etc) is left to the user;
+- doesn=E2=80=99t require a new tc-flower entry for each stream DA;
+- entry state maps 1:1 to mv88e6xxx AVB_NRL ATU EntryState.
 
-struct tc_fq_pie_xstats {
-__u32 packets_in;       /* offset  0, untouched */
-...
-__u32 memory_usage;     /* offset 32, untouched */
-__u32 type;             /* offset 36, new */
+Disadvantages:
 
-```
-      union {
-              struct tc_fq_pie_cl_stats  class_stats;
-              struct tc_fq_pie_xqd_stats xqdisc_stats;
-      };
-```
+- no unicast support, although potentially can be extended (there are =
+some subtleties);
+- mv88e6xxx support would either require rich enough tc-flower support =
+in TCAM, intercepting TCA_FLOWER_DYNAMIC_RESERVATION_HIT and mapping to =
+native AVB admission control, or a per-port devlink parameter (not so =
+nice).
 
-};
+This is implemented and working with the software bridge, I still =
+haven=E2=80=99t quite figured out the right mapping for mv88e6xxx.
 
-tc_fq_pie_xqd_stats is currently empty. It acts as a placeholder for
-future qdisc stats if needed.
+Luke
 
-With this layout, older iproute2 versions receiving the new 64-byte
-blob still see RTA_PAYLOAD(64) >= sizeof(36) and read the original
-fields correctly since offsets 0-35 remain unchanged.
-
-Conversely, newer iproute2 versions receiving the old 36-byte blob
-take the memcpy path into a zeroed local struct, type defaults to 0
-(QDISC), and execution falls back to the qdisc stats path.
-
-Approach #2
-
-Leave struct tc_fq_pie_xstats unchanged and export class stats
-separately as an NLA blob via gnet_stats_copy_app():
-
-enum {
-TCA_FQ_PIE_XSTATS_UNSPEC,
-TCA_FQ_PIE_XSTATS_TYPE,
-TCA_FQ_PIE_XSTATS_CL_PROB,
-TCA_FQ_PIE_XSTATS_CL_DELAY,
-TCA_FQ_PIE_XSTATS_CL_AVG_DQ_RATE,
-...
-};
-
-Adding any new stat, class or qdisc, is just a new enum entry and one
-nla_put() call. Old iproute2 sees an unknown TYPE and skips it
-gracefully via the default case. No struct versioning, no size math.
-
-Let us know which approach you'd prefer, or if there's another
-approach you think would work better, and we'll send a revised patch
-accordingly.
-
-Thanks,
-Hemendra
-
+PS. I previously incorrectly asserted that 802.1Q required dropping =
+frames with AVB/SRP PCPs but without valid dynamic reservation entries. =
+802.1Q discussions priority mapping in clause 6.9.4 for traffic from SRP =
+boundary ports (those not participating in SRP). In practice I think =
+this should all be policy, e.g. you might want to reprioritise valid =
+DSCP traffic from within a SRP domain, or drop instead of reprioritise, =
+etc.=
 
