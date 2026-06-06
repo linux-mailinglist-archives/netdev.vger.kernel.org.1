@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-296026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id E1LoA62BI2rgugEAu9opvQ
-	(envelope-from <netdev+bounces-296026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 04:10:53 +0200
+	id WXJDBgGCI2rjugEAu9opvQ
+	(envelope-from <netdev+bounces-296027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 04:12:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BED964C312
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 04:10:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE4564C321
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 04:12:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=bbfsgX2v;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296026-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296026-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="Zku03E/P";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296027-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296027-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 17DDA3028DDE
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 02:10:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D9788303EC33
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 02:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E18233723;
-	Sat,  6 Jun 2026 02:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8177A2459DD;
+	Sat,  6 Jun 2026 02:10:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952CE1C2AA;
-	Sat,  6 Jun 2026 02:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C51C207DF7;
+	Sat,  6 Jun 2026 02:10:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780711850; cv=none; b=GmsY4aijTZiNYR+R6QoOANHKSBBVjt8xhvTy7vcl2PdlH/vsa1ms5LI/dfN6jZDbMhXzAlmcDIhhK/kkk25+wgYoUx5Hfy05JFGJn4D2dFMUuGj7qGghlLDco/JNSp2lgi10r6xaa/gEzoWYjOu2qwCQH55tGEANJ+gM/YPrJ1g=
+	t=1780711854; cv=none; b=BlzGVjBi6ve/DopvPOxffUbdebBnVxrj8i2InqYGkKc9z2vuZP4+uJT4vJuVrmGdRtUz+wCs91y8IKf18quxVZY0PqNB2gnO4At6mnQlC3XMswz3zhQUlKVK0EO2NXvPiOgdFcwbUHQDkpvPV1oj1JBgo5LVYWceWuf7OlOWo9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780711850; c=relaxed/simple;
-	bh=lNFD03ePlf1Bc6M78coQulpqrgJ5H1v2B8hI1xHsqbA=;
+	s=arc-20240116; t=1780711854; c=relaxed/simple;
+	bh=nRSzevO4boHh2qkVUIEl4RPXyF4U8yaIMc55Aodf5Sg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CDBhBFe61a0p0Y1dPsIQSrhFcU2i7Me/dy4WVHLSyHSjtpt24HcPoi743ILrnTXkEsRipiQhDWC1z7D6jDePGTKC1qK0mXpCRQGoO0xpXcC1TgD1Dj/leUtiVAtnSjExAt98oPE88yqohO5aA8DTS7UnIi230dDJtUno/t9dN8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbfsgX2v; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6AD91F00893;
-	Sat,  6 Jun 2026 02:10:48 +0000 (UTC)
+	 MIME-Version; b=LgwwSn00CuXW8ie7eNfGLnSvQhLZkAeSbyP12JhjoIFnQUpEjWJuEoGXgxuTsyAFT+hewJk8rZUf21zSzKmRx3p6jWyhOqumuOoCaCmjE9njaIm+jNgeIrZNDEP8PElZXG5WYN6wKn1Nr9Z76etHiOyh9YWBn+hT3R4f2xzttWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zku03E/P; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F0FD1F00893;
+	Sat,  6 Jun 2026 02:10:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780711849;
-	bh=HXZvyS4g7zloBoaeVtOb7icNcuXfmlIIKdOSRCzs5a4=;
+	s=k20260515; t=1780711852;
+	bh=S2gmTkr6Mhe++4Pcp61CLhd1ZPamrXVBmqrAzOA0ZD8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=bbfsgX2viiL2kZoDMs7BqKGIJCCHvIlnJSrYF4cFkc9o2+rC9F0cU1V7UeLzhO77q
-	 r0pqt8Ufa9jje2VeFGjn828fSucALqYsOehmXKQF/wv9mUOpOGlaEz31Dia8DKnwMJ
-	 ypIaj2IEuQ6z6MCrKDVlEpZmy1O+xoASnwhq2nZTcUgRCMBmK4EZIOmXyW0YRu00cT
-	 9FF/g7XcaktRcmijxJCO+noeoNC5ojMxGEFaaR0Go+x6G9Wz85A+daO3Clu6MCfPjI
-	 7Uqz0WwcKxdPpHl0sk17rdmlRY4IDXS8t8GAcboy2/taDjPSEWtRAo72eggxoakSxY
-	 t7w7vyXx1OEAA==
+	b=Zku03E/Pe5bVdDbFKChwV+45b60Ty4Tx4Sd8YQ0hkmX1VSmJacHVHvjEUDBTZ1BZU
+	 2riUbP9ZKq4Kms2GXaFloTdtqDRHZwN8K2ch7FnC2gATjQLYrGjIt539IGJ344pvsY
+	 vUshVHbxAIAMf16ISYBsuDr+o4kASEqrOHK4BsjRm3adfkr15I8enlsVXJQxQFINir
+	 1ImuBtbeeRSsFrjXGn9SIpHkxvMRkZx8FaIbqZA7HtzgB3ZqqUQAaSXAwFLrY9g7aX
+	 dSGpFLco8hu+TgmXx3RPWm+jW60IKolPZTChIPIW+q+gcCERMn2/OyWuoqhLZeWMjQ
+	 y4N5L19OBVGwg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: ioana.ciornei@nxp.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -55,12 +55,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 02/12] dpaa2-switch: add support for LAG offload
-Date: Fri,  5 Jun 2026 19:10:47 -0700
-Message-ID: <20260606021047.4124576-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v3 04/12] dpaa2-switch: extend dpaa2_switch_port_set_fdb() to cover bond scenarios
+Date: Fri,  5 Jun 2026 19:10:50 -0700
+Message-ID: <20260606021050.4124679-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260603143623.3712024-3-ioana.ciornei@nxp.com>
-References: <20260603143623.3712024-3-ioana.ciornei@nxp.com>
+In-Reply-To: <20260603143623.3712024-5-ioana.ciornei@nxp.com>
+References: <20260603143623.3712024-5-ioana.ciornei@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +76,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -84,11 +84,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-296026-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296027-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS(0.00)[m:ioana.ciornei@nxp.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -101,197 +101,135 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9BED964C312
+X-Rspamd-Queue-Id: 6DE4564C321
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-dpaa2-switch: add support for LAG offload
+dpaa2-switch: extend dpaa2_switch_port_set_fdb() to cover bond scenarios
 
-This patch adds the bulk of the changes needed in order to support
-offloading of an upper bond device.
+The dpaa2_switch_port_set_fdb() function is responsible with determining
+what FDB should be used by a port as a consequence of changing its upper
+device. This patch extends the function to also cover the circumstances
+in which a DPAA2 switch port offloads a bond device.
 
 > diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> index a0bf5b50aae5f..d082ecf9b1252 100644
+> index 8026a50141055..b851376b8e1b8 100644
 > --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
 > +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> @@ -68,15 +68,45 @@ static void dpaa2_switch_port_set_fdb(struct ethsw_port_priv *port_priv,
 
 [ ... ]
 
-> @@ -2210,19 +2300,275 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
-> +static int dpaa2_switch_port_bond_join(struct net_device *netdev,
-> +				       struct net_device *bond_dev,
-> +				       struct netdev_lag_upper_info *info,
-> +				       struct netlink_ext_ack *extack)
-> +{
-
-[ ... ]
-
-> +	/* If the bond device is a switch port, join the bridge as well */
-> +	bridge_dev = netdev_master_upper_dev_get(bond_dev);
-> +	if (!bridge_dev || !netif_is_bridge_master(bridge_dev))
-> +		return 0;
-> +
-> +	err = dpaa2_switch_port_bridge_join(netdev, bridge_dev, extack);
-
-[Severity: High]
-Should switchdev_bridge_port_offload() inside dpaa2_switch_port_bridge_join()
-receive the actual bridge port (the bond device) rather than the lower
-physical port?
-
-For ports enslaved to a LAG, passing the lower physical port might cause
-switchdev to immediately abort the offload with -EINVAL, since the netdev
-is not directly enslaved to the bridge. I see this was addressed in a later
-commit adding a dpaa2_switch_port_to_bridge_port() helper.
-
-[Severity: High]
-When a port joins a LAG that is already enslaved to a bridge, is there a risk
-of dpaa2_switch_port_set_fdb() corrupting the in_use flag of active FDBs?
-
-Since the port first acquires the bond's shared FDB, and then
-dpaa2_switch_port_bridge_join() finds a port already using that same FDB,
-the code in dpaa2_switch_port_set_fdb() seems to lack a self-assignment
-check. This could mark the shared FDB as unused before reassigning it,
-allowing another standalone port to reallocate it. I note this was fixed in
-a later commit covering bond scenarios.
-
-[Severity: High]
-Will dpaa2_switch_port_set_fdb() skip bonds when iterating through lower
-devices, breaking cross-LAG forwarding?
-
-When a port joins a bridge, dpaa2_switch_port_set_fdb() uses a non-recursive
-iterator (netdev_for_each_lower_dev). If the other lower device is a bond,
-dpaa2_switch_port_dev_check() will return false, skipping nested ports and
-failing to share the hardware FDB. I note this was also fixed in a later
-commit.
-
-> +	if (err)
-> +		goto err_bridge_join;
-> +
-> +	return err;
-> +
-> +err_bridge_join:
-> +	dpaa2_switch_port_del_vlan(port_priv, DEFAULT_VLAN_ID);
-> +err_vlan_add:
-> +err_lag_cfg:
-> +	rcu_assign_pointer(port_priv->lag, NULL);
-> +	dpaa2_switch_set_lag_cfg(bond_dev, lag_id, ethsw);
-> +err_egress_flood:
-> +	if (port_priv->fdb != old_fdb) {
-> +		new_fdb = port_priv->fdb;
-> +
-> +		/* Explicitly move the port back into the old private FDB */
-> +		old_fdb->in_use = true;
-> +		old_fdb->bridge_dev = NULL;
-> +		port_priv->fdb = old_fdb;
-> +
-> +		/* Reprogram the bond FDB to no longer include this port */
-> +		dpaa2_switch_fdb_set_egress_flood(ethsw, new_fdb->fdb_id);
-
-[Severity: High]
-Are we permanently leaking a hardware FDB resource in this error path?
-
-If dpaa2_switch_port_bridge_join() fails, it will have allocated a new
-intermediate FDB and marked it in_use. The cleanup block here restores
-the original old_fdb, but does not appear to set new_fdb->in_use back to
-false. Repeated failures might exhaust the fixed number of FDBs.
-
-> +	} else {
-> +		/* Same FDB means that this was the first port joining the
-> +		 * bond. Keep using the same FDB.
-> +		 */
-> +		old_fdb->bridge_dev = NULL;
-> +	}
-
-[ ... ]
-
-> +static int dpaa2_switch_port_bond_leave(struct net_device *netdev,
-> +					struct net_device *bond_dev)
-> +{
-
-[ ... ]
-
-> +lag_cleanup:
-> +	/* Recreate the LAG configuration for the LAG group that we left. In
-> +	 * case any step failed, at least we free up a LAG resource.
-> +	 */
-> +	rcu_assign_pointer(port_priv->lag, NULL);
-> +	dpaa2_switch_set_lag_cfg(bond_dev, lag->id, ethsw);
-
-[Severity: Critical]
-Could this trigger a kernel panic if lag is NULL on the rollback path?
-
-If dpaa2_switch_port_bond_join() fails and sets port_priv->lag to NULL, a
-subsequent NETDEV_CHANGEUPPER rollback calls this function. The lag variable
-is initialized via rtnl_dereference(port_priv->lag), which would be NULL,
-leading to a dereference when accessing lag->id here.
-
-> +
-> +	return err;
-> +}
-> +
->  static int dpaa2_switch_port_prechangeupper(struct net_device *netdev,
->  					    struct netdev_notifier_changeupper_info *info)
->  {
-> +	struct net_device *upper_dev, *br;
->  	struct netlink_ext_ack *extack;
-> -	struct net_device *upper_dev;
->  	int err;
+> -		/* Since we are not the last port which leaves a bridge,
+> -		 * acquire a new FDB and use it. The number of FDBs is sized to
+> -		 * accommodate all switch ports as standalone, each with its
+> -		 * private FDB, which means that dpaa2_switch_fdb_get_unused()
+> -		 * must succeed here. WARN if not.
+> -		 */
+> -		fdb = dpaa2_switch_fdb_get_unused(port_priv->ethsw_data);
+> -		if (WARN_ON(!fdb))
+> -			return;
+> +		if (fdb) {
+> +			/* Switching to the FDB of another port which is under
+> +			 * the same bond device. Release the previous FDB in
+> +			 * case we were the last to use it.
+> +			 */
+> +			if (last_fdb_user) {
+> +				port_priv->fdb->in_use = false;
+> +				port_priv->fdb->bridge_dev = NULL;
+> +			}
+> +			port_priv->fdb = fdb;
+> +		} else if (last_fdb_user) {
+> +			/* No other bond lowers to share the FDB with and we
+> +			 * are its last user, just keep it.
+> +			 */
+> +		} else {
+> +			fdb = dpaa2_switch_fdb_get_unused(port_priv->ethsw_data);
+> +			if (WARN_ON(!fdb))
+> +				return;
 >  
->  	if (!dpaa2_switch_port_dev_check(netdev))
-> @@ -2239,6 +2585,24 @@ static int dpaa2_switch_port_prechangeupper(struct net_device *netdev,
->  
->  		if (!info->linking)
->  			dpaa2_switch_port_pre_bridge_leave(netdev);
-> +	} else if (netif_is_lag_master(upper_dev)) {
-> +		if (!info->linking) {
-> +			if (netif_is_bridge_port(upper_dev))
-> +				dpaa2_switch_port_pre_bridge_leave(netdev);
-> +			return 0;
-> +		}
-> +
-> +		if (netif_is_bridge_port(upper_dev)) {
-> +			br = netdev_master_upper_dev_get(upper_dev);
-> +			err = dpaa2_switch_prechangeupper_sanity_checks(netdev,
-> +									br,
-> +									extack);
-> +			if (err)
-> +				return err;
-> +		}
-> +
-> +		return dpaa2_switch_pre_lag_join(netdev, upper_dev,
-> +						 info->upper_info, extack);
+> -		port_priv->fdb = fdb;
+> -		port_priv->fdb->in_use = true;
+> -		port_priv->fdb->bridge_dev = NULL;
+> +			port_priv->fdb = fdb;
+> +			port_priv->fdb->in_use = true;
+>  		}
+
+[Severity: High]
+Does this code leak a hardware FDB structure on the error recovery path of
+dpaa2_switch_port_bond_join()?
+
+If dpaa2_switch_port_bridge_join() fails inside dpaa2_switch_port_bond_join(),
+the error recovery calls dpaa2_switch_port_set_fdb(port_priv, upper_dev, false).
+
+Since the port is not the last user of the shared bridge FDB, this dynamically
+allocates a new, unused FDB via dpaa2_switch_fdb_get_unused() and marks it
+in_use = true.
+
+Control then returns to dpaa2_switch_port_bond_join(), which continues its own
+error recovery and explicitly reverts port_priv->fdb back to its original
+pre-bond private FDB (old_fdb):
+
+    if (port_priv->fdb != old_fdb) {
+        new_fdb = port_priv->fdb;
+        old_fdb->in_use = true;
+        old_fdb->bridge_dev = NULL;
+        port_priv->fdb = old_fdb;
+        ...
+    }
+
+However, the newly allocated FDB (new_fdb) from the bridge_join failure
+path is ignored and left marked as in_use = true. Because this FDB is no
+longer referenced by any port, it seems to be permanently leaked.
+
+Could this deplete the highly limited pool of hardware FDB slots, eventually
+preventing any new standalone ports from functioning?
+
+[ ... ]
+
+>  	/* The current port is about to change its FDB to the one used by the
+> @@ -143,7 +203,8 @@ static void dpaa2_switch_port_set_fdb(struct ethsw_port_priv *port_priv,
 >  	}
 >  
->  	return 0;
+>  	/* Keep track of the new upper bridge device */
+> -	port_priv->fdb->bridge_dev = upper_dev;
+> +	if (netif_is_bridge_master(upper_dev))
+> +		port_priv->fdb->bridge_dev = upper_dev;
+>  }
 
-[Severity: High]
-Might this bypass topological checks and allow VLAN uppers on offloaded LAGs?
+[Severity: Critical]
+Does this prematurely mark actively shared FDBs as unused?
 
-If a port joins a LAG first, and then a VLAN is added to the LAG, the
-event propagates here with the VLAN device as upper_dev. Since it is
-neither a bridge nor a LAG master, this function returns 0 without checking
-vlan_uses_dev(), inadvertently allowing an unsupported hardware configuration.
+When a port joins a bond that is already in a bridge alongside another
+standalone port:
 
-> @@ -2263,6 +2627,80 @@ static int dpaa2_switch_port_changeupper(struct net_device *netdev,
->  							     extack);
->  		else
->  			return dpaa2_switch_port_bridge_leave(netdev);
+1. dpaa2_switch_port_bond_join() first gives the port the bond's shared FDB
+   (which is the bridge FDB).
+2. Then it calls dpaa2_switch_port_bridge_join(), which calls
+   dpaa2_switch_port_set_fdb(..., true).
+3. This searches the bridge's lowers and finds the standalone port, skipping
+   the bond's ports.
 
-[Severity: High]
-Does calling dpaa2_switch_port_bridge_leave() wrongly split LAG member ports
-into isolated private FDBs?
+Because both the bond and the standalone port are in the same bridge, they
+share the exact same FDB.
 
-When a LAG leaves a bridge, this is invoked for each member port. It will
-unconditionally call dpaa2_switch_port_set_fdb(port_priv, NULL), which forces
-the port to drop the shared FDB and isolates it from the other LAG members.
-I note this was also fixed in a later commit covering bond scenarios.
+However, the existing code just above this diff:
 
-> +	} else if (netif_is_lag_master(upper_dev)) {
-> +		if (info->linking)
-> +			return dpaa2_switch_port_bond_join(netdev, upper_dev,
-> +							   info->upper_info,
-> +							   extack);
+	if (other_port_priv) {
+		port_priv->fdb->in_use = false;
+		port_priv->fdb->bridge_dev = NULL;
+		port_priv->fdb = other_port_priv->fdb;
+	}
+
+executes without checking if port_priv->fdb == other_port_priv->fdb. Since
+port_priv->fdb was already the bridge's FDB, this unconditionally marks the
+actively shared bridge FDB as unused.
+
+Once the RTNL lock is released, could subsequent calls to
+dpaa2_switch_fdb_get_unused() by unrelated ports allocate this actively used
+bridge FDB, causing L2 isolation breakdown and silent data corruption across
+the entire bridge?
 
