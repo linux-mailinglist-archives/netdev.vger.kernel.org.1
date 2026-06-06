@@ -1,66 +1,63 @@
-Return-Path: <netdev+bounces-296001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L1M+HF9mI2rwsgEAu9opvQ
-	(envelope-from <netdev+bounces-296001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 02:14:23 +0200
+	id wZzxGxtnI2p2swEAu9opvQ
+	(envelope-from <netdev+bounces-296002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 02:17:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B38A764BF8E
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 02:14:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0121664BFA9
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 02:17:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Ff+t3ON5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296001-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296001-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=BUSa6dnL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296002-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296002-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 90212302977A
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 00:09:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2125301CF8A
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 00:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A7B2F84F;
-	Sat,  6 Jun 2026 00:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952A513DDA4;
+	Sat,  6 Jun 2026 00:14:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476F4191
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 00:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A5512FF69;
+	Sat,  6 Jun 2026 00:14:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780704595; cv=none; b=RdMjgq2vZyPjklyMPlct6l50iWzKCTNXMpX+H4aAxi8Ne8MBGmbDjIGQ1mv5rC0U5WMiuD9Z+V6XVbRIEE8U6w2rL69YY9qKiAWvbpE1Ko1A5OtHTuKOu2eGSWynjz5T0UsQ3oU3kAbU54mEuExPC/V/FUDWd+JTMz3IzA+CV28=
+	t=1780704843; cv=none; b=cL68QmfbJHoz8Z7V1PyANnoASdlMJWB5ffAgU+tkPu9J98MIADW8syezcSkVyCEKe2gvPFPU7be63bE5WFplmpunR0jKS0RbT2hpqlnIu3TFZ+ujXsvc+GBeg2hjgonmQYJPaZ0qz0TRcZ+f7qJfvGTbvZbLCdsmpHs7KrFv3rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780704595; c=relaxed/simple;
-	bh=YoHDSTWk8nycq1cpRuJNFRogL6XKL95l8OAFqxn+FrE=;
+	s=arc-20240116; t=1780704843; c=relaxed/simple;
+	bh=T25UxFVpAsTAV7mOYStO0y+btYY0B1jLKjLpes3J068=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IA6MrOLWrcQfV6WuXV+VDjoLxpKiuJDC4bnYxm8b8RVKd6iFmBCLUd9OjDduXdlgBHJtGaCf97ifN2hRH1tq9vHc5AZTFYmcnr2GXg4bIKuEOIAkQ27CgyRMxlBdspXvLhz8uOYx+UHyLcqSYwuwuPAzY5zP4UVQCrCLOEqzZWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ff+t3ON5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BCC31F00893;
-	Sat,  6 Jun 2026 00:09:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uQUU9yVqxiNBqkzpkeO9Yroj6CJ+gGbOCM2r66CIZIBJ6SpxWl6fFVDOo3GNLFc9UM3L7sOORMswYZAr0idJGskWLQSwABFGRisyCxmRm1oeTa4n2FQWFvuRX9ZVhk8EowdBupu6qrT1cIbOXWQWuBy4uyfz9fenUybiItVwFcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUSa6dnL; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C778E1F00893;
+	Sat,  6 Jun 2026 00:14:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780704594;
-	bh=8rzj7kRzjuTRwf+gA2Dov7GuobV+AAz3ZGhVXLDaZYI=;
+	s=k20260515; t=1780704842;
+	bh=1tBS+PWRltVDR7TbiiZO1ZJyqTFKJmsVHy9CohoL78E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Ff+t3ON5aJNddaN1Ye8b1gDSrwl8fZE5VBb7JfmBnsEiynmhvA4fEKVWsGnQUG4K9
-	 Fo01QKiwMC4Rt3004r+wY0n4Qj4vS27gESA4P4KayHSt83qQgUWoxEjTxLFI8csz24
-	 gkfU1oTNwp05JYFVn/2EoucktLbftkeoP4snZIhREdxyrnzGYWV9n6Fux386VArb+Y
-	 9ynknu9HF5t+CNmq501DZU5v57oM3Iz6/8AOoVNGn3c6j8mHxgScbWTvyj4sEb34Wz
-	 H2wJNfBmlHYs+IcHQEFE15n6/H89LDN1UyPWBiT8C4nhf9BLZSo2jDW8A07G82WWnn
-	 0pczSW7ZIu1CA==
-Date: Fri, 5 Jun 2026 17:09:52 -0700
+	b=BUSa6dnLHWKD6eKxzJESSROrOUHuY4Zchhv79FpJPyvwkFLaiZcVgFJQUzM+FCpSx
+	 UFrbEwLkgYDRnoprzHN22Au9DVxYWvb9n9+KWF2p8JnQBtlNYoZSm9ZYy5FAldsb6J
+	 JSTxYKzUR+ud7WDbF+/NT7Tp5pmaQea1rTfAhCUskqDKe3uBLjHXcTpvO49Pe4zjHM
+	 v67nhm6EcoB7eA4Upmaf9SrPN6bVV2sKSuPyfAWPbAFA/AeNkxJFc6z+jht/ehtCC1
+	 q2vUqQt+BA50rQKY8Iyp1aA1CUbsTQw2UUU5PCQ7UqLc0zup0tZQ2hP02/ZejpQATE
+	 KcjlweVd80rtw==
+Date: Fri, 5 Jun 2026 17:14:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- michael.chan@broadcom.com, hkallweit1@gmail.com,
- maxime.chevallier@bootlin.com, joshwash@google.com, tariqt@nvidia.com,
- alexanderduyck@fb.com, willemb@google.com, jacob.e.keller@intel.com,
- kory.maincent@bootlin.com, jakub@cloudflare.com, nb@tipi-net.de
-Subject: Re: [PATCH net-next v2 00/12] net: ethtool: let ops locked drivers
- run without rtnl_lock
-Message-ID: <20260605170952.52c00c2e@kernel.org>
-In-Reply-To: <aiNR_GaST-NnkZie@devvm7509.cco0.facebook.com>
-References: <20260605002912.3456868-1-kuba@kernel.org>
-	<aiNR_GaST-NnkZie@devvm7509.cco0.facebook.com>
+To: "[Ko Han Chen]" <urbaner3@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Simon Horman <horms@kernel.org>, Shuah Khan
+ <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Document: Fix missing reference pages
+Message-ID: <20260605171401.0586831d@kernel.org>
+In-Reply-To: <20260605084130.13363-1-urbaner3@gmail.com>
+References: <20260605084130.13363-1-urbaner3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,56 +67,63 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:joshwash@google.com,m:tariqt@nvidia.com,m:alexanderduyck@fb.com,m:willemb@google.com,m:jacob.e.keller@intel.com,m:kory.maincent@bootlin.com,m:jakub@cloudflare.com,m:nb@tipi-net.de,m:sdfkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296001-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296002-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:urbaner3@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:corbet@lwn.net,m:horms@kernel.org,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,gmail.com,bootlin.com,nvidia.com,fb.com,intel.com,cloudflare.com,tipi-net.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hackmd.io:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B38A764BF8E
+X-Rspamd-Queue-Id: 0121664BFA9
 
-On Fri, 5 Jun 2026 15:48:48 -0700 Stanislav Fomichev wrote:
-> netdev_ops_lock_dereference name trips me a bit (_compat suffix would've been
-> more obvious), but I do agree with the reasoning about needing 'a' lock..
+On Fri,  5 Jun 2026 16:41:30 +0800 [Ko Han Chen] wrote:
+> Subject: [PATCH] Document: Fix missing reference pages
+> Date: Fri,  5 Jun 2026 16:41:30 +0800
+> X-Mailer: git-send-email 2.48.1
+> 
+> Today, my friend and I are discussing a wwan driver produced by
+> Mediatek. I am reading the related document and reference link,
+> then I found the page is missing. So after a short search I am
+> giving the better link and test the two pages with my bash
+> program for more dead links. It turns out only this one. I check
+> the page and the following documents. Details are covered in
+> this markdown [page](https://hackmd.io/@Urbaner/lk_patch_doc).
 
-Guess I hate long lines more than I hate inconsistencies.
+Nothing really wrong with your commit message, but the narrative
+format is quite unusual. Please rewrite it as if you were telling
+the code base what to do.
 
-This:
+	Correct the links to ... in ...
 
-	something = netdev_lock_ops_compat_dereference(&dev->something, dev);
+> Signed-off-by: [Ko Han Chen] <urbaner3@gmail.com>
 
-is uncomfortably close to 80 columns for me.
-
-I think the existing naming is as good as we'll get..
-If y'all disagree I can respin. I'll be sad but I'll respin :)
+And please remove the brackets around your name in the Author line and
+the Signed line.
 
