@@ -1,190 +1,512 @@
-Return-Path: <netdev+bounces-296077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UMhHMuvYI2qVzgEAu9opvQ
-	(envelope-from <netdev+bounces-296077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:23:07 +0200
+	id p386JHzaI2rhzgEAu9opvQ
+	(envelope-from <netdev+bounces-296078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:29:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A09B64CEAE
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:23:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB2FC64CECE
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:29:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=blackwall.org header.s=google header.b=UH05RJSL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296077-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296077-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=hI85UbDQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296078-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296078-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BBF33031025
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 08:21:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C99FF3018589
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 08:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FB931714F;
-	Sat,  6 Jun 2026 08:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A9130D407;
+	Sat,  6 Jun 2026 08:29:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCDA317143
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 08:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEF94071CE
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 08:29:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780734099; cv=none; b=TYxPEEvN3UMtGiICeiFbQE8OzvsJiytukvhYs4zuX7pQXqrjQ99+hUQTVZZoJXses7LcNYrGRgoc2kdoZzkUVB/vOp5CrQV+bg5p9HNlpa4M9nayJiTw3lXmfPwST32Syk4F37w5bb7tXraUHdhvVTL/JaQlO02pxQqhb0r5geo=
+	t=1780734585; cv=none; b=C2dZdBusElU5YVVoSvAzQfzjtJTCK/cOZfvE/e2/UzZU5yahh8yiVmsCRjAIfXJbqgrndLnmTVYlcRg4nE4Rrq3fDiE2Ay4Y6i2t/YzZqtnP0RTOJSqfY53M9BcIT7cI4eu5HEdy4Ia5SSi1216YqW8b53VU8AJ4GS1vKH6W/W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780734099; c=relaxed/simple;
-	bh=xNsig66RaSc9mwJJKda5AfVrR7MopkMm6DomHG+DJVc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BNm3QCuVFyeBazqkXL3KkGxe6lhWUmBaiIQpmne/are0ZXbT8QbCcQvkWtBU7FDnqqgIWD2bE2UNpog/RQA71zyN/1f1auRW3h2LiPf53EIxDKOXh1SiG2T5F3ZI7reBmczNNJF2rDmG1TLfUc55qeKZirn1zquV2mZRVDCgszo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=UH05RJSL; arc=none smtp.client-ip=209.85.128.47
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4906869f0cbso31393485e9.1
-        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 01:21:37 -0700 (PDT)
+	s=arc-20240116; t=1780734585; c=relaxed/simple;
+	bh=AIDn9cQyiDcvCPUjwx9WkvJ2cFdEKc62JUD+lPKbsMs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VCboZZSHi49R0jDnumR4HhQqiGEemfUN43ViyGOtXSC+Ncdzi3iirwAy2kPHDqLkmRdr5YSBHQZ7YbTCLJfDN5ICAQwoW1dx1nVEulr/zEaPYoXhQ04MIxiQ4SPzEtmA3o23KtGhma89ouIHlAeNVdkXUzw8IhLvOBUv9Q4AQHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hI85UbDQ; arc=none smtp.client-ip=209.85.217.48
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-6cfd2b2e7b1so997260137.2
+        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 01:29:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1780734096; x=1781338896; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4gMg6KaYvC+cJxi997viIEAJIuy1B+hppRNVQz2bByc=;
-        b=UH05RJSLI0QctYLwr0qzLZKFjNETsRVKTwKFx0L2fmVue84qdzMF8amgvjFCWr9kYZ
-         /YtZKrp2m4lw32rFAyxTxX3UEbZeM9XSO9EKvrTaAfuaRgimy+HY05Xz/wOXm7inNem0
-         6dxSFjusNVmEtwOfQ4wAc4gKl2niSPWagQP18+7wFKEaaTURdQ/MZYbOoWY8euXKQwT5
-         amH+ztZnH4WPThQHboUNfr66vOCjk0nceCr+VgpXhcU7wk3V5S6n/G4WzGxnbVmaKpC8
-         +IIzaQbP+7FDFGNE9qOZLc5B/PtUzJ0kmhqdpMD6z6ECjaBJY9aUwNm+i+IPjHXwNy97
-         j5tw==
+        d=gmail.com; s=20251104; t=1780734583; x=1781339383; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nbdG8rTTa+Ns3CE4q1E4xPdEBLWdT8odv2vCdDuMmAw=;
+        b=hI85UbDQo3TymCa1KRL6bePOzbMD1c1V1AYQ6+mMks0CxScRBubrz9mqBnTnFenLea
+         U8Tt7nLacFo0sojySq9U2L3OiGWuNLUWXaD3MfBUvr2lBOUHEIOfOF7zYfpZ32T80KdA
+         3Gl9RrqNdNO6ZQ3A8ubdJj62fCcEc5pIuy2HeMznvGebdyOqhwfxd5UKJsCy+8+LELwW
+         4gDa3/su/BGh3+Sk1ceiiK5DUzaqqvpTUPJJk9iWnD1NSRoH7icOyPKGPqXTnHGIXw6n
+         n8/SYyBNsFvn6LHrxraCeEaMPYhIOAsg1sqEX0QHw6oogKqg/his33F90RifytgXUVCN
+         Jrdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780734096; x=1781338896;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4gMg6KaYvC+cJxi997viIEAJIuy1B+hppRNVQz2bByc=;
-        b=ZCcMXcnRqeHHrmIvyvKigUhaP+bdo5MD3X3F3zqym7KJ9LQf+a/asRoQ9Zvdo51yve
-         XujCp727AKFRywmz2OEkRuvNQG9/TNw9wsmPXpopr6ehzu15NcmLIiSVoJfvcoypcu0S
-         Cas7lkyDJk3vX3PwZpVXcoVv0BlTMcg5+WjKTywptBWvohpUsFsLEUwHNfhhP76CGes7
-         o+PEJaIqlMT9IdWCKtoDe8RFOcjO1jUWMJvBR8A+SyMKb7uMrS1O2JzfIuWaepOKkBEk
-         nkMnLFQLZYtJHsA3XGZmjZCalW5B6oA4pWum722WgT0LuVOLoj2XDD/bkTQJRxA0UcUI
-         90ZA==
-X-Forwarded-Encrypted: i=1; AFNElJ/KN1A7cZesu67TKX4r3V+oeApaoF9gE/U5PajZFM8BRX8GZrnWjwaMOK6dGOHAftZcQSa1ipg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzEEcetCJ2ZoKxTb2HpA8R3RrKX2H+/WZZoQrxCXAn4OSO3FYN
-	jtBbIirjXz55Wc1c/OvZ9B1GELmKp8Z2H3B69cojvgJ+6LcMdqbooDEQ75ktnoeqdbI=
-X-Gm-Gg: Acq92OHWzV3rP6RRLOF3sPAlucqIyBwv+bZ3pdlkFmbvkEKCS7W0wxJHVpxLy4Lg6c2
-	rAhjNDEr/nYcWKTCx09NgJtMFdeIycyQloOOvEN4T9ErznVpRerz7GV9gYn+uPZ5znyfjaqZtB7
-	EIU7H0ktzzEX6nGsYtJmCiCf77sPcN5Z1CQTodOfnu1CcG71kTLeTZnHW5ciYmvqp5IwoSPZjQk
-	QEdrAWQ5uMLlJHLqOOAXz0jRu510eAV1rkA3QzuLl9jGrxspj2DzgvqaCTpiiLgDqzemD8Zi8mM
-	PWep2KwHriBB1XIMNnqIC8HXiEZbnjYVvnEx5rZWAz/OW/Ha5FzanmNSpsB7xU5jn7AFeG6oHIF
-	x4Rb4FrmgVusFy4s2Rr9ObN3EF/gVTyyf1zJYrLs+bnqZVTW3n+MTwh2HGyGVmTZ5+rqNWN7fyt
-	yV8VgF+RLo6oEV5zsG+VdYdq/3lEqrX4I4bEq7mS7TPUb/pSkxk+n6jmgn84CaXFsK
-X-Received: by 2002:a05:600c:4e4c:b0:490:bb3e:30b0 with SMTP id 5b1f17b1804b1-490c25b2ab5mr131639785e9.4.1780734095644;
-        Sat, 06 Jun 2026 01:21:35 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490c2d4891csm82571075e9.1.2026.06.06.01.21.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Jun 2026 01:21:35 -0700 (PDT)
-Message-ID: <a63eed7d-b674-4830-a690-1b55dfdc9a72@blackwall.org>
-Date: Sat, 6 Jun 2026 11:21:33 +0300
+        d=1e100.net; s=20251104; t=1780734583; x=1781339383;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nbdG8rTTa+Ns3CE4q1E4xPdEBLWdT8odv2vCdDuMmAw=;
+        b=N43PbDfBO/9jxfOxaKHq57c9i4s4tTgZG4s8esQjTzUmjuFEJB5DFdT9bsDRJu6OQq
+         7f1MFJRKwA0TZI81c6/OqHlNfbVFIC4s94Mzi0TefYytWzk8dbPzlf5DOEa3vJpSQ6Or
+         Nw8VLIUdrRp7RUKCtX0JtduxNhJCBVoV29OgONKhKO/g+84udyxXOcBgFwzj3I9+1Ji5
+         3ovbfLtM3JleaXWAcGftr8F+GEGOWa/6SYOxG6tvYgc2QyjzEYMQ5aR4YBJ0Q5eP7irI
+         QAQxhD87rM9sG74eGQ9X5E/wSEYRZUJz6We90zmMUMHZkH9SW2xl1VarzpnXam6bP+RM
+         3JkA==
+X-Gm-Message-State: AOJu0YwCZ4xuGAHVKiR3LEwy99YQ8JD3etoLhpCBw6wVAm/mmvUrqw8t
+	ZabQEZnDIG29ywMaav7KrSfRWXwVE+/LjbLYpDeExgldyb34fJFIPq9iciXXy9k9pW8=
+X-Gm-Gg: Acq92OFoR7g+kGdMRfTQhUl7MnZlKzAVzhRg4TnuXaUMQ/O63RAM3B7ii7RbmzcUBro
+	QyEJNw7YIKiQM/7ApvK2ZK6th3etlePIXJoUAkhOd2i9SJ0S/KBtYw3PFuWYZE/iNQf/cNvZ450
+	VhQdhP8BbFnwokiuOm/Q2nPWuMOgK7i2gM1QS4B6Qj2+1KfHUuTBViRB5I4OLwlzIZbyZYsi5yu
+	n5YmME4fGUbc6lp9NpvtkS0AVwZ/3UqoTvepZRE6z7uPa5DmYGHm8ZZn615m1WuMGr+G/OxWBg/
+	wiSM9KJqsz5RJ9/btmZ/uw8CatiBvucdblV/4RPCMSBi6UvhFaxFlHHvJJtzEXJ+N683F2XJTi1
+	qe6uYBESfsfvCio6Xw/2uxQRvIlAFtSFCVvnONqQPmA401zkCLbFRYKrRsF/GD2djjMHGbFmWQW
+	gsm1ngCT0q5pPVj3/WCRu9XWsZaDdatc3S4XEuKw8ERaE7DKe0R3U37hicUzGW
+X-Received: by 2002:a05:6102:2ad5:b0:631:2cb0:bf8d with SMTP id ada2fe7eead31-6fef75cc38fmr4442123137.6.1780734582946;
+        Sat, 06 Jun 2026 01:29:42 -0700 (PDT)
+Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5a6dc44d233sm9630281e0c.10.2026.06.06.01.29.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jun 2026 01:29:41 -0700 (PDT)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [net-next PATCH v13 0/9] net: dsa: realtek: rtl8365mb: bridge
+ offloading and VLAN support
+Date: Sat, 06 Jun 2026 05:29:24 -0300
+Message-Id: <20260606-realtek_forward-v13-0-b9e409687cbe@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/6] net: bridge: add 802.1Qat stream
- reservation admission control
-Content-Language: en-US, bg
-To: Luke Howard <lukeh@padl.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: Cedric Jehasse <cedric.jehasse@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Ivan Vecera <ivecera@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev,
- linux-kselftest@vger.kernel.org, Max Hunter <max@huntershome.org>,
- Kieran Tyrrell <kieran@sienda.com>
-References: <20260602-mv88e6xxx-8021qat-mqprio-v2-0-72be14522e7c@padl.com>
- <20260602-mv88e6xxx-8021qat-mqprio-v2-3-72be14522e7c@padl.com>
- <537410c3-ff4e-43fd-834e-775cd1bbe89e@blackwall.org>
- <E1253C6D-F6F0-407A-AABF-FCAB57100A1C@padl.com>
- <n2pi7h5nvxg3xvshtcxqeizpukp6hphqa7kodbe7b3ioc3kcq5@n34fgocvaicm>
- <d0e650fb-4011-4d64-9780-a0ddd0ca1cf3@lunn.ch>
- <CCF20D32-6C9F-49DC-9838-592EFB5E88D2@padl.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <CCF20D32-6C9F-49DC-9838-592EFB5E88D2@padl.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAGTaI2oC/23SS07DMBAG4KsgrwnyePwKK+6BEPJj3Ea0CUqiU
+ FT17jhlgYmzjEff78x4rmyisaOJPT9c2UhLN3VDnz8AHx9YOLr+QE0X8wETXGiOApuR3Gmmj/c
+ 0jF9ujA14F9AZE7SWLKvPkVJ3uUe+sp7mpqfLzN5y5dhN8zB+3+9a4F7/TUWoUhdoeCNl8hpz3
+ Rt6OZxdd3oKw/metYg/r3j9V4vIPnItSQjusYWtx9Lr2mP2EK0JKlnl0G+9LDzseJm99TpqB0Q
+ phq1XpW9rr7IPvk2GiwDGiq3XhRc789Nr/7lv711EG3DrTel35meyR0DLFQmwqfK29Kr2NntF3
+ nIntVG+er+29Dv9t9lTXiqwRsRWVPcDLwKQ7ywQXycA0isg7XQbqwQoE/ZWcN1BxaPmSRkwZKu
+ EYglzxk7CuoXGkjceISbz7xVvt9sP2RKXw38DAAA=
+X-Change-ID: 20260323-realtek_forward-1bac3a77c664
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Linus Walleij <linusw@kernel.org>, 
+ =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Yury Norov <yury.norov@gmail.com>, 
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mieczyslaw Nalewaj <namiltd@yahoo.com>, 
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
+ Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
+ Yury Norov <ynorov@nvidia.com>
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296077-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:lukeh@padl.com,m:andrew@lunn.ch,m:cedric.jehasse@gmail.com,m:jiri@resnulli.us,m:ivecera@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:shuah@kernel.org,m:olteanv@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bridge@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:max@huntershome.org,m:kieran@sienda.com,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DMARC_NA(0.00)[blackwall.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296078-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:yury.norov@gmail.com,m:linux@rasmusvillemoes.dk,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:namiltd@yahoo.com,m:luizluca@gmail.com,m:abdulkader.alrezej@gmail.com,m:ynorov@nvidia.com,m:yurynorov@gmail.com,m:abdulkaderalrezej@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,redhat.com,davemloft.net,google.com,kernel.org,nvidia.com,lunn.ch,vger.kernel.org,lists.linux.dev,huntershome.org,sienda.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,yahoo.com,gmail.com,nvidia.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[blackwall.org:+];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,blackwall.org:mid,blackwall.org:from_mime,blackwall.org:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A09B64CEAE
+X-Rspamd-Queue-Id: EB2FC64CECE
 
-On 06/06/2026 11:02, Luke Howard wrote:
-> 
->> So it sounds like you first need to work on the software
->> implementation and expand the simplified version with the features you
->> need. You can then add support to accelerate this by offloading it to
->> the hardware.
-> 
-> Agreed.
-> 
-> The definition of Dynamic Reservation Entries in 802.1Q (clause 8.8.7) might support the addition of a new MDB (or even FDB) entry state to the kernel:
-> 
-> - add MDB_DYNAMIC_RESERVATION (a state, not a flag);
-> - the software bridge only _classifies_ packets against  MDB_DYNAMIC_RESERVATION entries, and only when MDB is authoritative. Classification sets dynamic_reservation_hit on tc_skb_ext;
-> - dynamic_reservation_hit is visible to the flow dissector so can be used for policy enforcement.
-> 
+This series introduces bridge offloading, FDB management, and VLAN support
+for the Realtek rtl8365mb DSA switch driver. The primary goal is to
+enable hardware frame forwarding between bridge ports, reducing CPU
+overhead and providing advanced features like VLAN and FDB isolation.
 
-See, saying the bridge has to classify doesn't sound right. Why not do the
-classification where such operations are usually done, e.g. tc?
-You have to manually designate these entries anyway.
+Some of these patches are based on original work by Alvin Šipraga,
+subsequently adapted and updated for the current net-next state.
 
-> Advantages:
-> 
-> - the new MDB state maps well to 802.1Q;
-> - minimal changes to bridge;
-> - actual policy (reclassify, drop, etc) is left to the user;
-> - doesn’t require a new tc-flower entry for each stream DA;
-> - entry state maps 1:1 to mv88e6xxx AVB_NRL ATU EntryState.
-> 
-> Disadvantages:
-> 
-> - no unicast support, although potentially can be extended (there are some subtleties);
-> - mv88e6xxx support would either require rich enough tc-flower support in TCAM, intercepting TCA_FLOWER_DYNAMIC_RESERVATION_HIT and mapping to native AVB admission control, or a per-port devlink parameter (not so nice).
-> 
-> This is implemented and working with the software bridge, I still haven’t quite figured out the right mapping for mv88e6xxx.
-> 
-> Luke
-> 
-> PS. I previously incorrectly asserted that 802.1Q required dropping frames with AVB/SRP PCPs but without valid dynamic reservation entries. 802.1Q discussions priority mapping in clause 6.9.4 for traffic from SRP boundary ports (those not participating in SRP). In practice I think this should all be policy, e.g. you might want to reprioritise valid DSCP traffic from within a SRP domain, or drop instead of reprioritise, etc.
+---
+I attempted to reach Alvin for review of the final version but was
+unable to establish contact. Any regressions in this version are my
+responsibility.
+
+Changes in v13:
+* Patch 4 (Multiple Sources):
+ - Add trailing comment after the backslash in the Makefile.
+* Patch 6 (VLAN):
+ - Removed RTL_VLAN_ERR macro, splitting user validation (extack) from
+   hardware logs (dev_err).
+ - Renamed rtl8365mb_vlan_mc_get_pvid() to rtl8365mb_vlan_get_pvid_mc().
+ - Changed VLAN MC table exhaustion error from -E2BIG to -ENOSPC.
+* Patch 7 (FDB)
+ - Demote rtl8365mb_l2_get_next_uc() kerneldoc to a standard C comment
+   and correctly document its wrap-around behavior.
+ - Moved ds->max_num_bridges initialization and EFID register
+   definitions here from the next patch to fix FDB isolation
+   bisectability.
+* Patch 8 (Bridge Join/Leave):
+ - Dropped ds->max_num_bridges and EFID definitions (moved to the
+   previous patch).
+- Link to v12: https://patch.msgid.link/20260605-realtek_forward-v12-0-78eb7b31df72@gmail.com
+
+Changes in v12:
+* Patch 3 (DSA helpers):
+ - Moved irq_set_parent() to the .map callback to fix IRQ routing for
+   dynamically mapped ports.
+* Patch 6 (VLAN):
+ - Moved bridge isolation behavior description to the bridge join/leave
+   patch.
+ - Added comments justifying the state inversion logic in the
+   port_vlan_filtering undo path.
+ - Refactored port_vlan_del to fail-fast if PVID clearing fails,
+   preventing partial hardware state deletions.
+* Patch 8->7 (FDB):
+ - Reordered the patch before the bridge support to avoid flooding
+   CPU-destined traffic to all ports.
+ - Documented the is_static = true trade-off for DSA-assisted learning
+   entries.
+ - Removed the artificial l2_table_size limit in fdb_dump, relying safely
+   on the hardware wrap-around.
+ - Reverted support for multicast addresses in fdb_add/del, delegating it
+   strictly to MDB operations.
+* Patch 7->8 (Bridge Join/Leave):
+ - Reordered the patch after FDB support to avoid flooding CPU-destined
+   traffic to all ports.
+ - Log hardware errors during port_bridge_leave to avoid silent failures.
+- Link to v11: https://patch.msgid.link/20260531-realtek_forward-v11-0-50d60f5717e8@gmail.com
+
+Changes in v11:
+* Patch 2 (unsupported topologies):
+  - Moved the check for DSA links to an early pre-flight phase before
+    configuring any ports.
+  - Omitted "Link" from the missing upstream port error message. If
+    cascading is supported in the future, that message will be updated
+    as well.
+* Patch 3 (DSA helpers):
+  - Reworded the commit message to clarify that unused ports are
+    explicitly blocked.
+  - Reworded the commit message to explain why all IRQ mappings need to
+    be cleaned during teardown, even for unused ports.
+* Patch 6 (VLAN):
+  - Added the same VID==0 guard for the vlan port del path.
+  - Reworded the VID==0 error message, mentioning it is reserved by the
+    driver and not "unsupported by the HW".
+- Link to v10: https://patch.msgid.link/20260530-realtek_forward-v10-0-d14b51e6a69d@gmail.com
+
+Changes in v10:
+* Patch 2->2,3 (DSA helpers):
+ - Split the unsupported topology checks into a new preparation patch.
+* Patch 4->5 (Table lookup):
+ - Fix port mask size in the table lookup command.
+* Patch 5->6 (VLAN support):
+ - Only remove a failed rtl8365mb_vlan_pvid_port_set() from
+   VlanMC if it wasn't already a member.
+* Patch 6->7 (Bridge Join/Leave):
+ - Bridge join should only enable learning after efid was set. If not, a
+   learned MAC could be leaked to EFID 0.
+- Link to v9: https://patch.msgid.link/20260529-realtek_forward-v9-0-e7c61872d923@gmail.com
+
+Changes in v9:
+* Patch 2 (DSA helpers):
+  - Switch to dsa_switch_for_each_port() in the irq_setup error path.
+* Patch 4 (Table lookup):
+  - Convert kdoc to standard comments.
+  - Fix doc description for L2 write operation return value and
+    data/addr on errors.
+  - Removed misleading comment on RTL8365MB_TABLE_CTRL_PORT_MASK.
+* Patch 5 (VLAN support):
+  - Do PVID first in port_vlan_add() to avoid reverting vlan4k changes
+    if it fails.
+  - Do not use dsa_switch_for_each_port_continue_reverse() after the
+    loop ends (use-after-iterator).
+  - Simplify PVID helpers to receive VID instead of switchdev vlan.
+  - Avoid redundant writes in the PVID error path.
+  - Convert kdoc to standard comments.
+* Patch 6 (Bridge Join/Leave):
+  - Do not use dsa_switch_for_each_port_continue_reverse() after the
+    loop ends (use-after-iterator).
+- Link to v8: https://patch.msgid.link/20260525-realtek_forward-v8-0-5eb80a4675be@gmail.com
+
+Changes in v8:
+* Patch 4 (Table lookup):
+ - Revert -ENOSPC suggestion from Sashiko. It is better for the caller
+   to handle the semantic meaning of table query failures, as write
+   operations are also used for deletion where -ENOSPC makes no sense.
+   Physical lookup/hit failures in table_query() now simply return -ENOENT.
+* Patch 5 (VLAN):
+ - Removed unused attribution to variable dp.
+* Patch 6 (Bridge Join/Leave):
+ - Migrate the .port_set_learning callback definition from the bridge
+   flags patch to ensure MAC learning can be explicitly enabled on
+   bridge join and disabled on bridge leave, preserving bisectability.
+* Patch 7 (FDB):
+ - Reroute fdb_add/del to l2_add_mc/l2_del_mc if the MAC address is
+   multicast to prevent bit corruption in the unified LUT.
+ - Silence -ENOENT (and -ENOSPC on write-based deletion) when fdb_del
+   tries to delete a missing entry, as it could have expired in the
+   meantime.  Repeated deletion calls are already filtered out by the
+   upper layers before reaching the driver.
+ - Improved multicast deletion debug message to include the MAC address.
+* Patch 8 (Bridge Flags)
+ - .port_set_learning was moved to patch 6
+- Link to v7: https://patch.msgid.link/20260523-realtek_forward-v7-0-313805e218f3@gmail.com
+
+Changes in v7:
+* Patch 2 (DSA helpers):
+ - Switch from dsa_switch_for_each_available_port() to
+   dsa_switch_for_each_port() in irq_teardown() to properly dispose
+   of unused ports' mappings.
+ - Reorder the !cpu->enable check in setup() to run before chip
+   configuration.
+ - Add a detailed comment explaining the limitation of the unsupported
+   cascading layout.
+ - Expand the commit message to document the pre-existing IRQ handler
+   guard and the new -EINVAL probe failure mode.
+* Patch 5 (VLAN):
+ - Replace br_vlan_get_pvid() with rtl8365mb_vlan_port_get_pvid(), which
+   uses the HW info directly.
+ - Rename the existing internal static helper to
+   rtl8365mb_vlan_port_get_pvid_idx() to cleanly export the new PVID
+   retrieval helper.
+ - Add a logical guard check in rtl8365mb_vlan_pvid_port_add() to prevent
+   accidental deletion of VLAN MC entries when reconfiguring an identical
+   PVID.
+ - Removed spurious rtl8365mb_vlan.c.orig file.
+* Patch 7 (L2):
+ - Clarify CPU port EFID and assisted learning comment in fdb_add().
+ - Comment that EFID computation in mdb_add/del is for debugging only.
+* Patch 8 (bridge flags):
+ - Added missing '\n' in rtl8365mb_port_pre_bridge_flags() dbg message.
+- Link to v6: https://patch.msgid.link/20260521-realtek_forward-v6-0-d391bbad38c3@gmail.com
+
+Changes in v6:
+* General:
+ - Added missing Reviewed-by tags across the series.
+ - Removed redundant parentheses around the dp macro evaluation ((dp)).
+* Patch 1 (err_ptr):
+ - Updated the commit message to document the use of dev_err_probe().
+ - Fixed a minor typo (failed map IRQ -> failed to map IRQ).
+* Patch 2 (DSA helpers):
+ - Fixed a space typo (Cascading(DSA link) -> Cascading (DSA link)).
+ - Added a safety check to abort configuration early with -EINVAL
+   if no upstream (CPU/Link) port is active (!cpu->enable).
+ - Fixed error handling inside port configuration loop that was not
+   using out_teardown_irq.
+* Patch 5 (VLAN):
+ - Added a vlan_lock mutex to protect read-modify-write ops in vlan4k
+   and vlanMC, used in vlan_port_add/del.
+ - Set framefilter to tagged-only only if vlan filtering is enabled and
+   PVID is not active (checked both while changing vlan_filtering or
+   adding a PVID port).
+ - Added rtl8365mb_vlan_mc_get_pvid() helper function.
+ - Added rtl8365mb_vlan_port_get_framefilter() and made
+   rtl8365mb_vlan_port_set_framefilter() and enum
+   rtl8365mb_frame_ingress public.
+ - Explicitly reject requests for VLAN 0 with -EOPNOTSUPP.
+ - Fixed string formatting bounds for the vlanMC overflow.
+ - rtl8365mb_vlan_pvid_port_{add,del} error handling now attempts to
+   return to the previous PVID state.
+ - rtl8365mb_vlan_pvid_port_del with vlan NULL (without informing the
+   VID) is not needed anymore.
+ - Added kdocs to public functions
+* Patch 7 (L2):
+ - Removed check for -ENOENT on L2 write as the table access already
+   returns the expected error.
+ - Increased L2 polling timeout to 10000us, matching the table polling.
+ - Improved l2_{add/del}_mc debug messages while strictly respecting
+   the 80-column limit.
+ - If an unexpected dynamic multicast group exists while adding a new
+   port, promote that group to static.
+ - Improved comment about how HW deletes a multicast group.
+- Link to v5: https://patch.msgid.link/20260519-realtek_forward-v5-0-cb9f702c1782@gmail.com
+
+Changes in v5:
+* General:
+ - Removed Alvin from Co-Developed-By and added myself.
+* Patch 1 (err_ptr):
+ - Fixed error message on failed IRQ mapping
+* Patch 2 (DSA helpers):
+ - Fixed missing irq teardown when DSA link port was detected.
+ - Added missing \n in error message when DSA link port is detected.
+* Patch 4 (Table lookup):
+ - Fixed RTL8365MB_TABLE_ADDR_MASK mask
+ - Added a check for busy table access before preparing and issuing
+   a new command (protecting from a failed previous access)
+ - Increased table timeout from 100us to 10000us
+ - Changed -ENOENT to -ENOSPC when writing to L2 failed
+ - Moved RTL8365MB_TABLE_ENTRY_MAX_SIZE to table.h (as kdoc mentions it)
+* Patch 5 (VLAN):
+ - Removed duplicated filtering registers macros
+ - Removed wrong comment on undo_transparent
+ - Forced the removal of a possible PVID state if an added port
+   is not PVID
+ - Added vlanmc->priority_en to VlanMC reading, although always zero
+ - Use VlanMC member just for tracking ports using PVID and do not
+   try to keep it in sync with Vlan4k. rtl8365mb_vlan_mc_pvid_members()
+   is not needed anymore.
+ - Changed rtl8365mb_vlan_mc_port_set signature to receive vid and pvid
+   instead of the vlan struct to avoid null pointer dereference
+* Patch 7 (L2):
+ - Removed addr from rtl8365mb_l2_del_mc when -ENOENT is returned by the table_access as it is undefined (noticed by sashiko)
+ - Added RTL8365MB_L2_TABLE_SIZE and use it instead of RTL8365MB_LEARN_LIMIT_MAX when needed
+ - Extended RTL8365MB_LEARN_LIMIT_MAX comment to cite that the exception RTL8370B might not even be a RTL8367C member
+ - Moved l2_lock init to rtl83xx.c as it is a field in a common struct.
+ - Fixed fdb_dump kdoc, now returning OK when the table is empty
+ - Expaned L2 commit to cite unicast/multicast table key
+   differences
+- Link to v4: https://patch.msgid.link/20260516-realtek_forward-v4-0-8b6d6a1eefdc@gmail.com
+
+Changes in v4:
+* General:
+ - Fixed comments/kdoc wording identified by Sashiko.
+* Patch 1 (err_prt):
+ - Added missing %pe/ERR_PTR conversion identified by Sashiko.
+* Patch 2 (dsa macros):
+ - Reorganize port setup initialization, collecting ports in upports_mask
+   and downports_mask.
+ - Include a fail fast during setup if DSA links ports are detected.
+* Patch 4 (table):
+ - Added missing return value check for regmap_bulk_read in table access
+   (spotted by Sashiko).
+* Patch 5 (vlan):
+ - Added undo steps to rtl8365mb_port_vlan_filtering (noticed by
+   Sashiko).
+ - Removed residual double max packet configuation (noticed by Sashiko).
+ - Added meteridx and policing_en to rtl8365mb_vlan_mc_read, although
+   always written as zero in rtl8365mb_vlan_mc_write() (noticed by
+   Sashiko).
+ - Explicitly comment that VlanMC[0] uses EVID==0 (Sashiko was worried).
+ - Always undo previous PVID setting before applying a new one. It might
+   exhaust VlanMC entries if the user keeps changing PVID without removing
+   the port from the previous PVID VLAN (bug detected by Sashiko).
+ - Fixed a bug where a missing VLAN MC entry during PVID assignment would
+   return success instead of an error (reportd by Sashiko).
+* Patch 6 (bridge join/leave):
+ - Added error unwinding path (undo isolation and EFID) in
+   rtl83xx_port_bridge_join (noticed by Sashiko).
+* Patch 7 (FDB support):
+ - Added RTL8365MB_L2_ENTRY_SIZE macro.
+ - Aixed RTL8365MB_L2_FLUSH_CTRL2_TYPE_BOTH definition (noticed by
+   Sashiko).
+ - Removed the union in rtl8365mb_l2_uc_key. Each field is independent
+   now (bug detected by by Sashiko).
+ - Fixed mc->member calculation. Now it uses bitfield to rebuild the
+   Value (bug detected by Sashiko).
+ - Return mdb_del without errors if entry is missing.
+ - Improve debug messages for l2 operations.
+ - Added comment about ds->assisted_learning_on_cpu_port and
+   fdb_isolation in the commit message (asked by Sashiko)
+ - Renamed some _MASK macros to _MSK to reduce the name length.
+ ** rtl83xx_port_fdb_dump fixes:
+  - Initialize entry as null (noticed by Sashiko)
+  - Check return of cb() (bugfix reported by Sashiko)
+  - Fix address overflow (noticed by Sashiko)
+- Link to v3: https://patch.msgid.link/20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com
+
+Changes in v3:
+- Fixed kernel-doc warnings
+- Removed unnecessary defensive checks
+- Link to v2: https://patch.msgid.link/20260503-realtek_forward-v2-0-d064e220b391@gmail.com
+
+Changes in v2:
+- Added patch to use ERR_PTR()
+- Dropped bitfield patch. Use FIELD_PREP instead. Suggested by Yury
+  Norov
+- tag_rtl8_4 patches were submitted on its own series (already accepted)
+- Dropped rtl8365mb_vlan_mc_port_{add,del}(). rtl8365mb_vlan_mc_port_set
+  is now called directly from PVID methods.
+- Reordered methods in rtl8365mb_vlan.c
+- Use dsa_switch_for_each_user_port() instead of simple for in bridge
+  port join/leave
+- PVID check now uses dsa_switch_for_each_available_port instead of
+  dsa_switch_for_each_port
+- Set EFID of user ports to 0 at setup(), although it is the expected
+  state after reset
+- STP patch was dropped and replaced by a more extensive one that
+  disables all ports (including unused ones) before setting CPU and user
+  ports. It also extended the CPU port isolation to include all user
+  ports.
+- Refactored bridge, FDB, and MDB port operations into the common
+  rtl83xx module, introducing new realtek_ops callbacks to abstract the
+  hardware access
+- Collected Reviewed-by and Suggested-by tags
+- Link to v1:
+  https://patch.msgid.link/20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com
+
+To: Linus Walleij <linusw@kernel.org>
+To: Alvin Šipraga <alsi@bang-olufsen.dk>
+To: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Alvin Šipraga (5):
+      net: dsa: realtek: rtl8365mb: prepare for multiple source files
+      net: dsa: realtek: rtl8365mb: add table lookup interface
+      net: dsa: realtek: rtl8365mb: add VLAN support
+      net: dsa: realtek: rtl8365mb: add FDB support
+      net: dsa: realtek: rtl8365mb: add port_bridge_{join,leave}
+
+Luiz Angelo Daros de Luca (4):
+      net: dsa: realtek: rtl8365mb: use ERR_PTR
+      net: dsa: realtek: rtl8365mb: reject unsupported topologies
+      net: dsa: realtek: rtl8365mb: use dsa helpers for port iteration
+      net: dsa: realtek: rtl8365mb: add bridge port flags
+
+ drivers/net/dsa/realtek/Makefile                   |   5 +
+ drivers/net/dsa/realtek/realtek.h                  |  46 +
+ drivers/net/dsa/realtek/rtl8365mb_l2.c             | 576 +++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_l2.h             |  32 +
+ .../dsa/realtek/{rtl8365mb.c => rtl8365mb_main.c}  | 712 ++++++++++++++--
+ drivers/net/dsa/realtek/rtl8365mb_table.c          | 214 +++++
+ drivers/net/dsa/realtek/rtl8365mb_table.h          | 138 +++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.c           | 944 +++++++++++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.h           |  39 +
+ drivers/net/dsa/realtek/rtl83xx.c                  | 563 ++++++++++++
+ drivers/net/dsa/realtek/rtl83xx.h                  |  27 +
+ 11 files changed, 3219 insertions(+), 77 deletions(-)
+---
+base-commit: 627ac78f2741e2ebd2225e2e953b6964a8a9182f
+change-id: 20260323-realtek_forward-1bac3a77c664
+
+Best regards,
+--  
+Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
 
