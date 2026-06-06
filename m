@@ -1,215 +1,194 @@
-Return-Path: <netdev+bounces-296088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WcksMgjdI2o9zwEAu9opvQ
-	(envelope-from <netdev+bounces-296088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:40:40 +0200
+	id 58v2D27lI2oo0AEAu9opvQ
+	(envelope-from <netdev+bounces-296089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 11:16:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BE864CF40
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 10:40:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EC264CFAB
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 11:16:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=WQsKoxgn;
-	dkim=pass header.d=redhat.com header.s=google header.b="nd1Lg/Th";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296088-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296088-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ir9xp+Rf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296089-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296089-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB74F301D68B
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 08:40:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFAEA30075D5
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 09:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08A4316199;
-	Sat,  6 Jun 2026 08:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED17310652;
+	Sat,  6 Jun 2026 09:16:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3CE2D5C7A
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 08:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F862F5468
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 09:16:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780735221; cv=none; b=GQsfH1jZuFKrNjFizT7z7occbPR7Lp/cjGIrxxgS+GZbRKlJ12I5c/S9X9PHnXBF7737l1p/nVGYvvjrhd00b0RaRKatt2Kv+ml+JcN9N07zLncz624fkqKXnkz0+pd8rtwDPDblqIlXrgoI5toFmOYLZc3lTUSXdpWli9pjdsI=
+	t=1780737386; cv=none; b=f5QLTKFT+Q6n5Ej7ZxLbThAPlqWctZ8dPZdBTeosFkuUegiFK961JQAOve+s60iMZGXneSTdVRnBKXa5ySZsjJ8CihuPMQJJ7ADZSafNza7b1AhHjn2jHzfaH+WLXOsSxU3razyE3kW0wyq/qqMsLTxy7GghVzCttF+WYUFRGzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780735221; c=relaxed/simple;
-	bh=rkhKQS89b50kiu4B39caolckRfcM07Ahq3gjWequ89o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CwRC39yhwqGDhscdC42m7VuYcCDFH6oK8rp0voueAQIV0unM7Z+6HGyVMJjrVaPvfyVdEn4N5W6cA7XHQIFJynmSeKrqTSeBHVlZGfyXZod+OX9Zk1Gr09kkyxJhF8CU5Nt3ysyTxi5zJu9CGvUUvZxCpmjFuDZ/UABGuoG6aCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQsKoxgn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nd1Lg/Th; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780735219;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6a8D6PKyj3T42BmGkn1gN/k2Pm8r+kvs7tG5TWxDMy0=;
-	b=WQsKoxgn3PN8/w8OeztXu0ygbG7QWpIIAEknMKDS3bHZ8wv4T3jamBQInPWiCjf2RhtB8t
-	ra/Dg0+3ZOy3fUbj5fl+GRDIQPHXh7t7zkCucU7j6l/0r+/4BCmdc9yRbdqLdVFoWCCAIO
-	v9NtuOBsU4YaS+6paub7IxlOqlxe2xs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-319-nq-pOYK7N0eS2UMeePWftQ-1; Sat, 06 Jun 2026 04:40:16 -0400
-X-MC-Unique: nq-pOYK7N0eS2UMeePWftQ-1
-X-Mimecast-MFC-AGG-ID: nq-pOYK7N0eS2UMeePWftQ_1780735215
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-490b37e1f48so23048065e9.0
-        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 01:40:16 -0700 (PDT)
+	s=arc-20240116; t=1780737386; c=relaxed/simple;
+	bh=CpQdRBzECz1cjWSW+VoW6/cj4i4cip2V9Z6XLkYrqQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EHmVkhWxzyXf81NiOkrW9UlnIsGPMlmxB6wuhYdR+i9BTXuV6cmk2HlsKU/DtWj0V/5Ftnl9XZLjQi7nOL0+UC+x65zRBBiZW2Gr6gvzW29nfIEpNHGgkbs8O+rLoo5IUFDLWqw0mh46fJxbqQHJwnChhSo0WtBCMi1mREKuX1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ir9xp+Rf; arc=none smtp.client-ip=209.85.128.41
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-490af320e2aso30612225e9.2
+        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 02:16:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780735215; x=1781340015; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6a8D6PKyj3T42BmGkn1gN/k2Pm8r+kvs7tG5TWxDMy0=;
-        b=nd1Lg/Th4VRA1rN24GFqrT4gTMu484r2naWxluBqdunupDttAj6cCdx6kbrc56mtS2
-         rrdXlGpuR8V698aF77DNCoUiNQDhhigQyKw//d8+jtuPwcbKR3u9DjovAfWe6gf2rVbL
-         PfaHdkm0t2YW1N77PJYbC+fCIeKu6qU7YgJ3E2vMOyF6XN1WJ6YFeb2tUQ60vxBJvNeZ
-         fdDjnfuvlPioRHhlA6rkI+agAchtPrmxZwmdazfPjUls1v3LxJa21j+WmECD7/WMLOWA
-         NikJvFMeM3jEBbGmHs66BhCUHbLUf3rqWhDZ2BvIc3X/Xp79xXrFvphaC9bvvhDt5ymG
-         AAbQ==
+        d=gmail.com; s=20251104; t=1780737383; x=1781342183; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/SxOH3sBqh56WyqC7iKaRtAkj2hv0SNo09/WoL7JuhE=;
+        b=Ir9xp+RfW7zEfhlmHWN4cKq4EtLbS6jnYjUT+aoOTb4FcEuqF5HOl85ypGKR1nXorh
+         Sps2ILrf5DTgYLbvMPtc72+zJ5YzSLcJhI7qiQVRN8au+vPQVPJtO7cqqxDBES9Pq2C3
+         zJXYBsd06ojJkLJ2bZRiFV+BIssT9CvlIGPnjE74nfj1gV/Bvo1BfHZL5vPNBaPCI5RE
+         GcuTqEqf9pFd+z2tDdK/Dpy5iV0eqG1q6SjyWiWQoleNeVnpMbPU8fnqrAFfGhoCegZc
+         S9JvwNEGltkYKAdUu86r+XJK9bR4+ra4xPdJewTmDRDKYaHgcIPpjsAcV8WQ4lPKWg/Q
+         KNAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780735215; x=1781340015;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6a8D6PKyj3T42BmGkn1gN/k2Pm8r+kvs7tG5TWxDMy0=;
-        b=ljUVIhPRqp5mav58Y9+44TFaqlpkMjIMOb/TOfBYFb4pDJEvNDMkELG+CMRKKyZltK
-         mfxo8VKsaMY+Voz726rXisLwPilUbGOvDrl47sAxlDnc7rhfSOI6lJgwK+/BAImUr+Fs
-         JoACMTkD3zW2mo0FLpE+8vCeZ3ERzclaz7B9dbSI9wM70CM68Bl6IZDH7PD4IPL/+CBR
-         5zgVSw2x1ezpx926q1iszc2mvL08NJzNsGFXStuvpa4UgYFOsSW5lfo2O571nuyiJU+v
-         Ivh1SJnjifXkUNCkGnbAKB4MCtiKMcIjAjy1tSrOhhIDH14236Np9XXGre0Ju8QNl5ns
-         p9fA==
-X-Forwarded-Encrypted: i=1; AFNElJ9Wf/QqV+Zc/4dwEymfa7gVw5ddt7S+upefGI9YfvRbNE4zti3jfvcGKrF1TS4/LJx+Qzki4fI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPDP0ekL4LEgs1Z9ir+PP8VUIXTla8SvNVa1TQ6p15mzSaSMa3
-	LJgzV0+tDDnWf9KX7yEozARfPjk7bGCxMwY6p5AzEJM5HaR/pCpKxsG4nhU5tV1XlGHNwTHgIDj
-	L1H/XWt5JXXhlRBc1mnrl91pyMqnp6kevs4RfGTcEKGwVU4XVZeE93u2whA==
-X-Gm-Gg: Acq92OFUPV9S95VTtxm8kn9xhLIYSDGdWPA3pcBWc8K1jMIJcM39wPCwHqAAgJmiHu5
-	wJOzoL8zk3dg5JzZXI0y6X+A71FSjHWOv17CEiJ9o2utZmrJAd3UB67mIhw5/gS1d+8QcxZ5rd7
-	OQ8MXg6xate4MVXzQNU80AVMYWRWHWn3j9Yv598+Qyb7SnRRQlSCHhKpINZbW5+t+yEfecjFx60
-	540c7jwS2mZAgXRnCr/GGRrhec8V9LHVfyb5x5l1J5DC97XyYnYU5qDeJ+wItAEbhCi8Pz/oKoK
-	0iGvLm8dcoQxPg6UNI57Mz51ltTBhU6V/NaPhHAqS4s3d935YXklMHAnm80X86GMwMmWHWz1wVY
-	zzfuIBf+V2MsYEz7bYO8YA48=
-X-Received: by 2002:a05:600c:628c:b0:48f:e26a:1744 with SMTP id 5b1f17b1804b1-490c25a87f5mr107060605e9.9.1780735214986;
-        Sat, 06 Jun 2026 01:40:14 -0700 (PDT)
-X-Received: by 2002:a05:600c:628c:b0:48f:e26a:1744 with SMTP id 5b1f17b1804b1-490c25a87f5mr107060075e9.9.1780735214457;
-        Sat, 06 Jun 2026 01:40:14 -0700 (PDT)
-Received: from redhat.com ([31.152.37.159])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3e4b5asm222765095e9.13.2026.06.06.01.40.11
+        d=1e100.net; s=20251104; t=1780737383; x=1781342183;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/SxOH3sBqh56WyqC7iKaRtAkj2hv0SNo09/WoL7JuhE=;
+        b=AnXTXXAIlPexwxKqzUljVmSRtTNzf9Wcr2EGl57VEjLmRX7OFbhyOZMDm7yaf/rmJU
+         rd9zWZl59C+D940UICH3hESZeq7bx/+Dmf0TsbNe3NKh5ACmE+zq74cCJ6StZT5V/0DS
+         rjUIie6YN6NhRoPva/FhaQmjxWapIqqQpeE+qKF+WTk9ox+o/sFNUj2r749h2EpGzRrq
+         /LTtQUDyRngK0Xv0dEzLYM4gM4RtxBm7hmA16pU8fDjJ32iRlCtzDbEOw6REa0CgJiqd
+         qbEThqpBqgxntkj1eekjPJI76PyStdle85pIYma20cGN1sM1fq0M4lOxonVq5Dl6lRhx
+         JqPA==
+X-Forwarded-Encrypted: i=1; AFNElJ9w6OoEvLQOPv7wgzaXwKTtRVSVr4xT/vhn0wceUztwNmGHPmykaLVOA6Vxcggc4Yy/7yMZIpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxF3ZuSGqKxfuQs+9XyMXLLpz9bTrnBRg3w+IgtPL6gOfqQRwJ
+	x6Xf9IKwMQhXQTfy0VOIWz0bX4QgsB/VGAzQdQ7sLZBhMj9OanySQNXo
+X-Gm-Gg: Acq92OEOaLzIaqltmHGX3+UkYlbGOGBS6NidrhrXksFrYcyUuipvgUtr8vHvNrKWgVV
+	765szoxCGurdZLVNhMDXmPG9XRNL0ELvcrAiV8/NPnKSi48iLq3aOIlSJwJ7ESZrtgsy7sXRdnK
+	tBzkgEIkI+OGuZAfHzUZk6SZIKub6ehtdOUePqWcdg0cl1uCixCcsxlq595canZhxxXmt6ZGywp
+	O9EXoPyyzYXf+YSOsqPX5GVTtP0mR6fg+rCvxeNi409C1JS/CPZ4HT7MZLhVcH41vUMZitFPcL/
+	O3xq0ZdJmUnBz8Ok+YKxF3olNUpVXwYS+8fLipUgwDLzC+sOtvbDjFLOCutxfZdyN5rVziJVCeT
+	sssXrfY4CYIlTcFiOwsl0WkuhT39YEQUXuHdVwRjahwKukSaUMpW6qwkhdV2naz9rEKiQDBBR/v
+	S748EhiGgak5JfeFlAl2iYX5JE/ocsy8DSbQfytToLYFcEY0GvEtga17fxPYyHM9kVPSw+UqQ=
+X-Received: by 2002:a05:600c:83c3:b0:48f:d612:3c59 with SMTP id 5b1f17b1804b1-490c25a21a9mr135656445e9.9.1780737383320;
+        Sat, 06 Jun 2026 02:16:23 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3fd663sm247272215e9.10.2026.06.06.02.16.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jun 2026 01:40:13 -0700 (PDT)
-Date: Sat, 6 Jun 2026 04:40:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Samuel Moelius <sam.moelius@trailofbits.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO NET DRIVER" <netdev@vger.kernel.org>,
-	"open list:VIRTIO NET DRIVER" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] virtio_net: normalize non-positive napi_weight values
-Message-ID: <20260606043757-mutt-send-email-mst@kernel.org>
-References: <20260605194045.2625610-1-sam.moelius@trailofbits.com>
+        Sat, 06 Jun 2026 02:16:23 -0700 (PDT)
+Date: Sat, 6 Jun 2026 10:16:20 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Florian Weimer <fweimer@redhat.com>, Askar Safin <safinaskar@gmail.com>,
+ metze@samba.org, akpm@linux-foundation.org, axboe@kernel.dk,
+ brauner@kernel.org, david@kernel.org, dhowells@redhat.com,
+ hch@infradead.org, jack@suse.cz, linux-api@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, miklos@szeredi.hu, netdev@vger.kernel.org,
+ patches@lists.linux.dev, pfalcato@suse.de, viro@zeniv.linux.org.uk,
+ willy@infradead.org
+Subject: Re: [PATCH 2/3] vmsplice: make vmsplice a trivial wrapper for
+ preadv2/pwritev2
+Message-ID: <20260606101620.602ed92d@pumpkin>
+In-Reply-To: <CAHk-=wiTQr4YYYUH38srGvWAq3_UpDeAPR+qZWVyf-ZU7z8Hzw@mail.gmail.com>
+References: <f919874c-065e-48be-ac5b-300c4ab86d4e@samba.org>
+	<20260603211736.755139-1-safinaskar@gmail.com>
+	<20260604100609.6b37f500@pumpkin>
+	<CAHk-=wjvb56qo27-axALOKCY-CjLsj9_294zeBovPVJaYm14dA@mail.gmail.com>
+	<20260604183829.63c35fd9@pumpkin>
+	<CAHk-=wip3mwLOHOYJ9TtjDxOaq9YUXmuCg2AycyASGgeY6qqUw@mail.gmail.com>
+	<20260604223216.73468830@pumpkin>
+	<CAHk-=wh1Avi8FGbWkt9k0Z-KXWB0spo5mQyowO8PB2sJ3unbkw@mail.gmail.com>
+	<87se71jps4.fsf@oldenburg.str.redhat.com>
+	<CAHk-=wjkZSAhxykvG6tQM5DnBoS30_XCKkYpCsQwEGcxJb=i3Q@mail.gmail.com>
+	<87wlwdhrvr.fsf@oldenburg.str.redhat.com>
+	<CAHk-=wiTQr4YYYUH38srGvWAq3_UpDeAPR+qZWVyf-ZU7z8Hzw@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260605194045.2625610-1-sam.moelius@trailofbits.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296088-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296089-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:sam.moelius@trailofbits.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:fweimer@redhat.com,m:safinaskar@gmail.com,m:metze@samba.org,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,samba.org,linux-foundation.org,kernel.dk,kernel.org,infradead.org,suse.cz,vger.kernel.org,kvack.org,szeredi.hu,lists.linux.dev,suse.de,zeniv.linux.org.uk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trailofbits.com:email,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux-foundation.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pumpkin:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 28BE864CF40
+X-Rspamd-Queue-Id: 79EC264CFAB
 
-On Fri, Jun 05, 2026 at 07:40:44PM +0000, Samuel Moelius wrote:
-> The virtio_net.napi_weight module parameter is signed and is copied
-> directly into the RX NAPI weight after netif_napi_add_config().
-> 
-> A value of -1 lets virtnet_poll() run with a negative budget.  The RX
-> loop processes no packets, the unsigned received-vs-budget comparison
-> completes NAPI, and the NAPI core reports:
-> 
-> NAPI poll function virtnet_poll returned 0, exceeding its budget of -1
-> 
-> The device then repeatedly drops receive progress under stock QEMU
-> virtio-net traffic.
-> 
-> Normalize non-positive values to the default NAPI weight before
-> assigning the RX and TX NAPI weights.  TX NAPI can still be disabled
-> through the separate napi_tx parameter, which intentionally sets the TX
-> weight to zero.
-> 
-> Assisted-by: Codex:gpt-5.5-cyber-preview
-> Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+On Fri, 5 Jun 2026 10:12:05 -0700
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-
-Why should we bother working around admin errors in the kernel?
-Leave it for the userspace tooling which can at least provide
-useful diagnostics.
-
-> ---
->  drivers/net/virtio_net.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> On Fri, 5 Jun 2026 at 09:30, Florian Weimer <fweimer@redhat.com> wrote:
+> >  
+> > > Uhhuh. But that is only specific to 'bool', right?  
+> >
+> > Also char and short.  
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index f4adcfee7a80..667026607cfa 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6481,6 +6481,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
->  static int virtnet_alloc_queues(struct virtnet_info *vi)
->  {
->  	int i;
-> +	int weight = napi_weight > 0 ? napi_weight : NAPI_POLL_WEIGHT;
->  
->  	if (vi->has_cvq) {
->  		vi->ctrl = kzalloc_obj(*vi->ctrl);
-> @@ -6500,10 +6501,10 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
->  		vi->rq[i].pages = NULL;
->  		netif_napi_add_config(vi->dev, &vi->rq[i].napi, virtnet_poll,
->  				      i);
-> -		vi->rq[i].napi.weight = napi_weight;
-> +		vi->rq[i].napi.weight = weight;
->  		netif_napi_add_tx_weight(vi->dev, &vi->sq[i].napi,
->  					 virtnet_poll_tx,
-> -					 napi_tx ? napi_weight : 0);
-> +					 napi_tx ? weight : 0);
->  
->  		sg_init_table(vi->rq[i].sg, ARRAY_SIZE(vi->rq[i].sg));
->  		ewma_pkt_len_init(&vi->rq[i].mrg_avg_pkt_len);
-> -- 
-> 2.43.0
+> That sounds like a complete ABI violation as far as I can tell.
+> 
+> Scary. Because I would not be surprised if we have code that assumes otherwise.
+> 
+> Now, the kernel *seldom* uses char/short types, and since compilers
+> are typically at least self-consistent in those cases and we don't
+> interact directly with untrusted sources.
+
+There are plenty of places where char/short are used for function call
+parameters/results (and not for single characters or similar).
+
+I'm sure some people (even some who should really know better) think
+the smaller type will save space.
+
+I've always worried about whether the calling or called code is responsible
+for ensuring the unused bits are zero (or maybe the sign extension of a
+signed value).
+Clearly the compiler should obey its own rules - so mostly it is just
+extra instruction to do the masking.
+But for interactions with asm code, and possibly code that gets mixed
+between gcc and clang (maybe for out of tree modules) it does matter.
+
+You also don't really want to be doing maths of char/short (and there
+are quite a of of those as well). I think it is only m86 and m68k that
+actually have 8/16 bits maths instructions (is s390 old enough?)
+everywhere else the compiler has to explicitly mask the high bits.
+
+Maybe it is time to 'nuke' all the 'short' locals/parameters/results
+(eg from htons()) as well as all the 'long' for values than aren't
+dependant on 32/64 bit builds.
+
+-- David
 
 
