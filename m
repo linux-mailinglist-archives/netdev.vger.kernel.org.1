@@ -1,94 +1,96 @@
-Return-Path: <netdev+bounces-296308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qqH4OLXIJWphLwIAu9opvQ
-	(envelope-from <netdev+bounces-296308-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:38:29 +0200
+	id OJ8zHILIJWpYLwIAu9opvQ
+	(envelope-from <netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:37:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 482AA65166F
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:38:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A778651658
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:37:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=j0ChbRs0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296308-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296308-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=PV0yGyrp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E6F8300EF91
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 19:36:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 80AD630022D4
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 19:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D988C326928;
-	Sun,  7 Jun 2026 19:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4681F31E820;
+	Sun,  7 Jun 2026 19:37:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40C63101D8
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 19:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8842DB798
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 19:37:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780860995; cv=none; b=G33z9ZDa7QdoAFFMFXD9KUnihSLv+EYYJpsASOq3GOPjGT7KzwCua6MQj3K/G20bnhAPPDMEBVV6L5J+5dtnlKR7qIc33f1xDccbXQmKC4TQG2U3uTi89Yfb1t8C0I/65cXVYJs8yo/wG8cn7voI4HtaP+FvadNGLUfmUa1xd48=
+	t=1780861056; cv=none; b=T1cG5jBmoWQ4j/kA5KLvB/FVcNLHGqcKRvDlAGznpyKIv74CeKj/q/RdGZlAHLy17JNntyop2f43D5fsUJBPG/+dvPxoHyPC3wyEcW3u7XhpdnX+Kyv7IJeGsrEeJPm7vfrb4orkXNZzrTFMiOBUs78uAhHvHN1n4lfwiwyRTAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780860995; c=relaxed/simple;
-	bh=z6wUJkcK3a3hmv5kqjzLvlF/m1n8D4xOw1dvhkAbUtc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mYpm1dR1Maz80sneb4C6VLD3uvPwosU02AKryM9ZT1FLTLDltAEHvFrvLVOC9/Kk87+ixTdHzHoVfcylTg8UFp9lje330sLxUrKWz6j4KTvFID5km3bOo5b6UsWLEJ674wvGyztQ0mcgNf6SQNfSp8nOLKIBZ3vPry44hVL2voY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=j0ChbRs0; arc=none smtp.client-ip=209.85.160.171
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-51784eb2ba0so27692271cf.2
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 12:36:33 -0700 (PDT)
+	s=arc-20240116; t=1780861056; c=relaxed/simple;
+	bh=TzvQakJ1S+Nsey6Vt7ynoW4v8ZmbADwjeVvQIRX45Uw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VYocfoVvoalZaXT0TsEM/CESR7cvto+/omUG+LUiNPA4eo54RVS2cQ/7YgW9+3tIPJ5C4hSlJHlALVdqg4Djx8yOcQ2/OjnvvumQg17qxaQat/NmQ+4ahofy8EvKhZyJD84NNa2u90X8hkyau3ZYRmFp3BxMKjg9OHE/dUHL6Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PV0yGyrp; arc=none smtp.client-ip=209.85.210.176
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-842307473b5so2444369b3a.2
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 12:37:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780860993; x=1781465793; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780861054; x=1781465854; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sUmFtnwXcLgoMd8peK2Y4+0rrThIeVZcm4BZaIh1vuU=;
-        b=j0ChbRs0MmgtWNNdxjn7tYKaMiRXOtQdkAqZ84VOup0Igzwk6aZyKTUWKcVlLrOj/A
-         8de86UjdZY4aVIce5cMH0P43dO9haTk0DQ18rsfuUI2NM7NzeS1p0e3XfP8Q9PjmBa5+
-         oCrurPpo5dlXveZJ9V7oySAqXtCe49oCvqu8L2mReEKWpiKnSv9e6fBOnBfBWy3V047p
-         BSv8vpBpcPcibGoIxBArvQiOBOuT3qOralKuLlHwTsNZPcqpwv3V9U9PYBlf90hAV7z8
-         +qprIGd3qlr8BXHRkkEoVpah5rsO+7AmR4SlHgP24s/2DMBQqV6GRSCmv4zx4VlTO9Jv
-         TZOg==
+        bh=kewoD/JaIrVG2iWe454sEs6y3jw5rtHEnURmpvnmVNo=;
+        b=PV0yGyrpIRRgZpF/C70DQA8rz8caUKzHVIpLeIMhltfxKUTlICTRqp5JwcfHc15Z31
+         EkBaGji9UUXohJyMn+OmOb2jPhuhrgE30xbq5uBM8h641M1UmYz9RqtyaKJIPgOyn+XV
+         vpBZgd3AUQltCeKsAUVoXELlRbP0Qm6hvAXbwvGodUuj7qlZT7WldqAC3rzCJTmGPmOA
+         vEL3lrlCmRIdxs1Q+VHpzzSIyQzEuQK4piJu40kELE0hrd/mXskPIyIXpycX5TG0gLA5
+         V06IauUZBcIj5HDeSvl47JXz4UpcVvd9IaFNqYvPnzVYgmeYiFE2T1DTBu2D6IGLhF+3
+         3sxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780860993; x=1781465793;
+        d=1e100.net; s=20251104; t=1780861054; x=1781465854;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sUmFtnwXcLgoMd8peK2Y4+0rrThIeVZcm4BZaIh1vuU=;
-        b=bksk6FaY86BgjX7W5m6KPU0Ta607TTJo292thxxTjJZVb9EGcNynYHxcWJdXX2JPum
-         a+5b59puYzvNFJ9E4BgYQeeEtUJF0DGJpv1Byblufh1IrL0vts8qHmOy/0fJos0RAPvD
-         Tjb3m4jtuVTpMOu/oFs1FjQZhHYknaQ4AvPJS59S5bI05JzW0Kk/VU+UcMCT3zXx0SwP
-         4x2466CV48LgK6MIL/d8+soEzf4cHW6YZvwk252L3s4FQ5XMJUpoPV8hT+dCsgO7PU3r
-         vkAJgtvZ1U+dhzzB5SXniysj7Zy4Fe8KGQXRMGWr5wX+wELJg2dIRKz9/hzdGPXvuxgl
-         1bzA==
-X-Forwarded-Encrypted: i=1; AFNElJ/wTcP+b0+9lS+y1ogzrI1KTJnRTQICR0TEIBG9S6mH0PIu0OsXgMu9D7uyxwNqjDFiNkz3b/Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzehF9CWUiL8Avc9bRTq6TGX/yXYpdHzwb+kWBzCFFZLKRVmS3w
-	sy+WbmF3jAfFxZVpVDAyatKc0DCcJwa8ToUXpAKNpPEw1Qja/tQfCtN6b2eFWllsEN8=
-X-Gm-Gg: Acq92OEN4KbrTGiENsu8eCNORp4IHu1xpUv9IB6HvHMscMecEJgN407og5gOIRD2bO8
-	jmFixCcFE9MbIYVLjhgZL32gcN1GMuwwKUMf5vQ4So2ep+he8VTlNardXfZ++pweZvbDVDJA0yM
-	uz6M9lvOsIXwAzQaOtODmgw406GDA9CSHdLHFDP+rhk0c/kaI+q0wkCplJtiiPXVvpTCHYXWbUu
-	K9e7G73/imhtOAecIUW6Gsh3mqSvXVnMEky0nCOEUj+704ivTiWBMSEwpjN2VWq6MMIDaHMRCaU
-	9a4v0JP3QUM29qxcKvNJkIqLNNgFefobcbxspIDkdWjVNoSrnf0nKRv6WwtYKs/B47AQyiVp35I
-	0OwBNCL6vggZQT0aaz48Dz5va3868WhPdzWWQnfY3qnU1X7qhILrM1qVsahiZceyTteAtWrV4/u
-	kxRrKTahvJPyzBOwC2jqkmDalZk7Sktv5vRuxtNA==
-X-Received: by 2002:ac8:7f01:0:b0:517:82a1:351f with SMTP id d75a77b69052e-51795ad2ae6mr181641731cf.16.1780860992885;
-        Sun, 07 Jun 2026 12:36:32 -0700 (PDT)
-Received: from localhost ([161.35.96.86])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-51775c4d7absm129790711cf.11.2026.06.07.12.36.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jun 2026 12:36:32 -0700 (PDT)
-From: Samuel Moelius <sam.moelius@trailofbits.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
-	Jiri Pirko <jiri@resnulli.us>,
+        bh=kewoD/JaIrVG2iWe454sEs6y3jw5rtHEnURmpvnmVNo=;
+        b=dUV/eyuNXrHHWr3y0HId7pedMG+8BK/u3el0FCCwpG0OvqRGJgSnGMFLlUbTr3b5UK
+         3mKL73Wg7DyCL9zGaWbezlAgn+4NGp5GZHI9j21ldQMHZFFweSHQV4U0y/i9Ghj5jLGz
+         1LLOjOXHGsIm0zm1ey3AGSnkPXOlIVJD+ETBijZtm5PvIGMmuSLvqo17P64Bd4Z5qsvc
+         rGyv0UOTnwDem4udDDYlNt41WvaQAo6pp0QfLEhoQLcwzKbQ/bkkYj4Ebu2OreShSewu
+         eMmOHClKxYB51KhiB9eD/Xy4vM4iD3lxiBO02G7pc89jOnR7LPEvN0ALjOBpx188x+Nb
+         wmxg==
+X-Forwarded-Encrypted: i=1; AFNElJ9Or1+FNFDhwOEZO8xVvoDNygqwJnxd9amISDwYeW3mHBih83O/KU3XxOxgQpSkP7FuQsmmpkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfbYopWBx5iU2wIbHc04FCRfu8vwsHuIYPnj5M6jSxJh6rgWHN
+	hAQUEoaYK7YNsJgSnsCyiTlkSveIErpmVpp9V1PdB5DJt8xu5emv6nnn
+X-Gm-Gg: Acq92OFfXfD3QMK217Ok0CMUUCn1r6IW0/H1c8qrZeKTJUnoLu9qr6CG2FeA5TsSj/X
+	Gffzj8WKKloq1wAuO1jZ3cUIYpzYeoLLVtZiqxXJeNu6e/AtlOmEhL8b/QTp11/99DA9aUEasuM
+	9sO0TurS14LWfzXWfd1TFzfrBLQjlonlJodxTS2xxrUpSkIx3Dc5baB5xkmsYR2TQlz9kI1Ei4q
+	6aiSAjAc5XM3OoPTCN+xcHBk5sY+XGke/Z2UCSJGj8TcTsAQI9UmsbhssxbSTh11MJK6BnwSQNz
+	BkuB0gWtCJ87WSNskydYeCQc4gNUMZ7bNRR4MzdJF145CDHc593qw1JjzRRYTiO0f8KTds8nTFX
+	4+O+2/P5PRmsrNYvwa02dWkynXRFsVKOaGZiNzfz0pCncV2Y/fkKgmSJ8AsE7/Beg5jaBJYLrxC
+	WwSP4mqtV28q2rN/6UNOYTHFsvRKi1uC6iqDqJIOACWhv/AMnRvNwk/RXfyCULT923Ek33bVDy
+X-Received: by 2002:a05:6a00:1da3:b0:82f:3a1e:5618 with SMTP id d2e1a72fcca58-842b0dafd4bmr12422704b3a.22.1780861054230;
+        Sun, 07 Jun 2026 12:37:34 -0700 (PDT)
+Received: from localhost.localdomain ([115.110.225.242])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828821d0sm15429233b3a.28.2026.06.07.12.37.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Jun 2026 12:37:33 -0700 (PDT)
+From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+To: Wells Lu <wellslutw@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org (open list:TC subsystem),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v2] net/sched: act_pedit: require matching IPv4 L4 protocol
-Date: Sun,  7 Jun 2026 19:35:46 +0000
-Message-ID: <20260607193621.1057618-1-sam.moelius@trailofbits.com>
-X-Mailer: git-send-email 2.43.0
+	stable@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: [PATCH net] net: ethernet: sunplus: spl2sw: fix multiple of_node refcount leaks in probe
+Date: Mon,  8 Jun 2026 01:07:11 +0530
+Message-Id: <20260607193711.601544-1-shitalkumar.gandhi@cambiumnetworks.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,84 +99,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296308-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,s:lists@lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296309-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,trailofbits.com:mid,trailofbits.com:dkim,trailofbits.com:from_mime,trailofbits.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cambiumnetworks.com:mid,cambiumnetworks.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 482AA65166F
+X-Rspamd-Queue-Id: 0A778651658
 
-The extended IPv4 L4 header mode in act_pedit can select TCP or UDP
-header fields without confirming that the IPv4 protocol field matches
-the selected transport header.
+spl2sw_probe() acquires three of_node references that are never properly
+released in all paths:
 
-That lets a rule written for TCP or UDP modify unrelated payload bytes
-in a packet carrying a different protocol.
+  - eth_ports_np from of_get_child_by_name() leaks on every probe.
+  - port_np returned from spl2sw_get_eth_child_node() (which exits a
+    for_each_child_of_node() loop mid-iteration) leaks per loop pass.
+  - phy_np from of_parse_phandle() leaks on the -EPROBE_DEFER and
+    spl2sw_init_netdev() failure goto paths, and the registered netdev's
+    mac->phy_node is not released on the out_unregister_dev cleanup path.
 
-Verify that the IPv4 header is long enough, that the protocol matches
-the selected TCP or UDP header, and that the packet is not a non-initial
-fragment before applying TCP or UDP extended header edits.
+Convert eth_ports_np and port_np to scoped __free(device_node), add
+explicit of_node_put(phy_np) on the two early-error gotos where
+ownership has not yet been transferred to mac->phy_node, and release
+each registered ndev's mac->phy_node in the out_unregister_dev loop
+before unregister_netdev().
 
-Assisted-by: Codex:gpt-5.5-cyber-preview
-Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+The mac->phy_node release in the normal driver-remove path is handled
+by the preceding fix to spl2sw_phy_remove().
+
+Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
 ---
-Changes in v2
-  - Add check of iph->frag_off & htons(IP_OFFSET)
+ drivers/net/ethernet/sunplus/spl2sw_driver.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
- net/sched/act_pedit.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-index bc20f08a2789..2730accbc56a 100644
---- a/net/sched/act_pedit.c
-+++ b/net/sched/act_pedit.c
-@@ -17,6 +17,7 @@
- #include <linux/ipv6.h>
- #include <linux/slab.h>
- #include <net/ipv6.h>
-+#include <net/ip.h>
- #include <net/netlink.h>
- #include <net/pkt_sched.h>
- #include <linux/tc_act/tc_pedit.h>
-@@ -341,6 +342,9 @@ static int pedit_l4_skb_offset(struct sk_buff *skb, int *hoffset, const int head
+diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+index 5e0e4c9ecbb0..d78bda050ee4 100644
+--- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
++++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+@@ -319,10 +319,8 @@ static struct device_node *spl2sw_get_eth_child_node(struct device_node *ether_n
  
- 		if (!iph)
- 			goto out;
-+		if (iph->ihl < 5 || iph->protocol != header_type ||
-+		    (iph->frag_off & htons(IP_OFFSET)))
-+			goto out;
- 		*hoffset = noff + iph->ihl * 4;
- 		ret = 0;
- 		break;
+ static int spl2sw_probe(struct platform_device *pdev)
+ {
+-	struct device_node *eth_ports_np;
+-	struct device_node *port_np;
++	struct device_node *eth_ports_np __free(device_node) = NULL;
+ 	struct spl2sw_common *comm;
+-	struct device_node *phy_np;
+ 	phy_interface_t phy_mode;
+ 	struct net_device *ndev;
+ 	struct spl2sw_mac *mac;
+@@ -418,8 +416,10 @@ static int spl2sw_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	for (i = 0; i < MAX_NETDEV_NUM; i++) {
+-		/* Get port@i of node ethernet-ports. */
+-		port_np = spl2sw_get_eth_child_node(eth_ports_np, i);
++		struct device_node *port_np __free(device_node) =
++			spl2sw_get_eth_child_node(eth_ports_np, i);
++		struct device_node *phy_np;
++
+ 		if (!port_np)
+ 			continue;
+ 
+@@ -441,6 +441,7 @@ static int spl2sw_probe(struct platform_device *pdev)
+ 		/* Get mac-address from nvmem. */
+ 		ret = spl2sw_nvmem_get_mac_address(&pdev->dev, port_np, mac_addr);
+ 		if (ret == -EPROBE_DEFER) {
++			of_node_put(phy_np);
+ 			goto out_unregister_dev;
+ 		} else if (ret) {
+ 			dev_info(&pdev->dev, "Generate a random mac address!\n");
+@@ -449,8 +450,10 @@ static int spl2sw_probe(struct platform_device *pdev)
+ 
+ 		/* Initialize the net device. */
+ 		ret = spl2sw_init_netdev(pdev, mac_addr, &ndev);
+-		if (ret)
++		if (ret) {
++			of_node_put(phy_np);
+ 			goto out_unregister_dev;
++		}
+ 
+ 		ndev->irq = irq;
+ 		comm->ndev[i] = ndev;
+@@ -500,8 +503,11 @@ static int spl2sw_probe(struct platform_device *pdev)
+ 
+ out_unregister_dev:
+ 	for (i = 0; i < MAX_NETDEV_NUM; i++)
+-		if (comm->ndev[i])
++		if (comm->ndev[i]) {
++			mac = netdev_priv(comm->ndev[i]);
++			of_node_put(mac->phy_node);
+ 			unregister_netdev(comm->ndev[i]);
++		}
+ 
+ out_free_mdio:
+ 	spl2sw_mdio_remove(comm);
 -- 
-2.43.0
+2.25.1
 
 
