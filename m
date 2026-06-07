@@ -1,171 +1,176 @@
-Return-Path: <netdev+bounces-296241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296243-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4V4fF/F2JWqkIQIAu9opvQ
-	(envelope-from <netdev+bounces-296241-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 15:49:37 +0200
+	id ENf2MUR3JWqxIQIAu9opvQ
+	(envelope-from <netdev+bounces-296243-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 15:51:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE23650A99
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 15:49:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15C42650AB5
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 15:51:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZuK4OqAW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296241-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296241-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=tk154.de header.s=DKIM001 header.b=Evj2L04x;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296243-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296243-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C327300A744
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 13:49:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19D943002E76
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 13:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979E23A168B;
-	Sun,  7 Jun 2026 13:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CC532B99E;
+	Sun,  7 Jun 2026 13:50:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp10.goneo.de (smtp10.goneo.de [85.220.189.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DD11F09AD
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 13:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E013AB29E;
+	Sun,  7 Jun 2026 13:50:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780840174; cv=none; b=I0IvlNi5uPDp4ECO+9gOLokVKaMcrLsUpFR2xnGPK/ZQgMVZfvT7j7RRSOxZn9zvdsx05CGdZmWIyX98HbO6cjt4LtyDUnHau6PWZMqyIE8sUSa+Z83x5ItXpc9Xi3lRVTU0YCJZllKZIP5raZSYmQ+L1qNZqvHLTjJkXqQlv/8=
+	t=1780840258; cv=none; b=dXCziG4lFXiNdgMDVHMlP0czjeaz2D+Sv396Q497OfqtWafla2BCIccWd2PqrI4RbE71KrjHY8b7h5nm9jmYi6/LCtrHrbFJb8STBJPXUOp9l6gcTtcZqmPcRzgJoISRkmUu5cEEAiK6IoQPyk0gidgc7fxZfniwHc3ZyBltYsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780840174; c=relaxed/simple;
-	bh=XEmC8cTzKQpgszHArxiOjIai4otMc07eukOUPay4pQU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=THzwCy6cLuc16M2n/IZ9vaaPaEkwg/WN8zF6/70z/erRNK0BkZfsr0jhH0nc4j5QJzIu5OwJtqQP7P4IeGgXLk/9IKticN67agTyfih435OsZ0QxxCNzwwzGXCbjjqZb6YldyTeT0tGMOCeW6lLE8JIOnS/6DTxCTJQpAEB1T9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZuK4OqAW; arc=none smtp.client-ip=209.85.128.178
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7e1c3f47d78so36476217b3.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 06:49:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780840172; x=1781444972; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=93wINgt7Upt+lx98SvFQMNbQYg0vszE9BajcG6iLDZI=;
-        b=ZuK4OqAWIGLGiIbJbySOub/GRfPbfZyoMJNaKDCCQNI0RoBCX5gHQ/1j7REZGhUmBN
-         PyxXZxB3RDOTKRA8wWeFgTy+UZ7rm5IbYhLKCuY7k0QGhOREDvbUSNZK/AhVDj3jMNiL
-         K6Xs/T0tIyE+YjE0JP8ju5XadGOSZRthpiNr0aYvlLsqiv3NaSBMcGCFFbDRnMPeXWKL
-         l3GPyiK9RXBJCXWZRwi7/AkqZsJGOANUlp7rrHi9hGnB5FYnKTQheyHnS1QU2cW12b8l
-         LO8YLKYXn5XF6JdCPDmxAd6wPGzXj4ScZSAz2Jbdq+XO3Wal1+nDImpTVjHc6K8cPISB
-         cA8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780840172; x=1781444972;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=93wINgt7Upt+lx98SvFQMNbQYg0vszE9BajcG6iLDZI=;
-        b=QP9A5iQhSAopLVBO37xGnC2JDz5N+3r/td2b9uXLqMZOaXQu8ODQYLef/Vll7b2hCK
-         04IgQb+Oh+xA1cChKB089vXCRMjoDMFxcLSKBh4wnwO1FzKgS70e+6ZiFiEPsCQH417o
-         d6F0HOq65qFJGJmv4qDeYzx9xsmVQvFoENfz8gpg8JkADlk56Y0GZMcxqxc4yCyeeRYa
-         1eDfDnfeoeuGprpAph0wQjYVUL0hl8eM4DMm/uPFu313fsqNa6f68zBSjc2ML/Sa9+Xm
-         +OjYQ6WtT18VhymAsl+JTJia7lH6Fal6WCL39EJxGQsH5eaJhk2JYFaYO9gSfUuVr2tP
-         TdIQ==
-X-Gm-Message-State: AOJu0YwS/aUGe7/RYq8jdVOPlEie5ol489cqU7qTcQCsnt67jfWPdke/
-	uA684AGGVpxzbLRDU1oLXNTFOKrn+jAbTDcZSPPM7AF2NNoLLN+a3Cq4RRef9Q==
-X-Gm-Gg: Acq92OEINNuHOx1Njh9jxrsAnKFyLKKw5xnsUe0XVQ7WYVg1V8yW9PvkqwJhEUKlVaG
-	SvlF64ZC8+YGYIzH01JVcN/41hku0RlKnmyXW2XPjxzIGyMKTOkf10GvvFUxyRLlQYrLxI4H5CL
-	bCWA46MGgn1b/SmGgvbYJqcGHUQb3anRcuy0G5gF5chPBe5B9LrvBGXei4XADTbhMo7tmS0Sf5B
-	0wyxyQI6tCfaAIAvmIAjTn+bZdG9gE/7cEHFlbVh4D0YROPmv/54U027Yyqh2rF/XKumnyWllKS
-	ZA2MFLESpJqTwdn0WHbwEjJh9yDhRpGTtMmPvIjCKjcdhQAFrhcx/bDy9kD7skqUGtDp95KT3/1
-	eJ4giVsth1cGgCxLuHwF0Ls6rUzFAXi2U1lYt1OUzRUtuPUsR1+vRy5u1QktDcpAKrXno5o8uDC
-	x1btI83PspsQfMrYFVvh6j5xWesFlHW/iAJRxnNPJU6W+MWhMQoFhjiOonKbvEu8nw4qg+2seMN
-	Sd9HYw9T8n0qnficw==
-X-Received: by 2002:a05:690e:191c:b0:651:d430:7832 with SMTP id 956f58d0204a3-66106dceef5mr10363870d50.10.1780840172574;
-        Sun, 07 Jun 2026 06:49:32 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-660d5f441f8sm8081424d50.3.2026.06.07.06.49.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 06:49:31 -0700 (PDT)
-Date: Sun, 07 Jun 2026 09:49:31 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- shuah@kernel.org, 
- willemb@google.com, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.ee6597e4f7af@gmail.com>
-In-Reply-To: <20260607002401.212976-1-kuba@kernel.org>
-References: <20260607002401.212976-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next] selftests: drv-net: gro: signal over-coalescing
- more reliably
+	s=arc-20240116; t=1780840258; c=relaxed/simple;
+	bh=xVpGXQjW5z6eyU+GUxxWplVBYw1+nlCwHkms84d3DS0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qc4B9RGz7OohwKPx+6yFIvlV8DOHkBCgzp98ORsMBrAn+u4hnu9vRzId6VI3YeD5gWW+apTdo3jhJg6R3VOkrX5gyM3ecwyFc5XnngxYxJ61hdeWWhy4O1Ry+F0ZzBCO3uH3a8KFYn9G4hlq8eyp0+XZ1OUCtYB86yJagvkaBxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=Evj2L04x; arc=none smtp.client-ip=85.220.189.106
+Received: from hub1.goneo.de (hub1.goneo.de [85.220.129.52])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by smtp10.goneo.de (Postfix) with ESMTPS id C9D02240937;
+	Sun, 07 Jun 2026 15:50:44 +0200 (CEST)
+Received: from hub1.goneo.de (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by hub1.goneo.de (Postfix) with ESMTPS id DA251240263;
+	Sun,  7 Jun 2026 15:50:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=DKIM001;
+	t=1780840242;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RY5vvpBdIrhlPmSwQt+qsx928b8LsAM9g3/uCePEky4=;
+	b=Evj2L04xkrrFMzGrZeY+67ieB3ybNuXg1zAWRgDpU2UXzXShHpMThwlEc6uPikhiwsIjXj
+	m4xamoPXTfgYXwBbjXjMtVP/NU7Zn1s1QhrmuJwLJ6OWCxpW2U1CMahJMTPdPQ7szaX7po
+	0bPLrdt9cflGp9Sr5SaHrvtm4wWeMR4VplFXuiXtMyMaQBteYZFXifzc1djouJ9URKku7e
+	wC/1DCPuAXTfco/JDqCtbO7bNZIeLS5/gqKZ/dGAivIxFdb0l8p2xt+5qwMKnzxRuaqcMz
+	VmyI+ji0mapBeOUS7zJMmyBsQFglWdMPdrd0hmTmVINCHe2RnUtJlQleseCUEA==
+Received: from Til-Notebook.lan (unknown [IPv6:2a00:1f:5743:3300:7fdc:421c:b21a:ba71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by hub1.goneo.de (Postfix) with ESMTPSA id 9D3BE240023;
+	Sun,  7 Jun 2026 15:50:38 +0200 (CEST)
+From: Til Kaiser <mail@tk154.de>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: marcin.s.wojtas@gmail.com,
+	linux@armlinux.org.uk,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	mcroce@redhat.com,
+	sven.auhagen@voleatech.de,
+	lorenzo@kernel.org,
+	Til Kaiser <mail@tk154.de>
+Subject: [PATCH net v5 0/4] net: mvpp2: fix XDP RX buffer handling
+Date: Sun,  7 Jun 2026 15:49:39 +0200
+Message-ID: <20260607134943.21996-1-mail@tk154.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-UID: 976ab9
+X-Rspamd-UID: 8272ca
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[tk154.de:s=DKIM001];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296241-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shuah@kernel.org,m:willemb@google.com,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296243-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[mail@tk154.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:marcin.s.wojtas@gmail.com,m:linux@armlinux.org.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:mcroce@redhat.com,m:sven.auhagen@voleatech.de,m:lorenzo@kernel.org,m:mail@tk154.de,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[tk154.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,voleatech.de,tk154.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@tk154.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[tk154.de:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tk154.de:mid,tk154.de:from_mime,tk154.de:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ABE23650A99
+X-Rspamd-Queue-Id: 15C42650AB5
 
-Jakub Kicinski wrote:
-> GRO test is very timing-sensitive, packets may be delayed
-> by the network or just sent slowly. Because of this we retry
-> each test case up to 6 times.
-> 
-> This makes perfect sense for positive cases, in which we want
-> to see coalescing. Negative test cases, which modify headers
-> and expect no coalescing should have opposite treatment.
-> We should really try 6 times and make sure that each time
-> the test failed. This would, however, require that we annotate
-> each test to indicate whether its positive or negative.
-> Let's start with a simpler improvement. Do not allow
-> retries if we detected over-coalescing. Previously the negative
-> case would have to get lucky at least once in 6 tries to pass.
-> Now the first failure breaks the retry loop.
-> 
-> For background - NICs tend to ignore the contents of the TCP
-> timestamp option, so that test case commonly fails. In NIPA
-> having 6 attempts, however, was enough for some NICs to get
-> multiple successful runs in a row, getting the test cases
-> auto-classified as expected to pass, even tho the NIC does
-> not comply with the expectations.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+This is v5 of the earlier XDP_PASS fix. The XDP_PASS change is
+retained, and the series also fixes related RX/XDP buffer handling
+issues found during review.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Tested with tools/testing/selftests/drivers/net/xdp.py on mvpp2
+hardware.
+
+---
+v1: https://lore.kernel.org/all/20260524122334.1730451-1-mail@tk154.de/
+v2: https://lore.kernel.org/all/20260602164635.62517-1-mail@tk154.de/
+v3: https://lore.kernel.org/all/20260605121332.147397-1-mail@tk154.de/
+v4: https://lore.kernel.org/all/20260605154457.163304-1-mail@tk154.de/
+
+Changes in v5:
+- Kept a separate page-pool recycle sync length for skb allocation
+  failure, which must stay tied to the received buffer range.
+
+Changes in v4:
+- Reposted as a new independent thread, no code changes.
+
+Changes in v3:
+- Reworked RX refill failure handling to preserve BM pool depth by
+  refilling before the current buffer is consumed by XDP or an skb.
+
+Changes in v2:
+- Fixed RX DMA sync range to account for RX headroom.
+- Limited XDP frame size to the actual RX buffer size.
+- Fixed refill error paths so retired buffers are not returned to BM.
+
+Til Kaiser (4):
+  net: mvpp2: sync RX data at the hardware packet offset
+  net: mvpp2: limit XDP frame size to the RX buffer
+  net: mvpp2: refill RX buffers before XDP or skb use
+  net: mvpp2: build skb from XDP-adjusted data on XDP_PASS
+
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 67 ++++++++++++-------
+ 1 file changed, 41 insertions(+), 26 deletions(-)
+
+-- 
+2.54.0
+
 
