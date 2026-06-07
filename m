@@ -1,56 +1,98 @@
-Return-Path: <netdev+bounces-296197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296198-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3Yj2BXw2JWqYEgIAu9opvQ
-	(envelope-from <netdev+bounces-296197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:14:36 +0200
+	id /U6GBX07JWomEwIAu9opvQ
+	(envelope-from <netdev+bounces-296198-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:35:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898FA64F386
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:14:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5066F64F3B8
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:35:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296197-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296197-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=OuEF+ZoL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296198-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296198-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7537D3001F83
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 09:14:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8064F300E618
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 09:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D1337C0F9;
-	Sun,  7 Jun 2026 09:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C766329CB57;
+	Sun,  7 Jun 2026 09:35:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91651372EC2
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 09:14:23 +0000 (UTC)
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B23A377EC5
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 09:35:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780823670; cv=none; b=MC2ikZ3NX0YWww0WLP1tPCsSdyfhoZ8ukE2RLcQB6lEX/6bXkGkYYlgAk4Cwy/v6dTJYzdO+nZw1v9zvnLiXLHCfg3RPTtTC9bvLtg1VNr4qnVYT6XLrQLf0QttAVesFaEz6XRZvmPKnzKxJMG683HUXpyTyBaRocYvLxpmyhdI=
+	t=1780824923; cv=none; b=e2jq9q1h5sz0/zU7kSWIB/2R5QiKAVMreCXjE+pOjWeSpUeJpuQuGvJCuGy0IyCYbWujHz+wUbapSyhHN3hZwTsbqjosz85vVpKdL3FPzQVXbSKokQrbJfE1A07ePeD8q1qagsQNihMS+4pMVU2tvlM2wwHy/41sEAKu3V/SnFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780823670; c=relaxed/simple;
-	bh=iErmJWCMvtbEQXD2hnu/Ys+bGMFTDER2vVHmFfCDPKA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EhVOmhCTlAUlUzBZKYxIy3vYB1NIy2fVNFoJILJjD//YCTAFiB43mMxb+7kNvmzcFiFjexG+utVTAZJawSAMfBvMulkcpPZTQpJoK8aRZqCY8nFCrBkCW/4JkFuW9/cHyIVZzmxpyNI7Q6n14fQLx1ZRti1nrAwyK7OzgKtHWEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowAD3E75hNiVq2OVmAA--.51170S3;
-	Sun, 07 Jun 2026 17:14:13 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	xiyou.wangcong@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	edragain@163.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net/sched: act_ife: ensure ETH_HLEN is pullable after decap
-Date: Sun,  7 Jun 2026 17:14:01 +0800
-Message-ID: <6200dc9e5ea7a85d500e72543d897c2d930fcdce.1780809474.git.edragain@163.com>
+	s=arc-20240116; t=1780824923; c=relaxed/simple;
+	bh=qSDy0AfkxAYlNXnjkHbJOEepYE/1eEVQeyRmTN/eZDw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bnCK4hhqgAVbyxfwPWnrmyxPPwmSJ6Cp8l8ca2Wl9fPwcB8RZhZZEMcmlJwFhRp/WL3E84dj/2EsMWhQXhKfrXTrT64xqvcVlbMU2+J5VKl0+i+1Qot5vTl+92uPUsQ+9lqPsecM4mLGRGzwrG8//5zyX3BXFctJmc5/h7C3BMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OuEF+ZoL; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2bea7176c72so21295045ad.0
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 02:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780824922; x=1781429722; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hJ+nE3Gpnoe4Cp99JZ7VpoEQgM0qNrm472Qh8AEjSOw=;
+        b=OuEF+ZoLaoDkgkY9w15XJ5nr9IhljCK7FNQLbrsLc4WgIPedvgpLQFubif8vTR0W5+
+         pEtlrrmx5zJ0lmW/G+EF41Q97/hZKV/7I026N01vdXGlrwBpPNijf4EqD0uxcwd+e4/T
+         /S4chwU6pAKanjADRTgE2o1Yuis+RZ3U7k9FTJy47e1YIOh1f5muo0hPVtO6dDmOJGdk
+         C/v3wo9l85Y+8rq1cAc2DgVPEYxJDyny8LANvQW6/OraW6WFKCaEy+vJeHwBJch4Kr9/
+         p4hHSQETE+rSMlvHSIRCFtBGNwpwWnaJmawfJzquckNQgwpZi05U7MjxyG0wQj93L5T9
+         nQew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780824922; x=1781429722;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hJ+nE3Gpnoe4Cp99JZ7VpoEQgM0qNrm472Qh8AEjSOw=;
+        b=p9f0LsYJJqHxOvvdRyt/9SVNz9OqhiJMeXZm17+db3vt9lPUaKCe0U7EHEfdC5Ux5l
+         w0uI3+ZpXtpc0mrMkzkENGs5/Fus6hRjRL24T+IKHhWJeUYMpu4hLkfsSOp5+fKmlmss
+         fSm8DlGm2fLTaoJHXYmFEKKtuvubbTe28DusVhLKuZBTHhn54gkP4bB5jxKm64D6Nzsn
+         tkI51GJ0WFiftVOZZ4cAPyAR3sE5NHwQ8F3yhyMpvzXhMcvYbt9KMJ++hIYEKe+9kBNj
+         JbOhOPquOtPVACD8xy4DCDUXVpzzaBmK67+x9V+AIKetCL/gyFexeVzDt8N+DAS+sb4I
+         W4ug==
+X-Forwarded-Encrypted: i=1; AFNElJ+vP9S1yA0OPtUzy5lCdCcrekJBEKuUTwJnO2PTLbGbQ8hAjUzhkwQf49gc18tJYyppY5RwHG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz6yvsJl7OXT9AXztpC1CnDnP65FuZasdoCyK9sGwXrbuXzr6W
+	8g/G0HqUnJExHGWl3m/tWKyAmDAq37edlO0LxOvAaoxvqdZAfBnrQGRY4Su1/T2NZ+s=
+X-Gm-Gg: Acq92OEtM7E+qwFhgKuY6HjG1PjjKDcEve+dFjLTIqH65nGelU1rXm9whbOs7x8f6qR
+	WpaKGURoi9FVHcEbsZSLsO3q+/8SgJzF0njH9hRxAJS/6SQTtBykC9p+GbY7EoaBbSnghwKB/VI
+	Te1eAKMEMKaEyBUTPLx4hUaVD4fM1SRSvtVGI68AtnSKbzI+th6qhJZwZGipppJIwXEr9/UsZ9x
+	nNqhJGtbH6PVxOimozE9259ZmrcxHwsd9nRb6bivKhgsFTrMjhVFm1OanVH+FyhEtA9pnHmQ1Zr
+	5ug+vAEcW0FEY8LoZsWsRyeZLhWiGxIjHnwtC9huRLaNwSuSTQvdjI3QX5WBbVLkKXa69hMlAyg
+	KrCvrVc/1AW1CxjctkaGJCA+B3eLXunjo6TaM78xcOlIWVOMbCFpTLjtcZq5HslFHbyF9FUO563
+	k6ChFpuNWEPX+owb78iIW5xTvcs1L0MukGqe+F2psFJB31x0b6p6N6
+X-Received: by 2002:a17:903:1b47:b0:2bd:9c0a:32c with SMTP id d9443c01a7336-2c1e7f921bcmr127871045ad.19.1780824921886;
+        Sun, 07 Jun 2026 02:35:21 -0700 (PDT)
+Received: from haichao.tail057a43.ts.net ([2001:da8:e000:1206:5d57:2cec:64ac:50a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c166396fa9sm145238635ad.66.2026.06.07.02.35.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Jun 2026 02:35:21 -0700 (PDT)
+From: Ruoyu Wang <ruoyuw560@gmail.com>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Liu Haijun <haijun.liu@mediatek.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ruoyu Wang <ruoyuw560@gmail.com>
+Subject: [PATCH] net: wwan: t7xx: check skb_clone in control TX
+Date: Sun,  7 Jun 2026 17:35:15 +0800
+Message-ID: <20260607093515.3-1-ruoyuw560@gmail.com>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1780809474.git.edragain@163.com>
-References: <cover.1780809474.git.edragain@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,103 +100,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowAD3E75hNiVq2OVmAA--.51170S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw4xWF13Cr1ftr48tF45trb_yoW8Wry7p3
-	srWr4DKrZrCFy7Ar1vkry8u3y5CFsxG3y7XF4j93yYv3Z5Wr13tFyFkFW7ur18CFZ5ua42
-	yr1qqryDAFWDZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvG1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK6svP
-	MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsLCWolKdAAbAAAsS
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.54 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296198-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-296197-lists,netdev=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:xiyou.wangcong@gmail.com,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:edragain@163.com,m:n05ec@lzu.edu.cn,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,gmail.com,lzu.edu.cn,163.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_TO(0.00)[intel.com,mediatek.com,linux.intel.com,oss.qualcomm.com,gmail.com,sipsolutions.net];
+	FORGED_SENDER(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:chandrashekar.devegowda@intel.com,m:haijun.liu@mediatek.com,m:ricardo.martinez@linux.intel.com,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ruoyuw560@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lzu.edu.cn:from_mime,lzu.edu.cn:email]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 898FA64F386
+X-Rspamd-Queue-Id: 5066F64F3B8
 
-From: Yong Wang <edragain@163.com>
+t7xx_port_ctrl_tx() clones each skb fragment before passing it to the
+port transmit path. The clone is used immediately to set cloned->len, so
+an skb_clone() failure results in a NULL pointer dereference.
 
-tcf_ife_decode() calls eth_type_trans() after ife_decode() removes the
-outer IFE header and metadata. However, ife_decode() only makes the outer
-IFE header area pullable before advancing skb->data.
+Check the clone before using it. If previous fragments were already
+queued, preserve the driver's existing partial-write behavior by
+returning the number of bytes submitted so far. Keep the existing byte
+accounting unchanged so this patch only handles the allocation failure.
 
-As a result, the decapsulated inner Ethernet header may still be shorter
-than ETH_HLEN in the linear data area, or entirely reside in frags.
-eth_type_trans() then operates on an skb that does not satisfy its
-expected Ethernet header access requirements, which can trigger a BUG in
-the pull path.
-
-Fix this by requiring ETH_HLEN to be pullable before calling
-eth_type_trans(). If that fails, drop the packet just like the other
-decode error paths in tcf_ife_decode().
-
-Fixes: ef6980b6becb ("introduce IFE action")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Yong Wang <edragain@163.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
 ---
- net/sched/act_ife.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-index d5e8a91bb4eb..e0075e3f6949 100644
---- a/net/sched/act_ife.c
-+++ b/net/sched/act_ife.c
-@@ -759,6 +759,11 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- 		return TC_ACT_SHOT;
- 	}
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_wwan.c b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
+index 7fc569565..d2529df75 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_wwan.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
+@@ -106,6 +106,8 @@ static int t7xx_port_ctrl_tx(struct t7xx_port *port, struct sk_buff *skb)
  
-+	if (!pskb_may_pull(skb, ETH_HLEN)) {
-+		qstats_drop_inc(this_cpu_ptr(ife->common.cpu_qstats));
-+		return TC_ACT_SHOT;
-+	}
-+
- 	skb->protocol = eth_type_trans(skb, skb->dev);
- 	skb_reset_network_header(skb);
- 
+ 	while (cur) {
+ 		cloned = skb_clone(cur, GFP_KERNEL);
++		if (!cloned)
++			return cnt ? cnt : -ENOMEM;
+ 		cloned->len = skb_headlen(cur);
+ 		ret = t7xx_port_send_skb(port, cloned, 0, 0);
+ 		if (ret) {
 -- 
-2.34.1
+2.51.0
 
 
