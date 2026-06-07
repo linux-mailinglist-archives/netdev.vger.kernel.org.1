@@ -1,152 +1,175 @@
-Return-Path: <netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7h0QCuA/JWrtEwIAu9opvQ
-	(envelope-from <netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:54:40 +0200
+	id wtPxBRVAJWoJFAIAu9opvQ
+	(envelope-from <netdev+bounces-296217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:55:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A50564F49B
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:54:39 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED7764F4B2
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:55:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=YJp1uk0V;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linuxfoundation.org;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=i8IUfMym;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296217-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296217-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4801F3002507
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 09:54:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 076323003D1C
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 09:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B343D38888B;
-	Sun,  7 Jun 2026 09:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D215389452;
+	Sun,  7 Jun 2026 09:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE4F38734A;
-	Sun,  7 Jun 2026 09:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7403890F1;
+	Sun,  7 Jun 2026 09:55:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780826074; cv=none; b=lctMABqML2yHNZlG95dxm91pTfz8YlCShR1m2QSZFohyDBv1VxVOq4WfUQ5w5ym4kdgDLtRnP1jZypp3KVy3juxlSMIiG/LrorIbeEjB2CoXx6c1Xx91JPOet1r7TCwcho5LjgtANC3LYjQuASolIonIus4nBoKTcBJspGtfkG4=
+	t=1780826131; cv=none; b=Bl1dC8Xcg8ztQDD3mbPTH9f0Rkrf5e/wVXozU1cU369gKMZuT1sCf9TTQjQFZ2ToGA+JdpSY4Jd7k8dzmZXFL5NrqPGxwFmtSk1/h9BOHThY3K2wkt42EFUjtRHHqpKu7bKzXTuKOjHdvFBjvlOl/gaczrqXS+ypBhQfkQHNwuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780826074; c=relaxed/simple;
-	bh=rLzS8kVZIaLrxE7golOIyuypqsEka7TpVmWikthKQlE=;
+	s=arc-20240116; t=1780826131; c=relaxed/simple;
+	bh=rm3s+wuYQ/bxne2+NqDXphAOsD3znMQg4FT1tTRd3pc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JFvA5rxDLpBEHCdE8JDBYehYSnm/AfRTN7qx/pBnjopGiS3COAfMGhA/RvHOURKUUI6A0ptFqsDX4MsY/YQJb6HfFvAQO8cBerIdDesadFHsYfVGkEMJjAxQQuJ1vvhjAOzxOBs0Wd4nl3L27YPWetFQWi5yR2J1pyyDrS9s0nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YJp1uk0V; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED021F00893;
-	Sun,  7 Jun 2026 09:54:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1780826073;
-	bh=z13/UNc27kjJOIZUWZbt7bi5IAGJ1TZgFynQ0tyy04I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YJp1uk0VkfN4UnvjgEac9t3OrHpM5RBCSrkWIy/xf5j0n4E4BZeNs/SsuTEJmBD9o
-	 CLRKYBo//Qk7u4IxLlNgE2V0/Svj84B1YAvzNwFvdTaYALNAnQfzN9Oe8CnJYhH0Kd
-	 jcacCC7kIT2E2DQUBvp7q9ANevZQKJJ5UwNV6otU=
-Date: Sun, 7 Jun 2026 11:53:36 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: David Heidelberg <david+nfc@ixit.cz>, oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org, stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] nfc: nci: add data_len bound checks to activation
- parameter extractors
-Message-ID: <2026060725-husked-latter-8231@gregkh>
-References: <20260607094822.322125-1-hexlabsecurity@proton.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RGKmfsBq38ETv4IIUU33ffOIeZXUSsQnLhLwiyUUGNmfqAvgqfCwZMM4aKkO4pKU7VJuXJjkFSc750T5l0s1xNBuCRDRg/Naqe1WMsLAT6Zt6v9mTg1Ld7jnxozY3NFI7BcMJfYuPU9gRsAt8Hvqx6C1lHEGzoef1108x7JXChk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=i8IUfMym; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 3AFD6601A1;
+	Sun,  7 Jun 2026 11:55:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1780826128;
+	bh=os6NNiOZk0xeuYivLkV89UjzlTOROuz7qHU5o/Xbh5Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i8IUfMymsIq5kA6WEkjt8H3oyyWOtJeuLhvbqqEAGbz9sMKUXlC7nlSTAv0Q9IQSA
+	 76igRozpLUrWpg0sGAys8VmN1AJkF9i6CHlNkIBZwfTWvcgQSf1agQdRWl87o8p8pI
+	 USDOrrfzftJF5VHLNAr3+qUU3OQY3tSkC8CSjALmvMTB3DjXmIqUa2t2oGsq2vCjeN
+	 tZqd3kSMKwk9ISZMuxIAe8emkInqMV9ZbjWs7IBz2cPRfZiN2cIm5mT3CrlwEjIDZ5
+	 HsH4dnUmUkNEmzH5lLNH3esSXpGA6W5u46XWohXU4tCXu6jOe90Nj8zPc3HzgKBy2w
+	 i43Ifisp0Bihg==
+Date: Sun, 7 Jun 2026 11:55:25 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: flowtable: Validate iph->ihl in
+ nf_flow_ip4_tunnel_proto()
+Message-ID: <aiVADSnC6rBgpUnz@chamomile>
+References: <20260605-nf_flow_ip4_tunnel_proto-update-v1-1-9de42230f080@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260607094822.322125-1-hexlabsecurity@proton.me>
+In-Reply-To: <20260605-nf_flow_ip4_tunnel_proto-update-v1-1-9de42230f080@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296216-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:david+nfc@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:david@ixit.cz,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296217-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gregkh:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,netfilter.org:from_mime,netfilter.org:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A50564F49B
+X-Rspamd-Queue-Id: EED7764F4B2
 
-On Sun, Jun 07, 2026 at 09:48:26AM +0000, Bryam Vargas wrote:
-> nci_extract_activation_params_iso_dep() and
-> nci_extract_activation_params_nfc_dep() read an inner length byte from
-> the NCI RF_INTF_ACTIVATED_NTF payload and use it to memcpy() into fixed
-> kernel buffers, but neither function receives the caller-validated
-> activation_params_len.  A crafted NCI notification with
-> activation_params_len=1 and an inner length byte of up to 20 (NFC-A) or
-> 50 (NFC-B) causes memcpy() to read that many bytes past the one valid
-> byte in the activation params region -- a slab out-of-bounds read of
-> kernel memory adjacent to the NCI skb.
+Hi Lorenzo,
+
+Thanks for your patch, comments below.
+
+On Fri, Jun 05, 2026 at 06:47:48PM +0200, Lorenzo Bianconi wrote:
+> Add sanity check for iph->ihl field in nf_flow_ip4_tunnel_proto routine.
+> Moreover, similar to nf_flow_ip6_tunnel_proto(), rely on
+> skb_header_pointer() to validate skb header layout.
 > 
-> The sibling nci_extract_rf_params_*() family was given equivalent
-> protection by commit 571dcbeb8e63 ("net: nfc: nci: Fix parameter
-> validation for packet data"), but the two activation parameter
-> extractors were not updated at that time.
-> 
-> Add a data_len parameter to both functions, guard against an empty
-> region before consuming the inner length byte, decrement the remaining
-> count after consuming it, and clamp the copy length to what is actually
-> available.  Update both call sites to pass ntf.activation_params_len,
-> which is already validated against the skb at ntf.c:801.
-> 
-> Fixes: e8c0dacd9836 ("NFC: Update names and structs to NCI spec 1.0 d18")
-> Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+> Fixes: ab427db178858 ("netfilter: flowtable: Add IPIP rx sw acceleration")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > ---
-> Verification (NFC-A ISO-DEP, NFC_ATS_MAXSIZE = 20):
+>  net/netfilter/nf_flow_table_ip.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
 > 
->   data_len  inner_len  without patch              with patch
->   --------  ---------  -------------------------  --------------------
->   1         0          rats_res_len=0, clean       same
->   1         1          memcpy +1B OOB              clamped to 0, clean
->   1         20         memcpy +20B OOB  <-- PoC   clamped to 0, clean
->   2         2          memcpy +1B OOB              clamped to 1, clean
->   21        20         memcpy 20B clean            same
+> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+> index 9c05a50d6013..9684c19da37a 100644
+> --- a/net/netfilter/nf_flow_table_ip.c
+> +++ b/net/netfilter/nf_flow_table_ip.c
+> @@ -319,15 +319,17 @@ static unsigned int nf_flow_xmit_xfrm(struct sk_buff *skb,
+>  static bool nf_flow_ip4_tunnel_proto(struct nf_flowtable_ctx *ctx,
+>  				     struct sk_buff *skb)
+>  {
+> -	struct iphdr *iph;
+> +	struct iphdr *iph, _iph;
+>  	u16 size;
+>  
+> -	if (!pskb_may_pull(skb, sizeof(*iph) + ctx->offset))
+> +	iph = skb_header_pointer(skb, ctx->offset, sizeof(*iph), &_iph);
+
+I think we have to update nf_flow_ip6_tunnel_proto() to call
+pskb_may_pull() instead, given that this calls skb_pull() later on to
+pull the tunnel header and this ensures that the IP header this will
+pull will be in a linear area.
+
+> +	if (!iph)
+>  		return false;
+>  
+> -	iph = (struct iphdr *)(skb_network_header(skb) + ctx->offset);
+> -	size = iph->ihl << 2;
+> +	if (iph->ihl < 5)
+> +		return false;
+>  
+> +	size = iph->ihl << 2;
+>  	if (ip_is_fragment(iph) || unlikely(ip_has_options(size)))
+>  		return false;
+>  
+> @@ -335,9 +337,9 @@ static bool nf_flow_ip4_tunnel_proto(struct nf_flowtable_ctx *ctx,
+>  		return false;
+>  
+>  	if (iph->protocol == IPPROTO_IPIP) {
+> -		ctx->tun.proto = IPPROTO_IPIP;
+> +		ctx->tun.proto = iph->protocol;
+>  		ctx->tun.hdr_size = size;
+> -		ctx->offset += size;
+> +		ctx->offset += ctx->tun.hdr_size;
+>  	}
+>  
+>  	return true;
 > 
-> NFC-B (attrib_res, max 50) and NFC-DEP poll/listen (atr_res/atr_req,
-> max 62) have the same shape and receive the same fix.
+> ---
+> base-commit: 4aacf509e537a711fa71bca9f234e5eb6968850e
+> change-id: 20260605-nf_flow_ip4_tunnel_proto-update-b31f7bff6fb9
 > 
->  net/nfc/nci/ntf.c | 26 ++++++++++++++++++++++----
->  1 file changed, 22 insertions(+), 4 deletions(-)
-
-<formletter>
-
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
-
-</formletter>
+> Best regards,
+> -- 
+> Lorenzo Bianconi <lorenzo@kernel.org>
+> 
 
