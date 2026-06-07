@@ -1,220 +1,225 @@
-Return-Path: <netdev+bounces-296168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296169-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VEsJFCi6JGoG+wEAu9opvQ
-	(envelope-from <netdev+bounces-296168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 02:24:08 +0200
+	id VzFUAZW7JGox+wEAu9opvQ
+	(envelope-from <netdev+bounces-296169-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 02:30:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B38964E991
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 02:24:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E713664E9A5
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 02:30:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eYLGphjO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296168-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296168-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=j6O7qCmx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296169-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296169-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 493B13018281
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 00:24:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C66743004C88
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 00:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692691DED49;
-	Sun,  7 Jun 2026 00:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDB71A682B;
+	Sun,  7 Jun 2026 00:30:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449887404E;
-	Sun,  7 Jun 2026 00:24:03 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780791845; cv=none; b=ILEJpOZGAGAlI8qvcx4soi1N+eqcgGbtAwwdiWFCSF/igRn5I7otqjP79VbZhS6HhEwbjJvSqh2/qfHIfnLUXH8GaKUHWrZmzqps08lWnEDCbYRur1mtCis4AwB6O7lAxVjwSYOhfbriz7siOULOQLV1F/b1tSZ2ziN4o1dzf3g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780791845; c=relaxed/simple;
-	bh=DKguOZb9mOl7XKbSfwY+p/PXNRTpSvnWvJbTr9s8+Ik=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XuyHp90WzK9j0GDmAasAfx3CGrtXZVPeZOAp254UiwxK8JgW/SELwTwcEdKfK+ETbzTc+vG/auA+6rEh7GzLO9W4xmsc+q3xUo2sO+1r34epjUDQIMmmkonRBCK9q6b90hOv6Ituks+jDdyal2GQBd5013YuhAB/FdMRf47wVNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYLGphjO; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CC4D1F00893;
-	Sun,  7 Jun 2026 00:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780791843;
-	bh=2BbaLjFNS7Uw5sD2tYs4S6utpBK8n6JKQZdIEsfwDNQ=;
-	h=From:To:Cc:Subject:Date;
-	b=eYLGphjOBFE3r0Kn+2qVclxjKAPS3N1KATs9kylTiZb5fu2kRwOj99Sc5Z1GDZ5Nm
-	 VSMPmQvD0QznCNzP0NsbsOPt6roZonUhUCz6UN2QyzWOF3m1oSHUIfiMSoY78KtuON
-	 vVc9u414Bk6rnZrXeBzkJBacALHMG+0zggAJeERDIlFurg6KmFl1PyI5s8B2087i/v
-	 Iy9M4A5pf4MZcPK5j8Ltt3dIQgI/V1AjTrkDl0IXbzuAPwntDdWW7FyBwhi6iHimqa
-	 Ih845zzqBL/rMEDWzgVKM3uhoWlBCDkbWkXscWSc/TPQWMDfUmG4aujimRUVgakGCC
-	 NmqWSNM7rht8A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: gro: signal over-coalescing more reliably
-Date: Sat,  6 Jun 2026 17:24:01 -0700
-Message-ID: <20260607002401.212976-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B231EDA32
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 00:30:05 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780792207; cv=pass; b=ZEGHUjvgRZtOjOdFYREpVW5gfjXBCgLWuWClLdlLMekyyH1wGJZWNZGW4h4xloUzUIUlHqHZaVUQKqa2n0VuLFkybBFJsllJS3b5oBBfFC/Ds7nHONKU7ol9xcVDyrt6+cCja6KKV6yjA2AHyjqeG08TdOM2GgfOwMXt8kPW9do=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780792207; c=relaxed/simple;
+	bh=bvm8XR80mK0+tJ7bOaj+iLMt1hixXvlRE+ID0KlE5F8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D8TBfkFcrqey8HJWOGrZ4EwtJOj237ZXszTiKOX7ahhU0bjKsuZYP59oxWXaeY9+8SarzsKR0tjXAjp1XrHcjXkmDVa0QQrjWMjoCTQXrbnhWhOf9txLW2rwPrDUW7zDUltYxFhDpPBj0Fq8G23rB0t8oRfGotfp5ehU50Wo2+M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j6O7qCmx; arc=pass smtp.client-ip=209.85.210.176
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8423f236418so1677026b3a.1
+        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 17:30:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780792205; cv=none;
+        d=google.com; s=arc-20240605;
+        b=E30xx60k54DOFKSKu5ROs/xj2mQT1TPeyPp7oOCY2h4cyFlgKv5OYBla3xAd+jKBcJ
+         lymL06H4YgdFcpgzcoMrWHYmshl4Rpl5Ccqi4iW9V2/rR46Db/rEg71X6lU5WrrfSGg0
+         FqlvTy2caBvEe7yxjBD0lpNr+SEYKx4zmr6tVFnQKdvx2emcDGc5f7eyI9mb4q/PMIBn
+         SHHxnCtuHEwZcigl1mUaKlwhnxt23lNcG3DqOYmWWFAcPlEpYka94LfnyL80D3V+B6lX
+         wkkWgMYD1VMd6uwmpX2F7sQ72pAMrdTSfOOByy3m6jcxbnvGuZ7aRXbvkrFfZFh5VLIs
+         /fqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0CJN8f1kq0P5OFHhUxk52kB/BECDO+WDurskh2BXXEc=;
+        fh=Z3gyTDLV792Xt6m5bDENW/IpwE4hTU4t1Xuz3YneztQ=;
+        b=Q05DaqbIVaFrZI4NvpsSdf9P3Mjg5zHSeRpr9/nRcApOkasQdBknxF3iECOxg8P72H
+         VTuZ6fdphEzBy3Cc77AUxUIUH8U7iz9CyzrcdOSqCTO9sogrstHwQSPPL15ETjfrWFmX
+         lENRMS25LaBknfjxxYFpwrv+xSVwRdkfFM4fIDmPUIx5uzIoEm5SE6R3KzNRtGW5AVrt
+         P4Pf8U/lQYqWXPOiFtJ2t91w+MkvDzSDaABv/jM2ESzZxALzgyg7O/2538GDONVZNbnX
+         ANqT1wUfkyLFk2zJVZ2jQ1FCFS9EahSZnARUG375ZNRvXrPf56U5vPmp+vP1ui1gX6Rk
+         NFdw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780792205; x=1781397005; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0CJN8f1kq0P5OFHhUxk52kB/BECDO+WDurskh2BXXEc=;
+        b=j6O7qCmxHmH6zzs5K+Ps8rcC8Di7+YT41Qff8Lzhx8ErpXDz4Ug+EGVEWVqjmh2ZjL
+         A6rO4CJi/O+5NKXtLs4gqaVpoSAKnj/+HFdL1ElI3JSq9DXYCtXzU3wNTgNN5yWyoknn
+         aN5hsEgA/NK6t5aRjKtnKFKTah00YVsraSAI6c5AyqvBySoZSfGhi28r26X6H8uP9xaF
+         YlcdifjqLhDQAAiul7I1qSR6bZfJG3i1o46v1v5OYk3XvViEdu6jukoXI50tImUoXbNs
+         xrMYM+flEq1uINcgrPZAvHKIKOfZeUnqrdu8+PUE3QwqNjpBsr9anNHoogMNgQeRqpMY
+         NVeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780792205; x=1781397005;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0CJN8f1kq0P5OFHhUxk52kB/BECDO+WDurskh2BXXEc=;
+        b=ezNywg+UxeBwhLBTZR8/LHusfjR+0vOo1NK4rF3IjAUH0eFuuQ55PA6SHtld+njVZV
+         Lh82okbtir46dHqGhPrW/Ryho7YYRnElkpSBN8mJTDjaQiakeD7w0aciQmYte0zv6mDH
+         +p1fndwcU7pbECJM+DDKzyAXrYv5oCUloICsAs8kyOQKlkat87Wd7KNrIjAvOFlcXMQd
+         VAmK2NUyBlatdMAg7xsjOvF58cgV20FSWwOSBRvi++FF+2goYIU1iatB4gmaCjGTZQB3
+         5CJrkeplGD76Kv6BSJQwgeAwHqFhxCN21nFDk4pcWHPKuObcHRkg2zJpGkuUP2IV0LcO
+         rR/Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+ga0olegRu+zRC96dojn7zqxdAbrwkuBaPB+vK1l5I1gHkOBn3kV5NH587DjfLkjoEHcsftyU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5q+sttFpFf/AfwHwFZFmktx9sPIE7S8/kC/UXxTyqVvX8CnGX
+	YxsW/V5nBhHSELLcNeVqpjsd1FVRVmV1hlHUkGpRR98dtXR3TEDaWNic7OogRsd7zFfgev9oTW6
+	DZAccQwVK23zxQnYKY0d8FoCAS2Ipu+0=
+X-Gm-Gg: Acq92OE3NTILAZfLCnKyqbjgfHOqxmUvO6mbtQhx2Rovu8yndc4KJtFuhChBXIku53Z
+	OibpbEOvga+VOauHzaU02TCadVKdtTcCgWltFpSI0sBr8RxWY/Kk01Tx+7ki1t1/uXOhNjKLfKX
+	CYjEWhJOWksKvK1ahUSWz/fT3btGWjKrPPnXDgiYXxuj8TeXqJJj7PN3iK22/8N4BBlZC9AZNur
+	55eMcOsrPvutOAkEtSBq6eTrzNOIg4RbObuNWiHGp/kSahB3UPnvl2RpBmRjEstCReUUE3N8tpx
+	aoK6VtqXxDVmx8GqS2HyH5kxM6WE8Dll/gHQnWJMG9AsMmRzbpo9E/Zk1crxBwYL5LmlnMkNwDq
+	m0HATCXHf7SdMQqd6Ew==
+X-Received: by 2002:a05:6a00:2441:b0:842:57e8:1bdc with SMTP id
+ d2e1a72fcca58-842b0e718b4mr9040468b3a.18.1780792205031; Sat, 06 Jun 2026
+ 17:30:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <d78954ecd94954653ee299400e98d74a03a6f7d3.1780603399.git.bronzed_45_vested@icloud.com>
+In-Reply-To: <d78954ecd94954653ee299400e98d74a03a6f7d3.1780603399.git.bronzed_45_vested@icloud.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sat, 6 Jun 2026 20:29:53 -0400
+X-Gm-Features: AVVi8Cff1SYXJTyct_UzvU-aEB56DUj-CEcggirsskGphb4yopP6wOJDomNiapg
+Message-ID: <CADvbK_cw+w+NSS+=7wJwEd5Z2ziBesVgc4nz4PepPDy1hjNZew@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/1] sctp: stream: fully roll back denied
+ add-stream state
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	marcelo.leitner@gmail.com, davem@davemloft.net, yuantan098@gmail.com, 
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, zcliangcn@gmail.com, 
+	bird@lzu.edu.cn, bronzed_45_vested@icloud.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296169-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:marcelo.leitner@gmail.com,m:davem@davemloft.net,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,lzu.edu.cn,icloud.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-296168-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuba@kernel.org,m:shuah@kernel.org,m:willemb@google.com,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,icloud.com:email,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9B38964E991
+X-Rspamd-Queue-Id: E713664E9A5
 
-GRO test is very timing-sensitive, packets may be delayed
-by the network or just sent slowly. Because of this we retry
-each test case up to 6 times.
-
-This makes perfect sense for positive cases, in which we want
-to see coalescing. Negative test cases, which modify headers
-and expect no coalescing should have opposite treatment.
-We should really try 6 times and make sure that each time
-the test failed. This would, however, require that we annotate
-each test to indicate whether its positive or negative.
-Let's start with a simpler improvement. Do not allow
-retries if we detected over-coalescing. Previously the negative
-case would have to get lucky at least once in 6 tries to pass.
-Now the first failure breaks the retry loop.
-
-For background - NICs tend to ignore the contents of the TCP
-timestamp option, so that test case commonly fails. In NIPA
-having 6 attempts, however, was enough for some NICs to get
-multiple successful runs in a row, getting the test cases
-auto-classified as expected to pass, even tho the NIC does
-not comply with the expectations.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/lib/gro.c      | 16 +++++++++++++++-
- tools/testing/selftests/drivers/net/gro.py |  8 +++++++-
- 2 files changed, 22 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-index fa35dfc8e790..7a333155de1a 100644
---- a/tools/testing/selftests/net/lib/gro.c
-+++ b/tools/testing/selftests/net/lib/gro.c
-@@ -108,6 +108,8 @@
- #define EXT_PAYLOAD_1 "\x00\x00\x00\x00\x00\x00"
- #define EXT_PAYLOAD_2 "\x11\x11\x11\x11\x11\x11"
- 
-+#define EXIT_OVER_COALESCE	42
-+
- #define ipv6_optlen(p)  (((p)->hdrlen+1) << 3) /* calculate IPv6 extension header len */
- #define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
- 
-@@ -1165,6 +1167,8 @@ static void check_recv_pkts(int fd, int *correct_payload,
- 	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + nhoff);
- 	struct tcphdr *tcph;
- 	bool bad_packet = false;
-+	int bytes_expected = 0;
-+	int bytes_received = 0;
- 	int tcp_ext_len = 0;
- 	int ip_ext_len = 0;
- 	int pkt_size = -1;
-@@ -1173,8 +1177,10 @@ static void check_recv_pkts(int fd, int *correct_payload,
- 	int i;
- 
- 	vlog("Expected {");
--	for (i = 0; i < correct_num_pkts; i++)
-+	for (i = 0; i < correct_num_pkts; i++) {
- 		vlog("%d ", correct_payload[i]);
-+		bytes_expected += correct_payload[i];
-+	}
- 	vlog("}, Total %d packets\nReceived {", correct_num_pkts);
- 
- 	while (1) {
-@@ -1209,9 +1215,17 @@ static void check_recv_pkts(int fd, int *correct_payload,
- 			vlog("[!=%d]", correct_payload[num_pkt]);
- 			bad_packet = true;
- 		}
-+		bytes_received += data_len;
- 		num_pkt++;
- 	}
- 	vlog("}, Total %d packets.\n", num_pkt);
-+	/* Signal over-coalescing explicitly, it's a hard failure, unlike
-+	 * under-coalescing which could be timing- or loss-related.
-+	 */
-+	if (num_pkt < correct_num_pkts && bytes_received == bytes_expected)
-+		error(EXIT_OVER_COALESCE, 0,
-+		      "over-coalesced: got %d pkts vs expected %d (%d B)",
-+		      num_pkt, correct_num_pkts, bytes_received);
- 	if (num_pkt != correct_num_pkts)
- 		error(1, 0, "incorrect number of packets");
- 	if (bad_packet)
-diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-index fd158c775b1c..6ab8c97880d1 100755
---- a/tools/testing/selftests/drivers/net/gro.py
-+++ b/tools/testing/selftests/drivers/net/gro.py
-@@ -40,7 +40,7 @@ import glob
- import os
- import re
- from lib.py import ksft_run, ksft_exit, ksft_pr
--from lib.py import NetDrvEpEnv, KsftXfailEx
-+from lib.py import NetDrvEpEnv, KsftFailEx, KsftXfailEx
- from lib.py import NetdevFamily, EthtoolFamily
- from lib.py import bkg, cmd, defer, ethtool, ip
- from lib.py import ksft_variants, KsftNamedVariant
-@@ -370,6 +370,12 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
- 
-         ksft_pr(rx_proc)
- 
-+        # ret==42 means the receiver detected over-coalescing.
-+        # This is unambiguous proof of a bug, retries can only cause
-+        # false negatives.
-+        if rx_proc.ret == 42:
-+            raise KsftFailEx(f"GRO over-coalesced in {protocol}/{test_name}")
-+
-         if test_name.startswith("large_") and os.environ.get("KSFT_MACHINE_SLOW"):
-             ksft_pr(f"Ignoring {protocol}/{test_name} failure due to slow environment")
-             return
--- 
-2.54.0
-
+On Fri, Jun 5, 2026 at 1:54=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+>
+> From: Wyatt Feng <bronzed_45_vested@icloud.com>
+>
+> When ADD_OUT_STREAMS is denied, SCTP only shrinks the queued chunks and
+> then lowers outcnt. That leaves removed stream metadata behind, so a
+> later re-add can reuse a stale ext and hit a null-pointer dereference in
+> the scheduler get path.
+>
+> Fix the rollback by tearing down the removed stream state the same way
+> other stream resizes do. Unschedule the current scheduler state, drop
+> the removed stream ext state with sctp_stream_outq_migrate(), and then
+> reschedule the remaining streams.
+>
+> This keeps scheduler-private RR/FC/PRIO lists consistent while fully
+> rolling back denied outgoing stream additions.
+>
+> Fixes: 637784ade221 ("sctp: introduce priority based stream scheduler")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:GPT-5.4
+> Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+> Changes in v2:
+>   - Moved the `sched` declaration below `addstrm` and dropped the
+>     `out_curr` handling. The rollback fix now only unschedules the
+>         current scheduler state, migrates/drops the removed stream ext
+>         state, and reschedules the remaining streams.
+>   - v1 Link: https://lore.kernel.org/all/345886be48a66f70bad26ddcea6defb3=
+8d1d0f72.1780439824.git.bronzed_45_vested@icloud.com/
+>
+>
+>  net/sctp/stream.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/sctp/stream.c b/net/sctp/stream.c
+> index c2247793c88b..5c2fdedea088 100644
+> --- a/net/sctp/stream.c
+> +++ b/net/sctp/stream.c
+> @@ -1038,6 +1038,7 @@ struct sctp_chunk *sctp_process_strreset_resp(
+>                         stsn, rtsn, GFP_ATOMIC);
+>         } else if (req->type =3D=3D SCTP_PARAM_RESET_ADD_OUT_STREAMS) {
+>                 struct sctp_strreset_addstrm *addstrm;
+> +               const struct sctp_sched_ops *sched;
+>                 __u16 number;
+>
+>                 addstrm =3D (struct sctp_strreset_addstrm *)req;
+> @@ -1048,7 +1049,10 @@ struct sctp_chunk *sctp_process_strreset_resp(
+>                         for (i =3D number; i < stream->outcnt; i++)
+>                                 SCTP_SO(stream, i)->state =3D SCTP_STREAM=
+_OPEN;
+>                 } else {
+> -                       sctp_stream_shrink_out(stream, number);
+> +                       sched =3D sctp_sched_ops_from_stream(stream);
+> +                       sched->unsched_all(stream);
+> +                       sctp_stream_outq_migrate(stream, NULL, number);
+> +                       sched->sched_all(stream);
+>                         stream->outcnt =3D number;
+>                 }
+>
+> --
+> 2.43.7
+>
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
