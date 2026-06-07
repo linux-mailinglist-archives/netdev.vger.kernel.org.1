@@ -1,106 +1,103 @@
-Return-Path: <netdev+bounces-296261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MrNjNrCiJWqzJwIAu9opvQ
-	(envelope-from <netdev+bounces-296261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 18:56:16 +0200
+	id 6cUzEvilJWpAKAIAu9opvQ
+	(envelope-from <netdev+bounces-296262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 19:10:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A4E65104A
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 18:56:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20286510A0
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 19:10:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=sartura.hr header.s=sartura header.b=usK1+uiL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296261-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296261-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=sartura.hr;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=CUyAZTZT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296262-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296262-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C27B5300251F
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 16:56:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 639EA3005EBD
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 17:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB15030EF90;
-	Sun,  7 Jun 2026 16:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CEE2D0C7B;
+	Sun,  7 Jun 2026 17:10:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3092F8EAE
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 16:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D525220F2D
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 17:10:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780851371; cv=none; b=n6liRd6DdknEmmlLr/8TRY/LOOHewjUBQQUuF3flOcsK7BLT7h06wK2xNO+xS06hTu9gc/SOe9LDLzN1CBySxD4MNCGhaFmHYiXfjrixLHE3AwMmhMx9c70LpKWIQG9BY6dUUuf5HSg5Ts2aO33Y32UlJH6Tr3SlD0l1MarChcI=
+	t=1780852213; cv=none; b=f9/ejQw4bfgyAJjMkAV53YhyWEfBDcciaoBxKPN7UriIJU8mZVzbWoifJIUWLNypGDrHBur8oILmZyFfj9vk7YMfETfrWP9CdX0xTneQkmjyUqO10EeNB12VwTd5AbG3yFBXQZju32Gwuu5toj6cUxEkKwHBDYqolN6Jnv7aLrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780851371; c=relaxed/simple;
-	bh=RKgDcDPNfLY94yo6BB9eMCgx4LrUtIzIBcqu+7gcGaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CHUlNwI1/eUyfqfJiXMoOyVThvbTuRN5/K7NtQW4o14sxNmIrKFKdhkvNYIyhiIoDC/6cihhI5TsgU2CQ+xtyOoB03W1OtJtigTrmlJM80VnfwN25fa90i6QrMKGr5HmIDL2B3ai/GwipmdnAdGP/JQvAQfvJpy6gVhrWyM+79E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=usK1+uiL; arc=none smtp.client-ip=209.85.128.42
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490ace40f4bso40997805e9.3
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 09:56:10 -0700 (PDT)
+	s=arc-20240116; t=1780852213; c=relaxed/simple;
+	bh=IPvwljyQZpDcct7pE20QDt1P9VTQ7sgAgBY3rD8eWII=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ro7/cil4xcMj6ZxJFVrRE1LRKPtNolFWs0JuJUpOkWXjBbA+aF/a3LDvwordLCsp4jQSqiAmKzhIFCR0YJ4J1u0VsorhYXbX8tCCs5UandV8Cy68US1L55lx5RhXWk9DdBlNecPqkvmKEj+M0aQMgg+55T6pIy6cIGnBwmXCtcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUyAZTZT; arc=none smtp.client-ip=209.85.214.170
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2bf3781ca51so35233905ad.0
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 10:10:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1780851369; x=1781456169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jb6+zlsavv1nSrFH8SGOlJzElOa9/FGNdN9bgvlBisE=;
-        b=usK1+uiLqh+3OoBXej03mryHh4bxi/A243MUnxN3g9yXxPYCG0axgIMXnJZoL9msaS
-         htbhHuudE+AbiC1UlErX9d9Vn4xzC5qQMDwvpsXsG1nwXl6CRU4NnF1klMJ3P7h/Qxrq
-         dJwxgSlqxbyRlGejO6O+HjHvujn261mSacy8kb+OtF7SNhwkQ72vaOdcBEewG9MonMPR
-         we2Aki1GxYr0BJvVGBCP6Q7FIEbu69AN4Ux/SoBz/RxIyIuK5NPSONqjM80yrfG21Zom
-         AA2yuTnuLGmJciWpsTTQ22XzEN0pCqPpUm2+JxUyfG3lo3veH7remfBtxvzG5c32NxGg
-         ZKFA==
+        d=gmail.com; s=20251104; t=1780852211; x=1781457011; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GoWrcAuat8IsrHrGyIVSC+v4fTVKv8rexkicE+h/qZI=;
+        b=CUyAZTZTbJVElzgv3ot6uGDUhLp7rLTHr7lL4t/w27k9fLfHpQ6malpZ3XKJsaHl7w
+         2DSVDZ5G7U9iY/oJIJa2JRF+6CoS8xiCKnHbcrcLhTd0Sf3OEuhttn/RsF5F3mPcU98n
+         zOOa7R+UDfJ3X8wlrIlgBgnNMA8XSExt1Pk+RdqpDxLUeN3Nvq1tMFxgaEShtMxTLWcZ
+         mMXiiLuUj0yHKjlNkzks5VdADdmwOr7LSs77cJ6iH/R6po6ERZGJ1OoZ3FM9phIIbMFR
+         CLOrIvWvhOESPgRDSkqWDO5UjEXrzMHneMGK/70PhQcoZFXSzW/1JLluy5xTWMs14iTb
+         EsdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780851369; x=1781456169;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Jb6+zlsavv1nSrFH8SGOlJzElOa9/FGNdN9bgvlBisE=;
-        b=FJXab0nKgluvcK7NdIdMK76bVZb/s+F17bbBG44q4V7iP6bbHiI9AyiNP7fG77mVoC
-         32Jo3as9tCDxAG/WUOr8OZVjcBAUKeKsV5We6qQecPOU5GeaMEsCPJbzSffxdfOKgVf+
-         c80Z1MdAtp+fz9z/h/Im5FnVJ+UvSDR24gaj5eXF7HKfwFnnSHsROeYARlCTUd2BbwPv
-         DiFe02AxA14Rs0h8bmRQJFmkrBWbkOdcPxmAVaMOhmiJXn/RVMGmBV9kkGVwPyRDYVji
-         ln7Q+3fUVNa2MTnXLSVndC/gAtRJgja77CnFKqiuvnzEUaJFyv4WAzoxARoxmGSoYntz
-         +UBg==
-X-Forwarded-Encrypted: i=1; AFNElJ9uu0hiihjQooUKKw94b4JVlx75+73WacxWQh7t43IjtcXRxswHuGWbV1UxHhxEwSXLtCaFCZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4/qpmFjgn7/+5LbEBdaJnkFC/uOujq+RgskCTiXTz7KNESXpw
-	MXHMMRTTwMAZdya4JVGMS9QAV3MbmNQD2X+dkLbtL2wmUimMp9E08anv/WTSeIiICgs=
-X-Gm-Gg: Acq92OH+wWx4aq4FUhfNJRcoXOs5bSDwvCaEL8ykK4CDalp4St2SSUtK7o+RayQ+L5v
-	dmYqi8vg9a1/oL/rUPjRxMrb8nNfnqXkcaX796FpJDoMx4SdTsP9V7ra53NIlWMo/uE4eZwc1Bp
-	+pR3LlPUX9FvOWR8OvxEY0viCjf9q1wrVktP67PxZHoikTKCNnxHTc6j1yT9osv9JCyVbI9tW2u
-	JG9Cmp2LEYgwxxUlXaZTqIxon7PRF2jT06mKvElRq4cHbmbkZjarLzIikbbTcfO6L1qkS+jeE/F
-	XO22TmCjQB7LMmyiW4QVIBV6iOuofmfDY/S/fZGwi7ItwI9HywxhoA0zBbqmwSmOvGuQD/bu+jM
-	5fUQ5beUqy+UDNMqCVYyBxiOpdoYfvkJf110H/w1nyzHw8tpGwDz+lEweLTpj/kIGWCqKgNrzaf
-	nTq/k1sG6zqii6Wdq3mbnJTPqTcZF0norJ/nEgaovRcxd6i+0tj537gSmworOZZ3AQRGTxbG/7k
-	CKhFQpgMIZGGLWw+dbOr/6OjdNhZYti8ThELMLI+DDoHYKQh1tLapJL7CRFxlCqJ2p/XV/mNcHO
-	BKPfGw==
-X-Received: by 2002:a05:600c:4f90:b0:490:3890:605b with SMTP id 5b1f17b1804b1-490c260f448mr210709255e9.31.1780851368991;
-        Sun, 07 Jun 2026 09:56:08 -0700 (PDT)
-Received: from threadripper-fedora-workstation (d-zg2-253.globalnet.hr. [213.149.37.253])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3c1149sm283230325e9.4.2026.06.07.09.56.08
+        d=1e100.net; s=20251104; t=1780852211; x=1781457011;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GoWrcAuat8IsrHrGyIVSC+v4fTVKv8rexkicE+h/qZI=;
+        b=PQ1WOueKZMu8wPKpz1S5/qYHikPcZidyVhmidNRHuuvNYKer74Zm816Jbhn1dfbCWF
+         rdaJoGAJBDbGEYvp8dmMxZOPMWYiXyjv7FUY40739ySQAQwGmFsbMekCwQl+FOh9wJbt
+         pscP10ftGaFteCs0xTPKp7SUhTdqJi3u6sb7dShJV0PiNFvOp2r3lkWJiphybfgpR50u
+         xFhO5nWsuv7iJaYnaX6271YGIZAQvOCLfsqqY+3MyYnJaeWOc/6raIjGKodj1zvEcmeg
+         zJohuUXTf4YAL6z7OwjLKSwxZpcDX+hCq1AeD1xh+rMaAwZ+lun9EypDMI4mYV4UJpGD
+         IWOA==
+X-Gm-Message-State: AOJu0Yxb2qbwNj5j4VOwpm28D1V8zwNO+YAqI3iTbkdwJqHsxKzONW66
+	gQLMUpmWq4F+qTTceklg5065YUKHgsTnt0OgEDPfCalocvrzmb1Kx7Au
+X-Gm-Gg: Acq92OEqNT/f67a8V1HzIj/qZ6n4b8JPq9AsAlfXWbRFFa+3uK5++XIbyUl3/il/gpZ
+	FCKS27+5mImhYLqG1ZtQ0gGNBe2jSCNA2NHp5RdYFQ32VPHyyhWvJD6qvlepXgUzg+qhgUOeKtw
+	YfSVPnJ/sxcg1HTldZ5itoUXnNrWMPrjJWwMWoA9x/ZJVTdf2uWMPM1v1eC3HJr6ikD/7SCWNPz
+	vBVVNtmLaSiNGLQuvO4kdGYcwGx0ffAZLWyDaHv/DQUGcQ02EwYgn3e5djawLVZxHTTCkLN9Hyb
+	fd+muxLc4Gr0Wnved1kXvl+KB48rbOy0xRLnD+Df3Svgj/xpwPXNL4LOjC1cGJIucFj9be6gAYg
+	xZf3T34dGRsBDHBymaSLN3vSn7S3j0aKirddzGiW3Il8SQecx1jj4ynGIn3AGrvusUpTBJ49Wot
+	K6WJi9TL7SIivSAiVJc1qX16Gy6dHMLoo1c7qzvGQXkjOOOALz1RwD
+X-Received: by 2002:a17:903:11d0:b0:2c0:a711:534 with SMTP id d9443c01a7336-2c1e7e589b6mr142658535ad.13.1780852211012;
+        Sun, 07 Jun 2026 10:10:11 -0700 (PDT)
+Received: from DESKTOP-MUHC17F.lan ([188.253.121.145])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f9ed6csm155375265ad.31.2026.06.07.10.10.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 09:56:08 -0700 (PDT)
-From: Robert Marko <robert.marko@sartura.hr>
-To: o.rempel@pengutronix.de,
-	kory.maincent@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
+        Sun, 07 Jun 2026 10:10:10 -0700 (PDT)
+From: Zhenzhong Wu <jt26wzz@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	daniel.machon@microchip.com
-Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH net-next v3 2/2] net: pse-pd: pd692x0: support disabling disable ports GPIO
-Date: Sun,  7 Jun 2026 18:55:36 +0200
-Message-ID: <20260607165600.1260210-2-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260607165600.1260210-1-robert.marko@sartura.hr>
-References: <20260607165600.1260210-1-robert.marko@sartura.hr>
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	menglong8.dong@gmail.com,
+	eddyz87@gmail.com,
+	shung-hsi.yu@suse.com,
+	stable@vger.kernel.org,
+	mykolal@fb.com,
+	tamird@kernel.org
+Subject: [PATCH stable 6.6.y v2 0/3] bpf: backport scalar not-equal tracking fixes
+Date: Mon,  8 Jun 2026 01:09:55 +0800
+Message-ID: <20260607170959.823755-1-jt26wzz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,93 +108,185 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[sartura.hr,reject];
-	R_DKIM_ALLOW(-0.20)[sartura.hr:s=sartura];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[robert.marko@sartura.hr,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-296261-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,google.com,suse.com,fb.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel.machon@microchip.com,m:luka.perkov@sartura.hr,m:robert.marko@sartura.hr,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-296262-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:sdf@google.com,m:haoluo@google.com,m:jolsa@kernel.org,m:menglong8.dong@gmail.com,m:eddyz87@gmail.com,m:shung-hsi.yu@suse.com,m:stable@vger.kernel.org,m:mykolal@fb.com,m:tamird@kernel.org,m:johnfastabend@gmail.com,m:menglong8dong@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robert.marko@sartura.hr,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[sartura.hr:+];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sartura.hr:mid,sartura.hr:dkim,sartura.hr:from_mime,sartura.hr:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8A4E65104A
+X-Rspamd-Queue-Id: A20286510A0
 
-Microchip PSE controllers have a dedicated disable ports input that like it
-name says disables PoE on all ports.
+Hi,
 
-So lets support parsing that GPIO and using the GPIO flags to set it low
-by default and enable PoE on all ports during probe.
+This series backports two BPF verifier scalar range-tracking fixes to
+6.6.y and adds a selftest. It fixes a verifier state-pruning issue where
+an impossible linked-scalar path can be kept while the real success path is
+pruned.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
-Changes in v3:
-* Update commit message to reflect the logic level change, and make Sashiko
-happy
-* Pick up Acked-by from Oleksij
+The issue is verifier scalar state tracking, not helper-specific behavior.
+A helper return value in r0 and another scalar can become linked by scalar
+id on one branch. If the verifier does not preserve the not-equal fact on
+the right branch edge, a later check can let it explore an impossible
+continuation, narrow the linked scalar to the wrong value, and prune the
+real success path against an earlier cached state. The program is accepted
+by the verifier but then reports the wrong branch outcome at runtime.
 
-Changes in v2:
-* Use GPIOD_OUT_LOW by default so that DTS reflects the real active state
+The original visible failure was found in Rust-generated eBPF around helper
+calls. Rust match lowering can keep a helper return value and a scalar
+filled through a by-reference helper argument in the same enum-style control
+flow. That makes it easy for the verifier-visible scalar values to become
+linked by scalar id.
 
- drivers/net/pse-pd/pd692x0.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+The relevant verifier-log bytecode from the original fexit reproducer is
+below. The later instructions only store r7 into a map so user space can
+observe which branch the verifier kept.
 
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 49b1527829ad..cb377d5ba7af 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -7,6 +7,7 @@
- 
- #include <linux/delay.h>
- #include <linux/firmware.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/i2c.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -1757,6 +1758,7 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
- 	static const char * const regulators[] = { "vdd", "vdda" };
- 	struct pd692x0_msg msg, buf = {0}, zero = {0};
- 	struct device *dev = &client->dev;
-+	struct gpio_desc *disable_ports;
- 	struct pd692x0_msg_ver ver;
- 	struct pd692x0_priv *priv;
- 	struct fw_upload *fwl;
-@@ -1780,6 +1782,11 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
- 	priv->client = client;
- 	i2c_set_clientdata(client, priv);
- 
-+	disable_ports = devm_gpiod_get_optional(dev, "disable-ports", GPIOD_OUT_LOW);
-+	if (IS_ERR(disable_ports))
-+		return dev_err_probe(&client->dev, PTR_ERR(disable_ports),
-+				     "Failed to get disable ports GPIO\n");
-+
- 	ret = i2c_master_recv(client, (u8 *)&buf, sizeof(buf));
- 	if (ret != sizeof(buf)) {
- 		dev_err(dev, "Failed to get device status\n");
+  15: (85) call bpf_get_func_ret#184    ; R0_w=scalar() fp-8_w=mmmmmmmm
+  16: (79) r7 = *(u64 *)(r10 -8)        ; R7_w=scalar() R10=fp0
+  17: (15) if r0 == 0x0 goto pc+1       ; R0_w=scalar()
+  18: (bf) r7 = r0                      ; R0=scalar(id=1) R7=scalar(id=1)
+  19: (55) if r0 != 0x0 goto pc+6       ; R0=0
+  20: (67) r7 <<= 32                    ; R7_w=0
+  21: (77) r7 >>= 32                    ; R7_w=0
+  22: (b7) r1 = 1                       ; R1_w=1
+  23: (55) if r7 != 0xf goto pc+1
+
+The failure mechanism is:
+
+  1. The program checks "if r0 == 0". The jump target is the success path,
+     and the fallthrough path is the failure path and should imply r0 != 0.
+
+  2. On affected kernels, the verifier does not record that r0 != 0 fact for
+     the fallthrough path. The following "r7 = r0" then gives r0 and r7 the
+     same scalar id while both are still treated as possibly zero.
+
+  3. At the later "if r0 != 0" check, the verifier still thinks r0 may be
+     zero, so it explores the fallthrough path of that JNE. That path means
+     r0 == 0, and because r7 shares the same scalar id, r7 is narrowed to
+     zero as well. This is an impossible path: it came from the earlier
+     failure path that should have implied r0 != 0.
+
+  4. That impossible continuation reaches the return-value comparison with
+     r7 == 0 and can make the verifier keep only the wrong branch. When the
+     real success path is analyzed later, state pruning considers it safe
+     against the earlier cached verifier state, so the real continuation is
+     not explored.
+
+The relevant pruning point is that regsafe()/states_equal() accepted the
+real success-path state against an earlier cached state where r0 was an
+imprecise scalar and r7 constraints were loose enough to cover the current
+r7.
+
+After confirming the mechanism, I used a reproducer with the same verifier
+state shape, now captured by the selftest, as the test case for git bisect.
+The bisect started from the affected 6.7.y behavior and the fixed v6.8
+behavior, and narrowed the fix to the v6.7..v6.8 window. It identified the
+upstream fix as:
+
+  d028f87517d6775dccff4ddbca2740826f9e53f1
+  bpf: make the verifier tracks the "not equal" for regs
+
+For 6.6.y and older stable verifier code, applying d028f87517d6 alone is
+not sufficient. The verifier also needs the range-preservation semantics
+from:
+
+  9e314f5d8682e1fe6ac214fb34580a238b6fd3c4
+  bpf: drop knowledge-losing __reg_combine_{32,64}_into_{64,32} logic
+
+Without that semantic prerequisite, the old range-combining logic can still
+discard the refined bounds after the verifier learns them.
+
+The new selftest uses bpf_skb_load_bytes() only to create a helper status in
+r0 and run through the normal tc test-run path. It reproduces the verifier
+state shape without requiring fexit attach or bpf_get_func_ret().
+
+I would like this fix to be applied to the supported 6.6.y, 6.1.y,
+5.15.y, and 5.10.y stable trees. This v2 targets 6.6.y first for stable
+ordering. The same issue is also reproducible on 6.1.y, 5.15.y, and
+5.10.y, but those trees need separate older-layout adaptations.
+
+Targeted BPF selftest/reproducer results are:
+
+  For 5.10.y and 5.15.y, I used the same minimized reproducer bytecode in
+  QEMU because those trees still use the older test_verifier framework.
+
+  v5.10.258:                         FAIL
+  v5.10.258 + equivalent backport:   PASS
+  v5.15.209:                         FAIL
+  v5.15.209 + equivalent backport:   PASS
+  v6.1.91:                         FAIL
+  v6.1.91 + RFC backport series:   PASS
+  v6.6.142:                        FAIL
+  v6.6.142 + this series:          PASS
+  v6.7.12:                         FAIL
+  v6.8:                            PASS
+
+I also checked bpf-next: bpf-next passes even when the d028f87517d6 JNE
+refinement is reverted, because newer kernels also have the later
+4bf79f9be434e ("bpf: Track equal scalars history on per-instruction level")
+precision-tracking change. I did not use 4bf79f9be434e as the stable
+backport base because it is a broader jmp_history/precision-tracking change
+for linked scalars. For 6.6.y this series keeps the smaller stable backport
+path that directly follows the bisected fix: preserve scalar bounds after
+conditional refinement, then add the not-equal range refinement in the older
+reg_set_min_max() layout.
+
+Changes since RFC v1:
+  - drop RFC;
+  - state the intended stable targets and keep 6.6.y first for stable
+    ordering;
+  - add a BPF selftest covering the failure;
+  - add 5.10.y and 5.15.y reproducer validation;
+  - document why Rust-generated eBPF can naturally create this state shape;
+  - note the later 4bf79f9be434e precision-tracking reason why bpf-next can
+    pass independently.
+
+RFC v1:
+  https://lore.kernel.org/r/20260601180400.1381736-1-jt26wzz@gmail.com/
+
+Thanks to Shung-Hsi Yu for reviewing the RFC, pointing out that 6.6.y
+should be handled first for stable ordering, and noting that bpf-next is
+also protected by the later 4bf79f9be434e ("bpf: Track equal scalars
+history on per-instruction level") precision-tracking change.
+
+Zhenzhong Wu (3):
+  bpf: drop knowledge-losing __reg_combine_{32,64}_into_{64,32} logic
+  bpf: make the verifier tracks the "not equal" for regs
+  selftests/bpf: add helper retval linked scalar pruning test
+
+ kernel/bpf/verifier.c                         | 92 ++++++++-----------
+ .../selftests/bpf/progs/verifier_reg_equal.c  | 35 +++++++
+ 2 files changed, 75 insertions(+), 52 deletions(-)
+
+base-commit: 924b4a879cbb75aef37c160b955b92f6894b11a4
 -- 
-2.54.0
-
+2.43.0
 
