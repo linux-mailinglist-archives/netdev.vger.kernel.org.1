@@ -1,137 +1,245 @@
-Return-Path: <netdev+bounces-296316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xJo+AX7qJWqMNgIAu9opvQ
-	(envelope-from <netdev+bounces-296316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:02:38 +0200
+	id scBwDtPqJWqfNgIAu9opvQ
+	(envelope-from <netdev+bounces-296317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:04:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BB34651C71
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:02:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67CA4651C7B
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:04:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=wp.pl header.s=20241105 header.b=AkEv3xpX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296316-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296316-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=wp.pl;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296317-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296317-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0516C3009FAE
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 22:01:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C78DD3009F82
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 22:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3B926ED3C;
-	Sun,  7 Jun 2026 22:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA99338593;
+	Sun,  7 Jun 2026 22:02:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6201F91E3
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 22:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42087282F15
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 22:02:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780869683; cv=none; b=OsnY48OuALTEqI7Rb2UbQy0zYQEK5AGVEMUDR1ttQmqAE31sPmGB2qMzaro9oO5g0wMVTGhr66etRYCMshuG3BZNHR8FbuJRS+RgVvVQdbJDY848gEJc5vZkfrg+z/ujZb+6EQXuATE5j66/84Hi8DtWeZIgpSFXWGqMKv416uE=
+	t=1780869752; cv=none; b=lu9B0dkTxefl1Bpb7j115DKADNCeZk5UKrbQ4SI8nEelEfay00kKUX//XgrS97udtTiarSsi05G+HiwiDnkyXlao0+iotftdkWQlWVve/9jOvEfN3ZQWsJrkrw8vOazK+uhMygrdsI56aBr5I1CMpyP5dlyuj0Fpm2Dx5qJvz4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780869683; c=relaxed/simple;
-	bh=pbYbfzHZJn15jKp3lFFOAkIDquD3wszzxKyRjN5oI28=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rW61i7Nr8iXavt4bMpO65KPYlN/SchNUVkV1gY6AWxoeqJHtN8MG3qrfAK9rNh2GsYe1SLpXe4i5Yd5kvoWUyCmbp9ioaLbsM/nNuInmhxWDob9S+fpAP0X1CFn+RIOZN+pXghdRd5hFnq+GPaAzUsoNuKHD6hZjDtYDhT+lmgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=AkEv3xpX; arc=none smtp.client-ip=212.77.101.12
-Received: (wp-smtpd smtp.wp.pl 23065 invoked from network); 7 Jun 2026 23:54:39 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1780869279; bh=3dBNDhJiHQlxvdBDrnFrEN6RfO7AKAcPS9WPFBjqqV4=;
-          h=From:To:Cc:Subject;
-          b=AkEv3xpXPb4a/IvB0OYO1Wa9EuqcMEr1HCsle4YrDAFYwPoSGKfRY0QqHB3iVsQB9
-           lR3dvNA0o1HJ8gX2smy9w4rJj72JLGN/ZG6hLFbkPDefS1HglQBNg7OaBf4kzu6ARM
-           9Fyq155sA5qR6Qc1I4ik++o6o2u8xAHODm2MKuj3d5ME14ooB0TPJJIwc5ba1OUPPh
-           TgHwWMM8E6WhvWI63zYPgiSeRxEJ2Yhgq/qblqhkn5XOv37rIYVlhhV0TSKxNs/NWK
-           uKbd5Czz1AcoNFYt7PpZGtoB1Srf17NSzpUKTLPNHBADlqn8iPeRI/Fm2QxE/yhT80
-           O049hkdqlnQuw==
-Received: from 83.24.121.144.ipv4.supernova.orange.pl (HELO abajkowski.home) (olek2@wp.pl@[83.24.121.144])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <netdev@vger.kernel.org>; 7 Jun 2026 23:54:38 +0200
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: netdev@vger.kernel.org,
-	mkubecek@suse.cz
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH ethtool-next] sfpid: add support for newer SFF-8472 compliance codes
-Date: Sun,  7 Jun 2026 23:54:25 +0200
-Message-ID: <20260607215437.1644059-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1780869752; c=relaxed/simple;
+	bh=8S8tJ6nJZ0eKpxggUWH7vYEzC2+v+aJvXC6Iwsl6KV8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=bH124em42A/deHotgZvZj19VyV1sTjSxXQcTlZFulOTClvuwHR9rdFyH9XOmSJrbfuy7Y8MZTfjTTiA9qSRYDOOX8nvaaC9ob6EexCmdbbWmdT7cwYm6bSckBtM++ky4HnK6k+h0Z+vE+PY1z5iNVzNAFaV6IHbQ3eKEl8y8jmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.206
+Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-48687e7f161so760191b6e.2
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 15:02:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780869750; x=1781474550;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QrnJscUqb8nFwrlaHYcAxf2BdfKALHQGG36qMQ6iurs=;
+        b=OzCTKv3CU+5H6+QNTqk3hgry1ZVluIhtFRLd6e4pBpOR/PZXVdAtPdk9FbmCjxF8OF
+         qJZ4dX6B/4baAlIice/foqqWbAYx8C6ZyiBYESokCc1IMz4UeKoFZqR47SqfiqVbbC6m
+         q3PsdgdckNGBxtalBi+W9Eljsr83BWyQzTakh44aPPjWoCi8GmPJA6zPq3oB/HvOb/i2
+         xNZ8dCJyTSbppwor+qCQpqKbiXHb4US/DLsX0Lc7vb45ARchWidoSaRYYZPuUCPC675c
+         Rv7c+pgkEVzU6kLqy1KI5Mz1s7nA17O0DxEPaOJ7I4mwm0RacpImaNh4xrEYCCCy8QlF
+         F9Dg==
+X-Forwarded-Encrypted: i=1; AFNElJ8mFP/W/hQQP39N5mBMpMdkYRMtLxZnUgsn4CdYkIWghXFNTZWvsH9xqdppzpIaqFdAPWXiPO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+5GsjzwM96xG7peWEAwcB9xDwX29Pnx4/rDRMGFyG7SG3+DnP
+	ClrIIstOgTyWu1tPQPsj6ZKpATntTv/yKaZY2wuAOlLGFsyvmnT1diQFLMn3JGesVikK/HHw74g
+	ybKPfwkOJovQjU5lMi4fiRWidb1a4z9BXnK/HJID41NEPIzjMjPNaNkPrP9w=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 0936d93fac4d7caa57477f48870c6ef0
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [kYOk]                               
+X-Received: by 2002:a05:6820:451:b0:69e:3dde:8695 with SMTP id
+ 006d021491bc7-69e68c9433emr5423015eaf.54.1780869750317; Sun, 07 Jun 2026
+ 15:02:30 -0700 (PDT)
+Date: Sun, 07 Jun 2026 15:02:30 -0700
+In-Reply-To: <69a69eb7.a70a0220.135158.0008.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a25ea76.c25708ab.1b19ef.000e.GAE@google.com>
+Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in __dentry_kill
+From: syzbot <syzbot+f8ccdac0a7eede0e1ae5@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, brauner@kernel.org, hannes@cmpxchg.org, 
+	jack@suse.cz, jackmanb@google.com, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, mhocko@suse.com, 
+	netdev@vger.kernel.org, surenb@google.com, syzkaller-bugs@googlegroups.com, 
+	vbabka@kernel.org, viro@zeniv.linux.org.uk, ziy@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=65472e27d1590a04];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
-	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296316-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:olek2@wp.pl,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296317-lists,netdev=lfdr.de,f8ccdac0a7eede0e1ae5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,syzkaller.appspotmail.com:from_mime,vger.kernel.org:from_smtp,appspotmail.com:email,storage.googleapis.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS(0.00)[m:akpm@linux-foundation.org,m:brauner@kernel.org,m:hannes@cmpxchg.org,m:jack@suse.cz,m:jackmanb@google.com,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:mhocko@suse.com,m:netdev@vger.kernel.org,m:surenb@google.com,m:syzkaller-bugs@googlegroups.com,m:vbabka@kernel.org,m:viro@zeniv.linux.org.uk,m:ziy@nvidia.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[wp.pl:+];
-	FREEMAIL_FROM(0.00)[wp.pl];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[wp.pl];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,wp.pl:mid,wp.pl:dkim,wp.pl:from_mime,wp.pl:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_RCPT(0.00)[netdev];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2BB34651C71
+X-Rspamd-Queue-Id: 67CA4651C7B
 
-This change adds support for newer compliance codes defined in
-SFF-8472.
+syzbot has found a reproducer for the following issue on:
 
-Standards for SFF-8472
-a) SFF_8472 Rev 12.5a dated Jan 16, 2026
+HEAD commit:    9772589b57e4 netlabel: validate unlabeled address and mask..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=13230bec580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=65472e27d1590a04
+dashboard link: https://syzkaller.appspot.com/bug?extid=f8ccdac0a7eede0e1ae5
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12fc5e7a580000
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/54d0bafddbc5/disk-9772589b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/82dd93b33708/vmlinux-9772589b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5ab8ee618a60/bzImage-9772589b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f8ccdac0a7eede0e1ae5@syzkaller.appspotmail.com
+
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P5788/1:b.el
+rcu: 	(detected by 0, t=10506 jiffies, g=15749, q=1307 ncpus=2)
+task:syz-executor    state:R  running task     stack:21752 pid:5788  tgid:5788  ppid:5780   task_flags:0x400140 flags:0x00080001
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5388 [inline]
+ __schedule+0x1821/0x5740 kernel/sched/core.c:7189
+ preempt_schedule_irq+0x4d/0xa0 kernel/sched/core.c:7513
+ irqentry_exit_to_kernel_mode include/linux/irq-entry-common.h:539 [inline]
+ irqentry_exit+0x14f/0x8b0 kernel/entry/common.c:164
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:__orc_find arch/x86/kernel/unwind_orc.c:101 [inline]
+RIP: 0010:orc_find arch/x86/kernel/unwind_orc.c:238 [inline]
+RIP: 0010:unwind_next_frame+0x4d6/0x2550 arch/x86/kernel/unwind_orc.c:510
+Code: 00 00 83 f8 01 4c 8b 7c 24 50 48 bd 00 00 00 00 00 fc ff df 4c 8b 6c 24 20 0f 84 86 16 00 00 e9 03 02 00 00 49 89 d5 48 89 d5 <48> 89 d8 48 29 e8 48 89 c1 48 c1 f9 02 48 c1 e8 3f 48 01 c8 48 83
+RSP: 0018:ffffc90003c2f4b8 EFLAGS: 00000246
+RAX: ffffffff9052f1d0 RBX: ffffffff9052f1d0 RCX: ffffffff9052f1d8
+RDX: ffffffff9052f1d0 RSI: ffffffff90d3bfc2 RDI: ffffffff8c28b880
+RBP: ffffffff9052f1d0 R08: 0000000000000003 R09: ffffffff8e95cc20
+R10: ffffc90003c2f5d8 R11: ffffffff81b0e0e0 R12: ffffffff8243249e
+R13: ffffffff9052f1d0 R14: ffffc90003c2f588 R15: ffffffff9052f1d4
+ arch_stack_walk+0x11b/0x150 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0xa9/0x100 kernel/stacktrace.c:122
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4570 [inline]
+ slab_alloc_node mm/slub.c:4899 [inline]
+ kmem_cache_alloc_noprof+0x2bc/0x650 mm/slub.c:4906
+ kmem_alloc_batch lib/debugobjects.c:371 [inline]
+ fill_pool+0x156/0x580 lib/debugobjects.c:420
+ debug_objects_fill_pool lib/debugobjects.c:752 [inline]
+ debug_object_activate+0x4a3/0x580 lib/debugobjects.c:841
+ debug_rcu_head_queue kernel/rcu/rcu.h:236 [inline]
+ __call_rcu_common kernel/rcu/tree.c:3116 [inline]
+ call_rcu+0x43/0x890 kernel/rcu/tree.c:3251
+ __destroy_inode+0x2b2/0x640 fs/inode.c:369
+ destroy_inode fs/inode.c:392 [inline]
+ evict+0x8a7/0xb10 fs/inode.c:865
+ __dentry_kill+0x1a2/0x690 fs/dcache.c:718
+ finish_dput+0xc9/0x480 fs/dcache.c:927
+ __fput+0x691/0xa60 fs/file_table.c:518
+ fput_close_sync+0x11f/0x240 fs/file_table.c:615
+ __do_sys_close fs/open.c:1507 [inline]
+ __se_sys_close fs/open.c:1492 [inline]
+ __x64_sys_close+0x7e/0x110 fs/open.c:1492
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7efe5039bfc7
+RSP: 002b:00007fff8a26cfa8 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007efe5039bfc7
+RDX: 0000000000000000 RSI: 0000000000008933 RDI: 0000000000000005
+RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000004
+R10: 0000000000000005 R11: 0000000000000246 R12: 00007fff8a26d03c
+R13: 00007efe504334c0 R14: 00007efe51144620 R15: 00007efe504334c0
+ </TASK>
+rcu: rcu_preempt kthread starved for 5285 jiffies! g15749 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
+rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:R  running task     stack:27688 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5388 [inline]
+ __schedule+0x1821/0x5740 kernel/sched/core.c:7189
+ __schedule_loop kernel/sched/core.c:7268 [inline]
+ schedule+0x164/0x360 kernel/sched/core.c:7283
+ schedule_timeout+0x158/0x2c0 kernel/time/sleep_timeout.c:99
+ rcu_gp_fqs_loop+0x312/0x11d0 kernel/rcu/tree.c:2095
+ rcu_gp_kthread+0x9e/0x2b0 kernel/rcu/tree.c:2297
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+rcu: Stack dump where RCU GP kthread last ran:
+CPU: 0 UID: 0 PID: 1163 Comm: kworker/u8:9 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+Workqueue: events_unbound toggle_allocation_gate
+RIP: 0010:csd_lock_wait kernel/smp.c:342 [inline]
+RIP: 0010:smp_call_function_many_cond+0xfcf/0x13d0 kernel/smp.c:892
+Code: 79 45 8b 2e 44 89 ee 83 e6 01 31 ff e8 aa 07 0c 00 41 83 e5 01 49 bd 00 00 00 00 00 fc ff df 75 07 e8 55 03 0c 00 eb 37 f3 90 <43> 0f b6 04 2c 84 c0 75 10 41 f7 06 01 00 00 00 74 1e e8 3a 03 0c
+RSP: 0018:ffffc900058e7700 EFLAGS: 00000293
+RAX: ffffffff81b9b376 RBX: ffff8880b863c388 RCX: ffff888028eb3e00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc900058e7840 R08: ffffffff903034f7 R09: 1ffffffff206069e
+R10: dffffc0000000000 R11: fffffbfff206069f R12: 1ffff110170e81b1
+R13: dffffc0000000000 R14: ffff8880b8740d88 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8881252a0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f7680c6904c CR3: 000000000e74a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ on_each_cpu_cond_mask+0x3f/0x80 kernel/smp.c:1057
+ on_each_cpu include/linux/smp.h:72 [inline]
+ smp_text_poke_sync_each_cpu arch/x86/kernel/alternative.c:2773 [inline]
+ smp_text_poke_batch_finish+0x5f5/0x1160 arch/x86/kernel/alternative.c:2983
+ arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
+ static_key_enable_cpuslocked+0x128/0x240 kernel/jump_label.c:210
+ static_key_enable+0x1a/0x20 kernel/jump_label.c:223
+ toggle_allocation_gate+0xab/0x290 mm/kfence/core.c:906
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
- sfpid.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/sfpid.c b/sfpid.c
-index 228b3ee..9e49544 100644
---- a/sfpid.c
-+++ b/sfpid.c
-@@ -188,8 +188,12 @@ static void sff8079_show_transceiver(const __u8 *id)
- 		sprintf(value, "%s", "FC: 1200 MBytes/sec");
- 	if (id[10] & (1 << 6))
- 		sprintf(value, "%s", "FC: 800 MBytes/sec");
-+	if (id[10] & (1 << 5))
-+		sprintf(value, "%s", "FC: 1600 MBytes/sec");
- 	if (id[10] & (1 << 4))
- 		sprintf(value, "%s", "FC: 400 MBytes/sec");
-+	if (id[10] & (1 << 3))
-+		sprintf(value, "%s", "FC: 3200 MBytes/sec");
- 	if (id[10] & (1 << 2))
- 		sprintf(value, "%s", "FC: 200 MBytes/sec");
- 	if (id[10] & (1 << 0))
--- 
-2.53.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
