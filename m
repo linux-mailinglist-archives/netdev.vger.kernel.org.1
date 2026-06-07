@@ -1,215 +1,355 @@
-Return-Path: <netdev+bounces-296219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296220-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dqoIKV5MJWqQGQIAu9opvQ
-	(envelope-from <netdev+bounces-296219-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 12:47:58 +0200
+	id NaRVIQlSJWq9GwIAu9opvQ
+	(envelope-from <netdev+bounces-296220-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 13:12:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB85665001B
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 12:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E29D66505A5
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 13:12:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=dv1fadNV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296219-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296219-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="ZSFak/AX";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="S93ccYn/";
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=1faICB0B;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Q5l3i9V3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296220-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296220-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C839A304BBDC
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 10:42:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD12930AB73A
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 11:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD2531F9AC;
-	Sun,  7 Jun 2026 10:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986043290C3;
+	Sun,  7 Jun 2026 11:01:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62CB291C10
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 10:42:23 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780828945; cv=pass; b=TTnOv2bta7G1jOg1Sxwcp70hDGkpTd8r1RNzodpOywVFYBA/0ZonRCdufTMgFywJO5U8x31wZgFHBDEC+wO7klg4d4N0MCIIGbbDG+aflVMQnAR+EMkyOH6D8c/nZfQr0jWvt9rvfTlfMKHDOXk5uvCjc0y/rVXjxkmQhJ3h06s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780828945; c=relaxed/simple;
-	bh=nm1kSW7uGBwHp9ivo2uRnEtL5DMlKDtFnw1T3o2OkRU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tip8lpaflJPexTyvIrE+UC5R/vMJYrjCsAY5NlOR5P2pJ73ZxDA+5hVtktsRuMr6ES+jtm87W7dnZbJofcHnCkeT9A8bhj1a8pV1xqtgCL1GQLySiiYF3nwccF7U4vzpaaYBohRPCc5S8MACmg2f54BwVh0AMZMjcJAF5bP8qj4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=dv1fadNV; arc=pass smtp.client-ip=209.85.210.177
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8423610ec93so2652432b3a.2
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 03:42:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780828943; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lUEV2klVN0PnxpEaxr2Cu9TmPxbe7znal4WsPh1ceePQ3xnIjLP3oFoZwOEAQuyhC7
-         NBicM3bj/HDBGOxPhJbCUyUEaSOqbz3tUMkU4KE9MMIOf1eZXgTX+4hVDwFcnq7zpcKJ
-         p/C0QnTlVpNisDqKGmUByl/gYHj0MQMrigMkQqH1iUuFSG7Soh5vVUWjL5VAC1530K0T
-         jbD4t5CcxTIZdD9m1k7q6AFRlkAWxWL16PvDHxqhVfCkjh8C77r2KFvzAgIM9AQGvfwm
-         WgTaOL67Wz3YRsdPLSbBmAck9yp8xGPmdL5RwAERzs/KXcijxIaKzg5n+IbqTQ/N94EI
-         x8Fg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PC9jnqHu/XnMh1/2hI7tqdGIASHNGz+5rE+pmkkpmvw=;
-        fh=tPIdxDGehFhgFaZEb/9rKY73nhiNY/B/RlP7swQUxF8=;
-        b=iDlILTgHI8OHcUPaf3Wu9bBkIKS2dapHqAs584I87XYTd4qz4iKk9uYzh6dDdNojdc
-         Fsg9pP6Pox927bdpFptbwsAsYYmYa+IAVnbbLCXmqyybADZ0/C1+4FwsaQ4HOAo5GvAX
-         EcbONjpazNXjr8sSvaya5mxSEr3AmJyW3BNAxw9brkM2aNX5icSaXkgo975vM+g4DD0G
-         B+zS9mxdnrp+AwpWVaEn5FSk0AtN1zV0z3nYnnb2JZfi5ay6BhS65UO0EuSLNn2nE5nk
-         g5zpL8kkZqLkwYq097yx/jzI9cvv3vjDJ4goiqD6h4sxa/ue6mU6VMDqeCtMTVZWvB/D
-         3vFQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1780828943; x=1781433743; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PC9jnqHu/XnMh1/2hI7tqdGIASHNGz+5rE+pmkkpmvw=;
-        b=dv1fadNV54Tbz3SEeBOzfCHDCAFQonVTR/owMGriDqC+5ZopoEtxEy7sou8KJWDv+b
-         2yOQqIKqzHwSlPNsnFBVNl+hI6UyAbK7/1Vm2ic9zPxEkg/ApW4W+46ETor4UaPPFNwc
-         MO7d2ZEzZkKH+hEb80BSx7Fqvx6kuRHawyL1g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780828943; x=1781433743;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PC9jnqHu/XnMh1/2hI7tqdGIASHNGz+5rE+pmkkpmvw=;
-        b=fiWu1rVf1Lkp0liEWygoGlvBrS32IdjWgRlJ1MPMX6ix41ezz7oZX57U9mJM3bxYzM
-         wDzahR2zioDafWnpBy2iuagQdQdFnWFg1MpS7PBGxhHvVOpi/lpeqCtM5xxvUSNvXn5m
-         C1Di948mqI9enkDDiZP305ooNRGAC1+RPyQhFVqIp1f+lrZWgLx3nGMWV6ZONSXxAaQ2
-         stbJa7Ez5Lf/J70dlAziyLdhabh3dtAb5xbW0OAfkshRi9TJ9xZAczDlKljWUOveioOg
-         Mp9z6IJqtpTNCGn/Eqokpn6c/K1n+6H4fphLH8bWGE43nbdB/FjTDJFrQdFWwx6gWijZ
-         speA==
-X-Gm-Message-State: AOJu0YytiKNi1gpfF45WZwAUTzGdQ1Uygi7MV/7tcnzmaIVWrJUBbxwY
-	B6C9h0CLkk8gEjg3gTlzsj/I8vHZ31xbFlKG2zU9PHYKg5P6t5rbV7FWr5Wz4KwnTKNOhVq5pe6
-	hpCIfAqi6SOFx6Ex4L7Hy/4B8DV8+c0Veul1CJkt3zTlIYq9vc/QjuLRr
-X-Gm-Gg: Acq92OE1mkRcYpu1XNskki512c5d/xknf/5iE4jYwkupdnESw3vk+2Jh7HDhySuMBtR
-	5/iQVF0xSBmzL9qytfDNLgWmXj15aQ75ZKZe+WzMJroimupJmFzKDhCj7/IRyGPgGSB+X84E6qK
-	dHguqLC7arlirGFL5KDlFfxos0AL5HRh/lhJbCbDOtPlt/CAT/Ry+70zmrDoSyaySmkDqVhBBWz
-	XXEfNpDpMAnqoec3GBVZzokFKMnZ83bChX+JI/xoJuP6g2Sxha87DYCryPGu5COc92OymYd0Kkp
-	popKLuUUCGxERHHF7lg=
-X-Received: by 2002:a05:6a00:4b04:b0:83e:d427:9817 with SMTP id
- d2e1a72fcca58-842b0db7dbamr10636323b3a.11.1780828942886; Sun, 07 Jun 2026
- 03:42:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC1D282F30
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 11:01:44 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780830106; cv=none; b=IpKsZFs5IW3/mTfStrWcedf72sCIcOhRYnzn+dTMrHQ8YT9JmuVgqqg02rwI/smuviMP0NO3UFAHPcAWp6Xvqa/NSOFAXynjSyAayaftGrwJBRm5bnGiskETDkhmAZE8uatUk8pB0B7Dc0SQg1xH9RdfnRdQwYVZIf8m2lsX6NM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780830106; c=relaxed/simple;
+	bh=cUCQQVRmCwOwmEaBToql6Sk0+PTShfltO6OrkgUWwDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WS+hS+m2L3s1WfNW6YoL9gyrlM5733Qr8aZmuuiy3cir39U8hlv96TsXa2EDHRMrlxydARTA/7PlPwl9lRRxJoZc43d+Bbn4jUACcxvTy+hZPPyi5Zwj4TJshm6qRNl4LiqE0jEskdSYXI3s+iTF7fhU8hHlzeOBGW/RN9L9IEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZSFak/AX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=S93ccYn/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1faICB0B; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Q5l3i9V3; arc=none smtp.client-ip=195.135.223.130
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E12066B5BB;
+	Sun,  7 Jun 2026 11:01:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780830103; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZWzQov16FcVDChj2JQ+rQX5bPB0uLgdMp0G0dPr7odU=;
+	b=ZSFak/AXKVZOva83nL2cLhYfJELGsueuC9Mv13zvNJG9IDqaEq2SpGihLfsHYA+SRoDQg5
+	BW8MYpUileYuAZ2eCT+JxPZISmRTmg7akxQKLAiPtJK/wbhrAmn0bTqcrUdKyNOQ1BRzcd
+	OTzGAd99ab8xOC8WLcXR16Twa6YWVDk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780830103;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZWzQov16FcVDChj2JQ+rQX5bPB0uLgdMp0G0dPr7odU=;
+	b=S93ccYn/C/i6qmaR2uDQCM5UcgKVM65sBMmiZrN5wXUfYiaAUaHSCdfhmPrgoj5jbSgZn3
+	lPop2QRGxs+/BrAw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780830102; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZWzQov16FcVDChj2JQ+rQX5bPB0uLgdMp0G0dPr7odU=;
+	b=1faICB0B9tJM+YlIHi4TDa5+lAhYPeP5LuUtT/eWBJBlZih0nA5GZxisVf2pbz3wV9oiaX
+	FHAaJuYDuCCLweo6fb/TL5LK6f7FurBck3DUbMaF8aVTFV3yF4nc8nO4BaWmlt0un/yg7+
+	NI0R4Y64Oay2oj8VtwBbgibMPMtp8HQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780830102;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ZWzQov16FcVDChj2JQ+rQX5bPB0uLgdMp0G0dPr7odU=;
+	b=Q5l3i9V3GDEKRs967syyb/EMDF9pRLEvtYEAxR5GWSJz8MomXxJdQtKaOPeDckLnYlFD7N
+	+HlFCttUvlkhUrDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5514F779A7;
+	Sun,  7 Jun 2026 11:01:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id x1sIEpZPJWqiAwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sun, 07 Jun 2026 11:01:42 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	idosch@nvidia.com,
+	dsahern@kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH 1/3 net-next v5] ipv4: centralize devconf sysctl handling
+Date: Sun,  7 Jun 2026 13:01:21 +0200
+Message-ID: <20260607110123.5939-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1780809474.git.edragain@163.com> <6200dc9e5ea7a85d500e72543d897c2d930fcdce.1780809474.git.edragain@163.com>
-In-Reply-To: <6200dc9e5ea7a85d500e72543d897c2d930fcdce.1780809474.git.edragain@163.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 7 Jun 2026 06:42:11 -0400
-X-Gm-Features: AVVi8CchEQ3PxI_r86lB2NRfDKNEQNLVatLtq5CzQ7njqfgPPuE-f37Tjh_w5s4
-Message-ID: <CAM0EoMm5YH+BKEUbtAy7iaxrF73Wti==9n1gbMOHwK+vaFALdQ@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] net/sched: act_ife: ensure ETH_HLEN is pullable
- after decap
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net, 
-	xiyou.wangcong@gmail.com, yuantan098@gmail.com, bird@lzu.edu.cn, 
-	edragain@163.com, Victor Nogueira <victor@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296219-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:davem@davemloft.net,m:xiyou.wangcong@gmail.com,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:edragain@163.com,m:victor@mojatatu.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,davemloft.net,gmail.com,lzu.edu.cn,163.com,mojatatu.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296220-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:fmancera@suse.de,m:nicolas.dichtel@6wind.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:email,vger.kernel.org:from_smtp,suse.de:mid,suse.de:dkim,suse.de:from_mime,suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BB85665001B
+X-Rspamd-Queue-Id: E29D66505A5
 
-On Sun, Jun 7, 2026 at 5:14=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
->
-> From: Yong Wang <edragain@163.com>
->
-> tcf_ife_decode() calls eth_type_trans() after ife_decode() removes the
-> outer IFE header and metadata. However, ife_decode() only makes the outer
-> IFE header area pullable before advancing skb->data.
->
-> As a result, the decapsulated inner Ethernet header may still be shorter
-> than ETH_HLEN in the linear data area, or entirely reside in frags.
-> eth_type_trans() then operates on an skb that does not satisfy its
-> expected Ethernet header access requirements, which can trigger a BUG in
-> the pull path.
->
+The logic for handling IPv4 devconf sysctls is scattered. Notification
+and cache flushes are managed in devinet_conf_proc(), while a separate
+ipv4_doint_and_flush() function and DEVINET_SYSCTL_FLUSHING_ENTRY macro
+is used for properties that solely require a cache flush.
 
-From inspection this looks legit. I did not run your poc.
-Could you create a tdc test instead? You should be able to craft a
-scapy ethernet frame using nsplugin. Something like this:
-Ether(type=3D0xED3E) / Raw(b'\\x00\\x02\\xaa') would suffice.
-That would be more helpful for future reference as well.
+This patch refactors the sysctl handling by introducing a centralized
+helper, devinet_conf_post_set(). This new function evaluates the changed
+attribute and handles all necessary operations like triggering netlink
+notifications. It returns a boolean indicating whether a routing cache
+flush is required.
 
-> Fix this by requiring ETH_HLEN to be pullable before calling
-> eth_type_trans(). If that fails, drop the packet just like the other
-> decode error paths in tcf_ife_decode().
->
-> Fixes: ef6980b6becb ("introduce IFE action")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Assisted-by: Codex:gpt-5.4
-> Signed-off-by: Yong Wang <edragain@163.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
->  net/sched/act_ife.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-> index d5e8a91bb4eb..e0075e3f6949 100644
-> --- a/net/sched/act_ife.c
-> +++ b/net/sched/act_ife.c
-> @@ -759,6 +759,11 @@ static int tcf_ife_decode(struct sk_buff *skb, const=
- struct tc_action *a,
->                 return TC_ACT_SHOT;
->         }
->
-> +       if (!pskb_may_pull(skb, ETH_HLEN)) {
-> +               qstats_drop_inc(this_cpu_ptr(ife->common.cpu_qstats));
-> +               return TC_ACT_SHOT;
-> +       }
-> +
->         skb->protocol =3D eth_type_trans(skb, skb->dev);
->         skb_reset_network_header(skb);
+Note that the boolean is necessary as this function will be re-used for
+netlink IPv4 devconf handling where the cache flushing must wait until
+all the attributes have been processed.
 
-We already do a pull in ife_decode(), so why not just extend that to
-have ETH_HLEN?
-Given that IFE is always encaped over ethernet frames it should be
-fine to assume ethernet header.
-i.e something like:
--    if (unlikely(!pskb_may_pull(skb, total_pull)))
-+    if (unlikely(!pskb_may_pull(skb, total_pull + ETH_HLEN)))
+Finally, this is introducing a small change in behavior for
+IPV4_DEVCONF_ROUTE_LOCALNET. As commit d0daebc3d622 ("ipv4: Add
+interface option to enable routing of 127.0.0.0/8") intended, the cache
+flush should only be performed when ROUTE_LOCALNET changes from 1 to 0.
+Unfortunately, this was not true because while implementing it the
+DEVINET_SYSCTL_FLUSHING_ENTRY was used for the attribute, making the
+code related to it on devinet_conf_proc() dead.
 
-cheers,
-jamal
->
-> --
-> 2.34.1
->
+IPV4_DEVCONF_FORWARDING is still being handled separately as it requires
+more operations.
+
+Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+v2: no changes
+v3: no changes
+v4: no changes
+v5: no changes
+---
+ net/ipv4/devinet.c | 127 ++++++++++++++++++++++++---------------------
+ 1 file changed, 68 insertions(+), 59 deletions(-)
+
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 58fe7cb69545..8300516fb38f 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -2128,6 +2128,46 @@ static int inet_validate_link_af(const struct net_device *dev,
+ 	return 0;
+ }
+ 
++static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
++				  int attr, int new, int old, int ifindex)
++{
++	if (new == old)
++		return false;
++
++	switch (attr) {
++	case IPV4_DEVCONF_ROUTE_LOCALNET:
++	case IPV4_DEVCONF_ACCEPT_LOCAL:
++		if (new == 0)
++			return true;
++		break;
++	case IPV4_DEVCONF_NOXFRM:
++	case IPV4_DEVCONF_NOPOLICY:
++	case IPV4_DEVCONF_PROMOTE_SECONDARIES:
++	case IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST:
++	case IPV4_DEVCONF_BC_FORWARDING:
++		return true;
++	case IPV4_DEVCONF_RP_FILTER:
++		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
++					    NETCONFA_RP_FILTER,
++					    ifindex, cnf);
++		break;
++	case IPV4_DEVCONF_PROXY_ARP:
++		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
++					    NETCONFA_PROXY_NEIGH,
++					    ifindex, cnf);
++		break;
++	case IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN:
++		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
++					    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
++					    ifindex, cnf);
++		break;
++	default:
++		break;
++	}
++
++	return false;
++}
++
+ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
+ 			    struct netlink_ext_ack *extack)
+ {
+@@ -2509,44 +2549,31 @@ static int devinet_conf_proc(const struct ctl_table *ctl, int write,
+ 
+ 	if (write) {
+ 		struct ipv4_devconf *cnf = ctl->extra1;
+-		struct net *net = ctl->extra2;
+ 		int i = (int *)ctl->data - cnf->data;
++		struct net *net = ctl->extra2;
+ 		int ifindex;
+ 
+-		set_bit(i, cnf->state);
+-
+-		if (cnf == net->ipv4.devconf_dflt)
+-			devinet_copy_dflt_conf(net, i);
+-		if (i == IPV4_DEVCONF_ACCEPT_LOCAL - 1 ||
+-		    i == IPV4_DEVCONF_ROUTE_LOCALNET - 1)
+-			if ((new_value == 0) && (old_value != 0))
+-				rt_cache_flush(net);
++		/* These attributes are bypassing the tracking state,
++		 * for the rest track the state and propagate the changes
++		 * to default config
++		 */
++		switch (i + 1) {
++		case IPV4_DEVCONF_NOXFRM:
++		case IPV4_DEVCONF_NOPOLICY:
++		case IPV4_DEVCONF_PROMOTE_SECONDARIES:
++		case IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST:
++			break;
++		default:
++			set_bit(i, cnf->state);
++			if (cnf == net->ipv4.devconf_dflt)
++				devinet_copy_dflt_conf(net, i);
++			break;
++		}
+ 
+-		if (i == IPV4_DEVCONF_BC_FORWARDING - 1 &&
+-		    new_value != old_value)
++		ifindex = devinet_conf_ifindex(net, cnf);
++		if (devinet_conf_post_set(net, cnf, i + 1, new_value,
++					  old_value, ifindex))
+ 			rt_cache_flush(net);
+-
+-		if (i == IPV4_DEVCONF_RP_FILTER - 1 &&
+-		    new_value != old_value) {
+-			ifindex = devinet_conf_ifindex(net, cnf);
+-			inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+-						    NETCONFA_RP_FILTER,
+-						    ifindex, cnf);
+-		}
+-		if (i == IPV4_DEVCONF_PROXY_ARP - 1 &&
+-		    new_value != old_value) {
+-			ifindex = devinet_conf_ifindex(net, cnf);
+-			inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+-						    NETCONFA_PROXY_NEIGH,
+-						    ifindex, cnf);
+-		}
+-		if (i == IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN - 1 &&
+-		    new_value != old_value) {
+-			ifindex = devinet_conf_ifindex(net, cnf);
+-			inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+-						    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
+-						    ifindex, cnf);
+-		}
+ 	}
+ 
+ 	return ret;
+@@ -2599,20 +2626,6 @@ static int devinet_sysctl_forward(const struct ctl_table *ctl, int write,
+ 	return ret;
+ }
+ 
+-static int ipv4_doint_and_flush(const struct ctl_table *ctl, int write,
+-				void *buffer, size_t *lenp, loff_t *ppos)
+-{
+-	int *valp = ctl->data;
+-	int val = *valp;
+-	int ret = proc_dointvec(ctl, write, buffer, lenp, ppos);
+-	struct net *net = ctl->extra2;
+-
+-	if (write && *valp != val)
+-		rt_cache_flush(net);
+-
+-	return ret;
+-}
+-
+ #define DEVINET_SYSCTL_ENTRY(attr, name, mval, proc) \
+ 	{ \
+ 		.procname	= name, \
+@@ -2633,9 +2646,6 @@ static int ipv4_doint_and_flush(const struct ctl_table *ctl, int write,
+ #define DEVINET_SYSCTL_COMPLEX_ENTRY(attr, name, proc) \
+ 	DEVINET_SYSCTL_ENTRY(attr, name, 0644, proc)
+ 
+-#define DEVINET_SYSCTL_FLUSHING_ENTRY(attr, name) \
+-	DEVINET_SYSCTL_COMPLEX_ENTRY(attr, name, ipv4_doint_and_flush)
+-
+ static struct devinet_sysctl_table {
+ 	struct ctl_table_header *sysctl_header;
+ 	struct ctl_table devinet_vars[IPV4_DEVCONF_MAX];
+@@ -2678,15 +2688,14 @@ static struct devinet_sysctl_table {
+ 					"ignore_routes_with_linkdown"),
+ 		DEVINET_SYSCTL_RW_ENTRY(DROP_GRATUITOUS_ARP,
+ 					"drop_gratuitous_arp"),
+-
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(NOXFRM, "disable_xfrm"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(NOPOLICY, "disable_policy"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(PROMOTE_SECONDARIES,
+-					      "promote_secondaries"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(ROUTE_LOCALNET,
+-					      "route_localnet"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(DROP_UNICAST_IN_L2_MULTICAST,
+-					      "drop_unicast_in_l2_multicast"),
++		DEVINET_SYSCTL_RW_ENTRY(NOXFRM, "disable_xfrm"),
++		DEVINET_SYSCTL_RW_ENTRY(NOPOLICY, "disable_policy"),
++		DEVINET_SYSCTL_RW_ENTRY(PROMOTE_SECONDARIES,
++					"promote_secondaries"),
++		DEVINET_SYSCTL_RW_ENTRY(ROUTE_LOCALNET,
++					"route_localnet"),
++		DEVINET_SYSCTL_RW_ENTRY(DROP_UNICAST_IN_L2_MULTICAST,
++					"drop_unicast_in_l2_multicast"),
+ 	},
+ };
+ 
+-- 
+2.54.0
+
 
