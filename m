@@ -1,214 +1,159 @@
-Return-Path: <netdev+bounces-296250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296253-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8ISkKWOBJWpGIwIAu9opvQ
-	(envelope-from <netdev+bounces-296250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 16:34:11 +0200
+	id HtWOCROIJWoVJAIAu9opvQ
+	(envelope-from <netdev+bounces-296253-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 17:02:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47AF2650C38
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 16:34:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E7D650D00
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 17:02:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=g98Jo6+i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296250-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296250-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=XwqtSqIG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296253-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296253-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 707D3300FEDC
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 14:34:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E475F30107CF
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 15:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BED3AA4E8;
-	Sun,  7 Jun 2026 14:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189A923B638;
+	Sun,  7 Jun 2026 15:02:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4773264D0
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 14:34:00 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780842843; cv=pass; b=gR+Ua3V94t4gvtiXi13EY7tTH1okz16WUYkyTXQl+GqeAU3ib93Pxk2bPRJ9YF74cZXE9sR+CWEj8axMNsg32S9F8sOnqSKV2WT2oE+xqEJZ80wIZR6Hoi1DWNQCUUdG0iVKyQWEYVD1RDGLilX9Mw4/JXIYp9NJ6os9+EA3hr0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780842843; c=relaxed/simple;
-	bh=T9GE5eXzrNAz4VGE5rOsvFKtLGT8u9fcz4i/AknuEgQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=heBqaPckjKDsgf2SCw/HzBKCHbvaq3GvGQ6AlBDhEGuEfxOFAQG8pNUB3pu365eK1ibq79EN0WP+9Vbao2Dlh9IVzTHNh14/tanMYs5nKreVKfyNqBlSVWELR21DW8rEFD87nWkRpxlE8pPcB1L57pdXlRXcOJwqh/7M+qeV53A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=g98Jo6+i; arc=pass smtp.client-ip=209.85.167.44
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5aa6863327fso2905795e87.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 07:34:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780842839; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z97hvdU867naA42L+7jJWTfHgiHUC/rBQqQLmMEme6nvenwkVkK6JHQ2Dp9ASJBCsd
-         eTwABOk91pgTYL89L4BDJMOFobC3zz5+G9XKQ9wJfbOpF3SoO+GNnCW6dS9NRp8z6APp
-         5llGQJ1wd/TfHvz3QtW6nqSoM/E/GBVlpxS1DYPbpqzknOi6BK4nlDoIume2Ys466aXI
-         ogNfMrbD+hld7ZkFjvO0ftkOE8F8BfsKOx7WXmfwG91bIBv6arRymIFc0CfgkN0Wetdk
-         +MkwfJiqnlLOtaFkRSmIT431rFr3BqGCF83MDxJqMXNK1pD/d6UtzKXpZZNEDR9a0Dvu
-         NrnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7C14YURADh7hq1Zism3wRTF+TwlbmOv0MNpx2ZDOl9E=;
-        fh=jDQM5lXtOenJ6CEZkKeFvxFTY7+lPiMAd7dmuII+5Rs=;
-        b=iAZimdPkz+xYipwrZyuci8deEeWJUt4FWRM0dcT8dC3vi4fxg3U6sDX4PP0BXE/5Da
-         QsY7vk04MyDyPFYoliEFn+kV+TLxZ77U+r0tvEpRYJAUqz92O+IlQy8OrbQ1P7FnlOPX
-         l8Fq8pnv3PSDkHVwAb5ZCx5lMznii0PGsO0/Dwl/23RkXApYlMSxtLUxJC4d8PTfKrKH
-         DlSgic5A1hmeVLzzNQq02mMMoc4bw5xb7UbCbXzir9il0UNEnPzkOMCxsSoJKIMu+0SM
-         Wu8g9nas3EoUrpOEufC5HGp/HKt4VvrqEqn/I859r8RcWIwsMiszpBhB67p1raTzlygt
-         Wz6A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780842839; x=1781447639; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7C14YURADh7hq1Zism3wRTF+TwlbmOv0MNpx2ZDOl9E=;
-        b=g98Jo6+iO1ol4OuNSTNTrFG2zQ2cvNnzU2E4nNfFwPFkL9LETvgmCUyHym126h64Jc
-         pGO2HWwZeoVcrmD9xjrTMTnveFcO0AQro5N1vnUGgAlFRpGLQB7Lkb5kPCiTwvzYAKDx
-         1rfpI4rH3E/Z5lnv5nDNuVgdSXJ3Gb1SZfsn1g3eFMzLQ5qKQI6UYKRON9VcVl/nQbYO
-         7TmwMhRdbzFzAJKbJQQJcE8HGsQszoGgibQlqVLniK2q8EcZ8fGRQ1CPSr2ns4VcAJrC
-         hLd/ymHD+KId9+k2yI2L/DdoTkD2IwrmIRaKcCZKh/9wbIcMDaiZaLWSmRvlpoabr7LV
-         mzRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780842839; x=1781447639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7C14YURADh7hq1Zism3wRTF+TwlbmOv0MNpx2ZDOl9E=;
-        b=aOiLDeUgf0BxWbfSnWy4vtXRsVjisCrcAfdThyNhtbIo8kClvaddT+GMyd1h5iwpBD
-         wk+AWO8BqqA2ArX5G3bq1fheY9OVB6EUwGiZ4/4HAQ46vW+tUdAdsyF9XSOqVtKaaG+v
-         xsXK85Y8XM0U2Pan1UiuhkSyvFJZT/93UNx9cSHwgAgj/cyZmIYn3kA7R7b71WVGf102
-         5/YzUkT1JueAAERK57BZCFbIessPqzLGzsvJBBLutlmlfPyPxe5+VfC7at9hK0Ea7PCB
-         y1mLdIqD3ZsFp/awW3BmXLrts2tPipZpV0M4C9Y0FLBEwYfJ9lh+rEE01z7A+7/EPGL5
-         xJ9w==
-X-Forwarded-Encrypted: i=1; AFNElJ+B3MgDhPd73GXgwsEk1PoWznoD4mm88R3g1ZTKr6iDxQgMBB60kAfOUhp1gdl9glkqlqPDpvk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzwf1Qj1XhoQy5MXCCmUXqjUhFlilqSSVkR5pLfMo4KO4mqKV/k
-	S2yE3pnSMM60EjhbD/Iv9TEoSI0tkEfKWt2Y2FbVHEftkkyMa6nn1IYU5m1TabjIv3BuLJWoRZE
-	Lb64MSi1dHhGAQZQPY/sjGKZqo9EIy1TUsdZ7mqsRhKSwx0gyjox2DbY=
-X-Gm-Gg: Acq92OGXy36+eoFqz4+Q79ymEUJKBOVzEDSMBzoZ/XQYfbA1vgsOFmeDs2cmwjDXZLO
-	gtugOH0X39KZa9zhgGRG4aPcXPn+2DBtalVXWwwLZ6YckPPkzeePS4cuUYuPuUwG5G8tTuCQ1me
-	VvUP47CWXFPkFMBHVd4BNuj1SzFrMkARPbYgo0g/WIqjnxIfoN6v0jRV1ng75oxmUbYy7fX3six
-	CLQQ5tFssqjrPljcsdvZMuUOXIuNLLzzUmmVU3mejch8jXMPe+Mvmhe3v1pOY4s58IqyamZ13hi
-	1UrkD6cpXZ+47HsJ
-X-Received: by 2002:a05:6512:15a5:b0:5aa:61da:f44 with SMTP id
- 2adb3069b0e04-5aa87b670aemr3347321e87.5.1780842838503; Sun, 07 Jun 2026
- 07:33:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A681FBEB0;
+	Sun,  7 Jun 2026 15:02:30 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780844555; cv=none; b=hO+7b8V6pbhNC+Bs8z9Kb2hofsOD+yZWDEiEgfGwks4LZhXc/rUPPgcKDxZECZ6yZJpxAvi9VE0eSsG3gNn8nXXpsRnnQ8TX5sHej/QOCXLY2Bu/cr/8sIja+tLVsCTGG8iA1iUuNijVn9wu5grfStJ0Doc3DIISk0ohAWxpXwM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780844555; c=relaxed/simple;
+	bh=rJH4DiD+myAN0gBKEx7g72RXEhghty7AqdKW0O0xR7Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CV9HtWc5LGckYp8Mbnutu2+OC20J9b+h0oSuBPaVHAj7VQqN7LJDW+tvJCvP3uySQy1wHyJLiRiQlHTZ3pRsDi0uSwPbBtWWWdZffD82XO6KE2coR/4iCTlAXrMoUnZdyrwHbwfy81KFoTjoVzJnwrZbiaXibBpcfibXIiAg1xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=XwqtSqIG; arc=none smtp.client-ip=101.71.155.101
+Received: from DESKTOP-SUEFNF9.taila7e912.ts.net (unknown [58.241.16.34])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 4163e2705;
+	Sun, 7 Jun 2026 22:57:10 +0800 (GMT+08:00)
+From: Dawei Feng <dawei.feng@seu.edu.cn>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dirk Brandewie <dirk.j.brandewie@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Dawei Feng <dawei.feng@seu.edu.cn>,
+	stable@vger.kernel.org,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: [PATCH net] e1000: fix memory leak in e1000_probe()
+Date: Sun,  7 Jun 2026 22:57:06 +0800
+Message-Id: <20260607145706.2933860-1-dawei.feng@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260605194640.2645386-1-sam.moelius@trailofbits.com> <CAM0EoMmeftLxWNdQqWsJonxEtMoCCuJdeTEjNzQfc2GYUX+mtw@mail.gmail.com>
-In-Reply-To: <CAM0EoMmeftLxWNdQqWsJonxEtMoCCuJdeTEjNzQfc2GYUX+mtw@mail.gmail.com>
-From: Samuel Moelius <sam.moelius@trailofbits.com>
-Date: Sun, 7 Jun 2026 10:33:47 -0400
-X-Gm-Features: AVVi8CfjDvxpey4KY4eMr6JTO65pRw4-bmDI3IJwXZQ-lDcBK3tVHTPesMTdCOg
-Message-ID: <CAE+C+DZTme=GQBy9BaXCiPe0pO7Pv7XNM69iru0VTGFX_ybBKg@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: act_pedit: require matching IPv4 L4 protocol
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, "open list:TC subsystem" <netdev@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9ea29678dd03a2kunm392e2c96b787a
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCTRhIVklIQkxPT0pOHkMZGFYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0
+	NVSktLVUtZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=XwqtSqIGXZcPQOauGN+4pq8mJd9J+ZwpxFkIekP0stgMnFI1UFr1kBGk7Q2uu3Msok1J36bm/eeWHCGpTnCCjMdyH3KQVFufKsII36BtIvSUMDDgHhgLvUQQY5jmFv1sPA6aowAonWCy9X7wPA4pqWgONC7nPKlEPwjHbncEz+w=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=mrsfiJvZujVMJsxbWI6VmHgpGn8Fz7/vkXorwSa3nAA=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296250-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-296253-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[dawei.feng@seu.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dirk.j.brandewie@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:dawei.feng@seu.edu.cn,m:stable@vger.kernel.org,m:zilin@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dawei.feng@seu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,trailofbits.com:dkim,trailofbits.com:from_mime,trailofbits.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 47AF2650C38
+X-Rspamd-Queue-Id: 97E7D650D00
 
-On Sat, Jun 6, 2026 at 5:29=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com> =
-wrote:
->
-> On Fri, Jun 5, 2026 at 3:46=E2=80=AFPM Samuel Moelius
-> <sam.moelius@trailofbits.com> wrote:
-> >
-> > The extended IPv4 L4 header mode in act_pedit can select TCP or UDP
-> > header fields without confirming that the IPv4 protocol field matches
-> > the selected transport header.
-> >
-> > That lets a rule written for TCP or UDP modify unrelated payload bytes
-> > in a packet carrying a different protocol.
-> >
-> > Verify the IPv4 protocol before applying TCP or UDP extended header
-> > edits.
-> >
-> > Assisted-by: Codex:gpt-5.5-cyber-preview
-> > Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
-> > ---
-> >  net/sched/act_pedit.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-> > index bc20f08a2789..9a4590451f7e 100644
-> > --- a/net/sched/act_pedit.c
-> > +++ b/net/sched/act_pedit.c
-> > @@ -341,6 +341,8 @@ static int pedit_l4_skb_offset(struct sk_buff *skb,=
- int *hoffset, const int head
-> >
-> >                 if (!iph)
-> >                         goto out;
-> > +               if (iph->ihl < 5 || iph->protocol !=3D header_type)
-> > +                       goto out;
->
-> From inspection the fix looks reasonable.
-> At first glance it seems that the only fix that resolves the issue you
-> are describing is to check the protocol header.
-> header length seems to be an extra thing. But let's do what the v6
-> side seems to and skip frags as well? Something maybe along the lines
-> of:
->
-> if (iph->ihl < 5 || iph->protocol !=3D header_type || (iph->frag_off &
-> htons(IP_OFFSET)))
->         goto out;
+In the e1000_probe() path, e1000_sw_init() allocates adapter->tx_ring and
+adapter->rx_ring. If the subsequent CE4100-specific MDIO BAR mapping
+fails, the error handling jumps past the ring cleanup code, leaking both
+allocations.
 
-I will submit an updated patch.
+Fix this leak by moving the err_mdio_ioremap label above the ring
+deallocation logic. This guarantees the proper release of these resources
+and prevents the memory leak.
 
-> Are you able to describe how someone would configure a tc rule that
-> will allow this to happen?
-> IOW, how did you verify the problem and then validate that your fix works=
-?
+The bug was first flagged by an experimental analysis tool we are
+developing for kernel memory-management bugs while analyzing
+v6.13-rc1. The tool is still under development and is not yet publicly
+available. Manual inspection confirms that the bug is still
+present in v7.1-rc6.
 
-The bug was validated using a custom init script in QEMU. The specific
-line used was:
+An x86_64 allyesconfig build showed no new warnings. As we do not have a
+CE4100 reference platform to test with, no runtime testing was able to
+be performed.
 
-/usr/sbin/tc filter add dev veth0 egress protocol ip pref 1 matchall
-action pedit ex munge udp dport set 18053
+Fixes: 5377a4160bb65 ("e1000: Add support for the CE4100 reference platform")
+Cc: stable@vger.kernel.org
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
+---
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-An IPv4 TCP packet with destination port 2222 was sent through that
-path. With the unpatched kernel, the packet was received with TCP
-destination port 18053. With the patched kernel, the same packet was
-received unchanged.
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 9b09eb144b81..d7f5c6f16142 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -1222,11 +1222,11 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	if (hw->flash_address)
+ 		iounmap(hw->flash_address);
++err_mdio_ioremap:
+ 	kfree(adapter->tx_ring);
+ 	kfree(adapter->rx_ring);
+ err_dma:
+ err_sw_init:
+-err_mdio_ioremap:
+ 	iounmap(hw->ce4100_gbe_mdio_base_virt);
+ 	iounmap(hw->hw_addr);
+ err_ioremap:
+-- 
+2.34.1
 
-I can provide more details or artifacts if you would like.
 
