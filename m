@@ -1,388 +1,146 @@
-Return-Path: <netdev+bounces-296266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296267-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0Lq+J1qoJWq9KAIAu9opvQ
-	(envelope-from <netdev+bounces-296266-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 19:20:26 +0200
+	id 7B84O3+qJWoKKQIAu9opvQ
+	(envelope-from <netdev+bounces-296267-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 19:29:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E326D651118
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 19:20:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B2C65113D
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 19:29:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=gZVNhkQl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296266-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296266-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=fJoVabPR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296267-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296267-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E22A2300D157
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 17:20:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A5D43010B9D
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 17:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0042281503;
-	Sun,  7 Jun 2026 17:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB352FB632;
+	Sun,  7 Jun 2026 17:28:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EE013FEE
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 17:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306742EEE74;
+	Sun,  7 Jun 2026 17:28:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780852822; cv=none; b=eJIbU0TfpYalpfDYbfdGqTEaoMeci/AWtDZ5PITMW0XMzXM7Jhn4Zh1Fz8WFIZOgqsGqTj5J0jz1Ti49AsklZ4aZ31ForMlsncVGkN4c5cFMqlGVqRzWmO/tAN8PpcBT6X6qy3HbwOfV3JPefgXSOFyo5GbVdedcL4BvAGa820Y=
+	t=1780853304; cv=none; b=I3zyMV0OfTVMR9Dts+XJ+5P7Nf7rfTeSAoUxO0QDzLo43Ew1wB247or1Ig58/fX3hBp268aZIbsAP3YF0KkexArD9vmNkqcV3XkbCJ2/hkrPKKL7wT9G7g8kS86tcxpM83cs73t6rQqLcAiFmBfOT0kesBEvwbarOJ/SYLQbUsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780852822; c=relaxed/simple;
-	bh=G2nnsdH8gytKBVW/eGz4OpAMXBXzdeJmjedXmw6Ev8Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=M3GkOKM0bc1B0pQgB3TVWh9951ixO1XyQkqkXZ4bLS1X8zmHjqSd0chzvt+cn5j0v9HRhXzQA1dnx8vZaRcKX87PEaDPcKM+LMNsc0WkqRzfFk+EztI9PW1WUzDzNNI+xsE0ZwdHYc+Q114zrCco0q3qOd+V5L+69MzB3MrW0XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZVNhkQl; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB781F00893;
-	Sun,  7 Jun 2026 17:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780852820;
-	bh=0PFvvRoQU5PwSdUR+UghrKZhMGryQd4xz+guH/Kgrtc=;
-	h=From:Date:Subject:To:Cc;
-	b=gZVNhkQl4bUu8UqBYP6mZntvPmVyr1qkDfZXE4QRVnp/Hchz4kdR0PWhb/dGT6pnN
-	 MkBf4p35AiDgDRZGu53nhc2xRLJPrh1CQTmTgO4nMfu1uY3pUQqOAufvm9NSaq3FIs
-	 JwYbkbxBXobqp6xtSUdWB3pr/K/bBoSa+Zu9iJQyQf+eHfcObdVsA+bXJv4Ef7XysB
-	 +wxWyaMC68Wmvsyp5ew4U1hJNbCFvWpXNY/MFdHQSjkK5p/a8EO3OodpXoYnF6QYDO
-	 1Gz+ZphqR6yLK4AwMjcirlp5DatIFhtyYHXnnB0rCBO5INRQZ5pb0BqbKFZ5fgLZb8
-	 MGiy/LPkVWd/g==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 07 Jun 2026 19:19:49 +0200
-Subject: [PATCH net-next v2] net: airoha: add ethtool priv_flags support
- for LAN/WAN and GDM2 loopback
+	s=arc-20240116; t=1780853304; c=relaxed/simple;
+	bh=g6Qssiyd/0gNBdIF+YVWj7h6uA4J1vqU8FZUZN3RMP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H7osp+L6mYy3veA4FAP9iyG5ASgmLow39LUEIWgnVXFTdm6bZo2m/f1g/XUHhEs4sGFwFDZSfS19KdulwTs8KJ9PTP63AbDXFFAsEDo4FEsafA/gYLgQZSGpAjkdWlzr3GaPHU0q6Io37OQl/+KaH030XZjsB2EO1MZyqyjERW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fJoVabPR; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vkRXkBHTm1p59dLWdZH+b6kuiXEG97WGreWW32kZBcI=; b=fJoVabPRm7sSrD8SYBAPv9XVuB
+	LT8iLJLArRNeO/aE9RYUAGc2UybhReA9LeCxwjmdNXi7ZZ2uG+pKUCZklygP0URF0PSHp8/fxButY
+	By5OHnJhEYiimEZgKMRhn04GSJXudvFgLOUK+4Ah64tvzeWqNi1ZgfbX0AN1nryfapdw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wWHI2-006UPP-OB; Sun, 07 Jun 2026 19:28:02 +0200
+Date: Sun, 7 Jun 2026 19:28:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Linus Walleij <linusw@kernel.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v13 2/9] net: dsa: realtek: rtl8365mb: reject
+ unsupported topologies
+Message-ID: <9f8d3ee8-4249-4cb2-925d-53b2996239db@lunn.ch>
+References: <20260606-realtek_forward-v13-0-b9e409687cbe@gmail.com>
+ <20260606-realtek_forward-v13-2-b9e409687cbe@gmail.com>
+ <617aa489-4f0c-4fe0-8cf3-55c98f4d4d9e@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260607-airoha-ethtool-priv_flags-v2-1-742c7aa1e182@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NUQrCMBBEr1L225UkSLV+eQ8pktZNs1iSsgmhU
- np3Q08gAwPDY2Y2SCRMCe7NBkKFE8dQgzk1MHobJkJ+1wxGmVZVoWWJ3iJln2OccREuLzfbKeH
- QWntVY7WbgtpfhByvx/YTAmUMtGboK/GccpTvcVr0wf/YLxo1XpQezNg56px+fEgCzecoE/T7v
- v8AXAAK/s0AAAA=
-X-Change-ID: 20260606-airoha-ethtool-priv_flags-b6aa70caa780
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Madhur Agrawal <madhur.agrawal@airoha.com>
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <617aa489-4f0c-4fe0-8cf3-55c98f4d4d9e@yahoo.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:namiltd@yahoo.com,m:luizluca@gmail.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:yury.norov@gmail.com,m:linux@rasmusvillemoes.dk,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yurynorov@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296267-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296266-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[yahoo.com];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:madhur.agrawal@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,airoha.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E326D651118
+X-Rspamd-Queue-Id: 43B2C65113D
 
-Introduce ethtool private flags infrastructure for the airoha ethernet
-driver, allowing userspace to configure per-device behavior via ethtool.
-Implement the "wan" private flag to let the user select whether a GDM
-port is used as a hardware LAN or WAN interface. GDM2 is fixed as WAN
-only, GDM1 is fixed as LAN only, while GDM3 and GDM4 can be switched
-between LAN and WAN at runtime (when the interface is not running).
-When a GDM3/GDM4 port is set to WAN mode, enable GDM2 loopback to
-support hardware QoS. Conversely, when switching back to LAN mode,
-disable the GDM2 loopback and restore the default forwarding
-configuration.
-Add airoha_disable_gdm2_loopback() as the counterpart of the existing
-airoha_enable_gdm2_loopback(), and define FC_MAP6_DEF_VALUE for use
-during loopback teardown.
+On Sun, Jun 07, 2026 at 02:55:07PM +0200, Mieczyslaw Nalewaj wrote:
+> On 6/6/2026 10:29 AM, Luiz Angelo Daros de Luca wrote:
+> > Explicitly enforce the presence of a CPU port (-EINVAL) and reject DSA
+> > cascade links (-EOPNOTSUPP) during setup to prevent silent failures.
+> > 
+> > These topologies were already non-functional. Without a CPU port, the
+> > driver does not activate CPU tagging. Additionally, the switch hardware
+> > was not designed to be cascaded, and DSA links never worked because
+> > CPU tagging is not enabled for them.
+> > 
+> > Reviewed-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> > Reviewed-by: Linus Walleij <linusw@kernel.org>
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> > ---
+> [...]
+> >drivers/net/dsa/realtek/rtl8365mb.c:rtl8365mb_get_stats64() {
+> >    ...
+> >	mb = priv->chip_data;
+> >	p = &mb->ports[port];
+> >	spin_lock(&p->stats_lock);
+> >	memcpy(s, &p->stats, sizeof(*s));
+> >	spin_unlock(&p->stats_lock);
+> >}
+> 
+> Sashiko reports a potential deadlock around stats_lock, however I couldn't find a call chain reaching rtl8365mb_get_stats64() from softirq context. Can anyone point to such a path?
 
-Example usage to configure eth1 (GDM3/GDM4) as WAN:
+Enable CONFIG_PROVE_LOCKING and use the device, get the statistics
+etc. If you hit the two paths with a potential deadlock you will get a
+report.
 
-$ ethtool --show-priv-flags eth1
-Private flags for eth1:
-wan: off
-
-$ ethtool --set-priv-flags eth1 wan on
-
-$ ethtool --show-priv-flags eth1
-Private flags for eth1:
-wan: on
-
-To revert back to LAN mode:
-
-$ ethtool --set-priv-flags eth1 wan off
-
-Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Rework airoha_dev_set_wan_flag routine
-- Enable GDM_STRIP_CRC_MASK in airoha_disable_gdm2_loopback()
-- Do not always reset REG_SRC_PORT_FC_MAP6 in
-  airoha_disable_gdm2_loopback() but use the same condition used in
-  airoha_enable_gdm2_loopback().
-- Link to v1: https://lore.kernel.org/r/20260606-airoha-ethtool-priv_flags-v1-1-401b2c9fe9f1@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c  | 173 ++++++++++++++++++++++++++++++
- drivers/net/ethernet/airoha/airoha_regs.h |   1 +
- 2 files changed, 174 insertions(+)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 5a8e84fa9918..5dd160dbbbc1 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1960,6 +1960,49 @@ static int airoha_enable_gdm2_loopback(struct airoha_gdm_dev *dev)
- 	return 0;
- }
- 
-+static int airoha_disable_gdm2_loopback(struct airoha_gdm_dev *dev)
-+{
-+	struct airoha_gdm_port *port = dev->port;
-+	struct airoha_eth *eth = dev->eth;
-+	int i, src_port;
-+	u32 pse_port;
-+
-+	src_port = eth->soc->ops.get_sport(dev->port, dev->nbq);
-+	if (src_port < 0)
-+		return src_port;
-+
-+	airoha_fe_clear(eth,
-+			REG_SP_DFT_CPORT(src_port >> fls(SP_CPORT_DFT_MASK)),
-+			SP_CPORT_MASK(src_port & SP_CPORT_DFT_MASK));
-+
-+	airoha_fe_set(eth, REG_GDM_FWD_CFG(AIROHA_GDM2_IDX),
-+		      GDM_STRIP_CRC_MASK);
-+	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(AIROHA_GDM2_IDX),
-+				    FE_PSE_PORT_DROP);
-+	airoha_fe_clear(eth, REG_GDM_LPBK_CFG(AIROHA_GDM2_IDX),
-+			LPBK_CHAN_MASK | LPBK_MODE_MASK | LPBK_EN_MASK);
-+	pse_port = airoha_ppe_is_enabled(eth, 1) ? FE_PSE_PORT_PPE2
-+						 : FE_PSE_PORT_PPE1;
-+	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(AIROHA_GDM2_IDX),
-+				    pse_port);
-+
-+	airoha_fe_rmw(eth, REG_FE_WAN_PORT, WAN0_MASK,
-+		      FIELD_PREP(WAN0_MASK, AIROHA_GDM2_IDX));
-+
-+	for (i = 0; i < eth->soc->num_ppe; i++)
-+		airoha_fe_clear(eth, REG_PPE_DFT_CPORT(i, AIROHA_GDM2_IDX),
-+				DFT_CPORT_MASK(AIROHA_GDM2_IDX));
-+
-+	/* Enable VIP and IFC for GDM2 */
-+	airoha_fe_set(eth, REG_FE_VIP_PORT_EN, BIT(AIROHA_GDM2_IDX));
-+	airoha_fe_set(eth, REG_FE_IFC_PORT_EN, BIT(AIROHA_GDM2_IDX));
-+
-+	if (port->id == AIROHA_GDM4_IDX && airoha_is_7581(eth))
-+		airoha_fe_wr(eth, REG_SRC_PORT_FC_MAP6, FC_MAP6_DEF_VALUE);
-+
-+	return 0;
-+}
-+
- static struct airoha_gdm_dev *
- airoha_get_wan_gdm_dev(struct airoha_eth *eth)
- {
-@@ -2296,6 +2339,77 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 	return NETDEV_TX_OK;
- }
- 
-+struct airoha_ethool_priv_flags {
-+	char name[ETH_GSTRING_LEN];
-+	int (*handler)(struct net_device *netdev, u32 flags);
-+};
-+
-+static int airoha_dev_set_wan_flag(struct net_device *netdev, u32 flags)
-+{
-+	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-+	struct airoha_gdm_port *port = dev->port;
-+	struct airoha_eth *eth = dev->eth;
-+	int err;
-+
-+	if (port->id != AIROHA_GDM3_IDX &&
-+	    port->id != AIROHA_GDM4_IDX) {
-+		/* GDM1 can be used just as LAN while GDM2 can be configured
-+		 * only as WAN
-+		 */
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (netif_running(netdev))
-+		return -EBUSY;
-+
-+	if (flags & AIROHA_PRIV_F_WAN) {
-+		struct airoha_gdm_dev *wan_dev;
-+
-+		/* Verify the WAN device is not already configured */
-+		wan_dev = airoha_get_wan_gdm_dev(eth);
-+		if (wan_dev && wan_dev != dev)
-+			return -EBUSY;
-+
-+		dev->flags |= AIROHA_PRIV_F_WAN;
-+		airoha_dev_set_qdma(dev);
-+		err = airoha_enable_gdm2_loopback(dev);
-+		if (err)
-+			goto error;
-+	} else {
-+		err = airoha_disable_gdm2_loopback(dev);
-+		if (err)
-+			return err;
-+
-+		dev->flags &= ~AIROHA_PRIV_F_WAN;
-+		airoha_dev_set_qdma(dev);
-+	}
-+
-+	err = airoha_set_macaddr(dev, netdev->dev_addr);
-+	if (err)
-+		goto error;
-+
-+	return 0;
-+error:
-+	/* Restore previous LAN or WAN configuration */
-+	if (flags & AIROHA_PRIV_F_WAN) {
-+		airoha_disable_gdm2_loopback(dev);
-+		dev->flags &= ~AIROHA_PRIV_F_WAN;
-+		airoha_dev_set_qdma(dev);
-+	} else {
-+		dev->flags |= AIROHA_PRIV_F_WAN;
-+		airoha_dev_set_qdma(dev);
-+		airoha_enable_gdm2_loopback(dev);
-+	}
-+
-+	return err;
-+}
-+
-+static const struct airoha_ethool_priv_flags airoha_eth_priv_flags[] = {
-+	{ "wan", airoha_dev_set_wan_flag },
-+};
-+
-+#define AIROHA_PRIV_FLAGS_STR_LEN	ARRAY_SIZE(airoha_eth_priv_flags)
-+
- static void airoha_ethtool_get_drvinfo(struct net_device *netdev,
- 				       struct ethtool_drvinfo *info)
- {
-@@ -2304,6 +2418,7 @@ static void airoha_ethtool_get_drvinfo(struct net_device *netdev,
- 
- 	strscpy(info->driver, eth->dev->driver->name, sizeof(info->driver));
- 	strscpy(info->bus_info, dev_name(eth->dev), sizeof(info->bus_info));
-+	info->n_priv_flags = AIROHA_PRIV_FLAGS_STR_LEN;
- }
- 
- static void airoha_ethtool_get_mac_stats(struct net_device *netdev,
-@@ -2368,6 +2483,60 @@ airoha_ethtool_get_rmon_stats(struct net_device *netdev,
- 	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
- }
- 
-+static int airoha_ethtool_set_priv_flags(struct net_device *netdev, u32 flags)
-+{
-+	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-+	int i;
-+
-+	for (i = 0; i < AIROHA_PRIV_FLAGS_STR_LEN; i++) {
-+		int err;
-+
-+		if (!((dev->flags ^ flags) & BIT(i)))
-+			continue;
-+
-+		if (!airoha_eth_priv_flags[i].handler)
-+			continue;
-+
-+		err = airoha_eth_priv_flags[i].handler(netdev, flags);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static u32 airoha_ethtool_get_priv_flags(struct net_device *netdev)
-+{
-+	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-+
-+	return dev->flags;
-+}
-+
-+static int airoha_ethtool_get_sset_count(struct net_device *netdev, int sset)
-+{
-+	switch (sset) {
-+	case ETH_SS_PRIV_FLAGS:
-+		return AIROHA_PRIV_FLAGS_STR_LEN;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static void airoha_ethtool_get_strings(struct net_device *netdev,
-+				       u32 stringset, u8 *data)
-+{
-+	int i;
-+
-+	switch (stringset) {
-+	case ETH_SS_PRIV_FLAGS:
-+		for (i = 0; i < AIROHA_PRIV_FLAGS_STR_LEN; i++)
-+			ethtool_puts(&data, airoha_eth_priv_flags[i].name);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static int airoha_qdma_set_chan_tx_sched(struct net_device *netdev,
- 					 int channel, enum tx_sched_mode mode,
- 					 const u16 *weights, u8 n_weights)
-@@ -3094,6 +3263,10 @@ static const struct ethtool_ops airoha_ethtool_ops = {
- 	.get_rmon_stats		= airoha_ethtool_get_rmon_stats,
- 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
- 	.get_link		= ethtool_op_get_link,
-+	.set_priv_flags		= airoha_ethtool_set_priv_flags,
-+	.get_priv_flags		= airoha_ethtool_get_priv_flags,
-+	.get_sset_count		= airoha_ethtool_get_sset_count,
-+	.get_strings		= airoha_ethtool_get_strings,
- };
- 
- static int airoha_metadata_dst_alloc(struct airoha_gdm_port *port)
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 436f3c8779c1..4e17dfbcf2b8 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -376,6 +376,7 @@
- 
- #define REG_SRC_PORT_FC_MAP6		0x2298
- #define FC_ID_OF_SRC_PORT_MASK(_n)	GENMASK(4 + ((_n) << 3), ((_n) << 3))
-+#define FC_MAP6_DEF_VALUE		0x1b1a1918
- 
- #define REG_CDM5_RX_OQ1_DROP_CNT	0x29d4
- 
-
----
-base-commit: 903db046d5579bef0ea699eae4b279dd6455fc9f
-change-id: 20260606-airoha-ethtool-priv_flags-b6aa70caa780
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+	Andrew
 
