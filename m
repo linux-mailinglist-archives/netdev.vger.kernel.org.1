@@ -1,151 +1,152 @@
-Return-Path: <netdev+bounces-296215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +H0KIwVAJWr/EwIAu9opvQ
-	(envelope-from <netdev+bounces-296215-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:55:17 +0200
+	id 7h0QCuA/JWrtEwIAu9opvQ
+	(envelope-from <netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:54:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D799064F4A7
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:55:16 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A50564F49B
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 11:54:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b=XeUj7r60;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296215-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296215-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=YJp1uk0V;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296216-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linuxfoundation.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A7E21306470B
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 09:50:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4801F3002507
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 09:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EF63890F3;
-	Sun,  7 Jun 2026 09:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B343D38888B;
+	Sun,  7 Jun 2026 09:54:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63AD4071FE;
-	Sun,  7 Jun 2026 09:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE4F38734A;
+	Sun,  7 Jun 2026 09:54:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780825830; cv=none; b=RClT6nqjHPqGi68CNAmL3mM9y33w45GD4lxja3e/9nltnXXesy6HSNqIhZqeE2/lFYiDTu3pcL6nnORUxC957V0EOd5jnCj5QU+q4l6YX+Cu+M1vJ0Ch7JqjphYp5fHGZJHZ7/o5sspZiObvtwnvQ/sxzAiuVjkiwPLYHdBUWOA=
+	t=1780826074; cv=none; b=lctMABqML2yHNZlG95dxm91pTfz8YlCShR1m2QSZFohyDBv1VxVOq4WfUQ5w5ym4kdgDLtRnP1jZypp3KVy3juxlSMIiG/LrorIbeEjB2CoXx6c1Xx91JPOet1r7TCwcho5LjgtANC3LYjQuASolIonIus4nBoKTcBJspGtfkG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780825830; c=relaxed/simple;
-	bh=x4FciXz4Pgj1xXWuG/FRvoFuHeIa3bXOlDEc1mx5PDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NXgPtgEL1lIvjml8yhFG9T8We/Cd2H97kbztjDaJ4yBr+LxYD/0RDxWZL9NlgF24kMOf7z5AyIL/wJDG/3fQMIGYSTEwT/jkS/B5LAQanYZi29i9gSZUMV+V9WOx6xrL0biHG7YgEUYBASP8GZtW+yqfd40XmBDzLF0wTuKj/6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=XeUj7r60; arc=none smtp.client-ip=217.70.190.124
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id B651D601AF;
-	Sun,  7 Jun 2026 11:50:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1780825827;
-	bh=8bsgA67qW2EyeKMVDKI4MI1DUw6mc8ko9lrHR+cbK/8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XeUj7r60TOPet7yNplbPf14XFzbg1Hk/9F+tY0fwECjKUVBYGJqLbNkUekuO2YFHe
-	 RNj5ovovCIcnS2a1dos9pu+FPlrzwjCsBM4o3C8vqWEfiX3h/fMZ7xVJU2vxl4h2Fw
-	 wBytkLNT3UJZjG8Xw56tVABd6yw3QgC4AH96PzGp/GnPecM09epZXvzzrPB4j03uz3
-	 iz8wabYenFGnBJav0ZQtxkUzAzGT3bQSPYY3sWv0r+4+CP6hLDbJ7Vy1rgR3k9/LeH
-	 XhL2juUatExKFLIf8CHwGF869CTchnJIebOmd2HkGL1ZROfq+BhLYoQM+tPh0kT4NK
-	 3oATEPiQfI9QQ==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net-next 15/15] netfilter: nf_conntrack: use get_unaligned_be32() in tcp_sack()
-Date: Sun,  7 Jun 2026 11:49:54 +0200
-Message-ID: <20260607094954.48892-16-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260607094954.48892-1-pablo@netfilter.org>
-References: <20260607094954.48892-1-pablo@netfilter.org>
+	s=arc-20240116; t=1780826074; c=relaxed/simple;
+	bh=rLzS8kVZIaLrxE7golOIyuypqsEka7TpVmWikthKQlE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JFvA5rxDLpBEHCdE8JDBYehYSnm/AfRTN7qx/pBnjopGiS3COAfMGhA/RvHOURKUUI6A0ptFqsDX4MsY/YQJb6HfFvAQO8cBerIdDesadFHsYfVGkEMJjAxQQuJ1vvhjAOzxOBs0Wd4nl3L27YPWetFQWi5yR2J1pyyDrS9s0nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YJp1uk0V; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED021F00893;
+	Sun,  7 Jun 2026 09:54:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1780826073;
+	bh=z13/UNc27kjJOIZUWZbt7bi5IAGJ1TZgFynQ0tyy04I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YJp1uk0VkfN4UnvjgEac9t3OrHpM5RBCSrkWIy/xf5j0n4E4BZeNs/SsuTEJmBD9o
+	 CLRKYBo//Qk7u4IxLlNgE2V0/Svj84B1YAvzNwFvdTaYALNAnQfzN9Oe8CnJYhH0Kd
+	 jcacCC7kIT2E2DQUBvp7q9ANevZQKJJ5UwNV6otU=
+Date: Sun, 7 Jun 2026 11:53:36 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: David Heidelberg <david+nfc@ixit.cz>, oe-linux-nfc@lists.linux.dev,
+	netdev@vger.kernel.org, stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] nfc: nci: add data_len bound checks to activation
+ parameter extractors
+Message-ID: <2026060725-husked-latter-8231@gregkh>
+References: <20260607094822.322125-1-hexlabsecurity@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260607094822.322125-1-hexlabsecurity@proton.me>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296215-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296216-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	FROM_HAS_DN(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:david+nfc@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:david@ixit.cz,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:mid,netfilter.org:dkim,netfilter.org:from_mime,netfilter.org:email,vger.kernel.org:from_smtp,suse.de:email]
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[gregkh:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D799064F4A7
+X-Rspamd-Queue-Id: 2A50564F49B
 
-From: Rosen Penev <rosenp@gmail.com>
+On Sun, Jun 07, 2026 at 09:48:26AM +0000, Bryam Vargas wrote:
+> nci_extract_activation_params_iso_dep() and
+> nci_extract_activation_params_nfc_dep() read an inner length byte from
+> the NCI RF_INTF_ACTIVATED_NTF payload and use it to memcpy() into fixed
+> kernel buffers, but neither function receives the caller-validated
+> activation_params_len.  A crafted NCI notification with
+> activation_params_len=1 and an inner length byte of up to 20 (NFC-A) or
+> 50 (NFC-B) causes memcpy() to read that many bytes past the one valid
+> byte in the activation params region -- a slab out-of-bounds read of
+> kernel memory adjacent to the NCI skb.
+> 
+> The sibling nci_extract_rf_params_*() family was given equivalent
+> protection by commit 571dcbeb8e63 ("net: nfc: nci: Fix parameter
+> validation for packet data"), but the two activation parameter
+> extractors were not updated at that time.
+> 
+> Add a data_len parameter to both functions, guard against an empty
+> region before consuming the inner length byte, decrement the remaining
+> count after consuming it, and clamp the copy length to what is actually
+> available.  Update both call sites to pass ntf.activation_params_len,
+> which is already validated against the skb at ntf.c:801.
+> 
+> Fixes: e8c0dacd9836 ("NFC: Update names and structs to NCI spec 1.0 d18")
+> Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+> ---
+> Verification (NFC-A ISO-DEP, NFC_ATS_MAXSIZE = 20):
+> 
+>   data_len  inner_len  without patch              with patch
+>   --------  ---------  -------------------------  --------------------
+>   1         0          rats_res_len=0, clean       same
+>   1         1          memcpy +1B OOB              clamped to 0, clean
+>   1         20         memcpy +20B OOB  <-- PoC   clamped to 0, clean
+>   2         2          memcpy +1B OOB              clamped to 1, clean
+>   21        20         memcpy 20B clean            same
+> 
+> NFC-B (attrib_res, max 50) and NFC-DEP poll/listen (atr_res/atr_req,
+> max 62) have the same shape and receive the same fix.
+> 
+>  net/nfc/nci/ntf.c | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
 
-The timestamp-only fast path dereferences the option stream as
-*(__be32 *)ptr, which assumes 4-byte alignment that the TCP option
-stream does not guarantee. Use get_unaligned_be32() instead, which
-reads the value safely and already returns host byte order, so the
-htonl() on the comparison constant can be dropped.
+<formletter>
 
-This matches the existing get_unaligned_be32() use later in the same
-function.
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-Assisted-by: Claude:Opus-4.7
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
-Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_conntrack_proto_tcp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
-index 027d69edba44..ceeed3d7fe52 100644
---- a/net/netfilter/nf_conntrack_proto_tcp.c
-+++ b/net/netfilter/nf_conntrack_proto_tcp.c
-@@ -405,11 +405,11 @@ static void tcp_sack(const struct sk_buff *skb, unsigned int dataoff,
- 		return;
- 
- 	/* Fast path for timestamp-only option */
--	if (length == TCPOLEN_TSTAMP_ALIGNED
--	    && *(__be32 *)ptr == htonl((TCPOPT_NOP << 24)
--				       | (TCPOPT_NOP << 16)
--				       | (TCPOPT_TIMESTAMP << 8)
--				       | TCPOLEN_TIMESTAMP))
-+	if (length == TCPOLEN_TSTAMP_ALIGNED &&
-+	    get_unaligned_be32(ptr) == ((TCPOPT_NOP << 24) |
-+					(TCPOPT_NOP << 16) |
-+					(TCPOPT_TIMESTAMP << 8) |
-+					TCPOLEN_TIMESTAMP))
- 		return;
- 
- 	while (length > 0) {
--- 
-2.47.3
-
+</formletter>
 
