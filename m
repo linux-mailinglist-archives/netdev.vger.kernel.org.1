@@ -1,359 +1,218 @@
-Return-Path: <netdev+bounces-296322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kOGkGyLzJWocPAIAu9opvQ
-	(envelope-from <netdev+bounces-296322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:39:30 +0200
+	id 52jdNKnzJWqUPAIAu9opvQ
+	(envelope-from <netdev+bounces-296323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:41:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC6D651D2A
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:39:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FAA651D44
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:41:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=jqqeFzbV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296322-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296322-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=UjemT3CV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296323-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296323-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 20C5D30015A8
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 22:39:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0B73030013B7
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 22:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032A03815E2;
-	Sun,  7 Jun 2026 22:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0809433BBC6;
+	Sun,  7 Jun 2026 22:41:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AB830C14A
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 22:39:20 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780871962; cv=pass; b=uur2J15Ya8ouFHGWP4IASK0noReXfA6h0LXa5rI3UkoBBXiUs79Ffyt/M2WjbV3BeGated0CyIpAHXMIMqKGKBbL3cZsfwuzIwOzftfTVoKAqrbemJK0vItWfLRRTmwMGs2ovcPOG93Z5Wgd32R6/rlUd0FRrOFiXyZEyPEBvvQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780871962; c=relaxed/simple;
-	bh=+4mYuEEkjpSNx57Rsctj9s4xcox12ds3O2xGUt/EI7o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iexuN9LWdwKntCZn3968ONn4Y9AR6l/D/jNBNyPeDot1FbyGnqGqL+jaUsk9tm6pRAsL6K7+w1PsT66De63F4LCATGpxtiLvDkfiWqTNfyfCTC0d1DXNxYBlblmalqx/HFZ8C1W8qovme+p2Zj2WsBrrKo4/fOr54k5juGNPqUs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jqqeFzbV; arc=pass smtp.client-ip=209.85.208.171
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-396775c2720so33769001fa.2
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 15:39:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780871959; cv=none;
-        d=google.com; s=arc-20240605;
-        b=StIry0MTaFWeETCXPCfTJ+GaE4RWPKXlEhrZQ+L0CD0I+wMpCKaUKZf40BbqbgmBj6
-         bW7QkOiquqO+dKpOeALCOnF0A5J7Ck7ZAN649TxtvMhRQEsrQPl5mzHl2EqfPHqvUI01
-         TRYsHKLIqj8t3bH7PJVFcX2GEw+EMUTsDrpl182q6ADad2h88QhFH5CJiz9rfokyDbsU
-         +Qo3wJ5jsfBL0Ut7BWc32FZylU9che3oF9QET+0VCuwc78hQ27TqU+OXvW53KjWzQn3E
-         OJN/UiMdnE54n78p2f4eQS+D+Y9d6yccQ54CJYM97ov9l15QYRTj3VWTxB7FT4bnFR2A
-         Lrlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qEabNRu6O8V8GUgPf9A0UcDW6n2grWo6MuT1e8VBwSo=;
-        fh=+8eu1zxn6dzJPeKJi+J9GJyeu9j9o/OlXv1xkTsljAk=;
-        b=XLpUt3LC9Gorn8IDRARNq7DJKd2Xn4jv/pdsBIBfvUOVSVt/LsnCcQFeYyUZb0Hq7U
-         i34MBNKOTHU6E+6qnbym1sZq7J00bPw5FHL9mmYjHCdHCbjMaFTPbzYmCiV4AyZxk8BP
-         gWCm0wkL3WtfhvOOHA0bZJvrmDVfrqpyUaX0bavBNUiLOrF6eOQuh5ObY48BUAY01hUQ
-         Q47F0FGIkh3shBu0B0SSd5DRGprBCfU29AJwgiXS/U8o1CYik3MNFfvNG0voMx6AhlDV
-         VLVDFAMtzL/l8H3SOm0qFyFYaAeUlm631c85jHTtWJ95UIZS0qgwIrnR6OFZJGRgaQtg
-         PboA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780871959; x=1781476759; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qEabNRu6O8V8GUgPf9A0UcDW6n2grWo6MuT1e8VBwSo=;
-        b=jqqeFzbVUFDB5+sHNIx65aXlnVIDx8cstAD1PVHTx2HklgcbiXUvi3AAzMI9vaojqi
-         jjsLQY3ySGNKmfjpShPn0Subu5owGAK44OZowh8ECKAmlumKLjTe101pY7Y1WnIVKqBi
-         Nu6S5Xni3yxh0ReILMJCgHrWhFppqbqPWscEdIfFJB2U34mEtYJtblTMB5xhV3H+J3nt
-         jKmr5oRSz+L0Qjcl1L7GByeYbftVAPau512WezRkf8WC/PcKp3rMeOv5IneBVm/M7Gzv
-         E7ikNPLVJp/K1QqAMmwydRjWI2ye9aC/hXlkABmHOu2BKq8xKCREOicy56yLWgKkv7uw
-         XhQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780871959; x=1781476759;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qEabNRu6O8V8GUgPf9A0UcDW6n2grWo6MuT1e8VBwSo=;
-        b=EgaIr6fdKXhQbKC7tqEpMbY8o8cEqSkHucd1qA6HRKbW0xk0LpYjiW9rqmDX7UaJjd
-         srWjSe82MRCd9bCN6pWbI6LQGv1I40uBPCOJEqgs11XbQD/t/3udyIJzLJwiE+v3xc21
-         ZW8j0pdkXkEwPrfqnOYsBwJ6XGGI/jJWl2nBfUYrqeMvF24aDjlZGxMPpZPsS50G7xst
-         /PYC3Nl1Mv1kP74+lZhNl3dP4PqL0Kk5xZiypNDTx6eAK3s9R1ydTNn9XjlmqNMAAp/C
-         RbFfksXjJ/z2RIRNzxgoZFGb2kN6Yn6YnGCWB9P9xQM1RmAyJ2PihzrqOSVwDflYTGHg
-         GOCQ==
-X-Gm-Message-State: AOJu0Yx7zSNnAMZdo3sMpx9abuYQtEC/BiPpMy/ggT7ULzspINxsuHo5
-	WkXqiZNve3F1WsrKxhFTjVyre3dkiZY+T0cZZ57DlI7+t82jbx05tablfyyItpyfadqC6txmtGU
-	3x4J4enpMEBV+Hq32Q860QEfK77uAUcndutv//jTU
-X-Gm-Gg: Acq92OGX5Wc34X2zXbDefjkf5xP0h3f+Ebi7i6/nV8ArWASbr6N8ZlcwSqR/wd+P6FM
-	4ijKd6ntBlBvjsM7Mxhq/0oWsQlmep9njR5V7bHHFSFjGUwQk+U+sxoU/EtXO5hL1FnFKa9XK5A
-	1GGZFjsBmTHwL0LxVtCCutZpgV+rFdCv4TRdmlWfNHfhMYP7ua4cJjdGuX3szsA4gRI8dAcpM8f
-	AnDODG4IAHofVa/fCHsDWzv1wCLpGmXv/s8CBi9w5J1Ru3meayGyi9R1TwP5VQzeUp+dwJoCcX3
-	a7VxOKEuyB4nmhb3P8oZQNcDn2ZmPO31/1pWNdt/es8qd+lgQ09x3xD36MUhCw==
-X-Received: by 2002:a2e:a9a1:0:b0:396:a826:a278 with SMTP id
- 38308e7fff4ca-396d0975cfamr35123311fa.19.1780871959031; Sun, 07 Jun 2026
- 15:39:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7AC281503;
+	Sun,  7 Jun 2026 22:41:39 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780872100; cv=none; b=Y9wewppvufMKkYeETAG8wXsuX8L3KrfMd2qn9RUpdEZ6W+4R6Oyj4lsfqdxcmQVzzEsUMN0bejHfRFXcL4tmhzTmL576RYOFfHkm5aXmc9DRfZHca+aN5vChHrp7jK0cA3HZyjgLn4nZ9fNQrLPC5DqwjP3P1AQaiv58q7WvooY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780872100; c=relaxed/simple;
+	bh=lmGFcrexkEvQEW+cMW4RWPUg0K5/Vkp28qLscUgMcOg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YLwYuTNfP9BoLq1ZGpHuCbUH6WPQ2EXCOdOj7vZvbtBw4V6LrVNN3xqcpjXbiHwII4A/fAdoISf5glQQceyLOdUJHpXOKF/dFRPnhB98Y88cVMtucagvZLCGLOCPBUgbElAGIfWCwyh/O0Jl8ycbJvZM2LGTz9w87LrlaFugZYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjemT3CV; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B161F00893;
+	Sun,  7 Jun 2026 22:41:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780872099;
+	bh=S0SFdJIbFGxEfERXn/7dSvNyCSRCV2YmfDFR7pNS5cU=;
+	h=From:Subject:Date:To:Cc;
+	b=UjemT3CVdrce/BNF24oLixBrIPGs8E3s+rCeFMMJ/XAiGbgo5z8AXdjMphRvapUAm
+	 PZ1y0eRnZqz/l5waIkyDv5zE/VV5M4N7tNAtJgvPe1fsbcZW3gN1wkCKRyjjpKvfyh
+	 H6uPDW++dU0N5J8Bd7DMTXv1+Akshj2630h617QbAY10SwLe+aCsKa/umUeNWY/EMT
+	 yIxneWQQFabkrYEDJUbsc059mdPvr+w1zhpjPtrsPXkLZ0XIXk7wsN3H8f4nNwjqdL
+	 fw5gIdUtSYqYV5g6A53y62GTO6GgPCLupi9B8KEIC/4Rc1lEaGAJy2wfi4J2RRWW+N
+	 Sj783CV9XriWg==
+From: Linus Walleij <linusw@kernel.org>
+Subject: [PATCH net-next v6 0/5] net: dsa: microchip: Add support for
+ KSZ8995XA/KS8995XA
+Date: Mon, 08 Jun 2026 00:41:28 +0200
+Message-Id: <20260608-ks8995-to-ksz8-v6-0-d91eb43edcc5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260602235900.3050782-1-hramamurthy@google.com> <20260602235900.3050782-14-hramamurthy@google.com>
-In-Reply-To: <20260602235900.3050782-14-hramamurthy@google.com>
-From: Joshua Washington <joshwash@google.com>
-Date: Sun, 7 Jun 2026 15:39:06 -0700
-X-Gm-Features: AVVi8CcMiPI765Ff_RGoQb-Kf01bLpzY3qJ3FGUiOV6UbzlpFmpvBmvXzg6zsAg
-Message-ID: <CALuQH+XHrmb-2zjVagWi=+gSowvTC67CSU09XMPwhtMSVszZjw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 13/15] gve: setup and teardown management interrupts
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	sdf@fomichev.me, willemb@google.com, jordanrhee@google.com, 
-	jfraker@google.com, nktgrg@google.com, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2XOy07DMBAF0F+pvMbIr/GDFf+BWCTOuDVFDrJNV
+ Kjy77jpgoB3Mxqfe30lBXPEQp4OV5JxiSXOqS364UD8aUhHpHFqOxFMaAbM0XOxzgGtc5u+LeU
+ QZHDeCsMDaegjY4iXLfCFJKw04aWS1/ulfI5v6Ost7/b2FEud89fWvfBN3Gu4/l+zcMqoYRPDo
+ IYBgno+Y074/jjn45a+iJ0XovOieTBceDZ5hwY6L/e+75fNe5AsaODOutB59es1k51XzSMHrhw
+ GwdF0HvZedR6ad3YccFSAWv/9/7quP7HD+g7JAQAA
+X-Change-ID: 20260509-ks8995-to-ksz8-15f3f9c8271f
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, 
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Woojung Huh <Woojung.Huh@microchip.com>, 
+ devicetree@vger.kernel.org, Linus Walleij <linusw@kernel.org>, 
+ Nicolai Buchwitz <nb@tipi-net.de>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:hramamurthy@google.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:willemb@google.com,m:jordanrhee@google.com,m:jfraker@google.com,m:nktgrg@google.com,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296322-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296323-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:marex@denx.de,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:Woojung.Huh@microchip.com,m:devicetree@vger.kernel.org,m:linusw@kernel.org,m:nb@tipi-net.de,m:krzysztof.kozlowski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[joshwash@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,armlinux.org.uk];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joshwash@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4CC6D651D2A
+X-Rspamd-Queue-Id: D6FAA651D44
 
-On Tue, Jun 2, 2026 at 4:59=E2=80=AFPM Harshitha Ramamurthy
-<hramamurthy@google.com> wrote:
->
-> From: Joshua Washington <joshwash@google.com>
->
-> Introduce control ops to setup/teardown control plane IRQs. Admin
-> queue-specific functionality is moved to admin queue files.
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Reviewed-by: Jordan Rhee <jordanrhee@google.com>
-> Signed-off-by: Joshua Washington <joshwash@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> ---
->  drivers/net/ethernet/google/gve/gve.h        |  4 +++
->  drivers/net/ethernet/google/gve/gve_adminq.c | 32 ++++++++++++++++++++
->  drivers/net/ethernet/google/gve/gve_adminq.h |  2 ++
->  drivers/net/ethernet/google/gve/gve_main.c   | 28 ++++++-----------
->  4 files changed, 47 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet=
-/google/gve/gve.h
-> index 6db5fbc0b321..b2e578b3d450 100644
-> --- a/drivers/net/ethernet/google/gve/gve.h
-> +++ b/drivers/net/ethernet/google/gve/gve.h
-> @@ -835,6 +835,8 @@ struct gve_device_info {
->   *                     initialization.
->   * @request_db_info: Request and store doorbell information into @priv
->   * @free_db_resources: Free DMA memory holding doorbell info (AdminQ onl=
-y)
-> + * @setup_mgmt_irq: Setup control plane IRQ
-> + * @teardown_mgmt_irq: Teardown control plane IRQ
->   * @get_ptype_map: Learn packet type map from device and store it in @pr=
-iv
->   * @configure_rss: Set up default RSS configuration
->   * @setup_stats_report: Set up DMA region for stats report (AdminQ only)
-> @@ -847,6 +849,8 @@ struct gve_ctrl_ops {
->         int (*set_num_ntfy_blks)(struct gve_priv *priv);
->         int (*request_db_info)(struct gve_priv *priv);
->         void (*free_db_resources)(struct gve_priv *priv);
-> +       int (*setup_mgmt_irq)(struct gve_priv *priv);
-> +       void (*teardown_mgmt_irq)(struct gve_priv *priv);
->         int (*get_ptype_map)(struct gve_priv *priv);
->         int (*configure_rss)(struct gve_priv *priv,
->                              struct ethtool_rxfh_param *param);
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/e=
-thernet/google/gve/gve_adminq.c
-> index 259dcd617216..5dc5c63cee32 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -1790,3 +1790,35 @@ void gve_adminq_free_db_resources(struct gve_priv =
-*priv)
->         priv->irq_db_indices =3D NULL;
->         gve_free_counter_array(priv);
->  }
-> +
-> +static irqreturn_t gve_mgmnt_intr(int irq, void *arg)
-> +{
-> +       struct gve_priv *priv =3D arg;
-> +
-> +       queue_work(priv->gve_wq, &priv->service_task);
-> +       return IRQ_HANDLED;
-> +}
-> +
-> +int gve_adminq_setup_mgmt_irq(struct gve_priv *priv)
-> +{
-> +       int err;
-> +
-> +       snprintf(priv->mgmt_msix_name, sizeof(priv->mgmt_msix_name),
-> +                "gve-mgmnt@pci:%s", pci_name(priv->pdev));
-> +       err =3D request_irq(priv->msix_vectors[priv->mgmt_msix_idx].vecto=
-r,
-> +                         gve_mgmnt_intr, 0, priv->mgmt_msix_name, priv);
-> +       if (err)
-> +               return err;
-> +
-> +       priv->mgmt_irq_requested =3D true;
-> +
-> +       return 0;
-> +}
-> +
-> +void gve_adminq_teardown_mgmt_irq(struct gve_priv *priv)
-> +{
-> +       if (priv->mgmt_irq_requested) {
-> +               free_irq(priv->msix_vectors[priv->mgmt_msix_idx].vector, =
-priv);
-> +               priv->mgmt_irq_requested =3D false;
-> +       }
-> +}
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/e=
-thernet/google/gve/gve_adminq.h
-> index 985b1aefea6e..ff656fb4f113 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.h
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-> @@ -659,5 +659,7 @@ int gve_adminq_set_num_ntfy_blks(struct gve_priv *pri=
-v);
->  void gve_adminq_set_num_queues(struct gve_priv *priv);
->  int gve_adminq_request_db_info(struct gve_priv *priv);
->  void gve_adminq_free_db_resources(struct gve_priv *priv);
-> +int gve_adminq_setup_mgmt_irq(struct gve_priv *priv);
-> +void gve_adminq_teardown_mgmt_irq(struct gve_priv *priv);
->
->  #endif /* _GVE_ADMINQ_H */
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
-ernet/google/gve/gve_main.c
-> index 55f48aee125e..9d00093826e3 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -267,14 +267,6 @@ static void gve_free_stats_report(struct gve_priv *p=
-riv)
->         priv->stats_report =3D NULL;
->  }
+This series breaks with the dated attempt to polish the old
+KS8995 driver, and instead implement support for the KS8995XA
+in the KSZ driver, and after that delete the old KS8995 driver.
 
-Sashiko says:
-This is a pre-existing issue, but does this function fail to cancel
-the stats_report_task?
+The hardware clearly has the same ancestry, the KSZ8995XA is
+just a rebrand of the much older Micrel KX8995XA switch.
 
-This issue predates this patch series; will have to introduce a net
-patch to fix.
+The old drivers referce to "KS8995" was actually KS8995XA only,
+it never supported the sibling devices KS8995E or KS8995MA.
+This is reflected in this patch set.
 
->
-> -static irqreturn_t gve_mgmnt_intr(int irq, void *arg)
-> -{
-> -       struct gve_priv *priv =3D arg;
-> -
-> -       queue_work(priv->gve_wq, &priv->service_task);
-> -       return IRQ_HANDLED;
-> -}
-> -
->  static irqreturn_t gve_intr(int irq, void *arg)
->  {
->         struct gve_notify_block *block =3D arg;
-> @@ -499,6 +491,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *p=
-riv)
->
->  static void gve_teardown_notify_blocks(struct gve_priv *priv)
->  {
-> +       const struct gve_ctrl_ops *ops =3D priv->ctrl_ops;
->         int i;
->
->         if (!priv->ntfy_blocks)
-> @@ -518,29 +511,24 @@ static void gve_teardown_notify_blocks(struct gve_p=
-riv *priv)
->                 block->irq_requested =3D false;
->         }
->
-> -       if (priv->mgmt_irq_requested) {
-> -               free_irq(priv->msix_vectors[priv->mgmt_msix_idx].vector, =
-priv);
-> -               priv->mgmt_irq_requested =3D false;
-> -       }
-> +       ops->teardown_mgmt_irq(priv);
->  }
+Add new compatibles, add special code paths for the KSZ8995XA
+and add a new tagger for the special front tag found in the
+KSZ8995XA.
 
-Sashiko says:
-This isn't a bug introduced by this patch, but is it possible for the
-management IRQ to fire after the workqueue is destroyed?
+The patches were tested with the Actiontec MI424WR rev D (which
+has the KS8995XA) and OpenWrt as userspace.
 
-Again, this will be fixed with changes in gve: Simplify Reset Logic.
+Signed-off-by: Linus Walleij <linusw@kernel.org>
+---
+Changes in v6:
+- Provide a prompt along with the transition symbol NET_DSA_KS8995
+  so that oldconfig works.
+- Clarify in commit message that the platform data probe path is
+  unused in the kernel and it is fine to delete this mechanism.
+- Link to v5: https://patch.msgid.link/20260604-ks8995-to-ksz8-v5-0-98baeb45e665@kernel.org
 
->
->  static int gve_setup_notify_blocks(struct gve_priv *priv)
->  {
-> +       const struct gve_ctrl_ops *ops =3D priv->ctrl_ops;
->         const struct cpumask *node_mask;
->         unsigned int cur_cpu;
->         int i;
->         int err;
->
-> -       /* Setup Management Vector  - the last vector */
-> -       snprintf(priv->mgmt_msix_name, sizeof(priv->mgmt_msix_name),
-> -                "gve-mgmnt@pci:%s", pci_name(priv->pdev));
-> -       err =3D request_irq(priv->msix_vectors[priv->mgmt_msix_idx].vecto=
-r,
-> -                         gve_mgmnt_intr, 0, priv->mgmt_msix_name, priv);
-> +       /* Setup Management Vector */
-> +       err =3D ops->setup_mgmt_irq(priv);
->         if (err) {
-> -               dev_err(&priv->pdev->dev, "Did not receive management vec=
-tor.\n");
-> +               dev_err(&priv->pdev->dev,
-> +                       "Did not receive management vector.\n");
->                 return err;
->         }
-> -       priv->mgmt_irq_requested =3D true;
->
->         node_mask =3D gve_get_node_mask(priv);
->         cur_cpu =3D cpumask_first(node_mask);
-> @@ -2460,6 +2448,8 @@ static const struct gve_ctrl_ops gve_adminq_ops =3D=
- {
->         .configure_rss          =3D gve_adminq_configure_rss,
->         .request_db_info        =3D gve_adminq_request_db_info,
->         .free_db_resources      =3D gve_adminq_free_db_resources,
-> +       .setup_mgmt_irq         =3D gve_adminq_setup_mgmt_irq,
-> +       .teardown_mgmt_irq      =3D gve_adminq_teardown_mgmt_irq,
->  };
->
->  static int gve_init_priv(struct gve_priv *priv)
-> --
-> 2.54.0.1013.g208068f2d8-goog
->
+Changes in v5:
+- Rebase on net-next again to be sure we apply.
+- Fix the codepath where DCB was set up per-port, damaging KS8995XA
+  port registers.
+- Fix up the transitional symbol NET_DSA_KS8995 to depend on
+  SPI and select both NET_DSA_MICROCHIP_KSZ_COMMON and
+  NET_DSA_MICROCHIP_KSZ_SPI.
+- Link to v4: https://patch.msgid.link/20260603-ks8995-to-ksz8-v4-0-e15149ef21e7@kernel.org
 
+Changes in v4:
+- Create a stub symbol for NET_DSA_KS8995 to phase over users to
+  the new driver.
+- Link to v3: https://patch.msgid.link/20260526-ks8995-to-ksz8-v3-0-c530f651989f@kernel.org
 
---=20
+Changes in v3:
+- Rebase on net-next again, moving target!
+- Fix a netdev_info() print in the tagger to be netdev_debug()
+- Add net/dsa/tag_ks8995.c to MAINTAINERS
+- Link to v2: https://patch.msgid.link/20260522-ks8995-to-ksz8-v2-0-5712c0dc9e75@kernel.org
 
-Joshua Washington | Software Engineer | joshwash@google.com | (414) 366-442=
-3
+Changes in v2:
+- Avoid trying to configure TOS priority settings (DCB) on the KSZ8995XA.
+  It does have some support for this, but let's add that later.
+- Pick up Krzysztof's ACK on the new DT bindings.
+- Reset the KSZ8995XA by disabling and enabling the switch like the old
+  driver does.
+- Move mutually exclusive Kconfig over to the patch introducing the
+  old Micrel compatibles to the Microchip ksz_spi driver.
+  (this complaint from Sashiko.)
+- Use __be16 instead of u16 when casting into the SKB in the tagger
+  (this complaint from Sashiko.)
+- Do not modify the hdr->h_vlan_TCI if no hardware accelerated tag
+  is detected, it would get nullified. Use whatever the Linux network stack
+  assigned to TCI there.
+  (this complaint from Sashiko.)
+- Avoid dereference of NULL in debug prints in the tagger.
+  (this complaint from Sashiko.)
+- Ignored comment: Sashiko complains about ilog2(0) being potentially
+  undefined but that is clearly defined as 0 in the Linux kernel.
+- Link to v1: https://patch.msgid.link/20260516-ks8995-to-ksz8-v1-0-70d0ef4aa5f4@kernel.org
+
+---
+Linus Walleij (5):
+      net: dsa: microchip: Add fallback Micrel compatibles
+      dt-bindings: net: dsa: microchip: Add KSZ8995XA
+      net: dsa: tag_ks8995: Add the KS8995 tag handling
+      net: dsa: microchip: Support Microchip KSZ8995XA / KS8995XA
+      net: dsa: ks8995: Delete surplus driver
+
+ .../devicetree/bindings/net/dsa/microchip,ksz.yaml |   1 +
+ MAINTAINERS                                        |   1 +
+ drivers/net/dsa/Kconfig                            |   9 +-
+ drivers/net/dsa/Makefile                           |   1 -
+ drivers/net/dsa/ks8995.c                           | 857 ---------------------
+ drivers/net/dsa/microchip/Kconfig                  |   1 +
+ drivers/net/dsa/microchip/ksz8.c                   | 177 ++++-
+ drivers/net/dsa/microchip/ksz8.h                   |   2 +
+ drivers/net/dsa/microchip/ksz8_reg.h               |   7 +
+ drivers/net/dsa/microchip/ksz_common.c             |  58 +-
+ drivers/net/dsa/microchip/ksz_common.h             |  11 +-
+ drivers/net/dsa/microchip/ksz_spi.c                |  33 +-
+ include/linux/platform_data/microchip-ksz.h        |   1 +
+ include/net/dsa.h                                  |   2 +
+ net/dsa/Kconfig                                    |   6 +
+ net/dsa/Makefile                                   |   1 +
+ net/dsa/tag_ks8995.c                               | 132 ++++
+ 17 files changed, 400 insertions(+), 900 deletions(-)
+---
+base-commit: c1c3d01e3a9038d3e8f497e773e1f7b5d6b8212a
+change-id: 20260509-ks8995-to-ksz8-15f3f9c8271f
+
+Best regards,
+--  
+Linus Walleij <linusw@kernel.org>
+
 
