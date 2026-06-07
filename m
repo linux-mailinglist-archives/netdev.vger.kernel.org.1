@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-296272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QGCDN4WyJWp8KgIAu9opvQ
-	(envelope-from <netdev+bounces-296272-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:03:49 +0200
+	id xrEjD4yyJWqCKgIAu9opvQ
+	(envelope-from <netdev+bounces-296275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:03:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DEE86512B6
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:03:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DFD6512C4
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:03:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=f3MEM2CG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296272-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296272-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="Ap3EckD/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296275-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296275-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3164330036C7
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 18:03:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A429130068D7
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 18:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8BA2D8DC2;
-	Sun,  7 Jun 2026 18:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0D330B517;
+	Sun,  7 Jun 2026 18:03:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4620C281503
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 18:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CAB281503
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 18:03:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780855427; cv=none; b=LPV3jE+f/strHVSl+Mcd+LdrIrc9JZwlO0118dLRDqTXf5ADe3KOcnePB72DWyxDHEC358F/XD79rcVEb56V6jCyBQJv9O31WaYg4wCy4e8H+KkN9hM07Dm21ExwRZkeagsJPkL4BskzmhqlARgVHcabbYpyPBImlTyUDBNz6Qw=
+	t=1780855433; cv=none; b=hX2aUXpgXAZL/6D3IeIcxUGJV0naDCEkBDyF3d2bAp0PpKDaR9cuKVy5r0r3v3cFGJq5Nc/wc6T1L8AKQBY8N14LBRPCeDIFiReG0UCQarj6jcsslV/g62iDU2AgTvLNEW3U86WX3ckaL7CS2+UhWQDzUiQ2E6q1anxphitzaG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780855427; c=relaxed/simple;
-	bh=Oq9uMBA7F1231B6O729WkmXV78Ehl8cbE8bTwDhokAM=;
+	s=arc-20240116; t=1780855433; c=relaxed/simple;
+	bh=cQlLy+1hBN/KMkbrEWpRu2CTLJcumUiIon8feDuvBcA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d88qAVkPQHxxlRS3XcQfMCh/enYYQ09nWm4rnUE7Ik9hsc5thvDiyIFMm2XQ71tPAGlvSVv++RJ3OwEkKHgvkVQZfUbIZDH2ZupORTm2XVYc31/sCd0NR8JopMcDYfAxj6tKd4TTiVr+iJYdsQ4zlpMv2dZp8BfUH2vSYwkU5o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3MEM2CG; arc=none smtp.client-ip=209.85.222.176
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-915767ea2d0so277338285a.1
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 11:03:46 -0700 (PDT)
+	 MIME-Version:Content-Type; b=DrAliZBpaozRf1Po5dFqvi2Ggacu7hVhE4xWZT1YHq3US6R9pkAKhsbm9tWTUtrd4lS6XzNh2WES74FLGG9Q5Zl33biq/vnzma8zFAnLAwW3pU4AqOkkBSnngndskX72e/CHpg3jLlm3t3GcyU7XDBp6nlp2ZUxF4mZgfOtU1xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ap3EckD/; arc=none smtp.client-ip=209.85.222.180
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-91562bf6c12so461276985a.2
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 11:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780855425; x=1781460225; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780855428; x=1781460228; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=36vd5FRxf1iF0JtG6WtjCmp2BwAM71UYEOie/h60d3k=;
-        b=f3MEM2CGUp7ob3mOFbo4SLwHPUyRNi+cZ9PSqVtwmiMU6cP53MZ9QVAfnb4VE/OKUM
-         mxMCxS0C91t6UG8j+ivrcU0QeaehJ1jMKTk+jS45Az0l8IHbe9h8WB7PGGmVLi4jCkqc
-         4FpugGC94Ixi+Smb9dRoSG4J3o5Y7zC+LJf5wYVr3HMmfq12biVMX0wGPP6/qmbaQiXP
-         vPYpjs3BciOg2CVsVL96CIhuKBwbYQQLwLRI/C0AJfwwr6LoZJHdDPFsA+i7uC/rZuWV
-         /AlsA/DRSzUtNdiuDR69FazW9FASw+6QOD4s5N7iiujleLPc4+7uvsvEjQxr695+dHjy
-         AjGQ==
+        bh=ieQrk0iMm/Jw89W6/oIYRqCDXnQMovdFXuMRIAqU+5A=;
+        b=Ap3EckD/knoIM6g4hHWOFFtxgyFD3lBBGY5Z4yDXBymL3SB09SonEG00vaNOkYYEyy
+         2ZNWMRAEKgTVMPz9YlRNiVSFcgXcrwkhPmJiismHjhpH3qwqbqIE0fc5l5ss1lb65k1a
+         g2HgjTAei3LeYHXoBa6Zo359BTUmFYagzvzu/AK032VjQRadafWVpUFWix2rXm/dGmT3
+         93kviRoPVW0Vd83WByjS9+37VQtFsJLvT1Eu7Qzrubo8MYKdqNRi0Hg/R93KBxpKjvtP
+         TyXD7cDLLD9vfCtmrRU2iSJomqoIERsfXdDojKO6nLQdZC4wHTCuqjsPorFYHyffVX/U
+         1Byw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780855425; x=1781460225;
+        d=1e100.net; s=20251104; t=1780855428; x=1781460228;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=36vd5FRxf1iF0JtG6WtjCmp2BwAM71UYEOie/h60d3k=;
-        b=hRtFjdgnONIWIGgn27TOZ+/2GXUj+JNQtCz9Xa2FJsnLDz1M8L7QKp8R6ouXNgD9UJ
-         6cAWpKEVEmFwECklJyR2aZF0kLOhkv2uYeCAlZi3kw+OdmfV4YAWVfedxLF4zWeXX+Yz
-         PcqYPlj1CHVQJRlMJEYBWU9R6njUty9dC/boRLbSyL0pF72RQh3RtPyYSL33uGvJn8oy
-         sB3wjTyUijLURL6I2F1YnCRG0afU3tmJIf9C+5GJ5In2bvTFIT6XZptZzq+LpqVcA9JI
-         w+BkXHkzx9RXN47339QRQfaHfdjeoakihzdAxlNxxfjiUSfruJ9Na3+8JUtrfBGG0fXs
-         SAtg==
-X-Gm-Message-State: AOJu0YyDEbfVyiXwKneLrzdDH/9WIY6UhliFOqo1bh+3dnATNdTTK0v1
-	V0hZ/cmW3RXHZ6P4L/Evv5fPTKb13OoFzjWKUwf+JxclZCFJKdKMPv1Vf7vul4g+
-X-Gm-Gg: Acq92OF6r5fmwjrdd9+NW2uLsDEwX7s6KOUEIpb6mXFw36ljF501dV6Juan1LMG9wi9
-	Y5iDbemvReXvxGqS9+/wZxdITHiotOs0LNX8J4aNWQ9uFVl/O61t9qxQ4gv75GzITpM2IMhSurT
-	BoN1/9/ZTF3TFlvTV8vxrnITthVuAmF1pEL6RwibK5alVniJ8mO7Eo0CXbLExgEcvQ09u+O363X
-	bI1YTzq+bCBV7E3SVu6VGa1Tztnfa+kat/Yxd88r4CSUtZAZ44wZw67KSqBAtrp+OEVExBapKaU
-	6PUgtRJrOMC1iKzJq7ClhHP5Yd0YxAK1an6TIHZe9obMIquM+8++9D2buUHcwj7WrljCyCpvwpI
-	IjpShjYTQ5W0UZnDSTqgsWSnxjQQXyQKKfQqX5Yq+JVTqsfp/XImfcjORcxcwkxHl9cgI2GGDmZ
-	RErXNVe3+dmrnTkhFugmxFkH9DySWMO58d5sU5CkMrm7k+MNPihwGhqhkNVbedgrpQ6Vc0XSzQs
-	8IcfLbnvkmWhZL5PeVvYVO1TUT1q24drOO6EHgeonctzWpJuVZiakOR2aPJV2Tdna0slME0cc5d
-X-Received: by 2002:a05:620a:2910:b0:915:8594:68dc with SMTP id af79cd13be357-915a9e05dbbmr1997918785a.55.1780855425365;
-        Sun, 07 Jun 2026 11:03:45 -0700 (PDT)
+        bh=ieQrk0iMm/Jw89W6/oIYRqCDXnQMovdFXuMRIAqU+5A=;
+        b=imqnph/tNuqe1LxHC9a0d/d2G0hy9Ch2bE7+TBOJEnPjYlDlBD0tpy/CbZks9cZxIH
+         rwicbAzqESJiKfeZf4a6rhebdHwQek9zwitJpXwgn5bF1iOOETDYwTzCwITqp521isiz
+         CG1sCsQ9q/xWXB3sv7IDuUN6cRUMuZj+/3w+hlML5kDONUmDbPsEcEgcVIBsUKeEB4A0
+         vk9jS/+3K0Xuz0Fb6AX0MIFrkhgqgYxEz34wSihAQUkd45/ycfhKYeFWfuaqzJWZPJAh
+         hnaBCoypJZuaH48d/yfYonrIx+NDuEIddExo0g0oe+lmDRQQq8t94wO9Tiaa2eJK2PVp
+         gS2A==
+X-Gm-Message-State: AOJu0YyxAtiUOLqNyWNtyIZaMPZsA+F6gVJUEDSJxJBsrKA+0VAx831K
+	sjOv0J5MqC3+dFWt40DZ9Ni0hOuG2pPABc6CzB0O7S5I9Avf5Oifo9+sCdTszokm7SQ=
+X-Gm-Gg: Acq92OFim4vR2C6/cQ7SSb+kae2CbKUNiY86DZ8N7CWbnVXesfkKwUJw7jlFhAfJv+/
+	NYTha/291pZ1Pxv9mcUsznm8671YVymxAxedtrY6UrUulsth3a+h6U47vKrZOTzWQRLVY78MpCv
+	f+I4YeLDnmNQ9S0cO8N8f/34MyY6Du8orF40plVFNSE6KP0QaYcvzGHV9rd/FZInhqckif11ki9
+	pnguit2B+gd9b/DoX4fU5LfOi7BJnGjCm8xv2QAKxXgt7qv8ehseOqv7NQVB1nat6HGPDZqD0z0
+	gg9aMuWvUbUxRBs7CoguVmu1X188mo8t7DLP2YEJ1bk7gtz2qmDVg4TC0Gf7S0/iZ4XPXRyaLTa
+	Wm+NG+z31I2kqW+fywrWYrgZ22OS0IS0fsxwKEy7VvmKeS6HODu56j+btxPh3Uq5uCmqRb94ZEN
+	KTYPs+x5QViUkMzoz/jHnEnNqTt4NaDiFdcv8/NnFAz2HOPvNVo3nsxfXgwR+LJyENTYkf33gFU
+	4PsGoV4pRYv2uuyetl8aqaz6bIv334ARP/7YwF9ywrMPYD1MVk0GmdhkRUOYCseWR77yHYjQDdH
+X-Received: by 2002:a05:620a:414f:b0:911:9e67:44cb with SMTP id af79cd13be357-915a9d6ed13mr2063772085a.38.1780855427707;
+        Sun, 07 Jun 2026 11:03:47 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a2359ecsm1489771785a.14.2026.06.07.11.03.44
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a2359ecsm1489771785a.14.2026.06.07.11.03.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 11:03:44 -0700 (PDT)
+        Sun, 07 Jun 2026 11:03:46 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -112,9 +112,9 @@ Cc: davem@davemloft.net,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
 	mef@scarletmail.rutgers.edu,
 	paul@jakma.org
-Subject: [PATCH net-next v13 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
-Date: Sun,  7 Jun 2026 14:01:23 -0400
-Message-ID: <686819eebb82be0eed7beea4f468284288c37536.1780855296.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v13 02/15] net: build socket infrastructure for QUIC protocol
+Date: Sun,  7 Jun 2026 14:01:24 -0400
+Message-ID: <dce78da9998995433bbfc8139e125dfe4905a5e5.1780855296.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1780855296.git.lucien.xin@gmail.com>
 References: <cover.1780855296.git.lucien.xin@gmail.com>
@@ -124,107 +124,1040 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-296272-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	TAGGED_FROM(0.00)[bounces-296275-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:quic@lists.linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:metze@samba.org,m:mbuhl@openbsd.org,m:tfanelli@redhat.com,m:hepengtao@xiaomi.com,m:dreibh@simula.no,m:linux-cifs@vger.kernel.org,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:tom@talpey.com,m:kernel-tls-handshake@lists.linux.dev,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:steved@redhat.com,m:hare@suse.de,m:aahringo@redhat.com,m:dhowells@redhat.com,m:matttbe@kernel.org,m:mail@johnericson.me,m:xiyou.wangcong@gmail.com,m:alibuda@linux.alibaba.com,m:jbaron@akamai.com,m:illiliti@protonmail.com,m:sd@queasysnail.net,m:marcelo.leitner@gmail.com,m:daniel@haxx.se,m:andrew.gospodarek@broadcom.com,m:mef@scarletmail.rutgers.edu,m:paul@jakma.org,m:xiyouwangcong@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,samba.org,openbsd.org,xiaomi.com,simula.no,vger.kernel.org,gmail.com,talpey.com,lists.linux.dev,oracle.com,suse.de,johnericson.me,linux.alibaba.com,akamai.com,protonmail.com,queasysnail.net,haxx.se,broadcom.com,scarletmail.rutgers.edu,jakma.org];
+	RCPT_COUNT_TWELVE(0.00)[35];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,vger.kernel.org:from_smtp,amd.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4DEE86512B6
+X-Rspamd-Queue-Id: A0DFD6512C4
 
-This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
-subsystem. These definitions are essential for applications to set
-socket options and protocol identifiers related to the QUIC protocol.
+This patch lays the groundwork for QUIC socket support in the kernel.
+It defines the core structures and protocol hooks needed to create
+QUIC sockets, without implementing any protocol behavior at this stage.
 
-QUIC does not possess a protocol number allocated from IANA, and like
-IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
-socket with:
+Basic integration is included to allow building the module via
+CONFIG_IP_QUIC=m.
 
-  socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
+This provides the scaffolding necessary for adding actual QUIC socket
+behavior in follow-up patches.
 
-Note we did not opt for UDP ULP for QUIC implementation due to several
-considerations:
-
-- QUIC's connection Migration requires at least 2 UDP sockets for one
-  QUIC connection at the same time, not to mention the multipath
-  feature in one of its draft RFCs.
-
-- In-Kernel QUIC, as a Transport Protocol, wants to provide users with
-  the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
-  Note that a single UDP socket might even be used for multiple QUIC
-  connections.
-
-The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
-address these challenges and provides a more flexible and scalable
-solution.
-
+Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
+v3:
+  - Kconfig: add 'default n' for IP_QUIC (reported by Paolo).
+  - quic_disconnect(): return -EOPNOTSUPP (suggested by Paolo).
+  - quic_init/destroy_sock(): drop local_bh_disable/enable() calls (noted
+    by Paolo).
+  - sysctl: add alpn_demux option to en/disable ALPN-based demux.
+  - SNMP: remove SNMP_MIB_SENTINEL, switch to
+    snmp_get_cpu_field_batch_cnt() to align with latest net-next changes.
+v4:
+  - Remove unnecessary READ_ONCE() in quic_inet_connect() (reported by
+    Paolo).
+v5:
+  - Update the type of the parameter 'addr' in quic_inet_connect(),
+    quic_connect(), and quic_bind() to match the latest net-next changes.
+  - Define quic_is_serv() to reuse sk->sk_max_ack_backlog for server-side
+    detection; path->serv will be deleted in a later patch.
+  - Use MODULE_ALIAS_NET_PF_PROTO instead of MODULE_ALIAS (suggested by
+    Stefan).
+  - Add the missing Documentation entry for the new sysctl options (noted
+    by Paolo).
+  - Add the missing MAINTAINERS entry for the QUIC PROTOCOL (noted by
+    Jakub).
+v6:
+  - Relocate the QUIC PROTOCOL MAINTAINERS entry to its proper section
+    (noted by Jakub).
+v7:
+  - Replace #ifdef CONFIG_XXX with #if IS_ENABLED(CONFIG_XXX) (noted by
+    Paolo).
+v8:
+  - Fix an issue where an uninitialized value could be returned from
+    quic_net_init() by initializing err to 0 (reported by AI review).
+  - Replace the global ALPN demultiplexing sysctl with a static key that
+    will be enabled only when ALPN is configured on a listening socket
+    (noted by Stefan).
+v10:
+  - Note for AI reviews: inet6_register_protosw() never fails for QUIC,
+    so checking its return value is unnecessary.
+  - Remove sk_sndbuf/sk_rcvbuf initialization in quic_init_sock(), as it's
+    already done in sock_init_data_uid() with sysctl_w/rmem_default.
 v11:
+  - Note for AI review: quic_sk(sk)->reqs is used only for listen sockets
+    and will be initialized in quic_inet_listen() in a later patch, so
+    there is no need to initialize it in quic_init_sock().
   - Set maximum line length to 80 characters.
+  - Drop addr_len from quic_recvmsg() to match the latest
+    proto_ops.recvmsg() update.
+  - Use %lu for SNMP counters in quic_snmp_seq_show().
+v12:
+  - Move the quic_table definition under #if IS_ENABLED(CONFIG_SYSCTL).
+  - Add comments and invoke sk_wake_async_rcu() in quic_write_space().
+  - Avoid overwriting sk->sk_destruct in quic_init_sock().
+  - Add quic_reqs list initialization in quic_init_sock().
 ---
- include/linux/socket.h  | 1 +
- include/uapi/linux/in.h | 2 ++
- 2 files changed, 3 insertions(+)
+ Documentation/networking/ip-sysctl.rst |  39 +++
+ MAINTAINERS                            |   7 +
+ net/Kconfig                            |   1 +
+ net/Makefile                           |   1 +
+ net/quic/Kconfig                       |  35 +++
+ net/quic/Makefile                      |   8 +
+ net/quic/protocol.c                    | 378 +++++++++++++++++++++++++
+ net/quic/protocol.h                    |  57 ++++
+ net/quic/socket.c                      | 214 ++++++++++++++
+ net/quic/socket.h                      |  89 ++++++
+ 10 files changed, 829 insertions(+)
+ create mode 100644 net/quic/Kconfig
+ create mode 100644 net/quic/Makefile
+ create mode 100644 net/quic/protocol.c
+ create mode 100644 net/quic/protocol.h
+ create mode 100644 net/quic/socket.c
+ create mode 100644 net/quic/socket.h
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index 1a4d0d128a13..77bcab269b3c 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -401,6 +401,7 @@ struct ucred {
- #define SOL_MCTP	285
- #define SOL_SMC		286
- #define SOL_VSOCK	287
-+#define SOL_QUIC	288
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 4c6a35d07a08..e50d42820f48 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -3805,6 +3805,45 @@ l3mdev_accept - BOOLEAN
+ 	Default: 1 (enabled)
  
- /* IPX options */
- #define IPX_TYPE	1
-diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-index ced0fc3c3aa5..e4072152f2e6 100644
---- a/include/uapi/linux/in.h
-+++ b/include/uapi/linux/in.h
-@@ -85,6 +85,8 @@ enum {
- #define IPPROTO_RAW		IPPROTO_RAW
-   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
- #define IPPROTO_SMC		IPPROTO_SMC
-+  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed Secure Transport */
-+#define IPPROTO_QUIC		IPPROTO_QUIC
-   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
- #define IPPROTO_MPTCP		IPPROTO_MPTCP
-   IPPROTO_MAX
+ 
++``/proc/sys/net/quic/*`` Variables
++===================================
++
++quic_mem - vector of 3 LONGs: min, pressure, max
++	Number of pages allowed for queueing by all QUIC sockets.
++
++	min: below this number of pages QUIC is not bothered about its
++	memory appetite.
++
++	pressure: when amount of memory allocated by QUIC exceeds this number
++	of pages, QUIC moderates its memory consumption and enters memory
++	pressure mode, which is exited when memory consumption falls
++	under "min".
++
++	max: number of pages allowed for queueing by all QUIC sockets.
++
++	Defaults are calculated at boot time from amount of available
++	memory.
++
++quic_rmem - vector of 3 INTEGERs: min, default, max
++	Only the first value ("min") is used, "default" and "max" are
++	ignored.
++
++	min: Minimal size of receive buffer used by QUIC sockets.
++	It is guaranteed to each QUIC socket, even under moderate memory
++	pressure.
++
++	Default: 4K
++
++quic_wmem - vector of 3 INTEGERs: min, default, max
++	Only the first value ("min") is used, "default" and "max" are
++	ignored.
++
++	min: Amount of memory reserved for send buffers for QUIC sockets.
++	Each QUIC socket has rights to use it due to fact of its birth.
++
++	Default: 4K
++
++
+ ``/proc/sys/net/core/*``
+ ========================
+ 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index eb8cdcc76324..fcb0c8617fe4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22171,6 +22171,13 @@ L:	linux-wireless@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/wireless/quantenna/
+ 
++QUIC PROTOCOL
++M:	Xin Long <lucien.xin@gmail.com>
++L:	quic@lists.linux.dev
++S:	Maintained
++W:	https://github.com/lxin/quic
++F:	net/quic/
++
+ RADEON and AMDGPU DRM DRIVERS
+ M:	Alex Deucher <alexander.deucher@amd.com>
+ M:	Christian König <christian.koenig@amd.com>
+diff --git a/net/Kconfig b/net/Kconfig
+index bdea8aef7983..b481a720f2e2 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -251,6 +251,7 @@ source "net/bridge/netfilter/Kconfig"
+ 
+ endif # if NETFILTER
+ 
++source "net/quic/Kconfig"
+ source "net/sctp/Kconfig"
+ source "net/rds/Kconfig"
+ source "net/tipc/Kconfig"
+diff --git a/net/Makefile b/net/Makefile
+index d2175fce0406..c50ee5fde65a 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -40,6 +40,7 @@ obj-$(CONFIG_PHONET)		+= phonet/
+ ifneq ($(CONFIG_VLAN_8021Q),)
+ obj-y				+= 8021q/
+ endif
++obj-$(CONFIG_IP_QUIC)		+= quic/
+ obj-$(CONFIG_IP_SCTP)		+= sctp/
+ obj-$(CONFIG_RDS)		+= rds/
+ obj-$(CONFIG_WIRELESS)		+= wireless/
+diff --git a/net/quic/Kconfig b/net/quic/Kconfig
+new file mode 100644
+index 000000000000..602e6d89eafd
+--- /dev/null
++++ b/net/quic/Kconfig
+@@ -0,0 +1,35 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# QUIC configuration
++#
++
++menuconfig IP_QUIC
++	tristate "QUIC: A UDP-Based Multiplexed Secure Transport (Experimental)"
++	depends on INET
++	depends on IPV6
++	select CRYPTO
++	select CRYPTO_HMAC
++	select CRYPTO_AES
++	select CRYPTO_GCM
++	select CRYPTO_CCM
++	select CRYPTO_CHACHA20POLY1305
++	select NET_UDP_TUNNEL
++	default n
++	help
++	  QUIC: A UDP-Based Multiplexed and Secure Transport
++
++	  From rfc9000 <https://www.rfc-editor.org/rfc/rfc9000.html>.
++
++	  QUIC provides applications with flow-controlled streams for structured
++	  communication, low-latency connection establishment, and network path
++	  migration.  QUIC includes security measures that ensure
++	  confidentiality, integrity, and availability in a range of deployment
++	  circumstances.  Accompanying documents describe the integration of
++	  TLS for key negotiation, loss detection, and an exemplary congestion
++	  control algorithm.
++
++	  To compile this protocol support as a module, choose M here: the
++	  module will be called quic. Debug messages are handled by the
++	  kernel's dynamic debugging framework.
++
++	  If in doubt, say N.
+diff --git a/net/quic/Makefile b/net/quic/Makefile
+new file mode 100644
+index 000000000000..020e4dd133d8
+--- /dev/null
++++ b/net/quic/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Makefile for QUIC support code.
++#
++
++obj-$(CONFIG_IP_QUIC) += quic.o
++
++quic-y := protocol.o socket.o
+diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+new file mode 100644
+index 000000000000..fac7f9808eeb
+--- /dev/null
++++ b/net/quic/protocol.c
+@@ -0,0 +1,378 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* QUIC kernel implementation
++ * (C) Copyright Red Hat Corp. 2023
++ *
++ * This file is part of the QUIC kernel implementation
++ *
++ * Initialization/cleanup for QUIC protocol support.
++ *
++ * Written or modified by:
++ *    Xin Long <lucien.xin@gmail.com>
++ */
++
++#include <net/inet_common.h>
++#include <linux/proc_fs.h>
++#include <net/protocol.h>
++#include <net/rps.h>
++#include <net/tls.h>
++
++#include "socket.h"
++
++static unsigned int quic_net_id __read_mostly;
++
++struct percpu_counter quic_sockets_allocated;
++
++DEFINE_STATIC_KEY_FALSE(quic_alpn_demux_key);
++
++long sysctl_quic_mem[3];
++int sysctl_quic_rmem[3];
++int sysctl_quic_wmem[3];
++
++static int quic_inet_connect(struct socket *sock, struct sockaddr_unsized *addr,
++			     int addr_len, int flags)
++{
++	struct sock *sk = sock->sk;
++
++	if (addr_len < (int)sizeof(addr->sa_family))
++		return -EINVAL;
++
++	return sk->sk_prot->connect(sk, addr, addr_len);
++}
++
++static int quic_inet_listen(struct socket *sock, int backlog)
++{
++	return -EOPNOTSUPP;
++}
++
++static int quic_inet_getname(struct socket *sock, struct sockaddr *uaddr,
++			     int peer)
++{
++	return -EOPNOTSUPP;
++}
++
++static __poll_t quic_inet_poll(struct file *file, struct socket *sock,
++			       poll_table *wait)
++{
++	return 0;
++}
++
++struct quic_net *quic_net(struct net *net)
++{
++	return net_generic(net, quic_net_id);
++}
++
++#if IS_ENABLED(CONFIG_PROC_FS)
++static const struct snmp_mib quic_snmp_list[] = {
++	SNMP_MIB_ITEM("QuicConnCurrentEstabs", QUIC_MIB_CONN_CURRENTESTABS),
++	SNMP_MIB_ITEM("QuicConnPassiveEstabs", QUIC_MIB_CONN_PASSIVEESTABS),
++	SNMP_MIB_ITEM("QuicConnActiveEstabs", QUIC_MIB_CONN_ACTIVEESTABS),
++	SNMP_MIB_ITEM("QuicPktRcvFastpaths", QUIC_MIB_PKT_RCVFASTPATHS),
++	SNMP_MIB_ITEM("QuicPktDecFastpaths", QUIC_MIB_PKT_DECFASTPATHS),
++	SNMP_MIB_ITEM("QuicPktEncFastpaths", QUIC_MIB_PKT_ENCFASTPATHS),
++	SNMP_MIB_ITEM("QuicPktRcvBacklogs", QUIC_MIB_PKT_RCVBACKLOGS),
++	SNMP_MIB_ITEM("QuicPktDecBacklogs", QUIC_MIB_PKT_DECBACKLOGS),
++	SNMP_MIB_ITEM("QuicPktEncBacklogs", QUIC_MIB_PKT_ENCBACKLOGS),
++	SNMP_MIB_ITEM("QuicPktInvHdrDrop", QUIC_MIB_PKT_INVHDRDROP),
++	SNMP_MIB_ITEM("QuicPktInvNumDrop", QUIC_MIB_PKT_INVNUMDROP),
++	SNMP_MIB_ITEM("QuicPktInvFrmDrop", QUIC_MIB_PKT_INVFRMDROP),
++	SNMP_MIB_ITEM("QuicPktRcvDrop", QUIC_MIB_PKT_RCVDROP),
++	SNMP_MIB_ITEM("QuicPktDecDrop", QUIC_MIB_PKT_DECDROP),
++	SNMP_MIB_ITEM("QuicPktEncDrop", QUIC_MIB_PKT_ENCDROP),
++	SNMP_MIB_ITEM("QuicFrmRcvBufDrop", QUIC_MIB_FRM_RCVBUFDROP),
++	SNMP_MIB_ITEM("QuicFrmRetrans", QUIC_MIB_FRM_RETRANS),
++	SNMP_MIB_ITEM("QuicFrmOutCloses", QUIC_MIB_FRM_OUTCLOSES),
++	SNMP_MIB_ITEM("QuicFrmInCloses", QUIC_MIB_FRM_INCLOSES),
++};
++
++static int quic_snmp_seq_show(struct seq_file *seq, void *v)
++{
++	unsigned long buff[ARRAY_SIZE(quic_snmp_list)];
++	const int cnt = ARRAY_SIZE(quic_snmp_list);
++	struct net *net = seq->private;
++	u32 idx;
++
++	memset(buff, 0, sizeof(buff));
++
++	snmp_get_cpu_field_batch_cnt(buff, quic_snmp_list, cnt,
++				     quic_net(net)->stat);
++	for (idx = 0; idx < cnt; idx++)
++		seq_printf(seq, "%-32s\t%lu\n", quic_snmp_list[idx].name,
++			   buff[idx]);
++
++	return 0;
++}
++
++static int quic_net_proc_init(struct net *net)
++{
++	quic_net(net)->proc_net = proc_net_mkdir(net, "quic", net->proc_net);
++	if (!quic_net(net)->proc_net)
++		return -ENOMEM;
++
++	if (!proc_create_net_single("snmp", 0444, quic_net(net)->proc_net,
++				    quic_snmp_seq_show, NULL))
++		goto free;
++	return 0;
++free:
++	remove_proc_subtree("quic", net->proc_net);
++	quic_net(net)->proc_net = NULL;
++	return -ENOMEM;
++}
++
++static void quic_net_proc_exit(struct net *net)
++{
++	remove_proc_subtree("quic", net->proc_net);
++	quic_net(net)->proc_net = NULL;
++}
++#endif
++
++static const struct proto_ops quic_proto_ops = {
++	.family		   = PF_INET,
++	.owner		   = THIS_MODULE,
++	.release	   = inet_release,
++	.bind		   = inet_bind,
++	.connect	   = quic_inet_connect,
++	.socketpair	   = sock_no_socketpair,
++	.accept		   = inet_accept,
++	.getname	   = quic_inet_getname,
++	.poll		   = quic_inet_poll,
++	.ioctl		   = inet_ioctl,
++	.gettstamp	   = sock_gettstamp,
++	.listen		   = quic_inet_listen,
++	.shutdown	   = inet_shutdown,
++	.setsockopt	   = sock_common_setsockopt,
++	.getsockopt	   = sock_common_getsockopt,
++	.sendmsg	   = inet_sendmsg,
++	.recvmsg	   = inet_recvmsg,
++	.mmap		   = sock_no_mmap,
++};
++
++static struct inet_protosw quic_stream_protosw = {
++	.type       = SOCK_STREAM,
++	.protocol   = IPPROTO_QUIC,
++	.prot       = &quic_prot,
++	.ops        = &quic_proto_ops,
++};
++
++static struct inet_protosw quic_dgram_protosw = {
++	.type       = SOCK_DGRAM,
++	.protocol   = IPPROTO_QUIC,
++	.prot       = &quic_prot,
++	.ops        = &quic_proto_ops,
++};
++
++static const struct proto_ops quicv6_proto_ops = {
++	.family		   = PF_INET6,
++	.owner		   = THIS_MODULE,
++	.release	   = inet6_release,
++	.bind		   = inet6_bind,
++	.connect	   = quic_inet_connect,
++	.socketpair	   = sock_no_socketpair,
++	.accept		   = inet_accept,
++	.getname	   = quic_inet_getname,
++	.poll		   = quic_inet_poll,
++	.ioctl		   = inet6_ioctl,
++	.gettstamp	   = sock_gettstamp,
++	.listen		   = quic_inet_listen,
++	.shutdown	   = inet_shutdown,
++	.setsockopt	   = sock_common_setsockopt,
++	.getsockopt	   = sock_common_getsockopt,
++	.sendmsg	   = inet_sendmsg,
++	.recvmsg	   = inet_recvmsg,
++	.mmap		   = sock_no_mmap,
++};
++
++static struct inet_protosw quicv6_stream_protosw = {
++	.type       = SOCK_STREAM,
++	.protocol   = IPPROTO_QUIC,
++	.prot       = &quicv6_prot,
++	.ops        = &quicv6_proto_ops,
++};
++
++static struct inet_protosw quicv6_dgram_protosw = {
++	.type       = SOCK_DGRAM,
++	.protocol   = IPPROTO_QUIC,
++	.prot       = &quicv6_prot,
++	.ops        = &quicv6_proto_ops,
++};
++
++static int quic_protosw_init(void)
++{
++	int err;
++
++	err = proto_register(&quic_prot, 1);
++	if (err)
++		return err;
++
++	err = proto_register(&quicv6_prot, 1);
++	if (err) {
++		proto_unregister(&quic_prot);
++		return err;
++	}
++
++	inet_register_protosw(&quic_stream_protosw);
++	inet_register_protosw(&quic_dgram_protosw);
++	inet6_register_protosw(&quicv6_stream_protosw);
++	inet6_register_protosw(&quicv6_dgram_protosw);
++
++	return 0;
++}
++
++static void quic_protosw_exit(void)
++{
++	inet_unregister_protosw(&quic_dgram_protosw);
++	inet_unregister_protosw(&quic_stream_protosw);
++	proto_unregister(&quic_prot);
++
++	inet6_unregister_protosw(&quicv6_dgram_protosw);
++	inet6_unregister_protosw(&quicv6_stream_protosw);
++	proto_unregister(&quicv6_prot);
++}
++
++static int __net_init quic_net_init(struct net *net)
++{
++	struct quic_net *qn = quic_net(net);
++	int err = 0;
++
++	qn->stat = alloc_percpu(struct quic_mib);
++	if (!qn->stat)
++		return -ENOMEM;
++
++#if IS_ENABLED(CONFIG_PROC_FS)
++	err = quic_net_proc_init(net);
++	if (err) {
++		free_percpu(qn->stat);
++		qn->stat = NULL;
++	}
++#endif
++	return err;
++}
++
++static void __net_exit quic_net_exit(struct net *net)
++{
++	struct quic_net *qn = quic_net(net);
++
++#if IS_ENABLED(CONFIG_PROC_FS)
++	quic_net_proc_exit(net);
++#endif
++	free_percpu(qn->stat);
++	qn->stat = NULL;
++}
++
++static struct pernet_operations quic_net_ops = {
++	.init = quic_net_init,
++	.exit = quic_net_exit,
++	.id   = &quic_net_id,
++	.size = sizeof(struct quic_net),
++};
++
++#if IS_ENABLED(CONFIG_SYSCTL)
++static struct ctl_table_header *quic_sysctl_header;
++
++static struct ctl_table quic_table[] = {
++	{
++		.procname	= "quic_mem",
++		.data		= &sysctl_quic_mem,
++		.maxlen		= sizeof(sysctl_quic_mem),
++		.mode		= 0644,
++		.proc_handler	= proc_doulongvec_minmax
++	},
++	{
++		.procname	= "quic_rmem",
++		.data		= &sysctl_quic_rmem,
++		.maxlen		= sizeof(sysctl_quic_rmem),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++	},
++	{
++		.procname	= "quic_wmem",
++		.data		= &sysctl_quic_wmem,
++		.maxlen		= sizeof(sysctl_quic_wmem),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++	},
++};
++
++static void quic_sysctl_register(void)
++{
++	quic_sysctl_header = register_net_sysctl(&init_net, "net/quic",
++						 quic_table);
++}
++
++static void quic_sysctl_unregister(void)
++{
++	unregister_net_sysctl_table(quic_sysctl_header);
++}
++#endif
++
++static __init int quic_init(void)
++{
++	int max_share, err = -ENOMEM;
++	unsigned long limit;
++
++	/* Set QUIC memory limits based on available system memory, similar to
++	 * sctp_init().
++	 */
++	limit = nr_free_buffer_pages() / 8;
++	limit = max(limit, 128UL);
++	sysctl_quic_mem[0] = (long)limit / 4 * 3;
++	sysctl_quic_mem[1] = (long)limit;
++	sysctl_quic_mem[2] = sysctl_quic_mem[0] * 2;
++
++	limit = (sysctl_quic_mem[1]) << (PAGE_SHIFT - 7);
++	max_share = min(4UL * 1024 * 1024, limit);
++
++	sysctl_quic_rmem[0] = PAGE_SIZE;
++	sysctl_quic_rmem[1] = 1024 * 1024;
++	sysctl_quic_rmem[2] = max(sysctl_quic_rmem[1], max_share);
++
++	sysctl_quic_wmem[0] = PAGE_SIZE;
++	sysctl_quic_wmem[1] = 16 * 1024;
++	sysctl_quic_wmem[2] = max(64 * 1024, max_share);
++
++	err = percpu_counter_init(&quic_sockets_allocated, 0, GFP_KERNEL);
++	if (err)
++		goto err_percpu_counter;
++
++	err = register_pernet_subsys(&quic_net_ops);
++	if (err)
++		goto err_def_ops;
++
++	err = quic_protosw_init();
++	if (err)
++		goto err_protosw;
++
++#if IS_ENABLED(CONFIG_SYSCTL)
++	quic_sysctl_register();
++#endif
++	pr_info("quic: init\n");
++	return 0;
++
++err_protosw:
++	unregister_pernet_subsys(&quic_net_ops);
++err_def_ops:
++	percpu_counter_destroy(&quic_sockets_allocated);
++err_percpu_counter:
++	return err;
++}
++
++static __exit void quic_exit(void)
++{
++#if IS_ENABLED(CONFIG_SYSCTL)
++	quic_sysctl_unregister();
++#endif
++	quic_protosw_exit();
++	unregister_pernet_subsys(&quic_net_ops);
++	percpu_counter_destroy(&quic_sockets_allocated);
++	pr_info("quic: exit\n");
++}
++
++module_init(quic_init);
++module_exit(quic_exit);
++
++MODULE_ALIAS_NET_PF_PROTO(PF_INET, 261); /* IPPROTO_QUIC == 261 */
++MODULE_ALIAS_NET_PF_PROTO(PF_INET6, 261);
++MODULE_AUTHOR("Xin Long <lucien.xin@gmail.com>");
++MODULE_DESCRIPTION("Support for the QUIC protocol (RFC9000)");
++MODULE_LICENSE("GPL");
+diff --git a/net/quic/protocol.h b/net/quic/protocol.h
+new file mode 100644
+index 000000000000..fbd0fe39eccc
+--- /dev/null
++++ b/net/quic/protocol.h
+@@ -0,0 +1,57 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* QUIC kernel implementation
++ * (C) Copyright Red Hat Corp. 2023
++ *
++ * This file is part of the QUIC kernel implementation
++ *
++ * Written or modified by:
++ *    Xin Long <lucien.xin@gmail.com>
++ */
++
++extern struct percpu_counter quic_sockets_allocated;
++
++DECLARE_STATIC_KEY_FALSE(quic_alpn_demux_key);
++
++extern long sysctl_quic_mem[3];
++extern int sysctl_quic_rmem[3];
++extern int sysctl_quic_wmem[3];
++
++enum {
++	QUIC_MIB_NUM = 0,
++	QUIC_MIB_CONN_CURRENTESTABS, /* Current established connections */
++	QUIC_MIB_CONN_PASSIVEESTABS, /* Passively established connections */
++	QUIC_MIB_CONN_ACTIVEESTABS,  /* Actively established connections */
++	QUIC_MIB_PKT_RCVFASTPATHS,   /* Packets received on fast path */
++	QUIC_MIB_PKT_DECFASTPATHS,   /* Packets decrypted on fast path */
++	QUIC_MIB_PKT_ENCFASTPATHS,   /* Packets encrypted on fast path */
++	QUIC_MIB_PKT_RCVBACKLOGS,    /* Packets processed via backlog */
++	QUIC_MIB_PKT_DECBACKLOGS,    /* Packets decrypted in backlog */
++	QUIC_MIB_PKT_ENCBACKLOGS,    /* Packets encrypted in backlog */
++	QUIC_MIB_PKT_INVHDRDROP,     /* Dropped: invalid packet header */
++	QUIC_MIB_PKT_INVNUMDROP,     /* Dropped: invalid packet number */
++	QUIC_MIB_PKT_INVFRMDROP,     /* Dropped: invalid frame */
++	QUIC_MIB_PKT_RCVDROP,        /* Dropped on receive (general) */
++	QUIC_MIB_PKT_DECDROP,        /* Dropped: decryption failure */
++	QUIC_MIB_PKT_ENCDROP,        /* Dropped: encryption failure */
++	QUIC_MIB_FRM_RCVBUFDROP,     /* Frames dropped: recv buf limit */
++	QUIC_MIB_FRM_RETRANS,        /* Frames retransmitted */
++	QUIC_MIB_FRM_OUTCLOSES,      /* CONNECTION_CLOSE frames sent */
++	QUIC_MIB_FRM_INCLOSES,       /* CONNECTION_CLOSE frames rcvd */
++	QUIC_MIB_MAX
++};
++
++struct quic_mib {
++	unsigned long mibs[QUIC_MIB_MAX]; /* Counters indexed by QUIC_MIB_* */
++};
++
++struct quic_net {
++	DEFINE_SNMP_STAT(struct quic_mib, stat); /* Per-net QUIC MIB stats */
++#if IS_ENABLED(CONFIG_PROC_FS)
++	struct proc_dir_entry *proc_net; /* procfs entry for QUIC stats */
++#endif
++};
++
++struct quic_net *quic_net(struct net *net);
++
++#define QUIC_INC_STATS(net, field) SNMP_INC_STATS(quic_net(net)->stat, field)
++#define QUIC_DEC_STATS(net, field) SNMP_DEC_STATS(quic_net(net)->stat, field)
+diff --git a/net/quic/socket.c b/net/quic/socket.c
+new file mode 100644
+index 000000000000..a0d31854d0ab
+--- /dev/null
++++ b/net/quic/socket.c
+@@ -0,0 +1,214 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* QUIC kernel implementation
++ * (C) Copyright Red Hat Corp. 2023
++ *
++ * This file is part of the QUIC kernel implementation
++ *
++ * Initialization/cleanup for QUIC protocol support.
++ *
++ * Written or modified by:
++ *    Xin Long <lucien.xin@gmail.com>
++ */
++
++#include <net/inet_common.h>
++#include <net/tls.h>
++
++#include "socket.h"
++
++static DEFINE_PER_CPU(int, quic_memory_per_cpu_fw_alloc);
++static unsigned long quic_memory_pressure;
++static atomic_long_t quic_memory_allocated;
++
++static void quic_enter_memory_pressure(struct sock *sk)
++{
++	WRITE_ONCE(quic_memory_pressure, 1);
++}
++
++static void quic_write_space(struct sock *sk)
++{
++	__poll_t mask = EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
++	struct socket_wq *wq;
++
++	/* Do not check sock_writeable(). Also wakes stream-open waiters
++	 * blocked on stream limits, where sock_writeable() may be false.
++	 */
++	rcu_read_lock();
++	wq = rcu_dereference(sk->sk_wq);
++	if (skwq_has_sleeper(wq))
++		wake_up_interruptible_sync_poll(&wq->wait, mask);
++	sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
++	rcu_read_unlock();
++}
++
++static int quic_init_sock(struct sock *sk)
++{
++	sk->sk_write_space = quic_write_space;
++	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
++
++	sk_sockets_allocated_inc(sk);
++	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
++	INIT_LIST_HEAD(quic_reqs(sk));
++
++	return 0;
++}
++
++static void quic_destroy_sock(struct sock *sk)
++{
++	sk_sockets_allocated_dec(sk);
++	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
++}
++
++static int quic_bind(struct sock *sk, struct sockaddr_unsized *addr,
++		     int addr_len)
++{
++	return -EOPNOTSUPP;
++}
++
++static int quic_connect(struct sock *sk, struct sockaddr_unsized *addr,
++			int addr_len)
++{
++	return -EOPNOTSUPP;
++}
++
++static int quic_hash(struct sock *sk)
++{
++	return 0;
++}
++
++static void quic_unhash(struct sock *sk)
++{
++}
++
++static int quic_sendmsg(struct sock *sk, struct msghdr *msg, size_t msg_len)
++{
++	return -EOPNOTSUPP;
++}
++
++static int quic_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
++			int flags)
++{
++	return -EOPNOTSUPP;
++}
++
++static struct sock *quic_accept(struct sock *sk, struct proto_accept_arg *arg)
++{
++	arg->err = -EOPNOTSUPP;
++	return NULL;
++}
++
++static void quic_close(struct sock *sk, long timeout)
++{
++	lock_sock(sk);
++
++	quic_set_state(sk, QUIC_SS_CLOSED);
++
++	release_sock(sk);
++
++	sk_common_release(sk);
++}
++
++static int quic_do_setsockopt(struct sock *sk, int optname, sockptr_t optval,
++			      unsigned int optlen)
++{
++	return -EOPNOTSUPP;
++}
++
++static int quic_setsockopt(struct sock *sk, int level, int optname,
++			   sockptr_t optval, unsigned int optlen)
++{
++	if (level != SOL_QUIC)
++		return -EOPNOTSUPP;
++
++	return quic_do_setsockopt(sk, optname, optval, optlen);
++}
++
++static int quic_do_getsockopt(struct sock *sk, int optname, sockptr_t optval,
++			      sockptr_t optlen)
++{
++	return -EOPNOTSUPP;
++}
++
++static int quic_getsockopt(struct sock *sk, int level, int optname,
++			   char __user *optval, int __user *optlen)
++{
++	if (level != SOL_QUIC)
++		return -EOPNOTSUPP;
++
++	return quic_do_getsockopt(sk, optname, USER_SOCKPTR(optval),
++				  USER_SOCKPTR(optlen));
++}
++
++static void quic_release_cb(struct sock *sk)
++{
++}
++
++static int quic_disconnect(struct sock *sk, int flags)
++{
++	return -EOPNOTSUPP;
++}
++
++static void quic_shutdown(struct sock *sk, int how)
++{
++	quic_set_state(sk, QUIC_SS_CLOSED);
++}
++
++struct proto quic_prot = {
++	.name		=  "QUIC",
++	.owner		=  THIS_MODULE,
++	.init		=  quic_init_sock,
++	.destroy	=  quic_destroy_sock,
++	.shutdown	=  quic_shutdown,
++	.setsockopt	=  quic_setsockopt,
++	.getsockopt	=  quic_getsockopt,
++	.connect	=  quic_connect,
++	.bind		=  quic_bind,
++	.close		=  quic_close,
++	.disconnect	=  quic_disconnect,
++	.sendmsg	=  quic_sendmsg,
++	.recvmsg	=  quic_recvmsg,
++	.accept		=  quic_accept,
++	.hash		=  quic_hash,
++	.unhash		=  quic_unhash,
++	.release_cb	=  quic_release_cb,
++	.no_autobind	=  true,
++	.obj_size	=  sizeof(struct quic_sock),
++	.sysctl_mem		=  sysctl_quic_mem,
++	.sysctl_rmem		=  sysctl_quic_rmem,
++	.sysctl_wmem		=  sysctl_quic_wmem,
++	.memory_pressure	=  &quic_memory_pressure,
++	.enter_memory_pressure	=  quic_enter_memory_pressure,
++	.memory_allocated	=  &quic_memory_allocated,
++	.per_cpu_fw_alloc	=  &quic_memory_per_cpu_fw_alloc,
++	.sockets_allocated	=  &quic_sockets_allocated,
++};
++
++struct proto quicv6_prot = {
++	.name		=  "QUICv6",
++	.owner		=  THIS_MODULE,
++	.init		=  quic_init_sock,
++	.destroy	=  quic_destroy_sock,
++	.shutdown	=  quic_shutdown,
++	.setsockopt	=  quic_setsockopt,
++	.getsockopt	=  quic_getsockopt,
++	.connect	=  quic_connect,
++	.bind		=  quic_bind,
++	.close		=  quic_close,
++	.disconnect	=  quic_disconnect,
++	.sendmsg	=  quic_sendmsg,
++	.recvmsg	=  quic_recvmsg,
++	.accept		=  quic_accept,
++	.hash		=  quic_hash,
++	.unhash		=  quic_unhash,
++	.release_cb	=  quic_release_cb,
++	.no_autobind	=  true,
++	.obj_size	= sizeof(struct quic6_sock),
++	.ipv6_pinfo_offset	=  offsetof(struct quic6_sock, inet6),
++	.sysctl_mem		=  sysctl_quic_mem,
++	.sysctl_rmem		=  sysctl_quic_rmem,
++	.sysctl_wmem		=  sysctl_quic_wmem,
++	.memory_pressure	=  &quic_memory_pressure,
++	.enter_memory_pressure	=  quic_enter_memory_pressure,
++	.memory_allocated	=  &quic_memory_allocated,
++	.per_cpu_fw_alloc	=  &quic_memory_per_cpu_fw_alloc,
++	.sockets_allocated	=  &quic_sockets_allocated,
++};
+diff --git a/net/quic/socket.h b/net/quic/socket.h
+new file mode 100644
+index 000000000000..98d3f738e909
+--- /dev/null
++++ b/net/quic/socket.h
+@@ -0,0 +1,89 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* QUIC kernel implementation
++ * (C) Copyright Red Hat Corp. 2023
++ *
++ * This file is part of the QUIC kernel implementation
++ *
++ * Written or modified by:
++ *    Xin Long <lucien.xin@gmail.com>
++ */
++
++#include <net/udp_tunnel.h>
++
++#include "protocol.h"
++
++extern struct proto quic_prot;
++extern struct proto quicv6_prot;
++
++enum quic_state {
++	QUIC_SS_CLOSED		= TCP_CLOSE,
++	QUIC_SS_LISTENING	= TCP_LISTEN,
++	QUIC_SS_ESTABLISHING	= TCP_SYN_RECV,
++	QUIC_SS_ESTABLISHED	= TCP_ESTABLISHED,
++};
++
++struct quic_sock {
++	struct inet_sock		inet;
++	struct list_head		reqs;
++};
++
++struct quic6_sock {
++	struct quic_sock	quic;
++	struct ipv6_pinfo	inet6;
++};
++
++static inline struct quic_sock *quic_sk(const struct sock *sk)
++{
++	return (struct quic_sock *)sk;
++}
++
++static inline struct list_head *quic_reqs(const struct sock *sk)
++{
++	return &quic_sk(sk)->reqs;
++}
++
++static inline bool quic_is_serv(const struct sock *sk)
++{
++	return !!sk->sk_max_ack_backlog;
++}
++
++static inline bool quic_is_establishing(struct sock *sk)
++{
++	return sk->sk_state == QUIC_SS_ESTABLISHING;
++}
++
++static inline bool quic_is_established(struct sock *sk)
++{
++	return sk->sk_state == QUIC_SS_ESTABLISHED;
++}
++
++static inline bool quic_is_listen(struct sock *sk)
++{
++	return sk->sk_state == QUIC_SS_LISTENING;
++}
++
++static inline bool quic_is_closed(struct sock *sk)
++{
++	return sk->sk_state == QUIC_SS_CLOSED;
++}
++
++static inline void quic_set_state(struct sock *sk, int state)
++{
++	struct net *net = sock_net(sk);
++	int mib;
++
++	if (sk->sk_state == state)
++		return;
++
++	if (state == QUIC_SS_ESTABLISHED) {
++		mib = quic_is_serv(sk) ? QUIC_MIB_CONN_PASSIVEESTABS :
++					 QUIC_MIB_CONN_ACTIVEESTABS;
++		QUIC_INC_STATS(net, mib);
++		QUIC_INC_STATS(net, QUIC_MIB_CONN_CURRENTESTABS);
++	} else if (quic_is_established(sk)) {
++		QUIC_DEC_STATS(net, QUIC_MIB_CONN_CURRENTESTABS);
++	}
++
++	inet_sk_set_state(sk, state);
++	sk->sk_state_change(sk);
++}
 -- 
 2.47.1
 
