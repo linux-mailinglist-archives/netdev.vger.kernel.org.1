@@ -1,292 +1,131 @@
-Return-Path: <netdev+bounces-296303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L+klKem7JWpzLAIAu9opvQ
-	(envelope-from <netdev+bounces-296303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:43:53 +0200
+	id 8EsqD2+9JWq9LAIAu9opvQ
+	(envelope-from <netdev+bounces-296304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:50:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 212BC6514B0
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:43:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF36651502
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 20:50:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=VpQx7zJ+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296303-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296303-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=0CnGAI4M;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296304-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296304-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 64B043007963
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 18:43:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3BDC0300A744
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 18:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AB72D8793;
-	Sun,  7 Jun 2026 18:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924032E6CC7;
+	Sun,  7 Jun 2026 18:48:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6040630E838;
-	Sun,  7 Jun 2026 18:43:47 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780857828; cv=fail; b=RRv5CtKfvUZNQDWPyKwughz9cH1/E06S0syP3J3Ctp1JEQDP6HbdzH/yu73dlOLaYjbhHn6A7tCg/0qLYG0sM0lenefCEPaERNwwWUVuy40mQvih/qPym1o2WBGjWBTT/nI06/xRGYOt7hSO+8D5q4lbY7gn6i1S2ZBDkTX6/9k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780857828; c=relaxed/simple;
-	bh=mXVBOGBDXOHHZmQ9dVxgvwPBvTbzq8rfAPBeUtEg8Sc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=b44mW78sQWMx4byyqEaecPNXCrfNkwZBJXtS4ov9qQC7h17kKxzbd0U8YMdyqGpY5xxHpDUrfM8wQCxllLxkrvHFP7J+gDEO1xmKPI30IG03I6H3zCONPJMPC2TP6mqHPhGTV6yIyESAePdXXZ6GmRupE8DmbNKK4siQkIotNHw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VpQx7zJ+; arc=fail smtp.client-ip=198.175.65.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780857827; x=1812393827;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mXVBOGBDXOHHZmQ9dVxgvwPBvTbzq8rfAPBeUtEg8Sc=;
-  b=VpQx7zJ+ZoKP+8KJH7nULSb4NCsPeJxEvg+oGkkxFNJxyK1KFZ08Rdiv
-   wipMw5hooof7AppaSAjGKoFAcyPYU+6e4YqoalJP6B1HHkFIMQmRO+gpi
-   7lHsyzph59eEJYB/mjNt6Odvvn0Eun3DsDpqArC+i2b32nAkcmXPWXzRb
-   PbVpqY1WOD4BsT7/IJeDfMfWg8KEZec9oZWYs//sVQu+sH4m6YjN+ieBX
-   usT5gjM5HMDa3nTpKutcGc7kgB3SC5p3zLn6W+fVXuSduEkWGDxEt5SRe
-   jeZnRtzkJ8wu0rH51Elblt+RNbTOyFuNWv8fYwQpoAYFxZYb4CWncu+DX
-   A==;
-X-CSE-ConnectionGUID: bpqq5JQORE2jbL85NNXu9Q==
-X-CSE-MsgGUID: dy0zk/abRN2HhVnAodJaxg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11810"; a="81664489"
-X-IronPort-AV: E=Sophos;i="6.24,193,1774335600"; 
-   d="scan'208";a="81664489"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2026 11:43:47 -0700
-X-CSE-ConnectionGUID: hoq6MSf5R7Ojj8TuvAeeVA==
-X-CSE-MsgGUID: MJxUALnpSDSvSg9IUrj5Mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,193,1774335600"; 
-   d="scan'208";a="241153954"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2026 11:43:47 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sun, 7 Jun 2026 11:43:46 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Sun, 7 Jun 2026 11:43:46 -0700
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.44) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sun, 7 Jun 2026 11:43:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i4Q5WHBfuXDY6JSkSrqjXWOrWUTlBPJXp7mqfYxqASnoVIQlxjc2SwSB7YMzcW3PCVqrEqVwytjM579gvbjBwwjNdKEGvLM7noHACh4X9qTBK0I32nqoUSJhhhZJlmkbhC3Xr1fHZWi5qSy52Sm97oK2wsqXFYi1emVmNNkVF4/sWos/9vnnpoZ3ppzrmDnNBJjoijn7cmJu3jiZX3rjgJQqQoDece6iifZL/7/ffg6VUwDBpvdpaUDq++N6hfjAzkVC91kmJ8iXL0lX8GpKxi7lVcLsdRZHo9/oy7rwF5IyfTl0T9qakAaEK6QWXxWzFsU+mGSBDRr2KKlO2y5H4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EjtkuncPzpU+zLvkBIiESV+ZeOqOheMDo2Qtqj6iFrQ=;
- b=nNJZy/6rDPtSFUykY2OuEEf1XipdVw3dMRZ2lwh//42BetLaZdTAskBh1xwXZc+2AlJJVuRoDcu25etpSaL3EshZw3VImjcI+J+GiEQRpKqiRKlcfobym6qoXlgH0TKvHw96MLXRGBxmyt9CGty7nQ0YgMSq5nwmeyEqFYxr5ZjxE7PTQJ9QhwXz0wAeYSxBKI/3q6Xi8Jkj+McvZfeqV5rMzkKAP+msG8KD2lpYuchB2b9lP4Kvmj4sj3vQc4+1vI+0iiFuKfGv7NFC80eiW6Z2Xaei5I917yn/Ex6SvxghvP/I+9tzjcy5w8x9N9bNTsWwnrF1D7x0O7mvy4GkWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by CHXPR11MB9673.namprd11.prod.outlook.com (2603:10b6:610:2fc::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Sun, 7 Jun 2026
- 18:43:40 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31%5]) with mapi id 15.21.0092.011; Sun, 7 Jun 2026
- 18:43:40 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Oros,
- Petr" <poros@redhat.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
-	<Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
-Subject: RE: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and full
- TX reference clock control for E825
-Thread-Topic: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and
- full TX reference clock control for E825
-Thread-Index: AQHc73fbuuwofGiUWEqM+0MeGgr+dbYtpIwAgAEzHgCAADOQAIABGPFggACCTYCAAtS1oA==
-Date: Sun, 7 Jun 2026 18:43:39 +0000
-Message-ID: <IA1PR11MB6219FC5035A394BEFC7537B9921F2@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260529142628.1678955-1-grzegorz.nitka@intel.com>
-	<20260603183036.7c4762d2@kernel.org>
-	<IA1PR11MB62197FC8E64BE92FBC108E6992102@IA1PR11MB6219.namprd11.prod.outlook.com>
-	<20260604155422.167314ff@kernel.org>
-	<IA1PR11MB6219C1EF3BF8160226E5826992112@IA1PR11MB6219.namprd11.prod.outlook.com>
- <20260605162615.0987ff2a@kernel.org>
-In-Reply-To: <20260605162615.0987ff2a@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|CHXPR11MB9673:EE_
-x-ms-office365-filtering-correlation-id: b76eb4c3-762e-4b4e-aa1c-08dec4c4b188
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700021|56012099006|11063799006|18002099003|22082099003|4143699003;
-x-microsoft-antispam-message-info: 2ZoerhrQH0jgbgWH7oZs6pv8sIy2VpxDBJyPXvrH/Rb0WuPfkMv6hQacOEO+V+PVBB3wre6fvHhKTD/wnxByYUMqNYQHjYQKKfE/Cj4vJ5DKGLtzQXv5RbY1e3KHf+9b24PJHqjUt2wfd5iJT48fVAqvgeKOlWbQPUPDJEU62yN6727hde85i4n1IGMPA1by2lWnagtLoJlhk+hO7h+lNEoBZm5iHTZ2+PBFGcrtfdsIPn5L/pUTfgDKqBQnBdvNf0sjih2tAzy3nO1ZT+tvXpzOJbdVH39RT7jrnyi1wrjAB8QqWxzq+rsuVeiccNKXKKRV00YFWLvMvCi5hBKMdjv1ZkW5DsqxcC6mGQvmjq61i9/agJEuF5SQ9Yoi1VzhjKCHAZiiKvH4dHzh5XkS2qKiVwAMw0BYt4dprjHeHYOd0FSdj9qvEV/XTKHgkXkQR86YbSF4rBBOAIvyieAHist3kx1JCOk5eZ7DE+JyYcBmeOr/PBJFx6xleNmnMKIeme335NeTwL9MY+4E9DEtTyQ7JiKnEPXklubX8ngjGeQp3x2K5cMxWgQO89W2LZnCjMt9qKI9YQwKQWQ5Ft3zkAJE1ingDgxBlDatgUHSSQg7uINCci0qIoFMCg5TjRPgA9XU598ddTsvH8cjScqWWCb8DCyDbp+4EI3MhHVdgUck6L1+KEfn8aipe6/m39eR/nnBivplRsoujU2rV02J52pDq7BxtbhTJgdh/HqBjrGV39gM+fF406kPk3r0cgeq
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700021)(56012099006)(11063799006)(18002099003)(22082099003)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?49Y+UIeI3N+wizTpsES2W7NpHtBdfu6jM9PVxg3I6l4xrIvReadgVQAQcc+J?=
- =?us-ascii?Q?30QswieJM89ktIeu2Bajnoz2259Gm47v4b2sU2P8f+X7y5ZaBdLb+lsG/J2V?=
- =?us-ascii?Q?vJaTnwOE8oht2N/Z4zan2sbp/s4zGXsnSLJ6tfWVRvwMAFqxaT2Z3KMrWVvD?=
- =?us-ascii?Q?4gNhR8uWQTc4M3HHayF82pWci1gQ+XSSSlQFVfflXHDAP6waA2EqtqRBTmDL?=
- =?us-ascii?Q?riGtyGBOir9oXIPSoWeISrb+49CJdUjEKs9ZzLfm9WVUl1mCiMAsZrj8zZCe?=
- =?us-ascii?Q?EJKO0B2HI1z7SqWw9vcJ/YnNFqKEjZV0xYOLunIr21DB/tR/MucxqKz47d31?=
- =?us-ascii?Q?U1cgjjtnGc6lSiCAtGkGlHlOAQJcnuoaImACK6mmAx16+35C/Y35lXBLlvJz?=
- =?us-ascii?Q?nPfrveP8Q6ho8Lq0j48b8WoEOLZt3bqf6WBRqQ3Sq+t+0Kl+EQNTtmPKLHV+?=
- =?us-ascii?Q?xaJy54uZixjYCFtqRJQAeJQjLOP8fntXHeXOEp//grmNYuB2Rb6iu2EXifw/?=
- =?us-ascii?Q?UjxZxIZGNXpSbSfkJN9wE7L8xZCam/qfLYaNnrAMrT5FfpAi0we9NBe3pau8?=
- =?us-ascii?Q?Flh2LsBnx+NHI5T8FcNgcdxY+2Qj7bg2dgUZenhT5HlqEPllUWpPHxeAI6zm?=
- =?us-ascii?Q?7jPZqKWMHbG9T5mulpgVbg6Z+0ifCa5/e3cNX6DwN+TKYl3jZY6qUTK6R24F?=
- =?us-ascii?Q?/teJDZFT/I4SPSJMGiyxOajSpcLU+K8f5Px7IHxutd0q6D41gYzVRYuZYF8/?=
- =?us-ascii?Q?DUq8TxmcsUyMbRqvjbOlDLH9Zo7GI3VwTw4hRhlEU5uzFvGuhT3wMb7JaiJK?=
- =?us-ascii?Q?SOTbxOro0kb9mWgZdFXSLJNKUe54ac/t2IcfyzHvEbN5+rW6jkOgEpa66PbR?=
- =?us-ascii?Q?G7v9ViESYlkylUJtCMgwvXjzB848wCJlAGPVlDndRnU1nL7Kiq8Fyu+BCtVY?=
- =?us-ascii?Q?gdNdECujOwd+Z4vpDMmNFSXVOiczZTRiriGw/fh/FknBR5Or6mJi6AG1pRNb?=
- =?us-ascii?Q?KhcpcWLvbdt6QcP0YwWmpR9VAnB0FyWIN4c7yffn37lphLwD6Q0DuN/0mVgt?=
- =?us-ascii?Q?Amz2hvPdGSNDRZPS0tOJIwUpGF1kb28sua1XKLpAYCnIAdXwE8o6Hlpezdw+?=
- =?us-ascii?Q?D8XKw4Xaa0czma+dNNaCZbWarqdQXj5TSlPn7Cc7A/o/EJwMw8YMmKFhVV1b?=
- =?us-ascii?Q?hVG/MzYzV9T1Eyg+sjw6+HX1doXwGQK8gQyNpzxbNIbml0YTK7VkSQW79XTJ?=
- =?us-ascii?Q?F9dxuIkeVfOAts1A8N/1DYxo6eNTJPut3vIAQKJSoP0OH9fyNzv8/mS5hNvV?=
- =?us-ascii?Q?TUB9TQlR0YUIlx2B+RHuukFO4eWJTRii28YBTzGwmxcVAhhuOqVgNWJAXLKy?=
- =?us-ascii?Q?ium+V1ffS3pLOGlJxJV9aNZakDNPrLcF6ZsbprqkhumFNmCZYqn0NKISauBx?=
- =?us-ascii?Q?Dk4Y6+Ri2Gn16lw69Fnyf59PAhIxHVpMQgOJH5aHpQ3IKx+HcmrL8WirkK8K?=
- =?us-ascii?Q?+h/1mHLLdEvD4VrzEewGwN8+7PS52iAt6fJZd559f2hhgy37ywzGr9gEC8fw?=
- =?us-ascii?Q?HMVV//k5gbk5AcpUteSH35G+tK8fklbi9P/xfk3+qz5Nxg8mhEbCNst7NH3o?=
- =?us-ascii?Q?OEMOdk1Fi7/aT1XBHoBO8dhzVOlCFBJnMarwTGd4atvsAaFy+7Emq4T9by3N?=
- =?us-ascii?Q?nJ8esoZ/12hFTSGBRW7vEB72aOa57lojJO0Ib5ibByLX649arSnrvP6Wth3I?=
- =?us-ascii?Q?8gLHSULNzg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B7E2BE02A
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 18:48:48 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780858130; cv=none; b=ZG38OvrEsb1SYqdHkk6jIEYlmQUxId9ZJdU8WG/F7jIY9CVL+5s7iakdDAw3Jj9lHUhzwVp0WJ3gfyOMJmamA9ZzgC17zwx++n20jGUJuFfw87QIC1uw4lei4LcSiTfI6yHv0EnJ8/u35exAkFdY37F/dZbzP0hitfSM3cN07kg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780858130; c=relaxed/simple;
+	bh=ZHzWBTgu2DQQzr0lhj7HG8pN3/vXTbAOZT5B30ftn0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IxaEspGLogpZPdrG8VIQWvwlJO/CI8N6nl9d455bQR1+xAlL4eJ19NP0MMnQ8Je6FhLH4NPW5TQTpXMu6jn4qTRVe+TKmlI4jLUMioNqioiW1vx25cgc4ARDNaIBJ8nf25IjumkBPMFMXNa4BiSTyz45LY7ioYDvtZpK2FM4QGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0CnGAI4M; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EKo7HGAbgsIDL31kPHzl3tZYuwTp1av9mowY1XXGB9k=; b=0CnGAI4MBR4qwHMnl6f2tC5l0x
+	hczLYBiRcqVZ82WBlypFVktHKhKO8lZAwNrnpFaAvK8zKDm3yqpBrED+lvyyFDEW3KKSsnYlY+Q06
+	rjO8v+kQ4dt0RVX6jV5JlL1tvnemkQTxZTIK16BN1hhdNszNJOOd8pNDSg35p1vUTnlk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wWIY3-006UzT-3N; Sun, 07 Jun 2026 20:48:39 +0200
+Date: Sun, 7 Jun 2026 20:48:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	Madhur Agrawal <madhur.agrawal@airoha.com>
+Subject: Re: [PATCH net-next v2] net: airoha: add ethtool priv_flags support
+ for LAN/WAN and GDM2 loopback
+Message-ID: <e8f3d24a-985b-4bde-9f51-2d5ae3d25b01@lunn.ch>
+References: <20260607-airoha-ethtool-priv_flags-v2-1-742c7aa1e182@kernel.org>
+ <33c3a87d-ad97-4f6a-8f76-ebab80c496ac@lunn.ch>
+ <aiWzaV1f1Fpc2rhJ@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: QAaM7+U0GpAh5cB+cCLX/6r78KTe2ttS59tyepMWrZc2b8rHPpepumD8Rjtyv1PGtb1xsGgvDQ76Ldt3VLWul6YimI4NEBbvbZ7ykRmz5+lB/rP8O1/EndbT0o6pLfRUrsViyvRH1ntU+OH3/5cJEJyGlgjCj5CsFl4LVkkNRKCCyCCPqDl5TkoIq31B3KMblZVN9yoXokZRGUnzuz70yMo8l3cFGvB55+pz0dilvkN2gegUWFP4MwQosb9wopP2byjI63rbXSFOdKaLoh6ceFtbkEkHDv4L8O9Sf347m+XxOIX1+Dx1dQ/RhRgMRNnRmF/mTFGwcM5xaeWBEQiXDA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b76eb4c3-762e-4b4e-aa1c-08dec4c4b188
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2026 18:43:40.0256
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: O8pHVaD3uRxSgwWtrln/H7Y+5sSUT2SEGWXXoRMfDpQXsL4jQt5XotRXg6F7+27VC96vVoOOAXmVh4nCFvcN2L04p0yq6r3+SaMVbVF2mi8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CHXPR11MB9673
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aiWzaV1f1Fpc2rhJ@lore-desk>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296303-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296304-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:madhur.agrawal@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:from_mime,lunn.ch:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 212BC6514B0
+X-Rspamd-Queue-Id: 5EF36651502
 
+On Sun, Jun 07, 2026 at 08:07:37PM +0200, Lorenzo Bianconi wrote:
+> > > When a GDM3/GDM4 port is set to WAN mode, enable GDM2 loopback to
+> > > support hardware QoS. Conversely, when switching back to LAN mode,
+> > > disable the GDM2 loopback and restore the default forwarding
+> > > configuration.
+> > 
+> > Why not just use the presence of an off loadable qdisc as the
+> > indicator to change mode?
+> 
+> Hi Andrew,
+> 
+> Interesting, can you please provide more details about you mean?
 
+You say you need it to be in loopback mode in order to support
+hardware QoS. You configure QoS by using a qdisc, and something like
+mqprio, tcf etc. So when the user configures QoS, you can see if the
+hardware supports the request QoS. If so, swap to loopback mode and
+offload the QoS function to the hardware. If the hardware does not
+support the requested QoS, leave it in software and keep with LAN
+mode.
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Saturday, June 6, 2026 1:26 AM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; intel-wired-
-> lan@lists.osuosl.org; Oros, Petr <poros@redhat.com>;
-> richardcochran@gmail.com; andrew+netdev@lunn.ch; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Prathosh.Satish@microchip.com; Vecera,
-> Ivan <ivecera@redhat.com>; jiri@resnulli.us; Kubalewski, Arkadiusz
-> <arkadiusz.kubalewski@intel.com>; vadim.fedorenko@linux.dev;
-> donald.hunter@gmail.com; horms@kernel.org; pabeni@redhat.com;
-> davem@davemloft.net; edumazet@google.com
-> Subject: Re: [PATCH v12 net-next 0/8] dpll/ice: Add generic DPLL type and=
- full
-> TX reference clock control for E825
->=20
-> On Fri, 5 Jun 2026 16:10:19 +0000 Nitka, Grzegorz wrote:
-> > Hi Kuba. Just submitted v13.
-> >
-> > It includes the following fixes for pre-existing issues:
-> >   - dpll core fixes. Each AI review concern (3) is addressed in separat=
-e
-> >     commit. If you think it's better to squash them, let me know (howev=
-er
-> >     it addresses issues from two different 'old' commits).
-> >     Also, the hint form AI  to use different dpll xa_array (parent not =
-pin) to
-> >     address one of the issues, it simply does not work (WARNING flood
-> observed,
-> >     more details in patch 3/11)
-> >   - ice driver fix for potential hung on flush_workqueue in error path =
-for FW
-> node pins
-> >
-> > As you noted, two other pre-existing issues are covered by ICE_FLAG_DPL=
-L.
-> > I left the code as it is for those concerns.
-> > There is one more pre-existing one, related to ice_ptp_link_change. As =
-the fix
-> seems to be
-> > rather simple one, I believe I need more time for more comprehensive
-> testing.
-> > So my preference is to go with standard fix-path on 'net'.
->=20
-> SG, thanks!
->=20
-> BTW either you or Arkadiusz should chime in on the NCO thread, please:
-> https://lore.kernel.org/all/20260531194423.383366-2-
-> ivecera@redhat.com/
-> Shouldn't take much time to express an opinion, I hope.
-
-Sure, we will do on Monday (we had a long weekend this week, so limited
-capacity).
-
-Regarding this series. There are another pre-existing dpll-core findings
-reported in v13. As I still had to address valid critical/high issues in 'i=
-ce',
-I added 2 simple dpll-core fixes in v14 (just submitted, along with ice=20
-improvements).
-
-Regards
-
-Grzegorz
+	Andrew
 
