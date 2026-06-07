@@ -1,96 +1,96 @@
-Return-Path: <netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OJ8zHILIJWpYLwIAu9opvQ
-	(envelope-from <netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:37:38 +0200
+	id YzdtCCjcJWpuMwIAu9opvQ
+	(envelope-from <netdev+bounces-296310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 23:01:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A778651658
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:37:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF098651942
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 23:01:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=PV0yGyrp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296309-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZICtpup9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296310-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296310-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 80AD630022D4
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 19:37:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 023463001FF9
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 21:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4681F31E820;
-	Sun,  7 Jun 2026 19:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E765832FA18;
+	Sun,  7 Jun 2026 21:01:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8842DB798
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 19:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA3F2E4257
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 21:01:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780861056; cv=none; b=T1cG5jBmoWQ4j/kA5KLvB/FVcNLHGqcKRvDlAGznpyKIv74CeKj/q/RdGZlAHLy17JNntyop2f43D5fsUJBPG/+dvPxoHyPC3wyEcW3u7XhpdnX+Kyv7IJeGsrEeJPm7vfrb4orkXNZzrTFMiOBUs78uAhHvHN1n4lfwiwyRTAw=
+	t=1780866085; cv=none; b=mZFydO7xbLr36qw+8arwUZLAFp3VNd4TuP5o+lcNJcAGAURCsiVXy16j8G4/wbQ9c5urEIdyR3CeScK7bc29lF3rcEjrBDI8qVVWUi4euy6WYUm2NhiH2ho2zxH3TgSNowVcnTvUFm3PQ4rgOTfjb9NDsgU0VOe5jD2s8bw7l5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780861056; c=relaxed/simple;
-	bh=TzvQakJ1S+Nsey6Vt7ynoW4v8ZmbADwjeVvQIRX45Uw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VYocfoVvoalZaXT0TsEM/CESR7cvto+/omUG+LUiNPA4eo54RVS2cQ/7YgW9+3tIPJ5C4hSlJHlALVdqg4Djx8yOcQ2/OjnvvumQg17qxaQat/NmQ+4ahofy8EvKhZyJD84NNa2u90X8hkyau3ZYRmFp3BxMKjg9OHE/dUHL6Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PV0yGyrp; arc=none smtp.client-ip=209.85.210.176
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-842307473b5so2444369b3a.2
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 12:37:34 -0700 (PDT)
+	s=arc-20240116; t=1780866085; c=relaxed/simple;
+	bh=cvyOcjhtMlvvFxqMsah19NK9zcmo5fvDbymjyWwBqUE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=INuVZPLjtqKMUGNKWCXqCdctGwpaZEOfHn4X0UMkYEOX08ELaYixhr3ranxUBglR3xjVRFRrVmCKDGuWUaqfbqBdzsonY4C7pphNPoqptO8vK/g8jgjUEjOTXbj9YSEjQJVh17xMST6zeX+CenMI4CghKsx28mmL77+y4AgiiVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZICtpup9; arc=none smtp.client-ip=209.85.128.52
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490a7629453so3613545e9.0
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 14:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780861054; x=1781465854; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780866083; x=1781470883; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kewoD/JaIrVG2iWe454sEs6y3jw5rtHEnURmpvnmVNo=;
-        b=PV0yGyrpIRRgZpF/C70DQA8rz8caUKzHVIpLeIMhltfxKUTlICTRqp5JwcfHc15Z31
-         EkBaGji9UUXohJyMn+OmOb2jPhuhrgE30xbq5uBM8h641M1UmYz9RqtyaKJIPgOyn+XV
-         vpBZgd3AUQltCeKsAUVoXELlRbP0Qm6hvAXbwvGodUuj7qlZT7WldqAC3rzCJTmGPmOA
-         vEL3lrlCmRIdxs1Q+VHpzzSIyQzEuQK4piJu40kELE0hrd/mXskPIyIXpycX5TG0gLA5
-         V06IauUZBcIj5HDeSvl47JXz4UpcVvd9IaFNqYvPnzVYgmeYiFE2T1DTBu2D6IGLhF+3
-         3sxQ==
+        bh=KuWhUU666YoCkcgjw3YuQ/NERV8K0Y26bfg0NnK3PCM=;
+        b=ZICtpup9fHGT/Om+JcLOpWNhN6g1UvQR+qApKh4wXClQbt29+kubA6XKC9kmuEMAxD
+         5nY2k4jFmnxTvrXUYp+XEuK2wNeIp2wPaR2vKgSq6BQ2qbEDGSraACWyIsoIVw5ATfaT
+         gDbEWq6f0YhZCjTwyEoClRG9/y1uohp7WLRLCTIpCYmrWrQ0AzEfSJDj5EGMZqonJezc
+         OmRfQWmpA11hk9My4Uj2YBjPgCA/qH8U6qcw9FHeKAhw22LRx73UUKekIQ0RmANGw5qW
+         MLisEp2qQ/5H96i7wh2H/Zv86Th/uHblABFDYOhBjs2iUA4gxxn3uTznVVG/5xdz3ERR
+         rwUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780861054; x=1781465854;
+        d=1e100.net; s=20251104; t=1780866083; x=1781470883;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kewoD/JaIrVG2iWe454sEs6y3jw5rtHEnURmpvnmVNo=;
-        b=dUV/eyuNXrHHWr3y0HId7pedMG+8BK/u3el0FCCwpG0OvqRGJgSnGMFLlUbTr3b5UK
-         3mKL73Wg7DyCL9zGaWbezlAgn+4NGp5GZHI9j21ldQMHZFFweSHQV4U0y/i9Ghj5jLGz
-         1LLOjOXHGsIm0zm1ey3AGSnkPXOlIVJD+ETBijZtm5PvIGMmuSLvqo17P64Bd4Z5qsvc
-         rGyv0UOTnwDem4udDDYlNt41WvaQAo6pp0QfLEhoQLcwzKbQ/bkkYj4Ebu2OreShSewu
-         eMmOHClKxYB51KhiB9eD/Xy4vM4iD3lxiBO02G7pc89jOnR7LPEvN0ALjOBpx188x+Nb
-         wmxg==
-X-Forwarded-Encrypted: i=1; AFNElJ9Or1+FNFDhwOEZO8xVvoDNygqwJnxd9amISDwYeW3mHBih83O/KU3XxOxgQpSkP7FuQsmmpkU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfbYopWBx5iU2wIbHc04FCRfu8vwsHuIYPnj5M6jSxJh6rgWHN
-	hAQUEoaYK7YNsJgSnsCyiTlkSveIErpmVpp9V1PdB5DJt8xu5emv6nnn
-X-Gm-Gg: Acq92OFfXfD3QMK217Ok0CMUUCn1r6IW0/H1c8qrZeKTJUnoLu9qr6CG2FeA5TsSj/X
-	Gffzj8WKKloq1wAuO1jZ3cUIYpzYeoLLVtZiqxXJeNu6e/AtlOmEhL8b/QTp11/99DA9aUEasuM
-	9sO0TurS14LWfzXWfd1TFzfrBLQjlonlJodxTS2xxrUpSkIx3Dc5baB5xkmsYR2TQlz9kI1Ei4q
-	6aiSAjAc5XM3OoPTCN+xcHBk5sY+XGke/Z2UCSJGj8TcTsAQI9UmsbhssxbSTh11MJK6BnwSQNz
-	BkuB0gWtCJ87WSNskydYeCQc4gNUMZ7bNRR4MzdJF145CDHc593qw1JjzRRYTiO0f8KTds8nTFX
-	4+O+2/P5PRmsrNYvwa02dWkynXRFsVKOaGZiNzfz0pCncV2Y/fkKgmSJ8AsE7/Beg5jaBJYLrxC
-	WwSP4mqtV28q2rN/6UNOYTHFsvRKi1uC6iqDqJIOACWhv/AMnRvNwk/RXfyCULT923Ek33bVDy
-X-Received: by 2002:a05:6a00:1da3:b0:82f:3a1e:5618 with SMTP id d2e1a72fcca58-842b0dafd4bmr12422704b3a.22.1780861054230;
-        Sun, 07 Jun 2026 12:37:34 -0700 (PDT)
-Received: from localhost.localdomain ([115.110.225.242])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828821d0sm15429233b3a.28.2026.06.07.12.37.30
+        bh=KuWhUU666YoCkcgjw3YuQ/NERV8K0Y26bfg0NnK3PCM=;
+        b=K7UYK2QUA+IBr+oAbL9NtCG/RwoBKloArYRx+gEXCNs19PCqA/E9wzEUUTjrYZt7d1
+         N+EdLtsC9oWHt/efuwi+xh/DXNTbbScRd5IfwvwHWgwFqKdG8pfP9qcOgo9bG/EFjXyT
+         G9YpKFXrF7RWSRVlZ3SpzmhCaz2MQeOl0S5GETP+8izPcREPsMZ00Hyqv5Xp7ixEbgq/
+         4MBWfNKCK/hyyJ68u8Rm13g2rKYew0753bttJFqJqglN4U1Y06BqKF9UcSNpjAfa4X5E
+         0CQG5V/c5ihNAfXJug68nJ4lCNBmA9hvyOogPpomG1bTvSShbCQXKTIz16YQEJccMc8R
+         wC4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8Aio4Pc99kbTfzteSuuGsYcKVMF+38KElDO8tHAFKWl2JT4Y5nCvEyyA5R4Q1qqVr6sm6AN6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGlr8AqQZL0VPfxxn+U9BDl3S0fVkmCsZ83yhxpYAz0nmPbRUk
+	GzO6T4OXSbVBLfZTFr5z0J/24Re5ew+QIt/H8uLCU4nNob5GsnNj7M6r
+X-Gm-Gg: Acq92OH5ZZCByagdMZ1Rl/0xDiyZptTcRsjum6vYx2bAj7cq/JFqjoMbMaU8PkbVfwL
+	I79DERRrvBE7dmuBxtFblF00o/yFKKPqTB7mXMjbdY3cizgdqaE2YWlc0DBTCQ66bp3pFMQi6V+
+	S/MJBDWx5Ra+o0Glr4ObVCj9Q1kvk5UBzI9lOPjlXTDiiYZZT0BuOQ/GnAlyC49yO9AA5gkW+Ax
+	dz0dWSncXSbxhnZpbPHkp+PU0yTf3wdw1wx0a4B6CdQb8DFT04wmYR4ElXJ16S6WUZCu9p1fYIP
+	QPRwKJCCwprmC8j2cD5wTwyLl86ATw0TsiRFwO4orPtirYSn4atT9kTk4TPdS+kzXwSkgsAxrNF
+	+Ese4zLwtSL8f9oWs6+T9ED8NSbEeNc76EfZdhUgq6r2QSy2fdC4tli4NoMlLR+lK0eu+d9gTLT
+	cvx6vmso4bimC+ePaNUi1W/3T2F0Ao8ie//Kna+CJ4fooUZo/fKZORb7otVVR4Og6wyAj+hsAz1
+	uP5hg6IltpTQqh+Sg==
+X-Received: by 2002:a05:600c:3551:b0:490:b71f:2eb with SMTP id 5b1f17b1804b1-490c26220b7mr90247955e9.7.1780866082417;
+        Sun, 07 Jun 2026 14:01:22 -0700 (PDT)
+Received: from ast-epyc5.inf.ethz.ch (ast-epyc4.inf.ethz.ch. [129.132.161.179])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f3529e0sm47940617f8f.28.2026.06.07.14.01.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 12:37:33 -0700 (PDT)
-From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-To: Wells Lu <wellslutw@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+        Sun, 07 Jun 2026 14:01:21 -0700 (PDT)
+From: Zijing Yin <yzjaurora@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Your Name <yzjaurora@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>,
 	Simon Horman <horms@kernel.org>,
-	stable@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-Subject: [PATCH net] net: ethernet: sunplus: spl2sw: fix multiple of_node refcount leaks in probe
-Date: Mon,  8 Jun 2026 01:07:11 +0530
-Message-Id: <20260607193711.601544-1-shitalkumar.gandhi@cambiumnetworks.com>
-X-Mailer: git-send-email 2.25.1
+	stable@vger.kernel.org
+Subject: [PATCH net] net: af_key: initialize alg_key_len for IPComp states
+Date: Sun,  7 Jun 2026 14:01:17 -0700
+Message-ID: <20260607210119.2437752-1-yzjaurora@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,131 +99,147 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,s:lists@lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296309-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,kernel.org,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296310-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:yzjaurora@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:idosch@nvidia.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[yzjaurora@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yzjaurora@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cambiumnetworks.com:mid,cambiumnetworks.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0A778651658
+X-Rspamd-Queue-Id: AF098651942
 
-spl2sw_probe() acquires three of_node references that are never properly
-released in all paths:
+From: Your Name <yzjaurora@gmail.com>
 
-  - eth_ports_np from of_get_child_by_name() leaks on every probe.
-  - port_np returned from spl2sw_get_eth_child_node() (which exits a
-    for_each_child_of_node() loop mid-iteration) leaks per loop pass.
-  - phy_np from of_parse_phandle() leaks on the -EPROBE_DEFER and
-    spl2sw_init_netdev() failure goto paths, and the registered netdev's
-    mac->phy_node is not released on the out_unregister_dev cleanup path.
+pfkey_msg2xfrm_state() handles the IPComp (SADB_X_SATYPE_IPCOMP) case by
+allocating x->calg and copying only the algorithm name:
 
-Convert eth_ports_np and port_np to scoped __free(device_node), add
-explicit of_node_put(phy_np) on the two early-error gotos where
-ownership has not yet been transferred to mac->phy_node, and release
-each registered ndev's mac->phy_node in the out_unregister_dev loop
-before unregister_netdev().
+	x->calg = kmalloc_obj(*x->calg);
+	if (!x->calg) {
+		err = -ENOMEM;
+		goto out;
+	}
+	strcpy(x->calg->alg_name, a->name);
+	x->props.calgo = sa->sadb_sa_encrypt;
 
-The mac->phy_node release in the normal driver-remove path is handled
-by the preceding fix to spl2sw_phy_remove().
+Unlike the authentication (x->aalg) and encryption (x->ealg) branches of
+the same function, the compression branch never initializes
+calg->alg_key_len.  IPComp carries no key and the allocation only
+reserves sizeof(struct xfrm_algo) (i.e. no room for a key), so the field
+is left containing uninitialized slab data.
 
-Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+calg->alg_key_len is later used as a length by xfrm_algo_clone() when an
+IPComp state is cloned during XFRM_MSG_MIGRATE:
+
+	xfrm_state_migrate()
+	  xfrm_state_clone_and_setup()
+	    x->calg = xfrm_algo_clone(orig->calg);
+	      kmemdup(orig, xfrm_alg_len(orig));
+
+where xfrm_alg_len() returns sizeof(*alg) + (alg_key_len + 7) / 8.  With
+a non-zero garbage alg_key_len, kmemdup() reads past the end of the
+68-byte calg object.  Adding an IPComp SA via PF_KEY and then migrating
+it triggers (net-next, KASAN, init_on_alloc=0):
+
+  BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x44/0x60
+  Read of size 4164 at addr ff11000025a74980 by task diag2/9287
+  CPU: 3 UID: 0 PID: 9287 Comm: diag2 7.1.0-rc6-g903db046d557 #1
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x10e/0x1f0
+   print_report+0xf7/0x600
+   kasan_report+0xe4/0x120
+   kasan_check_range+0x105/0x1b0
+   __asan_memcpy+0x23/0x60
+   kmemdup_noprof+0x44/0x60
+   xfrm_state_migrate+0x70a/0x1da0
+   xfrm_migrate+0x753/0x18a0
+   xfrm_do_migrate+0xb47/0xf10
+   xfrm_user_rcv_msg+0x411/0xb50
+   netlink_rcv_skb+0x158/0x420
+   xfrm_netlink_rcv+0x71/0x90
+   netlink_unicast+0x584/0x850
+   netlink_sendmsg+0x8b0/0xdc0
+   ____sys_sendmsg+0x9f7/0xb90
+   ___sys_sendmsg+0x134/0x1d0
+   __sys_sendmsg+0x16d/0x220
+   do_syscall_64+0x116/0x7d0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+
+  Allocated by task 9287:
+   kasan_save_stack+0x33/0x60
+   kasan_save_track+0x14/0x30
+   __kasan_kmalloc+0xaa/0xb0
+   pfkey_add+0x2652/0x2ea0
+   pfkey_process+0x6d0/0x830
+   pfkey_sendmsg+0x42c/0x850
+   __sys_sendto+0x461/0x4b0
+   __x64_sys_sendto+0xe0/0x1c0
+   do_syscall_64+0x116/0x7d0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+  The buggy address belongs to the object at ff11000025a74980
+   which belongs to the cache kmalloc-96 of size 96
+  The buggy address is located 0 bytes inside of
+   allocated 68-byte region [ff11000025a74980, ff11000025a749c4)
+
+Depending on the uninitialized value the same field can instead request
+an oversized kmemdup() allocation and make the migration clone fail.
+
+The XFRM netlink path is not affected: verify_one_alg() rejects an
+XFRMA_ALG_COMP attribute shorter than xfrm_alg_len(), so a calg added via
+XFRM_MSG_NEWSA is always self-consistent.
+
+Initialize calg->alg_key_len to 0, matching the aalg/ealg branches.
+
+Fixes: 80c9abaabf42 ("[XFRM]: Extension for dynamic update of endpoint address(es)")
 Cc: stable@vger.kernel.org
-Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Signed-off-by: Zijing Yin <yzjaurora@gmail.com>
 ---
- drivers/net/ethernet/sunplus/spl2sw_driver.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ net/key/af_key.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
-index 5e0e4c9ecbb0..d78bda050ee4 100644
---- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
-+++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
-@@ -319,10 +319,8 @@ static struct device_node *spl2sw_get_eth_child_node(struct device_node *ether_n
- 
- static int spl2sw_probe(struct platform_device *pdev)
- {
--	struct device_node *eth_ports_np;
--	struct device_node *port_np;
-+	struct device_node *eth_ports_np __free(device_node) = NULL;
- 	struct spl2sw_common *comm;
--	struct device_node *phy_np;
- 	phy_interface_t phy_mode;
- 	struct net_device *ndev;
- 	struct spl2sw_mac *mac;
-@@ -418,8 +416,10 @@ static int spl2sw_probe(struct platform_device *pdev)
- 	}
- 
- 	for (i = 0; i < MAX_NETDEV_NUM; i++) {
--		/* Get port@i of node ethernet-ports. */
--		port_np = spl2sw_get_eth_child_node(eth_ports_np, i);
-+		struct device_node *port_np __free(device_node) =
-+			spl2sw_get_eth_child_node(eth_ports_np, i);
-+		struct device_node *phy_np;
-+
- 		if (!port_np)
- 			continue;
- 
-@@ -441,6 +441,7 @@ static int spl2sw_probe(struct platform_device *pdev)
- 		/* Get mac-address from nvmem. */
- 		ret = spl2sw_nvmem_get_mac_address(&pdev->dev, port_np, mac_addr);
- 		if (ret == -EPROBE_DEFER) {
-+			of_node_put(phy_np);
- 			goto out_unregister_dev;
- 		} else if (ret) {
- 			dev_info(&pdev->dev, "Generate a random mac address!\n");
-@@ -449,8 +450,10 @@ static int spl2sw_probe(struct platform_device *pdev)
- 
- 		/* Initialize the net device. */
- 		ret = spl2sw_init_netdev(pdev, mac_addr, &ndev);
--		if (ret)
-+		if (ret) {
-+			of_node_put(phy_np);
- 			goto out_unregister_dev;
-+		}
- 
- 		ndev->irq = irq;
- 		comm->ndev[i] = ndev;
-@@ -500,8 +503,11 @@ static int spl2sw_probe(struct platform_device *pdev)
- 
- out_unregister_dev:
- 	for (i = 0; i < MAX_NETDEV_NUM; i++)
--		if (comm->ndev[i])
-+		if (comm->ndev[i]) {
-+			mac = netdev_priv(comm->ndev[i]);
-+			of_node_put(mac->phy_node);
- 			unregister_netdev(comm->ndev[i]);
-+		}
- 
- out_free_mdio:
- 	spl2sw_mdio_remove(comm);
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index 9cffeef18..3216f897a 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -1218,6 +1218,7 @@ static struct xfrm_state * pfkey_msg2xfrm_state(struct net *net,
+ 				goto out;
+ 			}
+ 			strcpy(x->calg->alg_name, a->name);
++			x->calg->alg_key_len = 0;
+ 			x->props.calgo = sa->sadb_sa_encrypt;
+ 		} else {
+ 			int keysize = 0;
 -- 
-2.25.1
+2.43.0
 
 
