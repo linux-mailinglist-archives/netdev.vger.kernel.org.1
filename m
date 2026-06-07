@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-296325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296326-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id c5ySExj0JWrwPAIAu9opvQ
-	(envelope-from <netdev+bounces-296325-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:43:36 +0200
+	id Vv5aMDb0JWoMPQIAu9opvQ
+	(envelope-from <netdev+bounces-296326-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:44:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD57B651D5F
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C67D651D63
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 00:44:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=GfVFfcCt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296325-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296325-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ngyQN39L;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296326-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296326-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD70D301DCE7
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 22:41:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24DF5300D319
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 22:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D52382289;
-	Sun,  7 Jun 2026 22:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD06A3822BF;
+	Sun,  7 Jun 2026 22:41:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4785F327BEC;
-	Sun,  7 Jun 2026 22:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666BA382289;
+	Sun,  7 Jun 2026 22:41:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780872111; cv=none; b=UZeJh6GaX8Y+nVVLZr+2sFMRCGNETnYrAVR4AvKiwfO/ob3clQQIaBcuvAU0T2uvJ075JySbn7rv+iFnx3XBY2jT+kvIkj83LmfiK9g8npXmajdQAtQyh8hnrMpMseKg89q5EhCnJ2QkAIRRsq5wWP/qqn2DOOfB+N4EN19Ru20=
+	t=1780872116; cv=none; b=pcReTT0N7/z1erVGjgZq2hRK4X8s6DOkKaxFpUHuf7Idvc9qN2WlGGDEKiZU/iYlGvm6w6WiQxkANm5tDrkDKe7z1xX4sM1VQ0RWNqgp7k/Ni8dcVD4g3rMsLkCvSGHQv4tit8aexRpG2c3Dfe9rusY9FsBstoLGBW2Om74dNGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780872111; c=relaxed/simple;
-	bh=hg8iabcFIbap/ynQls0mcJx6AM2EhUOOGizDrln07Wg=;
+	s=arc-20240116; t=1780872116; c=relaxed/simple;
+	bh=MiuZmRuNIuT/Dx0tLEAh4pcvVZKFgWebFevT6pyLwI4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lrOtshktWF2zCBORViuqqTd1obWLVaxbGhitMnQzys4V/oOqgviJ28Nw4GiIvRahPtZPtLm4kHOGhGgGdYw4KmB3kb53pyKlxPuLwQQvjxtxl888F7wydQHKXsQN6A/Ff+o7ZKr/YE9x4V/hLoEcp13ocWPBYHcpl7D5rbNIOOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GfVFfcCt; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FCBD1F00899;
-	Sun,  7 Jun 2026 22:41:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ZDhpCAq7I16WoicqfVBVW+hR97Q8zvggZ07G70yIDhyadS/tlgTGLpO7BDO2l1qdwKKdd5o85y5b+BLmQPHS2NCO3oDW/2nUCYb8wgz7JvB8BOc1pAYNNZepoZZEFQnLxFFiQ9pdON7Cq6ndlt3NjRVnDzONg9tQ9MAkIcocXRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngyQN39L; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F23A1F00893;
+	Sun,  7 Jun 2026 22:41:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780872109;
-	bh=Zx7rvW5ZY9Px9CVnzO/KcJSO7h1jSduZQlE1l8PfwWY=;
+	s=k20260515; t=1780872115;
+	bh=ItOusNlNzF3NhJ87Id/V8+ZTlx1+RAAqb1qk8slAzL4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=GfVFfcCttUe5JsCNtR6wOcUJD9qnVbCnrSjUiLufjnoGx9HPxKszb2qUqt9euhsFQ
-	 C5f+5anaQKHDbcAda6LHQF0O7+SyfaE722YyrszjRXvwl1EgcBffzN8IYXX17/WUG5
-	 xs97bNKFc5IL+pVF0lM/pHsCWJ8a6bxZoDVIKeKlHADD9yu3Bt2/SAERbnaVXprMda
-	 ASWWTP3utJxsWoVStere/eeUxFrsmAtZILTnJat61CMwZSe+V30HJWVNFty4BdWX7B
-	 r7kT+0jvwxIqlRaJccxtWEAPpekqeroArIC3Tgtq1R5lFE53yZwF63uJeAXqXuxKSZ
-	 PswRLfIQ1mtTA==
+	b=ngyQN39LhqkG3Lj/ldUMv09BGtrszlFL4uQnODRkCwgo1GWdTkIBZlxADHYlvTYAO
+	 2mEu0s9JTf/0JOZISpNEdyj/9oga35PT2hpNsuqO7J53oFzdpjZwprH6+inPhRMvau
+	 XTpQK9xY/WV93de4yFRp5m2FdUzxrAtA8Jq0sHFGdkUfnojqmSWxMNtgqEZPqsUHFm
+	 WfMMhNetS7Nr3/AvUyf0tmBQLnhEmW+EvCg/aBz8s2D8+FWEsJI+qE6qg0M0xdPU1E
+	 pyWAo9aJ1A+LP7tO0qLpr6des69NgAo84bQPFZi766F8V2b5yRft8a4DLSoeof8imp
+	 WHmqg9iLVKMQw==
 From: Linus Walleij <linusw@kernel.org>
-Date: Mon, 08 Jun 2026 00:41:30 +0200
-Subject: [PATCH net-next v6 2/5] dt-bindings: net: dsa: microchip: Add
- KSZ8995XA
+Date: Mon, 08 Jun 2026 00:41:31 +0200
+Subject: [PATCH net-next v6 3/5] net: dsa: tag_ks8995: Add the KS8995 tag
+ handling
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260608-ks8995-to-ksz8-v6-2-d91eb43edcc5@kernel.org>
+Message-Id: <20260608-ks8995-to-ksz8-v6-3-d91eb43edcc5@kernel.org>
 References: <20260608-ks8995-to-ksz8-v6-0-d91eb43edcc5@kernel.org>
 In-Reply-To: <20260608-ks8995-to-ksz8-v6-0-d91eb43edcc5@kernel.org>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -69,8 +69,7 @@ To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
  Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, 
  Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, Woojung Huh <Woojung.Huh@microchip.com>, 
- devicetree@vger.kernel.org, Linus Walleij <linusw@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+ devicetree@vger.kernel.org, Linus Walleij <linusw@kernel.org>
 X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -82,12 +81,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296325-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:marex@denx.de,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:Woojung.Huh@microchip.com,m:devicetree@vger.kernel.org,m:linusw@kernel.org,m:krzysztof.kozlowski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296326-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:marex@denx.de,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:Woojung.Huh@microchip.com,m:devicetree@vger.kernel.org,m:linusw@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,armlinux.org.uk];
 	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -105,36 +104,225 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DD57B651D5F
+X-Rspamd-Queue-Id: 1C67D651D63
 
-The KSZ8995XA is just like the KSZ8795 and KSZ8864 a Micrel
-product. It was renamed from KS8995XA to KSZ8995XA at some point,
-but it has the same properties as the KS8995XA.
+The KS8995 100Mbit switch can do proper DSA per-port tagging
+with the proper set-up. This adds the code to handle ingress
+and egress KS8995 tags.
 
-Be careful to use the full product name in this new compatible:
-there is also KSZ8995MA and KSZ8995E which are not compatible
-with the KS8995XA.
+The tag is a modified 0x8100 ethertype tag where a bit in the
+last nybble is set for each target port.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
- Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ MAINTAINERS          |   1 +
+ include/net/dsa.h    |   2 +
+ net/dsa/Kconfig      |   6 +++
+ net/dsa/Makefile     |   1 +
+ net/dsa/tag_ks8995.c | 132 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 142 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-index 8d4a3a9a33fc..4ed13870ed3a 100644
---- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-@@ -23,6 +23,7 @@ properties:
-       - microchip,ksz8864  # 4-port version of KSZ8895 family switch
-       - microchip,ksz8873
-       - microchip,ksz8895  # 5-port version of KSZ8895 family switch
-+      - microchip,ksz8995xa
-       - microchip,ksz9477
-       - microchip,ksz9897
-       - microchip,ksz9896
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cf7e92d9e6db..1219ad4d5423 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17409,6 +17409,7 @@ F:	Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+ F:	drivers/net/dsa/microchip/*
+ F:	include/linux/dsa/ksz_common.h
+ F:	include/linux/platform_data/microchip-ksz.h
++F:	net/dsa/tag_ks8995.c
+ F:	net/dsa/tag_ksz.c
+ 
+ MICROCHIP LAN743X ETHERNET DRIVER
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 8c16ef23cc10..abd159527782 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -59,6 +59,7 @@ struct tc_action;
+ #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
+ #define DSA_TAG_PROTO_MXL862_VALUE		32
+ #define DSA_TAG_PROTO_NETC_VALUE		33
++#define DSA_TAG_PROTO_KS8995_VALUE		34
+ 
+ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+@@ -95,6 +96,7 @@ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
+ 	DSA_TAG_PROTO_MXL862		= DSA_TAG_PROTO_MXL862_VALUE,
+ 	DSA_TAG_PROTO_NETC		= DSA_TAG_PROTO_NETC_VALUE,
++	DSA_TAG_PROTO_KS8995		= DSA_TAG_PROTO_KS8995_VALUE,
+ };
+ 
+ struct dsa_switch;
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index d5e725b90d78..bbdf324addac 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -119,6 +119,12 @@ config NET_DSA_TAG_MXL_GSW1XX
+ 	  Say Y or M if you want to enable support for tagging frames for
+ 	  MaxLinear GSW1xx switches.
+ 
++config NET_DSA_TAG_KS8995
++	tristate "Tag driver for Micrel KS8995 switch"
++	help
++	  Say Y if you want to enable support for tagging frames for the
++	  Micrel KS8995 switch.
++
+ config NET_DSA_TAG_KSZ
+ 	tristate "Tag driver for Microchip 8795/937x/9477/9893 families of switches"
+ 	help
+diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+index b8c2667cd14a..a9c2a0569e9e 100644
+--- a/net/dsa/Makefile
++++ b/net/dsa/Makefile
+@@ -25,6 +25,7 @@ obj-$(CONFIG_NET_DSA_TAG_BRCM_COMMON) += tag_brcm.o
+ obj-$(CONFIG_NET_DSA_TAG_DSA_COMMON) += tag_dsa.o
+ obj-$(CONFIG_NET_DSA_TAG_GSWIP) += tag_gswip.o
+ obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
++obj-$(CONFIG_NET_DSA_TAG_KS8995) += tag_ks8995.o
+ obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
+ obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
+ obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
+diff --git a/net/dsa/tag_ks8995.c b/net/dsa/tag_ks8995.c
+new file mode 100644
+index 000000000000..5bdb18271582
+--- /dev/null
++++ b/net/dsa/tag_ks8995.c
+@@ -0,0 +1,132 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2026 Linus Walleij <linusw@kernel.org>
++ */
++#include <linux/etherdevice.h>
++#include <linux/log2.h>
++#include <linux/list.h>
++#include <linux/slab.h>
++
++#include "tag.h"
++
++/* The Micrel KS8995XA / Microchip KSZ8995XA Special Tag Packet ID (STPID)
++ * pushes its tag in a modified VLAN (802.1Q) tag.
++ * -----------------------------------------------------------
++ * | MAC DA | MAC SA | 2 bytes tag | 2 bytes TCI | EtherType |
++ * -----------------------------------------------------------
++ * The tag is: 0x8100 |= BIT(port), ports 0,1,2,3
++ */
++
++#define KS8995_NAME "ks8995"
++
++#define KS8995M_STPID_STD	GENMASK(15, 4)
++#define KS8995M_STPID_PORTMASK	GENMASK(3, 0)
++#define KS8995M_STPID(portmask)	htons(ETH_P_8021Q | FIELD_PREP(KS8995M_STPID_PORTMASK, portmask))
++
++static struct sk_buff *ks8995_xmit(struct sk_buff *skb, struct net_device *dev)
++{
++	struct vlan_ethhdr *hdr = vlan_eth_hdr(skb);
++	bool have_hwaccel_tag = false;
++	u16 tci = 0, portmask;
++
++	/* Prepare the special KS8995 tags */
++	portmask = dsa_xmit_port_mask(skb, dev);
++
++	if (skb_vlan_tag_present(skb) && skb->vlan_proto == htons(ETH_P_8021Q)) {
++		tci = skb_vlan_tag_get(skb);
++		__vlan_hwaccel_clear_tag(skb);
++		have_hwaccel_tag = true;
++	}
++
++	if (have_hwaccel_tag || hdr->h_vlan_proto != htons(ETH_P_8021Q)) {
++		skb = vlan_insert_tag(skb, KS8995M_STPID(portmask), tci);
++		if (!skb)
++			return NULL;
++		hdr = vlan_eth_hdr(skb);
++		netdev_dbg(dev, "%s: inserted VLAN TAG %04x TCI %04x\n",
++			   __func__, hdr->h_vlan_proto, hdr->h_vlan_TCI);
++	} else {
++		/* VLAN tag already exists in skb head, modify it in place */
++		hdr = vlan_eth_hdr(skb);
++		hdr->h_vlan_proto = KS8995M_STPID(portmask);
++		netdev_dbg(dev, "%s: modified VLAN TAG %04x\n",
++			   __func__, hdr->h_vlan_proto);
++	}
++
++	return skb;
++}
++
++static struct sk_buff *ks8995_rcv(struct sk_buff *skb, struct net_device *dev)
++{
++	int portmask;
++	u16 etype;
++
++	/* We are expecting all received packets to have a mangled VLAN
++	 * TPID, so drop anything else. Because of the non-standard TPID,
++	 * don't even bother looking for a tag in the hwaccel area.
++	 *
++	 * We have to inspect the ethertype directly because skb->protocol
++	 * will contain garbage.
++	 */
++	etype = ntohs(*(__be16 *)dsa_etype_header_pos_rx(skb));
++	if ((etype & KS8995M_STPID_STD) != ETH_P_8021Q) {
++		netdev_dbg(dev, "%s: dropped ethertype 0x%04x\n",
++			   __func__, etype);
++		return NULL;
++	}
++	netdev_dbg(dev, "%s: received ethertype %04x\n",
++		   __func__, etype);
++
++	/* Move the custom DSA+VLAN tag into the hwaccel area and strip
++	 * it from the skb head
++	 */
++	skb = skb_vlan_untag(skb);
++	if (!skb) {
++		netdev_err(dev, "%s: unable to untag skb\n", __func__);
++		return NULL;
++	}
++
++	portmask = FIELD_GET(KS8995M_STPID_PORTMASK, etype);
++	netdev_dbg(dev, "%s: etype %04x portmask %04x (%d)\n",
++		   __func__, etype, portmask, ilog2(portmask));
++	skb->dev = dsa_conduit_find_user(dev, 0, ilog2(portmask));
++	if (!skb->dev)
++		return NULL;
++
++	/* Preserve the VLAN tag if it contains a non-zero VID which is not
++	 * identical to 0x001, or PCP, and restore its TPID to the standard
++	 * value.
++	 *
++	 * If this is just an ordinary inbound package the datasheet claims
++	 * it will "replace null VID with ingress port VID", which means
++	 * VID set to 1: 0x8101 0001 for port 0 or 0x8102 0001 for port 1.
++	 * So in the DSA driver we will set the default port VID to 0 so
++	 * we can properly detect non-VLAN frames.
++	 */
++	if (!skb->vlan_tci) {
++		netdev_dbg(dev, "%s: clear VLAN tag from frame\n", __func__);
++		__vlan_hwaccel_clear_tag(skb);
++	} else {
++		skb->vlan_proto = htons(ETH_P_8021Q);
++		netdev_dbg(dev, "%s: vlan_tci = 0x%04x VLAN frame\n",
++			   __func__, skb->vlan_tci);
++	}
++
++	dsa_default_offload_fwd_mark(skb);
++
++	return skb;
++}
++
++static const struct dsa_device_ops ks8995_netdev_ops = {
++	.name = KS8995_NAME,
++	.proto	= DSA_TAG_PROTO_KS8995,
++	.xmit = ks8995_xmit,
++	.rcv = ks8995_rcv,
++	.needed_headroom = VLAN_HLEN,
++};
++
++MODULE_DESCRIPTION("DSA tag driver for Micrel KS8995 family of switches");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KS8995, KS8995_NAME);
++
++module_dsa_tag_driver(ks8995_netdev_ops);
 
 -- 
 2.54.0
