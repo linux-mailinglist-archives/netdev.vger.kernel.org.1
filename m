@@ -1,179 +1,171 @@
-Return-Path: <netdev+bounces-296306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296307-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YnCUJvzGJWrmLgIAu9opvQ
-	(envelope-from <netdev+bounces-296306-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:31:08 +0200
+	id F/WCK0XHJWr/LgIAu9opvQ
+	(envelope-from <netdev+bounces-296307-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:32:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089D66515C0
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:31:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC686515CF
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 21:32:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Lh5enM3B;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296306-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296306-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=d85Promd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296307-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296307-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D4DA43006516
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 19:31:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 83CD03001FE6
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 19:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71722DB798;
-	Sun,  7 Jun 2026 19:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DF52EAB6F;
+	Sun,  7 Jun 2026 19:32:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B291F7575
-	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 19:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E30D3FFD;
+	Sun,  7 Jun 2026 19:32:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780860664; cv=none; b=IhqgxHXTi2/6uWJXjNWyK6NgUiqb3jZJpbY4+QbQJpLvb4atrtQl4JS9kXrmnyNPFwml2IMg6RAD3SSqmEEMa/s4lEY2AZK9hnEuJ0M8NMsGOOybYkgb491ZDgxYq5I67mFxNuDNwIHAIvJMvUxEzSD8Uifs16uwqeHLRCb85sY=
+	t=1780860738; cv=none; b=o0MH487FbDDj53CoDYLeoOUylyW+qnnwMSpAqSYGLafp7WhN1zKzKAqT3scn/Sbz73DyVgcLi5JnkGbycL4kLefyt0190eQqdFyzJqxqOQPPhDmjS7o7FoDnyGsifPJhhbKlom8i2AxM0qJpkz5yIAVA8vTnFBE59j0lgawINZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780860664; c=relaxed/simple;
-	bh=UqBn+YJY7M+u065RMcQHz1GgsUI7JWcXHJmj8EfdyBk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AhQJUNwaDiUeiIrLJ9RXwe7s4qtdR6u3i3+jvottKzij/yXKVFnIGeWLizb78Yxc8eC+SaO/InxvlrB+KBLiDlKzsTLDGNU+1KHPGqKcfnPjS+tqIpt1JLZv7YHvCOicJL2XzMPobRhHGTd+S1vP2M9aLTe3S+mFKPMUF3/0gPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lh5enM3B; arc=none smtp.client-ip=209.85.214.178
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c0c2c7d45eso31862645ad.1
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 12:31:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780860663; x=1781465463; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Js68PLPyN3XjWqEU0fIOqcPtf+mTXJxmFseuifo/CDY=;
-        b=Lh5enM3BZ9aNrJWeUNtyQMjlswsGR2q0v+ChADDSaNo0XB2Qbw20fhhDh5TTuvIjcA
-         tUhxhmPGM9zeuk/rJzbY5bP/+BgmM+aV3moO+qLFGxgTW9/0Bb/SX0LEDLWoYj7dVphD
-         2JHTv3YjLX9xqGGGP3aimhD4Q419CIvMOMKjiuvZLeURnBvxZk2O5JgNCqsG9nb2nixJ
-         BGCppcSfhzdtmXOEgFWRu9iVOYPUMQKlrRqk9d9V78bBs/mKOrpe5+Euwq+/IGbMP2zm
-         Q921z8jtEfpVGEbLmaHvtuGolvXT1rfCf99KR/LP36btnzm3qNa1yEG4PeeCv9E8rypx
-         mPtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780860663; x=1781465463;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Js68PLPyN3XjWqEU0fIOqcPtf+mTXJxmFseuifo/CDY=;
-        b=hDdTvd9+nTM+QhzTNwg+biYsV7jubTTt7gYn8bMFobFQkZBSnh+/MMPQkCaSCwfb2o
-         oCN2qtPgn0R5cRQazpkkSbdJ/a38iOcUlQoBj0Rcciy4JP+D011JYi5VgcRTWMZV1UzK
-         b9wnwWyCj6PnvzwqbiFY6PR2OFHwytJFPXO7tbrgxxNoUyH98ncokTKmR6iemGYm4Qx0
-         GyBrLx4rcdJoj4AA2SVbNvn2PFoWUfaorGWJtUX9xSCqBye3x+aV7/wNQwlQtVuPqYyz
-         UQNVdqT2yG0u34wzwzrmcnAwotb+y64Y1zUJIwXxUi1IQ7Uc7moJZWANiT9LBlwtSiuN
-         lI6A==
-X-Forwarded-Encrypted: i=1; AFNElJ884VzCPsm7D2Xq7kfddTfSW0Guv6NyYfHAVLqoDZrw3LK45Lsf2QjDC1QWWeaMsQT4zhSwsnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM3J4sWugIhOJ+YRy9xJepp/8KQZFzxdXCmyQTzxGMxX5/4Wls
-	QZvEO9liYL4YQCtSAlRGsbypld7q6ZI+NDGFIucsdpBy9yi04mYGFgLM
-X-Gm-Gg: Acq92OHxe/eI92fgXXBCLcrM26r87h22Os2eZNZdvo7eCUkkfpQhzASWF+rdYOAOqCQ
-	mFzbIGdXq5yzoLOKdNpqgb0SUpIzgAbFS/YXzuCT7JliKVZt9xMuFC9cbuLsaxuDA0qrtlutMPa
-	H5CdhTAcmtoFiEh0mAmAEfcH+dg1H+1vLX0TN0bwmV/6kg7sqldacz/Ni3mKLcFTnrGEXU40YEK
-	K0OF6ya5vGrVHImvvdKxdZCK3TLeO6zOXrFVvZKJlwCUb8QXaD7TOqo+y1WS4BA+9Nz34uyM0oJ
-	jzml6Q4eLz1QQvoBs2JpnM4R/xZrkp4qFQ+6C5+Ki9B4TlkdYZYPlxFIuXXLHx4xDlExIjQd/l3
-	y08eWlalniv0qI1QMDfnMPR5iB3yV/L5l+/EjV0Mm1De0RcNlBratZHx3bgjzNatUgIutYG4N/R
-	MFmoCJneiZuN4CLPg3XK0uGTuI5qLCxjB50uSyKwYv0eIyrC4Y0pIQ/FP3uqIGALgJhAcN9nwN
-X-Received: by 2002:a17:902:c94c:b0:2c2:33a4:aa8f with SMTP id d9443c01a7336-2c233a4ade9mr63422735ad.13.1780860662802;
-        Sun, 07 Jun 2026 12:31:02 -0700 (PDT)
-Received: from localhost.localdomain ([115.110.225.242])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16629d55esm157971855ad.63.2026.06.07.12.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 12:31:02 -0700 (PDT)
-From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-To: Wells Lu <wellslutw@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	stable@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-Subject: [PATCH net] net: ethernet: sunplus: spl2sw: fix phy_node refcount leak in remove
-Date: Mon,  8 Jun 2026 01:00:29 +0530
-Message-Id: <20260607193029.589736-1-shitalkumar.gandhi@cambiumnetworks.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1780860738; c=relaxed/simple;
+	bh=0CL0LpYY71PFAf0+GCT4CUN73l3MpK4SmyHk3tTPOu0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tpJsN/KbqrqGtcyYJIg4dVt5yPwoLzssgxnfblnkqeBslW4Zk8LS08wwg2DjrPUV1GnXzTIl64nPYSIsfyvfWIgmLqr2s5YgPWGsCtQxE+GYMyKO9pSN21gDcKJSODKEXbeYzUPcRHBQjkBo1TGYPPK6yjuBll8b7ZlgqXvFn8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d85Promd; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A12041F00893;
+	Sun,  7 Jun 2026 19:32:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780860737;
+	bh=Ha9Hmh5rF02wsMuPsCKqS/tkDi5MaZZ5kGu0z2TbIb0=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=d85PromdyaTj834q9gv73RnZggzjtGaVKJPmm9PrtzkOVLGVpNUztSQhHqoDiXwDC
+	 6jhUtvc0rANu+eKFBud0pZ3NIodrLrL4CeNf8D85ByOrthFnv89/obfYz8tnR0NsNE
+	 JoICLGJWqRXjICtrt7KcdQP3kZ6JKwxNPV1KN8AZWauL/pevUmd5pZGDiss2Rk3yt1
+	 9XlJIHyH8+aUt5PKXjXfkYpLKcsx/adwmcxkezZiax2i2gTlxfPUxiR2PtFUG7F9sp
+	 qW+fyDKIlRcIF9jEdPjah+1Iwr9Ym1MVkZ/QhbRdBhpQ8PB1AjuLBqdqk8ztnIr4Qx
+	 ZQJL9Ygfhdt2g==
+Message-ID: <73dcc08ff744364c097ec63bf81a26bd15e8f2af.camel@kernel.org>
+Subject: Re: [PATCH net] net/rds: fix NULL deref in
+ rds_ib_send_cqe_handler() on masked atomic completion
+From: Allison Henderson <achender@kernel.org>
+To: Weiming Shi <bestswngs@gmail.com>, netdev@vger.kernel.org
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+ linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, Xiang Mei
+ <xmei5@asu.edu>
+Date: Sun, 07 Jun 2026 12:32:15 -0700
+In-Reply-To: <20260606192447.1179255-2-bestswngs@gmail.com>
+References: <20260606192447.1179255-2-bestswngs@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,s:lists@lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296306-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-296307-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:xmei5@asu.edu,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,cambiumnetworks.com:mid,cambiumnetworks.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 089D66515C0
+X-Rspamd-Queue-Id: 3AC686515CF
 
-mac->phy_node is acquired via of_parse_phandle() in spl2sw_probe() and
-stored in the mac private data, transferring ownership of the
-device_node reference to mac. On driver removal, spl2sw_phy_remove()
-disconnects the PHY but never drops that reference, so each
-probe-then-remove cycle leaks one of_node refcount per port permanently.
+On Sat, 2026-06-06 at 12:24 -0700, Weiming Shi wrote:
+> rds_ib_xmit_atomic() always programs a masked atomic opcode
+> (IB_WR_MASKED_ATOMIC_CMP_AND_SWP or IB_WR_MASKED_ATOMIC_FETCH_AND_ADD)
+> for every RDS atomic cmsg.  But the completion-side switch in
+> rds_ib_send_unmap_op() only handles the non-masked opcodes, so a masked
+> atomic completion falls through to default and returns rm =3D=3D NULL whi=
+le
+> send->s_op is left set.  rds_ib_send_cqe_handler() then dereferences the
+> NULL rm via rm->m_final_op, oopsing in softirq context.  An unprivileged
+> AF_RDS sendmsg() of an atomic cmsg over an active RDS/IB connection
+> triggers it; on hardware that natively accepts masked atomics (mlx4,
+> mlx5) no extra setup is needed.
+>=20
+>   RDS/IB: rds_ib_send_unmap_op: unexpected opcode 0xd in WR!
+>   Oops: general protection fault [#1] SMP KASAN
+>   KASAN: null-ptr-deref in range [0x0000000000000190-0x0000000000000197]
+>   RIP: rds_ib_send_cqe_handler+0x25c/0xb10 (net/rds/ib_send.c:282)
+>   Call Trace:
+>    <IRQ>
+>    rds_ib_send_cqe_handler (net/rds/ib_send.c:282)
+>    poll_scq (net/rds/ib_cm.c:274)
+>    rds_ib_tasklet_fn_send (net/rds/ib_cm.c:294)
+>    tasklet_action_common (kernel/softirq.c:943)
+>    handle_softirqs (kernel/softirq.c:573)
+>    run_ksoftirqd (kernel/softirq.c:479)
+>    </IRQ>
+>   Kernel panic - not syncing: Fatal exception in interrupt
+>=20
+> Handle the masked atomic opcodes in the same case as the non-masked
+> ones: they map to the same struct rds_message.atomic union member, so
+> the existing container_of()/rds_ib_send_unmap_atomic() body is correct
+> for them.
+>=20
+> Fixes: 20c72bd5f5f9 ("RDS: Implement masked atomic operations")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 
-Drop the reference after phy_disconnect(). While at it, remove the
-redundant inner "if (ndev)" check; comm->ndev[i] was just verified
-non-NULL on the line above.
+Hi Weiming,
 
-Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
----
- drivers/net/ethernet/sunplus/spl2sw_phy.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Thanks for the thorough writeup, I've traced through the logic and the
+fix looks correct to me as do the tags.  Thanks for catching this!
 
-diff --git a/drivers/net/ethernet/sunplus/spl2sw_phy.c b/drivers/net/ethernet/sunplus/spl2sw_phy.c
-index 6f899e48f51d..a4889c52e00e 100644
---- a/drivers/net/ethernet/sunplus/spl2sw_phy.c
-+++ b/drivers/net/ethernet/sunplus/spl2sw_phy.c
-@@ -79,12 +79,14 @@ int spl2sw_phy_connect(struct spl2sw_common *comm)
- void spl2sw_phy_remove(struct spl2sw_common *comm)
- {
- 	struct net_device *ndev;
-+	struct spl2sw_mac *mac;
- 	int i;
- 
- 	for (i = 0; i < MAX_NETDEV_NUM; i++)
- 		if (comm->ndev[i]) {
- 			ndev = comm->ndev[i];
--			if (ndev)
--				phy_disconnect(ndev->phydev);
-+			mac = netdev_priv(ndev);
-+			phy_disconnect(ndev->phydev);
-+			of_node_put(mac->phy_node);
- 		}
- }
--- 
-2.25.1
+Reviewed-by: Allison Henderson <achender@kernel.org>
+Allison
+
+> ---
+>  net/rds/ib_send.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/net/rds/ib_send.c b/net/rds/ib_send.c
+> index fcd04c29f543..d6be95542119 100644
+> --- a/net/rds/ib_send.c
+> +++ b/net/rds/ib_send.c
+> @@ -170,6 +170,8 @@ static struct rds_message *rds_ib_send_unmap_op(struc=
+t rds_ib_connection *ic,
+>  		break;
+>  	case IB_WR_ATOMIC_FETCH_AND_ADD:
+>  	case IB_WR_ATOMIC_CMP_AND_SWP:
+> +	case IB_WR_MASKED_ATOMIC_FETCH_AND_ADD:
+> +	case IB_WR_MASKED_ATOMIC_CMP_AND_SWP:
+>  		if (send->s_op) {
+>  			rm =3D container_of(send->s_op, struct rds_message, atomic);
+>  			rds_ib_send_unmap_atomic(ic, send->s_op, wc_status);
 
 
