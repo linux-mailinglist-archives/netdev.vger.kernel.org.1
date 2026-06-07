@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-296133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HQD7H2ppJGpe6AEAu9opvQ
-	(envelope-from <netdev+bounces-296133-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 20:39:38 +0200
+	id BMFpIXNnJGoS6AEAu9opvQ
+	(envelope-from <netdev+bounces-296124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 20:31:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8E164E0A0
-	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 20:39:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C7D64E070
+	for <lists+netdev@lfdr.de>; Sat, 06 Jun 2026 20:31:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296133-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296133-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296124-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296124-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=chelsio.com (policy=reject);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97D2C3014287
-	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 18:39:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4889E302883A
+	for <lists+netdev@lfdr.de>; Sat,  6 Jun 2026 18:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B673783C0;
-	Sat,  6 Jun 2026 18:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EE03B47DD;
+	Sat,  6 Jun 2026 18:21:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from stargate.chelsio.com (unknown [12.32.117.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDAF3B47E1
-	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 18:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF0ACA4E
+	for <netdev@vger.kernel.org>; Sat,  6 Jun 2026 18:20:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780771151; cv=none; b=LKYwEGGfNsm1RLzTh8Nv8xgg/up5vOpqHrCEnHBG5LP0TbV4pf9tir0vQMAYlbgbbqYJFm/WXT4gVxtOuw2Q1XqQD5PEXAJqDvCVVnU69r0dvqBv0j6KheoHlHYMReRonHEIAtWDLiZlY5d7RHk461x2oNPeuBmQUbJmkeUSRik=
+	t=1780770062; cv=none; b=byOtsd+NFDxeEuceaTckOhgO87/EIMo//vFZ7oYgSUOPdmYmtN22WtfDTsS/8Ow7ewUvIP/uzPokGm8c/KlMnQljOmhEh4M+pWSgDL/fWdNIb0Wze1kWd+MlfqcXBg/85XfthDC22utEsDnaDP66h7bvSDueoguYFh+p4NEuJB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780771151; c=relaxed/simple;
-	bh=aqcniQuC0+KuKaZtPmgYp/xS1qwmbfSo/IyUDH+AoXc=;
+	s=arc-20240116; t=1780770062; c=relaxed/simple;
+	bh=OfoxDMKE6KeF13RqELfNGvUuUeUoeybJP5VikqdR4Go=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=if90egwGLfaWzpsL79P+v34UAhiODLZFeakBdW1v96A7jSMS7KlVoBB9h3VZzeREqKYMTRhYUSVenKbs3lSO/PiQgMKW5K2S+RMz4j8zIj2rwOZveZpaqQ4uoldnG+QECRZ/MbP7McAr7pD0sJe+kv5eeSiKUXwpNxyDhGbMXCw=
+	 MIME-Version; b=NJYbt7eWxey7m7AD6NYb6/1Ke9NJEY9PaRHgmdVxiklavQZo0rieIeo7xuH14AY8UrB0Rt7YM83ZBGzt1+9FOEDhEVXgB79ohmVCD3zKULdqDu70DC33eJzNN2tCblPiI43Xs6Ng2pKry477SQ+tbXWdwCEGXJABfI9GL6VAEHY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
 Received: from mehrangarh-blr-asicdesigners-com.asicdesigners.com (mehrangarh.blr.asicdesigners.com [10.193.185.169])
-	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 656IKSGD029679;
-	Sat, 6 Jun 2026 11:20:45 -0700
+	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 656IKSGE029679;
+	Sat, 6 Jun 2026 11:20:48 -0700
 From: Potnuri Bharat Teja <bharat@chelsio.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
         pabeni@redhat.com, andrew+netdev@lunn.ch, bharat@chelsio.com
-Subject: [PATCH net-next v1 03/10] cxgb4: Add T7 CPL messages, FW constants, and PCI IDs
-Date: Sat,  6 Jun 2026 23:52:13 -0400
-Message-Id: <20260607035220.528439-4-bharat@chelsio.com>
+Subject: [PATCH net-next v1 04/10] cxgb4: Add versioned structures and scratch buffs
+Date: Sat,  6 Jun 2026 23:52:14 -0400
+Message-Id: <20260607035220.528439-5-bharat@chelsio.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20260607035220.528439-1-bharat@chelsio.com>
 References: <20260607035220.528439-1-bharat@chelsio.com>
@@ -68,10 +68,10 @@ X-Spamd-Result: default: False [7.54 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:bharat@chelsio.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296133-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296124-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,meta];
+	GREYLIST(0.00)[pass,body];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[bharat@chelsio.com,netdev@vger.kernel.org];
@@ -89,427 +89,374 @@ X-Spamd-Result: default: False [7.54 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_NONE(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CC8E164E0A0
+X-Rspamd-Queue-Id: D5C7D64E070
 X-Spam: Yes
 
-Extend the core protocol and firmware messaging interfaces to support the
-T7 hardware generation, and register the matching T7 physical PCI IDs.
+Upgrade the cudbg framework to support the expanded address space and
+multi-core tracking requirements of T7 adapters.
 
-Update CPL structures within t4_msg.h for the expanded traffic
-management pipelines. This introduces the CPL_SET_LE_REQ opcode and
-tracking structures for hardware Lookup Engine and TCAM programming.
-implements cpl_t7_act_open_req and cpl_t7_act_open_req6 layouts,
-remove stale, duplicate legacy macros for CPL_TX_TNL_LSO to clean
-up the file.
+Refactor the debug layout by replacing flat representations with
+versioned structures like cim_ibq_rev1 and sge_ctxt_rev1 embedded with
+compatibility headers for user-space parsing tools. Widen memory
+description bounds from u32 to u64 to accommodate T7's 64-bit physical
+memory footprint, and register 16 new T7-specific debug entity IDs.
+A new parameter-passing array is also added to route microprocessor
+core IDs and mailbox logging context straight to the capture routines.
 
-Expand firmware command definitions within t4fw_api.h and t4fw_version.h
-to interact with new T7 engine features. This includes adding multi-core
-queue assignment parameters, SWAPMAC and TX_LOOP offload capabilities,
-and definitions for next-generation physical interfaces like SFP56,
-QSFP56, OSFP, and QSFPDD. The firmware header layout is refactored to
-support the T7 chip marker.
+Finally, introduce get_scratch_buff and release_scratch_buff management
+helpers. These functions carve out transient working space directly from
+the tail of the pre-allocated output payload, eliminating the overhead
+and memory fragmentation of repetitive kmalloc calls during diagnostic
+dump captures.
 
 Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
 ---
- drivers/net/ethernet/chelsio/cxgb4/t4_msg.h   | 109 ++++++++++++++++--
- .../ethernet/chelsio/cxgb4/t4_pci_id_tbl.h    |  21 ++++
- drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h |  82 +++++++++++--
- .../net/ethernet/chelsio/cxgb4/t4fw_version.h |   9 ++
- 4 files changed, 203 insertions(+), 18 deletions(-)
+ .../net/ethernet/chelsio/cxgb4/cudbg_common.c |  30 ++++
+ .../net/ethernet/chelsio/cxgb4/cudbg_entity.h | 147 +++++++++++++++---
+ drivers/net/ethernet/chelsio/cxgb4/cudbg_if.h |  54 ++++++-
+ .../ethernet/chelsio/cxgb4/cudbg_lib_common.h |   4 +
+ 4 files changed, 216 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h b/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h
-index fed5f93bf620..66a55ddf0c24 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h
-@@ -88,6 +88,7 @@ enum {
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cudbg_common.c b/drivers/net/ethernet/chelsio/cxgb4/cudbg_common.c
+index 175e1a675de5..ccbf402a0a89 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cudbg_common.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cudbg_common.c
+@@ -7,6 +7,36 @@
+ #include "cudbg_if.h"
+ #include "cudbg_lib_common.h"
  
- 	CPL_RDMA_READ_REQ     = 0x60,
- 
-+	CPL_SET_LE_REQ        = 0x80,
- 	CPL_PASS_OPEN_REQ6    = 0x81,
- 	CPL_ACT_OPEN_REQ6     = 0x83,
- 
-@@ -544,6 +545,26 @@ struct cpl_t6_act_open_req {
- 	__be32 opt3;
++void release_scratch_buff(struct cudbg_buffer *pscratch_buff,
++			  struct cudbg_buffer *pdbg_buff)
++{
++	pdbg_buff->size += pscratch_buff->size;
++	memset(pscratch_buff->data, 0, pscratch_buff->size);
++	pscratch_buff->data = NULL;
++	pscratch_buff->offset = 0;
++	pscratch_buff->size = 0;
++}
++
++int get_scratch_buff(struct cudbg_buffer *pdbg_buff, u32 size,
++		     struct cudbg_buffer *pscratch_buff)
++{
++	u32 scratch_offset;
++	int rc = 0;
++
++	scratch_offset = pdbg_buff->size - size;
++	if (pdbg_buff->offset > (int)scratch_offset || pdbg_buff->size < size) {
++		rc = CUDBG_STATUS_NO_MEM;
++		goto err;
++	} else {
++		pscratch_buff->data = (char *)pdbg_buff->data + scratch_offset;
++		pscratch_buff->offset = 0;
++		pscratch_buff->size = size;
++		pdbg_buff->size -= size;
++	}
++err:
++	return rc;
++}
++
+ int cudbg_get_buff(struct cudbg_init *pdbg_init,
+ 		   struct cudbg_buffer *pdbg_buff, u32 size,
+ 		   struct cudbg_buffer *pin_buff)
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cudbg_entity.h b/drivers/net/ethernet/chelsio/cxgb4/cudbg_entity.h
+index d5218e74284c..bad27fedac63 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cudbg_entity.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cudbg_entity.h
+@@ -21,13 +21,58 @@ struct cudbg_mbox_log {
+ 	u32 lo[MBOX_LEN / 8];
  };
  
-+struct cpl_t7_act_open_req {
-+	WR_HDR;
-+	union opcode_tid ot;
-+	__be16 local_port;
-+	__be16 peer_port;
-+	__be32 local_ip;
-+	__be32 peer_ip;
-+	__be64 opt0;
-+	__be32 iss;
-+	__be32 opt2;
-+	__be64 params;
-+	__be32 rsvd2;
-+	__be32 opt3;
+-struct cudbg_cim_qcfg {
+-	u8 chip;
+-	u16 base[CIM_NUM_IBQ + CIM_NUM_OBQ_T5];
+-	u16 size[CIM_NUM_IBQ + CIM_NUM_OBQ_T5];
+-	u16 thres[CIM_NUM_IBQ];
+-	u32 obq_wr[2 * CIM_NUM_OBQ_T5];
+-	u32 stat[4 * (CIM_NUM_IBQ + CIM_NUM_OBQ_T5)];
++#define CUDBG_CIM_IBQ_REV 1
++
++struct cim_ibq_rev1 {
++	struct cudbg_ver_hdr ver_hdr;
++	u8 qid;
++	u8 coreid;
++	u32 data[]; /* Must be last */
 +};
 +
-+#define T7_FILTER_TUPLE_S       1
-+#define T7_FILTER_TUPLE_M       0x7FFFFFFFFFFFFFFFULL
-+#define T7_FILTER_TUPLE_V(x)    ((x) << T7_FILTER_TUPLE_S)
-+#define T7_FILTER_TUPLE_G(x)    (((x) >> T7_FILTER_TUPLE_S) & T7_FILTER_TUPLE_M)
++#define CUDBG_CIM_OBQ_REV 1
 +
- struct cpl_act_open_req6 {
- 	WR_HDR;
- 	union opcode_tid ot;
-@@ -590,6 +611,23 @@ struct cpl_t6_act_open_req6 {
- 	__be32 opt3;
- };
- 
-+struct cpl_t7_act_open_req6 {
-+	WR_HDR;
-+	union opcode_tid ot;
-+	__be16 local_port;
-+	__be16 peer_port;
-+	__be64 local_ip_hi;
-+	__be64 local_ip_lo;
-+	__be64 peer_ip_hi;
-+	__be64 peer_ip_lo;
-+	__be64 opt0;
-+	__be32 iss;
-+	__be32 opt2;
-+	__be64 params;
-+	__be32 rsvd2;
-+	__be32 opt3;
++struct cim_obq_rev1 {
++	struct cudbg_ver_hdr ver_hdr;
++	u8 qid;
++	u8 coreid;
++	u32 data[]; /* Must be last */
 +};
 +
- struct cpl_act_open_rpl {
- 	union opcode_tid ot;
- 	__be32 atid_status;
-@@ -682,10 +720,20 @@ struct cpl_get_tcb {
- #define QUEUENO_S    0
- #define QUEUENO_V(x) ((x) << QUEUENO_S)
- 
-+#define T7_QUEUENO_S    0
-+#define T7_QUEUENO_M    0xFFF
-+#define T7_QUEUENO_V(x) ((x) << T7_QUEUENO_S)
-+#define T7_QUEUENO_G(x) (((x) >> T7_QUEUENO_S) & T7_QUEUENO_M)
++#define CUDBG_CIM_QCFG_REV 1
 +
- #define REPLY_CHAN_S    14
- #define REPLY_CHAN_V(x) ((x) << REPLY_CHAN_S)
- #define REPLY_CHAN_F    REPLY_CHAN_V(1U)
- 
-+#define T7_REPLY_CHAN_S	 12
-+#define T7_REPLY_CHAN_M	 0x7
-+#define T7_REPLY_CHAN_V(x)      ((x) << T7_REPLY_CHAN_S)
-+#define T7_REPLY_CHAN_G(x)      (((x) >> T7_REPLY_CHAN_S) & T7_REPLY_CHAN_M)
-+
- #define NO_REPLY_S    15
- #define NO_REPLY_V(x) ((x) << NO_REPLY_S)
- #define NO_REPLY_F    NO_REPLY_V(1U)
-@@ -1363,6 +1411,53 @@ struct cpl_smt_write_rpl {
- #define SMTW_NORPL_V(x)	((x) << SMTW_NORPL_S)
- #define SMTW_NORPL_F	SMTW_NORPL_V(1U)
- 
-+struct cpl_set_le_req {
-+	WR_HDR;
-+	union opcode_tid ot;
-+	__be16 reply_ctrl;
-+	__be16 params;
-+	__be64 mask_hi;
-+	__be64 mask_lo;
-+	__be64 val_hi;
-+	__be64 val_lo;
++enum cudbg_entity_cim_qcfg_qtype {
++	CUDBG_ENTITY_CIM_QCFG_QTYPE_IBQ = 0,
++	CUDBG_ENTITY_CIM_QCFG_QTYPE_OBQ,
 +};
 +
-+/* cpl_set_le_req.reply_ctrl additional fields */
-+#define LE_REQ_RXCHANNEL_S      14
-+#define LE_REQ_RXCHANNEL_M      0x1
-+#define LE_REQ_RXCHANNEL_V(x)   ((x) << LE_REQ_RXCHANNEL_S)
-+#define LE_REQ_RXCHANNEL_G(x) (((x) >> LE_REQ_RXCHANNEL_S) & LE_REQ_RXCHANNEL_M)
-+#define LE_REQ_RXCHANNEL_F      LE_REQ_RXCHANNEL_V(1U)
++struct cim_qcfg_rev1_data {
++	u8 qtype;
++	u8 qid;
++	u16 base;
++	u16 size;
++	u16 thres;
++	u32 obq_wr[2];
++	u32 stat[4];
++};
 +
-+#define LE_REQ_IP6_S    13
-+#define LE_REQ_IP6_V(x) ((x) << LE_REQ_IP6_S)
-+#define LE_REQ_IP6_F    LE_REQ_IP6_V(1U)
++struct cim_qcfg_rev1 {
++	struct cudbg_ver_hdr ver_hdr;
++	u8 num_cim_ibq;
++	u8 num_cim_obq;
++	u8 coreid;
++	struct cim_qcfg_rev1_data data[]; /* Must be last */
++};
 +
-+/* cpl_set_le_req.params fields */
-+#define LE_CHAN_S    0
-+#define LE_CHAN_M    0x3
-+#define LE_CHAN_V(x) ((x) << LE_CHAN_S)
-+#define LE_CHAN_G(x) (((x) >> LE_CHAN_S) & LE_CHAN_M)
++#define CUDBG_CIM_LA_REV 1
 +
-+#define LE_OFFSET_S    5
-+#define LE_OFFSET_M    0x7
-+#define LE_OFFSET_V(x) ((x) << LE_OFFSET_S)
-+#define LE_OFFSET_G(x) (((x) >> LE_OFFSET_S) & LE_OFFSET_M)
-+
-+#define LE_MORE_S    8
-+#define LE_MORE_V(x) ((x) << LE_MORE_S)
-+#define LE_MORE_F    LE_MORE_V(1U)
-+
-+#define LE_REQSIZE_S    9
-+#define LE_REQSIZE_M    0x7
-+#define LE_REQSIZE_V(x) ((x) << LE_REQSIZE_S)
-+#define LE_REQSIZE_G(x) (((x) >> LE_REQSIZE_S) & LE_REQSIZE_M)
-+
-+#define LE_REQCMD_S    12
-+#define LE_REQCMD_M    0xF
-+#define LE_REQCMD_V(x) ((x) << LE_REQCMD_S)
-+#define LE_REQCMD_G(x) (((x) >> LE_REQCMD_S) & LE_REQCMD_M)
-+
- struct cpl_rdma_terminate {
- 	union opcode_tid ot;
- 	__be16 rsvd;
-@@ -1631,10 +1726,10 @@ struct cpl_tx_tnl_lso {
- 	(((x) >> CPL_TX_TNL_LSO_IPV6OUT_S) & CPL_TX_TNL_LSO_IPV6OUT_M)
- #define CPL_TX_TNL_LSO_IPV6OUT_F        CPL_TX_TNL_LSO_IPV6OUT_V(1U)
- 
--#define CPL_TX_TNL_LSO_ETHHDRLEN_S	16
--#define CPL_TX_TNL_LSO_ETHHDRLEN_M	0xf
--#define CPL_TX_TNL_LSO_ETHHDRLEN_V(x)	((x) << CPL_TX_TNL_LSO_ETHHDRLEN_S)
--#define CPL_TX_TNL_LSO_ETHHDRLEN_G(x)	\
-+#define CPL_TX_TNL_LSO_ETHHDRLEN_S     16
-+#define CPL_TX_TNL_LSO_ETHHDRLEN_M     0xf
-+#define CPL_TX_TNL_LSO_ETHHDRLEN_V(x)  ((x) << CPL_TX_TNL_LSO_ETHHDRLEN_S)
-+#define CPL_TX_TNL_LSO_ETHHDRLEN_G(x)  \
- 	(((x) >> CPL_TX_TNL_LSO_ETHHDRLEN_S) & CPL_TX_TNL_LSO_ETHHDRLEN_M)
- 
- #define CPL_TX_TNL_LSO_IPHDRLEN_S	4
-@@ -1719,12 +1814,6 @@ struct cpl_tx_tnl_lso {
- #define CPL_TX_TNL_LSO_TNLTYPE_G(x)	\
- 	(((x) >> CPL_TX_TNL_LSO_TNLTYPE_S) & CPL_TX_TNL_LSO_TNLTYPE_M)
- 
--#define S_CPL_TX_TNL_LSO_ETHHDRLEN	16
--#define M_CPL_TX_TNL_LSO_ETHHDRLEN	0xf
--#define V_CPL_TX_TNL_LSO_ETHHDRLEN(x)	((x) << S_CPL_TX_TNL_LSO_ETHHDRLEN)
--#define G_CPL_TX_TNL_LSO_ETHHDRLEN(x)	\
--	(((x) >> S_CPL_TX_TNL_LSO_ETHHDRLEN) & M_CPL_TX_TNL_LSO_ETHHDRLEN)
--
- #define CPL_TX_TNL_LSO_TNLHDRLEN_S      0
- #define CPL_TX_TNL_LSO_TNLHDRLEN_M      0xfff
- #define CPL_TX_TNL_LSO_TNLHDRLEN_V(x)	((x) << CPL_TX_TNL_LSO_TNLHDRLEN_S)
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_pci_id_tbl.h b/drivers/net/ethernet/chelsio/cxgb4/t4_pci_id_tbl.h
-index 0b1b5f9c67d4..d0921b76049d 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4_pci_id_tbl.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_pci_id_tbl.h
-@@ -220,6 +220,27 @@ CH_PCI_DEVICE_ID_TABLE_DEFINE_BEGIN
- 	CH_PCI_ID_TABLE_FENTRY(0x608a), /* Custom T62100-CR */
- 	CH_PCI_ID_TABLE_FENTRY(0x608b), /* Custom T6225-CR */
- 	CH_PCI_ID_TABLE_FENTRY(0x6092), /* Custom T62100-CR-LOM */
-+
-+	/* T7 adapter */
-+	CH_PCI_ID_TABLE_FENTRY(0x7000), /* T7-DBG */
-+	CH_PCI_ID_TABLE_FENTRY(0x7001), /* T7250 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7002), /* S7250 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7003), /* T7450 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7004), /* S7450 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7005), /* T72200 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7006), /* S72200 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7007), /* T72200-FH */
-+	CH_PCI_ID_TABLE_FENTRY(0x7008), /* T71400 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7009), /* S7210-BT */
-+	CH_PCI_ID_TABLE_FENTRY(0x700a), /* T7450-RC */
-+	CH_PCI_ID_TABLE_FENTRY(0x700b), /* T72200-RC */
-+	CH_PCI_ID_TABLE_FENTRY(0x700c), /* T72200-FH-RC */
-+	CH_PCI_ID_TABLE_FENTRY(0x700d), /* S72200-OCP3 */
-+	CH_PCI_ID_TABLE_FENTRY(0x700e), /* S7450-OCP3 */
-+	CH_PCI_ID_TABLE_FENTRY(0x700f), /* S7410-BT-OCP3 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7010), /* S7210-BT-A */
-+	CH_PCI_ID_TABLE_FENTRY(0x7011), /* T7_MAYRA_7 */
-+	CH_PCI_ID_TABLE_FENTRY(0x7012), /* T7-iNIC */
- CH_PCI_DEVICE_ID_TABLE_DEFINE_END;
- 
- #endif /* __T4_PCI_ID_TBL_H__ */
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-index 2419459a0b85..e4fb8999daf1 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-@@ -35,6 +35,8 @@
- #ifndef _T4FW_INTERFACE_H_
- #define _T4FW_INTERFACE_H_
- 
-+#include <linux/if_ether.h>
-+
- enum fw_retval {
- 	FW_SUCCESS		= 0,	/* completed successfully */
- 	FW_EPERM		= 1,	/* operation not permitted */
-@@ -434,6 +436,13 @@ struct fw_filter2_wr {
- #define FW_FILTER_WR_RX_RPL_IQ_G(x)     \
- 	(((x) >> FW_FILTER_WR_RX_RPL_IQ_S) & FW_FILTER_WR_RX_RPL_IQ_M)
- 
-+#define FW_FILTER2_WR_SWAPMAC_S	 0
-+#define FW_FILTER2_WR_SWAPMAC_M	 0x1
-+#define FW_FILTER2_WR_SWAPMAC_V(x)      ((x) << FW_FILTER2_WR_SWAPMAC_S)
-+#define FW_FILTER2_WR_SWAPMAC_G(x) \
-+	(((x) >> FW_FILTER2_WR_SWAPMAC_S) & FW_FILTER2_WR_SWAPMAC_M)
-+#define FW_FILTER2_WR_SWAPMAC_F	 FW_FILTER2_WR_SWAPMAC_V(1U)
-+
- #define FW_FILTER2_WR_FILTER_TYPE_S	1
- #define FW_FILTER2_WR_FILTER_TYPE_M	0x1
- #define FW_FILTER2_WR_FILTER_TYPE_V(x)	((x) << FW_FILTER2_WR_FILTER_TYPE_S)
-@@ -460,6 +469,13 @@ struct fw_filter2_wr {
- #define FW_FILTER2_WR_ULP_TYPE_G(x)     \
- 	(((x) >> FW_FILTER2_WR_ULP_TYPE_S) & FW_FILTER2_WR_ULP_TYPE_M)
- 
-+#define FW_FILTER2_WR_TX_LOOP_S	 29
-+#define FW_FILTER2_WR_TX_LOOP_M	 0x1
-+#define FW_FILTER2_WR_TX_LOOP_V(x)      ((x) << FW_FILTER2_WR_TX_LOOP_S)
-+#define FW_FILTER2_WR_TX_LOOP_G(x)      \
-+	    (((x) >> FW_FILTER2_WR_TX_LOOP_S) & FW_FILTER2_WR_TX_LOOP_M)
-+#define FW_FILTER2_WR_TX_LOOP_F	 FW_FILTER2_WR_TX_LOOP_V(1U)
-+
- #define FW_FILTER_WR_MACI_S     23
- #define FW_FILTER_WR_MACI_M     0x1ff
- #define FW_FILTER_WR_MACI_V(x)  ((x) << FW_FILTER_WR_MACI_S)
-@@ -1882,6 +1898,12 @@ struct fw_eq_eth_cmd {
- #define FW_EQ_ETH_CMD_EQSTOP_V(x)	((x) << FW_EQ_ETH_CMD_EQSTOP_S)
- #define FW_EQ_ETH_CMD_EQSTOP_F	FW_EQ_ETH_CMD_EQSTOP_V(1U)
- 
-+#define FW_EQ_ETH_CMD_COREGROUP_S      16
-+#define FW_EQ_ETH_CMD_COREGROUP_M      0x3f
-+#define FW_EQ_ETH_CMD_COREGROUP_V(x)   ((x) << FW_EQ_ETH_CMD_COREGROUP_S)
-+#define FW_EQ_ETH_CMD_COREGROUP_G(x) \
-+	(((x) >> FW_EQ_ETH_CMD_COREGROUP_S) & FW_EQ_ETH_CMD_COREGROUP_M)
-+
- #define FW_EQ_ETH_CMD_EQID_S	0
- #define FW_EQ_ETH_CMD_EQID_M	0xfffff
- #define FW_EQ_ETH_CMD_EQID_V(x)	((x) << FW_EQ_ETH_CMD_EQID_S)
-@@ -2010,6 +2032,12 @@ struct fw_eq_ctrl_cmd {
- #define FW_EQ_CTRL_CMD_CMPLIQID_S	20
- #define FW_EQ_CTRL_CMD_CMPLIQID_V(x)	((x) << FW_EQ_CTRL_CMD_CMPLIQID_S)
- 
-+#define FW_EQ_CTRL_CMD_COREGROUP_S     16
-+#define FW_EQ_CTRL_CMD_COREGROUP_M     0x3f
-+#define FW_EQ_CTRL_CMD_COREGROUP_V(x)  ((x) << FW_EQ_CTRL_CMD_COREGROUP_S)
-+#define FW_EQ_CTRL_CMD_COREGROUP_G(x) \
-+	(((x) >> FW_EQ_CTRL_CMD_COREGROUP_S) & FW_EQ_CTRL_CMD_COREGROUP_M)
-+
- #define FW_EQ_CTRL_CMD_EQID_S		0
- #define FW_EQ_CTRL_CMD_EQID_M		0xfffff
- #define FW_EQ_CTRL_CMD_EQID_V(x)	((x) << FW_EQ_CTRL_CMD_EQID_S)
-@@ -2597,7 +2625,7 @@ struct fw_acl_vlan_cmd {
- #define FW_ACL_VLAN_CMD_EN_M		0x1
- #define FW_ACL_VLAN_CMD_EN_V(x)		((x) << FW_ACL_VLAN_CMD_EN_S)
- #define FW_ACL_VLAN_CMD_EN_G(x)         \
--	(((x) >> S_FW_ACL_VLAN_CMD_EN_S) & FW_ACL_VLAN_CMD_EN_M)
-+	(((x) >> FW_ACL_VLAN_CMD_EN_S_S) & FW_ACL_VLAN_CMD_EN_M)
- #define FW_ACL_VLAN_CMD_EN_F            FW_ACL_VLAN_CMD_EN_V(1U)
- 
- #define FW_ACL_VLAN_CMD_DROPNOVLAN_S	7
-@@ -3107,8 +3135,26 @@ enum fw_port_type {
- 	FW_PORT_TYPE_SFP28,
- 	FW_PORT_TYPE_KR_SFP28,
- 	FW_PORT_TYPE_KR_XLAUI,
--
--	FW_PORT_TYPE_NONE = FW_PORT_CMD_PTYPE_M
-+	/* Applicable on T7 */
-+	FW_PORT_TYPE_BARE_LINK_50G    = 23,   /* No, 1, 50G */
-+	FW_PORT_TYPE_BARE_LINK_100G   = 24,   /* No, 2, 100G/50G */
-+	FW_PORT_TYPE_BARE_LINK_200G   = 25,   /* No, 4, 200G/100G/50G */
-+	FW_PORT_TYPE_SFP56	      = 26,   /* No, 1, 50G/25G */
-+	FW_PORT_TYPE_QSFP56	      = 27,   /* No, 4, 200G/100G/50G/25G */
-+	FW_PORT_TYPE_QSFP56_4_50G     = 28,   /* No, 1, 50G */
-+	FW_PORT_TYPE_KR_50G	      = 29,   /* No, 1, 50G */
-+	FW_PORT_TYPE_KR2_100G	      = 30,   /* No, 2, 100G/50G */
-+	FW_PORT_TYPE_KR4_200G	      = 31,   /* No, 4, 200G/100G/50G */
-+	FW_PORT_TYPE_QSFP56_2_50G     = 32,   /* No, 1, 50G */
-+	FW_PORT_TYPE_OSFP	      = 33,   /* No, 8, 400G/200G/100G/50G */
-+	FW_PORT_TYPE_QSFPDD	      = 34,   /* No, 8, 400G/200G/100G/50G  */
-+	FW_PORT_TYPE_OSFP_2_200G      = 35,   /* No, 4, 200G/100G/50G */
-+	FW_PORT_TYPE_QSFP_4_100G      = 36,   /* No, 2, 100G/50G */
-+	FW_PORT_TYPE_QSFPDD_2_200G    = 37,   /* No, 4, 200G/100G/50G */
-+	FW_PORT_TYPE_KR8_400G	      = 38,   /* No, 8, 400G/200G/100G/50G? */
-+	FW_PORT_TYPE_MAX,
-+
-+	FW_PORT_TYPE_NONE = FW_PORT_CMD_PORTTYPE32_M
++struct struct_cim_la_rev1 {
++	struct cudbg_ver_hdr ver_hdr;
++	u8 coreid;
++	u8 ncol;
++	u16 nrow;
++	u32 config;
++	u32 data[]; /* Must be last */
  };
  
- enum fw_port_module_type {
-@@ -3119,6 +3165,7 @@ enum fw_port_module_type {
- 	FW_PORT_MOD_TYPE_TWINAX_PASSIVE,
- 	FW_PORT_MOD_TYPE_TWINAX_ACTIVE,
- 	FW_PORT_MOD_TYPE_LRM,
-+	FW_PORT_MOD_TYPE_DR,
- 	FW_PORT_MOD_TYPE_ERROR		= FW_PORT_CMD_MODTYPE_M - 3,
- 	FW_PORT_MOD_TYPE_UNKNOWN	= FW_PORT_CMD_MODTYPE_M - 2,
- 	FW_PORT_MOD_TYPE_NOTSUPPORTED	= FW_PORT_CMD_MODTYPE_M - 1,
-@@ -3770,13 +3817,17 @@ struct fw_hdr {
- 	__u32   reserved3;
- 	__u32   reserved4;
- 	__be32  flags;
--	__be32  reserved6[23];
-+	__be32  reserved6[4];
-+	__u8    reserved7[3];
-+	__u8    dsign_len;
-+	__u8    dsign[72];	      /* fw binary digital signature */
+ struct cudbg_rss_vf_conf {
+@@ -50,6 +95,25 @@ struct cudbg_hw_sched {
+ 	u32 map;
  };
  
- enum fw_hdr_chip {
- 	FW_HDR_CHIP_T4,
- 	FW_HDR_CHIP_T5,
--	FW_HDR_CHIP_T6
-+	FW_HDR_CHIP_T6,
-+	FW_HDR_CHIP_T7
++#define CUDBG_TP_INDIR_REG_REV 1
++#define CUDBG_PM_INDIR_REG_REV 1
++#define CUDBG_MA_INDIR_REG_REV 1
++#define CUDBG_UP_CIM_INDIR_REG_REV 1
++#define CUDBG_HMA_INDIR_REG_REV 1
++
++struct cudbg_indir_reg_data {
++	u32 offset;
++	u32 data;
++};
++
++struct cudbg_indir_reg_entity {
++	struct cudbg_ver_hdr ver_hdr;
++	u32 indir_reg;
++	u32 indir_data;
++	u32 nentries;
++	struct cudbg_indir_reg_data data[];
++};
++
+ #define SGE_QBASE_DATA_REG_NUM 4
+ 
+ struct sge_qbase_reg_field {
+@@ -91,20 +155,20 @@ static const char * const cudbg_region[] = {
+ 	"Tx payload:", "Rx payload:", "LE hash:", "iSCSI region:",
+ 	"TDDP region:", "TPT region:", "STAG region:", "RQ region:",
+ 	"RQUDP region:", "PBL region:", "TXPBL region:",
+-	"DBVFIFO region:", "ULPRX state:", "ULPTX state:",
+-	"On-chip queues:"
++	"RRQ region:", "DBVFIFO region:", "ULPRX state:",
++	"ULPTX state:", "On-chip queues:"
  };
  
- #define FW_HDR_FW_VER_MAJOR_S	24
-@@ -3888,7 +3939,9 @@ struct fw_devlog_cmd {
- 	__u8   r2[7];
- 	__be32 memtype_devlog_memaddr16_devlog;
- 	__be32 memsize_devlog;
--	__be32 r3[2];
-+	__u8   num_devlog;
-+	__u8   r3[3];
-+	__be32 r4;
+ /* Memory region info relative to current memory (i.e. wrt 0). */
+ struct cudbg_region_info {
+ 	bool exist; /* Does region exists in current memory? */
+-	u32 start;  /* Start wrt 0 */
+-	u32 end;    /* End wrt 0 */
++	u64 start;  /* Start wrt 0 */
++	u64 end;    /* End wrt 0 */
  };
  
- #define FW_DEVLOG_CMD_MEMTYPE_DEVLOG_S		28
-@@ -3915,8 +3968,14 @@ struct fw_devlog_cmd {
-  */
- #define PCIE_FW_PF_DEVLOG		7
+ struct cudbg_mem_desc {
+-	u32 base;
+-	u32 limit;
++	u64 base;
++	u64 limit;
+ 	u32 idx;
+ };
  
-+#define PCIE_FW_PF_DEVLOG_COUNT_MSB_S  31
-+#define PCIE_FW_PF_DEVLOG_COUNT_MSB_M  0x1
-+#define PCIE_FW_PF_DEVLOG_COUNT_MSB_V(x) ((x) << PCIE_FW_PF_DEVLOG_COUNT_MSB_S)
-+#define PCIE_FW_PF_DEVLOG_COUNT_MSB_G(x) \
-+	(((x) >> PCIE_FW_PF_DEVLOG_COUNT_MSB_S) & PCIE_FW_PF_DEVLOG_COUNT_MSB_M)
-+
- #define PCIE_FW_PF_DEVLOG_NENTRIES128_S	28
--#define PCIE_FW_PF_DEVLOG_NENTRIES128_M	0xf
-+#define PCIE_FW_PF_DEVLOG_NENTRIES128_M	0x7
- #define PCIE_FW_PF_DEVLOG_NENTRIES128_V(x) \
- 	((x) << PCIE_FW_PF_DEVLOG_NENTRIES128_S)
- #define PCIE_FW_PF_DEVLOG_NENTRIES128_G(x) \
-@@ -3929,8 +3988,15 @@ struct fw_devlog_cmd {
- #define PCIE_FW_PF_DEVLOG_ADDR16_G(x) \
- 	(((x) >> PCIE_FW_PF_DEVLOG_ADDR16_S) & PCIE_FW_PF_DEVLOG_ADDR16_M)
+@@ -187,20 +251,42 @@ struct cudbg_tid_info_region_rev1 {
+ 	struct cudbg_ver_hdr ver_hdr;
+ 	struct cudbg_tid_info_region tid;
+ 	u32 tid_start;
+-	u32 reserved[16];
++	u32 nhash;
++	u32 clip_base;
++	u32 nclip;
++	u32 route_base;
++	u32 nroute;
++	u32 reserved[11];
+ };
  
-+#define PCIE_FW_PF_DEVLOG_COUNT_LSB_S  3
-+#define PCIE_FW_PF_DEVLOG_COUNT_LSB_M  0x1
-+#define PCIE_FW_PF_DEVLOG_COUNT_LSB_V(x) \
-+	((x) << PCIE_FW_PF_DEVLOG_COUNT_LSB_S)
-+#define PCIE_FW_PF_DEVLOG_COUNT_LSB_G(x) \
-+	(((x) >> PCIE_FW_PF_DEVLOG_COUNT_LSB_S) & PCIE_FW_PF_DEVLOG_COUNT_LSB_M)
+ #define CUDBG_LOWMEM_MAX_CTXT_QIDS 256
+ #define CUDBG_MAX_FL_QIDS 1024
+ 
+-struct cudbg_ch_cntxt {
+-	u32 cntxt_type;
+-	u32 cntxt_id;
+-	u32 data[SGE_CTXT_SIZE / 4];
++#define CUDBG_SGE_CTXT_REV 1
 +
- #define PCIE_FW_PF_DEVLOG_MEMTYPE_S	0
--#define PCIE_FW_PF_DEVLOG_MEMTYPE_M	0xf
-+#define PCIE_FW_PF_DEVLOG_MEMTYPE_M	0x7
- #define PCIE_FW_PF_DEVLOG_MEMTYPE_V(x)	((x) << PCIE_FW_PF_DEVLOG_MEMTYPE_S)
- #define PCIE_FW_PF_DEVLOG_MEMTYPE_G(x) \
- 	(((x) >> PCIE_FW_PF_DEVLOG_MEMTYPE_S) & PCIE_FW_PF_DEVLOG_MEMTYPE_M)
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4fw_version.h b/drivers/net/ethernet/chelsio/cxgb4/t4fw_version.h
-index a02b1dff403e..d19979c8bfc0 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4fw_version.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4fw_version.h
-@@ -61,4 +61,13 @@
- #define T6FW_MIN_VERSION_MAJOR 0x00
- #define T6FW_MIN_VERSION_MINOR 0x00
- #define T6FW_MIN_VERSION_MICRO 0x00
++struct struct_sge_ctxt_rev1_data {
++	u8 ctxt_type;
++	u8 size;
++	u32 ctxt_id;
++	u32 data[];
++};
 +
-+#define T7FW_VERSION_MAJOR 0x01
-+#define T7FW_VERSION_MINOR 0x19
-+#define T7FW_VERSION_MICRO 0x01
-+#define T7FW_VERSION_BUILD 0x1B
++struct struct_sge_ctxt_rev1 {
++	struct cudbg_ver_hdr ver_hdr;
++	u32 nentries;
++	struct struct_sge_ctxt_rev1_data data[]; /* Must be last */
+ };
+ 
+ #define CUDBG_MAX_RPLC_SIZE 128
+ 
++struct cudbg_cntxt_field {
++	char *name;
++	u32 start_bit;
++	u32 end_bit;
++	u32 shift;
++	u32 islog2;
++};
 +
-+#define T7FW_MIN_VERSION_MAJOR 0x00
-+#define T7FW_MIN_VERSION_MINOR 0x00
-+#define T7FW_MIN_VERSION_MICRO 0x00
- #endif
+ struct cudbg_mps_tcam {
+ 	u64 mask;
+ 	u32 rplc[8];
+@@ -250,6 +336,8 @@ enum cudbg_le_entry_types {
+ 	LE_ET_TCAM_ROUTING = 5,
+ 	LE_ET_HASH_CON = 6,
+ 	LE_ET_INVALID_TID = 8,
++	/* Reserve for future regions */
++	LE_ET_TCAM_MAX = 16,
+ };
+ 
+ struct cudbg_tcam {
+@@ -349,4 +437,27 @@ struct cudbg_qdesc_info {
+ 
+ #define CUDBG_NUM_PCIE_CONFIG_REGS 0x61
+ 
++struct cudbg_letcam_region {
++	u8 type;
++	u32 start;
++	u32 nentries;
++
++	u8 reserved[64];
++};
++
++struct cudbg_letcam {
++	struct cudbg_ver_hdr ver_hdr;
++
++	u8 nregions;
++	u32 region_hdr_size;
++
++	u32 max_tid;
++	u32 tid_data_hdr_size;
++
++	u8 reserved[64];
++};
++
++int cudbg_view_sge_ctxt(u8 ctxt_type, u32 qid, u32 *ctxt_data,
++			struct cudbg_cntxt_field *field,
++			struct cudbg_buffer *cudbg_poutbuf);
+ #endif /* __CUDBG_ENTITY_H__ */
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cudbg_if.h b/drivers/net/ethernet/chelsio/cxgb4/cudbg_if.h
+index c84719e3ca08..dbb0611b6d26 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cudbg_if.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cudbg_if.h
+@@ -17,6 +17,12 @@
+ #define CUDBG_MAJOR_VERSION 1
+ #define CUDBG_MINOR_VERSION 14
+ 
++#define CUDBG_MAX_PARAMS 16
++
++enum {
++	CUDBG_UP_COREID_PARAM = 13,
++};
++
+ enum cudbg_dbg_entity_type {
+ 	CUDBG_REG_DUMP = 1,
+ 	CUDBG_DEV_LOG = 2,
+@@ -71,11 +77,57 @@ enum cudbg_dbg_entity_type {
+ 	CUDBG_HMA = 68,
+ 	CUDBG_QDESC = 70,
+ 	CUDBG_FLASH = 71,
+-	CUDBG_MAX_ENTITY = 72,
++	CUDBG_CIM_IBQ_TP2  = 73,
++	CUDBG_CIM_IBQ_TP3  = 74,
++	CUDBG_CIM_IBQ_IPC1 = 75,
++	CUDBG_CIM_IBQ_IPC2 = 76,
++	CUDBG_CIM_IBQ_IPC3 = 77,
++	CUDBG_CIM_IBQ_IPC4 = 78,
++	CUDBG_CIM_IBQ_IPC5 = 79,
++	CUDBG_CIM_IBQ_IPC6 = 80,
++	CUDBG_CIM_IBQ_IPC7 = 81,
++	CUDBG_CIM_OBQ_IPC1 = 82,
++	CUDBG_CIM_OBQ_IPC2 = 83,
++	CUDBG_CIM_OBQ_IPC3 = 84,
++	CUDBG_CIM_OBQ_IPC4 = 85,
++	CUDBG_CIM_OBQ_IPC5 = 86,
++	CUDBG_CIM_OBQ_IPC6 = 87,
++	CUDBG_CIM_OBQ_IPC7 = 88,
++	CUDBG_MAX_ENTITY,
++};
++
++struct cudbg_param {
++	u16 param_type;
++	u16 reserved;
++	union {
++		struct {
++			u32 memtype; /* which memory (EDC0, EDC1, MC) */
++			u32 start; /* start of log in firmware memory */
++			u32 size; /* size of log */
++		} devlog_param;
++		struct {
++			struct mbox_cmd_log *log;
++			u16 mbox_cmds;
++		} mboxlog_param;
++		struct {
++			const char *caller_string;
++			u8 os_type;
++		} sw_state_param;
++		struct {
++			u32 itr;
++		} yield_param;
++		u64 time;
++		u8 tcb_bit_param;
++		void *adap;
++		u8 coreid;
++	} u;
+ };
+ 
+ struct cudbg_init {
+ 	struct adapter *adap; /* Pointer to adapter structure */
++	u16                dbg_params_cnt;
++	u16                dbg_reserved;
++	struct cudbg_param dbg_params[CUDBG_MAX_PARAMS];
+ 	void *outbuf; /* Output buffer */
+ 	u32 outbuf_size;  /* Output buffer size */
+ 	u8 compress_type; /* Type of compression to use */
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cudbg_lib_common.h b/drivers/net/ethernet/chelsio/cxgb4/cudbg_lib_common.h
+index 9fac777b0b24..45551f464ac4 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cudbg_lib_common.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cudbg_lib_common.h
+@@ -67,6 +67,10 @@ struct cudbg_error {
+ #define CDUMP_MAX_COMP_BUF_SIZE ((64 * 1024) - 1)
+ #define CUDBG_CHUNK_SIZE ((CDUMP_MAX_COMP_BUF_SIZE / 1024) * 1024)
+ 
++void release_scratch_buff(struct cudbg_buffer *pscratch_buff,
++			  struct cudbg_buffer *pdbg_buff);
++int get_scratch_buff(struct cudbg_buffer *pdbg_buff, u32 size,
++		     struct cudbg_buffer *pscratch_buff);
+ int cudbg_get_buff(struct cudbg_init *pdbg_init,
+ 		   struct cudbg_buffer *pdbg_buff, u32 size,
+ 		   struct cudbg_buffer *pin_buff);
 -- 
 2.39.1
 
