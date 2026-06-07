@@ -1,268 +1,305 @@
-Return-Path: <netdev+bounces-296256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Lqt/OPOXJWqyJQIAu9opvQ
-	(envelope-from <netdev+bounces-296256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 18:10:27 +0200
+	id E1YJG9GeJWr2JgIAu9opvQ
+	(envelope-from <netdev+bounces-296257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 18:39:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33132650EE9
-	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 18:10:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66583650FD8
+	for <lists+netdev@lfdr.de>; Sun, 07 Jun 2026 18:39:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmx.de header.s=s31663417 header.b=DrA2cCVQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296256-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296256-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=gmx.de;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Pv2B6EFb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296257-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296257-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFB153007F47
-	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 16:10:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 53A7D3001A7D
+	for <lists+netdev@lfdr.de>; Sun,  7 Jun 2026 16:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66822E736A;
-	Sun,  7 Jun 2026 16:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BC72EBBA4;
+	Sun,  7 Jun 2026 16:39:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBADB284682;
-	Sun,  7 Jun 2026 16:10:22 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780848624; cv=none; b=L6SM9O0xgUAKMSkMSOHS6xQni4SBAdguyKf21CbQPaLUWim9ysycqIcSzqOa8PekrZj/dWWFPAZeDym69N4MU6jsh6Y2YdaLFZmJ8oMChV7JomO0rPKTqdogUevHOlPfV1ryfjtieuME/B+Wu7BuxtPdvrP/fpGY+dcWCiousfw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780848624; c=relaxed/simple;
-	bh=g0Vo+tXEBXKyC94/HxGuD5MiElCQ917r14BJU87XAWE=;
-	h=From:To:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MGyDNFLlkolmLuxMzi8BfxmKKqx1K3s2w91OMXVoeJ1MC0d2aBZ+SZ7DyzYCEJ65vxaCa52NSZU6gPEMPvUzSStTmz8I78yjrrS8YiR3RktB5kh5YDmGVPsXVboOkWPCqNj3IegV1Bxrj/B5TSn8zBtnHfNo2GtJZGSEJ28f/RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=DrA2cCVQ; arc=none smtp.client-ip=212.227.15.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1780848598; x=1781453398;
-	i=markus.stockhausen@gmx.de;
-	bh=s90ND1ZkkdsB+sZqJLNOn1cTofoH5b9g01atXc56HFU=;
-	h=X-UI-Sender-Class:From:To:References:In-Reply-To:Subject:Date:
-	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=DrA2cCVQ1RaYgDEFNLeUPShWZh/btGv5RnlA/2yxQ+t8+xAcrIvf6pK4InvNP2In
-	 T25AGbkQ3pGWDArJxSEQlnqRjOkyTyNLl4O/bFr1ROY+kIxk0cO7d50HxynI+DcxC
-	 LhKo8qUZWl7x72Peo84nfAwq0LGella0Fs8eONqpP5xXLFnE4qwDBLFFk1ubXoHpq
-	 30GcaQG4VfyneVGDKkK3Vi/NvYCg86No9pgPJA7RRY9Z5jOpnk3LwQnK7o9ydjt8w
-	 8wck9uLF+aV+V94tDCjytXOWV1i110u78HX3/kAMNesTDpBC5zyXjcEc/2PdFu01m
-	 iOO97ULEIZYVQGTRPQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N0X8o-1xQGOo13O0-00tmoo; Sun, 07
- Jun 2026 18:09:58 +0200
-From: "Markus Stockhausen" <markus.stockhausen@gmx.de>
-To: "'Krzysztof Kozlowski'" <krzk@kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<netdev@vger.kernel.org>,
-	<chris.packham@alliedtelesis.co.nz>,
-	<daniel@makrotopia.org>,
-	<robh@kernel.org>,
-	<krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>
-References: <20260607125406.2853607-1-markus.stockhausen@gmx.de> <20260607125406.2853607-2-markus.stockhausen@gmx.de> <0bbe9ff3-5d42-496b-b777-8eb657b6e6a2@kernel.org>
-In-Reply-To: <0bbe9ff3-5d42-496b-b777-8eb657b6e6a2@kernel.org>
-Subject: AW: [PATCH net-next 1/5] dt-bindings: net: realtek,rtl9301-mdio: Add RTL931x series
-Date: Sun, 7 Jun 2026 18:09:54 +0200
-Message-ID: <003b01dcf698$16788010$43698030$@gmx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CF2223DE9
+	for <netdev@vger.kernel.org>; Sun,  7 Jun 2026 16:39:37 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780850379; cv=pass; b=kGWVrFka9wTIdpT1Y8cTEA/SgE02C6W1NGLAFU98lazE5wg4Zr9M9iy45g4JPp4F5hbGGhrjkEkmqSnDFHOOwWf7ugXpievj4rdhmg0sNZYwIT4ucekXqGD0inWdbW9XtGndIMe74f8nDIC0MIp0a7ikpcs1Dn4rsl/30RrAQ6Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780850379; c=relaxed/simple;
+	bh=aZfvW5qlm08Z6cAsmRjpaKkg8fk6no1tZyfdpgmnUyw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qCpKeXcY1CfyF+qyyedo5CjmaIzCPOsQXzLxJEWU7CgAMHI6Ig/mrUNLatp5e9VKJCZb7h0IZ74fssVcxb+QeHLiiK+8ubuj4S0xtHXZPrS2VQivRSNjdklBPqFKepJMdOTWHUPevNseJPAkILRnwAdU4P4xmlNGGLhTE1rEnfM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pv2B6EFb; arc=pass smtp.client-ip=209.85.167.171
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4854166e1efso3510483b6e.3
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 09:39:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780850377; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JYutJQzdnO2dQTARFPFR5IFSNcjOGrcQ/hT//1Pr6pRLZu0vO7Ol+BOUSyzf7JCAW8
+         FMcVjdP/FbBmK583ENfy33dn6GuUpzTP2n+aLjpv8tVVpoiD5K3u4Y1k233jHAF7zPyk
+         jgNC4EgqGlOvfUj5EZ+T5z1bSkNVztjFUGa3MTGoWeS1E93j0htWtCVyCzY9QCgH1ryj
+         4Y/C8D0Yzgz0mCkJ4qQg310bS6Zzz3q/56BoiAQqyL1BE0zNAa3c/zu2d+oSpJxm0YBo
+         fxtrUiPhYXD3f+ozpwl+zLK1OwK+YICXf2fKGYqIagsBcmV7a7bTSx/j7STVe6mh82L2
+         9kqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=DicLQFuJxU23McocBCUnupcyFssPDQMMi8zUVhLjO8o=;
+        fh=+QqGPzJbav1WFVYltr6nl+952Q5uZkK6egP168UuvGU=;
+        b=XMIXJSWDcvYTppbYFUiGTyW8QYUEswZpsuoW5iIQ+W9pTtvCQTLc6y0KIUdBHFjYRw
+         R0qAVob+FytNZKtHxg6xuqmIS+gtW0Ye+2vgQ4d/Tg9qkEeRwEC97/T3Xwj4wtWpMVfF
+         Mje80JjsnIGF5VgeG0KWjUzlZN79wZoa4SiTbGCA8RgUWhILusQOW0JQYmH4OyFm3wcT
+         oA9XAPs5I7ZUI2QkXxAfmwOzg/2lfFS/oYhEc2L1kqoHcc5rSACbR9FetdEXoQNCDLo1
+         cMx9ddsVC23qOXdmczkw9w5oRInq1BfWdBGENZ16FdCdOqDdMd+xXJ6kwNL5pOjwYB0r
+         EdJg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780850377; x=1781455177; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DicLQFuJxU23McocBCUnupcyFssPDQMMi8zUVhLjO8o=;
+        b=Pv2B6EFb/ixPQWhVWanqWtQq9iQ775LzTp+qgEz8n7dsWna68/0pvioMckCC70Iga+
+         y6FYK6TP0xZZRzRAwDUh+E9jDZpWlqRALCY960H7uw5PSHG66/gZZew+Q1TgwyDLBi3c
+         IGp4avL9qbDYlZLxMvbrMyWlXDMs9LtzwQYxBgw8RJOVqw862ao+23gf3DCQsBBaWduD
+         bmkV5LOSk68xXGbRuHZPoEXw2Pxoy5JibJpZQrZNpJshbQIMHs+eiEqXIq+7n2BaCzSn
+         sIwvbiGAURvpfpsJuJLJgZWv1hbuqRJa5U/VeqSyaTLCpsf56RCa2HzTaXfnlI9hOz53
+         3MEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780850377; x=1781455177;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DicLQFuJxU23McocBCUnupcyFssPDQMMi8zUVhLjO8o=;
+        b=jXBCbbuTGAtBvb5LM8c5zLvrTM6ARfuoWPprAVwwH3F3vkoYTth1j9877qEvNlO1yO
+         ecg5c7koUdv9bCsQoWNN8d5LiArDuIdo6uqI2OrxtzAnR6xusMYUkplYZKaHTH8tN1F2
+         pSqLXRKPCO7bXXK6a4KqP3nj0LsyJlf2QfFRYHD3XUNvLlz72mVdmz8w6D6owhotFn55
+         lPb+ra+rkaPLZ98nUREv/2NJRRrTJnyaDlQlk1f7p77OVIUObhqnNVTZt1Jz4Vw0CqtE
+         sq85u7wf0LSbAYDn/JnaQ6XJ/Vd9MXenmE0RP/twZCNwQQzPe03WvGFsvzLyXANrrmIo
+         EfBQ==
+X-Gm-Message-State: AOJu0YwOqQYv70sCTx8W2w59vE/wXbWnVvZC/lXzIGNncoiC4M+PMmim
+	7/X3U5esrQHbliP/o8PzkCEAWpxa6gMjHe+6dAsgl5+QjMlU0ByNKpTWGE6NOXcEFI6YJ73jAr8
+	gR1FdeFcl/l4bSfLlyz4mWMnVJZjtpvY=
+X-Gm-Gg: Acq92OEmsrYF7vXw1asIBEscPyJ+ljMepOtUDWzwV3yV6074a9BbTkyj+0JpsYxe90D
+	1v/RtKaOdmN3HW+CYEptavSeI7D85sF7lBuGcEGny/hufZN/TtenJi3ewm33K6HBKIoSyno9XfL
+	4dXnva8UOUuUYeqaY8q3T1soGjkkwr5NjnKspwv+9nTPrI+7AfF6mBlzVvKs9VMcp89NVVPUnla
+	v8lC0nv1yVFpZzwTAIPcQxy1bQodHFKisFXS3UCIpn0D64QLscCW3sBRJtuPDzyi+o5X5jwmuRC
+	zc1uDQStYHDe/l8lK2o=
+X-Received: by 2002:a05:6808:2388:b0:469:fc59:b128 with SMTP id
+ 5614622812f47-4868def1f81mr6761464b6e.25.1780850377000; Sun, 07 Jun 2026
+ 09:39:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+References: <CAN2cbVe79oj0O9==m4+4x3v+O+qzRagA=2=wkrp9i9=CqYvyZA@mail.gmail.com>
+ <8978c158-b005-4b53-99d7-b475d9c4c665@mojatatu.com> <CAN2cbVenex+3wB0o+rvxcFrQOTjAL3W_WQ1sh7QZ_AKewgRVVQ@mail.gmail.com>
+ <CA+NMeC-cpoV8X44wTXm=a+Xkpx0Ka0uydG1fUNqM_0vFEh2GTA@mail.gmail.com>
+In-Reply-To: <CA+NMeC-cpoV8X44wTXm=a+Xkpx0Ka0uydG1fUNqM_0vFEh2GTA@mail.gmail.com>
+From: Anirudh Gupta <anirudhrudr@gmail.com>
+Date: Sun, 7 Jun 2026 22:09:26 +0530
+X-Gm-Features: AVVi8CezqMiC2SKz1hdpx6MbNvtZqEZ4vku4MaHOnc8cDYV_8yuISEOQnQttgr4
+Message-ID: <CAN2cbVfu3OQ31eejnPASukW_BMVqucUJcXev7KzbCEgdv5QH6w@mail.gmail.com>
+Subject: Re: [BUG] net/sched: HFSC + fq_codel stall on 6.6.116
+ (qdisc_tree_reduce_backlog / qlen_notify)
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"jhs@mojatatu.com" <jhs@mojatatu.com>, Anirudh Gupta <Anirudh.gupta@sophos.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: de
-Thread-Index: AQIUbFKmgVOGcbhv3p98ab92Sqq5PQIsQ4yOAlsnLGC1oBvGoA==
-X-Provags-ID: V03:K1:t+na+Z6kyu9uh8SBCuSJvsQaRRFinCpRqkJ+LpJvt9xEF40u1OY
- 62pX7zyFiK5JpKoqfjkzM4UWfcinF4AkrIZBNp2uveZHvvetqYX+QcmfnVy8ZB1T/LyNjAE
- P8rysIT4mDB2rITSM5avJmjGbWc8CkvUY4a0IM2SmpL2+HlExAi/O8ZKdxDVgZttenb0le/
- U8jxc3WjGbQR0JUvi0LHw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:KhrXKFPwc44=;lqrzOri+yjV1GKyAz/ZPhjqI5jK
- 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
- asz8bmm/nzqE8Zd2PRuvQxvbW3yvaT/pI5DoRnP
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	URL_NUMERIC_IP(1.50)[10.179.64.152];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:krzk@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:devicetree@vger.kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:victor@mojatatu.com,m:netdev@vger.kernel.org,m:xiyou.wangcong@gmail.com,m:jhs@mojatatu.com,m:Anirudh.gupta@sophos.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-296257-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmx.de];
-	FREEMAIL_TO(0.00)[kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296256-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmx.de:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[anirudhrudr@gmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[anirudhrudr@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,mojatatu.com,sophos.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,gmx.de:mid,gmx.de:dkim,gmx.de:from_mime,gmx.de:email]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,apply_tc_tree.sh:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 33132650EE9
+X-Rspamd-Queue-Id: 66583650FD8
 
-Hi Krzysztof,
+Hi Victor,
 
-> Von: Krzysztof Kozlowski <krzk@kernel.org>=20
-> Gesendet: Sonntag, 7. Juni 2026 15:11
-> Betreff: Re: [PATCH net-next 1/5] dt-bindings: net: =
-realtek,rtl9301-mdio: Add RTL931x series
->=20
-> > On 07/06/2026 14:54, Markus Stockhausen wrote:
-> > Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
-> > ---
-> >  .../devicetree/bindings/net/realtek,rtl9301-mdio.yaml       | 6 =
-++++++
-> >  1 file changed, 6 insertions(+)
-> >=20
-> > diff --git =
-a/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml =
-b/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
-> > index 02e4e33e9969..494c92601e09 100644
-> > --- =
-a/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
-> > +++ =
-b/Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
-> > @@ -19,6 +19,12 @@ properties:
-> >                - realtek,rtl9303-mdio
-> >            - const: realtek,rtl9301-mdio
-> >        - const: realtek,rtl9301-mdio
-> > +      - items:
-> > +          - enum:
-> > +              - realtek,rtl9312-mdio
-> > +              - realtek,rtl9313-mdio
-> > +          - const: realtek,rtl9311-mdio
-> > +      - const: realtek,rtl9311-mdio
+The new patch seems to be working fine. I could not reproduce the
+issue with this new patch.
+
+------
+Just for reference, I'm using following setup for reproducing -
+
+Setup topology -
+[Client VM] (eth1 - 192.168.168.1) ---------------------- (enX2 -
+192.168.168.2) [ DUT VM ] (enX0) ---------------------- (server)
+
+Environment of Client VM -
+-----------
+kabir@KABIR-CL-1:~$ hostnamectl
+   Static hostname: KABIR-CL-1
+         Icon name: computer-vm
+           Chassis: vm
+        Machine ID: 9cf567e712893204a35b60a064423b22
+           Boot ID: 35ea99b0bfb74da792ef87e62ab30d90
+    Virtualization: xen
+  Operating System: Ubuntu 16.04.7 LTS
+            Kernel: Linux 4.4.0-210-generic
+      Architecture: x86-64
+kabir@KABIR-CL-1:~$ ip route get 10.179.64.152
+10.179.64.152 via 192.168.168.2 dev eth1  src 192.168.168.1
+    cache
+kabir@KABIR-CL-1:~$
+kabir@KABIR-CL-1:~$ #using following simple loop to download files via DUT =
+VM
+kabir@KABIR-CL-1:~$ while true; do wget
+http://10.179.64.152/ta-testfiles/http_proxy/random_20M -O /dev/null;
+done
+-----------
+
+Environment of Device Under Test VM -
+-----------
+kabir@KABIR-CL-2:~$ hostnamectl
+ Static hostname: KABIR-CL-2
+       Icon name: computer-vm
+         Chassis: vm =F0=9F=96=B4
+      Machine ID: 8522b84c24c449e09a21d02cdcf0fcb5
+         Boot ID: 5f5199fcc953492281f481de1907f32f
+  Virtualization: xen
+Operating System: Ubuntu 23.10
+          Kernel: Linux 7.1.0-rc6+
+    Architecture: x86-64
+ Hardware Vendor: Xen
+  Hardware Model: HVM domU
+Firmware Version: 4.13
+   Firmware Date: Wed 2019-12-04
+kabir@KABIR-CL-2:~$
+kabir@KABIR-CL-2:~$ ifconfig enX2
+enX2: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.168.2  netmask 255.255.255.0  broadcast 192.168.168.25=
+5
+        ether ba:c1:db:23:fc:d9  txqueuelen 1000  (Ethernet)
+        RX packets 44  bytes 1400 (1.4 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 194  bytes 29478 (29.4 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+kabir@KABIR-CL-2:~$
+kabir@KABIR-CL-2:~$ #### compiled provided patch on top of linux
+stable git master branch kernel
+kabir@KABIR-CL-2:~$ uname -a
+Linux KABIR-CL-2 7.1.0-rc6+ #10 SMP PREEMPT_DYNAMIC Sun Jun  7
+09:20:39 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+kabir@KABIR-CL-2:~$
+-----------
+
+Then to apply tc chains, using already shared apply_tc_tree.sh script,
+to redirect all ingress traffic of enX2 to ifb0 -
+=3D=3D script execution logs =3D=3D
+kabir@KABIR-CL-2:~$ sh -x apply_tc_tree.sh
++ sudo modprobe ifb act_mirred sch_htb sch_hfsc sch_fq_codel cls_u32 sch_in=
+gress
+[sudo] password for kabir:
++ DEV=3DenX2
++ sudo tc qdisc add dev enX2 handle ffff: ingress
++ sudo tc filter add dev enX2 parent ffff: protocol all u32 match u32
+0 0 action mirred egress redirect dev ifb0
++ IFB=3Difb0
++ sudo tc qdisc del dev ifb0 root
++ FQ=3Dlimit 10240 flows 1024 quantum 1514 target 5ms interval 100ms
+memory_limit 32Mb ecn drop_batch 64
++ sudo tc qdisc add dev ifb0 root handle fffe: htb default 1 r2q 10
++ sudo tc class add dev ifb0 parent fffe: classid fffe:1 htb rate
+800mbit ceil 800mbit burst 1600b cburst 1600b
+Warning: sch_htb: quantum of class FFFE0001 is big. Consider r2q change.
++ sudo tc qdisc replace dev ifb0 parent fffe:1 handle fffd: prio bands
+8 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
++ sudo tc qdisc add dev ifb0 parent fffd:1 handle 1: hfsc default fffc
++ sudo tc class add dev ifb0 parent 1: classid 1:1 hfsc sc rate
+800mbit ul rate 800mbit
++ sudo tc class add dev ifb0 parent 1:1 classid 1:9 hfsc rt m1 0bit d
+0us m2 4096kbit ls m1 0bit d 0us m2 1kbit ul m1 0bit d 0us m2 8192kbit
++ sudo tc class add dev ifb0 parent 1:1 classid 1:a hfsc rt m1 0bit d
+0us m2 320kbit ls m1 0bit d 0us m2 1kbit ul m1 0bit d 0us m2 480kbit
++ sudo tc class add dev ifb0 parent 1:1 classid 1:fffc hfsc rt m1 0bit
+d 0us m2 8kbit ls m1 0bit d 0us m2 1kbit ul m1 0bit d 0us m2 800mbit
++ sudo tc qdisc add dev ifb0 parent 1:9 handle 9: fq_codel limit 10240
+flows 1024 quantum 1514 target 5ms interval 100ms memory_limit 32Mb
+ecn drop_batch 64
++ sudo tc qdisc add dev ifb0 parent 1:a handle a: fq_codel limit 10240
+flows 1024 quantum 1514 target 5ms interval 100ms memory_limit 32Mb
+ecn drop_batch 64
++ sudo tc qdisc add dev ifb0 parent 1:fffc handle fffc: fq_codel limit
+10240 flows 1024 quantum 1514 target 5ms interval 100ms memory_limit
+32Mb ecn drop_batch 64
++ sudo tc filter add dev ifb0 parent 1: protocol ip prio 1 u32 match
+u32 0 0 flowid 1:a
+kabir@KABIR-CL-2:~$
+kabir@KABIR-CL-2:~$ sudo ifconfig ifb0 up
+kabir@KABIR-CL-2:~$
+=3D=3D logs end =3D=3D
+Post these steps, will continuously send traffic from client, and
+monitor tc stats in DUT, in case sent bytes are getting stuck and
+backlog keeps on increasing.
+--------
+
+Thanks & Regards,
+Anirudh
+
+On Fri, 5 Jun 2026 at 03:02, Victor Nogueira <victor@mojatatu.com> wrote:
 >
-> That one is part of enum with other single entries - rtl9301.
+> On Thu, Jun 4, 2026 at 11:23=E2=80=AFAM Anirudh Gupta <anirudhrudr@gmail.=
+com> wrote:
+> >
+> > The provided patch did not fix the bug.
+> >
+> > Observing the same issue, where sent bytes get stuck and backlog
+> > continues to increase, while traffic gets stuck.
+>
+> I can't reproduce this locally with the previous patch, but investigating=
+ the
+> code I think I understand what might be happening. Can you try the new
+> attached patch instead? If it still doesn't work, can you provide me with
+> more details on how you are reproducing (environment, traffic
+> generator and etc)?
+>
+> cheers,
+> Victor
 
-This way?
 
-    oneOf:
-      - items:
-          - enum:
-              - realtek,rtl9302b-mdio
-              - realtek,rtl9302c-mdio
-              - realtek,rtl9303-mdio
-          - const: realtek,rtl9301-mdio
-      - items:
-          - enum:
-              - realtek,rtl9312-mdio
-              - realtek,rtl9313-mdio
-          - const: realtek,rtl9311-mdio
-      - enum:
-          - realtek,rtl9301-mdio
-          - realtek,rtl9311-mdio
 
-Thanks in advance.
+--=20
+Regards
 
-Markus
-
+Anirudh Gupta
 
