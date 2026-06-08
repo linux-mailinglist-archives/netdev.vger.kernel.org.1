@@ -1,274 +1,166 @@
-Return-Path: <netdev+bounces-296414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VvKWNax+JmrNXQIAu9opvQ
-	(envelope-from <netdev+bounces-296414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:34:52 +0200
+	id DmMyFrN9Jmp+XQIAu9opvQ
+	(envelope-from <netdev+bounces-296415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:30:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 474B46541A6
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:34:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE34D654104
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:30:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amazon.de header.s=amazoncorp2 header.b=UYN3TFFu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296414-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296414-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amazon.de;
+	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="J ApMGmv";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=fgMDP0Dw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296415-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296415-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 39AB2303CC1B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 08:27:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 42C52301B265
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 08:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CFE3947AE;
-	Mon,  8 Jun 2026 08:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4B23AFD0D;
+	Mon,  8 Jun 2026 08:28:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.1.125])
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6C23AEF47;
-	Mon,  8 Jun 2026 08:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5946D3B14B1
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 08:28:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780907264; cv=none; b=tkRiZP5oB0+QspBHbjCFeqgb99HMnyI/YqkBmrc2QfA0/X+efaesGJAzL7MnvlwhecsW3dzBFXz+LD7cOedQ8UlagZq/Yu+wl9VVBxwQKmjLK3vj4qxs3sqyoexpIxZgRzXO6gk08Qb3NfKKEx8WNtKQzK+QFuiqfUFN+cUjyVw=
+	t=1780907334; cv=none; b=n9a4zDdQ0PqihNE7lZWtUl95afu8x9Iu8NMbWkTMK+dkPh3wcHfW1OB508OzCMmXf1iXTfxrASA/PcKb+5zAyi90RFverseQGRWiOLXHqIpiIW4C5tyJxniD36wTCP0/bSdYQEEbIGwagxeLxY9gKBpiy+7AGopoyflCQ2LJIcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780907264; c=relaxed/simple;
-	bh=xX11XFF7CllnWCKodwtyNSA/wMhgnnvj0XHseFjK5So=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ATVjwlQmzn7SFg0lc74VK09B2Ieua5S4kVqfQtqP2M47lLFPFD+pZFIionJ8SZyBGZIW8EZuEU3+H/G+uUr+LlCID8nFoTeOqeppMw3/BPHwnpdHYVRMWp62/XsX84PTOVh8FGyYmOCcmee2FMjsEb+kMtaaoJlZq+rqWlEpcUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=UYN3TFFu; arc=none smtp.client-ip=44.246.1.125
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1780907260; x=1812443260;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VmUw3UxYK4bXB/9MEWnupktjMpispESwRKJsyd57xfM=;
-  b=UYN3TFFuh5E6mx2aL/rWrJl3/qw0OpJyDqxjNiSTMNjH37w0bYrvJeJD
-   NrZTH2tdJ54J+Z4tJ2oxv0Hye401hA/4/Ad8ki6bUDVxg+wkwDaTfcaWb
-   PjFnOBhvGPR4LpbZQZWylhj8Op6w/gQjkTwZZF3VwaYgaozBnhEd0PMbH
-   Pzx2nLFMuud3DSArYCo9JpIhEOZ7xr5HITlSGoWdq0lLd/oohKsCxLEx9
-   gSOQ2nV42fOng+2cu2WvWAKRhhS74IznyCnMkEHlz3CS4/Lqtw+aSCA1p
-   QZ1WVfWfABZYi2BXKMO2IE9mj50jLm963U0gf/C61bqyZ1wAm/gtxTKBc
-   g==;
-X-CSE-ConnectionGUID: WdyUHsMAT5KzyG3KElEbzg==
-X-CSE-MsgGUID: 2QCoQ4erQxeJCr3JM1h9Ag==
-X-IronPort-AV: E=Sophos;i="6.24,194,1774310400"; 
-   d="scan'208";a="21316100"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 08:27:38 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:16354]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.234:2525] with esmtp (Farcaster)
- id e186b9df-872e-4727-a057-6affbab4a8b6; Mon, 8 Jun 2026 08:27:37 +0000 (UTC)
-X-Farcaster-Flow-ID: e186b9df-872e-4727-a057-6affbab4a8b6
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 8 Jun 2026 08:27:37 +0000
-Received: from dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com
- (172.19.78.185) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Mon, 8 Jun 2026
- 08:27:35 +0000
-From: Simon Liebold <simonlie@amazon.de>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>, Simon Liebold <lieboldsimonpaul@gmail.com>
-CC: Qi Tang <tpluszz77@gmail.com>, Florian Westphal <fw@strlen.de>, "Simon
- Liebold" <simonlie@amazon.de>
-Subject: [PATCH 6.1.y] xfrm: hold dev ref until after transport_finish NF_HOOK
-Date: Mon, 8 Jun 2026 08:27:18 +0000
-Message-ID: <20260608082718.2789134-1-simonlie@amazon.de>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1780907334; c=relaxed/simple;
+	bh=Vcwx4wpDVfdW54CMOACwFWgvF0pKt/OdqNx3hxjiAA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j6k5F+ORIfEOrZHonV1BbWgGSgBAZBugWdk7wV001c+NKfYDP3tgc6s5QBC2lHc8JbXCwb2EDlpaJMqaIgeMaOiLh7o74YFtQUAlZ2sLo1iysMhgEQKSXyrrg8xzJkfvML9iQka5mTWw20/gMFhdyO1AkPHi93eQKwb+byc43Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=JApMGmvK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fgMDP0Dw; arc=none smtp.client-ip=103.168.172.157
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2C6411400087;
+	Mon,  8 Jun 2026 04:28:49 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Mon, 08 Jun 2026 04:28:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1780907329; x=
+	1780993729; bh=/6YUVylcBJYIyGEqLW67qZMbT2/Icy8DuBaWz6AsGn0=; b=J
+	ApMGmvKR48oa6d3kh98b1PClsqFNygmhFrq9/o3gWM0sgOwH8Jb5gDC3uNi9wPN1
+	ER3bx+D3JFuXCnFY+xMg4jlVKJkeKm0ePiCUswzWz/u5rNdTztl6C/r3TSvB7EsJ
+	qm32s6R84nfEqroH8oVvmOrxS0rMhn42NxAWwMe/Jggpb49fuZ0h/CozRfi0oEql
+	/+FWHnm98J4kPIYudufwETKFFtfTcCVQN7pPKw0M5PhLkEhu4EJiMPXzeBjt6tVO
+	0jpH5It4KGK7O13UFn99ducBhTvAV2Z1xiCNL4YOIMvpBz3tb1Hv1U0uhuJU2H6n
+	dvb2NQ/PmOF6VVTW9B3Ow==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1780907329; x=1780993729; bh=/6YUVylcBJYIyGEqLW67qZMbT2/Icy8DuBa
+	Wz6AsGn0=; b=fgMDP0DwWvTTQvyZoU9ZKL7YsmJA5049v4uCeQTwxpeFGoMPlhR
+	+ekSpYBORKuJ5xIgvYkt8FZ97GDT88o1uwwd3F6Uu1Bz4RbgUP9s+1DI3i88EaFv
+	yQ1MfeAw5/7Ao0kqbW1VK+m3Dd8dzY7V81o6CfQUm43v02GLDI2pulCeEIzLv8Ls
+	J7CSEBWASlhhh0QKkXMhJ0ai5jHqDSI9Dr8olHJllOhcuRBpsiJAMucpRwu61Lq8
+	rd5YYyOYzGMJXALkIKTgmKXoztp5N+0T/hIeZsanyPvHXfnviMxJ7FGIjlEOkZ6W
+	a5M1vf6bc550YoUlG/CYsPxwbmKqxJGBUwQ==
+X-ME-Sender: <xms:QH0mal6qvnbVLSQcFyzuNk1ivlvZgxBD9plFsuSu7BQwdxH7Jf837g>
+    <xme:QH0makc7laETKDzoXItS3fgpdiS53JLdqIF7QVcYgiVARQhrXZEnnYPcrjQm0tZco
+    PQXsSLXDhNb2dL78lxmSQ4N246SYVhRJEVfjbJdu_a6EWXo2nK0y5g>
+X-ME-Received: <xmr:QH0marudyl2kZ9onPh4uDYwmYFo3h07cuTS6p84Hf4zNDUlaZDqeRtjiIHN7cWPUvOVrBaxpgQh71XM0HcyvgDw>
+X-ME-Proxy-Cause: dmFkZTF5U5CZAuVuEjZLGgeINGSgcZQvwuZrthws7l1JZXZgYLWPF96nfLTV1NNhYnqybC
+    dPOl/K5egFQgHbgKWGYwftJIIPeLIQPz/MCK5mLOG2bqHHS8gaW284kpfDq/e/v9pzj2nv
+    URRCt9Wo0aK2WIKjr7j4UsPb091XzSNGPj7mu+5I1c3iIWsCq/6tODS3VS5cduYWoydDrK
+    N782N1xY8dY3CmxkFqGsp7mmaYT86zpxPNCyT99qgQ5Ti7FechW5Xwvv4QAyC/ggcF6Bc6
+    ygrsm4Aiat833ztMdNRBphDloAt7usBvvUn+qWplaxK4GoPRak2AeN21OVAQ/WwC7YghTS
+    WKx6kZjHdELfpODAD+Pj6tfyFX3i36MFCwRX4FQRydzV7YWuQV3mLpJg+oZFg0ZDUZmRtL
+    EWAIec1onbPT0GsUlnQmoAtiLqHaZ7hMvASKPyveJ7iGc0pN2LgFytVPy8KjXHwqicM+oH
+    5oTNARazcT2xoYH0emFJKE2YMKfwx65js59B6pmkHjrSZJE/RGfeeDR4Z2wVUxeL3BF0zJ
+    N/GaI4F+oyjciHBQi1IoV5IJnSJ/srgRCSTqUnOLHElv/WvyefYLFawKJ8x3qxypkDZj9u
+    XEm1r/Hp0si//PweYaA97JTAEo9DITfgKOnFzK0tJZVWKjgWNhVqcZ0IkQMA
+X-ME-Proxy: <xmx:QH0makn8Xba0EzgmiVDiHOCRajNmZqrvzHTSrFYPJlICfyTkD97poA>
+    <xmx:QH0mauQOk8ELDJJl70zegWB4LvCcC9sj_bfyqIaJ8LZuhvNNTy-7Hg>
+    <xmx:QH0maqKtmE_eug6dH2CiJQzE8WG_5Xvfb1W3of_xkwmFoqQe4OgkLA>
+    <xmx:QH0maoGbSRo--QFb5Kb_rWYceA2FJYsLolZSkKoeZbyutx7tgkLxzA>
+    <xmx:QX0maoNj5O_d3QnyVki3WS4z2ob1SoCaKB0WJ-3BWCRjSyseAWAOA49X>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Jun 2026 04:28:47 -0400 (EDT)
+Date: Mon, 8 Jun 2026 10:28:45 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Geliang Tang <geliang@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Atul Gupta <atul.gupta@chelsio.com>,
+	Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, Gang Yan <yangang@kylinos.cn>
+Subject: Re: [PATCH net] tls: restore sk_prot before calling original
+ destructor
+Message-ID: <aiZ9PZxNyp9jik2v@krikkit>
+References: <158c0562b4969c61574633e5d22c962d50e5bc31.1780663476.git.tanggeliang@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <158c0562b4969c61574633e5d22c962d50e5bc31.1780663476.git.tanggeliang@kylinos.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amazon.de:s=amazoncorp2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:tpluszz77@gmail.com,m:fw@strlen.de,m:simonlie@amazon.de,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296414-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[amazon.de:+];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_RECIPIENTS(0.00)[m:geliang@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:atul.gupta@chelsio.com,m:tanggeliang@kylinos.cn,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:yangang@kylinos.cn,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-296415-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,strlen.de,amazon.de];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 474B46541A6
+X-Rspamd-Queue-Id: BE34D654104
 
-From: Qi Tang <tpluszz77@gmail.com>
+2026-06-05, 20:57:07 +0800, Geliang Tang wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+> 
+> When a TLS socket is offloaded to a TOE device, tls_toe_bypass() replaces
 
-[ Upstream commit 1c428b03840094410c5fb6a5db30640486bbbfcb ]
+Or maybe it's time to simply drop tls_toe? There's only one driver
+that uses it (chelsio/chtls), and it hasn't been touched by someone at
+chelsio since 2021 (2355a6773a2c [1]). Since then, there have been a
+few fixes by people who I doubt are actually using this (Eric, Dan
+Carpenter), everything else is treewide/refactoring patches.
 
-After async crypto completes, xfrm_input_resume() calls dev_put()
-immediately on re-entry before the skb reaches transport_finish.
-The skb->dev pointer is then used inside NF_HOOK and its okfn,
-which can race with device teardown.
+[1] the author of this commit, and current maintainer for
+drivers/crypto/chelsio and drivers/net/ethernet/chelsio/inline_crypto,
+hasn't been around since 2022
 
-Remove the dev_put from the async resumption entry and instead
-drop the reference after the NF_HOOK call in transport_finish,
-using a saved device pointer since NF_HOOK may consume the skb.
-This covers NF_DROP, NF_QUEUE and NF_STOLEN paths that skip
-the okfn.
-
-For non-transport exits (decaps, gro, drop) and secondary
-async return points, release the reference inline when
-async is set.
-
-Suggested-by: Florian Westphal <fw@strlen.de>
-Fixes: acf568ee859f ("xfrm: Reinject transport-mode packets through tasklet")
-Cc: stable@vger.kernel.org
-Signed-off-by: Qi Tang <tpluszz77@gmail.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-[ net/xfrm/xfrm_input.c: dev_hold/dev_put are unconditional here rather
-than inside !crypto_done as in mainline, and the dev_put in the
-encap_type == -1 async-resumption block does not exist; adapted by
-gating dev_put at resume: with if (!async), adding if (async) dev_put
-at -EINPROGRESS return, gro_cells_receive paths, and drop label. ]
-Signed-off-by: Simon Liebold <simonlie@amazon.de>
----
- net/ipv4/xfrm4_input.c |  5 ++++-
- net/ipv6/xfrm6_input.c |  5 ++++-
- net/xfrm/xfrm_input.c  | 14 ++++++++++++--
- 3 files changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
-index f6e90ba50b63..d05e8ff9c37b 100644
---- a/net/ipv4/xfrm4_input.c
-+++ b/net/ipv4/xfrm4_input.c
-@@ -48,6 +48,7 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
- {
- 	struct xfrm_offload *xo = xfrm_offload(skb);
- 	struct iphdr *iph = ip_hdr(skb);
-+	struct net_device *dev = skb->dev;
- 
- 	iph->protocol = XFRM_MODE_SKB_CB(skb)->protocol;
- 
-@@ -71,8 +72,10 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
- 	}
- 
- 	NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING,
--		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
-+		dev_net(dev), NULL, skb, dev, NULL,
- 		xfrm4_rcv_encap_finish);
-+	if (async)
-+		dev_put(dev);
- 	return 0;
- }
- 
-diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
-index 8432b50d9ce4..b2e328de620b 100644
---- a/net/ipv6/xfrm6_input.c
-+++ b/net/ipv6/xfrm6_input.c
-@@ -41,6 +41,7 @@ static int xfrm6_transport_finish2(struct net *net, struct sock *sk,
- int xfrm6_transport_finish(struct sk_buff *skb, int async)
- {
- 	struct xfrm_offload *xo = xfrm_offload(skb);
-+	struct net_device *dev = skb->dev;
- 	int nhlen = skb->data - skb_network_header(skb);
- 
- 	skb_network_header(skb)[IP6CB(skb)->nhoff] =
-@@ -66,8 +67,10 @@ int xfrm6_transport_finish(struct sk_buff *skb, int async)
- 	}
- 
- 	NF_HOOK(NFPROTO_IPV6, NF_INET_PRE_ROUTING,
--		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
-+		dev_net(dev), NULL, skb, dev, NULL,
- 		xfrm6_transport_finish2);
-+	if (async)
-+		dev_put(dev);
- 	return 0;
- }
- 
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index 4bba890ff3bc..588c671e661b 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -636,10 +636,14 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 		else
- 			nexthdr = x->type->input(x, skb);
- 
--		if (nexthdr == -EINPROGRESS)
-+		if (nexthdr == -EINPROGRESS) {
-+			if (async)
-+				dev_put(skb->dev);
- 			return 0;
-+		}
- resume:
--		dev_put(skb->dev);
-+		if (!async)
-+			dev_put(skb->dev);
- 
- 		spin_lock(&x->lock);
- 		if (nexthdr < 0) {
-@@ -706,6 +710,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 			sp->olen = 0;
- 		if (skb_valid_dst(skb))
- 			skb_dst_drop(skb);
-+		if (async)
-+			dev_put(skb->dev);
- 		gro_cells_receive(&gro_cells, skb);
- 		return 0;
- 	} else {
-@@ -725,6 +731,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 				sp->olen = 0;
- 			if (skb_valid_dst(skb))
- 				skb_dst_drop(skb);
-+			if (async)
-+				dev_put(skb->dev);
- 			gro_cells_receive(&gro_cells, skb);
- 			return err;
- 		}
-@@ -735,6 +743,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- drop_unlock:
- 	spin_unlock(&x->lock);
- drop:
-+	if (async)
-+		dev_put(skb->dev);
- 	xfrm_rcv_cb(skb, family, x && x->type ? x->type->proto : nexthdr, -1);
- 	kfree_skb(skb);
- 	return 0;
-
-base-commit: dcbcab9d707928cd1679eba21ef0697fbb73b88a
 -- 
-2.50.1
-
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
+Sabrina
 
